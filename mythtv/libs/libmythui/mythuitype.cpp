@@ -82,6 +82,29 @@ QValueVector<MythUIType *> *MythUIType::GetAllChildren(void)
     return &m_ChildrenList;
 }
 
+MythUIType *MythUIType::GetChildAt(const QPoint &p)
+{
+    if (GetArea().contains(p)) 
+    {
+        /* assumes no selectible ui type will contain another
+         * selectible ui type. */
+        if (CanTakeFocus() && IsVisible()) 
+            return this;
+
+        /* check all children */
+        QValueVector<MythUIType*>::iterator it;
+        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        {
+            MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
+            if (child != NULL)
+            {
+                return child;
+            }
+        }
+    }
+    return NULL;
+}
+
 bool MythUIType::NeedsRedraw(void)
 {
     return m_NeedsRedraw;

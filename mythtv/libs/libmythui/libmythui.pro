@@ -20,12 +20,12 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
 HEADERS += mythpainter_ogl.h mythpainter_qt.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
-HEADERS += mythuitext.h mythuistatetype.h
+HEADERS += mythuitext.h mythuistatetype.h mythgesture.h
 HEADERS += mythuibutton.h mythlistbutton.h themedmenu.h dialogbox.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp
 SOURCES += mythpainter_ogl.cpp mythpainter_qt.cpp
-SOURCES += mythscreenstack.cpp mythscreentype.cpp 
+SOURCES += mythscreenstack.cpp mythscreentype.cpp mythgesture.cpp
 SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp
 SOURCES += mythuistatetype.cpp mythlistbutton.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp themedmenu.cpp dialogbox.cpp

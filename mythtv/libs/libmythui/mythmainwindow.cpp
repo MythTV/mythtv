@@ -26,8 +26,11 @@
 #include "mythpainter_qt.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mythgesture.h"
 
 //#include "screensaver.h"
+
+#define GESTURE_TIMEOUT 1000
 
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
@@ -128,6 +131,9 @@ class MythMainWindowPrivate
     bool AllowInput;
 
     QRegion repaintRegion;
+
+    MythGesture gesture;
+    QTimer *gestureTimer;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -197,6 +203,8 @@ MythMainWindow::MythMainWindow()
     d->escapekey = Key_Escape;
     d->mainStack = NULL;
 
+    installEventFilter(this);
+
 #ifdef USE_LIRC
     pthread_t lirc_tid;
     pthread_attr_t attr;
@@ -237,6 +245,9 @@ MythMainWindow::MythMainWindow()
     RegisterKey("Global", "9", "9", "9");
 
     setAutoBufferSwap(false);
+
+    d->gestureTimer = new QTimer(this);
+    connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
 
     d->drawTimer = new QTimer(this);
     connect(d->drawTimer, SIGNAL(timeout()), this, SLOT(drawTimeout()));
@@ -724,25 +735,129 @@ void MythMainWindow::AllowInput(bool allow)
     d->AllowInput = allow;
 }
 
-void MythMainWindow::keyPressEvent(QKeyEvent *e)
+void MythMainWindow::mouseTimeout(void)
 {
-    if (!d->AllowInput)
-        return;
+    MythGestureEvent *e;
 
-    QValueVector<MythScreenStack *>::Iterator it;
-    for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+    /* complete the stroke if its our first timeout */
+    if (d->gesture.recording())
     {
-         MythScreenType *top = (*it)->GetTopScreen();
-         if (top)
-         {
-             if (top->keyPressEvent(e))
-                 break;
-         }
+        d->gesture.stop();
     }
+
+    /* get the last gesture */
+    e = d->gesture.gesture();
+
+    if (e->gesture() < MythGestureEvent::Click)
+        QApplication::postEvent(this, e);
 }
 
-void MythMainWindow::customEvent(QCustomEvent* /* ce */)
+bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 {
+    MythGestureEvent *ge;
+
+    /* dont let anything through if input is disallowed. */
+    if (!d->AllowInput)
+        return true;
+
+    switch (e->type())
+    {
+        case QEvent::KeyPress:
+        {
+            QValueVector<MythScreenStack *>::Iterator it;
+            for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+            {
+                MythScreenType *top = (*it)->GetTopScreen();
+                if (top)
+                {
+                    if (top->keyPressEvent(dynamic_cast<QKeyEvent*>(e)))
+                        return true;
+                }
+            }
+            break;
+        }
+        case QEvent::MouseButtonPress:
+        {
+            if (!d->gesture.recording())
+            {
+                d->gesture.start();
+                d->gesture.record(dynamic_cast<QMouseEvent*>(e)->pos());
+
+                /* start a single shot timer */
+                d->gestureTimer->start(GESTURE_TIMEOUT);
+
+                return true;
+            }
+            break;
+        }
+        case QEvent::MouseButtonRelease:
+        {
+            if (d->gestureTimer->isActive())
+                d->gestureTimer->stop();
+
+            if (d->gesture.recording())
+            {
+                d->gesture.stop();
+                ge = d->gesture.gesture();
+
+                /* handle clicks separately */
+                if (ge->gesture() == MythGestureEvent::Click)
+                {            
+                    MythUIType *clicked;
+                    QValueVector<MythScreenStack *>::iterator it;
+                    QPoint p = dynamic_cast<QMouseEvent*>(e)->pos();
+
+                    delete ge;
+
+                    for (it = d->stackList.begin(); it != d->stackList.end(); 
+                         it++)
+                    {
+                        MythScreenType *screen = (*it)->GetTopScreen();
+                        if ((clicked = screen->GetChildAt(p)) != NULL)
+                        {
+                            cout << "UI Type: " << clicked->name() << endl;
+                            break;
+                        }
+                    }
+                }
+                else 
+                    QApplication::postEvent(this, ge);
+
+                return true;
+            }
+            break;
+        }
+        case QEvent::MouseMove:
+        {
+            if (d->gesture.recording())
+            {
+                /* reset the timer */
+                d->gestureTimer->stop();
+                d->gestureTimer->start(GESTURE_TIMEOUT);
+
+                d->gesture.record(dynamic_cast<QMouseEvent*>(e)->pos());
+                return true;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return false;
+}
+
+void MythMainWindow::customEvent(QCustomEvent *ce)
+{
+    if (ce->type() == MythGestureEventType)
+    {
+        MythGestureEvent *ge = dynamic_cast<MythGestureEvent*>(ce);
+        if (ge != NULL)
+        {
+            cout << "Gesture: " << QString(*ge) << endl;
+        }
+    }
+
 #if 0
     if (ce->type() == kExitToMainMenuEventType && d->exitingtomain)
     {

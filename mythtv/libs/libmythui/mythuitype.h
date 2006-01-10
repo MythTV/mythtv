@@ -24,6 +24,7 @@ class MythUIType : public QObject
 
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const char *name, const char *inherits = 0);
+    MythUIType *GetChildAt(const QPoint &p);
     QValueVector<MythUIType *> *GetAllChildren(void);
 
     // Check set dirty status

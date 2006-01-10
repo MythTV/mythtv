@@ -85,11 +85,12 @@ class MythMainWindow : public QGLWidget
  
   public slots:
     void drawTimeout();
+    void mouseTimeout();
 
   protected:
     MythMainWindow();
 
-    void keyPressEvent(QKeyEvent *e);
+    bool eventFilter(QObject *o, QEvent *e);
     void customEvent(QCustomEvent *ce);
     void closeEvent(QCloseEvent *e);
     void paintEvent(QPaintEvent *e);
