@@ -189,8 +189,8 @@ void SingleView::paintEvent(QPaintEvent *)
 
             if (m_pixmap->width() <= screenwidth &&
                 m_pixmap->height() <= screenheight)
-                bitBlt(&pix, screenwidth/2-m_pixmap->width()/2,
-                       screenheight/2-m_pixmap->height()/2,
+                bitBlt(&pix, (screenwidth-m_pixmap->width())/2,
+                       (screenheight-m_pixmap->height())/2,
                        m_pixmap,0,0,-1,-1,Qt::CopyROP);
             else
                 bitBlt(&pix, 0, 0, m_pixmap, m_sx, m_sy,
