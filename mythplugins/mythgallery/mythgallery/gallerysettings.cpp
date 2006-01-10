@@ -36,7 +36,17 @@ static HostLineEdit *MythGalleryMoviePlayerCmd()
     gc->setLabel(QObject::tr("Command run to display movie files"));
     gc->setValue("mplayer -fs %s");
     gc->setHelpText(QObject::tr("This command is executed whenever a movie "
-				            "file is selected"));
+                    "file is selected"));
+    return gc;
+};
+
+static HostSpinBox *MythGalleryOverlayCaption()
+{
+    HostSpinBox *gc = new HostSpinBox("GalleryOverlayCaption", 0, 600, 1);
+    gc->setLabel(QObject::tr("Overlay caption"));
+    gc->setValue(0);
+    gc->setHelpText(QObject::tr("This is the number of seconds to show a caption "
+                    "on top of a full size picture."));
     return gc;
 };
 
@@ -170,7 +180,7 @@ public:
         addTarget("0", regularConfig);
 
 #else
-        
+        addChild(MythGalleryOverlayCaption());
         addChild(SlideshowTransition());
         addChild(SlideshowBackground());
         

@@ -99,7 +99,9 @@ IconView::IconView(const QString& galleryDir, MythMainWindow* parent,
 
     m_thumbGen = new ThumbGenerator(this, (int)(m_thumbW-10*wmult),
                                     (int)(m_thumbH-10*hmult));
-    
+
+    m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
+
     m_currRow = 0;
     m_currCol = 0;
     m_lastRow = 0;
@@ -171,7 +173,13 @@ void IconView::updateText()
         if (ttype) {
             ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
                                             m_currCol);
-            ttype->SetText(item ? item->name : QString(""));
+
+            if(item->caption == "" && m_showcaption)
+                item->caption = GalleryUtil::getCaption(item->path);
+            if(item->caption == "")
+                item->caption = item->name;
+
+            ttype->SetText(item ? item->caption : QString(""));
         }
         
         container->Draw(&p, 0, 0);

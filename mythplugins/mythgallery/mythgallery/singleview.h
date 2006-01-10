@@ -58,12 +58,17 @@ private:
     bool          m_info;
     QPixmap      *m_infoBgPix;
 
+    int           m_showcaption;
+    QPixmap      *m_captionBgPix;
+    QPixmap      *m_captionbackup;
+    QTimer       *m_ctimer;
+
     int           m_tmout;
     int           m_delay;
     bool          m_effectRunning;
     bool          m_running;
     int           m_slideShow;
-    QTimer       *m_timer;
+    QTimer       *m_sstimer;
     QPixmap      *m_effectPix;
     QPainter     *m_painter;
     
@@ -87,7 +92,7 @@ private:
     void  loadImage();
     void  rotate(int angle);
     void  zoom();
-    void  createInfoBg();
+    QPixmap *createBg(int width, int height);
 
     void  registerEffects();
     EffectMethod getRandomEffect();
@@ -110,7 +115,8 @@ private:
 
 private slots:
 
-     void  slotTimeOut();
+    void  slotSlideTimeOut();
+    void  slotCaptionTimeOut();
 };
 
 #endif /* SINGLEVIEW_H */

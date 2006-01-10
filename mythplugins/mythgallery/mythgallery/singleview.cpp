@@ -87,6 +87,18 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     if (!m_delay)
         m_delay = 2;
 
+    // ----------------------------------------------------------------
+
+    m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
+    if(m_showcaption > m_delay)
+        m_showcaption = m_delay;
+
+    if(m_showcaption)
+    {
+        m_captionBgPix = createBg(screenwidth, 100);
+        m_captionbackup = new QPixmap(screenwidth, 100);
+    }
+
     // --------------------------------------------------------------------
 
     setNoErase();
@@ -117,8 +129,11 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     m_sequence = 0;
     mIntArray = 0;
 
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), SLOT(slotTimeOut()));
+    m_sstimer = new QTimer(this);
+    connect(m_sstimer, SIGNAL(timeout()), SLOT(slotSlideTimeOut()));
+
+    m_ctimer = new QTimer(this);
+    connect(m_ctimer, SIGNAL(timeout()), SLOT(slotCaptionTimeOut()));
 
     // --------------------------------------------------------------------
 
@@ -133,7 +148,7 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     loadImage();
     if (slideShow) {
         m_running = true;
-        m_timer->start(m_tmout, true);
+        m_sstimer->start(m_tmout, true);
         gContext->DisableScreensaver();
     }
 }
@@ -196,6 +211,33 @@ void SingleView::paintEvent(QPaintEvent *)
                 bitBlt(&pix, 0, 0, m_pixmap, m_sx, m_sy,
                        pix.width(), pix.height());
 
+            if(m_showcaption && !m_ctimer->isActive())
+            {
+                ThumbItem* item = m_itemList.at(m_pos);
+                if(item->caption == "")
+                    item->caption = GalleryUtil::getCaption(item->path);
+
+                if(item->caption != "") {
+
+                    // Store actual background to restore later
+                    bitBlt(m_captionbackup, 0, 0, &pix,
+                           0, screenheight - 100, screenwidth, 100);
+
+                    // Blit semi-transparent background into place
+                    bitBlt(&pix, 0, screenheight - 100, m_captionBgPix,
+                           0, 0, screenwidth, 100);
+
+                    // Draw caption
+                    QPainter p(&pix, this);
+                    p.drawText(0, screenheight - 100,
+                               screenwidth, 100,
+                               Qt::AlignCenter, item->caption);
+                    p.end();
+
+                    m_ctimer->start(m_showcaption * 1000, true);
+                }
+            }
+
             if (m_zoom != 1) {
                 QPainter p(&pix, this);
                 p.drawText(screenwidth / 10, screenheight / 10,
@@ -206,7 +248,8 @@ void SingleView::paintEvent(QPaintEvent *)
             if (m_info) {
 
                 if (!m_infoBgPix)
-                    createInfoBg();
+                    m_infoBgPix = createBg(screenwidth-2*screenwidth/10,
+                                           screenheight-2*screenheight/10);
 
                 bitBlt(&pix, screenwidth/10, screenheight/10,
                        m_infoBgPix,0,0,-1,-1,Qt::CopyROP);
@@ -253,7 +296,8 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     bool handled = false;
 
     bool wasRunning = m_running;
-    m_timer->stop();
+    m_sstimer->stop();
+    m_ctimer->stop();
     m_running = false;
     gContext->RestoreScreensaver();
     m_effectRunning = false;
@@ -436,7 +480,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     }
 
     if (m_running) {
-        m_timer->start(m_tmout, true);
+        m_sstimer->start(m_tmout, true);
         gContext->DisableScreensaver();
     }
 
@@ -572,11 +616,9 @@ void SingleView::zoom()
     }
 }
 
-
-void SingleView::createInfoBg()
+QPixmap *SingleView::createBg(int width, int height)
 {
-    QImage img(screenwidth-2*screenwidth/10,
-               screenheight-2*screenheight/10,32);
+    QImage img(width, height, 32);
     img.setAlphaBuffer(true);
 
     for (int y = 0; y < img.height(); y++) 
@@ -584,11 +626,11 @@ void SingleView::createInfoBg()
         for (int x = 0; x < img.width(); x++) 
         {
             uint *p = (uint *)img.scanLine(y) + x;
-            *p = qRgba(0, 0, 0, 120);
+            *p = qRgba(0, 0, 0, 150);
         }
     }
 
-    m_infoBgPix = new QPixmap(img);
+    return new QPixmap(img);
 }
 
 void SingleView::registerEffects()
@@ -1208,8 +1250,7 @@ void SingleView::effectNoise()
 }
 
 
-
-void SingleView::slotTimeOut()
+void SingleView::slotSlideTimeOut()
 {
     bool wasMovie = false, isMovie = false;
     if (!m_effectMethod) {
@@ -1255,10 +1296,17 @@ void SingleView::slotTimeOut()
     }
 
     update();
-    m_timer->start(m_tmout, true);
+    m_sstimer->start(m_tmout, true);
     // If transitioning to/from a movie, no effect is running so 
     // next timeout should trigger proper immage delay.
     if( wasMovie || isMovie ) {
         m_tmout = -1;
     }
 }
+
+void SingleView::slotCaptionTimeOut()
+{
+    m_ctimer->stop();
+    bitBlt(this,0,screenheight - 100,m_captionbackup,0,0,-1,-1,Qt::CopyROP);
+}
+

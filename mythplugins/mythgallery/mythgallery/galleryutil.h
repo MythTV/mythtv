@@ -25,9 +25,11 @@ class GalleryUtil
 {
 
  public:
-	static bool isImage(const char* filePath);
-	static bool isMovie(const char* filePath);
-	static long getNaturalRotation(const char* filePath);
+    static bool isImage(const char* filePath);
+    static bool isMovie(const char* filePath);
+    static long getNaturalRotation(const char* filePath);
+
+    static QString getCaption(const QString &filePath);
 
     static bool loadDirectory(ThumbList& itemList,
                               const QString& dir, bool recurse,

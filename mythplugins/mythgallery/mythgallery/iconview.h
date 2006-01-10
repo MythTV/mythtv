@@ -39,6 +39,7 @@ public:
     ThumbItem() {
         pixmap = 0;
         name   = "";
+        caption= "";
         path   = "";
         isDir  = false;
     }
@@ -54,6 +55,7 @@ public:
 
     QPixmap *pixmap;
     QString  name;
+    QString  caption;
     QString  path;
     bool     isDir;
 };
@@ -138,6 +140,7 @@ private:
     int                 m_thumbH;
 
     ThumbGenerator     *m_thumbGen;
+    int                 m_showcaption;
 
     typedef void (IconView::*Action)();
 };

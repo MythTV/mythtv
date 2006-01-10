@@ -201,3 +201,65 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
 
     return isGallery;
 }
+
+QString GalleryUtil::getCaption(const QString& filePath)
+{
+    QString caption("");
+
+    try
+    {
+#ifdef EXIF_SUPPORT
+        char *exifvalue = new char[1024];
+        ExifData *data = exif_data_new_from_file (filePath);
+        if (data)
+        {
+            for (int i = 0; i < EXIF_IFD_COUNT; i++)
+            {
+                ExifEntry *entry = exif_content_get_entry (data->ifd[i],
+                                                    EXIF_TAG_USER_COMMENT);
+                if (entry)
+                {
+#if NEW_LIB_EXIF
+                    exif_entry_get_value(entry, exifvalue, 1023);
+                    caption = exifvalue;
+#else           
+                    caption = exif_entry_get_value(entry);
+#endif          
+                    // Found one, done
+                    if(!caption.isEmpty())
+                       break;
+                }
+
+                entry = exif_content_get_entry (data->ifd[i],
+                                                EXIF_TAG_IMAGE_DESCRIPTION);
+                if (entry)
+                {
+#if NEW_LIB_EXIF
+                    exif_entry_get_value(entry, exifvalue, 1023);
+                    caption = exifvalue;
+#else           
+                    caption = exif_entry_get_value(entry);
+#endif          
+                    // Found one, done
+                    if(!caption.isEmpty())
+                       break;
+                }
+            }
+            exif_data_free(data);
+        }
+        else
+        {
+           std::cerr << "Could not load exif data from " << filePath << std::endl;
+        }
+        
+        delete [] exifvalue;
+#endif // EXIF_SUPPORT
+    }
+    catch (...)
+    {
+        std::cerr << "GalleryUtil: Failed to extract EXIF headers from "
+        << filePath << std::endl;
+    }
+
+    return caption;
+}
