@@ -24,7 +24,7 @@
 # Some variables we'll use here
     our ($dest, $format, $usage, $underscores);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
-    our ($db_host, $db_user, $db_name, $db_pass, $video_dir);
+    our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
     our ($hostname, $dbh, $sh, $sh2, $q, $q2, $count);
 
 # Default filename format
@@ -45,7 +45,8 @@
                'separator=s'                  => \$separator,
                'replacement=s'                => \$replacement,
                'usage|help|h'                 => \$usage,
-               'underscores'                  => \$underscores
+               'underscores'                  => \$underscores,
+               'verbose'                      => \$verbose
               );
 
 # Print usage
@@ -123,6 +124,12 @@ options:
     Replace whitespace in filenames with underscore characters.
 
     default:  No underscores
+
+--verbose
+
+    Print debug info.
+
+    default:  No info printed to console
 
 --help
 
@@ -215,7 +222,9 @@ EOF
     # Double-check the destination
         $dest ||= "$video_dir/show_names";
     # Alert the user
-        print "Link destination directory:  $dest\n";
+        if (defined($verbose)) {
+            print "Link destination directory:  $dest\n";
+        }
     # Create nonexistent paths
         unless (-e $dest) {
             mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
@@ -356,7 +365,9 @@ EOF
         # Create the link
             symlink "$video_dir/".$info{'basename'}, "$dest/$name"
                 or die "Can't create symlink $dest/$name:  $!\n";
-            print "$dest/$name\n";
+            if (defined($verbose)) {
+                print "$dest/$name\n";
+            }
         }
     # Rename the file
         else {
@@ -379,7 +390,9 @@ EOF
                     $rows = $sh2->execute($info{'basename'}, $info{'chanid'}, $info{'starttime'});
                     die "Couldn't restore original basename in database for ".$info{'basename'}.":  ($q2)\n" unless ($rows == 1);
                 }
-                print $info{'basename'}."\t-> $name\n";
+                if (defined($verbose)) {
+                    print $info{'basename'}."\t-> $name\n";
+                }
             }
         }
     }
