@@ -109,6 +109,7 @@ class Metadata
     int Rating() { return rating; }
     void decRating();
     void incRating();
+    void setRating(int lrating) { rating = lrating; }
 
     double LastPlay();
     QString LastPlayStr() { return lastplay; }

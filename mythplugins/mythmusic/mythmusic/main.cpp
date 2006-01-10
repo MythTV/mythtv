@@ -107,6 +107,7 @@ void UpdateFileInDB(const QString &directory, const QString &filename)
         if (db_meta && disk_meta)
         {
             disk_meta->setID(db_meta->ID());
+            disk_meta->setRating(db_meta->Rating());
             disk_meta->updateDatabase(directory);
         }
 
