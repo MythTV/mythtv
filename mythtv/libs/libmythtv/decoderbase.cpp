@@ -157,7 +157,8 @@ bool DecoderBase::PosMapFromDb(void)
     {
         VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
                 .arg((long int) m_positionMap[m_positionMap.size()-1].index));
-        indexOffset = m_positionMap[0].index;
+        if (!ringBuffer->isDVD())
+            indexOffset = m_positionMap[0].index;
     }
 
     return true;
