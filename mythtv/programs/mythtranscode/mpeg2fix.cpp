@@ -1577,7 +1577,6 @@ int MPEG2fixup::Start()
 
     AVPacket pkt, lastRealvPkt;
 
-
     if (! InitAV(infile.ascii(), format, 0))
     {
         return (TRANSCODE_EXIT_UNKNOWN_ERROR);
@@ -2048,7 +2047,8 @@ int MPEG2fixup::Start()
                 }
                 int64_t deltaPTS = poq.Get(it.key(), &af->first()->pkt);
 
-                if (udiff2x33(nextPTS, deltaPTS) * 300 > expectedDTS)
+                if (udiff2x33(nextPTS, deltaPTS) * 300 > expectedDTS &&
+                    cutState != 1)
                 {
                     //VERBOSE(MPF_PROCESS, QString("Aud not ready: %1 > %2")
                     //        .arg(PtsTime(udiff2x33(nextPTS, deltaPTS)))
