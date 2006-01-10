@@ -145,15 +145,15 @@ class PlaybackBox : public MythDialog
     void doPlayList(void);
     void showViewChanger(void);
 
-    void previewThreadDone(const QString &fn)
-        { SetPreviewGenerator(fn, NULL); }
+    void previewThreadDone(const QString &fn, bool &success)
+        { success = SetPreviewGenerator(fn, NULL); }
     void previewReady(const ProgramInfo *pginfo);
 
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
 
-    void SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
+    bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
     bool IsGeneratingPreview(const QString &fn) const;
 
   private:

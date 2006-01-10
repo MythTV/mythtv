@@ -292,9 +292,6 @@ PlaybackBox::~PlaybackBox(void)
     delete theme;
     delete bgTransBackup;
     
-    if (previewPixmap)
-        delete previewPixmap;
-        
     if (curitem)
         delete curitem;
     if (delitem)
@@ -306,12 +303,18 @@ PlaybackBox::~PlaybackBox(void)
     if (lastProgram)
         delete lastProgram;
 
+    QMutexLocker locker(&previewGeneratorLock);
     QMap<QString, PreviewGenerator*>::iterator it = previewGenerator.begin();
     for (;it != previewGenerator.end(); ++it)
     {
         if (*it)
-            (*it)->disconnect();
+            (*it)->disconnectSafe();
     }
+
+    // free preview pixmap after preview generators
+    // no longer sending us any new previews.
+    if (previewPixmap)
+        delete previewPixmap;
 }
 
 void PlaybackBox::setDefaultView(int defaultView)
@@ -3360,20 +3363,28 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
 /** \fn PlaybackBox::SetPreviewGenerator(const QString&, PreviewGenerator*)
  *  \brief Sets the PreviewGenerator for a specific file.
  */
-void PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
+bool PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
 {
-    QMutexLocker locker(&previewGeneratorLock);
-    if (g)
+    if (!g)
     {
+        if (!previewGeneratorLock.tryLock())
+            return false;
+        previewGenerator.erase(fn);
+    }
+    else
+    {
+        previewGeneratorLock.lock();
+
         previewGenerator[fn] = g;
-        connect(g,    SIGNAL(previewThreadDone(const QString&)),
-                this, SLOT(  previewThreadDone(const QString&)));
+        connect(g,    SIGNAL(previewThreadDone(const QString&,bool&)),
+                this, SLOT(  previewThreadDone(const QString&,bool&)));
         connect(g,    SIGNAL(previewReady(const ProgramInfo*)),
                 this, SLOT(  previewReady(const ProgramInfo*)));
         g->Start();
     }
-    else
-        previewGenerator.erase(fn);
+
+    previewGeneratorLock.unlock();
+    return true;
 }
 
 /** \fn PlaybackBox::IsGeneratingPreview(const QString&) const

@@ -52,7 +52,7 @@
  */
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    bool local_only)
-    : programInfo(*pginfo), localOnly(local_only),
+    : programInfo(*pginfo), localOnly(local_only), isConnected(true),
       createSockets(false), eventSock(NULL), serverSock(NULL)
 {
     if (IsLocal())
@@ -76,9 +76,33 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
 
 PreviewGenerator::~PreviewGenerator()
 {
-    QMutexLocker locker(&previewLock);
     const QString filename = programInfo.pathname + ".png";
-    emit previewThreadDone(filename);
+
+    bool done = false;
+    MythTimer t;
+    t.start();
+    do
+    {
+        previewLock.lock();
+        if (isConnected)
+            emit previewThreadDone(filename, done);
+        else
+            done = true;
+        previewLock.unlock();
+        usleep(5000);
+    }
+    while (!done && t.elapsed() < 500);
+}
+
+/** \fn PreviewGenerator::disconnectSafe(void)
+ *  \brief disconnects signals while holding previewLock, ensuring that
+ *         no one will receive a signal from this class after this call.
+ */
+void PreviewGenerator::disconnectSafe(void)
+{
+    QMutexLocker locker(&previewLock);
+    QObject::disconnect(this, NULL, NULL, NULL);
+    isConnected = false;
 }
 
 /** \fn PreviewGenerator::Start(void)

@@ -31,8 +31,10 @@ class PreviewGenerator : public QObject
                                int &video_width, int &video_height,
                                float &video_aspect);
 
+    void disconnectSafe(void);
+
   signals:
-    void previewThreadDone(const QString&);
+    void previewThreadDone(const QString&, bool&);
     void previewReady(const ProgramInfo*);
 
   protected slots:
@@ -53,6 +55,7 @@ class PreviewGenerator : public QObject
     ProgramInfo        programInfo;
 
     bool               localOnly;
+    bool               isConnected;
     bool               createSockets;
     QSocket           *eventSock;
     QSocketDevice     *serverSock;
