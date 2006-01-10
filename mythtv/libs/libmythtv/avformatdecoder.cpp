@@ -55,6 +55,8 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
+void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+void decode_cc_atsc(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
 static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
 {

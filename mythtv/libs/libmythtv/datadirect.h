@@ -268,7 +268,7 @@ class DataDirectProcessor
 
     void setInputFile(const QString &filename);
 
-    bool DataDirectProcessor::getNextSuggestedTime(void);
+    bool getNextSuggestedTime(void);
 
     QValueList<DataDirectStation> stations;
     QValueList<DataDirectLineup> lineups;
