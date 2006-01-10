@@ -62,7 +62,7 @@ class EncoderLink
     void StopRecording(void);
     void FinishRecording(void);
     void FrontendReady(void);
-    void CancelNextRecording(void);
+    void CancelNextRecording(bool);
     bool WouldConflict(const ProgramInfo *rec);
 
     bool IsReallyRecording(void);

@@ -1035,6 +1035,12 @@ void Scheduler::Reschedule(int recordid) {
     reschedLock.unlock();
 }
 
+void Scheduler::AddRecording(const ProgramInfo &pi)
+{
+    QMutexLocker lockit(reclist_lock);
+    reclist.push_back(new ProgramInfo(pi));
+}
+
 void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;

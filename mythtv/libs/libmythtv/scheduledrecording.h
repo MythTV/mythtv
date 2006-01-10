@@ -91,7 +91,7 @@ public:
     void setPlayGroup(const QString& recgroup);
 
     
-    virtual void save();
+    virtual void save(bool send_reschedule_signal = true);
     virtual void save(QString);
 
     virtual void loadByID(int id);

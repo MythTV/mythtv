@@ -227,12 +227,11 @@ void RemoteEncoder::FillPositionMap(int start, int end,
     }
 }
 
-void RemoteEncoder::CancelNextRecording(void)
+void RemoteEncoder::CancelNextRecording(bool cancel)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CANCEL_NEXT_RECORDING";
-    VERBOSE(VB_IMPORTANT, QString("Sending QUERY_RECORDER %1 - CANCEL_NEXT_RECORDING")
-                          .arg(recordernum));
+    strlist << QString::number((cancel) ? 1 : 0);
                           
     SendReceiveStringList(strlist);
 }

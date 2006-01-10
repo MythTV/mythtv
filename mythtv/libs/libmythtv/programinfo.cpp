@@ -1001,6 +1001,32 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
     }
 }
 
+/** \fn ProgramInfo::ApplyRecordRecID(void)
+ *  \brief Sets recordid to match ScheduledRecording recordid
+ *  \param newrecgroup New recording group.
+ */
+void ProgramInfo::ApplyRecordRecID(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (getRecordID() < 0)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "ProgInfo Error: ApplyRecordRecID(void) needs recordid");
+        return;
+    }
+
+    query.prepare("UPDATE recorded "
+                  "SET recordid = :RECID"
+                  "WHERE chanid = :CHANID AND starttime = :START");
+    query.bindValue(":RECID",  getRecordID());
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START",  recstartts);
+
+    if (!query.exec())
+        MythContext::DBError("ProgramInfo: RecordID update", query);
+}
+
 /** \fn ProgramInfo::ApplyRecordStateChange(RecordingType)
  *  \brief Sets RecordingType of "record", creating "record" if it
  *         does not exist.

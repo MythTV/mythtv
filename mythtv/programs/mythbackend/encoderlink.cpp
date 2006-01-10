@@ -203,7 +203,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
  *  \brief Tells TVRec there is a pending recording "rec" in "secsleft" seconds.
  *  \param rec      Recording to make.
  *  \param secsleft Seconds to wait before starting recording.
- *  \sa StartRecording(const ProgramInfo*), CancelNextRecording()
+ *  \sa StartRecording(const ProgramInfo*), CancelNextRecording(bool)
  */
 void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft)
 {
@@ -568,7 +568,7 @@ void EncoderLink::FrontendReady(void)
         VERBOSE(VB_IMPORTANT, "Should be local only query: FrontendReady");
 }
 
-/** \fn EncoderLink::CancelNextRecording()
+/** \fn EncoderLink::CancelNextRecording(bool)
  *  \brief Tells TVRec to cancel the next recording.
  *         <b>This only works on local recorders.</b>
  *
@@ -577,10 +577,10 @@ void EncoderLink::FrontendReady(void)
  *
  *  \sa RecordPending(const ProgramInfo*,int)
  */
-void EncoderLink::CancelNextRecording(void)
+void EncoderLink::CancelNextRecording(bool cancel)
 {
     if (local)
-        tv->CancelNextRecording();
+        tv->CancelNextRecording(cancel);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: CancelNextRecording");
 }

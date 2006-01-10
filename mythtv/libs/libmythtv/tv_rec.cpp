@@ -120,6 +120,8 @@ TVRec::TVRec(int capturecardnum)
       curRecording(NULL), autoRunJobs(JOB_NONE),
       // Pending recording info
       pendingRecording(NULL),
+      // Pseudo LiveTV recording
+      pseudoLiveTVRecording(NULL),
       // tvchain
       tvchain(NULL),
       // RingBuffer info
@@ -348,6 +350,40 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
     SetFlags(kFlagAskAllowRecording);
 }
 
+/** \fn TVRec::SetPseudoLiveTVRecording(ProgramInfo*)
+ *  \brief Sets the pseudo LiveTV ProgramInfo
+ */
+void TVRec::SetPseudoLiveTVRecording(ProgramInfo *pi)
+{
+    ProgramInfo *old_rec = pseudoLiveTVRecording;
+    pseudoLiveTVRecording = pi;
+    if (old_rec)
+        delete old_rec;
+}
+
+/** \fn TVRec::GetRecordEndTime(const ProgramInfo*) const
+ *  \brief Returns recording end time with proper post-roll
+ */
+QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
+{
+    bool spcat = (pi->category == overRecordCategory);
+    int secs = (spcat) ? overRecordSecCat : overRecordSecNrml;
+    return pi->recendts.addSecs(secs);
+}
+
+/** \fn TVRec::CancelNextRecording(bool)
+ *  \brief Tells TVRec to cancel the upcoming recording.
+ *  \sa RecordPending(const ProgramInfo*,int),
+ *      TV::AskAllowRecording(const QStringList&,int)
+ */
+void TVRec::CancelNextRecording(bool cancel)
+{
+    if (cancel)
+        SetFlags(kFlagCancelNextRecording);
+    else
+        ClearFlags(kFlagCancelNextRecording);
+}
+
 /** \fn TVRec::StartRecording(const ProgramInfo*)
  *  \brief Tells TVRec to Start recording the program "rcinfo"
  *         as soon as possible.
@@ -409,46 +445,12 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     WaitForEventThreadSleep();
 
     // If in post-roll, end recording
-    if (GetState() == kState_RecordingOnly)
+    if (GetState() == kState_RecordingOnly &&
+        !HasFlags(kFlagCancelNextRecording))
     {
         stateChangeLock.unlock();
         StopRecording();
         stateChangeLock.lock();
-    }
-
-    // Request tuner from Live TV instance
-    if (internalState == kState_WatchingLiveTV && 
-        !HasFlags(kFlagCancelNextRecording))
-    {
-        QString message = QString("QUIT_LIVETV %1").arg(cardid);
-        MythEvent me(message);
-        gContext->dispatch(me);
-
-        MythTimer timer;
-        timer.start();
-
-        // Wait at least 10 seconds for response
-        while ((internalState != kState_None) && timer.elapsed() < 10000)
-            WaitForEventThreadSleep(false, max(10000 - timer.elapsed(), 100));
-
-        // Try again
-        if (internalState != kState_None)
-        {
-            gContext->dispatch(me);
-
-            timer.restart();
-            // Wait at least 10 seconds for response
-            while ((internalState != kState_None) && timer.elapsed() < 10000)
-                WaitForEventThreadSleep(
-                    false, max(10000 - timer.elapsed(), 100));
-        }
-
-        // Try harder
-        if (internalState != kState_None)
-        {
-            SetFlags(kFlagExitPlayer);
-            WaitForEventThreadSleep();
-        }
     }
 
     if (internalState == kState_None)
@@ -461,10 +463,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             tvchain = NULL;
         }
 
-        // Add post-roll to new recording end time.
-        bool spcat = (rcinfo->category == overRecordCategory);
-        int secs = (spcat) ? overRecordSecCat : overRecordSecNrml;
-        recordEndTime = rcinfo->recendts.addSecs(secs);
+        recordEndTime = GetRecordEndTime(rcinfo);
 
         // Tell event loop to begin recording.
         curRecording = new ProgramInfo(*rcinfo);
@@ -472,6 +471,23 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         StartedRecording(curRecording);
 
         ChangeState(kState_RecordingOnly);
+
+        retval = rsRecording;
+    }
+    else if (!HasFlags(kFlagCancelNextRecording) &&
+             (GetState() == kState_WatchingLiveTV))
+    {
+        SetPseudoLiveTVRecording(new ProgramInfo(*rcinfo));
+        recordEndTime = GetRecordEndTime(rcinfo);
+
+        // We want the frontend to to change channel for recording
+        // and disable the UI for channel change, PiP, etc.
+
+        QString message = QString("LIVETV_WATCH %1 1").arg(cardid);
+        QStringList prog;
+        rcinfo->ToStringList(prog);
+        MythEvent me(message, prog);
+        gContext->dispatch(me);
 
         retval = rsRecording;
     }
@@ -493,8 +509,6 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         retval = rsTunerBusy;
     }
 
-    ClearFlags(kFlagCancelNextRecording);
-
     WaitForEventThreadSleep();
 
     return retval;
@@ -512,6 +526,7 @@ void TVRec::StopRecording(void)
         ChangeState(RemoveRecording(GetState()));
         // wait for state change to take effect
         WaitForEventThreadSleep();
+        ClearFlags(kFlagCancelNextRecording);
     }
 }
 
@@ -673,6 +688,12 @@ void TVRec::HandleStateChange(void)
     else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
         tuningRequests.enqueue(TuningRequest(kFlagKillRec|kFlagKillRingBuffer));
+        SET_NEXT();
+    }
+    else if (TRANSITION(kState_WatchingLiveTV, kState_RecordingOnly))
+    {
+        SetPseudoLiveTVRecording(NULL);
+
         SET_NEXT();
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
@@ -1135,25 +1156,31 @@ void TVRec::RunTV(void)
 
         // If we have a pending recording and AskAllowRecording is set
         // and the frontend is ready send an ASK_RECORDING query to frontend.
-        if (pendingRecording &&
-            HasFlags(kFlagAskAllowRecording | kFlagFrontendReady))
+        if (pendingRecording && HasFlags(kFlagAskAllowRecording))
         {
             ClearFlags(kFlagAskAllowRecording);
 
-            int timeuntil = QDateTime::currentDateTime()
-                .secsTo(recordPendingStart);
+            CheckForRecGroupChange();
+            if (pseudoLiveTVRecording)
+                SetFlags(kFlagCancelNextRecording);
 
-            QString query = QString("ASK_RECORDING %1 %2")
-                .arg(cardid).arg(timeuntil);
-            QStringList messages;
-            messages << pendingRecording->title
-                     << pendingRecording->chanstr
-                     << pendingRecording->chansign
-                     << pendingRecording->channame;
-            
-            MythEvent me(query, messages);
+            if (GetState() == kState_WatchingLiveTV)
+            {
+                int timeuntil = QDateTime::currentDateTime()
+                    .secsTo(recordPendingStart);
 
-            gContext->dispatch(me);
+                QString query = QString("ASK_RECORDING %1 %2 %3")
+                    .arg(cardid).arg(timeuntil)
+                    .arg(pseudoLiveTVRecording ? 1 : 0);
+                VERBOSE(VB_IMPORTANT, LOC + query);
+                QStringList messages;
+                messages << pendingRecording->title
+                         << pendingRecording->chanstr
+                         << pendingRecording->chansign
+                         << pendingRecording->channame;
+                MythEvent me(query, messages);
+                gContext->dispatch(me);
+            }
         }
 
         // If we are recording a program, check if the recording is
@@ -1169,11 +1196,51 @@ void TVRec::RunTV(void)
         if (curRecording)
             curRecording->UpdateInUseMark();
 
-        if (GetState() == kState_WatchingLiveTV && curRecording && 
-            !pendingRecording)
+        if (GetState() == kState_WatchingLiveTV)
         {
-            if (QDateTime::currentDateTime() >= curRecording->endts) // change to curRecording->recstartts.addSecs(60) for testing
-                SwitchLiveTVRingBuffer();
+            bool enable_livetv_ui = false;
+            if (pseudoLiveTVRecording &&
+                (QDateTime::currentDateTime() > recordEndTime ||
+                 HasFlags(kFlagFinishRecording)))
+            {
+                SetPseudoLiveTVRecording(NULL);
+                enable_livetv_ui = true;
+            }
+            else if (curRecording &&
+                     !pseudoLiveTVRecording && !pendingRecording)
+            {
+//#define TESTING_RING_BUFFER_SWITCHING
+#ifdef TESTING_RING_BUFFER_SWITCHING
+                if ((QDateTime::currentDateTime() >=
+                     curRecording->recstartts.addSecs(60)))
+#else
+                if ((QDateTime::currentDateTime() >= curRecording->endts))
+#endif
+                {
+                    CheckForRecGroupChange();
+                    if (pseudoLiveTVRecording)
+                    {
+                        // If the last recording was flagged for keeping
+                        // in the frontend, then add the recording rule
+                        // so that transcode, commfrag, etc can be run.
+                        recordEndTime = 
+                            GetRecordEndTime(pseudoLiveTVRecording);
+                        NotifySchedulerOfRecording(curRecording);
+                    }
+                    else
+                    {
+                        SwitchLiveTVRingBuffer();
+                        enable_livetv_ui = true;
+                    }
+                }
+            }
+            if (enable_livetv_ui)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + "Enabling Full LiveTV UI.");
+                QString message = QString("LIVETV_WATCH %1 0").arg(cardid);
+                MythEvent me(message);
+                gContext->dispatch(me);
+            }   
         }
 
         // Check for ExitPlayer flag, and if set change to a non-watching
@@ -2459,21 +2526,132 @@ QString TVRec::GetChainID(void)
     return "";
 }
 
-/** \fn TVRec::StopLiveTV()
+/** \fn TVRec::CheckForRecGroupChange(void)
+ *  \brief Check if frontend changed the recording group.
+ *
+ *   This is needed because the frontend may toggle whether something
+ *   should be kept as a recording in the frontend, but this class may
+ *   not find out about it in time unless we check the DB when this
+ *   information is important.
+ */
+void TVRec::CheckForRecGroupChange(void)
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (internalState == kState_None)
+        return; // already stopped
+
+    ProgramInfo *pi = NULL;
+    if (curRecording)
+    {
+        pi = ProgramInfo::GetProgramFromRecorded(
+            curRecording->chanid, curRecording->recstartts);
+    }
+
+    if (pi && pi->recgroup != "LiveTV" && !pseudoLiveTVRecording)
+    {
+        // User wants this recording to continue
+        SetPseudoLiveTVRecording(pi);
+        pi = NULL;
+    }
+    else if (pi->recgroup == "LiveTV" && pseudoLiveTVRecording)
+    {
+        // User wants to abandon scheduled recording
+        SetPseudoLiveTVRecording(NULL);
+    }
+
+    if (pi)
+        delete pi;
+}
+
+/** \fn TVRec::NotifySchedulerOfRecording(ProgramInfo*)
+ *  \brief Tell scheduler about the recording.
+ *
+ *   This is needed if the frontend has marked the LiveTV
+ *   buffer for recording after we exit LiveTV. In this case
+ *   the scheduler needs to know about the recording so it
+ *   can properly take overrecord into account, and to properly
+ *   reschedule other recordings around to avoid this recording.
+ */
+void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
+{
+    if (!channel)
+        return;
+
+    // Notify scheduler of the recording.
+    // + set up recording so it can be resumed
+    rec->rectype   = kSingleRecord;
+    rec->cardid    = cardid;
+    rec->inputid   = channel->GetCurrentInputNum();
+    rec->GetScheduledRecording()->setRecordingType(kSingleRecord);
+
+    // + save rsInactive recstatus to so that a reschedule call
+    //   doesn't start recording this on another card before we
+    //   send the SCHEDULER_ADD_RECORDING message to the scheduler.
+    rec->recstatus = rsInactive;
+    rec->AddHistory(false);
+
+    // + save ScheduledRecording so that we get a recordid
+    //   (don't allow signalChange(), avoiding unneeded reschedule)
+    rec->GetScheduledRecording()->save(false);
+
+    // + save recordid to recorded entry
+    rec->ApplyRecordRecID();
+
+    // + set proper recstatus (saved later)
+    rec->recstatus = rsRecording;
+
+    // + pass proginfo to scheduler (so reschedule knows about recording)
+    QStringList prog;
+    rec->ToStringList(prog);
+    MythEvent me("SCHEDULER_ADD_RECORDING", prog);
+    // + + make sure scheduler gets the event before we reschedule
+    gContext->dispatchNow(me);
+
+    // + save rsRecording recstatus to DB
+    //   (this allows recordings to resume on backend restart)
+    rec->AddHistory(false);
+
+    // + save record rule,
+    //   this time we allow signalChange() to trigger reschedule..
+    rec->GetScheduledRecording()->save(true);
+}
+
+/** \fn TVRec::StopLiveTV(void)
  *  \brief Tells TVRec to stop a "Live TV" recorder.
  *  \sa EncoderLink::StopLiveTV(), RemoteEncoder::StopLiveTV()
  */
 void TVRec::StopLiveTV(void)
 {
-    if (GetState() != kState_None)
-    {
-        QMutexLocker lock(&stateChangeLock);
-        ChangeState(kState_None);
-        // Wait for state change to take effect...
-        WaitForEventThreadSleep();
+    QMutexLocker lock(&stateChangeLock);
+    VERBOSE(VB_RECORD, "StopLiveTV(void) curRec: "<<curRecording
+            <<" pseudoRec: "<<pseudoLiveTVRecording);
 
-        tvchain = NULL;
+    if (internalState == kState_None)
+        return; // already stopped
+
+    bool hadPseudoLiveTVRec = pseudoLiveTVRecording;
+    CheckForRecGroupChange();
+
+    if (!hadPseudoLiveTVRec && pseudoLiveTVRecording)
+        NotifySchedulerOfRecording(curRecording);
+
+    // Figure out next state and if needed recording end time.
+    TVState next_state = kState_None;
+    if (pseudoLiveTVRecording)
+    {
+        recordEndTime = GetRecordEndTime(pseudoLiveTVRecording);
+        next_state = kState_RecordingOnly;
     }
+
+    // Change to the appropriate state
+    ChangeState(next_state);
+
+    // Wait for state change to take effect...
+    WaitForEventThreadSleep();
+
+    // We are done with the tvchain...
+    tvchain = NULL;
 }
 
 /** \fn TVRec::PauseRecorder(void)
@@ -3069,10 +3247,13 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     {
         // We need there to be a ringbuffer for these modes
         bool ok;
+        ProgramInfo *tmp = pseudoLiveTVRecording;
+        pseudoLiveTVRecording = NULL;
         if (!ringBuffer)
             ok = CreateLiveTVRingBuffer();
         else
             ok = SwitchLiveTVRingBuffer(true, false);
+        pseudoLiveTVRecording = tmp;
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 1");
@@ -3450,6 +3631,27 @@ void TVRec::TuningRestartRecorder(void)
     // Some recorders unpause on Reset, others do not...
     recorder->Unpause();
 
+    if (pseudoLiveTVRecording)
+    {
+        ProgramInfo *rcinfo1 = pseudoLiveTVRecording; 
+        QString msg1 = QString("Recording: %1 %2 %3 %4")
+            .arg(rcinfo1->title).arg(rcinfo1->chanid)
+            .arg(rcinfo1->recstartts.toString())
+            .arg(rcinfo1->recendts.toString());
+        ProgramInfo *rcinfo2 = tvchain->GetProgramAt(-1);
+        QString msg2 = QString("Recording: %1 %2 %3 %4")
+            .arg(rcinfo2->title).arg(rcinfo2->chanid)
+            .arg(rcinfo2->recstartts.toString())
+            .arg(rcinfo2->recendts.toString());
+        delete rcinfo2;
+        VERBOSE(VB_RECORD, LOC + "Pseudo LiveTV recording starting." +
+                "\n\t\t\t" + msg1 + "\n\t\t\t" + msg2);
+
+        int autoexpiredef = gContext->GetNumSetting("AutoExpireDefault", 0);
+        curRecording->SetAutoExpire(autoexpiredef);
+        curRecording->ApplyRecordRecGroupChange("Default");
+    }
+
     ClearFlags(kFlagNeedToStartRecorder);
 }
 
@@ -3578,9 +3780,13 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
     }
 
     QString chanids = QString::number(chanid);
-    ProgramInfo *prog = ProgramInfo::GetProgramAtDateTime(chanids, 
-                                                  mythCurrentDateTime(),
-                                                  true);
+
+    ProgramInfo *prog = NULL;
+    if (pseudoLiveTVRecording)
+        prog = new ProgramInfo(*pseudoLiveTVRecording);
+    else
+        prog = ProgramInfo::GetProgramAtDateTime(
+            chanids, mythCurrentDateTime(), true);
 
     if (prog->recstartts == prog->recendts)
     {

@@ -148,6 +148,7 @@ class ProgramInfo
     void StartedRecording(QString prefix, QString ext);
     void FinishedRecording(bool prematurestop);
     void UpdateRecordingEnd(void);
+    void ApplyRecordRecID(void);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
     void ApplyRecordPlayGroupChange(const QString &newrecgroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,

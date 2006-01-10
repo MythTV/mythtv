@@ -640,6 +640,21 @@ void MainServer::customEvent(QCustomEvent *e)
             }
         }
 
+        if (me->Message().left(23) == "SCHEDULER_ADD_RECORDING")
+        {
+            VERBOSE(VB_IMPORTANT, "SCHEDULER_ADD_RECORDING message");
+            ProgramInfo pi;
+            QStringList list = me->ExtraDataList();
+            if (pi.FromStringList(list, 0))
+                m_sched->AddRecording(pi);
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "Bad SCHEDULER_ADD_RECORDING message");
+            }
+
+            return;
+        }
+
         if (me->Message().left(23) == "UPDATE_RECORDING_STATUS")
         {
             if (m_sched)
@@ -2411,8 +2426,9 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "CANCEL_NEXT_RECORDING")
     {
-        VERBOSE(VB_IMPORTANT, "Received: CANCEL_NEXT_RECORDING");
-        enc->CancelNextRecording();
+        QString cancel = slist[2];
+        VERBOSE(VB_IMPORTANT, "Received: CANCEL_NEXT_RECORDING "<<cancel);
+        enc->CancelNextRecording(cancel == "1");
         retlist << "ok";
     }
     else if (command == "SPAWN_LIVETV")
@@ -3587,7 +3603,7 @@ void MainServer::reconnectTimeout(void)
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
-        elink->CancelNextRecording();
+        elink->CancelNextRecording(true);
         ProgramInfo *pinfo = elink->GetRecording();
         pinfo->ToStringList(strlist);
         delete pinfo;

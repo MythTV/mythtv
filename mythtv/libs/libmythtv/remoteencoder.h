@@ -36,7 +36,7 @@ class RemoteEncoder
     void PauseRecorder(void);
     void FinishRecording(void);
     void FrontendReady(void);
-    void CancelNextRecording(void);
+    void CancelNextRecording(bool cancel);
 
     void ToggleInputs(void);
     int ChangeContrast(bool direction);

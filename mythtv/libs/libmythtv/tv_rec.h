@@ -144,10 +144,7 @@ class TVRec : public QObject
     void FinishRecording(void)  { SetFlags(kFlagFinishRecording); }
     /// \brief Tells TVRec that the frontend's TV class is ready for messages.
     void FrontendReady(void)    { SetFlags(kFlagFrontendReady); }
-    /** \brief Tells TVRec to cancel the upcoming recording.
-     *  \sa RecordPending(const ProgramInfo*,int),
-     *      TV::AskAllowRecording(const QStringList&,int) */
-    void CancelNextRecording(void) { SetFlags(kFlagCancelNextRecording); }
+    void CancelNextRecording(bool cancel);
     ProgramInfo *GetRecording(void);
 
     /// \brief Returns true if event loop has not been told to shut down
@@ -234,6 +231,7 @@ class TVRec : public QObject
 
   private:
     void SetRingBuffer(RingBuffer *);
+    void SetPseudoLiveTVRecording(ProgramInfo*);
     void TeardownAll(void);
 
     static bool GetDevices(int cardid,
@@ -290,6 +288,9 @@ class TVRec : public QObject
 
     void StartedRecording(ProgramInfo*);
     void FinishedRecording(ProgramInfo*);
+    QDateTime GetRecordEndTime(const ProgramInfo*) const;
+    void CheckForRecGroupChange(void);
+    void NotifySchedulerOfRecording(ProgramInfo*);
 
     void SetOption(RecordingProfile &profile, const QString &name);
 
@@ -348,6 +349,9 @@ class TVRec : public QObject
     // Pending recording info
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
+
+    // Pseudo LiveTV recording
+    ProgramInfo *pseudoLiveTVRecording;
 
     // LiveTV file chain
     LiveTVChain *tvchain;

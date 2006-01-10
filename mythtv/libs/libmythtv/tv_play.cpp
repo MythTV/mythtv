@@ -246,6 +246,7 @@ TV::TV(void)
       // Program Info for currently playing video
       recorderPlaybackInfo(NULL),
       playbackinfo(NULL), inputFilename(""), playbackLen(0),
+      lastProgram(NULL), jumpToProgram(false),
       // Video Players
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
       // Remote Encoders
@@ -262,6 +263,12 @@ TV::TV(void)
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL), embedWinID(0), embedBounds(0,0,0,0)
 {
+    for (uint i = 0; i < 2; i++)
+    {
+        pseudoLiveTVRec[i]   = NULL;
+        pseudoLiveTVState[i] = kPseudoNormalLiveTV;
+    }
+
     lastLcdUpdate = QDateTime::currentDateTime();
     lastLcdUpdate.addYears(-1); // make last LCD update last year..
     lastSignalMsgTime.start();
@@ -335,11 +342,11 @@ bool TV::Init(bool createWindow)
             float wmult, hmult;
             gContext->GetScreenSettings(xbase, width, wmult,
                                         ybase, height, hmult);
-            if (abs(saved_gui_bounds.x()-xbase < 3) &&
-                abs(saved_gui_bounds.y()-ybase < 3))
+            if ((abs(saved_gui_bounds.x()-xbase) < 3) &&
+                (abs(saved_gui_bounds.y()-ybase) < 3))
             {
-                saved_gui_bounds.setX(xbase);
-                saved_gui_bounds.setY(ybase);
+                saved_gui_bounds = QRect(QPoint(xbase, ybase),
+                                         mainWindow->size());
             }
         }
 
@@ -574,7 +581,8 @@ void TV::FinishRecording(void)
     activerecorder->FinishRecording();
 }
 
-void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
+void TV::AskAllowRecording(const QStringList &messages, int timeuntil,
+                           bool hasrec)
 {
     if (!StateIsLiveTV(GetState()))
        return;
@@ -605,9 +613,10 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
     options += tr("Record and watch while it records");
     options += tr("Let it record and go back to the Main Menu");
     options += tr("Don't let it record, I want to watch TV");
+    int sel = (hasrec) ? 2 : 0;
 
     dialogname = "allowrecordingbox";
-    GetOSD()->NewDialogBox(dialogname, message, options, timeuntil); 
+    GetOSD()->NewDialogBox(dialogname, message, options, timeuntil, sel);
 }
 
 void TV::setLastProgram(ProgramInfo *rcinfo)
@@ -1489,6 +1498,29 @@ void TV::RunTV(void)
             exitPlayer = false;
         }
 
+        for (uint i = InStateChange() ? 2 : 0; i < 2; i++)
+        {
+            if (kPseudoChangeChannel != pseudoLiveTVState[i])
+                continue;
+
+            VERBOSE(VB_PLAYBACK, "REC_PROGRAM -- channel change "<<i);
+            if (activerecorder != recorder)
+                ToggleActiveWindow();
+
+            uint    chanid  = pseudoLiveTVRec[i]->chanid.toUInt();
+            QString channum = pseudoLiveTVRec[i]->chanstr;
+            str_vec_t tmp = prevChan;
+            prevChan.clear();
+            if (i && activenvp == nvp)
+                ToggleActiveWindow();
+            ChangeChannel(chanid, channum);
+            prevChan = tmp;
+            pseudoLiveTVState[i] = kPseudoRecording;
+
+            if (i && pipnvp)
+                TogglePIPView();
+        }
+
         if ((doing_ff_rew || speed_index) && 
             activenvp && activenvp->AtNormalSpeed())
         {
@@ -1848,11 +1880,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else if (dialogname == "allowrecordingbox")
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
-    
-                    if (result == 2)
+
+                    if (result == 1)
+                        recorder->CancelNextRecording(false);
+                    else if (result == 2)
                         StopLiveTV();
                     else if (result == 3)
-                        recorder->CancelNextRecording();
+                        recorder->CancelNextRecording(true);
                 }
                 else if (dialogname == "channel_timed_out")
                 {
@@ -2212,7 +2246,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (StateIsLiveTV(GetState()))
             {
-                ChangeState(kState_None);
                 exitPlayer = true;
                 wantsToQuit = true;
             }
@@ -2292,7 +2325,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
 
-    if (StateIsLiveTV(GetState()))
+    if (StateIsLiveTV(GetState()) || StateIsPlaying(internalState))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -2306,6 +2339,64 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else
                     ToggleOSD(true);
             }
+            else if (action == "TOGGLESLEEP")
+                ToggleSleepTimer();
+            else
+                handled = false;
+        }
+    }
+
+    uint aindx = (activenvp == nvp) ? 0 : 1;
+    if (StateIsLiveTV(GetState()))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "TOGGLERECORD")
+                ToggleRecord();
+            else if (action == "TOGGLEFAV")
+                ToggleChannelFavorite();
+            else if (action == "SELECT")
+                CommitQueuedInput();
+            else if (action == "TOGGLERECCONTROLS")
+                DoToggleRecPictureAttribute();
+            else if (action == "TOGGLEBROWSE" && pseudoLiveTVState[aindx])
+                ShowOSDTreeMenu();
+            else
+                handled = false;
+        }
+
+        if (redisplayBrowseInfo)
+            BrowseStart();
+    }
+
+    if (StateIsLiveTV(GetState()) && !pseudoLiveTVState[aindx])
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "NEXTFAV")
+                ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
+            else if (action == "TOGGLEINPUTS")
+                ToggleInputs();
+            else if (action == "SWITCHCARDS")
+                SwitchCards();
+            else if (action == "GUIDE")
+                LoadMenu();
+            else if (action == "TOGGLEPIPMODE")
+                TogglePIPView();
+            else if (action == "TOGGLEPIPWINDOW")
+                ToggleActiveWindow();
+            else if (action == "SWAPPIP")
+                SwapPIP();
+            else if (action == "TOGGLEBROWSE")
+                BrowseStart();
+            else if (action == "PREVCHAN")
+                PreviousChannel();
             else if (action == "CHANNELUP")
             {
                 if (persistentbrowsemode)
@@ -2320,34 +2411,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else
                     ChangeChannel(CHANNEL_DIRECTION_DOWN);
             }
-            else if (action == "TOGGLERECORD")
-                ToggleRecord();
-            else if (action == "NEXTFAV")
-                ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
-            else if (action == "TOGGLEFAV")
-                ToggleChannelFavorite();
-            else if (action == "TOGGLEINPUTS")
-                ToggleInputs();
-            else if (action == "SWITCHCARDS")
-                SwitchCards();
-            else if (action == "SELECT")
-                CommitQueuedInput();
-            else if (action == "GUIDE")
-                LoadMenu();
-            else if (action == "TOGGLEPIPMODE")
-                TogglePIPView();
-            else if (action == "TOGGLEPIPWINDOW")
-                ToggleActiveWindow();
-            else if (action == "SWAPPIP")
-                SwapPIP();
-            else if (action == "TOGGLERECCONTROLS")
-                DoToggleRecPictureAttribute();
-            else if (action == "TOGGLEBROWSE")
-                BrowseStart();
-            else if (action == "PREVCHAN")
-                PreviousChannel();
-            else if (action == "TOGGLESLEEP")
-                ToggleSleepTimer();
             else
                 handled = false;
         }
@@ -2362,14 +2425,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
 
-            if (action == "INFO")
-            {
-                if (HasQueuedInput())
-                    DoArbSeek(ARBSEEK_SET);
-                else
-                    ToggleOSD(true);
-            }
-            else if (action == "SELECT")
+            if (action == "SELECT")
             {
                 if (!was_doing_ff_rew)
                 {
@@ -2422,8 +2478,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     DoSeek(jumptime * 60, tr("Jump Ahead"));
                 }
             }
-            else if (action == "TOGGLESLEEP")
-                ToggleSleepTimer();
             else
                 handled = false;
         }
@@ -2485,6 +2539,8 @@ void TV::TogglePIPView(void)
             else
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP player failed to start");
+                delete pipnvp;
+                pipnvp = NULL;
                 TeardownPipPlayer();
             }
         }
@@ -2513,6 +2569,8 @@ void TV::TogglePIPView(void)
         piprecorder->StopLiveTV();
 
         TeardownPipPlayer();
+
+        SetPseudoLiveTV(1, NULL, kPseudoNormalLiveTV);
     }
 }
 
@@ -3314,7 +3372,8 @@ void TV::CommitQueuedInput(void)
         if (HasQueuedInput())
             DoArbSeek(ARBSEEK_FORWARD);
     }
-    else if (StateIsLiveTV(GetState()))
+    else if (StateIsLiveTV(GetState()) &&
+             !pseudoLiveTVState[(activenvp == nvp) ? 0 : 1])
     {
         QString channum = GetQueuedChanNum();
         if (browsemode)
@@ -3323,9 +3382,10 @@ void TV::CommitQueuedInput(void)
             if (activenvp == nvp && GetOSD())
                 GetOSD()->HideSet("channel_number");
         }
-        else if (activerecorder->CheckChannel(channum))
+        else if (GetQueuedChanID() ||
+                 (!channum.isEmpty() && activerecorder->CheckChannel(channum)))
             ChangeChannel(GetQueuedChanID(), channum);
-        else if (GetQueuedInput() != "")
+        else if (!GetQueuedInput().isEmpty())
             ChangeChannel(GetQueuedChanID(), GetQueuedInput());
     }
 
@@ -4369,11 +4429,19 @@ void TV::customEvent(QCustomEvent *e)
             QStringList tokens = QStringList::split(" ", message);
             int cardnum = tokens[1].toInt();
             int timeuntil = tokens[2].toInt();
+            int hasrec    = tokens[3].toInt();
+            VERBOSE(VB_IMPORTANT, LOC + message << " hasrec: "<<hasrec);
 
             if (cardnum == recorder->GetRecorderNumber())
             {
                 menurunning = false;
-                AskAllowRecording(me->ExtraDataList(), timeuntil);
+                AskAllowRecording(me->ExtraDataList(), timeuntil, hasrec);
+            }
+            else if (piprecorder &&
+                     cardnum == piprecorder->GetRecorderNumber())
+            {
+                VERBOSE(VB_GENERAL, LOC + "Disabling PiP for recording");
+                TogglePIPView();
             }
         }
         else if (recorder && message.left(11) == "QUIT_LIVETV")
@@ -4387,6 +4455,38 @@ void TV::customEvent(QCustomEvent *e)
                 menurunning = false;
                 wantsToQuit = false;
                 exitPlayer = true;
+            }
+            else if (piprecorder &&
+                     cardnum == piprecorder->GetRecorderNumber())
+            {
+                VERBOSE(VB_GENERAL, LOC + "Disabling PiP for QUIT_LIVETV");
+                TogglePIPView();
+            }
+        }
+        else if (recorder && message.left(12) == "LIVETV_WATCH")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int cardnum = tokens[1].toInt();
+            int watch   = tokens[2].toInt();
+
+            uint s = (cardnum == recorder->GetRecorderNumber()) ? 0 : 1;
+
+            if (cardnum == recorder->GetRecorderNumber() ||
+                (piprecorder && cardnum == piprecorder->GetRecorderNumber()))
+            {
+                if (watch)
+                {
+                    ProgramInfo pi;
+                    QStringList list = me->ExtraDataList();
+                    if (pi.FromStringList(list, 0))
+                        SetPseudoLiveTV(s, &pi, kPseudoChangeChannel);
+
+                    if (!s && pipnvp)
+                        TogglePIPView();
+                }
+                else
+                    SetPseudoLiveTV(s, NULL, kPseudoNormalLiveTV);
             }
         }
         else if (tvchain && message.left(12) == "LIVETV_CHAIN")
@@ -4576,6 +4676,35 @@ void TV::BrowseDispInfo(int direction)
     delete program_info;
 }
 
+void TV::SetPseudoLiveTV(uint i, const ProgramInfo *pi, PseudoState new_state)
+{
+    ProgramInfo *old_rec = pseudoLiveTVRec[i];
+    ProgramInfo *new_rec = NULL;
+
+    if (pi)
+    {
+        new_rec = new ProgramInfo(*pi);
+        QString msg = QString("Wants to record: %1 %2 %3 %4")
+            .arg(new_rec->title).arg(new_rec->chanstr)
+            .arg(new_rec->recstartts.toString())
+            .arg(new_rec->recendts.toString());
+        VERBOSE(VB_PLAYBACK, LOC + msg);
+    }
+
+    pseudoLiveTVRec[i]   = new_rec;
+    pseudoLiveTVState[i] = new_state;
+
+    if (old_rec)
+    {
+        QString msg = QString("Done to recording: %1 %2 %3 %4")
+            .arg(old_rec->title).arg(old_rec->chanstr)
+            .arg(old_rec->recstartts.toString())
+            .arg(old_rec->recendts.toString());
+        VERBOSE(VB_PLAYBACK, LOC + msg);        
+        delete old_rec;
+    }
+}
+
 void TV::ToggleRecord(void)
 {
     if (browsemode)
@@ -4610,18 +4739,23 @@ void TV::ToggleRecord(void)
     }
 
     QString cmdmsg("");
+    uint s = (activenvp == nvp) ? 0 : 1;
     if (playbackinfo->GetAutoExpireFromRecorded() == kLiveTVAutoExpire)
     {
         int autoexpiredef = gContext->GetNumSetting("AutoExpireDefault", 0);
         playbackinfo->SetAutoExpire(autoexpiredef);
         playbackinfo->ApplyRecordRecGroupChange("Default");
         cmdmsg = tr("Record");
+        SetPseudoLiveTV(s, playbackinfo, kPseudoRecording);
+        VERBOSE(VB_RECORD, LOC + "Toggling Record on");
     }
     else
     {
         playbackinfo->SetAutoExpire(kLiveTVAutoExpire);
         playbackinfo->ApplyRecordRecGroupChange("LiveTV");
         cmdmsg = tr("Cancel Record");
+        SetPseudoLiveTV(s, playbackinfo, kPseudoNormalLiveTV);
+        VERBOSE(VB_RECORD, LOC + "Toggling Record off");
     }
 
     QString msg = cmdmsg + "\"" + playbackinfo->title + "\"";

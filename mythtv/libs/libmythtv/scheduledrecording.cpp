@@ -429,7 +429,7 @@ bool ScheduledRecording::GetMaxNewest(void) const {
     return(maxnewest->getValue().toInt());
 }
 
-void ScheduledRecording::save() 
+void ScheduledRecording::save(bool sendSig)
 {
     if (type->isChanged() && getRecordingType() == kNotRecording)
     {
@@ -454,7 +454,8 @@ void ScheduledRecording::save()
         if (!query.exec())
             MythContext::DBError("UPDATE recorded", query);
     }
-    signalChange(getRecordID());
+    if (sendSig)
+        signalChange(getRecordID());
 }
 
 void ScheduledRecording::save(QString destination) 

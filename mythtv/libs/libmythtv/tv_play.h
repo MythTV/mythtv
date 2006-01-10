@@ -53,6 +53,13 @@ class VBIMode
     }
 };
 
+typedef enum
+{
+    kPseudoNormalLiveTV  = 0,
+    kPseudoChangeChannel = 1,
+    kPseudoRecording     = 2,
+} PseudoState;
+
 class TV : public QObject
 {
     Q_OBJECT
@@ -97,7 +104,7 @@ class TV : public QObject
     // Various commands
     void ShowNoRecorderDialog(void);
     void FinishRecording(void);
-    void AskAllowRecording(const QStringList &messages, int timeuntil);
+    void AskAllowRecording(const QStringList&, int, bool);
 
     // Boolean queries
 
@@ -302,6 +309,8 @@ class TV : public QObject
 
     void GetPlayGroupSettings(const QString &group);
 
+    void SetPseudoLiveTV(uint, const ProgramInfo*, PseudoState);
+
     static QStringList GetValidRecorderList(uint chanid);
     static QStringList GetValidRecorderList(const QString &channum);
     static QStringList GetValidRecorderList(uint, const QString&);
@@ -441,6 +450,10 @@ class TV : public QObject
     int          playbackLen;   ///< initial playbackinfo->CalculateLength()
     ProgramInfo *lastProgram;   ///< last program played with this player
     bool         jumpToProgram;
+
+    // Recording to play next, after LiveTV
+    ProgramInfo *pseudoLiveTVRec[2];
+    PseudoState  pseudoLiveTVState[2];
 
     // Video Players
     NuppelVideoPlayer *nvp;
