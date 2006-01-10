@@ -1063,18 +1063,18 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open XvMC port...\n"
+        QString msg = LOC_ERR + "Could not open XvMC port...\n"
                 "\n"
                 "\t\t\tYou may wish to verify that your DISPLAY\n"
                 "\t\t\tenvironment variable does not use an external\n"
-                "\t\t\tnetwork connection.\n"
+                "\t\t\tnetwork connection.\n";
 #ifdef USING_XVMCW
-                "\n"
+        msg +=  "\n"
                 "\t\t\tYou may also wish to verify that\n"
                 "\t\t\t/etc/X11/XvMCConfig contains the correct\n"
-                "\t\t\tvendor's XvMC library.\n"
+                "\t\t\tvendor's XvMC library.\n";
 #endif // USING_XVMCW
-            );
+        VERBOSE(VB_IMPORTANT, msg);
         ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
     }
 
