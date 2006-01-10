@@ -905,16 +905,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     RecList schedList;
     if (m_sched)
         m_sched->getAllPending(&schedList);
-    for (ri = schedList.begin(); ri != schedList.end(); )
-    {
-        if ((*ri)->recstatus == rsRecording)
-            ri++;
-        else
-        {
-            delete (*ri);
-            ri = schedList.erase(ri);
-        }
-    }
 
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
@@ -1077,7 +1067,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             {
                 for (ri = schedList.begin(); ri != schedList.end(); ri++)
                 {
-                    if (proginfo->chanid == (*ri)->chanid &&
+                    if ((*ri) && (*ri)->recstatus == rsRecording &&
+                        proginfo->chanid == (*ri)->chanid &&
                         proginfo->recstartts == (*ri)->recstartts)
                     {
                         proginfo->recstatus = rsRecording;

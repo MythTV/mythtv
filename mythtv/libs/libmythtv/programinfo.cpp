@@ -156,20 +156,20 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     isVideo = other.isVideo;
     lenMins = other.lenMins;
     
-    title = other.title;
-    subtitle = other.subtitle;
-    description = other.description;
-    category = other.category;
-    chanid = other.chanid;
-    chanstr = other.chanstr;
-    chansign = other.chansign;
-    channame = other.channame;
+    title = QDeepCopy<QString>(other.title);
+    subtitle = QDeepCopy<QString>(other.subtitle);
+    description = QDeepCopy<QString>(other.description);
+    category = QDeepCopy<QString>(other.category);
+    chanid = QDeepCopy<QString>(other.chanid);
+    chanstr = QDeepCopy<QString>(other.chanstr);
+    chansign = QDeepCopy<QString>(other.chansign);
+    channame = QDeepCopy<QString>(other.channame);
     chancommfree = other.chancommfree;
-    chanOutputFilters = other.chanOutputFilters;
+    chanOutputFilters = QDeepCopy<QString>(other.chanOutputFilters);
     
-    pathname = other.pathname;
+    pathname = QDeepCopy<QString>(other.pathname);
     filesize = other.filesize;
-    hostname = other.hostname;
+    hostname = QDeepCopy<QString>(other.hostname);
 
     startts = other.startts;
     endts = other.endts;
@@ -197,29 +197,29 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     cardid = other.cardid;
     shareable = other.shareable;
     duplicate = other.duplicate;
-    schedulerid = other.schedulerid;
+    schedulerid = QDeepCopy<QString>(other.schedulerid);
     findid = other.findid;
     recpriority = other.recpriority;
-    recgroup = other.recgroup;
-    playgroup = other.playgroup;
+    recgroup = QDeepCopy<QString>(other.recgroup);
+    playgroup = QDeepCopy<QString>(other.playgroup);
     programflags = other.programflags;
     transcoder = other.transcoder;
 
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
 
-    seriesid = other.seriesid;
-    programid = other.programid;
-    catType = other.catType;
+    seriesid = QDeepCopy<QString>(other.seriesid);
+    programid = QDeepCopy<QString>(other.programid);
+    catType = QDeepCopy<QString>(other.catType);
 
-    sortTitle = other.sortTitle;
+    sortTitle = QDeepCopy<QString>(other.sortTitle);
 
     originalAirDate = other.originalAirDate;
     stars = other.stars;
-    year = other.year;
+    year = QDeepCopy<QString>(other.year);
     ignoreBookmark = other.ignoreBookmark; 
    
-    inUseForWhat = other.inUseForWhat;
+    inUseForWhat = QDeepCopy<QString>(other.inUseForWhat);
     lastInUseTime = other.lastInUseTime;
     record = NULL;
 
