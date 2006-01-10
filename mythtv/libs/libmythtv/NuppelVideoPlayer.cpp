@@ -3146,8 +3146,6 @@ void NuppelVideoPlayer::SetDeleteIter(void)
 
 void NuppelVideoPlayer::SetCommBreakIter(void)
 {
-    VERBOSE(VB_COMMFLAG, LOC + QString("SetCommBreakIter @ framesPlayed = %1")
-                                       .arg(framesPlayed));
     if (hascommbreaktable)
     {
         commBreakIter = commBreakMap.begin();
