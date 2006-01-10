@@ -177,6 +177,7 @@ class MPEGStreamData : public QObject
     uint                      _pmt_single_program_num_audio;
     ProgramAssociationTable  *_pat_single_program;
     ProgramMapTable          *_pmt_single_program;
+    QDateTime                 _unexpected_pat_timeout;
 };
 
 #include "mpegtables.h"

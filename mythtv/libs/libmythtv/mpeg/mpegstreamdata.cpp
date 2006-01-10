@@ -29,6 +29,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     AddListeningPID(MPEG_PAT_PID);
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
+    _unexpected_pat_timeout = QDateTime::currentDateTime().addYears(1);
 }
 
 MPEGStreamData::~MPEGStreamData()
@@ -214,7 +215,8 @@ bool MPEGStreamData::CreatePATSingleProgram(
     VERBOSE(VB_RECORD, QString("desired_program(%1) pid(0x%2)").
             arg(_desired_program).arg(_pid_pmt_single_program, 0, 16));
 
-    if (!_pid_pmt_single_program)
+    QDateTime now = QDateTime::currentDateTime();
+    if (!_pid_pmt_single_program && (_unexpected_pat_timeout < now))
     {
         _pid_pmt_single_program = pat.FindAnyPID();
         if (!_pid_pmt_single_program)
@@ -228,6 +230,13 @@ bool MPEGStreamData::CreatePATSingleProgram(
                         "\n\t\t\tCan Not create single program PAT.")
                 .arg(_desired_program));
         SetPATSingleProgram(NULL);
+        _unexpected_pat_timeout = now.addYears(1);
+        return false;
+    }
+    else if (!_pid_pmt_single_program)
+    {
+        if (_unexpected_pat_timeout > now.addMonths(6))
+            _unexpected_pat_timeout = now.addSecs(2);
         return false;
     }
 
