@@ -1951,8 +1951,8 @@ int MPEG2fixup::Start()
                     vFrame.at(frame_pos + Lreorder.count());
                 }
                 if (PTSdiscrep)
-                    poq.SetNextPos(add2x33(poq.Get(0, NULL), PTSdiscrep),
-                                lastRealvPkt);
+                    poq.SetNextPos(add2x33(poq.Get(0, &lastRealvPkt),
+                                       PTSdiscrep), lastRealvPkt);
             }
 
             if (discard)
