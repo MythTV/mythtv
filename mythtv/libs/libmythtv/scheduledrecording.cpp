@@ -429,6 +429,14 @@ bool ScheduledRecording::GetMaxNewest(void) const {
     return(maxnewest->getValue().toInt());
 }
 
+void ScheduledRecording::save(void)
+{
+    // NOTE: we can not use a default value for send(bool) because
+    // anyone calling save on a parent type pointer will then not 
+    // use our version of the virtual funcation.
+    save(true);
+}
+
 void ScheduledRecording::save(bool sendSig)
 {
     if (type->isChanged() && getRecordingType() == kNotRecording)

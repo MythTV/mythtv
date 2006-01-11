@@ -90,8 +90,8 @@ public:
     void setRecGroup(const QString& recgroup);
     void setPlayGroup(const QString& recgroup);
 
-    
-    virtual void save(bool send_reschedule_signal = true);
+    virtual void save(void);
+    virtual void save(bool send_reschedule_signal);
     virtual void save(QString);
 
     virtual void loadByID(int id);
