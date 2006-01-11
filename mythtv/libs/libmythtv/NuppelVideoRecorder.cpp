@@ -2937,8 +2937,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
     if (writesync) 
     {
-        frameheader.keyframe=0;
-        frameofgop=0;
         ringBuffer->Write("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE);
 
         UpdateSeekTable(((fnum - startnum) >> 1) / keyframedist);
@@ -2960,6 +2958,12 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
         wantkeyframe = true;
         //ringBuffer->Sync();
+    }
+
+    if (wantkeyframe)
+    {
+        frameheader.keyframe=0;
+        frameofgop=0;
     }
 
     if (videoFilters)
