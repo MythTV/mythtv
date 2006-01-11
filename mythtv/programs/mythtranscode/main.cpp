@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
     int found_starttime = 0;
     int found_chanid = 0;
     int found_infile = 0;
+    int update_index = 1;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -156,6 +157,7 @@ int main(int argc, char *argv[])
             if(a.argc() > argpos)
             {
                 outfile = a.argv()[argpos + 1];
+                update_index = 0;
                 ++argpos;
             }
             else
@@ -405,7 +407,10 @@ int main(int argc, char *argv[])
             int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);
             if (err)
                 return err;
-            UpdatePositionMap(posMap, NULL, pginfo);
+            if (update_index)
+                UpdatePositionMap(posMap, NULL, pginfo);
+            else
+                UpdatePositionMap(posMap, outfile + QString(".map"), pginfo);
         }
         else
         {
@@ -415,7 +420,10 @@ int main(int argc, char *argv[])
             err = BuildKeyframeIndex(m2f, outfile, posMap, jobID);
             if (err)
                 return err;
-            UpdatePositionMap(posMap, NULL, pginfo);
+            if (update_index)
+                UpdatePositionMap(posMap, NULL, pginfo);
+            else
+                UpdatePositionMap(posMap, outfile + QString(".map"), pginfo);
         }
         delete m2f;
         result = REENCODE_OK;
