@@ -235,6 +235,7 @@ TV::TV(void)
       asInputMode(false), asInputModeExpires(QTime::currentTime()),
       // Channel changing state variables
       queuedChanNum(""),
+      queuedChanNumExpr(QRegExp("([1-9]|\\w)")),
       muteTimer(new QTimer(this)),
       lockTimerOn(false),
       // previous channel functionality state variables
@@ -263,6 +264,8 @@ TV::TV(void)
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL), embedWinID(0), embedBounds(0,0,0,0)
 {
+    queuedChanNumExpr.setMinimal(true); // we don't need greedy matching
+
     for (uint i = 0; i < 2; i++)
     {
         pseudoLiveTVRec[i]   = NULL;
@@ -3258,23 +3261,33 @@ void TV::ChangeChannel(int direction)
     UnpauseLiveTV();
 }
 
+QString TV::GetQueuedInput(void) const
+{
+    QMutexLocker locker(&queuedInputLock);
+    return QDeepCopy<QString>(queuedInput);
+}
+
+int TV::GetQueuedInputAsInt(bool *ok, int base) const
+{
+    QMutexLocker locker(&queuedInputLock);
+    return queuedInput.toInt(ok, base);
+}
+
 QString TV::GetQueuedChanNum(void) const
 {
-    static QRegExp regexp = QRegExp("([1-9]|\\w)");
+    QMutexLocker locker(&queuedInputLock);
 
     // avoid regular expression if queue is empty.
-    if (queuedChanNum.isEmpty())
-        return queuedChanNum;
+    if (!queuedChanNum.isEmpty())
+    {
+        // strip initial zeros.
+        int nzi = queuedChanNum.find(queuedChanNumExpr);
+        if (nzi > 0)
+            queuedChanNum = queuedChanNum.right(queuedChanNum.length() - nzi);
+        queuedChanNum.stripWhiteSpace();
+    }
 
-    // strip initial zeros.
-    regexp.setMinimal(true); // we don't need greedy matching
-    // QRegExp reentrant not threadsafe, so we need a deep copy to operate on.
-    QString tmp = QDeepCopy<QString>(queuedChanNum);
-    int nzi = tmp.find(regexp);
-    if (nzi > 0)
-        queuedChanNum = tmp.right(tmp.length() - nzi);
-
-    return queuedChanNum.stripWhiteSpace();
+    return QDeepCopy<QString>(queuedChanNum);
 }
 
 /** \fn TV::ClearInputQueues(bool)
@@ -3286,6 +3299,7 @@ void TV::ClearInputQueues(bool hideosd)
     if (hideosd && GetOSD()) 
         GetOSD()->HideSet("channel_number");
 
+    QMutexLocker locker(&queuedInputLock);
     queuedInput   = "";
     queuedChanNum = "";
     queuedChanID  = 0;
@@ -3297,6 +3311,7 @@ void TV::AddKeyToInputQueue(char key)
 
     if (key)
     {
+        QMutexLocker locker(&queuedInputLock);
         queuedInput   = queuedInput.append(key).right(kInputKeysMax);
         queuedChanNum = queuedChanNum.append(key).right(kInputKeysMax);
     }
@@ -3327,11 +3342,18 @@ void TV::AddKeyToInputQueue(char key)
         }
 
         // Use valid channel if it is there, otherwise reset...
-        queuedChanNum = (ok) ? mod : chan.right(1);
+        QMutexLocker locker(&queuedInputLock);
+        queuedChanNum = QDeepCopy<QString>((ok) ? mod : chan.right(1));
         do_smart &= unique;
     }
 
-    QString inputStr = (do_smart) ? queuedChanNum : queuedInput;
+    QString inputStr = QString::null;
+    {
+        QMutexLocker locker(&queuedInputLock);
+        inputStr = QDeepCopy<QString>
+            ((do_smart) ? queuedChanNum : queuedInput);
+    }
+
     inputStr = inputStr.isEmpty() ? "?" : inputStr;
     if (ccInputMode)
     {
@@ -3385,6 +3407,7 @@ void TV::CommitQueuedInput(void)
              !pseudoLiveTVState[(activenvp == nvp) ? 0 : 1])
     {
         QString channum = GetQueuedChanNum();
+        QString chaninput = GetQueuedInput();
         if (browsemode)
         {
             BrowseChannel(channum);
@@ -3394,8 +3417,8 @@ void TV::CommitQueuedInput(void)
         else if (GetQueuedChanID() ||
                  (!channum.isEmpty() && activerecorder->CheckChannel(channum)))
             ChangeChannel(GetQueuedChanID(), channum);
-        else if (!GetQueuedInput().isEmpty())
-            ChangeChannel(GetQueuedChanID(), GetQueuedInput());
+        else if (!chaninput.isEmpty())
+            ChangeChannel(GetQueuedChanID(), chaninput);
     }
 
     ClearInputQueues(true);
@@ -3547,8 +3570,9 @@ void TV::SetPreviousChannel()
 
     if (chan_name != prevChan[i])
     {
-        queuedInput   = prevChan[i];
-        queuedChanNum = prevChan[i];
+        QMutexLocker locker(&queuedInputLock);
+        queuedInput   = QDeepCopy<QString>(prevChan[i]);
+        queuedChanNum = QDeepCopy<QString>(prevChan[i]);
         queuedChanID  = 0;
     }
 
@@ -4373,9 +4397,10 @@ void TV::EPGChannelUpdate(uint chanid, QString channum)
 {
     if (chanid && !channum.isEmpty())
     {
+        QMutexLocker locker(&queuedInputLock);
         // we need to use deep copy bcs this can be called from another thread.
         queuedInput   = QDeepCopy<QString>(channum);
-        queuedChanNum = queuedInput;
+        queuedChanNum = QDeepCopy<QString>(channum);
         queuedChanID  = chanid;
     }
 }
