@@ -255,11 +255,12 @@ bool ClassicCommDetector::go()
 {
     nvp->SetNullVideo();
     
-    int requiredHeadStart = 30;
+    int requiredHeadStart = 60;
     if (commDetectMethod & COMM_DETECT_LOGO)
-        requiredHeadStart += preRoll + commDetectLogoSecondsNeeded;
-    else
-        requiredHeadStart += 30;
+    {
+        requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
+        requiredHeadStart += commDetectLogoSecondsNeeded;
+    }
 
     emit statusUpdate("Building Detection Buffer");
 
