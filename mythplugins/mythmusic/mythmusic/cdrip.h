@@ -44,7 +44,7 @@ class Ripper : public MythDialog
     static QString fixFileToken(QString token);
     void handleFileTokens(QString &filename, Metadata *track);
     void ejectCD(QString &cddev);
-
+    bool isNewTune(QString &artist, QString &album, QString &title);
     QVBoxLayout *bigvb;
     QFrame *firstdiag;
 

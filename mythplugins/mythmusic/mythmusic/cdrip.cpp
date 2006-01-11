@@ -161,11 +161,11 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
     bool iscompilation = false;
 
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-
+    bool newTune = true;
+    int row = 0;
     if (decoder)
     {
 
-        int row = 0;
         QString label;
         int length, min, sec;
         Metadata *track;
@@ -195,24 +195,31 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
                 }
 
                 length = track->Length() / 1000;
-                min = length / 60;
-                sec = length % 60;
+
+		QString title = track->Title();
+		newTune = isNewTune(artistname, albumname, title);
+
+		if (newTune)
+		{
+		    min = length / 60;
+                    sec = length % 60;
+
+		    table->setNumRows(row + 1);
                 
-                table->setNumRows(row + 1);
+		    table->setRowHeight(row, (int)(30 * hmult));
+		    
+		    label.sprintf("%d", trackno + 1);
+		    table->setText(row, 0, label);
+		    
+		    table->setText(row, 1, track->Title());
+		    
+		    table->setText(row, 2, track->Artist());
+		    
+		    label.sprintf("%02d:%02d", min, sec);
+		    table->setText(row, 3, label);
                 
-                table->setRowHeight(row, (int)(30 * hmult));
-                
-                label.sprintf("%d", trackno + 1);
-                table->setText(row, 0, label);
-                
-                table->setText(row, 1, track->Title());
-                
-                table->setText(row, 2, track->Artist());
-                
-                label.sprintf("%02d:%02d", min, sec);
-                table->setText(row, 3, label);
-                
-                row++;
+		    row++;
+		}
                 delete track;
             }
         }
@@ -262,13 +269,49 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
     MythPushButton *ripit = new MythPushButton(tr("Import this CD"), firstdiag);
     ripit->setFocus ();
     vbox->addWidget(ripit);
-
-    connect(ripit, SIGNAL(clicked()), this, SLOT(ripthedisc())); 
+    if (row != 0)
+    {
+        connect(ripit, SIGNAL(clicked()), this, SLOT(ripthedisc())); 
+    }
 }
 
 Ripper::~Ripper(void)
 {   
 }       
+
+bool Ripper::isNewTune(QString& artist, QString& album, QString& title)
+{
+    if (gContext->GetNumSetting("OnlyImportNewMusic",1))
+    {
+        MSqlQuery query(MSqlQuery::InitCon());	
+	QString queryString("SELECT filename, artist, album, title, intid "
+			    "FROM musicmetadata WHERE artist REGEXP \'");      
+	QString token = artist;
+	token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+      
+	queryString += token + "\' AND " + "album REGEXP \'";
+	token = album;
+	token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+	queryString += token + "\' AND " + "title    REGEXP \'";
+	token = title;
+	token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+	queryString += token + "\' ORDER BY artist, album, title, intid, filename";      
+	query.prepare(queryString);
+	
+	bool has_entries = true;     
+	if (!query.exec() || !query.isActive())
+	{
+	    MythContext::DBError("Search music database", query);
+	    has_entries = false;
+	}
+      	if (query.numRowsAffected() > 0)
+	{
+	    return false;
+	}
+    }       
+    return true;
+}
+
 
 QSizePolicy Ripper::sizePolicy(void)
 {

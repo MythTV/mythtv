@@ -107,6 +107,15 @@ static HostCheckBox *IgnoreID3Tags()
     return gc;
 };
 
+static HostCheckBox *OnlyImportNewMusic()
+{
+    HostCheckBox *gc = new HostCheckBox("OnlyImportNewMusic");
+    gc->setLabel(QObject::tr("Only Import new music."));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Checks the database for duplicates when importing/ripping CDs."));
+    return gc;
+};
+
 static HostCheckBox *AutoLookupCD()
 {
     HostCheckBox *gc = new HostCheckBox("AutoLookupCD");
@@ -592,6 +601,7 @@ MusicRipperSettings::MusicRipperSettings()
     rippersettings->addChild(NoWhitespace());
     rippersettings->addChild(PostCDRipScript());
     rippersettings->addChild(EjectCD());
+    rippersettings->addChild(OnlyImportNewMusic());
     addChild(rippersettings);
 
     VerticalConfigurationGroup* encodersettings = new VerticalConfigurationGroup(false);
