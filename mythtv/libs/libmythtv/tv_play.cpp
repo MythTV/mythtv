@@ -3260,8 +3260,15 @@ void TV::ChangeChannel(int direction)
 
 QString TV::GetQueuedChanNum(void) const
 {
+    static QRegExp regexp = QRegExp("([1-9]|\\w)");
+
+    // avoid regular expression if queue is empty.
+    if (queuedChanNum.isEmpty())
+        return queuedChanNum;
+
     // strip initial zeros.
-    int nzi = queuedChanNum.find(QRegExp("([1-9]|\\w)"));
+    regexp.setMinimal(true); // we don't need greedy matching
+    int nzi = queuedChanNum.find(regexp);
     if (nzi > 0)
         queuedChanNum = queuedChanNum.right(queuedChanNum.length() - nzi);
 
