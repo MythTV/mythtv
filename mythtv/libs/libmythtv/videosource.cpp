@@ -150,6 +150,7 @@ bool CardUtil::HasDVBCRCBug(uint device)
     GetDVBType(device, name, type);
     return ((name == "Philips TDA10046H DVB-T") || // munges PMT
             (name == "VLSI VES1x93 DVB-S")      || // munges PMT
+            (name == "DST DVB-S")               || // munges PAT
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
