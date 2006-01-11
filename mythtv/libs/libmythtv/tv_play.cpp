@@ -3268,9 +3268,11 @@ QString TV::GetQueuedChanNum(void) const
 
     // strip initial zeros.
     regexp.setMinimal(true); // we don't need greedy matching
-    int nzi = queuedChanNum.find(regexp);
+    // QRegExp reentrant not threadsafe, so we need a deep copy to operate on.
+    QString tmp = QDeepCopy<QString>(queuedChanNum);
+    int nzi = tmp.find(regexp);
     if (nzi > 0)
-        queuedChanNum = queuedChanNum.right(queuedChanNum.length() - nzi);
+        queuedChanNum = tmp.right(tmp.length() - nzi);
 
     return queuedChanNum.stripWhiteSpace();
 }
