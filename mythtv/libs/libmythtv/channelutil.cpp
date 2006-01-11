@@ -11,11 +11,11 @@ static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
                                  // DVB specific
                                  int transport_id,      int network_id,
                                  bool set_odfm_info,
-                                 int symbol_rate,       char bandwidth,
-                                 char polarity,         char inversion,
-                                 char trans_mode,
+                                 int symbol_rate,       signed char bandwidth,
+                                 signed char polarity,  signed char inversion,
+                                 signed char trans_mode,
                                  QString inner_FEC,     QString constellation,
-                                 char hierarchy,        QString hp_code_rate,
+                                 signed char hierarchy, QString hp_code_rate,
                                  QString lp_code_rate,  QString guard_interval)
 {
     MSqlQuery query(MSqlQuery::InitCon());
