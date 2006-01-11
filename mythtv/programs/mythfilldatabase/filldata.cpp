@@ -2289,264 +2289,263 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
 
         query.exec();
 
-        if (query.isActive() && query.size() > 0)
-        {
-            query.next();
-            chanid = query.value(0).toInt();
-        }
-
-        if (chanid == 0)
+        if (!query.isActive() || query.size() <= 0)
         {
             cerr << "Unknown xmltv channel identifier: " << mapiter.key()
                  << endl << "Skipping channel.\n";
             continue;
         }
 
-        QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
-
-        fixProgramList(sortlist);
-
-        QValueList<ProgInfo>::iterator i = sortlist->begin();
-        for (; i != sortlist->end(); i++)
+        while (query.next())
         {
-            query.prepare("SELECT * FROM program WHERE "
-                          "chanid=:CHANID AND "
-                          "starttime=:START AND "
-                          "endtime=:END AND "
-                          "title=:TITLE AND "
-                          "subtitle=:SUBTITLE AND "
-                          "description=:DESC AND "
-                          "category=:CATEGORY AND "
-                          "category_type=:CATEGORY_TYPE AND "
-                          "airdate=:AIRDATE AND "
-                          "stars=:STARS AND "
-                          "previouslyshown=:PREVIOUSLYSHOWN AND "
-                          "title_pronounce=:TITLE_PRONOUNCE AND "
-                          "stereo=:STEREO AND "
-                          "subtitled=:SUBTITLED AND "
-                          "hdtv=:HDTV AND "
-                          "closecaptioned=:CLOSECAPTIONED AND "
-                          "partnumber=:PARTNUMBER AND "
-                          "parttotal=:PARTTOTAL AND "
-                          "seriesid=:SERIESID AND "
-                          "showtype=:SHOWTYPE AND "
-                          "colorcode=:COLORCODE AND "
-                          "syndicatedepisodenumber=:SYNDICATEDEPISODENUMBER AND "
-                          "programid=:PROGRAMID;");
-            query.bindValue(":CHANID", chanid);
-            query.bindValue(":START", (*i).start);
-            query.bindValue(":END", (*i).end);
-            query.bindValue(":TITLE", (*i).title.utf8());
-            query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
-            query.bindValue(":DESC", (*i).desc.utf8());
-            query.bindValue(":CATEGORY", (*i).category.utf8());
-            query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
-            query.bindValue(":AIRDATE", (*i).airdate.utf8());
-            query.bindValue(":STARS", (*i).stars.utf8());
-            query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
-            query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
-            query.bindValue(":STEREO", (*i).stereo);
-            query.bindValue(":SUBTITLED", (*i).subtitled);
-            query.bindValue(":HDTV", (*i).hdtv);
-            query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
-            query.bindValue(":PARTNUMBER", (*i).partnumber);
-            query.bindValue(":PARTTOTAL", (*i).parttotal);
-            query.bindValue(":SERIESID", (*i).seriesid);
-            query.bindValue(":SHOWTYPE", (*i).showtype);
-            query.bindValue(":COLORCODE", (*i).colorcode);
-            query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
-            query.bindValue(":PROGRAMID", (*i).programid);
-            query.exec();
+            chanid = query.value(0).toInt();
 
-            if (query.isActive() && query.size() > 0)
+            if (chanid == 0)
             {
-                unchanged++;
+                cerr << "Unknown xmltv channel identifier: " << mapiter.key()
+                     << endl << "Skipping channel.\n";
                 continue;
             }
 
-            query.prepare("SELECT title,starttime,endtime FROM program WHERE "
-                          "chanid=:CHANID AND starttime>=:START AND "
-                          "starttime<:END;");
-            query.bindValue(":CHANID", chanid);
-            query.bindValue(":START", (*i).start);
-            query.bindValue(":END", (*i).end);
-            query.exec();
+            QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
-            if (query.isActive() && query.size() > 0)
+            fixProgramList(sortlist);
+
+            QValueList<ProgInfo>::iterator i = sortlist->begin();
+            for (; i != sortlist->end(); i++)
             {
-                if (!quiet)
-                {
-                    while(query.next())
-                    {
-                        cerr << "removing existing program: "
-                             << (*i).channel.local8Bit() << " "
-                             << QString::fromUtf8(query.value(0).toString()).local8Bit() << " "
-                             << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
-                             << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
-                    }
-
-                    cerr << "inserting new program    : "
-                         << (*i).channel.local8Bit() << " "
-                         << (*i).title.local8Bit() << " "
-                         << (*i).start.toString() << " - " 
-                         << (*i).end.toString() << endl << endl;
-                }
-
-                MSqlQuery subquery(MSqlQuery::InitCon());
-                subquery.prepare("DELETE FROM program WHERE "
-                                 "chanid=:CHANID AND starttime>=:START "
-                                 "AND starttime<:END;");
-                subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":START", (*i).start);
-                subquery.bindValue(":END", (*i).end);
-
-                subquery.exec();
-
-                subquery.prepare("DELETE FROM programrating WHERE "
-                                 "chanid=:CHANID AND starttime>=:START "
-                                 "AND starttime<:END;");
-                subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":START", (*i).start);
-                subquery.bindValue(":END", (*i).end);
-
-                subquery.exec();
-
-                subquery.prepare("DELETE FROM credits WHERE "
-                                 "chanid=:CHANID AND starttime>=:START "
-                                 "AND starttime<:END;");
-                subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":START", (*i).start);
-                subquery.bindValue(":END", (*i).end);
-
-                subquery.exec();
-            }
-
-            query.prepare("INSERT INTO program (chanid,starttime,endtime,"
-                          "title,subtitle,description,category,category_type,"
-                          "airdate,stars,previouslyshown,title_pronounce,stereo,"
-                          "subtitled,hdtv,closecaptioned,partnumber,parttotal,"
-                          "seriesid,originalairdate,showtype,colorcode,"
-                          "syndicatedepisodenumber,programid) "
-                          "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
-                          ":SUBTITLE,:DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,:AIRDATE,:STARS,"
-                          ":PREVIOUSLYSHOWN,:TITLE_PRONOUNCE,:STEREO,:SUBTITLED,"
-                          ":HDTV,:CLOSECAPTIONED,:PARTNUMBER,:PARTTOTAL,:SERIESID,"
-                          ":ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,:SYNDICATEDEPISODENUMBER,"
-                          ":PROGRAMID);");
-            query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", (*i).start);
-            query.bindValue(":ENDTIME", (*i).end);
-            query.bindValue(":TITLE", (*i).title.utf8());
-            query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
-            query.bindValue(":DESCRIPTION", (*i).desc.utf8());
-            query.bindValue(":CATEGORY", (*i).category.utf8());
-            query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
-            query.bindValue(":AIRDATE", (*i).airdate.utf8());
-            query.bindValue(":STARS", (*i).stars.utf8());
-            query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
-            query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
-            query.bindValue(":STEREO", (*i).stereo);
-            query.bindValue(":SUBTITLED", (*i).subtitled);
-            query.bindValue(":HDTV", (*i).hdtv);
-            query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
-            query.bindValue(":PARTNUMBER", (*i).partnumber);
-            query.bindValue(":PARTTOTAL", (*i).parttotal);
-            query.bindValue(":SERIESID", (*i).seriesid);
-            query.bindValue(":ORIGINALAIRDATE", (*i).originalairdate);
-            query.bindValue(":SHOWTYPE", (*i).showtype);
-            query.bindValue(":COLORCODE", (*i).colorcode);
-            query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
-            query.bindValue(":PROGRAMID", (*i).programid);
-            if (!query.exec())
-            {
-                MythContext::DBError("program insert", query);
-            }
-
-            updated++;
-
-            QValueList<ProgRating>::iterator j = (*i).ratings.begin();
-            for (; j != (*i).ratings.end(); j++)
-            {
-                query.prepare("INSERT INTO programrating (chanid,starttime,"
-                              "system,rating) VALUES (:CHANID, :START, :SYS, "
-                              ":RATING);");
+                query.prepare("SELECT * FROM program WHERE "
+                              "chanid=:CHANID AND starttime=:START AND "
+                              "endtime=:END AND title=:TITLE AND "
+                              "subtitle=:SUBTITLE AND description=:DESC AND "
+                              "category=:CATEGORY AND "
+                              "category_type=:CATEGORY_TYPE AND "
+                              "airdate=:AIRDATE AND stars=:STARS AND "
+                              "previouslyshown=:PREVIOUSLYSHOWN AND "
+                              "title_pronounce=:TITLE_PRONOUNCE AND "
+                              "stereo=:STEREO AND subtitled=:SUBTITLED AND "
+                              "hdtv=:HDTV AND "
+                              "closecaptioned=:CLOSECAPTIONED AND "
+                              "partnumber=:PARTNUMBER AND "
+                              "parttotal=:PARTTOTAL AND "
+                              "seriesid=:SERIESID AND "
+                              "showtype=:SHOWTYPE AND "
+                              "colorcode=:COLORCODE AND "
+                              "syndicatedepisodenumber=:SYNDICATEDEPISODENUMBER AND "
+                              "programid=:PROGRAMID;");
                 query.bindValue(":CHANID", chanid);
                 query.bindValue(":START", (*i).start);
-                query.bindValue(":SYS", (*j).system.utf8());
-                query.bindValue(":RATING", (*j).rating.utf8());
+                query.bindValue(":END", (*i).end);
+                query.bindValue(":TITLE", (*i).title.utf8());
+                query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
+                query.bindValue(":DESC", (*i).desc.utf8());
+                query.bindValue(":CATEGORY", (*i).category.utf8());
+                query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
+                query.bindValue(":AIRDATE", (*i).airdate.utf8());
+                query.bindValue(":STARS", (*i).stars.utf8());
+                query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
+                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
+                query.bindValue(":STEREO", (*i).stereo);
+                query.bindValue(":SUBTITLED", (*i).subtitled);
+                query.bindValue(":HDTV", (*i).hdtv);
+                query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
+                query.bindValue(":PARTNUMBER", (*i).partnumber);
+                query.bindValue(":PARTTOTAL", (*i).parttotal);
+                query.bindValue(":SERIESID", (*i).seriesid);
+                query.bindValue(":SHOWTYPE", (*i).showtype);
+                query.bindValue(":COLORCODE", (*i).colorcode);
+                query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
+                query.bindValue(":PROGRAMID", (*i).programid);
+                query.exec();
 
-                if (!query.exec())
-                {
-                    MythContext::DBError("programrating insert", query);
-                }
-            }
-
-            QValueList<ProgCredit>::iterator k = (*i).credits.begin();
-            for (; k != (*i).credits.end(); k++)
-            {
-                query.prepare("SELECT person FROM people WHERE "
-                              "name = :NAME;");
-                query.bindValue(":NAME", (*k).name.utf8());
-                if (!query.exec())
-                    MythContext::DBError("person lookup", query);
-
-                int personid = -1;
                 if (query.isActive() && query.size() > 0)
                 {
-                    query.next();
-                    personid = query.value(0).toInt();
+                    unchanged++;
+                    continue;
                 }
 
-                if (personid < 0)
-                {
-                    query.prepare("INSERT INTO people (name) VALUES "
-                                  "(:NAME);");
-                    query.bindValue(":NAME", (*k).name.utf8());
-                    if (!query.exec())
-                        MythContext::DBError("person insert", query);
+                query.prepare("SELECT title,starttime,endtime FROM program "
+                              "WHERE chanid=:CHANID AND starttime>=:START AND "
+                              "starttime<:END;");
+                query.bindValue(":CHANID", chanid);
+                query.bindValue(":START", (*i).start);
+                query.bindValue(":END", (*i).end);
+                query.exec();
 
+                if (query.isActive() && query.size() > 0)
+                {
+                    if (!quiet)
+                    {
+                        while (query.next())
+                        {
+                            cerr << "removing existing program: "
+                                 << (*i).channel.local8Bit() << " "
+                                 << QString::fromUtf8(query.value(0).toString()).local8Bit() << " "
+                                 << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
+                                 << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
+                        }
+
+                        cerr << "inserting new program    : "
+                             << (*i).channel.local8Bit() << " "
+                             << (*i).title.local8Bit() << " "
+                             << (*i).start.toString() << " - " 
+                             << (*i).end.toString() << endl << endl;
+                    }
+
+                    MSqlQuery subquery(MSqlQuery::InitCon());
+                    subquery.prepare("DELETE FROM program WHERE "
+                                     "chanid=:CHANID AND starttime>=:START "
+                                     "AND starttime<:END;");
+                    subquery.bindValue(":CHANID", chanid);
+                    subquery.bindValue(":START", (*i).start);
+                    subquery.bindValue(":END", (*i).end);
+
+                    subquery.exec();
+
+                    subquery.prepare("DELETE FROM programrating WHERE "
+                                     "chanid=:CHANID AND starttime>=:START "
+                                     "AND starttime<:END;");
+                    subquery.bindValue(":CHANID", chanid);
+                    subquery.bindValue(":START", (*i).start);
+                    subquery.bindValue(":END", (*i).end);
+ 
+                    subquery.exec();
+
+                    subquery.prepare("DELETE FROM credits WHERE "
+                                     "chanid=:CHANID AND starttime>=:START "
+                                     "AND starttime<:END;");
+                    subquery.bindValue(":CHANID", chanid);
+                    subquery.bindValue(":START", (*i).start);
+                    subquery.bindValue(":END", (*i).end);
+
+                    subquery.exec();
+                }
+
+                query.prepare("INSERT INTO program (chanid,starttime,endtime,"
+                              "title,subtitle,description,category,"
+                              "category_type,airdate,stars,previouslyshown,"
+                              "title_pronounce,stereo,subtitled,hdtv,"
+                              "closecaptioned,partnumber,parttotal,"
+                              "seriesid,originalairdate,showtype,colorcode,"
+                              "syndicatedepisodenumber,programid) "
+                              "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
+                              ":SUBTITLE,:DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,"
+                              ":AIRDATE,:STARS,:PREVIOUSLYSHOWN,"
+                              ":TITLE_PRONOUNCE,:STEREO,:SUBTITLED,:HDTV,"
+                              ":CLOSECAPTIONED,:PARTNUMBER,:PARTTOTAL,"
+                              ":SERIESID,:ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,"
+                              ":SYNDICATEDEPISODENUMBER,:PROGRAMID);");
+                query.bindValue(":CHANID", chanid);
+                query.bindValue(":STARTTIME", (*i).start);
+                query.bindValue(":ENDTIME", (*i).end);
+                query.bindValue(":TITLE", (*i).title.utf8());
+                query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
+                query.bindValue(":DESCRIPTION", (*i).desc.utf8());
+                query.bindValue(":CATEGORY", (*i).category.utf8());
+                query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
+                query.bindValue(":AIRDATE", (*i).airdate.utf8());
+                query.bindValue(":STARS", (*i).stars.utf8());
+                query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
+                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
+                query.bindValue(":STEREO", (*i).stereo);
+                query.bindValue(":SUBTITLED", (*i).subtitled);
+                query.bindValue(":HDTV", (*i).hdtv);
+                query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
+                query.bindValue(":PARTNUMBER", (*i).partnumber);
+                query.bindValue(":PARTTOTAL", (*i).parttotal);
+                query.bindValue(":SERIESID", (*i).seriesid);
+                query.bindValue(":ORIGINALAIRDATE", (*i).originalairdate);
+                query.bindValue(":SHOWTYPE", (*i).showtype);
+                query.bindValue(":COLORCODE", (*i).colorcode);
+                query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
+                query.bindValue(":PROGRAMID", (*i).programid);
+                if (!query.exec())
+                    MythContext::DBError("program insert", query);
+
+                updated++;
+
+                QValueList<ProgRating>::iterator j = (*i).ratings.begin();
+                for (; j != (*i).ratings.end(); j++)
+                {
+                    query.prepare("INSERT INTO programrating (chanid,starttime,"
+                                  "system,rating) VALUES (:CHANID,:START,:SYS,"
+                                  ":RATING);");
+                    query.bindValue(":CHANID", chanid);
+                    query.bindValue(":START", (*i).start);
+                    query.bindValue(":SYS", (*j).system.utf8());
+                    query.bindValue(":RATING", (*j).rating.utf8());
+
+                    if (!query.exec())
+                        MythContext::DBError("programrating insert", query);
+                }
+
+                QValueList<ProgCredit>::iterator k = (*i).credits.begin();
+                for (; k != (*i).credits.end(); k++)
+                {
                     query.prepare("SELECT person FROM people WHERE "
                                   "name = :NAME;");
                     query.bindValue(":NAME", (*k).name.utf8());
                     if (!query.exec())
-                       MythContext::DBError("person lookup", query);
+                        MythContext::DBError("person lookup", query);
 
+                    int personid = -1;
                     if (query.isActive() && query.size() > 0)
                     {
                         query.next();
                         personid = query.value(0).toInt();
                     }
-                }
 
-                if (personid < 0)
-                {
-                    cerr << "Error inserting person\n";
-                    continue;
-                }
+                    if (personid < 0)
+                    {
+                        query.prepare("INSERT INTO people (name) VALUES "
+                                      "(:NAME);");
+                        query.bindValue(":NAME", (*k).name.utf8());
+                        if (!query.exec())
+                            MythContext::DBError("person insert", query);
 
-                query.prepare("INSERT INTO credits (chanid,starttime,"
-                              "role,person) VALUES "
-                              "(:CHANID, :START, :ROLE, :PERSON);");
-                query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", (*i).start);
-                query.bindValue(":ROLE", (*k).role.utf8());
-                query.bindValue(":PERSON", personid);
-                if (!query.exec())
-                {
-                    // be careful of the startime/timestamp "feature"!
-                    query.prepare("UPDATE credits SET "
-                                  "role = concat(role,',:ROLE'), "
-                                  "starttime = :START "
-                                  "WHERE chanid = :CHANID AND "
-                                  "starttime = :START2 and person = :PERSON");
-                    query.bindValue(":ROLE", (*k).role.utf8());
-                    query.bindValue(":START", (*i).start);
+                        query.prepare("SELECT person FROM people WHERE "
+                                      "name = :NAME;");
+                        query.bindValue(":NAME", (*k).name.utf8());
+                        if (!query.exec())
+                            MythContext::DBError("person lookup", query);
+
+                        if (query.isActive() && query.size() > 0)
+                        {
+                            query.next();
+                            personid = query.value(0).toInt();
+                        }
+                    }
+
+                    if (personid < 0)
+                    {
+                        cerr << "Error inserting person\n";
+                        continue;
+                    }
+
+                    query.prepare("INSERT INTO credits (chanid,starttime,"
+                                  "role,person) VALUES "
+                                  "(:CHANID, :START, :ROLE, :PERSON);");
                     query.bindValue(":CHANID", chanid);
-                    query.bindValue(":START2", (*i).start);
+                    query.bindValue(":START", (*i).start);
+                    query.bindValue(":ROLE", (*k).role.utf8());
                     query.bindValue(":PERSON", personid);
-
                     if (!query.exec())
-                        MythContext::DBError("credits update", query);
+                    {
+                        // be careful of the startime/timestamp "feature"!
+                        query.prepare("UPDATE credits SET "
+                                      "role = concat(role,',:ROLE'), "
+                                      "starttime = :START "
+                                      "WHERE chanid = :CHANID AND "
+                                      "starttime = :START2 and person = :PERSON");
+                        query.bindValue(":ROLE", (*k).role.utf8());
+                        query.bindValue(":START", (*i).start);
+                        query.bindValue(":CHANID", chanid);
+                        query.bindValue(":START2", (*i).start);
+                        query.bindValue(":PERSON", personid);
+
+                        if (!query.exec())
+                            MythContext::DBError("credits update", query);
+                    }
                 }
             }
         }
