@@ -1,8 +1,0 @@
-Makefile
-config.pro
-config.h
-moc_phoneui.cpp
-moc_tone.cpp
-moc_sipfsm.cpp
-moc_webcam.cpp
-
