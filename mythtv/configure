@@ -2844,6 +2844,7 @@ fi
 
 if test x"$xrandr" = x"yes" ; then
   CCONFIG="$CCONFIG using_xrandr"
+  echo "CONFIG_XRANDR_LIBS=-lXrandr" >> $MYTH_CONFIG_MAK
 fi
 
 if test x"$xvmc" = x"yes" ; then
