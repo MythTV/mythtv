@@ -628,6 +628,10 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
         curRec->recendts.addSecs(30).time().hour(),
         curRec->recendts.addSecs(30).time().minute()));
 
+    // Make sure really short recordings have positive run time.
+    if (curRec->recendts <= curRec->recstartts)
+        curRec->recendts = mythCurrentDateTime().addSecs(1);
+
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                  .arg(curRec->cardid)
                  .arg(curRec->chanid)
@@ -3868,6 +3872,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     ProgramInfo *oldinfo = tvchain->GetProgramAt(-1);
     if (oldinfo)
     {
+        FinishedRecording(oldinfo);
         (new PreviewGenerator(oldinfo, true))->Start();
         delete oldinfo;
     }
