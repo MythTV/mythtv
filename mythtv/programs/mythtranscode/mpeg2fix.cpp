@@ -868,6 +868,7 @@ bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
                            .arg(info->current_picture->temporal_reference)
                            .arg(info->current_picture->nb_fields)
                            .arg(info->current_picture->flags);
+        msg += QString(" pos: %1").arg(vf->pkt.pos);
         VERBOSE(MPF_DECODE, msg);
     }
 
@@ -1345,7 +1346,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
             return NULL;
 
         if (! skip_first && curPos >= framePos && info->display_picture &&
-              (int)info->display_picture->temporal_reference == frameNum)
+              (int)info->display_picture->temporal_reference >= frameNum)
         {
             found = 1;
             ++(*displayFrame);
@@ -1367,7 +1368,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
                              (spare->framePos - spare->pkt.data);
 
         while (! info->display_picture ||
-                (int)info->display_picture->temporal_reference != frameNum)
+                (int)info->display_picture->temporal_reference < frameNum)
         {
             SetFrameNum(tmpFrame->framePos, ++tmpFrameNum);
             if (ProcessVideo(tmpFrame, img_decoder) < 0)
@@ -1377,6 +1378,17 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
         framePool.enqueue(tmpFrame);
     }
 
+    if (info->display_picture->temporal_reference > frameNum)
+    {
+        // the frame in question doesn't exist.  We have no idea where we are.
+        // reset the displayFrame so we start searching from the beginning next
+        // time
+        displayFrame->toFirst();
+        VERBOSE(MPF_IMPORTANT, QString("Frame %1 > %2."
+                " Corruption likely at pos: %2")
+               .arg(info->display_picture->temporal_reference)
+               .arg(frameNum).arg(spare->pkt.pos));
+    }
     return spare;
 }
 
@@ -1542,8 +1554,7 @@ void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
     else if (tmpPTS < -ptsIncrement ||
              tmpPTS > ptsIncrement*numframes)
     {
-        if (tmpPTS > PTSdiscrep && PTSdiscrep >= 0 ||
-            tmpPTS < PTSdiscrep && PTSdiscrep <= 0)
+        if (tmpPTS != PTSdiscrep)
         {
             PTSdiscrep = tmpPTS;
             VERBOSE(MPF_PROCESS,
@@ -1735,9 +1746,7 @@ int MPEG2fixup::Start()
                                     PTSdiscrep = 0;
                                     break;
                                 }
-                                if (tmpPTSdiscrep > PTSdiscrep && PTSdiscrep > 0
-                                    || tmpPTSdiscrep < PTSdiscrep && 
-                                       PTSdiscrep < 0)
+                                if (tmpPTSdiscrep != PTSdiscrep)
                                     PTSdiscrep = tmpPTSdiscrep;
                             }
                             count += tmpReorder.count();
@@ -2030,8 +2039,9 @@ int MPEG2fixup::Start()
                 nextPTS = add2x33(af->first()->pkt.pts,
                            90000LL * (int64_t)CC->frame_size / CC->sample_rate);
 
-                if (cutState && cmp2x33(nextPTS, cutStartPTS) > 0
-                    && cmp2x33(af->first()->pkt.pts, cutEndPTS) < 0)
+                if (cutState == 1 && cmp2x33(nextPTS, cutStartPTS) > 0 ||
+                    cutState == 2 && 
+                                 cmp2x33(af->first()->pkt.pts, cutEndPTS) < 0)
                 {
                     //VERBOSE(MPF_PROCESS, QString("Aud in cutpoint:\n"
                     //                     "\t%1 > %2 &&\n"
