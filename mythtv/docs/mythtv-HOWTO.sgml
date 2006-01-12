@@ -166,8 +166,8 @@ seems to be ignoring you.
 
 <sect1>Bug database
 <p>If you feel you need to contribute to a bug database, use the MythTV bug
-ticketing system at <url url="http://cvs.mythtv.org/trac"
-name="http://cvs.mythtv.org/trac">.
+ticketing system at <url url="http://svn.mythtv.org/trac"
+name="http://svn.mythtv.org/trac">.
 
 Good entries will contain the following:
 <enum>
@@ -196,7 +196,7 @@ grammatical or spelling error, or if the wording of something is just plain
 confusing.
 
 If you'd like to make a new contribution, create a ticket at <url
-url="http://cvs.mythtv.org/trac" name="http://cvs.mythtv.org/trac"> and
+url="http://svn.mythtv.org/trac" name="http://svn.mythtv.org/trac"> and
 click "New Ticket".  The type should be set to "patch" and the owner set to
 "rkulagow" to ensure that I see your contribution.
 
@@ -1194,7 +1194,7 @@ first is to download the latest release in tarball format and compile.  The
 tarball release of MythTV should work on a wide variety of systems and
 should be the preferred method for new users.  If you wish to use the
 <bf>subversion</bf> copy of MythTV you may obtain it from <url
-url="http://cvs.mythtv.org" name="http://cvs.mythtv.org">
+url="http://svn.mythtv.org" name="http://svn.mythtv.org">
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -5265,72 +5265,60 @@ $ su
 # exit
 </verb></tscreen>
 
-At this point, you now have debug-enabled software ready.  Let's assume that
-the problem you're having is in the <tt>setup</tt> program.
-<tscreen><verb>
-$ cd setup
-$ gdb ./mythtv-setup
-
-GNU gdb 5.3-1mdk (Mandrake Linux)
-Copyright 2002 Free Software Foundation, Inc.
-GDB is free software, covered by the GNU General Public License, and you are
-welcome to change it and/or distribute copies of it under certain
-conditions.
-Type "show copying" to see the conditions.
-There is absolutely no warranty for GDB.  Type "show warranty" for details.
-This GDB was configured as "i586-mandrake-linux-gnu"...
-(gdb) handle SIGPIPE nostop
-Signal        Stop      Print   Pass to program Description
-SIGPIPE       No        Yes     Yes             Broken pipe
-(gdb) handle SIG33 nostop 
-Signal        Stop      Print   Pass to program Description 
-SIG33         No        Yes     Yes             Real-time event 33
-(gdb) set logging on
-Copying output to gdb.txt.
-(gdb)
-</verb></tscreen>
-
-<bf>gdb</bf> has a number of options, read the <tt>man</tt> page for more
-information.
-
-Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
-execution.  When the program segfaults or appears to lock-up (press CTRL-C),
-type 
-<tscreen><verb>
-(gdb) set pagination off
-(gdb) thread apply all bt full
-(gdb) set logging off
-</verb></tscreen>
-
-All of the output from <tt>gdb.txt</tt> should be posted to the mythtv-dev
-mailing list, along with the steps you followed to get the program to crash.
-
-You can also setup <bf>gdb</bf> to run in a semi-automated mode using the
-<tt>~/.gdbinit</tt> file.  In this example we'll be debugging the
-<bf>mythbackend</bf> program:
+At this point, you now have debug-enabled software ready.  To make sure that
+you don't forget to type a command required for debugging, it's best to
+setup a <tt>gdbcommands</tt> file.  This will be read by <bf>gdb</bf> when it's
+started.
+Put the following into <tt>gdbcommands</tt> in your home directory:
 
 <tscreen><verb>
 handle SIGPIPE nostop noprint
 handle SIG33 nostop noprint
 set logging on
 set pagination off
-file mythbackend
-set args -l mythbackend.log -v record,channel,siparser
+set args -l myth.log -v record,channel,siparser
 run
 thread apply all bt full
 set logging off
 </verb></tscreen>
 
-Using the <tt>.gdbinit</tt> file in conjunction with a <bf>while</bf> loop
+Let's assume that the problem you're having is in <bf>mythbackend</bf>.
+
+<tscreen><verb>
+$ gdb mythbackend -x gdbcommands
+GNU gdb 6.3-debian
+Copyright 2004 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i386-linux".Using host libthread_db library "/lib/tls/libthread_db.so.1".
+[Thread debugging using libthread_db enabled]
+</verb></tscreen>
+
+<bf>gdb</bf> will automatically read the commands that you've placed in the
+<tt>gdbcommands</tt> file and begin running the program you specified on the
+command line.
+
+If the program appears to be locked up, press CTRL-C to create the backtrace
+file.
+
+All of the output from <tt>gdb.txt</tt> should be posted to the mythtv-dev
+mailing list, along with the steps you followed to get the program to crash.
+
+<bf>gdb</bf> has a number of options, read the <tt>man</tt> page for more
+information.  
+
+Using the <tt>gdbcommands</tt> file in conjunction with a <bf>while</bf> loop
 will ensure that <bf>gdb</bf> creates a trace file and then restarts:
 
 <tscreen><verb>
-$ while true; do date >> gdb.txt; gdb; done;
+$ while true; do date >> gdb.txt; gdb mythbackend -x gdbcommands; done;
 </verb></tscreen>
 
 <bf>NOTE</bf>: To exit this loop you will need to kill the while loop.
 
-If you're trying to troubleshoot and you can't get back to the gdb window
+If you're trying to troubleshoot and you can't get back to the <bf>gdb</bf> window
 for some reason, it may be easier to use two systems or to start
 mythfrontend from the text console.
 
@@ -7725,7 +7713,7 @@ in the doc about what a good bug report should contain, tell people to use
 trac to submit docs patches.
 
 v0.19pre, 2006-01-  Add "cont" to gdb instructions.  Put in a gdb example of
-using .gdbinit and a while loop.  Start deleting older cruft.
+using a gdbcommands file.  Start deleting older cruft.
 
 -->
 
