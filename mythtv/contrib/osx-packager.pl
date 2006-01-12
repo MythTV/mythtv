@@ -20,6 +20,7 @@ our $svn = `which svn`; chomp $svn;
 # By default, only the frontend is built (i.e. no backend or transcoding)
 #
 our $backend = 0;
+our $jobtools = 0;
 
 # For faster downloads, change this to a local mirror.
 #
@@ -29,8 +30,7 @@ our $sourceforge = 'http://internap.dl.sf.net';
 our @components = ( 'myththemes', 'mythplugins' );
 
 # The OS X programs that we are likely to be interested in.
-our @targetsFE = ( 'MythFrontend',  'MythCommFlag',
-                   'MythJobQueue',  'MythTranscode');
+our @targetsJT = ( 'MythCommFlag',  'MythJobQueue');
 our @targetsBE = ( 'MythBackend',   'MythFillDatabase',
                    'MythTranscode', 'MythTV-Setup');
 
@@ -234,6 +234,7 @@ osx-packager.pl - build OS X binary packages for MythTV
    -nohead          don't update to HEAD revision of MythTV before building
    -usehdimage      perform build inside of a case-sensitive disk image
    -enable-backend  build the backend server as well as the frontend
+   -enable-jobtools build commflag/jobqueue  as well as the frontend
    -plugins <str>   comma-separated list of plugins to include
                       Available plugins:
    mythbrowser mythcontrols mythdvd mythflix mythgallery mythgame
@@ -300,6 +301,7 @@ Getopt::Long::GetOptions(\%OPT,
                          'nohead',
                          'usehdimage',
                          'enable-backend',
+                         'enable-jobtools',
                          'plugins=s',
                         ) or Pod::Usage::pod2usage(2);
 Pod::Usage::pod2usage(1) if $OPT{'help'};
@@ -307,6 +309,9 @@ Pod::Usage::pod2usage('-verbose' => 2) if $OPT{'man'};
 
 if ( $OPT{'enable-backend'} )
 {   $backend = 1  }
+
+if ( $OPT{'enable-jobtools'} )
+{   $jobtools = 1  }
 
 # Get version string sorted out
 if ($OPT{'svntag'} && !$OPT{'version'})
@@ -700,22 +705,8 @@ foreach my $comp (@comps)
     &Syscall('touch config/config.pro');
 
     # Remove Nigel's frontend speedup hack
-    open(IN,  'programs/programs.pro')       or die;
-    open(OUT, '>programs/programs.pro.orig') or die;
-    while ( <IN> )
-    {
-      if ( m/^# Nigel/ )  # Skip
-      {  last  }
-      print OUT;
-    }
-    if ( ! $backend )
-    {
-      # Nigel's hack to speedup building
-      print OUT "# Nigel\'s speedup hack:";
-      print OUT "SUBDIRS = mythfrontend";
-    }
-    close IN; close OUT;
-    rename('programs/programs.pro.orig', 'programs/programs.pro');
+    &DoSpeedupHacks('programs/programs.pro', 'mythfrontend');
+    &DoSpeedupHacks('mythtv.pro', 'libs filters programs themes i18n');
   }
   
   &Verbose("Making $comp");
@@ -743,7 +734,11 @@ $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
 ### because there are now multiple copies of each library.
-my @targets = @targetsFE;
+my @targets = ('MythFrontend');
+
+if ( $jobtools )
+{   push @targets, @targetsJT   }
+
 if ( $backend )
 {   push @targets, @targetsBE   }
 
@@ -761,7 +756,7 @@ foreach my $target ( @targets )
              $finalTarget ]) or die;
   
   # write a custom Info.plist
-  &FrontendPlist($finalTarget, $VERS);
+  &GeneratePlist($target, $builtTarget, $finalTarget, $VERS);
   
   # Make frameworks from Myth libraries
   &Verbose("Installing frameworks into $target");
@@ -788,7 +783,7 @@ foreach my $target ( @targets )
  if ( $target eq "MythFrontend" or $target eq "MythTV-Setup" )
  {
   # Install themes, filters, etc.
-  &Verbose("Installing resources into MythFrontend");
+  &Verbose("Installing resources into $target");
   mkdir "$finalTarget/Contents/Resources";
   mkdir "$finalTarget/Contents/Resources/lib";
   &Syscall([ '/bin/cp', '-R',
@@ -880,14 +875,14 @@ END
 
 
 ######################################
-## FrontendPlist .
+## GeneratePlist .
 ######################################
 
-sub FrontendPlist
+sub GeneratePlist
 {
-  my ($path, $vers) = @_;
+  my ($name, $binary, $path, $vers) = @_;
   
-  &Verbose("Writing Info.plist for MythFrontend");
+  &Verbose("Writing Info.plist for $name");
   my $plist;
   $path .= '/Contents/Info.plist';
   unless (open($plist, ">$path"))
@@ -901,11 +896,11 @@ sub FrontendPlist
 <plist version="1.0">
 <dict>
   <key>CFBundleExecutable</key>
-  <string>mythfrontend</string>
+  <string>$binary</string>
   <key>CFBundleIconFile</key>
   <string>application.icns</string>
   <key>CFBundleIdentifier</key>
-  <string>org.mythtv.macx.mythfrontend</string>
+  <string>org.mythtv.macx.$binary</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundlePackageType</key>
@@ -921,7 +916,7 @@ sub FrontendPlist
   <key>CFBundleGetInfoString</key>
   <string>$vers, MythTV project, www.mythtv.org</string>
   <key>CFBundleName</key>
-  <string>MythFrontend</string>
+  <string>$name</string>
   <key>NSHumanReadableCopyright</key>
   <string>MythTV project, www.mythtv.org</string>
 </dict>
@@ -939,7 +934,7 @@ END
 APPLMyth
 END
   close($plist);
-} # end FrontendPlist
+}
 
 ######################################
 ## FindLibraryFile locates a dylib.
@@ -1149,7 +1144,7 @@ sub UnmountHDImage
     my $device = HDImageDevice();
     if ($device)
     {
-        System('hdiutil', 'detach', $device, '-force');
+        Syscall(['hdiutil', 'detach', $device, '-force']);
     }
 }
 
@@ -1172,6 +1167,34 @@ sub CaseSensitiveFilesystem
   return $sensitivity;
 }
 
+
+######################################
+## Remove or add Nigel's speedup hacks
+######################################
+
+sub DoSpeedupHacks($$)
+{
+  my ($file, $subdirs) = @_;
+
+  &Verbose("Removing Nigel's hacks from file $file");
+
+  open(IN,  $file)         or die;
+  open(OUT, ">$file.orig") or die;
+  while ( <IN> )
+  {
+    if ( m/^# Nigel/ )  # Skip
+    {  last  }
+    print OUT;
+  }
+  if ( ! $backend && ! $jobtools )
+  {
+    # Nigel's hack to speedup building
+    print OUT "# Nigel\'s speedup hack:\n";
+    print OUT "SUBDIRS = $subdirs\n";
+  }
+  close IN; close OUT;
+  rename("$file.orig", $file);
+}
 
 ### end file
 1;
