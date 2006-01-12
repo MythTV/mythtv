@@ -256,6 +256,14 @@
         <source>General Settings (2/2)</source>
         <translation>Generelle innstillinger (2/2)</translation>
     </message>
+    <message>
+        <source>Video List Loads Video Meta Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

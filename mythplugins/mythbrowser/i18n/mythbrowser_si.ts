@@ -82,15 +82,15 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>         Back         </source>
-        <translation>         Nazaj         </translation>
+        <translation type="obsolete">         Nazaj         </translation>
     </message>
     <message>
         <source>       Next Tab       </source>
-        <translation>     Naslednji jeziček     </translation>
+        <translation type="obsolete">     Naslednji jeziček     </translation>
     </message>
     <message>
         <source>       Prev Tab       </source>
-        <translation>     Predhodnji jeziček     </translation>
+        <translation type="obsolete">     Predhodnji jeziček     </translation>
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
@@ -118,15 +118,55 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
     </message>
     <message>
         <source>      Remove Tab      </source>
-        <translation>      Odstrani Zavihek      </translation>
+        <translation type="obsolete">      Odstrani Zavihek      </translation>
     </message>
     <message>
         <source>       Zoom Out       </source>
-        <translation>       Pomanjšaj       </translation>
+        <translation type="obsolete">       Pomanjšaj       </translation>
     </message>
     <message>
         <source>       Zoom In        </source>
-        <translation>       Povečaj       </translation>
+        <translation type="obsolete">       Povečaj       </translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prev Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Skupina:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Opis:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
     </message>
 </context>
 </TS>

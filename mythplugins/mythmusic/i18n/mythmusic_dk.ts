@@ -311,6 +311,42 @@
         <source>From CD</source>
         <translation>Fra CD</translation>
     </message>
+    <message>
+        <source>Change Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Playlist Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert after current track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Append to end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue playing current track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play first track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play first new track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Duplicates</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -440,7 +476,7 @@
     </message>
     <message>
         <source> - </source>
-        <translation> - </translation>
+        <translation type="obsolete"> - </translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -696,7 +732,7 @@
     </message>
     <message>
         <source> ~ </source>
-        <translation> ~ </translation>
+        <translation type="obsolete"> ~ </translation>
     </message>
     <message>
         <source>Ooops</source>
@@ -704,7 +740,7 @@
     </message>
     <message>
         <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
+        <translation type="obsolete">%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -716,7 +752,7 @@
     </message>
     <message>
         <source>,%1</source>
-        <translation>,%1</translation>
+        <translation type="obsolete">,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -800,23 +836,23 @@
     </message>
     <message>
         <source>1x</source>
-        <translation>1x</translation>
+        <translation type="obsolete">1x</translation>
     </message>
     <message>
         <source>2x</source>
-        <translation>2x</translation>
+        <translation type="obsolete">2x</translation>
     </message>
     <message>
         <source>4x</source>
-        <translation>4x</translation>
+        <translation type="obsolete">4x</translation>
     </message>
     <message>
         <source>8x</source>
-        <translation>8x</translation>
+        <translation type="obsolete">8x</translation>
     </message>
     <message>
         <source>16x</source>
-        <translation>16x</translation>
+        <translation type="obsolete">16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -885,6 +921,18 @@
     <message>
         <source>Rebuilding music tree</source>
         <translation>Genopbygger musik træ</translation>
+    </message>
+    <message>
+        <source>Only Import new music.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checks the database for duplicates when importing/ripping CDs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading Music</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

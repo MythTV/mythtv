@@ -100,6 +100,10 @@
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -194,6 +198,14 @@
     <message>
         <source>Ok</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Overlay caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the number of seconds to show a caption on top of a full size picture.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

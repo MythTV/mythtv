@@ -17,6 +17,25 @@ El valor mínimo permitido son 30 minutos.</translation>
     </message>
 </context>
 <context>
+    <name>MythFlixQueue</name>
+    <message>
+        <source>Manage Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top Of Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove From Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NewsSite</name>
     <message>
         <source>Retrieve Failed. </source>

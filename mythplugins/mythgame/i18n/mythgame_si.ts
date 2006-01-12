@@ -1030,8 +1030,50 @@ Prosim vnesite pravilno pot in poizkusite ponovno.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rom Information
-</source>
+        <source>19xx</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No to all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes to all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Missing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 appears to be missing.
+Remove it from the database?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will clear all Game Meta Data
+from the database. Are you sure you
+want to do this?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SEGA/MASTER SYSYTEM</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

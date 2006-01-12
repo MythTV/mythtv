@@ -890,6 +890,14 @@
         <source>Loading Music</source>
         <translation>Cargando música</translation>
     </message>
+    <message>
+        <source>Only Import new music.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checks the database for duplicates when importing/ripping CDs.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>

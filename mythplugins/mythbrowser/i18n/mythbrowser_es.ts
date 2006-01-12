@@ -78,15 +78,15 @@ Pulsar ESPACIO/Enter en una entrada seleccionada la borra de la lista.</translat
     <name>TabView</name>
     <message>
         <source>         Back         </source>
-        <translation>Atrás</translation>
+        <translation type="obsolete">Atrás</translation>
     </message>
     <message>
         <source>       Next Tab       </source>
-        <translation>Siguiente Pestaña</translation>
+        <translation type="obsolete">Siguiente Pestaña</translation>
     </message>
     <message>
         <source>       Prev Tab       </source>
-        <translation>Anterior Pestaña</translation>
+        <translation type="obsolete">Anterior Pestaña</translation>
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
@@ -118,15 +118,55 @@ Pulsar ESPACIO/Enter en una entrada seleccionada la borra de la lista.</translat
     </message>
     <message>
         <source>      Remove Tab      </source>
-        <translation>Borrar Pestaá</translation>
+        <translation type="obsolete">Borrar Pestaá</translation>
     </message>
     <message>
         <source>       Zoom Out       </source>
-        <translation>Zoom -</translation>
+        <translation type="obsolete">Zoom -</translation>
     </message>
     <message>
         <source>       Zoom In        </source>
-        <translation>Zoom +</translation>
+        <translation type="obsolete">Zoom +</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prev Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Grupo:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Descripción:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
     </message>
 </context>
 </TS>

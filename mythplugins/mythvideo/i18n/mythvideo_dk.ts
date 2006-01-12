@@ -69,11 +69,11 @@
     </message>
     <message>
         <source>2</source>
-        <translation>2</translation>
+        <translation type="obsolete">2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation>3</translation>
+        <translation type="obsolete">3</translation>
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
@@ -263,6 +263,14 @@
     <message>
         <source>General Settings (2/2)</source>
         <translation>Generel Opsætning (2/2)</translation>
+    </message>
+    <message>
+        <source>Video List Loads Video Meta Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -523,7 +531,7 @@
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skift til Browse visning</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
@@ -679,7 +687,7 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ingen ratings tilgængelig</translation>
     </message>
     <message>
         <source>minutes</source>

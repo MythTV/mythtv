@@ -82,15 +82,15 @@ De OK toets verwijders het item uit de lijst.</translation>
     </message>
     <message>
         <source>         Back         </source>
-        <translation>         Terug         </translation>
+        <translation type="obsolete">         Terug         </translation>
     </message>
     <message>
         <source>       Next Tab       </source>
-        <translation>     Volgende Tab       </translation>
+        <translation type="obsolete">     Volgende Tab       </translation>
     </message>
     <message>
         <source>       Prev Tab       </source>
-        <translation>     Vorige Tab         </translation>
+        <translation type="obsolete">     Vorige Tab         </translation>
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
@@ -117,15 +117,43 @@ De OK toets verwijders het item uit de lijst.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>      Remove Tab      </source>
+        <source>Back</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>       Zoom Out       </source>
+        <source>Next Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>       Zoom In        </source>
+        <source>Prev Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Groep:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Beschrijving:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

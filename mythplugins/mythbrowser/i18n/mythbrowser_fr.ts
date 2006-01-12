@@ -78,15 +78,15 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
     <name>TabView</name>
     <message>
         <source>         Back         </source>
-        <translation>        Arrière        </translation>
+        <translation type="obsolete">        Arrière        </translation>
     </message>
     <message>
         <source>       Next Tab       </source>
-        <translation>    Onglet Suivant    </translation>
+        <translation type="obsolete">    Onglet Suivant    </translation>
     </message>
     <message>
         <source>       Prev Tab       </source>
-        <translation>   Onglet Précédent   </translation>
+        <translation type="obsolete">   Onglet Précédent   </translation>
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
@@ -117,16 +117,44 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
         <translation>Annuler</translation>
     </message>
     <message>
-        <source>      Remove Tab      </source>
+        <source>Back</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>       Zoom Out       </source>
+        <source>Next Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>       Zoom In        </source>
+        <source>Prev Tab</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Groupe:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Description:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
     </message>
 </context>
 </TS>

@@ -81,19 +81,19 @@ Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
     </message>
     <message>
         <source>         Back         </source>
-        <translation>         Bakover         </translation>
+        <translation type="obsolete">         Bakover         </translation>
     </message>
     <message>
         <source>       Next Tab       </source>
-        <translation>       Neste fane       </translation>
+        <translation type="obsolete">       Neste fane       </translation>
     </message>
     <message>
         <source>       Prev Tab       </source>
-        <translation>       Forrige fane       </translation>
+        <translation type="obsolete">       Forrige fane       </translation>
     </message>
     <message>
         <source>      Remove Tab      </source>
-        <translation>      Fjern fane      </translation>
+        <translation type="obsolete">      Fjern fane      </translation>
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
@@ -101,11 +101,11 @@ Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
     </message>
     <message>
         <source>       Zoom Out       </source>
-        <translation>       Forminske       </translation>
+        <translation type="obsolete">       Forminske       </translation>
     </message>
     <message>
         <source>       Zoom In        </source>
-        <translation>       Forstørre        </translation>
+        <translation type="obsolete">       Forstørre        </translation>
     </message>
     <message>
         <source>Enter URL</source>
@@ -118,6 +118,46 @@ Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prev Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation type="unfinished">Gruppe:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Beskrivelse:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
     </message>
 </context>
 </TS>

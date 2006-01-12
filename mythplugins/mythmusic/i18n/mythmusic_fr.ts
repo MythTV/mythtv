@@ -315,6 +315,42 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>From CD</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Change Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update Playlist Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert after current track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Append to end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue playing current track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play first track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play first new track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Duplicates</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -852,6 +888,18 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Rebuilding music tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only Import new music.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checks the database for duplicates when importing/ripping CDs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading Music</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
