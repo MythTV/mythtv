@@ -344,6 +344,10 @@
         <source>Exclude unidentified episodes</source>
         <translation>Exkludera oidentifierade avsnitt</translation>
     </message>
+    <message>
+        <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
+        <translation>Begränsa enligt MPAA- eller VCHIP-klassificering (Data Direct)</translation>
+    </message>
 </context>
 <context>
     <name>DTVSignalMonitor</name>
@@ -1134,16 +1138,24 @@ Returning to the previous menu.</source>
         <translation>OBS: borttagning av poster från denna lista raderar inte några inspelningar.</translation>
     </message>
     <message>
-        <source>Keep this episode in the list</source>
-        <translation>Behåll detta avsnitt i listan</translation>
-    </message>
-    <message>
         <source>Remove this episode from the list</source>
         <translation>Ta bort detta avsnitt från listan</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
         <translation>Ta bort alla avsnitt för denna titel</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Allow this episode to re-record</source>
+        <translation>Tillåt återinspelning av detta avsnitt</translation>
+    </message>
+    <message>
+        <source>Never record this episode</source>
+        <translation>Spela aldrig in detta avsnitt</translation>
     </message>
 </context>
 <context>
@@ -1883,10 +1895,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Time format</source>
         <translation>Tidsformat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Välj det tidsformat du föredrar. Välj ett format med &quot;AP&quot; i formatmallen för att få tider med AM/PM angivelse. Övriga format ger 24-timmarsvisning.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -2946,10 +2954,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Välj lämplig frekvenstabell. I Sverige borde &apos;europe-west&apos; vara att föredra.</translation>
     </message>
     <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation>Döp om originalfilen (nuv) till nuv.old när omkodningen är klar.</translation>
-    </message>
-    <message>
         <source>Time offset for XMLTV listings</source>
         <translation>Tidsförskjutning för XMLTV-tablåinformation</translation>
     </message>
@@ -3603,7 +3607,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Separate video modes for GUI and TV playback</source>
-        <translation>Separat upplösning för användargränsnittet och TV-uppspelning</translation>
+        <translation>Separat upplösning för användargränssnittet och TV-uppspelning</translation>
     </message>
     <message>
         <source>Video Mode Settings</source>
@@ -3887,7 +3891,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>When enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
-        <translation>Kräv bekräftelse när du trycker på Systemavslutningstangenten.</translation>
+        <translation>Kräv bekräftelse när du trycker på Systemnedstängningstangenten.</translation>
     </message>
     <message>
         <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
@@ -4247,7 +4251,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Listings Status shows the latest status information from mythfilldatabase</source>
-        <translation>TV-tablåstatus visar senaste statusinformationen från mythfilldatabase</translation>
+        <translation>TV-tablåstatus visar senaste statusinformation från mythfilldatabase</translation>
     </message>
     <message>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
@@ -4666,10 +4670,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>Director</source>
         <translation>Regissör</translation>
-    </message>
-    <message>
-        <source>Filesize</source>
-        <translation>Filstorlek</translation>
     </message>
     <message>
         <source>Recording Group</source>
@@ -6120,7 +6120,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Your preferred language for the user interface.</source>
-        <translation>Det språk som skall användas i användargränsnittet.</translation>
+        <translation>Det språk som skall användas i användargränssnittet.</translation>
     </message>
     <message>
         <source>Guide Language #%1</source>
@@ -6460,7 +6460,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Subtype</source>
-        <translation>Subtyp</translation>
+        <translation>Undertyp</translation>
     </message>
     <message>
         <source>Frontend ID</source>
@@ -6584,7 +6584,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Perform EIT Scan</source>
-        <translation>Utför EIT-scanning</translation>
+        <translation>Utför EIT-sökning</translation>
     </message>
     <message>
         <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
@@ -6596,7 +6596,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
-        <translation>Maximal tid att vänta på programinformation på en digital kanal innan scanningen går vidare till nästa kanal.</translation>
+        <translation>Maximal tid att vänta på programinformation på en digital kanal innan sökningen går vidare till nästa kanal.</translation>
     </message>
     <message>
         <source>Status</source>
@@ -6784,7 +6784,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Adapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Adapter</translation>
     </message>
     <message>
         <source>Presenter</source>
@@ -6816,7 +6816,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old.  LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation>Audoraderingen tvingar radering av LiveTV-inspelningar när de är så här många dagar gamla, men de raderas även tidigare om nödvändigt.</translation>
+        <translation>Autoraderingen tvingar radering av LiveTV-inspelningar när de är så här många dagar gamla, men de raderas även tidigare om nödvändigt.</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
@@ -6880,7 +6880,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
-        <translation>Tillåt DataDirect att specificera när nästa nerladdning av guidedata ska ske för att jämna ut fördelningen på deras servrar.</translation>
+        <translation>Tillåt DataDirect att specificera när nästa nerladdning av guidedata ska ske för att jämna ut belastningen på deras servrar.</translation>
     </message>
     <message>
         <source>Recording Profile</source>
@@ -6893,6 +6893,74 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>Suggested Next: </source>
         <translation>Föreslagen nästa körning: </translation>
+    </message>
+    <message>
+        <source>Title Pronounce</source>
+        <translation>Titel-uttal</translation>
+    </message>
+    <message>
+        <source>Recording Rule</source>
+        <translation>Inspelningsregel</translation>
+    </message>
+    <message>
+        <source>Search Phrase</source>
+        <translation>Sökfras</translation>
+    </message>
+    <message>
+        <source>Recorded File Size</source>
+        <translation>Sparad filstorlek</translation>
+    </message>
+    <message>
+        <source>Allows the transcoder to resize the video during transcoding.</source>
+        <translation>Låter omkodaren ändra storlek på video under omkodning.</translation>
+    </message>
+    <message>
+        <source>Lossless transcoding</source>
+        <translation>Icke-förstörande omkodning</translation>
+    </message>
+    <message>
+        <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
+        <translation>Omkoda endast där det är absolut nödvändigt (normalt endast runt klippunkter). Ljud och videoformat behålls identiskt med källan. Detta ger högst kvalitet men sparar inte lika mycket diskutrymme som fullständig omkodning.</translation>
+    </message>
+    <message>
+        <source>Enable DTS to SPDIF passthrough</source>
+        <translation>Aktivera DTS till SPDIF</translation>
+    </message>
+    <message>
+        <source>Enable sending DTS audio directly to your sound card&apos;s SPDIF output, on sources which contain DTS soundtracks (usually DVDs).  Requires that the audio output device be set to something suitable.</source>
+        <translation>Skicka DTS-ljud direkt till ditt ljudkorts SPDIF-utgång för källor som har DTS-ljudspår (vanligtvis DVDer). Kräver att ljudenheten är satt till något lämpligt.</translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>Exempel visas med dagens datum.</translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>Exempel visas med morgondagens datum.</translation>
+    </message>
+    <message>
+        <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation>Önskat datumformat.</translation>
+    </message>
+    <message>
+        <source>AutoExpire List</source>
+        <translation>Autoradering</translation>
+    </message>
+    <message>
+        <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
+        <translation>Autoradering visar alla inspelningar som kan tas bort automatiskt och deras inbördes ordning. Inspelningar överst i listan tas bort först.</translation>
+    </message>
+    <message>
+        <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
+        <translation>Om omkodaren är aktiverad, döp om originalfilerna till .old när omkodningen är klar.</translation>
+    </message>
+    <message>
+        <source>Preserve Aspect Ratio of Video when resizing</source>
+        <translation>Bevara bildaspekt när storlek ändras</translation>
+    </message>
+    <message>
+        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
+        <translation>Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
     </message>
 </context>
 <context>
@@ -7069,6 +7137,14 @@ Inga andra detaljer</translation>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
         <translation>Temat som används innehåller ett okänt element (&apos;%1&apos;) som kommer att ignoreras</translation>
+    </message>
+    <message>
+        <source>%1 recordings consuming %2 are allowed to expire</source>
+        <translation>%1 inspelningar på %2 tillåts autoraderas</translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation>LiveTV</translation>
     </message>
 </context>
 <context>
@@ -7586,14 +7662,6 @@ Inga andra detaljer</translation>
         <translation>Signal %1%</translation>
     </message>
     <message>
-        <source>S/N %1 dB</source>
-        <translation>S/N %1 dB</translation>
-    </message>
-    <message>
-        <source>Bit Errors %1</source>
-        <translation>Bitfel %1</translation>
-    </message>
-    <message>
         <source>Seek:</source>
         <translation>Sök:</translation>
     </message>
@@ -7606,14 +7674,26 @@ Inga andra detaljer</translation>
         <translation>Uppspelningsgrupp: %1</translation>
     </message>
     <message>
-        <source>CC:</source>
-        <comment>closed caption, teletext page</comment>
-        <translation>Textning:</translation>
-    </message>
-    <message>
         <source>Seek:</source>
         <comment>seek to location</comment>
         <translation>Sök:</translation>
+    </message>
+    <message>
+        <source>TXT:</source>
+        <translation>Text-TV:</translation>
+    </message>
+    <message>
+        <source>CC:</source>
+        <translation>Textning:</translation>
+    </message>
+    <message>
+        <source>S/N %1dB</source>
+        <translation>S/N %1dB</translation>
+    </message>
+    <message>
+        <source>BE %1</source>
+        <comment>Bit Errors</comment>
+        <translation>BE %1</translation>
     </message>
 </context>
 <context>
@@ -7777,6 +7857,42 @@ Inga andra detaljer</translation>
     <message>
         <source>(1)Time (2)Title</source>
         <translation>(1)Tid (2)Titel</translation>
+    </message>
+    <message>
+        <source>Program Details:</source>
+        <translation>Programdetaljer:</translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation>Programdetaljer</translation>
+    </message>
+    <message>
+        <source>Welcome to MythTV</source>
+        <translation>Välkommen till MythTV</translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown shortly.</source>
+        <translation>MythTV är inaktivt och kommer att stänga ned inom kort.</translation>
+    </message>
+    <message>
+        <source>Current Recording(s)</source>
+        <translation>Nuvarande inspelning(ar)</translation>
+    </message>
+    <message>
+        <source>Retrieving Recording Status ...</source>
+        <translation>Hämtar inspelningsstatus ...</translation>
+    </message>
+    <message>
+        <source>Next Scheduled Recording(s)</source>
+        <translation>Nästa schemalagda inspelning(ar)</translation>
+    </message>
+    <message>
+        <source>Retrieving Scheduled Recordings ...</source>
+        <translation>Hämtar schemalagda inspelningar ...</translation>
+    </message>
+    <message>
+        <source>WARNING: There are conflicting scheduled recordings!</source>
+        <translation>VARNING: Schemalagda inspelningar krockar!</translation>
     </message>
 </context>
 <context>
@@ -7981,7 +8097,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
-        <translation>MythTV är inaktivt och kommer stänga ned om %1 sekunder.</translation>
+        <translation>MythTV är inaktivt och kommer att stänga ned om %1 sekunder.</translation>
     </message>
 </context>
 </TS>
