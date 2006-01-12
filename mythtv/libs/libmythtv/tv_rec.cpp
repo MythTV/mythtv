@@ -395,6 +395,8 @@ void TVRec::CancelNextRecording(bool cancel)
  */
 RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
+    VERBOSE(VB_RECORD, LOC + QString("StartRecording(%1)").arg(rcinfo->title));
+
     QMutexLocker lock(&stateChangeLock);
     QString msg("");
 
@@ -469,6 +471,9 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         curRecording = new ProgramInfo(*rcinfo);
         curRecording->MarkAsInUse(true, "recorder");
         StartedRecording(curRecording);
+
+        // Make sure scheduler is allowed to end this recording
+        ClearFlags(kFlagCancelNextRecording);
 
         ChangeState(kState_RecordingOnly);
 
@@ -702,6 +707,7 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
     {
+        SetPseudoLiveTVRecording(NULL);
         tuningRequests.enqueue(TuningRequest(kFlagRecording, curRecording));
         SET_NEXT();
     }
@@ -2619,6 +2625,10 @@ void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
     // + save record rule,
     //   this time we allow signalChange() to trigger reschedule..
     rec->GetScheduledRecording()->save(true);
+
+    // Allow scheduler to end this recording before post-roll,
+    // if it has another recording for this recorder.
+    ClearFlags(kFlagCancelNextRecording);
 }
 
 /** \fn TVRec::StopLiveTV(void)
