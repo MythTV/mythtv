@@ -661,11 +661,14 @@ bool NuppelDecoder::InitAVCodec(int codec)
         mpa_ctx->extradata_size = ffmpeg_extradatasize;
     }
 
+    pthread_mutex_lock(&avcodeclock);
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
+        pthread_mutex_unlock(&avcodeclock);
         VERBOSE(VB_IMPORTANT, "Couldn't find lavc codec");
         return false;
     }
+    pthread_mutex_unlock(&avcodeclock);
 
     return true;
 }
@@ -675,7 +678,9 @@ void NuppelDecoder::CloseAVCodec(void)
     if (!mpa_codec)
         return;
 
+    pthread_mutex_lock(&avcodeclock);
     avcodec_close(mpa_ctx);
+    pthread_mutex_unlock(&avcodeclock);
 
     if (mpa_ctx)
         av_free(mpa_ctx);
