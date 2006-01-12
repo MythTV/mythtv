@@ -344,6 +344,10 @@
         <source>The database error was</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DTVSignalMonitor</name>
@@ -657,6 +661,17 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -671,10 +686,6 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Create New Playback Group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -695,6 +706,10 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>(Create new group)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -754,10 +769,6 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1132,15 +1143,23 @@ Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep this episode in the list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remove this episode from the list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow this episode to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never record this episode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1958,10 +1977,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2691,10 +2706,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Filesize</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording Group</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3235,10 +3246,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Create New Recording Group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5142,7 +5149,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will use the 24-hour clock.</translation>
+        <translation type="obsolete">Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will use the 24-hour clock.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -6236,26 +6243,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>, using recording profile &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>, using your typical recording profile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 hours left %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 minutes left %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Uptime</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6457,10 +6444,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6852,11 +6835,115 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display Name</source>
+        <source>Title Pronounce</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This name is displayed on screen when live TV begins and when changing the selected input or card.</source>
+        <source>Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded File Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows the transcoder to resize the video during transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lossless transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Name (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable DTS to SPDIF passthrough</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sending DTS audio directly to your sound card&apos;s SPDIF output, on sources which contain DTS soundtracks (usually DVDs).  Requires that the audio output device be set to something suitable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run mythfilldatabase at time suggested by the grabber.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AutoExpire List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suggested Next: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, using your %1 rate of %2 Kb/sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hours left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hours and %2 minutes left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 minutes left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>maximum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7031,6 +7118,14 @@ No other details</source>
         <source>Status: </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 recordings consuming %2 are allowed to expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TV</name>
@@ -7191,11 +7286,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CC:</source>
-        <comment>closed caption, teletext page</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Seek:</source>
         <comment>seek to location</comment>
         <translation type="unfinished"></translation>
@@ -7218,14 +7308,6 @@ No other details</source>
     </message>
     <message>
         <source>Signal %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>S/N %1 dB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bit Errors %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7576,6 +7658,31 @@ No other details</source>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TXT:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S/N %1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BE %1</source>
+        <comment>Bit Errors</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -7737,6 +7844,42 @@ No other details</source>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown shortly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recording(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieving Recording Status ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Scheduled Recording(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieving Scheduled Recordings ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING: There are conflicting scheduled recordings!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

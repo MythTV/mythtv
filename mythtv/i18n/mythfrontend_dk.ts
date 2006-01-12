@@ -237,11 +237,11 @@
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation>Undlad ukendte episoder (Data Direct)</translation>
+        <translation type="obsolete">Undlad ukendte episoder (Data Direct)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation>Undlad ukendte episoder (XMLTV)</translation>
+        <translation type="obsolete">Undlad ukendte episoder (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -377,6 +377,14 @@
     </message>
     <message>
         <source>Additional Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -699,6 +707,17 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -721,7 +740,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation>Brug dit tastatur eller nummertasterne på din remote til at indtaste gruppe navnet</translation>
+        <translation type="obsolete">Brug dit tastatur eller nummertasterne på din remote til at indtaste gruppe navnet</translation>
     </message>
     <message>
         <source>Delete playback group:</source>
@@ -734,6 +753,14 @@ Returning to the previous menu.</source>
     <message>
         <source>No, Don&apos;t delete group</source>
         <translation>Nej, behold gruppen</translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Create new group)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -804,7 +831,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation type="obsolete">Afbryd</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -1154,6 +1181,10 @@ Returning to the previous menu.</source>
         <source>Group Password</source>
         <translation>Gruppe kode</translation>
     </message>
+    <message>
+        <source>Show Program Details</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1230,7 +1261,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation>Behold denne episode på listen</translation>
+        <translation type="obsolete">Behold denne episode på listen</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1239,6 +1270,25 @@ Returning to the previous menu.</source>
     <message>
         <source>Remove all episodes for this title</source>
         <translation>Fjern alle episode med denne titel</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Allow this episode to re-record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never record this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ProgDetails</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -2034,7 +2084,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Dit foretrukne tidsformat. Vælg et format med &quot;AP&quot; i for at bruge AM/PM. Ellers bliver det vist i 24 timersformat eller militær format.</translation>
+        <translation type="obsolete">Dit foretrukne tidsformat. Vælg et format med &quot;AP&quot; i for at bruge AM/PM. Ellers bliver det vist i 24 timersformat eller militær format.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -3081,7 +3131,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Status</source>
-        <translation type="obsolete">Status</translation>
+        <translation type="unfinished">Status</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -3229,7 +3279,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation>Hvis aktiv og transkodning er gennemført, bliver den originale nuv fil omdøbt til nuv.old.</translation>
+        <translation type="obsolete">Hvis aktiv og transkodning er gennemført, bliver den originale nuv fil omdøbt til nuv.old.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
@@ -3657,7 +3707,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>TXT on</source>
-        <translation>TXT til</translation>
+        <translation type="obsolete">TXT til</translation>
     </message>
     <message>
         <source>CC</source>
@@ -4016,7 +4066,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation>Brug dit tastatur eller nummertasterne på din remote til at indtaste gruppe navnet</translation>
+        <translation type="obsolete">Brug dit tastatur eller nummertasterne på din remote til at indtaste gruppe navnet</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
@@ -4862,7 +4912,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Filesize</source>
-        <translation>Filstørrelse</translation>
+        <translation type="obsolete">Filstørrelse</translation>
     </message>
     <message>
         <source>Recording Group</source>
@@ -6315,24 +6365,16 @@ Myth will now exit.</source>
         <translation>%1 totalt, %2 brugt, %3 (eller %4%) fri.</translation>
     </message>
     <message>
-        <source>, using recording profile &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>, using your typical recording profile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 hours left %2</source>
-        <translation>%1 timer tilbage %2</translation>
+        <translation type="obsolete">%1 timer tilbage %2</translation>
     </message>
     <message>
         <source>%1 hours and %2 minutes left %3</source>
-        <translation>%1 timer og %2 minutter tilbage %1</translation>
+        <translation type="obsolete">%1 timer og %2 minutter tilbage %1</translation>
     </message>
     <message>
         <source>%1 minutes left %2</source>
-        <translation>%1 minutter tilbage %2</translation>
+        <translation type="obsolete">%1 minutter tilbage %2</translation>
     </message>
     <message>
         <source>Disk usage on %1:</source>
@@ -6425,7 +6467,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Status: </source>
-        <translation>Status: </translation>
+        <translation type="obsolete">Status: </translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -6461,10 +6503,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7042,10 +7080,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythShutdown Script Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Perform EIT Scan</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7290,10 +7324,6 @@ Myth will now exit.</source>
         <translation>Afspilnings gruppe</translation>
     </message>
     <message>
-        <source>Store in the &quot;%1&quot; playback group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select Playback Group</source>
         <translation>Vælg Afspilnings gruppe</translation>
     </message>
@@ -7307,6 +7337,198 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Pronounce</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unidentified Episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Producer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Executive Producer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Writer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adapter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Presenter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commentator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded File Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows the transcoder to resize the video during transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lossless transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Name (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable DTS to SPDIF passthrough</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sending DTS audio directly to your sound card&apos;s SPDIF output, on sources which contain DTS soundtracks (usually DVDs).  Requires that the audio output device be set to something suitable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV recordings Max Age</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old.  LiveTV recordings may also be expired early if necessary to free up disk space.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run mythfilldatabase at time suggested by the grabber.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AutoExpire List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suggested Next: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, using your %1 rate of %2 Kb/sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hours left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hours and %2 minutes left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 minutes left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>maximum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Defines a period the master backend should be awake</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown with Master Backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run to start the Frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to start mythfrontend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythShutdown/MythWelcome Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7484,6 +7706,14 @@ Ikke flere oplysninger</translation>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 recordings consuming %2 are allowed to expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished">LiveTV</translation>
     </message>
 </context>
 <context>
@@ -8034,11 +8264,11 @@ Ikke flere oplysninger</translation>
     </message>
     <message>
         <source>S/N %1 dB</source>
-        <translation>S/N %1 dB</translation>
+        <translation type="obsolete">S/N %1 dB</translation>
     </message>
     <message>
         <source>Bit Errors %1</source>
-        <translation>Bit fejl %1</translation>
+        <translation type="obsolete">Bit fejl %1</translation>
     </message>
     <message>
         <source>Seek:</source>
@@ -8059,6 +8289,32 @@ Ikke flere oplysninger</translation>
     <message>
         <source>%1 Settings</source>
         <translation>%1 Opsætning</translation>
+    </message>
+    <message>
+        <source>TXT:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seek:</source>
+        <comment>seek to location</comment>
+        <translation type="unfinished">Søg:</translation>
+    </message>
+    <message>
+        <source>S/N %1dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BE %1</source>
+        <comment>Bit Errors</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8223,6 +8479,61 @@ Ikke flere oplysninger</translation>
         <source>(1)Time (2)Title</source>
         <translation>(1)Tid  (2)Titel</translation>
     </message>
+    <message>
+        <source>Program Details:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown shortly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recording(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieving Recording Status ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Scheduled Recording(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieving Scheduled Recordings ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING: There are conflicting scheduled recordings!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UIManagedTreeListType</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts with text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contains text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Afbryd</translation>
+    </message>
 </context>
 <context>
     <name>VideoSourceEditor</name>
@@ -8268,6 +8579,14 @@ Ikke flere oplysninger</translation>
     <message>
         <source>All</source>
         <translation>Alt</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;schdiff&apos; element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>

@@ -750,6 +750,17 @@ Je reviens au menu précédent.</translation>
     </message>
 </context>
 <context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -1908,7 +1919,7 @@ Je reviens au menu précédent.</translation>
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Choisissez votre format de date préféré. saisissez &apos;AP&apos; dans le format pour indiquer un affichage de type matin/après-midi.</translation>
+        <translation type="obsolete">Choisissez votre format de date préféré. saisissez &apos;AP&apos; dans le format pour indiquer un affichage de type matin/après-midi.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -7872,6 +7883,18 @@ Myth va maintenant s&apos;interrompre.</translation>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
         <translation>Quand cette option est choisie et après transcodage, les enregistrements originaux seront renommés en &quot;.old&quot;.</translation>
     </message>
+    <message>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8652,6 +8675,14 @@ Pas d&apos;autres informations</translation>
         <comment>Bit Errors</comment>
         <translation>BE %1</translation>
     </message>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -8814,6 +8845,42 @@ Pas d&apos;autres informations</translation>
     <message>
         <source>(1)Time (2)Title</source>
         <translation>(1)Heure (2)Titre</translation>
+    </message>
+    <message>
+        <source>Program Details:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown shortly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recording(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieving Recording Status ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Scheduled Recording(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieving Scheduled Recordings ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING: There are conflicting scheduled recordings!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

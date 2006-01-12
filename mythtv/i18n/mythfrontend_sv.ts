@@ -667,6 +667,17 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
+    <name>NuppelVideoPlayer</name>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -6956,11 +6967,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation>Bevara bildaspekt när storlek ändras</translation>
+        <translation type="obsolete">Bevara bildaspekt när storlek ändras</translation>
     </message>
     <message>
         <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
-        <translation>Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
+        <translation type="obsolete">Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
     </message>
 </context>
 <context>
@@ -7694,6 +7705,14 @@ Inga andra detaljer</translation>
         <source>BE %1</source>
         <comment>Bit Errors</comment>
         <translation>BE %1</translation>
+    </message>
+    <message>
+        <source>Close Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load commercial skip list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
