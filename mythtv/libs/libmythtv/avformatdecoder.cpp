@@ -310,9 +310,9 @@ void AvFormatDecoder::CloseContext()
             AVStream *st = ic->streams[i];
             if (st->codec->codec)
             {
-                pthread_mutex_lock(&avcodeclock);
+                //pthread_mutex_lock(&avcodeclock);
                 avcodec_close(st->codec);
-                pthread_mutex_unlock(&avcodeclock);
+                //pthread_mutex_unlock(&avcodeclock);
             }
         }
 
@@ -1109,9 +1109,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (!enc->codec)
         {
-            pthread_mutex_lock(&avcodeclock);
+            //pthread_mutex_lock(&avcodeclock);
             int open_val = avcodec_open(enc, codec);
-            pthread_mutex_unlock(&avcodeclock);
+            //pthread_mutex_unlock(&avcodeclock);
             if (open_val < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR
