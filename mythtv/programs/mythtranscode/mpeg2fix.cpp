@@ -1104,7 +1104,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             statustime = statustime.addSecs(5);
         }
 
-        //VERBOSE(MPF_FRAME, QString("Stream: %1 PTS: %2 pos: %3")
+        //VERBOSE(MPF_DECODE, QString("Stream: %1 PTS: %2 pos: %3")
         //      .arg(pkt->stream_index).arg(PtsTime(pkt->pts)).arg(pkt->pos));
 
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
@@ -1177,8 +1177,18 @@ bool MPEG2fixup::FindStart()
 
             while (! af->isEmpty())
             {
-                if (cmp2x33(af->first()->pkt.pts, vFrame.first()->pkt.pts) < 0
-                        && af->count() > 1)
+                int64_t delta = diff2x33(af->first()->pkt.pts,
+                                         vFrame.first()->pkt.pts);
+                if (delta < -180000 || delta > 180000) //2 seconds
+                {
+                        VERBOSE(MPF_PROCESS,
+                                QString("Dropping A packet from stream %1")
+                                       .arg(it.key()));
+                        framePool.enqueue( af->first());
+                        af->removeFirst();
+                        continue;
+                }
+                if (delta < 0 && af->count() > 1)
                 {
                     if (cmp2x33(af->next()->pkt.pts,
                                 vFrame.first()->pkt.pts) > 0)
@@ -1198,8 +1208,7 @@ bool MPEG2fixup::FindStart()
                         continue;
                     }
                 }
-                else if (cmp2x33(af->first()->pkt.pts,
-                                 vFrame.first()->pkt.pts) >= 0)
+                else if (delta >= 0)
                 {
                     VERBOSE(MPF_PROCESS, QString("Found useful audio "
                             "frame from stream %1").arg(it.key()));
@@ -1584,6 +1593,7 @@ int MPEG2fixup::Start()
     int64_t cutStartPTS = 0, cutEndPTS = 0;
     int64_t frame_count = 0;
     int new_discard_state = 0, cutState = 0;
+    QMap<int, int> af_dlta_cnt;
     //  int i;
 
     AVPacket pkt, lastRealvPkt;
@@ -1647,6 +1657,7 @@ int MPEG2fixup::Start()
         QPtrList<MPEG2frame> *af = &it.data();
         origaPTS[it.key()] = af->first()->pkt.pts * 300;
         expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
+        af_dlta_cnt[it.key()] = 0;
     }
 
     if (delMap.count())
@@ -1999,7 +2010,10 @@ int MPEG2fixup::Start()
 
                 if (poq.UpdateOrigPTS(it.key(), origaPTS[it.key()],
                                                   af->first()->pkt) < 0)
+                {
                     backwardsPTS = true;
+                    af_dlta_cnt[it.key()] = 0;
+                }
 
                 tmpPTS = diff2x33(af->first()->pkt.pts,
                                   origaPTS[it.key()] / 300);
@@ -2010,6 +2024,7 @@ int MPEG2fixup::Start()
                     //        .arg(PtsTime(origaPTS[it.key()] / 300)));
                     framePool.enqueue(af->first());
                     af->remove();
+                    af_dlta_cnt[it.key()] = 0;
                     continue;
                 }
                 if (tmpPTS > incPTS * maxframes)
@@ -2027,15 +2042,34 @@ int MPEG2fixup::Start()
                                    300 * tmpPTS);
                             backwardsPTS = false;
                         }
+                        else if (tmpPTS < 90000LL * 4) // 4 seconds
+                        {
+                            if (af_dlta_cnt[it.key()] >= 20)
+                            {
+                                //If there are 20 consecutive frames with an
+                                //offset < 4sec, assume a mismatch and correct.
+                                //Note: if we allow too much discrepency,
+                                //we could overrun the video queue
+                                ptsinc((uint64_t *)&origaPTS[it.key()],
+                                       200 * tmpPTS);
+                                af_dlta_cnt[it.key()] = 0;
+                            }
+                            else
+                                af_dlta_cnt[it.key()]++;
+                        }
                         af->first()->pkt.pts = origaPTS[it.key()] / 300;
                 }
                 else if (tmpPTS > incPTS) //correct for small discrepencies
                 {
                     incPTS += incPTS;
                     backwardsPTS = false;
+                    af_dlta_cnt[it.key()] = 0;
                 }
                 else
+                {
                     backwardsPTS = false;
+                    af_dlta_cnt[it.key()] = 0;
+                }
                 nextPTS = add2x33(af->first()->pkt.pts,
                            90000LL * (int64_t)CC->frame_size / CC->sample_rate);
 

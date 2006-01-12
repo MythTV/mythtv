@@ -286,9 +286,9 @@ int main(int argc, char *argv[])
          cerr << "Must specify -i OR -c AND -s options!\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
-    if (found_infile && ((jobID >= 0) || build_index))
+    if (jobID >= 0 && (found_infile || build_index))
     {
-         cerr << "Can't specify -j or --buildindex with --infile\n";
+         cerr << "Can't specify -j with --buildindex or --infile\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if ((jobID >= 0) && build_index)
@@ -468,7 +468,7 @@ int main(int argc, char *argv[])
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo)
 {
-    if (pginfo)
+    if (pginfo && ! mapfile)
     {
         pginfo->ClearPositionMap(MARK_KEYFRAME);
         pginfo->ClearPositionMap(MARK_GOP_START);
