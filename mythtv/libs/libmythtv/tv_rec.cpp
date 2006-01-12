@@ -2574,6 +2574,27 @@ void TVRec::CheckForRecGroupChange(void)
         delete pi;
 }
 
+static uint get_input_id(uint cardid, const QString &inputname)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT cardinputid "
+        "FROM cardinput "
+        "WHERE cardid    = :CARDID AND "
+        "      inputname = :INNAME");
+
+    query.bindValue(":CARDID", cardid);
+    query.bindValue(":INNAME", inputname);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("get_input_id", query);
+    else if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
+}
+
 /** \fn TVRec::NotifySchedulerOfRecording(ProgramInfo*)
  *  \brief Tell scheduler about the recording.
  *
@@ -2592,7 +2613,7 @@ void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
     // + set up recording so it can be resumed
     rec->rectype   = kSingleRecord;
     rec->cardid    = cardid;
-    rec->inputid   = channel->GetCurrentInputNum();
+    rec->inputid   = get_input_id(cardid, channel->GetCurrentInput());
     rec->GetScheduledRecording()->setRecordingType(kSingleRecord);
 
     // + save rsInactive recstatus to so that a reschedule call
