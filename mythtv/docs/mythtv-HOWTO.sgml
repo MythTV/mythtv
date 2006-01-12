@@ -1453,28 +1453,27 @@ the MythTV directory that you <tt>cd</tt>'d to above.
 
 
 <sect2>Enabling real-time scheduling of the display thread.
+<p>MythTV supports real-time scheduling of the video output thread. There
+are three ways to go about enabling this: You can use rlimits, you can use
+the realtime security module, or on older systems you can SUID the
+executable. Enabling real-time scheduling is optional, but can make the
+video display smoother, especially if you are decoding HDTV.
 
-<p>MythTV supports real-time scheduling of the video output thread.
-There are three ways to go about eanbling this: You can use rlimits,
-you can use the realtime security module, or on older systems you 
-can SUID the executable. Enabling real-time scheduling is optional,
-but can make the video display more smooth, especially if you are
-decoding HDTV.
-
-<sect3>1. rlimits
-<p>The rlimits method is the preferred method and is included in Linux 2.6.12
-and above. Unfortunately, you need PAM version 0.76-8 or above, which
+<sect3>rlimits
+<p>The rlimits method is the preferred method and is included in Linux
+2.6.12 and above. Unfortunately, you need PAM version 0.79 or above, which
 may not be supported by your distribution yet. Assuming anyone running
-mythfrontend is in the audio group and rlimits are supported, all
-you need to do is place this in your /etc/security/limit.conf
+<bf>mythfrontend</bf> is in the audio group and rlimits are supported, all
+you need to do is place this in your <tt>/etc/security/limits.conf</tt>
+
 <tscreen><verb>
-*               -       rt_priority     0
-*               -       nice            0
-@audio          -       rt_priority     50
-@audio          -       nice            0
+*               -       rtprio     0
+*               -       nice       0
+@audio          -       rtprio     50
+@audio          -       nice       0
 </verb></tscreen>
 
-<sect3>2. realtime module
+<sect3>realtime module
 <p>The second option is to use the Linux realtime kernel module.
 This is will be phased out over time, but is currently supported
 by many distributions that do not yet support rlimits. If you are
@@ -1484,32 +1483,31 @@ with:
 Security options : [*] Enable different security models
 Security options : [M] Default Linux Capabilties
 </verb></tscreen>
-You may also need to install the realtime module, using your
-distribution's realtime package. Assuming the users who will
-be running mythfrontend will be in the audio group you can
-get GUID of a named group like so:
+You may also need to install the realtime module, using your distribution's
+realtime package. Assuming the users who will be running
+<bf>mythfrontend</bf> will be in the audio group you can get the GUID of a named
+group like so:
 <tscreen><verb>
 $ grep audio /etc/group
 </verb></tscreen>
 If the number printed out from the grep was 18, you can now load 
-this module as root before starting mythfrontend like so:
+this module as root before starting <bf>mythfrontend</bf>:
 <tscreen><verb>
 # modprobe realtime gid=18
 </verb></tscreen>
 
-<sect3>3. run as root option (not safe)
+<sect3>run as root option (not safe)
 <p>The final and least preferred option is to set the sticky bit
-of the mythfrontend executable. This <bf>opens a security hole</bf>,
+on the <bf>mythfrontend</bf> executable. This <bf>opens a security hole</bf>,
 but is the only option on systems that do not support either
 rlimits or the realtime module. This does not work on modern
 distributions either, and is <bf><em>not recommended</em></bf>
 on any system connected to the internet. This may also make it
-impossible to debug MythTV without running gdb as root. If you
+impossible to debug MythTV without running <bf>gdb</bf> as root. If you
 would still like to do this, you just need to run this as root:
 <tscreen><verb>
 # chmod a+s /usr/local/bin/mythfrontend /usr/local/bin/mythtv
 </verb></tscreen>
-
 
 <sect2>Frontend-only configuration <label id="frontend-only">
 <p>Since MythTV uses a client/server architecture, multiple frontend
@@ -7713,7 +7711,9 @@ in the doc about what a good bug report should contain, tell people to use
 trac to submit docs patches.
 
 v0.19pre, 2006-01-  Add "cont" to gdb instructions.  Put in a gdb example of
-using a gdbcommands file.  Start deleting older cruft.
+using a gdbcommands file.  Start deleting older cruft.  Update the real-time
+priority docs; they've changed the parameter to "rtprio".  (I guess
+"rt_priority" took too long to type.)
 
 -->
 
