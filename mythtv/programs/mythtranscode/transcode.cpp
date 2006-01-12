@@ -378,10 +378,17 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             vidsetting = encodingType;
             audsetting = "MP3";
         }
-         else if (profile.byName("transcoderesize")->getValue().toInt())
+        else if (profile.byName("transcoderesize")->getValue().toInt())
         {
             newWidth = profile.byName("width")->getValue().toInt();
             newHeight = profile.byName("height")->getValue().toInt();
+
+            if (profile.byName("transcodepreserveaspect")->getValue().toInt())
+                newHeight = (int)(1.0 * newWidth * video_height / video_width);
+
+            VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
+                    .arg(video_width).arg(video_height)
+                    .arg(newWidth).arg(newHeight));
         }
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge

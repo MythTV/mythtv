@@ -676,7 +676,20 @@ public:
     };
 };
 
-class ImageSize: public HorizontalConfigurationGroup {
+class TranscodePreserveAspect: public CodecParam, public CheckBoxSetting {
+public:
+    TranscodePreserveAspect(const RecordingProfile& parent):
+        CodecParam(parent, "transcodepreserveaspect") {
+        setLabel(QObject::tr("Preserve Aspect Ratio of Video when resizing"));
+        setValue(false);
+        setHelpText(QObject::tr("Preserve the aspect ratio of the original "
+                                "recording file by ignoring the height "
+                                "setting above, and calculating the new height "
+                                "based on the aspect ratio and width."));
+    };
+};
+
+class ImageSize: public VerticalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
     public:
@@ -700,8 +713,9 @@ public:
 
     ImageSize(const RecordingProfile& parent, QString tvFormat,
               QString profName) 
-         : HorizontalConfigurationGroup(false) 
+         : VerticalConfigurationGroup(false) 
     {
+        ConfigurationGroup* imgSize = new HorizontalConfigurationGroup(false);
         QString labelName;
         if (profName.isNull())
             labelName = QObject::tr("Image size");
@@ -728,8 +742,19 @@ public:
             maxheight = 576;
         }
 
-        addChild(new Width(parent,maxwidth));
-        addChild(new Height(parent,maxheight));
+        imgSize->addChild(new Width(parent,maxwidth));
+        imgSize->addChild(new Height(parent,maxheight));
+        addChild(imgSize);
+
+        if (profName != NULL)
+        {
+            if (profName.left(11) == "Transcoders")
+                addChild(new TranscodePreserveAspect(parent));
+        }
+        else
+        {
+            addChild(new TranscodePreserveAspect(parent));
+        }
     };
 };
 
