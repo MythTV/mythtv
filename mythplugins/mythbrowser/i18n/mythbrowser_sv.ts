@@ -81,18 +81,6 @@ Ett tryck på Mellanslag/Enter på en markerad post tar bort den från listvisar
         <translation>MythBrowser-meny</translation>
     </message>
     <message>
-        <source>         Back         </source>
-        <translation>         Bakåt        </translation>
-    </message>
-    <message>
-        <source>       Next Tab       </source>
-        <translation>      Nästa tabb      </translation>
-    </message>
-    <message>
-        <source>       Prev Tab       </source>
-        <translation>    Föregående tabb   </translation>
-    </message>
-    <message>
         <source>Save Link in Bookmarks</source>
         <translation>Spara länk i bokmärken</translation>
     </message>
@@ -109,16 +97,44 @@ Ett tryck på Mellanslag/Enter på en markerad post tar bort den från listvisar
         <translation>Avbryt</translation>
     </message>
     <message>
-        <source>      Remove Tab      </source>
-        <translation>     Ta bort tabb     </translation>
+        <source>Back</source>
+        <translation>Bakåt</translation>
     </message>
     <message>
-        <source>       Zoom Out       </source>
-        <translation>       Zooma ut       </translation>
+        <source>Next Tab</source>
+        <translation>Nästa flik</translation>
     </message>
     <message>
-        <source>       Zoom In        </source>
-        <translation>       Zooma in       </translation>
+        <source>Prev Tab</source>
+        <translation>Föregående flik</translation>
+    </message>
+    <message>
+        <source>Remove Tab</source>
+        <translation>Ta bort flik</translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation>Zooma ut</translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation>Zooma in</translation>
+    </message>
+    <message>
+        <source>Add New Bookmark</source>
+        <translation>Lägg till nytt bokmärke</translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation>Grupp:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Beskrivning:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation>URL:</translation>
     </message>
 </context>
 </TS>

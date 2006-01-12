@@ -313,6 +313,42 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>From CD</source>
         <translation>Från CD</translation>
     </message>
+    <message>
+        <source>Change Filter</source>
+        <translation>Ändra filter</translation>
+    </message>
+    <message>
+        <source>Update Playlist Options</source>
+        <translation>Uppdatera spellistinställningar</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation>Ersätt</translation>
+    </message>
+    <message>
+        <source>Insert after current track</source>
+        <translation>Infoga efter aktuellt spår</translation>
+    </message>
+    <message>
+        <source>Append to end</source>
+        <translation>Lägg till slutet</translation>
+    </message>
+    <message>
+        <source>Continue playing current track</source>
+        <translation>Fortsätt spela upp aktuellt spår</translation>
+    </message>
+    <message>
+        <source>Play first track</source>
+        <translation>Spela första spår</translation>
+    </message>
+    <message>
+        <source>Play first new track</source>
+        <translation>Spela första nya spår</translation>
+    </message>
+    <message>
+        <source>Remove Duplicates</source>
+        <translation>Ta bort dubbletter</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -853,6 +889,18 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Rebuilding music tree</source>
         <translation>Återuppbygger musikträd</translation>
+    </message>
+    <message>
+        <source>Only Import new music.</source>
+        <translation>Importera endast ny musik.</translation>
+    </message>
+    <message>
+        <source>Checks the database for duplicates when importing/ripping CDs.</source>
+        <translation>Letar efter dubbletter i databasen vid import/inläsning av CD.</translation>
+    </message>
+    <message>
+        <source>Loading Music</source>
+        <translation>Laddar musik</translation>
     </message>
 </context>
 <context>

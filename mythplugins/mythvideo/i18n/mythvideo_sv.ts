@@ -256,6 +256,14 @@
         <source>General Settings (2/2)</source>
         <translation>Generella inställningar (2/2)</translation>
     </message>
+    <message>
+        <source>Video List Loads Video Meta Data</source>
+        <translation>Videolistvyn laddar videometadata</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation>Videolistvyn laddar alla kända videometadata från databasen. Att stänga av denna funktion kan minska tiden det tar att ladda videolistvyn väsentligt</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

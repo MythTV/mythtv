@@ -156,12 +156,6 @@ Välj en.</translation>
         <translation>(Ny spelare)</translation>
     </message>
     <message>
-        <source>Rom Information
-</source>
-        <translation>Rom-information
-</translation>
-    </message>
-    <message>
         <source>OTHER</source>
         <translation>ANNAN</translation>
     </message>
@@ -211,19 +205,69 @@ Välj en.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekräfta borttagning av raderad(e) rom(ar)</translation>
     </message>
     <message>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga innan borttagna rom-ar raderas från databasen under en spelsökning</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa filnamn i spelträdet</translation>
     </message>
     <message>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Visar filnamnen i spelträdet i stället för förkortade/uppslagna spelnamn</translation>
+    </message>
+    <message>
+        <source>19xx</source>
+        <translation>19xx</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nej</translation>
+    </message>
+    <message>
+        <source>No to all</source>
+        <translation>Nej till alla</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>Yes to all</source>
+        <translation>Ja till alla</translation>
+    </message>
+    <message>
+        <source>File Missing</source>
+        <translation>Fil saknas</translation>
+    </message>
+    <message>
+        <source>%1 appears to be missing.
+Remove it from the database?</source>
+        <translation>%1 verkar saknas.
+Ta bort den från databasen?</translation>
+    </message>
+    <message>
+        <source>Are you sure?</source>
+        <translation>Är du säker?</translation>
+    </message>
+    <message>
+        <source>This will clear all Game Meta Data
+from the database. Are you sure you
+want to do this?</source>
+        <translation>Detta rensar alla spelmetadata
+från databasen. Är du säker på
+att du vill göra detta?</translation>
+    </message>
+    <message>
+        <source>SEGA/MASTER SYSYTEM</source>
+        <translation>SEGA/MASTER SYSTEM</translation>
     </message>
 </context>
 <context>

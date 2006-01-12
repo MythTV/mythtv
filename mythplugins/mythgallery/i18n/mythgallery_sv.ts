@@ -100,6 +100,10 @@
         <source>Random</source>
         <translation>Slumpvis</translation>
     </message>
+    <message>
+        <source>Delete</source>
+        <translation>Ta bort</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -194,6 +198,14 @@
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Låt bildspelet inkludera underkataloger.</translation>
+    </message>
+    <message>
+        <source>Overlay caption</source>
+        <translation>Överlagra beskrivning</translation>
+    </message>
+    <message>
+        <source>This is the number of seconds to show a caption on top of a full size picture.</source>
+        <translation>Antal sekunder att visa en beskrivning ovanpå en fullstor bild.</translation>
     </message>
 </context>
 <context>
