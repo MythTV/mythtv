@@ -1170,12 +1170,12 @@ void TVRec::RunTV(void)
         {
             ClearFlags(kFlagAskAllowRecording);
 
-            CheckForRecGroupChange();
-            if (pseudoLiveTVRecording)
-                SetFlags(kFlagCancelNextRecording);
-
             if (GetState() == kState_WatchingLiveTV)
             {
+                CheckForRecGroupChange();
+                if (pseudoLiveTVRecording)
+                    SetFlags(kFlagCancelNextRecording);
+
                 int timeuntil = QDateTime::currentDateTime()
                     .secsTo(recordPendingStart);
 
