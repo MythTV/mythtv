@@ -1017,7 +1017,7 @@ void ProgramInfo::ApplyRecordRecID(void)
     }
 
     query.prepare("UPDATE recorded "
-                  "SET recordid = :RECID"
+                  "SET recordid = :RECID "
                   "WHERE chanid = :CHANID AND starttime = :START");
     query.bindValue(":RECID",  getRecordID());
     query.bindValue(":CHANID", chanid);
