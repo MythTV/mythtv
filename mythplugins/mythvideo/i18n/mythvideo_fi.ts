@@ -258,7 +258,7 @@
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Videolistaus Lataa Videoiden Metatiedot</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>

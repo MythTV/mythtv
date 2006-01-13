@@ -313,39 +313,39 @@
     </message>
     <message>
         <source>Change Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda Suodatinta</translation>
     </message>
     <message>
         <source>Update Playlist Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitä Soittolistan Valinnat</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Korvaa</translation>
     </message>
     <message>
         <source>Insert after current track</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää nykyisen kappaleen jälkeen</translation>
     </message>
     <message>
         <source>Append to end</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää loppuun</translation>
     </message>
     <message>
         <source>Continue playing current track</source>
-        <translation type="unfinished"></translation>
+        <translation>Jatka nykyisen kappaleen soittoa</translation>
     </message>
     <message>
         <source>Play first track</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita 1. kappale</translation>
     </message>
     <message>
         <source>Play first new track</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita 1. uusi kappale</translation>
     </message>
     <message>
         <source>Remove Duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Kaksoiskappaleet</translation>
     </message>
 </context>
 <context>
@@ -888,15 +888,15 @@
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo vain uutta musiikkia.</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarkistaa tietokannan kaksoiskappaleiden varalta tuotaessa musiikkia CD:ltä.</translation>
     </message>
     <message>
         <source>Loading Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladataan Musiikkia</translation>
     </message>
 </context>
 <context>

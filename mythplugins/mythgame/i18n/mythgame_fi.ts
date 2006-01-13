@@ -225,50 +225,52 @@
     </message>
     <message>
         <source>19xx</source>
-        <translation type="unfinished"></translation>
+        <translation>19xx</translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei Kaikkiin</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä Kaikkiin</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedosto Puuttuu</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedostoa %1 ei ole olemassa.
+Poistetaanko se tietokannasta?</translation>
     </message>
     <message>
         <source>Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletko varma?</translation>
     </message>
     <message>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaan kaikki metatiedot
+Pelitietokannasta. Oletko Varma?</translation>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
-        <translation type="unfinished"></translation>
+        <translation>SEGA/MASTER Systeemi</translation>
     </message>
 </context>
 <context>

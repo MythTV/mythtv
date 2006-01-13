@@ -122,43 +122,43 @@ SPACE/Enter valitulla osoitteella poistaa sen.</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Takaisin</translation>
     </message>
     <message>
         <source>Next Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuraava Välilehti</translation>
     </message>
     <message>
         <source>Prev Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Edellinen Välilehti</translation>
     </message>
     <message>
         <source>Remove Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Välilehti</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Pienennä</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>Suurenna</translation>
     </message>
     <message>
         <source>Add New Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää Uusi Kirjanmerkki</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation type="unfinished">Ryhmä:</translation>
+        <translation>Ryhmä:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">Kuvaus:</translation>
+        <translation>Kuvaus:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
 </context>
 </TS>

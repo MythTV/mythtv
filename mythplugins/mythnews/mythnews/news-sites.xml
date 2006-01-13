@@ -593,7 +593,6 @@
         <ico>http://rss.topix.net/favicon.ico</ico>
     </item>
 
-
     <item>
         <title>BBC News - Africa</title>
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/africa/rss.xml</url>
@@ -624,11 +623,20 @@
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss.xml</url>
     </item>
 
-
     <item>
         <title>BBC News - UK</title>
         <url>http://newsrss.bbc.co.uk/rss/newsonline_world_edition/uk_news/rss.xml</url>
     </item>
+
+    <item>
+        <title>Helsingin Sanomat (Finland)</title>
+        <url>http://siirto.helsinginsanomat.fi/aukio/HS-Tuoreet-RSS.xml</url>
+    </item>
+
+    <item>
+        <title>Sydsvenskan senaste nytt (Sweden)</title>
+        <url>http://sydsvenskan.se/rss/senastenytt</url>
+    </item>    
 
 </category>
 
@@ -986,6 +994,11 @@
         <title>New York Times - Opinion</title>
         <url>http://www.nytimes.com/services/xml/rss/nyt/Opinion.xml</url>
     </item>
+    
+    <item>
+        <title>Sydsvenskan opinion (Sweden)</title>
+        <url>http://sydsvenskan.se/rss/opinion</url>
+    </item>
 
 </category>
 
@@ -1063,6 +1076,11 @@
         <title>Topix: World Soccer</title>
         <url>http://rss.topix.net/rss/world-soccer/world-soccer.xml</url>
         <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Sydsvenskan sport (Sweden)</title>
+        <url>http://sydsvenskan.se/rss/sport</url>
     </item>
 
 </category>

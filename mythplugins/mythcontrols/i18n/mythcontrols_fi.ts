@@ -22,11 +22,11 @@
     <name>ConfirmMenu</name>
     <message>
         <source>Confirm</source>
-        <translation type="unfinished"></translation>
+        <translation>Vahvista</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 <context>
@@ -52,27 +52,27 @@
     <name>MythControls</name>
     <message>
         <source>Binding comes from %1 context</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento tulee %1 viitekehyksestä</translation>
     </message>
     <message>
         <source>Delete this key binding from context %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko tämä komento viitekehyksestä %1?</translation>
     </message>
     <message>
         <source>Delete this binding?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko tämä komento?</translation>
     </message>
     <message>
         <source>Contexts</source>
-        <translation type="unfinished"></translation>
+        <translation>Viitekehykset</translation>
     </message>
     <message>
         <source>Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Komennot</translation>
     </message>
     <message>
         <source>Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Toiminnot</translation>
     </message>
 </context>
 <context>

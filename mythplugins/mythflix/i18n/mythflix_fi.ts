@@ -20,19 +20,19 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
     <name>MythFlixQueue</name>
     <message>
         <source>Manage Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Hallitse Jonoa</translation>
     </message>
     <message>
         <source>Top Of Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Jonon Huippu</translation>
     </message>
     <message>
         <source>Remove From Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Jonosta</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Peruuta</translation>
     </message>
 </context>
 <context>
