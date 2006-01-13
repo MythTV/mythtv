@@ -356,8 +356,9 @@ void UpdateSourceIcons(int sourceid)
             QFile localfile(fileprefix + "/" + qfi.fileName());
             if (!localfile.exists())
             {
-                QString icon_get_command = QString("wget --timestamping "
-                        "--directory-prefix=") + fileprefix + " " + icon_url;
+                QString icon_get_command =
+                    QString("wget --timestamping --directory-prefix=%1 '%2'")
+                            .arg(fileprefix).arg(icon_url);
 
                 if ((print_verbose_messages & VB_GENERAL) == 0)
                     icon_get_command += " > /dev/null 2> /dev/null";
