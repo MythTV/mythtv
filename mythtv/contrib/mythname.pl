@@ -7,7 +7,9 @@
 ## 28 Mar 03	1.0	Hack
 ## 29 Mar 03	1.1	Added --legal to fix filenames for / and \
 ##			Should probably be fixed for other chars
-##			but I'm to lazy.
+##			but I'm too lazy.
+## 14 Nov 05    2.0 Make it work with 0.18 and up
+## 17 Nov 05    2.1 Fix a bug with the path for --all
 ##
 ## This is a very nasty hack of myth.rebuilddatabase.pl which was nicely 
 ## done by Greg Froese and instructions by Robert Kulagowski.  
@@ -17,6 +19,8 @@
 ##
 ## written by greg froese (g_froese@yahoo.com)
 ## install instructions by Robert Kulagowski (rkulagow@rocketmail.com)
+## Much hacking by Behan Webster <behanw@websterwood.com>
+##   Who also added some code from epair_optimize.pl by xris
 ##
 ## use at your own risk, i am not responsible for anything this program may
 ## or may not do.
@@ -25,92 +29,188 @@
 use DBI;
 use Getopt::Long;
 use File::Basename;
+use File::stat qw(:FIELDS);;
 
 ## get command line args
 
-my ($database, $host, $user, $pass, $verbose, $dir);
+sub usage() {
+	print <<END;
+Usage:  $0 [options] files
 
-my $argc=@ARGV;
-if ($argc == 0) {
-   print "usage:  mythname.pl [options] 
-/path/to/store/1001_20030401190000_20030401200000.nuv
-
-Where [options] is:
---host          - hostname or IP address of the mysql server (default: 
-\"127.0.0.1\")
---user          - DBUSERNAME (default: \"mythtv\")
---pass          - DBPASSWORD (default: \"mythtv\")
---database      - DATABASENAME (default: \"mythconverg\")
---replace	- Replace spaces with this string (--rep=. will return Daily.Show)
---sublen	- Maximum subtitle length (only useful with -s)
--s		- Add subtitle to string after a ':'
---legal		- Make sure the filename is legal (no '/', '\', etc.)
-";
-exit(0);
+Where [options] are:
+  --host          - hostname of the mysql server (default: \"127.0.0.1\")
+  --user          - DBUSERNAME (default: \"mythtv\")
+  --pass          - DBPASSWORD (default: \"mythtv\")
+  --database      - DATABASENAME (default: \"mythconverg\")
+  --replace       - Replace spaces with this string (--rep=. will return Daily.Show)
+  --subtitle      - Add subtitle to string after a ':'
+  --sublen        - Maximum subtitle length (only useful with -subtitle)
+  --legal         - Make sure the filename is legal (no '/', '\', etc.)
+  --all           - Consider all files
+  --channel       - Print channel
+  --codec         - Print codec
+  --description   - Print description
+  --extension     - Extension to add to title (defaults to same as filename)
+  --file          - Print filename
+  --grep          - Search title:subtitle
+  --mpeg {2,4}    - Only show files of mpeg2 or mpeg4 encoding
+  --quiet         - Don't print title
+  --size          - Show size of show (mins, size, size/h)
+  --total         - Print total size of listed files
+END
+	exit 0;
 }
 
-GetOptions('verbose+'=>\$verbose, 'database=s'=>\$database, 'host=s'=>\$host, 
-'user=s'=>\$user, 'pass=s'=>\$pass, 's+'=>\$sub, 'replace=s'=>\$rep, 
-'sublen=s'=>\$sublen, 'legal+'=>\$legal);
+my $host="127.0.0.1";
+my $database="mythconverg";
+my $user="mythtv";
+my $pass="mythtv";
+my $mythdir = '/var/lib/mythtv/';
 
-if (!$host) { $host="127.0.0.1"; }
-if (!$database) { $database="mythconverg"; }
-if (!$user) { $user="mythtv"; }
-if (!$pass) { $pass="mythtv"; }
+# Read the mysql.txt file in use by MythTV.
+# could be in a couple places, so try the usual suspects
+	my $found = 0;
+	my @mysql = ('/usr/local/share/mythtv/mysql.txt',
+		'/usr/share/mythtv/mysql.txt',
+		'/etc/mythtv/mysql.txt',
+		'/usr/local/etc/mythtv/mysql.txt',
+		"$ENV{HOME}/.mythtv/mysql.txt",
+		'mysql.txt'
+	);
+	foreach my $file (@mysql) {
+		next unless (-e $file);
+		$found = 1;
+		open(CONF, $file) or die "Unable to open $file:  $!\n\n";
+		while (my $line = <CONF>) {
+			# Cleanup
+			next if ($line =~ /^\s*#/);
+			$line =~ s/^str //;
+			chomp($line);
 
-my $dbh = 
-DBI->connect("dbi:mysql:database=$database:host=$host","$user","$pass") or
-		 die "Cannot connect to database ($!)\n";
-
- ($show, $path, $suffix)  = fileparse(@ARGV[0],"\.nuv");
-  $channel = substr($show,0,4);
-  $syear = substr($show, 5,4);
-  $smonth = substr($show, 9,2);
-  $sday = substr($show,11,2);
-  $shour = substr($show,13,2);
-  $sminute = substr($show,15,2);
-  $ssecond = substr($show,17,2);
-  $eyear = substr($show,20,4);
-  $emonth = substr($show,24,2);
-  $eday = substr($show,26,2);
-  $ehour = substr($show,28,2);
-  $eminute = substr($show,30,2);
-  $esecond = substr($show,32,2);
-
- $q = "select title, subtitle, chanid, starttime, endtime from recorded where 
-chanid=$channel and starttime='$syear$smonth$sday$shour$sminute$ssecond' and 
-endtime='$eyear$emonth$eday$ehour$eminute$esecond'";
- $sth = $dbh->prepare($q);
- $sth->execute or die "Could not execute ($q)\n";
-
-@row=$sth->fetchrow_array;
-$title = $row[0];
-$subtitle = $row[1];
-
-if ($rep) {
-	$subtitle=~s/\ /$rep/gio;
-	$title=~s/\ /$rep/gio;
-}
-if ($sublen) {
-	$subtitle=substr($subtitle,0,$sublen);
-}
-
-if ($legal) {
-	$nogood = " ";
-	if ($rep) {
-		$nogood = $rep;
+			# Split off the var=val pairs
+			my ($var, $val) = split(/\=/, $line, 2);
+			next unless ($var && $var =~ /\w/);
+			if ($var eq 'DBHostName') {
+				$host = $val;
+			} elsif ($var eq 'DBUserName') {
+				$user = $val;
+			} elsif ($var eq 'DBName') {
+				$database = $val;
+			} elsif ($var eq 'DBPassword') {
+				$pass = $val;
+			}
+		}
+		close CONF;
 	}
-	$title =~ s/\\/$nogood/gio;
-	$subtitle =~ s/\\/$nogood/gio;
-	$title =~ s/\//$nogood/gio;
-	$subtitle =~ s/\//$nogood/gio;
+	#die "Unable to locate mysql.txt:  $!\n\n" unless ($found && $dbhost);
+
+usage if !GetOptions('verbose+'=>\$verbose, 'help'=>\$help, 'quiet'=>\$quiet,
+'database=s'=>\$database, 'host=s'=>\$host, 'user=s'=>\$user, 'pass=s'=>\$pass,
+'subtitle'=>\$sub, 'sublen=s'=>\$sublen, 'replace=s'=>\$rep, 'legal'=>\$legal,
+'file'=>\$printfile, 'codec'=>\$printcodec, 'channel'=>\$printchan,
+'size'=>\$printsize, 'description'=>\$printdesc, 'mpeg=i'=>\$mpeg,
+'all'=>\$all, 'extension:s'=>\$extension, 'grep=s'=>\$grep, 'total'=>\$printtotal,
+);
+usage if $help;
+
+my @files;
+if ($all) {
+	opendir(DIR, $mythdir) || die "$mythdir: $!";
+	@files = grep {/(mpg|nuv)$/} readdir DIR;
+	closedir DIR;
+} else {
+	@files = @ARGV;
+}
+usage unless @files;
+
+my $dbh = DBI->connect("dbi:mysql:database=$database:host=$host","$user","$pass")
+	|| die "Cannot connect to database ($!)\n";
+
+my $sql = 'SELECT title, subtitle, chanid, starttime, endtime, description FROM recorded WHERE basename=?';
+my $sth = $dbh->prepare($sql);
+my $chansql = 'SELECT channum, callsign FROM channel WHERE chanid=?';
+my $sthchan = $dbh->prepare($chansql);
+for my $file (@files) {
+	($show, $path, $suffix)  = fileparse($file , '.nuv');
+
+	$sth->execute("$show$suffix") || die "Could not execute ($sql)\n";
+	my ($title, $subtitle, $chanid, $start, $end, $description) = $sth->fetchrow_array;
+	$sthchan->execute($chanid) || die "Could not execute ($chansql)\n";
+	my ($channum, $callsign) = $sthchan->fetchrow_array;
+
+	unless ($title) {
+		print "$file is not in the database\n";
+		next;
+	}
+
+	if ($rep) {
+		$subtitle=~s/\ /$rep/gio;
+		$title=~s/\ /$rep/gio;
+	}
+
+	if ($legal) {
+		my $good = " ";
+		if ($rep) {
+			$good = $rep;
+		}
+		$title =~ s/[\\\/'"()]/$good/gio;
+		$subtitle =~ s/[\\\/'"()]/$good/gio;
+	}
+
+	if ($sublen) {
+		$subtitle=substr($subtitle,0,$sublen);
+	}
+	
+	my $print = 1;
+	if ($mpeg || $printcodec || $printsize || $printtotal) {
+		require Time::Piece;
+		my $before = Time::Piece->strptime($start, '%Y-%m-%d %H:%M:%S');
+		my $after  = Time::Piece->strptime($end,   '%Y-%m-%d %H:%M:%S');
+		my $diff = $after - $before;
+		stat($file) || stat("$mythdir/$file") || die "Can't find $file: $!";
+		$mins = $diff->minutes;
+		$gb = $st_size/1024/1024/1024;
+		$gbh = $gb * 60 / $mins;
+
+		# This is a bit of a hack, but recording from an ivtv card, and then transcoding it works.
+		$codec = $gbh >= 1.1 ? 2 : 4;
+
+		$print = 0 if $mpeg && $mpeg ne $codec;
+		#print "MPEG:$mpeg $gbh $print\n";
+	}
+
+	if ($grep) {
+		$print = 0 unless $title =~ /$grep/ || $subtitle && $subtitle =~ /$grep/;
+		#print "Grep: $print $grep $title\n";
+	}
+
+	my $ext;
+	if (defined $extension) {
+		$file =~ /\.(.*?)$/;
+		$ext = $extension || $1;
+	}
+
+	if ($print) {
+		print "$file " if $printfile;
+		print "mpeg$codec " if $printcodec;
+		print $title unless $quiet;
+		print ":$subtitle" if $sub && $subtitle;
+		print ".$ext" if $ext;
+		print " on $callsign($chanid)" if $printchan;
+		printf " (%d mins in %.3f GB %.3f GB/h)", $mins, $gb, $gbh if $printsize;
+		print "\n";
+		print " $description\n" if $printdesc;
+
+		$tgb += $gb;
+		$tt  += $mins;
+		$tn  += 1;
+	}
 }
 
-
-print "$title";
-if ($sub) {
-	print ":$subtitle";
+if ($printtotal) {
+	printf "%.3f GB for %.1f hours in %d files\n", $tgb, $tt/60, $tn;
 }
-print "\n";
 
 exit(0);
+
+# vim: sw=4 ts=4
