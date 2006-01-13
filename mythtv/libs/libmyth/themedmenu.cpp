@@ -2513,7 +2513,7 @@ bool ThemedMenuPrivate::findDepends(const QString &fileList)
     
     for ( QStringList::Iterator it = files.begin(); it != files.end(); ++it ) {
         filename = findMenuFile(*it);
-        if (filename != "")
+        if (filename != "" && filename.endsWith(".xml"))
             return true;
     
         QString newname = gContext->FindPlugin(*it);
