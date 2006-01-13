@@ -25,12 +25,18 @@
 #include <qfileinfo.h>
 #include <qdir.h>
 
+#include "config.h"
 #include "mythtv/mythcontext.h"
 #include "mythtv/util.h"
 
 #include "thumbgenerator.h"
 #include "constants.h"
 #include "galleryutil.h"
+
+#ifdef EXIF_SUPPORT
+#include <libexif/exif-data.h>
+#include <libexif/exif-entry.h>
+#endif
 
 ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h)
 {
@@ -211,7 +217,7 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     }
 
     if (found) {
-        image.load(f->absFilePath());
+        loadFile(image, *f);
         return;
     }
     else {
@@ -240,47 +246,64 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 
 void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 {
-  if (GalleryUtil::isMovie(fi.filePath()))
-  {
-      bool thumbnailCreated = false;
-      QDir tmpDir("/tmp/mythgallery");
-      if (! tmpDir.exists())
-      {
-        if (! tmpDir.mkdir(tmpDir.absPath()))
+    if (GalleryUtil::isMovie(fi.filePath()))
+    {
+        bool thumbnailCreated = false;
+        QDir tmpDir("/tmp/mythgallery");
+        if (!tmpDir.exists())
         {
-          std::cerr << "Unable to create temp dir for movie thumbnail creation: "
-                     << tmpDir.absPath() << endl;
+            if (!tmpDir.mkdir(tmpDir.absPath()))
+            {
+                std::cerr << "Unable to create temp dir for movie thumbnail creation: "
+                          << tmpDir.absPath() << endl;
+            }
         }
-      }
-      if (tmpDir.exists())
-      {
-          QString cmd = "cd \"" + tmpDir.absPath()
-            + "\"; mplayer -nosound -frames 1 -vo png \"" + fi.absFilePath() +
-            "\"";
-          if (myth_system(cmd) == 0)
-          {
-              QFileInfo thumb(tmpDir.filePath("00000001.png"));
-              if (thumb.exists())
-              {
-                QImage img(thumb.absFilePath());
-                image = img;
-                thumbnailCreated = true;
-              }
-          }
-      }
-      if (! thumbnailCreated)
-      {
-        QImage *img = gContext->LoadScaleImage("gallery-moviethumb.png");
-        if (img)
+
+        if (tmpDir.exists())
         {
-          image = *img;
+            QString cmd = "cd \"" + tmpDir.absPath() + 
+                          "\"; mplayer -nosound -frames 1 -vo png \"" + 
+                          fi.absFilePath() + "\"";
+            if (myth_system(cmd) == 0)
+            {
+                QFileInfo thumb(tmpDir.filePath("00000001.png"));
+                if (thumb.exists())
+                {
+                    QImage img(thumb.absFilePath());
+                    image = img;
+                    thumbnailCreated = true;
+                }
+            }
         }
-      }
-  }
-  else
-  {
-      image.load(fi.absFilePath());
-  }
+
+        if (!thumbnailCreated)
+        {
+            QImage *img = gContext->LoadScaleImage("gallery-moviethumb.png");
+            if (img)
+            {
+                image = *img;
+            }
+        }
+    }
+    else
+    {
+#ifdef EXIF_SUPPORT
+        // Try to get thumbnail from exif data
+        ExifData *ed = exif_data_new_from_file(fi.absFilePath());
+        if (ed && ed->data)
+        {
+            image.loadFromData(ed->data, ed->size);
+        }
+
+        if (ed)
+            exif_data_free(ed);
+
+        if (image.width() > 0 && image.height() > 0)
+            return;
+#endif
+
+        image.load(fi.absFilePath());
+    }
 }
 
 QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
@@ -314,17 +337,21 @@ bool ThumbGenerator::mkpath(const QString& inPath)
     int i = 0;
     QString absPath = QDir(inPath).absPath() + "/";
     QDir parent("/");
-    do {
+    do 
+    {
         i = absPath.find('/', i + 1);
-        if (i == -1) {
+        if (i == -1) 
             return true;
-        }
+
         QString subPath(absPath.left(i));
-        if (! QDir(subPath).exists()) {
-            if (! parent.mkdir(subPath.right(subPath.length() - parent.absPath().length() - 1))) {
+        if (!QDir(subPath).exists()) 
+        {
+            if (!parent.mkdir(subPath.right(subPath.length() - 
+                                            parent.absPath().length() - 1))) 
+            {
                 return false;
             }
         }
         parent = QDir(subPath);
-    } while(true);
+    } while(1);
 }
