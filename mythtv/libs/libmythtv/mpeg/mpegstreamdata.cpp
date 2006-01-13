@@ -29,7 +29,6 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     AddListeningPID(MPEG_PAT_PID);
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
-    _unexpected_pat_timeout = QDateTime::currentDateTime().addYears(1);
 }
 
 MPEGStreamData::~MPEGStreamData()
@@ -215,8 +214,7 @@ bool MPEGStreamData::CreatePATSingleProgram(
     VERBOSE(VB_RECORD, QString("desired_program(%1) pid(0x%2)").
             arg(_desired_program).arg(_pid_pmt_single_program, 0, 16));
 
-    QDateTime now = QDateTime::currentDateTime();
-    if (!_pid_pmt_single_program && (_unexpected_pat_timeout < now))
+    if (!_pid_pmt_single_program)
     {
         _pid_pmt_single_program = pat.FindAnyPID();
         if (!_pid_pmt_single_program)
@@ -230,13 +228,6 @@ bool MPEGStreamData::CreatePATSingleProgram(
                         "\n\t\t\tCan Not create single program PAT.")
                 .arg(_desired_program));
         SetPATSingleProgram(NULL);
-        _unexpected_pat_timeout = now.addYears(1);
-        return false;
-    }
-    else if (!_pid_pmt_single_program)
-    {
-        if (_unexpected_pat_timeout > now.addMonths(6))
-            _unexpected_pat_timeout = now.addSecs(2);
         return false;
     }
 
@@ -384,16 +375,12 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 ProgramAssociationTable *pat =
                     new ProgramAssociationTable(psip);
                 CachePAT(pat);
-                emit UpdatePAT(pat);
-                if ((_desired_program >= 0) && CreatePATSingleProgram(*pat))
-                    emit UpdatePATSingleProgram(PATSingleProgram());
+                ProcessPAT(pat);
             }
             else
             {
                 ProgramAssociationTable pat(psip);
-                emit UpdatePAT(&pat);
-                if ((_desired_program >= 0) && CreatePATSingleProgram(pat))
-                    emit UpdatePATSingleProgram(PATSingleProgram());
+                ProcessPAT(&pat);
             }
             return true;
         }
@@ -404,22 +391,12 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             {
                 ProgramMapTable *pmt = new ProgramMapTable(psip);
                 CachePMT(pmt->ProgramNumber(), pmt);
-                emit UpdatePMT(pmt->ProgramNumber(), pmt);
-                if (pid == _pid_pmt_single_program)
-                {
-                    if (CreatePMTSingleProgram(*pmt))
-                        emit UpdatePMTSingleProgram(PMTSingleProgram());
-                }
+                ProcessPMT(pid, pmt);
             }
             else
             {
                 ProgramMapTable pmt(psip);
-                emit UpdatePMT(pmt.ProgramNumber(), &pmt);
-                if (pid == _pid_pmt_single_program)
-                {
-                    if (CreatePMTSingleProgram(pmt))
-                        emit UpdatePMTSingleProgram(PMTSingleProgram());
-                }
+                ProcessPMT(pid, &pmt);
             }
             return true;
         }
@@ -427,6 +404,22 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
     return false;
 }
 
+void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
+{
+    emit UpdatePAT(pat);
+    if ((_desired_program >= 0) && CreatePATSingleProgram(*pat))
+        emit UpdatePATSingleProgram(PATSingleProgram());
+}
+
+void MPEGStreamData::ProcessPMT(const uint pid, const ProgramMapTable *pmt)
+{
+    emit UpdatePMT(pmt->ProgramNumber(), pmt);
+    if (pid == _pid_pmt_single_program)
+    {
+        if (CreatePMTSingleProgram(*pmt))
+            emit UpdatePMTSingleProgram(PMTSingleProgram());
+    }
+}
 
 #define DONE_WITH_PES_PACKET() { if (psip) delete psip; \
     if (morePSIPPackets) goto HAS_ANOTHER_PES; else return; }

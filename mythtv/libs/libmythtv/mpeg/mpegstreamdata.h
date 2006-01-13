@@ -136,6 +136,8 @@ class MPEGStreamData : public QObject
     void ClearPartialPES(uint pid)
         { _partial_pes_packet_cache.remove(pid); }
     void DeletePartialPES(uint pid);
+    void ProcessPAT(const ProgramAssociationTable *pat);
+    void ProcessPMT(const uint pid, const ProgramMapTable *pmt);
 
     static int ResyncStream(unsigned char *buffer, int curr_pos, int len);
 
@@ -177,7 +179,6 @@ class MPEGStreamData : public QObject
     uint                      _pmt_single_program_num_audio;
     ProgramAssociationTable  *_pat_single_program;
     ProgramMapTable          *_pmt_single_program;
-    QDateTime                 _unexpected_pat_timeout;
 };
 
 #include "mpegtables.h"
