@@ -2276,30 +2276,30 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
 
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
     {
-        MSqlQuery query(MSqlQuery::InitCon());
+        MSqlQuery query(MSqlQuery::InitCon()), chanQuery(MSqlQuery::InitCon());
 
         if (mapiter.key() == "")
             continue;
 
         int chanid = 0;
 
-        query.prepare("SELECT chanid FROM channel WHERE sourceid = :ID AND "
-                      "xmltvid = :XMLTVID;"); 
-        query.bindValue(":ID", id);
-        query.bindValue(":XMLTVID", mapiter.key());
+        chanQuery.prepare("SELECT chanid FROM channel WHERE sourceid = :ID AND "
+                          "xmltvid = :XMLTVID;"); 
+        chanQuery.bindValue(":ID", id);
+        chanQuery.bindValue(":XMLTVID", mapiter.key());
 
-        query.exec();
+        chanQuery.exec();
 
-        if (!query.isActive() || query.size() <= 0)
+        if (!chanQuery.isActive() || chanQuery.size() <= 0)
         {
             cerr << "Unknown xmltv channel identifier: " << mapiter.key()
                  << endl << "Skipping channel.\n";
             continue;
         }
 
-        while (query.next())
+        while (chanQuery.next())
         {
-            chanid = query.value(0).toInt();
+            chanid = chanQuery.value(0).toInt();
 
             if (chanid == 0)
             {
