@@ -2383,6 +2383,8 @@ if test "$imlib2" = "yes" ; then
 fi
 if test "$freetype2" = "yes" ; then
   echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
+  echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
+  echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
 fi
 if test "$sunmlib" = "yes" ; then
   echo "HAVE_MLIB=yes" >> $MYTH_CONFIG_MAK

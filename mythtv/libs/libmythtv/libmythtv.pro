@@ -33,9 +33,9 @@ TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_S
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 DEFINES += _LARGEFILE_SOURCE
-QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
-QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
-QMAKE_LFLAGS_SHLIB += `freetype-config --libs`
+QMAKE_CXXFLAGS_RELEASE += $${FREETYPE_CFLAGS}
+QMAKE_CXXFLAGS_DEBUG += $${FREETYPE_CFLAGS}
+QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
