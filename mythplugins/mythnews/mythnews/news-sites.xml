@@ -634,9 +634,24 @@
     </item>
 
     <item>
-        <title>Sydsvenskan senaste nytt (Sweden)</title>
+        <title>Aftonbladet (Sweden)</title>
+        <url>http://www.aftonbladet.se/rss/nyheter.xml</url>
+    </item>
+
+    <item>
+        <title>DN (Sweden)</title>
+        <url>http://www.dn.se/huvudnyheter-rss</url>
+    </item>
+
+    <item>
+        <title>Expressen (Sweden)</title>
+        <url>http://expressen.se/rss/nyheter</url>
+    </item>
+
+    <item>
+        <title>Sydsvenskan (Sweden)</title>
         <url>http://sydsvenskan.se/rss/senastenytt</url>
-    </item>    
+    </item>
 
 </category>
 
@@ -1076,6 +1091,21 @@
         <title>Topix: World Soccer</title>
         <url>http://rss.topix.net/rss/world-soccer/world-soccer.xml</url>
         <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>DN sport (Sweden)</title>
+        <url>http://www.dn.se/sport-rss</url>
+    </item>
+
+    <item>
+        <title>Expressen sport (Sweden)</title>
+        <url>http://expressen.se/rss/sport</url>
+    </item>
+
+    <item>
+        <title>Sportbladet (Sweden)</title>
+        <url>http://www.aftonbladet.se/rss/sport.xml</url>
     </item>
 
     <item>
