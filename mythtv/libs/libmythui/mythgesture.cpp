@@ -27,15 +27,17 @@
  * the appropriate fixes.
  */
 
-using namespace std;
 
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
+#include <algorithm>
 
 #include <qmutex.h>
 #include <qmap.h>
 
 #include "mythgesture.h"
 
+using namespace std;
 
 /**
  * @class MythGesturePrivate
