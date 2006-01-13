@@ -629,27 +629,27 @@
     </item>
 
     <item>
-        <title>Helsingin Sanomat (Finland)</title>
+        <title>Helsingin Sanomat (FI)</title>
         <url>http://siirto.helsinginsanomat.fi/aukio/HS-Tuoreet-RSS.xml</url>
     </item>
 
     <item>
-        <title>Aftonbladet (Sweden)</title>
+        <title>Aftonbladet (SE)</title>
         <url>http://www.aftonbladet.se/rss/nyheter.xml</url>
     </item>
 
     <item>
-        <title>DN (Sweden)</title>
-        <url>http://www.dn.se/nyheter-rss</url>
+        <title>DN (SE)</title>
+        <url>http://www.dn.se/DNet/jsp/polopoly.jsp?d=1400</url>
     </item>
 
     <item>
-        <title>Expressen (Sweden)</title>
+        <title>Expressen (SE)</title>
         <url>http://expressen.se/rss/nyheter</url>
     </item>
 
     <item>
-        <title>Sydsvenskan (Sweden)</title>
+        <title>Sydsvenskan (SE)</title>
         <url>http://sydsvenskan.se/rss/senastenytt</url>
     </item>
 
@@ -1011,7 +1011,7 @@
     </item>
     
     <item>
-        <title>Sydsvenskan opinion (Sweden)</title>
+        <title>Sydsvenskan opinion (SE)</title>
         <url>http://sydsvenskan.se/rss/opinion</url>
     </item>
 
@@ -1094,22 +1094,22 @@
     </item>
 
     <item>
-        <title>DN sport (Sweden)</title>
-        <url>http://www.dn.se/sport-rss</url>
+        <title>DN sport (SE)</title>
+        <url>http://www.dn.se/DNet/jsp/polopoly.jsp?d=1402</url>
     </item>
 
     <item>
-        <title>Expressen sport (Sweden)</title>
+        <title>Expressen sport (SE)</title>
         <url>http://expressen.se/rss/sport</url>
     </item>
 
     <item>
-        <title>Sportbladet (Sweden)</title>
+        <title>Sportbladet (SE)</title>
         <url>http://www.aftonbladet.se/rss/sport.xml</url>
     </item>
 
     <item>
-        <title>Sydsvenskan sport (Sweden)</title>
+        <title>Sydsvenskan sport (SE)</title>
         <url>http://sydsvenskan.se/rss/sport</url>
     </item>
 
@@ -1216,6 +1216,11 @@
     <item>
         <title>CNN - Science &amp; Space</title>
         <url>http://rss.cnn.com/rss/cnn_space.rss</url>
+    </item>
+
+    <item>
+        <title>DN vetenskap (SE)</title>
+        <url>http://www.dn.se/DNet/jsp/polopoly.jsp?d=2241</url>
     </item>
 
 </category>
