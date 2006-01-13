@@ -361,7 +361,8 @@ class MythContext : public QObject, public MythObservable
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true); 
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
 
-    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false);
+    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false, 
+                               bool block = true);
 
     QImage *CacheRemotePixmap(const QString &url, bool reCache = false);
 

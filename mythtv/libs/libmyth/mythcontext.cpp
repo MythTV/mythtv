@@ -204,6 +204,7 @@ class MythContextPrivate
     QString m_localhostname;
 
     QMutex serverSockLock;
+    bool attemptingToConnect;
 
     MDBManager m_dbmanager;
     
@@ -263,6 +264,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_baseWidth(800), m_baseHeight(600),
       m_localhostname(QString::null),
       serverSockLock(false),
+      attemptingToConnect(false),
       language(""),
       mainWindow(NULL),
       m_wmult(1.0), m_hmult(1.0),
@@ -860,6 +862,10 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
             delete serverSock;
             serverSock = NULL;
         
+            if (d->attemptingToConnect)
+                break;
+            d->attemptingToConnect = true;
+
             // only inform the user of a failure if WOL is disabled 
             if (sleepTime <= 0)
             {
@@ -870,6 +876,12 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
                     "proper IP address.");
                 if (d->m_height && d->m_width)
                 {
+                    bool manageLock = false;
+                    if (!blockingClient && d->serverSockLock.locked())
+                    {
+                        manageLock = true;
+                        d->serverSockLock.unlock();
+                    }
                     MythPopupBox::showOkPopup(d->mainWindow, 
                                               "connection failure",
                                               tr("Could not connect to the "
@@ -877,8 +889,11 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
                                                  "it running?  Is the IP "
                                                  "address set for it in the "
                                                  "setup program correct?"));
+                    if (manageLock)
+                        d->serverSockLock.lock();
                 }
 
+                d->attemptingToConnect = false;
                 return false;
             }
             else
@@ -897,6 +912,7 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
                 sleep(sleepTime);
                 ++cnt;
             }
+            d->attemptingToConnect = false;
         }
         else
             break;
@@ -2273,12 +2289,15 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
     ClearSettingsCache(key, newValue);
 }
 
-bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
+bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout, bool block)
 {
     d->serverSockLock.lock();
     
     if (!d->serverSock)
+    {
         ConnectToMasterServer(false);
+        // should clear popup if it is currently active here. Not sure of the correct way. TBD
+    }
 
     bool ok = false;
     
@@ -2312,7 +2331,12 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
 
         if (!ok)
         {
+            delete d->serverSock;
+            d->serverSock = NULL;
+
             qApp->lock();
+            if (!block)
+                d->serverSockLock.unlock();
             VERBOSE(VB_ALL, QString("Reconnection to backend server failed"));
             if (d->m_height && d->m_width)
                 MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
@@ -2320,8 +2344,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
 
-            delete d->serverSock;
-            d->serverSock = NULL;
+            if (!block)
+                d->serverSockLock.lock();
             qApp->unlock();
         }
     }    

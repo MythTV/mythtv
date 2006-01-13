@@ -346,7 +346,7 @@ int RemoteIsRecording(void)
 {
     QStringList strlist = "QUERY_ISRECORDING";
 
-    if (!gContext->SendReceiveStringList(strlist))
+    if (!gContext->SendReceiveStringList(strlist, false, false))
         return -1;
 
     return strlist[0].toInt();
