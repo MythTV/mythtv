@@ -93,6 +93,8 @@ class MythContextPrivate;
       "VBI related messages")                    \
     F(VB_DATABASE,  0x00010000, "database",  1,  \
       "Display all SQL commands executed")       \
+    F(VB_TIMESTAMP, 0x80000000, "timestamp", 1,  \
+      "Conditional data driven messages")        \
     F(VB_NONE,      0x00000000, "none",      0,  \
       "NO debug output")
 
@@ -151,7 +153,7 @@ struct DatabaseParams
 
 #define VERBOSE(mask,args...) \
 do { \
-    if ((print_verbose_messages & mask) != 0) \
+    if ((print_verbose_messages & (mask)) == (mask)) \
     { \
         QDateTime dtmp = QDateTime::currentDateTime(); \
         QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
@@ -166,7 +168,7 @@ do { \
 // use a slower non-deadlockable version in release builds
 #define VERBOSE(mask,args...) \
 do { \
-    if ((print_verbose_messages & mask) != 0) \
+    if ((print_verbose_messages & (mask)) == (mask)) \
     { \
         QDateTime dtmp = QDateTime::currentDateTime(); \
         QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
