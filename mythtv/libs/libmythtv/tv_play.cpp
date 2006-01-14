@@ -5009,6 +5009,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             normal_speed = stretch;   // alter speed before display
         }
 
+        StopFFRew();
+
+        if (paused)
+            DoPause();
+
         ChangeTimeStretch(0, !floatRead);   // just display
     }
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
