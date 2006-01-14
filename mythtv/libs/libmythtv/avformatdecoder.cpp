@@ -749,9 +749,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
     av_read_frame_flush(ic);
 
     // Scan for the initial A/V streams
-    pthread_mutex_lock(&avcodeclock);
     ret = ScanStreams(novideo);
-    pthread_mutex_unlock(&avcodeclock);
     if (-1 == ret)
         return ret;
 
