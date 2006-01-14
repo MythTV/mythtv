@@ -704,7 +704,7 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
                "       hostname,        channum,     name,        "
                "       callsign,        seriesid,    programid,   "
                "       recorded.        recpriority, progstart, "
-               "       progend,         filesize "
+               "       progend,         filesize,    recgroup "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "WHERE %1 "
@@ -717,12 +717,30 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
 
     while (query.next())
     {
+        QString m_chanid = query.value(0).toString();
+        QDateTime m_recstartts = query.value(1).toDateTime();
+
+        if (IsInDontExpireSet(m_chanid, m_recstartts))
+        {
+            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Chanid "
+                             "%1 @ %2 is in Don't Expire List")
+                             .arg(m_chanid).arg(m_recstartts.toString()));
+            continue;
+        }
+        else if (IsInExpireList(m_chanid, m_recstartts))
+        {
+            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Chanid "
+                             "%1 @ %2 is already in Expire List")
+                             .arg(m_chanid) .arg(m_recstartts.toString()));
+            continue;
+        }
+
         ProgramInfo *proginfo = new ProgramInfo;
 
-        proginfo->chanid = query.value(0).toString();
+        proginfo->chanid = m_chanid;
         proginfo->startts = query.value(13).toDateTime();
         proginfo->endts = query.value(14).toDateTime();
-        proginfo->recstartts = query.value(1).toDateTime();
+        proginfo->recstartts = m_recstartts;
         proginfo->recendts = query.value(2).toDateTime();
         proginfo->title = QString::fromUtf8(query.value(3).toString());
         proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
@@ -745,27 +763,15 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
         proginfo->seriesid = query.value(10).toString();
         proginfo->programid = query.value(11).toString();
         proginfo->recpriority = query.value(12).toInt();
-
         proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
-
         proginfo->filesize = stringToLongLong(query.value(15).toString());
+        proginfo->recgroup = query.value(16).toString();
 
-        if (IsInDontExpireSet(proginfo->chanid, proginfo->recstartts))
-        {
-            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Chanid "
-                                     "%1 @ %2 is in Don't Expire List")
-                                     .arg(proginfo->chanid)
-                                     .arg(proginfo->recstartts.toString()));
-            delete proginfo;
-        }
-        else
-        {
-            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Adding chanid "
-                                     "%1 @ %2 to expire list")
-                                     .arg(proginfo->chanid)
-                                     .arg(proginfo->recstartts.toString()));
-            expire_list.push_back(proginfo);
-        }
+        VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Adding chanid "
+                                       "%1 @ %2 to expire list")
+                                       .arg(proginfo->chanid)
+                                       .arg(proginfo->recstartts.toString()));
+        expire_list.push_back(proginfo);
     }
 }
 
@@ -875,6 +881,19 @@ bool AutoExpire::IsInDontExpireSet(QString chanid, QDateTime starttime)
     QString key = chanid + starttime.toString(Qt::ISODate);
 
     return (dont_expire_set.count(key));
+}
+
+bool AutoExpire::IsInExpireList(QString chanid, QDateTime starttime)
+{
+    pginfolist_t::iterator it;
+    
+    for (it = expire_list.begin(); it != expire_list.end(); ++it)
+    {
+        if (((*it)->chanid == chanid) &&
+            ((*it)->recstartts == starttime))
+            return true;
+    }
+    return false;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
