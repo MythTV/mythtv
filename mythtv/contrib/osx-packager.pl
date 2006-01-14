@@ -796,6 +796,33 @@ foreach my $target ( @targets )
  }
 }
 
+if ( $backend )
+{
+  # The backend gets all the useful binaries it might call:
+  foreach my $binary ( 'mythjobqueue', 'mythcommflag', 'mythtranscode' )
+  {
+    my $SRC  = "$PREFIX/bin/$binary.app/Contents/MacOS/$binary";
+    if ( -e $SRC )
+    {
+      &Syscall([ '/bin/cp', $SRC,
+                 "$SCRIPTDIR/MythBackend.app/Contents/MacOS" ]) or die
+    }
+  }
+}
+
+if ( $jobtools )
+{
+  # JobQueue also gets some binaries it might call:
+  my $DEST = "$SCRIPTDIR/MythJobQueue.app/Contents/MacOS";
+  my $SRC  = "$PREFIX/bin/mythcommflag.app/Contents/MacOS/mythcommflag";
+
+  &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
+
+  my $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
+  if ( -e $SRC )
+  { &Syscall([ '/bin/cp', $SRC, $DEST ]) or die }
+}
+
 if ($OPT{usehdimage})
 {
     Verbose("Dismounting case-sensitive build device");
