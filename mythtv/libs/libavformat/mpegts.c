@@ -1729,6 +1729,7 @@ static int mpegts_read_header(AVFormatContext *s,
             ts->scanning = 1;
             ts->pat_filter = mpegts_open_section_filter(
                 ts, PAT_PID, pat_cb, ts, 1);
+            url_fseek(pb, pos, SEEK_SET);
             handle_packets(ts, MAX_SCAN_PACKETS);
             ts->scanning = 0;
 
