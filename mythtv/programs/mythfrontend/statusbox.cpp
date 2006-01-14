@@ -1062,9 +1062,12 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
 
     query.prepare(querystr.arg(hostnames));
 
-    if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+    if (query.exec() && query.isActive() && query.size() > 0 && query.next() &&
+        query.value(0).toDouble() > 0)
+    {
         recordingProfilesBPS[QObject::tr("average")] =
             (int)(query.value(0).toDouble());
+    }
 
     querystr =
         "SELECT max(filesize * 8 / "
@@ -1075,9 +1078,12 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
 
     query.prepare(querystr.arg(hostnames));
 
-    if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+    if (query.exec() && query.isActive() && query.size() > 0 && query.next() &&
+        query.value(0).toDouble() > 0)
+    {
         recordingProfilesBPS[QObject::tr("maximum")] =
             (int)(query.value(0).toDouble());
+    }
 }
 
 /** \fn StatusBox::doMachineStatus()
