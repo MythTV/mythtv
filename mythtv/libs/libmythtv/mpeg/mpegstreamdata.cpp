@@ -24,7 +24,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _cached_pat(NULL), _desired_program(desiredProgram),
       _pmt_single_program_num_video(1),
       _pmt_single_program_num_audio(0),
-      _pat_single_program(NULL), _pmt_single_program(NULL)
+      _pat_single_program(NULL), _pmt_single_program(NULL),
+      _invalid_pat_seen(false)
 {
     AddListeningPID(MPEG_PAT_PID);
 
@@ -46,6 +47,7 @@ MPEGStreamData::~MPEGStreamData()
 void MPEGStreamData::Reset(int desiredProgram)
 {
     _desired_program = desiredProgram;
+    _invalid_pat_seen = false;
 
     SetPATSingleProgram(0);
     SetPMTSingleProgram(0);
@@ -406,9 +408,43 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
 void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
 {
-    emit UpdatePAT(pat);
-    if ((_desired_program >= 0) && CreatePATSingleProgram(*pat))
-        emit UpdatePATSingleProgram(PATSingleProgram());
+    bool foundProgram = pat->FindPID(_desired_program);
+
+    if (_desired_program < 0)
+    {
+        emit UpdatePAT(pat);
+        return;
+    }
+
+    if (!_invalid_pat_seen && !foundProgram)
+    {
+        _invalid_pat_seen = true;
+        _invalid_pat_timer.start();
+        VERBOSE(VB_RECORD, "ProcessPAT: "
+                "PAT is missing program, setting timeout");
+    }
+    else if (_invalid_pat_seen && (_invalid_pat_timer.elapsed() > 400))
+    {
+        // After 400ms emit error if we haven't found correct PAT.
+        VERBOSE(VB_IMPORTANT, "ProcesPAT: Program not found in PAT. "
+                "\n\t\t\tRescan your transports.");
+
+        // This will trigger debug PAT print
+        emit UpdatePAT(pat);
+        if (CreatePATSingleProgram(*pat))
+            emit UpdatePATSingleProgram(PATSingleProgram());
+        _invalid_pat_seen = false;
+    }
+    else if (foundProgram)
+    {
+        if (_invalid_pat_seen)
+            VERBOSE(VB_RECORD, "ProcesPAT: Good PAT seen after a bad PAT");
+
+        _invalid_pat_seen = false;
+        emit UpdatePAT(pat);
+        if (CreatePATSingleProgram(*pat))
+            emit UpdatePATSingleProgram(PATSingleProgram());
+    }
 }
 
 void MPEGStreamData::ProcessPMT(const uint pid, const ProgramMapTable *pmt)

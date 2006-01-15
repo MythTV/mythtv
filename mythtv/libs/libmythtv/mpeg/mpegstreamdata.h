@@ -8,6 +8,7 @@ using namespace std;
 
 #include <qmap.h>
 #include "tspacket.h"
+#include "util.h"
 
 class ProgramAssociationTable;
 class ProgramMapTable;
@@ -179,6 +180,11 @@ class MPEGStreamData : public QObject
     uint                      _pmt_single_program_num_audio;
     ProgramAssociationTable  *_pat_single_program;
     ProgramMapTable          *_pmt_single_program;
+
+  // PAT Timeout handling.
+  private:
+    bool                      _invalid_pat_seen;
+    MythTimer                 _invalid_pat_timer;
 };
 
 #include "mpegtables.h"
