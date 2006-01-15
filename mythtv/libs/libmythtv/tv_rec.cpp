@@ -2612,6 +2612,9 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip)
     ChangeState(kState_WatchingLiveTV);
     // Wait for state change to take effect
     WaitForEventThreadSleep();
+
+    // Make sure StartRecording can't steal our tuner
+    SetFlags(kFlagCancelNextRecording);
 }
 
 /** \fn TVRec::GetChainID()
