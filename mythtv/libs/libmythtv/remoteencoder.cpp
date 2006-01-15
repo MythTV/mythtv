@@ -479,7 +479,7 @@ bool RemoteEncoder::CheckChannel(QString channel)
     return retval;
 }
 
-/** \fn EncoderLink::ShouldSwitchToAnotherCard(QString)
+/** \fn RemoteEncoder::ShouldSwitchToAnotherCard(QString)
  *  \brief Checks if named channel exists on current tuner, or
  *         another tuner.
  *         <b>This only works on local recorders.</b>
@@ -503,18 +503,29 @@ bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
     return retval;
 }
 
-bool RemoteEncoder::CheckChannelPrefix(QString channel, bool &unique) 
+/** \fn RemoteEncoder::CheckChannelPrefix(const QString&,uint&,bool&,QString&)
+ *  \brief Checks a prefix against the channels in the DB.
+ *
+ *  \sa TVRec::CheckChannelPrefix(const QString&,uint&,bool&,QString&)
+ *      for details.
+ */
+bool RemoteEncoder::CheckChannelPrefix(
+    const QString &prefix,
+    uint          &is_complete_valid_channel_on_rec,
+    bool          &is_extra_char_useful,
+    QString       &needed_spacer)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CHECK_CHANNEL_PREFIX";
-    strlist << channel;
+    strlist << prefix;
 
     SendReceiveStringList(strlist);
 
-    bool retval = strlist[0].toInt();
-    unique = strlist[1].toInt();
+    is_complete_valid_channel_on_rec = strlist[1].toInt();
+    is_extra_char_useful = strlist[2].toInt();
+    needed_spacer = (strlist[3] == "X") ? "" : strlist[3];
 
-    return retval;
+    return strlist[0].toInt();
 }
 
 /** \fn RemoteEncoder::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)

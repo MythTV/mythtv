@@ -2535,11 +2535,19 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {
-        bool unique;
-        QString name = slist[2];
-        retlist << QString::number((int)(enc->CheckChannelPrefix(name, 
-                                                                 unique)));
-        retlist << QString::number((int)unique);
+        QString needed_spacer = QString::null;
+        QString prefix        = slist[2];
+        uint    is_complete_valid_channel_on_rec = 0;
+        bool    is_extra_char_useful             = false;
+
+        bool match = enc->CheckChannelPrefix(
+            prefix, is_complete_valid_channel_on_rec,
+            is_extra_char_useful, needed_spacer);
+
+        retlist << QString::number((int)match);
+        retlist << QString::number(is_complete_valid_channel_on_rec);
+        retlist << QString::number((int)is_extra_char_useful);
+        retlist << ((needed_spacer.isEmpty()) ? QString("X") : needed_spacer);
     }
     else if (command == "GET_NEXT_PROGRAM_INFO")
     {

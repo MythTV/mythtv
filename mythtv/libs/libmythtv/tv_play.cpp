@@ -46,6 +46,7 @@ const int TV::kSMExitTimeout  = 2000;
 const int TV::kInputKeysMax   = 6;
 const int TV::kInputModeTimeout=5000;
 
+#define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 #define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
 #define LOC QString("TV: ")
 #define LOC_ERR QString("TV Error: ")
@@ -3307,8 +3308,6 @@ void TV::ClearInputQueues(bool hideosd)
 
 void TV::AddKeyToInputQueue(char key)
 {
-    static char *spacers[5] = { "_", "-", "#", ".", NULL };
-
     if (key)
     {
         QMutexLocker locker(&queuedInputLock);
@@ -3316,44 +3315,19 @@ void TV::AddKeyToInputQueue(char key)
         queuedChanNum = queuedChanNum.append(key).right(kInputKeysMax);
     }
 
-    /* 
-     * Always use smartChannelChange when channel numbers are entered in
-     * browse mode because in browse mode space/enter exit browse mode and
-     * change to the currently browsed channel. This makes smartChannelChange
-     * the only way to enter a channel number to browse without waiting for the
-     * OSD to fadeout after entering numbers.
-     */
-    bool do_smart = StateIsLiveTV(GetState()) &&
-        !ccInputMode && !asInputMode &&
-        (smartChannelChange || browsemode);
-    QString chan = GetQueuedChanNum();
-    if (!chan.isEmpty() && do_smart)
+    bool commitSmart = false;
+    QString inputStr = GetQueuedInput();
+
+    // Always use smartChannelChange when channel numbers are entered
+    // in browse mode because in browse mode space/enter exit browse
+    // mode and change to the currently browsed channel.
+    if (StateIsLiveTV(GetState()) && !ccInputMode && !asInputMode &&
+        (smartChannelChange || browsemode))
     {
-        // Look for channel in line-up
-        bool unique = false;
-        bool ok = activerecorder->CheckChannelPrefix(chan, unique);
-
-        // If pure channel not in line-up, try adding a spacer
-        QString mod = chan;
-        for (uint i=0; (spacers[i] != NULL) && !ok; ++i)
-        {
-            mod = chan.left(chan.length()-1) + spacers[i] + chan.right(1);
-            ok = activerecorder->CheckChannelPrefix(mod, unique);
-        }
-
-        // Use valid channel if it is there, otherwise reset...
-        QMutexLocker locker(&queuedInputLock);
-        queuedChanNum = QDeepCopy<QString>((ok) ? mod : chan.right(1));
-        do_smart &= unique;
+        commitSmart = ProcessSmartChannel(inputStr);
     }
-
-    QString inputStr = QString::null;
-    {
-        QMutexLocker locker(&queuedInputLock);
-        inputStr = QDeepCopy<QString>
-            ((do_smart) ? queuedChanNum : queuedInput);
-    }
-
+ 
+    // Handle OSD...
     inputStr = inputStr.isEmpty() ? "?" : inputStr;
     if (ccInputMode)
     {
@@ -3364,8 +3338,75 @@ void TV::AddKeyToInputQueue(char key)
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
     UpdateOSDTextEntry(inputStr);
 
-    if (do_smart)
+    // Commit the channel if it is complete and smart changing is enabled.
+    if (commitSmart)
         CommitQueuedInput();
+}
+
+static QString add_spacer(const QString &chan, const QString &spacer)
+{
+    if ((chan.length() >= 2) && !spacer.isEmpty())
+        return chan.left(chan.length()-1) + spacer + chan.right(1);
+    return chan;
+}
+
+bool TV::ProcessSmartChannel(QString &inputStr)
+{
+    QString chan = GetQueuedChanNum();
+
+    if (chan.isEmpty())
+        return false;
+
+    // Check for and remove duplicate separator characters
+    if ((chan.length() > 2) && (chan.right(1) == chan.right(2).left(1)) &&
+        !chan.right(1).toUInt())
+    {
+        chan = chan.left(chan.length()-1);
+
+        QMutexLocker locker(&queuedInputLock);
+        queuedChanNum = QDeepCopy<QString>(chan);
+    }
+
+    // Look for channel in line-up
+    QString needed_spacer;
+    uint    pref_cardid;
+    uint    cardid = activerecorder->GetRecorderNumber();
+    bool    is_not_complete;
+
+    bool valid_prefix = activerecorder->CheckChannelPrefix(
+        chan, pref_cardid, is_not_complete, needed_spacer);
+
+#if DEBUG_CHANNEL_PREFIX
+    VERBOSE(VB_IMPORTANT, QString("valid_pref(%1) cardid(%2) chan(%3) "
+                                  "pref_cardid(%4) complete(%5) sp(%6)")
+            .arg(valid_prefix).arg(cardid).arg(chan)
+            .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
+#endif
+
+    if (!valid_prefix)
+    {
+        // not a valid prefix.. reset...
+        QMutexLocker locker(&queuedInputLock);
+        queuedChanNum = "";
+    }
+    else if (!needed_spacer.isEmpty())
+    {
+        // need a spacer..
+        QMutexLocker locker(&queuedInputLock);
+        queuedChanNum = add_spacer(chan, needed_spacer);
+    }
+
+#if DEBUG_CHANNEL_PREFIX
+    VERBOSE(VB_IMPORTANT, QString(" ValidPref(%1) CardId(%2) Chan(%3) "
+                                  " PrefCardId(%4) Complete(%5) Sp(%6)")
+            .arg(valid_prefix).arg(cardid).arg(GetQueuedChanNum())
+            .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
+#endif
+
+    QMutexLocker locker(&queuedInputLock);
+    inputStr = QDeepCopy<QString>(queuedChanNum);
+
+    return !is_not_complete;
 }
 
 void TV::UpdateOSDTextEntry(const QString &message)
@@ -3414,32 +3455,46 @@ void TV::CommitQueuedInput(void)
             if (activenvp == nvp && GetOSD())
                 GetOSD()->HideSet("channel_number");
         }
-        else if (GetQueuedChanID() ||
-                 (!channum.isEmpty() && activerecorder->CheckChannel(channum)))
+        else if (GetQueuedChanID() || !channum.isEmpty())
             ChangeChannel(GetQueuedChanID(), channum);
-        else if (!chaninput.isEmpty())
-            ChangeChannel(GetQueuedChanID(), chaninput);
     }
 
     ClearInputQueues(true);
 }
 
-void TV::ChangeChannel(uint chanid, const QString &channum)
+void TV::ChangeChannel(uint chanid, const QString &chan)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("ChangeChannel(%1, '%2') ")
-            .arg(chanid).arg(channum));
+            .arg(chanid).arg(chan));
 
+    if (!chanid && chan.isEmpty())
+        return;
+
+    QString channum = chan;
     QStringList reclist;
     bool muted = false;
 
     if (activerecorder)
     {
-        bool getit = false, unique = false;
+        bool getit = false;
+
         if (chanid)
+        {
             getit = activerecorder->ShouldSwitchToAnotherCard(
                 QString::number(chanid));
+        }
         else
-            getit = !activerecorder->CheckChannelPrefix(channum, unique);
+        {
+            QString needed_spacer;
+            uint pref_cardid, cardid = activerecorder->GetRecorderNumber();
+            bool dummy;
+
+            activerecorder->CheckChannelPrefix(chan,  pref_cardid,
+                                               dummy, needed_spacer);
+
+            channum = add_spacer(chan, needed_spacer);
+            getit = (pref_cardid != cardid);
+        }
 
         if (getit)
             reclist = GetValidRecorderList(chanid, channum);

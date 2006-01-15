@@ -814,24 +814,30 @@ bool EncoderLink::ShouldSwitchToAnotherCard(const QString &channelid)
     return false;
 }
 
-/** \fn EncoderLink::CheckChannelPrefix(const QString&,bool&)
- *  \brief Returns true if the numbers in prefix_num match the first digits
- *         of any channel, if it unquely identifies a channel the unique
- *         parameter is set.
+/** \fn EncoderLink::CheckChannelPrefix(const QString&,uint&,bool&,QString&)
+ *  \brief Checks a prefix against the channels in the DB.
  *         <b>This only works on local recorders.</b>
  *
- *  \param prefix_num Channel number prefix to check
- *  \param unique     This is set to true if prefix uniquely identifies
- *                    channel, false otherwise.
- *  \return true if the prefix matches any channels.
+ *  \sa TVRec::CheckChannelPrefix(const QString&,uint&,bool&,QString&)
+ *      for details.
  */
-bool EncoderLink::CheckChannelPrefix(const QString &prefix_num, bool &unique)
+bool EncoderLink::CheckChannelPrefix(
+    const QString &prefix,
+    uint          &is_complete_valid_channel_on_rec,
+    bool          &is_extra_char_useful,
+    QString       &needed_spacer)
 {
     if (local)
-        return tv->CheckChannelPrefix(prefix_num, unique);
+    {
+        return tv->CheckChannelPrefix(
+            prefix, is_complete_valid_channel_on_rec,
+            is_extra_char_useful, needed_spacer);
+    }
 
     VERBOSE(VB_IMPORTANT, "Should be local only query: CheckChannelPrefix");
-    unique = false;
+    is_complete_valid_channel_on_rec = false;
+    is_extra_char_useful             = false;
+    needed_spacer                    = "";
     return false;
 }
 

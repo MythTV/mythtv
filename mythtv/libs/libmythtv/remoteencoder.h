@@ -50,7 +50,7 @@ class RemoteEncoder
     int SetSignalMonitoringRate(int msec, bool notifyFrontend = true);
     bool CheckChannel(QString channel);
     bool ShouldSwitchToAnotherCard(QString channelid);
-    bool CheckChannelPrefix(QString channel, bool &unique);
+    bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc, 
                         QString &category, QString &starttime, QString &endtime,

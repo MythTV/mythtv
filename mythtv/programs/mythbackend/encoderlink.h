@@ -85,7 +85,7 @@ class EncoderLink
     int ChangeHue(bool direction);
     bool CheckChannel(const QString &name);
     bool ShouldSwitchToAnotherCard(const QString &channelid);
-    bool CheckChannelPrefix(const QString &name, bool &unique);
+    bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,

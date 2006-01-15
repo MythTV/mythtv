@@ -216,6 +216,7 @@ class TV : public QObject
     void AddKeyToInputQueue(char key);
     void ClearInputQueues(bool hideosd = false); 
     void CommitQueuedInput(void);
+    bool ProcessSmartChannel(QString&);
 
     // query key queues
     bool HasQueuedInput(void) const
