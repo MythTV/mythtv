@@ -31,6 +31,11 @@ enum MPFDisplayMask {
     MPF_DECODE    = 0x0020,
 };
 
+enum MPFListType {
+    MPF_TYPE_CUTLIST = 0,
+    MPF_TYPE_SAVELIST,
+};
+
 class MPEG2frame
 {
   public:
@@ -127,7 +132,8 @@ class MPEG2fixup
                int fixPTS, int maxf, bool showprog);
     ~MPEG2fixup();
     int Start();
-    void AddCutlist(QStringList cutlist);
+    void AddRangeList(QStringList cutlist, int type);
+    void ShowRangeMap(QMap<long long, int> *mapPtr, QString msg);
     int BuildKeyframeIndex(QString &file, QMap<long long, long long> &posMap);
 
 
@@ -150,11 +156,13 @@ class MPEG2fixup
     int InitAV(const char *inputfile, const char *type, int64_t offset);
     void ScanAudio();
     bool ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
+    void WriteFrame(const char *filename, MPEG2frame *f);
     void WriteFrame(const char *filename, AVPacket *pkt);
     void WriteYUV(const char *filename, const mpeg2_info_t *info);
     void WriteData(const char *filename, uint8_t *data, int size);
     int BuildFrame(AVPacket *pkt, QString fname);
     MPEG2frame *GetPoolFrame(AVPacket *pkt);
+    MPEG2frame *GetPoolFrame(MPEG2frame *f);
     int GetFrame(AVPacket *pkt);
     bool FindStart();
     void SetRepeat(MPEG2frame *vf, int nb_fields, bool topff);
@@ -212,6 +220,7 @@ class MPEG2fixup
     mpeg2dec_t *img_decoder;
 
     QMap<long long, int> delMap;
+    QMap<long long, int> saveMap;
 
     pthread_t thread;
 
