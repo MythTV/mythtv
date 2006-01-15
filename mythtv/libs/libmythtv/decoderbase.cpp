@@ -378,8 +378,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     {
         while (lower >= 0 && m_positionMap[lower].adjFrame > desired_value)
             lower--;
-        while (upper < size &&
-               m_positionMap[upper].adjFrame > desired_value)
+        while (upper < size && m_positionMap[upper].adjFrame < desired_value)
             upper++;
     }
     else

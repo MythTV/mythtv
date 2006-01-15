@@ -47,7 +47,7 @@ class NuppelDecoder : public DecoderBase
     bool GetFrame(int onlyvideo);
 
     // lastFrame is really (framesPlayed - 1) since we increment after getting
-    bool isLastFrameKey(void) { return (lastKey == (framesPlayed - 1)); }
+    bool isLastFrameKey(void) { return (lastKey == framesPlayed); }
     void WriteStoredData(RingBuffer *rb, bool writevid, long timecodeOffset);
     void ClearStoredData(void);
 
