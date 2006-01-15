@@ -88,7 +88,7 @@
    <button>
      <type>SETTINGS_INFO_CENTER</type>
      <text>Info Center Settings</text>
-     <text lang="DE">Informationszentrale</text>
+     <text lang="DE">Informationen</text>
      <text lang="NL">Informatiecentrale</text>     
      <text lang="FR">Configuration centre d'informations</text>
      <text lang="IS">Stillingar upplýsinga- miðstöðvar</text>
@@ -103,6 +103,7 @@
      <text lang="ES">Centro Información</text>
      <text lang="EN_GB">Info Centre Settings</text>
      <text lang="PT">Config. Centro de Info.</text>
+     <alttext lang="DE">Infocenter</alttext>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends> 
    </button>

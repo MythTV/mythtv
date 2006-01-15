@@ -50,6 +50,7 @@
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
      <text lang="PT">Horário de Cinema</text>
+     <text lang="DE">Kinoprogramm</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -82,6 +83,7 @@
      <text>NetFlix</text>
      <text lang="FI">MythFlix</text>
      <text lang="PT">Aluguer de Filmes</text>
+     <text lang="DE">MythFlix</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

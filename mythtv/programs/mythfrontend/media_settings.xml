@@ -134,6 +134,7 @@
       <text lang="FI">DVD:n Polttoasetukset</text>
       <text lang="FR">Gravure de DVD</text>
       <text lang="PT">Conf. Grav. de DVDs</text>
+      <text lang="DE">DVD brennen</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

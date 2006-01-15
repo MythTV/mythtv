@@ -20,6 +20,7 @@
       <text lang="ET">Planeeri salvestamisi</text>
       <text lang="NB">Planlegg opptak</text>
       <alttext lang="SV">Schemalägg</alttext>
+      <alttext lang="DE">Planung</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -74,7 +75,7 @@
       <text lang="CA">Esborrar Gravacions</text>
       <text lang="NL">Opnames Verwijderen</text>
       <text lang="FR">Supprimer des enregistrements</text>
-      <text lang="DE">Löschen</text>
+      <text lang="DE">Aufnahmen löschen</text>
       <text lang="DK">Slet optagelser</text>
       <text lang="IS">Eyða upptöku</text>
       <text lang="PT">Apagar Gravações</text>
@@ -86,6 +87,7 @@
       <text lang="ET">Kustuta salvestusi</text>
       <text lang="NB">Slett opptak</text>
       <alttext lang="SV">Radera</alttext>
+      <alttext lang="DE">Löschen</alttext>
       <action>TV_DELETE</action>
    </button>
 

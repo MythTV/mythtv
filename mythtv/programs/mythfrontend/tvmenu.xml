@@ -102,6 +102,7 @@
       <text lang="ET">Kustuta salvestusi</text>
       <text lang="NB">Slett opptak</text>
       <alttext lang="ET">Kustuta</alttext>
+      <alttext lang="DE">Löschen</alttext>
       <action>TV_DELETE</action>
    </button> 
 
