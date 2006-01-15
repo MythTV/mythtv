@@ -1206,6 +1206,11 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
                     text = getFirstText(info);
                 }
                 else if (info.attribute("lang","").lower() == 
+                         gContext->GetLanguageAndVariant())
+                {
+                    text = getFirstText(info);
+                }
+                else if (info.attribute("lang","").lower() == 
                          gContext->GetLanguage())
                 {
                     text = getFirstText(info);
@@ -1217,6 +1222,11 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
                     info.attribute("lang","") == "")
                 {
                     alttext = getFirstText(info);
+                }
+                else if (info.attribute("lang","").lower() == 
+                         gContext->GetLanguageAndVariant())
+                {
+                    text = getFirstText(info);
                 }
                 else if (info.attribute("lang","").lower() ==
                          gContext->GetLanguage())

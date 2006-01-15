@@ -20,7 +20,7 @@ VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
     setLineWidth(1);
     m_parentEdit = parentEdit;
 
-    switchLayout(gContext->GetLanguage());
+    switchLayout(gContext->GetLanguageAndVariant());
 }
 
 void VirtualKeyboard::switchLayout(QString language)

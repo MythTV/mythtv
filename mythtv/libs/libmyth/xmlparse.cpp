@@ -1297,6 +1297,11 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
                     value = qApp->translate("ThemeUI", getFirstText(info));
                 }
                 else if (info.attribute("lang","").lower() ==
+                         gContext->GetLanguageAndVariant())
+                {
+                    value = getFirstText(info);
+                }
+                else if (info.attribute("lang","").lower() ==
                          gContext->GetLanguage())
                 {
                     value = getFirstText(info);
@@ -1450,6 +1455,11 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
                      info.attribute("lang","") == "")
                 {
                     value = qApp->translate("ThemeUI", getFirstText(info));
+                }
+                else if (info.attribute("lang","").lower() ==
+                         gContext->GetLanguageAndVariant())
+                {
+                    value = getFirstText(info);
                 }
                 else if (info.attribute("lang","").lower() ==
                          gContext->GetLanguage())
@@ -1755,6 +1765,11 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                     info.attribute("lang","") == "")
                 {
                     value = qApp->translate("ThemeUI", getFirstText(info));
+                }
+                else if (info.attribute("lang","").lower() ==
+                         gContext->GetLanguageAndVariant())
+                {
+                    value = getFirstText(info);
                 }
                 else if (info.attribute("lang","").lower() ==
                          gContext->GetLanguage())

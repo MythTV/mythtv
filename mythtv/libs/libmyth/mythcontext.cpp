@@ -2487,6 +2487,18 @@ QFont MythContext::GetSmallFont(void)
  */
 QString MythContext::GetLanguage(void)
 {
+    return GetLanguageAndVariant().left(2);
+}
+
+/** \fn MythContext::GetLanguageAndVariant()
+ *  \brief Returns the user-set language and variant.
+ *
+ *   The string has the form ll or ll_vv, where ll is the two character
+ *   ISO-639 language code, and vv (which may not exist) is the variant.
+ *   Examples include en_AU, en_CA, en_GB, en_US, fr_CH, fr_DE, pt_BR, pt_PT.
+ */
+QString MythContext::GetLanguageAndVariant(void)
+{
     if (d->language == QString::null || d->language == "")
         d->language = GetSetting("Language", "EN").lower();
 
