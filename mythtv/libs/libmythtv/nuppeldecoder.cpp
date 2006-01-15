@@ -28,7 +28,7 @@ using namespace std;
 #define LOC QString("NVD: ")
 #define LOC_ERR QString("NVD Error: ")
 
-pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t avcodeclock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 
 NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     : DecoderBase(parent, pginfo),

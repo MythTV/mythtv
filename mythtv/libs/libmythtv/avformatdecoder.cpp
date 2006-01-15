@@ -1109,7 +1109,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (!enc->codec)
         {
+            pthread_mutex_lock(&avcodeclock);
             int open_val = avcodec_open(enc, codec);
+            pthread_mutex_unlock(&avcodeclock);
             if (open_val < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR
