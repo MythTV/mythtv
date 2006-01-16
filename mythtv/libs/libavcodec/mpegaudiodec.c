@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -1650,7 +1650,7 @@ static int huffman_decode(MPADecodeContext *s, GranuleDef *g,
             if (get_bits_count(&s->gb) >= end_pos)
                 break;
             if (code_table) {
-                code = get_vlc(&s->gb, vlc);
+                code = get_vlc2(&s->gb, vlc->table, 8, 2);
                 if (code < 0)
                     return -1;
                 y = code_table[code];
@@ -1701,7 +1701,7 @@ static int huffman_decode(MPADecodeContext *s, GranuleDef *g,
         }
         last_gb= s->gb;
 
-        code = get_vlc(&s->gb, vlc);
+        code = get_vlc2(&s->gb, vlc->table, vlc->bits, 2);
         dprintf("t=%d code=%d\n", g->count1table_select, code);
         if (code < 0)
             return -1;

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 #include "avi.h"
@@ -193,6 +193,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_FRAPS, MKTAG('F', 'P', 'S', '1') },
     { CODEC_ID_THEORA, MKTAG('t', 'h', 'e', 'o') },
     { CODEC_ID_TRUEMOTION2, MKTAG('T', 'M', '2', '0') },
+    { CODEC_ID_CSCD, MKTAG('C', 'S', 'C', 'D') },
     { CODEC_ID_RAWVIDEO, 0 },
     { 0, 0 },
 };

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 #ifndef NEWPOSTPROCESS_H
@@ -28,6 +28,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define LIBPOSTPROC_VERSION_INT ((51<<16)+(1<<8)+0)
+#define LIBPOSTPROC_VERSION     51.1.0
+#define LIBPOSTPROC_BUILD       LIBPOSTPROC_VERSION_INT
+
+#define LIBPOSTPROC_IDENT       "postproc" AV_STRINGIFY(LIBPOSTPROC_VERSION)
 
 #define PP_QUALITY_MAX 6
 

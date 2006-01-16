@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -99,7 +99,7 @@ typedef void (*tpel_mc_func)(uint8_t *block/*align width (8 or 16)*/, const uint
 typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
 typedef void (*h264_chroma_mc_func)(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int srcStride, int h, int x, int y);
 typedef void (*h264_weight_func)(uint8_t *block, int stride, int log2_denom, int weight, int offset);
-typedef void (*h264_biweight_func)(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets);
+typedef void (*h264_biweight_func)(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offset);
 
 #define DEF_OLD_QPEL(name)\
 void ff_put_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);\
@@ -253,8 +253,8 @@ typedef struct DSPContext {
     h264_chroma_mc_func put_h264_chroma_pixels_tab[3];
     h264_chroma_mc_func avg_h264_chroma_pixels_tab[3];
 
-    qpel_mc_func put_h264_qpel_pixels_tab[3][16];
-    qpel_mc_func avg_h264_qpel_pixels_tab[3][16];
+    qpel_mc_func put_h264_qpel_pixels_tab[4][16];
+    qpel_mc_func avg_h264_qpel_pixels_tab[4][16];
 
     h264_weight_func weight_h264_pixels_tab[10];
     h264_biweight_func biweight_h264_pixels_tab[10];
@@ -510,6 +510,7 @@ struct unaligned_16 { uint16_t l; } __attribute__((packed));
 #define LD32(a) (((const struct unaligned_32 *) (a))->l)
 #define LD64(a) (((const struct unaligned_64 *) (a))->l)
 
+#define ST16(a, b) (((struct unaligned_16 *) (a))->l) = (b)
 #define ST32(a, b) (((struct unaligned_32 *) (a))->l) = (b)
 
 #else /* __GNUC__ */

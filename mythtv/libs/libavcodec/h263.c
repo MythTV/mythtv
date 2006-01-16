@@ -17,7 +17,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * ac prediction encoding, b-frame support, error resilience, optimizations,
  * qpel decoding, gmc decoding, interlaced decoding,
@@ -5285,13 +5285,13 @@ static void mpeg4_decode_sprite_trajectory(MpegEncContext * s, GetBitContext *gb
         int length;
         int x=0, y=0;
 
-        length= get_vlc(gb, &sprite_trajectory);
+        length= get_vlc2(gb, sprite_trajectory.table, SPRITE_TRAJ_VLC_BITS, 3);
         if(length){
             x= get_xbits(gb, length);
         }
         if(!(s->divx_version==500 && s->divx_build==413)) skip_bits1(gb); /* marker bit */
 
-        length= get_vlc(gb, &sprite_trajectory);
+        length= get_vlc2(gb, sprite_trajectory.table, SPRITE_TRAJ_VLC_BITS, 3);
         if(length){
             y=get_xbits(gb, length);
         }

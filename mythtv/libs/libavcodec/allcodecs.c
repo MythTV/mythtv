@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -226,9 +226,11 @@ void avcodec_register_all(void)
 #ifdef CONFIG_VC9_DECODER
     register_avcodec(&vc9_decoder);
 #endif //CONFIG_VC9_DECODER
+/* Reenable when it stops crashing on every file, causing bug report spam.
 #ifdef CONFIG_WMV3_DECODER
     register_avcodec(&wmv3_decoder);
 #endif //CONFIG_WMV3_DECODER
+*/
 #ifdef CONFIG_H263I_DECODER
     register_avcodec(&h263i_decoder);
 #endif //CONFIG_H263I_DECODER
@@ -262,6 +264,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_TSCC_DECODER
     register_avcodec(&tscc_decoder);
 #endif //CONFIG_TSCC_DECODER
+#ifdef CONFIG_CSCD_DECODER
+    register_avcodec(&cscd_decoder);
+#endif //CONFIG_CSCD_DECODER
 #ifdef CONFIG_ULTI_DECODER
     register_avcodec(&ulti_decoder);
 #endif //CONFIG_ULTI_DECODER

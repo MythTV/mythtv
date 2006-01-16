@@ -29,7 +29,7 @@ SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c
 SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
 SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c 
 SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
-SOURCES += dvbsub.c dvbsubdec.c dvdsubenc.c opt.c myth_utils.c
+SOURCES += dvbsub.c dvbsubdec.c dvdsubenc.c opt.c lzo.c myth_utils.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h i386/mmx.h opt.h
@@ -231,6 +231,10 @@ contains( CONFIG_TRUESPEECH_DECODER, yes ) {
 
 contains( CONFIG_TSCC_DECODER, yes ) {
     SOURCES += tscc.c
+}
+
+contains( CONFIG_CSCD_DECODER, yes) {
+    SOURCES += cscd.c
 }
 
 contains( CONFIG_ULTI_DECODER, yes ) {
