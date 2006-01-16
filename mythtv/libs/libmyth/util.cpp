@@ -209,7 +209,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 
     if (!socket->isOpen() || socket->error())
     {
-        VERBOSE(VB_ALL, "ReadStringList: Bad socket");
+        VERBOSE(VB_IMPORTANT, "ReadStringList: Bad socket");
         return false;
     }    
 
@@ -341,7 +341,7 @@ bool WriteBlock(QSocketDevice *socket, void *data, uint len)
     
     if (!socket->isOpen() || socket->error())
     {
-        VERBOSE(VB_ALL, "WriteBlock: Bad socket");
+        VERBOSE(VB_IMPORTANT, "WriteBlock: Bad socket");
         return false;
     }    
     
@@ -959,7 +959,7 @@ bool getUptime(time_t &uptime)
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
-        VERBOSE(VB_ALL, "sysinfo() error");
+        VERBOSE(VB_IMPORTANT, "sysinfo() error");
         return false;
     }
     else
@@ -978,7 +978,7 @@ bool getUptime(time_t &uptime)
     mib[1] = KERN_BOOTTIME;
     if (sysctl(mib, 2, &bootTime, &len, NULL, 0) == -1)
     {
-        VERBOSE(VB_ALL, "sysctl() error");
+        VERBOSE(VB_IMPORTANT, "sysctl() error");
         return false;
     }
     else
@@ -986,7 +986,7 @@ bool getUptime(time_t &uptime)
 
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
-    VERBOSE(VB_ALL, "Unknown platform. How do I get the uptime?");
+    VERBOSE(VB_IMPORTANT, "Unknown platform. How do I get the uptime?");
     return false;
 #endif
 

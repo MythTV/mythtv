@@ -24,7 +24,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    VERBOSE(VB_ALL, QString("Upgrading to MythMusic schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythMusic schema version ") + 
             version);
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -52,7 +52,7 @@ void UpgradeMusicDatabaseSchema(void)
 
     if (dbver == "")
     {
-        VERBOSE(VB_ALL, "Inserting MythMusic initial database information.");
+        VERBOSE(VB_IMPORTANT, "Inserting MythMusic initial database information.");
 
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS musicmetadata ("
@@ -119,7 +119,7 @@ void UpgradeMusicDatabaseSchema(void)
                         i += modify.numRowsAffected();
                 }
             }
-            VERBOSE(VB_ALL, QString("Modified %1 entries for db schema 1001").arg(i));
+            VERBOSE(VB_IMPORTANT, QString("Modified %1 entries for db schema 1001").arg(i));
         }
 
         const QString updates[] = {
@@ -158,7 +158,7 @@ void UpgradeMusicDatabaseSchema(void)
     
     if (dbver == "1002")
     {
-        VERBOSE(VB_ALL, "Updating music metadata to be UTF-8 in the database");
+        VERBOSE(VB_IMPORTANT, "Updating music metadata to be UTF-8 in the database");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT intid, artist, album, title, genre, "
@@ -214,7 +214,7 @@ void UpgradeMusicDatabaseSchema(void)
             }
         }
 
-        VERBOSE(VB_ALL, "Done updating music metadata to UTF-8");
+        VERBOSE(VB_IMPORTANT, "Done updating music metadata to UTF-8");
 
         const QString updates[] = {
 ""

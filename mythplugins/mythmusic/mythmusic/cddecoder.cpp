@@ -387,7 +387,7 @@ Metadata *CdDecoder::getMetadata()
     if (ret < 0)
     {
         cd_finish(cd);
-        VERBOSE(VB_ALL, QString("Error during CD lookup: %1").arg(ret));
+        VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
         return NULL;
     }
 
@@ -472,7 +472,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
     if (ret < 0)
     {
         cd_finish(cd);
-        VERBOSE(VB_ALL, QString("Error during CD lookup: %1").arg(ret));
+        VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
         return;
     }
   

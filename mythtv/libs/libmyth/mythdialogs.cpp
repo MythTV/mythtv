@@ -798,7 +798,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                 {
                    if ((itr.data().MediaType & (int)pDev->getMediaType()))
                    {
-                       VERBOSE(VB_ALL, "Found a handler");
+                       VERBOSE(VB_IMPORTANT, "Found a handler");
                        d->exitingtomain = true;
                        d->exitmenumediadevicecallback = itr.data().callback;
                        d->mediadeviceforcallback = pDev;

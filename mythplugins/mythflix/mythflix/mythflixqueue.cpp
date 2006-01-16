@@ -625,7 +625,7 @@ QString MythFlixQueue::executeExternal(const QStringList& args, const QString& p
         ret = "#ERROR";
     }
     
-    VERBOSE(VB_ALL, ret); 
+    VERBOSE(VB_IMPORTANT, ret); 
     return ret;
 }
 

@@ -102,7 +102,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
             .arg(m_DevicePath);
     
-        VERBOSE(VB_ALL,  QString("Executing '%1'").arg(MountCommand));
+        VERBOSE(VB_IMPORTANT,  QString("Executing '%1'").arg(MountCommand));
         if (0 == myth_system(MountCommand)) 
         {
             if (DoMount)
@@ -122,7 +122,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     } 
     else 
     {
-        VERBOSE( VB_ALL,  "Disk iserted on a supermount device" );
+        VERBOSE( VB_IMPORTANT,  "Disk iserted on a supermount device" );
         // If it's a super mount then the OS will handle mounting /  unmounting.
         // We just need to give derived classes a chance to perform their 
         // mount / unmount logic.

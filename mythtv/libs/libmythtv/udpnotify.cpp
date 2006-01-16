@@ -141,7 +141,7 @@ UDPNotify::UDPNotify(TV *tv, int udp_port)
     qsd = new QSocketDevice(QSocketDevice::Datagram);
     if (!qsd->bind(bcastaddr, udp_port))
     {
-        VERBOSE(VB_ALL, QString("Could not bind to UDP notify port: %1")
+        VERBOSE(VB_IMPORTANT, QString("Could not bind to UDP notify port: %1")
                                        .arg(udp_port));
         qsn = NULL;
     }
@@ -215,7 +215,7 @@ void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        VERBOSE(VB_ALL, "Text area needs a name");
+        VERBOSE(VB_IMPORTANT, "Text area needs a name");
         return;
     }
 
@@ -242,7 +242,7 @@ void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_ALL, QString("Unknown tag in text area: %1")
+                VERBOSE(VB_IMPORTANT, QString("Unknown tag in text area: %1")
                                        .arg(info.tagName()));
             }                   
         }
@@ -254,7 +254,7 @@ UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        VERBOSE(VB_ALL, "Container needs a name");
+        VERBOSE(VB_IMPORTANT, "Container needs a name");
         return NULL;
     }
 
@@ -282,7 +282,7 @@ UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_ALL, QString("Unknown container child: %1")
+                VERBOSE(VB_IMPORTANT, QString("Unknown container child: %1")
                                        .arg(info.tagName()));
             }
         }
@@ -313,11 +313,11 @@ void UDPNotify::incomingData(int socket)
     nr = qsd->readBlock(buf.data(), qsd->bytesAvailable()); 
     if (nr < 0)
     {
-        VERBOSE(VB_ALL, "Error reading from udpnotify socket");
+        VERBOSE(VB_IMPORTANT, "Error reading from udpnotify socket");
         return;
     }
     buf.resize(nr);  // Resize to actual bytes read
-    //VERBOSE(VB_ALL, QString("Read %1 bytes from peer IP %2 port %3")
+    //VERBOSE(VB_IMPORTANT, QString("Read %1 bytes from peer IP %2 port %3")
     //                       .arg(nr)
     //                       .arg(qsd->peerAddress().toString())
     //                       .arg(qsd->port()));
@@ -328,7 +328,7 @@ void UDPNotify::incomingData(int socket)
   
     if (!doc.setContent(buf, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_ALL, QString("Error parsing udpnotify xml:\n"
+        VERBOSE(VB_IMPORTANT, QString("Error parsing udpnotify xml:\n"
                                 "at line: %1  column: %2\n%3")
                                .arg(errorLine)
                                .arg(errorColumn)
@@ -343,14 +343,14 @@ void UDPNotify::incomingData(int socket)
     {
         if (docElem.tagName() != "mythnotify")
         {
-            VERBOSE(VB_ALL, "Unknown UDP packet (not <mythnotify> XML)");
+            VERBOSE(VB_IMPORTANT, "Unknown UDP packet (not <mythnotify> XML)");
             return;
         }
 
         QString version = docElem.attribute("version", "");
         if (version.isNull() || version.isEmpty())
         {
-            VERBOSE(VB_ALL, "<mythnotify> missing 'version' attribute");
+            VERBOSE(VB_IMPORTANT, "<mythnotify> missing 'version' attribute");
             return;
         }
 
@@ -373,7 +373,7 @@ void UDPNotify::incomingData(int socket)
             }
             else
             {
-                VERBOSE(VB_ALL, QString("Unknown element: %1")
+                VERBOSE(VB_IMPORTANT, QString("Unknown element: %1")
                                        .arg(e.tagName()));
                 return;
             }

@@ -298,7 +298,7 @@ QString VideoManager::GetMoviePoster(const QString& movieNum)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    VERBOSE(VB_ALL, QString("Copying '%1' -> '%2'...").arg(uri).arg(fileprefix));
+    VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...").arg(uri).arg(fileprefix));
     QUrlOperator *op = new QUrlOperator();
     connect(op, SIGNAL(finished(QNetworkOperation*)), 
           this, SLOT(copyFinished(QNetworkOperation*)) );
@@ -336,7 +336,7 @@ QString VideoManager::GetMoviePoster(const QString& movieNum)
 
        QString err = QString("Copying of '%1' timed out").arg(uri);
        cerr << err << endl;
-       VERBOSE(VB_ALL, err);
+       VERBOSE(VB_IMPORTANT, err);
 
        MythPopupBox::showOkPopup( gContext->GetMainWindow(),
                                   QObject::tr("Could not retrieve poster"),
@@ -398,7 +398,7 @@ void VideoManager::copyFinished(QNetworkOperation* op)
             break;
    }
    
-   VERBOSE(VB_ALL, QString("%1: %2: %3")
+   VERBOSE(VB_IMPORTANT, QString("%1: %2: %3")
            .arg(operation)
            .arg(state)
            .arg(op->protocolDetail()) );
@@ -596,7 +596,7 @@ QString VideoManager::executeExternal(const QStringList& args, const QString& pu
         ret = "#ERROR";
     }
     
-    VERBOSE(VB_ALL, ret); 
+    VERBOSE(VB_IMPORTANT, ret); 
     return ret;
 }
 
@@ -1645,7 +1645,7 @@ void VideoManager::slotAutoIMDB()
          ret = 1;
        }
 
-      VERBOSE(VB_ALL,
+      VERBOSE(VB_IMPORTANT,
               QString("GetMovieList returned %1 possible matches").arg(ret));
       if (ret == 1) {
           if (movieNumber.isNull() || movieNumber.length() == 0)

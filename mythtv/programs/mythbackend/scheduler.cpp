@@ -1161,7 +1161,7 @@ void Scheduler::RunScheduler(void)
                     ((curtime.secsTo((*startIter)->startts) - prerollseconds)
                         < (idleWaitForRecordingTime * 60)))
                 {
-                    VERBOSE(VB_ALL,
+                    VERBOSE(VB_IMPORTANT,
                             "Recording starts soon, AUTO-Startup assumed");
                     startupParam = "auto";
             
@@ -1171,7 +1171,7 @@ void Scheduler::RunScheduler(void)
                 }
                 else
                 {
-                    VERBOSE(VB_ALL, "Seem to be woken up by USER");
+                    VERBOSE(VB_IMPORTANT, "Seem to be woken up by USER");
                 }
         
                 QString startupCommand = gContext->GetSetting("startupCommand",
@@ -1384,7 +1384,7 @@ void Scheduler::RunScheduler(void)
                                 msg = QString("I\'m idle now... shutdown will "
                                               "occur in %1 seconds.")
                                              .arg(idleTimeoutSecs);
-                                VERBOSE(VB_ALL, msg);
+                                VERBOSE(VB_IMPORTANT, msg);
                                 MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                              .arg(idleTimeoutSecs));
                                 gContext->dispatch(me);
@@ -1394,7 +1394,7 @@ void Scheduler::RunScheduler(void)
                                 msg = QString("%1 secs left to system "
                                               "shutdown!")
                                              .arg(idleTimeoutSecs - itime);
-                                VERBOSE(VB_ALL, msg);
+                                VERBOSE(VB_IMPORTANT, msg);
                                 MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                              .arg(idleTimeoutSecs - itime));
                                 gContext->dispatch(me);

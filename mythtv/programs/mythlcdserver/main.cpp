@@ -61,13 +61,13 @@ int main(int argc, char **argv)
                 special_port = port_number.toInt();
                 if (special_port < 1 || special_port > 65534)
                 {
-                    VERBOSE(VB_ALL, "lcdserver: Bad port number");
+                    VERBOSE(VB_IMPORTANT, "lcdserver: Bad port number");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
             } 
             else 
             {
-                VERBOSE(VB_ALL, "lcdserver: Missing argument to "
+                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-p/--port option");
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
             } 
             else 
             {
-                VERBOSE(VB_ALL, "lcdserver: Missing argument to "
+                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-m/--startupmessage");
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
@@ -97,13 +97,13 @@ int main(int argc, char **argv)
                 message_time = sTime.toInt();
                 if (message_time < 1 || message_time > 1000)
                 {
-                    VERBOSE(VB_ALL, "lcdserver: Bad show message time");
+                    VERBOSE(VB_IMPORTANT, "lcdserver: Bad show message time");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
             } 
             else 
             {
-                VERBOSE(VB_ALL, "lcdserver: Missing argument to "
+                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-t/--messagetime");
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
@@ -158,13 +158,13 @@ int main(int argc, char **argv)
                 debug_level = sTemp.toInt();
                 if (debug_level < 0 || debug_level > 10)
                 {
-                    VERBOSE(VB_ALL, "lcdserver: Bad debug level");
+                    VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
             } 
             else 
             {
-                VERBOSE(VB_ALL, "lcdserver: Missing argument to "
+                VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-x/--debuglevel");
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
@@ -219,7 +219,7 @@ int main(int argc, char **argv)
     {
         if (daemon(0, 1) < 0)
         {
-            VERBOSE(VB_ALL, "lcdserver: Failed to run as a daemon. "
+            VERBOSE(VB_IMPORTANT, "lcdserver: Failed to run as a daemon. "
                             "Bailing out.");
             return LCD_EXIT_DEAMONIZING_ERROR;
         }
@@ -231,7 +231,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_ALL, "lcdserver: Could not initialize myth context. "
+        VERBOSE(VB_IMPORTANT, "lcdserver: Could not initialize myth context. "
                         "Exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }

@@ -203,7 +203,7 @@ bool MediaMonitor::addDevice(struct fstab * mep)
      if (pDevice) 
      {
          pDevice->setMountPath(mep->fs_file);
-         VERBOSE(VB_ALL, QString("Mediamonitor: Adding %1")
+         VERBOSE(VB_IMPORTANT, QString("Mediamonitor: Adding %1")
                          .arg(pDevice->getDevicePath()));
          if (pDevice->testMedia() == MEDIAERR_OK) 
          {
@@ -331,7 +331,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     if (!m_Active)
         return;
     
-    VERBOSE(VB_ALL, QString("Media status changed...  New status is: %1 "
+    VERBOSE(VB_IMPORTANT, QString("Media status changed...  New status is: %1 "
                             "old status was %2")
                  .arg(MythMediaDevice::MediaStatusStrings[pMedia->getStatus()])
                  .arg(MythMediaDevice::MediaStatusStrings[oldStatus]));
@@ -340,7 +340,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     if (pMedia->getStatus() == MEDIASTAT_USEABLE || 
         pMedia->getStatus() == MEDIASTAT_MOUNTED) 
     {
-        VERBOSE(VB_ALL, QString( "Posting MediaEvent"));
+        VERBOSE(VB_IMPORTANT, QString( "Posting MediaEvent"));
         QApplication::postEvent((QObject*)gContext->GetMainWindow(), 
                                 new MediaEvent(oldStatus, pMedia));
     }

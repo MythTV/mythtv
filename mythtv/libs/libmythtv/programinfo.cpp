@@ -1343,7 +1343,7 @@ QString ProgramInfo::GetRecordBasename(void) const
         if (!query.exec() || !query.isActive())
             MythContext::DBError("GetRecordBasename", query);
         else if (query.size() < 1)
-            VERBOSE(VB_ALL, QString("GetRecordBasename found no entry"));
+            VERBOSE(VB_IMPORTANT, QString("GetRecordBasename found no entry"));
         else
         {
             query.next();

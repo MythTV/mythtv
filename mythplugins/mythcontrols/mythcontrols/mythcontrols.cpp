@@ -126,20 +126,20 @@ bool MythControls::loadUI()
     /* Get the UI widgets that we need to work with */
     if ((description = getUITextType("description")) == NULL)
     {
-        VERBOSE(VB_ALL, "MythControls: Unable to load action_description");
+        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load action_description");
         retval = false;
     }
 
     if ((container = getContainer("controls")) == NULL) {
-        VERBOSE(VB_ALL, "MythControls:  No controls container in theme");
+        VERBOSE(VB_IMPORTANT, "MythControls:  No controls container in theme");
         retval = false;
     }
     else if ((LeftList = getUIListBtnType("leftlist")) == NULL) {
-        VERBOSE(VB_ALL, "MythControls:  No leftlist in theme");
+        VERBOSE(VB_IMPORTANT, "MythControls:  No leftlist in theme");
         retval = false;
     }
     else if ((RightList = getUIListBtnType("rightlist")) == NULL) {
-        VERBOSE(VB_ALL, "MythControls:  No rightList in theme");
+        VERBOSE(VB_IMPORTANT, "MythControls:  No rightList in theme");
         retval = false;
     }
     else {
@@ -156,22 +156,22 @@ bool MythControls::loadUI()
     /* Check that all the buttons are there */
     if ((ActionButtons[0] = getUITextButtonType("action_one")) == NULL)
     {
-        VERBOSE(VB_ALL, "MythControls: Unable to load first action button");
+        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load first action button");
         retval = false;
     }
     else if ((ActionButtons[1] = getUITextButtonType("action_two")) == NULL)
     {
-        VERBOSE(VB_ALL, "MythControls: Unable to load second action button");
+        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load second action button");
         retval = false;
     }
     else if ((ActionButtons[2] = getUITextButtonType("action_three")) == NULL)
     {
-        VERBOSE(VB_ALL, "MythControls: Unable to load thrid action button");
+        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load thrid action button");
         retval = false;
     }
     else if ((ActionButtons[3] = getUITextButtonType("action_four")) == NULL)
     {
-        VERBOSE(VB_ALL, "MythControls: Unable to load fourth action button");
+        VERBOSE(VB_IMPORTANT, "MythControls: Unable to load fourth action button");
         retval = false;
     }
 
@@ -473,7 +473,7 @@ void MythControls::refreshRightList()
             QStringList *actions = m_contexts[context];
             if (actions == NULL)
             {
-                VERBOSE(VB_ALL, QString("MythControls: Unable to find actions for context %1").arg(context));
+                VERBOSE(VB_IMPORTANT, QString("MythControls: Unable to find actions for context %1").arg(context));
                 return;
             }
             UIListBtnTypeItem *item;
@@ -487,7 +487,7 @@ void MythControls::refreshRightList()
             BindingList *list = contextKeys[context];
             if (list == NULL)
             {
-                VERBOSE(VB_ALL, QString("MythControls: Unable to find keys for context %1").arg(context));
+                VERBOSE(VB_IMPORTANT, QString("MythControls: Unable to find keys for context %1").arg(context));
                 return;
             }
             UIListBtnTypeItem *item;
@@ -503,7 +503,7 @@ void MythControls::refreshRightList()
         BindingList *list = keyActions[key];
         if (list == NULL)
         {
-            VERBOSE(VB_ALL, QString("MythControls: Unable to find actions for key %1").arg(key));
+            VERBOSE(VB_IMPORTANT, QString("MythControls: Unable to find actions for key %1").arg(key));
             return;
         }
         UIListBtnTypeItem *item;

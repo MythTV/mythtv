@@ -367,7 +367,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_ALL, QString("Upgrading to schema version ") + version);
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to schema version ") + version);
 
     int counter = 0;
     QString thequery = updates[counter];
@@ -2002,11 +2002,11 @@ bool InitializeDatabase(void)
             "If you are sure this is a good mythtv database, verify\n"
             "that the settings table has the DBSchemaVer variable.\n")
             .arg(query.size() - 1);
-        VERBOSE(VB_ALL, msg);
+        VERBOSE(VB_IMPORTANT, msg);
         return false;   
     }
 
-    VERBOSE(VB_ALL, "Inserting MythTV initial database information.");
+    VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
     const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS `callsignnetworkmap` ("

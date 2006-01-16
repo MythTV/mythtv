@@ -25,7 +25,7 @@ static void performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_ALL, QString("Upgrading to MythPhone schema version ") +
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythPhone schema version ") +
             version);
 
     int counter = 0;
@@ -51,7 +51,7 @@ void UpgradePhoneDatabaseSchema(void)
 
     if (dbver == "")
     {
-        VERBOSE(VB_ALL, "Inserting MythPhone initial database information.");
+        VERBOSE(VB_IMPORTANT, "Inserting MythPhone initial database information.");
 
         const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS phonedirectory ("

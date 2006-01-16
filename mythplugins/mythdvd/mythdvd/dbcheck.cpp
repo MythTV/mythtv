@@ -26,7 +26,7 @@ static void performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_ALL, QString("Upgrading to MythDVD schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythDVD schema version ") + 
             version);
 
     int counter = 0;
@@ -45,7 +45,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
 static void InitializeDatabase(void)
 {
-    VERBOSE(VB_ALL, "Inserting MythDVD initial database information.");
+    VERBOSE(VB_IMPORTANT, "Inserting MythDVD initial database information.");
 
     MSqlQuery qQuery(MSqlQuery::InitCon());
     qQuery.exec("SELECT * FROM dvdinput;");

@@ -25,7 +25,7 @@ static void performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_ALL, QString("Upgrading to MythVideo schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythVideo schema version ") + 
             version);
 
     int counter = 0;
@@ -44,7 +44,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
 static void InitializeDatabase(void)
 {
-    VERBOSE(VB_ALL, "Inserting MythVideo initial database information.");
+    VERBOSE(VB_IMPORTANT, "Inserting MythVideo initial database information.");
 
     const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS videometadata ("

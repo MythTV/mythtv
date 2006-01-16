@@ -924,10 +924,10 @@ int main(int argc, char **argv)
     }
     gContext->ActivateSettingsCache(true);
 
-    VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
 
-    VERBOSE(VB_ALL, QString("Enabled verbose msgs: %1").arg(verboseString));
+    VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
     LCD::SetupLCD ();
     if (class LCD *lcd = LCD::Get ()) {
@@ -1008,7 +1008,7 @@ int main(int argc, char **argv)
     mon = MediaMonitor::getMediaMonitor();
     if (mon)
     {
-        VERBOSE(VB_ALL, QString("Starting media monitor."));
+        VERBOSE(VB_IMPORTANT, QString("Starting media monitor."));
         mon->startMonitoring();
     }
 #endif

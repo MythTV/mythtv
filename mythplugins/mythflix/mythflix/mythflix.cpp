@@ -660,7 +660,7 @@ QString MythFlix::executeExternal(const QStringList& args, const QString& purpos
         ret = "#ERROR";
     }
     
-    VERBOSE(VB_ALL, ret); 
+    VERBOSE(VB_IMPORTANT, ret); 
     return ret;
 }
 

@@ -306,7 +306,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
         if (QDir(prefixDir.canonicalPath() + "/share").exists())
             m_installprefix = prefixDir.canonicalPath();
     }
-    VERBOSE(VB_ALL, QString("Using runtime prefix = %1")
+    VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1")
             .arg(m_installprefix));
 }
 
@@ -367,7 +367,7 @@ void MythContextPrivate::GetScreenBounds()
         bool inWindow = parent->GetNumSetting("RunFrontendInWindow", 0);
 
         if (inWindow)
-            VERBOSE(VB_ALL, QString("Running in a window"));
+            VERBOSE(VB_IMPORTANT, QString("Running in a window"));
 
         if (inWindow)
             // This doesn't include the area occupied by the
@@ -482,16 +482,16 @@ void MythContextPrivate::StoreGUIsettings()
 
     if (m_screenheight < 160 || m_screenwidth < 160)
     {
-        VERBOSE(VB_ALL, "Somehow, your screen size settings are bad.");
-        VERBOSE(VB_ALL, QString("GuiResolution: %1")
+        VERBOSE(VB_IMPORTANT, "Somehow, your screen size settings are bad.");
+        VERBOSE(VB_IMPORTANT, QString("GuiResolution: %1")
                         .arg(parent->GetSetting("GuiResolution")));
-        VERBOSE(VB_ALL, QString("  old GuiWidth: %1")
+        VERBOSE(VB_IMPORTANT, QString("  old GuiWidth: %1")
                         .arg(parent->GetNumSetting("GuiWidth")));
-        VERBOSE(VB_ALL, QString("  old GuiHeight: %1")
+        VERBOSE(VB_IMPORTANT, QString("  old GuiHeight: %1")
                         .arg(parent->GetNumSetting("GuiHeight")));
-        VERBOSE(VB_ALL, QString("m_width: %1").arg(m_width));
-        VERBOSE(VB_ALL, QString("m_height: %1").arg(m_height));
-        VERBOSE(VB_ALL, "Falling back to 640x480");
+        VERBOSE(VB_IMPORTANT, QString("m_width: %1").arg(m_width));
+        VERBOSE(VB_IMPORTANT, QString("m_height: %1").arg(m_height));
+        VERBOSE(VB_IMPORTANT, "Falling back to 640x480");
 
         m_screenwidth  = 640;
         m_screenheight = 480;
@@ -500,7 +500,7 @@ void MythContextPrivate::StoreGUIsettings()
     m_wmult = m_screenwidth  / (float)m_baseWidth;
     m_hmult = m_screenheight / (float)m_baseHeight;
     
-    //VERBOSE(VB_ALL, QString("GUI multipliers are: width %1, height %2").arg(m_wmult).arg(m_hmult));
+    //VERBOSE(VB_IMPORTANT, QString("GUI multipliers are: width %1, height %2").arg(m_wmult).arg(m_hmult));
 }
 
 
@@ -1101,13 +1101,13 @@ QString MythContext::GetConfDir(void)
     if (tmp_confdir)
     {
         dir = QString(tmp_confdir);
-        //VERBOSE(VB_ALL, QString("Read conf dir = %1").arg(dir));
+        //VERBOSE(VB_IMPORTANT, QString("Read conf dir = %1").arg(dir));
         dir.replace("$HOME", QDir::homeDirPath());
     }
     else
         dir = QDir::homeDirPath() + "/.mythtv";
 
-    //VERBOSE(VB_ALL, QString("Using conf dir = %1").arg(dir));
+    //VERBOSE(VB_IMPORTANT, QString("Using conf dir = %1").arg(dir));
     return dir;
 }
 
@@ -1215,12 +1215,12 @@ void MythContext::LoadQtConfig(void)
     
     if (themename.contains("-wide", false))
     {
-        VERBOSE( VB_ALL, QString("Switching to wide mode (%1)").arg(themename));
+        VERBOSE( VB_IMPORTANT, QString("Switching to wide mode (%1)").arg(themename));
         d->SetWideMode();
     }
     else
     {
-        VERBOSE( VB_ALL, QString("Switching to square mode (%1)").arg(themename));
+        VERBOSE( VB_IMPORTANT, QString("Switching to square mode (%1)").arg(themename));
         d->SetSquareMode();
     }
     
@@ -2337,7 +2337,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout,
             qApp->lock();
             if (!block)
                 d->serverSockLock.unlock();
-            VERBOSE(VB_ALL, QString("Reconnection to backend server failed"));
+            VERBOSE(VB_IMPORTANT, QString("Reconnection to backend server failed"));
             if (d->m_height && d->m_width)
                 MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
@@ -2425,7 +2425,7 @@ bool MythContext::CheckProtoVersion(QSocketDevice* socket)
     }
     else if (strlist[0] == "ACCEPT")
     {
-        VERBOSE(VB_ALL, QString("Using protocol version %1")
+        VERBOSE(VB_IMPORTANT, QString("Using protocol version %1")
                                .arg(MYTH_PROTO_VERSION));
         return true;
     }
@@ -2691,7 +2691,7 @@ void MythContext::LogEntry(const QString &module, int priority,
         }
 
         if (priority <= d->m_logprintlevel)
-            VERBOSE(VB_ALL, module + ": " + message);
+            VERBOSE(VB_IMPORTANT, module + ": " + message);
     }
 }
 

@@ -1074,7 +1074,7 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
             VERBOSE(VB_GENERAL, "Grabbing ALL available data.");
             if (!ddprocessor.grabAllData())
             {
-                VERBOSE(VB_ALL, "Encountered error in grabbing data.");
+                VERBOSE(VB_IMPORTANT, "Encountered error in grabbing data.");
                 return false;
             }
         }
@@ -1095,7 +1095,7 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
 
             if (!ddprocessor.grabData(false, fromdatetime, todatetime))
             {
-                VERBOSE(VB_ALL, "Encountered error in grabbing data.");
+                VERBOSE(VB_IMPORTANT, "Encountered error in grabbing data.");
                 return false;
             }
         }
@@ -2599,7 +2599,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
     {
-        VERBOSE(VB_ALL,
+        VERBOSE(VB_IMPORTANT,
                 QString("Error creating temporary file in /tmp, %1")
                 .arg(strerror(errno)));
         exit(FILLDB_BUGGY_EXIT_ERR_OPEN_TMPFILE);
@@ -3267,7 +3267,7 @@ int fix_end_times(void)
 
     if (!query1.exec(querystr))
     {
-        VERBOSE(VB_ALL,
+        VERBOSE(VB_IMPORTANT,
                 QString("fix_end_times query failed: %1").arg(querystr));
         return -1;
     }
@@ -3287,7 +3287,7 @@ int fix_end_times(void)
 
         if (!query2.exec(querystr))
         {
-            VERBOSE(VB_ALL,
+            VERBOSE(VB_IMPORTANT,
                     QString("fix_end_times query failed: %1").arg(querystr));
             return -1;
         }
@@ -3306,7 +3306,7 @@ int fix_end_times(void)
 
             if (!query2.exec(querystr)) 
             {
-                VERBOSE(VB_ALL,
+                VERBOSE(VB_IMPORTANT,
                        QString("fix_end_times query failed: %1").arg(querystr));
                 return -1;
             }
@@ -3707,7 +3707,7 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_ALL, "Failed to init MythContext, exiting.");
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -3826,7 +3826,7 @@ int main(int argc, char *argv[])
              }
              else
              {
-                  VERBOSE(VB_ALL,
+                  VERBOSE(VB_IMPORTANT,
                           "There are no channel sources defined, did you run "
                           "the setup program?");
                   gContext->LogEntry("mythfilldatabase", LP_CRITICAL,
@@ -3845,7 +3845,7 @@ int main(int argc, char *argv[])
     
         if (!fillData(sourcelist))
         {
-             VERBOSE(VB_ALL, "Failed to fetch some program info");
+             VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
              gContext->LogEntry("mythfilldatabase", LP_WARNING,
                                 "Failed to fetch some program info", "");
              return FILLDB_EXIT_DB_ERROR;
@@ -3887,7 +3887,7 @@ int main(int argc, char *argv[])
         VERBOSE(VB_GENERAL, "Adjusting program database end times.");
         int update_count = fix_end_times();
         if (update_count == -1)
-            VERBOSE(VB_ALL, "fix_end_times failed!");
+            VERBOSE(VB_IMPORTANT, "fix_end_times failed!");
         else if (!quiet)
             VERBOSE(VB_GENERAL,
                     QString("    %1 replacements made").arg(update_count));

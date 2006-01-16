@@ -60,7 +60,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_ALL, QString("Upgrading to MythGame schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythGame schema version ") + 
             version);
 
     int counter = 0;
@@ -96,7 +96,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool InitializeDatabase(void)
 {
-    VERBOSE(VB_ALL, "Inserting MythGame initial database information.");
+    VERBOSE(VB_IMPORTANT, "Inserting MythGame initial database information.");
 
     const QString updates[] = {
 "CREATE TABLE gamemetadata ("

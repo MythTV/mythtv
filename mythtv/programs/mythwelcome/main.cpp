@@ -28,14 +28,14 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init()) 
     {
-        VERBOSE(VB_ALL, "mythwelcome: Could not initialize myth context. "
+        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not initialize myth context. "
                         "Exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
     if (!MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_ALL, "mythwelcome: Could not open the database. "
+        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not open the database. "
                         "Exiting.");
         return -1;
     }

@@ -1247,7 +1247,7 @@ void ReadCDThread::run()
     if (tracknum != all_music->getCDTrackCount())
     {
         cd_status_changed = true;
-        VERBOSE(VB_ALL, QString("Set cd_status_changed to true"));
+        VERBOSE(VB_IMPORTANT, QString("Set cd_status_changed to true"));
     }
     else
         cd_status_changed = false;

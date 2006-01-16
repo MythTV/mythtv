@@ -161,14 +161,14 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
      * re-create the directdraw surfaces. */
     if (!ddobject && DirectXInitDDraw() != 0)
     {
-        VERBOSE(VB_ALL, "cannot initialize DirectDraw");
+        VERBOSE(VB_IMPORTANT, "cannot initialize DirectDraw");
         return false;
     }
 
     /* Create the directx display */
     if (!display && DirectXCreateDisplay() != 0)
     {
-        VERBOSE(VB_ALL, "cannot initialize DirectDraw");
+        VERBOSE(VB_IMPORTANT, "cannot initialize DirectDraw");
         return false;
     }
 
@@ -306,7 +306,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         DirectXUnlockSurface();
     }
     else
-        VERBOSE(VB_ALL, "Could not lock surface!");    
+        VERBOSE(VB_IMPORTANT, "Could not lock surface!");    
 }
 
 void VideoOutputDX::Show(FrameScanType )
@@ -321,7 +321,7 @@ void VideoOutputDX::Show(FrameScanType )
 
     if ((display == NULL))
     {
-        VERBOSE(VB_ALL, "no display!!");
+        VERBOSE(VB_IMPORTANT, "no display!!");
         return;
     }
 
@@ -379,7 +379,7 @@ void VideoOutputDX::Show(FrameScanType )
                                             &rect_src, DDBLT_ASYNC, &ddbltfx);
         if (dxresult != DD_OK)
         {
-            VERBOSE(VB_ALL, "could not blit surface (error " << hex << dxresult << dec << ")");
+            VERBOSE(VB_IMPORTANT, "could not blit surface (error " << hex << dxresult << dec << ")");
             return;
         }
 
@@ -395,7 +395,7 @@ void VideoOutputDX::Show(FrameScanType )
         dxresult = IDirectDrawSurface2_Flip(front_surface, NULL, DDFLIP_WAIT);
         if (dxresult != DD_OK)
         {
-            VERBOSE(VB_ALL, "could not flip overlay (error " << hex << dxresult << dec << ")");
+            VERBOSE(VB_IMPORTANT, "could not flip overlay (error " << hex << dxresult << dec << ")");
         }
 
         /* set currently displayed pic */
@@ -483,7 +483,7 @@ int VideoOutputDX::ChangePictureAttribute(int attribute, int newValue)
     dxresult = IDirectDrawColorControl_SetColorControls(ccontrol, &ddcc);
     
     if (dxresult != DD_OK) {
-        VERBOSE(VB_ALL, "Could not update colour controls: " << hex << dxresult << dec);
+        VERBOSE(VB_IMPORTANT, "Could not update colour controls: " << hex << dxresult << dec);
         return -1;
     }
     
@@ -562,13 +562,13 @@ int VideoOutputDX::DirectXInitDDraw()
     LPFNDDEE OurDirectDrawEnumerateEx;
     LPDIRECTDRAW p_ddobject;
 
-    VERBOSE(VB_ALL, "DirectXInitDDraw");
+    VERBOSE(VB_IMPORTANT, "DirectXInitDDraw");
 
     /* Load direct draw DLL */
     ddraw_dll = LoadLibrary("DDRAW.DLL");
     if (ddraw_dll == NULL)
     {
-        VERBOSE(VB_ALL, "DirectXInitDDraw failed loading ddraw.dll");
+        VERBOSE(VB_IMPORTANT, "DirectXInitDDraw failed loading ddraw.dll");
         goto error;
     }
 
@@ -576,7 +576,7 @@ int VideoOutputDX::DirectXInitDDraw()
       (LPFNDDC)GetProcAddress(ddraw_dll, "DirectDrawCreate");
     if (OurDirectDrawCreate == NULL )
     {
-        VERBOSE(VB_ALL, "DirectXInitDDraw failed GetProcAddress");
+        VERBOSE(VB_IMPORTANT, "DirectXInitDDraw failed GetProcAddress");
         goto error;
     }
 
@@ -596,7 +596,7 @@ int VideoOutputDX::DirectXInitDDraw()
     dxresult = OurDirectDrawCreate(display_driver, &p_ddobject, NULL);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "DirectXInitDDraw cannot initialize DDraw");
+        VERBOSE(VB_IMPORTANT, "DirectXInitDDraw cannot initialize DDraw");
         goto error;
     }
 
@@ -606,7 +606,7 @@ int VideoOutputDX::DirectXInitDDraw()
     IDirectDraw_Release(p_ddobject);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot get IDirectDraw2 interface" );
+        VERBOSE(VB_IMPORTANT, "cannot get IDirectDraw2 interface" );
         goto error;
     }
 
@@ -615,7 +615,7 @@ int VideoOutputDX::DirectXInitDDraw()
     dxresult = IDirectDraw2_SetCooperativeLevel(ddobject, wnd, DDSCL_NORMAL);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot set direct draw cooperative level");
+        VERBOSE(VB_IMPORTANT, "cannot set direct draw cooperative level");
         goto error;
     }
 
@@ -635,7 +635,7 @@ int VideoOutputDX::DirectXInitDDraw()
         rect_display.bottom = GetSystemMetrics(SM_CYSCREEN);
     }
 
-    VERBOSE(VB_ALL, "screen dimensions ("
+    VERBOSE(VB_IMPORTANT, "screen dimensions ("
               << rect_display.left << "x"
               << rect_display.top << ","
               << rect_display.right << "x"
@@ -644,7 +644,7 @@ int VideoOutputDX::DirectXInitDDraw()
     /* Probe the capabilities of the hardware */
     DirectXGetDDrawCaps();
 
-    VERBOSE(VB_ALL, "End DirectXInitDDraw");
+    VERBOSE(VB_IMPORTANT, "End DirectXInitDDraw");
     return 0;
 
  error:
@@ -669,13 +669,13 @@ int VideoOutputDX::DirectXCreateClipper()
 {
     HRESULT dxresult;
 
-    VERBOSE(VB_ALL, "DirectXCreateClipper");
+    VERBOSE(VB_IMPORTANT, "DirectXCreateClipper");
 
     /* Create the clipper */
     dxresult = IDirectDraw2_CreateClipper(ddobject, 0, &clipper, NULL);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot create clipper (error " << hex << dxresult << dec << ")");
+        VERBOSE(VB_IMPORTANT, "cannot create clipper (error " << hex << dxresult << dec << ")");
         goto error;
     }
 
@@ -683,7 +683,7 @@ int VideoOutputDX::DirectXCreateClipper()
     dxresult = IDirectDrawClipper_SetHWnd(clipper, 0, wnd);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot attach clipper to window (error " << hex << dxresult << dec << ")");
+        VERBOSE(VB_IMPORTANT, "cannot attach clipper to window (error " << hex << dxresult << dec << ")");
         goto error;
     }
 
@@ -691,7 +691,7 @@ int VideoOutputDX::DirectXCreateClipper()
     dxresult = IDirectDrawSurface_SetClipper(display, clipper);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot attach clipper to surface (error " << hex << dxresult << dec << ")");
+        VERBOSE(VB_IMPORTANT, "cannot attach clipper to surface (error " << hex << dxresult << dec << ")");
         goto error;
     }
 
@@ -718,7 +718,7 @@ int VideoOutputDX::DirectXCreateDisplay()
     DDSURFACEDESC        ddsd;
     LPDIRECTDRAWSURFACE  p_display;
 
-    VERBOSE(VB_ALL, "DirectXCreateDisplay");
+    VERBOSE(VB_IMPORTANT, "DirectXCreateDisplay");
 
     /* Now get the primary surface. This surface is what you actually see
      * on your screen */
@@ -730,7 +730,7 @@ int VideoOutputDX::DirectXCreateDisplay()
     dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_display, NULL );
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot get primary surface (error %li)" << dxresult);
+        VERBOSE(VB_IMPORTANT, "cannot get primary surface (error %li)" << dxresult);
         return -1;
     }
 
@@ -739,7 +739,7 @@ int VideoOutputDX::DirectXCreateDisplay()
     IDirectDrawSurface_Release(p_display);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot query IDirectDrawSurface2 interface " <<
+        VERBOSE(VB_IMPORTANT, "cannot query IDirectDrawSurface2 interface " <<
                          "(error %li)" << dxresult);
         return -1;
     }
@@ -751,9 +751,9 @@ int VideoOutputDX::DirectXCreateDisplay()
     colorkey = 0;
     rgb_colorkey = DirectXFindColorkey(colorkey);
 
-    VERBOSE(VB_ALL, "colour key = " << hex << rgb_colorkey << dec);
+    VERBOSE(VB_IMPORTANT, "colour key = " << hex << rgb_colorkey << dec);
 
-    VERBOSE(VB_ALL, "brushing");
+    VERBOSE(VB_IMPORTANT, "brushing");
 
     /* Create the actual brush */
     SetClassLong(wnd, GCL_HBRBACKGROUND,
@@ -761,7 +761,7 @@ int VideoOutputDX::DirectXCreateDisplay()
     InvalidateRect(wnd, NULL, TRUE);
     //DirectXUpdateRects(true);
 
-    VERBOSE(VB_ALL, "display created");
+    VERBOSE(VB_IMPORTANT, "display created");
 
     return 0;
 }
@@ -807,12 +807,12 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
         ddsd.dwWidth = XJ_width;
         ddsd.dwBackBufferCount = i_backbuffers;
 
-        VERBOSE(VB_ALL, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
+        VERBOSE(VB_IMPORTANT, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
 
         dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_surface, NULL );
         if (dxresult != DD_OK)
         {
-            VERBOSE(VB_ALL, "DD_CreateSurface failed " << hex << dxresult << dec);
+            VERBOSE(VB_IMPORTANT, "DD_CreateSurface failed " << hex << dxresult << dec);
         
             *pp_surface_final = NULL;
             return -1;
@@ -848,12 +848,12 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
             ddsd.ddpfPixelFormat.dwFourCC = i_chroma;
         }
 
-        VERBOSE(VB_ALL, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
+        VERBOSE(VB_IMPORTANT, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
 
         dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_surface, NULL );
         if (dxresult != DD_OK )
         {
-            VERBOSE(VB_ALL, "DD_CreateSurface failed " << hex << dxresult << dec);
+            VERBOSE(VB_IMPORTANT, "DD_CreateSurface failed " << hex << dxresult << dec);
 
             *pp_surface_final = NULL;
             return -1;
@@ -865,7 +865,7 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
     IDirectDrawSurface_Release(p_surface);    /* Release the old interface */
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot query IDirectDrawSurface2 interface " <<
+        VERBOSE(VB_IMPORTANT, "cannot query IDirectDrawSurface2 interface " <<
                          "(error " << hex << dxresult << dec << ")");
         *pp_surface_final = NULL;
         return -1;
@@ -896,7 +896,7 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
             IDirectDrawSurface2_Release(*pp_surface_final);
             *pp_surface_final = NULL;
             front_surface = NULL;
-            VERBOSE(VB_ALL, "overlay unuseable (might already be in use)" );
+            VERBOSE(VB_IMPORTANT, "overlay unuseable (might already be in use)" );
             return -1;
         }
     }
@@ -905,7 +905,7 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
     dxresult = IDirectDraw_QueryInterface(*pp_surface_final, IID_IDirectDrawColorControl, (LPVOID *) &ccontrol);
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "cannot get colour control interface" );
+        VERBOSE(VB_IMPORTANT, "cannot get colour control interface" );
         ccontrol = NULL;
     }
 
@@ -920,7 +920,7 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
  *****************************************************************************/
 void VideoOutputDX::DirectXCloseDDraw()
 {
-    VERBOSE(VB_ALL, "DirectXCloseDDraw");
+    VERBOSE(VB_IMPORTANT, "DirectXCloseDDraw");
     if (ddobject != NULL)
     {
         IDirectDraw2_Release(ddobject);
@@ -949,18 +949,18 @@ void VideoOutputDX::DirectXCloseDDraw()
  *****************************************************************************/
 void VideoOutputDX::DirectXCloseDisplay()
 {
-    VERBOSE(VB_ALL, "DirectXCloseDisplay");
+    VERBOSE(VB_IMPORTANT, "DirectXCloseDisplay");
 
     if (clipper != NULL)
     {
-        VERBOSE(VB_ALL, "DirectXCloseDisplay clipper");
+        VERBOSE(VB_IMPORTANT, "DirectXCloseDisplay clipper");
         IDirectDrawClipper_Release(clipper);
         clipper = NULL;
     }
 
     if (display != NULL)
     {
-        VERBOSE(VB_ALL, "DirectXCloseDisplay display");
+        VERBOSE(VB_IMPORTANT, "DirectXCloseDisplay display");
         IDirectDrawSurface2_Release(display);
         display = NULL;
     }
@@ -974,7 +974,7 @@ void VideoOutputDX::DirectXCloseDisplay()
  *****************************************************************************/
 void VideoOutputDX::DirectXCloseSurface()
 {
-    VERBOSE(VB_ALL, "DirectXCloseSurface");
+    VERBOSE(VB_IMPORTANT, "DirectXCloseSurface");
     
     if (ccontrol != NULL)
     {
@@ -1001,7 +1001,7 @@ int VideoOutputDX::NewPicture()
     int i_ret = -1;
     LPDIRECTDRAWSURFACE2 p_surface;
 
-    VERBOSE(VB_ALL, "NewPicture overlay");
+    VERBOSE(VB_IMPORTANT, "NewPicture overlay");
 
     outputpictures = 0;
 
@@ -1042,14 +1042,14 @@ int VideoOutputDX::NewPicture()
             dds_caps.dwCaps = DDSCAPS_BACKBUFFER;
             if (DD_OK != IDirectDrawSurface2_GetAttachedSurface(p_surface, &dds_caps, &back_surface))
             {
-                VERBOSE(VB_ALL, "NewPicture could not get back buffer");
+                VERBOSE(VB_IMPORTANT, "NewPicture could not get back buffer");
                 /* front buffer is the same as back buffer */
                 back_surface = p_surface;
             }
 
             DirectXUpdateOverlay();
             outputpictures = 1;
-            VERBOSE(VB_ALL, "YUV overlay created successfully");
+            VERBOSE(VB_IMPORTANT, "YUV overlay created successfully");
         }
     }
 
@@ -1121,7 +1121,7 @@ int VideoOutputDX::NewPicture()
                     chroma = MAKEFOURCC('R','V','3','2');
                     break;
                 default:
-                    VERBOSE(VB_ALL, "unknown screen depth");
+                    VERBOSE(VB_IMPORTANT, "unknown screen depth");
                     return 0;
                 }
             }
@@ -1142,7 +1142,7 @@ int VideoOutputDX::NewPicture()
 
             outputpictures = 1;
 
-            VERBOSE(VB_ALL, "created plain surface of chroma: " << PRINT_FOURCC(chroma) );
+            VERBOSE(VB_IMPORTANT, "created plain surface of chroma: " << PRINT_FOURCC(chroma) );
         }
     }
 
@@ -1153,13 +1153,13 @@ int VideoOutputDX::NewPicture()
         {
             /* AAARRGG */
             outputpictures = 0;
-            VERBOSE(VB_ALL, "cannot lock surface");
+            VERBOSE(VB_IMPORTANT, "cannot lock surface");
             return -1;
         }
         DirectXUnlockSurface();
     }
 
-    VERBOSE(VB_ALL, "End NewPictureVec (" <<
+    VERBOSE(VB_IMPORTANT, "End NewPictureVec (" <<
              (outputpictures ? "succeeded" : "failed") << ")");
 
     return 0;
@@ -1183,7 +1183,7 @@ void VideoOutputDX::DirectXGetDDrawCaps()
     dxresult = IDirectDraw2_GetCaps(ddobject, &ddcaps, NULL);
     if (dxresult != DD_OK )
     {
-        VERBOSE(VB_ALL, "cannot get caps");
+        VERBOSE(VB_IMPORTANT, "cannot get caps");
     }
     else
     {
@@ -1209,7 +1209,7 @@ void VideoOutputDX::DirectXGetDDrawCaps()
         bCanBltFourcc = ((ddcaps.dwCaps & DDCAPS_BLTFOURCC ) ==
                         DDCAPS_BLTFOURCC) ? TRUE : FALSE;
 
-        VERBOSE(VB_ALL, "DirectDraw Capabilities: overlay=" << bHasOverlay
+        VERBOSE(VB_IMPORTANT, "DirectDraw Capabilities: overlay=" << bHasOverlay
                         << " yuvoverlay=" << bHasOverlayFourCC
                         << " can_deinterlace_overlay=" << bCanDeinterlace
                         << " colorkey=" << bHasColorKey
@@ -1232,17 +1232,17 @@ DWORD VideoOutputDX::DirectXFindColorkey(uint32_t i_color)
     uint32_t i_pixel_backup;
     HDC hdc;
 
-    VERBOSE(VB_ALL, "determining colour key");
+    VERBOSE(VB_IMPORTANT, "determining colour key");
 
     ddsd.dwSize = sizeof(ddsd);
     dxresult = IDirectDrawSurface2_Lock(display, NULL, &ddsd, DDLOCK_WAIT, NULL );
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL, "surface lock failed: 0x" << hex << dxresult << dec);
+        VERBOSE(VB_IMPORTANT, "surface lock failed: 0x" << hex << dxresult << dec);
         return 0;
     }
 
-    VERBOSE(VB_ALL, "surface locked");
+    VERBOSE(VB_IMPORTANT, "surface locked");
 
     i_pixel_backup = *(uint32_t *)ddsd.lpSurface;
 
@@ -1264,7 +1264,7 @@ DWORD VideoOutputDX::DirectXFindColorkey(uint32_t i_color)
 
     IDirectDrawSurface2_Unlock(display, NULL);
 
-    VERBOSE(VB_ALL, "surface unlocked");
+    VERBOSE(VB_IMPORTANT, "surface unlocked");
 
     if (IDirectDrawSurface2_GetDC(display, &hdc) == DD_OK )
     {
@@ -1276,17 +1276,17 @@ DWORD VideoOutputDX::DirectXFindColorkey(uint32_t i_color)
     dxresult = IDirectDrawSurface2_Lock(display, NULL, &ddsd, DDLOCK_WAIT, NULL );
     if (dxresult != DD_OK )
     {
-        VERBOSE(VB_ALL, "surface lock failed: 0x" << hex << dxresult << dec);
+        VERBOSE(VB_IMPORTANT, "surface lock failed: 0x" << hex << dxresult << dec);
         return i_rgb;
     }
 
-    VERBOSE(VB_ALL, "surface locked");
+    VERBOSE(VB_IMPORTANT, "surface locked");
 
     *(uint32_t *)ddsd.lpSurface = i_pixel_backup;
 
     IDirectDrawSurface2_Unlock(display, NULL);
 
-    VERBOSE(VB_ALL, "surface unlocked");
+    VERBOSE(VB_IMPORTANT, "surface unlocked");
 
     return i_rgb;
 }
@@ -1343,13 +1343,13 @@ int VideoOutputDX::DirectXUpdateOverlay()
         rect_dest.bottom = dispyoff + disphoff;
     }
 
-    VERBOSE(VB_ALL, "rect_src ("
+    VERBOSE(VB_IMPORTANT, "rect_src ("
               << rect_src.left << "x"
               << rect_src.top << ","
               << rect_src.right << "x"
               << rect_src.bottom << ")");
     
-    VERBOSE(VB_ALL, "rect_dest ("
+    VERBOSE(VB_IMPORTANT, "rect_dest ("
               << rect_dest.left << "x"
               << rect_dest.top << ","
               << rect_dest.right << "x"
@@ -1371,7 +1371,7 @@ int VideoOutputDX::DirectXUpdateOverlay()
                                          dwFlags, &ddofx );
     if (dxresult != DD_OK)
     {
-        VERBOSE(VB_ALL,
+        VERBOSE(VB_IMPORTANT,
                   "DirectXUpdateOverlay cannot move or resize overlay: " << hex << dxresult << dec);
         return -1;
     }
@@ -1423,7 +1423,7 @@ int VideoOutputDX::DirectXLockSurface(void **picbuf, int *stride)
                                                  &ddsd,
                                                  DDLOCK_WAIT, NULL);
             if (dxresult == DDERR_SURFACELOST)
-                VERBOSE(VB_ALL, "DirectXLockSurface: DDERR_SURFACELOST");
+                VERBOSE(VB_IMPORTANT, "DirectXLockSurface: DDERR_SURFACELOST");
         }
         if (dxresult != DD_OK)
         {

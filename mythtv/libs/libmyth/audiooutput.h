@@ -64,7 +64,7 @@ class AudioOutput : public VolumeBase, public OutputListeners
 
  protected:
     void Error(QString msg) 
-     { lastError = msg; VERBOSE(VB_ALL, lastError); };
+     { lastError = msg; VERBOSE(VB_IMPORTANT, lastError); };
 
  private:
     QString lastError;

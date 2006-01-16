@@ -823,7 +823,7 @@ void Ripper::ripthedisc(void)
 
     if (!PostRipCDScript.isEmpty()) 
     {
-        VERBOSE(VB_ALL, QString("PostCDRipScript: %1").arg(PostRipCDScript));
+        VERBOSE(VB_IMPORTANT, QString("PostCDRipScript: %1").arg(PostRipCDScript));
         pid_t child = fork();
         if (child < 0)
         {

@@ -43,7 +43,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    VERBOSE(VB_ALL, QString("Upgrading to MythMovieTime schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythMovieTime schema version ") + 
             version);
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -71,7 +71,7 @@ void UpgradeMovieTimeDatabaseSchema(void)
 
     if (dbver == "")
     {
-        VERBOSE(VB_ALL, "Inserting MythMovieTime initial database information.");
+        VERBOSE(VB_IMPORTANT, "Inserting MythMovieTime initial database information.");
 
         const QString updates[] = {
             "CREATE TABLE movietime_advisories ("
@@ -165,7 +165,7 @@ void UpgradeMovieTimeDatabaseSchema(void)
     
     if (dbver == "1000")
     {
-        //VERBOSE(VB_ALL, "Inserting MythMovieTime database schema to 1001.");        
+        //VERBOSE(VB_IMPORTANT, "Inserting MythMovieTime database schema to 1001.");        
         const QString updates[] = {
             "ALTER TABLE movietime_showtimes CHANGE Time Time TIME NOT NULL;",
             ""

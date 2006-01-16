@@ -177,7 +177,7 @@ bool AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
 //        }
 //        if (dsresult != DS_OK)
 //        {
-//            VERBOSE(VB_ALL, "cannot start playing buffer" );
+//            VERBOSE(VB_IMPORTANT, "cannot start playing buffer" );
 //        }
         
         awaiting_data = false;
@@ -185,7 +185,7 @@ bool AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
 
 
     
-//    VERBOSE(VB_ALL, "add_samples(a) " << frames << " " << timecode);
+//    VERBOSE(VB_IMPORTANT, "add_samples(a) " << frames << " " << timecode);
 
     if (timecode < 0) 
         timecode = audbuf_timecode; // add to current timecode
@@ -200,7 +200,7 @@ bool AudioOutputDX::AddSamples(char *buffer, int frames, long long timecode)
 
 bool AudioOutputDX::AddSamples(char *buffers[], int frames, long long timecode)
 {
-//    VERBOSE(VB_ALL, "add_samples(b) " << frames << " " << timecode);
+//    VERBOSE(VB_IMPORTANT, "add_samples(b) " << frames << " " << timecode);
 
 /*    int err;
     int waud=0;
@@ -258,7 +258,7 @@ void AudioOutputDX::SetTimecode(long long timecode)
 
 void AudioOutputDX::SetEffDsp(int dsprate)
 {
-    VERBOSE(VB_ALL, "setting dsprate = " << dsprate);
+    VERBOSE(VB_IMPORTANT, "setting dsprate = " << dsprate);
     
     HRESULT dsresult;
 
@@ -266,7 +266,7 @@ void AudioOutputDX::SetEffDsp(int dsprate)
 
     if (dsresult != DS_OK)
     {
-        VERBOSE(VB_ALL, "cannot set frequency");
+        VERBOSE(VB_IMPORTANT, "cannot set frequency");
     }
 
     effdsp = dsprate / 100;
@@ -281,14 +281,14 @@ void AudioOutputDX::Pause(bool pause)
 {
     HRESULT dsresult;
 
-    VERBOSE(VB_ALL, "pause: " << pause);
+    VERBOSE(VB_IMPORTANT, "pause: " << pause);
 
     if (pause == paused)
         return;
         
     if (paused)
     {
-        VERBOSE(VB_ALL, "unpausing");
+        VERBOSE(VB_IMPORTANT, "unpausing");
     
         dsresult = IDirectSoundBuffer_Play(dsbuffer, 0, 0, DSBPLAY_LOOPING);
         if (dsresult == DSERR_BUFFERLOST)
@@ -298,12 +298,12 @@ void AudioOutputDX::Pause(bool pause)
         }
         if (dsresult != DS_OK)
         {
-            VERBOSE(VB_ALL, "cannot start playing buffer" );
+            VERBOSE(VB_IMPORTANT, "cannot start playing buffer" );
         }
     }
     else
     {
-        VERBOSE(VB_ALL, "pausing");
+        VERBOSE(VB_IMPORTANT, "pausing");
     
         IDirectSoundBuffer_Stop(dsbuffer);
     }
@@ -320,7 +320,7 @@ int AudioOutputDX::GetAudiotime(void)
 
     if (dsresult != DS_OK)
     {
-        VERBOSE(VB_ALL, "cannot get current buffer positions");
+        VERBOSE(VB_IMPORTANT, "cannot get current buffer positions");
         return -1;
     }
 
@@ -343,12 +343,12 @@ int AudioOutputDX::InitDirectSound()
 //    HRESULT (WINAPI *OurDirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
     LPFNDSC OurDirectSoundCreate;
 
-    VERBOSE(VB_ALL, "initialising DirectSound");
+    VERBOSE(VB_IMPORTANT, "initialising DirectSound");
    
     dsound_dll = LoadLibrary("DSOUND.DLL");
     if (dsound_dll == NULL )
     {
-        VERBOSE(VB_ALL, "cannot open DSOUND.DLL" );
+        VERBOSE(VB_IMPORTANT, "cannot open DSOUND.DLL" );
         goto error;
     }
 
@@ -356,20 +356,20 @@ int AudioOutputDX::InitDirectSound()
                                 GetProcAddress(dsound_dll, "DirectSoundCreate");
     if (OurDirectSoundCreate == NULL)
     {
-        VERBOSE(VB_ALL, "GetProcAddress FAILED" );
+        VERBOSE(VB_IMPORTANT, "GetProcAddress FAILED" );
         goto error;
     }
 
-    VERBOSE(VB_ALL, "create DS object");
+    VERBOSE(VB_IMPORTANT, "create DS object");
 
     /* Create the direct sound object */
     if FAILED(OurDirectSoundCreate(NULL, &dsobject, NULL))
     {
-        VERBOSE(VB_ALL, "cannot create a direct sound device" );
+        VERBOSE(VB_IMPORTANT, "cannot create a direct sound device" );
         goto error;
     }
 
-    VERBOSE(VB_ALL, "setting cooperative level");
+    VERBOSE(VB_IMPORTANT, "setting cooperative level");
 
     /* Set DirectSound Cooperative level, ie what control we want over Windows
      * sound device. In our case, DSSCL_EXCLUSIVE means that we can modify the
@@ -385,16 +385,16 @@ int AudioOutputDX::InitDirectSound()
                                          GetDesktopWindow(),
                                          DSSCL_EXCLUSIVE))
     {
-        VERBOSE(VB_ALL, "cannot set direct sound cooperative level" );
+        VERBOSE(VB_IMPORTANT, "cannot set direct sound cooperative level" );
     }
 
-    VERBOSE(VB_ALL, "creating notificatoin events");
+    VERBOSE(VB_IMPORTANT, "creating notificatoin events");
 
     /* Then create the notification events */
     for (int i = 0; i < 4; i++)
         notif[i].hEventNotify = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-    VERBOSE(VB_ALL, "initialised DirectSound");
+    VERBOSE(VB_IMPORTANT, "initialised DirectSound");
 
     return 0;
 
@@ -475,7 +475,7 @@ int AudioOutputDX::CreateDSBuffer(int audio_bits, int audio_channels, int audio_
 
     audio_bytes_per_sample = waveformat.Format.wBitsPerSample / 8 * audio_channels;
 
-    VERBOSE(VB_ALL, "New format: " << audio_bits << "bits, " << audio_channels << "ch, " << audio_samplerate << "Hz");
+    VERBOSE(VB_IMPORTANT, "New format: " << audio_bits << "bits, " << audio_channels << "ch, " << audio_samplerate << "Hz");
 
     /* Only use the new WAVE_FORMAT_EXTENSIBLE format for multichannel audio */
     if (audio_channels <= 2)
@@ -508,7 +508,7 @@ int AudioOutputDX::CreateDSBuffer(int audio_bits, int audio_channels, int audio_
         {
             return -1;
         }
-        if ( !b_probe ) VERBOSE(VB_ALL, "couldn't use hardware sound buffer" );
+        if ( !b_probe ) VERBOSE(VB_IMPORTANT, "couldn't use hardware sound buffer" );
     }
 
     write_cursor = 0;
@@ -532,20 +532,20 @@ int AudioOutputDX::CreateDSBuffer(int audio_bits, int audio_channels, int audio_
     /* Get the IDirectSoundNotify interface */
     if FAILED(IDirectSoundBuffer_QueryInterface(dsbuffer, IID_IDirectSoundNotify, (LPVOID*) &dsnotify))
     {
-        VERBOSE(VB_ALL, "cannot get IDirectSoundNotify interface" );
+        VERBOSE(VB_IMPORTANT, "cannot get IDirectSoundNotify interface" );
         goto error;
     }
 
     if FAILED(IDirectSoundNotify_SetNotificationPositions(dsnotify, 4, notif))
     {
-        VERBOSE(VB_ALL, "cannot set position notification" );
+        VERBOSE(VB_IMPORTANT, "cannot set position notification" );
         goto error;
     }
 
 //    p_aout->output.p_sys->i_channel_mask = waveformat.dwChannelMask;
 //    CheckReordering( p_aout, i_nb_channels );
 
-    VERBOSE(VB_ALL, "created DirectSound buffer");
+    VERBOSE(VB_IMPORTANT, "created DirectSound buffer");
 
     return 0;
 
@@ -568,7 +568,7 @@ void AudioOutputDX::DestroyDSBuffer()
         dsnotify = NULL;
     }
 
-    VERBOSE(VB_ALL, "destroying DirectSound buffer");
+    VERBOSE(VB_IMPORTANT, "destroying DirectSound buffer");
 
     if (dsbuffer)
     {
@@ -593,13 +593,13 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
     if (!awaiting_data && !paused) 
     {
     
-//        VERBOSE(VB_ALL, "checking buffer positions");
+//        VERBOSE(VB_IMPORTANT, "checking buffer positions");
     
         dsresult = IDirectSoundBuffer_GetCurrentPosition(dsbuffer, &play_pos, &write_pos);
 
         if (dsresult != DS_OK)
         {
-            VERBOSE(VB_ALL, "cannot get current buffer positions");
+            VERBOSE(VB_IMPORTANT, "cannot get current buffer positions");
             return -1;
         }
 
@@ -610,7 +610,7 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
             ((play_pos < write_pos) && (write_cursor >= write_pos && write_cursor < play_pos) &&
                                         (end_write >= write_pos && end_write < play_pos))))
         {
-//            VERBOSE(VB_ALL, "cannot write audio data: " << write_cursor << " " << write_pos << " " << play_pos << " sleeping");
+//            VERBOSE(VB_IMPORTANT, "cannot write audio data: " << write_cursor << " " << write_pos << " " << play_pos << " sleeping");
 
             HANDLE  notification_events[4];
 
@@ -619,13 +619,13 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
 
                 WaitForMultipleObjects(4, notification_events, 0, INFINITE );
                 
-//                VERBOSE(VB_ALL, "woken");
+//                VERBOSE(VB_IMPORTANT, "woken");
                 
             dsresult = IDirectSoundBuffer_GetCurrentPosition(dsbuffer, &play_pos, &write_pos);
 
             if (dsresult != DS_OK)
             {
-                VERBOSE(VB_ALL, "cannot get current buffer positions");
+                VERBOSE(VB_IMPORTANT, "cannot get current buffer positions");
                 return -1;
             }
 
@@ -634,7 +634,7 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
     }
                                     
 
-//    VERBOSE(VB_ALL, "Locking buffer");
+//    VERBOSE(VB_IMPORTANT, "Locking buffer");
 
     /* Before copying anything, we have to lock the buffer */
     dsresult = IDirectSoundBuffer_Lock(
@@ -661,13 +661,13 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
     }
     if (dsresult != DS_OK)
     {
-        VERBOSE(VB_ALL, "cannot lock buffer");
+        VERBOSE(VB_IMPORTANT, "cannot lock buffer");
         return -1;
     }
 
     if (buffer == NULL)
     {
-        VERBOSE(VB_ALL, "Writing null bytes");
+        VERBOSE(VB_IMPORTANT, "Writing null bytes");
     
         memset(p_write_position, 0, l_bytes1);
         if (p_wrap_around)
@@ -697,13 +697,13 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
     }*/
     else    
     {
-//        VERBOSE(VB_ALL, "filling buffer");
+//        VERBOSE(VB_IMPORTANT, "filling buffer");
     
         memcpy(p_write_position, buffer, l_bytes1);
-//        VERBOSE(VB_ALL, "buf_fill: " << l_bytes1 << " bytes, " << p_write_position << "-" << ((int)p_write_position + l_bytes1));
+//        VERBOSE(VB_IMPORTANT, "buf_fill: " << l_bytes1 << " bytes, " << p_write_position << "-" << ((int)p_write_position + l_bytes1));
         if (p_wrap_around) {
             memcpy(p_wrap_around, buffer + l_bytes1, l_bytes2);
-//        VERBOSE(VB_ALL, "buf_fill2: " << l_bytes2 << " bytes, " << p_wrap_around << "-" << ((int)p_wrap_around + l_bytes2));
+//        VERBOSE(VB_IMPORTANT, "buf_fill2: " << l_bytes2 << " bytes, " << p_wrap_around << "-" << ((int)p_wrap_around + l_bytes2));
         }
             
            write_cursor += l_bytes1 + l_bytes2;
@@ -712,14 +712,14 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
                write_cursor -= buffer_size;
     }
 
-//    VERBOSE(VB_ALL, "unlocking buffer");
+//    VERBOSE(VB_IMPORTANT, "unlocking buffer");
 
     /* Now the data has been copied, unlock the buffer */
     IDirectSoundBuffer_Unlock(dsbuffer, p_write_position, l_bytes1,
                               p_wrap_around, l_bytes2 );
 
 
-//    VERBOSE(VB_ALL, "finished fillbuffer");
+//    VERBOSE(VB_IMPORTANT, "finished fillbuffer");
 
     return 0;
 }

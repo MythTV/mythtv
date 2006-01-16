@@ -157,7 +157,7 @@ MSqlDatabase *MDBManager::popConnection()
     if (!db)
     {
         db = new MSqlDatabase("DBManager" + QString::number(m_connID++));
-        VERBOSE(VB_ALL, QString("New DB connection, total: %1").arg(m_connID));
+        VERBOSE(VB_IMPORTANT, QString("New DB connection, total: %1").arg(m_connID));
     }
 
     m_lock.unlock();
@@ -185,7 +185,7 @@ MSqlDatabase *MDBManager::getSchedCon()
     if (!m_schedCon)
     {
         m_schedCon = new MSqlDatabase("SchedCon");
-        VERBOSE(VB_ALL, "New DB scheduler connection");
+        VERBOSE(VB_IMPORTANT, "New DB scheduler connection");
     }
 
     m_schedCon->OpenDatabase();
@@ -198,7 +198,7 @@ MSqlDatabase *MDBManager::getDDCon()
     if (!m_DDCon)
     {
         m_DDCon = new MSqlDatabase("DataDirectCon");
-        VERBOSE(VB_ALL, "New DB DataDirect connection");
+        VERBOSE(VB_IMPORTANT, "New DB DataDirect connection");
     }
 
     m_DDCon->OpenDatabase();
@@ -233,7 +233,7 @@ MSqlQuery::~MSqlQuery()
 {
     if (!gContext)
     {
-        VERBOSE(VB_ALL, "~MSqlQuery::gContext null");
+        VERBOSE(VB_IMPORTANT, "~MSqlQuery::gContext null");
         return;
     }
 
@@ -263,7 +263,7 @@ MSqlQueryInfo MSqlQuery::InitCon()
     }
     else
     {
-        VERBOSE(VB_ALL, "MSqlQuery::InitCon gContext null");
+        VERBOSE(VB_IMPORTANT, "MSqlQuery::InitCon gContext null");
     }
 
     return qi;
@@ -286,7 +286,7 @@ MSqlQueryInfo MSqlQuery::SchedCon()
     }
     else
     {
-        VERBOSE(VB_ALL, "MSqlQuery::SchedCon gContext null");
+        VERBOSE(VB_IMPORTANT, "MSqlQuery::SchedCon gContext null");
     }
 
     return qi;
@@ -309,7 +309,7 @@ MSqlQueryInfo MSqlQuery::DDCon()
     }
     else
     {
-        VERBOSE(VB_ALL, "MSqlQuery::DDCon gContext null");
+        VERBOSE(VB_IMPORTANT, "MSqlQuery::DDCon gContext null");
     }
 
     return qi;

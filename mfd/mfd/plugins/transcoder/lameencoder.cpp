@@ -155,7 +155,7 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     if (lameret < 0)
     {
-        VERBOSE(VB_ALL, QString("LAME encoder error."));
+        VERBOSE(VB_IMPORTANT, QString("LAME encoder error."));
     } 
     else if (lameret > 0 && out)
     {

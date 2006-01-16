@@ -78,7 +78,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
         int ret = write_page(&og, out);
         if (ret != og.header_len + og.body_len)
         {
-            VERBOSE(VB_ALL, QString("Failed to write header"
+            VERBOSE(VB_IMPORTANT, QString("Failed to write header"
                                     " to output stream."));
         }
     }

@@ -39,7 +39,7 @@ LCD::LCD()
     // communications with the LDCd daemon.
 
 #if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_ALL, "lcddevice: An LCD object now exists (LCD() was called)");
+    VERBOSE(VB_IMPORTANT, "lcddevice: An LCD object now exists (LCD() was called)");
 #endif
 
     GetLEDMask = NULL;
@@ -103,7 +103,7 @@ void LCD::SetupLCD (void)
 bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 {
 #if LCD_DEVICE_DEBUG > 0    
-    VERBOSE(VB_ALL, "lcddevice: connecting to host: " 
+    VERBOSE(VB_IMPORTANT, "lcddevice: connecting to host: " 
             << lhostname << " - port: " << lport);
 #endif
             
@@ -196,7 +196,7 @@ void LCD::sendToServer(const QString &someText)
         // Ack, connection to server has been severed try to re-establish the 
         // connection
         retryTimer->start(10000, false);
-        VERBOSE(VB_ALL, "lcddevice: Connection to LCDServer died unexpectedly.\n\t\t\t"
+        VERBOSE(VB_IMPORTANT, "lcddevice: Connection to LCDServer died unexpectedly.\n\t\t\t"
                          "Trying to reconnect every 10 seconds. . .");
         return;
     }
@@ -208,7 +208,7 @@ void LCD::sendToServer(const QString &someText)
     if (connected)
     {
 #if LCD_DEVICE_DEBUG > 9
-        VERBOSE(VB_ALL, "lcddevice: Sending to Server: " << someText);
+        VERBOSE(VB_IMPORTANT, "lcddevice: Sending to Server: " << someText);
 #endif
         // Just stream the text out the socket
 
@@ -260,7 +260,7 @@ void LCD::serverSendingData()
 #if LCD_DEVICE_DEBUG > 4
         // Make debugging be less noisy
         if (lineFromServer != "OK\n")
-            VERBOSE(VB_ALL, "lcddevice: Received from server: " << lineFromServer);
+            VERBOSE(VB_IMPORTANT, "lcddevice: Received from server: " << lineFromServer);
 #endif
 
         aList = QStringList::split(" ", lineFromServer);
@@ -272,7 +272,7 @@ void LCD::serverSendingData()
             // get lcd width & height
             if (aList.count() != 3)
             {
-                VERBOSE(VB_ALL, "lcddevice: received bad no. of arguments "
+                VERBOSE(VB_IMPORTANT, "lcddevice: received bad no. of arguments "
                                 "in CONNECTED response from LCDServer");
             }
             
@@ -280,14 +280,14 @@ void LCD::serverSendingData()
             lcd_width = aList[1].toInt(&bOK);
             if (!bOK)
             {
-                VERBOSE(VB_ALL, "lcddevice: received bad int for width"
+                VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for width"
                                 "in CONNECTED response from LCDServer");
             }
              
             lcd_height = aList[2].toInt(&bOK);
             if (!bOK)
             {
-                VERBOSE(VB_ALL, "lcddevice: received bad int for height"
+                VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for height"
                                 "in CONNECTED response from LCDServer");
             }
             
@@ -295,9 +295,9 @@ void LCD::serverSendingData()
         }
         else if (aList[0] == "HUH?")
         {
-            VERBOSE(VB_ALL, "lcddevice: WARNING: Something is getting passed"
+            VERBOSE(VB_IMPORTANT, "lcddevice: WARNING: Something is getting passed"
                             "to LCDServer that it doesn't understand");
-            VERBOSE(VB_ALL, "lcddevice: last command: " << last_command);
+            VERBOSE(VB_IMPORTANT, "lcddevice: last command: " << last_command);
         }
         else if (aList[0] == "KEY")
            handleKeyPress(aList.last().stripWhiteSpace());
@@ -378,7 +378,7 @@ void LCD::stopAll()
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: stopAll");
+    VERBOSE(VB_IMPORTANT, "lcddevice: stopAll");
 #endif
        
     sendToServer("STOP_ALL");    
@@ -473,7 +473,7 @@ void LCD::switchToTime()
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToTime");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToTime");
 #endif
        
     sendToServer("SWITCH_TO_TIME");    
@@ -485,7 +485,7 @@ void LCD::switchToMusic(const QString &artist, const QString &album, const QStri
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToMusic");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToMusic");
 #endif
     
     sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + " " 
@@ -499,7 +499,7 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToChannel");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToChannel");
 #endif
     
     sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + " " 
@@ -514,7 +514,7 @@ void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToMenu");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToMenu");
 #endif
 
     if (menuItems->isEmpty())
@@ -557,7 +557,7 @@ void LCD::switchToGeneric(QPtrList<LCDTextItem> *textItems)
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToGeneric ");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToGeneric ");
 #endif
     
     if (textItems->isEmpty())
@@ -596,7 +596,7 @@ void LCD::switchToVolume(QString app_name)
         return;
 
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToVolume ");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToVolume ");
 #endif
     
     sendToServer("SWITCH_TO_VOLUME " + quotedString(app_name));
@@ -608,7 +608,7 @@ void LCD::switchToNothing()
         return;
     
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: switchToNothing");
+    VERBOSE(VB_IMPORTANT, "lcddevice: switchToNothing");
 #endif
 
     sendToServer("SWITCH_TO_NOTHING");
@@ -617,7 +617,7 @@ void LCD::switchToNothing()
 void LCD::shutdown()
 {
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: shutdown");
+    VERBOSE(VB_IMPORTANT, "lcddevice: shutdown");
 #endif
 
     socket->close();
@@ -632,7 +632,7 @@ void LCD::resetServer()
         return;
     
 #if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_ALL, "lcddevice: RESET");
+    VERBOSE(VB_IMPORTANT, "lcddevice: RESET");
 #endif
 
     sendToServer("RESET");
@@ -643,7 +643,7 @@ LCD::~LCD()
     m_lcd = NULL;
 
 #if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_ALL, "lcddevice: An LCD device is being snuffed out of "
+    VERBOSE(VB_IMPORTANT, "lcddevice: An LCD device is being snuffed out of "
                     "existence (~LCD() was called)");
 #endif
     
@@ -661,7 +661,7 @@ void LCD::setLevels(int numbLevels, float *values)
     values = values;
 
 #if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_ALL, "lcddevice: setLevels");
+    VERBOSE(VB_IMPORTANT, "lcddevice: setLevels");
 #endif
 }
 

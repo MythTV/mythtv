@@ -320,7 +320,7 @@ bool DDStructureParser::characters(const QString& pchars)
 
            QDateTime curTime = QDateTime::currentDateTime();
            if (curTime.daysTo(EDFM) <= 5)
-               VERBOSE(VB_ALL, LOC + QString("WARNING: ") + ExpirationDateMessage);
+               VERBOSE(VB_IMPORTANT, LOC + QString("WARNING: ") + ExpirationDateMessage);
            else
                VERBOSE(VB_IMPORTANT, LOC + ExpirationDateMessage);
 
