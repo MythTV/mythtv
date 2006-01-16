@@ -2050,9 +2050,9 @@ UIRichTextType::UIRichTextType(const QString &name, fontProp *font,
     m_yPos = 0;
     m_textArea = textrect;
     m_order = dorder;
-    m_image = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
-    m_background = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
-    m_compBackground = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
+    m_image = new QPixmap(m_displayArea.width(), m_displayArea.height(), -1);
+    m_background = new QPixmap(m_displayArea.width(), m_displayArea.height(), -1);
+    m_compBackground = new QPixmap(m_displayArea.width(), m_displayArea.height(), -1);
     m_backgroundImage = NULL;
     m_backgroundFile = "";
 
