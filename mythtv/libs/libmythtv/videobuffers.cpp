@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "mythcontext.h"
 #include "videobuffers.h"
+#include "../libavcodec/avcodec.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h" // for xvmc stuff
@@ -1072,7 +1073,7 @@ bool VideoBuffers::CreateBuffers(int width, int height, vector<unsigned char*> b
     uint buf_size = (width * height * bpp + 4/* to round up */) / bpb;
     while (bufs.size() < allocSize())
     {
-        unsigned char *data = new unsigned char[buf_size + 64];
+        unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
 
         // init buffers (y plane to 0, u/v planes to 127),
         // to prevent green screens..
@@ -1202,7 +1203,7 @@ void VideoBuffers::DeleteBuffers()
     allocated_structs.clear();
 
     for (uint i = 0; i < allocated_arrays.size(); i++)
-        delete [] allocated_arrays[i];
+        av_free(allocated_arrays[i]);
     allocated_arrays.clear();
 #ifdef USING_XVMC
     xvmc_surf_to_frame.clear();
