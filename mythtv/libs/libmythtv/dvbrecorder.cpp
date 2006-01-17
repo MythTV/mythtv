@@ -67,7 +67,7 @@ using namespace std;
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
 
-const int DVBRecorder::PMT_PID = 0x20; ///< PID for rewritten PMT
+const int DVBRecorder::PMT_PID = 0x1700; ///< PID for rewritten PMT
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
