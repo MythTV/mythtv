@@ -190,7 +190,7 @@ class Freqid: public LineEditSetting, public CSetting
         setLabel(QObject::tr("Frequency")+" "+QObject::tr("or")+" "+
                  QObject::tr("Channel"));
         setHelpText(QObject::tr(
-                        "Specify either the exact frequency in Hertz or "
+                        "Specify either the exact frequency in kHz or "
                         "a valid channel for your 'TV Format'."));
     };
 };
@@ -203,7 +203,7 @@ class Finetune: public SliderSetting, public CSetting
     {
         setLabel(QObject::tr("Finetune")+" (kHz)");
         setHelpText(QObject::tr("Value to be added to your desired frequency "
-                                "in Hertz, for 'fine tuning'."));
+                                "in kHz, for 'fine tuning'."));
     };
 };
 
