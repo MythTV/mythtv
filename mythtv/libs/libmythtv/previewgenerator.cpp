@@ -243,6 +243,8 @@ bool PreviewGenerator::SavePreview(QString filename,
 
 void PreviewGenerator::LocalPreviewRun(void)
 {
+    programInfo.MarkAsInUse(true, "preview_generator");
+
     float aspect = 0;
     int   secsin = (gContext->GetNumSetting("PreviewPixmapOffset", 64) +
                     gContext->GetNumSetting("RecordPreRoll",       0));
@@ -261,6 +263,8 @@ void PreviewGenerator::LocalPreviewRun(void)
 
     if (data)
         delete[] data;
+
+    programInfo.MarkAsInUse(false);
 }
 
 bool PreviewGenerator::IsLocal(void) const
