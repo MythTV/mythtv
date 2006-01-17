@@ -8,13 +8,17 @@
 	
 */
 
+#include <faad.h>
+
+#ifdef __STDC_LIMIT_MACROS
+#define FAAD_MODIFIED
+#endif
+
 #include <iostream>
 #include <string>
 #include <qobject.h>
 #include <qiodevice.h>
 #include <qfile.h>
-
-#include <faad.h>
 
 #include "aacdecoder.h"
 #include "constants.h"
@@ -295,7 +299,10 @@ bool aacDecoder::initializeMP4()
                             );    
     
     if (faacDecInit2(decoder_handle, buffer, buffer_size,
-                    &sample_rate, &channels) < 0)
+#ifdef FAAD_MODIFIED
+                     (uint32_t*)
+#endif
+                     &sample_rate, &channels) < 0)
     {
         error("aacDecoder: error in second stage initialization");
         faacDecClose(decoder_handle);
