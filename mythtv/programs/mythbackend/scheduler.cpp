@@ -410,7 +410,8 @@ void Scheduler::PrintRec(ProgramInfo *p, const char *prefix)
          << p->sourceid << " " << p->cardid << " "
          << p->inputid << "  " << p->RecTypeChar() << " "
          << p->RecStatusChar() << " "
-         << QString::number(p->recpriority).rightJustify(3, ' ')
+         << QString::number(p->recpriority + p->recpriority2)
+                           .rightJustify(3, ' ')
          << endl;
 }
 
