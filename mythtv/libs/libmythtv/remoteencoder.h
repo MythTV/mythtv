@@ -38,6 +38,7 @@ class RemoteEncoder
     void FrontendReady(void);
     void CancelNextRecording(bool cancel);
 
+    void SetLiveRecording(bool recording);
     void ToggleInputs(void);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);

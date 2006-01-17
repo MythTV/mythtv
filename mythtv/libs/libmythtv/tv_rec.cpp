@@ -1177,6 +1177,8 @@ void TVRec::RunTV(void)
                 CheckForRecGroupChange();
                 if (pseudoLiveTVRecording)
                     SetFlags(kFlagCancelNextRecording);
+                else
+                    ClearFlags(kFlagCancelNextRecording);
 
                 int timeuntil = QDateTime::currentDateTime()
                     .secsTo(recordPendingStart);
@@ -2741,6 +2743,56 @@ void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
     // Allow scheduler to end this recording before post-roll,
     // if it has another recording for this recorder.
     ClearFlags(kFlagCancelNextRecording);
+}
+
+/** \fn TVRec::SetLiveRecording(int)
+ *  \brief Tells the Scheduler about changes to the recording status
+ *         of the LiveTV recording.
+ *
+ *   NOTE: Currently the 'recording' parameter is ignored and decisions
+ *         are based on the recording group alone.
+ *
+ *  \param recording Set to 1 to mark as rsRecording, set to 0 to mark as
+ *         rsCancelled, and set to -1 to base the decision of the recording
+ *         group.
+ */
+void TVRec::SetLiveRecording(int recording)
+{
+    VERBOSE(VB_IMPORTANT, LOC + "SetLiveRecording("<<recording<<")");
+    QMutexLocker locker(&stateChangeLock);
+
+    (void) recording;
+
+    RecStatusType recstat = rsCancelled;
+    bool was_rec = pseudoLiveTVRecording;
+    CheckForRecGroupChange();
+    if (was_rec && !pseudoLiveTVRecording)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "SetLiveRecording() -- cancel");
+        // cancel -- 'recording' should be 0 or -1
+        SetFlags(kFlagCancelNextRecording);
+    }
+    else if (!was_rec && pseudoLiveTVRecording)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "SetLiveRecording() -- record");
+        // record -- 'recording' should be 1 or -1
+
+        // If the last recording was flagged for keeping
+        // in the frontend, then add the recording rule
+        // so that transcode, commfrag, etc can be run.
+        recordEndTime = GetRecordEndTime(pseudoLiveTVRecording);
+        NotifySchedulerOfRecording(curRecording);
+        recstat = curRecording->recstatus;
+    }
+
+    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                 .arg(curRecording->cardid)
+                 .arg(curRecording->chanid)
+                 .arg(curRecording->startts.toString(Qt::ISODate))
+                 .arg(recstat)
+                 .arg(curRecording->recendts.toString(Qt::ISODate)));
+
+    gContext->dispatch(me);
 }
 
 /** \fn TVRec::StopLiveTV(void)

@@ -31,6 +31,9 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
 
+#define LOC QString("Scheduler: ")
+#define LOC_ERR QString("Scheduler, Error: ")
+
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
                      QString recordTbl, MSqlQueryInfo *databaseConnection,
                      Scheduler *master_sched)
@@ -1039,7 +1042,41 @@ void Scheduler::Reschedule(int recordid) {
 void Scheduler::AddRecording(const ProgramInfo &pi)
 {
     QMutexLocker lockit(reclist_lock);
-    reclist.push_back(new ProgramInfo(pi));
+    bool add_it = true;
+
+    VERBOSE(VB_SCHEDULE, LOC + "AddRecording() recid: " << pi.recordid);
+
+    for (RecIter it = reclist.begin(); it != reclist.end(); ++it)
+    {
+        VERBOSE(VB_SCHEDULE, LOC +
+                QString("AddRecording()  pre: item '%1' status '%2'")
+                .arg((*it)->title).arg((*it)->RecStatusText()));
+    }
+
+    for (RecIter it = reclist.begin(); it != reclist.end(); ++it)
+    {
+        if ((*it)->getRecordID() == pi.recordid)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Not adding recording, " +
+                    QString("'%1' is already in reclist.").arg(pi.title));
+            (*it)->recstatus = pi.recstatus;
+            add_it = false;
+        }
+    }
+
+    if (add_it)
+    {
+        VERBOSE(VB_SCHEDULE, LOC + 
+                QString("Adding '%1' to reclist.").arg(pi.title));
+        reclist.push_back(new ProgramInfo(pi));
+    }
+
+    for (RecIter it = reclist.begin(); it != reclist.end(); ++it)
+    {
+        VERBOSE(VB_SCHEDULE, LOC +
+                QString("AddRecording() post: item '%1' status '%2'")
+                .arg((*it)->title).arg((*it)->RecStatusText()));
+    }
 }
 
 void Scheduler::RunScheduler(void)

@@ -75,6 +75,7 @@ class EncoderLink
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
+    void SetLiveRecording(int);
     void ToggleInputs(void);
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);

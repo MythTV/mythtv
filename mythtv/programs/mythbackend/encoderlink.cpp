@@ -641,11 +641,24 @@ void EncoderLink::PauseRecorder(void)
         VERBOSE(VB_IMPORTANT, "Should be local only query: PauseRecorder");
 }
 
-/** \fn EncoderLink::ToggleInputs()
+/** \fn EncoderLink::SetLiveRecording(int recording)
+ *  \brief Tells TVRec to keep a LiveTV recording if 'recording' is 1.
+ *         and to not keep a LiveTV recording if 'recording; is 0.
+ *         <b>This only works on local recorders.</b>
+ */
+void EncoderLink::SetLiveRecording(int recording)
+{
+    if (local)
+        tv->SetLiveRecording(recording);
+    else
+        VERBOSE(VB_IMPORTANT, "Should be local only query: SetLiveRecording");
+}
+
+/** \fn EncoderLink::ToggleInputs(void)
  *  \brief Tells TVRec's recorder to change to the next input.
  *         <b>This only works on local recorders.</b>
  *
- *   You must call PauseRecorder() before calling this.
+ *   You must call PauseRecorder(void) before calling this.
  */
 void EncoderLink::ToggleInputs(void)
 {
@@ -655,7 +668,7 @@ void EncoderLink::ToggleInputs(void)
         VERBOSE(VB_IMPORTANT, "Should be local only query: ToggleInputs");
 }
 
-/** \fn EncoderLink::ToggleChannelFavorite()
+/** \fn EncoderLink::ToggleChannelFavorite(void)
  *  \brief Toggles whether the current channel should be on our favorites list.
  *         <b>This only works on local recorders.</b>
  *  \return -1 if query does not succeed, otherwise.

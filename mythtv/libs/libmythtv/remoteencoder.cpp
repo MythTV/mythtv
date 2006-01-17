@@ -304,6 +304,14 @@ void RemoteEncoder::FinishRecording(void)
     SendReceiveStringList(strlist);
 }
 
+void RemoteEncoder::SetLiveRecording(bool recording)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "SET_LIVE_RECORDING";
+
+    SendReceiveStringList(strlist);
+}
+
 void RemoteEncoder::ToggleInputs(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);

@@ -4836,6 +4836,7 @@ void TV::ToggleRecord(void)
         playbackinfo->ApplyRecordRecGroupChange("Default");
         cmdmsg = tr("Record");
         SetPseudoLiveTV(s, playbackinfo, kPseudoRecording);
+        activerecorder->SetLiveRecording(true);
         VERBOSE(VB_RECORD, LOC + "Toggling Record on");
     }
     else
@@ -4844,6 +4845,7 @@ void TV::ToggleRecord(void)
         playbackinfo->ApplyRecordRecGroupChange("LiveTV");
         cmdmsg = tr("Cancel Record");
         SetPseudoLiveTV(s, playbackinfo, kPseudoNormalLiveTV);
+        activerecorder->SetLiveRecording(false);
         VERBOSE(VB_RECORD, LOC + "Toggling Record off");
     }
 

@@ -2474,6 +2474,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->FinishRecording();
         retlist << "ok";
     }
+    else if (command == "SET_LIVE_RECORDING")
+    {
+        int recording = slist[2].toInt();
+        enc->SetLiveRecording(recording);
+        retlist << "ok";
+    }
     else if (command == "TOGGLE_INPUTS")
     {
         enc->ToggleInputs();
