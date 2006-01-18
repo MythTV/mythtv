@@ -326,6 +326,8 @@ ScanCountry::ScanCountry()
         country = SE;
     else if (qtcountry == QLocale::UnitedKingdom)
         country = UK;
+    else if (qtcountry == QLocale::Spain)
+        country = ES;
 #endif
 
     setLabel(tr("Country"));
@@ -334,6 +336,7 @@ ScanCountry::ScanCountry()
     addSelection(QObject::tr("Sweden"),         "se", country == SE);
     addSelection(QObject::tr("United Kingdom"), "uk", country == UK);
     addSelection(QObject::tr("Germany"),        "de", country == DE);
+    addSelection(QObject::tr("Spain"),          "es", country == ES);
 }
 
 ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
