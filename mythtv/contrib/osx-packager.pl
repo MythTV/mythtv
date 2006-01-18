@@ -414,6 +414,7 @@ our %makecleanopt = (
 $ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin";
 $ENV{'DYLD_LIBRARY_PATH'} = "$PREFIX/lib";
 $ENV{'LD_LIBRARY_PATH'} = "/usr/local/lib";
+$ENV{'PKG_CONFIG_PATH'} = "$PREFIX/lib/pkgconfig:";
 delete $ENV{'CC'};
 delete $ENV{'CXX'};
 delete $ENV{'CPP'};
@@ -818,7 +819,7 @@ if ( $jobtools )
 
   &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
 
-  my $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
+  $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
   { &Syscall([ '/bin/cp', $SRC, $DEST ]) or die }
 }
