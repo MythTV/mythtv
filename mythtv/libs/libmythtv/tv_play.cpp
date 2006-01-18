@@ -3044,11 +3044,12 @@ void TV::DoSkipCommercials(int direction)
         muteTimer->start(kMuteTimeout, true);
 }
 
-static int get_cardinputid(uint cardid, const QString &channum)
+static int get_cardinputid(uint cardid, const QString &channum,
+                           QString &inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardinputid "
+        "SELECT cardinputid, inputname "
         "FROM channel, capturecard, cardinput "
         "WHERE channel.channum      = :CHANNUM           AND "
         "      channel.sourceid     = cardinput.sourceid AND "
@@ -3060,7 +3061,10 @@ static int get_cardinputid(uint cardid, const QString &channum)
     if (!query.exec() || !query.isActive())
         MythContext::DBError("get_cardinputid", query);
     else if (query.next())
+    {
+        inputname = query.value(1).toString();
         return query.value(0).toInt();
+    }
 
     return -1;    
 }
@@ -3076,6 +3080,18 @@ static void set_startchan(uint cardinputid, const QString &channum)
     query.exec();
     if (!query.exec())
         MythContext::DBError("set_startchan", query);
+}
+
+static void set_startinput(uint cardid, const QString &inputname)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE capturecard "
+                  "SET defaultinput = :INNAME "
+                  "WHERE cardid = :CARDID");
+    query.bindValue(":INNAME", inputname);
+    query.bindValue(":CARDID", cardid);
+    if (!query.exec())
+        MythContext::DBError("set_startinput", query);
 }
 
 void TV::SwitchCards(uint chanid, QString channum)
@@ -3097,12 +3113,17 @@ void TV::SwitchCards(uint chanid, QString channum)
         // now we need to set our channel as the starting channel..
         if (testrec && testrec->IsValidRecorder())
         {
+            QString inputname("");
             int cardid = testrec->GetRecorderNumber();
-            int cardinputid = get_cardinputid(cardid, channum);
-            VERBOSE(VB_IMPORTANT, LOC + "setting startchan: " +
+            int cardinputid = get_cardinputid(cardid, channum, inputname);
+            VERBOSE(VB_CHANNEL, LOC + "Setting startchan: " +
                     QString("cardid(%1) cardinputid(%2) channum(%3)")
                     .arg(cardid).arg(cardinputid).arg(channum));
-            set_startchan(cardinputid, channum);
+            if (cardid >= 0 && cardinputid >= 0 && !inputname.isEmpty())
+            {
+                set_startchan(cardinputid, channum);
+                set_startinput(cardid, inputname);
+            }
         }
     }
 
@@ -3370,7 +3391,6 @@ bool TV::ProcessSmartChannel(QString &inputStr)
     // Look for channel in line-up
     QString needed_spacer;
     uint    pref_cardid;
-    uint    cardid = activerecorder->GetRecorderNumber();
     bool    is_not_complete;
 
     bool valid_prefix = activerecorder->CheckChannelPrefix(
