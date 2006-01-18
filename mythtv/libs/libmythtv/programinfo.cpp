@@ -1740,7 +1740,7 @@ long long ProgramInfo::GetBookmark(void) const
 /** \fn ProgramInfo::IsEditing(void) const
  *  \brief Queries "recorded" table for its "editing" field
  *         and returns true if it is set to true.
- *  \return true iff we have started, but not finished, editing.
+ *  \return true if we have started, but not finished, editing.
  */
 bool ProgramInfo::IsEditing(void) const
 {
