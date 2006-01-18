@@ -24,7 +24,7 @@ if the user had pressed the keys on the keyboard.  The file
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>: If you are running Mandrake, you may install
+<CAPTION><B>NOTE</B>: If you are running Mandriva, you may install
 <B>lirc</B> by executing: <CODE># urpmi lirc lirc-remotes</CODE> and bypass
 the manual compilation steps described below by jumping to the 
 <A HREF="#completing_lirc_install">Completing the lirc install</A> section. See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
@@ -46,11 +46,11 @@ build process. </P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Mandrake</A>
+<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Mandriva</A>
 </H2>
 
-<P>lircd has two prerequisites:  <B>dialog</B>, available in Mandrake
-through the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
+<P>lircd has two prerequisites:  <B>dialog</B>, available in Mandriva
+through the "cdialog" RPM, and the kernel source.  Mandriva 9.0 is using the
 2.4.19 kernel, so either install the kernel sources from the installation CD
 or go to 
 <A HREF="http://www.kernel.org">http://www.kernel.org</A> and
@@ -203,7 +203,7 @@ remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE to Mandrake 9.1 users</B>: skip to the manual start paragraph
+<CAPTION><B>NOTE to Mandriva 9.1 users</B>: skip to the manual start paragraph
 below.</CAPTION>
 </FIGURE>
 </P>
@@ -227,7 +227,7 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Next, we're going to manually start lircd the first time.  Mandrake 9.1
+<P>Next, we're going to manually start lircd the first time.  Mandriva 9.1
 users, type: <CODE># /etc/rc.d/init.d/lircd start</CODE> instead of:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -237,7 +237,7 @@ users, type: <CODE># /etc/rc.d/init.d/lircd start</CODE> instead of:
 </P>
 <P>If this fails, complaining of a missing <CODE>lircd.conf</CODE> file, then you
 must find or make one. First look for a pre-made configuration file at 
-<A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  Mandrake 9.1 users, look in
+<A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  Mandriva 9.1 users, look in
 <CODE>/usr/share/lirc-remotes</CODE>. If you find one your remotes either on the
 website or in <CODE>/usr/share</CODE>, download or copy the file, name it
 <CODE>lircd.conf</CODE> and put it in your <CODE>/etc</CODE> directory. If you
@@ -267,7 +267,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>Now, we're going to add the commands necessary for lircd to run each time we
-boot. Mandrake 9.1 users, you can execute:
+boot. Mandriva 9.1 users, you can execute:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su

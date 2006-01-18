@@ -250,8 +250,10 @@ for Live TV at 416x480.</LI>
 
 <H3>DVB capture cards.</H3>
 
-<P>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
-see the pages maintained by Martin Smith 
+<P>DVB is a video standard primarily found in Europe (where it comes in
+DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
+is also used as the programming interface for HDTV capture cards in Linux. 
+MythTV supports DVB; see the pages maintained by Martin Smith 
 <A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A>
 at 
 <A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
@@ -264,16 +266,10 @@ unencrypted Free-To-Air satellite channels.</P>
 
 <H3>HDTV.</H3>
 
-<P>Currently there are two HDTV card with Linux drivers which are known to
-operate in the United States - the HD-2000/HD-3000 cards available from
-<A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A> or 
-<A HREF="http://mythic.tv/">http://mythic.tv/</A> and the Air2PC-ATSC-PCI
-available from 
-<A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A>
-or 
-<A HREF="http://mythic.tv/">http://mythic.tv/</A>. </P>
-<P> The
-Air2PC is supported using the linux-dvb drivers.</P>
+<P>There are a number of HDTV card with Linux drivers which are known to
+operate in the United States; a complete list of cards with DVB drivers can
+be found at 
+<A HREF="http://www.linuxtv.org/wiki/index.php/ATSC_cards">http://www.linuxtv.org/wiki/index.php/ATSC_cards</A></P>
 <P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
 progressive or interlaced, and whether your display card has hardware-assist
@@ -287,7 +283,9 @@ use a 1.8GHz processor.</P>
 
 <H3>Firewire.</H3>
 
-<P>You may use the Firewire output of the DCT6200 or the SA3250.</P>
+<P>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
+If your provider uses 5C encryption on a particular channel, you won't be
+able to get any content.</P>
 
 <H3>DBoxII or other devices running Neutrino</H3>
 
@@ -309,7 +307,7 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <LI>Hauppauge WinTV-USB series</LI>
 <LI>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
-<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)</LI>
+<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net no MythTV support)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
 </P>
@@ -366,7 +364,7 @@ recommended that you use a card which supports XVideo (XV) extensions. If
 your card does not support XV, color conversion and scaling will be
 performed by your CPU rather than the video card.  This is very CPU
 and memory intensive and will often result in dropped frames and a
-corresponding degradation of quality.  Check the XFree86 documentation
+corresponding degradation of quality.  Check the X documentation
 for details if you are uncertain about your preferred card.  You may
 also run <CODE>xvinfo</CODE>; look for your video card to be listed as one
 of the adapters.</P>
@@ -395,9 +393,11 @@ the card name in your search string.</P>
 
 <H3>ATI</H3>
 
-<P>ATI makes many cards with TV-out capability, but ATI offers no official
-support for their use with Linux. The standard XFree86 ati driver does not
-support TV-out.</P>
+<P>ATI makes many cards with TV-out capability, but only offers linux
+drivers for Radeon 8500 and above cards.  See the Drivers and Software
+section of 
+<A HREF="http://www.ati.com/">http://www.ati.com</A> for the
+driver and additional information.</P>
 <P>The enhanced ati.2 X driver created by the GATOS 
 <A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
 project offers some support for TV-out, but only in its "experimental"
@@ -420,6 +420,10 @@ no details reported.</LI>
 </P>
 
 <H3>Matrox</H3>
+
+<P><B>NOTE</B>: If updated information for the Matrox cards is not
+provided prior to MythTV v0.20 I will assume that there is no interest and
+will remove this section.</P>
 
 <P>The standard Matrox driver included with XFree86 does not support TV-out.</P>
 <P>Older Matrox cards can be used with a proprietary X driver provided by 
@@ -444,7 +448,7 @@ Composite and S-Video ports. TV-out implementation does <EM>NOT</EM> support XVi
 <H3>NVIDIA</H3>
 
 <P>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
-XFree86, combined with the userspace application <B>nvtv</B> to control the TV-out 
+X, combined with the userspace application <B>nvtv</B> to control the TV-out 
 port. See 
 <A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A> for details.  Recent
 versions of the NVIDIA driver have better support for overscan and other
@@ -452,7 +456,10 @@ features useful with TV-Out, so the <B>nvtv</B> application may not be
 required.</P>
 <P>Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
 available by NVIDIA. See 
-<A HREF="http://www.nvidia.com/view.asp?IO=linux">http://www.nvidia.com/view.asp?IO=linux</A> for more information.</P>
+<A HREF="http://www.nvidia.com/object/unix.html">http://www.nvidia.com/object/unix.html</A> for more information.</P>
+<P><B>NOTE</B>:  It's strongly recommended that you use the proprietary
+NVIDIA drivers; they have excellent support for XvMC and ship with a good
+configuration utility.</P>
 <P>Specific cards:
 <UL>
 <LI>GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using the
@@ -559,9 +566,17 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3><A NAME="atrpms"></A> Red Hat Linux/Fedora Core</H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux / Fedora Core</H3>
 
-<P>Red Hat Linux and Fedora Core 3 packages for MythTV and all of its add-on
+<P>The definitive documentation on installing MythTV on Red Hat Linux /
+Fedora Core can be found in Jarod Wilson's (
+<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A>) HOWTO at 
+<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> Just
+like 3rd-party packages, any 3rd-party documentation problems should be
+brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).  The
+installation instructions which follow should be used as a guide only; refer
+to Jarod's guide.</P>
+<P>Red Hat Linux and Fedora Core packages for MythTV and all of its add-on
 modules and some themes have been packaged by 
 <A HREF="mailto:Axel.Thimm@ATrpms.net">mailto:Axel.Thimm@ATrpms.net</A> and
 are available at 
@@ -604,32 +619,64 @@ And finally:
 </CODE></BLOCKQUOTE>
         
 These steps however, do NOT perform the installation of any drivers required
-for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do they set up
-your MythTV database. Check 
-<A HREF="http://ATrpms.net/topic/multimedia/">ATrpms</A> for
-the drivers you need.</P>
-<P>Further documentation on using ATrpms packages can be found in Jarod
-Wilson's (
-<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A>) HOWTO at 
-<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A>
-Just like 3rd-party packages, any 3rd-party documentation problems
-should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).</P>
+for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do
+they set up your MythTV database. Check 
+<A HREF="http://ATrpms.net/topic/multimedia/">ATrpms</A> for the drivers you
+need.</P>
 
-<H3>Mandrake</H3>
+<H3>Mandriva</H3>
 
-<P>Thac has created RPMs for MythTV for Mandrake 9.0 and above which may
+<P>Thac has created RPMs for MythTV for Mandriva 9.0 and above which may
 be obtained from 
 <A HREF="http://rpm.nyvalls.se/">http://rpm.nyvalls.se/</A> If you have problems with the RPMs, please
 send him email directly at 
 <A HREF="thac@nyvalls.se">thac@nyvalls.se</A>.</P>
+<H3>Debian</H3>
+
+<P>Debian packages for MythTV and most of its add-on modules are maintained
+by Christian Marillat 
+<A HREF="mailto:marillat@free.fr">mailto:marillat@free.fr</A> and are available at 
+<A HREF="http://debian.video.free.fr/">http://debian.video.free.fr/</A>. 
+Installation instructions can be found on those pages as well. All of the
+prerequisites for MythTV are available as Debian packages, most of them from
+the official Debian archive.</P>
+<P>If you have followed the instructions on the above page you should have added
+<BLOCKQUOTE><CODE>
+<PRE>
+deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>to your <CODE>/etc/apt/sources.list</CODE> file.  Running <B>apt-get update</B> and then
+executing <B>apt-get build-dep mythtv</B> should install all the
+pre-requisites required to compile MythTV.</P>
+<P>
+<FIGURE>
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
+<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1+, there are no packages for
+Debian woody/stable.</CAPTION>
+</FIGURE>
+</P>
+
+<P>The Debian packages are configured such that MythTV programs should be
+run as the <CODE>mythtv</CODE> user, which is automatically created during
+installation.  This user has access to write new recordings to disk in the
+default directory, read and write the database, access the audio and video
+devices, and everything else that MythTV needs to do.</P>
+
+<P>See <CODE>/usr/share/doc/<I>packagename</I>/README.Debian</CODE> for more
+information, including copies of the MythTV documentation.  The
+<CODE>mythtv-doc</CODE> package contains a copy of this HOWTO in
+<CODE>/usr/share/doc/mythtv-doc</CODE>.</P>
 <H3>Manual installation</H3>
 
 <P>You may use the graphical tools that come with your distribution, or you
 can use command-line utilities.  Either system will get the job done, and it
 all depends on your comfort level with Linux.</P>
 <P>In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-03-15, this list includes <B>mysql</B>,
-<B>gcc</B>, <B>freetype2-devel</B>, <B>XFree86-devel</B>,
+is installed.  As of 2006-01-17, this list includes <B>mysql</B>,
+<B>gcc</B>, <B>freetype2-devel</B>, <B>xorg-xserver-devel</B>,
 <B>qt-devel</B> and <B>lame</B>.  If you're going to use a remote
 control with MythTV, you're going to need the <B>cdialog</B> package in
 order to compile <B>lircd</B> if your distribution doesn't have a
@@ -650,8 +697,11 @@ that you've installed the -devel version of a prerequisite.
 
 <H3><A NAME="graphicinstalltools_"></A> Graphical installation tools </H3>
 
-<H3>Mandrake</H3>
+<H3>Mandriva</H3>
 
+<P><B>NOTE</B>:  As of 2006-01-17 the following section should be
+considered out of date.  If no updates are submitted prior to the release of
+v0.20, they will be considered abandoned and removed from the HOWTO.</P>
 <P>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
 clicking K->Configuration->Packaging->KPackage</P>
@@ -679,7 +729,7 @@ Qt") and libqt3 ("Libraries").</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION>NOTE for Mandrake users:  In versions after Mandrake 9.1, Mandrake
+<CAPTION>NOTE for Mandriva users:  In versions after Mandriva 9.1, Mandriva
 removed the MySQL modules from the default installation.  Ensure that you
 install libqt3-mysql.</CAPTION>
 </FIGURE>
@@ -698,7 +748,7 @@ OK if you get a message about satisfying dependencies.</P>
 <P> This section details the various methods for installing prerequisites
 from the command line.</P>
 
-<H3>Mandrake</H3>
+<H3>Mandriva</H3>
 
 <P><B>urpmi</B> is the simplest tool for installation of packages from the
 command line, but properly configuring it can be difficult.  The
@@ -708,11 +758,6 @@ a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <CODE>lame</CODE> library without compiling from source.</P>
-
-<H3>Mandrake 9.0</H3>
-
-<P>The simplest tool for installing packages from the command line is
-<B>urpmi</B>.</P>
 <P>Open a shell, and execute the following, all on the same line. You may get
 asked a number of questions regarding dependencies.  It's best to answer
 "YES".
@@ -728,7 +773,7 @@ $ su
 <P>
 <HR>
 <PRE>
-NOTE for Mandrake 9.1+ users: execute the following command.
+NOTE for Mandriva 9.1+ users: execute the following command.
 
 # urpmi libqt3-mysql
 </PRE>
@@ -777,6 +822,28 @@ To enable SQL support, add "mysql" to your USE variable in
 </P>
 <P>All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.</P>
+
+<H3>Debian.</H3>
+
+<P>Build-dependencies for MythTV can be satisfied by adding the following to
+your <CODE>/etc/apt/sources.list</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+# Christian Marillat's packages (mplayer, lame)
+deb ftp://ftp.nerim.net/debian-marillat/ sid main
+deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and executing:
+<BLOCKQUOTE><CODE>
+<PRE>
+# apt-get build-dep mythtv
+# apt-get source mythtv --compile
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-4.html">Next</A>
 <A HREF="mythtv-HOWTO-2.html">Previous</A>

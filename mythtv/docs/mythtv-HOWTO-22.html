@@ -103,45 +103,61 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>At this point, you now have debug-enabled software ready.  Let's assume that
-the problem you're having is in the <CODE>setup</CODE> program.
+<P>At this point, you now have debug-enabled software ready.  To make sure that
+you don't forget to type a command required for debugging, it's best to
+setup a <CODE>gdbcommands</CODE> file.  This will be read by <B>gdb</B> when it's
+started.
+Put the following into <CODE>gdbcommands</CODE> in your home directory:</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd setup
-$ gdb ./mythtv-setup
-
-GNU gdb 5.3-1mdk (Mandrake Linux)
-Copyright 2002 Free Software Foundation, Inc.
+handle SIGPIPE nostop noprint
+handle SIG33 nostop noprint
+set logging on
+set pagination off
+set args -l myth.log -v record,channel,siparser
+run
+thread apply all bt full
+set logging off
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Let's assume that the problem you're having is in <B>mythbackend</B>.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ gdb mythbackend -x gdbcommands
+GNU gdb 6.3-debian
+Copyright 2004 Free Software Foundation, Inc.
 GDB is free software, covered by the GNU General Public License, and you are
-welcome to change it and/or distribute copies of it under certain
-conditions.
+welcome to change it and/or distribute copies of it under certain conditions.
 Type "show copying" to see the conditions.
 There is absolutely no warranty for GDB.  Type "show warranty" for details.
-This GDB was configured as "i586-mandrake-linux-gnu"...
-(gdb) handle SIGPIPE nostop
-Signal        Stop      Print   Pass to program Description
-SIGPIPE       No        Yes     Yes             Broken pipe
-(gdb) set logging on
-Copying output to gdb.txt.
-(gdb)
+This GDB was configured as "i386-linux".Using host libthread_db library "/lib/tls/libthread_db.so.1".
+[Thread debugging using libthread_db enabled]
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
-information.</P>
-<P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
-execution.  When the program segfaults or appears to lock-up (press CTRL-C),
-type 
-<BLOCKQUOTE><CODE>
-<PRE>
-(gdb) thread apply all bt full
-(gdb) set logging off
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P><B>gdb</B> will automatically read the commands that you've placed in the
+<CODE>gdbcommands</CODE> file and begin running the program you specified on the
+command line.</P>
+<P>If the program appears to be locked up, press CTRL-C to create the backtrace
+file.</P>
 <P>All of the output from <CODE>gdb.txt</CODE> should be posted to the mythtv-dev
 mailing list, along with the steps you followed to get the program to crash.</P>
-<P>If you're trying to troubleshoot and you can't get back to the gdb window
+<P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
+information.  </P>
+<P>Using the <CODE>gdbcommands</CODE> file in conjunction with a <B>while</B> loop
+will ensure that <B>gdb</B> creates a trace file and then restarts:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ while true; do date >> gdb.txt; gdb mythbackend -x gdbcommands; done;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: To exit this loop you will need to kill the while loop.</P>
+<P>If you're trying to troubleshoot and you can't get back to the <B>gdb</B> window
 for some reason, it may be easier to use two systems or to start
 mythfrontend from the text console.</P>
 <P>If you're going to troubleshoot from a remote system, connect to the machine
@@ -153,11 +169,6 @@ session, or by switching back to the text console by pressing CTRL-ALT-F1.
 You can now continue troubleshooting using <B>gdb</B> as detailed in the
 instructions.</P>
 
-<H3>Illegal Instruction</H3>
-
-<P>This error used to occur when users compiled MythTV with incorrect CPU
-options.  This should no longer occur with the new <B>configure</B>
-script.</P>
 <H3>MythTV is crashing your system</H3>
 
 <P>When run as a non-privileged user, MythTV <EM>can not</EM> crash your
@@ -382,7 +393,7 @@ program to check and enable DMA.
 <P>You may also setup your PC to do this at boot time, either by adding the
 command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
 /etc/sysconfig.</P>
-<P>On Mandrake and other distributions, if you install <B>hdparm</B> from an RPM you
+<P>On Mandriva and other distributions, if you install <B>hdparm</B> from an RPM you
 will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed. 
 This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
 the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices

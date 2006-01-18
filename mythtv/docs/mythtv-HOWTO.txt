@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-12-10, v0.18.17
+  2006-01, v0.19.pre
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -53,66 +53,66 @@
         3.1.10 External Adapters
      3.2 Software
         3.2.1 Pre-compiled packages
-           3.2.1.1 Red Hat Linux/Fedora Core
-           3.2.1.2 Mandrake
+           3.2.1.1 Red Hat Linux / Fedora Core
+           3.2.1.2 Mandriva
+           3.2.1.3 Debian
         3.2.2 Manual installation
         3.2.3 Graphical installation tools
-           3.2.3.1 Mandrake
+           3.2.3.1 Mandriva
         3.2.4 Command-line installation
-           3.2.4.1 Mandrake
-              3.2.4.1.1 Mandrake 9.0
+           3.2.4.1 Mandriva
            3.2.4.2 Gentoo.
+           3.2.4.3 Debian.
 
   4. System Configuration Requirements for Compiling MythTV.
      4.1 Software requirements for compiling MythTV
         4.1.1 General requirements
-     4.2 Shared-Library Requirements for MythTV
+     4.2 Shared-Library requirements for MythTV
         4.2.1 Modifying /etc/ld.so.conf
-     4.3 Environment variable Requirements for MythTV
+     4.3 Environment variable requirements for MythTV
         4.3.1 General requirements
            4.3.1.1 QT libraries and binaries
         4.3.2 Distribution-Specific Notes
-           4.3.2.1 Mandrake
+           4.3.2.1 Mandriva
            4.3.2.2 Red Hat Linux 9
-           4.3.2.3 Debian
         4.3.3 Device Permissions
 
   5. Downloading and compiling.
      5.1 Building LAME
      5.2 XMLTV
         5.2.1 Red Hat Linux and Fedora Core:
-        5.2.2 Mandrake
+        5.2.2 Mandriva
         5.2.3 Manual installation
      5.3 Configuring the Zap2It.com DataDirect service
      5.4 Manually building MythTV
         5.4.1 Enabling real-time scheduling of the display thread.
-           5.4.1.1 1. rlimits
-           5.4.1.2 2. realtime module
-           5.4.1.3 3. run as root option (not safe)
+           5.4.1.1 rlimits
+           5.4.1.2 realtime module
+           5.4.1.3 run as root option (not safe)
         5.4.2 Frontend-only configuration
      5.5 Gentoo
 
   6. MySQL.
      6.1 Distribution-specific information
-        6.1.1 Mandrake
+        6.1.1 Mandriva
         6.1.2 Red Hat Linux and Fedora Core
         6.1.3 Gentoo
      6.2 Setting up the initial database
-        6.2.1 Mandrake and Red Hat Linux/Fedora Core
+        6.2.1 Mandriva and Red Hat Linux/Fedora Core
         6.2.2 Debian 3.0
         6.2.3 Gentoo
         6.2.4 Modifying access to the MySQL database for multiple systems
 
   7. Configuring Sound.
      7.1 Graphically setting up the mixer
-        7.1.1 Mandrake and Red Hat Linux/Fedora Core
+        7.1.1 Mandriva and Red Hat Linux/Fedora Core
            7.1.1.1 Using OSS drivers.
            7.1.1.2 Using ALSA.
      7.2 Setting the mixer from the command line
 
   8. Setting up a remote control.
      8.1 Gentoo
-     8.2 Mandrake
+     8.2 Mandriva
         8.2.1 Obtaining the kernel
      8.3 Red Hat Linux/Fedora Core
      8.4 Obtaining and compiling lirc
@@ -163,16 +163,15 @@
         11.1.14 Watch Recordings Screen
         11.1.15 Remote Controls
      11.2 Using themes with MythTV
-     11.3 Adding DirecTV information to the database
-     11.4 Adding DishTV information to the database
-     11.5 Adding support for an external tuner
-     11.6 Using Shutdown/Wakeup
-        11.6.1 A deeper look into the operation
-        11.6.2 Setting up the MythTV side of this extension.
-           11.6.2.1 Using WOL to wake your Master backend.
-           11.6.2.2 Using BIOS wakeup to wake your Master backend.
-        11.6.3 Wakeup the MySQL server using WOL
-        11.6.4 Tips/Tricks:
+     11.3 Adding DishTV information to the database
+     11.4 Adding support for an external tuner
+     11.5 Using Shutdown/Wakeup
+        11.5.1 A deeper look into the operation
+        11.5.2 Setting up the MythTV side of this extension.
+           11.5.2.1 Using WOL to wake your Master backend.
+           11.5.2.2 Using BIOS wakeup to wake your Master backend.
+        11.5.3 Wakeup the MySQL server using WOL
+        11.5.4 Tips/Tricks:
 
   12. Scheduling Recordings
      12.1 Record Types
@@ -186,7 +185,7 @@
      12.3 Storage Options
         12.3.1 Recording Profile
         12.3.2 Recording Group
-        12.3.3 Time Stretch
+        12.3.3 Playback Group
         12.3.4 Auto-Expire
         12.3.5 Episode Limit
      12.4 Post Recording Processing
@@ -194,15 +193,16 @@
         12.4.2 Transcoding
         12.4.3 User Jobs
      12.5 Advanced Recording Options
-        12.5.1 Getting Started
-        12.5.2 How it Works
-        12.5.3 Common Tricks and Tips
-        12.5.4 Working with SQL
+        12.5.1 Creating Power Search rules with Custom Record MythTV's "Custom Record" feature gives you unlimited control for creating specialized search recording rules to meet your needs. It allows you to choose your criteria to search for matching shows based on any of the information in the program listings, channel information, time functions and more. This goes beyond the capabilities of any other DVR system and it is unlikely that this level of scheduling customization will ever be available in any commercial DVR system.
+        12.5.2 Getting Started
+        12.5.3 How it Works
+        12.5.4 Common Tricks and Tips
+        12.5.5 Working with SQL
 
   13. MythPlugins.
   14. MythWeb.
      14.1 Installation and prerequisites
-        14.1.1 Mandrake
+        14.1.1 Mandriva
      14.2 Completing the installation
      14.3 Resetting the key binding table
      14.4 Resetting the theme.
@@ -216,13 +216,13 @@
      16.1 Setup Directory Structure
      16.2 Download and Install xmame
      16.3 Download extra files
-     16.4 Download and Install Mythgame.
-     16.5 Setup mythgame
+     16.4 Download and Install MythGame.
+     16.5 Setup xmame in MythGame
      16.6 Hints:
 
   17. MythMusic.
      17.1 Manual installation of prerequisites
-     17.2 Mandrake
+     17.2 Mandriva
         17.2.1 Additional options with MythMusic
      17.3 Red Hat Linux 9
      17.4 Compiling MythMusic
@@ -250,8 +250,7 @@
         22.2.1 MythTV segfaults
         22.2.2 MythTV isn't doing anything
         22.2.3 Debugging with GDB
-        22.2.4 Illegal Instruction
-        22.2.5 MythTV is crashing your system
+        22.2.4 MythTV is crashing your system
      22.3 Installing
         22.3.1 When trying to run setup, you get an error like this: "./setup: error while loading shared libraries:"
      22.4 Using
@@ -298,9 +297,9 @@
      23.10 NFS
      23.11 Automatically starting mythfrontend at system boot time
      23.12 Automatically starting mythbackend at system boot time
-        23.12.1 Red Hat And Mandrake
+        23.12.1 Red Hat And Mandriva
            23.12.1.1 Log files
-           23.12.1.2 Mandrake
+           23.12.1.2 Mandriva
         23.12.2 Gentoo
      23.13 Advanced Backend Configurations
      23.14 What is this transcoder thing, and how do I use it?
@@ -344,6 +343,7 @@
         24.4.1 Backend Configuration
         24.4.2 Configuring DHCP
         24.4.3 Editing
+
   ______________________________________________________________________
 
   [1m1.  First things first.[0m
@@ -463,7 +463,7 @@
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
-  This HOWTO is for MythTV v0.18.1
+  This HOWTO is for MythTV v0.19
 
 
   [1m1.5.  Document conventions[0m
@@ -516,8 +516,8 @@
   [1m1.8.  Bug database[0m
 
   If you feel you need to contribute to a bug database, use the MythTV
-  bug ticketing system at http://cvs.mythtv.org/trac
-  <http://cvs.mythtv.org/trac>.
+  bug ticketing system at http://svn.mythtv.org/trac
+  <http://svn.mythtv.org/trac>.
 
   Good entries will contain the following:
 
@@ -554,7 +554,7 @@
   plain confusing.
 
   If you'd like to make a new contribution, create a ticket at
-  http://cvs.mythtv.org/trac <http://cvs.mythtv.org/trac> and click "New
+  http://svn.mythtv.org/trac <http://svn.mythtv.org/trac> and click "New
   Ticket".  The type should be set to "patch" and the owner set to
   "rkulagow" to ensure that I see your contribution.
 
@@ -569,7 +569,7 @@
   as an example.
 
   To create the actual patch, run [1mdiff -u origfilename newfile >[0m
-  [1mdoc.patch [22mand mail it to the address above.
+  [1mdoc.patch [22mand attach your contribution to the trac ticket.
 
 
   [1m2.  Introduction.[0m
@@ -840,13 +840,15 @@
 
   [1m3.1.5.3.  DVB capture cards.[0m
 
-  DVB is a video standard primarily found in Europe.  MythTV supports
-  DVB; see the pages maintained by Martin Smith martin@ethics-
-  gradient.net <mailto:martin@ethics-gradient.net> at http://www.ethics-
-  gradient.net/myth/mythdvb.html <http://www.ethics-
-  gradient.net/myth/mythdvb.html> for more information.  To see if your
-  DVB card is supported, see the list of cards in the "Supported
-  Hardware" section of the DVB Wiki at
+  DVB is a video standard primarily found in Europe (where it comes in
+  DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite)
+  and is also used as the programming interface for HDTV capture cards
+  in Linux.  MythTV supports DVB; see the pages maintained by Martin
+  Smith martin@ethics-gradient.net <mailto:martin@ethics-gradient.net>
+  at http://www.ethics-gradient.net/myth/mythdvb.html
+  <http://www.ethics-gradient.net/myth/mythdvb.html> for more
+  information.  To see if your DVB card is supported, see the list of
+  cards in the "Supported Hardware" section of the DVB Wiki at
   http://www.linuxtv.org/wiki/index.php/Main_Page
   <http://www.linuxtv.org/wiki/index.php/Main_Page> for more
   information.
@@ -857,16 +859,11 @@
 
   [1m3.1.5.4.  HDTV.[0m
 
-  Currently there are two HDTV card with Linux drivers which are known
-  to operate in the United States - the HD-2000/HD-3000 cards available
-  from http://www.pchdtv.com/ <http://www.pchdtv.com/> or
-  http://mythic.tv/ <http://mythic.tv/> and the Air2PC-ATSC-PCI
-  available from
-  http://www.cyberestore.com/product_info.php?cPath=28&products_id=103
-  <http://www.cyberestore.com/product_info.php?cPath=28&products_id=103>
-  or http://mythic.tv/ <http://mythic.tv/>.
-
-  The Air2PC is supported using the linux-dvb drivers.
+  There are a number of HDTV card with Linux drivers which are known to
+  operate in the United States; a complete list of cards with DVB
+  drivers can be found at
+  http://www.linuxtv.org/wiki/index.php/ATSC_cards
+  <http://www.linuxtv.org/wiki/index.php/ATSC_cards>
 
   To playback HDTV content, plan on a powerful CPU.  "How powerful?"
   depends on a number of factors, such as the capture resolution,
@@ -883,7 +880,9 @@
 
   [1m3.1.5.5.  Firewire.[0m
 
-  You may use the Firewire output of the DCT6200 or the SA3250.
+  You may use the Firewire output of the Motorola DCT6200 or the SA3250.
+  If your provider uses 5C encryption on a particular channel, you won't
+  be able to get any content.
 
 
   [1m3.1.5.6.  DBoxII or other devices running Neutrino[0m
@@ -912,8 +911,9 @@
      cards (no driver - this is not the PVR-250/350 series of cards
      supported by the IvyTV driver)
 
-  +o  Hauppauge WinTV-PVR-USB2 (driver available at
-     http://justiceforall.free.fr/pvrusb2.html, no MythTV support)
+
+  +o  Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net
+     no MythTV support)
 
   +o  ATI All-in-Wonder series
 
@@ -969,7 +969,7 @@
   extensions. If your card does not support XV, color conversion and
   scaling will be performed by your CPU rather than the video card.
   This is very CPU and memory intensive and will often result in dropped
-  frames and a corresponding degradation of quality.  Check the XFree86
+  frames and a corresponding degradation of quality.  Check the X
   documentation for details if you are uncertain about your preferred
   card.  You may also run xvinfo; look for your video card to be listed
   as one of the adapters.
@@ -1003,9 +1003,10 @@
 
   [1m3.1.9.1.  ATI[0m
 
-  ATI makes many cards with TV-out capability, but ATI offers no
-  official support for their use with Linux. The standard XFree86 ati
-  driver does not support TV-out.
+  ATI makes many cards with TV-out capability, but only offers linux
+  drivers for Radeon 8500 and above cards.  See the Drivers and Software
+  section of http://www.ati.com <http://www.ati.com/> for the driver and
+  additional information.
 
   The enhanced ati.2 X driver created by the GATOS
   http://gatos.sourceforge.net <http://gatos.sourceforge.net> project
@@ -1034,6 +1035,11 @@
 
 
   [1m3.1.9.2.  Matrox[0m
+
+  [1mNOTE[22m: If updated information for the Matrox cards is not provided
+  prior to MythTV v0.20 I will assume that there is no interest and will
+  remove this section.
+
 
   The standard Matrox driver included with XFree86 does not support TV-
   out.
@@ -1068,16 +1074,20 @@
   [1m3.1.9.3.  NVIDIA[0m
 
   Some NVIDIA cards with TV-out can be run using the standard nv driver
-  in XFree86, combined with the userspace application [1mnvtv [22mto control
-  the TV-out port. See http://sourceforge.net/projects/nv-tv-out/
+  in X, combined with the userspace application [1mnvtv [22mto control the TV-
+  out port. See http://sourceforge.net/projects/nv-tv-out/
   <http://sourceforge.net/projects/nv-tv-out/> for details.  Recent
   versions of the NVIDIA driver have better support for overscan and
   other features useful with TV-Out, so the [1mnvtv [22mapplication may not be
   required.
 
   Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
-  available by NVIDIA. See http://www.nvidia.com/view.asp?IO=linux
-  <http://www.nvidia.com/view.asp?IO=linux> for more information.
+  available by NVIDIA. See http://www.nvidia.com/object/unix.html
+  <http://www.nvidia.com/object/unix.html> for more information.
+
+  [1mNOTE[22m:  It's strongly recommended that you use the proprietary NVIDIA
+  drivers; they have excellent support for XvMC and ship with a good
+  configuration utility.
 
   Specific cards:
 
@@ -1102,7 +1112,6 @@
 
   +o  Savage 2000 AGP. Has Composite and SVideo ports. Does not support
      XVideo.
-
 
   +o  S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
 
@@ -1160,6 +1169,7 @@
   +o  TVIEW Gold (mentioned once, favorably)
 
 
+
   [1m3.2.  Software[0m
 
   There are a few ways of installing programs on Linux systems; you can
@@ -1193,10 +1203,18 @@
   to perform.  See your package documentation.
 
 
-  [1m3.2.1.1.  Red Hat Linux/Fedora Core[0m
+  [1m3.2.1.1.  Red Hat Linux / Fedora Core[0m
 
-  Red Hat Linux and Fedora Core 3 packages for MythTV and all of its
-  add-on modules and some themes have been packaged by
+  The definitive documentation on installing MythTV on Red Hat Linux /
+  Fedora Core can be found in Jarod Wilson's (mailto:jcw@wilsonet.com
+  <mailto:jcw@wilsonet.com>) HOWTO at http://wilsonet.com/mythtv/
+  <http://wilsonet.com/mythtv/> Just like 3rd-party packages, any 3rd-
+  party documentation problems should be brought up with the 3rd-parties
+  (maintainer, lists, bugzillas etc.).  The installation instructions
+  which follow should be used as a guide only; refer to Jarod's guide.
+
+  Red Hat Linux and Fedora Core packages for MythTV and all of its add-
+  on modules and some themes have been packaged by
   mailto:Axel.Thimm@ATrpms.net <mailto:Axel.Thimm@ATrpms.net> and are
   available at http://ATrpms.net/topic/multimedia/
   <http://ATrpms.net/topic/multimedia/>. All of the prerequisites for
@@ -1242,19 +1260,52 @@
   they set up your MythTV database. Check ATrpms
   <http://ATrpms.net/topic/multimedia/> for the drivers you need.
 
-  Further documentation on using ATrpms packages can be found in Jarod
-  Wilson's (mailto:jcw@wilsonet.com <mailto:jcw@wilsonet.com>) HOWTO at
-  http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> Just like
-  3rd-party packages, any 3rd-party documentation problems should be
-  brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
 
+  [1m3.2.1.2.  Mandriva[0m
 
-  [1m3.2.1.2.  Mandrake[0m
-
-  Thac has created RPMs for MythTV for Mandrake 9.0 and above which may
+  Thac has created RPMs for MythTV for Mandriva 9.0 and above which may
   be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If
   you have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
+
+  [1m3.2.1.3.  Debian[0m
+
+  Debian packages for MythTV and most of its add-on modules are
+  maintained by Christian Marillat mailto:marillat@free.fr
+  <mailto:marillat@free.fr> and are available at
+  http://debian.video.free.fr/ <http://debian.video.free.fr/>.
+  Installation instructions can be found on those pages as well. All of
+  the prerequisites for MythTV are available as Debian packages, most of
+  them from the official Debian archive.
+
+  If you have followed the instructions on the above page you should
+  have added
+
+
+       deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+
+
+
+  to your /etc/apt/sources.list file.  Running [1mapt-get update [22mand then
+  executing [1mapt-get build-dep mythtv [22mshould install all the pre-
+  requisites required to compile MythTV.
+
+
+
+   [1mNOTE[22m:  Due to the requirement for Qt 3.1+, there are no packages for
+  Debian woody/stable.
+
+
+  The Debian packages are configured such that MythTV programs should be
+  run as the mythtv user, which is automatically created during
+  installation.  This user has access to write new recordings to disk in
+  the default directory, read and write the database, access the audio
+  and video devices, and everything else that MythTV needs to do.
+
+
+  See /usr/share/doc/[4mpackagename[24m/README.Debian for more information,
+  including copies of the MythTV documentation.  The mythtv-doc package
+  contains a copy of this HOWTO in /usr/share/doc/mythtv-doc.
 
   [1m3.2.2.  Manual installation[0m
 
@@ -1263,12 +1314,12 @@
   done, and it all depends on your comfort level with Linux.
 
   In order to compile MythTV, we need to make sure that the software it
-  needs is installed.  As of 2003-03-15, this list includes [1mmysql[22m, [1mgcc[22m,
-  [1mfreetype2-devel[22m, [1mXFree86-devel[22m, [1mqt-devel [22mand [1mlame[22m.  If you're going to
-  use a remote control with MythTV, you're going to need the [1mcdialog[0m
-  package in order to compile [1mlircd [22mif your distribution doesn't have a
-  pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
-  [1mperl[22m.
+  needs is installed.  As of 2006-01-17, this list includes [1mmysql[22m, [1mgcc[22m,
+  [1mfreetype2-devel[22m, [1mxorg-xserver-devel[22m, [1mqt-devel [22mand [1mlame[22m.  If you're
+  going to use a remote control with MythTV, you're going to need the
+  [1mcdialog [22mpackage in order to compile [1mlircd [22mif your distribution doesn't
+  have a pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you
+  will need [1mperl[22m.
 
 
   ______________________________________________________________________
@@ -1284,7 +1335,11 @@
 
   [1m3.2.3.  Graphical installation tools[0m
 
-  [1m3.2.3.1.  Mandrake[0m
+  [1m3.2.3.1.  Mandriva[0m
+
+  [1mNOTE[22m:  As of 2006-01-17 the following section should be considered out
+  of date.  If no updates are submitted prior to the release of v0.20,
+  they will be considered abandoned and removed from the HOWTO.
 
   On systems running KDE, a tool which will allow you to see what
   packages are available and if they're installed on your system can be
@@ -1300,6 +1355,7 @@
   some are a part of the apache web server, others are a part of the
   perl distribution.  In each case, we're looking to make sure that the
   primary module is getting installed.
+
 
   Click the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your
   search term.  You should find it under the "Perl" folder.  You need at
@@ -1322,7 +1378,7 @@
 
 
 
-    NOTE for Mandrake users:  In versions after Mandrake 9.1, Mandrake
+    NOTE for Mandriva users:  In versions after Mandriva 9.1, Mandriva
   removed the MySQL modules from the default installation.  Ensure that
   you install libqt3-mysql.
 
@@ -1344,7 +1400,7 @@
   from the command line.
 
 
-  [1m3.2.4.1.  Mandrake[0m
+  [1m3.2.4.1.  Mandriva[0m
 
   [1murpmi [22mis the simplest tool for installation of packages from the
   command line, but properly configuring it can be difficult.  The
@@ -1356,26 +1412,21 @@
   you will be able to load the lame library without compiling from
   source.
 
-
-  [1m3.2.4.1.1.  Mandrake 9.0[0m
-
-  The simplest tool for installing packages from the command line is
-  [1murpmi[22m.
-
   Open a shell, and execute the following, all on the same line. You may
   get asked a number of questions regarding dependencies.  It's best to
   answer "YES".
 
 
-       $ su
-       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-       # urpmi XFree86-devel perl
-       # urpmi libqt3-devel
+
+  $ su
+  # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+  # urpmi XFree86-devel perl
+  # urpmi libqt3-devel
 
 
 
   ______________________________________________________________________
-  NOTE for Mandrake 9.1+ users: execute the following command.
+  NOTE for Mandriva 9.1+ users: execute the following command.
 
   # urpmi libqt3-mysql
   ______________________________________________________________________
@@ -1418,12 +1469,34 @@
   MythTV.  To enable SQL support, add "mysql" to your USE variable in
   /etc/make.conf and rebuild Qt by running
 
-  # emerge qt
+
+       # emerge qt
 
 
 
   All the necessary files will be downloaded and built. Even on a fast
   machine this may take a lot of time if you need to do a full Qt build.
+
+
+  [1m3.2.4.3.  Debian.[0m
+
+  Build-dependencies for MythTV can be satisfied by adding the following
+  to your /etc/apt/sources.list
+
+
+       # Christian Marillat's packages (mplayer, lame)
+       deb ftp://ftp.nerim.net/debian-marillat/ sid main
+       deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+
+
+
+  and executing:
+
+
+       # apt-get build-dep mythtv
+       # apt-get source mythtv --compile
+
+
 
   [1m4.  System Configuration Requirements for Compiling MythTV.[0m
 
@@ -1454,10 +1527,10 @@
   Subsequent sections of this chapter address the few oddities that you
   may have to adjust by hand before you compile MythTV.
 
-  The reference compilation system for MythTV is Debian.
+  The reference compilation system for MythTV is Ubuntu.
 
 
-  [1m4.2.  Shared-Library Requirements for MythTV[0m
+  [1m4.2.  Shared-Library requirements for MythTV[0m
 
   [1m4.2.1.  Modifying /etc/ld.so.conf[0m
 
@@ -1481,7 +1554,7 @@
 
 
 
-  [1m4.3.  Environment variable Requirements for MythTV[0m
+  [1m4.3.  Environment variable requirements for MythTV[0m
 
   [1m4.3.1.  General requirements[0m
 
@@ -1507,7 +1580,7 @@
 
 
 
-  For Mandrake, you should see a value like /usr/lib/qt3 for QTDIR and
+  For Mandriva, you should see a value like /usr/lib/qt3 for QTDIR and
   /usr/lib/qt3/bin should be in $PATH.
 
   For Gentoo, you should see a value like /usr/qt/3 for QTDIR and
@@ -1524,16 +1597,16 @@
 
   [1m4.3.2.  Distribution-Specific Notes[0m
 
-  [1m4.3.2.1.  Mandrake[0m
+  [1m4.3.2.1.  Mandriva[0m
 
-  The following instructions work for Mandrake using [1mbash [22mas the shell,
+  The following instructions work for Mandriva using [1mbash [22mas the shell,
   and may be applicable for a distribution which uses /etc/profile.d.
 
 
 
-          [1mNOTE[22m:  Mandrake 10 installs a /etc/profile.d/qtdir3.sh
+          [1mNOTE[22m:  Mandriva 10 installs a /etc/profile.d/qtdir3.sh
   file, but it doesn't include the addition of the PATH variable.  If
-  you're running Mandrake 10, don't create a mythtv.sh file as detailed
+  you're running Mandriva 10, don't create a mythtv.sh file as detailed
   below; edit the qtdir3.sh file and add the PATH statement within the
   if / fi block.  As root, create the following file in /etc/profile.d
   The example filename is "mythtv.sh". Use what you feel is appropriate.
@@ -1563,6 +1636,8 @@
 
   [1m4.3.2.2.  Red Hat Linux 9[0m
 
+  [1mNOTE[22m: This section will be considered abandoned as of v0.20.
+
   Red Hat Linux 9 use a default locale with UTF-8 encoding.
   Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a
   result, whenever you run setup or mythfilldatabase you will get a lot
@@ -1573,65 +1648,6 @@
   bugs.
 
 
-  [1m4.3.2.3.  Debian[0m
-
-  Debian source packages are available from the same place as the binary
-  packages.  These can be used to build customized packages, and to
-  automatically satisfy MythTV's build-time dependencies.
-
-
-
-  [...]
-  sh-2.05b# cd /tmp
-  sh-2.05b# apt-get source mythtv
-  Reading Package Lists...
-  Building Dependency Tree...
-  Need to get 3085kB of source archives.
-  Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
-  Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
-  Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
-  Fetched 3085kB in 0s (8120kB/s)
-  dpkg-source: extracting mythtv in mythtv-0.11
-  sh-2.05b# cd mythtv-0.11
-  [customize settings.pro, etc.]
-  [edit debian/changelog and increment the version number]
-  sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
-  [...]
-  dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
-  dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
-  dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
-  dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
-   dpkg-genchanges -b
-  dpkg-genchanges: binary-only upload - not including any source code
-  dpkg-buildpackage: binary only upload (no source included)
-  sh-2.05b# ls -l ../*.deb
-  -rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
-  -rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
-  -rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
-  -rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
-  -rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
-  -rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
-  -rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
-  -rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
-
-
-
-  If building from [1msubversion [22minstead of the source package, then the
-  QTDIR environment variable must be set when building.  On Debian
-  unstable, QTDIR should be set to /usr/share/qt3.  Edit the
-  /etc/profile file using your favorite text editor and add something
-  like:
-
-
-       PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
-       QTDIR="/usr/share/qt3"
-       .
-       .
-       .
-       export PATH QTDIR
-
-
-
   [1m4.3.3.  Device Permissions[0m
 
   MythTV will need access to the video4linux devices on your system.  By
@@ -1640,8 +1656,7 @@
   from a script rather than an interactive terminal session you will
   need to make some adjustments.
 
-  [1mNOTE[22m: The following instructions are accurate for Mandrake.
-
+  [1mNOTE[22m: The following instructions are accurate for Mandriva.
 
   Check for a file called /etc/security/console.perms.  Open the file in
   your favorite text editor and look for a line that has:
@@ -1668,8 +1683,8 @@
   to download the latest release in tarball format and compile.  The
   tarball release of MythTV should work on a wide variety of systems and
   should be the preferred method for new users.  If you wish to use the
-  [1msubversion [22mcopy of MythTV you may obtain it from http://cvs.mythtv.org
-  <http://cvs.mythtv.org>
+  [1msubversion [22mcopy of MythTV you may obtain it from http://svn.mythtv.org
+  <http://svn.mythtv.org>
 
 
 
@@ -1691,16 +1706,11 @@
   <http://xmltv.sourceforge.net>.  Download the latest version (0.5.39).
 
 
-
   ______________________________________________________________________
-  NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
+  NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
   next step and type:
 
   # urpmi libmp3lame0 libmp3lame0-devel
-
-  NOTE for Red Hat users: If you are installing with apt or yum, you may skip
-  this step, it will be taken care of. Otherwise get lame and lame-devel from
-  <url url="http://ATrpms.net/name/lame/" name="http://ATrpms.net/name/lame/">.
 
   After downloading, be sure to install both:
   # rpm -Uvh lame*
@@ -1718,13 +1728,13 @@
   Open a shell and switch to the directory where you saved lame.
 
 
-       $ tar -xzf lame-3.93.1.tar.gz
-       $ cd lame-3.93.1
-       $ ./configure
-       $ make
-       $ make test
-       $ su
-       # make install
+  $ tar -xzf lame-3.93.1.tar.gz
+  $ cd lame-3.93.1
+  $ ./configure
+  $ make
+  $ make test
+  $ su
+  # make install
 
 
 
@@ -1755,16 +1765,17 @@
   page has a list of all the dependent packages you must download and
   install.
 
-  # rpm -Uvh xmltv* perl*
+
+       # rpm -Uvh xmltv* perl*
 
 
 
   If you install from this location you may skip to ``Manually building
   MythTV''.
 
-  [1m5.2.2.  Mandrake[0m
+  [1m5.2.2.  Mandriva[0m
 
-  RPMs for [1mXMLTV [22mand all of its dependencies are located in Mandrake's
+  RPMs for [1mXMLTV [22mand all of its dependencies are located in Mandriva's
   "contrib".  If you have added a contrib mirror, try installing [1mXMLTV[22m:
 
 
@@ -1772,12 +1783,13 @@
 
 
 
-  If this does not work, it is possible that contrib for your Mandrake
+  If this does not work, it is possible that contrib for your Mandriva
   version does not have [1mXMLTV[22m, so you may install the XMLTV prerequi-
   sites by typing:
 
 
-       # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+
+  # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 
 
 
@@ -1815,6 +1827,8 @@
 
        $ cd xmltv-0.5.39
        $ perl Makefile.PL
+
+
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
   to the grabber required for your location.
@@ -1880,6 +1894,7 @@
   to obtain the latest version of MythTV:
 
 
+
        $ mkdir mythtv
        $ cd mythtv
        $ svn co http://svn.mythtv.org/svn/trunk/mythtv
@@ -1896,14 +1911,9 @@
        $ cd mythtv-0.18.1
        $ ./configure
 
-
-
-  As of MythTV version 0.18, there is no need to edit the settings.pro
-  file to set compile-time options.  The [1mconfigure [22mscript will configure
-  MythTV appropriately for your system.  If you wish to change options,
-  run [1m./configure --help [22mto see what is available and to override and
-  automatically detected options.  See the config.log file after running
-  [1mconfigure [22mto see previous runs.
+  If you wish to change options, run [1m./configure --help [22mto see what is
+  available and to override and automatically detected options.  See the
+  config.log file after running [1mconfigure [22mto see previous runs.
 
   On a single CPU machine, you would type the following to compile
   MythTV:
@@ -1967,34 +1977,33 @@
   the MythTV directory that you cd'd to above.
 
 
-
   [1m5.4.1.  Enabling real-time scheduling of the display thread.[0m
 
-  MythTV supports real-time scheduling of the video output thread.
-  There are three ways to go about eanbling this: You can use rlimits,
-  you can use the realtime security module, or on older systems you can
-  SUID the executable. Enabling real-time scheduling is optional, but
-  can make the video display more smooth, especially if you are decoding
-  HDTV.
+  MythTV supports real-time scheduling of the video output thread. There
+  are three ways to go about enabling this: You can use rlimits, you can
+  use the realtime security module, or on older systems you can SUID the
+  executable. Enabling real-time scheduling is optional, but can make
+  the video display smoother, especially if you are decoding HDTV.
 
 
-  [1m5.4.1.1.  1. rlimits[0m
+  [1m5.4.1.1.  rlimits[0m
 
   The rlimits method is the preferred method and is included in Linux
-  2.6.12 and above. Unfortunately, you need PAM version 0.76-8 or above,
+  2.6.12 and above. Unfortunately, you need PAM version 0.79 or above,
   which may not be supported by your distribution yet. Assuming anyone
-  running mythfrontend is in the audio group and rlimits are supported,
-  all you need to do is place this in your /etc/security/limit.conf
-
-
-       *               -       rt_priority     0
-       *               -       nice            0
-       @audio          -       rt_priority     50
-       @audio          -       nice            0
+  running [1mmythfrontend [22mis in the audio group and rlimits are supported,
+  all you need to do is place this in your /etc/security/limits.conf
 
 
 
-  [1m5.4.1.2.  2. realtime module[0m
+       *               -       rtprio     0
+       *               -       nice       0
+       @audio          -       rtprio     50
+       @audio          -       nice       0
+
+
+
+  [1m5.4.1.2.  realtime module[0m
 
   The second option is to use the Linux realtime kernel module.  This is
   will be phased out over time, but is currently supported by many
@@ -2008,9 +2017,9 @@
 
 
   You may also need to install the realtime module, using your distribu-
-  tion's realtime package. Assuming the users who will be running myth-
-  frontend will be in the audio group you can get GUID of a named group
-  like so:
+  tion's realtime package. Assuming the users who will be running [1mmyth-[0m
+  [1mfrontend [22mwill be in the audio group you can get the GUID of a named
+  group like so:
 
 
        $ grep audio /etc/group
@@ -2018,21 +2027,21 @@
 
 
   If the number printed out from the grep was 18, you can now load this
-  module as root before starting mythfrontend like so:
+  module as root before starting [1mmythfrontend[22m:
 
 
        # modprobe realtime gid=18
 
 
 
-  [1m5.4.1.3.  3. run as root option (not safe)[0m
+  [1m5.4.1.3.  run as root option (not safe)[0m
 
-  The final and least preferred option is to set the sticky bit of the
-  mythfrontend executable. This [1mopens a security hole[22m, but is the only
+  The final and least preferred option is to set the sticky bit on the
+  [1mmythfrontend [22mexecutable. This [1mopens a security hole[22m, but is the only
   option on systems that do not support either rlimits or the realtime
   module. This does not work on modern distributions either, and is [4mnot[0m
   [4mrecommended[24m on any system connected to the internet. This may also
-  make it impossible to debug MythTV without running gdb as root. If you
+  make it impossible to debug MythTV without running [1mgdb [22mas root. If you
   would still like to do this, you just need to run this as root:
 
 
@@ -2056,7 +2065,6 @@
 
   You do NOT need to run the MythTV setup program on your frontend
   machine
-
 
   Other than the exclusion of the MySQL server and XMLTV, the MythTV
   compilation procedure is the same as when you're setting up both a
@@ -2100,10 +2108,10 @@
 
   [1m6.1.  Distribution-specific information[0m
 
-  [1m6.1.1.  Mandrake[0m
+  [1m6.1.1.  Mandriva[0m
 
   If this is the system maintaining the database, make sure that MySQL
-  is running and started at boot.  Click on Mandrake Control
+  is running and started at boot.  Click on Mandriva Control
   Center->System->Services, find MySQL and click the "On Boot" button
   and the "Start" button if the MySQL status shows that it isn't running
   yet.
@@ -2118,6 +2126,8 @@
        # chkconfig --level 35 mysql on
        # /etc/rc.d/init.d/mysql start
        # exit
+
+
 
   [1m6.1.2.  Red Hat Linux and Fedora Core[0m
 
@@ -2154,7 +2164,7 @@
 
 
 
-  [1m6.2.1.  Mandrake and Red Hat Linux/Fedora Core[0m
+  [1m6.2.1.  Mandriva and Red Hat Linux/Fedora Core[0m
 
 
 
@@ -2199,10 +2209,9 @@
   you're in a controlled environment.  This example has no security at
   all, and allows access from any host.
 
-
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-       mysql> flush privileges;
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+  mysql> flush privileges;
 
 
 
@@ -2217,7 +2226,8 @@
 
 
 
-  Finally, if you just want to restrict by IP subnet:
+  Finally, if you just want to restrict by IP subnet (in this example,
+  the 192.168.1. network):
 
 
        $ mysql -u root mythconverg
@@ -2253,9 +2263,9 @@
 
   [1m7.1.  Graphically setting up the mixer[0m
 
-  [1m7.1.1.  Mandrake and Red Hat Linux/Fedora Core[0m
+  [1m7.1.1.  Mandriva and Red Hat Linux/Fedora Core[0m
 
-  Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
+  Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandriva, or
 
   RedHat Menu>Sound & Video>Volume Control
 
@@ -2273,8 +2283,10 @@
   "ON"; this insures that the Line-in is used as the source.  Click OK,
   and make sure that you save the settings so that this is your default.
 
-
   [1m7.1.1.1.  Using OSS drivers.[0m
+
+  [1mNOTE[22m: This section will be removed in 0.20.  ALSA is the kernel sound
+  driver now.
 
   Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather
   than the ALSA drivers recommended by the MythTV team. The OSS drivers
@@ -2285,7 +2297,7 @@
   cards.  Full duplex is required if you want to record and play sound
   using just one sound card. ALSA has good full-duplex support, and also
   has drivers for some built-in (motherboard) sound cards that OSS does
-  not.  Installing ALSA is less painful than you might think, so if OSS
+  not. Installing ALSA is less painful than you might think, so if OSS
   does not work for you, installing ALSA is not too difficult. For those
   of you who do not wish to install ALSA you must do this:
 
@@ -2298,7 +2310,6 @@
   (on the far left) is up. Also make sure that the "line in" section has
   "mute" and "record" checked and that the gain is turned up. You may
   have to experiment with volume/gain levels to get the best sound.
-
 
   [1m7.1.1.2.  Using ALSA.[0m
 
@@ -2324,7 +2335,6 @@
   ______________________________________________________________________
   Note the spelling in the following commands.
   ______________________________________________________________________
-
 
 
        $ amixer set Master,0 100%,100% unmute
@@ -2373,7 +2383,7 @@
 
 
 
-            [1mNOTE[22m: If you are running Mandrake, you may install
+            [1mNOTE[22m: If you are running Mandriva, you may install
   [1mlirc [22mby executing: # urpmi lirc lirc-remotes and bypass the manual
   compilation steps described below by jumping to the ``Completing the
   lirc install'' section. See the contrib/mandrake91.etc.sysconfig.lircd
@@ -2389,14 +2399,14 @@
   To install lirc on Gentoo, all you need to do is:
 
 
-       # emerge lirc
+  # emerge lirc
 
 
 
-  [1m8.2.  Mandrake[0m
+  [1m8.2.  Mandriva[0m
 
-  lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
-  the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
+  lircd has two prerequisites:  [1mdialog[22m, available in Mandriva through
+  the "cdialog" RPM, and the kernel source.  Mandriva 9.0 is using the
   2.4.19 kernel, so either install the kernel sources from the
   installation CD or go to http://www.kernel.org <http://www.kernel.org>
   and download the full 2.4.19 tar file from
@@ -2427,6 +2437,7 @@
        # exit
 
 
+
   [1m8.4.  Obtaining and compiling lirc[0m
 
   You're going to need to download and compile [1mlircd[22m.  Go to
@@ -2447,7 +2458,6 @@
   menu comes up, perform the configuration by going to Driver Configura-
   tion->Other Serial Port Devices->Pinnacle Systems Receiver->OK and on
   the next page select COM1->OK.
-
   Each remote is different; some remote receivers connect directly to
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
@@ -2490,6 +2500,8 @@
 
        crw-------    1 root     root      61,   0 Dec 31  1969 lirc
 
+
+
   Some IR receivers (including some homebrew units) use a character
   device as their data interface as opposed to a link to a serial port.
   If the make install step has created a character device for you, don't
@@ -2505,11 +2517,12 @@
   use ttyS1, etc.
 
 
-       $ su
-       # cd /dev
-       # ln -sf ttyS0 lirc
-       # exit
-       $
+
+  $ su
+  # cd /dev
+  # ln -sf ttyS0 lirc
+  # exit
+  $
 
 
 
@@ -2546,7 +2559,7 @@
 
 
 
-      [1mNOTE to Mandrake 9.1 users[22m: skip to the manual start paragraph
+      [1mNOTE to Mandriva 9.1 users[22m: skip to the manual start paragraph
   below.
 
   If the lirc configure program / compile did not mention anything about
@@ -2569,7 +2582,7 @@
 
 
 
-  Next, we're going to manually start lircd the first time.  Mandrake
+  Next, we're going to manually start lircd the first time.  Mandriva
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
 
@@ -2580,7 +2593,7 @@
   If this fails, complaining of a missing lircd.conf file, then you must
   find or make one. First look for a pre-made configuration file at
   http://lirc.sourceforge.net/remotes/
-  <http://lirc.sourceforge.net/remotes/>.  Mandrake 9.1 users, look in
+  <http://lirc.sourceforge.net/remotes/>.  Mandriva 9.1 users, look in
   /usr/share/lirc-remotes. If you find one your remotes either on the
   website or in /usr/share, download or copy the file, name it
   lircd.conf and put it in your /etc directory. If you couldn't find
@@ -2606,13 +2619,12 @@
   now try to start lircd again:
 
 
-
-  # /usr/local/sbin/lircd
+       # /usr/local/sbin/lircd
 
 
 
   Now, we're going to add the commands necessary for lircd to run each
-  time we boot. Mandrake 9.1 users, you can execute:
+  time we boot. Mandriva 9.1 users, you can execute:
 
 
        $ su
@@ -2682,7 +2694,6 @@
        $ irxevent &
 
 
-
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control unless you're using native lirc support.
 
@@ -2724,20 +2735,19 @@
   my /home/[yourusername]/.lircrc file:
 
 
+       begin
+           prog = irxevent
+           button = channel+
+           repeat = 3
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel+
-      repeat = 3
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = channel-
-      repeat = 3
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           repeat = 3
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2787,20 +2797,19 @@
   kernel module you might see the following message during make:
 
 
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
-
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
 
 
@@ -2811,8 +2820,6 @@
 
        $ su
        # make install
-
-
 
   You will notice that lirc installs the kernel module in
   /lib/modules/uname -a/misc.
@@ -2851,6 +2858,8 @@
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
 
+
+
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
 
@@ -2866,16 +2875,17 @@
   parent file descriptors before they start.
 
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
 
 
@@ -2892,20 +2902,6 @@
   By this point, all of the compile-time prerequisites have been
   installed, [1mmysql [22mis running and has had its initial database setup.
   It's now time to configure MythTV.
-
-
-
-      [1mNOTE[22m:  If you're running Debian unstable and you have compiled
-  MythTV from source, you will need to install an additional package
-  before you will be able to run MythTV.  Execute the following to
-  install the MySQL driver for QT.
-
-
-       $ su -
-       # apt-get install libqt3c102-mt-mysql
-       # exit
-
-
 
   [1m9.1.  Configuring the Master backend system[0m
 
@@ -2970,8 +2966,9 @@
   or may not work.  Add the following to /etc/my.cnf on the backend
   machine and restart MySQL.
 
-  skip-innodb
-  set-variable=thread_stack=256k
+
+       skip-innodb
+       set-variable=thread_stack=256k
 
 
 
@@ -2999,6 +2996,7 @@
   1. General
 
   2. Capture Cards
+
 
   3. Video Sources
 
@@ -3066,7 +3064,6 @@
 
   Once you have no additional cards to setup, press ESC.
 
-
   [1m9.1.3.  Video Sources[0m
 
   When you start, the highlight should be on (New Video Source).  Press
@@ -3133,7 +3130,6 @@
   is actually available on the device.
 
 
-
         [1mNOTE[22m:  If you have a Hauppauge PVR-500, you must think of
   it has two PVR-150's on a single PCI card.  For example, if you have a
   single PVR-500 card, it will appear as /dev/video0 and /dev/video1.
@@ -3197,7 +3193,6 @@
        00:00:00 2004 (UTC)
 
 
-
   Once mythfilldatabase has finished, start the master server before
   continuing.
 
@@ -3213,24 +3208,23 @@
   As of MythTV v0.18.1, the available options are:
 
 
-
-  $ mythbackend --help
-  Valid options are:
-  -h or --help                   List valid command line parameters
-  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-  -p or --pidfile filename       Write PID of mythbackend to filename
-  -d or --daemon                 Runs mythbackend as a daemon
-  -v or --verbose debug-level    Prints more information
-                                 Accepts any combination (separated by comma)
-                                 of all,none,quiet,record,playback,channel,
-                                 osd,file,schedule,network,commflag,audio,
-                                 libav,jobqueue
-  --printexpire                  List of auto-expire programs
-  --printsched                   Upcoming scheduled programs
-  --testsched                    Test run scheduler (ignore existing schedule)
-  --resched                      Force the scheduler to update
-  --nosched                      Do not perform any scheduling
-  --version                      Version information
+       $ mythbackend --help
+       Valid options are:
+       -h or --help                   List valid command line parameters
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose debug-level    Prints more information
+                                      Accepts any combination (separated by comma)
+                                      of all,none,quiet,record,playback,channel,
+                                      osd,file,schedule,network,commflag,audio,
+                                      libav,jobqueue
+       --printexpire                  List of auto-expire programs
+       --printsched                   Upcoming scheduled programs
+       --testsched                    Test run scheduler (ignore existing schedule)
+       --resched                      Force the scheduler to update
+       --nosched                      Do not perform any scheduling
+       --version                      Version information
 
 
 
@@ -3258,6 +3252,7 @@
   defined on the master backend.  Modify the
   /usr/local/share/mythtv/mysql.txt file on all slave backends to ensure
   that the DBHostName has the address of the MySQL server.
+
 
   Make sure that the IP addresses on the General setup screen are
   accurate.  If the slave backend can't communicate with the master
@@ -3377,6 +3372,8 @@
   mythfrontend before using any other modules such as MythMusic, etc. to
   correctly initialize the database.
 
+
+
   [1m10.1.  General[0m
 
   The General screen has configuration items that don't really fit
@@ -3394,7 +3391,6 @@
   displayed on your system.  The help text will give you more
   information.  Move the focus to Next and press the space bar to
   continue.
-
 
   The final General page sets up some final configuration items.  See
   the help text for more information.
@@ -3452,7 +3448,7 @@
   the video image, including hiding the effects of an interlaced image
   or reducing the effects of noise in a poor video signal. The following
   is a brief introduction to introduce you to the filters that are
-  available in MythTV version 0.18.1.
+  available in MythTV version 0.19
 
   [1m10.4.2.  Applying filters[0m
 
@@ -3524,6 +3520,7 @@
          [1mNOTE[22m: This filter requires the frame rate to be doubled
   and therefore can only be used with the "Deinterlace Playback"
   checkbox.  Do not include this in your filter chain.
+
   o  The "kerneldeint" filter
 
   Kerneldeint is a more complex deinterlacing filter which applies a
@@ -3571,7 +3568,6 @@
 
   [1mNOTE[22m: If it is not already specified in the filter chain, this filter
   will be automatically applied when recording with the "bttv" driver.
-
   o  The "quickdnr" filter
 
   A fast temporal denoiser. This can take 1, 2 or 4 parameters, each
@@ -3587,7 +3583,6 @@
   A slower denoiser that applies a spatial and temporal low-pass filter.
   The spatial filter can remove some noise that quickdnr can't, but a
   more powerful CPU is needed.  This filter accepts 3 float parameters:
-
 
 
   +o  luma spatial filter strength
@@ -3634,6 +3629,7 @@
 
   While this exists in MythTV source code, it is currently not
   recommended for use.
+
 
 
   [1m10.4.4.  Usage Considerations[0m
@@ -3720,7 +3716,6 @@
 
   +o  Live TV
 
-
   +o  Low Quality
 
   +o  High Quality
@@ -3763,6 +3758,7 @@
   from the Xbox-Linux project site at http://xbox-linux.sf.net/
   <http://xbox-linux.sf.net/>. The program you need is part of the
   eds_i2c_staff module in CVS.  Note the spelling.
+
 
   Once you have installed [1mblink [22myou will need to set permissions.  [1mblink[0m
   needs write permission to the i2c device to function properly.  There
@@ -3823,26 +3819,8 @@
                 I     edit recording options from the EPG, "Program Finder", "Program Recording Priorities", or "Fix Scheduling Conflicts" screens. From the Playback and Delete screens, 'I' presents options for recorded shows such as Auto Expire or Stop Recording. Pressing 'I' while on the Recording Options screen will take you to the Advanced Recording Options screen.
 
 
+
   [1m11.1.2.  Watching TV or a recording[0m
-
-
-  [1m11.1.3.  Watching TV only[0m
-
-
-  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H           Channel history. Each repeat steps back through the previous channels.
-  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
-
-
-  [1m11.1.4.  LiveTV Browse Mode[0m
-
-
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
-
-
-  [1m11.1.6.  If you have two or more tuner cards[0m
-
 
 
   Up or down          keys change the channel
@@ -3901,11 +3879,17 @@
             Right     advance 1 frame
                 >     advance 1 second
 
-  [1m11.1.7.  Watching a recording only[0m
+
+  [1m11.1.3.  Watching TV only[0m
 
 
-  [1m11.1.8.  EPG[0m
 
+  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H           Channel history. Each repeat steps back through the previous channels.
+  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+
+  [1m11.1.4.  LiveTV Browse Mode[0m
 
 
              Left     browse program prior to current listed program
@@ -3919,6 +3903,9 @@
             ESC/O     Exit Browse mode
 
 
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
+
              Left     Move video to Left
             Right     Move video to Right
                Up     Move video Up
@@ -3929,9 +3916,15 @@
               ESC     Exit Zoom mode and return to original size
 
 
+  [1m11.1.6.  If you have two or more tuner cards[0m
+
+
   V           toggle Picture-in-picture on or off
   B           toggles the window focus (lets you change channels on the PiP window)
   N           swaps the two channels by changing channels on both cards
+
+
+  [1m11.1.7.  Watching a recording only[0m
 
 
       Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
@@ -3950,6 +3943,10 @@
                 Z     loads the commercial skip list (if one exists) into the cutlist
            C or Q     clear all cut points in the cutlist
                 I     Inverts the cutlist
+
+
+  [1m11.1.8.  EPG[0m
+
 
 
            Arrows     are used to move the highlighted program point around
@@ -3971,7 +3968,6 @@
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
 
 
-
                    Right     increases priority value
                     Left     decreases priority value
                        1     sorts by title
@@ -3979,6 +3975,7 @@
          Home/End            toggle sort priority
                        I     edit recording options
                      ESC     commits changes and exits
+
 
   [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
 
@@ -4013,6 +4010,7 @@
 
     M           change the view or to set a group password
     I           move a program from one Recording Group to another
+
 
 
   [1m11.1.14.  Watch Recordings Screen[0m
@@ -4077,28 +4075,15 @@
   section.
 
 
-  [1m11.3.  Adding DirecTV information to the database[0m
 
-  A script used to exist for adding DirecTV pay-per-view information
-  into the database.  As of 2005-04-01 this script no longer appears to
-  work, and this section will be removed from the HOWTO with the release
-  of 0.19.
-
-  A script for adding DirecTV information into the database has been
-  written by tarek Lubani  <mailto:tarek@tarek.2y.net> and is available
-  at http://tarek.2y.net/myth/ppv.pl <http://tarek.2y.net/myth/ppv.pl>.
-  This is currently an external user-supplied program, so if you have
-  issues with the script, please contact the author.
-
-
-  [1m11.4.  Adding DishTV information to the database[0m
+  [1m11.3.  Adding DishTV information to the database[0m
 
   A script for adding Pay Per View information into the MythTV database
   for DishTV subscribers is available at http://www.mythppv.com/
   <http://www.mythppv.com/>.
 
 
-  [1m11.5.  Adding support for an external tuner[0m
+  [1m11.4.  Adding support for an external tuner[0m
 
   MythTV supports changing the channel on an external tuner.  If you
   have an external tuner, such as a DirecTV or digital cable set top
@@ -4121,7 +4106,7 @@
   pinouts for RCA DSS receivers.
 
 
-  [1m11.6.  Using Shutdown/Wakeup[0m
+  [1m11.5.  Using Shutdown/Wakeup[0m
 
   What does the MythTV Shutdown/Wakeup function do? The scheduler on the
   Master backend (MBE) keeps track of the idle status of the entire
@@ -4151,13 +4136,12 @@
      <http://www.malloc.de/tools/wakeup_clock.html>
 
 
-  [1m11.6.1.  A deeper look into the operation[0m
+  [1m11.5.1.  A deeper look into the operation[0m
 
   The scheduler keeps track of the idle status of the MythTV system. To
   determine whether or not the MythTV system is idle, the following
   conditions must be met for a period of time defined in the "Idle
   timeout (secs)" parameter.
-
   +o  no client is connected to the server
 
   +o  no recording (neither LiveTV nor a regular recording) is currently
@@ -4186,7 +4170,7 @@
   required Slave backend, so all Slave backends will startup.
 
 
-  [1m11.6.2.  Setting up the MythTV side of this extension.[0m
+  [1m11.5.2.  Setting up the MythTV side of this extension.[0m
 
   There are a number of options that are used to control the Shutdown /
   Wakeup feature.
@@ -4258,7 +4242,7 @@
      wakeup all Slave backend systems.
 
 
-  [1m11.6.2.1.  Using WOL to wake your Master backend.[0m
+  [1m11.5.2.1.  Using WOL to wake your Master backend.[0m
 
   To use WOL to wake your Master backend you will need a WOL capable
   Master backend, a machine that runs 24/7 which can execute an at-job
@@ -4293,16 +4277,15 @@
   /etc/xinet.d/ directory:
 
 
-
-  service mythwake
-    {
-          socket_type     = stream
-          wait            = no
-          user            = mythtv
-          protocol        = tcp
-          id              = mythwake
-          server          = /usr/local/bin/mythwake
-    }
+       service mythwake
+         {
+               socket_type     = stream
+               wait            = no
+               user            = mythtv
+               protocol        = tcp
+               id              = mythwake
+               server          = /usr/local/bin/mythwake
+         }
 
 
 
@@ -4335,14 +4318,14 @@
   server!
 
 
-  [1m11.6.2.2.  Using BIOS wakeup to wake your Master backend.[0m
+  [1m11.5.2.2.  Using BIOS wakeup to wake your Master backend.[0m
 
   Since I don't use this, I cannot say much about this. If your
   motherboard supports any wakeup tool you have to call that tool as
   "Set wakeuptime command" with the "Wakeup time format" suitable for
   that tool.
 
-  [1m11.6.3.  Wakeup the MySQL server using WOL[0m
+  [1m11.5.3.  Wakeup the MySQL server using WOL[0m
 
   If your MySQL server and your Master backend are not on the same
   machine, you can have the Master backend wake your MySQL server using
@@ -4351,7 +4334,8 @@
   as discussed in "The WakeOnLan settings" above.
 
 
-  [1m11.6.4.  Tips/Tricks:[0m
+
+  [1m11.5.4.  Tips/Tricks:[0m
 
   If, for example, one of the Slave backends is also your desktop
   computer, you could simply use a little script as 'server halt
@@ -4386,10 +4370,12 @@
   find which showings you would like to record.
 
 
-  +o  Single Record -- record only this title at this specific time. This
-     is the best way to be sure that a certain showing is recorded.
-     However, if the TV listings change and the show is not broadcast at
-     that time, the show will not be recorded.
+  +o  Single Record -- record only this title at this specific time and
+     this station. This is the best way to be sure that a certain
+     showing is recorded. However, if the TV listings change and the
+     show is not broadcast at that time, the show will not be recorded
+     but will be marked as Not Listed to let you know that you should
+     investigate.
 
   +o  Find One -- this will record a title once from any of the times
      that appear in the TV listings. This is useful for recording a
@@ -4410,11 +4396,11 @@
      the showing that was selected when the rule was set. This is useful
      for news, current events or other programs where the same episode
      is shown several times each week but the listings may not include
-     descriptive information. This is not a good choice if there are
+     descriptive information. This may not be a good choice if there are
      different episodes shown during the week.
 
   +o  Record Daily -- this records a show whenever the title is listed
-     for the time and channel on any day of the week. Here again, a show
+     for the time and station on any day of the week. Here again, a show
      will not be recorded if the time was altered by the station.
 
   +o  Find Daily -- this will record a title once per day from any of the
@@ -4422,11 +4408,11 @@
      showing that was selected when the rule was set. This is useful for
      news, current events or other programs where the same episode is
      shown several times each day but the listings may not include
-     descriptive information. This is not a good choice if there are
+     descriptive information. This may not be a good choice if there are
      different episodes shown during the day.
 
   +o  Channel Record -- records a show anytime the title is listed on
-     this channel.  This is perhaps the most common rule to use for most
+     this station.  This is perhaps the most common rule to use for most
      shows.
 
   +o  Record All -- record this title on any channel at any time. This
@@ -4442,7 +4428,7 @@
   By default, all shows you select have equal value to the scheduler.
   There are a set of rules to make good choices when two or more shows
   are in conflict. However, priority values let the scheduler know what
-  you want so that it can set the schedule based on your preferences.
+  you prefer so that it can set the schedule based on your preferences.
 
   Initially all priority values are set to zero. You may choose to leave
   everything at "0" and let the scheduler follow rules to guess what you
@@ -4453,12 +4439,12 @@
   favorites are 2. good shows are 1 and extra 'filler' shows are all -1
   for example. You could sort each title on the "Set Priorities" to have
   a unique value so the scheduler can always know which show you'd
-  prefer verses any other show. The choice and style are entirely up to
+  prefer versus any other show. The choice and style are entirely up to
   you. However, the more information you give to the scheduler, the more
-  likely it will make the choices you would like in the first place.
+  likely it will make the choices you would prefer in the first place.
 
   The scheduler choices are based on the total priority for a showing by
-  adding up four different priority factors. By default, all of these
+  adding up four different priority factors. By default, most of these
   factors are "0" but you may use any combination to express your likes
   and needs.
 
@@ -4471,10 +4457,10 @@
   Per record type -- Setup->TV Settings->Recording Priorities->General
   allows you to add to the priority based on the type. It may make sense
   to increase the value for "Single" so that by default they have an
-  extra advantage over other shows. You may want to decrease the value
-  for Find rules so that they will be less likely to interfere with
-  regular shows and will be more likely to record in a non-conflicting
-  time instead.
+  extra advantage over other shows. The default is +1. You may want to
+  decrease the value for Find rules so that they will be less likely to
+  interfere with regular shows and will be more likely to record in a
+  non-conflicting time instead. The default is -1.
 
   Per channel -- Setup->TV Settings->Recording Priorities->Channel
   Priorities can be useful if you believe that you prefer any of the
@@ -4553,7 +4539,6 @@
   to record in any situation.
 
 
-
   [1m12.2.4.  Scheduling decisions[0m
 
   Here are the actual decisions made by the scheduler as it fills in the
@@ -4561,14 +4546,29 @@
 
 
   +o  Currently recording beats not currently recording -- A recording in
-     progress can not be moved so it "wins" it's current timeslot.
+     progress can not be moved to another input or time so it "wins" its
+     current timeslot.
+
+  +o  Single showing rules with no match are marked Not Listed -- If a
+     Single or Override do not match the current listings because the
+     listings have changed, they are added to the schedule and marked to
+     indicate that they will not record.
+
+  +o  Other record statuses beat Inactive or Repeat -- If two rules match
+     the same showing of a program, a rule marked as inactive or a
+     showing marked as a repeat yield to the other rule.
+
+  +o  More specific record type is used in place of less specific -- If
+     two rules match the same showing of a program, preference is given
+     to Don't Record then Override, Single, Find One, Record Weekly,
+     Find Weekly, Record Daily, Find Daily, Channel and finally All.
 
   +o  Higher total priority beats lower total priority -- This is the
      core of the scheduling process. Episodes of the highest priority
-     show are placed on the first available card then the next highest
-     priority and so on.
+     show are placed on the first available input followed by the next
+     highest priority show and so on.
 
-  +o  Future start time beats passed start time -- If there is an episode
+  +o  Future start time beats past start time -- If there is an episode
      in progress and also a later showing of the same episode, it is
      better to record the complete episode. If there isn't another
      showing, start recording now to record the remaining portion.  This
@@ -4586,16 +4586,25 @@
      start time -- This attempts to miss the least amount of time.
 
   +o  If neither start time has passed, earlier start time beats later
-     start time -- This rule help assure that the earliest showing of an
+     start time -- This helps assure that the earliest showing of an
      episode has the advantage.
 
   +o  Lower input id beats higher input id -- The scheduler fills in open
-     time slots on the first available card. The next cards is used when
-     there is another show already placed for the first card.
+     time slots on the first available input for the video source. The
+     next input is used when there is another show already placed for
+     the card of the first input.
 
   +o  Older record rule beats newer record rule -- If two shows are still
      equal after all of these other checks, the show whose record rule
      was added first is preferred over a more recent addition.
+
+
+  +o  Postpone showings to resolve conflicts -- If Reschedule Higher
+     Priorities is set or if a conflict has the same priority as a show
+     that was scheduled at the same time, the scheduler will check to
+     see if a scheduled show can be moved to another input or later
+     matching showing without creating a new conflict so that the
+     conflicting show can be scheduled to record.
 
 
   [1m12.2.5.  Reschedule Higher Priorities[0m
@@ -4606,7 +4615,7 @@
   scheduler will look for situations where a show cannot record because
   all inputs for the channel are used for higher priority shows. It will
   check to see if any of the other shows could be recorded at another
-  time so that the conflicting show can be recorded in it's place.
+  time so that the conflicting show can be recorded in its place.
 
   Generally, this is a good strategy but there are tradeoffs. If a
   higher priority show is postponed, you will not get to watch it until
@@ -4614,13 +4623,13 @@
   listings may change and the later showing may go away. In this rare
   case the higher priority show may never record. On the other hand, if
   you do not use this option you will miss recording some lower priority
-  shows unnecessarily unless you make similar these changes manually.
+  shows unnecessarily unless you manually make similar changes.
 
   By using Reschedule Higher Priorities, the scheduler will do a better
   job of recording as many of your shows as possible when left
   unattended. It will also be easy to see that shows have been marked to
   record at a later time.  You can then decide for yourself when you
-  would prefer to record the first showing.
+  would prefer to record the first showing by clicking "Record anyway".
 
 
   [1m12.2.6.  Controlling Your Schedule[0m
@@ -4639,19 +4648,20 @@
   in the upper right-hand corner will remind you when there are
   conflicts that would prevent one or more shows from being recorded.
 
-  The items in the list are colored white for things that will record,
-  gray for those that do not need to record and yellow when there is a
-  time conflict. Items at the top of the list may also be highlighted
-  indicating that the recording is in progress.
+  The items in the list are colored in the record color for things that
+  will record, white for things that may need attention, gray for those
+  that do not need to record and yellow when there is a time conflict.
+  Items at the top of the list may also be highlighted indicating that
+  the recording is in progress.
 
   Along with the channels, start times and titles, the right-hand column
   has a status code. Numbers indicate which card number has been
   assigned to record the show. Letters are used to indicate the reason
   that something will not be recorded. Just below the box is a short
   status message for the highlighted item that indicates the type of
-  record rule that was matched and a one or two word explanation of the
-  status code. If you press SELECT, you will see more information about
-  the status.
+  record rule that was matched, the "total priority" for this showing
+  and a one or two word explanation of the status code. If you press
+  SELECT, you will see more information about the status.
 
   There are a few status codes that may require your attention. "C"
   indicates that there are more overlapping shows to record than there
@@ -4661,10 +4671,10 @@
   your preferences. However, you may notice situations where you would
   like to modify the scheduler's initial choices.
 
-  The first thing you can do is to highlight an item and press INFO once
-  or twice to see the Recording Options page. From this page you can
-  change the record rule type, the duplicate matching rules, or raise or
-  lower the priority to resolve whatever problem you noticed.
+  The first thing you can do is to highlight an item and press INFO to
+  see the recording options page. From this page you can change the
+  record rule type, the duplicate matching rules, or raise or lower the
+  priority to resolve whatever problem you noticed.
 
   Additionally, you can treat any individual showing as an exception
   that you do want to record or don't want to record. To use these
@@ -4689,43 +4699,56 @@
   show will record. These changes would apply to this and all future
   showings that match this record rule.  "Add Override" will allow you
   to set options that apply to the specific showing without affecting
-  the existing record rule.
+  the recurring record rule.
 
   If you return to an override page after an override has already been
-  set, you will also see a "Clear override" to undo your changes. This
+  set, you will also see a "Clear Override" to undo your changes. This
   option makes it very easy to try out some "what if" attempts when
   deciding on your best strategy in a difficult situation.
+
+  For a recording in progress, there will be a "Change Ending Time"
+  button.  This will take you to the options page for a Single or
+  Override or create an Override if it is a recurring rule. Here you can
+  go to the Recording Options section to change the program end time
+  offset. If you extend the end time so that it overlaps upcoming
+  recordings, the schedule will change to accommodate the new end time.
+  This may cause a conflict or later showing even for a show with higher
+  priority. Therefore, it is a good idea to check your schedule after
+  changing the end time of a recording in progress.
 
 
   [1m12.3.  Storage Options[0m
 
   [1m12.3.1.  Recording Profile[0m
 
-  Each schedule can be configured with a different recording profile.
-  For example, important shows can be configured with a "High Quality"
-  profile, while "filler" shows can be configured with a "Low Quality"
-  profile. These recording profiles need to be configured first (see
-  ``Recording'', above).
+  Each recording rule can be configured with a different recording
+  profile.  For example, colorful cinematography can be configured with
+  a "High Quality" profile, while 'talking heads' interviews shows can
+  be configured with a "Low Quality" profile. These recording profiles
+  need to be configured before using them (see ``Recording'', above).
+
 
 
   [1m12.3.2.  Recording Group[0m
 
   For organization of the "Watch Recordings" screen and the MythWeb
-  interface, recordings can be grouped into "recording groups".
+  interface, recordings can be assigned into "recording groups".
 
 
-  [1m12.3.3.  Time Stretch[0m
+  [1m12.3.3.  Playback Group[0m
 
-  A default time stretch value can be configured for each schedule; this
-  value will automatically be applied when the recordings are played
-  back.
+  This selects a set of pre-configured playback parameters which can be
+  created and edited in Setup->TV Settings->Playback Groups.  When the
+  recording is played, the values from this playback group will be used.
+  This allows you to choose a default time stretch value, skip and jump
+  amounts appropriate for this type of television program.
 
 
   [1m12.3.4.  Auto-Expire[0m
 
   MythTV will "autoexpire" old recordings to make room for new
   recordings when disk space gets filled up. This option can be set to
-  "Don't allow auto expire" to prevent recordings from being
+  "Don't allow auto expire" to prevent these recordings from being
   automatically deleted when disk space fills up.
 
 
@@ -4745,9 +4768,8 @@
   An episode limit can also be configured to limit the maximum number of
   episodes recorded of a single series, to restrict that series' disk
   usage. If this is set, you can further decide what to do when this
-  limit is reached: either stop recording that series, or to delete the
+  limit is reached; either stop recording that series, or to delete the
   oldest episodes in favor of the new ones.
-
 
 
   [1m12.4.  Post Recording Processing[0m
@@ -4772,7 +4794,6 @@
   User Jobs allow you to configure up to 4 custom commands to run on
   recordings. They can be configured in mythtv-setup. The following
   tokens have special meaning when used in the User Job commands:
-
 
   +o  %DIR% - the directory component of the recording's filename
 
@@ -4814,26 +4835,22 @@
 
   [1m12.5.  Advanced Recording Options[0m
 
-  Creating Power Search rules with Custom Record
+  [1m12.5.1.  Creating Power Search rules with Custom Record MythTV's "Cus-[0m
+  [1mtom Record" feature gives you unlimited control for creating special-[0m
+  [1mized search recording rules to meet your needs. It allows you to[0m
+  [1mchoose your criteria to search for matching shows based on any of the[0m
+  [1minformation in the program listings, channel information, time func-[0m
+  [1mtions and more. This goes beyond the capabilities of any other DVR[0m
+  [1msystem and it is unlikely that this level of scheduling customization[0m
+  [1mwill ever be available in any commercial DVR system.[0m
 
-  MythTV's "Custom Record" feature gives you unlimited control for
-  creating specialized search recording rules to meet your needs. It
-  allows you to choose your criteria to search for matching shows based
-  on any of the information in the program listings, channel
-  information, time functions and more. This goes beyond the
-  capabilities of any other DVR system and it is unlikely that this
-  level of scheduling customization will ever be available in any
-  commercial DVR system.
+  [1m12.5.2.  Getting Started[0m
 
-
-  [1m12.5.1.  Getting Started[0m
-
-  Go to Schedule Recordings->Custom Record. This page, titled "Power
-  Search Recording Rule Editor", helps you build a database search one
-  clause at a time. Each added clause further limits which showings will
-  be matched in the TV listings data. You can test the search at any
-  time and when you are done, you can save your search as a recording
-  rule.
+  Go to Schedule Recordings->Custom Record. This page, helps you build a
+  database search one clause at a time. Each added clause further limits
+  which showings will be matched in the TV listings. You can test the
+  search at any time and when you are done, you can save your search as
+  a recording rule.
 
   To familiarize yourself with how you can create custom rules, create a
   simple rule to record "Nova" only in primetime.
@@ -4847,7 +4864,7 @@
   large text box should now show:
 
 
-            program.title = "Nova"
+            program.title = 'Nova'
 
 
 
@@ -4862,7 +4879,8 @@
   type a different title between the quotes. With a remote control, you
   can do 'cell phone' style text entry with the number pad. The delete
   key is the "X" in the grouping for "1", zero is grouped with "9" and
-  "0" acts as the "Caps Lock" key.
+  "0" acts as the "Caps Lock" key.  With MythTV version 0.19 or later,
+  you can press ENTER in the text box to popup a virtual keyboard.
 
   Note: the text box honors many familiar Emacs control keys. It is also
   possible to cut and paste text into the text box so you can edit with
@@ -4879,10 +4897,9 @@
   primetime". Click "Add this example clause". You should now see:
 
 
-
-              program.title = "Nova"
-              AND HOUR(program.starttime) >= 19
-              AND HOUR(program.starttime) < 23
+                   program.title = 'Nova'
+                   AND HOUR(program.starttime) >= 19
+                   AND HOUR(program.starttime) < 23
 
 
 
@@ -4897,13 +4914,18 @@
   settings". You now have a special rule to record "Nova" but only when
   it is shown in primetime.
 
+  You can make further modifications to this rule by returning to the
+  Custom Record page then press the right or left arrow keys on "Edit
+  Rule:" until you find "Nova". You can experiment and test but the
+  saved rule will not be updated until you click "Record" then "Save
+  these settings".
+
   To remove this, or any other rule, you can go to the "Recording
   Priorities" page, arrow down to the title, press Enter and change the
   the recording type to "Do not record this program" then "Save these
   settings".
 
-
-  [1m12.5.2.  How it Works[0m
+  [1m12.5.3.  How it Works[0m
 
   MythTV stores TV program information in a database and uses the
   Structured Query Language (SQL) to access the data. Information about
@@ -4911,14 +4933,14 @@
   each TV station you receive is stored in 'channel'. These two tables
   are used in the scheduler queries and their fields are available to be
   used in your rules. The rules you create are stored in 'record'.
-  Normal rules in MythTV simply match the title in the rule with the
-  titles in the 'program' table.
 
-  MythTV also has search rules for "Titles", "Keywords" and "People".
-  These store the key phrase in the description field of the rule and
-  includes them in specialized SQL replacements for the normal title
-  check. There is also a type called "Power Search" which takes the raw
-  SQL in the description as the replacement for title matching.
+  Normal rules in MythTV simply match the title in the rule with the
+  titles in the 'program' table. MythTV also has search rules for
+  "Titles", "Keywords" and "People". These store the key phrase in the
+  description field of the rule and includes them in specialized SQL
+  replacements for the normal title check. There is also a type called
+  "Power Search" which takes the raw SQL in the description as the
+  replacement for title matching.
 
   Custom Record is a tool to help you build valid SQL for Power Search
   rules.  You do not need to be a SQL expert to use Custom Record
@@ -4929,7 +4951,7 @@
   possibilities are limitless.
 
 
-  [1m12.5.3.  Common Tricks and Tips[0m
+  [1m12.5.4.  Common Tricks and Tips[0m
 
   The example clauses marked "complete example" are actual rules that
   have been used to address specific problems. You may find that some of
@@ -4968,8 +4990,6 @@
   their highest rated shows a dozen on more times per week. However, the
   scheduler only needs two or three choices to do a good job of making a
   flexible choice.
-
-
               program.title LIKE "Celebrity Fit Club%"
               AND DAYNAME(program.starttime) = "Sunday"
 
@@ -4982,11 +5002,11 @@
   Notice the word "LIKE" and the "%" at the end. This does wildcard
   matching so that this would match even if the title ended with "2".
   "III" or ":Revenge of the Snapple Lady". This can be useful where the
-  title may change from one season to the next like "Survivor%", "Big
+  title may change from one season to the next like "Survivor: %", "Big
   Brother%" or "The Amazing Race%".
 
 
-  [1m12.5.4.  Working with SQL[0m
+  [1m12.5.5.  Working with SQL[0m
 
   As you experiment, it is possible that you may misplace a quote or
   mistype a word. If there is a mistake when you press "Test" or
@@ -4999,14 +5019,15 @@
   "Date and Time Functions". There are many other good resources for SQL
   on the Web.
 
-  While the example clauses demonstrate how many of the data fields may
-  be used, you can get a more complete list of all the fields that are
+  While the example clauses demonstrate how to use many of the data
+  fields, you can get a more complete list of all the fields that are
   available by using a MySQL client program:
 
 
        $ mysql -u mythtv -pmythtv mythconverg
        mysql> describe program;
        mysql> describe channel;
+
 
 
   This will show the names of all of the fields along with their type
@@ -5033,7 +5054,6 @@
      date or if the show was marked as a repeat and did not have a date
      for the first airing. If this is "0" it usually means that this is
      a brand new show or a rebroadcast within the first two weeks.
-
   +o  "program.programid" is the Tribune Media Service database record
      identifier for each program description. In general, these start
      with a two letter prefix, MV, EP, SP or SH that correspond to the
@@ -5041,22 +5061,21 @@
      except EP where the last four digits are the episode number in the
      series. Note that these are generated by TMS and not the show's
      producers but they are usually in the same order as the original
-     air dates for the episodes. Detailed information can be found in
+     air dates for the episodes.  Detailed information can be found in
      the Data Direct documentation at http://labs.zap2it.com/
-     <http://labs.zap2it.com/> .
+     <http://labs.zap2it.com/>.
 
-     Finally, if you are doing something very experimental and a field
-     is not giving you the results you had anticipated, you can always
-     check the MythTV source code to see exactly how a field is used.
-     The open source for MythTV is available from http://www.mythtv.org/
-     <http://www.mythtv.org/> .
+  Finally, if you are doing something very experimental and a field is
+  not giving you the results you had anticipated, you can always check
+  the MythTV source code to see exactly how a field is used. The open
+  source for MythTV is available from http://www.mythtv.org/
+  <http://www.mythtv.org/> .
 
 
   [1m13.  MythPlugins.[0m
 
-  MythTV has a rich set of plugins available.  Beginning with MythTV
-  v0.18, a single tarball contains all of the plugins. Once you have
-  downloaded the tarball, untar it and run the [1mconfigure [22mscript:
+  MythTV has a rich set of plugins available.  Once you have downloaded
+  the tarball, untar it and run the [1mconfigure [22mscript:
 
 
 
@@ -5155,18 +5174,18 @@
   support.
 
 
-  [1m14.1.1.  Mandrake[0m
+  [1m14.1.1.  Mandriva[0m
 
-  Mandrake has [1mapache [22mand [1mPHP [22mpre-packaged, so installation is quite
+  Mandriva has [1mapache [22mand [1mPHP [22mpre-packaged, so installation is quite
   simple.  Once you have installed the two programs, either with the
   graphical installer (see instructions in ``Graphic Install Tools'') or
   through the command line (section ``Command Line''), and you've
-  ensured that the [1mapache [22mserver will start at boot using the Mandrake
+  ensured that the [1mapache [22mserver will start at boot using the Mandriva
   Control Center.
 
 
 
-             [1mNOTE[22m: Mandrake 9.1 users, perform the following:
+             [1mNOTE[22m: Mandriva 9.1 users, perform the following:
 
 
        # urpmi apache2 apache2-mod_php php-mysql
@@ -5246,7 +5265,7 @@
 
   There are a number of transitions available, some requiring OpenGL
   support.  You will also need to install a TIFF library.  Under
-  Mandrake, you would perform the following command:
+  Mandriva, you would perform the following command:
 
 
        # urpmi libtiff3-devel
@@ -5360,6 +5379,8 @@
 
   [1m16.  MythGame.[0m
 
+  MythGame can used as a frontend to start any emulator that your host
+  OS runs. This is an example of how to set up xmame on Linux.
   http://www.mameworld.net/ <http://www.mameworld.net/> is an excellent
   resource for all things mame.
 
@@ -5369,13 +5390,13 @@
 
   2. Download and install xmame
 
-  3. Download and place files (artwork/catver.ini/etc..)
+  3. Download and place extra files (artwork/catver.ini/etc..)
 
-  4. Download and install mythgame plugin
+  4. Download and install MythGame plugin
 
-  5. Setup mythgame from inside mythfrontend
+  5. Setup xmame in MythGame
 
-  6. Hints: No joystick solution
+  6. Hints
 
   [1m16.1.  Setup Directory Structure[0m
 
@@ -5390,15 +5411,19 @@
 
   [1m16.2.  Download and Install xmame[0m
 
+  [1mNOTE[22m:  There may be pre-packaged versions of [1mxmame [22mavailable for your
+  distribution.  Check http://x.mame.net/download.html
+  <http://x.mame.net/download.html> for the latest version.
+
   Download the source to [1mxmame [22mfrom
-  http://x.mame.net/download/xmame-0.97.tar.bz2
-  <http://x.mame.net/download/xmame-0.97.tar.bz2>
+  http://x.mame.net/download/xmame-0.102.tar.bz2
+  <http://x.mame.net/download/xmame-0.102.tar.bz2>
 
 
 
-       $ wget http://x.mame.net/download/xmame-0.97.tar.bz2
-       $ tar -xjf xmame-0.97.tar.bz2
-       $ cd xmame-0.97
+       $ wget http://x.mame.net/download/xmame-0.102.tar.bz2
+       $ tar -xjf xmame-0.102.tar.bz2
+       $ cd xmame-0.102
 
 
 
@@ -5428,18 +5453,17 @@
        $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 
 
+
   Because some ROMS work better with different display toolkits, or
   possibly even older versions of xmame, it's convenient to keep all of
-  your [1mxmame [22mbinaries and to rename them to include the version number,
-  then make a symbolic link to "xmame". If you want to test a different
-  version of [1mxmame [22mat some point you only need to switch this link.
+  your [1mxmame [22mbinaries and to rename them to include the version number.
+  MythGame allows you to match individual roms to preferred binaries.
 
 
 
        $ su
        (enter password)
-       # mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.97.x11
-       # ln -s /usr/local/bin/xmame-0.97.x11 /usr/local/bin/xmame
+       # mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.102.x11
        # exit
 
 
@@ -5448,6 +5472,20 @@
   [1mxmame.SDL [22mor [1mxmame.xgl [22mbased on what display toolkit you used. Also,
   you may need to remove and recreate xmamerc after upgrading since some
   of the default options may have changed.
+
+  Edit ~/.xmame/xmamerc to include your paths.
+
+
+       ### Fileio Related ###
+       rompath                         /usr/local/share/xmame/roms
+       snapshot_directory              /usr/local/share/xmame/snaps
+       cheat_file                      /usr/local/share/xmame/cheat.dat
+       hiscore_file                    /usr/local/share/xmame/hiscore.dat
+       hiscore_directory               /usr/local/share/xmame/hiscore
+       history_file                    /usr/local/share/xmame/history.dat
+       mameinfo_file                   /usr/local/share/xmame/mameinfo.dat
+
+
 
   Confirm that [1mxmame [22mworks before running it inside MythTV. Place your
   ROM in the /usr/local/share/xmame/roms directory you created earlier.
@@ -5466,16 +5504,17 @@
   Some basic [1mmame [22mkeyboard commands:
 
 
-       5 = Insert coin
-       1 = Player 1 start
-       arrow keys = movement
-       left control = button 1
-       left alt = button 2
-       SPACE = button 3
-       ESC = exit
-       TAB - menu
-       ~ to adjust Volume
-            < and >
+
+  5 = Insert coin
+  1 = Player 1 start
+  arrow keys = movement
+  left control = button 1
+  left alt = button 2
+  SPACE = button 3
+  ESC = exit
+  TAB - menu
+  ~ to adjust Volume
+       < and >
 
 
 
@@ -5488,7 +5527,6 @@
   ROMs.
 
   Useful for keeping large libraries of ROMs organized.
-
 
   It may be downloaded from http://www.catver.com
   <http://www.catver.com> or http://www.mameworld.net/catlist
@@ -5519,9 +5557,9 @@
   <http://cheat.retrogames.com/>
 
 
-  [1m16.4.  Download and Install Mythgame.[0m
+  [1m16.4.  Download and Install MythGame.[0m
 
-  [1mmythgame [22mis part of the mythplugins package.  See the instructions in
+  [1mMythGame [22mis part of the mythplugins package.  See the instructions in
   the ``Downloading and Compiling'' section to obtain mythplugins.
 
   Switch to the mythplugins directory:
@@ -5544,57 +5582,40 @@
 
 
 
-  [1m16.5.  Setup mythgame[0m
+  [1m16.5.  Setup xmame in MythGame[0m
 
-  Start [1mmythfrontend [22mand navigate to Utilities/Setup>Setup>Media
-  Settings>Game Settings>General Settings
+  Start [1mmythfrontend [22mand navigate to Utilities/Setup > Setup > Media
+  Settings > Game Settings > Game Players. Select (New Game Player).
 
-  On page one you can setup the display order of your games, on page 2
-  and 3 you need to enter the paths to files and directories that xmame
-  uses.
-
-       MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
-       MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
-       catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
-       MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
-       MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
-       MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
-       MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
-       MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
-       MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
-       MAME cheat files path: /usr/local/share/xmame/cheats
-       MAME image downloader                                     (no longer used)
+  To set up a new player for xmame enter the following:
 
 
 
-  Setup options:
+       Player Name:    xmame-0.102.x11                  (Name by which you want your emulator or game called)
+       Type:           xmame                           (This is used for display purposes only and does not affect the function of your system)
+       Command:        xmame-0.102.x11 -vidmod 1 -fullscreen     (Path and name of binary + any optional parameters)
+       Rom Path:       /usr/local/share/xmame/roms     (This tells MythGame what directories to scan for roms to be used with this emulator)
+       ScreenShots:    /usr/local/share/xmame/snaps    (This tells MythGame what directories to scan for snapshots to be used with these roms)
+       Working Directory:                              (Directory to change to before launching game or emulator. Blank in our case ignores this setting)
+       File Extensions:                                (List of all file extension to be used for this emulator. Blank menas any file under the Rom Path)
+       [] Allow games to span multiple roms/disks      (will treat game.1.rom game.2.rom game.3.rom as one game)
 
-  Automatically download images - no longer used
-
-  Show disclaimer - show warning about illegal ROMs before starting each
-  ROM.
-
-  Show game info - show info about the game, ie:year, maker, CPU, sound,
-  screen resolution before starting the game
 
 
   [1m16.6.  Hints:[0m
 
-  No joystick causing failure to launch.
 
-  By default, [1mmythgame [22mexpects that you have a joystick installed.
-  [1mxmame [22mwill fail to launch because [1mmythgame [22msends the option "-joytype
-  4" to [1mxmame [22mby default.  You may reset this using the following
-  command:
+  +o  Rom name before options: %s can be used as a standin for rom names
+     on the command line.
 
-  [1mNOTE[22m: The following command will set the joytype to "0" for all hosts.
-  If you need to specify this on a per-host basis you can either modify
-  the command below (if you know SQL), or use a tool which simplifies
-  access to MySQL such as [1mphpMyAdmin[22m.
+  +o  Multiple disk/rom games: %d1 %d2 etc can be used as standins for
+     multiple disc games on the command line.
 
+  +o  Associating a rom with an emulator: Browse to the desired rom and
+     press 'M' to enter the settings page for that rom.
 
-       $ mysql -u root -e "update mythconverg.mamesettings set joytype=0"
-
+  +o  Assign a Game Favorite Status: Browse to the desired game and press
+     "/".
 
 
   [1m17.  MythMusic.[0m
@@ -5679,14 +5700,14 @@
   install:
 
 
-  $ tar -xzf libcdaudio-0.99.9.tar.gz
-  $ cd libcdaudio-0.99.9
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf libcdaudio-0.99.9.tar.gz
+       $ cd libcdaudio-0.99.9
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -5709,9 +5730,9 @@
 
 
 
-  [1m17.2.  Mandrake[0m
+  [1m17.2.  Mandriva[0m
 
-  Mandrake has a number of the prerequisites available on the
+  Mandriva has a number of the prerequisites available on the
   installation CD.  Some of the software you're going to need will have
   to be obtained from the "contrib" or "cooker" development
   repositories.  Applications downloaded from "cooker" come from the
@@ -5737,7 +5758,6 @@
        # urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
 
 
-
   [1m17.2.1.  Additional options with MythMusic[0m
 
   Additional visualizations have been added to MythMusic.  If you wish
@@ -5752,7 +5772,7 @@
   +o  SDL
 
   fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
-  In Mandrake it may be installed by typing:
+  In Mandriva it may be installed by typing:
 
 
        # urpmi libfftw2 libfftw2-devel
@@ -5760,7 +5780,7 @@
 
 
   OpenGL should be installed on practically all distributions.  However,
-  you will need the devel module.  In Mandrake it may be installed by
+  you will need the devel module.  In Mandriva it may be installed by
   typing:
 
 
@@ -5769,7 +5789,7 @@
 
 
   SDL may be obtained from http://www.libsdl.org
-  <http://www.libsdl.org>.  In Mandrake it may be installed by typing:
+  <http://www.libsdl.org>.  In Mandriva it may be installed by typing:
 
 
        # urpmi libSDL1.2 libSDL1.2-devel
@@ -6047,7 +6067,7 @@
 
   [1m20.2.  Pre-compiled binaries[0m
 
-  Mandrake users may install the prerequisites this way:
+  Mandriva users may install the prerequisites this way:
 
 
        # urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel
@@ -6230,47 +6250,66 @@
 
 
 
-  At this point, you now have debug-enabled software ready.  Let's
-  assume that the problem you're having is in the setup program.
+  At this point, you now have debug-enabled software ready.  To make
+  sure that you don't forget to type a command required for debugging,
+  it's best to setup a gdbcommands file.  This will be read by [1mgdb [22mwhen
+  it's started.  Put the following into gdbcommands in your home
+  directory:
 
 
 
-  $ cd setup
-  $ gdb ./mythtv-setup
-
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb) handle SIGPIPE nostop
-  Signal        Stop      Print   Pass to program Description
-  SIGPIPE       No        Yes     Yes             Broken pipe
-  (gdb) set logging on
-  Copying output to gdb.txt.
-  (gdb)
+  handle SIGPIPE nostop noprint
+  handle SIG33 nostop noprint
+  set logging on
+  set pagination off
+  set args -l myth.log -v record,channel,siparser
+  run
+  thread apply all bt full
+  set logging off
 
 
 
-  [1mgdb [22mhas a number of options, read the man page for more information.
-
-  Once at the (gdb) prompt, type run to start program execution.  When
-  the program segfaults or appears to lock-up (press CTRL-C), type
+  Let's assume that the problem you're having is in [1mmythbackend[22m.
 
 
-       (gdb) thread apply all bt full
-       (gdb) set logging off
+
+       $ gdb mythbackend -x gdbcommands
+       GNU gdb 6.3-debian
+       Copyright 2004 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i386-linux".Using host libthread_db library "/lib/tls/libthread_db.so.1".
+       [Thread debugging using libthread_db enabled]
 
 
+
+  [1mgdb [22mwill automatically read the commands that you've placed in the
+  gdbcommands file and begin running the program you specified on the
+  command line.
+
+  If the program appears to be locked up, press CTRL-C to create the
+  backtrace file.
 
   All of the output from gdb.txt should be posted to the mythtv-dev
   mailing list, along with the steps you followed to get the program to
   crash.
 
-  If you're trying to troubleshoot and you can't get back to the gdb
+  [1mgdb [22mhas a number of options, read the man page for more information.
+
+  Using the gdbcommands file in conjunction with a [1mwhile [22mloop will
+  ensure that [1mgdb [22mcreates a trace file and then restarts:
+
+
+
+       $ while true; do date >> gdb.txt; gdb mythbackend -x gdbcommands; done;
+
+
+
+  [1mNOTE[22m: To exit this loop you will need to kill the while loop.
+
+  If you're trying to troubleshoot and you can't get back to the [1mgdb[0m
   window for some reason, it may be easier to use two systems or to
   start mythfrontend from the text console.
 
@@ -6282,14 +6321,7 @@
   or by switching back to the text console by pressing CTRL-ALT-F1.  You
   can now continue troubleshooting using [1mgdb [22mas detailed in the
   instructions.
-
-
-  [1m22.2.4.  Illegal Instruction[0m
-
-  This error used to occur when users compiled MythTV with incorrect CPU
-  options.  This should no longer occur with the new [1mconfigure [22mscript.
-
-  [1m22.2.5.  MythTV is crashing your system[0m
+  [1m22.2.4.  MythTV is crashing your system[0m
 
   When run as a non-privileged user, MythTV [4mcan[24m [4mnot[24m crash your system.
   If your system is crashing when you run MythTV, then you have some
@@ -6353,6 +6385,7 @@
   If you have reason to believe that your MySQL database is corrupt,
   execute the following commands to attempt to repair it.
 
+
   [1mNOTE[22m: Ensure that there are no programs accessing the database while
   you attempt to repair it.  Make sure that all backend and frontend
   programs have exited.
@@ -6361,8 +6394,6 @@
 
 
   [1m22.4.4.  Using a MPEG-2 encoder card and the video appears "jittery"[0m
-
-
 
   [1m22.4.5.  Using a MPEG-2 encoder card and the video is jumping up and[0m
   [1mdown[0m
@@ -6413,20 +6444,20 @@
   Also, look for:
 
 
-       Section "Device"
-           Identifier "device1"
-           VendorName "nVidia Corporation"
-           BoardName "NVIDIA GeForce 256 (generic)"
-           Driver "nv"
-           Option "DPMS"
-       EndSection
+
+  Section "Device"
+      Identifier "device1"
+      VendorName "nVidia Corporation"
+      BoardName "NVIDIA GeForce 256 (generic)"
+      Driver "nv"
+      Option "DPMS"
+  EndSection
 
 
 
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
-
 
   Finally, check:
 
@@ -6476,7 +6507,6 @@
        $ xset -dpms s off
 
 
-
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
 
@@ -6490,6 +6520,9 @@
   First, if you are in North America, ensure that your DataDirect
   subscription is still valid, otherwise, check to see what version of
   XMLTV you're running and that it's the latest version.
+
+
+
          [1mNOTE[22m:  It is highly recommended that you run the latest
   version of XMLTV available.  Your listings provider may have made
   changes which negatively impact XMLTV.
@@ -6530,7 +6563,7 @@
   the command to your /etc/rc.local file, or by adding files to
   /etc/sysconfig.
 
-  On Mandrake and other distributions, if you install [1mhdparm [22mfrom an RPM
+  On Mandriva and other distributions, if you install [1mhdparm [22mfrom an RPM
   you will most likely get a /etc/sysconfig/harddisks file installed.
   This file will be parsed by the /etc/rc.sysinit script.  If you use
   the default harddisks file, your changes will affect all IDE devices
@@ -6683,7 +6716,6 @@
   in that case.
 
 
-
   [1m22.5.9.  PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://www.mythtv.org/pipermail/mythtv-
@@ -6730,6 +6762,7 @@
   of the libmp3lame library.
 
 
+
   [1m22.5.15.  Can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
@@ -6745,7 +6778,6 @@
   to view a program, try switching back to the shell and look for error
   messages there, or, if you're running from a startup script, check the
   log file.
-
 
 
   [1m22.5.17.  Poor performance with NVidia cards and XvMC[0m
@@ -6851,10 +6883,11 @@
   --fifosync for rate-control):
 
 
-       $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 \
-       --profile autodetect --fifodir . --fifosync &
-       $ cat audout > audio.raw &
-       $ cat vidout > video.yuv
+
+  $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 \
+  --profile autodetect --fifodir . --fifosync &
+  $ cat audout > audio.raw &
+  $ cat vidout > video.yuv
 
 
 
@@ -6863,7 +6896,6 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc and .fvwmrc file you may use.
-
 
 
   [1m23.3.  What capture resolution should I use?  How does video work?[0m
@@ -6931,7 +6963,6 @@
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
 
 
-
   [1m23.4.  MythTV GUI and X Display Sizes[0m
 
   MythTV is designed to be run as dedicated full screen TV application
@@ -6980,7 +7011,6 @@
   Most font sizes can be changed in setup selections or in the .xml
   files under /usr/local/share/mythtv/ . Make sure to use fonts large
   enough to be read on a TV screen from a distance.
-
   The full screen TV size is based on the X display size. For Xinerama,
   you can specify a screen in Setup->General. The TV picture will be
   stretched to fit the entire GUI area regardless of the ``capture
@@ -6995,6 +7025,7 @@
   screen.  This is called "overscan". Underscan is fitting the entire
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
+
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -7041,10 +7072,9 @@
    lose all of your settings and will need to re-run the mc.sql script
   to setup the database structure before running the setup program.
 
-
-       $ mysql -u root
-       mysql> drop database mythconverg;
-       mysql> quit
+  $ mysql -u root
+  mysql> drop database mythconverg;
+  mysql> quit
 
 
 
@@ -7052,7 +7082,6 @@
 
   This assumes that you will be moving your data to newer / bigger
   hardware and don't want to lose your programs.
-
 
   The first step is to create a database backup as demonstrated in an
   earlier section.
@@ -7117,6 +7146,7 @@
   that will allow you to use the btaudio module is the MSP34xx.
   However, having a MSP34xx is no guarantee that you will be able to use
   the btaudio module.
+
   As of 2003-03-31, this is the current list of cards and their status:
   Works with btaudio:
 
@@ -7183,6 +7213,8 @@
        1 row in set (0.00 sec)
        mysql> delete from channel where chanid = 1015;
 
+
+
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
   the channel that has been removed:
@@ -7225,6 +7257,7 @@
   filesizes over 2GB.
 
 
+
   [1m23.11.  Automatically starting mythfrontend at system boot time[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -7244,11 +7277,12 @@
 
   The following also works with blackbox:
 
-  $ cat > .xinitrc
-  xset -dpms s off &
-  irxevent &
-  mythfrontend &
-  blackbox
+
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
 
 
 
@@ -7265,7 +7299,7 @@
 
   [1m23.12.  Automatically starting mythbackend at system boot time[0m
 
-  [1m23.12.1.  Red Hat And Mandrake[0m
+  [1m23.12.1.  Red Hat And Mandriva[0m
 
   Here's a method for automatically starting mythbackend submitted by
   Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
@@ -7304,11 +7338,10 @@
   runlevels 3, 4 or 5:
 
 
-
-  $ su
-  # chkconfig --level 345 mythbackend on
-  # exit
-  $
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
 
 
 
@@ -7316,7 +7349,7 @@
 
   By default, the log file for mythbackend will be written to
   /var/tmp/mythbackend.log. This has been tested and is known to work on
-  Mandrake and Red Hat, but many people prefer to place logs under
+  Mandriva and Red Hat, but many people prefer to place logs under
   /var/log/.
 
   To do this, create a group called mythtv (or anything you prefer) and
@@ -7339,9 +7372,9 @@
 
 
 
-  [1m23.12.1.2.  Mandrake[0m
+  [1m23.12.1.2.  Mandriva[0m
 
-  Mandrake adds one more twist in the form of the msec utility, which
+  Mandriva adds one more twist in the form of the msec utility, which
   runs regularly and (at the default or any higher security level) sets
   permissions on many files, including those under /var/log.
 
@@ -7349,13 +7382,12 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
+  # /etc/security/msec/perm.local
+  # Local overrides to the msec program
+  #
+  # Full file path                user.group              permissions
+  /var/log/mythtv/                root.mythtv             775
+  /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -7363,11 +7395,10 @@
   may add it by typing:
 
 
-
-  $ cd contrib
-  $ su
-  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-  # exit
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
 
 
 
@@ -7407,8 +7438,7 @@
 
   To obtain a list of options:
 
-
-       # /etc/init.d/mythbackend
+  # /etc/init.d/mythbackend
 
 
 
@@ -7419,6 +7449,7 @@
   backend [4mmust[24m have a capture device defined, but shouldn't imply that
   the capture device in the Master backend must be the first capture
   card defined in the database.
+
   One example of an advanced configuration is the round-robin scheme.
   Rather than defining all of the cards on the master, you could first
   go into setup on the master to define globals such as the general
@@ -7469,6 +7500,7 @@
   create MPEG-4 streams to save space.
 
   The transcoder can be used in two ways:
+
 
   +o  Automatically re-encode every file once it has completed recording
 
@@ -7532,8 +7564,9 @@
   script, you would do something like the following:
 
 
-       $ su
-       # /etc/init.d/mythbackend stop
+
+  $ su
+  # /etc/init.d/mythbackend stop
 
 
 
@@ -7545,6 +7578,7 @@
   distributions, refer to the documentation, such as the
 
   hostname(1)
+
 
 
   To alter the hostname in the current session, run:
@@ -7591,7 +7625,6 @@
        mysql>exit
 
 
-
   6.  Restore the database using your edited version.
 
 
@@ -7607,7 +7640,7 @@
   otherwise start them from terminal consoles.
 
 
-  # /etc/init.d/mythbackend start
+       # /etc/init.d/mythbackend start
 
 
 
@@ -7667,21 +7700,21 @@
 
 
 
-  #!/bin/sh
+       #!/bin/sh
 
-  mkfifo aud0
-  mkfifo vid0
-  mkfifo dvdmpg
+       mkfifo aud0
+       mkfifo vid0
+       mkfifo dvdmpg
 
-  mpeg2desc -a0 < $1 > aud0 &
-  mpeg2desc -v0 < $1 > vid0 &
-  mplex -f 8 -V -o dvdmpg aud0 vid0 &
-  dvdauthor -o $2 -f dvdmpg
-  dvdauthor -o $2 -T
+       mpeg2desc -a0 < $1 > aud0 &
+       mpeg2desc -v0 < $1 > vid0 &
+       mplex -f 8 -V -o dvdmpg aud0 vid0 &
+       dvdauthor -o $2 -f dvdmpg
+       dvdauthor -o $2 -T
 
-  rm aud0
-  rm vid0
-  rm dvdmpg
+       rm aud0
+       rm vid0
+       rm dvdmpg
 
 
 
@@ -7718,6 +7751,7 @@
 
   +o  k3b - a GUI for burning DVD's and CD's.  Not necessary, but useful.
 
+
   1. Find the file you want.
 
   2. Run [1mavidemux2 [22mand open the .nuv file which corresponds with the
@@ -7730,6 +7764,7 @@
   4. Save the raw video stream and audio: File-> Save -> Save Raw Video
   Stream.  Save the file as 1.m2v.  When that's done, go to Audio ->
   Save Audio.  Save the file as 1.mp2
+
   5. Repeat steps 2 & 3 until you have saved all the segments you wish
   to keep.
 
@@ -7781,6 +7816,7 @@
   2. the highlighted buttons
 
   3. the selected buttons
+
 
   You would then use [1mspumux [22mto combine the background video with the
   overlay menus.
@@ -7843,6 +7879,7 @@
   menu.mp2
 
 
+
   [1m23.21.1.5.  Merge the M2V video with the MP2 audio[0m
 
   mplex -f 8 -o menu.mpg menu.m2v menu.mp2
@@ -7898,28 +7935,27 @@
 
 
 
-       ###begin menu.xml###
-       <subpictures>
-         <stream>
-           <spu
-            force="yes"
-            start="00:00:00.00"
-            image="menu1.png"
-            select="menu2.png"
-            highlight="menu2.png"
-            autooutline="infer"
-            outlinewidth="6"
-            autoorder="rows"
-           >
-           </spu>
-         </stream>
-       </subpictures>
-       ###end menu.xml###
+  ###begin menu.xml###
+  <subpictures>
+    <stream>
+      <spu
+       force="yes"
+       start="00:00:00.00"
+       image="menu1.png"
+       select="menu2.png"
+       highlight="menu2.png"
+       autooutline="infer"
+       outlinewidth="6"
+       autoorder="rows"
+      >
+      </spu>
+    </stream>
+  </subpictures>
+  ###end menu.xml###
 
 
 
   Then create the final menu with
-
 
   spumux menu.xml < menu.mpg > menu_final.mpg
 
@@ -8549,7 +8585,7 @@
   JFS (Journaling File System) is a journaling filesystem originally
   developed by IBM for AIX which was later released as open source.
   While not as common as Ext3 or ReiserFS, it is distributed with RedHat
-  9 (RH9) and Fedora Core 1 (RHFC1) and Mandrake as well as other
+  9 (RH9) and Fedora Core 1 (RHFC1) and Mandriva as well as other
   distros.  According to tests, JFS is the file deletion speed king,
   deleting virtually any file in under one second, even files as large
   as 10 gigabytes.
@@ -8560,7 +8596,7 @@
   XFS is a journaling file system originally developed by SGI for Irix,
   and later released as open source.  While not a part of the default
   RedHat Linux 9 or Fedora Core installation (although it is a part of
-  Mandrake and Fedora Core 2), it can be easily installed via ATrpms.
+  Mandriva and Fedora Core 2), it can be easily installed via ATrpms.
   XFS provides deletion speeds for large files only slightly slower than
   JFS.  According to the test results shown at
   (http://aurora.zemris.fer.hr/filesystems/big.html
@@ -8580,7 +8616,6 @@
   First, you must compile a version of the Linux kernel to support the
   new tuner device.
 
-  Download the source to 2.6.11.
 
 
        $ su
@@ -8630,12 +8665,9 @@
   this automatically as a part of the [1mgenkernel [22mstep.
 
 
-
-  # make modules
-  # make
-  # make install modules_install
-
-
+       # make modules
+       # make
+       # make install modules_install
 
   Make any modifications necessary to your boot configuration files
   (lilo or grub) as required to boot your new kernel.
@@ -8698,9 +8730,9 @@
   HDTV channels.
 
 
-       $ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
-       $ test ~/.azap || mkdir ~/.azap
-       $ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+  $ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+  $ test ~/.azap || mkdir ~/.azap
+  $ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
 
 
 
@@ -8754,8 +8786,9 @@
        # apt-get install dhcpd3-server atftpd syslinux
 
 
-       # mkdir -p /nfsroot/basement
-       # debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+
+  # mkdir -p /nfsroot/basement
+  # debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
 
 
 

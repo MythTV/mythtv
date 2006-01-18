@@ -21,7 +21,7 @@ first is to download the latest release in tarball format and compile.  The
 tarball release of MythTV should work on a wide variety of systems and
 should be the preferred method for new users.  If you wish to use the
 <B>subversion</B> copy of MythTV you may obtain it from 
-<A HREF="http://cvs.mythtv.org">http://cvs.mythtv.org</A></P>
+<A HREF="http://svn.mythtv.org">http://svn.mythtv.org</A></P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -44,14 +44,10 @@ or higher.</P>
 <P>
 <HR>
 <PRE>
-NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
+NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
 next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
-
-NOTE for Red Hat users: If you are installing with apt or yum, you may skip
-this step, it will be taken care of. Otherwise get lame and lame-devel from
-&lt;url url="http://ATrpms.net/name/lame/" name="http://ATrpms.net/name/lame/">.
 
 After downloading, be sure to install both:
 # rpm -Uvh lame*
@@ -113,10 +109,10 @@ list of all the dependent packages you must download and install.
 </P>
 <P>If you install from this location you may skip to 
 <A HREF="#manually_building_mythtv">Manually building MythTV</A>.</P>
-<H3>Mandrake</H3>
+<H3>Mandriva</H3>
 
 <P>RPMs for <B>XMLTV</B> and all of its dependencies are located in
-Mandrake's "contrib".  If you have added a contrib mirror, try installing
+Mandriva's "contrib".  If you have added a contrib mirror, try installing
 <B>XMLTV</B>:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -124,7 +120,7 @@ Mandrake's "contrib".  If you have added a contrib mirror, try installing
 </PRE>
 </CODE></BLOCKQUOTE>
 
-If this does not work, it is possible that contrib for your Mandrake version
+If this does not work, it is possible that contrib for your Mandriva version
 does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -249,10 +245,7 @@ $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As of MythTV version 0.18, there is no need to edit the
-<CODE>settings.pro</CODE> file to set compile-time options.  The
-<B>configure</B> script will configure MythTV appropriately for your
-system.  If you wish to change options, run <B>./configure --help</B> to
+<P>If you wish to change options, run <B>./configure --help</B> to
 see what is available and to override and automatically detected options. 
 See the <CODE>config.log</CODE> file after running <B>configure</B> to see
 previous runs.</P>
@@ -320,34 +313,33 @@ the MythTV directory that you <CODE>cd</CODE>'d to above.</CAPTION>
 </FIGURE>
 </P>
 
-
 <H3>Enabling real-time scheduling of the display thread.</H3>
 
-<P>MythTV supports real-time scheduling of the video output thread.
-There are three ways to go about eanbling this: You can use rlimits,
-you can use the realtime security module, or on older systems you 
-can SUID the executable. Enabling real-time scheduling is optional,
-but can make the video display more smooth, especially if you are
-decoding HDTV.</P>
+<P>MythTV supports real-time scheduling of the video output thread. There
+are three ways to go about enabling this: You can use rlimits, you can use
+the realtime security module, or on older systems you can SUID the
+executable. Enabling real-time scheduling is optional, but can make the
+video display smoother, especially if you are decoding HDTV.</P>
 
-<H3>1. rlimits</H3>
+<H3>rlimits</H3>
 
-<P>The rlimits method is the preferred method and is included in Linux 2.6.12
-and above. Unfortunately, you need PAM version 0.76-8 or above, which
+<P>The rlimits method is the preferred method and is included in Linux
+2.6.12 and above. Unfortunately, you need PAM version 0.79 or above, which
 may not be supported by your distribution yet. Assuming anyone running
-mythfrontend is in the audio group and rlimits are supported, all
-you need to do is place this in your /etc/security/limit.conf
+<B>mythfrontend</B> is in the audio group and rlimits are supported, all
+you need to do is place this in your <CODE>/etc/security/limits.conf</CODE></P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-*               -       rt_priority     0
-*               -       nice            0
-@audio          -       rt_priority     50
-@audio          -       nice            0
+*               -       rtprio     0
+*               -       nice       0
+@audio          -       rtprio     50
+@audio          -       nice       0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3>2. realtime module</H3>
+<H3>realtime module</H3>
 
 <P>The second option is to use the Linux realtime kernel module.
 This is will be phased out over time, but is currently supported
@@ -361,10 +353,10 @@ Security options : [M] Default Linux Capabilties
 </PRE>
 </CODE></BLOCKQUOTE>
 
-You may also need to install the realtime module, using your
-distribution's realtime package. Assuming the users who will
-be running mythfrontend will be in the audio group you can
-get GUID of a named group like so:
+You may also need to install the realtime module, using your distribution's
+realtime package. Assuming the users who will be running
+<B>mythfrontend</B> will be in the audio group you can get the GUID of a named
+group like so:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ grep audio /etc/group
@@ -372,7 +364,7 @@ $ grep audio /etc/group
 </CODE></BLOCKQUOTE>
 
 If the number printed out from the grep was 18, you can now load 
-this module as root before starting mythfrontend like so:
+this module as root before starting <B>mythfrontend</B>:
 <BLOCKQUOTE><CODE>
 <PRE>
 # modprobe realtime gid=18
@@ -380,15 +372,15 @@ this module as root before starting mythfrontend like so:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3>3. run as root option (not safe)</H3>
+<H3>run as root option (not safe)</H3>
 
 <P>The final and least preferred option is to set the sticky bit
-of the mythfrontend executable. This <B>opens a security hole</B>,
+on the <B>mythfrontend</B> executable. This <B>opens a security hole</B>,
 but is the only option on systems that do not support either
 rlimits or the realtime module. This does not work on modern
 distributions either, and is <B><EM>not recommended</EM></B>
 on any system connected to the internet. This may also make it
-impossible to debug MythTV without running gdb as root. If you
+impossible to debug MythTV without running <B>gdb</B> as root. If you
 would still like to do this, you just need to run this as root:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -396,7 +388,6 @@ would still like to do this, you just need to run this as root:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
 
 <H3><A NAME="frontend-only"></A> Frontend-only configuration </H3>
 

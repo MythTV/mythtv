@@ -36,9 +36,9 @@ from its packaging system. Section 3.2 of this HOWTO provides some details
 of how to install the required environment for many distributions.</P>
 <P>Subsequent sections of this chapter address the few oddities that you may 
 have to adjust by hand before you compile MythTV.</P>
-<P>The reference compilation system for MythTV is Debian.</P>
+<P>The reference compilation system for MythTV is Ubuntu.</P>
 
-<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Shared-Library Requirements for MythTV </A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Shared-Library requirements for MythTV </A>
 </H2>
 
 <H3><A NAME="modifying_ld.so.conf"></A> Modifying /etc/ld.so.conf </H3>
@@ -64,7 +64,7 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Environment variable Requirements for MythTV</A>
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Environment variable requirements for MythTV</A>
 </H2>
 
 <H3>General requirements</H3>
@@ -90,7 +90,7 @@ $ which qmake
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>For Mandrake, you should see a value like <CODE>/usr/lib/qt3</CODE> for
+<P>For Mandriva, you should see a value like <CODE>/usr/lib/qt3</CODE> for
 <CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
 <P>For Gentoo, you should see a value like <CODE>/usr/qt/3</CODE> for <CODE>QTDIR</CODE> 
 and <CODE>/usr/qt/3/bin</CODE> should be in $PATH.</P>
@@ -103,18 +103,18 @@ called <CODE>default</CODE>. If not, you'll get errors during the compile. See
 the Troubleshooting Section for more information.</P>
 <H3>Distribution-Specific Notes</H3>
 
-<H3>Mandrake</H3>
+<H3>Mandriva</H3>
 
-<P>The following instructions work for Mandrake using
+<P>The following instructions work for Mandriva using
 <B>bash</B> as the shell, and may be applicable for a distribution which
 uses <CODE>/etc/profile.d</CODE>.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Mandrake 10 installs a <CODE>/etc/profile.d/qtdir3.sh</CODE>
+<CAPTION><B>NOTE</B>:  Mandriva 10 installs a <CODE>/etc/profile.d/qtdir3.sh</CODE>
 file, but it doesn't include the addition of the PATH variable.  If you're
-running Mandrake 10, don't create a <CODE>mythtv.sh</CODE> file as detailed
+running Mandriva 10, don't create a <CODE>mythtv.sh</CODE> file as detailed
 below; edit the <CODE>qtdir3.sh</CODE> file and add the PATH statement within
 the if / fi block.</CAPTION>
 </FIGURE>
@@ -149,6 +149,7 @@ open a shell your new commands
 will take effect.</P>
 <H3>Red Hat Linux 9</H3>
 
+<P><B>NOTE</B>: This section will be considered abandoned as of v0.20.</P>
 <P>Red Hat Linux 9 use a default locale with UTF-8 encoding.
 Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
 whenever you run setup or mythfilldatabase you will get a lot of UTF-8
@@ -157,65 +158,6 @@ warnings. There is an
 Date::Manip at the XMLTV site fixing this and other XMLTV related
 bugs.</P>
 
-<H3>Debian</H3>
-
-<P>Debian source packages are available from the same place as the
-binary packages.  These can be used to build customized packages, and
-to automatically satisfy MythTV's build-time dependencies.
-<BLOCKQUOTE><CODE>
-<PRE>
-[...]
-sh-2.05b# cd /tmp
-sh-2.05b# apt-get source mythtv
-Reading Package Lists...
-Building Dependency Tree...
-Need to get 3085kB of source archives.
-Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
-Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
-Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
-Fetched 3085kB in 0s (8120kB/s)
-dpkg-source: extracting mythtv in mythtv-0.11
-sh-2.05b# cd mythtv-0.11
-[customize settings.pro, etc.]
-[edit debian/changelog and increment the version number]
-sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
-[...]
-dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
-dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
-dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
-dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
- dpkg-genchanges -b
-dpkg-genchanges: binary-only upload - not including any source code
-dpkg-buildpackage: binary only upload (no source included)
-sh-2.05b# ls -l ../*.deb
--rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
--rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
--rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
--rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
--rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
--rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
--rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
--rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<P>If building from <B>subversion</B> instead of the source package, then the QTDIR
-environment variable must be set when building.  On Debian unstable, QTDIR
-should be set to <CODE>/usr/share/qt3</CODE>.  Edit the <CODE>/etc/profile</CODE>
-file using your favorite text editor and add something like:
-<BLOCKQUOTE><CODE>
-<PRE>
-PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
-QTDIR="/usr/share/qt3"
-.
-.
-.
-export PATH QTDIR
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
 <H3><A NAME="devperms"></A> Device Permissions </H3>
 
 <P>MythTV will need access to the video4linux devices on your system.  By
@@ -223,7 +165,7 @@ default, your distribution may restrict access to these devices to the
 logged-in user, so if you will be automatically starting
 <B>mythbackend</B> from a script rather than an interactive terminal
 session you will need to make some adjustments.</P>
-<P><B>NOTE</B>: The following instructions are accurate for Mandrake.</P>
+<P><B>NOTE</B>: The following instructions are accurate for Mandriva.</P>
 <P>Check for a file called <CODE>/etc/security/console.perms</CODE>.  Open the file
 in your favorite text editor and look for a line that has:
 <BLOCKQUOTE><CODE>

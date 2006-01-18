@@ -14,17 +14,18 @@
 <HR>
 <H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythGame.</A></H2>
 
-<P>
+<P>MythGame can used as a frontend to start any emulator that your host OS
+runs. This is an example of how to set up xmame on Linux.
 <A HREF="http://www.mameworld.net/">http://www.mameworld.net/</A> is
 an excellent resource for all things mame.</P>
 <P>Installation overview:
 <OL>
 <LI>Setup directory structure</LI>
 <LI>Download and install xmame</LI>
-<LI>Download and place files (artwork/catver.ini/etc..)</LI>
-<LI>Download and install mythgame plugin</LI>
-<LI>Setup mythgame from inside mythfrontend</LI>
-<LI>Hints: No joystick solution</LI>
+<LI>Download and place extra files (artwork/catver.ini/etc..)</LI>
+<LI>Download and install MythGame plugin</LI>
+<LI>Setup xmame in MythGame</LI>
+<LI>Hints</LI>
 </OL>
 </P>
 <H2><A NAME="ss16.1">16.1</A> <A HREF="mythtv-HOWTO.html#toc16.1">Setup Directory Structure</A>
@@ -43,14 +44,17 @@ $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 <H2><A NAME="ss16.2">16.2</A> <A HREF="mythtv-HOWTO.html#toc16.2">Download and Install xmame</A>
 </H2>
 
+<P><B>NOTE</B>:  There may be pre-packaged versions of <B>xmame</B>
+available for your distribution.  Check 
+<A HREF="http://x.mame.net/download.html">http://x.mame.net/download.html</A> for the latest version.</P>
 <P>Download the source to <B>xmame</B> from 
-<A HREF="http://x.mame.net/download/xmame-0.97.tar.bz2">http://x.mame.net/download/xmame-0.97.tar.bz2</A></P>
+<A HREF="http://x.mame.net/download/xmame-0.102.tar.bz2">http://x.mame.net/download/xmame-0.102.tar.bz2</A></P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://x.mame.net/download/xmame-0.97.tar.bz2
-$ tar -xjf xmame-0.97.tar.bz2
-$ cd xmame-0.97
+$ wget http://x.mame.net/download/xmame-0.102.tar.bz2
+$ tar -xjf xmame-0.102.tar.bz2
+$ cd xmame-0.102
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -82,16 +86,14 @@ $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 </P>
 <P>Because some ROMS work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
-<B>xmame</B> binaries and to rename them to include the version number,
-then make a symbolic link to "xmame". If you want to test a different
-version of <B>xmame</B> at some point you only need to switch this link.</P>
+<B>xmame</B> binaries and to rename them to include the version number. 
+MythGame allows you to match individual roms to preferred binaries.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 (enter password)
-# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.97.x11
-# ln -s /usr/local/bin/xmame-0.97.x11 /usr/local/bin/xmame
+# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.102.x11
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -101,6 +103,20 @@ $ su
 display toolkit you used. Also, you may need to remove and recreate
 <CODE>xmamerc</CODE> after upgrading since some of the default options may have
 changed.</P>
+<P>Edit <CODE>~/.xmame/xmamerc</CODE> to include your paths.
+<BLOCKQUOTE><CODE>
+<PRE>
+### Fileio Related ###
+rompath                         /usr/local/share/xmame/roms
+snapshot_directory              /usr/local/share/xmame/snaps
+cheat_file                      /usr/local/share/xmame/cheat.dat
+hiscore_file                    /usr/local/share/xmame/hiscore.dat
+hiscore_directory               /usr/local/share/xmame/hiscore
+history_file                    /usr/local/share/xmame/history.dat
+mameinfo_file                   /usr/local/share/xmame/mameinfo.dat
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>Confirm that <B>xmame</B> works before running it inside MythTV. Place
 your ROM in the <CODE>/usr/local/share/xmame/roms</CODE> directory you created
 earlier.</P>
@@ -156,10 +172,10 @@ This file fills in a bit of background about each ROM.</P>
 <P>Download from 
 <A HREF="http://cheat.retrogames.com/">http://cheat.retrogames.com/</A></P>
 
-<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">Download and Install Mythgame.</A>
+<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">Download and Install MythGame.</A>
 </H2>
 
-<P><B>mythgame</B> is part of the mythplugins package.  See the instructions
+<P><B>MythGame</B> is part of the mythplugins package.  See the instructions
 in the 
 <A HREF="mythtv-HOWTO-5.html#DownloadAndCompile">Downloading and Compiling</A>
 section to obtain mythplugins.</P>
@@ -184,53 +200,37 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">Setup mythgame</A>
+<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">Setup xmame in MythGame</A>
 </H2>
 
-<P>Start <B>mythfrontend</B> and navigate to Utilities/Setup>Setup>Media
-Settings>Game Settings>General Settings</P>
-<P>On page one you can setup the display order of your games, on page 2 and 3
-you need to enter the paths to files and directories that xmame uses.</P>
+<P>Start <B>mythfrontend</B> and navigate to Utilities/Setup > Setup > Media
+Settings > Game Settings > Game Players. Select <CODE>(New Game Player)</CODE>.</P>
+<P>To set up a new player for xmame enter the following:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
-MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
-catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
-MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
-MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
-MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
-MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
-MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
-MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
-MAME cheat files path: /usr/local/share/xmame/cheats
-MAME image downloader                                     (no longer used)
+Player Name:    xmame-0.102.x11                  (Name by which you want your emulator or game called)
+Type:           xmame                           (This is used for display purposes only and does not affect the function of your system)
+Command:        xmame-0.102.x11 -vidmod 1 -fullscreen     (Path and name of binary + any optional parameters)
+Rom Path:       /usr/local/share/xmame/roms     (This tells MythGame what directories to scan for roms to be used with this emulator)
+ScreenShots:    /usr/local/share/xmame/snaps    (This tells MythGame what directories to scan for snapshots to be used with these roms)
+Working Directory:                              (Directory to change to before launching game or emulator. Blank in our case ignores this setting)
+File Extensions:                                (List of all file extension to be used for this emulator. Blank menas any file under the Rom Path)
+[] Allow games to span multiple roms/disks      (will treat game.1.rom game.2.rom game.3.rom as one game)
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Setup options:</P>
-<P>Automatically download images - no longer used</P>
-<P>Show disclaimer - show warning about illegal ROMs before starting each ROM.</P>
-<P>Show game info - show info about the game, ie:year, maker, CPU, sound,
-screen resolution before starting the game</P>
 
 <H2><A NAME="ss16.6">16.6</A> <A HREF="mythtv-HOWTO.html#toc16.6">Hints:</A>
 </H2>
 
-<P>No joystick causing failure to launch.</P>
-<P>By default, <B>mythgame</B> expects that you have a joystick installed.
-<B>xmame</B> will fail to launch because <B>mythgame</B> sends the
-option "-joytype 4" to <B>xmame</B> by default.  You may reset this using
-the following command:</P>
-<P><B>NOTE</B>: The following command will set the joytype to "0" for all
-hosts.  If you need to specify this on a per-host basis you can either
-modify the command below (if you know SQL), or use a tool which simplifies
-access to MySQL such as <B>phpMyAdmin</B>.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root -e "update mythconverg.mamesettings set joytype=0"
-</PRE>
-</CODE></BLOCKQUOTE>
+<P>
+<UL>
+<LI>Rom name before options: %s can be used as a standin for rom names on the command line.</LI>
+<LI>Multiple disk/rom games: %d1 %d2 etc can be used as standins for multiple disc games on the command line.</LI>
+<LI>Associating a rom with an emulator: Browse to the desired rom and press 'M' to enter the settings page for that rom.</LI>
+<LI>Assign a Game Favorite Status: Browse to the desired game and press "/".</LI>
+</UL>
 </P>
 
 <HR>

@@ -36,9 +36,9 @@ set it as the recording source.</P>
 <H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Graphically setting up the mixer</A>
 </H2>
 
-<H3>Mandrake and Red Hat Linux/Fedora Core</H3>
+<H3>Mandriva and Red Hat Linux/Fedora Core</H3>
 
-<P>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
+<P>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandriva, or
 <PRE>
 RedHat Menu>Sound &amp; Video>Volume Control
 </PRE>
@@ -53,20 +53,21 @@ dark green, meaning that it's "off".  You also want to click on the red LED
 so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.</P>
-
 <H3>Using OSS drivers.</H3>
 
-<P>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than the ALSA
-drivers recommended by the MythTV team. The OSS drivers do work for many
-people, and for many cards. We recommend that you give OSS a try since it is
-already included in the vendor distribution. However, some people report problems (sync
-and jitter) with OSS, and in addition it does not support full-duplex on
-some cards.  Full duplex is required if you want to record and play sound
-using just one sound card. ALSA has good full-duplex support, and also has
-drivers for some built-in (motherboard) sound cards that OSS does not.
-Installing ALSA is less painful than you might think, so if OSS does not
-work for you, installing ALSA is not too difficult. For those of you who do
-not wish to install ALSA you must do this:</P>
+<P><B>NOTE</B>: This section will be removed in 0.20.  ALSA is the kernel
+sound driver now.</P>
+<P>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than
+the ALSA drivers recommended by the MythTV team. The OSS drivers do work for
+many people, and for many cards. We recommend that you give OSS a try since
+it is already included in the vendor distribution. However, some people
+report problems (sync and jitter) with OSS, and in addition it does not
+support full-duplex on some cards.  Full duplex is required if you want to
+record and play sound using just one sound card. ALSA has good full-duplex
+support, and also has drivers for some built-in (motherboard) sound cards
+that OSS does not. Installing ALSA is less painful than you might think, so
+if OSS does not work for you, installing ALSA is not too difficult. For
+those of you who do not wish to install ALSA you must do this:</P>
 <P>To configure sound to work with MythTV, select 
 <PRE>
 RedHat Menu>Sound &amp;
@@ -76,7 +77,6 @@ Video>Volume Control
 (on the far left) is up. Also make sure that the "line in" section has
 "mute" and "record" checked and that the gain is turned up. You may have to
 experiment with volume/gain levels to get the best sound.  </P>
-
 <H3>Using ALSA.</H3>
 
 <P>If you'd like to use ALSA, you'll need to correctly setup your

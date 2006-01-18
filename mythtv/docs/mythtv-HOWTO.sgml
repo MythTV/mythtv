@@ -211,7 +211,7 @@ on the linuxdoc format itself, or look at the <tt>mythtv-HOWTO.sgml</tt>
 file as an example.
 
 To create the actual patch, run <bf>diff -u origfilename newfile >
-doc.patch</bf> and mail it to the address above.
+doc.patch</bf> and attach your contribution to the trac ticket.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -457,8 +457,10 @@ for Live TV at 416x480.
 </itemize>
 
 <sect3>DVB capture cards.
-<p>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
-see the pages maintained by Martin Smith <url
+<p>DVB is a video standard primarily found in Europe (where it comes in
+DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
+is also used as the programming interface for HDTV capture cards in Linux. 
+MythTV supports DVB; see the pages maintained by Martin Smith <url
 url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net">
 at <url url="http://www.ethics-gradient.net/myth/mythdvb.html"
 name="http://www.ethics-gradient.net/myth/mythdvb.html"> for more
@@ -490,7 +492,9 @@ acceleration.  If you enable the hardware acceleration, you may be able to
 use a 1.8GHz processor.
 
 <sect3>Firewire.
-<p>You may use the Firewire output of the DCT6200 or the SA3250.
+<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
+If your provider uses 5C encryption on a particular channel, you won't be
+able to get any content.
 
 <sect3>DBoxII or other devices running Neutrino
 <p>You may use the Ethernet port of an DBoxII or a similar device to capture 
@@ -509,7 +513,7 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <item>Hauppauge WinTV-USB series
 <item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
-<item>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)
+<item>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net no MythTV support)
 <item>ATI All-in-Wonder series
 </itemize>
 
@@ -566,7 +570,7 @@ recommended that you use a card which supports XVideo (XV) extensions. If
 your card does not support XV, color conversion and scaling will be
 performed by your CPU rather than the video card.  This is very CPU
 and memory intensive and will often result in dropped frames and a
-corresponding degradation of quality.  Check the XFree86 documentation
+corresponding degradation of quality.  Check the X documentation
 for details if you are uncertain about your preferred card.  You may
 also run <tt>xvinfo</tt>; look for your video card to be listed as one
 of the adapters.
@@ -598,9 +602,10 @@ name="http://www.gossamer-threads.com/lists/mythtv/"> using
 the card name in your search string.
 
 <sect3>ATI
-<p>ATI makes many cards with TV-out capability, but ATI offers no official
-support for their use with Linux. The standard XFree86 ati driver does not
-support TV-out.
+<p>ATI makes many cards with TV-out capability, but only offers linux
+drivers for Radeon 8500 and above cards.  See the Drivers and Software
+section of <url url="http://www.ati.com/" name="http://www.ati.com"> for the
+driver and additional information.
 
 The enhanced ati.2 X driver created by the GATOS <url
 url="http://gatos.sourceforge.net" name="http://gatos.sourceforge.net">
@@ -625,6 +630,10 @@ no details reported.
 </itemize>
 
 <sect3>Matrox
+<p><bf>NOTE</bf>: If updated information for the Matrox cards is not
+provided prior to MythTV v0.20 I will assume that there is no interest and
+will remove this section.
+
 <p>The standard Matrox driver included with XFree86 does not support TV-out.
 
 Older Matrox cards can be used with a proprietary X driver provided by 
@@ -650,7 +659,7 @@ Composite and S-Video ports. TV-out implementation does <em>NOT</em> support XVi
 
 <sect3>NVIDIA
 <p>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
-XFree86, combined with the userspace application <bf>nvtv</bf> to control the TV-out 
+X, combined with the userspace application <bf>nvtv</bf> to control the TV-out 
 port. See <url url="http://sourceforge.net/projects/nv-tv-out/"
 name="http://sourceforge.net/projects/nv-tv-out/"> for details.  Recent
 versions of the NVIDIA driver have better support for overscan and other
@@ -658,8 +667,12 @@ features useful with TV-Out, so the <bf>nvtv</bf> application may not be
 required.
 
 Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
-available by NVIDIA. See <url url="http://www.nvidia.com/view.asp?IO=linux"
-name="http://www.nvidia.com/view.asp?IO=linux"> for more information.
+available by NVIDIA. See <url url="http://www.nvidia.com/object/unix.html"
+name="http://www.nvidia.com/object/unix.html"> for more information.
+
+<bf>NOTE</bf>:  It's strongly recommended that you use the proprietary
+NVIDIA drivers; they have excellent support for XvMC and ship with a good
+configuration utility.
 
 Specific cards:
 <itemize>
@@ -760,9 +773,18 @@ additional configuration steps in this HOWTO.  The next logical step is
 <ref id="mysql" name="configuring MySQL">, which you may or may not have to
 perform.  See your package documentation.
 
-<sect3>Red Hat Linux/Fedora Core
+<sect3>Red Hat Linux / Fedora Core
 <label id="atrpms">
-<p>Red Hat Linux and Fedora Core 3 packages for MythTV and all of its add-on
+<p>The definitive documentation on installing MythTV on Red Hat Linux /
+Fedora Core can be found in Jarod Wilson's (<url
+url="mailto:jcw@wilsonet.com" name="mailto:jcw@wilsonet.com">) HOWTO at <url
+url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/"> Just
+like 3rd-party packages, any 3rd-party documentation problems should be
+brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).  The
+installation instructions which follow should be used as a guide only; refer
+to Jarod's guide.
+
+Red Hat Linux and Fedora Core packages for MythTV and all of its add-on
 modules and some themes have been packaged by <url
 url="mailto:Axel.Thimm@ATrpms.net" name="mailto:Axel.Thimm@ATrpms.net"> and
 are available at <url url="http://ATrpms.net/topic/multimedia/"
@@ -799,20 +821,13 @@ And finally:
 # apt-get install mythtv-suite
 </verb></tscreen>	
 These steps however, do NOT perform the installation of any drivers required
-for <bf>ALSA</bf>, capture cards, <bf>lirc kernel modules</bf>, etc., nor do they set up
-your MythTV database. Check <url
-url="http://ATrpms.net/topic/multimedia/" name="ATrpms"> for
-the drivers you need.
+for <bf>ALSA</bf>, capture cards, <bf>lirc kernel modules</bf>, etc., nor do
+they set up your MythTV database. Check <url
+url="http://ATrpms.net/topic/multimedia/" name="ATrpms"> for the drivers you
+need.
 
-Further documentation on using ATrpms packages can be found in Jarod
-Wilson's (<url url="mailto:jcw@wilsonet.com"
-name="mailto:jcw@wilsonet.com">) HOWTO at <url
-url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/">
-Just like 3rd-party packages, any 3rd-party documentation problems
-should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
-
-<sect3>Mandrake
-<p>Thac has created RPMs for MythTV for Mandrake 9.0 and above which may
+<sect3>Mandriva
+<p>Thac has created RPMs for MythTV for Mandriva 9.0 and above which may
 be obtained from <url url="http://rpm.nyvalls.se/"
 name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
 send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
@@ -828,7 +843,7 @@ the official Debian archive.
 
 If you have followed the instructions on the above page you should have added
 <tscreen><verb>
-deb ftp://ftp.nerim.net/debian-marillat/ sid main
+deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
 </verb></tscreen>
 
 to your <tt>/etc/apt/sources.list</tt> file.  Running <bf>apt-get update</bf> and then
@@ -852,15 +867,14 @@ devices, and everything else that MythTV needs to do.
 information, including copies of the MythTV documentation.  The
 <tt>mythtv-doc</tt> package contains a copy of this HOWTO in
 <tt>/usr/share/doc/mythtv-doc</tt>.
--->
 <sect2>Manual installation
 <p>You may use the graphical tools that come with your distribution, or you
 can use command-line utilities.  Either system will get the job done, and it
 all depends on your comfort level with Linux.
 
 In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-03-15, this list includes <bf>mysql</bf>,
-<bf>gcc</bf>, <bf>freetype2-devel</bf>, <bf>XFree86-devel</bf>,
+is installed.  As of 2006-01-17, this list includes <bf>mysql</bf>,
+<bf>gcc</bf>, <bf>freetype2-devel</bf>, <bf>xorg-xserver-devel</bf>,
 <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a remote
 control with MythTV, you're going to need the <bf>cdialog</bf> package in
 order to compile <bf>lircd</bf> if your distribution doesn't have a
@@ -877,7 +891,10 @@ that you've installed the -devel version of a prerequisite.
 </code>
 
 <sect2>Graphical installation tools <label id="graphicinstalltools_">
-<sect3>Mandrake
+<sect3>Mandriva
+<p><bf>NOTE</bf>:  As of 2006-01-17 the following section should be
+considered out of date.  If no updates are submitted prior to the release of
+v0.20, they will be considered abandoned and removed from the HOWTO.
 <p>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
 clicking K->Configuration->Packaging->KPackage
@@ -913,7 +930,7 @@ Qt") and libqt3 ("Libraries").
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption>NOTE for Mandrake users:  In versions after Mandrake 9.1, Mandrake
+<caption>NOTE for Mandriva users:  In versions after Mandriva 9.1, Mandriva
 removed the MySQL modules from the default installation.  Ensure that you
 install libqt3-mysql.
 </caption>
@@ -934,7 +951,7 @@ OK if you get a message about satisfying dependencies.
 <p> This section details the various methods for installing prerequisites
 from the command line.
 
-<sect3>Mandrake
+<sect3>Mandriva
 <p><bf>urpmi</bf> is the simplest tool for installation of packages from the
 command line, but properly configuring it can be difficult.  The
 following website <url url="http://addmedia.linuxfornewbies.org/"
@@ -943,10 +960,6 @@ a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <tt>lame</tt> library without compiling from source.
-
-<sect4>Mandrake 9.0
-<p>The simplest tool for installing packages from the command line is
-<bf>urpmi</bf>.
 
 Open a shell, and execute the following, all on the same line. You may get
 asked a number of questions regarding dependencies.  It's best to answer
@@ -959,7 +972,7 @@ $ su
 </verb></tscreen>
 
 <code>
-NOTE for Mandrake 9.1+ users: execute the following command.
+NOTE for Mandriva 9.1+ users: execute the following command.
 
 # urpmi libqt3-mysql
 </code>
@@ -995,45 +1008,21 @@ To enable SQL support, add "mysql" to your USE variable in
 
 All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.
-<!--
-<sect3>Debian.
-<p>See <url
-url="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/"
-name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/"> for
-up-to-date information for Debian.
 
-Build-dependencies for MythTV can be satisfied by adding the following to
+<sect3>Debian.
+<p>Build-dependencies for MythTV can be satisfied by adding the following to
 your <tt>/etc/apt/sources.list</tt>
 <tscreen><verb>
-# MythTV
-deb http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
-deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
-
 # Christian Marillat's packages (mplayer, lame)
-deb ftp://ftp.nerim.net/debian-marillat/ sarge main
+deb ftp://ftp.nerim.net/debian-marillat/ sid main
+deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
 </verb></tscreen>
 and executing:
 <tscreen><verb>
-sh-2.05b# apt-get build-dep mythtv
-Reading Package Lists...
-Building Dependency Tree...
-The following NEW packages will be installed:
-  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-  zlib1g-dev
-0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-Need to get 0B/24.0MB of archives.
-After unpacking 78.7MB of additional disk space will be used.
-Do you want to continue? [Y/n] 
+# apt-get build-dep mythtv
+# apt-get source mythtv --compile
 </verb></tscreen>
--->
+
 <sect>System Configuration Requirements for Compiling MythTV. <label
 id="Setting_up_paths">
 <p>Before you compile MythTV from the current source tarball or from
@@ -1060,7 +1049,7 @@ have to adjust by hand before you compile MythTV.
 
 The reference compilation system for MythTV is Ubuntu.
 
-<sect1>Shared-Library Requirements for MythTV 
+<sect1>Shared-Library requirements for MythTV 
 <sect2>Modifying /etc/ld.so.conf <label id="modifying_ld.so.conf">
 <p>The runtime manager for shared libraries, <bf>/lib/ld.so</bf>, gets
 information about the locations and contents of shared libraries from
@@ -1080,7 +1069,7 @@ $ su -
 # exit
 $
 </verb></tscreen>
-<sect1>Environment variable Requirements for MythTV
+<sect1>Environment variable requirements for MythTV
 <sect2>General requirements
 <sect3>QT libraries and binaries
 <p>The compiler needs to be able to locate QT binaries and libraries in
@@ -1101,7 +1090,7 @@ $ which qmake
 /usr/lib/qt3/bin/qmake
 </verb></tscreen>
 
-For Mandrake, you should see a value like <tt>/usr/lib/qt3</tt> for
+For Mandriva, you should see a value like <tt>/usr/lib/qt3</tt> for
 <tt>QTDIR</tt> and <tt>/usr/lib/qt3/bin</tt> should be in $PATH.
 
 For Gentoo, you should see a value like <tt>/usr/qt/3</tt> for <tt>QTDIR</tt> 
@@ -1116,17 +1105,17 @@ Also, check that there has been a link created in
 called <tt>default</tt>. If not, you'll get errors during the compile. See
 the Troubleshooting Section for more information.
 <sect2>Distribution-Specific Notes
-<sect3>Mandrake
-<p>The following instructions work for Mandrake using
+<sect3>Mandriva
+<p>The following instructions work for Mandriva using
 <bf>bash</bf> as the shell, and may be applicable for a distribution which
 uses <tt>/etc/profile.d</tt>.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>:  Mandrake 10 installs a <tt>/etc/profile.d/qtdir3.sh</tt>
+<caption><bf>NOTE</bf>:  Mandriva 10 installs a <tt>/etc/profile.d/qtdir3.sh</tt>
 file, but it doesn't include the addition of the PATH variable.  If you're
-running Mandrake 10, don't create a <tt>mythtv.sh</tt> file as detailed
+running Mandriva 10, don't create a <tt>mythtv.sh</tt> file as detailed
 below; edit the <tt>qtdir3.sh</tt> file and add the PATH statement within
 the if / fi block.
 </caption>
@@ -1158,6 +1147,7 @@ The last two commands are to exit out of the shell. This way, when you next
 open a shell your new commands
 will take effect.
 <sect3>Red Hat Linux 9
+<p><bf>NOTE</bf>: This section will be considered abandoned as of v0.20.
 <p>Red Hat Linux 9 use a default locale with UTF-8 encoding.
 Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
 whenever you run setup or mythfilldatabase you will get a lot of UTF-8
@@ -1173,7 +1163,7 @@ logged-in user, so if you will be automatically starting
 <bf>mythbackend</bf> from a script rather than an interactive terminal
 session you will need to make some adjustments.
 
-<bf>NOTE</bf>: The following instructions are accurate for Mandrake.
+<bf>NOTE</bf>: The following instructions are accurate for Mandriva.
 
 Check for a file called <tt>/etc/security/console.perms</tt>.  Open the file
 in your favorite text editor and look for a line that has:
@@ -1219,14 +1209,10 @@ Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.39).
 
 <code>
-NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
+NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
 next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
-
-NOTE for Red Hat users: If you are installing with apt or yum, you may skip
-this step, it will be taken care of. Otherwise get lame and lame-devel from
-<url url="http://ATrpms.net/name/lame/" name="http://ATrpms.net/name/lame/">.
 
 After downloading, be sure to install both:
 # rpm -Uvh lame*
@@ -1276,14 +1262,14 @@ list of all the dependent packages you must download and install.
 
 If you install from this location you may skip to <ref id="manually_building_mythtv"
 name="Manually building MythTV">.
-<sect2>Mandrake
+<sect2>Mandriva
 <p>RPMs for <bf>XMLTV</bf> and all of its dependencies are located in
-Mandrake's "contrib".  If you have added a contrib mirror, try installing
+Mandriva's "contrib".  If you have added a contrib mirror, try installing
 <bf>XMLTV</bf>:
 <tscreen><verb>
 # urpmi xmltv xmltv-grabbers
 </verb></tscreen>
-If this does not work, it is possible that contrib for your Mandrake version
+If this does not work, it is possible that contrib for your Mandriva version
 does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typing:
 <tscreen><verb>
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
@@ -1451,7 +1437,6 @@ the MythTV directory that you <tt>cd</tt>'d to above.
 </caption>
 </figure>
 
-
 <sect2>Enabling real-time scheduling of the display thread.
 <p>MythTV supports real-time scheduling of the video output thread. There
 are three ways to go about enabling this: You can use rlimits, you can use
@@ -1557,9 +1542,9 @@ Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 </verb></tscreen>
 <sect>MySQL.<label id="mysql">
 <sect1>Distribution-specific information
-<sect2>Mandrake
+<sect2>Mandriva
 <p>If this is the system maintaining the database, make sure that MySQL is
-running and started at boot.  Click on Mandrake Control
+running and started at boot.  Click on Mandriva Control
 Center->System->Services, find MySQL and click the "On Boot" button and the
 "Start" button if the MySQL status shows that it isn't running yet.
 
@@ -1602,16 +1587,14 @@ To setup the initial MySQL databases:
 <tscreen><verb>
 $ cd database
 </verb></tscreen>
-<sect2>Mandrake and Red Hat Linux/Fedora Core
+<sect2>Mandriva and Red Hat Linux/Fedora Core
 <p><tscreen><verb>
 $ mysql -u root < mc.sql
 </verb></tscreen>
-<!--
 <sect2>Debian 3.0
 <p><tscreen><verb>
 $ mysql < mc.sql
 </verb></tscreen>
--->
 <sect2>Gentoo
 <p><tscreen><verb>
 $ su
@@ -1690,8 +1673,8 @@ set it as the recording source.
 There are two ways to do this.  Graphically, and from the command line.
 
 <sect1>Graphically setting up the mixer
-<sect2>Mandrake and Red Hat Linux/Fedora Core
-<p>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
+<sect2>Mandriva and Red Hat Linux/Fedora Core
+<p>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandriva, or
 <verb>RedHat Menu>Sound & Video>Volume Control</verb> on Red Hat/Fedora.
 
 Click on Settings->Configure  Make sure that "Tick Marks" and "Show
@@ -1705,26 +1688,26 @@ dark green, meaning that it's "off".  You also want to click on the red LED
 so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.
-
 <sect3>Using OSS drivers.
-<p>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than the ALSA
-drivers recommended by the MythTV team. The OSS drivers do work for many
-people, and for many cards. We recommend that you give OSS a try since it is
-already included in the vendor distribution. However, some people report problems (sync
-and jitter) with OSS, and in addition it does not support full-duplex on
-some cards.  Full duplex is required if you want to record and play sound
-using just one sound card. ALSA has good full-duplex support, and also has
-drivers for some built-in (motherboard) sound cards that OSS does not.
-Installing ALSA is less painful than you might think, so if OSS does not
-work for you, installing ALSA is not too difficult. For those of you who do
-not wish to install ALSA you must do this:
+<p><bf>NOTE</bf>: This section will be removed in 0.20.  ALSA is the kernel
+sound driver now.
+<p>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than
+the ALSA drivers recommended by the MythTV team. The OSS drivers do work for
+many people, and for many cards. We recommend that you give OSS a try since
+it is already included in the vendor distribution. However, some people
+report problems (sync and jitter) with OSS, and in addition it does not
+support full-duplex on some cards.  Full duplex is required if you want to
+record and play sound using just one sound card. ALSA has good full-duplex
+support, and also has drivers for some built-in (motherboard) sound cards
+that OSS does not. Installing ALSA is less painful than you might think, so
+if OSS does not work for you, installing ALSA is not too difficult. For
+those of you who do not wish to install ALSA you must do this:
 
 To configure sound to work with MythTV, select <verb>RedHat Menu>Sound &
 Video>Volume Control</verb> to open up a mixer. Make sure your global volume
 (on the far left) is up. Also make sure that the "line in" section has
 "mute" and "record" checked and that the gain is turned up. You may have to
 experiment with volume/gain levels to get the best sound.  
-
 <sect3>Using ALSA.
 <p>If you'd like to use ALSA, you'll need to correctly setup your
 <tt>asoundrc</tt> file. Configuring this file is beyond the scope of this
@@ -1789,7 +1772,7 @@ if the user had pressed the keys on the keyboard.  The file
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption><bf>NOTE</bf>: If you are running Mandrake, you may install
+<caption><bf>NOTE</bf>: If you are running Mandriva, you may install
 <bf>lirc</bf> by executing: <tt># urpmi lirc lirc-remotes</tt> and bypass
 the manual compilation steps described below by jumping to the <ref
 id="completing_lirc_install" name="Completing the lirc install"> section. 
@@ -1808,9 +1791,9 @@ build process.
 # emerge lirc
 </verb></tscreen>
 
-<sect1>Mandrake
-<p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake
-through the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
+<sect1>Mandriva
+<p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandriva
+through the "cdialog" RPM, and the kernel source.  Mandriva 9.0 is using the
 2.4.19 kernel, so either install the kernel sources from the installation CD
 or go to <url url="http://www.kernel.org" name="http://www.kernel.org"> and
 download the full 2.4.19 tar file from <url
@@ -1941,7 +1924,7 @@ remote will be sending keypresses that your PC "sees" on the keyboard port.
 <p><figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption><bf>NOTE to Mandrake 9.1 users</bf>: skip to the manual start paragraph
+<caption><bf>NOTE to Mandriva 9.1 users</bf>: skip to the manual start paragraph
 below.
 </caption>
 </figure>
@@ -1961,7 +1944,7 @@ $ su
 # /sbin/ldconfig
 </verb></tscreen>
 
-Next, we're going to manually start lircd the first time.  Mandrake 9.1
+Next, we're going to manually start lircd the first time.  Mandriva 9.1
 users, type: <tt># /etc/rc.d/init.d/lircd start</tt> instead of:
 <tscreen><verb>
 # /usr/local/sbin/lircd
@@ -1970,7 +1953,7 @@ users, type: <tt># /etc/rc.d/init.d/lircd start</tt> instead of:
 If this fails, complaining of a missing <tt>lircd.conf</tt> file, then you
 must find or make one. First look for a pre-made configuration file at <url
 url="http://lirc.sourceforge.net/remotes/"
-name="http://lirc.sourceforge.net/remotes/">.  Mandrake 9.1 users, look in
+name="http://lirc.sourceforge.net/remotes/">.  Mandriva 9.1 users, look in
 <tt>/usr/share/lirc-remotes</tt>. If you find one your remotes either on the
 website or in <tt>/usr/share</tt>, download or copy the file, name it
 <tt>lircd.conf</tt> and put it in your <tt>/etc</tt> directory. If you
@@ -1995,7 +1978,7 @@ now try to start lircd again:
 </verb></tscreen>
 
 Now, we're going to add the commands necessary for lircd to run each time we
-boot. Mandrake 9.1 users, you can execute:
+boot. Mandriva 9.1 users, you can execute:
 <tscreen><verb>
 $ su
 # chkconfig --level 35 lircd on
@@ -4365,19 +4348,19 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball. The next step depends on whether your distribution has a web server
 and if you have PHP support.
 
-<sect2>Mandrake
-<p>Mandrake has <bf>apache</bf> and <bf>PHP</bf> pre-packaged, so
+<sect2>Mandriva
+<p>Mandriva has <bf>apache</bf> and <bf>PHP</bf> pre-packaged, so
 installation is quite simple.  Once you have installed the two programs,
 either with the graphical installer (see instructions in <ref
 id="graphicinstalltools_" name="Graphic Install Tools">) or through the
 command line (section <ref id="CLIinstalltools_" name="Command Line">), and
 you've ensured that the <bf>apache</bf> server will start at boot using the
-Mandrake Control Center.
+Mandriva Control Center.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: Mandrake 9.1 users, perform the following:
+<caption><bf>NOTE</bf>: Mandriva 9.1 users, perform the following:
 </caption>
 </figure>
 <tscreen><verb>
@@ -4446,7 +4429,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 There are a number of transitions available, some requiring OpenGL
-support.  You will also need to install a TIFF library.  Under Mandrake, you 
+support.  You will also need to install a TIFF library.  Under Mandriva, you 
 would perform the following command:
 <tscreen><verb>
 # urpmi libtiff3-devel
@@ -4829,8 +4812,8 @@ $ su
 $ 
 </verb></tscreen>
 
-<sect1>Mandrake
-<p>Mandrake has a number of the prerequisites available on the
+<sect1>Mandriva
+<p>Mandriva has a number of the prerequisites available on the
 installation CD.  Some of the software you're going to need will have to be
 obtained from the "contrib" or "cooker" development repositories. 
 Applications downloaded from "cooker" come from the development branch, so
@@ -4865,21 +4848,21 @@ use these, there are some prerequisites you must install prior to compiling.
 </itemize>
 
 <tt>fftw</tt> may be obtained from <url url="http://www.fftw.org/"
-name="http://www.fftw.org/">.  In Mandrake it may be installed by
+name="http://www.fftw.org/">.  In Mandriva it may be installed by
 typing:
 <tscreen><verb>
 # urpmi libfftw2 libfftw2-devel
 </verb></tscreen>
 
 <tt>OpenGL</tt> should be installed on practically all distributions. 
-However, you will need the devel module.  In Mandrake it may be
+However, you will need the devel module.  In Mandriva it may be
 installed by typing:
 <tscreen><verb>
 # urpmi libMesaGLU1-devel
 </verb></tscreen>
 
 <tt>SDL</tt> may be obtained from <url url="http://www.libsdl.org"
-name="http://www.libsdl.org">.  In Mandrake it may be installed by
+name="http://www.libsdl.org">.  In Mandriva it may be installed by
 typing:
 <tscreen><verb>
 # urpmi libSDL1.2 libSDL1.2-devel
@@ -5128,7 +5111,7 @@ MPEG-4 or xvid you may skip the prerequisite installation step.
 <sect1>Manual Compilation of Prerequisites
 <p>
 <sect1>Pre-compiled binaries
-<p>Mandrake users may install the prerequisites this way:
+<p>Mandriva users may install the prerequisites this way:
 <tscreen><verb>
 # urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel 
 # urpmi mplayer ogle xine
@@ -5531,7 +5514,7 @@ You may also setup your PC to do this at boot time, either by adding the
 command to your <tt>/etc/rc.local</tt> file, or by adding files to
 /etc/sysconfig.
 
-On Mandrake and other distributions, if you install <bf>hdparm</bf> from an RPM you
+On Mandriva and other distributions, if you install <bf>hdparm</bf> from an RPM you
 will most likely get a <tt>/etc/sysconfig/harddisks</tt> file installed. 
 This file will be parsed by the <tt>/etc/rc.sysinit</tt> script.  If you use
 the default <tt>harddisks</tt> file, your changes will affect all IDE devices
@@ -6164,7 +6147,7 @@ session.screen0.focusModel:     SloppyFocus
 
 <label id="mythbackend_autostart">
 <sect1>Automatically starting mythbackend at system boot time
-<sect2>Red Hat And Mandrake
+<sect2>Red Hat And Mandriva
 <p>Here's a method for automatically starting mythbackend submitted by Mike
 Thomson (<url url="mailto:linux@m-thomson.net" name="mailto:linux@m-thomson.net">) and Stu Tomlinson (<url
 url="mailto:stu@nosnilmot.com" name="mailto:stu@nosnilmot.com">).
@@ -6206,7 +6189,7 @@ $
 <sect3>Log files 
 <p>By default, the log file for mythbackend will be written to
 <tt>/var/tmp/mythbackend.log</tt>. This has been tested and is known to work
-on Mandrake and Red Hat, but many people prefer to place logs under
+on Mandriva and Red Hat, but many people prefer to place logs under
 <tt>/var/log/</tt>.
 
 To do this, create a group called <tt>mythtv</tt> (or anything you prefer)
@@ -6227,8 +6210,8 @@ drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
 $
 </verb></tscreen>
 
-<sect3>Mandrake 
-<p>Mandrake adds one more twist in the form of the <tt>msec</tt> utility,
+<sect3>Mandriva 
+<p>Mandriva adds one more twist in the form of the <tt>msec</tt> utility,
 which runs regularly and (at the default or any higher security level) sets
 permissions on many files, including those under <tt>/var/log</tt>.
 
@@ -7320,14 +7303,14 @@ encoder bitrates that produce very large files.
 <p>JFS (Journaling File System) is a journaling filesystem originally
 developed by IBM for AIX which was later released as open source.  While not
 as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9) and
-Fedora Core 1 (RHFC1) and Mandrake as well as other distros.  According to
+Fedora Core 1 (RHFC1) and Mandriva as well as other distros.  According to
 tests, JFS is the file deletion speed king, deleting virtually any file in
 under one second, even files as large as 10 gigabytes.
 
 <sect2>XFS
 <p>XFS is a journaling file system originally developed by SGI for Irix, and
 later released as open source.  While not a part of the default RedHat Linux
-9 or Fedora Core installation (although it is a part of Mandrake and Fedora
+9 or Fedora Core installation (although it is a part of Mandriva and Fedora
 Core 2), it can be easily installed via ATrpms.  XFS provides deletion
 speeds for large files only slightly slower than JFS.  According to the test
 results shown at (<url
@@ -7664,7 +7647,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.18.00, 2005-04-10.  Version bump. Add note that Mandrake > 9.1 needs
+v0.18.00, 2005-04-10.  Version bump. Add note that Mandriva > 9.1 needs
 libqt3-mysql.  Add note that you don't need to explicitly disable DPMS. 
 ./setup is now mythtv-setup.  Add DishTV PPV link.  Get rid of references to
 settings.pro since everything is now done in the configure script.  Update
@@ -7674,7 +7657,7 @@ selective restore of program information/migration section added.
 v0.18.01, 2005-04-20.  Change all the plugins stuff since it's all within
 the mythplugins tarball instead of individual ones.
 v0.18.02, 2005-05-05.  Fix a few more directory issues WRT the plugins.  Get
-rid of Mandrake versioning where it's no longer needed.  Get rid of the old
+rid of Mandriva versioning where it's no longer needed.  Get rid of the old
 crontab stuff since native mythfilldatabase is better.
 v0.18.03, 2005-05-13.  Add text for pulling release-branch CVS code.  Add
 text about PVR-500 being two PVR-150's.  Expand on choosing lowest numbered
@@ -7710,10 +7693,13 @@ v0.18.17, 2005-12-10.  Add some more details about debugging, put text early
 in the doc about what a good bug report should contain, tell people to use
 trac to submit docs patches.
 
-v0.19pre, 2006-01-  Add "cont" to gdb instructions.  Put in a gdb example of
-using a gdbcommands file.  Start deleting older cruft.  Update the real-time
-priority docs; they've changed the parameter to "rtprio".  (I guess
-"rt_priority" took too long to type.)
+v0.19pre, 2006-01-  Rewrite the gdb debugging instructions. Start deleting
+older cruft.  Update the real-time priority docs; they've changed the
+parameter to "rtprio".  (I guess "rt_priority" took too long to type.)
+Update link to pvrusb2 driver site - device might be useable by saying that
+it's a PVR-x50.  Start putting notices that sections are going to be removed
+in 0.20 if there are no updates.  sed for Mandrake -> Mandriva.  Re-enable
+Debian build instructions.  Update ATSC / DVB stuff.
 
 -->
 
@@ -7745,5 +7731,7 @@ Itemized and enumerated items should be full sentences, and should end with
 a period.
 
 All major sections end with a period; subsections don't.
+
+Dates must be in ISO8601 format YYYY-MM-DD.
 
 -->
