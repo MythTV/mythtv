@@ -69,7 +69,7 @@ OSD::OSD(const QRect &osd_bounds, int   frameRate,
     }
     SetDefaults();
 
-    // Reinit since SetDefaults() appears to mess things up.
+    // Reinit since LoadThemes and SetDefaults() appear to mess things up.
     Reinit(osd_bounds, frameRate, vis_bounds, visibleAspect, fontScaling);
 }
 
@@ -276,7 +276,7 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
                         wmult, hmult, frameint);
     }
 
-    if (oldB != osdBounds)
+    if (true || oldB != osdBounds)
     {
         delete drawSurface;
         drawSurface = new OSDSurface(osdBounds.width(), osdBounds.height());
@@ -1183,6 +1183,15 @@ void OSD::parseContainer(QDomElement &element)
 
 bool OSD::LoadTheme(void)
 {
+    // HACK begin -- needed to address ticket #989
+    xoffset = 0;
+    yoffset = 0;
+    displaywidth  = 640;
+    displayheight = 480;
+    hmult = 1.0f;
+    wmult = 1.0f;
+    // HACK end
+
     QString themefile = themepath + "/osd.xml";
 
     QDomDocument doc;
