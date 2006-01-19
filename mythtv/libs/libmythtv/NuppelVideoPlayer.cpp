@@ -758,15 +758,22 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     eof = false;
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
-    int ret;
-    // We still want to locate decoder for video even if using_null_videoout is true
-    bool disable_video_decoding = false; // set to true for audio only decodeing
-    if ((ret = GetDecoder()->OpenFile(ringBuffer, disable_video_decoding, testbuf)) < 0)
+    // Set 'no_video_decode' to true for audio only decodeing
+    bool no_video_decode = false;
+
+    // We want to locate decoder for video even if using_null_videoout
+    // is true, only disable if no_video_decode is true.
+    int ret = GetDecoder()->OpenFile(ringBuffer, no_video_decode, testbuf);
+    if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't open decoder for: %1")
                 .arg(ringBuffer->GetFilename()));
         return -1;
     }
+
+    // Reinitialize videoout if we already have video out
+    if (videoOutput)
+        ReinitVideo();
 
     if (audio_bits == -1)
         no_audio_in = no_audio_out = true;
@@ -785,7 +792,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     }
     bookmarkseek = GetBookmark();
 
-    return 0;
+    return IsErrored() ? -1 : 0;
 }
 
 void NuppelVideoPlayer::InitFilters(void)
@@ -2028,7 +2035,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     {
         ringBuffer->Reset(true);
         if (newtype)
-            OpenFile();
+            errored = (OpenFile() >= 0) ? errored : true;
         else
             ResetPlaying();
     }
@@ -2107,11 +2114,11 @@ void NuppelVideoPlayer::JumpToProgram(void)
     ringBuffer->OpenFile(pginfo->pathname);
 
     if (newtype)
-        OpenFile();
+        errored = (OpenFile() >= 0) ? errored : true;
     else
         ResetPlaying();
 
-    if (!GetDecoder())
+    if (errored || !GetDecoder())
     {
         errored = true;
         return;
