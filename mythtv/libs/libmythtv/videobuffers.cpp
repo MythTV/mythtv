@@ -1065,12 +1065,19 @@ bool VideoBuffers::CreateBuffers(int width, int height)
     return CreateBuffers(width, height, bufs);
 }
 
-bool VideoBuffers::CreateBuffers(int width, int height, vector<unsigned char*> bufs)
+bool VideoBuffers::CreateBuffers(int width, int height,
+                                 vector<unsigned char*> bufs)
 {
     bool ok = true;
     uint bpp = 12 / 4; /* bits per pixel div common factor */
     uint bpb =  8 / 4; /* bits per byte div common factor */
-    uint buf_size = (width * height * bpp + 4/* to round up */) / bpb;
+
+    // If the buffer sizes are not a multple of 16, adjust.
+    // old versions of MythTV allowed people to set invalid
+    // dimensions for MPEG-4 capture, no need to segfault..
+    uint adj_w = (width  + 15) & ~0xF;
+    uint adj_h = (height + 15) & ~0xF;
+    uint buf_size = (adj_w * adj_h * bpp + 4/* to round up */) / bpb;
     while (bufs.size() < allocSize())
     {
         unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
