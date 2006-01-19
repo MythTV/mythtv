@@ -386,6 +386,13 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             if (profile.byName("transcodepreserveaspect")->getValue().toInt())
                 newHeight = (int)(1.0 * newWidth * video_height / video_width);
 
+            if (encodingType.left(4).lower() == "mpeg")
+            {
+                // make sure dimensions are valid for MPEG codecs
+                newHeight = (newHeight + 15) & ~0xF;
+                newWidth  = (newWidth  + 15) & ~0xF;
+            }
+
             VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
                     .arg(video_width).arg(video_height)
                     .arg(newWidth).arg(newHeight));
