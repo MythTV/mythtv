@@ -171,10 +171,14 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         return 0;
     }
 
+    // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
+    // pointer_field (+8 bits), since payload start is true if we are here.
+    const int extra_offset = 4;
+
     const unsigned char* pesdata = tspacket->data() + offset;
     const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
     const PESPacket pes = PESPacket::View(*tspacket);
-    if ((pes_length + offset)>188)
+    if ((pes_length + offset + extra_offset) > 188)
     {
         SavePartialPES(tspacket->PID(), new PESPacket(*tspacket));
         moreTablePackets = false;
