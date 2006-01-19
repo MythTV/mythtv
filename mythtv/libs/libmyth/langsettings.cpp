@@ -155,7 +155,8 @@ QStringList LanguageSettings::getLanguages(void)
           << QString::fromUtf8("Eesti")       << "ET"   // Estonian
           << QString::fromUtf8("Português Brasileiro")
               << "PT_BR"                               // Brazilian Portuguese
-          << QString::fromUtf8("English (British)") << "EN_GB";   // British English
+          << QString::fromUtf8("English (British)") << "EN_GB"   // British English
+          << QString::fromUtf8("Česky")       << "CZ";   // Czech
     return langs;
 }
 
