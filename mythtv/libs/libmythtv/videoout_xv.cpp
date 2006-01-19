@@ -1487,6 +1487,9 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool create_xvmc_block
  */
 vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("CreateShmImages(%1): ").arg(num)
+            <<QString("XJ: (%1,%2)").arg(XJ_width).arg(XJ_height));
+
     vector<unsigned char*> bufs;
     XShmSegmentInfo blank;
     // for now make reserve big enough to avoid realloc.. 
