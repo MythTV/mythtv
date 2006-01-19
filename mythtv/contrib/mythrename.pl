@@ -22,7 +22,7 @@
     use File::Path;
 
 # Some variables we'll use here
-    our ($dest, $format, $usage, $underscores);
+    our ($dest, $format, $usage, $underscores, $live);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
     our ($hostname, $dbh, $sh, $sh2, $q, $q2, $count);
@@ -42,6 +42,7 @@
 # Load the cli options
     GetOptions('link|dest|destination|path:s' => \$dest,
                'format=s'                     => \$format,
+               'live'                         => \$live,
                'separator=s'                  => \$separator,
                'replacement=s'                => \$replacement,
                'usage|help|h'                 => \$usage,
@@ -64,6 +65,13 @@ options:
     directory on this machine.  eg:
 
     /var/video/show_names/
+
+--live
+
+    Include live tv recordings, affects both linking and renaming. This assumes
+    that recgroup = "LiveTV" for live tv recordings.
+
+    default: do not link/rename live tv recordings
 
 --format
 
@@ -239,7 +247,11 @@ EOF
     }
 
 # Prepare a database queries
-    $q  = 'SELECT * FROM recorded';
+    if (defined($live)) {
+        $q  = 'SELECT * FROM recorded';
+    } else {
+        $q  = 'SELECT * FROM recorded where recgroup != "LiveTV"';
+    }
     $sh  = $dbh->prepare($q);
     $sh->execute() or die "Couldn't execute $q:  $!\n";
 
