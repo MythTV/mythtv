@@ -672,17 +672,6 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
-    <name>NuppelVideoPlayer</name>
-    <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -6103,14 +6092,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
         <translation type="unfinished"></translation>
@@ -7040,6 +7021,26 @@ Myth will now exit.</source>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve Aspect Ratio of Video when resizing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spain</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7218,6 +7219,10 @@ No other details</source>
     </message>
     <message>
         <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of these are LiveTV and consume %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7783,14 +7788,6 @@ No other details</source>
     <message>
         <source>BE %1</source>
         <comment>Bit Errors</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

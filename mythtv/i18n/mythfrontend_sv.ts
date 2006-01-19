@@ -667,17 +667,6 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
-    <name>NuppelVideoPlayer</name>
-    <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -6061,11 +6050,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation>Ange antingen en exakt frekvens i Hertz eller en giltig kanal för ditt &apos;TV-format&apos;.</translation>
+        <translation type="obsolete">Ange antingen en exakt frekvens i Hertz eller en giltig kanal för ditt &apos;TV-format&apos;.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation>Värde i Hertz som läggs till din önskade frekvens för &apos;fininställning&apos;.</translation>
+        <translation type="obsolete">Värde i Hertz som läggs till din önskade frekvens för &apos;fininställning&apos;.</translation>
     </message>
     <message>
         <source>A</source>
@@ -6967,11 +6956,23 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation type="obsolete">Bevara bildaspekt när storlek ändras</translation>
+        <translation>Bevara bildaspekt när storlek ändras</translation>
     </message>
     <message>
         <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
-        <translation type="obsolete">Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
+        <translation>Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
+    </message>
+    <message>
+        <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation>Ange antingen en exakt frekvens i kHz eller en giltig kanal för ditt &apos;TV-format&apos;.</translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
+        <translation>Värde i kHz som läggs till din önskade frekvens för &apos;fininställning&apos;.</translation>
+    </message>
+    <message>
+        <source>Spain</source>
+        <translation>Spanien</translation>
     </message>
 </context>
 <context>
@@ -7156,6 +7157,10 @@ Inga andra detaljer</translation>
     <message>
         <source>LiveTV</source>
         <translation>LiveTV</translation>
+    </message>
+    <message>
+        <source>%1 of these are LiveTV and consume %2</source>
+        <translation>%1 av dessa är LiveTV och förbrukar %2</translation>
     </message>
 </context>
 <context>
@@ -7707,12 +7712,8 @@ Inga andra detaljer</translation>
         <translation>BE %1</translation>
     </message>
     <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ladda reklamlista</translation>
     </message>
 </context>
 <context>

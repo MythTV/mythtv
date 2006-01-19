@@ -750,17 +750,6 @@ Je reviens au menu précédent.</translation>
     </message>
 </context>
 <context>
-    <name>NuppelVideoPlayer</name>
-    <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -6947,11 +6936,11 @@ Myth va maintenant s&apos;interrompre.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation>Entrez soit la fréquence exacte en [Hz], soit un canal TV valide.</translation>
+        <translation type="obsolete">Entrez soit la fréquence exacte en [Hz], soit un canal TV valide.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation>Réglage fin en [Hz].</translation>
+        <translation type="obsolete">Réglage fin en [Hz].</translation>
     </message>
     <message>
         <source>A</source>
@@ -7895,6 +7884,26 @@ Myth va maintenant s&apos;interrompre.</translation>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve Aspect Ratio of Video when resizing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spain</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8097,6 +8106,10 @@ Pas d&apos;autres informations</translation>
     <message>
         <source>LiveTV</source>
         <translation>TV en direct</translation>
+    </message>
+    <message>
+        <source>%1 of these are LiveTV and consume %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8674,14 +8687,6 @@ Pas d&apos;autres informations</translation>
         <source>BE %1</source>
         <comment>Bit Errors</comment>
         <translation>BE %1</translation>
-    </message>
-    <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

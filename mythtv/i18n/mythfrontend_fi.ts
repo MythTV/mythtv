@@ -777,11 +777,11 @@ Palaa edelliseen valikkoon.</translation>
     <name>NuppelVideoPlayer</name>
     <message>
         <source>Close Edit Recording</source>
-        <translation>Sulje Nauhoituksen Muokkaus</translation>
+        <translation type="obsolete">Sulje Nauhoituksen Muokkaus</translation>
     </message>
     <message>
         <source>Load commercial skip list</source>
-        <translation>Lataa mainosten sivuutuslista</translation>
+        <translation type="obsolete">Lataa mainosten sivuutuslista</translation>
     </message>
 </context>
 <context>
@@ -7063,14 +7063,6 @@ Myth lopetetaan.</translation>
         <translation>Kanava</translation>
     </message>
     <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
         <translation type="unfinished">A</translation>
@@ -8011,7 +8003,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anna ryhmän nimi tai paina SELECT antaaksesi sen virtuaalisen näppäimistön kautta</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
@@ -8131,6 +8123,26 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve Aspect Ratio of Video when resizing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spain</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8337,6 +8349,10 @@ Se ohitetaan</translation>
     <message>
         <source>LiveTV</source>
         <translation>LiveTV</translation>
+    </message>
+    <message>
+        <source>%1 of these are LiveTV and consume %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8941,11 +8957,11 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Close Edit Recording</source>
-        <translation>Sulje Nauhoituksen Muokkaus</translation>
+        <translation type="obsolete">Sulje Nauhoituksen Muokkaus</translation>
     </message>
     <message>
         <source>Load commercial skip list</source>
-        <translation>Lataa mainosten sivuutuslista</translation>
+        <translation type="obsolete">Lataa mainosten sivuutuslista</translation>
     </message>
 </context>
 <context>

@@ -750,17 +750,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
 </context>
 <context>
-    <name>NuppelVideoPlayer</name>
-    <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PlayGroup</name>
     <message>
         <source>Group</source>
@@ -805,7 +794,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <source>(Create new group)</source>
         <translation>(Neue Gruppe anlegen)</translation>
     </message>
-    </context>
+</context>
 <context>
     <name>PlaybackBox</name>
     <message>
@@ -6968,11 +6957,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation>Geben Sie entweder eine Frequenz (in Hertz) oder einen für Ihre TV-Norm gültigen Kanal ein.</translation>
+        <translation type="obsolete">Geben Sie entweder eine Frequenz (in Hertz) oder einen für Ihre TV-Norm gültigen Kanal ein.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation>Geben Sie hier zur Feinabstimmung eine Frequenz (in Hertz) an, die zur Kanalfrequenz addiert wird.</translation>
+        <translation type="obsolete">Geben Sie hier zur Feinabstimmung eine Frequenz (in Hertz) an, die zur Kanalfrequenz addiert wird.</translation>
     </message>
     <message>
         <source>A</source>
@@ -7908,6 +7897,26 @@ Myth wird nun beendet.</translation>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve Aspect Ratio of Video when resizing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spain</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8106,6 +8115,10 @@ Keine weiteren Informationen</translation>
     <message>
         <source>LiveTV</source>
         <translation>LiveTV</translation>
+    </message>
+    <message>
+        <source>%1 of these are LiveTV and consume %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8681,12 +8694,8 @@ Keine weiteren Informationen</translation>
         <translation>Bitfehler %1</translation>
     </message>
     <message>
-        <source>Close Edit Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load commercial skip list</source>
-        <translation type="unfinished"></translation>
+        <source>No Lock</source>
+        <translation type="unfinished">Kein Lock</translation>
     </message>
 </context>
 <context>
