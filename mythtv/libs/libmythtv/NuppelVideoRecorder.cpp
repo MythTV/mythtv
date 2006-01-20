@@ -49,12 +49,6 @@ extern "C" {
 
 #include "programinfo.h"
 
-#ifdef USING_FRONTEND
-extern pthread_mutex_t avcodeclock;
-#else
-pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
-#endif
-
 #define LOC QString("NVR(%1): ").arg(videodevice)
 #define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
 
@@ -533,7 +527,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (codec.lower() == "huffyuv" || codec.lower() == "mjpeg")
         mpa_ctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
 
-    pthread_mutex_lock(&avcodeclock);
+    QMutexLocker locker(&avcodeclock);
 
 #ifdef HAVE_PTHREADS
     if ((encoding_thread_count > 1) &&
@@ -545,13 +539,11 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
 
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
-        pthread_mutex_unlock(&avcodeclock);
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Unable to open FFMPEG/%1 codec").arg(codec));
         return false;
     }
 
-    pthread_mutex_unlock(&avcodeclock);
     return true;
 }
 
@@ -2987,10 +2979,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
         if (!hardware_encode)
         {
-            pthread_mutex_lock(&avcodeclock);
+            QMutexLocker locker(&avcodeclock);
             tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
                                        len, &mpa_picture); 
-            pthread_mutex_unlock(&avcodeclock);
         }
     }
     else

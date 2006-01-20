@@ -47,8 +47,6 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate,
 static int encode_frame(bool dts, unsigned char* data, int len,
                         short *samples, int &samples_size);
 
-extern pthread_mutex_t avcodeclock;
-
 int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -307,13 +305,10 @@ void AvFormatDecoder::CloseContext()
     {
         for (int i = 0; i < ic->nb_streams; i++)
         {
+            QMutexLocker locker(&avcodeclock);
             AVStream *st = ic->streams[i];
             if (st->codec->codec)
-            {
-                pthread_mutex_lock(&avcodeclock);
                 avcodec_close(st->codec);
-                pthread_mutex_unlock(&avcodeclock);
-            }
         }
 
         ic->iformat->flags |= AVFMT_NOFILE;
@@ -671,10 +666,9 @@ extern "C" void HandleStreamChange(void* data) {
     VERBOSE(VB_PLAYBACK, LOC + "HandleStreamChange(): "
             "streams_changed "<<data<<" -- stream count "<<cnt);
 
-    pthread_mutex_lock(&avcodeclock);
+    QMutexLocker locker(&avcodeclock);
     decoder->SeekReset(0, 0, true, true);
     decoder->ScanStreams(false);
-    pthread_mutex_unlock(&avcodeclock);
 }
 
 /** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[2048])
@@ -1109,9 +1103,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (!enc->codec)
         {
-            pthread_mutex_lock(&avcodeclock);
+            QMutexLocker locker(&avcodeclock);
+
             int open_val = avcodec_open(enc, codec);
-            pthread_mutex_unlock(&avcodeclock);
             if (open_val < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR
@@ -1817,7 +1811,7 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
     if (trackNo >= (int)audioStreams.size())
         return false;
 
-    pthread_mutex_lock(&avcodeclock);
+    QMutexLocker locker(&avcodeclock);
 
     currentAudioTrack = max(-1, trackNo);
     if (currentAudioTrack >= 0)
@@ -1830,8 +1824,6 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
 
     QString msg = SetupAudioStream() ? "" : "not ";
     VERBOSE(VB_AUDIO, LOC + "Audio stream type "+msg+"changed.");
-
-    pthread_mutex_unlock(&avcodeclock);
 
     return (currentAudioTrack >= 0);
 }
@@ -2065,7 +2057,7 @@ bool AvFormatDecoder::setCurrentSubtitleTrack(int trackNo)
     if (trackNo >= (int)subtitleStreams.size())
         return false;
 
-    pthread_mutex_lock(&avcodeclock);
+    QMutexLocker locker(&avcodeclock);
 
     currentSubtitleTrack = max(-1, trackNo);
     if (currentSubtitleTrack >= 0)
@@ -2075,8 +2067,6 @@ bool AvFormatDecoder::setCurrentSubtitleTrack(int trackNo)
     }
     else
         selectedSubtitleStream.av_stream_index = -1;
-
-    pthread_mutex_unlock(&avcodeclock);
 
     return currentSubtitleTrack >= 0;
 }
@@ -2194,10 +2184,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     bool allowedquit = false;
     bool storevideoframes = false;
 
-    pthread_mutex_lock(&avcodeclock);
-    autoSelectAudioTrack();
-    autoSelectSubtitleTrack();
-    pthread_mutex_unlock(&avcodeclock);
+    {
+        QMutexLocker locker(&avcodeclock);
+        autoSelectAudioTrack();
+        autoSelectSubtitleTrack();
+    }
 
     bool skipaudio = (lastvpts == 0);
 
@@ -2367,11 +2358,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         firstloop = true;
         have_err = false;
 
-        pthread_mutex_lock(&avcodeclock);
+        avcodeclock.lock();
         int ctype  = curstream->codec->codec_type;
         int audIdx = selectedAudioStream.av_stream_index;
         int subIdx = selectedSubtitleStream.av_stream_index;
-        pthread_mutex_unlock(&avcodeclock);
+        avcodeclock.unlock();
 
         while (!have_err && len > 0)
         {
@@ -2383,7 +2374,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     // to be decoded before we can know this
                     if (!curstream->codec->channels)
                     {
-                        pthread_mutex_lock(&avcodeclock);
+                        QMutexLocker locker(&avcodeclock);
                         curstream->codec->channels = MAX_OUTPUT_CHANNELS;
                         ret = avcodec_decode_audio(
                             curstream->codec, audioSamples,
@@ -2396,7 +2387,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             autoSelectAudioTrack();
                             audIdx = selectedAudioStream.av_stream_index;
                         }
-                        pthread_mutex_unlock(&avcodeclock);
                     }
 
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
@@ -2422,7 +2412,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             skipaudio = false;
                     }
 
-                    pthread_mutex_lock(&avcodeclock);
+                    avcodeclock.lock();
                     ret = len;
                     data_size = 0;
                     if (audioOut.do_passthru)
@@ -2456,7 +2446,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             data_size = 0;
                         }
                     }
-                    pthread_mutex_unlock(&avcodeclock);
+                    avcodeclock.unlock();
 
                     // BEGIN Is this really safe? -- dtk
                     if (data_size <= 0)
@@ -2501,14 +2491,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     int gotpicture = 0;
 
-                    pthread_mutex_lock(&avcodeclock);
+                    avcodeclock.lock();
                     if (d->HasMPEG2Dec())
                         ret = d->DecodeMPEG2Video(context, &mpa_pic,
                                                   &gotpicture, ptr, len);
                     else
                         ret = avcodec_decode_video(context, &mpa_pic,
                                                    &gotpicture, ptr, len);
-                    pthread_mutex_unlock(&avcodeclock);
+                    avcodeclock.unlock();
 
                     if (ret < 0)
                     {
@@ -2608,11 +2598,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (pkt->stream_index == subIdx)
                     {
-                        pthread_mutex_lock(&avcodeclock);
+                        QMutexLocker locker(&avcodeclock);
                         avcodec_decode_subtitle(curstream->codec,
                                                 &subtitle, &gotSubtitles,
                                                 ptr, len);
-                        pthread_mutex_unlock(&avcodeclock);
                     }
 
                     // the subtitle decoder always consumes the whole packet
@@ -2673,9 +2662,8 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
         VERBOSE(VB_AUDIO, LOC + msg + " pass through");
 
         // Force pass through state to be reanalyzed
-        pthread_mutex_lock(&avcodeclock);
+        QMutexLocker locker(&avcodeclock);
         SetupAudioStream();
-        pthread_mutex_unlock(&avcodeclock);
     }
 }
 

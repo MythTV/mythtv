@@ -50,6 +50,8 @@ QMutex MythContext::verbose_mutex(true);
 unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 QString verboseString = QString(" important general");
 
+QMutex avcodeclock(true);
+
 int parse_verbose_arg(QString arg)
 {
     QString option;

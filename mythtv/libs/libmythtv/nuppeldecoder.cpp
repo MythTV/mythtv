@@ -28,12 +28,6 @@ using namespace std;
 #define LOC QString("NVD: ")
 #define LOC_ERR QString("NVD Error: ")
 
-#ifdef CONFIG_DARWIN
-pthread_mutex_t avcodeclock;
-#else
-pthread_mutex_t avcodeclock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
-#endif
-
 NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     : DecoderBase(parent, pginfo),
       gf(0), rtjd(0), video_width(0), video_height(0), video_size(0),
@@ -48,22 +42,6 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       lastct('1'), strm(0), buf(0), buf2(0), 
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
-#ifdef CONFIG_DARWIN
-    // There is only a default static initialiser for pthread_mutexes
-    // (i.e. no recursive types), so we have to do it the longhand way:        
-    pthread_mutexattr_t avcodeclock_attr;
-
-    if (pthread_mutexattr_init(&avcodeclock_attr) ||
-        pthread_mutexattr_settype(&avcodeclock_attr, PTHREAD_MUTEX_RECURSIVE) ||
-        pthread_mutex_init(&avcodeclock, &avcodeclock_attr))
-    {
-        VERBOSE(VB_IMPORTANT,
-                "NuppelDecoder: Couldn't init a recursive mutex, aborting");
-        errored = true;
-        return;
-    }
-#endif
-
     // initialize structures
     memset(&fileheader, 0, sizeof(rtfileheader));
     memset(&frameheader, 0, sizeof(rtframeheader));
@@ -681,30 +659,30 @@ bool NuppelDecoder::InitAVCodec(int codec)
         mpa_ctx->extradata_size = ffmpeg_extradatasize;
     }
 
-    pthread_mutex_lock(&avcodeclock);
+    QMutexLocker locker(&avcodeclock);
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
-        pthread_mutex_unlock(&avcodeclock);
-        VERBOSE(VB_IMPORTANT, "Couldn't find lavc codec");
+        VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc codec");
         return false;
     }
-    pthread_mutex_unlock(&avcodeclock);
 
     return true;
 }
 
 void NuppelDecoder::CloseAVCodec(void)
 {
-    if (!mpa_codec)
-        return;
+    QMutexLocker locker(&avcodeclock);
 
-    pthread_mutex_lock(&avcodeclock);
-    avcodec_close(mpa_ctx);
-    pthread_mutex_unlock(&avcodeclock);
+    if (mpa_codec)
+    {
+        avcodec_close(mpa_ctx);
 
-    if (mpa_ctx)
-        av_free(mpa_ctx);
-    mpa_ctx = NULL;
+        if (mpa_ctx)
+        {
+            av_free(mpa_ctx);
+            mpa_ctx = NULL;
+        }
+    }
 }
 
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
@@ -789,23 +767,23 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
         AVFrame mpa_pic;
 
-        int gotpicture = 0;
-        pthread_mutex_lock(&avcodeclock);
-        // if directrendering, writes into buf
-        int ret = avcodec_decode_video(mpa_ctx, &mpa_pic, &gotpicture,
-                                       lstrm, frameheader->packetlength);
-        directframe = NULL;
-        pthread_mutex_unlock(&avcodeclock);
-        if (ret < 0)
         {
-            VERBOSE(VB_PLAYBACK, QString("decoding error: %1 back from avcodec")
-                                 .arg(ret));
-            return false;
-        }
-
-        if (!gotpicture)
-        {
-            return false;
+            QMutexLocker locker(&avcodeclock);
+            // if directrendering, writes into buf
+            int gotpicture = 0;
+            int ret = avcodec_decode_video(mpa_ctx, &mpa_pic, &gotpicture,
+                                           lstrm, frameheader->packetlength);
+            directframe = NULL;
+            if (ret < 0)
+            {
+                VERBOSE(VB_PLAYBACK, LOC_ERR +
+                        "avcodec_decode_video returned: "<<ret);
+                return false;
+            }
+            else if (!gotpicture)
+            {
+                return false;
+            }
         }
 
 /* XXX: Broken

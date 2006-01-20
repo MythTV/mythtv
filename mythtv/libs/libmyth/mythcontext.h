@@ -428,4 +428,7 @@ class MythContext : public QObject, public MythObservable
 /// This global variable contains the MythContext instance for the application
 extern MythContext *gContext;
 
+/// This global variable is used to makes certain calls to avlib threadsafe.
+extern QMutex avcodeclock;
+
 #endif
