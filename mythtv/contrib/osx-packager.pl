@@ -17,6 +17,12 @@ use Cwd ();
 our $svn = `which svn`; chomp $svn;
 #our $svn = '/Volumes/Users/nigel/bin/svn';
 
+# This script used to always delete the installed include and lib dirs.
+# That probably ensures a safe build, but when rebuilding adds minutes to
+# the total build time, and prevents us skipping some parts of a full build
+#
+our $cleanLibs = 0;
+
 # By default, only the frontend is built (i.e. no backend or transcoding)
 #
 our $backend = 0;
@@ -227,6 +233,9 @@ osx-packager.pl - build OS X binary packages for MythTV
    -distclean       throw away all intermediate files and exit
    -thirdclean      do a clean rebuild of third party packages
    -thirdskip       don't rebuild the third party packages
+   -mythtvskip      don't rebuild/install mythtv
+   -pluginskip      don't rebuild/install mythplugins
+   -themeskip       don't install the extra themes from myththemes
    -clean           do a clean rebuild of MythTV
    -svnbranch <str> build a specified Subversion branch,   instead of HEAD
    -svnrev <str>    build a specified Subversion revision, instead of HEAD
@@ -293,6 +302,9 @@ Getopt::Long::GetOptions(\%OPT,
                          'distclean',
                          'thirdclean',
                          'thirdskip',
+                         'mythtvskip',
+                         'pluginskip',
+                         'themeskip',
                          'clean',
                          'svnbranch=s',
                          'svnrev=s',
@@ -309,6 +321,9 @@ Pod::Usage::pod2usage('-verbose' => 2) if $OPT{'man'};
 
 if ( $OPT{'enable-backend'} )
 {   $backend = 1  }
+
+if ( $OPT{'clean'} )
+{   $cleanLibs = 1  }
 
 if ( $OPT{'enable-jobtools'} )
 {   $jobtools = 1  }
@@ -589,6 +604,13 @@ foreach my $sw (@build_depends)
 ### build MythTV
 
 # Clean any previously installed libraries
+if ( $cleanLibs )
+{
+  if ( $OPT{'mythtvskip'} )
+  {
+    &Complain("Cannot skip building mythtv src if also cleaning");
+    exit;
+  }
 &Verbose("Cleaning previous installs of MythTV");
 my @mythlibs = glob "$PREFIX/lib/libmyth*";
 if (scalar @mythlibs)
@@ -601,6 +623,7 @@ foreach my $dir ('include', 'lib', 'share')
   {
     &Syscall([ '/bin/rm', '-f', '-r', "$PREFIX/$dir/mythtv" ]) or die;
   }
+}
 }
 
 my $svndir = "$SRCDIR/myth-svn";
@@ -651,6 +674,20 @@ if (! $OPT{'nohead'})
   Verbose("Checking out source code");
   &Syscall([ $svn, 'co', @svnrevision,
             map($svnrepository . $_, @comps), $svndir ]) or die;
+}
+
+# Deal with user-supplied skip arguments
+if ( $OPT{'mythtvskip'} )
+{   @comps = grep(!m/mythtv/,      @comps)   }
+if ( $OPT{'pluginskip'} )
+{   @comps = grep(!m/mythplugins/, @comps)   }
+if ( $OPT{'themeskip'} )
+{   @comps = grep(!m/myththemes/,  @comps)   }
+
+if ( ! @comps )
+{
+  &Complain("Nothing to build! Too many ...skip arguments?");
+  exit;
 }
 
 # Build MythTV and any plugins
