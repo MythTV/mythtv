@@ -435,7 +435,9 @@ void NuppelVideoPlayer::ReinitVideo(void)
 {
     InitFilters();
 
+    vidExitLock.lock();
     videofiltersLock.lock();
+
     videoOutput->InputChanged(video_width, video_height, video_aspect);
     if (videoOutput->IsErrored())
     {
@@ -454,6 +456,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
     }
 
     videofiltersLock.unlock();
+    vidExitLock.unlock();
 
     ClearAfterSeek();
 }
