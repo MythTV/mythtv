@@ -425,8 +425,13 @@ our %makecleanopt = (
       ],
 );
 
+# Source code version.pro needs to call subversion binary
+#
+use File::Basename;
+our $svnpath = dirname $svn;
+
 # Clean the environment
-$ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin";
+$ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin:$svnpath";
 $ENV{'DYLD_LIBRARY_PATH'} = "$PREFIX/lib";
 $ENV{'LD_LIBRARY_PATH'} = "/usr/local/lib";
 $ENV{'PKG_CONFIG_PATH'} = "$PREFIX/lib/pkgconfig:";

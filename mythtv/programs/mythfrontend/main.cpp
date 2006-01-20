@@ -775,7 +775,9 @@ int main(int argc, char **argv)
         }
         else if (!strcmp(a.argv()[argpos],"--version"))
         {
-            cout << MYTH_BINARY_VERSION << endl;
+            extern const char *myth_source_version;
+            cout << "Library API version: " << MYTH_BINARY_VERSION << endl;
+            cout << "Source code version: " << myth_source_version << endl;
 #ifdef MYTH_BUILD_CONFIG
             cout << "Options compiled in:" <<endl;
             cout << MYTH_BUILD_CONFIG << endl;
