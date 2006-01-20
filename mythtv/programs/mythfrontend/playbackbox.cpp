@@ -880,6 +880,7 @@ void PlaybackBox::updateVideo(QPainter *p)
             if (conv_rgba_buf)
                 delete [] conv_rgba_buf;
             conv_rgba_buf = new unsigned char[w * h * 4];
+            conv_rgba_size = QSize(w, h);
         }
 
         conv_yuv2rgba(conv_rgba_buf,
