@@ -31,7 +31,7 @@ class EITHelper : public QObject
 
   private:
     int GetChanID(int tid_db, const Event &event) const;
-    static uint UpdateEITList(int mplexid, const QList_Events &events);
+    uint UpdateEITList(int mplexid, const QList_Events &events);
 
     QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock

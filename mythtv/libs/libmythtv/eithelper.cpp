@@ -132,15 +132,14 @@ uint EITHelper::UpdateEITList(int mplexid, const QList_Events &events)
     MSqlQuery query1(MSqlQuery::InitCon());
     MSqlQuery query2(MSqlQuery::InitCon());
 
+    int  chanid  = 0;
     uint counter = 0;
+
     QList_Events::const_iterator e = events.begin();
     for (; e != events.end(); ++e)
-    {
-        int chanid = get_chan_id_from_db(mplexid, **e);
-        if (chanid <= 0)
-            continue;
-        counter += update_eit_in_db(query1, query2, chanid, **e);
-    }
+        if ((chanid = GetChanID(mplexid, **e)) > 0)
+            counter += update_eit_in_db(query1, query2, chanid, **e);
+
     return counter;
 }
 
