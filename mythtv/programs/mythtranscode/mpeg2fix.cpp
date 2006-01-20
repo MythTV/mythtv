@@ -1706,11 +1706,11 @@ int MPEG2fixup::Start()
                              .arg(PtsTime(af->current()->pkt.pts))
                              .arg(1000.0*deltaPTS / 90000.0).arg(af->count()));
 
-        if (cmp2x33(af->current()->pkt.pts, initPTS) < 0);
+        if (cmp2x33(af->current()->pkt.pts, initPTS) < 0)
             initPTS = af->current()->pkt.pts;
     }
 
-    initPTS -= 16200;
+    initPTS -= 16200; //0.18 seconds back to prevent underflow
 
     PTSOffsetQueue poq(aFrame.keys(), initPTS);
 
