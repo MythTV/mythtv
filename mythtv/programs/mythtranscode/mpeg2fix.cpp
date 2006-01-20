@@ -1672,8 +1672,8 @@ int MPEG2fixup::Start()
     int64_t origvPTS = 0, origaPTS[N_AUDIO];
     int64_t cutStartPTS = 0, cutEndPTS = 0;
     int64_t frame_count = 0;
-    int new_discard_state = 0, cutState = 0;
-    QMap<int, int> af_dlta_cnt;
+    int new_discard_state = 0;
+    QMap<int, int> af_dlta_cnt, cutState;
     //  int i;
 
     AVPacket pkt, lastRealvPkt;
@@ -1728,7 +1728,6 @@ int MPEG2fixup::Start()
     if (discard)
     {
         cutStartPTS = origvPTS / 300;
-        cutState = 1;
     }
 
     for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
@@ -1738,6 +1737,7 @@ int MPEG2fixup::Start()
         origaPTS[it.key()] = af->first()->pkt.pts * 300;
         expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
+        cutState[it.key()] = !!(discard);
     }
 
     ShowRangeMap(&delMap, "Cutlist:");
@@ -1890,7 +1890,11 @@ int MPEG2fixup::Start()
                             cutStartPTS = add2x33(markedFrameP->pkt.pts,
                                           ptsIncrement * 
                                           GetNbFields(markedFrameP) / 2);
-                            cutState = 1;
+                            QMap<int, QPtrList<MPEG2frame> >::iterator it;
+                            for (it = aFrame.begin(); it != aFrame.end(); it++)
+                            {
+                                cutState[it.key()] = 1;
+                            }
                         }
 
                         //Rebuild when 'B' frame, or completing a cut, and the marked
@@ -2170,8 +2174,8 @@ int MPEG2fixup::Start()
                 nextPTS = add2x33(af->first()->pkt.pts,
                            90000LL * (int64_t)CC->frame_size / CC->sample_rate);
 
-                if (cutState == 1 && cmp2x33(nextPTS, cutStartPTS) > 0 ||
-                    cutState == 2 && 
+                if (cutState[it.key()] == 1 && cmp2x33(nextPTS, cutStartPTS) > 0
+                    || cutState[it.key()] == 2 && 
                                  cmp2x33(af->first()->pkt.pts, cutEndPTS) < 0)
                 {
 #ifdef DEBUG_AUDIO
@@ -2184,14 +2188,14 @@ int MPEG2fixup::Start()
 #endif
                     framePool.enqueue(af->first());
                     af->remove();
-                    cutState = 2;
+                    cutState[it.key()] = 2;
                     ptsinc((uint64_t *)&origaPTS[it.key()], incPTS * 300);
                     continue;
                 }
                 int64_t deltaPTS = poq.Get(it.key(), &af->first()->pkt);
 
                 if (udiff2x33(nextPTS, deltaPTS) * 300 > expectedDTS &&
-                    cutState != 1)
+                    cutState[it.key()] != 1)
                 {
 #ifdef DEBUG_AUDIO
                     VERBOSE(MPF_PROCESS, QString("Aud not ready: %1 > %2")
@@ -2201,8 +2205,8 @@ int MPEG2fixup::Start()
                     break;
                 }
 
-                if (cutState == 2)
-                    cutState = 0;
+                if (cutState[it.key()] == 2)
+                    cutState[it.key()] = 0;
 
                 ptsinc((uint64_t *)&origaPTS[it.key()], incPTS * 300);
 
