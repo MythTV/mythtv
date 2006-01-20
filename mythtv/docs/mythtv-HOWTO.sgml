@@ -175,7 +175,7 @@ Good entries will contain the following:
 <item>Linux distribution
 <item>gcc version
 <item>the last entry in config.log to detail how you compiled
-<item>MythTV version number
+<item>MythTV version numbers (<em>e.g.</em>from mythfrontend --version)
 <item>Hardware
 <item>How you are able to reproduce the bug
 </enum>
