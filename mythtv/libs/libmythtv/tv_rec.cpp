@@ -2704,10 +2704,16 @@ void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
 
     // Notify scheduler of the recording.
     // + set up recording so it can be resumed
-    rec->rectype   = kSingleRecord;
     rec->cardid    = cardid;
     rec->inputid   = get_input_id(cardid, channel->GetCurrentInput());
-    rec->GetScheduledRecording()->setRecordingType(kSingleRecord);
+
+    rec->rectype = rec->GetScheduledRecording()->getRecordingType();
+
+    if(rec->rectype == kNotRecording)
+    {
+        rec->rectype = kSingleRecord;
+        rec->GetScheduledRecording()->setRecordingType(kSingleRecord);
+    }
 
     // + save rsInactive recstatus to so that a reschedule call
     //   doesn't start recording this on another card before we
