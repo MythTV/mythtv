@@ -209,6 +209,7 @@
       <text>Burn DVD</text>
       <text lang="FR">Gravure DVD</text>
       <text lang="PT">Gravar DVD</text>
+      <text lang="ET">Kirjuta DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

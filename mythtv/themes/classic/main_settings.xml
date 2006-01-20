@@ -44,6 +44,7 @@
       <text lang="SV">Ändra knappar</text>
       <text lang="DK">Tasteopsætning</text>
       <text lang="PT">Configurar Teclas</text>
+      <text lang="ET">Muuda klahve</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
@@ -209,6 +210,7 @@
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
+     <text lang="ET">NetFlix seaded</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -293,6 +295,7 @@
       <text>Burn DVD Settings</text>
       <text lang="FR">Gravure DVD</text>
       <text lang="PT">Configurar Gravação de DVDs</text>
+      <text lang="ET">DVD-kirjutaja seaded</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

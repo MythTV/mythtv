@@ -60,6 +60,7 @@
       <text>Playback Groups</text>
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="PT">Grupos de Visualização</text>
+      <text lang="ET">Esitlusgrupid</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -94,7 +95,7 @@
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <text lang="SI">Snemalne prioritete</text>
-      <text lang="ET">Salvestamisprioriteedid</text>
+      <text lang="ET">Salvestusprioriteedid</text>
       <text lang="DK">Optagelsesprioriteter</text>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="PT">Prioridades</alttext>

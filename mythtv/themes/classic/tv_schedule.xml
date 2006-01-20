@@ -28,6 +28,7 @@
       <alttext lang="SI">Vodič</alttext>
       <alttext lang="ET">Kava</alttext>
       <alttext lang="PT">Guia</alttext>
+      <alttext lang="ET">Kava</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -73,6 +74,7 @@
       <text lang="ET">Otsi telekavu</text>
       <text lang="DK">Søg på lister</text>
       <text lang="PT">Pesquisar Listagens</text>
+      <text lang="ET">Kavade otsing</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoek</alttext>      
@@ -80,6 +82,7 @@
       <alttext lang="ET">Telekavad</alttext>
       <alttext lang="DK">Lister</alttext>
       <alttext lang="PT">Pesquisar</alttext>
+      <alttext lang="ET">Otsing</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -107,6 +110,7 @@
       <alttext lang="PT">Gravação Imediata</alttext>
       <alttext lang="SV">Omedelbar</alttext>
       <alttext lang="JA">簡単録画</alttext>
+      <alttext lang="ET">Kohene salvestamine</alttext>
       <action>TV_MANUAL</action>
    </button>
 -->
@@ -162,12 +166,14 @@
       <text lang="JA">録画優先順位</text>
       <text lang="SI">Snemalne prioritete</text>
       <text lang="PT">Prioridades de Gravação</text>
+      <text lang="ET">Salvestusprioriteedid</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="SI">Prioritete</alttext>
       <alttext lang="PT">Prioridades</alttext>
+      <alttext lang="ET">Prioriteedid</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -188,7 +194,9 @@
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
       <text lang="SI">Prihajajoča snemanja</text>
+      <text lang="ET">Tulevased salvestused</text>
       <alttext lang="SV">Kommande</alttext>
+      <alttext lang="ET">Tulevased</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
