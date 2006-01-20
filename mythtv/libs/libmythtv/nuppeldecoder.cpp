@@ -49,11 +49,19 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
 #ifdef CONFIG_DARWIN
+    // There is only a default static initialiser for pthread_mutexes
+    // (i.e. no recursive types), so we have to do it the longhand way:        
     pthread_mutexattr_t avcodeclock_attr;
 
-    pthread_mutexattr_init(&avcodeclock_attr);
-    pthread_mutexattr_settype(&avcodeclock_attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&avcodeclock, &avcodeclock_attr);
+    if (pthread_mutexattr_init(&avcodeclock_attr) ||
+        pthread_mutexattr_settype(&avcodeclock_attr, PTHREAD_MUTEX_RECURSIVE) ||
+        pthread_mutex_init(&avcodeclock, &avcodeclock_attr))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "NuppelDecoder: Couldn't init a recursive mutex, aborting");
+        errored = true;
+        return;
+    }
 #endif
 
     // initialize structures
