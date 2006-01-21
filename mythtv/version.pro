@@ -14,7 +14,8 @@ isEmpty( SVNVERSION ) {
 SOURCES += version.cpp
 
 version.target = version.cpp 
-version.commands = echo "const char *myth_source_version = \"$${SVNVERSION}\";" > version.cpp 
+version.commands = echo 'const char *myth_source_version =' \
+'"'`(svnversion . 2>/dev/null) || echo Unknown`'";' > version.cpp
 version.depends = FORCE 
 
 QMAKE_EXTRA_UNIX_TARGETS += version
