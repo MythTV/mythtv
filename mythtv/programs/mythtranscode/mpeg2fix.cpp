@@ -221,6 +221,7 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
             discard = 1;
             delMap.remove(0);
         }
+        use_secondary = true;
     }
 
     ext_count = 0;
@@ -1479,12 +1480,13 @@ int MPEG2fixup::ConvertToI(int frameNum, int numFrames, int headPos)
         //pkt.data is a newly malloced area
         {
             QString fname = (SHOW_MSG(MPF_PROCESS)) ?
-                   QString("cnv%1.yuv").arg(ins_count++) : NULL;
+                   QString("cnv%1").arg(ins_count++) : NULL;
             if(BuildFrame(&pkt, fname))
                 return 1;
             VERBOSE(MPF_GENERAL,
-                    QString("Converting frame %1 to an I-frame (%2)")
-                           .arg(i).arg(fname));
+                    QString("Converting frame #%1 from %2 to I %3")
+                           .arg(i).arg(GetFrameTypeT(spare))
+                           .arg(fname.isNull() ? "" : "(" + fname + ")"));
         }
         spare->set_pkt(&pkt);
         av_free(pkt.data);
