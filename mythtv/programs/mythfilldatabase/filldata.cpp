@@ -3635,7 +3635,7 @@ int main(int argc, char *argv[])
             cout << "   <xawtvrcfile> = file to read\n";
             cout << "\n";
             cout << "--do_channel_updates\n";
-            cout << "   When using data direct, ask mythfilldatabase to\n";
+            cout << "   When using DataDirect, ask mythfilldatabase to\n";
             cout << "   overwrite channel names, frequencies, etc. with the\n";
             cout << "   values available from the data source. This will \n";
             cout << "   override custom channel names, which is why it is\n";
@@ -3653,7 +3653,7 @@ int main(int argc, char *argv[])
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
             cout << "--refresh-all\n";
-            cout << "   (Only valid for grabbers: na, se_swedb, no, ee, de_tvtoday)\n";
+            cout << "   (Only valid for grabbers: DataDirect, se_swedb, no, ee, de_tvtoday)\n";
             cout << "   Force a refresh today or two days (or every day) from now,\n";
             cout << "   to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
