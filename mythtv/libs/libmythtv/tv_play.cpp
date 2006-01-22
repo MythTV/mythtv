@@ -492,8 +492,9 @@ void TV::GetPlayGroupSettings(const QString &group)
 /** \fn LiveTV(bool)
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
+ *  \param startInGuide if true the EPG will be shown upon entering LiveTV
  */
-int TV::LiveTV(bool showDialogs)
+int TV::LiveTV(bool showDialogs, bool startInGuide)
 {
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
@@ -509,6 +510,27 @@ int TV::LiveTV(bool showDialogs)
         switchToRec = NULL;
 
         GetPlayGroupSettings("Default");
+
+        if (startInGuide || gContext->GetNumSetting("WatchTVGuide", 0))
+        {
+            MSqlQuery query(MSqlQuery::InitCon()); 
+            query.prepare("SELECT keylist FROM keybindings WHERE "
+                          "context = 'TV Playback' AND action = 'GUIDE' AND "
+                          "hostname = :HOSTNAME ;");
+            query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+            if (query.exec() && query.isActive() && query.size() > 0)
+            {
+                query.next();
+
+                QKeySequence keyseq(query.value(0).toString());
+
+                int keynum = keyseq[0];
+                keynum &= ~Qt::UNICODE_ACCEL;
+   
+                keyList.prepend(new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
+            }
+        }
 
         return 1;
     }
@@ -1376,27 +1398,6 @@ void TV::RunTV(void)
 { 
     paused = false;
     QKeyEvent *keypressed;
-
-    if (gContext->GetNumSetting("WatchTVGuide", 0))
-    {
-        MSqlQuery query(MSqlQuery::InitCon()); 
-        query.prepare("SELECT keylist FROM keybindings WHERE "
-                      "context = 'TV Playback' AND action = 'GUIDE' AND "
-                      "hostname = :HOSTNAME ;");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            query.next();
-
-            QKeySequence keyseq(query.value(0).toString());
-
-            int keynum = keyseq[0];
-            keynum &= ~Qt::UNICODE_ACCEL;
-   
-            keyList.prepend(new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
-        }
-    }
 
     doing_ff_rew = 0;
     ff_rew_index = kInitFFRWSpeed;

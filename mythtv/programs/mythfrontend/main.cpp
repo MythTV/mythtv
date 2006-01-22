@@ -239,7 +239,7 @@ void startManualSchedule(void)
     qApp->lock();
 }
 
-void startTV(void)
+void startTV(bool startInGuide)
 {
     TV *tv = new TV();
 
@@ -254,7 +254,7 @@ void startTV(void)
     bool quitAll = false;
     bool showDialogs = true;
 
-    if (!tv->LiveTV(showDialogs))
+    if (!tv->LiveTV(showDialogs, startInGuide))
     {
         tv->StopLiveTV();
         quitAll = true;
@@ -283,6 +283,16 @@ void startTV(void)
     }
 
     delete tv;
+}
+
+void startTVInGuide(void)
+{
+    startTV(true);
+}
+
+void startTVNormal(void)
+{
+    startTV(false);
 }
 
 void showStatus(void)
@@ -316,7 +326,9 @@ void TVMenuCallback(void *data, QString &selection)
     }
 
     if (sel == "tv_watch_live")
-        startTV();
+        startTVNormal();
+    else if (sel == "tv_watch_live_epg")
+        startTVInGuide();
     else if (sel == "tv_watch_recording")
         startPlayback();
     else if (sel == "tv_schedule")
@@ -639,8 +651,11 @@ void InitJumpPoints(void)
     REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
     REG_JUMP("TV Recording Playback", "", "", startPlayback);
     REG_JUMP("TV Recording Deletion", "", "", startDelete);
-    REG_JUMP("Live TV", "", "", startTV);
+    REG_JUMP("Live TV", "", "", startTVNormal);
+    REG_JUMP("Live TV In Guide", "", "", startTVInGuide);
     REG_JUMP("Manual Record Scheduling", "", "", startManual);
+    REG_JUMP("Status Screen", "", "", showStatus);
+    REG_JUMP("Previously Recorded", "", "", startPrevious);
 
     TV::InitKeys();
 }

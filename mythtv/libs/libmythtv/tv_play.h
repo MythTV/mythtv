@@ -85,7 +85,7 @@ class TV : public QObject
     void customEvent(QCustomEvent *e);
 
     // LiveTV commands
-    int  LiveTV(bool showDialogs = true);
+    int  LiveTV(bool showDialogs = true, bool startInGuide = false);
     /// This command is used to exit the player in order to record using
     /// the recording being used by LiveTV.
     void StopLiveTV(void) { exitPlayer = true; }
