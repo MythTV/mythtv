@@ -5,6 +5,7 @@
 #        "exported" is reported as the revision.           #
 ############################################################
 
+SVNTREEDIR = $$system(pwd)
 SVNVERSION = $$system(svnversion . 2>/dev/null)
 
 isEmpty( SVNVERSION ) {
@@ -15,7 +16,7 @@ SOURCES += version.cpp
 
 version.target = version.cpp 
 version.commands = echo 'const char *myth_source_version =' \
-'"'`(svnversion . 2>/dev/null) || echo Unknown`'";' > version.cpp
+'"'`(svnversion $${SVNTREEDIR} 2>/dev/null) || echo Unknown`'";' > version.cpp
 version.depends = FORCE 
 
 QMAKE_EXTRA_UNIX_TARGETS += version
