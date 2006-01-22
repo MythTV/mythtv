@@ -33,6 +33,8 @@ class ThemedMenu : public MythDialog
     void ReloadTheme(void);
     void ReloadExitKey(void);
 
+    void gotoMainMenu(void);
+
   protected:
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);

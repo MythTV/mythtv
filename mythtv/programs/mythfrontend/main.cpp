@@ -619,8 +619,18 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     return res;
 }
 
+void gotoMainMenu(void)
+{
+    // If we got to this callback, we're back on the menu.  So, send a CTRL-L
+    // to cause the menu to reload
+    QKeyEvent *event =
+        new QKeyEvent(QEvent::KeyPress, Qt::Key_L, 0, Qt::ControlButton);
+    QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+}
+
 void InitJumpPoints(void)
 {
+    REG_JUMP("Main Menu", "", "", gotoMainMenu);
     REG_JUMP("Program Guide", "", "", startGuide);
     REG_JUMP("Program Finder", "", "", startFinder);
     //REG_JUMP("Search Listings", "", "", startSearch);

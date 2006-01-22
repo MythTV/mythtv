@@ -116,6 +116,7 @@ class ThemedMenuPrivate
     
     void parseFont(QDomElement &element);
 
+    void gotoMainMenu(void);
     void setDefaults(void);
 
     void addButton(const QString &type, const QString &text,
@@ -2589,6 +2590,12 @@ bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     return false;
 }
 
+void ThemedMenuPrivate::gotoMainMenu(void)
+{
+    menulevel = 0;
+    parseMenu("mainmenu.xml");
+}
+
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
                        MythMainWindow *parent, bool allowreorder)
           : MythDialog(parent, 0)
@@ -2702,8 +2709,15 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
     d->ignorekeys = true;
 
-    if (!d->keyPressHandler(e))
+    if ((e->key() == Qt::Key_L) && (e->state() == Qt::ControlButton))
+        gotoMainMenu();
+    else if (!d->keyPressHandler(e))
         MythDialog::keyPressEvent(e);
 
     d->ignorekeys = false;
+}
+
+void ThemedMenu::gotoMainMenu(void)
+{
+    d->gotoMainMenu();
 }
