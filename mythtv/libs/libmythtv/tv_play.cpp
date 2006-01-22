@@ -2947,7 +2947,7 @@ void TV::SetFFRew(int index)
         return;
 
     ff_rew_index = index;
-    unsigned int speed;
+    int speed;
 
     QString mesg;
     if (doing_ff_rew > 0)
