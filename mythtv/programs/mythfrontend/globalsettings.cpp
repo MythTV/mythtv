@@ -2190,7 +2190,7 @@ static HostSpinBox *NetworkControlPort()
 {
     HostSpinBox *gs = new HostSpinBox("NetworkControlPort", 1025, 65535, 1);
     gs->setLabel(QObject::tr("Network Remote Control Port"));
-    gs->setValue(6545);
+    gs->setValue(6546);
     gs->setHelpText(QObject::tr("This specifies what port the Network Remote "
                     "Control interface will listen on for new connections."));
     return gs;
