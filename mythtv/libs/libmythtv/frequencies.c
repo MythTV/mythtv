@@ -831,6 +831,14 @@ static struct CHANLIST pal_australia_optus[] = {
     { "S40", 455250 },	\
     { "S41", 463250 }
 
+#define FREQ_CCIR_H2          \
+    { "E21",   471250 },      \
+    { "E22",   479250 },      \
+    { "E23",   487250 },      \
+    { "E24",   495250 },      \
+    { "E25",   503250 },      \
+    { "E26",   511250 }
+
 /* OIRT frequencies */
 
 #define FREQ_OIRT_I_III		\
@@ -924,6 +932,7 @@ static struct CHANLIST europe_west[] = {
     FREQ_CCIR_I_III,
     FREQ_CCIR_SL_SH,
     FREQ_CCIR_H,
+    FREQ_CCIR_H2,
     FREQ_UHF
 };
 
@@ -933,6 +942,7 @@ static struct CHANLIST europe_east[] = {
     FREQ_CCIR_I_III,
     FREQ_CCIR_SL_SH,
     FREQ_CCIR_H,
+    FREQ_CCIR_H2,
     FREQ_UHF
 };
 
