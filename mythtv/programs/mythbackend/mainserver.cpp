@@ -623,60 +623,51 @@ void MainServer::customEvent(QCustomEvent *e)
             return;
         }
 
-        if (me->Message().left(21) == "RESCHEDULE_RECORDINGS")
+        if (me->Message().left(21) == "RESCHEDULE_RECORDINGS" && m_sched)
         {
-            if (m_sched)
+            QStringList tokens = QStringList::split(" ", me->Message());
+            if (tokens.size() != 2)
             {
-                QStringList tokens = QStringList::split(" ", me->Message());
-                if (tokens.size() != 2)
-                {
-                    VERBOSE(VB_IMPORTANT, "Bad RESCHEDULE_RECORDINGS message");
-                    return;
-                }
-
-                int recordid = tokens[1].toInt();
-                m_sched->Reschedule(recordid);
+                VERBOSE(VB_IMPORTANT, "Bad RESCHEDULE_RECORDINGS message");
                 return;
             }
-        }
 
-        if (me->Message().left(23) == "SCHEDULER_ADD_RECORDING")
-        {
-            VERBOSE(VB_IMPORTANT, "SCHEDULER_ADD_RECORDING message");
-            ProgramInfo pi;
-            QStringList list = me->ExtraDataList();
-            if (pi.FromStringList(list, 0))
-                m_sched->AddRecording(pi);
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "Bad SCHEDULER_ADD_RECORDING message");
-            }
-
+            int recordid = tokens[1].toInt();
+            m_sched->Reschedule(recordid);
             return;
         }
 
-        if (me->Message().left(23) == "UPDATE_RECORDING_STATUS")
+        if (me->Message().left(23) == "SCHEDULER_ADD_RECORDING" && m_sched)
         {
-            if (m_sched)
+            ProgramInfo pi;
+            QStringList list = me->ExtraDataList();
+            if (!pi.FromStringList(list, 0))
             {
-                QStringList tokens = QStringList::split(" ", me->Message());
-                if (tokens.size() != 6)
-                {
-                    VERBOSE(VB_IMPORTANT, "Bad UPDATE_RECORDING_STATUS message");
-                    return;
-                }
-
-                int cardid = tokens[1].toInt();
-                QString chanid = tokens[2];
-                QDateTime startts = QDateTime::fromString(tokens[3], 
-                                                          Qt::ISODate);
-                RecStatusType recstatus = RecStatusType(tokens[4].toInt());
-                QDateTime recendts = QDateTime::fromString(tokens[5], 
-                                                           Qt::ISODate);
-                m_sched->UpdateRecStatus(cardid, chanid, startts, 
-                                         recstatus, recendts);
+                VERBOSE(VB_IMPORTANT, "Bad SCHEDULER_ADD_RECORDING message");
                 return;
             }
+
+            m_sched->AddRecording(pi);
+            return;
+        }
+
+        if (me->Message().left(23) == "UPDATE_RECORDING_STATUS" && m_sched)
+        {
+            QStringList tokens = QStringList::split(" ", me->Message());
+            if (tokens.size() != 6)
+            {
+                VERBOSE(VB_IMPORTANT, "Bad UPDATE_RECORDING_STATUS message");
+                return;
+            }
+
+            int cardid = tokens[1].toInt();
+            QString chanid = tokens[2];
+            QDateTime startts = QDateTime::fromString(tokens[3], Qt::ISODate);
+            RecStatusType recstatus = RecStatusType(tokens[4].toInt());
+            QDateTime recendts = QDateTime::fromString(tokens[5], Qt::ISODate);
+            m_sched->UpdateRecStatus(cardid, chanid, startts, 
+                                     recstatus, recendts);
+            return;
         }
 
         if (me->Message().left(13) == "LIVETV_EXITED")
