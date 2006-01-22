@@ -39,7 +39,6 @@ bool fullSpeed = true;
 bool rebuildSeekTable = false;
 bool beNice = true;
 bool inJobQueue = false;
-bool copyToCutlist = false;
 bool watchingRecording = false;
 CommDetectorBase* commDetector = NULL;
 RemoteEncoder* recorder = NULL;
@@ -154,6 +153,78 @@ int CopySkipListToCutList(QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
+int ClearCutList(QString chanid, QString starttime)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded "
+                  "SET cutlist = NULL "
+                  "WHERE chanid = :CHANID "
+                      "AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", starttime);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("clear cutlist",
+                             query);
+
+    VERBOSE(VB_IMPORTANT, "Cutlist cleared");
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+}
+
+int SetCutList(QString chanid, QString starttime, QString newCutList)
+{
+    newCutList.replace(QRegExp(","), "\n");
+    newCutList.replace(QRegExp("-"), " - ");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded "
+                  "SET cutlist = :CUTLIST "
+                  "WHERE chanid = :CHANID "
+                      "AND starttime = :STARTTIME ;");
+    query.bindValue(":CUTLIST", newCutList);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", starttime);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("clear cutlist",
+                             query);
+
+    newCutList.replace(QRegExp("\n"), ",");
+    newCutList.replace(QRegExp(" - "), "-");
+
+    VERBOSE(VB_IMPORTANT, QString("Cutlist set to: %1").arg(newCutList));
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+}
+
+int GetCutList(QString chanid, QString starttime)
+{
+    QString result;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT cutlist FROM recorded "
+                  "WHERE chanid = :CHANID "
+                      "AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", starttime);
+
+    if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+        result = query.value(0).toString();
+    else
+        MythContext::DBError("get cutlist",
+                             query);
+
+    result.replace(QRegExp("\n"), ",");
+    result.replace(QRegExp(" - "), "-");
+
+    cout << QString("Cutlist: %1\n").arg(result);
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+}
 void streamOutCommercialBreakList(ostream& output,
                                   QMap<long long, int>& commercialBreakList)
 {
@@ -548,6 +619,10 @@ int main(int argc, char *argv[])
     time_t time_now;
     bool allRecorded = false;
     bool queueJobInstead = false;
+    bool copyToCutlist = false;
+    bool clearCutlist = false;
+    bool getCutlist = false;
+    QString newCutList = "";
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -633,9 +708,13 @@ int main(int argc, char *argv[])
                 commDetectMethod = -1;
         }
         else if (!strcmp(a.argv()[argpos], "--gencutlist"))
-        {
             copyToCutlist = true;
-        }
+        else if (!strcmp(a.argv()[argpos], "--clearcutlist"))
+            clearCutlist = true;
+        else if (!strcmp(a.argv()[argpos], "--getcutlist"))
+            getCutlist = true;
+        else if (!strcmp(a.argv()[argpos], "--setcutlist"))
+            newCutList = (a.argv()[++argpos]);
         else if (!strcmp(a.argv()[argpos], "-j"))
         {
             int jobID = QString(a.argv()[++argpos]).toInt();
@@ -769,6 +848,10 @@ int main(int argc, char *argv[])
                     "--sleep                      Give up some CPU time after processing each frame\n"
                     "--rebuild                    Do not flag commercials, just rebuild seektable\n"
                     "--gencutlist                 Copy the commercial skip list to the cutlist\n"
+                    "--clearcutlist               Clear the cutlist\n"
+                    "--setcutlist CUTLIST         Set a new cutlist.  CUTLIST is of the form:\n"
+                    "                             #-#[,#-#]...  (ie, 1-100,1520-3012,4091-5094\n"
+                    "--getcutlist                 Display the current cutlist\n"
                     "-v or --verbose debug-level  Use '-v help' for level info\n"
                     "--queue                      Insert flagging job into the JobQueue rather than\n"
                     "                             running flagging in the foreground\n"
@@ -817,6 +900,15 @@ int main(int argc, char *argv[])
 
     if (copyToCutlist)
         return CopySkipListToCutList(chanid, starttime);
+
+    if (clearCutlist)
+        return ClearCutList(chanid, starttime);
+
+    if (getCutlist)
+        return GetCutList(chanid, starttime);
+
+    if (newCutList != "")
+        return SetCutList(chanid, starttime, newCutList);
 
     if (inJobQueue)
     {
