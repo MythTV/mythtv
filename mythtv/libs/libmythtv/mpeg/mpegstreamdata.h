@@ -184,6 +184,7 @@ class MPEGStreamData : public QObject
   // PAT Timeout handling.
   private:
     bool                      _invalid_pat_seen;
+    bool                      _invalid_pat_warning;
     MythTimer                 _invalid_pat_timer;
 };
 

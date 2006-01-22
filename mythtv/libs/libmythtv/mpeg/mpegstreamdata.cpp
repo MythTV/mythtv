@@ -25,7 +25,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _pmt_single_program_num_video(1),
       _pmt_single_program_num_audio(0),
       _pat_single_program(NULL), _pmt_single_program(NULL),
-      _invalid_pat_seen(false)
+      _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
     AddListeningPID(MPEG_PAT_PID);
 
@@ -423,14 +423,17 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
     if (!_invalid_pat_seen && !foundProgram)
     {
         _invalid_pat_seen = true;
+        _invalid_pat_warning = false;
         _invalid_pat_timer.start();
         VERBOSE(VB_RECORD, "ProcessPAT: "
                 "PAT is missing program, setting timeout");
     }
-    else if (_invalid_pat_seen && (_invalid_pat_timer.elapsed() > 400))
+    else if (_invalid_pat_seen && !foundProgram &&
+             (_invalid_pat_timer.elapsed() > 400) && !_invalid_pat_warning)
     {
+        _invalid_pat_warning = true; // only emit one warning...
         // After 400ms emit error if we haven't found correct PAT.
-        VERBOSE(VB_IMPORTANT, "ProcesPAT: Program not found in PAT. "
+        VERBOSE(VB_IMPORTANT, "ProcessPAT: Program not found in PAT. "
                 "\n\t\t\tRescan your transports.");
 
         // This will trigger debug PAT print
@@ -442,7 +445,7 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
     else if (foundProgram)
     {
         if (_invalid_pat_seen)
-            VERBOSE(VB_RECORD, "ProcesPAT: Good PAT seen after a bad PAT");
+            VERBOSE(VB_RECORD, "ProcessPAT: Good PAT seen after a bad PAT");
 
         _invalid_pat_seen = false;
         emit UpdatePAT(pat);
