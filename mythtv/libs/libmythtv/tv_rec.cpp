@@ -43,6 +43,7 @@ using namespace std;
 #include "atsctables.h"
 
 #include "livetvchain.h"
+#include "dummychannel.h"
 
 #ifdef USING_V4L
 #include "channel.h"
@@ -185,7 +186,8 @@ bool TVRec::Init(void)
     else if (genOpt.cardtype == "MPEG" &&
              genOpt.videodev.lower().left(5) == "file:")
     {
-        // No need to initialize channel..
+        channel = new DummyChannel(this);
+        InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
