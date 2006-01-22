@@ -29,6 +29,7 @@ using namespace std;
 #include "globalsettings.h"
 #include "profilegroup.h"
 #include "playgroup.h"
+#include "networkcontrol.h"
 
 #include "exitcodes.h"
 #include "themedmenu.h"
@@ -1045,6 +1046,17 @@ int main(int argc, char **argv)
     }
 #endif
 
+    NetworkControl *networkControl = NULL;
+    if (gContext->GetNumSetting("NetworkControlEnabled", 0))
+    {
+        int networkPort = gContext->GetNumSetting("NetworkControlPort", 6545);
+        networkControl = new NetworkControl(networkPort);
+        if (!networkControl->ok())
+            VERBOSE(VB_IMPORTANT,
+                    QString("NetworkControl failed to bind to port %1.")
+                    .arg(networkPort));
+    }
+
     gContext->addCurrentLocation("MainMenu");
 
     int exitstatus = RunMenu(themedir);
@@ -1068,8 +1080,13 @@ int main(int argc, char **argv)
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, &value);
     }
-    
+
+    if (networkControl)
+        delete networkControl;
+
     delete mainWindow;
     delete gContext;
     return FRONTEND_EXIT_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

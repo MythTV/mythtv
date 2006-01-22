@@ -1398,6 +1398,7 @@ void TV::RunTV(void)
 { 
     paused = false;
     QKeyEvent *keypressed;
+    QString netCmd;
 
     doing_ff_rew = 0;
     ff_rew_index = kInitFFRWSpeed;
@@ -1468,6 +1469,18 @@ void TV::RunTV(void)
             ProcessKeypress(keypressed);
             delete keypressed;
         }
+
+        netCmd = "";
+        ncLock.lock();
+        if (networkControlCommands.size())
+        {
+            netCmd = networkControlCommands.front();
+            networkControlCommands.pop_front();
+        }
+        ncLock.unlock();
+
+        if (netCmd != "")
+            processNetworkControlCommand(netCmd);
 
         if ((recorder && recorder->GetErrorStatus()) || IsErrored())
         {
@@ -2491,6 +2504,217 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 }
 
+void TV::processNetworkControlCommand(QString command)
+{
+    QStringList tokens = QStringList::split(" ", command);
+
+    if (tokens[1] != "QUERY")
+        ClearOSD();
+
+    if (tokens.size() == 3 && tokens[1] == "CHANID")
+    {
+        ChangeChannel(tokens[2].toUInt(), "");
+    }
+    else if (tokens.size() == 3 && tokens[1] == "CHANNEL")
+    {
+        if (tokens[2] == "UP")
+            ChangeChannel(CHANNEL_DIRECTION_UP);
+        else if (tokens[2] == "DOWN")
+            ChangeChannel(CHANNEL_DIRECTION_DOWN);
+        else if (tokens[2].contains(QRegExp("^\\d+$")))
+            ChangeChannel(0, tokens[2]);
+    }
+    else if (tokens.size() == 3 && tokens[1] == "SPEED")
+    {
+        if (tokens[2] == "0x")
+        {
+            NormalSpeed();
+            StopFFRew();
+
+            if (!paused)
+                DoPause();
+        }
+        else if (tokens[2].contains(QRegExp("^\\-*\\d+x$")))
+        {
+            QString speed = tokens[2].left(tokens[2].length()-1);
+            bool ok = false;
+            int tmpSpeed = speed.toInt(&ok);
+            int searchSpeed = abs(tmpSpeed);
+            unsigned int index;
+
+            if (paused)
+                DoPause();
+
+            if (tmpSpeed == 1 && normal_speed != 1.0f)
+            {
+                StopFFRew();
+                normal_speed = 1.0f;
+                ChangeTimeStretch(0, false);
+
+                return;
+            }
+
+            NormalSpeed();
+
+            for (index = 0; index < ff_rew_speeds.size(); index++)
+                if (ff_rew_speeds[index] == searchSpeed)
+                    break;
+
+            if ((index < ff_rew_speeds.size()) &&
+                (ff_rew_speeds[index] == searchSpeed))
+            {
+                if (tmpSpeed < 0)
+                    doing_ff_rew = -1;
+                else if (tmpSpeed > 1)
+                    doing_ff_rew = 1;
+                else
+                    StopFFRew();
+
+                if (doing_ff_rew)
+                    SetFFRew(index);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, QString("Couldn't find %1 speed in "
+                    "FFRewSpeed settings array, changing to default speed "
+                    "of 1x").arg(searchSpeed));
+
+                doing_ff_rew = 0;
+                SetFFRew(kInitFFRWSpeed);
+            }
+        }
+        else if (tokens[2].contains(QRegExp("^\\d*\\.\\d+x$")))
+        {
+            QString tmpSpeed = tokens[2].left(tokens[2].length() - 1);
+
+            if (paused)
+                DoPause();
+
+            StopFFRew();
+
+            bool floatRead;
+            float stretch = tmpSpeed.toFloat(&floatRead);
+            if (floatRead &&
+                stretch <= 2.0 &&
+                stretch >= 0.48)
+            {
+                normal_speed = stretch;   // alter speed before display
+                ChangeTimeStretch(0, false);
+            }
+        }
+        else if (tokens[2].contains(QRegExp("^\\d+\\/\\d+x$")))
+        {
+            if (paused)
+                DoPause();
+
+            if (tokens[2] == "16x")
+                ChangeSpeed(5 - speed_index);
+            else if (tokens[2] == "8x")
+                ChangeSpeed(4 - speed_index);
+            else if (tokens[2] == "4x")
+                ChangeSpeed(3 - speed_index);
+            else if (tokens[2] == "3x")
+                ChangeSpeed(2 - speed_index);
+            else if (tokens[2] == "2x")
+                ChangeSpeed(1 - speed_index);
+            else if (tokens[2] == "1x")
+                ChangeSpeed(0 - speed_index);
+            else if (tokens[2] == "1/2x")
+                ChangeSpeed(-1 - speed_index);
+            else if (tokens[2] == "1/3x")
+                ChangeSpeed(-2 - speed_index);
+            else if (tokens[2] == "1/4x")
+                ChangeSpeed(-3 - speed_index);
+            else if (tokens[2] == "1/8x")
+                ChangeSpeed(-4 - speed_index);
+            else if (tokens[2] == "1/16x")
+                ChangeSpeed(-5 - speed_index);
+        }
+        else
+            VERBOSE(VB_IMPORTANT,
+                QString("Found an unknown speed of %1").arg(tokens[2]));
+    }
+    else if (tokens.size() == 2 && tokens[1] == "STOP")
+    {
+        if (internalState != kState_WatchingLiveTV && nvp)
+            nvp->SetBookmark();
+        exitPlayer = true;
+        wantsToQuit = true;
+    }
+    else if (tokens.size() >= 3 && tokens[1] == "SEEK" && activenvp)
+    {
+        if (tokens[2] == "BEGINNING")
+            DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Beginning"));
+        else if (tokens[2] == "FORWARD")
+            DoSeek(fftime, tr("Skip Ahead"));
+        else if (tokens[2] == "BACKWARD")
+            DoSeek(-rewtime, tr("Skip Back"));
+        else if ((tokens[2] == "POSITION") && (tokens.size() == 4) &&
+                 (tokens[3].contains(QRegExp("^\\d+$"))))
+            DoSeek(tokens[3].toInt() -
+                   (activenvp->GetFramesPlayed() / frameRate), tr("Jump To"));
+    }
+    else if (tokens.size() >= 3 && tokens[1] == "QUERY" && activenvp)
+    {
+        if (tokens[2] == "POSITION")
+        {
+            QString speedStr;
+
+            switch (speed_index)
+            {
+                case  5: speedStr = "16x"; break;
+                case  4: speedStr = "8x";  break;
+                case  3: speedStr = "4x";  break;
+                case  2: speedStr = "3x";  break;
+                case  1: speedStr = "2x";  break;
+                case  0: speedStr = "1x";  break;
+                case -1: speedStr = "1/2x"; break;
+                case -2: speedStr = "1/3x"; break;
+                case -3: speedStr = "1/4x"; break;
+                case -4: speedStr = "1/8x"; break;
+                case -5: speedStr = "1/16x"; break;
+                case -6: speedStr = "0x"; break;
+                default: speedStr = "1x"; break;
+            }
+
+            if (doing_ff_rew == -1)
+                speedStr = QString("-%1").arg(speedStr);
+            else if (normal_speed != 1.0)
+                speedStr = QString("%1X").arg(normal_speed);
+
+            struct StatusPosInfo posInfo;
+            nvp->calcSliderPos(posInfo);
+
+            QDateTime respDate = mythCurrentDateTime();
+            QString infoStr = "";
+
+            pbinfoLock.lock();
+            if (internalState == kState_WatchingLiveTV)
+            {
+                infoStr = "LiveTV";
+                if (playbackinfo)
+                    respDate = playbackinfo->startts;
+            }
+            else
+            {
+                infoStr = "Recorded";
+                if (playbackinfo)
+                    respDate = playbackinfo->recstartts;
+            }
+
+            infoStr += QString(" %1 %2 %3 %4").arg(posInfo.desc).arg(speedStr)
+                               .arg(playbackinfo != NULL ? playbackinfo->chanid : "-1")
+                               .arg(respDate.toString(Qt::ISODate));
+            pbinfoLock.unlock();
+
+            QString message = QString("NETWORK_CONTROL ANSWER %1")
+                                      .arg(infoStr);
+            MythEvent me(message);
+            gContext->dispatch(me);
+        }
+    }
+}
+
 void TV::TogglePIPView(void)
 {
     if (!pipnvp)
@@ -2863,13 +3087,18 @@ void TV::ChangeSpeed(int direction)
 
     switch (speed_index)
     {
+        case  5: speed = 16.0;     mesg = QString(tr("Speed 16X"));   break;
+        case  4: speed = 8.0;      mesg = QString(tr("Speed 8X"));    break;
+        case  3: speed = 4.0;      mesg = QString(tr("Speed 4X"));    break;
         case  2: speed = 3.0;      mesg = QString(tr("Speed 3X"));    break;
         case  1: speed = 2.0;      mesg = QString(tr("Speed 2X"));    break;
         case  0: speed = 1.0;      mesg = PlayMesg();                 break;
-        case -1: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
-        case -2: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
-        case -3: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
-        case -4: DoPause(); return; break;
+        case -1: speed = 1.0 / 2;  mesg = QString(tr("Speed 1/2X"));  break;
+        case -2: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
+        case -3: speed = 1.0 / 4;  mesg = QString(tr("Speed 1/4X"));  break;
+        case -4: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
+        case -5: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
+        case -6: DoPause(); return; break;
         default: speed_index = old_speed; return; break;
     }
 
@@ -4655,6 +4884,16 @@ void TV::customEvent(QCustomEvent *e)
             bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
             (void)tc;
         }
+        else if (message.left(15) == "NETWORK_CONTROL")
+        {
+            QStringList tokens = QStringList::split(" ", message);
+            if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
+            {
+                ncLock.lock();
+                networkControlCommands.push_back(message);
+                ncLock.unlock();
+            }
+        }
 
         pbinfoLock.lock();
         if (playbackinfo && message.left(14) == "COMMFLAG_START")
@@ -5838,3 +6077,4 @@ void TV::SetCurrentlyPlaying(ProgramInfo *pginfo)
     pbinfoLock.unlock();
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

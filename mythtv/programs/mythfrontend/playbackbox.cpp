@@ -156,6 +156,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // useRecGroups controls showing of recording groups in group list
     useRecGroups = false;
 
+    underNetworkControl = false;
+
     if (gContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
     else
@@ -1959,11 +1961,13 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
         playCompleted = true;
 
     if (tv->getRequestDelete() &&
+        !underNetworkControl &&
         !inPlaylist)
     {
         doremove = true;
     }
     else if (tv->getEndOfRecording() &&
+             !underNetworkControl &&
              !inPlaylist &&
              gContext->GetNumSetting("EndOfRecordingExitPrompt"))
     {
@@ -3244,9 +3248,102 @@ void PlaybackBox::timeout(void)
         update(videoRect);
 }
 
+void PlaybackBox::processNetworkControlCommands(void)
+{
+    int commands = 0;
+    QString command;
+
+    ncLock.lock();
+    commands = networkControlCommands.size();
+    ncLock.unlock();
+
+    while (commands)
+    {
+        ncLock.lock();
+        command = networkControlCommands.front();
+        networkControlCommands.pop_front();
+        ncLock.unlock();
+
+        processNetworkControlCommand(command);
+
+        ncLock.lock();
+        commands = networkControlCommands.size();
+        ncLock.unlock();
+    }
+}
+
+void PlaybackBox::processNetworkControlCommand(QString command)
+{
+    QStringList tokens = QStringList::split(" ", command);
+
+    if (tokens.size() >= 4 && (tokens[1] == "PLAY" || tokens[1] == "RESUME"))
+    {
+        if (tokens.size() == 5 && tokens[2] == "PROGRAM")
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
+                            .arg(tokens[1]).arg(tokens[3]).arg(tokens[4]));
+
+            if (playingSomething)
+            {
+                VERBOSE(VB_IMPORTANT, "NetworkControl: ERROR: Already playing");
+
+                MythEvent me("NETWORK_CONTROL RESPONSE ERROR: Unable to play, "
+                             "player is already playing another recording.");
+                gContext->dispatch(me);
+                return;
+            }
+
+            ProgramInfo *tmpItem =
+                ProgramInfo::GetProgramFromRecorded(tokens[3], tokens[4]);
+
+            if (tmpItem)
+            {
+                if (curitem)
+                    delete curitem;
+
+                curitem = tmpItem;
+                curitem->pathname = curitem->GetPlaybackURL();
+
+                MythEvent me("NETWORK_CONTROL RESPONSE OK");
+                gContext->dispatch(me);
+
+                if (tokens[1] == "PLAY")
+                    curitem->setIgnoreBookmark(true);
+
+                underNetworkControl = true;
+                playSelected();
+                underNetworkControl = false;
+            }
+            else
+            {
+                QString message = QString("NETWORK_CONTROL RESPONSE "
+                                          "ERROR: Could not find recording for "
+                                          "chanid %1 @ %2")
+                                          .arg(tokens[3]).arg(tokens[4]);
+                MythEvent me(message);
+                gContext->dispatch(me);
+            }
+        }
+    }
+}
+
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
+
+    // This should be an impossible keypress we've simulated
+    if ((e->key() == Qt::Key_LaunchMedia) &&
+        (e->state() == (Qt::MouseButtonMask | Qt::KeyButtonMask)))
+    {
+        e->accept();
+        ncLock.lock();
+        int commands = networkControlCommands.size();
+        ncLock.unlock();
+        if (commands)
+            processNetworkControlCommands();
+        return;
+    }
 
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
@@ -3334,6 +3431,31 @@ void PlaybackBox::customEvent(QCustomEvent *e)
  
         if (message == "RECORDING_LIST_CHANGE" && !fillListTimer->isActive())
             fillListTimer->start(1000, true);
+        else if (message.left(15) == "NETWORK_CONTROL")
+        {
+            QStringList tokens = QStringList::split(" ", message);
+            if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
+            {
+                ncLock.lock();
+                networkControlCommands.push_back(message);
+                ncLock.unlock();
+
+                // This should be an impossible keypress we're simulating
+                QKeyEvent *event;
+                int buttons = 
+                        (Qt::MouseButtonMask | Qt::KeyButtonMask);
+                
+                event = new QKeyEvent(QEvent::KeyPress, Qt::Key_LaunchMedia,
+                                      0, buttons);
+                QApplication::postEvent((QObject*)(gContext->GetMainWindow()),
+                                        event);
+
+                event = new QKeyEvent(QEvent::KeyRelease, Qt::Key_LaunchMedia,
+                                      0, buttons);
+                QApplication::postEvent((QObject*)(gContext->GetMainWindow()),
+                                        event);
+            }
+        }
     }
 }
 
@@ -4458,3 +4580,5 @@ void PlaybackBox::recGroupOldPasswordChanged(const QString &newText)
     else
         recGroupOkButton->setEnabled(false);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

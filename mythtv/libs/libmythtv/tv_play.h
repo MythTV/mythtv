@@ -6,6 +6,7 @@
 #include <qdatetime.h>
 #include <pthread.h>
 #include <qvaluevector.h>
+#include <qvaluelist.h>
 #include <qptrlist.h>
 #include <qmutex.h>
 #include <qstringlist.h>
@@ -82,6 +83,7 @@ class TV : public QObject
 
     // User input processing commands
     void ProcessKeypress(QKeyEvent *e);
+    void processNetworkControlCommand(QString command);
     void customEvent(QCustomEvent *e);
 
     // LiveTV commands
@@ -533,6 +535,9 @@ class TV : public QObject
     static const int kInputKeysMax;  ///< When to start discarding early keys
     static const int kInputModeTimeout; ///< Timeout for entry modes in msec
 
+    // Network Control stuff
+    QValueList<QString> networkControlCommands;
+    QMutex ncLock;
 };
 
 #endif

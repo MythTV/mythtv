@@ -2176,6 +2176,26 @@ static HostCheckBox *EnableXbox()
     return gc;
 }
 
+static HostCheckBox *NetworkControlEnabled()
+{
+    HostCheckBox *gc = new HostCheckBox("NetworkControlEnabled");
+    gc->setLabel(QObject::tr("Enable Network Remote Control interface"));
+    gc->setHelpText(QObject::tr("This enables support for controlling "
+                    "mythfrontend over the network."));
+    gc->setValue(false);
+    return gc;
+}
+
+static HostSpinBox *NetworkControlPort()
+{
+    HostSpinBox *gs = new HostSpinBox("NetworkControlPort", 1025, 65535, 1);
+    gs->setLabel(QObject::tr("Network Remote Control Port"));
+    gs->setValue(6545);
+    gs->setHelpText(QObject::tr("This specifies what port the Network Remote "
+                    "Control interface will listen on for new connections."));
+    return gs;
+}
+
 static HostCheckBox *RealtimePriority()
 {
     HostCheckBox *gc = new HostCheckBox("RealtimePriority");
@@ -2997,6 +3017,8 @@ MainGeneralSettings::MainGeneralSettings()
     general->addChild(HaltCommand());
     general->addChild(LircKeyPressedApp());
     general->addChild(UseArrowAccels());
+    general->addChild(NetworkControlEnabled());
+    general->addChild(NetworkControlPort());
     addChild(general);
 
     general = new VerticalConfigurationGroup(false);

@@ -14,6 +14,7 @@
 #include "yuv2rgb.h"
 #include "jobqueue.h"
 
+#include <qvaluelist.h>
 #include <pthread.h>
 
 class QListViewItem;
@@ -172,6 +173,12 @@ class PlaybackBox : public MythDialog
 
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
+
+    void processNetworkControlCommands(void);
+    void processNetworkControlCommand(QString command);
+    QValueList<QString> networkControlCommands;
+    QMutex ncLock;
+    bool underNetworkControl;
 
     bool haveGroupInfoSet;
     
