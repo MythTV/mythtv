@@ -321,6 +321,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("CustomRecord");
 
     if (m_title->text().isEmpty())
         m_rule->setFocus();
@@ -333,6 +334,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 CustomRecord::~CustomRecord(void)
 {
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
 }
 
 void CustomRecord::ruleChanged(void)

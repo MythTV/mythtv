@@ -92,11 +92,13 @@ ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
         gContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("ChannelRecPriority");
 }
 
 ChannelRecPriority::~ChannelRecPriority()
 {
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     delete theme;
     if (bgTransBackup)
         delete bgTransBackup;

@@ -80,10 +80,13 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     min_level = gContext->GetNumSetting("LogDefaultView",1);
     my_parent = parent;
     clicked();
+
+    gContext->addCurrentLocation("StatusBox");
 }
 
 StatusBox::~StatusBox(void)
 {
+    gContext->removeCurrentLocation();
 }
 
 void StatusBox::paintEvent(QPaintEvent *e)

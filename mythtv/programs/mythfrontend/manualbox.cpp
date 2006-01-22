@@ -149,11 +149,13 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
     m_timer->start(300);
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("ManualBox");
 }
 
 ManualBox::~ManualBox(void)
 {
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     killPlayer();
 }
 

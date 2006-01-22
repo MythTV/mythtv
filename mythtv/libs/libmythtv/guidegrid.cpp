@@ -39,6 +39,8 @@ bool RunProgramGuide(uint &chanid, QString &channum,
     if (thread)
         qApp->lock();
 
+    gContext->addCurrentLocation("GuideGrid");
+
     GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(),
                                   chanid, channum,
                                   player, allowsecondaryepg, "guidegrid");
@@ -66,6 +68,8 @@ bool RunProgramGuide(uint &chanid, QString &channum,
         qApp->lock();
 
     delete gg;
+
+    gContext->removeCurrentLocation();
 
     if (thread)
         qApp->unlock();

@@ -2785,3 +2785,33 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     }
     return ret;
 }
+
+void MythContext::addCurrentLocation(QString location)
+{
+    QMutexLocker locker(&locationLock);
+    if (currentLocation.last() != location)
+        currentLocation.push_back(location);
+}
+
+QString MythContext::removeCurrentLocation(void)
+{
+    QMutexLocker locker(&locationLock);
+
+    if (currentLocation.isEmpty())
+        return QString("UNKNOWN");
+
+    QString result = currentLocation.last();
+    currentLocation.pop_back();
+    return result;
+}
+
+QString MythContext::getCurrentLocation(void)
+{
+    QMutexLocker locker(&locationLock);
+
+    if (currentLocation.isEmpty())
+        return QString("UNKNOWN");
+
+    return currentLocation.last();
+}
+

@@ -38,6 +38,8 @@ void RunProgramFind(bool thread, bool ggActive)
     if (thread)
         qApp->lock();
 
+    gContext->addCurrentLocation("ProgFinder");
+
     // Language specific progfinder, if needed
 
     ProgFinder *programFind = NULL;
@@ -62,6 +64,8 @@ void RunProgramFind(bool thread, bool ggActive)
         programFind->exec();
 
     delete programFind;
+
+    gContext->removeCurrentLocation();
 
     return;
 }

@@ -152,11 +152,13 @@ ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent,
     setNoErase();
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("ProgramRecPriority");
 }
 
 ProgramRecPriority::~ProgramRecPriority()
 {
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     delete theme;
     if (bgTransBackup)
         delete bgTransBackup;

@@ -310,7 +310,10 @@ void TVMenuCallback(void *data, QString &selection)
     QString sel = selection.lower();
 
     if (sel.left(9) == "settings ")
+    {
+        gContext->addCurrentLocation("Setup");
         gContext->ActivateSettingsCache(false);
+    }
 
     if (sel == "tv_watch_live")
         startTV();
@@ -427,6 +430,8 @@ void TVMenuCallback(void *data, QString &selection)
 
     if (sel.left(9) == "settings ")
     {
+        gContext->removeCurrentLocation();
+
         gContext->ActivateSettingsCache(true);
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
     }
@@ -1014,6 +1019,8 @@ int main(int argc, char **argv)
         mon->startMonitoring();
     }
 #endif
+
+    gContext->addCurrentLocation("MainMenu");
 
     int exitstatus = RunMenu(themedir);
 

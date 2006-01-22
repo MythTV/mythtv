@@ -285,6 +285,7 @@ TV::TV(void)
     sleep_times.push_back(SleepTimerInfo(QObject::tr("2h"),   120*60));
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("Playback");
 
     connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
     connect(browseTimer,      SIGNAL(timeout()), SLOT(BrowseEndTimer()));
@@ -423,6 +424,7 @@ TV::~TV(void)
 {
     QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal from continuing.
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
 
     runMainLoop = false;
     pthread_join(event, NULL);

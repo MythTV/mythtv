@@ -100,6 +100,7 @@ PreviousList::PreviousList(MythMainWindow *parent, const char *name,
     setNoErase();
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("PreviousList");
 }
 
 PreviousList::~PreviousList()
@@ -107,6 +108,7 @@ PreviousList::~PreviousList()
     itemList.clear();
 
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     delete theme;
 }
 

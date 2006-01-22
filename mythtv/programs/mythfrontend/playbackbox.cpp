@@ -277,6 +277,11 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         (gContext->GetNumSetting("QueryInitialFilter", 0)))
         showRecGroupChooser();
 
+    if (type == Delete)
+        gContext->addCurrentLocation("DeleteBox");
+    else
+        gContext->addCurrentLocation("PlaybackBox");
+
     // Initialize yuv2rgba conversion stuff
     conv_yuv2rgba  = yuv2rgb_init_mmx(32, MODE_RGB);
     conv_rgba_buf  = NULL;
@@ -286,6 +291,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 PlaybackBox::~PlaybackBox(void)
 {
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     killPlayerSafe();
     delete timer;
     delete fillListTimer;

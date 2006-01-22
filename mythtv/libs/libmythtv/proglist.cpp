@@ -119,12 +119,14 @@ ProgLister::ProgLister(ProgListType pltype,
     setNoErase();
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("ProgLister");
 }
 
 ProgLister::~ProgLister()
 {
     itemList.clear();
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     delete theme;
 }
 

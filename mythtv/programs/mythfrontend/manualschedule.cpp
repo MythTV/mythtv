@@ -230,11 +230,13 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     m_channel->setFocus();
     
     gContext->addListener(this);
+    gContext->addCurrentLocation("ManualSchedule");
 }
 
 ManualSchedule::~ManualSchedule(void)
 {
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
 }
 
 void ManualSchedule::minuteChanged(void)

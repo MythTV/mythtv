@@ -216,7 +216,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20060115-1"
+#define MYTH_BINARY_VERSION "0.19.20060121-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -400,6 +400,10 @@ class MythContext : public QObject, public MythObservable
     void waitPrivRequest() const;
     MythPrivRequest popPrivRequest();
 
+    void addCurrentLocation(QString location);
+    QString removeCurrentLocation(void);
+    QString getCurrentLocation(void);
+
     static QMutex verbose_mutex;
 
   private slots:
@@ -423,6 +427,9 @@ class MythContext : public QObject, public MythObservable
     bool useSettingsCache;
     QMutex cacheLock;
     QMap <QString, QString> settingsCache;
+
+    QMutex locationLock;
+    QValueList <QString> currentLocation;
 };
 
 /// This global variable contains the MythContext instance for the application

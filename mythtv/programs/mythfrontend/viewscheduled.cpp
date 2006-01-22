@@ -69,12 +69,14 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
     setNoErase();
 
     gContext->addListener(this);
+    gContext->addCurrentLocation("ViewScheduled");
 }
 
 ViewScheduled::~ViewScheduled()
 {
     gContext->SaveSetting("ViewSchedShowLevel", !showAll);
     gContext->removeListener(this);
+    gContext->removeCurrentLocation();
     delete theme;
 }
 
