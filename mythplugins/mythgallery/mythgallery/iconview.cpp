@@ -174,12 +174,17 @@ void IconView::updateText()
             ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
                                             m_currCol);
 
-            if(item->caption == "" && m_showcaption)
-                item->caption = GalleryUtil::getCaption(item->path);
-            if(item->caption == "")
-                item->caption = item->name;
+            if (item)
+            {
+                if(item->caption == "" && m_showcaption)
+                    item->caption = GalleryUtil::getCaption(item->path);
+                if(item->caption == "")
+                    item->caption = item->name;
 
-            ttype->SetText(item ? item->caption : QString(""));
+                ttype->SetText(item->caption);
+            }
+            else
+                ttype->SetText(QString(""));
         }
         
         container->Draw(&p, 0, 0);
