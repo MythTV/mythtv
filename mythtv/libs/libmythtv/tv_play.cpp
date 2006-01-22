@@ -2961,7 +2961,7 @@ void TV::SetFFRew(int index)
         speed = -ff_rew_speeds[ff_rew_index];
     }
 
-    activenvp->Play(speed, false);
+    activenvp->Play((float)speed, (speed == 1) && (doing_ff_rew > 0));
     UpdateOSDSeekMessage(mesg, -1);
 }
 
