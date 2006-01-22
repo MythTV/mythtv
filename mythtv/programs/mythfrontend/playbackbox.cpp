@@ -1958,7 +1958,8 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     if (tv->getEndOfRecording())
         playCompleted = true;
 
-    if (tv->getRequestDelete())
+    if (tv->getRequestDelete() &&
+        !inPlaylist)
     {
         doremove = true;
     }
