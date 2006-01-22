@@ -3497,6 +3497,18 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
     QStringList reclist;
     bool muted = false;
 
+    if (channum.isEmpty())
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT channum FROM channel "
+                      "WHERE chanid = :CHANID");
+        query.bindValue(":CHANID", chanid);
+        if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+            channum = query.value(0).toString();
+        else
+            channum = QString::number(chanid);
+    }
+
     if (activerecorder)
     {
         bool getit = false;
