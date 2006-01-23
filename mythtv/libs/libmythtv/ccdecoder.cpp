@@ -717,12 +717,13 @@ static char Printable(char c)
     return IsPrintable(c) ? ((c) & 0x7F) : '.';
 }
 
+#if 0
 static int OddParity(unsigned char c)
 {
     c ^= (c >> 4); c ^= (c >> 2); c ^= (c >> 1);
     return c & 1;
 }
-
+#endif
 
 // // // // // // // // // // // // // // // // // // // // // // // //
 // // // // // // // // // // //  VPS  // // // // // // // // // // //

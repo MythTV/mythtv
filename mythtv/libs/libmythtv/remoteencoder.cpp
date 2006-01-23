@@ -308,6 +308,7 @@ void RemoteEncoder::SetLiveRecording(bool recording)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "SET_LIVE_RECORDING";
+    strlist << QString::number(recording);
 
     SendReceiveStringList(strlist);
 }

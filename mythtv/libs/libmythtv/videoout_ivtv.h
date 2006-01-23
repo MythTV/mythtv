@@ -55,6 +55,8 @@ class VideoOutputIvtv: public VideoOutput
     VideoFrame *GetNextFreeFrame(bool with_lock = false,
                                  bool allow_unsafe = false)
     {
+        (void) with_lock;
+        (void) allow_unsafe;
         return NULL;
     }
   private:
