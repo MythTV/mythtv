@@ -2545,7 +2545,7 @@ void TV::processNetworkControlCommand(QString command)
             if (paused)
                 DoPause();
 
-            if (tmpSpeed == 1 && normal_speed != 1.0f)
+            if (tmpSpeed == 1)
             {
                 StopFFRew();
                 normal_speed = 1.0f;

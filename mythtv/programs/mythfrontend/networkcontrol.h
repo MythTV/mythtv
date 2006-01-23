@@ -41,13 +41,11 @@ class NetworkControl : public QServerSocket
     QString processQuery(QStringList tokens);
     QString processHelp(QStringList tokens);
 
-    void disconnectClient(const QString msg = "");
-
+    void notifyDataAvailable(void);
     void customEvent(QCustomEvent *e);
 
     QString listRecordings(void);
 
-    void processNetworkControlCommands(void);
     void processNetworkControlCommand(QString command);
 
 
@@ -58,7 +56,6 @@ class NetworkControl : public QServerSocket
     QMap <QString, int> keyMap;
 
     QMutex clientLock;
-    bool dataAvailable;
     QSocket *client;
     QTextStream *cs;
 
@@ -71,10 +68,6 @@ class NetworkControl : public QServerSocket
     pthread_t command_thread;
     bool runCommandThread;
     bool commandThreadRunning;
-
-    pthread_t socket_thread;
-    bool runSocketThread;
-    bool socketThreadRunning;
 };
 
 #endif

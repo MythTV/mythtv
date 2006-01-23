@@ -16,11 +16,13 @@ using namespace std;
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
 
+const int kNetworkControlDataReadyEvent = 35671;
+const int kNetworkControlCloseEvent     = 35672;
+
 NetworkControl::NetworkControl(int port)
           : QServerSocket(port, 1),
             prompt("# "),
             gotAnswer(false), answer(""),
-            dataAvailable(false),
             client(NULL), cs(NULL)
 {
     VERBOSE(VB_IMPORTANT, LOC +
@@ -72,7 +74,6 @@ NetworkControl::NetworkControl(int port)
     keyMap["pagedown"]               = Qt::Key_Next;
     keyMap["escape"]                 = Qt::Key_Escape;
 
-    runSocketThread = true;
     runCommandThread = true;
 
     pthread_attr_t attr;
@@ -80,81 +81,25 @@ NetworkControl::NetworkControl(int port)
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
     pthread_create(&command_thread, &attr, CommandThread, this);
-    pthread_create(&socket_thread, &attr, SocketThread, this);
 
     gContext->addListener(this);
 }
 
 NetworkControl::~NetworkControl(void)
 {
-    runSocketThread = false;
+    nrLock.lock();
+    networkControlReplies.push_back(
+        "mythfrontend shutting down, connection closing...");
+    nrLock.unlock();
+
+    notifyDataAvailable();
+
     runCommandThread = false;
 
-    while (socketThreadRunning || commandThreadRunning)
+    while (commandThreadRunning)
         usleep(1000);
 
-    pthread_join(socket_thread, NULL);
     pthread_join(command_thread, NULL);
-}
-
-void *NetworkControl::SocketThread(void *param)
-{
-    NetworkControl *networkControl = (NetworkControl *)param;
-    networkControl->RunSocketThread();
-
-    return NULL;
-}
-
-void NetworkControl::RunSocketThread(void)
-{
-    QString lineIn;
-    QString reply;
-    int replies;
-    QRegExp crlfRegEx("\r\n$");
-    QRegExp crlfcrlfRegEx("\r\n.*\r\n");
-
-    socketThreadRunning = true;
-
-    while(runSocketThread)
-    {
-        if (client && dataAvailable)
-        {
-            dataAvailable = false;
-            QMutexLocker locker(&clientLock);
-
-            while (client->canReadLine())
-            {
-                lineIn = client->readLine().lower();
-                lineIn.replace(QRegExp("[\r\n]"), "");
-
-                ncLock.lock();
-                networkControlCommands.push_back(lineIn);
-                ncLock.unlock();
-            }
-        }
-
-        nrLock.lock();
-        replies = networkControlReplies.size();
-        if (client && cs && replies > 0 &&
-            client->state() == QSocket::Connected)
-        {
-            reply = networkControlReplies.front();
-            networkControlReplies.pop_front();
-            *cs << reply;
-            if (!reply.contains(crlfRegEx) || reply.contains(crlfcrlfRegEx))
-                *cs << "\r\n" << prompt;
-            client->flush();
-        }
-        nrLock.unlock();
-
-        usleep(50000);
-    }
-
-    QMutexLocker locker(&clientLock);
-    if (client && cs)
-        disconnectClient("mythfrontend shutting down, connection closing...\r\n");
-
-    socketThreadRunning = false;
 }
 
 void *NetworkControl::CommandThread(void *param)
@@ -167,6 +112,7 @@ void *NetworkControl::CommandThread(void *param)
 
 void NetworkControl::RunCommandThread(void)
 {
+    QString command;
     int commands = 0;
     commandThreadRunning = true;
 
@@ -176,96 +122,24 @@ void NetworkControl::RunCommandThread(void)
         commands = networkControlCommands.size();
         ncLock.unlock();
 
-        if (commands)
-            processNetworkControlCommands();
+        while (commands)
+        {
+            ncLock.lock();
+            command = networkControlCommands.front();
+            networkControlCommands.pop_front();
+            ncLock.unlock();
+
+            processNetworkControlCommand(command);
+
+            ncLock.lock();
+            commands = networkControlCommands.size();
+            ncLock.unlock();
+        }
 
         usleep(50000);
     }
 
-    QMutexLocker locker(&clientLock);
-    if (client && cs)
-        disconnectClient("mythfrontend shutting down, connection closing...\r\n");
-
     commandThreadRunning = false;
-}
-
-void NetworkControl::disconnectClient(const QString msg)
-{
-    VERBOSE(VB_IMPORTANT, QString(LOC + "Control connection Closed"));
-
-    if (client->state() != QSocket::Idle)
-    {
-        int replies;
-        int loops = 0;
-
-        nrLock.lock();
-        if (msg != "")
-            networkControlReplies.push_back(msg);
-        replies = networkControlReplies.size();
-        nrLock.unlock();
-
-        while (replies > 0 && loops++ < 10)
-        {
-            usleep(50000);
-
-            nrLock.lock();
-            replies = networkControlReplies.size();
-            nrLock.unlock();
-        }
-
-        client->close();
-    }
-
-    QTime timer;
-    timer.start();
-    while ((timer.elapsed() < 3000) &&
-           (client->state() != QSocket::Idle))
-        usleep(10000);
-    
-    if (client->state() == QSocket::Idle)
-    {
-        delete client;
-        delete cs;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to disconnect socket");
-    }
-
-    client = NULL;
-    cs = NULL;
-
-    ncLock.lock();
-    networkControlCommands.clear();
-    ncLock.unlock();
-
-    nrLock.lock();
-    networkControlReplies.clear();
-    nrLock.unlock();
-}
-
-void NetworkControl::processNetworkControlCommands(void)
-{
-    int commands = 0;
-    QString command;
-
-    ncLock.lock();
-    commands = networkControlCommands.size();
-    ncLock.unlock();
-
-    while (commands)
-    {
-        ncLock.lock();
-        command = networkControlCommands.front();
-        networkControlCommands.pop_front();
-        ncLock.unlock();
-
-        processNetworkControlCommand(command);
-
-        ncLock.lock();
-        commands = networkControlCommands.size();
-        ncLock.unlock();
-    }
 }
 
 void NetworkControl::processNetworkControlCommand(QString command)
@@ -285,7 +159,8 @@ void NetworkControl::processNetworkControlCommand(QString command)
     else if (tokens[0] == "help")
         result = processHelp(tokens);
     else if ((tokens[0] == "exit") || (tokens[0] == "quit"))
-        disconnectClient("Closing connection...\r\n");
+        QApplication::postEvent(this,
+                                new QCustomEvent(kNetworkControlCloseEvent));
     else
         result = QString("INVALID usage, try 'help' for more info");
 
@@ -294,6 +169,8 @@ void NetworkControl::processNetworkControlCommand(QString command)
         nrLock.lock();
         networkControlReplies.push_back(result);
         nrLock.unlock();
+
+        notifyDataAvailable();
     }
 }
 
@@ -307,7 +184,8 @@ void NetworkControl::newConnection(int socket)
     connect(s, SIGNAL(connectionClosed()), this, SLOT(discardClient()));
     s->setSocket(socket);
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("New connection established"));
+    VERBOSE(VB_IMPORTANT, LOC +
+            QString("New connection established. (%1)").arg(socket));
 
     QTextStream *os = new QTextStream(s);
     os->setEncoding(QTextStream::UnicodeUTF8);
@@ -341,6 +219,8 @@ void NetworkControl::newConnection(int socket)
     nrLock.lock();
     networkControlReplies.push_back(welcomeStr);
     nrLock.unlock();
+
+    notifyDataAvailable();
 }
 
 void NetworkControl::readClient(void)
@@ -349,7 +229,16 @@ void NetworkControl::readClient(void)
     if (!socket)
         return;
 
-    dataAvailable = true;
+    QString lineIn;
+    while (socket->canReadLine())
+    {
+        lineIn = socket->readLine().lower();
+        lineIn.replace(QRegExp("[\r\n]"), "");
+
+        ncLock.lock();
+        networkControlCommands.push_back(lineIn);
+        ncLock.unlock();
+    }
 }
 
 void NetworkControl::discardClient(void)
@@ -360,7 +249,12 @@ void NetworkControl::discardClient(void)
 
     QMutexLocker locker(&clientLock);
     if (client == socket)
-        disconnectClient();
+    {
+        delete cs;
+        delete client;
+        client = NULL;
+        cs = NULL;
+    }
     else
         delete socket;
 }
@@ -712,6 +606,12 @@ QString NetworkControl::processHelp(QStringList tokens)
     return helpText;
 }
 
+void NetworkControl::notifyDataAvailable(void)
+{
+    QApplication::postEvent(this,
+                            new QCustomEvent(kNetworkControlDataReadyEvent));
+}
+
 void NetworkControl::customEvent(QCustomEvent *e)
 {       
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
@@ -740,6 +640,40 @@ void NetworkControl::customEvent(QCustomEvent *e)
             nrLock.lock();
             networkControlReplies.push_back(response);
             nrLock.unlock();
+
+            notifyDataAvailable();
+        }
+    }
+    else if (e->type() == kNetworkControlDataReadyEvent)
+    {
+        QString reply;
+        int replies;
+        QRegExp crlfRegEx("\r\n$");
+        QRegExp crlfcrlfRegEx("\r\n.*\r\n");
+
+        nrLock.lock();
+        replies = networkControlReplies.size();
+        while (client && cs && replies > 0 &&
+               client->state() == QSocket::Connected)
+        {
+            reply = networkControlReplies.front();
+            networkControlReplies.pop_front();
+            *cs << reply;
+            if (!reply.contains(crlfRegEx) || reply.contains(crlfcrlfRegEx))
+                *cs << "\r\n" << prompt;
+            client->flush();
+
+            replies = networkControlReplies.size();
+        }
+        nrLock.unlock();
+    }
+    else if (e->type() == kNetworkControlCloseEvent)
+    {
+        if (client && client->state() == QSocket::Connected)
+        {
+            clientLock.lock();
+            client->close();
+            clientLock.unlock();
         }
     }
 }
