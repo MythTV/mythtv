@@ -161,7 +161,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     waiting_for_playlists_timer = new QTimer(this);
     connect(waiting_for_playlists_timer, SIGNAL(timeout()), this, 
             SLOT(checkForPlaylists()));
-    waiting_for_playlists_timer->start(100);
+    waiting_for_playlists_timer->start(50, TRUE);
 
     // Warm up the visualizer
     
@@ -891,77 +891,86 @@ void PlaybackBoxMusic::showEditMetadataDialog()
 
 void PlaybackBoxMusic::checkForPlaylists()
 {
+    // This is only done off a timer on startup
+
     if (first_playlist_check)
     {
         first_playlist_check = false;
         repaint();
-        return;
-    }
-
-    // This is only done off a timer on startup
-
-    if (all_playlists->doneLoading() &&
-        all_music->doneLoading())
-    {
-        if (progress)
-        {
-            progress->Close();
-            delete progress;
-            progress = NULL;
-            progress_type = kProgressNone;
-        }
-
-        if (tree_is_done)
-        {
-            if (scan_for_cd)
-                updatePlaylistFromCD();
-
-            music_tree_list->showWholeTree(show_whole_tree);
-            waiting_for_playlists_timer->stop();
-            QValueList <int> branches_to_current_node;
-            branches_to_current_node.append(0); //  Root node
-            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
-            branches_to_current_node.append(0); //  Active play Queue
-            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
-            music_tree_list->refresh();
-            if (show_whole_tree)
-                setContext(1);
-            else
-                setContext(2);
-            updateForeground();
-            mainvisual->setVisual(visual_mode);
-            
-            if (curMeta) 
-                updateTrackInfo(curMeta);
-        }    
-        else
-            constructPlaylistTree();
     }
     else
     {
-        if (!all_music->doneLoading())
-        {
-            if (all_music->count() < 250) return;
-
-            if (!progress)
-            {
-                progress = new MythProgressDialog(
-                    QObject::tr("Loading Music"), all_music->count());
-                progress_type = kProgressMusic;
-            }
-            progress->setProgress(all_music->countLoaded());
-        } 
-        else if (progress_type == kProgressMusic)
+        if (all_playlists->doneLoading() &&
+            all_music->doneLoading())
         {
             if (progress)
             {
                 progress->Close();
                 delete progress;
+                progress = NULL;
+                progress_type = kProgressNone;
             }
-            progress = NULL;
-            progress_type = kProgressNone;
+
+            if (tree_is_done)
+            {
+                if (scan_for_cd)
+                    updatePlaylistFromCD();
+
+                music_tree_list->showWholeTree(show_whole_tree);
+                QValueList <int> branches_to_current_node;
+                branches_to_current_node.append(0); //  Root node
+                branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+                branches_to_current_node.append(0); //  Active play Queue
+                music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+                music_tree_list->refresh();
+                if (show_whole_tree)
+                    setContext(1);
+                else
+                    setContext(2);
+                updateForeground();
+                mainvisual->setVisual(visual_mode);
+
+                if (curMeta) 
+                    updateTrackInfo(curMeta);
+
+                return;     // Do not restart Timer
+            }
+            else
+            {
+                constructPlaylistTree();
+            }
+        }
+        else
+        {
+            if (!all_music->doneLoading())
+            {
+                // Only bother with progress dialogue
+                // if we have a reasonable number of tracks
+                if (all_music->count() >= 250)
+                {
+                    if (!progress)
+                    {
+                        progress = new MythProgressDialog(
+                            QObject::tr("Loading Music"), all_music->count());
+                        progress_type = kProgressMusic;
+                    }
+                    progress->setProgress(all_music->countLoaded());
+                }
+            } 
+            else if (progress_type == kProgressMusic)
+            {
+                if (progress)
+                {
+                    progress->Close();
+                    delete progress;
+                }
+                progress = NULL;
+                progress_type = kProgressNone;
+            }
         }
     }
+
+    waiting_for_playlists_timer->start(100, TRUE); // Restart Timer
 }
 
 void PlaybackBoxMusic::changeVolume(bool up_or_down)
