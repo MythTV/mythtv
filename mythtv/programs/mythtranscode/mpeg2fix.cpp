@@ -305,7 +305,7 @@ static void SETBITS(unsigned char *ptr, long value, int num)
 {
     static int sb_pos;
     static unsigned char *sb_ptr = 0;
-    unsigned long sb_long, mask;
+    uint32_t sb_long, mask;
     int offset, offset_r, offset_b;
 
     if (ptr != 0)
@@ -318,10 +318,10 @@ static void SETBITS(unsigned char *ptr, long value, int num)
     offset_r = sb_pos & 0x07;
     offset_b = 32 - offset_r;
     mask = ~(((1 << num) - 1) << (offset_b - num));
-    sb_long = ntohl(*((unsigned long *) (sb_ptr + offset)));
+    sb_long = ntohl(*((uint32_t *) (sb_ptr + offset)));
     value = value << (offset_b - num);
     sb_long = (sb_long & mask) + value;
-    *((unsigned long *)(sb_ptr + offset)) = htonl(sb_long);
+    *((uint32_t *)(sb_ptr + offset)) = htonl(sb_long);
 }
 
 void MPEG2fixup::dec2x33(int64_t *pts1, int64_t pts2)
@@ -1202,10 +1202,10 @@ bool MPEG2fixup::FindStart()
                 {
                     if (pkt.pos == vFrame.first()->pkt.pos)
                     {
-                        if (pkt.pts != AV_NOPTS_VALUE ||
-                            pkt.dts != AV_NOPTS_VALUE)
+                        if ((uint64_t)pkt.pts != AV_NOPTS_VALUE ||
+                            (uint64_t)pkt.dts != AV_NOPTS_VALUE)
                         {
-                            if (pkt.pts == AV_NOPTS_VALUE)
+                            if ((uint64_t)pkt.pts == AV_NOPTS_VALUE)
                                 vFrame.first()->pkt.pts = pkt.dts;
                             VERBOSE(MPF_PROCESS, "Found 1st valid video frame");
                             break;
@@ -1445,7 +1445,7 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
         framePool.enqueue(tmpFrame);
     }
 
-    if (info->display_picture->temporal_reference > frameNum)
+    if ((int)info->display_picture->temporal_reference > frameNum)
     {
         // the frame in question doesn't exist.  We have no idea where we are.
         // reset the displayFrame so we start searching from the beginning next
