@@ -204,10 +204,11 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
                 int ret = read(fd2, buf, kReadTestSize);
                 if (ret != (int)kReadTestSize)
                 {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Invalid file handle when opening %1.  "
-                                    "%2 retries remaining.")
-                            .arg(filename).arg(openAttempts));
+                    VERBOSE(VB_IMPORTANT, LOC +
+                            QString("Invalid file (fd %1) when opening '%2'.")
+                            .arg(fd2).arg(filename) + 
+                            QString(" %2 retries remaining.")
+                            .arg(openAttempts));
 
                     close(fd2);
                     fd2 = -1;
@@ -350,6 +351,9 @@ int RingBuffer::safe_read(int fd, void *data, uint sz)
                 "Invalid file descriptor in 'safe_read()'");
         return 0;
     }
+
+    if (stopreads)
+        return 0;
 
     while (tot < sz)
     {
@@ -627,7 +631,11 @@ void RingBuffer::ReadAheadThread(void)
             continue;
         }
 
-        readaheadpaused = false;
+        if (readaheadpaused)
+        {
+            totfree = ReadBufFree();
+            readaheadpaused = false;
+        }
 
         if (totfree < readblocksize)
         {

@@ -698,6 +698,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
 
     ringBuffer->Start();
     char testbuf[2048];
+    ringBuffer->Unpause(); // so we can read testbuf if we were paused
     if (ringBuffer->Read(testbuf, 2048) != 2048)
     {
         VERBOSE(VB_IMPORTANT,
@@ -2030,6 +2031,13 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     ringBuffer->WaitForPause();
 
     ringBuffer->OpenFile(pginfo->pathname, 10 /* retries -- about 5 seconds */);
+    if (!ringBuffer->IsOpen())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram's OpenFile failed.");
+        eof = true;
+        errored = true;
+        return;
+    }
 
     if (eof)
         discontinuity = true;
@@ -2115,6 +2123,13 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
     ringBuffer->Reset(true);
     ringBuffer->OpenFile(pginfo->pathname);
+    if (!ringBuffer->IsOpen())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram's OpenFile failed.");
+        eof = true;
+        errored = true;
+        return;
+    }
 
     if (newtype)
         errored = (OpenFile() >= 0) ? errored : true;

@@ -406,6 +406,16 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 
     newtype = (oldentry.cardtype !=  entry.cardtype);
 
+    if (discont)
+    {
+        // Some cards can change their streams
+        // dramatically on a channel change...
+        newtype |= entry.cardtype == "DVB";
+        newtype |= entry.cardtype == "HDTV";
+        newtype |= entry.cardtype == "FIREWIRE";
+        newtype |= entry.cardtype == "DBOX2";
+    }
+
     m_switchid = -1;
 
     return pginfo;
