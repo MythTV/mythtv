@@ -1058,7 +1058,19 @@ void Scheduler::AddRecording(const ProgramInfo &pi)
 
     VERBOSE(VB_SCHEDULE, LOC + 
             QString("Adding '%1' to reclist.").arg(pi.title));
-    reclist.push_back(new ProgramInfo(pi));
+
+    ProgramInfo * new_pi = new ProgramInfo(pi);
+    reclist.push_back(new_pi);
+
+    // Save rsRecording recstatus to DB
+    // This allows recordings to resume on backend restart
+    new_pi->AddHistory(false);
+
+    // Make sure we have a ScheduledRecording instance
+    new_pi->GetScheduledRecording();
+
+    // Trigger reschedule..
+    ScheduledRecording::signalChange(pi.recordid);
 }
 
 void Scheduler::RunScheduler(void)

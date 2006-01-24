@@ -2733,20 +2733,11 @@ void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
     // + set proper recstatus (saved later)
     rec->recstatus = rsRecording;
 
-    // + pass proginfo to scheduler (so reschedule knows about recording)
+    // + pass proginfo to scheduler and reschedule
     QStringList prog;
     rec->ToStringList(prog);
     MythEvent me("SCHEDULER_ADD_RECORDING", prog);
-    // + + make sure scheduler gets the event before we reschedule
-    gContext->dispatchNow(me);
-
-    // + save rsRecording recstatus to DB
-    //   (this allows recordings to resume on backend restart)
-    rec->AddHistory(false);
-
-    // + save record rule,
-    //   this time we allow signalChange() to trigger reschedule..
-    rec->GetScheduledRecording()->save(true);
+    gContext->dispatch(me);
 
     // Allow scheduler to end this recording before post-roll,
     // if it has another recording for this recorder.
