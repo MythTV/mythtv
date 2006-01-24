@@ -1637,10 +1637,13 @@ void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
     if ((uint64_t)curFrame->pkt.pts == AV_NOPTS_VALUE)
     {
         VERBOSE(MPF_PROCESS,
-            QString("Found frame %1 with mising PTS at %2")
+            QString("Found frame %1 with missing PTS at %2")
                 .arg(GetFrameNum(curFrame))
                 .arg(PtsTime(origvPTS / 300)));
-        curFrame->pkt.pts = origvPTS / 300;
+        if (fix)
+            curFrame->pkt.pts = origvPTS / 300;
+        else
+            PTSdiscrep = AV_NOPTS_VALUE;
     }
     else if (tmpPTS < -ptsIncrement ||
              tmpPTS > ptsIncrement*numframes)
@@ -1838,7 +1841,8 @@ int MPEG2fixup::Start()
                                     PTSdiscrep = 0;
                                     break;
                                 }
-                                if (tmpPTSdiscrep != PTSdiscrep)
+                                if (tmpPTSdiscrep != AV_NOPTS_VALUE &&
+                                    tmpPTSdiscrep != PTSdiscrep)
                                     PTSdiscrep = tmpPTSdiscrep;
                             }
                             count += tmpReorder.count();
