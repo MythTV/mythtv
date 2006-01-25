@@ -47,6 +47,26 @@ int ring_init (ringbuffer *rbuf, int size)
 	return 0;
 }
 
+int ring_reinit (ringbuffer *rbuf, int size)
+{
+	if (size > rbuf->size) {
+		uint8_t *tmpalloc = (uint8_t *) realloc(rbuf->buffer,
+							sizeof(uint8_t)*size);
+		if (! tmpalloc)
+			return -1;
+		rbuf->buffer = tmpalloc;
+		if (rbuf->write_pos < rbuf->read_pos)
+		{
+			unsigned int delta = size - rbuf->size;
+			memmove(rbuf->buffer + rbuf->read_pos + delta,
+				rbuf->buffer + rbuf->read_pos,
+				rbuf->size - rbuf->read_pos);
+			rbuf->read_pos += delta;
+		}
+		rbuf->size = size;
+	}
+	return 0;
+}
 void ring_clear(ringbuffer *rbuf)
 {
 	rbuf->read_pos = 0;	

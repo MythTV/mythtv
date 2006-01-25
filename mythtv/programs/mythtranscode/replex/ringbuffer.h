@@ -56,6 +56,7 @@ extern "C" {
 
 
 	int  ring_init (ringbuffer *rbuf, int size);
+	int  ring_reinit (ringbuffer *rbuf, int size);
 	void ring_clear(ringbuffer *rbuf);
 	void ring_destroy(ringbuffer *rbuf);
 	int ring_write(ringbuffer *rbuf, uint8_t *data, int count);

@@ -645,6 +645,16 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
                     ring_avail(&rx.index_extrbuf[i]) < sizeof(index_unit))
                 ok = 0;
 
+        if (! ok && ring_free(rb) < (unsigned int)f->pkt.size &&
+                    ring_free(rbi) >= sizeof(index_unit))
+        {
+            // increase memory to avoid deadlock
+            unsigned int inc_size = 10*(unsigned int)f->pkt.size;
+            VERBOSE(MPF_IMPORTANT, QString("Increasing ringbuffer size by %1 "
+                                   "to avoid deadlock").arg(inc_size));
+            if (! ring_reinit(rb, rb->size + inc_size))
+                ok = 1;
+        }
         if (! ok)
         {
             //deadlock
@@ -2158,7 +2168,7 @@ int MPEG2fixup::Start()
                                 //Note: if we allow too much discrepency,
                                 //we could overrun the video queue
                                 ptsinc((uint64_t *)&origaPTS[it.key()],
-                                       200 * tmpPTS);
+                                       300 * tmpPTS);
                                 af_dlta_cnt[it.key()] = 0;
                             }
                             else
