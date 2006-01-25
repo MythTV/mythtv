@@ -546,7 +546,9 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     else if (command == "BACKEND_MESSAGE")
     {
         QString message = listline[1];
-        QString extra = listline[2];
+        QStringList extra = listline[2];
+        for (uint i = 3; i < listline.size(); i++)
+            extra << listline[i];
         MythEvent me(message, extra);
         gContext->dispatch(me);
     }
