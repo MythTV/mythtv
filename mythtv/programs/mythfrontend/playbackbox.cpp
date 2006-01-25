@@ -130,7 +130,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     previewPixmap = NULL;
     previewStartts = QDateTime::currentDateTime();
     previewChanid = "";
-    
+    previewSuspend = false;
+
     updateFreeSpace = true;
     freeSpaceTotal = 0;
     freeSpaceUsed = 0;
@@ -1947,7 +1948,6 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     lastProgram = new ProgramInfo(*tvrec);
 
     playingSomething = false;
-    state = kStarting; // restart playback preview
     setEnabled(true);
 
     bool doremove = false;
@@ -1972,6 +1972,8 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 
     delete tv;
 
+    previewSuspend = doremove || doprompt;
+
     if (doremove)
     {
         remove(tvrec);
@@ -1979,6 +1981,10 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     else if (doprompt) 
     {
         promptEndOfRecording(tvrec);
+    }
+    else
+    {
+        state = kStarting; // restart playback preview
     }
 
     delete tvrec;
@@ -2910,6 +2916,7 @@ void PlaybackBox::askDelete(void)
 
 void PlaybackBox::noDelete(void)
 {
+    previewSuspend = false;
     if (!expectingPopup)
         return;
 
@@ -2944,7 +2951,10 @@ void PlaybackBox::doPlaylistDelete(void)
 void PlaybackBox::doDelete(void)
 {
     if (!expectingPopup)
+    {
+        previewSuspend = false;
         return;
+    }
 
     cancelPopup();
 
@@ -2952,6 +2962,7 @@ void PlaybackBox::doDelete(void)
         (!REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
+        previewSuspend = false;
         return;
     }
 
@@ -2966,6 +2977,7 @@ void PlaybackBox::doDelete(void)
         ProgramInfo *tmpItem = findMatchingProg(delitem);
         if (tmpItem)
             tmpItem->availableStatus = asPendingDelete;
+        previewSuspend = false;
     }
     else
         showDeletePopup(delitem, ForceDeleteRecording);
@@ -2974,7 +2986,10 @@ void PlaybackBox::doDelete(void)
 void PlaybackBox::doForceDelete(void)
 {
     if (!expectingPopup)
+    {
+        previewSuspend = false;
         return;
+    }
 
     cancelPopup();
 
@@ -2982,6 +2997,7 @@ void PlaybackBox::doForceDelete(void)
         (!REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
+        previewSuspend = false;
         return;
     }
 
@@ -2995,7 +3011,10 @@ void PlaybackBox::doForceDelete(void)
 void PlaybackBox::doDeleteForgetHistory(void)
 {
     if (!expectingPopup)
+    {
+        previewSuspend = false;
         return;
+    }
 
     cancelPopup();
 
@@ -3003,6 +3022,7 @@ void PlaybackBox::doDeleteForgetHistory(void)
         (!REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
+        previewSuspend = false;
         return;
     }
 
@@ -3017,6 +3037,7 @@ void PlaybackBox::doDeleteForgetHistory(void)
         ProgramInfo *tmpItem = findMatchingProg(delitem);
         if (tmpItem)
             tmpItem->availableStatus = asPendingDelete;
+        previewSuspend = false;
     }
     else
         showDeletePopup(delitem, ForceDeleteRecording);
@@ -3562,27 +3583,33 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (!generatePreviewPixmap || !pginfo)
         return retpixmap;
         
+    if ((asPendingDelete == pginfo->availableStatus) || previewSuspend)
+    {
+        if (previewPixmap)
+            retpixmap = *previewPixmap;
+
+        return retpixmap;
+    }
+
     QString filename = pginfo->pathname + ".png";
 
     previewLastModified = getPreviewLastModified(pginfo);
     if (previewLastModified <  pginfo->lastmodified &&
         previewLastModified >= pginfo->recendts &&
         !pginfo->IsEditing() && 
-        !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
+        !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo) &&
+        !IsGeneratingPreview(filename))
     {
-        RemoteGeneratePreviewPixmap(pginfo);
-        previewLastModified = getPreviewLastModified(pginfo);
+        SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
     }
 
     // Check and see if we've already tried this one.
-    if (pginfo->recstartts == previewStartts &&
+    if (previewPixmap &&
+        pginfo->recstartts == previewStartts &&
         pginfo->chanid == previewChanid &&
         previewLastModified == previewFilets)
     {
-        if (previewPixmap)
-            retpixmap = *previewPixmap;
-        
-        return retpixmap;
+        return *previewPixmap;
     }
 
     if (previewPixmap)

@@ -330,6 +330,7 @@ class PlaybackBox : public MythDialog
     QDateTime previewLastModified;
     QDateTime previewFilets;
     QDateTime previewStartts;
+    bool      previewSuspend;
     QString previewChanid;
     int listOrder;
 
