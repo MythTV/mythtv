@@ -689,7 +689,7 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
         case emNormalLiveTVPrograms:
             where = QString("recgroup = 'LiveTV' "
                     "AND endtime <= DATE_ADD(NOW(), INTERVAL '-%1' DAY) ")
-                    .arg(gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 7));
+                    .arg(gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 1));
             if (!allHosts)
                 where += QString(" AND hostname = '%1' ")
                                  .arg(gContext->GetHostName());

@@ -550,7 +550,7 @@ static GlobalSpinBox *AutoExpireLiveTVMaxAge()
                         "recordings when they are this many days old.  "
                         "LiveTV recordings may also be expired early if "
                         "necessary to free up disk space."));
-    bs->setValue(7);
+    bs->setValue(1);
     return bs;
 };
 

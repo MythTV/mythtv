@@ -39,7 +39,7 @@ extern "C" {
 
 /** Set to zero to allow any number of AC3 channels. */
 #define MAX_OUTPUT_CHANNELS 2
-#define VB_AUDIO VB_IMPORTANT
+
 static int dts_syncinfo(uint8_t *indata_ptr, int *flags,
                         int *sample_rate, int *bit_rate);
 static int dts_decode_header(uint8_t *indata_ptr, int *rate,

@@ -1057,14 +1057,14 @@ void MythContext::ClearSettingsCache(QString myKey, QString newVal)
     cacheLock.lock();
     if (myKey != "" && settingsCache.contains(myKey))
     {
-        VERBOSE(VB_GENERAL, QString("Clearing Settings Cache for '%1'.")
+        VERBOSE(VB_DATABASE, QString("Clearing Settings Cache for '%1'.")
                                     .arg(myKey));
         settingsCache.remove(myKey);
         settingsCache[myKey] = newVal;
     }
     else
     {
-        VERBOSE(VB_GENERAL, "Clearing Settings Cache.");
+        VERBOSE(VB_DATABASE, "Clearing Settings Cache.");
         settingsCache.clear();
     }
     cacheLock.unlock();
@@ -1073,9 +1073,9 @@ void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 void MythContext::ActivateSettingsCache(bool activate)
 {
     if (activate)
-        VERBOSE(VB_GENERAL, "Enabling Settings Cache.");
+        VERBOSE(VB_DATABASE, "Enabling Settings Cache.");
     else
-        VERBOSE(VB_GENERAL, "Disabling Settings Cache.");
+        VERBOSE(VB_DATABASE, "Disabling Settings Cache.");
 
     useSettingsCache = activate;
     ClearSettingsCache();

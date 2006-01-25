@@ -2855,7 +2855,7 @@ void clearOldDBEntries(void)
     query.prepare("DELETE FROM oldfind WHERE findid < TO_DAYS(NOW()) - 14;");
     query.exec();
 
-    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 21);
+    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 10);
 
     query.prepare("DELETE FROM oldrecorded WHERE "
                   "recstatus <> :RECORDED AND duplicate = 0 AND "
@@ -2950,6 +2950,9 @@ bool fillData(QValueList<Source> &sourcelist)
             else if (xmltv_grabber == "tv_grab_be_tvb" ||
                      xmltv_grabber == "tv_grab_be_tlm")
                 grabdays = 5;
+
+            if (grabdays == 1)
+                refresh_today = true;
 
             for (int i = 0; i < grabdays; i++)
             {
