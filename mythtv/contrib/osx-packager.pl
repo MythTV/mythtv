@@ -702,6 +702,12 @@ foreach my $comp (@comps)
 
   chdir $compdir;
   
+  if ($comp eq 'mythtv')
+  {
+    # MythTV has an empty subdirectory 'config' that causes problems for me:
+    &Syscall('touch config/config.pro');
+  }
+
   if ($OPT{'clean'} && -e 'Makefile')
   {
     &Verbose("Cleaning $comp");
@@ -744,9 +750,6 @@ foreach my $comp (@comps)
 
   if ($comp eq 'mythtv')
   {
-    # MythTV has an empty subdirectory 'config' that causes problems for me:
-    &Syscall('touch config/config.pro');
-
     # Remove Nigel's frontend speedup hack
     &DoSpeedupHacks('programs/programs.pro', 'mythfrontend');
     &DoSpeedupHacks('mythtv.pro', 'libs filters programs themes i18n');
