@@ -73,9 +73,18 @@ NetworkControl::NetworkControl(int port)
     keyMap["pageup"]                 = Qt::Key_Prior;
     keyMap["pagedown"]               = Qt::Key_Next;
     keyMap["escape"]                 = Qt::Key_Escape;
+    keyMap["f1"]                     = Qt::Key_F1;
+    keyMap["f2"]                     = Qt::Key_F2;
+    keyMap["f3"]                     = Qt::Key_F3;
+    keyMap["f4"]                     = Qt::Key_F4;
+    keyMap["f5"]                     = Qt::Key_F5;
+    keyMap["f6"]                     = Qt::Key_F6;
+    keyMap["f7"]                     = Qt::Key_F7;
+    keyMap["f8"]                     = Qt::Key_F8;
     keyMap["f9"]                     = Qt::Key_F9;
-    keyMap["f10"]                    = Qt::Key_F9;
-    keyMap["f11"]                    = Qt::Key_F9;
+    keyMap["f10"]                    = Qt::Key_F10;
+    keyMap["f11"]                    = Qt::Key_F11;
+    keyMap["f12"]                    = Qt::Key_F12;
 
     runCommandThread = true;
 
@@ -552,9 +561,7 @@ QString NetworkControl::processHelp(QStringList tokens)
             "key pagedown          - Send the Page Down key\r\n"
             "key enter             - Send the Enter key\r\n"
             "key escape            - Send the Escape key\r\n"
-            "key f9                - Send the F9 key\r\n"
-            "key f10               - Send the F10 key\r\n"
-            "key f11               - Send the F11 key\r\n";
+            "key f1..f12           - Send the F# Function keys\r\n";
     }
     else if (command == "play")
     {
