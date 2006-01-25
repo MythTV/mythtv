@@ -253,6 +253,7 @@ class PlaybackBox : public MythDialog
     typedef enum
     { kNvpToPlay, kNvpToStop, kDone } killStateType;
      
+    mutable QMutex killLock;
     killStateType killState;
     MythTimer killTimeout;
 

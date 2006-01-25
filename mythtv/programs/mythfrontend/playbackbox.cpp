@@ -350,28 +350,24 @@ void PlaybackBox::setDefaultView(int defaultView)
 /* blocks until playing has stopped */
 void PlaybackBox::killPlayerSafe(void)
 {
+    QMutexLocker locker(&killLock);
     /* don't process any keys while we are trying to let the nvp stop */
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    if (state != kKilled && state != kStopped && playbackPreview != 0 &&
-        everStartedVideo)
+    while (state != kKilled && state != kStopped && everStartedVideo)
     {
-        while (state != kKilled)
-        {
-            /* ensure that key events don't mess up our states */
-            if ((state != kKilling) && (state != kKilled))
-                state = kKilling;
+        /* ensure that key events don't mess up our states */
+        state = (state == kKilled) ? kKilled :  kKilling;
 
-            /* NOTE: need unlock/process/lock here because we need
-               to allow updateVideo() to run to handle changes in states */
-            qApp->unlock();
-            qApp->processEvents();
-            usleep(500);
-            qApp->lock();
-        }
-        state = kStopped;
+        /* NOTE: need unlock/process/lock here because we need
+           to allow updateVideo() to run to handle changes in states */
+        qApp->unlock();
+        qApp->processEvents();
+        usleep(500);
+        qApp->lock();
     }
+    state = kStopped;
 
     setEnabled(true);
 }
