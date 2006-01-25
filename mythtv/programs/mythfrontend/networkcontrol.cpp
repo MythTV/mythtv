@@ -73,6 +73,9 @@ NetworkControl::NetworkControl(int port)
     keyMap["pageup"]                 = Qt::Key_Prior;
     keyMap["pagedown"]               = Qt::Key_Next;
     keyMap["escape"]                 = Qt::Key_Escape;
+    keyMap["f9"]                     = Qt::Key_F9;
+    keyMap["f10"]                    = Qt::Key_F9;
+    keyMap["f11"]                    = Qt::Key_F9;
 
     runCommandThread = true;
 
@@ -548,7 +551,10 @@ QString NetworkControl::processHelp(QStringList tokens)
             "key pageup            - Send the Page Up Key\r\n"
             "key pagedown          - Send the Page Down key\r\n"
             "key enter             - Send the Enter key\r\n"
-            "key escape            - Send the Escape key\r\n";
+            "key escape            - Send the Escape key\r\n"
+            "key f9                - Send the F9 key\r\n"
+            "key f10               - Send the F10 key\r\n"
+            "key f11               - Send the F11 key\r\n";
     }
     else if (command == "play")
     {
