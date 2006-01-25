@@ -6049,14 +6049,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Kanal</translation>
     </message>
     <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">Ange antingen en exakt frekvens i Hertz eller en giltig kanal för ditt &apos;TV-format&apos;.</translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="obsolete">Värde i Hertz som läggs till din önskade frekvens för &apos;fininställning&apos;.</translation>
-    </message>
-    <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
         <translation>A</translation>
@@ -6940,7 +6932,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Önskat datumformat.</translation>
+        <translation>Välj det tidsformat du föredrar.</translation>
     </message>
     <message>
         <source>AutoExpire List</source>
@@ -6973,6 +6965,22 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>Spain</source>
         <translation>Spanien</translation>
+    </message>
+    <message>
+        <source>Enable Network Remote Control interface</source>
+        <translation>Aktivera nätverksgränssnitt för fjärrstyrning</translation>
+    </message>
+    <message>
+        <source>This enables support for controlling mythfrontend over the network.</source>
+        <translation>Aktiverar stöd för att fjärrstyra mythfrontend över nätverket.</translation>
+    </message>
+    <message>
+        <source>Network Remote Control Port</source>
+        <translation>Nätverksport för fjärrstyrning</translation>
+    </message>
+    <message>
+        <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
+        <translation>Den nätverksport som fjärrstyrningsgränssnittet lyssnar på för nya anslutningar.</translation>
     </message>
 </context>
 <context>
@@ -7712,8 +7720,24 @@ Inga andra detaljer</translation>
         <translation>BE %1</translation>
     </message>
     <message>
-        <source>Load commercial skip list</source>
-        <translation type="obsolete">Ladda reklamlista</translation>
+        <source>Speed 16X</source>
+        <translation>Hastighet 16X</translation>
+    </message>
+    <message>
+        <source>Speed 8X</source>
+        <translation>Hastighet 8X</translation>
+    </message>
+    <message>
+        <source>Speed 4X</source>
+        <translation>Hastighet 4X</translation>
+    </message>
+    <message>
+        <source>Speed 1/2X</source>
+        <translation>Hastighet 1/2X</translation>
+    </message>
+    <message>
+        <source>Speed 1/4X</source>
+        <translation>Hastighet 1/4X</translation>
     </message>
 </context>
 <context>
