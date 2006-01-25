@@ -20,6 +20,8 @@
     use DBI;
     use Getopt::Long;
     use File::Path;
+    use File::Basename;
+    use File::Find;
 
 # Some variables we'll use here
     our ($dest, $format, $usage, $underscores, $live);
@@ -66,10 +68,12 @@ options:
 
     /var/video/show_names/
 
+    WARNING: ALL symlinks within the destination directory and its
+    subdirectories (recursive) will be removed when using the --link option.
+
 --live
 
-    Include live tv recordings, affects both linking and renaming. This assumes
-    that recgroup = "LiveTV" for live tv recordings.
+    Include live tv recordings, affects both linking and renaming.
 
     default: do not link/rename live tv recordings
 
@@ -98,6 +102,7 @@ options:
     \%a = am/pm
     \%A = AM/PM
     \%- = separator character
+    /   = directory/folder (path separator)
 
     * For end time, prepend an "e" to the appropriate time/date format code
       above; i.e. "\%eG" gives the 24-hour hour for the end time.
@@ -107,6 +112,13 @@ options:
       aired.
 
     * A suffix of .mpg or .nuv will be added where appropriate.
+
+    * To separate links into subdirectories, include the / format specifier
+      between the appropriate fields.  For example, "\%T/\%S" would create
+      a directory for each title containing links for each recording named
+      by subtitle.  You may use any number of subdirectories in your format
+      specifier.  If used without the --link option, "/" will be replaced
+      with the "\%-" separator character.
 
 --separator
 
@@ -240,10 +252,13 @@ EOF
     # Bad path
         die "$dest is not a directory.\n" unless (-d $dest);
     # Delete any old links
-        foreach my $file (<$dest/*>) {
-            next unless (-l $file);
-            unlink $file or die "Couldn't remove old symlink $file:  $!\n";
-        }
+        find sub { if (-l $_) {
+                       unlink $_ or die "Couldn't remove old symlink $_: $!\n";
+                   }
+                 }, $dest;
+    # Delete empty directories (should this be an option?)
+    # Let this fail silently for non-empty directories
+        finddepth sub { rmdir $_; }, $dest;
     }
 
 # Prepare a database queries
@@ -337,11 +352,12 @@ EOF
         $fields{'oj'} = int($oday);         # day of month
         $fields{'od'} = $oday;              # day of month, leading zero
     # Literals
-        $fields{'%'}  = '%';
+        $fields{'%'}   = '%';
         ($fields{'-'}  = $separator) =~ s/%/%%/g;
     # Make the substitution
         my $keys = join('|', sort keys %fields);
         my $name = $format;
+        $name =~ s#/#$dest ? "\0" : $separator#ge;
         $name =~ s/(?<!%)(?:%($keys))/$fields{$1}/g;
         $name =~ s/%%/%/g;
     # Some basic cleanup for illegal (windows) filename characters, etc.
@@ -352,10 +368,14 @@ EOF
         $name =~ s/(?:(?:$safe_sep)+\s*)+(?=[^\d\s])/$separator /sg;
         $name =~ s/^($safe_sep|$safe_rep|\ )+//s;
         $name =~ s/($safe_sep|$safe_rep|\ )+$//s;
+        $name =~ s/\0($safe_sep|$safe_rep|\ )+/\0/s;
+        $name =~ s/($safe_sep|$safe_rep|\ )+\0/\0/s;
     # Underscores?
         if ($underscores) {
             $name =~ tr/ /_/s;
         }
+    # Folders
+        $name =~ s#\0#/#sg;
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
         my $safe_file = $info{'basename'};
         $safe_file =~ s/'/'\\''/sg;
@@ -375,6 +395,11 @@ EOF
             }
             $name .= $suffix;
         # Create the link
+            my $directory = dirname("$dest/$name");
+            unless (-e $directory) {
+                mkpath($directory, 0, 0755)
+                    or die "Failed to create $directory:  $!\n";
+            }
             symlink "$video_dir/".$info{'basename'}, "$dest/$name"
                 or die "Can't create symlink $dest/$name:  $!\n";
             if (defined($verbose)) {
