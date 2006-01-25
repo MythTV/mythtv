@@ -31,7 +31,29 @@
 #define LCD_DEVICE_DEBUG 0
 
 LCD::LCD()
-   :QObject(NULL, "LCD")
+    : QObject(NULL, "LCD"),
+      socket(new QSocket(this)),    socketLock(true),
+      hostname("localhost"),        port(6545),
+      connected(false),
+
+      retryTimer(new QTimer(this)), LEDTimer(new QTimer(this)),
+
+      send_buffer(""),              last_command(QString::null),
+
+      lcd_width(0),                 lcd_height(0),
+
+      lcd_ready(false),             lcd_showtime(false),
+      lcd_showmenu(false),          lcd_showgeneric(false),
+      lcd_showmusic(false),         lcd_showchannel(false),
+      lcd_showvolume(false),        lcd_showrecstatus(false),
+      lcd_backlighton(false),       lcd_heartbeaton(false),
+
+      lcd_popuptime(0),
+
+      lcd_showmusic_items(QString::null),
+      lcd_keystring(QString::null),
+
+      GetLEDMask(NULL)
 {
     // Constructor for LCD
     //
@@ -39,28 +61,14 @@ LCD::LCD()
     // communications with the LDCd daemon.
 
 #if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_IMPORTANT, "lcddevice: An LCD object now exists (LCD() was called)");
+    VERBOSE(VB_IMPORTANT, "lcddevice: An LCD object now exists "
+            "(LCD() was called)");
 #endif
 
-    GetLEDMask = NULL;
-
-    socket = new QSocket(this);
-    connect(socket, SIGNAL(error(int)), this, SLOT(veryBadThings(int)));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(serverSendingData()));
-
-    lcd_ready = false;
-    
-    hostname = "localhost";
-    port = 6545;
-    
-    connected = false;
-    send_buffer = "";
-    
-    retryTimer = new QTimer(this);
-    connect(retryTimer, SIGNAL(timeout()), this, SLOT(restartConnection()));    
-
-    LEDTimer = new QTimer(this);
-    connect(LEDTimer, SIGNAL(timeout()), this, SLOT(outputLEDs()));
+    connect(socket,     SIGNAL(error(int)),  this, SLOT(veryBadThings(int)));
+    connect(socket,     SIGNAL(readyRead()), this, SLOT(serverSendingData()));
+    connect(retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
+    connect(LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
 }
 
 bool LCD::m_server_unavailable = false;
@@ -102,7 +110,9 @@ void LCD::SetupLCD (void)
 
 bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 {
-#if LCD_DEVICE_DEBUG > 0    
+    QMutexLocker locker(&socketLock);
+
+#if LCD_DEVICE_DEBUG > 0
     VERBOSE(VB_IMPORTANT, "lcddevice: connecting to host: " 
             << lhostname << " - port: " << lport);
 #endif
@@ -185,6 +195,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
 void LCD::sendToServer(const QString &someText)
 {
+    QMutexLocker locker(&socketLock);
+
     // Check the socket, make sure the connection is still up
     if (socket->state() == QSocket::Idle)
     {
@@ -236,6 +248,8 @@ void LCD::restartConnection()
 
 void LCD::serverSendingData()
 {
+    QMutexLocker locker(&socketLock);
+
     QString lineFromServer, tempString;
     QStringList aList;
     QStringList::Iterator it;
@@ -354,6 +368,8 @@ void LCD::init()
 
 void LCD::veryBadThings(int anError)
 {
+    QMutexLocker locker(&socketLock);
+
     // Deal with failures to connect and inabilities to communicate
 
     QString err;
@@ -616,6 +632,8 @@ void LCD::switchToNothing()
 
 void LCD::shutdown()
 {
+    QMutexLocker locker(&socketLock);
+
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: shutdown");
 #endif
@@ -628,6 +646,8 @@ void LCD::shutdown()
 
 void LCD::resetServer()
 {
+    QMutexLocker locker(&socketLock);
+
     if (!lcd_ready)
         return;
     

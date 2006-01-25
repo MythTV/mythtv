@@ -2,14 +2,15 @@
 #define LCDDEVICE_H_
 
 #include <iostream>
+using namespace std;
+
 #include <qobject.h>
 #include <qstringlist.h>
 #include <qvaluevector.h>
 #include <qsocket.h>
 #include <qtimer.h>
 #include <qdatetime.h>
-
-using namespace std;
+#include <qmutex.h>
 
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 
@@ -225,19 +226,19 @@ class LCD : public QObject
     void init();
     void handleKeyPress(QString key);
     QString quotedString(const QString &s);
+    void describeServer();
     
     QSocket *socket;
+    QMutex   socketLock;
+    QString  hostname;
+    uint     port;
+    bool     connected;
+
     QTimer *retryTimer;
     QTimer *LEDTimer;
     
-    void describeServer();
-
-    bool connected;
-
     QString send_buffer;
     QString last_command;
-    QString hostname;
-    unsigned int port;
 
     int  lcd_width;
     int  lcd_height;
