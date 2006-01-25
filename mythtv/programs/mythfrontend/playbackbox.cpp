@@ -3967,8 +3967,8 @@ void PlaybackBox::showRecGroupChooser(void)
             else if (dispGroup == "LiveTV")
                 dispGroup = tr("LiveTV");
 
-            groups += QString::fromUtf8(QString("%1 [%2 %3]").arg(dispGroup)
-                                                .arg(items).arg(itemStr));
+            groups += QString("%1 [%2 %3]").arg(dispGroup)
+                              .arg(items).arg(itemStr);
 
             recGroupType[query.value(0).toString()] = "recgroup";
 
@@ -4009,8 +4009,8 @@ void PlaybackBox::showRecGroupChooser(void)
 
             if (!recGroupType.contains(dispGroup))
             {
-                groups += QString::fromUtf8(QString("%1 [%2 %3]").arg(dispGroup)
-                                                    .arg(items).arg(itemStr));
+                groups += QString("%1 [%2 %3]").arg(dispGroup)
+                                  .arg(items).arg(itemStr);
 
                 recGroupType[dispGroup] = "category";
             }
@@ -4211,10 +4211,8 @@ void PlaybackBox::showRecGroupChanger(void)
             else if (dispGroup == "LiveTV")
                 dispGroup = tr("LiveTV");
 
-            groups += QString::fromUtf8(QString("%1 [%2 %3]")
-                                        .arg(dispGroup)
-                                        .arg(query.value(1).toInt())
-                                        .arg(itemStr));
+            groups += QString("%1 [%2 %3]").arg(dispGroup)
+                              .arg(query.value(1).toInt()).arg(itemStr);
         }
     }
     groups.sort();
