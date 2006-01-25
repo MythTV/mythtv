@@ -76,12 +76,16 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
 
 PreviewGenerator::~PreviewGenerator()
 {
+    TeardownAll();
+}
+
+void PreviewGenerator::TeardownAll(void)
+{
     const QString filename = programInfo.pathname + ".png";
 
-    bool done = false;
     MythTimer t;
     t.start();
-    do
+    for (bool done = false; !done;)
     {
         previewLock.lock();
         if (isConnected)
@@ -91,7 +95,14 @@ PreviewGenerator::~PreviewGenerator()
         previewLock.unlock();
         usleep(5000);
     }
-    while (!done && t.elapsed() < 500);
+    VERBOSE(VB_PLAYBACK, LOC + "previewThreadDone took "<<t.elapsed()<<"ms");
+    disconnectSafe();
+}
+
+void PreviewGenerator::deleteLater()
+{
+    TeardownAll();
+    QObject::deleteLater();
 }
 
 /** \fn PreviewGenerator::disconnectSafe(void)

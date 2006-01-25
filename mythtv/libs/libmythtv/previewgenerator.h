@@ -37,12 +37,16 @@ class PreviewGenerator : public QObject
     void previewThreadDone(const QString&, bool&);
     void previewReady(const ProgramInfo*);
 
+  public slots:
+    void deleteLater();
+
   protected slots:
     void EventSocketConnected();
     void EventSocketClosed();
     void EventSocketRead();
 
   private:
+    void TeardownAll(void);
     bool RemotePreviewSetup(void);
     void RemotePreviewRun(void);
     void RemotePreviewTeardown(void);
