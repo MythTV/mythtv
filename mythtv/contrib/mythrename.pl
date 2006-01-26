@@ -224,6 +224,8 @@ EOF
     $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
         or die "Cannot connect to database: $!\n\n";
     END {
+        $sh->finish      if ($sh);
+        $sh2->finish     if ($sh2);
         $dbh->disconnect if ($dbh);
     }
 
