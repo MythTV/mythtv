@@ -1212,45 +1212,27 @@ void TVRec::RunTV(void)
         if (curRecording)
             curRecording->UpdateInUseMark();
 
+        // Check for the end of the current program..
         if (GetState() == kState_WatchingLiveTV)
         {
-            bool enable_livetv_ui = false;
-            if (pseudoLiveTVRecording &&
-                (QDateTime::currentDateTime() > recordEndTime ||
-                 HasFlags(kFlagFinishRecording)))
-            {
+#define LIVETV_END (now >= curRecording->endts)
+// use the following instead to test ringbuffer switching
+//#define LIVETV_END (now >= curRecording->recstartts.addSecs(60))
+
+            QDateTime now   = QDateTime::currentDateTime();
+            bool has_finish = HasFlags(kFlagFinishRecording);
+            bool has_rec    = pseudoLiveTVRecording;
+            bool rec_soon   = pendingRecording;
+            bool enable_ui  = true;
+
+            if (has_rec && (has_finish || (now > recordEndTime)))
                 SetPseudoLiveTVRecording(NULL);
-                enable_livetv_ui = true;
-            }
-            else if (curRecording &&
-                     !pseudoLiveTVRecording && !pendingRecording)
-            {
-//#define TESTING_RING_BUFFER_SWITCHING
-#ifdef TESTING_RING_BUFFER_SWITCHING
-                if ((QDateTime::currentDateTime() >=
-                     curRecording->recstartts.addSecs(60)))
-#else
-                if ((QDateTime::currentDateTime() >= curRecording->endts))
-#endif
-                {
-                    CheckForRecGroupChange();
-                    if (pseudoLiveTVRecording)
-                    {
-                        // If the last recording was flagged for keeping
-                        // in the frontend, then add the recording rule
-                        // so that transcode, commfrag, etc can be run.
-                        recordEndTime = 
-                            GetRecordEndTime(pseudoLiveTVRecording);
-                        NotifySchedulerOfRecording(curRecording);
-                    }
-                    else
-                    {
-                        SwitchLiveTVRingBuffer();
-                        enable_livetv_ui = true;
-                    }
-                }
-            }
-            if (enable_livetv_ui)
+            else if (!has_rec && !rec_soon && curRecording && LIVETV_END)
+                SwitchLiveTVRingBuffer();
+            else
+                enable_ui = false;
+
+            if (enable_ui)
             {
                 VERBOSE(VB_IMPORTANT, LOC + "Enabling Full LiveTV UI.");
                 QString message = QString("LIVETV_WATCH %1 0").arg(cardid);
