@@ -2153,6 +2153,12 @@ bool AvFormatDecoder::autoSelectSubtitleTrack(void)
         }
     }
 
+    if (selectedTrack < 0 && numStreams)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Selecting first subtitle track");
+        selectedTrack = 0;
+    }
+
     currentSubtitleTrack = (selectedTrack < 0) ? -1 : selectedTrack;
     selectedSubtitleStream = subtitleStreams[currentSubtitleTrack];
     if (wantedSubtitleStream.av_stream_index < 0)
