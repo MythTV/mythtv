@@ -190,6 +190,8 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt)
             ptsdec((uint64_t *)&origPTS, -300 * dltaList->first().newPTS);
         delta += dltaList->first().newPTS;
         dltaList->pop_front();
+        VERBOSE(MPF_PROCESS, QString("Moving PTS offset of stream %1 by %2")
+                             .arg(idx).arg(PtsTime(delta)));
     }
     return (delta);
 }
@@ -1813,7 +1815,7 @@ int MPEG2fixup::Start()
                 for (MPEG2frame *curFrame = Lreorder.first();
                      curFrame; curFrame = Lreorder.next())
                 {
-                    poq.UpdateOrigPTS(0, origvPTS,curFrame->pkt);
+                    poq.UpdateOrigPTS(vid_id, origvPTS,curFrame->pkt);
                     InitialPTSFixup(curFrame, origvPTS, PTSdiscrep, 
                                     maxframes, true);
                 }
