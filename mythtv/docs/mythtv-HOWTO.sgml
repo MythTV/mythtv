@@ -477,7 +477,18 @@ unencrypted Free-To-Air satellite channels.
 <p>There are a number of HDTV card with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
 be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_cards"
-name="http://www.linuxtv.org/wiki/index.php/ATSC_cards">
+name="http://www.linuxtv.org/wiki/index.php/ATSC_cards"> Some cards support
+capture of unencrypted digital cable TV (utilizing QAM256), others will only
+work with Over The Air signals captured with an antenna (with 8VSB).
+
+Cards that have been reported to work include:
+<itemize>
+<item>Air2PC PCI (8VSB)
+<item>pcHDTV-2000 (8VSB)
+<item>Air2PC HD5000 (8VSB, QAM256)
+<item>pcHDTV-3000 (8VSB, QAM256)
+<item>dvico Fusion HDTV Lite 5 (8VSB, QAM256)
+</itemize>
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
@@ -7230,7 +7241,7 @@ unmounted during this procedure.
 <p>XFS does not need to be unmounted to extend the size:
 <tscreen><verb>
 # lvextend --size +50G /dev/VGforMyth/video
-# xfs_growfs /dev/VGforMyth/video
+# xfs_growfs /var/video
 </verb></tscreen>
 <sect1>Advanced Partition Formatting <label
 id="advancedpartitionformatting">
@@ -7322,8 +7333,8 @@ leading to dropped frames.
 
 <sect1>HDTV with the Air2PC-ATSC-PCI card
 <p>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB)<!-- and unencrypted HDTV (QAM) off of cable TV-->.  The Air2PC card is
-installed as a DVB device and is supported within MythTV.  
+(8VSB).  The Air2PC card is installed as a DVB device and is supported
+within MythTV.
 
 First, you must compile a version of the Linux kernel to support the new
 tuner device.  
@@ -7331,16 +7342,10 @@ tuner device.
 <tscreen><verb>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
-# tar -xjf linux-2.6.11.tar.bz2
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.15.tar.bz2
+# tar -xjf linux-2.6.15.tar.bz2
 # pushd .
 </verb></tscreen>
-<!--
-# cd linux-2.6.11/drivers/media/dvb/frontends
-# wget http://www.digitalregime.com/patches/nxt2002-qam.patch
-# patch -p0 < nxt2002-qam.patch
-# popd
--->
 If you already have a 2.6 kernel running, copy the <tt>.config</tt> file and
 use it as your starting point.  If not, then go straight to the <tt>make
 menuconfig</tt> portion below.
@@ -7699,7 +7704,8 @@ parameter to "rtprio".  (I guess "rt_priority" took too long to type.)
 Update link to pvrusb2 driver site - device might be useable by saying that
 it's a PVR-x50.  Start putting notices that sections are going to be removed
 in 0.20 if there are no updates.  sed for Mandrake -> Mandriva.  Re-enable
-Debian build instructions.  Update ATSC / DVB stuff.
+Debian build instructions.  Update ATSC / DVB stuff.  Fix xfs_growfs
+example. (kkvenkit at gmail dot com).  Update list of ATSC cards.
 
 -->
 
