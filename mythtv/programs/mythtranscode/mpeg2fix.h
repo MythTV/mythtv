@@ -86,7 +86,7 @@ typedef struct {
 class PTSOffsetQueue
 {
   public:
-    PTSOffsetQueue(QValueList<int> keys, int64_t initPTS);
+    PTSOffsetQueue(int vidid, QValueList<int> keys, int64_t initPTS);
     void SetNextPTS(int64_t newPTS, int64_t atPTS);
     void SetNextPos(int64_t newPTS, AVPacket &pkt);
     int64_t Get(int idx, AVPacket *pkt);
@@ -95,6 +95,7 @@ class PTSOffsetQueue
     QMap<int, QValueList<poq_idx_t> > offset;
     QMap<int, QValueList<poq_idx_t> > orig;
     QValueList<int> keyList;
+    int vid_id;
 };
 
 //container for all multiplex related variables

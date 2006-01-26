@@ -96,12 +96,13 @@ static QString PtsTime(int64_t pts)
                 (((unsigned int)(pts / 90.) % 3600000) % 60000) % 1000));
 }
 
-PTSOffsetQueue::PTSOffsetQueue(QValueList<int> keys, int64_t initPTS)
+PTSOffsetQueue::PTSOffsetQueue(int vidid, QValueList<int> keys, int64_t initPTS)
 {
     QValueList<int>::Iterator it;
     poq_idx_t idx;
+    vid_id = vidid;
     keyList = keys;
-    keyList.append(0);
+    keyList.append(vid_id);
 
     idx.newPTS = initPTS;
     idx.pos_pts = 0;
@@ -156,7 +157,7 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket &pkt)
 {
     QValueList<int>::Iterator it;
-    int64_t delta = MPEG2fixup::diff2x33(newPTS, offset[0].last().newPTS);
+    int64_t delta = MPEG2fixup::diff2x33(newPTS, offset[vid_id].last().newPTS);
     poq_idx_t idx;
 
     idx.pos_pts = pkt.pos;
@@ -164,7 +165,7 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket &pkt)
     idx.type = 1;
 
     VERBOSE(MPF_FRAME, QString("Offset %1 -> %2 (%3) at %4")
-            .arg(PtsTime(offset[0].last().newPTS))
+            .arg(PtsTime(offset[vid_id].last().newPTS))
             .arg(PtsTime(newPTS)).arg(PtsTime(delta)).arg(pkt.pos));
     for (it = keyList.begin(); it != keyList.end(); ++it)
     {
@@ -1727,7 +1728,7 @@ int MPEG2fixup::Start()
 
     initPTS -= 16200; //0.18 seconds back to prevent underflow
 
-    PTSOffsetQueue poq(aFrame.keys(), initPTS);
+    PTSOffsetQueue poq(vid_id, aFrame.keys(), initPTS);
 
     VERBOSE(MPF_PROCESS, QString("ptsIncrement: %1 Frame #: %2 PTS-adjust: %3")
                          .arg(ptsIncrement).arg(GetFrameNum(vFrame.current()))
@@ -1963,7 +1964,7 @@ int MPEG2fixup::Start()
                         }
 
                         dec2x33(&curFrame->pkt.pts,
-                              poq.Get(0, &curFrame->pkt));
+                              poq.Get(vid_id, &curFrame->pkt));
                         deltaPTS = diff2x33(curFrame->pkt.pts,
                                             expectedvPTS / 300);
 
@@ -2086,7 +2087,7 @@ int MPEG2fixup::Start()
                     vFrame.at(frame_pos + Lreorder.count());
                 }
                 if (PTSdiscrep)
-                    poq.SetNextPos(add2x33(poq.Get(0, &lastRealvPkt),
+                    poq.SetNextPos(add2x33(poq.Get(vid_id, &lastRealvPkt),
                                        PTSdiscrep), lastRealvPkt);
             }
 
