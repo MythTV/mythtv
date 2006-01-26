@@ -97,12 +97,12 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
  * // In the displaying thread
  * while (playing)
  * {
- *     if (videoOutput->EnoughPrebufferedFrames())
+ *     if (vo->EnoughPrebufferedFrames())
  *     {
  *         // Sets "Last Shown Frame" to head of "used" queue
- *         videoOutput->StartDisplayingFrame();
+ *         vo->StartDisplayingFrame();
  *         // Get pointer to "Last Shown Frame"
- *         frame = videoOutput->GetLastShownFrame();
+ *         frame = vo->GetLastShownFrame();
  *         // add OSD, do any filtering, etc.
  *         vo->ProcessFrame(frame, osd, filters, pict-in-pict);
  *         // tells show what frame to be show, do other last minute stuff
