@@ -126,6 +126,12 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       audio_samplerate(44100),      audio_stretchfactor(1.0f),
       // Picture-in-Picture
       pipplayer(NULL), setpipplayer(NULL), needsetpipplayer(false),
+      // Preview window support
+      argb_buf(NULL),               argb_size(0,0),
+      yuv2argb_conv(yuv2rgb_init_mmx(32, MODE_RGB)),
+      yuv_need_copy(false),         yuv_desired_size(0,0),
+      yuv_frame_scaled(NULL),       yuv_scaler(NULL),
+      yuv_scaler_out_size(0,0),     yuv_scaler_in_size(0,0),
       // Filters
       videoFilterList(""),
       postfilt_width(0),            postfilt_height(0),
@@ -226,6 +232,14 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     if (videoOutput)
         delete videoOutput;
+
+    if (argb_buf)
+    {
+        delete [] argb_buf;
+        argb_buf = NULL;
+    }
+
+    ShutdownYUVResize();
 }
 
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)
@@ -1054,6 +1068,85 @@ void NuppelVideoPlayer::ReleaseCurrentFrame(VideoFrame *frame)
         vidExitLock.unlock();
 }
 
+void NuppelVideoPlayer::ShutdownYUVResize(void)
+{
+    if (yuv_frame_scaled)
+    {
+        delete [] yuv_frame_scaled;
+        yuv_frame_scaled = NULL;
+    }
+
+    if (yuv_scaler)
+    {
+        img_resample_close(yuv_scaler);
+        yuv_scaler = NULL;
+    }
+
+    yuv_scaler_in_size  = QSize(0,0);
+    yuv_scaler_out_size = QSize(0,0);
+}
+
+/** \fn NuppelVideoPlayer::GetScaledFrame(QSize&)
+ *  \brief Returns a scaled version of the latest decoded frame.
+ *
+ *   The buffer returned is only valid until the next call to this function
+ *   or GetARGBFrame(QSize&).
+ *   If the size width and height are not multiples of two they will be
+ *   scaled down to the nearest multiple of two.
+ *
+ *  \param size Used the pass the desired size of the frame in, and
+ *              will contain the actual size of the returned image.
+ */
+const unsigned char *NuppelVideoPlayer::GetScaledFrame(QSize &size)
+{
+    QMutexLocker locker(&yuv_lock);
+    yuv_desired_size = size = QSize(size.width() & ~0x1, size.height() & ~0x1);
+
+    if ((size.width() > 0) && (size.height() > 0))
+    {
+        yuv_need_copy = true;
+        while (yuv_wait.wait(locker.mutex(), 50) && yuv_need_copy);
+        return yuv_frame_scaled;
+    }
+    return NULL;
+}
+
+/** \fn NuppelVideoPlayer::GetARGBFrame(QSize&)
+ *  \brief Returns a QImage scaled to near the size specified in 'size'
+ *
+ *   The QImage returned is only valid until the next call to this function
+ *   or GetScaledFrame(QSize&).
+ *   And if the size width and height are not multiples of two they will be
+ *   scaled down to the nearest multiple of two.
+ *
+ *  \param size Used the pass the desired size of the frame in, and
+ *              will contain the actual size of the returned image.
+ */
+const QImage &NuppelVideoPlayer::GetARGBFrame(QSize &size)
+{   
+    unsigned char *yuv_buf = (unsigned char*) GetScaledFrame(size);
+    if (!yuv_buf)
+        return argb_scaled_img;
+
+    if (argb_size != size)
+    { 
+        if (argb_buf)
+            delete [] argb_buf;
+        argb_buf = new unsigned char[(size.width() * size.height() * 4) + 128];
+        argb_size = QSize(size.width(), size.height());
+    }
+
+    uint w = argb_size.width(), h = argb_size.height();
+    yuv2argb_conv(argb_buf,
+                  yuv_buf, yuv_buf + (w * h), yuv_buf + (w * h * 5 / 4),
+                  w, h, w * 4, w, w / 2, 0);
+
+    argb_scaled_img = QImage(argb_buf, argb_size.width(), argb_size.height(),
+                             32, NULL, 65536 * 65536, QImage::LittleEndian);
+
+    return argb_scaled_img;
+}
+
 void NuppelVideoPlayer::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (videoOutput)
@@ -1774,6 +1867,40 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     videoOutput->StartDisplayingFrame();
 
     VideoFrame *frame = videoOutput->GetLastShownFrame();
+
+    if (yuv_need_copy)
+    {
+        // We need to make a preview copy of the frame...
+        QMutexLocker locker(&yuv_lock);
+        QSize vsize = QSize(video_width, video_height);
+        if ((vsize            != yuv_scaler_in_size) ||
+            (yuv_desired_size != yuv_scaler_out_size))
+        {
+            ShutdownYUVResize();
+
+            uint sz = yuv_desired_size.width() * yuv_desired_size.height();
+            yuv_frame_scaled = new unsigned char[(sz * 3 / 2) + 128];
+
+            yuv_scaler_in_size  = vsize;
+            yuv_scaler_out_size = yuv_desired_size;
+
+            yuv_scaler = img_resample_init(
+                yuv_scaler_out_size.width(), yuv_scaler_out_size.height(),
+                yuv_scaler_in_size.width(),  yuv_scaler_in_size.height());
+        }
+
+        AVPicture img_out, img_in;
+        avpicture_fill(&img_out, yuv_frame_scaled, PIX_FMT_YUV420P,
+                       yuv_scaler_out_size.width(),
+                       yuv_scaler_out_size.height());
+        avpicture_fill(&img_in, frame->buf, PIX_FMT_YUV420P,
+                       yuv_scaler_in_size.width(),
+                       yuv_scaler_in_size.height());
+
+        img_resample(yuv_scaler, &img_out, &img_in);
+        yuv_need_copy = false;
+        yuv_wait.wakeAll();
+    }
 
     if (subtitlesOn)
     {

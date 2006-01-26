@@ -14,6 +14,7 @@
 #include "recordingprofile.h"
 #include "videooutbase.h"
 #include "tv_play.h"
+#include "yuv2rgb.h"
 
 extern "C" {
 #include "filter.h"
@@ -212,6 +213,11 @@ class NuppelVideoPlayer
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(bool next_frame_keyframe);
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+
+    // Preview Image stuff
+    const QImage &GetARGBFrame(QSize &size);
+    const unsigned char *GetScaledFrame(QSize &size);
+    void ShutdownYUVResize(void);
 
     // Reinit
     void    ReinitOSD(void);
@@ -492,6 +498,20 @@ class NuppelVideoPlayer
     NuppelVideoPlayer *pipplayer;
     NuppelVideoPlayer *setpipplayer;
     bool needsetpipplayer;
+
+    // Preview window support
+    unsigned char      *argb_buf;
+    QSize               argb_size;
+    QImage              argb_scaled_img;
+    yuv2rgb_fun         yuv2argb_conv;
+    bool                yuv_need_copy;
+    QSize               yuv_desired_size;
+    ImgReSampleContext *yuv_scaler;
+    unsigned char      *yuv_frame_scaled;
+    QSize               yuv_scaler_in_size;
+    QSize               yuv_scaler_out_size;
+    QMutex              yuv_lock;
+    QWaitCondition      yuv_wait;
 
     // Filters
     QMutex   videofiltersLock;

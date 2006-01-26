@@ -11,7 +11,6 @@
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "programinfo.h"
-#include "yuv2rgb.h"
 #include "jobqueue.h"
 
 #include <qvaluelist.h>
@@ -340,10 +339,6 @@ class PlaybackBox : public MythDialog
     bool useRecGroups;
     bool useCategories;
     void setDefaultView(int defaultView);
-
-    yuv2rgb_fun    conv_yuv2rgba;
-    unsigned char *conv_rgba_buf;
-    QSize          conv_rgba_size;
 
     bool everStartedVideo;
 

@@ -284,11 +284,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         gContext->addCurrentLocation("DeleteBox");
     else
         gContext->addCurrentLocation("PlaybackBox");
-
-    // Initialize yuv2rgba conversion stuff
-    conv_yuv2rgba  = yuv2rgb_init_mmx(32, MODE_RGB);
-    conv_rgba_buf  = NULL;
-    conv_rgba_size = QSize(0,0);
 }
 
 PlaybackBox::~PlaybackBox(void)
@@ -305,9 +300,6 @@ PlaybackBox::~PlaybackBox(void)
         delete curitem;
     if (delitem)
         delete delitem;
-
-    if (conv_rgba_buf)
-        delete [] conv_rgba_buf;
 
     if (lastProgram)
         delete lastProgram;
@@ -870,35 +862,8 @@ void PlaybackBox::updateVideo(QPainter *p)
     /* if we are playing and nvp is running, then grab a new video frame */
     if ((state == kPlaying) && nvp->IsPlaying() && !playingSomething)
     {
-        int w = 0, h = 0;
-        VideoFrame *frame = nvp->GetCurrentFrame(w, h);
-
-        if (w == 0 || h == 0 || !frame || !(frame->buf))
-        {
-            nvp->ReleaseCurrentFrame(frame);
-            return;
-        }
-
-        unsigned char *yuv_buf = frame->buf;
-        if (conv_rgba_size.width() != w || conv_rgba_size.height() != h)
-        { 
-            if (conv_rgba_buf)
-                delete [] conv_rgba_buf;
-            conv_rgba_buf = new unsigned char[w * h * 4];
-            conv_rgba_size = QSize(w, h);
-        }
-
-        conv_yuv2rgba(conv_rgba_buf,
-                      yuv_buf, yuv_buf + (w * h), yuv_buf + (w * h * 5 / 4),
-                      w, h, w * 4, w, w / 2, 0);
-
-        nvp->ReleaseCurrentFrame(frame);
-
-        QImage img(conv_rgba_buf, w, h, 32, NULL, 65536 * 65536, 
-                   QImage::LittleEndian);
-        img = img.scale(videoRect.width(), videoRect.height());
-
-        p->drawImage(videoRect.x(), videoRect.y(), img);
+        QSize size = videoRect.size();
+        p->drawImage(videoRect.x(), videoRect.y(), nvp->GetARGBFrame(size));
     }
 
     /* have we timed out waiting for nvp to start? */
