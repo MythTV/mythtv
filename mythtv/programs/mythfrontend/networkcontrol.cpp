@@ -302,22 +302,23 @@ QString NetworkControl::processKey(QStringList tokens)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
 
+    QWidget *widget = gContext->GetMainWindow()->currentWidget()->focusWidget();
     if (keyMap.contains(tokens[1]))
     {
         event = new QKeyEvent(QEvent::KeyPress, keyMap[tokens[1]], 0, NoButton);
-        QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+        QApplication::postEvent(widget, event);
 
         event = new QKeyEvent(QEvent::KeyRelease, keyMap[tokens[1]], 0, NoButton);
-        QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+        QApplication::postEvent(widget, event);
     }
     else if (tokens[1].length() == 1 && tokens[1][0].isLetterOrNumber())
     {
         int ch = (int)(tokens[1][0].upper());
         event = new QKeyEvent(QEvent::KeyPress, ch, 0, NoButton);
-        QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+        QApplication::postEvent(widget, event);
 
         event = new QKeyEvent(QEvent::KeyRelease, ch,0, NoButton);
-        QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+        QApplication::postEvent(widget, event);
     }
     else
         return QString("ERROR: See 'help %1' for usage information")
