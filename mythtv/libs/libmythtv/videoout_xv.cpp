@@ -1500,6 +1500,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
         XJ_shm_infos.push_back(blank);
         void *image = NULL;
         int size = 0;
+        int desiredsize = 0;
 
         X11L;
 
@@ -1508,6 +1509,16 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             image = XvShmCreateImage(XJ_disp, xv_port, xv_chroma, 0, 
                                      XJ_width, XJ_height, &XJ_shm_infos[i]);
             size = ((XvImage*)image)->data_size + 64;
+            desiredsize = XJ_width * XJ_height * 3 / 2;
+
+            if (image && size < desiredsize)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                        "XvShmCreateImage() failed to create image of the "
+                        "requested size.");
+                XFree(image);
+                image = NULL;
+            }
         }
         else
         {
@@ -1517,6 +1528,15 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                                 dispw, disph);
             size = img->bytes_per_line * img->height + 64;
             image = img;
+            desiredsize = dispw * disph * 3 / 2;
+            if (image && size < desiredsize)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                        "XShmCreateImage() failed to create image of the "
+                        "requested size.");
+                XDestroyImage((XImage *)image);
+                image = NULL;
+            }
         }
 
         X11U;
@@ -1712,7 +1732,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
             if ((XImage*)image == (XImage*)XJ_non_xv_image)
                 X11S(XDestroyImage((XImage*)XJ_non_xv_image));
             else
-                X11S(XFree(XJ_non_xv_image));
+                X11S(XFree(image));
         }
         if (XJ_shm_infos[i].shmaddr)
             shmdt(XJ_shm_infos[i].shmaddr);
