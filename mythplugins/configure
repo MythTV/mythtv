@@ -279,10 +279,10 @@ has_library()
 
     # recurse down just one level, should be enough in most cases
     if test -f /etc/ld.so.conf ; then
-        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "include"`
-        SRCH=`echo $INCL | sed s/"include "//g`
+        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "^include"`
+        SRCH=`echo $INCL | sed s/"^include "//g`
         for x in $SRCH ; do
-            LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
+            LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "^include"`
             LIBPATHS="$LIBPATHS $LP_APPEND"
         done
     fi
