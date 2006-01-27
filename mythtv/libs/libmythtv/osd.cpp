@@ -1897,8 +1897,8 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     sprintf(name, "%lld-%d", number, type);
 
     int xpos = (int)((editarrowRect.width() * 1.0 / totalframes) * number);
-    xpos = editarrowRect.left() + xpos;
-    int ypos = editarrowRect.top();
+    xpos = (editarrowRect.left() + xpos) * wmult;
+    int ypos = editarrowRect.top() * hmult;
 
     osdlock.lock();
 
