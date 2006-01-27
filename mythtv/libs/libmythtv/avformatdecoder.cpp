@@ -1632,7 +1632,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
                                          keyframedist, aspect, 
-                                         kScan_Detect, true);
+                                         kScan_Detect);
 
                 current_width  = width;
                 current_height = height;

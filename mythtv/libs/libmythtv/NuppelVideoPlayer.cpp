@@ -599,7 +599,7 @@ void NuppelVideoPlayer::FallbackDeint(void)
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
-                                       FrameScanType scan, bool reinit)
+                                       FrameScanType scan)
 {
     if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
         return;
@@ -625,7 +625,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         frame_interval = (int)(1000000.0f / video_frame_rate / temp_speed);
     }
 
-    if (reinit)
+    if (videoOutput)
         ReinitVideo();
 
     if (IsErrored())
@@ -788,10 +788,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                 .arg(ringBuffer->GetFilename()));
         return -1;
     }
-
-    // Reinitialize videoout if we already have video out
-    if (videoOutput)
-        ReinitVideo();
 
     if (audio_bits == -1)
         no_audio_in = no_audio_out = true;

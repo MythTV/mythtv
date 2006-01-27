@@ -105,8 +105,7 @@ class NuppelVideoPlayer
     void SetBookmark(void);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
-                        float a = 1.33333, FrameScanType scan = kScan_Ignore,
-                        bool reinit = false);
+                        float a = 1.33333, FrameScanType scan = kScan_Ignore);
     void SetAudioParams(int bits, int channels, int samplerate);
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
