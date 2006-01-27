@@ -130,8 +130,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       argb_buf(NULL),               argb_size(0,0),
       yuv2argb_conv(yuv2rgb_init_mmx(32, MODE_RGB)),
       yuv_need_copy(false),         yuv_desired_size(0,0),
-      yuv_frame_scaled(NULL),       yuv_scaler(NULL),
-      yuv_scaler_out_size(0,0),     yuv_scaler_in_size(0,0),
+      yuv_scaler(NULL),             yuv_frame_scaled(NULL),
+      yuv_scaler_in_size(0,0),      yuv_scaler_out_size(0,0),
       // Filters
       videoFilterList(""),
       postfilt_width(0),            postfilt_height(0),
