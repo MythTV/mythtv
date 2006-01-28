@@ -3591,17 +3591,15 @@ set-wakeuptime-script should stop the program that uses <tt>/dev/rtc</tt> before
 setting the wakeuptime.
 
 <sect>Scheduling Recordings
-<p>The MythTV master backend is responsible for managing the schedule
-for all TV tuner cards on the master and any slave. Its job is to
-search the TV listing for the shows you have requested and assign
-recordings to the TV tuner cards. If none of the shows that you've
-chosen overlap, it simply records all of the shows. However, if
-there are shows where the beginning and end times overlap, the
-scheduler follows rules that you've specified or makes logical
-decisions about what would be best if you haven't express your
-preference. Further, the "Upcoming Recordings" page allows you make
-specific decisions about what you really do and don't want to
-record.
+<p>The MythTV master backend is responsible for managing the schedule for
+all TV tuner cards on the master and any slave. Its job is to search the TV
+listing for the shows you have requested and assign recordings to the TV
+tuner cards. If none of the shows that you've chosen overlap, it simply
+records all of the shows. However, if there are shows where the beginning
+and end times overlap, the scheduler follows rules that you've specified or
+makes logical decisions about what would be best if you haven't express your
+preference. Further, the "Upcoming Recordings" page allows you make specific
+decisions about what you really do and don't want to record.
 
 <sect1>Record Types
 <p>When you choose a show that you would like to record from the
@@ -3660,7 +3658,6 @@ station when the original airing cannot be recorded.
 </itemize>
 
 <sect1>Scheduling Options
-
 <sect2>Priority
 <p>By default, all shows you select have equal value to the
 scheduler.  There are a set of rules to make good choices when
@@ -3682,49 +3679,45 @@ are entirely up to you. However, the more information you give to
 the scheduler, the more likely it will make the choices you would
 prefer in the first place.
 
-The scheduler choices are based on the total priority for a showing
-by adding up four different priority factors. By default, most of
-these factors are "0" but you may use any combination to express
-your likes and needs.
+The scheduler choices are based on the total priority for a showing by
+adding up four different priority factors. By default, most of these factors
+are "0" but you may use any combination to express your likes and needs.
 
-Per record rule -- this is the "priority" field in the "Scheduling
-Options" section of the options page and this values is included for
-any showings that match the recording rule.  You may choose to only
-use these values and not use the other factors for the sake of
-simplicity and clarity.
+Per record rule -- this is the "priority" field in the "Scheduling Options"
+section of the options page and this values is included for any showings
+that match the recording rule.  You may choose to only use these values and
+not use the other factors for the sake of simplicity and clarity.
 
-Per record type -- Setup->TV Settings->Recording Priorities->General
-allows you to add to the priority based on the type. It may make sense to
-increase the value for "Single" so that by default they have an extra
-advantage over other shows. The default is +1. You may want to decrease
-the value for Find rules so that they will be less likely to interfere
-with regular shows and will be more likely to record in a non-conflicting
-time instead. The default is -1.
+Per record type -- Setup->TV Settings->Recording Priorities->General allows
+you to add to the priority based on the type. It may make sense to increase
+the value for "Single" so that by default they have an extra advantage over
+other shows. The default is +1. You may want to decrease the value for Find
+rules so that they will be less likely to interfere with regular shows and
+will be more likely to record in a non-conflicting time instead. The default
+is -1.
 
-Per channel -- Setup->TV Settings->Recording Priorities->Channel
-Priorities can be useful if you believe that you prefer any of the
-shows on certain channels. This would give all shows on a channel an
-advantage by default.
+Per channel -- Setup->TV Settings->Recording Priorities->Channel Priorities
+can be useful if you believe that you prefer any of the shows on certain
+channels. This would give all shows on a channel an advantage by default.
 
-Input preference -- in the MythTV "setup" program, the "Input
-Connections" section allows you to add additional priority in the
-"Input preference". This is simply another priority factor but has an
-interesting effect. If a card input has a higher value than the other
-cards, the scheduler will see that you would rather record showings of
-episodes on this card rather than a showing on another card. If you
-have multiple cards of different quality, you may want to set input
-preference to encourage the scheduler to record shows on your best
-card(s) whenever possible. This can also be useful if you have
-multiple video sources which include the same stations. For example,
-with digital and analog cable you could increase the digital cable
-input preference by 1 to tell the scheduler that you want to record
-from the digital station whenever possible but the station on the
-analog input could still be used when the digital input is busy.
+Input preference -- in the MythTV "setup" program, the "Input Connections"
+section allows you to add additional priority in the "Input preference".
+This is simply another priority factor but has an interesting effect. If a
+card input has a higher value than the other cards, the scheduler will see
+that you would rather record showings of episodes on this card rather than a
+showing on another card. If you have multiple cards of different quality,
+you may want to set input preference to encourage the scheduler to record
+shows on your best card(s) whenever possible. This can also be useful if you
+have multiple video sources which include the same stations. For example,
+with digital and analog cable you could increase the digital cable input
+preference by 1 to tell the scheduler that you want to record from the
+digital station whenever possible but the station on the analog input could
+still be used when the digital input is busy.
 
-For any single showing of any show you've chosen to record, these
-factors are added together to find the "total priority". This is the
-priority that the scheduler uses to decide which shows are given the
-first choice when filling in the schedule.
+For any single showing of any show you've chosen to record, these factors
+are added together to find the "total priority". This is the priority that
+the scheduler uses to decide which shows are given the first choice when
+filling in the schedule.
 
 The scheduling priority of a show may also be used to determine
 auto-expiration of recordings when disk space gets full (see <ref
@@ -3733,31 +3726,30 @@ id="Auto-Expire" name="Auto-Expire">, below).
 <sect2>Duplicates
 <p>Singles will record without regard to duplicate matching.
 
-<p>The standard recurring methods of All, Channel, Weekly and Daily use
-the descriptive information in the TV listings to try to record only one
-showing of each unique episode. However, This goal is sometimes
-complicated by the fact that the stations may not include a description
-for a specific episode but use a generic description for the series
-instead. When there is a generic description, the default behavior is to
-assume that it may be an episode that you have not seen and to record it
-for you.  One of the duplicate matching options is "Record new episodes
-only".  If this is selected, listing that have an original air date of
-more than 14 days earlier are considered repeats and are not eligible to
-record. Generally, generic episodes will be marked as repeats also.
+<p>The standard recurring methods of All, Channel, Weekly and Daily use the
+descriptive information in the TV listings to try to record only one showing
+of each unique episode. However, This goal is sometimes complicated by the
+fact that the stations may not include a description for a specific episode
+but use a generic description for the series instead. When there is a
+generic description, the default behavior is to assume that it may be an
+episode that you have not seen and to record it for you.  One of the
+duplicate matching options is "Record new episodes only".  If this is
+selected, listing that have an original air date of more than 14 days
+earlier are considered repeats and are not eligible to record. Generally,
+generic episodes will be marked as repeats also.
 
 <p>Because of generic episodes and other situations, MythTV offers an
-alternative approach where shows may be recorded by choosing from
-multiple showings even when the descriptive information is not reliable.
-All of the "Find" record types look for matching titles in the
-listings. If there is a showing with specific episode information and
-that episode has recorded before, that showing is marked as previously
-or currently recorded. The scheduler will then choose to record the
-earliest non-conflicting showing from any of other remaining showings
-regardless of the descriptive information. Generally, Find One is most
-useful for movies or specials and the Find Daily and Find Weekly rules
-are best for news or current events shows that are repeated. However,
-these may be useful in other situations where the standard recording
-rules may not work correctly.
+alternative approach where shows may be recorded by choosing from multiple
+showings even when the descriptive information is not reliable. All of the
+"Find" record types look for matching titles in the listings. If there is a
+showing with specific episode information and that episode has recorded
+before, that showing is marked as previously or currently recorded. The
+scheduler will then choose to record the earliest non-conflicting showing
+from any of other remaining showings regardless of the descriptive
+information. Generally, Find One is most useful for movies or specials and
+the Find Daily and Find Weekly rules are best for news or current events
+shows that are repeated. However, these may be useful in other situations
+where the standard recording rules may not work correctly.
 
 <sect2>Conflicts
 <p>As you add more shows that you would like to record, the scheduler
@@ -4232,7 +4224,8 @@ EP where the last four digits are the episode number in the series. Note
 that these are generated by TMS and not the show's producers but they are
 usually in the same order as the original air dates for the episodes.
 Detailed information can be found in the Data Direct documentation at <url
-url="http://labs.zap2it.com/" name="http://labs.zap2it.com/">.  </itemize>
+url="http://labs.zap2it.com/" name="http://labs.zap2it.com/">.
+</itemize>
 
 Finally, if you are doing something very experimental and a field is not
 giving you the results you had anticipated, you can always check the MythTV
@@ -4542,13 +4535,13 @@ url="http://x.mame.net/download.html"
 name="http://x.mame.net/download.html"> for the latest version.
 
 Download the source to <bf>xmame</bf> from <url
-url="http://x.mame.net/download/xmame-0.102.tar.bz2"
-name="http://x.mame.net/download/xmame-0.102.tar.bz2">
+url="http://x.mame.net/download/xmame-0.103.tar.bz2"
+name="http://x.mame.net/download/xmame-0.103.tar.bz2">
 
 <tscreen><verb>
-$ wget http://x.mame.net/download/xmame-0.102.tar.bz2
-$ tar -xjf xmame-0.102.tar.bz2
-$ cd xmame-0.102
+$ wget http://x.mame.net/download/xmame-0.103.tar.bz2
+$ tar -xjf xmame-0.103.tar.bz2
+$ cd xmame-0.103
 </verb></tscreen>
 
 Edit the Makefile with your favorite editor.  Adjust the options as required for your system.
@@ -4579,7 +4572,7 @@ MythGame allows you to match individual roms to preferred binaries.
 <tscreen><verb>
 $ su
 (enter password)
-# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.102.x11
+# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.103.x11
 # exit
 </verb></tscreen>
 
@@ -4687,9 +4680,9 @@ Settings > Game Settings > Game Players. Select <tt>(New Game Player)</tt>.
 To set up a new player for xmame enter the following:
 
 <tscreen><verb>
-Player Name:    xmame-0.102.x11                  (Name by which you want your emulator or game called)
+Player Name:    xmame-0.103.x11                  (Name by which you want your emulator or game called)
 Type:           xmame                           (This is used for display purposes only and does not affect the function of your system)
-Command:        xmame-0.102.x11 -vidmod 1 -fullscreen     (Path and name of binary + any optional parameters)
+Command:        xmame-0.103.x11 -vidmod 1 -fullscreen     (Path and name of binary + any optional parameters)
 Rom Path:       /usr/local/share/xmame/roms     (This tells MythGame what directories to scan for roms to be used with this emulator)
 ScreenShots:    /usr/local/share/xmame/snaps    (This tells MythGame what directories to scan for snapshots to be used with these roms)
 Working Directory:                              (Directory to change to before launching game or emulator. Blank in our case ignores this setting)
@@ -4727,40 +4720,35 @@ The prerequisites for MythMusic are:
 <p>These instructions are for distributions which don't have pre-compiled
 versions of the software necessary to run MythTV.
 
-Download MAD from <url url="http://www.mars.org/home/rob/proj/mpeg/"
-name="http://www.mars.org/home/rob/proj/mpeg/">  Save it to a directory you
-can find later.
+Download MAD and libid3tag from <url
+url="http://www.underbit.com/products/mad/"
+name="http://www.underbit.com/products/mad/"> Follow the link to download
+via FTP and save the files to a directory you can find later.
+
 <tscreen><verb>
-$ tar -xzf mad-0.14.2b.tar.gz
-$ cd mad-0.14.2b
+$ tar -xzf mad-0.15.1b.tar.gz
+$ cd mad-0.15.1b
 $ ./configure
 $ make
 $ su
 # make install
 # exit
-$ 
-</verb></tscreen>
-
-Download libid3tag from <url url="http://www.underbit.com/products/mad/"
-name="http://www.underbit.com/products/mad/"> Save it to a directory you can
-find later.
-
-<tscreen><verb>
-$ tar -xzf libid3tag-0.15.0b.tar.gz
-$ cd libid3tag-0.15.0b
+$ cd ..
+$ tar -xzf libid3tag-0.15.1b.tar.gz
+$ cd libid3tag-0.15.1b
 $ ./configure
 $ make
 $ su
 # make install
 # exit
-$ 
+$ cd ..
 </verb></tscreen>
 
 Download FLAC from <url url="http://flac.sourceforge.net"
 name="http://flac.sourceforge.net"> and install:
 <tscreen><verb>
-$ tar -xzf flac-1.1.0.tar.gz
-$ cd flac-1.1.0
+$ tar -xzf flac-1.1.2.tar.gz
+$ cd flac-1.1.2
 $ ./configure
 $ make
 $ su
@@ -4769,12 +4757,12 @@ $ su
 $ 
 </verb></tscreen>
 
-Download libcdaudio from <url name="libcdaudio.sourceforge.net"
+Download libcdaudio from <url name="http://libcdaudio.sourceforge.net"
 url="http://sourceforge.net/project/showfiles.php?group_id=27134"> and
 install:
 <tscreen><verb>
-$ tar -xzf libcdaudio-0.99.9.tar.gz
-$ cd libcdaudio-0.99.9
+$ tar -xzf libcdaudio-0.99.12p2.tar.gz
+$ cd libcdaudio-0.99.12p2
 $ ./configure
 $ make
 $ su
