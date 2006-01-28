@@ -17,7 +17,9 @@ To use this with mythtv do the following:
 
       # sa3250ch <your_favorite_channel_number>
 
-(5) Configure Mythtv to use the channel changer by running the "setup" program and adding to "/usr/local/bin/sa3250ch" to the "External channel change command" field under "Connect source to Input".
+(5) Configure Mythtv to use the channel changer by running the "setup"
+program and adding to "/usr/local/bin/sa3250ch" to the "External channel
+change command" field under "Connect source to Input".
 
 I'm curious if this works for anybody on other SciAtl boxes when the proper
 model IDs are added.
