@@ -1,24 +1,35 @@
-6200ch is a small program that Stacey Son (mythdev@son.org) wrote to change channels on a Motorola DCT-6200 cable box via a 1394 (aka. Firewire) connection.   
+6200ch is a small program that Stacey Son (mythdev@son.org) wrote to change
+channels on a Motorola DCT-6200 cable box via a 1394 (aka. Firewire)
+connection.
 
 ---
-I was working on some code to record the video/audio via firewire, however, I have noticed that my cable provider has started to encrypt (5C/DTCP) many of the channels that I care to record.   I am currently using a s-video cable, a PVR-250 and this code with mythtv until I figure out something better to do.   This works with for DCT-6200 but may be easy to modify for other firewire tuners as well.
+I was working on some code to record the video/audio via firewire, however,
+I have noticed that my cable provider has started to encrypt (5C/DTCP) many
+of the channels that I care to record.  I am currently using a s-video
+cable, a PVR-250 and this code with mythtv until I figure out something
+better to do.  This works with for DCT-6200 but may be easy to modify for
+other firewire tuners as well.
 
 To use this with mythtv do the following:
 
 (1) Make sure you have 1394/Firewire drivers installed in your kernel.
 
-(2) Install libraw1394, librom1394 and libavc1394.   (On gentoo:  "emerge libavc1394").
+(2) Install libraw1394, librom1394 and libavc1394.   (On gentoo:  "emerge
+libavc1394").
 
 (3) Compile and install "6200ch":
 
       # cc -o 6200ch 6200ch.c -lrom1394 -lavc1394 -lraw1394
       # cp 6200ch /usr/local/bin
 
-(4) Connect a 1394/Firewire cable from your computer to your DCT-6200 and test:
+(4) Connect a 1394/Firewire cable from your computer to your DCT-6200 and
+test:
 
       # 6200ch <your_favorite_channel_number>
 
-(5) Configure Mythtv to use the channel changer by running the "setup" program and adding to "/usr/local/bin/6200ch" to the "External channel change command" field under "Connect source to Input".
+(5) Configure Mythtv to use the channel changer by running the "setup"
+program and adding to "/usr/local/bin/6200ch" to the "External channel
+change command" field under "Connect source to Input".
 
 Enjoy!
 
