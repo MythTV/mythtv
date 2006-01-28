@@ -49,16 +49,17 @@ post a question to the list.</P>
 hardware selection, mainly because there are so many tradeoffs which can be
 made.  For example, if you have plenty of CPU, you can use higher bitrates
 or capture sizes, etc.</P>
-<P>MythTV has two modes of operation.  First, it can function as a software video
-encoder, which means that it uses a fairly generic "dumb" video capture card
-to get frames of video, encodes them using the CPU on your motherboard and
-writes them to disk.  High-end video capture cards and devices like the TiVo
-and ReplayTV have dedicated encoder chips which use specialized hardware to
-convert the video stream to the MPEG-2 format without using the motherboard
-CPU.  The main CPU has the responsibility of running the Operating System
-and reading and writing the encoded frames to the disk.  These tasks have
-fairly low CPU requirements compared to encoding video, which is why a
-device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz CPU.</P>
+<P>MythTV has two modes of operation.  First, it can function as a software
+video encoder, which means that it uses a fairly generic "dumb" video
+capture card to get frames of video, encodes them using the CPU on your
+motherboard and writes them to disk.  High-end video capture cards and
+devices like the TiVo and ReplayTV have dedicated encoder chips which use
+specialized hardware to convert the video stream to the MPEG-2 format
+without using the motherboard CPU.  The main CPU has the responsibility of
+running the Operating System and reading and writing the encoded frames to
+the disk.  These tasks have fairly low CPU requirements compared to encoding
+video, which is why a device like a Series 1 TiVo can run with only 16MB of
+RAM and a 54MHz CPU.</P>
 <P>There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
 experience will be with MythTV.  If you are using the software MPEG-4
@@ -269,7 +270,18 @@ unencrypted Free-To-Air satellite channels.</P>
 <P>There are a number of HDTV card with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
 be found at 
-<A HREF="http://www.linuxtv.org/wiki/index.php/ATSC_cards">http://www.linuxtv.org/wiki/index.php/ATSC_cards</A></P>
+<A HREF="http://www.linuxtv.org/wiki/index.php/ATSC_cards">http://www.linuxtv.org/wiki/index.php/ATSC_cards</A> Some cards support
+capture of unencrypted digital cable TV (utilizing QAM256), others will only
+work with Over The Air signals captured with an antenna (with 8VSB).</P>
+<P>Cards that have been reported to work include:
+<UL>
+<LI>Air2PC PCI (8VSB)</LI>
+<LI>pcHDTV-2000 (8VSB)</LI>
+<LI>Air2PC HD5000 (8VSB, QAM256)</LI>
+<LI>pcHDTV-3000 (8VSB, QAM256)</LI>
+<LI>dvico Fusion HDTV Lite 5 (8VSB, QAM256)</LI>
+</UL>
+</P>
 <P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
 progressive or interlaced, and whether your display card has hardware-assist
@@ -307,7 +319,7 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <LI>Hauppauge WinTV-USB series</LI>
 <LI>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
-<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net no MythTV support)</LI>
+<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net - no MythTV support.  May work if setup thinks it's a PVR-x50 card.)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
 </P>
@@ -324,18 +336,16 @@ operated by the ALSA (Advanced Linux Sound Architecture) kernel modules will
 work with MythTV.  However, some cards and drivers will provide better
 quality or compatibility than others.  In particular, many audio
 devices included on motherboards can be problematic.</P>
-<P>The usual practice for capturing the audio associated with the video
-is to run a cable from an audio output on the video capture card to
-the Line input on a sound card. However, some video capture cards
-provide on-board audio capabilities that work with the kernel
-<CODE>btaudio</CODE> module instead, thereby eliminating the need for a
-cable.  This is useful if you will be using multiple capture cards in
-a single chassis, since each capture card will not need its own sound
-card.  Note that a separate sound card is still required for playback
-when using <CODE>btaudio</CODE>, and that often the audio recorded in this
-way will be mono only.  See the 
-<A HREF="mythtv-HOWTO-23.html#btaudio">btaudio</A>
-section for more information.</P>
+<P>The usual practice for capturing the audio associated with the video is to
+run a cable from an audio output on the video capture card to the Line input
+on a sound card. However, some video capture cards provide on-board audio
+capabilities that work with the kernel <CODE>btaudio</CODE> module instead,
+thereby eliminating the need for a cable.  This is useful if you will be
+using multiple capture cards in a single chassis, since each capture card
+will not need its own sound card.  Note that a separate sound card is still
+required for playback when using <CODE>btaudio</CODE>, and that often the audio
+recorded in this way will be mono only.  See the 
+<A HREF="mythtv-HOWTO-23.html#btaudio">btaudio</A> section for more information.</P>
 <P>
 <FIGURE>
 <EPS FILE="warning">
@@ -393,31 +403,23 @@ the card name in your search string.</P>
 
 <H3>ATI</H3>
 
-<P>ATI makes many cards with TV-out capability, but only offers linux
+<P>ATI makes many cards with TV-out capability, but only offers Linux
 drivers for Radeon 8500 and above cards.  See the Drivers and Software
 section of 
 <A HREF="http://www.ati.com/">http://www.ati.com</A> for the
 driver and additional information.</P>
 <P>The enhanced ati.2 X driver created by the GATOS 
 <A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
-project offers some support for TV-out, but only in its "experimental"
-version, available through CVS. There have been reports from people who say
-they have made this driver work with one or another ATI card. For example,
-Bruce Markey 
-<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A> writes (on the mythtv-users
-mailing list): "I got this to work. You can quote me on that. I've used
-TV-out on several models of ATI cards both All-In-Wonder and regular cards
-with TV-out." See the "Adventurous Setup" section of 
+project offers some support for TV-out on other ATI cards, but only in its
+"experimental" version, available through CVS. There have been reports from
+people who say they have made this driver work with one or another ATI card.
+For example, Bruce Markey 
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A> writes (on the
+mythtv-users mailing list): "I got this to work. You can quote me on that.
+I've used TV-out on several models of ATI cards both All-In-Wonder and
+regular cards with TV-out." See the "Adventurous Setup" section of 
 <A HREF="http://gatos.sourceforge.net/watching_tv.php">http://gatos.sourceforge.net/watching_tv.php</A> for details. Also see
 <A HREF="http://www.retinalburn.net/linux/tvout.html">http://www.retinalburn.net/linux/tvout.html</A> for more information.</P>
-<P>Specific cards:
-<UL>
-<LI>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but
-no details reported.</LI>
-<LI>Rage 128 VIVO. Ports not described. Reported to work, but no details reported.</LI>
-<LI>Radeon 7500. Ports not described. Reported to work, but no details reported.</LI>
-</UL>
-</P>
 
 <H3>Matrox</H3>
 
@@ -459,16 +461,8 @@ available by NVIDIA. See
 <A HREF="http://www.nvidia.com/object/unix.html">http://www.nvidia.com/object/unix.html</A> for more information.</P>
 <P><B>NOTE</B>:  It's strongly recommended that you use the proprietary
 NVIDIA drivers; they have excellent support for XvMC and ship with a good
-configuration utility.</P>
-<P>Specific cards:
-<UL>
-<LI>GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using the
-NVIDIA X driver.</LI>
-<LI>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the NVIDIA X 
-driver. Reportedly works using the nv driver plus nvtv.</LI>
-<LI>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.</LI>
-</UL>
-</P>
+configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
+important if you want to display HDTV.</P>
 
 <H3>Savage</H3>
 
@@ -503,7 +497,7 @@ audio control on the PVR-350 setup page.</LI>
 <H3>Other Options</H3>
 
 <P>Some devices with on-board TV-out capability, such as Xboxes converted to 
-Linux and some laptops, can be used as MythTV frontends to display on a 
+Linux and some laptops can be used as MythTV frontends to display on a 
 television screen. Please consult the mythtv-users mailing list for messages 
 that report the details of these special arrangements.</P>
 
@@ -626,7 +620,7 @@ need.</P>
 
 <H3>Mandriva</H3>
 
-<P>Thac has created RPMs for MythTV for Mandriva 9.0 and above which may
+<P>Thac has created RPMs for MythTV for Mandriva which may
 be obtained from 
 <A HREF="http://rpm.nyvalls.se/">http://rpm.nyvalls.se/</A> If you have problems with the RPMs, please
 send him email directly at 

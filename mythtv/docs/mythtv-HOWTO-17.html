@@ -35,36 +35,28 @@ instructions for manually compiling and installing the software.</P>
 
 <P>These instructions are for distributions which don't have pre-compiled
 versions of the software necessary to run MythTV.</P>
-<P>Download MAD from 
-<A HREF="http://www.mars.org/home/rob/proj/mpeg/">http://www.mars.org/home/rob/proj/mpeg/</A>  Save it to a directory you
-can find later.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf mad-0.14.2b.tar.gz
-$ cd mad-0.14.2b
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download libid3tag from 
-<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Save it to a directory you can
-find later.</P>
+<P>Download MAD and libid3tag from 
+<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Follow the link to download
+via FTP and save the files to a directory you can find later.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xzf libid3tag-0.15.0b.tar.gz
-$ cd libid3tag-0.15.0b
+$ tar -xzf mad-0.15.1b.tar.gz
+$ cd mad-0.15.1b
 $ ./configure
 $ make
 $ su
 # make install
 # exit
-$ 
+$ cd ..
+$ tar -xzf libid3tag-0.15.1b.tar.gz
+$ cd libid3tag-0.15.1b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ cd ..
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -72,8 +64,8 @@ $
 <A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xzf flac-1.1.0.tar.gz
-$ cd flac-1.1.0
+$ tar -xzf flac-1.1.2.tar.gz
+$ cd flac-1.1.2
 $ ./configure
 $ make
 $ su
@@ -84,12 +76,12 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 <P>Download libcdaudio from 
-<A HREF="http://sourceforge.net/project/showfiles.php?group_id=27134">libcdaudio.sourceforge.net</A> and
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=27134">http://libcdaudio.sourceforge.net</A> and
 install:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xzf libcdaudio-0.99.9.tar.gz
-$ cd libcdaudio-0.99.9
+$ tar -xzf libcdaudio-0.99.12p2.tar.gz
+$ cd libcdaudio-0.99.12p2
 $ ./configure
 $ make
 $ su
@@ -224,7 +216,7 @@ compiling MythMusic.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make

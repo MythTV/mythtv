@@ -16,7 +16,24 @@
 
 <P>By this point, all of the compile-time prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
-time to configure MythTV.</P>
+time to configure MythTV.
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you're running Debian unstable and you have compiled
+MythTV from source, you will need to install an additional package before
+you will be able to run MythTV.  Execute the following to install the MySQL
+driver for QT.</CAPTION>
+</FIGURE>
+
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su -
+# apt-get install libqt3c102-mt-mysql
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <H2><A NAME="ss9.1">9.1</A> <A HREF="mythtv-HOWTO.html#toc9.1">Configuring the Master backend system</A>
 </H2>
 
@@ -219,8 +236,7 @@ available on the device.</P>
 <CAPTION><B>NOTE</B>:  If you have a Hauppauge PVR-500, you must think of
 it has two PVR-150's on a single PCI card.  For example, if you have a
 single PVR-500 card, it will appear as <CODE>/dev/video0</CODE> and
-<CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner 0
-and Tuner 1 input, so you would choose Tuner 0 for <B>both</B> devices.</CAPTION>
+<CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner input.</CAPTION>
 </FIGURE>
 
 Once you're done, press RETURN to go back to the Input Connections screen. 
@@ -293,7 +309,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of MythTV v0.18.1, the available options are:
+<P>As of MythTV v0.19, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend --help
@@ -302,16 +318,14 @@ Valid options are:
 -l or --logfile filename       Writes STDERR and STDOUT messages to filename
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
--v or --verbose debug-level    Prints more information
-                               Accepts any combination (separated by comma)
-                               of all,none,quiet,record,playback,channel,
-                               osd,file,schedule,network,commflag,audio,
-                               libav,jobqueue
+-v or --verbose debug-level    Use '-v help' for level info
 --printexpire                  List of auto-expire programs
 --printsched                   Upcoming scheduled programs
 --testsched                    Test run scheduler (ignore existing schedule)
 --resched                      Force the scheduler to update
 --nosched                      Do not perform any scheduling
+--nojobqueue                   Do not start the JobQueue
+--noautoexpire                 Do not start the AutoExpire thread
 --version                      Version information
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -394,8 +408,7 @@ run once a day.</P>
 <B>mythfrontend</B> Setup option.  From the MythFrontend, enter the
 Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
-<B>mythbackend</B> program will now run <B>mythfilldatabase</B> at the
-times you specify.</P>
+<B>mythbackend</B> program will now run <B>mythfilldatabase</B> for you.</P>
 
 <H2><A NAME="ss9.5">9.5</A> <A HREF="mythtv-HOWTO.html#toc9.5">Grabbing channel icons for DataDirect users</A>
 </H2>

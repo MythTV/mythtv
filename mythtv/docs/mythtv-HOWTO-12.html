@@ -14,17 +14,15 @@
 <HR>
 <H2><A NAME="s12">12.</A> <A HREF="mythtv-HOWTO.html#toc12">Scheduling Recordings</A></H2>
 
-<P>The MythTV master backend is responsible for managing the schedule
-for all TV tuner cards on the master and any slave. Its job is to
-search the TV listing for the shows you have requested and assign
-recordings to the TV tuner cards. If none of the shows that you've
-chosen overlap, it simply records all of the shows. However, if
-there are shows where the beginning and end times overlap, the
-scheduler follows rules that you've specified or makes logical
-decisions about what would be best if you haven't express your
-preference. Further, the "Upcoming Recordings" page allows you make
-specific decisions about what you really do and don't want to
-record.</P>
+<P>The MythTV master backend is responsible for managing the schedule for
+all TV tuner cards on the master and any slave. Its job is to search the TV
+listing for the shows you have requested and assign recordings to the TV
+tuner cards. If none of the shows that you've chosen overlap, it simply
+records all of the shows. However, if there are shows where the beginning
+and end times overlap, the scheduler follows rules that you've specified or
+makes logical decisions about what would be best if you haven't express your
+preference. Further, the "Upcoming Recordings" page allows you make specific
+decisions about what you really do and don't want to record.</P>
 
 <H2><A NAME="ss12.1">12.1</A> <A HREF="mythtv-HOWTO.html#toc12.1">Record Types</A>
 </H2>
@@ -108,44 +106,40 @@ which show you'd prefer versus any other show. The choice and style
 are entirely up to you. However, the more information you give to
 the scheduler, the more likely it will make the choices you would
 prefer in the first place.</P>
-<P>The scheduler choices are based on the total priority for a showing
-by adding up four different priority factors. By default, most of
-these factors are "0" but you may use any combination to express
-your likes and needs.</P>
-<P>Per record rule -- this is the "priority" field in the "Scheduling
-Options" section of the options page and this values is included for
-any showings that match the recording rule.  You may choose to only
-use these values and not use the other factors for the sake of
-simplicity and clarity.</P>
-<P>Per record type -- Setup->TV Settings->Recording Priorities->General
-allows you to add to the priority based on the type. It may make sense to
-increase the value for "Single" so that by default they have an extra
-advantage over other shows. The default is +1. You may want to decrease
-the value for Find rules so that they will be less likely to interfere
-with regular shows and will be more likely to record in a non-conflicting
-time instead. The default is -1.</P>
-<P>Per channel -- Setup->TV Settings->Recording Priorities->Channel
-Priorities can be useful if you believe that you prefer any of the
-shows on certain channels. This would give all shows on a channel an
-advantage by default.</P>
-<P>Input preference -- in the MythTV "setup" program, the "Input
-Connections" section allows you to add additional priority in the
-"Input preference". This is simply another priority factor but has an
-interesting effect. If a card input has a higher value than the other
-cards, the scheduler will see that you would rather record showings of
-episodes on this card rather than a showing on another card. If you
-have multiple cards of different quality, you may want to set input
-preference to encourage the scheduler to record shows on your best
-card(s) whenever possible. This can also be useful if you have
-multiple video sources which include the same stations. For example,
-with digital and analog cable you could increase the digital cable
-input preference by 1 to tell the scheduler that you want to record
-from the digital station whenever possible but the station on the
-analog input could still be used when the digital input is busy.</P>
-<P>For any single showing of any show you've chosen to record, these
-factors are added together to find the "total priority". This is the
-priority that the scheduler uses to decide which shows are given the
-first choice when filling in the schedule.</P>
+<P>The scheduler choices are based on the total priority for a showing by
+adding up four different priority factors. By default, most of these factors
+are "0" but you may use any combination to express your likes and needs.</P>
+<P>Per record rule -- this is the "priority" field in the "Scheduling Options"
+section of the options page and this values is included for any showings
+that match the recording rule.  You may choose to only use these values and
+not use the other factors for the sake of simplicity and clarity.</P>
+<P>Per record type -- Setup->TV Settings->Recording Priorities->General allows
+you to add to the priority based on the type. It may make sense to increase
+the value for "Single" so that by default they have an extra advantage over
+other shows. The default is +1. You may want to decrease the value for Find
+rules so that they will be less likely to interfere with regular shows and
+will be more likely to record in a non-conflicting time instead. The default
+is -1.</P>
+<P>Per channel -- Setup->TV Settings->Recording Priorities->Channel Priorities
+can be useful if you believe that you prefer any of the shows on certain
+channels. This would give all shows on a channel an advantage by default.</P>
+<P>Input preference -- in the MythTV "setup" program, the "Input Connections"
+section allows you to add additional priority in the "Input preference".
+This is simply another priority factor but has an interesting effect. If a
+card input has a higher value than the other cards, the scheduler will see
+that you would rather record showings of episodes on this card rather than a
+showing on another card. If you have multiple cards of different quality,
+you may want to set input preference to encourage the scheduler to record
+shows on your best card(s) whenever possible. This can also be useful if you
+have multiple video sources which include the same stations. For example,
+with digital and analog cable you could increase the digital cable input
+preference by 1 to tell the scheduler that you want to record from the
+digital station whenever possible but the station on the analog input could
+still be used when the digital input is busy.</P>
+<P>For any single showing of any show you've chosen to record, these factors
+are added together to find the "total priority". This is the priority that
+the scheduler uses to decide which shows are given the first choice when
+filling in the schedule.</P>
 <P>The scheduling priority of a show may also be used to determine
 auto-expiration of recordings when disk space gets full (see 
 <A HREF="#Auto-Expire">Auto-Expire</A>, below).</P>
@@ -154,31 +148,30 @@ auto-expiration of recordings when disk space gets full (see
 
 <P>Singles will record without regard to duplicate matching.</P>
 
-<P>The standard recurring methods of All, Channel, Weekly and Daily use
-the descriptive information in the TV listings to try to record only one
-showing of each unique episode. However, This goal is sometimes
-complicated by the fact that the stations may not include a description
-for a specific episode but use a generic description for the series
-instead. When there is a generic description, the default behavior is to
-assume that it may be an episode that you have not seen and to record it
-for you.  One of the duplicate matching options is "Record new episodes
-only".  If this is selected, listing that have an original air date of
-more than 14 days earlier are considered repeats and are not eligible to
-record. Generally, generic episodes will be marked as repeats also.</P>
+<P>The standard recurring methods of All, Channel, Weekly and Daily use the
+descriptive information in the TV listings to try to record only one showing
+of each unique episode. However, This goal is sometimes complicated by the
+fact that the stations may not include a description for a specific episode
+but use a generic description for the series instead. When there is a
+generic description, the default behavior is to assume that it may be an
+episode that you have not seen and to record it for you.  One of the
+duplicate matching options is "Record new episodes only".  If this is
+selected, listing that have an original air date of more than 14 days
+earlier are considered repeats and are not eligible to record. Generally,
+generic episodes will be marked as repeats also.</P>
 
 <P>Because of generic episodes and other situations, MythTV offers an
-alternative approach where shows may be recorded by choosing from
-multiple showings even when the descriptive information is not reliable.
-All of the "Find" record types look for matching titles in the
-listings. If there is a showing with specific episode information and
-that episode has recorded before, that showing is marked as previously
-or currently recorded. The scheduler will then choose to record the
-earliest non-conflicting showing from any of other remaining showings
-regardless of the descriptive information. Generally, Find One is most
-useful for movies or specials and the Find Daily and Find Weekly rules
-are best for news or current events shows that are repeated. However,
-these may be useful in other situations where the standard recording
-rules may not work correctly.</P>
+alternative approach where shows may be recorded by choosing from multiple
+showings even when the descriptive information is not reliable. All of the
+"Find" record types look for matching titles in the listings. If there is a
+showing with specific episode information and that episode has recorded
+before, that showing is marked as previously or currently recorded. The
+scheduler will then choose to record the earliest non-conflicting showing
+from any of other remaining showings regardless of the descriptive
+information. Generally, Find One is most useful for movies or specials and
+the Find Daily and Find Weekly rules are best for news or current events
+shows that are repeated. However, these may be useful in other situations
+where the standard recording rules may not work correctly.</P>
 
 <H3>Conflicts</H3>
 
@@ -652,7 +645,7 @@ EP where the last four digits are the episode number in the series. Note
 that these are generated by TMS and not the show's producers but they are
 usually in the same order as the original air dates for the episodes.
 Detailed information can be found in the Data Direct documentation at 
-<A HREF="http://labs.zap2it.com/">http://labs.zap2it.com/</A>.  </LI>
+<A HREF="http://labs.zap2it.com/">http://labs.zap2it.com/</A>.</LI>
 </UL>
 </P>
 <P>Finally, if you are doing something very experimental and a field is not

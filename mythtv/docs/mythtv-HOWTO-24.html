@@ -201,7 +201,7 @@ unmounted during this procedure.
 <BLOCKQUOTE><CODE>
 <PRE>
 # lvextend --size +50G /dev/VGforMyth/video
-# xfs_growfs /dev/VGforMyth/video
+# xfs_growfs /var/video
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -296,8 +296,8 @@ leading to dropped frames.</P>
 </H2>
 
 <P>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB).  The Air2PC card is
-installed as a DVB device and is supported within MythTV.  </P>
+(8VSB).  The Air2PC card is installed as a DVB device and is supported
+within MythTV.</P>
 <P>First, you must compile a version of the Linux kernel to support the new
 tuner device.  </P>
 <P>
@@ -305,8 +305,8 @@ tuner device.  </P>
 <PRE>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
-# tar -xjf linux-2.6.11.tar.bz2
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.15.tar.bz2
+# tar -xjf linux-2.6.15.tar.bz2
 # pushd .
 </PRE>
 </CODE></BLOCKQUOTE>
