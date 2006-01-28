@@ -958,7 +958,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "recorded.lastmodified, recorded.findid, "
                        "recorded.originalairdate, recorded.playgroup, "
                        "recorded.basename, recorded.progstart, "
-                       "recorded.progend "
+                       "recorded.progend, recorded.stars "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1084,6 +1084,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     }
                 }
             }
+
+            proginfo->stars = query.value(31).toDouble();
 
             QString lpath = fileprefix + "/" + basename;
             PlaybackSock *slave = NULL;
