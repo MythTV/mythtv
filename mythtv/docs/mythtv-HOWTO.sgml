@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-01, v0.19.pre
+<date>2006-01-28, v0.19.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -17,12 +17,12 @@ necessary.
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
 <caption>
-<bf>NOTE</bf>: Please note that I am <em>NOT</em> the author/programmer of
-the MythTV application!  I can not give you personalized installation
-support.  If you are having issues installing MythTV you should examine the
-archives, or post your question to the MythTV-users mailing list.  If you
-send me "Does MythTV work with 'X'"? messages - I will simply delete your
-mail.
+<bf>NOTE</bf>: Please note that I, Robert Kulagowski, am <em>NOT</em> the
+author/programmer of the MythTV application!  I can not give you
+personalized installation support.  If you are having issues installing
+MythTV you should examine the archives, or post your question to the
+MythTV-users mailing list.  If you send me "Does MythTV work with 'X'"?
+messages - I will simply delete your mail.
 </caption>
 </figure>
 <sect1>What is MythTV?
@@ -257,16 +257,17 @@ hardware selection, mainly because there are so many tradeoffs which can be
 made.  For example, if you have plenty of CPU, you can use higher bitrates
 or capture sizes, etc.
 
-MythTV has two modes of operation.  First, it can function as a software video
-encoder, which means that it uses a fairly generic "dumb" video capture card
-to get frames of video, encodes them using the CPU on your motherboard and
-writes them to disk.  High-end video capture cards and devices like the TiVo
-and ReplayTV have dedicated encoder chips which use specialized hardware to
-convert the video stream to the MPEG-2 format without using the motherboard
-CPU.  The main CPU has the responsibility of running the Operating System
-and reading and writing the encoded frames to the disk.  These tasks have
-fairly low CPU requirements compared to encoding video, which is why a
-device like a Series 1 TiVo can run with only 16MB of RAM and a 54MHz CPU.
+MythTV has two modes of operation.  First, it can function as a software
+video encoder, which means that it uses a fairly generic "dumb" video
+capture card to get frames of video, encodes them using the CPU on your
+motherboard and writes them to disk.  High-end video capture cards and
+devices like the TiVo and ReplayTV have dedicated encoder chips which use
+specialized hardware to convert the video stream to the MPEG-2 format
+without using the motherboard CPU.  The main CPU has the responsibility of
+running the Operating System and reading and writing the encoded frames to
+the disk.  These tasks have fairly low CPU requirements compared to encoding
+video, which is why a device like a Series 1 TiVo can run with only 16MB of
+RAM and a 54MHz CPU.
 
 There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
@@ -524,7 +525,7 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <item>Hauppauge WinTV-USB series
 <item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
-<item>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net no MythTV support)
+<item>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net - no MythTV support.  May work if setup thinks it's a PVR-x50 card.)
 <item>ATI All-in-Wonder series
 </itemize>
 
@@ -542,17 +543,16 @@ work with MythTV.  However, some cards and drivers will provide better
 quality or compatibility than others.  In particular, many audio
 devices included on motherboards can be problematic.
 
-The usual practice for capturing the audio associated with the video
-is to run a cable from an audio output on the video capture card to
-the Line input on a sound card. However, some video capture cards
-provide on-board audio capabilities that work with the kernel
-<tt>btaudio</tt> module instead, thereby eliminating the need for a
-cable.  This is useful if you will be using multiple capture cards in
-a single chassis, since each capture card will not need its own sound
-card.  Note that a separate sound card is still required for playback
-when using <tt>btaudio</tt>, and that often the audio recorded in this
-way will be mono only.  See the <ref id="btaudio" name="btaudio">
-section for more information.
+The usual practice for capturing the audio associated with the video is to
+run a cable from an audio output on the video capture card to the Line input
+on a sound card. However, some video capture cards provide on-board audio
+capabilities that work with the kernel <tt>btaudio</tt> module instead,
+thereby eliminating the need for a cable.  This is useful if you will be
+using multiple capture cards in a single chassis, since each capture card
+will not need its own sound card.  Note that a separate sound card is still
+required for playback when using <tt>btaudio</tt>, and that often the audio
+recorded in this way will be mono only.  See the <ref id="btaudio"
+name="btaudio"> section for more information.
 
 <figure loc="here">
 <eps file="warning" height="1cm">
@@ -613,32 +613,24 @@ name="http://www.gossamer-threads.com/lists/mythtv/"> using
 the card name in your search string.
 
 <sect3>ATI
-<p>ATI makes many cards with TV-out capability, but only offers linux
+<p>ATI makes many cards with TV-out capability, but only offers Linux
 drivers for Radeon 8500 and above cards.  See the Drivers and Software
 section of <url url="http://www.ati.com/" name="http://www.ati.com"> for the
 driver and additional information.
 
 The enhanced ati.2 X driver created by the GATOS <url
 url="http://gatos.sourceforge.net" name="http://gatos.sourceforge.net">
-project offers some support for TV-out, but only in its "experimental"
-version, available through CVS. There have been reports from people who say
-they have made this driver work with one or another ATI card. For example,
-Bruce Markey <url url="mailto:bjm@lvcm.com"> writes (on the mythtv-users
-mailing list): "I got this to work. You can quote me on that. I've used
-TV-out on several models of ATI cards both All-In-Wonder and regular cards
-with TV-out." See the "Adventurous Setup" section of <url
+project offers some support for TV-out on other ATI cards, but only in its
+"experimental" version, available through CVS. There have been reports from
+people who say they have made this driver work with one or another ATI card.
+For example, Bruce Markey <url url="mailto:bjm@lvcm.com"> writes (on the
+mythtv-users mailing list): "I got this to work. You can quote me on that.
+I've used TV-out on several models of ATI cards both All-In-Wonder and
+regular cards with TV-out." See the "Adventurous Setup" section of <url
 url="http://gatos.sourceforge.net/watching_tv.php"
 name="http://gatos.sourceforge.net/watching_tv.php"> for details. Also see
 <url url="http://www.retinalburn.net/linux/tvout.html"
 name="http://www.retinalburn.net/linux/tvout.html"> for more information.
-
-Specific cards:
-<itemize>
-<item>ATI Rage II+DVD (Mach 64). Ports not described. Reported to work, but
-no details reported.
-<item>Rage 128 VIVO. Ports not described. Reported to work, but no details reported.
-<item>Radeon 7500. Ports not described. Reported to work, but no details reported.
-</itemize>
 
 <sect3>Matrox
 <p><bf>NOTE</bf>: If updated information for the Matrox cards is not
@@ -683,16 +675,8 @@ name="http://www.nvidia.com/object/unix.html"> for more information.
 
 <bf>NOTE</bf>:  It's strongly recommended that you use the proprietary
 NVIDIA drivers; they have excellent support for XvMC and ship with a good
-configuration utility.
-
-Specific cards:
-<itemize>
-<item>GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using the
-NVIDIA X driver.
-<item>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the NVIDIA X 
-driver. Reportedly works using the nv driver plus nvtv.
-<item>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
-</itemize>
+configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
+important if you want to display HDTV.
 
 <sect3>Savage
 <p>The standard savage X driver supports TV out on some Savage cards. 
@@ -725,7 +709,7 @@ audio control on the PVR-350 setup page.
 
 <sect3>Other Options
 <p>Some devices with on-board TV-out capability, such as Xboxes converted to 
-Linux and some laptops, can be used as MythTV frontends to display on a 
+Linux and some laptops can be used as MythTV frontends to display on a 
 television screen. Please consult the mythtv-users mailing list for messages 
 that report the details of these special arrangements.
 
@@ -838,7 +822,7 @@ url="http://ATrpms.net/topic/multimedia/" name="ATrpms"> for the drivers you
 need.
 
 <sect3>Mandriva
-<p>Thac has created RPMs for MythTV for Mandriva 9.0 and above which may
+<p>Thac has created RPMs for MythTV for Mandriva which may
 be obtained from <url url="http://rpm.nyvalls.se/"
 name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
 send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
@@ -1217,7 +1201,7 @@ skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.39).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.41).
 
 <code>
 NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
@@ -1237,8 +1221,8 @@ by following the links from "Using" through "Download...".
 <sect1>Building LAME
 <p>Open a shell and switch to the directory where you saved lame.
 <tscreen><verb>
-$ tar -xzf lame-3.93.1.tar.gz
-$ cd lame-3.93.1
+$ tar -xzf lame-3.96.1.tar.gz
+$ cd lame-3.96.1
 $ ./configure
 $ make
 $ make test
@@ -1292,7 +1276,7 @@ and skip straight to the XMLTV compilation step.
 <p>
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.39.tar.bz2
+$ tar -xjf xmltv-0.5.41.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites.  The following prerequisites are the
 minimum required; when you actually start running the xmltv setup program it
@@ -1311,7 +1295,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.39
+$ cd xmltv-0.5.41
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1381,8 +1365,8 @@ $ cd mythtv
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.18.1.tar.bz2
-$ cd mythtv-0.18.1
+$ tar -xjf mythtv-0.19.tar.bz2
+$ cd mythtv-0.19
 $ ./configure
 </verb></tscreen>
 
@@ -1831,11 +1815,11 @@ $ su
 <sect1>Obtaining and compiling lirc
 <p>You're going to need to download and compile <bf>lircd</bf>.  Go to <url
 url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
-of 2005-05-17, the version available is 0.7.1.  Grab the remotes.tgz file as
+of 2006-01-21, the version available is 0.8.0.  Grab the remotes.tar.bz2 file as
 well. 
 <tscreen><verb>
-$ tar -xjf lirc-0.7.1.tar.bz2
-$ cd lirc-0.7.1
+$ tar -xjf lirc-0.8.0.tar.bz2
+$ cd lirc-0.8.0
 $ ./setup.sh
 </verb></tscreen>
 You're going to need to know what sort of receiver you have and where it's
@@ -2018,7 +2002,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.18.1/configfiles
+$ cd ~/mythtv-0.19/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2228,7 +2212,6 @@ the IRDA device within a few feet of the box.
 <p>By this point, all of the compile-time prerequisites have been installed,
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure MythTV.
-<!--
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -2243,7 +2226,6 @@ $ su -
 # apt-get install libqt3c102-mt-mysql
 # exit
 </verb></tscreen>
--->
 <sect1>Configuring the Master backend system
 <p>Open a shell and decide where you will store your video files.  By
 default, MythTV will assume that you will be using <tt>/mnt/store/</tt>, but
@@ -2459,8 +2441,7 @@ available on the device.
 <caption><bf>NOTE</bf>:  If you have a Hauppauge PVR-500, you must think of
 it has two PVR-150's on a single PCI card.  For example, if you have a
 single PVR-500 card, it will appear as <tt>/dev/video0</tt> and
-<tt>/dev/video1</tt>.  Each <tt>/dev/video</tt> device will have a Tuner 0
-and Tuner 1 input, so you would choose Tuner 0 for <bf>both</bf> devices.
+<tt>/dev/video1</tt>.  Each <tt>/dev/video</tt> device will have a Tuner input.
 </caption>
 </figure>
 Once you're done, press RETURN to go back to the Input Connections screen. 
@@ -2529,7 +2510,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.18.1, the available options are:
+As of MythTV v0.19, the available options are:
 <tscreen><verb>
 $ mythbackend --help
 Valid options are:
@@ -2537,16 +2518,14 @@ Valid options are:
 -l or --logfile filename       Writes STDERR and STDOUT messages to filename
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
--v or --verbose debug-level    Prints more information
-                               Accepts any combination (separated by comma)
-                               of all,none,quiet,record,playback,channel,
-                               osd,file,schedule,network,commflag,audio,
-                               libav,jobqueue
+-v or --verbose debug-level    Use '-v help' for level info
 --printexpire                  List of auto-expire programs
 --printsched                   Upcoming scheduled programs
 --testsched                    Test run scheduler (ignore existing schedule)
 --resched                      Force the scheduler to update
 --nosched                      Do not perform any scheduling
+--nojobqueue                   Do not start the JobQueue
+--noautoexpire                 Do not start the AutoExpire thread
 --version                      Version information
 </verb></tscreen>
 
@@ -2630,8 +2609,7 @@ To use MythTV's built-in capability, you'll need to run the
 <bf>mythfrontend</bf> Setup option.  From the MythFrontend, enter the
 Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
-<bf>mythbackend</bf> program will now run <bf>mythfilldatabase</bf> at the
-times you specify.
+<bf>mythbackend</bf> program will now run <bf>mythfilldatabase</bf> for you.
 
 <sect1>Grabbing channel icons for DataDirect users
 <p>While the DataDirect TV listings service has several advantages, it does
@@ -2678,9 +2656,9 @@ fields, press Enter twice to write these configurations on your local machine,
 and attempt to connect to the database.  If you make any mistakes, the screens
 will pop up again.
 
-Now that mythfrontend has started up,
-you should have a number of buttons/choices.  Before
-doing anything, go to TV, then to Setup and configure the frontend client.
+Now that mythfrontend has started up, you should have a number of
+buttons/choices.  Before doing anything, go to TV, then to Setup and
+configure the frontend client.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -3384,8 +3362,8 @@ can be modified by the user without re-compiling or altering the program
 functionality.  Download the MythThemes tarball from the website and untar it:
 
 <tscreen><verb>
-$ tar -xjf myththemes-0.18.1.tar.bz2
-$ cd ~/myththemes-0.18.1
+$ tar -xjf myththemes-0.19.tar.bz2
+$ cd ~/myththemes-0.19
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -3406,20 +3384,18 @@ an external tuner, such as a DirecTV or digital cable set top box, you
 should add <tt>/usr/local/bin/changechannel</tt> to your Input Connections in the
 mythbackend configuration GUI.
 
-The <bf>changechannel</bf> program is not supplied with MythTV, so this is
-going to be dependent on what sort of external tuner you have.  Example
-scripts for Sony and RCA receivers can be obtained from <url url="http://tarek.2y.net/myth/"
-name="http://tarek.2y.net/myth/">.  This is currently an external
-user-supplied program, so if you have issues with the script, please contact
-the author.
+However, there is not <bf>changechannel</bf> program per-se, because this is
+going to be dependent on what sort of external tuner you have.  Look in the
+<tt>contrib/channel_changers</tt> directory for a number of programs and
+scripts which may be used to change channels.  Once you find one which
+works, copy it to <tt>/usr/local/bin/changechannel</tt>.
 
 Feel free to browse some of what sort of hardware is available at <url
-url="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html"
-name="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">, or if
-you wish to assemble your own, rather than purchase, the following may be
-helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
-name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
-pinouts for RCA DSS receivers.
+url="http://store.snapstream.com/accessories.html"
+name="http://store.snapstream.com/accessories.html">, or if you wish to
+assemble your own, rather than purchase, the following may be helpful: <url
+url="http://www.dtvcontrol.com/" name="http://www.dtvcontrol.com/"> for
+cable pinouts.
 
 <sect1>Using Shutdown/Wakeup
 <p>What does the MythTV Shutdown/Wakeup function do? The scheduler on the
@@ -4269,8 +4245,8 @@ name="http://www.mythtv.org/"> .
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
-$ tar -xjf mythplugins-0.18.1.tar.bz2
-$ cd mythplugins-0.18.1
+$ tar -xjf mythplugins-0.19.tar.bz2
+$ cd mythplugins-0.19
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4318,7 +4294,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins-0.18.1/</tt> directory.
+already in the <tt>~/mythplugins-0.19/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4334,7 +4310,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19 
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4383,7 +4359,7 @@ Mandriva Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1/mythweb
+$ cd ~/mythplugins-0.19/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4447,7 +4423,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4690,7 +4666,7 @@ section to obtain mythplugins.
 
 Switch to the mythplugins directory:
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 </verb></tscreen>
 
 Compile and install mythgame:
@@ -4911,7 +4887,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5044,7 +5020,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5096,7 +5072,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5136,7 +5112,7 @@ prerequisites using the following command:
 In the example below, we have enabled support for transcoding and for VCD
 playing.  You may remove these options if you don't need them.
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
 $ qmake mythplugins.pro
 $ make
@@ -5172,7 +5148,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins-0.18.1
+$ cd ~/mythplugins-0.19
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -6854,6 +6830,10 @@ You may leave the Setup now and proceed as usual.
 
 <sect1>Migrating from XMLTV to DataDirect <label id="MigratingtoDD">
 <!-- Mostly from a post by Bruce Markey -->
+<p><bf>NOTE</bf>:  This section will be deprecated and will be removed in
+v0.20.  DataDirect has been the default for a number of revisions, so it is
+unlikely that there are North American users that will need to migrate.
+
 <p>DataDirect will use different information for your video sources and
 channels than was used by XMLTV. The following will clear your old
 information in a way that will allow your EPG and existing recording rules
@@ -7652,60 +7632,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.18.00, 2005-04-10.  Version bump. Add note that Mandriva > 9.1 needs
-libqt3-mysql.  Add note that you don't need to explicitly disable DPMS. 
-./setup is now mythtv-setup.  Add DishTV PPV link.  Get rid of references to
-settings.pro since everything is now done in the configure script.  Update
-debugging to reflect new configure script.  Update XMLTV version.  bjm's
-selective restore of program information/migration section added.
-(2004-09-01!)
-v0.18.01, 2005-04-20.  Change all the plugins stuff since it's all within
-the mythplugins tarball instead of individual ones.
-v0.18.02, 2005-05-05.  Fix a few more directory issues WRT the plugins.  Get
-rid of Mandriva versioning where it's no longer needed.  Get rid of the old
-crontab stuff since native mythfilldatabase is better.
-v0.18.03, 2005-05-13.  Add text for pulling release-branch CVS code.  Add
-text about PVR-500 being two PVR-150's.  Expand on choosing lowest numbered
-input device in each class.  Remove note that Plextor is in CVS since it's
-now in released code.  Add more information on hard drive requirements.  Spelling.
-v0.18.04, 2005-05-16.  Bump to v0.18.1.
-v0.18.05, 2005-05-25.  Alter some of the troubleshooting text about full duplex.
-v0.18.06, 2005-06-10.  Add note about mulitple slashes.  Update mythbackend
-help text.  Add GPL.  Add a bit on skipping XMLTV.  Get rid of a superfluous
-subsection for DataDirect.
-v0.18.07, 2005-06-27.  Add mythgame setup instructions. (harywilke at
-yahoo.com).  Get rid of Hauppauge-250 / Native lirc - versions referenced
-are ancient.  Update instructions to reference subversion.  Get rid of
-instructions on recompiling RHL 8.0 kernel.
-v0.18.08, 2005-07-08.  Spelling.
-v0.18.09, 2005-07-14.  Start diskless ubuntu.  Backticks on table names in mysqldump.
-v0.18.10, 2005-07-15.  Escape backticks in the mysqldump example, otherwise bash complains.
-v0.18.11, 2005-08-17.  Refine diskless Ubuntu.  Add Bruce's Advanced Scheduling text.
-v0.18.12, 2005-08-19.  Tweaks to Bruce's stuff.
-v0.18.13, 2005-10-14.  Updates from users.  Update bugzilla entry to point
-at trac.  Get rid of PVR-250 example install - it's not necessary anymore
-and way out of date.  Specifically mention how multiple mysql.txt files are
-bad if they're all saying different things.
-v0.18.14, 2005-11-01.  Add "don't use QT 4.0" warning message.  Add explanation
-of what the tuning status letters mean.  Add some details about PVR 150/500
-cards.  Robert Tsai's doc contribution.
-v0.18.15, 2005-11-23.  Update link to DVB wiki.  Update link to
-ivtvdriver.org.  If you're running SVN, you'd better be on -commits and
--dev.
-v0.18.16, 2005-12-03.  Remove link to mdz's Debian packages since he's not
-maintaining them anymore.
-v0.18.17, 2005-12-10.  Add some more details about debugging, put text early
-in the doc about what a good bug report should contain, tell people to use
-trac to submit docs patches.
-
-v0.19pre, 2006-01-  Rewrite the gdb debugging instructions. Start deleting
-older cruft.  Update the real-time priority docs; they've changed the
-parameter to "rtprio".  (I guess "rt_priority" took too long to type.)
-Update link to pvrusb2 driver site - device might be useable by saying that
-it's a PVR-x50.  Start putting notices that sections are going to be removed
-in 0.20 if there are no updates.  sed for Mandrake -> Mandriva.  Re-enable
-Debian build instructions.  Update ATSC / DVB stuff.  Fix xfs_growfs
-example. (kkvenkit at gmail dot com).  Update list of ATSC cards.
+v0.19.00, 2006-01-28.  Version bump.
 
 -->
 
