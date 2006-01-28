@@ -105,7 +105,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 {
     type = ltype;
 
-    everStartedVideo = false;    
+    previewThreadRunning = false;    
     state = kStopped;
     killState = kDone;
     waitToStart = false;
@@ -348,7 +348,7 @@ void PlaybackBox::killPlayerSafe(void)
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    while (state != kKilled && state != kStopped && everStartedVideo)
+    while (state != kKilled && state != kStopped && previewThreadRunning)
     {
         /* ensure that key events don't mess up our states */
         state = (state == kKilled) ? kKilled :  kKilling;
@@ -1582,6 +1582,7 @@ bool PlaybackBox::killPlayer(void)
         if (!nvp->IsPlaying() || (killTimeout.elapsed() > 2000))
         {
             pthread_join(decoder, NULL);
+            previewThreadRunning = true;
             delete nvp;
             delete rbuffer;
 
@@ -1618,7 +1619,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
         QString filters = "";
         nvp->SetVideoFilters(filters);
 
-        everStartedVideo = true;
+        previewThreadRunning = true;
         pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
         nvpTimeout.start();

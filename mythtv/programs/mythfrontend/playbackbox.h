@@ -340,7 +340,7 @@ class PlaybackBox : public MythDialog
     bool useCategories;
     void setDefaultView(int defaultView);
 
-    bool everStartedVideo;
+    bool previewThreadRunning;
 
     mutable QMutex previewGeneratorLock;
     QMap<QString, PreviewGenerator*> previewGenerator;
