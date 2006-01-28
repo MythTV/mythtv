@@ -1,11 +1,14 @@
 README for trailer.pl by Andrei Rjeousski (arjeousski@gmail.com)
 
-This script is similar on imdb.pl but can be used to get the URLs for the ACTUAL movie trailers based on IMDB #.
+This script is similar on imdb.pl but can be used to get the URLs for the
+ACTUAL movie trailers based on IMDB #.
 
-The script parses apple.com website and tries to find a large trailer and if thats not available, it gets regular trailer.
+The script parses apple.com website and tries to find a large trailer and if
+thats not available, it gets regular trailer.
 
 Heres the example:
 # ./trailer.pl -T 0356150
 http://movies.apple.com/movies/dreamworks/eurotrip/eurotrip_m480.mov
 
-This script can be used for getting pretty much any trailers for either upcoming movies or the movies that are currently in the database
+This script can be used for getting pretty much any trailers for either
+upcoming movies or the movies that are currently in the database
