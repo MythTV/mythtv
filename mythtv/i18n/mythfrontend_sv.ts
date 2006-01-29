@@ -5965,7 +5965,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Auto Expire Default</source>
-        <translation>Autoradering påslaget som standard</translation>
+        <translation>Autoradera som standard</translation>
     </message>
     <message>
         <source>Re-Record</source>
@@ -6256,7 +6256,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation>Du vill också ange språk i uppspelningsklientens inställningar (Generellt, sida 3).</translation>
+        <translation>Ange även språk i uppspelningsklientens inställningar (Generellt, sida 3).</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -7695,7 +7695,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Uppspelningsgrupp: %1</translation>
+        <translation>Uppspelning: %1</translation>
     </message>
     <message>
         <source>Seek:</source>
