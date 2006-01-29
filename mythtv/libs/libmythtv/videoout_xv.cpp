@@ -27,6 +27,7 @@
 #include "XvMCSurfaceTypes.h"
 #include "util-x11.h"
 #include "config.h"
+#include "exitcodes.h"
 
 #define LOC QString("VideoOutputXv: ")
 #define LOC_ERR QString("VideoOutputXv Error: ")
@@ -48,6 +49,51 @@ static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 #define round(x) ((int) ((x) + 0.5))
 #endif
 
+class port_info { public: Display *disp; int port; };
+static QMap<int,port_info> open_xv_ports;
+
+static void close_all_xv_ports_signal_handler(int sig)
+{
+    cerr<<"Signal: "<<sys_siglist[sig]<<endl;
+    QMap<int,port_info>::iterator it;
+    for (it = open_xv_ports.begin(); it != open_xv_ports.end(); ++it)
+    {
+        cerr<<"Ungrabbing XVideo port: "<<(*it).port<<endl;
+        XvUngrabPort((*it).disp, (*it).port, CurrentTime);
+    }
+    exit(GENERIC_EXIT_NOT_OK);
+}
+static void add_open_xv_port(Display *disp, int port)
+{
+    if (port >= 0)
+    {
+        open_xv_ports[port].disp = disp;
+        open_xv_ports[port].port = port;
+        // TODO enable more catches after 0.19 is out -- dtk
+        signal(SIGINT,  close_all_xv_ports_signal_handler);
+    }
+}
+static void del_open_xv_port(int port)
+{
+    if (port >= 0)
+    {
+        open_xv_ports.remove(port);
+
+        if (!open_xv_ports.count())
+        {
+            // TODO enable more catches 0.19 is out -- dtk
+            signal(SIGINT, SIG_DFL);
+        }
+    }
+}
+static bool has_open_xv_port(int port)
+{
+    return open_xv_ports.find(port) != open_xv_ports.end();
+}
+static uint cnt_open_xv_port(void)
+{
+    return open_xv_ports.count();
+}
 
 //#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
 
@@ -245,7 +291,11 @@ VideoOutputXv::~VideoOutputXv()
     // ungrab port...
     if (xv_port >= 0)
     {
-        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
+        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
+        X11L;
+        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        del_open_xv_port(xv_port);
+        X11U;
         xv_port = -1;
     }
 
@@ -631,22 +681,38 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
                 if (!surf.size())
                     continue;
 
-                X11S(ret = XvGrabPort(disp, p, CurrentTime));
+                X11L;
+                ret = XvGrabPort(disp, p, CurrentTime);
+                if (Success == ret)
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + "Grabbed xv port "<<p);
+                    port = p;
+                    add_open_xv_port(disp, p);
+                }
+                X11U;
                 if (Success != ret)
+                {
+                    VERBOSE(VB_PLAYBACK,  LOC + "Failed to grab xv port "<<p);
                     continue;
+                }
                 
                 if (xvmc_surf_info)
                     surf.set(surfNum, xvmc_surf_info);
-                port = p;
 #endif // USING_XVMC
             }
             else
             {
                 for (p = firstPort; (p <= lastPort) && (port == -1); ++p)
                 {
-                    X11S(ret = XvGrabPort(disp, p, CurrentTime));
+                    X11L;
+                    ret = XvGrabPort(disp, p, CurrentTime);
                     if (Success == ret)
+                    {
+                        VERBOSE(VB_PLAYBACK,  LOC + "Grabbed xv port "<<p);
                         port = p;
+                        add_open_xv_port(disp, p);
+                    }
+                    X11U;
                 }
             }
         }
@@ -826,7 +892,11 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
             delete xvmc_osd_available[i];
         xvmc_osd_available.clear();
         xvmc_osd_lock.unlock();
-        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
+        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
+        X11L;
+        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        del_open_xv_port(xv_port);
+        X11U;
         xv_port = -1;
     }
 
@@ -903,7 +973,11 @@ bool VideoOutputXv::InitXVideo()
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Couldn't find the proper XVideo image format.");
-        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
+        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
+        X11L;
+        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        del_open_xv_port(xv_port);
+        X11U;
         xv_port = -1;
     }
 
@@ -916,7 +990,11 @@ bool VideoOutputXv::InitXVideo()
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create XVideo Buffers.");
         DeleteBuffers(XVideo, false);
-        X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
+        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
+        X11L;
+        XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+        del_open_xv_port(xv_port);
+        X11U;
         xv_port = -1;
         ok = false;
     }
@@ -1056,10 +1134,15 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
                                   width, height);
             ok = NULL != ctx;
             DeleteXvMCContext(disp, ctx);
-            X11S(XvUngrabPort(disp, port, CurrentTime));
+            VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << port);
+            X11L;
+            XvUngrabPort(disp, port, CurrentTime);
+            del_open_xv_port(port);
+            X11U;
         }
     }
     X11S(XCloseDisplay(disp));
+    X11S(ok |= cnt_open_xv_port() > 0); // also ok if we already opened port..
 
     if (!ok)
     {
@@ -1182,7 +1265,11 @@ bool VideoOutputXv::Init(
         DeleteBuffers(VideoOutputSubType(), true);
         if (xv_port >= 0)
         {
-            X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
+            VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
+            X11L;
+            XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+            del_open_xv_port(xv_port);
+            X11U;
             xv_port = -1;
         }
 #endif // USING_XVMC
