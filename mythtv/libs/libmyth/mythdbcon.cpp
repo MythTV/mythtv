@@ -77,6 +77,12 @@ bool MSqlDatabase::OpenDatabase()
                 VERBOSE(VB_IMPORTANT, "WOL failed, unable to connect to database!");
             }
         }
+        if (connected)
+        {
+            VERBOSE(VB_GENERAL,
+                    QString("Connected to database '%1' at host: %2")
+                            .arg(m_db->databaseName()).arg(m_db->hostName()));
+        }
     }
 
     if (!connected)
