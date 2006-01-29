@@ -137,7 +137,7 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Caminos separados por &apos;:&apos;. Si el camino és un directorio, el contenido se copiará. Si es un programa, se ejecutará.</translation>
+        <translation>Rutas separadas por &apos;:&apos;. Si la ruta és un directorio, el contenido se copiará. Si es un programa, se ejecutará.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
@@ -201,11 +201,11 @@
     </message>
     <message>
         <source>Overlay caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Leyenda Sobreescrita</translation>
     </message>
     <message>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de segundos a mostrar la leyenda encima de una foto a tamaño completo.</translation>
     </message>
 </context>
 <context>

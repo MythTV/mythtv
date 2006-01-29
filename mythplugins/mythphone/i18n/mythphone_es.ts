@@ -398,7 +398,7 @@
     </message>
     <message>
         <source>My Display Name</source>
-        <translation>My nombre</translation>
+        <translation>Mi nombre</translation>
     </message>
     <message>
         <source>My common name to display when I call other people. </source>
@@ -490,15 +490,15 @@
     </message>
     <message>
         <source>Your username for authentication with the SIP Server. For FWD this is your FWD number.</source>
-        <translation>Su usuario para la autentificación con el servidor SIP. Para FWP este es su número FWD.</translation>
+        <translation>Su usuario para la autentificación con el servidor SIP. Para FWD este es su número FWD.</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>COntraseña</translation>
+        <translation>Contraseña</translation>
     </message>
     <message>
         <source>Your password for authentication with the SIP Server.</source>
-        <translation>Su contraseña para la autentificación cpn el servidor SIP.</translation>
+        <translation>Su contraseña para la autentificación con el servidor SIP.</translation>
     </message>
     <message>
         <source>Method to use for NAT traversal; needs a Frontend restart after changing. Choose NONE if you have a public IP address, choose MANUAL if your ISP always gives you the same public address and manually enter this address below. Choose Web Server if you have a dynamic NAT address and enter a web address like http://checkip.dyndns.org below. </source>

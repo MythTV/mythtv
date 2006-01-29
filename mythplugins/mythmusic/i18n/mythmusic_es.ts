@@ -305,7 +305,7 @@
     </message>
     <message>
         <source>Search</source>
-        <translation>Búscar</translation>
+        <translation>Buscar</translation>
     </message>
     <message>
         <source>From CD</source>
@@ -384,7 +384,7 @@
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>ESte directorio debe de existir y el usuario de MythMusic requiere acceso en escritura sobre el mismo.</translation>
+        <translation>Este directorio debe de existir y el usuario de MythMusic requiere acceso en escritura sobre el mismo.</translation>
     </message>
     <message>
         <source>Audio device</source>
@@ -400,7 +400,7 @@
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation>CDRom a usar en la reproducción y ripeado.</translation>
+        <translation>CDROM a usar en la reproducción y ripeado.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
@@ -408,7 +408,7 @@
     </message>
     <message>
         <source>Script Path</source>
-        <translation>nombre del script</translation>
+        <translation>Nombre del script</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
@@ -476,7 +476,7 @@
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation>Los archovos se separarán con esta marca.</translation>
+        <translation>Los archivos se separarán con esta marca.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -600,7 +600,7 @@
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation>Cambiar el visualizador cuando tambén se cambia de canción.</translation>
+        <translation>Cambiar el visualizador cuando también se cambia de canción.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -772,7 +772,7 @@
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation>Si está activado el codificador MP3 usará bitrates variables (VBR) excepto para el ajuste de baja calidad. El codificaor OGG siempre usará bitrate variable.</translation>
+        <translation>Si está activado el codificador MP3 usará bitrates variables (VBR) excepto para el ajuste de baja calidad. El codificador OGG siempre usará bitrate variable.</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
@@ -892,11 +892,11 @@
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sólo importar nueva música.</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprueba la existencia de duplicados al importar/ripear CDs.</translation>
     </message>
 </context>
 <context>

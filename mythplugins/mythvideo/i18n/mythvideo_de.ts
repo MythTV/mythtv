@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>Starting Parental Level</source>
-        <translation>Anfangs-Kindersicherungs-Level</translation>
+        <translation>anfänglicher Kindersicherungs-Level</translation>
     </message>
     <message>
         <source>4 - Highest</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation>MythVideo startet mit diesem &apos;Level&apos;. Videos mit gleichem oder niedrigerem Level werden angezeigt. Die Kindersicherungs-PIN sollte gesetzt werden, um das Ändern des Default-Levels einzuschränken.</translation>
+        <translation>MythVideo startet mit diesem &apos;Level&apos;. Videos mit gleichem oder niedrigerem Level werden angezeigt. Die Kindersicherungs-PIN sollte gesetzt werden, um das Ändern des Standard-Levels einzuschränken.</translation>
     </message>
     <message>
         <source>Parental Control PIN</source>
@@ -165,7 +165,7 @@
     </message>
     <message>
         <source>Video Manager</source>
-        <translation>Video Manager</translation>
+        <translation>Video-Manager</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
@@ -199,7 +199,7 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>Dieser Befehl wird für alle Dateien verwendet, für deren Erweiterung nichts anderes festgelegt wurde. Sie können auch den Namen eines MythTV Plugins eingeben, z.B. &apos;Internal&apos;.</translation>
+        <translation>Dieser Befehl wird für alle Dateien verwendet, für deren Erweiterung nichts anderes festgelegt wurde. Sie können auch den Namen eines Wiedergabe-Plugins von MythTV eingeben, z.B. &apos;Internal&apos;.</translation>
     </message>
     <message>
         <source>Rows to display</source>
@@ -235,35 +235,35 @@
     </message>
     <message>
         <source>Video Browser browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateien im Video-Browser zeigen</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, so werden im Video-Browser-Menü alle relevanten Dateien im MythVideo-Verzeichnis und darunter, unabhängig davon ob sie eingelesen wurden oder nicht, angezeigt.</translation>
     </message>
     <message>
         <source>Video Gallery browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateien in der Videogalerie zeigen</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, so werden im Videogalerie-Menü alle relevanten Dateien im MythVideo-Verzeichnis und darunter, unabhängig davon ob sie eingelesen wurden oder nicht, angezeigt.</translation>
     </message>
     <message>
         <source>General Settings (1/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundeinstellungen (1/2)</translation>
     </message>
     <message>
         <source>General Settings (2/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundeinstellungen (2/2)</translation>
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoliste lädt Video-Metadaten</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei gleichzeitiger Benutzung mit &apos;Dateien anzeigen&apos; werden sämtliche bekannten Video-Metadaten aus der Datenbank geladen. Abschalten führt zu kürzeren Ladezeiten des Videolistenbaums</translation>
     </message>
 </context>
 <context>
@@ -286,7 +286,7 @@
     </message>
     <message>
         <source>Browsable:</source>
-        <translation>Listbar:</translation>
+        <translation>Auflistbar:</translation>
     </message>
     <message>
         <source>Runtime:</source>
@@ -454,11 +454,11 @@
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>Kindersicherungs</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Level</translation>
     </message>
     <message>
         <source>Year</source>
@@ -661,7 +661,7 @@
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Auflistbar</translation>
     </message>
     <message>
         <source>Remove Video</source>

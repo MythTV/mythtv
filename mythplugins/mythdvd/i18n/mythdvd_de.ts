@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine CD zu importieren.</translation>
+        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine DVD zu importieren.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -68,7 +68,7 @@ Sie haben keinen Befehl zum Abspielen von VCDs definiert.</translation>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation>Sie haben kein VCD Gerät eingerichtet.</translation>
+        <translation>Sie haben kein VCD-Gerät eingerichtet.</translation>
     </message>
     <message>
         <source>
@@ -86,7 +86,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Location of VCD device</source>
-        <translation>Pfad zum VCD Gerät</translation>
+        <translation>Pfad zum VCD-Gerät</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
@@ -94,7 +94,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Location of DVD device</source>
-        <translation>Pfad zum DVD Gerät</translation>
+        <translation>Pfad zum DVD-Gerät</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -102,27 +102,27 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation>DVD Abspielbefehl</translation>
+        <translation>DVD-Abspielbefehl</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation>Dieser Befehl sollte den DVD Spieler starten (z.B. mplayer, ogle usw.). &apos;%d&apos; wird dabei durch das DVD-Gerät ersetzt (z.B. /dev/dvd).</translation>
+        <translation>Dieser Befehl sollte den DVD-Spieler starten (z.B. mplayer, ogle usw.). &apos;%d&apos; wird dabei durch das DVD-Gerät ersetzt (z.B. /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation>VCD Abspielbefehl</translation>
+        <translation>VCD-Abspielbefehl</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation>Dieser Befehl sollte den VCD Spieler starten (z.B. mplayer, xine usw.). &apos;%d&apos; wird dabei durch das VCD-Gerät ersetzt (z.B. /dev/cdrom).</translation>
+        <translation>Dieser Befehl sollte den VCD-Spieler starten (z.B. mplayer, xine usw.). &apos;%d&apos; wird dabei durch das VCD-Gerät ersetzt (z.B. /dev/cdrom).</translation>
     </message>
     <message>
         <source>DVD Player Settings</source>
-        <translation>DVD Wiedergabe</translation>
+        <translation>DVD-Wiedergabe</translation>
     </message>
     <message>
         <source>VCD Player Settings</source>
-        <translation>VCD Wiedergabe</translation>
+        <translation>VCD-Wiedergabe</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -134,7 +134,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Title Playing Command</source>
-        <translation>Titel Abspielbefehl</translation>
+        <translation>Titel-Abspielbefehl</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
@@ -174,11 +174,11 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation>AC3 Audio erhalten</translation>
+        <translation>AC3-Audio erhalten</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation>Falls gesetzt, bleibt AC3 Audio (Dolby Digital) in umgewandelten Dateien erhalten.</translation>
+        <translation>Falls gesetzt, bleibt AC3-Audio (Dolby Digital) in umgewandelten Dateien erhalten.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
@@ -206,7 +206,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
-        <translation>DVD Import</translation>
+        <translation>DVD-Import</translation>
     </message>
     <message>
         <source>MTD Settings</source>
@@ -262,7 +262,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>On DVD insertion</source>
-        <translation>Beim DVD einlegen</translation>
+        <translation>Beim DVD-Einlegen</translation>
     </message>
     <message>
         <source>Do nothing</source>
@@ -282,15 +282,15 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Display mythdvd menu</source>
-        <translation>MythDVD Menü anzeigen</translation>
+        <translation>MythDVD-Menü anzeigen</translation>
     </message>
     <message>
         <source>ISO copy of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO-Kopie von %1</translation>
     </message>
     <message>
         <source>Waiting for access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Warten auf Zugriff auf die DVD</translation>
     </message>
 </context>
 <context>
@@ -376,7 +376,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO-Image</translation>
     </message>
 </context>
 </TS>

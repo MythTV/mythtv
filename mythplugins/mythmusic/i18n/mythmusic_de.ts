@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Kompilations-Künstler: </translation>
     </message>
 </context>
 <context>
@@ -154,7 +154,7 @@
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation>Sind sie sicher, daß Sie die Änderungen in der Datei speichern wollen?</translation>
+        <translation>Sind Sie sicher, daß Sie die Änderungen in der Datei speichern wollen?</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -162,7 +162,7 @@
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Künstler für die Zusammenstellung wählen</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
@@ -237,7 +237,7 @@
     </message>
     <message>
         <source>playlist root</source>
-        <translation>Playlist Start</translation>
+        <translation>Playlist-Start</translation>
     </message>
     <message>
         <source>Playing stream.</source>
@@ -305,47 +305,47 @@
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche</translation>
     </message>
     <message>
         <source>From CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Von CD</translation>
     </message>
     <message>
         <source>Change Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter ändern</translation>
     </message>
     <message>
         <source>Update Playlist Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlist-Optionen aktualisieren</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersetzen</translation>
     </message>
     <message>
         <source>Insert after current track</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach dem aktuellen Titel einfügen</translation>
     </message>
     <message>
         <source>Append to end</source>
-        <translation type="unfinished"></translation>
+        <translation>Am Ende anhängen</translation>
     </message>
     <message>
         <source>Continue playing current track</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuellen Titel weiterspielen</translation>
     </message>
     <message>
         <source>Play first track</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersten Titel abspielen</translation>
     </message>
     <message>
         <source>Play first new track</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersten neuen Titel abspielen</translation>
     </message>
     <message>
         <source>Remove Duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation>Duplikate entfernen</translation>
     </message>
 </context>
 <context>
@@ -412,7 +412,7 @@
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Dieses Skript wird, falls vorhanden, nach dem importieren einer CD ausgeführt.</translation>
+        <translation>Dieses Skript wird, falls vorhanden, nach dem Importieren einer CD ausgeführt.</translation>
     </message>
     <message>
         <source>Filename Format</source>
@@ -508,7 +508,7 @@
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation>Falls gesetzt, wird die Laufwerksschublade nach dem importieren geöffnet.</translation>
+        <translation>Falls gesetzt, wird die Laufwerksschublade nach dem Importieren geöffnet.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation>Import Qualität</translation>
+        <translation>Import-Qualität</translation>
     </message>
     <message>
         <source>Low</source>
@@ -756,7 +756,7 @@
     </message>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation>Visualisierung erfordert die FFT Bibliothek</translation>
+        <translation>Visualisierung benötigt die FFT-Bibliothek</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
@@ -780,7 +780,7 @@
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation>CDs brennen erlauben</translation>
+        <translation>CD-Brennen erlauben</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
@@ -788,7 +788,7 @@
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation>CD-Brenner Gerät</translation>
+        <translation>CD-Brenner</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -804,11 +804,11 @@
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation>Standard CD Kapazität.</translation>
+        <translation>Standard CD-Kapazität.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation>Erlaube Verzeichnisse für MP3 CDs</translation>
+        <translation>Erlaube Verzeichnisse für MP3-CDs</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
@@ -824,7 +824,7 @@
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation>CD-RW Löschen Methode</translation>
+        <translation>Löschmethode für CD-RWs</translation>
     </message>
     <message>
         <source>Fast</source>
@@ -836,7 +836,7 @@
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation>Löschmethode. Bei &apos;Schnell&apos; dauert das löschen 1 Minute, mit &apos;Vollständig&apos; bis zu 20 Minuten.</translation>
+        <translation>Löschmethode. Bei &apos;Schnell&apos; dauert das Löschen 1 Minute, mit &apos;Vollständig&apos; bis zu 20 Minuten.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
@@ -848,7 +848,7 @@
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation>Erzeuge ein CD Dateisystem</translation>
+        <translation>Erzeuge CD-Dateisystem</translation>
     </message>
     <message>
         <source>Burning CD</source>
@@ -860,43 +860,43 @@
     </message>
     <message>
         <source>Track %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reihenfolge in der Ihre Musik sortiert wird. Mögliche Werte sind eine durch Leerzeichen getrennte Liste von genre, splitartist, splitartist1, artist, album und title ODER das Schlüsselwort &quot;directory&quot;. Damit enstpricht der importierte Musikbaum dem Dateisystem.</translation>
     </message>
     <message>
         <source>Automatically play CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>CDs automatisch abspielen</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch neue CDs in die Playlist hinzufügen und abspielen.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>SCSI- oder IDE-Brenner auswählen.</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchsuche Musik-Dateien</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Erneuere die Musik-Struktur</translation>
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur neue Titel importieren.</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim CD-Import die Datenbank auf Duplikate überprüfen.</translation>
     </message>
     <message>
         <source>Loading Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Lade Musik</translation>
     </message>
 </context>
 <context>
@@ -973,11 +973,11 @@
     </message>
     <message>
         <source>Quality: </source>
-        <translation type="unfinished"></translation>
+        <translation>Qualität: </translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished"></translation>
+        <translation>Importiere </translation>
     </message>
 </context>
 <context>
@@ -1000,7 +1000,7 @@
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Künstler für die Zusammenstellung wählen</translation>
     </message>
 </context>
 <context>

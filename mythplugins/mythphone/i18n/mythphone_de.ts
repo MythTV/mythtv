@@ -31,7 +31,7 @@
     </message>
     <message>
         <source>Delete this Voicemail</source>
-        <translation>Sprachnachicht löschen</translation>
+        <translation>Sprachnachricht löschen</translation>
     </message>
     <message>
         <source>Delete all Voicemails</source>
@@ -39,11 +39,11 @@
     </message>
     <message>
         <source>Place Videocall Now</source>
-        <translation>Starte Videoruf</translation>
+        <translation>Starte Videoanruf</translation>
     </message>
     <message>
         <source>Place Voice-Only Call Now</source>
-        <translation>Starte Sprachruf</translation>
+        <translation>Starte Sprachanruf</translation>
     </message>
     <message>
         <source>Switch from digits to URL input</source>
@@ -99,11 +99,11 @@
     </message>
     <message>
         <source>Trying to Contact Remote Party</source>
-        <translation>Versuche die Gegenstelle zu erreichen</translation>
+        <translation>Versuche, die Gegenstelle zu erreichen</translation>
     </message>
     <message>
         <source>Audio and Video Looped to </source>
-        <translation type="unfinished"></translation>
+        <translation>Audio und Video durchschleifen zu </translation>
     </message>
     <message>
         <source>Incoming Call</source>
@@ -115,7 +115,7 @@
     </message>
     <message>
         <source>Call History</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorangegangene Anrufe</translation>
     </message>
     <message>
         <source>Voicemail</source>
@@ -171,15 +171,15 @@
     </message>
     <message>
         <source>You Called </source>
-        <translation type="unfinished"></translation>
+        <translation>Sie riefen an </translation>
     </message>
     <message>
         <source>They Called </source>
-        <translation type="unfinished"></translation>
+        <translation>Sie wurden angerufen </translation>
     </message>
     <message>
         <source>You missed their call </source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben den Anruf verpasst </translation>
     </message>
     <message>
         <source>Today</source>
@@ -195,47 +195,47 @@
     </message>
     <message>
         <source> for %d min</source>
-        <translation type="unfinished"></translation>
+        <translation> für %d Min.</translation>
     </message>
     <message>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke</translation>
     </message>
     <message>
         <source>Mic Volume (not impl.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mikrofon-Lautstärke (nicht implementiert)</translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Helligkeit</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast</translation>
     </message>
     <message>
         <source>Colour</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbe</translation>
     </message>
     <message>
         <source>Transmit Video Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildgröße der Videoübertragung</translation>
     </message>
     <message>
         <source>Transmit Video FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholrate der Videoübertragung</translation>
     </message>
     <message>
         <source>Up/Down - Change       Left/Right - Adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfeil-Auf/-Ab - Ändern       Pfeil-Links/-Rechts - Anpassen</translation>
     </message>
     <message>
         <source>Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen</translation>
     </message>
     <message>
         <source>OK</source>
@@ -247,59 +247,59 @@
     </message>
     <message>
         <source>Registered to </source>
-        <translation type="unfinished"></translation>
+        <translation>Registriert bei </translation>
     </message>
     <message>
         <source> as </source>
-        <translation type="unfinished"></translation>
+        <translation> als </translation>
     </message>
     <message>
         <source>Connecting</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinde...</translation>
     </message>
     <message>
         <source>First Name (Optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorname (optional)</translation>
     </message>
     <message>
         <source>Surname (Optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachname (optional)</translation>
     </message>
     <message>
         <source>Speed Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurzwahl</translation>
     </message>
     <message>
         <source>Client is on My Home LAN</source>
-        <translation type="unfinished"></translation>
+        <translation>Gegenstelle befindet sich in meinem LAN</translation>
     </message>
     <message>
         <source> Videocall</source>
-        <translation type="unfinished"></translation>
+        <translation> Videoanruf</translation>
     </message>
     <message>
         <source> Voice-Only</source>
-        <translation type="unfinished"></translation>
+        <translation> Nur-Sprache</translation>
     </message>
     <message>
         <source>Today </source>
-        <translation type="unfinished"></translation>
+        <translation>Heute </translation>
     </message>
     <message>
         <source>Yesterday </source>
-        <translation type="unfinished"></translation>
+        <translation>Gestern </translation>
     </message>
     <message>
         <source>Packets In/Out/Lost/Late:             </source>
-        <translation type="unfinished"></translation>
+        <translation>Pakete (Eingehend/Ausgehend/Verloren/Verspätet): </translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>Resolution In/Out: </source>
-        <translation type="unfinished"></translation>
+        <translation>Auflösung (Eingehend/Ausgehend): </translation>
     </message>
     <message>
         <source>Packets In/Lost/Disc/Late: </source>
@@ -307,7 +307,7 @@
     </message>
     <message>
         <source>Packets Out/Dropped: </source>
-        <translation type="unfinished"></translation>
+        <translation>Pakete (Ausgehend/Verworfen): </translation>
     </message>
     <message>
         <source>Video Frames In/Out/Disc: </source>
@@ -327,7 +327,7 @@
     </message>
     <message>
         <source>Audio Codec</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio-Codec</translation>
     </message>
     <message>
         <source>Playout Delay Min/Avg/Max:            </source>
@@ -354,7 +354,7 @@
     </message>
     <message>
         <source>Select the device path your webcam is using. If you have a capture card it may be using /dev/video so try dev/video1</source>
-        <translation>Gerät auswählen, den die Webcam nutzt. Falls schon ein anderes Aufnahmegerät /dev/video benutzt, bitte /dev/video1 versuchen</translation>
+        <translation>Wählen Sie die Gerätedatei für Ihre Webcam. Falls schon ein anderes Aufnahmegerät /dev/video benutzt, bitte /dev/video1 versuchen.</translation>
     </message>
     <message>
         <source>Transmit Resolution</source>
@@ -430,19 +430,19 @@
     </message>
     <message>
         <source>The URL to retrieve a VXML script which can be used to prompt for leaving a voicemail etc. Leave blank if you have no HTTP server and a default Voicemail script will be used.</source>
-        <translation>Die Adresse eines VXML-Skripts, das benutzt werden soll zum Hinterlassen einer Sprachnachricht usw. Leer lassen, wenn kein HTTP-Server vorhanden ist und ein standard Sprachnachricht-Skript benutzt werden soll.</translation>
+        <translation>Die URL eines VXML-Skripts, das für Sprachnachrichten usw. benutzt werden soll. Falls SIe keinen HTTP-Server betreiben wird ein Standardskript verwendet.</translation>
     </message>
     <message>
         <source>Default Voicemail Prompt</source>
-        <translation>Standard Ansagetext</translation>
+        <translation>Standard-Ansagetext</translation>
     </message>
     <message>
         <source>I am not at home, please leave a message after the tone</source>
-        <translation>Ich bin derzeit nicht erreichbar, bitte eine Nachricht nach dem Piepston hinterlassen</translation>
+        <translation>Ich bin derzeit nicht erreichbar, bitte hinterlassen Sie nach dem Piepston eine Nachricht</translation>
     </message>
     <message>
         <source>Either a text message to be read by the TTS engine or the filename of a .wav file to be played to callers. Only used where the above setting is blank.</source>
-        <translation>Entweder eine Textnachricht, die vorgelesen werden soll oder der Dateiname einer WAV-Datei, die den Anrufern vorgespielt wird. Wird nur benötigt, falls der obere Wert leer ist. </translation>
+        <translation>Entweder eine Textnachricht, die von der TTS Software vorgelesen werden soll oder der Dateiname einer WAV-Datei, die den Anrufern vorgespielt wird. Wird nur benötigt, falls der vorherige Eintrag leer ist.</translation>
     </message>
     <message>
         <source>Text to Speech Voice</source>
@@ -454,11 +454,11 @@
     </message>
     <message>
         <source>Allows you to register with services such as Free World Dialup; or with applications like Asterisk. Restart mythfrontend if you change this.</source>
-        <translation>Erlaubt das Anmelden bei einem SIP-Service wie Free World Dial oder bei Programmen wie Astrisk. Bei Änderungen wird ein Neustart von Mythfrontend benötigt.</translation>
+        <translation>Erlaubt das Anmelden bei einem SIP-Service wie Free World Dial oder bei Programmen wie Asterisk. Bei Änderungen wird ein Neustart von Mythfrontend notwendig.</translation>
     </message>
     <message>
         <source>Name of the Proxy, such as fwd.pulver.com for Free World Dialup.</source>
-        <translation>Name des SIP-Proxys, zB fwd.pulver.com bei Free World Dialup.</translation>
+        <translation>Name des SIP-Proxys, z.B. fwd.pulver.com bei Free World Dialup.</translation>
     </message>
     <message>
         <source>SIP Local Port</source>
@@ -470,7 +470,7 @@
     </message>
     <message>
         <source>The port on this machine to use. You may need to make these different for each Mythfrontend and setup your firewall to let this port through.</source>
-        <translation>Port, der auf diesem Rechner benutzt werden soll. Dieser Port sollte auf jedem Frontend unterschiedlich sein und in der Firewall freigeschaltet.</translation>
+        <translation>Port, der auf diesem Rechner benutzt werden soll. Dieser Port sollte auf jedem Frontend unterschiedlich und in der Firewall freigeschaltet sein.</translation>
     </message>
     <message>
         <source>Microphone device</source>
@@ -506,7 +506,7 @@
     </message>
     <message>
         <source>Enter the name of the network to bind to e.g. eth0</source>
-        <translation>Bezeichnung des Netzwerks eingeben  z.B.: eth0</translation>
+        <translation>Bezeichnung des Netzwerkgeräts eingeben (z.B. eth0)</translation>
     </message>
     <message>
         <source>NAT Traversal Method</source>
@@ -518,31 +518,31 @@
     </message>
     <message>
         <source>http://checkip.dyndns.org</source>
-        <translation>http://meineip.dyndns.org</translation>
+        <translation>http://checkip.dyndns.org</translation>
     </message>
     <message>
         <source>If you selected MANUAL above, then enter your Public IP Address here. If you selected WEB Server above then enter your web server URL here.</source>
-        <translation>Eine öffentliche IP-Adresse eingeben, wenn oben Manual ausgewählt wurde. Wenn Web-Server ausgewählt wurde, die Adresse des Web-Servers eingeben.</translation>
+        <translation>Eine öffentliche IP-Adresse eingeben, wenn zuvor &apos;Manual&apos; ausgewählt wurde. Die Adresse des Web-Servers eingeben, falls zuvor &apos;Web-Server&apos; ausgewählt wurde.</translation>
     </message>
     <message>
         <source>Audio RTP Port</source>
-        <translation>Audio RTP-Port</translation>
+        <translation>Audio-RTP Port</translation>
     </message>
     <message>
         <source>Enter the port to use for Audio RTP; an even number between 1024 and 32767. If you have a firewall you should enable UDP through the firewall on this port.</source>
-        <translation>Port eingeben, der für Audio-RTP benutzt werden soll; eine gerade Zahl zwischen 1024 und 32767. Bei einer vorhandenen Firewall sollte UDP auf diesem Port freigeschaltet werden.</translation>
+        <translation>Port eingeben, der für Audio-RTP benutzt werden soll; eine gerade Zahl zwischen 1024 und 32767. Falls eine Firewall vorhanden ist, sollte dort für diesen Port UDP freigeschaltet werden.</translation>
     </message>
     <message>
         <source>Video RTP Port</source>
-        <translation>Video RTP-Port</translation>
+        <translation>Video-RTP Port</translation>
     </message>
     <message>
         <source>Enter the port to use for Video RTP; an even number between 1024 and 32767. If you have a firewall you should enable UDP through the firewall on this port.</source>
-        <translation>Port eingeben, der für Video-RTP benutzt werden soll; eine gerade Zahl zwischen 1024 und 32767. Bei einer vorhandenen Firewall sollte UDP auf diesem Port freigeschaltet werden.</translation>
+        <translation>Port eingeben, der für Video-RTP benutzt werden soll; eine gerade Zahl zwischen 1024 und 32767. Falls eine Firewall vorhanden ist, sollte dort für diesen Port UDP freigeschaltet werden.</translation>
     </message>
     <message>
         <source>Auto-Answer</source>
-        <translation>Auto-Antwort</translation>
+        <translation>Autom. Antwort</translation>
     </message>
     <message>
         <source>When the MythFrontend is in the MythPhone plugin, setting this automatically answers all incoming calls. There is no security yet.</source>
@@ -550,7 +550,7 @@
     </message>
     <message>
         <source>SIP Proxy Settings</source>
-        <translation>SIP Proxy-Einstellungen</translation>
+        <translation>SIP-Proxy Einstellungen</translation>
     </message>
     <message>
         <source>SIP Settings</source>
@@ -578,7 +578,7 @@
     </message>
     <message>
         <source>Your username for authentication with the SIP Server. For FWD this is your FWD number.</source>
-        <translation>Benutzername für die Authentifizierung beim SIP-Server. Bei Free World Dial ist es z.B. die FWD-Nummer.</translation>
+        <translation>Benutzername für die Authentifizierung am SIP-Server. Bei Free World Dial ist es z.B. die FWD-Nummer.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -586,11 +586,11 @@
     </message>
     <message>
         <source>Your password for authentication with the SIP Server.</source>
-        <translation>Ihr Passwort für die Authentifizierung beim SIP-Server.</translation>
+        <translation>Ihr Passwort für die Authentifizierung am SIP-Server.</translation>
     </message>
     <message>
         <source>Method to use for NAT traversal; needs a Frontend restart after changing. Choose NONE if you have a public IP address, choose MANUAL if your ISP always gives you the same public address and manually enter this address below. Choose Web Server if you have a dynamic NAT address and enter a web address like http://checkip.dyndns.org below. </source>
-        <translation>Methode zum NAT-Überqueren; Änderungen benötigen einen Frontendneustart. None wählen, wenn eine öffentliche IP-Adresse benutzt wird, Manual falls der ISP immer die gleiche öffentliche Adresse vergibt (unten eingeben). Web Server wählen, falls eine dynamische NAT-Adresse benutzt wird; dabei eine Adresse eingeben wie z.B.: http://meineip.dyndns.org.</translation>
+        <translation>Methode zum NAT-Überqueren; Änderungen benötigen einen Neustart des Frontends. &apos;None&apos; wählen, wenn eine öffentliche IP-Adresse benutzt wird, &apos;Manual&apos; falls der ISP immer die gleiche öffentliche Adresse vergibt (unten eingeben). &apos;Web Server&apos; wählen, falls eine dynamische NAT-Adresse benutzt wird; dabei eine Adresse eingeben wie z.B.: http://checkip.dyndns.org.</translation>
     </message>
     <message>
         <source>Speed Dials</source>
@@ -610,23 +610,23 @@
     </message>
     <message>
         <source>A directory entry already exists with this URL.</source>
-        <translation type="unfinished">Es existiert bereits ein Eintrag mit dieser URL.</translation>
+        <translation>Es existiert bereits ein Eintrag mit dieser URL.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Max Transmit Bandwidth Kbps</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. Übertragungsbandbreite (Kbps)</translation>
     </message>
     <message>
         <source>Enter the upspeed bandwidth of your local WAN in Kbps. </source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie die Upload-Bandbreite ihrer Internetverbindung in Kbps an.</translation>
     </message>
     <message>
         <source>Me</source>
-        <translation type="unfinished"></translation>
+        <translation>Ich</translation>
     </message>
     <message>
         <source>Jitter Buffer (Audio Call)</source>
@@ -646,11 +646,11 @@
     </message>
     <message>
         <source>IP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IP-Einstellungen</translation>
     </message>
     <message>
         <source>AUDIO Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio-Einstellungen</translation>
     </message>
 </context>
 </TS>

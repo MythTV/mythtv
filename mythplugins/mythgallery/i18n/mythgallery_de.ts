@@ -102,7 +102,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
@@ -181,31 +181,31 @@
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation>Dieser Befehl wird ausgeführt, wenn ein Film ausgewählt wird</translation>
+        <translation>Dieser Befehl wird ausgeführt, wenn ein Film ausgewählt wird.</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorschaubilder im Bilderverzeichnis speichern</translation>
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Vorschaubilder im &apos;.thumbcache&apos;-Verzeichnis innerhalb des o.g. Pfades gespeichert. Falls nicht gesetzt, werden sie in Ihrem home-Verzeichnis gespeichert.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Rekursiv in Verzeichnisse absteigen</translation>
     </message>
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anklicken damit in der Diashow auch Bilder in Unterverzeichnissen angezeigt werden.</translation>
     </message>
     <message>
         <source>Overlay caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel einblenden</translation>
     </message>
     <message>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dauer in Sekunden zum Anzeigen des Titels auf dem Vollbild-Photo.</translation>
     </message>
 </context>
 <context>

@@ -20,7 +20,7 @@
       <type>GAME_SETTINGS_GENERAL</type>
       <text>Game Players</text>
       <text lang="IT">Impostazioni generali</text>
-      <text lang="ES">Opciones Generales</text>
+      <text lang="ES">Opciones Reproductores</text>
       <text lang="CA">Opcions Generals</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Spil Systemer</text>
@@ -41,6 +41,7 @@
       <text lang="SI">Iskanje iger</text>
       <text lang="DK">Skan efter spil</text>
       <text lang="FI">Etsi Pelejä</text>
+      <text lang="ES">Buscar Juegos</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
 
@@ -48,7 +49,7 @@
       <type>GAME_SETTINGS_GENERAL</type>
       <text>Clear Game Data</text>
       <text lang="IT">Impostazioni generali</text>
-      <text lang="ES">Opciones Generales</text>
+      <text lang="ES">Borrar Datos</text>
       <text lang="CA">Opcions Generals</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Slet spil data</text>

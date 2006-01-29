@@ -3,7 +3,7 @@
    <button>
      <type>VIDEO_BROWSER</type>
      <text>Browse Videos</text>
-     <text lang="ES">Ver vídeos</text>
+     <text lang="ES">Ver Videos</text>
      <text lang="CA">Veure vídeos</text>
      <text lang="DE">Videos ansehen</text>
      <text lang="DK">Gennemse film</text>
@@ -20,7 +20,7 @@
   <button>
      <type>VIDEO_LIST</type>
      <text>Video List</text>
-     <text lang="ES">Listar vídeos</text>
+     <text lang="ES">Listar Videos</text>
      <text lang="CA">Llistar vídeos</text>
      <text lang="DK">Film oversigt</text>
      <text lang="DE">Liste</text>
@@ -44,13 +44,14 @@
      <text lang="DK">Film Galleri</text>
      <text lang="SV">Filmgalleri</text>
      <text lang="PT">Galeria de Filmes</text>
+     <text lang="ES">Galería</text>
      <action>GALLERY</action>
    </button>
 
    <button>
      <type>VIDEO_MANAGER</type>
      <text>Video Manager</text>
-     <text lang="ES">Gestionar vídeos</text>
+     <text lang="ES">Gestionar Videos</text>
      <text lang="CA">Gestionar vídeos</text>
      <text lang="DK">Film opsætning</text>
      <text lang="DE">Video-Manager</text>
