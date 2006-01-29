@@ -7532,6 +7532,22 @@ Myth will now exit.</source>
         <source>Spain</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable Network Remote Control interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for controlling mythfrontend over the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network Remote Control Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8312,6 +8328,26 @@ Ikke flere oplysninger</translation>
         <source>BE %1</source>
         <comment>Bit Errors</comment>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 16X</source>
+        <translation type="unfinished">16X hastighed</translation>
+    </message>
+    <message>
+        <source>Speed 8X</source>
+        <translation type="unfinished">8X hastighed</translation>
+    </message>
+    <message>
+        <source>Speed 4X</source>
+        <translation type="unfinished">4X hastighed</translation>
+    </message>
+    <message>
+        <source>Speed 1/2X</source>
+        <translation type="unfinished">1/2X hastighed</translation>
+    </message>
+    <message>
+        <source>Speed 1/4X</source>
+        <translation type="unfinished">1/4X hastighed</translation>
     </message>
 </context>
 <context>

@@ -58,9 +58,11 @@ Localization support, italian Translation:
 Spanish and Catalan Translations, Photo-Theme, Manual schedule of recordings, 
 channel preset support & misc:
     Ramon Roca <ramon dot roca at xcombo dot com>
+Spanish Translation:
+    Carlos Fdez. Manteiga <churly at gmail.com>
 Dynamic MMX/3DNow in linearblend filter, genericbutton UI extensions:
     Simon Kenyon <simon@koala.ie>
 DVB Code rewrite, fixes for MPEG2 playback, Channel Editor
     Kenneth Aafloy <ke-aa at frisurf.no>
 G.A.N.T. theme, re-design of backend status page, Swedish translation
-    Oscar Carlsson <oscar.carlsson at home.se>
+    Oscar Carlsson <oscar at minioffroad.se>

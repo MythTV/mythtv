@@ -195,6 +195,7 @@
      <text lang="ET">Veebi seaded</text>
      <text lang="DK">Web Indstillinger</text>
      <text lang="PT">Config. Navegação Web</text>
+     <text lang="ES">Configurar Web</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -208,6 +209,7 @@
       <text lang="SV">Recept</text>
       <text lang="DK">Opskriftsindstillinger</text>
       <text lang="PT">Configurar Receitas</text>
+      <text lang="ES">Configurar Recetas</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -221,6 +223,7 @@
       <text lang="SV">Telefon</text>
       <text lang="DK">Telefon Indstillinger</text>
       <text lang="PT">Configurar Telefone</text>
+      <text lang="ES">Configurar Teléfono</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -259,6 +262,7 @@
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
+     <text lang="ES">MythFlix</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -267,6 +271,7 @@
        <type>SETTINGS_BURN</type>
        <text>Burn DVD Settings</text>
        <text lang="PT">Configurar Gravação de DVDs</text>
+       <text lang="ES">Configurar Grabación DVD</text>
        <action>CONFIGPLUGIN mythburn</action>
        <depends>mythburn</depends>
    </button>

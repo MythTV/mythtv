@@ -14,6 +14,7 @@
       <text lang="ET">Pealkirjad</text>
       <text lang="DK">Titel</text>
       <text lang="PT">Por Títulos</text>
+      <text lang="ES">Títulos</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -31,6 +32,7 @@
       <text lang="ET">Võtmesõnad</text>
       <text lang="DK">Søgeord</text>
       <text lang="PT">Por Palavras-Chave</text>
+      <text lang="ES">Palabras</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -47,6 +49,7 @@
       <text lang="ET">Inimesed</text>
       <text lang="DK">Person</text>
       <text lang="PT">Por Pessoas</text>
+      <text lang="ES">Personas</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -63,6 +66,7 @@
       <text lang="ET">Muud valikud</text>
       <text lang="DK">Supersøgning</text>
       <text lang="PT">Pesquisa Avançada</text>
+      <text lang="ES">Avanzada</text>
       <alttext lang="DE">Erweitert</alttext>
       <alttext lang="ET">Muud</alttext>
       <alttext lang="PT">Avançada</alttext>

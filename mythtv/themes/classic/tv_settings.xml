@@ -21,7 +21,7 @@
       <type>TV_SETTINGS_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
-      <text lang="ES">Guía de programas</text>
+      <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille horaire</text>
@@ -61,6 +61,7 @@
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="PT">Grupos de Visualização</text>
       <text lang="ET">Esitlusgrupid</text>
+      <text lang="ES">Grupos Reproducción</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -97,6 +98,7 @@
       <text lang="SI">Snemalne prioritete</text>
       <text lang="ET">Salvestusprioriteedid</text>
       <text lang="DK">Optagelsesprioriteter</text>
+      <text lang="ES">Prioridades</text>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="PT">Prioridades</alttext>
       <action>MENU recpriorities_settings.xml</action>

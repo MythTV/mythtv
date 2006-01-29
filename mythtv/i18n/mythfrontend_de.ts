@@ -788,7 +788,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppennamen eingeben oder nach &apos;SELECT&apos; den Text über die Bildschirmtastatur eingeben.</translation>
     </message>
     <message>
         <source>(Create new group)</source>
@@ -1051,7 +1051,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation>Es sind %1 Einträge in der Liste.</translation>
+        <translation>Es gibt %1 Einträge in der Liste.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
@@ -1163,11 +1163,11 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>item</source>
-        <translation>Element</translation>
+        <translation>Eintrag</translation>
     </message>
     <message>
         <source>items</source>
-        <translation>Elemente</translation>
+        <translation>Einträge</translation>
     </message>
     <message>
         <source>Groups</source>
@@ -2589,7 +2589,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Enable AC3 to SPDIF passthrough</source>
-        <translation>AC3 nach SPDIF durchschleifen</translation>
+        <translation>AC3-Ton nach SPDIF durchschleifen</translation>
     </message>
     <message>
         <source>PIP Video Location</source>
@@ -4290,7 +4290,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Enable sending AC3 audio directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
-        <translation>AC3 Audio am SPDIF Ausgang der Soundkarte bereitstellen. Dies funktioniert nur falls eine AC3 Tonspur verfügbar ist (wie beim Digitalfernsehen). Das &apos;Audio Ausgabegerät&apos; muss dazu entsprechend konfiguriert sein.</translation>
+        <translation>AC3-Audio am SPDIF Ausgang der Soundkarte bereitstellen. Dies funktioniert nur falls eine AC3-Tonspur verfügbar ist (wie beim Digitalfernsehen). Das &apos;Audio Ausgabegerät&apos; muss dazu entsprechend konfiguriert sein.</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).</source>
@@ -7375,11 +7375,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Cable box model</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabelbox Modell</translation>
     </message>
     <message>
         <source>Connection Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindungstyp</translation>
     </message>
     <message>
         <source>IEEE-1394 Port</source>
@@ -7387,7 +7387,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Knoten</translation>
     </message>
     <message>
         <source>Speed</source>
@@ -7639,7 +7639,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>PIP</source>
-        <translation>BiB</translation>
+        <translation>PiP</translation>
     </message>
     <message>
         <source>Schedule Information</source>
@@ -7775,7 +7775,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppennamen eingeben oder nach &apos;SELECT&apos; den Text über die Bildschirmtastatur eingeben.</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
@@ -7787,23 +7787,23 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Enable DTS to SPDIF passthrough</source>
-        <translation type="unfinished"></translation>
+        <translation>DTS-Ton nach SPDIF durchschleifen</translation>
     </message>
     <message>
         <source>Enable sending DTS audio directly to your sound card&apos;s SPDIF output, on sources which contain DTS soundtracks (usually DVDs).  Requires that the audio output device be set to something suitable.</source>
-        <translation type="unfinished"></translation>
+        <translation>DTS-Audio am SPDIF Ausgang der Soundkarte bereitstellen. Dies funktioniert nur falls eine DTS Tonspur verfügbar ist (wie bei DVDs). Das &apos;Audio Ausgabegerät&apos; muss dazu entsprechend konfiguriert sein.</translation>
     </message>
     <message>
         <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;LiveTV&apos; Aufnahmen beim &apos;Alle Sendungen&apos; Filter zeigen</translation>
     </message>
     <message>
         <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls diese Option deaktiviert ist, sind LiveTV Aufnahmen nur in der &apos;LiveTV&apos; Aufnahmegruppe sichtbar.</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Methode nach der bestimmt wird welche Aufnahme zuerst gelöscht wird. LiveTV Aufnahmen werden immer vor normalen Aufnahmen gelöscht.</translation>
     </message>
     <message>
         <source>LiveTV recordings Max Age</source>
@@ -7815,15 +7815,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Beispiele gelten für das Heute.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Beispiele gelten für Morgen.</translation>
     </message>
     <message>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr bevorzugtes Zeitformat. Einträge mit &quot;am&quot; bzw &quot;pm&quot; zeigen die Zeit mit 12 Stunden Teilung an.</translation>
     </message>
     <message>
         <source>Run mythfilldatabase at time suggested by the grabber.</source>
@@ -7831,7 +7831,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaubt es einem DataDirect-Anbieter den nächsten Termin für den Download der EPG-Daten vorzugeben, um die Belastung seiner Server zu verringern.</translation>
     </message>
     <message>
         <source>AutoExpire List</source>
@@ -7843,7 +7843,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Suggested Next: </source>
-        <translation type="unfinished"></translation>
+        <translation>Nächster Download: </translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
@@ -7871,15 +7871,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt ein Zeitfenster in dem das Master Backend läuft</translation>
     </message>
     <message>
         <source>Shutdown with Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit dem Master Backend herunterfahren</translation>
     </message>
     <message>
         <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
-        <translation type="unfinished"></translation>
+        <translation>MythWelcome wird diesen Rechner zusammen mit dem Master Backend herunterfahren. Dies sollte nur bei reinen Frontend-Rechnern aktiviert sein.</translation>
     </message>
     <message>
         <source>Command to run to start the Frontend</source>
@@ -7891,7 +7891,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>MythShutdown/MythWelcome Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythShutdown/MythWelcome Einstellungen</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
@@ -7915,6 +7915,22 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Spain</source>
+        <translation>Spanien</translation>
+    </message>
+    <message>
+        <source>Enable Network Remote Control interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for controlling mythfrontend over the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network Remote Control Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7957,7 +7973,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Locked</translation>
     </message>
     <message>
         <source>No Lock</source>
@@ -8118,7 +8134,7 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>i%1 davon sind LiveTV und belegen %2</translation>
     </message>
 </context>
 <context>
@@ -8695,7 +8711,27 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished">Kein Lock</translation>
+        <translation>Kein Lock</translation>
+    </message>
+    <message>
+        <source>Speed 16X</source>
+        <translation>Zeitraffer 16x</translation>
+    </message>
+    <message>
+        <source>Speed 8X</source>
+        <translation>Zeitraffer 8x</translation>
+    </message>
+    <message>
+        <source>Speed 4X</source>
+        <translation>Zeitraffer 4x</translation>
+    </message>
+    <message>
+        <source>Speed 1/2X</source>
+        <translation>Zeitlupe 1/2x</translation>
+    </message>
+    <message>
+        <source>Speed 1/4X</source>
+        <translation>Zeitlupe 1/4x</translation>
     </message>
 </context>
 <context>
@@ -9002,7 +9038,8 @@ Keine weiteren Informationen</translation>
     <message>
         <source>Tuner %1 is recording:
 </source>
-        <translation>Tuner %1 nimmt auf:</translation>
+        <translation>Tuner %1 nimmt auf:
+</translation>
     </message>
     <message>
         <source>Tuner %1 is not recording</source>
@@ -9042,15 +9079,15 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>MythTV is locked by a user.</source>
-        <translation>MythTV is von einem Benutzer gesperrt.</translation>
+        <translation>MythTV ist von einem Benutzer gesperrt.</translation>
     </message>
     <message>
         <source>MythTV is in a daily wakeup/shutdown period.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV ist in einem täglichen Start/Stop Intervall.</translation>
     </message>
     <message>
         <source>MythTV is about to start a wakeup/shutdown period.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV wird bald ein Start/Stop Intervall beginnen.</translation>
     </message>
     <message>
         <source>MythTV is idle.</source>
@@ -9086,15 +9123,15 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is currently recording</source>
-        <translation>Kein Herunterfahren möglich, da MythTV im Moment aufnimmt</translation>
+        <translation>Kein Herunterfahren möglich, da MythTV im Moment aufnimmt.</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start recording</source>
-        <translation>Kein Herunterfahren möglich, da MythTV bald eine Aufnahme beginnt</translation>
+        <translation>Kein Herunterfahren möglich, da MythTV bald eine Aufnahme beginnt.</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Herunterfahren möglich, da MythTV bald ein Start/Stop Intervall beginnt.</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>

@@ -835,11 +835,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Commercials are flagged</source>
-        <translation>Los anuncios se marcan</translation>
+        <translation>Anuncios marcados</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
-        <translation>Se usa recorte</translation>
+        <translation>Lista de cortes</translation>
     </message>
     <message>
         <source>The program is able to auto-expire</source>
@@ -1748,7 +1748,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation>Establece cuántos segundos se saltra atrás al retroceder.</translation>
+        <translation>Establece cuantos segundos se saltara atrás al retroceder.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
@@ -1776,7 +1776,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
-        <translation>Salto automático de anuncios</translation>
+        <translation>Salto Automático de Anuncios</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
@@ -4339,7 +4339,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
-        <translation>MythTV puede comprobar la potencia de la señal cuando sintonize un canal HDTV o otro digital terrestre. Este valor es el número de milisegundos que MythTV espera a encontrar una señal aceptable.</translation>
+        <translation>MythTV puede comprobar la potencia de la señal cuando sintonize un canal HDTV u otro digital terrestre. Este valor es el número de milisegundos que MythTV espera a encontrar una señal aceptable.</translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
@@ -4371,7 +4371,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation>Si está activado, la GEP inicialmente mostrará sólo los canales favoritos. Pulsar &quot;4&quot; cambiará entre los favoritos y todos los canales.</translation>
+        <translation>Si está activado, la EPG inicialmente mostrará sólo los canales favoritos. Pulsar &quot;4&quot; cambiará entre los favoritos y todos los canales.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
@@ -4735,7 +4735,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
-        <translation>La posición horizontal desde la que se dibujará la IGU.  Puede que sólo funcione en una ventana.</translation>
+        <translation>La posición horizontal desde la que se dibujará la GUI. Puede que sólo funcione en una ventana.</translation>
     </message>
     <message>
         <source>Default size is 12.</source>
@@ -4977,7 +4977,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation>El vídeo mostrado a pantalla completa o sin ventana saltará este número de fotogramas por cada uno dibujado. Fíjelo a 0 para mostrar todos los fotogramas. Sólo es válido cuando no estén marcados &apos;Usar tamaño IGU para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
+        <translation>El vídeo mostrado a pantalla completa o sin ventana saltará este número de fotogramas por cada uno dibujado. Fíjelo a 0 para mostrar todos los fotogramas. Sólo es válido cuando no estén marcados &apos;Usar tamaño GUI para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
     </message>
     <message>
         <source>Video in main window</source>
@@ -4985,7 +4985,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Si está activado, el vídeo se mostrará en la ventana principal. Desactive esto si solo quiere vídeo en el escritorio o en una ventana. Sólo es válido cuando estén marcados &apos;Usar tamaño IGU para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
+        <translation>Si está activado, el vídeo se mostrará en la ventana principal. Desactive esto si solo quiere vídeo en el escritorio o en una ventana. Sólo es válido cuando estén marcados &apos;Usar tamaño GUI para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
     </message>
     <message>
         <source>Frames to skip</source>
@@ -5009,7 +5009,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Si está activado, el vídeo será mostrado en una ventana. Sólo es válido cuando estén marcados &apos;Usar tamaño IGU para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
+        <translation>Si está activado, el vídeo será mostrado en una ventana. Sólo es válido cuando estén marcados &apos;Usar tamaño GUI para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5037,7 +5037,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Si está activado, el vídeo se mostrará en el escritorio, detrás de los iconos. Sólo es válido cuando estén marcados &apos;Usar tamaño IGU para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
+        <translation>Si está activado, el vídeo se mostrará en el escritorio, detrás de los iconos. Sólo es válido cuando estén marcados &apos;Usar tamaño GUI para TV&apos; o &apos;Ejecutar el interfaz en una ventana&apos;.</translation>
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5834,7 +5834,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation>Activa/desactiva la visibilidad del cursor del ratón. La mayoría de la IGU de Myth no responde a los clicks, esto sólo es para evitar &quot;perder&quot; el cursor del ratón.</translation>
+        <translation>Activa/desactiva la visibilidad del cursor del ratón. La mayoría de la GUI de Myth no responde a los clicks, esto sólo es para evitar &quot;perder&quot; el cursor del ratón.</translation>
     </message>
     <message>
         <source>Job Queue Start Time</source>
@@ -5956,7 +5956,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>GUI</source>
-        <translation>IGU</translation>
+        <translation>GUI</translation>
     </message>
     <message>
         <source>Resolution of screen when not watching a video.</source>
@@ -7562,7 +7562,7 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Spain</source>
-        <translation type="unfinished">España</translation>
+        <translation>España</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
@@ -7678,30 +7678,46 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Los ejemplos se muestran con la fecha de hoy.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Los ejemplos se muestran con la fecha de mañana.</translation>
     </message>
     <message>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Su formato preferido de hora. Puede elegir entre un formato con &quot;AM&quot; o &quot;PM&quot; en él, o formato 24h (militar).</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Especifique o la frecuencia exacta en kHz o un canal válido para su &apos;Formato TV&apos;.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valor a añadir a la frecuencia deseada en kHz, para &apos;sintonía fina&apos;.</translation>
     </message>
     <message>
         <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation type="unfinished"></translation>
+        <translation>Conservar relación aspecto del video al redimensionar</translation>
     </message>
     <message>
         <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
+        <translation>Conservar la relación de aspecto de la grabación original ignorando el ajuste de altura, y calculando la nueva altura basandose en la relación de aspecto y el ancho.</translation>
+    </message>
+    <message>
+        <source>Enable Network Remote Control interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for controlling mythfrontend over the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network Remote Control Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7890,7 +7906,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de estos son LiveTV y consumen %2</translation>
     </message>
 </context>
 <context>
@@ -8001,7 +8017,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation>Parar recodificación</translation>
+        <translation>Parar Recodificación</translation>
     </message>
     <message>
         <source>Transcoding</source>
@@ -8237,11 +8253,11 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation>Parar recodificación</translation>
+        <translation>Parar Recodificación</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation>Empezar recodificación</translation>
+        <translation>Empezar Recodificación</translation>
     </message>
     <message>
         <source>Audio track</source>
@@ -8297,7 +8313,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Adjust Time Stretch</source>
-        <translation>Ajustar Tiempo Repr</translation>
+        <translation>Ajustar Tiempo</translation>
     </message>
     <message>
         <source>Adjust</source>
@@ -8481,6 +8497,26 @@ Sin más detalles</translation>
         <comment>Bit Errors</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Speed 16X</source>
+        <translation type="unfinished">Velocidad 16X</translation>
+    </message>
+    <message>
+        <source>Speed 8X</source>
+        <translation type="unfinished">Velocidad 8X</translation>
+    </message>
+    <message>
+        <source>Speed 4X</source>
+        <translation type="unfinished">Velocidad 4X</translation>
+    </message>
+    <message>
+        <source>Speed 1/2X</source>
+        <translation type="unfinished">Velocidad 1/2X</translation>
+    </message>
+    <message>
+        <source>Speed 1/4X</source>
+        <translation type="unfinished">Velocidad 1/4X</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -8646,39 +8682,39 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Program Details:</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalles Programa:</translation>
     </message>
     <message>
         <source>Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detalles Programa</translation>
     </message>
     <message>
         <source>Welcome to MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Bienvenido a MythTV</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV está desocupado y se apagará en breve.</translation>
     </message>
     <message>
         <source>Current Recording(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabaciones Actuales</translation>
     </message>
     <message>
         <source>Retrieving Recording Status ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Consultando Estado Grabaciones ...</translation>
     </message>
     <message>
         <source>Next Scheduled Recording(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabaciones Programadas</translation>
     </message>
     <message>
         <source>Retrieving Scheduled Recordings ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Consultando Grabaciones Programadas ...</translation>
     </message>
     <message>
         <source>WARNING: There are conflicting scheduled recordings!</source>
-        <translation type="unfinished"></translation>
+        <translation>AVISO: ¡Hay grabaciones programadas en conflicto!</translation>
     </message>
 </context>
 <context>

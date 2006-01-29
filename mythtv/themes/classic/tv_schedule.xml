@@ -17,7 +17,7 @@
       <text lang="ET">Telekava</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
-      <alttext lang="ES">Parilla</alttext>
+      <alttext lang="ES">Guía</alttext>
       <alttext lang="CA">Guia</alttext>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
@@ -36,7 +36,7 @@
       <type>TV_PROGFIND</type>
       <text>Program Finder</text>
       <text lang="IT">Ricerca programmi</text>
-      <text lang="ES">Buscar programas</text>
+      <text lang="ES">Buscar Programas</text>
       <text lang="CA">Cercar programes</text>
       <text lang="NL">Programma Zoeker</text>
       <text lang="FR">Recherche de programmes</text>
@@ -75,6 +75,7 @@
       <text lang="DK">Søg på lister</text>
       <text lang="PT">Pesquisar Listagens</text>
       <text lang="ET">Kavade otsing</text>
+      <text lang="ES">Buscar Listados</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoek</alttext>      
@@ -125,13 +126,14 @@
       <text lang="SI">Poljubno snemanje</text>
       <text lang="ET">Kohandatud salvestamine</text>
       <text lang="PT">Regras de Gravação</text>
+      <text lang="ES">Avanzada</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
    <button>
       <type>TV_MANUAL_SCHEDULE</type>
       <text>Manual Schedule</text>
-      <text lang="ES">Programar Grabaciones</text>
+      <text lang="ES">Programación Manual</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Aufnahme</text>
       <text lang="FR">Manuel</text>
@@ -143,7 +145,7 @@
       <text lang="SI">Ročno snemanje</text>
       <text lang="ET">Käsitsi salvestamine</text>
       <alttext>Man. Sched.</alttext>
-      <alttext lang="ES">Programar</alttext>
+      <alttext lang="ES">Manual</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DE">Manuell</alttext>
       <alttext lang="DK">Manuel prog.</alttext>
@@ -167,6 +169,7 @@
       <text lang="SI">Snemalne prioritete</text>
       <text lang="PT">Prioridades de Gravação</text>
       <text lang="ET">Salvestusprioriteedid</text>
+      <text lang="ES">Prioridades Grabación</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
@@ -174,6 +177,7 @@
       <alttext lang="SI">Prioritete</alttext>
       <alttext lang="PT">Prioridades</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
+      <alttext lang="ES">Prioridades</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -197,6 +201,7 @@
       <text lang="ET">Tulevased salvestused</text>
       <alttext lang="SV">Kommande</alttext>
       <alttext lang="ET">Tulevased</alttext>
+      <alttext lang="ES">Conflictos</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

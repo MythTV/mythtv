@@ -24,7 +24,7 @@
       <type>TV_SETTINGS_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
-      <text lang="ES">Guía de programas</text>
+      <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille des programmes</text>
@@ -67,6 +67,7 @@
       <text>Playback Groups</text>
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="PT">Grupos de Reprodução</text>
+      <text lang="ES">Grupos de Reproducción</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -74,7 +75,7 @@
       <type>TV_SETTINGS_RECORDING_PROFILES</type>
       <text>Recording Profiles</text>
       <text lang="IT">Registrazione</text>
-      <text lang="ES">Grabación</text>
+      <text lang="ES">Perfiles Grabación</text>
       <text lang="CA">Gravació</text>
       <text lang="NL">Opnemen</text>
       <text lang="FR">Profils d'enregistrement</text>
@@ -91,6 +92,7 @@
       <alttext lang="DE">Profile</alttext>
       <alttext lang="ET">Profiilid</alttext>
       <alttext lang="PT">Perfis</alttext>
+      <alttext lang="ES">Perfiles</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -107,9 +109,11 @@
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="DK">Optagelsesprioriteter</text>
       <text lang="PT">Prioridades de Gravação</text>
+      <text lang="ES">Prioridades de Grabación</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="PT">Prioridades</alttext>
+      <alttext lang="ES">Prioridades</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

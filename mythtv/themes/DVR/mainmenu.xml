@@ -25,7 +25,7 @@
       <type>TV_CONFLICTS</type>
       <text>Upcoming Recordings</text>
       <text lang="IT">Correggi i conflitti</text>
-      <text lang="ES">Resolver conflictos</text>
+      <text lang="ES">Resolver Conflictos</text>
       <text lang="CA">Resoldre Conflictes</text>
       <text lang="NL">Geplande Opnames</text>
       <text lang="FR">Gestion des conflits</text>
@@ -84,6 +84,7 @@
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="DK">Optagelses prioriteter</text>
       <text lang="PT">Prioridades de Gravações</text>
+      <text lang="ES">Prioridades Grabaciones</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
@@ -92,6 +93,7 @@
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="DK">Prioriteter</alttext>
       <alttext lang="PT">Prioridades</alttext>
+      <alttext lang="ES">Prioridades</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -99,7 +101,7 @@
      <type>MENU_UTILITIES_SETUP</type>
      <text>Utilities / Setup</text>
      <text lang="IT">Impostazioni</text>
-     <text lang="ES">Configurar</text>
+     <text lang="ES">Utilidades/Configurar</text>
      <text lang="CA">Configurar</text>
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör / Konfiguration</text>

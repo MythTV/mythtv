@@ -1036,11 +1036,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>item</source>
-        <translation>sak</translation>
+        <translation>sakÅÄÖ</translation>
     </message>
     <message>
         <source>items</source>
-        <translation>saker</translation>
+        <translation>sakerÅÄÖ</translation>
     </message>
     <message>
         <source>Groups</source>

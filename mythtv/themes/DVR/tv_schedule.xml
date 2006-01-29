@@ -4,7 +4,7 @@
       <type>TV_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
-      <text lang="ES">Guía de programas</text>
+      <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille des programmes</text>
@@ -19,7 +19,7 @@
       <text lang="ET">Telekava</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
-      <alttext lang="ES">Parilla</alttext>
+      <alttext lang="ES">Guía</alttext>
       <alttext lang="CA">Guia</alttext>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
@@ -37,7 +37,7 @@
       <type>TV_PROGFIND</type>
       <text>Program Finder</text>
       <text lang="IT">Ricerca programmi</text>
-      <text lang="ES">Buscar programas</text>
+      <text lang="ES">Buscar Programas</text>
       <text lang="CA">Cercar programes</text>
       <text lang="NL">Programma Zoeker</text>
       <text lang="FR">Recherche d'émission</text>
@@ -80,6 +80,7 @@
       <text lang="ET">Otsi sõnu</text>
       <text lang="DK">Søgeord</text>
       <text lang="PT">Pesquisar Palavras</text>
+      <text lang="ES">Palabras</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -105,6 +106,7 @@
       <text lang="ET">Otsi nimekirju</text>
       <text lang="DK">Søg på lister</text>
       <text lang="PT">Pesquisar Listas</text>
+      <text lang="ES">Listados</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
@@ -160,13 +162,14 @@
       <text lang="ET">Kohandatud salvestamine</text>
       <text lang="DK">Avanceret</text>
       <text lang="PT">Regras de Gravação</text>
+      <text lang="ES">Avanzada</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
    <button>
       <type>TV_MANUAL_SCHEDULE</type>
       <text>Manual Schedule</text>
-      <text lang="ES">Programar Grabaciones</text>
+      <text lang="ES">Grabación Manual</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Aufnahme</text>
       <text lang="DK">Manuel programmering</text>
@@ -180,7 +183,7 @@
       <text lang="SI">Ročno snemanje</text>
       <text lang="ET">Käsitsi salvestamine</text>
       <alttext>Man. Sched.</alttext>
-      <alttext lang="ES">Programar</alttext>
+      <alttext lang="ES">Manual</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DE">Manuell</alttext>
       <alttext lang="FR">Prog. Man.</alttext>
