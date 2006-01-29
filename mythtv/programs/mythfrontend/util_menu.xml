@@ -54,6 +54,7 @@
       <text lang="SV">Ändra knappar</text>
       <text lang="ES">Editar Teclas</text>
       <text lang="PT">Configurar Teclas</text>
+      <text lang="ET">Muuda klahve</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>

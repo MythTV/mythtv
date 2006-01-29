@@ -64,6 +64,7 @@
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="DE">MythFlix</text>
      <text lang="ES">MythFlix</text>
+     <text lang="ET">MythFlix seaded</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

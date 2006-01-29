@@ -39,7 +39,7 @@
       <text lang="FI">Ajasta Nauhoituksia</text>
       <text lang="ZH_TW">預設錄影</text>
       <text lang="SI">Plan snemanj</text>
-      <text lang="ET">Planeeri salvestamisi</text>
+      <text lang="ET">Plaani salvestamisi</text>
       <text lang="NB">Planlegg opptak</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Planification</alttext>
@@ -54,7 +54,7 @@
       <alttext lang="DE">Planung</alttext>
       <alttext lang="ZH_TW">預錄</alttext>
       <alttext lang="SI">Plan</alttext>
-      <alttext lang="ET">Planeerimine</alttext>
+      <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="NB">Planlegg</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
@@ -76,9 +76,9 @@
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Predvajanje snemanj</text>
-      <text lang="ET">Vaata salvestusi</text>
+      <text lang="ET">Vaata salvestisi</text>
       <text lang="NB">Se på opptak</text>
-      <alttext lang="ET">Salvestused</alttext>
+      <alttext lang="ET">Salvestised</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -99,7 +99,7 @@
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
       <text lang="SI">Brisanje snemanj</text>
-      <text lang="ET">Kustuta salvestusi</text>
+      <text lang="ET">Kustuta salvestisi</text>
       <text lang="NB">Slett opptak</text>
       <alttext lang="ET">Kustuta</alttext>
       <alttext lang="DE">Löschen</alttext>

@@ -16,7 +16,7 @@
       <text lang="FI">Katso DVD</text>
       <text lang="ZH_TW">播放DVD</text>
       <text lang="SI">Predvajaj DVD</text>
-      <text lang="ET">Näita DVD-d</text>
+      <text lang="ET">Mängi DVD-d</text>
       <text lang="NB">Se på DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythdvd</depends>
@@ -38,7 +38,7 @@
       <text lang="FI">Toista VCD</text>
       <text lang="ZH_TW">播放VCD</text>
       <text lang="SI">Predvajaj VCD</text>
-      <text lang="ET">Näita VCD-d</text>
+      <text lang="ET">Mängi VCD-d</text>
       <text lang="NB">Se på VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythdvd</depends>

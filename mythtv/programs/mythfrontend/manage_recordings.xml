@@ -84,10 +84,11 @@
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
       <text lang="SI">Brisanje snemanj</text>
-      <text lang="ET">Kustuta salvestusi</text>
+      <text lang="ET">Kustuta salvestisi</text>
       <text lang="NB">Slett opptak</text>
       <alttext lang="SV">Radera</alttext>
       <alttext lang="DE">Löschen</alttext>
+      <alttext lang="ET">Kustuta</alttext>
       <action>TV_DELETE</action>
    </button>
 

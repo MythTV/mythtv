@@ -17,9 +17,10 @@
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Gledanje snemanj</text>
-      <text lang="ET">Vaata salvestusi</text>
+      <text lang="ET">Vaata salvestisi</text>
       <text lang="NB">Se på opptak</text>
       <alttext lang="SV">Inspelningar</alttext>
+      <alttext lang="ET">Salvestised</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -42,6 +43,7 @@
      <text lang="ET">Vaata videot</text>
      <text lang="NB">Se på videoer</text>
      <alttext lang="SV">Filmer</alttext>
+     <alttext lang="ET">Video</alttext>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -87,6 +89,7 @@
      <text lang="PT">Ouvir Rádio</text>
      <alttext lang="SV">Radio</alttext>
      <alttext lang="PT">Rádio</alttext>
+     <alttext lang="ET">Raadio</alttext>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -131,7 +134,7 @@
      <text lang="FI">Pelit</text>
      <text lang="ZH_TW">遊戲</text>
      <text lang="SI">Igranje iger</text>
-     <text lang="ET">Mängi mänge</text>
+     <text lang="ET">Mängud</text>
      <text lang="NB">Spill</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>

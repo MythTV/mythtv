@@ -227,6 +227,7 @@
       <text lang="DK">Tasteopsætning</text>
       <text lang="PT">Configurar Teclas</text>
       <text lang="ES">Configurar Teclas</text>
+      <text lang="ET">Muuda klahve</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>

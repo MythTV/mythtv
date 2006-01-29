@@ -71,7 +71,6 @@
       <text lang="NL">Zoekfunctie</text>
       <text lang="JA">リスト検索</text>
       <text lang="SI">Iskanje seznamov</text>
-      <text lang="ET">Otsi telekavu</text>
       <text lang="DK">Søg på lister</text>
       <text lang="PT">Pesquisar Listagens</text>
       <text lang="ET">Kavade otsing</text>
@@ -80,7 +79,6 @@
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoek</alttext>      
       <alttext lang="SI">Iskanje</alttext>
-      <alttext lang="ET">Telekavad</alttext>
       <alttext lang="DK">Lister</alttext>
       <alttext lang="PT">Pesquisar</alttext>
       <alttext lang="ET">Otsing</alttext>
@@ -168,7 +166,7 @@
       <text lang="JA">録画優先順位</text>
       <text lang="SI">Snemalne prioritete</text>
       <text lang="PT">Prioridades de Gravação</text>
-      <text lang="ET">Salvestusprioriteedid</text>
+      <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="ES">Prioridades Grabación</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
@@ -198,7 +196,7 @@
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
       <text lang="SI">Prihajajoča snemanja</text>
-      <text lang="ET">Tulevased salvestused</text>
+      <text lang="ET">Tulevased salvestamised</text>
       <alttext lang="SV">Kommande</alttext>
       <alttext lang="ET">Tulevased</alttext>
       <alttext lang="ES">Conflictos</alttext>
