@@ -317,7 +317,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
         return false;
     }
     pmt.FindPIDs(StreamID::AnyAudio, pids, types);
-    for (uint i = 1; i < audioPIDs.size(); i++)
+    for (uint i = 0; i < audioPIDs.size(); i++)
         AddAudioPID(audioPIDs[i]);
 
     // Timebase
