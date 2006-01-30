@@ -1408,7 +1408,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
                 else if (info.attribute("lang","").lower() == 
                          gContext->GetLanguageAndVariant())
                 {
-                    text = getFirstText(info);
+                    alttext = getFirstText(info);
                 }
                 else if (info.attribute("lang","").lower() ==
                          gContext->GetLanguage())
