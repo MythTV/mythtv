@@ -6,7 +6,7 @@
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
-      <text lang="NL">Programma Gids</text>
+      <text lang="NL">Programmagids</text>
       <text lang="FR">Grille Horaire</text>
       <text lang="DE">TV Programm</text>
       <text lang="DK">Program Guide</text>
@@ -38,7 +38,7 @@
       <text lang="IT">Ricerca programmi</text>
       <text lang="ES">Buscar Programas</text>
       <text lang="CA">Cercar programes</text>
-      <text lang="NL">Programma Zoeker</text>
+      <text lang="NL">Programma's Zoeken</text>
       <text lang="FR">Recherche de programmes</text>
       <text lang="DE">Alphabetische Suche</text>
       <text lang="DK">Program Søger</text>
@@ -53,7 +53,7 @@
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DE">ABC Suche</alttext>
       <alttext lang="DK">Søger</alttext>
-      <alttext lang="NL">Zoeker</alttext>
+      <alttext lang="NL">Zoeken A-Z</alttext>
       <alttext lang="PT">Procurar</alttext>
       <alttext lang="SV">Letaren</alttext>
       <alttext lang="JA">検索</alttext>
@@ -68,7 +68,7 @@
       <text lang="DE">Suche</text>
       <text lang="FR">Recherche</text>
       <text lang="SV">Sök i TV-tablå</text>
-      <text lang="NL">Zoekfunctie</text>
+      <text lang="NL">Gids Doorzoeken</text>
       <text lang="JA">リスト検索</text>
       <text lang="SI">Iskanje seznamov</text>
       <text lang="DK">Søg på lister</text>
@@ -77,7 +77,7 @@
       <text lang="ES">Buscar Listados</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
-      <alttext lang="NL">Zoek</alttext>      
+      <alttext lang="NL">Zoeken Gids</alttext>      
       <alttext lang="SI">Iskanje</alttext>
       <alttext lang="DK">Lister</alttext>
       <alttext lang="PT">Pesquisar</alttext>
@@ -125,6 +125,7 @@
       <text lang="ET">Kohandatud salvestamine</text>
       <text lang="PT">Regras de Gravação</text>
       <text lang="ES">Avanzada</text>
+      <text lang="NL">Geavanceerde Opname</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -161,7 +162,7 @@
       <text>Recording Priorities</text>
       <text lang="DE">Aufnahmeprioritäten</text>
       <text lang="FR">Priorités d'enregistrement</text>
-      <text lang="NL">Opname Prioriteiten</text>      
+      <text lang="NL">Opnameprioriteiten</text>      
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <text lang="SI">Snemalne prioritete</text>

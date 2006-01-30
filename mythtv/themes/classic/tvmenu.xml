@@ -6,7 +6,7 @@
       <text lang="IT">Guarda la TV</text>
       <text lang="ES">Ver la TV</text>
       <text lang="CA">Veure la TV</text>
-      <text lang="NL">Kijk TV</text>
+      <text lang="NL">TV Kijken</text>
       <text lang="FR">Regarder la TV</text>
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
@@ -103,6 +103,7 @@
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
       <text lang="ET">TV läbilase</text>
+      <text lang="NL">TV Direct</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->
@@ -118,6 +119,7 @@
       <text lang="DK">Tidligere optagelser</text>
       <text lang="PT">Gravações Feitas</text>
       <text lang="ES">Grabaciones Antiguas</text>
+      <text lang="NL">Eerdere Opnames</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -133,6 +135,7 @@
       <text lang="DK">Systemstatus</text>
       <text lang="PT">Estado do Sistema</text>
       <text lang="ES">Estado Sistema</text>
+      <text lang="NL">Systeemstatus</text>
       <action>TV_STATUS</action>
    </button>
 

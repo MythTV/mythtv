@@ -11,6 +11,7 @@
      <text lang="ET">TV</text>
      <text lang="DK">TV</text>
      <text lang="ES">TV</text>
+     <text lang="NL">TV</text>
      <action>MENU tvmenu.xml</action>
    </button>
 
@@ -78,6 +79,7 @@
       <text lang="DK">Radio</text>
       <text lang="PT">Rádio FM</text>
       <text lang="ES">Radio</text>
+      <text lang="NL">Radio</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -88,7 +90,7 @@
      <text lang="IT">Immagini</text>
      <text lang="ES">Fotos</text>
      <text lang="CA">Imatges</text>
-     <text lang="NL">Beelden</text>
+     <text lang="NL">Foto's</text>
      <text lang="FR">Images</text>
      <text lang="DE">Bilder</text>
      <text lang="DK">Billeder</text>
@@ -177,6 +179,7 @@
       <text lang="DK">Web</text>
       <text lang="PT">Navegação Web</text>
       <text lang="ES">Web</text>
+      <text lang="NL">Internet</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -192,6 +195,7 @@
       <text lang="DK">Telefon</text>
       <text lang="PT">Telefone</text>
       <text lang="ES">Teléfono</text>
+      <text lang="NL">Telefoon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -206,6 +210,7 @@
       <text lang="SV">Recept</text>
       <text lang="PT">Receitas</text>
       <text lang="ES">Recetas</text>
+      <text lang="NL">Recepten</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -217,6 +222,7 @@
       <text lang="PT">Gravar DVD</text>
       <text lang="ET">Kirjuta DVD</text>
       <text lang="ES">Grabar DVD</text>
+      <text lang="NL">DVD Branden</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -229,6 +235,7 @@
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
      <text lang="PT">Horários de Cinema</text>
+     <text lang="NL">Bioscoop Tijden</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -260,6 +267,7 @@
      <text lang="ET">Seiska</text>
      <text lang="DK">Afslut</text>
      <text lang="PT">Desligar</text>
+     <text lang="NL">Afsluiten</text>
      <action>SHUTDOWN</action>
    </button> -->
 

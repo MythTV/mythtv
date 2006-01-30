@@ -113,6 +113,7 @@
       <text lang="SV">Radio</text>
       <text lang="DK">Radio Indstillinger</text>
       <text lang="PT">Configurar Rádio</text>
+      <text lang="NL">Radio Instellingen</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -124,7 +125,7 @@
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder</text>
       <text lang="DK">Billed indstillinger</text>
-      <text lang="NL">Beelden Instellingen</text>
+      <text lang="NL">Foto 's Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Bilder</text>
       <text lang="JA">イメージ設定</text>
@@ -196,6 +197,7 @@
      <text lang="DK">Web Indstillinger</text>
      <text lang="PT">Config. Navegação Web</text>
      <text lang="ES">Configurar Web</text>
+     <text lang="NL">Web Instellingen</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -210,6 +212,7 @@
       <text lang="DK">Opskriftsindstillinger</text>
       <text lang="PT">Configurar Receitas</text>
       <text lang="ES">Configurar Recetas</text>
+      <text lang="NL">Recepten Instellingen</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -224,6 +227,7 @@
       <text lang="DK">Telefon Indstillinger</text>
       <text lang="PT">Configurar Telefone</text>
       <text lang="ES">Configurar Teléfono</text>
+      <text lang="NL">Telefoon Instellingen</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -237,6 +241,7 @@
      <text lang="SV">Biotider</text>
      <text lang="DK">Biograf Indstillinger</text>
      <text lang="PT">Configurar Horários de Cinema</text>
+     <text lang="NL">Bioscoop Instellingen</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -264,6 +269,7 @@
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="ES">MythFlix</text>
      <text lang="ET">NetFlix seaded</text>
+     <text lang="NL">NetFlix Instellingen</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -274,6 +280,7 @@
        <text lang="PT">Configurar Gravação de DVDs</text>
        <text lang="ES">Configurar Grabación DVD</text>
        <text lang="ET">DVD-kirjutaja seaded</text>
+       <text lang="NL">DVD Branden Instellingen</text>
        <action>CONFIGPLUGIN mythburn</action>
        <depends>mythburn</depends>
    </button>

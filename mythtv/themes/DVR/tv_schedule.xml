@@ -6,7 +6,7 @@
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
-      <text lang="NL">Programma Gids</text>
+      <text lang="NL">Programmagids</text>
       <text lang="FR">Grille des programmes</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
@@ -39,7 +39,7 @@
       <text lang="IT">Ricerca programmi</text>
       <text lang="ES">Buscar Programas</text>
       <text lang="CA">Cercar programes</text>
-      <text lang="NL">Programma Zoeker</text>
+      <text lang="NL">Programma's Zoeken</text>
       <text lang="FR">Recherche d'émission</text>
       <text lang="DE">Alphabetische Suche</text>
       <text lang="DK">Program SØger</text>
@@ -72,7 +72,7 @@
       <text lang="FR">Recherche textuelle</text>
       <text lang="DE">Volltextsuche</text>
       <text lang="SV">Sök ord</text>
-      <text lang="NL">Zoek Woorden</text>
+      <text lang="NL">Woorden Zoeken</text>
       <text lang="JA">単語検索</text>
       <text lang="FI">Etsi Sanoista</text>
       <text lang="ZH_TW">關鍵字</text>
@@ -83,7 +83,7 @@
       <text lang="ES">Palabras</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
-      <alttext lang="NL">Zoek</alttext>
+      <alttext lang="NL">Zoeken</alttext>
       <alttext lang="SV">Ord</alttext>
       <alttext lang="DE">Wörter</alttext>
       <alttext lang="SI">Iskanje</alttext>
@@ -156,7 +156,6 @@
       <text lang="JA">カスタム録画</text>
       <text lang="FR">Enregistrement avancé</text>
       <text lang="DE">freie Planung</text>
-      <text lang="NL">Opname op maat</text>
       <text lang="FI">Edistyneet Valinnat</text>
       <text lang="SI">Poljubno snemanje</text>
       <text lang="ET">Kohandatud salvestamine</text>

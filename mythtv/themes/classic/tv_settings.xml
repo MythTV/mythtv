@@ -23,7 +23,7 @@
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
-      <text lang="NL">Programma Gids</text>
+      <text lang="NL">Programmagids</text>
       <text lang="FR">Grille horaire</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
@@ -62,6 +62,7 @@
       <text lang="PT">Grupos de Visualização</text>
       <text lang="ET">Esitlusgrupid</text>
       <text lang="ES">Grupos Reproducción</text>
+      <text lang="NL">Afspeelgroepen</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -71,7 +72,7 @@
       <text lang="IT">Registrazione</text>
       <text lang="ES">Grabación</text>
       <text lang="CA">Gravació</text>
-      <text lang="NL">Opnemen</text>
+      <text lang="NL">Opnameprofielen</text>
       <text lang="FR">Enregistrement</text>
       <text lang="DE">Aufnahmeprofile</text>
       <text lang="DK">Optagelse</text>
@@ -99,6 +100,7 @@
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="DK">Optagelsesprioriteter</text>
       <text lang="ES">Prioridades</text>
+      <text lang="NL">Opnameprioriteiten</text>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="PT">Prioridades</alttext>
       <action>MENU recpriorities_settings.xml</action>

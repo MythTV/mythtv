@@ -48,6 +48,7 @@
       <text lang="ET">Inimesed</text>
       <text lang="PT">Por Pessoas</text>
       <text lang="ES">Personas</text>
+      <text lang="NL">Personen</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -64,6 +65,7 @@
       <text lang="DK">Supersøger</text>
       <text lang="PT">Pesquisa Avançada</text>
       <text lang="ES">Avanzada</text>
+      <text lang="NL">Geavanceerd</text>
       <alttext lang="ET">Muud</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>

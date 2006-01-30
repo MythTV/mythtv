@@ -106,7 +106,7 @@
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör / Konfiguration</text>
      <text lang="DK">Konfiguration</text>
-     <text lang="NL">Beheer</text>
+     <text lang="NL">Beheer / Instellingen</text>
      <text lang="PT">Utensílios</text>
      <text lang="SV">Verktyg / Inställningar</text>
      <text lang="JA">設定</text>
@@ -116,6 +116,7 @@
      <text lang="ET">Utiliidid / seaded</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
+     <alttext lang="NL">Beheer</alttext>
      <alttext lang="ET">Seaded</alttext>
      <action>MENU util_menu.xml</action>
    </button>
@@ -128,6 +129,7 @@
      <text lang="ET">Seiska</text>
      <text lang="DK">Afslut</text>
      <text lang="PT">Desligar</text>
+     <text lang="NL">Afsluiten</text>
      <action>SHUTDOWN</action>
    </button> -->
 

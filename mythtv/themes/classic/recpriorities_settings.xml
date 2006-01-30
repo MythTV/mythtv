@@ -11,6 +11,7 @@
       <text lang="DK">Optagelsesprioriteter</text>
       <text lang="PT">Definir Prioridades de Gravação</text>
       <text lang="ES">Ajustar Prioridades de Grabación</text>
+      <text lang="NL">Opnameprioriteiten Instellen</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
@@ -18,6 +19,7 @@
       <alttext lang="ET">Salvestamisprioriteedid</alttext>
       <alttext lang="PT">Prioridades de Gravação</alttext>
       <alttext lang="ES">Prioridades Grabación</alttext>
+      <alttext lang="NL">Opnameprioriteiten</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -33,6 +35,7 @@
       <text lang="DK">Kanalprioriteter</text>
       <text lang="PT">Definir Prioridades de Gravação de Canais</text>
       <text lang="ES">Ajustar Prioridades de Canales</text>
+      <text lang="NL">Opnameprioriteiten per Zender</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
@@ -42,6 +45,7 @@
       <alttext lang="DK">Kanal</alttext>
       <alttext lang="PT">Prioridades de Canais</alttext>
       <alttext lang="ES">Prioridades Canales</alttext>
+      <alttext lang="NL">Zenderprioriteiten</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

@@ -26,7 +26,7 @@
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
-      <text lang="NL">Programma Gids</text>
+      <text lang="NL">Programmagids</text>
       <text lang="FR">Grille des programmes</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
@@ -69,6 +69,7 @@
       <text lang="PT">Grupos de Reprodução</text>
       <text lang="ES">Grupos de Reproducción</text>
       <text lang="ET">Mahamängimisgrupid</text>
+      <text lang="NL">Afspeelgroepen</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -78,7 +79,7 @@
       <text lang="IT">Registrazione</text>
       <text lang="ES">Perfiles Grabación</text>
       <text lang="CA">Gravació</text>
-      <text lang="NL">Opnemen</text>
+      <text lang="NL">Opnameprofielen</text>
       <text lang="FR">Profils d'enregistrement</text>
       <text lang="DE">Aufnahmeprofile</text>
       <text lang="DK">Optagelse</text>
@@ -111,6 +112,7 @@
       <text lang="DK">Optagelsesprioriteter</text>
       <text lang="PT">Prioridades de Gravação</text>
       <text lang="ES">Prioridades de Grabación</text>
+      <text lang="NL">Opnameproriteiten</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="PT">Prioridades</alttext>
