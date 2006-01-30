@@ -440,7 +440,6 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         emit UpdatePAT(pat);
         if (CreatePATSingleProgram(*pat))
             emit UpdatePATSingleProgram(PATSingleProgram());
-        _invalid_pat_seen = false;
     }
     else if (foundProgram)
     {
