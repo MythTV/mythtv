@@ -102,7 +102,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderen</translation>
     </message>
 </context>
 <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation>Deze map moet bestaan en we moeten leesrechten hebben</translation>
+        <translation>Deze map moet bestaan en MythGallery moet leesrechten hebben.</translation>
     </message>
     <message>
         <source>Paths to import images from</source>
@@ -137,15 +137,15 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Geef hier de lijst van mappen vanwaar u wil importeren. Als je hier een script ingeeft wordt dit uitgevoerd.</translation>
+        <translation>Lijst van mappen vanwaar u wil importeren. Als u hier een script ingeeft wordt dit uitgevoerd.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>Dit is het overganstype dat gebruikt wordt in diashow modus.</translation>
+        <translation>Overgangstype dat gebruikt wordt in diashow modus.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation>Dit is het type achtergrond voor elke foto.</translation>
+        <translation>Type achtergrond gebruikt voor elke foto.</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
@@ -153,19 +153,19 @@
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation>Gebruik OpenGL overgang</translation>
+        <translation>OpenGL-overgangen gebruiken</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation>Vink dit aan om de OpenGL overgangen te kunnen gebruiken</translation>
+        <translation>Aanvinken om OpenGL-overgangen te kunnen gebruiken</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation>Type OpenGL overgang</translation>
+        <translation>Type OpenGL-overgang</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation>Dit is het type OpenGL overgang die gebruikt wordt in diashow modus.</translation>
+        <translation>Type OpenGL-overgang gebruikt in diashow modus.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
@@ -177,35 +177,35 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation>Command om video bestanden te spelen</translation>
+        <translation>Commando om videobestanden af te spelen</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation>Dit commando wordt gebruikt om een video bestand te spelen</translation>
+        <translation>Commando wordt gebruikt om een videobestand af te spelen</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
-        <translation>Sla voorbeeld plaatjes op in de image directory</translation>
+        <translation>Voorbeeldafbeeldingen opslaan in de fotomap</translation>
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation>Als dit is ingevuld, worden de voorbeeld plaatjes opgeslagen in &apos;.thumbcache&apos; directories binnen bovenstaande directory. Als het niet is ingevuld, worden ze bewaard in uw home directory.</translation>
+        <translation>Als dit is ingevuld, worden de voorbeeldafbeeldingen opgeslagen in &apos;.thumbcache&apos;-mappen in bovenstaande map. Indien niet ingevuld, worden ze bewaard in uw home directory.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
-        <translation>Ga recursief door alle directories</translation>
+        <translation>Recursief door mappen</translation>
     </message>
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation>Zet dit aan zodat de dia-show ook alle subdirectories laat zien.</translation>
+        <translation>Zodat de diashow ook alle submappen laat zien.</translation>
     </message>
     <message>
         <source>Overlay caption</source>
-        <translation type="unfinished"></translation>
+        <translation>Informatie over afbeelding</translation>
     </message>
     <message>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal seconden dat informatie over een afbeelding wordt getoond.</translation>
     </message>
 </context>
 <context>

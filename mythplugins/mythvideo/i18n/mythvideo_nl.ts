@@ -22,15 +22,15 @@
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation>Geef nieuwe extensie:</translation>
+        <translation>Nieuwe extensie:</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation>Maak nieuwe extensie</translation>
+        <translation>Nieuwe extensie maken</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleer</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Done</source>
@@ -42,7 +42,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Wis</translation>
+        <translation>Verwijderen</translation>
     </message>
 </context>
 <context>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation>Toon onbekende bestandstypes</translation>
+        <translation>Onbekende bestandstypes tonen</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation>Film Lijst bladert bestanden</translation>
+        <translation>Filmlijst bladert bestanden</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
@@ -97,7 +97,7 @@
     </message>
     <message>
         <source>Player Settings</source>
-        <translation>Instellingen voor het Afspeelprogramma</translation>
+        <translation>Instellingen voor het afspeelprogramma</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Geen Cover</translation>
+        <translation>Geen cover</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Onbekende Beoordeling</translation>
+        <translation>Onbekende beoordeling</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -232,11 +232,11 @@
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het standaard uiterlijk van MythVideo. Andere zijn mogelijk via het popup-menu (MENU),</translation>
     </message>
     <message>
         <source>Video Browser browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Browser bladert bestanden</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
@@ -451,7 +451,7 @@
     </message>
     <message>
         <source></source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Parental</source>

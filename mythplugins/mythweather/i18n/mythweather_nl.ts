@@ -612,39 +612,39 @@
     </message>
     <message>
         <source>RAIN</source>
-        <translation type="unfinished"></translation>
+        <translation>REGEN</translation>
     </message>
     <message>
         <source>MIX/ICE</source>
-        <translation type="unfinished"></translation>
+        <translation>REGEN/IJS</translation>
     </message>
     <message>
         <source>SNOW</source>
-        <translation type="unfinished"></translation>
+        <translation>SNEEUW</translation>
     </message>
     <message>
         <source>LIGHT</source>
-        <translation type="unfinished"></translation>
+        <translation>LICHTE</translation>
     </message>
     <message>
         <source>HEAVY</source>
-        <translation type="unfinished"></translation>
+        <translation>ZWARE</translation>
     </message>
     <message>
         <source>Enter Zip Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Postcode invoeren</translation>
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>KOUD</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>KOUDSTE</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>WOLKENTEMPERATUUR</translation>
     </message>
 </context>
 <context>
@@ -687,31 +687,31 @@
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Kies uw locatie met de rechterpijl...</translation>
+        <translation>Locatie kiezen met de rechterpijl...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Kies uw aggressiviteit met de rechterpijl...</translation>
+        <translation>Agressiviteit kiezen met de rechterpijl...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation> 1  Hoge Snelheid Verbinding</translation>
+        <translation> 1  Hoge snelheid verbinding</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation> 8  Gemiddelde Snelheid Verbinding</translation>
+        <translation> 8  Gemiddelde snelheid verbinding</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation> 15 Lage Snelheid Verbinding</translation>
+        <translation> 15 Lage snelheid verbinding</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Ophalen initieel weerbericht...</translation>
+        <translation>Eerste weerbericht ophalen...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Bijwerken weerbericht...</translation>
+        <translation>Weerbericht bijwerken...</translation>
     </message>
     <message>
         <source>Calm</source>
@@ -794,56 +794,28 @@
         <translation> km.</translation>
     </message>
     <message>
-        <source>SUN</source>
-        <translation type="obsolete">ZO</translation>
-    </message>
-    <message>
         <source>Sunday</source>
         <translation>Zondag</translation>
-    </message>
-    <message>
-        <source>MON</source>
-        <translation type="obsolete">MA</translation>
     </message>
     <message>
         <source>Monday</source>
         <translation>Maandag</translation>
     </message>
     <message>
-        <source>TUE</source>
-        <translation type="obsolete">DI</translation>
-    </message>
-    <message>
         <source>Tuesday</source>
         <translation>Dinsdag</translation>
-    </message>
-    <message>
-        <source>WED</source>
-        <translation type="obsolete">WO</translation>
     </message>
     <message>
         <source>Wednesday</source>
         <translation>Woensdag</translation>
     </message>
     <message>
-        <source>THU</source>
-        <translation type="obsolete">DO</translation>
-    </message>
-    <message>
         <source>Thursday</source>
         <translation>Donderdag</translation>
     </message>
     <message>
-        <source>FRI</source>
-        <translation type="obsolete">VR</translation>
-    </message>
-    <message>
         <source>Friday</source>
         <translation>Vrijdag</translation>
-    </message>
-    <message>
-        <source>SAT</source>
-        <translation type="obsolete">ZA</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -872,18 +844,6 @@
     <message>
         <source> (Not All Information Available)</source>
         <translation>(Niet alle informatie is beschikbaar)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** Ongeldige Locatie ingevoerd *** Gebruik een geldige ID.</translation>
-    </message>
-    <message>
-        <source>Weather Data Not Available</source>
-        <translation type="obsolete">Weerbericht Niet Beschikbaar</translation>
-    </message>
-    <message>
-        <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation type="obsolete">!!! Timeout !!! Wijzig uw aggressiviteit.</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>

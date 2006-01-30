@@ -3,59 +3,59 @@
     <name>Bookmarks</name>
     <message>
         <source>MythBrowser: Select group or single site to view</source>
-        <translation>Browser: Kies een groep of een unieke site om te bekijken</translation>
+        <translation>MythBrowser: Groep of website kiezen</translation>
     </message>
 </context>
 <context>
     <name>BookmarksConfig</name>
     <message>
         <source>MythBrowser Bookmarks Settings</source>
-        <translation>Browser Bladwijzer Instellingen</translation>
+        <translation>MythBrowser bladwijzer instellingen</translation>
     </message>
     <message>
         <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
 Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation>Gebruik de &apos;Nieuwe Bladwijzer&apos; knop om een Pagina/Groep toe te voegen.
-De OK toets verwijders het item uit de lijst.</translation>
+        <translation>De &apos;Nieuwe bladwijzer&apos; knop gebruiken om een pagina/groep toe te voegen.
+De &apos;OK&apos; toets verwijdert het item uit de lijst.</translation>
     </message>
     <message>
         <source>Zoom [%]:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom [%]:</translation>
     </message>
     <message>
         <source>Browser:</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser:</translation>
     </message>
     <message>
         <source>Hide Scrollbars</source>
-        <translation>Verberg Schuifbalken</translation>
+        <translation>Schuifbalken verbergen</translation>
     </message>
     <message>
         <source>Scroll Page</source>
-        <translation>Verschuif Pagina</translation>
+        <translation>Pagina verschuiven</translation>
     </message>
     <message>
         <source>Scroll Speed:</source>
-        <translation>Scroll Snelheid:</translation>
+        <translation>Scrollsnelheid:</translation>
     </message>
     <message>
         <source>&amp;New Bookmark</source>
-        <translation>Nieuwe Bladwijzer</translation>
+        <translation>Nieuwe bladwijzer</translation>
     </message>
     <message>
         <source>Add a new Website</source>
-        <translation>Voeg een nieuwe Pagina Toe</translation>
+        <translation>Nieuwe pagina toevoegen</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation>Stop</translation>
+        <translation>&amp;Stoppen</translation>
     </message>
 </context>
 <context>
     <name>PopupBox</name>
     <message>
         <source>Add New Website</source>
-        <translation>Voeg Nieuwe Pagina Toe</translation>
+        <translation>Nieuwe pagina toevoegen</translation>
     </message>
     <message>
         <source>Group:</source>
@@ -67,82 +67,62 @@ De OK toets verwijders het item uit de lijst.</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>&amp;Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;OK</translation>
     </message>
 </context>
 <context>
     <name>TabView</name>
     <message>
         <source>MythBrowser Menu</source>
-        <translation>Browser Menu</translation>
-    </message>
-    <message>
-        <source>         Back         </source>
-        <translation type="obsolete">         Terug         </translation>
-    </message>
-    <message>
-        <source>       Next Tab       </source>
-        <translation type="obsolete">     Volgende Tab       </translation>
-    </message>
-    <message>
-        <source>       Prev Tab       </source>
-        <translation type="obsolete">     Vorige Tab         </translation>
+        <translation>Browser menu</translation>
     </message>
     <message>
         <source>Save Link in Bookmarks</source>
-        <translation>Bewaar Link Bij Bladwijzers</translation>
-    </message>
-    <message>
-        <source>       zoom Out       </source>
-        <translation type="obsolete">      zoom Uit        </translation>
-    </message>
-    <message>
-        <source>       zoom In        </source>
-        <translation type="obsolete">      zoom In         </translation>
+        <translation>Link in bladwijzers bewaren</translation>
     </message>
     <message>
         <source>Enter URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL invoegen</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Terug</translation>
     </message>
     <message>
         <source>Next Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Volgende tab</translation>
     </message>
     <message>
         <source>Prev Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorige tab</translation>
     </message>
     <message>
         <source>Remove Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Tab verwijderen</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitzoomen</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>Inzoomen</translation>
     </message>
     <message>
         <source>Add New Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe bladwijzer toevoegen</translation>
     </message>
     <message>
         <source>Group:</source>
@@ -154,7 +134,7 @@ De OK toets verwijders het item uit de lijst.</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
 </context>
 </TS>

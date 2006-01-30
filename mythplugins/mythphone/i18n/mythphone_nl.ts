@@ -3,127 +3,127 @@
     <name>PhoneUIBox</name>
     <message>
         <source>Add someone to your Directory </source>
-        <translation type="unfinished"></translation>
+        <translation>Iemand aan telefoongids toevoegen</translation>
     </message>
     <message>
         <source>Edit this Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerken</translation>
     </message>
     <message>
         <source>Remove from Speed Dials</source>
-        <translation type="unfinished"></translation>
+        <translation>Uit snelkeuze verwijderen</translation>
     </message>
     <message>
         <source>Save this in the Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>In telefoongids opslaan</translation>
     </message>
     <message>
         <source>Clear the Call History</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschiedenis leegmaken</translation>
     </message>
     <message>
         <source>Make this a Speeddial</source>
-        <translation type="unfinished"></translation>
+        <translation>Toevoegen aan snelkeuze</translation>
     </message>
     <message>
         <source>Delete this Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <source>Delete this Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation>Voicemail verwijderen</translation>
     </message>
     <message>
         <source>Delete all Voicemails</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle voicemails verwijderen</translation>
     </message>
     <message>
         <source>Place Videocall Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogesprek starten</translation>
     </message>
     <message>
         <source>Place Voice-Only Call Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewoon gesprek starten</translation>
     </message>
     <message>
         <source>Switch from digits to URL input</source>
-        <translation type="unfinished"></translation>
+        <translation>Wisselen van numerieke- naar URL-invoer</translation>
     </message>
     <message>
         <source>Switch from URL to Digits input</source>
-        <translation type="unfinished"></translation>
+        <translation>Wisselen van URL- naar numerieke-invoer</translation>
     </message>
     <message>
         <source>Send IM</source>
-        <translation type="unfinished"></translation>
+        <translation>IM sturen</translation>
     </message>
     <message>
         <source>Save Changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Veranderingen opslaan</translation>
     </message>
     <message>
         <source>ADD</source>
-        <translation type="unfinished"></translation>
+        <translation>TOEVOEGEN</translation>
     </message>
     <message>
         <source>ADD DIRECTORY</source>
-        <translation type="unfinished"></translation>
+        <translation>TELEFOONGIDS TOEVOEGEN</translation>
     </message>
     <message>
         <source>Registered to </source>
-        <translation type="unfinished"></translation>
+        <translation>Geregistreerd bij</translation>
     </message>
     <message>
         <source> as </source>
-        <translation type="unfinished"></translation>
+        <translation>als</translation>
     </message>
     <message>
         <source>Not Registered</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet geregistreerd</translation>
     </message>
     <message>
         <source>Audio and Video Looped to </source>
-        <translation type="unfinished"></translation>
+        <translation>Geluid en video gelooped naar</translation>
     </message>
     <message>
         <source>No Active Calls</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen actieve gesprekken</translation>
     </message>
     <message>
         <source>Caller is Leaving Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation>Beller verlaat voicemail</translation>
     </message>
     <message>
         <source>Trying to Contact Remote Party</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het proberen te contacteren</translation>
     </message>
     <message>
         <source>Connecting</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het verbinden</translation>
     </message>
     <message>
         <source>Incoming Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkomend gesprek</translation>
     </message>
     <message>
         <source>Hanging Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Ophangen</translation>
     </message>
     <message>
         <source>Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefoongids</translation>
     </message>
     <message>
         <source>Speed Dials</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelkeuze</translation>
     </message>
     <message>
         <source>Call History</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschiedenis</translation>
     </message>
     <message>
         <source>Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation>Voicemail</translation>
     </message>
     <message>
         <source>Nickname</source>
@@ -131,31 +131,31 @@
     </message>
     <message>
         <source>First Name (Optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voornaam (niet verplicht)</translation>
     </message>
     <message>
         <source>Surname (Optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Achternaam (niet verplicht)</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <source>Speed Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelkeuze</translation>
     </message>
     <message>
         <source>Client is on My Home LAN</source>
-        <translation type="unfinished"></translation>
+        <translation>Client bevindt zich in mijn thuisnetwerk</translation>
     </message>
     <message>
         <source>Default Photo</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard foto</translation>
     </message>
     <message>
         <source>To Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Naar telefoongids</translation>
     </message>
     <message>
         <source>Business Card</source>
@@ -163,71 +163,71 @@
     </message>
     <message>
         <source>Latest Calls:</source>
-        <translation type="unfinished"></translation>
+        <translation>Laatste gesprekken:</translation>
     </message>
     <message>
         <source> Videocall</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogesprek</translation>
     </message>
     <message>
         <source> Voice-Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Gesprek</translation>
     </message>
     <message>
         <source>Send an Instant Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Een &apos;Instant Message&apos; versturen</translation>
     </message>
     <message>
         <source>You Called </source>
-        <translation type="unfinished"></translation>
+        <translation>U belde</translation>
     </message>
     <message>
         <source>They Called </source>
-        <translation type="unfinished"></translation>
+        <translation>Zij belden</translation>
     </message>
     <message>
         <source>You missed their call </source>
-        <translation type="unfinished"></translation>
+        <translation>U heeft hun gesprek gemist</translation>
     </message>
     <message>
         <source>Today </source>
-        <translation type="unfinished"></translation>
+        <translation>Vandaag</translation>
     </message>
     <message>
         <source>Yesterday </source>
-        <translation type="unfinished"></translation>
+        <translation>Gisteren</translation>
     </message>
     <message>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation>om</translation>
     </message>
     <message>
         <source> for %d min</source>
-        <translation type="unfinished"></translation>
+        <translation>voor %d min</translation>
     </message>
     <message>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Geluid</translation>
     </message>
     <message>
         <source>Packets In/Out/Lost/Late:             </source>
-        <translation type="unfinished"></translation>
+        <translation>Pakketten in/uit/verloren/te laat:       </translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>Resolution In/Out: </source>
-        <translation type="unfinished"></translation>
+        <translation>Resolutie in/uit</translation>
     </message>
     <message>
         <source>Packets In/Lost/Disc/Late: </source>
-        <translation type="unfinished"></translation>
+        <translation>Pakketten in/verloren/disk/te laat: </translation>
     </message>
     <message>
         <source>Packets Out/Dropped: </source>
-        <translation type="unfinished"></translation>
+        <translation>Pakketten uit/laten vallen: </translation>
     </message>
     <message>
         <source>Video Frames In/Out/Disc: </source>
@@ -306,11 +306,11 @@
     <name>QObject</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Webcam device</source>
-        <translation type="unfinished"></translation>
+        <translation>Webcam-apparaat</translation>
     </message>
     <message>
         <source>Select the device path your webcam is using. If you have a capture card it may be using /dev/video so try dev/video1</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
         <source>Transmit Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzendresolutie</translation>
     </message>
     <message>
         <source>Size of video window to transmit; higher resolutions require more bandwidth.</source>
@@ -334,11 +334,11 @@
     </message>
     <message>
         <source>Transmit Frames/Second</source>
-        <translation type="unfinished"></translation>
+        <translation>Frames/sec verzenden</translation>
     </message>
     <message>
         <source>Time to Answer</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijd voor antwoord</translation>
     </message>
     <message>
         <source>The time in seconds a call rings before being automatically answered and diverted to a VXML script.</source>
@@ -346,7 +346,7 @@
     </message>
     <message>
         <source>Default VXML URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard VXML URL</translation>
     </message>
     <message>
         <source>The URL to retrieve a VXML script which can be used to prompt for leaving a voicemail etc. Leave blank if you have no HTTP server and a default Voicemail script will be used.</source>
@@ -354,7 +354,7 @@
     </message>
     <message>
         <source>Default Voicemail Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard voicemailbericht</translation>
     </message>
     <message>
         <source>I am not at home, please leave a message after the tone</source>
@@ -366,7 +366,7 @@
     </message>
     <message>
         <source>Text to Speech Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Tekst naar spraak&apos; stem</translation>
     </message>
     <message>
         <source>Choose a voice to use from the Text To Speech library. </source>
@@ -382,7 +382,7 @@
     </message>
     <message>
         <source>SIP Local Port</source>
-        <translation type="unfinished"></translation>
+        <translation>SIP lokale poort</translation>
     </message>
     <message>
         <source>The port on this machine to use. You may need to make these different for each Mythfrontend and setup your firewall to let this port through.</source>
@@ -390,7 +390,7 @@
     </message>
     <message>
         <source>Microphone device</source>
-        <translation type="unfinished"></translation>
+        <translation>Microfoonapparaat</translation>
     </message>
     <message>
         <source>Select the device path for your microphone. Currently this CANNOT be the same device as used for audio output.</source>
@@ -398,7 +398,7 @@
     </message>
     <message>
         <source>My Display Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Afgebeelde naam</translation>
     </message>
     <message>
         <source>My common name to display when I call other people. </source>
@@ -406,7 +406,7 @@
     </message>
     <message>
         <source>Codecs Supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondersteunde codecs</translation>
     </message>
     <message>
         <source>The list of codecs to use, in the preferred order separated by semicolon. Supported codecs are G.711u, G.711a and GSM.</source>
@@ -414,7 +414,7 @@
     </message>
     <message>
         <source>SIP Network Interface</source>
-        <translation type="unfinished"></translation>
+        <translation>SIP netwerkinterface</translation>
     </message>
     <message>
         <source>Enter the name of the network to bind to e.g. eth0</source>
@@ -454,7 +454,7 @@
     </message>
     <message>
         <source>Auto-Answer</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch beantwoorden</translation>
     </message>
     <message>
         <source>When the MythFrontend is in the MythPhone plugin, setting this automatically answers all incoming calls. There is no security yet.</source>
@@ -462,15 +462,15 @@
     </message>
     <message>
         <source>SIP Proxy Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>SIP proxy instellingen</translation>
     </message>
     <message>
         <source>VXML Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>WXML instellingen</translation>
     </message>
     <message>
         <source>WEBCAM Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>WEBCAM instellingen</translation>
     </message>
     <message>
         <source>Number of webcam frames/sec to transmit, from 1 to 30. Higher numbers create better results but use more bandwidth.</source>
@@ -486,7 +486,7 @@
     </message>
     <message>
         <source>Sign-in Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Inlognaam</translation>
     </message>
     <message>
         <source>Your username for authentication with the SIP Server. For FWD this is your FWD number.</source>
@@ -494,7 +494,7 @@
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Wachtwoord</translation>
     </message>
     <message>
         <source>Your password for authentication with the SIP Server.</source>
@@ -506,19 +506,19 @@
     </message>
     <message>
         <source>Speed Dials</source>
-        <translation type="unfinished"></translation>
+        <translation>Snelkeuze</translation>
     </message>
     <message>
         <source>Voicemail</source>
-        <translation type="unfinished"></translation>
+        <translation>Voicemail</translation>
     </message>
     <message>
         <source>Placed Calls</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigen gesprekken</translation>
     </message>
     <message>
         <source>Received Calls</source>
-        <translation type="unfinished"></translation>
+        <translation>Ontvangen gesprekken</translation>
     </message>
     <message>
         <source>A directory entry already exists with this URL.</source>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Me</source>
-        <translation type="unfinished"></translation>
+        <translation>Ik</translation>
     </message>
     <message>
         <source>Jitter Buffer (Audio Call)</source>
@@ -554,11 +554,11 @@
     </message>
     <message>
         <source>IP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>IP instellingen</translation>
     </message>
     <message>
         <source>AUDIO Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>GELUID instellingen</translation>
     </message>
 </context>
 </TS>

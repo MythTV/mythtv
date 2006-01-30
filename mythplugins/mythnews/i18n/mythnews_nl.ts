@@ -13,54 +13,41 @@
 <context>
     <name>MythNewsConfig</name>
     <message>
-        <source>Select News Feeds</source>
-        <translation type="obsolete">Selecter News Feeds</translation>
-    </message>
-    <message>
-        <source>Set Update Frequency</source>
-        <translation type="obsolete">Stel De Verversfrekwentie In</translation>
-    </message>
-    <message>
-        <source>Set Update Frequency in Minutes
-Minimum allowed value is 30 Minutes</source>
-        <translation type="obsolete">Verversfrekwentie in Minuten
-Minimum is 30 Minuten</translation>
-    </message>
-    <message>
         <source>Press MENU to set the update frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>MENU kiezen om verversingsfrequentie aan te passen</translation>
     </message>
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verversingsfrequentie kiezen met pijltoetsen. 
+De minimumwaarde is 30 minuten.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>MENU kiezen om terug te keren.</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
         <source>Failed to retrieve news</source>
-        <translation>Kon Berichten Niet Inlezen</translation>
+        <translation>Kon berichten niet ophalen</translation>
     </message>
     <message>
         <source>Retrieve Failed. </source>
-        <translation>Inlezen Mislukt. </translation>
+        <translation>Ophalen mislukt. </translation>
     </message>
     <message>
         <source>No Cached News</source>
-        <translation>Geen Bewaarde Nieuwsitems</translation>
+        <translation>Geen nieuws in geheugen</translation>
     </message>
     <message>
         <source>Failed to read downloaded file</source>
-        <translation>Kan ingelzen Bestand niet lezen</translation>
+        <translation>Ka opgehaalde bestand niet lezen</translation>
     </message>
     <message>
         <source>Showing Cached News</source>
-        <translation>Ik Toon de Bewaarde Nieuwsitems</translation>
+        <translation>Nieuws in geheugen wordt getoond</translation>
     </message>
 </context>
 <context>

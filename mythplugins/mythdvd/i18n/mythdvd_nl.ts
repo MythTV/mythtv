@@ -7,15 +7,15 @@
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation>Kan geen verbinding maken met MTD. Probeer MTD te starten door op een nr. toets te drukken. Als dit bericht blijft staan is er iets ernstig fout.</translation>
+        <translation>Kan geen verbinding maken met MTD. Probeer MTD te starten door op een nummertoets te drukken. Als dit bericht blijft staan is er iets ernstig fout.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation>Kan geen verbinding maken met MTD.</translation>
+        <translation>Kan geen verbinding maken met MTD. Host werd niet gevonden.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation>Netwerk error (socket-communicatie).</translation>
+        <translation>Netwerkfout (socket-communicatie).</translation>
     </message>
     <message>
         <source>Something is wrong, but I don&apos;t know what.</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Geen taken. Druk 0 om een DVD te &quot;rippen&quot;.</translation>
+        <translation>Geen taken. Op 0 om drukken een DVD te &quot;rippen&quot;.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Geen taken. Druk 0 om een CD te &quot;rippen&quot;.</translation>
+        <translation>Geen taken. Op 0 drukken om een CD te &quot;rippen&quot;.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation>9 Annuleer taak</translation>
+        <translation>9 Taak annuleren</translation>
     </message>
 </context>
 <context>
@@ -76,15 +76,6 @@ Er is geen VCD-apparaat ingesteld.</translation>
     <message>
         <source>
 
-You have no DVD Player command defined.</source>
-        <translation type="obsolete">
-
-U heeft geen DVD-afspeelcommando gedefinieerd.
-</translation>
-    </message>
-    <message>
-        <source>
-
 You have no DVD Device defined.</source>
         <translation>
 
@@ -105,7 +96,7 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Algemene Instellingen</translation>
+        <translation>Algemene instellingen</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
@@ -189,11 +180,11 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>Use xvid rather than divx</source>
-        <translation>Gebruik liever xvid dan divx</translation>
+        <translation>Xvid boven divx verkiezen</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation>Indien geselecteerd, zal MTD de (open, vrije) xvid-codec gebruiken i.pv. divx waar mogelijk.</translation>
+        <translation>MTD zal de (open, vrije) xvid-codec gebruiken i.p.v. divx, waar mogelijk.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
@@ -225,7 +216,7 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>Waiting For Access to DVD</source>
-        <translation>Wacht op DVD</translation>
+        <translation>Wacht op toegang tot DVD</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
@@ -233,7 +224,7 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation>Perfecte DVD Rip van %1</translation>
+        <translation>Perfecte DVD-rip van %1</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
@@ -261,11 +252,11 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation>Gelijktijdige Transcode-taken</translation>
+        <translation>Gelijktijdige transcode-taken</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation>Bepaalt het aantal gelijktijdige transcode taken. Indien 1 (standaard), zal er slechts een actieve taak zijn.</translation>
+        <translation>Bepaalt het aantal gelijktijdige transcode taken. Indien 1 (standaard), zal er slechts één actieve taak zijn.</translation>
     </message>
     <message>
         <source>On DVD insertion</source>
@@ -273,23 +264,23 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>Do nothing</source>
-        <translation>Doe niets</translation>
+        <translation>Niets doen</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation>Speel DVD</translation>
+        <translation>DVD afspelen</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation>Importeer DVD</translation>
+        <translation>DVD importeren</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation>Media-monitoring moet geactiveerd zijn om dit toe te laten (Instellingen -&gt; Algemeen -&gt; CD/DVD Monitor)</translation>
+        <translation>Media-monitoring moet geactiveerd zijn (Instellingen -&gt; Algemeen -&gt; CD/DVD Monitor)</translation>
     </message>
     <message>
         <source>Display mythdvd menu</source>
-        <translation>Toon MythDVD menu</translation>
+        <translation>MythDVD menu tonen</translation>
     </message>
     <message>
         <source>ISO copy of %1</source>
@@ -375,15 +366,15 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation>0 Verwerk de geselecteerde titel</translation>
+        <translation>0 Geselecteerde titel verwerken</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation>0 Verwerk de geselecteerde titels</translation>
+        <translation>0 Geselecteerde titels verwerken</translation>
     </message>
     <message>
         <source>ISO Image</source>
-        <translation>ISO Kopie</translation>
+        <translation>ISO-kopie</translation>
     </message>
 </context>
 </TS>

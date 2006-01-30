@@ -3,39 +3,39 @@
     <name>DatabaseBox</name>
     <message>
         <source>Copy To New Playlist</source>
-        <translation>Kopieer naar Nieuwe Afspeellijst</translation>
+        <translation>Naar nieuwe afspeellijst kopiëren</translation>
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Maak Actieve Speellijst leeg</translation>
+        <translation>Huidige afspeellijst leegmaken</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
-        <translation>Sla op in Speellijst</translation>
+        <translation>In afspeellijst opslaan</translation>
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>Verplaats naar Actieve Speellijst</translation>
+        <translation>Naar huidige afspeellijst verplaatsen</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
-        <translation>Verwijder deze Speellijst</translation>
+        <translation>Afspeellijst verwijderen</translation>
     </message>
     <message>
         <source>Rename This Playlist</source>
-        <translation>Hernoem deze Speellijst</translation>
+        <translation>Afspeellijst hernoemen</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Actieve Speellijst</translation>
+        <translation>Actieve afspeellijst</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Alle Afspeellijsten</translation>
+        <translation>Alle afspeellijsten</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation>Mijn Muziek</translation>
+        <translation>Mijn muziek</translation>
     </message>
     <message>
         <source>Blechy Blech Blah</source>
@@ -43,11 +43,11 @@
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation>Mijn Muziek ~ Muziekdata aan het laden</translation>
+        <translation>Mijn muziek ~ Bezig met laden muziekdata</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
-        <translation>Muziekdata aan het laden</translation>
+        <translation>Bezig met laden muziekdata</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
@@ -71,117 +71,137 @@
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation>Maak Audio-CD van Speellijst</translation>
+        <translation>Audio CD van afspeellijst maken</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation>Maak MP3-CD van Speellijst</translation>
+        <translation>MP3 CD van afspeellijst maken</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation>Wis CD-RW</translation>
+        <translation>CD-RW leeg maken</translation>
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
         <translation>Het thema dat u gebruikt bevat geen informatie in het music element. Neem contact op met de maker van dit thema en vraag of ze het thema willen aanpassen.&lt;br&gt;&lt;br&gt;Het volgende scherm zal leeg zijn. Ga eruit om terug te gaan naar het menu.</translation>
     </message>
     <message>
-        <source>Artist:<byte value="x9"/></source>
-        <translation>Uitvoerder:</translation>
+        <source>Artist:</source>
+        <translation type="obsolete">Artiest:</translation>
     </message>
     <message>
-        <source>Album:<byte value="x9"/></source>
-        <translation>Album:</translation>
+        <source>Album:</source>
+        <translation type="obsolete">Album:</translation>
     </message>
     <message>
-        <source>Title:<byte value="x9"/></source>
-        <translation>Titel:</translation>
+        <source>Title:</source>
+        <translation type="obsolete">Titel:</translation>
     </message>
     <message>
-        <source>Length:<byte value="x9"/></source>
-        <translation>Lengte:</translation>
+        <source>Length:</source>
+        <translation type="obsolete">Lengte:</translation>
     </message>
     <message>
         <source>Genre: </source>
         <translation>Genre: </translation>
     </message>
     <message>
+        <source>Compilation Artist:</source>
+        <translation type="obsolete">Compilatie Artiest:</translation>
+    </message>
+    <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation>Compilatie Artiest:</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation>Klaar</translation>
+        <translation>Gereed</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation>Statistieken</translation>
+        <translation>DB statistieken</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation>Verschillende Artiesten</translation>
+        <translation>Verschillende artiesten</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation>Kies een Artiest</translation>
+        <translation>Artiest kiezen</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation>Kies een Compilatie Artiest</translation>
+        <translation>Compilatie Artiest kiezen</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation>Kies een Album</translation>
+        <translation>Album kiezen</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation>Kies een Genre</translation>
+        <translation>Genre kiezen</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation>Bewaar Wijzigingen?</translation>
+        <translation>Wijzigingen opslaan?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation>Bewaar Enkel In De Database</translation>
+        <translation>Enkel in database opslaan</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation>Pas Enkel Het Bestand Aan</translation>
+        <translation>Enkel bestand opslaan</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation>Bewaar in Bestand en Database</translation>
+        <translation>Bestand en in database opslaan</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation>Stop/Niet Bewaren</translation>
+        <translation>Stoppen/Niet opslaan</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleer</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation>Ben je zeker dat je de gewijzigde gegevens in het bestand wil opslaan?</translation>
+        <translation>Bent u zeker dat u de gewijzigde gegevens in het bestand wilt opslaan?</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Wijzig Speellijst</translation>
+        <translation>Afspeellijst wijzigen</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation>Visuele Effecten</translation>
+        <translation>Visualisatie</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 Wijzig Speellijst</translation>
+        <translation>3 Afspeellijst wijzigen</translation>
     </message>
     <message>
         <source>4 Visualize</source>
@@ -245,11 +265,11 @@
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Bezig bufferen stream.</translation>
+        <translation>Bezig bufferen stroom.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Stream gepauseerd.</translation>
+        <translation>Stroom gepauzeerd.</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -269,11 +289,11 @@
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Stream gestopt.</translation>
+        <translation>Stroom gestopt.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>Stream afgespeeld.</translation>
+        <translation>Stroom afgespeeld.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
@@ -281,71 +301,71 @@
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation>Slimme Speellijsten</translation>
+        <translation>Slimme afspeellijsten</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation>Alle Nummers</translation>
+        <translation>Alle nummers</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation>Alle Nummers Van Deze Artiest</translation>
+        <translation>Alle nummers van deze artiest</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation>Alle Nummers Van Dit Album</translation>
+        <translation>Alle nummers van dit album</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation>Alle Nummers Van Dit Genre</translation>
+        <translation>Alle nummers van dit genre</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation>Alle Nummers Uit Dit Jaar</translation>
+        <translation>Alle nummers uit dit jaar</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoeken</translation>
     </message>
     <message>
         <source>From CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <source>Change Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter veranderen</translation>
     </message>
     <message>
         <source>Update Playlist Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeellijst-opties verversen</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Vervangen</translation>
     </message>
     <message>
         <source>Insert after current track</source>
-        <translation type="unfinished"></translation>
+        <translation>Na huidig nummer invoegen</translation>
     </message>
     <message>
         <source>Append to end</source>
-        <translation type="unfinished"></translation>
+        <translation>Op einde invoegen</translation>
     </message>
     <message>
         <source>Continue playing current track</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidig nummer blijven afspelen</translation>
     </message>
     <message>
         <source>Play first track</source>
-        <translation type="unfinished"></translation>
+        <translation>Eerste nummer afspelen</translation>
     </message>
     <message>
         <source>Play first new track</source>
-        <translation type="unfinished"></translation>
+        <translation>Eerste nieuwe nummer afspelen</translation>
     </message>
     <message>
         <source>Remove Duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbels vervangen</translation>
     </message>
 </context>
 <context>
@@ -356,7 +376,7 @@
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Bezig met bijwerken databank</translation>
+        <translation>Bezig met bijwerken database</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -364,7 +384,7 @@
     </message>
     <message>
         <source>Various Artists</source>
-        <translation>Verschillende Artiesten</translation>
+        <translation>Verschillende artiesten</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
@@ -388,11 +408,11 @@
     </message>
     <message>
         <source>Audio device</source>
-        <translation>Audio-apparaat</translation>
+        <translation>Audioapparaat</translation>
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation>Audio-apparaat gebruikt voor afspelen.</translation>
+        <translation>Audioapparaat voor afspelen.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -400,15 +420,15 @@
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation>CD-ROM-apparaat gebruikt voor importeren en afspelen.</translation>
+        <translation>CD-ROM-apparaat voor importeren en afspelen.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
-        <translation>Sorteerwijze</translation>
+        <translation>Manier van rangschikken</translation>
     </message>
     <message>
         <source>Script Path</source>
-        <translation>Path voor script</translation>
+        <translation>Script uitvoeren</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
@@ -424,7 +444,7 @@
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
-        <translation>Negeer ID3-tags</translation>
+        <translation>ID3-tags negeren</translation>
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
@@ -448,7 +468,7 @@
     </message>
     <message>
         <source>Encoding</source>
-        <translation>Formaat voor audio</translation>
+        <translation>Audioformaat</translation>
     </message>
     <message>
         <source>Ogg Vorbis</source>
@@ -460,7 +480,7 @@
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Audio-encoder die gebruikt wordt om CD&apos;s te importeren. Voor perfecte kwaliteit wordt de FLAC-encoder gebruikt.</translation>
+        <translation>Audio-encoder die gebruikt wordt om Cd&apos;s te importeren. Voor perfecte kwaliteit wordt de FLAC-encoder gebruikt.</translation>
     </message>
     <message>
         <source>File storage location</source>
@@ -488,7 +508,7 @@
     </message>
     <message>
         <source>Paranoia Level</source>
-        <translation>Paranoia Niveau</translation>
+        <translation>Paranoia niveau</translation>
     </message>
     <message>
         <source>Full</source>
@@ -500,7 +520,7 @@
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation>Paranoia niveau van de CD-ripper. Selecteer sneller als U niet bekommerd bent om mogelijke fouten in de muziek.</translation>
+        <translation>Paranoia niveau van de CD-ripper. Sneller kiezen als U niet bekommerd bent om mogelijke fouten in de muziek.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
@@ -544,23 +564,23 @@
     </message>
     <message>
         <source>Show Song Ratings</source>
-        <translation>Toon Beoordeling</translation>
+        <translation>Beoordeling tonen</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
-        <translation>Toon beoordeling van nummers op het afspeelscherm.</translation>
+        <translation>Beoordeling van nummers worden op het afspeelscherm getoond.</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
-        <translation>Toon Gemengd</translation>
+        <translation>Gemengd tonen</translation>
     </message>
     <message>
         <source>List songs on the playback screen in the order they will be played.</source>
-        <translation>Toon nummers op het afspeelscherm in de volgorde waarin ze afgespeeld worden.</translation>
+        <translation>Nummers op het afspeelscherm laten zien in de volgorde waarin ze afgespeeld worden.</translation>
     </message>
     <message>
         <source>Show entire music tree</source>
-        <translation>Toon hele muzieklijst</translation>
+        <translation>Hele muzieklijst tonen</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
@@ -584,40 +604,40 @@
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation>Manier van Mengen waarin gestart wordt.
+        <translation>Manier van mengen waarmee gestart wordt.
 Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
-        <translation>Vertraging voor starten visuele effecten (seconden)</translation>
+        <translation>Vertraging voor starten visualisaties (seconden)</translation>
     </message>
     <message>
         <source>If set to 0, visualizations will never automatically start.</source>
-        <translation>Indien ingesteld op 0, zullen visuele effecten nooit automatisch starten.</translation>
+        <translation>Indien ingesteld op 0, zullen visualisaties nooit automatisch starten.</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation>Verander visueel effect bij elk nummer</translation>
+        <translation>Visualisatie bij elk nummer veranderen</translation>
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation>Verander van visueel effect bij overgang naar een ander nummer.</translation>
+        <translation>Veranderen van visualisatie bij overgang naar een ander nummer.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
-        <translation>Breedte voor schalen visuele effecten</translation>
+        <translation>Breedte voor schalen visualisatie</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation>Indien ingesteld op &quot;2&quot;, zullen de visuele effecten geschaald worden naar de helft. Op dit moment enkel gebruikt door &quot;Goom&quot;. Reduceert processorbelasting op tragere systemen.</translation>
+        <translation>Indien ingesteld op &quot;2&quot;, zullen de visualisaties geschaald worden naar de helft. Op dit moment enkel gebruikt door &quot;Goom&quot;. Reduceert processorbelasting op tragere systemen.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
-        <translation>Hoogte voor schalen visuele effecten</translation>
+        <translation>Hoogte voor schalen visualisaties</translation>
     </message>
     <message>
         <source>Visualizations</source>
-        <translation>Visuele Effecten</translation>
+        <translation>Visualisaties</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
@@ -653,7 +673,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation>Standaard kwaliteit bij importeren</translation>
+        <translation>Standaard kwaliteit importeren</translation>
     </message>
     <message>
         <source>Low</source>
@@ -677,7 +697,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Algemene Instellingen</translation>
+        <translation>Algemene instellingen</translation>
     </message>
     <message>
         <source>Playback Settings</source>
@@ -725,7 +745,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Missing database entry: %1</source>
-        <translation>Ontbrekende databankinvoer: %1</translation>
+        <translation>Ontbrekende database-invoer: %1</translation>
     </message>
     <message>
         <source>Ooops</source>
@@ -733,7 +753,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation>Niet geïnitialseerd</translation>
+        <translation>Niet geïnitialiseerd</translation>
     </message>
     <message>
         <source>oops</source>
@@ -741,15 +761,15 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Alle Afspeellijsten</translation>
+        <translation>Alle afspeellijsten</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Actieve Speellijst</translation>
+        <translation>Actieve afspeellijst</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation>Actieve Speellijst (%1)</translation>
+        <translation>Actieve afspeellijst (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
@@ -757,7 +777,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation>Visueel effect heeft FFT bibliotheek nodig</translation>
+        <translation>Visualisatie heeft FFT bibliotheek nodig</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
@@ -769,7 +789,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation>Gebruik variabele bitrates</translation>
+        <translation>Variabele bitrates gebruiken</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
@@ -781,7 +801,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation>Schakel CD branden in.</translation>
+        <translation>CD branden inschakelen</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
@@ -797,11 +817,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation></translation>
+        <translation>650MB/75min</translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation></translation>
+        <translation>700MB/80min</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
@@ -809,7 +829,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation>Maak mappen bij aanmaken van MP3-CD</translation>
+        <translation>Mappen maken bij MP3-CD</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
@@ -825,7 +845,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation>Methode voor wissen CD</translation>
+        <translation>Methode voor leeg maken CD</translation>
     </message>
     <message>
         <source>Fast</source>
@@ -833,11 +853,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation>Compleet</translation>
+        <translation>Volledig</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation>Methode voor wissen. Snel duurt ongeveer 1 minuut. Compleet kan tot 20 minuten in beslag nemen.</translation>
+        <translation>Methode voor wissen. Snel duurt ongeveer 1 minuut. Volledig kan tot 20 minuten in beslag nemen.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
@@ -849,7 +869,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation>Bezig met aanmaken van CD bestandssysteem</translation>
+        <translation>Bezig met maken van CD-bestandssysteem</translation>
     </message>
     <message>
         <source>Burning CD</source>
@@ -861,7 +881,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Track %1</source>
-        <translation>Track %1</translation>
+        <translation>Nummer %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
@@ -869,42 +889,42 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Automatically play CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>CD &apos;s automatisch afspelen</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Een nieuw ingevoerde CD wordt onmiddellijk aan de afspeellijst toegevoegd en afgespeeld.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>SCSI of IDE apparaat kiezen voor het branden van CD &apos;s.</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met zoeken naar muziekbestanden</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Muziekboom wordt opnieuw gebouwd</translation>
     </message>
     <message>
         <source>Only Import new music.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel nieuwe muziek importeren</translation>
     </message>
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Database wordt op dubbels gecontroleerd bij importeren van CD &apos;s.</translation>
     </message>
     <message>
         <source>Loading Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met laden van muziek</translation>
     </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Kies de gewenste kwaliteit en controleer de albuminformatie:</translation>
+        <translation>Gewenste kwaliteit kiezen en albuminformatie controleren:</translation>
     </message>
     <message>
         <source>Low</source>
@@ -932,36 +952,36 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>Importeer deze CD</translation>
+        <translation>CD importeren</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>Bezig met importeren van CD:
+        <translation>Bezig met importeren van:
 
 </translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>Bezig met kopiëren van CD:
+        <translation>Bezig met kopiëren van:
 </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>Bezig met importeren...</translation>
+        <translation>Bezig met rippen...</translation>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation>Verschillende Uitvoereders?</translation>
+        <translation>Verschillende uitvoerders?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation>Wissel Titels en Uitvoerders</translation>
+        <translation>Titels en artiesten wisselen</translation>
     </message>
     <message>
         <source>Title</source>
@@ -969,11 +989,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Uitvoerder</translation>
+        <translation>Artiest</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation>Lengte</translation>
+        <translation>Duur</translation>
     </message>
     <message>
         <source>Quality: </source>
@@ -988,30 +1008,30 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation>Kies een Uitvoerder</translation>
+        <translation>Artiest kiezen</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation>Kies een Album</translation>
+        <translation>Album kiezen</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation>Kies een Genre</translation>
+        <translation>Genre kiezen</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation>Kies een Titel</translation>
+        <translation>Titel kiezen</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation>Kies een Compilatie Artiest</translation>
+        <translation>Compilatie Artiest kiezen</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation>Bewerkings datum</translation>
+        <translation>Bewerkingsdatum</translation>
     </message>
     <message>
         <source>Fixed Date</source>
@@ -1031,11 +1051,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation>Gebruik de huidige datum</translation>
+        <translation>Huidige datum gebruiken</translation>
     </message>
     <message>
         <source>+/- Days</source>
-        <translation>+/- Dagen</translation>
+        <translation>+/- dagen</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1043,7 +1063,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleer</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Invalid Date</source>
@@ -1054,7 +1074,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation>Sorteren Op</translation>
+        <translation>Rangschikken</translation>
     </message>
     <message>
         <source>1 Add</source>
@@ -1066,11 +1086,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation>2 Wis</translation>
+        <translation>2 Verwijderen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Wis</translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <source>3 Move Up</source>
@@ -1117,11 +1137,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation>Resultaatvenster Slimme Speellijst</translation>
+        <translation>Bekijken van resultaat slimme afspeellijst</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Stop</translation>
+        <translation>Afsluiten</translation>
     </message>
     <message>
         <source>ID</source>
@@ -1129,7 +1149,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>Uitvoerder</translation>
+        <translation>Artiest</translation>
     </message>
     <message>
         <source>Album</source>
@@ -1156,15 +1176,15 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation>Slimme Speellijsten</translation>
+        <translation>Slimme afspeellijsten</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation>1 Kies</translation>
+        <translation>1 Kiezen</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation>Kies</translation>
+        <translation>Kiezen</translation>
     </message>
     <message>
         <source>2 New</source>
@@ -1176,30 +1196,30 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation>3 Bewerk</translation>
+        <translation>3 Bewerken</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Bewerk</translation>
+        <translation>Bewerken</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation>4 Wis</translation>
+        <translation>4 Verwijderen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Wis</translation>
+        <translation>Verwijderen</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation>Deze Slimme Speellijst verwijderen?</translation>
+        <translation>Deze slimme afspeellijst verwijderen?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation>Slimme Speellijs Bewerken</translation>
+        <translation>Slimme afspeellijst bewerken</translation>
     </message>
     <message>
         <source>Category:</source>
@@ -1211,27 +1231,27 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation>Match</translation>
+        <translation>Voldoen aan</translation>
     </message>
     <message>
         <source>All</source>
-        <translation>Alle</translation>
+        <translation>alle</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation>Een</translation>
+        <translation>één</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation>Van de Volgende Voorwaarden</translation>
+        <translation>van de volgende voorwaarden</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation>Sorteren Volgens:</translation>
+        <translation>Rangschikken:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation>Matches:</translation>
+        <translation>Overeenkomsten:</translation>
     </message>
     <message>
         <source>Limit:</source>
@@ -1243,39 +1263,39 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Anuleer</translation>
+        <translation>Annuleren</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Bewaar</translation>
+        <translation>Opslaan</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation>Toon Resultaten</translation>
+        <translation>Resultaten tonen</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation>Categorien Van Slimme Speellijsten</translation>
+        <translation>Categorieën slimme afspeellijsten</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation>Nieuwe Categorie</translation>
+        <translation>Nieuwe categorie</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation>Wis Categorie</translation>
+        <translation>Categorie verwijderen</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation>Hernoem Categorie</translation>
+        <translation>Categorie hernoemen</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation>Deze Categorie Verwijderen?</translation>
+        <translation>Deze categorie verwijderen?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation>Ook Alle Slimme Speellijsten van deze Categorie zullen verdwijnen.</translation>
+        <translation>Ook alle slimme afspeellijsten in deze categorie zullen verdwijnen.</translation>
     </message>
 </context>
 <context>
@@ -1286,11 +1306,11 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Track Information</source>
-        <translation>Informatie Over Nummer</translation>
+        <translation>Informatie</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation>Uitvoerder:</translation>
+        <translation>Artiest</translation>
     </message>
     <message>
         <source>Album:</source>
@@ -1314,15 +1334,15 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation>Waardering:</translation>
+        <translation>Beoordeling:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation>Aantal Maal Gespeeld:</translation>
+        <translation>Aantal maal afgespeeld:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation>Laatst Gespeeld:</translation>
+        <translation>Laatst afgespeeld:</translation>
     </message>
     <message>
         <source>Compilation:</source>
