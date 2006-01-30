@@ -73,6 +73,17 @@ NetworkControl::NetworkControl(int port)
     keyMap["pageup"]                 = Qt::Key_Prior;
     keyMap["pagedown"]               = Qt::Key_Next;
     keyMap["escape"]                 = Qt::Key_Escape;
+    keyMap["space"]                  = Qt::Key_Space;
+    keyMap["backspace"]              = Qt::Key_Backspace;
+    keyMap["bracketleft"]            = Qt::Key_BracketLeft;
+    keyMap["bracketright"]           = Qt::Key_BracketRight;
+    keyMap["backslash"]              = Qt::Key_Backslash;
+    keyMap["slash"]                  = Qt::Key_Slash;
+    keyMap["colon"]                  = Qt::Key_Colon;
+    keyMap["semicolon"]              = Qt::Key_Semicolon;
+    keyMap["less"]                   = Qt::Key_Less;
+    keyMap["equal"]                  = Qt::Key_Equal;
+    keyMap["greater"]                = Qt::Key_Greater;
     keyMap["f1"]                     = Qt::Key_F1;
     keyMap["f2"]                     = Qt::Key_F2;
     keyMap["f3"]                     = Qt::Key_F3;
@@ -160,6 +171,8 @@ void NetworkControl::processNetworkControlCommand(QString command)
     QString result = "";
     QStringList tokens = QStringList::split(" ", command);
 
+    tokens[0] = tokens[0].lower();
+
     if (tokens[0] == "jump")
         result = processJump(tokens);
     else if (tokens[0] == "key")
@@ -242,10 +255,15 @@ void NetworkControl::readClient(void)
         return;
 
     QString lineIn;
+    QStringList tokens;
     while (socket->canReadLine())
     {
-        lineIn = socket->readLine().lower();
+        lineIn = socket->readLine();
         lineIn.replace(QRegExp("[\r\n]"), "");
+
+        tokens = QStringList::split(" ", lineIn);
+        if (tokens[0].lower() != "key")
+            lineIn = lineIn.lower();
 
         ncLock.lock();
         networkControlCommands.push_back(lineIn);
@@ -313,11 +331,20 @@ QString NetworkControl::processKey(QStringList tokens)
     }
     else if (tokens[1].length() == 1 && tokens[1][0].isLetterOrNumber())
     {
-        int ch = (int)(tokens[1][0].upper());
-        event = new QKeyEvent(QEvent::KeyPress, ch, 0, NoButton);
+        QKeySequence a(tokens[1]);
+        int keyCode = a[0];
+        int ch = (tokens[1].ascii())[0];
+        int buttons = NoButton;
+
+        if (tokens[1] == tokens[1].upper())
+            buttons = ShiftButton;
+
+        event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
+                              tokens[1]);
         QApplication::postEvent(widget, event);
 
-        event = new QKeyEvent(QEvent::KeyRelease, ch,0, NoButton);
+        event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, buttons,
+                              tokens[1]);
         QApplication::postEvent(widget, event);
     }
     else
