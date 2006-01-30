@@ -187,6 +187,7 @@ class PlaybackBox : public MythDialog
     ProgramInfo *curitem;
     ProgramInfo *delitem;
     ProgramInfo *lastProgram;
+    uint lastBrokenRecordId;
 
     void LoadWindow(QDomElement &);
     XMLParse *theme;

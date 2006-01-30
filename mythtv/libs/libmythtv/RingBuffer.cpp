@@ -112,6 +112,22 @@ RingBuffer::RingBuffer(const QString &lfilename,
     OpenFile(filename, read_retries);
 }
 
+/** \fn check_permissions(const QString&)
+ *  \brief Returns false iff file exists and has incorrect permissions.
+ *  \param filename File (including path) that we want to know about
+ */
+bool check_permissions(const QString &filename)
+{
+    QFileInfo fileInfo(filename);
+    if (fileInfo.exists() && !fileInfo.isReadable())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "File exists but is not readable by MythTV!");
+        return false;
+    }
+    return true;
+}
+
 /** \fn RingBuffer::OpenFile(const QString&, uint)
  *  \brief Opens a file for reading.
  *
@@ -193,6 +209,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
                 
             if (fd2 < 0)
             {
+                if (!check_permissions(filename))
+                    break;
+
                 VERBOSE(VB_IMPORTANT,
                         QString("Could not open %1.  %2 retries remaining.")
                         .arg(filename).arg(openAttempts));

@@ -38,6 +38,9 @@ using namespace std;
 #include "previewgenerator.h"
 #include "playgroup.h"
 
+#define LOC QString("PlaybackBox: ")
+#define LOC_ERR QString("PlaybackBox Error: ")
+
 #define REC_CAN_BE_DELETED(rec) \
     ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
      ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
@@ -101,7 +104,7 @@ static int comp_originalAirDate_rev(ProgramInfo *a, ProgramInfo *b)
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
-           : MythDialog(parent, name)
+    : MythDialog(parent, name), lastBrokenRecordId(0)
 {
     type = ltype;
 
@@ -1603,6 +1606,10 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
 
     if (rec != NULL)
     {
+        // Don't keep trying to open broken files when just sitting on entry
+        if (lastBrokenRecordId && lastBrokenRecordId == rec->recordid)
+            return;
+
         if (rbuffer || nvp)
         {
             VERBOSE(VB_IMPORTANT,
@@ -1612,6 +1619,16 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
         }
 
         rbuffer = new RingBuffer(rec->pathname, false, false);
+        if (!rbuffer->IsOpen())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Could not open file for preview video.");
+            delete rbuffer;
+            rbuffer = NULL;
+            lastBrokenRecordId = rec->recordid;
+            return;
+        }
+        lastBrokenRecordId = 0;
 
         nvp = new NuppelVideoPlayer("preview player");
         nvp->SetRingBuffer(rbuffer);
