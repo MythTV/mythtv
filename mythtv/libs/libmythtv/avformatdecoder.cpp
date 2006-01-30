@@ -870,8 +870,12 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);    
 
-    if (!gContext->GetNumSetting("DecodeExtraAudio", 0))
+    if (!gContext->GetNumSetting("DecodeExtraAudio", 0) &&
+        codec->id != CODEC_ID_MPEG2VIDEO_XVMC           &&
+        codec->id != CODEC_ID_MPEG2VIDEO_XVMC_VLD)
+    {
         SetLowBuffers(false);
+    }
 
     if (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||
                   codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))

@@ -780,7 +780,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     GetDecoder()->setRecorder(nvr_enc);
     GetDecoder()->setWatchingRecording(watchingrecording);
     GetDecoder()->setTranscoding(transcoding);
-    GetDecoder()->SetLowBuffers(decode_extra_audio);
+    GetDecoder()->SetLowBuffers(decode_extra_audio && !using_null_videoout);
 
     eof = false;
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
