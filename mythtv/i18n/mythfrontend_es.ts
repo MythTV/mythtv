@@ -7706,19 +7706,19 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Enable Network Remote Control interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar Control Remoto por Red</translation>
     </message>
     <message>
         <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esto activa el control de mythfrontend a través de la red.</translation>
     </message>
     <message>
         <source>Network Remote Control Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Puerto Control Remoto por Red</translation>
     </message>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esto especifica en que puerto escuchará el Control Remoto por Red.</translation>
     </message>
 </context>
 <context>
@@ -8499,23 +8499,23 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Speed 16X</source>
-        <translation type="unfinished">Velocidad 16X</translation>
+        <translation>Velocidad 16X</translation>
     </message>
     <message>
         <source>Speed 8X</source>
-        <translation type="unfinished">Velocidad 8X</translation>
+        <translation>Velocidad 8X</translation>
     </message>
     <message>
         <source>Speed 4X</source>
-        <translation type="unfinished">Velocidad 4X</translation>
+        <translation>Velocidad 4X</translation>
     </message>
     <message>
         <source>Speed 1/2X</source>
-        <translation type="unfinished">Velocidad 1/2X</translation>
+        <translation>Velocidad 1/2X</translation>
     </message>
     <message>
         <source>Speed 1/4X</source>
-        <translation type="unfinished">Velocidad 1/4X</translation>
+        <translation>Velocidad 1/4X</translation>
     </message>
 </context>
 <context>
