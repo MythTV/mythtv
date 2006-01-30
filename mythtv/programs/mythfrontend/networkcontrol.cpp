@@ -582,17 +582,23 @@ QString NetworkControl::processHelp(QStringList tokens)
     else if (command == "key")
     {
         helpText +=
-            "key LETTER            - Send the letter key specified\r\n"
-            "key NUMBER            - Send the number key specified\r\n"
-            "key up                - Send the Up cursor key\r\n"
-            "key down              - Send the Down cursor key\r\n"
-            "key left              - Send the Left cursor key\r\n"
-            "key right             - Send the Right cursor key\r\n"
-            "key pageup            - Send the Page Up Key\r\n"
-            "key pagedown          - Send the Page Down key\r\n"
-            "key enter             - Send the Enter key\r\n"
-            "key escape            - Send the Escape key\r\n"
-            "key f1..f12           - Send the F# Function keys\r\n";
+            "key LETTER           - Send the letter key specified\r\n"
+            "key NUMBER           - Send the number key specified\r\n"
+            "key CODE             - Send one of the following key codes\r\n"
+            "\r\n";
+
+        QMap<QString, int>::Iterator it;
+        bool first = true;
+        for (it = keyMap.begin(); it != keyMap.end(); ++it)
+        {
+            if (first)
+                first = false;
+            else
+                helpText += ", ";
+
+            helpText += it.key();
+        }
+        helpText += "\r\n";
     }
     else if (command == "play")
     {
