@@ -383,15 +383,18 @@ QString NetworkControl::processPlay(QStringList tokens)
         }
         else
         {
-            result = "ERROR: Unable to change to PlaybackBox, can not "
-                     "play requested file.";
+            result = QString("ERROR: Unable to change to PlaybackBox from "
+                             "%1, can not play requested file.")
+                             .arg(gContext->getCurrentLocation());
         }
     }
     // Everything below here requires us to be in playback mode so check to
     // see if we are
     else if (gContext->getCurrentLocation().lower() != "playback")
     {
-        return "ERROR: You are not in playback mode";
+        return QString("ERROR: You are in %1 mode and this command is only "
+                       "for playback mode")
+                       .arg(gContext->getCurrentLocation());
     }
     else if (tokens[1] == "chanid")
     {
@@ -687,6 +690,10 @@ void NetworkControl::customEvent(QCustomEvent *e)
         {
             clientLock.lock();
             client->close();
+            delete client;
+            delete cs;
+            client = NULL;
+            cs = NULL;
             clientLock.unlock();
         }
     }
