@@ -181,6 +181,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
     m_DeintSetting   = gContext->GetNumSetting("Deinterlace", 0);
+    decode_extra_audio=gContext->GetNumSetting("DecodeExtraAudio", 0);
 
     bzero(&txtbuffers, sizeof(txtbuffers));
     bzero(&tc_lastval, sizeof(tc_lastval));
@@ -414,15 +415,22 @@ bool NuppelVideoPlayer::InitVideo(void)
             return false;
         }
 
-        if (gContext->GetNumSetting("DecodeExtraAudio", 0))
-            GetDecoder()->SetLowBuffers(true);
-
         if (!videoOutput->Init(video_width, video_height, video_aspect,
                                widget->winId(), 0, 0, widget->width(),
                                widget->height(), 0))
         {
             errored = true;
             return false;
+        }
+
+        if (videoOutput->hasMCAcceleration() && !decode_extra_audio)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "Forcing decode extra audio option on. "
+                    "\n\t\t\tXvMC playback requires it.");
+            decode_extra_audio = true;
+            if (GetDecoder())
+                GetDecoder()->SetLowBuffers(decode_extra_audio);
         }
     }
 
@@ -772,6 +780,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     GetDecoder()->setRecorder(nvr_enc);
     GetDecoder()->setWatchingRecording(watchingrecording);
     GetDecoder()->setTranscoding(transcoding);
+    GetDecoder()->SetLowBuffers(decode_extra_audio);
 
     eof = false;
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
@@ -944,6 +953,14 @@ void NuppelVideoPlayer::CheckPrebuffering(void)
 {
     if (kVideoOutput_IVTV == forceVideoOutput)
         return;
+
+    if ((videoOutput->hasMCAcceleration()   ||
+         videoOutput->hasIDCTAcceleration() ||
+         videoOutput->hasVLDAcceleration()) &&
+        (videoOutput->EnoughDecodedFrames()))
+    {
+        SetPrebuffering(false);
+    }
 
 #if FAST_RESTART
     if (videoOutput->EnoughPrebufferedFrames())
