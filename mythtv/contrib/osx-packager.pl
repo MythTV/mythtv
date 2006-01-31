@@ -680,6 +680,10 @@ if (! $OPT{'nohead'})
   &Syscall([ $svn, 'co', @svnrevision,
             map($svnrepository . $_, @comps), $svndir ]) or die;
 }
+else
+{
+  &Syscall("mkdir -p $svndir/mythtv/config")
+}
 
 # Deal with user-supplied skip arguments
 if ( $OPT{'mythtvskip'} )
@@ -797,34 +801,14 @@ foreach my $target ( @targets )
   # Get a fresh copy of the app
   &Verbose("Building self-contained $target");
   &Syscall([ 'rm', '-fr', $finalTarget ]) or die;
-  &Syscall([ '/bin/cp', '-R',
-             "$PREFIX/bin/$builtTarget.app",
-             $finalTarget ]) or die;
+  &RecursiveCopy("$PREFIX/bin/$builtTarget.app", $finalTarget);
   
   # write a custom Info.plist
   &GeneratePlist($target, $builtTarget, $finalTarget, $VERS);
   
   # Make frameworks from Myth libraries
   &Verbose("Installing frameworks into $target");
-  my $fw_dir = "$finalTarget/Contents/Frameworks";
-  mkdir($fw_dir);
-  my $dephash = &ProcessDependencies("$finalTarget/Contents/MacOS/$builtTarget",
-                                     glob("$PREFIX/lib/mythtv/*/*.dylib"));
-  my @deps = values %$dephash;
-  while (scalar @deps)
-  {
-    my $dep = shift @deps;
-    next if $dep =~ m/executable_path/;
-
-    my $file = &MakeFramework(&FindLibraryFile($dep), $fw_dir);
-    my $newhash = &ProcessDependencies($file);
-    foreach my $base (keys %$newhash)
-    {
-      next if exists $dephash->{$base};
-      $dephash->{$base} = $newhash->{$base};
-      push(@deps, $newhash->{$base});
-    }
-  }
+  &PackagedExecutable($finalTarget, $builtTarget);
   
  if ( $target eq "MythFrontend" or $target eq "MythTV-Setup" )
  {
@@ -832,13 +816,11 @@ foreach my $target ( @targets )
   &Verbose("Installing resources into $target");
   mkdir "$finalTarget/Contents/Resources";
   mkdir "$finalTarget/Contents/Resources/lib";
-  &Syscall([ '/bin/cp', '-R',
-             "$PREFIX/lib/mythtv",
-             "$finalTarget/Contents/Resources/lib" ]) or die;
+  &RecursiveCopy("$PREFIX/lib/mythtv",
+                 "$finalTarget/Contents/Resources/lib");
   mkdir "$finalTarget/Contents/Resources/share";
-  &Syscall([ '/bin/cp', '-R',
-             "$PREFIX/share/mythtv",
-             "$finalTarget/Contents/Resources/share" ]) or die;
+  &RecursiveCopy("$PREFIX/share/mythtv",
+                 "$finalTarget/Contents/Resources/share");
  }
 }
 
@@ -851,7 +833,8 @@ if ( $backend )
     if ( -e $SRC )
     {
       &Syscall([ '/bin/cp', $SRC,
-                 "$SCRIPTDIR/MythBackend.app/Contents/MacOS" ]) or die
+                 "$SCRIPTDIR/MythBackend.app/Contents/MacOS" ]) or die;
+      &PackagedExecutable("$SCRIPTDIR/MythBackend.app", $binary);
     }
   }
 }
@@ -866,7 +849,10 @@ if ( $jobtools )
 
   $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
-  { &Syscall([ '/bin/cp', $SRC, $DEST ]) or die }
+  {
+      &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
+      &PackagedExecutable("$SCRIPTDIR/MythJobQueue.app", 'mythcommflag');
+  }
 }
 
 if ($OPT{usehdimage})
@@ -881,6 +867,71 @@ if ($OPT{usehdimage})
 exit 0;
 
 
+######################################
+## RecursiveCopy copies a directory tree, stripping out .svn
+## directories and properly managing static libraries.
+######################################
+
+sub RecursiveCopy
+{
+    my ($src, $dst) = @_;
+
+    # First copy absolutely everything
+    &Syscall([ '/bin/cp', '-R', "$src", "$dst"]) or die;
+
+    # Then strip out any .svn directories
+    my @files = map { chomp $_; $_ } `find $dst -name .svn`;
+    if (scalar @files)
+    {
+        &Syscall([ '/bin/rm', '-f', '-r', @files ]);
+    }
+
+    # And make sure any static libraries are properly relocated.
+    my @libs = map { chomp $_; $_ } `find $dst -name "lib*.a"`;
+    if (scalar @libs)
+    {
+        &Syscall([ 'ranlib', '-s', @libs ]);
+    }
+}
+
+######################################
+## Given an application package $finalTarget and an executable
+## $builtTarget that has been copied into it, PackagedExecutable
+## makes sure the package contains all the library dependencies as
+## frameworks and that all the paths internal to the executable have
+## been adjusted appropriately.
+######################################
+
+sub PackagedExecutable($$)
+{
+    my ($finalTarget, $builtTarget) = @_;
+
+    my $fw_dir = "$finalTarget/Contents/Frameworks";
+    mkdir $fw_dir;
+
+    my $dephash
+        = &ProcessDependencies("$finalTarget/Contents/MacOS/$builtTarget",
+                               glob "$PREFIX/lib/mythtv/*/*.dylib");
+    my @deps = values %$dephash;
+    while (scalar @deps)
+    {
+        my $dep = shift @deps;
+        next if $dep =~ m/executable_path/;
+
+        my $file = &MakeFramework(&FindLibraryFile($dep), $fw_dir);
+        if ( $file )
+        {
+            my $newhash = &ProcessDependencies($file);
+            foreach my $base (keys %$newhash)
+            {
+                next if exists $dephash->{$base};
+                $dephash->{$base} = $newhash->{$base};
+                push(@deps, $newhash->{$base});
+            }
+        }
+    }
+}
+
 
 ######################################
 ## MakeFramework copies a dylib into a
@@ -893,9 +944,12 @@ sub MakeFramework
   
   my ($base, $vers) = &BaseVers($dylib);
   $vers .= '.' . $OPT{'version'} if ($OPT{'version'} && $base =~ /myth/);
+  my $fw_dir = $dest . '/' . $base . '.framework';
+
+  return '' if ( -e $fw_dir );
+
   &Verbose("Building $base framework");
   
-  my $fw_dir = $dest . '/' . $base . '.framework';
   &Syscall([ '/bin/mkdir',
              '-p',
              "$fw_dir/Versions/A/Resources" ]) or die;
@@ -1050,7 +1104,14 @@ sub ProcessDependencies
     foreach my $dep (@deps)
     {
       chomp $dep;
+
+      # otool returns lines like:
+      #    libblah-7.dylib   (compatibility version 7, current version 7)
+      # but we only want the file part
       $dep =~ s/\s+(.*) \(.*\)$/$1/;
+
+      # Paths like /usr/lib/libstdc++ contain quantifiers that must be escaped
+      $dep =~ s/([+*?])/\\$1/;
       
       # otool sometimes lists the framework as depending on itself
       next if ($file =~ m,/Versions/A/$dep,);
