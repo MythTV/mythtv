@@ -7558,7 +7558,7 @@ MythTV lõpetab töö.</translation>
         <translation>Näita TV salvestisi kui on valitud filter &quot;Kõik programmid&quot;</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation>Kui pole määratud, on TV salvestised näha vaid eraldiseisvas &quot;TV&quot; salvestusgrupis.</translation>
     </message>
     <message>

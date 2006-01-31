@@ -7589,7 +7589,7 @@ Myth saldrá ahora.</translation>
         <translation>Mostrar grabaciones &apos;LiveTV&apos; cuando se use el filtro &quot;Todos los programas&quot;</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation>Si está desactivado, las grabaciones LiveTV sólo serán visibles mediante el Grupo Grabación &quot;LiveTV&quot;.</translation>
     </message>
     <message>

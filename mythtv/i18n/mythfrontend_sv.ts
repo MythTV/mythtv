@@ -6795,7 +6795,7 @@ Myth kommer nu att avslutas.</translation>
         <translation>Visa &apos;LiveTV&apos;-inspelningar när &quot;Alla program&quot; visas</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation>Visa LiveTV-inspelningar med &quot;Alla program&quot;, annars måste inspelningsgruppen &quot;LiveTV&quot; specifikt väljas för att se dessa inspelningar.</translation>
     </message>
     <message>

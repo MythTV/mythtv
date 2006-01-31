@@ -7785,7 +7785,7 @@ Myth va maintenant s&apos;interrompre.</translation>
         <translation>Montrer les enregistrements &quot;TV Directe&quot; dans le filtre &quot;Toutes les émissions&quot;</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation>Si cette option est désactivée, les enregistrements &quot;TV Directe&quot; ne seront visibles que dans le groupe spécial &quot;TV Directe&quot;.</translation>
     </message>
     <message>

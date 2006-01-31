@@ -334,8 +334,8 @@ static HostCheckBox *LiveTVInAllPrograms()
                              "\"All Programs\" filter"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If this setting is disabled, LiveTV "
-                    "recordings will only be visible via the special \"LiveTV\""
-                    "Recording Group."));
+                   "recordings will only be visible via the special \"LiveTV\" "
+                   "Recording Group."));
     return gc;
 }
 

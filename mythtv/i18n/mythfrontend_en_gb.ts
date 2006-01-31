@@ -4197,7 +4197,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Show &apos;LiveTV&apos; recordings when using &quot;All Programmes&quot; filter</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -7798,7 +7798,7 @@ Myth wird nun beendet.</translation>
         <translation>&apos;LiveTV&apos; Aufnahmen beim &apos;Alle Sendungen&apos; Filter zeigen</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation>Falls diese Option deaktiviert ist, sind LiveTV Aufnahmen nur in der &apos;LiveTV&apos; Aufnahmegruppe sichtbar.</translation>
     </message>
     <message>

@@ -6838,7 +6838,7 @@ Myth zal nu afsluiten.</translation>
         <translation>&apos;LiveTV&apos; opnames tonen bij gebruik van &apos;Alle programma &apos;s&apos; filter.</translation>
     </message>
     <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
         <translation>Indien deze instelling uitgeschakeld is zullen LiveTV-opnames enkel te zien zijn via de speciale &apos;LiveTV&apos; opnamegroep.</translation>
     </message>
     <message>
