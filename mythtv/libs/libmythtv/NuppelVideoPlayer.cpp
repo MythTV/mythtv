@@ -957,7 +957,7 @@ void NuppelVideoPlayer::CheckPrebuffering(void)
     if ((videoOutput->hasMCAcceleration()   ||
          videoOutput->hasIDCTAcceleration() ||
          videoOutput->hasVLDAcceleration()) &&
-        (videoOutput->EnoughDecodedFrames()))
+        (videoOutput->EnoughPrebufferedFrames()))
     {
         SetPrebuffering(false);
     }
