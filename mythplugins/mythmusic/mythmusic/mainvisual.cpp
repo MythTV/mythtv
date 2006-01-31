@@ -22,8 +22,8 @@
 #include <qstring.h>
 #include <qregexp.h>
 
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // fast inlines
 #include "inlines.h"
@@ -31,6 +31,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
@@ -799,22 +800,23 @@ void LogScale::setMax(int maxscale, int maxrange)
 
     double alpha;
     int i, scaled;
-    double domain = double(maxscale),
-	    range = double(maxrange),
-		x = 1.0,
-	       dx = 1.0,
-		y = 0.0,
-	       yy = 0.0,
-		t = 0.0,
-	       e4 = double(1.0E-8);
+    long double domain = (long double) maxscale;
+    long double range  = (long double) maxrange;
+    long double x  = 1.0;
+    long double dx = 1.0;
+    long double y  = 0.0;
+    long double yy = 0.0;
+    long double t  = 0.0;
+    long double e4 = 1.0E-8;
 
     indices = new int[maxrange];
     for (i = 0; i < maxrange; i++)
 	indices[i] = 0;
 
     // initialize log scale
-    while (fabs(dx) > e4) {
-	t = log((domain + x) / x);
+    for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
+    {
+	t = std::log((domain + x) / x);
 	y = (x * t) - range;
 	yy = t - (domain / (x + domain));
 	dx = y / yy;
