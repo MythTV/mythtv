@@ -5123,7 +5123,7 @@ void TV::ToggleRecord(void)
         VERBOSE(VB_RECORD, LOC + "Toggling Record off");
     }
 
-    QString msg = cmdmsg + "\"" + playbackinfo->title + "\"";
+    QString msg = cmdmsg + " \"" + playbackinfo->title + "\"";
     if (activenvp == nvp && GetOSD())
         GetOSD()->SetSettingsText(msg, 3);
 }
