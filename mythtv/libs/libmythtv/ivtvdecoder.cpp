@@ -23,8 +23,8 @@ using namespace std;
 #define LOC QString("IVD: ")
 #define LOC_ERR QString("IVD Error: ")
 
-bool IvtvDecoder::device_ok     = false;
-bool IvtvDecoder::ntsc          = true;
+DevInfoMap IvtvDecoder::devInfo;
+QMutex     IvtvDecoder::devInfoLock;
 const uint IvtvDecoder::vidmax  = 131072; // must be a power of 2
 
 IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
@@ -135,6 +135,35 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
     }
 }
 
+bool IvtvDecoder::GetDeviceWorks(QString dev)
+{
+    QMutexLocker locker(&devInfoLock);
+    DevInfoMap::const_iterator it = devInfo.find(dev);
+    if (it != devInfo.end())
+        return (*it).works;
+    return false;
+}
+
+bool IvtvDecoder::GetDeviceNTSC(QString dev)
+{
+    QMutexLocker locker(&devInfoLock);
+    DevInfoMap::const_iterator it = devInfo.find(dev);
+    if (it != devInfo.end())
+        return (*it).ntsc;
+    return true;
+}
+
+void IvtvDecoder::SetDeviceInfo(QString dev, bool works, bool ntsc)
+{
+    QString tmpStr = QDeepCopy<QString>(dev);
+    DeviceInfo tmp;
+    tmp.works = works;
+    tmp.ntsc  = ntsc;
+
+    QMutexLocker locker(&devInfoLock);
+    devInfo[tmpStr] = tmp;
+}
+
 /** \fn IvtvDecoder::CheckDevice(void)
  *  \brief Checks the validity of the ivtv output device.
  *
@@ -143,13 +172,13 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
  */
 bool IvtvDecoder::CheckDevice(void)
 {
-    if (device_ok)
-        return true;
-
     if (!gContext->GetNumSetting("PVR350OutputEnable", 0))
         return false;
 
     QString videodev = gContext->GetSetting("PVR350VideoDev");
+
+    if (GetDeviceWorks(videodev))
+        return true;
 
     int testfd = open(videodev.ascii(), O_RDWR);
     if (testfd < 0)
@@ -177,7 +206,7 @@ bool IvtvDecoder::CheckDevice(void)
     }
 
     v4l2_std_id std = V4L2_STD_NTSC;
-    ntsc = true;
+    bool ntsc = true;
 
     if (ioctl(testfd, VIDIOC_G_STD, &std) < 0)
     {
@@ -196,7 +225,7 @@ bool IvtvDecoder::CheckDevice(void)
     if (!ok)
         return false;
 
-    device_ok = true;
+    SetDeviceInfo(videodev, true, ntsc);
     return true;
 }
 
@@ -233,15 +262,11 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     keyframedist = -1;
     positionMapType = MARK_UNSET;
 
-    int video_width = 720;
-    int video_height = 480;
-    if (!ntsc)
-    {
-        video_height = 576;
-        fps = 25.00;
-    }
-    GetNVP()->SetVideoParams(video_width, video_height, 
-                             fps, keyframedist, 1.33);
+    QString videodev = gContext->GetSetting("PVR350VideoDev");
+    bool    ntsc     = GetDeviceNTSC(videodev);
+
+    GetNVP()->SetVideoParams(720 /*width*/, (ntsc) ? 480 : 576 /*height*/,
+                             (ntsc) ? 29.97f : 25.0f, keyframedist, 1.33);
      
     ringBuffer->CalcReadAheadThresh(8000);
 

@@ -26,6 +26,15 @@ struct IvtvQueuedFrame
 };
 typedef QValueList<IvtvQueuedFrame> ivtv_frame_list_t;
 
+class DeviceInfo
+{
+  public:
+    DeviceInfo() : works(false), ntsc(true) {}
+    bool works;
+    bool ntsc;
+};
+typedef QMap<QString,DeviceInfo> DevInfoMap;
+
 class IvtvDecoder : public DecoderBase
 {
   public:
@@ -64,6 +73,9 @@ class IvtvDecoder : public DecoderBase
     bool ReadWrite(int onlyvideo, long stopframe = LONG_MAX);
     bool StepFrames(long long start, long long count);
 
+    static bool GetDeviceWorks(QString dev);
+    static bool GetDeviceNTSC(QString dev);
+    static void SetDeviceInfo(QString dev, bool works, bool ntsc);
     static bool CheckDevice(void);
 
   private:
@@ -91,8 +103,8 @@ class IvtvDecoder : public DecoderBase
     ivtv_frame_list_t queuedlist;
 
   private:
-    static bool       device_ok;
-    static bool       ntsc;
+    static DevInfoMap devInfo;
+    static QMutex     devInfoLock;
     static const uint vidmax;
 };
 
