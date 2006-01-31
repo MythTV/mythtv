@@ -846,12 +846,13 @@ if ( $jobtools )
   my $SRC  = "$PREFIX/bin/mythcommflag.app/Contents/MacOS/mythcommflag";
 
   &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
+  &PackagedExecutable("$SCRIPTDIR/MythJobQueue.app", 'mythcommflag');
 
   $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
   {
       &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-      &PackagedExecutable("$SCRIPTDIR/MythJobQueue.app", 'mythcommflag');
+      &PackagedExecutable("$SCRIPTDIR/MythJobQueue.app", 'mythtranscode');
   }
 }
 
