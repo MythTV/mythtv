@@ -27,14 +27,58 @@ class PreviewGenerator;
 
 class LayerSet;
 
+typedef QMap<QString,ProgramList>       ProgramMap;
+typedef QMap<QString,QString>           Str2StrMap;
+typedef QMap<QString,PreviewGenerator*> PreviewMap;
+
 class PlaybackBox : public MythDialog
 {
     Q_OBJECT
   public:
-    typedef enum { Play, Delete } BoxType;
-    typedef enum { TitlesOnly, TitlesCategories, TitlesCategoriesRecGroups,
-                   TitlesRecGroups, Categories, CategoriesRecGroups, RecGroups} ViewType;
+    typedef enum
+    {
+        Play,
+        Delete,
+    } BoxType;
 
+    typedef enum
+    {
+        TitlesOnly,
+        TitlesCategories,
+        TitlesCategoriesRecGroups,
+        TitlesRecGroups,
+        Categories,
+        CategoriesRecGroups,
+        RecGroups,
+    } ViewType;
+
+    typedef enum
+    {
+        EndOfRecording,
+        DeleteRecording,
+        AutoExpireRecording,
+        StopRecording,
+        ForceDeleteRecording,
+    } deletePopupType;
+
+    typedef enum 
+    {
+        kStarting,
+        kPlaying,
+        kKilling,
+        kKilled,
+        kStopping,
+        kStopped,
+        kChanging,
+    } playerStateType;
+
+    typedef enum
+    {
+        kNvpToPlay,
+        kNvpToStop,
+        kDone
+    } killStateType;
+     
 
     PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0);
    ~PlaybackBox(void);
@@ -99,7 +143,7 @@ class PlaybackBox : public MythDialog
     void exitWin();
 
     void listChanged(void);
-    void setUpdateFreeSpace() { updateFreeSpace = true; }
+    void setUpdateFreeSpace() { freeSpaceNeedsUpdate = true; }
 
     void initRecGroupPopup(QString title, QString name);
     void closeRecGroupPopup(bool refreshList = true);
@@ -175,44 +219,15 @@ class PlaybackBox : public MythDialog
 
     void processNetworkControlCommands(void);
     void processNetworkControlCommand(QString command);
-    QValueList<QString> networkControlCommands;
-    QMutex ncLock;
-    bool underNetworkControl;
-
-    bool haveGroupInfoSet;
-    
-    bool skipUpdate;
-    bool pageDowner;
-    bool connected;
-    ProgramInfo *curitem;
-    ProgramInfo *delitem;
-    ProgramInfo *lastProgram;
-    uint lastBrokenRecordId;
 
     void LoadWindow(QDomElement &);
-    XMLParse *theme;
-    QDomElement xmldata;
 
     void parsePopup(QDomElement &);
     void parseContainer(QDomElement &);
 
-    int skipCnt;
-    bool inTitle;
-    bool playingVideo;
-    bool leftRight;
-    int titleIndex;
-    int progIndex;
-    QStringList titleList;
-    QStringList playList;
-    QMap<QString, ProgramList> progLists;
-
     ProgramInfo *findMatchingProg(ProgramInfo *);
     ProgramInfo *findMatchingProg(QString key);
     ProgramInfo *findMatchingProg(QString chanid, QString startts);
-
-    BoxType type;
-
-    bool arrowAccel;
 
     bool killPlayer(void);
     void killPlayerSafe(void);
@@ -220,10 +235,6 @@ class PlaybackBox : public MythDialog
 
     bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
     void promptEndOfRecording(ProgramInfo *);
-    typedef enum {
-         EndOfRecording,DeleteRecording,AutoExpireRecording,StopRecording,
-         ForceDeleteRecording
-    } deletePopupType;
     void showDeletePopup(ProgramInfo *, deletePopupType);
     void showActionPopup(ProgramInfo *program);
     void initPopup(MythPopupBox *popup, ProgramInfo *program, 
@@ -239,34 +250,6 @@ class PlaybackBox : public MythDialog
     QString getRecGroupPassword(QString recGroup);
     void fillRecGroupPasswordCache(void);
 
-    QTimer *timer;
-    NuppelVideoPlayer *nvp;
-    RingBuffer *rbuffer;
-    pthread_t decoder;
-
-    typedef enum 
-    { kStarting, kPlaying, kKilling, kKilled, kStopping, kStopped, 
-      kChanging } playerStateType;
-
-    playerStateType state;
-
-    typedef enum
-    { kNvpToPlay, kNvpToStop, kDone } killStateType;
-     
-    mutable QMutex killLock;
-    killStateType killState;
-    MythTimer killTimeout;
-
-    MythTimer nvpTimeout;    
-    MythTimer waitToStartPreviewTimer;
-    bool waitToStart;
- 
-    bool graphicPopup;
-    bool playbackPreview;
-    bool generatePreviewPixmap;
-    QString dateformat;
-    QString timeformat;
-
     void grayOut(QPainter *);
     void updateBackground(void);
     void updateVideo(QPainter *);
@@ -275,76 +258,147 @@ class PlaybackBox : public MythDialog
     void updateUsage(QPainter *);
     void updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix);
     void updateCurGroup(QPainter *p);
-    void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString cont_name = "group_info");
-    
-    QString showDateFormat;
-    QString showTimeFormat;
-
-    MythPopupBox *popup;
-    QPixmap myBackground;
-
-    QPixmap *containerPixmap;
-    QPixmap *fillerPixmap;
-  
-    QPixmap *bgTransBackup;
-
-    QRect fullRect;
-    QRect listRect;
-    QRect infoRect;
-    QRect groupRect;
-    QRect usageRect;
-    QRect videoRect;
-    QRect curGroupRect;
-
-    QTimer *fillListTimer;
-    int listsize;
-
-    QColor popupForeground;
-    QColor popupBackground;
-    QColor popupHighlight;
-
-    bool expectingPopup;
-    bool updateFreeSpace;
-    QTimer *freeSpaceTimer;
-    int freeSpaceTotal;
-    int freeSpaceUsed;
-
-    QString groupDisplayName;
-    QString recGroup;
-    QString recGroupPassword;
-    QString curGroupPassword;
-    QMap <QString, QString> recGroupType;
-    QMap <QString, QString> recGroupPwCache;
-
-    int recGroupLastItem;
-    MythPopupBox *recGroupPopup;
-    MythListBox *recGroupListBox;
-    MythLineEdit *recGroupLineEdit;
-    MythLineEdit *recGroupLineEdit1;
-    MythLineEdit *recGroupOldPassword;
-    MythLineEdit *recGroupNewPassword;
-    MythPushButton *recGroupOkButton;
-    QString recGroupChooserPassword;
-    bool groupnameAsAllProg;
-    QPixmap *previewPixmap;
-    QDateTime previewLastModified;
-    QDateTime previewFilets;
-    QDateTime previewStartts;
-    bool      previewSuspend;
-    QString previewChanid;
-    int listOrder;
-
-    bool playingSomething;
-    bool titleView;
-
-    bool useRecGroups;
-    bool useCategories;
+    void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix,
+                         QString cont_name = "group_info");
     void setDefaultView(int defaultView);
 
-    bool previewThreadRunning;
+    // Settings ///////////////////////////////////////////////////////////////
+    /// If "Play"  this is a recording playback selection UI,
+    /// if "Delete this is a recording deletion selection UI.
+    BoxType             type;
+    // date/time formats from DB
+    QString             formatShortDate;
+    QString             formatLongDate;
+    QString             formatTime;
+    /// titleView controls showing titles in group list
+    bool                titleView;
+    /// useCategories controls showing categories in group list
+    bool                useCategories;
+    /// useRecGroups controls showing of recording groups in group list
+    bool                useRecGroups;
+    /// contains "DispRecGroupAsAllProg" setting
+    bool                groupnameAsAllProg;
+    /// if true we allow arrow keys to replace SELECT and ESCAPE as appropiate
+    bool                arrowAccel;
+    /// listOrder controls the ordering of the recordings in the list
+    int                 listOrder;
+    /// Number of items in selector that can be shown on the screen at once
+    int                 listsize;
 
-    mutable QMutex previewGeneratorLock;
-    QMap<QString, PreviewGenerator*> previewGenerator;
+    // Recording Group settings
+    QString             groupDisplayName;
+    QString             recGroup;
+    QString             recGroupPassword;
+    QString             curGroupPassword;
+
+    // Theme parsing variables
+    XMLParse           *theme;
+    QDomElement         xmldata;
+
+    // Non-volatile drawing variables /////////////////////////////////////////
+    QPixmap            *drawTransPixmap;
+    bool                drawPopupSolid;
+    QColor              drawPopupFgColor;
+    QColor              drawPopupBgColor;
+    QColor              drawPopupSelColor;
+    QRect               drawTotalBounds;
+    QRect               drawListBounds;
+    QRect               drawInfoBounds;
+    QRect               drawGroupBounds;
+    QRect               drawUsageBounds;
+    QRect               drawVideoBounds;
+    QRect               drawCurGroupBounds;
+
+    // Popup support //////////////////////////////////////////////////////////
+    // General popup support
+    MythPopupBox       *popup;
+    bool                expectingPopup;
+
+    // Recording Group popup support
+    int                 recGroupLastItem;
+    QString             recGroupChooserPassword;
+    Str2StrMap          recGroupType;
+    Str2StrMap          recGroupPwCache;
+    MythPopupBox       *recGroupPopup;
+    MythListBox        *recGroupListBox;
+    MythLineEdit       *recGroupLineEdit;
+    MythLineEdit       *recGroupLineEdit1;
+    MythLineEdit       *recGroupOldPassword;
+    MythLineEdit       *recGroupNewPassword;
+    MythPushButton     *recGroupOkButton;
+
+    // State Variables ////////////////////////////////////////////////////////
+    // Main Recording List support
+    QTimer             *fillListTimer;
+    bool                connected;  ///< true if last FillList() succeeded
+    int                 titleIndex; ///< Index of selected item in whole list
+    int                 progIndex;  ///< Index of selected item index on page
+    QStringList         titleList;  ///< list of pages
+    ProgramMap          progLists;  ///< lists of programs by page        
+
+    // Play List support
+    QStringList         playList;   ///< list of selected items "play list"
+
+    // Other state
+    /// Currently selected program
+    ProgramInfo        *curitem;
+    /// Program currently selected for deletion
+    ProgramInfo        *delitem;
+    /// Last Program played by play(ProgramInfo*,bool)
+    ProgramInfo        *lastProgram;
+    /// playingSomething is set to true iff a full screen recording is playing
+    bool                playingSomething;
+
+    // Selection state variables
+    bool                haveGroupInfoSet;
+    bool                inTitle;
+    /// If change is left or right, don't restart video
+    bool                leftRight;
+
+    // Free disk space tracking
+    bool                freeSpaceNeedsUpdate;
+    QTimer             *freeSpaceTimer;
+    int                 freeSpaceTotal;
+    int                 freeSpaceUsed;
+
+    // Volatile drawing variables
+    int                 paintSkipCount;
+    bool                paintSkipUpdate;
+    QPixmap             paintBackgroundPixmap;
+
+    // Preview Video Variables ////////////////////////////////////////////////
+    NuppelVideoPlayer  *previewVideoNVP;
+    RingBuffer         *previewVideoRingBuf;
+    QTimer             *previewVideoRefreshTimer;
+    MythTimer           previewVideoStartTimer;
+    MythTimer           previewVideoPlayingTimer;  
+    int                 previewVideoBrokenRecId;
+    playerStateType     previewVideoState;
+    bool                previewVideoStartTimerOn;
+    bool                previewVideoEnabled;
+    bool                previewVideoPlaying;
+    bool                previewVideoThreadRunning;
+    pthread_t           previewVideoThread;
+
+    mutable QMutex      previewVideoKillLock;
+    killStateType       previewVideoKillState;
+    MythTimer           previewVideoKillTimeout;
+
+    // Preview Pixmap Variables ///////////////////////////////////////////////
+    bool                previewPixmapEnabled;
+    QPixmap            *previewPixmap;
+    QDateTime           previewLastModified;
+    QDateTime           previewFilets;
+    QDateTime           previewStartts;
+    bool                previewSuspend;
+    QString             previewChanid;
+    mutable QMutex      previewGeneratorLock;
+    PreviewMap          previewGenerator;
+
+    // Network Control Variables //////////////////////////////////////////////
+    mutable QMutex      ncLock;
+    QValueList<QString> networkControlCommands;
+    bool                underNetworkControl;
 };
 
 #endif

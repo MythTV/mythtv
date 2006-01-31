@@ -104,117 +104,106 @@ static int comp_originalAirDate_rev(ProgramInfo *a, ProgramInfo *b)
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
-    : MythDialog(parent, name), lastBrokenRecordId(0)
+    : MythDialog(parent, name),
+      // Settings
+      type(ltype),
+      formatShortDate("M/d"),           formatLongDate("ddd MMMM d"),
+      formatTime("h:mm AP"),
+      titleView(true),                  useCategories(false),
+      useRecGroups(false),              groupnameAsAllProg(false),
+      arrowAccel(true),
+      listOrder(1),                     listsize(0),
+      // Recording Group settings
+      groupDisplayName(tr("All Programs")),
+      recGroup("All Programs"),
+      recGroupPassword(""),             curGroupPassword(""),
+      // Theme parsing
+      theme(new XMLParse()),
+      // Non-volatile drawing variables
+      drawTransPixmap(NULL),            drawPopupSolid(true),
+      drawPopupFgColor(Qt::white),      drawPopupBgColor(Qt::black),
+      drawPopupSelColor(Qt::green),
+      drawTotalBounds(0, 0, size().width(), size().height()),
+      drawListBounds(0, 0, 0, 0),       drawInfoBounds(0, 0, 0, 0),
+      drawGroupBounds(0, 0, 0, 0),      drawUsageBounds(0, 0, 0, 0),
+      drawVideoBounds(0, 0, 0, 0),      drawCurGroupBounds(0, 0, 0, 0),
+      // General popup support
+      popup(NULL),                      expectingPopup(false),
+      // Recording Group popup support
+      recGroupLastItem(0),              recGroupChooserPassword(""),
+      recGroupPopup(NULL),              recGroupListBox(NULL),
+      recGroupLineEdit(NULL),           recGroupLineEdit1(NULL),
+      recGroupOldPassword(NULL),        recGroupNewPassword(NULL),
+      recGroupOkButton(NULL),
+      // Main Recording List support
+      fillListTimer(new QTimer(this)),  connected(false),
+      titleIndex(0),                    progIndex(0),
+      // Other state
+      curitem(NULL),                    delitem(NULL),
+      lastProgram(NULL),
+      playingSomething(false),
+      // Selection state variables
+      haveGroupInfoSet(false),          inTitle(false),
+      leftRight(false),
+      // Free disk space tracking
+      freeSpaceNeedsUpdate(true),       freeSpaceTimer(new QTimer(this)),
+      freeSpaceTotal(0),                freeSpaceUsed(0),
+      // Volatile drawing variables
+      paintSkipCount(0),                paintSkipUpdate(false),
+      // Preview Video Variables
+      previewVideoNVP(NULL),            previewVideoRingBuf(NULL),
+      previewVideoRefreshTimer(new QTimer(this)),
+      previewVideoBrokenRecId(0),       previewVideoState(kStopped),
+      previewVideoStartTimerOn(false),  previewVideoEnabled(false),
+      previewVideoPlaying(false),       previewVideoThreadRunning(false),
+      previewVideoKillState(kDone),
+      // Preview Image Variables
+      previewPixmapEnabled(false),      previewPixmap(NULL),
+      previewSuspend(false),            previewChanid(""),
+      // Network Control Variables
+      underNetworkControl(false)
 {
-    type = ltype;
+    formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
+    formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    formatTime         = gContext->GetSetting("TimeFormat", "h:mm AP");
+    recGroup           = gContext->GetSetting("DisplayRecGroup","All Programs");
+    listOrder          = gContext->GetNumSetting("PlayBoxOrdering", 1);
+    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
+    arrowAccel         = gContext->GetNumSetting("UseArrowAccels", 1);
+    inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
+    previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
+    previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
+    drawTransPixmap    = gContext->LoadScalePixmap("trans-backup.png");
+    if (!drawTransPixmap)
+        drawTransPixmap = new QPixmap();
 
-    previewThreadRunning = false;    
-    state = kStopped;
-    killState = kDone;
-    waitToStart = false;
-
-    connected = false;
-    rbuffer = NULL;
-    nvp = NULL;
-
-    playingSomething = false;
-
-    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
+    bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
+    int  defaultView = gContext->GetNumSetting("DisplayGroupDefaultView", 0);
 
     progLists[""];
     titleList << "";
-    progIndex = 0;
-    titleIndex = 0;
     playList.clear();
 
-    skipUpdate = false;
-    skipCnt = 0;
-    
-    previewPixmap = NULL;
-    previewStartts = QDateTime::currentDateTime();
-    previewChanid = "";
-    previewSuspend = false;
-
-    updateFreeSpace = true;
-    freeSpaceTotal = 0;
-    freeSpaceUsed = 0;
-
-    leftRight = false;      // If change is left or right, don't restart video
-    playingVideo = false;
-    graphicPopup = true;
-    expectingPopup = false;
-
-    popup = NULL;
-    curitem = NULL;
-    delitem = NULL;
-    lastProgram = NULL;
-
-    recGroupPopup = NULL;
-
-    // titleView controls showing titles in group list 
-    titleView = true;
-
-    // useCategories controls showing categories in group list
-    useCategories = false;
-
-    // useRecGroups controls showing of recording groups in group list
-    useRecGroups = false;
-
-    underNetworkControl = false;
-
-    if (gContext->GetNumSetting("UseArrowAccels", 1))
-        arrowAccel = true;
-    else
-        arrowAccel = false;
-
-    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
-    listOrder = gContext->GetNumSetting("PlayBoxOrdering", 1);    
+    // recording group stuff
     recGroupType.clear();
-
-    curGroupPassword = QString("");
-    recGroup = gContext->GetSetting("DisplayRecGroup", QString("All Programs"));
-    VERBOSE( VB_GENERAL, recGroup);
+    recGroupType[recGroup] = (displayCat) ? "category" : "recgroup";
     if (groupnameAsAllProg)
     {
-        if ((recGroup == "Default") || (recGroup == "All Programs") || 
+        groupDisplayName = recGroup;
+        if ((recGroup == "All Programs") ||
+            (recGroup == "Default") ||
             (recGroup == "LiveTV"))
+        {
             groupDisplayName = tr(recGroup);
-        else
-            groupDisplayName = recGroup;
+        }
     }
-    else
-        groupDisplayName = tr("All Programs");
-
     recGroupPassword = getRecGroupPassword(recGroup);
+    setDefaultView(defaultView);
 
-    if (gContext->GetNumSetting("DisplayRecGroupIsCategory",0))
-        recGroupType[recGroup] = "category";
-    else
-        recGroupType[recGroup] = "recgroup";
-
-    setDefaultView(gContext->GetNumSetting("DisplayGroupDefaultView", 0));
-
-    fullRect = QRect(0, 0, size().width(), size().height());
-    listRect = QRect(0, 0, 0, 0);
-    infoRect = QRect(0, 0, 0, 0);
-    groupRect = QRect(0, 0, 0, 0);
-    usageRect = QRect(0, 0, 0, 0);
-    videoRect = QRect(0, 0, 0, 0);
-    curGroupRect = QRect(0, 0, 0, 0);
-
-    showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
-    showTimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    
-    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
-
-    if (!bgTransBackup)
-        bgTransBackup = new QPixmap();
-
-    theme = new XMLParse();
+    // theme stuff
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
     theme->LoadTheme(xmldata, "playback");
-
     LoadWindow(xmldata);
 
     LayerSet *container = theme->GetSet("selector");
@@ -227,16 +216,16 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     }
     else
     {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(),
-            QObject::tr("Failed to get selector object"),
-            QObject::tr(
-                "Myth could not locate the selector object within your theme.\n"
-                "Please make sure that your ui.xml is valid.\n"
-                "\n"
-                "Myth will now exit."));
+        QString btn0 = QObject::tr("Failed to get selector object");
+        QString btn1 = QObject::tr(
+            "Myth could not locate the selector object within your theme.\n"
+            "Please make sure that your ui.xml is valid.\n"
+            "\n"
+            "Myth will now exit.");
+
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), btn0, btn1);
                                   
-        VERBOSE(VB_IMPORTANT, "Failed to get selector object.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get selector object.");
         exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
         return;
     }
@@ -248,45 +237,34 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         if (listtype)
             listtype->ShowSelAlways(false);
     }
-    else
-        haveGroupInfoSet = false;
 
-    
+    // initially fill the list
     connected = FillList();
 
-    playbackPreview = gContext->GetNumSetting("PlaybackPreview");
-    generatePreviewPixmap = gContext->GetNumSetting("GeneratePreviewPixmaps");
-    dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    // connect up timers...
+    connect(previewVideoRefreshTimer, SIGNAL(timeout()),
+            this,                     SLOT(timeout()));
+    connect(freeSpaceTimer,           SIGNAL(timeout()),
+            this,                     SLOT(setUpdateFreeSpace()));
+    connect(fillListTimer,            SIGNAL(timeout()),
+            this,                     SLOT(listChanged()));
 
-    nvp = NULL;
-    timer = new QTimer(this);
+    // preview video & preview pixmap init
+    previewVideoRefreshTimer->start(500);
+    previewStartts = QDateTime::currentDateTime();
 
+    // misc setup
     updateBackground();
-
     setNoErase();
-
-    connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
-
-    timer->start(500);
     gContext->addListener(this);
 
-    freeSpaceTimer = new QTimer(this);
-    connect(freeSpaceTimer, SIGNAL(timeout()), this, 
-            SLOT(setUpdateFreeSpace()));
-
-    fillListTimer = new QTimer(this);
-    connect(fillListTimer, SIGNAL(timeout()), this, SLOT(listChanged()));
-
-    if ((recGroupPassword != "") ||
-        (titleList.count() <= 1) ||
+    if ((recGroupPassword != "") || (titleList.count() <= 1) ||
         (gContext->GetNumSetting("QueryInitialFilter", 0)))
+    {
         showRecGroupChooser();
+    }
 
-    if (type == Delete)
-        gContext->addCurrentLocation("DeleteBox");
-    else
-        gContext->addCurrentLocation("PlaybackBox");
+    gContext->addCurrentLocation((type == Delete)? "DeleteBox":"PlaybackBox");
 }
 
 PlaybackBox::~PlaybackBox(void)
@@ -294,10 +272,10 @@ PlaybackBox::~PlaybackBox(void)
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
     killPlayerSafe();
-    delete timer;
+    delete previewVideoRefreshTimer;
     delete fillListTimer;
     delete theme;
-    delete bgTransBackup;
+    delete drawTransPixmap;
     
     if (curitem)
         delete curitem;
@@ -346,24 +324,27 @@ void PlaybackBox::setDefaultView(int defaultView)
 /* blocks until playing has stopped */
 void PlaybackBox::killPlayerSafe(void)
 {
-    QMutexLocker locker(&killLock);
+    QMutexLocker locker(&previewVideoKillLock);
     /* don't process any keys while we are trying to let the nvp stop */
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    while (state != kKilled && state != kStopped && previewThreadRunning)
+    while (previewVideoState != kKilled && previewVideoState != kStopped &&
+           previewVideoThreadRunning)
     {
-        /* ensure that key events don't mess up our states */
-        state = (state == kKilled) ? kKilled :  kKilling;
+        /* ensure that key events don't mess up our previewVideoStates */
+        previewVideoState = (previewVideoState == kKilled) ?
+            kKilled :  kKilling;
 
         /* NOTE: need unlock/process/lock here because we need
-           to allow updateVideo() to run to handle changes in states */
+           to allow updateVideo() to run to handle changes in
+           previewVideoStates */
         qApp->unlock();
         qApp->processEvents();
         usleep(500);
         qApp->lock();
     }
-    state = kStopped;
+    previewVideoState = kStopped;
 
     setEnabled(true);
 }
@@ -406,19 +387,19 @@ void PlaybackBox::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, context, area);
 
     if (name.lower() == "selector")
-        listRect = area;
+        drawListBounds = area;
     if (name.lower() == "program_info_play" && context == 0 && type != Delete)
-        infoRect = area;
+        drawInfoBounds = area;
     if (name.lower() == "program_info_del" && context == 1 && type == Delete)
-        infoRect = area;
+        drawInfoBounds = area;
     if (name.lower() == "video")
-        videoRect = area;
+        drawVideoBounds = area;
     if (name.lower() == "group_info")
-        groupRect = area;        
+        drawGroupBounds = area;        
     if (name.lower() == "usage")
-        usageRect = area;
+        drawUsageBounds = area;
     if (name.lower() == "cur_group")
-        curGroupRect = area;        
+        drawCurGroupBounds = area;        
     
 }
 
@@ -444,18 +425,18 @@ void PlaybackBox::parsePopup(QDomElement &element)
             if (info.tagName() == "solidbgcolor")
             {
                 QString col = theme->getFirstText(info);
-                popupBackground = QColor(col);
-                graphicPopup = false;
+                drawPopupBgColor = QColor(col);
+                drawPopupSolid = false;
             }
             else if (info.tagName() == "foreground")
             {
                 QString col = theme->getFirstText(info);
-                popupForeground = QColor(col);
+                drawPopupFgColor = QColor(col);
             }
             else if (info.tagName() == "highlight")
             {
                 QString col = theme->getFirstText(info);
-                popupHighlight = QColor(col);
+                drawPopupSelColor = QColor(col);
             }
             else
             {
@@ -487,49 +468,49 @@ void PlaybackBox::updateBackground(void)
         container->Draw(&tmp, 0, 1);
 
     tmp.end();
-    myBackground = bground;
+    paintBackgroundPixmap = bground;
  
-    setPaletteBackgroundPixmap(myBackground);
+    setPaletteBackgroundPixmap(paintBackgroundPixmap);
 }
   
 void PlaybackBox::paintEvent(QPaintEvent *e)
 {
     if (e->erased())
-        skipUpdate = false;
+        paintSkipUpdate = false;
 
     QRect r = e->rect();
     QPainter p(this);
 
-    if (r.intersects(listRect) && skipUpdate == false)
+    if (r.intersects(drawListBounds) && !paintSkipUpdate)
     {
         updateShowTitles(&p);
     }
     
-    if (r.intersects(infoRect) && skipUpdate == false)
+    if (r.intersects(drawInfoBounds) && !paintSkipUpdate)
     {
         updateInfo(&p);
     }
     
-    if (r.intersects(curGroupRect) && skipUpdate == false)
+    if (r.intersects(drawCurGroupBounds) && !paintSkipUpdate)
     {
         updateCurGroup(&p);
     }
     
-    if (r.intersects(usageRect) && skipUpdate == false)
+    if (r.intersects(drawUsageBounds) && !paintSkipUpdate)
     {
         updateUsage(&p);
     }
     
-    if (r.intersects(videoRect))
+    if (r.intersects(drawVideoBounds))
     {
         updateVideo(&p);
     }
 
-    skipCnt--;
-    if (skipCnt < 0)
+    paintSkipCount--;
+    if (paintSkipCount < 0)
     {
-        skipUpdate = true;
-        skipCnt = 0;
+        paintSkipUpdate = true;
+        paintSkipCount = 0;
     }
 }
 
@@ -542,13 +523,13 @@ void PlaybackBox::grayOut(QPainter *tmp)
         tmp->fillRect(QRect(QPoint(0, 0), size()), 
                       QBrush(QColor(10, 10, 10), Dense4Pattern));
     else if (transparentFlag == 1)
-        tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
+        tmp->drawPixmap(0, 0, *drawTransPixmap, 0, 0, (int)(800*wmult), 
                         (int)(600*hmult));
 */
 }
 void PlaybackBox::updateCurGroup(QPainter *p)
 {
-    QRect pr = curGroupRect;
+    QRect pr = drawCurGroupBounds;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     if (recGroup != "Default")
@@ -571,7 +552,8 @@ void PlaybackBox::updateCurGroup(QPainter *p)
 }
 
 
-void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString cont_name)
+void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr,
+                                  QPixmap& pix, QString cont_name)
 {
     LayerSet *container = theme->GetSet(cont_name);
     if ( container)
@@ -634,8 +616,8 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
     QMap<QString, QString> infoMap;
     QPainter tmp(&pix);
         
-    if (playingVideo == true)
-        state = kChanging;
+    if (previewVideoPlaying == true)
+        previewVideoState = kChanging;
 
     LayerSet *container = NULL;
     if (type != Delete)
@@ -648,8 +630,8 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         if (curitem)
             curitem->ToMap(infoMap);
         
-        if ((playbackPreview == 0) &&
-            (generatePreviewPixmap == 0))
+        if ((previewVideoEnabled == 0) &&
+            (previewPixmapEnabled == 0))
             container->UseAlternateArea(true);
 
         container->ClearAllText();
@@ -723,17 +705,17 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 
-    waitToStartPreviewTimer.start();
-    waitToStart = true;
+    previewVideoStartTimer.start();
+    previewVideoStartTimerOn = true;
 
 }
 
 void PlaybackBox::updateInfo(QPainter *p)
 {
-    QRect pr = infoRect;
+    QRect pr = drawInfoBounds;
     bool updateGroup = (inTitle && haveGroupInfoSet);
     if (updateGroup)
-        pr = groupRect;
+        pr = drawGroupBounds;
         
     QPixmap pix(pr.size());
     
@@ -765,38 +747,43 @@ void PlaybackBox::updateVideo(QPainter *p)
 
     /* show a still frame if the user doesn't want a video preview or nvp 
      * hasn't started playing the video preview yet */
-    if (((playbackPreview == 0) || !playingVideo || (state == kStarting) || 
-        (state == kChanging)) && curitem)
+    if (((!previewVideoEnabled) || !previewVideoPlaying ||
+         (previewVideoState == kStarting) || 
+         (previewVideoState == kChanging)) && curitem)
     {
         if (!playingSomething)
         {
             QPixmap temp = getPixmap(curitem);
             if (temp.width() > 0)
             {
-                p->drawPixmap(videoRect.x(), videoRect.y(), temp);
+                p->drawPixmap(drawVideoBounds.x(), drawVideoBounds.y(), temp);
             }
         }
     }
 
     /* keep calling killPlayer() to handle nvp cleanup */
     /* until killPlayer() is done */
-    if (killState != kDone)
+    if (previewVideoKillState != kDone)
     {
         if (!killPlayer())
             return;
     }
 
     /* if we aren't supposed to have a preview playing then always go */
-    /* to the stopping state */
-    if (!playbackPreview && (state != kKilling) && (state != kKilled))
+    /* to the stopping previewVideoState */
+    if (!previewVideoEnabled &&
+        (previewVideoState != kKilling) && (previewVideoState != kKilled))
     {
-        state = kStopping;
+        previewVideoState = kStopping;
     }
 
     /* if we have no nvp and aren't playing yet */
     /* if we have an item we should start playing */
-    if (!nvp && playbackPreview && (playingVideo == false) && curitem && 
-        (state != kKilling) && (state != kKilled) && (state != kStarting))
+    if (!previewVideoNVP   && previewVideoEnabled  &&
+        curitem            && !previewVideoPlaying &&
+        (previewVideoState != kKilling) &&
+        (previewVideoState != kKilled)  &&
+        (previewVideoState != kStarting))
     {
         ProgramInfo *rec = curitem;
 
@@ -805,7 +792,7 @@ void PlaybackBox::updateVideo(QPainter *p)
             VERBOSE(VB_IMPORTANT, QString("Error: File '%1' missing.")
                     .arg(rec->pathname));
 
-            state = kStopping;
+            previewVideoState = kStopping;
 
             ProgramInfo *tmpItem = findMatchingProg(rec);
             if (tmpItem)
@@ -813,32 +800,33 @@ void PlaybackBox::updateVideo(QPainter *p)
 
             return;
         }
-        state = kStarting;
+        previewVideoState = kStarting;
     }
 
-    if (state == kChanging)
+    if (previewVideoState == kChanging)
     {
-        if (nvp)
+        if (previewVideoNVP)
         {
             killPlayer(); /* start killing the player */
             return;
         }
 
-        state = kStarting;
+        previewVideoState = kStarting;
     }
 
-    if ((state == kStarting) && 
-        (!waitToStart || (waitToStartPreviewTimer.elapsed() > 500)))
+    if ((previewVideoState == kStarting) && 
+        (!previewVideoStartTimerOn ||
+         (previewVideoStartTimer.elapsed() > 500)))
     {
-        waitToStart = false;
+        previewVideoStartTimerOn = false;
 
-        if (!nvp)
+        if (!previewVideoNVP)
             startPlayer(curitem);
 
-        if (nvp)
+        if (previewVideoNVP)
         {
-            if (nvp->IsPlaying())
-                state = kPlaying;
+            if (previewVideoNVP->IsPlaying())
+                previewVideoState = kPlaying;
         }
         else
         {
@@ -848,33 +836,35 @@ void PlaybackBox::updateVideo(QPainter *p)
         }
     }
 
-    if ((state == kStopping) || (state == kKilling))
+    if ((previewVideoState == kStopping) || (previewVideoState == kKilling))
     {
-        if (nvp)
+        if (previewVideoNVP)
         {
             killPlayer(); /* start killing the player and exit */
             return;
         }
 
-        if (state == kKilling)
-            state = kKilled;
+        if (previewVideoState == kKilling)
+            previewVideoState = kKilled;
         else
-            state = kStopped;
+            previewVideoState = kStopped;
     }
 
     /* if we are playing and nvp is running, then grab a new video frame */
-    if ((state == kPlaying) && nvp->IsPlaying() && !playingSomething)
+    if ((previewVideoState == kPlaying) && previewVideoNVP->IsPlaying() &&
+        !playingSomething)
     {
-        QSize size = videoRect.size();
-        p->drawImage(videoRect.x(), videoRect.y(), nvp->GetARGBFrame(size));
+        QSize size = drawVideoBounds.size();
+        p->drawImage(drawVideoBounds.x(), drawVideoBounds.y(),
+                     previewVideoNVP->GetARGBFrame(size));
     }
 
     /* have we timed out waiting for nvp to start? */
-    if ((state == kPlaying) && !nvp->IsPlaying())
+    if ((previewVideoState == kPlaying) && !previewVideoNVP->IsPlaying())
     {
-        if (nvpTimeout.elapsed() > 2000)
+        if (previewVideoPlayingTimer.elapsed() > 2000)
         {
-            state = kStarting;
+            previewVideoState = kStarting;
             killPlayer();
             return;
         }
@@ -898,9 +888,9 @@ void PlaybackBox::updateUsage(QPainter *p)
         }
 
         vector<FileSystemInfo> fsInfos;
-        if (updateFreeSpace && connected)
+        if (freeSpaceNeedsUpdate && connected)
         {
-            updateFreeSpace = false;
+            freeSpaceNeedsUpdate = false;
             freeSpaceTotal = 0;
             freeSpaceUsed = 0;
 
@@ -925,7 +915,7 @@ void PlaybackBox::updateUsage(QPainter *p)
         QString rep = tr(", %1 GB free").arg(size);
         usestr = usestr + rep;
 
-        QRect pr = usageRect;
+        QRect pr = drawUsageBounds;
         QPixmap pix(pr.size());
         pix.fill(this, pr.topLeft());
         QPainter tmp(&pix);
@@ -967,7 +957,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     QString tempSize;
 
     QString match;
-    QRect pr = listRect;
+    QRect pr = drawListBounds;
     QPixmap pix(pr.size());
 
     LayerSet *container = NULL;
@@ -1121,8 +1111,8 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                         tempInfo->subtitle + "\"";
                 }
 
-                tempDate = (tempInfo->recstartts).toString(showDateFormat);
-                tempTime = (tempInfo->recstartts).toString(showTimeFormat);
+                tempDate = (tempInfo->recstartts).toString(formatShortDate);
+                tempTime = (tempInfo->recstartts).toString(formatTime);
 
                 long long size = tempInfo->filesize;
                 tempSize.sprintf("%0.2f GB", size / 1024.0 / 1024.0 / 1024.0);
@@ -1206,7 +1196,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 
     if (titleList.count() <= 1)
-        update(infoRect);
+        update(drawInfoBounds);
 }
 
 void PlaybackBox::cursorLeft()
@@ -1217,9 +1207,9 @@ void PlaybackBox::cursorLeft()
             killPlayerSafe();
         
         inTitle = true;
-        skipUpdate = false;
+        paintSkipUpdate = false;
         
-        update(fullRect);
+        update(drawTotalBounds);
         leftRight = true;
     }
     else if (arrowAccel)
@@ -1233,8 +1223,8 @@ void PlaybackBox::cursorRight()
     {
         leftRight = true;
         inTitle = false;
-        skipUpdate = false;
-        update(fullRect);
+        paintSkipUpdate = false;
+        update(drawTotalBounds);
     }
     else if (curitem && curitem->availableStatus != asAvailable)
         showAvailablePopup(curitem);
@@ -1254,8 +1244,8 @@ void PlaybackBox::cursorDown(bool page, bool newview)
         if (newview)
             inTitle = false;
 
-        skipUpdate = false;
-        update(fullRect);
+        paintSkipUpdate = false;
+        update(drawTotalBounds);
     }
     else 
     {
@@ -1266,9 +1256,9 @@ void PlaybackBox::cursorDown(bool page, bool newview)
             if (progIndex > progCount - 1)
                 progIndex = progCount - 1;
 
-            skipUpdate = false;
-            update(listRect);
-            update(infoRect);
+            paintSkipUpdate = false;
+            update(drawListBounds);
+            update(drawInfoBounds);
         }
     }
 }
@@ -1286,8 +1276,8 @@ void PlaybackBox::cursorUp(bool page, bool newview)
         if (newview)
             inTitle = false;
 
-        skipUpdate = false;
-        update(fullRect);
+        paintSkipUpdate = false;
+        update(drawTotalBounds);
     }
     else 
     {
@@ -1297,9 +1287,9 @@ void PlaybackBox::cursorUp(bool page, bool newview)
             if (progIndex < 0)
                 progIndex = 0;
 
-            skipUpdate = false;
-            update(listRect);
-            update(infoRect);
+            paintSkipUpdate = false;
+            update(drawListBounds);
+            update(drawInfoBounds);
         }
     }
 }
@@ -1310,8 +1300,8 @@ void PlaybackBox::listChanged(void)
         return;
 
     connected = FillList();      
-    skipUpdate = false;
-    update(fullRect);
+    paintSkipUpdate = false;
+    update(drawTotalBounds);
     if (type == Delete)
         UpdateProgressBar();
 }
@@ -1543,7 +1533,7 @@ bool PlaybackBox::FillList()
     return (infoList != NULL);
 }
 
-static void *SpawnDecoder(void *param)
+static void *SpawnPreviewVideoThread(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
     nvp->StartPlaying();
@@ -1552,46 +1542,46 @@ static void *SpawnDecoder(void *param)
 
 bool PlaybackBox::killPlayer(void)
 {
-    playingVideo = false;
+    previewVideoPlaying = false;
 
     /* if we don't have nvp to deal with then we are done */
-    if (!nvp)
+    if (!previewVideoNVP)
     {
-        killState = kDone;
+        previewVideoKillState = kDone;
         return true;
     }
 
-    if (killState == kDone)
+    if (previewVideoKillState == kDone)
     {
-        killState = kNvpToPlay;
-        killTimeout.start();
+        previewVideoKillState = kNvpToPlay;
+        previewVideoKillTimeout.start();
     }
  
-    if (killState == kNvpToPlay)
+    if (previewVideoKillState == kNvpToPlay)
     {
-        if (nvp->IsPlaying() || (killTimeout.elapsed() > 2000))
+        if (previewVideoNVP->IsPlaying() || (previewVideoKillTimeout.elapsed() > 2000))
         {
-            killState = kNvpToStop;
+            previewVideoKillState = kNvpToStop;
 
-            rbuffer->Pause();
-            nvp->StopPlaying();
+            previewVideoRingBuf->Pause();
+            previewVideoNVP->StopPlaying();
         }
         else /* return false status since we aren't done yet */
             return false;
     }
 
-    if (killState == kNvpToStop)
+    if (previewVideoKillState == kNvpToStop)
     {
-        if (!nvp->IsPlaying() || (killTimeout.elapsed() > 2000))
+        if (!previewVideoNVP->IsPlaying() || (previewVideoKillTimeout.elapsed() > 2000))
         {
-            pthread_join(decoder, NULL);
-            previewThreadRunning = true;
-            delete nvp;
-            delete rbuffer;
+            pthread_join(previewVideoThread, NULL);
+            previewVideoThreadRunning = true;
+            delete previewVideoNVP;
+            delete previewVideoRingBuf;
 
-            nvp = NULL;
-            rbuffer = NULL;
-            killState = kDone;
+            previewVideoNVP = NULL;
+            previewVideoRingBuf = NULL;
+            previewVideoKillState = kDone;
         }
         else /* return false status since we aren't done yet */
             return false;
@@ -1602,15 +1592,18 @@ bool PlaybackBox::killPlayer(void)
 
 void PlaybackBox::startPlayer(ProgramInfo *rec)
 {
-    playingVideo = true;
+    previewVideoPlaying = true;
 
     if (rec != NULL)
     {
         // Don't keep trying to open broken files when just sitting on entry
-        if (lastBrokenRecordId && lastBrokenRecordId == rec->recordid)
+        if (previewVideoBrokenRecId &&
+            previewVideoBrokenRecId == rec->recordid)
+        {
             return;
+        }
 
-        if (rbuffer || nvp)
+        if (previewVideoRingBuf || previewVideoNVP)
         {
             VERBOSE(VB_IMPORTANT,
                     "PlaybackBox::startPlayer(): Error, last preview window "
@@ -1618,30 +1611,31 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
             return;
         }
 
-        rbuffer = new RingBuffer(rec->pathname, false, false);
-        if (!rbuffer->IsOpen())
+        previewVideoRingBuf = new RingBuffer(rec->pathname, false, false);
+        if (!previewVideoRingBuf->IsOpen())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Could not open file for preview video.");
-            delete rbuffer;
-            rbuffer = NULL;
-            lastBrokenRecordId = rec->recordid;
+            delete previewVideoRingBuf;
+            previewVideoRingBuf = NULL;
+            previewVideoBrokenRecId = rec->recordid;
             return;
         }
-        lastBrokenRecordId = 0;
+        previewVideoBrokenRecId = 0;
 
-        nvp = new NuppelVideoPlayer("preview player");
-        nvp->SetRingBuffer(rbuffer);
-        nvp->SetAsPIP();
+        previewVideoNVP = new NuppelVideoPlayer("preview player");
+        previewVideoNVP->SetRingBuffer(previewVideoRingBuf);
+        previewVideoNVP->SetAsPIP();
         QString filters = "";
-        nvp->SetVideoFilters(filters);
+        previewVideoNVP->SetVideoFilters(filters);
 
-        previewThreadRunning = true;
-        pthread_create(&decoder, NULL, SpawnDecoder, nvp);
+        previewVideoThreadRunning = true;
+        pthread_create(&previewVideoThread, NULL,
+                       SpawnPreviewVideoThread, previewVideoNVP);
 
-        nvpTimeout.start();
+        previewVideoPlayingTimer.start();
 
-        state = kStarting;
+        previewVideoState = kStarting;
 
         int previewRate = 30;
         if (gContext->GetNumSetting("PlaybackPreviewLowCPU", 0))
@@ -1649,13 +1643,13 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
             previewRate = 12;
         }
         
-        timer->start(1000 / previewRate); 
+        previewVideoRefreshTimer->start(1000 / previewRate); 
     }
 }
 
 void PlaybackBox::playSelectedPlaylist(bool random)
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1686,7 +1680,7 @@ void PlaybackBox::playSelectedPlaylist(bool random)
 
 void PlaybackBox::playSelected()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1699,7 +1693,7 @@ void PlaybackBox::playSelected()
 
 void PlaybackBox::stopSelected()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1709,7 +1703,7 @@ void PlaybackBox::stopSelected()
 
 void PlaybackBox::deleteSelected()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1723,7 +1717,7 @@ void PlaybackBox::deleteSelected()
 
 void PlaybackBox::expireSelected()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1733,7 +1727,7 @@ void PlaybackBox::expireSelected()
 
 void PlaybackBox::upcoming()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1752,7 +1746,7 @@ void PlaybackBox::upcoming()
 
 void PlaybackBox::details()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!curitem)
         return;
@@ -1765,7 +1759,7 @@ void PlaybackBox::details()
 
 void PlaybackBox::selected()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (inTitle && haveGroupInfoSet)
     {
@@ -1785,15 +1779,15 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showMenu()
 {
-    state = kStopping;
+    previewVideoState = kStopping;
     killPlayer();
 
-    timer->stop();
-    playingVideo = false;
+    previewVideoRefreshTimer->stop();
+    previewVideoPlaying = false;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "menu popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "menu popup");
 
     QLabel *label = popup->addLabel(tr("Recording List Menu"),
                                   MythPopupBox::Large, false);
@@ -1886,7 +1880,7 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     }
 
     setEnabled(false);
-    state = kKilling; // stop preview playback and don't restart it
+    previewVideoState = kKilling; // stop preview playback and don't restart it
     playingSomething = true;
 
     tv->setLastProgram(lastProgram);
@@ -1967,7 +1961,7 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     }
     else
     {
-        state = kStarting; // restart playback preview
+        previewVideoState = kStarting; // restart playback preview
     }
 
     delete tvrec;
@@ -1993,7 +1987,7 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 
 void PlaybackBox::remove(ProgramInfo *toDel)
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (delitem)
         delete delitem;
@@ -2004,7 +1998,7 @@ void PlaybackBox::remove(ProgramInfo *toDel)
 
 void PlaybackBox::expire(ProgramInfo *toExp)
 {
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (delitem)
         delete delitem;
@@ -2030,11 +2024,11 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 
 void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
-    updateFreeSpace = true;
+    freeSpaceNeedsUpdate = true;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "delete popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "delete popup");
     QString message1 = "";
     QString message2 = "";
     switch (types)
@@ -2185,9 +2179,9 @@ void PlaybackBox::showPlaylistPopup()
     if (expectingPopup)
        cancelPopup();
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "playlist popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "playlist popup");
 
     QLabel *tlabel = NULL;
     if (playList.count() > 1)
@@ -2244,9 +2238,9 @@ void PlaybackBox::showPlaylistJobPopup()
     if (expectingPopup)
        cancelPopup();
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "playlist popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "playlist popup");
 
     QLabel *tlabel = NULL;
     if (playList.count() > 1)
@@ -2370,9 +2364,9 @@ void PlaybackBox::showPlayFromPopup()
     if (expectingPopup)
         cancelPopup();
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "playfrom popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "playfrom popup");
 
     initPopup(popup, delitem, "", "");
 
@@ -2391,9 +2385,9 @@ void PlaybackBox::showStoragePopup()
     if (expectingPopup)
         cancelPopup();
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "storage popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "storage popup");
 
     initPopup(popup, delitem, "", tr("A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low."));
 
@@ -2423,9 +2417,9 @@ void PlaybackBox::showRecordingPopup()
     if (expectingPopup)
         cancelPopup();
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "recording popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "recording popup");
 
     initPopup(popup, delitem, "", "");
 
@@ -2458,9 +2452,9 @@ void PlaybackBox::showJobPopup()
     if (!curitem)
         return;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "job popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "job popup");
 
     initPopup(popup, delitem, "", "");
 
@@ -2547,9 +2541,9 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     if (!curitem || !program)
         return;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
-                             popupForeground, popupBackground,
-                             popupHighlight, "action popup");
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "action popup");
 
     initPopup(popup, program, "", "");
 
@@ -2609,9 +2603,9 @@ void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
     QDateTime recstartts = program->recstartts;
     QDateTime recendts = program->recendts;
 
-    QString timedate = recstartts.date().toString(dateformat) + QString(", ") +
-                       recstartts.time().toString(timeformat) + QString(" - ") +
-                       recendts.time().toString(timeformat);
+    QString timedate = recstartts.date().toString(formatLongDate) + QString(", ") +
+                       recstartts.time().toString(formatTime) + QString(" - ") +
+                       recendts.time().toString(formatTime);
 
     QString descrip = program->description;
     descrip = cutDownString(descrip, &defaultMediumFont, (int)(width() / 2));
@@ -2640,8 +2634,8 @@ void PlaybackBox::cancelPopup(void)
     delete popup;
     popup = NULL;
 
-    skipUpdate = false;
-    skipCnt = 2;
+    paintSkipUpdate = false;
+    paintSkipCount = 2;
 
     setActiveWindow();
 }
@@ -2739,9 +2733,9 @@ void PlaybackBox::noStop(void)
 
     cancelPopup();
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    timer->start(500);
+    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::doStop(void)
@@ -2753,9 +2747,9 @@ void PlaybackBox::doStop(void)
 
     stop(delitem);
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    timer->start(500);
+    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::showProgramDetails()
@@ -2830,7 +2824,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 void PlaybackBox::doBeginFlagging()
 {
     doJobQueueJob(JOB_COMMFLAG);
-    update(listRect);
+    update(drawListBounds);
 }
 
 void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
@@ -2905,9 +2899,9 @@ void PlaybackBox::noDelete(void)
 
     cancelPopup();
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    timer->start(500);
+    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::doPlaylistDelete(void)
@@ -2951,9 +2945,9 @@ void PlaybackBox::doDelete(void)
 
     bool result = doRemove(delitem, false, false);
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    timer->start(500);
+    previewVideoRefreshTimer->start(500);
 
     if (result)
     {
@@ -2986,9 +2980,9 @@ void PlaybackBox::doForceDelete(void)
 
     doRemove(delitem, true, true);
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    timer->start(500);
+    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::doDeleteForgetHistory(void)
@@ -3011,9 +3005,9 @@ void PlaybackBox::doDeleteForgetHistory(void)
 
     bool result = doRemove(delitem, true, false);
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    timer->start(500);
+    previewVideoRefreshTimer->start(500);
 
     if (result)
     {
@@ -3088,9 +3082,9 @@ void PlaybackBox::noAutoExpire(void)
     delete delitem;
     delitem = NULL;
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    update(listRect);
+    update(drawListBounds);
 }
 
 void PlaybackBox::doAutoExpire(void)
@@ -3109,9 +3103,9 @@ void PlaybackBox::doAutoExpire(void)
     delete delitem;
     delitem = NULL;
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    update(listRect);
+    update(drawListBounds);
 }
 
 void PlaybackBox::doCancel(void)
@@ -3121,7 +3115,7 @@ void PlaybackBox::doCancel(void)
 
     cancelPopup();
 
-    state = kChanging;
+    previewVideoState = kChanging;
 }
 
 void PlaybackBox::toggleTitleView(void)
@@ -3141,7 +3135,7 @@ void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
     if (!rec)
         return;
 
-    state = kStopping;
+    previewVideoState = kStopping;
 
     if (!rec)
         return;
@@ -3155,7 +3149,7 @@ void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
 
 void PlaybackBox::UpdateProgressBar(void)
 {
-    update(usageRect);
+    update(drawUsageBounds);
 }
 
 void PlaybackBox::togglePlayListTitle(void)
@@ -3199,8 +3193,8 @@ void PlaybackBox::togglePlayListItem(void)
     if (!inTitle)
         cursorDown();
 
-    skipUpdate = false;
-    update(listRect);
+    paintSkipUpdate = false;
+    update(drawListBounds);
 }
 
 void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
@@ -3235,8 +3229,8 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
         playList << key;
     }
 
-    skipUpdate = false;
-    update(listRect);
+    paintSkipUpdate = false;
+    update(drawListBounds);
 }
 
 void PlaybackBox::timeout(void)
@@ -3244,8 +3238,8 @@ void PlaybackBox::timeout(void)
     if (titleList.count() <= 1)
         return;
 
-    if (playbackPreview)
-        update(videoRect);
+    if (previewVideoEnabled)
+        update(drawVideoBounds);
 }
 
 void PlaybackBox::processNetworkControlCommands(void)
@@ -3286,7 +3280,8 @@ void PlaybackBox::processNetworkControlCommand(QString command)
 
             if (playingSomething)
             {
-                VERBOSE(VB_IMPORTANT, "NetworkControl: ERROR: Already playing");
+                VERBOSE(VB_IMPORTANT,
+                        "NetworkControl: ERROR: Already playing");
 
                 MythEvent me("NETWORK_CONTROL RESPONSE ERROR: Unable to play, "
                              "player is already playing another recording.");
@@ -3370,16 +3365,16 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         {
             playList.clear();
             connected = FillList();      
-            skipUpdate = false;
-            update(fullRect);
+            paintSkipUpdate = false;
+            update(drawTotalBounds);
         }
         else if (action == "TOGGLERECORD")
         {
             if (titleView) titleView = false;
             else titleView = true;
             connected = FillList();
-            skipUpdate = false;
-            update(fullRect);
+            paintSkipUpdate = false;
+            update(drawTotalBounds);
         }
         else if (titleList.count() > 1)
         {
@@ -3563,7 +3558,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
 
-    if (!generatePreviewPixmap || !pginfo)
+    if (!previewPixmapEnabled || !pginfo)
         return retpixmap;
         
     if ((asPendingDelete == pginfo->availableStatus) || previewSuspend)
@@ -3669,10 +3664,9 @@ void PlaybackBox::showIconHelp(void)
     if (!container)
         return;
 
-    MythPopupBox *iconhelp = new MythPopupBox(gContext->GetMainWindow(),
-                                              true, popupForeground,
-                                              popupBackground, popupHighlight,
-                                              "icon help");
+    MythPopupBox *iconhelp = new MythPopupBox(
+        gContext->GetMainWindow(), true, drawPopupFgColor,
+        drawPopupBgColor, drawPopupSelColor, "icon help");
 
     QGridLayout *grid = new QGridLayout(6, 2, (int)(10 * wmult));
 
@@ -3691,7 +3685,7 @@ void PlaybackBox::showIconHelp(void)
         label = new QLabel(tr("Commercials are flagged"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 0, 1, Qt::AlignLeft);
          
         label = new QLabel(iconhelp, "nopopsize");
@@ -3703,7 +3697,7 @@ void PlaybackBox::showIconHelp(void)
 
         label->setMaximumWidth(width() / 2);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 0, 0, Qt::AlignCenter);
     }
 
@@ -3713,7 +3707,7 @@ void PlaybackBox::showIconHelp(void)
         label = new QLabel(tr("An editing cutlist is present"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 1, 1, Qt::AlignLeft);
 
         label = new QLabel(iconhelp, "nopopsize");
@@ -3725,7 +3719,7 @@ void PlaybackBox::showIconHelp(void)
 
         label->setMaximumWidth(width() / 2);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 1, 0, Qt::AlignCenter);
     }
 
@@ -3735,7 +3729,7 @@ void PlaybackBox::showIconHelp(void)
         label = new QLabel(tr("The program is able to auto-expire"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 2, 1, Qt::AlignLeft);
 
         label = new QLabel(iconhelp, "nopopsize");
@@ -3747,7 +3741,7 @@ void PlaybackBox::showIconHelp(void)
 
         label->setMaximumWidth(width() / 2);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 2, 0, Qt::AlignCenter);
     }
 
@@ -3757,7 +3751,7 @@ void PlaybackBox::showIconHelp(void)
         label = new QLabel(tr("Commercials are being flagged"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 3, 1, Qt::AlignLeft);
 
         label = new QLabel(iconhelp, "nopopsize");
@@ -3769,7 +3763,7 @@ void PlaybackBox::showIconHelp(void)
 
         label->setMaximumWidth(width() / 2);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 3, 0, Qt::AlignCenter);
     }
 
@@ -3779,7 +3773,7 @@ void PlaybackBox::showIconHelp(void)
         label = new QLabel(tr("A bookmark is set"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 4, 1, Qt::AlignLeft);
 
         label = new QLabel(iconhelp, "nopopsize");
@@ -3791,7 +3785,7 @@ void PlaybackBox::showIconHelp(void)
 
         label->setMaximumWidth(width() / 2);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 4, 0, Qt::AlignCenter);
     }
 
@@ -3801,7 +3795,7 @@ void PlaybackBox::showIconHelp(void)
         label = new QLabel(tr("Recording is in use"), iconhelp);
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 5, 1, Qt::AlignLeft);
 
         label = new QLabel(iconhelp, "nopopsize");
@@ -3813,7 +3807,7 @@ void PlaybackBox::showIconHelp(void)
 
         label->setMaximumWidth(width() / 2);
         label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(popupForeground);
+        label->setPaletteForegroundColor(drawPopupFgColor);
         grid->addWidget(label, 5, 0, Qt::AlignCenter);
     }
 
@@ -3834,10 +3828,10 @@ void PlaybackBox::showIconHelp(void)
 
     delete iconhelp;
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
-    skipUpdate = false;
-    skipCnt = 2;
+    paintSkipUpdate = false;
+    paintSkipCount = 2;
 
     setActiveWindow();
 }
@@ -3848,8 +3842,8 @@ void PlaybackBox::initRecGroupPopup(QString title, QString name)
         closeRecGroupPopup();
 
     recGroupPopup = new MythPopupBox(gContext->GetMainWindow(), true,
-                                     popupForeground, popupBackground,
-                                     popupHighlight, name);
+                                     drawPopupFgColor, drawPopupBgColor,
+                                     drawPopupSelColor, name);
 
     QLabel *label = recGroupPopup->addLabel(title, MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter);
@@ -3876,10 +3870,10 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
     if (refreshList)
         connected = FillList();
 
-    skipUpdate = false;
-    skipCnt = 2;
+    paintSkipUpdate = false;
+    paintSkipCount = 2;
 
-    state = kChanging;
+    previewVideoState = kChanging;
 
     setActiveWindow();
 
@@ -4451,8 +4445,8 @@ void PlaybackBox::setRecTitle()
     progIndex = 0;
 
     connected = FillList();
-    skipUpdate = false;
-    update(fullRect);
+    paintSkipUpdate = false;
+    update(drawTotalBounds);
 }
 
 void PlaybackBox::recGroupChangerListBoxChanged(void)
@@ -4479,7 +4473,7 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     QLabel *label = new QLabel(tr("Recording Group:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(popupForeground);
+    label->setPaletteForegroundColor(drawPopupFgColor);
     grid->addWidget(label, 0, 0, Qt::AlignLeft);
 
     if ((recGroup == "Default") || (recGroup == "All Programs") || 
@@ -4490,13 +4484,13 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
 
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(popupForeground);
+    label->setPaletteForegroundColor(drawPopupFgColor);
     grid->addWidget(label, 0, 1, Qt::AlignLeft);
 
     label = new QLabel(tr("Old Password:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(popupForeground);
+    label->setPaletteForegroundColor(drawPopupFgColor);
     grid->addWidget(label, 1, 0, Qt::AlignLeft);
 
     recGroupOldPassword = new MythLineEdit(recGroupPopup);
@@ -4507,7 +4501,7 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     label = new QLabel(tr("New Password:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(popupForeground);
+    label->setPaletteForegroundColor(drawPopupFgColor);
     grid->addWidget(label, 2, 0, Qt::AlignLeft);
 
     recGroupNewPassword = new MythLineEdit(recGroupPopup);
