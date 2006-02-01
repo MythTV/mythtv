@@ -98,6 +98,21 @@
    </button>
 
    <button>
+      <type>TV_STATUS</type>
+      <text>System Status</text>
+      <text lang="DE">Systemstatus</text>
+      <text lang="SV">Systemstatus</text>
+      <text lang="JA">システムステータス</text>
+      <text lang="SI">Status sistema</text>
+      <text lang="ET">Süsteemi olek</text>
+      <text lang="DK">Systemstatus</text>
+      <text lang="PT">Estado do Sistema</text>
+      <text lang="ES">Estado Sistema</text>
+      <text lang="NL">Systeemstatus</text>
+      <action>TV_STATUS</action>
+   </button>
+
+   <button>
      <type>MENU_UTILITIES_SETUP</type>
      <text>Utilities / Setup</text>
      <text lang="IT">Impostazioni</text>

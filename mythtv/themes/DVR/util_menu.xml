@@ -2,7 +2,7 @@
 
    <button>
      <type>TV</type>
-     <text>TV</text>
+     <text>TV Utilities</text>
      <text lang="PT">Televisão</text>
      <text lang="FR">TV</text>
      <text lang="SV">TV</text>
@@ -228,6 +228,14 @@
    </button>
 
    <button>
+     <type>NETFLIX</type>
+     <text>NetFlix</text>
+     <text lang="PT">Aluguer de Filmes</text>
+     <action>PLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
+
+   <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="DE">Tastenbelegung ändern</text>
@@ -270,13 +278,5 @@
      <text lang="NL">Afsluiten</text>
      <action>SHUTDOWN</action>
    </button> -->
-
-   <button>
-     <type>NETFLIX</type>
-     <text>NetFlix</text>
-     <text lang="PT">Aluguer de Filmes</text>
-     <action>PLUGIN mythflix</action>
-     <depends>mythflix</depends>
-   </button>
 
 </mythmenu>
