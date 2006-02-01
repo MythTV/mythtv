@@ -179,6 +179,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
     int  defaultView = gContext->GetNumSetting("DisplayGroupDefaultView", 0);
+    int  initialFilt = gContext->GetNumSetting("QueryInitialFilter", 0);
 
     progLists[""];
     titleList << "";
@@ -258,11 +259,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     setNoErase();
     gContext->addListener(this);
 
-    if ((recGroupPassword != "") || (titleList.count() <= 1) ||
-        (gContext->GetNumSetting("QueryInitialFilter", 0)))
-    {
+    if (!recGroupPassword.isEmpty() || (titleList.count() <= 1) || initialFilt)
         showRecGroupChooser();
-    }
 
     gContext->addCurrentLocation((type == Delete)? "DeleteBox":"PlaybackBox");
 }
@@ -271,20 +269,61 @@ PlaybackBox::~PlaybackBox(void)
 {
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
+
     killPlayerSafe();
-    delete previewVideoRefreshTimer;
-    delete fillListTimer;
-    delete theme;
-    delete drawTransPixmap;
+
+    if (previewVideoRefreshTimer)
+    {
+        previewVideoRefreshTimer->disconnect(this);
+        previewVideoRefreshTimer->deleteLater();
+        previewVideoRefreshTimer = NULL;
+    }
+
+    if (fillListTimer)
+    {
+        fillListTimer->disconnect(this);
+        fillListTimer->deleteLater();
+        fillListTimer = NULL;
+    }
+
+    if (freeSpaceTimer)
+    {
+        freeSpaceTimer->disconnect(this);
+        freeSpaceTimer->deleteLater();
+        freeSpaceTimer = NULL;
+    }
+
+    if (theme)
+    {
+        delete theme;
+        theme = NULL;
+    }
+
+    if (drawTransPixmap)
+    {
+        delete drawTransPixmap;
+        drawTransPixmap = NULL;
+    }
     
     if (curitem)
+    {
         delete curitem;
+        curitem = NULL;
+    }
+
     if (delitem)
+    {
         delete delitem;
+        delitem = NULL;
+    }
 
     if (lastProgram)
+    {
         delete lastProgram;
+        lastProgram = NULL;
+    }
 
+    // disconnect preview generators
     QMutexLocker locker(&previewGeneratorLock);
     QMap<QString, PreviewGenerator*>::iterator it = previewGenerator.begin();
     for (;it != previewGenerator.end(); ++it)
@@ -293,10 +332,13 @@ PlaybackBox::~PlaybackBox(void)
             (*it)->disconnectSafe();
     }
 
-    // free preview pixmap after preview generators
-    // no longer sending us any new previews.
+    // free preview pixmap after preview generators are
+    // no longer telling us about any new previews.
     if (previewPixmap)
+    {
         delete previewPixmap;
+        previewPixmap = NULL;
+    }
 }
 
 void PlaybackBox::setDefaultView(int defaultView)
@@ -616,7 +658,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
     QMap<QString, QString> infoMap;
     QPainter tmp(&pix);
         
-    if (previewVideoPlaying == true)
+    if (previewVideoPlaying)
         previewVideoState = kChanging;
 
     LayerSet *container = NULL;
@@ -695,19 +737,15 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
             else
                 itype->hide();
         }
-    }
 
-    if (container && type != Delete)
-        container->Draw(&tmp, 6, 0);
-    else
-        container->Draw(&tmp, 6, 1);
+        container->Draw(&tmp, 6, (type == Delete) ? 1 : 0);
+    }
 
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 
     previewVideoStartTimer.start();
     previewVideoStartTimerOn = true;
-
 }
 
 void PlaybackBox::updateInfo(QPainter *p)
@@ -747,27 +785,21 @@ void PlaybackBox::updateVideo(QPainter *p)
 
     /* show a still frame if the user doesn't want a video preview or nvp 
      * hasn't started playing the video preview yet */
-    if (((!previewVideoEnabled) || !previewVideoPlaying ||
+    if (curitem && !playingSomething &&
+        (!previewVideoEnabled             ||
+         !previewVideoPlaying             ||
          (previewVideoState == kStarting) || 
-         (previewVideoState == kChanging)) && curitem)
+         (previewVideoState == kChanging)))
     {
-        if (!playingSomething)
-        {
-            QPixmap temp = getPixmap(curitem);
-            if (temp.width() > 0)
-            {
-                p->drawPixmap(drawVideoBounds.x(), drawVideoBounds.y(), temp);
-            }
-        }
+        QPixmap temp = getPixmap(curitem);
+        if (temp.width() > 0)
+            p->drawPixmap(drawVideoBounds.x(), drawVideoBounds.y(), temp);
     }
 
     /* keep calling killPlayer() to handle nvp cleanup */
     /* until killPlayer() is done */
-    if (previewVideoKillState != kDone)
-    {
-        if (!killPlayer())
-            return;
-    }
+    if (previewVideoKillState != kDone && !killPlayer())
+        return;
 
     /* if we aren't supposed to have a preview playing then always go */
     /* to the stopping previewVideoState */
@@ -1542,6 +1574,8 @@ static void *SpawnPreviewVideoThread(void *param)
 
 bool PlaybackBox::killPlayer(void)
 {
+    QMutexLocker locker(&previewVideoUnsafeKillLock);
+
     previewVideoPlaying = false;
 
     /* if we don't have nvp to deal with then we are done */
@@ -1559,7 +1593,8 @@ bool PlaybackBox::killPlayer(void)
  
     if (previewVideoKillState == kNvpToPlay)
     {
-        if (previewVideoNVP->IsPlaying() || (previewVideoKillTimeout.elapsed() > 2000))
+        if (previewVideoNVP->IsPlaying() ||
+            (previewVideoKillTimeout.elapsed() > 2000))
         {
             previewVideoKillState = kNvpToStop;
 
@@ -1572,7 +1607,8 @@ bool PlaybackBox::killPlayer(void)
 
     if (previewVideoKillState == kNvpToStop)
     {
-        if (!previewVideoNVP->IsPlaying() || (previewVideoKillTimeout.elapsed() > 2000))
+        if (!previewVideoNVP->IsPlaying() ||
+            (previewVideoKillTimeout.elapsed() > 2000))
         {
             pthread_join(previewVideoThread, NULL);
             previewVideoThreadRunning = true;
@@ -1779,11 +1815,16 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showMenu()
 {
-    previewVideoState = kStopping;
-    killPlayer();
-
-    previewVideoRefreshTimer->stop();
-    previewVideoPlaying = false;
+    {
+        QMutexLocker locker(&previewVideoKillLock);
+        setEnabled(false);
+        previewVideoState = kStopping;
+        while (!killPlayer())
+            usleep(2500);
+        previewVideoRefreshTimer->stop();
+        previewVideoState = kStopped;
+        setEnabled(true);
+    }
 
     popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
                              drawPopupFgColor, drawPopupBgColor,
@@ -3533,25 +3574,26 @@ bool PlaybackBox::IsGeneratingPreview(const QString &fn) const
  */
 void PlaybackBox::previewReady(const ProgramInfo *pginfo)
 {
+    // lock QApplication so that we don't remove pixmap
+    // from under a running paint event.
+    qApp->lock();
+
     // If we are still displaying this preview update it.
     if (pginfo->recstartts  == previewStartts &&
         pginfo->chanid      == previewChanid  &&
-        previewLastModified == previewFilets)
+        previewLastModified == previewFilets  &&
+        titleList.count() > 1)
     {
-        // lock QApplication so that we don't remove pixmap
-        // from under a running paint event.
-        qApp->lock();
-        QPixmap *pix = previewPixmap;
-        previewPixmap = NULL;
-        qApp->unlock();
+        if (previewPixmap)
+        {
+            delete previewPixmap;
+            previewPixmap = NULL;
+        }
 
         // ask for repaint
-        update();
-
-        // delete the old blank pixmap
-        if (pix)
-            delete pix;
+        update(drawVideoBounds);
     }
+    qApp->unlock();
 }
 
 QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
@@ -3589,6 +3631,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         return *previewPixmap;
     }
+
+    paintSkipUpdate = false; // repaint background next time around
 
     if (previewPixmap)
     {

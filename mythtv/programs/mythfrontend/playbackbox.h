@@ -381,6 +381,7 @@ class PlaybackBox : public MythDialog
     pthread_t           previewVideoThread;
 
     mutable QMutex      previewVideoKillLock;
+    mutable QMutex      previewVideoUnsafeKillLock;
     killStateType       previewVideoKillState;
     MythTimer           previewVideoKillTimeout;
 
