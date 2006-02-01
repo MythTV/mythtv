@@ -1754,8 +1754,14 @@ void GuideGrid::details()
 
 void GuideGrid::channelUpdate(void)
 {
+    if (m_channelInfos.empty())
+        return;
+
+    uint idx = (m_currentRow + m_currentStartChannel) % m_channelInfos.size();
+    ChannelInfo info = m_channelInfos[idx];
+
     if (m_player)
-        m_player->EPGChannelUpdate(GetChanID(), GetChanNum());
+        m_player->EPGChannelUpdate(info.chanid, info.chanstr);
 }
 
 //
