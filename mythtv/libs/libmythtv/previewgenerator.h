@@ -31,6 +31,7 @@ class PreviewGenerator : public QObject
                                int &video_width, int &video_height,
                                float &video_aspect);
 
+    void AttachSignals(QObject*);
     void disconnectSafe(void);
 
   signals:

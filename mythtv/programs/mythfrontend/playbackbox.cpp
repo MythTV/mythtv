@@ -46,6 +46,8 @@ using namespace std;
      ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
       ((rec)->recgroup != "LiveTV")))
 
+//#define USE_PREV_GEN_THREAD
+
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->programid == b->programid)
@@ -3531,28 +3533,26 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
 
 /** \fn PlaybackBox::SetPreviewGenerator(const QString&, PreviewGenerator*)
  *  \brief Sets the PreviewGenerator for a specific file.
+ *  \return true iff call succeeded.
  */
 bool PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
 {
     if (!g)
     {
-        if (!previewGeneratorLock.tryLock())
-            return false;
-        previewGenerator.erase(fn);
-    }
-    else
-    {
-        previewGeneratorLock.lock();
-
-        previewGenerator[fn] = g;
-        connect(g,    SIGNAL(previewThreadDone(const QString&,bool&)),
-                this, SLOT(  previewThreadDone(const QString&,bool&)));
-        connect(g,    SIGNAL(previewReady(const ProgramInfo*)),
-                this, SLOT(  previewReady(const ProgramInfo*)));
-        g->Start();
+        if (previewGeneratorLock.tryLock())
+        {
+            previewGenerator.erase(fn);
+            previewGeneratorLock.unlock();
+            return true;
+        }
+        return false;
     }
 
-    previewGeneratorLock.unlock();
+    QMutexLocker locker(&previewGeneratorLock);
+    g->AttachSignals(this);
+    previewGenerator[fn] = g;
+    g->Start();
+
     return true;
 }
 
@@ -3623,7 +3623,12 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo) &&
         !IsGeneratingPreview(filename))
     {
+#ifdef USE_PREV_GEN_THREAD
         SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+#else
+        PreviewGenerator pg(pginfo, false);
+        pg.Run();
+#endif
     }
 
     // Check and see if we've already tried this one.
@@ -3668,7 +3673,15 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     // If the image is not available remotely either, we need to generate it.
     if (!image && !IsGeneratingPreview(filename))
+    {
+#ifdef USE_PREV_GEN_THREAD
         SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+#else
+        PreviewGenerator pg(pginfo, false);
+        pg.Run();
+        image = gContext->CacheRemotePixmap(filename, true);
+#endif
+    }
 
     if (image)
     {

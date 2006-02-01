@@ -52,7 +52,7 @@
  */
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    bool local_only)
-    : programInfo(*pginfo), localOnly(local_only), isConnected(true),
+    : programInfo(*pginfo), localOnly(local_only), isConnected(false),
       createSockets(false), eventSock(NULL), serverSock(NULL)
 {
     if (IsLocal())
@@ -103,6 +103,16 @@ void PreviewGenerator::deleteLater()
 {
     TeardownAll();
     QObject::deleteLater();
+}
+
+void PreviewGenerator::AttachSignals(QObject *obj)
+{
+    QMutexLocker locker(&previewLock);
+    connect(this, SIGNAL(previewThreadDone(const QString&,bool&)),
+            obj,  SLOT(  previewThreadDone(const QString&,bool&)));
+    connect(this, SIGNAL(previewReady(const ProgramInfo*)),
+            obj,  SLOT(  previewReady(const ProgramInfo*)));
+    isConnected = true;
 }
 
 /** \fn PreviewGenerator::disconnectSafe(void)
