@@ -289,6 +289,7 @@ class TV : public QObject
     void TogglePIPView(void);
     void ToggleActiveWindow(void);
     void SwapPIP(void);
+    void SwapPIPSoon(void) { needToSwapPIP = true; }
 
     void ToggleAutoExpire(void);
 
@@ -375,6 +376,7 @@ class TV : public QObject
     int recAdjustment;   ///< Which recorder picture attribute to modify...
 
     bool ignoreKeys;
+    bool needToSwapPIP;
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.

@@ -115,7 +115,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEPIPMODE", "Toggle Picture-in-Picture mode",
             "V");
     REG_KEY("TV Playback", "TOGGLEPIPWINDOW", "Toggle active PiP window", "B");
-    REG_KEY("TV Playback", "SWAPPIP", "Swap the PiP window channels", "N");
+    REG_KEY("TV Playback", "SWAPPIP", "Swap PiP/Main", "N");
     REG_KEY("TV Playback", "TOGGLEASPECT", "Toggle the display aspect ratio",
             "W");
     REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
@@ -219,7 +219,7 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       picAdjustment(kPictureAttribute_None),
       recAdjustment(kPictureAttribute_None),
-      ignoreKeys(false),
+      ignoreKeys(false), needToSwapPIP(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
@@ -1617,6 +1617,13 @@ void TV::RunTV(void)
 
             lastLcdUpdate = QDateTime::currentDateTime();
         }
+
+        if (needToSwapPIP)
+        {
+            ClearOSD();
+            SwapPIP();
+            needToSwapPIP = false;
+        }
     }
   
     if (!IsErrored() && (GetState() != kState_None))
@@ -2412,7 +2419,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "TOGGLEPIPWINDOW")
                 ToggleActiveWindow();
             else if (action == "SWAPPIP")
-                SwapPIP();
+                SwapPIPSoon();
             else if (action == "TOGGLEBROWSE")
                 BrowseStart();
             else if (action == "PREVCHAN")
@@ -5384,7 +5391,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         else if (action == "TOGGLEPIPWINDOW")
             ToggleActiveWindow();
         else if (action == "SWAPPIP")
-            SwapPIP();
+            SwapPIPSoon();
         else if (action == "TOGGLEBROWSE")
             BrowseStart();
         else if (action == "PREVCHAN")
@@ -5475,7 +5482,7 @@ void TV::BuildOSDTreeMenu(void)
             item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
             subitem = new OSDGenericTree(item, tr("Enable/Disable"), 
                                          "TOGGLEPIPMODE");
-            subitem = new OSDGenericTree(item, tr("Swap Channels"), "SWAPPIP");
+            subitem = new OSDGenericTree(item, tr("Swap PiP/Main"), "SWAPPIP");
             subitem = new OSDGenericTree(item, tr("Change Active Window"),
                                          "TOGGLEPIPWINDOW");
         }
