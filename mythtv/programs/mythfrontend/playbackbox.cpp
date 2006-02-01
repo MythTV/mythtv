@@ -1132,14 +1132,22 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 tempInfo = plist->at(skip+cnt);
 
-                if ((titleList[titleIndex] == "") || (!(titleView)))
+                if ((titleList[titleIndex] == "") ||
+                    ((titleList[titleIndex] != tempInfo->title) &&
+                     ((titleList[titleIndex] == tempInfo->recgroup) ||
+                      (titleList[titleIndex] == tempInfo->category))) ||
+                    (!(titleView)))
                     tempSubTitle = tempInfo->title; 
                 else
                     tempSubTitle = tempInfo->subtitle;
                 if (tempSubTitle.stripWhiteSpace().length() == 0)
                     tempSubTitle = tempInfo->title;
                 if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
-                    && ((titleList[titleIndex] == "") || (!(titleView))))
+                    && ((titleList[titleIndex] == "") ||
+                        ((titleList[titleIndex] != tempInfo->title) &&
+                         ((titleList[titleIndex] == tempInfo->recgroup) ||
+                          (titleList[titleIndex] == tempInfo->category))) ||
+                        (!(titleView))))
                 {
                     tempSubTitle = tempSubTitle + " - \"" + 
                         tempInfo->subtitle + "\"";
