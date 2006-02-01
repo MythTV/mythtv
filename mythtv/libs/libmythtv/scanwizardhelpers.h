@@ -653,11 +653,8 @@ class ATSCPane : public VerticalConfigurationGroup
   public:
     ATSCPane() : VerticalConfigurationGroup(false,false,true,false)
     {
-        HorizontalConfigurationGroup *hg =
-            new HorizontalConfigurationGroup(false,false,true,true);
-        hg->addChild(atsc_table        = new ScanFrequencyTable());
-        hg->addChild(atsc_modulation   = new ScanATSCModulation());
-        addChild(hg);
+        addChild(atsc_table            = new ScanFrequencyTable());
+        addChild(atsc_modulation       = new ScanATSCModulation());
         addChild(atsc_format           = new ScanATSCChannelFormat());
         addChild(old_channel_treatment = new ScanOldChannelTreatment());
     }
