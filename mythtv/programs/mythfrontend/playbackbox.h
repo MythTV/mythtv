@@ -227,7 +227,7 @@ class PlaybackBox : public MythDialog
 
     ProgramInfo *findMatchingProg(ProgramInfo *);
     ProgramInfo *findMatchingProg(QString key);
-    ProgramInfo *findMatchingProg(QString chanid, QString startts);
+    ProgramInfo *findMatchingProg(QString chanid, QString recstartts);
 
     bool killPlayer(void);
     void killPlayerSafe(void);
