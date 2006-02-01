@@ -74,7 +74,7 @@
       <text lang="DE">Bilder</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="IS">Stillingar ljósmynda</text>
-      <text lang="NL">Beelden Instellingen</text>
+      <text lang="NL">Foto's Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Bilder</text>
       <text lang="JA">イメージ設定</text>
@@ -124,6 +124,7 @@
      <text lang="DK">Radioindstillinger</text>
      <text lang="ES">Configurar Radio</text>
      <text lang="PT">Configurar Rádio</text>
+     <text lang="NL">Radio Instellingen</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>
@@ -135,6 +136,7 @@
       <text lang="FR">Gravure de DVD</text>
       <text lang="PT">Conf. Grav. de DVDs</text>
       <text lang="DE">DVD brennen</text>
+      <text lang="NL">DVD Branden Instellingen</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

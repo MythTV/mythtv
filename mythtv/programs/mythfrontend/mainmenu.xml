@@ -6,7 +6,7 @@
       <text lang="IT">Guarda la TV</text>
       <text lang="ES">Ver la TV</text>
       <text lang="CA">Veure la TV</text>
-      <text lang="NL">Kijk TV</text>
+      <text lang="NL">TV Kijken</text>
       <text lang="FR">Regarder la TV</text>
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
@@ -28,7 +28,7 @@
      <text lang="DE">Mediathek</text>
      <text lang="FR">Médiathèque</text>
      <text lang="IS">Margmiðlunarsafn</text>
-     <text lang="NL">Media-Center</text>     
+     <text lang="NL">Mediatheek</text>     
      <text lang="SV">Mediabibliotek</text>
      <text lang="JA">メディアライブラリ</text>
      <text lang="FI">Mediakirjasto</text>
@@ -94,6 +94,7 @@
      <alttext lang="SV">Infocenter</alttext>
      <alttext lang="ET">Info</alttext>
      <alttext lang="PT">Informação</alttext>
+     <alttext lang="NL">Infocenter</alttext>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -103,7 +104,7 @@
      <text lang="DE">CD/DVD</text>
      <text lang="FR">Disques optiques</text>
      <text lang="IS">Geisladiskar</text>
-     <text lang="NL">DVD-CD media</text>
+     <text lang="NL">DVD/CD</text>
      <text lang="SV">Optiska diskar</text>
      <text lang="JA">オプティカルディスク</text>
      <text lang="FI">DVD ja CD</text>
@@ -129,7 +130,7 @@
      <text lang="DE">Zubehör / Konfiguration</text>
      <text lang="DK">Konfiguration</text>
      <text lang="IS">Uppsetning</text>
-     <text lang="NL">Beheer</text>
+     <text lang="NL">Configuratie</text>
      <text lang="PT">Utensílios</text>
      <text lang="SV">Verktyg / Inställningar</text>
      <text lang="JA">設定</text>
@@ -152,6 +153,7 @@
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>
      <text lang="PT">Gravações</text>
+     <text lang="NL">Afsluiten</text>
      <action>SHUTDOWN</action>
    </button> -->
 

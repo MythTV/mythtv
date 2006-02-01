@@ -32,7 +32,7 @@
       <text lang="PT">Gerir Filmes</text>
       <text lang="SV">Filmhanterare</text>
       <text lang="FR">Vidéos</text>
-      <text lang="NL">Video's Beheren</text>
+      <text lang="NL">Films Beheren</text>
       <text lang="JA">ビデオマネージャー</text>
       <text lang="FI">Videonhallinta</text>
       <text lang="ZH_TW">電影工具</text>
@@ -55,6 +55,7 @@
       <text lang="ES">Editar Teclas</text>
       <text lang="PT">Configurar Teclas</text>
       <text lang="ET">Muuda klahve</text>
+      <text lang="NL">Toetsen Aanpassen</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>
@@ -69,7 +70,7 @@
       <text lang="DE">Konfiguration</text>
       <text lang="DK">Konfiguration</text>
       <text lang="IS">Stillingar</text>
-      <text lang="NL">Instellingen</text>
+      <text lang="NL">Configuratie</text>
       <text lang="PT">Configurações</text>
       <text lang="SV">Inställningar</text>
       <text lang="JA">設定</text>

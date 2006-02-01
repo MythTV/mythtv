@@ -51,6 +51,7 @@
      <text lang="SV">Biotider</text>
      <text lang="PT">Horário de Cinema</text>
      <text lang="DE">Kinoprogramm</text>
+     <text lang="NL">Bioscoop Tijden</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -84,6 +85,7 @@
      <text lang="FI">MythFlix</text>
      <text lang="PT">Aluguer de Filmes</text>
      <text lang="DE">MythFlix</text>
+     <text lang="NL">MythFlix</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -104,6 +106,7 @@
       <text lang="DK">Web</text>
       <text lang="ES">Web</text>
       <text lang="PT">Navegação Web</text>
+      <text lang="NL">Internet</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -113,7 +116,7 @@
      <text>Recipes</text>
      <text lang="SV">Recept</text>
      <text lang="IS">Uppskriftir</text>
-     <text lang="NL">Kookboek</text>     
+     <text lang="NL">Recepten</text>     
      <text lang="FR">Recettes</text>
      <text lang="NL">Recepten</text>
      <text lang="JA">レシピ</text>

@@ -74,6 +74,7 @@
       <text lang="FR">Graver un DVD</text>
       <text lang="PT">Gravar DVD</text>
       <text lang="DE">DVD brennen</text>
+      <text lang="NL">DVD Branden</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

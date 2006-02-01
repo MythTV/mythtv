@@ -44,7 +44,7 @@
       <type>TV_SEARCH_PEOPLE</type>
       <text>People</text>
       <text lang="SV">Person</text>
-      <text lang="NL">Persoonsnamen</text>     
+      <text lang="NL">Personen</text>     
       <text lang="FR">Personnes</text>
       <text lang="JA">人</text>
       <text lang="DE">nach Personen</text>
@@ -63,7 +63,7 @@
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
       <text lang="SV">Avancerad</text>
-      <text lang="NL">Geavanceer</text>      
+      <text lang="NL">Geavanceerd</text>      
       <text lang="IS">Frekari</text>
       <text lang="FR">Avancée</text>
       <text lang="JA">アドバンスト</text>

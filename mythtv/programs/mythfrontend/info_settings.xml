@@ -53,6 +53,7 @@
      <text lang="SV">Biotider</text>
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="DE">Kinoprogramm</text>
+     <text lang="NL">Bioscoop Tijden</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -65,6 +66,7 @@
      <text lang="DE">MythFlix</text>
      <text lang="ES">MythFlix</text>
      <text lang="ET">MythFlix seaded</text>
+     <text lang="NL">MythFlix Instellingen</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -77,7 +79,7 @@
      <text lang="JA">Web設定</text>
      <text lang="FR">Configuration du web</text>
      <text lang="IS">Stillingar vefs</text>
-     <text lang="NL">Web Instellingen</text>     
+     <text lang="NL">Internet Instellingen</text>     
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
      <text lang="SI">Spletne nastavitve</text>
@@ -99,7 +101,7 @@
      <text lang="FR">Configuration des recettes</text>
      <text lang="FI">Reseptiasetukset</text>
      <text lang="IS">Stillingar uppskrifta</text>
-     <text lang="NL">Kookboek Instellingen</text>     
+     <text lang="NL">Recepten Instellingen</text>     
      <text lang="SI">Nastavitve receptov</text>
      <text lang="ET">Retseptide seaded</text>     
      <text lang="NB">Innstillinger for oppskrifter</text>

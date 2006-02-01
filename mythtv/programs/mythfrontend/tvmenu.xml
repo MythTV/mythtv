@@ -6,7 +6,7 @@
       <text lang="IT">Guarda la TV</text>
       <text lang="ES">Ver la TV</text>
       <text lang="CA">Veure la TV</text>
-      <text lang="NL">Kijk TV</text>
+      <text lang="NL">TV Kijken</text>
       <text lang="FR">En direct</text>
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
@@ -119,6 +119,7 @@
       <text lang="JA">パススルーモード</text>
       <text lang="ET">TV läbilase</text>
       <text lang="PT">Televisão Directa</text>
+      <text lang="NL">TV Direct</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->
