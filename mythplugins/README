@@ -1,5 +1,8 @@
-This is a consolidation of all the official MythTV plugins that used to be
-distributed as separate downloads from mythtv.org.  
+This is a consolidation of all the official MythTV plugins that
+used to be distributed as separate downloads from mythtv.org.  
+
+WARNING: You must install MythTV before configuring
+         or compiling any of the plugins.
 
 For installation help for everything but mythweb, run:
   ./configure --help
