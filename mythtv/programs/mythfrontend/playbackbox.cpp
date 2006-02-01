@@ -16,6 +16,7 @@
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
+#include <qeventloop.h>
 
 #include <unistd.h>
 
@@ -384,7 +385,7 @@ void PlaybackBox::killPlayerSafe(void)
            to allow updateVideo() to run to handle changes in
            previewVideoStates */
         qApp->unlock();
-        qApp->processEvents();
+        qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
         usleep(500);
         qApp->lock();
     }
@@ -1828,16 +1829,7 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showMenu()
 {
-    {
-        QMutexLocker locker(&previewVideoKillLock);
-        setEnabled(false);
-        previewVideoState = kStopping;
-        while (!killPlayer())
-            usleep(2500);
-        previewVideoRefreshTimer->stop();
-        previewVideoState = kStopped;
-        setEnabled(true);
-    }
+    killPlayerSafe();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
                              drawPopupFgColor, drawPopupBgColor,
@@ -2033,6 +2025,9 @@ void PlaybackBox::stop(ProgramInfo *rec)
 bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
                            bool forceMetadataDelete)
 {
+    previewVideoBrokenRecId = rec->recordid;
+    killPlayerSafe();
+
     if (playList.grep(rec->MakeUniqueKey()).count())
         togglePlayListItem(rec);
 
