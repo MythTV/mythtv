@@ -1411,7 +1411,8 @@ bool PlaybackBox::FillList()
                     progLists[p->title].prepend(p);
                     sTitle = p->title;
                     sTitle.remove(prefixes);
-                    sortedList[sTitle.lower()] = p->title;
+                    sTitle = sTitle.lower();
+                    sortedList[sTitle] = p->title;
                 } 
 
                 if (useRecGroups && p->recgroup != "") // Show recording groups                 
@@ -1489,11 +1490,13 @@ bool PlaybackBox::FillList()
 
     QString oldsTitle = oldtitle;
     oldsTitle.remove(prefixes);
+    oldsTitle = oldsTitle.lower();
     titleIndex = titleList.count() - 1;
     for (int i = titleIndex; i >= 0; i--)
     {
         sTitle = titleList[i];
         sTitle.remove(prefixes);
+        sTitle = sTitle.lower();
         
         if (oldsTitle > sTitle)
             break;
