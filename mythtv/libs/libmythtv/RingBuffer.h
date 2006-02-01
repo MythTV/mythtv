@@ -16,7 +16,7 @@ class RingBuffer
 {
   public:
     RingBuffer(const QString &lfilename, bool write,
-               bool usereadahead = true, uint read_retries = 6);
+               bool usereadahead = true, uint read_retries = 12/*6*/);
    ~RingBuffer();
 
     // Sets
@@ -42,7 +42,7 @@ class RingBuffer
     bool      IsOpen(void)           const;
 
     // General Commands
-    void OpenFile(const QString &lfilename, uint retryCount = 4);
+    void OpenFile(const QString &lfilename, uint retryCount = 12/*4*/);
     int  Read(void *buf, int count);
     void Reset(bool full = false, bool toAdjust = false);
 
