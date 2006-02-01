@@ -1690,7 +1690,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>OSD font</source>
-        <translation>Informationstypsnitt</translation>
+        <translation>Infotypsnitt</translation>
     </message>
     <message>
         <source>Closed Caption font</source>
@@ -3343,7 +3343,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Any arguments you want passed to the mythfilldatabase program.</source>
-        <translation>Argument som skickas till mythfilldatabase.</translation>
+        <translation>Argument som skickas till mythfilldatabase. Använd &apos;--quiet&apos; för att undvika problem som kan uppstå.</translation>
     </message>
     <message>
         <source>mythfilldatabase Log Path</source>
