@@ -122,6 +122,8 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     audio_samplerate = laudio_samplerate;
     if (audio_bits != 8 && audio_bits != 16)
     {
+        pthread_mutex_unlock(&avsync_lock);
+        pthread_mutex_unlock(&audio_buflock);
         Error("AudioOutput only supports 8 or 16bit audio.");
         return;
     }
@@ -139,10 +141,11 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
             .arg(audiodevice));
     
     // Actually do the device specific open call
-    if (!OpenDevice()) {
+    if (!OpenDevice())
+    {
+        VERBOSE(VB_AUDIO, "Aborting reconfigure");
         pthread_mutex_unlock(&avsync_lock);
         pthread_mutex_unlock(&audio_buflock);
-        VERBOSE(VB_AUDIO, "Aborting reconfigure");
         return;
     }
 
@@ -175,6 +178,8 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
         {
             Error(QString("Error creating resampler, the error was: %1")
                   .arg(src_strerror(error)) );
+            pthread_mutex_unlock(&avsync_lock);
+            pthread_mutex_unlock(&audio_buflock);
             return;
         }
         src_data.src_ratio = (double) audio_samplerate / laudio_samplerate;
