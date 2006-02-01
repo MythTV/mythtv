@@ -2528,7 +2528,7 @@ void TV::processNetworkControlCommand(QString command)
             ChangeChannel(CHANNEL_DIRECTION_UP);
         else if (tokens[2] == "DOWN")
             ChangeChannel(CHANNEL_DIRECTION_DOWN);
-        else if (tokens[2].contains(QRegExp("^\\d+$")))
+        else if (tokens[2].contains(QRegExp("^[-\\.\\d_#]+$")))
             ChangeChannel(0, tokens[2]);
     }
     else if (tokens.size() == 3 && tokens[1] == "SPEED")

@@ -441,7 +441,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             message = "NETWORK_CONTROL CHANNEL UP";
         else if (tokens[2] == "down")
             message = "NETWORK_CONTROL CHANNEL DOWN";
-        else if (tokens[2].contains(QRegExp("^\\d+$")))
+        else if (tokens[2].contains(QRegExp("^[-\\.\\d_#]+$")))
             message = QString("NETWORK_CONTROL CHANNEL %1").arg(tokens[2]);
         else
             return QString("ERROR: See 'help %1' for usage information")
