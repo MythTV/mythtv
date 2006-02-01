@@ -29,7 +29,7 @@ The following is a list of some of the prerequisites you will need installed:
            your distro, or from http://www.mysql.com
 
    XMLTV - If you are outside of North America, you will need to install the
-           latest version (0.5.39 as of 2005-03-13).  This will do the work
+           latest version (0.5.42 as of 2006-01-08).  This will do the work
            of actually grabbing the program information. Get it from
            http://xmltv.sf.net
 
