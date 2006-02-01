@@ -1201,7 +1201,7 @@ skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.41).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.42).
 
 <code>
 NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
@@ -1276,7 +1276,7 @@ and skip straight to the XMLTV compilation step.
 <p>
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.41.tar.bz2
+$ tar -xjf xmltv-0.5.42.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites.  The following prerequisites are the
 minimum required; when you actually start running the xmltv setup program it
@@ -1295,7 +1295,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.41
+$ cd xmltv-0.5.42
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -3472,7 +3472,7 @@ according to your wakeup mechanism. If you need seconds since the epoch
 <item>"Set wakeuptime command" is the command executed to set the new wakeuptime. 
 <item>"Server Halt Command" is the command executed to shutdown the Master
 backend and the Slave backends.
-<item>"pre Shutdown check-command" is an optional command used to give a
+<item>"pre Shutdown check-command" is used to give a
 "Go/NO-GO" decision from a non-MythTV source.  This command is executed
 immediately before the shutdown would occur. The return value is use to make
 the following choices:
@@ -7620,7 +7620,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.19.00, 2006-01-28.  Version bump.
+v0.19.00, 2006-01-31.  Version bump.
 
 -->
 

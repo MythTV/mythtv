@@ -1691,7 +1691,7 @@
   higher.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.41).
+  <http://xmltv.sourceforge.net>.  Download the latest version (0.5.42).
 
 
   ______________________________________________________________________
@@ -1790,7 +1790,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.41.tar.bz2
+       $ tar -xjf xmltv-0.5.42.tar.bz2
 
 
 
@@ -1814,7 +1814,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.41
+       $ cd xmltv-0.5.42
        $ perl Makefile.PL
 
 
@@ -4197,10 +4197,10 @@
   +o  "Server Halt Command" is the command executed to shutdown the
      Master backend and the Slave backends.
 
-  +o  "pre Shutdown check-command" is an optional command used to give a
-     "Go/NO-GO" decision from a non-MythTV source.  This command is
-     executed immediately before the shutdown would occur. The return
-     value is use to make the following choices:
+  +o  "pre Shutdown check-command" is used to give a "Go/NO-GO" decision
+     from a non-MythTV source.  This command is executed immediately
+     before the shutdown would occur. The return value is use to make
+     the following choices:
 
      +o  If it returns a "0" the shutdown will occur as scheduled.
 
