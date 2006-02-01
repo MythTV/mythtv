@@ -187,7 +187,8 @@ void NetworkControl::processNetworkControlCommand(QString command)
         QApplication::postEvent(this,
                                 new QCustomEvent(kNetworkControlCloseEvent));
     else
-        result = QString("INVALID usage, try 'help' for more info");
+        result = QString("INVALID command '%1', try 'help' for more info")
+                         .arg(tokens[0]);
 
     if (result != "")
     {
