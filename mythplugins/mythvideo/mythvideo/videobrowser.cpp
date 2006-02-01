@@ -407,6 +407,10 @@ void VideoBrowser::jumpToSelection(int index)
 void VideoBrowser::jumpSelection(int amount)
 {
     unsigned int list_count = video_list->count();
+
+    if (list_count == 0)
+        return;
+
     int index;
 
     if (amount >= 0 || inData >= (unsigned int)-amount)
