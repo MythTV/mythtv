@@ -22,45 +22,44 @@ mythfrontend
 Watching TV or a recording
 --------------------------
 
-- Up and down arrow keys change the channel.
-- Type a number to enter a channel number or jump amount (HHMM format).
-- P to pause / play.
-  - You may also add an explicit keybinding for "Play" through the MythWeb
-    keybindings page, returning you to normal speed if you are in slow-motion,
-    rewind, fast forward or pause mode.
-- C to change inputs on TV Tuner card
-- ESC quits
-- I puts the On-screen Display up again.
-    During playback, 'I' toggles between position and show description info.
-    If a jump amount is entered, jump to that position.
-- M brings up the electronic program guide (Grid) -- see the EPG section.
-- Page Up to jump back the configured number of minutes.  (default is 10)
-- Page Down to jump ahead the configured number of minutes.  (default is 10)
-- K jumps to the bookmark position.
-- End or 'Z' to skip to next commercial break marker
-- Home or 'Q' to skip back to previous commercial break marker
-- T to toggle closed caption support
-- Pressing 0-9 (preferably 3 times) + T changes teletext page and turns on 
-  teletext.
-- F to rotate between the various Picture Adjustments (Colour, Hue, etc.)
-    While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-    These settings adjust the look of the video playback, and are independent
-    of the G-key settings used at record-time.
-- [ or F10 to decrease volume
-- ] or F11 to increase volume
-- | or F9 to toggle mute
-- / to jump to the next "favorite" channel
-- ? to mark/unmark the current channel as a "favorite"
-- U to increase the play speed
-- J to decrease the play speed
-- A to adjust time stretch (speed up or slow down normal play audio and video)
-- W to cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),
-  16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
-- Left (if a jump amount is entered) to jump back that amount.
-- Right (if a jump amount is entered) to jump ahead that amount.
-- F8 to toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
-- Ctrl+B to jump to the beginning of the recording / ringbuffer.
-- + to switch between audio streams
+- P   Pause / Play.
+      You may also add an explicit keybinding for "Play" through the
+      MythWeb keybindings page, returning you to normal speed if you
+      are in slow-motion, rewind, fast forward or pause mode.
+- ESC Exit player if no OSD on screen, otherwise exit OSD.
+- I   Puts the On-screen Display up again.
+      During playback, 'I' toggles between position and show description info.
+      If a jump amount is entered, jump to that position.
+- M   Menu (allows access to EPG and many other useful features
+- K   Jumps to the bookmark position.
+- T   In North America this toggles closed caption support.
+- T   In Europe follow this with the teletext page and another T
+- F   Rotate between the various Picture Adjustments (Colour, Hue, etc.)
+      While Picture Adjustment is on-screen, use Left and Right arrows
+      to adjust. These settings adjust the look of the video playback,
+      and are independent of the G-key settings used at record-time.
+- U   Increase the play speed [muted]
+- J   Decrease the play speed [muted]
+- A   Adjust time stretch (speed up or slow down play speed [with audio])
+      Use the arrow keys to make adjustment.
+- W   Cycle through zoom and fill modes: force 4:3 aspect ratio, force 16:9
+      aspect ratio, 4:3 Zoom (like Pan and Scan), 16:9 Zoom, 16:9 Stretch.
+- F8  Cycle through sleep timer settings Off->30m->1hr->1hr30m->2hr->Off
+- Left arrow  Jump back
+- Right arrow Jump ahead
+  NOTE: In a recording you can enter a number of minutes to jump before
+        using the jump key. Otherwise, the configured defaults will be used.
+        Seconds can be entered by entering four digits in the MMss format.
+
+- Page Up     Jump back the configured number of minutes.  (default is 10)
+- Page Down   Jump ahead the configured number of minutes. (default is 10)
+- Z or End    Skip to next commercial break marker
+- Q or Home   Skip back to previous commercial break marker
+- + or -      Cycle through audio streams
+- | or F9     Toggle mute
+- [ or F10    Decrease volume
+- ] or F11    Increase volume
+- Ctrl+B      Jump to the beginning of the recording / ringbuffer.
 
 Without the stickykeys option selected:
 
@@ -85,21 +84,31 @@ With the stickykeys option selected:
 
 With the video paused:
 
-- Left arrow to rewind 1 frame
-- < or comma to rewind 1 second
-- Right arrow to advance 1 frame
-- > or period to advance 1 second
+- Left arrow   Rewind one frame
+- < or comma   Rewind one second
+- Right arrow  Advance one frame
+- > or period  Advance one second
 
 Watching TV only:
 
-- G to rotate between the various Picture Adjustments (Colour, Hue, etc.)
-    for recording.  These values affect the look of the resulting .nuv file,
-    and are independent of the playback picture settings. While Picture 
-    Adjustment is on-screen, use Left and Right arrows to adjust.
-- H Channel history. Each repeat steps back through the previous channels.
-- O Turns on 'Browse' mode, allowing user to browse channels and program
-    info while watching current show FullScreen.
-- Y Switch Capture Cards
+- 0-9 Enter a channel number...
+      If the channel is not unique or smart channel change is disabled
+      press Return/OK when done, to commit the channel change.
+- G   Rotate between the various Picture Adjustments (Colour, Hue, etc.)
+      for recording.  These values affect the look of the resulting .nuv file,
+      and are independent of the playback picture settings. While Picture 
+      Adjustment is on-screen, use Left and Right arrows to adjust.
+- H   Channel history. Each repeat steps back through the previous channels.
+- O   Turns on 'Browse' mode, allowing user to browse channels and program
+      info while watching current show FullScreen.
+- /   Change to the next "favorite" channel
+- ?   Mark/Unmark the current channel as a "favorite" channel
+- Y   Switch Capture Cards
+- C   Change inputs on TV Tuner card
+- F7  Monitor signal on a card capable of signal monitoring.
+
+LiveTV NOT in Browse Mode:
+- Up/Down arrows  Change the channel.
 
 LiveTV Browse Mode:
 - Left          browse program prior to current listed program.
@@ -109,7 +118,7 @@ LiveTV Browse Mode:
 - /             browse program on next favorite channel.
 - 0-9           enter a channel number to browse.
 - Space/Enter   change channel to channel of current listed program.
-- R/r           Toggle recording of current program (cycles through types)
+- R             Toggle recording of current program (cycles through types)
 - ESC/O         Exit Browse mode.
 
 Playback Recording Zoom Mode:
