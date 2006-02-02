@@ -260,8 +260,9 @@ void NetworkControl::readClient(void)
     while (socket->canReadLine())
     {
         lineIn = socket->readLine();
+        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/]"), "");
         lineIn.replace(QRegExp("[\r\n]"), "");
-        lineIn.replace(QRegExp("[^-\\w\\s\\.:_#/]"), "");
+        lineIn.replace(QRegExp("^\\s"), "");
 
         tokens = QStringList::split(" ", lineIn);
         if (tokens[0].lower() != "key")
