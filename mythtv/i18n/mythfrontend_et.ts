@@ -183,7 +183,7 @@
     </message>
     <message>
         <source>Delete Channels</source>
-        <translation>Kstuta kanalid</translation>
+        <translation>Kustuta kanalid</translation>
     </message>
     <message>
         <source>Delete all channels on currently selected source[s].</source>
@@ -213,7 +213,7 @@
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">Võimsa salvestusreegeli redaktor</translation>
+        <translation type="obsolete">Võimsa salvestusreegli redaktor</translation>
     </message>
     <message>
         <source>Rule Name</source>
@@ -277,7 +277,7 @@
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation>Ainult kindla vidoeallika kanalid</translation>
+        <translation>Ainult kindla videoallika kanalid</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
@@ -321,7 +321,7 @@
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation>Nädala film (täielik näide - kasuta Nädlaotsingut)</translation>
+        <translation>Nädala film (täielik näide - kasuta Nädalaotsingut)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
@@ -7047,7 +7047,7 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
-        <translation>kokku %1, kasutatud %2, vaba %3 (või %4).</translation>
+        <translation>kokku %1, kasutatud %2, vaba %3 (%4%).</translation>
     </message>
     <message>
         <source>Disk usage on %1:</source>
