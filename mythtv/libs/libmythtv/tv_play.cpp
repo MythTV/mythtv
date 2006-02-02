@@ -990,7 +990,7 @@ void TV::HandleStateChange(void)
     {
         if (GetOSD() && (PlayGroup::GetCount() > 0))
             GetOSD()->SetSettingsText(tr("%1 Settings")
-                                      .arg(playbackinfo->playgroup), 3);
+                                      .arg(tr(playbackinfo->playgroup)), 3);
     }
     if (recorder)
         recorder->FrontendReady();
