@@ -16,7 +16,6 @@
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
-#include <qeventloop.h>
 
 #include <unistd.h>
 
@@ -114,7 +113,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       formatTime("h:mm AP"),
       titleView(true),                  useCategories(false),
       useRecGroups(false),              groupnameAsAllProg(false),
-      arrowAccel(true),
+      arrowAccel(true),                 ignoreKeyPressEvents(false),
       listOrder(1),                     listsize(0),
       // Recording Group settings
       groupDisplayName(tr("All Programs")),
@@ -370,9 +369,10 @@ void PlaybackBox::setDefaultView(int defaultView)
 void PlaybackBox::killPlayerSafe(void)
 {
     QMutexLocker locker(&previewVideoKillLock);
-    /* don't process any keys while we are trying to let the nvp stop */
-    /* if the user keeps selecting new recordings we will never stop playing */
-    setEnabled(false);
+
+    // Don't process any keys while we are trying to make the nvp stop.
+    // Qt's setEnabled(false) doesn't work, because of LIRC events...
+    ignoreKeyPressEvents = true;
 
     while (previewVideoState != kKilled && previewVideoState != kStopped &&
            previewVideoThreadRunning)
@@ -385,13 +385,13 @@ void PlaybackBox::killPlayerSafe(void)
            to allow updateVideo() to run to handle changes in
            previewVideoStates */
         qApp->unlock();
-        qApp->eventLoop()->processEvents(QEventLoop::ExcludeUserInput);
+        qApp->processEvents();
         usleep(500);
         qApp->lock();
     }
     previewVideoState = kStopped;
 
-    setEnabled(true);
+    ignoreKeyPressEvents = false;
 }
 
 void PlaybackBox::LoadWindow(QDomElement &element)
@@ -3375,6 +3375,9 @@ void PlaybackBox::processNetworkControlCommand(QString command)
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
+    
+    if (ignoreKeyPressEvents)
+        return;
 
     // This should be an impossible keypress we've simulated
     if ((e->key() == Qt::Key_LaunchMedia) &&

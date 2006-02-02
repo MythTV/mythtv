@@ -280,6 +280,8 @@ class PlaybackBox : public MythDialog
     bool                groupnameAsAllProg;
     /// if true we allow arrow keys to replace SELECT and ESCAPE as appropiate
     bool                arrowAccel;
+    /// if true keypress events are ignored  
+    bool                ignoreKeyPressEvents;
     /// listOrder controls the ordering of the recordings in the list
     int                 listOrder;
     /// Number of items in selector that can be shown on the screen at once
