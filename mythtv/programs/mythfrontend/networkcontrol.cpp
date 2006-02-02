@@ -638,6 +638,11 @@ QString NetworkControl::processHelp(QStringList tokens)
             "query location        - Query current screen or location\r\n"
             "query recordings      - List currently available recordings\r\n";
     }
+    else if (command == "exit")
+    {
+        helpText +=
+            "exit                  - Terminates session\r\n\r\n";
+    }
 
     if (helpText != "")
         return helpText;
