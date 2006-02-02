@@ -657,7 +657,7 @@ QString NetworkControl::processHelp(QStringList tokens)
         "key                - Send a keypress to the program\r\n"
         "play               - Playback related commands\r\n"
         "query              - Queries\r\n"
-        "exit               - Exit NetworkControl\r\n"
+        "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";
 
