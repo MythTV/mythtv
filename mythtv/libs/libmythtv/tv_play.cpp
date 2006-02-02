@@ -2216,6 +2216,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if ((GetState() == kState_WatchingLiveTV) && activerecorder)
             {
+                uint timeout = lockTimeout[activerecorder->GetRecorderNumber()];
+                if (timeout == 0xffffffff)
+                {
+                    if (GetOSD())
+                        GetOSD()->SetSettingsText("No Signal Monitor", 2);
+                    return;
+                }
+
                 int rate   = sigMonMode ? 0 : 100;
                 int notify = sigMonMode ? 0 : 1;
 
