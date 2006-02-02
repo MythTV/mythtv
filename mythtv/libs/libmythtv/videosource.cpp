@@ -457,7 +457,7 @@ InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
         if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("Could detemine name of input #%1"
+                    QString("Could determine name of input #%1"
                             "\n\t\t\tNot adding it to the list.")
                     .arg(test.channel) + ENO);
             continue;
