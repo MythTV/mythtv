@@ -12,11 +12,9 @@ mythfrontend
     Delete screens, EPG, "Program Finder", "Fix Scheduling Conflicts"
     and search results screens.
 - O to list the upcoming episodes for the currently selected show
-    on the EPG, "Program Finder", "Program Recording Priorities",
-    "Fix Scheduling Conflicts" or search results screens.
-- I to edit recording options from the EPG, "Program Finder",
-    "Program Recording Priorities", or "Fix Scheduling Conflicts"
-    screens. From the Watch and Delete screens, 'I' presents options
+    on any page where a show title may be highlighed.
+- I to edit recording options from any of the pages for scheduling
+    recordings. From the Watch and Delete screens, 'I' presents options
     for recorded shows such as Auto Expire or Stop Recording.
 
 Watching TV or a recording
@@ -29,7 +27,7 @@ Watching TV or a recording
 - ESC Exit player if no OSD on screen, otherwise exit OSD.
 - I   Puts the On-screen Display up again.
       During playback, 'I' toggles between position and show description info.
-      If a jump amount is entered, jump to that position.
+      If a number of minutes is entered, jump to that position.
 - M   Menu (allows access to EPG and many other useful features
 - K   Jumps to the bookmark position.
 - T   In North America this toggles closed caption support.
@@ -45,11 +43,12 @@ Watching TV or a recording
 - W   Cycle through zoom and fill modes: force 4:3 aspect ratio, force 16:9
       aspect ratio, 4:3 Zoom (like Pan and Scan), 16:9 Zoom, 16:9 Stretch.
 - F8  Cycle through sleep timer settings Off->30m->1hr->1hr30m->2hr->Off
-- Left arrow  Jump back
-- Right arrow Jump ahead
-  NOTE: In a recording you can enter a number of minutes to jump before
-        using the jump key. Otherwise, the configured defaults will be used.
-        Seconds can be entered by entering four digits in the MMss format.
+- Left arrow  Skip back
+- Right arrow Skip ahead
+  NOTE: During playback of a recording you can enter a number of minutes to
+        jump before using the Skip key. Otherwise, the configured defaults
+        will be used. Seconds can be entered by entering four digits in the
+        MMss format.
 
 - Page Up     Jump back the configured number of minutes.  (default is 10)
 - Page Down   Jump ahead the configured number of minutes. (default is 10)
@@ -107,7 +106,7 @@ Watching TV only:
 - C   Change inputs on TV Tuner card
 - F7  Monitor signal on a card capable of signal monitoring.
 
-LiveTV NOT in Browse Mode:
+LiveTV while not in Browse Mode:
 - Up/Down arrows  Change the channel.
 
 LiveTV Browse Mode:
