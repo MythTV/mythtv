@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef RINGBUFFER
 #define RINGBUFFER
 
@@ -22,7 +24,8 @@ class RingBuffer
     // Sets
     void SetWriteBufferSize(int newSize);
     void SetWriteBufferMinWriteSize(int newMinSize);
-    void CalcReadAheadThresh(uint estbitrate);
+    void UpdateRawBitrate(uint rawbitrate);
+    void UpdatePlaySpeed(float playspeed);
 
     // Gets
     /// Returns name of file used by this RingBuffer
@@ -39,6 +42,8 @@ class RingBuffer
     long long GetReadPosition(void)  const;
     long long GetWritePosition(void) const;
     long long GetRealFileSize(void)  const;
+    uint      GetBitrate(void)       const;
+    uint      GetReadBlockSize(void) const;
     bool      IsOpen(void)           const;
 
     // General Commands
@@ -90,6 +95,7 @@ class RingBuffer
     void ReadAheadThread(void);
 
   private:
+    void CalcReadAheadThresh(void);
     int safe_read_dvd(void *data, uint sz);
     int safe_read(int fd, void *data, uint sz);
     int safe_read(RemoteFile *rf, void *data, uint sz);
@@ -136,10 +142,13 @@ class RingBuffer
     bool ateof;
     bool readsallowed;
     bool wantseek;
-    int fill_threshold;
-    int fill_min;
 
-    int readblocksize;
+    mutable QMutex bitratelock;
+    uint           rawbitrate;
+    float          playspeed;
+    int            fill_threshold;
+    int            fill_min;
+    int            readblocksize;
 
     QWaitCondition pauseWait;
 

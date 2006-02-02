@@ -86,6 +86,7 @@ RingBuffer::RingBuffer(const QString &lfilename,
       rbrpos(0),                rbwpos(0),
       internalreadpos(0),       ateof(false),
       readsallowed(false),      wantseek(false),
+      rawbitrate(8000),         playspeed(1.0f),
       fill_threshold(-1),       fill_min(-1),
       readblocksize(128000),    wanttoread(0),
       numfailures(0),           commserror(false),
@@ -443,47 +444,90 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
     return ret;
 }
 
-/** \fn RingBuffer::CalcReadAheadThresh(uint)
- *  \brief Calculates fill_min, fill_threshold, and readblocksize from
- *         the estimated bitrate of the stream.
+/** \fn RingBuffer::UpdateRawBitrate(uint)
+ *  \brief Set the raw bit rate, to allow RingBuffer adjust effective bitrate.
  *  \param estbitrate Streams average number of kilobits per second.
  */
-void RingBuffer::CalcReadAheadThresh(uint estbitrate)
+void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 {
+    QMutexLocker locker(&bitratelock);
+    rawbitrate = raw_bitrate;
+    CalcReadAheadThresh();
+}
+
+/** \fn RingBuffer::GetBitrate(void) const
+ *  \brief Returns effective bits per second (in thousands).
+ *
+ *   NOTE: This is reported in telecom kilobytes, to get
+ *         the bits per second multiply by 1000, not 1024.
+ */
+uint RingBuffer::GetBitrate(void) const
+{
+    QMutexLocker locker(&bitratelock);
+    return (uint) (rawbitrate * playspeed);
+}
+
+/** \fn RingBuffer::GetReadBlockSize(void) const
+ *  \brief Returns size of each disk read made by read ahead thread (in bytes).
+ */
+uint RingBuffer::GetReadBlockSize(void) const
+{
+    QMutexLocker locker(&bitratelock);
+    return readblocksize;
+}
+
+/** \fn RingBuffer::UpdatePlaySpeed(float)
+ *  \param Set the play speed, to allow RingBuffer adjust effective bitrate.
+ */
+void RingBuffer::UpdatePlaySpeed(float play_speed)
+{
+    QMutexLocker locker(&bitratelock);
+    playspeed = play_speed;
+    CalcReadAheadThresh();
+}
+
+/** \fn RingBuffer::CalcReadAheadThresh(void)
+ *  \brief Calculates fill_min, fill_threshold, and readblocksize
+ *         from the estimated effective bitrate of the stream.
+ */
+void RingBuffer::CalcReadAheadThresh(void)
+{
+    const uint KB32  =  32*1024;
+    const uint KB128 = 128*1024;
+    const uint KB256 = 256*1024;
+    const uint KB512 = 512*1024;
+    uint estbitrate;
+
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
 
+    estbitrate     = (uint) (rawbitrate * playspeed);
     wantseek       = false;
     readsallowed   = false;
     fill_min       = 1;
-    readblocksize  = (estbitrate > 12000) ? 256000 : 128000;
+    readblocksize  = (estbitrate > 9000)  ? KB256 : KB128;
+    readblocksize  = (estbitrate > 18000) ? KB512 : readblocksize;
 
-#if 1
-    fill_threshold = 0;
+    uint  secs_thr = 300; // seconds of buffering desired
+    float secs_min = 0.1; // minumum seconds of buffering before allowing read
 
-    if (remotefile)
-        fill_threshold += 256000;
+    // set basic fill_threshold based on bitrate
+    fill_threshold = (estbitrate * secs_thr) >> 3; // >>3 => bits -> bytes
+    // extra buffering for remote files
+    fill_threshold = fill_threshold + ((remotefile) ? KB256 : 0);
+    // make the fill_threshold at least one block
+    fill_threshold = max(readblocksize, fill_threshold);
 
-    if (estbitrate > 6000)
-        fill_threshold += 256000;
+    // set the minimum buffering before allowing ffmpeg read
+    fill_min        = (uint) ((estbitrate * secs_min) * 0.125f);
+    // make this a multiple of ffmpeg block size..
+    fill_min        = ((fill_min / KB32) + 1) * KB32;
 
-    if (estbitrate > 10000)
-        fill_threshold += 256000;
-
-    if (estbitrate > 12000)
-        fill_threshold += 256000;
-
-    fill_threshold = (fill_threshold) ? fill_threshold : -1;
-#else
-    fill_threshold = (remotefile) ? 256000 : 0;
-    fill_threshold = max(0, estbitrate) * 60*10;
-    fill_threshold = (fill_threshold) ? fill_threshold : -1;
-#endif
-
-    VERBOSE(VB_PLAYBACK, "RingBuf:" +
-            QString("CalcReadAheadThresh(%1 KB) -> ").arg(estbitrate) +
-            QString("threshhold(%1 KB) readblocksize(%2 KB)")
-            .arg(fill_threshold/1024).arg(readblocksize/1024));
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("CalcReadAheadThresh(%1 KB)\n\t\t\t -> "
+                    "threshhold(%2 KB) min read(%3 KB) blk size(%4 KB)")
+            .arg(estbitrate).arg(fill_threshold/1024)
+            .arg(fill_min/1024).arg(readblocksize/1024));
 
     pthread_rwlock_unlock(&rwlock);
 }

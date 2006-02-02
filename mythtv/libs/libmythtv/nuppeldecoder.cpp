@@ -541,7 +541,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (usingextradata && extradata.video_fourcc == MKTAG('D', 'I', 'V', 'X'))
         setreadahead = true;
 
-    ringBuffer->CalcReadAheadThresh(0);
+    ringBuffer->UpdateRawBitrate(0);
 
     videosizetotal = 0;
     videoframesread = 0;
@@ -1083,7 +1083,7 @@ bool NuppelDecoder::GetFrame(int avignore)
                     float bps = videosizetotal * 8.0 / 1024 * video_frame_rate;
                     bps = bps * 3 / 2;
 
-                    ringBuffer->CalcReadAheadThresh((int)bps);
+                    ringBuffer->UpdateRawBitrate((uint) bps);
                     setreadahead = true;
                 }
             }

@@ -52,6 +52,7 @@ class DecoderBase
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
     virtual QString GetEncodingType(void) const = 0;
+    virtual double  GetFPS(void) const { return fps; }
 
     virtual void UpdateFramesPlayed(void);
     long long GetFramesRead(void) const { return framesRead; };

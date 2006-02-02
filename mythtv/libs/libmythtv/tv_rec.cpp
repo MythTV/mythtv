@@ -1228,7 +1228,18 @@ void TVRec::RunTV(void)
             if (has_rec && (has_finish || (now > recordEndTime)))
                 SetPseudoLiveTVRecording(NULL);
             else if (!has_rec && !rec_soon && curRecording && LIVETV_END)
+            {
                 SwitchLiveTVRingBuffer();
+
+                QDateTime starttime; starttime.setTime_t(0);
+                if (curRecording)
+                    starttime = curRecording->recstartts;
+                VERBOSE(VB_RECORD, LOC 
+                        <<"!has_rec("<<!has_rec<<") "
+                        <<"!rec_soon("<<!rec_soon<<") "
+                        <<"curRec("<<curRecording<<") "
+                        <<"starttm("<<starttime.toString(Qt::ISODate)<<")");
+            }
             else
                 enable_ui = false;
 

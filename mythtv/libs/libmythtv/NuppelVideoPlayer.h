@@ -141,6 +141,7 @@ class NuppelVideoPlayer
     bool    IsPlaying(void) const             { return playing; }
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
+    bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(long long framesRemaining = -1) const;
     bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
     bool    HasAudioIn(void) const            { return !no_audio_in; }

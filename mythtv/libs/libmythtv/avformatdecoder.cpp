@@ -1172,9 +1172,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     if (bitrate > 0)
     {
-        bitrate /= 1000;
+        bitrate = (bitrate + 999) / 1000;
         if (ringBuffer)
-            ringBuffer->CalcReadAheadThresh(bitrate);
+            ringBuffer->UpdateRawBitrate(bitrate);
     }
 
     // Select a new track at the next opportunity.

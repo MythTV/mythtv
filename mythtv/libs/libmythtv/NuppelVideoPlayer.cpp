@@ -2145,13 +2145,9 @@ void NuppelVideoPlayer::CheckTVChain(void)
 
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
-    if (videoOutput)
-    {
-        int  sz  = ringBuffer->DataInReadAhead();
-        uint vvf = videoOutput->ValidVideoFrames();
-        if ((vvf > 3 && sz > 128000) || (sz > 256000))
-            return;
-    }
+    if (!IsReallyNearEnd())
+        return;
+    VERBOSE(VB_PLAYBACK, "SwitchToProgram(void)");
 
     bool discontinuity = false, newtype = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
@@ -2242,6 +2238,7 @@ void NuppelVideoPlayer::FileChangedCallback(void)
 
 void NuppelVideoPlayer::JumpToProgram(void)
 {
+    VERBOSE(VB_PLAYBACK, "JumpToProgram(void)");
     bool discontinuity = false, newtype = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
     if (!pginfo)
@@ -2487,7 +2484,10 @@ void NuppelVideoPlayer::StartPlaying(void)
                 decoderThreadPaused.wakeAll();
             }
             else
+            {
+                ringBuffer->UpdatePlaySpeed(play_speed);
                 DoPlay();
+            }
 
             decoder_lock.unlock();
             continue;
@@ -3160,6 +3160,42 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     }
 
     return ret;
+}
+
+/** \fn NuppelVideoPlayer::IsReallyNearEnd(void) const
+ *  \brief Returns true iff really near end of recording.
+ *
+ *   This is used by SwitchToProgram() to determine if we are so
+ *   close to the end that we need to switch to the next program.
+ */
+bool NuppelVideoPlayer::IsReallyNearEnd(void) const
+{
+    if (!videoOutput)
+        return false;
+
+    int    sz              = ringBuffer->DataInReadAhead();
+    uint   rbs             = ringBuffer->GetReadBlockSize();
+    uint   kbits_per_sec   = ringBuffer->GetBitrate();
+    uint   vvf             = videoOutput->ValidVideoFrames();
+    double inv_fps         = 1.0 / GetDecoder()->GetFPS();
+    double bytes_per_frame = kbits_per_sec * (1000.0/8.0) * inv_fps;
+    double rh_frames       = sz / bytes_per_frame;
+
+    // WARNING: rh_frames can greatly overestimate or underestimate
+    //          the number of frames available in the read ahead buffer
+    //          when rh_frames is less than the keyframe distance.
+
+    bool near_end = ((vvf + rh_frames) < 10.0) || (sz < rbs*1.5);
+
+    VERBOSE(VB_PLAYBACK, LOC + "IsReallyNearEnd()"
+            <<" br("<<(kbits_per_sec/8)<<"KB)"
+            <<" fps("<<((uint)(1.0/inv_fps))<<")"
+            <<" sz("<<(sz / 1000)<<"KB)"
+            <<" vfl("<<vvf<<")"
+            <<" frh("<<((uint)rh_frames)<<")"
+            <<" ne:"<<near_end);
+
+    return near_end;
 }
 
 /** \fn NuppelVideoPlayer::IsNearEnd(long long) const
