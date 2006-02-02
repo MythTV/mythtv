@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2006-01-28, v0.19.00
+  2006-02-01, v0.19.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -172,8 +172,9 @@
            11.5.2.2 Using BIOS wakeup to wake your Master backend.
         11.5.3 Wakeup the MySQL server using WOL
         11.5.4 Tips/Tricks:
+     11.6 Controlling the mythfrontend via telnet
 
-  12. Scheduling Recordings
+  12. Scheduling Recordings.
      12.1 Record Types
      12.2 Scheduling Options
         12.2.1 Priority
@@ -211,7 +212,6 @@
      15.1 Installation and prerequisites
      15.2 Using MythGallery
      15.3 Importing Pictures
-
   16. MythGame.
      16.1 Setup Directory Structure
      16.2 Download and Install xmame
@@ -4342,8 +4342,56 @@
   wakeuptime-script should stop the program that uses /dev/rtc before
   setting the wakeuptime.
 
+  [1m11.6.  Controlling the mythfrontend via telnet[0m
 
-  [1m12.  Scheduling Recordings[0m
+  New in 0.19 is the capability to control the mythfrontend using telnet
+  commands.  To use this feature you must first enable it in
+  Settings>General>General
+
+  The network control listens on port 6546, as demonstrated below:
+
+
+
+  $ telnet basement 6546
+  Connected to basement.
+  Escape character is '^]'.
+  MythFrontend Network Control
+  Type 'help' for usage information
+  ---------------------------------
+  # help
+  Valid Commands:
+  ---------------
+  jump               - Jump to a specified location in Myth
+  key                - Send a keypress to the program
+  play               - Playback related commands
+  query              - Queries
+  exit               - Exit Network Control
+
+  Type 'help COMMANDNAME' for help on any specific command.
+
+  # help jump
+  Usage: jump JUMPPOINT
+
+  Where JUMPPOINT is one of the following:
+  channelpriorities    - Channel Recording Priorities
+  channelrecpriority   - Channel Recording Priorities
+  deletebox            - TV Recording Deletion
+  deleterecordings     - TV Recording Deletion
+  guidegrid            - Program Guide
+  livetv               - Live TV
+  livetvinguide        - Live TV In Guide
+  mainmenu             - Main Menu
+  ...snip...
+  # exit
+  $
+
+
+
+  Please note that this feature only allows one connection at a time, so
+  any new connections will automatically terminate prior ones.
+
+
+  [1m12.  Scheduling Recordings.[0m
 
   The MythTV master backend is responsible for managing the schedule for
   all TV tuner cards on the master and any slave. Its job is to search
@@ -4576,7 +4624,6 @@
      Weekly, Find Weekly, Record Daily, Find Daily, Channel and finally
      All. This only applies if the priorities are the same.
 
-
   +o  If both start times have passed, later start time beats earlier
      start time -- This attempts to miss the least amount of time.
 
@@ -4633,6 +4680,7 @@
   gives you all of the information and tools you need to see all of your
   alternatives and make whatever adjustments you desire.
 
+
   The upper half of the screen has a scrollable box listing items that
   match your record rules sorted by time. The lower half shows the
   details for the highlighted item. There are two 'views' available.
@@ -4641,7 +4689,6 @@
   that will record and items that may need your attention. The message
   in the upper right-hand corner will remind you when there are
   conflicts that would prevent one or more shows from being recorded.
-
 
   The items in the list are colored in the record color for things that
   will record, white for things that may need attention, gray for those
@@ -4700,7 +4747,6 @@
   set, you will also see a "Clear Override" to undo your changes. This
   option makes it very easy to try out some "what if" attempts when
   deciding on your best strategy in a difficult situation.
-
   For a recording in progress, there will be a "Change Ending Time"
   button.  This will take you to the options page for a Single or
   Override or create an Override if it is a recurring rule. Here you can
@@ -4764,6 +4810,7 @@
   usage. If this is set, you can further decide what to do when this
   limit is reached; either stop recording that series, or to delete the
   oldest episodes in favor of the new ones.
+
 
 
   [1m12.4.  Post Recording Processing[0m
@@ -4830,6 +4877,8 @@
 
   [1m12.5.  Advanced Recording Options[0m
 
+
+
   [1m12.5.1.  Creating Power Search rules with Custom Record MythTV's "Cus-[0m
   [1mtom Record" feature gives you unlimited control for creating special-[0m
   [1mized search recording rules to meet your needs. It allows you to[0m
@@ -4838,8 +4887,6 @@
   [1mtions and more. This goes beyond the capabilities of any other DVR[0m
   [1msystem and it is unlikely that this level of scheduling customization[0m
   [1mwill ever be available in any commercial DVR system.[0m
-
-
 
   [1m12.5.2.  Getting Started[0m
 
@@ -4894,9 +4941,10 @@
   primetime". Click "Add this example clause". You should now see:
 
 
-                   program.title = 'Nova'
-                   AND HOUR(program.starttime) >= 19
-                   AND HOUR(program.starttime) < 23
+
+              program.title = 'Nova'
+              AND HOUR(program.starttime) >= 19
+              AND HOUR(program.starttime) < 23
 
 
 
@@ -4957,6 +5005,7 @@
   show off how powerful custom rules can be but there are also several
   simple idioms that you may find useful for many of the shows you would
   like to record.
+
 
   Wait for a known title -- If there is a movie that you anticipate will
   be televised in the coming months but is not yet in the listings, you
@@ -5022,8 +5071,6 @@
   While the example clauses demonstrate how to use many of the data
   fields, you can get a more complete list of all the fields that are
   available by using a MySQL client program:
-
-
        $ mysql -u mythtv -pmythtv mythconverg
        mysql> describe program;
        mysql> describe channel;

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-01-28, v0.19.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-02-01, v0.19.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -114,9 +114,10 @@ necessary.</EM>
 <LI><A NAME="toc11.3">11.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.3">Adding DishTV information to the database</A>
 <LI><A NAME="toc11.4">11.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.4">Adding support for an external tuner</A>
 <LI><A NAME="toc11.5">11.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.5">Using Shutdown/Wakeup</A>
+<LI><A NAME="toc11.6">11.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.6">Controlling the mythfrontend via telnet</A>
 </UL>
 <P>
-<H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s12">Scheduling Recordings</A></H2>
+<H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s12">Scheduling Recordings.</A></H2>
 
 <UL>
 <LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss12.1">Record Types</A>
@@ -4019,8 +4020,54 @@ permission to shutdown. If you cancel the shutdown, simply call
 <P>If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <CODE>/dev/rtc</CODE> before
 setting the wakeuptime.</P>
+<H2><A NAME="ss11.6">11.6</A> <A HREF="#toc11.6">Controlling the mythfrontend via telnet</A>
+</H2>
 
-<H2><A NAME="s12">12.</A> <A HREF="#toc12">Scheduling Recordings</A></H2>
+<P>New in 0.19 is the capability to control the mythfrontend using telnet
+commands.  To use this feature you must first enable it in Settings>General>General</P>
+<P>The network control listens on port 6546, as demonstrated below:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ telnet basement 6546
+Connected to basement.
+Escape character is '^]'.
+MythFrontend Network Control
+Type 'help' for usage information
+---------------------------------
+# help
+Valid Commands:
+---------------
+jump               - Jump to a specified location in Myth
+key                - Send a keypress to the program
+play               - Playback related commands
+query              - Queries
+exit               - Exit Network Control
+
+Type 'help COMMANDNAME' for help on any specific command.
+
+# help jump
+Usage: jump JUMPPOINT
+
+Where JUMPPOINT is one of the following:
+channelpriorities    - Channel Recording Priorities
+channelrecpriority   - Channel Recording Priorities
+deletebox            - TV Recording Deletion
+deleterecordings     - TV Recording Deletion
+guidegrid            - Program Guide
+livetv               - Live TV
+livetvinguide        - Live TV In Guide
+mainmenu             - Main Menu
+...snip...
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Please note that this feature only allows one connection at a time, so any
+new connections will automatically terminate prior ones.</P>
+
+<H2><A NAME="s12">12.</A> <A HREF="#toc12">Scheduling Recordings.</A></H2>
 
 <P>The MythTV master backend is responsible for managing the schedule for
 all TV tuner cards on the master and any slave. Its job is to search the TV

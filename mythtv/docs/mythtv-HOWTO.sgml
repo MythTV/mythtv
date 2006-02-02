@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-01-28, v0.19.00
+<date>2006-02-01, v0.19.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3589,8 +3589,51 @@ permission to shutdown. If you cancel the shutdown, simply call
 If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <tt>/dev/rtc</tt> before
 setting the wakeuptime.
+<sect1>Controlling the mythfrontend via telnet
+<p>New in 0.19 is the capability to control the mythfrontend using telnet
+commands.  To use this feature you must first enable it in Settings>General>General
 
-<sect>Scheduling Recordings
+The network control listens on port 6546, as demonstrated below:
+
+<tscreen><verb>
+$ telnet basement 6546
+Connected to basement.
+Escape character is '^]'.
+MythFrontend Network Control
+Type 'help' for usage information
+---------------------------------
+# help
+Valid Commands:
+---------------
+jump               - Jump to a specified location in Myth
+key                - Send a keypress to the program
+play               - Playback related commands
+query              - Queries
+exit               - Exit Network Control
+
+Type 'help COMMANDNAME' for help on any specific command.
+
+# help jump
+Usage: jump JUMPPOINT
+
+Where JUMPPOINT is one of the following:
+channelpriorities    - Channel Recording Priorities
+channelrecpriority   - Channel Recording Priorities
+deletebox            - TV Recording Deletion
+deleterecordings     - TV Recording Deletion
+guidegrid            - Program Guide
+livetv               - Live TV
+livetvinguide        - Live TV In Guide
+mainmenu             - Main Menu
+...snip...
+# exit
+$
+</verb></tscreen>
+
+Please note that this feature only allows one connection at a time, so any
+new connections will automatically terminate prior ones.
+
+<sect>Scheduling Recordings.
 <p>The MythTV master backend is responsible for managing the schedule for
 all TV tuner cards on the master and any slave. Its job is to search the TV
 listing for the shows you have requested and assign recordings to the TV
@@ -7620,7 +7663,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.19.00, 2006-01-31.  Version bump.
+v0.19.00, 2006-02-01.  Version bump.  Add snippet for network control.
 
 -->
 

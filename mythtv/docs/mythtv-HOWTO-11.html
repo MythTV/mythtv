@@ -569,6 +569,52 @@ permission to shutdown. If you cancel the shutdown, simply call
 <P>If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <CODE>/dev/rtc</CODE> before
 setting the wakeuptime.</P>
+<H2><A NAME="ss11.6">11.6</A> <A HREF="mythtv-HOWTO.html#toc11.6">Controlling the mythfrontend via telnet</A>
+</H2>
+
+<P>New in 0.19 is the capability to control the mythfrontend using telnet
+commands.  To use this feature you must first enable it in Settings>General>General</P>
+<P>The network control listens on port 6546, as demonstrated below:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ telnet basement 6546
+Connected to basement.
+Escape character is '^]'.
+MythFrontend Network Control
+Type 'help' for usage information
+---------------------------------
+# help
+Valid Commands:
+---------------
+jump               - Jump to a specified location in Myth
+key                - Send a keypress to the program
+play               - Playback related commands
+query              - Queries
+exit               - Exit Network Control
+
+Type 'help COMMANDNAME' for help on any specific command.
+
+# help jump
+Usage: jump JUMPPOINT
+
+Where JUMPPOINT is one of the following:
+channelpriorities    - Channel Recording Priorities
+channelrecpriority   - Channel Recording Priorities
+deletebox            - TV Recording Deletion
+deleterecordings     - TV Recording Deletion
+guidegrid            - Program Guide
+livetv               - Live TV
+livetvinguide        - Live TV In Guide
+mainmenu             - Main Menu
+...snip...
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Please note that this feature only allows one connection at a time, so any
+new connections will automatically terminate prior ones.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-12.html">Next</A>
