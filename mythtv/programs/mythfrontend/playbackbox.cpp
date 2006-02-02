@@ -940,8 +940,10 @@ void PlaybackBox::updateUsage(QPainter *p)
 
         QString usestr;
 
-        double perc = (double)((double)freeSpaceUsed / (double)freeSpaceTotal);
-        perc = ((double)100 * (double)perc);
+        double perc = 0.0;
+        if (freeSpaceTotal > 0)
+            perc = (100.0 * freeSpaceUsed) / (double) freeSpaceTotal;
+
         usestr.sprintf("%d", (int)perc);
         usestr = usestr + tr("% used");
 
