@@ -883,10 +883,11 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
             }
 
             bool quit = false;
-            if (livetvchain)
+            if (livetvchain && elapsed > 8000)
             {
                 livetvchain->ReloadAll();
-                quit = livetvchain->HasNext();
+                quit = livetvchain->NeedsToSwitch() || 
+                       livetvchain->NeedsToJump();
             }
 
             if (elapsed > 16000 || quit)

@@ -2180,6 +2180,9 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     if (discontinuity || newtype)
     {
+        livetvchain->SetProgram(pginfo);
+        GetDecoder()->SetProgramInfo(pginfo);
+
         ringBuffer->Reset(true);
         if (newtype)
             errored = (OpenFile() >= 0) ? errored : true;
@@ -2203,8 +2206,6 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     if (discontinuity || newtype)
     {
-        livetvchain->SetProgram(pginfo);
-        GetDecoder()->SetProgramInfo(pginfo);
         if (m_tv)
             m_tv->SetCurrentlyPlaying(pginfo);
 
