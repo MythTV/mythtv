@@ -107,7 +107,8 @@ bool MSqlDatabase::KickDatabase()
     // with no intervention).
     // mdz, 2003/08/11
 
-    if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30)
+    if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 && 
+        m_db->isOpen())
     {
         return true;
     }
@@ -120,6 +121,11 @@ bool MSqlDatabase::KickDatabase()
         {
             m_lastDBKick = QDateTime::currentDateTime();
             return true;
+        }
+        else if (i == 0)
+        {
+            m_db->close();
+            m_db->open();
         }
         else
             MythContext::DBError("KickDatabase", result);
@@ -229,10 +235,7 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi) : QSqlQuery(QString::null, qi.qsql
     m_db = qi.db;
     m_returnConnection = qi.returnConnection;
 
-    if (m_db && m_db->isOpen())
-    {
-        m_isConnected = m_db->KickDatabase();
-    }
+    m_isConnected = m_db && m_db->isOpen();
 }
 
 MSqlQuery::~MSqlQuery()
@@ -264,7 +267,9 @@ MSqlQueryInfo MSqlQuery::InitCon()
         if (db)
         {
             qi.db = db;
-            qi.qsqldb = db->db(); 
+            qi.qsqldb = db->db();
+
+            db->KickDatabase();
         } 
     }
     else
@@ -288,6 +293,8 @@ MSqlQueryInfo MSqlQuery::SchedCon()
         {
             qi.db = db;
             qi.qsqldb = db->db(); 
+
+            db->KickDatabase();
         } 
     }
     else
@@ -311,6 +318,8 @@ MSqlQueryInfo MSqlQuery::DDCon()
         {
             qi.db = db;
             qi.qsqldb = db->db(); 
+
+            db->KickDatabase();
         } 
     }
     else
