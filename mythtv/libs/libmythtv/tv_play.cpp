@@ -1358,6 +1358,7 @@ void TV::TeardownPipPlayer(void)
 {
     if (pipnvp)
     {
+        QMutexLocker locker(&osdlock);
         pthread_join(pipdecode, NULL);
         delete pipnvp;
         pipnvp = NULL;
@@ -2785,8 +2786,10 @@ void TV::TogglePIPView(void)
             else
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP player failed to start");
+                osdlock.lock();
                 delete pipnvp;
                 pipnvp = NULL;
+                osdlock.unlock();
                 TeardownPipPlayer();
             }
         }
@@ -4859,17 +4862,29 @@ void TV::customEvent(QCustomEvent *e)
         }
         else if (tvchain && message.left(12) == "LIVETV_CHAIN")
         {
+            // Get osdlock, while intended for the OSD this ensures that
+            // the nvp & pipnvp are not deleted while we are using it..
+            while (!osdlock.tryLock())
+                usleep(2500);
+
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
             if (tokens[1] == "UPDATE")
             {
-                if (tokens[2] == tvchain->GetID())
+                if (tvchain && nvp && tokens[2] == tvchain->GetID())
                 {
                     tvchain->ReloadAll();
-                    if (nvp && nvp->GetTVChain())
+                    if (nvp->GetTVChain())
                         nvp->CheckTVChain();
                 }
+                if (piptvchain && pipnvp && tokens[2] == piptvchain->GetID())
+                {
+                    piptvchain->ReloadAll();
+                    if (pipnvp->GetTVChain())
+                        pipnvp->CheckTVChain();
+                }
             }
+            osdlock.unlock();
         }
         else if (nvp && message.left(12) == "EXIT_TO_MENU")
         {
