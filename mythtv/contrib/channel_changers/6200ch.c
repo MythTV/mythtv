@@ -55,12 +55,16 @@
         AVC1394_6200_OPERAND_SET
 
 #define STARTING_NODE 1  /* skip 1394 nodes to avoid error msgs */
+#define STARTING_PORT 0
 
 void usage()
 {
-   fprintf(stderr, "Usage: 6200ch [-v] [-n NODE] <channel_num>\n");
+   fprintf(stderr, "Usage: 6200ch [-v] [-n NODE] [-p PORT] <channel_num>\n");
    fprintf(stderr, "-v        Print additional verbose output\n");
-   fprintf(stderr, "-n NODE   node to start device scanning on\n");
+   fprintf(stderr, "-n NODE   node to start device scanning on (default:%i)\n",
+           STARTING_NODE);
+   fprintf(stderr, "-p PORT   port/adapter to use              (default:%i)\n",
+           STARTING_PORT);
    exit(1);
 }
 
@@ -76,6 +80,7 @@ int main (int argc, char *argv[])
 
    /* some people experience crashes when starting on node 1 */
    int starting_node = STARTING_NODE;
+   int starting_port = STARTING_PORT;
    int c;
    int index;
 
@@ -83,13 +88,16 @@ int main (int argc, char *argv[])
       usage();
 
    opterr = 0;
-   while ((c = getopt(argc, argv, "vn:")) != -1) {
+   while ((c = getopt(argc, argv, "vn:p:")) != -1) {
        switch (c) {
        case 'v':
            verbose = 1;
            break;
        case 'n':
            starting_node = atoi(optarg);
+           break;
+       case 'p':
+           starting_port = atoi(optarg);
            break;
        default:
            fprintf(stderr, "incorrect command line arguments\n");
@@ -120,7 +128,7 @@ int main (int argc, char *argv[])
       exit(1);
    } 
 
-   if (raw1394_set_port(handle, 0) < 0) {
+   if (raw1394_set_port(handle, starting_port) < 0) {
       perror("couldn't set port");
       raw1394_destroy_handle(handle);
       exit(1);
