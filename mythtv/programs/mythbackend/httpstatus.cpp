@@ -465,9 +465,13 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
 
                     // Output HTML
 
-                os << "      <a href=\"#\">"
-                   << recStartTs.addSecs(-nPreRollSecs).toString("ddd") << " "
-                   << recStartTs.addSecs(-nPreRollSecs).toString(shortdateformat) << " "
+                os << "      <a href=\"#\">";
+                if (shortdateformat.find("ddd") == -1) {
+                    // If day-of-week not already present somewhere, prepend it.
+                    os << recStartTs.addSecs(-nPreRollSecs).toString("ddd")
+                        << " ";
+                }
+                os << recStartTs.addSecs(-nPreRollSecs).toString(shortdateformat) << " "
                    << recStartTs.addSecs(-nPreRollSecs).toString(timeformat) << " - ";
 
                 if (nEncoderId > 0)
