@@ -927,7 +927,7 @@ void DataDirectStationUpdate(Source source)
             "FROM dd_v_station");
         dd_station_info.exec();
 
-        if (chan_update_q.size() > 0)
+        if (dd_station_info.size() > 0)
         {
             chan_update_q.prepare(
                 "UPDATE channel "
