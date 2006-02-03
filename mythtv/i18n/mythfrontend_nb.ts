@@ -213,14 +213,6 @@
         <translation>Bare nye episoder</translation>
     </message>
     <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Ikke ta med uidentifiserte episoder (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Ikke ta med uidentifiserte episoder (XMLTV)</translation>
-    </message>
-    <message>
         <source>Category type</source>
         <translation>Kategoritype</translation>
     </message>
@@ -696,10 +688,6 @@ Går tilbake til forrige meny.</translation>
         <translation>Lag ny avspillingsgruppe</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Bruk tastaturet eller fjernkontrollen til å skrive inn gruppens navn</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation>Slett avspillingsgruppe:</translation>
     </message>
@@ -769,10 +757,6 @@ Går tilbake til forrige meny.</translation>
     <message>
         <source>Add this recording to Playlist</source>
         <translation>Legg dette opptaket til i spillelisten</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>You have finished watching:</source>
@@ -1152,10 +1136,6 @@ Går tilbake til forrige meny.</translation>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation>MERK: å slette elementer fra denne listen vil ikke slette noen opptak</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Behold denne episoden i listen</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1930,10 +1910,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Teksting av</translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="obsolete">Tekst-TV på</translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation>Teksting</translation>
     </message>
@@ -2458,10 +2434,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Opptaksvert</translation>
     </message>
     <message>
-        <source>Filesize</source>
-        <translation type="obsolete">Filstørrelse</translation>
-    </message>
-    <message>
         <source>Recording Group</source>
         <translation>Opptaksgruppe</translation>
     </message>
@@ -2862,10 +2834,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>Create New Recording Group</source>
         <translation>Lag ny opptaksgruppe</translation>
-    </message>
-    <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Bruk tastaturet eller fjernkontrollen til å skrive inn gruppens navn</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
@@ -4228,10 +4196,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Tidsformat</translation>
     </message>
     <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Det foretrukkede tidsformatet. Velg et format med «AP» i seg for am/pm-visning, ellers brukes et 24-timersformat.</translation>
-    </message>
-    <message>
         <source>Theme</source>
         <translation>Tema</translation>
     </message>
@@ -5232,10 +5196,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Velg en frekvenstabell passende for systemet. Bruk en «-bcast»-frekvens hvis det brukes en antenne.</translation>
     </message>
     <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation type="obsolete">Når valg og konvertereren er aktiv, vil de originale .nuv-filene få etternavnet .nuv.old når konverteringen er ferdig.</translation>
-    </message>
-    <message>
         <source>Follow symbolic links when deleting files</source>
         <translation>Følg symbolske koblinger når filer slettes</translation>
     </message>
@@ -5587,10 +5547,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>det var markert til å aldri bli tatt opp.</translation>
     </message>
     <message>
-        <source>Status: </source>
-        <translation type="obsolete">Status: </translation>
-    </message>
-    <message>
         <source>ATSC Channel %1</source>
         <translation>ATSC-kanal %1</translation>
     </message>
@@ -5815,10 +5771,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Ekstra diskplass som skal være ledig på filsystemet utover det MythTV krever. Dette er nyttig hvis filsystemet som holder opptak også brukes til andre ting.</translation>
     </message>
     <message>
-        <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
-        <translation type="obsolete">Metode som brukes for å avgjøre hvilke opptak som skal slettes først. Velg «Ingen» for å slå av automatisk utløping (anbefales ikke).</translation>
-    </message>
-    <message>
         <source>Auto Expire Default</source>
         <translation>Utløp automatisk som standard</translation>
     </message>
@@ -5984,26 +5936,6 @@ Myth vil nå avsluttes.</translation>
         <translation>%1 totalt, %2 brukt, %3 (eller %4%) ledig.</translation>
     </message>
     <message>
-        <source>, using recording profile &apos;%1&apos;</source>
-        <translation type="obsolete">, bruker opptaksprofilen «%1»</translation>
-    </message>
-    <message>
-        <source>, using your typical recording profile.</source>
-        <translation type="obsolete">, bruker din typiske opptaksprofil.</translation>
-    </message>
-    <message>
-        <source>%1 hours left %2</source>
-        <translation type="obsolete">%1 timer igjen %2</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left %3</source>
-        <translation type="obsolete">%1 timer og %2 minutter igjen %3</translation>
-    </message>
-    <message>
-        <source>%1 minutes left %2</source>
-        <translation type="obsolete">%1 minutter igjen %2</translation>
-    </message>
-    <message>
         <source>Disk usage on %1:</source>
         <translation>Diskforbruk på %1:</translation>
     </message>
@@ -6102,14 +6034,6 @@ Myth vil nå avsluttes.</translation>
     <message>
         <source>Channel</source>
         <translation>Kanal</translation>
-    </message>
-    <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">Oppgi enten den eksakte frekvensen i Hertz eller en gyldig kanal for ditt TV-format.</translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="obsolete">Verdi som legges til din ønskede frekvens i Hertz, for finpussing.</translation>
     </message>
     <message>
         <source>A</source>
@@ -6638,10 +6562,6 @@ Myth vil nå avsluttes.</translation>
         <translation>Kommandol for å starte en X-terminal. Kan slås av ved å la dette feltet være tomt.</translation>
     </message>
     <message>
-        <source>MythShutdown Script Settings</source>
-        <translation type="obsolete">Innstillinger for «MythShutdown»-skriptet</translation>
-    </message>
-    <message>
         <source>Perform EIT Scan</source>
         <translation>Utfør EIT-søk</translation>
     </message>
@@ -6800,10 +6720,6 @@ Myth vil nå avsluttes.</translation>
     <message>
         <source>Playback Group</source>
         <translation>Avspillingsgruppe</translation>
-    </message>
-    <message>
-        <source>Store in the &quot;%1&quot; playback group</source>
-        <translation type="obsolete">Lagre i avspillingsgruppen «%1»</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
@@ -7541,10 +7457,6 @@ Ingen flere detaljer</translation>
         <translation>Slå på/av</translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation>Bytt kanaler</translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation>Endre aktivt vindu</translation>
     </message>
@@ -7757,14 +7669,6 @@ Ingen flere detaljer</translation>
         <translation>Signal %1%</translation>
     </message>
     <message>
-        <source>S/N %1 dB</source>
-        <translation type="obsolete">Lyd til bråk %1 dB</translation>
-    </message>
-    <message>
-        <source>Bit Errors %1</source>
-        <translation type="obsolete">Bitfeil %1</translation>
-    </message>
-    <message>
         <source>Seek:</source>
         <translation>Søk:</translation>
     </message>
@@ -7817,6 +7721,10 @@ Ingen flere detaljer</translation>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">Fart: 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -63,13 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">No, non lo fare</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -501,10 +494,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pausa</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation type="unfinished"></translation>
     </message>
@@ -772,20 +761,8 @@ Returning to the previous menu.</source>
         <translation>Ferma la registrazione</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Non autocancellare</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Autocancellazione</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Elimina</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulla</translation>
     </message>
     <message>
         <source>Status Icons</source>
@@ -1542,10 +1519,6 @@ Returning to the previous menu.</source>
         <translation>Cancella dopo questa frame</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">Trovati %1 sec. di pubblicità</translation>
-    </message>
-    <message>
         <source>Not Flagged</source>
         <translation>Non marcato</translation>
     </message>
@@ -1572,14 +1545,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Conflicting</source>
         <translation>In conflitto</translation>
-    </message>
-    <message>
-        <source>Deleted</source>
-        <translation type="obsolete">Cancellato</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Fermato</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -1626,14 +1591,6 @@ Returning to the previous menu.</source>
         <translation>Questo programma è stato registrato.</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="obsolete">Questo programma non è stato registrato completamente, è stato fermato prima della fine.</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="obsolete">Questo programma è stato registrato, ma poi cancellato prima che la registrazione fosse completata.</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>Lo stato di questa registrazione è sconosciuto.</translation>
     </message>
@@ -1662,10 +1619,6 @@ Returning to the previous menu.</source>
         <translation>sono già state fatte troppe registrazioni di questo programma.</translation>
     </message>
     <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">è stato cancellato manualmente.</translation>
-    </message>
-    <message>
         <source>there wasn&apos;t enough disk space available.</source>
         <translation>non c&apos;era abbastanza spazio libero su disco.</translation>
     </message>
@@ -1676,18 +1629,6 @@ Returning to the previous menu.</source>
     <message>
         <source>you should never see this.</source>
         <translation>non dovresti vedere questa scritta.</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">In onda:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodio:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descrizione:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -4375,10 +4316,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pausa</translation>
-    </message>
-    <message>
         <source>Post Recording Processing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6642,38 +6579,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Capture Card Menu</source>
-        <translation type="obsolete">Menu Schede Acquisizione</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Modifica..</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">No, non lo fare</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this capture card?</source>
-        <translation type="obsolete">Sei sicuro di voler cancellare queste schede di acquisizione?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture card</source>
-        <translation type="obsolete">Sì, cancella le schede di acquisizione</translation>
-    </message>
-    <message>
-        <source>Video Source Menu</source>
-        <translation type="obsolete">Menu sorgenti video</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video source?</source>
-        <translation type="obsolete">Sei sicuro di voler eliminare questa sorgente video?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video source</source>
-        <translation type="obsolete">Sì, elimina questa sorgente video</translation>
-    </message>
-    <message>
         <source>Ignore Signal Timeout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7357,14 +7262,6 @@ No other details</source>
         <translation>Velocità 1/16X</translation>
     </message>
     <message>
-        <source>Forward </source>
-        <translation type="obsolete">Avanti</translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">Indietro</translation>
-    </message>
-    <message>
         <source>Stopping Transcode</source>
         <translation>Ferma la trascodifica</translation>
     </message>
@@ -7379,14 +7276,6 @@ No other details</source>
     <message>
         <source>Skip</source>
         <translation>Salta</translation>
-    </message>
-    <message>
-        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="obsolete">Sei attualmente indietro rispetto al tempo reale. Se cambi canali adesso, perderai una parte del video.</translation>
-    </message>
-    <message>
-        <source>Change the channel anyway</source>
-        <translation type="obsolete">Cambia il canale comunque</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
@@ -7518,10 +7407,6 @@ No other details</source>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Swap Channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7825,6 +7710,10 @@ No other details</source>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">Velocità 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

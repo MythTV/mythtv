@@ -63,33 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">Musíte uložit současnou kartu před jejím nastavováním, chcete to udělat teď?</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">Ano, uložit teď</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Ne, neukládat</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Pokročilé nastavení</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">Volby nahrávání</translation>
-    </message>
-    <message>
-        <source>Diseqc</source>
-        <translation type="obsolete">Diseqc</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
@@ -212,10 +185,6 @@
 <context>
     <name>CustomRecord</name>
     <message>
-        <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">Editor pravidel pokročilého vyhledávání nahrávek</translation>
-    </message>
-    <message>
         <source>Rule Name</source>
         <translation>Jméno pravidla</translation>
     </message>
@@ -242,14 +211,6 @@
     <message>
         <source>New episodes only</source>
         <translation>Pouze nové díly</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Vyřadit nerozpoznané epizody (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Vyřadit nerozpoznané epizody (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -533,50 +494,6 @@
         <translation>Neznámý úkol</translation>
     </message>
     <message>
-        <source>Queued</source>
-        <translation type="obsolete">Ve frontě</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation type="obsolete">Nevyřízené</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation type="obsolete">Začínající</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation type="obsolete">Běžící</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pozastavené</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation type="obsolete">Stojící</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation type="obsolete">Hotovo (neplatný stav!)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="obsolete">Ukončené</translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="obsolete">Přerušené</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation type="obsolete">Chybové</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation type="obsolete">Zrušené</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation>Nedefinované</translation>
     </message>
@@ -767,10 +684,6 @@ Návrat do předchozího menu.</translation>
         <translation>Vytvořit novou skupinu přehrávání</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Zadejte jméno skupiny pomocí klávesnice nebo čísel na dálkovém ovladači</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation>Smazat skupinu přehrávání:</translation>
     </message>
@@ -838,28 +751,12 @@ Návrat do předchozího menu.</translation>
         <translation>Změnit skupinové heslo</translation>
     </message>
     <message>
-        <source>Show group list as recording groups</source>
-        <translation type="obsolete">Ukázat seznam skupin jako nahrávací skupiny</translation>
-    </message>
-    <message>
-        <source>Show group list as titles</source>
-        <translation type="obsolete">Ukázat seznam skupin jako názvy</translation>
-    </message>
-    <message>
         <source>Playlist options</source>
         <translation>Volby plejlistu</translation>
     </message>
     <message>
-        <source>Add this Category/Title Group to Playlist</source>
-        <translation type="obsolete">Přidat tuto kategorii/název </translation>
-    </message>
-    <message>
         <source>Add this recording to Playlist</source>
         <translation>Přidat tuto nahrávku do plejlistu</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Zrušit</translation>
     </message>
     <message>
         <source>You have finished watching:</source>
@@ -1211,49 +1108,6 @@ Návrat do předchozího menu.</translation>
     </message>
 </context>
 <context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Předchozí nahrávky</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">Zvolte pořadí řazení</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">Řadit dle názvu</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">Názvy pozpátku</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">Řadit dle času</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">Čas pozpátku</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">POZN.: odstranění prvků z tohoto seznamu nesmaže žádné nahrávky.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Držet tento díl v seznamu</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Odstranit tento díl ze seznamu</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Odstranit všechny díly tohoto názvu</translation>
-    </message>
-</context>
-<context>
     <name>PreviousList</name>
     <message>
         <source>Previously Recorded</source>
@@ -1282,10 +1136,6 @@ Návrat do předchozího menu.</translation>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation>POZN.: odstranění prvků z tohoto seznamu nesmaže žádné nahrávky.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Držet tento díl v seznamu</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -7206,10 +7056,6 @@ Myth will now exit.</source>
         <translation>Chyba ladění na transport</translation>
     </message>
     <message>
-        <source>Error detecting card type</source>
-        <translation type="obsolete">Chyba zjištění typu karty</translation>
-    </message>
-    <message>
         <source>Error parsing parameters</source>
         <translation>Chyba rozboru parametrů</translation>
     </message>
@@ -7224,21 +7070,6 @@ Myth will now exit.</source>
     <message>
         <source>Failed to parse : </source>
         <translation>Nemohl rozebrat : </translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardTuningPage</name>
-    <message>
-        <source>Tuning</source>
-        <translation type="obsolete">Ladění</translation>
-    </message>
-    <message>
-        <source>Failed to open the card</source>
-        <translation type="obsolete">Selhalo otevírání karty</translation>
-    </message>
-    <message>
-        <source>Failed to probe the card</source>
-        <translation type="obsolete">Selhalo prozkoumávání karty</translation>
     </message>
 </context>
 <context>
@@ -7621,10 +7452,6 @@ No other details</source>
         <translation>Zapnout/vypnout</translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation>Přehodit kanály</translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation>Změnit aktivní okno</translation>
     </message>
@@ -7889,6 +7716,10 @@ No other details</source>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">Rychlost 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

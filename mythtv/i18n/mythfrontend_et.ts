@@ -63,33 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">Sa pead aktiivse kaardi salvestama enne selle seadistamist. Soovid sa seda kohe teha?</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">Jah, salvesta kohe</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Ei, ära salvesta</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Muud seadistusvalikud</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">Salvestamisseadistused</translation>
-    </message>
-    <message>
-        <source>Diseqc</source>
-        <translation type="obsolete">DiSEqC</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
@@ -212,10 +185,6 @@
 <context>
     <name>CustomRecord</name>
     <message>
-        <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">Võimsa salvestusreegli redaktor</translation>
-    </message>
-    <message>
         <source>Rule Name</source>
         <translation>Reegli nimi</translation>
     </message>
@@ -242,14 +211,6 @@
     <message>
         <source>New episodes only</source>
         <translation>Ainult uued episoodid</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Välja arvatud määratlemata episoodid (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Välja arvatud määratlemata episoodid (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -402,10 +363,6 @@
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <source>DisEqC</source>
-        <translation type="obsolete">DisEqC</translation>
-    </message>
-    <message>
         <source>Recording Options</source>
         <translation>Salvestamisseadistused</translation>
     </message>
@@ -535,50 +492,6 @@
     <message>
         <source>Unknown Job</source>
         <translation>Tundmatu töö</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation type="obsolete">Järjekorras</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation type="obsolete">Ootel</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation type="obsolete">Alustamine</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation type="obsolete">Käivitatud</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Peatatud</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation type="obsolete">Peatamine</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation type="obsolete">Tehtud (vigane olek!)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="obsolete">Lõpetatud</translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="obsolete">Katkestatud</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation type="obsolete">Tekkinud on viga</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation type="obsolete">Tühistatud</translation>
     </message>
     <message>
         <source>Undefined</source>
@@ -838,32 +751,12 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Vaheta grupi parooli</translation>
     </message>
     <message>
-        <source>Show group list as recording groups</source>
-        <translation type="obsolete">Näita grupilisti salvestusgrupina</translation>
-    </message>
-    <message>
-        <source>Show group list as titles</source>
-        <translation type="obsolete">Näita grupilisti pealkirjadena</translation>
-    </message>
-    <message>
         <source>Playlist options</source>
         <translation>Esitusnimekirja valikud</translation>
     </message>
     <message>
-        <source>Add this Category/Title Group to Playlist</source>
-        <translation type="obsolete">Lisa see kategooria / pealkirjade grupp esitusnimekirja</translation>
-    </message>
-    <message>
-        <source>Add this Recording Group to Playlist</source>
-        <translation type="obsolete">Lisa see salvestusgrupp esitusnimekirja</translation>
-    </message>
-    <message>
         <source>Add this recording to Playlist</source>
         <translation>Lisa see salvestis esitusnimekirja</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Tühista</translation>
     </message>
     <message>
         <source>You have finished watching:</source>
@@ -1006,14 +899,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Limiiti ületanud episoodide kustutamisel säilitatud episoode ei arvestata.  Sobimatud programmid kustutatakse kõvaketta täitumisel automaatset aegumist kasutades.</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Ära lase automaatselt aeguda</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Automaatne aegumine</translation>
-    </message>
-    <message>
         <source>Do not preserve this episode</source>
         <translation>Ära säilita seda episoodi</translation>
     </message>
@@ -1082,16 +967,8 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Valmis</translation>
     </message>
     <message>
-        <source>Recording Group View</source>
-        <translation type="obsolete">Salvestusgrupi vaade</translation>
-    </message>
-    <message>
         <source>Default</source>
         <translation>Vaikimisi</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation type="obsolete">Grupp</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1100,10 +977,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     <message>
         <source>OK</source>
         <translation>Valmis</translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="obsolete">Vaheta salvestusgrupi parooli</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1232,49 +1105,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     <message>
         <source>Group Password</source>
         <translation>Grupi parool</translation>
-    </message>
-</context>
-<context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Eelnevalt salvestatud</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">Vali sorteerimisjärjekord</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">Sorteeri pealkirja järgi</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">Sorteeri pealkirja järgi tagurpidi</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">Sorteeri aja järgi</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">Sorteeri aja järgi tagurpidi</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">Märkus: elementide eemaldamine sellest nimekirjast ei kustuta ühtegi salvestist.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Säilita see episood nimekirjas</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Eemalda see episood nimekirjast</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Eemalda kõik episoodid nimekirjast</translation>
     </message>
 </context>
 <context>
@@ -1691,10 +1521,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Kui on valitud, siis võetakse kavainfo &apos;On Air Channel&apos;-ist.</translation>
     </message>
     <message>
-        <source>Frequency ID</source>
-        <translation type="obsolete">Sageduse ID</translation>
-    </message>
-    <message>
         <source>Finetune</source>
         <translation>Täppishäälestus</translation>
     </message>
@@ -1747,22 +1573,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Peida ilma numbrita kanalid.</translation>
     </message>
     <message>
-        <source>Scan for channels(s)</source>
-        <translation type="obsolete">Kanalite skaneerimine</translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="obsolete">See nupp skaneerib digiTV kanaleid.</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="obsolete">Muud</translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="obsolete">Muud valikud digi-tv kanalitele</translation>
-    </message>
-    <message>
         <source>TXT off</source>
         <translation>Teletekst väljas</translation>
     </message>
@@ -1771,20 +1581,12 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Teletekst väljas</translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="obsolete">Teletekst sees</translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation>Teletekst (CC)</translation>
     </message>
     <message>
         <source>TXT</source>
         <translation>Teletekst (TXT)</translation>
-    </message>
-    <message>
-        <source>CC/TXT disabled</source>
-        <translation type="obsolete">Teletekst keelatud</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
@@ -1907,51 +1709,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Kustuta peale seda kaadrit</translation>
     </message>
     <message>
-        <source>Completed</source>
-        <translation type="obsolete">Lõpetatud</translation>
-    </message>
-    <message>
-        <source>Building Detection Buffer</source>
-        <translation type="obsolete">Tuvastamise puhvri loomine</translation>
-    </message>
-    <message>
-        <source>Searching for Logo</source>
-        <translation type="obsolete">Logo otsimine</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Peatatud</translation>
-    </message>
-    <message>
-        <source>Restarting</source>
-        <translation type="obsolete">Taaskäivitamine</translation>
-    </message>
-    <message>
-        <source>%1% Completed @ %2 fps.</source>
-        <translation type="obsolete">%1% lõpetatud @ %2 fps.</translation>
-    </message>
-    <message>
-        <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="obsolete">%1% kaadrit lõpetatud @ %2 fps.</translation>
-    </message>
-    <message>
-        <source>Completed, %1 FPS</source>
-        <translation type="obsolete">Lõpetatud, %1 fps</translation>
-    </message>
-    <message>
-        <source>Commercial Breaks Found</source>
-        <translation type="obsolete">Reklaamipausid leitud</translation>
-    </message>
-    <message>
-        <source>%1 behind  --  %2 full</source>
-        <translation type="obsolete">Ajast maas: %2
-Kasutusel %2</translation>
-    </message>
-    <message>
-        <source>%1 behind</source>
-        <translation type="obsolete">%1 taga</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 %2-st</translation>
     </message>
@@ -1962,10 +1719,6 @@ Kasutusel %2</translation>
     <message>
         <source>Commercial: %1</source>
         <translation>Reklaam: %1</translation>
-    </message>
-    <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">Leitud %1 sek. reklaami</translation>
     </message>
     <message>
         <source>Not Flagged</source>
@@ -2178,10 +1931,6 @@ Kasutusel %2</translation>
     <message>
         <source>MPEG-2 Hardware Encoder</source>
         <translation>MPEG-2 riistvaraline kooder</translation>
-    </message>
-    <message>
-        <source>Automatically transcode after recording</source>
-        <translation type="obsolete">Transkodeeri automaatselt peale salvestamist</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
@@ -2466,32 +2215,12 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <source>Timed out waiting for signal.</source>
-        <translation type="obsolete">Aegus signaali ootamisel.</translation>
-    </message>
-    <message>
-        <source>Signal Locked</source>
-        <translation type="obsolete">Signaal leitud</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation type="obsolete">Ei leidnud</translation>
-    </message>
-    <message>
         <source>Terrestrial</source>
         <translation>Maismaa</translation>
     </message>
     <message>
         <source>Cable</source>
         <translation>Kaabel</translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="obsolete">ATSC transport</translation>
-    </message>
-    <message>
-        <source>ATSC transport, cable or terrestrial</source>
-        <translation type="obsolete">ATSC transport, kaabel või maismaa</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
@@ -2516,18 +2245,6 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
         <translation>Olek</translation>
     </message>
     <message>
-        <source>Scan Activity</source>
-        <translation type="obsolete">Skaneerimise tegevus</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">Signaalitugevus</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">Signaal/müra</translation>
-    </message>
-    <message>
         <source>XMLTV listings grabber</source>
         <translation>XMLTV telekavade sikutaja</translation>
     </message>
@@ -2546,27 +2263,6 @@ Enamus kaarte suudab selle automaatselt tuvastada. Muuda vaid juhul, kui see mui
     <message>
         <source>Password</source>
         <translation>Parool</translation>
-    </message>
-    <message>
-        <source>Failed to retrieve provider list</source>
-        <translation type="obsolete">Pakkujate nimekirja tõmbamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>You probably need to update XMLTV.</source>
-        <translation type="obsolete">Tõenäoliselt vajad sa XMLTV värskendamist.</translation>
-    </message>
-    <message>
-        <source>tv_grab_uk configuration</source>
-        <translation type="obsolete">tv_grab_uk  seadistused</translation>
-    </message>
-    <message>
-        <source>Please wait while MythTV retrieves the list of available channels
-.  You might want to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">Palun oota kuni MythTV tõmbab saadaolevate kanalite nimekirja.
-Kui soovid väljundit kontrollida, lülitu terminalile,
-kust sa selle programmi käivitasid.</translation>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
@@ -2643,36 +2339,8 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Selle seade muutmisel peab allolev tekst näitama kaardi nime ja tüüpi. Kui kaarti ei õnnestu avada, näidatakse viga.</translation>
     </message>
     <message>
-        <source>Card Type</source>
-        <translation type="obsolete">Kaardi tüüp</translation>
-    </message>
-    <message>
-        <source>Card Name</source>
-        <translation type="obsolete">Kaardi nimi</translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="obsolete">Riistvaraline MPEG kooder</translation>
-    </message>
-    <message>
-        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="obsolete">Kui su digi-tv kaart sisaldab MPEG dekoodrit, saad selle siit aktiviseerida (ainult mõned täiuslikumad kaardid ja teatud USB seadmed).</translation>
-    </message>
-    <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="obsolete">Salvesta PS formaadi asemel TS formaadis.</translation>
-    </message>
-    <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="obsolete">Keelab transportvoost (TS) programmivooks (PS) teisendamise. TS salvestamine tekitab natuke suuremaid faile kuid vähendab töötlusvigade tekkimise riski.</translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation>Oota SEQ alguspäist.</translation>
-    </message>
-    <message>
-        <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="obsolete">Tavaliselt digi-tv salvestamisel ignoreeritakse kaardilt tulevaid pakette kuni saabub järjekorra stardi päis. See valik lülitab välja selle võmaluse.</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -2691,28 +2359,12 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Vali DVB-S kaarid sisendi tüüp.  DVB-C või DVB-T kaartidele jäta &quot;Single LNB/Input&quot;. Sisendid seostatakse peamenüüs olevas valikus &quot;Sisendite ühendused&quot;</translation>
     </message>
     <message>
-        <source>Per PID driver buffer size</source>
-        <translation type="obsolete">PID puhvri suurus</translation>
-    </message>
-    <message>
-        <source>Packet buffer</source>
-        <translation type="obsolete">Paketi puhver</translation>
-    </message>
-    <message>
-        <source>Firewire Model</source>
-        <translation type="obsolete">Firewire mudel</translation>
-    </message>
-    <message>
         <source>Other</source>
         <translation>Muu</translation>
     </message>
     <message>
         <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
         <translation>Firewire mudelit võidakse tulevikus kasutada, kui tekib vajadus mudelispetsiifiliste erilahenduste jaoks.</translation>
-    </message>
-    <message>
-        <source>Firewire Connection Type</source>
-        <translation type="obsolete">Firewire ühenduse tüüp</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -2723,24 +2375,12 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Leviedastus</translation>
     </message>
     <message>
-        <source>Firewire Port</source>
-        <translation type="obsolete">Firewire port</translation>
-    </message>
-    <message>
         <source>Firewire port on your firewire card.</source>
         <translation>Firewire port sinu firewire kaardil.</translation>
     </message>
     <message>
-        <source>Firewire Node</source>
-        <translation type="obsolete">Firewire sõlm</translation>
-    </message>
-    <message>
         <source>Firewire node is the remote device.</source>
         <translation>Firewire sõlm on kaugseade.</translation>
-    </message>
-    <message>
-        <source>Firewire Speed</source>
-        <translation type="obsolete">Firewire kiirus</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -2775,32 +2415,8 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Sea kaarditüüp vastavusse konfigureeritava salvestuskaardi tüübiga.</translation>
     </message>
     <message>
-        <source>Standard V4L capture card</source>
-        <translation type="obsolete">Standartne V4L salvestuskaart</translation>
-    </message>
-    <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation>MJPEG salvestuskaart (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
-        <translation type="obsolete">MPEG-2 kodeeriv kaart (PVR-250, PVR-350)</translation>
-    </message>
-    <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="obsolete">pcHDTV salvestuskaart (HD-2000, HD-3000)</translation>
-    </message>
-    <message>
-        <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="obsolete">Digi-TV kaart (DVB)</translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation type="obsolete">FireWire sisend</translation>
-    </message>
-    <message>
-        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="obsolete">USB MPEG-4 koodeerija (Plextor ConvertX, jne)</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -2875,10 +2491,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Algkanal</translation>
     </message>
     <message>
-        <source>LiveTV will change to the above channel when the input is first selected.</source>
-        <translation type="obsolete">TV vahetub selle kanali peale kui sisend esmakordselt valitakse.</translation>
-    </message>
-    <message>
         <source>Input preference</source>
         <translation>Sisendi eelistus</translation>
     </message>
@@ -2899,32 +2511,8 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>(Uus video allikas)</translation>
     </message>
     <message>
-        <source>ERROR, No inputs found</source>
-        <translation type="obsolete">VIGA, ei leidnud sisendeid</translation>
-    </message>
-    <message>
-        <source>ERROR, V4L support unavailable on this OS</source>
-        <translation type="obsolete">VIGA, sellel operatsioonisüsteemil V4L tugi puudub</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Muud seadistusvalikud</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Salvestaja seadistused</translation>
-    </message>
-    <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="obsolete">Sinu satelliidi taldriku laiuskraad..  Seda kasutatakse DiSEqC mootori toe puhul.  Formaat &quot;35.78&quot; 35,78 kraadise põhjalaiuse puhul</translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="obsolete">Sinu satelliidi taldriku pikkuskraad..  Seda kasutatakse DiSEqC mootori toe puhul.  Formaat &quot;-78.93&quot; 78,93 kraadise läänepikkuse puhul</translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="obsolete">DiSEqC  seadistused</translation>
     </message>
     <message>
         <source>30m</source>
@@ -3049,16 +2637,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Ei salvesta</translation>
     </message>
     <message>
-        <source>D</source>
-        <comment>RecStatusChar rsDeleted</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar rsStopped</comment>
-        <translation type="obsolete">P</translation>
-    </message>
-    <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
         <translation>R</translation>
@@ -3094,11 +2672,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>T</translation>
     </message>
     <message>
-        <source>N</source>
-        <comment>RecStatusChar rsCancelled</comment>
-        <translation type="obsolete">N</translation>
-    </message>
-    <message>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
         <translation>C</translation>
@@ -3122,14 +2695,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
         <translation>x</translation>
-    </message>
-    <message>
-        <source>Deleted</source>
-        <translation type="obsolete">Kustutatud</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Peatatud</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -3204,14 +2769,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>See saade on salvestatud.</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="obsolete">Seda saadet salvestati kuid peatati enne salvestamise lõppu.</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="obsolete">Seda saadet salvestati kuid kustutati enne salvestamise lõppu.</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>Selle saate olek pole teada.</translation>
     </message>
@@ -3252,10 +2809,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>sellest porgrammist on tehtud juba liiga palju salvestisi.</translation>
     </message>
     <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">see oli käsitsi tühistatud.</translation>
-    </message>
-    <message>
         <source>another program with a higher priority will be recorded.</source>
         <translation>salvestatakse mingit teist programmi, millel on  kõrgem priroteet.</translation>
     </message>
@@ -3274,18 +2827,6 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     <message>
         <source>you should never see this.</source>
         <translation>sa ei näe seda kunagi.</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">Eetriaeg:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episood:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Kirjeldus:</translation>
     </message>
     <message>
         <source>Title</source>
@@ -3357,10 +2898,6 @@ category_type</translation>
     <message>
         <source>Recording Host</source>
         <translation>Salvestanud server</translation>
-    </message>
-    <message>
-        <source>Filesize</source>
-        <translation type="obsolete">Faili suurus</translation>
     </message>
     <message>
         <source>Recording Group</source>
@@ -3447,10 +2984,6 @@ category_type</translation>
     <message>
         <source>Create New Recording Group</source>
         <translation>Loo uus salvestusgrupp</translation>
-    </message>
-    <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Sisesta grupi nimi kasutades klaviatuuri või puldil olevaid numbreid</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
@@ -3621,14 +3154,6 @@ category_type</translation>
         <translation>Kõik salvestised säilitatakse selles kataloogis.</translation>
     </message>
     <message>
-        <source>Directory to hold the Live-TV buffers</source>
-        <translation type="obsolete">TV puhvrite hoidmise kataloog</translation>
-    </message>
-    <message>
-        <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation type="obsolete">Kõiki TV puhvreid hoitakse selles kataloogis. Neid puhvreid kasutatakse eetrisoleva saate peatamiseks ning edasi ja tagasi kerimiseks.</translation>
-    </message>
-    <message>
         <source>TV format</source>
         <translation>TV formaat</translation>
     </message>
@@ -3649,30 +3174,6 @@ category_type</translation>
         <translation>Vali oma süsteemile vastav sagedustabel.  Vali &quot;-bcast&quot; sagedustabel juhul, kui sa kasutad antenni.</translation>
     </message>
     <message>
-        <source>Live TV buffer (GB)</source>
-        <translation type="obsolete">TV puhver (GB)</translation>
-    </message>
-    <message>
-        <source>How large the live TV buffer is allowed to grow.</source>
-        <translation type="obsolete">Kui suureks lubatakse TV puhvril kasvada.</translation>
-    </message>
-    <message>
-        <source>Minimum free Live TV buffer (MB)</source>
-        <translation type="obsolete">Minimaalne vaba TV puhver (MB)</translation>
-    </message>
-    <message>
-        <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation type="obsolete">Kui suureks lastakse TV puhvril kasvada enne kui sunnitakse peatatud saadet edasi mängima.</translation>
-    </message>
-    <message>
-        <source>Save original files after transcoding</source>
-        <translation type="obsolete">Säilita originaalfailid peale transkodeerimist</translation>
-    </message>
-    <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation type="obsolete">Kui on valitud, siis peale transkoodri kasutamist nimetatakse esialgsed .nuv failid ümber .nuv.old failideks.</translation>
-    </message>
-    <message>
         <source>Follow symbolic links when deleting files</source>
         <translation>Failikustutamisel järgne  nimeviitadele</translation>
     </message>
@@ -3683,10 +3184,6 @@ category_type</translation>
     <message>
         <source>Time offset for XMLTV listings</source>
         <translation>XMLTV telekavade ajanihe</translation>
-    </message>
-    <message>
-        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation type="obsolete">Kui su ajavöönd ei lange kokku XMLTV poolt antud ajavööndiga, siis seda seadistust kasutades &apos;mythfilldatabase&apos; korrigeerib programmide algus- ja lõpuaegu. &quot;Puudub&quot; keelab selle võimaluse, &quot;Automaatne&quot;  teeb sinu ajavööndi automaatselt kindlaks</translation>
     </message>
     <message>
         <source>Master Backend Override</source>
@@ -3781,10 +3278,6 @@ category_type</translation>
         <translation>Enne seiskumist käivitatav käsk</translation>
     </message>
     <message>
-        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="obsolete">See käsk täidetakse enne taustserveri seiskamist. Tagastatud väärtus näitab, kas taustserver saab seiskuda. 0 - jah, 1 - restart idleing, 2 - reset the backend to wait for frontend</translation>
-    </message>
-    <message>
         <source>Block shutdown before client connected</source>
         <translation>Peata seiskamine kuni klient on ühendatud</translation>
     </message>
@@ -3871,10 +3364,6 @@ category_type</translation>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
         <translation>Alusta automaatset reklaamide märkimist kohe salvestamise alustamisel</translation>
-    </message>
-    <message>
-        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation type="obsolete">Kui on valitud ning salvestusel on sisse lülitatud automaatne reklaamide märgistamine, alustatakse sellega kohe kui salvestamine algab.  Vähese jõudlusega süsteemide kasutamisel pole soovitatav</translation>
     </message>
     <message>
         <source>User Job #1 Description</source>
@@ -3977,30 +3466,6 @@ category_type</translation>
         <translation>Tööjärjekord (töökäsud)</translation>
     </message>
     <message>
-        <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="obsolete">Kas sa soovid enne konfigureerimist puhastada kõikide salvestuskaartide seadistused?</translation>
-    </message>
-    <message>
-        <source>No, leave my card settings alone</source>
-        <translation type="obsolete">Ei, jäta mu kaardi seadistused rahule</translation>
-    </message>
-    <message>
-        <source>Yes, delete my card settings</source>
-        <translation type="obsolete">Jah, kustuta kaardi seadistused</translation>
-    </message>
-    <message>
-        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="obsolete">Kas sa soovid enne konfigureerimise alustamist kustutada kõik programmiandmed ning kanalite seadistused? See valik ei puutu olemasolevaid salvestusi.</translation>
-    </message>
-    <message>
-        <source>No, leave my channel settings alone</source>
-        <translation type="obsolete">Ei, jäta mu kanalite seadistused rahule</translation>
-    </message>
-    <message>
-        <source>Yes, delete my channel settings</source>
-        <translation type="obsolete">Jah, kustuta kanalite seadistused</translation>
-    </message>
-    <message>
         <source>Audio output device</source>
         <translation>Heli väljundseade</translation>
     </message>
@@ -4027,10 +3492,6 @@ category_type</translation>
     <message>
         <source>Master Mixer Volume</source>
         <translation>Süsteemimikseri helitugevus</translation>
-    </message>
-    <message>
-        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="obsolete">Süsteemimikseri algne helitugevus.  See mõjutab kõiki helikaardist tulevaid helisid.  Märkus: äramuuda seda liiga väikeseks.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
@@ -4083,10 +3544,6 @@ category_type</translation>
     <message>
         <source>One field</source>
         <translation>Üks väli</translation>
-    </message>
-    <message>
-        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Kihilisuse eemaldamise algoritm. &apos;Tuum&apos; vajab SSE-d. &apos;Bob&apos; vajab Xv või XvMC videoväljundit.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -4143,40 +3600,8 @@ category_type</translation>
         <translation>Täieliku nimekirja vaatamiseks tuleb sisestada see parool, kui see määratud on.</translation>
     </message>
     <message>
-        <source>Default Recording Group to display</source>
-        <translation type="obsolete">Vaikimisi näidatav salvestusgrupp</translation>
-    </message>
-    <message>
         <source>All Programs</source>
         <translation>Kõik programmid</translation>
-    </message>
-    <message>
-        <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation type="obsolete">Salvestusgrupp, mida näidatakse vaikimisi salvestuste vaatamise ekraanil.</translation>
-    </message>
-    <message>
-        <source>Save current Recording Group view when changed</source>
-        <translation type="obsolete">Muutmisel jäta meelde viimati valitud salvestusgrupp</translation>
-    </message>
-    <message>
-        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation type="obsolete">Jäta meelde viimati valitud salbvestusgrupp ning mahamängimise ekraanile naastes näita seda vaikimisi grupi asemel.</translation>
-    </message>
-    <message>
-        <source>Use program categories as display groups</source>
-        <translation type="obsolete">Kasuta programmide kategooriaid näidatavate gruppidena</translation>
-    </message>
-    <message>
-        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation type="obsolete">Lisa programmide kategooriaid näidatavate salvestusgruppide nimekirja.  Ainult parooliga kaitsmata gruppides olevaid programme näidatakse.</translation>
-    </message>
-    <message>
-        <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation type="obsolete">&quot;Kõik programmid&quot; asemel näita grupi nime</translation>
-    </message>
-    <message>
-        <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="obsolete">Mahamängimise ekraanil näita &quot;Kõik programmid&quot; asemel hetkel vaadatava grupi nime.</translation>
     </message>
     <message>
         <source>Start in Title section</source>
@@ -4203,16 +3628,8 @@ category_type</translation>
         <translation>Kui mitu minutit liigutakse edasi või tagasi hüppenuppude vajutatamisel.</translation>
     </message>
     <message>
-        <source>Fast forward amount (in seconds)</source>
-        <translation type="obsolete">Edasikerimise pikkus (sekundites)</translation>
-    </message>
-    <message>
         <source>How many seconds to skip forward on a fast forward.</source>
         <translation>Mitu sekundit jäetakse vahele edasikerimisel.</translation>
-    </message>
-    <message>
-        <source>Rewind amount (in seconds)</source>
-        <translation type="obsolete">Tagasikerimise pikkus (sekundites)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -4279,14 +3696,6 @@ category_type</translation>
         <translation>Kas jätta mythcommflag poolt automaatselt märgitud reklaamid vahele või lihtsalt anda reklaamidest märku.</translation>
     </message>
     <message>
-        <source>Skip Unflagged Commercials</source>
-        <translation type="obsolete">Jäta vahele märgistamata reklaamid</translation>
-    </message>
-    <message>
-        <source>Default Auto Commercial Flagging setting</source>
-        <translation type="obsolete">Vaikimisi automaatse reklaamide märgistamise seadistus</translation>
-    </message>
-    <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
         <translation>Seda kasutatakse reklaamide automaatse märkimise puhul uute saadete salvestamisel.</translation>
     </message>
@@ -4311,10 +3720,6 @@ category_type</translation>
         <translation>Reklaami vahelejätmisel automaatne edasikerimine</translation>
     </message>
     <message>
-        <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">Myth kerib automaatselt tagasi niipalju sekundeid peale reklaamipausi vahelejätmist.</translation>
-    </message>
-    <message>
         <source>Commercial Skip Notify Amount</source>
         <translation>Reklaami vahelejätmise-eelne teavitus</translation>
     </message>
@@ -4323,28 +3728,12 @@ category_type</translation>
         <translation>Selle valimisel käitub MythTV nagu oleks reklaam nii palju varem alanud.  See võib olla kasulik, kui kasutatakse reklaamide automaatse vahelejätmise aja teavitust.</translation>
     </message>
     <message>
-        <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="obsolete">Automaatse aegumise tihedus (minutites)</translation>
-    </message>
-    <message>
-        <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation type="obsolete">Kui tihti automaatne aegumine kontrollib vaba kettamahtu.</translation>
-    </message>
-    <message>
         <source>Auto Expire Method</source>
         <translation>Automaatse aegumise meetod</translation>
     </message>
     <message>
         <source>Oldest Show First</source>
         <translation>Vanim saade esimesena</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="obsolete">Mille põhjal otsustatakse, milline salvestus aegub esimesena.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation type="obsolete">Vaikimisi automaatne aegumine</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -4357,14 +3746,6 @@ category_type</translation>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
         <translation>MythTV ei käivita uut salvestamist kui taustaserveri vaba kettamaht langeb allapoole seda väärtust.</translation>
-    </message>
-    <message>
-        <source>Re-record programs which have been automatically expired</source>
-        <translation type="obsolete">Salvesta uuesti automaatselt aegunud programme</translation>
-    </message>
-    <message>
-        <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation type="obsolete">Kui on valitud, siis on lubatud automaatselt aegunud (ning kustutatud) programme uuesti salvestada, kui neid peaks eetris olema.</translation>
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
@@ -4421,14 +3802,6 @@ category_type</translation>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
         <translation>Tagasikerimisnupu vajutamisel edasikerimisel aktiveerib tagasikerimise ja vastupidi.  Ilma selleta vähendab tagasikerimisnupp kerimiskiirust kuni lülitub mahamängimisele, kui on saavutatud aeglaseim kerimiskiirus.</translation>
-    </message>
-    <message>
-        <source>Number of seconds for OSD information</source>
-        <translation type="obsolete">Info näitamise aeg sekundites</translation>
-    </message>
-    <message>
-        <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="obsolete">Kui kaua näidatakse programminifot peale kanali vahetamist.</translation>
     </message>
     <message>
         <source>Menu theme</source>
@@ -4573,14 +3946,6 @@ category_type</translation>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
         <translation>Mahamängimisel kasutatakse Xv seadistusi (heledus, kontrast, jne.). Need on salvestamisel kasutatavatest Video4Linux seadistustest sõltumatud. Xv seadistused ei pruugi iga süüsteemi puhul korrektselt töötada.</translation>
-    </message>
-    <message>
-        <source>Enable channel change buffer warnings</source>
-        <translation type="obsolete">Luba kanali vahetamisel puhvri hoiatused</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="obsolete">Kui on lubatud, hoiatatakse kanali vahetamisel kui TV vaatamisel ollakse ajast maas.</translation>
     </message>
     <message>
         <source>UDP Notify Port</source>
@@ -4963,10 +4328,6 @@ category_type</translation>
         <translation>Kellaaja formaat</translation>
     </message>
     <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Eelistatud kellaaja formaat.  Vali &quot;AP&quot;-ga formaat AM/PM näitamiseks. Vastasel juhul näidatakse 24-tunnist aega.</translation>
-    </message>
-    <message>
         <source>Theme</source>
         <translation>Kujundus</translation>
     </message>
@@ -5029,10 +4390,6 @@ category_type</translation>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
         <translation>MythTV üritab kontrollida HDTV või muu antenni kaudu vastuvõetava signaali tugevust. Selle aja jooksul piisava tugevusega signaali mittesaamisel loobub MythTV vastuvõtust.</translation>
-    </message>
-    <message>
-        <source>ATSC Signal Threshold</source>
-        <translation type="obsolete">ATSC signaali lävi</translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
@@ -5261,10 +4618,6 @@ category_type</translation>
     <message>
         <source>Language</source>
         <translation>Keel</translation>
-    </message>
-    <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">Eelistatud keel.</translation>
     </message>
     <message>
         <source>Enable Xbox Hardware</source>
@@ -5515,40 +4868,12 @@ category_type</translation>
         <translation>mythfilldatabase</translation>
     </message>
     <message>
-        <source>LCD Displays Time</source>
-        <translation type="obsolete">LCD näitab aega</translation>
-    </message>
-    <message>
-        <source>LCD Displays Menus</source>
-        <translation type="obsolete">LCD näitab menüüdid</translation>
-    </message>
-    <message>
         <source>Menu Pop-up Time</source>
         <translation>Hüpikmenüü aeg</translation>
     </message>
     <message>
         <source>The time (in seconds) that the menu will remain visible after navigation.</source>
         <translation>Hüpikmenüü näitamise aeg sekundites.</translation>
-    </message>
-    <message>
-        <source>LCD Displays Music Artist and Title</source>
-        <translation type="obsolete">LCD näitab muusika esitajat ning pealkirja</translation>
-    </message>
-    <message>
-        <source>LCD Displays Channel Information</source>
-        <translation type="obsolete">LCD näitab kanaliinfot</translation>
-    </message>
-    <message>
-        <source>LCD Displays Volume Information</source>
-        <translation type="obsolete">LCD näitab helitugevust</translation>
-    </message>
-    <message>
-        <source>LCD Displays Generic Information</source>
-        <translation type="obsolete">LCD näitab üldinfot</translation>
-    </message>
-    <message>
-        <source>LCD Backlight Always On</source>
-        <translation type="obsolete">LCD taustvalgus alati sees</translation>
     </message>
     <message>
         <source>Enable LCD device</source>
@@ -5899,14 +5224,6 @@ category_type</translation>
         <translation>Tööjärjekord on tühi.</translation>
     </message>
     <message>
-        <source>used</source>
-        <translation type="obsolete">kasutatud</translation>
-    </message>
-    <message>
-        <source>free</source>
-        <translation type="obsolete">vaba</translation>
-    </message>
-    <message>
         <source>Uptime</source>
         <translation>Tööaeg</translation>
     </message>
@@ -5941,18 +5258,6 @@ category_type</translation>
     <message>
         <source>MythTV server</source>
         <translation>MythTV  server</translation>
-    </message>
-    <message>
-        <source>Disk space:</source>
-        <translation type="obsolete">Kettaruum:</translation>
-    </message>
-    <message>
-        <source>Recordings</source>
-        <translation type="obsolete">Savlestusi</translation>
-    </message>
-    <message>
-        <source>TV buffer</source>
-        <translation type="obsolete">TV puhver</translation>
     </message>
     <message>
         <source>Failed to get selector object</source>
@@ -6179,14 +5484,6 @@ category_type</translation>
         <translation>Loo uus salvestusgrupp</translation>
     </message>
     <message>
-        <source>Region</source>
-        <translation type="obsolete">Regioon</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">Pakkuja</translation>
-    </message>
-    <message>
         <source>Data Direct Lineup</source>
         <translation>Data Direct kavad</translation>
     </message>
@@ -6249,14 +5546,6 @@ category_type</translation>
     <message>
         <source>Channel</source>
         <translation>Kanal</translation>
-    </message>
-    <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">Sisesta täpne sagedus hertsides või kasutatava TV formaadi kanali nimi.</translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="obsolete">Sagedus hertsides, mis lisatakse kanali täppishäälestuseks.</translation>
     </message>
     <message>
         <source>Signal Lock</source>
@@ -6346,10 +5635,6 @@ category_type</translation>
     <message>
         <source>it was marked to never be recorded.</source>
         <translation>see oli märgitud mitte kunagi salvestama.</translation>
-    </message>
-    <message>
-        <source>Status: </source>
-        <translation type="obsolete">Olek: </translation>
     </message>
     <message>
         <source>Change Ending Time</source>
@@ -6492,14 +5777,6 @@ category_type</translation>
         <translation>Transkodeeri kasutades &quot;%1&quot;</translation>
     </message>
     <message>
-        <source>Time Stretch</source>
-        <translation type="obsolete">Aja skaleerimine</translation>
-    </message>
-    <message>
-        <source>Default time stretch %1</source>
-        <translation type="obsolete">Vaikimisi aja skaleerimine %1</translation>
-    </message>
-    <message>
         <source>Transcode new recordings</source>
         <translation>Transkodeeri uued salvestised</translation>
     </message>
@@ -6514,14 +5791,6 @@ category_type</translation>
     <message>
         <source>Signal Timeout (msec)</source>
         <translation>Signaali aegumine (msek)</translation>
-    </message>
-    <message>
-        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation type="obsolete">Makimaalne aeg, mis MythTV ootab signaali</translation>
-    </message>
-    <message>
-        <source>Channel Timeout (msec)</source>
-        <translation type="obsolete">Kanali aegumine (msek)</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
@@ -7254,38 +6523,6 @@ MythTV lõpetab töö.</translation>
         <translation>Lubab väljade sisestamisel kasutada virtuaalset klaviatuuri.  Klaviatuur tekitatakse väljal olles OK või valikuklahvi vajutamisel.</translation>
     </message>
     <message>
-        <source>Period 1 Start Time</source>
-        <translation type="obsolete">Perioodi 1 algus</translation>
-    </message>
-    <message>
-        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="obsolete">Perioodi 1 algus. Keelamiseks sisesta algus ja lõpp 00:00</translation>
-    </message>
-    <message>
-        <source>Period 1 End Time</source>
-        <translation type="obsolete">Perioodi 1 lõpp</translation>
-    </message>
-    <message>
-        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
-        <translation type="obsolete">Perioodi 1 lõpp. Keelamiseks sisesta algus ja lõpp 00:00</translation>
-    </message>
-    <message>
-        <source>Period 2 Start Time</source>
-        <translation type="obsolete">Perioodi 2 algus</translation>
-    </message>
-    <message>
-        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="obsolete">Perioodi 2 algus. Keelamiseks sisesta algus ja lõpp 00:00</translation>
-    </message>
-    <message>
-        <source>Period 2 End Time</source>
-        <translation type="obsolete">Perioodi 2 lõpp</translation>
-    </message>
-    <message>
-        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
-        <translation type="obsolete">Perioodi 2 lõpp. Keelamiseks sisesta algus ja lõpp 00:00</translation>
-    </message>
-    <message>
         <source>Automatically Start Myth Frontend</source>
         <translation>Käivita automaatselt MythTV kasutajaliides</translation>
     </message>
@@ -7296,14 +6533,6 @@ MythTV lõpetab töö.</translation>
     <message>
         <source>MythWelcome Settings</source>
         <translation>MythWelcome seadistused</translation>
-    </message>
-    <message>
-        <source>Daily Wakeup/ShutDown Period 1</source>
-        <translation type="obsolete">Igapäevane äratuse/seiskumise tsükkel 1</translation>
-    </message>
-    <message>
-        <source>Daily Wakeup/ShutDown Period 2</source>
-        <translation type="obsolete">Igapäevane äratuse/seiskumise tsükkel 2</translation>
     </message>
     <message>
         <source>nvram-wakeup Command</source>
@@ -7344,10 +6573,6 @@ MythTV lõpetab töö.</translation>
     <message>
         <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
         <translation>Käsk Xterm käivitamiseks. Keelamiseks jäta tühjaks.</translation>
-    </message>
-    <message>
-        <source>MythShutdown Script Settings</source>
-        <translation type="obsolete">MythShutdown skripti seadistused</translation>
     </message>
     <message>
         <source>Ignore Signal Timeout</source>
@@ -7845,10 +7070,6 @@ MythTV lõpetab töö.</translation>
         <translation>Transpordi häälestamise viga</translation>
     </message>
     <message>
-        <source>Error detecting card type</source>
-        <translation type="obsolete">Kaardi tüübi tuvastamise viga</translation>
-    </message>
-    <message>
         <source>Error parsing parameters</source>
         <translation>Parameetrite parsimise viga</translation>
     </message>
@@ -7863,21 +7084,6 @@ MythTV lõpetab töö.</translation>
     <message>
         <source>Failed to parse : </source>
         <translation>Ei õnnestu parsida: </translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardTuningPage</name>
-    <message>
-        <source>Tuning</source>
-        <translation type="obsolete">Häälestamine</translation>
-    </message>
-    <message>
-        <source>Failed to open the card</source>
-        <translation type="obsolete">Kaardi avamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Failed to probe the card</source>
-        <translation type="obsolete">Kaardi tuvastus ebaõnnestus</translation>
     </message>
 </context>
 <context>
@@ -8080,14 +7286,6 @@ Rohkem andmeid pole</translation>
         <translation>Kiirus 1/16X</translation>
     </message>
     <message>
-        <source>Forward </source>
-        <translation type="obsolete">Keri edasi</translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">Keri tagasi</translation>
-    </message>
-    <message>
         <source>Stopping Transcode</source>
         <translation>Transkodeerimise peatamine</translation>
     </message>
@@ -8106,14 +7304,6 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Skip</source>
         <translation>Jäta vahele</translation>
-    </message>
-    <message>
-        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="obsolete">Sa oled ajast maas. Kui sa praegu kanalit vahetad, kaotad sa vaatamata osa.</translation>
-    </message>
-    <message>
-        <source>Change the channel anyway</source>
-        <translation type="obsolete">Vaheta kanalit igal juhul</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -8276,10 +7466,6 @@ Rohkem andmeid pole</translation>
         <translation>Näita/peida</translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation>Vaheta kanaleid</translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation>Vaheta aktiivset akent</translation>
     </message>
@@ -8314,10 +7500,6 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Auto-Skip Notify</source>
         <translation>Vahelejätmise märguanne</translation>
-    </message>
-    <message>
-        <source>Auto-Skip Pre-Notify</source>
-        <translation type="obsolete">Automaatse vahelejätmise eelmärguanne</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
@@ -8456,14 +7638,6 @@ Rohkem andmeid pole</translation>
         <translation>Signaal %1%</translation>
     </message>
     <message>
-        <source>S/N %1 dB</source>
-        <translation type="obsolete">S/N %1 dB</translation>
-    </message>
-    <message>
-        <source>Bit Errors %1</source>
-        <translation type="obsolete">Bitivigu %1</translation>
-    </message>
-    <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
         <translation>Praeguseks peaks olema kanal leitud. Võid signaali edasi oodata või vahetada kanaleid nuppudega %1 ja %2, vahetada sisendit (%3), salvestuskaarti (%4), jne.</translation>
     </message>
@@ -8482,10 +7656,6 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Adjust Audio Sync</source>
         <translation>Sünkroniseeri heli</translation>
-    </message>
-    <message>
-        <source>Manual Record</source>
-        <translation type="obsolete">Käsitsi salvestamine</translation>
     </message>
     <message>
         <source>Previous Recording</source>
@@ -8514,10 +7684,6 @@ Rohkem andmeid pole</translation>
     <message>
         <source>CC:</source>
         <translation>Teletekst:</translation>
-    </message>
-    <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">Uuesti aktiveerimine</translation>
     </message>
     <message>
         <source>%1 Settings</source>
@@ -8564,6 +7730,10 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Speed 1/4X</source>
         <translation>Kiirus 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8921,10 +8091,6 @@ Rohkem andmeid pole</translation>
     <message>
         <source>MythTV is about to start a wakeup/shutdown period.</source>
         <translation>MythTV on läheb igapäevasesse äratuse/seiskumise tsüklisse.</translation>
-    </message>
-    <message>
-        <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="obsolete">MythTV on jõude ning seiskub peagi.</translation>
     </message>
     <message>
         <source>MythTV is idle.</source>

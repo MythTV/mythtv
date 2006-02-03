@@ -5129,10 +5129,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will use the 24-hour clock.</translation>
-    </message>
-    <message>
         <source>Theme</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7516,10 +7512,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7714,6 +7706,10 @@ No other details</source>
     </message>
     <message>
         <source>Speed 1/4X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

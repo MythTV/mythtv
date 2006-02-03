@@ -7426,10 +7426,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7709,6 +7705,10 @@ No other details</source>
     </message>
     <message>
         <source>Speed 1/4X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -63,29 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">Você tem que salvar a placa atual antes de configurar-la, gostaria de fazer isso agora?</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">Sim, salvar agora</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Não</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Configuração Avançada</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">Opções de Gravação</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
@@ -242,14 +219,6 @@
     <message>
         <source>New episodes only</source>
         <translation type="unfinished">Apenas novos episódios</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Excluir episódios não identificados (Data Especifíca)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Excluir episódios não identificados (XMLTV)( </translation>
     </message>
     <message>
         <source>Category type</source>
@@ -621,12 +590,6 @@
 <context>
     <name>MythImageFileDialog</name>
     <message>
-        <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
-
-Returning to previous menu.</source>
-        <translation type="obsolete">No tema que você está usando, está faltando o elemento &apos;file_browser_background&apos;.</translation>
-    </message>
-    <message>
         <source>Missing UI Element</source>
         <translation type="unfinished">Faltando Elemento UI</translation>
     </message>
@@ -798,10 +761,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished">Adicionar esta gravação a Playlist</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Cancelar</translation>
-    </message>
-    <message>
         <source>You have finished watching:</source>
         <translation type="unfinished">Você acabou de assistir:</translation>
     </message>
@@ -946,14 +905,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished">Um episódio preservado é ignorado nos cálculos de remoção de episódios acima do limite. Auto-expiração é utilizada para remover programas escolhidos quando o espaço de disco está baixo</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Não Auto Expirar</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Auto Expirar</translation>
-    </message>
-    <message>
         <source>Do not preserve this episode</source>
         <translation type="unfinished">Não preservar este episódio</translation>
     </message>
@@ -1050,16 +1001,8 @@ Returning to the previous menu.</source>
         <translation type="unfinished">Mostrar Grupos de gravações apenas</translation>
     </message>
     <message>
-        <source>Recording Group View</source>
-        <translation type="obsolete">Modo de Exibição do Grupo de Gravação</translation>
-    </message>
-    <message>
         <source>Default</source>
         <translation type="unfinished">Padrão</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation type="obsolete">Grupo</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1068,10 +1011,6 @@ Returning to the previous menu.</source>
     <message>
         <source>OK</source>
         <translation type="unfinished">ok</translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="obsolete">Alterar Senha do Grupo de Gravação</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1163,49 +1102,6 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Gravado Anteriormente</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">Selecionar Ordem de Classificação</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">Ordenar por Título</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">Inverter Título</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">Ordenar por Tempo</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">Inverter Tempo</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">NOTA:remover itens desta lista não apagará qualquer gravação</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Manter este episódio na lista</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Remover este episódio da lista</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Remover todos os episódios deste título</translation>
-    </message>
-</context>
-<context>
     <name>PreviousList</name>
     <message>
         <source>Previously Recorded</source>
@@ -1234,10 +1130,6 @@ Returning to the previous menu.</source>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation type="unfinished">NOTA:remover itens desta lista não apagará qualquer gravação</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Manter este episódio na lista</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1711,22 +1603,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished">Ocultar canais sem o número do canal</translation>
     </message>
     <message>
-        <source>Scan for channels(s)</source>
-        <translation type="obsolete">Varrer canais</translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="obsolete">Este botão varerá canais digitais</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="obsolete">Avançado</translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="obsolete">Opções avançadas de edição para canais digitais</translation>
-    </message>
-    <message>
         <source>[Not Selected]</source>
         <translation type="unfinished">[Não Selecionado]</translation>
     </message>
@@ -1795,10 +1671,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished">se definir o guia de informação sairá do guia de Canal de Ar</translation>
     </message>
     <message>
-        <source>Frequency ID</source>
-        <translation type="obsolete">ID de frequência</translation>
-    </message>
-    <message>
         <source>Finetune</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1833,62 +1705,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Signal Power</source>
         <translation type="unfinished">Sinal de Potência</translation>
-    </message>
-    <message>
-        <source>Seen PAT</source>
-        <translation type="obsolete">Visto em PAT</translation>
-    </message>
-    <message>
-        <source>Seen PMT</source>
-        <translation type="obsolete">Visto em PMT</translation>
-    </message>
-    <message>
-        <source>Seen MGT</source>
-        <translation type="obsolete">Visto em MGT</translation>
-    </message>
-    <message>
-        <source>Seen VCT</source>
-        <translation type="obsolete">Visto em VCT</translation>
-    </message>
-    <message>
-        <source>Seen NIT</source>
-        <translation type="obsolete">Visto em NIT</translation>
-    </message>
-    <message>
-        <source>Seen SDT</source>
-        <translation type="obsolete">Visto em SDT</translation>
-    </message>
-    <message>
-        <source>Matching PAT</source>
-        <translation type="obsolete">Parâmetros PAT</translation>
-    </message>
-    <message>
-        <source>Matching PMT</source>
-        <translation type="obsolete">Parâmetros PMT</translation>
-    </message>
-    <message>
-        <source>Matching MGT</source>
-        <translation type="obsolete">Parâmetros MGT</translation>
-    </message>
-    <message>
-        <source>Matching VCT</source>
-        <translation type="obsolete">Parâmetros VCT</translation>
-    </message>
-    <message>
-        <source>Matching NIT</source>
-        <translation type="obsolete">Parâmetros NIT</translation>
-    </message>
-    <message>
-        <source>Matching SDT</source>
-        <translation type="obsolete">Parâmetros SDT</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Taxa de Erro Bit</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Blocos Incorretos</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
@@ -2102,20 +1918,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">CC destivado</translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="obsolete">TXT ativado</translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation type="unfinished">CC</translation>
     </message>
     <message>
         <source>TXT</source>
         <translation type="unfinished">TXT</translation>
-    </message>
-    <message>
-        <source>CC/TXT disabled</source>
-        <translation type="obsolete">CC/TXT desabilitado</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
@@ -2376,16 +2184,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">Não está Gravando</translation>
     </message>
     <message>
-        <source>D</source>
-        <comment>RecStatusChar rsDeleted</comment>
-        <translation type="obsolete">D</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar rsStopped</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
         <translation type="unfinished">R</translation>
@@ -2454,14 +2252,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
         <translation type="unfinished">N</translation>
-    </message>
-    <message>
-        <source>Deleted</source>
-        <translation type="obsolete">Removido</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Parado</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -2572,10 +2362,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">muitas gravações deste programa forão gravadas.</translation>
     </message>
     <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">foi manualmente cancelado.</translation>
-    </message>
-    <message>
         <source>another program with a higher priority will be recorded.</source>
         <translation type="unfinished">programa com maior prioridade será gravado.</translation>
     </message>
@@ -2678,10 +2464,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Filesize</source>
-        <translation type="obsolete">Tamanho do Arquivo</translation>
-    </message>
-    <message>
         <source>Recording Group</source>
         <translation type="unfinished">Grupo de Gravação</translation>
     </message>
@@ -2747,18 +2529,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">Status</translation>
     </message>
     <message>
-        <source>Scan</source>
-        <translation type="obsolete">Varrer</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">Força do Sinal</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">Sinal/Barulho</translation>
-    </message>
-    <message>
         <source>ATSC Channel %1</source>
         <translation type="unfinished">Canal ATSC %1</translation>
     </message>
@@ -2817,10 +2587,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Cable</source>
         <translation type="unfinished">Cabo</translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="obsolete">Transporte ATSC</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
@@ -3424,18 +3190,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">ID de usuário</translation>
     </message>
     <message>
-        <source>Failed to retrieve provider list</source>
-        <translation type="obsolete">Falhou na recuperação da lista do provedor</translation>
-    </message>
-    <message>
-        <source>You probably need to update XMLTV.</source>
-        <translation type="obsolete">Você provavelmente precisa atualizar XMLTV</translation>
-    </message>
-    <message>
-        <source>tv_grab_uk configuration</source>
-        <translation type="obsolete">tv_grab_uk configuração</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation type="unfinished">Falhou na recuperação da informação do canal</translation>
     </message>
@@ -3506,22 +3260,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Card Type</source>
-        <translation type="obsolete">Tipo de Cartão</translation>
-    </message>
-    <message>
-        <source>Card Name</source>
-        <translation type="obsolete">Nome do Cartão</translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="obsolete">Utilizar o decodificar de hardware MPEG</translation>
-    </message>
-    <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="obsolete">Gravar no formato TS em vez de PS</translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation type="unfinished">Aguardar a inicialização do cabeçalho pelo SEQ</translation>
     </message>
@@ -3540,10 +3278,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Packet buffer</source>
-        <translation type="obsolete">Pacote buffer</translation>
     </message>
     <message>
         <source>Other</source>
@@ -3602,28 +3336,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Standard V4L capture card</source>
-        <translation type="obsolete">Cartão de Captura V4L padrão</translation>
-    </message>
-    <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation type="unfinished">Cartão de Captura MPJEG (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>MPEG-2 Encoder card (PVR-x50, PVR-500)</source>
-        <translation type="obsolete">Cartão Codificador MPEG-2 (PVR-x50, PVR-500)</translation>
-    </message>
-    <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="obsolete">Cartão de Captura pcHDTV (HD-2000, HD-3000)</translation>
-    </message>
-    <message>
-        <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="obsolete">Cartão de Transmissão de Vídeo Digital (DVB)</translation>
-    </message>
-    <message>
-        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="obsolete">Codificador USB Mpeg-4 (Plextor ConvertX, etc)</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3718,28 +3432,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished">(Nova fonte de vídeo)</translation>
     </message>
     <message>
-        <source>ERROR, No inputs found</source>
-        <translation type="obsolete">ERRO, Nenhuma entrada encontrada</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Configuração Avançada</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation type="unfinished">Opções de Gravação</translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="obsolete">Opções Diseqc</translation>
-    </message>
-    <message>
-        <source>Region</source>
-        <translation type="obsolete">Região</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">Provedor</translation>
     </message>
     <message>
         <source>Data Direct Lineup</source>
@@ -4115,10 +3809,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto Expire Enabled</source>
-        <translation type="obsolete">Habilitar Auto Expiração</translation>
-    </message>
-    <message>
         <source>Extra Disk Space (in Gigabytes)</source>
         <translation type="unfinished">Espaço Extra no Disco (em Gigabytes)</translation>
     </message>
@@ -4133,10 +3823,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Oldest Show First</source>
         <translation type="unfinished">Mostrar primeiro mais antigo</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation type="obsolete">Auto-Expiração Padrão</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -6885,36 +6571,12 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fetching lineups from DataDirect service...</source>
-        <translation type="obsolete">Buscando lineups do serviço da DataDirect...</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from the Myth Plus service...</source>
-        <translation type="obsolete">Buscando lineups do serviço da Myth Plus...</translation>
-    </message>
-    <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Capture Card Menu</source>
-        <translation type="obsolete">Menu da Placa de Captura</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Não</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this capture card?</source>
-        <translation type="obsolete">Tem certeza que deseja remover este cartão de captura?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture card</source>
-        <translation type="obsolete">Sim, remover cartão de captura</translation>
     </message>
     <message>
         <source>Ignore Signal Timeout</source>
@@ -7808,10 +7470,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8047,6 +7705,10 @@ No other details</source>
     </message>
     <message>
         <source>Speed 1/4X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

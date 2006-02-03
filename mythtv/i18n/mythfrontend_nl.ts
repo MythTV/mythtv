@@ -7451,10 +7451,6 @@ Geen verdere details</translation>
         <translation>AAN/UIT</translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation>Zenders wisselen</translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation>Actief venster wisselen</translation>
     </message>
@@ -7755,6 +7751,10 @@ Geen verdere details</translation>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">Snelheid 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

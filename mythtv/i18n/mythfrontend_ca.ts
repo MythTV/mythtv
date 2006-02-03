@@ -494,10 +494,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pausat</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation type="unfinished"></translation>
     </message>
@@ -761,20 +757,8 @@ Returning to the previous menu.</source>
         <translation>Parar la gravació</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">No auto-expira</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Auto-expira</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Esborra</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Cancel·lar</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -1539,10 +1523,6 @@ Returning to the previous menu.</source>
         <translation>Esborrar després d&apos;aquest punt</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">He trobat %1 seg. d&apos;anuncis</translation>
-    </message>
-    <message>
         <source>At End, can not Skip.</source>
         <translation>Al final, no puc saltar.</translation>
     </message>
@@ -1565,18 +1545,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Not Recording</source>
         <translation>No gravar</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">Data d&apos;emisió:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodi:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descripció:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1603,10 +1571,6 @@ Returning to the previous menu.</source>
         <translation>Volum de mescla Original</translation>
     </message>
     <message>
-        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="obsolete">Ajustament del volum inicial del mesclador. Això afecta a tot el só creat per la seva tarja. Nota: No ajustar un valor massa baix.</translation>
-    </message>
-    <message>
         <source>PCM Mixer Volume</source>
         <translation>Volum del PCM</translation>
     </message>
@@ -1627,16 +1591,8 @@ Returning to the previous menu.</source>
         <translation>Minuts a saltar endavant o enrera al prèmer les tecles de salt.</translation>
     </message>
     <message>
-        <source>Fast forward amount (in seconds)</source>
-        <translation type="obsolete">Avanç ràpid (segons)</translation>
-    </message>
-    <message>
         <source>How many seconds to skip forward on a fast forward.</source>
         <translation>Nombre se segons a saltar en mode d&apos;avanç ràpid.</translation>
-    </message>
-    <message>
-        <source>Rewind amount (in seconds)</source>
-        <translation type="obsolete">Retrocedir (en segons)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -1671,20 +1627,8 @@ Returning to the previous menu.</source>
         <translation>Saltar-se els anuncis</translation>
     </message>
     <message>
-        <source>Automatically Flag Commercials</source>
-        <translation type="obsolete">Detectar els anuncis</translation>
-    </message>
-    <message>
         <source>Strict Commercial Detection</source>
         <translation>Detecció d&apos;anuncis estricte</translation>
-    </message>
-    <message>
-        <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="obsolete">Espai mínim de disc lliure per activar l&apos;auto-expiració (Gigabytes)</translation>
-    </message>
-    <message>
-        <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="obsolete">Freqüència de l&apos;auto-expiració (minuts)</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -1693,14 +1637,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Oldest Show First</source>
         <translation>El més antic primer</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="obsolete">Mètode per a determinar quina gravació auto-expira primer.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation type="obsolete">Auto-Expiració per omisió</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -1729,10 +1665,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Language</source>
         <translation>Idioma</translation>
-    </message>
-    <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">L&apos;idioma de la seva preferència.</translation>
     </message>
     <message>
         <source>Setup Pin Code</source>
@@ -4382,10 +4314,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Use 1-8 to change priority level.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pausat</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
@@ -7302,14 +7230,6 @@ No other details</source>
         <translation>Posició</translation>
     </message>
     <message>
-        <source>Forward </source>
-        <translation type="obsolete">Endavant </translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">Retrocedint </translation>
-    </message>
-    <message>
         <source>Jump Ahead</source>
         <translation>Salt endavant</translation>
     </message>
@@ -7487,10 +7407,6 @@ No other details</source>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Swap Channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7794,6 +7710,10 @@ No other details</source>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">Velocitat 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

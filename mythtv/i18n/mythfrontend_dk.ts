@@ -63,33 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">Du skal gemme før det kan sættes op. Vil du gøre det nu?</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">Ja, gem nu</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Nej, slet ikke</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Advanceret opsætning</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">Optagelses opsætninger</translation>
-    </message>
-    <message>
-        <source>Diseqc</source>
-        <translation type="obsolete">Diseqc</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -212,10 +185,6 @@
 <context>
     <name>CustomRecord</name>
     <message>
-        <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">Super Søgnings opsætning</translation>
-    </message>
-    <message>
         <source>Rule Name</source>
         <translation>Regel navn</translation>
     </message>
@@ -234,14 +203,6 @@
     <message>
         <source>New episodes only</source>
         <translation>Kun nye episoder</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Undlad ukendte episoder (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Undlad ukendte episoder (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -533,10 +494,6 @@
         <translation>Ukendt job</translation>
     </message>
     <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pauset</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation>Udefinerede</translation>
     </message>
@@ -728,10 +685,6 @@ Returning to the previous menu.</source>
         <translation>Opret Ny Afspilnings Gruppe</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Brug dit tastatur eller nummertasterne på din remote til at indtaste gruppe navnet</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation>Slette afspilnings gruppe:</translation>
     </message>
@@ -807,20 +760,8 @@ Returning to the previous menu.</source>
         <translation>Stop optagelse</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Unlad auto-udløb</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Auto-udløb</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Slet</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Afbryd</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -875,16 +816,8 @@ Returning to the previous menu.</source>
         <translation>Ændre planlagte optagelser</translation>
     </message>
     <message>
-        <source>Recording Group View</source>
-        <translation type="obsolete">Optagegruppe visning</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="obsolete">Ændre optagegruppe password</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1051,10 +984,6 @@ Returning to the previous menu.</source>
         <translation>Gem den så jeg kan se den igen</translation>
     </message>
     <message>
-        <source>Group</source>
-        <translation type="obsolete">Gruppe</translation>
-    </message>
-    <message>
         <source>Password:</source>
         <translation>Password:</translation>
     </message>
@@ -1176,49 +1105,6 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Optaget tidligere</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">Vælg sorterings orden</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">Sorter udfra titel</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">Modsat titel</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">Sorter udfra tid</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">Modsat tid</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">BEMÆRK: fjernelse af ting fra denne liste sletter ikke optagelserne.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Behold denne episode på listen</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Fjerne dennne episode fra listen</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Fjern alle episode med denne titel</translation>
-    </message>
-</context>
-<context>
     <name>PreviousList</name>
     <message>
         <source>Previously Recorded</source>
@@ -1247,10 +1133,6 @@ Returning to the previous menu.</source>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation>BEMÆRK: fjernelse af ting fra denne liste sletter ikke optagelserne.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Behold denne episode på listen</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1652,10 +1534,6 @@ Returning to the previous menu.</source>
         <translation>Slet efter denne frame</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">Fandt %1 sek. reklame</translation>
-    </message>
-    <message>
         <source>At End, can not Skip.</source>
         <translation>ved slutningen, kan ikke skippe.</translation>
     </message>
@@ -1670,18 +1548,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Not Recording</source>
         <translation>Optager ikke</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">Sendt:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Afsnit:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beskrivelse:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1708,10 +1574,6 @@ Returning to the previous menu.</source>
         <translation>Master mixer lydstyrke</translation>
     </message>
     <message>
-        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="obsolete">Start lydstyrke for Master Mixer.  Dette påvirker al lyd lavet af lydkortet.  Note: Pas på ikke at angive for lave værdier.</translation>
-    </message>
-    <message>
         <source>PCM Mixer Volume</source>
         <translation>PCM Mixer lydstyrke</translation>
     </message>
@@ -1732,16 +1594,8 @@ Returning to the previous menu.</source>
         <translation>Hvor mange minutter der skal hoppes fremad eller tilbage når &apos;hop&apos; tasterne trykkes.</translation>
     </message>
     <message>
-        <source>Fast forward amount (in seconds)</source>
-        <translation type="obsolete">Spol fremad (sekunder)</translation>
-    </message>
-    <message>
         <source>How many seconds to skip forward on a fast forward.</source>
         <translation>Hvor mange sekunder der skal hoppes frem ved fremadspoling.</translation>
-    </message>
-    <message>
-        <source>Rewind amount (in seconds)</source>
-        <translation type="obsolete">Spol tilbage (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -1776,20 +1630,8 @@ Returning to the previous menu.</source>
         <translation>Automatisk skipning af reklamer</translation>
     </message>
     <message>
-        <source>Automatically Flag Commercials</source>
-        <translation type="obsolete">Markér reklamer automatisk</translation>
-    </message>
-    <message>
         <source>Strict Commercial Detection</source>
         <translation>Streng reklame sporing</translation>
-    </message>
-    <message>
-        <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="obsolete">Auto udløb fri disk plads grænse (i gigabyte)</translation>
-    </message>
-    <message>
-        <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="obsolete">Auto udløb hyppighed (i minutter)</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -1798,14 +1640,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Oldest Show First</source>
         <translation>Ældste show først</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="obsolete">Metoden auto udløb skal bruge til at bestemme hvilke optagelser skal slettes først.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation type="obsolete">Auto udløb standard</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -1836,10 +1670,6 @@ Returning to the previous menu.</source>
         <translation>Sprog</translation>
     </message>
     <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">Dit foretrukne sprog.</translation>
-    </message>
-    <message>
         <source>Setup Pin Code</source>
         <translation>System optsætnings kode</translation>
     </message>
@@ -1850,14 +1680,6 @@ Returning to the previous menu.</source>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>Hvis denne opsætning er aktiv, kan koden ikke nulstilles uden at den indtastes først</translation>
-    </message>
-    <message>
-        <source>Number of seconds for OSD information</source>
-        <translation type="obsolete">Antal sekunder for OSD information</translation>
-    </message>
-    <message>
-        <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="obsolete">Hvor lang tid bliver program informationen på skærmen efter skift af kanal.</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -2070,10 +1892,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Time format</source>
         <translation>Tidsformat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Dit foretrukne tidsformat. Vælg et format med &quot;AP&quot; i for at bruge AM/PM. Ellers bliver det vist i 24 timersformat eller militær format.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -2642,14 +2460,6 @@ Returning to the previous menu.</source>
         <translation>Hardware Dekoder Opsætning</translation>
     </message>
     <message>
-        <source>Deleted</source>
-        <translation type="obsolete">Slettet</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Standset</translation>
-    </message>
-    <message>
         <source>Recorded</source>
         <translation>Optaget</translation>
     </message>
@@ -2686,14 +2496,6 @@ Returning to the previous menu.</source>
         <translation>Denne udsendelse er optaget.</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="obsolete">Denne udsendelse er optaget, men standset inden den var slut.</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="obsolete">Denne udsendelse er optaget, men slettet inden den var slut.</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>Status på denne udsendelse er ukendt.</translation>
     </message>
@@ -2720,10 +2522,6 @@ Returning to the previous menu.</source>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>der allerede er mange optagelser af dette program.</translation>
-    </message>
-    <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">den blev standses manuelt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2828,10 +2626,6 @@ Returning to the previous menu.</source>
     <message>
         <source>XMLTV ID</source>
         <translation>XMLTV ID</translation>
-    </message>
-    <message>
-        <source>Frequency ID</source>
-        <translation type="obsolete">Frekvens ID</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -2950,14 +2744,6 @@ Returning to the previous menu.</source>
         <translation>Kort-type</translation>
     </message>
     <message>
-        <source>Failed to retrieve provider list</source>
-        <translation type="obsolete">Kunne ikke modtage listen over udgivere</translation>
-    </message>
-    <message>
-        <source>You probably need to update XMLTV.</source>
-        <translation type="obsolete">XMLTV behøver opdatering</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation>Det var ikke muligt at hente kanal information</translation>
     </message>
@@ -2966,16 +2752,6 @@ Returning to the previous menu.</source>
 Please check the terminal window for more information</source>
         <translation>Det var ikke muligt for MythTV at hente information fra udgiveren.
 Check terminal viduet.</translation>
-    </message>
-    <message>
-        <source>Please wait while MythTV retrieves the list of available channels
-.  You might want to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">Vent venligst mens MythTV henter listen over tilgængelige kanaler
-. Du kan se resultatet mens programmet kører
-ved st skifte tilbage til den terminal du startede
-programmet fra.</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
@@ -3007,16 +2783,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Skift kort typen til det kort du vil konfigurere.</translation>
     </message>
     <message>
-        <source>Standard V4L capture card</source>
-        <translation type="obsolete">Standard V4L optage kort</translation>
-    </message>
-    <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation>MJPEG optage kort (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="obsolete">Digital Video Broadcast kort (DVB)</translation>
     </message>
     <message>
         <source>(New capture card)</source>
@@ -3027,32 +2795,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>(Ny video kilde)</translation>
     </message>
     <message>
-        <source>ERROR, No inputs found</source>
-        <translation type="obsolete">FEJL, intet input fundet</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">Signal/Støj</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">Signal styrke</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Advanceret opsætning</translation>
-    </message>
-    <message>
         <source>XMLTV listings grabber</source>
         <translation>XMLTV liste grabber</translation>
-    </message>
-    <message>
-        <source>Region</source>
-        <translation type="obsolete">Region</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">Udgiver</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -3061,10 +2805,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
         <translation>Brug standard instillinger med mindre denne kilde bruger en anden tabel end resten af systemet. (opsat i Generelle opsætninger)</translation>
-    </message>
-    <message>
-        <source>tv_grab_uk configuration</source>
-        <translation type="obsolete">tv_grab_uk opsætning</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
@@ -3111,14 +2851,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Når du ændre på denne opsætning, ændrer teksten underved til navn og type af dit kort. Hvis kortet ikke kan åbnes, bliver der vist en fejl meddelse.</translation>
     </message>
     <message>
-        <source>Card Type</source>
-        <translation type="obsolete">Kort type</translation>
-    </message>
-    <message>
-        <source>Card Name</source>
-        <translation type="obsolete">Kort navn</translation>
-    </message>
-    <message>
         <source>Status</source>
         <translation type="unfinished">Status</translation>
     </message>
@@ -3161,10 +2893,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Starting channel</source>
         <translation>Start kanal</translation>
-    </message>
-    <message>
-        <source>LiveTV will change to the above channel when the input is first selected.</source>
-        <translation type="obsolete">LiveTV ændrer til ovenstående kanal når indgang er valgt.</translation>
     </message>
     <message>
         <source>Connect source to input</source>
@@ -3219,14 +2947,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Alle optagelser gemmes i denne mappe.</translation>
     </message>
     <message>
-        <source>Directory to hold the Live-TV buffers</source>
-        <translation type="obsolete">Mappe til Live-TV buffer</translation>
-    </message>
-    <message>
-        <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation type="obsolete">Alle Live-TV buffere bliver gemt i denne mappe. Disse buffere gør at du kan pause og spole frem/tilbage i live tv. </translation>
-    </message>
-    <message>
         <source>TV format</source>
         <translation>TV format</translation>
     </message>
@@ -3245,30 +2965,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
         <translation>Vælg den passende frekvens tabel til dit system. If du bruger antenne, så brug &quot;-bcast&quot; frekvenser.</translation>
-    </message>
-    <message>
-        <source>Live TV buffer (GB)</source>
-        <translation type="obsolete">Live TV buffer (GB)</translation>
-    </message>
-    <message>
-        <source>How large the live TV buffer is allowed to grow.</source>
-        <translation type="obsolete">Størrelsen på live TV bufferen.</translation>
-    </message>
-    <message>
-        <source>Minimum free Live TV buffer (MB)</source>
-        <translation type="obsolete">Mindst mængde fri Live TV buffer (MB)</translation>
-    </message>
-    <message>
-        <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation type="obsolete">Hvor fuld må live TV bufferen blive før pausen afbrydes.</translation>
-    </message>
-    <message>
-        <source>Save original files after transcoding</source>
-        <translation type="obsolete">Gem originale optagelser efter transkodning</translation>
-    </message>
-    <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation type="obsolete">Hvis aktiv og transkodning er gennemført, bliver den originale nuv fil omdøbt til nuv.old.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
@@ -3387,10 +3083,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable channel change buffer warnings</source>
-        <translation type="obsolete">Aktiver buffer advarsel ved kanalskift</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3451,14 +3143,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Vis optagelser</translation>
     </message>
     <message>
-        <source>%1 behind  --  %2 full</source>
-        <translation type="obsolete">1% bagud  --  %2 fuld</translation>
-    </message>
-    <message>
-        <source>%1 behind</source>
-        <translation type="obsolete">%1 bagud</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 af %2</translation>
     </message>
@@ -3469,10 +3153,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
         <translation type="unfinished">Reklame skip Auto-Tilbage mængde</translation>
-    </message>
-    <message>
-        <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">Hvis aktiv, vil myth automatisk spooler dette antal sekunder til efter et reklame skip.</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -3695,10 +3375,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>CC fra</translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="obsolete">TXT til</translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation>CC</translation>
     </message>
@@ -3737,30 +3413,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Keypress Application</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Displays Time</source>
-        <translation type="obsolete">LCD viser tiden</translation>
-    </message>
-    <message>
-        <source>LCD Displays Menus</source>
-        <translation type="obsolete">LCD viser menuer</translation>
-    </message>
-    <message>
-        <source>LCD Displays Music Artist and Title</source>
-        <translation type="obsolete">LCD viser musik kunster og titel</translation>
-    </message>
-    <message>
-        <source>LCD Displays Channel Information</source>
-        <translation type="obsolete">LCD viser Kanal information</translation>
-    </message>
-    <message>
-        <source>LCD Displays Volume Information</source>
-        <translation type="obsolete">LCD viser lydstyrke</translation>
-    </message>
-    <message>
-        <source>LCD Displays Generic Information</source>
-        <translation type="obsolete">LCD viser diverse information</translation>
     </message>
     <message>
         <source>LCD device display</source>
@@ -4054,10 +3706,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Opret ny optage gruppe</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Brug dit tastatur eller nummertasterne på din remote til at indtaste gruppe navnet</translation>
-    </message>
-    <message>
         <source>Store in the &quot;%1&quot; recording group</source>
         <translation>Opbevar i &quot;%1&quot; optage gruppe</translation>
     </message>
@@ -4088,10 +3736,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>Efterlad dette felt blank med mindre du har en ekstern tuner koblet til tuner indgangen på dit kort. Hvis du har, er du nød til at specificere standard kanalen for dette signal (normalt 3 eller 4).</translation>
-    </message>
-    <message>
-        <source>ERROR, V4L support unavailable on this OS</source>
-        <translation type="obsolete">FEJL, V4L er ikke understøttet på dette OS</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -4410,10 +4054,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Hvis aktiv, startes program guiden med det samme at der startes for Live TV.</translation>
     </message>
     <message>
-        <source>LCD Backlight Always On</source>
-        <translation type="obsolete">LCD Backlight tændt altid</translation>
-    </message>
-    <message>
         <source>Directed By</source>
         <translation>Instrueret af</translation>
     </message>
@@ -4690,10 +4330,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Brug 1-8 for at ændre niveau.</translation>
     </message>
     <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pauset</translation>
-    </message>
-    <message>
         <source>Post Recording Processing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4900,10 +4536,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Instruktør</translation>
     </message>
     <message>
-        <source>Filesize</source>
-        <translation type="obsolete">Filstørrelse</translation>
-    </message>
-    <message>
         <source>Recording Group</source>
         <translation>Optagegruppe</translation>
     </message>
@@ -5092,18 +4724,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Dette vil gøre at Myth følger symnlinks når optagelser og relaterede filer slettes, i stedet for at slette synlinken og beholde filen.</translation>
     </message>
     <message>
-        <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="obsolete">Vil du slette alle optagekort opsætninger før konfigurationen starter?</translation>
-    </message>
-    <message>
-        <source>No, leave my card settings alone</source>
-        <translation type="obsolete">Nej, slet ikke kort opsætningen</translation>
-    </message>
-    <message>
-        <source>Yes, delete my card settings</source>
-        <translation type="obsolete">Ja, slet kort opsætningen</translation>
-    </message>
-    <message>
         <source>Use custom identifier for frontend preferences</source>
         <translation>Brug bruger identifikation til frontend opsætning</translation>
     </message>
@@ -5228,34 +4848,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Optage Host</translation>
     </message>
     <message>
-        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="obsolete">Vil du slette al program data og kanal opsætning før konfigurationen starter. Dette har ingen indflydelse på eksisterende optagelser.</translation>
-    </message>
-    <message>
-        <source>No, leave my channel settings alone</source>
-        <translation type="obsolete">Nej, behold min kanalopsætning</translation>
-    </message>
-    <message>
-        <source>Yes, delete my channel settings</source>
-        <translation type="obsolete">Ja, slet min kanalopsætning</translation>
-    </message>
-    <message>
-        <source>Scan for channels(s)</source>
-        <translation type="obsolete">Skan efter kanaler</translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="obsolete">Denne knap vil skanne efter digitale kanaler.</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="obsolete">Advanceret</translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="obsolete">Advancerede opsætninger for digitale kanaler</translation>
-    </message>
-    <message>
         <source>Use on air guide</source>
         <translation>Brug On-Air-Guide</translation>
     </message>
@@ -5376,20 +4968,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Slet ældste, hvis denne optagelse overskrider max episoder</translation>
     </message>
     <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="obsolete">Optag i TS format i stedet for PS.</translation>
-    </message>
-    <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
         <translation>DiSEqC Input Type: (DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="obsolete">pcHDTV optage kort (HD-2000, HD-3000)</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
@@ -5420,16 +5004,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Diseqc Options</source>
-        <translation type="obsolete">Diseqc Opsætning</translation>
-    </message>
-    <message>
         <source>All</source>
         <translation>Alle</translation>
-    </message>
-    <message>
-        <source>Use libmpeg2 for decoding</source>
-        <translation type="obsolete">Brug libmpeg2 til dekodning</translation>
     </message>
     <message>
         <source>4/3</source>
@@ -5521,16 +5097,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>O</translation>
     </message>
     <message>
-        <source>D</source>
-        <comment>RecStatusChar rsDeleted</comment>
-        <translation type="obsolete">D</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar rsStopped</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
         <translation>R</translation>
@@ -5591,28 +5157,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>x</translation>
     </message>
     <message>
-        <source>Firewire Model</source>
-        <translation type="obsolete">Firewire model</translation>
-    </message>
-    <message>
-        <source>Firewire Port</source>
-        <translation type="obsolete">Firewire port</translation>
-    </message>
-    <message>
         <source>Firewire port on your firewire card.</source>
         <translation>Firewire port på dit firewire kort.</translation>
     </message>
     <message>
-        <source>Firewire Node</source>
-        <translation type="obsolete">Firewire node</translation>
-    </message>
-    <message>
         <source>Firewire node is the remote device.</source>
         <translation>Firewire node er den tilkoblede enhed</translation>
-    </message>
-    <message>
-        <source>Firewire Speed</source>
-        <translation type="obsolete">Firewire hastighed</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5633,10 +5183,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
         <translation>Kun MPEG2TS er understøttet</translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation type="obsolete">Firewire indgang</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -5755,10 +5301,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Optag absolut ikke</translation>
     </message>
     <message>
-        <source>Firewire Connection Type</source>
-        <translation type="obsolete">Firewire fobindelses type</translation>
-    </message>
-    <message>
         <source>Point to Point</source>
         <translation>Punkt til Punkt</translation>
     </message>
@@ -5781,18 +5323,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Cable</source>
         <translation>Kabel</translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="obsolete">ATSC Transport</translation>
-    </message>
-    <message>
-        <source>ATSC transport, cable or terrestrial</source>
-        <translation type="obsolete">ATSC transport, kabel eller jordbaseret</translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="obsolete">Brug hardware MPEG dekoder</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -6354,18 +5884,6 @@ Myth will now exit.</source>
         <translation>%1 totalt, %2 brugt, %3 (eller %4%) fri.</translation>
     </message>
     <message>
-        <source>%1 hours left %2</source>
-        <translation type="obsolete">%1 timer tilbage %2</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left %3</source>
-        <translation type="obsolete">%1 timer og %2 minutter tilbage %1</translation>
-    </message>
-    <message>
-        <source>%1 minutes left %2</source>
-        <translation type="obsolete">%1 minutter tilbage %2</translation>
-    </message>
-    <message>
         <source>Disk usage on %1:</source>
         <translation>Disk forbrug på %1:</translation>
     </message>
@@ -6453,10 +5971,6 @@ Myth will now exit.</source>
     <message>
         <source>it was marked to never be recorded.</source>
         <translation>den er markeret til aldrig at blive optaget.</translation>
-    </message>
-    <message>
-        <source>Status: </source>
-        <translation type="obsolete">Status: </translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -6567,10 +6081,6 @@ Myth will now exit.</source>
     <message>
         <source>Signal Timeout (msec)</source>
         <translation>Signal Timeout (msek)</translation>
-    </message>
-    <message>
-        <source>Channel Timeout (msec)</source>
-        <translation type="obsolete">Kanal Timeout (msek)</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
@@ -7077,96 +6587,12 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scan</source>
-        <translation type="obsolete">Skan</translation>
-    </message>
-    <message>
-        <source>Locked</source>
-        <translation type="obsolete">Låst</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation type="obsolete">Ingen lås</translation>
-    </message>
-    <message>
-        <source>Full Scan</source>
-        <translation type="obsolete">Fuld skanning</translation>
-    </message>
-    <message>
-        <source>Import channels.conf</source>
-        <translation type="obsolete">Importer channels.conf</translation>
-    </message>
-    <message>
-        <source>Country</source>
-        <translation type="obsolete">Land</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from DataDirect service...</source>
-        <translation type="obsolete">Henter lineups fra DataDirect service</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from the Myth Plus service...</source>
-        <translation type="obsolete">Henter lineups fra Myth Plus service...</translation>
-    </message>
-    <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use channel scanner to find channels for this input.</source>
-        <translation type="obsolete">Brug kanal skanner for at finde kanaler til denne ingang.</translation>
-    </message>
-    <message>
-        <source>This can take a long time to run.</source>
-        <translation type="obsolete">Dette kan tage lang tid.</translation>
-    </message>
-    <message>
-        <source>Capture Card Menu</source>
-        <translation type="obsolete">Optage kort Menu</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Ændre..</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation type="obsolete">Er du sikker på du vil slette ALLE optage kort?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture cards</source>
-        <translation type="obsolete">Ja, slet alle optage kort</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this capture card?</source>
-        <translation type="obsolete">Er du sikker på du vil slette dette optage kort?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture card</source>
-        <translation type="obsolete">Ja, slet dette optage kort</translation>
-    </message>
-    <message>
-        <source>Video Source Menu</source>
-        <translation type="obsolete">Video kilde menu</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete ALL video sources?</source>
-        <translation type="obsolete">Er du sikker på at du vil slette ALLE video kilder?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video sources</source>
-        <translation type="obsolete">Ja, slet alle video kilder</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video source?</source>
-        <translation type="obsolete">Er du sikker på at du vil slette den video kilde?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video source</source>
-        <translation type="obsolete">Ja, slet video kilden</translation>
     </message>
     <message>
         <source>Ignore Signal Timeout</source>
@@ -7788,14 +7214,6 @@ Ikke flere oplysninger</translation>
         <translation>Position</translation>
     </message>
     <message>
-        <source>Forward </source>
-        <translation type="obsolete">Fremad </translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">Tilbage </translation>
-    </message>
-    <message>
         <source>Jump Ahead</source>
         <translation>Hop fremad</translation>
     </message>
@@ -7964,14 +7382,6 @@ Ikke flere oplysninger</translation>
         <translation>Hop til</translation>
     </message>
     <message>
-        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="obsolete">Du er i øjeblikket bagefter real tid. Hvis du skifter kanal nu, mister du uset video.</translation>
-    </message>
-    <message>
-        <source>Change the channel anyway</source>
-        <translation type="obsolete">Skift kanal alligevel</translation>
-    </message>
-    <message>
         <source>Zoom Mode OFF</source>
         <translation>Zoom Mode FRA</translation>
     </message>
@@ -8014,10 +7424,6 @@ Ikke flere oplysninger</translation>
     <message>
         <source>Enable/Disable</source>
         <translation>TIL/FRA</translation>
-    </message>
-    <message>
-        <source>Swap Channels</source>
-        <translation>Byt Kanaler</translation>
     </message>
     <message>
         <source>Change Active Window</source>
@@ -8224,18 +7630,6 @@ Ikke flere oplysninger</translation>
         <translation>MythTV bruger allerede alle tilgængelige inputs til at optage med.  Hvis du ønsker at se en udsendelse, der er i færd med at blive optaget, så vel et fra afspilnings menuen.  Hvis du ønsker at se direkte TV må du stoppe en af optagelserne fra sletnings menuen.</translation>
     </message>
     <message>
-        <source>Next Audio Track</source>
-        <translation type="obsolete">Næste lydspor</translation>
-    </message>
-    <message>
-        <source>Channel Lock</source>
-        <translation type="obsolete">Kanal låst</translation>
-    </message>
-    <message>
-        <source>Signal Lock</source>
-        <translation type="obsolete">Signal låst</translation>
-    </message>
-    <message>
         <source>No Lock</source>
         <translation>Ingen lås</translation>
     </message>
@@ -8260,10 +7654,6 @@ Ikke flere oplysninger</translation>
         <translation>Ok</translation>
     </message>
     <message>
-        <source>Manual Record</source>
-        <translation type="obsolete">Manuel optagelse</translation>
-    </message>
-    <message>
         <source>Previous Recording</source>
         <translation>Forrige optagelse</translation>
     </message>
@@ -8284,24 +7674,12 @@ Ikke flere oplysninger</translation>
         <translation>Signal %1%</translation>
     </message>
     <message>
-        <source>S/N %1 dB</source>
-        <translation type="obsolete">S/N %1 dB</translation>
-    </message>
-    <message>
-        <source>Bit Errors %1</source>
-        <translation type="obsolete">Bit fejl %1</translation>
-    </message>
-    <message>
         <source>Seek:</source>
         <translation>Søg:</translation>
     </message>
     <message>
         <source>CC:</source>
         <translation>CC:</translation>
-    </message>
-    <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">Genaktiver</translation>
     </message>
     <message>
         <source>Cancel Record</source>
@@ -8348,6 +7726,10 @@ Ikke flere oplysninger</translation>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">1/4X hastighed</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

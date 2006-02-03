@@ -205,14 +205,6 @@
         <translation>Eingöngu nýjir þættir</translation>
     </message>
     <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Undanskilja óþekkta þætti (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Unndaskilja óþekkta þætti (XMLTV)</translation>
-    </message>
-    <message>
         <source>Category type</source>
         <translation>Tegund flokks</translation>
     </message>
@@ -696,10 +688,6 @@ Fer í fyrri valmynd.</translation>
         <translation>Búa til nýjan afspilunarhóp</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Notaðu lyklaborðið eða tölustafina á fjarstýringunni til að slá inn heiti hóps</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation>Eyða afspilunarhóp:</translation>
     </message>
@@ -777,10 +765,6 @@ Fer í fyrri valmynd.</translation>
     <message>
         <source>Delete</source>
         <translation>Eyða</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Hætta við</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -1152,10 +1136,6 @@ Fer í fyrri valmynd.</translation>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation>ATH: Engri upptöku verður eytt þó að eytt sé úr þessum lista.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Geyma þennan þátt í listanum</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1915,10 +1895,6 @@ Fer í fyrri valmynd.</translation>
     <message>
         <source>Time format</source>
         <translation>Tímasnið</translation>
-    </message>
-    <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Þitt uppáhalds tímasnið. Veldu snið með &apos;AP&apos; í því til að nota AM/PM, annars mun 24 tíma klukkan vera notuð.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -3725,10 +3701,6 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
         <translation>Búa til nýjan upptökuhóp</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Notaðu lyklaborð eða númeralykla á fjarstýringu til að slá inn nafn hóps</translation>
-    </message>
-    <message>
         <source>Store in the &quot;%1&quot; recording group</source>
         <translation>Geymi í &apos;%1&apos; upptökuhópnum</translation>
     </message>
@@ -4528,12 +4500,6 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
     <message>
         <source>Category</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <comment>category_type
-</comment>
-        <translation type="obsolete">Tegund</translation>
     </message>
     <message>
         <source>Episode Number</source>
@@ -5906,14 +5872,6 @@ Myth will now exit.</source>
         <translation type="unfinished">eða.</translation>
     </message>
     <message>
-        <source>%1 hours and %2 minutes left %3</source>
-        <translation type="obsolete">mínútur</translation>
-    </message>
-    <message>
-        <source>%1 minutes left %2</source>
-        <translation type="obsolete">mínútur</translation>
-    </message>
-    <message>
         <source>Disk usage on %1:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6039,10 +5997,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
-        <translation type="obsolete">Engin Sjálfvirkt.</translation>
-    </message>
-    <message>
         <source>Auto Expire Default</source>
         <translation type="unfinished">Sjálfvirkt Sjálfgefið</translation>
     </message>
@@ -6077,10 +6031,6 @@ Myth will now exit.</source>
     <message>
         <source>Channel</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">eða.</translation>
     </message>
     <message>
         <source>A</source>
@@ -7469,10 +7419,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7772,6 +7718,10 @@ No other details</source>
     </message>
     <message>
         <source>Speed 1/4X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

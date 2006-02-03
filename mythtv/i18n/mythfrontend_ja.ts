@@ -63,29 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">これをする前に現在のカードの設定を保存しますか？</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">はい、保存します</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">いいえ</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">詳細設定</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">録画オプション</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -208,10 +185,6 @@
 <context>
     <name>CustomRecord</name>
     <message>
-        <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">パワーサーチ録画ルール編集</translation>
-    </message>
-    <message>
         <source>Rule Name</source>
         <translation>ルール名</translation>
     </message>
@@ -230,14 +203,6 @@
     <message>
         <source>New episodes only</source>
         <translation>新しい番組のみ</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">未確認の番組を除く(Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">未確認の番組を除く(XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -529,52 +494,8 @@
         <translation>不明なジョブ</translation>
     </message>
     <message>
-        <source>Queued</source>
-        <translation type="obsolete">待機中</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation type="obsolete">保留中</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation type="obsolete">開始中</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation type="obsolete">実行中</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">一時停止中</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation type="obsolete">停止中</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation type="obsolete">終了 (無効なステータス)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="obsolete">完了</translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="obsolete">異常終了</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation type="obsolete">エラー発生</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation>未完了</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation type="obsolete">中断</translation>
     </message>
 </context>
 <context>
@@ -761,10 +682,6 @@ Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">キーボードかリモコンの番号キーでグループ名を入力してください</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -840,20 +757,8 @@ Returning to the previous menu.</source>
         <translation>録画停止</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">自動削除しない</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">自動削除</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>削除</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">中断</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -908,16 +813,8 @@ Returning to the previous menu.</source>
         <translation>録画予約変更</translation>
     </message>
     <message>
-        <source>Recording Group View</source>
-        <translation type="obsolete">録画グループビュー</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>はい</translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="obsolete">録画グループパスワード変更</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1014,28 +911,12 @@ Returning to the previous menu.</source>
         <translation>ジョブオプション</translation>
     </message>
     <message>
-        <source>Show group list as recording groups</source>
-        <translation type="obsolete">レコーディンググループ事に表示する</translation>
-    </message>
-    <message>
-        <source>Show group list as titles</source>
-        <translation type="obsolete">タイトル毎に表示する</translation>
-    </message>
-    <message>
         <source>Shuffle Play</source>
         <translation>シャッフルプレイ</translation>
     </message>
     <message>
         <source>Playlist options</source>
         <translation>プレイリストオプション</translation>
-    </message>
-    <message>
-        <source>Add this Category/Title Group to Playlist</source>
-        <translation type="obsolete">このカテゴリー/タイトルをプレイリストに追加する</translation>
-    </message>
-    <message>
-        <source>Add this Recording Group to Playlist</source>
-        <translation type="obsolete">このレコーディンググループをプレイリストに追加する</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
@@ -1100,10 +981,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Save it so I can watch it again</source>
         <translation>保存する</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation type="obsolete">グループ</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1227,49 +1104,6 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">以前の録画</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">並び順選択</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">タイトルで並び替え</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">タイトル逆順</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">時間で並び替え</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">時間逆順</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">注意： このリストから削除しても録画された物は削除されません。</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">この番組をリストに保存しておく</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">この番組をリストから削除する</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">このタイトルの番組を全て削除する</translation>
-    </message>
-</context>
-<context>
     <name>PreviousList</name>
     <message>
         <source>Previously Recorded</source>
@@ -1298,10 +1132,6 @@ Returning to the previous menu.</source>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation type="unfinished">注意： このリストから削除しても録画された物は削除されません。</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">この番組をリストに保存しておく</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1699,10 +1529,6 @@ Returning to the previous menu.</source>
         <translation>このフレームの後を削除する</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">%1秒間のCMを検出</translation>
-    </message>
-    <message>
         <source>At End, can not Skip.</source>
         <translation>終端です．スキップできません．</translation>
     </message>
@@ -1721,18 +1547,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Not Recording</source>
         <translation>録画しない</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">放送日:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">番組:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">内容:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1759,10 +1573,6 @@ Returning to the previous menu.</source>
         <translation>マスターミキサーボリューム</translation>
     </message>
     <message>
-        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="obsolete">マスターミキサーボリュームの初期値．全てのサウンドカードの出力に影響します．注意:あまり低くセットしないで下さい．</translation>
-    </message>
-    <message>
         <source>PCM Mixer Volume</source>
         <translation>PCMミキサーボリューム</translation>
     </message>
@@ -1783,16 +1593,8 @@ Returning to the previous menu.</source>
         <translation>早送り，巻戻しキーを押したときに進む量です．</translation>
     </message>
     <message>
-        <source>Fast forward amount (in seconds)</source>
-        <translation type="obsolete">早送り(秒)</translation>
-    </message>
-    <message>
         <source>How many seconds to skip forward on a fast forward.</source>
         <translation>速送り時のスキップ秒数です．</translation>
-    </message>
-    <message>
-        <source>Rewind amount (in seconds)</source>
-        <translation type="obsolete">巻戻し(秒)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -1827,20 +1629,8 @@ Returning to the previous menu.</source>
         <translation>自動的にCMをスキップ</translation>
     </message>
     <message>
-        <source>Automatically Flag Commercials</source>
-        <translation type="obsolete">自動的にCMをマーク</translation>
-    </message>
-    <message>
         <source>Strict Commercial Detection</source>
         <translation>厳密なCM検出</translation>
-    </message>
-    <message>
-        <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="obsolete">自動削除時の空きディスク容量のしきい値(GB)</translation>
-    </message>
-    <message>
-        <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="obsolete">自動削除間隔(分)</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -1849,14 +1639,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Oldest Show First</source>
         <translation>再生済みの中の一番古いもの</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="obsolete">再生済みのものから削除されます．</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation type="obsolete">自動削除 既定</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -1887,10 +1669,6 @@ Returning to the previous menu.</source>
         <translation>言語</translation>
     </message>
     <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">好みの言語を指定してください.</translation>
-    </message>
-    <message>
         <source>Setup Pin Code</source>
         <translation>セットアップピンコード</translation>
     </message>
@@ -1901,18 +1679,6 @@ Returning to the previous menu.</source>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>チェックすると，現在のピンコードを入力するまではこの画面に戻ってきたり，セットアップピンコードをリセットしたりできなくなります．</translation>
-    </message>
-    <message>
-        <source>Reposition after fast forward/rewind</source>
-        <translation type="obsolete">早送り・巻き戻しの後に位置を戻す</translation>
-    </message>
-    <message>
-        <source>Number of seconds for OSD information</source>
-        <translation type="obsolete">OSD情報表示秒数</translation>
-    </message>
-    <message>
-        <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="obsolete">チャンネルを変更した時に画面に情報を表示している時間．</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -1981,10 +1747,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
         <translation>テレビのチャンネル変更時に常にブラウズモードを使用する</translation>
-    </message>
-    <message>
-        <source>Aggressive Soundcard Buffering</source>
-        <translation type="obsolete">積極的なサウンドカードバッファリング</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -2131,10 +1893,6 @@ Returning to the previous menu.</source>
         <translation>時間の書式</translation>
     </message>
     <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">時間の書式を選択して下さい．&apos;AM&apos;の書式を選んだ場合は&apos;AM/PM&apos;と表示されます．その他は24時表示です．</translation>
-    </message>
-    <message>
         <source>Theme</source>
         <translation>テーマ</translation>
     </message>
@@ -2199,10 +1957,6 @@ Returning to the previous menu.</source>
         <translation>Xboxのハードウェアを有効にする</translation>
     </message>
     <message>
-        <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation type="obsolete">Xbox特有のハードウェアを有効にします．フロントエンドの再起動が必要です．</translation>
-    </message>
-    <message>
         <source>Xbox Linux Distribution</source>
         <translation>Xbox Linuxディストリビューション</translation>
     </message>
@@ -2253,10 +2007,6 @@ Returning to the previous menu.</source>
     <message>
         <source>General</source>
         <translation>全般</translation>
-    </message>
-    <message>
-        <source>Global Auto Expire Settings</source>
-        <translation type="obsolete">全体的な自動削除設定</translation>
     </message>
     <message>
         <source>Program Guide</source>
@@ -2455,10 +2205,6 @@ Returning to the previous menu.</source>
         <translation>MPEG-2ハードウェアエンコーダ</translation>
     </message>
     <message>
-        <source>Automatically transcode after recording</source>
-        <translation type="obsolete">録画終了時に自動的に変換する</translation>
-    </message>
-    <message>
         <source>Width</source>
         <translation>幅</translation>
     </message>
@@ -2489,10 +2235,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
         <translation>PVR-350のTV出力/MPEGデコーダを使用する</translation>
-    </message>
-    <message>
-        <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
-        <translation type="obsolete">MythTVはPVR-350のTV出力とMPEGデコーダを使った高品質な再生をサポートしています．ivtv-fbモジュールがロードされ，正しく設定されていることが必要です．</translation>
     </message>
     <message>
         <source>Video device for the PVR-350 MPEG decoder</source>
@@ -2717,10 +2459,6 @@ Returning to the previous menu.</source>
         <translation>XMLTV ID</translation>
     </message>
     <message>
-        <source>Frequency ID</source>
-        <translation type="obsolete">周波数ID</translation>
-    </message>
-    <message>
         <source>Finetune</source>
         <translation>ファインチューン</translation>
     </message>
@@ -2829,14 +2567,6 @@ Returning to the previous menu.</source>
         <translation>マークされていません</translation>
     </message>
     <message>
-        <source>Deleted</source>
-        <translation type="obsolete">削除済み</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">停止中</translation>
-    </message>
-    <message>
         <source>Recorded</source>
         <translation>録画済み</translation>
     </message>
@@ -2873,14 +2603,6 @@ Returning to the previous menu.</source>
         <translation>この番組は録画が終了しました．</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="obsolete">この番組は録画されましたが，途中で停止されました．</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="obsolete">この番組は録画されましたが，途中で削除されました．</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>この番組のステータスは不明です．</translation>
     </message>
@@ -2907,10 +2629,6 @@ Returning to the previous menu.</source>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>この番組の録画数が多すぎます．</translation>
-    </message>
-    <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">手動でキャンセルされています．</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2961,14 +2679,6 @@ Returning to the previous menu.</source>
         <translation>カードタイプ</translation>
     </message>
     <message>
-        <source>Failed to retrieve provider list</source>
-        <translation type="obsolete">プロバイダリストを検索できませんでした</translation>
-    </message>
-    <message>
-        <source>You probably need to update XMLTV.</source>
-        <translation type="obsolete">おそらくXMLTVの更新が必要です．</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation>チャンネル情報の取得に失敗しました．</translation>
     </message>
@@ -2977,14 +2687,6 @@ Returning to the previous menu.</source>
 Please check the terminal window for more information</source>
         <translation>MythTVはプロバイダからチャンネル情報を取得できませんでした．
 ターミナルウィンドウで詳しい情報を確認して下さい</translation>
-    </message>
-    <message>
-        <source>Please wait while MythTV retrieves the list of available channels
-.  You might want to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">使用可能なチャンネルの検索が終わるまでお待ち下さい．
-このプログラムを起動したターミナルで出力を確認することができます．</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
@@ -3015,20 +2717,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>設定中のキャプチャーカードに適切なカードタイプを選択して下さい．</translation>
     </message>
     <message>
-        <source>Standard V4L capture card</source>
-        <translation type="obsolete">一般的なV4Lキャプチャーカード</translation>
-    </message>
-    <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation>MJPEGキャプチャーカード (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
-        <translation type="obsolete">MPEG-2 エンコーダーカード (PVR-250, PVR-350)</translation>
-    </message>
-    <message>
-        <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="obsolete">デジタルビデオ放送カード (DVB)</translation>
     </message>
     <message>
         <source>(New capture card)</source>
@@ -3039,32 +2729,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>(新規ビデオソース)</translation>
     </message>
     <message>
-        <source>ERROR, No inputs found</source>
-        <translation type="obsolete">エラー．入力が見つかりませんでした</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">シグナル/ノイズ比</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">信号強度</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">詳細設定</translation>
-    </message>
-    <message>
         <source>XMLTV listings grabber</source>
         <translation>XMLTV grabber</translation>
-    </message>
-    <message>
-        <source>Region</source>
-        <translation type="obsolete">地域</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">プロバイダ</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -3073,10 +2739,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
         <translation>全般の設定で定義されたシステム全体の周波数テーブルと異なるものを使う以外は，既定値のままにしておいてください．</translation>
-    </message>
-    <message>
-        <source>tv_grab_uk configuration</source>
-        <translation type="obsolete">tv_grab_uk設定</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
@@ -3123,36 +2785,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>この設定を変更すると，下にカード名とタイプが表示されます．カードがオープンできない場合はエラーメッセージが表示されます．</translation>
     </message>
     <message>
-        <source>Card Type</source>
-        <translation type="obsolete">カードタイプ</translation>
-    </message>
-    <message>
-        <source>Card Name</source>
-        <translation type="obsolete">カード名</translation>
-    </message>
-    <message>
-        <source>Do NOT use DVB driver for filtering.</source>
-        <translation type="obsolete">DVBドライバをフィルタに使用しない</translation>
-    </message>
-    <message>
-        <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
-        <translation type="obsolete">(故障中) このオプションは，いくつかのDVBカードにあるフィルタの制限を回避するために使用します</translation>
-    </message>
-    <message>
         <source>Wait for SEQ start header.</source>
         <translation>SEQスタートヘッダを待つ</translation>
-    </message>
-    <message>
-        <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="obsolete">通常，DVB録画はシーケンススタートヘッダが来るまでパケットを破棄しますが，これを行わないようにします．</translation>
-    </message>
-    <message>
-        <source>Per PID driver buffer size</source>
-        <translation type="obsolete">PID毎のバッファサイズ</translation>
-    </message>
-    <message>
-        <source>Packet buffer</source>
-        <translation type="obsolete">パケットバッファ</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3199,10 +2833,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>開始チャンネル</translation>
     </message>
     <message>
-        <source>LiveTV will change to the above channel when the input is first selected.</source>
-        <translation type="obsolete">入力が最初に選択されたときに，テレビはここで指定したチャンネルになります．</translation>
-    </message>
-    <message>
         <source>Connect source to input</source>
         <translation>ソースを入力に接続</translation>
     </message>
@@ -3211,24 +2841,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>入力接続</translation>
     </message>
     <message>
-        <source>Skip Unflagged Commercials</source>
-        <translation type="obsolete">マークされていないCMをスキップする</translation>
-    </message>
-    <message>
-        <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
-        <translation type="obsolete">CMがマークされていなくてもスキップしようとします．これは必ずしもうまくいくとは限らず，CMが正しく検知されない場合は再生が混乱してしまうことがあります．</translation>
-    </message>
-    <message>
         <source>Use video as timebase</source>
         <translation>映像を時間の基準として使う</translation>
     </message>
     <message>
         <source>Use the video as the timebase and warp the audio to keep it in sync. (Experimental)</source>
         <translation>映像を時間の基準として用いて，音声を同期させます．(実験的な機能)</translation>
-    </message>
-    <message>
-        <source>Enable channel change buffer warnings</source>
-        <translation type="obsolete">チャンネル変更時のバッファ警告</translation>
     </message>
     <message>
         <source>Use GUI size for TV playback</source>
@@ -3335,14 +2953,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>全ての録画はこのディレクトリに保存されます．</translation>
     </message>
     <message>
-        <source>Directory to hold the Live-TV buffers</source>
-        <translation type="obsolete">TVバッファ用ディレクトリ</translation>
-    </message>
-    <message>
-        <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation type="obsolete">全てのTVバッファはこのディレクトリに保存されます．このバッファはテレビ視聴時の一時停止，早送り，巻き戻しに使用されます．</translation>
-    </message>
-    <message>
         <source>TV format</source>
         <translation>TVフォーマット</translation>
     </message>
@@ -3361,30 +2971,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
         <translation>適切な周波数テーブルを指定してください．アンテナ接続の場合は&quot;-bcast&quot;を指定します．</translation>
-    </message>
-    <message>
-        <source>Live TV buffer (GB)</source>
-        <translation type="obsolete">TVバッファ(GB)</translation>
-    </message>
-    <message>
-        <source>How large the live TV buffer is allowed to grow.</source>
-        <translation type="obsolete">TV用バッファの最大値です．</translation>
-    </message>
-    <message>
-        <source>Minimum free Live TV buffer (MB)</source>
-        <translation type="obsolete">TVバッファ最小空き容量(MB)</translation>
-    </message>
-    <message>
-        <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation type="obsolete">一時停止が解除される前に，どこまでTV用バッファを使っていいかを指定します．</translation>
-    </message>
-    <message>
-        <source>Save original files after transcoding</source>
-        <translation type="obsolete">トランスコード後にオリジナルのファイルを保存</translation>
-    </message>
-    <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation type="obsolete">トランスコーダが有効になっているときにこれを指定すると，元のnuvファイルはトランスコード終了後nuv.oldにリネームされます．</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
@@ -3535,26 +3121,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>これをセットすると完全な全録画一覧を表示するのにパスワードが入力する必要が有ります。</translation>
     </message>
     <message>
-        <source>Default Recording Group to display</source>
-        <translation type="obsolete">表示する既定の録画グループ</translation>
-    </message>
-    <message>
-        <source>Save current Recording Group view when changed</source>
-        <translation type="obsolete">現在の録画ビューを変更した時に保存する</translation>
-    </message>
-    <message>
-        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation type="obsolete">再生の場合は常に、デフォルト・グループを表示する代わりに最後に選択された録画グループ記憶する。</translation>
-    </message>
-    <message>
-        <source>Use program categories as display groups</source>
-        <translation type="obsolete">表示グループで番組カテゴリーを使用する</translation>
-    </message>
-    <message>
-        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation type="obsolete">画面使用するで録画グループ一覧に番組カテゴリーリストを追加する。パスワードで保護されてないグループのみ有効です。</translation>
-    </message>
-    <message>
         <source>Time offset for thumbnail preview images</source>
         <translation>サムネイル画像のタイムオフセット</translation>
     </message>
@@ -3563,16 +3129,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>1回検索録画の優先順位</translation>
     </message>
     <message>
-        <source>Length of time to retain DVB signal data (in days)</source>
-        <translation type="obsolete">DVB信号データ(数日で)を保持する時間の長さ</translation>
-    </message>
-    <message>
         <source>View Recordings</source>
         <translation>録画ビュー</translation>
-    </message>
-    <message>
-        <source>DVB Global Settings</source>
-        <translation type="obsolete">全体的なDVB設定</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -3587,14 +3145,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>これをセットするとクライアントが接続中は自動シャットダウンは無効になります。</translation>
     </message>
     <message>
-        <source>%1 behind  --  %2 full</source>
-        <translation type="obsolete">%1 経過  --  %2 全体</translation>
-    </message>
-    <message>
-        <source>%1 behind</source>
-        <translation type="obsolete">%1 経過</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 / %2</translation>
     </message>
@@ -3605,10 +3155,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
         <translation>コマーシャルスキップ自動巻き戻し量</translation>
-    </message>
-    <message>
-        <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">これをセットするとコマーシャルスキップ後に指定した秒数まき戻します｡</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -3835,20 +3381,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>CC オフ</translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="obsolete">TXT オン</translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation>CC</translation>
     </message>
     <message>
         <source>TXT</source>
         <translation>TXT</translation>
-    </message>
-    <message>
-        <source>CC/TXT disabled</source>
-        <translation type="obsolete">CC/TXT 無効</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -3877,54 +3415,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Keypress Application</source>
         <translation>キープレスアプリケーション</translation>
-    </message>
-    <message>
-        <source>LCD Displays Time</source>
-        <translation type="obsolete">LCD表示時間</translation>
-    </message>
-    <message>
-        <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">現在時刻をアイドルLCDディスプレイに表示します。mythfrontendの再起動が必要です。</translation>
-    </message>
-    <message>
-        <source>LCD Displays Menus</source>
-        <translation type="obsolete">LCDディスプレイメニュー</translation>
-    </message>
-    <message>
-        <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">LCDディスプレイに選択したメニューを表示します。mythfrontendの再起動が必要です。</translation>
-    </message>
-    <message>
-        <source>LCD Displays Music Artist and Title</source>
-        <translation type="obsolete">LCDディスプレイにミュージックアーティストとタイトルを表示する</translation>
-    </message>
-    <message>
-        <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">MythMusicで再生中のアーティストと曲のタイトルを表示する。mythfrontendの再起動が必要です。</translation>
-    </message>
-    <message>
-        <source>LCD Displays Channel Information</source>
-        <translation type="obsolete">LCDディスプレイにチャンネル情報を表示</translation>
-    </message>
-    <message>
-        <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">チャンネル情報を表示します。mythfrontendの再起動が必要です。</translation>
-    </message>
-    <message>
-        <source>LCD Displays Volume Information</source>
-        <translation type="obsolete">LCDディスプレイにボリューム情報を表示</translation>
-    </message>
-    <message>
-        <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">ボリュームレベルを表示します。mythfrontendの再起動が必要です。</translation>
-    </message>
-    <message>
-        <source>LCD Displays Generic Information</source>
-        <translation type="obsolete">LCDに一般情報を表示します</translation>
-    </message>
-    <message>
-        <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">一般情報を表示します。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD device display</source>
@@ -4047,16 +3537,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>セレクターオブジェクトを取得できませんでした</translation>
     </message>
     <message>
-        <source>Myth could not locate the selector object within your theme.
-Please make that your ui.xml is valid.
-
-Myth will now exit.</source>
-        <translation type="obsolete">MythTVはあなたの選択したテーマでセレクターオブジェクトを配置できませんでした。
-あなたのui.xmlを有効に作成してください。
-
-MythTVは終了します。</translation>
-    </message>
-    <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
         <translation>このチャンネルの録画にフィルターが使用されます。ハードウェアエンコーディングカードでは使用されません。</translation>
     </message>
@@ -4139,26 +3619,6 @@ MythTVは終了します。</translation>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation>これを有効にすると、マスターバックエンドがストリームとファイルをビデオディレクトリで見付けた時に削除できるようになります。NFS共有の様な中央保存場所を使用している時に便利です。</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="obsolete">スティッキーキーが有るとの早送りと巻き戻しは、通常の再生に入る前に場所を修正します。実際に再生する場所を決める時のリアクションタイムを補います。</translation>
-    </message>
-    <message>
-        <source>ATSC Signal Threshold</source>
-        <translation type="obsolete">ATSC信号閾値</translation>
-    </message>
-    <message>
-        <source>General (page 2)</source>
-        <translation type="obsolete">全般(ページ2)</translation>
-    </message>
-    <message>
-        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation type="obsolete">XMLTVが返すタイムゾーンとあなたのローカルのタイムゾーンが合わないときmythfilldatabaseがこの値を使って番組の開始時間と終了時間を調整します｡何も設定しないと無効になります｡自動は自動的にあなたのシステムのタイムゾーンを検出します。</translation>
-    </message>
-    <message>
-        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="obsolete">バックエンドが終了する前に実行するコマンド。戻り値でバックエンドをシャットダウンするか決定します｡0 - はい, 1 - アイドル再開, 2 - リセットしてフロントエンドの接続待ち</translation>
     </message>
     <message>
         <source>Commercial Free</source>
@@ -4244,10 +3704,6 @@ MythTVは終了します。</translation>
         <translation>新しい録画グループを作る</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">キーボードかリモコンの番号キーでグループ名を入力してください</translation>
-    </message>
-    <message>
         <source>Store in the &quot;%1&quot; recording group</source>
         <translation>&quot;%1&quot;レコーディンググループに保存する</translation>
     </message>
@@ -4278,10 +3734,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>外部チューナーを使用する場合はプリセットするチャンネル番号を指定します。使用しない場合は空白のままにします。</translation>
-    </message>
-    <message>
-        <source>ERROR, V4L support unavailable on this OS</source>
-        <translation type="obsolete">エラー, V4LはこのOSではサポートされていません</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -4326,18 +3778,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
         <translation>ハードウェアエンコード使用で、再生中に音飛びが発生する場合に指定します。MPEG-4あるいはRTJPEGを指定している場合は効果はありません。</translation>
-    </message>
-    <message>
-        <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation type="obsolete">既定の録画グループを録画画面に表示する。</translation>
-    </message>
-    <message>
-        <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation type="obsolete">&quot;全番組&quot;の代わりにグループ名を表示する</translation>
-    </message>
-    <message>
-        <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="obsolete">&quot;全番組&quot;の代わりに表示グループの名前を使用する。</translation>
     </message>
     <message>
         <source>Start in Title section</source>
@@ -4388,14 +3828,6 @@ MythTVは終了します。</translation>
         <translation>設定秒数分早めにCM開始として扱います。自動スキップの代わりにCM通知を使用する場合に役立ちます。</translation>
     </message>
     <message>
-        <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
-        <translation type="obsolete">ディスクの空き容量がこの値を下回ると自動削除を開始します。0にすると無効になります。</translation>
-    </message>
-    <message>
-        <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation type="obsolete">自動削除プロセスがディスク空き容量をチェックする間隔。</translation>
-    </message>
-    <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
         <translation>新規録画を自動削除の対象としてマークします。録画済みのものは現在の設定を維持します。</translation>
     </message>
@@ -4424,10 +3856,6 @@ MythTVは終了します。</translation>
         <translation>テレビのチャンネル変更時に、自動的にブラウズモードを有効にします。</translation>
     </message>
     <message>
-        <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation type="obsolete">サウンドカード内のバッファ使用量を意図的に少なくします。これにより、シーク速度が向上しますが、再生時に問題を起こす場合があります。</translation>
-    </message>
-    <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
         <translation>録画時に保存した位置を再生時に自動的にクリアします。指定しない場合は、保存した位置を開始位置として利用できます。</translation>
     </message>
@@ -4440,10 +3868,6 @@ MythTVは終了します。</translation>
         <translation>Xv画像制御(明るさ、コントラスト等)を有効にします。録画時のVideo4Linux制御とは独立しています。Xv制御はシステムによっては正しく動作しません。</translation>
     </message>
     <message>
-        <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="obsolete">チャンネル変更時、TV放送に追随できていない場合に警告する機能を有効にします。</translation>
-    </message>
-    <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
         <translation>再生時、このポートを経由する&quot;mythtvosd&quot;あるいは&quot;mythudprelay&quot;からの接続を監視します。README(contrib/mythnotify/)参照。</translation>
     </message>
@@ -4454,10 +3878,6 @@ MythTVは終了します。</translation>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
         <translation>&quot;録画再生&quot;メニューでサムネイル(静止画像)を表示します。</translation>
-    </message>
-    <message>
-        <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
-        <translation type="obsolete">サムネイルの作成位置を、録画の先頭からの秒数で指定します。冒頭のオープニング等をスキップする場合に有効です。</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
@@ -4518,18 +3938,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
         <translation>X WindowのビデオモードをTVのとき切替える。&quot;xrandr&quot;のサポートが必要です。</translation>
-    </message>
-    <message>
-        <source>GUI Size (px)</source>
-        <translation type="obsolete">GUIサイズ (px)</translation>
-    </message>
-    <message>
-        <source>Default Display (px)</source>
-        <translation type="obsolete">デフォルトディスプレイ (px)</translation>
-    </message>
-    <message>
-        <source>Physical Size</source>
-        <translation type="obsolete">物理サイズ</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
@@ -4612,10 +4020,6 @@ MythTVは終了します。</translation>
         <translation>XboxのLEDを制御(録画中)する間隔を秒単位で設定します。</translation>
     </message>
     <message>
-        <source>Use hardware XvMC MPEG Decoding</source>
-        <translation type="obsolete">ハードウェアXvMC MPEGデコードを使用する</translation>
-    </message>
-    <message>
         <source>Log MythTV events to database</source>
         <translation>MythTVのイベントをデータベースに記録する</translation>
     </message>
@@ -4646,14 +4050,6 @@ MythTVは終了します。</translation>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation>TV放送の視聴を始める時に番組ガイドを表示します。</translation>
-    </message>
-    <message>
-        <source>LCD Backlight Always On</source>
-        <translation type="obsolete">LCDバックライトを常時点灯</translation>
-    </message>
-    <message>
-        <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">バックライトを常時点灯にします。設定を反映させるには、mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4924,46 +4320,12 @@ MythTVは終了します。</translation>
         <translation>DataDirect ステータス:</translation>
     </message>
     <message>
-        <source>Details of DVB error statistics for last 48 hours:
-</source>
-        <translation type="obsolete">過去48時間のDVBエラーの統計:
-</translation>
-    </message>
-    <message>
-        <source>Recording period from %1 to %2</source>
-        <translation type="obsolete">録画%1から%2まで</translation>
-    </message>
-    <message>
-        <source>There is no DVB signal quality data available to display.</source>
-        <translation type="obsolete">DVB信号品質データを表示できません。</translation>
-    </message>
-    <message>
         <source>No items found at priority level %1 or lower.</source>
         <translation>優先順位が%1より低いのもがありません。</translation>
     </message>
     <message>
         <source>Use 1-8 to change priority level.</source>
         <translation>1-8を使って優先順位を変更してください。</translation>
-    </message>
-    <message>
-        <source>Completed</source>
-        <translation type="obsolete">完了</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">一時停止中</translation>
-    </message>
-    <message>
-        <source>Restarting</source>
-        <translation type="obsolete">再開中</translation>
-    </message>
-    <message>
-        <source>Completed, %1 FPS</source>
-        <translation type="obsolete">完了, %1 FPS</translation>
-    </message>
-    <message>
-        <source>Commercial Breaks Found</source>
-        <translation type="obsolete">CM終了発見</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
@@ -4984,10 +4346,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Default size is 12.</source>
         <translation>既定のサイズは12です。</translation>
-    </message>
-    <message>
-        <source>Use HW XVMC VLD Decoding (Via only)</source>
-        <translation type="obsolete">HW XVMC VLDデコードを使用 (VIAのみ)</translation>
     </message>
     <message>
         <source>Commercial Skip</source>
@@ -5176,10 +4534,6 @@ MythTVは終了します。</translation>
         <translation>ディレクター</translation>
     </message>
     <message>
-        <source>Filesize</source>
-        <translation type="obsolete">ファイルサイズ</translation>
-    </message>
-    <message>
         <source>Recording Group</source>
         <translation>録画グループ</translation>
     </message>
@@ -5206,18 +4560,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
         <translation>新しい録画のために&apos;%1&apos;を実行しない</translation>
-    </message>
-    <message>
-        <source>Re-record programs which have been automatically expired</source>
-        <translation type="obsolete">自動削除された番組を再録画する</translation>
-    </message>
-    <message>
-        <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation type="obsolete">自動削除された番組を再録画できるようにします。</translation>
-    </message>
-    <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation type="obsolete">Via UnichromeチップセットのハードウェアMPEGデコード機能を有効にします</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -5340,14 +4682,6 @@ MythTVは終了します。</translation>
         <translation>ジョブをもう一度キューに入れる？</translation>
     </message>
     <message>
-        <source>used</source>
-        <translation type="obsolete">使用済</translation>
-    </message>
-    <message>
-        <source>free</source>
-        <translation type="obsolete">空き</translation>
-    </message>
-    <message>
         <source>Uptime</source>
         <translation>稼働時間</translation>
     </message>
@@ -5384,44 +4718,8 @@ MythTVは終了します。</translation>
         <translation>MythTVサーバー</translation>
     </message>
     <message>
-        <source>Disk space:</source>
-        <translation type="obsolete">ディスク空き容量:</translation>
-    </message>
-    <message>
-        <source>Recordings</source>
-        <translation type="obsolete">録画</translation>
-    </message>
-    <message>
-        <source>DB error - RecordFilePrefix unknown</source>
-        <translation type="obsolete">データベースエラー - RecordFilePrefix 不明</translation>
-    </message>
-    <message>
-        <source>TV buffer</source>
-        <translation type="obsolete">TVバッファー</translation>
-    </message>
-    <message>
-        <source>DB error - LiveBufferDir unknown</source>
-        <translation type="obsolete">データベースエラー - LiveBufferDir 不明</translation>
-    </message>
-    <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
         <translation>録画時および録画削除時にシンボリックリンクをたどって実行します。無効の場合はシンボリックリンクを削除するのみで、実際のファイルは削除されません。</translation>
-    </message>
-    <message>
-        <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="obsolete">構成の前に全てのキャプチャーカードの設定を削除しますか？</translation>
-    </message>
-    <message>
-        <source>No, leave my card settings alone</source>
-        <translation type="obsolete">いいえ、カード設定を削除しません</translation>
-    </message>
-    <message>
-        <source>Yes, delete my card settings</source>
-        <translation type="obsolete">はい、カード設定を削除します。</translation>
-    </message>
-    <message>
-        <source>%1% Completed @ %2 fps.</source>
-        <translation type="obsolete">%1%終了 (%2fps).</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5528,10 +4826,6 @@ MythTVは終了します。</translation>
         <translation>フロントエンドがデータベースサーバーを起動するためのコマンドです。</translation>
     </message>
     <message>
-        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">デインターレースアルゴリズム。&quot;カーネル&quot;はSSE機能が必要です。&quot;Bob&quot;は、XvあるいはXvMCビデオ出力のサポートが必要です。</translation>
-    </message>
-    <message>
         <source>Enable gamma correction for video</source>
         <translation>映像のガンマ補正を有効</translation>
     </message>
@@ -5552,34 +4846,6 @@ MythTVは終了します。</translation>
         <translation>録画ホスト</translation>
     </message>
     <message>
-        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="obsolete">全ての番組データとチャンネル設定をよろしいですか？既存の録画には何の影響が有りません。</translation>
-    </message>
-    <message>
-        <source>No, leave my channel settings alone</source>
-        <translation type="obsolete">いいえ、チャンネル設定はそのままにしておく</translation>
-    </message>
-    <message>
-        <source>Yes, delete my channel settings</source>
-        <translation type="obsolete">はい、チャンネル設定を削除します</translation>
-    </message>
-    <message>
-        <source>Scan for channels(s)</source>
-        <translation type="obsolete">チャンネルをスキャン</translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="obsolete">デジタルチャンネルのスキャンを行います。</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="obsolete">アドバンスド</translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="obsolete">デジタルチャンネルのアドバンスドオプション</translation>
-    </message>
-    <message>
         <source>Use on air guide</source>
         <translation>エアガイドを使用する</translation>
     </message>
@@ -5598,10 +4864,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Return to Menu</source>
         <translation>メニューに戻る</translation>
-    </message>
-    <message>
-        <source>Searching for Logo</source>
-        <translation type="obsolete">ロゴを検索</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -5680,10 +4942,6 @@ MythTVは終了します。</translation>
         <translation>スキャニング</translation>
     </message>
     <message>
-        <source>Scan Activity</source>
-        <translation type="obsolete">スキャン状態</translation>
-    </message>
-    <message>
         <source>Record one showing of this title</source>
         <translation>このタイトルの番組を一回録画する</translation>
     </message>
@@ -5708,24 +4966,12 @@ MythTVは終了します。</translation>
         <translation>最大録画数に達したら古い方から削除されます</translation>
     </message>
     <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="obsolete">PSの変わりにTSフォーマットで録画する。</translation>
-    </message>
-    <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="obsolete">TSフォーマットからPSフォーマットへの変換を無効にします。TSでの録画はファイルサイズが大きくなりますが、エラー発生の可能性が低くなります。</translation>
-    </message>
-    <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
         <translation>DiSEqC入力タイプ：(DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
         <translation>DVB-Sカードの入力タイプを設定します。DVB-C、DVB-Tの場合は、シングルLNBにしてください。入力はメインメニューの入力接続オプションでマップされます</translation>
-    </message>
-    <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="obsolete">pcHDTV キャプチャーカード (HD-2000, HD-3000)</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
@@ -5756,28 +5002,8 @@ MythTVは終了します。</translation>
         <translation>無料放送チャンネルのみを使用する場合に設定します。</translation>
     </message>
     <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="obsolete">衛星の緯度を指定します。この値はDiSEqCモーターサポートで使われます。北半球35.78度の場合は35.78と設定します</translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="obsolete">衛星の経度を指定します。この値はDiSEqCモーターサポートで使われます。西半球78.93度の場合、-78.93とします</translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="obsolete">Diseqcオプション</translation>
-    </message>
-    <message>
         <source>All</source>
         <translation>全て</translation>
-    </message>
-    <message>
-        <source>Use libmpeg2 for decoding</source>
-        <translation type="obsolete">libmpeg2デコードを使用する</translation>
-    </message>
-    <message>
-        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
-        <translation type="obsolete">MPEG-1、MPEG-2デコード時にffmpegの代わりにlibmpeg2を使用します。これにより速度が向上します。XvMCを利用している場合は有効ではありません。</translation>
     </message>
     <message>
         <source>4/3</source>
@@ -5869,11 +5095,6 @@ MythTVは終了します。</translation>
         <translation>O</translation>
     </message>
     <message>
-        <source>D</source>
-        <comment>RecStatusChar rsDeleted</comment>
-        <translation type="obsolete">D</translation>
-    </message>
-    <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
         <translation></translation>
@@ -5934,28 +5155,12 @@ MythTVは終了します。</translation>
         <translation></translation>
     </message>
     <message>
-        <source>Firewire Model</source>
-        <translation type="obsolete">Firewireモデル</translation>
-    </message>
-    <message>
-        <source>Firewire Port</source>
-        <translation type="obsolete">Firewireポート</translation>
-    </message>
-    <message>
         <source>Firewire port on your firewire card.</source>
         <translation>カード上のFirewireポート.</translation>
     </message>
     <message>
-        <source>Firewire Node</source>
-        <translation type="obsolete">Firewireノード</translation>
-    </message>
-    <message>
         <source>Firewire node is the remote device.</source>
         <translation>リモートデバイスのFirewireノード.</translation>
-    </message>
-    <message>
-        <source>Firewire Speed</source>
-        <translation type="obsolete">Firewireスピード</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5976,10 +5181,6 @@ MythTVは終了します。</translation>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
         <translation>現時点ではMPEG2TSのみサポートされています。</translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation type="obsolete">Firewire入力</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -6084,10 +5285,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>LCDデバイスを有効</translation>
     </message>
     <message>
-        <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">LCDディスプレイにMythTVのステータスを表示する。mythfrontendの再起動が必要です。</translation>
-    </message>
-    <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation>このグローバルな設定は予約録画開始前に有効になります。スケジューラーには影響しません。録画と録画の間に十分な時間がないと時は無視されます。</translation>
     </message>
@@ -6104,20 +5301,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>まったく録画しない</translation>
     </message>
     <message>
-        <source>Firewire Connection Type</source>
-        <translation type="obsolete">Firewire接続タイプ</translation>
-    </message>
-    <message>
         <source>Point to Point</source>
         <translation></translation>
     </message>
     <message>
         <source>Broadcast</source>
         <translation>ブロードキャスト</translation>
-    </message>
-    <message>
-        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="obsolete">USB Mpeeg-4 エンコーダー (プレクスター ConvertX等)</translation>
     </message>
     <message>
         <source>Original Air date</source>
@@ -6128,40 +5317,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>TVオーディオスルー (PVR-350のみ)</translation>
     </message>
     <message>
-        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation type="obsolete">PVR-350の音声は通常サウンドカードに入力されますが、もしそうでないときはこれをチェックしてください。MythTVはボリュームをコントロールをしなくなります。</translation>
-    </message>
-    <message>
-        <source>Building Detection Buffer</source>
-        <translation type="obsolete">出て区ションバッファー作成中</translation>
-    </message>
-    <message>
-        <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="obsolete">%1フレーム完了 @ %2 fps.</translation>
-    </message>
-    <message>
         <source>Terrestrial</source>
         <translation>地上波</translation>
     </message>
     <message>
         <source>Cable</source>
         <translation>ケーブル</translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="obsolete">ATSCトランスポート</translation>
-    </message>
-    <message>
-        <source>ATSC transport, cable or terrestrial</source>
-        <translation type="obsolete">ATSCトランスポート、ケーブルまたは地上波</translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="obsolete">ハードウェアMPEGデコーダーを使用</translation>
-    </message>
-    <message>
-        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="obsolete">使用しているDVBカードがハードウェアMPEGデコーダーを持っているときは有効に出来ます。 (フル機能のカードか幾つかのUSBデバイスのみ)。</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -6200,10 +5361,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>録画開始時に自動CMマークを開始する</translation>
     </message>
     <message>
-        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation type="obsolete">録画と同時にCMマークを開始します。  非力なシステムではお勧めしません</translation>
-    </message>
-    <message>
         <source>Job Queue (Job Commands)</source>
         <translation>ジョブキュー (ジョブコマンド)</translation>
     </message>
@@ -6214,18 +5371,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>No Menu File</source>
         <translation>メニューファイル無し</translation>
-    </message>
-    <message>
-        <source>Timed out waiting for signal.</source>
-        <translation type="obsolete">シグナル検知タイムアウト.</translation>
-    </message>
-    <message>
-        <source>Signal Locked</source>
-        <translation type="obsolete">シグナルロック</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation type="obsolete">ロック無し</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
@@ -6282,44 +5427,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>巻き戻し.</translation>
     </message>
     <message>
-        <source>Default Auto Commercial Flagging setting</source>
-        <translation type="obsolete">規定の自動CMマーク設定</translation>
-    </message>
-    <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
         <translation>新しい予約に使用する自動CMマークの初期値です。</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #1&apos; setting</source>
-        <translation type="obsolete">規定の&apos;ユーザージョブ #1 実行&apos;設定</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">新しい予約に使用する&apos;ユーザージョブ #1実行&apos;の既定値です.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #2&apos; setting</source>
-        <translation type="obsolete">規定の&apos;ユーザージョブ #2 実行&apos;設定</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">新しい予約に使用する&apos;ユーザージョブ #2実行&apos;の既定値です.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #3&apos; setting</source>
-        <translation type="obsolete">規定の&apos;ユーザージョブ #3 実行&apos;設定</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">新しい予約に使用する&apos;ユーザージョブ #3実行&apos;の既定値です.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #4&apos; setting</source>
-        <translation type="obsolete">規定の&apos;ユーザージョブ #4 実行&apos;設定</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">新しい予約に使用する&apos;ユーザージョブ #4実行&apos;の既定値です.</translation>
     </message>
     <message>
         <source>Run on the specified screen or spanning all screens.</source>
@@ -6862,10 +5971,6 @@ Myth will now exit.</source>
     <message>
         <source>it was marked to never be recorded.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Status: </source>
-        <translation type="obsolete">ステータス:</translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -7482,60 +6587,12 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scan Progress</source>
-        <translation type="obsolete">スキャン進捗</translation>
-    </message>
-    <message>
-        <source>Tuning</source>
-        <translation type="obsolete">チューニング</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from DataDirect service...</source>
-        <translation type="obsolete">DataDirectサービスからラインナップを取得中...</translation>
-    </message>
-    <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Capture Card Menu</source>
-        <translation type="obsolete">キャプチャカードメニュー</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">編集..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">削除..</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">いいえ</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this capture card?</source>
-        <translation type="obsolete">本当にこのキャプチャカードを削除しますか？</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture card</source>
-        <translation type="obsolete">はい，削除します</translation>
-    </message>
-    <message>
-        <source>Video Source Menu</source>
-        <translation type="obsolete">ビデオソースメニュー</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video source?</source>
-        <translation type="obsolete">このビデオソースを本当に削除しますか?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video source</source>
-        <translation type="obsolete">はい，ビデオソースを削除します</translation>
     </message>
     <message>
         <source>Ignore Signal Timeout</source>
@@ -8009,10 +7066,6 @@ Myth will now exit.</source>
         <translation>トランスポートチューニングエラー</translation>
     </message>
     <message>
-        <source>Error detecting card type</source>
-        <translation type="obsolete">カードタイプ検出エラー</translation>
-    </message>
-    <message>
         <source>Error parsing parameters</source>
         <translation>パラメータエラー</translation>
     </message>
@@ -8027,21 +7080,6 @@ Myth will now exit.</source>
     <message>
         <source>Failed to parse : </source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardTuningPage</name>
-    <message>
-        <source>Tuning</source>
-        <translation type="obsolete">チューニング</translation>
-    </message>
-    <message>
-        <source>Failed to open the card</source>
-        <translation type="obsolete">カードのオープンに失敗しました</translation>
-    </message>
-    <message>
-        <source>Failed to probe the card</source>
-        <translation type="obsolete">カードの検出に失敗しました</translation>
     </message>
 </context>
 <context>
@@ -8174,14 +7212,6 @@ No other details</source>
     <message>
         <source>Position</source>
         <translation>位置</translation>
-    </message>
-    <message>
-        <source>Forward </source>
-        <translation type="obsolete">早送り</translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">巻戻し</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
@@ -8352,14 +7382,6 @@ No other details</source>
         <translation>録画</translation>
     </message>
     <message>
-        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="obsolete">実際の時間より遅れた映像を見ています．いまチャンネルを変えると，まだ見ていない映像が失われます．</translation>
-    </message>
-    <message>
-        <source>Change the channel anyway</source>
-        <translation type="obsolete">とにかくチャンネルを変更する</translation>
-    </message>
-    <message>
         <source>Zoom Mode OFF</source>
         <translation>ズームモード OFF</translation>
     </message>
@@ -8402,10 +7424,6 @@ No other details</source>
     <message>
         <source>Enable/Disable</source>
         <translation>有効/無効</translation>
-    </message>
-    <message>
-        <source>Swap Channels</source>
-        <translation>チャンネル交換</translation>
     </message>
     <message>
         <source>Change Active Window</source>
@@ -8510,10 +7528,6 @@ No other details</source>
     <message>
         <source>(REC)</source>
         <translation>(録画)</translation>
-    </message>
-    <message>
-        <source>Auto-Skip Pre-Notify</source>
-        <translation type="obsolete">自動スキップを事前通知</translation>
     </message>
     <message>
         <source>Jump to Beginning</source>
@@ -8640,10 +7654,6 @@ No other details</source>
         <translation type="unfinished">はい</translation>
     </message>
     <message>
-        <source>Manual Record</source>
-        <translation type="obsolete">手動録画</translation>
-    </message>
-    <message>
         <source>Previous Recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8670,10 +7680,6 @@ No other details</source>
     <message>
         <source>CC:</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">有効にする</translation>
     </message>
     <message>
         <source>Cancel Record</source>
@@ -8720,6 +7726,10 @@ No other details</source>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">1/4スロー</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

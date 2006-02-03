@@ -1690,7 +1690,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>OSD font</source>
-        <translation>Infotypsnitt</translation>
+        <translation>Info-font</translation>
     </message>
     <message>
         <source>Closed Caption font</source>
@@ -7434,10 +7434,6 @@ Inga andra detaljer</translation>
         <translation>Aktivera/Avaktivera</translation>
     </message>
     <message>
-        <source>Swap Channels</source>
-        <translation>Skifta kanaler</translation>
-    </message>
-    <message>
         <source>Change Active Window</source>
         <translation>Ändra aktivt fönster</translation>
     </message>
@@ -7738,6 +7734,10 @@ Inga andra detaljer</translation>
     <message>
         <source>Speed 1/4X</source>
         <translation>Hastighet 1/4X</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished">Byt PiP/Huvud</translation>
     </message>
 </context>
 <context>

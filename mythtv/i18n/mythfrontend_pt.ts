@@ -494,10 +494,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paused</source>
-        <translation type="obsolete">Parado</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation type="unfinished"></translation>
     </message>
@@ -761,16 +757,8 @@ Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Permitir que a gravação seja apagada automaticamente</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Cancelar</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -1535,10 +1523,6 @@ Returning to the previous menu.</source>
         <translation>Apagar depois deste fotograma</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">Foram encontrados %1 segundos de anúncios</translation>
-    </message>
-    <message>
         <source>At End, can not Skip.</source>
         <translation>Está no fim, não pode avançar mais.</translation>
     </message>
@@ -1577,10 +1561,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Master Mixer Volume</source>
         <translation>Controlo de Volume Geral</translation>
-    </message>
-    <message>
-        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="obsolete">Valor inicial para o volume geral. Isto afecta todos os sons criados por esta placa de som. Nota: não atribua um valor demasiado baixo.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
@@ -1679,24 +1659,12 @@ Returning to the previous menu.</source>
         <translation>Idioma</translation>
     </message>
     <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">O </translation>
-    </message>
-    <message>
         <source>Pre-scaling theme images</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not Recording</source>
         <translation type="unfinished">Não Gravar</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodio:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descrição:</translation>
     </message>
     <message>
         <source>Setup Pin Code</source>
@@ -4346,10 +4314,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Use 1-8 to change priority level.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Parado</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
@@ -7266,14 +7230,6 @@ No other details</source>
         <translation>Posição</translation>
     </message>
     <message>
-        <source>Forward </source>
-        <translation type="obsolete">Frente</translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">Trás</translation>
-    </message>
-    <message>
         <source>Jump Ahead</source>
         <translation>Saltar para a Frente</translation>
     </message>
@@ -7451,10 +7407,6 @@ No other details</source>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Swap Channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7758,6 +7710,10 @@ No other details</source>
     <message>
         <source>Speed 1/4X</source>
         <translation type="unfinished">Velocidade 1/4x</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -63,33 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">Sie müssen die aktuelle Karte vor dem konfigurieren abspeichern. Möchten Sie dies jetzt tun?</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">Jetzt speichern</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Nicht speichern</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Erweiterte Konfiguration</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">Aufnahmeoptionen</translation>
-    </message>
-    <message>
-        <source>Diseqc</source>
-        <translation type="obsolete">Diseqc</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -212,10 +185,6 @@
 <context>
     <name>CustomRecord</name>
     <message>
-        <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">Erweiterte Aufnahmeregeln bearbeiten</translation>
-    </message>
-    <message>
         <source>Rule Name</source>
         <translation>Regelname</translation>
     </message>
@@ -234,14 +203,6 @@
     <message>
         <source>New episodes only</source>
         <translation>Nur neue Folgen</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Unbek. Folgen ausschließen (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Unbek. Folgen ausschließen (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -533,52 +494,8 @@
         <translation>Unbekannter Auftrag</translation>
     </message>
     <message>
-        <source>Queued</source>
-        <translation type="obsolete">In Warteschlange eingereiht</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation type="obsolete">Wartend</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation type="obsolete">Beginnt</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation type="obsolete">Läuft</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pausiert</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation type="obsolete">Anhaltend</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation type="obsolete">Fertig (Ungültiger Status!)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="obsolete">Fertig</translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation type="obsolete">Abgebrochen</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation type="obsolete">Fehlerhaft</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation>Nicht definiert</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation type="obsolete">Abgebrochen</translation>
     </message>
 </context>
 <context>
@@ -771,10 +688,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Eine neue Wiedergabegruppe erzeugen</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Geben Sie den Gruppennamen ein</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation>Wiedergabegruppe löschen:</translation>
     </message>
@@ -850,20 +763,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Aufnahme abbrechen</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Nicht autom. löschen</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Automatisch löschen</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -918,16 +819,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Aufnahmeplan ändern</translation>
     </message>
     <message>
-        <source>Recording Group View</source>
-        <translation type="obsolete">Gruppenansicht</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="obsolete">Passwort der Aufnahmegruppe ändern</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1022,28 +915,12 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Auftragsoptionen</translation>
     </message>
     <message>
-        <source>Show group list as recording groups</source>
-        <translation type="obsolete">Zeige Gruppenliste als Aufnahmegruppen</translation>
-    </message>
-    <message>
-        <source>Show group list as titles</source>
-        <translation type="obsolete">Zeige Gruppenliste als Titel</translation>
-    </message>
-    <message>
         <source>Shuffle Play</source>
         <translation>Zufallswiedergabe</translation>
     </message>
     <message>
         <source>Playlist options</source>
         <translation>Playlist Optionen</translation>
-    </message>
-    <message>
-        <source>Add this Category/Title Group to Playlist</source>
-        <translation type="obsolete">Diese Kategorie/Titelgruppe der Playlist hinzufügen</translation>
-    </message>
-    <message>
-        <source>Add this Recording Group to Playlist</source>
-        <translation type="obsolete">Diese Aufnahmegruppe der Playlist hinzufügen</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
@@ -1108,10 +985,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>Save it so I can watch it again</source>
         <translation>Bitte speichern, ich möchte es noch einmal sehen</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation type="obsolete">Gruppe</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1235,49 +1108,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
 </context>
 <context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Frühere Aufnahmen</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">Sortierung wählen</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">Nach Titel</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">Nach Titel absteigend</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">Nach Zeit</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">Nach Zeit absteigend</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">Hinweis: Mit dem Entfernen von Einträgen aus dieser Liste werden keine Aufnahmen gelöscht.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Diese Folge in der Liste behalten</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Diese Folge aus der Liste entfernen</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Alle Folgen dieser Sendung entfernen</translation>
-    </message>
-</context>
-<context>
     <name>PreviousList</name>
     <message>
         <source>Previously Recorded</source>
@@ -1306,10 +1136,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
         <translation>Hinweis: Mit dem Entfernen von Einträgen aus dieser Liste werden keine Aufnahmen gelöscht.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Diese Folge in der Liste behalten</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
@@ -1707,10 +1533,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Nach diesem Frame löschen</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation type="obsolete">%1 Sekunden Werbung erkannt</translation>
-    </message>
-    <message>
         <source>At End, can not Skip.</source>
         <translation>Am Ende, kann nicht überspringen.</translation>
     </message>
@@ -1729,18 +1551,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>Not Recording</source>
         <translation>Nicht geplant</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">Sendezeit:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Folge:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Inhalt:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1767,10 +1577,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Master Lautstärke</translation>
     </message>
     <message>
-        <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation type="obsolete">Anfangslautstärke des Master Mischers. Dies beeinflußt alle Eingänge der Soundkarte und sollte nicht zu leise eingestellt werden.</translation>
-    </message>
-    <message>
         <source>PCM Mixer Volume</source>
         <translation>PCM Lautstärke</translation>
     </message>
@@ -1791,16 +1597,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Wieviele Minuten überspringen, wenn die Sprung-Tasten gedrückt werden.</translation>
     </message>
     <message>
-        <source>Fast forward amount (in seconds)</source>
-        <translation type="obsolete">Schnelles Vorspulen (in Sek.)</translation>
-    </message>
-    <message>
         <source>How many seconds to skip forward on a fast forward.</source>
         <translation>Wieviele Sekunden beim Vorwärts-Springen auslassen.</translation>
-    </message>
-    <message>
-        <source>Rewind amount (in seconds)</source>
-        <translation type="obsolete">Schnelles Rückspulen (in Sek.)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -1835,20 +1633,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Werbung autom. überspringen</translation>
     </message>
     <message>
-        <source>Automatically Flag Commercials</source>
-        <translation type="obsolete">Werbung autom. markieren</translation>
-    </message>
-    <message>
         <source>Strict Commercial Detection</source>
         <translation>Strikte Werbeerkennung</translation>
-    </message>
-    <message>
-        <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation type="obsolete">Minimal freier Speicherplatz (in GB)</translation>
-    </message>
-    <message>
-        <source>Auto Expire Frequency (in minutes)</source>
-        <translation type="obsolete">Autom. Löschen Intervall (in Minuten)</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -1857,14 +1643,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>Oldest Show First</source>
         <translation>Älteste Aufnahme zuerst</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation type="obsolete">Nach welcher Methode soll Autom. Löschen entscheiden, welche Aufnahme gelöscht wird.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation type="obsolete">Automatisch Löschen</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -1895,10 +1673,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Sprache</translation>
     </message>
     <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">Ihre bevorzugte Sprache.</translation>
-    </message>
-    <message>
         <source>Setup Pin Code</source>
         <translation>Setup Pin Code</translation>
     </message>
@@ -1909,18 +1683,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>Falls gesetzt, muss zum Ändern der PIN zuerst die aktuelle PIN eingegeben werden.</translation>
-    </message>
-    <message>
-        <source>Reposition after fast forward/rewind</source>
-        <translation type="obsolete">Neu positionieren nach Sprung</translation>
-    </message>
-    <message>
-        <source>Number of seconds for OSD information</source>
-        <translation type="obsolete">Anzeigedauer des OSD (in Sek.)</translation>
-    </message>
-    <message>
-        <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="obsolete">Bestimmt wie lange das OSD (on screen display) nach dem Umschalten angezeigt wird.</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -1989,10 +1751,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
         <translation>Browse-Modus nach dem Umschalten</translation>
-    </message>
-    <message>
-        <source>Aggressive Soundcard Buffering</source>
-        <translation type="obsolete">Aggressiver Audiodatenpuffer</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -2139,10 +1897,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Zeitformat</translation>
     </message>
     <message>
-        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Ihr bevorzugtes Zeitformat. Einträge mit &quot;am&quot; zeigen die Zeit mit 12 Stunden Teilung an.</translation>
-    </message>
-    <message>
         <source>Theme</source>
         <translation>Thema</translation>
     </message>
@@ -2207,10 +1961,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Nutze Xbox Hardware</translation>
     </message>
     <message>
-        <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation type="obsolete">Schaltet die Unterstützung für Xbox-spezifische Hardware ein. Das Frontend muß dafür neu gestartet werden.</translation>
-    </message>
-    <message>
         <source>Xbox Linux Distribution</source>
         <translation>Xbox Linux Distribution</translation>
     </message>
@@ -2261,10 +2011,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>General</source>
         <translation>Allgemeines</translation>
-    </message>
-    <message>
-        <source>Global Auto Expire Settings</source>
-        <translation type="obsolete">Automatisches Löschen (Global)</translation>
     </message>
     <message>
         <source>Program Guide</source>
@@ -2463,10 +2209,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>MPEG-2 Hardware Kodierer</translation>
     </message>
     <message>
-        <source>Automatically transcode after recording</source>
-        <translation type="obsolete">Aufnahmen autom. umwandeln</translation>
-    </message>
-    <message>
         <source>Width</source>
         <translation>Breite</translation>
     </message>
@@ -2497,10 +2239,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
         <translation>Nutze den PVR-350 MPEG Dekoder (TV Ausgang)</translation>
-    </message>
-    <message>
-        <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
-        <translation type="obsolete">MythTV kann den TV-Ausgang und MPEG-Dekoder auf Hauppage PVR-350 Karten für die Wiedergabe nutzen. Dazu muß das ivtv-fb Kernelmodul richtig eingerichtet und geladen sein.</translation>
     </message>
     <message>
         <source>Video device for the PVR-350 MPEG decoder</source>
@@ -2724,14 +2462,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Hardware Dekodereinstellungen</translation>
     </message>
     <message>
-        <source>Deleted</source>
-        <translation type="obsolete">Gelöscht</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Gestoppt</translation>
-    </message>
-    <message>
         <source>Recorded</source>
         <translation>Aufgenommen</translation>
     </message>
@@ -2768,14 +2498,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Diese Sendung wurde aufgenommen.</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="obsolete">Diese Sendung wurde aufgenommen aber vorzeitig abgebrochen.</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="obsolete">Diese Sendung wurde aufgenommen aber vorzeitig gelöscht.</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>Der Status dieser Sendung ist unbekannt.</translation>
     </message>
@@ -2802,10 +2524,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>für diese Serie schon zu viele Folgen aufgenommen wurden.</translation>
-    </message>
-    <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">sie manuell abgebrochen wurde.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2842,14 +2560,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>No, Don&apos;t delete group</source>
         <translation>Nein, Gruppe nicht löschen</translation>
-    </message>
-    <message>
-        <source>Skip Unflagged Commercials</source>
-        <translation type="obsolete">Nicht markierte Werbung auslassen</translation>
-    </message>
-    <message>
-        <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
-        <translation type="obsolete">Versucht Werbepausen zu überspringen, auch wenn sie nicht markiert sind. Dies funktioniert nicht immer zuverlässig und kann die Wiedergabe stören.</translation>
     </message>
     <message>
         <source>Program Guide Alpha</source>
@@ -2918,10 +2628,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
     <message>
         <source>XMLTV ID</source>
         <translation>XMLTV ID</translation>
-    </message>
-    <message>
-        <source>Frequency ID</source>
-        <translation type="obsolete">Kanal (Frequency ID)</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -3040,14 +2746,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation>Kartentyp</translation>
     </message>
     <message>
-        <source>Failed to retrieve provider list</source>
-        <translation type="obsolete">Konnte keine Anbieterliste finden</translation>
-    </message>
-    <message>
-        <source>You probably need to update XMLTV.</source>
-        <translation type="obsolete">Vermutlich müssen Sie XMLTV aktualisieren.</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation>Konnte keine Senderinformationen finden.</translation>
     </message>
@@ -3056,15 +2754,6 @@ Kehre nun ins vorherige Menü zurück.</translation>
 Please check the terminal window for more information</source>
         <translation>MythTV konnte keine Senderinformationen für Ihren Anbieter finden.
 Bitte sehen Sie im Terminal-Fenster für weitere Informationen nach</translation>
-    </message>
-    <message>
-        <source>Please wait while MythTV retrieves the list of available channels
-.  You might want to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">Bitte warten während MythTV eine Liste der verfügbaren Sender einliest.
-Bitte beobachten Sie die Meldungen, die Sie im Terminal vorfinden
-in dem Sie dieses Programm gestartet haben.</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
@@ -3096,20 +2785,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Ändern Sie den Kartentyp entsprechend Ihrer TV-Karte.</translation>
     </message>
     <message>
-        <source>Standard V4L capture card</source>
-        <translation type="obsolete">Standard V4L Fernsehkarte</translation>
-    </message>
-    <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation>MJPEG Enkoderkarte (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
-        <translation type="obsolete">MPEG-2 Enkoderkarte (PVR 250/350)</translation>
-    </message>
-    <message>
-        <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="obsolete">Digital Video Broadcast Karte (DVB)</translation>
     </message>
     <message>
         <source>(New capture card)</source>
@@ -3120,32 +2797,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>(Neue Videoquelle)</translation>
     </message>
     <message>
-        <source>ERROR, No inputs found</source>
-        <translation type="obsolete">FEHLER, Keine Eingänge gefunden</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">Signal/Rauschen</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">Signalstärke</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Erweiterte Konfiguration</translation>
-    </message>
-    <message>
         <source>XMLTV listings grabber</source>
         <translation>XMLTV Skript</translation>
-    </message>
-    <message>
-        <source>Region</source>
-        <translation type="obsolete">Region</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">Anbieter</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -3154,10 +2807,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
         <translation>Ändern Sie diese Einstellung nur, falls diese Quelle eine von der Grundeinstellung abweichende Frequenztabelle verwendet.</translation>
-    </message>
-    <message>
-        <source>tv_grab_uk configuration</source>
-        <translation type="obsolete">tv_grab_uk Konfiguration</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
@@ -3204,22 +2853,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Wenn Sie diese Einstellung verändern sollte im Feld darunter der Name und Typ Ihrer Karte angezeigt werden. Falls die Karte nicht angesprochen werden kann wird eine Fehlermeldung ausgegeben.</translation>
     </message>
     <message>
-        <source>Card Type</source>
-        <translation type="obsolete">Kartentyp</translation>
-    </message>
-    <message>
-        <source>Card Name</source>
-        <translation type="obsolete">Kartenname</translation>
-    </message>
-    <message>
-        <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="obsolete">Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader empfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
-    </message>
-    <message>
-        <source>Packet buffer</source>
-        <translation type="obsolete">Paketpuffer</translation>
-    </message>
-    <message>
         <source>Status</source>
         <translation>Status</translation>
     </message>
@@ -3262,10 +2895,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Starting channel</source>
         <translation>Anfangskanal</translation>
-    </message>
-    <message>
-        <source>LiveTV will change to the above channel when the input is first selected.</source>
-        <translation type="obsolete">Dieser Kanal wird angezeigt, wenn dieser Eingang zum ersten mal genutzt wird.</translation>
     </message>
     <message>
         <source>Connect source to input</source>
@@ -3320,14 +2949,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Alle Aufnahmen werden in diesem Verzeichnis abgespeichert.</translation>
     </message>
     <message>
-        <source>Directory to hold the Live-TV buffers</source>
-        <translation type="obsolete">Verzeichnis für die TV Datenpuffer</translation>
-    </message>
-    <message>
-        <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation type="obsolete">Die TV Datenpuffer werden in diesem Verzeichnis angelegt. Diese ermöglichen Ihnen, während des Fernsehens zu pausieren oder zum Anfang einer Sendung zurück zu springen.</translation>
-    </message>
-    <message>
         <source>TV format</source>
         <translation>TV Norm</translation>
     </message>
@@ -3346,30 +2967,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
         <translation>Wählen Sie die entsprechende Frequenztabelle für Ihren Standort. Wenn Sie eine Antenne nutzen, wählen Sie eine &apos;-bcast&apos; Option.</translation>
-    </message>
-    <message>
-        <source>Live TV buffer (GB)</source>
-        <translation type="obsolete">Live TV Puffer (GB)</translation>
-    </message>
-    <message>
-        <source>How large the live TV buffer is allowed to grow.</source>
-        <translation type="obsolete">Die maximale Größe des TV Datenpuffers.</translation>
-    </message>
-    <message>
-        <source>Minimum free Live TV buffer (MB)</source>
-        <translation type="obsolete">Minimal freier Live TV Datenpuffer (MB)</translation>
-    </message>
-    <message>
-        <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation type="obsolete">Wie voll der Live TV Buffer werden darf, bevor die Pause-Funktion unterbrochen wird.</translation>
-    </message>
-    <message>
-        <source>Save original files after transcoding</source>
-        <translation type="obsolete">Originale behalten</translation>
-    </message>
-    <message>
-        <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation type="obsolete">Falls gesetzt und der Umwandler ist aktiv, werden die originalen &apos;nuv&apos; Dateien nach &apos;nuv.old&apos; umbenannt nachdem die Umwandlung fertig ist.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
@@ -3488,10 +3085,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Warte auf SEQ-Start Header.</translation>
     </message>
     <message>
-        <source>Enable channel change buffer warnings</source>
-        <translation type="obsolete">Beim Umschalten warnen</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation>Wählen Sie diese Option für preiswerte, auf dem BT878 basierende, DVB-T Karten (z.B. AverTV DVB-T). Bei diesen Karten darf die Lautstärke nicht verändert werden.</translation>
     </message>
@@ -3502,14 +3095,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Find One Recordings Priority</source>
         <translation>&apos;Suche Eine&apos; Priorität</translation>
-    </message>
-    <message>
-        <source>Length of time to retain DVB signal data (in days)</source>
-        <translation type="obsolete">Haltezeit der Daten zum DVB Signal (in Tagen)</translation>
-    </message>
-    <message>
-        <source>DVB Global Settings</source>
-        <translation type="obsolete">DVB Globale Einstellungen</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -3556,36 +3141,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Falls gesetzt, muss ein Passwort eingegeben werden um eine vollständige Liste aller Aufnahmen einzusehen.</translation>
     </message>
     <message>
-        <source>Default Recording Group to display</source>
-        <translation type="obsolete">Standard Aufnahmegruppe</translation>
-    </message>
-    <message>
-        <source>Save current Recording Group view when changed</source>
-        <translation type="obsolete">Aktuelle Aufnahmegruppe merken</translation>
-    </message>
-    <message>
-        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation type="obsolete">Falls gesetzt, so bleibt die zuletzt gewählte Aufnahmegruppe beim Betreten des &quot;Aufnahmen ansehen&quot; Menüs aktiv.</translation>
-    </message>
-    <message>
-        <source>Use program categories as display groups</source>
-        <translation type="obsolete">Kategorien als Gruppen</translation>
-    </message>
-    <message>
-        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation type="obsolete">Nutzt die Kategorien auch als Aufnahmegruppen für die Anzeige. Nur Aufnahmen in nicht-geschützten Gruppen werden angezeigt.</translation>
-    </message>
-    <message>
         <source>View Recordings</source>
         <translation>Aufnahmen ansehen</translation>
-    </message>
-    <message>
-        <source>%1 behind  --  %2 full</source>
-        <translation type="obsolete">%1 zurück - %2 voll</translation>
-    </message>
-    <message>
-        <source>%1 behind</source>
-        <translation type="obsolete">%1 zurück</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -3598,10 +3155,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
         <translation>Werbeblock Sprunglänge</translation>
-    </message>
-    <message>
-        <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">Falls gesetzt, wird Myth autom. so viele Sekunden zurück springen nachdem ein Werbeblock übersprungen wurde.</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -3824,20 +3377,12 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>CC aus</translation>
     </message>
     <message>
-        <source>TXT on</source>
-        <translation type="obsolete">TXT ein</translation>
-    </message>
-    <message>
         <source>CC</source>
         <translation>CC</translation>
     </message>
     <message>
         <source>TXT</source>
         <translation>TXT</translation>
-    </message>
-    <message>
-        <source>CC/TXT disabled</source>
-        <translation type="obsolete">CC/TXT deaktiviert</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -3870,54 +3415,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Keypress Application</source>
         <translation>LIRC Skript</translation>
-    </message>
-    <message>
-        <source>LCD Displays Time</source>
-        <translation type="obsolete">Uhrzeit</translation>
-    </message>
-    <message>
-        <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Zeigt die aktuelle Uhrzeit im LCD-Display an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
-    </message>
-    <message>
-        <source>LCD Displays Menus</source>
-        <translation type="obsolete">Menüs</translation>
-    </message>
-    <message>
-        <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Zeigt das gewählte Menü auf dem LCD-Display an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
-    </message>
-    <message>
-        <source>LCD Displays Music Artist and Title</source>
-        <translation type="obsolete">Interpret/Titel</translation>
-    </message>
-    <message>
-        <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Zeigt den aktuellen Interpreten und Liedtitel in MythMusic an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
-    </message>
-    <message>
-        <source>LCD Displays Channel Information</source>
-        <translation type="obsolete">Senderinformationen</translation>
-    </message>
-    <message>
-        <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Zeigt Informationen zum aktuellen Sender an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
-    </message>
-    <message>
-        <source>LCD Displays Volume Information</source>
-        <translation type="obsolete">Lautstärke</translation>
-    </message>
-    <message>
-        <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Zeigt die momentane Lautstärke an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
-    </message>
-    <message>
-        <source>LCD Displays Generic Information</source>
-        <translation type="obsolete">Allgemeines</translation>
-    </message>
-    <message>
-        <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Zeigt allgemeine Informationen an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD device display</source>
@@ -4044,16 +3541,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Konnte &apos;selector&apos; Objekt nicht finden</translation>
     </message>
     <message>
-        <source>Myth could not locate the selector object within your theme.
-Please make that your ui.xml is valid.
-
-Myth will now exit.</source>
-        <translation type="obsolete">Myth konnte das &apos;selector&apos; Objekt nicht in ihrem Thema finden.
-Bitte stellen Sie sicher daß die &apos;ui.xml&apos; Datei gültig ist.
-
-Myth wird nun beendet.</translation>
-    </message>
-    <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
         <translation>Eine Liste von Filtern die für Aufnahmen auf diesem Sender verwendet werden. Wird bei Tunerkarten mit integriertem Kodierer (Hauppauge PVR250, Matrox G200 u.a.) ignoriert.</translation>
     </message>
@@ -4136,26 +3623,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation>Falls gesetzt, wird der Master Rechner Aufnahmen löschen oder an ein Frontend übertragen. Nützlich wenn Sie Aufnahmen zentral speichern und ein Slave Rechner nicht eingeschaltet ist.</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="obsolete">Beim Beenden des schnellen Vor-/Rücklaufs im &quot;Klebrige Tasten&quot;-Modus wird erst neu positioniert bevor die Wiedergabe einsetzt. Dies gleicht die Verzögerung beim Beenden des schnellen Vor-/Rücklaufs aus.</translation>
-    </message>
-    <message>
-        <source>ATSC Signal Threshold</source>
-        <translation type="obsolete">ATSC Signalschwelle</translation>
-    </message>
-    <message>
-        <source>General (page 2)</source>
-        <translation type="obsolete">Allgemeines (2)</translation>
-    </message>
-    <message>
-        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation type="obsolete">Falls Ihre lokale Zeitzone nicht mit der von XMLTV benutzten übereinstimmt, können Sie damit mythfilldatabase anweisen die Sendezeiten anzupassen. Bei &apos;Auto&apos; wird die lokale Zeitzone automatisch bestimmt. &apos;None&apos; schaltet diese Option ab</translation>
-    </message>
-    <message>
-        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="obsolete">Dieses Kommando wird vor dem Herunterfahren ausgeführt. Der Rückgabewert bestimmt ob der Rechner herunter gefahren werden kann. 0 - Ja; 1 - Leerlaufzeit zurücksetzen; 2 - auf Frontend warten.</translation>
     </message>
     <message>
         <source>Commercial Free</source>
@@ -4241,10 +3708,6 @@ Myth wird nun beendet.</translation>
         <translation>Neue Aufnahmegruppe anlegen</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="obsolete">Geben Sie den Gruppennamen ein</translation>
-    </message>
-    <message>
         <source>Store in the &quot;%1&quot; recording group</source>
         <translation>In der &quot;%1&quot; Gruppe ablegen</translation>
     </message>
@@ -4275,10 +3738,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>Lassen Sie dieses Feld leer, außer Sie haben am Tunereingang Ihrer TV-Karte einen externen Tuner (Satellitentuner, Premiere-Dekoder u.ä.) angeschlossen. In diesem Fall geben Sie den vorgegebenen Kanal an (meist 3 oder 4).</translation>
-    </message>
-    <message>
-        <source>ERROR, V4L support unavailable on this OS</source>
-        <translation type="obsolete">FEHLER. Ihrem Betriebssystem fehlt die Unterstützung für Video4Linux</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -4323,18 +3782,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
         <translation>Testen Sie diese Einstellung bei Audioproblemen (Störgeräusche) mit Hardwarekodierern. Diese Option hat bei MPEG-4 oder RTJPEG Kodierung keine Wirkung. MythTV hält dabei mehr Audiodaten im internen Datenpuffer um diesen Fehler zu umgehen.</translation>
-    </message>
-    <message>
-        <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation type="obsolete">Standard Aufnahmegruppe für das &quot;Aufnahmen ansehen&quot; Menü.</translation>
-    </message>
-    <message>
-        <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation type="obsolete">Zeige Gruppennamen anstatt &apos;Alle Sendungen&apos;</translation>
-    </message>
-    <message>
-        <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="obsolete">Zeigt den Namen der aktuell gewählten Aufnahmegruppe statt dem allgemeineren &quot;Alle Sendungen&quot; im Wiedergabemenü.</translation>
     </message>
     <message>
         <source>Start in Title section</source>
@@ -4385,14 +3832,6 @@ Myth wird nun beendet.</translation>
         <translation>Wenn gesetzt, wird MythTV so tun, als ob die Werbung einige Sekunden früher beginnen würde. Diese Einstellung kann sinnvoll sein, wenn Werbebenachrichtignung statt dem Überspringen benutzt wird.</translation>
     </message>
     <message>
-        <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
-        <translation type="obsolete">Automatisches Löschen startet, falls der freie Speicherplatz diesen Wert (in GB) unterschreitet. &apos;0&apos; schaltet autom. Löschen aus.</translation>
-    </message>
-    <message>
-        <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation type="obsolete">Wieviele Minuten der Autom. Löschen Prozeß zwischen zwei Durchgängen wartet.</translation>
-    </message>
-    <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
         <translation>Falls gesetzt, wird für neue Aufnahmen das automatische Löschen erlaubt. Alte Aufnahmen behalten ihre momentane Einstellung.</translation>
     </message>
@@ -4421,10 +3860,6 @@ Myth wird nun beendet.</translation>
         <translation>Falls gesetzt, wird nach dem Senderwechsel der Browse-Modus aktiviert.</translation>
     </message>
     <message>
-        <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation type="obsolete">Falls gesetzt, wird MythTV vorgeben, einen kleineren Audiodatenpuffer zu haben. Dies kann das Positionieren beschleunigen, aber auch Probleme bei der Wiedergabe verursachen.</translation>
-    </message>
-    <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
         <translation>Löscht bei der Wiedergabe automatisch die gespeicherte Position in einer Aufnahme. Wenn diese Option nicht gesetzt ist, können Sie die Position durch &apos;Position speichern&apos; abspeichern.</translation>
     </message>
@@ -4437,10 +3872,6 @@ Myth wird nun beendet.</translation>
         <translation>Falls gesetzt, können während der Wiedergabe die Xv Bildregler genutzt werden. Diese sind unabhängig von den für die Aufnahme verwendeten V4L Einstellungen. In manchen Rechnern könnten die Xv Regler nicht funktionieren.</translation>
     </message>
     <message>
-        <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="obsolete">Falls gesetzt, wird MythTV Sie vor dem Senderwechsel auf den Verlust des Live TV Datenpuffers hinweisen.</translation>
-    </message>
-    <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
         <translation>Während der Wiedergabe wird MythTV auf Verbindungen von &quot;mythtvosd&quot; oder &quot;mythudprelay&quot; auf diesem Port reagieren. Näheres dazu finden Sie in der README Datei in contrib/mythnotify.</translation>
     </message>
@@ -4451,10 +3882,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
         <translation>Falls gesetzt, wird im &quot;Aufnahmen ansehen&quot; Menü ein Vorschaubild einer Aufnahme angezeigt.</translation>
-    </message>
-    <message>
-        <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
-        <translation type="obsolete">Erzeugt das Vorschaubild einer Aufnahme um so viele Sekunden nach dem Beginn einer Sendung.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
@@ -4515,58 +3942,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
         <translation>Schaltet die X Window Bildschirmauflösung für die TV Wiedergabe um. Benötigt die &apos;xrandr&apos; Unterstützung des X Window Systems.</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="obsolete">Horizontale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="obsolete">Vertikale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation type="obsolete">X</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation type="obsolete">Horizontale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
-    </message>
-    <message>
-        <source>Y</source>
-        <translation type="obsolete">Y</translation>
-    </message>
-    <message>
-        <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation type="obsolete">Vertikale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="obsolete">Horizontale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
-    </message>
-    <message>
-        <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="obsolete">Vertikale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
-    </message>
-    <message>
-        <source>Alt Aspect</source>
-        <translation type="obsolete">Alt Aspekt</translation>
-    </message>
-    <message>
-        <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation type="obsolete">Falls X&apos; DisplaySize 16:9 meldet, zwänge die vertikale Größe in 4:3 und umgekehrt.</translation>
-    </message>
-    <message>
-        <source>GUI Size (px)</source>
-        <translation type="obsolete">GUI Größe (pixel)</translation>
-    </message>
-    <message>
-        <source>Default Display (px)</source>
-        <translation type="obsolete">Standarddisplay (pixel)</translation>
-    </message>
-    <message>
-        <source>Physical Size</source>
-        <translation type="obsolete">Physische Größe</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
@@ -4649,10 +4024,6 @@ Myth wird nun beendet.</translation>
         <translation>Dies bestimmt wie häufig kontrolliert wird ob gerade eine Aufnahme läuft, um den Zustand der Aufnahme-LED zu aktualisieren.</translation>
     </message>
     <message>
-        <source>Use hardware XvMC MPEG Decoding</source>
-        <translation type="obsolete">Nutze den XvMC MPEG Hardware Dekoder</translation>
-    </message>
-    <message>
         <source>Log MythTV events to database</source>
         <translation>MythTV Meldungen in der Datenbank speichern</translation>
     </message>
@@ -4683,14 +4054,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation>Zeigt die Programmübersicht im LiveTV-Modus wenn Fernsehen ausgewählt wird.</translation>
-    </message>
-    <message>
-        <source>LCD Backlight Always On</source>
-        <translation type="obsolete">LCD-Beleuchtung immer ein</translation>
-    </message>
-    <message>
-        <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">Die LCD Hintergrundbeleuchtung permanent einschalten. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4961,50 +4324,12 @@ Myth wird nun beendet.</translation>
         <translation>DataDirect Status: </translation>
     </message>
     <message>
-        <source>Details of DVB error statistics for last 48 hours:
-</source>
-        <translation type="obsolete">Detailierte DVB Fehlerstatistik der letzten 2 Tage:
-</translation>
-    </message>
-    <message>
-        <source>Recording period from %1 to %2</source>
-        <translation type="obsolete">Alle Aufnahmen von %1 bis %2</translation>
-    </message>
-    <message>
-        <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
-        <translation type="obsolete">Enkoder %1 min SRV: %2 ø SRV: %3 min BER %4 ø BER %5 Cont Errs: %6 Überläufe: %7</translation>
-    </message>
-    <message>
-        <source>There is no DVB signal quality data available to display.</source>
-        <translation type="obsolete">Keine Daten zur DVB Signalqualität verfügbar.</translation>
-    </message>
-    <message>
         <source>No items found at priority level %1 or lower.</source>
         <translation>Keine Meldungen &lt;= %1 vorhanden.</translation>
     </message>
     <message>
         <source>Use 1-8 to change priority level.</source>
         <translation>Mit 1-8 die Prioritätsstufe ändern.</translation>
-    </message>
-    <message>
-        <source>Completed</source>
-        <translation type="obsolete">Beendet</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pausiert</translation>
-    </message>
-    <message>
-        <source>Restarting</source>
-        <translation type="obsolete">Neustart</translation>
-    </message>
-    <message>
-        <source>Completed, %1 FPS</source>
-        <translation type="obsolete">Beendet, %1 fps</translation>
-    </message>
-    <message>
-        <source>Commercial Breaks Found</source>
-        <translation type="obsolete">Werbeblöcke gefunden</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
@@ -5025,10 +4350,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Default size is 12.</source>
         <translation>Standardgröße ist 12.</translation>
-    </message>
-    <message>
-        <source>Use HW XVMC VLD Decoding (Via only)</source>
-        <translation type="obsolete">Nutze den XvMC VLD Dekoder</translation>
     </message>
     <message>
         <source>Commercial Skip</source>
@@ -5149,14 +4470,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Power Search</source>
         <translation>Erweiterte Suche</translation>
-    </message>
-    <message>
-        <source>Re-record programs which have been automatically expired</source>
-        <translation type="obsolete">Autom. gelöschte Aufnahmen erneut aufnehmen lassen</translation>
-    </message>
-    <message>
-        <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation type="obsolete">Falls gesetzt, werden Aufnahmen, die autom. gelöscht wurden, erneut aufgenommen.</translation>
     </message>
     <message>
         <source>Delete Job?</source>
@@ -5341,10 +4654,6 @@ Myth wird nun beendet.</translation>
         <translation>Regisseur</translation>
     </message>
     <message>
-        <source>Filesize</source>
-        <translation type="obsolete">Dateigröße</translation>
-    </message>
-    <message>
         <source>Recording Group</source>
         <translation>Aufnahmegruppe</translation>
     </message>
@@ -5369,10 +4678,6 @@ Myth wird nun beendet.</translation>
         <translation>&apos;%1&apos; nicht ausführen</translation>
     </message>
     <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation type="obsolete">Schaltet die Unterstützung für den Via XvMC Hardware MPEG Dekoder ein. Nur beim Via Unichrome Chipsatz verfügbar.</translation>
-    </message>
-    <message>
         <source>Machine Status</source>
         <translation>Rechner</translation>
     </message>
@@ -5383,14 +4688,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>and the MythTV server</source>
         <translation>und der MythTV Server</translation>
-    </message>
-    <message>
-        <source>used</source>
-        <translation type="obsolete">belegt</translation>
-    </message>
-    <message>
-        <source>free</source>
-        <translation type="obsolete">frei</translation>
     </message>
     <message>
         <source>Uptime</source>
@@ -5427,42 +4724,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>MythTV server</source>
         <translation>MythTV Server</translation>
-    </message>
-    <message>
-        <source>Disk space:</source>
-        <translation type="obsolete">Speicherplatz:</translation>
-    </message>
-    <message>
-        <source>Recordings</source>
-        <translation type="obsolete">Aufnahmen</translation>
-    </message>
-    <message>
-        <source>DB error - RecordFilePrefix unknown</source>
-        <translation type="obsolete">Datenbankfehler - RecordFilePrefix unbekannt</translation>
-    </message>
-    <message>
-        <source>TV buffer</source>
-        <translation type="obsolete">TV Puffer</translation>
-    </message>
-    <message>
-        <source>DB error - LiveBufferDir unknown</source>
-        <translation type="obsolete">Datenbankfehler - LiveBufferDir unbekannt</translation>
-    </message>
-    <message>
-        <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="obsolete">Möchten Sie die Einstellungen aller TV-Karten löschen bevor Sie mit der Konfiguration beginnen?</translation>
-    </message>
-    <message>
-        <source>No, leave my card settings alone</source>
-        <translation type="obsolete">Nein, nicht löschen</translation>
-    </message>
-    <message>
-        <source>Yes, delete my card settings</source>
-        <translation type="obsolete">Ja, die Karteneinstellungen löschen</translation>
-    </message>
-    <message>
-        <source>%1% Completed @ %2 fps.</source>
-        <translation type="obsolete">%1% fertig @ %2 fps.</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5569,10 +4830,6 @@ Myth wird nun beendet.</translation>
         <translation>Der Befehl mit dem dieses Frontend den Datenbankserver startet.</translation>
     </message>
     <message>
-        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Deinterlace Algorithmus. &apos;Kernel&apos; benötigt SSE Unterstützung. &apos;Bob&apos; funktioniert nur falls Xv oder XvMC zur Videoausgabe vewendet werden.</translation>
-    </message>
-    <message>
         <source>Enable gamma correction for video</source>
         <translation>Aktiviere Gamma-Korrektur</translation>
     </message>
@@ -5593,34 +4850,6 @@ Myth wird nun beendet.</translation>
         <translation>Aufgenommen von</translation>
     </message>
     <message>
-        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="obsolete">Möchten Sie alle Programminformationen und Sendereinstellungen löschen, bevor Sie mit der Konfiguration beginnen? Dies hat auf bestehende Aufnahmen keine Auswirkung.</translation>
-    </message>
-    <message>
-        <source>No, leave my channel settings alone</source>
-        <translation type="obsolete">Nein, nicht löschen</translation>
-    </message>
-    <message>
-        <source>Yes, delete my channel settings</source>
-        <translation type="obsolete">Ja, die Sendereinstellungen löschen</translation>
-    </message>
-    <message>
-        <source>Scan for channels(s)</source>
-        <translation type="obsolete">Sendersuchlauf</translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="obsolete">Damit wird die Suche nach digitalen Sendern gestartet.</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="obsolete">Erweitert</translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="obsolete">Erweiterte Optionen für digitale Sender</translation>
-    </message>
-    <message>
         <source>Use on air guide</source>
         <translation>EPG über DVB benutzen</translation>
     </message>
@@ -5639,10 +4868,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Return to Menu</source>
         <translation>Zurück ins Menü</translation>
-    </message>
-    <message>
-        <source>Searching for Logo</source>
-        <translation type="obsolete">Suche nach Logo</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -5721,24 +4946,12 @@ Myth wird nun beendet.</translation>
         <translation>Scannen</translation>
     </message>
     <message>
-        <source>Scan Activity</source>
-        <translation type="obsolete">Scanaktivität</translation>
-    </message>
-    <message>
         <source>This recording schedule is inactive</source>
         <translation>Diese Aufnahme ist inaktiv</translation>
     </message>
     <message>
         <source>This recording schedule is active</source>
         <translation>Diese Aufnahme ist aktiv</translation>
-    </message>
-    <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="obsolete">TS-Format zum Aufnehmen benutzen statt PS.</translation>
-    </message>
-    <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="obsolete">Deaktiviert die Umwandlung vom Transport-Stream zum Program-Stream. Das Aufnehmen in TS erzeugt etwas größere Dateien, dabei sinkt aber das Fehler-Risiko bei der Umwandlung.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5910,24 +5123,8 @@ Myth wird nun beendet.</translation>
         <translation>Die älteste Aufnahme löschen,  falls die max. Anzahl an Aufnahmen für diese Serie überschritten würde.</translation>
     </message>
     <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="obsolete">pcHDTV TV-Karte (HD-2000, HD-3000)</translation>
-    </message>
-    <message>
         <source>All</source>
         <translation>Alle</translation>
-    </message>
-    <message>
-        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Die Voreinstellung der &apos;Werbung markieren&apos; Funktion für neu geplante Aufnahmen.</translation>
-    </message>
-    <message>
-        <source>Use libmpeg2 for decoding</source>
-        <translation type="obsolete">Nutze libmpeg2 zur Wiedergabe</translation>
-    </message>
-    <message>
-        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
-        <translation type="obsolete">Falls aktiviert, wird libmpeg2 anstatt ffmpeg benutzt um MPEG-1/2 Videos zu dekodieren. libmpeg2 kann schneller sein, ist aber nicht verfügbar falls XvMC genutzt wird.</translation>
     </message>
     <message>
         <source>4/3</source>
@@ -5962,28 +5159,12 @@ Myth wird nun beendet.</translation>
         <translation>Folge beim Dateien löschen symb. Links</translation>
     </message>
     <message>
-        <source>Firewire Model</source>
-        <translation type="obsolete">Firewire Modell</translation>
-    </message>
-    <message>
-        <source>Firewire Port</source>
-        <translation type="obsolete">Firewire Anschluß</translation>
-    </message>
-    <message>
         <source>Firewire port on your firewire card.</source>
         <translation>Der Anschluß auf Ihrer Firewire-Karte.</translation>
     </message>
     <message>
-        <source>Firewire Node</source>
-        <translation type="obsolete">Firewire Knoten</translation>
-    </message>
-    <message>
         <source>Firewire node is the remote device.</source>
         <translation>Das entfernte Gerät.</translation>
-    </message>
-    <message>
-        <source>Firewire Speed</source>
-        <translation type="obsolete">Firewire Geschwindigkeit</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -6004,10 +5185,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
         <translation>Im Moment wird nur MPEG2TS unterstützt.</translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation type="obsolete">Firewire Eingang</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -6109,10 +5286,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Nutze LCD-Display</translation>
     </message>
     <message>
-        <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="obsolete">MythTV kann verschiedene Statusinformationen auf einem LCD-Display ausgeben. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
-    </message>
-    <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation>Diese globale Einstellung erlaubt es MythTV, eine Aufnahme vorzeitig zu beginnen. Dies hat keine Auswirkung auf die Aufnahmeplanung und wird ignoriert, falls zwischen zwei Aufnahmen nicht genügend Zeit ist.</translation>
     </message>
@@ -6129,10 +5302,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Nicht aufnehmen</translation>
     </message>
     <message>
-        <source>Firewire Connection Type</source>
-        <translation type="obsolete">Firewire Verbindungstyp</translation>
-    </message>
-    <message>
         <source>Point to Point</source>
         <translation>Point to Point</translation>
     </message>
@@ -6141,28 +5310,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Broadcast</translation>
     </message>
     <message>
-        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="obsolete">USB MPEG-4 Enkoder (Plextor ConvertX, u.a.)</translation>
-    </message>
-    <message>
         <source>Original Air date</source>
         <translation>Produktionsjahr/Sendezeit</translation>
     </message>
     <message>
-        <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation type="obsolete">Für Xinerama Nutzer; benutze nur den angegebenen Bildschirm. Bei -1 werden alle Bildschirme genutzt.</translation>
-    </message>
-    <message>
         <source>TV audio through PVR-350 only</source>
         <translation>TV-Ton nur über PVR-350</translation>
-    </message>
-    <message>
-        <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation type="obsolete">Normalerweise wird bei PVR-350 TV-Karten der Ton über eine Soundkarte geschleift. Aktivieren Sie diese Option falls dies bei Ihnen nicht der Fall ist. MythTV kann in diesem Fall die Lautstärke nicht regeln.</translation>
-    </message>
-    <message>
-        <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="obsolete">%1 Frames fertig @ %2 fps.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
@@ -6171,22 +5324,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Cable</source>
         <translation>Kabel</translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="obsolete">ATSC-Transponder</translation>
-    </message>
-    <message>
-        <source>ATSC transport, cable or terrestrial</source>
-        <translation type="obsolete">ATSC Transponder, Kabel oder Terrestrisch</translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="obsolete">Nutze Harware MPEG Dekoder</translation>
-    </message>
-    <message>
-        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="obsolete">Falls Ihre DVB-Karte einen MPEG-Dekoder besitzt, können Sie Ihn hiermit aktivieren (nur bei bestimmten Karten und USB-Geräten).</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -6225,10 +5362,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Werbungserkennung bereits während der Aufnahme</translation>
     </message>
     <message>
-        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation type="obsolete">Falls gesetzt, wird bereits während der Aufnahme nach Werbung gesucht. Dazu muß autom. Werbemarkierung aktiviert sein. Nur bei leistungsstarken Rechnern empfohlen.</translation>
-    </message>
-    <message>
         <source>Job Queue (Job Commands)</source>
         <translation>Auftragsliste (Befehle)</translation>
     </message>
@@ -6237,44 +5370,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Springe zurück</translation>
     </message>
     <message>
-        <source>Default Auto Commercial Flagging setting</source>
-        <translation type="obsolete">Voreinstellung der &apos;Werbung markieren&apos; Funktion</translation>
-    </message>
-    <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
         <translation>Falls gesetzt, wird für neue Aufnahmen die &apos;Werbung markieren&apos; Funktion standardmäßig aktiviert sein.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #1&apos; setting</source>
-        <translation type="obsolete">Voreinstellung für den Auftragstyp 1</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 1 standardmäßig aktiviert sein.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #2&apos; setting</source>
-        <translation type="obsolete">Voreinstellung für den Auftragstyp 2</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 2 standardmäßig aktiviert sein.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #3&apos; setting</source>
-        <translation type="obsolete">Voreinstellung für den Auftragstyp 3</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 3 standardmäßig aktiviert sein.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #4&apos; setting</source>
-        <translation type="obsolete">Voreinstellung für den Auftragstyp 4</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 4 standardmäßig aktiviert sein.</translation>
     </message>
     <message>
         <source>Run on the specified screen or spanning all screens.</source>
@@ -6880,10 +5977,6 @@ Myth wird nun beendet.</translation>
         <translation>es war markiert als &quot;Niemals aufnehmen&quot;.</translation>
     </message>
     <message>
-        <source>Status: </source>
-        <translation type="obsolete">Status: </translation>
-    </message>
-    <message>
         <source>Channel Separator</source>
         <translation>Trennzeichen für Sender (bei ATSC)</translation>
     </message>
@@ -6954,14 +6047,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Channel</source>
         <translation>Kanal</translation>
-    </message>
-    <message>
-        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">Geben Sie entweder eine Frequenz (in Hertz) oder einen für Ihre TV-Norm gültigen Kanal ein.</translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="obsolete">Geben Sie hier zur Feinabstimmung eine Frequenz (in Hertz) an, die zur Kanalfrequenz addiert wird.</translation>
     </message>
     <message>
         <source>A</source>
@@ -7506,52 +6591,12 @@ Myth wird nun beendet.</translation>
         <translation>Die maximale Zeit, die auf einem digitalen Sender verbracht werden soll, bevor der nächste Sender nach EPG-Daten durchsucht wird.</translation>
     </message>
     <message>
-        <source>Scan Progress</source>
-        <translation type="obsolete">Scan-Fortschritt</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from DataDirect service...</source>
-        <translation type="obsolete">Hole Senderliste von DataDirect...</translation>
-    </message>
-    <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation>Dies funktioniert normalerweise nur bei DVB- oder ATSC-Sendern,</translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation>und liefert nur für die nächsten Tage EPG-Daten.</translation>
-    </message>
-    <message>
-        <source>Capture Card Menu</source>
-        <translation type="obsolete">TV-Kartenmenü</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Bearbeiten..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Löschen..</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this capture card?</source>
-        <translation type="obsolete">Soll diese TV-Karte wirklich gelöscht werden?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture card</source>
-        <translation type="obsolete">Ja, Karte löschen</translation>
-    </message>
-    <message>
-        <source>Video Source Menu</source>
-        <translation type="obsolete">Videoquellen Menü</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video source?</source>
-        <translation type="obsolete">Soll diese Videoquelle wirklich gelöscht werden?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video source</source>
-        <translation type="obsolete">Ja, Videoquelle löschen</translation>
     </message>
     <message>
         <source>Ignore Signal Timeout</source>
@@ -8025,10 +7070,6 @@ Myth wird nun beendet.</translation>
         <translation>Fehler beim Einstellen der Transponderfrequenz</translation>
     </message>
     <message>
-        <source>Error detecting card type</source>
-        <translation type="obsolete">Fehler beim Ermitteln des Karten-Typs</translation>
-    </message>
-    <message>
         <source>Error parsing parameters</source>
         <translation>Fehler beim Analysieren der Parameter</translation>
     </message>
@@ -8043,17 +7084,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Failed to parse : </source>
         <translation>Fehler beim analysieren: </translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardTuningPage</name>
-    <message>
-        <source>Failed to open the card</source>
-        <translation type="obsolete">Konnte die Karte nicht ansprechen</translation>
-    </message>
-    <message>
-        <source>Failed to probe the card</source>
-        <translation type="obsolete">Konnte die Karte nicht finden</translation>
     </message>
 </context>
 <context>
@@ -8186,14 +7216,6 @@ Keine weiteren Informationen</translation>
     <message>
         <source>Position</source>
         <translation>Position</translation>
-    </message>
-    <message>
-        <source>Forward </source>
-        <translation type="obsolete">Vorwärts</translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
@@ -8364,14 +7386,6 @@ Keine weiteren Informationen</translation>
         <translation>Springe zu</translation>
     </message>
     <message>
-        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="obsolete">Sie sehen gerade zeitverzögert fern. Wenn Sie nun umschalten geht der noch folgende Teil verloren.</translation>
-    </message>
-    <message>
-        <source>Change the channel anyway</source>
-        <translation type="obsolete">Dennoch umschalten</translation>
-    </message>
-    <message>
         <source>Zoom Mode OFF</source>
         <translation>Zoom AUS</translation>
     </message>
@@ -8414,10 +7428,6 @@ Keine weiteren Informationen</translation>
     <message>
         <source>Enable/Disable</source>
         <translation>Ein-/Ausschalten</translation>
-    </message>
-    <message>
-        <source>Swap Channels</source>
-        <translation>Sender tauschen</translation>
     </message>
     <message>
         <source>Change Active Window</source>
@@ -8522,10 +7532,6 @@ Keine weiteren Informationen</translation>
     <message>
         <source>(REC)</source>
         <translation>(REC)</translation>
-    </message>
-    <message>
-        <source>Auto-Skip Pre-Notify</source>
-        <translation type="obsolete">Auto-Sprung Vorwarnung</translation>
     </message>
     <message>
         <source>Jump to Beginning</source>
@@ -8648,10 +7654,6 @@ Keine weiteren Informationen</translation>
         <translation>Ok</translation>
     </message>
     <message>
-        <source>Manual Record</source>
-        <translation type="obsolete">Manuelle Aufnahme</translation>
-    </message>
-    <message>
         <source>Previous Recording</source>
         <translation>Vorherige Aufnahme</translation>
     </message>
@@ -8678,10 +7680,6 @@ Keine weiteren Informationen</translation>
     <message>
         <source>CC:</source>
         <translation>CC:</translation>
-    </message>
-    <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">Wieder aktivieren</translation>
     </message>
     <message>
         <source>Cancel Record</source>
@@ -8732,6 +7730,10 @@ Keine weiteren Informationen</translation>
     <message>
         <source>Speed 1/4X</source>
         <translation>Zeitlupe 1/4x</translation>
+    </message>
+    <message>
+        <source>Swap PiP/Main</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
