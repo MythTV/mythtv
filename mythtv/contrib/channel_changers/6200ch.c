@@ -56,11 +56,18 @@
 
 #define STARTING_NODE 1  /* skip 1394 nodes to avoid error msgs */
 #define STARTING_PORT 0
+#define RETRY_COUNT_SLOW 1
+#define RETRY_COUNT_FAST 0
+
+void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn);
+void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn);
 
 void usage()
 {
-   fprintf(stderr, "Usage: 6200ch [-v] [-n NODE] [-p PORT] <channel_num>\n");
-   fprintf(stderr, "-v        Print additional verbose output\n");
+   fprintf(stderr, "Usage: 6200ch [-v] [-s] [-n NODE] [-p PORT] "
+           "<channel_num>\n");
+   fprintf(stderr, "-v        print additional verbose output\n");
+   fprintf(stderr, "-s        use single packet method\n");
    fprintf(stderr, "-n NODE   node to start device scanning on (default:%i)\n",
            STARTING_NODE);
    fprintf(stderr, "-p PORT   port/adapter to use              (default:%i)\n",
@@ -74,8 +81,8 @@ int main (int argc, char *argv[])
    int device = -1;
    int i;
    int verbose = 0;
+   int single_packet = 0;
    quadlet_t cmd[2];
-   int dig[3];
    int chn = 550;
 
    /* some people experience crashes when starting on node 1 */
@@ -88,11 +95,15 @@ int main (int argc, char *argv[])
       usage();
 
    opterr = 0;
-   while ((c = getopt(argc, argv, "vn:p:")) != -1) {
+   while ((c = getopt(argc, argv, "vsn:p:")) != -1)
+   {
        switch (c) {
        case 'v':
            verbose = 1;
            break;
+       case 's':
+	   single_packet = 1;
+	   break;
        case 'n':
            starting_node = atoi(optarg);
            break;
@@ -177,6 +188,21 @@ int main (int argc, char *argv[])
         exit(1);
    }
 
+   if (single_packet)
+       set_chan_fast(handle, device, verbose, chn);
+   else
+       set_chan_slow(handle, device, verbose, chn);
+
+   raw1394_destroy_handle(handle);
+   exit(0);
+}
+
+void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn)
+{
+   int i;
+   int dig[3];
+   quadlet_t cmd[2];
+
    dig[2] = (chn % 10);
    dig[1] = (chn % 100)  / 10;
    dig[0] = (chn % 1000) / 100;
@@ -190,10 +216,22 @@ int main (int argc, char *argv[])
       cmd[0] = CTL_CMD0 | dig[i];
       cmd[1] = 0x0;
     
-      avc1394_transaction_block(handle, device, cmd, 2, 1);
+      avc1394_transaction_block(handle, device, cmd, 2, RETRY_COUNT_SLOW);
       usleep(500000);  // small delay for button to register
    }
+}
 
-   raw1394_destroy_handle(handle);
-   exit(0);
+void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn)
+{
+    quadlet_t cmd[3];
+
+    cmd[0] = CTL_CMD0 | 0x67;
+    cmd[1] = (0x04 << 24) | (chn << 8) | 0x000000FF;
+    cmd[2] = 0xFF << 24;
+
+    if (verbose)
+        printf("AV/C command for channel %d = 0x%08X %08X %08X\n", 
+               chn, cmd[0], cmd[1], cmd[2]);
+ 
+    avc1394_transaction_block(handle, device, cmd, 3, RETRY_COUNT_FAST);
 }
