@@ -1,18 +1,23 @@
-#include <qapplication.h>
-#include <qdatetime.h>
-#include <qfileinfo.h>
+// ANSI C headers
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
 
-#include <stdio.h>
-#include <stdlib.h>
+// POSIX C headers
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <errno.h>
 #include <pthread.h>
+
+// Qt headers
 #include <qsocket.h>
 #include <qfile.h>
 #include <qregexp.h>
+#include <qapplication.h>
+#include <qdatetime.h>
+#include <qfileinfo.h>
 
 using namespace std;
 
@@ -464,7 +469,8 @@ void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 uint RingBuffer::GetBitrate(void) const
 {
     QMutexLocker locker(&bitratelock);
-    return (uint) (rawbitrate * playspeed);
+    uint tmp = max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
+    return min(rawbitrate * 3, tmp);
 }
 
 /** \fn RingBuffer::GetReadBlockSize(void) const
@@ -501,7 +507,8 @@ void RingBuffer::CalcReadAheadThresh(void)
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
 
-    estbitrate     = (uint) (rawbitrate * playspeed);
+    estbitrate     = max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
+    estbitrate     = min(rawbitrate * 3, estbitrate);
     wantseek       = false;
     readsallowed   = false;
     fill_min       = 1;
