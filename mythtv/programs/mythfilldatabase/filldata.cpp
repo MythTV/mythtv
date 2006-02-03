@@ -2594,7 +2594,10 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate, DD_ZAP2IT);
     else if (xmltv_grabber == "technovera")
-        return grabDDData(source, offset, *qCurrentDate, DD_LXM);
+    {
+        VERBOSE(VB_ALL, "This grabber is no longer supported");
+        exit(FILLDB_EXIT_INVALID_CMDLINE);
+    }
         
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
@@ -2909,14 +2912,13 @@ bool fillData(QValueList<Source> &sourcelist)
             if (!grabData(*it, 0))
                 ++failures;
         }
-        else if ((xmltv_grabber == "datadirect" || xmltv_grabber == "technovera") && dd_grab_all)
+        else if ((xmltv_grabber == "datadirect") && dd_grab_all)
         {
             QDate qCurrentDate = QDate::currentDate();
 
             grabData(*it, 0, &qCurrentDate);
         }
         else if (xmltv_grabber == "datadirect" ||
-                 xmltv_grabber == "technovera" ||
                  xmltv_grabber == "tv_grab_se_swedb" ||
                  xmltv_grabber == "tv_grab_no" ||
                  xmltv_grabber == "tv_grab_de_tvtoday" ||
@@ -2939,8 +2941,7 @@ bool fillData(QValueList<Source> &sourcelist)
             // often decided by the person maintaining the grabbers.
             if (maxDays > 0) // passed with --max-days
                 grabdays = maxDays;
-            else if (xmltv_grabber == "datadirect" ||
-                     xmltv_grabber == "technovera")
+            else if (xmltv_grabber == "datadirect")
                 grabdays = 14;
             else if (xmltv_grabber == "tv_grab_se_swedb")
                 grabdays = 10;
@@ -3822,8 +3823,7 @@ int main(int argc, char *argv[])
                        newsource.lineupid = sourcequery.value(5).toString();
 
                        sourcelist.append(newsource);
-                       if (newsource.xmltvgrabber == "datadirect" || 
-                           newsource.xmltvgrabber == "technovera")
+                       if (newsource.xmltvgrabber == "datadirect")
                            usingDataDirect = true;
                   }
              }

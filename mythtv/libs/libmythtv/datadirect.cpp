@@ -15,9 +15,7 @@
 
 const QString DataDirectURLS[] =
 {
-    "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
-    "http://webservices.technovera.tmsdatadirect.com/"
-    "technovera/tvlistings/xtvdService",
+    "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService"
 };
 
 // XXX Program duration should be stored as seconds, not as a QTime.

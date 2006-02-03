@@ -841,9 +841,6 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
     addTarget("datadirect", new DataDirect_config(parent));
     grabber->addSelection("North America (DataDirect)", "datadirect");
     
-    addTarget("technovera", new DataDirect_config(parent, DD_LXM));
-    grabber->addSelection("LxM (United States)", "technovera");
-
 #ifdef USING_DVB_EIT
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
