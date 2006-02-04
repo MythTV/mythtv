@@ -36,6 +36,7 @@
 #include "dvbtypes.h"
 #include "dvbconfparser.h"
 #include "mythdbcon.h"
+#include "channelutil.h"
 
 void DVBConfParser::Multiplex::dump()
 {
@@ -156,6 +157,8 @@ bool DVBConfParser::parseConfATSC(QStringList& tokens)
     if (i == end || !c.modulation.parseConf(*i++)) return false;
     // We need the program number in the transport stream,
     // otherwise we cannot "tune" to the program.
+    if (i == end ) return false; else i++;   // Ignore video pid
+    if (i == end ) return false; else i++;   // Ignore audio pid
     if (i != end) c.serviceid = (*i++).toInt(); else return false;
 
     channels.append(c);
@@ -349,24 +352,44 @@ int DVBConfParser::findMultiplex(const DVBConfParser::Multiplex& m)
     return -1;
 }
 
-int DVBConfParser::findChannel(const DVBConfParser::Channel& c)
+int DVBConfParser::findChannel(const DVBConfParser::Channel &c, int &mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid FROM channel where mplexid=:MPLEXID AND "
-                  "sourceid=:SOURCEID AND callsign=:CALLSIGN;");
-    query.bindValue(":MPLEXID",multiplexes[c.mplexnumber].mplexid);
-    query.bindValue(":SOURCEID",sourceid);
-    query.bindValue(":CALLSIGN",c.name.utf8());
 
-    if (!query.exec())
+    // try to find exact match first
+    query.prepare("SELECT chanid "
+                  "FROM channel "
+                  "WHERE callsign = :CALLSIGN AND "
+                  "      mplexid  = :MPLEXID  AND "
+                  "      sourceid = :SOURCEID");
+    query.bindValue(":MPLEXID",  multiplexes[c.mplexnumber].mplexid);
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":CALLSIGN", c.name.utf8());
+
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("searching for channel", query);
-    if (!query.isActive())
-        MythContext::DBError("searching for channel.", query);
-    if (query.size() > 0)
+    else if (query.next())
     {
-       query.next();
-       return query.value(0).toInt();
+        mplexid = multiplexes[c.mplexnumber].mplexid;
+        return query.value(0).toInt();
     }
+
+    // if we didn't find exact match, try to match just the source & callsign
+    query.prepare("SELECT chanid, mplexid "
+                  "FROM channel "
+                  "WHERE callsign = :CALLSIGN AND "
+                  "      sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":CALLSIGN", c.name.utf8());
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("searching for channel", query);
+    else if (query.next())
+    {
+        mplexid = query.value(1).toInt();
+        return query.value(0).toInt();
+    }
+
     return -1;
 } 
 
@@ -446,34 +469,90 @@ void DVBConfParser::processChannels()
        else
            multiplexes[i].mplexid = mplexid;
     }
+
+    // If the channel number cannot be determined from the config
+    // file, assign temporary unique numbers. First determine the
+    // highest channel number already assigned. This will likely
+    // fail if there are any ATSC channels, since channum is not
+    // really an integer. But in that case 501 is a generally safe
+    // offset for the first unknown channel.
+    int maxchannum = 500;
+    query.prepare("SELECT MAX(channum) FROM channel");
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Getting highest channel number.", query);
+    else if (query.next())
+        maxchannum = max(maxchannum, query.value(0).toInt());
+    for (iter = channels.begin(); iter != channels.end(); ++iter)
+        maxchannum = max(maxchannum, (*iter).lcn);
+
+    // Now insert the channels
     for (iter=channels.begin();iter!=channels.end();iter++)
     {
-        int chanid = findChannel(*iter);
+        int mplexid    = multiplexes[(*iter).mplexnumber].mplexid;
+        int db_mplexid = 0;
+        int chanid     = findChannel(*iter, db_mplexid);
         if (chanid < 0)
         {
+            // The channel does not exist in the DB at all, insert it.
             query.prepare("INSERT INTO channel (chanid, channum, "
                   "sourceid, callsign, name,  mplexid, "
                   "serviceid) "
                   "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
                   ":NAME,:MPLEXID,:SERVICEID);");
 
-            query.bindValue(":CHANID",generateNewChanID(sourceid));
-            query.bindValue(":CHANNUM",(*iter).lcn==-1 ? (*iter).serviceid:(*iter).lcn);
-            query.bindValue(":SOURCEID",sourceid);
-            query.bindValue(":CALLSIGN",(*iter).name.utf8());
-            query.bindValue(":NAME",(*iter).name.utf8());
-            query.bindValue(":MPLEXID",multiplexes[(*iter).mplexnumber].mplexid);
-            query.bindValue(":SERVICEID",(*iter).serviceid);
-            if (!query.exec())
-                MythContext::DBError("Adding new DVB Channel", query);
+            // If the channel number is unknown, get next unique number
+            int channum = (*iter).lcn;
+            if (-1 == channum)
+                channum = ++maxchannum;
 
-            if (!query.isActive())
+            int chanid = ChannelUtil::CreateChanID(
+                sourceid, QString::number(channum));
+
+            query.bindValue(":CHANID",    chanid);
+            query.bindValue(":CHANNUM",   channum);
+            query.bindValue(":SOURCEID",  sourceid);
+            query.bindValue(":CALLSIGN",  (*iter).name.utf8());
+            query.bindValue(":NAME",      (*iter).name.utf8());
+            query.bindValue(":MPLEXID",   mplexid);
+            query.bindValue(":SERVICEID", (*iter).serviceid);
+            if (!query.exec() || !query.isActive())
+            {
                 MythContext::DBError("Adding new DVB Channel", query);
-            emit updateText(QObject::tr("Adding %1").arg((*iter).name));
+                emit updateText(QObject::tr("Failed to add %1: DB error")
+                                .arg((*iter).name));
+            }
+            else
+            {
+                emit updateText(QObject::tr("Adding %1").arg((*iter).name));
+            }
+        }
+        else if (db_mplexid == 32767)
+        {
+            // The channel in the database if from the listings provider amd
+            // does not have tuning information. Just fill in the tuning info.
+            query.prepare("UPDATE channel "
+                          "SET mplexid   = :MPLEXID,  "
+                          "    serviceid = :SERVICEID "
+                          "WHERE chanid   = :CHANID   AND "
+                          "      sourceid = :SOURCEID     ");
+
+            query.bindValue(":MPLEXID",   mplexid);
+            query.bindValue(":SERVICEID", (*iter).serviceid);
+            query.bindValue(":CHANID",    chanid);
+            query.bindValue(":SOURCEID",  sourceid);
+
+            if (!query.exec() || !query.isActive())
+            {
+                MythContext::DBError("Updating DVB Channel", query);
+                emit updateText(QObject::tr("Failed to add %1: DB error")
+                                .arg((*iter).name));
+            }
+            else
+            {
+                emit updateText(QObject::tr("Updating %1").arg((*iter).name));
+            }
         }
         else
             emit updateText(QObject::tr("Skipping %1").arg((*iter).name));
     }
 }
-
-

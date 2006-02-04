@@ -113,7 +113,7 @@ protected:
     bool parseConfATSC(QStringList& tokens);
     void processChannels();
     int findMultiplex(const Multiplex& m);
-    int findChannel(const Channel& c);
+    int findChannel(const Channel& c, int& mplexid);
     int generateNewChanID(int sourceID);
 };
 
