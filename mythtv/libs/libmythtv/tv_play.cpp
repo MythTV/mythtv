@@ -4762,7 +4762,7 @@ void TV::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(14) == "DONE_RECORDING")
+        if (recorder && message.left(14) == "DONE_RECORDING")
         {
             if (GetState() == kState_WatchingRecording)
             {
@@ -4771,7 +4771,7 @@ void TV::customEvent(QCustomEvent *e)
                 int cardnum = tokens[1].toInt();
                 int filelen = tokens[2].toInt();
 
-                if (cardnum == recorder->GetRecorderNumber())
+                if (recorder && cardnum == recorder->GetRecorderNumber())
                 {
                     nvp->SetWatchingRecording(false);
                     nvp->SetLength(filelen);
@@ -4785,7 +4785,7 @@ void TV::customEvent(QCustomEvent *e)
                 int cardnum = tokens[1].toInt();
                 int filelen = tokens[2].toInt();
 
-                if (cardnum == recorder->GetRecorderNumber() &&
+                if (recorder && cardnum == recorder->GetRecorderNumber() &&
                     tvchain && tvchain->HasNext())
                 {
                     nvp->SetWatchingRecording(false);
@@ -4803,7 +4803,7 @@ void TV::customEvent(QCustomEvent *e)
             int hasrec    = tokens[3].toInt();
             VERBOSE(VB_IMPORTANT, LOC + message << " hasrec: "<<hasrec);
 
-            if (cardnum == recorder->GetRecorderNumber())
+            if (recorder && cardnum == recorder->GetRecorderNumber())
             {
                 menurunning = false;
                 AskAllowRecording(me->ExtraDataList(), timeuntil, hasrec);
@@ -4843,7 +4843,7 @@ void TV::customEvent(QCustomEvent *e)
 
             uint s = (cardnum == recorder->GetRecorderNumber()) ? 0 : 1;
 
-            if (cardnum == recorder->GetRecorderNumber() ||
+            if ((recorder    && cardnum == recorder->GetRecorderNumber()) ||
                 (piprecorder && cardnum == piprecorder->GetRecorderNumber()))
             {
                 if (watch)
@@ -4905,7 +4905,7 @@ void TV::customEvent(QCustomEvent *e)
                 UpdateOSDSignal(signalList);
             }
         }
-        else if (message.left(7) == "SKIP_TO")
+        else if (recorder && message.left(7) == "SKIP_TO")
         {
             int cardnum = (QStringList::split(" ", message))[1].toInt();
             QStringList keyframe = me->ExtraDataList();
