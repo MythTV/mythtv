@@ -1308,14 +1308,29 @@ void TV::TeardownPlayer(void)
 {
     if (nvp)
     {
-        QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal using osd...
-        pthread_join(decode, NULL);
-        delete nvp;
-        nvp = NULL;
+        osdlock.lock(); // prevent UpdateOSDSignal from using osd...
+
+        NuppelVideoPlayer *xnvp = nvp;
+        pthread_t          xdec = decode;
+
+        nvp            = NULL;
+        activenvp      = NULL;
+        activerecorder = NULL;
+        activerbuffer  = NULL;
+
+        osdlock.unlock();
+
+        // NVP may try to get qapp lock if there is an error,
+        // so we need to do this outside of the osdlock.
+        pthread_join(xdec, NULL);
+        delete xnvp;
     }
 
     if (udpnotify)
+    {
         delete udpnotify;
+        udpnotify = NULL;
+    }
 
     paused = false;
     doing_ff_rew = 0;
@@ -1323,8 +1338,6 @@ void TV::TeardownPlayer(void)
     speed_index = 0;
     sleep_index = 0;
     normal_speed = 1.0f;
-
-    nvp = activenvp = NULL;
 
     pbinfoLock.lock();
     if (playbackinfo)
@@ -1358,14 +1371,20 @@ void TV::TeardownPipPlayer(void)
 {
     if (pipnvp)
     {
-        QMutexLocker locker(&osdlock);
-        pthread_join(pipdecode, NULL);
-        delete pipnvp;
-        pipnvp = NULL;
-    }
+        if (activerecorder == piprecorder)
+            ToggleActiveWindow();
 
-    if (activerecorder == piprecorder)
-        activerecorder = recorder;
+        osdlock.lock(); // prevent UpdateOSDSignal from using osd...
+        NuppelVideoPlayer *xnvp = pipnvp;
+        pthread_t          xdec = pipdecode;
+        pipnvp = NULL;
+        osdlock.unlock();
+
+        // NVP may try to get qapp lock if there is an error,
+        // so we need to do this outside of the osdlock.
+        pthread_join(xdec, NULL);
+        delete xnvp;
+    }
 
     if (piprecorder)
     {
@@ -1483,10 +1502,11 @@ void TV::RunTV(void)
         if (netCmd != "")
             processNetworkControlCommand(netCmd);
 
-        if ((recorder && recorder->GetErrorStatus()) || IsErrored())
+        if ((recorder && recorder->GetErrorStatus()) ||
+            (nvp && nvp->IsErrored()) || IsErrored())
         {
             exitPlayer = true;
-            wantsToQuit = false;
+            wantsToQuit = true;
         }
 
         if (StateIsPlaying(internalState))
@@ -4864,7 +4884,7 @@ void TV::customEvent(QCustomEvent *e)
         {
             // Get osdlock, while intended for the OSD this ensures that
             // the nvp & pipnvp are not deleted while we are using it..
-            while (!osdlock.tryLock())
+            while (!osdlock.tryLock() && nvp)
                 usleep(2500);
 
             message = message.simplifyWhiteSpace();
