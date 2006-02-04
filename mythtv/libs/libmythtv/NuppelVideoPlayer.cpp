@@ -2982,8 +2982,8 @@ void NuppelVideoPlayer::DoPlay(void)
         ClearAfterSeek();
     }
 
-    float tmp = ffrew_skip / video_frame_rate / play_speed;
-    frame_interval = (int) (1000000.0f * tmp);
+    frame_interval = (int) (1000000.0f * ffrew_skip / video_frame_rate / 
+                            play_speed);
 
     VERBOSE(VB_PLAYBACK, LOC + "DoPlay: " +
             QString("rate: %1 speed: %2 skip: %3 => new interval %4")
