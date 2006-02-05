@@ -1215,7 +1215,7 @@ void TVRec::RunTV(void)
         // Check for the end of the current program..
         if (GetState() == kState_WatchingLiveTV)
         {
-/#define LIVETV_END (now >= curRecording->endts)
+#define LIVETV_END (now >= curRecording->endts)
 // use the following instead to test ringbuffer switching
 //static QDateTime last = QDateTime::currentDateTime(); 
 //#define LIVETV_END ((now >= curRecording->recstartts.addSecs(20)) && (now > last))
