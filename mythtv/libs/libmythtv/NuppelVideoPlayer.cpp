@@ -2260,6 +2260,8 @@ void NuppelVideoPlayer::JumpToProgram(void)
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
 
+    livetvchain->SetProgram(pginfo);
+
     ringBuffer->Reset(true);
     ringBuffer->OpenFile(pginfo->pathname);
     if (!ringBuffer->IsOpen())
@@ -2284,7 +2286,6 @@ void NuppelVideoPlayer::JumpToProgram(void)
     ringBuffer->Unpause();
     ringBuffer->IgnoreLiveEOF(false);
 
-    livetvchain->SetProgram(pginfo);
     GetDecoder()->SetProgramInfo(pginfo);
     if (m_tv)
         m_tv->SetCurrentlyPlaying(pginfo);
@@ -2457,6 +2458,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (m_playbackinfo)
             m_playbackinfo->UpdateInUseMark();
 
+printf("loop: %d %d %d %d\n", paused, eof, livetvchain->NeedsToSwitch(), livetvchain->NeedsToJump());
         if ((!paused || eof) && livetvchain && !GetDecoder()->GetWaitForChange())
         {
             if (livetvchain->NeedsToSwitch())
@@ -2497,9 +2499,9 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (eof)
         {
-            if (livetvchain && livetvchain->HasNext())
+            if (livetvchain)
             {
-                if (!paused)
+                if (!paused && livetvchain->HasNext())
                 {
                     livetvchain->JumpToNext(true, 1);
                     continue;
