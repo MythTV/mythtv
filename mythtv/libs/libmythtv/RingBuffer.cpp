@@ -470,7 +470,7 @@ void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 uint RingBuffer::GetBitrate(void) const
 {
     QMutexLocker locker(&bitratelock);
-    uint tmp = max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
+    uint tmp = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
     return min(rawbitrate * 3, tmp);
 }
 
@@ -508,7 +508,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
 
-    estbitrate     = max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
+    estbitrate     = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
     estbitrate     = min(rawbitrate * 3, estbitrate);
     wantseek       = false;
     readsallowed   = false;
