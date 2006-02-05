@@ -2252,13 +2252,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 return false;
             }
 
-            if (waitingForChange)
-            {
-                VERBOSE(VB_PLAYBACK,
-                        "pkt->pos: "<<pkt->pos<<" readAdjust: "
-                        <<readAdjust);
-            }
-
             if (waitingForChange && pkt->pos >= readAdjust)
                 FileChanged();
 
