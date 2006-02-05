@@ -2458,7 +2458,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (m_playbackinfo)
             m_playbackinfo->UpdateInUseMark();
 
-printf("loop: %d %d %d %d\n", paused, eof, livetvchain->NeedsToSwitch(), livetvchain->NeedsToJump());
         if ((!paused || eof) && livetvchain && !GetDecoder()->GetWaitForChange())
         {
             if (livetvchain->NeedsToSwitch())
