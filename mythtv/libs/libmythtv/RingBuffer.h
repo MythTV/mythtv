@@ -142,6 +142,7 @@ class RingBuffer
     bool ateof;
     bool readsallowed;
     bool wantseek;
+    bool setswitchtonext;
 
     mutable QMutex bitratelock;
     uint           rawbitrate;

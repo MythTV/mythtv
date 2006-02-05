@@ -90,7 +90,7 @@ RingBuffer::RingBuffer(const QString &lfilename,
       pausereadthread(false),
       rbrpos(0),                rbwpos(0),
       internalreadpos(0),       ateof(false),
-      readsallowed(false),      wantseek(false),
+      readsallowed(false),      wantseek(false), setswitchtonext(false),
       rawbitrate(8000),         playspeed(1.0f),
       fill_threshold(-1),       fill_min(-1),
       readblocksize(128000),    wanttoread(0),
@@ -341,6 +341,7 @@ void RingBuffer::Reset(bool full, bool toAdjust)
     wantseek = false;
     numfailures = 0;
     commserror = false;
+    setswitchtonext = false;
 
     writepos = 0;
     readpos = (toAdjust) ? (readpos - readAdjust) : 0;
@@ -754,10 +755,11 @@ void RingBuffer::ReadAheadThread(void)
             {
                 if (livetvchain)
                 {
-                    if (!ateof && !ignoreliveeof && livetvchain->HasNext())
+                    if (!setswitchtonext && !ignoreliveeof && 
+                        livetvchain->HasNext())
                     {
                         livetvchain->SwitchToNext(true);
-                        ateof = true;
+                        setswitchtonext = true;
                     }
                 }
                 else
