@@ -670,6 +670,11 @@ void DecoderBase::SetWaitForChange(void)
     waitingForChange = true;
 }
 
+bool DecoderBase::GetWaitForChange(void)
+{
+    return waitingForChange;
+}
+
 void DecoderBase::ChangeDVDTrack(bool ffw)
 {
     bool result = true;

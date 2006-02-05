@@ -86,6 +86,7 @@ class DecoderBase
     bool IsErrored() { return errored; }
 
     void SetWaitForChange(void);
+    bool GetWaitForChange(void);
     void SetReadAdjust(long long adjust);
 
     // DVD public stuff

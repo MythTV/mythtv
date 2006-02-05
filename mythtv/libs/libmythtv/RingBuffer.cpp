@@ -754,7 +754,7 @@ void RingBuffer::ReadAheadThread(void)
             {
                 if (livetvchain)
                 {
-                    if (!ignoreliveeof && livetvchain->HasNext())
+                    if (!ateof && !ignoreliveeof && livetvchain->HasNext())
                     {
                         livetvchain->SwitchToNext(true);
                         ateof = true;

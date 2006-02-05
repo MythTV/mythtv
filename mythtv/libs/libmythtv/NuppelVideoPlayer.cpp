@@ -2178,9 +2178,10 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     if (eof)
         discontinuity = true;
 
+    livetvchain->SetProgram(pginfo);
+
     if (discontinuity || newtype)
     {
-        livetvchain->SetProgram(pginfo);
         GetDecoder()->SetProgramInfo(pginfo);
 
         ringBuffer->Reset(true);
@@ -2456,7 +2457,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (m_playbackinfo)
             m_playbackinfo->UpdateInUseMark();
 
-        if ((!paused || eof) && livetvchain)
+        if ((!paused || eof) && livetvchain && !GetDecoder()->GetWaitForChange())
         {
             if (livetvchain->NeedsToSwitch())
                 SwitchToProgram();
@@ -2496,7 +2497,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (eof)
         {
-            if (livetvchain)
+            if (livetvchain && livetvchain->HasNext())
             {
                 if (!paused)
                 {
