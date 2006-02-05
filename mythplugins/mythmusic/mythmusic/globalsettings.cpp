@@ -25,24 +25,6 @@ static HostLineEdit *SetMusicDirectory()
     return gc;
 };
 
-static HostComboBox *MusicAudioDevice()
-{
-    HostComboBox *gc = new HostComboBox("AudioDevice", true);
-    gc->setLabel(QObject::tr("Audio device"));
-    QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
-    gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("adsp*");
-    gc->fillSelectionsFromDir(dev);
-
-    dev.setNameFilter("dsp*");
-    dev.setPath("/dev/sound");
-    gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("adsp*");
-    gc->fillSelectionsFromDir(dev);
-    gc->setHelpText(QObject::tr("Audio Device used for playback."));
-    return gc;
-};
-
 static HostComboBox *CDDevice()
 {
     HostComboBox *gc = new HostComboBox("CDDevice", true);
@@ -546,7 +528,6 @@ MusicGeneralSettings::MusicGeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
     general->addChild(SetMusicDirectory());
-    general->addChild(MusicAudioDevice());
     general->addChild(CDDevice());
     general->addChild(TreeLevels());
     general->addChild(NonID3FileNameFormat());
