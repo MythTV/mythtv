@@ -3115,7 +3115,7 @@ void TV::ChangeSpeed(int direction)
     int old_speed = speed_index;
 
     if (paused)
-        speed_index = -4;
+        speed_index = -6;
 
     speed_index += direction;
 
