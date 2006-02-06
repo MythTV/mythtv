@@ -567,7 +567,7 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
             }
         }
 
-        if (total == 0)
+        if (total == 0 && (vidread != vidwrite))
         {
             ateof = true;
 #ifdef EXTRA_DEBUG
