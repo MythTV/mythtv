@@ -3649,13 +3649,17 @@ bool TV::ProcessSmartChannel(QString &inputStr)
         return false;
 
     // Check for and remove duplicate separator characters
-    if ((chan.length() > 2) && (chan.right(1) == chan.right(2).left(1)) &&
-        !chan.right(1).toUInt())
+    if ((chan.length() > 2) && (chan.right(1) == chan.right(2).left(1)))
     {
-        chan = chan.left(chan.length()-1);
+        bool ok;
+        chan.right(1).toUInt(&ok);
+        if (!ok)
+        {
+            chan = chan.left(chan.length()-1);
 
-        QMutexLocker locker(&queuedInputLock);
-        queuedChanNum = QDeepCopy<QString>(chan);
+            QMutexLocker locker(&queuedInputLock);
+            queuedChanNum = QDeepCopy<QString>(chan);
+        }
     }
 
     // Look for channel in line-up
@@ -3669,7 +3673,7 @@ bool TV::ProcessSmartChannel(QString &inputStr)
 #if DEBUG_CHANNEL_PREFIX
     VERBOSE(VB_IMPORTANT, QString("valid_pref(%1) cardid(%2) chan(%3) "
                                   "pref_cardid(%4) complete(%5) sp(%6)")
-            .arg(valid_prefix).arg(cardid).arg(chan)
+            .arg(valid_prefix).arg(0).arg(chan)
             .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
 #endif
 
@@ -3689,7 +3693,7 @@ bool TV::ProcessSmartChannel(QString &inputStr)
 #if DEBUG_CHANNEL_PREFIX
     VERBOSE(VB_IMPORTANT, QString(" ValidPref(%1) CardId(%2) Chan(%3) "
                                   " PrefCardId(%4) Complete(%5) Sp(%6)")
-            .arg(valid_prefix).arg(cardid).arg(GetQueuedChanNum())
+            .arg(valid_prefix).arg(0).arg(GetQueuedChanNum())
             .arg(pref_cardid).arg(is_not_complete).arg(needed_spacer));
 #endif
 
