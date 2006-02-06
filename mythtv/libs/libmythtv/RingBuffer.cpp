@@ -39,7 +39,7 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
-const uint RingBuffer::kBufferSize = 10 * 256000;
+const uint RingBuffer::kBufferSize = 10 * 256 * 1024;
 
 #define PNG_MIN_SIZE   20 /* header plus one empty chunk */
 #define NUV_MIN_SIZE  204 /* header size? */

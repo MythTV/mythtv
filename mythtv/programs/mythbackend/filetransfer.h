@@ -1,8 +1,15 @@
 #ifndef FILETRANSFER_H_
 #define FILETRANSFER_H_
 
-#include <qstring.h>
+// POSIX headers
 #include <pthread.h>
+
+// C++ headers
+#include <vector>
+using namespace std;
+
+// Qt headers
+#include <qstring.h>
 #include <qmutex.h>
 
 class RingBuffer;
@@ -36,7 +43,7 @@ class FileTransfer
     QSocket *sock;
     bool ateof;
 
-    char requestBuffer[256001];
+    vector<char> requestBuffer;
 };
 
 #endif

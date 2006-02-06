@@ -68,19 +68,18 @@ int FileTransfer::RequestBlock(int size)
     int ret = 0;
 
     readthreadLock.lock();
+    requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
+    char *buf = &requestBuffer[0];
     while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
     {
         int request = size - tot;
 
-        if (request > 256000)
-            request = 256000;
-
-        ret = rbuffer->Read(requestBuffer, request);
+        ret = rbuffer->Read(buf, request);
         
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
 
-        if (!WriteBlock(sock->socketDevice(), requestBuffer, (uint)ret))
+        if (!WriteBlock(sock->socketDevice(), buf, (uint)ret))
         {
             tot = -1;
             break;
@@ -92,10 +91,7 @@ int FileTransfer::RequestBlock(int size)
     }
     readthreadLock.unlock();
 
-    if (ret < 0)
-        tot = -1;
-
-    return tot;
+    return (ret < 0) ? -1 : tot;
 }
 
 long long FileTransfer::Seek(long long curpos, long long pos, int whence)
