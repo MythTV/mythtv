@@ -891,19 +891,18 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
                         " seconds for data to become available...");
             }
 
-            bool quit = false;
-            if (livetvchain && elapsed > 8000)
-            {
-                livetvchain->ReloadAll();
-                quit = livetvchain->NeedsToSwitch() || 
-                       livetvchain->NeedsToJump();
-            }
+            bool quit = livetvchain && (livetvchain->NeedsToSwitch() || 
+                                        livetvchain->NeedsToJump());
 
             if (elapsed > 16000 || quit)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
-                        QString("%1").arg(elapsed/1000) +
-                        " seconds for data, aborting.");
+                if (!quit)
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
+                            QString("%1").arg(elapsed/1000) +
+                            " seconds for data, aborting.");
+                else
+                    VERBOSE(VB_IMPORTANT, LOC + "Timing out wait due to "
+                            "impending livetv switch.");
 
                 ateof = true;
                 wanttoread = 0;

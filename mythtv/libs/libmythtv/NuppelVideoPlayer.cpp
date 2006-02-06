@@ -2508,6 +2508,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                     livetvchain->JumpToNext(true, 1);
                     continue;
                 }
+                VERBOSE(VB_PLAYBACK, "Ignoring livetv eof in decoder loop");
             }
             else
                 break;
