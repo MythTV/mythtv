@@ -1662,12 +1662,16 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             seq_count++;
 
             if (!seen_gop && seq_count > 1)
+            {
                 HandleGopStart(pkt);
+                pkt->flags |= PKT_FLAG_KEY;
+            }
         }
         else if (GOP_START == state)
         {
             HandleGopStart(pkt);
             seen_gop = true;
+            pkt->flags |= PKT_FLAG_KEY;
         }
     }
 
@@ -2286,19 +2290,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
-            if (framesRead == 0 && !justAfterChange && 
-                !(pkt->flags & PKT_FLAG_KEY))
-            {
-                av_free_packet(pkt);
-                continue;
-            }
-
-            framesRead++;
-            justAfterChange = false;
-
-            if (exitafterdecoded)
-                gotvideo = 1;
-
             AVCodecContext *context = curstream->codec;
 
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
@@ -2324,6 +2315,19 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                 }
             }
+
+            if (framesRead == 0 && !justAfterChange &&
+                !(pkt->flags & PKT_FLAG_KEY))
+            {
+                av_free_packet(pkt);
+                continue;
+            }
+
+            framesRead++;
+            justAfterChange = false;
+
+            if (exitafterdecoded)
+                gotvideo = 1;
         }
 
         if (len > 0 &&
