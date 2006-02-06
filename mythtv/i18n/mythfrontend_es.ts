@@ -7274,7 +7274,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation>Trascodificación</translation>
+        <translation>Recodificación</translation>
     </message>
     <message>
         <source>Forward</source>
@@ -7282,7 +7282,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation>Salto adelante</translation>
+        <translation>Salto Adelante</translation>
     </message>
     <message>
         <source>Rewind</source>
@@ -7736,7 +7736,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternar PiP/Principal</translation>
     </message>
 </context>
 <context>
