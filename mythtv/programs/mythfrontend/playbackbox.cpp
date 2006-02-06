@@ -4004,76 +4004,67 @@ void PlaybackBox::showRecGroupChooser(void)
     QStringList groups;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT recgroup, COUNT(title) FROM recorded "
-        "WHERE deletepending = 0 GROUP BY recgroup;");
-
     QString itemStr;
     QString dispGroup;
     int items;
     int totalItems = 0;
-    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
+    bool liveTVInAll = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
     recGroupType.clear();
 
     recGroupListBox = new MythListBox(recGroupPopup);
 
+    // Find each recording group, and the number of recordings in each
+    query.prepare(
+        "SELECT recgroup, COUNT(title) "
+        "FROM recorded "
+        "WHERE deletepending = 0 "
+        "GROUP BY recgroup");
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
             dispGroup = query.value(0).toString();
-            items = query.value(1).toInt();
-
-            if (items == 1)
-                itemStr = tr("item");
-            else
-                itemStr = tr("items");
-
-            if (dispGroup == "Default")
-                dispGroup = tr("Default");
-            else if (dispGroup == "LiveTV")
-                dispGroup = tr("LiveTV");
+            items     = query.value(1).toInt();
+            itemStr   = (items == 1) ? tr("item") : tr("items");
+            dispGroup = (dispGroup == "Default") ? tr("Default") : dispGroup;
+            dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
 
             groups += QString("%1 [%2 %3]").arg(dispGroup)
                               .arg(items).arg(itemStr);
 
             recGroupType[query.value(0).toString()] = "recgroup";
 
-            if (dispGroup != "LiveTV" || LiveTVInAllPrograms)
+            if (dispGroup != "LiveTV" || liveTVInAll)
                 totalItems += items;
         }
     }
 
-    if (totalItems == 1)
-        itemStr = tr("item");
-    else
-        itemStr = tr("items");
-
+    // Create and add the "All Programs" entry
+    itemStr = (totalItems == 1) ? tr("item") : tr("items");
     recGroupListBox->insertItem(QString("%1 [%2 %3]").arg(tr("All Programs"))
                                         .arg(totalItems).arg(itemStr));
     recGroupType["All Programs"] = "recgroup";
 
+    // Add the group entries
     recGroupListBox->insertItem(QString("------- %1 -------")
                                         .arg(tr("Groups")));
     groups.sort();
     recGroupListBox->insertStringList(groups);
     groups.clear();
 
-    query.prepare("SELECT DISTINCT category, COUNT(title) "
-                   "FROM recorded GROUP BY category;");
-
+    // Find each category, and the number of recordings in each
+    query.prepare(
+        "SELECT DISTINCT category, COUNT(title) "
+        "FROM recorded "
+        "GROUP BY category");
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
             dispGroup = query.value(0).toString();
-            items = query.value(1).toInt();
-
-            if (items == 1)
-                itemStr = tr("item");
-            else
-                itemStr = tr("items");
+            items     = query.value(1).toInt();
+            itemStr   = (items == 1) ? tr("item") : tr("items");
 
             if (!recGroupType.contains(dispGroup))
             {
@@ -4085,14 +4076,17 @@ void PlaybackBox::showRecGroupChooser(void)
         }
     }
 
+    // Add the category entries
     recGroupListBox->insertItem(QString("------- %1 -------")
                                 .arg(tr("Categories")));
     groups.sort();
     recGroupListBox->insertStringList(groups);
 
+    // Now set up the widget
     recGroupPopup->addWidget(recGroupListBox);
     recGroupListBox->setFocus();
 
+    // figure out what our recGroup is called in the recGroupPopup
     if (recGroup == "All Programs")
         dispGroup = tr("All Programs");
     else if (recGroup == "Default")
@@ -4102,8 +4096,12 @@ void PlaybackBox::showRecGroupChooser(void)
     else
         dispGroup = recGroup;
 
-    recGroupListBox->setCurrentItem(
-        recGroupListBox->index(recGroupListBox->findItem(dispGroup)));
+    // select the recGroup in the dialog
+    int index = recGroupListBox->index(recGroupListBox->findItem(dispGroup));
+    // HACK make the selection show up by selecting a different item first.
+    recGroupListBox->setCurrentItem((index + 1) % 2);
+    recGroupListBox->setCurrentItem(index);
+
     recGroupLastItem = recGroupListBox->currentItem();
 
     connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
