@@ -901,12 +901,9 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
 
             if (elapsed > 16000 || quit)
             {
-                if (!quit)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
-                            QString("%1").arg(elapsed/1000) +
-                            " seconds for data, aborting.");
-                }
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
+                        QString("%1").arg(elapsed/1000) +
+                        " seconds for data, aborting.");
 
                 ateof = true;
                 wanttoread = 0;

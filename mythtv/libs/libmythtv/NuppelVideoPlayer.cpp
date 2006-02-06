@@ -2219,6 +2219,8 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
 void NuppelVideoPlayer::FileChangedCallback(void)
 {
+    VERBOSE(VB_PLAYBACK, "FileChangedCallback");
+
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
 
@@ -2502,6 +2504,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             {
                 if (!paused && livetvchain->HasNext())
                 {
+                    VERBOSE(VB_IMPORTANT, "LiveTV forcing JumpTo 1");
                     livetvchain->JumpToNext(true, 1);
                     continue;
                 }
