@@ -685,7 +685,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Create New Playback Group</source>
-        <translation>Eine neue Wiedergabegruppe erzeugen</translation>
+        <translation>Eine neue Wiedergabegruppe anlegen</translation>
     </message>
     <message>
         <source>Delete playback group:</source>
@@ -701,7 +701,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation>Gruppennamen eingeben oder nach &apos;SELECT&apos; den Text über die Bildschirmtastatur eingeben.</translation>
+        <translation>Den Gruppennamen oder nach &apos;SELECT&apos; den Text über die virtuelle Tastatur eingeben.</translation>
     </message>
     <message>
         <source>(Create new group)</source>
@@ -1598,11 +1598,11 @@ Kehre nun ins vorherige Menü zurück.</translation>
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
-        <translation>Wieviele Sekunden beim Vorwärts-Springen auslassen.</translation>
+        <translation>Um wieviele Sekunden beim Vorwärts-Springen gesprungen werden soll.</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
-        <translation>Wieviele Sekunden beim Rückwärts-Springen auslassen.</translation>
+        <translation>Um wieviele Sekunden beim Rückwärts-Springen gesprungen werden soll.</translation>
     </message>
     <message>
         <source>Seek to exact frame</source>
@@ -5379,11 +5379,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Auflösung für die eine bestimmte Wiedergabeauflösung notwendig ist.</translation>
     </message>
     <message>
         <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Auflösung für die eine bestimmte Wiedergabeauflösung notwendig ist.</translation>
     </message>
     <message>
         <source>GUI</source>
@@ -5679,7 +5679,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie die Aufnahmegruppe aus, die im &apos;Aufnahmen ansehen&apos; Menü standardmäßig angezeigt werden soll.</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
@@ -6014,7 +6014,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Auto Expire Default</source>
-        <translation>Autom. Löschen aktivieren für neue Aufnahmen</translation>
+        <translation>Autom. Löschen bei neuen Aufnahmen aktivieren</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
@@ -6092,7 +6092,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichert Aufnahmen im TS-Format (Transport Stream) ab, anstatt Sie ins PS-Format (Program Stream) umzuwandeln. Bei der Umwandlung gehen Daten verloren und zwingt MythTV dazu, einige Sicherheitschecks zu umgehen.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
@@ -6220,7 +6220,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird selten benötigt, z.B. wenn Sie eine Satellitenschüssel besitzen und für den Sendersuchlauf eine Startfrequenz  eingeben müssen.</translation>
     </message>
     <message>
         <source>(5_1) Underscore</source>
@@ -6256,7 +6256,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation type="unfinished">Sie sollten auch im Frontend ihre bevorzugten Sprachen festlegen (Zubehör/Konfiguration : Konfiguration : TV : Grundeinstellungen (Seite 3) festlegen).</translation>
+        <translation>Sie sollten auch im Frontend ihre bevorzugten Sprachen festlegen (Zubehör/Konfiguration : Konfiguration : Erscheinungsbild : Lokalisierung).</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6372,7 +6372,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie hier eine Zahl &lt;= der Anzahl der CPUs des Backends ein, das die Umwandlung vornehmen wird.</translation>
     </message>
     <message>
         <source>MPEG-2 Parameters</source>
@@ -6428,7 +6428,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Option nur ab Kanal 78 an aufwärts zu suchen existiert, da die meisten digitalen Sender in diesem Bereich liegen.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
@@ -6608,7 +6608,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur die EPG-Daten des EIT-Service verwenden.</translation>
     </message>
     <message>
         <source>UDP Notify OSD time-out</source>
@@ -6688,7 +6688,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Schedule Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Planungsinformationen</translation>
     </message>
     <message>
         <source>List previous episodes</source>
@@ -6716,11 +6716,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Skip ahead (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Springe vorwärts (Sek.)</translation>
     </message>
     <message>
         <source>Skip back (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Springe zurück (Sek.)</translation>
     </message>
     <message>
         <source>Time stretch (speed x 100)</source>
@@ -6728,7 +6728,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anfängliche Wiedergabegeschwindigkeit mit angepasstem Ton. 100 steht für normale, 50 für halbe und 200 für doppelte Geschwindigkeit.</translation>
     </message>
     <message>
         <source>Playback Group</source>
@@ -6740,15 +6740,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Daily Wakeup/ShutDown Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Tägliches Start/Stop Intervall</translation>
     </message>
     <message>
         <source>Use &quot;%1&quot; playback group settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutze die Einstellungen der &apos;%1&apos; Wiedergabegruppe</translation>
     </message>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird MythTV autom. so viele Sekunden zurück springen nachdem ein Werbeblock übersprungen wurde.</translation>
     </message>
     <message>
         <source>Title Pronounce</source>
@@ -6808,7 +6808,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaubt dem Umwandler das Videobild in der Größe anzupassen</translation>
     </message>
     <message>
         <source>Lossless transcoding</source>
@@ -6820,7 +6820,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished">Gruppennamen eingeben oder nach &apos;SELECT&apos; den Text über die Bildschirmtastatur eingeben.</translation>
+        <translation>Gruppennamen eingeben oder nach &apos;SELECT&apos; den Text über die Bildschirmtastatur eingeben.</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
@@ -6828,7 +6828,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Name wird beim Fernsehen angezeigt. Stellen Sie sicher dass der Name für jeden Videoeingang eindeutig ist.</translation>
     </message>
     <message>
         <source>Enable DTS to SPDIF passthrough</source>
@@ -6860,7 +6860,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation>Die Beispiele gelten für das Heute.</translation>
+        <translation>Die Beispiele gelten für das heutige Datum.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
@@ -6940,19 +6940,19 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt und der Umwandler ist aktiv, werden die originalen Dateien nach der Umwandlung in &apos;.old&apos; umbenannt.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie entweder eine Frequenz (in KHz) oder einen für Ihre TV-Norm gültigen Kanal ein.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie hier zur Feinabstimmung eine Frequenz (in KHz) an, die zur Kanalfrequenz addiert wird.</translation>
     </message>
     <message>
         <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenverhältnis beim Vergrößern beibehalten</translation>
     </message>
     <message>
         <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
@@ -6964,19 +6964,19 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Enable Network Remote Control interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Fernsteuerung via LAN</translation>
     </message>
     <message>
         <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaubt die Steuerung von mythfrontend über das Netzwerk.</translation>
     </message>
     <message>
         <source>Network Remote Control Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port für die Fernsteuerung</translation>
     </message>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Port auf dem auf eine Verbindung zur Fernsteuerung des Frontends gewartet wird.</translation>
     </message>
 </context>
 <context>
@@ -7164,7 +7164,7 @@ Keine weiteren Informationen</translation>
     </message>
     <message>
         <source>%1 of these are LiveTV and consume %2</source>
-        <translation>i%1 davon sind LiveTV und belegen %2</translation>
+        <translation>%1 davon sind LiveTV und belegen %2</translation>
     </message>
 </context>
 <context>
