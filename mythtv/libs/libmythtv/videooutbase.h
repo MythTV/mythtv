@@ -215,7 +215,8 @@ class VideoOutput
     bool WaitForAvailable(uint w) { return vbuffers.WaitForAvailable(w); }
 
     /// \brief Returns number of frames that are fully decoded.
-    int ValidVideoFrames(void) { return vbuffers.ValidVideoFrames(); }
+    virtual int ValidVideoFrames(void) const
+        { return vbuffers.ValidVideoFrames(); }
     /// \brief Returns number of frames available for decoding onto.
     int FreeVideoFrames(void) { return vbuffers.FreeVideoFrames(); }
     /// \brief Returns true iff enough frames are available to decode onto.

@@ -160,6 +160,11 @@ int VideoOutputIvtv::GetRefreshRate(void)
     return 0;
 }
 
+int VideoOutputIvtv::ValidVideoFrames(void) const
+{
+    return 131; // approximation for when output buffer is full...
+}
+
 bool VideoOutputIvtv::Init(int width, int height, float aspect, 
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)

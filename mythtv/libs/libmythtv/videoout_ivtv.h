@@ -59,6 +59,9 @@ class VideoOutputIvtv: public VideoOutput
         (void) allow_unsafe;
         return NULL;
     }
+
+    int ValidVideoFrames(void) const;
+
   private:
     typedef enum
     {
