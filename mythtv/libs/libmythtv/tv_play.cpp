@@ -1687,17 +1687,42 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     }
 }
 
+static bool has_action(QString action, const QStringList &actions)
+{
+    QStringList::const_iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it)
+    {
+        if (action == *it)
+            return true;
+    }
+    return false;
+}
+
 void TV::ProcessKeypress(QKeyEvent *e)
 {
 #if DEBUG_ACTIONS
-    VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress()");
+    VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress() ignoreKeys: "<<ignoreKeys);
 #endif // DEBUG_ACTIONS
 
     bool was_doing_ff_rew = false;
     bool redisplayBrowseInfo = false;
+    QStringList actions;
 
     if (ignoreKeys)
-        return;
+    {
+        if (!gContext->GetMainWindow()->TranslateKeyPress(
+                "TV Playback", e, actions))
+        {
+            return;
+        }
+
+        bool esc   = has_action("ESCAPE", actions);
+        bool pause = has_action("PAUSE",  actions);
+        bool play  = has_action("PLAY",   actions);
+
+        if ((!esc || browsemode) && !pause && !play)
+            return;
+    }
 
     if (editmode)
     {   
@@ -1731,7 +1756,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
 
-    QStringList actions;
     if (!gContext->GetMainWindow()->TranslateKeyPress(
             "TV Playback", e, actions))
     {
