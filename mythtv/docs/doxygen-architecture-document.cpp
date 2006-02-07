@@ -65,7 +65,7 @@ to documentation on the code itself.
       <a href="http://www.mega-nerd.com/SRC/api.html">Documented Externally</a>.
       We use this to support a different output sample rates than the sample
       rate used in the audio streams we play.
-  <dt>libmythsoundtouch</a>  <dd>Pitch preserving audio resampling library.
+  <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
       <a href="http://sky.prohosting.com/oparviai/soundtouch/">External Website</a>.
       We use this for the time-stretch feature.
   <dt>libmythui              <dd>Next Gen UI rendering library, not yet being used.
