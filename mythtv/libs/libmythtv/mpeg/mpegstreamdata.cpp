@@ -497,13 +497,6 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     if (!psip->IsCurrent()) // we don't cache the next table, for now
         DONE_WITH_PES_PACKET();
 
-    if (1!=tspacket->AdaptationFieldControl())
-    { // payload only, ATSC req.
-        VERBOSE(VB_RECORD,
-                "PSIP packet has Adaptation Field Control, not ATSC compiant");
-        DONE_WITH_PES_PACKET();
-    }
-
     if (tspacket->ScramplingControl())
     { // scrambled! ATSC, DVB require tables not to be scrambled
         VERBOSE(VB_RECORD,
