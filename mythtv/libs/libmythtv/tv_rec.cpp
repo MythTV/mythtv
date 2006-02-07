@@ -620,7 +620,7 @@ void TVRec::StartedRecording(ProgramInfo *curRec)
  *         programs. If the recording type is kFindOneRecord this find
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
- *  \param prematurestop If true, we only fetch the recording status.
+ *  \param curRec ProgramInfo or recording to mark as done
  */
 void TVRec::FinishedRecording(ProgramInfo *curRec)
 {
@@ -760,7 +760,8 @@ void TVRec::ChangeState(TVState nextState)
  *  \brief Calls RecorderBase::SetOption(const QString&,int) with the "name"d
  *         option from the recording profile.
  *  \sa RecordingProfile, RecorderBase
- *  \param "name" Profile/RecorderBase option to get/set.
+ *  \param profile RecordingProfile to use
+ *  \param name RecordingProfile option to get and RecorderBase option to set
  */
 void TVRec::SetOption(RecordingProfile &profile, const QString &name)
 {
@@ -1307,7 +1308,7 @@ void TVRec::RunTV(void)
     }
 }
 
-bool TVRec::WaitForEventThreadSleep(bool wake, unsigned long time)
+bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 {
     bool ok = false;
     MythTimer t;
@@ -1787,7 +1788,7 @@ DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
  *  \brief Checks if named channel exists on current tuner, or
  *         another tuner.
  *
- *  \param channelid channel to verify against tuners.
+ *  \param chanid channel to verify against tuners.
  *  \return true if the channel on another tuner and not current tuner,
  *          false otherwise.
  *  \sa EncoderLink::ShouldSwitchToAnotherCard(const QString&),
@@ -2565,12 +2566,12 @@ long long TVRec::GetKeyframePosition(long long desired)
     return -1;
 }
 
-/** \fn TVRec::GetMaxBitrate()
+/** \fn TVRec::GetMaxBitrate(void)
  *  \brief Returns the maximum bits per second this recorder can produce.
  *
- *  \sa EncoderLink::GetMaxBitrate(), RemoteEncoder::GetMaxBitrate()
+ *  \sa EncoderLink::GetMaxBitrate(void), RemoteEncoder::GetMaxBitrate(void)
  */
-long long TVRec::GetMaxBitrate()
+long long TVRec::GetMaxBitrate(void)
 {
     long long bitrate;
     if (genOpt.cardtype == "MPEG")
@@ -2587,9 +2588,10 @@ long long TVRec::GetMaxBitrate()
     return bitrate;
 }
 
-/** \fn TVRec::SpawnLiveTV()
+/** \fn TVRec::SpawnLiveTV(LiveTVChain*,bool)
  *  \brief Tells TVRec to spawn a "Live TV" recorder.
- *  \sa EncoderLink::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
+ *  \sa EncoderLink::SpawnLiveTV(LiveTVChain*,bool),
+ *      RemoteEncoder::SpawnLiveTV(LiveTVChain*,bool)
  */
 void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip)
 {
@@ -2997,7 +2999,9 @@ int TVRec::ChangeHue(bool direction)
  *
  *   You must call PauseRecorder() before calling this.
  *
- *  \param name channel to change to.
+ *  \param name channum of channel to change to
+ *  \param requestType tells us what kind of request to actually send to
+ *                     the tuning thread, kFlagDetect is usually sufficient
  */
 void TVRec::SetChannel(QString name, uint requestType)
 {
@@ -3263,7 +3267,7 @@ void TVRec::HandleTuning(void)
     }
 }
 
-/** \fn TuningShutdowns(const TuningRequest&)
+/** \fn TVRec::TuningShutdowns(const TuningRequest&)
  *  \brief This shuts down anything that needs to be shut down 
  *         before handling the passed in tuning request.
  */
@@ -3588,7 +3592,7 @@ static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
     // grab standard jobs flags from program info
     JobQueue::AddJobsToMask(rec->GetAutoRunJobs(), jobs);
 
-        // disable commercial flagging on PBS, BBC, etc.
+    // disable commercial flagging on PBS, BBC, etc.
     if (rec->chancommfree)
         JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, jobs);
 

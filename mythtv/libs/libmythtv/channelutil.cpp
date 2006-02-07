@@ -231,11 +231,11 @@ void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
     }
 }
 
-/** \fn CreateMultiplexes(int, const NetworkInformationTable*)
+/** \fn ChannelUtil::CreateMultiplexes(int, const NetworkInformationTable*)
  *
  */
-vector<uint> ChannelUtil::CreateMultiplexes(int sourceid,
-                                           const NetworkInformationTable *nit)
+vector<uint> ChannelUtil::CreateMultiplexes(
+    int sourceid, const NetworkInformationTable *nit)
 {
     vector<uint> muxes;
 

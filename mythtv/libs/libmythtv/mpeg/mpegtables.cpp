@@ -160,7 +160,7 @@ void  ProgramMapTable::Parse() const
     unsigned char *pos =
       const_cast<unsigned char*>
         (pesdata() + PSIP_OFFSET + pmt_header + ProgramInfoLength());
-    for (unsigned int i=0; pos < pesdata()+Length(); i++) {
+    for (uint i=0; pos < pesdata()+Length(); i++) {
         _ptrs.push_back(pos);
         pos += 5 + StreamInfoLength(i);
     }
@@ -169,8 +169,8 @@ void  ProgramMapTable::Parse() const
 }
 
 void ProgramMapTable::AppendStream(
-    unsigned int pid, unsigned int type,
-    unsigned char* streamInfo, unsigned int infoLength)
+    uint pid, uint type,
+    unsigned char* streamInfo, uint infoLength)
 {
     if (!StreamCount())
         _ptrs.push_back(pesdata() + PSIP_OFFSET +
@@ -254,6 +254,7 @@ bool ProgramMapTable::IsStillPicture(void) const
 
 /** \fn ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
  *  \brief Finds all pids matching type.
+ *  \param type StreamType to match
  *  \param pids vector pids will be added to
  *  \return number of pids in list
  */
@@ -283,8 +284,9 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
 
 /** \fn ProgramMapTable::FindPIDs(uint, vector<uint>&, vector<uint>&) const
  *  \brief Finds all pids w/types, matching type (useful for AnyVideo/AnyAudio).
- *  \param pids vector pids will be added to
- *  \param type vector types will be added to
+ *  \param type  StreamType to match
+ *  \param pids  vector pids will be added to
+ *  \param types vector types will be added to
  *  \return number of items in pids and types lists.
  */
 uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
@@ -324,7 +326,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
 const QString PSIPTable::toString() const
 {
     QString str;
-    //for (unsigned int i=0; i<9; i++)
+    //for (uint i=0; i<9; i++)
     //str.append(QString(" 0x%1").arg(int(pesdata()[i]), 0, 16));
     //str.append("\n");
     str.append(QString(" PSIP prefix(0x%1) tableID(0x%1) "
@@ -346,7 +348,7 @@ const QString ProgramAssociationTable::toString() const
     str.append(static_cast<const PSIPTable*>(this)->toString());
     str.append(QString("         tsid: %1\n").arg(TransportStreamID()));
     str.append(QString(" programCount: %1\n").arg(ProgramCount()));
-    for (unsigned int i=0; i<ProgramCount(); i++) {
+    for (uint i=0; i<ProgramCount(); i++) {
         const unsigned char* p=pesdata()+PSIP_OFFSET+(i<<2);
         str.append(QString("  program number %1").arg(int(ProgramNumber(i)))).
             append(QString(" has PID 0x%1   data ").arg(ProgramPID(i),4,16)).
@@ -372,7 +374,7 @@ const QString ProgramMapTable::toString() const
                        .arg(MPEGDescriptor(desc[i]).toString()));
     }
     str.append("\n");
-    for (unsigned int i=0; i<StreamCount(); i++)
+    for (uint i=0; i<StreamCount(); i++)
     {
         str.append(QString(" Stream #%1 pid(0x%2) type(%3  0x%4)\n")
                    .arg(i).arg(StreamPID(i), 0, 16)
@@ -389,7 +391,7 @@ const QString ProgramMapTable::toString() const
     return str;
 }
 
-const char *StreamID::toString(unsigned int streamID)
+const char *StreamID::toString(uint streamID)
 {
     // valid for some ATSC/DVB stuff too
     char* retval = "unknown";
@@ -453,7 +455,7 @@ const char *StreamID::toString(unsigned int streamID)
     return retval;
 }
 
-const QString ProgramMapTable::StreamTypeString(unsigned int i) const
+const QString ProgramMapTable::StreamTypeString(uint i) const
 {
     return QString( StreamID::toString(StreamType(i)) );
 }

@@ -82,7 +82,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     return signalMonitor;
 }
 
-/** \fn SignalMonitor::SignalMonitor(int,int)
+/** \fn SignalMonitor::SignalMonitor(int,ChannelBase*,uint,const char*)
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
@@ -92,8 +92,9 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *         if this is less than 0, SIGNAL events will not be
  *         sent to the frontend even if SetNotifyFrontend(true)
  *         is called.
- *  \param _channel ChannelBase class for our monitoring
+ *  \param _channel      ChannelBase class for our monitoring
  *  \param wait_for_mask SignalMonitorFlags to start with.
+ *  \param name          Instance name for Qt signal/slot debugging
  */
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                              uint wait_for_mask,  const char *name)

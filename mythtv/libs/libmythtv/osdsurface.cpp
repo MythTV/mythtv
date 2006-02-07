@@ -670,7 +670,7 @@ static void BlendToBlack(unsigned char *argbptr, uint width, uint outheight)
     }
 }
 
-/** \fn OSDSurface::BlendToARGB(unsigned char *,uint,uint,bool) const
+/** \fn OSDSurface::BlendToARGB(unsigned char *,uint,uint,bool,uint) const
  *  \brief Alpha blends OSDSurface to ARGB buffer.
  *
  *  \todo Currently blend_to_black is implemented as a post process
@@ -872,7 +872,7 @@ void OSDSurface::DitherToIA44(unsigned char* outbuf,
     DitherToI44(outbuf, false, stride, outheight);
 }
 
-/** \fn OSDSurface::DitherToAI44(unsigned char*,bool,uint,uint) const
+/** \fn OSDSurface::DitherToAI44(unsigned char*,uint,uint) const
  *  \brief Copies and converts OSDSurface to a greyscale AI44 buffer.
  *
  *  \param outbuf Output buffer

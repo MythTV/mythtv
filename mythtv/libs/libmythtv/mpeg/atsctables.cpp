@@ -4,7 +4,7 @@
 #include "atscdescriptors.h"
 #include "qstring.h"
 
-QString MasterGuideTable::TableClassString(unsigned int i) const 
+QString MasterGuideTable::TableClassString(uint i) const 
 {
     static const QString tts[] = {
         QString("UNKNOWN"),
@@ -23,7 +23,7 @@ QString MasterGuideTable::TableClassString(unsigned int i) const
     return tts[tt];
 }
 
-int MasterGuideTable::TableClass(unsigned int i) const 
+int MasterGuideTable::TableClass(uint i) const 
 {
     const int tt = TableType(i);
     if (tt < 6)
@@ -46,7 +46,7 @@ void MasterGuideTable::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(const_cast<unsigned char*>(pesdata()) + 12);
-    for (unsigned int i = 0; i < TableCount(); i++)
+    for (uint i = 0; i < TableCount(); i++)
         _ptrs.push_back(_ptrs[i] + 11 + TableDescriptorsLength(i));
 }
 
@@ -55,7 +55,7 @@ void VirtualChannelTable::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(const_cast<unsigned char*>(pesdata()) + 11);
-    for (unsigned int i = 0; i < ChannelCount(); i++)
+    for (uint i = 0; i < ChannelCount(); i++)
         _ptrs.push_back(_ptrs[i] + 32 + DescriptorsLength(i));
 }
 
@@ -63,7 +63,7 @@ void EventInformationTable::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(const_cast<unsigned char*>(pesdata()) + 11);
-    for (unsigned int i = 0; i < EventCount(); i++)
+    for (uint i = 0; i < EventCount(); i++)
         _ptrs.push_back(_ptrs[i] + 12 + TitleLength(i) + DescriptorsLength(i));
 }
 
@@ -71,7 +71,7 @@ QString MasterGuideTable::toString(void) const
 {
     QString str;
     str.append(QString("MGT: tables(%1)\n").arg(TableCount()));
-    for (unsigned int i = 0; i < TableCount(); i++)
+    for (uint i = 0; i < TableCount(); i++)
     {
         str.append(QString("Table #%1 ").arg(i, 2, 10));
         str.append(QString("pid(0x%1) ver(%2) ")
@@ -153,7 +153,7 @@ QString TerrestrialVirtualChannelTable::toString(void) const
     str.append(QString("VCT Terra: channels(%1) tsid(0x%2) ")
                .arg(ChannelCount()).arg(TransportStreamID(), 0, 16));
     str.append(QString("seclength(%3)\n").arg(Length()));
-    for (unsigned int i = 0; i < ChannelCount(); i++)
+    for (uint i = 0; i < ChannelCount(); i++)
     {
         str.append(toString(i)).append("\n");
     }
@@ -224,7 +224,7 @@ QString CableVirtualChannelTable::toString(void) const
     str.append(QString("VCT Cable: channels(%1) tsid(0x%2) ")
                .arg(ChannelCount()).arg(TransportStreamID(), 0, 16));
     str.append(QString("seclength(%3)\n").arg(Length()));
-    for (unsigned int i = 0; i < ChannelCount(); i++)
+    for (uint i = 0; i < ChannelCount(); i++)
     {
         str.append(toString(i)).append("\n");
     }

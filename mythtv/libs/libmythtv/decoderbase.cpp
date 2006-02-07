@@ -515,7 +515,7 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
     return last_frame;
 }
 
-/** \fn DoFastForward(long long, bool)
+/** \fn DecoderBase::DoFastForward(long long, bool)
  *  \brief Skips ahead or rewinds to desiredFrame.
  *
  *  If discardFrames is true and cached frames are released and playback
@@ -598,7 +598,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     return true;
 }
 
-/** \fn DoFastForwardSeek(long long,bool&)
+/** \fn DecoderBase::DoFastForwardSeek(long long,bool&)
  *  \brief Seeks to the keyframe just before the desiredFrame if exact
  *         seeks  is enabled, or the frame just after it if exact seeks
  *         is not enabled.

@@ -362,9 +362,9 @@ bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
     return true;
 }
 
-/** \fn DeviceReadBuffer::Read(unsigned char*, uint)
+/** \fn DeviceReadBuffer::Read(unsigned char*, const uint)
  *  \brief Try to Read count bytes from into buffer
- *  \param buffer Buffer to put data in
+ *  \param buf    Buffer to put data in
  *  \param count  Number of bytes to attempt to read
  *  \return number of bytes actually read
  */
@@ -406,7 +406,10 @@ uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
     return cnt;
 }
 
-/// \return bytes available for writing
+/** \fn DeviceReadBuffer::WaitForUnused(uint) const
+ *  \param needed Number of bytes we want to write
+ *  \return bytes available for writing
+ */
 uint DeviceReadBuffer::WaitForUnused(uint needed) const
 {
     size_t unused = GetUnused();
@@ -429,7 +432,10 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
     return min(contig, unused);
 }
 
-/// \return bytes available for reading
+/** \fn DeviceReadBuffer::WaitForUsed(uint) const
+ *  \param needed Number of bytes we want to read
+ *  \return bytes available for reading
+ */
 uint DeviceReadBuffer::WaitForUsed(uint needed) const
 {
     size_t avail = GetUsed();

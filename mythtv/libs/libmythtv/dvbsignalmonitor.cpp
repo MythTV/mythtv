@@ -43,7 +43,7 @@
  *                    is called.
  *  \param _channel DVBChannel for card
  *  \param _flags   Flags to start with
- *  \param _name    Name for Qt signal debugging
+ *  \param _name    Instance name for Qt signal/slot debugging
  */
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                                    uint _flags, const char *_name)
@@ -117,7 +117,7 @@ void DVBSignalMonitor::deleteLater(void)
     DTVSignalMonitor::deleteLater();
 }
 
-/** \fn DVBSignalMonitor::GetDVBCardNum(void)
+/** \fn DVBSignalMonitor::GetDVBCardNum(void) const
  *  \brief Returns DVB Card Number from DVBChannel.
  */
 int DVBSignalMonitor::GetDVBCardNum(void) const

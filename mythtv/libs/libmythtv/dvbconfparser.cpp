@@ -67,7 +67,7 @@ bool DVBConfParser::Multiplex::operator==(const Multiplex& m) const
 }
 
 DVBConfParser::DVBConfParser(enum TYPE _type,unsigned _sourceid,
-                                 const QString& _file)
+                             const QString& _file)
 {
     type=_type;
     filename = _file;

@@ -120,7 +120,7 @@ QString NuppelDecoder::GetEncodingType(void) const
     return (value);
 }
 
-inline bool NuppelDecoder::ReadFileheader(rtfileheader *fh)
+bool NuppelDecoder::ReadFileheader(struct rtfileheader *fh)
 {
     if (ringBuffer->Read(fh, FILEHEADERSIZE) != FILEHEADERSIZE)
         return false;
@@ -141,7 +141,7 @@ inline bool NuppelDecoder::ReadFileheader(rtfileheader *fh)
     return true;
 }
 
-inline bool NuppelDecoder::ReadFrameheader(rtframeheader *fh)
+bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 {
     if (ringBuffer->Read(fh, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         return false;

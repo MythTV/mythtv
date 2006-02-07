@@ -37,7 +37,7 @@
  *   and when the preview thread finishes running if Start(void) was called.
  */
 
-/** \fn PreviewGenerator(const ProgramInfo*,bool)
+/** \fn PreviewGenerator::PreviewGenerator(const ProgramInfo*,bool)
  *  \brief Constructor
  *
  *   ProgramInfo::pathname must include recording prefix, so that
@@ -324,7 +324,7 @@ void PreviewGenerator::EventSocketRead(void)
     }
 }
 
-/** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
+/** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
  *  \param pginfo       Recording to grab from.
@@ -334,6 +334,7 @@ void PreviewGenerator::EventSocketRead(void)
  *  \param bufferlen    Returns size of buffer returned (in bytes).
  *  \param video_width  Returns width of frame grabbed.
  *  \param video_height Returns height of frame grabbed.
+ *  \param video_aspect Returns aspect ratio of frame grabbed.
  *  \return Buffer allocated with new containing frame in RGBA32 format if
  *          successful, NULL otherwise.
  */

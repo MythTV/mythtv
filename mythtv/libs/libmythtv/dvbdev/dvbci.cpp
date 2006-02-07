@@ -1383,18 +1383,18 @@ void cCiCaPmt::AddElementaryStream(int type, int pid)
  *  \brief Inserts an Access Control (CA) Descriptor into a PMT.
  *
  *   The format of ca_pmt is:
-<code>
-ca_pmt_list_management
-<program header>
-if (program descriptors > 0)
+\code
+    ca_pmt_list_management
+    [program header]
+    if (program descriptors > 0)
         CPCI_OK_DESCRAMBLING
-<program descriptors>
-for each stream
-        <stream header>
+    [program descriptors]
+    for each stream
+        [stream header]
         if (stream descriptors > 0)
-                CPCI_OK_DESCRAMBLING
-        <stream descriptors>
-</code>
+            CPCI_OK_DESCRAMBLING
+        [stream descriptors]
+\endcode
  */
 void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8_t *data)
 {

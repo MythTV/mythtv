@@ -738,12 +738,12 @@ void VideoOutputDirectfb::DeleteDirectfbBuffers(void)
     data->buffers.clear();
 }
 
-int VideoOutputDirectfb::ChangePictureAttribute(int attributeType, int newValue)
+int VideoOutputDirectfb::ChangePictureAttribute(int attribute, int newValue)
 {
     data->videoLayer->GetColorAdjustment(data->videoLayer, (DFBColorAdjustment*) &adj);
     adj.flags = 0;
 
-    switch (attributeType) {
+    switch (attribute) {
     case kPictureAttribute_Brightness:
         if (data->videoLayerDesc.caps & DLCAPS_BRIGHTNESS ) {
             adj.flags = DCAF_BRIGHTNESS;

@@ -51,7 +51,7 @@ public:
       @param _sourceid the video source id 
       @param _cardid the card id to perform the scan on
      */
-    AnalogScan(unsigned _sorceid,unsigned _cardid);
+    AnalogScan(unsigned _sourceid, unsigned _cardid);
 
     ~AnalogScan();
 

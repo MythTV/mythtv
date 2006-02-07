@@ -755,7 +755,7 @@ void DumpPIL(int pil)
 #undef _PIL_
 }
 
-void CCDecoder::DecodeVPS(const uint8_t *buf)
+void CCDecoder::DecodeVPS(const unsigned char *buf)
 {
     int cni, pcs, pty, pil;
 
@@ -795,7 +795,7 @@ void CCDecoder::DecodeVPS(const uint8_t *buf)
 // // // // // // // // // // //  WSS  // // // // // // // // // // //
 // // // // // // // // // // // // // // // // // // // // // // // //
 
-void CCDecoder::DecodeWSS(const uint8_t *buf)
+void CCDecoder::DecodeWSS(const unsigned char *buf)
 {
     static const int wss_bits[8] = { 0, 0, 0, 1, 0, 1, 1, 1 };
     uint wss = 0;

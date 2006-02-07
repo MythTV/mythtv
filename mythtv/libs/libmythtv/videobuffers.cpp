@@ -114,6 +114,9 @@ VideoBuffers::~VideoBuffers()
  *                             after SetPrebuffering(false) has been called.
  * \param keepprebuffer        number of buffers in used or limbo that are considered
  *                             enough for decent playback.
+ * \param enable_frame_locking if true, the frames will be locked with a mutex,
+ *                             this makes XvMC decoding safe, but adds some CPU
+ *                             overhead. It is normally left off.
  */
 void VideoBuffers::Init(uint numdecode, bool extra_for_pause, 
                         uint need_free, uint needprebuffer_normal,

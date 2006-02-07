@@ -46,7 +46,7 @@
 
 #include "analogscan.h"
 
-AnalogScan::AnalogScan(unsigned _sourceid,unsigned _cardid) :
+AnalogScan::AnalogScan(unsigned _sourceid, unsigned _cardid) :
     fRunning(false),
     fStop(false),
     sourceid(_sourceid),

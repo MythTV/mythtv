@@ -17,7 +17,7 @@
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "pcHDTVSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
-/** \fn pcHDTVSignalMonitor::pcHDTVSignalMonitor(int,uint,int)
+/** \fn pcHDTVSignalMonitor::pcHDTVSignalMonitor(int,Channel*,uint,const char*)
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous signal
@@ -26,12 +26,13 @@
  *   the threshold is initialized to the value of the
  *   "ATSCCheckSignalThreshold" setting as a percentage.
  *
- *  \param _capturecardnum Recorder number to monitor,
+ *  \param _db_cardnum     Recorder number to monitor,
  *                         if this is less than 0, SIGNAL events will not be
  *                         sent to the frontend even if SetNotifyFrontend(true)
  *                         is called.
- *  \param _input          Input of device to monitor.
- *  \param _channel        File descriptor for device being monitored.
+ *  \param _channel        Channel class of device you want monitored
+ *  \param _flags          SignalMonitorFlags to start with
+ *  \param _name           Instance name for Qt signal/slot debugging
  */
 pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
                                          uint _flags, const char *_name)
@@ -179,7 +180,7 @@ void pcHDTVSignalMonitor::UpdateValues()
 template<typename V>
 V clamp(V val, V minv, V maxv) { return std::min(maxv, std::max(minv, val)); }
 
-/** \fn pcHDTVSignalMonitor::GetSignal(fd,uint,bool)
+/** \fn pcHDTVSignalMonitor::GetSignal(int,uint,bool)
  *  \brief Returns ATSC signal strength as a percentage from 0 to 100%.
  *
  *  \param fd        File descriptor of V4L device.

@@ -192,9 +192,9 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-/** \fn TV:TV()
+/** \fn TV::TV(void)
  *  \brief Performs instance initialiation not requiring access to database.
- *  \sa Init()
+ *  \sa Init(void)
  */
 TV::TV(void)
     : QObject(NULL, "TV"),
@@ -489,7 +489,7 @@ void TV::GetPlayGroupSettings(const QString &group)
         prev_speed = normal_speed;
 }
 
-/** \fn LiveTV(bool)
+/** \fn TV::LiveTV(bool,bool)
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
  *  \param startInGuide if true the EPG will be shown upon entering LiveTV
@@ -3608,7 +3608,7 @@ QString TV::GetQueuedChanNum(void) const
 
 /** \fn TV::ClearInputQueues(bool)
  *  \brief Clear channel key buffer of input keys.
- *  \param hideosd, if true hides "channel_number" OSDSet.
+ *  \param hideosd if true, hides "channel_number" OSDSet.
  */
 void TV::ClearInputQueues(bool hideosd)
 {
@@ -4334,6 +4334,7 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
  *  \brief Fetches information on the desired program from the backend.
  *  \param enc RemoteEncoder to query, if null query the activerecorder.
  *  \param direction BrowseDirection to get information on.
+ *  \param infoMap InfoMap to fill in with returned data
  */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap)
@@ -5048,7 +5049,7 @@ void TV::BrowseStart(void)
 
 /** \fn TV::BrowseEnd(bool)
  *  \brief Ends channel browsing. Changing the channel if change is true.
- *  \param change, iff true we call ChangeChannel()
+ *  \param change iff true we call ChangeChannel()
  */
 void TV::BrowseEnd(bool change)
 {

@@ -1294,7 +1294,7 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
     Table[EVENTS]->AddPid(0x12,0x7F,0x80,0x12); // see ticket #755
 }
 
-/** \fn GetLanguagePriority(const QString&)
+/** \fn SIParser::GetLanguagePriority(const QString&)
  *  \brief Returns the desirability of a particular language to the user.
  *
  *   The lower the returned number the more preferred the language is.
@@ -1950,7 +1950,7 @@ TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
      return retval;
 }
 
-/** \fn ProcessDVBEventDescriptors(uint,const unsigned char*,QString&,const unsigned char*,QString&, vector<const unsigned char*>&,Event&)
+/** \fn SIParser::ProcessDVBEventDescriptors(uint,const unsigned char*,const unsigned char*,uint,vector<const unsigned char*>&,Event&)
  *  \brief Processes non-language dependent DVB Event descriptors, and caches
  *         language dependent DVB Event descriptors for the most preferred
  *         language.
@@ -2057,7 +2057,7 @@ void SIParser::ProcessContentDescriptor(const uint8_t *buf, uint size, Event& e)
     }
 }
 
-/** \fn ProcessShortEventDescriptor(const uint8_t*,uint,Event&)
+/** \fn SIParser::ProcessShortEventDescriptor(const uint8_t*,uint,Event&)
  *  \brief Processes DVB Descriptor 0x4D - Short Event Descriptor - EIT
  */
 void SIParser::ProcessShortEventDescriptor(
@@ -2075,7 +2075,7 @@ void SIParser::ProcessShortEventDescriptor(
         e.Event_Subtitle = "";
 }
 
-/** \fn ProcessExtendedEventDescriptor(const uint8_t*,uint,Event&)
+/** \fn SIParser::ProcessExtendedEventDescriptor(const uint8_t*,uint,Event&)
  *  \brief Processes DVB Descriptor 0x4E - Extended Event - EIT
  */
 void SIParser::ProcessExtendedEventDescriptor(
@@ -2671,7 +2671,7 @@ QString SIParser::HuffmanToQString(uint8_t test[], uint16_t size,
     return QString("");
 }
 
-int SIParser::Huffman2GetBit(int bit_index, uint8_t *byteptr)
+int SIParser::Huffman2GetBit(int bit_index, unsigned char *byteptr)
 {
     int byte_offset;
     int bit_number;
@@ -2686,7 +2686,7 @@ int SIParser::Huffman2GetBit(int bit_index, uint8_t *byteptr)
 }
 
 uint16_t SIParser::Huffman2GetBits(int bit_index, int bit_count,
-                                   uint8_t *byteptr)
+                                   unsigned char *byteptr)
 {
     int i;
     uint bits = 0;
@@ -2697,7 +2697,8 @@ uint16_t SIParser::Huffman2GetBits(int bit_index, int bit_count,
     return bits;
 }
 
-int SIParser::Huffman2ToQString(uint8_t *compressed, int length, int table,
+int SIParser::Huffman2ToQString(unsigned char *compressed,
+                                int length, int table,
                                 QString &Decompressed)
 {
     int            i;

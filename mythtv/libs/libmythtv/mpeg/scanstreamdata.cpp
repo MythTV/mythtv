@@ -32,7 +32,7 @@ bool ScanStreamData::IsRedundant(const PSIPTable &psip) const
     return ATSCStreamData::IsRedundant(psip) || dvb.IsRedundant(psip);
 }
 
-/** \fn ScanStreamData::HandleTables(const PSIPTable&)
+/** \fn ScanStreamData::HandleTables(uint, const PSIPTable&)
  *  \brief Processes PSIP tables
  */
 bool ScanStreamData::HandleTables(uint pid, const PSIPTable &psip)
@@ -42,7 +42,7 @@ bool ScanStreamData::HandleTables(uint pid, const PSIPTable &psip)
     return h0 || h1;
 }
 
-void ScanStreamData::Reset()
+void ScanStreamData::Reset(void)
 {
     ATSCStreamData::Reset(-1,-1);
     ATSCStreamData::AddListeningPID(MPEG_PAT_PID);

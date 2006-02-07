@@ -58,7 +58,7 @@ class DVBDiSEqCConfigurationWizard: public ConfigurationWizard
 
 /** \fn CardUtil::IsCardTypePresent(const QString&)
  *  \brief Returns true if the card type is present
- *  \param [in]strType card type being checked for
+ *  \param strType card type being checked for
  */
 bool CardUtil::IsCardTypePresent(const QString &strType)
 {
@@ -85,7 +85,9 @@ bool CardUtil::IsCardTypePresent(const QString &strType)
 
 /** \fn CardUtil::GetDVBType(uint, QString&, QString&)
  *  \brief Returns the card type from the video device
- *  \param [in]device video dev to be checked
+ *  \param device    DVB videodevice to be checked
+ *  \param name      Returns the probed card name
+ *  \param card_type Returns the card type as a string
  *  \return the card type
  */
 enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
@@ -141,7 +143,7 @@ enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
  *   Currently the list of broken DVB hardware and drivers includes:
  *   "Philips TDA10046H DVB-T", "VLSI VES1x93 DVB-S", and "ST STV0299 DVB-S"
  *
- *  \param [in]device video dev to be checked
+ *  \param device video dev to be checked
  *  \return true iff the device munges tables, so that they fail a CRC check.
  */
 bool CardUtil::HasDVBCRCBug(uint device)
@@ -156,9 +158,9 @@ bool CardUtil::HasDVBCRCBug(uint device)
 
 /** \fn CardUtil::GetCardType(uint, QString&, QString&)
  *  \brief Returns the card type from the video device
- *  \param [in]nVideoDev video dev to be checked
- *  \param [out]name the probed card name
- *  \param [out]card_type the card_type as a string
+ *  \param nCardID   cardid of card to be checked
+ *  \param name      Returns the probed card name
+ *  \param card_type Returns the card type as a string
  *  \return the card type from CARD_TYPES enum
  */
 enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name,
@@ -201,8 +203,8 @@ enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name,
 
 /** \fn CardUtil::GetCardType(uint, QString&)
  *  \brief Returns the card type from the video device
- *  \param [in]nVideoDev video dev to be checked
- *  \param [out]name the probed card name
+ *  \param nCardID   cardid of card to be checked
+ *  \param name      Returns the probed card name
  *  \return the card type
  */
 enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name)
@@ -213,7 +215,7 @@ enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name)
 
 /** \fn CardUtil::GetCardType(uint)
  *  \brief Returns the card type from the video device
- *  \param [in]nVideoDev video dev to be checked
+ *  \param nCardID   cardid of card to be checked
  *  \return the card type
  */
 enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID)
@@ -234,8 +236,8 @@ bool CardUtil::IsDVBCardType(const QString card_type)
 
 /** \fn CardUtil::GetVideoDevice(uint, QString&)
  *  \brief Returns the card type from the video device
- *  \param [in]nVideoDev video dev to be checked
- *  \param [out]name the probed card name
+ *  \param nCardID   cardid of card to be checked
+ *  \param device    Returns the videodevice corresponding to cardid
  *  \return the card type
  */
 bool CardUtil::GetVideoDevice(uint nCardID, QString& device)
@@ -287,9 +289,9 @@ int CardUtil::GetCardID(const QString &videodevice, QString hostname)
 
 /** \fn CardUtil::GetVideoDevice(uint, QString&, QString&)
  *  \brief Returns the the video device associated with the card id
- *  \param [in]nCardID card id to check
- *  \param [out]device the returned device
- *  \param [out]vbi the returned vbi device
+ *  \param nCardID card id to check
+ *  \param device the returned device
+ *  \param vbi the returned vbi device
  *  \return true on success
  */
 bool CardUtil::GetVideoDevice(uint nCardID, QString& device, QString& vbi)
@@ -313,7 +315,7 @@ bool CardUtil::GetVideoDevice(uint nCardID, QString& device, QString& vbi)
 
 /** \fn CardUtil::IsDVB(uint)
  *  \brief Returns true if the card is a DVB card
- *  \param [in]nCardID card id to check
+ *  \param nCardID card id to check
  *  \return true if the card is a DVB one
  */
 bool CardUtil::IsDVB(uint nCardID)
@@ -336,7 +338,7 @@ bool CardUtil::IsDVB(uint nCardID)
 
 /** \fn CardUtil::GetDISEqCType(uint)
  *  \brief Returns the disqec type associated with a DVB card
- *  \param [in]nCardID card id to check
+ *  \param nCardID card id to check
  *  \return the disqec type
  */
 enum CardUtil::DISEQC_TYPES CardUtil::GetDISEqCType(uint nCardID)
@@ -358,7 +360,7 @@ enum CardUtil::DISEQC_TYPES CardUtil::GetDISEqCType(uint nCardID)
 
 /** \fn CardUtil::GetDefaultInput(uint)
  *  \brief Returns the default input for the card
- *  \param [in]nCardID card id to check
+ *  \param nCardID card id to check
  *  \return the default input
  */
 QString CardUtil::GetDefaultInput(uint nCardID)

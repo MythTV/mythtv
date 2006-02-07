@@ -91,7 +91,7 @@ void MPEGStreamData::DeletePartialPES(uint pid)
     }
 }
 
-/** \fn MPEGStreamData::AssemblePSIP(const TSPacket* tspacket)
+/** \fn MPEGStreamData::AssemblePSIP(const TSPacket*,bool&)
  *  \brief PES packet assembler.
  *
  *   This is not a general purpose TS->PES packet converter,
@@ -107,8 +107,10 @@ void MPEGStreamData::DeletePartialPES(uint pid)
  *   PSI stuffing bytes are 0xFF and will complete the
  *   remaining portion of the TSPacket.  (Section 2.4.4)
  *
- *   \note This method makes the assumption that AddTSPacket
- *   correctly handles duplicate packets.
+ *  \note This method makes the assumption that AddTSPacket
+ *        correctly handles duplicate packets.
+ *
+ *  \param moreTablePackets returns true if we need more packets
  */
 PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                                         bool &moreTablePackets)

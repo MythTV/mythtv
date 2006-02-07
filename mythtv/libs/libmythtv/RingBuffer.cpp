@@ -455,7 +455,8 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
 
 /** \fn RingBuffer::UpdateRawBitrate(uint)
  *  \brief Set the raw bit rate, to allow RingBuffer adjust effective bitrate.
- *  \param estbitrate Streams average number of kilobits per second.
+ *  \param raw_bitrate Streams average number of kilobits per second when
+ *                     playspeed is 1.0
  */
 void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 {
@@ -487,7 +488,8 @@ uint RingBuffer::GetReadBlockSize(void) const
 }
 
 /** \fn RingBuffer::UpdatePlaySpeed(float)
- *  \param Set the play speed, to allow RingBuffer adjust effective bitrate.
+ *  \brief Set the play speed, to allow RingBuffer adjust effective bitrate.
+ *  \param play_speed Speed to set. (1.0 for normal speed)
  */
 void RingBuffer::UpdatePlaySpeed(float play_speed)
 {
@@ -825,7 +827,7 @@ long long RingBuffer::SetAdjustFilesize(void)
 /** \fn RingBuffer::ReadFromBuf(void*, int)
  *  \brief Reads from the read-ahead buffer, this is called by
  *         Read(void*, int) when the read-ahead thread is running.
- *  \param data  Pointer to where data will be written
+ *  \param buf   Pointer to where data will be written
  *  \param count Number of bytes to read
  *  \return Returns number of bytes read
  */

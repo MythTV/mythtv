@@ -69,7 +69,7 @@ class VideoOutputXv : public VideoOutput
     void StopEmbedding(void);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
-    int ChangePictureAttribute(int attributeType, int newValue);
+    int ChangePictureAttribute(int attribute, int newValue);
 
     int  GetRefreshRate(void);
 

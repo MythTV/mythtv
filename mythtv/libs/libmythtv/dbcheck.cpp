@@ -353,7 +353,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-/** \fn performActualUpdate(const QString[], QString, QString&)
+/** \fn performActualUpdate(const QString updates[], QString, QString&)
  *  \brief Runs a number of SQL commands, and updates the schema version.
  *
  *  \param updates  array of SQL commands to issue, terminated by a "" string.

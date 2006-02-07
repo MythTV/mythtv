@@ -90,7 +90,7 @@ void delete_services(int db_mplexid, const ServiceDescriptionTable*);
  *   HandleDVBDBInsertion() and HandleMPEGDBInsertion() are similar.
  */
 
-/** \fn SIScan(QString,ChannelBase*,int,uint,uint)
+/** \fn SIScan::SIScan(QString,ChannelBase*,int,uint,uint)
  */
 SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
                uint signal_timeout, uint channel_timeout)
@@ -958,11 +958,11 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 
-/** \fn UpdatePATinDB(int,const ProgramAssociationTable*,const pmt_map_t&,bool)
+/** \fn SIScan::UpdatePATinDB(int,const ProgramAssociationTable*,const PMTMap&,bool)
  */
 void SIScan::UpdatePATinDB(int tid_db,
                            const ProgramAssociationTable *pat,
-                           const pmt_map_t &pmt_map,
+                           const PMTMap &pmt_map,
                            bool)
 {
     SISCAN(QString("UpdatePATinDB(): mplex: %1:%2")
@@ -1068,7 +1068,7 @@ void SIScan::UpdatePATinDB(int tid_db,
     }    
 }
 
-/** \fn UpdateVCTinDB(int, const VirtualChannelTable*, bool)
+/** \fn SIScan::UpdateVCTinDB(int,const VirtualChannelTable*,bool)
  */
 void SIScan::UpdateVCTinDB(int tid_db,
                            const VirtualChannelTable *vct,

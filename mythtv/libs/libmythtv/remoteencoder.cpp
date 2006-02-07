@@ -113,10 +113,10 @@ ProgramInfo *RemoteEncoder::GetRecording(void)
     return proginfo;
 }
 
-/** \fn RemoteEncoder::GetFramerate()
+/** \fn RemoteEncoder::GetFrameRate(void)
  *  \brief Returns recordering frame rate set by nvr.
- *  \sa TVRec::GetFramerate(), EncoderLink::GetFramerate(void),
- *      RecorderBase::GetFrameRate()
+ *  \sa TVRec::GetFramerate(void), EncoderLink::GetFramerate(void),
+ *      RecorderBase::GetFrameRate(void)
  *  \return Frames per second if query succeeds -1 otherwise.
  */
 float RemoteEncoder::GetFrameRate(void)
@@ -130,11 +130,11 @@ float RemoteEncoder::GetFrameRate(void)
     return retval;
 }
 
-/** \fn RemoteEncoder::GetFramesWritten()
+/** \fn RemoteEncoder::GetFramesWritten(void)
  *  \brief Returns number of frames written to disk by TVRec's RecorderBase
  *         instance.
  *
- *  \sa TVRec::GetFramesWritten(), EncoderLink::GetFramesWritten()
+ *  \sa TVRec::GetFramesWritten(void), EncoderLink::GetFramesWritten(void)
  *  \return Number of frames if query succeeds, -1 otherwise.
  */
 long long RemoteEncoder::GetFramesWritten(void)
@@ -149,10 +149,10 @@ long long RemoteEncoder::GetFramesWritten(void)
     return cachedFramesWritten;
 }
 
-/** \fn RemoteEncoder::GetFilePosition()
+/** \fn RemoteEncoder::GetFilePosition(void)
  *  \brief Returns total number of bytes written by TVRec's RingBuffer.
  *
- *  \sa TVRec::GetFilePosition(), EncoderLink::GetFilePosition()
+ *  \sa TVRec::GetFilePosition(void), EncoderLink::GetFilePosition(void)
  *  \return Bytes written if query succeeds, -1 otherwise.
  */
 long long RemoteEncoder::GetFilePosition(void)
@@ -167,11 +167,11 @@ long long RemoteEncoder::GetFilePosition(void)
     return retval;
 }
 
-/** \fn TVRec::GetMaxBitrate()
+/** \fn TVRec::GetMaxBitrate(void)
  *   Returns the maximum bits per second this recorder can produce.
- *  \sa TVRec::GetMaxBitrate(), EncoderLink::GetMaxBitrate()
+ *  \sa TVRec::GetMaxBitrate(void), EncoderLink::GetMaxBitrate(void)
  */
-long long RemoteEncoder::GetMaxBitrate()
+long long RemoteEncoder::GetMaxBitrate(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "GET_MAX_BITRATE";
@@ -244,9 +244,9 @@ void RemoteEncoder::FrontendReady(void)
     SendReceiveStringList(strlist);
 }
 
-/** \fn RemoteEncoder::StopPlaying()
+/** \fn RemoteEncoder::StopPlaying(void)
  *  \brief Tells TVRec to stop streaming a recording to the frontend.
- *  \sa TVRec::StopPlaying(), EncoderLink::StopPlaying()
+ *  \sa TVRec::StopPlaying(void), EncoderLink::StopPlaying(void)
  */
 void RemoteEncoder::StopPlaying(void)
 {
@@ -256,9 +256,10 @@ void RemoteEncoder::StopPlaying(void)
     SendReceiveStringList(strlist);
 }
 
-/** \fn TVRec::SpawnLiveTV()
+/** \fn RemoteEncoder::SpawnLiveTV(QString,bool)
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
- *  \sa TVRec::SpawnLiveTV(), EncoderLink::SpawnLiveTV()
+ *  \sa TVRec::SpawnLiveTV(LiveTVChain*,bool),
+ *      EncoderLink::SpawnLiveTV(LiveTVChain*,bool)
  */
 void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip)
 {
@@ -270,10 +271,10 @@ void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip)
     SendReceiveStringList(strlist);
 }
 
-/** \fn EncoderLink::StopLiveTV()
+/** \fn EncoderLink::StopLiveTV(void)
  *  \brief Tells TVRec to stop a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
- *  \sa TVRec::StopLiveTV(), EncoderLink::StopLiveTV()
+ *  \sa TVRec::StopLiveTV(void), EncoderLink::StopLiveTV(void)
  */
 void RemoteEncoder::StopLiveTV(void)
 {
@@ -283,10 +284,10 @@ void RemoteEncoder::StopLiveTV(void)
     SendReceiveStringList(strlist);
 }
 
-/** \fn RemoteEncoder::PauseRecorder()
+/** \fn RemoteEncoder::PauseRecorder(void)
  *  \brief Tells TVRec to pause a recorder, used for channel and input changes.
- *  \sa TVRec::PauseRecorder(), EncoderLink::PauseRecorder(),
- *      RecorderBase::Pause()
+ *  \sa TVRec::PauseRecorder(void), EncoderLink::PauseRecorder(void),
+ *      RecorderBase::Pause(void)
  */
 void RemoteEncoder::PauseRecorder(void)
 {
@@ -353,7 +354,7 @@ void RemoteEncoder::SetChannel(QString channel)
     lastchannel = "";
 }
 
-/** \fn RemoteEncoder::SetSignalMonitoringRate(int,int)
+/** \fn RemoteEncoder::SetSignalMonitoringRate(int,bool)
  *  \brief Sets the signal monitoring rate.
  *
  *  This will actually call SetupSignalMonitor() and 
@@ -361,7 +362,7 @@ void RemoteEncoder::SetChannel(QString channel)
  *  be used directly, without worrying about the 
  *  SignalMonitor instance.
  *
- *  \sa TVRec::RemoteEncoder::SetSignalMonitoringRate(int,int),
+ *  \sa TVRec::SetSignalMonitoringRate(int,int),
  *      EncoderLink::SetSignalMonitoringRate(int,bool)
  *  \param rate           The update rate to use in milliseconds,
  *                        use 0 to disable.
@@ -369,11 +370,11 @@ void RemoteEncoder::SetChannel(QString channel)
  *                        the frontend using this recorder.
  *  \return Previous update rate
  */
-int RemoteEncoder::SetSignalMonitoringRate(int msec, bool notifyFrontend)
+int RemoteEncoder::SetSignalMonitoringRate(int rate, bool notifyFrontend)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "SET_SIGNAL_MONITORING_RATE";
-    strlist << QString::number(msec);
+    strlist << QString::number(rate);
     strlist << QString::number((int)notifyFrontend);
 
     SendReceiveStringList(strlist);

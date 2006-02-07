@@ -205,7 +205,7 @@ VideoOutput::~VideoOutput()
 }
 
 /**
- * \fn Init(int,int,float,WId,int,int,int,int,WId)
+ * \fn VideoOutput::Init(int,int,float,WId,int,int,int,int,WId)
  * \brief Performs most of the initialization for VideoOutput.
  * \return true if successful, false otherwise.
  */
@@ -271,7 +271,7 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 }
 
 /**
- * \fn VideoOutput::SetupDeinterlace(bool)
+ * \fn VideoOutput::SetupDeinterlace(bool,const QString&)
  * \brief Attempts to enable or disable deinterlacing.
  * \return true if successful, false otherwise.
  * \param overridefilter optional, explicitly use this nondefault deint filter
@@ -514,7 +514,7 @@ static float sq(float a) { return a*a; }
 //    { return ((1.0f - r) * a) + (r * b); }
 
 /**
- * \fn VideoOutput::GetVisibleOSDBounds(float&) const
+ * \fn VideoOutput::GetVisibleOSDBounds(float&,float&) const
  * \brief Returns visible portions of total OSD bounds
  * \param visible_aspect physical aspect ratio of bounds returned
  * \param font_scaling   scaling to apply to fonts
@@ -564,7 +564,7 @@ QRect VideoOutput::GetVisibleOSDBounds(
 }
 
 /**
- * \fn VideoOutput::GetVisibleSize(void) const
+ * \fn VideoOutput::GetTotalOSDBounds(void) const
  * \brief Returns total OSD bounds
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
@@ -1236,7 +1236,7 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
 }
 
 /**
- * \fn VideoOutput::CopyFrame(VideoFrame *, VideoFrame *)
+ * \fn VideoOutput::CopyFrame(VideoFrame*, const VideoFrame*)
  * \brief Copies frame data from one VideoFrame to another.
  * 
  *  Note: The frames must have the same width, height, and format.

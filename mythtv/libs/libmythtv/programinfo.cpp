@@ -407,8 +407,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     return true;
 }
 
-/** \fn ProgramInfo::ToMap(QMap<QString, QString> &progMap,
- *                         bool showrerecord) const
+/** \fn ProgramInfo::ToMap(QMap<QString,QString>&,bool) const
  *  \brief Converts ProgramInfo into QString QMap containing each field
  *         in ProgramInfo converted into lockalized strings.
  */
@@ -631,8 +630,7 @@ int ProgramInfo::SecsTillStart(void) const
     return QDateTime::currentDateTime().secsTo(startts);
 }
 
-
-/** \fn ProgramInfo::GetProgramAtDateTime(const QString&, const QDateTime&)
+/** \fn ProgramInfo::GetProgramAtDateTime(const QString&,const QDateTime&,bool)
  *  \brief Returns a new ProgramInfo for the program that air at
  *         "dtime" on "channel".
  *  \param channel %Channel ID on which to search for program.
@@ -1006,7 +1004,6 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
 
 /** \fn ProgramInfo::ApplyRecordRecID(void)
  *  \brief Sets recordid to match ScheduledRecording recordid
- *  \param newrecgroup New recording group.
  */
 void ProgramInfo::ApplyRecordRecID(void)
 {
@@ -1301,7 +1298,7 @@ QString ProgramInfo::CreateRecordBasename(const QString &ext) const
     return retval;
 }               
 
-/** \fn ProgramInfo::SetRecordBasename(QString basename) const
+/** \fn ProgramInfo::SetRecordBasename(QString)
  *  \brief Sets a recording's basename in the database.
  */
 bool ProgramInfo::SetRecordBasename(QString basename)
@@ -1693,7 +1690,7 @@ void ProgramInfo::SetBookmark(long long pos) const
                              query);
 }
 
-/** \fn ProgramInfo::GetBookmark(void)
+/** \fn ProgramInfo::GetBookmark(void) const
  *  \brief Gets any bookmark position in database,
  *         unless "ignoreBookmark" is set.
  *
@@ -2005,7 +2002,7 @@ bool ProgramInfo::UsesMaxEpisodes(void) const
     return false;
 }
 
-void ProgramInfo::GetCutList(QMap<long long, int> &delMap) const
+void ProgramInfo::GetCutList(frm_dir_map_t &delMap) const
 {
 //    GetMarkupMap(delMap, db, MARK_CUT_START);
 //    GetMarkupMap(delMap, db, MARK_CUT_END, true);
@@ -2048,7 +2045,7 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap) const
     }
 }
 
-void ProgramInfo::SetCutList(QMap<long long, int> &delMap) const
+void ProgramInfo::SetCutList(frm_dir_map_t &delMap) const
 {
 //    ClearMarkupMap(db, MARK_CUT_START);
 //    ClearMarkupMap(db, MARK_CUT_END);
@@ -2091,14 +2088,14 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap) const
                              query);
 }
 
-void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames) const
+void ProgramInfo::SetCommBreakList(frm_dir_map_t &frames) const
 {
     ClearMarkupMap(MARK_COMM_START);
     ClearMarkupMap(MARK_COMM_END);
     SetMarkupMap(frames);
 }
 
-void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames) const
+void ProgramInfo::GetCommBreakList(frm_dir_map_t &frames) const
 {
     GetMarkupMap(frames, MARK_COMM_START);
     GetMarkupMap(frames, MARK_COMM_END, true);
@@ -2150,7 +2147,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
                              query);
 }
 
-void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
+void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
                                int type, long long min_frame, 
                                long long max_frame) const
 {
@@ -2218,7 +2215,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
     }
 }
 
-void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks,
+void ProgramInfo::GetMarkupMap(frm_dir_map_t &marks,
                                int type, bool mergeIntoMap) const
 {
     if (!mergeIntoMap)
@@ -2276,7 +2273,7 @@ void ProgramInfo::SetMarkupFlag(int type, bool flag) const
     }
 }
 
-void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap,
+void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
                                  int type) const
 {
     posMap.clear();
@@ -2335,7 +2332,7 @@ void ProgramInfo::ClearPositionMap(int type) const
                              query);
 }
 
-void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
+void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
                                  long long min_frame, long long max_frame) const
 {
     QMap<long long, long long>::Iterator i;
@@ -2426,7 +2423,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
     }
 }
 
-void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
+void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
                                       int type) const
 {
     QMap<long long, long long>::Iterator i;
@@ -3566,7 +3563,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         RemoteSendMessage("RECORDING_LIST_CHANGE");
 }
 
-/** \fn ProgramInfo::GetChannel(const ProgramInfo*,QString&,QString&) const
+/** \fn ProgramInfo::GetChannel(QString&,QString&) const
  *  \brief Returns the channel and input needed to record the program.
  *  \return true on success, false on failure
  */

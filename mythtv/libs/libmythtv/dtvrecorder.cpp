@@ -185,7 +185,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
  *         some channels, but will break on others so algorithmic
  *         optimizations should be done with great care.
  *
- *  \startcode
+ *  \code
  *   PES header format
  *   byte 0  byte 1  byte 2  byte 3      [byte 4     byte 5]
  *   0x00    0x00    0x01    PESStreamID  PES packet length

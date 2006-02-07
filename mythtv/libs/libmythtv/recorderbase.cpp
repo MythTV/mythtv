@@ -142,7 +142,7 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
                     "SetIntOption(...%1): Option not in profile.").arg(name));
 }
 
-/** \fn WaitForPause(int)
+/** \fn RecorderBase::WaitForPause(int)
  *  \brief WaitForPause blocks until StartRecording() is actually paused,
  *         or timeout milliseconds elapse.
  *  \param timeout number of milliseconds to wait defaults to 1000.

@@ -92,7 +92,7 @@ public:
     enum RETURN {ERROR_OPEN,ERROR_PARSE,OK};
     enum TYPE {ATSC,OFDM,QPSK,QAM};
 
-    DVBConfParser(TYPE _type,unsigned sourceid, const QString& _file);
+    DVBConfParser(enum TYPE _type,unsigned sourceid, const QString& _file);
     virtual ~DVBConfParser() {};
     int parse(); 
 

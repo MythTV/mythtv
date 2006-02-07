@@ -899,7 +899,7 @@ void NuppelVideoPlayer::DiscardVideoFrame(VideoFrame *buffer)
         videoOutput->DiscardFrame(buffer);
 }
 
-/** \fn DiscardVideoFrames(bool)
+/** \fn NuppelVideoPlayer::DiscardVideoFrames(bool)
  *  \brief Places frames in the available frames queue.
  *
  *   If called with 'next_frame_keyframe' set to false then all frames
@@ -1185,7 +1185,7 @@ void NuppelVideoPlayer::StopEmbedding(void)
     }
 }
 
-/** \fn ToggleCC(uint, uint)
+/** \fn NuppelVideoPlayer::ToggleCC(uint, uint)
  *  \brief Sets vbimode. If arg is zero, toggles subtitlesOn,
  *         otherwise it turns subtitles on and sets a specific
  *         teletext page or cc text.
