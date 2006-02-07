@@ -890,8 +890,9 @@ void PlaybackBox::updateVideo(QPainter *p)
         !playingSomething)
     {
         QSize size = drawVideoBounds.size();
-        p->drawImage(drawVideoBounds.x(), drawVideoBounds.y(),
-                     previewVideoNVP->GetARGBFrame(size));
+        const QImage &img = previewVideoNVP->GetARGBFrame(size);
+        uint xoff = max((size.width() - drawVideoBounds.width()) / 2, 0);
+        p->drawImage(drawVideoBounds.x() + xoff, drawVideoBounds.y(), img);
     }
 
     /* have we timed out waiting for nvp to start? */
