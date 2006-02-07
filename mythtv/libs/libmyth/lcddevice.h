@@ -180,7 +180,7 @@ class LCD : public QObject
     void setMusicRepeat(int repeat);
 
     /** \brief Set music player's shuffle properties             
-        \param repeat the state of repeat
+        \param shuffle the state of shuffle
     */
     void setMusicShuffle(int shuffle);
 

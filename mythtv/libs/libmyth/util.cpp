@@ -489,7 +489,7 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     return retval;
 }
 
-/** \fn ReadStringList(QSocketDevice*,QStringList&)
+/** \fn ReadStringList(QSocket*,QStringList&)
  *  \brief Read a string list from the socket (backend call).
  */
 bool ReadStringList(QSocket *socket, QStringList &list)
