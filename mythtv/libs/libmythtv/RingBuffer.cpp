@@ -581,6 +581,7 @@ void RingBuffer::ResetReadAhead(long long newinternal)
     internalreadpos = newinternal;
     ateof = false;
     readsallowed = false;
+    setswitchtonext = false;
     readAheadLock.unlock();
 }
 
@@ -796,7 +797,7 @@ void RingBuffer::ReadAheadThread(void)
             readsAllowedWait.wakeAll();
 
         availWaitMutex.lock();
-        if (commserror || ateof || stopreads ||
+        if (commserror || ateof || stopreads || setswitchtonext ||
             (wanttoread <= used && wanttoread > 0))
         {
             availWait.wakeAll();
@@ -895,7 +896,8 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
             }
 
             bool quit = livetvchain && (livetvchain->NeedsToSwitch() || 
-                                        livetvchain->NeedsToJump());
+                                        livetvchain->NeedsToJump() ||
+                                        setswitchtonext);
 
             if (elapsed > 16000 || quit)
             {
