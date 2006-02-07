@@ -58,6 +58,7 @@ VideoOutputIvtv::VideoOutputIvtv(void) :
     stride(0),
 
     lastcleared(false),       pipon(false),
+    osdon(false),
     osdbuffer(NULL),          osdbuf_aligned(NULL),
     osdbufsize(0),            osdbuf_revision(0xfffffff),
 
@@ -421,6 +422,9 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     else if (!embedding && alphaState == kAlpha_Embedded && lastcleared)
         SetAlpha(kAlpha_Clear);
 
+    if (embedding)
+        return;
+
     VideoFrame tmpframe;
     tmpframe.codec = FMT_ARGB32;
     tmpframe.buf = (unsigned char *)osdbuf_aligned;
@@ -447,54 +451,63 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         drawanyway = true;
     }
 
-    int ret = 0;
-    if (osd)
-        ret = DisplayOSD(&tmpframe, osd, stride, osdbuf_revision);
-    osdbuf_revision = new_revision;
-
-    if (ret < 0 && !lastcleared)
-    {
-        lastcleared = true;
-        drawanyway = true;
-    }
-
     if (pipPlayer)
     {
         ShowPip(&tmpframe, pipPlayer);
-        drawanyway = true;
+        osdbuf_revision = 0xfffffff; // make sure OSD is redrawn
         lastcleared = false;
+        drawanyway  = true;
     }
+
+    int ret = 0;
+    ret = DisplayOSD(&tmpframe, osd, stride, osdbuf_revision);
+    osdbuf_revision = new_revision;
+
+    // Handle errors, such as no surface, by clearing OSD surface.
+    // If there is a PiP, we need to actually clear the buffer, otherwise
+    // we can get away with setting the alpha to kAlpha_Clear.
+    if (ret < 0 && osdon)
+    {
+        if (!clear || pipon)
+        {
+            VERBOSE(VB_PLAYBACK, "clearing buffer");
+            bzero(tmpframe.buf, XJ_height * stride);
+            // redraw PiP...
+            if (pipPlayer)
+                ShowPip(&tmpframe, pipPlayer);
+        }
+        drawanyway  |= !lastcleared || pipon;
+        lastcleared |= !pipon;
+    }
+
+    // Set these so we know if/how to clear if need be, the next time around.
+    osdon = (ret >= 0);
     pipon = (bool) pipPlayer;
 
-    if (ret >= 0)
-        lastcleared = false;
+    // If there is an OSD, make sure we draw OSD surface
+    lastcleared &= (ret < 0);
 
+    // If nothing on OSD surface, just set the alpha to zero
     if (lastcleared && drawanyway)
     {
-        if (!embedding)
-            SetAlpha(kAlpha_Clear);
-        lastcleared = true;
-    } 
-    else if (ret > 0 || drawanyway)
-    {
-        if (embedding)
-            return;
-
-        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-        bzero(&prep, sizeof(prep));
-
-        prep.source = osdbuf_aligned;
-        prep.dest_offset = 0;
-        prep.count = XJ_height * stride;
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to process frame" + ENO);
-        }
-        if (alphaState != kAlpha_Local)
-            SetAlpha(kAlpha_Local);
+        SetAlpha(kAlpha_Clear);
+        return;
     }
+
+    // If there has been no OSD change and no draw has been forced we're done
+    if (ret <= 0 && !drawanyway)
+        return;
+
+    // The OSD surface needs to be updated...
+    struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+    bzero(&prep, sizeof(prep));
+    prep.source = osdbuf_aligned;
+    prep.count  = XJ_height * stride;
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to process frame" + ENO);
+
+    SetAlpha(kAlpha_Local);
 }
 
 /** \fn VideoOutputIvtv::Start(int,int)

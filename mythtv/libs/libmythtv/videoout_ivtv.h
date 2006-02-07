@@ -93,6 +93,7 @@ class VideoOutputIvtv: public VideoOutput
 
     bool lastcleared;
     bool pipon;
+    bool osdon;
 
     char *osdbuffer;
     char *osdbuf_aligned;
