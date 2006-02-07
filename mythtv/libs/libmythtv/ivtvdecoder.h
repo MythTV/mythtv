@@ -102,6 +102,8 @@ class IvtvDecoder : public DecoderBase
     int               lastdequeued;
     ivtv_frame_list_t queuedlist;
 
+    bool              needReset;
+    MythTimer         needResetTimer;
   private:
     static DevInfoMap devInfo;
     static QMutex     devInfoLock;

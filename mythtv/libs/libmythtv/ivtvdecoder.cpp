@@ -451,6 +451,7 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
     frame_decoded = 0;
 
     int count, total = 0;
+    bool canwrite = false;
 
     VideoOutputIvtv *videoout = (VideoOutputIvtv*) GetNVP()->getVideoOutput();
 
@@ -460,11 +461,12 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
     }
     else if (vidfull || vidread != vidwrite)
     {
-        bool canwrite = videoout->Poll(1) > 0;
+        int ret = videoout->Poll(50);
 
-        if (!canwrite)
+        if (ret==0)
             VERBOSE(VB_PLAYBACK, LOC + "write0 !canwrite");
 
+        canwrite = ret > 0;
         if (canwrite && vidwrite >= vidread)
         {
             count = vidmax - vidwrite;
@@ -482,7 +484,8 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
 #ifdef EXTRA_DEBUG
                 VERBOSE(VB_PLAYBACK, LOC +
                         QString("write1 cnt(%1) rd(%2) wr(%3) full(%4)")
-                        .arg(count).arg(vidread).arg(vidwrite).arg(vidfull));
+                        .arg(count, 5).arg(vidread, 5).arg(vidwrite, 5)
+                        .arg(vidfull));
 #endif // EXTRA_DEBUG
             }
         }
@@ -504,7 +507,8 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
 #ifdef EXTRA_DEBUG
                 VERBOSE(VB_PLAYBACK, LOC +
                         QString("write2 cnt(%1) rd(%2) wr(%3) full(%4)")
-                        .arg(count).arg(vidread).arg(vidwrite).arg(vidfull));
+                        .arg(count, 5).arg(vidread, 5).arg(vidwrite, 5)
+                        .arg(vidfull));
 #endif // EXTRA_DEBUG
             }
         }
@@ -542,8 +546,9 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
                 total += count;
 #ifdef EXTRA_DEBUG
                 VERBOSE(VB_PLAYBACK, LOC +
-                        QString("read1 cnt(%1) rd(%2) wr(%3) full(%4)")
-                        .arg(count).arg(vidread).arg(vidwrite).arg(vidfull));
+                        QString("read1  cnt(%1) rd(%2) wr(%3) full(%4)")
+                        .arg(count, 5).arg(vidread, 5).arg(vidwrite, 5)
+                        .arg(vidfull));
 #endif // EXTRA_DEBUG
             }
         }
@@ -561,22 +566,52 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
                 total += count;
 #ifdef EXTRA_DEBUG
                 VERBOSE(VB_PLAYBACK, LOC +
-                        QString("read2 cnt(%1) rd(%2) wr(%3) full(%4)")
-                        .arg(count).arg(vidread).arg(vidwrite).arg(vidfull));
+                        QString("read2  cnt(%1) rd(%2) wr(%3) full(%4)")
+                        .arg(count, 5).arg(vidread, 5).arg(vidwrite, 5)
+                        .arg(vidfull));
 #endif // EXTRA_DEBUG
             }
         }
 
-        if (total == 0 && (vidread != vidwrite))
+        if (total == 0 && (vidread != vidwrite) && canwrite)
         {
             ateof = true;
 #ifdef EXTRA_DEBUG
             VERBOSE(VB_PLAYBACK, LOC +
-                    QString("read3 cnt(%1) rd(%2) wr(%3) full(%4) size(%5)")
-                    .arg(count).arg(vidread).arg(vidwrite).arg(vidfull)
-                    .arg(size) + " ateof");
+                    QString("read3  cnt(%1) rd(%2) wr(%3) full(%4) size(%5)")
+                    .arg(count, 5).arg(vidread, 5).arg(vidwrite, 5)
+                    .arg(vidfull).arg(size) + " ateof");
 #endif // EXTRA_DEBUG
         }
+
+        bool was_set = needReset;
+        needReset = !total && !canwrite;
+        if (needReset && !was_set)
+            needResetTimer.start();
+    }
+
+#ifdef EXTRA_DEBUG
+    if (needReset)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "needReset "<<needResetTimer.elapsed());
+        usleep(50000);
+    }
+#endif // EXTRA_DEBUG
+
+    if (needReset && needResetTimer.elapsed() > 1000)
+    { 
+        needReset = false;
+        VERBOSE(VB_IMPORTANT, LOC + "*********************************");
+        VERBOSE(VB_IMPORTANT, LOC + "RESET -- begin");
+        lastdequeued = 0;
+        vidframes = 0;
+        queuedlist.clear();
+        videoout->Stop(false /* hide */);
+        videoout->Flush();
+        videoout->Start(0 /*GOP offset*/, 0 /* muted frames */);
+        videoout->Play();
+        VERBOSE(VB_IMPORTANT, LOC + "RESET -- end");
+        VERBOSE(VB_IMPORTANT, LOC + "*********************************");
     }
 
     if ((long)framesRead <= stopframe)
