@@ -57,7 +57,7 @@ VideoOutputIvtv::VideoOutputIvtv(void) :
 
     stride(0),
 
-    lastcleared(false),
+    lastcleared(false),       pipon(false),
     osdbuffer(NULL),          osdbuf_aligned(NULL),
     osdbufsize(0),            osdbuf_revision(0xfffffff),
 
@@ -88,28 +88,33 @@ VideoOutputIvtv::~VideoOutputIvtv()
 
 void VideoOutputIvtv::ClearOSD(void) 
 {
-    if (fbfd >= 0)
+    if (fbfd < 0)
     {
-        struct ivtv_osd_coords osdcoords;
-        bzero(&osdcoords, sizeof(osdcoords));
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to get active buffer for ClearOSD()" + ENO);
-        }
-        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-        bzero(&prep, sizeof(prep));
-
-        prep.source = osdbuf_aligned;
-        prep.dest_offset = 0;
-        prep.count = osdcoords.max_offset;
-
-        bzero(osdbuf_aligned, osdbufsize);
-
-        if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to prepare frame" + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "ClearOSD() -- no framebuffer!");
+        return;
     }
+
+    VERBOSE(VB_PLAYBACK, LOC + "ClearOSD");
+
+    struct ivtv_osd_coords osdcoords;
+    bzero(&osdcoords, sizeof(osdcoords));
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Failed to get active buffer for ClearOSD()" + ENO);
+    }
+    struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+    bzero(&prep, sizeof(prep));
+
+    prep.source = osdbuf_aligned;
+    prep.dest_offset = 0;
+    prep.count = osdcoords.max_offset;
+
+    bzero(osdbuf_aligned, osdbufsize);
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to prepare frame" + ENO);
 }
 
 void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
@@ -405,75 +410,90 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)filterList;
     (void)frame;
 
-    if (fbfd >= 0 && osd)
+    if (fbfd < 0)
+        return;
+
+    if (!osd && !pipon)
+        return;
+
+    if (embedding && alphaState != kAlpha_Embedded)
+        SetAlpha(kAlpha_Embedded);
+    else if (!embedding && alphaState == kAlpha_Embedded && lastcleared)
+        SetAlpha(kAlpha_Clear);
+
+    VideoFrame tmpframe;
+    tmpframe.codec = FMT_ARGB32;
+    tmpframe.buf = (unsigned char *)osdbuf_aligned;
+    tmpframe.width = stride;
+    tmpframe.height = XJ_height;
+
+    OSDSurface *surface = NULL;
+    if (osd)
+        surface = osd->Display();
+
+    // Clear osdbuf if OSD has changed, or PiP has been toggled
+    bool clear = (pipPlayer!=0) ^ pipon;
+    int new_revision = osdbuf_revision;
+    if (surface)
     {
-        bool drawanyway = false;
+        new_revision = surface->GetRevision();
+        clear |= surface->GetRevision() != osdbuf_revision;
+    }
 
-        if (embedding && alphaState != kAlpha_Embedded)
-            SetAlpha(kAlpha_Embedded);
-        else if (!embedding && alphaState == kAlpha_Embedded && lastcleared)
+    bool drawanyway = false;
+    if (clear)
+    {
+        bzero(tmpframe.buf, XJ_height * stride);
+        drawanyway = true;
+    }
+
+    int ret = 0;
+    if (osd)
+        ret = DisplayOSD(&tmpframe, osd, stride, osdbuf_revision);
+    osdbuf_revision = new_revision;
+
+    if (ret < 0 && !lastcleared)
+    {
+        lastcleared = true;
+        drawanyway = true;
+    }
+
+    if (pipPlayer)
+    {
+        ShowPip(&tmpframe, pipPlayer);
+        drawanyway = true;
+        lastcleared = false;
+    }
+    pipon = (bool) pipPlayer;
+
+    if (ret >= 0)
+        lastcleared = false;
+
+    if (lastcleared && drawanyway)
+    {
+        if (!embedding)
             SetAlpha(kAlpha_Clear);
+        lastcleared = true;
+    } 
+    else if (ret > 0 || drawanyway)
+    {
+        if (embedding)
+            return;
 
-        VideoFrame tmpframe;
-        tmpframe.codec = FMT_ARGB32;
-        tmpframe.buf = (unsigned char *)osdbuf_aligned;
-        tmpframe.width = stride;
-        tmpframe.height = XJ_height;
+        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+        bzero(&prep, sizeof(prep));
 
-        // Clear osdbuf if OSD has changed.
-        OSDSurface *surface = osd->Display();
-        int new_revision = osdbuf_revision;
-        if (surface && (surface->GetRevision() != osdbuf_revision))
+        prep.source = osdbuf_aligned;
+        prep.dest_offset = 0;
+        prep.count = XJ_height * stride;
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
         {
-            bzero(tmpframe.buf, XJ_height * stride);
-            new_revision = surface->GetRevision();
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to process frame" + ENO);
         }
-
-        int ret = DisplayOSD(&tmpframe, osd, stride, osdbuf_revision);
-        osdbuf_revision = new_revision;
-
-        if (ret < 0 && !lastcleared)
-        {
-            lastcleared = true;
-            drawanyway = true;
-        }
-
-        if (pipPlayer)
-        {
-            ShowPip(&tmpframe, pipPlayer);
-            drawanyway = true;
-            lastcleared = false;
-        }
-
-        if (ret >= 0)
-            lastcleared = false;
-
-        if (lastcleared && drawanyway)
-        {
-            if (!embedding)
-                SetAlpha(kAlpha_Clear);
-            lastcleared = true;
-        } 
-        else if (ret > 0 || drawanyway)
-        {
-            if (embedding)
-                return;
-
-            struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-            bzero(&prep, sizeof(prep));
-
-            prep.source = osdbuf_aligned;
-            prep.dest_offset = 0;
-            prep.count = XJ_height * stride;
-
-            if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to process frame" + ENO);
-            }
-            if (alphaState != kAlpha_Local)
-                SetAlpha(kAlpha_Local);
-        }
+        if (alphaState != kAlpha_Local)
+            SetAlpha(kAlpha_Local);
     }
 }
 
