@@ -331,10 +331,10 @@ void RingBuffer::Start(void)
         StartupReadAheadThread();
 }
 
-/** \fn RingBuffer::Reset(bool)
+/** \fn RingBuffer::Reset(bool, bool, bool)
  *  \brief Resets the read-ahead thread and our position in the file
  */
-void RingBuffer::Reset(bool full, bool toAdjust)
+void RingBuffer::Reset(bool full, bool toAdjust, bool resetInternal)
 {
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
@@ -348,7 +348,10 @@ void RingBuffer::Reset(bool full, bool toAdjust)
     readAdjust = 0;
 
     if (full)
-        ResetReadAhead(readpos - readAdjust);
+        ResetReadAhead(readpos);
+
+    if (resetInternal)
+        internalreadpos = readpos;
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -782,7 +785,7 @@ void RingBuffer::ReadAheadThread(void)
         if (!readsallowed && used >= fill_min)
             readsallowed = true;
 
-        if (readsallowed && used < fill_min && !ateof)
+        if (readsallowed && used < fill_min && !ateof && !setswitchtonext)
         {
             readsallowed = false;
             VERBOSE(VB_GENERAL, QString ("rebuffering (%1 %2)").arg(used)

@@ -49,7 +49,9 @@ class RingBuffer
     // General Commands
     void OpenFile(const QString &lfilename, uint retryCount = 12/*4*/);
     int  Read(void *buf, int count);
-    void Reset(bool full = false, bool toAdjust = false);
+    void Reset(bool full          = false,
+               bool toAdjust      = false,
+               bool resetInternal = false);
 
     // Seeks
     long long Seek(long long pos, int whence);

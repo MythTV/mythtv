@@ -2224,7 +2224,10 @@ void NuppelVideoPlayer::FileChangedCallback(void)
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
 
-    ringBuffer->Reset(false, true);
+    if (dynamic_cast<AvFormatDecoder *>(GetDecoder()))
+        ringBuffer->Reset(false, true);
+    else
+        ringBuffer->Reset(false, true, true);
 
     ringBuffer->Unpause();
 
