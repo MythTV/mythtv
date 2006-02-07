@@ -4129,7 +4129,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 {
     QMutexLocker locker(&osdlock);
 
-    if (!GetOSD())
+    if (!GetOSD() || browsemode || !queuedChanNum.isEmpty())
     {
         if (&lastSignalMsg != &strlist)
             lastSignalMsg = strlist;
