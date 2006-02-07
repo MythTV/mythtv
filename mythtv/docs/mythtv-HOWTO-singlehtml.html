@@ -8142,15 +8142,40 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>Much of the information in this section comes from 
+<A HREF="http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html">http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html</A></P>
+<P>Download <B>debootstrap</B> so that your system knows how to locate the
+files required to build an image.  Find the latest version of the
+debootstrap program and download it.  At this time, the latest is
+<B>debootstrap_0.3.3.0ubuntu1_all.deb</B></P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ lynx http://archive.ubuntulinux.org/ubuntu/pool/main/d/debootstrap/
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Cursor down to the latest file, then press "D".</P>
+<P>Install it:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir temp1
+$ mv debootstrap_0.3.3.0ubuntu1_all.deb temp1
+$ cd temp1
+$ ar -xf debootstrap_0.3.3.0ubuntu1_all.deb
+$ su
+# tar -xzf data.tar.gz
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 # mkdir -p /nfsroot/basement
-# debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+# debootstrap --arch i386 breezy /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html</P>
 <P>Once that's done, we'll need to <B>chroot</B> into the newly created
 directory structure for some initial setup.
 <BLOCKQUOTE><CODE>
@@ -8172,7 +8197,37 @@ shell:
 <BLOCKQUOTE><CODE>
 <PRE>
 # echo "127.0.0.1 localhost" >> /etc/hosts
-# echo "192.168.10.51 backend-2" >> /etc/hosts
+# echo "192.168.10.51 basement" >> /etc/hosts
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Put something into the <CODE>/etc/fstab</CODE> file.  The <CODE>^D</CODE> indicates
+that you should press CTRL-D.
+<BLOCKQUOTE><CODE>
+<PRE>
+# cat >> /etc/fstab
+proc /proc proc defaults 0 0
+sys /sys sysfs defaults 0 0
+^D
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Configure your keyboard:
+<BLOCKQUOTE><CODE>
+<PRE>
+# dpkg-reconfigure console-data
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Setup <CODE>resolv.conf</CODE>.  These values need to be appropriate for your configuration.
+<BLOCKQUOTE><CODE>
+<PRE>
+# cat >> /etc/resolv.conf
+search .local
+nameserver 68.87.66.196
+nameserver 68.87.64.196
+nameserver 63.240.76.4
+^D
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -8226,10 +8281,15 @@ deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-mysql
-edit /etc/default/distcc to start it and allow other hosts</P>
-<P>sudo apt-get build-dep mythtv</P>
-<P>sudo apt-get install libqt3c102-mysql</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+sudo apt-get install subversion distcc bind9 bind9-doc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>edit /etc/default/distcc to start it and allow other hosts</P>
+
 
 <H3>Configuring DHCP</H3>
 
@@ -8278,7 +8338,14 @@ group {
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3>Editing </H3>
+<H3>Compiling a kernel</H3>
+
+<H3>Preparing the frontend</H3>
+
+<P>sudo apt-get build-dep mythtv</P>
+<P>sudo apt-get install libqt3c102-mysql</P>
+
+<H3>Installing MythTV</H3>
 
 <P>svn co http://svn.mythtv.org/svn/trunk/mythtv
 svn co http://svn.mythtv.org/svn/trunk/mythplugins

@@ -342,7 +342,10 @@
      24.4 Diskless Ubuntu
         24.4.1 Backend Configuration
         24.4.2 Configuring DHCP
-        24.4.3 Editing
+        24.4.3 Compiling a kernel
+        24.4.4 Preparing the frontend
+        24.4.5 Installing MythTV
+
 
   ______________________________________________________________________
 
@@ -404,7 +407,6 @@
 
   +o  MythMusic, a music playing / ripping application which supports MP3
      and FLAC
-
   +o  MythGame
 
   +o  MythWeather
@@ -473,6 +475,8 @@
   typewriter - used for program paths.
   [4memphasis[24m - Pay attention here.
 
+
+
                            Pay more attention.
 
 
@@ -524,6 +528,7 @@
   1. Qt version
 
   2. Linux distribution
+
 
   3. gcc version
 
@@ -598,7 +603,6 @@
   some general guidance but stop short of offering specific
   recommendations.
 
-
   For a good MythTV experience, you must understand that MythTV
   exercises your hardware more than a typical desktop. Encoder cards
   generate DMA across the PCI bus.  The CPU is busy encoding / decoding
@@ -657,13 +661,13 @@
      live TV watching, but does allow for encoding video and then
      watching it later.
 
+
   +o  A developer states that his AMD1800+ system can [1malmost [22mencode two
      MPEG-4 video streams and watch one program simultaneously.
 
   +o  A PIII/800MHz system with 512MB RAM can encode one video stream
      using the RTjpeg codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
-
 
   +o  A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps
      file created on a different system with 30% CPU usage.
@@ -838,6 +842,7 @@
      80% CPU.
 
 
+
   [1m3.1.5.3.  DVB capture cards.[0m
 
   DVB is a video standard primarily found in Europe (where it comes in
@@ -904,8 +909,6 @@
 
   You may use the Ethernet port of an DBoxII or a similar device to
   capture MPEG2. Your set top box has to be running the Neutrino GUI.
-
-
   [1m3.1.5.7.  USB Capture Devices.[0m
 
   The Plextor ConvertX PVR devices are supported through Linux drivers
@@ -1038,6 +1041,7 @@
   http://www.retinalburn.net/linux/tvout.html
   <http://www.retinalburn.net/linux/tvout.html> for more information.
 
+
   [1m3.1.9.2.  Matrox[0m
 
   [1mNOTE[22m: If updated information for the Matrox cards is not provided
@@ -1095,6 +1099,7 @@
   which is important if you want to display HDTV.
 
 
+
   [1m3.1.9.4.  Savage[0m
 
   The standard savage X driver supports TV out on some Savage cards.
@@ -1102,7 +1107,6 @@
   and inexpensive Savage card with TV out) is broken. See
   http://www.probo.com/timr/savage40.html
   <http://www.probo.com/timr/savage40.html> for details.
-
 
   Specific cards:
 
@@ -1170,6 +1174,9 @@
   There are a few ways of installing programs on Linux systems; you can
   either use a pre-compiled package, or install from a tarball after
   satisfying any prerequisites.
+
+
+
       [1mNOTE[22m: you must have the MySQL database software installed on a
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.
@@ -1232,6 +1239,8 @@
 
 
   Then run:
+
+
        # apt-get update
        # apt-get dist-upgrade
        # apt-get update
@@ -1279,9 +1288,6 @@
   to your /etc/apt/sources.list file.  Running [1mapt-get update [22mand then
   executing [1mapt-get build-dep mythtv [22mshould install all the pre-
   requisites required to compile MythTV.
-
-
-
    [1mNOTE[22m:  Due to the requirement for Qt 3.1+, there are no packages for
   Debian woody/stable.
 
@@ -1291,6 +1297,7 @@
   installation.  This user has access to write new recordings to disk in
   the default directory, read and write the database, access the audio
   and video devices, and everything else that MythTV needs to do.
+
 
   See /usr/share/doc/[4mpackagename[24m/README.Debian for more information,
   including copies of the MythTV documentation.  The mythtv-doc package
@@ -1345,6 +1352,7 @@
   perl distribution.  In each case, we're looking to make sure that the
   primary module is getting installed.
 
+
   Click the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your
   search term.  You should find it under the "Perl" folder.  You need at
   least the perl 5.80 base package installed.  If not, click on the
@@ -1355,7 +1363,6 @@
   mysql-clients are installed.  If not, click on "Mark".
 
   Search for gcc.  You're going to need gcc and gcc-c++ installed.
-
 
   Search for freetype2.  Make sure that you've got freetype2 and
   freetype2-devel installed.
@@ -1406,10 +1413,11 @@
   answer "YES".
 
 
-       $ su
-       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-       # urpmi XFree86-devel perl
-       # urpmi libqt3-devel
+
+  $ su
+  # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+  # urpmi XFree86-devel perl
+  # urpmi libqt3-devel
 
 
 
@@ -1472,10 +1480,9 @@
   to your /etc/apt/sources.list
 
 
-
-  # Christian Marillat's packages (mplayer, lame)
-  deb ftp://ftp.nerim.net/debian-marillat/ sid main
-  deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+       # Christian Marillat's packages (mplayer, lame)
+       deb ftp://ftp.nerim.net/debian-marillat/ sid main
+       deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
 
 
 
@@ -1535,11 +1542,11 @@
 
 
 
-  $ su -
-  # echo /usr/local/lib >> /etc/ld.so.conf
-  # /sbin/ldconfig
-  # exit
-  $
+       $ su -
+       # echo /usr/local/lib >> /etc/ld.so.conf
+       # /sbin/ldconfig
+       # exit
+       $
 
 
 
@@ -1657,7 +1664,8 @@
 
   and replace it with
 
-  <console>  0666 <v4l>        0666 root.video
+
+       <console>  0666 <v4l>        0666 root.video
 
 
 
@@ -1714,7 +1722,6 @@
   [1m5.1.  Building LAME[0m
 
   Open a shell and switch to the directory where you saved lame.
-
 
 
   $ tar -xzf lame-3.96.1.tar.gz
@@ -8843,13 +8850,41 @@
 
 
 
-       # mkdir -p /nfsroot/basement
-       # debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
-
-
-
+  Much of the information in this section comes from
   http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-
   i386/current/doc/manual/en/apcs03.html
+  <http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-
+  i386/current/doc/manual/en/apcs03.html>
+
+  Download [1mdebootstrap [22mso that your system knows how to locate the files
+  required to build an image.  Find the latest version of the
+  debootstrap program and download it.  At this time, the latest is
+  [1mdebootstrap_0.3.3.0ubuntu1_all.deb[0m
+
+
+
+       $ lynx http://archive.ubuntulinux.org/ubuntu/pool/main/d/debootstrap/
+
+
+
+  Cursor down to the latest file, then press "D".
+
+  Install it:
+
+
+       $ mkdir temp1
+       $ mv debootstrap_0.3.3.0ubuntu1_all.deb temp1
+       $ cd temp1
+       $ ar -xf debootstrap_0.3.3.0ubuntu1_all.deb
+       $ su
+       # tar -xzf data.tar.gz
+
+
+
+       # mkdir -p /nfsroot/basement
+       # debootstrap --arch i386 breezy /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+
+
 
   Once that's done, we'll need to [1mchroot [22minto the newly created
   directory structure for some initial setup.
@@ -8862,8 +8897,6 @@
 
   Set the hostname that you'd like this machine to display at login and
   at the shell:
-
-
        # echo "basement" > /etc/hostname
 
 
@@ -8872,7 +8905,38 @@
 
 
        # echo "127.0.0.1 localhost" >> /etc/hosts
-       # echo "192.168.10.51 backend-2" >> /etc/hosts
+       # echo "192.168.10.51 basement" >> /etc/hosts
+
+
+
+  Put something into the /etc/fstab file.  The ^D indicates that you
+  should press CTRL-D.
+
+
+       # cat >> /etc/fstab
+       proc /proc proc defaults 0 0
+       sys /sys sysfs defaults 0 0
+       ^D
+
+
+
+  Configure your keyboard:
+
+
+       # dpkg-reconfigure console-data
+
+
+
+  Setup resolv.conf.  These values need to be appropriate for your
+  configuration.
+
+
+       # cat >> /etc/resolv.conf
+       search .local
+       nameserver 68.87.66.196
+       nameserver 68.87.64.196
+       nameserver 63.240.76.4
+       ^D
 
 
 
@@ -8889,11 +8953,9 @@
        # xorgconfig
 
 
+
   Edit your /etc/apt/sources.list and look at the bottom of the file.
   It should end up looking like this:
-
-
-
        deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
        deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
 
@@ -8925,12 +8987,12 @@
 
 
 
-  sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-
-  mysql edit /etc/default/distcc to start it and allow other hosts
+       sudo apt-get install subversion distcc bind9 bind9-doc
 
-  sudo apt-get build-dep mythtv
 
-  sudo apt-get install libqt3c102-mysql
+
+  edit /etc/default/distcc to start it and allow other hosts
+
 
 
   [1m24.4.2.  Configuring DHCP[0m
@@ -8979,7 +9041,16 @@
 
 
 
-  [1m24.4.3.  Editing[0m
+  [1m24.4.3.  Compiling a kernel[0m
+
+  [1m24.4.4.  Preparing the frontend[0m
+
+  sudo apt-get build-dep mythtv
+
+  sudo apt-get install libqt3c102-mysql
+
+
+  [1m24.4.5.  Installing MythTV[0m
 
   svn co http://svn.mythtv.org/svn/trunk/mythtv svn co
   http://svn.mythtv.org/svn/trunk/mythplugins svn co
@@ -8992,6 +9063,7 @@
   edit .mythtv/mysql.txt
 
   Then restart
+
 
   Disable xscreensaver: System->Preferences->ScreenSaver.  Mode: Disable
   Screen Saver Advanced: Power Management Enabled: uncheck

@@ -7523,12 +7523,34 @@ $ su
 # apt-get install dhcpd3-server atftpd syslinux
 </verb></tscreen>
 
+Much of the information in this section comes from <url
+url="http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html"
+name="http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html">
+
+Download <bf>debootstrap</bf> so that your system knows how to locate the
+files required to build an image.  Find the latest version of the
+debootstrap program and download it.  At this time, the latest is
+<bf>debootstrap_0.3.3.0ubuntu1_all.deb</bf>
+
 <tscreen><verb>
-# mkdir -p /nfsroot/basement
-# debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+$ lynx http://archive.ubuntulinux.org/ubuntu/pool/main/d/debootstrap/
+</verb></tscreen>
+Cursor down to the latest file, then press "D".
+
+Install it:
+<tscreen><verb>
+$ mkdir temp1
+$ mv debootstrap_0.3.3.0ubuntu1_all.deb temp1
+$ cd temp1
+$ ar -xf debootstrap_0.3.3.0ubuntu1_all.deb
+$ su
+# tar -xzf data.tar.gz
 </verb></tscreen>
 
-http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html
+<tscreen><verb>
+# mkdir -p /nfsroot/basement
+# debootstrap --arch i386 breezy /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+</verb></tscreen>
 
 Once that's done, we'll need to <bf>chroot</bf> into the newly created
 directory structure for some initial setup.
@@ -7546,7 +7568,31 @@ shell:
 Add the IP address of this host to <tt>/etc/hosts</tt>
 <tscreen><verb>
 # echo "127.0.0.1 localhost" >> /etc/hosts
-# echo "192.168.10.51 backend-2" >> /etc/hosts
+# echo "192.168.10.51 basement" >> /etc/hosts
+</verb></tscreen>
+
+Put something into the <tt>/etc/fstab</tt> file.  The <tt>^D</tt> indicates
+that you should press CTRL-D.
+<tscreen><verb>
+# cat >> /etc/fstab
+proc /proc proc defaults 0 0
+sys /sys sysfs defaults 0 0
+^D
+</verb></tscreen>
+
+Configure your keyboard:
+<tscreen><verb>
+# dpkg-reconfigure console-data
+</verb></tscreen>
+
+Setup <tt>resolv.conf</tt>.  These values need to be appropriate for your configuration.
+<tscreen><verb>
+# cat >> /etc/resolv.conf
+search .local
+nameserver 68.87.66.196
+nameserver 68.87.64.196
+nameserver 63.240.76.4
+^D
 </verb></tscreen>
 
 Create the initial configuration:
@@ -7591,12 +7637,12 @@ Finally, exit out of the <bf>chroot</bf>:
 # exit
 </verb></tscreen>
 
-sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-mysql
+<tscreen><verb>
+sudo apt-get install subversion distcc bind9 bind9-doc
+</verb></tscreen>
+
 edit /etc/default/distcc to start it and allow other hosts
 
-sudo apt-get build-dep mythtv
-
-sudo apt-get install libqt3c102-mysql
 
 <sect2>Configuring DHCP
 <p>
@@ -7642,7 +7688,14 @@ group {
 }
 </verb></tscreen>
 
-<sect2>Editing 
+<sect2>Compiling a kernel
+<sect2>Preparing the frontend
+<p>
+sudo apt-get build-dep mythtv
+
+sudo apt-get install libqt3c102-mysql
+
+<sect2>Installing MythTV
 <p>
 svn co http://svn.mythtv.org/svn/trunk/mythtv
 svn co http://svn.mythtv.org/svn/trunk/mythplugins
@@ -7663,7 +7716,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.19.00, 2006-02-01.  Version bump.  Add snippet for network control.
+v0.19.00, 2006-02-07.  Version bump.  Add snippet for network control.  Update diskless HOWTO.
 
 -->
 
