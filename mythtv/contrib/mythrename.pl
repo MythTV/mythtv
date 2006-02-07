@@ -408,8 +408,8 @@ EOF
                 print "$dest/$name\n";
             }
         }
-    # Rename the file
-        else {
+    # Rename the file, but only if it's a real file
+        elsif (-f "$video_dir/".$info{'basename'}) {
             if ($info{'basename'} ne $name.$suffix) {
             # Check for duplicates
                 if (-e "$video_dir/$name$suffix") {
