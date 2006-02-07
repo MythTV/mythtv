@@ -199,7 +199,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     return retval;
 }
 
-/** \fn RecordPending(const ProgramInfo*, int)
+/** \fn EncoderLink::RecordPending(const ProgramInfo*, int)
  *  \brief Tells TVRec there is a pending recording "rec" in "secsleft" seconds.
  *  \param rec      Recording to make.
  *  \param secsleft Seconds to wait before starting recording.
@@ -585,14 +585,15 @@ void EncoderLink::CancelNextRecording(bool cancel)
         VERBOSE(VB_IMPORTANT, "Should be local only query: CancelNextRecording");
 }
 
-/** \fn EncoderLink::SpawnLiveTV()
+/** \fn EncoderLink::SpawnLiveTV(LiveTVChain*, bool)
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
  *
  *  \param chain The LiveTV chain to use
  *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture di
 splay.
- *  \sa TVRec::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
+ *  \sa TVRec::SpawnLiveTV(LiveTVChain*,bool),
+ *      RemoteEncoder::SpawnLiveTV(LiveTVChain*,bool)
  */
 void EncoderLink::SpawnLiveTV(LiveTVChain *chain, bool pip)
 {
@@ -876,7 +877,7 @@ void EncoderLink::GetNextProgram(int direction,
         VERBOSE(VB_IMPORTANT, "Should be local only query: GetNextProgram");
 }
 
-/** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
+/** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *         <b>This only works on local recorders.</b>
  *  \param pginfo       Recording to grab from.
@@ -885,6 +886,7 @@ void EncoderLink::GetNextProgram(int direction,
  *  \param bufferlen    Returns size of buffer returned (in bytes).
  *  \param video_width  Returns width of frame grabbed.
  *  \param video_height Returns height of frame grabbed.
+ *  \param video_aspect Returns the aspect ratio of frame grabbed.
  *  \return Buffer allocated with new containing frame in RGBA32 format if
  *          successful, NULL otherwise.
  */

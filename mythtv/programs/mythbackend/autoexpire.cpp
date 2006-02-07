@@ -88,7 +88,7 @@ AutoExpire::~AutoExpire()
 //#define DBG_CALC_PARAM(X) VERBOSE(VB_IMPORTANT, LOC + X);
 #define DBG_CALC_PARAM(X) 
 
-/** \fn AutoExpire::CalcParams()
+/** \fn AutoExpire::CalcParams(vector<EncoderLink*>)
  *   Calcualtes how much space needs to be cleared, and how often.
  */
 void AutoExpire::CalcParams(vector<EncoderLink*> recs)
@@ -622,7 +622,7 @@ void AutoExpire::PrintExpireList(void)
     }
 }
 
-/** \fn AutoExpire::GetAllExpiring()
+/** \fn AutoExpire::GetAllExpiring(QStringList&)
  *  \brief Gets the full list of programs that can expire in expiration order
  */
 void AutoExpire::GetAllExpiring(QStringList &strList)

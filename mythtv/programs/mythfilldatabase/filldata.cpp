@@ -2868,7 +2868,7 @@ void clearOldDBEntries(void)
     query.exec();
 }
 
-/** \fn filldata(QValueList<Source> &sourcelist)
+/** \fn fillData(QValueList<Source> &sourcelist)
  *  \brief Goes through the sourcelist and updates its channels with
  *         program info grabbed with the associated grabber.
  *  \return true if there was no failures

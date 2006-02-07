@@ -29,7 +29,6 @@ class Scheduler : public QObject
 
     void Reschedule(int recordid);
     void AddRecording(const ProgramInfo&);
-    /// @param[in] recordID changed from master (-1 == everything changed)
     void FillRecordListFromDB(int recordid = -1);
     void FillRecordListFromMaster(void);
 

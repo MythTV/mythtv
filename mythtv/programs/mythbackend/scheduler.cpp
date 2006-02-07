@@ -292,6 +292,10 @@ bool Scheduler::FillRecordList(void)
     return hasconflicts;
 }
 
+/** \fn Scheduler::FillRecordListFromDB(int)
+ *  \param recordid Record ID of recording that has changed,
+ *                  or -1 if anything might have been changed.
+ */
 void Scheduler::FillRecordListFromDB(int recordid)
 {
     struct timeval fillstart, fillend;
