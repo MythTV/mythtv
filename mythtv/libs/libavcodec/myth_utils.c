@@ -26,7 +26,7 @@
  
 #include "avcodec.h"
 
-/** \fn codec_id_string(enum CodecType)
+/** \fn codec_id_string(enum CodecID)
  *  returns a human readable string for the CodecID enum.
  */
 const char *codec_id_string(enum CodecID codec_id)
