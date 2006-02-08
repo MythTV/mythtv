@@ -104,6 +104,7 @@ class IvtvDecoder : public DecoderBase
 
     bool              needReset;
     MythTimer         needResetTimer;
+    MythTimer         lastResetTime;
   private:
     static DevInfoMap devInfo;
     static QMutex     devInfoLock;

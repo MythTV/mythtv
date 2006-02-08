@@ -47,6 +47,7 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
       nexttoqueue(1),         lastdequeued(0)
 {
+    lastResetTime.start();
     fps = 29.97f;
     lastKey = 0;
 }
@@ -514,9 +515,9 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
         }
     }
 
+    int size = 0;
     if ((long)framesRead <= stopframe && (!vidfull || vidread != vidwrite))
     {
-        int size = 0;
         long long startpos = ringBuffer->GetReadPosition();
         if (waitingForChange)
         {
@@ -593,14 +594,28 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
 #ifdef EXTRA_DEBUG
     if (needReset)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "needReset "<<needResetTimer.elapsed());
+        VERBOSE(VB_PLAYBACK, LOC + "needReset "<<needResetTimer.elapsed()
+                <<" livetv("<<(bool)GetNVP()->GetTVChain()<<")");
         usleep(50000);
     }
 #endif // EXTRA_DEBUG
 
+    // If hit the EOF and are watching an old recording, set ateof.
+    // This lets us exit out of old recording quicker.
+    ateof |= needReset && (size > 0) && !(bool)GetNVP()->GetTVChain();
+
     if (needReset && needResetTimer.elapsed() > 1000)
-    { 
+    {
+        // Abort the reset itself if the we just did a reset, to avoid looping.
+        if (lastResetTime.elapsed() < 1200)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "RESET -- aborted "
+                    <<lastResetTime.elapsed());
+            ateof = true;
+            return false;
+        }
         needReset = false;
+        lastResetTime.start();
         VERBOSE(VB_IMPORTANT, LOC + "*********************************");
         VERBOSE(VB_IMPORTANT, LOC + "RESET -- begin");
         lastdequeued = 0;
