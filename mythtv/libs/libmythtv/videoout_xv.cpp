@@ -2924,7 +2924,13 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
 
     if (osd && !embedding)
     {
-        DisplayOSD(frame, osd);
+        if (!chroma_osd)
+            DisplayOSD(frame, osd);
+        else
+        {
+            QMutexLocker locker(&global_lock);
+            needrepaint |= chroma_osd->ProcessOSD(osd);
+        }
     }
 
     if (!pauseframe && deint_proc && !m_deinterlaceBeforeOSD)
