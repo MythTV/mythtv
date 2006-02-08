@@ -123,6 +123,17 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
     if (alphaState == newAlphaState)
         return;
 
+#if 0
+    if (newAlphaState == kAlpha_Local)
+        VERBOSE(VB_PLAYBACK, LOC + "SetAlpha(Local)");
+    if (newAlphaState == kAlpha_Clear)
+        VERBOSE(VB_PLAYBACK, LOC + "SetAlpha(Clear)");
+    if (newAlphaState == kAlpha_Solid)
+        VERBOSE(VB_PLAYBACK, LOC + "SetAlpha(Solid)");
+    if (newAlphaState == kAlpha_Embedded)
+        VERBOSE(VB_PLAYBACK, LOC + "SetAlpha(Embedded)");
+#endif
+
     alphaState = newAlphaState;
 
     struct ivtvfb_ioctl_state_info fbstate;
@@ -248,6 +259,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
         if (ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords) < 0)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting active buffer" + ENO);
+
+        SetAlpha(kAlpha_Clear);
     }
 
     VERBOSE(VB_GENERAL, "Using the PVR-350 decoder/TV-out");
@@ -477,7 +490,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
                 ShowPip(&tmpframe, pipPlayer);
         }
         drawanyway  |= !lastcleared || pipon;
-        lastcleared |= !pipon;
+        lastcleared &= !pipon;
     }
 
     // Set these so we know if/how to clear if need be, the next time around.
@@ -485,8 +498,11 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     pipon = (bool) pipPlayer;
 
     // If there is an OSD, make sure we draw OSD surface
-    lastcleared &= (ret < 0);
+    lastcleared &= !osd;
 
+#if 0
+// These optimizations have been disabled until someone with a real PVR-350
+// setup can test them Feb 7th, 2006 -- dtk
     // If nothing on OSD surface, just set the alpha to zero
     if (lastcleared && drawanyway)
     {
@@ -497,6 +513,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     // If there has been no OSD change and no draw has been forced we're done
     if (ret <= 0 && !drawanyway)
         return;
+#endif
 
     // The OSD surface needs to be updated...
     struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
