@@ -914,7 +914,7 @@ int main(int argc, char *argv[])
     {
         int jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
 
-        if (beNice || jobQueueCPU < 2)
+        if (jobQueueCPU < 2)
             nice(17);
 
         if (jobQueueCPU)
