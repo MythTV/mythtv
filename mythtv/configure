@@ -1229,6 +1229,9 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Deschutes" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
        optimize="small"
+   elif expr "$processor" : ".*Pentium II" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
+       optimize="small"
 # AMD Turion
    elif expr "$processor" : ".*AMD Turion(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
