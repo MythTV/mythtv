@@ -2481,22 +2481,14 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
         QString rest = action.right(action.length() - 13);
         MythPluginManager *pmanager = gContext->getPluginManager();
         if (pmanager)
-        {
-            gContext->addCurrentLocation(rest.stripWhiteSpace().lower() + "setup");
             pmanager->config_plugin(rest.stripWhiteSpace());
-            gContext->removeCurrentLocation();
-        }
     }
     else if (action.left(6) == "PLUGIN")
     {
         QString rest = action.right(action.length() - 7);
         MythPluginManager *pmanager = gContext->getPluginManager();
         if (pmanager)
-        {
-            gContext->addCurrentLocation(rest.stripWhiteSpace().lower());
             pmanager->run_plugin(rest.stripWhiteSpace());
-            gContext->removeCurrentLocation();
-        }
     }
     else if (action.left(8) == "SHUTDOWN")
     {

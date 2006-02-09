@@ -39,12 +39,15 @@ NetworkControl::NetworkControl(int port)
     jumpMap["mythmovietime"]         = "MythMovieTime";
     jumpMap["mythvideo"]             = "MythVideo";
     jumpMap["mythweather"]           = "MythWeather";
+    jumpMap["mythgame"]              = "MythGame";
+    jumpMap["mythnews"]              = "MythNews";
     jumpMap["playdvd"]               = "Play DVD";
     jumpMap["playmusic"]             = "Play music";
     jumpMap["programfinder"]         = "Program Finder";
     jumpMap["programguide"]          = "Program Guide";
     jumpMap["recordingpriorities"]   = "Program Recording Priorities";
     jumpMap["ripcd"]                 = "Rip CD";
+    jumpMap["ripdvd"]                = "Rip DVD";
     jumpMap["musicplaylists"]        = "Select music playlists";
     jumpMap["deleterecordings"]      = "TV Recording Deletion";
     jumpMap["playbackrecordings"]    = "TV Recording Playback";
@@ -52,6 +55,9 @@ NetworkControl::NetworkControl(int port)
     jumpMap["videogallery"]          = "Video Gallery";
     jumpMap["videolistings"]         = "Video Listings";
     jumpMap["videomanager"]          = "Video Manager";
+    jumpMap["flixbrowse"]            = "Netflix Browser";
+    jumpMap["flixqueue"]             = "Netflix Queue";
+    jumpMap["flixhistory"]           = "Netflix History";
 
     // These jump point names match the (lowercased) locations from gContext
     jumpMap["channelrecpriority"]    = "Channel Recording Priorities";
