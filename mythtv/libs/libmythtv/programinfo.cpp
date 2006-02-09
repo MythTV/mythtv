@@ -1503,14 +1503,16 @@ static bool insert_program(MSqlQuery                &query,
         "    recgroup,  autoexpire,  recordid,        seriesid,         "
         "    programid, stars,       previouslyshown, originalairdate,  "
         "    findid,    transcoder,  playgroup,       recpriority,      "
-        "    basename,  progstart,   progend,         profile) "
+        "    basename,  progstart,   progend,         profile,          "
+        "    duplicate) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
         "   :SUBTITLE, :DESC,       :HOSTNAME,       :CATEGORY,         "
         "   :RECGROUP, :AUTOEXP,    :RECORDID,       :SERIESID,         "
         "   :PROGRAMID,:STARS,      :REPEAT,         :ORIGAIRDATE,      "
         "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
-        "    :BASENAME, :PROGSTART,  :PROGEND,       :PROFILE) "
+        "   :BASENAME, :PROGSTART,  :PROGEND,        :PROFILE,          "
+        "   0) "
         );
 
     query.bindValue(":CHANID",      pg->chanid);
@@ -1556,7 +1558,8 @@ static bool insert_program(MSqlQuery                &query,
 void ProgramInfo::FinishedRecording(bool prematurestop)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE recorded SET endtime = :ENDTIME "
+    query.prepare("UPDATE recorded SET endtime = :ENDTIME, "
+                  "       duplicate = 1 "
                   "WHERE chanid = :CHANID AND "
                   "    starttime = :STARTTIME ");
     query.bindValue(":ENDTIME", recendts);
