@@ -641,9 +641,11 @@ void runMusicPlayback(void)
 {
     MusicData mdata;
 
+    gContext->addCurrentLocation("playmusic");
     preMusic(&mdata);
     startPlayback(mdata.all_playlists, mdata.all_music);
     postMusic(&mdata);
+    gContext->removeCurrentLocation();
 }
 
 
@@ -652,15 +654,18 @@ void runMusicSelection(void)
 {
     MusicData mdata;
 
+    gContext->addCurrentLocation("musicplaylists");
     preMusic(&mdata);
     startDatabaseTree(mdata.all_playlists, mdata.all_music);
     postMusic(&mdata);
+    gContext->removeCurrentLocation();
 }
 
 void runRipCD(void)
 {
     MusicData mdata;
 
+    gContext->addCurrentLocation("ripcd");
     preMusic(&mdata);
     if (startRipper())
     {
@@ -670,4 +675,5 @@ void runRipCD(void)
         RebuildMusicTree(&mdata);
     }
     postMusic(&mdata);
+    gContext->removeCurrentLocation();
 }

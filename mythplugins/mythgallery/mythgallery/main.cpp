@@ -23,6 +23,7 @@ int mythplugin_config(void);
 
 void runGallery(void)
 {
+    gContext->addCurrentLocation("mythgallery");
     QString startdir = gContext->GetSetting("GalleryDir");
     QDir dir(startdir);
     if (!dir.exists() || !dir.isReadable()) {
@@ -36,6 +37,7 @@ void runGallery(void)
         IconView icv(startdir, gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
+    gContext->removeCurrentLocation();
 }
 
 void setupKeys(void)

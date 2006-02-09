@@ -123,8 +123,10 @@ int mythplugin_init(const char *libversion)
 
 void runGames(void)
 {
+    gContext->addCurrentLocation("mythgame");
     GameTree gametree(gContext->GetMainWindow(), "gametree", "game-");
     gametree.exec();
+    gContext->removeCurrentLocation();
 }
 
 int mythplugin_run(void)

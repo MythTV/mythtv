@@ -44,18 +44,24 @@ int mythplugin_config(void);
 //void runNews(void);
 
 void browse(void){
+        gContext->addCurrentLocation("flixbrowse");
         MythFlix flix(gContext->GetMainWindow(), "netflix browse");
         flix.exec();
+        gContext->removeCurrentLocation();
 }
 
 void queue(void){
+        gContext->addCurrentLocation("flixqueue");
         MythFlixQueue flix(gContext->GetMainWindow(), "netflix queue");
         flix.exec();
+        gContext->removeCurrentLocation();
 }
 
 void history(void){
+        gContext->addCurrentLocation("flixhistory");
         MythFlixQueue flix(gContext->GetMainWindow(), "netflix history");
         flix.exec();
+        gContext->removeCurrentLocation();
 }
 
 void NetFlixCallback(void *data, QString &selection)
@@ -103,7 +109,9 @@ void runMenu()
 
 void setupKeys(void)
 {
-    REG_JUMP("Browse", "", "", browse);
+    REG_JUMP("Netflix Browser", "Browse Netflix titles", "", browse);
+    REG_JUMP("Netflix Queue", "Administer Netflix Queue", "", queue);
+    REG_JUMP("Netflix History", "View Netflix History", "", history);
 
     REG_KEY("NetFlix", "MOVETOTOP", "Moves movie to top of queue", "1");
     REG_KEY("NetFlix", "REMOVE", "Removes movie from queue", "D");

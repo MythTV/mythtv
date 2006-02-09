@@ -211,9 +211,11 @@ void runVideoManager(void)
 
         VideoManager *manage = new VideoManager(gContext->GetMainWindow(),
                                                 "video manager");
+        gContext->addCurrentLocation("videomanager");
         qApp->unlock();
         manage->exec();
         qApp->lock();
+        gContext->removeCurrentLocation();
         delete manage;
     }
 }
@@ -222,9 +224,11 @@ void runVideoBrowser(void)
 {
     VideoBrowser *browse = new VideoBrowser(gContext->GetMainWindow(),
                                             "video browser");
+    gContext->addCurrentLocation("videobrowser");
     qApp->unlock();
     browse->exec();
     qApp->lock();
+    gContext->removeCurrentLocation();
     delete browse;
 }
 
@@ -234,10 +238,11 @@ void runVideoTree(void)
                                     "videotree",
                                     "video-",
                                     "video tree"); 
-
+    gContext->addCurrentLocation("videolistings");
     qApp->unlock();
     tree->exec();
     qApp->lock();
+    gContext->removeCurrentLocation();
     delete tree;
 }
 
@@ -267,9 +272,11 @@ void runVideoGallery(void)
 {
     VideoGallery *gallery = new VideoGallery(gContext->GetMainWindow(),
                                              "video gallery");
+    gContext->addCurrentLocation("videogallery");
     qApp->unlock();
     gallery->exec();
     qApp->lock();
+    gContext->removeCurrentLocation();
     delete gallery;
 }
 

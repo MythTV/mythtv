@@ -42,9 +42,11 @@ void startDVDRipper(void)
 {
     DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
                                    "dvd_rip", "dvd-"); 
+    gContext->addCurrentLocation("ripdvd");
     qApp->unlock();
     drb->exec();
     qApp->lock();
+    gContext->removeCurrentLocation();
 
     qApp->processEvents();
 
@@ -63,6 +65,8 @@ void playVCD()
     //
     QString command_string = gContext->GetSetting("VCDPlayerCommand");
 
+    gContext->addCurrentLocation("playvcd");
+
     if(command_string.length() < 1)
     {
         //
@@ -74,6 +78,7 @@ void playVCD()
         no_player_dialog->exec();
         
         delete no_player_dialog;
+        gContext->removeCurrentLocation();
         return;
     }
     else
@@ -95,6 +100,7 @@ void playVCD()
                 no_device_dialog->exec();
                 
                 delete no_device_dialog;
+                gContext->removeCurrentLocation();
                 return;
             }
             else
@@ -107,6 +113,7 @@ void playVCD()
         gContext->GetMainWindow()->setActiveWindow();
         gContext->GetMainWindow()->currentWidget()->setFocus();
     }
+    gContext->removeCurrentLocation();
 }
 #endif
 
@@ -118,12 +125,15 @@ void playDVD(void)
     
     QString command_string = gContext->GetSetting("DVDPlayerCommand");
 
+    gContext->addCurrentLocation("playdvd");
+
     if ( (command_string.find("internal", 0, false) > -1)||
          (command_string.length() < 1))
     {
         QString filename = QString("dvd:/%1" ).arg(gContext->GetSetting("DVDDeviceLocation"));
         command_string = "Internal";
         gContext->GetMainWindow()->HandleMedia(command_string, filename);
+        gContext->removeCurrentLocation();
         return;
     }
     
@@ -146,6 +156,7 @@ void playDVD(void)
                 no_device_dialog->exec();
         
                 delete no_device_dialog;
+                gContext->removeCurrentLocation();
                 return;
             }
             else
@@ -159,6 +170,7 @@ void playDVD(void)
         gContext->GetMainWindow()->currentWidget()->setFocus();
         
     }
+    gContext->removeCurrentLocation();
 }
 
 void DVDCallback(void *data, QString &selection)

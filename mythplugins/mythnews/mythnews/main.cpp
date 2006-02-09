@@ -64,8 +64,10 @@ int mythplugin_init(const char *libversion)
 
 void runNews(void)
 {
+    gContext->addCurrentLocation("mythnews");
     MythNews news(gContext->GetMainWindow(), "news");
     news.exec();
+    gContext->removeCurrentLocation();
 }
 
 int mythplugin_run(void)

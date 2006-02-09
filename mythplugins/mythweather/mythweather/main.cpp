@@ -51,8 +51,10 @@ void runWeather(void)
 {
     int appCode = 0;
 
+    gContext->addCurrentLocation("mythweather");
     Weather weatherDat(appCode, gContext->GetMainWindow(), "weather");
     weatherDat.exec();
+    gContext->removeCurrentLocation();
 }
 
 int mythplugin_run(void)
