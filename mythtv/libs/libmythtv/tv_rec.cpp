@@ -627,14 +627,19 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
     if (!curRec)
         return;
 
-    bool was_rec = false;
+    ProgramInfo *pi = NULL;
 
-    VERBOSE(VB_RECORD, LOC + QString("FinishedRecording(%1) was status: %2")
-                                     .arg(curRec->title)
-                                     .arg(curRec->RecStatusText()));
+    QString pigrp = curRec->recgroup;
 
-    if (curRec->recstatus == rsRecording)
-        was_rec = true;
+    pi = ProgramInfo::GetProgramFromRecorded(curRec->chanid,
+                                             curRec->recstartts);
+    if (pi)
+    {
+        pigrp = pi->recgroup;
+        delete pi;
+    }
+    VERBOSE(VB_RECORD, LOC + QString("FinishedRecording(%1) in recgroup: %2")
+                                     .arg(curRec->title).arg(pigrp));
 
     curRec->recstatus = rsRecorded;
     curRec->recendts = mythCurrentDateTime();
@@ -650,7 +655,7 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
     if (curRec->recendts <= curRec->recstartts)
         curRec->recendts = mythCurrentDateTime().addSecs(1);
 
-    if (was_rec)
+    if (pigrp != "LiveTV")
     {
         MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                      .arg(curRec->cardid)
