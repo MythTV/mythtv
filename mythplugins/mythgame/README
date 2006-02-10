@@ -1,8 +1,6 @@
                                     MythGame
-			          Release 0.17
+			          Release 0.19
 
-
-There'll be more information here later, but for now:
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
@@ -33,31 +31,8 @@ Follow this by a 'make install'.  It'll put a 'libmythgame.so' plugin in your
 MythGame will also read the mysql.txt settings files used by MythTV, so any 
 changes you made to those will be carried over into this.
 
-After compiling and installing, you will need to enter the setup menu from
-mythfrontend to configure mythgame.  You'll probably want to set ROM paths, etc.
-
-The first time you run MythGame, it'll search out and insert all games that it
-finds into its database, so it may seem to take awhile.  Later runs should be
-fairly quick.  In the normal text-only selection interface, just navigate around
-with the arrow keys, and use space/enter to start a game.  Hitting 'm' on the
-game name will take you to a settings dialog, and hitting 'm' on the system
-name (ie, MAME), will take you to a system setup menu.  In the screenshot-based
-selection menu, just hit tab to switch between navigating the list and the
-screenshot section.
-
-To use the generic PC game stuff, check out the example gamelist.xml file
-in this directory and modify it/add to it as desired.
-
-NES SETTINGS
------------------
-
-ROM Screenshots
-Screenshots must be in GIF format and must have an extension of ".gif"
-MythGame will first look to the database for the name of the screenshot. If
-that file is not found, it will then attempt to match an image with the
-the game name from the database.  If that fails, it will then atttempt to 
-find the image with the same name as the ROM file. 
-
+If you require help configuring MythGame please see the new Wiki located on
+http://www.mythtv.org.
 
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
