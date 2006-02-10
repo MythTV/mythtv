@@ -627,6 +627,15 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
     if (!curRec)
         return;
 
+    bool was_rec = false;
+
+    VERBOSE(VB_RECORD, LOC + QString("FinishedRecording(%1) was status: %2")
+                                     .arg(curRec->title)
+                                     .arg(curRec->RecStatusText()));
+
+    if (curRec->recstatus == rsRecording)
+        was_rec = true;
+
     curRec->recstatus = rsRecorded;
     curRec->recendts = mythCurrentDateTime();
 
@@ -641,14 +650,16 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
     if (curRec->recendts <= curRec->recstartts)
         curRec->recendts = mythCurrentDateTime().addSecs(1);
 
-    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
-                 .arg(curRec->cardid)
-                 .arg(curRec->chanid)
-                 .arg(curRec->startts.toString(Qt::ISODate))
-                 .arg(curRec->recstatus)
-                 .arg(curRec->recendts.toString(Qt::ISODate)));
-    gContext->dispatch(me);
-
+    if (was_rec)
+    {
+        MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                     .arg(curRec->cardid)
+                     .arg(curRec->chanid)
+                     .arg(curRec->startts.toString(Qt::ISODate))
+                     .arg(curRec->recstatus)
+                     .arg(curRec->recendts.toString(Qt::ISODate)));
+        gContext->dispatch(me);
+    }
     curRec->FinishedRecording(false);
 }
 
