@@ -1788,8 +1788,13 @@ void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
 
 void PlaybackBoxMusic::openOutputDevice(void)
 {
-    QString adevice = gContext->GetSetting("AudioOutputDevice");
-    
+    QString adevice;
+
+    if (gContext->GetSetting("MusicAudioDevice") == "default")
+        adevice = gContext->GetSetting("AudioOutputDevice");
+    else
+        adevice = gContext->GetSetting("MusicAudioDevice");
+ 
     // TODO: Error checking that device is opened correctly!
     output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
                                     AUDIOOUTPUT_MUSIC, true ); 
