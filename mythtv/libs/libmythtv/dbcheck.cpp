@@ -422,6 +422,10 @@ bool UpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
+    MSqlQuery chartype(MSqlQuery::InitCon());
+    chartype.prepare("ALTER DATABASE mythconverg DEFAULT CHARACTER SET latin1;");
+    chartype.exec();
+
     VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
                                   .arg(currentDatabaseVersion));
 
