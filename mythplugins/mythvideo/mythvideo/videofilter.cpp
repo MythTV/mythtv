@@ -140,7 +140,7 @@ QString VideoFilterSettings::BuildClauseWhere(int parental_level)
     if (genre != -1)
     {
         condition = genre ? QString("= %1").arg(genre) : QString("IS NULL");
-        where = QString(" AND videometadatagenre.idgenre %1").arg(condition);
+        where += QString(" AND videometadatagenre.idgenre %1").arg(condition);
     }
     
     if (country != -1)
