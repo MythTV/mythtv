@@ -774,7 +774,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         if (QDateTime::currentDateTime() > curtime) 
         {
-            if (honorCutList && 
+            if (honorCutList && m_proginfo &&
                 m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT))
             {
                 unlink(outputname);
@@ -807,9 +807,12 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     if (! fifow)
     {
-        m_proginfo->ClearPositionMap(MARK_KEYFRAME);
-        m_proginfo->ClearPositionMap(MARK_GOP_START);
-        m_proginfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        if (m_proginfo)
+        {
+            m_proginfo->ClearPositionMap(MARK_KEYFRAME);
+            m_proginfo->ClearPositionMap(MARK_GOP_START);
+            m_proginfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        }
 
         nvr->WriteSeekTable();
         if (!kfa_table->isEmpty())
