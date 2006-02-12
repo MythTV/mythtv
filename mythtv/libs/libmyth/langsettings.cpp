@@ -146,6 +146,7 @@ QStringList LanguageSettings::getLanguages(void)
           << QString::fromUtf8("Islenska")    << "IS"   // Icelandic
           << QString::fromUtf8("Norsk (bokmål)") << "NB" // Norwegian (Bokmål)
           << QString::fromUtf8("Svenska")     << "SV"   // Swedish
+          << QString::fromUtf8("Polski")      << "PL"   // Polish
           << QString::fromUtf8("Português")  << "PT"   // Portuguese
           << QString::fromUtf8("Nihongo")     << "JA"   // Japanese
           << QString::fromUtf8("Slovenski")   << "SI"   // Slovenian

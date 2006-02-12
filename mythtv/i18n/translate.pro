@@ -69,4 +69,4 @@ TRANSLATIONS += mythfrontend_dk.ts mythfrontend_pt.ts mythfrontend_sv.ts
 TRANSLATIONS += mythfrontend_ja.ts mythfrontend_si.ts mythfrontend_fi.ts
 TRANSLATIONS += mythfrontend_zh_tw.ts mythfrontend_nb.ts mythfrontend_is.ts
 TRANSLATIONS += mythfrontend_pt_br.ts mythfrontend_en_gb.ts mythfrontend_cz.ts
-TRANSLATIONS += mythfrontend_et.ts
+TRANSLATIONS += mythfrontend_et.ts mythfrontend_pl.ts
