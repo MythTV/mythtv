@@ -3736,15 +3736,12 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
                 case kState_RecordingOnly:
                 case kState_WatchingRecording:
                 {
-                    if (isLocal)
-                    {
-                        ProgramInfo *pInfo = elink->GetRecording();
+                    ProgramInfo *pInfo = elink->GetRecording();
 
-                        if (pInfo)
-                        {
-                            FillProgramInfo(pDoc, encoder, pInfo);
-                            delete pInfo;
-                        }
+                    if (pInfo)
+                    {
+                        FillProgramInfo(pDoc, encoder, pInfo);
+                        delete pInfo;
                     }
 
                     break;
