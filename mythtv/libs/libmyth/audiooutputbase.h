@@ -52,8 +52,6 @@ class AudioOutputBase : public AudioOutput
     // Send output events showing current progress
     virtual void Status(void);
 
-    QString GetError() { return lastError; };
-
     virtual void SetSourceBitrate(int rate);
 
     //  Only really used by the AudioOutputNULL object
@@ -116,8 +114,6 @@ class AudioOutputBase : public AudioOutput
     bool buffer_output_data_for_use; //  used by AudioOutputNULL
     
  private:
-    QString lastError;
-
     // resampler
     bool need_resampler;
     SRC_STATE *src_ctx;

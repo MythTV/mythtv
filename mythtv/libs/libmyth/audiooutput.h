@@ -22,7 +22,10 @@ class AudioOutput : public VolumeBase, public OutputListeners
                                  int audio_channels, int audio_samplerate,
                                  AudioOutputSource source, bool set_initial_vol);
 
-    AudioOutput() : VolumeBase(), OutputListeners() { lastError = QString::null; };
+    AudioOutput() :
+        VolumeBase(),             OutputListeners(),
+        lastError(QString::null), lastWarn(QString::null) {}
+
     virtual ~AudioOutput() { };
 
     // reconfigure sound out for new params
@@ -55,19 +58,30 @@ class AudioOutput : public VolumeBase, public OutputListeners
 
     virtual void SetSourceBitrate(int ) { }
 
-    QString GetError() { return lastError; };
+    QString GetError(void)   const { return lastError; }
+    QString GetWarning(void) const { return lastWarn; }
 
     //  Only really used by the AudioOutputNULL object
     
     virtual void bufferOutputData(bool y) = 0;
     virtual int readOutputData(unsigned char *read_buffer, int max_length) = 0;
 
- protected:
-    void Error(QString msg) 
-     { lastError = msg; VERBOSE(VB_IMPORTANT, lastError); };
+  protected:
+    void Error(QString msg)
+    {
+        lastError = msg;
+        VERBOSE(VB_IMPORTANT, "AudioOutput Error: " + lastError);
+    }
 
- private:
+    void Warn(QString msg)
+    {
+        lastWarn  = msg;
+        VERBOSE(VB_IMPORTANT, "AudioOutput Warning: " + lastWarn);
+    }
+
+  protected:
     QString lastError;
+    QString lastWarn;
 };
 
 #endif

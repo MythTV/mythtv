@@ -15,7 +15,8 @@ using namespace std;
 
 AudioOutputBase::AudioOutputBase(QString audiodevice, int, 
                                  int, int,
-                                 AudioOutputSource source, bool set_initial_vol)
+                                 AudioOutputSource source,
+                                 bool set_initial_vol)
 {
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);

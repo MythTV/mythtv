@@ -53,11 +53,9 @@ class AudioOutputALSA : public AudioOutputBase
     void OpenMixer(bool setstartingvolume);
     void CloseMixer(void);
     void SetupMixer(void);
-    inline void GetVolumeRange(void);
+    void GetVolumeRange(snd_mixer_elem_t *elem);
 
     snd_mixer_t          *mixer_handle;
-    snd_mixer_elem_t     *elem;
-    snd_mixer_selem_id_t *sid;
 
     QString mixer_control;  // e.g. "PCM"
 
