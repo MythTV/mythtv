@@ -961,7 +961,7 @@ QString SIParser::DecodeText(const uint8_t *src, uint length)
     unsigned char buf[length];
     memcpy(buf, src, length);
 
-    if ((buf[0] < 0x10) || (buf[0] >= 0x20))
+    if ((buf[0] <= 0x10) || (buf[0] >= 0x20))
     {
         // Strip formatting characters
         for (uint p = 0; p < length; p++)
@@ -979,6 +979,20 @@ QString SIParser::DecodeText(const uint8_t *src, uint length)
             QString coding = "ISO8859-" + QString::number(4 + buf[0]);
             QTextCodec *codec = QTextCodec::codecForName(coding);
             result = codec->toUnicode((const char*)buf + 1, length - 1);
+        }
+        else if (buf[0] == 0x10)
+        {
+            // If the first byte of the text field has a value "0x10"
+            // then the following two bytes carry a 16-bit value (uimsbf) N
+            // to indicate that the remaining data of the text field is
+            // coded using the character code table specified by
+            // ISO Standard 8859, parts 1 to 9
+
+            uint code = 1;
+            swab(buf + 1, &code, 2);
+            QString coding = "ISO8859-" + QString::number(code);
+            QTextCodec *codec = QTextCodec::codecForName(coding);
+            result = codec->toUnicode((const char*)buf + 3, length - 3);
         }
         else
         {
