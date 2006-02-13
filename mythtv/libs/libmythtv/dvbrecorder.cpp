@@ -23,6 +23,8 @@
  *            in ::StartRecording, is based upon.
  *      Martin Smith (martin at spamcop.net)
  *          - The signal quality monitor
+ *      David Matthews (dm at prolingua.co.uk)
+ *          - Added video stream for radio channels
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -96,6 +98,8 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       // Output stream info
       _pat(NULL), _pmt(NULL), _next_pmt_version(0),
       _ts_packets_until_psip_sync(0),
+      // Fake video
+      _video_stream_fd(-1),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -237,6 +241,12 @@ void DVBRecorder::Close(void)
         _drb->Reset(videodevice, -1);
 #endif
 
+        if (_video_stream_fd >= 0)
+        {
+            close(_video_stream_fd);
+            _video_stream_fd = -1;
+        }
+
         CloseFilters();
         close(_stream_fd);
         _stream_fd = -1;
@@ -272,8 +282,8 @@ void DVBRecorder::OpenFilter(uint           pid,
     // rounded up to the nearest page
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
-    VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%2 size(%3)")
-            .arg((int)pid,0,16).arg(pid_buffer_size));
+    VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%2 size(%3) type(%4)")
+            .arg((int)pid,0,16).arg(pid_buffer_size).arg(type));
 
     // Open the demux device
     int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
@@ -331,8 +341,12 @@ void DVBRecorder::OpenFilter(uint           pid,
     _pid_infos[pid] = info;
 }
 
+#define TS_TICKS_PER_SEC    90000
+#define DUMMY_VIDEO_PID     VIDEO_PID(0x20)
+
 bool DVBRecorder::OpenFilters(void)
 {
+    bool videoMissing = true;
     CloseFilters();
 
     QMutexLocker change_lock(&_pid_lock);
@@ -351,6 +365,10 @@ bool DVBRecorder::OpenFilters(void)
 
         int pid = (*es).PID;
         dmx_pes_type_t pes_type;
+
+        if ((*es).Type == ES_TYPE_VIDEO_MPEG1 ||
+            (*es).Type == ES_TYPE_VIDEO_MPEG2)
+            videoMissing = false;
             
         if (_hw_decoder_option)
         {
@@ -399,6 +417,49 @@ bool DVBRecorder::OpenFilters(void)
         OpenFilter(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_OTHER,
                     (*es).Orig_Type);
 
+    if (_video_stream_fd >= 0)
+    {
+        close(_video_stream_fd);
+        _video_stream_fd = -1;
+    }
+
+    if (videoMissing)
+    {
+        VERBOSE(VB_RECORD, LOC + "Creating dummy video");
+        // Create a dummy video stream.
+
+        QString p = gContext->GetThemesParentDir();
+        QString path[] =
+        {
+            p+gContext->GetSetting("Theme", "G.A.N.T.")+"/",
+            p+"default/",
+        };
+        uint width  = 768;
+        uint height = 576;
+        
+        _frames_per_sec = 50;
+
+        QString filename = QString("dummy%1x%2p%3.ts")
+            .arg(width).arg(height)
+            .arg(_frames_per_sec, 0, 'f', 2);
+
+        _video_stream_fd = open(path[0]+filename.ascii(), O_RDONLY);
+        if (_video_stream_fd < 0)
+            _video_stream_fd = open(path[1]+filename.ascii(), O_RDONLY);
+        _video_header_pos = 0;
+        _audio_header_pos = 0;
+        _audio_pid = 0;
+        _time_stamp = 0;
+        _next_time_stamp = 0;
+        _video_cc = 0;
+        _ts_change_count = 0;
+
+        PIDInfo *info = new PIDInfo();
+        info->isVideo = true;
+
+        QMutexLocker change_lock(&_pid_lock);    
+        _pid_infos[DUMMY_VIDEO_PID] = info;
+    }
 
     if (_pid_infos.empty())
     {        
@@ -615,6 +676,14 @@ void DVBRecorder::CreatePMT(void)
         }
     }
 
+    if (_video_stream_fd >= 0)
+    {
+        pdesc.resize(pdesc.size()+1);
+        pdesc.back().clear();
+        pids.push_back(DUMMY_VIDEO_PID);
+        types.push_back(StreamID::MPEG2Video);
+    }
+
     // Create the PMT
     ProgramMapTable *pmt = ProgramMapTable::Create(
         programNumber, PMT_PID, _input_pmt.PCRPID,
@@ -779,6 +848,13 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
     if (info->isVideo)
         _buffer_packets = !FindKeyframes(&tspacket);
 
+    // Create dummy video stream if needed
+    if (_video_stream_fd >= 0 && pid != DUMMY_VIDEO_PID)
+    {
+        GetTimeStamp(tspacket);
+        CreateFakeVideo();
+    }
+
     // Sync recording start to first keyframe
     if (_wait_for_keyframe_option && _first_keyframe<0)
         return true;
@@ -802,6 +878,203 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
     BufferedWrite(tspacket);
 
     return true;
+}
+
+void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
+{
+    const uint pid = tspacket.PID();
+    if (pid != _audio_pid)
+        _audio_header_pos = 0;
+
+    // Find the current audio time stamp.  This code is based on
+    // DTVRecorder::FindKeyframes.
+    if (tspacket.PayloadStart())
+        _audio_header_pos = 0;
+    for (uint i = tspacket.AFCOffset(); i < TSPacket::SIZE; i++)
+    {
+        const unsigned char k = tspacket.data()[i];
+        switch (_audio_header_pos)
+        {
+            case 0:
+                _audio_header_pos = (k == 0x00) ? 1 : 0;
+                break;
+            case 1:
+                _audio_header_pos = (k == 0x00) ? 2 : 0;
+                break;
+            case 2:
+                _audio_header_pos = (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
+                break;
+            case 3:
+                if ((k >= PESStreamID::MPEGAudioStreamBegin) &&
+                    (k <= PESStreamID::MPEGAudioStreamEnd))
+                {
+                    _audio_header_pos++;
+                }
+                else
+                {
+                    _audio_header_pos = 0;
+                }
+                break;
+            case 4: case 5: case 6: case 8:
+                _audio_header_pos++;
+                break;
+            case 7:
+                _audio_header_pos = (k & 0x80) ? 8 : 0;
+                break;
+            case 9:
+                _audio_header_pos++;
+                _next_time_stamp = (k >> 1) & 0x7;
+                break;
+            case 10:
+                _audio_header_pos++;
+                _next_time_stamp = (_next_time_stamp << 8) | k;
+                break;
+            case 11:
+                _audio_header_pos++;
+                _next_time_stamp = (_next_time_stamp << 7) | ((k >> 1) & 0x7f);
+                break;
+            case 12:
+                _audio_header_pos++;
+                _next_time_stamp = (_next_time_stamp << 8) | k;
+                break;
+            case 13:
+                _next_time_stamp = (_next_time_stamp << 7) | ((k >> 1) & 0x7f);
+                _audio_header_pos = 0;
+
+                // We've found a time-stamp.
+                // Generally the time stamps will increase at a steady rate
+                // but they may jump or wrap round.  Because of errors in
+                // the stream we may get odd values out of sequence.
+                if (_next_time_stamp > _time_stamp+TS_TICKS_PER_SEC*5 ||
+                    _next_time_stamp+TS_TICKS_PER_SEC < _time_stamp)
+                {
+                    if (_ts_change_count != 0 &&
+                        _next_time_stamp > _new_time_stamp &&
+                        _next_time_stamp <=
+                        _new_time_stamp+TS_TICKS_PER_SEC*10)
+                    {
+                        _ts_change_count++;
+                        if (_ts_change_count == 4)
+                        {
+                            // We've seen 4 stamps in the new sequence.
+                            VERBOSE(VB_RECORD, LOC +
+                                    QString("Time stamp change: was %1 now %2")
+                                    .arg(_time_stamp).arg(_new_time_stamp));
+                            _time_stamp = _new_time_stamp;
+                            _ts_change_count = 0;
+                        }
+                        else
+                        {
+                            _next_time_stamp = _time_stamp;
+                        }
+                    }
+                    else
+                    {
+                        _new_time_stamp = _next_time_stamp;
+                        _next_time_stamp = _time_stamp;
+                        _ts_change_count = 1;
+                    }
+                }
+                else
+                {
+                    _ts_change_count = 0;
+                }
+        }
+    }
+
+    // If we're part way through a packet only continue if it's the same pid
+    if (_audio_header_pos != 0)
+        _audio_pid = pid;
+}
+
+void DVBRecorder::CreateFakeVideo(void)
+{
+    if (_video_stream_fd < 0 ||
+        _next_time_stamp > _time_stamp + TS_TICKS_PER_SEC*5)
+    {
+        return;
+    }
+
+    while (_next_time_stamp > _time_stamp)
+    {
+        unsigned char buffer[TSPacket::SIZE];
+        int len = read(_video_stream_fd, buffer, TSPacket::SIZE);
+        if (len == 0)
+        {
+            // Reached the end - rewind
+            lseek(_video_stream_fd, 0, SEEK_SET);
+            _video_header_pos = 0;
+            continue;
+        }
+        else if (len != (int)TSPacket::SIZE)
+            break; // Something wrong
+
+        TSPacket *pkt = reinterpret_cast<TSPacket*>(buffer);
+        if (pkt->PID() != DUMMY_VIDEO_PID)
+            continue; // Skip the tables
+        // Find the time-stamp field and overwrite it.
+        if (pkt->PayloadStart())
+            _video_header_pos = 0;
+        for (uint i = pkt->AFCOffset(); i < TSPacket::SIZE; i++)
+        {
+            const unsigned char k = buffer[i];
+            switch (_video_header_pos) {
+            case 0:
+                _video_header_pos = (k == 0x00) ? 1 : 0;
+                break;
+            case 1:
+                _video_header_pos = (k == 0x00) ? 2 : 0;
+                break;
+            case 2:
+                _video_header_pos = (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
+                break;
+            case 3:
+                if (k >= PESStreamID::MPEGVideoStreamBegin &&
+                    k <= PESStreamID::MPEGVideoStreamEnd)
+                {
+                    _video_header_pos++;
+                }
+                else if (k == PESStreamID::PictureStartCode)
+                {
+                    _video_header_pos = 0;
+                    _time_stamp += (int)
+                        ((double)TS_TICKS_PER_SEC/_frames_per_sec);
+                }
+                else _video_header_pos = 0;
+                break;
+            case 4: case 5: case 6: case 8:
+                _video_header_pos++;
+                break;
+            case 7:
+                // Is there a time-stamp?
+                _video_header_pos = (k & 0x80) ? 8 : 0;
+                break;
+            case 9:
+                buffer[i] = (k & 0xf0) | ((_time_stamp >> 29) & 0x0e) | 1;
+                _video_header_pos++;
+                break;
+            case 10:
+                buffer[i] = (_time_stamp >> 22) & 0xff;
+                _video_header_pos++;
+                break;
+            case 11:
+                buffer[i] = ((_time_stamp >> 14) & 0xfe) | 1;
+                _video_header_pos++;
+                break;
+            case 12:
+                buffer[i] = (_time_stamp >> 7) & 0xff; // 7..14
+                _video_header_pos++;
+                break;
+            case 13:
+                buffer[i] = ((_time_stamp << 1) & 0xfe) | 1; // 0..6
+                _video_header_pos = 0;
+            }
+        }
+        pkt->SetContinuityCounter(_video_cc);
+        _video_cc = (_video_cc + 1) & 0xf;
+        // Recursive call to pass the packet to the ring-buffer
+        ProcessTSPacket(*pkt);
+    }
 }
 
 ////////////////////////////////////////////////////////////

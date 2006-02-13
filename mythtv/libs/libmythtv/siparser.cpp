@@ -1275,7 +1275,8 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
 
 #ifdef USING_DVB_EIT
         if ((s.EITPresent) && 
-            (s.ServiceType == SDTObject::TV) && 
+            (s.ServiceType == SDTObject::TV ||
+             s.ServiceType == SDTObject::RADIO) && 
             ((!PrivateTypes.GuideOnSingleTransport) ||
             ((PrivateTypes.GuideOnSingleTransport) && 
             (PrivateTypes.GuideTransportID == 

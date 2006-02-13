@@ -102,7 +102,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
       // Settable
-      ignoreAudioOnlyServices(true),
+      ignoreAudioOnlyServices(false),
       ignoreEncryptedServices(false),
       forceUpdate(false),
       renameChannels(false),

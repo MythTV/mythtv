@@ -1638,7 +1638,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetStreamData(sd);
         sd->Reset(progNum);
         sm->SetProgramNumber(progNum);
-        sd->SetVideoStreamsRequired(1);
+        sd->SetVideoStreamsRequired(0);
         sm->SetFTAOnly(fta);
         sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
 

@@ -118,6 +118,9 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     DeviceReadBuffer *_drb;
 
+    void GetTimeStamp(const TSPacket& tspacket);
+    void CreateFakeVideo(void);
+
   private:
     // Options set in SetOption()
     int             _card_number_option;
@@ -147,6 +150,18 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     // Input Misc
     /// PMT on input side
     PMTObject       _input_pmt;
+
+    // Fake video for audio-only streams
+    uint            _audio_header_pos;
+    uint            _video_header_pos;
+    uint            _audio_pid;
+    int64_t         _time_stamp;
+    int64_t         _next_time_stamp;
+    int64_t         _new_time_stamp;
+    uint            _ts_change_count;
+    int             _video_stream_fd;
+    double          _frames_per_sec;
+    uint            _video_cc;
 
     // Statistics
     mutable uint        _continuity_error_count;
