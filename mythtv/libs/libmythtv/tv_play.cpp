@@ -896,7 +896,11 @@ void TV::HandleStateChange(void)
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingRecording))
     {
-        QString playbackURL = playbackinfo->GetPlaybackURL();
+        QString playbackURL;
+        if (playbackinfo->pathname.left(4) == "dvd:")
+            playbackURL = playbackinfo->pathname;
+        else
+            playbackURL = playbackinfo->GetPlaybackURL();
 
         prbuffer = new RingBuffer(playbackURL, false);
         if (prbuffer->IsOpen())
