@@ -11,7 +11,11 @@ using namespace std;
 CCDecoder::CCDecoder(CCReader *ccr)
     : reader(ccr), rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
       vps_l(0),
-      wss_flags(0), wss_valid(false)
+      wss_flags(0),       wss_valid(false),
+      xds_vchip(false),   xds_ptype(false),
+      xds_plength(false), xds_pname(false),
+      xds_stime(false),   xds_cnt(0),
+      xds_ProgramName("")
 {
     for (uint i = 0; i < 2; i++)
     {
@@ -54,8 +58,12 @@ CCDecoder::CCDecoder(CCReader *ccr)
     stdchar[126] = 'ñ';
     stdchar[127] = 0x2588; /* full block */
 
+    // VPS data
     bzero(vps_pr_label, sizeof(vps_pr_label));
     bzero(vps_label,    sizeof(vps_label));
+
+    // XDS data
+    bzero(xds_buf,      sizeof(xds_buf));
 }
 
 CCDecoder::~CCDecoder(void)
@@ -181,36 +189,7 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
             goto skip;
     }
 
-    if ((field == 1) &&
-        (xds[field] || b1 && ((b1 & 0x70) == 0x00)))
-        // 0x01 <= b1 <= 0x0F
-        // start XDS
-        // or inside XDS packet
-    {
-        int xds_packet = 1;
-
-        // TODO: process XDS packets
-        if (b1 == 0x0F)
-        {
-            // end XDS
-            xds[field] = 0;
-            xds_packet = 1;
-        }
-        else if ((b1 & 0x70) == 0x10)
-        {
-            // ctrl code -- interrupt XDS
-            xds[field] = 0;
-            xds_packet = 0;
-        }
-        else
-        {
-            xds[field] = 1;
-            xds_packet = 1;
-        }
-
-        if (xds_packet)
-            goto skip;
-    }
+    DecodeXDS(field, b1, b2);
 
     if (b1 & 0x60)
         // 0x20 <= b1 <= 0x7F
@@ -832,5 +811,210 @@ void CCDecoder::DecodeWSS(const unsigned char *buf)
     {
         wss_flags = wss;
         wss_valid = true;
+    }
+}
+
+void CCDecoder::DecodeXDSStartTime(int b1, int b2)
+{
+    if (b1 == 0x0F)
+    {
+        xds_stime = false;
+        VERBOSE(VB_VBI, QString("XDS Packet: Start Time/Program ID: End"));
+        return;
+    }
+
+    // Process Start Time packets here
+    VERBOSE(VB_VBI, QString("XDS Packet: Start Time/Program ID: "
+                            "Packet %1 %2").arg(b1).arg(b2));
+}
+
+void CCDecoder::DecodeXDSProgramLength(int b1, int b2)
+{
+    if (b1 == 0x0F)
+    {
+        xds_plength = false;
+        // Payload bytes 1 and 2 are minutes and hours in length
+        if (xds_cnt > 0)
+            VERBOSE(VB_VBI, "XDS Packet: " +
+                    QString("Program Length: %1 hours, %1 minutes")
+                    .arg(xds_buf[1]-64).arg(xds_buf[0]-64));
+        // Payload bytes 3 and 4 are elapsed minutes and hours in length
+        if (xds_cnt >= 2)
+            VERBOSE(VB_VBI, "XDS Packet: " +
+                    QString("Program Elapsed: %1 hours, %1 mintues")
+                    .arg(xds_buf[3]-64).arg(xds_buf[2]-64));
+        // If Payload byte 6 is filler 0x40,
+        // then payload byte 5 is elapsed seconds
+        if ((xds_cnt >= 4) && (xds_buf[5]==0x40))
+            VERBOSE(VB_VBI, "XDS Packet: " +
+                    QString("Program Elapsed: %1 seconds").arg(xds_buf[4]-64));
+
+        //VERBOSE(VB_VBI, "XDS Packet: Program Length/Time in Show: End");
+        return;
+    }
+
+    // Process Program Length packets here
+    //VERBOSE(VB_VBI, "XDS Packet: " +
+    //        QString("Program Length/Time in Show: Packet %1 %2")
+    //        .arg(b1).arg(b2));
+    xds_buf[xds_cnt] = b1;
+    xds_cnt++;
+    xds_buf[xds_cnt] = b2;
+    xds_cnt++;
+}
+
+void CCDecoder::DecodeXDSProgramName(int b1, int b2)
+{
+    if (b1 == 0x0F)
+    {
+        xds_pname = false;
+        VERBOSE(VB_VBI, QString("XDS Packet: Program Name: %1")
+                .arg(xds_ProgramName));
+        return;
+    }
+
+    // Process Program Name packets here
+    xds_ProgramName += CharCC(b1);
+    xds_ProgramName += CharCC(b2);
+}
+
+void CCDecoder::DecodeXDSProgramType(int b1, int b2)
+{
+    if (b1 == 0x0F)
+    {
+        xds_ptype = false;
+        VERBOSE(VB_VBI, QString("XDS Packet: Program Type: End"));
+        return;
+    }
+
+    // Process Program Type packets here
+    if ((b1 == 0xA8) || (b2 == 0xA8))
+        VERBOSE(VB_VBI, "XDS Packet: Program Type: Advertisement");
+       
+    VERBOSE(VB_VBI, QString("XDS Packet: Program Type: %1 %2")
+            .arg(b1).arg(b2));
+}
+
+void CCDecoder::DecodeXDSVChip(int b1, int b2)
+{
+    if (b1 == 0x0F)
+    {
+        xds_vchip = false;
+        //VERBOSE(VB_VBI, QString("XDS Packet: VChip: End"));
+        return;
+    }
+
+    int xds_vchip_mpaa = (b2 & 0x07);
+    switch (xds_vchip_mpaa)
+    {
+        case 0x01:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: TV-Y");
+            break;
+        case 0x02:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: TV-Y7");
+            break;
+        case 0x03:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: TV-G");
+            break;
+        case 0x04:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: TV-PG");
+            break;
+        case 0x05:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: TV-14");
+            break;
+        case 0x06:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: TV-MA");
+            break;
+        default:
+            VERBOSE(VB_VBI, "XDS Packet: VChip Rating: None");
+            break; 
+    }
+    if (b1 & 0x20)
+        VERBOSE(VB_VBI, "XDS Packet: VChip Flag: Suggestive Dialog");
+    if (b2 & 0x20)
+        VERBOSE(VB_VBI, "XDS Packet: VChip Flag: Violence");
+    if (b2 & 0x08)
+        VERBOSE(VB_VBI, "XDS Packet: VChip Flag: Language");
+    if (b2 & 0x10)
+        VERBOSE(VB_VBI, "XDS Packet: VChip Flag: Sexual Situations");
+}
+
+void CCDecoder::DecodeXDSPacket(int b1, int b2)
+{
+    //VERBOSE(VB_VBI, QString("XDS Packet : %1 %2").arg(b1).arg(b2));
+    // Detect data packets
+    if (xds_stime)
+        DecodeXDSStartTime(b1, b2);
+    else if (xds_plength)
+        DecodeXDSProgramLength(b1, b2);
+    else if (xds_pname)
+        DecodeXDSProgramName(b1, b2);
+    else if (xds_ptype)
+        DecodeXDSProgramType(b1, b2);
+    else if (xds_vchip)
+        DecodeXDSVChip(b1, b2);
+    else if ((b1 == 0x01) && (b2 == 0x01))
+    {
+        // Detect start packets 
+        //VERBOSE(VB_VBI, QString("XDS Packet: Start Time/Program ID"));
+        xds_stime = true;
+    }
+    else if ((b1 == 0x01) && (b2 == 0x02))
+    {
+        //VERBOSE(VB_VBI, QString("XDS Packet: Program Length/Time in Show"));
+        xds_plength = true;
+        bzero(xds_buf, sizeof(xds_buf));
+        xds_cnt = 0;
+    }
+    else if ((b1 == 0x01) && (b2 == 0x03))
+    {
+        //VERBOSE(VB_VBI, QString("XDS Packet: Program Name"));
+        xds_pname = true;
+        xds_ProgramName = "";
+    }
+    else if ((b1 == 0x01) && (b2 == 0x04))
+    {
+        //VERBOSE(VB_VBI, QString("XDS Packet: Program Type"));
+        xds_ptype = true;
+    }
+    else if ((b1 == 0x01) && (b2 == 0x05))
+    {
+        //VERBOSE(VB_VBI, QString("XDS Packet: V-Chip"));
+        xds_vchip = true;
+    }
+    else
+    {
+        VERBOSE(VB_VBI, QString("Unknown XDS Packet : %1 %2").arg(b1).arg(b2));
+    }
+}
+
+void CCDecoder::DecodeXDS(int field, int b1, int b2)
+{ 
+    // if (0x01 <= b1 <= 0x0F) -> start XDS or inside XDS packet
+    if ((field == 1) && (xds[field] || b1 && ((b1 & 0x70) == 0x00)))
+    {
+        bool xds_packet = true;
+
+        // VERBOSE(VB_VBI, QString("XDS Packet : %1 %2").arg(b1).arg(b2));
+        if (b1 == 0x0F)
+        {
+            // end XDS
+            xds[field] = 0;
+            xds_packet = true;
+        }
+        else if ((b1 & 0x70) == 0x10)
+        {
+            // ctrl code -- interrupt XDS
+            xds[field] = 0;
+            xds_packet = false;
+        }
+        else
+        {
+            xds[field] = 1;
+            xds_packet = true;
+        }
+
+        if (xds_packet)
+            DecodeXDSPacket(b1, b2);
     }
 }

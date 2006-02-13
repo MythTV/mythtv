@@ -33,6 +33,14 @@ class CCDecoder
     void BufferCC(int mode, int len, int clr);
     int NewRowCC(int mode, int len);
 
+    void DecodeXDSStartTime(int b1, int b2);
+    void DecodeXDSProgramLength(int b1, int b2);
+    void DecodeXDSProgramName(int b1, int b2);
+    void DecodeXDSProgramType(int b1, int b2);
+    void DecodeXDSVChip(int b1, int b2);
+    void DecodeXDSPacket(int b1, int b2);
+    void DecodeXDS(int field, int b1, int b2);
+
     CCReader *reader;
 
     // per-field
@@ -72,6 +80,16 @@ class CCDecoder
     // WSS data
     uint            wss_flags;
     bool            wss_valid;
+
+    // XDS data
+    bool            xds_vchip;
+    bool            xds_ptype;
+    bool            xds_plength;
+    bool            xds_pname;
+    bool            xds_stime;
+    uint            xds_cnt;
+    QString         xds_ProgramName;
+    int             xds_buf[32];
 };
 
 #endif
