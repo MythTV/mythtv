@@ -94,12 +94,67 @@ bool DVBDiSEqC::Set(DVBTuning& tuning, bool reset, bool& havetuned)
             if (!Diseqc1xSwitch(tuning, reset, havetuned, 10))
                 return false;
             break;
+        case 9: // SW21
+        case 10: // SW64
+            if (!LegacyDishSwitch(tuning, reset, havetuned))
+                return false;
+            break;
  
         default:
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Unsupported DiSEqC type("
                     <<tuning.diseqc_type<<")");
     }
     
+    return true;
+}
+
+bool DVBDiSEqC::LegacyDishSwitch(DVBTuning &tuning, bool reset,
+                                 bool &havetuned)
+{
+    VERBOSE(VB_CHANNEL, LOC + "Legacy Dish Switch: " +
+            QString("Port %1").arg(tuning.diseqc_port));
+
+    if (reset ||
+        (prev_tuning.diseqc_port != tuning.diseqc_port ||
+         prev_tuning.tone        != tuning.tone        ||
+         prev_tuning.voltage     != tuning.voltage))
+    {
+        uint8_t cmd = 0x00;
+
+        if (9 == tuning.diseqc_type) // SW21
+            cmd = (tuning.diseqc_port) ? 0x66 : 0x34;
+        else if (10 == tuning.diseqc_type) // SW64
+        {
+            if (tuning.diseqc_port == 0)
+                cmd = (tuning.voltage == SEC_VOLTAGE_13) ? 0x39 : 0x1A;
+            else if (tuning.diseqc_port == 1)
+                cmd = (tuning.voltage == SEC_VOLTAGE_13) ? 0x4B : 0x5C;
+            else
+                cmd = (tuning.voltage == SEC_VOLTAGE_13) ? 0x0D : 0x2E;
+        }
+
+        if (tuning.voltage == SEC_VOLTAGE_18)
+            cmd |= 0x80;
+
+#ifdef FE_DISHNETWORK_SEND_LEGACY_CMD
+        if (ioctl(fd_frontend, FE_DISHNETWORK_SEND_LEGACY_CMD, cmd) <0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Legacy Dish Switch: "
+                    "Sending init command failed." + ENO);
+            return false;
+        }
+#else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Legacy Dish Switch: " +
+                "Linux kernel does not support this switch.");
+#endif
+
+        usleep(DISEQC_SHORT_WAIT);
+
+        prev_tuning.diseqc_port = tuning.diseqc_port;
+        prev_tuning.tone        = tuning.tone;
+        prev_tuning.voltage     = tuning.voltage;
+        havetuned = true;
+    }
     return true;
 }
 

@@ -1241,6 +1241,8 @@ class DVBDiSEqCType: public ComboBoxSetting, public CCSetting
         addSelection("DiSEqC v1.2 Positioner","6");
         addSelection("DiSEqC v1.3 Positioner (Goto X)","7");
         addSelection("DiSEqC v1.1 or 2.1 (10-way method2)","8");
+        addSelection("SW21 Switch","9");
+        addSelection("SW64 Switch","10");
         setHelpText(QObject::tr("Select the input type for DVB-S cards. "
                     "Leave as Single LNB/Input for DVB-C or DVB-T. "
                     "The inputs are mapped from Input Connections option "
@@ -2403,6 +2405,8 @@ VideoDevice::fillDVBInputsDiSEqC(int dvb_diseqc_type)
     QString stxt = "DiSEqC Switch Input %1";
     QString mtxt = "DiSEqC v1.2 Motor Position %1";
     QString itxt = "DiSEqC v1.3 Input %1";
+    QString l21txt = "SW21 Input %1";
+    QString l64txt = "SW64 Input %1";
 
     uint i;
     switch (dvb_diseqc_type)
@@ -2431,6 +2435,16 @@ VideoDevice::fillDVBInputsDiSEqC(int dvb_diseqc_type)
             for (i = 0; i < 10; ++i)
                 list.append(DVBDiSEqCInputList(
                                 stxt.arg(i+1,2), QString::number(i), ""));
+            break;
+        case 9:
+            for (i = 0; i < 2; ++i)
+                list.append(DVBDiSEqCInputList(
+                                l21txt.arg(i+1,2), QString::number(i), ""));
+            break;
+        case 10:
+            for (i = 0; i < 3; ++i)
+                list.append(DVBDiSEqCInputList(
+                                l64txt.arg(i+1,2), QString::number(i), ""));
             break;
         default:
             list.append(DVBDiSEqCInputList(

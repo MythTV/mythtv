@@ -37,6 +37,7 @@ private:
     
     bool ToneVoltageLnb(DVBTuning& tuning, bool reset, bool& havetuned);
     bool ToneSwitch(DVBTuning& tuning, bool reset, bool& havetuned);
+    bool LegacyDishSwitch(DVBTuning& tuning, bool reset, bool& havetuned);
     bool Diseqc1xSwitch(DVBTuning& tuning, bool reset, bool& havetuned,
                         uint ports);
     bool PositionerGoto(DVBTuning& tuning, bool reset, bool& havetuned);
