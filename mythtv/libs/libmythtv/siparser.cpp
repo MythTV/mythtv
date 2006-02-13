@@ -33,6 +33,10 @@
 #define LOC QString("SIParser: ")
 #define LOC_ERR QString("SIParser, Error: ")
 
+static uint huffman2_to_string(const unsigned char *compressed,
+                               uint length, uint table,
+                               QString &decompressed);
+
 /** \class SIParser
  *  This class parses DVB SI and ATSC PSIP tables.
  *
@@ -2336,9 +2340,17 @@ void SIParser::AddToServices(const VirtualChannelTable &vct)
 #ifdef USING_DVB_EIT
         if (!vct.IsHiddenInGuide(chan_idx))
         {
+            VERBOSE(VB_EIT, LOC + "Adding Source #"<<s.ATSCSourceID
+                    <<" ATSC chan "<<vct.MajorChannel(chan_idx)
+                    <<"-"<<vct.MinorChannel(chan_idx));
             sourceid_to_channel[s.ATSCSourceID] =
                 vct.MajorChannel(chan_idx) << 8 | vct.MinorChannel(chan_idx);
             Table[EVENTS]->RequestEmit(s.ATSCSourceID);
+        }
+        else
+        {
+            VERBOSE(VB_EIT, LOC + "ATSC chan "<<vct.MajorChannel(chan_idx)
+                    <<"-"<<vct.MinorChannel(chan_idx)<<" is hidden in guide");
         }
 #endif
 
@@ -2671,92 +2683,101 @@ QString SIParser::HuffmanToQString(uint8_t test[], uint16_t size,
     return QString("");
 }
 
-int SIParser::Huffman2GetBit(int bit_index, unsigned char *byteptr)
+static inline int huffman2_get_bit(unsigned char &bitpos,
+                                   const unsigned char **bufptr)
 {
-    int byte_offset;
-    int bit_number;
-
-    byte_offset = bit_index / 8;
-    bit_number  = bit_index - ( byte_offset * 8 );
-
-    if (byteptr[ byte_offset ] & ( 1 << (7 - bit_number) ) )
-        return 1;
-    else
-        return 0;
+   int ret = ((**bufptr & bitpos) != 0);
+   bitpos >>= 1;
+   if (!bitpos)
+   {
+       bitpos = 0x80;
+       (*bufptr)++;
+   }
+   return ret;
 }
 
-uint16_t SIParser::Huffman2GetBits(int bit_index, int bit_count,
-                                   unsigned char *byteptr)
+static inline void huffman2_set_pos(unsigned char &bitpos,
+                                    const unsigned char **bufptr,
+                                    const unsigned char *buffer,
+                                    uint pos)
 {
-    int i;
-    uint bits = 0;
-
-    for ( i = 0 ; i < bit_count ; i++ )
-        bits = ( bits << 1 ) | Huffman2GetBit( bit_index + i, byteptr );
-
-    return bits;
+    *bufptr = buffer + (pos >> 3);
+    bitpos  = 0x80 >> (pos & 0x7);
 }
 
-int SIParser::Huffman2ToQString(unsigned char *compressed,
-                                int length, int table,
-                                QString &Decompressed)
+static uint huffman2_to_string(const unsigned char *compressed,
+                               uint length, uint table,
+                               QString &decompressed)
 {
-    int            i;
-    int            total_bits;
-    int            current_bit = 0;
-    int            count = 0;
-    uint   bits;
-    int            table_size;
-    struct huffman_table *ptrTable;
+    decompressed = "";
+
+    unsigned char        bitpos;
+    const unsigned char *bufptr;
+    huffman2_set_pos(bitpos, &bufptr, compressed, 0);
 
     // Determine which huffman table to use
-    if (table == 1 )
+    struct huffman_table *ptrTable;
+    const unsigned char  *lookup;
+    uint                  min_size;
+    uint                  max_size;
+    if (table == 1)
     {
-        table_size = 128;
-        ptrTable   = Table128; 
+        ptrTable = Table128;
+        lookup   = Huff2Lookup128;
+        min_size = 3;
+        max_size = 12;
     }
     else
     {
-        table_size = 255;
-        ptrTable   = Table255; 
+        ptrTable = Table255;
+        lookup   = Huff2Lookup256;
+        min_size = 2;
+        max_size = 14;
     }
-    total_bits = length * 8;
-    Decompressed = "";
 
     // walk thru all the bits in the byte array, finding each sequence in the
     // list and decoding it to a character.
-    while ( current_bit < total_bits - 3 )
+    uint total_bits  = length << 3;
+    uint current_bit = 0;
+    uint count       = 0;
+    while (current_bit + 3 < total_bits)
     {
-        for ( i = 0; i < table_size; i++ )
+        uint cur_size = 0;
+        uint bits     = 0;
+
+        for (; cur_size < min_size; cur_size++)
+            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
+
+        while (cur_size < max_size)
         {
-            bits = Huffman2GetBits(
-                current_bit, ptrTable[i].number_of_bits, compressed );
-            if (bits == ptrTable[i].encoded_sequence ) 
+            uint key = lookup[bits];
+            if (key && (ptrTable[key].number_of_bits == cur_size))
             {
-                if ((ptrTable[i].character < 128) && 
-                    (ptrTable[i].character > 30))
-                   Decompressed += QChar(ptrTable[i].character);
-                current_bit += ptrTable[i].number_of_bits;
+                decompressed += ptrTable[key].character;
+                current_bit += cur_size;
                 break;
             }
+            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
+            cur_size++;
         }
-        // if we get here then the bit sequence was not found ... 
-        // ...problem try to recover
-        if (i == table_size ) 
-            current_bit += 1;
+
+        if (cur_size == max_size)
+            huffman2_set_pos(bitpos, &bufptr, compressed, ++current_bit);
     }
+
     return count;
 }
 
 /* Huffman Text Decompression Routines used by some Nagra Providers */
-void SIParser::ProcessDescHuffmanEventInfo(uint8_t *buf, uint, Event &e)
+void SIParser::ProcessDescHuffmanEventInfo(
+    const unsigned char *buf, uint /*sz*/, Event &e)
 {
     QString decompressed;
 
     if ((buf[4] & 0xF8) == 0x80)
-       Huffman2ToQString(buf+5, buf[1]-3 , 2, decompressed);
+       huffman2_to_string(buf+5, buf[1]-3 , 2, decompressed);
     else
-       Huffman2ToQString(buf+4, buf[1]-2 , 2, decompressed);
+       huffman2_to_string(buf+4, buf[1]-2 , 2, decompressed);
 
     QStringList SplitValues = QStringList::split("}{",decompressed);
 
@@ -2800,26 +2821,28 @@ void SIParser::ProcessDescHuffmanEventInfo(uint8_t *buf, uint, Event &e)
 }
 
 /* Used by some Nagra Systems for Huffman Copressed Guide */
-QString SIParser::ProcessDescHuffmanText(uint8_t *buf, uint)
+QString SIParser::ProcessDescHuffmanText(
+    const unsigned char *buf, uint /*sz*/)
 {
     QString decompressed;
 
     if ((buf[3] & 0xF8) == 0x80)
-       Huffman2ToQString(buf+4, buf[1]-2, 2, decompressed);
+       huffman2_to_string(buf+4, buf[1]-2, 2, decompressed);
     else
-       Huffman2ToQString(buf+3, buf[1]-1, 2, decompressed);
+       huffman2_to_string(buf+3, buf[1]-1, 2, decompressed);
 
     return decompressed;
 }
 
-QString SIParser::ProcessDescHuffmanTextLarge(uint8_t *buf, uint)
+QString SIParser::ProcessDescHuffmanTextLarge(
+    const unsigned char *buf, uint /*sz*/)
 {
     QString decompressed;
 
     if ((buf[4] & 0xF8) == 0x80)
-       Huffman2ToQString(buf+5, buf[1]-3 , 2, decompressed);
+       huffman2_to_string(buf+5, buf[1]-3 , 2, decompressed);
     else
-       Huffman2ToQString(buf+4, buf[1]-2 , 2, decompressed);
+       huffman2_to_string(buf+4, buf[1]-2 , 2, decompressed);
 
     return decompressed;
 }

@@ -170,9 +170,10 @@ class SIParser : public QObject
     void ParseDescSubtitling                 (uint8_t* buf, int sz);
 
     // ATSC EIT Table Descriptor processors
-    void ProcessDescHuffmanEventInfo         (uint8_t *buf, uint sz, Event &e);
-    QString ProcessDescHuffmanText           (uint8_t *buf, uint sz);
-    QString ProcessDescHuffmanTextLarge      (uint8_t *buf, uint sz);
+    static void ProcessDescHuffmanEventInfo(const unsigned char*, uint sz,
+                                            Event&);
+    static QString ProcessDescHuffmanText(const unsigned char*, uint sz);
+    static QString ProcessDescHuffmanTextLarge(const unsigned char*, uint sz);
 
     // DVB EIT Table Descriptor processors
     uint ProcessDVBEventDescriptors(
@@ -210,12 +211,6 @@ class SIParser : public QObject
     int HuffmanGetRootNode(uint8_t Input, uint8_t Table[]);
     bool HuffmanGetBit(uint8_t test[], uint16_t bit);
     QString HuffmanToQString(uint8_t test[], uint16_t size,uint8_t Table[]);
-
-    int Huffman2GetBit(int bit_index, unsigned char *byteptr);
-    uint16_t Huffman2GetBits(int bit_index, int bit_count,
-                             unsigned char *byteptr);
-    int Huffman2ToQString(unsigned char *compressed, int length, int table,
-                          QString &Decompressed);
 
     void InitializeCategories(void);
 
