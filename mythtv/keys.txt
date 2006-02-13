@@ -42,6 +42,8 @@ Watching TV or a recording
       Use the arrow keys to make adjustment.
 - W   Cycle through zoom and fill modes: force 4:3 aspect ratio, force 16:9
       aspect ratio, 4:3 Zoom (like Pan and Scan), 16:9 Zoom, 16:9 Stretch.
+- S   Display the Program Guide (EPG).
+- F6  Display the Program Finder.
 - F8  Cycle through sleep timer settings Off->30m->1hr->1hr30m->2hr->Off
 - Left arrow  Skip back
 - Right arrow Skip ahead

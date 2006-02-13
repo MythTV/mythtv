@@ -20,6 +20,7 @@
 #include "remoteencoder.h"
 #include "remoteutil.h"
 #include "guidegrid.h"
+#include "progfind.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
@@ -140,6 +141,7 @@ void TV::InitKeys(void)
             "adjustment controls", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
+    REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "F6");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
     REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
     REG_KEY("TV Playback", "NEXTAUDIO", "Switch to the next audio track", "+");
@@ -2528,6 +2530,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 exitPlayer = true;
                 wantsToQuit = true;
             }
+            else if (action == "GUIDE")
+                LoadMenu();
+            else if (action == "FINDER")
+                LoadMenu(true);
             else if (action == "TOGGLEEDIT")
                 DoEditMode();
             else if (action == "TOGGLEBROWSE")
@@ -4417,7 +4423,7 @@ void TV::StopEmbeddingOutput(void)
     embedWinID = 0;
 }
 
-void TV::doLoadMenu(void)
+void TV::doLoadMenu(bool showFinder)
 {
     if (!playbackinfo)
     {
@@ -4441,15 +4447,34 @@ void TV::doLoadMenu(void)
     QString channum = playbackinfo->chanstr;
     pbinfoLock.unlock();
 
-    // See if we can provide a channel preview in EPG
-    bool allowsecondary = true;
-    if (nvp && nvp->getVideoOutput())
-        allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
+    bool changeChannel = false;
 
-    // Start up EPG
-    bool cc = RunProgramGuide(chanid, channum, true, this, allowsecondary);
+    if (StateIsLiveTV(GetState()))
+    {
+        // See if we can provide a channel preview in EPG
+        bool allowsecondary = true;
+        if (nvp && nvp->getVideoOutput())
+            allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
 
-    StopEmbeddingOutput();
+        // Start up EPG
+        changeChannel = RunProgramGuide(chanid, channum, true, this, allowsecondary);
+
+        StopEmbeddingOutput();
+    }
+    else
+    {
+        bool stayPaused = paused;
+        if (!paused)
+            DoPause();
+
+        if (showFinder)
+            RunProgramFind(true, false);
+        else
+            RunProgramGuide(chanid, channum, true);
+
+        if (!stayPaused)
+            DoPause();
+    }
 
     // Resize the window back to the MythTV Player size
     if (!using_gui_size_for_tv)
@@ -4460,13 +4485,13 @@ void TV::doLoadMenu(void)
     }
 
     // If user selected a new channel in the EPG, change to that channel
-    if (cc)
+    if (changeChannel)
         EPGChannelUpdate(chanid, channum);
 
     menurunning = false;
 }
 
-void *TV::MenuHandler(void *param)
+void *TV::EPGMenuHandler(void *param)
 {
     TV *obj = (TV *)param;
     obj->doLoadMenu();
@@ -4474,7 +4499,15 @@ void *TV::MenuHandler(void *param)
     return NULL;
 }
 
-void TV::LoadMenu(void)
+void *TV::FinderMenuHandler(void *param)
+{
+    TV *obj = (TV *)param;
+    obj->doLoadMenu(true);
+
+    return NULL;
+}
+
+void TV::LoadMenu(bool showFinder)
 {
     if (menurunning == true)
         return;
@@ -4484,7 +4517,10 @@ void TV::LoadMenu(void)
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&tid, &attr, TV::MenuHandler, this);
+    if (showFinder)
+        pthread_create(&tid, &attr, TV::FinderMenuHandler, this);
+    else
+        pthread_create(&tid, &attr, TV::EPGMenuHandler, this);
 }
 
 void TV::ChangeBrightness(bool up, bool recorder)
@@ -5454,11 +5490,13 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         ChangeSubtitleTrack(-1);
     else if (action.left(14) == "SELECTSUBTITLE")
         SetSubtitleTrack(action.mid(14).toInt());
+    else if (action == "GUIDE")
+        LoadMenu();
+    else if (action == "FINDER")
+        LoadMenu(true);
     else if (StateIsLiveTV(GetState()))
     {
-        if (action == "GUIDE")
-            LoadMenu();
-        else if (action == "TOGGLEPIPMODE")
+        if (action == "TOGGLEPIPMODE")
             TogglePIPView();
         else if (action == "TOGGLEPIPWINDOW")
             ToggleActiveWindow();

@@ -174,8 +174,9 @@ class TV : public QObject
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
   protected:
-    void doLoadMenu(void);
-    static void *MenuHandler(void *param);
+    void doLoadMenu(bool showFinder = false);
+    static void *EPGMenuHandler(void *param);
+    static void *FinderMenuHandler(void *param);
 
     void RunTV(void);
     static void *EventThread(void *param);
@@ -274,7 +275,7 @@ class TV : public QObject
     void UpdateOSDSignal(const QStringList& strlist);
     void UpdateOSDTimeoutMessage(void);
 
-    void LoadMenu(void);
+    void LoadMenu(bool showFinder = false);
 
     void SetupPlayer(bool isWatchingRecording);
     void TeardownPlayer(void);
