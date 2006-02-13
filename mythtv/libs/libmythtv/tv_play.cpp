@@ -897,7 +897,8 @@ void TV::HandleStateChange(void)
              TRANSITION(kState_None, kState_WatchingRecording))
     {
         QString playbackURL;
-        if (playbackinfo->pathname.left(4) == "dvd:")
+        if ((playbackinfo->pathname.left(4) == "dvd:") ||
+            (playbackinfo->isVideo))
             playbackURL = playbackinfo->pathname;
         else
             playbackURL = playbackinfo->GetPlaybackURL();
