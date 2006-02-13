@@ -249,7 +249,7 @@ TV::TV(void)
       browsechannum(""), browsechanid(""), browsestarttime(""),
       // Program Info for currently playing video
       recorderPlaybackInfo(NULL),
-      playbackinfo(NULL), inputFilename(""), playbackLen(0),
+      playbackinfo(NULL), playbackLen(0),
       lastProgram(NULL), jumpToProgram(false),
       // Video Players
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
@@ -661,8 +661,6 @@ int TV::Playback(ProgramInfo *rcinfo)
     if (internalState != kState_None)
         return 0;
 
-    inputFilename = rcinfo->pathname;
-
     playbackLen = rcinfo->CalculateLength();
     playbackinfo = new ProgramInfo(*rcinfo);
 
@@ -846,9 +844,10 @@ void TV::HandleStateChange(void)
         }
         else
         {
-            tvchain->SetProgram(playbackinfo);
+            QString playbackURL = playbackinfo->GetPlaybackURL();
 
-            prbuffer = new RingBuffer(playbackinfo->pathname, false);
+            tvchain->SetProgram(playbackinfo);
+            prbuffer = new RingBuffer(playbackURL, false);
             prbuffer->SetLiveMode(tvchain);
         }
 
@@ -897,7 +896,9 @@ void TV::HandleStateChange(void)
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingRecording))
     {
-        prbuffer = new RingBuffer(inputFilename, false);
+        QString playbackURL = playbackinfo->GetPlaybackURL();
+
+        prbuffer = new RingBuffer(playbackURL, false);
         if (prbuffer->IsOpen())
         {
             gContext->DisableScreensaver();
@@ -2812,8 +2813,10 @@ void TV::TogglePIPView(void)
         }
         else
         {
+            QString playbackURL = playbackinfo->GetPlaybackURL();
+
             piptvchain->SetProgram(playbackinfo);
-            piprbuffer = new RingBuffer(playbackinfo->pathname, false);
+            piprbuffer = new RingBuffer(playbackURL, false);
             piprbuffer->SetLiveMode(piptvchain);
         }
 
@@ -3478,8 +3481,10 @@ void TV::SwitchCards(uint chanid, QString channum)
         }
         else
         {
+            QString playbackURL = playbackinfo->GetPlaybackURL();
+
             tvchain->SetProgram(playbackinfo);
-            prbuffer = new RingBuffer(playbackinfo->pathname, false);
+            prbuffer = new RingBuffer(playbackURL, false);
             prbuffer->SetLiveMode(tvchain);
         }
 
