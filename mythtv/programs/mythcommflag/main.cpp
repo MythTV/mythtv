@@ -225,6 +225,42 @@ int GetCutList(QString chanid, QString starttime)
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
+
+int GetSkipList(QString chanid, QString starttime)
+{
+    QMap<long long, int> cutlist;
+    QMap<long long, int>::Iterator it;
+    QString result;
+
+    ProgramInfo *pginfo =
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+
+    if (!pginfo)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("No program data exists for channel %1 at %2")
+                .arg(chanid.ascii()).arg(starttime.ascii()));
+        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+    }
+
+    pginfo->GetCommBreakList(cutlist);
+    for (it = cutlist.begin(); it != cutlist.end(); ++it)
+    {
+        if (it.data() == MARK_COMM_START)
+        {
+            if (result != "")
+                result += ",";
+            result += QString("%1-").arg(it.key());
+        }
+        else
+            result += QString("%1").arg(it.key());
+    }
+
+    cout << QString("Commercial Skip List: %1\n").arg(result);
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+}
+
 void streamOutCommercialBreakList(ostream& output,
                                   QMap<long long, int>& commercialBreakList)
 {
@@ -622,6 +658,7 @@ int main(int argc, char *argv[])
     bool copyToCutlist = false;
     bool clearCutlist = false;
     bool getCutlist = false;
+    bool getSkipList = false;
     QString newCutList = "";
 
     QFileInfo finfo(a.argv()[0]);
@@ -713,6 +750,8 @@ int main(int argc, char *argv[])
             clearCutlist = true;
         else if (!strcmp(a.argv()[argpos], "--getcutlist"))
             getCutlist = true;
+        else if (!strcmp(a.argv()[argpos], "--getskiplist"))
+            getSkipList = true;
         else if (!strcmp(a.argv()[argpos], "--setcutlist"))
             newCutList = (a.argv()[++argpos]);
         else if (!strcmp(a.argv()[argpos], "-j"))
@@ -852,6 +891,7 @@ int main(int argc, char *argv[])
                     "--setcutlist CUTLIST         Set a new cutlist.  CUTLIST is of the form:\n"
                     "                             #-#[,#-#]...  (ie, 1-100,1520-3012,4091-5094\n"
                     "--getcutlist                 Display the current cutlist\n"
+                    "--getskiplist                Display the current Commercial Skip list\n"
                     "-v or --verbose debug-level  Use '-v help' for level info\n"
                     "--queue                      Insert flagging job into the JobQueue rather than\n"
                     "                             running flagging in the foreground\n"
@@ -906,6 +946,9 @@ int main(int argc, char *argv[])
 
     if (getCutlist)
         return GetCutList(chanid, starttime);
+
+    if (getSkipList)
+        return GetSkipList(chanid, starttime);
 
     if (newCutList != "")
         return SetCutList(chanid, starttime, newCutList);
