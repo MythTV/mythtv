@@ -324,42 +324,50 @@ QString NetworkControl::processKey(QStringList tokens)
     QString result = "OK";
     QKeyEvent *event = NULL;
 
-    if ((tokens.size() < 2) ||
-        (!keyMap.contains(tokens[1]) && (tokens[1].length() > 1)))
+    if (tokens.size() < 2)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
 
     QWidget *widget = gContext->GetMainWindow()->currentWidget()->focusWidget();
-    if (keyMap.contains(tokens[1]))
+    unsigned int curToken = 1;
+    while (curToken < tokens.size())
     {
-        event = new QKeyEvent(QEvent::KeyPress, keyMap[tokens[1]], 0, NoButton);
-        QApplication::postEvent(widget, event);
+        if (keyMap.contains(tokens[curToken]))
+        {
+            int keyCode = keyMap[tokens[curToken]];
 
-        event = new QKeyEvent(QEvent::KeyRelease, keyMap[tokens[1]], 0, NoButton);
-        QApplication::postEvent(widget, event);
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, NoButton);
+            QApplication::postEvent(widget, event);
+
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, 0, NoButton);
+            QApplication::postEvent(widget, event);
+        }
+        else if ((tokens[curToken].length() == 1) &&
+                 (tokens[curToken][0].isLetterOrNumber()))
+        {
+            QKeySequence a(tokens[curToken]);
+            int keyCode = a[0];
+            int ch = (tokens[curToken].ascii())[0];
+            int buttons = NoButton;
+
+            if (tokens[curToken] == tokens[curToken].upper())
+                buttons = ShiftButton;
+
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
+                                  tokens[curToken]);
+            QApplication::postEvent(widget, event);
+
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, buttons,
+                                  tokens[curToken]);
+            QApplication::postEvent(widget, event);
+        }
+        else
+            return QString("ERROR: Invalid syntax at '%1', see 'help %2' for "
+                           "usage information")
+                           .arg(tokens[curToken]).arg(tokens[0]);
+
+        curToken++;
     }
-    else if (tokens[1].length() == 1 && tokens[1][0].isLetterOrNumber())
-    {
-        QKeySequence a(tokens[1]);
-        int keyCode = a[0];
-        int ch = (tokens[1].ascii())[0];
-        int buttons = NoButton;
-
-        if (tokens[1] == tokens[1].upper())
-            buttons = ShiftButton;
-
-        event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
-                              tokens[1]);
-        QApplication::postEvent(widget, event);
-
-        event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, buttons,
-                              tokens[1]);
-        QApplication::postEvent(widget, event);
-    }
-    else
-        return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
-
 
     return result;
 }
@@ -547,6 +555,12 @@ QString NetworkControl::processQuery(QStringList tokens)
     }
     else if (tokens[1] == "recordings")
         return listRecordings();
+    else if ((tokens.size() == 4) &&
+             (tokens[1] == "recording") &&
+             (tokens[2].contains(QRegExp("^\\d+$"))) &&
+             (tokens[3].contains(QRegExp(
+                         "^\\d\\d\\d\\d-\\d\\d-\\d\\dt\\d\\d:\\d\\d:\\d\\d$"))))
+        return listRecordings(tokens[2], tokens[3]);
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
@@ -642,7 +656,9 @@ QString NetworkControl::processHelp(QStringList tokens)
     {
         helpText +=
             "query location        - Query current screen or location\r\n"
-            "query recordings      - List currently available recordings\r\n";
+            "query recordings      - List currently available recordings\r\n"
+            "query recording CHANID STARTTIME\r\n"
+            "                      - List info about the specified program\r\n";
     }
     else if (command == "exit")
     {
@@ -746,15 +762,27 @@ void NetworkControl::customEvent(QCustomEvent *e)
     }
 }
 
-QString NetworkControl::listRecordings(void)
+QString NetworkControl::listRecordings(QString chanid, QString starttime)
 {
     QString result = "";
     QString episode;
     MSqlQuery query(MSqlQuery::InitCon());
+    QString queryStr;
+    bool appendCRLF = true;
 
-    query.prepare("SELECT chanid, starttime, title, subtitle "
-                  "FROM recorded WHERE deletepending = 0 "
-                  "ORDER BY starttime, title;");
+    queryStr = "SELECT chanid, starttime, title, subtitle "
+               "FROM recorded WHERE deletepending = 0 ";
+
+    if ((chanid != "") && (starttime != ""))
+    {
+        queryStr += "AND chanid = " + chanid + " "
+                    "AND starttime = '" + starttime.upper() + "' ";
+        appendCRLF = false;
+    }
+
+    queryStr += "ORDER BY starttime, title;";
+
+    query.prepare(queryStr);
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
@@ -767,9 +795,12 @@ QString NetworkControl::listRecordings(void)
                 episode = query.value(2).toString().local8Bit();
 
             result +=
-                QString("%1 %2 %3\r\n").arg(query.value(0).toInt())
+                QString("%1 %2 %3").arg(query.value(0).toInt())
                         .arg(query.value(1).toDateTime().toString(Qt::ISODate))
                         .arg(episode);
+
+            if (appendCRLF)
+                result += "\r\n";
         }
     }
     else
