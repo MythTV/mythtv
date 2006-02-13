@@ -275,6 +275,11 @@ void JobQueue::ProcessQueue(void)
                     (hostname != "") &&
                     (hostname != m_hostname))
                 {
+                    // Setting the status here will prevent us from processing
+                    // any other jobs for this recording until this one is
+                    // completed on the remote host.
+                    jobStatus[key] = status;
+
                     message = QString("JobQueue: Skipping '%1' job for chanid "
                                       "%2 @ %3, should run on '%4' instead")
                                       .arg(JobText(type))
