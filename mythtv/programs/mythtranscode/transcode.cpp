@@ -34,7 +34,7 @@ class AudioReencodeBuffer : public AudioOutput
     AudioReencodeBuffer(int audio_bits, int audio_channels)
     {
         Reset();
-        Reconfigure(audio_bits, audio_channels, 0);
+        Reconfigure(audio_bits, audio_channels, 0, 0);
         bufsize = 512000;
         audiobuffer = new unsigned char[bufsize];
     }
@@ -45,8 +45,8 @@ class AudioReencodeBuffer : public AudioOutput
     }
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(int audio_bits,
-                        int audio_channels, int audio_samplerate)
+    virtual void Reconfigure(int audio_bits, int audio_channels,
+                             int audio_samplerate, bool audio_passthru)
     {
         (void)audio_samplerate;
         bits = audio_bits;

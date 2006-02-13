@@ -97,7 +97,8 @@ DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
 
 AudioOutputDX::AudioOutputDX(QString audiodevice, int audio_bits, 
                              int audio_channels, int audio_samplerate,
-                             AudioOutputSource source, bool set_initial_vol)
+                             AudioOutputSource source,
+                             bool set_initial_vol, bool audio_passthru)
 {
     this->audiodevice = audiodevice;
     
@@ -110,7 +111,7 @@ AudioOutputDX::AudioOutputDX(QString audiodevice, int audio_bits,
     
     InitDirectSound();
     
-    Reconfigure(audio_bits, audio_channels, audio_samplerate);
+    Reconfigure(audio_bits, audio_channels, audio_samplerate, audio_passthru);
 }
 
 void AudioOutputDX::SetBlocking(bool blocking)
@@ -118,8 +119,8 @@ void AudioOutputDX::SetBlocking(bool blocking)
     // FIXME: kedl: not sure what else could be required here?
 }
 
-void AudioOutputDX::Reconfigure(int audio_bits, 
-                                  int audio_channels, int audio_samplerate)
+void AudioOutputDX::Reconfigure(int audio_bits, int audio_channels,
+                                int audio_samplerate, int audio_passthru)
 {
     if (dsbuffer)
         DestroyDSBuffer();
@@ -132,6 +133,7 @@ void AudioOutputDX::Reconfigure(int audio_bits,
     effdsp = audio_samplerate;
     this->audio_bits = audio_bits;
     this->audio_channels = audio_channels;
+    this->audio_passthru = audio_passthru;
 }
 
 AudioOutputDX::~AudioOutputDX()

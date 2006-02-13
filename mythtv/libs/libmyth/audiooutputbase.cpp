@@ -16,7 +16,8 @@ using namespace std;
 AudioOutputBase::AudioOutputBase(QString audiodevice, int, 
                                  int, int,
                                  AudioOutputSource source,
-                                 bool set_initial_vol)
+                                 bool set_initial_vol,
+                                 bool /*laudio_passthru*/)
 {
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);
@@ -42,7 +43,7 @@ AudioOutputBase::AudioOutputBase(QString audiodevice, int,
 
     // You need to call the next line from your concrete class.
     // Virtuals cause problems in the base class constructors
-    // Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
+    // Reconfigure(laudio_bits, laudio_channels, laudio_samplerate, laudio_passthru);
 }
 
 AudioOutputBase::~AudioOutputBase()
@@ -103,10 +104,11 @@ void AudioOutputBase::SetStretchFactor(float laudio_stretchfactor)
 }
 
 void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels, 
-                                 int laudio_samplerate)
+                                 int laudio_samplerate, bool laudio_passthru)
 {
     if (laudio_bits == audio_bits && laudio_channels == audio_channels &&
-        laudio_samplerate == audio_samplerate && !need_resampler)
+        laudio_samplerate == audio_samplerate &&
+        laudio_passthru == audio_passthru && !need_resampler)
         return;
 
     KillAudio();
@@ -121,6 +123,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     audio_channels = laudio_channels;
     audio_bits = laudio_bits;
     audio_samplerate = laudio_samplerate;
+    audio_passthru = laudio_passthru;
     if (audio_bits != 8 && audio_bits != 16)
     {
         pthread_mutex_unlock(&avsync_lock);

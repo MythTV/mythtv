@@ -27,9 +27,11 @@ using namespace std;
 
 AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits, 
                                int laudio_channels, int laudio_samplerate,
-                               AudioOutputSource source, bool set_initial_vol)
-              : AudioOutputBase(audiodevice, laudio_bits,
-                              laudio_channels, laudio_samplerate, source, set_initial_vol)
+                               AudioOutputSource source, bool set_initial_vol,
+                               bool laudio_passthru)
+    : AudioOutputBase(audiodevice, laudio_bits,
+                      laudio_channels, laudio_samplerate, source,
+                      set_initial_vol, laudio_passthru)
 {
     // our initalisation
     audiofd = -1;
@@ -37,7 +39,8 @@ AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits,
     numbadioctls = 0;
 
     // Set everything up
-    Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
+    Reconfigure(laudio_bits, laudio_channels,
+                laudio_samplerate, laudio_passthru);
 }
 
 AudioOutputOSS::~AudioOutputOSS()

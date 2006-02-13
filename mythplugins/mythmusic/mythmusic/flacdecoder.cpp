@@ -140,7 +140,8 @@ void FlacDecoder::setFlacMetadata(const FLAC__StreamMetadata *metadata)
    
     if (output())
     {
-        output()->Reconfigure(bitspersample, chan, freq);
+        output()->Reconfigure(bitspersample, chan,
+                              freq, false /* AC3/DTS pass through */);
         output()->SetSourceBitrate(44100 * 2 * 16);
     }
 }

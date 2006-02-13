@@ -474,7 +474,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 #endif
         GetNVP()->SetAudioParams(extradata.audio_bits_per_sample,
                                  extradata.audio_channels, 
-                                 extradata.audio_sample_rate);
+                                 extradata.audio_sample_rate,
+                                 false /* AC3/DTS pass through */);
         GetNVP()->ReinitAudio();
         foundit = 1;
     }

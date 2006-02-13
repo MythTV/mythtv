@@ -19,12 +19,13 @@ class AudioOutputBase : public AudioOutput
  public:
     AudioOutputBase(QString audiodevice, int laudio_bits,
                     int laudio_channels, int laudio_samplerate,
-                    AudioOutputSource source, bool set_initial_vol);
+                    AudioOutputSource source,
+                    bool set_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputBase();
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(int audio_bits, 
-                             int audio_channels, int audio_samplerate);
+    virtual void Reconfigure(int audio_bits, int audio_channels,
+                             int audio_samplerate, bool audio_passthru);
     
     // do AddSamples calls block?
     virtual void SetBlocking(bool blocking);
@@ -103,6 +104,8 @@ class AudioOutputBase : public AudioOutput
     int fragment_size;
     long soundcard_buffer_size;
     QString audiodevice;
+
+    bool audio_passthru;
 
     float audio_stretchfactor;
     AudioOutputSource source;

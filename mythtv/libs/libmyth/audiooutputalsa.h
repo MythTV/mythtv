@@ -17,8 +17,9 @@ class AudioOutputALSA : public AudioOutputBase
 {
   public:
     AudioOutputALSA(QString audiodevice, int laudio_bits, 
-                   int laudio_channels, int laudio_samplerate,
-                   AudioOutputSource source, bool set_initial_vol);
+                    int laudio_channels, int laudio_samplerate,
+                    AudioOutputSource source,
+                    bool set_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputALSA();
 
     // Volume control

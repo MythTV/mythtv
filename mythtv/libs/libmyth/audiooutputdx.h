@@ -16,7 +16,8 @@ class AudioOutputDX : public AudioOutputBase
 public:
     AudioOutputDX(QString audiodevice, int audio_bits, 
                   int audio_channels, int audio_samplerate,
-                  AudioOutputSource source, bool set_initial_vol);
+                  AudioOutputSource source,
+                  bool set_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputDX();
 
     virtual void Reset(void);

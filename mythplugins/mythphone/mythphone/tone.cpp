@@ -305,7 +305,9 @@ void Tone::OpenSpeaker(QString devName)
         return;
 
 #else
-    mythOutput = AudioOutput::OpenAudio(devName, 16, 1, 8000, AUDIOOUTPUT_TELEPHONY, true);
+    mythOutput = AudioOutput::OpenAudio(devName, 16, 1, 8000,
+                                        AUDIOOUTPUT_TELEPHONY, true,
+                                        false /* AC3/DTS pass through */);
     if (mythOutput)
     {
         mythOutput->SetBlocking(false);

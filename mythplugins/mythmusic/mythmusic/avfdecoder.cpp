@@ -188,7 +188,8 @@ bool avfDecoder::initialize()
 
     if (output())
     {
-        output()->Reconfigure(16, audio_dec->channels, audio_dec->sample_rate);
+        output()->Reconfigure(16, audio_dec->channels, audio_dec->sample_rate,
+                              false /* AC3/DTS pass through */);
         output()->SetSourceBitrate(audio_dec->bit_rate);
     }
 

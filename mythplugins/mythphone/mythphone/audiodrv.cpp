@@ -835,7 +835,9 @@ void mythAudioDriver::Open()
         cerr << "Cannot have matching spk and mic devices in this mode, should have chosen OSS mode\n";
     else
     {
-        mythOutput = AudioOutput::OpenAudio(spkDevice, 16, 1, 8000, AUDIOOUTPUT_TELEPHONY, true);
+        mythOutput = AudioOutput::OpenAudio(spkDevice, 16, 1, 8000,
+                                            AUDIOOUTPUT_TELEPHONY, true,
+                                            false /* AC3/DTS pass through */);
         if (mythOutput)
         {
             mythOutput->SetBlocking(false);

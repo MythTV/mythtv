@@ -9,15 +9,17 @@ using namespace std;
 
 AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits, 
                                  int audio_channels, int audio_samplerate,
-                                 AudioOutputSource source, bool set_initial_vol)
-              : AudioOutputBase(audiodevice, audio_bits, audio_channels,
-                                audio_samplerate, source, set_initial_vol)
+                                 AudioOutputSource source,
+                                 bool set_initial_vol, bool audio_passthru)
+    : AudioOutputBase(audiodevice, audio_bits, audio_channels,
+                      audio_samplerate, source, set_initial_vol,
+                      audio_passthru)
 {
     // our initalisation
     pcm_handle = NULL;
 
     // Set everything up
-    Reconfigure(audio_bits, audio_channels, audio_samplerate);
+    Reconfigure(audio_bits, audio_channels, audio_samplerate, audio_passthru);
 }
 
 AudioOutputARTS::~AudioOutputARTS()

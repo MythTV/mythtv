@@ -510,7 +510,7 @@ QString NuppelVideoPlayer::ReinitAudio(void)
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
                                              audio_channels, audio_samplerate, 
                                              AUDIOOUTPUT_VIDEO,
-                                             setVolume);
+                                             setVolume, audio_passthru);
         if (!audioOutput)
             errMsg = QObject::tr("Unable to create AudioOutput.");
         else
@@ -536,7 +536,8 @@ QString NuppelVideoPlayer::ReinitAudio(void)
 
     if (audioOutput)
     {
-        audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
+        audioOutput->Reconfigure(audio_bits, audio_channels,
+                                 audio_samplerate, audio_passthru);
         errMsg = audioOutput->GetError();
         if (!errMsg.isEmpty())
             audioOutput->SetStretchFactor(audio_stretchfactor);
@@ -2692,11 +2693,13 @@ void NuppelVideoPlayer::StartPlaying(void)
     }
 }
 
-void NuppelVideoPlayer::SetAudioParams(int bps, int channels, int samplerate)
+void NuppelVideoPlayer::SetAudioParams(int bps, int channels,
+                                       int samplerate, bool passthru)
 {
     audio_bits = bps;
     audio_channels = channels;
     audio_samplerate = samplerate;
+    audio_passthru = passthru;
 }
 
 void NuppelVideoPlayer::SetEffDsp(int dsprate)

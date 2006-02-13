@@ -106,7 +106,7 @@ class NuppelVideoPlayer
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
                         float a = 1.33333, FrameScanType scan = kScan_Ignore);
-    void SetAudioParams(int bits, int channels, int samplerate);
+    void SetAudioParams(int bits, int channels, int samplerate, bool passthru);
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
     void Zoom(int direction);
@@ -493,6 +493,7 @@ class NuppelVideoPlayer
     int      audio_bits;
     int      audio_samplerate;
     float    audio_stretchfactor;
+    bool     audio_passthru;
 
     // Picture-in-Picture
     NuppelVideoPlayer *pipplayer;

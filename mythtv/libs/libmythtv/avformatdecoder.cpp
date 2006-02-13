@@ -1185,7 +1185,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // waiting on audio.
     if (GetNVP()->HasAudioIn() && audioStreams.empty())
     {
-        GetNVP()->SetAudioParams(-1, -1, -1);
+        GetNVP()->SetAudioParams(-1, -1, -1, false /* AC3/DTS pass-through */);
         GetNVP()->ReinitAudio();
     }
 
@@ -2747,7 +2747,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
         GetNVP()->SetEffDsp(audioOut.sample_rate * 100);
 
     GetNVP()->SetAudioParams(audioOut.bps(), audioOut.channels,
-                             audioOut.sample_rate);
+                             audioOut.sample_rate,
+                             audioIn.do_passthru);
     GetNVP()->ReinitAudio();
 
     return true;

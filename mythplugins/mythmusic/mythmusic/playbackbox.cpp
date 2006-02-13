@@ -1797,7 +1797,8 @@ void PlaybackBoxMusic::openOutputDevice(void)
  
     // TODO: Error checking that device is opened correctly!
     output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
-                                    AUDIOOUTPUT_MUSIC, true ); 
+                                    AUDIOOUTPUT_MUSIC, true,
+                                    false /* AC3/DTS pass through */);
     output->setBufferSize(outputBufferSize * 1024);
     output->SetBlocking(false);
     output->addListener(this);

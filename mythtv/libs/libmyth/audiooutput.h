@@ -19,8 +19,9 @@ class AudioOutput : public VolumeBase, public OutputListeners
  public:
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(QString audiodevice, int audio_bits, 
-                                 int audio_channels, int audio_samplerate,
-                                 AudioOutputSource source, bool set_initial_vol);
+                                  int audio_channels, int audio_samplerate,
+                                  AudioOutputSource source,
+                                  bool set_initial_vol, bool audio_passthru);
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
@@ -29,8 +30,8 @@ class AudioOutput : public VolumeBase, public OutputListeners
     virtual ~AudioOutput() { };
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(int audio_bits, 
-                             int audio_channels, int audio_samplerate) = 0;
+    virtual void Reconfigure(int audio_bits, int audio_channels,
+                             int audio_samplerate, bool audio_passthru) = 0;
     
     virtual void SetStretchFactor(float factor);
 

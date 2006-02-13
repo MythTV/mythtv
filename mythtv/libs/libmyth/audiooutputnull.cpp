@@ -18,14 +18,16 @@ using namespace std;
 
 AudioOutputNULL::AudioOutputNULL(QString audiodevice, int laudio_bits, 
                                  int laudio_channels, int laudio_samplerate,
-                                 AudioOutputSource source, bool set_initial_vol)
+                                 AudioOutputSource source, bool set_initial_vol,
+                                 bool laudio_passthru)
                : AudioOutputBase(audiodevice, laudio_bits, laudio_channels,
-                                 laudio_samplerate, source, set_initial_vol)
+                                 laudio_samplerate, source, set_initial_vol,
+                                 laudio_passthru)
 {
     locked_audio_channels = laudio_channels;
     locked_audio_bits = laudio_bits;
     locked_audio_samplerate = laudio_samplerate;
-    Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
+    Reconfigure(laudio_bits, laudio_channels, laudio_samplerate, laudio_passthru);
     current_buffer_size = 0;
 }
 

@@ -137,7 +137,7 @@ bool CdDecoder::initialize()
 
     if (output())
     {
-        output()->Reconfigure(16, chan, freq);
+        output()->Reconfigure(16, chan, freq, false /* AC3/DTS passthru */);
         output()->SetSourceBitrate(44100 * 2 * 16);
     }
 

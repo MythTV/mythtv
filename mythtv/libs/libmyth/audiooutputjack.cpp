@@ -23,9 +23,11 @@ extern "C"
 
 AudioOutputJACK::AudioOutputJACK(QString audiodevice, int laudio_bits, 
                                  int laudio_channels, int laudio_samplerate,
-                                 AudioOutputSource source, bool set_initial_vol)
-               : AudioOutputBase(audiodevice, laudio_bits, laudio_channels,
-                                 laudio_samplerate, source, set_initial_vol)
+                                 AudioOutputSource source,
+                                 bool set_initial_vol, bool laudio_passthru)
+    : AudioOutputBase(audiodevice, laudio_bits,
+                      laudio_channels, laudio_samplerate, source,
+                      set_initial_vol, laudio_passthru)
 {
     // Initialise the Jack output layer
     JACK_Init();
@@ -34,7 +36,8 @@ AudioOutputJACK::AudioOutputJACK(QString audiodevice, int laudio_bits,
     audioid = -1;
 
     // Set everything up
-    Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
+    Reconfigure(laudio_bits, laudio_channels,
+                laudio_samplerate, laudio_passthru);
 }
 
 AudioOutputJACK::~AudioOutputJACK()

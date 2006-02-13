@@ -19,7 +19,8 @@ class AudioOutputCA : public AudioOutputBase
 public:
     AudioOutputCA(QString audiodevice, int laudio_bits, 
                   int laudio_channels, int laudio_samplerate,
-                  AudioOutputSource source, bool set_initial_vol);
+                  AudioOutputSource source,
+                  bool set_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputCA();
     
     // callback for delivering audio to output device

@@ -12,9 +12,11 @@ using namespace std;
 
 AudioOutputALSA::AudioOutputALSA(QString audiodevice, int laudio_bits, 
                                  int laudio_channels, int laudio_samplerate,
-                                 AudioOutputSource source, bool set_initial_vol)
-              : AudioOutputBase(audiodevice, laudio_bits,
-                              laudio_channels, laudio_samplerate, source, set_initial_vol)
+                                 AudioOutputSource source,
+                                 bool set_initial_vol, bool laudio_passthru)
+    : AudioOutputBase(audiodevice, laudio_bits,
+                      laudio_channels, laudio_samplerate, source,
+                      set_initial_vol, laudio_passthru)
 {
     // our initalisation
     pcm_handle = NULL;
@@ -22,7 +24,8 @@ AudioOutputALSA::AudioOutputALSA(QString audiodevice, int laudio_bits,
     mixer_handle = NULL;
 
     // Set everything up
-    Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
+    Reconfigure(laudio_bits, laudio_channels,
+                laudio_samplerate, laudio_passthru);
 }
 
 AudioOutputALSA::~AudioOutputALSA()
@@ -41,8 +44,12 @@ bool AudioOutputALSA::OpenDevice()
 
     pcm_handle = NULL;
     numbadioctls = 0;
+
+    QString real_device = audiodevice;
+    if (audio_passthru)
+        real_device.append(":{ AES0 0x02 }");
     
-    err = snd_pcm_open(&pcm_handle, audiodevice,
+    err = snd_pcm_open(&pcm_handle, real_device,
           SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK); 
 
     if (err < 0)
