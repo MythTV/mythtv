@@ -310,6 +310,16 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     QDateTime statustime = curtime;
     if (honorCutList && m_proginfo)
     {
+        VERBOSE(VB_GENERAL, "Honoring the cutlist while transcoding");
+
+        QMap<long long, int> delMap;
+        QMap<long long, int>::Iterator it;
+        m_proginfo->GetCutList(delMap);
+
+        for (it = delMap.begin(); it != delMap.end(); ++it)
+            VERBOSE(VB_GENERAL, QString("%1 cut at %2")
+                    .arg(it.data() ? "Start" : "End").arg(it.key()));
+
         if ((m_proginfo->IsEditing()) ||
             (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
         {
@@ -538,10 +548,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     AVPicture imageIn, imageOut;
     ImgReSampleContext *scontext;
 
-    if (video_width != newWidth || video_height != newHeight)
-        VERBOSE(VB_GENERAL, QString("Resizing video from %1x%2 to %3x%4")
-                                    .arg(video_width).arg(video_height)
-                                    .arg(newWidth).arg(newHeight));
+    if (fifow)
+        VERBOSE(VB_GENERAL, "Dumping Video and Audio data to fifos");
+    else if (copyaudio)
+        VERBOSE(VB_GENERAL, "Copying Audio while transcoding Video");
+    else
+        VERBOSE(VB_GENERAL, "Transcoding Video and Audio");
+
+    QTime flagTime;
+    flagTime.start();
 
     while (nvp->TranscodeGetNextFrame(dm_iter, &did_ff, &is_key, honorCutList))
     {
@@ -792,10 +807,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
                     return REENCODE_STOPPED;
                 }
+                float flagFPS = 0.0;
+                float elapsed = flagTime.elapsed() / 1000.0;
+                if (elapsed)
+                    flagFPS = curFrameNum / elapsed;
+
                 int percentage = curFrameNum * 100 / total_frame_count;
                 JobQueue::ChangeJobComment(jobID,
-                                           QString("%1% ").arg(percentage) + 
-                                           QObject::tr("Completed"));
+                          QObject::tr("%1% Completed @ %2 fps.")
+                                      .arg(percentage).arg(flagFPS));
             }
             curtime = QDateTime::currentDateTime();
             curtime = curtime.addSecs(20);
