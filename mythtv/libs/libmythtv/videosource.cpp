@@ -400,6 +400,25 @@ bool CardUtil::IgnoreEncrypted(uint cardid, const QString &input_name)
     return freetoair;
 }
 
+bool CardUtil::TVOnly(uint cardid, const QString &input_name)
+{
+    bool radioservices = true;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT radioservices "
+        "FROM cardinput "
+        "WHERE cardid    = :CARDID AND "
+        "      inputname = :INPUTNAME");
+    query.bindValue(":CARDID",    cardid);
+    query.bindValue(":INPUTNAME", input_name);
+
+    if (query.exec() && query.isActive() && query.next())
+        radioservices = query.value(0).toBool();
+
+    return !radioservices;
+}
+
 bool CardUtil::hasV4L2(int videofd)
 {
     (void) videofd;
@@ -1725,6 +1744,17 @@ class FreeToAir: public CheckBoxSetting, public CISetting {
     };
 };
 
+class RadioServices: public CheckBoxSetting, public CISetting {
+public:
+    RadioServices(const CardInput& parent):
+        CISetting(parent, "radioservices")
+    {
+        setValue(true);
+        setLabel(QObject::tr("Radio channels."));
+        setHelpText(QObject::tr("If set, radio channels will also be included.")); 
+    };
+};
+
 class ExternalChannelCommand: public LineEditSetting, public CISetting {
   public:
     ExternalChannelCommand(const CardInput& parent):
@@ -1888,7 +1918,11 @@ CardInput::CardInput(bool isDVBcard)
         group->addChild(lnblofswitch = new LNBLofSwitch(*this));
         group->addChild(lnblofhi = new LNBLofHi(*this));
         group->addChild(lnbloflo = new LNBLofLo(*this));
-        group->addChild(new FreeToAir(*this));
+        HorizontalConfigurationGroup *h1 =
+            new HorizontalConfigurationGroup(false, false, true, true);
+        h1->addChild(new FreeToAir(*this));
+        h1->addChild(new RadioServices(*this));
+        group->addChild(h1);
     }
 #endif
 

@@ -446,6 +446,9 @@ void ScanWizardScanner::scan()
         bool ftao = CardUtil::IgnoreEncrypted(
             parent->captureCard(), channel->GetCurrentInput());
         scanner->SetFTAOnly(ftao);
+        bool tvo = CardUtil::TVOnly(
+            parent->captureCard(), channel->GetCurrentInput());
+        scanner->SetTVOnly(tvo);
 
         connect(scanner, SIGNAL(ServiceScanComplete(void)),
                 this,    SLOT(  scanComplete(void)));

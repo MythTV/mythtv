@@ -78,6 +78,7 @@ class CardUtil
     static QString      GetDefaultInput(uint cardid);
 
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
+    static bool         TVOnly(uint cardid, const QString &inputname);
 
     static bool         hasV4L2(int videofd);
     static InputNames   probeV4LInputs(int videofd, bool &ok);
