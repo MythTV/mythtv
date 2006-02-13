@@ -21,7 +21,7 @@ our $svn = `which svn`; chomp $svn;
 # That probably ensures a safe build, but when rebuilding adds minutes to
 # the total build time, and prevents us skipping some parts of a full build
 #
-our $cleanLibs = 0;
+our $cleanLibs = 1;
 
 # By default, only the frontend is built (i.e. no backend or transcoding)
 #
@@ -159,7 +159,7 @@ our %depend = (
 #   },
   {
     'url'
-    =>  'ftp://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-free-3.3.4.tar.gz',
+    =>  'ftp://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-free-3.3.5.tar.gz',
     'conf-cmd'
     =>  'echo yes | ./configure',
     'conf'
