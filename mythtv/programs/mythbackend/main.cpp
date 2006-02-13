@@ -232,6 +232,7 @@ int main(int argc, char **argv)
     bool resched = false;
     bool nosched = false;
     bool nojobqueue = false;
+    bool nohousekeeper = false;
     bool noexpirer = false;
     bool printexpire = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -313,6 +314,10 @@ int main(int argc, char **argv)
         {
             nojobqueue = true;
         } 
+        else if (!strcmp(a.argv()[argpos],"--nohousekeeper"))
+        {
+            nohousekeeper = true;
+        } 
         else if (!strcmp(a.argv()[argpos],"--noautoexpire"))
         {
             noexpirer = true;
@@ -350,6 +355,7 @@ int main(int argc, char **argv)
                     "--resched                      Force the scheduler to update" << endl <<
                     "--nosched                      Do not perform any scheduling" << endl <<
                     "--nojobqueue                   Do not start the JobQueue" << endl <<
+                    "--nohousekeeper                Do not start the Housekeeper" << endl <<
                     "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
                     "--version                      Version information" << endl;
             return BACKEND_EXIT_INVALID_CMDLINE;
@@ -497,7 +503,11 @@ int main(int argc, char **argv)
     }
 
     // Get any initial housekeeping done before we fire up anything else
-    housekeeping = new HouseKeeper(true, ismaster);
+    if (nohousekeeper)
+        cerr << "****** The Housekeeper has been DISABLED with "
+                "the --nohousekeeper option ******\n";
+    else
+        housekeeping = new HouseKeeper(true, ismaster);
 
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
