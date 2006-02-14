@@ -36,6 +36,9 @@ SOURCES += networkcontrol.cpp
 macx {
     RC_FILE += mythfrontend.icns
     LIBS += `freetype-config --libs`
+
+    # OS X has no ldconfig
+    setting.extra -= -ldconfig
 }
 
 # OpenBSD ldconfig expects different arguments than the Linux one
