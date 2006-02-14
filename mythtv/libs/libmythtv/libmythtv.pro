@@ -39,14 +39,24 @@ QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 
 macx {
     # Mac OS X Frameworks
-    FWKS = ApplicationServices Carbon QuickTime
+    FWKS = AGL ApplicationServices Carbon Cocoa OpenGL QuickTime
+    PFWKS = DVD
 
     # The following trick shortens the command line, but depends on
     # the shell expanding Csh-style braces. Luckily, Bash and Zsh do.
     FC = $$join(FWKS,",","{","}")
+    PFC = $$join(PFWKS,",","{","}")
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
+    QMAKE_CXXFLAGS += -F/System/Library/PrivateFrameworks/$${PFC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
+    LIBS           += -F/System/Library/PrivateFrameworks
+    LIBS           += -framework $$join(PFWKS," -framework ")
+
+    using_mac_accel {
+        # accel_utils uses Objective-C++, activated by .mm suffix
+        QMAKE_EXT_CPP += .mm
+    }
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
@@ -162,6 +172,9 @@ using_frontend {
 
     macx:HEADERS +=               videoout_quartz.h
     macx:SOURCES +=               videoout_quartz.cpp
+
+    using_mac_accel:HEADERS +=    accel_utils.h accel_private.h
+    using_mac_accel:SOURCES +=    accel_utils.mm
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp

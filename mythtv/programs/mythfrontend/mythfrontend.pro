@@ -37,6 +37,8 @@ macx {
     RC_FILE += mythfrontend.icns
     LIBS += `freetype-config --libs`
 
+    using_mac_accel : LIBS += -lobjc
+
     # OS X has no ldconfig
     setting.extra -= -ldconfig
 }
