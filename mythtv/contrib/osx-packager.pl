@@ -704,14 +704,14 @@ foreach my $comp (@comps)
 {
   my $compdir = "$svndir/$comp/" ;
 
+  chdir $compdir;
+
   if ( ! -e "$comp.pro" )
   {
     &Complain("$compdir/$comp.pro does not exist.",
               'You must be building really old source?');
     next;
   }
-
-  chdir $compdir;
   
   if ($comp eq 'mythtv')
   {
