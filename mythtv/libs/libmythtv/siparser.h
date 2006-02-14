@@ -30,6 +30,7 @@ using namespace std;
 
 // MythTV includes
 #include "sitypes.h"
+#include "eitfixup.h"
 
 class VirtualChannelTable;
 
@@ -214,13 +215,6 @@ class SIParser : public QObject
 
     void InitializeCategories(void);
 
-    // EIT Fix Up Functions
-    void EITFixUp      (Event &event);
-    void EITFixUpStyle1(Event &event);
-    void EITFixUpStyle2(Event &event);
-    void EITFixUpStyle3(Event &event);
-    void EITFixUpStyle4(Event &event);
-
   private:
     bool PAT_ready;
     bool PMT_ready;
@@ -270,6 +264,9 @@ class SIParser : public QObject
 
     // DVB category descriptions
     QMap<uint,QString>  m_mapCategories;
+
+    // EIT fix up class
+    EITFixUp            eitfixup;
 
     // statistics
     QMap<uint,uint>     descCount;
