@@ -57,6 +57,13 @@ using namespace std;
 #import <Carbon/Carbon.h>
 #import <QuickTime/QuickTime.h>
 
+#include "osd.h"
+#include "osdsurface.h"
+#include "mythconfig.h"
+#ifdef CONFIG_MAC_ACCEL
+#include "accel_utils.h"
+#endif
+
 class VideoOutputQuartzView;
 
 /*
@@ -393,6 +400,15 @@ void VideoOutputQuartzView::Transform(void)
                                     .arg(name).arg((w - sw)/2.0).arg((h - sh)/2.0));
         TranslateMatrix(&matrix, X2Fix((w - sw) / 2.0), X2Fix((h - sh) / 2.0));
     }
+
+// apply the basic sizing to AccelUtils
+#ifdef CONFIG_MAC_ACCEL
+    AccelUtils *accel = AccelUtils::singleton();
+    if (accel)
+      accel->MoveResize(0, 0, parentData->srcWidth, parentData->srcHeight,
+                        (int)((w - sw) / 2.0), (int)((h - sh) / 2.0),
+                        sw, sh);
+#endif // CONFIG_MAC_ACCEL                        
 
     // apply over/underscan
     int hscan = gContext->GetNumSetting("HorizScanPercentage", 5);
@@ -1615,6 +1631,12 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)t;
 
+#ifdef CONFIG_MAC_ACCEL
+    AccelUtils *accel = AccelUtils::singleton();
+    if (accel && buffer)
+        accel->DecodeFrame(buffer);
+#endif // CONFIG_MAC_ACCEL
+
     if (!buffer)
         buffer = vbuffers.GetScratchFrame();
 
@@ -1624,6 +1646,15 @@ void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 void VideoOutputQuartz::Show(FrameScanType t)
 {
     (void)t;
+
+#ifdef CONFIG_MAC_ACCEL
+    AccelUtils *accel = AccelUtils::singleton();
+    if (accel)
+    {
+        accel->ShowFrame();
+        return;
+    }
+#endif // CONFIG_MAC_ACCEL
 
     data->pixelLock.lock();
     for (VideoOutputQuartzView *view = data->views.first();
@@ -1658,6 +1689,27 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         frame = vbuffers.GetScratchFrame();
         CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
     }
+
+#ifdef CONFIG_MAC_ACCEL
+    AccelUtils *accel = AccelUtils::singleton();
+    if (accel)
+    {
+        if (osd && osd->Visible())
+        {
+            OSDSurface *surface = osd->Display();
+            if (surface && surface->Changed())
+            {
+              accel->DrawOSD(surface->y, surface->u, surface->v,
+                             surface->alpha);
+            }
+        }
+        else
+        {
+          accel->DrawOSD(NULL, NULL, NULL, NULL);
+        }
+        return;   // no need to process frame, it won't be used
+    }
+#endif // CONFIG_MAC_ACCEL
 
     if (filterList)
         filterList->ProcessFrame(frame);
