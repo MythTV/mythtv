@@ -958,10 +958,14 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "recorded.lastmodified, recorded.findid, "
                        "recorded.originalairdate, recorded.playgroup, "
                        "recorded.basename, recorded.progstart, "
-                       "recorded.progend, recorded.stars "
+                       "recorded.progend, recorded.stars, "
+                       "recordedprogram.stereo, recordedprogram.hdtv, "
+                       "recordedprogram.closecaptioned "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+                       "LEFT JOIN recordedprogram ON (recorded.chanid = recordedprogram.chanid "
+                              "AND recorded.starttime = recordedprogram.starttime) "
                        "WHERE (recorded.deletepending = 0 OR "
                               "DATE_ADD(recorded.lastmodified, "
                                        "INTERVAL 5 MINUTE) <= NOW()) "
@@ -1045,6 +1049,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= query.value(11).toString().length() > 1 ? FL_CUTLIST : 0;
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
             flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
+            flags |= (query.value(32).toInt() == 1) ? FL_STEREO : 0;
+            flags |= (query.value(34).toInt() == 1) ? FL_CC : 0;
+            flags |= (query.value(33).toInt() == 1) ? FL_HDTV : 0;
 
             inUseKey = query.value(0).toString() + " " +
                        query.value(1).toDateTime().toString(Qt::ISODate);

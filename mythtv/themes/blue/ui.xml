@@ -898,6 +898,18 @@
         <filename>cutlist.png</filename>
         <position>148,106</position>
       </image>
+      <image name="stereo" draworder="6">
+        <filename>type/stereo.png</filename>
+        <position>180,106</position>
+      </image>
+      <image name="cc" draworder="6">
+        <filename>type/cc.png</filename>
+        <position>212,106</position>
+      </image>
+      <image name="hdtv" draworder="6">
+        <filename>type/hd.png</filename>
+        <position>257,106</position>
+      </image>
 
       <image name="processing" draworder="6">
         <filename>processing.png</filename>

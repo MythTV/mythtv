@@ -596,7 +596,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     }
     else
         progMap["stars"] = "";
-        
+
     if (hasAirDate)
     {
         progMap["originalairdate"] = originalAirDate.toString(dateFormat);
@@ -3472,8 +3472,11 @@ int ProgramInfo::getProgramFlags(void) const
     MSqlQuery query(MSqlQuery::InitCon());
     
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
-                  "editing, bookmark FROM recorded WHERE "
-                  "chanid = :CHANID AND starttime = :STARTTIME ;");
+                  "editing, bookmark, stereo, closecaptioned, hdtv "
+                  "FROM recorded LEFT JOIN recordedprogram ON "
+                  "(recorded.chanid = recordedprogram.chanid AND "
+                  "recorded.starttime = recordedprogram.starttime) "
+                  "WHERE recorded.chanid = :CHANID AND recorded.starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
@@ -3488,6 +3491,9 @@ int ProgramInfo::getProgramFlags(void) const
             (query.value(0).toInt() == COMM_FLAG_PROCESSING))
             flags |= FL_EDITING;
         flags |= query.value(4).toString().length() > 1 ? FL_BOOKMARK : 0;
+        flags |= (query.value(5).toInt() == 1) ? FL_STEREO : 0;
+        flags |= (query.value(6).toInt() == 1) ? FL_CC : 0;
+        flags |= (query.value(7).toInt() == 1) ? FL_HDTV : 0;
     }
 
     return flags;

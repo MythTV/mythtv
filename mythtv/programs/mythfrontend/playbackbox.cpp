@@ -741,6 +741,33 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
                 itype->hide();
         }
 
+        itype = (UIImageType *)container->GetType("stereo");
+        if (itype)
+        {
+            if (flags & FL_STEREO)
+                itype->show();
+            else
+                itype->hide();
+        }
+
+        itype = (UIImageType *)container->GetType("cc");
+        if (itype)
+        {
+            if (flags & FL_CC)
+                itype->show();
+            else
+                itype->hide();
+        }
+
+        itype = (UIImageType *)container->GetType("hdtv");
+        if (itype)
+        {
+            if (flags & FL_HDTV)
+                itype->show();
+            else
+                itype->hide();
+        }
+
         container->Draw(&tmp, 6, (type == Delete) ? 1 : 0);
     }
 

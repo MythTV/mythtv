@@ -1332,6 +1332,19 @@
         <filename>type/processing.png</filename>
         <position>160,195</position>
       </image>
+      <image name="stereo" draworder="6">
+        <filename>type/stereo.png</filename>
+        <position>195,195</position>
+      </image>
+      <image name="cc" draworder="6">
+        <filename>type/cc.png</filename>
+        <position>230,195</position>
+      </image>
+      <image name="hdtv" draworder="6">
+        <filename>type/hd.png</filename>
+        <position>275,195</position>
+      </image>
+
 
     </container>
 

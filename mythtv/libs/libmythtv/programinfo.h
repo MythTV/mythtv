@@ -57,7 +57,10 @@ enum FlagMask {
     FL_EDITING        = 0x08,
     FL_BOOKMARK       = 0x10,
     FL_INUSERECORDING = 0x20,
-    FL_INUSEPLAYING   = 0x40
+    FL_INUSEPLAYING   = 0x40,
+    FL_STEREO         = 0x80,
+    FL_CC             = 0x100,
+    FL_HDTV           = 0x200
 };
 
 enum RecStatusType {
