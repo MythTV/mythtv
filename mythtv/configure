@@ -62,6 +62,7 @@ xv="yes"
 xvmc="no"
 xvmc_vld="yes"
 xvmc_pro="no"
+mac_accel="no"
 opengl_vsync="no"
 direct_fb="no"
 direct_x="no"
@@ -188,6 +189,7 @@ echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
 echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
 echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
 #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
+echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
 echo "  --enable-opengl-vsync    enable OpenGL vsync method"
 echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
 echo "  --enable-directx         enable DirectX   (Microsoft video)"
@@ -477,6 +479,7 @@ audio_oss="no"
 audio_alsa="no"
 audio_arts="no"
 audio_jack="no"
+mac_accel="yes"
 dv1394="no"
 ffserver="no"
 SHFLAGS="-dynamiclib"
@@ -823,6 +826,10 @@ for opt do
   --enable-xvmc-pro) xvmc_pro="yes"
   ;;
   --disable-xvmc-pro) xvmc_pro="no"
+  ;;
+  --enable-mac-accel) mac_accel="yes"
+  ;;
+  --disable-mac-accel) mac_accel="no"
   ;;
   --enable-opengl-vsync) opengl_vsync="yes"
   ;;
@@ -2087,6 +2094,13 @@ else
     xvmc_vld="no"
 fi
 
+if test x"$mac_accel" = x"yes" ; then
+    # Can only do Mac accel on Mac platform
+    if test $targetos != Darwin; then
+        mac_accel="no"
+    fi
+fi
+
 if test x"$opengl_vsync" = x"yes" ; then
     CONFIG_OPENGL_VSYNC_LIBS="-lGL -lGLU"
 fi
@@ -2210,6 +2224,7 @@ if test x"$frontend" = x"yes" ; then
   echo "XvMC VLD support $xvmc_vld"
   echo "XvMC pro support $xvmc_pro"
   echo "XvMC libs        $VENDOR_XVMC_LIBS"
+  echo "Mac accel.       $mac_accel"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $direct_fb"
   if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
@@ -2605,6 +2620,13 @@ fi
 if test "$xvid" = "yes" ; then
   echo "#define CONFIG_XVID 1" >> $TMPH
   echo "CONFIG_XVID=yes" >> $MYTH_CONFIG_MAK
+fi
+
+if test "$mac_accel" = "yes" ; then
+  CCONFIG="$CCONFIG using_mac_accel"
+  echo "#define HAVE_DVDV 1" >> $TMPH
+  echo "#define CONFIG_MAC_ACCEL 1" >> $TMPH
+  echo "CONFIG_MAC_ACCEL=yes" >> $MYTH_CONFIG_MAK
 fi
 
 if test "$x264" = "yes" ; then

@@ -877,6 +877,9 @@ static HostComboBox *PreferredMPEG2Decoder()
 #ifdef USING_XVMC_VLD
     gc->addSelection(QObject::tr("VIA XvMC"), "xvmc-vld");
 #endif // USING_XVMC_VLD    
+#ifdef CONFIG_MAC_ACCEL
+    gc->addSelection(QObject::tr("Mac hardware acceleration"), "macaccel");
+#endif // CONFIG_MAC_ACCEL
     gc->setHelpText(
         QObject::tr("Decoder to use to play back MPEG2 video.") + " " +
         QObject::tr("Standard will use ffmpeg library.") + " " +
@@ -892,6 +895,11 @@ static HostComboBox *PreferredMPEG2Decoder()
         + " " +
         QObject::tr("VIA XvMC will use the VIA VLD XvMC extension.")
 #endif // USING_XVMC_VLD
+#ifdef CONFIG_MAC_ACCEL
+        + " " +
+        QObject::tr("Mac hardware will try to use the graphics "
+                    "processor - this may hang or crash your Mac!")
+#endif
         );
     return gc;
 }
