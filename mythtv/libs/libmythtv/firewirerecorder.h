@@ -8,11 +8,14 @@
 #define FIREWIRERECORDER_H_
 
 #include "dtvrecorder.h"
-#include "mpeg/tspacket.h"
+#include "tsstats.h"
 #include <libraw1394/raw1394.h>
 #include <libiec61883/iec61883.h>
-
 #include <time.h>
+
+class MPEGStreamData;
+class ProgramAssociationTable;
+class ProgramMapTable;
 
 #define FIREWIRE_TIMEOUT 15
 
@@ -29,15 +32,13 @@
  */
 class FirewireRecorder : public DTVRecorder
 {
+  Q_OBJECT
+    friend class MPEGStreamData;
+    friend class TSPacketProcessor;
+
   public:
-    FirewireRecorder(TVRec *rec) :
-        DTVRecorder(rec, "FirewireRecorder"),
-        fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1),
-        fwfd(-1),       fwconnection(FIREWIRE_CONNECTION_P2P),
-        fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0),
-        fwhandle(NULL), fwmpeg(NULL),  isopen(false), lastpacket(0) {;}
-        
-    ~FirewireRecorder() { Close(); }
+    FirewireRecorder(TVRec *rec);
+    ~FirewireRecorder();
 
     void StartRecording(void);
     bool Open(void); 
@@ -50,6 +51,8 @@ class FirewireRecorder : public DTVRecorder
     void SetOption(const QString &name, const QString &value);
     void SetOption(const QString &name, int value);
     QString FirewireSpeedString(int speed);
+    void SetStreamData(MPEGStreamData*);
+    MPEGStreamData* StreamData(void) { return _mpeg_stream_data; }
 
     bool PauseAndWait(int timeout = 100);
 
@@ -58,6 +61,12 @@ class FirewireRecorder : public DTVRecorder
         
   private:
     void Close(void);
+
+  private slots:
+    void WritePAT(ProgramAssociationTable*);
+    void WritePMT(ProgramMapTable*);
+
+  private:
     int fwport, fwchannel, fwspeed, fwbandwidth, fwfd, fwconnection;
     int fwoplug, fwiplug;
     QString fwmodel;
@@ -66,6 +75,9 @@ class FirewireRecorder : public DTVRecorder
     iec61883_mpeg2_t fwmpeg;
     bool isopen;
     time_t lastpacket;
+    MPEGStreamData *_mpeg_stream_data;
+    TSStats         _ts_stats;
+    
 };
 
 #endif

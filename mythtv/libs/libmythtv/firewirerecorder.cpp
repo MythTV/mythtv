@@ -15,7 +15,8 @@ using namespace std;
 // MythTV includes
 #include "firewirerecorder.h"
 #include "mythcontext.h"
-#include "tspacket.h"
+#include "mpegtables.h"
+#include "mpegstreamdata.h"
 #include "tv_rec.h"
 
 // callback function for libiec61883
@@ -44,6 +45,33 @@ int read_tspacket (unsigned char *tspacket, int /*len*/,
     return 1;
 }
 
+FirewireRecorder::FirewireRecorder(TVRec *rec)
+    : DTVRecorder(rec, "FirewireRecorder"),
+      fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1),
+      fwfd(-1),       fwconnection(FIREWIRE_CONNECTION_P2P),
+      fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0),
+      fwhandle(NULL), fwmpeg(NULL),  isopen(false), lastpacket(0),
+      _mpeg_stream_data(NULL)
+{
+    _mpeg_stream_data = new MPEGStreamData(1, true);
+    connect(_mpeg_stream_data,
+            SIGNAL(UpdatePATSingleProgram(ProgramAssociationTable*)),
+            this, SLOT(WritePAT(ProgramAssociationTable*)));
+    connect(_mpeg_stream_data,
+            SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)),
+            this, SLOT(WritePMT(ProgramMapTable*)));
+}
+
+FirewireRecorder::~FirewireRecorder()
+{
+   Close();
+   if (_mpeg_stream_data)
+   {
+       delete _mpeg_stream_data;
+       _mpeg_stream_data = NULL;
+   }
+}
+      
 void FirewireRecorder::deleteLater(void)
 {
     Close();
@@ -55,6 +83,9 @@ bool FirewireRecorder::Open() {
      if (isopen)
          return true;
     
+     if (!_mpeg_stream_data)
+         return false;
+
      VERBOSE(VB_GENERAL,QString("Firewire: Initializing Port: %1, Node: %2, Speed: %3")
                                .arg(fwport)
                                .arg(fwnode)
@@ -111,6 +142,17 @@ bool FirewireRecorder::Open() {
      isopen = true;
      fwfd = raw1394_get_fd(fwhandle); 
      return true;
+}
+
+void FirewireRecorder::SetStreamData(MPEGStreamData *stream_data)
+{
+    if (stream_data == _mpeg_stream_data)
+        return;
+
+    MPEGStreamData *old_data = _mpeg_stream_data;
+    _mpeg_stream_data = stream_data;
+    if (old_data)
+        delete old_data;
 }
 
 void FirewireRecorder::Close(void)
@@ -189,11 +231,59 @@ void FirewireRecorder::StartRecording(void) {
     _recording = false;
 }  
 
+void FirewireRecorder::WritePAT(ProgramAssociationTable *pat)
+{
+    if (!pat)
+        return;
+
+    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+    pat->tsheader()->SetContinuityCounter(next);
+    BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
+}
+
+void FirewireRecorder::WritePMT(ProgramMapTable *pmt)
+{
+    if (!pmt)
+        return;
+
+    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+    pmt->tsheader()->SetContinuityCounter(next);
+    BufferedWrite(*(reinterpret_cast<TSPacket*>(pmt->tsheader())));
+}
+
 void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
 {
+    if (tspacket.TransportError())
+        return;
+
+    if (tspacket.ScramplingControl())
+        return;
+
+    if (tspacket.HasAdaptationField())
+        StreamData()->HandleAdaptationFieldControl(&tspacket);
+
+    if (tspacket.HasPayload())
+    {
+        const unsigned int lpid = tspacket.PID();
+
+        // Pass or reject packets based on PID, and parse info from them
+        if (lpid == StreamData()->VideoPIDSingleProgram())
+        {
+            _buffer_packets = !FindKeyframes(&tspacket);
+            BufferedWrite(tspacket);
+        }
+        else if (StreamData()->IsAudioPID(lpid))
+            BufferedWrite(tspacket);
+        else if (StreamData()->IsListeningPID(lpid))
+            StreamData()->HandleTSTables(&tspacket);
+        else if (StreamData()->IsWritingPID(lpid))
+            BufferedWrite(tspacket);
+    }
+
     lastpacket = time(NULL);
-    _buffer_packets = !FindKeyframes(&tspacket);
-    BufferedWrite(tspacket);
+    _ts_stats.IncrTSPacketCount();
+    if (0 == _ts_stats.TSPacketCount()%1000000)
+        VERBOSE(VB_RECORD, _ts_stats.toString());
 }
 
 void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
