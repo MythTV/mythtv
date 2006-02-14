@@ -115,6 +115,12 @@ class DescriptorID
         audio_stream                = 0x81,
         caption_service             = 0x86,
         content_advisory            = 0x87,
+
+        // Dish Network
+        dish_ename                  = 0x91,
+        dish_edescription           = 0x92,
+
+        // ATSC
         extended_channel_name       = 0xA0,
         service_location            = 0xA1,
         atsc_time_shifted_service   = 0xA2,

@@ -223,8 +223,12 @@ QString MPEGDescriptor::DescriptorTagString() const
             return QString("Audio");
         case DescriptorID::caption_service:
             return QString("Caption Service");
-        case DescriptorID:: content_advisory:
+        case DescriptorID::content_advisory:
             return QString("Content Advisory");
+        case DescriptorID::dish_ename:
+            return QString("Dishnet EIT Name");
+        case DescriptorID::dish_edescription:
+            return QString("Dishnet EIT Description");
         case DescriptorID::extended_channel_name:
             return QString("Extended Channel Name");
         case DescriptorID::service_location:
