@@ -80,6 +80,7 @@ void TV::InitKeys(void)
             "Left");
     REG_KEY("TV Frontend", "UPCOMING", "List upcoming episodes", "O");
     REG_KEY("TV Frontend", "DETAILS", "Show program details", "U");
+    REG_KEY("TV Frontend", "VIEWCARD", "Switch Capture Card view", "Y");
 
     REG_KEY("TV Playback", "CLEAROSD", "Clear OSD", "Backspace");
     REG_KEY("TV Playback", "PAUSE", "Pause", "P");

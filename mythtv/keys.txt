@@ -9,13 +9,15 @@ mythfrontend
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
 - U to view details for the currently selected show on the Watch or
-    Delete screens, EPG, "Program Finder", "Fix Scheduling Conflicts"
+    Delete screens, EPG, "Program Finder", "Upcoming Recordings"
     and search results screens.
 - O to list the upcoming episodes for the currently selected show
     on any page where a show title may be highlighed.
 - I to edit recording options from any of the pages for scheduling
     recordings. From the Watch and Delete screens, 'I' presents options
     for recorded shows such as Auto Expire or Stop Recording.
+- Y on the "Upcoming Recordings" page switches which capture cards'
+    items are displayed in the highlight color.
 
 Watching TV or a recording
 --------------------------

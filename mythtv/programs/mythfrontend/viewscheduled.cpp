@@ -63,6 +63,7 @@ ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
     inFill = false;
     needFill = false;
 
+    curcard = 0;
     listPos = 0;
     FillList();
  
@@ -120,6 +121,8 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 setShowAll(false);
             else if (action == "PREVVIEW" || action == "NEXTVIEW")
                 setShowAll(!showAll);
+            else if (action == "VIEWCARD")
+                viewCards();
             else
                 handled = false;
         }
@@ -266,7 +269,13 @@ void ViewScheduled::FillList(void)
             (showAll || p->recstatus <= rsWillRecord || 
              p->recstatus == rsDontRecord ||
              (p->recstatus > rsEarlierShowing && p->recstatus != rsRepeat)))
+        {
+            cardref[p->cardid]++;
+            if (p->cardid > maxcard)
+                maxcard = p->cardid;
+
             p = recList.next();
+        }
         else
         {
             recList.remove();
@@ -356,7 +365,10 @@ void ViewScheduled::updateList(QPainter *p)
                          p->recstatus == rsAborted)
                     ltype->EnableForcedFont(i, "conflictingrecording");
                 else if (p->recstatus == rsWillRecord)
-                    ltype->EnableForcedFont(i, "record");
+                    {
+                    if (curcard == 0 || p->cardid == curcard)
+                        ltype->EnableForcedFont(i, "record");
+                    }
                 else if (p->recstatus == rsRepeat ||
                          (p->recstatus != rsDontRecord &&
                           p->recstatus <= rsEarlierShowing))
@@ -593,4 +605,18 @@ void ViewScheduled::setShowAll(bool all)
     showAll = all;
 
     needFill = true;
+}
+
+void ViewScheduled::viewCards()
+{
+    needFill = true;
+
+    curcard++;
+    while (curcard <= maxcard)
+    {
+        if (cardref[curcard] > 0)
+            return;
+        curcard++;
+    }
+    curcard = 0;
 }
