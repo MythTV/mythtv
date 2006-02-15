@@ -1828,7 +1828,7 @@ void Scheduler::UpdateMatches(int recordid) {
 "INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
 "SELECT RECTABLE.recordid, program.chanid, program.starttime, "
 " IF(search = %1, recordid, 0) "
-"FROM program, RECTABLE ").arg(kManualSearch) + fromclauses[clause] + QString(
+"FROM RECTABLE, program ").arg(kManualSearch) + fromclauses[clause] + QString(
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 "WHERE ") + whereclauses[clause] + QString(" AND channel.visible = 1 AND "
 "((RECTABLE.type = %1 " // allrecord
