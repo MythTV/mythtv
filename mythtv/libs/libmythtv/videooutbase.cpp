@@ -837,12 +837,14 @@ void VideoOutput::MoveResize(void)
  
     VERBOSE(VB_PLAYBACK,
             QString("Image size. dispxoff %1, dispyoff: %2, dispwoff: %3, "
-                    "disphoff: %4")
-            .arg(dispxoff).arg(dispyoff).arg(dispwoff).arg(disphoff));
+                    "disphoff: %4, dispaspect: %5")
+            .arg(dispxoff).arg(dispyoff).arg(dispwoff).arg(disphoff)
+            .arg(displayAspect));
 
     VERBOSE(VB_PLAYBACK,
-            QString("Image size. imgx %1, imgy: %2, imgw: %3, imgh: %4")
-           .arg(imgx).arg(imgy).arg(imgw).arg(imgh));
+            QString("Image size. imgx %1, imgy: %2, imgw: %3, imgh: %4, "
+                    "aspect: %5")
+           .arg(imgx).arg(imgy).arg(imgw).arg(imgh).arg(XJ_aspect));
 
     needrepaint = true;
 }

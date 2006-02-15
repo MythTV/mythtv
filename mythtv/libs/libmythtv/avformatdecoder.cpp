@@ -888,7 +888,7 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
         aspect_ratio = av_q2d(enc->sample_aspect_ratio) *
             enc->width / enc->height;
 
-    if (aspect_ratio <= 0.0f)
+    if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
         aspect_ratio = (float)enc->width / (float)enc->height;
 
     current_width = enc->width;
@@ -1092,7 +1092,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") type ("<<codec_type_string(enc->codec_type)
                             <<") already open, leaving it alone.");
                 }
-                assert(enc->codec_id);
+                //assert(enc->codec_id);
 
                 // HACK BEGIN REALLY UGLY HACK FOR DTS PASSTHRU
                 if (enc->codec_id == CODEC_ID_DTS)
