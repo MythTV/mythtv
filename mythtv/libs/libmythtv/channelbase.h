@@ -97,10 +97,10 @@ class ChannelBase
     /** \brief Returns cached MPEG PIDs for last tuned channel.
      *  \param pid_cache List of PIDs with their TableID
      *                   types is returned in pid_cache. */
-    virtual void GetCachedPids(pid_cache_t &pid_cache) const { ; };
+    virtual void GetCachedPids(pid_cache_t &/*pid_cache*/) const { ; };
     /// \brief Saves MPEG PIDs to cache to database
     /// \param pid_cache List of PIDs with their TableID types to be saved.
-    virtual void SaveCachedPids(const pid_cache_t &pid_cache) const { ; };
+    virtual void SaveCachedPids(const pid_cache_t &/*pid_cache*/) const { ; };
     /// \brief Returns program number in PAT, -1 if unknown.
     virtual int GetProgramNumber(void) const { return currentProgramNum; };
     /// \brief Returns major channel, -1 if unknown.

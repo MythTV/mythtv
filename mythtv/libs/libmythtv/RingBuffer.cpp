@@ -278,11 +278,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
  */
 bool RingBuffer::IsOpen(void) const
 { 
-#ifdef HAVE_DVDNAV
     return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen());
-#else // if !HAVE_DVDNAV
-    return tfw || (fd2 > -1) || remotefile; 
-#endif // !HAVE_DVDNAV
 }
 
 /** \fn RingBuffer::~RingBuffer(void)
@@ -1202,70 +1198,10 @@ void RingBuffer::SetLiveMode(LiveTVChain *chain)
     livetvchain = chain;
 }
 
-/** \fn RingBuffer::getPartAndTitle(int&,int&)
- *  \brief Calls DVDRingBufferPriv::GetPartAndTitle(int&,int&)
- */
-void RingBuffer::getPartAndTitle(int &title, int &part)
+bool RingBuffer::InDVDMenuOrStillFrame(void)
 {
     if (dvdPriv)
-        dvdPriv->GetPartAndTitle(title, part);
-}
-
-/** \fn RingBuffer::getDescForPos(QString&)
- *  \brief Calls DVDRingBufferPriv::GetDescForPos(QString&)
- */
-void RingBuffer::getDescForPos(QString &desc)
-{
-    if (dvdPriv)
-        dvdPriv->GetDescForPos(desc);
-}
-
-/** \fn RingBuffer::nextTrack(void)
- *  \brief Calls DVDRingBufferPriv::nextTrack(void)
- */
-bool RingBuffer::nextTrack(void)
-{
-    if (dvdPriv)
-        return dvdPriv->nextTrack();
+        return (dvdPriv->IsInMenu() || dvdPriv->InStillFrame());
     return false;
-}
-
-/** \fn RingBuffer::prevTrack(void)
- *  \brief Calls DVDRingBufferPriv::prevTrack(void)
- */
-void RingBuffer::prevTrack(void)
-{
-    if (dvdPriv)
-        dvdPriv->prevTrack();
-}
-
-/** \fn RingBuffer::GetTotalTimeOfTitle(void)
- *  \brief Calls DVDRingBufferPriv::GetTotalTimeOfTitle(void)
- */
-uint RingBuffer::GetTotalTimeOfTitle(void)
-{
-    if (dvdPriv)
-        return dvdPriv->GetTotalTimeOfTitle();
-    return 0;
-}
-
-/** \fn RingBuffer::GetCellStart(void)
- *  \brief Calls DVDRingBufferPriv::GetCellStart(void)
- */
-uint RingBuffer::GetCellStart(void)
-{
-    if (dvdPriv)
-        return dvdPriv->GetCellStart();
-    return 0;
-}
-
-/** \fn RingBuffer::GetTotalReadPosition(void)
- *  \brief Calls DVDRingBufferPriv::GetTotalReadPosition(void)
- */
-long long RingBuffer::GetTotalReadPosition(void)
-{
-    if (dvdPriv)
-        return dvdPriv->GetTotalReadPosition();
-    return 0;
 }
 

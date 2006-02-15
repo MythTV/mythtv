@@ -92,6 +92,7 @@ class DecoderBase
     // DVD public stuff
     void ChangeDVDTrack(bool ffw);
     long long DVDFindPosition(long long desiredFrame);
+    long long DVDCurrentFrameNumber(void);
 
   protected:
     void FileChanged(void);

@@ -261,6 +261,9 @@ class NuppelVideoPlayer
 
     // DVD public stuff
     void ChangeDVDTrack(bool ffw);
+    void ActivateDVDButton(void);
+    void GoToDVDMenu(QString str);
+    void GoToDVDProgram(bool direction);
 
   protected:
     void DisplayPauseFrame(void);
@@ -363,6 +366,9 @@ class NuppelVideoPlayer
     // Private LiveTV stuff
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
+
+    // Private DVD stuff
+    void DisplayDVDButton(void);
 
   private:
     VideoOutputType forceVideoOutput;
@@ -589,6 +595,9 @@ class NuppelVideoPlayer
     // LiveTV
     LiveTVChain *livetvchain;
     TV *m_tv;
+
+    // DVD
+    bool indvdstillframe;
 
     // Debugging variables
     Jitterometer *output_jmeter;

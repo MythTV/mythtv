@@ -7,10 +7,10 @@
 
 #include <qstring.h>
 #include <qobject.h>
+#include "util.h"
+#include "avcodec.h"
 
-#ifdef HAVE_DVDNAV
-#   include <dvdnav/dvdnav.h>
-#endif // HAVE_DVDNAV
+#include "../libmythdvdnav/dvdnav.h"
 
 /** \class DVDRingBufferPriv
  *  \brief RingBuffer class for DVD's
@@ -20,29 +20,6 @@
  *   until it's all done and tested I'm not real sure about what stuff
  *   needs to be in a RingBufferBase class.
  */
-
-#ifndef HAVE_DVDNAV
-
-// Stub version to cut down on the ifdefs.
-class DVDRingBufferPriv
-{
-  public:
-    DVDRingBufferPriv()                       {               }
-    bool OpenFile(const QString& )            { return false; }
-    bool IsOpen()                       const { return false; }
-    long long Seek(long long, int)            { return  0;    }
-    int safe_read(void *, unsigned)           { return -1;    }
-    long long GetReadPosition()         const { return  0;    }
-    long long GetTotalReadPosition()    const { return  0;    }
-    void GetPartAndTitle(int &, int &)  const {               }
-    bool nextTrack()                          {               }
-    void prevTrack()                          {               }
-    void GetDescForPos(QString&)              {               }
-    uint GetTotalTimeOfTitle(void)            {               }
-    uint GetCellStart(void)                   {               }
-};
-
-#else // if HAVE_DVDNAV
 
 class DVDRingBufferPriv
 {
@@ -56,12 +33,26 @@ class DVDRingBufferPriv
     bool IsInMenu(void) const { return (title == 0); }
     bool IsOpen(void)   const { return dvdnav;       }
     long long GetReadPosition(void);
-    long long GetTotalReadPosition(void);
+    long long GetTotalReadPosition(void) { return titleLength; }
     void GetDescForPos(QString &desc) const;
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = part; _title = _title; }
     uint GetTotalTimeOfTitle(void);
     uint GetCellStart(void);
+    bool InStillFrame(void) { return cellHasStillFrame; }
+    bool IsWaiting(void) { return dvdWaiting; }
+    int    NumPartsInTitle(void) { return titleParts; }
+    void GetMenuSPUPkt(uint8_t *buf, int buf_size,long long pts);
+    AVSubtitleRect *GetMenuButton(void);
+    bool IgnoringStillorWait(void) { return skipstillorwait; }
+    long long GetCellStartPos(void) { return cellstartPos; }
+    void HideMenuButton(bool hide);
+    uint ButtonPosX(void) { return hl_startx; }
+    uint ButtonPosY(void) { return hl_starty; }
+    uint GetAudioLanguage(int id);
+    uint GetSubtitleLanguage(int id);
+    long long MenuSpuPts(void) { return menuspupts; }
+    int CellChange(void) { return cellChange; }
 
     // commands
     bool OpenFile(const QString &filename);
@@ -70,6 +61,19 @@ class DVDRingBufferPriv
     void prevTrack(void);
     int  safe_read(void *data, unsigned sz);
     long long Seek(long long pos, int whence);
+    void SkipStillFrame(void);
+    void WaitSkip(void);
+    void GoToMenu(const QString str);
+    void GoToNextProgram(void);
+    void GoToPreviousProgram(void);
+    void MoveButtonLeft(void);
+    void MoveButtonRight(void);
+    void MoveButtonUp(void);
+    void MoveButtonDown(void);
+    void ActivateButton(void);
+    int NumMenuButtons(void);
+    void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
+    uint GetCurrentTime(void);
         
   protected:
     dvdnav_t      *dvdnav;
@@ -84,9 +88,47 @@ class DVDRingBufferPriv
     dvdnav_t      *lastNav; // This really belongs in the player.
     int            part;
     int            title;
-    int            maxPart;
-    int            mainTitle;
+    int            titleParts;
     bool           gotStop;
+
+    bool           cellHasStillFrame;
+    bool           dvdWaiting;
+    long long      titleLength;
+    MythTimer      stillFrameTimer;
+    uint32_t       clut[16];
+    uint8_t        button_color[4];
+    uint8_t        button_alpha[4];
+    uint16_t       hl_startx;
+    uint16_t       hl_width;
+    uint16_t       hl_starty;
+    uint16_t       hl_height;
+    bool           spuchanged;
+    uint8_t       *menuSpuPkt;
+    int            menuBuflength;
+    uint8_t       *buttonBitmap;
+    AVSubtitleRect *dvdMenuButton;
+    int            buttonCoords;
+    bool           skipstillorwait;
+    bool           spuStreamLetterbox;
+    long long      cellstartPos;
+    bool           buttonSelected;
+    bool           buttonExists;
+    long long      menuspupts;
+    int            cellChange;
+
+    bool DrawMenuButton(uint8_t *spu_pkt, int buf_size);
+    bool DVDButtonUpdate(bool b_mode);
+    void ClearMenuSPUParameters(void);
+    bool MenuButtonChanged(void);
+    uint ConvertLangCode(uint16_t code); // converts 2char key to 3char key
+    
+    /* copied from dvdsub.c from ffmpeg */
+    int get_nibble(const uint8_t *buf, int nibble_offset);
+    int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
+                    const uint8_t *buf, int nibble_offset, int buf_size);
+    void guess_palette(uint32_t *rgba_palette,uint8_t *palette,
+                        uint8_t *alpha);
 };
-#endif // HAVE_DVDNAV
+
 #endif // DVD_RING_BUFFER_H_
+

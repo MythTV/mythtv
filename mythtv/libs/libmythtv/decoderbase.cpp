@@ -7,6 +7,7 @@
 #include "decoderbase.h"
 #include "programinfo.h"
 #include "livetvchain.h"
+#include "DVDRingBuffer.h"
 
 #define LOC QString("Dec: ")
 #define LOC_ERR QString("Dec, Error: ")
@@ -98,8 +99,8 @@ bool DecoderBase::PosMapFromDb(void)
         keyframedist = 15;
         if (fps < 26 && fps > 24)
            keyframedist = 12;
-        totframes = (long long)(ringBuffer->GetTotalTimeOfTitle() * fps);
-        posMap[totframes] = ringBuffer->GetTotalReadPosition();
+        totframes = (long long)(ringBuffer->DVD()->GetTotalTimeOfTitle() * fps);
+        posMap[totframes] = ringBuffer->DVD()->GetTotalReadPosition();
     }
     else if ((positionMapType == MARK_UNSET) ||
         (keyframedist == -1))
@@ -316,7 +317,7 @@ bool DecoderBase::SyncPositionMap(void)
         if (ringBuffer->isDVD())
         { 
             totframes = m_positionMap[m_positionMap.size() - 1].index;
-            length = ringBuffer->GetTotalTimeOfTitle();
+            length = ringBuffer->DVD()->GetTotalTimeOfTitle();
         }
         else
         { 
@@ -681,22 +682,22 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
     if (!ringBuffer->isDVD())
         return;
 
-    uint prevcellstart = ringBuffer->GetCellStart();
+    uint prevcellstart = ringBuffer->DVD()->GetCellStart();
 
     if (ffw)
-        result = ringBuffer->nextTrack();
+        result = ringBuffer->DVD()->nextTrack();
     else
-        ringBuffer->prevTrack();
+        ringBuffer->DVD()->prevTrack();
 
     if (result)
     {
         if ((prevcellstart == 0 && ffw) || (prevcellstart != 0))
         {
-            while (prevcellstart == ringBuffer->GetCellStart())
+            while (prevcellstart == ringBuffer->DVD()->GetCellStart())
                 usleep(10000);
         } 
 
-        uint elapsed = ringBuffer->GetCellStart();
+        uint elapsed = ringBuffer->DVD()->GetCellStart();
 
         if (elapsed == 0)
             SeekReset(framesPlayed, 0, true, true);
@@ -719,5 +720,17 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
     int multiplier = m_positionMap[size].pos / m_positionMap[size].index ;
     return (long long)(desiredFrame * multiplier);
 } 
+
+long long DecoderBase::DVDCurrentFrameNumber(void)
+{
+    if (!ringBuffer->isDVD())
+        return 0;
+
+    int size = m_positionMap.size() - 1;
+    long long currentpos = ringBuffer->GetReadPosition();
+    long long multiplier = (currentpos * m_positionMap[size].index);
+    long long currentframe = multiplier / m_positionMap[size].pos;
+    return currentframe;
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

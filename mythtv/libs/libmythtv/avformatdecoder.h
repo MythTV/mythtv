@@ -254,6 +254,11 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     // language preferences for auto-selection of streams
     vector<int>       languagePreference;
+
+    // DVD
+    int lastdvdtitle;
+    int lastdvdpart;
+    int lastdvdcellchange;
 };
 
 #endif

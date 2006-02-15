@@ -34,6 +34,7 @@
 #include "config.h"
 #include "livetvchain.h"
 #include "playgroup.h"
+#include "DVDRingBuffer.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -151,7 +152,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
-    
+    REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");   
+ 
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "INVERTMAP", "Invert Begin/End cut points", "I");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
@@ -1164,6 +1166,13 @@ void TV::StartOSD()
 void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 {
     VERBOSE(VB_PLAYBACK, LOC + "StopStuff() -- begin");
+
+    if (prbuffer->isDVD())
+    {
+        VERBOSE(VB_PLAYBACK,LOC + " StopStuff() -- get dvd player out of still frame or wait status");
+        prbuffer->DVD()->IgnoreStillOrWait(true);
+    } 
+
     if (stopRingBuffers)
     {
         VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping ring buffer[s]");
@@ -2169,7 +2178,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 AddKeyToInputQueue(0);
             }            
         }
-        else if (action == "SEEKFFWD")
+        else if (action == "SEEKFFWD" && !prbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_FORWARD);
@@ -2185,7 +2194,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(1);
         }
-        else if (action == "FFWDSTICKY")
+        else if (action == "FFWDSTICKY" && !prbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_END);
@@ -2194,7 +2203,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(1);
         }
-        else if (action == "SEEKRWND")
+        else if (action == "SEEKRWND" && !prbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_REWIND);
@@ -2209,7 +2218,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(-1);
         }
-        else if (action == "RWNDSTICKY")
+        else if (action == "RWNDSTICKY" && !prbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_SET);
@@ -2222,9 +2231,18 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if (prbuffer->isDVD())
             {
-                nvp->ChangeDVDTrack(0);
-                UpdateOSDSeekMessage(tr("Previous Chapter"),
-                                     osd_general_timeout);
+                if (prbuffer->DVD()->NumPartsInTitle() < 2)
+                {
+                    nvp->GoToDVDProgram(0);
+                    UpdateOSDSeekMessage(tr("Previous Title/Chapter"),
+                            osd_general_timeout);
+                }
+                else
+                {
+                    nvp->ChangeDVDTrack(0);
+                    UpdateOSDSeekMessage(tr("Previous Chapter"),
+                            osd_general_timeout);
+                }
             }
             else
             {
@@ -2235,8 +2253,24 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if (prbuffer->isDVD())
             {
-                nvp->ChangeDVDTrack(1);
-                UpdateOSDSeekMessage(tr("Next Chapter"), osd_general_timeout);
+                if (prbuffer->DVD()->InStillFrame())
+                {
+                    prbuffer->DVD()->SkipStillFrame();
+                    UpdateOSDSeekMessage(tr("Skip Still Frame"),
+                            osd_general_timeout);
+                }
+                else if (prbuffer->DVD()->NumPartsInTitle() > 2)
+                {
+                    nvp->ChangeDVDTrack(1);
+                    UpdateOSDSeekMessage(tr("Next Chapter"),
+                            osd_general_timeout);
+                }
+                else 
+                {
+                    nvp->GoToDVDProgram(1);
+                    UpdateOSDSeekMessage(tr("Next Title"), 
+                            osd_general_timeout);
+                }
             }
             else
             {
@@ -2514,7 +2548,24 @@ void TV::ProcessKeypress(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
 
-            if (action == "SELECT")
+            if (prbuffer->isDVD() && prbuffer->DVD()->IsInMenu())
+            {
+                int nb_buttons = prbuffer->DVD()->NumMenuButtons();
+                if (nb_buttons > 0)
+                {
+                    if (action == "UP" || action == "CHANNELUP")
+                        prbuffer->DVD()->MoveButtonUp();
+                    else if (action == "DOWN" || action == "CHANNELDOWN")
+                        prbuffer->DVD()->MoveButtonDown();
+                    else if (action == "LEFT" || action == "SEEKRWND")
+                        prbuffer->DVD()->MoveButtonLeft();
+                    else if (action == "RIGHT" || action == "SEEKFFWD")
+                        prbuffer->DVD()->MoveButtonRight();
+                    else if (action == "SELECT")
+                        nvp->ActivateDVDButton();
+                }
+            }
+            else if (action == "SELECT")
             {
                 if (!was_doing_ff_rew)
                 {
@@ -2537,6 +2588,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 exitPlayer = true;
                 wantsToQuit = true;
             }
+            else if (action == "JUMPTODVDROOTMENU")
+                nvp->GoToDVDMenu("menu");
             else if (action == "GUIDE")
                 LoadMenu();
             else if (action == "FINDER")
@@ -2547,7 +2600,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
             {
-                if (prbuffer->isDVD())
+                if (prbuffer->isDVD() && !prbuffer->InDVDMenuOrStillFrame())
                 {
                     nvp->ChangeDVDTrack(0);
                     UpdateOSDSeekMessage(tr("Previous Chapter"),
@@ -2560,7 +2613,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }    
             else if (action == "CHANNELDOWN")
             {
-                if (prbuffer->isDVD())
+                if (prbuffer->isDVD() && !prbuffer->InDVDMenuOrStillFrame())
                 {
                     nvp->ChangeDVDTrack(1);
                     UpdateOSDSeekMessage(tr("Next Chapter"),
@@ -3035,6 +3088,9 @@ QString TV::PlayMesg()
 
 void TV::DoPause(void)
 {
+    if (prbuffer->InDVDMenuOrStillFrame())
+        return;
+
     speed_index = 0;
     float time = 0.0;
 
@@ -5526,7 +5582,9 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (StateIsPlaying(internalState))
     {
-        if (action == "TOGGLEEDIT")
+        if (action == "JUMPTODVDROOTMENU")
+            nvp->GoToDVDMenu("menu");
+        else if (action == "TOGGLEEDIT")
             DoEditMode();
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire();
@@ -5614,6 +5672,10 @@ void TV::BuildOSDTreeMenu(void)
 
         item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
                                   "PREVCHAN");
+    }
+    else if (StateIsPlaying(internalState) && prbuffer->isDVD())
+    {
+        item = new OSDGenericTree(treeMenu,tr("DVD Root Menu"), "JUMPTODVDROOTMENU");
     }
     else if (StateIsPlaying(internalState))
     {

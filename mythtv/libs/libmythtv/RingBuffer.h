@@ -7,6 +7,7 @@
 #include <qwaitcondition.h>
 #include <qmutex.h>
 #include <pthread.h>
+#include "avcodec.h"
 
 class RemoteFile;
 class RemoteEncoder;
@@ -81,14 +82,9 @@ class RingBuffer
 
     // DVDRingBuffer proxies
     /// Returns true if this is a DVD backed RingBuffer.
-    bool isDVD(void) const { return dvdPriv; }
-    void getPartAndTitle(int &title, int &part);
-    void getDescForPos(QString &desc);
-    bool nextTrack(void);
-    void prevTrack(void);
-    uint GetTotalTimeOfTitle(void);
-    uint GetCellStart(void);
-    long long GetTotalReadPosition(void);
+    inline bool isDVD(void) const { return dvdPriv; }
+    DVDRingBufferPriv *DVD() { return dvdPriv; }
+    bool InDVDMenuOrStillFrame(void);
 
     long long SetAdjustFilesize(void);
     

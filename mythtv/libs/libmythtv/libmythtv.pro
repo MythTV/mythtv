@@ -11,14 +11,15 @@ INCLUDEPATH += ../.. ..
 INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
 INCLUDEPATH += ./dvbdev ./mpeg
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
-DEPENDPATH  += ../libmythmpeg2
+DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav
 DEPENDPATH  += ./dvbdev ./mpeg
 
-LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat -L../libmythmpeg2
-LIBS += -lmyth-$${LIBVERSION} -lmythavutil-$${LIBVERSION} \
-        -lmythavcodec-$${LIBVERSION} \
-        -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION} \
-        $$EXTRA_LIBS
+LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
+LIBS += -L../libmythmpeg2 -L../libmythdvdnav
+LIBS += -lmyth-$${LIBVERSION} -lmythavutil-$${LIBVERSION}
+LIBS += -lmythavcodec-$${LIBVERSION} -lmythdvdnav-$${LIBVERSION}
+LIBS += -lmythavformat-$${LIBVERSION} -lmythmpeg2-$${LIBVERSION}
+LIBS += $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
@@ -31,6 +32,8 @@ TARGETDEPS += ../libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+
 
 DEFINES += _LARGEFILE_SOURCE
 QMAKE_CXXFLAGS_RELEASE += $${FREETYPE_CFLAGS}
