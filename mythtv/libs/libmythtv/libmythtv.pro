@@ -59,10 +59,6 @@ macx {
     }
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
-
-    DEFINES += __BUILD_ALTIVEC_ASM__
-    SOURCES += memcpyaltivec.c
-    HEADERS += memcpy.h
 }
 
 # Enable Linux Open Sound System support
