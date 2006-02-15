@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "DVDRingBuffer.h"
 #include "mythcontext.h"
 #include "iso639.h"
