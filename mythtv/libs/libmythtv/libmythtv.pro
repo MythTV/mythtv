@@ -59,6 +59,10 @@ macx {
     }
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
+
+    DEFINES += __BUILD_ALTIVEC_ASM__
+    SOURCES += memcpyaltivec.c
+    HEADERS += memcpy.h
 }
 
 # Enable Linux Open Sound System support
@@ -173,8 +177,9 @@ using_frontend {
     macx:HEADERS +=               videoout_quartz.h
     macx:SOURCES +=               videoout_quartz.cpp
 
-    using_mac_accel:HEADERS +=    accel_utils.h accel_private.h
-    using_mac_accel:SOURCES +=    accel_utils.mm
+    using_mac_accel:HEADERS +=    videoout_accel_utils.h
+    using_mac_accel:HEADERS +=    videoout_accel_private.h
+    using_mac_accel:SOURCES +=    videoout_accel_utils.mm
 
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp
