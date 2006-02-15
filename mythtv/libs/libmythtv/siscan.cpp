@@ -15,7 +15,7 @@
 #include "mythdbcon.h"
 #include "channelbase.h"
 #include "channelutil.h"
-#include "videosource.h" // for CardUtil
+#include "cardutil.h"
 
 #ifdef USING_V4L
 #include "channel.h"

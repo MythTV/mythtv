@@ -33,7 +33,7 @@
 #include "scanwizardhelpers.h"
 #include "mythcontext.h"
 #include "scanwizard.h"
-#include "videosource.h"
+#include "cardutil.h"
 #include "mythdbcon.h"
 #include "channel.h"
 #include "qlocale.h"

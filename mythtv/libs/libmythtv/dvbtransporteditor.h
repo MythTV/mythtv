@@ -32,17 +32,8 @@
 #ifndef DVBTRANSPORTEDITOR_H
 #define DVBTRANSPORTEDITOR_H
 
-#include <qwidget.h>
-#include <qsqldatabase.h>
-
-#include <cstdlib>
-
+#include <qobject.h>
 #include "settings.h"
-#include "mythwidgets.h"
-#include "mythwizard.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "videosource.h"
 
 class DTVTStandard;
 class DvbTATSCModulation;

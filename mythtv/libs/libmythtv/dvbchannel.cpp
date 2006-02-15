@@ -51,7 +51,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "tv_rec.h"
-#include "videosource.h"
+#include "cardutil.h"
 
 #include "dvbtypes.h"
 #include "dvbdev.h"

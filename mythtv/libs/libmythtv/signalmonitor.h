@@ -14,7 +14,7 @@
 // MythTV headers
 #include "signalmonitorvalue.h"
 #include "channelbase.h"
-#include "videosource.h"
+#include "cardutil.h"
 
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);

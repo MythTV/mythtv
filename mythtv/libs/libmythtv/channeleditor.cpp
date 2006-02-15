@@ -14,7 +14,6 @@
 #include <mythdialogs.h>
 #include <mythwizard.h>
 
-#include "videosource.h"
 #include "channelsettings.h"
 #include "dvbtransporteditor.h"
 

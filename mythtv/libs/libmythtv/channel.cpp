@@ -27,7 +27,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "channelutil.h"
-#include "videosource.h" // for CardUtil
+#include "cardutil.h"
 
 #define LOC QString("Channel(%1): ").arg(device)
 #define LOC_ERR QString("Channel(%1) Error: ").arg(device)

@@ -39,7 +39,7 @@
 #include <fcntl.h>
 
 #include "mythcontext.h"
-#include "videosource.h"
+#include "cardutil.h"
 #include "frequencies.h"
 #include "channel.h"
 #include "channelutil.h"

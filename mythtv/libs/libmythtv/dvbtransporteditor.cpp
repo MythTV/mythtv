@@ -30,6 +30,9 @@
  */
 
 #include "dvbtransporteditor.h"
+#include "cardutil.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
 
 void DVBTransportList::fillSelections(void)
 {

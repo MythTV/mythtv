@@ -37,6 +37,7 @@
 
 #include "mythcontext.h"
 #include "tv_rec.h"
+#include "cardutil.h"
 
 #include "dvbtypes.h"
 #include "dvbdiseqc.h"
@@ -61,41 +62,40 @@ DVBDiSEqC::~DVBDiSEqC()
 
 bool DVBDiSEqC::Set(DVBTuning& tuning, bool reset, bool& havetuned)
 {
-
-    switch(tuning.diseqc_type)
+    switch (tuning.diseqc_type)
     {
-        case 1:
+        case DISEQC_MINI_2:
             if (!ToneSwitch(tuning, reset, havetuned))
                 return false;
             // fall through
-        case 0:
+        case DISEQC_SINGLE:
             if (!ToneVoltageLnb(tuning, reset, havetuned))
                 return false;
             break;
-        case 2: // v1.0 2 Way
-        case 3: // v1.1 2 Way
+        case DISEQC_SWITCH_2_1_0: // 2 Way v1.0
+        case DISEQC_SWITCH_2_1_1: // 2 Way v1.1
             if (!Diseqc1xSwitch(tuning, reset, havetuned, 2))
                 return false;
             break;
-        case 4: // v1.0 4 Way
-        case 5: // v1.1 4 Way
+        case DISEQC_SWITCH_4_1_0: // 4 Way v1.0
+        case DISEQC_SWITCH_4_1_1: // 4 Way v1.1
             if (!Diseqc1xSwitch(tuning, reset, havetuned, 4))
                 return false;
             break;
-        case 6: // 1.2 Positioner (HH Motor)
+        case DISEQC_POSITIONER_1_2: // 1.2 Positioner (HH Motor)
             if (!PositionerGoto(tuning,reset,havetuned))
 		return false;
             break;
-        case 7: // 1.3 Positioner (HH Motor with USALS)
+        case DISEQC_POSITIONER_X: // 1.3 Positioner (HH Motor with USALS)
             if (!PositionerGotoAngular(tuning,reset,havetuned))
 		return false;
             break;
-        case 8: // v1.1 10 Way
+        case DISEQC_POSITIONER_1_2_SWITCH_2: // 10 Way v1.1 or v2.1
             if (!Diseqc1xSwitch(tuning, reset, havetuned, 10))
                 return false;
             break;
-        case 9: // SW21
-        case 10: // SW64
+        case DISEQC_SW21: // Dish Network legacy switch SW21
+        case DISEQC_SW64: // Dish Network legacy switch SW64
             if (!LegacyDishSwitch(tuning, reset, havetuned))
                 return false;
             break;
@@ -121,9 +121,9 @@ bool DVBDiSEqC::LegacyDishSwitch(DVBTuning &tuning, bool reset,
     {
         uint8_t cmd = 0x00;
 
-        if (9 == tuning.diseqc_type) // SW21
+        if (DISEQC_SW21 == tuning.diseqc_type)
             cmd = (tuning.diseqc_port) ? 0x66 : 0x34;
-        else if (10 == tuning.diseqc_type) // SW64
+        else if (DISEQC_SW64 == tuning.diseqc_type)
         {
             if (tuning.diseqc_port == 0)
                 cmd = (tuning.voltage == SEC_VOLTAGE_13) ? 0x39 : 0x1A;

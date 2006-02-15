@@ -34,7 +34,7 @@
 #include "libmythtv/programinfo.h"
 #include "libmythtv/frequencytables.h"
 #include "libmythtv/channelutil.h"
-#include "libmythtv/videosource.h"
+#include "libmythtv/sourceutil.h"
 #include "libmythtv/remoteutil.h"
 #include "libmyth/util.h"
 

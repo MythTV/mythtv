@@ -40,7 +40,7 @@
 #include "siscan.h"
 #include "channelbase.h"
 #include "dtvsignalmonitor.h"
-#include "videosource.h"
+#include "sourceutil.h"
 #include "frequencies.h"
 #include "mythdbcon.h"
 #include "scanwizard.h"

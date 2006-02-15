@@ -34,7 +34,6 @@ using namespace std;
 #include "jobqueue.h"
 #include "scheduledrecording.h"
 #include "eitscanner.h"
-#include "videosource.h"
 #include "RingBuffer.h"
 #include "previewgenerator.h"
 
@@ -1679,12 +1678,7 @@ void TVRec::SetupSignalMonitor(bool tablemon, bool notify)
     SignalMonitorValue::Init();
 
     if (SignalMonitor::IsSupported(genOpt.cardtype) && channel->Open())
-    {
-        // TODO reset the tuner hardware
-        //channel->SwitchToInput(channel->GetCurrentInputNum(), true);
-
         signalMonitor = SignalMonitor::Init(genOpt.cardtype, cardid, channel);
-    }
     
     if (signalMonitor)
     {
@@ -3944,7 +3938,7 @@ QString TVRec::FlagToString(uint f)
         }
     }
     if (kFlagRingBufferReady & f)
-        msg += "RingBufferReset,";
+        msg += "RingBufferReady,";
 
     if (msg.isEmpty())
         msg = QString("0x%1").arg(f,0,16);

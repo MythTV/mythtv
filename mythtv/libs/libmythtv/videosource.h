@@ -1,96 +1,15 @@
 #ifndef VIDEOSOURCE_H
 #define VIDEOSOURCE_H
 
-#include "libmyth/settings.h"
-#include <qregexp.h>
 #include <vector>
-#include <qdir.h>
-#include <qstringlist.h>
+using namespace std;
 
-#include "channelsettings.h"
+#include "settings.h"
 #include "datadirect.h"
-
-#ifdef USING_DVB
-#include "dvbchannel.h"
-#endif
 
 class SignalTimeout;
 class ChannelTimeout;
 class UseEIT;
-
-typedef QMap<int,QString> InputNames;
-
-/** \class CardUtil
- *  \brief Collection of helper utilities for capture card DB use
- */
-class CardUtil
-{
-  public:
-    /// \brief all the different capture cards
-    enum CARD_TYPES
-    {
-        ERROR_OPEN,
-        ERROR_PROBE,
-        QPSK,
-        QAM,
-        OFDM,
-        ATSC,
-        V4L,
-        MPEG,
-        HDTV,
-        FIREWIRE,
-    };
-    /// \brief all the different dvb DiSEqC devices
-    enum DISEQC_TYPES
-    {
-        SINGLE=0,
-        MINI_2,
-        SWITCH_2_1_0,
-        SWITCH_2_1_1,
-        SWITCH_4_1_0,
-        SWITCH_4_1_1,
-        POSITIONER_1_2,
-        POSITIONER_X,
-        POSITIONER_1_2_SWITCH_2,
-        POSITIONER_X_SWITCH_2,
-    };
-    /// \brief dvb card type
-    static const QString DVB;
-
-    static int          GetCardID(const QString &videodevice,
-                                  QString hostname = QString::null);
-
-    static bool         IsCardTypePresent(const QString &strType);
-
-    static CARD_TYPES   GetCardType(uint cardid, QString &name, QString &card_type);
-    static CARD_TYPES   GetCardType(uint cardid, QString &name);
-    static CARD_TYPES   GetCardType(uint cardid);
-    static bool         IsDVBCardType(const QString card_type);
-
-    static bool         GetVideoDevice(uint cardid, QString& device, QString& vbi);
-    static bool         GetVideoDevice(uint cardid, QString& device);
-
-    static bool         IsDVB(uint cardid);
-    static DISEQC_TYPES GetDISEqCType(uint cardid);
-
-    static CARD_TYPES   GetDVBType(uint device, QString &name, QString &card_type);
-    static bool         HasDVBCRCBug(uint device);
-    static QString      GetDefaultInput(uint cardid);
-
-    static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
-    static bool         TVOnly(uint cardid, const QString &inputname);
-
-    static bool         hasV4L2(int videofd);
-    static InputNames   probeV4LInputs(int videofd, bool &ok);
-};
-
-class SourceUtil
-{
-  public:
-    static QString GetChannelSeparator(uint sourceid);
-    static QString GetChannelFormat(uint sourceid);
-    static uint    GetChannelCount(uint sourceid);
-};
 
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
@@ -240,10 +159,8 @@ private:
     };
 
 private:
-    ID* id;
-    Name* name;
-
-protected:
+    ID   *id;
+    Name *name;
 };
 
 class CaptureCard;
@@ -315,36 +232,15 @@ public:
     };
 };
 
-class DVBDiSEqCInputList
-{
-  public:
-    DVBDiSEqCInputList() { clearValues(); }
-    DVBDiSEqCInputList(const QString& in, const QString& prt, 
-                       const QString& pos)
-        : input(in), port(prt), position(pos)
-    {}
-
-    void clearValues() 
-    {
-        input = "";
-        port = "";
-        position = "";
-    }
-
-    QString input;
-    QString port;
-    QString position;
-};
-
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent);
     static void fillSelections(SelectSetting* setting);
 };
 
+class TunerCardInput;
 class DVBCardName;
 class DVBCardType;
-class DVBDiseqcType;
 
 class DVBConfigurationGroup: public VerticalConfigurationGroup {
     Q_OBJECT
@@ -379,11 +275,7 @@ class CaptureCard: public ConfigurationWizard {
 public:
     CaptureCard();
 
-    int getCardID(void) const {
-        return id->intValue();
-    };
-
-    QString getDvbCard() { return dvbCard; };
+    int  getCardID(void) const { return id->intValue(); }
 
     void loadByID(int id);
 
@@ -399,6 +291,8 @@ public slots:
     void setDvbCard(const QString& card) { dvbCard = card; };
 
 private:
+    void reload(void);
+
     class ID: virtual public IntegerSetting,
               public AutoIncrementStorage {
     public:
@@ -415,8 +309,8 @@ private:
     };
 
 private:
-    ID* id;
-    QString dvbCard;
+    ID       *id;
+    QString   dvbCard;
 };
 
 class CardInput;
