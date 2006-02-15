@@ -1551,13 +1551,14 @@ void SIParser::ParseDescLinkage(uint8_t *buffer, int, NetworkObject &n)
     n.LinkageType = buffer[8];
     n.LinkagePresent = 1;
 
-    //The following was found to break EIT guide for 
-    // Kristian Kalweit <kalweit@exorpro.de>
+    // See ticket #778. Breaks "DVB-S in Germany with Astra 19.2E"
+#if 0
     if (n.LinkageType == 4)
     {
         PrivateTypes.GuideOnSingleTransport = true;
         PrivateTypes.GuideTransportID = n.LinkageTransportID;
     }
+#endif
 }
 
 // Descriptor 0x62 - Frequency List - NIT
