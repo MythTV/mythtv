@@ -10,6 +10,7 @@
 #include "util.h"
 #include "avcodec.h"
 
+#define DVDNAV_COMPILE
 #include "../libmythdvdnav/dvdnav.h"
 
 /** \class DVDRingBufferPriv

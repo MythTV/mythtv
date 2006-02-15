@@ -1,6 +1,5 @@
 #include "DVDRingBuffer.h"
 #include "mythcontext.h"
-#include <dvdnav/nav_read.h>
 #include "iso639.h"
 
 #define LOC QString("DVDRB: ")

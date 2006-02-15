@@ -12,6 +12,8 @@ QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -fPIC -DPIC -D_FILE_OFFSET_BITS=
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
+DEFINES += DVDNAV_COMPILE
+
 # Input
 HEADERS += bswap.h decoder.h dvd_input.h dvdnav_events.h dvdnav.h 
 HEADERS += dvdnav_internal.h dvd_reader.h dvdread_internal.h dvd_types.h
