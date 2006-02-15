@@ -23,7 +23,7 @@ DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
       http(new QHttp()),             httpChanger(new QHttp()),
       m_dbox2channelcount(0)
 {
-    channelnames[0] = "DBOX2";
+    InitializeInputs();
 
     connect(http,        SIGNAL(           done(bool)),
             this,        SLOT(  HttpRequestDone(bool)));
@@ -153,9 +153,11 @@ void DBox2Channel::Close()
     
 bool DBox2Channel::SwitchToInput(const QString &input, const QString &chan)
 {
-    currentcapchannel = 0;
-    if (channelnames.empty())
-        channelnames[currentcapchannel] = input;
+    int inputNum = GetInputByName(input);
+    if (inputNum < 0)
+        return false;
+
+    // input swiching code would go here
 
     return SetChannelByString(chan);
 }

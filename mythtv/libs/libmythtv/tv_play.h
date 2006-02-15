@@ -187,7 +187,6 @@ class TV : public QObject
     bool RequestNextRecorder(bool showDialogs);
     void DeleteRecorder();
 
-    static uint GetLockTimeout(uint cardid);
     bool StartRecorder(RemoteEncoder *rec, int maxWait=-1);
     bool StartPlayer(bool isWatchingRecording, int maxWait=-1);
     void StartOSD(void);
@@ -270,7 +269,7 @@ class TV : public QObject
     void ToggleOSD(bool includeStatusOSD); 
     void UpdateOSDProgInfo(const char *whichInfo);
     void UpdateOSDSeekMessage(const QString &mesg, int disptime);
-    void UpdateOSDInput(void);
+    void UpdateOSDInput(QString inputname = QString::null);
     void UpdateOSDTextEntry(const QString &message);
     void UpdateOSDSignal(const QStringList& strlist);
     void UpdateOSDTimeoutMessage(void);
@@ -437,7 +436,6 @@ class TV : public QObject
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;
-    QMap<uint,uint> lockTimeout;
 
     // Previous channel functionality state variables
     str_vec_t prevChan;       ///< Previous channels

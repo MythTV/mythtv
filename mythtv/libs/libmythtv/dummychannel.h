@@ -36,7 +36,7 @@ class DummyChannel : public ChannelBase
     bool SwitchToInput(const QString &inputname, const QString &chan)
          { curinputname = inputname; curchannelname = chan; return true; }
     bool SwitchToInput(int newcapchannel, bool setstarting)
-         { currentcapchannel = newcapchannel; (void)setstarting; return true; }
+         { currentInputID = newcapchannel; (void)setstarting; return true; }
 
   private:
     QString curinputname;

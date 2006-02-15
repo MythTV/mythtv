@@ -29,7 +29,7 @@
 #include "jobqueue.h"
 #include "audiooutput.h"
 #include "DisplayRes.h"
-#include "signalmonitor.h"
+#include "signalmonitorvalue.h"
 #include "scheduledrecording.h"
 #include "config.h"
 #include "livetvchain.h"
@@ -1044,27 +1044,6 @@ void TV::ForceNextStateNone()
     stateLock.unlock();
 }
 
-uint TV::GetLockTimeout(uint cardid)
-{
-    uint timeout = 0xffffffff;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT channel_timeout, cardtype "
-                  "FROM capturecard "
-                  "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting timeout", query);
-    else if (query.next() &&
-             SignalMonitor::IsSupported(query.value(1).toString()))
-        timeout = max(query.value(0).toInt(), 500);
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("GetLockTimeout(%1): "
-                                       "Set lock timeout to %2 ms")
-            .arg(cardid).arg(timeout));
-
-    return timeout;
-}
-
 /** \fn TV::StartRecorder(RemoteEncoder*, int)
  *  \brief Starts recorder, must be called before StartPlayer().
  *  \param maxWait How long to wait for RecorderBase to start recording.
@@ -1087,10 +1066,6 @@ bool TV::StartRecorder(RemoteEncoder *rec, int maxWait)
 
     VERBOSE(VB_PLAYBACK, LOC + "StartRecorder(): took "<<t.elapsed()
             <<" ms to start recorder.");
-
-    // Get timeout for this recorder
-    lockTimeout[rec->GetRecorderNumber()] =
-        GetLockTimeout(rec->GetRecorderNumber());
 
     // Cache starting frame rate for this recorder
     if (rec == recorder)
@@ -2304,7 +2279,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if ((GetState() == kState_WatchingLiveTV) && activerecorder)
             {
-                uint timeout = lockTimeout[activerecorder->GetRecorderNumber()];
+                QString input = activerecorder->GetInput();
+                uint timeout  = activerecorder->GetSignalLockTimeout(input);
+
                 if (timeout == 0xffffffff)
                 {
                     if (GetOSD())
@@ -3598,14 +3575,22 @@ void TV::ToggleInputs(void)
         paused = false;
     }
 
-    // Pause the backend recorder, send command, and then unpause..
-    PauseLiveTV();
-    activerecorder->ToggleInputs();
-    UnpauseLiveTV();
+    QString inputname = "Unknown";
+    QStringList inputs = activerecorder->GetInputs();
+    if (inputs.size() <= 1)
+        inputname = activerecorder->GetInput();
+    else
+    {
+        // Pause the backend recorder, send command, and then unpause..
+        PauseLiveTV();
+        lockTimerOn = false;
+        inputname = activerecorder->SetInput("SwitchToNextInput");
+        UnpauseLiveTV();
+    }        
 
     // If activenvp is main nvp, show new input in on screen display
     if (nvp && activenvp == nvp)
-        UpdateOSDInput();
+        UpdateOSDInput(inputname);
 }
 
 void TV::ToggleChannelFavorite(void)
@@ -4164,35 +4149,35 @@ void TV::UpdateOSDSeekMessage(const QString &mesg, int disptime)
     update_osd_pos = true;
 }
 
-void TV::UpdateOSDInput(void)
+void TV::UpdateOSDInput(QString inputname)
 {
+    QString displayName = QString::null;
+
     if (!activerecorder || !tvchain)
         return;
 
-    QString name = tvchain->GetInputName(-1);
-    QString displayName = "";
-    QString msg;
+    int cardid = activerecorder->GetRecorderNumber();
 
+    if (inputname.isEmpty())
+        inputname = tvchain->GetInputName(-1);
+
+    // Try to get display name
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname FROM cardinput "
-                  "WHERE cardid = :CARDID AND inputname = :INPUTNAME");
-    query.bindValue(":CARDID", activerecorder->GetRecorderNumber());
-    query.bindValue(":INPUTNAME", name);
-    query.exec();
-    if (query.isActive() && query.size() > 0)
-    {
-        query.next();
+    query.prepare("SELECT displayname "
+                  "FROM cardinput "
+                  "WHERE inputname = :INPUTNAME AND "
+                  "      cardid    = :CARDID");
+    query.bindValue(":CARDID",    cardid);
+    query.bindValue(":INPUTNAME", inputname);
+    if (query.exec() && query.isActive() && query.next())
         displayName = query.value(0).toString();
-    }
 
-    if ( displayName == "")
-        msg = QString("%1: %2")
-                .arg(activerecorder->GetRecorderNumber()).arg(name);
-    else
-        msg = displayName;
+    // If a display name doesn't exist use cardid and inputname
+    if (displayName.isEmpty())
+        displayName = QString("%1: %2").arg(cardid).arg(inputname);
 
     if (GetOSD())
-        GetOSD()->SetSettingsText(msg, 3);
+        GetOSD()->SetSettingsText(displayName, 3);
 }
 
 /** \fn TV::UpdateOSDSignal(const QStringList&)
@@ -4318,7 +4303,8 @@ void TV::UpdateOSDTimeoutMessage(void)
     bool timed_out = false;
     if (activerecorder)
     {
-        uint timeout = lockTimeout[activerecorder->GetRecorderNumber()];
+        QString input = activerecorder->GetInput();
+        uint timeout  = activerecorder->GetSignalLockTimeout(input);
         timed_out = lockTimerOn && ((uint)lockTimer.elapsed() > timeout);
     }
     OSD *osd = GetOSD();
@@ -6209,7 +6195,9 @@ void TV::PauseLiveTV(void)
     osdlock.unlock();
 
     lockTimerOn = false;
-    uint timeout = lockTimeout[activerecorder->GetRecorderNumber()];
+
+    QString input = activerecorder->GetInput();
+    uint timeout  = activerecorder->GetSignalLockTimeout(input);
     if (timeout < 0xffffffff)
     {
         lockTimer.start();

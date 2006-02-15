@@ -39,7 +39,9 @@ class RemoteEncoder
     void CancelNextRecording(bool cancel);
 
     void SetLiveRecording(bool recording);
-    void ToggleInputs(void);
+    QStringList GetInputs(void);
+    QString GetInput(void);
+    QString SetInput(QString);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
     int ChangeColour(bool direction);
@@ -48,7 +50,8 @@ class RemoteEncoder
     void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
-    int SetSignalMonitoringRate(int msec, bool notifyFrontend = true);
+    int  SetSignalMonitoringRate(int msec, bool notifyFrontend = true);
+    uint GetSignalLockTimeout(QString input);
     bool CheckChannel(QString channel);
     bool ShouldSwitchToAnotherCard(QString channelid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
@@ -78,6 +81,7 @@ class RemoteEncoder
 
     bool backendError;
     long long cachedFramesWritten;
+    uint cachedTimeout;
 };
 
 #endif

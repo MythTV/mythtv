@@ -19,9 +19,11 @@ FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent)
 	
     isopen = false;
     fwhandle = NULL;
-    channelnames[0] = "MPEG2TS";
 
-    if (externalChanger[currentcapchannel].isEmpty())
+    InitializeInputs();
+
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if ((*it)->externalChanger.isEmpty())
     {
         if ((fw_opts.model == "DCT-6200") || (fw_opts.model == "SA3250HD"))
         {
@@ -60,10 +62,11 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
      int channel = chan.toInt();
      quadlet_t cmd[3];
 
-     inputChannel[currentcapchannel] = chan;
+     inputs[currentInputID]->startChanNum = chan;
      curchannelname = chan;
 
-     if (externalChanger[currentcapchannel].isEmpty())
+     InputMap::const_iterator it = inputs.find(currentInputID);
+     if ((*it)->externalChanger.isEmpty())
      {
          dig[2] = channel % 10;
          dig[1] = (channel % 100) / 10;
@@ -129,7 +132,6 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
 
 bool FirewireChannel::Open()
 {
-    SetExternalChanger();
     return true;
 }
 
@@ -139,15 +141,11 @@ void FirewireChannel::Close()
     
 bool FirewireChannel::SwitchToInput(const QString &input, const QString &chan)
 {
-    currentcapchannel = 0;
-    if (channelnames.empty())
-       channelnames[currentcapchannel] = input;
+    int inputNum = GetInputByName(input);
+    if (inputNum < 0)
+        return false;
+
+    // input swiching code would go here
 
     return SetChannelByString(chan);
-}
-
-void FirewireChannel::SetExternalChanger(void)
-{	
-    RetrieveInputChannels(inputChannel, inputTuneTo,
-                          externalChanger, sourceid);
 }

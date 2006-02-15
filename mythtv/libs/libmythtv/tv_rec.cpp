@@ -3004,6 +3004,84 @@ int TVRec::ChangeHue(bool direction)
     return ret;
 }
 
+/** \fn TVRec::GetConnectedInputs(void) const
+ *  \brief Returns TVRec's recorders connected inputs.
+ */
+QStringList TVRec::GetConnectedInputs(void) const
+{
+    QStringList list;
+    if (channel)
+        list = channel->GetConnectedInputs();
+    return list;
+}
+
+/** \fn TVRec::GetInput(void) const
+ *  \brief Returns current input.
+ */
+QString TVRec::GetInput(void) const
+{
+    if (channel)
+        return channel->GetCurrentInput();
+    return QString::null;
+}
+
+/** \fn TVRec::SetInput(QString)
+ *  \brief Changes to the specified input.
+ *
+ *   You must call PauseRecorder(void) before calling this.
+ *
+ *  \param input Input to switch to, or "SwitchToNectInput".
+ *  \return input we have switched to
+ */
+QString TVRec::SetInput(QString input, uint requestType)
+{
+    QMutexLocker lock(&stateChangeLock);
+    QString origIn = input;
+    VERBOSE(VB_RECORD, LOC + "SetInput("<<input<<") -- begin");
+
+    if (!channel)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetInput() -- end  no channel class");
+        return QString::null;
+    }
+
+    input = (input == "SwitchToNextInput") ? channel->GetNextInput() : input;
+
+    if (input == channel->GetCurrentInput())
+    {
+        VERBOSE(VB_RECORD, LOC + "SetInput("<<origIn<<":"<<input
+                <<") -- end  nothing to do");
+        return input;
+    }
+
+    QString name = channel->GetNextInputStartChan();
+    
+    // Detect tuning request type if needed
+    if (requestType & kFlagDetect)
+    {
+        WaitForEventThreadSleep();
+        requestType = lastTuningRequest.flags & (kFlagRec | kFlagNoRec);
+    }
+
+    // Clear the RingBuffer reset flag, in case we wait for a reset below
+    ClearFlags(kFlagRingBufferReady);
+
+    // Actually add the tuning request to the queue, and
+    // then wait for it to start tuning
+    tuningRequests.enqueue(TuningRequest(requestType, name, input));
+    WaitForEventThreadSleep();
+
+    // If we are using a recorder, wait for a RingBuffer reset
+    if (requestType & kFlagRec)
+    {
+        while (!HasFlags(kFlagRingBufferReady))
+            WaitForEventThreadSleep();
+    }
+    VERBOSE(VB_RECORD, LOC + "SetInput("<<origIn<<":"<<input<<") -- end");
+
+    return GetInput();
+}
+
 /** \fn TVRec::SetChannel(QString,uint)
  *  \brief Changes to a named channel on the current tuner.
  *
@@ -3398,8 +3476,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (!input.isEmpty())
             ok = channel->SwitchToInput(input, channum);
-        else if (channum.find("ToggleInputs") >= 0)
-            ok = channel->ToggleInputs();
         else
             ok = channel->SetChannelByString(channum);
     }

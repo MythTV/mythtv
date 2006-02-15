@@ -655,18 +655,56 @@ void EncoderLink::SetLiveRecording(int recording)
         VERBOSE(VB_IMPORTANT, "Should be local only query: SetLiveRecording");
 }
 
-/** \fn EncoderLink::ToggleInputs(void)
- *  \brief Tells TVRec's recorder to change to the next input.
+/** \fn EncoderLink::GetConnectedInputs(void) const
+ *  \brief Returns TVRec's recorders connected inputs.
+ *         <b>This only works on local recorders.</b>
+ *
+ *  \sa TVRec::GetConnectedInputs(void) const
+ */
+QStringList EncoderLink::GetConnectedInputs(void) const
+{
+    QStringList list;
+
+    if (local)
+        list = tv->GetConnectedInputs();
+    else
+        VERBOSE(VB_IMPORTANT, "Should be local only query: GetConnectedInputs");
+
+    return list;
+}
+
+/** \fn EncoderLink::GetInput(void) const
+ *  \brief Returns TVRec's recorders current input.
+ *         <b>This only works on local recorders.</b>
+ *
+ *  \sa TVRec::GetInput(void) const
+ */
+QString EncoderLink::GetInput(void) const
+{
+    if (local)
+        return tv->GetInput();
+
+    VERBOSE(VB_IMPORTANT, "Should be local only query: GetInput");
+    return QString::null;
+}
+
+/** \fn EncoderLink::SetInput(QString)
+ *  \brief Tells TVRec's recorder to change to the specified input.
  *         <b>This only works on local recorders.</b>
  *
  *   You must call PauseRecorder(void) before calling this.
+ *
+ *  \param input Input to switch to, or "SwitchToNectInput".
+ *  \return input we have switched to
+ *  \sa TVRec::SetInput(QString)
  */
-void EncoderLink::ToggleInputs(void)
+QString EncoderLink::SetInput(QString input)
 {
     if (local)
-        tv->ToggleInputs();
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ToggleInputs");
+        return tv->SetInput(input);
+
+    VERBOSE(VB_IMPORTANT, "Should be local only query: SetInput");
+    return QString::null;
 }
 
 /** \fn EncoderLink::ToggleChannelFavorite(void)

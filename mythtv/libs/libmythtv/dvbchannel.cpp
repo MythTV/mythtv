@@ -128,59 +128,6 @@ void DVBChannel::Close()
     }
 }
 
-/** \fn DVBChannel::InitializeInputs(void)
- *  This enumerates the inputs, from a DiSEqC switch if available
- */
-void DVBChannel::InitializeInputs(void)
-{
-    channelnames.clear();
-    inputChannel.clear();
-    inputTuneTo.clear();
-    
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardinputid, inputname, "
-        "       if (tunechan='', 'Undefined', tunechan), "
-        "       if (startchan, startchan, '') "
-        "FROM cardinput "
-        "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", GetCardID());
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("InitializeInputs", query);
-        return;
-    }
-    else if (!query.size())
-    {
-        VERBOSE(VB_IMPORTANT, "dvbchannel.cpp::InitializeInputs"
-                "\n\t\t\tCould not get inputs for the capturecard."
-                "\n\t\t\tPerhaps you have forgotten to bind video"
-                "\n\t\t\tsources to your card's inputs?");
-        return;
-    }
-
-    while (query.next())
-    {
-        int inputNum              = query.value(0).toInt();
-        channelnames[inputNum]    = query.value(1).toString();
-        inputTuneTo[inputNum]     = query.value(2).toString();
-        inputChannel[inputNum]    = query.value(3).toString();
-    }
-
-    // print em
-    InputNames::const_iterator it;
-    for (it = channelnames.begin(); it != channelnames.end(); ++it)
-    {
-        VERBOSE(VB_CHANNEL, LOC + QString("Input #%1: '%2' schan(%3)")
-                .arg(it.key()).arg(*it)
-                .arg(inputChannel[it.key()]));
-    }
-    currentcapchannel = nextcapchannel = GetNextInput();
-    VERBOSE(VB_CHANNEL, LOC + QString("Current Input #%1: '%2'")
-            .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
-}
-
 bool DVBChannel::Open()
 {
     CHANNEL("Opening DVB channel");
@@ -228,6 +175,7 @@ bool DVBChannel::Open()
     first_tune = true;
 
     InitializeInputs();
+    nextcapchannel = currentInputID;
 
     return (fd_frontend >= 0);
 }
@@ -292,9 +240,9 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     CHANNEL(QString("Tuned to frequency for channel %1.").arg(chan));
 
-    currentcapchannel = chan_opts.input_id;
-    nextcapchannel = currentcapchannel;
-    inputChannel[currentcapchannel] = curchannelname;
+    currentInputID = chan_opts.input_id;
+    nextcapchannel = currentInputID;
+    inputs[currentInputID]->startChanNum = curchannelname;
 
     return true;
 }
@@ -310,28 +258,33 @@ void DVBChannel::RecorderStarted()
 
 bool DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 {
-    if (input != channelnames[currentcapchannel])
+    int inputNum = GetInputByName(input);
+    if (inputNum < 0)
+        return false;
+
+    if (input == inputs[inputNum]->name)
     {
         nextcapchannel = GetInputByName(input);
         if (nextcapchannel == -1)
         {
             VERBOSE(VB_IMPORTANT, QString("Failed to locate input %1").
                     arg(input));
-            nextcapchannel = currentcapchannel;
+            nextcapchannel = currentInputID;
         }
     }
     return SetChannelByString(chan);
 }
 
-bool DVBChannel::SwitchToInput(int newcapchannel, bool setstarting)
+bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
 {
     (void)setstarting;
-    if(inputChannel[newcapchannel] != "")
-     {
-        nextcapchannel = newcapchannel;
-        return SetChannelByString(inputChannel[newcapchannel]);
-    }
-    return false;
+
+    InputMap::const_iterator it = inputs.find(newInputNum);
+    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
+        return false;
+
+    nextcapchannel = newInputNum;
+    return SetChannelByString((*it)->startChanNum);
 }
 
 /** \fn DVBChannel::GetChannelOptions(const QString&)
@@ -367,7 +320,7 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
     }
 
     bool found = false;
-    int mplexid;
+    int mplexid = 0;
     while (query.next())
     {
         int this_inputid = query.value(4).toInt();
@@ -704,17 +657,6 @@ bool DVBChannel::GetTuningParams(DVBTuning& tuning) const
         return false;
     }
     return true;
-}
-
-/** \fn DVBChannel::GetCardID() const
- *  \brief Returns card id.
- */
-int DVBChannel::GetCardID() const
-{
-    if (pParent)
-        return pParent->GetCaptureCardNum();
-    else
-        return CardUtil::GetCardID(GetDevice());
 }
 
 /** \fn DVBChannel::GetChanID() const

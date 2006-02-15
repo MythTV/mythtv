@@ -2102,7 +2102,8 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(cardid);
     if (iter == encoderList->end())
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown encoder: %1").arg(cardid));
+        VERBOSE(VB_IMPORTANT, "MainServer::HandleFreeTuner() " +
+                QString("Unknown encoder: %1").arg(cardid));
         strlist << "FAILED";
     }
     else
@@ -2341,7 +2342,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown encoder: %1").arg(recnum));
+        VERBOSE(VB_IMPORTANT, "MainServer::HandleRecorderQuery() " +
+                QString("Unknown encoder: %1").arg(recnum));
         QStringList retlist = "bad";
         SendResponse(pbssock, retlist);
         return;
@@ -2482,10 +2484,26 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->SetLiveRecording(recording);
         retlist << "ok";
     }
-    else if (command == "TOGGLE_INPUTS")
+    else if (command == "GET_CONNECTED_INPUTS")
     {
-        enc->ToggleInputs();
-        retlist << "ok";
+        QStringList ret = enc->GetConnectedInputs();
+        if (ret.empty())
+            retlist << "EMPTY_LIST";
+        else
+            retlist += ret;
+    }
+    else if (command == "GET_INPUT")
+    {
+        QString ret = enc->GetInput();
+        ret = (ret.isEmpty()) ? "UNKNOWN" : ret;
+        retlist << ret;
+    }
+    else if (command == "SET_INPUT")
+    {
+        QString input = slist[2];
+        QString ret   = enc->SetInput(input);
+        ret = (ret.isEmpty()) ? "UNKNOWN" : ret;
+        retlist << ret;
     }
     else if (command == "TOGGLE_CHANNEL_FAVORITE")
     {
@@ -2630,7 +2648,9 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown encoder: %1").arg(recnum));
+        VERBOSE(VB_IMPORTANT, "MainServer: " +
+                QString("HandleRemoteEncoder(cmd %1) ").arg(slist[1]) +
+                QString("Unknown encoder: %1, exiting").arg(recnum));
         exit(BACKEND_BUGGY_EXIT_UNKNOWN_ENC);
     }
 

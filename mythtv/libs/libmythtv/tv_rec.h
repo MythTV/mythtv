@@ -187,8 +187,11 @@ class TVRec : public QObject
     void ToggleChannelFavorite(void);
 
     void SetLiveRecording(int recording);
-    /// Toggles between inputs on current capture card.
-    void ToggleInputs(void)     { SetChannel("ToggleInputs"); }
+
+    QStringList GetConnectedInputs(void) const;
+    QString     GetInput(void) const;
+    QString     SetInput(QString input, uint requestType = kFlagDetect);
+
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
         { SetChannel(QString("NextChannel %1").arg((int)dir)); }

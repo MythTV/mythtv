@@ -76,7 +76,9 @@ class EncoderLink
     void StopLiveTV(void);
     void PauseRecorder(void);
     void SetLiveRecording(int);
-    void ToggleInputs(void);
+    QStringList GetConnectedInputs(void) const;
+    QString GetInput(void) const;
+    QString SetInput(QString);
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);
     void SetChannel(const QString &name);

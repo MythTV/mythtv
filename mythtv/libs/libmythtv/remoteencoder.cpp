@@ -8,11 +8,12 @@ using namespace std;
 #include "programinfo.h"
 #include "util.h"
 #include "mythcontext.h"
+#include "signalmonitor.h"
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
       remoteport(port),       lastchannel(""),        backendError(false),
-      cachedFramesWritten(0)
+      cachedFramesWritten(0), cachedTimeout(0)
 {
     pthread_mutex_init(&lock, NULL); 
 }
@@ -314,14 +315,37 @@ void RemoteEncoder::SetLiveRecording(bool recording)
     SendReceiveStringList(strlist);
 }
 
-void RemoteEncoder::ToggleInputs(void)
+QStringList RemoteEncoder::GetInputs(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "TOGGLE_INPUTS";
+    strlist << "GET_CONNECTED_INPUTS";
+
+    SendReceiveStringList(strlist);
+
+    return strlist;
+}
+
+QString RemoteEncoder::GetInput(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "GET_INPUT";
+
+    SendReceiveStringList(strlist);
+
+    return strlist[0]; 
+}
+
+QString RemoteEncoder::SetInput(QString input)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "SET_INPUT";
+    strlist << input;
 
     SendReceiveStringList(strlist);
 
     lastchannel = "";
+
+    return strlist[0];
 }
 
 void RemoteEncoder::ToggleChannelFavorite(void)
@@ -381,6 +405,33 @@ int RemoteEncoder::SetSignalMonitoringRate(int rate, bool notifyFrontend)
   
     int retval = strlist[0].toInt();
     return retval;
+}
+
+uint RemoteEncoder::GetSignalLockTimeout(QString /*input*/)
+{
+    if (cachedTimeout)
+        return cachedTimeout;
+
+    uint cardid  = recordernum;
+    uint timeout = 0xffffffff;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT channel_timeout, cardtype "
+                  "FROM capturecard "
+                  "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Getting timeout", query);
+    else if (query.next() &&
+             SignalMonitor::IsSupported(query.value(1).toString()))
+        timeout = max(query.value(0).toInt(), 500);
+
+/*
+    VERBOSE(VB_PLAYBACK, "RemoteEncoder: " +
+            QString("GetSignalLockTimeout(%1): Set lock timeout to %2 ms")
+            .arg(cardid).arg(timeout));
+*/
+    cachedTimeout = timeout;
+    return timeout;
 }
 
 /** \fn RemoteEncoder::ChangeContrast(bool)

@@ -86,12 +86,9 @@ class DVBChannel : public QObject, public ChannelBase
     void UpdatePMTObject(const PMTObject *);
 
   private:
-    int  GetCardID(void) const;
     int  GetChanID(void) const;
     bool GetTransportOptions(int mplexid);
     bool GetChannelOptions(const QString &channum);
-
-    void InitializeInputs(void);
 
     void CheckOptions();
     bool CheckModulation(fe_modulation_t modulation) const;
