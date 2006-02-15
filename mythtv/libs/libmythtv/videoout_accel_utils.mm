@@ -15,9 +15,9 @@ using namespace std;
 // Accel path is always enabled while building this library
 #define HAVE_DVDV 1
 
-#include "accel_utils.h"
+#include "videoout_accel_utils.h"
 #include "dvdv.h"
-#include "accel_private.h"
+#include "videoout_accel_private.h"
 #include "yuv2rgb.h"
 
 
