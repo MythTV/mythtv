@@ -1,10 +1,12 @@
 // Standard UNIX C headers
 #include <fcntl.h>
+#include <sys/ioctl.h>
 
 // MythTV headers
 #include "cardutil.h"
 #include "videosource.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 #ifdef USING_DVB
 #include "dvbchannel.h"
