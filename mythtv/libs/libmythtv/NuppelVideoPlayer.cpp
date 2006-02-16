@@ -2573,6 +2573,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                     continue;
                 }
                 VERBOSE(VB_PLAYBACK, "Ignoring livetv eof in decoder loop");
+                usleep(50000);
             }
             else
                 break;
