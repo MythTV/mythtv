@@ -1,6 +1,7 @@
 #include <cmath>
 #include <unistd.h>
 
+#include "CommDetector.h"
 #include "ClassicCommDetector.h"
 #include "libmythtv/NuppelVideoPlayer.h"
 
@@ -9,16 +10,6 @@
 #include "libmythtv/programinfo.h"
 
 //#include "commercial_debug.h"
-
-// This is used as a bitmask.
-enum SkipTypes {
-    COMM_DETECT_OFF         = 0x00,
-    COMM_DETECT_BLANKS      = 0x01,
-    COMM_DETECT_SCENE       = 0x02,
-    COMM_DETECT_BLANK_SCENE = 0x03,
-    COMM_DETECT_LOGO        = 0x04,
-    COMM_DETECT_ALL         = 0xFF
-};
 
 enum frameMaskValues {
     COMM_FRAME_SKIPPED       = 0x0001,

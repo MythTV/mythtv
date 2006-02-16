@@ -24,6 +24,7 @@
 #include "libmythtv/remoteencoder.h"
 #include "libmyth/mythdbcon.h"
 
+#include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "CommDetectorFactory.h"
 #include "SlotRelayer.h"
