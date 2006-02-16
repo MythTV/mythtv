@@ -202,7 +202,7 @@ DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::confTable[] =
 {
    {"TRANSMISSION_MODE_AUTO",TRANSMISSION_MODE_AUTO},
    {"TRANSMISSION_MODE_2K",TRANSMISSION_MODE_2K},
-   {"TRANSMISSION_MODE_8K",TRANSMISSION_MODE_2K},
+   {"TRANSMISSION_MODE_8K",TRANSMISSION_MODE_8K},
    {NULL,TRANSMISSION_MODE_AUTO},
 };
 
@@ -210,7 +210,7 @@ DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::vdrTable[] =
 {
    {"999",TRANSMISSION_MODE_AUTO},
    {"2",TRANSMISSION_MODE_2K},
-   {"8",TRANSMISSION_MODE_2K},
+   {"8",TRANSMISSION_MODE_8K},
    {NULL,TRANSMISSION_MODE_AUTO},
 };
 
@@ -218,7 +218,7 @@ DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::parseTable[] =
 {
    {"auto",TRANSMISSION_MODE_AUTO},
    {"2",TRANSMISSION_MODE_2K},
-   {"8",TRANSMISSION_MODE_2K},
+   {"8",TRANSMISSION_MODE_8K},
    {NULL,TRANSMISSION_MODE_AUTO},
 };
 
