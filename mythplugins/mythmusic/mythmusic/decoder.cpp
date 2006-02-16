@@ -107,7 +107,7 @@ Metadata* Decoder::getMetadata(void)
 {
 
     Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(musiclocation))
+    if (mdata->isInDatabase())
     {
         return mdata;
     }

@@ -189,10 +189,7 @@ void DatabaseBox::keepFilling()
         the_playlists->doneLoading())
     {
         //  Good, now lets grab some QListItems
-        //
-        //  Say ... I dunno ... 100 at a time?
-
-        if (all_music->putYourselfOnTheListView(allmusic, 100))
+        if (all_music->putYourselfOnTheListView(allmusic))
         {
             allmusic->setText(tr("All My Music"));
             fill_list_timer->stop();

@@ -488,7 +488,7 @@ void EditMetadataDialog::saveToDatabase()
 {
     cancelPopup();
 
-    m_metadata->updateDatabase(QString::null);
+    m_metadata->updateDatabase();
     *m_sourceMetadata = m_metadata;
     done(1);
 }

@@ -67,7 +67,7 @@ Decoder *getDecoder(const QString &filename)
     return decoder;
 }
 
-void AddFileToDB(const QString &directory, const QString &filename)
+void AddFileToDB(const QString &filename)
 {
     Decoder *decoder = getDecoder(filename);
 
@@ -75,7 +75,7 @@ void AddFileToDB(const QString &directory, const QString &filename)
     {
         Metadata *data = decoder->getMetadata();
         if (data) {
-            data->dumpToDatabase(directory);
+            data->dumpToDatabase();
             delete data;
         }
 
@@ -91,11 +91,11 @@ void RemoveFileFromDB (const QString &directory, const QString &filename)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM musicmetadata WHERE "
                   "filename = :NAME ;");
-    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":NAME", filename.utf8());
     query.exec();
 }
 
-void UpdateFileInDB(const QString &directory, const QString &filename)
+void UpdateFileInDB(const QString &filename)
 {
     Decoder *decoder = getDecoder(filename);
 
@@ -108,7 +108,7 @@ void UpdateFileInDB(const QString &directory, const QString &filename)
         {
             disk_meta->setID(db_meta->ID());
             disk_meta->setRating(db_meta->Rating());
-            disk_meta->updateDatabase(directory);
+            disk_meta->updateDatabase();
         }
 
         if (disk_meta)
@@ -316,11 +316,11 @@ void SearchDir(QString &directory)
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if (*iter == kFileSystem)
-            AddFileToDB(directory, iter.key());
+            AddFileToDB(iter.key());
         else if (*iter == kDatabase)
             RemoveFileFromDB(directory, iter.key ());
         else if (*iter == kNeedUpdate)
-            UpdateFileInDB(directory, iter.key());
+            UpdateFileInDB(iter.key());
 
         file_checking->setProgress(++counter);
     }

@@ -126,13 +126,11 @@ class Metadata
     void setCompilation(bool state) { compilation = state; formattedartist = formattedtitle = ""; }
     bool determineIfCompilation(bool cd = false);
     
-    bool isInDatabase(QString startdir);
-    void dumpToDatabase(QString startdir);
-    void updateDatabase(QString startdir);
+    bool isInDatabase(void);
+    void dumpToDatabase(void);
+    void updateDatabase(void);
     void setField(const QString &field, const QString &data);
-    void getField(const QString &field, QString *data);
-    void getField(const QStringList& tree_levels, QString *data, const QString &paths, const QString &startdir, uint depth);
-    bool areYouFinished(uint depth, uint treedepth, const QString& paths, const QString& startdir);
+    void getField(const QString& field, QString *data);
     void fillData();
     void fillDataFromID();
     void persist();
@@ -209,22 +207,14 @@ class MusicNodePtrList : public QPtrList<MusicNode>
 };
 
 class MusicNode
-{
-    //  Not a root of the music tree, and
-    //  not a leaf, but anything in the
-    //  middle
-    
+{    
   public:
   
-    MusicNode(QString a_title, QStringList tree_levels, uint depth);
+    MusicNode(const QString &a_title, const QString &tree_level);
    ~MusicNode();
 
-    void        insert(Metadata* inserter);
     QString     getTitle(){return my_title;}
-    void        intoTree(QStringList tree_levels, MetadataPtrList &list,
-                         uint depth);
     void        printYourself(int indent_amount);   // debugging
-    void        clearTracks() { my_tracks.clear(); }
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
     void        writeTree(GenericTree *tree_to_write_to, int a_counter);
     void        sort();
@@ -233,13 +223,21 @@ class MusicNode
     void        setLastPlayMin(double tmp_min) { lastplayMin = tmp_min; }
     void        setLastPlayMax(double tmp_max) { lastplayMax = tmp_max; }
 
+    inline void addChild(MusicNode *child) { my_subnodes.append(child); }
+    inline void addLeaf(Metadata *leaf) { my_tracks.append(leaf); }
+    inline void setLeaves(MetadataPtrList leaves) { my_tracks = leaves; }
+
+    void clear(void) { 
+        my_tracks.clear(); 
+        my_subnodes.clear();
+    }
+
     static void SetStaticData(const QString &startdir, const QString &paths);
  
   private:
   
     MetadataPtrList     my_tracks;
     MusicNodePtrList    my_subnodes;
-    QDict<MusicNode>    my_subnode_hash;
     QString             my_title;
     QString             my_level;
 
@@ -297,9 +295,8 @@ class AllMusic
     void        printTree();    // debugging
     void        sortTree();
     void        writeTree(GenericTree *tree_to_write_to);
-    void        intoTree(QPtrList<Metadata> &list);
     void        setSorting(QString a_paths);
-    bool        putYourselfOnTheListView(TreeCheckItem *where, int how_many);
+    bool        putYourselfOnTheListView(TreeCheckItem *where);
     void        putCDOnTheListView(CDCheckItem *where);
     bool        doneLoading(){return done_loading;}
     bool        cleanOutThreads();
@@ -310,7 +307,6 @@ class AllMusic
   private:
   
     MetadataPtrList     all_music;
-    MusicNodePtrList    top_nodes;
     MusicNode           *root_node;
     
     int numPcs;
@@ -330,7 +326,6 @@ class AllMusic
 
     QString     startdir;
     QString     paths;
-    QStringList tree_levels;
     
     
     MetadataLoadingThread   *metadata_loader;

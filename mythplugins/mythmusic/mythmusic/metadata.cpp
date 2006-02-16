@@ -11,52 +11,7 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 
 #include "metadata.h"
-
-struct FieldSplitInfo {
-   QString testStr;
-   QString dispStr;
-};
-
-static FieldSplitInfo splitArray4[] =
-{ 
-  {"ABCDE", " (A B C D E)"},
-  {"FGHIJ", " (F G H I J)"},
-  {"KLMNO", " (K L M N O)"},
-  {"PQRST", " (P Q R S T)"},
-  {"UVWXYZ", " (U V W X Y Z)"}
-};
-const int kSplitArray4_Max = sizeof splitArray4 / sizeof splitArray4[0];
-
-static FieldSplitInfo splitArray1[] =
-{ 
-  {"A", " (A)"},
-  {"B", " (B)"},
-  {"C", " (C)"},
-  {"D", " (D)"},
-  {"E", " (E)"},
-  {"F", " (F)"},
-  {"G", " (G)"},
-  {"H", " (H)"},
-  {"I", " (I)"},
-  {"J", " (J)"},
-  {"K", " (K)"},
-  {"L", " (L)"},
-  {"M", " (M)"},
-  {"N", " (N)"},
-  {"O", " (O)"},
-  {"P", " (P)"},
-  {"Q", " (Q)"},
-  {"R", " (R)"},
-  {"S", " (S)"},
-  {"T", " (T)"},
-  {"U", " (U)"},
-  {"V", " (V)"},
-  {"W", " (W)"},
-  {"X", " (X)"},
-  {"Y", " (Y)"},
-  {"Z", " (Z)"},
-};
-const int kSplitArray1_Max = sizeof splitArray1 / sizeof splitArray1[0];
+#include "treebuilders.h"
 
 static QString thePrefix = "the ";
 
@@ -123,11 +78,10 @@ int Metadata::compare(Metadata *other)
 {
     if (format == "cast") 
     {
-        int artist_cmp = qstrcmp (Artist(), other->Artist());
-        int title_cmp = qstrcmp (Title(), other->Title());
+        int artist_cmp = Artist().lower().localeAwareCompare(other->Artist().lower());
         
         if (artist_cmp == 0) 
-            return title_cmp;
+            return Title().lower().localeAwareCompare(other->Title().lower());
         
         return artist_cmp;
     } 
@@ -137,12 +91,11 @@ int Metadata::compare(Metadata *other)
     }
 }
 
-bool Metadata::isInDatabase(QString startdir)
+bool Metadata::isInDatabase()
 {
     bool retval = false;
 
-    QString sqlfilename = filename;
-    sqlfilename = filename.remove(0, startdir.length());
+    QString sqlfilename = filename.remove(0, m_startdir.length());
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT artist,compilation_artist,album,title,genre,year,tracknum,"
@@ -175,7 +128,7 @@ bool Metadata::isInDatabase(QString startdir)
     return retval;
 }
 
-void Metadata::dumpToDatabase(QString startdir)
+void Metadata::dumpToDatabase()
 {
     if (artist == "")
         artist = QObject::tr("Unknown Artist");
@@ -188,8 +141,7 @@ void Metadata::dumpToDatabase(QString startdir)
     if (genre == "")
         genre = QObject::tr("Unknown Genre");
 
-    QString sqlfilename = filename;
-    sqlfilename = filename.remove(0, startdir.length());
+    QString sqlfilename = filename.remove(0, m_startdir.length());
 
     // Don't update the database if a song with the exact same
     // metadata is already there
@@ -306,10 +258,10 @@ bool Metadata::determineIfCompilation(bool cd)
 inline QString Metadata::formatReplaceSymbols(const QString &format)
 {
   QString rv = format;
-  rv.replace(QRegExp("COMPARTIST"), compilation_artist);
-  rv.replace(QRegExp("ARTIST"), artist);
-  rv.replace(QRegExp("TITLE"), title);
-  rv.replace(QRegExp("TRACK"), QString("%1").arg(tracknum, 2));
+  rv.replace("COMPARTIST", compilation_artist);
+  rv.replace("ARTIST", artist);
+  rv.replace("TITLE", title);
+  rv.replace("TRACK", QString("%1").arg(tracknum, 2));
   return rv;
 }
 
@@ -372,9 +324,8 @@ QString Metadata::FormatTitle()
 }
 
 
-void Metadata::updateDatabase(QString startdir)
+void Metadata::updateDatabase()
 {
-    startdir = startdir; 
     // only save to DB if something changed
     //if (!hasChanged())
     //    return;
@@ -454,51 +405,6 @@ void Metadata::setField(const QString &field, const QString &data)
     }
 }
 
-bool Metadata::areYouFinished(uint depth, uint treedepth, const QString &paths, const QString &startdir)
-{
-    if(paths == "directory")
-    {
-        //  have we made it to directory just above the file name?
-
-        QString working = filename;
-        working.replace(QRegExp(startdir), QString(""));
-        working = working.section('/', depth);
-        if(working.contains('/') < 1)
-        {
-            return true;
-        }
-    }
-    else
-    {
-        if(depth + 1 >= treedepth)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void Metadata::getField(const QStringList &tree_levels, QString *data, const QString &paths, const QString &startdir, uint depth)
-{
-    if(paths == "directory")
-    {
-        //  Return directory values as if they were 
-        //  real metadata/TAG values
-        
-        QString working = filename;
-        working.replace(QRegExp(startdir), QString(""));
-        working.replace(QRegExp("/[^/]*$"), QString(""));
-
-        working = working.section('/', depth, depth);        
-        
-        *data = working;
-    }
-    else
-    {
-        getField(tree_levels[depth], data);
-    }
-}
-
 void Metadata::getField(const QString &field, QString *data)
 {
     if (field == "artist")
@@ -509,48 +415,6 @@ void Metadata::getField(const QString &field, QString *data)
         *data = FormatTitle();
     else if (field == "genre")
         *data = genre;
-    else if (field == "splitartist")
-    {
-        bool set = false;
-        QString firstchar;
-        if (FormatArtist().left(4).lower() == thePrefix)
-            firstchar = FormatArtist().mid(4, 1).upper();
-        else
-            firstchar = FormatArtist().left(1).upper();
-
-        for (int i = 0; i < kSplitArray4_Max; i++)
-        {
-            if (splitArray4[i].testStr.contains(firstchar))
-            {
-                set = true;
-                *data = QObject::tr("Artists") + splitArray4[i].dispStr;
-            }
-        }
-
-        if (!set)
-            *data = QObject::tr("Artists") + " (" + firstchar + ")";
-    }
-    else if (field == "splitartist1")
-    {
-        bool set = false;
-        QString firstchar;
-        if (FormatArtist().left(4).lower() == thePrefix)
-            firstchar = FormatArtist().mid(4, 1).upper();
-        else
-            firstchar = FormatArtist().left(1).upper();
-
-        for (int i = 0; i < kSplitArray1_Max; i++)
-        {
-            if (splitArray1[i].testStr.contains(firstchar))
-            {
-                set = true;
-                *data = QObject::tr("Artists") + splitArray1[i].dispStr;
-            }
-        }
-
-        if (!set)
-            *data = QObject::tr("Artists") + " (" + firstchar + ")";
-    }
     else
     {
         cerr << "metadata.o: Something asked me to return data about a field called " << field << endl ;
@@ -708,9 +572,7 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir)
     //  How should we sort?
     setSorting(path_assignment);
 
-    MusicNode::SetStaticData(startdir, paths);
-
-    root_node = new MusicNode("root", tree_levels, 0);
+    root_node = new MusicNode(QObject::tr("All My Music"), paths);
 
     //
     //  Start a thread to do data
@@ -721,7 +583,6 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir)
     startLoading();
 
     all_music.setAutoDelete(true);
-    top_nodes.setAutoDelete(true);
     
     last_listed = -1;
 }
@@ -729,7 +590,6 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir)
 AllMusic::~AllMusic()
 {
     all_music.clear();
-    top_nodes.clear();
 
     delete root_node;
 
@@ -790,15 +650,12 @@ void AllMusic::resync()
                         "FROM musicmetadata "
                         "ORDER BY intid;";
 
-    QString filename;
-    QString startdir = gContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanDirPath(startdir);
-    if (!startdir.endsWith("/"));
-        startdir += "/";
+    QString filename, artist, album, title;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(aquery);
 
+    root_node->clear();
     all_music.clear();
 
     numPcs = query.size() * 2;
@@ -812,12 +669,24 @@ void AllMusic::resync()
             if (!filename.contains("://"))
                 filename = startdir + filename;
 
+            artist = QString::fromUtf8(query.value(1).toString());
+            if (artist.isEmpty())
+                artist = QObject::tr("Unknown Artist");
+
+            album = QString::fromUtf8(query.value(3).toString());
+            if (album.isEmpty())
+                album = QObject::tr("Unknown Album");
+
+            title = QString::fromUtf8(query.value(4).toString());
+            if (title.isEmpty())
+                title = QObject::tr("Unknown Title");
+
             Metadata *temp = new Metadata(
                 filename,
-                QString::fromUtf8(query.value(1).toString()),
+                artist,
                 QString::fromUtf8(query.value(2).toString()),
-                QString::fromUtf8(query.value(3).toString()),
-                QString::fromUtf8(query.value(4).toString()),
+                album,
+                title,
                 QString::fromUtf8(query.value(5).toString()),
                 query.value(6).toInt(),
                 query.value(7).toInt(),
@@ -882,21 +751,6 @@ void AllMusic::resync()
 void AllMusic::sortTree()
 {
     root_node->sort();
-
-    //  sort top level nodes
-    
-    top_nodes.sort();
-    
-    //  tell top level nodes to sort from themselves 
-    //  downwards
-
-    QPtrListIterator<MusicNode> iter(top_nodes);
-    MusicNode *crawler;
-    while ( (crawler = iter.current()) != 0 )
-    {
-        crawler->sort();
-        ++iter;
-    }
 }
 
 void AllMusic::printTree()
@@ -905,13 +759,6 @@ void AllMusic::printTree()
 
     cout << "Whole Music Tree" << endl;
     root_node->printYourself(0);
-    QPtrListIterator<MusicNode> iter( top_nodes );
-    MusicNode *printer;
-    while ( (printer = iter.current()) != 0 )
-    {
-        printer->printYourself(1);
-        ++iter;
-    }
 }
 
 void AllMusic::buildTree()
@@ -926,12 +773,9 @@ void AllMusic::buildTree()
     //  Select Music screen
     //
     
-    top_nodes.clear();
-    root_node->clearTracks();
-    
     QPtrListIterator<Metadata> an_iterator( all_music );
     Metadata *inserter;
-    QPtrList<Metadata> list;
+    MetadataPtrList list;
 
     while ( (inserter = an_iterator.current()) != 0 )
     {
@@ -942,81 +786,20 @@ void AllMusic::buildTree()
         numLoaded++;
     }
 
-    intoTree(list);
+    MusicTreeBuilder *builder = MusicTreeBuilder::createBuilder (paths);
+    builder->makeTree (root_node, list);
+    delete builder;
 }
 
 void AllMusic::writeTree(GenericTree *tree_to_write_to)
 {
-    GenericTree *sub_node = tree_to_write_to->addNode(QObject::tr("All My Music"), 0);
-    sub_node->setAttribute(0, 0);
-    sub_node->setAttribute(1, 0);
-    sub_node->setAttribute(2, 0);
-    sub_node->setAttribute(3, 0);
-    
-
-    QPtrListIterator<MusicNode> iter( top_nodes );
-    MusicNode *traverse;
-    iter.toFirst();
-    int a_counter = 0;
-    while ( (traverse = iter.current()) != 0 )
-    {
-        traverse->setPlayCountMin(playcountMin);
-        traverse->setPlayCountMax(playcountMax);
-        traverse->setLastPlayMin(lastplayMin);
-        traverse->setLastPlayMax(lastplayMax);
-        traverse->writeTree(sub_node, a_counter);
-        ++a_counter;
-        ++iter;
-    }
+    root_node->writeTree(tree_to_write_to, 0);
 }
 
-bool AllMusic::putYourselfOnTheListView(TreeCheckItem *where, int how_many)
+bool AllMusic::putYourselfOnTheListView(TreeCheckItem *where)
 {
     root_node->putYourselfOnTheListView(where, false);
-
-    if (how_many < 0)
-    {
-        QPtrListIterator<MusicNode> iter(top_nodes);
-        MusicNode *traverse;
-        while ((traverse = iter.current()) != 0)
-        {
-            traverse->putYourselfOnTheListView(where, true);
-            ++iter;
-        }
-        return true;
-    }
-    else
-    {
-        if (last_listed < 0)
-            last_listed = 0;
-        
-        QPtrListIterator<MusicNode> iter(top_nodes);
-        MusicNode *traverse;
-        iter += last_listed;
-        int numb_this_round = 0;
-
-        while (true)
-        {
-            traverse = iter.current();
-            if (traverse)
-            {
-                traverse->putYourselfOnTheListView(where, true);
-                ++iter;
-                ++last_listed;
-                ++numb_this_round;
-                if(numb_this_round >= how_many)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return true;
-            }
-        }
-    }
-    cerr << "metadata.o: Control defied all possible logic and jumped way out here. World may end shortly. " << endl;
-    return false;
+    return true;
 }
 
 void AllMusic::putCDOnTheListView(CDCheckItem *where)
@@ -1039,52 +822,6 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
                                                 -(*anit).Track());
         new_item->setCheck(false); //  Avoiding -Wall     
     }  
-}
-
-
-void AllMusic::intoTree(QPtrList<Metadata> &list)
-{
-    uint depth = 0;
-    QString a_field = "";
-
-    QDict<MetadataPtrList> mapping;
-    QPtrListIterator<Metadata> iter( list );
-    MetadataPtrList *curList;
-    mapping.setAutoDelete(true);
-
-    Metadata *cur;
-    while ((cur = iter.current()) != 0)
-    {
-        if (cur->areYouFinished(depth, tree_levels.count(), paths, startdir))
-        {
-            //  special case, track is at root level
-            //  e.g. an mp3 in the root directory and
-            //  paths=directory
-            root_node->insert(cur);
-            ++iter;
-            continue;
-        }
-
-        cur->getField(tree_levels.first(), &a_field, paths, startdir, depth);
-        curList = mapping.find(a_field);
-        if (!curList)
-        {
-            curList = new MetadataPtrList;
-            mapping.insert(a_field, curList);
-        }
-        curList->append(cur);
-        ++iter;
-    }
-
-    QDictIterator<MetadataPtrList> rest(mapping);
-    while ((curList = rest.current()) != 0)
-    {
-        a_field = rest.currentKey();
-        MusicNode *new_one = new MusicNode(a_field, tree_levels, 0);
-        top_nodes.append(new_one);
-        new_one->intoTree(tree_levels, *curList, depth + 1);
-        ++rest;
-    }
 }
 
 QString AllMusic::getLabel(int an_id, bool *error_flag)
@@ -1232,12 +969,13 @@ bool AllMusic::getCDMetadata(int the_track, Metadata *some_metadata)
 void AllMusic::setSorting(QString a_paths)
 {
     paths = a_paths;
+    MusicNode::SetStaticData(startdir, paths);
+
     if (paths == "directory")
         return;
-    else
-        tree_levels = QStringList::split(" ", paths);
 
     //  Error checking
+    QStringList tree_levels = QStringList::split(" ", paths);
     QStringList::const_iterator it = tree_levels.begin();
     for (; it != tree_levels.end(); ++it)
     {
@@ -1265,26 +1003,15 @@ void AllMusic::setAllVisible(bool visible)
     }
 }
 
-MusicNode::MusicNode(QString a_title, QStringList tree_levels, uint depth)
+MusicNode::MusicNode(const QString &a_title, const QString &tree_level)
 {
     my_title = a_title;
-    if (m_paths == "directory")
-    {
-        my_level = "directory";
-    }
-    else
-    {
-        if (depth < tree_levels.count())
-            my_level = tree_levels[depth];
-        else
-        {
-            my_level = "I am confused";
-            cerr << "metadata.o: Something asked me to look up a StringList entry that doesn't exist" << endl ;
-        }
-       
-    }
-
+    my_level = tree_level;
     my_subnodes.setAutoDelete(true);
+    setPlayCountMin(0);
+    setPlayCountMax(0);
+    setLastPlayMin(0);
+    setLastPlayMax(0);
 }
 
 MusicNode::~MusicNode()
@@ -1311,74 +1038,6 @@ void MusicNode::SetStaticData(const QString &startdir, const QString &paths)
     m_RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
 }
     
-void MusicNode::insert(Metadata* inserter)
-{
-    my_tracks.append(inserter);
-}
-
-void MusicNode::intoTree(QStringList tree_levels, 
-                         MetadataPtrList &list, uint depth)
-{
-    QString a_field = "";
-    QString a_lowercase_field = "";
-    QString a_title = "";
-    bool usesPath = false;
-
-    if (m_paths == "directory") 
-        usesPath = true;
-    else
-    {
-        if (depth + 1 >= tree_levels.count())
-        {
-            my_tracks = list;
-            return;
-        }
-    }
-
-    //  Search and create from my node downards
-
-    QDict<MetadataPtrList> mapping;
-    QPtrListIterator<Metadata> iter(list);
-    MetadataPtrList *curList;
-    mapping.setAutoDelete(true);
-
-    Metadata *cur;
-    while ((cur = iter.current()) != 0)
-    {
-        if (usesPath && cur->areYouFinished(depth, tree_levels.count(), m_paths, m_startdir))
-        {
-            insert(cur);
-            ++iter;
-            continue;
-        }
- 
-        cur->getField(tree_levels, &a_field, m_paths, m_startdir, depth);
-  
-        a_lowercase_field = a_field.lower();
-        if (a_lowercase_field.left(4) == "the ")
-            a_field = a_field.mid(4);
-  
-        curList = mapping.find(a_field);
-        if (!curList)
-        {
-            curList = new MetadataPtrList;
-            mapping.insert(a_field, curList);
-        }
-        curList->append(cur);
-        ++iter;
-    }
-  
-    QDictIterator<MetadataPtrList> rest(mapping);
-    while ((curList = rest.current()) != 0)
-    {
-        a_field = rest.currentKey();
-        MusicNode *new_one = new MusicNode(a_field, tree_levels, depth);
-        my_subnodes.append(new_one);
-        new_one->intoTree(tree_levels, *curList, depth + 1);
-        ++rest;
-    }
-}
-
 void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
 {
     TreeCheckItem *current_parent;
@@ -1448,10 +1107,16 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         double lastplaydbl = a_track->LastPlay();
         double ratingValue = (double)(rating) / 10;
         double playcountValue, lastplayValue;
-        if (playcountMax == playcountMin) { playcountValue = 0; }
-        else { playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1); }
-        if (lastplayMax == lastplayMin) { lastplayValue = 0; }
-        else { lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1); }
+
+        if (playcountMax == playcountMin) 
+            playcountValue = 0; 
+        else 
+            playcountValue = ((playcountMin - (double)playcount) / (playcountMax - playcountMin) + 1); 
+        if (lastplayMax == lastplayMin) 
+            lastplayValue = 0;
+        else 
+            lastplayValue = ((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin) + 1);
+
         double rating_value =  (m_RatingWeight * ratingValue + m_PlayCountWeight * playcountValue +
                                 m_LastPlayWeight * lastplayValue + m_RandomWeight * (double)rand() /
                                 (RAND_MAX + 1.0));
@@ -1546,8 +1211,10 @@ int MusicNodePtrList::compareItems (QPtrCollection::Item item1,
     QString title2 = itemB->getTitle().lower();
     
     // Cut "the " off the front of titles
-    title1 = (title1.lower().left(4) == thePrefix) ? title1.mid(4) : title1;
-    title2 = (title2.lower().left(4) == thePrefix) ? title2.mid(4) : title2;
+    if (title1.left(4) == thePrefix) 
+        title1 = title1.mid(4);
+    if (title2.left(4) == thePrefix) 
+        title2 = title2.mid(4);
 
-    return qstrcmp(title1, title2);
+    return title1.localeAwareCompare(title2);
 }
