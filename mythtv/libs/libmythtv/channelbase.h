@@ -131,6 +131,8 @@ class ChannelBase
     virtual int  ChangeContrast(bool up)   { (void)up; return 0; };
     virtual int  ChangeHue(bool up)        { (void)up; return 0; };
 
+    bool CheckChannel(const QString &channum, QString& inputName) const;
+
     // MPEG stuff
     /** \brief Returns cached MPEG PIDs for last tuned channel.
      *  \param pid_cache List of PIDs with their TableID

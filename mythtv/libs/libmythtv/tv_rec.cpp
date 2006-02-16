@@ -1889,7 +1889,7 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
     return false;
 }
 
-/** \fn TVRec::CheckChannel(QString)
+/** \fn TVRec::CheckChannel(QString) const
  *  \brief Checks if named channel exists on current tuner.
  *
  *  \param name channel to verify against current tuner.
@@ -1899,101 +1899,13 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
  *      CheckChannel(ChannelBase*,const QString&,QString&),
  *      ShouldSwitchToAnotherCard(QString)
  */
-bool TVRec::CheckChannel(QString name)
+bool TVRec::CheckChannel(QString name) const
 {
     if (!channel)
         return false;
 
     QString dummyID;
-    return CheckChannel(channel, name, dummyID);
-}
-
-bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum, 
-                         QString& inputName)
-{
-    if (!chan)
-        return false;
-
-    inputName = "";
-    
-    bool ret = false;
-
-    QString channelinput = chan->GetCurrentInput();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (!query.isConnected())
-        return true;
-
-    query.prepare(
-        "SELECT channel.chanid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = :INPUT             AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME");
-    query.bindValue(":CHANNUM", channum);
-    query.bindValue(":INPUT", channelinput);
-    query.bindValue(":CARDID", cardid);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("checkchannel", query);
-    }
-    else if (query.size() > 0)
-    {
-        return true;
-    }
-
-    QString msg = QString(
-        "Failed to find channel(%1) on current input (%2) of card (%3).")
-        .arg(channum).arg(channelinput).arg(cardid);
-    VERBOSE(VB_RECORD, LOC + msg);
-
-    // We didn't find it on the current input let's widen the search
-    query.prepare(
-        "SELECT channel.chanid, cardinput.inputname "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME");
-    query.bindValue(":CHANNUM", channum);
-    query.bindValue(":CARDID", cardid);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("checkchannel", query);
-    } 
-    else if (query.size() > 0)
-    {
-        query.next();
-        QString test = query.value(1).toString();
-        if (test != QString::null)
-            inputName = QString::fromUtf8(test);
-
-        msg = QString("Found channel(%1) on another input (%2) of card (%3).")
-            .arg(channum).arg(inputName).arg(cardid);
-        VERBOSE(VB_RECORD, LOC + msg);
-
-        return true;
-    }
-
-    msg = QString("Failed to find channel(%1) on any input of card (%2).")
-        .arg(channum).arg(cardid);
-    VERBOSE(VB_RECORD, LOC + msg);
-
-    query.prepare("SELECT NULL FROM channel");
-
-    if (query.exec() && query.size() == 0)
-        ret = true;
-
-    return ret;
+    return channel->CheckChannel(name, dummyID);
 }
 
 /** \fn QString add_spacer(const QString&, const QString&)

@@ -435,12 +435,11 @@ bool Channel::SetChannelByString(const QString &chan)
     }
 
     QString inputName;
-    if (pParent && !pParent->CheckChannel(this, chan, inputName))
+    if (!CheckChannel(chan, inputName))
     {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "Channel(%1): CheckChannel failed. Please verify "
-                    "channel \"%2\" in the \"mythtv-setup\" Channel Editor.").
-                arg(device).arg(chan));
+        VERBOSE(VB_IMPORTANT, LOC + "CheckChannel failed. " +
+                QString("Please verify channel '%1'").arg(chan) +
+                " in the \"mythtv-setup\" Channel Editor.");
         return false;
     }
 

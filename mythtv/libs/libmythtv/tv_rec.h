@@ -159,8 +159,6 @@ class TVRec : public QObject
     /// \sa IsReallyRecording()
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
-    bool CheckChannel(ChannelBase *chan, const QString &channum, 
-                      QString& inputID); 
     void SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                          const QString &channum);
     int GetChannelValue(const QString &channel_field, ChannelBase *chan, 
@@ -202,7 +200,7 @@ class TVRec : public QObject
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
     int ChangeHue(bool direction);
-    bool CheckChannel(QString name);
+    bool CheckChannel(QString name) const;
     bool ShouldSwitchToAnotherCard(QString chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);
     void GetNextProgram(int direction,
