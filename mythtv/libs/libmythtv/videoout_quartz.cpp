@@ -4,7 +4,7 @@
  *
  * = DESCRIPTION
  * Basic video for Mac OS X, using an unholy amalgamation of QuickTime,
- * QuickDraw, and Quartz/Core Graphics.
+ * QuickDraw, Quartz/Core Graphics, and undocumented DVD playback APIs.
  *
  * = POSSIBLE ENHANCEMENTS
  * - Expand choices for the possibility of multiple displays
@@ -61,7 +61,7 @@ using namespace std;
 #include "osdsurface.h"
 #include "mythconfig.h"
 #ifdef CONFIG_MAC_ACCEL
-#include "accel_utils.h"
+#include "videoout_accel_utils.h"
 #endif
 
 class VideoOutputQuartzView;
