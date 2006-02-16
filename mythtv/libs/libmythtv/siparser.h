@@ -30,7 +30,12 @@ using namespace std;
 
 // MythTV includes
 #include "sitypes.h"
+
+#ifdef USING_DVB_EIT
 #include "eitfixup.h"
+#else // if !USING_DVB_EIT
+typedef void QMap_Events;
+#endif // !USING_DVB_EIT
 
 class VirtualChannelTable;
 
@@ -117,10 +122,10 @@ class SIParser : public QObject
     void FindTransportsComplete(void);
     void FindServicesComplete(void);
     void FindEventsComplete(void);
-    void EventsReady(QMap_Events* Events);
-    void AllEventsPulled(void);
     void TableLoaded(void);
     void UpdatePMT(const PMTObject *pmt);
+    void EventsReady(QMap_Events* Events);
+    void AllEventsPulled(void);
 
   protected:
     void PrintDescriptorStatistics(void) const;
@@ -171,6 +176,7 @@ class SIParser : public QObject
     void ParseDescSubtitling                 (uint8_t* buf, int sz);
 
     // ATSC EIT Table Descriptor processors
+#ifdef USING_DVB_EIT
     static void ProcessDescHuffmanEventInfo(const unsigned char*, uint sz,
                                             Event&);
     static QString ProcessDescHuffmanText(const unsigned char*, uint sz);
@@ -190,6 +196,7 @@ class SIParser : public QObject
     void ProcessShortEventDescriptor    (const uint8_t*, uint sz, Event &e);
     void ProcessExtendedEventDescriptor (const uint8_t*, uint sz, Event &e);
     void ProcessComponentDescriptor     (const uint8_t*, uint sz, Event &e);
+#endif //USING_DVB_EIT
 
     // ATSC Helper Parsers
     QDateTime ConvertATSCDate(uint32_t offset);
@@ -243,9 +250,11 @@ class SIParser : public QObject
     // Storage Objects (ATSC)
     QMap<uint,uint>     sourceid_to_channel;
 
+#ifdef USING_DVB_EIT
     // Storage Objects (ATSC & DVB)
     QMap2D_Events       EventMapObject;
     QMap_Events         EventList;
+#endif //USING_DVB_EIT
 
     // Mutex Locks
     // TODO: Lock Events, and Services, Transports, etc
@@ -265,8 +274,10 @@ class SIParser : public QObject
     // DVB category descriptions
     QMap<uint,QString>  m_mapCategories;
 
-    // EIT fix up class
+#ifdef USING_DVB_EIT
+    /// EITFixUp instance
     EITFixUp            eitfixup;
+#endif
 
     // statistics
     QMap<uint,uint>     descCount;

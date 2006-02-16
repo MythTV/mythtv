@@ -14,10 +14,13 @@ using namespace std;
 #include <qdatetime.h>
 
 #include "config.h"
-#include "eit.h"
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
+#ifdef USING_DVB_EIT
+#include "eit.h"
 #endif
 
 /* This file will contain all of the common objects for DVB SI and 
@@ -524,6 +527,7 @@ public:
     pullStatus     status;
 };
 
+#ifdef USING_DVB_EIT
 // TODO: Setup only for ATSC Guide right now
 class EventHandler : public TableHandler
 {
@@ -555,6 +559,7 @@ public:
     QMap2D_Events          Events;
     QMap_bool              TrackerSetup;
 };
+#endif //USING_DVB_EIT
 
 class ServiceHandler : public TableHandler
 {

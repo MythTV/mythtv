@@ -76,9 +76,11 @@ SIParser::SIParser(const char *name) :
     Table[PMT]      = new PMTHandler();
     Table[MGT]      = new MGTHandler();
     Table[STT]      = new STTHandler();
-    Table[EVENTS]   = new EventHandler();
     Table[SERVICES] = new ServiceHandler();
     Table[NETWORK]  = new NetworkHandler();
+#ifdef USING_DVB_EIT
+    Table[EVENTS]   = new EventHandler();
+#endif //USING_DVB_EIT
 
     InitializeCategories();
 
@@ -207,6 +209,7 @@ void SIParser::CheckTrackers()
                         emit UpdatePMT(&pmt);
                     }
                     break;
+#ifdef USING_DVB_EIT
                 case EVENTS:
                     while (Table[EVENTS]->GetEmitID(key0,key1))
                     {
@@ -214,6 +217,7 @@ void SIParser::CheckTrackers()
                         emit EventsReady(&(hdl->Events[key0]));
                     }
                     break;
+#endif // USING_DVB_EIT
                 case NETWORK:
                     while(Table[NETWORK]->GetEmitID(key0,key1))
                         emit FindTransportsComplete();
@@ -331,6 +335,7 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                             QString("Added TV Type %1").arg((*i).toInt()));
                 }
             }
+#ifdef USING_DVB_EIT
             if (QString(query.value(0).toString()) == "parse_subtitle_list")
             {
                 eitfixup.clearSubtitleServiceIDs();
@@ -345,6 +350,7 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                             .arg((*i).toInt()));
                 }
             }
+#endif //USING_DVB_EIT
             query.next();
         }
     }
@@ -1366,6 +1372,11 @@ uint SIParser::GetLanguagePriority(const QString &language)
 void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
                            uint8_t *buffer, uint size)
 {
+    (void) pid;
+    (void) head;
+    (void) buffer;
+    (void) size;
+#ifdef USING_DVB_EIT
     uint8_t last_segment_number  = buffer[4];
     uint8_t last_table_id        = buffer[5];
 
@@ -1511,6 +1522,7 @@ void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
         events[head->table_id_ext][event.EventID] = event;
         pos += descriptors_length;
     }
+#endif //USING_DVB_EIT
 }
 
 /*------------------------------------------------------------------------
@@ -1970,6 +1982,7 @@ TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
      return retval;
 }
 
+#ifdef USING_DVB_EIT
 /** \fn SIParser::ProcessDVBEventDescriptors(uint,const unsigned char*,const unsigned char*,uint,vector<const unsigned char*>&,Event&)
  *  \brief Processes non-language dependent DVB Event descriptors, and caches
  *         language dependent DVB Event descriptors for the most preferred
@@ -2048,7 +2061,9 @@ uint SIParser::ProcessDVBEventDescriptors(
     }
     return descriptorLength + 2;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 /**
  *  \brief DVB Descriptor 0x54 - Process Content Descriptor - EIT
  *
@@ -2076,7 +2091,9 @@ void SIParser::ProcessContentDescriptor(const uint8_t *buf, uint size, Event& e)
         }     
     }
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 /** \fn SIParser::ProcessShortEventDescriptor(const uint8_t*,uint,Event&)
  *  \brief Processes DVB Descriptor 0x4D - Short Event Descriptor - EIT
  */
@@ -2094,7 +2111,9 @@ void SIParser::ProcessShortEventDescriptor(
     if (e.Event_Subtitle == e.Event_Name)
         e.Event_Subtitle = "";
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 /** \fn SIParser::ProcessExtendedEventDescriptor(const uint8_t*,uint,Event&)
  *  \brief Processes DVB Descriptor 0x4E - Extended Event - EIT
  */
@@ -2106,6 +2125,7 @@ void SIParser::ProcessExtendedEventDescriptor(
     if (data[6] == 0)
         e.Description += DecodeText(&data[8], data[7]);
 }
+#endif //USING_DVB_EIT
 
 QString SIParser::ParseDescLanguage(const uint8_t *data, uint size)
 {
@@ -2114,6 +2134,7 @@ QString SIParser::ParseDescLanguage(const uint8_t *data, uint size)
     return QString::fromLatin1((const char*)data, 3);
 }
 
+#ifdef USING_DVB_EIT
 void SIParser::ProcessComponentDescriptor(
     const uint8_t *buf, uint size, Event &e)
 {
@@ -2141,6 +2162,7 @@ void SIParser::ProcessComponentDescriptor(
        break;
    }
 }
+#endif //USING_DVB_EIT
 
 void SIParser::ParseDescTeletext(uint8_t *buffer, int size)
 {
@@ -2428,8 +2450,11 @@ void SIParser::ParseRRT(tablehead_t *head, uint8_t *buffer, int size)
 void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
                             int size, uint16_t pid)
 {
-
+    (void) head;
+    (void) buffer;
     (void) size;
+    (void) pid;
+#ifdef USING_DVB_EIT
 
     if (Table[EVENTS]->AddSection(head,head->table_id_ext,pid))
         return;
@@ -2518,6 +2543,7 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
         EventHandler *eh = (EventHandler*) Table[EVENTS];
         eh->Events[head->table_id_ext][event_id] = e;
     }
+#endif //USING_DVB_EIT
 }
 
 /*
@@ -2526,6 +2552,9 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
 void SIParser::ParseETT(tablehead_t */*head*/, uint8_t *buffer,
                         int size, uint16_t /*pid*/)
 {
+    (void) buffer;
+    (void) size;
+#ifdef USING_DVB_EIT
     int source_id = buffer[1] << 8 | buffer[2];
     int etm_id    = buffer[3] << 8 | buffer[4];
     int etm_id2   = etm_id >> 2;
@@ -2548,6 +2577,7 @@ void SIParser::ParseETT(tablehead_t */*head*/, uint8_t *buffer,
 
         eh->Events[source_id][etm_id2].ETM_Location = 0;
     }
+#endif //USING_DVB_EIT
 }
 
 /*
@@ -2784,6 +2814,7 @@ static uint huffman2_to_string(const unsigned char *compressed,
     return count;
 }
 
+#ifdef USING_DVB_EIT
 /* Huffman Text Decompression Routines used by some Nagra Providers */
 void SIParser::ProcessDescHuffmanEventInfo(
     const unsigned char *buf, uint /*sz*/, Event &e)
@@ -2835,7 +2866,9 @@ void SIParser::ProcessDescHuffmanEventInfo(
         }
     }
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 /* Used by some Nagra Systems for Huffman Copressed Guide */
 QString SIParser::ProcessDescHuffmanText(
     const unsigned char *buf, uint /*sz*/)
@@ -2849,7 +2882,9 @@ QString SIParser::ProcessDescHuffmanText(
 
     return decompressed;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 QString SIParser::ProcessDescHuffmanTextLarge(
     const unsigned char *buf, uint /*sz*/)
 {
@@ -2862,6 +2897,7 @@ QString SIParser::ProcessDescHuffmanTextLarge(
 
     return decompressed;
 }
+#endif //USING_DVB_EIT
 
 void SIParser::InitializeCategories()
 {

@@ -607,6 +607,7 @@ bool STTHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
     return Tracker.AddSection(head);
 }
 
+#ifdef USING_DVB_EIT
 void EventHandler::Reset()
 {
     Tracker.clear();
@@ -619,7 +620,9 @@ void EventHandler::Reset()
     CompleteSent = false;
     SIStandard = SI_STANDARD_DVB;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 bool EventHandler::Complete()
 {
     if (status.empty())
@@ -650,7 +653,9 @@ bool EventHandler::Complete()
     }
     return false;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 void EventHandler::SetupTrackers()
 {
     QMap_pullStatus::Iterator s;
@@ -677,7 +682,9 @@ void EventHandler::SetupTrackers()
         }
     }
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 bool EventHandler::RequirePIDs()
 {
     if (SIStandard == SI_STANDARD_ATSC)
@@ -710,7 +717,9 @@ bool EventHandler::RequirePIDs()
     }
     return false;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 bool EventHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
 {
     QMap_pidHandler::Iterator i;
@@ -738,7 +747,9 @@ bool EventHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
     }
     return false;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 void EventHandler::RequestEmit(uint16_t key)
 {
 #ifdef EIT_DEBUG_SID
@@ -753,7 +764,9 @@ void EventHandler::RequestEmit(uint16_t key)
     status[key].pulling = true;
 // HACK end
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 bool EventHandler::EmitRequired()
 {
     QMap_pidHandler::Iterator p;
@@ -847,7 +860,9 @@ bool EventHandler::EmitRequired()
     }
     return false;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 bool EventHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
 {
     QMap_pidHandler::Iterator p;
@@ -908,7 +923,9 @@ bool EventHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
     }
     return false;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 void EventHandler::DependencyMet(tabletypes t)
 {
     if (t == MGT)
@@ -918,7 +935,9 @@ void EventHandler::DependencyMet(tabletypes t)
     if (t == SERVICES)
         servicesloaded = true;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 void EventHandler::AddPid(uint16_t pid,uint8_t filter, uint8_t mask, uint8_t key)
 {
     if (filter == 0xCB)
@@ -948,7 +967,9 @@ void EventHandler::AddPid(uint16_t pid,uint8_t filter, uint8_t mask, uint8_t key
     EITpid[key].mask = mask;
     EITpid[key].pulling = false;
 }
+#endif //USING_DVB_EIT
 
+#ifdef USING_DVB_EIT
 bool EventHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
 {
     int retval = false;
@@ -1007,6 +1028,7 @@ bool EventHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
     }
     return false;
 }
+#endif //USING_DVB_EIT
 
 void ServiceHandler::Reset()
 {
