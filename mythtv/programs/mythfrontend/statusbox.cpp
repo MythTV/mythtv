@@ -790,7 +790,7 @@ void StatusBox::doTunerStatus()
             status += " " + proginfo->title;
             status += "\n";
             status += proginfo->subtitle;
-            contentDetail[count] = status;
+            contentDetail[count] = tun + devlabel + " " + status;
         }
         count++;
     }
