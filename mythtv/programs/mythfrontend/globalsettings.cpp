@@ -1597,6 +1597,7 @@ static HostComboBox *MythDateFormat()
     gc->addSelection(sampdate.toString("M/d/yyyy"), "M/d/yyyy");
     gc->addSelection(sampdate.toString("dd.MM.yyyy"), "dd.MM.yyyy");
     gc->addSelection(sampdate.toString("yyyy-MM-dd"), "yyyy-MM-dd");
+    gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy"); 
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
     gc->setHelpText(QObject::tr("Your preferred date format.") + " " +
                     sampleStr);
@@ -1627,6 +1628,7 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("d.M."), "d.M.");
     gc->addSelection(sampdate.toString("dd.MM."), "dd.MM.");
     gc->addSelection(sampdate.toString("MM-dd"), "MM-dd");
+    gc->addSelection(sampdate.toString("MMM d"), "MMM d"); 
     gc->addSelection(sampdate.toString("ddd d"), "ddd d");
     gc->addSelection(sampdate.toString("d ddd"), "d ddd");
     gc->addSelection(sampdate.toString("ddd M/d"), "ddd M/d");
