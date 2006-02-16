@@ -393,8 +393,21 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             newWidth = profile.byName("width")->getValue().toInt();
             newHeight = profile.byName("height")->getValue().toInt();
 
-            if (profile.byName("transcodepreserveaspect")->getValue().toInt())
+            // If height or width are 0, then we need to calculate them
+            if (newHeight == 0 && newWidth > 0)
                 newHeight = (int)(1.0 * newWidth * video_height / video_width);
+            else if (newWidth == 0 && newHeight > 0)
+                newWidth = (int)(1.0 * newHeight * video_width / video_height);
+            else if (newWidth == 0 && newHeight == 0)
+            {
+                newHeight = 480;
+                newWidth = (int)(1.0 * 480 * video_width / video_height);
+                if (newWidth > 640)
+                {
+                    newWidth = 640;
+                    newHeight = (int)(1.0 * 640 * video_height / video_width);
+                }
+            }
 
             if (encodingType.left(4).lower() == "mpeg")
             {

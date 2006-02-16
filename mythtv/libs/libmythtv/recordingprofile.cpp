@@ -676,38 +676,39 @@ public:
     };
 };
 
-class TranscodePreserveAspect: public CodecParam, public CheckBoxSetting {
-public:
-    TranscodePreserveAspect(const RecordingProfile& parent):
-        CodecParam(parent, "transcodepreserveaspect") {
-        setLabel(QObject::tr("Preserve Aspect Ratio of Video when resizing"));
-        setValue(false);
-        setHelpText(QObject::tr("Preserve the aspect ratio of the original "
-                                "recording file by ignoring the height "
-                                "setting above, and calculating the new height "
-                                "based on the aspect ratio and width."));
-    };
-};
-
 class ImageSize: public VerticalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
     public:
-        Width(const RecordingProfile& parent, int maxwidth=704):
-            SpinBoxSetting(160,maxwidth,16),
+        Width(const RecordingProfile& parent, int maxwidth=704,
+              bool transcoding = false):
+            SpinBoxSetting(transcoding ? 0 : 160,
+                           maxwidth, 16, false,
+                           transcoding ? QObject::tr("Auto") : ""),
             CodecParam(parent, "width") {
             setLabel(QObject::tr("Width"));
             setValue(480);
+            if (transcoding)
+                setHelpText(QObject::tr("If the width is set to 'Auto', "
+                            "the width will be calculated based on the height "
+                            "and the recording's physical aspect ratio."));
         };
     };
 
     class Height: public SpinBoxSetting, public CodecParam {
     public:
-        Height(const RecordingProfile& parent, int maxheight=576):
-            SpinBoxSetting(160,maxheight,16),
+        Height(const RecordingProfile& parent, int maxheight=576,
+               bool transcoding = false):
+            SpinBoxSetting(transcoding ? 0 : 160,
+                           maxheight, 16, false,
+                           transcoding ? QObject::tr("Auto") : ""),
             CodecParam(parent, "height") {
             setLabel(QObject::tr("Height"));
             setValue(480);
+            if (transcoding)
+                setHelpText(QObject::tr("If the height is set to 'Auto', "
+                            "the height will be calculated based on the width "
+                            "and the recording's physical aspect ratio."));
         };
     };
 
@@ -727,9 +728,11 @@ public:
 
         QString fullsize, halfsize;
         int maxwidth, maxheight;
+        bool transcoding = false;
         if (profName.left(11) == "Transcoders") {
             maxwidth = 1920;
             maxheight = 1088;
+            transcoding = true;
         } else if ((tvFormat.lower() == "ntsc") ||
                    (tvFormat.lower() == "ntsc-jp")) {
             maxwidth = 720;
@@ -742,19 +745,9 @@ public:
             maxheight = 576;
         }
 
-        imgSize->addChild(new Width(parent,maxwidth));
-        imgSize->addChild(new Height(parent,maxheight));
+        imgSize->addChild(new Width(parent, maxwidth, transcoding));
+        imgSize->addChild(new Height(parent, maxheight, transcoding));
         addChild(imgSize);
-
-        if (profName != NULL)
-        {
-            if (profName.left(11) == "Transcoders")
-                addChild(new TranscodePreserveAspect(parent));
-        }
-        else
-        {
-            addChild(new TranscodePreserveAspect(parent));
-        }
     };
 };
 
