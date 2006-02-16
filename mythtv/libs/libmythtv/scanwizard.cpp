@@ -305,33 +305,24 @@ void ScanWizardScanner::cancelScan()
 
 void ScanWizardScanner::scan()
 {
-    VERBOSE(VB_SIPARSER, LOC + "scan(): " +
-            QString("type(%1) src(%2) card(%4)")
-            .arg(parent->scanType()).arg(parent->videoSource())
-            .arg(parent->captureCard()));
-
-    tunerthread_running = false;
-
-    nScanType = parent->scanType();
-    nVideoSource = parent->videoSource();
     uint signal_timeout  = 1000;
     uint channel_timeout = 40000;
+    int  cardid  = parent->captureCard();
+    nScanType    = parent->scanType();
+    nVideoSource = parent->videoSource();
+    tunerthread_running = false;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT signal_timeout, channel_timeout "
-                          "FROM capturecard "
-                          "WHERE cardid=%1").arg(parent->captureCard()));
-    if (query.exec() && query.isActive() && query.next())
-    {
-        signal_timeout  = (uint) max(query.value(0).toInt(), 250);
-        channel_timeout = (uint) max(query.value(1).toInt(), 500);
-    }
+    VERBOSE(VB_SIPARSER, LOC + "scan(): " +
+            QString("type(%1) src(%2) cardid(%3)")
+            .arg(nScanType).arg(nVideoSource).arg(cardid));
+
+    CardUtil::GetTimeouts(cardid, signal_timeout, channel_timeout);
  
     if (nScanType == ScanTypeSetting::FullScan_Analog)
     {
 #ifdef USING_V4L
         //Create an analog scan object
-        analogScan = new AnalogScan(nVideoSource, parent->captureCard());
+        analogScan = new AnalogScan(nVideoSource, cardid);
 
         popupProgress = new ScanProgressPopup(this, false);
         connect(analogScan, SIGNAL(serviceScanComplete(void)),
@@ -400,7 +391,6 @@ void ScanWizardScanner::scan()
     else // DVB || V4L
     {
         nMultiplexToTuneTo = parent->paneSingle->GetMultiplex();
-        int cardid = parent->captureCard();
 
         QString device = CardUtil::GetVideoDevice(cardid);
         if (device.isEmpty())
@@ -445,10 +435,10 @@ void ScanWizardScanner::scan()
         scanner->SetForceUpdate(true);
 
         bool ftao = CardUtil::IgnoreEncrypted(
-            parent->captureCard(), channel->GetCurrentInput());
+            cardid, channel->GetCurrentInput());
         scanner->SetFTAOnly(ftao);
         bool tvo = CardUtil::TVOnly(
-            parent->captureCard(), channel->GetCurrentInput());
+            cardid, channel->GetCurrentInput());
         scanner->SetTVOnly(tvo);
 
         connect(scanner, SIGNAL(ServiceScanComplete(void)),
@@ -499,17 +489,12 @@ void ScanWizardScanner::scan()
         {
 #ifdef USING_DVB
             OFDMPane *pane = parent->paneOFDM;
-            if (!chan_opts.tuning.parseOFDM(
-                          pane->frequency(),
-                          pane->inversion(),
-                          pane->bandwidth(),
-                          pane->coderate_hp(),
-                          pane->coderate_lp(),
-                          pane->constellation(),
-                          pane->trans_mode(),
-                          pane->guard_interval(),
-                          pane->hierarchy()))
-                fParseError = true;
+            fParseError = !chan_opts.tuning.parseOFDM(
+                pane->frequency(),   pane->inversion(),
+                pane->bandwidth(),   pane->coderate_hp(),
+                pane->coderate_lp(), pane->constellation(),
+                pane->trans_mode(),  pane->guard_interval(),
+                pane->hierarchy());
 #endif // USING_DVB
         }
         else if (nScanType == ScanTypeSetting::FullTunedScan_QPSK)
@@ -518,31 +503,29 @@ void ScanWizardScanner::scan()
             // SQL code to get the disqec paramters HERE
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare(
-                QString(
-                    "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
-                    "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
-                    "FROM cardinput, capturecard "
-                    "WHERE capturecard.cardid=%1 and cardinput.sourceid=%2")
-                .arg(parent->captureCard()).arg(nVideoSource));
+                "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
+                "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
+                "FROM cardinput, capturecard "
+                "WHERE capturecard.cardid = :CARDID AND "
+                "      cardinput.sourceid = :SOURCEID");
+            query.bindValue(":CARDID",   cardid);
+            query.bindValue(":SOURCEID", nVideoSource);
 
-            if (query.exec() && query.isActive() && query.size() > 0)
+            if (!query.exec() || !query.isActive())
+                MythContext::DBError("ScanWizardScanner::scan()", query);
+            else if (query.next())
             {
                 QPSKPane *pane = parent->paneQPSK;
-                query.next();
-                if (!chan_opts.tuning.parseQPSK(
-                        pane->frequency(),
-                        pane->inversion(),
-                        pane->symbolrate(),
-                        pane->fec(),
-                        pane->polarity(),
-                        query.value(0).toString(), // diseqc_type
-                        query.value(1).toString(), // diseqc_port
-                        query.value(2).toString(), // diseqc_pos
-                        query.value(3).toString(), // lnb_lof_switch
-                        query.value(4).toString(), // lnb_lof_hi
-                        query.value(5).toString()  // lnb_lof_lo
-                        ))
-                    fParseError = true;
+                fParseError = !chan_opts.tuning.parseQPSK(
+                    pane->frequency(),  pane->inversion(),
+                    pane->symbolrate(), pane->fec(),
+                    pane->polarity(),
+                    query.value(0).toString(), // diseqc_type
+                    query.value(1).toString(), // diseqc_port
+                    query.value(2).toString(), // diseqc_pos
+                    query.value(3).toString(), // lnb_lof_switch
+                    query.value(4).toString(), // lnb_lof_hi
+                    query.value(5).toString());  // lnb_lof_lo
             }
 #endif // USING_DVB
         }
@@ -550,12 +533,10 @@ void ScanWizardScanner::scan()
         {
 #ifdef USING_DVB
             QAMPane *pane = parent->paneQAM;
-            if (!chan_opts.tuning.parseQAM(pane->frequency(),
-                                           pane->inversion(),
-                                           pane->symbolrate(),
-                                           pane->fec(),
-                                           pane->modulation()))
-                fParseError = true;
+            fParseError = !chan_opts.tuning.parseQAM(
+                pane->frequency(),  pane->inversion(),
+                pane->symbolrate(), pane->fec(),
+                pane->modulation());
 #endif // USING_DVB
         }
         else if (nScanType == ScanTypeSetting::FullScan_OFDM)

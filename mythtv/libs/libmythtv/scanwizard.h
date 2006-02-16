@@ -33,11 +33,15 @@
 #ifndef SCANWIZARD_H
 #define SCANWIZARD_H
 
-#include <qsqldatabase.h>
+// Standard UNIX C headers
 #include <pthread.h>
-#include <mythwizard.h>
+
+// MythTV headers
+#include "mythdbcon.h"
+#include "mythwizard.h"
 #include "scanwizardhelpers.h"
 #include "settings.h"
+
 #ifdef USING_DVB
 #include "dvbtypes.h"
 #endif
