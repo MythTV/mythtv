@@ -4,6 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythdvdnav-$$LIBVERSION
 CONFIG += thread staticlib warn_off
+target.path = $${PREFIX}/lib
 
 INCLUDEPATH += ../../
 
@@ -24,5 +25,10 @@ SOURCES += decoder.c dvd_input.c dvdnav.c dvd_reader.c dvd_udf.c highlight.c
 SOURCES += ifo_read.c md5.c navigation.c nav_print.c nav_read.c read_cache.c
 SOURCES += remap.c searching.c settings.c vm.c vmcmd.c
 
+inc.path = $${PREFIX}/include/mythtv/dvdnav
+inc.files = dvdnav_events.h dvd_reader.h ifo_types.h nav_read.h dvdnav.h
+inc.files += dvd_types.h ifo_read.h nav_print.h nav_types.h
+
+INSTALLS += target inc
 
 

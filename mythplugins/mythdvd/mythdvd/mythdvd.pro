@@ -1,10 +1,5 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
-include ( config.pro )
-
-!exists( config.pro ) {
-    error(Missing config.pro: please run the configure script)
-}
 
 TEMPLATE = lib
 CONFIG += plugin thread
@@ -21,9 +16,10 @@ INSTALLS += installfiles uifiles
 
 LIBS += 
 
-HEADERS += config.h settings.h dbcheck.h
+HEADERS += settings.h dbcheck.h dvdripbox.h dvdinfo.h titledialog.h
 
-SOURCES += main.cpp settings.cpp dbcheck.cpp
+SOURCES += main.cpp settings.cpp dbcheck.cpp dvdripbox.cpp dvdinfo.cpp 
+SOURCES += titledialog.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

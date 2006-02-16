@@ -22,18 +22,13 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 #include <mythtv/langsettings.h>
 
-#include "../mythdvd/config.h"
 #include "../mythdvd/dbcheck.h"
-#if TRANSCODE_SUPPORT
 #include "mtd.h"
-#endif
 
 #define MTD_EXIT_DEAMONIZING_ERROR                FRONTEND_EXIT_START-1
-#define MTD_EXIT_NO_TRANSCODE_SUPPORT             FRONTEND_EXIT_START-2
 
 int main(int argc, char **argv)
 {
-#if TRANSCODE_SUPPORT
     QApplication a(argc, argv, false);
     bool daemon_mode = false;
     int  special_port = -1;    
@@ -160,11 +155,5 @@ int main(int argc, char **argv)
                                 
     delete gContext;
     return FRONTEND_EXIT_OK;
-#else
-    argc = argc;
-    *argv = *argv; // -Wall
-    cerr << "main.o: mtd was built without transcode support. It won't do anything." << endl;
-    return MTD_EXIT_NO_TRANSCODE_SUPPORT;
-#endif
 }
 

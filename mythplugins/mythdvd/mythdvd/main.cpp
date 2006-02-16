@@ -27,17 +27,13 @@ using namespace std;
 #include <mythtv/mythmedia.h>
 #include <mythtv/lcddevice.h>
 
-#include "config.h"
 #include "settings.h"
-#ifdef TRANSCODE_SUPPORT
 #include "dvdripbox.h"
-#endif
 #include "dbcheck.h"
 
 //
 //  Transcode stuff only if we were ./configure'd for it
 //
-#ifdef TRANSCODE_SUPPORT
 void startDVDRipper(void)
 {
     DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
@@ -52,12 +48,7 @@ void startDVDRipper(void)
 
     delete drb;
 }
-#endif
 
-//
-//  VCD Playing only if we were ./configure's for it.
-//
-#ifdef VCD_SUPPORT
 void playVCD()
 {
     //
@@ -115,7 +106,6 @@ void playVCD()
     }
     gContext->removeCurrentLocation();
 }
-#endif
 
 void playDVD(void)
 {
@@ -182,19 +172,13 @@ void DVDCallback(void *data, QString &selection)
     {
         playDVD();
     }
-#ifdef VCD_SUPPORT
     if (sel == "vcd_play")
     {
         playVCD();
     }
-#endif
     else if (sel == "dvd_rip")
     {
-#ifdef TRANSCODE_SUPPORT
         startDVDRipper();
-#else
-        cerr << "main.o: TRANSCODE_SUPPORT is not on, but I still got asked to start the DVD ripper" << endl ;
-#endif
     }
     else if (sel == "dvd_settings_general")
     {
@@ -257,18 +241,15 @@ void handleDVDMedia(MythMediaDevice *)
         case 2 : // play DVD
             playDVD();    
             break;
-#ifdef TRANSCODE_SUPPORT
         case 3 : //Rip DVD
             startDVDRipper();
             break;
-#endif
         default:
             cerr << "mythdvd main.o: handleMedia() does not know what to do"
                  << endl;
     }
 }
 
-#ifdef VCD_SUPPORT
 void handleVCDMedia(MythMediaDevice *) 
 {
     switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
@@ -285,20 +266,15 @@ void handleVCDMedia(MythMediaDevice *)
            break;
     }
 }
-#endif
 
 void initKeys(void)
 {
     REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
     REG_MEDIA_HANDLER("MythDVD DVD Media Handler", "", "", handleDVDMedia, MEDIATYPE_DVD);
-#ifdef VCD_SUPPORT
     REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
     REG_MEDIA_HANDLER("MythDVD VCD Media Handler", "", "", handleVCDMedia, MEDIATYPE_VCD);
-#endif
-#ifdef TRANSCODE_SUPPORT
     REG_JUMP("Rip DVD", "Import a DVD into your MythVideo database", "", 
              startDVDRipper);
-#endif
 }
 
 int mythplugin_init(const char *libversion)
@@ -317,11 +293,9 @@ int mythplugin_init(const char *libversion)
     DVDPlayerSettings psettings;
     psettings.load();
     psettings.save();
-#ifdef TRANSCODE_SUPPORT
     DVDRipperSettings rsettings;
     rsettings.load();
     rsettings.save();
-#endif
 
     initKeys();
 

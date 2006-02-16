@@ -1,10 +1,5 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
-include ( config.pro )
-
-!exists( ../mythdvd/config.pro ) {
-    error(Missing config.pro: please run the configure script)
-}
 
 TEMPLATE = app
 CONFIG += thread
@@ -12,9 +7,11 @@ TARGET = mtd
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS -lmythdvdnav-$$LIBVERSION
 
-HEADERS += ../mythdvd/config.h ../mythdvd/dbcheck.h
+HEADERS += ../mythdvd/dbcheck.h logging.h mtd.h 
+HEADERS += serversocket.h jobthread.h dvdprobe.h fileobs.h threadevents.h
 
-SOURCES += main.cpp ../mythdvd/dbcheck.cpp
+SOURCES += main.cpp ../mythdvd/dbcheck.cpp logging.cpp mtd.cpp serversocket.cpp
+SOURCES += jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp
 

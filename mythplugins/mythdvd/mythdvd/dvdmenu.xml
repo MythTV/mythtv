@@ -1,0 +1,51 @@
+<mythmenu name="DVD">
+
+   <button>
+      <type>DVD_PLAY</type>
+      <text>Play DVD</text>
+      <text lang="DK">Afspil DVD</text>
+      <text lang="PT">Ver DVD</text>
+      <text lang="DE">DVD abspielen</text>
+      <text lang="SV">Spela DVD</text>
+      <text lang="ES">Ver DVD</text>
+      <text lang="CA">Veure DVD</text>
+      <text lang="FR">Lecture DVD</text>
+      <text lang="NL">DVD Afspelen</text>
+      <text lang="JA">DVD再生</text>
+      <text lang="NB">Spill av DVD</text>
+      <text lang="FI">Toista DVD</text>
+      <action>DVD_PLAY</action>
+   </button>
+
+   <button>
+      <type>VCD_PLAY</type>
+      <text>Play VCD</text>
+      <text lang="DK">Afspil VCD</text>
+      <text lang="FR">Lecture VCD</text>
+      <text lang="PT">Ver VCD</text>
+      <text lang="DE">VCD abspielen</text>
+      <text lang="NL">VCD Afspelen</text>
+      <text lang="JA">VCD再生</text>
+      <text lang="FI">Toista VCD</text>
+      <action>VCD_PLAY</action>
+   </button>
+
+
+
+   <button>
+      <type>DVD_RIP</type>
+      <text>Rip DVD</text>
+      <text lang="DK">Genkod DVD</text>
+      <text lang="PT">Importar DVD p/ Disco</text>
+      <text lang="DE">DVD importieren</text>
+      <text lang="SV">Kopiera DVD</text>
+      <text lang="ES">"Ripear" DVD</text>
+      <text lang="CA">Volcar DVD</text>
+      <text lang="FR">Ripper un DVD</text>
+      <text lang="NL">DVD Rip</text>
+      <text lang="JA">DVDリッピング</text>
+      <text lang="FI">Kopioi DVD</text>
+      <action>DVD_RIP</action>
+   </button>
+
+</mythmenu>

@@ -18,13 +18,10 @@
 #include <qdir.h>
 #include <qimage.h>
 
-#include "config.h"
-
 /*
 --------------- General Settings ---------------
 */
 
-#ifdef VCD_SUPPORT
 static HostLineEdit *SetVCDDevice()
 {
     HostLineEdit *gc = new HostLineEdit("VCDDeviceLocation");
@@ -35,7 +32,6 @@ static HostLineEdit *SetVCDDevice()
                     "on the device."));
     return gc;
 };
-#endif
 
 static HostLineEdit *SetDVDDevice()
 {
@@ -55,9 +51,7 @@ static HostComboBox *SetOnInsertDVD()
     gc->addSelection(QObject::tr("Display mythdvd menu"),"1");
     gc->addSelection(QObject::tr("Do nothing"),"0");
     gc->addSelection(QObject::tr("Play DVD"),"2");
-#ifdef TRANSCODE_SUPPORT       
     gc->addSelection(QObject::tr("Rip DVD"),"3");
-#endif
     gc->setHelpText(QObject::tr("Media Monitoring should be turned on to "
                    "allow this feature (Setup -> General -> CD/DVD Monitor"));
     return gc;
@@ -68,9 +62,7 @@ DVDGeneralSettings::DVDGeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
     general->addChild(SetDVDDevice());
-#ifdef VCD_SUPPORT
     general->addChild(SetVCDDevice());
-#endif
     general->addChild(SetOnInsertDVD());
     addChild(general);
 }
@@ -93,7 +85,6 @@ static HostLineEdit *PlayerCommand()
     return gc;
 };
 
-#ifdef VCD_SUPPORT
 static HostLineEdit *VCDPlayerCommand()
 {
     HostLineEdit *gc = new HostLineEdit("VCDPlayerCommand");
@@ -104,7 +95,6 @@ static HostLineEdit *VCDPlayerCommand()
                     "be substituted for the VCD device (e.g. /dev/cdrom)."));
     return gc;
 };
-#endif
 
 
 DVDPlayerSettings::DVDPlayerSettings()
@@ -112,15 +102,11 @@ DVDPlayerSettings::DVDPlayerSettings()
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("DVD Player Settings"));
     playersettings->addChild(PlayerCommand());
-#ifdef VCD_SUPPORT
     VerticalConfigurationGroup* VCDplayersettings = new VerticalConfigurationGroup(false);
     VCDplayersettings->setLabel(QObject::tr("VCD Player Settings"));
     VCDplayersettings->addChild(VCDPlayerCommand());
-#endif
     addChild(playersettings);
-#ifdef VCD_SUPPORT
     addChild(VCDplayersettings);
-#endif
 }
 
 /*

@@ -19,13 +19,10 @@
 #define MAXDEFS
 #endif
 
-// C headers
-extern "C" { /* needed for inttypes.h by glibc 2.3.5 */
-#include <dvdread/ifo_types.h>
-#include <dvdread/ifo_read.h>
-#include <dvdread/dvd_reader.h>
-#include <dvdread/nav_read.h>
-}
+#include <mythtv/dvdnav/ifo_types.h>
+#include <mythtv/dvdnav/ifo_read.h>
+#include <mythtv/dvdnav/dvd_reader.h>
+#include <mythtv/dvdnav/nav_read.h>
 
 #ifdef MAXDEFS
 #undef UINT8_MAX
