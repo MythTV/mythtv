@@ -74,7 +74,7 @@ class RecordingProfile: public ConfigurationWizard
     // initializers
     RecordingProfile(QString profName = NULL);
     virtual void loadByID(int id);
-    virtual bool loadByCard(QString name, int cardid);
+    virtual bool loadByType(QString name, QString cardtype);
     virtual bool loadByGroup(QString name, QString group);
     virtual int exec();
 

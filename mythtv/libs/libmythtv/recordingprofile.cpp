@@ -867,7 +867,7 @@ void RecordingProfile::loadByID(int profileId)
     load();
 }
 
-bool RecordingProfile::loadByCard(QString name, int cardid) 
+bool RecordingProfile::loadByType(QString name, QString cardtype) 
 {
     QString hostname = gContext->GetHostName();
     int recid = 0;
@@ -878,24 +878,26 @@ bool RecordingProfile::loadByCard(QString name, int cardid)
         "       profilegroups.is_default "
         "FROM recordingprofiles, profilegroups, capturecard "
         "WHERE profilegroups.id       = recordingprofiles.profilegroup AND "
-        "      capturecard.cardtype   = profilegroups.cardtype         AND "
-        "      capturecard.cardid     = :CARDID                        AND "
+        "      profilegroups.cardtype = :CARDTYPE                      AND "
         "      recordingprofiles.name = :NAME");
-    result.bindValue(":CARDID", cardid);
+    result.bindValue(":CARDTYPE", cardtype);
     result.bindValue(":NAME", name);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (!result.exec() || !result.isActive())
     {
-        while (result.next())
+        MythContext::DBError("RecordingProfile::loadByType()", result);
+        return false;
+    }
+
+    while (result.next())
+    {
+        if (result.value(1).toString() == hostname)
         {
-            if (result.value(1).toString() == hostname)
-            {
-                recid = result.value(0).toInt();
-                break;
-            }
-            else if (result.value(2).toInt() == 1)
-                recid = result.value(0).toInt();
+            recid = result.value(0).toInt();
+            break;
         }
+        else if (result.value(2).toInt() == 1)
+            recid = result.value(0).toInt();
     }
     if (recid)
     {

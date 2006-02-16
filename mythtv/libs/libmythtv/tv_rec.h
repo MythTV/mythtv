@@ -252,6 +252,7 @@ class TVRec : public QObject
     HDTVRecorder *GetHDTVRecorder(void);
     DVBRecorder  *GetDVBRecorder(void);
     
+    bool CreateChannel(const QString &startChanNum);
     void InitChannel(const QString &inputname, const QString &startchannel);
     void CloseChannel(void);
     DBox2Channel *GetDBox2Channel(void);

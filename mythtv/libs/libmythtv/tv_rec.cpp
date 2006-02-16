@@ -131,27 +131,14 @@ TVRec::TVRec(int capturecardnum)
 {
 }
 
-/** \fn TVRec::Init()
- *  \brief Performs instance initialization, returns true on success.
- *
- *  \return Returns true on success, false on failure.
- */
-bool TVRec::Init(void)
+bool TVRec::CreateChannel(const QString &startchannel)
 {
-    QMutexLocker lock(&stateChangeLock);
-
-    bool ok = GetDevices(cardid, genOpt, dvbOpt, fwOpt, dboxOpt);
-
-    if (!ok)
-        return false;
-
-    QString startchannel = GetStartChannel(cardid, genOpt.defaultinput);
-
     bool init_run = false;
     if (genOpt.cardtype == "DVB")
     {
 #ifdef USING_DVB_EIT
-        scanner = new EITScanner();
+        if (!scanner)
+            scanner = new EITScanner();
 #endif // USING_DVB_EIT
 
 #ifdef USING_DVB
@@ -216,6 +203,24 @@ bool TVRec::Init(void)
         SetFlags(kFlagErrored);
         return false;
     }
+    return true;
+}
+
+/** \fn TVRec::Init(void)
+ *  \brief Performs instance initialization, returns true on success.
+ *
+ *  \return Returns true on success, false on failure.
+ */
+bool TVRec::Init(void)
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (!GetDevices(cardid, genOpt, dvbOpt, fwOpt, dboxOpt))
+        return false;
+
+    QString startchannel = GetStartChannel(cardid, genOpt.defaultinput);
+    if (!CreateChannel(startchannel))
+        return false;
 
     transcodeFirst    =
         gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
@@ -3646,27 +3651,6 @@ bool TVRec::TuningPMTCheck(void)
     return true;
 }
 
-static void load_recording_profile(
-    RecordingProfile &profile, ProgramInfo *rec, int cardid)
-{
-    QString profileName = "Live TV";
-    bool done = false;
-
-    if (rec)
-    {
-        profileName = rec->GetScheduledRecording()->getProfileName();
-        if (!profileName.isEmpty())
-            done = profile.loadByCard(profileName, cardid);
-        profileName = (done) ? profileName : QString("Default");
-    }
-
-    if (!done)
-        profile.loadByCard(profileName, cardid);
-
-    QString msg = QString("Using profile '%1' to record").arg(profileName);
-    VERBOSE(VB_RECORD, LOC + msg);
-}
-
 static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
                       bool on_host, bool transcode_bfr_comm, bool on_line_comm)
 {
@@ -3725,9 +3709,23 @@ void TVRec::TuningNewRecorder(void)
         had_dummyrec = true;
     }
 
-    RecordingProfile profile;
     ProgramInfo *rec = lastTuningRequest.program;
-    load_recording_profile(profile, rec, cardid);
+
+    // Load the correct recording profile.
+    // In LiveTV mode use "Live TV" profile, otherwise use the
+    // recording's specified profile. If the desired profile can't
+    // be found, fall back to the "Default" profile for card type.
+    QString profileName = (tvchain) ? QString("Live TV") :
+        rec->GetScheduledRecording()->getProfileName();
+    RecordingProfile profile;
+    if (!profile.loadByType(profileName, genOpt.cardtype))
+    {
+        profileName = "Default";
+        profile.loadByType(profileName, genOpt.cardtype);
+    }
+    VERBOSE(VB_RECORD, LOC + QString("Using profile '%1' to record")
+            .arg(profileName));
+
     if (tvchain)
     {
         bool ok;
