@@ -22,6 +22,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "util.h"
 #include "mythdbcon.h"
+#include "cardutil.h"
 
 /** \class StatusBox
  *  \brief Reports on various status items.
@@ -730,60 +731,68 @@ void StatusBox::doListingsStatus()
 
 void StatusBox::doTunerStatus()
 {
-    int count = 0;
     doScroll = true;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardid FROM capturecard;");
-    query.exec();
-
     contentLines.clear();
     contentDetail.clear();
     contentFont.clear();
 
-    if (query.isActive() && query.size())
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid, cardtype, videodevice "
+        "FROM capturecard ");
+    if (!query.exec() || !query.isActive())
     {
-        while(query.next())
-        {
-            int cardid = query.value(0).toInt();
+        MythContext::DBError("StatusBox::doTunerStatus()", query);
+        contentTotalLines = 0;
+        update(ContentRect);
+        return;
+    }
 
-            QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
-            QStringList strlist = cmd;
-            strlist << "GET_STATE";
+    uint count = 0;
+    while (query.next())
+    {
+        int cardid = query.value(0).toInt();
 
-            gContext->SendReceiveStringList(strlist);
-            int state = strlist[0].toInt();
+        QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+        QStringList strlist = cmd;
+        strlist << "GET_STATE";
+
+        gContext->SendReceiveStringList(strlist);
+        int state = strlist[0].toInt();
   
-            QString Status = QString(tr("Tuner %1 ")).arg(cardid);
-            if (state==kState_Error)
-                Status += tr("is not available");
-            else if (state==kState_WatchingLiveTV)
-                Status += tr("is watching live TV");
-            else if (state==kState_RecordingOnly ||
-                     state==kState_WatchingRecording)
-                Status += tr("is recording");
-            else 
-                Status += tr("is not recording");
+        QString status = "";
+        if (state == kState_Error)
+            status = tr("is not available");
+        else if (state == kState_WatchingLiveTV)
+            status = tr("is watching live TV");
+        else if (state == kState_RecordingOnly ||
+                 state == kState_WatchingRecording)
+            status = tr("is recording");
+        else 
+            status = tr("is not recording");
 
-            contentLines[count] = Status;
-            contentDetail[count] = Status;
+        QString tun = tr("Tuner %1 ").arg(cardid);
+        QString devlabel = CardUtil::GetDeviceLabel(
+            cardid, query.value(1).toString(), query.value(2).toString());
 
-            if (state==kState_RecordingOnly ||
-                state==kState_WatchingRecording)
-            {
-                strlist = QString("QUERY_RECORDER %1").arg(cardid);
-                strlist << "GET_RECORDING";
-                gContext->SendReceiveStringList(strlist);
-                ProgramInfo *proginfo = new ProgramInfo;
-                proginfo->FromStringList(strlist, 0);
+        contentLines[count]  = tun + status;
+        contentDetail[count] = tun + devlabel + " " + status;
+
+        if (state == kState_RecordingOnly ||
+            state == kState_WatchingRecording)
+        {
+            strlist = QString("QUERY_RECORDER %1").arg(cardid);
+            strlist << "GET_RECORDING";
+            gContext->SendReceiveStringList(strlist);
+            ProgramInfo *proginfo = new ProgramInfo;
+            proginfo->FromStringList(strlist, 0);
    
-                Status += " " + proginfo->title;
-                Status += "\n";
-                Status += proginfo->subtitle;
-                contentDetail[count] = Status;
-            }
-            count++;
+            status += " " + proginfo->title;
+            status += "\n";
+            status += proginfo->subtitle;
+            contentDetail[count] = status;
         }
+        count++;
     }
     contentTotalLines = count;
     update(ContentRect);
