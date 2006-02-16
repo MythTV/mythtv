@@ -369,8 +369,10 @@ void SipMsg::decode(QString sipString)
 
     // Decode main body of SIP message
     decodeRequestLine(attList[0]);
-    QStringList::Iterator it;
-    for (it=attList.begin(); (it != attList.end()) && (*it != ""); it++)
+    QStringList::Iterator it = attList.begin();
+    if (it != attList.end())
+        it++; // We already decoded the first line, so skip it
+    for (; (it != attList.end()) && (*it != ""); it++)
         decodeLine(*it);
 
     // Deccode main body of SIP message
