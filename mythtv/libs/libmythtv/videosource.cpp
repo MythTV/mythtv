@@ -543,12 +543,6 @@ class VideoDevice: public PathSetting, public CCSetting
         }
     }
 
-    static QStringList probeInputs(QString device);
-    static QStringList probeDVBInputs(int diseq_type);
-
-    static QStringList fillDVBInputs(int dvb_diseqc_type);
-    static QValueList<DVBDiSEqCInputList>
-        fillDVBInputsDiSEqC(int dvb_diseqc_type);
   private:
     QMap<uint, uint> minor_list;
 };
@@ -1022,21 +1016,19 @@ CaptureCard::CaptureCard()
 {
     // must be first
     addChild(id = new ID());
-
-    CaptureCardGroup *cardgroup = new CaptureCardGroup(*this);
-    addChild(cardgroup);
-
+    addChild(new CaptureCardGroup(*this));
     addChild(new Hostname(*this));
 }
 
 void CaptureCard::fillSelections(SelectSetting* setting) 
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardtype, videodevice, cardid, "
-                  "       firewire_port, firewire_node, "
-                  "       dbox2_port, dbox2_host, dbox2_httpport "
-                  "FROM capturecard "
-                  "WHERE hostname = :HOSTNAME ;");
+    query.prepare(
+        "SELECT cardtype, videodevice, cardid, "
+        "       firewire_port, firewire_node, "
+        "       dbox2_port, dbox2_host, dbox2_httpport "
+        "FROM capturecard "
+        "WHERE hostname = :HOSTNAME");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -1817,231 +1809,40 @@ void CardInputEditor::load()
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
-    MSqlQuery capturecards(MSqlQuery::InitCon());
-    
-    capturecards.prepare("SELECT cardid, videodevice, cardtype, "
-                         "       dvb_diseqc_type, firewire_port, firewire_node, dbox2_port, dbox2_host, dbox2_httpport "
-                         "FROM capturecard "
-                         "WHERE hostname = :HOSTNAME");
-    capturecards.bindValue(":HOSTNAME", gContext->GetHostName());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid, videodevice, cardtype "
+        "FROM capturecard "
+        "WHERE hostname = :HOSTNAME");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (capturecards.exec() && capturecards.isActive() && capturecards.size() > 0)
-        while (capturecards.next()) {
-            int cardid = capturecards.value(0).toInt();
-            QString videodevice(capturecards.value(1).toString());
+    if (!query.exec() || !query.isActive() || !query.size())
+        return;
 
-            QStringList inputs;
-            if (capturecards.value(2).toString() == "DVB")
-            {
-                QValueList<DVBDiSEqCInputList> dvbinput;
-                dvbinput = VideoDevice::fillDVBInputsDiSEqC(
-                    capturecards.value(3).toInt());
+    uint j = 0;
+    while (query.next())
+    {
+        int     cardid      = query.value(0).toInt();
+        QString videodevice = query.value(1).toString();
+        QString cardtype    = query.value(2).toString();
 
-                QValueList<DVBDiSEqCInputList>::iterator it;
-                for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
-                {
-                    // IS DVB Check for CardInput class
-                    CardInput* cardinput = new CardInput(true);
-                    cardinput->loadByInput(cardid, (*it).input);
+        QStringList        inputLabels;
+        vector<CardInput*> cardInputs;
 
-                    cardinput->fillDiseqcSettingsInput((*it).position,(*it).port);
+        CardUtil::GetCardInputs(cardid, videodevice, cardtype,
+                                inputLabels, cardInputs);
 
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label = QString("%1 (%2) -> %3")
-                        .arg("[ " + capturecards.value(2).toString() +
-                             " : " + capturecards.value(1).toString() +
-                             " ]")
-                        .arg((*it).input)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-                }
-            }
-            else if (capturecards.value(2).toString() == "FIREWIRE")
-            {
-                inputs = QStringList("MPEG2TS");
-                for (QStringList::iterator i = inputs.begin();
-                     i != inputs.end(); ++i)
-                { 
-                    CardInput* cardinput = new CardInput(false);
-                    cardinput->loadByInput(cardid, *i);   
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label;
-                    label = QString("%1 (%2) -> %3")
-                        .arg("[ " + capturecards.value(2).toString() +
-                             " Port: " + capturecards.value(3).toString() +
-                             ", Node: " + capturecards.value(4).toString() +
-                             " ]")
-                        .arg(*i)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-                }
-            }
-            else if (capturecards.value(2).toString() == "DBOX2")
-            {
-                inputs = QStringList("MPEG2TS");
-                for (QStringList::iterator i = inputs.begin();
-                     i != inputs.end(); ++i)
-                { 
-                    CardInput* cardinput = new CardInput(false);
-                    cardinput->loadByInput(cardid, *i);   
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label;
-                    label = QString("%1 (%2) -> %3")
-                        .arg("[ " + capturecards.value(2).toString() +
-                             "IP: " + capturecards.value(7).toString() +
-                             ", Port: " + capturecards.value(6).toString() +
-                             ", HttpPort: " + capturecards.value(8).toString() +
-                             " ]")
-                        .arg(*i)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-                }
-            }
-            else
-            {
-                inputs = VideoDevice::probeInputs(videodevice);
-                for (QStringList::iterator i = inputs.begin(); 
-                     i != inputs.end(); ++i)
-                {
-                    CardInput* cardinput = new CardInput(false);
-                    cardinput->loadByInput(cardid, *i);
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label = QString("%1 (%2) -> %3")
-                        .arg("[ " + capturecards.value(2).toString() +
-                             " : " + capturecards.value(1).toString() +
-                             " ]")
-                        .arg(*i)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-                }
-            }
+        for (uint i = 0; i < inputLabels.size(); i++, j++)
+        {
+            cardinputs.push_back(cardInputs[i]);
+            addSelection(inputLabels[i], QString::number(j));
         }
-}
-
-CardInputEditor::~CardInputEditor() {
-    while (cardinputs.size() > 0) {
-        delete cardinputs.back();
-        cardinputs.pop_back();
     }
 }
 
-QValueList<DVBDiSEqCInputList>
-VideoDevice::fillDVBInputsDiSEqC(int dvb_diseqc_type)
+CardInputEditor::~CardInputEditor()
 {
-    QValueList<DVBDiSEqCInputList> list;
-
-    QString stxt = "DiSEqC Switch Input %1";
-    QString mtxt = "DiSEqC v1.2 Motor Position %1";
-    QString itxt = "DiSEqC v1.3 Input %1";
-    QString l21txt = "SW21 Input %1";
-    QString l64txt = "SW64 Input %1";
-
-    uint i;
-    switch (dvb_diseqc_type)
-    {
-        case 1: case 2: case 3:
-            for (i = 0; i < 2; ++i)
-                list.append(DVBDiSEqCInputList(
-                                stxt.arg(i+1), QString::number(i), ""));
-            break;
-        case 4: case 5:
-            for (i = 0; i < 4; ++i)
-                list.append(DVBDiSEqCInputList(
-                                stxt.arg(i+1), QString::number(i), ""));
-            break;
-        case 6:
-            for (i = 1; i < 50; ++i)
-                list.append(DVBDiSEqCInputList(
-                                mtxt.arg(i), "", QString::number(i)));
-            break;
-        case 7:
-            for (i = 1; i < 20; ++i)
-                list.append(DVBDiSEqCInputList(
-                                itxt.arg(i), "", QString::number(i)));
-            break;
-        case 8:
-            for (i = 0; i < 10; ++i)
-                list.append(DVBDiSEqCInputList(
-                                stxt.arg(i+1,2), QString::number(i), ""));
-            break;
-        case 9:
-            for (i = 0; i < 2; ++i)
-                list.append(DVBDiSEqCInputList(
-                                l21txt.arg(i+1,2), QString::number(i), ""));
-            break;
-        case 10:
-            for (i = 0; i < 3; ++i)
-                list.append(DVBDiSEqCInputList(
-                                l64txt.arg(i+1,2), QString::number(i), ""));
-            break;
-        default:
-            list.append(DVBDiSEqCInputList(
-                            QString("DVBInput"), QString(""), QString("")));
-    }
-
-    return list;
-}
-
-QStringList VideoDevice::probeInputs(QString device)
-{
-    bool is_dvb = false;
-    int diseq_type = device.toInt(&is_dvb);
-
-    if (is_dvb)
-    {
-        return probeDVBInputs(diseq_type);
-    }
-
-    bool ok;
-    QStringList ret;
-    int videofd = open(device.ascii(), O_RDWR);
-    if (videofd < 0)
-    {
-        ret += QObject::tr("Could not open '%1' "
-                           "to probe its inputs.").arg(device);
-        return ret;
-    }
-    InputNames list = CardUtil::probeV4LInputs(videofd, ok);
-    close(videofd);
-
-    if (!ok)
-    {
-        ret += list[-1];
-        return ret;
-    }
-
-    InputNames::iterator it;
-    for (it = list.begin(); it != list.end(); ++it)
-    {
-        if (it.key() >= 0)
-            ret += *it;
-    }
-
-    return ret;
-}
-
-QStringList VideoDevice::probeDVBInputs(int diseq_type)
-{
-    QStringList ret;
-#ifdef USING_DVB
-    QValueList<DVBDiSEqCInputList> dvbinput;
-    dvbinput = fillDVBInputsDiSEqC(diseq_type);
-
-    QValueList<DVBDiSEqCInputList>::iterator it;
-    for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
-        ret += (*it).input;
-#else
-    ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
-#endif
-    return ret;
+    // CardInput instances are deleted by Qt, no need to do that here
 }
 
 void DVBConfigurationGroup::probeCard(const QString& cardNumber)
@@ -2103,6 +1904,24 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
 #endif
 }
 
+TunerCardInput::TunerCardInput(const CaptureCard &parent)
+    : CCSetting(parent, "defaultinput"),
+      last_device(QString::null),
+      last_cardtype(QString::null),
+      last_diseqct(-1)
+{
+    setLabel(QObject::tr("Default input"));
+    int cardid = parent.getCardID();
+    if (cardid <= 0)
+        return;
+
+    QString name;
+    CardUtil::GetCardType(cardid, name, last_cardtype);
+    bool isdvb    = CardUtil::IsDVBCardType(last_cardtype);
+    last_cardtype = (isdvb) ? "DVB" : last_cardtype;
+    last_device   = CardUtil::GetVideoDevice(cardid);
+}
+
 void TunerCardInput::fillSelections(const QString& device)
 {
     clearSelections();
@@ -2110,10 +1929,25 @@ void TunerCardInput::fillSelections(const QString& device)
     if (device.isEmpty())
         return;
 
-    QStringList inputs = VideoDevice::probeInputs(device);
+    last_device = device;
+    QStringList inputs =
+        CardUtil::probeInputs(device, last_cardtype, last_diseqct);
 
     for (QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
         addSelection(*i);
+}
+
+void TunerCardInput::diseqcType(const QString &diseqcType)
+{
+    VERBOSE(VB_IMPORTANT, QString("TunerCardInput::diseqcType(%1)")
+            .arg(diseqcType));
+    bool ok;
+    int tmp = diseqcType.toInt(&ok);
+    if (ok)
+    {
+        last_diseqct = tmp;
+        fillSelections(last_device);
+    }
 }
 
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
@@ -2164,17 +1998,15 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
-    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
-            &parent,      SLOT(  setDvbCard  (const QString&)));
-    connect(buttonRecOpt, SIGNAL(pressed()),
-            &parent,      SLOT(  recorderOptionsPanel()));
     connect(buttonDiSEqC, SIGNAL(pressed()),
             &parent,      SLOT(  DiSEqCPanel()));
-    connect(diseqctype,   SIGNAL(valueChanged  (const QString&)),
-            defaultinput, SLOT(  fillSelections(const QString&)));
+    connect(buttonRecOpt, SIGNAL(pressed()),
+            &parent,      SLOT(  recorderOptionsPanel()));
+    connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
+            defaultinput, SLOT(  diseqcType  (const QString&)));
 
     cardnum->setValue(0);
-    defaultinput->fillSelections(diseqctype->getValue());
+    defaultinput->diseqcType(diseqctype->getValue());
 }
 
 void CaptureCard::reload(void)
@@ -2253,7 +2085,7 @@ DVBDiSEqCConfigurationWizard::DVBDiSEqCConfigurationWizard(CaptureCard &parent)
     addChild(rec);
 
     connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
-            defaultinput, SLOT(fillSelections(const QString&)));
+            defaultinput, SLOT(  diseqcType(  const QString&)));
 
-    defaultinput->fillSelections(diseqctype->getValue());
+    defaultinput->diseqcType(diseqctype->getValue());
 }

@@ -181,16 +181,20 @@ private:
     const CaptureCard& parent;
 };
 
-class TunerCardInput: public ComboBoxSetting, public CCSetting {
+class TunerCardInput: public ComboBoxSetting, public CCSetting
+{
     Q_OBJECT
-public:
-    TunerCardInput(const CaptureCard& parent):
-        CCSetting(parent, "defaultinput") {
-        setLabel(QObject::tr("Default input"));
-    };
+  public:
+    TunerCardInput(const CaptureCard &parent);
 
-public slots:
-    void fillSelections(const QString& device);
+  public slots:
+    void fillSelections(const QString &device);
+    void diseqcType(const QString &diseqcType);
+
+  private:
+    QString last_device;
+    QString last_cardtype;
+    int     last_diseqct;
 };
 
 class DVBAudioDevice: public LineEditSetting, public CCSetting {    
@@ -288,7 +292,6 @@ public:
 public slots:
     void DiSEqCPanel();
     void recorderOptionsPanel();
-    void setDvbCard(const QString& card) { dvbCard = card; };
 
 private:
     void reload(void);
@@ -310,7 +313,6 @@ private:
 
 private:
     ID       *id;
-    QString   dvbCard;
 };
 
 class CardInput;

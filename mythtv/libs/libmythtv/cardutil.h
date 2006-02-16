@@ -15,26 +15,20 @@ using namespace std;
 class CardInput;
 typedef QMap<int,QString> InputNames;
 
-class DVBDiSEqCInputList
+class DVBDiSEqCInput
 {
   public:
-    DVBDiSEqCInputList() { clearValues(); }
-    DVBDiSEqCInputList(const QString& in, const QString& prt, 
-                       const QString& pos)
-        : input(in), port(prt), position(pos)
-    {}
+    DVBDiSEqCInput() { clearValues(); }
+    DVBDiSEqCInput(const QString &in, const QString &prt, const QString &pos)
+        : input(in), port(prt), position(pos) {}
 
-    void clearValues() 
-    {
-        input = "";
-        port = "";
-        position = "";
-    }
+    void clearValues(void) { input = port = position = ""; }
 
     QString input;
     QString port;
     QString position;
 };
+typedef QValueList<DVBDiSEqCInput> DiSEqCList;
 
 /// \brief all the different dvb DiSEqC devices
 enum DISEQC_TYPES
@@ -62,7 +56,7 @@ class CardUtil
     /// \brief all the different capture cards
     enum CARD_TYPES
     {
-        ERROR_OPEN,
+        ERROR_OPEN = 0,
         ERROR_PROBE,
         QPSK,
         QAM,
@@ -73,34 +67,61 @@ class CardUtil
         HDTV,
         FIREWIRE,
     };
-    /// \brief dvb card type
-    static const QString DVB;
 
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
 
     static bool         IsCardTypePresent(const QString &strType);
 
-    static CARD_TYPES   GetCardType(uint cardid, QString &name, QString &card_type);
+    static CARD_TYPES   GetCardType(uint cardid, QString &name,
+                                    QString &card_type);
     static CARD_TYPES   GetCardType(uint cardid, QString &name);
     static CARD_TYPES   GetCardType(uint cardid);
-    static bool         IsDVBCardType(const QString card_type);
 
-    static bool         GetVideoDevice(uint cardid, QString& device, QString& vbi);
-    static bool         GetVideoDevice(uint cardid, QString& device);
+    static bool         GetVideoDevice(uint cardid, QString& device,
+                                       QString& vbi);
+    static QString      GetVideoDevice(uint cardid);
 
-    static bool         IsDVB(uint cardid);
-    static DISEQC_TYPES GetDISEqCType(uint cardid);
-
-    static CARD_TYPES   GetDVBType(uint device, QString &name, QString &card_type);
-    static bool         HasDVBCRCBug(uint device);
     static QString      GetDefaultInput(uint cardid);
+    static QString      GetInputName(uint cardid, uint sourceid);
 
+    static QString      GetDeviceLabel(uint    cardid,
+                                       QString cardtype,
+                                       QString videodevice);
+
+    static QStringList  probeInputs(QString device,
+                                    QString cardtype = QString::null,
+                                    int diseqctype = -1);
+    static void         GetCardInputs(int                 cardid,
+                                      QString             device,
+                                      QString             cardtype,
+                                      QStringList        &inputLabels,
+                                      vector<CardInput*> &cardInputs);
+    // DTV info
+    static bool         GetTimeouts(uint cardid,
+                                    uint &signal_timeout,
+                                    uint &channel_timeout);
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
     static bool         TVOnly(uint cardid, const QString &inputname);
 
+    // DVB info
+    static bool         IsDVB(uint cardid);
+    static bool         IsDVBCardType(const QString card_type);
+    static CARD_TYPES   GetDVBType(uint device, QString &name,
+                                   QString &card_type);
+    static bool         HasDVBCRCBug(uint device);
+    static DISEQC_TYPES GetDISEqCType(uint cardid);
+
+    // V4L info
     static bool         hasV4L2(int videofd);
     static InputNames   probeV4LInputs(int videofd, bool &ok);
+
+  private:
+    static QStringList  probeV4LInputs(QString device);
+    static QStringList  probeDVBInputs(QString device, int diseqctype = -1);
+
+    static QStringList  fillDVBInputs(int dvb_diseqc_type);
+    static DiSEqCList   fillDVBInputsDiSEqC(int dvb_diseqc_type);
 };
 
 #endif //_CARDUTIL_H_

@@ -402,10 +402,11 @@ void ScanWizardScanner::scan()
         nMultiplexToTuneTo = parent->paneSingle->GetMultiplex();
         int cardid = parent->captureCard();
 
-        QString device, cn, card_type;
-        if (!CardUtil::GetVideoDevice(cardid, device))
+        QString device = CardUtil::GetVideoDevice(cardid);
+        if (device.isEmpty())
             return;
 
+        QString cn, card_type;
         int nCardType = CardUtil::GetCardType(cardid, cn, card_type);
         (void) nCardType;
 #ifdef USING_DVB
