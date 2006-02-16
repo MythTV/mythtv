@@ -62,6 +62,12 @@ typedef enum
     kPseudoRecording     = 2,
 } PseudoState;
 
+enum scheduleEditTypes {
+    kScheduleProgramGuide = 0,
+    kScheduleProgramFinder,
+    kScheduledRecording
+};
+
 class TV : public QObject
 {
     Q_OBJECT
@@ -174,9 +180,10 @@ class TV : public QObject
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
   protected:
-    void doLoadMenu(bool showFinder = false);
+    void doEditSchedule(int editType = kScheduleProgramGuide);
     static void *EPGMenuHandler(void *param);
     static void *FinderMenuHandler(void *param);
+    static void *ScheduleMenuHandler(void *param);
 
     void RunTV(void);
     static void *EventThread(void *param);
@@ -274,7 +281,7 @@ class TV : public QObject
     void UpdateOSDSignal(const QStringList& strlist);
     void UpdateOSDTimeoutMessage(void);
 
-    void LoadMenu(bool showFinder = false);
+    void EditSchedule(int editType = kScheduleProgramGuide);
 
     void SetupPlayer(bool isWatchingRecording);
     void TeardownPlayer(void);
@@ -511,9 +518,9 @@ class TV : public QObject
     MythDialog *myWindow;   ///< Our MythDialog window, if it exists
     WId   embedWinID;       ///< Window ID when embedded in another widget
     QRect embedBounds;      ///< Bounds when embedded in another widget
-    ///< player bounds, for after doLoadMenu() returns to normal playing.
+    ///< player bounds, for after doEditSchedule() returns to normal playing.
     QRect player_bounds;
-    ///< Prior GUI window bounds, for doLoadMenu() and player exit().
+    ///< Prior GUI window bounds, for doEditSchedule() and player exit().
     QRect saved_gui_bounds;
 
     // Various threads

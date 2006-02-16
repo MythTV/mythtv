@@ -2486,7 +2486,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "SWITCHCARDS")
                 SwitchCards();
             else if (action == "GUIDE")
-                LoadMenu();
+                EditSchedule(kScheduleProgramGuide);
             else if (action == "TOGGLEPIPMODE")
                 TogglePIPView();
             else if (action == "TOGGLEPIPWINDOW")
@@ -2568,9 +2568,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "JUMPTODVDROOTMENU")
                 nvp->GoToDVDMenu("menu");
             else if (action == "GUIDE")
-                LoadMenu();
+                EditSchedule(kScheduleProgramGuide);
             else if (action == "FINDER")
-                LoadMenu(true);
+                EditSchedule(kScheduleProgramFinder);
             else if (action == "TOGGLEEDIT")
                 DoEditMode();
             else if (action == "TOGGLEBROWSE")
@@ -4476,11 +4476,12 @@ void TV::StopEmbeddingOutput(void)
     embedWinID = 0;
 }
 
-void TV::doLoadMenu(bool showFinder)
+void TV::doEditSchedule(int editType)
 {
     if (!playbackinfo)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "doLoadMenu(): no active playbackinfo.");
+        VERBOSE(VB_IMPORTANT,
+                LOC_ERR + "doEditSchedule(): no active playbackinfo.");
         return;
     }
 
@@ -4520,10 +4521,23 @@ void TV::doLoadMenu(bool showFinder)
         if (!paused)
             DoPause();
 
-        if (showFinder)
-            RunProgramFind(true, false);
-        else
-            RunProgramGuide(chanid, channum, true);
+        switch (editType)
+        {
+            default:
+            case kScheduleProgramGuide:
+                    RunProgramGuide(chanid, channum, true);
+                    break;
+            case kScheduleProgramFinder:
+                    RunProgramFind(true, false);
+                    break;
+            case kScheduledRecording:
+                    pbinfoLock.lock();
+                    ScheduledRecording record;
+                    record.loadByProgram(playbackinfo);
+                    record.exec();
+                    pbinfoLock.unlock();
+                    break;
+        }
 
         if (!stayPaused)
             DoPause();
@@ -4547,7 +4561,7 @@ void TV::doLoadMenu(bool showFinder)
 void *TV::EPGMenuHandler(void *param)
 {
     TV *obj = (TV *)param;
-    obj->doLoadMenu();
+    obj->doEditSchedule(kScheduleProgramGuide);
 
     return NULL;
 }
@@ -4555,12 +4569,20 @@ void *TV::EPGMenuHandler(void *param)
 void *TV::FinderMenuHandler(void *param)
 {
     TV *obj = (TV *)param;
-    obj->doLoadMenu(true);
+    obj->doEditSchedule(kScheduleProgramFinder);
 
     return NULL;
 }
 
-void TV::LoadMenu(bool showFinder)
+void *TV::ScheduleMenuHandler(void *param)
+{
+    TV *obj = (TV *)param;
+    obj->doEditSchedule(kScheduledRecording);
+
+    return NULL;
+}
+
+void TV::EditSchedule(int editType)
 {
     if (menurunning == true)
         return;
@@ -4570,10 +4592,19 @@ void TV::LoadMenu(bool showFinder)
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    if (showFinder)
-        pthread_create(&tid, &attr, TV::FinderMenuHandler, this);
-    else
-        pthread_create(&tid, &attr, TV::EPGMenuHandler, this);
+    switch (editType)
+    {
+        default:
+        case kScheduleProgramGuide:
+                pthread_create(&tid, &attr, TV::EPGMenuHandler, this);
+                break;
+        case kScheduleProgramFinder:
+                pthread_create(&tid, &attr, TV::FinderMenuHandler, this);
+                break;
+        case kScheduledRecording:
+                pthread_create(&tid, &attr, TV::ScheduleMenuHandler, this);
+                break;
+    }
 }
 
 void TV::ChangeBrightness(bool up, bool recorder)
@@ -5544,9 +5575,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     else if (action.left(14) == "SELECTSUBTITLE")
         SetSubtitleTrack(action.mid(14).toInt());
     else if (action == "GUIDE")
-        LoadMenu();
+        EditSchedule(kScheduleProgramGuide);
     else if (action == "FINDER")
-        LoadMenu(true);
+        EditSchedule(kScheduleProgramFinder);
+    else if (action == "SCHEDULE")
+        EditSchedule(kScheduledRecording);
     else if (StateIsLiveTV(GetState()))
     {
         if (action == "TOGGLEPIPMODE")
@@ -5701,6 +5734,12 @@ void TV::BuildOSDTreeMenu(void)
                                       "TOGGLEAUTOEXPIRE");
 
         pbinfoLock.unlock();
+
+        item = new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
+        subitem = new OSDGenericTree(item, tr("Program Guide"), "GUIDE");
+        subitem = new OSDGenericTree(item, tr("Program Finder"), "FINDER");
+        subitem = new OSDGenericTree(item, tr("Edit Recording Schedule"),
+                                     "SCHEDULE");
     }
     
     const QStringList atracks = activenvp->listAudioTracks();
