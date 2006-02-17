@@ -360,6 +360,11 @@ QWidget *MythMainWindow::currentWidget(void)
     return NULL;
 }
 
+bool MythMainWindow::IsExitingToMain(void) const
+{
+    return d->exitingtomain;
+}
+
 void MythMainWindow::ExitToMainMenu(void)
 {
     QWidget *current = currentWidget();

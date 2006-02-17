@@ -109,6 +109,10 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
 bool VideoGallery::goBack()
 {
     bool handled = false;
+
+    if (m_parent->IsExitingToMain())
+        return handled;
+
     // one dir up
     if (isFileBrowser && !jumping)
     {

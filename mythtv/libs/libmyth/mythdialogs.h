@@ -118,6 +118,7 @@ class MythMainWindow : public QDialog
     void JumpTo(const QString &destination);
     bool DestinationExists(const QString &destination) const;
 
+    bool IsExitingToMain(void) const;
 
   protected:
     void keyPressEvent(QKeyEvent *e);
