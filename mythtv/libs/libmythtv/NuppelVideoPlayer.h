@@ -576,6 +576,7 @@ class NuppelVideoPlayer
     bool       m_playing_slower;
     bool       decode_extra_audio;
     float      m_stored_audio_stretchfactor;
+    bool       audio_paused;
 
     // Audio warping stuff
     bool       usevideotimebase;

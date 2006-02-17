@@ -159,6 +159,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       avsync_oldavg(0),             refreshrate(0),
       lastsync(false),              m_playing_slower(false),
       m_stored_audio_stretchfactor(1.0),
+      audio_paused(false),
       // Audio warping stuff
       usevideotimebase(false), 
       warpfactor(1.0f),             warpfactor_avg(1.0f),
@@ -284,7 +285,10 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     //cout << "stopping other threads" << endl;
     PauseVideo(waitvideo);
     if (audioOutput)
+    {
+        audio_paused = true;
         audioOutput->Pause(true);
+    }
     if (ringBuffer)
         ringBuffer->Pause();
 
@@ -306,7 +310,7 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
 
     UnpauseVideo();
     if (audioOutput && unpauseaudio)
-        audioOutput->Pause(false);
+        audio_paused = false;
     if (ringBuffer)
         ringBuffer->Unpause();
 
@@ -354,7 +358,11 @@ void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
     {
         prebuffering = prebuffer;
         if (audioOutput && !paused)
-            audioOutput->Pause(prebuffering);
+        {
+            if (prebuffering)
+                audioOutput->Pause(prebuffering);
+            audio_paused = prebuffering;
+        }
     }
 
     if (!prebuffering)
@@ -1951,6 +1959,9 @@ displayframe:
     videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
     videofiltersLock.unlock();
 
+    if (audioOutput && !audio_paused && audioOutput->GetPause())
+        audioOutput->Pause(false);
+
     AVSync();
 
     videoOutput->DoneDisplayingFrame();
@@ -2422,7 +2433,12 @@ void NuppelVideoPlayer::StartPlaying(void)
     }
 
     if (audioOutput)
+    {
+        audio_paused = true;
+        audioOutput->Pause(true);
         audioOutput->SetStretchFactor(audio_stretchfactor);
+    }
+
     next_play_speed = audio_stretchfactor;
 
     if (!InitVideo())
