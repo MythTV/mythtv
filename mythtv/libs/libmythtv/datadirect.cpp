@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <qfile.h>
 #include <qstring.h>
+#include <qregexp.h>
 #include <cerrno>
 
 
@@ -595,10 +596,12 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     myth_system(command.ascii());
 
     QDateTime NextSuggestedTime;
+    QDateTime BlockedTime;
 
     QFile file(tmpfilenamereceive);
 
     bool GotNextSuggestedTime = FALSE;
+    bool GotBlockedTime = FALSE;
 
     if (file.open(IO_ReadOnly)) 
     {
@@ -607,14 +610,31 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
         while (!stream.atEnd()) 
         {
             line = stream.readLine();
-            if (line.startsWith("<suggestedTime>"))
+            if (line.contains("<suggestedTime>", false))
             {
+                QString tmpStr = line;
+                tmpStr.replace(
+                      QRegExp(".*<suggestedTime>([^<]*)</suggestedTime>.*"),
+                              "\\1");
+
                 GotNextSuggestedTime = TRUE;
-                QDateTime UTCdt = QDateTime::fromString(line.mid(15,20),
-                                                        Qt::ISODate);
+                QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 NextSuggestedTime = MythUTCToLocal(UTCdt);
                 VERBOSE(VB_GENERAL, LOC + QString("NextSuggestedTime is: ") 
                         + NextSuggestedTime.toString(Qt::ISODate));
+            }
+
+            if (line.contains("<blockedTime>", false))
+            {
+                QString tmpStr = line;
+                tmpStr.replace(
+                      QRegExp(".*<blockedTime>([^<]*)</blockedTime>.*"), "\\1");
+
+                GotBlockedTime = TRUE;
+                QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
+                BlockedTime = MythUTCToLocal(UTCdt);
+                VERBOSE(VB_GENERAL, LOC + QString("BlockedTime is: ") 
+                        + BlockedTime.toString(Qt::ISODate));
             }
         }
         file.close();
