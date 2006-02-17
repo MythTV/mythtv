@@ -386,15 +386,13 @@ static GlobalComboBox *CommercialSkipMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
     bc->setLabel(QObject::tr("Commercial Skip Method"));
-    bc->addSelection(QObject::tr("Blank Frame Detection (default)"), "1");
+    bc->addSelection(QObject::tr("All Available Methods"), "255");
+    bc->addSelection(QObject::tr("Blank Frame Detection"), "1");
     bc->addSelection(QObject::tr("Blank Frame + Scene Change Detection"), "3");
     bc->addSelection(QObject::tr("Scene Change Detection"), "2");
     bc->addSelection(QObject::tr("Logo Detection"), "4");
-    bc->addSelection(QObject::tr("All"), "255");
     bc->setHelpText(QObject::tr("This determines the method used by MythTV to "
-                    "detect when commercials start and end.  You must have "
-                    "'Automatically Flag Commercials' enabled to use "
-                    "anything other than 'Blank Frame'." ));
+                    "detect when commercials start and end."));
     return bc;
 }
 

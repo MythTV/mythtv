@@ -485,7 +485,7 @@ int FlagCommercials(QString chanid, QString starttime)
     int breaksFound = 0;
     if (commDetectMethod==-1)
         commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
-                                                   COMM_DETECT_BLANKS);
+                                                   COMM_DETECT_ALL);
     QMap<long long, int> blanks;
     recorder = NULL;
     program_info = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
