@@ -262,6 +262,7 @@ private:
     DVBCardType        *cardtype;
     SignalTimeout      *signal_timeout;
     ChannelTimeout     *channel_timeout;
+    TransButtonSetting *buttonAnalog;
 };
 
 class CaptureCardGroup: public VerticalConfigurationGroup,
@@ -277,13 +278,15 @@ protected slots:
 class CaptureCard: public ConfigurationWizard {
     Q_OBJECT
 public:
-    CaptureCard();
+    CaptureCard(bool use_card_group = true);
 
     int  getCardID(void) const { return id->intValue(); }
 
     void loadByID(int id);
+    void setParentID(int id);
 
     static void fillSelections(SelectSetting* setting);
+    static void fillSelections(SelectSetting* setting, bool no_children);
 
     void load() {
         ConfigurationWizard::load();
@@ -291,6 +294,7 @@ public:
 
 public slots:
     void DiSEqCPanel();
+    void analogPanel();
     void recorderOptionsPanel();
 
 private:
@@ -306,6 +310,16 @@ private:
         };
     };
 
+    class ParentID: public CCSetting
+    {
+      public:
+        ParentID(const CaptureCard &parent) : CCSetting(parent, "parentid")
+        {
+            setValue("0");
+            setVisible(false);
+        }
+    };
+
     class Hostname: public HostnameSetting, public CCSetting {
     public:
         Hostname(const CaptureCard& parent): CCSetting(parent, "hostname") {};
@@ -313,6 +327,7 @@ private:
 
 private:
     ID       *id;
+    ParentID *parentid;
 };
 
 class CardInput;
@@ -414,6 +429,7 @@ class StartingChannel : public ComboBoxSetting, public CISetting
 };
 
 class CardID;
+class ChildID;
 class InputName;
 class SourceID;
 class DVBLNBChooser;
@@ -436,6 +452,7 @@ class CardInput: public ConfigurationWizard
     QString getSourceName(void) const;
 
     void fillDiseqcSettingsInput(QString _pos, QString _port);
+    void SetChildCardID(uint);
 
     virtual void save();
     virtual void save(QString /*destination*/) { save(); }
@@ -465,6 +482,7 @@ class CardInput: public ConfigurationWizard
 
     ID              *id;
     CardID          *cardid;
+    ChildID         *childid;
     InputName       *inputname;
     SourceID        *sourceid;
     DVBLNBChooser   *lnbsettings;

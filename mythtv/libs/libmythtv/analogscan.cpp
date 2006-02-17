@@ -81,7 +81,7 @@ void AnalogScan::doScan()
     struct CHANLIST *flist   = NULL;
     uint count               = 0;
 
-    QString device = CardUtil::GetVideoDevice(cardid);
+    QString device = CardUtil::GetVideoDevice(cardid, sourceid);
     QString input  = CardUtil::GetInputName(cardid, sourceid);
     if (device.isEmpty() || input.isEmpty())
         goto do_scan_end;

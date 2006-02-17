@@ -277,6 +277,9 @@ class TVRec : public QObject
     bool TuningPMTCheck(void);
     void TuningNewRecorder(void);
     void TuningRestartRecorder(void);
+    uint TuningCheckForHWChange(const TuningRequest&,
+                                QString &channum,
+                                QString &inputname);
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);

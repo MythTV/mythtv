@@ -218,24 +218,32 @@ void CaptureCardSetting::refresh()
     clearSelections();
 
     MSqlQuery query(MSqlQuery::InitCon());
-
-    QString thequery = QString(
+    query.prepare(
         "SELECT DISTINCT cardtype, videodevice, capturecard.cardid "
         "FROM capturecard, videosource, cardinput "
-        "WHERE videosource.sourceid = %1 AND "
+        "WHERE videosource.sourceid = :SOURCEID            AND "
         "      cardinput.sourceid   = videosource.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardtype in " CARDTYPES " AND "
-        "      capturecard.hostname = '%2';")
-        .arg(nSourceID).arg(gContext->GetHostName());
-    query.prepare(thequery);
+        "      capturecard.cardtype in " CARDTYPES "       AND "
+        "      capturecard.hostname = :HOSTNAME            AND "
+        "      ( ( cardinput.childcardid != '0' AND "
+        "          cardinput.childcardid  = capturecard.cardid ) OR "
+        "        ( cardinput.childcardid  = '0' AND "
+        "          cardinput.cardid       = capturecard.cardid ) "
+        "      )");
+    query.bindValue(":SOURCEID", nSourceID);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
     {
-        while (query.next())
-            addSelection("[ " + query.value(0).toString() + " : " +
-                         query.value(1).toString() + " ]",
-                         query.value(2).toString());
+        MythContext::DBError("CaptureCardSetting::refresh()", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        addSelection("[ " + query.value(0).toString() + " : " +
+                     query.value(1).toString() + " ]",
+                     query.value(2).toString());
     }
 }
 

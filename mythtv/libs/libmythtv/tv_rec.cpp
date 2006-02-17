@@ -2942,7 +2942,7 @@ QString TVRec::GetInput(void) const
     return QString::null;
 }
 
-/** \fn TVRec::SetInput(QString)
+/** \fn TVRec::SetInput(QString, uint)
  *  \brief Changes to the specified input.
  *
  *   You must call PauseRecorder(void) before calling this.
@@ -3272,12 +3272,54 @@ void TVRec::HandleTuning(void)
     }
 }
 
+/** \fn TVRec::TuningCheckForHWChange(const TuningRequest&,QString&,QString&)
+ *  \brief Returns cardid for device info row in capturecard if it changes.
+ */
+uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
+                                   QString &channum,
+                                   QString &inputname)
+{
+    if (!channel)
+        return 0;
+
+    uint curCardID = 0, newCardID = 0;
+    channum   = request.channel;
+    inputname = request.input;
+
+    if (request.program)
+        request.program->GetChannel(channum, inputname);
+
+    if (!channum.isEmpty() && inputname.isEmpty())
+        channel->CheckChannel(channum, inputname);
+
+    if (!inputname.isEmpty())
+    {
+        int current_input = channel->GetCurrentInputNum();
+        int new_input     = channel->GetInputByName(inputname);
+        curCardID = channel->GetInputCardID(current_input);
+        newCardID = channel->GetInputCardID(new_input);
+        VERBOSE(VB_IMPORTANT, LOC<<"HW Tuner: "<<curCardID<<"->"<<newCardID);
+    }
+
+    if (curCardID != newCardID)
+    {    
+        if (channum.isEmpty())
+            channum = GetStartChannel(newCardID, inputname);
+        return newCardID;
+    }
+
+    return 0;
+}
+
 /** \fn TVRec::TuningShutdowns(const TuningRequest&)
  *  \brief This shuts down anything that needs to be shut down 
  *         before handling the passed in tuning request.
  */
 void TVRec::TuningShutdowns(const TuningRequest &request)
 {
+    QString channum, inputname;
+    uint newCardID = TuningCheckForHWChange(request, channum, inputname);
+
 #ifdef USING_DVB_EIT
     if (!(request.flags & kFlagEITScan) && HasFlags(kFlagEITScannerRunning))
     {
@@ -3306,7 +3348,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
     // At this point any waits are canceled.
 
-    if ((request.flags & kFlagNoRec))
+    if (newCardID || (request.flags & kFlagNoRec))
     {
         if (HasFlags(kFlagDummyRecorderRunning))
         {
@@ -3330,6 +3372,21 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
         CloseChannel();
         // At this point the channel is shut down
+    }
+    
+    // handle HW change for digital/analog cards
+    if (newCardID)
+    {
+        VERBOSE(VB_IMPORTANT, "Recreating channel...");
+        channel->Close();
+        delete channel;
+        channel = NULL;
+
+        GetDevices(newCardID, genOpt, dvbOpt, fwOpt, dboxOpt);
+        genOpt.defaultinput = inputname;
+        CreateChannel(channum);
+        if (!(request.flags & kFlagNoRec))
+            channel->Open();
     }
 
     if (ringBuffer && (request.flags & kFlagKillRingBuffer))
@@ -3647,7 +3704,7 @@ void TVRec::TuningNewRecorder(void)
             SetFlags(kFlagRingBufferReady);
         }
         else
-            ok = SwitchLiveTVRingBuffer(true, !had_dummyrec);
+            ok = SwitchLiveTVRingBuffer(true, !had_dummyrec && recorder);
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 2");
@@ -3738,7 +3795,7 @@ void TVRec::TuningNewRecorder(void)
     if (GetV4LChannel())
         channel->SetFd(recorder->GetVideoFd());
 
-    SetFlags(kFlagRecorderRunning);
+    SetFlags(kFlagRecorderRunning | kFlagRingBufferReady);
 
     if (!tvchain)
         autoRunJobs = init_jobs(rec, profile, runJobOnHostOnly,

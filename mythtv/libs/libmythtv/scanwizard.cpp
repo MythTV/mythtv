@@ -307,7 +307,9 @@ void ScanWizardScanner::scan()
 {
     uint signal_timeout  = 1000;
     uint channel_timeout = 40000;
-    int  cardid  = parent->captureCard();
+    int  ccardid = parent->captureCard();
+    int  pcardid = CardUtil::GetParentCardID(ccardid);
+    int  cardid  = (pcardid) ? pcardid : ccardid;
     nScanType    = parent->scanType();
     nVideoSource = parent->videoSource();
     tunerthread_running = false;
@@ -316,7 +318,7 @@ void ScanWizardScanner::scan()
             QString("type(%1) src(%2) cardid(%3)")
             .arg(nScanType).arg(nVideoSource).arg(cardid));
 
-    CardUtil::GetTimeouts(cardid, signal_timeout, channel_timeout);
+    CardUtil::GetTimeouts(ccardid, signal_timeout, channel_timeout);
  
     if (nScanType == ScanTypeSetting::FullScan_Analog)
     {
@@ -392,12 +394,12 @@ void ScanWizardScanner::scan()
     {
         nMultiplexToTuneTo = parent->paneSingle->GetMultiplex();
 
-        QString device = CardUtil::GetVideoDevice(cardid);
+        QString device = CardUtil::GetVideoDevice(cardid, nVideoSource);
         if (device.isEmpty())
             return;
 
         QString cn, card_type;
-        int nCardType = CardUtil::GetCardType(cardid, cn, card_type);
+        int nCardType = CardUtil::GetCardType(ccardid, cn, card_type);
         (void) nCardType;
 #ifdef USING_DVB
         if (CardUtil::IsDVB(cardid))

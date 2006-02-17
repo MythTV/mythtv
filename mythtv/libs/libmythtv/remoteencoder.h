@@ -2,7 +2,7 @@
 #define REMOTEENCODER_H_
 
 #include <qstringlist.h>
-#include <pthread.h>
+#include <qmutex.h>
 #include <qmap.h>
 
 class ProgramInfo;
@@ -72,7 +72,7 @@ class RemoteEncoder
     int recordernum;
 
     QSocketDevice *controlSock;
-    pthread_mutex_t lock;
+    QMutex lock;
 
     QString remotehost;
     short remoteport;
@@ -81,7 +81,7 @@ class RemoteEncoder
 
     bool backendError;
     long long cachedFramesWritten;
-    uint cachedTimeout;
+    QMap<QString,uint> cachedTimeout;
 };
 
 #endif

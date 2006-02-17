@@ -1012,23 +1012,39 @@ void CaptureCardGroup::triggerChanged(const QString& value)
     TriggeredConfigurationGroup::triggerChanged(own);
 }
 
-CaptureCard::CaptureCard() 
+CaptureCard::CaptureCard(bool use_card_group) 
 {
     // must be first
     addChild(id = new ID());
-    addChild(new CaptureCardGroup(*this));
+    addChild(parentid = new ParentID(*this));
+    if (use_card_group)
+        addChild(new CaptureCardGroup(*this));
     addChild(new Hostname(*this));
+}
+
+void CaptureCard::setParentID(int id)
+{
+    parentid->setValue(QString::number(id));
 }
 
 void CaptureCard::fillSelections(SelectSetting* setting) 
 {
+    CaptureCard::fillSelections(setting, false);
+}
+
+void CaptureCard::fillSelections(SelectSetting* setting, bool no_children) 
+{
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
+    QString qstr =
         "SELECT cardtype, videodevice, cardid, "
         "       firewire_port, firewire_node, "
         "       dbox2_port, dbox2_host, dbox2_httpport "
         "FROM capturecard "
-        "WHERE hostname = :HOSTNAME");
+        "WHERE hostname = :HOSTNAME";
+    if (no_children)
+        qstr += " AND parentid='0'";
+
+    query.prepare(qstr);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -1115,6 +1131,16 @@ class CardID: public SelectLabelSetting, public CISetting {
     void fillSelections() {
         CaptureCard::fillSelections(this);
     };
+};
+
+class ChildID: public CISetting
+{
+  public:
+    ChildID(const CardInput &parent) : CISetting(parent, "childcardid")
+    {
+        setValue("0");
+        setVisible(false);
+    }
 };
 
 class InputDisplayName: public LineEditSetting, public CISetting
@@ -1425,6 +1451,9 @@ CardInput::CardInput(bool isDVBcard)
 
     addChild(group);
 
+    childid = new ChildID(*this);
+    addChild(childid);
+
     setName("CardInput");
     connect(scan,     SIGNAL(pressed()), SLOT(channelScanner()));
     connect(srcfetch, SIGNAL(pressed()), SLOT(sourceFetch()));
@@ -1435,6 +1464,11 @@ CardInput::CardInput(bool isDVBcard)
 QString CardInput::getSourceName(void) const
 {
     return sourceid->getSelectionLabel();
+}
+
+void CardInput::SetChildCardID(uint ccid)
+{
+    childid->setValue(QString::number(ccid));
 }
 
 void CardInput::channelScanner(void)
@@ -1595,7 +1629,7 @@ void CaptureCardEditor::load()
     clearSelections();
     addSelection(QObject::tr("(New capture card)"), "0");
     addSelection(QObject::tr("(Delete all capture cards)"), "-1");
-    CaptureCard::fillSelections(this);
+    CaptureCard::fillSelections(this, true);
 }
 
 MythDialog* CaptureCardEditor::dialogWidget(MythMainWindow* parent,
@@ -1672,7 +1706,9 @@ void CaptureCardEditor::del(void)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
-        query.prepare("DELETE FROM capturecard WHERE cardid = :CARDID");
+        query.prepare("DELETE FROM capturecard "
+                      "WHERE cardid   = :CARDID OR "
+                      "      parentid = :CARDID");
         query.bindValue(":CARDID", getValue());
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting Capture Card", query);
@@ -1813,7 +1849,8 @@ void CardInputEditor::load()
     query.prepare(
         "SELECT cardid, videodevice, cardtype "
         "FROM capturecard "
-        "WHERE hostname = :HOSTNAME");
+        "WHERE hostname = :HOSTNAME AND "
+        "      parentid = '0'");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive() || !query.size())
@@ -1894,6 +1931,10 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
             cardname->setValue(name);
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
+
+            if (name.left(6) == "pcHDTV")
+                buttonAnalog->setVisible(true);
+
             break;
         default:
             fEnable = false;
@@ -1939,8 +1980,6 @@ void TunerCardInput::fillSelections(const QString& device)
 
 void TunerCardInput::diseqcType(const QString &diseqcType)
 {
-    VERBOSE(VB_IMPORTANT, QString("TunerCardInput::diseqcType(%1)")
-            .arg(diseqcType));
     bool ok;
     int tmp = diseqcType.toInt(&ok);
     if (ok)
@@ -1979,12 +2018,17 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     TransButtonSetting *buttonDiSEqC = new TransButtonSetting();
     buttonDiSEqC->setLabel(tr("DiSEqC"));
 
+    buttonAnalog = new TransButtonSetting();
+    buttonAnalog->setLabel(tr("Analog Options"));
+    buttonAnalog->setVisible(false);
+
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));    
 
     HorizontalConfigurationGroup *advcfg = 
         new HorizontalConfigurationGroup(false, false, true, true);
     advcfg->addChild(buttonDiSEqC);
+    advcfg->addChild(buttonAnalog);
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
 
@@ -2000,6 +2044,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
             this,         SLOT(  probeCard   (const QString&)));
     connect(buttonDiSEqC, SIGNAL(pressed()),
             &parent,      SLOT(  DiSEqCPanel()));
+    connect(buttonAnalog, SIGNAL(pressed()),
+            &parent,      SLOT(  analogPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
             &parent,      SLOT(  recorderOptionsPanel()));
     connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
@@ -2016,6 +2062,28 @@ void CaptureCard::reload(void)
         save();
         load();
     }
+}
+
+void CaptureCard::analogPanel()
+{
+    reload();
+
+    uint    cardid       = getCardID();
+    uint    child_cardid = CardUtil::GetChildCardID(cardid);
+    QString devname = "Unknown";
+    QString dev = CardUtil::GetVideoDevice(cardid);
+    if (!dev.isEmpty())
+        devname = QString("[ DVB : %1 ]").arg(devname);
+
+    CaptureCard *card = new CaptureCard(false);
+    card->addChild(new V4LConfigurationGroup(*card));
+    if (child_cardid)
+        card->loadByID(child_cardid);
+    else
+        card->setParentID(cardid);
+    card->setLabel(tr("Analog Options for ") + devname);
+    card->exec();
+    delete card;
 }
 
 void CaptureCard::recorderOptionsPanel()

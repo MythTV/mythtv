@@ -216,6 +216,30 @@ QString CardUtil::GetVideoDevice(uint cardid)
     return QString::null;
 }
 
+QString CardUtil::GetVideoDevice(uint cardid, uint sourceid)
+{
+    QString device = QString::null;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice "
+                  "FROM capturecard, cardinput "
+                  "WHERE sourceid         = :SOURCEID AND "
+                  "      cardinput.cardid = :CARDID   AND "
+                  "      ( ( cardinput.childcardid != '0' AND "
+                  "          cardinput.childcardid  = capturecard.cardid ) OR "
+                  "        ( cardinput.childcardid  = '0' AND "
+                  "          cardinput.cardid       = capturecard.cardid ) )");
+    query.bindValue(":CARDID", cardid);
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("CardUtil::GetVideoDevice() 2", query);
+    else if (query.next())
+        device = query.value(0).toString();
+
+    return device;    
+}
+
 /** \fn CardUtil::GetCardID(const QString&, QString)
  *  \brief Returns the cardid of the card that uses the specified
  *         videodevice, and optionally a non-local hostname.
@@ -242,6 +266,44 @@ int CardUtil::GetCardID(const QString &videodevice, QString hostname)
         return query.value(0).toInt();
 
     return -1;
+}
+
+uint CardUtil::GetChildCardID(uint cardid)
+{
+    // check if child card definition does exist
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid "
+        "FROM capturecard "
+        "WHERE parentid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    int ret = 0;
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("CaptureCard::GetChildCardID()", query);
+    else if (query.next())
+        ret = query.value(0).toInt();
+
+    return ret;
+}
+
+uint CardUtil::GetParentCardID(uint cardid)
+{
+    // check if child card definition does exists
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT parentid "
+        "FROM capturecard "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    int ret = 0;
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("CaptureCard::GetParentCardID()", query);
+    else if (query.next())
+        ret = query.value(0).toInt();
+
+    return ret;
 }
 
 /** \fn CardUtil::GetVideoDevice(uint, QString&, QString&)
@@ -510,6 +572,8 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype,
     else
         ret += probeV4LInputs(device);
 
+    ret += probeChildInputs(device);
+
     return ret;
 }
 
@@ -564,6 +628,30 @@ QStringList CardUtil::probeDVBInputs(QString device, int diseqc_type)
 #else
     ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
 #endif
+    return ret;
+}
+
+QStringList CardUtil::probeChildInputs(QString device)
+{
+    QStringList ret;
+
+    int cardid = CardUtil::GetCardID(device);
+    if (cardid <= 0)
+        return ret;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice, cardtype "
+                  "FROM capturecard "
+                  "WHERE parentid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        return ret;
+
+    while (query.next())
+        ret += probeInputs(query.value(0).toString(),
+                           query.value(1).toString());
+
     return ret;
 }
 
@@ -677,9 +765,10 @@ void CardUtil::GetCardInputs(
     QString             device,
     QString             cardtype,
     QStringList        &inputLabels,
-    vector<CardInput*> &cardInputs)
+    vector<CardInput*> &cardInputs,
+    int                 parentid)
 {
-    int rcardid = cardid;
+    int rcardid = (parentid) ? parentid : cardid;
     QStringList inputs;
 
     if (("FIREWIRE" == cardtype) || ("DBOX2" == cardtype))
@@ -687,13 +776,15 @@ void CardUtil::GetCardInputs(
     else if ("DVB" != cardtype)
         inputs += probeV4LInputs(device);
 
-    QString dev_label = GetDeviceLabel(cardid, cardtype, device);
+    QString dev_label = (parentid) ? " -> " : "";
+    dev_label += GetDeviceLabel(cardid, cardtype, device);
 
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
         CardInput* cardinput = new CardInput(true);
         cardinput->loadByInput(rcardid, (*it));
+        cardinput->SetChildCardID((parentid) ? cardid : 0);
         inputLabels.push_back(
             dev_label + QString(" (%1) -> %2")
             .arg(*it).arg(cardinput->getSourceName()));
@@ -711,10 +802,31 @@ void CardUtil::GetCardInputs(
             CardInput* cardinput = new CardInput(true);
             cardinput->loadByInput(rcardid, (*it).input);
             cardinput->fillDiseqcSettingsInput((*it).position,(*it).port);
+            cardinput->SetChildCardID((parentid) ? cardid : 0);
             inputLabels.push_back(
                 dev_label + QString(" (%1) -> %2")
                 .arg((*it).input).arg(cardinput->getSourceName()));
             cardInputs.push_back(cardinput);            
         }
+    }
+
+    if (parentid)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardid, videodevice, cardtype "
+                  "FROM capturecard "
+                  "WHERE parentid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        return;
+
+    while (query.next())
+    {
+        GetCardInputs(query.value(0).toUInt(),
+                      query.value(1).toString(),
+                      query.value(2).toString(),
+                      inputLabels, cardInputs, cardid);
     }
 }

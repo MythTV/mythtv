@@ -169,6 +169,14 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
     return ok;
 }
 
+uint ChannelBase::GetInputCardID(int inputNum) const
+{
+    InputMap::const_iterator it = inputs.find(inputNum);
+    if (it != inputs.end())
+        return (*it)->cardid;
+    return 0;    
+}
+
 bool ChannelBase::ChangeExternalChannel(const QString &channum)
 {
     InputMap::const_iterator it = inputs.find(currentInputID);
@@ -387,7 +395,13 @@ int ChannelBase::GetCardID(void) const
     if (GetDevice().isEmpty())
         return -1;
 
-    return CardUtil::GetCardID(GetDevice());
+    int tmpcardid = CardUtil::GetCardID(GetDevice());
+    if (tmpcardid > 0)
+    {
+        uint pcardid = CardUtil::GetParentCardID(tmpcardid);
+        tmpcardid = (pcardid) ? pcardid : tmpcardid;
+    }
+    return tmpcardid;
 }
 
 /** \fn DVBChannel::InitializeInputs(void)
@@ -410,7 +424,7 @@ void ChannelBase::InitializeInputs(void)
         "SELECT cardinputid, "
         "       inputname,   startchan, "
         "       tunechan,    externalcommand, "
-        "       sourceid "
+        "       sourceid,    childcardid "
         "FROM cardinput "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
@@ -431,10 +445,14 @@ void ChannelBase::InitializeInputs(void)
 
     while (query.next())
     {
+        // If there is a childcardid use it instead of cardid
+        uint inputcardid = query.value(6).toUInt();
+        inputcardid = (inputcardid) ? inputcardid : cardid;
+
         inputs[query.value(0).toUInt()] = new InputBase(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
-            query.value(5).toUInt());
+            query.value(5).toUInt(),   inputcardid);
     }
 
     // Set initial input to first connected input
@@ -446,9 +464,9 @@ void ChannelBase::InitializeInputs(void)
     for (it = inputs.begin(); it != inputs.end(); ++it)
     {
         VERBOSE(VB_CHANNEL, LOC + QString("Input #%1: '%2' schan(%3) "
-                                          "sourceid(%4)")
+                                          "sourceid(%4) ccid(%5)")
                 .arg(it.key()).arg((*it)->name).arg((*it)->startChanNum)
-                .arg((*it)->sourceid));
+                .arg((*it)->sourceid).arg((*it)->cardid));
     }
     VERBOSE(VB_CHANNEL, LOC + QString("Current Input #%1: '%2'")
             .arg(GetCurrentInputNum()).arg(GetCurrentInput()));

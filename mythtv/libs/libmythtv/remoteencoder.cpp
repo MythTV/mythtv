@@ -13,9 +13,8 @@ using namespace std;
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
       remoteport(port),       lastchannel(""),        backendError(false),
-      cachedFramesWritten(0), cachedTimeout(0)
+      cachedFramesWritten(0)
 {
-    pthread_mutex_init(&lock, NULL); 
 }
 
 RemoteEncoder::~RemoteEncoder()
@@ -44,10 +43,9 @@ int RemoteEncoder::GetRecorderNumber(void)
 
 void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
 {
+    QMutexLocker locker(&lock);
     if (!controlSock)
         return;
-
-    pthread_mutex_lock(&lock);
 
     backendError = false;
 
@@ -58,8 +56,6 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
                 "RemoteEncoder::SendReceiveStringList(): No response.");
         backendError = true;
     }
-
-    pthread_mutex_unlock(&lock);
 }
 
 QSocketDevice *RemoteEncoder::openControlSocket(const QString &host, short port)
@@ -407,17 +403,27 @@ int RemoteEncoder::SetSignalMonitoringRate(int rate, bool notifyFrontend)
     return retval;
 }
 
-uint RemoteEncoder::GetSignalLockTimeout(QString /*input*/)
+uint RemoteEncoder::GetSignalLockTimeout(QString input)
 {
-    if (cachedTimeout)
-        return cachedTimeout;
+    QMutexLocker locker(&lock);
+
+    QMap<QString,uint>::const_iterator it = cachedTimeout.find(input);
+    if (it != cachedTimeout.end())
+        return *it;
 
     uint cardid  = recordernum;
     uint timeout = 0xffffffff;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT channel_timeout, cardtype "
-                  "FROM capturecard "
-                  "WHERE cardid = :CARDID");
+    query.prepare(
+        "SELECT channel_timeout, cardtype "
+        "FROM cardinput, capturecard "
+        "WHERE cardinput.inputname = :INNAME AND "
+        "      cardinput.cardid    = :CARDID AND "
+        "      ( ( cardinput.childcardid =  '0' AND "
+        "          cardinput.cardid = capturecard.cardid) OR "
+        "        ( cardinput.childcardid != '0' AND "
+        "          cardinput.childcardid = capturecard.cardid) )");
+    query.bindValue(":INNAME", input);
     query.bindValue(":CARDID", cardid);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Getting timeout", query);
@@ -430,7 +436,7 @@ uint RemoteEncoder::GetSignalLockTimeout(QString /*input*/)
             QString("GetSignalLockTimeout(%1): Set lock timeout to %2 ms")
             .arg(cardid).arg(timeout));
 */
-    cachedTimeout = timeout;
+    cachedTimeout[input] = timeout;
     return timeout;
 }
 

@@ -108,7 +108,10 @@ bool setupTVs(bool ismaster, bool &error)
         }
     }
 
-    query.exec("SELECT cardid,hostname FROM capturecard ORDER BY cardid;");
+    query.exec("SELECT cardid, hostname "
+               "FROM capturecard "
+               "WHERE parentid = '0' "
+               "ORDER BY cardid");
 
     if (query.isActive() && query.size())
     {

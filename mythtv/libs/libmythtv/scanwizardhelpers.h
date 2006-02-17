@@ -204,7 +204,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
   public:
     enum Type
     {
-        Error_Open,
+        Error_Open = 0,
         Error_Probe,
         FullScan_Analog,
         FullScan_ATSC,

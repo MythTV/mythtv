@@ -739,7 +739,9 @@ void StatusBox::doTunerStatus()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardid, cardtype, videodevice "
-        "FROM capturecard ");
+        "FROM capturecard "
+        "WHERE parentid='0'");
+
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("StatusBox::doTunerStatus()", query);

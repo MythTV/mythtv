@@ -25,16 +25,16 @@ class InputBase
     InputBase() :
         name(QString::null),            startChanNum(QString::null),
         tuneToChannel(QString::null),   externalChanger(QString::null),
-        sourceid(0),
+        sourceid(0),                    cardid(0),
         inputNumV4L(-1),
         videoModeV4L1(0),               videoModeV4L2(0) {}
 
     InputBase(QString _name,            QString _startChanNum,
               QString _tuneToChannel,   QString _externalChanger,
-              uint    _sourceid) :
+              uint    _sourceid,        uint    _cardid) :
         name(_name),                    startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
-        sourceid(_sourceid),
+        sourceid(_sourceid),            cardid(_cardid),
         inputNumV4L(-1),
         videoModeV4L1(0),               videoModeV4L2(0) {}
 
@@ -46,6 +46,7 @@ class InputBase
     QString tuneToChannel;   // for using a cable box & S-Video/Composite
     QString externalChanger; // for using a cable box...
     uint    sourceid;        // associated channel listings source
+    uint    cardid;          // input card id
     int     inputNumV4L;
     int     videoModeV4L1;
     int     videoModeV4L2;
@@ -95,6 +96,7 @@ class ChannelBase
         { return inputs[GetNextInputNum()]->name; }
     virtual QString GetNextInputStartChan(void)
         { return inputs[GetNextInputNum()]->startChanNum; }
+    virtual uint GetInputCardID(int inputNum) const;
     virtual QStringList GetConnectedInputs(void) const;
     virtual QString GetOrdering(void) const
         { return channelorder; }

@@ -70,6 +70,8 @@ class CardUtil
 
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
+    static uint         GetChildCardID(uint cardid);
+    static uint         GetParentCardID(uint cardid);
 
     static bool         IsCardTypePresent(const QString &strType);
 
@@ -81,6 +83,7 @@ class CardUtil
     static bool         GetVideoDevice(uint cardid, QString& device,
                                        QString& vbi);
     static QString      GetVideoDevice(uint cardid);
+    static QString      GetVideoDevice(uint cardid, uint sourceid);
 
     static QString      GetDefaultInput(uint cardid);
     static QString      GetInputName(uint cardid, uint sourceid);
@@ -96,7 +99,8 @@ class CardUtil
                                       QString             device,
                                       QString             cardtype,
                                       QStringList        &inputLabels,
-                                      vector<CardInput*> &cardInputs);
+                                      vector<CardInput*> &cardInputs,
+                                      int                 parentid = 0);
     // DTV info
     static bool         GetTimeouts(uint cardid,
                                     uint &signal_timeout,
@@ -119,6 +123,7 @@ class CardUtil
   private:
     static QStringList  probeV4LInputs(QString device);
     static QStringList  probeDVBInputs(QString device, int diseqctype = -1);
+    static QStringList  probeChildInputs(QString device);
 
     static QStringList  fillDVBInputs(int dvb_diseqc_type);
     static DiSEqCList   fillDVBInputsDiSEqC(int dvb_diseqc_type);
