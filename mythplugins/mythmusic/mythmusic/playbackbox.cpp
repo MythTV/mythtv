@@ -397,7 +397,9 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                                             160, 160);
                 setUpdatesEnabled(true);
                 mainvisual->setVisual(visual_workaround);
-                handled = true;
+
+                if (!m_parent->IsExitingToMain())
+                    handled = true;
             }
         }
     }
