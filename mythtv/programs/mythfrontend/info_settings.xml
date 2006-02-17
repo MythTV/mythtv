@@ -18,6 +18,7 @@
      <text lang="SI">Nastavitve vremena</text>
      <text lang="ET">Ilmateate seaded</text>
      <text lang="NB">Innstillinger for vær</text>
+     <text lang="CZ">Nastavení počasí</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -40,6 +41,7 @@
      <text lang="NB">Innstillinger for nyheter</text>
      <text lang="DK">Nyheds indstillinger</text>
      <text lang="PT">Configurar Notícias</text>
+     <text lang="CZ">Nastavení zpráv</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -54,6 +56,7 @@
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="DE">Kinoprogramm</text>
      <text lang="NL">Bioscoop Tijden</text>
+     <text lang="CZ">Nastavení programů kin</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -88,6 +91,7 @@
      <text lang="DK">Web instillinger</text>
      <text lang="ES">Configurar Web</text>
      <text lang="PT">Configurar Navegação Web</text>
+     <text lang="CZ">Nastavení webu</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -108,6 +112,7 @@
      <text lang="DK">Opskrifts indstillinger</text>
      <text lang="ES">Configurar Recetas</text>
      <text lang="PT">Configurar Receitas</text>
+     <text lang="CZ">Nastavení receptů</text>
      <alttext lang="ET">Retseptid</alttext>
      <alttext lang="PT">Receitas</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

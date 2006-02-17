@@ -19,6 +19,7 @@
       <text lang="SI">Glej TV</text>
       <text lang="ET">Vaata telerit</text>
       <text lang="NB">Se på TV</text>
+      <text lang="CZ">Sledovat TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -39,6 +40,7 @@
      <text lang="DK">Mediabibliotek</text>
      <text lang="ES">Mediateca</text>
      <text lang="PT">Galeria Multimédia</text>
+     <text lang="CZ">Multimediální katalog</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
      <alttext lang="PT">Galeria</alttext>
@@ -64,6 +66,7 @@
       <text lang="SI">Urejanje snemanj</text>
       <text lang="ET">Salvestamine</text>
       <text lang="NB">Behandle opptak</text>
+      <text lang="CZ">Spravovat nahrávky</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ES">Programar</alttext>
@@ -89,6 +92,7 @@
      <text lang="ES">Centro de Información</text>
      <text lang="EN_GB">Information Centre</text>
      <text lang="PT">Centro de Informação</text>
+     <text lang="CZ">Centrum informací</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
@@ -116,6 +120,7 @@
      <text lang="ES">CD/DVD</text>
      <text lang="EN_GB">CD/DVD</text>
      <text lang="PT">CD/DVD</text>
+     <text lang="CZ">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -139,6 +144,7 @@
      <text lang="SI">Nastavitve</text>
      <text lang="ET">Utiliidid / seaded</text>
      <text lang="NB">Verktøy/Oppsett</text>
+     <text lang="CZ">Pomůcky</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <alttext lang="ET">Seaded</alttext>

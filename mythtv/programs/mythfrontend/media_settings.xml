@@ -18,6 +18,7 @@
      <text lang="SI">Glasbene nastavitve</text>
      <text lang="ET">Muusika seaded</text>
      <text lang="NB">Musikkinnstillinger</text>
+     <text lang="CZ">Nastavení muziky</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -40,6 +41,7 @@
        <text lang="SI">Video nastavitve</text>
        <text lang="ET">Video seaded</text>
        <text lang="NB">Videoinnstillinger</text>
+       <text lang="CZ">Nastavení videa</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -61,6 +63,7 @@
      <text lang="SI">DVD nastavitve</text>
      <text lang="ET">DVD seaded</text>
      <text lang="NB">DVD-innstillinger</text>
+     <text lang="CZ">Nastavení DVD</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -83,6 +86,7 @@
       <text lang="SI">Nastavitve slik</text>
       <text lang="ET">Galerii seaded</text>
       <text lang="NB">Bildeinnstillinger</text>
+      <text lang="CZ">Nastavení obrázků</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>

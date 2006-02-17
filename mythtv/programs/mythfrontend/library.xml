@@ -19,6 +19,7 @@
       <text lang="SI">Gledanje snemanj</text>
       <text lang="ET">Vaata salvestisi</text>
       <text lang="NB">Se på opptak</text>
+      <text lang="CZ">Sledování nahrávek</text>
       <alttext lang="SV">Inspelningar</alttext>
       <alttext lang="ET">Salvestised</alttext>
       <action>TV_WATCH_RECORDING</action>
@@ -42,6 +43,7 @@
      <text lang="SI">Gledanje filmov</text>
      <text lang="ET">Vaata videot</text>
      <text lang="NB">Se på videoer</text>
+     <text lang="CZ">Sledovat filmy</text>
      <alttext lang="SV">Filmer</alttext>
      <alttext lang="ET">Video</alttext>
      <action>JUMP MythVideo</action>
@@ -67,6 +69,7 @@
       <text lang="SI">Predvajanje glasbe</text>
       <text lang="ET">Kuula muusikat</text>
       <text lang="NB">Hør på musikk</text>
+      <text lang="CZ">Poslouchat muziku</text>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -87,6 +90,7 @@
      <text lang="DK">Hør radio</text>
      <text lang="ES">Escuchar Radio</text>
      <text lang="PT">Ouvir Rádio</text>
+     <text lang="CZ">Poslouchat rádio</text>
      <alttext lang="SV">Radio</alttext>
      <alttext lang="PT">Rádio</alttext>
      <alttext lang="ET">Raadio</alttext>
@@ -113,6 +117,7 @@
      <text lang="SI">Gledanje slik</text>
      <text lang="ET">Pildialbum</text>
      <text lang="NB">Bildegalleri</text>
+     <text lang="CZ">Galerie fotek</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -136,6 +141,7 @@
      <text lang="SI">Igranje iger</text>
      <text lang="ET">Mängud</text>
      <text lang="NB">Spill</text>
+     <text lang="CZ">Hrát hry</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

@@ -19,6 +19,7 @@
       <text lang="SI">Planiranje snemanj</text>
       <text lang="ET">Planeeri salvestamisi</text>
       <text lang="NB">Planlegg opptak</text>
+      <text lang="CZ">Plánovat nahrávky</text>
       <alttext lang="SV">Schemalägg</alttext>
       <alttext lang="DE">Planung</alttext>
       <action>MENU tv_schedule.xml</action>
@@ -41,6 +42,7 @@
       <text lang="DK">Prioriteter</text>
       <text lang="ES">Fijar Prioridades</text>
       <text lang="PT">Definir Prioridades</text>
+      <text lang="CZ">Nastavit priority</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -63,6 +65,7 @@
       <text lang="SI">Prihajajoča snemanja</text>
       <text lang="ET">Tulevased salvestamised</text>
       <text lang="NB">Planlagte opptak</text>
+      <text lang="CZ">Nadcházející nahrávky</text>
       <alttext lang="SV">Kommande</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
@@ -86,6 +89,7 @@
       <text lang="SI">Brisanje snemanj</text>
       <text lang="ET">Kustuta salvestisi</text>
       <text lang="NB">Slett opptak</text>
+      <text lang="CZ">Smazat nahrávky</text>
       <alttext lang="SV">Radera</alttext>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="ET">Kustuta</alttext>
@@ -109,6 +113,7 @@
       <text lang="NB">Tidligere optagelser</text>
       <text lang="ES">Grabados Anteriormente</text>
       <text lang="PT">Gravações Feitas</text>
+      <text lang="CZ">Dříve nahráno</text>
       <alttext lang="SV">Tidigare</alttext>
       <action>TV_PREVIOUS</action>
    </button>

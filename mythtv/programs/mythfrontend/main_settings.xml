@@ -19,6 +19,7 @@
       <text lang="SI">Splošno</text>
       <text lang="ET">Üldine</text>
       <text lang="NB">Generelt</text>
+      <text lang="CZ">Obecné</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -41,6 +42,7 @@
       <text lang="SI">Vzgled</text>
       <text lang="ET">Kujundus</text>
       <text lang="NB">Utseende</text>
+      <text lang="CZ">Vzhled</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -61,6 +63,7 @@
      <text lang="NB">TV</text>
      <text lang="DK">TV</text>
      <text lang="PT">Configurar Televisão</text>
+     <text lang="CZ">Nastavení televize</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -81,6 +84,7 @@
      <text lang="DK">Media</text>
      <text lang="ES">Medios</text>
      <text lang="PT">Configurar Multimédia</text>
+     <text lang="CZ">Nastavení multimédií</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -103,6 +107,7 @@
      <text lang="ES">Centro Información</text>
      <text lang="EN_GB">Info Centre Settings</text>
      <text lang="PT">Config. Centro de Info.</text>
+     <text lang="CZ">Nastavení informačního centra</text>
      <alttext lang="DE">Infocenter</alttext>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends> 
@@ -126,6 +131,7 @@
      <text lang="ET">Xbox-i seaded</text>
      <text lang="NB">X-Box</text>
      <text lang="DK">X-Box</text>
+     <text lang="CZ">Nastavení XBOXu</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -145,6 +151,7 @@
       <text lang="DK">Telefon</text>
       <text lang="ES">Teléfono</text>
       <text lang="PT">Configurar Telefone</text>
+      <text lang="CZ">Nastavení telefonu</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

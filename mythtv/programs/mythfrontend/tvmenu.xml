@@ -19,6 +19,7 @@
       <text lang="SI">Gledanje TV</text>
       <text lang="ET">Vaata telerit</text>
       <text lang="NB">Se på TV</text>
+      <text lang="CZ">Sledovat TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -41,6 +42,7 @@
       <text lang="SI">Plan snemanj</text>
       <text lang="ET">Plaani salvestamisi</text>
       <text lang="NB">Planlegg opptak</text>
+      <text lang="CZ">Plánovat nahrávky</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Planification</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -78,6 +80,7 @@
       <text lang="SI">Predvajanje snemanj</text>
       <text lang="ET">Vaata salvestisi</text>
       <text lang="NB">Se på opptak</text>
+      <text lang="CZ">Sledovat nahrávky</text>
       <alttext lang="ET">Salvestised</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
@@ -101,6 +104,7 @@
       <text lang="SI">Brisanje snemanj</text>
       <text lang="ET">Kustuta salvestisi</text>
       <text lang="NB">Slett opptak</text>
+      <text lang="CZ">Mazat nahrávky</text>
       <alttext lang="ET">Kustuta</alttext>
       <alttext lang="DE">Löschen</alttext>
       <action>TV_DELETE</action>
@@ -141,6 +145,7 @@
       <text lang="ES">Estado Sistema</text>
       <text lang="DK">Systemstatus</text>
       <text lang="PT">Estado do Sistema</text>
+      <text lang="CZ">Stav systému</text>
       <action>TV_STATUS</action>
    </button>
 

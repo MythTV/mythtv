@@ -18,6 +18,7 @@
       <text lang="SI">Predvajaj DVD</text>
       <text lang="ET">Mängi DVD-d</text>
       <text lang="NB">Se på DVD</text>
+      <text lang="CZ">Přehrát DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -40,6 +41,7 @@
       <text lang="SI">Predvajaj VCD</text>
       <text lang="ET">Mängi VCD-d</text>
       <text lang="NB">Se på VCD</text>
+      <text lang="CZ">Přehrát VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythdvd</depends>
    </button>
@@ -63,6 +65,7 @@
       <text lang="SI">Ripanje DVD</text>
       <text lang="ET">DVD rippimine</text>
       <text lang="NB">Importer DVD</text>
+      <text lang="CZ">Načíst DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -75,6 +78,7 @@
       <text lang="PT">Gravar DVD</text>
       <text lang="DE">DVD brennen</text>
       <text lang="NL">DVD Branden</text>
+      <text lang="CZ">Vypálit DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -98,6 +102,7 @@
       <text lang="SI">Ripanje CD</text>
       <text lang="ET">CD rippimine</text>
       <text lang="NB">Importer CD</text>
+      <text lang="CZ">Načíst CD</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>

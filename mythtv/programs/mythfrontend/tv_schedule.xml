@@ -20,6 +20,7 @@
       <text lang="ET">Telekava</text>
       <text lang="NB">Programoversikt</text>
       <text lang="EN_GB">Programme Guide</text>
+      <text lang="CZ">Programový průvodce</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Guía</alttext>
@@ -58,6 +59,7 @@
       <text lang="ET">Programmiotsija</text>
       <text lang="NB">Programfinner</text>
       <text lang="EN_GB">Programme Finder</text>
+      <text lang="CZ">Vyhledávač programů</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -93,6 +95,7 @@
       <text lang="DK">Søg ord</text>
       <text lang="ES">Buscar Palabras</text>
       <text lang="PT">Pesquisar Palavras</text>
+      <text lang="CZ">Hledat slova</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -124,6 +127,7 @@
       <text lang="DK">Søg i lister</text>
       <text lang="ES">Buscar Listas</text>
       <text lang="PT">Pesquisar Listas</text>
+      <text lang="CZ">Hledat seznamy</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="IS">Listar</alttext>
@@ -187,6 +191,7 @@
       <text lang="DK">Brugerstyret optagelse</text>
       <text lang="ES">Avanzada</text>
       <text lang="PT">Regras de Gravação</text>
+      <text lang="CZ">Volné nahrávání</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -209,6 +214,7 @@
       <text lang="ET">Käsitsi salvestamine</text>
       <text lang="NB">Manuelt opptak</text>
       <text lang="ES">Programación Manual</text>
+      <text lang="CZ">Ruční plánování</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
