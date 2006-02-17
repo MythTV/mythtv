@@ -71,7 +71,7 @@ my $dbhost = $host;
 my $database = "mythconverg";
 my $user = "mythtv";
 my $pass = "mythtv";
-my $ext = "nuv";
+my $ext = "{nuv,mpg,mpeg,avi}";
 my $file = "";
 my @answers;
 my $norename = 0;
@@ -126,7 +126,8 @@ if ($argc == 0) {
       --quick_run     - don't prompt for title/subtitle/description just
                         use the default
       --test_mode     - do everything except update the database
-      --ext           - file extensions to scan for
+      --ext           - file extensions to scan. csh/File::Glob syntax
+                        is used (ie, --ext {mpg,avi,divx})
       --file          - specific file to import
       --answer        - command-line response to prompts (give as many
                         answers as you like)
@@ -141,6 +142,11 @@ if ($argc == 0) {
       Assumption: The script is run on a backend other than the DB machine.
 		
         $script_name --dbhost=mydbserver
+
+    Example 3:
+      Import one specific file and first few supply answers.
+		
+        $script_name --file MyVideo.avi --answer y --answer 1041 --answer \"My Video\"
 ";
 	exit(0);
 }
@@ -228,12 +234,13 @@ print "your database to see if the exist.  If they do not, you will be prompted\
 print "for a title and subtitle of the entry, and a record will be created.\n\n";
 
 my @files = $file ? ($dir . "/" . $file) : glob("$dir/*.$ext");
+print "@files\n";
 
 foreach my $show (@files) {
     my $showBase = basename($show);
 
-    my $found_title = $dbh->selectrow_array("select title from recorded where hostname=(?) and basename=(?)",
-                                            undef, $host, $showBase);
+    my $found_title = $dbh->selectrow_array("select title from recorded where basename=(?)",
+                                            undef, $showBase);
 
     if ($found_title) {
         print("Found a match between file and database\n");
@@ -261,7 +268,7 @@ foreach my $show (@files) {
     if ($showBase =~ m/$channel_regx\_/) {
         $channel = $1;
     } else {
-        $channel = "0000";
+        $channel = $dbh->selectrow_array("select min(chanid) from channel");
     }
 
     if ($showBase =~ m/$channel_regx\_$date_regx\./) {
@@ -359,6 +366,7 @@ foreach my $show (@files) {
         if ($mythfile ne $showBase) {
             rename($show, $dir. "/" . $mythfile);
         }
+
     }
 
     
@@ -374,7 +382,8 @@ foreach my $show (@files) {
              ? "--file" : "--video") .
              " " . $mythfile;
         if (!$test_mode) {
-            exec($commflag);
+            system($commflag);
+            print "\n"; # cursor isn't always on a new line after commflagging
         } else { 
             print("Test mode: exec would have done\n"); 
             print("  Exec: '", $commflag, "'\n");
