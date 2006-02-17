@@ -19,206 +19,148 @@
  * 
  * ============================================================ */
 
-#include <iostream>
+// ANSI C headers
+#include <cmath>
 
+// C++ headers
+#include <algorithm>
+using namespace std;
+
+// Qt headers
 #include <qapplication.h>
 #include <qpixmap.h>
 #include <qpainter.h>
 #include <qimage.h>
 #include <qcolor.h>
 
+// MythTV headers
 #include "mythcontext.h"
 #include "mythdialogs.h"
-
 #include "osdlistbtntype.h"
 
+#define LOC QString("OSDListTreeType: ")
+#define LOC_ERR QString("OSDListTreeType, Error: ")
 
-OSDGenericTree::OSDGenericTree(OSDGenericTree *parent, const QString &name, 
-                               const QString &action, int check, 
-                               OSDTypeImage *image, QString group)
-              : GenericTree(name)
+static QRect unbias(QRect rect, float wmult, float hmult)
 {
-    m_checkable = check;
-    m_action = action;
-    m_image = image;
-    m_parentButton = NULL;
-
-    if (group != "")
-        m_group = group;
-    else
-        m_group = action;
-
-    if (!action.isEmpty() && !action.isNull())
-        setSelectable(true);
-
-    if (parent)
-        parent->addNode(this);
+    return QRect((int)round(rect.x()      / wmult),
+                 (int)round(rect.y()      / hmult),
+                 (int)ceil( rect.width()  / wmult),
+                 (int)ceil( rect.height() / hmult));
 }
 
-////////////////////////////////////////////////////////////////////////////
-
-OSDListTreeType::OSDListTreeType(const QString &name, const QRect &area,
-                                 const QRect &levelsize, int levelspacing,
-                                 float wmult, float hmult)
-               : OSDType(name)
+static QRect bias(QRect rect, float wmult, float hmult)
 {
-    m_wmult = wmult;
-    m_hmult = hmult;
-
-    m_totalarea = area;
-    m_levelsize = levelsize;
-    m_levelspacing = levelspacing;
-
-    if (gContext->GetNumSetting("UseArrowAccels", 1))
-        m_arrowAccel = true;
-    else
-        m_arrowAccel = false;
-    
-    levels = 0;
-    curlevel = -1;
-
-    treetop = NULL;
-    currentpos = NULL;
-
-    currentlevel = NULL;
-
-    listLevels.setAutoDelete(true);
-
-    m_active = NULL;
-    m_inactive = NULL;
-
-    SetItemRegColor(Qt::black,QColor(80,80,80),100);
-    SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
-
-    m_spacing = 0;
-    m_margin = 0;
+    return QRect((int)round(rect.x()      * wmult),
+                 (int)round(rect.y()      * hmult),
+                 (int)ceil( rect.width()  * wmult),
+                 (int)ceil( rect.height() * hmult));
 }
 
-void OSDListTreeType::Reinit(float wchange, float hchange, float wmult,
-                             float hmult)
+OSDListTreeType::OSDListTreeType(
+    const QString &name,      const QRect &area,
+    const QRect   &levelsize, int          levelspacing,
+    float          wmult,     float        hmult)
+    : OSDType(name),
+      treetop(NULL),                    currentpos(NULL),
+      m_active(NULL),                   m_inactive(NULL),
+      m_itemRegBeg(Qt::black),          m_itemRegEnd(QColor(80,80,80)),
+      m_itemSelBeg(QColor(82,202,56)),  m_itemSelEnd(QColor(52,152,56)),
+      m_itemRegAlpha(100),              m_itemSelAlpha(255),
+      m_spacing(0),                     m_margin(0),
+      m_levelspacing(levelspacing),
+      m_totalarea(area),                m_levelsize(levelsize),
+      m_unbiasedspacing(1.0f),          m_unbiasedmargin(1.0f),
+      m_unbiasedarea(0,0,0,0),          m_unbiasedsize(0,0,0,0),
+      m_wmult(wmult),                   m_hmult(hmult),
+      m_depth(0),                        m_levelnum(-1),
+      m_visible(true),
+      m_arrowAccel(gContext->GetNumSetting("UseArrowAccels", 1))
 {
-    m_wmult = wmult;
-    m_hmult = hmult;
+    m_wmult        = (wmult == 0.0f) ? 1.0f : wmult;
+    m_hmult        = (hmult == 0.0f) ? 1.0f : hmult;
+    m_unbiasedarea = unbias(area,      wmult, hmult);
+    m_unbiasedsize = unbias(levelsize, wmult, hmult);
+}
 
-    m_spacing = (int)(m_spacing * wchange);
-    m_margin = (int)(m_margin * wchange);
+OSDListTreeType::~OSDListTreeType()
+{
+    OSDListBtnList::iterator it = listLevels.begin();
+    for (; it != listLevels.end(); ++it)
+        delete *it;    
+}
 
-    int width = (int)(m_totalarea.width() * wchange);
-    int height = (int)(m_totalarea.height() * hchange);
-    int x = (int)(m_totalarea.x() * wchange);
-    int y = (int)(m_totalarea.y() * hchange);
+void OSDListTreeType::Reinit(float wmult, float hmult)
+{
+    m_wmult     = (wmult == 0.0f) ? 1.0f : wmult;
+    m_hmult     = (hmult == 0.0f) ? 1.0f : hmult;
+    m_spacing   = (uint) round(m_unbiasedspacing * wmult);
+    m_margin    = (uint) round(m_unbiasedmargin  * wmult);
+    m_totalarea = bias(m_unbiasedarea, wmult, hmult);
+    m_levelsize = bias(m_unbiasedsize, wmult, hmult);
 
-    m_totalarea = QRect(x, y, width, height);
+    if (!treetop || m_levelnum < 0)
+        return;
 
-    width = (int)(m_levelsize.width() * wchange);
-    height = (int)(m_levelsize.height() * hchange);
-    x = (int)(m_levelsize.x() * wchange);
-    y = (int)(m_levelsize.y() * hchange);
+    // Save item indices
+    vector<uint> list;
+    for (uint i = 0; i <= (uint)m_levelnum; i++)
+        list.push_back(listLevels[i]->GetItemCurrentPos());
 
-    m_levelsize = QRect(x, y, width, height);
+    // Delete old OSD items
+    OSDListBtnList clone = listLevels;
+    listLevels.clear();
+    OSDListBtnList::iterator it = clone.begin();
+    for (; it != clone.end(); ++it)
+        delete *it;
 
-    QPtrListIterator<OSDListBtnType> it(listLevels);
-    OSDListBtnType *child;
-
-    while ((child = it.current()) != 0)
-    {
-        child->Reinit(wchange, hchange, wmult, hmult);
-        ++it;
-    }
+    // Create new OSD items
+    SetAsTree(treetop, &list);
 }
 
 void OSDListTreeType::SetGroupCheckState(QString group, int newState)
 {
-    QPtrListIterator<OSDListBtnType> it(listLevels);
-    OSDListBtnType *child;
-    while ((child = it.current()) != 0)
-    {
-        child->SetGroupCheckState(group, newState);
-        ++it;
-    }
+    OSDListBtnList::iterator it = listLevels.begin();
+    for (; it != listLevels.end(); ++it)
+        (*it)->SetGroupCheckState(group, newState);
 }
 
-void OSDListTreeType::SetItemRegColor(const QColor& beg, const QColor& end,
-                                      uint alpha)
-{
-    m_itemRegBeg   = beg;
-    m_itemRegEnd   = end;
-    m_itemRegAlpha = alpha;
-}
-
-void OSDListTreeType::SetItemSelColor(const QColor& beg, const QColor& end,
-                                      uint alpha)
-{
-    m_itemSelBeg   = beg;
-    m_itemSelEnd   = end;
-    m_itemSelAlpha = alpha;
-}
-
-void OSDListTreeType::SetFontActive(TTFFont *font)
-{
-    m_active = font;
-}
-
-void OSDListTreeType::SetFontInactive(TTFFont *font)
-{
-    m_inactive = font;
-}
-
-void OSDListTreeType::SetSpacing(int spacing)
-{
-    m_spacing = spacing;
-}
-
-void OSDListTreeType::SetMargin(int margin)
-{
-    m_margin = margin;
-}
-
-void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
+void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel,
+                                vector<uint> *select_list)
 {
     if (treetop)
     {
         listLevels.clear();
-        currentlevel = NULL;
-        treetop = NULL;
-        currentpos = NULL;
-        levels = 0;
-        curlevel = -1;
+        treetop      = NULL;
+        currentpos   = NULL;
+        m_depth      = 0;
+        m_levelnum   = -1;
     }
 
-    levels = toplevel->calculateDepth(0) - 1;
-
-    if (levels <= 0)
+    m_depth = toplevel->calculateDepth(0) - 1;
+    if (m_depth <= 0)
     {
-        cerr << "Need at least one level\n";
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "SetAsTree: Need at least one level");
         return;
     }
 
-    currentpos = (OSDGenericTree *)toplevel->getChildAt(0);
-
+    currentpos = (OSDGenericTree*) toplevel->getChildAt(0);
     if (!currentpos)
     {
-        cerr << "No top-level children?\n";
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "SetAsTree: Need top-level children");
         return;
     }
 
-    treetop = toplevel;
-
-    // just for now, remove later
-    if (levels > 2)
-        levels = 3;
-
-    for (int i = 0; i < levels; i++)
+    // Create OSD buttons for all levels
+    for (uint i = 0; i < (uint)m_depth; i++)
     {
         QString levelname = QString("level%1").arg(i + 1);
-
         QRect curlevelarea = m_levelsize;
         curlevelarea.moveBy(m_totalarea.x(), m_totalarea.y());
-
         curlevelarea.moveBy((m_levelsize.width() + m_levelspacing) * i, 0);
 
-        OSDListBtnType *newlevel = new OSDListBtnType(levelname, curlevelarea,
-                                                      m_wmult, m_hmult, true);
+        OSDListBtnType *newlevel = new OSDListBtnType(
+            levelname, curlevelarea, m_wmult, m_hmult, true);
 
         newlevel->SetFontActive(m_active);
         newlevel->SetFontInactive(m_inactive);
@@ -227,229 +169,200 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
         newlevel->SetSpacing(m_spacing);
         newlevel->SetMargin(m_margin);
 
-        listLevels.append(newlevel);
+        listLevels.push_back(newlevel);
     }
 
-    currentlevel = GetLevel(0);
+    // Set up needed levels and selects
+    vector<uint> slist;
+    slist.push_back(0);
+    if (select_list)
+        slist = *select_list;
 
-    if (!currentlevel)
+    currentpos = treetop = toplevel;
+    for (m_levelnum = 0; m_levelnum < (int)slist.size(); m_levelnum++)
     {
-        cerr << "Something is seriously wrong (currentlevel = NULL)\n";
-        return;
+        FillLevelFromTree(currentpos, m_levelnum);
+        GetLevel(m_levelnum)->SetActive(true);
+        GetLevel(m_levelnum)->SetVisible(true);
+        if (slist[m_levelnum])
+            GetLevel(m_levelnum)->SetItemCurrent(slist[m_levelnum]);
+        EnterItem(); // updates currentpos
     }
-
-    FillLevelFromTree(toplevel, currentlevel);
-
-    currentlevel->SetVisible(true);
-    currentlevel->SetActive(true);
-
-    currentpos = (OSDGenericTree *)(currentlevel->GetItemFirst()->getData());
-    curlevel = 0;
-
-    emit itemEntered(this, currentpos);
+    m_levelnum--;
 }
 
-OSDGenericTree *OSDListTreeType::GetCurrentPosition(void)
+static bool has_action(QString action, const QStringList &actions)
 {
-    return currentpos;
+    QStringList::const_iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it)
+    {
+        if (action == *it)
+            return true;
+    }
+    return false;
 }
 
 bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
 {
-    if (!currentlevel)
-        return false;
-
-    bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("TV Playback", e, 
-                                                     actions))
+    bool ok = gContext->GetMainWindow()->TranslateKeyPress(
+        "TV Playback", e, actions);
+
+    if (!ok || ((uint)m_levelnum >= listLevels.size()))
+        return false;
+    else if (has_action("UP", actions))
     {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+        GetLevel(m_levelnum)->MoveUp();
+        EnterItem();
+    }
+    else if (has_action("DOWN", actions))
+    {
+        GetLevel(m_levelnum)->MoveDown();
+        EnterItem();
+    }
+    else if (has_action("LEFT", actions) && (m_levelnum > 0))
+    {
+        GetLevel(m_levelnum)->Reset();
+        GetLevel(m_levelnum)->SetVisible(false);
 
-            if (action == "UP")
-            {
-                currentlevel->MoveUp();
-                SetCurrentPosition();
-            }
-            else if (action == "DOWN")
-            {
-                currentlevel->MoveDown();
-                SetCurrentPosition();
-            }
-            else if (action == "LEFT")
-            {
-                if (curlevel > 0)
-                {
-                    currentlevel->Reset();
-                    currentlevel->SetVisible(false);
+        m_levelnum--;
+        EnterItem();
+    }
+    else if ((has_action("LEFT", actions) && m_arrowAccel) ||
+             has_action("ESCAPE",   actions) ||
+             has_action("CLEAROSD", actions) ||
+             has_action("MENU",     actions))
+    {
+        m_visible = false;
+    }
+    else if (has_action("RIGHT", actions) &&
+             (m_levelnum + 1 < m_depth) &&
+             (currentpos->childCount() > 0))
+    {
+        GetLevel(m_levelnum)->SetActive(false);
+        m_levelnum++;
 
-                    curlevel--;
-
-                    currentlevel = GetLevel(curlevel);
-                    currentlevel->SetActive(true);
-                    SetCurrentPosition();
-                }
-                else if (m_arrowAccel)
-                {
-                    m_visible = false;
-                }
-            }
-            else if (action == "RIGHT")
-            {
-                // FIXME: create new levels if needed..
-                if (curlevel + 1 < levels && currentpos->childCount() > 0)
-                {
-                    currentlevel->SetActive(false);
-
-                    curlevel++;
-
-                    currentlevel = GetLevel(curlevel);
-
-                    FillLevelFromTree(currentpos, currentlevel);
-
-                    currentlevel->SetVisible(true);
-                    currentlevel->SetActive(true);
-                    SetCurrentPosition();
-                }
-                else if (m_arrowAccel)
-                {
-                    SetGroupCheckState(currentpos->getGroup(),
-                                       OSDListBtnTypeItem::NotChecked);
-                    currentpos->getParentButton()->setChecked(
-                                       OSDListBtnTypeItem::FullChecked);
-                    emit itemSelected(this, currentpos);
-                }
-            }
-            else if (action == "ESCAPE" || action == "MENU" ||
-                     action == "CLEAROSD")
-                m_visible = false;
-            else if (action == "SELECT")
-            {
-                SetGroupCheckState(currentpos->getGroup(),
-                                   OSDListBtnTypeItem::NotChecked);
-                currentpos->getParentButton()->setChecked(
-                                   OSDListBtnTypeItem::FullChecked);
-                emit itemSelected(this, currentpos);
-            }
-            else
-                handled = false;
-        }
+        FillLevelFromTree(currentpos, m_levelnum);
+        GetLevel(m_levelnum)->SetVisible(true);
+        EnterItem();
+    }
+    else if ((has_action("RIGHT", actions) && m_arrowAccel) ||
+             has_action("SELECT", actions))
+    {
+        SelectItem();
+    }
+    else
+    {
+        return false;
     }
 
-    return handled;
+    return true;
 }
 
 void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade, 
                            int xoff, int yoff)
 {
-    QPtrListIterator<OSDListBtnType> it(listLevels);
-    OSDListBtnType *child;
-
-    while ((child = it.current()) != 0)
-    {
-        child->Draw(surface, fade, maxfade, xoff, yoff);
-        ++it;
-    }
+    OSDListBtnList::iterator it = listLevels.begin();
+    for (; it != listLevels.end(); ++it)
+        (*it)->Draw(surface, fade, maxfade, xoff, yoff);
 }
 
 void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item, 
-                                        OSDListBtnType *list)
+                                        uint level_num)
 {
+    OSDListBtnType *list = GetLevel(level_num);
     if (!list)
     {
-        VERBOSE(VB_IMPORTANT, "OSDListTreeType::FillLevelFromTree() "
-                "called with no list. Ignoring call.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "FillLevelFromTree() "
+                "called with no list, ignoring.");
         return;
     }
     list->Reset();
 
     QPtrList<GenericTree> *itemlist = item->getAllChildren();
-
     QPtrListIterator<GenericTree> it(*itemlist);
-    GenericTree *child;
 
-    while ((child = it.current()) != 0)
+    OSDGenericTree     *child   = (OSDGenericTree*) it.current();
+    OSDListBtnTypeItem *newitem = NULL;
+    for (;(child = (OSDGenericTree*) it.current()); ++it)
     {
-        OSDGenericTree *osdchild = (OSDGenericTree *)child;
+        OSDTypeImage *im = child->getImage();
+        QString label    = child->getString();
+        QString group    = child->getGroup();
+        bool    canCheck = child->getCheckable() >= 0;
+        bool    hasCheck = child->getCheckable() == 1;
+        bool    hasChild = child->childCount()   >  0;
 
-        OSDListBtnTypeItem *newitem;
-        newitem = new OSDListBtnTypeItem(list, child->getString(),
-                                         osdchild->getImage(), 
-                                         (osdchild->getCheckable() >= 0),
-                                         (child->childCount() > 0));
-        if (osdchild->getCheckable() == 1)
+        newitem = new OSDListBtnTypeItem(list, label, im, canCheck, hasChild);
+
+        if (hasCheck)
             newitem->setChecked(OSDListBtnTypeItem::FullChecked);
-        newitem->setGroup(osdchild->getGroup());
-        newitem->setData(osdchild);
-        osdchild->setParentButton(newitem);
+        newitem->setGroup(group);
+        newitem->setData(child);
 
-        ++it;
+        child->setParentButton(newitem);
     }
 }
 
-OSDListBtnType *OSDListTreeType::GetLevel(int levelnum)
+OSDListBtnType *OSDListTreeType::GetLevel(uint levelnum)
 {
-    if ((uint)levelnum > listLevels.count())
+    if (levelnum < listLevels.size())
+        return listLevels[levelnum];
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "GetLevel("<<levelnum<<") "
+            "listLevels.size() is only "<<listLevels.size());
+    return NULL;
+}
+
+void OSDListTreeType::EnterItem(void)
+{
+    if ((uint)m_levelnum >= listLevels.size())
+        return;
+
+    listLevels[m_levelnum]->SetActive(true);
+    OSDListBtnTypeItem *lbt = listLevels[m_levelnum]->GetItemCurrent();
+    if (lbt)
     {
-        cerr << "OOB GetLevel call\n";
-        return NULL;
+        currentpos = (OSDGenericTree*) (lbt->getData());
+        emit itemEntered(this, currentpos);
     }
-
-    return listLevels.at(levelnum);
 }
 
-void OSDListTreeType::SetCurrentPosition(void)
+void OSDListTreeType::SelectItem(void)
 {
-    if (!currentlevel)
+    if (!currentpos)
         return;
 
-    OSDListBtnTypeItem *lbt = currentlevel->GetItemCurrent();
-
-    if (!lbt)
-        return;
-
-    currentpos = (OSDGenericTree *)(lbt->getData());
-    emit itemEntered(this, currentpos);
+    SetGroupCheckState(currentpos->getGroup(), OSDListBtnTypeItem::NotChecked);
+    currentpos->getParentButton()->setChecked(OSDListBtnTypeItem::FullChecked);
+    emit itemSelected(this, currentpos);
 }
- 
+
+#undef LOC_ERR
+#undef LOC
+
 //////////////////////////////////////////////////////////////////////////
 
 OSDListBtnType::OSDListBtnType(const QString &name, const QRect &area,
                                float wmult, float hmult,
                                bool showScrollArrows)
-              : OSDType(name)
+    : OSDType(name),
+      m_order(0),                       m_rect(area),
+      m_contentsRect(0,0,0,0),          m_arrowsRect(0,0,0,0),
+      m_wmult(wmult),                   m_hmult(hmult),
+      m_itemHeight(0),                  m_itemSpacing(0),
+      m_itemMargin(0),                  m_itemsVisible(0),
+      m_active(false),                  m_showScrollArrows(showScrollArrows),
+      m_showUpArrow(false),             m_showDnArrow(false),
+      m_initialized(false),             m_clearing(false),
+      m_visible(false),
+      m_itemRegBeg(Qt::black),          m_itemRegEnd(QColor(80,80,80)),
+      m_itemSelBeg(QColor(82,202,56)),  m_itemSelEnd(QColor(52,152,56)),
+      m_itemRegAlpha(100),              m_itemSelAlpha(255),
+      m_fontActive(NULL),               m_fontInactive(NULL),
+      m_topIndx(0),                     m_selIndx(0),
+      m_update(true)
 {
-    m_rect             = area;
-
-    m_wmult            = wmult;
-    m_hmult            = hmult;
-
-    m_showScrollArrows = showScrollArrows;
-
-    m_active           = false;
-    m_showUpArrow      = false;
-    m_showDnArrow      = false;
-
-    m_itemList.setAutoDelete(false);
-    m_topItem = 0;
-    m_selItem = 0;
-
-    m_initialized     = false;
-    m_clearing        = false;
-    m_itemSpacing     = 0;
-    m_itemMargin      = 0;
-    m_itemHeight      = 0;
-    m_itemsVisible    = 0;
-    m_fontActive      = 0;
-    m_fontInactive    = 0;
-
-    SetItemRegColor(Qt::black,QColor(80,80,80),100);
-    SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
-
-    m_visible = false;
 }
 
 OSDListBtnType::~OSDListBtnType()
@@ -457,316 +370,198 @@ OSDListBtnType::~OSDListBtnType()
     Reset();
 }
 
-void OSDListBtnType::Reinit(float wchange, float hchange, float wmult,
-                            float hmult)
-{
-    m_wmult = wmult;
-    m_hmult = hmult;
-
-    m_itemHeight = (int)(m_itemHeight * hchange);
-    m_itemSpacing = (int)(m_itemSpacing * wchange);
-    m_itemMargin = (int)(m_itemMargin * wchange);
-
-    int width = (int)(m_rect.width() * wchange);
-    int height = (int)(m_rect.height() * hchange);
-    int x = (int)(m_rect.x() * wchange);
-    int y = (int)(m_rect.y() * hchange);
-
-    m_rect = QRect(x, y, width, height);
-
-    Init();
-
-    OSDListBtnTypeItem* item = 0;
-    for (item = m_itemList.first(); item; item = m_itemList.next()) {
-        item->Reinit(wchange, hchange, wmult, hmult);
-    }
-
-}
-
 void OSDListBtnType::SetGroupCheckState(QString group, int newState)
 {
-    OSDListBtnTypeItem* item = 0;
-    for (item = m_itemList.first(); item; item = m_itemList.next()) {
-        if (item->getGroup() == group)
-            item->setChecked((OSDListBtnTypeItem::CheckState)newState);
-    }
+    OSDListBtnItemList::iterator it;
+    for (it = m_itemList.begin(); it != m_itemList.end(); ++it)
+        if ((*it)->getGroup() == group)
+            (*it)->setChecked((OSDListBtnTypeItem::CheckState) newState);
 }
 
-void OSDListBtnType::SetItemRegColor(const QColor& beg, const QColor& end, 
-                                     uint alpha)
-{
-    m_itemRegBeg   = beg;
-    m_itemRegEnd   = end;
-    m_itemRegAlpha = alpha;
-}
-
-void OSDListBtnType::SetItemSelColor(const QColor& beg, const QColor& end,
-                                     uint alpha)
-{
-    m_itemSelBeg   = beg;
-    m_itemSelEnd   = end;
-    m_itemSelAlpha = alpha;
-}
-
-void OSDListBtnType::SetFontActive(TTFFont *font)
-{
-    m_fontActive   = font;
-}
-
-void OSDListBtnType::SetFontInactive(TTFFont *font)
-{
-    m_fontInactive = font;
-}
-
-void OSDListBtnType::SetSpacing(int spacing)
-{
-    m_itemSpacing = spacing;    
-}
-
-void OSDListBtnType::SetMargin(int margin)
-{
-    m_itemMargin = margin;    
-}
-
-void OSDListBtnType::SetActive(bool active)
-{
-    m_active = active;
-}
-
-void OSDListBtnType::Reset()
+void OSDListBtnType::Reset(void)
 {
     QMutexLocker lock(&m_update);
 
     m_clearing = true;
-
-    OSDListBtnTypeItem* item = 0;
-    for (item = m_itemList.first(); item; item = m_itemList.next()) {
-        delete item;
-    }
-
-    m_clearing = false;
+    OSDListBtnItemList::iterator it;
+    OSDListBtnItemList clone = m_itemList;
     m_itemList.clear();
-    
-    m_topItem     = 0;
-    m_selItem     = 0;
+    for (it = clone.begin(); it != clone.end(); ++it)
+        delete (*it);
+    m_clearing = false;
+
+    m_topIndx     = 0;
+    m_selIndx     = 0;
     m_showUpArrow = false;
     m_showDnArrow = false;
 }
 
 void OSDListBtnType::InsertItem(OSDListBtnTypeItem *item)
 {
-    OSDListBtnTypeItem* lastItem = m_itemList.last();
-    m_itemList.append(item);
-
-    if (m_showScrollArrows && m_itemList.count() > m_itemsVisible)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
-
-    if (!lastItem) 
-    {
-        m_topItem = item;
-        m_selItem = item;
+    QMutexLocker lock(&m_update);
+    m_itemList.push_back(item);
+    m_showDnArrow = m_showScrollArrows && m_itemList.size() > m_itemsVisible;
+    if (m_itemList.size() == 1)
         emit itemSelected(item);
-    }
+}
+
+int find(const OSDListBtnItemList &list, const OSDListBtnTypeItem *item)
+{
+    for (uint i = 0; i < list.size(); i++)
+        if (list[i] == item)
+            return i;
+    return -1;
 }
 
 void OSDListBtnType::RemoveItem(OSDListBtnTypeItem *item)
 {
+    QMutexLocker lock(&m_update);
     if (m_clearing)
         return;
-    
-    if (m_itemList.find(item) == -1)
+
+    int i = find(m_itemList, item);
+    if (i < 0)
         return;
 
-    m_topItem = m_itemList.first();
-    m_selItem = m_itemList.first();
-
-    m_itemList.remove(item);
+    m_itemList.erase(m_itemList.begin()+i);
 
     m_showUpArrow = false;
-    
-    if (m_showScrollArrows && m_itemList.count() > m_itemsVisible)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
+    m_showDnArrow = m_itemList.size() > m_itemsVisible;
+    m_selIndx     = 0;
+    m_topIndx     = 0;
 
-    if (m_selItem) {
-        emit itemSelected(m_selItem);
-    }
+    if (m_itemList.size())
+        emit itemSelected(m_itemList[m_selIndx]);
 }
 
-void OSDListBtnType::SetItemCurrent(OSDListBtnTypeItem* item)
+void OSDListBtnType::SetItemCurrent(const OSDListBtnTypeItem* item)
 {
-    bool locked = m_update.tryLock();
+    QMutexLocker lock(&m_update);
+    int i = find(m_itemList, item);
+    if (i >= 0)
+        SetItemCurrent(i);
+}
 
-    if (m_itemList.find(item) == -1)
+void OSDListBtnType::SetItemCurrent(uint current)
+{
+    QMutexLocker lock(&m_update);
+    if (current >= m_itemList.size())
         return;
 
-    m_topItem = item;
-    m_selItem = item;
-
-    if (m_showScrollArrows && m_itemList.count() > m_itemsVisible)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
-
-    emit itemSelected(m_selItem);
-
-    if (locked)
-        m_update.unlock();
+    m_selIndx     = current;
+    m_topIndx     = max(m_selIndx - (int)m_itemsVisible, 0);
+    m_showUpArrow = m_topIndx;
+    m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
+    emit itemSelected(m_itemList[m_selIndx]);
 }
 
-void OSDListBtnType::SetItemCurrent(int current)
+int OSDListBtnType::GetItemCurrentPos(void) const
 {
     QMutexLocker lock(&m_update);
-
-    OSDListBtnTypeItem* item = m_itemList.at(current);
-    if (!item)
-        item = m_itemList.first();
-
-    SetItemCurrent(item);
+    return (m_itemList.size()) ? m_selIndx : -1;
 }
 
-OSDListBtnTypeItem* OSDListBtnType::GetItemCurrent()
-{
-    return m_selItem;
-}
-
-OSDListBtnTypeItem* OSDListBtnType::GetItemFirst()
-{
-    return m_itemList.first();    
-}
-
-OSDListBtnTypeItem* OSDListBtnType::GetItemNext(OSDListBtnTypeItem *item)
+OSDListBtnTypeItem* OSDListBtnType::GetItemCurrent(void)
 {
     QMutexLocker lock(&m_update);
-
-    if (m_itemList.find(item) == -1)
-        return 0;
-
-    return m_itemList.next();
+    if (!m_itemList.size())
+        return NULL;
+    return m_itemList[m_selIndx];
 }
 
-int OSDListBtnType::GetCount()
+OSDListBtnTypeItem* OSDListBtnType::GetItemFirst(void)
 {
-    return m_itemList.count();
+    QMutexLocker lock(&m_update);
+    if (!m_itemList.size())
+        return NULL;
+    return m_itemList[0];    
+}
+
+OSDListBtnTypeItem* OSDListBtnType::GetItemNext(const OSDListBtnTypeItem *item)
+{
+    QMutexLocker lock(&m_update);
+    int i = find(m_itemList, item) + 1;
+    if (i <= 0 || i >= (int)m_itemList.size())
+        return NULL;
+    return m_itemList[i];
+}
+
+int OSDListBtnType::GetCount(void) const
+{
+    QMutexLocker lock(&m_update);
+    return m_itemList.size();
 }
 
 OSDListBtnTypeItem* OSDListBtnType::GetItemAt(int pos)
 {
-    return m_itemList.at(pos);    
+    QMutexLocker lock(&m_update);
+    return m_itemList[pos];    
 }
 
-int OSDListBtnType::GetItemPos(OSDListBtnTypeItem* item)
+int OSDListBtnType::GetItemPos(const OSDListBtnTypeItem *item) const
 {
     QMutexLocker lock(&m_update);
-
-    return m_itemList.find(item);    
+    return find(m_itemList, item);
 }
 
-void OSDListBtnType::MoveUp()
+void OSDListBtnType::MoveUp(void)
 {
     QMutexLocker lock(&m_update);
-
-    if (m_itemList.find(m_selItem) == -1)
+    if (!m_itemList.size())
         return;
 
-    OSDListBtnTypeItem *item = m_itemList.prev();
-    if (!item)
+    if (--m_selIndx < 0)
     {
-        item = m_itemList.last();
-        if (!item)
-            return;
-
-        if (m_itemList.count() > m_itemsVisible)
-            m_topItem = m_itemList.at(m_itemList.count() - m_itemsVisible);
-        else
-            m_topItem = m_itemList.first();
+        m_selIndx = m_itemList.size() - 1;
+        m_topIndx = (m_itemList.size() > m_itemsVisible) ?
+            m_itemList.size() - m_itemsVisible : 0;
     }
 
-    m_selItem = item;
+    m_topIndx     = (m_selIndx < m_topIndx) ? m_selIndx : m_topIndx;
+    m_showUpArrow = m_topIndx;
+    m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
 
-    if (m_itemList.find(m_selItem) < m_itemList.find(m_topItem))
-        m_topItem = m_selItem;
-
-    if (m_topItem != m_itemList.first())
-        m_showUpArrow = true;
-    else
-        m_showUpArrow = false;
-
-    if (m_itemList.find(m_topItem) + m_itemsVisible < m_itemList.count())
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
-
-    emit itemSelected(m_selItem);
+    emit itemSelected(m_itemList[m_selIndx]);
 }
 
-void OSDListBtnType::MoveDown()
+void OSDListBtnType::MoveDown(void)
 {
     QMutexLocker lock(&m_update);
-
-    if (m_itemList.find(m_selItem) == -1)
+    if (!m_itemList.size())
         return;
 
-    OSDListBtnTypeItem *item = m_itemList.next();
-    if (!item)
-    {
-        item = m_itemList.first();
-        if (!item)
-            return;
+    if (++m_selIndx >= (int)m_itemList.size())
+        m_selIndx = m_topIndx = 0;
 
-        m_topItem = item;
-    }
-
-    m_selItem = item;
-
-    if (m_itemList.find(m_topItem) + m_itemsVisible <=
-        (unsigned int)m_itemList.find(m_selItem)) 
-    {
-        m_topItem = m_itemList.at(m_itemList.find(m_topItem) + 1);
-    }
+    bool scroll_down = m_topIndx + (int)m_itemsVisible <= m_selIndx;
+    m_topIndx = (scroll_down) ? m_topIndx + 1 : m_topIndx;
+        
+    m_showUpArrow = m_topIndx;
+    m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
     
-    if (m_topItem != m_itemList.first())
-        m_showUpArrow = true;
-    else
-        m_showUpArrow = false;
-
-    if (m_itemList.find(m_topItem) + m_itemsVisible < m_itemList.count())
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
-    
-    emit itemSelected(m_selItem);
+    emit itemSelected(m_itemList[m_selIndx]);
 }
 
-void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
-                          int yoff)
+void OSDListBtnType::Draw(OSDSurface *surface,
+                          int fade, int maxfade,
+                          int xoff, int yoff)
 {
-    (void)xoff;
-    (void)yoff;
-
+    QMutexLocker lock(&m_update);
     if (!m_visible)
         return;
-
-    QMutexLocker lock(&m_update);
-
     if (!m_initialized)
         Init();
 
     TTFFont *font = m_active ? m_fontActive : m_fontInactive;
     
     int y = m_rect.y();
-    m_itemList.find(m_topItem);
-    OSDListBtnTypeItem *it = m_itemList.current();
-    while (it && (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
+    for (uint i = m_topIndx; i < m_itemList.size(); i++)
     {
-        it->paint(surface, font, fade, maxfade, m_rect.x()+ xoff, y + yoff);
-
+        if (!((y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)))
+            break;
+        m_itemList[i]->paint(surface, font, fade, maxfade,
+                             m_rect.x() + xoff, y + yoff);
         y += m_itemHeight + m_itemSpacing;
-
-        it = m_itemList.next();
     }
 
     if (m_showScrollArrows) 
@@ -792,13 +587,12 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     }
 }
 
-void OSDListBtnType::Init()
+void OSDListBtnType::Init(void)
 {
     int sz1 = m_fontActive->Size() * 3 / 2;
     int sz2 = m_fontInactive->Size() * 3 / 2;
-    m_itemHeight = QMAX(sz1, sz2) + (int)(2 * m_itemMargin);
-
-    m_itemHeight = (m_itemHeight / 2) * 2;
+    m_itemHeight = max(sz1, sz2) + (int)(2 * m_itemMargin);
+    m_itemHeight = m_itemHeight & ~0x1;
 
     if (m_showScrollArrows) 
     {
@@ -838,11 +632,7 @@ void OSDListBtnType::Init()
     InitItem(m_itemSelActPix,   itemWidth,    m_itemHeight,
              m_itemSelBeg,      m_itemSelEnd, 255);
 
-    if (m_itemList.count() > m_itemsVisible && m_showScrollArrows)
-        m_showDnArrow = true;
-    else
-        m_showDnArrow = false;
-
+    m_showDnArrow = m_itemList.size() > m_itemsVisible && m_showScrollArrows;
     m_initialized = true;
 }
 
@@ -885,68 +675,57 @@ void OSDListBtnType::InitItem(
 
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
 {
-    QString file = gContext->GetThemesParentDir() + "default/lb-" + fileName + ".png";
-    pix.LoadImage(file, m_wmult, m_hmult);
+    QString path = gContext->GetThemesParentDir() + "default/lb-";
+    pix.LoadImage(path + fileName + ".png", m_wmult, m_hmult);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype, 
-                                       const QString& text,
-                                       OSDTypeImage *pixmap, bool checkable,
-                                       bool showArrow, CheckState state)
+OSDListBtnTypeItem::OSDListBtnTypeItem(
+    OSDListBtnType *lbtype,     const QString  &text,
+    OSDTypeImage   *pixmap,     bool            checkable,
+    bool            showArrow,  CheckState      state)
+    : m_parent(lbtype),       m_pixmap(pixmap),
+      m_data(NULL),           m_text(text),
+      m_group(QString::null), m_state(state),
+      m_showArrow(showArrow), m_checkable(checkable),
+      m_checkRect(0,0,0,0),   m_arrowRect(0,0,0,0),
+      m_pixmapRect(0,0,0,0),  m_textRect(0,0,0,0)
 {
-    m_parent    = lbtype;
-    m_text      = text;
-    m_pixmap    = pixmap;
-    m_checkable = checkable;
-    m_state     = state;
-    m_showArrow = showArrow;
-    m_data      = 0;
-
     if (!m_parent->m_initialized)
         m_parent->Init();
 
-    int  margin    = m_parent->m_itemMargin;
-    int  width     = m_parent->m_rect.width();
-    int  height    = m_parent->m_itemHeight;
+    OSDTypeImage &checkPix = m_parent->m_checkNonePix;
+    OSDTypeImage &arrowPix = m_parent->m_arrowPix;
 
-    OSDTypeImage& checkPix = m_parent->m_checkNonePix;
-    OSDTypeImage& arrowPix = m_parent->m_arrowPix;
-    
-    int cw = checkPix.ImageSize().width();
-    int ch = checkPix.ImageSize().height();
-    int aw = arrowPix.ImageSize().width();
-    int ah = arrowPix.ImageSize().height();
-    int pw = m_pixmap ? m_pixmap->ImageSize().width() : 0;
-    int ph = m_pixmap ? m_pixmap->ImageSize().height() : 0;
-    
+    int margin = m_parent->m_itemMargin;
+    int width  = m_parent->m_rect.width();
+    int height = m_parent->m_itemHeight;
+    int cw     = checkPix.ImageSize().width();
+    int ch     = checkPix.ImageSize().height();
+    int aw     = arrowPix.ImageSize().width();
+    int ah     = arrowPix.ImageSize().height();
+    int pw     = m_pixmap ? m_pixmap->ImageSize().width() : 0;
+    int ph     = m_pixmap ? m_pixmap->ImageSize().height() : 0;
+
     if (m_checkable) 
-        m_checkRect = QRect(margin, (height - ch)/2, cw, ch);
-    else
-        m_checkRect = QRect(0,0,0,0);
+        m_checkRect  = QRect(margin, (height - ch)/2, cw, ch);
 
     if (m_showArrow) 
-        m_arrowRect = QRect(width - aw - margin, (height - ah)/2,
-                            aw, ah);
-    else
-        m_arrowRect = QRect(0,0,0,0);
+        m_arrowRect  = QRect(width - aw - margin, (height - ah)/2, aw, ah);
 
-    if (m_pixmap) 
-        m_pixmapRect = QRect(m_checkable ? (2*margin + m_checkRect.width()) :
-                             margin, (height - ph)/2,
-                             pw, ph);
-    else
-        m_pixmapRect = QRect(0,0,0,0);
+    if (m_pixmap)
+    {
+        int tmp = (m_checkable) ? (2 * margin + m_checkRect.width()) : margin;
+        m_pixmapRect = QRect(tmp, (height - ph)/2, pw, ph);
+    }
 
-    m_textRect = QRect(margin +
-                       (m_checkable ? m_checkRect.width() + margin : 0) +
-                       (m_pixmap    ? m_pixmapRect.width() + margin : 0),
-                       0,
-                       width - 2*margin -
-                       (m_checkable ? m_checkRect.width() + margin : 0) -
-                       (m_showArrow ? m_arrowRect.width() + margin : 0) -
-                       (m_pixmap ? m_pixmapRect.width() + margin : 0),
-                       height);
+    int tx = margin, tw = width - (2 * margin);
+    tx += (m_checkable) ? m_checkRect.width()  + margin : 0;
+    tx += (m_pixmap)    ? m_pixmapRect.width() + margin : 0;
+    tw -= (m_checkable) ? m_checkRect.width()  + margin : 0;
+    tw -= (m_showArrow) ? m_arrowRect.width()  + margin : 0;
+    tw -= (m_pixmap)    ? m_pixmapRect.width() + margin : 0;
+    m_textRect = QRect(tx, 0, tw, height);
 
     m_parent->InsertItem(this);
 }
@@ -957,52 +736,10 @@ OSDListBtnTypeItem::~OSDListBtnTypeItem()
         m_parent->RemoveItem(this);
 }
 
-QString OSDListBtnTypeItem::text() const
-{
-    return m_text;
-}
-
-const OSDTypeImage* OSDListBtnTypeItem::pixmap() const
-{
-    return m_pixmap;
-}
-
-bool OSDListBtnTypeItem::checkable() const
-{
-    return m_checkable;
-}
-
-OSDListBtnTypeItem::CheckState OSDListBtnTypeItem::state() const
-{
-    return m_state;
-}
-
-OSDListBtnType* OSDListBtnTypeItem::parent() const
-{
-    return m_parent;
-}
-
-void OSDListBtnTypeItem::setChecked(CheckState state)
-{
-    if (!m_checkable)
-        return;
-    m_state = state;
-}
-
-void OSDListBtnTypeItem::setData(void *data)
-{
-    m_data = data;    
-}
-
-void* OSDListBtnTypeItem::getData()
-{
-    return m_data;
-}
-
 void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font, 
                                int fade, int maxfade, int x, int y)
 {
-    if (this == m_parent->m_selItem)
+    if (this == m_parent->GetItemCurrent())
     {
         if (m_parent->m_active)
             m_parent->m_itemSelActPix.Draw(surface, fade, maxfade, x, y);
@@ -1030,11 +767,14 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
         cr.moveBy(x, y);
         
         if (m_state == HalfChecked)
-            m_parent->m_checkHalfPix.Draw(surface, fade, maxfade, cr.x(), cr.y());
+            m_parent->m_checkHalfPix.Draw(surface, fade, maxfade,
+                                          cr.x(), cr.y());
         else if (m_state == FullChecked)
-            m_parent->m_checkFullPix.Draw(surface, fade, maxfade, cr.x(), cr.y());
+            m_parent->m_checkFullPix.Draw(surface, fade, maxfade,
+                                          cr.x(), cr.y());
         else
-            m_parent->m_checkNonePix.Draw(surface, fade, maxfade, cr.x(), cr.y());
+            m_parent->m_checkNonePix.Draw(surface, fade, maxfade,
+                                          cr.x(), cr.y());
     }
 
     if (m_pixmap)
@@ -1049,39 +789,3 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
     tr.moveBy(0, font->Size() / 4);
     font->DrawString(surface, tr.x(), tr.y(), m_text, tr.right(), tr.bottom());
 }
-
-void OSDListBtnTypeItem::Reinit(float wchange, float hchange, 
-                                float wmult, float hmult)
-{
-    (void)wmult;
-    (void)hmult;
-
-    int width = (int)(m_checkRect.width() * wchange);
-    int height = (int)(m_checkRect.height() * hchange);
-    int x = (int)(m_checkRect.x() * wchange);
-    int y = (int)(m_checkRect.y() * hchange);
-
-    m_checkRect = QRect(x, y, width, height);
-
-    width = (int)(m_pixmapRect.width() * wchange);
-    height = (int)(m_pixmapRect.height() * hchange);
-    x = (int)(m_pixmapRect.x() * wchange);
-    y = (int)(m_pixmapRect.y() * hchange);
-
-    m_pixmapRect = QRect(x, y, width, height);
-
-    width = (int)(m_textRect.width() * wchange);
-    height = (int)(m_textRect.height() * hchange);
-    x = (int)(m_textRect.x() * wchange);
-    y = (int)(m_textRect.y() * hchange);
-
-    m_textRect = QRect(x, y, width, height);
-
-    width = (int)(m_arrowRect.width() * wchange);
-    height = (int)(m_arrowRect.height() * hchange);
-    x = (int)(m_arrowRect.x() * wchange);
-    y = (int)(m_arrowRect.y() * hchange);
-
-    m_arrowRect = QRect(x, y, width, height);
-}
-

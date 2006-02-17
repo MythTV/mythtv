@@ -160,9 +160,6 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
                     int displaywidth, int displayheight, 
                     float wmult, float hmult, int frint)
 {
-    float wchange = wmult / m_wmult;
-    float hchange = hmult / m_hmult;
-
     m_frameint = frint;
 
     m_screenwidth = screenwidth;
@@ -175,57 +172,12 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
     vector<OSDType *>::iterator iter = allTypes->begin();
     for (;iter != allTypes->end(); iter++)
     {
-        OSDType *type = (*iter);
-        if (OSDTypeText *item = dynamic_cast<OSDTypeText*>(type))
-        {
-            item->Reinit(wchange, hchange);
-        }
-        else if (OSDTypePositionImage *item =
-                 dynamic_cast<OSDTypePositionImage*>(type))
-        {
-            item->Reinit(wchange, hchange, wmult, hmult);
-        }
-        else if (OSDTypePosSlider *item = dynamic_cast<OSDTypePosSlider*>(type))
-        {
-            item->Reinit(wchange, hchange, wmult, hmult);
-        }
-        else if (OSDTypeFillSlider *item = 
-                 dynamic_cast<OSDTypeFillSlider*>(type))
-        {
-            item->Reinit(wchange, hchange, wmult, hmult);
-        }
-        else if (OSDTypeEditSlider *item =
-                 dynamic_cast<OSDTypeEditSlider*>(type))
-        {
-            item->Reinit(wchange, hchange, wmult, hmult);
-        }
-        else if (OSDTypeImage *item = dynamic_cast<OSDTypeImage*>(type))
-        {
-            item->Reinit(wchange, hchange, wmult, hmult);
-        }
-        else if (OSDTypeBox *item = dynamic_cast<OSDTypeBox*>(type))
-        {
-            item->Reinit(wchange, hchange);
-        }
-        else if (OSDTypePositionRectangle *item =
-                  dynamic_cast<OSDTypePositionRectangle*>(type))
-        {
-            item->Reinit(wchange, hchange);
-        }
-        else if (OSDTypeCC *item = dynamic_cast<OSDTypeCC*>(type))
-        {
-            item->Reinit(xoff, yoff, displaywidth, displayheight);
-        }
-        else if (OSDListTreeType *item = dynamic_cast<OSDListTreeType*>(type))
-        {
-            item->Reinit(wchange, hchange, wmult, hmult);
-        }
+        if (OSDTypeCC *cc608 = dynamic_cast<OSDTypeCC*>(*iter))
+            cc608->Reinit(xoff, yoff, displaywidth, displayheight,
+                          wmult, hmult);
         else
-        {
-            cerr << "Unknown conversion\n";
-        }
+            (*iter)->Reinit(wmult, hmult);
     }
-
 }
 
 OSDType *OSDSet::GetType(const QString &name)
@@ -443,7 +395,8 @@ OSDType::~OSDType()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OSDTypeText::OSDTypeText(const QString &name, TTFFont *font, 
-                         const QString &text, QRect displayrect)
+                         const QString &text, QRect displayrect,
+                         float wmult, float hmult)
            : OSDType(name)
 {
     m_message = text;
@@ -464,6 +417,12 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_scrollinit = false;
 
     m_linespacing = 1.5;
+
+    m_unbiasedsize =
+        QRect((int)round(m_screensize.x()      / wmult),
+              (int)round(m_screensize.y()      / hmult),
+              (int)ceil( m_screensize.width()  / wmult),
+              (int)ceil( m_screensize.height() / hmult));
 }
 
 OSDTypeText::OSDTypeText(const OSDTypeText &other)
@@ -507,14 +466,13 @@ void OSDTypeText::SetDefaultText(const QString &text)
     m_scrollinit = false;
 }
 
-void OSDTypeText::Reinit(float wchange, float hchange)
+void OSDTypeText::Reinit(float wmult, float hmult)
 {
-    int width = (int)(m_screensize.width() * wchange);
-    int height = (int)(m_screensize.height() * hchange);
-    int x = (int)(m_screensize.x() * wchange);
-    int y = (int)(m_screensize.y() * hchange);
-
-    m_displaysize = m_screensize = QRect(x, y, width, height);
+    m_displaysize = m_screensize =
+        QRect((int)round(m_unbiasedsize.x()      * wmult),
+              (int)round(m_unbiasedsize.y()      * hmult),
+              (int)ceil( m_unbiasedsize.width()  * wmult),
+              (int)ceil( m_unbiasedsize.height() * hmult));
 }
 
 void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
@@ -708,7 +666,7 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
     m_onlyusefirst = false;
 
     m_filename = filename;
-    m_displaypos = displaypos;
+    SetPosition(displaypos, wmult, hmult);
 
     m_yuv = m_alpha = NULL;
     m_isvalid = false;
@@ -760,6 +718,7 @@ OSDTypeImage::OSDTypeImage(const QString &name)
     m_onlyusefirst = false;
 
     m_displaypos = QPoint(0, 0);
+    m_unbiasedpos = QPoint(0, 0);
 
     m_yuv = NULL;
     m_alpha = NULL;
@@ -778,6 +737,7 @@ OSDTypeImage::OSDTypeImage(void)
     m_onlyusefirst = false;
 
     m_displaypos = QPoint(0, 0);
+    m_unbiasedpos = QPoint(0, 0);
 
     m_yuv = NULL;
     m_alpha = NULL;
@@ -801,13 +761,19 @@ void OSDTypeImage::SetName(const QString &name)
     m_name = name;
 }
 
-void OSDTypeImage::Reinit(float wchange, float hchange, float wmult, float hmult)
+void OSDTypeImage::SetPosition(QPoint pos, float wmult, float hmult)
 {
-    int x = (int)(m_displaypos.x() * wchange);
-    int y = (int)(m_displaypos.y() * hchange);
+    m_displaypos  = pos;
+    m_unbiasedpos =
+        QPoint((int)round(pos.x() / wmult),
+               (int)round(pos.y() / hmult));
+}
 
-    m_displaypos.setX(x);
-    m_displaypos.setY(y);
+void OSDTypeImage::Reinit(float wmult, float hmult)
+{
+    m_displaypos =
+        QPoint((int)round(m_unbiasedpos.x() * wmult),
+               (int)round(m_unbiasedpos.y() * hmult));
 
     LoadImage(m_filename, wmult, hmult, m_scalew, m_scaleh);
 }
@@ -1043,23 +1009,25 @@ OSDTypePosSlider::OSDTypePosSlider(const QString &name,
     m_maxval = 1000;
     m_curval = 0;
     m_displayrect = displayrect;
+    m_unbiasedrect =
+        QRect((int)round(m_displayrect.x()      / wmult),
+              (int)round(m_displayrect.y()      / hmult),
+              (int)ceil( m_displayrect.width()  / wmult),
+              (int)ceil( m_displayrect.height() / hmult));
 }
 
 OSDTypePosSlider::~OSDTypePosSlider()
 {
 }
 
-void OSDTypePosSlider::Reinit(float wchange, float hchange, float wmult,
-                              float hmult)
+void OSDTypePosSlider::Reinit(float wmult, float hmult)
 {
-    int width = (int)(m_displayrect.width() * wchange);
-    int height = (int)(m_displayrect.height() * hchange);
-    int x = (int)(m_displayrect.x() * wchange);
-    int y = (int)(m_displayrect.y() * hchange);
-
-    m_displayrect = QRect(x, y, width, height);
-
-    OSDTypeImage::Reinit(wchange, hchange, wmult, hmult);
+    m_displayrect =
+        QRect((int)round(m_unbiasedrect.x()      * wmult),
+              (int)round(m_unbiasedrect.y()      * hmult),
+              (int)ceil( m_unbiasedrect.width()  * wmult),
+              (int)ceil( m_unbiasedrect.height() * hmult));
+    OSDTypeImage::Reinit(wmult, hmult);
 }
 
 void OSDTypePosSlider::SetPosition(int pos)
@@ -1092,23 +1060,25 @@ OSDTypeFillSlider::OSDTypeFillSlider(const QString &name,
     m_drawwidth = 0;
     m_onlyusefirst = true;
     m_displayrect = displayrect;
+    m_unbiasedrect =
+        QRect((int)round(m_displayrect.x()      / wmult),
+              (int)round(m_displayrect.y()      / hmult),
+              (int)ceil( m_displayrect.width()  / wmult),
+              (int)ceil( m_displayrect.height() / hmult));
 }
 
 OSDTypeFillSlider::~OSDTypeFillSlider()
 {
 }
 
-void OSDTypeFillSlider::Reinit(float wchange, float hchange, float wmult,
-                               float hmult)
+void OSDTypeFillSlider::Reinit(float wmult, float hmult)
 {
-    int width = (int)(m_displayrect.width() * wchange);
-    int height = (int)(m_displayrect.height() * hchange);
-    int x = (int)(m_displayrect.x() * wchange);
-    int y = (int)(m_displayrect.y() * hchange);
-
-    m_displayrect = QRect(x, y, width, height);
-
-    OSDTypeImage::Reinit(wchange, hchange, wmult, hmult);
+    m_displayrect =
+        QRect((int)round(m_unbiasedrect.x()      * wmult),
+              (int)round(m_unbiasedrect.y()      * hmult),
+              (int)ceil( m_unbiasedrect.width()  * wmult),
+              (int)ceil( m_unbiasedrect.height() * hmult));
+    OSDTypeImage::Reinit(wmult, hmult);
 }
 
 void OSDTypeFillSlider::SetPosition(int pos)
@@ -1143,6 +1113,11 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
     m_maxval = 1000;
     m_curval = 0;
     m_displayrect = displayrect;
+    m_unbiasedrect =
+        QRect((int)round(m_displayrect.x()      / wmult),
+              (int)round(m_displayrect.y()      / hmult),
+              (int)ceil( m_displayrect.width()  / wmult),
+              (int)ceil( m_displayrect.height() / hmult));
     m_drawwidth = displayrect.width();
 
     m_drawMap = new unsigned char[m_drawwidth + 1];
@@ -1191,15 +1166,14 @@ OSDTypeEditSlider::~OSDTypeEditSlider()
         delete [] m_ralpha;
 }
 
-void OSDTypeEditSlider::Reinit(float wchange, float hchange, float wmult,
-                               float hmult)
+void OSDTypeEditSlider::Reinit(float wmult, float hmult)
 {
-    int width = (int)(m_displayrect.width() * wchange);
-    int height = (int)(m_displayrect.height() * hchange);
-    int x = (int)(m_displayrect.x() * wchange);
-    int y = (int)(m_displayrect.y() * hchange);
+    m_displayrect =
+        QRect((int)round(m_unbiasedrect.x()      * wmult),
+              (int)round(m_unbiasedrect.y()      * hmult),
+              (int)ceil( m_unbiasedrect.width()  * wmult),
+              (int)ceil( m_unbiasedrect.height() * hmult));
 
-    m_displayrect = QRect(x, y, width, height);
     m_drawwidth = m_displayrect.width();
 
     delete [] m_drawMap;
@@ -1360,30 +1334,46 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OSDTypeBox::OSDTypeBox(const QString &name, QRect displayrect) 
-          : OSDType(name)
+OSDTypeBox::OSDTypeBox(const QString &name, QRect displayrect,
+                       float wmult, float hmult)
+    : OSDType(name)
 {
     size = displayrect;
+    m_unbiasedsize =
+        QRect((int)round(size.x()      / wmult),
+              (int)round(size.y()      / hmult),
+              (int)ceil( size.width()  / wmult),
+              (int)ceil( size.height() / hmult));
+}
+
+void OSDTypeBox::SetRect(QRect newrect, float wmult, float hmult)
+{
+    size = newrect;
+    m_unbiasedsize =
+        QRect((int)round(size.x()      / wmult),
+              (int)round(size.y()      / hmult),
+              (int)ceil( size.width()  / wmult),
+              (int)ceil( size.height() / hmult));
 }
 
 OSDTypeBox::OSDTypeBox(const OSDTypeBox &other)
           : OSDType(other.m_name)
 {
     size = other.size;
+    m_unbiasedsize = other.m_unbiasedsize;
 }
 
 OSDTypeBox::~OSDTypeBox()
 {
 }
 
-void OSDTypeBox::Reinit(float wchange, float hchange)
+void OSDTypeBox::Reinit(float wmult, float hmult)
 {
-    int width = (int)(size.width() * wchange);
-    int height = (int)(size.height() * hchange);
-    int x = (int)(size.x() * wchange);
-    int y = (int)(size.y() * hchange);
-
-    size = QRect(x, y, width, height);
+    size =
+        QRect((int)round(m_unbiasedsize.x()      * wmult),
+              (int)round(m_unbiasedsize.y()      * hmult),
+              (int)ceil( m_unbiasedsize.width()  * wmult),
+              (int)ceil( m_unbiasedsize.height() * hmult));
 }
 
 void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
@@ -1498,13 +1488,18 @@ OSDTypePositionRectangle::OSDTypePositionRectangle(const QString &name)
 }       
    
 OSDTypePositionRectangle::OSDTypePositionRectangle(
-                                        const OSDTypePositionRectangle &other) 
-                        : OSDType(other.m_name), OSDTypePositionIndicator(other)
+    const OSDTypePositionRectangle &other) 
+    : OSDType(other.m_name), OSDTypePositionIndicator(other)
 {
     for (int i = 0; i < m_numpositions; i++)
     {
         QRect tmp = other.positions[i];
         positions.push_back(tmp);
+    }
+    for (int i = 0; i < m_numpositions; i++)
+    {
+        QRect tmp = other.unbiasedpos[i];
+        unbiasedpos.push_back(tmp);
     }
 }
 
@@ -1512,30 +1507,33 @@ OSDTypePositionRectangle::~OSDTypePositionRectangle()
 {
 }
 
-void OSDTypePositionRectangle::Reinit(float wchange, float hchange)
+void OSDTypePositionRectangle::Reinit(float wmult, float hmult)
 {
     for (int i = 0; i < m_numpositions; i++)
     {
-        QRect tmp = positions[i];
-
-        int width = (int)(tmp.width() * wchange);
-        int height = (int)(tmp.height() * hchange);
-        int x = (int)(tmp.x() * wchange);
-        int y = (int)(tmp.y() * hchange);
-
-        tmp = QRect(x, y, width, height);
-        positions[i] = tmp;
+        QRect tmp = unbiasedpos[i];
+        positions[i] =
+            QRect((int)round(tmp.x()      * wmult),
+                  (int)round(tmp.y()      * hmult),
+                  (int)ceil( tmp.width()  * wmult),
+                  (int)ceil( tmp.height() * hmult));
     }
 }
 
-void OSDTypePositionRectangle::AddPosition(QRect rect)
+void OSDTypePositionRectangle::AddPosition(
+    QRect rect, float wmult, float hmult)
 {
     positions.push_back(rect);
+    unbiasedpos.push_back(
+        QRect((int)round(rect.x()      / wmult),
+              (int)round(rect.y()      / hmult),
+              (int)ceil( rect.width()  / wmult),
+              (int)ceil( rect.height() / hmult)));
     m_numpositions++;
 }
 
-void OSDTypePositionRectangle::Draw(OSDSurface *surface, int fade, int maxfade, 
-                                    int xoff, int yoff)
+void OSDTypePositionRectangle::Draw(
+    OSDSurface *surface, int fade, int maxfade, int xoff, int yoff)
 {
     fade = fade;
     maxfade = maxfade;
@@ -1618,17 +1616,21 @@ void OSDTypePositionRectangle::Draw(OSDSurface *surface, int fade, int maxfade,
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OSDTypePositionImage::OSDTypePositionImage(const QString &name)
-                    : OSDTypeImage(name), OSDTypePositionIndicator()
+    : OSDTypeImage(name), OSDTypePositionIndicator(),
+      m_wmult(0.0f), m_hmult(0.0f)
 {
 }
 
 OSDTypePositionImage::OSDTypePositionImage(const OSDTypePositionImage &other)
                     : OSDTypeImage(other), OSDTypePositionIndicator(other)
 {
+    m_wmult = other.m_wmult;
+    m_hmult = other.m_hmult;
+
     for (int i = 0; i < m_numpositions; i++)
     {
-        QPoint tmp = other.positions[i];
-        positions.push_back(tmp);
+        positions.push_back(other.positions[i]);
+        unbiasedpos.push_back(other.unbiasedpos[i]);
     }
 }
 
@@ -1636,45 +1638,61 @@ OSDTypePositionImage::~OSDTypePositionImage()
 {
 }
 
-void OSDTypePositionImage::Reinit(float wchange, float hchange, float wmult, 
-                                  float hmult)
+void OSDTypePositionImage::Reinit(float wmult, float hmult)
 {
-    OSDTypeImage::Reinit(wchange, hchange, wmult, hmult);
+    m_wmult = wmult;
+    m_hmult = hmult;
+    
+    OSDTypeImage::Reinit(wmult, hmult);
 
     for (int i = 0; i < m_numpositions; i++)
     {
-        QPoint tmp = positions[i];
-
-        int x = (int)(tmp.x() * wchange);
-        int y = (int)(tmp.y() * hchange);
-
-        positions[i].setX(x);
-        positions[i].setY(y);
+        positions[i] =
+            QPoint((int)round(unbiasedpos[i].x() * wmult),
+                   (int)round(unbiasedpos[i].y() * hmult));
     }
 }
 
-void OSDTypePositionImage::AddPosition(QPoint pos)
+void OSDTypePositionImage::AddPosition(QPoint pos, float wmult, float hmult)
 {
+    if (m_wmult == 0.0f || m_hmult == 0.0f)
+    {
+        m_wmult = wmult;
+        m_hmult = hmult;
+    }
     positions.push_back(pos);
+    unbiasedpos.push_back(
+        QPoint((int)round(pos.x() / wmult),
+               (int)round(pos.y() / hmult)));
+
+    VERBOSE(VB_IMPORTANT,
+            "OSDTypePositionImage::AddPosition["<<m_numpositions<<"]("
+            <<pos.x()<<"x"<<pos.y()
+            <<"  "<<wmult<<", "<<hmult<<")");
+
     m_numpositions++;
 }
 
 void OSDTypePositionImage::Draw(OSDSurface *surface, int fade, int maxfade,
                                 int xoff, int yoff)
 {
+    VERBOSE(VB_IMPORTANT,
+            "OSDTypePositionImage::Draw["<<m_curposition<<"]("
+            <<m_wmult<<", "<<m_hmult<<")");
+
     if (m_curposition < 0 || m_curposition >= m_numpositions)
         return;
 
     QPoint pos = positions[m_curposition];
 
-    OSDTypeImage::SetPosition(pos);
+    OSDTypeImage::SetPosition(pos, m_wmult, m_hmult);
     OSDTypeImage::Draw(surface, fade, maxfade, xoff, yoff);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
-                     int dispw, int disph)
+                     int dispw, int disph, float wmult, float hmult)
          : OSDType(name)
 {
     m_font = font;
@@ -1683,9 +1701,11 @@ OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
     yoffset = yoff;
     displaywidth = dispw;
     displayheight = disph;
+    m_wmult = wmult;
+    m_hmult = hmult;
 
     QRect rect = QRect(0, 0, 0, 0);
-    m_box = new OSDTypeBox("cc_background", rect);
+    m_box = new OSDTypeBox("cc_background", rect, wmult, hmult);
     m_ccbackground = gContext->GetNumSetting("CCBackground", 0);
 }
 
@@ -1695,12 +1715,23 @@ OSDTypeCC::~OSDTypeCC()
     delete m_box;
 }
 
-void OSDTypeCC::Reinit(int x, int y, int dispw, int disph)
+void OSDTypeCC::Reinit(float wmult, float hmult)
+{
+    (void) wmult;
+    (void) hmult;
+    VERBOSE(VB_IMPORTANT, "Programmer error: "
+            "Call to OSDTypeCC::Reinit(float,float)");
+}
+
+void OSDTypeCC::Reinit(int x, int y, int dispw, int disph,
+                       float wmult, float hmult)
 {
     xoffset = x;
     yoffset = y;
     displaywidth = dispw;
     displayheight = disph;
+    m_wmult = wmult;
+    m_hmult = hmult;    
 }
 
 void OSDTypeCC::AddCCText(const QString &text, int x, int y, int color, 
@@ -1875,7 +1906,7 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
             {
                 QRect rect = QRect(0, 0, textlength + 4, 
                                    (m_font->Size() * 3 / 2) + 3);
-                m_box->SetRect(rect);
+                m_box->SetRect(rect, m_wmult, m_hmult);
                 m_box->Draw(surface, 0, 0, x - 2, y - 2);
             }
 

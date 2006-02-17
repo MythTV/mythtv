@@ -5141,7 +5141,7 @@ void NuppelVideoPlayer::DisplaySubtitles()
                 QImage scaledImage = qImage.smoothScale(rect->w, rect->h);
 
                 OSDTypeImage* image = new OSDTypeImage();
-                image->SetPosition(QPoint(rect->x, rect->y));
+                image->SetPosition(QPoint(rect->x, rect->y), hmult, vmult);
                 image->LoadFromQImage(scaledImage);
 
                 subtitleOSD->AddType(image);
@@ -5290,10 +5290,11 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
                 hl_button.setPixel(x, y, pixel);
             }
         }
-
+        float hmult = osd->GetSubtitleBounds().width() / 720.0;
+        float vmult = osd->GetSubtitleBounds().height() / 576.0;
         OSDTypeImage* image = new OSDTypeImage();
         QImage scaledImage = hl_button.smoothScale(w + 1, h + 1);
-        image->SetPosition(QPoint(btnX - 1, btnY + 1));
+        image->SetPosition(QPoint(btnX - 1, btnY + 1), hmult, vmult);
         image->LoadFromQImage(scaledImage);
         subtitleOSD->AddType(image);
         osd->SetVisible(subtitleOSD, 0);
