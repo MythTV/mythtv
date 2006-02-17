@@ -564,6 +564,27 @@ static HostCheckBox *JobAllowTranscode()
     return gc;
 };
 
+static GlobalLineEdit *JobQueueTranscodeCommand()
+{
+    GlobalLineEdit *gc = new GlobalLineEdit("JobQueueTranscodeCommand");
+    gc->setLabel(QObject::tr("Transcoder command"));
+    gc->setValue("mythtranscode");
+    gc->setHelpText(QObject::tr("The program used to transcode recordings. "
+                    "The default is 'mythtranscode' if this setting is empty."));
+    return gc;
+};
+
+static GlobalLineEdit *JobQueueCommFlagCommand()
+{
+    GlobalLineEdit *gc = new GlobalLineEdit("JobQueueCommFlagCommand");
+    gc->setLabel(QObject::tr("Commercial Flagger command"));
+    gc->setValue("mythcommflag");
+    gc->setHelpText(QObject::tr("The program used to detect commercials in a "
+                    "recording.  The default is 'mythcommflag' "
+                    "if this setting is empty."));
+    return gc;
+};
+
 static HostCheckBox *JobAllowUserJob1()
 {
     HostCheckBox *gc = new HostCheckBox("JobAllowUserJob1");
@@ -618,7 +639,6 @@ BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
     group1->setLabel(QObject::tr("Host-specific Backend Setup"));
     group1->addChild(RecordFilePrefix());
-    group1->addChild(SaveTranscoding());
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
@@ -687,8 +707,11 @@ BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group6 = new VerticalConfigurationGroup(false);
     group6->setLabel(QObject::tr("Job Queue (Global)"));
     group6->addChild(JobsRunOnRecordHost());
-    group6->addChild(AutoTranscodeBeforeAutoCommflag());
     group6->addChild(AutoCommflagWhileRecording());
+    group6->addChild(JobQueueCommFlagCommand());
+    group6->addChild(JobQueueTranscodeCommand());
+    group6->addChild(AutoTranscodeBeforeAutoCommflag());
+    group6->addChild(SaveTranscoding());
     addChild(group6);    
 
     VerticalConfigurationGroup* group7 = new VerticalConfigurationGroup(false);

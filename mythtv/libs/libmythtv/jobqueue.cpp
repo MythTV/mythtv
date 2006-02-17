@@ -1526,15 +1526,15 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     runningJobTypes[key] = jobType;
     runningJobIDs[key] = id;
     runningJobDescs[key] = GetJobDescription(jobType);
-    runningJobCommands[key] = GetJobCommand(jobType, pginfo);
+    runningJobCommands[key] = GetJobCommand(id, jobType, pginfo);
 
     if ((jobType == JOB_TRANSCODE) ||
-        (runningJobCommands[key] == "transcode"))
+        (runningJobCommands[key] == "mythtranscode"))
     {
         StartChildJob(TranscodeThread, pginfo);
     }
     else if ((jobType == JOB_COMMFLAG) ||
-             (runningJobCommands[key] == "commflag"))
+             (runningJobCommands[key] == "mythcommflag"))
     {
         StartChildJob(FlagCommercialsThread, pginfo);
     }
@@ -1589,22 +1589,34 @@ QString JobQueue::GetJobDescription(int jobType)
     return gContext->GetSetting(descSetting, "Unknown Job");
 }
 
-QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
+QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 {
     QString command = "";
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (jobType == JOB_TRANSCODE)
-        return "transcode";
+    {
+        command = gContext->GetSetting("JobQueueTranscodeCommand");
+        if (command.stripWhiteSpace().isEmpty())
+            command = "mythtranscode";
+            
+        if (command == "mythtranscode")
+            return command;
+    }
     else if (jobType == JOB_COMMFLAG)
-        return "commflag";
-    else if (!(jobType & JOB_USERJOB))
-        return "";
-
-    QString commandSetting =
-        QString("UserJob%1").arg(UserJobTypeToIndex(jobType));
-
-    command = gContext->GetSetting(commandSetting, "");
+    {
+        command = gContext->GetSetting("JobQueueCommFlagCommand");
+        if (command.stripWhiteSpace().isEmpty())
+            command = "mythcommflag";
+            
+        if (command == "mythcommflag")
+            return command;
+    }
+    else if (jobType & JOB_USERJOB)
+    {
+        command = gContext->GetSetting(
+                    QString("UserJob%1").arg(UserJobTypeToIndex(jobType)), "");
+    }
 
     if (command != "")
     {
@@ -1636,17 +1648,17 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
                         tmpInfo->endts.toString(Qt::ISODate));
         command.replace(QRegExp("%VERBOSELEVEL%"),
                         QString("%1").arg(print_verbose_messages));
+        command.replace(QRegExp("%JOBID%"), QString("%1").arg(id));
+
+        QString transProf;
+        if (tmpInfo->transcoder == RecordingProfile::TranscoderAutodetect)
+            transProf = "autodetect";
+        else
+            transProf = QString::number(tmpInfo->transcoder);
+        command.replace(QRegExp("%TRANSPROFILE%"), transProf);
     }
 
     return command;
-}
-
-void *JobQueue::TranscodeThread(void *param)
-{
-    JobQueue *theTranscoder = (JobQueue *)param;
-    theTranscoder->DoTranscodeThread();
-
-    return NULL;
 }
 
 QString JobQueue::PrettyPrint(off_t bytes)
@@ -1682,6 +1694,14 @@ QString JobQueue::PrettyPrint(off_t bytes)
         .arg(pptab[ii].suffix);
 }
 
+void *JobQueue::TranscodeThread(void *param)
+{
+    JobQueue *theTranscoder = (JobQueue *)param;
+    theTranscoder->DoTranscodeThread();
+
+    return NULL;
+}
+
 void JobQueue::DoTranscodeThread(void)
 {
     if (!m_pginfo)
@@ -1710,10 +1730,23 @@ void JobQueue::DoTranscodeThread(void)
                             "autodetect" :
                             QString::number(transcoder);
 
-    QString path = gContext->GetInstallPrefix() + "/bin/mythtranscode";
-    QString command = QString("%1 -j %2 -V %3 -p %4 %5")
-                      .arg(path).arg(jobID).arg(print_verbose_messages)
-                      .arg(profilearg.ascii()).arg(useCutlist ? "-l" : "");
+    QString path;
+    QString command;
+
+    if (runningJobCommands[key] == "mythtranscode")
+    {
+        path = gContext->GetInstallPrefix() + "/bin/mythtranscode";
+        command = QString("%1 -j %2 -V %3 -p %4 %5")
+                          .arg(path).arg(jobID).arg(print_verbose_messages)
+                          .arg(profilearg.ascii()).arg(useCutlist ? "-l" : "");
+    }
+    else
+    {
+        command = runningJobCommands[key];
+
+        QStringList tokens = QStringList::split(" ", command);
+        path = tokens[0];
+    }
 
     if (jobQueueCPU < 2)
         nice(17);
@@ -2013,13 +2046,27 @@ void JobQueue::DoFlagCommercialsThread(void)
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;
-    QString path = gContext->GetInstallPrefix() + "/bin/mythcommflag";
-    QString cmd = QString("%1 -j %2 -V %3")
+    QString path;
+    QString command;
+
+    if (runningJobCommands[key] == "mythcommflag")
+    {
+        path = gContext->GetInstallPrefix() + "/bin/mythcommflag";
+        command = QString("%1 -j %2 -V %3")
                           .arg(path).arg(jobID).arg(print_verbose_messages);
+    }
+    else
+    {
+        command = runningJobCommands[key];
 
-    VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'").arg(cmd));
+        QStringList tokens = QStringList::split(" ", command);
+        path = tokens[0];
+    }
 
-    breaksFound = myth_system(cmd.ascii());
+    VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'")
+                                 .arg(command));
+
+    breaksFound = myth_system(command.ascii());
 
     controlFlagsLock.lock();
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||

@@ -183,7 +183,7 @@ class JobQueue : public QObject
     static QString GetJobQueueKey(ProgramInfo *pginfo);
 
     QString GetJobDescription(int jobType);
-    QString GetJobCommand(int jobType, ProgramInfo *tmpInfo);
+    QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
 
     static void *TranscodeThread(void *param);
     static QString PrettyPrint(off_t bytes);
