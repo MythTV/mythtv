@@ -39,9 +39,6 @@ typedef void QMap_Events;
 
 class VirtualChannelTable;
 
-/** \TODO Fix this size */
-#define NumHandlers     7
-
 /**
  *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
  *  DVB providers who use Huffman compressed guide in the 9x descriptors.

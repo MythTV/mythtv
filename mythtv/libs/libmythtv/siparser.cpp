@@ -182,9 +182,12 @@ void SIParser::CheckTrackers()
                     .arg((tabletypes) x));
             while (Table[x]->GetPIDs(pid,filter,mask))
             {
-                AddPid(pid, mask, filter, true, 
-                        ((SIStandard == SI_STANDARD_DVB) &&
-                         (x == EVENTS)) ? 1000 : 10);
+                int bufferFactor = 10;
+#ifdef USING_DVB_EIT
+                if ((SIStandard == SI_STANDARD_DVB) && (x == EVENTS))
+                    bufferFactor = 1000;
+#endif // USING_DVB_EIT
+                AddPid(pid, mask, filter, true, bufferFactor);
             }
         }
     }
@@ -1313,10 +1316,12 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
     if (CurrentTransport)
         emit FindServicesComplete();
 
+#ifdef USING_DVB_EIT
     // TODO: This is temp
     Table[EVENTS]->DependencyMet(SERVICES);
     //Table[EVENTS]->AddPid(0x12,0x00,0x00,true); // see ticket #755
     Table[EVENTS]->AddPid(0x12,0x7F,0x80,0x12); // see ticket #755
+#endif // USING_DVB_EIT
 }
 
 /** \fn SIParser::GetLanguagePriority(const QString&)
@@ -2321,6 +2326,7 @@ void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
                         .arg(table_type_pid,0,16).arg(size));
                 break;
 
+#ifdef USING_DVB_EIT
             case 0x100 ... 0x17F:
                 VERBOSE(VB_SIPARSER, LOC +
                         QString("EIT-%1 Present on PID 0x%2")
@@ -2338,6 +2344,7 @@ void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
                 Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,
                                       table_type - 0x200);
                 break;
+#endif // USING_DVB_EIT
 
             default:
                 VERBOSE(VB_SIPARSER, LOC +
@@ -2395,8 +2402,10 @@ void SIParser::AddToServices(const VirtualChannelTable &vct)
         ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
     }
 
+#ifdef USING_DVB_EIT
 // TODO REMOVE THIS WHEN SERVIVES SET
     Table[EVENTS]->DependencyMet(SERVICES);
+#endif // USING_DVB_EIT
 
     emit FindServicesComplete();
 }
@@ -3023,3 +3032,5 @@ void SIParser::PrintDescriptorStatistics(void) const
     }
     VERBOSE(VB_SIPARSER, LOC + "Descriptor Stats -- end");
 }
+
+/* vim: set sw=4 expandtab: */

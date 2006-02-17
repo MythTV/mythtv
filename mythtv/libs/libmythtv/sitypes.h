@@ -56,13 +56,17 @@ typedef enum tabletypes
     PMT,                /* Program Managemenet Table */
     MGT,                /* ATSC Management Table */
     STT,                /* ATSC Time Table */
-    EVENTS,             /* EIT for DVB or ATSC */
     SERVICES,           /* SDT or T/CVCT */
     NETWORK,            /* Current Network NIT */
+#ifdef USING_DVB_EIT
+    EVENTS,             /* EIT for DVB or ATSC */
+#endif // USING_DVB_EIT
 
-    OTHER_SERVICES,     /* Other Network SDT */
+    NumHandlers,        /* placeholder */
+
+    OTHER_SERVICES = NumHandlers, /* Other Network SDT */
     OTHER_NETWORK,      /* Other Network NIT */
-    CAT                 /* Conditional Access Table */
+    CAT,                /* Conditional Access Table */
 };
 
 class SectionTracker;
