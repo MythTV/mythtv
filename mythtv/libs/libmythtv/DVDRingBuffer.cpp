@@ -4,6 +4,8 @@
 #include "mythcontext.h"
 #include "iso639.h"
 
+#include "NuppelVideoPlayer.h"
+
 #define LOC QString("DVDRB: ")
 #define LOC_ERR QString("DVDRB, Error: ")
 
@@ -32,7 +34,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       skipstillorwait(true), spuStreamLetterbox(false),
       cellstartPos(0), buttonSelected(false), 
       buttonExists(false), menuspupts(0),
-      cellChange(0)
+      cellChange(0), parent(0)
 {
     dvdMenuButton = (AVSubtitleRect*)av_mallocz(sizeof(AVSubtitleRect));
 }
@@ -309,10 +311,19 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             {
                 dvdnav_vts_change_event_t* vts =
                     (dvdnav_vts_change_event_t*)(blockBuf);
+
+                int aspect = dvdnav_get_video_aspect(dvdnav);
+                int permission = dvdnav_get_video_scale_permission(dvdnav);
+
                 VERBOSE(VB_PLAYBACK, QString("DVDNAV_VTS_CHANGE: "
-                                             "old_vtsN==%1, new_vtsN==%2")
-                        .arg(vts->old_vtsN).arg(vts->new_vtsN));
-                            
+                                             "old_vtsN==%1, new_vtsN==%2, "
+                                             "aspect: %3, perm: %4")
+                        .arg(vts->old_vtsN).arg(vts->new_vtsN)
+                        .arg(aspect).arg(permission));
+
+                if (parent)
+                    parent->SetForcedAspectRatio(aspect, permission);
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);

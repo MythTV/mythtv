@@ -22,6 +22,8 @@
  *   needs to be in a RingBufferBase class.
  */
 
+class NuppelVideoPlayer;
+
 class DVDRingBufferPriv
 {
   public:
@@ -75,7 +77,9 @@ class DVDRingBufferPriv
     int NumMenuButtons(void);
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
     uint GetCurrentTime(void);
-        
+    
+    void SetParent(NuppelVideoPlayer *p) { parent = p; }
+    
   protected:
     dvdnav_t      *dvdnav;
     unsigned char  dvdBlockWriteBuf[DVD_BLOCK_SIZE];
@@ -116,6 +120,8 @@ class DVDRingBufferPriv
     bool           buttonExists;
     long long      menuspupts;
     int            cellChange;
+
+    NuppelVideoPlayer *parent;
 
     bool DrawMenuButton(uint8_t *spu_pkt, int buf_size);
     bool DVDButtonUpdate(bool b_mode);

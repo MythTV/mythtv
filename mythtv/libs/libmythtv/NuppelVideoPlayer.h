@@ -111,6 +111,7 @@ class NuppelVideoPlayer
     void SetFileLength(int total, int frames);
     void Zoom(int direction);
     void ClearBookmark(void);
+    void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
 
     // Toggle Sets
     void ToggleLetterbox(int letterboxMode = -1);
@@ -447,6 +448,7 @@ class NuppelVideoPlayer
     int      video_size;      ///< Video (input) buffer size in bytes
     double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
     float    video_aspect;    ///< Video (input) Apect Ratio
+    float    forced_video_aspect; 
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
     FrameScanType m_scan;
     /// Video (input) Number of frames between key frames (often inaccurate)

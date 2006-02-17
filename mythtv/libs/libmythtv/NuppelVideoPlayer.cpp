@@ -470,7 +470,8 @@ void NuppelVideoPlayer::ReinitVideo(void)
     vidExitLock.lock();
     videofiltersLock.lock();
 
-    videoOutput->InputChanged(video_width, video_height, video_aspect);
+    float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
+    videoOutput->InputChanged(video_width, video_height, aspect);
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, "ReinitVideo(): videoOutput->IsErrored()");
@@ -699,6 +700,9 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
 int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                                 bool allow_libmpeg2)
 {
+    if (ringBuffer->isDVD())
+        allow_libmpeg2 = false;
+
     if (!skipDsp)
     {
         if (!ringBuffer)
@@ -2396,6 +2400,9 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (OpenFile() < 0)
         return;
 
+    if (ringBuffer->isDVD())
+        ringBuffer->DVD()->SetParent(this);
+
     if (!no_audio_out ||
         (forceVideoOutput == kVideoOutput_IVTV &&
          !gContext->GetNumSetting("PVR350InternalAudioOnly")))
@@ -3731,6 +3738,26 @@ int NuppelVideoPlayer::GetLetterbox(void) const
     if (videoOutput)
         return videoOutput->GetLetterbox();
     return false;
+}
+
+void NuppelVideoPlayer::SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission)
+{
+    (void)letterbox_permission;
+
+    float forced_aspect_old = forced_video_aspect;
+
+    if (mpeg2_aspect_value == 2) // 4:3
+        forced_video_aspect = 4.0f / 3.0f;
+    else if (mpeg2_aspect_value == 3) // 16:9
+        forced_video_aspect = 16.0f / 9.0f;
+    else
+        forced_video_aspect = -1;
+
+    if (videoOutput && forced_video_aspect != forced_aspect_old)
+    {
+        float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
+        videoOutput->VideoAspectRatioChanged(aspect);
+    }
 }
 
 void NuppelVideoPlayer::ToggleLetterbox(int letterboxMode)
@@ -5251,7 +5278,7 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         uint btnY = ringBuffer->DVD()->ButtonPosY();
         subtitleOSD = osd->GetSet("subtitles");
 
-        QImage hl_button(w,h,32);
+        QImage hl_button(w, h, 32);
         hl_button.setAlphaBuffer(true);
         for (int y = 0; y < h; y++)
         {
@@ -5262,6 +5289,7 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
                 hl_button.setPixel(x, y, pixel);
             }
         }
+
         OSDTypeImage* image = new OSDTypeImage();
         QImage scaledImage = hl_button.smoothScale(w + 1, h + 1);
         image->SetPosition(QPoint(btnX - 1, btnY + 1));
