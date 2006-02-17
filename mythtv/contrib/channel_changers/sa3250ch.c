@@ -30,6 +30,7 @@
 
 /* SA3250HD IDs */
 #define SA3250HD_VENDOR_ID	0x000011e6
+#define SA3250HD_VENDOR_ID2     0x000014f8
 #define SA3250HD_MODEL_ID	0x00000be0
 
 #define AVC1394_SA3250_COMMAND_CHANNEL 0x000007c00   /* subunit command */
@@ -103,7 +104,8 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 		
-      if ((dir.vendor_id == SA3250HD_VENDOR_ID)  &&
+      if ((dir.vendor_id == SA3250HD_VENDOR_ID ||
+           dir.vendor_id == SA3250HD_VENDOR_ID2)  &&
           (dir.model_id == SA3250HD_MODEL_ID)) {
             device = i;
             break;
@@ -121,7 +123,7 @@ int main (int argc, char *argv[])
    dig[0] = 0x30 | ((chn % 1000) / 100);
 
    cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS;
-   cmd[1] = CTL_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
+   cmd[1] = CTL_CMD1 | (dig[2] << 16) | (dig[1] << 8) | dig[0];
    cmd[2] = CTL_CMD2;
 
    if (verbose)
@@ -130,6 +132,8 @@ int main (int argc, char *argv[])
 
    avc1394_transaction_block(handle, 0, cmd, 3, 1);
    cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
+   cmd[1] = CTL_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
+   cmd[2] = CTL_CMD2;
 
    if (verbose)
       printf("AV/C Command: %d%d%d = cmd0=0x%08x cmd2=0x%08x cmd3=0x%08x\n", 

@@ -96,7 +96,7 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
 	    dig[0] |= 0x30;
 
 	    cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS;
-	    cmd[1] = SA3250_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
+	    cmd[1] = SA3250_CMD1 | (dig[2] << 16) | (dig[1] << 8) | dig[0];
 	    cmd[2] = SA3250_CMD2;
             VERBOSE(VB_GENERAL, QString("FireWireChannel: channel:%1%2%3 "
                                         "cmds: 0x%4, 0x%5, 0x%6")
@@ -108,6 +108,9 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
 	    avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
 
 	    cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
+            cmd[1] = SA3250_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
+            cmd[2] = SA3250_CMD2;
+
             VERBOSE(VB_GENERAL, QString("FireWireChannel: channel:%1%2%3 "
                                         "cmds: 0x%4, 0x%5, 0x%6")
                     .arg(dig[0] & 0xf).arg(dig[1] & 0xf)
