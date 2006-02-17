@@ -428,6 +428,7 @@ if test "$browser" != "no" ; then
            has_header /opt/kde3/include/khtml_part.h    || \
            has_header /usr/kde/3.3/include/khtml_part.h || \
            has_header /usr/kde/3.4/include/khtml_part.h || \
+           has_header /usr/kde/3.5/include/khtml_part.h || \
            has_header khtml_part.h ; then
             hasit="yes"
         fi
