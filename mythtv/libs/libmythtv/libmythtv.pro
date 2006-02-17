@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythtv-$$LIBVERSION
 CONFIG += thread dll
-target.path = $${PREFIX}/lib
+target.path = $${LIBDIR}
 INSTALLS = target
 
 INCLUDEPATH += ../.. ..

@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythcontrols
-target.path = $${PREFIX}/lib/mythtv/plugins
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default

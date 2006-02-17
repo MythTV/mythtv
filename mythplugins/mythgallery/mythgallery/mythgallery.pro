@@ -10,7 +10,7 @@ include (config.pro)
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythgallery
-target.path = $${PREFIX}/lib/mythtv/plugins
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 LIBS += -ltiff
 

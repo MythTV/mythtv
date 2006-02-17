@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = myth-$$LIBVERSION
 CONFIG += thread dll
-target.path = $${PREFIX}/lib
+target.path = $${LIBDIR}
 INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)

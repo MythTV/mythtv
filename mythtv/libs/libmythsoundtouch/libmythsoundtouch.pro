@@ -4,8 +4,6 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythsoundtouch-$$LIBVERSION
 CONFIG += thread staticlib warn_off
-target.path = $${PREFIX}/lib
-INSTALLS = target
 
 INCLUDEPATH += ../../libs/libavcodec ../..
 

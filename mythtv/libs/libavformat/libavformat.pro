@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythavformat-$$LIBVERSION
 CONFIG += thread dll warn_off
-target.path = $${PREFIX}/lib
+target.path = $${LIBDIR}
 INSTALLS = target
 
 INCLUDEPATH += ../ ../../ ../libavcodec ../libavutil ../libmythtv

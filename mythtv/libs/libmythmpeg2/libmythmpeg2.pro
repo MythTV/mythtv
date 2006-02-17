@@ -4,8 +4,6 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythmpeg2-$$LIBVERSION
 CONFIG += thread staticlib warn_off
-target.path = $${PREFIX}/lib
-INSTALLS = target
 
 QMAKE_CFLAGS_RELEASE += -DPIC -fPIC -fno-common
 QMAKE_CFLAGS_DEBUG += -DPIC -fPIC -fno-common

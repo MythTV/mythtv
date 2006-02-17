@@ -10,7 +10,7 @@ INCLUDEPATH *= /usr/include/cdda
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythmusic
-target.path = $${PREFIX}/lib/mythtv/plugins
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 installfiles.path = $${PREFIX}/share/mythtv

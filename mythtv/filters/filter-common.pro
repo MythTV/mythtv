@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 CONFIG -= moc qt
 CONFIG += plugin thread
-target.path = $${PREFIX}/lib/mythtv/filters
+target.path = $${LIBDIR}/mythtv/filters
 INSTALLS = target
 
 QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes

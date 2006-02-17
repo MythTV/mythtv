@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythdvdnav-$$LIBVERSION
 CONFIG += thread staticlib warn_off
-target.path = $${PREFIX}/lib
+target.path = $${LIBDIR}
 
 INCLUDEPATH += ../../
 

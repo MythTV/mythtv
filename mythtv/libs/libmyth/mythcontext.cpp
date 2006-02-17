@@ -186,6 +186,7 @@ class MythContextPrivate
     Settings *m_qtThemeSettings;
 
     QString m_installprefix;
+    QString m_installlibdir;
 
     bool m_gui;
     bool m_backend;
@@ -258,7 +259,7 @@ class MythContextPrivate
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_settings(new Settings()), m_qtThemeSettings(new Settings()),
-      m_installprefix(PREFIX),
+      m_installprefix(PREFIX), m_installlibdir(LIBDIR),
       m_gui(false), m_backend(false), m_themeloaded(false),
       m_menuthemepathname(QString::null), m_themepathname(QString::null),
       m_backgroundimage(NULL),
@@ -1120,7 +1121,7 @@ QString MythContext::GetShareDir(void)
 
 QString MythContext::GetLibraryDir(void) 
 { 
-    return d->m_installprefix + "/lib/mythtv/"; 
+    return d->m_installlibdir + "/mythtv/"; 
 }
 
 QString MythContext::GetThemesParentDir(void) 

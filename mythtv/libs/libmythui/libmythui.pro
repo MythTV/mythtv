@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
 CONFIG += debug thread dll 
-target.path = $${PREFIX}/lib
+target.path = $${LIBDIR}
 INSTALLS = target
 
 INCLUDEPATH += ../libmyth

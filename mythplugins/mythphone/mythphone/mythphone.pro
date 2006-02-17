@@ -16,7 +16,7 @@ QMAKE_CFLAGS_RELEASE += -Wno-unused
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythphone
-target.path = $${PREFIX}/lib/mythtv/plugins
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default

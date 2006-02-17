@@ -7,7 +7,7 @@ INCLUDEPATH += /opt/kde3/include
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug
 TARGET = mythbookmarkmanager
-target.path = $${PREFIX}/lib/mythtv/plugins
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 #uifiles.path = $${PREFIX}/share/mythtv/themes/default
