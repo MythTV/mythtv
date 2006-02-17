@@ -271,6 +271,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             remotefile = NULL;
         }
     }
+
+    setswitchtonext = false;
 }
 
 /** \fn RingBuffer::IsOpen(void) const
