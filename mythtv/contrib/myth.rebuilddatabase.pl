@@ -53,6 +53,9 @@ use strict;
 use DBI;
 use Getopt::Long;
 use Sys::Hostname;
+use File::Basename;
+use Date::Parse;
+use Time::Format qw(time_format);
 
 ## get command line args
 
@@ -69,10 +72,33 @@ my $database = "mythconverg";
 my $user = "mythtv";
 my $pass = "mythtv";
 my $ext = "nuv";
+my $file = "";
+my @answers;
+my $norename = 0;
 
 my $date_regx = qr/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/;
 my $db_date_regx = qr/(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/;
 my $channel_regx = qr/(\d\d\d\d)/;
+
+sub GetAnswer {
+    my ($prompt, $default) = @_;
+    print $prompt;
+    if ($default) {
+        print " [", $default, "]";
+    }
+    print ": ";
+
+    my $answer;
+    if ($#answers >= 0) {
+        $answer = shift @answers;
+        print $answer, "\n";
+    } else {
+        chomp($answer = <STDIN>);
+        $answer = $default if !$answer;
+    }
+
+    return $answer;
+}
 
 my $script_name = $0;
 
@@ -80,7 +106,7 @@ if ($0 =~ m/([^\/]+)$/) {
 	$script_name = $1;
 }
 
-my $script_version = "0.0.1";
+my $script_version = "0.0.2";
 
 my $argc=@ARGV;
 if ($argc == 0) {
@@ -101,6 +127,10 @@ if ($argc == 0) {
                         use the default
       --test_mode     - do everything except update the database
       --ext           - file extensions to scan for
+      --file          - specific file to import
+      --answer        - command-line response to prompts (give as many
+                        answers as you like)
+      --norename      - don't rename file to myth convention
 
     Example 1:
       Assumption: The script is run on DB/backend machine.
@@ -111,7 +141,7 @@ if ($argc == 0) {
       Assumption: The script is run on a backend other than the DB machine.
 		
         $script_name --dbhost=mydbserver
-		";
+";
 	exit(0);
 }
 
@@ -126,7 +156,10 @@ GetOptions('verbose+'=>\$verbose,
 		'try_default|td'=>\$try_default,
 		'quick_run|qr'=>\$quick_run,
 		'test_mode|t|tm'=>\$test_mode,
-        'ext=s'=>\$ext
+		'ext=s'=>\$ext,
+		'file=s'=>\$file,
+        'answer=s'=>\@answers,    # =s{,} would be nice but isn't implemented widely
+		'norename'=>\$norename
 		);
 
 my $dbh = DBI->connect("dbi:mysql:database=$database:host=$dbhost",
@@ -194,198 +227,160 @@ print "\nThese are the files stored in ($dir) and will be checked against\n";
 print "your database to see if the exist.  If they do not, you will be prompted\n";
 print "for a title and subtitle of the entry, and a record will be created.\n\n";
 
-my @files = glob("$dir/*.$ext");
+my @files = $file ? ($dir . "/" . $file) : glob("$dir/*.$ext");
 
 foreach my $show (@files) {
-	my ($channel, $syear, $smonth, $sday, $shour, $sminute, $ssecond,
-			$eyear, $emonth, $eday, $ehour, $eminute, $esecond);
-	my ($starttime, $endtime);
+    my $showBase = basename($show);
 
-	if ($show =~ m/$channel_regx\_$date_regx\_$date_regx/) {
-		$channel = $1;
+    my $found_title = $dbh->selectrow_array("select title from recorded where hostname=(?) and basename=(?)",
+                                            undef, $host, $showBase);
 
-		($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
-			($2, $3, $4, $5, $6, $7);
+    if ($found_title) {
+        print("Found a match between file and database\n");
+        print("    File: '$show'\n");
+        print("    Title: '$found_title'\n");
 
-		($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
-			($8, $9, $10, $11, $12, $13);
+        # use this so the stuff below doesn't have to be indented
+        next;
+    }
 
-		$starttime = "$syear$smonth$sday$shour$sminute$ssecond";
-		$endtime = "$eyear$emonth$eday$ehour$eminute$esecond";
+    print("Unknown file $show found.\n");
+    next unless GetAnswer("Do you want to import?", "y") eq "y";
 
-## check if this is already in the db
-## second hit to the db i know, but performance is not a big
-## issue here
 
-		$q = "select title from recorded where chanid=(?) and starttime=(?) and endtime=(?)";
-		$sth = $dbh->prepare($q);
-		$sth->execute($channel, $starttime, $endtime)
-			or die "Could not execute ($q)\n";
+    # normal case: import file into the database
 
-		my $exists = 0;
-		my $found_title = "Unknown";
-		if (my @row = $sth->fetchrow_array) {
-			$exists = 1;
-			$found_title = $row[0];
-		}
+    my ($channel, $syear, $smonth, $sday, $shour, $sminute, $ssecond,
+        $eyear, $emonth, $eday, $ehour, $eminute, $esecond);
+    my ($starttime, $duration, $endtime);
+    my ($mythfile);
 
-		if ($exists) {
-			print("Found a match between file and database\n");
-			print("    File: '$show'\n");
-			print("    Title: '$found_title'\n");
-		} else {
-			my $basename = $show;
-			$basename =~ s/$dir\/(.*)/$1/s;
+    # filename varies depending on when the recording was
+    # created. Gleam as much as possible from the name.
 
-			my $guess = "select title, subtitle, description from oldrecorded where chanid=(?) and starttime=(?) and endtime=(?)";
-			$sth = $dbh->prepare($guess);
-			$sth->execute($channel, $starttime, $endtime)
-				or die "Could not execute ($guess)\n";
+    if ($showBase =~ m/$channel_regx\_/) {
+        $channel = $1;
+    } else {
+        $channel = "0000";
+    }
 
-			my $guess_title = "Unknown";
-			my $guess_subtitle = "Unknown";
-			my $guess_description = "Unknown";
+    if ($showBase =~ m/$channel_regx\_$date_regx\./) {
+        ($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
+            ($2, $3, $4, $5, $6, $7);
+    }
 
-			if (my @row = $sth->fetchrow_array) {
-				$guess_title = $row[0];
-				$guess_subtitle = $row[1];
-				$guess_description = $row[2];
-			}
+    if ($showBase =~ m/$channel_regx\_$date_regx\_$date_regx/) {
+        ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
+            ($8, $9, $10, $11, $12, $13);
+    }
 
-			print "Found an orphaned file, creating database record\n";
-			print "Channel:    $channel\n";
-			print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
-			print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
+    my $guess_title = "Unknown";
+    my $guess_subtitle = "";
+    my $guess_description = "Recovered file " . $showBase;
 
-			my $newtitle = $guess_title;
-			my $newsubtitle = $guess_subtitle;
-			my $newdescription = $guess_description;
+    # have enough to look for an past recording?
+    if ($ssecond) {
+        $starttime = "$syear$smonth$sday$shour$sminute$ssecond";
 
-			if (!$quick_run) {
-				print "Enter title (default: '$newtitle'): ";
-				chomp(my $tmp_title = <STDIN>);
-				if ($tmp_title) {$newtitle = $tmp_title;}
+        my $guess = "select title, subtitle, description from oldrecorded where chanid=(?) and starttime=(?)";
+        $sth = $dbh->prepare($guess);
+        $sth->execute($channel, $starttime)
+            or die "Could not execute ($guess)\n";
 
-				print "Enter subtitle (default: '$newsubtitle'): ";
-				chomp(my $tmp_subtitle = <STDIN>);
-				if ($tmp_subtitle) {$newsubtitle = $tmp_subtitle;}
-
-				print "Enter description (default: '$newdescription'): ";
-				chomp(my $tmp_description = <STDIN>);
-				if ($tmp_description) {$newdescription = $tmp_description;}
-			} else {
-				print("QuickRun defaults:\n");
-				print("        title: '$newtitle'\n");
-				print("     subtitle: '$newsubtitle'\n");
-				print("  description: '$newdescription'\n");
-			}
-
-## add records to db
-			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
-
-			$sth = $dbh->prepare($i);
-			if (!$test_mode) {
-				$sth->execute($channel, $starttime, $endtime, $newtitle,
-						$newsubtitle, $newdescription, $host, $basename,
-						$starttime, $endtime)
-					or die "Could not execute ($i)\n";
-			} else {
-				print("Test mode: insert would have been done\n");
-				print("  Query: '$i'\n");
-				print("  Query params: '$channel', '$starttime', '$endtime',");
-				print("'$newtitle', '$newsubtitle', '$newdescription',");
-				print("'$host', '$basename', '$starttime', '$endtime'\n");
-				
-			}
-		} ## if
-	} else {
-# file doesn't match
-        print("Non-nuv file $show found.\n");
-        print("Do you want to import? (y/n): ");
-        chomp(my $do_import = <STDIN>);
-        if ($do_import eq "y") {
-			my $basename = $show;
-			$basename =~ s/$dir\/(.*)/$1/s;
-
-            print("Enter channel: ");
-            chomp(my $tmp_channel = <STDIN>);
-            if ($tmp_channel) {$channel = $tmp_channel;}
-            
-            print("Enter start time (YYYY-MM-DD HH:MM:SS): ");
-            chomp(my $tmp_starttime = <STDIN>);
-            if ($tmp_starttime) {$starttime = $tmp_starttime;}
-
-            print("Enter end time (YYYY-MM-DD HH:MM:SS): ");
-            chomp(my $tmp_endtime = <STDIN>);
-            if ($tmp_endtime) {$endtime = $tmp_endtime;}
-
-			print "Enter title: ";
-			chomp(my $tmp_title = <STDIN>);
-			if ($tmp_title) {$title = $tmp_title;}
-
-			print "Enter subtitle: ";
-			chomp(my $tmp_subtitle = <STDIN>);
-			if ($tmp_subtitle) {$subtitle = $tmp_subtitle;}
-
-			print "Enter description: ";
-			chomp(my $tmp_description = <STDIN>);
-			if ($tmp_description) {$description = $tmp_description;}
-
-## add records to db
-			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
-
-			$sth = $dbh->prepare($i);
-			if (!$test_mode) {
-				$sth->execute($channel, $starttime, $endtime, $title,
-						$subtitle, $description, $host, $basename,
-						$starttime, $endtime)
-					or die "Could not execute ($i)\n";
-			} else {
-				print("Test mode: insert would have been done\n");
-				print("  Query: '$i'\n");
-				print("  Query params: '$channel', '$starttime', '$endtime',");
-				print("'$title', '$subtitle', '$description', '$host',");
-				print("'$basename', '$starttime', '$endtime'\n");
-				
-			}
-
-## rename file to proper format
-            
-		if ($starttime =~ m/$db_date_regx/) {
-			($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
-				($1, $2, $3, $4, $5, $6);
-		}
-
-		if ($endtime =~ m/$db_date_regx/) {
-			($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
-				($1, $2, $3, $4, $5, $6);
-		}
-
-        my $new_file = "$dir/$channel"."_$syear$smonth$sday$shour$sminute$ssecond"."_$eyear$emonth$eday$ehour$eminute$esecond.nuv";
-        if (!$test_mode) {
-            rename("$show", "$new_file");
-        } else {
-            print("Test mode: rename would have done\n");
-            print("  From: '$show'\n");
-            print("  To: '$new_file'\n");
-        } 
-
-## commercial flag
- 
-        print("Building a seek table should improve FF/RW and JUMP functions when watching this video\n");
-        print("Do you want to build a seek table for this file? (y/n): ");
-        chomp(my $do_commflag = <STDIN>);
-        if ($do_commflag eq "y") {
-            if (!$test_mode) {
-                exec("mythcommflag --file $new_file --rebuild"); 
-            } else { 
-                print("Test mode: exec would have done\n"); 
-                print("  Exec: 'mythcommflag --file $new_file --rebuild'\n");
-            }
+        if (my @row = $sth->fetchrow_array) {
+            $guess_title = $row[0];
+            $guess_subtitle = $row[1];
+            $guess_description = $row[2];
         }
 
-        } else { print("Skipping illegal file format: $show\n"); }
-	}
+        print "Found an orphaned file, initializing database record\n";
+        print "Channel:    $channel\n";
+        print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
+        print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
+    }
+
+    my $newtitle = $guess_title;
+    my $newsubtitle = $guess_subtitle;
+    my $newdescription = $guess_description;
+
+    if ($quick_run) {
+
+        print("QuickRun defaults:\n");
+        print("        title: '$newtitle'\n");
+        print("     subtitle: '$newsubtitle'\n");
+        print("  description: '$newdescription'\n");
+
+    } else {
+
+        $channel = GetAnswer("Enter channel", $channel);
+        $newtitle = GetAnswer("... title", $newtitle);
+        $newsubtitle = GetAnswer("... subtitle", $newsubtitle);
+        $newdescription = GetAnswer("Description", $newdescription);
+        $starttime = GetAnswer("... start time (YYYY-MM-DD HH:MM:SS)", $starttime);
+
+        if ($endtime) {
+            $duration = (str2time($endtime) - str2time($starttime)) / 60;
+        } else {
+            $duration = "60";
+        }
+        $duration = GetAnswer("... duration (in minutes)", $duration);
+        $endtime = time_format("yyyy-mm{on}-dd HH:mm{in}:ss", str2time($starttime) + $duration * 60);
+
+    }
+
+    if ($norename) {
+        $mythfile = $showBase;
+    } else {
+        my ($ext) = $showBase =~ /([^\.]*)$/;
+        my $time1 = $starttime;
+        $time1 =~ s/[ \-:]//g;
+        $mythfile = sprintf("%s_%s.%s", $channel, $time1, $ext);
+    }
+
+    my $sql = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
+
+    if ($test_mode) {
+
+        $sql =~ s/\(\?\)/"%s"/g;
+        my $statement = sprintf($sql, $channel, $starttime, $endtime, $newtitle,
+                                $newsubtitle, $newdescription, $host, $mythfile,
+                                $starttime, $endtime);
+        print("Test mode: insert would have been been:\n");
+        print($statement, ";\n");
+
+    } else {
+
+        $sth = $dbh->prepare($sql);
+        $sth->execute($channel, $starttime, $endtime, $newtitle,
+                      $newsubtitle, $newdescription, $host, $mythfile,
+                      $starttime, $endtime)
+            or die "Could not execute ($sql)\n";
+
+        if ($mythfile ne $showBase) {
+            rename($show, $dir. "/" . $mythfile);
+        }
+    }
+
+    
+    print("Building a seek table should improve FF/RW and JUMP functions when watching this video\n");
+
+    if (GetAnswer("Do you want to build a seek table for this file?", "y") eq "y") {
+        # mythcommflag takes --file for myth-originated files and
+        # --video for everything else. We assume it came from myth
+        # if it's a .nuv or if it's an mpeg where the name has that
+        # chanid_startime format
+        my $commflag = "mythcommflag --rebuild " .
+            ($showBase =~ /[.]nuv$/ || ($showBase =~ /[.]mpg$/ && $ssecond)
+             ? "--file" : "--video") .
+             " " . $mythfile;
+        if (!$test_mode) {
+            exec($commflag);
+        } else { 
+            print("Test mode: exec would have done\n"); 
+            print("  Exec: '", $commflag, "'\n");
+        }
+    }
+
 } ## foreach loop
 
 # vim:sw=4 ts=4 syn=off:
