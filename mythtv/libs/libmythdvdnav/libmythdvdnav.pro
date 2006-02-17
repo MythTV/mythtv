@@ -32,3 +32,7 @@ inc.files += dvd_types.h ifo_read.h nav_print.h nav_types.h
 INSTALLS += target inc
 
 
+macx {
+    # Globals in static libraries need special treatment on OS X
+    QMAKE_CFLAGS += -fno-common
+}
