@@ -661,7 +661,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
     off_t dvd_size = lseek(file, 0, SEEK_END);
     lseek(file, 0, SEEK_SET);
 
-    const int buf_size = 4098;
+    const int buf_size = 1024 * 1024;
     unsigned char buffer[buf_size];
     long long total_bytes(0);
 
