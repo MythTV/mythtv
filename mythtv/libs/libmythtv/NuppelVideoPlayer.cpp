@@ -106,6 +106,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Input Video Attributes
       video_width(0), video_height(0), video_size(0),
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
+      forced_video_aspect(-1),
       m_scan(kScan_Detect), keyframedist(30),
       // RingBuffer stuff
       filename("output.nuv"), weMadeBuffer(false), ringBuffer(NULL),
