@@ -70,6 +70,21 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-v"))
+        {
+            if (++argpos >= argc) {
+                cerr << "Error: -v requires parameters (try -v help)" <<
+                        std::endl;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            int err;
+            if ((err = parse_verbose_arg(a.argv()[argpos])) !=
+                GENERIC_EXIT_OK)
+            {
+                return err;
+            }
+        }
         else
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl <<

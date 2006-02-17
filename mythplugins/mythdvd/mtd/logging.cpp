@@ -25,7 +25,8 @@ MTDLogger::MTDLogger(bool log_stdout)
     QString logfile_name = gContext->GetSetting("DVDRipLocation");
     if(logfile_name.length() < 1)
     {
-        cerr << "MTDLogger.o: You do not have a DVD rip directory set. Run Setup." << endl;
+        VERBOSE(VB_IMPORTANT, "You do not have a DVD rip directory set."
+                  " Run Setup.");
         exit(0);
     }    
     logfile_name.append("/mtd.log");
@@ -34,7 +35,9 @@ MTDLogger::MTDLogger(bool log_stdout)
         logging_file.setName(logfile_name);
         if(!logging_file.open(IO_WriteOnly))
         {
-            cerr << "MTDLogger.o: Problem opening logfile. Does this look openable to you: " << logfile_name << endl;
+            VERBOSE(VB_IMPORTANT, QString("Problem opening logfile. Does this"
+                                          "look openable to you: %1")
+                                          .arg(logfile_name));
             exit(0);
         }
     }

@@ -46,7 +46,8 @@ JobThread::JobThread(MTD *owner, const QString &start_string, int nice_priority)
 
 void JobThread::run()
 {
-    cerr << "jobthread.o: Somebody ran an actual (base class) JobThread. I don't think that's supposed to happen." << endl;
+    VERBOSE(VB_IMPORTANT, "Somebody ran an actual (base class) JobThread. I"
+            " don't think that's supposed to happen.");
 }
 
 bool JobThread::keepGoing()
@@ -217,8 +218,9 @@ namespace
         {
             if (!(m_mutex && m_mutex->locked()))
             {
-                cerr << __FILE__ << ": Invalid mutext passed to MutexUnlocker"
-                        << endl;
+                VERBOSE(VB_IMPORTANT,
+                        QString("%1: Invalid mutext passed to MutexUnlocker")
+                        .arg(__FILE__));
             }
         }
 
@@ -284,7 +286,8 @@ DVDThread::DVDThread(MTD *owner,
 
 void DVDThread::run()
 {
-    cerr << "jobthread.o: Somebody ran an actual (base class) DVDThread. I don't think that's supposed to happen." << endl;
+    VERBOSE(VB_IMPORTANT, "Somebody ran an actual (base class) DVDThread. I"
+            " don't think that's supposed to happen.");
 }
 
 
@@ -476,7 +479,8 @@ bool DVDThread::ripTitle(int title_number,
                                     &video_data[0]);
             if( len != 1)
             {
-                problem(QString("DVDPerfectThread read failed for block %1").arg(cur_pack));
+                problem(QString("DVDPerfectThread read failed for block %1")
+                        .arg(cur_pack));
                 return false;
             }
             

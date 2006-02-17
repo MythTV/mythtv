@@ -347,8 +347,6 @@ if test "$aac" != "no" ; then
     fi
 fi
 
-# vcd support detection rutine does here
-
 if test "$exif" != "no" ; then
     exif="no"
     if has_library libexif ; then
