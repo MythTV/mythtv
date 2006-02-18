@@ -8,6 +8,7 @@
 #include <vector>
 #include <qobject.h>
 #include <qregexp.h>
+#include <cmath>
 
 using namespace std;
 
