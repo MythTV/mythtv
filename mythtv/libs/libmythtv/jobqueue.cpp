@@ -1778,6 +1778,7 @@ void JobQueue::DoTranscodeThread(void)
         retry = false;
 
         ChangeJobStatus(jobID, JOB_STARTING);
+        program_info->SetTranscoded(TRANSCODING_RUNNING);
 
         QString fileprefix = gContext->GetFilePrefix();
         QString filename = program_info->GetRecordFilename(fileprefix);
@@ -1821,6 +1822,7 @@ void JobQueue::DoTranscodeThread(void)
 
             ChangeJobStatus(jobID, JOB_ERRORED,
                 "ERROR: Unable to find mythtranscode, check backend logs.");
+            program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
 
             retry = false;
             break;
@@ -1830,6 +1832,8 @@ void JobQueue::DoTranscodeThread(void)
             VERBOSE(VB_JOBQUEUE, LOC + "Transcode command restarting");
             retry = true;
             retrylimit--;
+
+            program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
         }
         else
         {
@@ -1878,6 +1882,8 @@ void JobQueue::DoTranscodeThread(void)
 
                 MythEvent me("RECORDING_LIST_CHANGE");
                 gContext->dispatch(me);
+
+                program_info->SetTranscoded(TRANSCODING_COMPLETE);
             }
         }
     }

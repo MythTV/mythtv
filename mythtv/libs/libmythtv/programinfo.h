@@ -38,6 +38,12 @@ enum CommFlagStatuses {
     COMM_FLAG_COMMFREE = 3
 };
 
+enum TranscodingStatuses {
+    TRANSCODING_NOT_TRANSCODED = 0,
+    TRANSCODING_COMPLETE       = 1,
+    TRANSCODING_RUNNING        = 2
+};
+
 enum TranscoderStatus {
     TRANSCODE_QUEUED      = 0x01,
     TRANSCODE_RETRY       = 0x02,
@@ -51,16 +57,17 @@ enum TranscoderStatus {
 };
 
 enum FlagMask {
-    FL_COMMFLAG       = 0x01,
-    FL_CUTLIST        = 0x02,
-    FL_AUTOEXP        = 0x04,
-    FL_EDITING        = 0x08,
-    FL_BOOKMARK       = 0x10,
-    FL_INUSERECORDING = 0x20,
-    FL_INUSEPLAYING   = 0x40,
-    FL_STEREO         = 0x80,
+    FL_COMMFLAG       = 0x001,
+    FL_CUTLIST        = 0x002,
+    FL_AUTOEXP        = 0x004,
+    FL_EDITING        = 0x008,
+    FL_BOOKMARK       = 0x010,
+    FL_INUSERECORDING = 0x020,
+    FL_INUSEPLAYING   = 0x040,
+    FL_STEREO         = 0x080,
     FL_CC             = 0x100,
-    FL_HDTV           = 0x200
+    FL_HDTV           = 0x200,
+    FL_TRANSCODED     = 0x400
 };
 
 enum RecStatusType {
@@ -196,6 +203,7 @@ class ProgramInfo
     void SetFilesize(long long fsize);
     void SetBookmark(long long pos) const;
     void SetEditing(bool edit) const;
+    void SetTranscoded(int transFlag) const;
     void SetDeleteFlag(bool deleteFlag) const;
     void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
     void SetAutoExpire(int autoExpire) const;
@@ -371,3 +379,4 @@ class ProgramList: public QPtrList<ProgramInfo> {
 
 #endif
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

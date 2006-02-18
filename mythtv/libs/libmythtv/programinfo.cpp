@@ -1879,6 +1879,27 @@ bool ProgramInfo::IsInUse(QString &byWho) const
     return false;
 }
 
+/** \fn ProgramInfo::SetTranscoded(int transFlag) const
+ *  \brief Set "transcoded" field in "recorded" table to "transFlag".
+ *  \param transFlag value to set transcoded field to.
+ */
+void ProgramInfo::SetTranscoded(int transFlag) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                 " SET transcoded = :FLAG"
+                 " WHERE chanid = :CHANID"
+                 " AND starttime = :STARTTIME ;");
+    query.bindValue(":FLAG", transFlag);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if(!query.exec() || !query.isActive())
+        MythContext::DBError("Transcoded status update",
+                             query);
+}
+
 /** \fn ProgramInfo::SetCommFlagged(int) const
  *  \brief Set "commflagged" field in "recorded" table to "flag".
  *  \param flag value to set commercial flagging field to.

@@ -686,86 +686,31 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         if (curitem)
             flags = curitem->programflags;
 
+        QMap <QString, int>::iterator it;
+        QMap <QString, int> iconMap;
+
+        iconMap["commflagged"] = FL_COMMFLAG;
+        iconMap["cutlist"]     = FL_CUTLIST;
+        iconMap["autoexpire"]  = FL_AUTOEXP;
+        iconMap["processing"]  = FL_EDITING;
+        iconMap["bookmark"]    = FL_BOOKMARK;
+        iconMap["inuse"]       = (FL_INUSERECORDING | FL_INUSEPLAYING);
+        iconMap["transcoded"]  = FL_TRANSCODED;
+        iconMap["stereo"]      = FL_STEREO;
+        iconMap["cc"]          = FL_CC;
+        iconMap["hdtv"]        = FL_HDTV;
+
         UIImageType *itype;
-        itype = (UIImageType *)container->GetType("commflagged");
-        if (itype)
+        for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (flags & FL_COMMFLAG)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("cutlist");
-        if (itype)
-        {
-            if (flags & FL_CUTLIST)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("autoexpire");
-        if (itype)
-        {
-            if (flags & FL_AUTOEXP)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("processing");
-        if (itype)
-        {
-            if (flags & FL_EDITING)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("inuse");
-        if (itype)
-        {
-            if (flags & (FL_INUSERECORDING | FL_INUSEPLAYING))
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("bookmark");
-        if (itype)
-        {
-            if (flags & FL_BOOKMARK)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("stereo");
-        if (itype)
-        {
-            if (flags & FL_STEREO)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("cc");
-        if (itype)
-        {
-            if (flags & FL_CC)
-                itype->show();
-            else
-                itype->hide();
-        }
-
-        itype = (UIImageType *)container->GetType("hdtv");
-        if (itype)
-        {
-            if (flags & FL_HDTV)
-                itype->show();
-            else
-                itype->hide();
+            itype = (UIImageType *)container->GetType(it.key());
+            if (itype)
+            {
+                if (flags & it.data())
+                    itype->show();
+                else
+                    itype->hide();
+            }
         }
 
         container->Draw(&tmp, 6, (type == Delete) ? 1 : 0);
@@ -3751,6 +3696,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
 void PlaybackBox::showIconHelp(void)
 {
+    int curRow = 0;
     LayerSet *container = NULL;
     if (type != Delete)
         container = theme->GetSet("program_info_play");
@@ -3775,136 +3721,44 @@ void PlaybackBox::showIconHelp(void)
 
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    itype = (UIImageType *)container->GetType("commflagged");
-    if (itype)
+    QMap <QString, QString>::iterator it;
+    QMap <QString, QString> iconMap;
+    iconMap["commflagged"] = tr("Commercials are flagged");
+    iconMap["cutlist"]     = tr("An editing cutlist is present");
+    iconMap["autoexpire"]  = tr("The program is able to auto-expire");
+    iconMap["processing"]  = tr("Commercials are being flagged");
+    iconMap["bookmark"]    = tr("A bookmark is set");
+    iconMap["inuse"]       = tr("Recording is in use");
+    iconMap["transcoded"]  = tr("Recording has been transcoded");
+    iconMap["stereo"]      = tr("Recording is in Stereo");
+    iconMap["cc"]          = tr("Recording is Close Captioned");
+    iconMap["hdtv"]        = tr("Recording is in High Definition");
+
+    for (it = iconMap.begin(); it != iconMap.end(); ++it)
     {
-        label = new QLabel(tr("Commercials are flagged"), iconhelp);
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 0, 1, Qt::AlignLeft);
-         
-        label = new QLabel(iconhelp, "nopopsize");
+        itype = (UIImageType *)container->GetType(it.key());
+        if (itype)
+        {
+            label = new QLabel(it.data(), iconhelp);
+            label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+            label->setBackgroundOrigin(ParentOrigin);
+            label->setPaletteForegroundColor(drawPopupFgColor);
+            grid->addWidget(label, curRow, 1, Qt::AlignLeft);
+             
+            label = new QLabel(iconhelp, "nopopsize");
 
-        itype->ResetFilename();
-        itype->LoadImage();
-        label->setPixmap(itype->GetImage());
-        displayme = true;
+            itype->ResetFilename();
+            itype->LoadImage();
+            label->setPixmap(itype->GetImage());
+            displayme = true;
 
-        label->setMaximumWidth(width() / 2);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 0, 0, Qt::AlignCenter);
-    }
+            label->setMaximumWidth(width() / 2);
+            label->setBackgroundOrigin(ParentOrigin);
+            label->setPaletteForegroundColor(drawPopupFgColor);
+            grid->addWidget(label, curRow, 0, Qt::AlignCenter);
 
-    itype = (UIImageType *)container->GetType("cutlist");
-    if (itype)
-    {
-        label = new QLabel(tr("An editing cutlist is present"), iconhelp);
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 1, 1, Qt::AlignLeft);
-
-        label = new QLabel(iconhelp, "nopopsize");
-
-        itype->ResetFilename();
-        itype->LoadImage();
-        label->setPixmap(itype->GetImage());
-        displayme = true;
-
-        label->setMaximumWidth(width() / 2);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 1, 0, Qt::AlignCenter);
-    }
-
-    itype = (UIImageType *)container->GetType("autoexpire");
-    if (itype)
-    {
-        label = new QLabel(tr("The program is able to auto-expire"), iconhelp);
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 2, 1, Qt::AlignLeft);
-
-        label = new QLabel(iconhelp, "nopopsize");
-
-        itype->ResetFilename();
-        itype->LoadImage();
-        label->setPixmap(itype->GetImage());
-        displayme = true;
-
-        label->setMaximumWidth(width() / 2);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 2, 0, Qt::AlignCenter);
-    }
-
-    itype = (UIImageType *)container->GetType("processing");
-    if (itype)
-    {
-        label = new QLabel(tr("Commercials are being flagged"), iconhelp);
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 3, 1, Qt::AlignLeft);
-
-        label = new QLabel(iconhelp, "nopopsize");
-
-        itype->ResetFilename();
-        itype->LoadImage();
-        label->setPixmap(itype->GetImage());
-        displayme = true;
-
-        label->setMaximumWidth(width() / 2);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 3, 0, Qt::AlignCenter);
-    }
-
-    itype = (UIImageType *)container->GetType("bookmark");
-    if (itype)
-    {
-        label = new QLabel(tr("A bookmark is set"), iconhelp);
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 4, 1, Qt::AlignLeft);
-
-        label = new QLabel(iconhelp, "nopopsize");
-
-        itype->ResetFilename();
-        itype->LoadImage();
-        label->setPixmap(itype->GetImage());
-        displayme = true;
-
-        label->setMaximumWidth(width() / 2);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 4, 0, Qt::AlignCenter);
-    }
-
-    itype = (UIImageType *)container->GetType("inuse");
-    if (itype)
-    {
-        label = new QLabel(tr("Recording is in use"), iconhelp);
-        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 5, 1, Qt::AlignLeft);
-
-        label = new QLabel(iconhelp, "nopopsize");
-
-        itype->ResetFilename();
-        itype->LoadImage();
-        label->setPixmap(itype->GetImage());
-        displayme = true;
-
-        label->setMaximumWidth(width() / 2);
-        label->setBackgroundOrigin(ParentOrigin);
-        label->setPaletteForegroundColor(drawPopupFgColor);
-        grid->addWidget(label, 5, 0, Qt::AlignCenter);
+            curRow++;
+        }
     }
 
     if (!displayme)

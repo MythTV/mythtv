@@ -960,7 +960,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "recorded.basename, recorded.progstart, "
                        "recorded.progend, recorded.stars, "
                        "recordedprogram.stereo, recordedprogram.hdtv, "
-                       "recordedprogram.closecaptioned "
+                       "recordedprogram.closecaptioned, transcoded "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1050,8 +1050,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
             flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
             flags |= (query.value(32).toInt() == 1) ? FL_STEREO : 0;
-            flags |= (query.value(34).toInt() == 1) ? FL_CC : 0;
             flags |= (query.value(33).toInt() == 1) ? FL_HDTV : 0;
+            flags |= (query.value(34).toInt() == 1) ? FL_CC : 0;
+            flags |= (query.value(35).toInt() == TRANSCODING_COMPLETE) ?
+                      FL_TRANSCODED : 0;
 
             inUseKey = query.value(0).toString() + " " +
                        query.value(1).toDateTime().toString(Qt::ISODate);
