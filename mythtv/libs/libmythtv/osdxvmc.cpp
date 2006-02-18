@@ -3,6 +3,7 @@
 
 #ifdef USING_XVMC
 
+#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>

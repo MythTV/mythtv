@@ -42,12 +42,15 @@ extern "C" {
                                       int, int, XShmSegmentInfo*);
 }
 
+#include "../libavcodec/avcodec.h"
+
 static QString xvflags2str(int flags);
 static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
+
 
 class port_info { public: Display *disp; int port; };
 static QMap<int,port_info> open_xv_ports;
@@ -3469,7 +3472,7 @@ void ChromaKeyOSD::Reinit(int i)
     uint bpl = img[i]->bytes_per_line;
 
     // create chroma key line
-    char *cln = (char*) memalign(128, bpl + 128);
+    char *cln = (char*)av_malloc(bpl + 128);
     bzero(cln, bpl);
     int j  = max(videoOutput->dispxoff - videoOutput->dispx, 0);
     int ej = min(videoOutput->dispxoff + videoOutput->dispwoff, vf[i].width);
@@ -3500,7 +3503,7 @@ void ChromaKeyOSD::Reinit(int i)
     if (cend < vf[i].height)
         bzero(buf + (cend * bpl), (vf[i].height - cend) * bpl);
 
-    free(cln);
+    av_free(cln);
 }
 
 /** \fn ChromaKeyOSD::ProcessOSD(OSD*)

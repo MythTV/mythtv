@@ -23,6 +23,10 @@ using namespace std;
 
 #define MAXTBUFFER 21
 
+#ifndef LONG_LONG_MIN
+#define LONG_LONG_MIN LLONG_MIN
+#endif
+
 class VideoOutput;
 class OSDSet;
 class RemoteEncoder;

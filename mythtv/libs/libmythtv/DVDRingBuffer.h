@@ -8,7 +8,7 @@
 #include <qstring.h>
 #include <qobject.h>
 #include "util.h"
-#include "avcodec.h"
+#include "../libavcodec/avcodec.h"
 
 #define DVDNAV_COMPILE
 #include "../libmythdvdnav/dvdnav.h"

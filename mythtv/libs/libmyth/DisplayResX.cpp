@@ -1,3 +1,5 @@
+#include "DisplayResX.h"
+#include <iostream>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -10,9 +12,7 @@ namespace X11
 #include <X11/extensions/Xrandr.h>
 }
 
-#include <iostream>
 
-#include "DisplayResX.h"
 #include "util-x11.h"
 
 using namespace X11;
