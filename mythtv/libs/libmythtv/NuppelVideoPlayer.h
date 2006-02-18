@@ -305,6 +305,7 @@ class NuppelVideoPlayer
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
 
+    bool PrebufferEnoughFrames(void);
     void CheckPrebuffering(void);
     bool GetFrameNormal(int onlyvideo);
     bool GetFrameFFREW(void);

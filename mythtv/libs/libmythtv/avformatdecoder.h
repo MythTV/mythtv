@@ -259,8 +259,6 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     // DVD
     int lastdvdtitle;
-    int lastdvdpart;
-    int lastdvdcellchange;
 };
 
 #endif

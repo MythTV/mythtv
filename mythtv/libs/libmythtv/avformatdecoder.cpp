@@ -275,8 +275,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       // language preference
       languagePreference(iso639_get_language_key_list()),
       // DVD
-      lastdvdtitle(0), lastdvdpart(0),
-      lastdvdcellchange(0)
+      lastdvdtitle(0)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
@@ -2275,13 +2274,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             int dvdtitle  = 0;
             int dvdpart = 0;
             ringBuffer->DVD()->GetPartAndTitle(dvdtitle,dvdpart);
-            int dvdcellchange = ringBuffer->DVD()->CellChange();
-            if ((dvdtitle != lastdvdtitle || dvdpart != lastdvdpart || 
-                        dvdcellchange != lastdvdcellchange))
-            {
-                GetNVP()->GetOSD()->HideSet("subtitles");
-                GetNVP()->GetOSD()->ClearAll("subtitles");
-            }
             if (dvdtitle != lastdvdtitle)
             {
                 posmapStarted = false;
@@ -2294,8 +2286,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             .arg(framesPlayed));
             }
             lastdvdtitle = dvdtitle;
-            lastdvdpart = dvdpart;
-            lastdvdcellchange = dvdcellchange;
             
             if (storedPackets.count() < 2 && !dvdvideopause)
                 storevideoframes = true;

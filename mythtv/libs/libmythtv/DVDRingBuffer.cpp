@@ -34,7 +34,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       skipstillorwait(true), spuStreamLetterbox(false),
       cellstartPos(0), buttonSelected(false), 
       buttonExists(false), menuspupts(0),
-      cellChange(0), parent(0)
+      parent(0)
 {
     dvdMenuButton = (AVSubtitleRect*)av_mallocz(sizeof(AVSubtitleRect));
 }
@@ -223,10 +223,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 titleLength = length *DVD_BLOCK_SIZE;
                 cellstartPos = GetReadPosition();
                 buttonSelected = false; 
-                if (cellChange == 100)
-                    cellChange = 0;
-                else
-                    cellChange++;
+
+                if (parent && parent->GetOSD())
+                {
+                    parent->GetOSD()->HideSet("subtitles");
+                    parent->GetOSD()->ClearAll("subtitles");
+                }
 
                 if (blockBuf != dvdBlockWriteBuf)
                 {

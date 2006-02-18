@@ -55,7 +55,6 @@ class DVDRingBufferPriv
     uint GetAudioLanguage(int id);
     uint GetSubtitleLanguage(int id);
     long long MenuSpuPts(void) { return menuspupts; }
-    int CellChange(void) { return cellChange; }
 
     // commands
     bool OpenFile(const QString &filename);
@@ -119,7 +118,6 @@ class DVDRingBufferPriv
     bool           buttonSelected;
     bool           buttonExists;
     long long      menuspupts;
-    int            cellChange;
 
     NuppelVideoPlayer *parent;
 

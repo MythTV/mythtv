@@ -1838,14 +1838,8 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
     videosync->Start();
 }
 
-void NuppelVideoPlayer::DisplayNormalFrame(void)
+bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
 {
-    video_actually_paused = false;
-    resetvideo = false;
-
-    if (ringBuffer->isDVD())
-        goto displayframe;
-
     prebuffering_lock.lock();
     if (prebuffering)
     {
@@ -1873,7 +1867,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         }
         prebuffering_lock.unlock();
         videosync->Start();
-        return;
+        return false;
     }
     prebuffering_lock.unlock();
 
@@ -1891,7 +1885,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             VERBOSE(VB_GENERAL, "playing slower due to falling behind...");
         }
 #endif
-        return;
+        return false;
     }
 
 #if FAST_RESTART
@@ -1907,7 +1901,19 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     prebuffer_tries = 0;
     prebuffering_lock.unlock();
 
-displayframe:
+    return true;
+}
+
+void NuppelVideoPlayer::DisplayNormalFrame(void)
+{
+    video_actually_paused = false;
+    resetvideo = false;
+
+    if (!ringBuffer->isDVD())
+    {
+        if (!PrebufferEnoughFrames())
+            return;
+    }
 
     videoOutput->StartDisplayingFrame();
 
