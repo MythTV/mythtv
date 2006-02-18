@@ -399,7 +399,7 @@ our %conf = (
         '--prefix=' . $PREFIX,
         '--enable-opengl',
         '--disable-mythbrowser',
-        '--enable-mythdvd',
+        '--disable-mythdvd',
         '--enable-vcd',
         '--disable-transcode',
         '--enable-mythgallery',
