@@ -8,6 +8,8 @@
 #include "format.h"
 #include "decoderbase.h"
 #include "ccdecoder.h"
+#include "teletextdecoder.h"
+#include "vbilut.h"
 
 extern "C" {
 #include "frame.h"
@@ -234,6 +236,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     // Caption/Subtitle/Teletext decoders
     CCDecoder        *ccd;
+    TeletextDecoder  *ttd;
 
     // Audio
     short int        *audioSamples;

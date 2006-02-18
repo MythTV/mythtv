@@ -118,6 +118,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       wtxt(0), rtxt(0), text_size(0), ccline(""), cccol(0), ccrow(0),
       // Support for captions, teletext, etc. decoded by libav
       osdHasSubtitles(false),       osdSubtitlesExpireAt(-1),
+      tt_decoder(NULL),
       // OSD stuff
       osd(NULL),                    timedisplay(NULL),
       dialogname(""),               dialogtype(0),
@@ -224,6 +225,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
             delete [] txtbuffers[i].buffer;
     }
 
+    if (tt_decoder)
+        delete tt_decoder;
+
     SetDecoder(NULL);
 
     if (FiltMan)
@@ -245,6 +249,13 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     }
 
     ShutdownYUVResize();
+}
+
+TeletextDecoder *NuppelVideoPlayer::GetTeletextDecoder(void)
+{
+    if (!tt_decoder)
+        tt_decoder = new TeletextDecoder();
+    return tt_decoder;
 }
 
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)

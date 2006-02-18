@@ -26,6 +26,7 @@ using namespace std;
 #include "libmyth/oldsettings.h"
 #include "udpnotify.h"
 
+#include "osdtypeteletext.h"
 #include "osdlistbtntype.h"
 
 static float sq(float a) { return a*a; }
@@ -115,6 +116,8 @@ void OSD::SetFrameInterval(int frint)
 
 void OSD::SetDefaults(void)
 {
+    OSDSet *container = NULL;
+// TODO begin -- deleted in teletext patch
     TTFFont *ccfont = GetFont("cc_font");
     if (!ccfont)
     {
@@ -130,8 +133,7 @@ void OSD::SetDefaults(void)
     if (!ccfont)
         return;
 
-    OSDSet *container = GetSet("cc_page");
-    if (!container)
+    if (!GetSet("cc_page"))
     {
         QString name = "cc_page";
         container = new OSDSet(name, true,
@@ -158,9 +160,38 @@ void OSD::SetDefaults(void)
                                           wmult, hmult);
         container->AddType(ccpage);
     }
+// TODO end -- deleted in teletext patch
 
-    container = GetSet("menu");
-    if (!container)
+    if (!GetSet("teletext"))
+    {
+        QString name = "teletext";
+        container = new OSDSet(name, true,
+                               osdBounds.width(), osdBounds.height(),
+                               wmult, hmult, frameint);
+        container->SetAllowFade(false);
+        container->SetWantsUpdates(true);
+        AddSet(container, name);
+        QRect area = QRect(20, 20, 620, 440);
+        normalizeRect(area);
+        // XXX TODO use special teletextfont
+        QString fontname = "teletextfont";
+        TTFFont *font = GetFont(fontname);
+        if (!font)
+        {
+            int fontsize = 440 / 26;
+            font = LoadFont(gContext->GetSetting("OSDCCFont"), fontsize);
+
+            if (font)
+                fontMap[fontname] = font;
+        }
+
+        OSDTypeTeletext *ttpage = new OSDTypeTeletext(
+            name, font, area, wmult, hmult);
+  
+        container->AddType(ttpage);
+    }
+   
+    if (!GetSet("menu"))
     {
         QString name = "menu";
         container = new OSDSet(name, true,

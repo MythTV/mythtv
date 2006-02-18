@@ -15,6 +15,8 @@
 #include "osdsurface.h"
 #include "osdtypes.h"
 #include "osdlistbtntype.h"
+#include "osdtypeteletext.h"
+#include "teletextdecoder.h"
 #include "mythcontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -123,6 +125,18 @@ void TV::InitKeys(void)
             "W");
     REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
             "T");
+    REG_KEY("TV Playback", "MENURED",
+            "Menu Red",    "F2");
+    REG_KEY("TV Playback", "MENUGREEN",
+            "Menu Green",  "F3");
+    REG_KEY("TV Playback", "MENUYELLOW",
+            "Menu Yellow", "F4");
+    REG_KEY("TV Playback", "MENUBLUE",
+            "Menu Blue",   "F5");
+    REG_KEY("TV Playback", "MENUWHITE",
+            "Menu White",  "F6");
+    REG_KEY("TV Playback", "REVEAL",
+            "Teletext reveal hidden Text", "F12");
     REG_KEY("TV Playback", "DISPCC1", "Display CC1", "");
     REG_KEY("TV Playback", "DISPCC2", "Display CC2", "");
     REG_KEY("TV Playback", "DISPCC3", "Display CC3", "");
@@ -185,7 +199,7 @@ void TV::InitKeys(void)
   Global:   Return, Enter, Space, Esc
 
   Global:          F1,
-  Playback: Ctrl-B,   F7,F8,F9,F10,F11
+  Playback: Ctrl-B,   F2,F3,F4,F5,F6,F7,F8,F9,F10,F11
  */
 }
 
@@ -218,7 +232,8 @@ TV::TV(void)
       exitPlayer(false), paused(false), errored(false),
       stretchAdjustment(false),
       audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
-      editmode(false), zoomMode(false), sigMonMode(false),
+      editmode(false),     zoomMode(false),
+      teletextmode(false), sigMonMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
@@ -1098,6 +1113,18 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
 
     if (nvp->IsPlaying())
     {
+        TeletextDecoder *tt_dec = nvp->GetTeletextDecoder();
+	
+	// This is needed because the OSDType does the decoding/caching of
+	// the teletext pages 
+	OSDSet *oset = GetOSD()->GetSet("teletext");
+	if (oset)
+	{
+	    OSDType *traw = oset->GetType("teletext");
+	    OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
+	    tt_dec->SetViewer(tt_view);
+	}
+
         activenvp = nvp;
         activerbuffer = prbuffer;
         StartOSD();
@@ -1818,6 +1845,52 @@ void TV::ProcessKeypress(QKeyEvent *e)
             return;
     }
 
+    //XXX ivtv/dvb teletext
+    if (teletextmode)
+    {
+        int passThru = 0;
+
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+            if (action == "UP")
+                TeletextNavigate(-1);
+            else if (action == "DOWN")
+                TeletextNavigate(-2);
+            else if (action == "RIGHT")
+                TeletextNavigate(-3);
+            else if (action == "LEFT")
+                TeletextNavigate(-4);
+            else if (action == "TOGGLEASPECT")
+                TeletextNavigate(-5);
+            else if (action == "MENURED")
+                TeletextNavigate(-6);
+            else if (action == "MENUGREEN")
+                TeletextNavigate(-7);
+            else if (action == "MENUYELLOW")
+                TeletextNavigate(-8);
+            else if (action == "MENUBLUE")
+                TeletextNavigate(-9);
+            else if (action == "MENUWHITE")
+                TeletextNavigate(-10);
+            else if (action == "REVEAL")
+                TeletextNavigate(-11);
+            else if (action == "0" || action == "1" || action == "2" ||
+                     action == "3" || action == "4" || action == "5" ||
+                     action == "6" || action == "7" || action == "8" ||
+                     action == "9")
+                TeletextNavigate(action.toInt());
+            else if (action == "MENU" || action == "TOGGLECC" ||
+                     action == "ESCAPE")
+                TeletextStop();
+            else
+                handled = false;
+        }
+        if (!passThru)
+            return;
+    }
+
     if (zoomMode)
     {
         int passThru = 0;
@@ -2066,8 +2139,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
         handled = true;
 
         if (action == "TOGGLECC" && !browsemode)
-        {
-            if (vbimode == VBIMode::NTSC_CC)
+	{
+            int dec_type = nvp->GetTeletextDecoder()->GetDecoderType();
+	    if (dec_type != -1)
+                TeletextStart();
+	    else if (vbimode == VBIMode::NTSC_CC)
                 nvp->ToggleCC(vbimode, 0);
             else if (ccInputMode)
             {
@@ -3610,6 +3686,14 @@ void TV::ChangeChannel(int direction)
             aud->ToggleMute();
             muted = true;
         }
+        OSDSet *oset = GetOSD()->GetSet("teletext");
+        if (oset)
+        {
+            OSDType *traw = oset->GetType("teletext");
+            OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
+            if (tt_view)
+                tt_view->Reset();
+        }
     }
 
     if (nvp && (activenvp == nvp) && paused)
@@ -3926,6 +4010,14 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
         {
             aud->ToggleMute();
             muted = true;
+        }
+        OSDSet *oset = GetOSD()->GetSet("teletext");
+        if (oset)
+        {
+            OSDType *traw = oset->GetType("teletext");
+            OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
+            if (tt_view)
+                tt_view->Reset();
         }
     }
 
@@ -5325,6 +5417,121 @@ void TV::ToggleRecord(void)
     QString msg = cmdmsg + " \"" + playbackinfo->title + "\"";
     if (activenvp == nvp && GetOSD())
         GetOSD()->SetSettingsText(msg, 3);
+}
+
+//XXX new teletext
+void TV::TeletextStart(void)
+{
+    if (activenvp != nvp)
+        return;
+
+    if (paused || !GetOSD())
+        return;
+
+    TeletextDecoder *tt_dec = nvp->GetTeletextDecoder();
+    OSDSet *oset = GetOSD()->GetSet("teletext");
+    if (!oset)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext set available");
+        return;
+    }
+
+    OSDType *traw = oset->GetType("teletext");
+    OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
+    if (!tt_view)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext type available");
+        return;
+    }
+
+    tt_dec->SetViewer(tt_view);
+    tt_view->SetDisplaying(true);
+
+    teletextmode = true;
+
+    oset->Display();
+    GetOSD()->SetVisible(oset, 0);
+}
+
+void TV::TeletextNavigate(int page)
+{
+    if (!GetOSD())
+        return;
+
+    OSDSet *oset = GetOSD()->GetSet("teletext");
+    if (!oset)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext set available");
+        return;
+    }
+
+    OSDType *traw = oset->GetType("teletext");
+    OSDTypeTeletext *tt = dynamic_cast<OSDTypeTeletext*>(traw);
+    if (!tt)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext type available");
+        return;
+    }
+
+    switch (page)
+    {
+        case -1:
+            tt->KeyPress(TTKey::kNextPage);
+            break;
+        case -2:
+            tt->KeyPress(TTKey::kPrevPage);
+            break;
+        case -3:
+            tt->KeyPress(TTKey::kNextSubPage);
+            break;
+        case -4:
+            tt->KeyPress(TTKey::kPrevSubPage);
+            break;
+        case -5:
+            tt->KeyPress(TTKey::kTransparent);
+            break;
+        case -6:
+            tt->KeyPress(TTKey::kFlofRed);
+            break;
+        case -7:
+            tt->KeyPress(TTKey::kFlofGreen);
+            break;
+        case -8:
+            tt->KeyPress(TTKey::kFlofYellow);
+            break;
+        case -9:
+            tt->KeyPress(TTKey::kFlofBlue);
+            break;
+        case -10:
+            tt->KeyPress(TTKey::kFlofWhite);
+            break;
+        case -11:
+            tt->KeyPress(TTKey::kRevealHidden);
+            break;
+        case 0 ... 9:
+            tt->KeyPress(page);
+            break;
+    }
+}
+
+void TV::TeletextStop(void)
+{
+    if (!teletextmode || !GetOSD())
+        return;
+
+    OSDSet *oset = GetOSD()->GetSet("teletext");
+    if (oset)
+    {
+        OSDType *traw = oset->GetType("teletext");
+        OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
+        if (tt_view)
+           tt_view->SetDisplaying(false);
+    }	
+    GetOSD()->HideSet("teletext");
+
+    // nvp->GetTeletextDecoder()->SetViewer(NULL);
+
+    teletextmode = false;
 }
 
 void TV::BrowseChannel(const QString &chan)

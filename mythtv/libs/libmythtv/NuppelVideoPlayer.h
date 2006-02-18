@@ -13,6 +13,7 @@
 #include "jitterometer.h"
 #include "recordingprofile.h"
 #include "videooutbase.h"
+#include "teletextdecoder.h"
 #include "tv_play.h"
 #include "yuv2rgb.h"
 
@@ -164,6 +165,7 @@ class NuppelVideoPlayer
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
     LiveTVChain *GetTVChain(void)             { return livetvchain; }
+    TeletextDecoder *GetTeletextDecoder(void);
 
     // Start/Reset/Stop playing
     void StartPlaying(void);
@@ -492,6 +494,7 @@ class NuppelVideoPlayer
     bool      osdHasSubtitles;
     long long osdSubtitlesExpireAt;
     MythDeque<AVSubtitle> nonDisplayedSubtitles;
+    TeletextDecoder *tt_decoder;
 
     // OSD stuff
     OSD      *osd;

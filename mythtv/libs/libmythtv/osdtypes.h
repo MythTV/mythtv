@@ -16,6 +16,22 @@ class OSDType;
 class OSDSurface;
 class TV;
 
+static inline QRect unbias(QRect rect, float wmult, float hmult)
+{
+    return QRect((int)round(rect.x()      / wmult),
+                 (int)round(rect.y()      / hmult),
+                 (int)ceil( rect.width()  / wmult),
+                 (int)ceil( rect.height() / hmult));
+}
+
+static inline QRect bias(QRect rect, float wmult, float hmult)
+{
+    return QRect((int)round(rect.x()      * wmult),
+                 (int)round(rect.y()      * hmult),
+                 (int)ceil( rect.width()  * wmult),
+                 (int)ceil( rect.height() * hmult));
+}
+
 class OSDSet : public QObject
 {
     Q_OBJECT
@@ -188,7 +204,8 @@ class OSDTypeText : public OSDType
 
   private:
     void DrawString(OSDSurface *surface, QRect rect, const QString &text,
-                    int fade, int maxfade, int xoff, int yoff);
+                    int fade, int maxfade, int xoff, int yoff,
+                    bool double_size=false);
 
     QRect m_displaysize;
     QRect m_screensize;

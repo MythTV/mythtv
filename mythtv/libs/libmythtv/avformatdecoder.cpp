@@ -264,6 +264,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       video_codec_id(kCodec_NONE),
       maxkeyframedist(-1), 
       ccd(new CCDecoder(this)),
+      ttd(NULL),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
@@ -291,6 +292,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 #endif
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
+    ttd = GetNVP()->GetTeletextDecoder();
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -1769,7 +1771,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 // SECAM lines  6-23 
                 // PAL   lines  6-22
                 // NTSC  lines 10-21 (rare)
-                //ttd->Decode(buf+1, VBI_IVTV);
+                ttd->Decode(buf+1, VBI_IVTV);
                 break;
             case VBI_TYPE_CC:
                 // PAL   line 22 (rare)
@@ -1806,7 +1808,8 @@ void AvFormatDecoder::ProcessDVBDataPacket(
     const uint8_t *buf     = pkt->data;
     const uint8_t *buf_end = pkt->data + pkt->size;
 
-    while (buf < buf_end);
+
+    while (buf < buf_end)
     {
         if (*buf == 0x10)
             buf++; // skip
@@ -1816,12 +1819,12 @@ void AvFormatDecoder::ProcessDVBDataPacket(
         if (*buf == 0x02)
         {
             buf += 3;
-            //ttd->Decode(buf+1, VBI_DVB);
+            ttd->Decode(buf+1, VBI_DVB);
         }
         else if (*buf == 0x03)
         {
             buf += 3;
-            //ttd->Decode(buf+1, VBI_DVB_SUBTITLE);
+            ttd->Decode(buf+1, VBI_DVB_SUBTITLE);
         }
         else
         {
@@ -2434,7 +2437,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (len > 0 &&
             curstream->codec->codec_type == CODEC_TYPE_DATA &&
-            curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
+            curstream->codec->codec_id   == CODEC_ID_DVB_VBI)
         {
             ProcessDVBDataPacket(curstream, pkt);
 

@@ -82,6 +82,7 @@ OSDSurface::~OSDSurface()
 
 void OSDSurface::Clear(void)
 {
+    QMutexLocker lock(&usedRegionsLock);
     memset(y, 0, size);
     memset(u, 127, size / 4);
     memset(v, 127, size / 4);
@@ -91,6 +92,7 @@ void OSDSurface::Clear(void)
 
 void OSDSurface::ClearUsed(void)
 {
+    QMutexLocker lock(&usedRegionsLock);
     QMemArray<QRect> rects = usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
     QRect drawRect;
@@ -133,6 +135,7 @@ void OSDSurface::ClearUsed(void)
 
 bool OSDSurface::IntersectsDrawn(QRect &newrect)
 {
+    QMutexLocker lock(&usedRegionsLock);
     QMemArray<QRect> rects = usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
     for (; it != rects.end(); ++it)
@@ -143,6 +146,7 @@ bool OSDSurface::IntersectsDrawn(QRect &newrect)
 
 void OSDSurface::AddRect(QRect &newrect)
 {
+    QMutexLocker lock(&usedRegionsLock);
     usedRegions = usedRegions.unite(newrect);
 }
 
@@ -551,6 +555,7 @@ void delete_dithertoia44_8_context(dither8_context *context)
  */
 void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
 {
+    QMutexLocker lock(&usedRegionsLock);
     const OSDSurface *surface = this;
     blendtoyv12_8_fun blender = blendtoyv12_8_init(surface);
 
@@ -686,6 +691,7 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
                              uint outheight, bool blend_to_black,
                              uint threshold) const
 {
+    QMutexLocker lock(&usedRegionsLock);
     const OSDSurface *surface = this;
     blendtoargb_8_fun blender = blendtoargb_8_init(surface);
     const unsigned char *cm = surface->cm;
@@ -772,6 +778,7 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
 void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
                              uint stride, uint outheight) const
 {
+    QMutexLocker lock(&usedRegionsLock);
     const OSDSurface *surface = this;
     int ashift = ifirst ? 0 : 4;
     int amask = ifirst ? 0x0f : 0xf0;

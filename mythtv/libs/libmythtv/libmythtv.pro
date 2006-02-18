@@ -207,7 +207,9 @@ using_frontend {
     SOURCES += progfind.cpp             ttfont.cpp
 
     # Teletext stuff
+    HEADERS += teletextdecoder.h        osdtypeteletext.h
     HEADERS += vbilut.h
+    SOURCES += teletextdecoder.cpp      osdtypeteletext.cpp
     SOURCES += vbilut.cpp
 
     # C stuff

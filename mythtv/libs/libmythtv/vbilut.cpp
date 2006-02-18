@@ -325,3 +325,29 @@ const int hamm24cor[64] =
     0x00000, 0x00800, 0x01000, 0x02000, 0x04000, 0x08000, 0x10000, 0x20000,
     0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000, 0x00000,
 };
+
+int hamm8(const uint8_t *p, int *err)
+{
+    int a = hammtab[p[0]];
+    *err += a;
+    return a & 15;
+}
+
+int hamm84(const uint8_t *p, int *err)
+{
+    int a = hamm84tab[p[0]];
+
+    if (a == 255)
+        *err = 1;
+
+    return a;
+}
+
+int hamm16(const uint8_t *p, int *err)
+{
+    int a = hammtab[p[0]];
+    int b = hammtab[p[1]];
+    *err += a;
+    *err += b;
+    return (a & 15) | (b & 15) * 16;
+}

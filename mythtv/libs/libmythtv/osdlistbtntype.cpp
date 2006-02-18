@@ -41,22 +41,6 @@ using namespace std;
 #define LOC QString("OSDListTreeType: ")
 #define LOC_ERR QString("OSDListTreeType, Error: ")
 
-static QRect unbias(QRect rect, float wmult, float hmult)
-{
-    return QRect((int)round(rect.x()      / wmult),
-                 (int)round(rect.y()      / hmult),
-                 (int)ceil( rect.width()  / wmult),
-                 (int)ceil( rect.height() / hmult));
-}
-
-static QRect bias(QRect rect, float wmult, float hmult)
-{
-    return QRect((int)round(rect.x()      * wmult),
-                 (int)round(rect.y()      * hmult),
-                 (int)ceil( rect.width()  * wmult),
-                 (int)ceil( rect.height() * hmult));
-}
-
 OSDListTreeType::OSDListTreeType(
     const QString &name,      const QRect &area,
     const QRect   &levelsize, int          levelspacing,

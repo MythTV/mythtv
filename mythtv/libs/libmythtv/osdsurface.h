@@ -2,6 +2,7 @@
 #define OSDSURFACE_H_
 
 #include <qregion.h>
+#include <qmutex.h>
 #include "blend.h"
 
 #define MAX_NEG_CROP 1024
@@ -61,6 +62,7 @@ class OSDSurface
     int size;
 
     QRegion usedRegions;
+    mutable QMutex usedRegionsLock;
 
 #ifdef MMX
     short int rec_lut[256];

@@ -157,13 +157,15 @@ void TTFFont::destroy_font_raster(Raster_Map * rmap)
    delete rmap;
 }
 
-Raster_Map *TTFFont::calc_size(int *width, int *height, const QString &text)
+Raster_Map *TTFFont::calc_size(int *width, int *height,
+                               const QString &text, bool double_size)
 {
    unsigned int i, pw, ph;
    Raster_Map *rtmp;
 
    pw = 0;
    ph = ((max_ascent) - max_descent) / 64;
+   ph = (double_size) ? ph<<1 : ph;
 
    for (i = 0; i < text.length(); i++)
    {
@@ -200,12 +202,13 @@ Raster_Map *TTFFont::calc_size(int *width, int *height, const QString &text)
 }
 
 void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
-	                  const QString &text, int *xorblah, int *yor)
+                          const QString &text, int *xorblah, int *yor,
+                          bool double_size)
 {
    FT_F26Dot6 x, y, xmin, ymin, xmax, ymax;
    FT_BBox bbox;
    unsigned int i, ioff, iread;
-   char *off, *read, *_off, *_read;
+   char *off, *off2, *read, *_off, *_off2, *_read;
    int x_offset, y_offset;
    unsigned short j, previous;
    Raster_Map *rtmp;
@@ -326,20 +329,33 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
 
        _read = (char *)rtmp->bitmap + iread;
        _off = (char *)rmap->bitmap + ioff;
-
+       _off2 = _off - rmap->cols;
+       
        for (y = ymin; y <= ymax; y++)
        {
            read = _read;
            off = _off;
+           off2 = _off2;
 
            for (x = xmin; x <= xmax; x++)
            {
-	       *off = *read;
+               *off = *read;
+               if (double_size)
+               {
+                   *off2 = *read;
+                   off2++;
+               }
                off++;
                read++;
            }
            _read -= rtmp->cols;
            _off -= rmap->cols;
+           if (double_size)
+           {
+               _off -= rmap->cols;
+               _off2 -= rmap->cols;
+               _off2 -= rmap->cols;
+           }
        }
        if (glyphs[j]->advance.x == 0)
            x_offset += 4;
@@ -413,19 +429,19 @@ void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x,
 
 void TTFFont::DrawString(OSDSurface *surface, int x, int y, 
                          const QString &text, int maxx, int maxy, 
-                         int alphamod)
+                         int alphamod, bool double_size)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    Raster_Map          *rmap, *rtmp;
    char                 is_pixmap = 0;
 
-   if (text.length() < 1)
+   if (text.isEmpty())
         return;
 
    inx = 0;
    iny = 0;
 
-   rtmp = calc_size(&w, &h, text);
+   rtmp = calc_size(&w, &h, text, double_size);
    if (w <= 0 || h <= 0)
    {
        destroy_font_raster(rtmp);
@@ -433,14 +449,14 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
    }
    rmap = create_font_raster(w, h);
 
-   render_text(rmap, rtmp, text, &inx, &iny);
+   render_text(rmap, rtmp, text, &inx, &iny, double_size);
 
    is_pixmap = 1;
 
    y += loadedfontsize;
    
    width = maxx;
-   height = maxy;
+   height = (double_size) ? maxy<<1 : maxy;
 
    clipx = 0;
    clipy = 0;

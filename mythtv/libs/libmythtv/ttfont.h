@@ -42,7 +42,8 @@ class TTFFont
      bool isValid(void) { return valid; }
 
      void DrawString(OSDSurface *surface, int x, int y, const QString &text,
-                     int maxx, int maxy, int alphamod = 255); 
+                     int maxx, int maxy, int alphamod = 255,
+                     bool double_size = false); 
      void CalcWidth(const QString &text, int *width_return);
 
      int SpaceWidth() { return spacewidth; }
@@ -58,9 +59,10 @@ class TTFFont
      Raster_Map *duplicate_raster(FT_BitmapGlyph bmap);
      void clear_raster(Raster_Map *rmap);
      void destroy_font_raster(Raster_Map *rmap);
-     Raster_Map *calc_size(int *width, int *height, const QString &text);
+     Raster_Map *calc_size(int *width, int *height, const QString &text,
+                           bool double_size = false);
      void render_text(Raster_Map *rmap, Raster_Map *rchr, const QString &text, 
-                      int *xorblah, int *yor);
+                      int *xorblah, int *yor, bool double_size = false);
      void merge_text(OSDSurface *surface, Raster_Map *rmap, int offset_x, 
                      int offset_y, int xstart, int ystart, int width, 
                      int height, int alphamod, kTTF_Color k = kTTF_Normal);
