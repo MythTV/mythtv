@@ -19,19 +19,20 @@ typedef MythDeque<QList_Events*>           QListList_Events;
 class EITHelper : public QObject
 {
     Q_OBJECT
+
   public:
     EITHelper() : QObject(NULL, "EITHelper") { ; }
 
     void ClearList(void);
     uint GetListSize(void) const;
-    uint ProcessEvents(int mplexid);
+    uint ProcessEvents(uint sourceid);
 
   public slots:
     void HandleEITs(QMap_Events* events);
 
   private:
-    int GetChanID(int tid_db, const Event &event) const;
-    uint UpdateEITList(int mplexid, const QList_Events &events);
+    int  GetChanID(uint sourceid, const Event &event) const;
+    uint UpdateEITList(uint sourceid, const QList_Events &events) const;
 
     QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock

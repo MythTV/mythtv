@@ -91,10 +91,10 @@ void EITScanner::RunEventLoop(void)
     {
         if (channel)
         {
-            int mplex = channel->GetMultiplexID();
-            if ((mplex > 0) && parser && eitHelper->GetListSize())
+            uint sourceid = channel->GetCurrentSourceID();
+            if (sourceid && parser && eitHelper->GetListSize())
             {
-                eitCount += eitHelper->ProcessEvents(mplex);
+                eitCount += eitHelper->ProcessEvents(sourceid);
                 t.start();
             }
         }

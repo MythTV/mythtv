@@ -96,6 +96,8 @@ class ChannelBase
         { return inputs[GetNextInputNum()]->name; }
     virtual QString GetNextInputStartChan(void)
         { return inputs[GetNextInputNum()]->startChanNum; }
+    virtual uint GetCurrentSourceID(void) const
+        { return inputs[GetCurrentInputNum()]->sourceid; }
     virtual uint GetInputCardID(int inputNum) const;
     virtual QStringList GetConnectedInputs(void) const;
     virtual QString GetOrdering(void) const
