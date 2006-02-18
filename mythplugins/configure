@@ -8,6 +8,7 @@
 #
 
 prefix="/usr/local"
+libdir_name="lib"
 
 music="yes"
 video="yes"
@@ -50,6 +51,7 @@ NB:      all --enable-* options can be reversed with --disable-*
 
 Generic options:
   --prefix=PREFIX          MythTV install location PREFIX [$prefix]"
+  --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]"
   --help                   print this message
   --enable-all             Enable all options
   --enable-opengl          enable OpenGL (Music and Gallery) [$opengl]
@@ -124,6 +126,8 @@ echo "   $0$CONFIGURATION_OPTS" >> config.log
 for opt do
   case "$opt" in
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --libdir-name=*) libdir_name=`echo $opt | cut -d '=' -f 2`;
   ;;
   --enable-mythmusic) music="yes"
   ;;
@@ -271,7 +275,7 @@ has_library()
         done
     fi
 
-    LIBPATHS="`echo $LIBPATHS $prefix/lib /lib /usr/lib /usr/local/lib /usr/X11R6/lib | sed s/'\/ '/' '/g` "
+    LIBPATHS="`echo $LIBPATHS $prefix/$libdir_name /$libdir_name /usr/$libdir_name /usr/local/$libdir_name /usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
 
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
@@ -286,7 +290,7 @@ has_header()
 {
     HPATHS="$prefix/include /usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /"
     INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
-    HPATHS="$HPATHS `echo $INCL | sed s/lib/include/g` "
+    HPATHS="$HPATHS `echo $INCL | sed s/$libdir_name/include/g` "
 
     HAS_IT="no"
     for HPATH in $HPATHS ; do

@@ -608,7 +608,7 @@ for opt do
   ;;  
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`; force_prefix=yes
   ;;
-  --libdir-name=*) prefix=`echo $opt | cut -d '=' -f 2`;
+  --libdir-name=*) libdir_name=`echo $opt | cut -d '=' -f 2`;
   ;;
   --libdir=*) libdir=`echo $opt | cut -d '=' -f 2`; force_prefix=yes
   ;;
