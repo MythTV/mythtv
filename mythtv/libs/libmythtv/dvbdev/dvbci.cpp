@@ -1434,9 +1434,9 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8
   capmt[infoLengthPos + 1] = l & 0xFF;
 }
 
-// -- cCiHandler -------------------------------------------------------------
+// -- cLlCiHandler -------------------------------------------------------------
 
-cCiHandler::cCiHandler(int Fd, int NumSlots)
+cLlCiHandler::cLlCiHandler(int Fd, int NumSlots)
 {
   numSlots = NumSlots;
   newCaSupport = false;
@@ -1449,7 +1449,7 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
   needCaPmt = false;
 }
 
-cCiHandler::~cCiHandler()
+cLlCiHandler::~cLlCiHandler()
 {
   cMutexLock MutexLock(&mutex);
   for (int i = 0; i < MAX_CI_SESSION; i++)
@@ -1471,9 +1471,11 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
             if (NumSlots > 0)
             {
                 if (Caps.slot_type & CA_CI_LINK)
-                    return new cCiHandler(fd_ca, NumSlots);
+                    return new cLlCiHandler(fd_ca, NumSlots);
+                else if (Caps.slot_type & CA_CI)
+                    return new cHlCiHandler(fd_ca, NumSlots);
                 else
-                    isyslog("CAM doesn't support link layer interface,"
+                    isyslog("CAM doesn't support either high or low level CI,"
                             " Caps.slot_type=%i", Caps.slot_type);
             }
             else
@@ -1486,12 +1488,12 @@ cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
     return NULL;
 }
 
-int cCiHandler::ResourceIdToInt(const uint8_t *Data)
+int cLlCiHandler::ResourceIdToInt(const uint8_t *Data)
 {
   return (ntohl(*(int *)Data));
 }
 
-bool cCiHandler::Send(uint8_t Tag, int SessionId, int ResourceId, int Status)
+bool cLlCiHandler::Send(uint8_t Tag, int SessionId, int ResourceId, int Status)
 {
   uint8_t buffer[16];
   uint8_t *p = buffer;
@@ -1509,7 +1511,7 @@ bool cCiHandler::Send(uint8_t Tag, int SessionId, int ResourceId, int Status)
   return tc && tc->SendData(p - buffer, buffer) == OK;
 }
 
-cCiSession *cCiHandler::GetSessionBySessionId(int SessionId)
+cCiSession *cLlCiHandler::GetSessionBySessionId(int SessionId)
 {
   for (int i = 0; i < MAX_CI_SESSION; i++) {
       if (sessions[i] && sessions[i]->SessionId() == SessionId)
@@ -1518,7 +1520,7 @@ cCiSession *cCiHandler::GetSessionBySessionId(int SessionId)
   return NULL;
 }
 
-cCiSession *cCiHandler::GetSessionByResourceId(int ResourceId, int Slot)
+cCiSession *cLlCiHandler::GetSessionByResourceId(int ResourceId, int Slot)
 {
   for (int i = 0; i < MAX_CI_SESSION; i++) {
       if (sessions[i] && sessions[i]->Tc()->Slot() == Slot && sessions[i]->ResourceId() == ResourceId)
@@ -1527,7 +1529,7 @@ cCiSession *cCiHandler::GetSessionByResourceId(int ResourceId, int Slot)
   return NULL;
 }
 
-cCiSession *cCiHandler::CreateSession(int ResourceId)
+cCiSession *cLlCiHandler::CreateSession(int ResourceId)
 {
   if (!GetSessionByResourceId(ResourceId, tc->Slot())) {
      for (int i = 0; i < MAX_CI_SESSION; i++) {
@@ -1547,7 +1549,7 @@ cCiSession *cCiHandler::CreateSession(int ResourceId)
   return NULL;
 }
 
-bool cCiHandler::OpenSession(int Length, const uint8_t *Data)
+bool cLlCiHandler::OpenSession(int Length, const uint8_t *Data)
 {
   if (Length == 6 && *(Data + 1) == 0x04) {
      int ResourceId = ResourceIdToInt(Data + 2);
@@ -1573,7 +1575,7 @@ bool cCiHandler::OpenSession(int Length, const uint8_t *Data)
   return false;
 }
 
-bool cCiHandler::CloseSession(int SessionId)
+bool cLlCiHandler::CloseSession(int SessionId)
 {
   dbgprotocol("CloseSession %08X\n", SessionId);
   cCiSession *Session = GetSessionBySessionId(SessionId);
@@ -1590,7 +1592,7 @@ bool cCiHandler::CloseSession(int SessionId)
   return false;
 }
 
-int cCiHandler::CloseAllSessions(int Slot)
+int cLlCiHandler::CloseAllSessions(int Slot)
 {
   int result = 0;
   for (int i = 0; i < MAX_CI_SESSION; i++) {
@@ -1602,7 +1604,7 @@ int cCiHandler::CloseAllSessions(int Slot)
   return result;
 }
 
-bool cCiHandler::Process(void)
+bool cLlCiHandler::Process(void)
 {
     bool result = true;
     cMutexLock MutexLock(&mutex);
@@ -1688,14 +1690,14 @@ bool cCiHandler::Process(void)
     return result;
 }
 
-bool cCiHandler::EnterMenu(int Slot)
+bool cLlCiHandler::EnterMenu(int Slot)
 {
   cMutexLock MutexLock(&mutex);
   cCiApplicationInformation *api = (cCiApplicationInformation *)GetSessionByResourceId(RI_APPLICATION_INFORMATION, Slot);
   return api ? api->EnterMenu() : false;
 }
 
-cCiMenu *cCiHandler::GetMenu(void)
+cCiMenu *cLlCiHandler::GetMenu(void)
 {
   cMutexLock MutexLock(&mutex);
   for (int Slot = 0; Slot < numSlots; Slot++) {
@@ -1706,7 +1708,7 @@ cCiMenu *cCiHandler::GetMenu(void)
   return NULL;
 }
 
-cCiEnquiry *cCiHandler::GetEnquiry(void)
+cCiEnquiry *cLlCiHandler::GetEnquiry(void)
 {
   cMutexLock MutexLock(&mutex);
   for (int Slot = 0; Slot < numSlots; Slot++) {
@@ -1717,29 +1719,174 @@ cCiEnquiry *cCiHandler::GetEnquiry(void)
   return NULL;
 }
 
-const unsigned short *cCiHandler::GetCaSystemIds(int Slot)
+const unsigned short *cLlCiHandler::GetCaSystemIds(int Slot)
  {
   cMutexLock MutexLock(&mutex);
   cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
   return cas ? cas->GetCaSystemIds() : NULL;
 }
 
-bool cCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
+bool cLlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int Slot)
 {
   cMutexLock MutexLock(&mutex);
   cCiConditionalAccessSupport *cas = (cCiConditionalAccessSupport *)GetSessionByResourceId(RI_CONDITIONAL_ACCESS_SUPPORT, Slot);
   return cas && cas->SendPMT(CaPmt);
 }
 
-bool cCiHandler::Reset(int Slot)
+bool cLlCiHandler::Reset(int Slot)
 {
   cMutexLock MutexLock(&mutex);
   CloseAllSessions(Slot);
   return tpl->ResetSlot(Slot);
 }
 
-bool cCiHandler::connected() const
+bool cLlCiHandler::connected() const
 {
   return _connected;
 }
 
+// -- cHlCiHandler -------------------------------------------------------------
+
+cHlCiHandler::cHlCiHandler(int Fd, int NumSlots)
+{
+    numSlots = NumSlots;
+    numCaSystemIds = 0;
+    caSystemIds[0] = 0;
+    fdCa = Fd;
+    state = 0;
+    fprintf(stderr, "New High level CI handler\n");
+}
+
+cHlCiHandler::~cHlCiHandler()
+{
+    cMutexLock MutexLock(&mutex);
+    close(fdCa);
+}
+
+int cHlCiHandler::CommHL(unsigned tag, unsigned function, struct ca_msg *msg)
+{
+    if (tag) {
+	msg->msg[2] = tag & 0xff;
+	msg->msg[1] = (tag & 0xff00) >> 8;
+	msg->msg[0] = (tag & 0xff0000) >> 16;
+ 	fprintf(stderr, "Sending message=[%02x %02x %02x ]\n",
+ 		       msg->msg[0], msg->msg[1], msg->msg[2]);
+    }
+    
+    return ioctl(fdCa, function, msg);
+}
+
+int cHlCiHandler::GetData(unsigned tag, struct ca_msg *msg)
+{
+    return CommHL(tag, CA_GET_MSG, msg);
+}
+
+int cHlCiHandler::SendData(unsigned tag, struct ca_msg *msg)
+{
+    return CommHL(tag, CA_SEND_MSG, msg);
+}
+
+bool cHlCiHandler::Process(void)
+{
+    cMutexLock MutexLock(&mutex);
+
+    struct ca_msg msg;
+    switch(state) {
+    case 0:
+	// Get CA_system_ids
+	/*	Enquire		*/
+	if ((SendData(AOT_CA_INFO_ENQ, &msg)) < 0) {
+	    fprintf(stderr, "HLCI communication failed\n");
+	} else {
+	    dbgprotocol("==> Ca Info Enquiry");
+	    /*	Receive		*/
+	    if ((GetData(AOT_CA_INFO, &msg)) < 0) {
+		fprintf(stderr, "HLCI communication failed\n");
+	    } else {
+		printf("Debug: ");
+		for(int i = 0; i < 20; i++) {
+		    printf("%d ", msg.msg[i]);
+		}
+		printf("\n");
+		dbgprotocol("<== Ca Info");
+		int l = msg.msg[3];
+		const uint8_t *d = &msg.msg[4];
+		while (l > 1) {
+		    unsigned short id = ((unsigned short)(*d) << 8) | *(d + 1);
+		    dbgprotocol(" %04X", id);
+		    d += 2;
+		    l -= 2;
+		    if (numCaSystemIds < MAXCASYSTEMIDS) {
+			caSystemIds[numCaSystemIds++] = id;
+			caSystemIds[numCaSystemIds] = 0;
+		    }
+		    else
+			esyslog("ERROR: too many CA system IDs!");
+		}
+		dbgprotocol("\n");
+	    }
+	    state = 1;
+	    break;
+	}
+    }
+
+    bool result = true;
+
+    return result;
+}
+
+bool cHlCiHandler::EnterMenu(int)
+{
+    return false;
+}
+
+cCiMenu *cHlCiHandler::GetMenu(void)
+{
+    return NULL;
+}
+
+cCiEnquiry *cHlCiHandler::GetEnquiry(void)
+{
+    return NULL;
+}
+
+const unsigned short *cHlCiHandler::GetCaSystemIds(int)
+{
+    return caSystemIds;
+}
+
+bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
+{
+    cMutexLock MutexLock(&mutex);
+    struct ca_msg msg;
+
+    fprintf(stderr, "Setting CA PMT.\n");
+    state = 2;
+
+    msg.msg[3] = CaPmt.length;
+    memcpy(&msg.msg[4], CaPmt.capmt, CaPmt.length);
+
+    if ((SendData(AOT_CA_PMT, &msg)) < 0) {
+	fprintf(stderr, "HLCI communication failed\n");
+	return false;
+    }
+    
+    return true;
+}
+
+bool cHlCiHandler::Reset(int)
+{
+    if ((ioctl(fdCa, CA_RESET)) < 0) {
+	fprintf(stderr, "ioctl CA_RESET failed.\n");
+	return false;
+    }
+    return true;
+}
+
+bool cHlCiHandler::NeedCaPmt(void)
+{
+    if(state == 1)
+	return true;
+
+    return false;
+}

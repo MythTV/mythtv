@@ -122,6 +122,7 @@ public:
 
 class cCiCaPmt {
   friend class cCiConditionalAccessSupport;
+  friend class cHlCiHandler;
 private:
   int length;
   int infoLengthPos;
@@ -139,6 +140,21 @@ class cCiTransportLayer;
 class cCiTransportConnection;
 
 class cCiHandler {
+public:
+  static cCiHandler *CreateCiHandler(const char *FileName);
+  virtual int NumSlots(void) = 0;
+  virtual bool Process(void) = 0;
+  virtual bool HasUserIO(void) = 0;
+  virtual bool NeedCaPmt(void) = 0;
+  virtual bool EnterMenu(int Slot) = 0;
+  virtual cCiMenu *GetMenu(void) = 0;
+  virtual cCiEnquiry *GetEnquiry(void) = 0;
+  virtual const unsigned short *GetCaSystemIds(int Slot) = 0;
+  virtual bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) = 0;
+  };
+
+class cLlCiHandler : public cCiHandler {
+  friend class cCiHandler;
 private:
   cMutex mutex;
   int fdCa;
@@ -157,10 +173,9 @@ private:
   bool OpenSession(int Length, const uint8_t *Data);
   bool CloseSession(int SessionId);
   int CloseAllSessions(int Slot);
-  cCiHandler(int Fd, int NumSlots);
+  cLlCiHandler(int Fd, int NumSlots);
 public:
-  ~cCiHandler();
-  static cCiHandler *CreateCiHandler(const char *FileName);
+  virtual ~cLlCiHandler();
   int NumSlots(void) { return numSlots; }
   bool Process(void);
   bool HasUserIO(void) { return hasUserIO; }
@@ -174,6 +189,35 @@ public:
   bool Reset(int Slot);
   bool connected() const;
   };
+
+class cHlCiHandler : public cCiHandler {
+    friend class cCiHandler;
+  private:
+    cMutex mutex;
+    int fdCa;
+    int numSlots;
+    int state;
+    int numCaSystemIds;
+    unsigned short caSystemIds[MAXCASYSTEMIDS + 1]; // list is zero terminated!
+    cHlCiHandler(int Fd, int NumSlots);
+    int CommHL(unsigned tag, unsigned function, struct ca_msg *msg);
+    int GetData(unsigned tag, struct ca_msg *msg);
+    int SendData(unsigned tag, struct ca_msg *msg);
+  public:
+    virtual ~cHlCiHandler();
+    int NumSlots(void) { return numSlots; }
+    bool Process(void);
+    bool HasUserIO(void) { return false; }//hasUserIO; }
+    bool NeedCaPmt(void);
+    bool EnterMenu(int Slot);
+    cCiMenu *GetMenu(void);
+    cCiEnquiry *GetEnquiry(void);
+    bool SetCaPmt(cCiCaPmt &CaPmt);
+    const unsigned short *GetCaSystemIds(int Slot);
+    bool SetCaPmt(cCiCaPmt &CaPmt, int Slot);
+    bool Reset(int Slot);
+    bool connected() const;
+};
 
 int tcp_listen(struct sockaddr_in *name,int sckt,unsigned long address=INADDR_ANY);
 int accept_tcp(int ip_sock,struct sockaddr_in *ip_name);
