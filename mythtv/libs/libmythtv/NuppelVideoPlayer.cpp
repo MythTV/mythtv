@@ -3855,7 +3855,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     osd->SetText("editmode", infoMap, -1);
 }
 
-void NuppelVideoPlayer::HandleSelect(void)
+void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
 {
     bool deletepoint = false;
     QMap<long long, int>::Iterator i;
@@ -3866,7 +3866,7 @@ void NuppelVideoPlayer::HandleSelect(void)
         long long pos = framesPlayed - i.key();
         if (pos < 0)
             pos = 0 - pos;
-        if (pos < (int)ceil(20 * video_frame_rate))
+        if ((pos < (int)ceil(20 * video_frame_rate)) && !allowSelectNear)
         {
             deletepoint = true;
             deleteframe = i.key();
@@ -3877,16 +3877,17 @@ void NuppelVideoPlayer::HandleSelect(void)
 
     if (deletepoint)
     {
-        QString message = QObject::tr("You are close to an existing cut point.  Would you "
-                          "like to:");
+        QString message = QObject::tr("You are close to an existing cut point. "
+		                              "Would you like to:");
         QString option1 = QObject::tr("Delete this cut point");
-        QString option2 = QObject::tr("Move this cut point to the current position");
+        QString option2 = QObject::tr("Move this cut point to the current "
+		                              "position");
         QString option3 = QObject::tr("Flip directions - delete to the ");
         if (direction == 0)
             option3 += QObject::tr("right");
         else
             option3 += QObject::tr("left");
-        QString option4 = QObject::tr("Cancel");
+        QString option4 = QObject::tr("Insert a new cut point");
 
         dialogname = "deletemark";
         dialogtype = 0;
@@ -3904,7 +3905,6 @@ void NuppelVideoPlayer::HandleSelect(void)
         QString message = QObject::tr("Insert a new cut point?");
         QString option1 = QObject::tr("Delete before this frame");
         QString option2 = QObject::tr("Delete after this frame");
-        QString option3 = QObject::tr("Cancel");
 
         dialogname = "addmark";
         dialogtype = 1;
@@ -3912,7 +3912,6 @@ void NuppelVideoPlayer::HandleSelect(void)
         QStringList options;
         options += option1;
         options += option2;
-        options += option3;
 
         osd->NewDialogBox(dialogname, message, options, -1);
     }
@@ -3937,6 +3936,9 @@ void NuppelVideoPlayer::HandleResponse(void)
                 break;
             case 3:
                 ReverseMark(deleteframe);
+                break;
+            case 4:
+                HandleSelect(true);
                 break;
             default:
                 break;

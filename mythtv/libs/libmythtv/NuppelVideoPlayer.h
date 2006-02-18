@@ -343,7 +343,7 @@ class NuppelVideoPlayer
     void SetCommBreakIter(void);
 
     void HandleArbSeek(bool right);
-    void HandleSelect(void);
+    void HandleSelect(bool allowSelectNear = false);
     void HandleResponse(void);
 
     void UpdateTimeDisplay(void);
