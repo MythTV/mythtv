@@ -5018,7 +5018,7 @@ void NuppelVideoPlayer::DisplaySubtitles()
                 QImage scaledImage = qImage.smoothScale(rect->w, rect->h);
 
                 OSDTypeImage* image = new OSDTypeImage();
-                image->SetPosition(QPoint(rect->x, rect->y));
+                image->SetPosition(QPoint(rect->x, rect->y), hmult, vmult);
                 image->LoadFromQImage(scaledImage);
 
                 subtitleOSD->AddType(image);

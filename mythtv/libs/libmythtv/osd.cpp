@@ -154,7 +154,8 @@ void OSD::SetDefaults(void)
         }
 
         OSDTypeCC *ccpage = new OSDTypeCC(name, ccfont, sub_xoff, sub_yoff,
-                                          sub_dispw, sub_disph);
+                                          sub_dispw, sub_disph,
+                                          wmult, hmult);
         container->AddType(ccpage);
     }
 
@@ -517,7 +518,7 @@ void OSD::parseBox(OSDSet *container, QDomElement &element)
         }
     }
 
-    OSDTypeBox *box = new OSDTypeBox(name, area);
+    OSDTypeBox *box = new OSDTypeBox(name, area, wmult, hmult);
     container->AddType(box);
 }
 
@@ -658,7 +659,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
         return;
     }
 
-    OSDTypeText *text = new OSDTypeText(name, ttffont, "", area);
+    OSDTypeText *text = new OSDTypeText(name, ttffont, "", area, wmult, hmult);
     container->AddType(text);
 
     text->SetMultiLine(multiline);
@@ -875,7 +876,7 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
                 QRect area = parseRect(getFirstText(info));
                 normalizeRect(area);
 
-                rects->AddPosition(area);
+                rects->AddPosition(area, wmult, hmult);
             }
             else
             {
@@ -919,7 +920,7 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
                 pos.setX((int)(pos.x() * wmult + xoffset));
                 pos.setY((int)(pos.y() * hmult + yoffset));
 
-                image->AddPosition(pos);
+                image->AddPosition(pos, wmult, hmult);
             }
             else if (info.tagName() == "staticsize")
             {
@@ -1925,7 +1926,7 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
         image = new OSDTypeImage(*editarrowright);
     }
 
-    image->SetPosition(QPoint(xpos, ypos));
+    image->SetPosition(QPoint(xpos, ypos), wmult, hmult);
 
     set->AddType(image);
     set->Display();
