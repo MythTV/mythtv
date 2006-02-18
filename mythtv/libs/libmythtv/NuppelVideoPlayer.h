@@ -560,6 +560,7 @@ class NuppelVideoPlayer
     QMap<long long, int>::Iterator deleteIter;
     QMap<long long, int>::Iterator blankIter;
     QMap<long long, int>::Iterator commBreakIter;
+    QDateTime  lastIgnoredManualSkip;
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
@@ -615,3 +616,5 @@ class NuppelVideoPlayer
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

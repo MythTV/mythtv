@@ -501,6 +501,19 @@ static HostSpinBox *CommNotifyAmount()
     return gs;
 }
 
+static GlobalSpinBox *MaximumCommercialSkip()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("MaximumCommercialSkip", 0, 3600, 10);
+    bs->setLabel(QObject::tr("Maximum commercial skip (in seconds)"));
+    bs->setHelpText(QObject::tr("MythTV will discourage long manual commercial "
+                    "skips.  Skips which are longer than this will require the "
+                    "use to hit the SKIP key twice.  Automatic commercial "
+                    "skipping is not affected by this limit."));
+    bs->setValue(3600);
+    return bs;
+}
+
+
 static GlobalSpinBox *AutoExpireExtraSpace()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
@@ -3124,6 +3137,7 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(AutoCommercialSkip());
     comms->addChild(CommRewindAmount());
     comms->addChild(CommNotifyAmount());
+    comms->addChild(MaximumCommercialSkip());
     comms->addChild(CommSkipAllBlanks());
     addChild(comms);
 

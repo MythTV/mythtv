@@ -188,6 +188,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     m_DeintSetting   = gContext->GetNumSetting("Deinterlace", 0);
     decode_extra_audio=gContext->GetNumSetting("DecodeExtraAudio", 0);
 
+    lastIgnoredManualSkip = QDateTime::currentDateTime().addSecs(-10);
+
     bzero(&txtbuffers, sizeof(txtbuffers));
     bzero(&tc_lastval, sizeof(tc_lastval));
     bzero(&tc_wrap,    sizeof(tc_wrap));
@@ -4983,11 +4985,21 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
     {
         int skipped_seconds = (int)((commBreakIter.key() -
                 framesPlayed) / video_frame_rate);
+        int maxskip = gContext->GetNumSetting("MaximumCommercialSkip", 3600);
         QString skipTime;
         skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                          abs(skipped_seconds) % 60);
         struct StatusPosInfo posInfo;
         calcSliderPos(posInfo);
+        if ((lastIgnoredManualSkip.secsTo(QDateTime::currentDateTime()) > 3) &&
+            (abs(skipped_seconds) >= maxskip))
+        {
+            osd->ShowStatus(posInfo, false,
+                            QObject::tr("Too Far %1").arg(skipTime), 2);
+            commBreakMapLock.unlock();
+            lastIgnoredManualSkip = QDateTime::currentDateTime();
+            return false;
+        }
         osd->ShowStatus(posInfo, false,
                         QObject::tr("Skip %1").arg(skipTime), 2);
     }
