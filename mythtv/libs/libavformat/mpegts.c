@@ -55,6 +55,7 @@ typedef struct
     int comp_page;
     int anc_page;
     int sub_id;
+    int txt_type;
 } dvb_caption_info_t;
 
 static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
@@ -618,6 +619,8 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         if (dvbci.sub_id && (stream_type == STREAM_TYPE_PRIVATE_DATA))
             stream_type = STREAM_TYPE_SUBTITLE_DVB;
 
+        if (dvbci.txt_type && (stream_type == STREAM_TYPE_PRIVATE_DATA))
+            stream_type = STREAM_TYPE_VBI_DVB;
 #ifdef DEBUG_SI
         av_log(NULL, AV_LOG_DEBUG, "stream_type=%d pid=0x%x\n", stream_type, pid);
 #endif
@@ -784,7 +787,7 @@ static int is_desired_stream(int type)
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
-//        case STREAM_TYPE_PRIVATE_DATA:
+        case STREAM_TYPE_VBI_DVB:
         case STREAM_TYPE_SUBTITLE_DVB:
             val = 1;
             break;
@@ -838,6 +841,12 @@ static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
                 dvbci->language[1] = get8(p, desc_end);
                 dvbci->language[2] = get8(p, desc_end);
                 dvbci->language[3] = 0;
+                break;
+            case DVB_VBI_DESCID:
+                dvbci->language[0] = get8(p, desc_end);
+                dvbci->language[1] = get8(p, desc_end);
+                dvbci->language[2] = get8(p, desc_end);
+                dvbci->txt_type = (get8(p, desc_end)) >> 3;
                 break;
             default:
                 break;
@@ -1273,10 +1282,10 @@ static void init_stream(AVStream *st, int stream_type, int code)
             codec_type = CODEC_TYPE_AUDIO;
             codec_id = CODEC_ID_DTS;
             break;
-//        case STREAM_TYPE_PRIVATE_DATA:
-//            codec_type = CODEC_TYPE_DATA;
-//            codec_id = CODEC_ID_DVB_VBI;
-//            break;
+        case STREAM_TYPE_VBI_DVB:
+            codec_type = CODEC_TYPE_DATA;
+            codec_id = CODEC_ID_DVB_VBI;
+            break;
         case STREAM_TYPE_SUBTITLE_DVB:
             codec_type = CODEC_TYPE_SUBTITLE;
             codec_id = CODEC_ID_DVB_SUBTITLE;

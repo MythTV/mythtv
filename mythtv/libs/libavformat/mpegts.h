@@ -37,6 +37,7 @@ extern "C" {
 #define SDT_TID   0x42
 
 /* descriptor ids */
+#define DVB_VBI_DESCID              0x56
 #define DVB_SUBT_DESCID             0x59
 
 #define STREAM_TYPE_VIDEO_MPEG1     0x01
@@ -53,6 +54,7 @@ extern "C" {
 #define STREAM_TYPE_AUDIO_DTS       0x8a
 
 #define STREAM_TYPE_SUBTITLE_DVB    0x100
+#define STREAM_TYPE_VBI_DVB         0x101
 
 unsigned int mpegts_crc32(const uint8_t *data, int len);
 extern AVOutputFormat mpegts_mux;
