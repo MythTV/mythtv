@@ -44,18 +44,6 @@ enum TranscodingStatuses {
     TRANSCODING_RUNNING        = 2
 };
 
-enum TranscoderStatus {
-    TRANSCODE_QUEUED      = 0x01,
-    TRANSCODE_RETRY       = 0x02,
-    TRANSCODE_FAILED      = 0x03,
-    TRANSCODE_LAUNCHED    = 0x04,
-    TRANSCODE_STARTED     = 0x05,
-    TRANSCODE_FINISHED    = 0x06,
-    TRANSCODE_USE_CUTLIST = 0x10,
-    TRANSCODE_STOP        = 0x20,
-    TRANSCODE_FLAGS       = 0xF0
-};
-
 enum FlagMask {
     FL_COMMFLAG       = 0x001,
     FL_CUTLIST        = 0x002,
