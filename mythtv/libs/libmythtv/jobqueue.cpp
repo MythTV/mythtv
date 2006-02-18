@@ -23,6 +23,9 @@ using namespace std;
 #include "mythdbcon.h"
 #include "previewgenerator.h"
 
+#define LOC     QString("JobQueue: ")
+#define LOC_ERR QString("JobQueue Error: ")
+
 JobQueue::JobQueue(bool master)
 {
     isMaster = master;
@@ -88,19 +91,17 @@ void JobQueue::customEvent(QCustomEvent *e)
 
             if (jobType == JOB_UNKNOWN)
             {
-                msg = QString("ERROR in Job Queue.  Unable "
-                              "to determine job info for message: "
+                msg = QString("Unable to determine job info for message: "
                               "%1.  Program will not be flagged.")
                               .arg(message);
-                VERBOSE(VB_IMPORTANT, msg);
+                VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
                 return;
             }
 
             QString key = GetJobQueueKey(chanid, starttime);
 
-            msg = QString("Job Queue: Received message '%1'")
-                          .arg(message);
-            VERBOSE(VB_JOBQUEUE, msg);
+            msg = QString("Received message '%1'").arg(message);
+            VERBOSE(VB_JOBQUEUE, LOC + msg);
 
             if (((action == "STOP") ||
                  (action == "PAUSE") ||
@@ -148,7 +149,7 @@ void *JobQueue::QueueProcesserThread(void *param)
 
 void JobQueue::ProcessQueue(void)
 {
-    VERBOSE(VB_JOBQUEUE, "JobQueue::ProcessQueue() started");
+    VERBOSE(VB_JOBQUEUE, LOC + "ProcessQueue() started");
 
     QString chanid;
     QDateTime starttime;
@@ -186,10 +187,10 @@ void JobQueue::ProcessQueue(void)
             gContext->GetSetting("JobQueueWindowEnd", "23:59");
 
         maxJobs = gContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
-        VERBOSE(VB_JOBQUEUE, QString("JobQueue currently set at %1 job(s) "
-                                     "max and to run new jobs from %2 to %3")
-                                     .arg(maxJobs).arg(queueStartTimeStr)
-                                     .arg(queueEndTimeStr));
+        VERBOSE(VB_JOBQUEUE, LOC +
+                QString("Currently set at %1 job(s) max and to run new jobs "
+                        "from %2 to %3").arg(maxJobs).arg(queueStartTimeStr)
+                                        .arg(queueEndTimeStr));
 
         jobStatus.clear();
 
@@ -228,7 +229,7 @@ void JobQueue::ProcessQueue(void)
                 jobsRunning++;
             }
 
-            message = QString("JobQueue: Currently Running %1 jobs.")
+            message = QString("Currently Running %1 jobs.")
                               .arg(jobsRunning);
             if (!inTimeWindow)
             {
@@ -236,7 +237,7 @@ void JobQueue::ProcessQueue(void)
                                    "Job Queue time window, no new jobs can be "
                                    "started, next window starts at %1.")
                                    .arg(queueStartTimeStr);
-                VERBOSE(VB_JOBQUEUE, message);
+                VERBOSE(VB_JOBQUEUE, LOC + message);
             }
             else if (jobsRunning >= maxJobs)
             {
@@ -244,13 +245,13 @@ void JobQueue::ProcessQueue(void)
                            "a running job completes)";
 
                 if (!atMax)
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
 
                 atMax = true;
             }
             else
             {
-                VERBOSE(VB_JOBQUEUE, message);
+                VERBOSE(VB_JOBQUEUE, LOC + message);
                 atMax = false;
             }
 
@@ -280,12 +281,12 @@ void JobQueue::ProcessQueue(void)
                     // completed on the remote host.
                     jobStatus[key] = status;
 
-                    message = QString("JobQueue: Skipping '%1' job for chanid "
+                    message = QString("Skipping '%1' job for chanid "
                                       "%2 @ %3, should run on '%4' instead")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts)
                                       .arg(hostname);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
@@ -294,13 +295,13 @@ void JobQueue::ProcessQueue(void)
                     (jobStatus.contains(key)) &&
                     (!(jobStatus[key] & JOB_DONE)))
                 {
-                    message = QString("JobQueue: Skipping '%1' job for chanid "
+                    message = QString("Skipping '%1' job for chanid "
                                       "%2 @ %3, there is another job for "
                                       "this recording with a status of '%4'")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts)
                                       .arg(StatusText(jobStatus[key]));
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
@@ -309,12 +310,12 @@ void JobQueue::ProcessQueue(void)
                 // Are we allowed to run this job?
                 if ((inTimeWindow) && (!AllowedToRun(jobs[x])))
                 {
-                    message = QString("JobQueue: Skipping '%1' job for chanid "
+                    message = QString("Skipping '%1' job for chanid "
                                       "%2 @ %3, not allowed to run on this "
                                       "backend.")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
@@ -323,11 +324,11 @@ void JobQueue::ProcessQueue(void)
                     // if we're trying to stop a job and it's not queued
                     //  then lets send a STOP command
                     if (status != JOB_QUEUED) {
-                        message = QString("JobQueue: Stopping '%1' job for "
+                        message = QString("Stopping '%1' job for "
                                               "chanid %2 @ %3")
                                           .arg(JobText(type))
                                           .arg(chanid).arg(startts);
-                        VERBOSE(VB_JOBQUEUE, message);
+                        VERBOSE(VB_JOBQUEUE, LOC + message);
     
                         controlFlagsLock.lock();
                         if (jobControlFlags.contains(key))
@@ -341,11 +342,11 @@ void JobQueue::ProcessQueue(void)
                     //  then let's just change the status to cancelled so
                     //  we don't try to run it from the queue
                     } else {
-                        message = QString("JobQueue: Cancelling '%1' job for "
+                        message = QString("Cancelling '%1' job for "
                                           "chanid %2 @ %3")
                                           .arg(JobText(type))
                                           .arg(chanid).arg(startts);
-                        VERBOSE(VB_JOBQUEUE, message);
+                        VERBOSE(VB_JOBQUEUE, LOC + message);
 
                         // at the bottom of this loop we requeue any jobs that
                         //  are not currently queued and also not associated 
@@ -353,11 +354,11 @@ void JobQueue::ProcessQueue(void)
                         //  can cancel it
                         if (!ChangeJobHost(id, m_hostname))
                         {
-                            message = QString("JobQueue: ERROR claiming '%1' job "
+                            message = QString("Unable to clain '%1' job "
                                               "for chanid %2 @ %3.")
                                               .arg(JobText(type))
                                               .arg(chanid).arg(startts);
-                            VERBOSE(VB_JOBQUEUE, message);
+                            VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
                             continue;
                         }
 
@@ -369,11 +370,10 @@ void JobQueue::ProcessQueue(void)
 
                 if ((cmds & JOB_PAUSE) && (status != JOB_QUEUED))
                 {
-                    message = QString("JobQueue: Pausing '%1' job for chanid "
-                                      "%2 @ %3")
+                    message = QString("Pausing '%1' job for chanid %2 @ %3")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
 
                     controlFlagsLock.lock();
                     if (jobControlFlags.contains(key))
@@ -386,11 +386,10 @@ void JobQueue::ProcessQueue(void)
 
                 if ((cmds & JOB_RESTART) && (status != JOB_QUEUED))
                 {
-                    message = QString("JobQueue: Restart '%1' job for chanid "
-                                      "%2 @ %3")
+                    message = QString("Restart '%1' job for chanid %2 @ %3")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
 
                     controlFlagsLock.lock();
                     if (jobControlFlags.contains(key))
@@ -406,26 +405,25 @@ void JobQueue::ProcessQueue(void)
 
                     if (hostname == "")
                     {
-                        message = QString("JobQueue: Resetting '%1' job for "
+                        message = QString("Resetting '%1' job for "
                                           "chanid %2 @ %3 to %4 status, "
                                           "because no hostname is set.")
                                           .arg(JobText(type))
                                           .arg(chanid).arg(startts)
                                           .arg(StatusText(JOB_QUEUED));
-                        VERBOSE(VB_JOBQUEUE, message);
+                        VERBOSE(VB_JOBQUEUE, LOC + message);
 
                         ChangeJobStatus(id, JOB_QUEUED, "");
                         ChangeJobCmds(id, JOB_RUN);
                     }
                     else if (inTimeWindow)
                     {
-                        message = QString("JobQueue: Skipping '%1' job for "
-                                          "chanid %2 @ %3, current job status "
-                                          "is '%4'")
+                        message = QString("Skipping '%1' job for chanid %2 @ "
+                                          "%3, current job status is '%4'")
                                           .arg(JobText(type))
                                           .arg(chanid).arg(startts)
                                           .arg(StatusText(status));
-                        VERBOSE(VB_JOBQUEUE, message);
+                        VERBOSE(VB_JOBQUEUE, LOC + message);
                     }
                     continue;
                 }
@@ -438,40 +436,36 @@ void JobQueue::ProcessQueue(void)
                     (hostname == "") &&
                     (!ChangeJobHost(id, m_hostname)))
                 {
-                    message = QString("JobQueue: ERROR claiming '%1' job "
+                    message = QString("Unable to claim '%1' job "
                                       "for chanid %2 @ %3.")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
                     continue;
                 }
 
                 if (!inTimeWindow)
                 {
-                    message = QString("JobQueue: Skipping '%1' job for chanid "
+                    message = QString("Skipping '%1' job for chanid "
                                       "%2 @ %3, Current time is outside of the "
                                       "Job Queue processing window.")
                                       .arg(JobText(type))
                                       .arg(chanid).arg(startts);
-                    VERBOSE(VB_JOBQUEUE, message);
+                    VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
-                message = QString("JobQueue: Processing '%1' job for chanid "
+                message = QString("Processing '%1' job for chanid "
                                   "%2 @ %3, current status is '%4'")
                                   .arg(JobText(type))
                                   .arg(chanid).arg(startts)
                                   .arg(StatusText(status));
-                VERBOSE(VB_JOBQUEUE, message);
+                VERBOSE(VB_JOBQUEUE, LOC + message);
 
                 ProcessJob(id, type, chanid, starttime);
 
                 startedJobAlready = true;
             }
-        }
-        else
-        {
-            //VERBOSE(VB_JOBQUEUE, "JobQueue: No Jobs found to process.");
         }
 
         if (startedJobAlready)
@@ -787,10 +781,10 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         }
         else if ((totalSlept % 5) == 0)
         {
-            message = QString("JobQueue: Waiting on %1 jobs still running for "
+            message = QString("Waiting on %1 jobs still running for "
                               "chanid %2 @ %3").arg(query.size())
                               .arg(chanid).arg(starttime.toString());
-            VERBOSE(VB_JOBQUEUE, message);
+            VERBOSE(VB_JOBQUEUE, LOC + message);
         }
 
         sleep(1);
@@ -826,8 +820,8 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
             return 0;
         }
 
-        VERBOSE(VB_IMPORTANT,
-                QString( "JobQueue::DeleteAllJobs: ERROR: There are Jobs "
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                QString( "In DeleteAllJobs: There are Jobs "
                          "left in the JobQueue that are still running for "
                          "chanid %1 @ %2.").arg(chanid)
                          .arg(starttime.toString()));
@@ -836,7 +830,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         {
             while (query.next())
             {
-                VERBOSE(VB_IMPORTANT,
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
                         QString("Job ID %1: '%2' with status '%3' and "
                                 "comment '%4'")
                                 .arg(query.value(0).toInt())
@@ -1125,8 +1119,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
         return 0;
     }
 
-    VERBOSE(VB_JOBQUEUE,
-            QString("JobQueue::GetJobsInQueue: findJobs search bitmask %1, "
+    VERBOSE(VB_JOBQUEUE, LOC +
+            QString("GetJobsInQueue: findJobs search bitmask %1, "
                     "found %2 total jobs")
                     .arg(findJobs).arg(query.numRowsAffected()));
                          
@@ -1148,8 +1142,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                 ((!commflagWhileRecording) ||
                  (thisJob.type != JOB_COMMFLAG)))
             {
-                VERBOSE(VB_JOBQUEUE,
-                        QString("JobQueue::GetJobsInQueue: Ignoring '%1' Job "
+                VERBOSE(VB_JOBQUEUE, LOC +
+                        QString("GetJobsInQueue: Ignoring '%1' Job "
                                 "for %2 @ %3 in %4 state.  Endtime in future.")
                                 .arg(JobText(thisJob.type))
                                 .arg(thisJob.chanid)
@@ -1171,8 +1165,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 
             if (!wantThisJob)
             {
-                VERBOSE(VB_JOBQUEUE,
-                        QString("JobQueue::GetJobsInQueue: Ignore '%1' Job for "
+                VERBOSE(VB_JOBQUEUE, LOC +
+                        QString("GetJobsInQueue: Ignore '%1' Job for "
                                 "%2 @ %3 in %4 state.")
                                 .arg(JobText(thisJob.type))
                                 .arg(thisJob.chanid)
@@ -1181,8 +1175,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                 continue;
             }
 
-            VERBOSE(VB_JOBQUEUE,
-                    QString("JobQueue::GetJobsInQueue: Found '%1' Job for "
+            VERBOSE(VB_JOBQUEUE, LOC +
+                    QString("GetJobsInQueue: Found '%1' Job for "
                             "%2 @ %3 in %4 state.")
                             .arg(JobText(thisJob.type))
                             .arg(thisJob.chanid)
@@ -1201,8 +1195,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                 (UserJobTypeToIndex(thisJob.type) == 0))
             {
                 thisJob.type = JOB_NONE;
-                VERBOSE(VB_JOBQUEUE,
-                    QString("JobQueue::GetJobsInQueue: Unknown Job Type: %1")
+                VERBOSE(VB_JOBQUEUE, LOC +
+                    QString("GetJobsInQueue: Unknown Job Type: %1")
                         .arg(thisJob.type)); 
             }
 
@@ -1408,9 +1402,9 @@ void JobQueue::RecoverQueue(bool justOld)
     QMap<int, JobQueueEntry> jobs;
     QString msg;
 
-    msg = QString("JobQueue::RecoverQueue: Checking for unfinished jobs to "
+    msg = QString("RecoverQueue: Checking for unfinished jobs to "
                   "recover.");
-    VERBOSE(VB_JOBQUEUE, msg);
+    VERBOSE(VB_JOBQUEUE, LOC + msg);
 
     GetJobsInQueue(jobs);
         
@@ -1436,13 +1430,13 @@ void JobQueue::RecoverQueue(bool justOld)
                   (it.data().hostname == hostname)) ||
                  (it.data().statustime < oldDate)))
             {
-                msg = QString("JobQueue::RecoverQueue: Recovering '%1' %2 @ %3 "
+                msg = QString("RecoverQueue: Recovering '%1' %2 @ %3 "
                               "from '%4' state.")
                               .arg(JobText(it.data().type))
                               .arg(it.data().chanid)
                               .arg(it.data().startts)
                               .arg(StatusText(it.data().status));
-                VERBOSE(VB_JOBQUEUE, msg);
+                VERBOSE(VB_JOBQUEUE, LOC + msg);
                         
                 ChangeJobStatus(it.data().id, JOB_QUEUED, "");
                 ChangeJobCmds(it.data().id, JOB_RUN);
@@ -1451,14 +1445,14 @@ void JobQueue::RecoverQueue(bool justOld)
             }
             else
             {
-                msg = QString("JobQueue::RecoverQueue: Ignoring '%1' %2 @ %3 "
+                msg = QString("RecoverQueue: Ignoring '%1' %2 @ %3 "
                               "in '%4' state.")
                               .arg(JobText(it.data().type))
                               .arg(it.data().chanid)
                               .arg(it.data().startts)
                               .arg(StatusText(it.data().status));
                         
-                // VERBOSE(VB_JOBQUEUE, msg);
+                // VERBOSE(VB_JOBQUEUE, LOC + msg);
             }
         }
     }
@@ -1498,8 +1492,8 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
 
     if (!MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_JOBQUEUE, "JobQueue: ERROR: Unable to open database "
-                             "connection to process job");
+        VERBOSE(VB_JOBQUEUE, LOC_ERR +
+                "ProcessJob(): Unable to open database connection");
         return;
     }
 
@@ -1509,10 +1503,10 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
 
     if (!pginfo)
     {
-        QString message = QString("JobQueue: ERROR, unable to retrieve "
+        QString message = QString("Unable to retrieve "
                                   "program info for chanid %1, starttime %2")
                                   .arg(chanid).arg(starttime.toString());
-        VERBOSE(VB_JOBQUEUE, message);
+        VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
 
         ChangeJobStatus(id, JOB_ERRORED,
                         "Unable to retrieve Program Info from database");
@@ -2023,11 +2017,11 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     if (!MSqlQuery::testDBConnection())
     {
-        QString msg = QString("ERROR in Commercial Flagging.  Could not open "
+        QString msg = QString("Commercial Flagging failed.  Could not open "
                               "new database connection for %1. "
                               "Program can not be flagged.")
                               .arg(logDesc);
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
                         "Could not open new database connection for "
@@ -2042,7 +2036,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     controlFlagsLock.unlock();
 
     QString msg = "Commercial Flagging Starting";
-    VERBOSE(VB_GENERAL, QString("%1 for %2").arg(msg).arg(logDesc));
+    VERBOSE(VB_GENERAL, LOC + QString("%1 for %2").arg(msg).arg(logDesc));
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;
@@ -2063,8 +2057,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         path = tokens[0];
     }
 
-    VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'")
-                                 .arg(command));
+    VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
 
     breaksFound = myth_system(command.ascii());
 
@@ -2072,10 +2065,10 @@ void JobQueue::DoFlagCommercialsThread(void)
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
-        msg = QString("Commercial Flagging ERRORED for %1, %2 does not exist "
+        msg = QString("Commercial Flagging failed for %1, %2 does not exist "
                       "or is not executable")
                       .arg(logDesc).arg(path);
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
@@ -2132,7 +2125,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_FINISHED, msg);
 
-        VERBOSE(VB_GENERAL, QString("Commercial Flagging %1").arg(msg));
+        VERBOSE(VB_GENERAL, LOC + QString("Commercial Flagging %1").arg(msg));
         msg = "";
 
         MythEvent me("RECORDING_LIST_CHANGE");
@@ -2144,7 +2137,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     }
 
     if (msg != "")
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC + msg);
 
     jobControlFlags.erase(key);
     runningJobIDs.erase(key);
@@ -2181,10 +2174,10 @@ void JobQueue::DoUserJobThread(void)
     QString msg = QString("Started \"%1\" for \"%2\" recorded "
                           "from channel %3 at %4")
                           .arg(jobDesc)
-                          .arg(program_info->title)
+                          .arg(program_info->title.local8Bit())
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
-    VERBOSE(VB_GENERAL, msg.local8Bit());
+    VERBOSE(VB_GENERAL, LOC + msg);
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Started").arg(jobDesc), msg);
 
@@ -2198,19 +2191,20 @@ void JobQueue::DoUserJobThread(void)
         default: break;
     }
 
-    VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'")
-                                 .arg(runningJobCommands[key]));
+    VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
+                                       .arg(runningJobCommands[key]));
 
     int result = myth_system(runningJobCommands[key].ascii());
 
     if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
-        msg = QString("User Job '%1' ERRORED, unable to find "
+        msg = QString("User Job '%1' failed, unable to find "
                       "executable, check your PATH and backend logs.")
                       .arg(runningJobCommands[key]);
-        VERBOSE(VB_IMPORTANT, msg);
-        VERBOSE(VB_IMPORTANT, QString("Current PATH: '%1'").arg(getenv("PATH")));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+        VERBOSE(VB_IMPORTANT, LOC + QString("Current PATH: '%1'")
+                                            .arg(getenv("PATH")));
 
         gContext->LogEntry("jobqueue", LP_WARNING,
                            "User Job Errored", msg);
@@ -2223,10 +2217,10 @@ void JobQueue::DoUserJobThread(void)
         msg = QString("Finished \"%1\" for \"%2\" recorded from "
                       "channel %3 at %4.")
                       .arg(jobDesc)
-                      .arg(program_info->title)
+                      .arg(program_info->title.local8Bit())
                       .arg(program_info->chanid)
                       .arg(program_info->recstartts.toString());
-        VERBOSE(VB_GENERAL, msg.local8Bit());
+        VERBOSE(VB_GENERAL, LOC + msg);
 
         gContext->LogEntry("jobqueue", LP_NOTICE,
                            QString("Job \"%1\" Finished").arg(jobDesc), msg);
