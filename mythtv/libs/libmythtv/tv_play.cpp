@@ -157,7 +157,7 @@ void TV::InitKeys(void)
             "adjustment controls", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
-    REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "F6");
+    REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "#");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
     REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
     REG_KEY("TV Playback", "NEXTAUDIO", "Switch to the next audio track", "+");
