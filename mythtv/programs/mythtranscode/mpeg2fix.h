@@ -108,6 +108,7 @@ class MPEG2replex
     int WaitBuffers();
     int done;
     QString outfile;
+    int otype;
     ringbuffer vrbuf;
     ringbuffer extrbuf[N_AUDIO];
     ringbuffer index_vrbuf;
@@ -130,7 +131,7 @@ class MPEG2fixup
   public:
     MPEG2fixup(const char *inf, const char *outf,
                QMap<long long, int> *deleteMap, const char *fmt, int norp,
-               int fixPTS, int maxf, bool showprog);
+               int fixPTS, int maxf, bool showprog, int otype);
     ~MPEG2fixup();
     int Start();
     void AddRangeList(QStringList cutlist, int type);

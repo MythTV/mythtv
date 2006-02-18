@@ -34,6 +34,7 @@ void usage(char *progname)
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
     cerr << "\t[options]\n\n";
     cerr << "\t--mpeg2          or -m: Perform MPEG2 to MPEG2 transcode.\n";
+    cerr << "\t--ostream <type> or -e: Output stream type.  Options: dvd, ps.\n";
     cerr << "\t--chanid         or -c: Takes a channel id. REQUIRED\n";
     cerr << "\t--starttime      or -s: Takes a starttime for the\n";
     cerr << "\t                        recording. REQUIRED\n";
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     int jobID = -1;
+    int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
     QMap<long long, int> deleteMap;
@@ -273,6 +275,22 @@ int main(int argc, char *argv[])
         {
             mpeg2 = true;
         }
+        else if (!strcmp(a.argv()[argpos],"-e") ||
+                 !strcmp(a.argv()[argpos],"--ostream")) 
+        {
+            if (a.argc() > argpos)
+            {
+                if(!strcmp(a.argv()[argpos + 1], "dvd"))
+                    otype = REPLEX_DVD;
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -e/--ostream option\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -402,7 +420,7 @@ int main(int argc, char *argv[])
        
         MPEG2fixup *m2f = new MPEG2fixup(infile.ascii(), outfile.ascii(),
                                          &deleteMap, NULL, false, false, 20,
-                                         showprogress);
+                                         showprogress, otype);
         if (build_index)
         {
             int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);
