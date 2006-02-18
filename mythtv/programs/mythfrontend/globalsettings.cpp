@@ -520,6 +520,7 @@ static GlobalComboBox *AutoExpireMethod()
     bc->setLabel(QObject::tr("Auto Expire Method"));
     bc->addSelection(QObject::tr("Oldest Show First"), "1");
     bc->addSelection(QObject::tr("Lowest Priority First"), "2");
+    bc->addSelection(QObject::tr("Weighted Time/Priority Combination"), "3");
     bc->setHelpText(QObject::tr("Method used to determine which recorded "
                                 "shows to delete first.  LiveTV recordings "
                                 "will always expire before normal "
@@ -527,6 +528,17 @@ static GlobalComboBox *AutoExpireMethod()
     bc->setValue(1);
     return bc;
 }
+
+static GlobalSpinBox *AutoExpireDayPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireDayPriority", 1, 400, 1);
+    bs->setLabel(QObject::tr("Auto Expire Priority Weight"));
+    bs->setHelpText(QObject::tr("The number of days bonus a program gets for "
+                    "each priority point. This is only used when the Weighted "
+                    "Time/Priority Auto Expire Method is selected."));
+    bs->setValue(3);
+    return bs;
+};
 
 static GlobalCheckBox *AutoExpireDefault()
 {
@@ -3178,6 +3190,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
     general->addChild(AutoExpireMethod());
+    general->addChild(AutoExpireDayPriority());
     general->addChild(AutoExpireDefault());
     general->addChild(AutoExpireLiveTVMaxAge());
     addChild(general);

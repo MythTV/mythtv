@@ -590,6 +590,7 @@ void AutoExpire::FillExpireList(void)
     {
         case emOldestFirst:
         case emLowestPriorityFirst:
+        case emWeightedTimePriority:
                 FillDBOrdered(expMethod);
                 break;
         // default falls through so list is empty so no AutoExpire
@@ -677,6 +678,12 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
             where = "autoexpire > 0";
             orderby = "recorded.recpriority ASC, starttime ASC";
             break;
+        case emWeightedTimePriority:
+            where = "autoexpire > 0";
+            orderby = QString("DATE_ADD(starttime, INTERVAL '%1' * "
+                                        "recorded.recpriority DAY) ASC")
+                      .arg(gContext->GetNumSetting("AutoExpireDayPriority", 3));
+            break;
         case emShortLiveTVPrograms:
             where = "recgroup = 'LiveTV' "
                     "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
@@ -703,7 +710,7 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
                "       title,           subtitle,    description, "
                "       hostname,        channum,     name,        "
                "       callsign,        seriesid,    programid,   "
-               "       recorded.        recpriority, progstart, "
+               "       recorded.recpriority,         progstart, "
                "       progend,         filesize,    recgroup "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "

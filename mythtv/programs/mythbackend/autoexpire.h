@@ -21,6 +21,7 @@ typedef vector<EncoderLink*> enclinklist_t;
 enum ExpireMethodType {
     emOldestFirst          = 1,
     emLowestPriorityFirst  = 2,
+    emWeightedTimePriority = 3,
     emShortLiveTVPrograms  = 10000,
     emNormalLiveTVPrograms = 10001
 };
