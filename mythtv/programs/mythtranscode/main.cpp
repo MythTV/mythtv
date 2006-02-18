@@ -26,6 +26,7 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo);
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
                         QMap <long long, long long> &posMap, int jobID);
+void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode);
 
 void usage(char *progname) 
 {
@@ -459,6 +460,9 @@ int main(int argc, char *argv[])
         exitcode = TRANSCODE_EXIT_UNKNOWN_ERROR;
     }
 
+    if (jobID >= 0)
+        CompleteJob(jobID, pginfo, useCutlist, exitcode);
+
     delete transcode;
     delete pginfo;
     delete gContext;
@@ -502,4 +506,129 @@ int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
     }
     return 0;
 }
+
+void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode)
+{
+    int status = JobQueue::GetJobStatus(jobID);
+    QString fileprefix = gContext->GetFilePrefix();
+    QString filename = pginfo->GetRecordFilename(fileprefix);
+
+    if (!pginfo)
+    {
+        JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
+                  "Job errored, unable to find Program Info for job");
+        return;
+    }
+
+    if (status == JOB_STOPPING)
+    {
+        QString tmpfile = filename + ".tmp";
+
+        // To save the original file...
+        QString oldfile = filename + ".old";
+        QString newfile = filename;
+        QString jobArgs = JobQueue::GetJobArgs(jobID);
+
+        if ((jobArgs == "RENAME_TO_NUV") &&
+            (filename.contains(QRegExp("mpg$"))))
+        {
+            QString newbase = pginfo->GetRecordBasename();
+
+            newfile.replace(QRegExp("mpg$"), "nuv");
+            newbase.replace(QRegExp("mpg$"), "nuv");
+            pginfo->SetRecordBasename(newbase);
+        }
+
+        if (rename(filename, oldfile) == -1)
+            perror(QString("mythtranscode: Error Renaming '%1' to '%2'")
+                   .arg(filename).arg(oldfile).ascii());
+
+        if (rename(tmpfile, newfile) == -1)
+            perror(QString("mythtranscode: Error Renaming '%1' to '%2'")
+                   .arg(tmpfile).arg(newfile).ascii());
+
+        if (!gContext->GetNumSetting("SaveTranscoding", 0))
+        {
+            if (unlink(oldfile) == -1)
+                perror(QString("mythtranscode: Error Deleting '%1'")
+                       .arg(oldfile).ascii());
+        }
+
+        oldfile = filename + ".png";
+        newfile += ".png";
+
+        QFile checkFile(oldfile);
+        if ((oldfile != newfile) && (checkFile.exists()))
+            rename(oldfile, newfile);
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        if (useCutlist)
+        {
+            query.prepare("DELETE FROM recordedmarkup "
+                          "WHERE chanid = :CHANID "
+                          "AND starttime = :STARTTIME "
+                          "AND type not in ( :KEYFRAME, :GOP_BYFRAME ) ;");
+            query.bindValue(":CHANID", pginfo->chanid);
+            query.bindValue(":STARTTIME", pginfo->recstartts);
+            query.bindValue(":KEYFRAME", MARK_KEYFRAME);
+            query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
+            query.exec();
+
+            if (!query.isActive())
+                MythContext::DBError("Error in mythtranscode", query);
+
+            query.prepare("UPDATE recorded "
+                          "SET cutlist = NULL, bookmark = NULL "
+                          "WHERE chanid = :CHANID "
+                          "AND starttime = :STARTTIME ;");
+            query.bindValue(":CHANID", pginfo->chanid);
+            query.bindValue(":STARTTIME", pginfo->recstartts);
+            query.exec();
+
+            if (!query.isActive())
+                MythContext::DBError("Error in mythtranscode", query);
+
+            pginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
+        }
+        else
+        {
+            query.prepare("DELETE FROM recordedmarkup "
+                          "WHERE chanid = :CHANID "
+                          "AND starttime = :STARTTIME "
+                          "AND type not in ( :KEYFRAME, :GOP_BYFRAME, "
+                          "    :COMM_START, :COMM_END) ;");
+            query.bindValue(":CHANID", pginfo->chanid);
+            query.bindValue(":STARTTIME", pginfo->recstartts);
+            query.bindValue(":KEYFRAME", MARK_KEYFRAME);
+            query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
+            query.bindValue(":COMM_START", MARK_COMM_START);
+            query.bindValue(":COMM_END", MARK_COMM_END);
+            query.exec();
+
+            if (!query.isActive())
+                MythContext::DBError("Error in mythtranscode", query);
+        }
+
+        JobQueue::ChangeJobStatus(jobID, JOB_FINISHED);
+
+    } else {
+        // Not a successful run, so remove the files we created
+        filename += ".tmp";
+        VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename));
+        unlink(filename);
+
+        filename += ".map";
+        unlink(filename);
+
+        if (status == JOB_ABORTING)                     // Stop command was sent
+            JobQueue::ChangeJobStatus(jobID, JOB_ABORTED, "Job Aborted");
+        else if (status != JOB_ERRORING)                // Recoverable error
+            resultCode = TRANSCODE_EXIT_RESTART;
+        else                                            // Unrecoverable error
+            JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
+                                      "Unrecoverable error");
+    }
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

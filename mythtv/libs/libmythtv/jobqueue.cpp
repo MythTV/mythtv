@@ -1779,7 +1779,6 @@ void JobQueue::DoTranscodeThread(void)
 
         ChangeJobStatus(jobID, JOB_STARTING);
 
-        QString statusText = StatusText(GetJobStatus(jobID));
         QString fileprefix = gContext->GetFilePrefix();
         QString filename = program_info->GetRecordFilename(fileprefix);
 
@@ -1789,7 +1788,8 @@ void JobQueue::DoTranscodeThread(void)
         if (stat(filename.ascii(), &st) == 0)
             origfilesize = st.st_size;
 
-        QString msg = QString("Transcode %1").arg(statusText);
+        QString msg = QString("Transcode %1")
+                              .arg(StatusText(GetJobStatus(jobID)));
 
         QString details = QString("%1%2: %3 (%4)")
                             .arg(program_info->title.local8Bit())
@@ -1797,21 +1797,24 @@ void JobQueue::DoTranscodeThread(void)
                             .arg(PrettyPrint(origfilesize))
                             .arg(transcoderName);
 
-        VERBOSE(VB_GENERAL, QString("%1 for %2").arg(msg).arg(details));
+        VERBOSE(VB_GENERAL, LOC + QString("%1 for %2").arg(msg).arg(details));
         gContext->LogEntry("transcode", LP_NOTICE, msg, details);
 
-        VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'")
-                                     .arg(command));
+        VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
+                                           .arg(command));
 
         int result = myth_system(command.ascii());
+        int status = GetJobStatus(jobID);
+ 
+        details = "";
 
         if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
             (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
         {
-            msg = QString("Transcoding ERRORED for %1, %2 does not exist or "
+            msg = QString("Transcoding failed for %1, %2 does not exist or "
                           "is not executable")
                           .arg(details).arg(path);
-            VERBOSE(VB_IMPORTANT, msg);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
             gContext->LogEntry("transcode", LP_WARNING,
                                "Transcoding Errored", msg);
@@ -1822,162 +1825,70 @@ void JobQueue::DoTranscodeThread(void)
             retry = false;
             break;
         }
-
-        int status = GetJobStatus(jobID);
-
-        if (status == JOB_STOPPING)
+        else if (result == TRANSCODE_EXIT_RESTART && retrylimit > 0)
         {
-            QString tmpfile = filename;
-            tmpfile += ".tmp";
-            // Get filesizes
-            if (stat(tmpfile.ascii(), &st) == 0)
-                filesize = st.st_size;
-            // To save the original file...
-            QString oldfile = filename;
-            QString newfile = filename;
-            QString jobArgs = GetJobArgs(jobID);
-            oldfile += ".old";
-
-            if ((jobArgs == "RENAME_TO_NUV") &&
-                (filename.contains(QRegExp("mpg$"))))
-            {
-                QString newbase = program_info->GetRecordBasename();
-
-                newfile.replace(QRegExp("mpg$"), "nuv");
-                newbase.replace(QRegExp("mpg$"), "nuv");
-                program_info->SetRecordBasename(newbase);
-            }
-
-            if (rename(filename, oldfile) == -1)
-                perror(QString(
-                    "JobQueue::DoTranscodeThread: Error Renaming '%1' to '%2'")
-                    .arg(filename).arg(oldfile).ascii());
-
-            if (rename(tmpfile, newfile) == -1)
-                perror(QString(
-                    "JobQueue::DoTranscodeThread: Error Renaming '%1' to '%2'")
-                    .arg(tmpfile).arg(newfile).ascii());
-
-            if (!gContext->GetNumSetting("SaveTranscoding", 0))
-            {
-                if (unlink(oldfile) == -1)
-                    perror(QString(
-                        "JobQueue::DoTranscodeThread: Error Deleting '%1'")
-                        .arg(oldfile).ascii());
-            }
-
-            oldfile = filename + ".png";
-            newfile += ".png";
-
-            QFile checkFile(oldfile);
-            if ((oldfile != newfile) && (checkFile.exists()))
-                rename(oldfile, newfile);
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            if (useCutlist)
-            {
-                query.prepare("DELETE FROM recordedmarkup "
-                              "WHERE chanid = :CHANID "
-                              "AND starttime = :STARTTIME "
-                              "AND type not in ( :KEYFRAME, :GOP_BYFRAME ) ;");
-                query.bindValue(":CHANID", program_info->chanid);
-                query.bindValue(":STARTTIME", program_info->recstartts);
-                query.bindValue(":KEYFRAME", MARK_KEYFRAME);
-                query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
-                query.exec();
-
-                if (!query.isActive())
-                    MythContext::DBError(
-                        "Error in JobQueue::DoTranscodeThread()", query);
-
-                query.prepare("UPDATE recorded "
-                              "SET cutlist = NULL, bookmark = NULL "
-                              "WHERE chanid = :CHANID "
-                              "AND starttime = :STARTTIME ;");
-                query.bindValue(":CHANID", program_info->chanid);
-                query.bindValue(":STARTTIME", program_info->recstartts);
-                query.exec();
-
-                if (!query.isActive())
-                    MythContext::DBError(
-                        "Error in JobQueue::DoTranscodeThread()", query);
-
-                program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
-            }
-            else
-            {
-                query.prepare("DELETE FROM recordedmarkup "
-                              "WHERE chanid = :CHANID "
-                              "AND starttime = :STARTTIME "
-                              "AND type not in ( :KEYFRAME, :GOP_BYFRAME, "
-                              "    :COMM_START, :COMM_END) ;");
-                query.bindValue(":CHANID", program_info->chanid);
-                query.bindValue(":STARTTIME", program_info->recstartts);
-                query.bindValue(":KEYFRAME", MARK_KEYFRAME);
-                query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
-                query.bindValue(":COMM_START", MARK_COMM_START);
-                query.bindValue(":COMM_END", MARK_COMM_END);
-                query.exec();
-
-                if (!query.isActive())
-                    MythContext::DBError(
-                        "Error in JobQueue::DoTranscodeThread()", query);
-            }
-
-            if (filesize > 0)
-                program_info->SetFilesize(filesize);
-            QString comment = QString("%1: %2 => %3")
-                                    .arg(transcoderName)
-                                    .arg(PrettyPrint(origfilesize))
-                                    .arg(PrettyPrint(filesize));
-            ChangeJobStatus(jobID, JOB_FINISHED, comment);
-
-            MythEvent me("RECORDING_LIST_CHANGE");
-            gContext->dispatch(me);
-        } else {
-            // transcode didn't finish delete partial transcode
-            filename += ".tmp";
-            VERBOSE(VB_JOBQUEUE, QString("Deleting %1").arg(filename));
-            unlink(filename);
-            filename += ".map";
-            unlink(filename);
-            if (status == JOB_ABORTING) // Stop command was sent
-                ChangeJobStatus(jobID, JOB_ABORTED);
-            else if (status != JOB_ERRORING && retrylimit) // Recoverable error
-            {
-                retry = true;
-                retrylimit--;
-            } else // Unrecoverable error
-                ChangeJobStatus(jobID, JOB_ERRORED);
-        }
-
-        statusText = StatusText(GetJobStatus(jobID));
-
-        msg = QString("Transcode %1").arg(statusText);
-
-        if (filesize > 0)
-        {
-            details = QString("%1%2: %3 (%4)")
-                            .arg(program_info->title)
-                            .arg(subtitle)
-                            .arg(PrettyPrint(filesize))
-                            .arg(transcoderName);
+            VERBOSE(VB_JOBQUEUE, LOC + "Transcode command restarting");
+            retry = true;
+            retrylimit--;
         }
         else
         {
-            details = QString("%1%2").arg(program_info->title).arg(subtitle);
-        }
+            msg = QString("Transcode %1")
+                          .arg(StatusText(GetJobStatus(jobID)));
+            gContext->LogEntry("transcode", LP_NOTICE, msg, details);
 
-        VERBOSE(VB_GENERAL, QString("%1 for %2%3: %4 => %5 (%6)")
-                            .arg(msg)
-                            .arg(program_info->title)
-                            .arg(subtitle)
+            if (status == JOB_FINISHED)
+            {
+                retry = false;
+
+                // Clear the pathname to force rechecking the DB in case 
+                // mythtranscode renamed the file.
+                program_info->pathname = "";
+                filename = program_info->GetRecordFilename(fileprefix);
+
+                if (stat(filename.ascii(), &st) == 0)
+                    filesize = st.st_size;
+
+                if (filesize != origfilesize)
+                {
+                    QString comment = QString("%1: %2 => %3")
+                                            .arg(transcoderName)
+                                            .arg(PrettyPrint(origfilesize))
+                                            .arg(PrettyPrint(filesize));
+                    ChangeJobStatus(jobID, JOB_FINISHED, comment);
+
+                    details = QString("%1%2")
+                                      .arg(program_info->title).arg(subtitle);
+
+                    if (filesize > 0)
+                    {
+                        program_info->SetFilesize(filesize);
+
+                        details += QString(": %1 (%2)")
+                                          .arg(PrettyPrint(filesize))
+                                          .arg(transcoderName);
+                    }
+
+                    VERBOSE(VB_GENERAL, LOC +
+                            QString("%1 for %2%3: %4 => %5 (%6)")
+                            .arg(msg).arg(program_info->title).arg(subtitle)
                             .arg(PrettyPrint(origfilesize))
-                            .arg(PrettyPrint(filesize))
-                            .arg(transcoderName));
-        gContext->LogEntry("transcode", LP_NOTICE, msg, details);
+                            .arg(PrettyPrint(filesize)).arg(transcoderName));
+                }
+
+                MythEvent me("RECORDING_LIST_CHANGE");
+                gContext->dispatch(me);
+            }
+        }
     }
+
+    if (retrylimit == 0)
+    {
+        VERBOSE(VB_JOBQUEUE, LOC_ERR + "Retry limit exceeded for transcoder, "
+                                       "setting job status to errored.");
+        ChangeJobStatus(jobID, JOB_ERRORED, "Retry limit exceeded");
+    }
+
     controlFlagsLock.lock();
     runningJobIDs.erase(key);
     runningJobTypes.erase(key);

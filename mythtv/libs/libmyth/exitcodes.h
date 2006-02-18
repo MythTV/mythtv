@@ -78,6 +78,7 @@
 #define TRANSCODE_BUGGY_EXIT_INVALID_VIDEO        GENERIC_EXIT_START-11
 #define TRANSCODE_BUGGY_EXIT_DEADLOCK             GENERIC_EXIT_START-12
 #define TRANSCODE_EXIT_START                      GENERIC_EXIT_START-12
+#define TRANSCODE_EXIT_RESTART                    GENERIC_EXIT_START-13
 
 // mythfilldatabase
 #define FILLDB_EXIT_OK                            GENERIC_EXIT_OK
