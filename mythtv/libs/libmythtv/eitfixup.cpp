@@ -130,12 +130,17 @@ void EITFixUp::FixStyle1(Event &event)
  */
 void EITFixUp::FixStyle2(Event &event)
 {
-    const uint SUBTITLE_PCT = 50; //% of description to allow subtitle up to
+    const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
+    const uint SUBTITLE_MAX_LEN = 128; // max length of subtitle field in db.
     int position = event.Description.find("New Series");
     if (position != -1)
     {
         //Do something here
     }
+    QRegExp sub("\\[.*S\\]");
+    position = event.Description.find(sub);
+    event.SubTitled |= (position != -1);
+
     //BBC three case (could add another record here ?)
     QRegExp rx("\\s*(Then|Followed by) 60 Seconds\\.");
     rx.setCaseSensitive(false);
@@ -160,7 +165,8 @@ void EITFixUp::FixStyle2(Event &event)
     else if ((position = event.Description.find(":")) != -1)
     {
         // if the subtitle is less than 50% of the description use it.
-        if ((position*100)/event.Description.length() < SUBTITLE_PCT)
+        if (((uint)position < SUBTITLE_MAX_LEN) &&
+            ((position*100)/event.Description.length() < SUBTITLE_PCT))
         {
             event.Event_Subtitle = event.Description.left(position);
             event.Description = event.Description.mid(position+1);
@@ -168,7 +174,8 @@ void EITFixUp::FixStyle2(Event &event)
     }
     else if ((position = event.Description.find(terminatesWith)) != -1)
     {
-        if ((position*100)/event.Description.length() < SUBTITLE_PCT)
+        if (((uint)position < SUBTITLE_MAX_LEN) &&
+            ((position*100)/event.Description.length() < SUBTITLE_PCT))
         {
             event.Event_Subtitle = event.Description.left(position+1);
             event.Description = event.Description.mid(position+2);
