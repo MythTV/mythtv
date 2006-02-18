@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_VERSION_INT ((50<<16)+(0<<8)+0)
-#define LIBAVFORMAT_VERSION     50.0.0
+#define LIBAVFORMAT_VERSION_INT ((50<<16)+(3<<8)+0)
+#define LIBAVFORMAT_VERSION     50.3.0
 #define LIBAVFORMAT_BUILD       LIBAVFORMAT_VERSION_INT
 
 #define LIBAVFORMAT_IDENT       "Lavf" AV_STRINGIFY(LIBAVFORMAT_VERSION)
@@ -555,6 +555,24 @@ int nsvdec_init(void);
 
 /* daud.c */
 int daud_init(void);
+
+/* aiff.c */
+int ff_aiff_init(void);
+
+/* voc.c */
+int voc_init(void);
+
+/* tta.c */
+int tta_init(void);
+
+/* adts.c */
+int ff_adts_init(void);
+
+/* mm.c */
+int mm_init(void);
+
+/* avs.c */
+int avs_init(void);
 
 #include "rtp.h"
 

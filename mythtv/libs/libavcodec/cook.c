@@ -90,8 +90,8 @@ typedef struct {
     int                 samples_per_channel;
     int                 samples_per_frame;
     int                 subbands;
-    int                 numvector_bits;
-    int                 numvector_size;                //1 << numvector_bits;
+    int                 log2_numvector_size;
+    int                 numvector_size;                //1 << log2_numvector_size;
     int                 js_subband_start;
     int                 total_subbands;
     int                 num_vectors;
@@ -185,8 +185,8 @@ static void init_pow2table(COOKContext *q){
     int i;
     q->pow2tab[63] = 1.0;
     for (i=1 ; i<64 ; i++){
-        q->pow2tab[63+i]=(float)pow(2.0,(double)i);
-        q->pow2tab[63-i]=1.0/(float)pow(2.0,(double)i);
+        q->pow2tab[63+i]=(float)((uint64_t)1<<i);
+        q->pow2tab[63-i]=1.0/(float)((uint64_t)1<<i);
     }
 }
 
@@ -195,8 +195,8 @@ static void init_rootpow2table(COOKContext *q){
     int i;
     q->rootpow2tab[63] = 1.0;
     for (i=1 ; i<64 ; i++){
-        q->rootpow2tab[63+i]=sqrt((float)powf(2.0,(float)i));
-        q->rootpow2tab[63-i]=sqrt(1.0/(float)powf(2.0,(float)i));
+        q->rootpow2tab[63+i]=sqrt((float)((uint64_t)1<<i));
+        q->rootpow2tab[63-i]=sqrt(1.0/(float)((uint64_t)1<<i));
     }
 }
 
@@ -698,7 +698,7 @@ static void mono_decode(COOKContext *q, float* mlt_buffer) {
     memset(&category_index, 0, 128*sizeof(int));
 
     decode_envelope(q, quant_index_table);
-    q->num_vectors = get_bits(&q->gb,q->numvector_bits);
+    q->num_vectors = get_bits(&q->gb,q->log2_numvector_size);
     dequant_envelope(q, quant_index_table, quant_value_table);
     categorize(q, quant_index_table, category, category_index);
     expand_category(q, category, category_index);
@@ -954,7 +954,6 @@ static void joint_decode(COOKContext *q, float* mlt_buffer1,
  * @param inbuffer          pointer to the inbuffer
  * @param sub_packet_size   subpacket size
  * @param outbuffer         pointer to the outbuffer
- * @param pos               the subpacket number in the frame
  */
 
 
@@ -1119,6 +1118,7 @@ static int cook_decode_frame(AVCodecContext *avctx,
 
     return avctx->block_align;
 }
+
 #ifdef COOKDEBUG
 static void dump_cook_context(COOKContext *q, COOKextradata *e)
 {
@@ -1140,11 +1140,12 @@ static void dump_cook_context(COOKContext *q, COOKextradata *e)
     PRINT("random_state",q->random_state);
     PRINT("mlt_size",q->mlt_size);
     PRINT("js_subband_start",q->js_subband_start);
-    PRINT("numvector_bits",q->numvector_bits);
+    PRINT("log2_numvector_size",q->log2_numvector_size);
     PRINT("numvector_size",q->numvector_size);
     PRINT("total_subbands",q->total_subbands);
 }
 #endif
+
 /**
  * Cook initialization
  *
@@ -1191,7 +1192,7 @@ static int cook_decode_init(AVCodecContext *avctx)
 
     /* Initialize default data states. */
     q->js_subband_start = 0;
-    q->numvector_bits = 5;
+    q->log2_numvector_size = 5;
     q->total_subbands = q->subbands;
 
     /* Initialize version-dependent variables */
@@ -1224,10 +1225,10 @@ static int cook_decode_init(AVCodecContext *avctx)
                 q->js_vlc_bits = e->js_vlc_bits;
             }
             if (q->samples_per_channel > 256) {
-                q->numvector_bits++;   // q->numvector_bits  = 6
+                q->log2_numvector_size  = 6;
             }
             if (q->samples_per_channel > 512) {
-                q->numvector_bits++;   // q->numvector_bits  = 7
+                q->log2_numvector_size  = 7;
             }
             break;
         case MC_COOK:
@@ -1242,7 +1243,7 @@ static int cook_decode_init(AVCodecContext *avctx)
 
     /* Initialize variable relations */
     q->mlt_size = q->samples_per_channel;
-    q->numvector_size = (1 << q->numvector_bits);
+    q->numvector_size = (1 << q->log2_numvector_size);
 
     /* Generate tables */
     init_rootpow2table(q);
@@ -1279,6 +1280,11 @@ static int cook_decode_init(AVCodecContext *avctx)
     }
     if (q->subbands > 50) {
         av_log(NULL,AV_LOG_ERROR,"subbands > 50, report sample!\n");
+        return -1;
+    }
+    if ((q->samples_per_channel == 256) || (q->samples_per_channel == 512) || (q->samples_per_channel == 1024)) {
+    } else {
+        av_log(NULL,AV_LOG_ERROR,"unknown amount of samples_per_channel = %d, report sample!\n",q->samples_per_channel);
         return -1;
     }
 

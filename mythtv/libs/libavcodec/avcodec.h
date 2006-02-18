@@ -21,8 +21,8 @@ extern "C" {
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(1<<8)+0)
-#define LIBAVCODEC_VERSION      51.1.0
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(7<<8)+0)
+#define LIBAVCODEC_VERSION      51.7.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -116,6 +116,9 @@ enum CodecID {
     CODEC_ID_TRUEMOTION2,
     CODEC_ID_BMP,
     CODEC_ID_CSCD,
+    CODEC_ID_MMVIDEO,
+    CODEC_ID_ZMBV,
+    CODEC_ID_AVS,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -152,6 +155,9 @@ enum CodecID {
     CODEC_ID_ADPCM_CT,
     CODEC_ID_ADPCM_SWF,
     CODEC_ID_ADPCM_YAMAHA,
+    CODEC_ID_ADPCM_SBPRO_4,
+    CODEC_ID_ADPCM_SBPRO_3,
+    CODEC_ID_ADPCM_SBPRO_2,
 
     /* AMR */
     CODEC_ID_AMR_NB= 0x12000,
@@ -192,6 +198,7 @@ enum CodecID {
     CODEC_ID_QDM2,
     CODEC_ID_COOK,
     CODEC_ID_TRUESPEECH,
+    CODEC_ID_TTA,
 
     CODEC_ID_OGGTHEORA= 0x16000,
 
@@ -272,7 +279,7 @@ enum SampleFormat {
 };
 
 /* in bytes */
-#define AVCODEC_MAX_AUDIO_FRAME_SIZE 131072
+#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
 
 /**
  * Required number of additionally allocated bytes at the end of the input bitstream for decoding.
@@ -897,6 +904,8 @@ typedef struct AVCodecContext {
 
     /** obsolete FIXME remove */
     int rc_strategy;
+#define FF_RC_STRATEGY_XVID 1
+
     int b_frame_strategy;
 
     /**
@@ -1996,6 +2005,13 @@ typedef struct AVCodecContext {
     int cutoff;
 
     /**
+     * multiplied by qscale for each frame and added to scene_change_score
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int scenechange_factor;
+
+    /**
      * XVMC_VLD (VIA CLE266) Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
@@ -2167,6 +2183,7 @@ extern AVCodec mp3on4_decoder;
 extern AVCodec qdm2_decoder;
 extern AVCodec cook_decoder;
 extern AVCodec truespeech_decoder;
+extern AVCodec tta_decoder;
 extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
@@ -2237,6 +2254,9 @@ extern AVCodec fraps_decoder;
 extern AVCodec libgsm_encoder;
 extern AVCodec libgsm_decoder;
 extern AVCodec bmp_decoder;
+extern AVCodec mmvideo_decoder;
+extern AVCodec zmbv_decoder;
+extern AVCodec avs_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -2278,6 +2298,9 @@ PCM_CODEC(CODEC_ID_ADPCM_G726, adpcm_g726);
 PCM_CODEC(CODEC_ID_ADPCM_CT, adpcm_ct);
 PCM_CODEC(CODEC_ID_ADPCM_SWF, adpcm_swf);
 PCM_CODEC(CODEC_ID_ADPCM_YAMAHA, adpcm_yamaha);
+PCM_CODEC(CODEC_ID_ADPCM_SBPRO_4, adpcm_sbpro_4);
+PCM_CODEC(CODEC_ID_ADPCM_SBPRO_3, adpcm_sbpro_3);
+PCM_CODEC(CODEC_ID_ADPCM_SBPRO_2, adpcm_sbpro_2);
 
 #undef PCM_CODEC
 
@@ -2419,8 +2442,6 @@ void avcodec_thread_free(AVCodecContext *s);
 int avcodec_thread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
 int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
 //FIXME func typedef
-void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size);
-void avcodec_default_decode_cc_atsc(AVCodecContext *c, const uint8_t *buf, int buf_size);
 
 /**
  * opens / inits the AVCodecContext.
@@ -2531,6 +2552,7 @@ extern AVCodecParser mpegaudio_parser;
 extern AVCodecParser ac3_parser;
 extern AVCodecParser dvdsub_parser;
 extern AVCodecParser dvbsub_parser;
+extern AVCodecParser aac_parser;
 
 /* memory */
 void *av_malloc(unsigned int size);
@@ -2589,6 +2611,8 @@ extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
 
 extern unsigned int av_xiphlacing(unsigned char *s, unsigned int v);
 
+void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size);
+void avcodec_default_decode_cc_atsc(AVCodecContext *c, const uint8_t *buf, int buf_size);
 const char *codec_id_string(enum CodecID codec_id);
 const char *codec_type_string(enum CodecType codec_type);
 

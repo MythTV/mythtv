@@ -11,6 +11,8 @@
 
 class RingBuffer;
 
+const int kDecoderProbeBufferSize = 65536;
+
 class DecoderBase
 {
   public:
@@ -20,7 +22,7 @@ class DecoderBase
     virtual void Reset(void);
 
     virtual int OpenFile(RingBuffer *rbuffer, bool novideo,
-                         char testbuf[2048]) = 0;
+                         char testbuf[kDecoderProbeBufferSize]) = 0;
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     void setLiveTVMode(bool live) { livetv = live; }

@@ -106,6 +106,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_MPEG4, MKTAG('m', 'p', '4', 'v') },
     { CODEC_ID_MPEG4, MKTAG('U', 'M', 'P', '4') },
     { CODEC_ID_MPEG4, MKTAG('W', 'V', '1', 'F') },
+    { CODEC_ID_MPEG4, MKTAG('S', 'E', 'D', 'G') },
 
     { CODEC_ID_MSMPEG4V3, MKTAG('D', 'I', 'V', '3'), .invalid_asf = 1 }, /* default signature when using MSMPEG4 */
     { CODEC_ID_MSMPEG4V3, MKTAG('M', 'P', '4', '3') },
@@ -194,6 +195,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_THEORA, MKTAG('t', 'h', 'e', 'o') },
     { CODEC_ID_TRUEMOTION2, MKTAG('T', 'M', '2', '0') },
     { CODEC_ID_CSCD, MKTAG('C', 'S', 'C', 'D') },
+    { CODEC_ID_ZMBV, MKTAG('Z', 'M', 'B', 'V') },
     { CODEC_ID_RAWVIDEO, 0 },
     { 0, 0 },
 };
@@ -613,8 +615,8 @@ static int avi_write_idx1(AVFormatContext *s)
                 url_fseek(pb, avi->frames_hdr_strm[n], SEEK_SET);
                 ff_parse_specific_params(stream, &au_byterate, &au_ssize, &au_scale);
                 if (au_ssize == 0) {
-                    put_le32(pb, stream->frame_number);
-                    nb_frames += stream->frame_number;
+                    put_le32(pb, avi->packet_count[n]);
+                    nb_frames += avi->packet_count[n];
                 } else {
                     put_le32(pb, avi->audio_strm_length[n] / au_ssize);
                 }
@@ -730,11 +732,11 @@ static int avi_write_trailer(AVFormatContext *s)
         for (n=nb_frames=0;n<s->nb_streams;n++) {
              AVCodecContext *stream = s->streams[n]->codec;
              if (stream->codec_type == CODEC_TYPE_VIDEO) {
-                 if (nb_frames < stream->frame_number)
-                     nb_frames = stream->frame_number;
+                 if (nb_frames < avi->packet_count[n])
+                     nb_frames = avi->packet_count[n];
              } else {
                  if (stream->codec_id == CODEC_ID_MP2 || stream->codec_id == CODEC_ID_MP3) {
-                     nb_frames += stream->frame_number;
+                     nb_frames += avi->packet_count[n];
                 }
             }
         }

@@ -256,6 +256,23 @@ static int dts_read_header(AVFormatContext *s,
     return 0;
 }
 
+/* aac read */
+static int aac_read_header(AVFormatContext *s,
+                           AVFormatParameters *ap)
+{
+    AVStream *st;
+
+    st = av_new_stream(s, 0);
+    if (!st)
+        return AVERROR_NOMEM;
+
+    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_id = CODEC_ID_AAC;
+    st->need_parsing = 1;
+    /* the parameters will be extracted from the compressed bitstream */
+    return 0;
+}
+
 /* mpeg1/h263 input */
 static int video_read_header(AVFormatContext *s,
                              AVFormatParameters *ap)
@@ -286,31 +303,28 @@ static int video_read_header(AVFormatContext *s,
 #define SEQ_START_CODE          0x000001b3
 #define GOP_START_CODE          0x000001b8
 #define PICTURE_START_CODE      0x00000100
+#define SLICE_START_CODE        0x00000101
+#define PACK_START_CODE         0x000001ba
 
-/* XXX: improve that by looking at several start codes */
 static int mpegvideo_probe(AVProbeData *p)
 {
-    int code;
-    const uint8_t *d;
+    uint32_t code= -1;
+    int pic=0, seq=0, slice=0, pspack=0;
+    int i;
 
-    /* we search the first start code. If it is a sequence, gop or
-       picture start code then we decide it is an mpeg video
-       stream. We do not send highest value to give a chance to mpegts */
-    /* NOTE: the search range was restricted to avoid too many false
-       detections */
-
-    if (p->buf_size < 6)
-        return 0;
-    d = p->buf;
-    code = (d[0] << 24) | (d[1] << 16) | (d[2] << 8) | (d[3]);
-    if ((code & 0xffffff00) == 0x100) {
-        if (code == SEQ_START_CODE ||
-            code == GOP_START_CODE ||
-            code == PICTURE_START_CODE)
-            return 50 - 1;
-        else
-            return 0;
+    for(i=0; i<p->buf_size; i++){
+        code = (code<<8) + p->buf[i];
+        if ((code & 0xffffff00) == 0x100) {
+            switch(code){
+            case     SEQ_START_CODE:   seq++; break;
+            case PICTURE_START_CODE:   pic++; break;
+            case   SLICE_START_CODE: slice++; break;
+            case    PACK_START_CODE: pspack++; break;
+            }
+        }
     }
+    if(seq && seq*9<=pic*10 && pic*9<=slice*10 && !pspack)
+        return AVPROBE_SCORE_MAX/2+1; // +1 for .mpg
     return 0;
 }
 
@@ -390,6 +404,17 @@ AVInputFormat dts_iformat = {
     raw_read_partial_packet,
     raw_read_close,
     .extensions = "dts",
+};
+
+AVInputFormat aac_iformat = {
+    "aac",
+    "ADTS AAC",
+    0,
+    NULL,
+    aac_read_header,
+    raw_read_partial_packet,
+    raw_read_close,
+    .extensions = "aac",
 };
 
 AVInputFormat h261_iformat = {
@@ -741,6 +766,8 @@ int raw_init(void)
 
     av_register_input_format(&ac3_iformat);
     av_register_output_format(&ac3_oformat);
+
+    av_register_input_format(&aac_iformat);
 
     av_register_input_format(&dts_iformat);
 

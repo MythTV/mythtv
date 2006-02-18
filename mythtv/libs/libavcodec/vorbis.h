@@ -12,21 +12,48 @@ typedef struct {
     unsigned int nb_bits;
 } vorbis_codebook;
 
+typedef union vorbis_floor_u vorbis_floor_data;
+typedef struct vorbis_floor0_s vorbis_floor0;
+typedef struct vorbis_floor1_s vorbis_floor1;
+struct vorbis_context_s;
+typedef
+uint_fast8_t (* vorbis_floor_decode_func)
+             (struct vorbis_context_s *, vorbis_floor_data *, float *);
 typedef struct {
     uint_fast8_t floor_type;
-    uint_fast8_t partitions;
-    uint_fast8_t maximum_class;
-    uint_fast8_t partition_class[32];
-    uint_fast8_t class_dimensions[16];
-    uint_fast8_t class_subclasses[16];
-    uint_fast8_t class_masterbook[16];
-    int_fast16_t subclass_books[16][8];
-    uint_fast8_t multiplier;
-    uint_fast16_t x_list_dim;
-    uint_fast16_t *x_list;
-    uint_fast16_t *x_list_order;
-    uint_fast16_t *low_neighbour;
-    uint_fast16_t *high_neighbour;
+    vorbis_floor_decode_func decode;
+    union vorbis_floor_u
+    {
+        struct vorbis_floor0_s
+        {
+            uint_fast8_t order;
+            uint_fast16_t rate;
+            uint_fast16_t bark_map_size;
+            int_fast32_t * map[2];
+            uint_fast32_t map_size[2];
+            uint_fast8_t amplitude_bits;
+            uint_fast8_t amplitude_offset;
+            uint_fast8_t num_books;
+            uint_fast8_t * book_list;
+            float * lsp;
+        } t0;
+        struct vorbis_floor1_s
+        {
+            uint_fast8_t partitions;
+            uint_fast8_t maximum_class;
+            uint_fast8_t partition_class[32];
+            uint_fast8_t class_dimensions[16];
+            uint_fast8_t class_subclasses[16];
+            uint_fast8_t class_masterbook[16];
+            int_fast16_t subclass_books[16][8];
+            uint_fast8_t multiplier;
+            uint_fast16_t x_list_dim;
+            uint_fast16_t *x_list;
+            uint_fast16_t *x_list_order;
+            uint_fast16_t *low_neighbour;
+            uint_fast16_t *high_neighbour;
+        } t1;
+    } data;
 } vorbis_floor;
 
 typedef struct {
@@ -57,7 +84,7 @@ typedef struct {
     uint_fast8_t mapping;
 } vorbis_mode;
 
-typedef struct {
+typedef struct vorbis_context_s {
     AVCodecContext *avccontext;
     GetBitContext gb;
 
@@ -84,6 +111,7 @@ typedef struct {
     vorbis_mapping *mappings;
     uint_fast8_t mode_count;
     vorbis_mode *modes;
+    uint_fast8_t mode_number; // mode number for the current packet
     float *channel_residues;
     float *channel_floors;
     float *saved;

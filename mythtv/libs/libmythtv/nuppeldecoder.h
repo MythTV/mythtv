@@ -41,9 +41,10 @@ class NuppelDecoder : public DecoderBase
     NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
    ~NuppelDecoder();
 
-    static bool CanHandle(char testbuf[2048]);
+    static bool CanHandle(char testbuf[kDecoderProbeBufferSize]);
 
-    int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
+    int OpenFile(RingBuffer *rbuffer, bool novideo, 
+                 char testbuf[kDecoderProbeBufferSize]);
     bool GetFrame(int onlyvideo);
 
     // lastFrame is really (framesPlayed - 1) since we increment after getting

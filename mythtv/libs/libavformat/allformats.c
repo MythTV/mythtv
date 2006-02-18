@@ -54,7 +54,9 @@ void av_register_all(void)
     ff_mmf_init();
     swf_init();
     au_init();
+    ff_aiff_init();
 #ifdef CONFIG_MUXERS
+    ff_adts_init();
     gif_init();
 #endif //CONFIG_MUXERS
     mov_init();
@@ -77,6 +79,7 @@ void av_register_all(void)
     idcin_init();
     flic_init();
     vmd_init();
+    mm_init();
 
 #if defined(AMR_NB) || defined(AMR_NB_FIXED) || defined(AMR_WB)
     amr_init();
@@ -89,6 +92,9 @@ void av_register_all(void)
 #endif
 
     ffm_init();
+#if defined(CONFIG_VIDEO4LINUX2)
+//    v4l2_init();
+#endif
 #if defined(CONFIG_VIDEO4LINUX) || defined(CONFIG_BKTR)
 //    video_grab_init();
 #endif
@@ -110,6 +116,9 @@ void av_register_all(void)
     ea_init();
     nsvdec_init();
     daud_init();
+    voc_init();
+    tta_init();
+    avs_init();
 
 #ifdef CONFIG_MUXERS
     /* image formats */
@@ -130,6 +139,7 @@ void av_register_all(void)
 //    av_register_image_format(&sgi_image_format); heap corruption, dont enable
 #endif //CONFIG_MUXERS
 
+#ifdef CONFIG_PROTOCOLS
     /* file protocols */
     register_protocol(&file_protocol);
     register_protocol(&pipe_protocol);
@@ -140,5 +150,6 @@ void av_register_all(void)
     register_protocol(&rtp_protocol);
     register_protocol(&tcp_protocol);
     register_protocol(&http_protocol);
+#endif
 #endif
 }

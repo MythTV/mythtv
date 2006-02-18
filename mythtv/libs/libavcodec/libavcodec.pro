@@ -52,6 +52,10 @@ contains( DO_ASV1, yes ) {
     SOURCES += asv1.c
 }
 
+contains( CONFIG_AVS_DECODER, yes ) {
+    SOURCES += avs.c
+}
+
 contains( CONFIG_CINEPAK_DECODER, yes ) {
     SOURCES += cinepak.c
 }
@@ -229,6 +233,10 @@ contains( CONFIG_TRUESPEECH_DECODER, yes ) {
     SOURCES += truespeech.c
 }
 
+contains( CONFIG_TTA_DECODER, yes ) {
+    SOURCES += tta.c
+}
+
 contains( CONFIG_TSCC_DECODER, yes ) {
     SOURCES += tscc.c
 }
@@ -295,6 +303,14 @@ contains( CONFIG_BMP_DECODER, yes ) {
     SOURCES += bmp.c
 }
 
+contains( CONFIG_MMVIDEO_DECODER, yes ) {
+    SOURCES += mmvideo.c
+}
+
+contains( CONFIG_ZMBV_DECODER, yes ) {
+    SOURCES += zmbv.c
+}
+
 contains( HAVE_PTHREADS, yes ) {
     SOURCES += pthread.c
 }
@@ -352,7 +368,7 @@ contains( CONFIG_FAAC, yes ) {
 }
 
 contains( CONFIG_XVID, yes ) {
-    SOURCES += xvidff.c
+    SOURCES += xvidff.c xvid_rc.c
     LIBS += -lxvidcore
 }
 

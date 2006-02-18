@@ -90,10 +90,12 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
-    static bool CanHandle(char testbuf[2048], const QString &filename);
+    static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
+                          const QString &filename);
 
     /// Open our file and set up or audio and video parameters.
-    int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
+    int OpenFile(RingBuffer *rbuffer, bool novideo, 
+                 char testbuf[kDecoderProbeBufferSize]);
 
     /// Decode a frame of video/audio. If onlyvideo is set, 
     /// just decode the video portion.

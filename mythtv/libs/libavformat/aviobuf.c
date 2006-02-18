@@ -53,8 +53,6 @@ int init_put_byte(ByteIOContext *s,
     return 0;
 }
 
-
-#ifdef CONFIG_MUXERS
 static void flush_buffer(ByteIOContext *s)
 {
     if (s->buf_ptr > s->buffer) {
@@ -104,7 +102,6 @@ void put_flush_packet(ByteIOContext *s)
     flush_buffer(s);
     s->must_flush = 0;
 }
-#endif //CONFIG_MUXERS
 
 offset_t url_fseek(ByteIOContext *s, offset_t offset, int whence)
 {
@@ -193,7 +190,7 @@ int url_ferror(ByteIOContext *s)
     return s->error;
 }
 
-#ifdef CONFIG_MUXERS
+#if defined(CONFIG_MUXERS) || defined(CONFIG_PROTOCOLS)
 void put_le32(ByteIOContext *s, unsigned int val)
 {
     put_byte(s, val);
@@ -242,6 +239,12 @@ void put_be16(ByteIOContext *s, unsigned int val)
     put_byte(s, val);
 }
 
+void put_le24(ByteIOContext *s, unsigned int val)
+{
+    put_le16(s, val & 0xffff);
+    put_byte(s, val >> 16);
+}
+
 void put_be24(ByteIOContext *s, unsigned int val)
 {
     put_be16(s, val >> 8);
@@ -254,7 +257,7 @@ void put_tag(ByteIOContext *s, const char *tag)
         put_byte(s, *tag++);
     }
 }
-#endif //CONFIG_MUXERS
+#endif //CONFIG_MUXERS || CONFIG_PROTOCOLS
 
 /* Input stream */
 
@@ -396,6 +399,14 @@ unsigned int get_le16(ByteIOContext *s)
     unsigned int val;
     val = get_byte(s);
     val |= get_byte(s) << 8;
+    return val;
+}
+
+unsigned int get_le24(ByteIOContext *s)
+{
+    unsigned int val;
+    val = get_le16(s);
+    val |= get_byte(s) << 16;
     return val;
 }
 

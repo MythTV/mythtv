@@ -57,6 +57,13 @@
 #define LSP_POW_BITS 7
 
 #define VLCBITS 9
+#define VLCMAX ((22+VLCBITS-1)/VLCBITS)
+
+#define EXPVLCBITS 8
+#define EXPMAX ((19+EXPVLCBITS-1)/EXPVLCBITS)
+
+#define HGAINVLCBITS 9
+#define HGAINMAX ((13+HGAINVLCBITS-1)/HGAINVLCBITS)
 
 typedef struct WMADecodeContext {
     GetBitContext gb;
@@ -102,15 +109,15 @@ typedef struct WMADecodeContext {
     int block_pos; /* current position in frame */
     uint8_t ms_stereo; /* true if mid/side stereo mode */
     uint8_t channel_coded[MAX_CHANNELS]; /* true if channel is coded */
-    float exponents[MAX_CHANNELS][BLOCK_MAX_SIZE] __attribute__((aligned(16)));
+    DECLARE_ALIGNED_16(float, exponents[MAX_CHANNELS][BLOCK_MAX_SIZE]);
     float max_exponent[MAX_CHANNELS];
     int16_t coefs1[MAX_CHANNELS][BLOCK_MAX_SIZE];
-    float coefs[MAX_CHANNELS][BLOCK_MAX_SIZE] __attribute__((aligned(16)));
+    DECLARE_ALIGNED_16(float, coefs[MAX_CHANNELS][BLOCK_MAX_SIZE]);
     MDCTContext mdct_ctx[BLOCK_NB_SIZES];
     float *windows[BLOCK_NB_SIZES];
-    FFTSample mdct_tmp[BLOCK_MAX_SIZE] __attribute__((aligned(16))); /* temporary storage for imdct */
+    DECLARE_ALIGNED_16(FFTSample, mdct_tmp[BLOCK_MAX_SIZE]); /* temporary storage for imdct */
     /* output buffer for one frame and the last for IMDCT windowing */
-    float frame_out[MAX_CHANNELS][BLOCK_MAX_SIZE * 2] __attribute__((aligned(16)));
+    DECLARE_ALIGNED_16(float, frame_out[MAX_CHANNELS][BLOCK_MAX_SIZE * 2]);
     /* last frame info */
     uint8_t last_superframe[MAX_CODED_SUPERFRAME_SIZE + 4]; /* padding added */
     int last_bitoffset;
@@ -185,7 +192,7 @@ static void init_coef_vlc(VLC *vlc,
     const uint16_t *p;
     int i, l, j, level;
 
-    init_vlc(vlc, 9, n, table_bits, 1, 1, table_codes, 4, 4, 0);
+    init_vlc(vlc, VLCBITS, n, table_bits, 1, 1, table_codes, 4, 4, 0);
 
     run_table = av_malloc(n * sizeof(uint16_t));
     level_table = av_malloc(n * sizeof(uint16_t));
@@ -494,13 +501,13 @@ static int wma_decode_init(AVCodecContext * avctx)
             }
         }
 #endif
-        init_vlc(&s->hgain_vlc, 9, sizeof(hgain_huffbits),
+        init_vlc(&s->hgain_vlc, HGAINVLCBITS, sizeof(hgain_huffbits),
                  hgain_huffbits, 1, 1,
                  hgain_huffcodes, 2, 2, 0);
     }
 
     if (s->use_exp_vlc) {
-        init_vlc(&s->exp_vlc, 9, sizeof(scale_huffbits),
+        init_vlc(&s->exp_vlc, EXPVLCBITS, sizeof(scale_huffbits),
                  scale_huffbits, 1, 1,
                  scale_huffcodes, 4, 4, 0);
     } else {
@@ -681,7 +688,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
     }
     last_exp = 36;
     while (q < q_end) {
-        code = get_vlc2(&s->gb, s->exp_vlc.table, VLCBITS, 2);
+        code = get_vlc2(&s->gb, s->exp_vlc.table, EXPVLCBITS, EXPMAX);
         if (code < 0)
             return -1;
         /* NOTE: this offset is the same as MPEG4 AAC ! */
@@ -822,7 +829,7 @@ static int wma_decode_block(WMADecodeContext *s)
                         if (val == (int)0x80000000) {
                             val = get_bits(&s->gb, 7) - 19;
                         } else {
-                            code = get_vlc2(&s->gb, s->hgain_vlc.table, VLCBITS, 2);
+                            code = get_vlc2(&s->gb, s->hgain_vlc.table, HGAINVLCBITS, HGAINMAX);
                             if (code < 0)
                                 return -1;
                             val += code - 18;
@@ -879,7 +886,7 @@ static int wma_decode_block(WMADecodeContext *s)
             eptr = ptr + nb_coefs[ch];
             memset(ptr, 0, s->block_len * sizeof(int16_t));
             for(;;) {
-                code = get_vlc2(&s->gb, coef_vlc->table, VLCBITS, 3);
+                code = get_vlc2(&s->gb, coef_vlc->table, VLCBITS, VLCMAX);
                 if (code < 0)
                     return -1;
                 if (code == 1) {
@@ -1097,7 +1104,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
     for(ch = 0; ch < s->nb_channels; ch++) {
         if (s->channel_coded[ch]) {
-            FFTSample output[BLOCK_MAX_SIZE * 2] __attribute__((aligned(16)));
+            DECLARE_ALIGNED_16(FFTSample, output[BLOCK_MAX_SIZE * 2]);
             float *ptr;
             int i, n4, index, n;
 

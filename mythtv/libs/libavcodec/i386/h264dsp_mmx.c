@@ -104,6 +104,87 @@ void ff_h264_idct_add_mmx2(uint8_t *dst, int16_t *block, int stride)
     );
 }
 
+void ff_h264_idct_dc_add_mmx2(uint8_t *dst, int16_t *block, int stride)
+{
+    int dc = (block[0] + 32) >> 6;
+    asm volatile(
+        "movd          %0, %%mm0 \n\t"
+        "pxor       %%mm7, %%mm7 \n\t"
+        "pshufw $0, %%mm0, %%mm0 \n\t"
+        "pxor       %%mm1, %%mm1 \n\t"
+        "psubw      %%mm0, %%mm1 \n\t"
+        "pmaxsw     %%mm7, %%mm0 \n\t"
+        "pmaxsw     %%mm7, %%mm1 \n\t"
+        "packuswb   %%mm0, %%mm0 \n\t"
+        "packuswb   %%mm1, %%mm1 \n\t"
+        ::"r"(dc)
+    );
+    asm volatile(
+        "movd          %0, %%mm2 \n\t"
+        "movd          %1, %%mm3 \n\t"
+        "movd          %2, %%mm4 \n\t"
+        "movd          %3, %%mm5 \n\t"
+        "paddusb    %%mm0, %%mm2 \n\t"
+        "paddusb    %%mm0, %%mm3 \n\t"
+        "paddusb    %%mm0, %%mm4 \n\t"
+        "paddusb    %%mm0, %%mm5 \n\t"
+        "psubusb    %%mm1, %%mm2 \n\t"
+        "psubusb    %%mm1, %%mm3 \n\t"
+        "psubusb    %%mm1, %%mm4 \n\t"
+        "psubusb    %%mm1, %%mm5 \n\t"
+        "movd       %%mm2, %0    \n\t"
+        "movd       %%mm3, %1    \n\t"
+        "movd       %%mm4, %2    \n\t"
+        "movd       %%mm5, %3    \n\t"
+        :"+m"(*(uint32_t*)(dst+0*stride)),
+         "+m"(*(uint32_t*)(dst+1*stride)),
+         "+m"(*(uint32_t*)(dst+2*stride)),
+         "+m"(*(uint32_t*)(dst+3*stride))
+    );
+}
+
+void ff_h264_idct8_dc_add_mmx2(uint8_t *dst, int16_t *block, int stride)
+{
+    int dc = (block[0] + 32) >> 6;
+    int y;
+    asm volatile(
+        "movd          %0, %%mm0 \n\t"
+        "pxor       %%mm7, %%mm7 \n\t"
+        "pshufw $0, %%mm0, %%mm0 \n\t"
+        "pxor       %%mm1, %%mm1 \n\t"
+        "psubw      %%mm0, %%mm1 \n\t"
+        "pmaxsw     %%mm7, %%mm0 \n\t"
+        "pmaxsw     %%mm7, %%mm1 \n\t"
+        "packuswb   %%mm0, %%mm0 \n\t"
+        "packuswb   %%mm1, %%mm1 \n\t"
+        ::"r"(dc)
+    );
+    for(y=2; y--; dst += 4*stride){
+    asm volatile(
+        "movq          %0, %%mm2 \n\t"
+        "movq          %1, %%mm3 \n\t"
+        "movq          %2, %%mm4 \n\t"
+        "movq          %3, %%mm5 \n\t"
+        "paddusb    %%mm0, %%mm2 \n\t"
+        "paddusb    %%mm0, %%mm3 \n\t"
+        "paddusb    %%mm0, %%mm4 \n\t"
+        "paddusb    %%mm0, %%mm5 \n\t"
+        "psubusb    %%mm1, %%mm2 \n\t"
+        "psubusb    %%mm1, %%mm3 \n\t"
+        "psubusb    %%mm1, %%mm4 \n\t"
+        "psubusb    %%mm1, %%mm5 \n\t"
+        "movq       %%mm2, %0    \n\t"
+        "movq       %%mm3, %1    \n\t"
+        "movq       %%mm4, %2    \n\t"
+        "movq       %%mm5, %3    \n\t"
+        :"+m"(*(uint64_t*)(dst+0*stride)),
+         "+m"(*(uint64_t*)(dst+1*stride)),
+         "+m"(*(uint64_t*)(dst+2*stride)),
+         "+m"(*(uint64_t*)(dst+3*stride))
+    );
+    }
+}
+
 
 /***********************************/
 /* deblocking */
@@ -591,11 +672,11 @@ static void OPNAME ## h264_qpel8_h_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, i
     );\
 }\
 \
-static void OPNAME ## h264_qpel8_v_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
-    int h= 2;\
+static inline void OPNAME ## h264_qpel8or16_v_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h){\
+    int w= 2;\
     src -= 2*srcStride;\
     \
-    while(h--){\
+    while(w--){\
       asm volatile(\
         "pxor %%mm7, %%mm7          \n\t"\
         "movd (%0), %%mm0           \n\t"\
@@ -626,13 +707,29 @@ static void OPNAME ## h264_qpel8_v_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, i
         : "S"((long)srcStride), "D"((long)dstStride), "m"(ff_pw_5), "m"(ff_pw_16)\
         : "memory"\
      );\
-     src += 4-13*srcStride;\
-     dst +=  4-8*dstStride;\
+     if(h==16){\
+        asm volatile(\
+            QPEL_H264V(%%mm2, %%mm3, %%mm4, %%mm5, %%mm0, %%mm1, OP)\
+            QPEL_H264V(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, OP)\
+            QPEL_H264V(%%mm4, %%mm5, %%mm0, %%mm1, %%mm2, %%mm3, OP)\
+            QPEL_H264V(%%mm5, %%mm0, %%mm1, %%mm2, %%mm3, %%mm4, OP)\
+            QPEL_H264V(%%mm0, %%mm1, %%mm2, %%mm3, %%mm4, %%mm5, OP)\
+            QPEL_H264V(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, OP)\
+            QPEL_H264V(%%mm2, %%mm3, %%mm4, %%mm5, %%mm0, %%mm1, OP)\
+            QPEL_H264V(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, OP)\
+            \
+           : "+a"(src), "+c"(dst)\
+           : "S"((long)srcStride), "D"((long)dstStride), "m"(ff_pw_5), "m"(ff_pw_16)\
+           : "memory"\
+        );\
+     }\
+     src += 4-(h+5)*srcStride;\
+     dst += 4-h*dstStride;\
    }\
 }\
-static void OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride){\
-    int h=8;\
-    int w=4;\
+static inline void OPNAME ## h264_qpel8or16_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride, int size){\
+    int h = size;\
+    int w = (size+8)>>2;\
     src -= 2*srcStride+2;\
     while(w--){\
         asm volatile(\
@@ -652,23 +749,40 @@ static void OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, 
             "punpcklbw %%mm7, %%mm2 \n\t"\
             "punpcklbw %%mm7, %%mm3 \n\t"\
             "punpcklbw %%mm7, %%mm4 \n\t"\
-            QPEL_H264HV(%%mm0, %%mm1, %%mm2, %%mm3, %%mm4, %%mm5, 0*8*4)\
-            QPEL_H264HV(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, 1*8*4)\
-            QPEL_H264HV(%%mm2, %%mm3, %%mm4, %%mm5, %%mm0, %%mm1, 2*8*4)\
-            QPEL_H264HV(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, 3*8*4)\
-            QPEL_H264HV(%%mm4, %%mm5, %%mm0, %%mm1, %%mm2, %%mm3, 4*8*4)\
-            QPEL_H264HV(%%mm5, %%mm0, %%mm1, %%mm2, %%mm3, %%mm4, 5*8*4)\
-            QPEL_H264HV(%%mm0, %%mm1, %%mm2, %%mm3, %%mm4, %%mm5, 6*8*4)\
-            QPEL_H264HV(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, 7*8*4)\
-             \
+            QPEL_H264HV(%%mm0, %%mm1, %%mm2, %%mm3, %%mm4, %%mm5, 0*48)\
+            QPEL_H264HV(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, 1*48)\
+            QPEL_H264HV(%%mm2, %%mm3, %%mm4, %%mm5, %%mm0, %%mm1, 2*48)\
+            QPEL_H264HV(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, 3*48)\
+            QPEL_H264HV(%%mm4, %%mm5, %%mm0, %%mm1, %%mm2, %%mm3, 4*48)\
+            QPEL_H264HV(%%mm5, %%mm0, %%mm1, %%mm2, %%mm3, %%mm4, 5*48)\
+            QPEL_H264HV(%%mm0, %%mm1, %%mm2, %%mm3, %%mm4, %%mm5, 6*48)\
+            QPEL_H264HV(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, 7*48)\
             : "+a"(src)\
             : "c"(tmp), "S"((long)srcStride), "m"(ff_pw_5)\
             : "memory"\
         );\
+        if(size==16){\
+            asm volatile(\
+                QPEL_H264HV(%%mm2, %%mm3, %%mm4, %%mm5, %%mm0, %%mm1,  8*48)\
+                QPEL_H264HV(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2,  9*48)\
+                QPEL_H264HV(%%mm4, %%mm5, %%mm0, %%mm1, %%mm2, %%mm3, 10*48)\
+                QPEL_H264HV(%%mm5, %%mm0, %%mm1, %%mm2, %%mm3, %%mm4, 11*48)\
+                QPEL_H264HV(%%mm0, %%mm1, %%mm2, %%mm3, %%mm4, %%mm5, 12*48)\
+                QPEL_H264HV(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, 13*48)\
+                QPEL_H264HV(%%mm2, %%mm3, %%mm4, %%mm5, %%mm0, %%mm1, 14*48)\
+                QPEL_H264HV(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, 15*48)\
+                : "+a"(src)\
+                : "c"(tmp), "S"((long)srcStride), "m"(ff_pw_5)\
+                : "memory"\
+            );\
+        }\
         tmp += 4;\
-        src += 4 - 13*srcStride;\
+        src += 4 - (size+5)*srcStride;\
     }\
-    tmp -= 4*4;\
+    tmp -= size+8;\
+    w = size>>4;\
+    do{\
+    h = size;\
     asm volatile(\
         "movq %4, %%mm6             \n\t"\
         "1:                         \n\t"\
@@ -702,7 +816,7 @@ static void OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, 
         "psraw $6, %%mm3            \n\t"\
         "packuswb %%mm3, %%mm0      \n\t"\
         OP(%%mm0, (%1),%%mm7, q)\
-        "add $32, %0                \n\t"\
+        "add $48, %0                \n\t"\
         "add %3, %1                 \n\t"\
         "decl %2                    \n\t"\
         " jnz 1b                    \n\t"\
@@ -710,14 +824,17 @@ static void OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, 
         : "S"((long)dstStride), "m"(ff_pw_32)\
         : "memory"\
     );\
+    tmp += 8 - size*24;\
+    dst += 8 - size*dstStride;\
+    }while(w--);\
+}\
+\
+static void OPNAME ## h264_qpel8_v_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
+    OPNAME ## h264_qpel8or16_v_lowpass_ ## MMX(dst  , src  , dstStride, srcStride, 8);\
 }\
 static void OPNAME ## h264_qpel16_v_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
-    OPNAME ## h264_qpel8_v_lowpass_ ## MMX(dst  , src  , dstStride, srcStride);\
-    OPNAME ## h264_qpel8_v_lowpass_ ## MMX(dst+8, src+8, dstStride, srcStride);\
-    src += 8*srcStride;\
-    dst += 8*dstStride;\
-    OPNAME ## h264_qpel8_v_lowpass_ ## MMX(dst  , src  , dstStride, srcStride);\
-    OPNAME ## h264_qpel8_v_lowpass_ ## MMX(dst+8, src+8, dstStride, srcStride);\
+    OPNAME ## h264_qpel8or16_v_lowpass_ ## MMX(dst  , src  , dstStride, srcStride, 16);\
+    OPNAME ## h264_qpel8or16_v_lowpass_ ## MMX(dst+8, src+8, dstStride, srcStride, 16);\
 }\
 \
 static void OPNAME ## h264_qpel16_h_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
@@ -729,14 +846,86 @@ static void OPNAME ## h264_qpel16_h_lowpass_ ## MMX(uint8_t *dst, uint8_t *src, 
     OPNAME ## h264_qpel8_h_lowpass_ ## MMX(dst+8, src+8, dstStride, srcStride);\
 }\
 \
-static void OPNAME ## h264_qpel16_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride){\
-    OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(dst  , tmp  , src  , dstStride, tmpStride, srcStride);\
-    OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(dst+8, tmp  , src+8, dstStride, tmpStride, srcStride);\
-    src += 8*srcStride;\
-    dst += 8*dstStride;\
-    OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(dst  , tmp  , src  , dstStride, tmpStride, srcStride);\
-    OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(dst+8, tmp  , src+8, dstStride, tmpStride, srcStride);\
+static void OPNAME ## h264_qpel8_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride){\
+    OPNAME ## h264_qpel8or16_hv_lowpass_ ## MMX(dst  , tmp  , src  , dstStride, tmpStride, srcStride, 8);\
 }\
+\
+static void OPNAME ## h264_qpel16_hv_lowpass_ ## MMX(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride){\
+    OPNAME ## h264_qpel8or16_hv_lowpass_ ## MMX(dst  , tmp  , src  , dstStride, tmpStride, srcStride, 16);\
+}\
+\
+static void OPNAME ## pixels4_l2_shift5_ ## MMX(uint8_t *dst, int16_t *src16, uint8_t *src8, int dstStride, int src8Stride, int h)\
+{\
+    asm volatile(\
+        "pxor     %%mm7, %%mm7          \n\t"\
+        "movq       %5,  %%mm6          \n\t"\
+        "movq      (%1), %%mm0          \n\t"\
+        "movq    24(%1), %%mm1          \n\t"\
+        "paddw    %%mm6, %%mm0          \n\t"\
+        "paddw    %%mm6, %%mm1          \n\t"\
+        "psraw      $5,  %%mm0          \n\t"\
+        "psraw      $5,  %%mm1          \n\t"\
+        "pmaxsw   %%mm7, %%mm0          \n\t"\
+        "pmaxsw   %%mm7, %%mm1          \n\t"\
+        "packuswb %%mm7, %%mm0          \n\t"\
+        "packuswb %%mm7, %%mm1          \n\t"\
+        PAVGB"     (%0), %%mm0          \n\t"\
+        PAVGB"  (%0,%3), %%mm1          \n\t"\
+        OP(%%mm0, (%2),    %%mm4, d)\
+        OP(%%mm1, (%2,%4), %%mm5, d)\
+        "lea  (%0,%3,2), %0             \n\t"\
+        "lea  (%2,%4,2), %2             \n\t"\
+        "movq    48(%1), %%mm0          \n\t"\
+        "movq    72(%1), %%mm1          \n\t"\
+        "paddw    %%mm6, %%mm0          \n\t"\
+        "paddw    %%mm6, %%mm1          \n\t"\
+        "psraw      $5,  %%mm0          \n\t"\
+        "psraw      $5,  %%mm1          \n\t"\
+        "pmaxsw   %%mm7, %%mm0          \n\t"\
+        "pmaxsw   %%mm7, %%mm1          \n\t"\
+        "packuswb %%mm7, %%mm0          \n\t"\
+        "packuswb %%mm7, %%mm1          \n\t"\
+        PAVGB"     (%0), %%mm0          \n\t"\
+        PAVGB"  (%0,%3), %%mm1          \n\t"\
+        OP(%%mm0, (%2),    %%mm4, d)\
+        OP(%%mm1, (%2,%4), %%mm5, d)\
+        :"+a"(src8), "+c"(src16), "+d"(dst)\
+        :"S"((long)src8Stride), "D"((long)dstStride), "m"(ff_pw_16)\
+        :"memory");\
+}\
+static void OPNAME ## pixels8_l2_shift5_ ## MMX(uint8_t *dst, int16_t *src16, uint8_t *src8, int dstStride, int src8Stride, int h)\
+{\
+    asm volatile(\
+        "pxor     %%mm7, %%mm7          \n\t"\
+        "movq       %0,  %%mm6          \n\t"\
+        ::"m"(ff_pw_16)\
+        );\
+    while(h--){\
+    asm volatile(\
+        "movq      (%1), %%mm0          \n\t"\
+        "movq     8(%1), %%mm1          \n\t"\
+        "paddw    %%mm6, %%mm0          \n\t"\
+        "paddw    %%mm6, %%mm1          \n\t"\
+        "psraw      $5,  %%mm0          \n\t"\
+        "psraw      $5,  %%mm1          \n\t"\
+        "pmaxsw   %%mm7, %%mm0          \n\t"\
+        "pmaxsw   %%mm7, %%mm1          \n\t"\
+        "packuswb %%mm1, %%mm0          \n\t"\
+        PAVGB"     (%0), %%mm0          \n\t"\
+        OP(%%mm0, (%2), %%mm5, q)\
+        ::"a"(src8), "c"(src16), "d"(dst)\
+        :"memory");\
+        src8 += src8Stride;\
+        src16 += 24;\
+        dst += dstStride;\
+    }\
+}\
+static void OPNAME ## pixels16_l2_shift5_ ## MMX(uint8_t *dst, int16_t *src16, uint8_t *src8, int dstStride, int src8Stride, int h)\
+{\
+    OPNAME ## pixels8_l2_shift5_ ## MMX(dst  , src16  , src8  , dstStride, src8Stride, h);\
+    OPNAME ## pixels8_l2_shift5_ ## MMX(dst+8, src16+8, src8+8, dstStride, src8Stride, h);\
+}\
+
 
 #define H264_MC(OPNAME, SIZE, MMX) \
 static void OPNAME ## h264_qpel ## SIZE ## _mc00_ ## MMX (uint8_t *dst, uint8_t *src, int stride){\
@@ -816,13 +1005,13 @@ static void OPNAME ## h264_qpel ## SIZE ## _mc33_ ## MMX(uint8_t *dst, uint8_t *
 }\
 \
 static void OPNAME ## h264_qpel ## SIZE ## _mc22_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
-    uint64_t temp[SIZE*(SIZE+8)/4];\
+    uint64_t temp[SIZE*(SIZE<8?12:24)/4];\
     int16_t * const tmp= (int16_t*)temp;\
     OPNAME ## h264_qpel ## SIZE ## _hv_lowpass_ ## MMX(dst, tmp, src, stride, SIZE, stride);\
 }\
 \
 static void OPNAME ## h264_qpel ## SIZE ## _mc21_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
-    uint64_t temp[SIZE*(SIZE+8)/4 + SIZE*SIZE/4];\
+    uint64_t temp[SIZE*(SIZE<8?12:24)/4 + SIZE*SIZE/4];\
     uint8_t * const halfH= (uint8_t*)temp;\
     uint8_t * const halfHV= ((uint8_t*)temp) + SIZE*SIZE;\
     int16_t * const tmp= ((int16_t*)temp) + SIZE*SIZE;\
@@ -832,7 +1021,7 @@ static void OPNAME ## h264_qpel ## SIZE ## _mc21_ ## MMX(uint8_t *dst, uint8_t *
 }\
 \
 static void OPNAME ## h264_qpel ## SIZE ## _mc23_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
-    uint64_t temp[SIZE*(SIZE+8)/4 + SIZE*SIZE/4];\
+    uint64_t temp[SIZE*(SIZE<8?12:24)/4 + SIZE*SIZE/4];\
     uint8_t * const halfH= (uint8_t*)temp;\
     uint8_t * const halfHV= ((uint8_t*)temp) + SIZE*SIZE;\
     int16_t * const tmp= ((int16_t*)temp) + SIZE*SIZE;\
@@ -842,23 +1031,19 @@ static void OPNAME ## h264_qpel ## SIZE ## _mc23_ ## MMX(uint8_t *dst, uint8_t *
 }\
 \
 static void OPNAME ## h264_qpel ## SIZE ## _mc12_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
-    uint64_t temp[SIZE*(SIZE+8)/4 + SIZE*SIZE/4];\
-    uint8_t * const halfV= (uint8_t*)temp;\
-    uint8_t * const halfHV= ((uint8_t*)temp) + SIZE*SIZE;\
-    int16_t * const tmp= ((int16_t*)temp) + SIZE*SIZE;\
-    put_h264_qpel ## SIZE ## _v_lowpass_ ## MMX(halfV, src, SIZE, stride);\
-    put_h264_qpel ## SIZE ## _hv_lowpass_ ## MMX(halfHV, tmp, src, SIZE, SIZE, stride);\
-    OPNAME ## pixels ## SIZE ## _l2_ ## MMX(dst, halfV, halfHV, stride, SIZE, SIZE);\
+    uint64_t temp[SIZE*(SIZE<8?12:24)/4 + SIZE*SIZE/8];\
+    int16_t * const halfV= ((int16_t*)temp) + SIZE*SIZE/2;\
+    uint8_t * const halfHV= ((uint8_t*)temp);\
+    put_h264_qpel ## SIZE ## _hv_lowpass_ ## MMX(halfHV, halfV, src, SIZE, SIZE, stride);\
+    OPNAME ## pixels ## SIZE ## _l2_shift5_ ## MMX(dst, halfV+2, halfHV, stride, SIZE, SIZE);\
 }\
 \
 static void OPNAME ## h264_qpel ## SIZE ## _mc32_ ## MMX(uint8_t *dst, uint8_t *src, int stride){\
-    uint64_t temp[SIZE*(SIZE+8)/4 + SIZE*SIZE/4];\
-    uint8_t * const halfV= (uint8_t*)temp;\
-    uint8_t * const halfHV= ((uint8_t*)temp) + SIZE*SIZE;\
-    int16_t * const tmp= ((int16_t*)temp) + SIZE*SIZE;\
-    put_h264_qpel ## SIZE ## _v_lowpass_ ## MMX(halfV, src+1, SIZE, stride);\
-    put_h264_qpel ## SIZE ## _hv_lowpass_ ## MMX(halfHV, tmp, src, SIZE, SIZE, stride);\
-    OPNAME ## pixels ## SIZE ## _l2_ ## MMX(dst, halfV, halfHV, stride, SIZE, SIZE);\
+    uint64_t temp[SIZE*(SIZE<8?12:24)/4 + SIZE*SIZE/8];\
+    int16_t * const halfV= ((int16_t*)temp) + SIZE*SIZE/2;\
+    uint8_t * const halfHV= ((uint8_t*)temp);\
+    put_h264_qpel ## SIZE ## _hv_lowpass_ ## MMX(halfHV, halfV, src, SIZE, SIZE, stride);\
+    OPNAME ## pixels ## SIZE ## _l2_shift5_ ## MMX(dst, halfV+3, halfHV, stride, SIZE, SIZE);\
 }\
 
 
@@ -872,10 +1057,14 @@ static void OPNAME ## h264_qpel ## SIZE ## _mc32_ ## MMX(uint8_t *dst, uint8_t *
 "pavgb " #temp ", " #a "          \n\t"\
 "mov" #size " " #a ", " #b "      \n\t"
 
+#define PAVGB "pavgusb"
 QPEL_H264(put_,       PUT_OP, 3dnow)
 QPEL_H264(avg_, AVG_3DNOW_OP, 3dnow)
+#undef PAVGB
+#define PAVGB "pavgb"
 QPEL_H264(put_,       PUT_OP, mmx2)
 QPEL_H264(avg_,  AVG_MMX2_OP, mmx2)
+#undef PAVGB
 
 H264_MC(put_, 4, 3dnow)
 H264_MC(put_, 8, 3dnow)

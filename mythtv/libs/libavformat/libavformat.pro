@@ -25,10 +25,11 @@ SOURCES += mpjpeg.c nut.c os_support.c rm.c psxstr.c raw.c flic.c audio.c
 SOURCES += segafilm.c swf.c utils.c wav.c wc3movie.c westwood.c yuv4mpeg.c
 SOURCES += sierravmd.c asf-enc.c matroska.c img2.c electronicarts.c sol.c
 SOURCES += nsvdec.c ogg2.c oggparsevorbis.c oggparsetheora.c oggparseflac.c
-SOURCES += mmf.c gif.c gifdec.c jpeg.c png.c pnm.c sgi.c yuv.c daud.c
+SOURCES += mmf.c gif.c gifdec.c jpeg.c png.c pnm.c sgi.c yuv.c daud.c adtsenc.c
+SOURCES += aiff.c avs.c mm.c tta.c voc.c
 
 # not using:  barpainet.* beosaudio.cpp, dv1394.*, dc1394.c, framehook.*
-# not using:  grab.c
+# not using:  grab.c v4l2.c
 
 contains( AMR_NB, yes ) {
     SOURCES += amr.c

@@ -576,7 +576,8 @@ void AvFormatDecoder::Reset()
 #endif
 }
 
-bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
+bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize], 
+                                const QString &filename)
 {
     av_register_all();
 
@@ -584,7 +585,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
 
     probe.filename = (char *)(filename.ascii());
     probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = 2048;
+    probe.buf_size = kDecoderProbeBufferSize;
 
     if (av_probe_input_format(&probe, true))
         return true;
@@ -698,7 +699,7 @@ extern "C" void HandleStreamChange(void* data) {
     decoder->ScanStreams(false);
 }
 
-/** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[2048])
+/** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[kDecoderProbeBufferSize])
  *  OpenFile opens a ringbuffer for playback.
  *
  *  OpenFile deletes any existing context then use testbuf to
@@ -710,7 +711,8 @@ extern "C" void HandleStreamChange(void* data) {
  *  /param novideo if true then no video is sought in ScanSreams.
  *  /param _testbuf this paramater is not used by AvFormatDecoder.
  */
-int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048])
+int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
+                              char testbuf[kDecoderProbeBufferSize])
 {
     CloseContext();
 
@@ -722,7 +724,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
     AVProbeData probe;
     probe.filename = filename;
     probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = 2048;
+    probe.buf_size = kDecoderProbeBufferSize;
 
     fmt = av_probe_input_format(&probe, true);
     if (!fmt)

@@ -738,9 +738,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     }
 
     ringBuffer->Start();
-    char testbuf[2048];
+    char testbuf[kDecoderProbeBufferSize];
     ringBuffer->Unpause(); // so we can read testbuf if we were paused
-    if (ringBuffer->Read(testbuf, 2048) != 2048)
+    if (ringBuffer->Read(testbuf, kDecoderProbeBufferSize) != kDecoderProbeBufferSize)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("NVP::OpenFile(): Error, couldn't read file: %1")

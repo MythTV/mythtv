@@ -1263,7 +1263,7 @@ static int mpeg_mux_end(AVFormatContext *ctx)
 static int mpegps_probe(AVProbeData *p)
 {
     int i;
-    int size= FFMIN(256, p->buf_size);
+    int size= FFMIN(2048, p->buf_size);
     uint32_t code=0xFF;
 
     /* we search the first start code. If it is a packet start code,
@@ -1289,9 +1289,9 @@ static int mpegps_probe(AVProbeData *p)
                 return 0;
         }
     }
+
     return 0;
 }
-
 
 typedef struct MpegDemuxContext {
     int header_state;

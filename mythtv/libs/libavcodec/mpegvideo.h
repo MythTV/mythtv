@@ -70,6 +70,8 @@ enum OutputFormat {
 
 #define MAX_MB_BYTES (30*16*16*3/8 + 120)
 
+#define INPLACE_OFFSET 16
+
 typedef struct Predictor{
     double coeff;
     double count;
@@ -83,12 +85,14 @@ typedef struct RateControlEntry{
     int i_tex_bits;
     int p_tex_bits;
     int misc_bits;
+    int header_bits;
     uint64_t expected_bits;
     int new_pict_type;
     float new_qscale;
     int mc_mb_var_sum;
     int mb_var_sum;
     int i_count;
+    int skip_count;
     int f_code;
     int b_code;
 }RateControlEntry;
@@ -116,6 +120,9 @@ typedef struct RateControlContext{
     uint64_t qscale_sum[5];
     int frame_count[5];
     int last_non_b_pict_type;
+
+    void *non_lavc_opaque;        ///< context for non lavc rc code (for example xvid)
+    float dry_run_qscale;         ///< for xvid rc
 }RateControlContext;
 
 /**
@@ -127,7 +134,7 @@ typedef struct ScanTable{
     uint8_t raster_end[64];
 #ifdef ARCH_POWERPC
                 /** Used by dct_quantise_alitvec to find last-non-zero */
-    uint8_t __align8 inverse[64];
+    DECLARE_ALIGNED_8(uint8_t, inverse[64]);
 #endif
 } ScanTable;
 
@@ -189,7 +196,7 @@ typedef struct ParseContext{
     uint8_t *buffer;
     int index;
     int last_index;
-    int buffer_size;
+    unsigned int buffer_size;
     uint32_t state;             ///< contains the last few bytes in MSB order
     int frame_start_found;
     int overread;               ///< the number of bytes which where irreversibly read from the next frame
@@ -487,7 +494,7 @@ typedef struct MpegEncContext {
     uint16_t (*q_inter_matrix16)[2][64];
     int block_last_index[12];  ///< last non zero coefficient in block
     /* scantables */
-    ScanTable __align8 intra_scantable;
+    DECLARE_ALIGNED_8(ScanTable, intra_scantable);
     ScanTable intra_h_scantable;
     ScanTable intra_v_scantable;
     ScanTable inter_scantable; ///< if inter == intra then intra should be used to reduce tha cache usage
@@ -605,7 +612,7 @@ typedef struct MpegEncContext {
     int divx_packed;
     uint8_t *bitstream_buffer; //Divx 5.01 puts several frames in a single one, this is used to reorder them
     int bitstream_buffer_size;
-    int allocated_bitstream_buffer_size;
+    unsigned int allocated_bitstream_buffer_size;
 
     int xvid_build;
 
@@ -767,6 +774,7 @@ void ff_write_quant_matrix(PutBitContext *pb, int16_t *matrix);
 int ff_find_unused_picture(MpegEncContext *s, int shared);
 void ff_denoise_dct(MpegEncContext *s, DCTELEM *block);
 void ff_update_duplicate_context(MpegEncContext *dst, MpegEncContext *src);
+const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 
 void ff_er_frame_start(MpegEncContext *s);
 void ff_er_frame_end(MpegEncContext *s);
@@ -983,5 +991,9 @@ double ff_eval(char *s, double *const_value, const char **const_name,
                void *opaque);
 int ff_vbv_update(MpegEncContext *s, int frame_size);
 void ff_get_2pass_fcode(MpegEncContext *s);
+
+int ff_xvid_rate_control_init(MpegEncContext *s);
+void ff_xvid_rate_control_uninit(MpegEncContext *s);
+float ff_xvid_rate_estimate_qscale(MpegEncContext *s, int dry_run);
 
 #endif /* AVCODEC_MPEGVIDEO_H */
