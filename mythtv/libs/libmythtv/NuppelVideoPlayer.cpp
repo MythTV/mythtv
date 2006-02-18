@@ -3889,10 +3889,10 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
     if (deletepoint)
     {
         QString message = QObject::tr("You are close to an existing cut point. "
-		                              "Would you like to:");
+                                      "Would you like to:");
         QString option1 = QObject::tr("Delete this cut point");
         QString option2 = QObject::tr("Move this cut point to the current "
-		                              "position");
+                                      "position");
         QString option3 = QObject::tr("Flip directions - delete to the ");
         if (direction == 0)
             option3 += QObject::tr("right");
