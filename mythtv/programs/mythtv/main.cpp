@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
         ProgramInfo *pginfo = new ProgramInfo();
         pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
         pginfo->pathname = filename;
+        pginfo->isVideo = true;
     
         tv->Playback(pginfo);
     }
