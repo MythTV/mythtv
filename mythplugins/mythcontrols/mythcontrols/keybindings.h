@@ -65,6 +65,8 @@ public:
     /**
      * @brief Get a list of the context names.
      * @return A list of the context names.
+     * @note The returned list is a copy and can be modified without
+     * side-effects.
      */
     inline QStringList * getContexts() const
     {

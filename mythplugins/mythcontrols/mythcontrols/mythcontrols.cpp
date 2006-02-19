@@ -46,22 +46,6 @@ using namespace std;
 #include "keygrabber.h"
 
 
-static QMap<int,QString> FindContexts(const QString &context)
-{
-    QMap<int,QString> retval;
-    retval.clear();
-    if (context != JUMP_CONTEXT) retval[-1] = JUMP_CONTEXT;
-    retval[0] = context;
-    if (context != JUMP_CONTEXT && context != GLOBAL_CONTEXT)
-    {
-        if (context == "TV Editting")
-            retval[1] = "TV Playback";
-        retval[2] = GLOBAL_CONTEXT;
-        if (context != "qt")
-            retval[3] = "qt";
-    }
-    return retval;
-}
 
 static const QString KeyToDisplay(const QString key)
 {
@@ -838,7 +822,11 @@ void MythControls::addKeyToAction(void)
     refreshKeyInformation();
 }
 
-void MythControls::addBindings(QDict<binding_t> &bindings, const QString &context, const QString &contextParent, int bindlevel)
+
+
+void MythControls::addBindings(QDict<binding_t> &bindings,
+                               const QString &context,
+                               const QString &contextParent, int bindlevel)
 {
     QStringList *actions = key_bindings->getActions(context);
 
@@ -872,18 +860,13 @@ void MythControls::addBindings(QDict<binding_t> &bindings, const QString &contex
 
 BindingList *MythControls::getKeyBindings(const QString &context)
 {
+    QStringList keys;
     QDict<binding_t> bindings;
     bindings.clear();
 
-    QMap<int,QString> contextList = FindContexts(context);
-    for (QMap<int,QString>::iterator it = contextList.begin(); it != contextList.end(); ++it)
-    {
-        int level = it.key();
-        QString curcontext = it.data();
-        addBindings(bindings, curcontext, context, level);
-    }
+    for (size_t i = 0; i < contexts.size(); i++)
+        addBindings(bindings, contexts[i], context, i);
 
-    QStringList keys;
 
     for (QDictIterator<binding_t> it(bindings); it.current(); ++it)
     {

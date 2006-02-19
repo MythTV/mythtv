@@ -139,13 +139,19 @@ QStringList * ActionSet::contextStrings(void) const
 /* method description in header */
 QStringList * ActionSet::actionStrings(const QString &context_name) const
 {
-    QStringList *action_strings = new QStringList();
-    QDictIterator<Action> it(*(_contexts[context_name]));
+    Context *c = _contexts[context_name];
 
-    for (; it.current(); ++it)
-        action_strings->append(it.currentKey());
+    if (c == NULL) return NULL;
+    else
+    {
+        QStringList *action_strings = new QStringList();
+        QDictIterator<Action> it(*(_contexts[context_name]));
+
+        for (; it.current(); ++it)
+            action_strings->append(it.currentKey());
     
-    return action_strings;
+        return action_strings;
+    }
 }
 
 
