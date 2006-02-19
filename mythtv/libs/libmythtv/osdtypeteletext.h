@@ -2,6 +2,7 @@
 #define OSD_TYPE_TELETEXT_H_
 
 #include <vector>
+#include <map>
 using namespace std;
 
 #include <qstring.h>
