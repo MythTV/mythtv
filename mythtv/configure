@@ -1302,6 +1302,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 fi
 if test x"$tune" = x"generic" -a x"$cpu" = x"x86_64" -a x"$cpu_overide" != x"yes"; then
    ARCHFLAGS="-march=k8"
+elif test x"$tune" = x"generic" -a x"$cpu" = x"sparc64" -a x"$cpu_overide" != x"yes"; then
+   ARCHFLAGS="-mcpu=ultrasparc -mvis"
 fi
 
 if test x"$proc_error_msg" = x"yes"; then
@@ -1420,7 +1422,7 @@ fi
 else
 
 # if cross compiling, cannot launch a program, so make a static guess
-if test "$cpu" = "powerpc" -o "$cpu" = "mips" ; then
+if test "$cpu" = "powerpc" -o "$cpu" = "mips" -o "$cpu" = "sparc" -o "$cpu"="sparc64"; then
     bigendian="yes"
 fi
 
