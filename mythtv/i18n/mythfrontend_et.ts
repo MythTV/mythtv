@@ -63,6 +63,13 @@
     </message>
 </context>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>Analog Options for </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
@@ -369,6 +376,10 @@
     <message>
         <source>DiSEqC</source>
         <translation>DiSEqC</translation>
+    </message>
+    <message>
+        <source>Analog Options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1106,6 +1117,22 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <source>Group Password</source>
         <translation>Grupi parool</translation>
     </message>
+    <message>
+        <source>Recording has been transcoded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Close Captioned</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousList</name>
@@ -1670,7 +1697,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation>Sa oled olemasoleva lõikekoha lähedal.  Kas sa soovid:</translation>
+        <translation type="obsolete">Sa oled olemasoleva lõikekoha lähedal.  Kas sa soovid:</translation>
     </message>
     <message>
         <source>Delete this cut point</source>
@@ -3657,7 +3684,7 @@ category_type</translation>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation>Tühja kaadri avastamine (vaikimisi)</translation>
+        <translation type="obsolete">Tühja kaadri avastamine (vaikimisi)</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
@@ -3677,7 +3704,7 @@ category_type</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>Selle järgi leiab MythTV reklaamide algused ja lõpud.  Reklaamide automaatse märgistamise lubamiseta saab kasutada ainult tühjade kaadrite avastamist.</translation>
+        <translation type="obsolete">Selle järgi leiab MythTV reklaamide algused ja lõpud.  Reklaamide automaatse märgistamise lubamiseta saab kasutada ainult tühjade kaadrite avastamist.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -6444,11 +6471,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>Could not query inputs.</source>
-        <translation>Ei leia sisendeid.</translation>
+        <translation type="obsolete">Ei leia sisendeid.</translation>
     </message>
     <message>
         <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation>VIGA, sisendite leidmiseks kompileeri V4L toega</translation>
+        <translation type="obsolete">VIGA, sisendite leidmiseks kompileeri V4L toega</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6480,11 +6507,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation>Ei saa sisendite proovimiseks &apos;%1&apos; avada.</translation>
+        <translation type="obsolete">Ei saa sisendite proovimiseks &apos;%1&apos; avada.</translation>
     </message>
     <message>
         <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation>VIGA, sisendite leidmiseks kompileeri DVB toega</translation>
+        <translation type="obsolete">VIGA, sisendite leidmiseks kompileeri DVB toega</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.</source>
@@ -6928,11 +6955,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation>Video suuruse muutmisel säilita kuvasuhe</translation>
+        <translation type="obsolete">Video suuruse muutmisel säilita kuvasuhe</translation>
     </message>
     <message>
         <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
-        <translation>Originaalsalvestise vaatamisel ignoreeritakse kõrguse seadeid ning arvutatakse uus kõrgus laiuse ning kuvasuhte kaudu.</translation>
+        <translation type="obsolete">Originaalsalvestise vaatamisel ignoreeritakse kõrguse seadeid ning arvutatakse uus kõrgus laiuse ning kuvasuhte kaudu.</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
@@ -6977,6 +7004,90 @@ MythTV lõpetab töö.</translation>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation>Määrab pordi, mille kaudu kasutajaliidest juhtida.</translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point. Would you like to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert a new cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too Far %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, radio channels will also be included.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Available Methods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank Frame Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum commercial skip (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the use to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weighted Time/Priority Combination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Priority Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac hardware acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoder command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagger command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7734,6 +7845,34 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Swap PiP/Main</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Title/Chapter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Still Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Root Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished">Muuda salvestuskava</translation>
     </message>
 </context>
 <context>

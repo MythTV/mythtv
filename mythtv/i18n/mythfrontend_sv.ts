@@ -63,6 +63,13 @@
     </message>
 </context>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>Analog Options for </source>
+        <translation type="unfinished">Analoga inställningar för </translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -369,6 +376,10 @@
     <message>
         <source>DiSEqC</source>
         <translation>DiSEqC</translation>
+    </message>
+    <message>
+        <source>Analog Options</source>
+        <translation type="unfinished">Analoga inställningar</translation>
     </message>
 </context>
 <context>
@@ -1106,6 +1117,22 @@ Returning to the previous menu.</source>
         <source>Show Program Details</source>
         <translation>Visa programdetaljer</translation>
     </message>
+    <message>
+        <source>Recording has been transcoded</source>
+        <translation>Inspelning har omkodats</translation>
+    </message>
+    <message>
+        <source>Recording is in Stereo</source>
+        <translation>Inspelning är i stereo</translation>
+    </message>
+    <message>
+        <source>Recording is Close Captioned</source>
+        <translation>Inspelning är textad</translation>
+    </message>
+    <message>
+        <source>Recording is in High Definition</source>
+        <translation>Inspelning är högupplöst</translation>
+    </message>
 </context>
 <context>
     <name>PreviousList</name>
@@ -1502,7 +1529,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation>Du är nära en befintlig klippunkt. Vill du:</translation>
+        <translation type="obsolete">Du är nära en befintlig klippunkt. Vill du:</translation>
     </message>
     <message>
         <source>Delete this cut point</source>
@@ -1618,7 +1645,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation>Svart bild (standard)</translation>
+        <translation type="obsolete">Svart bild (standard)</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
@@ -3783,7 +3810,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>Detta bestämmer metoden som används för att detektera när reklam börjar och slutar. &apos;Automatisk reklamdetektering&apos; måste vara påslagen för att använda något annat än &apos;Svart bild&apos;.</translation>
+        <translation type="obsolete">Detta bestämmer metoden som används för att detektera när reklam börjar och slutar. &apos;Automatisk reklamdetektering&apos; måste vara påslagen för att använda något annat än &apos;Svart bild&apos;.</translation>
     </message>
     <message>
         <source>CPU Usage</source>
@@ -6444,11 +6471,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Could not query inputs.</source>
-        <translation>Kunde inte få fram ingångar.</translation>
+        <translation type="obsolete">Kunde inte få fram ingångar.</translation>
     </message>
     <message>
         <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation>FEL, kompilera med V4L-stöd för att få fram ingångar</translation>
+        <translation type="obsolete">FEL, kompilera med V4L-stöd för att få fram ingångar</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6480,11 +6507,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation>Kunde inte öppna &apos;%1&apos; för att undersöka dess ingångar.</translation>
+        <translation type="obsolete">Kunde inte öppna &apos;%1&apos; för att undersöka dess ingångar.</translation>
     </message>
     <message>
         <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation>FEL, kompilera med DVB-stöd för att få fram ingångar</translation>
+        <translation type="obsolete">FEL, kompilera med DVB-stöd för att få fram ingångar</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.</source>
@@ -6948,11 +6975,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation>Bevara bildaspekt när storlek ändras</translation>
+        <translation type="obsolete">Bevara bildaspekt när storlek ändras</translation>
     </message>
     <message>
         <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
-        <translation>Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
+        <translation type="obsolete">Bevara höjd/bredd-förhållandet från den ursprungliga inspelningsfilen genom att ignorera höjdinställningen ovan och beräkna ny höjd utifrån bildaspekt och bredd.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
@@ -6981,6 +7008,90 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation>Den nätverksport som fjärrstyrningsgränssnittet lyssnar på för nya anslutningar.</translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point. Would you like to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert a new cut point</source>
+        <translation>Infoga ny klippunkt</translation>
+    </message>
+    <message>
+        <source>Too Far %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio channels.</source>
+        <translation>Radiokanaler.</translation>
+    </message>
+    <message>
+        <source>If set, radio channels will also be included.</source>
+        <translation>Inkludera även radiokanaler.</translation>
+    </message>
+    <message>
+        <source>All Available Methods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank Frame Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum commercial skip (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the use to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weighted Time/Priority Combination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Priority Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac hardware acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoder command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagger command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7738,6 +7849,34 @@ Inga andra detaljer</translation>
     <message>
         <source>Swap PiP/Main</source>
         <translation type="unfinished">Byt PiP/Huvud</translation>
+    </message>
+    <message>
+        <source>Previous Title/Chapter</source>
+        <translation>Föregående titel/kapitel</translation>
+    </message>
+    <message>
+        <source>Skip Still Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Title</source>
+        <translation>Nästa titel</translation>
+    </message>
+    <message>
+        <source>DVD Root Menu</source>
+        <translation>DVD rotmeny</translation>
+    </message>
+    <message>
+        <source>Schedule Recordings</source>
+        <translation>Schemalägg inspelningar</translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation>Programletaren</translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation>Ändra inspelningsschema</translation>
     </message>
 </context>
 <context>

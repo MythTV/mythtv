@@ -63,6 +63,13 @@
     </message>
 </context>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>Analog Options for </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -368,6 +375,10 @@
     </message>
     <message>
         <source>DiSEqC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1102,6 +1113,22 @@ Returning to the previous menu.</source>
         <source>Show Program Details</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording has been transcoded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Close Captioned</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousList</name>
@@ -1490,7 +1517,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation>既にあるカットポイントの近くです．どのようにしますか:</translation>
+        <translation type="obsolete">既にあるカットポイントの近くです．どのようにしますか:</translation>
     </message>
     <message>
         <source>Delete this cut point</source>
@@ -1614,7 +1641,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
-        <translation>ブランクフレーム検知(既定)</translation>
+        <translation type="obsolete">ブランクフレーム検知(既定)</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change Detection</source>
@@ -3793,7 +3820,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>CM検出の方法を指定します。&apos;ブランクフレーム検知&apos;以外を指定する場合は、&apos;自動的にCMをマーク&apos;の設定にしておく必要があります。</translation>
+        <translation type="obsolete">CM検出の方法を指定します。&apos;ブランクフレーム検知&apos;以外を指定する場合は、&apos;自動的にCMをマーク&apos;の設定にしておく必要があります。</translation>
     </message>
     <message>
         <source>CPU Usage</source>
@@ -6439,14 +6466,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not query inputs.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Subtype</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6472,14 +6491,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ERROR, Compile with DVB support to query inputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6947,14 +6958,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Spain</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6972,6 +6975,90 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point. Would you like to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert a new cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too Far %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, radio channels will also be included.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Available Methods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank Frame Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum commercial skip (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the use to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weighted Time/Priority Combination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Priority Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac hardware acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoder command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagger command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7730,6 +7817,34 @@ No other details</source>
     <message>
         <source>Swap PiP/Main</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Title/Chapter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Still Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Root Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished">録画予約変更</translation>
     </message>
 </context>
 <context>
