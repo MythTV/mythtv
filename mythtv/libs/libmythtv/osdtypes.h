@@ -270,6 +270,8 @@ class OSDTypeImage : public OSDType
     virtual void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
                       int yoff);
 
+    void SetDontRoundPosition(bool round) { m_dontround = round; }
+
   protected:
     QRect m_imagesize;
     QPoint m_displaypos;
@@ -290,6 +292,7 @@ class OSDTypeImage : public OSDType
 
     int m_drawwidth;
     bool m_onlyusefirst;
+    bool m_dontround;
 };
 
 class OSDTypePosSlider : public OSDTypeImage

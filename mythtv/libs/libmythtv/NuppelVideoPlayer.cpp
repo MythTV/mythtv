@@ -5280,8 +5280,8 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         return;
 
     long long spupts = ringBuffer->DVD()->MenuSpuPts();
-    long long ptslow = spupts - 100;
-    long long ptshigh = spupts + 100;
+    long long ptslow = spupts - 1000;
+    long long ptshigh = spupts + 1000;
     VideoFrame *buffer = videoOutput->GetLastShownFrame();
 
     if (!osd->IsSetDisplaying("subtitles") &&
@@ -5322,11 +5322,13 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
             }
         }
         float hmult = osd->GetSubtitleBounds().width() / 720.0;
-        float vmult = osd->GetSubtitleBounds().height() / 576.0;
+        float vmult = osd->GetSubtitleBounds().height() / 480.0;
+
         OSDTypeImage* image = new OSDTypeImage();
-        QImage scaledImage = hl_button.smoothScale(w + 1, h + 1);
-        image->SetPosition(QPoint(btnX - 1, btnY + 1), hmult, vmult);
-        image->LoadFromQImage(scaledImage);
+        image->SetPosition(QPoint(btnX, btnY), hmult, vmult);
+        image->LoadFromQImage(hl_button);
+        image->SetDontRoundPosition(true);
+
         subtitleOSD->AddType(image);
         osd->SetVisible(subtitleOSD, 0);
     }

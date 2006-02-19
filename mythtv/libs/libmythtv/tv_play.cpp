@@ -2282,10 +2282,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if (prbuffer->isDVD())
             {
-                if (prbuffer->DVD()->NumPartsInTitle() < 2)
+                if (prbuffer->InDVDMenuOrStillFrame())
+                    UpdateOSDSeekMessage(tr("Skipping Back Not Allowed"),
+                                         osd_general_timeout);
+                else if (prbuffer->DVD()->NumPartsInTitle() < 2)
                 {
                     nvp->GoToDVDProgram(0);
-                    UpdateOSDSeekMessage(tr("Previous Title/Chapter"),
+                    UpdateOSDSeekMessage(tr("Previous Title"),
                             osd_general_timeout);
                 }
                 else

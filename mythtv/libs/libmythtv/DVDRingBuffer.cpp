@@ -287,14 +287,14 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (IsInMenu() && NumMenuButtons() > 0 && 
                         !buttonSelected)
                 {
-                    int32_t button;
                     pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
-                    dvdnav_get_current_highlight(dvdnav, &button);
 
-                    if (button > NumMenuButtons() || button < 1)
-                        dvdnav_button_select(dvdnav, pci,1);
+                    uint8_t button = pci->hli.hl_gi.fosl_btnn;
+                    if (button > 0)
+                        dvdnav_button_select(dvdnav,pci,button);
                     else
-                        dvdnav_button_select(dvdnav, pci, button);
+                        dvdnav_button_select(dvdnav,pci,1);
+
                     buttonSelected = true;
                     spuchanged = false;
                 }
@@ -345,13 +345,14 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         .arg(hl->sx).arg(hl->sy)
                         .arg(hl->ex).arg(hl->ey)
                         .arg(hl->pts).arg(hl->buttonN));
+
+                if (DVDButtonUpdate(false))
+                    buttonExists = DrawMenuButton(menuSpuPkt,menuBuflength);
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
                 }          
-
-                if (DVDButtonUpdate(false))
-                    buttonExists = DrawMenuButton(menuSpuPkt,menuBuflength);
             }
             break;
             case DVDNAV_STILL_FRAME:

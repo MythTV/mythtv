@@ -672,6 +672,7 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
 
     m_scalew = scalew;
     m_scaleh = scaleh;
+    m_dontround = false;
 
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
@@ -689,6 +690,7 @@ OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
     m_name = other.m_name;
     m_scalew = other.m_scalew;
     m_scaleh = other.m_scaleh;
+    m_dontround = other.m_dontround;
 
     m_alpha = m_yuv = NULL;
     if (m_isvalid)
@@ -725,6 +727,7 @@ OSDTypeImage::OSDTypeImage(const QString &name)
     m_vbuffer = NULL;
     m_isvalid = false;
     m_filename = "";
+    m_dontround = false;
 }
 
 OSDTypeImage::OSDTypeImage(void)
@@ -744,6 +747,7 @@ OSDTypeImage::OSDTypeImage(void)
     m_vbuffer = NULL;
     m_isvalid = false;
     m_filename = "";
+    m_dontround = false;
 }
 
 OSDTypeImage::~OSDTypeImage()
@@ -874,11 +878,18 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade,
     if (!m_isvalid)
         return;
 
-    int xstart = ((m_displaypos.x() + xoff + 1) / 2) * 2;
-    int ystart = ((m_displaypos.y() + yoff)     / 2) * 2;
+    int xstart = 0, ystart = 0, startcol = 0, startline = 0;
 
-    int startline = 0;
-    int startcol = 0;
+    if (m_dontround)
+    {
+        xstart = m_displaypos.x() + xoff;
+        ystart = m_displaypos.y() + yoff;
+    }
+    else
+    {
+        xstart = ((m_displaypos.x() + xoff + 1) / 2) * 2;
+        ystart = ((m_displaypos.y() + yoff)     / 2) * 2;
+    }
 
     if (ystart < 0)
     {
