@@ -1,6 +1,7 @@
 // Standard UNIX C headers
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 // MythTV headers
 #include "cardutil.h"
