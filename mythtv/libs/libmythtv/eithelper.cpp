@@ -179,7 +179,6 @@ static int get_chan_id_from_db(int sourceid, const Event &event)
     else if (query.next())
     {
         // Check to see if we are interseted in this channel
-        query.next();
         bool useOnAirGuide = query.value(1).toBool();
         return (useOnAirGuide) ? query.value(0).toInt() : -1;        
     }
