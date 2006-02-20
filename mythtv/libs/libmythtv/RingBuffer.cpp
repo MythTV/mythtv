@@ -273,6 +273,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     }
 
     setswitchtonext = false;
+    ateof = false;
+    commserror = false;
+    numfailures = 0;
 }
 
 /** \fn RingBuffer::IsOpen(void) const
