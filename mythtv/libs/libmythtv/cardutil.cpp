@@ -661,50 +661,53 @@ CardUtil::fillDVBInputsDiSEqC(int dvb_diseqc_type)
 {
     QValueList<DVBDiSEqCInput> list;
 
-    QString stxt = "DiSEqC Switch Input %1";
-    QString mtxt = "DiSEqC v1.2 Motor Position %1";
-    QString itxt = "DiSEqC v1.3 Input %1";
+    QString stxt   = "DiSEqC Switch Input %1";
+    QString mtxt   = "DiSEqC v1.2 Motor Position %1";
+    QString itxt   = "DiSEqC v1.3 Input %1";
     QString l21txt = "SW21 Input %1";
     QString l64txt = "SW64 Input %1";
 
-    uint i;
     switch (dvb_diseqc_type)
     {
-        case 1: case 2: case 3:
-            for (i = 0; i < 2; ++i)
+        case DISEQC_MINI_2:
+        case DISEQC_SWITCH_2_1_0:
+        case DISEQC_SWITCH_2_1_1:
+            for (uint i = 0; i < 2; ++i)
                 list.append(DVBDiSEqCInput(
                                 stxt.arg(i+1), QString::number(i), ""));
             break;
-        case 4: case 5:
-            for (i = 0; i < 4; ++i)
+        case DISEQC_SWITCH_4_1_0:
+        case DISEQC_SWITCH_4_1_1:
+            for (uint i = 0; i < 4; ++i)
                 list.append(DVBDiSEqCInput(
                                 stxt.arg(i+1), QString::number(i), ""));
             break;
-        case 6:
-            for (i = 1; i < 50; ++i)
+        case DISEQC_POSITIONER_1_2:
+            for (uint i = 1; i < 50; ++i)
                 list.append(DVBDiSEqCInput(
                                 mtxt.arg(i), "", QString::number(i)));
             break;
-        case 7:
-            for (i = 1; i < 20; ++i)
+        case DISEQC_POSITIONER_X:
+            for (uint i = 1; i < 20; ++i)
                 list.append(DVBDiSEqCInput(
                                 itxt.arg(i), "", QString::number(i)));
             break;
-        case 8:
-            for (i = 0; i < 10; ++i)
+        case DISEQC_POSITIONER_1_2_SWITCH_2:
+            for (uint i = 0; i < 10; ++i)
                 list.append(DVBDiSEqCInput(
                                 stxt.arg(i+1,2), QString::number(i), ""));
             break;
-        case 9:
-            for (i = 0; i < 2; ++i)
+        case DISEQC_SW21:
+            for (uint i = 0; i < 2; ++i)
                 list.append(DVBDiSEqCInput(
                                 l21txt.arg(i+1,2), QString::number(i), ""));
             break;
-        case 10:
-            for (i = 0; i < 3; ++i)
+        case DISEQC_SW64:
+            for (uint i = 0; i < 3; ++i)
                 list.append(DVBDiSEqCInput(
                                 l64txt.arg(i+1,2), QString::number(i), ""));
             break;
+        case DISEQC_SINGLE:
         default:
             list.append(DVBDiSEqCInput(
                             QString("DVBInput"), QString(""), QString("")));

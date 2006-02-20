@@ -739,27 +739,27 @@ class DVBDiSEqCType: public ComboBoxSetting, public CCSetting
       : CCSetting(parent, "dvb_diseqc_type")
     {
         setLabel(QObject::tr("DiSEqC Input Type: (DVB-S)"));
-        addSelection("Single LNB / Input",
+        addSelection(tr("Single LNB / Input"),
                      QString::number(DISEQC_SINGLE));
-        addSelection("Tone Switch aka Mini DiSEqC (2-Way)",
+        addSelection(tr("Tone Switch aka Mini DiSEqC (2-Way)"),
                      QString::number(DISEQC_MINI_2));
-        addSelection("DiSEqC v1.0 Switch (2-Way)",
+        addSelection(tr("DiSEqC v1.0 Switch (2-Way)"),
                      QString::number(DISEQC_SWITCH_2_1_0));
-        addSelection("DiSEqC v1.1 Switch (2-Way)",
+        addSelection(tr("DiSEqC v1.1 Switch (2-Way)"),
                      QString::number(DISEQC_SWITCH_2_1_1));
-        addSelection("DiSEqC v1.0 Switch (4-Way)",
+        addSelection(tr("DiSEqC v1.0 Switch (4-Way)"),
                      QString::number(DISEQC_SWITCH_4_1_0));
-        addSelection("DiSEqC v1.1 Switch (4-Way)",
+        addSelection(tr("DiSEqC v1.1 Switch (4-Way)"),
                      QString::number(DISEQC_SWITCH_4_1_1));
-        addSelection("DiSEqC v1.2 Positioner",
+        addSelection(tr("DiSEqC v1.2 Positioner"),
                      QString::number(DISEQC_POSITIONER_1_2));
-        addSelection("DiSEqC v1.3 Positioner (Goto X)",
+        addSelection(tr("DiSEqC v1.3 Positioner (Goto X)"),
                      QString::number(DISEQC_POSITIONER_X));
-        addSelection("DiSEqC v1.1 or 2.1 (10-way method2)",
+        addSelection(tr("DiSEqC v1.1 or 2.1 (10-way method2)"),
                      QString::number(DISEQC_POSITIONER_1_2_SWITCH_2));
-        addSelection("SW21 Switch",
+        addSelection(tr("SW21 Switch (2-Way)"),
                      QString::number(DISEQC_SW21));
-        addSelection("SW64 Switch",
+        addSelection(tr("SW64 Switch (3-Way)"),
                      QString::number(DISEQC_SW64));
         setHelpText(QObject::tr("Select the input type for DVB-S cards. "
                     "Leave as Single LNB/Input for DVB-C or DVB-T. "

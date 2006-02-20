@@ -270,16 +270,19 @@ bool DVBDiSEqC::SendDiSEqCMessage(DVBTuning& tuning, dvb_diseqc_master_cmd &cmd)
 
     usleep(DISEQC_SHORT_WAIT);
 
-    // Check to see if its a 1.1 or 1.2 device. If so repeat the message repeats times.
-    if ((tuning.diseqc_type == 3) || (tuning.diseqc_type == 5) || 
-        (tuning.diseqc_type == 6) || (tuning.diseqc_type == 7)) 
+    // Check to see if its a 1.1 or 1.2 device.
+    // If so repeat the message repeats times.
+    if ((tuning.diseqc_type == DISEQC_SWITCH_2_1_1)   ||
+        (tuning.diseqc_type == DISEQC_SWITCH_4_1_1)   || 
+        (tuning.diseqc_type == DISEQC_POSITIONER_1_2) ||
+        (tuning.diseqc_type == DISEQC_POSITIONER_X)) 
     {
 
         int repeats = repeat;
         while (repeats--) 
         {
 
-            if (tuning.diseqc_type == 7)
+            if (tuning.diseqc_type == DISEQC_POSITIONER_X)
             {
                 VERBOSE(VB_CHANNEL, LOC +
                         QString("Sending 1.3 Repeat Command: %1 %2 %3 %4 %5")
