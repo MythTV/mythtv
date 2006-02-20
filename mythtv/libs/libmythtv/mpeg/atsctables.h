@@ -50,17 +50,17 @@ class TableClass
   public:
     typedef enum
     {
-        UNKNOWN=-1,
-        TVCTc=0,
-        TVCTnc,
-        CVCTc,
-        CVCTnc,
-        ETTc,
-        DCCSCT,
-        EIT,
-        ETTe,
-        DCCT,
-        RRT,
+        UNKNOWN = -1,
+        TVCTc   =  0,
+        TVCTnc  =  1,
+        CVCTc   =  2,
+        CVCTnc  =  3,
+        ETTc    =  4,
+        DCCSCT  =  5,
+        EIT     =  6,
+        ETTe    =  7,
+        DCCT    =  8,
+        RRT     =  9,
     };
 };
 
