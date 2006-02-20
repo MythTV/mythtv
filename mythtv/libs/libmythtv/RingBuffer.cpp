@@ -851,15 +851,15 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
                  VERBOSE(VB_IMPORTANT,
                          LOC + "Taking too long to be allowed to read..");
                  readErr++;
-                 
+
                  // HACK Sometimes the readhead thread gets borked on startup.
-               /*  if ((readErr % 2) && (rbrpos ==0))
+                 if ((readErr > 2 && readErr % 2) && (rbrpos ==0))
                  {
                     VERBOSE(VB_IMPORTANT, "restarting readhead thread..");
                     KillReadAheadThread();
                     StartupReadAheadThread();
                  }                    
-                   */ 
+ 
                  if (readErr > 10)
                  {
                      VERBOSE(VB_IMPORTANT, LOC_ERR + "Took more than "
@@ -893,6 +893,12 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
                 VERBOSE(VB_IMPORTANT, LOC + "Waited " +
                         QString("%1").arg(elapsed/1000) +
                         " seconds for data to become available...");
+                if (livetvchain)
+                {
+                    VERBOSE(VB_IMPORTANT, "Checking to see if there's a "
+                                          "new livetv program to switch to..");
+                    livetvchain->ReloadAll();
+                }
             }
 
             bool quit = livetvchain && (livetvchain->NeedsToSwitch() || 
