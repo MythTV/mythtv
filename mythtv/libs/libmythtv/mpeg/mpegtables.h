@@ -285,45 +285,45 @@ class PSIPTable : public PESPacket
 
     // Section            Bits   Start Byte sbit
     // -----------------------------------------
-    // table_id             8       1.0       0
+    // table_id             8       0.0       0
     uint TableID(void) const { return StreamID(); }
 
-    // section_syntax_ind   1       2.0       8   should always be 1
-    // private_indicator    1       2.1       9   should always be 1
-    // reserved             2       2.2      10
+    // section_syntax_ind   1       1.0       8   should always be 1
+    // private_indicator    1       1.1       9   should always be 1
+    // reserved             2       1.2      10
 
-    // section_length      12       2.4      12   always less than 0xFFE
+    // section_length      12       1.4      12   always less than 0xFFE
     // adds 3 to the total section length to account for 3 bytes
     // before the end of the section length field.
     uint SectionLength(void) const { return Length() + 3; }
 
-    // table_id_extension  16       4.0      24   table dependent
+    // table_id_extension  16       3.0      24   table dependent
     uint TableIDExtension(void) const
-        { return (pesdata()[4]<<8) | pesdata()[5]; }
+        { return (pesdata()[3]<<8) | pesdata()[4]; }
 
-    // reserved             2       6.0      40
+    // reserved             2       5.0      40
 
-    // version_number       5       6.2      42
+    // version_number       5       5.2      42
     // incremented modulo 32 when table info changes
-    uint Version(void) const { return (pesdata()[6]>>1) & 0x1f; }
+    uint Version(void) const { return (pesdata()[5]>>2) & 0x1f; }
 
-    // current_next_ind     1       6.7      47
+    // current_next_ind     1       5.7      47
     // if 0 this table is not yet valid, but will be the next psip
     // table with the same sectionNumber(), tableIDExtension() and
     // tableID() to become valid.
-    bool IsCurrent(void) const { return bool(pesdata()[6]&1); }
+    bool IsCurrent(void) const { return bool(pesdata()[5]&1); }
 
-    // section_number       8       7.0      48
-    uint Section(void) const { return pesdata()[7]; }
+    // section_number       8       6.0      48
+    uint Section(void) const { return pesdata()[6]; }
 
-    // last_section_number  8       8.0      56
-    uint LastSection(void) const { return pesdata()[8]; }
+    // last_section_number  8       7.0      56
+    uint LastSection(void) const { return pesdata()[7]; }
 
     // this is only for real ATSC PSIP tables, not similar MPEG2 tables
-    // protocol_version     8       9.0      64   should always be 0 for now
-    uint ProtocolVersion(void) const { return pesdata()[9]; }
+    // protocol_version     8       8.0      64   should always be 0 for now
+    uint ProtocolVersion(void) const { return pesdata()[8]; }
 
-    // PSIP_table_data      x       9.0      72 (incl. protocolVersion)
+    // PSIP_table_data      x       8.0      72 (incl. protocolVersion)
     const unsigned char* psipdata(void) const
         { return pesdata() + PSIP_OFFSET; }
     unsigned char* psipdata(void)
@@ -336,22 +336,22 @@ class PSIPTable : public PESPacket
     void SetSectionLength(uint length) { SetLength(length-3); }
     void SetTableIDExtension(uint len)
     {
-        pesdata()[4] = (len>>8) & 0xff;
-        pesdata()[5] = len & 0xff;
+        pesdata()[3] = (len>>8) & 0xff;
+        pesdata()[4] = len & 0xff;
     }
     void SetVersionNumber(uint ver)
-        { pesdata()[6] = (pesdata()[6] & 0xc1) | ((ver & 0x1f)<<1); }
+        { pesdata()[5] = (pesdata()[6] & 0xc1) | ((ver & 0x1f)<<1); }
     void SetCurrent(bool cur)
-        { pesdata()[6] = (pesdata()[6] & 0xfe) | (cur ? 1 : 0); }
-    void SetSection(uint num) { pesdata()[7] = num; }
-    void SetLastSection(uint num) { pesdata()[8] = num; }
+        { pesdata()[5] = (pesdata()[6] & 0xfe) | (cur ? 1 : 0); }
+    void SetSection(uint num) { pesdata()[6] = num; }
+    void SetLastSection(uint num) { pesdata()[7] = num; }
 
     // only for real ATSC PSIP tables, not similar MPEG2 tables
-    //void setProtocolVersion(int ver) { pesdata()[7] = ver; }
+    void SetProtocolVersion(int ver) { pesdata()[8] = ver; }
 
     const QString toString(void) const;
 
-    static const uint PSIP_OFFSET = 9; // general PSIP header offset
+    static const uint PSIP_OFFSET = 8; // general PSIP header offset
 };
 
 /** \class ProgramAssociationTable
@@ -379,10 +379,9 @@ class ProgramAssociationTable : public PSIPTable
     static ProgramAssociationTable* CreateBlank(void)
     {
         TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data() + 4,
-               init_patheader, PSIP_OFFSET);
+        memcpy(tspacket->data() + 4, init_patheader, sizeof(init_patheader));
         PSIPTable psip = PSIPTable::View(*tspacket);
-        psip.SetLength(PSIP_OFFSET);
+        psip.SetLength(sizeof(init_patheader));
         ProgramAssociationTable *pat = new ProgramAssociationTable(psip);
         delete tspacket;
         return pat;
@@ -401,7 +400,7 @@ class ProgramAssociationTable : public PSIPTable
     uint TransportStreamID(void) const { return TableIDExtension(); }
 
     uint ProgramCount(void) const
-        { return (SectionLength()-PSIP_OFFSET-3)>>2; }
+        { return (SectionLength()-PSIP_OFFSET-2)>>2; }
 
     uint ProgramNumber(uint i) const
         { return (psipdata()[(i<<2)] << 8) | psipdata()[(i<<2) + 1]; }
@@ -459,7 +458,7 @@ class ProgramMapTable : public PSIPTable
         memcpy(tspacket->data() + 4,
                DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
         PSIPTable psip = PSIPTable::View(*tspacket);
-        psip.SetLength(PSIP_OFFSET);
+        psip.SetLength(sizeof(DEFAULT_PMT_HEADER));
         ProgramMapTable *pmt = new ProgramMapTable(psip);
         delete tspacket;
         return pmt;

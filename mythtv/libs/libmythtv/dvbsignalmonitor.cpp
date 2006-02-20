@@ -351,7 +351,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
         if (remainder > 0) // leftover bytes
             memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
     }
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "shutdown");
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "shutdown");
 
     if (GetStreamData())
     {
@@ -368,7 +368,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
     close(dvr_fd);
     delete[] buffer;
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "end");
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "end");
 }
 
 /** \fn DVBSignalMonitor::RunTableMonitorSR(void)

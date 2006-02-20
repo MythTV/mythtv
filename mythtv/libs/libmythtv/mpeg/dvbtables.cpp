@@ -7,7 +7,7 @@
 void NetworkInformationTable::Parse(void) const
 {
     _ptrs.clear();
-    _tsc_ptr = pesdata() + 11 + NetworkDescriptorsLength();
+    _tsc_ptr = pesdata() + 10 + NetworkDescriptorsLength();
     _ptrs.push_back(_tsc_ptr + 2);
     for (uint i = 0; i < TransportStreamCount(); i++)
         _ptrs.push_back(_ptrs[i] + 6 + TransportDescriptorsLength(i));
@@ -78,7 +78,7 @@ QString NetworkInformationTable::NetworkName() const
 void ServiceDescriptionTable::Parse(void) const
 {
     _ptrs.clear();
-    _ptrs.push_back(pesdata() + 12);
+    _ptrs.push_back(pesdata() + 11);
     uint i = 0;
     while ((_ptrs[i] + 5) < (pesdata() + Length()))
     {

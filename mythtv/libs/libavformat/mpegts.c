@@ -595,7 +595,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     if (mpegts_parse_pcrpid(mpegts_ctx, &p, p_end) < 0)
         HANDLE_PMT_PARSE_ERROR("PCR PID");
 
-    /* Extract prgoram info length, just so we can skip it */
+    /* Extract program info length, just so we can skip it */
     if (mpegts_parse_program_info_length(&p, p_end) < 0)
         HANDLE_PMT_PARSE_ERROR("program info");
 
