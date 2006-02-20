@@ -787,7 +787,15 @@ void RingBuffer::ReadAheadThread(void)
         }
 
         if (!readsallowed && used >= fill_min)
+        {
             readsallowed = true;
+            VERBOSE(VB_PLAYBACK, QString("reads allowed (%1 %2)").arg(used)
+                                                                .arg(fill_min));
+        }
+        else if (!readsallowed)
+            VERBOSE(VB_PLAYBACK, QString("buffering (%1 %2 %3)").arg(used)
+                                                                .arg(fill_min)
+                                                                .arg(ret));
 
         if (readsallowed && used < fill_min && !ateof && !setswitchtonext)
         {
