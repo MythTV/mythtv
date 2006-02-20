@@ -601,8 +601,16 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         switch (head.table_id)
         {
             case TableID::MGT:
-                ParseMGT(&head, &buffer[8], size-8);
+            {
+                if (Table[MGT]->AddSection(&head,0,0))
+                    break;
+
+                const PESPacket pes = PESPacket::ViewData(buffer);
+                const PSIPTable psip(pes);
+                const MasterGuideTable mgt(psip);
+                HandleMGT(mgt);
                 break;
+            }
             case TableID::TVCT:  
             case TableID::CVCT:
             {
@@ -2275,86 +2283,58 @@ QString SIParser::ParseMSS(uint8_t *buffer, int size)
 /*
  *  ATSC Table 0xC7 - Master Guide Table - PID 0x1FFB
  */
-void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
+void SIParser::HandleMGT(const MasterGuideTable &mgt)
 {
-    if (Table[MGT]->AddSection(head,0,0))
-        return;
-
-    uint16_t pos = 3;
-    uint16_t tables_defined = buffer[1] << 8 | buffer[2];;
-
-    for (int x = 0 ; x < tables_defined ; x++)
+    for (uint i = 0 ; i < mgt.TableCount(); i++)
     {
-        uint16_t table_type = buffer[pos] << 8 | buffer[pos+1];
-        uint16_t table_type_pid = (buffer[pos+2] & 0x1F) << 8 | buffer[pos+3];
-        uint32_t size = (buffer[pos+5] << 24) |
-            (buffer[pos+6] << 16) |
-            (buffer[pos+7] << 8) |
-            (buffer[pos+8]);
-
-        uint16_t descriptors_length =
-            (buffer[pos+9] & 0x0F) << 8 | buffer[pos+10];
-
-        switch (table_type)
+        const int table_class = mgt.TableClass(i);
+        const uint pid        = mgt.TablePID(i);
+        QString msg = QString(" on PID 0x%2").arg(pid,0,16);
+        if (table_class == TableClass::TVCTc)
         {
-            case 0x00 ... 0x03:
-                TableSourcePIDs.ServicesPID = table_type_pid;
-                TableSourcePIDs.ServicesMask = 0xFF;
-                if (table_type == 0x02)
-                {
-                    TableSourcePIDs.ServicesTable = TableID::CVCT;
-                    VERBOSE(VB_SIPARSER, LOC +
-                            QString("CVCT Present on PID 0x%1 (%2)")
-                            .arg(table_type_pid,0,16).arg(size));
-                }
-                if (table_type == 0x00)
-                {
-                    TableSourcePIDs.ServicesTable = TableID::TVCT;
-                    VERBOSE(VB_SIPARSER, LOC +
-                            QString("TVCT Present on PID 0x%1 (%2)")
-                            .arg(table_type_pid,0,16).arg(size));
-                }
-                break;
-            case 0x04:
-                TableSourcePIDs.ChannelETT = table_type_pid;
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("Channel ETT Present on PID 0x%1 (%2)")
-                        .arg(table_type_pid,0,16).arg(size));
-                break;
-
+            TableSourcePIDs.ServicesPID   = pid;
+            TableSourcePIDs.ServicesMask  = 0xFF;
+            TableSourcePIDs.ServicesTable = TableID::TVCT;
+            VERBOSE(VB_SIPARSER, LOC + "TVCT" + msg);
+        }
+        else if (table_class == TableClass::CVCTc)
+        {
+            TableSourcePIDs.ServicesPID   = pid;
+            TableSourcePIDs.ServicesMask  = 0xFF;
+            TableSourcePIDs.ServicesTable = TableID::CVCT;
+            VERBOSE(VB_SIPARSER, LOC + "CVCT" + msg);
+        }
+        else if (table_class == TableClass::ETTc)
+        {
+            TableSourcePIDs.ChannelETT = pid;
+            VERBOSE(VB_SIPARSER, LOC + "Channel ETT" + msg);
+        }
 #ifdef USING_DVB_EIT
-            case 0x100 ... 0x17F:
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("EIT-%1 Present on PID 0x%2")
-                        .arg(table_type - 0x100)
-                        .arg(table_type_pid,0,16));
-                Table[EVENTS]->AddPid(table_type_pid,0xCB,0xFF,
-                                      table_type - 0x100);
-                break;
-
-            case 0x200 ... 0x27F:
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("ETT-%1 Present on PID 0x%2")
-                        .arg(table_type - 0x200)
-                        .arg(table_type_pid,0,16));
-                Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,
-                                      table_type - 0x200);
-                break;
+        else if (table_class == TableClass::EIT)
+        {
+            const uint num = mgt.TableType(i) - 0x100;
+            VERBOSE(VB_SIPARSER, LOC + QString("EIT-%1").arg(num,2) + msg);
+            Table[EVENTS]->AddPid(pid, 0xCB, 0xFF, num);
+        }
+        else if (table_class == TableClass::ETTe)
+        {
+            const uint num = mgt.TableType(i) - 0x200;
+            VERBOSE(VB_SIPARSER, LOC + QString("ETT-%1").arg(num,2) + msg);
+            Table[EVENTS]->AddPid(pid, 0xCC, 0xFF, num);
+        }
 #endif // USING_DVB_EIT
-
-            default:
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("Unknown Table %1 in MGT on PID 0x%2")
-                        .arg(table_type).arg(table_type_pid,0,16));
-                break;
+        else
+        {
+            VERBOSE(VB_SIPARSER, LOC + "Unused Table " +
+                    mgt.TableClassString(i) + msg);
         }                    
-        pos += 11;
-        pos += descriptors_length;
     }
 }
 
 void SIParser::AddToServices(const VirtualChannelTable &vct)
 {
+    VERBOSE(VB_IMPORTANT, LOC + "AddToServices() cnt("
+            <<vct.ChannelCount()<<")");
     for (uint chan_idx = 0; chan_idx < vct.ChannelCount() ; chan_idx++)
     {
         // Do not add in Analog Channels in the VCT

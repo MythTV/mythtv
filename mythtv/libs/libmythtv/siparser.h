@@ -37,6 +37,7 @@ using namespace std;
 typedef void QMap_Events;
 #endif // !USING_DVB_EIT
 
+class MasterGuideTable;
 class VirtualChannelTable;
 
 /**
@@ -110,6 +111,7 @@ class SIParser : public QObject
     void CheckTrackers(void);
 
     // Functions that allow you to initialize the SIParser
+    void HandleMGT(const MasterGuideTable &mgt);
     void AddToServices(const VirtualChannelTable &vct);
 
   public slots:
