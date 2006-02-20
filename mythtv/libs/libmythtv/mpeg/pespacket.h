@@ -52,6 +52,15 @@ class PESPacket
         InitPESPacket(const_cast<TSPacket&>(*tspacket));
         _fullbuffer = const_cast<unsigned char*>(tspacket->data());
     }
+    // does not create it's own data
+    PESPacket(const unsigned char *pesdata, bool)
+        : _pesdata(const_cast<unsigned char*>(pesdata)),
+          _fullbuffer(const_cast<unsigned char*>(pesdata)),
+          _pesdataSize(0), _allocSize(0)
+    {
+        _badPacket = !VerifyCRC();
+        _pesdataSize = max(Length()-1 + (HasCRC() ? 4 : 0), (uint)0);
+    }
 
   private:
     //const PESPacket& operator=(const PESPacket& pkt);
@@ -64,9 +73,12 @@ class PESPacket
           _psiOffset(pkt._psiOffset),
           _ccLast(pkt._ccLast),
           _pesdataSize(pkt._pesdataSize),
-          _allocSize((pkt._allocSize) ? pkt._allocSize : 188),
+          _allocSize(pkt._allocSize),
           _badPacket(pkt._badPacket)
     { // clone
+        if (!_allocSize)
+            _allocSize = pkt._pesdataSize + (pkt._pesdata - pkt._fullbuffer);
+
         _fullbuffer = pes_alloc(_allocSize);
         memcpy(_fullbuffer, pkt._fullbuffer, _allocSize);
         _pesdata = _fullbuffer + (pkt._pesdata - pkt._fullbuffer);
@@ -93,7 +105,7 @@ class PESPacket
         //VirtualChannelTable vct;
 
     // may be modified
-    PESPacket(const TSPacket &tspacket, int start_code_prefix,
+    PESPacket(const TSPacket &tspacket,
               const unsigned char *pesdata, uint pes_size)
         : _ccLast(tspacket.ContinuityCounter()), _pesdataSize(pes_size)
     { // clone
@@ -121,6 +133,9 @@ class PESPacket
 
     static PESPacket View(TSPacket& tspacket)
         { return PESPacket(&tspacket, false); }
+
+    static const PESPacket ViewData(const unsigned char* pesdata)
+        { return PESPacket(pesdata, false); }
 
     bool IsClone() const { return bool(_allocSize); }
 

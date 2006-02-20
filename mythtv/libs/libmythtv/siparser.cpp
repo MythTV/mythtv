@@ -600,51 +600,43 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     {
         switch (head.table_id)
         {
-              case TableID::MGT:
-                  ParseMGT(&head, &buffer[8], size-8);
-                  break;
-              case TableID::TVCT:  
-              case TableID::CVCT:
-              {
-                  emit TableLoaded();
+            case TableID::MGT:
+                ParseMGT(&head, &buffer[8], size-8);
+                break;
+            case TableID::TVCT:  
+            case TableID::CVCT:
+            {
+                emit TableLoaded();
 
-                  if (Table[SERVICES]->AddSection(&head,0,0))
-                      break;
+                if (Table[SERVICES]->AddSection(&head,0,0))
+                    break;
 
-                  // We should have a PSIP table starting at 
-                  // stream_id in the buffer.
-                  // So lets construct a PSIP parsing object...
-                  TSPacket tspacket;
-                  tspacket.InitHeader(TSPacket::PAYLOAD_ONLY_HEADER);
-                  memcpy(tspacket.data()+4, buffer,
-                         min(TSPacket::PAYLOAD_SIZE, (uint)size));
-                  PESPacket pes(tspacket, 0, buffer, size+1);
-                  PSIPTable psip(pes);
-
-                  const VirtualChannelTable vct(psip);
-                  AddToServices(vct);
-              }
-              break;
-              case TableID::RRT:
-                  ParseRRT(&head, &buffer[8], size-8);
-                  break;
+                const PESPacket pes = PESPacket::ViewData(buffer);
+                const PSIPTable psip(pes);
+                const VirtualChannelTable vct(psip);
+                AddToServices(vct);
+            }
+            break;
+            case TableID::RRT:
+                ParseRRT(&head, &buffer[8], size-8);
+                break;
 #ifdef USING_DVB_EIT
-              case  TableID::EIT:
-                  ParseATSCEIT(&head, &buffer[8], size-8, pid);
-                  break;
-              case TableID::ETT:
-                  ParseETT(&head, &buffer[8], size-8, pid);
-                  break;
+            case TableID::EIT:
+                ParseATSCEIT(&head, &buffer[8], size-8, pid);
+                break;
+            case TableID::ETT:
+                ParseETT(&head, &buffer[8], size-8, pid);
+                break;
 #endif // USING_DVB_EIT
-              case TableID::STT:
-                  ParseSTT(&head, &buffer[8], size-8);
-                  break;
-              case TableID:: DCCT:
-                  ParseDCCT(&head, &buffer[8], size-8);
-                  break;
-              case TableID::DCCSCT:
-                  ParseDCCSCT(&head, &buffer[8], size-8);
-                  break;
+            case TableID::STT:
+                ParseSTT(&head, &buffer[8], size-8);
+                break;
+            case TableID:: DCCT:
+                ParseDCCT(&head, &buffer[8], size-8);
+                break;
+            case TableID::DCCSCT:
+                ParseDCCSCT(&head, &buffer[8], size-8);
+                break;
         }
     }
 
@@ -2311,12 +2303,16 @@ void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
                 if (table_type == 0x02)
                 {
                     TableSourcePIDs.ServicesTable = TableID::CVCT;
-                    VERBOSE(VB_SIPARSER, LOC + "CVCT Present");
+                    VERBOSE(VB_SIPARSER, LOC +
+                            QString("CVCT Present on PID 0x%1 (%2)")
+                            .arg(table_type_pid,0,16).arg(size));
                 }
                 if (table_type == 0x00)
                 {
                     TableSourcePIDs.ServicesTable = TableID::TVCT;
-                    VERBOSE(VB_SIPARSER, LOC + "TVCT Present");
+                    VERBOSE(VB_SIPARSER, LOC +
+                            QString("TVCT Present on PID 0x%1 (%2)")
+                            .arg(table_type_pid,0,16).arg(size));
                 }
                 break;
             case 0x04:
