@@ -2794,6 +2794,8 @@ QString ProgramInfo::RecStatusChar(void) const
         return QObject::tr("N", "RecStatusChar rsNotListed");
     case rsNeverRecord:
         return QObject::tr("V", "RecStatusChar rsNeverRecord");
+    case rsOffLine:
+        return QObject::tr("F", "RecStatusChar rsOffLine");
     default:
         return "-";
     }
@@ -2848,6 +2850,8 @@ QString ProgramInfo::RecStatusText(void) const
             return QObject::tr("Not Listed");
         case rsNeverRecord:
             return QObject::tr("Never Record");
+        case rsOffLine:
+            return QObject::tr("Recorder Off-Line");
         default:
             return QObject::tr("Unknown");
         }
@@ -2951,6 +2955,9 @@ QString ProgramInfo::RecStatusDesc(void) const
         case rsNeverRecord:
             message += QObject::tr("it was marked to never be recorded.");
             break;            
+        case rsOffLine:
+            message += QObject::tr("the backend recorder is off-line.");
+            break;
         default:
             message += QObject::tr("you should never see this.");
             break;

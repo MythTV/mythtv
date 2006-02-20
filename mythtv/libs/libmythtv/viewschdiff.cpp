@@ -518,6 +518,7 @@ void ViewScheduleDiff::updateList(QPainter *p)
                 else if (p->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");
                 else if (p->recstatus == rsConflict ||
+                         p->recstatus == rsOffLine ||
                          p->recstatus == rsAborted)
                     ltype->EnableForcedFont(i, "conflictingrecording");
                 else if (p->recstatus == rsWillRecord)

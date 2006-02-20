@@ -78,7 +78,8 @@ enum RecStatusType {
     rsLaterShowing = 8,
     rsRepeat = 9,
     rsInactive = 10,
-    rsNeverRecord = 11
+    rsNeverRecord = 11,
+    rsOffLine = 12
 };
 
 enum AvailableStatusType {

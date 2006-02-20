@@ -1651,7 +1651,8 @@ void ProgLister::updateList(QPainter *p)
 
                 ltype->SetItemText(i, 3, tmptitle);
 
-                if (pi->recstatus == rsConflict)
+                if (pi->recstatus == rsConflict ||
+                    pi->recstatus == rsOffLine)
                     ltype->EnableForcedFont(i, "conflicting");
                 else if (pi->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");

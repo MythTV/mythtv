@@ -2102,11 +2102,6 @@ void Scheduler::AddNewRecords(void)
 
     while (result.next())
     {
-        // Don't bother if the tuner card isn't on-line
-        int cardid = result.value(24).toInt();
-        if ((threadrunning || specsched) && !cardMap.contains(cardid))
-            continue;
-
         ProgramInfo *p = new ProgramInfo;
         p->reactivate = result.value(38).toInt();
         p->oldrecstatus = RecStatusType(result.value(37).toInt());
@@ -2139,7 +2134,7 @@ void Scheduler::AddNewRecords(void)
         p->recgroup = result.value(21).toString();
         p->playgroup = result.value(36).toString();
         p->chancommfree = result.value(23).toInt();
-        p->cardid = cardid;
+        p->cardid = result.value(24).toInt();
         p->inputid = result.value(25).toInt();
         p->shareable = result.value(26).toInt();
         p->seriesid = result.value(27).toString();
@@ -2147,7 +2142,6 @@ void Scheduler::AddNewRecords(void)
         p->catType = result.value(29).toString();
         p->year = result.value(30).toString();
         p->stars =  result.value(31).toDouble();
-
 
         if (result.value(32).isNull())
         {
@@ -2202,6 +2196,10 @@ void Scheduler::AddNewRecords(void)
         }
         if (p == NULL)
             continue;
+
+        // Check for rsOffLine
+        if ((threadrunning || specsched) && !cardMap.contains(p->cardid))
+            p->recstatus = rsOffLine;
 
         // Check for rsTooManyRecordings
         if (checkTooMany && tooManyMap[p->recordid] && !p->reactivate)

@@ -932,7 +932,8 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 }
 
                 int recStat;
-                if (proginfo->recstatus == rsConflict)
+                if (proginfo->recstatus == rsConflict ||
+                    proginfo->recstatus == rsOffLine)
                     recStat = 2;
                 if (proginfo->recstatus <= rsWillRecord)
                     recStat = 1;

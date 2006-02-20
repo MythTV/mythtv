@@ -594,7 +594,8 @@ void PreviousList::updateList(QPainter *p)
                 if (pi->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");
                 else if (pi->recstatus < rsRecorded ||
-                         pi->recstatus == rsConflict)
+                         pi->recstatus == rsConflict ||
+                         pi->recstatus == rsOffLine)
                     ltype->EnableForcedFont(i, "conflicting");
                 else if (pi->recstatus > rsRecorded)
                     ltype->EnableForcedFont(i, "inactive");

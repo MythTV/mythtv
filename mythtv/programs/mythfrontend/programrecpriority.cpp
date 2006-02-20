@@ -792,7 +792,8 @@ void ProgramRecPriority::FillList(void)
         if (s->recendts > now)
         {
             listMatch[s->recordid]++;
-            if (s->recstatus == rsConflict)
+            if (s->recstatus == rsConflict ||
+                s->recstatus == rsOffLine)
                 conMatch[s->recordid]++;
             else if (s->recstatus == rsWillRecord)
                 recMatch[s->recordid]++;
