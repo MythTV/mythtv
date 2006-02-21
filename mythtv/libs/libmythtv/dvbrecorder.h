@@ -87,8 +87,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
   private:
     void TeardownAll(void);
 
-    bool Poll(void) const;
-
     uint ProcessDataTS(unsigned char *buffer, uint len);
     bool ProcessTSPacket(const TSPacket& tspacket);
 
@@ -160,7 +158,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     mutable uint        _continuity_error_count;
     mutable uint        _stream_overflow_count;
     mutable uint        _bad_packet_count;
-    mutable MythTimer   _poll_timer;
 
     // Constants
     static const int PMT_PID;
