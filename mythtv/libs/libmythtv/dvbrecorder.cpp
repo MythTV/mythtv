@@ -88,7 +88,6 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _drb(NULL),
       // Options set in SetOption()
       _card_number_option(0), _record_transport_stream_option(false),
-      _hw_decoder_option(false),
       // DVB stuff
       dvbchannel(advbchannel),
       _reset_pid_filters(true),
@@ -161,8 +160,6 @@ void DVBRecorder::SetOption(const QString &name, int value)
         _card_number_option = value;
         videodevice = QString::number(value);
     }
-    else if (name == "hw_decoder")
-        _hw_decoder_option = (value == 1);
     else if (name == "recordts")
         _record_transport_stream_option = (value == 1);
     else
@@ -370,50 +367,15 @@ bool DVBRecorder::OpenFilters(void)
             (*es).Type == ES_TYPE_VIDEO_MPEG2)
             videoMissing = false;
             
-        if (_hw_decoder_option)
-        {
-            switch ((*es).Type)
-            {
-                case ES_TYPE_AUDIO_MPEG1:
-                case ES_TYPE_AUDIO_MPEG2:
-                    pes_type = DMX_PES_AUDIO;
-                    break;
-                case ES_TYPE_VIDEO_MPEG1:
-                case ES_TYPE_VIDEO_MPEG2:
-                    pes_type = DMX_PES_VIDEO;
-                    break;
-                case ES_TYPE_TELETEXT:
-                    pes_type = DMX_PES_TELETEXT;
-                    break;
-                case ES_TYPE_SUBTITLE:
-                    pes_type = DMX_PES_SUBTITLE;
-                    break;
-                default:
-                    pes_type = DMX_PES_OTHER;
-                    break;
-            }
-        }
-        else
-            pes_type = DMX_PES_OTHER;
+        pes_type = DMX_PES_OTHER;
 
         OpenFilter(pid, (*es).Type, pes_type, (*es).Orig_Type);
 
-        if (_hw_decoder_option)
-        {
-            // Set PCRPID if it's not the same as video
-            if ((pes_type == DMX_PES_VIDEO) &&
-                (pid != _input_pmt.PCRPID) &&
-                (_input_pmt.PCRPID != 0))
-            {
-                OpenFilter(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_PCR,
-                            (*es).Orig_Type);
-            }
-        }
-        else if (pid == _input_pmt.PCRPID)
+        if (pid == _input_pmt.PCRPID)
             need_pcr_pid = false;
     }
 
-    if (!_hw_decoder_option && need_pcr_pid && (_input_pmt.PCRPID != 0))
+    if (need_pcr_pid && (_input_pmt.PCRPID != 0))
         OpenFilter(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_OTHER,
                     (*es).Orig_Type);
 
@@ -1105,117 +1067,6 @@ static void print_pmt_info(
             "\t\t\tA/V Streams are " + ((fta ? "unencrypted" : "ENCRYPTED")));
 }
 
-/// processes pmt program list for things to record
-/// return true if audio is found
-bool select_streams_for_hw_decode(QValueList<ElementaryPIDObject> &pmt_list,
-                                  bool use_ts,
-                                  bool use_language_pref = true)
-{
-    // Wanted stream types:
-    QValueList<ES_Type> StreamTypes;
-    StreamTypes += ES_TYPE_VIDEO_MPEG1;
-    StreamTypes += ES_TYPE_VIDEO_MPEG2;
-    StreamTypes += ES_TYPE_AUDIO_MPEG1;
-    StreamTypes += ES_TYPE_AUDIO_MPEG2;
-    StreamTypes += ES_TYPE_AUDIO_AC3;
-    if (use_ts)
-    {
-        // The following types are only supported with TS recording
-        StreamTypes += ES_TYPE_AUDIO_DTS;
-        StreamTypes += ES_TYPE_AUDIO_AAC;
-        StreamTypes += ES_TYPE_TELETEXT;
-        StreamTypes += ES_TYPE_SUBTITLE;
-    }
-
-    QMap<ES_Type, bool> flagged;
-    // Wanted languages:
-    QStringList preferred_languages;
-    if (use_language_pref)
-        preferred_languages = iso639_get_language_list();
-
-    QValueList<ElementaryPIDObject>::iterator it;
-    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
-    {
-        (*it).Record = false;
-        if (!StreamTypes.contains((*it).Type))
-        {
-            // Type not wanted
-            continue;
-        }
-
-        if (((*it).Type == ES_TYPE_AUDIO_MPEG1) ||
-            ((*it).Type == ES_TYPE_AUDIO_MPEG2) ||
-            ((*it).Type == ES_TYPE_AUDIO_AC3))
-        {
-            bool ignore = false;
-            // Check for audio descriptors
-            DescriptorList::Iterator dit;
-            for (dit = (*it).Descriptors.begin();
-                 dit != (*it).Descriptors.end(); ++dit)
-            {
-                // Check for "Hearing impaired" or 
-                // "Visual impaired commentary" stream
-                if (((*dit).Data[0] == 0x0A) &&
-                    ((*dit).Data[5] & 0xFE == 0x02))
-                {
-                    ignore = true;
-                    break;
-                }
-            }
-
-            if (ignore)
-                continue; // Ignore this stream
-        }
-
-        // Limit hardware decoders to one A/V stream
-        switch ((*it).Type)
-        {
-            case ES_TYPE_VIDEO_MPEG1:
-            case ES_TYPE_VIDEO_MPEG2:
-                if (flagged.contains(ES_TYPE_VIDEO_MPEG1) ||
-                    flagged.contains(ES_TYPE_VIDEO_MPEG2))
-                {
-                    continue; // Ignore this stream
-                }
-                break;
-
-            case ES_TYPE_AUDIO_MPEG1: 
-            case ES_TYPE_AUDIO_MPEG2:
-            case ES_TYPE_AUDIO_AC3:
-            case ES_TYPE_AUDIO_DTS:
-            case ES_TYPE_AUDIO_AAC:
-                if (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
-                    flagged.contains(ES_TYPE_AUDIO_MPEG2) ||
-                    flagged.contains(ES_TYPE_AUDIO_AC3)   ||
-                    flagged.contains(ES_TYPE_AUDIO_DTS)   ||
-                    flagged.contains(ES_TYPE_AUDIO_AAC))
-                {
-                    continue; // Ignore this stream
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        // Record if no specific language wanted or component
-        // has no language or this is a desirable language.
-        if (preferred_languages.isEmpty() ||
-            (*it).Language.isEmpty() ||
-            preferred_languages.contains((*it).Language))
-        {
-            (*it).Record = true;
-            flagged[(*it).Type] = true;
-        }
-    }
-
-    return (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
-            flagged.contains(ES_TYPE_AUDIO_MPEG2) ||
-            flagged.contains(ES_TYPE_AUDIO_AC3)   ||
-            flagged.contains(ES_TYPE_AUDIO_DTS)   ||
-            flagged.contains(ES_TYPE_AUDIO_AAC));
-}
-
 /** \fn DVBRecorder::AutoPID(void)
  *  \brief Process PMT and decide which components should be recorded
  *
@@ -1231,28 +1082,16 @@ void DVBRecorder::AutoPID(void)
     QValueList<ElementaryPIDObject> &pmt_list = _input_pmt.Components;
     QValueList<ElementaryPIDObject>::iterator it;
 
-    if (_hw_decoder_option)
+    // If this is not for a hardware decoder, record everything
+    // we know about (ffmpeg doesn't like some DVB streams).
+    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
     {
-        bool ts = _record_transport_stream_option;
-        if (!select_streams_for_hw_decode(pmt_list, ts))
-            select_streams_for_hw_decode(pmt_list, ts, false);
-    }
-    else
-    {
-        // If this is not for a hardware decoder, record everything
-        // we know about (ffmpeg doesn't like some DVB streams).
-        for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
-        {
-            desc_list_t list;
-            DescList_to_desc_list((*it).Descriptors, list);
-            uint type = StreamID::Normalize((*it).Orig_Type, list);
-            if (StreamID::IsAudio(type) || StreamID::IsVideo(type) ||
-                (ES_TYPE_TELETEXT == (*it).Type) ||
-                (ES_TYPE_SUBTITLE == (*it).Type))
-            {                
-                (*it).Record = true;
-            }
-        }
+        desc_list_t list;
+        DescList_to_desc_list((*it).Descriptors, list);
+        uint type = StreamID::Normalize((*it).Orig_Type, list);
+        (*it).Record |= (StreamID::IsAudio(type) || StreamID::IsVideo(type) ||
+                         (ES_TYPE_TELETEXT == (*it).Type) ||
+                         (ES_TYPE_SUBTITLE == (*it).Type));
     }
 
     print_pmt_info(LOC, pmt_list,

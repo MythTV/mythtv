@@ -137,12 +137,11 @@ milliseconds how long it should take to get a signal and
 channel lock respectively. Signal lock detection is 
 currently only supported on "DVB" and "HDTV" card types.
 
-The 'dvb_swfilter', 'dvb_recordts', 'dvb_sat_type', 
-'dvb_wait_for_seqstart',
-'skipbtaudio', 'dvb_on_demand', 'dvb_diseqc_type' and 
-'dvb_hw_decoder' are all "DVB" specific configuration parameters.
+The 'dvb_swfilter', 'dvb_sat_type', 'dvb_wait_for_seqstart',
+'skipbtaudio', 'dvb_on_demand', and 'dvb_diseqc_type' columns
+are all "DVB" specific configuration parameters.
 
-Both 'dvb_dmx_buf_size' and 'dvb_pkt_buf_size' are unused, and
+Both 'dvb_recordts' and 'dvb_hw_decoder' are unused, and
 will be dropped in future versions of MythTV.
 
 The 'firewire_port', 'firewire_node', 'firewire_speed',
@@ -2039,6 +2038,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 
 // Drop xvmc_buffer_settings table in 0.20
 // Drop dvb_dmx_buf_size and dvb_pkt_buf_size columns of channel in 0.20
+//"ALTER TABLE capturecard DROP COLUMN dvb_recordts;" in 0.21
+//"ALTER TABLE capturecard DROP COLUMN dvb_hw_decoder;" in 0.21
 
     return true;
 }

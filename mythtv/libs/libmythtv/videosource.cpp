@@ -666,42 +666,6 @@ class DVBCardName: public LabelSetting, public TransientStorage
     };
 };
 
-class DVBHwDecoder: public CheckBoxSetting, public CCSetting
-{
-  public:
-    DVBHwDecoder(const CaptureCard& parent)
-        : CCSetting(parent, "dvb_hw_decoder")
-    {
-        setLabel(QObject::tr("Using hardware MPEG decoder"));
-        setHelpText(
-            QObject::tr("This reduces the complexity of the stream that "
-                        "MythTV records so that it can be fed directly to "
-                        "a hardware MPEG decoder.") + " " +
-            QObject::tr("Specifically, MythTV will record only one audio "
-                        "and one subtitle stream.") + " " +
-            QObject::tr("You will want to also set preferred languages in "
-                        "the frontend's "
-                        "Utilities/Setup:Setup:TV Settings:General(page 3)."));
-    };
-};
-
-#if 0
-class DVBRecordTS: public CheckBoxSetting, public CCSetting
-{
-  public:
-    DVBRecordTS(const CaptureCard& parent)
-        : CCSetting(parent, "dvb_recordts")
-    {
-        setLabel(QObject::tr("Store recordings in TS format."));
-        setHelpText(
-            QObject::tr("Use Transport Stream format as the storage format "
-                        "as opposed to using the deprecated Program Stream "
-                        "conversion. The conversion loses data, and forces "
-                        "MythTV to disable some tuning safety checks."));
-    };
-};
-#endif
-
 class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
 {
   public:
@@ -2109,7 +2073,6 @@ RecorderOptions::RecorderOptions(CaptureCard& parent)
     rec->setLabel(QObject::tr("Recorder Options"));
     rec->setUseLabel(false);
 
-    rec->addChild(new DVBHwDecoder(parent));
     rec->addChild(new DVBNoSeqStart(parent));
     rec->addChild(new DVBOnDemand(parent));
     addChild(rec);

@@ -125,7 +125,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     // Options set in SetOption()
     int             _card_number_option;
     bool            _record_transport_stream_option;
-    bool            _hw_decoder_option;
 
     // DVB stuff
     DVBChannel*     dvbchannel;
