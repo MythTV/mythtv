@@ -459,7 +459,7 @@ class EventInformationTable : public PSIPTable
     uint SourceID() const { return TableIDExtension(); }
 
     // num_events_in_section    8   9.0
-    uint EventCount() const { return pesdata()[9]; }
+    uint EventCount() const { return psipdata()[1]; }
     // for (j = 0; j< num_events_in_section;j++)
     // {
     //   reserved               2   0.0    3
@@ -548,21 +548,24 @@ class ExtendedTextTable : public PSIPTable
     ~ExtendedTextTable() { ; }
 
     uint ExtendedTextTableID() const { return TableIDExtension(); }
-    void SetExtendedTextTableID(uint id) { SetTableIDExtension(id); }
+    void SetExtendedTextTableID(uint id)
+        { SetTableIDExtension(id); }
 
     // ETM_id                  32  10.0
     //                    31..16      15..2 iff  1..0
     // channel ETM_id   source_id       0         00
     // event   ETM_id   source_id   event_id      10
-    bool IsChannelETM() const { return 0==(pesdata()[12]&3); }
-    bool IsEventETM() const   { return 2==(pesdata()[12]&3); }
-    int SourceID() const { return (pesdata()[9]<<8) | pesdata()[10]; }
-    int EventID() const  { return (pesdata()[11]<<6) | (pesdata()[12]>>2); }
+    bool IsChannelETM(void)    const { return 0 == (psipdata()[4] & 3); }
+    bool IsEventETM(void)      const { return 2 == (psipdata()[4] & 3); }
+    uint SourceID(void) const
+        { return (psipdata()[1] << 8) | psipdata()[2]; }
+    uint EventID(void) const
+        { return (psipdata()[3] << 6) | (psipdata()[4] >> 2); }
 
     // extended_text_message    *  14.0  multiple string structure a/65b p81
     const MultipleStringStructure ExtendedTextMessage() const
     {
-        return MultipleStringStructure(pesdata()+13);
+        return MultipleStringStructure(psipdata() + 5);
     }
 
     QString toString() const;

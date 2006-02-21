@@ -571,31 +571,41 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     // Parse ATSC specific tables
     if (SIStandard == SI_STANDARD_ATSC)
     {
-        if (TableID::MGT == head.table_id &&
+        const PESPacket pes = PESPacket::ViewData(buffer);
+        const PSIPTable psip(pes);
+
+        if (TableID::MGT == psip.TableID() &&
             !Table[MGT]->AddSection(&head, 0, 0))
         {
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
             const MasterGuideTable mgt(psip);
             HandleMGT(&mgt);
         }
-        else if ((TableID::TVCT == head.table_id ||
-                  TableID::CVCT == head.table_id) &&
+        else if ((TableID::TVCT == psip.TableID() ||
+                  TableID::CVCT == psip.TableID()) &&
                  !Table[SERVICES]->AddSection(&head, 0, 0))
         {
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
             const VirtualChannelTable vct(psip);
             HandleVCT(pid, &vct);
         }
-        else if (TableID::STT == head.table_id &&
+        else if (TableID::STT == psip.TableID() &&
                  !Table[STT]->AddSection(&head, 0, 0))
         {
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
             const SystemTimeTable stt(psip);
             HandleSTT(&stt);
         }
+#ifdef USING_DVB_EIT
+        if (TableID::EIT == psip.TableID() &&
+            !Table[EVENTS]->AddSection(&head, psip.TableIDExtension(), pid))
+        {
+            const EventInformationTable eit(psip);
+            HandleEIT(pid, &eit);
+        }
+        else if (TableID::ETT == psip.TableID())
+        {
+            const ExtendedTextTable ett(psip);
+            HandleETT(pid, &ett);
+        }
+#endif // USING_DVB_EIT
     }
 
 #ifdef USING_DVB_EIT
@@ -615,13 +625,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
                         TableID::SC_EITendo >= head.table_id);
         if (process_eit)
             ParseDVBEIT(pid, &head, &buffer[8], size - 8);
-    }
-    else if (SIStandard == SI_STANDARD_ATSC)
-    {
-        if (TableID::EIT == head.table_id)
-            ParseATSCEIT(&head, &buffer[8], size - 8, pid);
-        else if (TableID::ETT == head.table_id)
-            ParseATSCETT(&head, &buffer[8], size - 8, pid);
     }
 #endif // USING_DVB_EIT
 }
@@ -2191,55 +2194,6 @@ void SIParser::ParseDescSubtitling(uint8_t *buffer, int size)
 }
 
 /*------------------------------------------------------------------------
- *   ATSC HELPER PARSERS
- *------------------------------------------------------------------------*/
-
-QDateTime SIParser::ConvertATSCDate(uint32_t offset)
-{
-// TODO: Clean this up its a mess right now to get it to localtime
-    QDateTime ATSCEPOC = QDateTime(QDate(1980,1,6));
-    // Get event time and add on GPS Second Difference
-    // QDateTime UTCTime = 
-    //     ATSCEPOC.addSecs(offset - (((STTHandler*) Table[STT])->GPSOffset));
-    QDateTime UTCTime = ATSCEPOC.addSecs(offset - 13 );
-
-    // Convert to localtime
-    return MythUTCToLocal(UTCTime);
-}
-
-/*
- * Global ATSC Multiple String Format Parser into QString(s)
- */
-QString SIParser::ParseMSS(uint8_t *buffer, int size)
-{
-    (void) size;
-
-    MultipleStringStructure mss(buffer);
-
-    if (mss.StringCount() != 1)
-    {
-        VERBOSE(VB_EIT, LOC + "Multiple strings not yet decoded." +
-                mss.toString());
-
-        if (mss.StringCount() < 1)
-            return "";
-    }
-
-    if (mss.SegmentCount(0) != 1)
-    {
-        VERBOSE(VB_EIT, LOC + "Multiple segment strings not yet decoded." +
-                mss.toString());
-
-        if (mss.SegmentCount(0) < 1)
-            return "";
-    }
-
-    QString str = mss.CompressedString(0,0);
-
-    return str;
-}
-
-/*------------------------------------------------------------------------
  *   ATSC TABLE PARSERS
  *------------------------------------------------------------------------*/
 
@@ -2356,103 +2310,73 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
 /*
  *  ATSC Table 0xCB - Event Information Table - PID Varies
  */
-void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
-                            int size, uint16_t pid)
+void SIParser::HandleEIT(uint pid, const EventInformationTable *eit)
 {
-    (void) head;
-    (void) buffer;
-    (void) size;
     (void) pid;
+    (void) eit;
+
 #ifdef USING_DVB_EIT
-
-    if (Table[EVENTS]->AddSection(head, head->table_id_ext, pid))
-        return;
-
-    Event e;
-
-    uint8_t num_events = buffer[1];
-    uint16_t pos = 2, lentotal = 0, len = 0;
-
-    int atsc_src_id = sourceid_to_channel[head->table_id_ext];
+    int atsc_src_id = sourceid_to_channel[eit->SourceID()];
     if (!atsc_src_id)
     {
-        VERBOSE(VB_EIT, LOC + "ParseATSCEIT(): " +
+        VERBOSE(VB_EIT, LOC + "HandleEIT(): " +
                 QString("Ignoring data. Source %1 not in map.")
-                .arg(head->table_id_ext));
+                .arg(eit->SourceID()));
         return;
     }
     else
     {
-        VERBOSE(VB_EIT, LOC + "ParseATSCEIT(): " +
+        VERBOSE(VB_EIT, LOC + "HandleEIT(): " +
                 QString("Adding data. ATSC Channel is %1_%2.")
                 .arg(atsc_src_id >> 8).arg(atsc_src_id & 0xff));
     }   
 
-    for (int z = 0; z < num_events; z++)
+    EventHandler *eh = (EventHandler*) Table[EVENTS];
+    QMap_Events  &ev = eh->Events[eit->SourceID()];
+
+    for (uint i = 0; i < eit->EventCount(); i++)
     {
-        e.Reset();
-        e.SourcePID = pid;
-        uint16_t event_id = ((buffer[pos] & 0x3F) << 8) | buffer[pos+1];
-        uint32_t start_time_offset =
-            buffer[pos+2] << 24 | buffer[pos+3] << 16 |
-            buffer[pos+4] << 8  | buffer[pos+5];
+        Event e;
+        e.SourcePID    = pid;
+        e.StartTime    = MythUTCToLocal(eit->StartTimeGPS(i).addSecs(-13));
+        e.EndTime      = e.StartTime.addSecs(eit->LengthInSeconds(i));
+        e.ETM_Location = eit->ETMLocation(i);
+        e.ServiceID    = atsc_src_id;
+        e.ATSC         = true;
+        e.Event_Name   = eit->title(i).CompressedString(0,0);
 
-        e.StartTime = ConvertATSCDate(start_time_offset);
-        e.ETM_Location = (buffer[pos+6] & 0x30 ) >> 4;
-
-        uint32_t length_in_seconds =
-            (buffer[pos+6] & 0x0F) << 16 | buffer[pos+7] << 8 | buffer[pos+8];
-        e.EndTime = e.StartTime.addSecs(length_in_seconds);
-
-        e.ServiceID = atsc_src_id;
-        e.ATSC = true;
-
-        uint8_t title_length = buffer[pos+9];
-        e.Event_Name = ParseMSS(&buffer[pos+10], title_length);
-
-#ifdef EIT_DEBUG_SID
-        VERBOSE(VB_EIT, LOC + "ParseATSCEIT(): " +
-                QString("[%1][%2]: %3\t%4 - %5")
-                .arg(atsc_src_id).arg(event_id)
-                .arg(e.Event_Name.ascii(), 20)
-                .arg(e.StartTime.toString("MM/dd hh:mm"))
-                .arg(e.EndTime.toString("hh:mm")));
-#endif
-        pos += (title_length + 10);
-
-        uint16_t descriptors_length =
-            (buffer[pos] & 0x0F) << 8 | buffer[pos+1];
-
-        lentotal = 0;
-        while (descriptors_length > lentotal)
+        desc_list_t list = MPEGDescriptor::Parse(
+            eit->Descriptors(i), eit->DescriptorsLength(i));
+        
+        desc_list_t::const_iterator it;
+        for (it = list.begin(); it != list.end(); ++it)
         {
-            switch (buffer[pos + 2 + lentotal])
+            switch ((*it)[0])
             {
                 case DescriptorID::caption_service:
                     //TODO: ATSC Caption Descriptor
                     break;
                 case DescriptorID::content_advisory:
                     // Content Advisory Decriptor
-                    ParseDescATSCContentAdvisory(
-                        &buffer[pos + 2 + lentotal],
-                        buffer[pos + 3 + lentotal]);
+                    ParseDescATSCContentAdvisory(*it, (*it)[1] + 2);
                     break;
                 default:
-                    ProcessUnusedDescriptor(
-                        pid,
-                        &buffer[pos + 2 + lentotal],
-                        buffer[pos + 3 + lentotal] + 2);
+                    ProcessUnusedDescriptor(pid, *it, (*it)[1] + 2);
                     break;
             }
-            len = buffer[pos + 3 + lentotal];
-            lentotal += (len + 2);
         }
 
-        pos += (descriptors_length + 2);
-        eitfixup.Fix(e, PrivateTypes.EITFixUp);
+#ifdef EIT_DEBUG_SID
+        VERBOSE(VB_EIT, LOC + "HandleEIT(): " +
+                QString("[%1][%2]: %3\t%4 - %5")
+                .arg(atsc_src_id).arg(eit->EventID(i))
+                .arg(e.Event_Name.ascii(), 20)
+                .arg(e.StartTime.toString("MM/dd hh:mm"))
+                .arg(e.EndTime.toString("hh:mm")));
+#endif
 
-        EventHandler *eh = (EventHandler*) Table[EVENTS];
-        eh->Events[head->table_id_ext][event_id] = e;
+        eitfixup.Fix(e, PrivateTypes.EITFixUp);
+        ev[eit->EventID(i)] = e;
     }
 #endif //USING_DVB_EIT
 }
@@ -2460,33 +2384,24 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
 /*
  *  ATSC Table 0xCC - Extended Text Table - PID Varies
  */
-void SIParser::ParseATSCETT(tablehead_t */*head*/, uint8_t *buffer,
-                            int size, uint16_t /*pid*/)
+void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
 {
-    (void) buffer;
-    (void) size;
 #ifdef USING_DVB_EIT
-    int source_id = buffer[1] << 8 | buffer[2];
-    int etm_id    = buffer[3] << 8 | buffer[4];
-    int etm_id2   = etm_id >> 2;
-
-    if ((etm_id & 0x03) != 2)
-        return;
-
-    int atsc_src_id = sourceid_to_channel[source_id];
+    if (!ett->IsEventETM())
+        return; // decode only guide ETTs
+    
+    const uint atsc_src_id = sourceid_to_channel[ett->SourceID()];
     if (!atsc_src_id)
-        return;
+        return; // and we need atscsrcid...
 
     EventHandler *eh = (EventHandler*) Table[EVENTS];
-    if (eh->Events[source_id].contains(etm_id2) &&
-        eh->Events[source_id][etm_id2].ETM_Location)
+    QMap_Events  &ev = eh->Events[ett->SourceID()];
+    QMap_Events::iterator it = ev.find(ett->EventID());
+    if (it != ev.end() && (*it).ETM_Location)
     {
-        eh->Events[source_id][etm_id2].Description =
-            ParseMSS(&buffer[5], size - 5);
-
-        eitfixup.Fix(eh->Events[source_id][etm_id2], PrivateTypes.EITFixUp);
-
-        eh->Events[source_id][etm_id2].ETM_Location = 0;
+        (*it).ETM_Location = 0;
+        (*it).Description  = ett->ExtendedTextMessage().CompressedString(0,0);
+        eitfixup.Fix(*it, PrivateTypes.EITFixUp);
     }
 #endif //USING_DVB_EIT
 }
@@ -2504,8 +2419,7 @@ void SIParser::HandleSTT(const SystemTimeTable *stt)
  *   ATSC DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
 
-// TODO: Use this descriptor parser
-void SIParser::ParseDescATSCContentAdvisory(uint8_t *buffer, int size)
+void SIParser::ParseDescATSCContentAdvisory(const uint8_t *buffer, int size)
 {
 
     (void) buffer;
@@ -2523,7 +2437,10 @@ void SIParser::ParseDescATSCContentAdvisory(uint8_t *buffer, int size)
         for (int y = 0 ; y < dimensions ; y++)
             pos += 2;
         if (buffer[pos] > 0)
-            temp = ParseMSS(&buffer[pos+1],buffer[pos]);
+        {
+            MultipleStringStructure mss(&buffer[pos+1]);
+            temp = mss.CompressedString(0, 0);
+        }
         pos += buffer[pos] + 1;
     }
 

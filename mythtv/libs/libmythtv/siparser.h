@@ -40,6 +40,8 @@ typedef void QMap_Events;
 class MasterGuideTable;
 class VirtualChannelTable;
 class SystemTimeTable;
+class EventInformationTable;
+class ExtendedTextTable;
 
 /**
  *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
@@ -114,10 +116,11 @@ class SIParser : public QObject
   public slots:
     virtual void deleteLater(void);
 
-    // Functions that allow you to initialize the SIParser
     void HandleMGT(const MasterGuideTable*);
-    void HandleVCT(uint, const VirtualChannelTable*);
     void HandleSTT(const SystemTimeTable*);
+    void HandleVCT(uint, const VirtualChannelTable*);
+    void HandleEIT(uint, const EventInformationTable*);
+    void HandleETT(uint, const ExtendedTextTable*);
 
   signals:
     void FindTransportsComplete(void);
@@ -199,18 +202,8 @@ class SIParser : public QObject
     void ProcessComponentDescriptor     (const uint8_t*, uint sz, Event &e);
 #endif //USING_DVB_EIT
 
-    // ATSC Helper Parsers
-    QDateTime ConvertATSCDate(uint32_t offset);
-    QString ParseMSS(uint8_t* buffer, int size);
-
-    // ATSC Table Parsers
-    void ParseATSCEIT(tablehead_t* head, uint8_t* buffer, int size,
-                      uint16_t pid);
-    void ParseATSCETT(tablehead_t* head, uint8_t* buffer, int size,
-                      uint16_t pid);
-
     // ATSC Descriptor Parsers
-    void ParseDescATSCContentAdvisory(uint8_t* buffer, int size);
+    void ParseDescATSCContentAdvisory(const uint8_t* buffer, int size);
 
     void InitializeCategories(void);
 
