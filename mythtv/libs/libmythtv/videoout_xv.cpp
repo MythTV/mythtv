@@ -2752,10 +2752,11 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         return;
     }
 
-    if (chroma_osd)
+    if (chroma_osd && osd)
     {
         QMutexLocker locker(&global_lock);
-        needrepaint |= chroma_osd->ProcessOSD(osd);
+        if (!embedding)
+            needrepaint |= chroma_osd->ProcessOSD(osd);
         vbuffers.UnlockFrame(frame, "ProcessFrameXvMC");
         return;
     }
