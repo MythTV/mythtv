@@ -33,6 +33,10 @@
 #define LOC QString("SIParser: ")
 #define LOC_ERR QString("SIParser, Error: ")
 
+static QString huffman1_to_string(const unsigned char *compressed,
+                                  uint size,
+                                  const unsigned char *table);
+
 static uint huffman2_to_string(const unsigned char *compressed,
                                uint length, uint table,
                                QString &decompressed);
@@ -522,135 +526,112 @@ bool SIParser::FindServices()
 
 void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
 {
-    pmap_lock.lock();
-
-#ifndef USING_DVB_EIT
     (void) pid;
-#endif
 
     if (!(buffer[1] & 0x80))
     {
         VERBOSE(VB_SIPARSER, LOC + 
                 QString("SECTION_SYNTAX_INDICATOR = 0 - Discarding Table (%1)")
                 .arg(buffer[0],2,16));
-        pmap_lock.unlock();
         return;
     }
 
-    tablehead_t head = ParseTableHead(buffer,size);
+    QMutexLocker locker(&pmap_lock);
 
-    /* Parse Common Tables (PAT/CAT/PMT) regardless of SI Standard */
-    switch(head.table_id)
-    {
-        case 0x00:  ParsePAT(pid, &head, &buffer[8], size-8);
-                    break;
+    tablehead_t head = ParseTableHead(buffer, size);
 
-        case 0x01:  ParseCAT(pid, &head, &buffer[8], size-8);
-                    break;
+    // Parse MPEG tables
+    if (TableID::PAT == head.table_id)
+        ParsePAT(pid, &head, &buffer[8], size - 8);
+    else if (TableID::CAT == head.table_id)
+        ParseCAT(pid, &head, &buffer[8], size - 8);
+    else if (TableID::PMT == head.table_id)
+        ParsePMT(pid, &head, &buffer[8], size - 8);
 
-        case 0x02:  ParsePMT(pid, &head, &buffer[8], size-8);
-                    break;
-
-    }
-
-    /* In Detection mode determine what SIStandard you are using */
+    // In Detection mode determine what SIStandard you are using.
     if (SIStandard == SI_STANDARD_AUTO)
     {
-        switch(head.table_id)
+        if (TableID::MGT == head.table_id)
         {
-        case 0x46:
-        case 0x42:  
-            SIStandard = SI_STANDARD_DVB;
-            VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: DVB");
-            standardChange = true;
-        break;
-        case 0xC7:  
             SIStandard = SI_STANDARD_ATSC;
             VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
             standardChange = true;
-        break;
+        }
+        else if (TableID::SDT  == head.table_id ||
+                 TableID::SDTo == head.table_id)
+        {
+            SIStandard = SI_STANDARD_DVB;
+            VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: DVB");
+            standardChange = true;
         }
     }
 
-    /* Parse DVB Specific Tables Here */
+    // Parse DVB specific NIT and SDT tables
     if (SIStandard == SI_STANDARD_DVB)
     {
-        switch(head.table_id)
-        {
-        case 0x40:
-            /* Network Information Table(s) */
-            ParseNIT(pid, &head, &buffer[8], size-8);
-            break;
-        case 0x42: /* Service Table(s) */
-        case 0x46:  
-            ParseSDT(pid, &head, &buffer[8], size-8);
-            break;
-#ifdef USING_DVB_EIT
-        case 0x4E ... 0x4F:
-            /* Standard Now/Next Event Information Table(s) */
-        case 0x50 ... 0x6F:
-            /* Standard Future Event Information Table(s) */
-            ParseDVBEIT(pid, &head, &buffer[8], size-8);
-            break;
-#endif
-        }
+        if (TableID::NIT == head.table_id) // Network Information Table
+            ParseNIT(pid, &head, &buffer[8], size - 8);
+        else if (TableID::SDT  == head.table_id ||
+                 TableID::SDTo == head.table_id) // Service Tables
+            ParseSDT(pid, &head, &buffer[8], size - 8);
     }
 
+    // Parse ATSC specific tables
     if (SIStandard == SI_STANDARD_ATSC)
     {
-        switch (head.table_id)
+        if (TableID::MGT == head.table_id &&
+            !Table[MGT]->AddSection(&head, 0, 0))
         {
-            case TableID::MGT:
-            {
-                if (Table[MGT]->AddSection(&head,0,0))
-                    break;
-
-                const PESPacket pes = PESPacket::ViewData(buffer);
-                const PSIPTable psip(pes);
-                const MasterGuideTable mgt(psip);
-                HandleMGT(mgt);
-                break;
-            }
-            case TableID::TVCT:  
-            case TableID::CVCT:
-            {
-                emit TableLoaded();
-
-                if (Table[SERVICES]->AddSection(&head,0,0))
-                    break;
-
-                const PESPacket pes = PESPacket::ViewData(buffer);
-                const PSIPTable psip(pes);
-                const VirtualChannelTable vct(psip);
-                AddToServices(vct);
-            }
-            break;
-            case TableID::RRT:
-                ParseRRT(&head, &buffer[8], size-8);
-                break;
-#ifdef USING_DVB_EIT
-            case TableID::EIT:
-                ParseATSCEIT(&head, &buffer[8], size-8, pid);
-                break;
-            case TableID::ETT:
-                ParseETT(&head, &buffer[8], size-8, pid);
-                break;
-#endif // USING_DVB_EIT
-            case TableID::STT:
-                ParseSTT(&head, &buffer[8], size-8);
-                break;
-            case TableID:: DCCT:
-                ParseDCCT(&head, &buffer[8], size-8);
-                break;
-            case TableID::DCCSCT:
-                ParseDCCSCT(&head, &buffer[8], size-8);
-                break;
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+            const MasterGuideTable mgt(psip);
+            HandleMGT(&mgt);
+        }
+        else if ((TableID::TVCT == head.table_id ||
+                  TableID::CVCT == head.table_id) &&
+                 !Table[SERVICES]->AddSection(&head, 0, 0))
+        {
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+            const VirtualChannelTable vct(psip);
+            HandleVCT(pid, &vct);
+        }
+        else if (TableID::STT == head.table_id &&
+                 !Table[STT]->AddSection(&head, 0, 0))
+        {
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+            const SystemTimeTable stt(psip);
+            HandleSTT(&stt);
         }
     }
 
-    pmap_lock.unlock();
-
-    return;
+#ifdef USING_DVB_EIT
+    // Parse any embedded guide data
+    if (SIStandard == SI_STANDARD_DVB)
+    {
+        bool process_eit = false;
+        // Standard Now/Next Event Information Tables for this transport
+        process_eit |= TableID::PF_EIT == head.table_id;
+        // Standard Now/Next Event Information Tables for other transport
+        process_eit |= TableID::PF_EITo == head.table_id;
+        // Standard Future Event Information Tables for this transport
+        process_eit |= (TableID::SC_EITbeg <= head.table_id &&
+                        TableID::SC_EITend >= head.table_id);
+        // Standard Future Event Information Tables for other transports
+        process_eit |= (TableID::SC_EITbego <= head.table_id &&
+                        TableID::SC_EITendo >= head.table_id);
+        if (process_eit)
+            ParseDVBEIT(pid, &head, &buffer[8], size - 8);
+    }
+    else if (SIStandard == SI_STANDARD_ATSC)
+    {
+        if (TableID::EIT == head.table_id)
+            ParseATSCEIT(&head, &buffer[8], size - 8, pid);
+        else if (TableID::ETT == head.table_id)
+            ParseATSCETT(&head, &buffer[8], size - 8, pid);
+    }
+#endif // USING_DVB_EIT
 }
 
 tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
@@ -2263,17 +2244,17 @@ QString SIParser::ParseMSS(uint8_t *buffer, int size)
                 retval += QChar(buffer[8+z]);
             break;
         case 1:
-            retval = HuffmanToQString(&buffer[8],buffer[7],ATSC_C5);
+            retval = huffman1_to_string(&buffer[8], buffer[7], ATSC_C5);
             break;
         case 2:
-            retval = HuffmanToQString(&buffer[8],buffer[7],ATSC_C7);
+            retval = huffman1_to_string(&buffer[8], buffer[7], ATSC_C7);
             break;
         default:
             retval = QString("Unknown compression");
             break;
     }
+    //VERBOSE(VB_EIT, LOC + QString("MSS%1: %2").arg(buffer[4]).arg(retval));
     return retval;
-
 }
 
 /*------------------------------------------------------------------------
@@ -2283,12 +2264,13 @@ QString SIParser::ParseMSS(uint8_t *buffer, int size)
 /*
  *  ATSC Table 0xC7 - Master Guide Table - PID 0x1FFB
  */
-void SIParser::HandleMGT(const MasterGuideTable &mgt)
+void SIParser::HandleMGT(const MasterGuideTable *mgt)
 {
-    for (uint i = 0 ; i < mgt.TableCount(); i++)
+    VERBOSE(VB_SIPARSER, LOC + "HandleMGT()");
+    for (uint i = 0 ; i < mgt->TableCount(); i++)
     {
-        const int table_class = mgt.TableClass(i);
-        const uint pid        = mgt.TablePID(i);
+        const int table_class = mgt->TableClass(i);
+        const uint pid        = mgt->TablePID(i);
         QString msg = QString(" on PID 0x%2").arg(pid,0,16);
         if (table_class == TableClass::TVCTc)
         {
@@ -2312,13 +2294,13 @@ void SIParser::HandleMGT(const MasterGuideTable &mgt)
 #ifdef USING_DVB_EIT
         else if (table_class == TableClass::EIT)
         {
-            const uint num = mgt.TableType(i) - 0x100;
+            const uint num = mgt->TableType(i) - 0x100;
             VERBOSE(VB_SIPARSER, LOC + QString("EIT-%1").arg(num,2) + msg);
             Table[EVENTS]->AddPid(pid, 0xCB, 0xFF, num);
         }
         else if (table_class == TableClass::ETTe)
         {
-            const uint num = mgt.TableType(i) - 0x200;
+            const uint num = mgt->TableType(i) - 0x200;
             VERBOSE(VB_SIPARSER, LOC + QString("ETT-%1").arg(num,2) + msg);
             Table[EVENTS]->AddPid(pid, 0xCC, 0xFF, num);
         }
@@ -2326,52 +2308,55 @@ void SIParser::HandleMGT(const MasterGuideTable &mgt)
         else
         {
             VERBOSE(VB_SIPARSER, LOC + "Unused Table " +
-                    mgt.TableClassString(i) + msg);
+                    mgt->TableClassString(i) + msg);
         }                    
     }
 }
 
-void SIParser::AddToServices(const VirtualChannelTable &vct)
+void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "AddToServices() cnt("
-            <<vct.ChannelCount()<<")");
-    for (uint chan_idx = 0; chan_idx < vct.ChannelCount() ; chan_idx++)
+    VERBOSE(VB_SIPARSER, LOC + "HandleVCT("<<pid<<") cnt("
+            <<vct->ChannelCount()<<")");
+
+    emit TableLoaded();
+
+    for (uint chan_idx = 0; chan_idx < vct->ChannelCount() ; chan_idx++)
     {
         // Do not add in Analog Channels in the VCT
-        if (1 == vct.ModulationMode(chan_idx))
+        if (1 == vct->ModulationMode(chan_idx))
             continue;
 
         // Create SDTObject from info in VCT
         SDTObject s;
-        s.Version      = vct.Version();
+        s.Version      = vct->Version();
         s.ServiceType  = 1;
-        s.EITPresent   = !vct.IsHiddenInGuide(chan_idx);
+        s.EITPresent   = !vct->IsHiddenInGuide(chan_idx);
 
-        s.ServiceName  = vct.ShortChannelName(chan_idx);
-        s.ChanNum      =(vct.MajorChannel(chan_idx) * 10 +
-                         vct.MinorChannel(chan_idx));
-        s.TransportID  = vct.ChannelTransportStreamID(chan_idx);
-        s.CAStatus     = vct.IsAccessControlled(chan_idx);
-        s.ServiceID    = vct.ProgramNumber(chan_idx);
-        s.ATSCSourceID = vct.SourceID(chan_idx);
+        s.ServiceName  = vct->ShortChannelName(chan_idx);
+        s.ChanNum      =(vct->MajorChannel(chan_idx) * 10 +
+                         vct->MinorChannel(chan_idx));
+        s.TransportID  = vct->ChannelTransportStreamID(chan_idx);
+        s.CAStatus     = vct->IsAccessControlled(chan_idx);
+        s.ServiceID    = vct->ProgramNumber(chan_idx);
+        s.ATSCSourceID = vct->SourceID(chan_idx);
 
         if (!PrivateTypesLoaded)
             LoadPrivateTypes(s.TransportID);
 
 #ifdef USING_DVB_EIT
-        if (!vct.IsHiddenInGuide(chan_idx))
+        if (!vct->IsHiddenInGuide(chan_idx))
         {
             VERBOSE(VB_EIT, LOC + "Adding Source #"<<s.ATSCSourceID
-                    <<" ATSC chan "<<vct.MajorChannel(chan_idx)
-                    <<"-"<<vct.MinorChannel(chan_idx));
+                    <<" ATSC chan "<<vct->MajorChannel(chan_idx)
+                    <<"-"<<vct->MinorChannel(chan_idx));
             sourceid_to_channel[s.ATSCSourceID] =
-                vct.MajorChannel(chan_idx) << 8 | vct.MinorChannel(chan_idx);
+                vct->MajorChannel(chan_idx) << 8 | vct->MinorChannel(chan_idx);
             Table[EVENTS]->RequestEmit(s.ATSCSourceID);
         }
         else
         {
-            VERBOSE(VB_EIT, LOC + "ATSC chan "<<vct.MajorChannel(chan_idx)
-                    <<"-"<<vct.MinorChannel(chan_idx)<<" is hidden in guide");
+            VERBOSE(VB_EIT, LOC + "ATSC chan "<<vct->MajorChannel(chan_idx)
+                    <<"-"<<vct->MinorChannel(chan_idx)<<" is hidden in guide");
         }
 #endif
 
@@ -2384,49 +2369,6 @@ void SIParser::AddToServices(const VirtualChannelTable &vct)
 #endif // USING_DVB_EIT
 
     emit FindServicesComplete();
-}
-
-/**
- * \brief ATSC Table 0xCA - Rating Region Table - PID 0x1FFB
- * \TODO Decide what to do with this. 
- *       There currently is no field in Myth for a rating
- */
-void SIParser::ParseRRT(tablehead_t *head, uint8_t *buffer, int size)
-{
-    (void)head;
-    (void)buffer;
-    (void)size;
-
-    return;
-
-    uint16_t pos = 0;
-
-    QString temp = ParseMSS(&buffer[2],buffer[1]);
-
-    pos += buffer[1] + 2;
-    uint8_t dimensions = buffer[pos++];
-
-    for (int x = 0 ; x < dimensions ; x++)
-    {
-        QString Name = ParseMSS(&buffer[pos + 1],buffer[pos]);
-        /* Skip past Dimesion Name */
-        pos += buffer[pos] + 1;
-
-        /* Skip past Values Defined */
-        uint8_t values = buffer[pos] & 0x0F;
-        pos++;
-
-        for (int y = 0 ; y < values ; y++)
-        {
-            QString Value_Text = ParseMSS(&buffer[pos + 1],buffer[pos]);
-            pos += buffer[pos] + 1;
-
-            QString Rating_Value_Text = ParseMSS(&buffer[pos + 1],buffer[pos]);
-            pos += buffer[pos] + 1;
-
-        }
-
-    }
 }
 
 /*
@@ -2534,8 +2476,8 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
 /*
  *  ATSC Table 0xCC - Extended Text Table - PID Varies
  */
-void SIParser::ParseETT(tablehead_t */*head*/, uint8_t *buffer,
-                        int size, uint16_t /*pid*/)
+void SIParser::ParseATSCETT(tablehead_t */*head*/, uint8_t *buffer,
+                            int size, uint16_t /*pid*/)
 {
     (void) buffer;
     (void) size;
@@ -2568,40 +2510,10 @@ void SIParser::ParseETT(tablehead_t */*head*/, uint8_t *buffer,
 /*
  *  ATSC Table 0xCD - System Time Table - PID 0x1FFB
  */
-void SIParser::ParseSTT(tablehead_t *head, uint8_t *buffer, int size)
+void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
-    (void)head;
-    (void)size;
-
-    if (Table[STT]->AddSection(head,0,0))
-        return;
-
-    ((STTHandler*) Table[STT])->GPSOffset = buffer[5];
-
-    VERBOSE(VB_SIPARSER, LOC +
-            QString("GPS time offset is %1 seconds").arg(buffer[5]));
-}
-
-
-/*
- *  ATSC Table 0xD3 - Directed Channel Change Table - PID 0x1FFB
- */
-void SIParser::ParseDCCT(tablehead_t *head, uint8_t *buffer, int size)
-{
-    (void)head;
-    (void)buffer;
-    (void)size;
-
-}
-
-/*
- *  ATSC Table 0xD4 - Directed Channel Change Selection Code Table - PID 0x1FFB
- */
-void SIParser::ParseDCCSCT(tablehead_t *head, uint8_t *buffer, int size)
-{
-    (void)head;
-    (void)buffer;
-    (void)size;
+    VERBOSE(VB_SIPARSER, LOC + "GPS offset: "<<stt->GPSOffset()<<" seconds");
+    ((STTHandler*) Table[STT])->GPSOffset = stt->GPSOffset();
 }
 
 /*------------------------------------------------------------------------
@@ -2645,38 +2557,36 @@ void SIParser::ParseDescATSCContentAdvisory(uint8_t *buffer, int size)
  * atsc_huffman.h
  *------------------------------------------------------------------------*/
 
-/* returns the root for character Input from table Table[] */
-int SIParser::HuffmanGetRootNode(uint8_t Input, uint8_t Table[])
+/* returns the root for character input from table Table[] */
+static inline int huffman1_get_root(uint input, const unsigned char *table)
 {
-    if (Input > 127)
+    if (input > 127)
         return -1;
-    else
-        return (Table[Input * 2] << 8) | Table[(Input * 2) + 1];
+    return (table[input * 2] << 8) | table[(input * 2) + 1];
 }
 
 /* Returns the bit number bit from string test[] */
-bool SIParser::HuffmanGetBit(uint8_t test[], uint16_t bit)
+static inline bool huffman1_get_bit(const unsigned char *src, uint bit)
 {
-    return (test[(bit - (bit % 8)) / 8] >> (7-(bit % 8))) & 0x01;
+    return (src[(bit - (bit % 8)) / 8] >> (7-(bit % 8))) & 0x01;
 }
 
-QString SIParser::HuffmanToQString(uint8_t test[], uint16_t size,
-                                   uint8_t Table[])
+static QString huffman1_to_string(const unsigned char *compressed, uint size,
+                                  const unsigned char *table)
 {
-
     QString retval;
 
     int totalbits = size * 8;
     int bit = 0;
-    int root = HuffmanGetRootNode(0,Table);
+    int root = huffman1_get_root(0, table);
     int node = 0;
     bool thebit;
     uint8_t val;
 
     while (bit < totalbits)
     {
-        thebit = HuffmanGetBit(test,bit);
-        val = thebit? Table[root+(node*2)+1] : Table[root+(node*2)];
+        thebit = huffman1_get_bit(compressed, bit);
+        val = (thebit) ? table[root + (node*2) + 1] : table[root + (node*2)];
 
         if (val & 0x80)
         {
@@ -2691,17 +2601,17 @@ QString SIParser::HuffmanToQString(uint8_t test[], uint16_t size,
                 uint8_t val2 = 0;
                 for (int i = 0 ; i < 7 ; i++)
                 {
-                    val2 |= (HuffmanGetBit(test,bit+i+2) << 6-i);
-
+                    val2 |=
+                        huffman1_get_bit(compressed, bit + i + 2) << 6 - i;
                 }
                 retval += QChar(val2);
                 bit += 8;
-                root = HuffmanGetRootNode(val2,Table);
+                root = huffman1_get_root(val2, table);
             }
             /* Standard Character */
             else
             {
-                root = HuffmanGetRootNode(val & 0x7F,Table);
+                root = huffman1_get_root(val & 0x7F, table);
                 retval += QChar(val & 0x7F);
             }
             node = 0;

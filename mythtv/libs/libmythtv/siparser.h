@@ -39,6 +39,7 @@ typedef void QMap_Events;
 
 class MasterGuideTable;
 class VirtualChannelTable;
+class SystemTimeTable;
 
 /**
  *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
@@ -110,12 +111,13 @@ class SIParser : public QObject
     void ParseTable(uint8_t* buffer, int size, uint16_t pid);
     void CheckTrackers(void);
 
-    // Functions that allow you to initialize the SIParser
-    void HandleMGT(const MasterGuideTable &mgt);
-    void AddToServices(const VirtualChannelTable &vct);
-
   public slots:
     virtual void deleteLater(void);
+
+    // Functions that allow you to initialize the SIParser
+    void HandleMGT(const MasterGuideTable*);
+    void HandleVCT(uint, const VirtualChannelTable*);
+    void HandleSTT(const SystemTimeTable*);
 
   signals:
     void FindTransportsComplete(void);
@@ -202,22 +204,14 @@ class SIParser : public QObject
     QString ParseMSS(uint8_t* buffer, int size);
 
     // ATSC Table Parsers
-    void ParseMGT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseRRT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseATSCEIT   (tablehead_t* head, uint8_t* buffer, int size, uint16_t pid);
-    void ParseETT       (tablehead_t* head, uint8_t* buffer, int size, uint16_t pid);
-    void ParseSTT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseDCCT      (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseDCCSCT    (tablehead_t* head, uint8_t* buffer, int size);
+    void ParseATSCEIT(tablehead_t* head, uint8_t* buffer, int size,
+                      uint16_t pid);
+    void ParseATSCETT(tablehead_t* head, uint8_t* buffer, int size,
+                      uint16_t pid);
 
     // ATSC Descriptor Parsers
     QString ParseATSCExtendedChannelName(uint8_t* buffer, int size);
     void ParseDescATSCContentAdvisory(uint8_t* buffer, int size);
-
-    /* Huffman Text Decompression Routines */
-    int HuffmanGetRootNode(uint8_t Input, uint8_t Table[]);
-    bool HuffmanGetBit(uint8_t test[], uint16_t bit);
-    QString HuffmanToQString(uint8_t test[], uint16_t size,uint8_t Table[]);
 
     void InitializeCategories(void);
 
