@@ -37,6 +37,8 @@ using namespace std;
 typedef void QMap_Events;
 #endif // !USING_DVB_EIT
 
+class ProgramAssociationTable;
+class ProgramMapTable;
 class MasterGuideTable;
 class VirtualChannelTable;
 class SystemTimeTable;
@@ -116,11 +118,13 @@ class SIParser : public QObject
   public slots:
     virtual void deleteLater(void);
 
+    void HandlePAT(const ProgramAssociationTable*);
+    void HandlePMT(uint pnum, const ProgramMapTable*);
     void HandleMGT(const MasterGuideTable*);
     void HandleSTT(const SystemTimeTable*);
-    void HandleVCT(uint, const VirtualChannelTable*);
-    void HandleEIT(uint, const EventInformationTable*);
-    void HandleETT(uint, const ExtendedTextTable*);
+    void HandleVCT(uint pid, const VirtualChannelTable*);
+    void HandleEIT(uint pid, const EventInformationTable*);
+    void HandleETT(uint pid, const ExtendedTextTable*);
 
   signals:
     void FindTransportsComplete(void);
@@ -146,9 +150,7 @@ class SIParser : public QObject
     // MPEG Transport Parsers (ATSC and DVB)
     tablehead_t       ParseTableHead(uint8_t* buffer, int size);
 
-    void ParsePAT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
     void ParseCAT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
-    void ParsePMT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
 
     void ProcessUnusedDescriptor(uint pid, const uint8_t *buffer, uint size);
 
@@ -164,7 +166,7 @@ class SIParser : public QObject
     void ParseDVBEIT(uint pid, tablehead_t* h, uint8_t* buffer, uint size);
 
     // Common Descriptor Parsers
-    CAPMTObject ParseDescCA(uint8_t* buffer, int size);
+    CAPMTObject ParseDescCA(const uint8_t* buffer, int size);
 
     // DVB Descriptor Parsers
     void ParseDescNetworkName  (uint8_t* buf, int sz, NetworkObject   &n);
@@ -176,8 +178,8 @@ class SIParser : public QObject
     TransportObject ParseDescSatellite       (uint8_t* buf, int sz);
     TransportObject ParseDescCable           (uint8_t* buf, int sz);
     QString ParseDescLanguage                (const uint8_t*, uint sz);
-    void ParseDescTeletext                   (uint8_t* buf, int sz);
-    void ParseDescSubtitling                 (uint8_t* buf, int sz);
+    void ParseDescTeletext                   (const uint8_t* buf, int sz);
+    void ParseDescSubtitling                 (const uint8_t* buf, int sz);
 
     // ATSC EIT Table Descriptor processors
 #ifdef USING_DVB_EIT
@@ -208,9 +210,6 @@ class SIParser : public QObject
     void InitializeCategories(void);
 
   private:
-    bool PAT_ready;
-    bool PMT_ready;
-
     // Timeout Variables
     QDateTime TransportSearchEndTime;
     QDateTime ServiceSearchEndTime;

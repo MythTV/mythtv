@@ -52,7 +52,6 @@
  */
 SIParser::SIParser(const char *name) :
     QObject(NULL, name),
-    PAT_ready(false),               PMT_ready(false),
     // Common Variables
     SIStandard(SI_STANDARD_AUTO),
     CurrentTransport(0),            RequestedServiceID(0),
@@ -532,14 +531,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
 
     tablehead_t head = ParseTableHead(buffer, size);
 
-    // Parse MPEG tables
-    if (TableID::PAT == head.table_id)
-        ParsePAT(pid, &head, &buffer[8], size - 8);
-    else if (TableID::CAT == head.table_id)
-        ParseCAT(pid, &head, &buffer[8], size - 8);
-    else if (TableID::PMT == head.table_id)
-        ParsePMT(pid, &head, &buffer[8], size - 8);
-
     // In Detection mode determine what SIStandard you are using.
     if (SIStandard == SI_STANDARD_AUTO)
     {
@@ -556,6 +547,26 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: DVB");
             standardChange = true;
         }
+    }
+
+    // Parse MPEG tables
+    if (TableID::PAT == head.table_id &&
+        !((PATHandler*) Table[PAT])->Tracker.AddSection(&head))
+    {
+        const PESPacket pes = PESPacket::ViewData(buffer);
+        const PSIPTable psip(pes);
+        ProgramAssociationTable pat(psip);
+        HandlePAT(&pat);
+    }
+    else if (TableID::CAT == head.table_id)
+        ParseCAT(pid, &head, &buffer[8], size - 8);
+    else if (TableID::PMT == head.table_id &&
+             !Table[PMT]->AddSection(&head, head.table_id_ext, 0))
+    {
+        const PESPacket pes = PESPacket::ViewData(buffer);
+        const PSIPTable psip(pes);
+        ProgramMapTable pmt(psip);
+        HandlePMT(pmt.ProgramNumber(), &pmt);
     }
 
     // Parse DVB specific NIT and SDT tables
@@ -648,55 +659,33 @@ tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
 
 }
 
-void SIParser::ParsePAT(uint /*pid*/, tablehead_t *head,
-                        uint8_t *buffer, uint size)
+void SIParser::HandlePAT(const ProgramAssociationTable *pat)
 {
-    // Check to see if you have already loaded all of the PAT sections
-    // ISO 13818-1 state that PAT can be segmented, although it rarely is
-    if (((PATHandler*) Table[PAT])->Tracker.AddSection(head))
-        return;
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("PAT Version: %1  Tuned to TransportID: %2")
+            .arg(pat->Version()).arg(pat->TransportStreamID()));
 
-    VERBOSE(VB_SIPARSER, LOC + QString("PAT Version = %1").arg(head->version));
-    PrivateTypes.CurrentTransportID = head->table_id_ext;
-    VERBOSE(VB_SIPARSER, LOC + QString("Tuned to TransportID: %1")
-             .arg(PrivateTypes.CurrentTransportID));
+    PATHandler *path = (PATHandler*) Table[PAT];
+    PMTHandler *pmth = (PMTHandler*) Table[PMT];
 
-    int pos = -1;
-    while (pos < ((int)size - 4))
+    PrivateTypes.CurrentTransportID = pat->TransportStreamID();
+    for (uint i = 0; i < pat->ProgramCount(); ++i)
     {
-        if (pos+4 >= ((int)size-4))
+        // DVB Program 0 in the PAT represents the location of the NIT
+        if (0 == pat->ProgramNumber(i) && SI_STANDARD_ATSC != SIStandard)
         {
-            break;
-        }
-        uint16_t program = (buffer[pos + 1] << 8) | buffer[pos + 2];
-        uint16_t pid = ((buffer[pos + 3] & 0x1f)<<8) | buffer[pos + 4];
-        if (program != 0)
-        {
-            VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) on PID 0x%2")
-                    .arg(program).arg(pid,0,16));
-            ((PATHandler*) Table[PAT])->pids[program]=pid;
-            Table[PMT]->AddKey(pid,0);
-            ((PMTHandler*) Table[PMT])->pmt[program].PMTPID = pid;
-        }
-        else
-        {
-            // Program 0 in the PAT represents the location of the NIT in DVB
-            NITPID = pid;
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("NIT Present on this transport on PID 0x%1")
-                    .arg(NITPID,0,16));
-        }
-        pos += 4;
+            VERBOSE(VB_SIPARSER, LOC + "NIT Present on this transport " +
+                    QString(" on PID 0x%1").arg(NITPID,0,16));
 
+            NITPID = pat->ProgramPID(i);
+            continue;
+        }
+
+        path->pids[pat->ProgramNumber(i)] = pat->ProgramPID(i);
+
+        pmth->AddKey(pat->ProgramPID(i), 0);
+        pmth->pmt[pat->ProgramNumber(i)].PMTPID = pat->ProgramPID(i);
     }
-
-    QString ProgramList = QString("Services on this Transport: ");
-    QMap_uint16_t::Iterator p;
-
-    for (p = ((PATHandler*) Table[PAT])->pids.begin();
-         p != ((PATHandler*) Table[PAT])->pids.end() ; ++p)
-        ProgramList += QString("%1 ").arg(p.key());
-    VERBOSE(VB_SIPARSER, LOC + ProgramList);
 }
 
 void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
@@ -719,207 +708,172 @@ void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
     }
 }
 
-void SIParser::ParsePMT(uint pid, tablehead_t *head,
-                        uint8_t *buffer, uint size)
+ES_Type ProcessType(const ProgramMapTable &pmt, uint i);
+
+// TODO: Catch serviceMove descriptor and send a signal when you get one
+//       to retune to correct transport or send an error tuning the channel
+void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 {
-    // TODO: Catch serviceMove descriptor and send a signal when you get one
-    //       to retune to correct transport or send an error tuning the channel
-
-    if (Table[PMT]->AddSection(head,head->table_id_ext,0))
-        return;
-
-    VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) version(%2)")
-            .arg(head->table_id_ext).arg(head->version));
+    VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) version(%2) cnt(%3)")
+            .arg(pnum).arg(pmt->Version()).arg(pmt->StreamCount()));
 
     // Create a PMTObject and populate it
     PMTObject p;
-    uint8_t descriptors_length;
-    uint16_t pidescriptors_length = (((buffer[2] & 0x0F) << 8) | buffer[3]);
-
-    p.PCRPID = (buffer[0] & 0x1F) << 8 | buffer[1];
-    p.ServiceID = head->table_id_ext;
+    p.PCRPID    = pmt->PCRPID();
+    p.ServiceID = pmt->ProgramNumber();
 
     // Process Program Info Descriptors
-    uint16_t pos = 4;
-    uint16_t tempPos = pos + pidescriptors_length;
-    while (pos < tempPos)
+    const unsigned char *pi = pmt->ProgramInfo();
+    desc_list_t list = MPEGDescriptor::Parse(pi, pmt->ProgramInfoLength());
+    desc_list_t::const_iterator it = list.begin();
+    for (; it != list.end(); ++it)
     {
-        if (buffer[pos] == 0x09)
+        if (DescriptorID::conditional_access == (*it)[0])
         {
-            // Conditional Access Descriptor
-            CAPMTObject cad = ParseDescCA(&buffer[pos], buffer[pos + 1]);
+            CAPMTObject cad = ParseDescCA((*it), (*it)[1] + 2);
             p.CA.append(cad);
             p.hasCA = true;
         }
         else
         {
-            p.Descriptors.append(
-                Descriptor(&buffer[pos], buffer[pos + 1] + 2));
-            ProcessUnusedDescriptor(pid, &buffer[pos], buffer[pos + 1] + 2);
+            p.Descriptors.append(Descriptor(*it, (*it)[1] + 2));
+            ProcessUnusedDescriptor(0, *it, (*it)[1] + 2);
         }
-        pos += buffer[pos+1] + 2;
     }
 
     // Process streams
-    while ((pos + 4) < (int)size)
+    for (uint i = 0; i < pmt->StreamCount(); i++)
     {
+        VERBOSE(VB_SIPARSER, LOC +
+                QString("PID: 0x%1").arg(pmt->StreamPID(i),0,16));
 
-        ElementaryPIDObject e;
+        const unsigned char *si = pmt->StreamInfo(i);
+        desc_list_t list = MPEGDescriptor::Parse(si, pmt->StreamInfoLength(i));
+        uint type = StreamID::Normalize(pmt->StreamType(i), list);
 
         // Reset Elementary PID object
+        ElementaryPIDObject e;
         e.Reset();
+        e.PID         = pmt->StreamPID(i);
+        e.Orig_Type   = pmt->StreamType(i);
+        e.Type        = ProcessType(*pmt, i);
+        e.Description = StreamID::toString(type);
 
-        // Grab PIDs, and set PID Type
-        e.PID = (buffer[pos+1] & 0x1F) << 8 | buffer[pos+2];
-        e.Orig_Type = buffer[pos];
-        VERBOSE(VB_SIPARSER, LOC + QString("PID: 0x%1").arg(e.PID,0,16));
-
-        // The stream type can be detected in two ways:
-        // - by stream type field in PMT, if known
-        // - by a descriptor
-        switch (e.Orig_Type)
+        const unsigned char *d;
+        d = MPEGDescriptor::Find(list, DescriptorID::ISO_639_language);
+        if (d)
         {
-            case 0x01:
-                e.Type = ES_TYPE_VIDEO_MPEG1;
-                break;
-            case 0x80:  // OpenCable Mpeg2
-            case 0x02:  // DVB/ATSC Mpeg2
-                e.Type = ES_TYPE_VIDEO_MPEG2;
-                break;
-            case 0x03:
-                e.Type = ES_TYPE_AUDIO_MPEG1;
-                break;
-            case 0x04:
-                e.Type = ES_TYPE_AUDIO_MPEG2;
-                break;
-            case 0x08:
-            case 0x0B:
-                e.Type = ES_TYPE_DATA;
-                break;
-            case 0x0F:
-                e.Type = ES_TYPE_AUDIO_AAC;
-                break;
-            case 0x81:
-                // Where ATSC Puts the AC3 Descriptor
-                e.Type = ES_TYPE_AUDIO_AC3;
-                break;
-
+            ISO639LanguageDescriptor iso_lang(d);
+            e.Language = iso_lang.CanonicalLanguageString();
+            e.Description += QString(" (%1)").arg(e.Language);
         }
 
-        descriptors_length = (buffer[pos+3] & 0x0F) << 8 | buffer[pos+4];
-        pos += 5;
-        tempPos = pos + descriptors_length;
-
-        while (pos < tempPos)
+        d = MPEGDescriptor::Find(list, DescriptorID::conditional_access);
+        if (d)
         {
-            uint8_t *descriptor = &buffer[pos];
-            int descriptor_tag = descriptor[0];
-            int descriptor_len = descriptor[1];
-
-            if (descriptor_tag == 0x09) // Conditional Access Descriptor
-            {
-                // Note: the saved streams have already been 
-                // descrambled by the CAM so any CA descriptors 
-                // should *not* be added to the descriptor list.
-                // We need a CAPMTObject to send to the CAM though.
-                CAPMTObject cad = ParseDescCA(descriptor, descriptor_len);
-                e.CA.append(cad);
-                p.hasCA = true;
-            }
-            else
-            {
-                e.Descriptors.append(
-                    Descriptor(descriptor, descriptor_len + 2));
-
-                switch (descriptor_tag)
-                {
-                    case 0x05: // Registration Descriptor
-                        {
-                            QString format = QString::fromLatin1(
-                                    (const char*) descriptor + 2, 4);
-                            if (format == "DTS1")
-                                e.Type = ES_TYPE_AUDIO_DTS;
-                        }
-                        break;
-
-                    case 0x0A: // ISO 639 Language Descriptor
-                        e.Language =
-                            ParseDescLanguage(descriptor+2, descriptor_len);
-                        break;
-
-                    case 0x56: // Teletext Descriptor
-                        ParseDescTeletext(descriptor, descriptor_len);
-                        e.Type = ES_TYPE_TELETEXT;
-                        break;
-
-                    case 0x59: // Subtitling Descriptor
-                        ParseDescSubtitling(descriptor, descriptor_len);
-                        e.Type = ES_TYPE_SUBTITLE;
-                        break;
-
-                    case 0x6A: // AC3 Descriptor
-                        e.Type = ES_TYPE_AUDIO_AC3;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            
-            pos += descriptor_len + 2;
+            // Note: the saved streams have already been 
+            // descrambled by the CAM so any CA descriptors 
+            // should *not* be added to the descriptor list.
+            // We need a CAPMTObject to send to the CAM though.
+            CAPMTObject cad = ParseDescCA(d, d[1] + 2);
+            e.CA.append(cad);
+            p.hasCA = true;
         }
 
-        switch (e.Type)
+        d = MPEGDescriptor::Find(list, DescriptorID::teletext);
+        if (d)
+            ParseDescTeletext(d, d[1] + 2);
+
+        d = MPEGDescriptor::Find(list, DescriptorID::subtitling);
+        if (d)
+            ParseDescSubtitling(d, d[1] + 2);
+
+        desc_list_t::const_iterator it = list.begin();
+        for (; it != list.end(); ++it)
         {
-            case ES_TYPE_VIDEO_MPEG1:
-                e.Description = QString("MPEG-1 Video");
-                p.hasVideo = true;
-                break;
-            case ES_TYPE_VIDEO_MPEG2:
-                e.Description = QString("MPEG-2 Video");
-                p.hasVideo = true;
-                break;
-            case ES_TYPE_AUDIO_MPEG1:
-                e.Description = QString("MPEG-1 Audio");
-                p.hasAudio = true;
-                break;
-            case ES_TYPE_AUDIO_MPEG2:
-                e.Description = QString("MPEG-2 Audio");
-                p.hasAudio = true;
-                break;
-            case ES_TYPE_AUDIO_AC3:
-                e.Description = QString("AC3 Audio");
-                p.hasAudio = true;
-                break;
-            case ES_TYPE_AUDIO_DTS:
-                e.Description = QString("DTS Audio");
-                p.hasAudio = true;
-                break;
-            case ES_TYPE_AUDIO_AAC:
-                e.Description = QString("AAC Audio");
-                p.hasAudio = true;
-                break;
-            case ES_TYPE_TELETEXT:
-                e.Description = QString("Teletext");
-                break;
-            case ES_TYPE_SUBTITLE:
-                e.Description = QString("Subtitle");
-                break;
-            case ES_TYPE_DATA:
-                e.Description = QString("Data");
-                break;
-            default:
-                e.Description = QString("Unknown type: %1").arg(e.Orig_Type);
-                break;
+            if (DescriptorID::conditional_access != (*it)[0])
+                e.Descriptors.append(Descriptor(*it, (*it)[1] + 2));
         }
 
-        if (!e.Language.isEmpty())
-            e.Description += QString(" (%1").arg(e.Language);
-
-        p.Components += e;
+        p.Components += e; 
+        p.hasVideo |= StreamID::IsVideo(type);
+        p.hasAudio |= StreamID::IsAudio(type);
     }
 
-    ((PMTHandler*) Table[PMT])->pmt[head->table_id_ext] = p;
+    ((PMTHandler*) Table[PMT])->pmt[pmt->ProgramNumber()] = p;
+}
+
+ES_Type ProcessType(const ProgramMapTable &pmt, uint i)
+{
+    ES_Type proc_type;
+    // The stream type can be detected in two ways:
+    // - by stream type field in PMT, if known
+    // - by a descriptor
+    switch (pmt.StreamType(i))
+    {
+        case 0x01:
+            proc_type = ES_TYPE_VIDEO_MPEG1;
+            break;
+        case 0x80:  // OpenCable Mpeg2
+        case 0x02:  // DVB/ATSC Mpeg2
+            proc_type = ES_TYPE_VIDEO_MPEG2;
+            break;
+        case 0x03:
+            proc_type = ES_TYPE_AUDIO_MPEG1;
+            break;
+        case 0x04:
+            proc_type = ES_TYPE_AUDIO_MPEG2;
+            break;
+        case 0x08:
+        case 0x0B:
+            proc_type = ES_TYPE_DATA;
+            break;
+        case 0x0F:
+            proc_type = ES_TYPE_AUDIO_AAC;
+            break;
+        case 0x81:
+            // Where ATSC Puts the AC3 Descriptor
+            proc_type = ES_TYPE_AUDIO_AC3;
+            break;
+    }
+
+    const unsigned char *si = pmt.StreamInfo(i);
+    desc_list_t list = MPEGDescriptor::Parse(si, pmt.StreamInfoLength(i));
+    desc_list_t::const_iterator it = list.begin();
+    for (; it != list.end(); ++it)
+    {
+        if (DescriptorID::conditional_access == (*it)[0])
+            continue;
+
+        switch ((*it)[0])
+        {
+            case 0x05: // Registration Descriptor
+            {
+                const RegistrationDescriptor reg(*it);
+                QString format = reg.FormatIdentifierString();
+                if (format == "DTS1")
+                    proc_type = ES_TYPE_AUDIO_DTS;
+            }
+            break;
+
+            case 0x56: // Teletext Descriptor
+                proc_type = ES_TYPE_TELETEXT;
+                break;
+                
+            case 0x59: // Subtitling Descriptor
+                proc_type = ES_TYPE_SUBTITLE;
+                break;
+                
+            case 0x6A: // AC3 Descriptor
+                proc_type = ES_TYPE_AUDIO_AC3;
+                break;
+
+            default:
+                break;                
+        }
+    }
+
+    return proc_type;
 }
 
 void SIParser::ProcessUnusedDescriptor(uint pid, const uint8_t *data, uint)
@@ -1510,7 +1464,7 @@ void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
  *   COMMON DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
 // Descriptor 0x09 - Conditional Access Descriptor
-CAPMTObject SIParser::ParseDescCA(uint8_t *buffer, int size)
+CAPMTObject SIParser::ParseDescCA(const uint8_t *buffer, int size)
 {
     (void) size;
     CAPMTObject retval;
@@ -2145,7 +2099,7 @@ void SIParser::ProcessComponentDescriptor(
 }
 #endif //USING_DVB_EIT
 
-void SIParser::ParseDescTeletext(uint8_t *buffer, int size)
+void SIParser::ParseDescTeletext(const uint8_t *buffer, int size)
 {
     VERBOSE(VB_SIPARSER, LOC + QString("Teletext Descriptor"));
 
@@ -2170,7 +2124,7 @@ void SIParser::ParseDescTeletext(uint8_t *buffer, int size)
     }
 }
 
-void SIParser::ParseDescSubtitling(uint8_t *buffer, int size)
+void SIParser::ParseDescSubtitling(const uint8_t *buffer, int size)
 {
     VERBOSE(VB_SIPARSER, LOC + QString("Subtitling Descriptor"));
 
