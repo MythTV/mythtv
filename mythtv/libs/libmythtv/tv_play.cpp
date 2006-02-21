@@ -950,7 +950,7 @@ void TV::HandleStateChange(void)
             {
                 QString message = "COMMFLAG_REQUEST ";
                 message += playbackinfo->chanid + " " +
-                           playbackinfo->startts.toString(Qt::ISODate);
+                           playbackinfo->recstartts.toString(Qt::ISODate);
                 RemoteSendMessage(message);
             }                
         }
@@ -5206,7 +5206,7 @@ void TV::customEvent(QCustomEvent *e)
             QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
 
             if ((playbackinfo->chanid == evchanid) &&
-                (playbackinfo->startts == evstartts))
+                (playbackinfo->recstartts == evstartts))
             {
                 QString msg = "COMMFLAG_REQUEST ";
                 msg += tokens[1] + " " + tokens[2];
