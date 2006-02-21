@@ -2441,6 +2441,10 @@ echo "CONFIG_ENCODERS=yes" >> $MYTH_CONFIG_MAK
 echo "#define CONFIG_DECODERS 1" >> $TMPH
 echo "CONFIG_DECODERS=yes" >> $MYTH_CONFIG_MAK
 
+# if you do not want to use protocols, disable that.
+echo "#define CONFIG_PROTOCOLS 1" >> $TMPH
+echo "CONFIG_PROTOCOLS=yes" >> $MYTH_CONFIG_MAK
+
 # muxers
 if test "$muxers" = "yes" ; then
   echo "#define CONFIG_MUXERS 1" >> $TMPH
