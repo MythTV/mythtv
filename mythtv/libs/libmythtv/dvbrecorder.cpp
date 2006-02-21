@@ -87,7 +87,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
     : DTVRecorder(rec, "DVBRecorder"),
       _drb(NULL),
       // Options set in SetOption()
-      _card_number_option(0), _record_transport_stream_option(false),
+      _card_number_option(0),
       // DVB stuff
       dvbchannel(advbchannel),
       _reset_pid_filters(true),
@@ -160,8 +160,6 @@ void DVBRecorder::SetOption(const QString &name, int value)
         _card_number_option = value;
         videodevice = QString::number(value);
     }
-    else if (name == "recordts")
-        _record_transport_stream_option = (value == 1);
     else
         DTVRecorder::SetOption(name, value);
 }
@@ -218,8 +216,7 @@ bool DVBRecorder::Open(void)
             this, SLOT(SetPMTObject(const PMTObject *)));
 
     VERBOSE(VB_RECORD, LOC + QString("Card opened successfully fd(%1)")
-            .arg(_stream_fd) + QString(" (using %2 mode).")
-            .arg(_record_transport_stream_option ? "TS" : "PS"));
+            .arg(_stream_fd));
 
     dvbchannel->RecorderStarted();
 
@@ -328,10 +325,6 @@ void DVBRecorder::OpenFilter(uint           pid,
     info->isVideo = StreamID::IsVideo(stream_type);
     // Add the file descriptor to the filter list
     info->filter_fd = fd_tmp;
-
-    // If we are in legacy PES mode, initialize TS->PES converter
-    if (!_record_transport_stream_option)
-        info->ip = CreateIPack(type);
 
     // Add the new info to the map
     QMutexLocker change_lock(&_pid_lock);    
@@ -776,36 +769,6 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
         }
     }
 
-    // handle legacy PES recording mode
-    if (!_record_transport_stream_option)
-    {
-        // handle PS recording
-
-        ipack *ip = info->ip;
-        if (ip == NULL)
-            return true;
-
-        ip->ps = 1;
-
-        if (tspacket.PayloadStart() && (ip->plength == MMAX_PLENGTH-6))
-        {
-            ip->plength = ip->found-6;
-            ip->found = 0;
-            send_ipack(ip);
-            reset_ipack(ip);
-        }
-
-        uint afc_offset = tspacket.AFCOffset();
-        if (afc_offset > 187)
-            return true;
-
-        instant_repack((uint8_t*)tspacket.data() + afc_offset,
-                       TSPacket::SIZE - afc_offset, ip);
-        return true;
-    }
-
-    // handle TS recording
-
     // Check for keyframes and count frames
     if (info->isVideo)
         _buffer_packets = !FindKeyframes(&tspacket);
@@ -1047,7 +1010,7 @@ static void print_pmt_info(
     QString pre, const QValueList<ElementaryPIDObject> &pmt_list,
     bool fta, uint program_number, uint pcr_pid)
 {
-    if (!(print_verbose_messages|VB_RECORD))
+    if (!(print_verbose_messages&VB_RECORD))
         return;
 
     VERBOSE(VB_RECORD, pre +
@@ -1152,118 +1115,6 @@ bool DVBRecorder::Poll(void) const
 #endif // USE_DRB
 }
 
-void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
-{
-    if (len < 4)
-        return;
-
-    if (buffer[0] != 0x00 || buffer[1] != 0x00 || buffer[2] != 0x01)
-    {
-        if (!_wait_for_keyframe_option || _first_keyframe>=0)
-            ringBuffer->Write(buffer, len);
-        return;
-    }
-
-    uint stream_id = buffer[3];
-    if ((stream_id >= PESStreamID::MPEGVideoStreamBegin) &&
-        (stream_id <= PESStreamID::MPEGVideoStreamEnd))
-    {
-        uint pos = 8 + buffer[8];
-        uint datalen = len - pos;
-
-        unsigned char *bufptr = &buffer[pos];
-        uint state = 0xFFFFFFFF;
-        uint state_byte = 0;
-        int prvcount = -1;
-
-        uint framesWritten = _frames_written_count;
-        while (bufptr < &buffer[pos] + datalen)
-        {
-            state_byte  = (++prvcount < 3) ? _ps_rec_buf[prvcount] : *bufptr++;
-            uint last   = state;
-            state       = ((state << 8) | state_byte) & 0xFFFFFF;
-            stream_id   = state_byte;
-
-            // Skip non-prefixed stream id's and skip slice PES stream id's
-            if ((last != 0x000001) ||
-                ((stream_id >= PESStreamID::SliceStartCodeBegin) &&
-                 (stream_id <= PESStreamID::SliceStartCodeEnd)))
-            {
-                continue;
-            }
-
-            // Now process the stream id's we care about
-            if (PESStreamID::PictureStartCode == stream_id)
-                _frames_written_count++;
-            else if (PESStreamID::SequenceStartCode == stream_id)
-                _first_keyframe = framesWritten;
-            else if (PESStreamID::GOPStartCode == stream_id)
-            {
-                _position_map_lock.lock();
-                bool save_map = false;
-                if (!_position_map.contains(_frames_written_count))
-                {
-                    long long startpos = ringBuffer->GetWritePosition();
-                    _position_map_delta[_frames_written_count] = startpos;
-                    _position_map[_frames_written_count] = startpos;
-                    save_map = true;
-                }
-                _position_map_lock.unlock();
-                if (save_map)
-                    SavePositionMap(false);
-            }
-        }
-    }
-    memcpy(_ps_rec_buf, &buffer[len - 3], 3);
-
-    if (!_wait_for_keyframe_option || _first_keyframe>=0)
-        ringBuffer->Write(buffer, len);
-}
-
-void DVBRecorder::process_data_ps_cb(unsigned char *buffer,
-                                     int len, void *priv)
-{
-    if (len>=0)
-        ((DVBRecorder*)priv)->ProcessDataPS(buffer, (uint)len);
-}
-
-ipack *DVBRecorder::CreateIPack(ES_Type type)
-{
-    ipack* ip = (ipack*)malloc(sizeof(ipack));
-    assert(ip);
-    switch (type)
-    {
-        case ES_TYPE_VIDEO_MPEG1:
-        case ES_TYPE_VIDEO_MPEG2:
-            init_ipack(ip, 2048, process_data_ps_cb);
-            ip->replaceid = _ps_rec_video_id++;
-            break;
-
-        case ES_TYPE_AUDIO_MPEG1:
-        case ES_TYPE_AUDIO_MPEG2:
-            init_ipack(ip, 65535, process_data_ps_cb); /* don't repack PES */
-            ip->replaceid = _ps_rec_audio_id++;
-            break;
-
-        case ES_TYPE_AUDIO_AC3:
-            init_ipack(ip, 65535, process_data_ps_cb); /* don't repack PES */
-            ip->priv_type = PRIV_TS_AC3;
-            break;
-
-        case ES_TYPE_SUBTITLE:
-        case ES_TYPE_TELETEXT:
-            init_ipack(ip, 65535, process_data_ps_cb); /* don't repack PES */
-            ip->priv_type = PRIV_DVB_SUB;
-            break;
-
-        default:
-            init_ipack(ip, 2048, process_data_ps_cb);
-            break;
-    }
-    ip->data = (void*)this;
-    return ip;
-}
-
 #ifndef USE_DRB
 static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize)
 {
@@ -1279,41 +1130,3 @@ static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize)
     return size;
 }
 #endif // USE_DRB
-
-void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
-{
-    (void) len;
-
-    uint8_t sync = buffer[0];
-    uint8_t transport_error = (buffer[1] & 0x80) >> 7;
-    uint8_t payload_start = (buffer[1] & 0x40) >> 6;
-    uint16_t pid = (buffer[1] & 0x1F) << 8 | buffer[2];
-    uint8_t transport_scrambled = (buffer[3] & 0xB0) >> 6;
-    uint8_t adaptation_control = (buffer[3] & 0x30) >> 4;
-    uint8_t counter = buffer[3] & 0x0F;
-
-    int pos=4;
-    if (adaptation_control == 2 || adaptation_control == 3)
-    {
-        unsigned char adaptation_length;
-        adaptation_length = buffer[pos++];
-        pos += adaptation_length;
-    }
-
-    QString debugmsg =
-        QString("sync: %1 err: %2 paystart: %3 "
-                "pid: %4 enc: %5 adaptation: %6 counter: %7")
-        .arg(sync, 2, 16)
-        .arg(transport_error)
-        .arg(payload_start)
-        .arg(pid)
-        .arg(transport_scrambled)
-        .arg(adaptation_control)
-        .arg(counter);
-
-    const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[0]);
-    FindKeyframes(pkt);
-
-    int cardnum = _card_number_option;
-    GENERAL(debugmsg);
-}

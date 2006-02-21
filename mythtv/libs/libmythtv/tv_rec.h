@@ -73,12 +73,7 @@ class GeneralDBOptions
 class DVBDBOptions
 {
   public:
-    DVBDBOptions() :
-        hw_decoder(0),        recordts(1),
-        dvb_on_demand(false) {;}
-
-    int hw_decoder;
-    int recordts;
+    DVBDBOptions() : dvb_on_demand(false) {;}
     bool dvb_on_demand;
 };
 

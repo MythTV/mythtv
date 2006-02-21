@@ -32,12 +32,11 @@ class PIDInfo
 {
   public:
     PIDInfo() :
-        filter_fd(-1),  continuityCount(0xFF), ip(NULL),
+        filter_fd(-1),  continuityCount(0xFF),
         isVideo(false), isEncrypted(false),    payloadStartSeen(false) {;}
 
     int    filter_fd;         ///< Input filter file descriptor
     uint   continuityCount;   ///< last Continuity Count (sentinel 0xFF)
-    ipack *ip;                ///< TS->PES converter
     bool   isVideo;
     bool   isEncrypted;       ///< true if PID is marked as encrypted
     bool   payloadStartSeen;  ///< true if payload start packet seen on PID
@@ -111,11 +110,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     void ReaderPaused(int fd);
     bool PauseAndWait(int timeout = 100);
 
-    // TS->PS Transform
-    ipack *CreateIPack(ES_Type type);
-    void ProcessDataPS(unsigned char *buffer, uint len);
-    static void process_data_ps_cb(unsigned char*,int,void*);
-
     DeviceReadBuffer *_drb;
 
     void GetTimeStamp(const TSPacket& tspacket);
@@ -179,12 +173,6 @@ inline void PIDInfo::Close(void)
 {
     if (filter_fd >= 0)
         close(filter_fd);
-
-    if (ip)
-    {
-        free_ipack(ip);
-        free(ip);
-    }
 }
 
 inline bool PIDInfo::CheckCC(uint new_cnt)
