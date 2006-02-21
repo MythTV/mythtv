@@ -315,7 +315,8 @@ void DVBCam::SendPMT(PMTObject &pmt, uint8_t cplm)
         {
             if ((*es).Record)
             {
-                GENERAL(QString("CA: Adding elementary stream: %1, PID=%2").arg((*es).Description).arg((*es).PID));
+                GENERAL(QString("CA: Adding elementary stream: %1, PID=%2")
+                        .arg((*es).GetDescription()).arg((*es).PID));
                 capmt.AddElementaryStream((*es).Orig_Type, (*es).PID);
 
                 for (ca = (*es).CA.begin(); ca != (*es).CA.end(); ++ca)

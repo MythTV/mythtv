@@ -553,44 +553,34 @@ void DVBRecorder::CreatePAT(void)
     SetPAT(ProgramAssociationTable::Create(tsid, cc, pnum, pid));
 }
 
-static void DescList_to_desc_list(DescriptorList &list, desc_list_t &vec)
-{
-    vec.clear();
-    for (DescriptorList::iterator it = list.begin(); it != list.end(); ++it)
-        vec.push_back((*it).Data);
-}
-
 void DVBRecorder::CreatePMT(void)
 {
     QMutexLocker read_lock(&_pid_lock);
 
     // Figure out what goes into the PMT
     uint programNumber = 1; // MPEG Program Number
-    desc_list_t gdesc;
+    desc_list_t gdesc = _input_pmt.Descriptors;
     vector<uint> pids;
     vector<uint> types;
     vector<desc_list_t> pdesc;
     QValueList<ElementaryPIDObject>::iterator it;
-
-    DescList_to_desc_list(_input_pmt.Descriptors, gdesc);
 
     it = _input_pmt.Components.begin();
     for (; it != _input_pmt.Components.end(); ++it)
     {
         if ((*it).Record)
         {
-            pdesc.resize(pdesc.size()+1);
-            DescList_to_desc_list((*it).Descriptors, pdesc.back());
+            pdesc.push_back((*it).Descriptors);
             pids.push_back((*it).PID);
-            uint type = StreamID::Normalize((*it).Orig_Type, pdesc.back());
+            uint type = StreamID::Normalize((*it).Orig_Type,(*it).Descriptors);
             types.push_back(type);
         }
     }
 
     if (_video_stream_fd >= 0)
     {
-        pdesc.resize(pdesc.size()+1);
-        pdesc.back().clear();
+        desc_list_t dummy;
+        pdesc.push_back(dummy);
         pids.push_back(DUMMY_VIDEO_PID);
         types.push_back(StreamID::MPEG2Video);
     }
@@ -971,7 +961,7 @@ static void print_pmt_info(
         VERBOSE(VB_RECORD, pre +
                 QString("AutoPID %1 PID 0x%2, %3")
                 .arg(((*it).Record) ? "recording" : "skipping")
-                .arg((*it).PID,0,16).arg((*it).Description));
+                .arg((*it).PID,0,16).arg((*it).GetDescription()));
     }
 
     VERBOSE(VB_RECORD, pre + "AutoPID Complete - PAT/PMT Loaded for service\n"
@@ -997,8 +987,7 @@ void DVBRecorder::AutoPID(void)
     // we know about (ffmpeg doesn't like some DVB streams).
     for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
     {
-        desc_list_t list;
-        DescList_to_desc_list((*it).Descriptors, list);
+        const desc_list_t &list = (*it).Descriptors;
         uint type = StreamID::Normalize((*it).Orig_Type, list);
         const void *st = MPEGDescriptor::Find(list, DescriptorID::subtitling);
         const void *tt = MPEGDescriptor::Find(list, DescriptorID::teletext);

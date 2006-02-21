@@ -159,7 +159,7 @@ class RegistrationDescriptor : public MPEGDescriptor
         assert(DescriptorID::registration == DescriptorTag());
         if (0x04 != DescriptorLength())
         {
-            cerr<<"Registration Descriptor length != 4 !!!!"<<endl;
+            //cerr<<"Registration Descriptor length != 4 !!!!"<<endl;
         }
     }
 

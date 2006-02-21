@@ -201,56 +201,43 @@ void CAPMTObject::Reset()
     memset(Data, 0, sizeof(Data));
 }
 
-
-Descriptor::Descriptor()
+ElementaryPIDObject::ElementaryPIDObject(const ElementaryPIDObject &other)
 {
-    Data = NULL;
-    Length = 0;
-}
-
-Descriptor::Descriptor(const uint8_t *Data, const uint8_t Length)
-{
-    this->Length = Length;
-    this->Data = new uint8_t[Length];
-    memcpy(this->Data, Data, Length);
-}
-
-Descriptor::Descriptor(const Descriptor &orig)
-{
-    Length = orig.Length;
-    Data = new uint8_t[Length];
-    memcpy(Data, orig.Data, Length);
-}
-
-Descriptor::~Descriptor()
-{
-    if (Data)
-        delete[] Data;
+    deepCopy(other);
 }
 
 void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
 {
     Orig_Type   = e.Orig_Type;
     PID         = e.PID;
-    Description = QDeepCopy<QString>(e.Description);
-    Language    = QDeepCopy<QString>(e.Language);
     CA          = QDeepCopy<CAList>(e.CA);
     Record      = e.Record;
 
+    desc_list_t::iterator it = Descriptors.begin();
+    for (; it != Descriptors.end(); ++it)
+        delete [] *it;
     Descriptors.clear();
-    DescriptorList::const_iterator dit;
-    for (dit = e.Descriptors.begin(); dit != e.Descriptors.end(); ++dit)
-        Descriptors.append(Descriptor(*dit));
+
+    desc_list_t::const_iterator cit = e.Descriptors.begin();
+    for (; cit != e.Descriptors.end(); ++cit)
+    {
+        unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
+        memcpy(tmp, *cit, (*cit)[1] + 2);
+        Descriptors.push_back(tmp);
+    }
 }
 
 void ElementaryPIDObject::Reset()
 {
     Orig_Type = 0;
     PID = 0;
-    Description = "";
-    Language = "";
     CA.clear();
+
+    desc_list_t::iterator it = Descriptors.begin();
+    for (; it != Descriptors.end(); ++it)
+        delete [] *it;
     Descriptors.clear();
+
     Record = false;
 }
 
@@ -288,36 +275,20 @@ void NetworkObject::Reset()
 }
 
 /** \fn PMTObject::PMTObject(const PMTObject&)
- *  \brief Performs shallow copy.
+ *  \brief Performs deep copy.
  */
 PMTObject::PMTObject(const PMTObject &other)
 {
-    shallowCopy(other);
+    deepCopy(other);
 }
 
 /** \fn PMTObject::operator=(const PMTObject&)
- *  \brief Performs shallow copy.
+ *  \brief Performs deep copy.
  */
 PMTObject &PMTObject::operator=(const PMTObject &other)
 {
-    shallowCopy(other);
+    deepCopy(other);
     return *this;
-}
-
-/** \fn PMTObject::shallowCopy(const PMTObject&)
- *  \brief Copies each field in PMT, but shares QPtrVector data.
- */
-void PMTObject::shallowCopy(const PMTObject &other)
-{
-    PCRPID      = other.PCRPID;
-    ServiceID   = other.ServiceID;
-    PMTPID      = other.PMTPID;
-    CA          = other.CA;
-    Descriptors = other.Descriptors;
-    Components  = other.Components;
-    hasCA       = other.hasCA;
-    hasAudio    = other.hasAudio;
-    hasVideo    = other.hasVideo;
 }
 
 /** \fn PMTObject::deepCopy(const PMTObject&)
@@ -332,10 +303,18 @@ void PMTObject::deepCopy(const PMTObject &other)
 
     CA          = QDeepCopy<CAList>(other.CA);
 
+    desc_list_t::iterator it = Descriptors.begin();
+    for (; it != Descriptors.end(); ++it)
+        delete [] *it;
     Descriptors.clear();
-    DescriptorList::const_iterator dit;
-    for (dit = other.Descriptors.begin(); dit!=other.Descriptors.end(); ++dit)
-        Descriptors.append(Descriptor(*dit));
+
+    desc_list_t::const_iterator cit = other.Descriptors.begin();
+    for (; cit != other.Descriptors.end(); ++cit)
+    {
+        unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
+        memcpy(tmp, *cit, (*cit)[1] + 2);
+        Descriptors.push_back(tmp);
+    }
 
     Components.clear();
     QValueList<ElementaryPIDObject>::const_iterator eit;
@@ -356,11 +335,16 @@ void PMTObject::deepCopy(const PMTObject &other)
  */
 void PMTObject::Reset()
 {
+    PCRPID    = 0;
     ServiceID = 0;
-    PCRPID = 0;
+    PMTPID    = 0;
     CA.clear();
+
+    desc_list_t::iterator it = Descriptors.begin();
+    for (; it != Descriptors.end(); ++it)
+        delete [] *it;
+    Descriptors.clear();
     Components.clear();
-    PMTPID = 0;
 
     hasCA = false;
     hasAudio = false;

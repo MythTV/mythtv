@@ -734,8 +734,10 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         }
         else
         {
-            p.Descriptors.append(Descriptor(*it, (*it)[1] + 2));
             ProcessUnusedDescriptor(0, *it, (*it)[1] + 2);
+            unsigned char *tmp = new unsigned char[(*it)[1] + 2];
+            memcpy(tmp, *it, (*it)[1] + 2);
+            p.Descriptors.push_back(tmp);
         }
     }
 
@@ -754,16 +756,8 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         e.Reset();
         e.PID         = pmt->StreamPID(i);
         e.Orig_Type   = pmt->StreamType(i);
-        e.Description = StreamID::toString(type);
 
         const unsigned char *d;
-        d = MPEGDescriptor::Find(list, DescriptorID::ISO_639_language);
-        if (d)
-        {
-            ISO639LanguageDescriptor iso_lang(d);
-            e.Language = iso_lang.CanonicalLanguageString();
-            e.Description += QString(" (%1)").arg(e.Language);
-        }
 
         d = MPEGDescriptor::Find(list, DescriptorID::conditional_access);
         if (d)
@@ -789,7 +783,11 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         for (; it != list.end(); ++it)
         {
             if (DescriptorID::conditional_access != (*it)[0])
-                e.Descriptors.append(Descriptor(*it, (*it)[1] + 2));
+            {
+                unsigned char *tmp = new unsigned char[(*it)[1] + 2];
+                memcpy(tmp, *it, (*it)[1] + 2);
+                e.Descriptors.push_back(tmp);
+            }
         }
 
         p.Components += e; 

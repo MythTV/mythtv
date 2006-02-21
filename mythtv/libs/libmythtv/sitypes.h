@@ -14,6 +14,8 @@ using namespace std;
 #include <qdatetime.h>
 
 #include "config.h"
+#include "mpegdescriptors.h"
+#include "mpegtables.h"
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -279,33 +281,42 @@ public:
 };
 typedef QValueList<CAPMTObject> CAList;
 
-class Descriptor
-{
-public:
-    Descriptor();
-    Descriptor(const uint8_t *Data, const uint8_t Length);
-    Descriptor(const Descriptor &orig);
-    ~Descriptor();
-
-    uint8_t  Length;
-    uint8_t  *Data;
-};
-typedef QValueList<Descriptor> DescriptorList;
-
 class ElementaryPIDObject
 {
 public:
     ElementaryPIDObject() { Reset(); }
+    ~ElementaryPIDObject() { Reset(); }
+    ElementaryPIDObject(const ElementaryPIDObject &other);
+    ElementaryPIDObject& operator=(const ElementaryPIDObject &other);
     void deepCopy(const ElementaryPIDObject&);
     void Reset();
 
-    uint8_t Orig_Type;
-    uint16_t PID;
-    QString Description;
-    QString Language;
-    CAList CA;
-    DescriptorList Descriptors;
-    bool Record;
+    QString GetLanguage(void) const
+    {
+        const unsigned char *d;
+        d = MPEGDescriptor::Find(Descriptors, DescriptorID::ISO_639_language);
+        if (!d)
+            return QString::null;
+
+        ISO639LanguageDescriptor iso_lang(d);
+        return iso_lang.CanonicalLanguageString();
+    }
+
+    QString GetDescription(void) const
+    {
+        uint type = StreamID::Normalize(Orig_Type, Descriptors);
+        QString desc = StreamID::toString(type);
+        QString lang = GetLanguage();
+        if (!lang.isEmpty())
+            desc += QString(" (%1)").arg(lang);
+        return desc;
+    }
+
+    uint        Orig_Type;
+    uint        PID;
+    CAList      CA;
+    desc_list_t Descriptors;
+    bool        Record;
 };
 typedef QValueList<ElementaryPIDObject> ComponentList;
 
@@ -383,8 +394,9 @@ class PMTObject
   public:
     PMTObject() { Reset(); }
     PMTObject(const PMTObject &other);
+    ~PMTObject() { Reset(); }
+
     PMTObject& operator=(const PMTObject &other);
-    void shallowCopy(const PMTObject &other);
     void deepCopy(const PMTObject &other);
     void Reset();
 
@@ -403,7 +415,7 @@ class PMTObject
     uint16_t       ServiceID;
     uint16_t       PMTPID;
     CAList         CA;
-    DescriptorList Descriptors;
+    desc_list_t    Descriptors;
     ComponentList  Components;
 
     // helper variables
