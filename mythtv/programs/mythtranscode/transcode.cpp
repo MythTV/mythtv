@@ -297,6 +297,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                               bool honorCutList, bool framecontrol,
                               int jobID, QString fifodir)
 { 
+    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime statustime = curtime;
     int audioframesize;
     int audioFrame = 0;
 
@@ -305,43 +307,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     nvp = new NuppelVideoPlayer("transcoder", m_proginfo);
     nvp->SetNullVideo();
-
-    QDateTime curtime = QDateTime::currentDateTime();
-    QDateTime statustime = curtime;
-    if (honorCutList && m_proginfo)
-    {
-        VERBOSE(VB_GENERAL, "Honoring the cutlist while transcoding");
-
-        QMap<long long, int> delMap;
-        QMap<long long, int>::Iterator it;
-        QString cutStr = "";
-        m_proginfo->GetCutList(delMap);
-
-        for (it = delMap.begin(); it != delMap.end(); ++it)
-        {
-            if (it.data())
-            {
-                if (cutStr != "")
-                    cutStr += ",";
-                cutStr += QString("%1-").arg(it.key());
-            }
-            else
-                cutStr += QString("%1").arg(it.key());
-        }
-        if (cutStr == "")
-            cutStr = "Is Empty";
-        VERBOSE(VB_GENERAL, QString("Cutlist: %1").arg(cutStr));
-
-
-        if ((m_proginfo->IsEditing()) ||
-            (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
-        {
-            VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
-            return REENCODE_CUTLIST_CHANGE;
-        }
-        m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false);
-        curtime = curtime.addSecs(60);
-    }
 
     if (showprogress)
     {
@@ -363,6 +328,52 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         return REENCODE_ERROR;
     }
 
+    long long total_frame_count = nvp->GetTotalFrameCount();
+    long long new_frame_count = total_frame_count;
+    if (honorCutList && m_proginfo)
+    {
+        VERBOSE(VB_GENERAL, "Honoring the cutlist while transcoding");
+
+        QMap<long long, int> delMap;
+        QMap<long long, int>::Iterator it;
+        QString cutStr = "";
+        long long lastStart;
+
+        m_proginfo->GetCutList(delMap);
+
+        for (it = delMap.begin(); it != delMap.end(); ++it)
+        {
+            if (it.data())
+            {
+                if (cutStr != "")
+                    cutStr += ",";
+                cutStr += QString("%1-").arg((long)it.key());
+                lastStart = it.key();
+            }
+            else
+            {
+                cutStr += QString("%1").arg((long)it.key());
+                new_frame_count -= (it.key() - lastStart);
+            }
+        }
+        if (cutStr == "")
+            cutStr = "Is Empty";
+        VERBOSE(VB_GENERAL, QString("Cutlist        : %1").arg(cutStr));
+        VERBOSE(VB_GENERAL, QString("Original Length: %1 frames")
+                                    .arg((long)total_frame_count));
+        VERBOSE(VB_GENERAL, QString("New Length     : %1 frames")
+                                    .arg((long)new_frame_count));
+
+        if ((m_proginfo->IsEditing()) ||
+            (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
+        {
+            VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
+            return REENCODE_CUTLIST_CHANGE;
+        }
+        m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false);
+        curtime = curtime.addSecs(60);
+    }
+
     nvp->ReinitAudio();
     QString encodingType = nvp->GetEncodingType();
     bool copyvideo = false, copyaudio = false;
@@ -373,7 +384,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int video_height = nvp->GetVideoHeight();
     float video_aspect = nvp->GetVideoAspect();
     float video_frame_rate = nvp->GetFrameRate();
-    long long total_frame_count = nvp->GetTotalFrameCount();
     int newWidth = video_width;
     int newHeight = video_height;
 
@@ -824,7 +834,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 return REENCODE_CUTLIST_CHANGE;
             }
 
-            if (jobID >= 0)
+            if ((jobID >= 0) || (print_verbose_messages & VB_IMPORTANT))
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {
@@ -833,15 +843,23 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
                     return REENCODE_STOPPED;
                 }
+
                 float flagFPS = 0.0;
                 float elapsed = flagTime.elapsed() / 1000.0;
                 if (elapsed)
                     flagFPS = curFrameNum / elapsed;
 
-                int percentage = curFrameNum * 100 / total_frame_count;
-                JobQueue::ChangeJobComment(jobID,
-                          QObject::tr("%1% Completed @ %2 fps.")
-                                      .arg(percentage).arg(flagFPS));
+                int percentage = curFrameNum * 100 / new_frame_count;
+
+                if (jobID >= 0)
+                    JobQueue::ChangeJobComment(jobID,
+                              QObject::tr("%1% Completed @ %2 fps.")
+                                          .arg(percentage).arg(flagFPS));
+
+                VERBOSE(VB_IMPORTANT, QString(
+                        "mythtranscode: %1% Completed @ %2 fps.")
+                        .arg(percentage).arg(flagFPS));
+
             }
             curtime = QDateTime::currentDateTime();
             curtime = curtime.addSecs(20);
