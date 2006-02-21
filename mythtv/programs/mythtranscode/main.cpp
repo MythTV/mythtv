@@ -337,13 +337,12 @@ int main(int argc, char *argv[])
     ProgramInfo *pginfo = NULL;
     if (!found_infile)
     {
-        QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
+        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
 
         if (!pginfo)
         {
-            cerr << "Couldn't find recording " << chanid << " " 
-                 << startts.toString() << endl;
+            cerr << "Couldn't find recording for chanid " << chanid << " @ " 
+                 << starttime << endl;
             return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
 

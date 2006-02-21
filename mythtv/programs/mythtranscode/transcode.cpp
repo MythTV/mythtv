@@ -314,11 +314,24 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
         QMap<long long, int> delMap;
         QMap<long long, int>::Iterator it;
+        QString cutStr = "";
         m_proginfo->GetCutList(delMap);
 
         for (it = delMap.begin(); it != delMap.end(); ++it)
-            VERBOSE(VB_GENERAL, QString("%1 cut at %2")
-                    .arg(it.data() ? "Start" : "End").arg(it.key()));
+        {
+            if (it.data())
+            {
+                if (cutStr != "")
+                    cutStr += ",";
+                cutStr += QString("%1-").arg(it.key());
+            }
+            else
+                cutStr += QString("%1").arg(it.key());
+        }
+        if (cutStr == "")
+            cutStr = "Is Empty";
+        VERBOSE(VB_GENERAL, QString("Cutlist: %1").arg(cutStr));
+
 
         if ((m_proginfo->IsEditing()) ||
             (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
