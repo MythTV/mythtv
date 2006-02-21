@@ -4721,7 +4721,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
         QString message = "COMMFLAG_REQUEST ";
         message += m_playbackinfo->chanid + " " +
-                   m_playbackinfo->startts.toString(Qt::ISODate);
+                   m_playbackinfo->recstartts.toString(Qt::ISODate);
         RemoteSendMessage(message);
 
         return false;
