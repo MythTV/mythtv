@@ -130,7 +130,8 @@ private:
 public:
   cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddElementaryStream(int type, int pid);
-  void AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8_t *data);
+  void AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
+                       const uint8_t *data);
   };
 
 #define MAX_CI_SESSION  16 //XXX

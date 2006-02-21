@@ -1396,7 +1396,8 @@ void cCiCaPmt::AddElementaryStream(int type, int pid)
         [stream descriptors]
 \endcode
  */
-void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8_t *data)
+void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
+                               const uint8_t *data)
 {
   if (!infoLengthPos)
   {

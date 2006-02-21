@@ -1,11 +1,16 @@
 #ifndef DVBCAM_H
 #define DVBCAM_H
 
+#include <deque>
+using namespace std;
+
 #include <qobject.h>
-#include <pthread.h>
+#include <qmutex.h>
 
 #include <dvbci.h>
 #include "dvbtypes.h"
+
+typedef deque<PMTObject> pmt_list_t;
 
 class DVBCam: public QObject
 {
@@ -16,28 +21,30 @@ public:
 
     bool Start();
     bool Stop();
-    bool IsRunning();
+    bool IsRunning() const { return ciThreadRunning; }
     void SetPMT(const PMTObject *pmt);
     void AddPMT(const PMTObject *pmt);
 
 private:
-    static void *CiHandlerThreadHelper(void*self);
-    void CiHandlerLoop();
+    static void *CiHandlerThreadHelper(void*);
+    void CiHandlerLoop(void);
+    void HandleUserIO(void);
+    void HandlePMT(void);
 
-    void SendPMT(PMTObject &pmt, uint8_t cplm);
+    void SendPMT(const PMTObject &pmt, uint cplm);
 
     int             cardnum;
     int             numslots;
-    cCiHandler      *ciHandler;
+    cCiHandler     *ciHandler;
 
     bool            exitCiThread;
     bool            ciThreadRunning;
 
     pthread_t       ciHandlerThread;
 
-    QValueList<PMTObject> PMTList;
-    QValueList<PMTObject> PMTAddList;
-    pthread_mutex_t pmt_lock;
+    pmt_list_t      PMTList;
+    pmt_list_t      PMTAddList;
+    QMutex          pmt_lock;
     bool            have_pmt;
     bool            pmt_sent;
     bool            pmt_updated;
@@ -45,3 +52,4 @@ private:
 };
 
 #endif // DVBCAM_H
+
