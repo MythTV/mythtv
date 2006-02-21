@@ -248,7 +248,6 @@ void DVBRecorder::CloseFilters(void)
 }
 
 void DVBRecorder::OpenFilter(uint           pid,
-                             ES_Type        type,
                              dmx_pes_type_t pes_type,
                              uint           stream_type)
 {
@@ -261,8 +260,8 @@ void DVBRecorder::OpenFilter(uint           pid,
     // rounded up to the nearest page
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
-    VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%2 size(%3) type(%4)")
-            .arg((int)pid,0,16).arg(pid_buffer_size).arg(type));
+    VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%1 size(%2)")
+            .arg((int)pid,0,16).arg(pid_buffer_size));
 
     // Open the demux device
     int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
@@ -321,7 +320,6 @@ void DVBRecorder::OpenFilter(uint           pid,
 
 bool DVBRecorder::OpenFilters(void)
 {
-    bool videoMissing = true;
     CloseFilters();
 
     QMutexLocker change_lock(&_pid_lock);
@@ -338,24 +336,12 @@ bool DVBRecorder::OpenFilters(void)
         if (!(*es).Record)
             continue;
 
-        int pid = (*es).PID;
-        dmx_pes_type_t pes_type;
-
-        if ((*es).Type == ES_TYPE_VIDEO_MPEG1 ||
-            (*es).Type == ES_TYPE_VIDEO_MPEG2)
-            videoMissing = false;
-            
-        pes_type = DMX_PES_OTHER;
-
-        OpenFilter(pid, (*es).Type, pes_type, (*es).Orig_Type);
-
-        if (pid == _input_pmt.PCRPID)
-            need_pcr_pid = false;
+        OpenFilter((*es).PID, DMX_PES_OTHER, (*es).Orig_Type);
+        need_pcr_pid &= ((*es).PID != _input_pmt.PCRPID);
     }
 
-    if (need_pcr_pid && (_input_pmt.PCRPID != 0))
-        OpenFilter(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_OTHER,
-                    (*es).Orig_Type);
+    if (need_pcr_pid && (_input_pmt.PCRPID))
+        OpenFilter(_input_pmt.PCRPID, DMX_PES_OTHER, (*es).Orig_Type);
 
     if (_video_stream_fd >= 0)
     {
@@ -363,7 +349,7 @@ bool DVBRecorder::OpenFilters(void)
         _video_stream_fd = -1;
     }
 
-    if (videoMissing)
+    if (!_input_pmt.hasVideo)
     {
         VERBOSE(VB_RECORD, LOC + "Creating dummy video");
         // Create a dummy video stream.
@@ -1014,9 +1000,13 @@ void DVBRecorder::AutoPID(void)
         desc_list_t list;
         DescList_to_desc_list((*it).Descriptors, list);
         uint type = StreamID::Normalize((*it).Orig_Type, list);
-        (*it).Record |= (StreamID::IsAudio(type) || StreamID::IsVideo(type) ||
-                         (ES_TYPE_TELETEXT == (*it).Type) ||
-                         (ES_TYPE_SUBTITLE == (*it).Type));
+        const void *st = MPEGDescriptor::Find(list, DescriptorID::subtitling);
+        const void *tt = MPEGDescriptor::Find(list, DescriptorID::teletext);
+
+        (*it).Record |= StreamID::IsAudio(type);
+        (*it).Record |= StreamID::IsVideo(type);
+        (*it).Record |= (st != NULL);
+        (*it).Record |= (tt != NULL);
     }
 
     print_pmt_info(LOC, pmt_list,

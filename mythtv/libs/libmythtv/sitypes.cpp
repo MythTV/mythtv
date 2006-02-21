@@ -230,7 +230,6 @@ Descriptor::~Descriptor()
 
 void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
 {
-    Type        = e.Type;
     Orig_Type   = e.Orig_Type;
     PID         = e.PID;
     Description = QDeepCopy<QString>(e.Description);
@@ -246,7 +245,6 @@ void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
 
 void ElementaryPIDObject::Reset()
 {
-    Type = ES_TYPE_UNKNOWN;
     Orig_Type = 0;
     PID = 0;
     Description = "";

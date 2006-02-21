@@ -708,8 +708,6 @@ void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
     }
 }
 
-ES_Type ProcessType(const ProgramMapTable &pmt, uint i);
-
 // TODO: Catch serviceMove descriptor and send a signal when you get one
 //       to retune to correct transport or send an error tuning the channel
 void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
@@ -756,7 +754,6 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         e.Reset();
         e.PID         = pmt->StreamPID(i);
         e.Orig_Type   = pmt->StreamType(i);
-        e.Type        = ProcessType(*pmt, i);
         e.Description = StreamID::toString(type);
 
         const unsigned char *d;
@@ -801,79 +798,6 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     }
 
     ((PMTHandler*) Table[PMT])->pmt[pmt->ProgramNumber()] = p;
-}
-
-ES_Type ProcessType(const ProgramMapTable &pmt, uint i)
-{
-    ES_Type proc_type;
-    // The stream type can be detected in two ways:
-    // - by stream type field in PMT, if known
-    // - by a descriptor
-    switch (pmt.StreamType(i))
-    {
-        case 0x01:
-            proc_type = ES_TYPE_VIDEO_MPEG1;
-            break;
-        case 0x80:  // OpenCable Mpeg2
-        case 0x02:  // DVB/ATSC Mpeg2
-            proc_type = ES_TYPE_VIDEO_MPEG2;
-            break;
-        case 0x03:
-            proc_type = ES_TYPE_AUDIO_MPEG1;
-            break;
-        case 0x04:
-            proc_type = ES_TYPE_AUDIO_MPEG2;
-            break;
-        case 0x08:
-        case 0x0B:
-            proc_type = ES_TYPE_DATA;
-            break;
-        case 0x0F:
-            proc_type = ES_TYPE_AUDIO_AAC;
-            break;
-        case 0x81:
-            // Where ATSC Puts the AC3 Descriptor
-            proc_type = ES_TYPE_AUDIO_AC3;
-            break;
-    }
-
-    const unsigned char *si = pmt.StreamInfo(i);
-    desc_list_t list = MPEGDescriptor::Parse(si, pmt.StreamInfoLength(i));
-    desc_list_t::const_iterator it = list.begin();
-    for (; it != list.end(); ++it)
-    {
-        if (DescriptorID::conditional_access == (*it)[0])
-            continue;
-
-        switch ((*it)[0])
-        {
-            case 0x05: // Registration Descriptor
-            {
-                const RegistrationDescriptor reg(*it);
-                QString format = reg.FormatIdentifierString();
-                if (format == "DTS1")
-                    proc_type = ES_TYPE_AUDIO_DTS;
-            }
-            break;
-
-            case 0x56: // Teletext Descriptor
-                proc_type = ES_TYPE_TELETEXT;
-                break;
-                
-            case 0x59: // Subtitling Descriptor
-                proc_type = ES_TYPE_SUBTITLE;
-                break;
-                
-            case 0x6A: // AC3 Descriptor
-                proc_type = ES_TYPE_AUDIO_AC3;
-                break;
-
-            default:
-                break;                
-        }
-    }
-
-    return proc_type;
 }
 
 void SIParser::ProcessUnusedDescriptor(uint pid, const uint8_t *data, uint)

@@ -33,23 +33,6 @@ typedef enum
     SI_STANDARD_AUTO
 } SISTANDARD;
 
-typedef enum ES_Type
-{
-    ES_TYPE_UNKNOWN,
-    ES_TYPE_VIDEO_MPEG1,
-    ES_TYPE_VIDEO_MPEG2,
-    ES_TYPE_VIDEO_MPEG4,
-    ES_TYPE_VIDEO_H264,
-    ES_TYPE_AUDIO_MPEG1,
-    ES_TYPE_AUDIO_MPEG2,
-    ES_TYPE_AUDIO_AC3,
-    ES_TYPE_AUDIO_DTS,
-    ES_TYPE_AUDIO_AAC,
-    ES_TYPE_TELETEXT,
-    ES_TYPE_SUBTITLE,
-    ES_TYPE_DATA
-};
-
 typedef enum tabletypes
 {
     PAT,                /* Program Association Table */
@@ -316,7 +299,6 @@ public:
     void deepCopy(const ElementaryPIDObject&);
     void Reset();
 
-    ES_Type Type;
     uint8_t Orig_Type;
     uint16_t PID;
     QString Description;

@@ -93,7 +93,8 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     void AutoPID(void);
     bool OpenFilters(void);
     void CloseFilters(void);
-    void OpenFilter(uint pid, ES_Type type, dmx_pes_type_t pes_type,
+    void OpenFilter(uint pid,
+                    dmx_pes_type_t pes_type,
                     uint mpeg_stream_type);
 
     void SetPAT(ProgramAssociationTable*);
