@@ -247,6 +247,7 @@ using_backend {
     HEADERS += mpeg/dvbstreamdata.h        mpeg/scanstreamdata.h
     HEADERS += mpeg/mpegdescriptors.h      mpeg/atscdescriptors.h
     HEADERS += mpeg/dvbdescriptors.h
+    HEADERS += mpeg/atsc_huffman.h
     HEADERS += mpeg/tsstats.h 
     SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
     SOURCES += mpeg/dvbtables.cpp
@@ -254,6 +255,7 @@ using_backend {
     SOURCES += mpeg/dvbstreamdata.cpp      mpeg/scanstreamdata.cpp
     SOURCES += mpeg/mpegdescriptors.cpp    mpeg/atscdescriptors.cpp
     SOURCES += mpeg/dvbdescriptors.cpp
+    SOURCES += mpeg/atsc_huffman.cpp
 
     # Listings downloading classes
     HEADERS += datadirect.h

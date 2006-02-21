@@ -33,14 +33,6 @@
 #define LOC QString("SIParser: ")
 #define LOC_ERR QString("SIParser, Error: ")
 
-static QString huffman1_to_string(const unsigned char *compressed,
-                                  uint size,
-                                  const unsigned char *table);
-
-static uint huffman2_to_string(const unsigned char *compressed,
-                               uint length, uint table,
-                               QString &decompressed);
-
 /** \class SIParser
  *  This class parses DVB SI and ATSC PSIP tables.
  *
@@ -2220,41 +2212,31 @@ QDateTime SIParser::ConvertATSCDate(uint32_t offset)
  */
 QString SIParser::ParseMSS(uint8_t *buffer, int size)
 {
-// TODO: Check size
-//       Deal with multiple strings.
-//       Handle hufmann encoded text
+    (void) size;
 
-   (void) size;
+    MultipleStringStructure mss(buffer);
 
-   QString retval;
-
-   // Language bytes 1,2,3 - Use DVB Language Function
-   // Segments 4
-   // Compression Type = 5
-   // Mode = 6
-   // Bytes = 7
-
-    if (buffer[4] > 1)
-        VERBOSE(VB_SIPARSER, LOC + "MSS WITH MORE THAN 1 SEGMENT");
-
-    switch (buffer[5])
+    if (mss.StringCount() != 1)
     {
-        case 0:
-            for (int z=0; z < buffer[7]; z++)
-                retval += QChar(buffer[8+z]);
-            break;
-        case 1:
-            retval = huffman1_to_string(&buffer[8], buffer[7], ATSC_C5);
-            break;
-        case 2:
-            retval = huffman1_to_string(&buffer[8], buffer[7], ATSC_C7);
-            break;
-        default:
-            retval = QString("Unknown compression");
-            break;
+        VERBOSE(VB_EIT, LOC + "Multiple strings not yet decoded." +
+                mss.toString());
+
+        if (mss.StringCount() < 1)
+            return "";
     }
-    //VERBOSE(VB_EIT, LOC + QString("MSS%1: %2").arg(buffer[4]).arg(retval));
-    return retval;
+
+    if (mss.SegmentCount(0) != 1)
+    {
+        VERBOSE(VB_EIT, LOC + "Multiple segment strings not yet decoded." +
+                mss.toString());
+
+        if (mss.SegmentCount(0) < 1)
+            return "";
+    }
+
+    QString str = mss.CompressedString(0,0);
+
+    return str;
 }
 
 /*------------------------------------------------------------------------
@@ -2383,7 +2365,7 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
     (void) pid;
 #ifdef USING_DVB_EIT
 
-    if (Table[EVENTS]->AddSection(head,head->table_id_ext,pid))
+    if (Table[EVENTS]->AddSection(head, head->table_id_ext, pid))
         return;
 
     Event e;
@@ -2446,19 +2428,21 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
         {
             switch (buffer[pos + 2 + lentotal])
             {
-            case 0x86:    //TODO: ATSC Caption Descriptor
-                break;
-            case 0x87:   // Content Advisory Decriptor
-                ParseDescATSCContentAdvisory(
-                    &buffer[pos + 2 + lentotal],
-                    buffer[pos + 3 + lentotal]);
-            break;
-            default:
-                ProcessUnusedDescriptor(
-                    pid,
-                    &buffer[pos + 2 + lentotal],
-                    buffer[pos + 3 + lentotal] + 2);
-                break;
+                case DescriptorID::caption_service:
+                    //TODO: ATSC Caption Descriptor
+                    break;
+                case DescriptorID::content_advisory:
+                    // Content Advisory Decriptor
+                    ParseDescATSCContentAdvisory(
+                        &buffer[pos + 2 + lentotal],
+                        buffer[pos + 3 + lentotal]);
+                    break;
+                default:
+                    ProcessUnusedDescriptor(
+                        pid,
+                        &buffer[pos + 2 + lentotal],
+                        buffer[pos + 3 + lentotal] + 2);
+                    break;
             }
             len = buffer[pos + 3 + lentotal];
             lentotal += (len + 2);
@@ -2520,13 +2504,6 @@ void SIParser::HandleSTT(const SystemTimeTable *stt)
  *   ATSC DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
 
-QString SIParser::ParseATSCExtendedChannelName(uint8_t *buffer, int size)
-{
-
-    return ParseMSS(&buffer[2],size);
-
-}
-
 // TODO: Use this descriptor parser
 void SIParser::ParseDescATSCContentAdvisory(uint8_t *buffer, int size)
 {
@@ -2552,163 +2529,6 @@ void SIParser::ParseDescATSCContentAdvisory(uint8_t *buffer, int size)
 
 }
 
-/*------------------------------------------------------------------------
- * Huffman Text Decompressors - 1 and 2 level routines. Tables defined in
- * atsc_huffman.h
- *------------------------------------------------------------------------*/
-
-/* returns the root for character input from table Table[] */
-static inline int huffman1_get_root(uint input, const unsigned char *table)
-{
-    if (input > 127)
-        return -1;
-    return (table[input * 2] << 8) | table[(input * 2) + 1];
-}
-
-/* Returns the bit number bit from string test[] */
-static inline bool huffman1_get_bit(const unsigned char *src, uint bit)
-{
-    return (src[(bit - (bit % 8)) / 8] >> (7-(bit % 8))) & 0x01;
-}
-
-static QString huffman1_to_string(const unsigned char *compressed, uint size,
-                                  const unsigned char *table)
-{
-    QString retval;
-
-    int totalbits = size * 8;
-    int bit = 0;
-    int root = huffman1_get_root(0, table);
-    int node = 0;
-    bool thebit;
-    uint8_t val;
-
-    while (bit < totalbits)
-    {
-        thebit = huffman1_get_bit(compressed, bit);
-        val = (thebit) ? table[root + (node*2) + 1] : table[root + (node*2)];
-
-        if (val & 0x80)
-        {
-            /* Got a Null Character so return */
-            if ((val & 0x7F) == 0)
-            {
-                return retval;
-            }
-            /* Escape character so next character is uncompressed */
-            if ((val & 0x7F) == 27)
-            {
-                uint8_t val2 = 0;
-                for (int i = 0 ; i < 7 ; i++)
-                {
-                    val2 |=
-                        huffman1_get_bit(compressed, bit + i + 2) << 6 - i;
-                }
-                retval += QChar(val2);
-                bit += 8;
-                root = huffman1_get_root(val2, table);
-            }
-            /* Standard Character */
-            else
-            {
-                root = huffman1_get_root(val & 0x7F, table);
-                retval += QChar(val & 0x7F);
-            }
-            node = 0;
-        }
-        else
-            node = val;
-        bit++;
-    }
-    /* If you get here something went wrong so just return a blank string */
-    return QString("");
-}
-
-static inline int huffman2_get_bit(unsigned char &bitpos,
-                                   const unsigned char **bufptr)
-{
-   int ret = ((**bufptr & bitpos) != 0);
-   bitpos >>= 1;
-   if (!bitpos)
-   {
-       bitpos = 0x80;
-       (*bufptr)++;
-   }
-   return ret;
-}
-
-static inline void huffman2_set_pos(unsigned char &bitpos,
-                                    const unsigned char **bufptr,
-                                    const unsigned char *buffer,
-                                    uint pos)
-{
-    *bufptr = buffer + (pos >> 3);
-    bitpos  = 0x80 >> (pos & 0x7);
-}
-
-static uint huffman2_to_string(const unsigned char *compressed,
-                               uint length, uint table,
-                               QString &decompressed)
-{
-    decompressed = "";
-
-    unsigned char        bitpos;
-    const unsigned char *bufptr;
-    huffman2_set_pos(bitpos, &bufptr, compressed, 0);
-
-    // Determine which huffman table to use
-    struct huffman_table *ptrTable;
-    const unsigned char  *lookup;
-    uint                  min_size;
-    uint                  max_size;
-    if (table == 1)
-    {
-        ptrTable = Table128;
-        lookup   = Huff2Lookup128;
-        min_size = 3;
-        max_size = 12;
-    }
-    else
-    {
-        ptrTable = Table255;
-        lookup   = Huff2Lookup256;
-        min_size = 2;
-        max_size = 14;
-    }
-
-    // walk thru all the bits in the byte array, finding each sequence in the
-    // list and decoding it to a character.
-    uint total_bits  = length << 3;
-    uint current_bit = 0;
-    uint count       = 0;
-    while (current_bit + 3 < total_bits)
-    {
-        uint cur_size = 0;
-        uint bits     = 0;
-
-        for (; cur_size < min_size; cur_size++)
-            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
-
-        while (cur_size < max_size)
-        {
-            uint key = lookup[bits];
-            if (key && (ptrTable[key].number_of_bits == cur_size))
-            {
-                decompressed += ptrTable[key].character;
-                current_bit += cur_size;
-                break;
-            }
-            bits = (bits << 1) | huffman2_get_bit(bitpos, &bufptr);
-            cur_size++;
-        }
-
-        if (cur_size == max_size)
-            huffman2_set_pos(bitpos, &bufptr, compressed, ++current_bit);
-    }
-
-    return count;
-}
-
 #ifdef USING_DVB_EIT
 /* Huffman Text Decompression Routines used by some Nagra Providers */
 void SIParser::ProcessDescHuffmanEventInfo(
@@ -2717,9 +2537,9 @@ void SIParser::ProcessDescHuffmanEventInfo(
     QString decompressed;
 
     if ((buf[4] & 0xF8) == 0x80)
-       huffman2_to_string(buf+5, buf[1]-3 , 2, decompressed);
+       decompressed = atsc_huffman2_to_string(buf+5, buf[1]-3 , 2);
     else
-       huffman2_to_string(buf+4, buf[1]-2 , 2, decompressed);
+       decompressed = atsc_huffman2_to_string(buf+4, buf[1]-2 , 2);
 
     QStringList SplitValues = QStringList::split("}{",decompressed);
 
@@ -2768,14 +2588,10 @@ void SIParser::ProcessDescHuffmanEventInfo(
 QString SIParser::ProcessDescHuffmanText(
     const unsigned char *buf, uint /*sz*/)
 {
-    QString decompressed;
-
     if ((buf[3] & 0xF8) == 0x80)
-       huffman2_to_string(buf+4, buf[1]-2, 2, decompressed);
+       return atsc_huffman2_to_string(buf+4, buf[1]-2, 2);
     else
-       huffman2_to_string(buf+3, buf[1]-1, 2, decompressed);
-
-    return decompressed;
+       return atsc_huffman2_to_string(buf+3, buf[1]-1, 2);
 }
 #endif //USING_DVB_EIT
 
@@ -2783,14 +2599,10 @@ QString SIParser::ProcessDescHuffmanText(
 QString SIParser::ProcessDescHuffmanTextLarge(
     const unsigned char *buf, uint /*sz*/)
 {
-    QString decompressed;
-
     if ((buf[4] & 0xF8) == 0x80)
-       huffman2_to_string(buf+5, buf[1]-3 , 2, decompressed);
+       return atsc_huffman2_to_string(buf+5, buf[1]-3 , 2);
     else
-       huffman2_to_string(buf+4, buf[1]-2 , 2, decompressed);
-
-    return decompressed;
+       return atsc_huffman2_to_string(buf+4, buf[1]-2 , 2);
 }
 #endif //USING_DVB_EIT
 

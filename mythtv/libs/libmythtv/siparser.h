@@ -210,7 +210,6 @@ class SIParser : public QObject
                       uint16_t pid);
 
     // ATSC Descriptor Parsers
-    QString ParseATSCExtendedChannelName(uint8_t* buffer, int size);
     void ParseDescATSCContentAdvisory(uint8_t* buffer, int size);
 
     void InitializeCategories(void);

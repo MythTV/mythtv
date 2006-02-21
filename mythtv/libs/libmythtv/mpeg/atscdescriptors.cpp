@@ -5,6 +5,7 @@
 #include "atscdescriptors.h"
 #include "mythcontext.h"
 #include "iso639.h"
+#include "atsc_huffman.h"
 
 using namespace std;
 
@@ -172,16 +173,23 @@ QString MultipleStringStructure::toString() const {
     return str;
 }
 
-QString MultipleStringStructure::CompressedString(int i, int j) const {
+QString MultipleStringStructure::CompressedString(int i, int j) const
+{
     const unsigned char* buf = (Offset(i,j)+3);
     int len = Bytes(i,j);
-    if (len<=0) return QString("");
+
+    if (len <= 0)
+        return QString("");
+
     int ct = CompressionType(i,j);
-    if (ct<3) {
-        if (1==ct) return Huffman1(buf, len);
-        else if (2==ct) return Huffman2(buf, len);
-        else return Uncompressed(buf, len, Mode(i,j));
-    } else return QString("unknown text type");
+
+    if (ct == 0)
+        return Uncompressed(buf, len, Mode(i,j));
+
+    if (ct < 3)
+        return atsc_huffman1_to_string(buf, len, ct);
+
+    return QString("MSS unknown text compression %1").arg(ct);
 }
 
 QString MultipleStringStructure::Uncompressed(
@@ -214,16 +222,6 @@ QString MultipleStringStructure::Uncompressed(
     else
         str = QString("unknown character encoding mode(%0)").arg(mode);
     return str;
-}
-
-QString MultipleStringStructure::Huffman1(
-    const unsigned char* /*buf*/, int /*len*/) {
-    return QString("TODO huffman 1");
-}
-
-QString MultipleStringStructure::Huffman2(
-    const unsigned char* /*buf*/, int /*len*/) {
-    return QString("TODO huffman 2");
 }
 
 /** \fn ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(const unsigned char*)

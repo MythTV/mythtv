@@ -64,8 +64,6 @@ class MultipleStringStructure {
     //}
   private:
     static QString Uncompressed(const unsigned char* buf, int len, int mode);
-    static QString Huffman1(const unsigned char* buf, int len);
-    static QString Huffman2(const unsigned char* buf, int len);
     static uint Index(int i, int j) { return (i<<8)|(j&0xff); }
     const unsigned char* Offset(int i, int j) const
         { return _ptrs[Index(i,j)]; }
