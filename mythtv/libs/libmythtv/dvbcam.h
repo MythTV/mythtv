@@ -7,15 +7,14 @@ using namespace std;
 #include <qobject.h>
 #include <qmutex.h>
 
-#include <dvbci.h>
 #include "dvbtypes.h"
 
+class cCiHandler;
 typedef deque<PMTObject> pmt_list_t;
 
-class DVBCam: public QObject
+class DVBCam
 {
-    Q_OBJECT
-public:
+  public:
     DVBCam(int cardnum);
     ~DVBCam();
 
@@ -25,7 +24,7 @@ public:
     void SetPMT(const PMTObject *pmt);
     void AddPMT(const PMTObject *pmt);
 
-private:
+  private:
     static void *CiHandlerThreadHelper(void*);
     void CiHandlerLoop(void);
     void HandleUserIO(void);

@@ -48,6 +48,8 @@ using namespace std;
 #include <sys/poll.h>
 #include <linux/dvb/ca.h>
 
+#include <dvbci.h>
+
 #include "recorderbase.h"
 
 #include "dvbdev.h"
