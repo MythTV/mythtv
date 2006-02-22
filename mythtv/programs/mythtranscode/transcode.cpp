@@ -855,10 +855,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     JobQueue::ChangeJobComment(jobID,
                               QObject::tr("%1% Completed @ %2 fps.")
                                           .arg(percentage).arg(flagFPS));
-
-                VERBOSE(VB_IMPORTANT, QString(
-                        "mythtranscode: %1% Completed @ %2 fps.")
-                        .arg(percentage).arg(flagFPS));
+                else
+                    VERBOSE(VB_IMPORTANT, QString(
+                            "mythtranscode: %1% Completed @ %2 fps.")
+                            .arg(percentage).arg(flagFPS));
 
             }
             curtime = QDateTime::currentDateTime();
