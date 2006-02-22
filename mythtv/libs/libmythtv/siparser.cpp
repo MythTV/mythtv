@@ -575,8 +575,27 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             HandleNIT(&nit);
         }
         else if (TableID::SDT  == head.table_id ||
-                 TableID::SDTo == head.table_id) // Service Tables
-            ParseSDT(pid, &head, &buffer[8], size - 8);
+                 TableID::SDTo == head.table_id)
+        {
+            // Service Tables
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+            ServiceDescriptionTable sdt(psip);
+
+            emit TableLoaded(); // Signal to keep scan wizard bars moving
+
+            LoadPrivateTypes(sdt.OriginalNetworkID());
+
+            bool cur =
+                (PrivateTypes.SDTMapping &&
+                 PrivateTypes.CurrentTransportID == sdt.TSID()) ||
+                (!PrivateTypes.SDTMapping && TableID::SDT == sdt.TableID());
+
+            uint sect_tsid = (cur) ? 0 : sdt.TSID();
+
+            if (!Table[SERVICES]->AddSection(&head, sect_tsid, 0))
+                HandleSDT(sect_tsid, &sdt);
+        }
     }
 
     // Parse ATSC specific tables
@@ -977,123 +996,75 @@ void SIParser::HandleNIT(const NetworkInformationTable *nit)
     }
 }
 
-void SIParser::ParseSDT(uint pid, tablehead_t *head,
-                        uint8_t *buffer, uint size)
+void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 {
-    /* Signal to keep scan wizard bars moving */
-    emit TableLoaded();
-
-    int CurrentTransport = 0;
-
-    uint16_t network_id = buffer[0] << 8 | buffer[1];
-    // TODO: Handle Network Specifics here if they aren't set
-
-    LoadPrivateTypes(network_id);
-
-    if (PrivateTypes.SDTMapping)
-    {
-        if (PrivateTypes.CurrentTransportID == head->table_id_ext)
-            CurrentTransport = 1;
-    }
-    else
-    {
-        if (head->table_id == 0x42)
-            CurrentTransport = 1;
-    }
-
-    if (CurrentTransport)
-    {
-        if (Table[SERVICES]->AddSection(head,0,0))
-            return;
-    }
-    else
-    {
-        if (Table[SERVICES]->AddSection(head,head->table_id_ext,0))
-            return;
-    }
-
-    uint16_t len = 0;
-    uint16_t pos = 3;
-    uint16_t lentotal = 0;
-    uint16_t descriptors_loop_length = 0;
-    SDTObject s;
-
     VERBOSE(VB_SIPARSER, LOC + QString("SDT: NetworkID=%1 TransportID=%2")
-            .arg(network_id).arg(head->table_id_ext));
+            .arg(sdt->OriginalNetworkID()).arg(sdt->TSID()));
 
-    while (pos < (size-4))
+    ServiceHandler *sh    = (ServiceHandler*) Table[SERVICES];
+    QMap_SDTObject &slist = sh->Services[sdt->TSID()];
+
+    bool cur =
+        (PrivateTypes.SDTMapping &&
+         PrivateTypes.CurrentTransportID == sdt->TSID()) ||
+        (!PrivateTypes.SDTMapping && TableID::SDT == sdt->TableID());
+
+    for (uint i = 0; i < sdt->ServiceCount(); i++)
     {
-        s.ServiceID = buffer[pos] << 8 | buffer[pos+1];
-        s.TransportID = head->table_id_ext;
-        s.NetworkID = network_id;
-        // EIT is present if either EIT_schedule_flag or 
-        // EIT_present_following_flag is set
-	s.EITPresent  = (PrivateTypes.ForceGuidePresent) ? 1 : 0;
-        s.EITPresent |= (buffer[pos+2] & 0x03)           ? 1 : 0;
-        s.RunningStatus = (buffer[pos+3] & 0xE0) >> 5;
-        s.CAStatus = (buffer[pos+3] & 0x10) >> 4;
-        s.Version = head->version;
+        SDTObject s;
+        s.Version       = sdt->Version();
+        s.TransportID   = sdt->TSID();
+        s.NetworkID     = sdt->OriginalNetworkID();
 
-        if (((ServiceHandler*) Table[SERVICES])->
-            Services[s.TransportID].contains(s.ServiceID))
-            s.ChanNum =
-                ((ServiceHandler*) Table[SERVICES])->
-                Services[s.TransportID][s.ServiceID].ChanNum;
+        s.ServiceID     = sdt->ServiceID(i);
+        bool has_eit    = PrivateTypes.ForceGuidePresent;
+        has_eit        |= sdt->HasEITSchedule(i);
+        has_eit        |= sdt->HasEITPresentFollowing(i);
+        s.EITPresent    = (has_eit) ? 1 : 0;
+        s.RunningStatus = sdt->RunningStatus(i);
+        s.CAStatus      = sdt->HasFreeCA(i) ? 1 : 0;
 
-        descriptors_loop_length = (buffer[pos+3] & 0x0F) << 8 | buffer[pos+4];
-        lentotal = 0;
+        // Rename channel with info from DB
+        if (slist.contains(sdt->ServiceID(i)))
+            s.ChanNum = slist[sdt->ServiceID(i)].ChanNum;
 
-        while ((descriptors_loop_length) > (lentotal))
+        const desc_list_t list = MPEGDescriptor::Parse(
+            sdt->ServiceDescriptors(i), sdt->ServiceDescriptorsLength(i));
+        for (uint j = 0; j < list.size(); j++)
         {
-            switch(buffer[pos + 5 + lentotal])
-            {
-            case 0x48:
-                ParseDescService(&buffer[pos + 5 + lentotal], 
-                     buffer[pos + 6 + lentotal], s);
-                break;
-            default:
-                ProcessUnusedDescriptor(pid, &buffer[pos + 5 + lentotal],
-                                        buffer[pos + 6 + lentotal] + 2);
-                break;
-            }
-            len = buffer[pos + 6 + lentotal];
-            lentotal += (len + 2);
+            if (DescriptorID::service == list[j][0])
+                ParseDescService(list[j], list[j][1], s);
+            else
+                ProcessUnusedDescriptor(0, list[j], list[j][1] + 2);
         }
 
-        bool eit_requested = false;
+        // Check if we should collect EIT on this transport
+        bool is_tv_or_radio = (s.ServiceType == SDTObject::TV ||
+                               s.ServiceType == SDTObject::RADIO);
+
+        bool is_eit_transport = !PrivateTypes.GuideOnSingleTransport;
+        is_eit_transport |= PrivateTypes.GuideOnSingleTransport && 
+            (PrivateTypes.GuideTransportID == PrivateTypes.CurrentTransportID);
+
+        bool collect_eit = (has_eit && is_tv_or_radio && is_eit_transport);
 
 #ifdef USING_DVB_EIT
-        if ((s.EITPresent) && 
-            (s.ServiceType == SDTObject::TV ||
-             s.ServiceType == SDTObject::RADIO) && 
-            ((!PrivateTypes.GuideOnSingleTransport) ||
-            ((PrivateTypes.GuideOnSingleTransport) && 
-            (PrivateTypes.GuideTransportID == 
-             PrivateTypes.CurrentTransportID)))) 
-        {
-            Table[EVENTS]->RequestEmit(s.ServiceID);
-            eit_requested = true;
-        }
+        if (collect_eit)
+            Table[EVENTS]->RequestEmit(sdt->ServiceID(i));
 #endif
+
+        uint sect_tsid = (cur) ? 0 : sdt->TSID();
+        sh->Services[sect_tsid][sdt->ServiceID(i)] = s;
 
         VERBOSE(VB_SIPARSER, LOC +
                 QString("SDT: sid=%1 type=%2 eit_present=%3 "
-                        "eit_requested=%4 name=%5")
+                        "collect_eit=%4 name=%5")
                 .arg(s.ServiceID).arg(s.ServiceType)
-                .arg(s.EITPresent).arg(eit_requested)
+                .arg(s.EITPresent).arg(collect_eit)
                 .arg(s.ServiceName));
-
-        if (CurrentTransport)
-            ((ServiceHandler*) Table[SERVICES])->
-                Services[0][s.ServiceID] = s;
-        else
-            ((ServiceHandler*) Table[SERVICES])->
-                Services[s.TransportID][s.ServiceID] = s;
-        s.Reset();  
-        pos += (descriptors_loop_length + 5);
     }
 
-    if (CurrentTransport)
+    if (cur)
         emit FindServicesComplete();
 
 #ifdef USING_DVB_EIT

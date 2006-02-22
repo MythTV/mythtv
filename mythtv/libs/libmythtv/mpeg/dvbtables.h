@@ -103,8 +103,8 @@ class ServiceDescriptionTable: public PSIPTable
     uint TSID() const { return TableIDExtension(); }
 
     /// original_network_id    16   8.0
-    // TODO check this
-    uint OriginalNetworkID() const { return (pesdata()[3]<<8) | pesdata()[4]; }
+    uint OriginalNetworkID() const
+        { return (psipdata()[0]<<8) | psipdata()[1]; }
 
     /// Number of services
     uint ServiceCount() const { return _ptrs.size()-1; }
@@ -119,7 +119,8 @@ class ServiceDescriptionTable: public PSIPTable
     //   EIT_present_following  1  2.7+p
     bool HasEITPresentFollowing(uint i) const
         { return bool(_ptrs[i][2] & 0x1); }
-    //   running_status         3  3.0+p
+    ///   running_status        3  3.0+p
+    uint RunningStatus(uint i) const { return (_ptrs[i][3] & 0xE0) >> 5; }
     ///  free_CA_mode           1  3.3+p
     bool HasFreeCA(uint i) const { return bool(_ptrs[i][3] & 0x10); }
     ///  desc_loop_length      12  3.4+p

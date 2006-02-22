@@ -45,6 +45,7 @@ class SystemTimeTable;
 class EventInformationTable;
 class ExtendedTextTable;
 class NetworkInformationTable;
+class ServiceDescriptionTable;
 
 /**
  *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
@@ -127,6 +128,7 @@ class SIParser : public QObject
     void HandleEIT(uint pid, const EventInformationTable*);
     void HandleETT(uint pid, const ExtendedTextTable*);
     void HandleNIT(const NetworkInformationTable*);
+    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
 
   signals:
     void FindTransportsComplete(void);
@@ -159,7 +161,6 @@ class SIParser : public QObject
     QDateTime ConvertDVBDate(const uint8_t* dvb_buf);
 
     // DVB Table Parsers
-    void ParseSDT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
     void ParseDVBEIT(uint pid, tablehead_t* h, uint8_t* buffer, uint size);
 
     // Common Descriptor Parsers
