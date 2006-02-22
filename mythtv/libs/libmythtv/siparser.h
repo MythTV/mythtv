@@ -154,9 +154,6 @@ class SIParser : public QObject
 
     void ProcessUnusedDescriptor(uint pid, const uint8_t *buffer, uint size);
 
-    // Common Helper Functions
-    QString DecodeText(const uint8_t *s, uint length);
-
     // DVB Helper Parsers
     QDateTime ConvertDVBDate(const uint8_t* dvb_buf);
 
@@ -169,8 +166,6 @@ class SIParser : public QObject
     CAPMTObject ParseDescCA(const uint8_t* buffer, int size);
 
     // DVB Descriptor Parsers
-    void ParseDescNetworkName  (uint8_t* buf, int sz, NetworkObject   &n);
-    void ParseDescLinkage      (uint8_t* buf, int sz, NetworkObject   &n);
     void ParseDescService      (uint8_t* buf, int sz, SDTObject       &s);
     void ParseDescFrequencyList(uint8_t* buf, int sz, TransportObject &t);
     void ParseDescUKChannelList(uint8_t* buf, int sz, QMap_uint16_t &num);

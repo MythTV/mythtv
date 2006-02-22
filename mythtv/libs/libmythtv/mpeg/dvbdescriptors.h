@@ -44,6 +44,8 @@ static QString dvb_string(const unsigned char* data, uint length)
     return name;
 }
 
+extern QString dvb_decode_text(const unsigned char *src, uint length);
+
 #define byteBCDH2int(i) (i >> 4)
 #define byteBCDL2int(i) (i & 0x0f)
 #define byteBCD2int(i) (byteBCDH2int(i) * 10 + byteBCDL2int(i))
@@ -72,7 +74,7 @@ class NetworkNameDescriptor : public MPEGDescriptor
     }
     // for (i=0;i<N;i++){ char 8 uimsbf }
     QString Name() const
-        { return dvb_string(_data+2, DescriptorLength()); }
+        { return dvb_decode_text(_data+2, DescriptorLength()); }
     QString toString() const
         { return QString("NetworkNameDescriptor: ")+Name(); }
 };

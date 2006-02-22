@@ -3,7 +3,6 @@
 
 // Qt headers
 #include <qdatetime.h>
-#include <qtextcodec.h>
 #include <qregexp.h>
 #include <qptrvector.h>
 
@@ -15,7 +14,7 @@
 #include "atsc_huffman.h"
 #include "pespacket.h"
 #include "atsctables.h"
-#include "mpegdescriptors.h"
+#include "dvbtables.h"
 
 // MythTV DVB headers
 #include "siparser.h"
@@ -808,71 +807,6 @@ void SIParser::ProcessUnusedDescriptor(uint pid, const uint8_t *data, uint)
 }
 
 /*------------------------------------------------------------------------
- *   COMMON HELPER FUNCTIONS
- *------------------------------------------------------------------------*/
-
-// Decode a text string according to ETSI EN 300 468 Annex A
-QString SIParser::DecodeText(const uint8_t *src, uint length)
-{
-    QString result;
-
-    if (length <= 0)
-        return QString("");
-
-    unsigned char buf[length];
-    memcpy(buf, src, length);
-
-    if ((buf[0] <= 0x10) || (buf[0] >= 0x20))
-    {
-        // Strip formatting characters
-        for (uint p = 0; p < length; p++)
-        {
-            if ((buf[p] >= 0x80) && (buf[p] <= 0x9F))
-                memmove(buf + p, buf + p + 1, --length - p);
-        }
-
-        if (buf[0] >= 0x20)
-        {
-            result = QString::fromLatin1((const char*)buf, length);
-        }
-        else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
-        {
-            QString coding = "ISO8859-" + QString::number(4 + buf[0]);
-            QTextCodec *codec = QTextCodec::codecForName(coding);
-            result = codec->toUnicode((const char*)buf + 1, length - 1);
-        }
-        else if (buf[0] == 0x10)
-        {
-            // If the first byte of the text field has a value "0x10"
-            // then the following two bytes carry a 16-bit value (uimsbf) N
-            // to indicate that the remaining data of the text field is
-            // coded using the character code table specified by
-            // ISO Standard 8859, parts 1 to 9
-
-            uint code = 1;
-            swab(buf + 1, &code, 2);
-            QString coding = "ISO8859-" + QString::number(code);
-            QTextCodec *codec = QTextCodec::codecForName(coding);
-            result = codec->toUnicode((const char*)buf + 3, length - 3);
-        }
-        else
-        {
-            // Unknown/invalid encoding - assume local8Bit
-            result = QString::fromLocal8Bit((const char*)buf + 1, length - 1);
-        }
-    }
-    else
-    {
-        // TODO: Handle multi-byte encodings
-
-        VERBOSE(VB_SIPARSER, LOC + "Multi-byte coded text - not supported!");
-        result = "N/A";
-    }
-
-    return result;
-}
-
-/*------------------------------------------------------------------------
  *   DVB HELPER FUNCTIONS
  *------------------------------------------------------------------------*/
 
@@ -945,30 +879,40 @@ void SIParser::ParseNIT(uint pid, tablehead_t *head,
     uint16_t pos = 2;
 
     // Parse Network Descriptors (Name, Linkage)
-    if (network_descriptors_length > 0)
+    // Create a Network Object
+    NetworkObject n;
+    while (network_descriptors_length > (pos-2))
     {
-       // Create a Network Object
-       NetworkObject n;
-       while ((network_descriptors_length) > (pos-2)) {
-
-           switch (buffer[pos])
-           {
-               case 0x40:
-                          ParseDescNetworkName(&buffer[pos],buffer[pos+1],n);
-                          break;
-               case 0x4A:
-                          ParseDescLinkage(&buffer[pos],buffer[pos+1],n);
-                          break;
-               default:
-                          ProcessUnusedDescriptor(pid, &buffer[pos],
-                                                  buffer[pos+1] + 2);
-                          break;
-           }
-           pos += (buffer[pos+1] + 2);
-       }
-       ((NetworkHandler*) Table[NETWORK])->NITList.Network += n;
-
+        if (DescriptorID::network_name == buffer[pos])
+        {
+            n.NetworkName = NetworkNameDescriptor(&buffer[pos]).Name();
+        }
+        else if (DescriptorID::linkage == buffer[pos])
+        {
+            const LinkageDescriptor linkage(&buffer[pos]);
+            n.LinkageTransportID = linkage.TSID();
+            n.LinkageNetworkID   = linkage.OriginalNetworkID();
+            n.LinkageServiceID   = linkage.ServiceID();
+            n.LinkageType        = linkage.LinkageType();
+            n.LinkagePresent     = 1;
+#if 0
+            // See ticket #778.
+            // Breaks "DVB-S in Germany with Astra 19.2E"
+            if (n.LinkageType == 4)
+            {
+                PrivateTypes.GuideOnSingleTransport = true;
+                PrivateTypes.GuideTransportID = n.LinkageTransportID;
+            }
+#endif
+        }
+        else
+        {
+            ProcessUnusedDescriptor(pid, &buffer[pos], buffer[pos+1] + 2);
+        }
+        pos += (buffer[pos+1] + 2);
     }
+    if (network_descriptors_length > 0)
+       ((NetworkHandler*) Table[NETWORK])->NITList.Network += n;
 
     transport_stream_loop_length = (buffer[pos] & 0x0F) << 8 | buffer[pos+1];
     pos += 2;
@@ -1405,30 +1349,6 @@ CAPMTObject SIParser::ParseDescCA(const uint8_t *buffer, int size)
 /*------------------------------------------------------------------------
  *   DVB DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
-// Descriptor 0x40 - NetworkName
-void SIParser::ParseDescNetworkName(uint8_t *buffer, int, NetworkObject &n)
-{
-    n.NetworkName = DecodeText(buffer + 2, buffer[1]);
-}
-
-// Descriptor 0x4A - Linkage - NIT
-void SIParser::ParseDescLinkage(uint8_t *buffer, int, NetworkObject &n)
-{
-    n.LinkageTransportID = buffer[2] << 8 | buffer[3];
-    n.LinkageNetworkID = buffer[4] << 8 | buffer[5];
-    n.LinkageServiceID = buffer[6] << 8 | buffer[7];
-    n.LinkageType = buffer[8];
-    n.LinkagePresent = 1;
-
-    // See ticket #778. Breaks "DVB-S in Germany with Astra 19.2E"
-#if 0
-    if (n.LinkageType == 4)
-    {
-        PrivateTypes.GuideOnSingleTransport = true;
-        PrivateTypes.GuideTransportID = n.LinkageTransportID;
-    }
-#endif
-}
 
 // Descriptor 0x62 - Frequency List - NIT
 void SIParser::ParseDescFrequencyList(uint8_t *buffer, int size,
@@ -1490,9 +1410,9 @@ void SIParser::ParseDescService(uint8_t *buffer, int, SDTObject &s)
         s.ServiceType = tempType;
 
     buffer += 3;
-    s.ProviderName = DecodeText(buffer + 1, buffer[0]);
+    s.ProviderName = dvb_decode_text(buffer + 1, buffer[0]);
     buffer += buffer[0] + 1;
-    s.ServiceName = DecodeText(buffer + 1, buffer[0]);
+    s.ServiceName = dvb_decode_text(buffer + 1, buffer[0]);
 }
 
 // Descriptor 0x5A - DVB-T Transport - NIT
@@ -1962,8 +1882,8 @@ void SIParser::ProcessShortEventDescriptor(
     uint name_len     = data[5];
     uint subtitle_len = data[6 + name_len];
     e.LanguageCode    = ParseDescLanguage(data+2, size);
-    e.Event_Name      = DecodeText(&data[6],            name_len);
-    e.Event_Subtitle  = DecodeText(&data[7 + name_len], subtitle_len);
+    e.Event_Name      = dvb_decode_text(&data[6],            name_len);
+    e.Event_Subtitle  = dvb_decode_text(&data[7 + name_len], subtitle_len);
 
     if (e.Event_Subtitle == e.Event_Name)
         e.Event_Subtitle = "";
@@ -1980,7 +1900,7 @@ void SIParser::ProcessExtendedEventDescriptor(
     (void) size; // TODO validate size
 
     if (data[6] == 0)
-        e.Description += DecodeText(&data[8], data[7]);
+        e.Description += dvb_decode_text(&data[8], data[7]);
 }
 #endif //USING_DVB_EIT
 
