@@ -35,6 +35,16 @@ typedef enum
     SI_STANDARD_AUTO
 } SISTANDARD;
 
+static inline QString SIStandard_to_String(int std)
+{
+    if (SI_STANDARD_ATSC == std)
+        return "atsc";
+    if (SI_STANDARD_DVB == std)
+        return "dvb";
+    return "auto";
+}
+
+
 typedef enum tabletypes
 {
     PAT,                /* Program Association Table */

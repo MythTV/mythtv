@@ -230,133 +230,127 @@ void SIParser::CheckTrackers()
 
 }
 
-void SIParser::LoadPrivateTypes(uint16_t NetworkID)
+void SIParser::LoadPrivateTypes(uint networkID)
 {
-    QString STD;
+    // If we've already loaded this stuff, do nothing
+    if (PrivateTypesLoaded)
+        return;
 
-    switch (SIStandard)
-    {
-        case SI_STANDARD_DVB:    STD = "dvb";
-                                 break;
-        case SI_STANDARD_ATSC:   STD = "atsc";
-                                 break;
-        /* If you don't know the SI Standard yet you need to bail out */
-        default:
-                                 return;
-    }
+    QString stdStr = SIStandard_to_String(SIStandard);
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString theQuery =
-        QString("SELECT private_type, private_value "
-                "FROM dtv_privatetypes "
-                "WHERE networkid = %1 AND sitype = '%2'")
-        .arg(NetworkID).arg(STD);
-
-    query.prepare(theQuery);
-
-    if (!query.exec())
-        MythContext::DBError("Loading Private Types for SIParser", query);
-
-    if (!query.isActive())
-        MythContext::DBError("Loading Private Types for SIParser", query);
-
-    if (query.size() > 0)
-    {
-        query.next();
-        for (int x = 0 ; x < query.size() ; x++)
-        {
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("Private Type %1 = %2 defined for NetworkID %3")
-                    .arg(query.value(0).toString())
-                    .arg(query.value(1).toString())
-                    .arg(NetworkID) );
-
-            if (QString(query.value(0).toString()) == "sdt_mapping")
-            {
-                PrivateTypes.SDTMapping = true;
-                VERBOSE(VB_SIPARSER, LOC +
-                        "SDT Mapping Incorrect for this Service Fixup Loaded");
-            }
-            if (QString(query.value(0).toString()) == "channel_numbers")
-            {
-                PrivateTypes.ChannelNumbers = query.value(1).toInt();
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("ChannelNumbers Present using Descriptor %1")
-                        .arg(PrivateTypes.ChannelNumbers));
-            }
-            if (QString(query.value(0).toString()) == "force_guide_present")
-            {
-                if (query.value(1).toString() == "yes")
-                {
-                    PrivateTypes.ForceGuidePresent = true;
-                    VERBOSE(VB_SIPARSER, LOC + "Forcing Guide Present");
-                }
-            }
-            if (QString(query.value(0).toString()) == "guide_fixup")
-            {
-                PrivateTypes.EITFixUp = query.value(1).toInt();
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("Using Guide Fixup Scheme #%1")
-                        .arg(PrivateTypes.EITFixUp));
-            }
-            if (QString(query.value(0).toString()) == "guide_ranges")
-            {
-                PrivateTypes.CustomGuideRanges = true;
-                QStringList temp =
-                    QStringList::split(",", query.value(1).toString());
-                PrivateTypes.CurrentTransportTableMin = temp[0].toInt();
-                PrivateTypes.CurrentTransportTableMax = temp[1].toInt();
-                PrivateTypes.OtherTransportTableMin = temp[2].toInt();
-                PrivateTypes.OtherTransportTableMax = temp[3].toInt();
-                
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("Using Guide Custom Range; "
-                                "CurrentTransport: %1-%2, "
-                                "OtherTransport: %3-%4")
-                        .arg(PrivateTypes.CurrentTransportTableMin,2,16)
-                        .arg(PrivateTypes.CurrentTransportTableMax,2,16)
-                        .arg(PrivateTypes.OtherTransportTableMin,2,16)
-                        .arg(PrivateTypes.OtherTransportTableMax,2,16));
-            }
-            if (QString(query.value(0).toString()) == "tv_types")
-            {
-                PrivateTypes.TVServiceTypes.clear();
-                QStringList temp =
-                    QStringList::split(",", query.value(1).toString());
-                QStringList::Iterator i;
-                for (i = temp.begin() ; i != temp.end() ; i++)
-                {
-                    PrivateTypes.TVServiceTypes[(*i).toInt()] = 1;
-                    VERBOSE(VB_SIPARSER, LOC +
-                            QString("Added TV Type %1").arg((*i).toInt()));
-                }
-            }
-#ifdef USING_DVB_EIT
-            if (QString(query.value(0).toString()) == "parse_subtitle_list")
-            {
-                eitfixup.clearSubtitleServiceIDs();
-                QStringList temp =
-                    QStringList::split(",", query.value(1).toString());
-                for (QStringList::Iterator i = temp.begin();i!=temp.end();i++)
-                {
-                    eitfixup.addSubtitleServiceID((*i).toUInt());
-                    VERBOSE(VB_SIPARSER, LOC + 
-                            QString("Added ServiceID %1 to list of "
-                                    "channels to parse subtitle from")
-                            .arg((*i).toInt()));
-                }
-            }
-#endif //USING_DVB_EIT
-            query.next();
-        }
-    }
-    else
-        VERBOSE(VB_SIPARSER, LOC +
-                QString("No Private Types defined for NetworkID %1")
-                .arg(NetworkID));
+    // If you don't know the SI Standard yet you need to bail out
+    if (stdStr == "auto")
+        return;
 
     PrivateTypesLoaded = true;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT private_type, private_value "
+        "FROM dtv_privatetypes "
+        "WHERE networkid = :NETID AND "
+        "      sitype    = :SITYPE");
+    query.bindValue(":NETID",  networkID);
+    query.bindValue(":SITYPE", stdStr);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Loading Private Types for SIParser", query);
+        return;
+    }
+
+    if (!query.size())
+    {
+        VERBOSE(VB_SIPARSER, LOC + "No Private Types defined " +
+                QString("for NetworkID %1").arg(networkID));
+        return;
+    }
+
+    while (query.next())
+    {
+        QString key = query.value(0).toString();
+        QString val = query.value(1).toString();
+
+        VERBOSE(VB_SIPARSER, LOC +
+                QString("Private Type %1 = %2 defined for NetworkID %3")
+                .arg(key).arg(val).arg(networkID));
+
+        if (key == "sdt_mapping")
+        {
+            VERBOSE(VB_SIPARSER, LOC +
+                    "SDT Mapping Incorrect for this Service Fixup Loaded");
+
+            PrivateTypes.SDTMapping = true;
+        }
+        else if (key == "channel_numbers")
+        {
+            int cn = val.toInt();
+            VERBOSE(VB_SIPARSER, LOC + "ChannelNumbers Present using " +
+                    QString("Descriptor %1").arg(cn));
+
+            PrivateTypes.ChannelNumbers = cn;
+        }
+        else if (key == "force_guide_present" && val == "yes")
+        {
+            VERBOSE(VB_SIPARSER, LOC + "Forcing Guide Present");
+            PrivateTypes.ForceGuidePresent = true;
+        }
+        if (key == "guide_fixup")
+        {
+            int fxup = val.toInt();
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Using Guide Fixup Scheme #%1").arg(fxup));
+
+            PrivateTypes.EITFixUp = fxup;
+        }
+        if (key == "guide_ranges")
+        {
+            const QStringList temp = QStringList::split(",", val);
+            PrivateTypes.CustomGuideRanges = true;
+            PrivateTypes.CurrentTransportTableMin = temp[0].toInt();
+            PrivateTypes.CurrentTransportTableMax = temp[1].toInt();
+            PrivateTypes.OtherTransportTableMin   = temp[2].toInt();
+            PrivateTypes.OtherTransportTableMax   = temp[3].toInt();
+                
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Using Guide Custom Range; "
+                            "CurrentTransport: %1-%2, "
+                            "OtherTransport: %3-%4")
+                    .arg(PrivateTypes.CurrentTransportTableMin,2,16)
+                    .arg(PrivateTypes.CurrentTransportTableMax,2,16)
+                    .arg(PrivateTypes.OtherTransportTableMin,2,16)
+                    .arg(PrivateTypes.OtherTransportTableMax,2,16));
+        }
+        if (key == "tv_types")
+        {
+            PrivateTypes.TVServiceTypes.clear();
+            const QStringList temp = QStringList::split(",", val);
+            QStringList::const_iterator it = temp.begin();
+            for (; it != temp.end() ; it++)
+            {
+                int stype = (*it).toInt();
+                PrivateTypes.TVServiceTypes[stype] = 1;
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("Added TV Type %1").arg(stype));
+            }
+        }
+#ifdef USING_DVB_EIT
+        if (key == "parse_subtitle_list")
+        {
+            eitfixup.clearSubtitleServiceIDs();
+            const QStringList temp = QStringList::split(",", val);
+            QStringList::const_iterator it = temp.begin();
+            for (; it!=temp.end(); it++)
+            {
+                uint sid = (*it).toUInt();
+                VERBOSE(VB_SIPARSER, LOC + 
+                        QString("Added ServiceID %1 to list of "
+                                "channels to parse subtitle from").arg(sid));
+
+                eitfixup.addSubtitleServiceID(sid);
+            }
+        }
+#endif //USING_DVB_EIT
+    }
 }
 
 bool SIParser::GetTransportObject(NITObject &NIT)
@@ -958,8 +952,7 @@ void SIParser::HandleNIT(const NetworkInformationTable *nit)
     TransportObject t;
     for (uint i = 0; i < nit->TransportStreamCount(); i++)
     {
-        if (!PrivateTypesLoaded)
-            LoadPrivateTypes(nit->OriginalNetworkID(i));
+        LoadPrivateTypes(nit->OriginalNetworkID(i));
 
         const desc_list_t dlist = MPEGDescriptor::Parse(
             nit->TransportDescriptors(i), nit->TransportDescriptorsLength(i));
@@ -995,8 +988,7 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
     uint16_t network_id = buffer[0] << 8 | buffer[1];
     // TODO: Handle Network Specifics here if they aren't set
 
-    if (PrivateTypesLoaded == false)
-        LoadPrivateTypes(network_id);
+    LoadPrivateTypes(network_id);
 
     if (PrivateTypes.SDTMapping)
     {
@@ -2065,8 +2057,7 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
         s.ServiceID    = vct->ProgramNumber(chan_idx);
         s.ATSCSourceID = vct->SourceID(chan_idx);
 
-        if (!PrivateTypesLoaded)
-            LoadPrivateTypes(s.TransportID);
+        LoadPrivateTypes(s.TransportID);
 
 #ifdef USING_DVB_EIT
         if (!vct->IsHiddenInGuide(chan_idx))

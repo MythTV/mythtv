@@ -146,8 +146,7 @@ class SIParser : public QObject
     // Fixes for various DVB Network Spec Deviations
     void LoadDVBSpecDeviations(uint16_t NetworkID);
 
-    void LoadPrivateTypes(uint16_t networkID);
-
+    void LoadPrivateTypes(uint networkID);
 
     // MPEG Transport Parsers (ATSC and DVB)
     tablehead_t       ParseTableHead(uint8_t* buffer, int size);
