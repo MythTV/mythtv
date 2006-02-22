@@ -571,8 +571,15 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     // Parse DVB specific NIT and SDT tables
     if (SIStandard == SI_STANDARD_DVB)
     {
-        if (TableID::NIT == head.table_id) // Network Information Table
-            ParseNIT(pid, &head, &buffer[8], size - 8);
+        if (TableID::NIT == head.table_id &&
+            !Table[NETWORK]->AddSection(&head,0,0))
+        {
+            // Network Information Table
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+            NetworkInformationTable nit(psip);
+            HandleNIT(&nit);
+        }
         else if (TableID::SDT  == head.table_id ||
                  TableID::SDTo == head.table_id) // Service Tables
             ParseSDT(pid, &head, &buffer[8], size - 8);
@@ -854,141 +861,126 @@ QDateTime SIParser::ConvertDVBDate(const uint8_t *dvb_buf)
  *   DVB TABLE PARSERS
  *------------------------------------------------------------------------*/
 
-
-void SIParser::ParseNIT(uint pid, tablehead_t *head,
-                        uint8_t *buffer, uint size)
+// Parse Network Descriptors (Name, Linkage)
+void SIParser::HandleNITDesc(const desc_list_t &dlist)
 {
-    // Only process current network NITs for now
-    if (head->table_id != 0x40)
-        return;
-
-    // Check to see if you already pulled this table section
-    if (Table[NETWORK]->AddSection(head,0,0))
-        return;
-
-    // TODO: Emit a table load here for scanner
-
-    TransportObject t;
-
-    QMap_uint16_t ChannelNumbers;
-
-    uint16_t network_descriptors_length  = (buffer[0] & 0x0F) << 8 | buffer[1];
-    uint16_t transport_stream_loop_length = 0;
-    uint16_t transport_descriptors_length = 0;
-
-    uint16_t pos = 2;
-
-    // Parse Network Descriptors (Name, Linkage)
-    // Create a Network Object
     NetworkObject n;
-    while (network_descriptors_length > (pos-2))
+    bool n_set = false;
+    const unsigned char *d = NULL;
+
+    d = MPEGDescriptor::Find(dlist, DescriptorID::network_name);
+    if (d)
     {
-        if (DescriptorID::network_name == buffer[pos])
-        {
-            n.NetworkName = NetworkNameDescriptor(&buffer[pos]).Name();
-        }
-        else if (DescriptorID::linkage == buffer[pos])
-        {
-            const LinkageDescriptor linkage(&buffer[pos]);
-            n.LinkageTransportID = linkage.TSID();
-            n.LinkageNetworkID   = linkage.OriginalNetworkID();
-            n.LinkageServiceID   = linkage.ServiceID();
-            n.LinkageType        = linkage.LinkageType();
-            n.LinkagePresent     = 1;
+        n_set = true;
+        n.NetworkName = NetworkNameDescriptor(d).Name();
+    }
+
+    d = MPEGDescriptor::Find(dlist, DescriptorID::linkage);
+    if (d)
+    {
+        n_set = true;
+        const LinkageDescriptor linkage(d);
+        n.LinkageTransportID = linkage.TSID();
+        n.LinkageNetworkID   = linkage.OriginalNetworkID();
+        n.LinkageServiceID   = linkage.ServiceID();
+        n.LinkageType        = linkage.LinkageType();
+        n.LinkagePresent     = 1;
 #if 0
-            // See ticket #778.
-            // Breaks "DVB-S in Germany with Astra 19.2E"
-            if (n.LinkageType == 4)
-            {
-                PrivateTypes.GuideOnSingleTransport = true;
-                PrivateTypes.GuideTransportID = n.LinkageTransportID;
-            }
+        // See ticket #778.
+        // Breaks "DVB-S in Germany with Astra 19.2E"
+        if (LinkageDescriptor::lt_TSContainingCompleteNetworkBouquetSI ==
+            linkage.LinkageType())
+        {
+            PrivateTypes.GuideOnSingleTransport = true;
+            PrivateTypes.GuideTransportID = n.LinkageTransportID;
+        }
 #endif
+    }
+
+    if (n_set)
+       ((NetworkHandler*) Table[NETWORK])->NITList.Network += n;
+
+    // count the unused descriptors for debugging.
+    for (uint i = 0; i < dlist.size(); i++)
+    {
+        if (DescriptorID::network_name == dlist[i][0])
+            continue;
+        if (DescriptorID::linkage == dlist[i][0])
+            continue;
+        ProcessUnusedDescriptor(0, dlist[i], dlist[i][1] + 2);
+    }
+}
+
+void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
+                                      TransportObject   &tobj,
+                                      QMap_uint16_t     &clist)
+{
+    for (uint i = 0; i < dlist.size(); i++)
+    {
+        if (DescriptorID::cable_delivery_system == dlist[i][0])
+        {
+            tobj = ParseDescCable(dlist[i], dlist[i][1]);
+        }
+        else if (DescriptorID::terrestrial_delivery_system == dlist[i][0])
+        {
+            tobj = ParseDescTerrestrial(dlist[i], dlist[i][1]);
+        }
+        else if (DescriptorID::satellite_delivery_system == dlist[i][0])
+        {
+            tobj = ParseDescSatellite(dlist[i], dlist[i][1]);
+        }
+        else if (DescriptorID::frequency_list == dlist[i][0])
+        {
+            ParseDescFrequencyList(dlist[i], dlist[i][1], tobj);
+        }
+        else if (DescriptorID::dvb_uk_channel_list == dlist[i][0] &&
+                 DescriptorID::dvb_uk_channel_list ==
+                 PrivateTypes.ChannelNumbers)
+        {
+            ParseDescUKChannelList(dlist[i], dlist[i][1], clist);
         }
         else
         {
-            ProcessUnusedDescriptor(pid, &buffer[pos], buffer[pos+1] + 2);
+            ProcessUnusedDescriptor(0, dlist[i], dlist[i][1] + 2);
         }
-        pos += (buffer[pos+1] + 2);
     }
-    if (network_descriptors_length > 0)
-       ((NetworkHandler*) Table[NETWORK])->NITList.Network += n;
+}
 
-    transport_stream_loop_length = (buffer[pos] & 0x0F) << 8 | buffer[pos+1];
-    pos += 2;
+void SIParser::HandleNIT(const NetworkInformationTable *nit)
+{
+    ServiceHandler *sh = (ServiceHandler*) Table[SERVICES];
+    NetworkHandler *nh = (NetworkHandler*) Table[NETWORK];
 
-    // transport desctiptors parser
-    uint16_t dpos = 0;
+    const desc_list_t dlist = MPEGDescriptor::Parse(
+        nit->NetworkDescriptors(), nit->NetworkDescriptorsLength());
+    HandleNITDesc(dlist);
 
-    // Safe to assume that you can run until the end
-    while (pos < size - 4) {
+    TransportObject t;
+    for (uint i = 0; i < nit->TransportStreamCount(); i++)
+    {
+        if (!PrivateTypesLoaded)
+            LoadPrivateTypes(nit->OriginalNetworkID(i));
 
-        if (PrivateTypesLoaded == false)
-        {
-            t.NetworkID = buffer[pos+2] << 8 | buffer[pos+3];
-            LoadPrivateTypes(t.NetworkID);
-        }
+        const desc_list_t dlist = MPEGDescriptor::Parse(
+            nit->TransportDescriptors(i), nit->TransportDescriptorsLength(i));
 
-        transport_descriptors_length =
-            (buffer[pos+4] & 0x0F) << 8 | buffer[pos+5];
-        dpos=0;
-        while ((transport_descriptors_length) > (dpos))
-        {
-            switch (buffer[pos + 6 + dpos])
-            {
-                // DVB-C - Descriptor Parser written by Ian Caulfield
-                case 0x44:
-                    t = ParseDescCable(
-                        &buffer[pos + 6 + dpos],buffer[pos + 7 + dpos]);
-                    break;
+        QMap_uint16_t chanNums;
+        HandleNITTransportDesc(dlist, t, chanNums);
 
-                // DVB-T - Verified thanks to adante in #mythtv 
-                // allowing me access to his DVB-T card
-                case 0x5A:
-                    t = ParseDescTerrestrial(
-                        &buffer[pos + 6 + dpos],buffer[pos + 7 + dpos]);
-                    break;
-                // DVB-S
-                case 0x43:
-                    t = ParseDescSatellite(
-                        &buffer[pos + 6 + dpos],buffer[pos + 7 + dpos]);
-                    break;
-                case 0x62:
-                    ParseDescFrequencyList(
-                        &buffer[pos+6+dpos],buffer[pos + 7 + dpos],t);
-                    break;
-                case 0x83:
-                    if (PrivateTypes.ChannelNumbers == 0x83)
-                        ParseDescUKChannelList(
-                            &buffer[pos+6+dpos],buffer[pos + 7 + dpos],
-                            ChannelNumbers);
-                    break;
-                default:
-                    ProcessUnusedDescriptor(
-                        pid,
-                        &buffer[pos + 6 + dpos], buffer[pos + 7 + dpos] + 2);
-                    break;
-             }
-             dpos += (buffer[pos + 7 + dpos] + 2);
-        }
+        t.TransportID = nit->TSID(i);
+        t.NetworkID   = nit->OriginalNetworkID(i);
 
-        // Get TransportID and NetworkID
-        t.TransportID = buffer[pos] << 8 | buffer[pos+1];
-        t.NetworkID = buffer[pos+2] << 8 | buffer[pos+3];
-
-        Table[SERVICES]->Request(t.TransportID);
+        sh->Request(nit->TSID(i));
     
-        if (PrivateTypes.ChannelNumbers && !(ChannelNumbers.empty()))
+        if (PrivateTypes.ChannelNumbers && !(chanNums.empty()))
         {
-            QMap_uint16_t::Iterator c;
-            for (c = ChannelNumbers.begin() ; c != ChannelNumbers.end() ; ++c)
-                ((ServiceHandler*) Table[SERVICES])->
-                    Services[t.TransportID][c.key()].ChanNum = c.data();
+            QMap_SDTObject &slist = sh->Services[nit->TSID(i)];
+            QMap_uint16_t::const_iterator it = chanNums.begin();
+            for (; it != chanNums.end(); ++it)
+                slist[it.key()].ChanNum = it.data();
         }
 
-        ((NetworkHandler*) Table[NETWORK])->NITList.Transport += t;
-
-        pos += transport_descriptors_length + 6;
+        nh->NITList.Transport += t;
     }
 }
 
@@ -1351,7 +1343,7 @@ CAPMTObject SIParser::ParseDescCA(const uint8_t *buffer, int size)
  *------------------------------------------------------------------------*/
 
 // Descriptor 0x62 - Frequency List - NIT
-void SIParser::ParseDescFrequencyList(uint8_t *buffer, int size,
+void SIParser::ParseDescFrequencyList(const uint8_t *buffer, int size,
                                       TransportObject &t)
 {
     int i = 2;
@@ -1384,7 +1376,7 @@ void SIParser::ParseDescFrequencyList(uint8_t *buffer, int size,
 }
 
 //Descriptor 0x83 UK specific channel list
-void SIParser::ParseDescUKChannelList(uint8_t *buffer, int size,
+void SIParser::ParseDescUKChannelList(const uint8_t *buffer, int size,
                                       QMap_uint16_t &numbers)
 {
     int i = 2;
@@ -1400,7 +1392,7 @@ void SIParser::ParseDescUKChannelList(uint8_t *buffer, int size,
 }
 
 // Desctiptor 0x48 - Service - SDT
-void SIParser::ParseDescService(uint8_t *buffer, int, SDTObject &s)
+void SIParser::ParseDescService(const uint8_t *buffer, int, SDTObject &s)
 {
     uint8_t tempType = buffer[2];
 
@@ -1416,7 +1408,7 @@ void SIParser::ParseDescService(uint8_t *buffer, int, SDTObject &s)
 }
 
 // Descriptor 0x5A - DVB-T Transport - NIT
-TransportObject SIParser::ParseDescTerrestrial(uint8_t *buffer, int)
+TransportObject SIParser::ParseDescTerrestrial(const uint8_t *buffer, int)
 {
     TransportObject retval;
 
@@ -1553,7 +1545,7 @@ TransportObject SIParser::ParseDescTerrestrial(uint8_t *buffer, int)
 }
 
 // Desctiptor 0x43 - Satellite Delivery System - NIT
-TransportObject SIParser::ParseDescSatellite(uint8_t *buffer, int)
+TransportObject SIParser::ParseDescSatellite(const uint8_t *buffer, int)
 {
     TransportObject retval;
 
@@ -1663,7 +1655,8 @@ TransportObject SIParser::ParseDescSatellite(uint8_t *buffer, int)
 }
 
 // Descriptor 0x44 - Cable Delivery System - NIT
-TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
+// DVB-C - Descriptor Parser written by Ian Caulfield
+TransportObject SIParser::ParseDescCable(const uint8_t *buffer, int)
 {
      TransportObject retval;
 

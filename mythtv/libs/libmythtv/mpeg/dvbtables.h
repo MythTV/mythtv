@@ -33,20 +33,21 @@ class NetworkInformationTable : public PSIPTable
     ~NetworkInformationTable() { ; }
 
     /// network_id             16   3.0     0x0000
-    uint NetworkID() const { return TableIDExtension(); }
+    uint NetworkID(void) const { return TableIDExtension(); }
 
     // reserved_future_use      4   8.0        0xf
     /// network_desc_length    12   8.4          0
-    uint NetworkDescriptorsLength() const
-        { return ((pesdata()[8]<<8) | pesdata()[9]) & 0xfff; }
+    uint NetworkDescriptorsLength(void) const
+        { return ((psipdata()[0]<<8) | psipdata()[1]) & 0xfff; }
 
     /// for(i=0; i<N; i++)      x  10.0
     ///   { descriptor() }
-    const unsigned char* NetworkDescriptors() const { return pesdata()+10; }
+    const unsigned char* NetworkDescriptors(void) const
+        { return psipdata() + 2; }
 
     // reserved_future_use      4  0.0+ndl     0xf
     /// trans_stream_loop_len  12  0.4+ndl
-    uint TransportStreamCount() const
+    uint TransportStreamCount(void) const
         { return ((_tsc_ptr[0]<<8) | _tsc_ptr[1]) & 0xfff; }
     // for(i=0; i<N; i++) { 
     ///  transport_stream_id   16  0.0+p
@@ -66,7 +67,7 @@ class NetworkInformationTable : public PSIPTable
 
     void Parse(void) const;
     QString toString(void) const;
-    QString NetworkName() const;
+    QString NetworkName(void) const;
 
   private:
     mutable QString _cached_network_name;

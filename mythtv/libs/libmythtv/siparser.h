@@ -44,6 +44,7 @@ class VirtualChannelTable;
 class SystemTimeTable;
 class EventInformationTable;
 class ExtendedTextTable;
+class NetworkInformationTable;
 
 /**
  *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
@@ -125,6 +126,7 @@ class SIParser : public QObject
     void HandleVCT(uint pid, const VirtualChannelTable*);
     void HandleEIT(uint pid, const EventInformationTable*);
     void HandleETT(uint pid, const ExtendedTextTable*);
+    void HandleNIT(const NetworkInformationTable*);
 
   signals:
     void FindTransportsComplete(void);
@@ -158,7 +160,6 @@ class SIParser : public QObject
     QDateTime ConvertDVBDate(const uint8_t* dvb_buf);
 
     // DVB Table Parsers
-    void ParseNIT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
     void ParseSDT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
     void ParseDVBEIT(uint pid, tablehead_t* h, uint8_t* buffer, uint size);
 
@@ -166,12 +167,19 @@ class SIParser : public QObject
     CAPMTObject ParseDescCA(const uint8_t* buffer, int size);
 
     // DVB Descriptor Parsers
-    void ParseDescService      (uint8_t* buf, int sz, SDTObject       &s);
-    void ParseDescFrequencyList(uint8_t* buf, int sz, TransportObject &t);
-    void ParseDescUKChannelList(uint8_t* buf, int sz, QMap_uint16_t &num);
-    TransportObject ParseDescTerrestrial     (uint8_t* buf, int sz);
-    TransportObject ParseDescSatellite       (uint8_t* buf, int sz);
-    TransportObject ParseDescCable           (uint8_t* buf, int sz);
+    void HandleNITDesc(const desc_list_t &dlist);
+    void HandleNITTransportDesc(const desc_list_t &dlist,
+                                TransportObject   &tobj,
+                                QMap_uint16_t     &clist);
+    void ParseDescService      (const uint8_t* buf, int sz,
+                                SDTObject       &s);
+    void ParseDescFrequencyList(const uint8_t* buf, int sz,
+                                TransportObject &t);
+    void ParseDescUKChannelList(const uint8_t* buf, int sz,
+                                QMap_uint16_t   &num);
+    TransportObject ParseDescTerrestrial     (const uint8_t* buf, int sz);
+    TransportObject ParseDescSatellite       (const uint8_t* buf, int sz);
+    TransportObject ParseDescCable           (const uint8_t* buf, int sz);
     QString ParseDescLanguage                (const uint8_t*, uint sz);
     void ParseDescTeletext                   (const uint8_t* buf, int sz);
     void ParseDescSubtitling                 (const uint8_t* buf, int sz);
