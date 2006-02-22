@@ -353,7 +353,8 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
                     (e->key() == Qt::Key_Enter) ||
                     (e->key() == Qt::Key_Return)))
             {
-                if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
+                if ((allowVirtualKeyboard) &&
+				    (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1))
                 {
                     popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
                     gContext->GetMainWindow()->detach(popup);
