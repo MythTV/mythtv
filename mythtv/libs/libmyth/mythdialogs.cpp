@@ -2617,6 +2617,7 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     password_editor->setEchoMode(QLineEdit::Password);
     password_editor->setGeometry(textWidth + 20,10,135,30);
     password_editor->setBackgroundOrigin(ParentOrigin);
+    password_editor->setAllowVirtualKeyboard(false);
     connect(password_editor, SIGNAL(textChanged(const QString &)),
             this, SLOT(checkPassword(const QString &)));
 

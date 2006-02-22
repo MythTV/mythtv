@@ -122,17 +122,21 @@ class MythLineEdit : public QLineEdit
     Q_OBJECT
   public:
     MythLineEdit(QWidget *parent=NULL, const char* widgetName=0) :
-      QLineEdit(parent, widgetName) { rw = true; Init(); };
+      QLineEdit(parent, widgetName)
+	    { rw = true; allowVirtualKeyboard = true; Init(); };
 
     MythLineEdit(const QString& contents, QWidget *parent=NULL, 
                  const char* widgetName=0) :
-      QLineEdit(contents, parent, widgetName) { rw = true; Init(); };
+      QLineEdit(contents, parent, widgetName)
+	    { rw = true; allowVirtualKeyboard = true; Init(); };
 
     virtual ~MythLineEdit();
 
     void setHelpText(QString help) { helptext = help; };
     void setRW(bool readwrite = true) { rw = readwrite; };
     void setRO() { rw = false; };
+    void setAllowVirtualKeyboard(bool allowKbd = true)
+	       { allowVirtualKeyboard = allowKbd; }
     void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
     PopupPosition getPopupPosition(void) { return popupPosition; }
 
@@ -154,6 +158,7 @@ class MythLineEdit : public QLineEdit
     VirtualKeyboard *popup;
     QString helptext;
     bool rw;
+    bool allowVirtualKeyboard;
     PopupPosition popupPosition;
 };
 
