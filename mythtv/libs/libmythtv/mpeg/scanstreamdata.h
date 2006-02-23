@@ -13,7 +13,7 @@ class ScanStreamData : public ATSCStreamData
     ScanStreamData();
     virtual ~ScanStreamData();
 
-    bool IsRedundant(const PSIPTable&) const;
+    bool IsRedundant(uint pid, const PSIPTable&) const;
     bool HandleTables(uint pid, const PSIPTable &psip);
 
     void Reset();

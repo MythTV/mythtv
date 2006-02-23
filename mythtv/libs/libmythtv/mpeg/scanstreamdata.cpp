@@ -24,12 +24,12 @@ ScanStreamData::ScanStreamData()
 
 ScanStreamData::~ScanStreamData() { ; }
 
-/** \fn ScanStreamData::IsRedundant(const PSIPTable&) const
+/** \fn ScanStreamData::IsRedundant(uint,const PSIPTable&) const
  *  \brief Returns true if table already seen.
  */
-bool ScanStreamData::IsRedundant(const PSIPTable &psip) const
+bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
-    return ATSCStreamData::IsRedundant(psip) || dvb.IsRedundant(psip);
+    return ATSCStreamData::IsRedundant(pid,psip) || dvb.IsRedundant(pid,psip);
 }
 
 /** \fn ScanStreamData::HandleTables(uint, const PSIPTable&)

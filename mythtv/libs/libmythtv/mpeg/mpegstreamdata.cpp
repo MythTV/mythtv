@@ -351,10 +351,10 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     return true;
 }
 
-/** \fn MPEGStreamData::IsRedundant(const PSIPTable&) const
+/** \fn MPEGStreamData::IsRedundant(uint pid, const PSIPTable&) const
  *  \brief Returns true if table already seen.
  */
-bool MPEGStreamData::IsRedundant(const PSIPTable &psip) const
+bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
     const int table_id = psip.TableID();
     const int version  = psip.Version();
@@ -506,7 +506,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 
     // Don't decode redundant packets,
     // but if it is a desired PAT or PMT emit a "heartbeat" signal.
-    if (IsRedundant(*psip))
+    if (IsRedundant(tspacket->PID(), *psip))
     {
         if (TableID::PAT == psip->TableID())
             emit UpdatePATSingleProgram(PATSingleProgram());

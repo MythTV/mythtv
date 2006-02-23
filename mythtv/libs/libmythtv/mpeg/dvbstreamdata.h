@@ -23,7 +23,7 @@ class DVBStreamData : public MPEGStreamData
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
-    bool IsRedundant(const PSIPTable&) const;
+    bool IsRedundant(uint pid, const PSIPTable&) const;
 
     // Table versions
     void SetVersionNIT(int version)            { _nit_version = version;       }

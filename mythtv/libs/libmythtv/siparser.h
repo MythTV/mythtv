@@ -220,8 +220,6 @@ class SIParser : public QObject
     // Storage Objects (ATSC)
     QMap<uint,uint>     sourceid_to_channel;
     ATSCStreamData     *atsc_stream_data;
-    bool                mgt_seen;
-    bool                vct_seen;
 
 #ifdef USING_DVB_EIT
     // Storage Objects (ATSC & DVB)

@@ -32,6 +32,8 @@ typedef vector<const TerrestrialVirtualChannelTable*> tvct_vec_t;
 typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
 typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
 typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
+typedef vector<unsigned char>           uchar_vec_t;
+typedef uchar_vec_t                     sections_t;
 
 class ATSCStreamData : public MPEGStreamData
 {
@@ -47,7 +49,7 @@ class ATSCStreamData : public MPEGStreamData
 
     // Table processing
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
-    bool IsRedundant(const PSIPTable&) const;
+    virtual bool IsRedundant(uint, const PSIPTable&) const;
 
     /// Current UTC to GPS time offset in seconds
     uint GPSOffset() const { return _GPS_UTC_offset; }
@@ -59,16 +61,18 @@ class ATSCStreamData : public MPEGStreamData
         { _tvct_version[tsid] = version; }
     void SetVersionCVCT(uint tsid, int version)
         { _cvct_version[tsid] = version; }
-    void SetVersionEIT(uint pid,   int version)
-        {   _eit_version[pid] = version; }
-    void SetVersionETT(uint pid,   int version)
-        {   _ett_version[pid] = version; }
+    void SetVersionEIT(uint pid, uint atsc_source_id, int version)
+    {
+        _eit_version[(pid<<16) | atsc_source_id] = version;
+        _eit_section_seen.clear();
+    }
+    void SetEITSectionSeen(uint pid, uint atsc_source_id, uint section);
 
     int VersionMGT() const { return _mgt_version; }
     inline int VersionTVCT(uint tsid) const;
     inline int VersionCVCT(uint tsid) const;
-    inline int VersionEIT(uint pid) const;
-    inline int VersionETT(uint pid) const;
+    inline int VersionEIT(uint pid, uint atsc_sourceid) const;
+    bool EITSectionSeen(uint pid, uint atsc_source_id, uint section) const;
 
     // Caching
     bool HasCachedMGT(bool current = true) const;
@@ -130,7 +134,7 @@ class ATSCStreamData : public MPEGStreamData
     QMap<uint, int> _tvct_version;
     QMap<uint, int> _cvct_version;
     QMap<uint, int> _eit_version;
-    QMap<uint, int> _ett_version;
+    QMap<uint, sections_t> _eit_section_seen;
 
     // Caching
     mutable MasterGuideTable *_cached_mgt;
@@ -145,25 +149,26 @@ class ATSCStreamData : public MPEGStreamData
 inline int ATSCStreamData::VersionTVCT(uint tsid) const
 {
     const QMap<uint, int>::const_iterator it = _tvct_version.find(tsid);
-    return (it == _tvct_version.end()) ? -1 : *it;
+    if (it == _tvct_version.end())
+        return -1;
+    return *it;
 }
 
 inline int ATSCStreamData::VersionCVCT(uint tsid) const
 {
     const QMap<uint, int>::const_iterator it = _cvct_version.find(tsid);
-    return (it == _cvct_version.end()) ? -1 : *it;
+    if (it == _cvct_version.end())
+        return -1;
+    return *it;
 }
 
-inline int ATSCStreamData::VersionEIT(uint pid) const
+inline int ATSCStreamData::VersionEIT(uint pid, uint atsc_source_id) const
 {
-    const QMap<uint, int>::const_iterator it = _eit_version.find(pid);
-    return (it == _eit_version.end()) ? -1 : *it;
-}
-
-inline int ATSCStreamData::VersionETT(uint pid) const
-{
-    const QMap<uint, int>::const_iterator it = _ett_version.find(pid);
-    return (it == _ett_version.end()) ? -1 : *it;
+    uint key = (pid<<16) | atsc_source_id;
+    const QMap<uint, int>::const_iterator it = _eit_version.find(key);
+    if (it == _eit_version.end())
+        return -1;
+    return *it;
 }
 
 #endif

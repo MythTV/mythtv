@@ -35,7 +35,7 @@ class MPEGStreamData : public QObject
 
     // Table processing
     void SetIgnoreCRC(bool haveCRCbug) { _have_CRC_bug = haveCRCbug; }
-    virtual bool IsRedundant(const PSIPTable&) const;
+    virtual bool IsRedundant(uint pid, const PSIPTable&) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);

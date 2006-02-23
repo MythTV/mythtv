@@ -56,7 +56,7 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
     _tvct_version.clear();
     _cvct_version.clear();
     _eit_version.clear();
-    _ett_version.clear();
+    _eit_section_seen.clear();
 
     { 
         QMutexLocker locker(&_cache_lock);
@@ -78,34 +78,30 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
     AddListeningPID(ATSC_PSIP_PID);
 }
 
-/** \fn ATSCStreamData::IsRedundant(const PSIPTable&) const
+/** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&) const
  *  \brief Returns true if table already seen.
  *  \todo All RRT tables are ignored
  *  \todo We don't check the start time of EIT and ETT tables
  *        in the version check, so many tables are improperly
  *        ignored.
  */
-bool ATSCStreamData::IsRedundant(const PSIPTable &psip) const
+bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
     const int table_id = psip.TableID();
     const int version = psip.Version();
 
-    if (MPEGStreamData::IsRedundant(psip))
+    if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
 
     if (TableID::EIT == table_id)
     {
-        // HACK This isn't right, we should also check start_time..
-        // But this gives us a little sample.
-        return  VersionEIT(psip.tsheader()->PID()) == version;
+        if (VersionEIT(pid, psip.TableIDExtension()) != version)
+            return false;
+        return EITSectionSeen(pid, psip.TableIDExtension(), psip.Section());
     }
 
     if (TableID::ETT == table_id)
-    {
-        // HACK This isn't right, we should also check start_time..
-        // But this gives us a little sample.
-        return VersionETT(psip.tsheader()->PID()) == version;
-    }
+        return false; // retransmit ETT's we've seen
 
     if (TableID::STT == table_id)
         return false; // each SystemTimeTable matters
@@ -115,14 +111,12 @@ bool ATSCStreamData::IsRedundant(const PSIPTable &psip) const
 
     if (TableID::TVCT == table_id)
     {
-        TerrestrialVirtualChannelTable tvct(psip);
-        return VersionTVCT(tvct.TransportStreamID()) == version;
+        return VersionTVCT(psip.TableIDExtension()) == version;
     }
 
     if (TableID::CVCT == table_id)
     {
-        CableVirtualChannelTable cvct(psip);
-        return VersionCVCT(cvct.TransportStreamID()) == version;
+        return VersionCVCT(psip.TableIDExtension()) == version;
     }
 
     if (TableID::RRT == table_id)
@@ -133,6 +127,9 @@ bool ATSCStreamData::IsRedundant(const PSIPTable &psip) const
 
 bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
+    if (IsRedundant(pid, psip))
+        return true;
+
     if (MPEGStreamData::HandleTables(pid, psip))
         return true;
 
@@ -205,15 +202,17 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::EIT:
         {
+            if (VersionEIT(pid, psip.TableIDExtension()) != version)
+                SetVersionEIT(pid, psip.TableIDExtension(), version);
+            SetEITSectionSeen(pid, psip.TableIDExtension(), psip.Section());
+
             EventInformationTable eit(psip);
-            SetVersionEIT(pid, version);
             emit UpdateEIT(pid, &eit);
             return true;
         }
         case TableID::ETT:
         {
             ExtendedTextTable ett(psip);
-            SetVersionETT(pid, version);
             emit UpdateETT(pid, &ett);
             return true;
         }
@@ -246,6 +245,33 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
     }
     return false;
+}
+
+void ATSCStreamData::SetEITSectionSeen(uint pid, uint atsc_source_id,
+                                       uint section)
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    uint key = (pid<<16) | atsc_source_id;
+    QMap<uint, sections_t>::iterator it = _eit_section_seen.find(key);
+    if (it == _eit_section_seen.end())
+    {
+        _eit_section_seen[key].resize(32, 0);
+        it = _eit_section_seen.find(key);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool ATSCStreamData::EITSectionSeen(uint pid, uint atsc_source_id,
+                                    uint section) const
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    uint key = (pid<<16) | atsc_source_id;
+    QMap<uint, sections_t>::const_iterator it = _eit_section_seen.find(key);
+    if (it == _eit_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
 bool ATSCStreamData::HasCachedMGT(bool current) const

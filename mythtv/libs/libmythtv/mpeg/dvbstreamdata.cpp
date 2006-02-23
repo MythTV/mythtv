@@ -11,13 +11,13 @@ DVBStreamData::DVBStreamData(bool cacheTables)
     AddListeningPID(DVB_SDT_PID);
 }
 
-/** \fn DVBStreamData::IsRedundant(const PSIPTable&) const
+/** \fn DVBStreamData::IsRedundant(uint,const PSIPTable&) const
  *  \brief Returns true if table already seen.
  *  \todo This is just a stub.
  */
-bool DVBStreamData::IsRedundant(const PSIPTable &psip) const
+bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
-    if (MPEGStreamData::IsRedundant(psip))
+    if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
 
     return false;

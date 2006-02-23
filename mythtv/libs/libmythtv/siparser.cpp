@@ -52,7 +52,6 @@ SIParser::SIParser(const char *name) :
     RequestedTransportID(0),        NITPID(0),
     // ATSC Storage
     atsc_stream_data(new ATSCStreamData(-1,-1)),
-    mgt_seen(false),                vct_seen(false),
     // Mutex Locks
     pmap_lock(false),
     // State variables
@@ -101,6 +100,10 @@ SIParser::SIParser(const char *name) :
             this,             SLOT(  HandleSTT(const SystemTimeTable*)));
 
 #ifdef USING_DVB_EIT
+    connect(atsc_stream_data,
+            SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
+            this,
+            SLOT(  HandleEIT(uint, const EventInformationTable*)));
     connect(atsc_stream_data, SIGNAL(UpdateETT(uint,const ExtendedTextTable*)),
             this,             SLOT(HandleETT(uint,const ExtendedTextTable*)));
 #endif // USING_DVB_EIT
@@ -150,8 +153,6 @@ void SIParser::Reset()
     pmap_lock.unlock();
 
     atsc_stream_data->Reset(-1,-1);
-    mgt_seen = false;
-    vct_seen = false;
 
     VERBOSE(VB_SIPARSER, LOC + "SIParser Reset due to channel change");
 }
@@ -488,8 +489,6 @@ bool SIParser::AddPMT(uint16_t ServiceID)
     atsc_stream_data->Reset(-1, -1);
     atsc_stream_data->Reset(ServiceID);
     atsc_stream_data->AddListeningPID(ATSC_PSIP_PID);
-    mgt_seen = false;
-    vct_seen = false;
 
     return true;
 }
@@ -620,18 +619,7 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     {
         const PESPacket pes = PESPacket::ViewData(buffer);
         const PSIPTable psip(pes);
-#ifdef USING_DVB_EIT
-        if (TableID::EIT == psip.TableID() &&
-            !Table[EVENTS]->AddSection(&head, psip.TableIDExtension(), pid))
-        {
-            const EventInformationTable eit(psip);
-            HandleEIT(pid, &eit);
-        }
-        else
-        {
-            atsc_stream_data->HandleTables(pid, psip);
-        }
-#endif // USING_DVB_EIT
+        atsc_stream_data->HandleTables(pid, psip);
     }
 
 #ifdef USING_DVB_EIT
@@ -1797,10 +1785,6 @@ void SIParser::ParseDescSubtitling(const uint8_t *buffer, int size)
  */
 void SIParser::HandleMGT(const MasterGuideTable *mgt)
 {
-    if (mgt_seen)
-        return;
-    mgt_seen = true;
-
     VERBOSE(VB_SIPARSER, LOC + "HandleMGT()");
     for (uint i = 0 ; i < mgt->TableCount(); i++)
     {
@@ -1855,10 +1839,6 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
 
 void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
 {
-    if (vct_seen)
-        return;
-    vct_seen = true;
-
     VERBOSE(VB_SIPARSER, LOC + "HandleVCT("<<pid<<") cnt("
             <<vct->ChannelCount()<<")");
 
@@ -1925,15 +1905,19 @@ void SIParser::HandleEIT(uint pid, const EventInformationTable *eit)
     int atsc_src_id = sourceid_to_channel[eit->SourceID()];
     if (!atsc_src_id)
     {
-        VERBOSE(VB_EIT, LOC + "HandleEIT(): " +
-                QString("Ignoring data. Source %1 not in map.")
-                .arg(eit->SourceID()));
+        VERBOSE(VB_EIT, LOC +
+                QString("HandleEIT(%1, sect %2, src %3): "
+                        "Ignoring data. Source not in map.")
+                .arg(pid).arg(eit->Section()).arg(eit->SourceID()));
         return;
     }
     else
     {
-        VERBOSE(VB_EIT, LOC + "HandleEIT(): " +
-                QString("Adding data. ATSC Channel is %1_%2.")
+        VERBOSE(VB_EIT, LOC +
+                QString("HandleEIT(%1, sect %2, src %3, ver %4): "
+                        "Adding data. ATSC Channel is %5_%6.")
+                .arg(pid).arg(eit->Section()).arg(eit->SourceID())
+                .arg(eit->Version())
                 .arg(atsc_src_id >> 8).arg(atsc_src_id & 0xff));
     }   
 
