@@ -863,7 +863,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     return recordingHasPositionMap;
 }
 
-static float normalized_fps(AVCodecContext *enc)
+static float normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
     float fps = 1.0f / av_q2d(enc->time_base);
 
@@ -875,14 +875,22 @@ static float normalized_fps(AVCodecContext *enc)
         if (av_q2d(enc->time_base) > 0)
             fps = 1.0f / av_q2d(enc->time_base);
     }
+    // If it's still wonky, try the container's time_base
+    if (fps > 121.0f || fps < 3.0f)
+    {
+        float tmpfps = 1.0f / av_q2d(stream->time_base);
+        if (tmpfps > 20 && tmpfps < 70)
+            fps = tmpfps;
+    }
+
     // If it is still out of range, just assume NTSC...
     fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
     return fps;
 }
 
-void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
+void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
 {
-    fps = normalized_fps(enc);
+    fps = normalized_fps(stream, enc);
 
     float aspect_ratio;
     if (enc->sample_aspect_ratio.num == 0)
@@ -1073,7 +1081,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") type ("<<codec_type_string(enc->codec_type)
                             <<") already open.");
                 }
-                InitVideoCodec(enc);
+                InitVideoCodec(ic->streams[i], enc);
                 // Only use libmpeg2 when not using XvMC
                 if (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
                     CODEC_ID_MPEG2VIDEO == enc->codec_id)
@@ -1694,7 +1702,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 lastapts = lastvpts = lastccptsu = 0;
 
                 // fps debugging info
-                float avFPS = normalized_fps(context);
+                float avFPS = normalized_fps(stream, context);
                 if ((seqFPS > avFPS+0.01) || (seqFPS < avFPS-0.01))
                 {
                     VERBOSE(VB_PLAYBACK, LOC +

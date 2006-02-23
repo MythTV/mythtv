@@ -175,7 +175,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     friend int close_avf(URLContext *h);
 
     void InitByteContext(void);
-    void InitVideoCodec(AVCodecContext *enc);
+    void InitVideoCodec(AVStream *stream, AVCodecContext *enc);
 
     /// Preprocess a packet, setting the video parms if nessesary.
     /// Also feeds HandleGopStart for MPEG2 files.
