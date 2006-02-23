@@ -779,6 +779,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         SetDecoder(new IvtvDecoder(this, m_playbackinfo));
         no_audio_out = true; // no audio with ivtv.
         audio_bits = 16;
+        audio_samplerate = 44100;
+        audio_channels = 2;
     }
     else if (forceVideoOutput == kVideoOutput_IVTV)
     {
