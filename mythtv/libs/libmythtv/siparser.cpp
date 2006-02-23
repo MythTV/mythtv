@@ -1723,7 +1723,7 @@ TransportObject SIParser::ParseDescCable(const uint8_t *buffer, int)
  *  \brief Processes non-language dependent DVB Event descriptors, and caches
  *         language dependent DVB Event descriptors for the most preferred
  *         language.
- * \returns descriptor lenght + 2, aka total descriptor size
+ * \returns descriptor length + 2, aka total descriptor size
  */
 uint SIParser::ProcessDVBEventDescriptors(
     uint                         pid,
@@ -1788,9 +1788,9 @@ uint SIParser::ProcessDVBEventDescriptors(
         case DescriptorID::component:
         {
             ComponentDescriptor component(data);
-            event.HDTV      = component.IsHDTV();
-            event.Stereo    = component.IsStereo();
-            event.SubTitled = component.IsReallySubtitled();
+            event.HDTV      |= component.IsHDTV();
+            event.Stereo    |= component.IsStereo();
+            event.SubTitled |= component.IsReallySubtitled();
         }
         break;
 
@@ -1809,13 +1809,6 @@ uint SIParser::ProcessDVBEventDescriptors(
     return descriptorLength + 2;
 }
 #endif //USING_DVB_EIT
-
-QString SIParser::ParseDescLanguage(const uint8_t *data, uint size)
-{
-    (void) size; // TODO validate size
-
-    return QString::fromLatin1((const char*)data, 3);
-}
 
 void SIParser::ParseDescTeletext(const uint8_t *buffer, int size)
 {

@@ -180,16 +180,10 @@ class SIParser : public QObject
     TransportObject ParseDescTerrestrial     (const uint8_t* buf, int sz);
     TransportObject ParseDescSatellite       (const uint8_t* buf, int sz);
     TransportObject ParseDescCable           (const uint8_t* buf, int sz);
-    QString ParseDescLanguage                (const uint8_t*, uint sz);
     void ParseDescTeletext                   (const uint8_t* buf, int sz);
     void ParseDescSubtitling                 (const uint8_t* buf, int sz);
 
 #ifdef USING_DVB_EIT
-    static void ProcessDescHuffmanEventInfo(const unsigned char*, uint sz,
-                                            Event&);
-    static QString ProcessDescHuffmanText(const unsigned char*, uint sz);
-    static QString ProcessDescHuffmanTextLarge(const unsigned char*, uint sz);
-
     // DVB EIT Table Descriptor processors
     uint ProcessDVBEventDescriptors(
         uint                         pid,
