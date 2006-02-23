@@ -87,6 +87,7 @@ class RingBuffer
     bool InDVDMenuOrStillFrame(void);
 
     long long SetAdjustFilesize(void);
+    void SetTimeout(bool fast) { oldfile = fast; }
     
   protected:
     static void *StartReader(void *type);

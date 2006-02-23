@@ -35,6 +35,8 @@ class FileTransfer
 
     long long GetFileSize(void);
 
+    void SetTimeout(bool fast);
+
   private:
     bool readthreadlive;
     QMutex readthreadLock;

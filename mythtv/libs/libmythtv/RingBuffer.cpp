@@ -162,6 +162,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 
     bool is_local = false;
     bool is_dvd = false;
+
     if ((filename.left(7) == "myth://") &&
         (filename.length() > 7 ))
     {
@@ -728,7 +729,7 @@ void RingBuffer::ReadAheadThread(void)
         loops = 0;
 
         pthread_rwlock_rdlock(&rwlock);
-        if (totfree > readblocksize && !commserror)
+        if (totfree > readblocksize && !commserror && !ateof && !setswitchtonext)
         {
             // limit the read size
             totfree = readblocksize;
@@ -738,6 +739,9 @@ void RingBuffer::ReadAheadThread(void)
 
             if (remotefile)
             {
+                if (livetvchain && livetvchain->HasNext())
+                    remotefile->SetTimeout(true);
+
                 ret = safe_read(remotefile, readAheadBuffer + rbwpos,
                                 totfree);
                 internalreadpos += ret;
@@ -786,7 +790,7 @@ void RingBuffer::ReadAheadThread(void)
             totfree = 0;
         }
 
-        if (!readsallowed && used >= fill_min)
+        if (!readsallowed && (used >= fill_min || setswitchtonext))
         {
             readsallowed = true;
             VERBOSE(VB_PLAYBACK, QString("reads allowed (%1 %2)").arg(used)
@@ -817,8 +821,11 @@ void RingBuffer::ReadAheadThread(void)
 
         pthread_rwlock_unlock(&rwlock);
 
-        if ((used >= fill_threshold || wantseek) && !pausereadthread)
+        if ((used >= fill_threshold || wantseek || ateof || setswitchtonext) &&
+            !pausereadthread)
+        {
             usleep(500);
+        }
     }
 
     delete [] readAheadBuffer;
@@ -938,7 +945,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         availWaitMutex.unlock();
 
         avail = ReadBufAvail();
-        if (ateof && avail < count)
+        if ((ateof || setswitchtonext) && avail < count)
             count = avail;
 
         if (commserror)

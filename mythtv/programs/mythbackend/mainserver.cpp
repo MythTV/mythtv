@@ -2969,6 +2969,12 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         long long ret = ft->Seek(curpos, pos, whence);
         encodeLongLong(retlist, ret);
     }
+    else if (command == "SET_TIMEOUT")
+    {
+        bool fast = slist[2].toInt();
+        ft->SetTimeout(fast);
+        retlist << "ok";
+    }
     else 
     {
         VERBOSE(VB_IMPORTANT, QString("Unknown command: %1").arg(command));

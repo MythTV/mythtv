@@ -15,6 +15,7 @@ RemoteFile::RemoteFile(const QString &url)
     path = url;
     readposition = 0;
     filesize = -1;
+    timeoutisfast = false;
 
     query = "QUERY_FILETRANSFER %1";
 
@@ -295,4 +296,34 @@ bool RemoteFile::SaveAs(QByteArray &data)
     Read(data.data(), filesize);
 
     return true;
-} 
+}
+
+void RemoteFile::SetTimeout(bool fast)
+{
+    if (timeoutisfast == fast)
+        return;
+
+    if (!sock)
+    {
+        VERBOSE(VB_NETWORK, "RemoteFile::Seek(): Called with no socket");
+        return;
+    }
+
+    if (!sock->isOpen() || sock->error())
+        return;
+
+    if (!controlSock->isOpen() || controlSock->error())
+        return;
+
+    QStringList strlist = QString(query).arg(recordernum);
+    strlist << "SET_TIMEOUT";
+    strlist << QString::number((int)fast);
+
+    lock.lock();
+    WriteStringList(controlSock, strlist);
+    ReadStringList(controlSock, strlist);
+    lock.unlock();
+
+    timeoutisfast = fast;
+}
+

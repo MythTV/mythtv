@@ -27,6 +27,8 @@ class RemoteFile
 
     long long GetFileSize(void);
 
+    void SetTimeout(bool fast);
+
   private:
     QSocketDevice *openSocket(bool control);
 
@@ -43,6 +45,7 @@ class RemoteFile
     QMutex lock;
 
     long long filesize;
+    bool timeoutisfast;
 };
 
 #endif
