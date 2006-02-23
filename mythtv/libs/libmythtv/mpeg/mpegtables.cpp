@@ -165,11 +165,11 @@ void ProgramMapTable::Parse() const
     {
         _ptrs.push_back(pos);
         pos += 5 + StreamInfoLength(i);
-        VERBOSE(VB_SIPARSER, "Parsing PMT(0x"<<this<<") i("<<i<<") "
-                <<"len("<<StreamInfoLength(i)<<")");
+        //VERBOSE(VB_SIPARSER, "Parsing PMT("<<this<<") i("<<i<<") "
+        //        <<"len("<<StreamInfoLength(i)<<")");
     }
     _ptrs.push_back(pos);
-    VERBOSE(VB_SIPARSER, "Parsed PMT(0x"<<this<<")\n"<<this->toString());
+    //VERBOSE(VB_SIPARSER, "Parsed PMT("<<this<<")\n"<<this->toString());
 }
 
 void ProgramMapTable::AppendStream(
