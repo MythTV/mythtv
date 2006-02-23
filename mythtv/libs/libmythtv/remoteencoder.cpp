@@ -12,8 +12,8 @@ using namespace std;
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
-      remoteport(port),       lastchannel(""),        backendError(false),
-      cachedFramesWritten(0)
+      remoteport(port),       lastchannel(""),        lastinput(""),
+      backendError(false),    cachedFramesWritten(0)
 {
 }
 
@@ -292,6 +292,8 @@ void RemoteEncoder::PauseRecorder(void)
     strlist << "PAUSE";
 
     SendReceiveStringList(strlist);
+
+    lastinput = "";
 }
 
 void RemoteEncoder::FinishRecording(void)
@@ -323,12 +325,16 @@ QStringList RemoteEncoder::GetInputs(void)
 
 QString RemoteEncoder::GetInput(void)
 {
+    if (lastinput.length() > 0)
+        return lastinput;
+
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "GET_INPUT";
 
     SendReceiveStringList(strlist);
 
-    return strlist[0]; 
+    lastinput = strlist[0];
+    return lastinput; 
 }
 
 QString RemoteEncoder::SetInput(QString input)
@@ -340,6 +346,7 @@ QString RemoteEncoder::SetInput(QString input)
     SendReceiveStringList(strlist);
 
     lastchannel = "";
+    lastinput = "";
 
     return strlist[0];
 }
@@ -361,6 +368,7 @@ void RemoteEncoder::ChangeChannel(int channeldirection)
     SendReceiveStringList(strlist);
 
     lastchannel = "";
+    lastinput = "";
 }
 
 void RemoteEncoder::SetChannel(QString channel)
@@ -372,6 +380,7 @@ void RemoteEncoder::SetChannel(QString channel)
     SendReceiveStringList(strlist);
 
     lastchannel = "";
+    lastinput = "";
 }
 
 /** \fn RemoteEncoder::SetSignalMonitoringRate(int,bool)

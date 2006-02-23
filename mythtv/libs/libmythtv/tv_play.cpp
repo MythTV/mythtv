@@ -1474,7 +1474,6 @@ void TV::RunTV(void)
                 lastSignalMsg.clear();
             }
             UpdateOSDTimeoutMessage();
-            osdlock.unlock();
 
             if (!tvchainUpdate.isEmpty())
             {
@@ -1498,6 +1497,8 @@ void TV::RunTV(void)
                 tvchainUpdate.clear();
                 tvchainUpdateLock.unlock();
             }
+
+            osdlock.unlock();
         }
 
         usleep(1000);

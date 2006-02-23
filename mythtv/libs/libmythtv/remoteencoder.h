@@ -78,6 +78,7 @@ class RemoteEncoder
     short remoteport;
 
     QString lastchannel;
+    QString lastinput;
 
     bool backendError;
     long long cachedFramesWritten;
