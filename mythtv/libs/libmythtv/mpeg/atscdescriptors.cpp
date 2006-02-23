@@ -112,6 +112,27 @@ void CaptionServiceDescriptor::Parse() const {
     }
 }
 
+void ContentAdvisoryDescriptor::Parse() const
+{
+    _ptrs.clear();
+    _ptrs[Index(0,-1)] = _data + 2;
+
+    for (uint i = 0; i < RatingRegionCount(); i++)
+    {
+        _ptrs[Index(i,0)] = Offset(i,-1)+2;
+        uint j = 0;
+        for (; j < RatedDimensions(i); j++)
+            _ptrs[Index(i,j+1)] = Offset(i,j) + 2;
+        const unsigned char *tmp = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
+        uint len = RatingDescriptionLength(i);
+        _ptrs[Index(i+1,-1)] = tmp + len;
+    }
+}
+
+QString ContentAdvisoryDescriptor::toString() const
+{
+    return "ContentAdvisoryDescriptor::toString(): Not implemented";
+}
 
 /*
 void MultipleStringStructure::print() const {

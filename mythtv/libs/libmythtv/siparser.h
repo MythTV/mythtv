@@ -184,7 +184,6 @@ class SIParser : public QObject
     void ParseDescTeletext                   (const uint8_t* buf, int sz);
     void ParseDescSubtitling                 (const uint8_t* buf, int sz);
 
-    // ATSC EIT Table Descriptor processors
 #ifdef USING_DVB_EIT
     static void ProcessDescHuffmanEventInfo(const unsigned char*, uint sz,
                                             Event&);
@@ -206,9 +205,6 @@ class SIParser : public QObject
     void ProcessExtendedEventDescriptor (const uint8_t*, uint sz, Event &e);
     void ProcessComponentDescriptor     (const uint8_t*, uint sz, Event &e);
 #endif //USING_DVB_EIT
-
-    // ATSC Descriptor Parsers
-    void ParseDescATSCContentAdvisory(const uint8_t* buffer, int size);
 
     void InitializeCategories(void);
 

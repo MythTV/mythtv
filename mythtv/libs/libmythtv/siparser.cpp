@@ -27,7 +27,7 @@
 #define bcdtoint(i) ((((i & 0xf0) >> 4) * 10) + (i & 0x0f))
 
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
-// #define EIT_DEBUG_SID 1602
+//#define EIT_DEBUG_SID 1602
 
 #define LOC QString("SIParser: ")
 #define LOC_ERR QString("SIParser, Error: ")
@@ -2102,18 +2102,29 @@ void SIParser::HandleEIT(uint pid, const EventInformationTable *eit)
         desc_list_t::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
-            switch ((*it)[0])
+            if (DescriptorID::caption_service == (*it)[0])
             {
-                case DescriptorID::caption_service:
-                    //TODO: ATSC Caption Descriptor
-                    break;
-                case DescriptorID::content_advisory:
-                    // Content Advisory Decriptor
-                    ParseDescATSCContentAdvisory(*it, (*it)[1] + 2);
-                    break;
-                default:
-                    ProcessUnusedDescriptor(pid, *it, (*it)[1] + 2);
-                    break;
+                e.SubTitled = true;
+#ifdef EIT_DEBUG_SID
+                CaptionServiceDescriptor csd(*it);
+                VERBOSE(VB_EIT, LOC + csd.toString());
+#endif // EIT_DEBUG_SID
+            }
+            else if (DescriptorID::content_advisory == (*it)[0])
+            {
+                //ContentAdvisoryDescriptor cad(*it);
+                // ..
+            }
+            else if (DescriptorID::audio_stream == (*it)[0])
+            {
+#ifdef EIT_DEBUG_SID
+                AudioStreamDescriptor asd(*it);
+                VERBOSE(VB_EIT, LOC + asd.toString());
+#endif // EIT_DEBUG_SID
+            }
+            else
+            {
+                ProcessUnusedDescriptor(pid, *it, (*it)[1] + 2);
             }
         }
 
@@ -2121,12 +2132,10 @@ void SIParser::HandleEIT(uint pid, const EventInformationTable *eit)
         VERBOSE(VB_EIT, LOC + "HandleEIT(): " +
                 QString("[%1][%2]: %3\t%4 - %5")
                 .arg(atsc_src_id).arg(eit->EventID(i))
-                .arg(e.Event_Name.ascii(), 20)
+                .arg(e.Event_Name, 20)
                 .arg(e.StartTime.toString("MM/dd hh:mm"))
                 .arg(e.EndTime.toString("hh:mm")));
-#endif
-
-        eitfixup.Fix(e, PrivateTypes.EITFixUp);
+#endif // EIT_DEBUG_SID
         ev[eit->EventID(i)] = e;
     }
 #endif //USING_DVB_EIT
@@ -2165,114 +2174,6 @@ void SIParser::HandleSTT(const SystemTimeTable *stt)
     VERBOSE(VB_SIPARSER, LOC + "GPS offset: "<<stt->GPSOffset()<<" seconds");
     ((STTHandler*) Table[STT])->GPSOffset = stt->GPSOffset();
 }
-
-/*------------------------------------------------------------------------
- *   ATSC DESCRIPTOR PARSERS
- *------------------------------------------------------------------------*/
-
-void SIParser::ParseDescATSCContentAdvisory(const uint8_t *buffer, int size)
-{
-
-    (void) buffer;
-    (void) size;
-
-    return;
-
-    uint8_t pos = 3;
-    QString temp = "";
-
-    for (int x = 0 ; x < (buffer[2] & 0x3F) ; x++)
-    {
-        uint8_t dimensions = buffer[pos+1];
-        pos += 2;
-        for (int y = 0 ; y < dimensions ; y++)
-            pos += 2;
-        if (buffer[pos] > 0)
-        {
-            MultipleStringStructure mss(&buffer[pos+1]);
-            temp = mss.CompressedString(0, 0);
-        }
-        pos += buffer[pos] + 1;
-    }
-
-}
-
-#ifdef USING_DVB_EIT
-/* Huffman Text Decompression Routines used by some Nagra Providers */
-void SIParser::ProcessDescHuffmanEventInfo(
-    const unsigned char *buf, uint /*sz*/, Event &e)
-{
-    QString decompressed;
-
-    if ((buf[4] & 0xF8) == 0x80)
-       decompressed = atsc_huffman2_to_string(buf+5, buf[1]-3 , 2);
-    else
-       decompressed = atsc_huffman2_to_string(buf+4, buf[1]-2 , 2);
-
-    QStringList SplitValues = QStringList::split("}{",decompressed);
-
-    uint8_t switchVal = 0;
-    QString temp;
-
-    for (QStringList::Iterator it = SplitValues.begin();
-         it != SplitValues.end(); ++it)
-    {
-        (*it).replace( "{" , "" );
-        (*it).replace( "}" , "" );
-        switchVal = (*it).left(1).toInt();
-        temp = (*it).mid(2);
-
-        switch (switchVal)
-        {
-            case 1:
-                /* Sub Title */
-                e.Event_Subtitle = temp;
-                break;
-            case 2:
-                /* Category */
-                e.ContentDescription = temp;
-                break;
-            case 4:
-                e.Year = temp;
-                break;
-            case 5:
-                e.Description = temp;
-                break;
-            case 7:
-                /* Audio */
-                break;
-            case 6: 
-                /* Subtitles */
-                break;
-            default:
-                break;
-        }
-    }
-}
-#endif //USING_DVB_EIT
-
-#ifdef USING_DVB_EIT
-/* Used by some Nagra Systems for Huffman Copressed Guide */
-QString SIParser::ProcessDescHuffmanText(
-    const unsigned char *buf, uint /*sz*/)
-{
-    if ((buf[3] & 0xF8) == 0x80)
-       return atsc_huffman2_to_string(buf+4, buf[1]-2, 2);
-    else
-       return atsc_huffman2_to_string(buf+3, buf[1]-1, 2);
-}
-#endif //USING_DVB_EIT
-
-#ifdef USING_DVB_EIT
-QString SIParser::ProcessDescHuffmanTextLarge(
-    const unsigned char *buf, uint /*sz*/)
-{
-    if ((buf[4] & 0xF8) == 0x80)
-       return atsc_huffman2_to_string(buf+5, buf[1]-3 , 2);
-    else
-       return atsc_huffman2_to_string(buf+4, buf[1]-2 , 2);
-}
-#endif //USING_DVB_EIT
 
 void SIParser::InitializeCategories()
 {

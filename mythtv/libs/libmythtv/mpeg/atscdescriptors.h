@@ -85,7 +85,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor {
         MPEGDescriptor(data) {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
-        assert(0x86==DescriptorTag());
+        assert(DescriptorID::caption_service == DescriptorTag());
     // descriptor_length        8   1.0
     }
     // reserved                 3   2.0       0x07
@@ -147,6 +147,58 @@ class CaptionServiceDescriptor : public MPEGDescriptor {
     }    
 };
 
+class ContentAdvisoryDescriptor : public MPEGDescriptor
+{
+    mutable IntToBuf _ptrs;
+  public:
+    ContentAdvisoryDescriptor(const unsigned char* data) :
+        MPEGDescriptor(data)
+    {
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x87
+        assert(DescriptorID::content_advisory == DescriptorTag());
+        Parse();
+    // descriptor_length        8   1.0
+    }
+    // reserved                 2   2.0       0x03
+    // rating_region_count      6   2.2
+    uint RatingRegionCount(void) const { return _data[2] & 0x3f; }
+    // for (i=0; i<rating_region_count; i++) {
+    //   rating_region          8 x+0.0
+    uint RatingRegion(uint i) const
+        { return *Offset(i,-1); }
+    //   rated_dimensions       8 x+1.0
+    uint RatedDimensions(uint i) const
+        { return *(Offset(i,-1) + 1); }
+    //   for (j=0;j<rated_dimensions;j++) {
+    //     rating_dimension_j   8 y+0.0
+    uint RatingDimension(uint i, uint j) const
+        { return *Offset(i,j); }
+    //     reserved             4 y+1.0       0x0f
+    //     rating_value         4 y+1.4
+    uint RatingValue(uint i, uint j) const
+        { return (*(Offset(i,j) + 1)) & 0xf; }
+    //   }
+    //   rating_desc_length     8 x+2+(rated_dimensions*2)+0.0
+    uint RatingDescriptionLength(uint i) const
+        { return (*(Offset(i,-1) + 2 + (RatedDimensions(i)<<1)));  }
+    //   rating_desc_text         x+2+(rated_dimensions*2)+1.0
+    const MultipleStringStructure RatingDescription(uint i) const
+    {
+        const unsigned char* data = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
+        return MultipleStringStructure(data);
+    }
+    // }
+
+    void Parse(void) const;
+    QString toString() const;
+  protected:
+    int Index(int i, int j) const { return (i<<8)|(j&0xff); }
+    const unsigned char* Offset(int i, int j) const {
+        return _ptrs[Index(i,j)];
+    }    
+};
+
 class ComponentNameDescriptor : public MPEGDescriptor {
   public:
     ComponentNameDescriptor(const unsigned char* data) :
@@ -169,7 +221,7 @@ class AudioStreamDescriptor : public MPEGDescriptor {
     AudioStreamDescriptor(const unsigned char* data) :
         MPEGDescriptor(data) {
 // descriptor_tag   The value for the AC-3 descriptor tag is 0x81.
-        assert(0x81==DescriptorTag());
+        assert(DescriptorID::audio_stream == DescriptorTag());
     }
     // sample_rate_code                      3   2.0
     uint SampleRateCode() const { return (_data[2]>>5)&7; }
