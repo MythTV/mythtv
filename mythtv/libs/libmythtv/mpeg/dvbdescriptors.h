@@ -323,6 +323,14 @@ class ComponentDescriptor : public MPEGDescriptor
     // component_tag            8   4.0
     uint ComponentTag(void)  const { return _data[4]; }
     // ISO_639_language_code   24   5.0
+    int LanguageKey(void) const
+        { return iso639_str3_to_key(&_data[5]); }
+    QString LanguageString(void) const
+        { return iso639_key_to_str3(LanguageKey()); }
+    int CanonicalLanguageKey(void) const
+        { return iso639_key_to_canonical_key(LanguageKey()); }
+    QString CanonicalLanguageString(void) const
+        { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // 
     // for (i=0; i<N; i++) { text_char 8 }
 
@@ -785,9 +793,20 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     }
 
     // descriptor_number        4   2.0
+    uint DescriptorNumber(void) const { return _data[2] >> 4; }
     // last_number              4   2.4
+    uint LastNumber(void)       const { return _data[2] & 0xf; }
     // ISO_639_language_code   24   3.0
+    int LanguageKey(void) const
+        { return iso639_str3_to_key(&_data[3]); }
+    QString LanguageString(void) const
+        { return iso639_key_to_str3(LanguageKey()); }
+    int CanonicalLanguageKey(void) const
+        { return iso639_key_to_canonical_key(LanguageKey()); }
+    QString CanonicalLanguageString(void) const
+        { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // length_of_items          8   6.0
+    uint LengthOfItems(void)    const { return _data[6]; }
     // for ( i=0;i<N;i++)
     // {
     //   item_description_len   8   0.0+p
@@ -796,7 +815,10 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     //   for (j=0;j<N;j++) { item_char 8 }
     // }
     // text_length 8 
+    uint TextLength(void)       const { return _data[7 + _data[6]]; }
     // for (i=0; i<N; i++) { text_char 8 } 
+    QString Text(void) const
+        { return dvb_decode_text(&_data[8 + _data[6]], TextLength()); }
     QString toString() const { return QString("ExtendedEventDescriptor(stub)"); }
 };
 
@@ -1190,11 +1212,27 @@ class ShortEventDescriptor : public MPEGDescriptor
     }
 
     // ISO_639_language_code   24   2.0
+    int LanguageKey(void) const
+        { return iso639_str3_to_key(&_data[2]); }
+    QString LanguageString(void) const
+        { return iso639_key_to_str3(LanguageKey()); }
+    int CanonicalLanguageKey(void) const
+        { return iso639_key_to_canonical_key(LanguageKey()); }
+    QString CanonicalLanguageString(void) const
+        { return iso639_key_to_str3(CanonicalLanguageKey()); }
     // event_name_length        8   5.0
+    uint EventNameLength(void) const { return _data[5]; }
     // for (i=0;i<event_name_length;i++) { event_name_char 8 }
+    QString EventName(void) const
+        { return dvb_decode_text(&_data[6], _data[5]); }
     // text_length              8
+    uint TextLength(void) const { return _data[6 + _data[5]]; }
     // for (i=0;i<text_length;i++) { text_char 8 }
-    QString toString() const { return QString("ShortEventDescriptor(stub)"); }
+    QString Text(void) const
+        { return dvb_decode_text(&_data[7 + _data[5]], TextLength()); }
+
+    QString toString() const
+        { return LanguageString() + " : " + EventName() + " : " + Text(); }
 };
 
 class ShortSmoothingBufferDescriptor : public MPEGDescriptor

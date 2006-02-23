@@ -200,8 +200,6 @@ class SIParser : public QObject
         vector<const unsigned char*> &bestDescriptorsEE,
         Event                        &event);
 
-    void ProcessShortEventDescriptor    (const uint8_t*, uint sz, Event &e);
-    void ProcessExtendedEventDescriptor (const uint8_t*, uint sz, Event &e);
 #endif //USING_DVB_EIT
 
   private:

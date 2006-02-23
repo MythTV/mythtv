@@ -1244,19 +1244,24 @@ void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
         for (uint i = 0; i < bestDescriptorsEE.size(); ++i)
         {
             if (!bestDescriptorsEE[i])
-                continue;
+            {
+                event.Description = "";
+                break;
+            }
 
-            uint8_t *desc    = (uint8_t*) bestDescriptorsEE[i];
-            uint     descLen = desc[1];
-            ProcessExtendedEventDescriptor(desc, descLen + 2, event);
+            ExtendedEventDescriptor eed(bestDescriptorsEE[i]);
+            event.Description += eed.Text();
         }
 
         // Parse short event descriptor for the most preferred language
         if (bestDescriptorSE)
         {
-            uint8_t *desc    = (uint8_t*) bestDescriptorSE;
-            uint     descLen = desc[1];
-            ProcessShortEventDescriptor(desc, descLen + 2, event);
+            ShortEventDescriptor sed(bestDescriptorSE);
+            event.LanguageCode    = sed.CanonicalLanguageString();
+            event.Event_Name      = sed.EventName();
+            event.Event_Subtitle  = sed.Text();
+            if (event.Event_Subtitle == event.Event_Name)
+                event.Event_Subtitle = "";
         }
 
         eitfixup.Fix(event, PrivateTypes.EITFixUp);
@@ -1736,8 +1741,8 @@ uint SIParser::ProcessDVBEventDescriptors(
     {
         case DescriptorID::short_event:
         {
-            QString language = ParseDescLanguage(data+2, descriptorLength);
-
+            ShortEventDescriptor sed(data);
+            QString language = sed.CanonicalLanguageString();
             uint    priority = GetLanguagePriority(language);
             bestPrioritySE   = min(bestPrioritySE, priority);
 
@@ -1749,14 +1754,16 @@ uint SIParser::ProcessDVBEventDescriptors(
 
         case DescriptorID::extended_event:
         {
-            uint last_desc_number =  data[2]     & 0xf;
-            uint desc_number      = (data[2]>>4) & 0xf;
+            ExtendedEventDescriptor eed(data);
+
+            uint last_desc_number = eed.LastNumber();
+            uint desc_number      = eed.DescriptorNumber();
 
             // Break if the descriptor is out of bounds
             if (desc_number > last_desc_number)
                 break;
 
-            QString language = ParseDescLanguage(data+3, descriptorLength-1);
+            QString language = eed.CanonicalLanguageString();
             uint    priority = GetLanguagePriority(language);
 
             // lower priority number is a higher priority...
@@ -1800,40 +1807,6 @@ uint SIParser::ProcessDVBEventDescriptors(
             break;
     }
     return descriptorLength + 2;
-}
-#endif //USING_DVB_EIT
-
-#ifdef USING_DVB_EIT
-/** \fn SIParser::ProcessShortEventDescriptor(const uint8_t*,uint,Event&)
- *  \brief Processes DVB Descriptor 0x4D - Short Event Descriptor - EIT
- */
-void SIParser::ProcessShortEventDescriptor(
-    const uint8_t *data, uint size, Event &e)
-{
-    // TODO validate size
-
-    uint name_len     = data[5];
-    uint subtitle_len = data[6 + name_len];
-    e.LanguageCode    = ParseDescLanguage(data+2, size);
-    e.Event_Name      = dvb_decode_text(&data[6],            name_len);
-    e.Event_Subtitle  = dvb_decode_text(&data[7 + name_len], subtitle_len);
-
-    if (e.Event_Subtitle == e.Event_Name)
-        e.Event_Subtitle = "";
-}
-#endif //USING_DVB_EIT
-
-#ifdef USING_DVB_EIT
-/** \fn SIParser::ProcessExtendedEventDescriptor(const uint8_t*,uint,Event&)
- *  \brief Processes DVB Descriptor 0x4E - Extended Event - EIT
- */
-void SIParser::ProcessExtendedEventDescriptor(
-    const uint8_t *data, uint size, Event &e)
-{
-    (void) size; // TODO validate size
-
-    if (data[6] == 0)
-        e.Description += dvb_decode_text(&data[8], data[7]);
 }
 #endif //USING_DVB_EIT
 
