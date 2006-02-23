@@ -91,6 +91,7 @@ class RingBuffer
     long long GetTotalReadPosition(void);
 
     long long SetAdjustFilesize(void);
+    void SetTimeout(bool fast) { oldfile = fast; }
     
   protected:
     static void *StartReader(void *type);

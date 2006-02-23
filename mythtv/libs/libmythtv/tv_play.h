@@ -484,6 +484,8 @@ class TV : public QObject
     // LiveTVChain
     LiveTVChain *tvchain;
     LiveTVChain *piptvchain;
+    QStringList tvchainUpdate;
+    QMutex tvchainUpdateLock;
 
     // RingBuffers
     RingBuffer *prbuffer;

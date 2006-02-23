@@ -2199,6 +2199,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     }
     if (IsErrored())
     {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram failed.");
         eof = true;
         return;
     }
@@ -2284,6 +2285,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
     if (errored || !GetDecoder())
     {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram failed.");
         errored = true;
         return;
     }
@@ -4654,6 +4656,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
 
             if (commBreakIter.key() == totalFrames)
             {
+                VERBOSE(VB_IMPORTANT, LOC + "Skipping commercial to end of file");
                 eof = true;
             }
             else

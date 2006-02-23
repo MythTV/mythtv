@@ -131,3 +131,9 @@ long long FileTransfer::GetFileSize(void)
 
     return size;
 }
+
+void FileTransfer::SetTimeout(bool fast)
+{
+    rbuffer->SetTimeout(fast);
+}
+

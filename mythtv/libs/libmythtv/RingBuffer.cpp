@@ -162,6 +162,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 
     bool is_local = false;
     bool is_dvd = false;
+
     if ((filename.left(7) == "myth://") &&
         (filename.length() > 7 ))
     {
@@ -271,6 +272,11 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             remotefile = NULL;
         }
     }
+
+    setswitchtonext = false;
+    ateof = false;
+    commserror = false;
+    numfailures = 0;
 }
 
 /** \fn RingBuffer::IsOpen(void) const
@@ -727,7 +733,7 @@ void RingBuffer::ReadAheadThread(void)
         loops = 0;
 
         pthread_rwlock_rdlock(&rwlock);
-        if (totfree > readblocksize && !commserror)
+        if (totfree > readblocksize && !commserror && !ateof && !setswitchtonext)
         {
             // limit the read size
             totfree = readblocksize;
@@ -737,6 +743,9 @@ void RingBuffer::ReadAheadThread(void)
 
             if (remotefile)
             {
+                if (livetvchain && livetvchain->HasNext())
+                    remotefile->SetTimeout(true);
+
                 ret = safe_read(remotefile, readAheadBuffer + rbwpos,
                                 totfree);
                 internalreadpos += ret;
@@ -785,8 +794,16 @@ void RingBuffer::ReadAheadThread(void)
             totfree = 0;
         }
 
-        if (!readsallowed && used >= fill_min)
+        if (!readsallowed && (used >= fill_min || setswitchtonext))
+        {
             readsallowed = true;
+            VERBOSE(VB_PLAYBACK, QString("reads allowed (%1 %2)").arg(used)
+                                                                .arg(fill_min));
+        }
+        else if (!readsallowed)
+            VERBOSE(VB_PLAYBACK, QString("buffering (%1 %2 %3)").arg(used)
+                                                                .arg(fill_min)
+                                                                .arg(ret));
 
         if (readsallowed && used < fill_min && !ateof && !setswitchtonext)
         {
@@ -808,8 +825,11 @@ void RingBuffer::ReadAheadThread(void)
 
         pthread_rwlock_unlock(&rwlock);
 
-        if ((used >= fill_threshold || wantseek) && !pausereadthread)
+        if ((used >= fill_threshold || wantseek || ateof || setswitchtonext) &&
+            !pausereadthread)
+        {
             usleep(500);
+        }
     }
 
     delete [] readAheadBuffer;
@@ -853,15 +873,15 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
                  VERBOSE(VB_IMPORTANT,
                          LOC + "Taking too long to be allowed to read..");
                  readErr++;
-                 
+
                  // HACK Sometimes the readhead thread gets borked on startup.
-               /*  if ((readErr % 2) && (rbrpos ==0))
+                 if ((readErr > 2 && readErr % 2) && (rbrpos ==0))
                  {
                     VERBOSE(VB_IMPORTANT, "restarting readhead thread..");
                     KillReadAheadThread();
                     StartupReadAheadThread();
                  }                    
-                   */ 
+ 
                  if (readErr > 10)
                  {
                      VERBOSE(VB_IMPORTANT, LOC_ERR + "Took more than "
@@ -895,6 +915,12 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
                 VERBOSE(VB_IMPORTANT, LOC + "Waited " +
                         QString("%1").arg(elapsed/1000) +
                         " seconds for data to become available...");
+                if (livetvchain)
+                {
+                    VERBOSE(VB_IMPORTANT, "Checking to see if there's a "
+                                          "new livetv program to switch to..");
+                    livetvchain->ReloadAll();
+                }
             }
 
             bool quit = livetvchain && (livetvchain->NeedsToSwitch() || 
@@ -923,7 +949,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         availWaitMutex.unlock();
 
         avail = ReadBufAvail();
-        if (ateof && avail < count)
+        if ((ateof || setswitchtonext) && avail < count)
             count = avail;
 
         if (commserror)

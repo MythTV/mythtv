@@ -1461,6 +1461,29 @@ void TV::RunTV(void)
             }
             UpdateOSDTimeoutMessage();
             osdlock.unlock();
+
+            if (!tvchainUpdate.isEmpty())
+            {
+                tvchainUpdateLock.lock();
+                for (QStringList::Iterator it = tvchainUpdate.begin();
+                     it != tvchainUpdate.end(); ++it)
+                {
+                    if (tvchain && nvp && *it == tvchain->GetID())
+                    {
+                        tvchain->ReloadAll();
+                        if (nvp->GetTVChain())
+                            nvp->CheckTVChain();
+                    }
+                    if (piptvchain && pipnvp && *it == piptvchain->GetID())
+                    {
+                        piptvchain->ReloadAll();
+                        if (pipnvp->GetTVChain())
+                            pipnvp->CheckTVChain();
+                    }
+                }
+                tvchainUpdate.clear();
+                tvchainUpdateLock.unlock();
+            }
         }
 
         usleep(1000);
@@ -4921,29 +4944,14 @@ void TV::customEvent(QCustomEvent *e)
         }
         else if (tvchain && message.left(12) == "LIVETV_CHAIN")
         {
-            // Get osdlock, while intended for the OSD this ensures that
-            // the nvp & pipnvp are not deleted while we are using it..
-            while (!osdlock.tryLock() && nvp)
-                usleep(2500);
-
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
             if (tokens[1] == "UPDATE")
             {
-                if (tvchain && nvp && tokens[2] == tvchain->GetID())
-                {
-                    tvchain->ReloadAll();
-                    if (nvp->GetTVChain())
-                        nvp->CheckTVChain();
-                }
-                if (piptvchain && pipnvp && tokens[2] == piptvchain->GetID())
-                {
-                    piptvchain->ReloadAll();
-                    if (pipnvp->GetTVChain())
-                        pipnvp->CheckTVChain();
-                }
+                tvchainUpdateLock.lock();
+                tvchainUpdate += QDeepCopy<QString>(tokens[2]);
+                tvchainUpdateLock.unlock();
             }
-            osdlock.unlock();
         }
         else if (nvp && message.left(12) == "EXIT_TO_MENU")
         {

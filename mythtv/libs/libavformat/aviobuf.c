@@ -164,7 +164,13 @@ offset_t url_fseek(ByteIOContext *s, offset_t offset, int whence)
 
 void url_fskip(ByteIOContext *s, offset_t offset)
 {
-    url_fseek(s, offset, SEEK_CUR);
+    if (offset < 16384) 
+    {
+        static unsigned char fskipbuf[16384];
+        get_buffer(s, fskipbuf, offset);
+    }
+    else
+        url_fseek(s, offset, SEEK_CUR);
 }
 
 offset_t url_ftell(ByteIOContext *s)
