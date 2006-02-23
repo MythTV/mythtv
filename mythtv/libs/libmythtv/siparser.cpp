@@ -786,7 +786,6 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         }
         else
         {
-            ProcessUnusedDescriptor(0, *it, (*it)[1] + 2);
             unsigned char *tmp = new unsigned char[(*it)[1] + 2];
             memcpy(tmp, *it, (*it)[1] + 2);
             p.Descriptors.push_back(tmp);
@@ -809,31 +808,30 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         e.PID         = pmt->StreamPID(i);
         e.Orig_Type   = pmt->StreamType(i);
 
-        const unsigned char *d;
+        desc_list_t::const_iterator it = list.begin();
+        for (; it != list.end(); ++it)
+        {
+            if (DescriptorID::conditional_access == (*it)[0])
+            {
+                CAPMTObject cad = ParseDescCA(*it, (*it)[1] + 2);
+                e.CA.append(cad);
+                p.hasCA = true;
+            }
+            else if (DescriptorID::teletext == (*it)[0])
+            {
+                ParseDescTeletext(*it, (*it)[1] + 2);
+            }
+            else if (DescriptorID::subtitling == (*it)[0])
+            {
+                ParseDescSubtitling(*it, (*it)[1] + 2);
+            }
+        }
 
-        d = MPEGDescriptor::Find(list, DescriptorID::conditional_access);
-        if (d)
+        for (it = list.begin(); it != list.end(); ++it)
         {
             // Note: the saved streams have already been 
             // descrambled by the CAM so any CA descriptors 
             // should *not* be added to the descriptor list.
-            // We need a CAPMTObject to send to the CAM though.
-            CAPMTObject cad = ParseDescCA(d, d[1] + 2);
-            e.CA.append(cad);
-            p.hasCA = true;
-        }
-
-        d = MPEGDescriptor::Find(list, DescriptorID::teletext);
-        if (d)
-            ParseDescTeletext(d, d[1] + 2);
-
-        d = MPEGDescriptor::Find(list, DescriptorID::subtitling);
-        if (d)
-            ParseDescSubtitling(d, d[1] + 2);
-
-        desc_list_t::const_iterator it = list.begin();
-        for (; it != list.end(); ++it)
-        {
             if (DescriptorID::conditional_access != (*it)[0])
             {
                 unsigned char *tmp = new unsigned char[(*it)[1] + 2];
