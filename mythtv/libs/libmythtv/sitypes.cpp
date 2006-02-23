@@ -498,54 +498,6 @@ void PMTHandler::DependencyChanged(tabletypes t)
     //TODO: Handle this situation
 }
 
-bool MGTHandler::RequirePIDs()
-{
-    if ((status.pulling == false) && (status.requested == true))
-        return true;
-    return false;
-}
-
-/* It's best to open the PID wide open so you get the other ATSC tables */
-bool MGTHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
-{
-    if (status.pulling == true)
-        return false;
-    pid = 0x1FFB;
-    filter = 0xFF;
-    mask = 0x00;
-    status.pulling = true;
-    return true;
-}
-
-void MGTHandler::Request(uint16_t key)
-{
-    (void) key;
-    status.requested = true;
-}
-
-bool MGTHandler::Complete()
-{
-    if (Tracker.IsComplete() && !status.emitted)
-    {
-        if (status.requestedEmit == false)
-            status.emitted = true;
-        return true;
-    }
-    return false;
-}
-
-bool MGTHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
-{
-    (void) key0;
-    (void) key1;
-
-    int retval = Tracker.AddSection(head);
-
-    if (retval == -1)
-        return false;
-    return retval;
-}
-
 #ifdef USING_DVB_EIT
 void EventHandler::Reset()
 {
@@ -1051,11 +1003,8 @@ bool ServiceHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
 
 void ServiceHandler::DependencyMet(tabletypes t)
 {
-    if (t == MGT)
-        mgtloaded = true;
-    if (t == NETWORK)
-        nitloaded = true;
-
+    mgtloaded |= (t == MGT);
+    nitloaded |= (t == NETWORK);
 }
 
 bool ServiceHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)

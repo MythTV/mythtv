@@ -111,12 +111,7 @@ void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
 
     int sect_buf_size = MAX_SECTION_SIZE * bufferFactor;
 
-    VERBOSE(VB_SIPARSER, LOC +
-            QString("Adding PID 0x%1 Filter 0x%2 Mask 0x%3 Buffer %4")
-            .arg(pid, 4, 16).arg(filter, 2, 16)
-            .arg(mask, 2, 16).arg(sect_buf_size));
-
-    /* Set flag so other processes can get past pollLock */
+     /* Set flag so other processes can get past pollLock */
     filterChange = true;
     pollLock.lock();
 
@@ -132,6 +127,11 @@ void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
           return;
        }
     }
+
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("Adding PID 0x%1 Filter 0x%2 Mask 0x%3 Buffer %4")
+            .arg(pid, 4, 16).arg(filter, 2, 16)
+            .arg(mask, 2, 16).arg(sect_buf_size));
 
     memset(&params, 0, sizeof(struct dmx_sct_filter_params));
     params.flags = DMX_IMMEDIATE_START;

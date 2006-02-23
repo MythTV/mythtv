@@ -49,7 +49,6 @@ typedef enum tabletypes
 {
     PAT,                /* Program Association Table */
     PMT,                /* Program Managemenet Table */
-    MGT,                /* ATSC Management Table */
     SERVICES,           /* SDT or T/CVCT */
     NETWORK,            /* Current Network NIT */
 #ifdef USING_DVB_EIT
@@ -61,8 +60,26 @@ typedef enum tabletypes
     OTHER_SERVICES = NumHandlers, /* Other Network SDT */
     OTHER_NETWORK,      /* Other Network NIT */
     CAT,                /* Conditional Access Table */
+    MGT,                /* ATSC Management Table */
     STT,                /* ATSC SystemTimeTable */
 };
+static QString tabletypes2string[] =
+{
+    "PAT",
+    "PMT",
+    "SERVICES",
+    "NETWORK",
+#ifdef USING_DVB_EIT
+    "EVENTS",
+#endif // USING_DVB_EIT
+
+    "OTHER_SERVICES",
+    "OTHER_NETWORK",
+    "CAT",
+    "MGT",
+    "STT",
+};
+
 
 class SectionTracker;
 class pidHandler;
@@ -486,30 +503,6 @@ private:
     QMap_SectionTracker Tracker;
     bool                patloaded;
     QMap_pullStatus     status;
-};
-
-class MGTHandler : public TableHandler
-{
-public:
-    MGTHandler() : TableHandler() { }
-    ~MGTHandler() {}
-
-    void Reset() { status.Reset();  Tracker.Reset();  pids.clear(); }
-    bool RequirePIDs();
-    /* It's best to open the PID wide open so you get the other ATSC tables */
-    bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
-    void Request(uint16_t key = 0);
-    bool Complete();
-    void AddKey(uint16_t key0, uint16_t key1) { (void) key0; (void) key1; }
-    bool AddSection(tablehead_t *head, uint16_t key0 = 0, uint16_t key1 = 0);
-
-    void DependencyMet(tabletypes t) { (void) t; }
-    void DependencyChanged(tabletypes t) { (void) t; }
-
-    QMap_uint16_t pids;
-
-    SectionTracker Tracker;
-    pullStatus     status;
 };
 
 #ifdef USING_DVB_EIT

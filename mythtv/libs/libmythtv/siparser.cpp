@@ -14,6 +14,7 @@
 #include "atsc_huffman.h"
 #include "pespacket.h"
 #include "atsctables.h"
+#include "atscstreamdata.h"
 #include "dvbtables.h"
 
 // MythTV DVB headers
@@ -50,7 +51,8 @@ SIParser::SIParser(const char *name) :
     CurrentTransport(0),            RequestedServiceID(0),
     RequestedTransportID(0),        NITPID(0),
     // ATSC Storage
-    gps_utc_offset(13),
+    atsc_stream_data(new ATSCStreamData(-1,-1)),
+    mgt_seen(false),                vct_seen(false),
     // Mutex Locks
     pmap_lock(false),
     // State variables
@@ -64,7 +66,6 @@ SIParser::SIParser(const char *name) :
     /* Initialize the Table Handlers */
     Table[PAT]      = new PATHandler();
     Table[PMT]      = new PMTHandler();
-    Table[MGT]      = new MGTHandler();
     Table[SERVICES] = new ServiceHandler();
     Table[NETWORK]  = new NetworkHandler();
 #ifdef USING_DVB_EIT
@@ -88,6 +89,21 @@ SIParser::SIParser(const char *name) :
             LanguagePriority[*plit] = prio++;
         }
     }
+
+    connect(atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
+            this,             SLOT(  HandleMGT(const MasterGuideTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
+            this,
+            SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
+
+    connect(atsc_stream_data, SIGNAL(UpdateSTT(const SystemTimeTable*)),
+            this,             SLOT(  HandleSTT(const SystemTimeTable*)));
+
+#ifdef USING_DVB_EIT
+    connect(atsc_stream_data, SIGNAL(UpdateETT(uint,const ExtendedTextTable*)),
+            this,             SLOT(HandleETT(uint,const ExtendedTextTable*)));
+#endif // USING_DVB_EIT
 }
 
 SIParser::~SIParser()
@@ -119,8 +135,6 @@ void SIParser::Reset()
 
     PrintDescriptorStatistics();
 
-    Table[MGT]->Reset();
-
     VERBOSE(VB_SIPARSER, LOC + "Closing all PIDs");
     DelAllPids();
 
@@ -134,6 +148,10 @@ void SIParser::Reset()
         Table[x]->Reset();
 
     pmap_lock.unlock();
+
+    atsc_stream_data->Reset(-1,-1);
+    mgt_seen = false;
+    vct_seen = false;
 
     VERBOSE(VB_SIPARSER, LOC + "SIParser Reset due to channel change");
 }
@@ -166,7 +184,7 @@ void SIParser::CheckTrackers()
         {
             VERBOSE(VB_SIPARSER, LOC +
                     QString("Table[%1]->RequirePIDs() == true")
-                    .arg((tabletypes) x));
+                    .arg(tabletypes2string[x]));
             while (Table[x]->GetPIDs(pid,filter,mask))
             {
                 int bufferFactor = 10;
@@ -176,11 +194,11 @@ void SIParser::CheckTrackers()
 #endif // USING_DVB_EIT
                 AddPid(pid, mask, filter, true, bufferFactor);
             }
-            // for ATSC SystemTimeTable
-            if (SIStandard == SI_STANDARD_ATSC)
-                AddPid(0x1FFB, 0x00, 0xFF, true, 10 /*bufferFactor*/);
         }
     }
+    // for ATSC STT and MGT.
+    if (SIStandard == SI_STANDARD_ATSC)
+        AddPid(ATSC_PSIP_PID, 0x00, 0xFF, true, 10 /*bufferFactor*/);
 
     uint16_t key0 = 0,key1 = 0;
 
@@ -410,7 +428,6 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
     /* By default open only the PID for PAT */
     Table[PAT]->Request(0);
     Table[SERVICES]->Request(0);
-    Table[MGT]->Request(0);
     Table[NETWORK]->Request(0);
 
     for (int x = 0 ; x < NumHandlers ; x++)
@@ -467,6 +484,12 @@ bool SIParser::AddPMT(uint16_t ServiceID)
     pmap_lock.lock();
     Table[PMT]->RequestEmit(ServiceID);
     pmap_lock.unlock();
+
+    atsc_stream_data->Reset(-1, -1);
+    atsc_stream_data->Reset(ServiceID);
+    atsc_stream_data->AddListeningPID(ATSC_PSIP_PID);
+    mgt_seen = false;
+    vct_seen = false;
 
     return true;
 }
@@ -597,25 +620,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     {
         const PESPacket pes = PESPacket::ViewData(buffer);
         const PSIPTable psip(pes);
-
-        if (TableID::MGT == psip.TableID() &&
-            !Table[MGT]->AddSection(&head, 0, 0))
-        {
-            const MasterGuideTable mgt(psip);
-            HandleMGT(&mgt);
-        }
-        else if ((TableID::TVCT == psip.TableID() ||
-                  TableID::CVCT == psip.TableID()) &&
-                 !Table[SERVICES]->AddSection(&head, 0, 0))
-        {
-            const VirtualChannelTable vct(psip);
-            HandleVCT(pid, &vct);
-        }
-        else if (TableID::STT == psip.TableID())
-        {
-            const SystemTimeTable stt(psip);
-            HandleSTT(&stt);
-        }
 #ifdef USING_DVB_EIT
         if (TableID::EIT == psip.TableID() &&
             !Table[EVENTS]->AddSection(&head, psip.TableIDExtension(), pid))
@@ -623,10 +627,9 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             const EventInformationTable eit(psip);
             HandleEIT(pid, &eit);
         }
-        else if (TableID::ETT == psip.TableID())
+        else
         {
-            const ExtendedTextTable ett(psip);
-            HandleETT(pid, &ett);
+            atsc_stream_data->HandleTables(pid, psip);
         }
 #endif // USING_DVB_EIT
     }
@@ -1794,6 +1797,10 @@ void SIParser::ParseDescSubtitling(const uint8_t *buffer, int size)
  */
 void SIParser::HandleMGT(const MasterGuideTable *mgt)
 {
+    if (mgt_seen)
+        return;
+    mgt_seen = true;
+
     VERBOSE(VB_SIPARSER, LOC + "HandleMGT()");
     for (uint i = 0 ; i < mgt->TableCount(); i++)
     {
@@ -1839,10 +1846,19 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
                     mgt->TableClassString(i) + msg);
         }                    
     }
+
+#ifdef USING_DVB_EIT
+    Table[EVENTS]->DependencyMet(MGT);
+#endif // USING_DVB_EIT
+    Table[SERVICES]->DependencyMet(MGT);
 }
 
 void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
 {
+    if (vct_seen)
+        return;
+    vct_seen = true;
+
     VERBOSE(VB_SIPARSER, LOC + "HandleVCT("<<pid<<") cnt("
             <<vct->ChannelCount()<<")");
 
@@ -1891,7 +1907,6 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
     }
 
 #ifdef USING_DVB_EIT
-// TODO REMOVE THIS WHEN SERVIVES SET
     Table[EVENTS]->DependencyMet(SERVICES);
 #endif // USING_DVB_EIT
 
@@ -2011,13 +2026,7 @@ void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
  */
 void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
-    if (stt->GPSOffset() != gps_utc_offset)
-    {
-        gps_utc_offset = stt->GPSOffset();
-        VERBOSE(VB_GENERAL, "GPS2UTC_Offset changed to "<<gps_utc_offset);
-    }
     Table[EVENTS]->DependencyMet(STT);
-
     VERBOSE(VB_SIPARSER, LOC + stt->toString());
 }
 

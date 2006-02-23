@@ -39,11 +39,14 @@ typedef void QMap_Events;
 
 class ProgramAssociationTable;
 class ProgramMapTable;
+
+class ATSCStreamData;
 class MasterGuideTable;
 class VirtualChannelTable;
 class SystemTimeTable;
 class EventInformationTable;
 class ExtendedTextTable;
+
 class NetworkInformationTable;
 class ServiceDescriptionTable;
 class DVBEventInformationTable;
@@ -216,7 +219,9 @@ class SIParser : public QObject
 
     // Storage Objects (ATSC)
     QMap<uint,uint>     sourceid_to_channel;
-    uint                gps_utc_offset;
+    ATSCStreamData     *atsc_stream_data;
+    bool                mgt_seen;
+    bool                vct_seen;
 
 #ifdef USING_DVB_EIT
     // Storage Objects (ATSC & DVB)
