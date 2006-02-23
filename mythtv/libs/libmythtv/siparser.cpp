@@ -76,8 +76,6 @@ SIParser::SIParser(const char *name) :
     Table[EVENTS]   = new EventHandler();
 #endif //USING_DVB_EIT
 
-    InitializeCategories();
-
     Reset();
 
     // Get a list of wanted languages and set up their priorities
@@ -1785,44 +1783,18 @@ uint SIParser::ProcessDVBEventDescriptors(
             break;
 
         case DescriptorID::content:
-            ProcessContentDescriptor(data, descriptorLength + 2, event);
-            break;
+        {
+            ContentDescriptor content(data);
+            event.ContentDescription = content.GetDescription(0);
+            event.CategoryType       = content.GetMythCategory(0);
+        }
+        break;
 
         default:
             ProcessUnusedDescriptor(pid, data, descriptorLength + 2);
             break;
     }
     return descriptorLength + 2;
-}
-#endif //USING_DVB_EIT
-
-#ifdef USING_DVB_EIT
-/**
- *  \brief DVB Descriptor 0x54 - Process Content Descriptor - EIT
- *
- *  \TODO Add all types, possibly just lookup from a big 
- *        array that is an include file?
- */
-void SIParser::ProcessContentDescriptor(const uint8_t *buf, uint size, Event& e)
-{
-    (void) size; // TODO validate size
-
-    uint8_t content = buf[2];
-    if (content)
-    {
-        e.ContentDescription = m_mapCategories[content];
-        switch (content)
-        {
-        case 0x10 ... 0x1f:
-            e.CategoryType = "movie";
-            break;
-        case 0x40 ... 0x4f:
-            e.CategoryType = "sports";
-            break;
-        default:
-            e.CategoryType = "tvshow";
-        }     
-    }
 }
 #endif //USING_DVB_EIT
 
@@ -2173,109 +2145,6 @@ void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
     VERBOSE(VB_SIPARSER, LOC + "GPS offset: "<<stt->GPSOffset()<<" seconds");
     ((STTHandler*) Table[STT])->GPSOffset = stt->GPSOffset();
-}
-
-void SIParser::InitializeCategories()
-{
-    m_mapCategories[0x10] = tr("Movie");
-    m_mapCategories[0x11] = tr("Movie") + " - " +
-        tr("Detective/Thriller");
-    m_mapCategories[0x12] = tr("Movie")+ " - " +
-        tr("Adventure/Western/War");
-    m_mapCategories[0x13] = tr("Movie")+ " - " +
-        tr("Science Fiction/Fantasy/Horror");
-    m_mapCategories[0x14] = tr("Movie")+ " - " +
-        tr("Comedy");
-    m_mapCategories[0x15] = tr("Movie")+ " - " +
-        tr("Soap/melodrama/folkloric");
-    m_mapCategories[0x16] = tr("Movie")+ " - " +
-        tr("Romance");
-    m_mapCategories[0x17] = tr("Movie")+ " - " +
-        tr("Serious/Classical/Religious/Historical Movie/Drama");
-    m_mapCategories[0x18] = tr("Movie")+ " - " +
-        tr("Adult", "Adult Movie");
-    
-    m_mapCategories[0x20] = tr("News");
-    m_mapCategories[0x21] = tr("News/weather report");
-    m_mapCategories[0x22] = tr("News magazine");
-    m_mapCategories[0x23] = tr("Documentary");
-    m_mapCategories[0x24] = tr("Intelligent Programmes");
-    
-    m_mapCategories[0x30] = tr("Show/game Show");
-    m_mapCategories[0x31] = tr("Game Show");
-    m_mapCategories[0x32] = tr("Variety Show");
-    m_mapCategories[0x33] = tr("Talk Show");
-    
-    m_mapCategories[0x40] = tr("Sports");
-    m_mapCategories[0x41] = tr("Special Events (World Cup, World Series..)");
-    m_mapCategories[0x42] = tr("Sports Magazines");
-    m_mapCategories[0x43] = tr("Football (Soccer)");
-    m_mapCategories[0x44] = tr("Tennis/Squash");
-    m_mapCategories[0x45] = tr("Misc. Team Sports"); // not football/soccer
-    m_mapCategories[0x46] = tr("Athletics");
-    m_mapCategories[0x47] = tr("Motor Sport");
-    m_mapCategories[0x48] = tr("Water Sport");
-    m_mapCategories[0x49] = tr("Winter Sports");
-    m_mapCategories[0x4A] = tr("Equestrian");
-    m_mapCategories[0x4B] = tr("Martial Sports");
-    
-    m_mapCategories[0x50] = tr("Kids");
-    m_mapCategories[0x51] = tr("Pre-School Children's Programmes");
-    m_mapCategories[0x52] = tr("Entertainment Programmes for 6 to 14");
-    m_mapCategories[0x53] = tr("Entertainment Programmes for 10 to 16");
-    m_mapCategories[0x54] = tr("Informational/Educational");
-    m_mapCategories[0x55] = tr("Cartoons/Puppets");
-    
-    m_mapCategories[0x60] = tr("Music/Ballet/Dance");
-    m_mapCategories[0x61] = tr("Rock/Pop");
-    m_mapCategories[0x62] = tr("Classical Music");
-    m_mapCategories[0x63] = tr("Folk Music");
-    m_mapCategories[0x64] = tr("Jazz");
-    m_mapCategories[0x65] = tr("Musical/Opera");
-    m_mapCategories[0x66] = tr("Ballet");
-
-    m_mapCategories[0x70] = tr("Arts/Culture");
-    m_mapCategories[0x71] = tr("Performing Arts");
-    m_mapCategories[0x72] = tr("Fine Arts");
-    m_mapCategories[0x73] = tr("Religion");
-    m_mapCategories[0x74] = tr("Popular Culture/Traditional Arts");
-    m_mapCategories[0x75] = tr("Literature");
-    m_mapCategories[0x76] = tr("Film/Cinema");
-    m_mapCategories[0x77] = tr("Experimental Film/Video");
-    m_mapCategories[0x78] = tr("Broadcasting/Press");
-    m_mapCategories[0x79] = tr("New Media");
-    m_mapCategories[0x7A] = tr("Arts/Culture Magazines");
-    m_mapCategories[0x7B] = tr("Fashion");
-    
-    m_mapCategories[0x80] = tr("Social/Policical/Economics");
-    m_mapCategories[0x81] = tr("Magazines/Reports/Documentary");
-    m_mapCategories[0x82] = tr("Economics/Social Advisory");
-    m_mapCategories[0x83] = tr("Remarkable People");
-    
-    m_mapCategories[0x90] = tr("Education/Science/Factual");
-    m_mapCategories[0x91] = tr("Nature/animals/Environment");
-    m_mapCategories[0x92] = tr("Technology/Natural Sciences");
-    m_mapCategories[0x93] = tr("Medicine/Physiology/Psychology");
-    m_mapCategories[0x94] = tr("Foreign Countries/Expeditions");
-    m_mapCategories[0x95] = tr("Social/Spiritual Sciences");
-    m_mapCategories[0x96] = tr("Further Education");
-    m_mapCategories[0x97] = tr("Languages");
-    
-    m_mapCategories[0xA0] = tr("Leisure/Hobbies");
-    m_mapCategories[0xA1] = tr("Tourism/Travel");
-    m_mapCategories[0xA2] = tr("Handicraft");
-    m_mapCategories[0xA3] = tr("Motoring");
-    m_mapCategories[0xA4] = tr("Fitness & Health");
-    m_mapCategories[0xA5] = tr("Cooking");
-    m_mapCategories[0xA6] = tr("Advertizement/Shopping");
-    m_mapCategories[0xA7] = tr("Gardening");
-    // Special
-    m_mapCategories[0xB0] = tr("Original Language");
-    m_mapCategories[0xB1] = tr("Black & White");
-    m_mapCategories[0xB2] = tr("\"Unpublished\" Programmes");
-    m_mapCategories[0xB3] = tr("Live Broadcast");
-    // UK Freeview custom id
-    m_mapCategories[0xF0] = tr("Drama");
 }
 
 void SIParser::PrintDescriptorStatistics(void) const

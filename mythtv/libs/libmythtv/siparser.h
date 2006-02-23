@@ -200,13 +200,10 @@ class SIParser : public QObject
         vector<const unsigned char*> &bestDescriptorsEE,
         Event                        &event);
 
-    void ProcessContentDescriptor       (const uint8_t*, uint sz, Event &e);
     void ProcessShortEventDescriptor    (const uint8_t*, uint sz, Event &e);
     void ProcessExtendedEventDescriptor (const uint8_t*, uint sz, Event &e);
     void ProcessComponentDescriptor     (const uint8_t*, uint sz, Event &e);
 #endif //USING_DVB_EIT
-
-    void InitializeCategories(void);
 
   private:
     // Timeout Variables
@@ -253,9 +250,6 @@ class SIParser : public QObject
     TableHandler       *Table[NumHandlers+1];
     privateTypes        PrivateTypes;
     bool                PrivateTypesLoaded;
-
-    // DVB category descriptions
-    QMap<uint,QString>  m_mapCategories;
 
 #ifdef USING_DVB_EIT
     /// EITFixUp instance

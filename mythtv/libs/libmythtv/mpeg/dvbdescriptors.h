@@ -5,6 +5,8 @@
 
 #include <cassert>
 #include <vector>
+#include <map>
+#include <qmutex.h>
 #include <qstring.h>
 #include "mythcontext.h"
 #include "mpegdescriptors.h"
@@ -334,14 +336,34 @@ class ContentDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
+    uint Count(void)         const { return DescriptorLength() >> 1; }
     // for (i=0;i<N;i++)
     // {
     //   content_nibble_level_1 4   0.0+p
+    uint Nibble1(uint i)     const { return _data[2 + (i<<1)] >> 4; }
     //   content_nibble_level_2 4   0.4+p
+    uint Nibble2(uint i)     const { return _data[2 + (i<<1)] & 0xf; }
+
+    uint Nibble(uint i)      const { return _data[2 + (i<<1)]; }
+
     //   user_nibble            4   1.0+p
+    uint UserNibble1(uint i) const { return _data[3 + (i<<1)] >> 4; }
     //   user_nibble            4   1.4+p
+    uint UserNibble2(uint i) const { return _data[3 + (i<<1)] & 0xf; }
+    uint UserNibble(uint i)  const { return _data[3 + (i<<1)]; }
     // }                            2.0
-    QString toString() const { return QString("ContentDescriptor(stub)"); }
+
+    QString GetMythCategory(uint i) const;
+    QString GetDescription(uint i) const;
+    QString toString() const;
+
+  private:
+    static void Init(void);
+
+  private:
+    static QMutex            categoryLock;
+    static map<uint,QString> categoryDesc;
+    static bool              categoryDescExists;
 };
 
 class CountryAvailabilityDescriptor : public MPEGDescriptor
