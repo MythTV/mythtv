@@ -1779,8 +1779,13 @@ uint SIParser::ProcessDVBEventDescriptors(
         break;
 
         case DescriptorID::component:
-            ProcessComponentDescriptor(data, descriptorLength + 2, event);
-            break;
+        {
+            ComponentDescriptor component(data);
+            event.HDTV      = component.IsHDTV();
+            event.Stereo    = component.IsStereo();
+            event.SubTitled = component.IsReallySubtitled();
+        }
+        break;
 
         case DescriptorID::content:
         {
@@ -1838,36 +1843,6 @@ QString SIParser::ParseDescLanguage(const uint8_t *data, uint size)
 
     return QString::fromLatin1((const char*)data, 3);
 }
-
-#ifdef USING_DVB_EIT
-void SIParser::ProcessComponentDescriptor(
-    const uint8_t *buf, uint size, Event &e)
-{
-   (void) size; // TODO validate size
-
-   switch (buf[2] & 0x0f)
-   {
-   case 0x1: //Video
-       if ((buf[3] >= 0x9) && (buf[3] <= 0x10))
-           e.HDTV = true;
-       break;
-   case 0x2: //Audio
-       if ((buf[3] == 0x3) || (buf[3] == 0x5))
-           e.Stereo = true;
-       break;
-   case 0x3: //Teletext/Subtitles
-       switch (buf[3])
-       {
-           case 0x1:
-           case 0x3:
-           case 0x10 ... 0x13:
-           case 0x20 ... 0x23:
-               e.SubTitled = true;
-       }
-       break;
-   }
-}
-#endif //USING_DVB_EIT
 
 void SIParser::ParseDescTeletext(const uint8_t *buffer, int size)
 {

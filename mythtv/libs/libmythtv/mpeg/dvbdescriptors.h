@@ -317,11 +317,46 @@ class ComponentDescriptor : public MPEGDescriptor
 
     // reserved_future_use      4   2.0
     // stream_content           4   2.4
+    uint StreamContent(void) const { return _data[2] & 0xf; }
     // component_type           8   3.0
+    uint ComponentType(void) const { return _data[3]; }
     // component_tag            8   4.0
+    uint ComponentTag(void)  const { return _data[4]; }
     // ISO_639_language_code   24   5.0
     // 
     // for (i=0; i<N; i++) { text_char 8 }
+
+    bool IsVideo(void)    const { return 0x1 == StreamContent(); }
+    bool IsAudio(void)    const { return 0x2 == StreamContent(); }
+    bool IsSubtitle(void) const { return 0x3 == StreamContent(); }
+
+    bool IsHDTV(void) const
+    {
+        return IsVideo() && 0x9 <= ComponentType() && ComponentType() <= 0x10;
+    }
+
+    bool IsStereo(void) const
+    {
+        return IsAudio() &&
+            ((0x3 == ComponentType()) || (0x5 == ComponentType()));
+    }
+
+    bool IsReallySubtitled(void) const
+    {
+        if (!IsSubtitle())
+            return false;
+        switch (ComponentType())
+        {
+            case 0x1:
+            case 0x3:
+            case 0x10 ... 0x13:
+            case 0x20 ... 0x23:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     QString toString() const { return QString("ComponentDescriptor(stub)"); }
 };
 

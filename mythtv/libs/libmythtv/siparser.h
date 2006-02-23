@@ -202,7 +202,6 @@ class SIParser : public QObject
 
     void ProcessShortEventDescriptor    (const uint8_t*, uint sz, Event &e);
     void ProcessExtendedEventDescriptor (const uint8_t*, uint sz, Event &e);
-    void ProcessComponentDescriptor     (const uint8_t*, uint sz, Event &e);
 #endif //USING_DVB_EIT
 
   private:
