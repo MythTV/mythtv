@@ -874,50 +874,6 @@ void SIParser::ProcessUnusedDescriptor(uint pid, const uint8_t *data, uint)
 }
 
 /*------------------------------------------------------------------------
- *   DVB HELPER FUNCTIONS
- *------------------------------------------------------------------------*/
-
-QDateTime SIParser::ConvertDVBDate(const uint8_t *dvb_buf)
-{
-// TODO: clean this up some since its sort of a mess right now
-
-    // This function taken from dvbdate.c in linuxtv-apps code
-
-    int i;
-    int year, month, day, hour, min, sec;
-    long int mjd;
-
-    mjd = (dvb_buf[0] & 0xff) << 8;
-    mjd += (dvb_buf[1] & 0xff);
-    hour = bcdtoint(dvb_buf[2] & 0xff);
-    min  = bcdtoint(dvb_buf[3] & 0xff);
-    sec  = bcdtoint(dvb_buf[4] & 0xff);
-
-/*
- * Use the routine specified in ETSI EN 300 468 V1.4.1,
- * "Specification for Service Information in Digital Video Broadcasting"
- * to convert from Modified Julian Date to Year, Month, Day.
- */
-
-    year = (int) ((mjd - 15078.2) / 365.25);
-    month = (int) ((mjd - 14956.1 - (int) (year * 365.25)) / 30.6001);
-    day = mjd - 14956 - (int) (year * 365.25) - (int) (month * 30.6001);
-    if (month == 14 || month == 15)
-        i = 1;
-    else
-        i = 0;
-    year += i;
-    month = month - 1 - i * 12;
-
-    year += 1900;
-
-    QDateTime UTCTime = QDateTime(QDate(year,month,day),QTime(hour,min,sec));
-
-    // Convert to localtime
-    return MythUTCToLocal(UTCTime);
-}
-
-/*------------------------------------------------------------------------
  *   DVB TABLE PARSERS
  *------------------------------------------------------------------------*/
 

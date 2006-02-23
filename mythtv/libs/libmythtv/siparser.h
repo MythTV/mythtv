@@ -159,9 +159,6 @@ class SIParser : public QObject
 
     void ProcessUnusedDescriptor(uint pid, const uint8_t *buffer, uint size);
 
-    // DVB Helper Parsers
-    QDateTime ConvertDVBDate(const uint8_t* dvb_buf);
-
     // Common Descriptor Parsers
     CAPMTObject ParseDescCA(const uint8_t* buffer, int size);
 
