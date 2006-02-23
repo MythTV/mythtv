@@ -325,7 +325,7 @@ QStringList RemoteEncoder::GetInputs(void)
 
 QString RemoteEncoder::GetInput(void)
 {
-    if (lastinput.length() > 0)
+    if (lastinput.length() > 2)
         return lastinput;
 
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
