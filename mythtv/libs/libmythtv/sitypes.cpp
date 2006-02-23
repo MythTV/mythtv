@@ -546,49 +546,6 @@ bool MGTHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
     return retval;
 }
 
-bool STTHandler::RequirePIDs()
-{
-    if ((status.pulling == false) && (status.requested == true))
-        return true;
-    return false;
-}
-
-bool STTHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
-{
-    if (status.pulling == true)
-        return false;
-    pid = 0x1FFB;
-    filter = 0xFF;
-    mask = 0x00;
-    status.pulling = true;
-    return true;
-}
-
-void STTHandler::Request(uint16_t key)
-{
-    (void) key;
-    status.requested = true;
-}
-
-bool STTHandler::Complete()
-{
-    if (Tracker.IsComplete() && !status.emitted)
-    {
-        if (status.requestedEmit == false)
-            status.emitted = true;
-        return true;
-    }
-    return false;
-}
-
-bool STTHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
-{
-    (void) key0;
-    (void) key1;
-
-    return Tracker.AddSection(head);
-}
-
 #ifdef USING_DVB_EIT
 void EventHandler::Reset()
 {
@@ -610,13 +567,8 @@ bool EventHandler::Complete()
     if (status.empty())
         return false;
 
-    if (SIStandard == SI_STANDARD_ATSC)
-    {
-        if (!(mgtloaded))
-            return false;
-        if (!(sttloaded))
-            return false;
-    }
+    if (SIStandard == SI_STANDARD_ATSC && (!mgtloaded || !sttloaded))
+        return false;
 
     if (!(servicesloaded))
         return false;
@@ -669,13 +621,8 @@ void EventHandler::SetupTrackers()
 #ifdef USING_DVB_EIT
 bool EventHandler::RequirePIDs()
 {
-    if (SIStandard == SI_STANDARD_ATSC)
-    {
-        if (!(mgtloaded))
-            return false;
-        if (!(sttloaded))
-            return false;
-    }
+    if (SIStandard == SI_STANDARD_ATSC && (!mgtloaded || !sttloaded))
+        return false;
 
     if (!(servicesloaded))
         return false;
@@ -910,12 +857,9 @@ bool EventHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
 #ifdef USING_DVB_EIT
 void EventHandler::DependencyMet(tabletypes t)
 {
-    if (t == MGT)
-        mgtloaded = true;
-    if (t == STT)
-        sttloaded = true;
-    if (t == SERVICES)
-        servicesloaded = true;
+    mgtloaded      |= (t == MGT);
+    sttloaded      |= (t == STT);
+    servicesloaded |= (t == SERVICES);
 }
 #endif //USING_DVB_EIT
 

@@ -50,7 +50,6 @@ typedef enum tabletypes
     PAT,                /* Program Association Table */
     PMT,                /* Program Managemenet Table */
     MGT,                /* ATSC Management Table */
-    STT,                /* ATSC Time Table */
     SERVICES,           /* SDT or T/CVCT */
     NETWORK,            /* Current Network NIT */
 #ifdef USING_DVB_EIT
@@ -62,6 +61,7 @@ typedef enum tabletypes
     OTHER_SERVICES = NumHandlers, /* Other Network SDT */
     OTHER_NETWORK,      /* Other Network NIT */
     CAT,                /* Conditional Access Table */
+    STT,                /* ATSC SystemTimeTable */
 };
 
 class SectionTracker;
@@ -507,29 +507,6 @@ public:
     void DependencyChanged(tabletypes t) { (void) t; }
 
     QMap_uint16_t pids;
-
-    SectionTracker Tracker;
-    pullStatus     status;
-};
-
-class STTHandler : public TableHandler
-{
-public:
-    STTHandler() : TableHandler() {}
-    ~STTHandler() {}
-
-    void Reset() { status.Reset();  Tracker.Reset();  GPSOffset = 0; }
-    bool RequirePIDs();
-    bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
-    void Request(uint16_t key = 0);
-    bool Complete();
-    void AddKey(uint16_t key0, uint16_t key1) { (void) key0; (void) key1; }
-    bool AddSection(tablehead_t *head, uint16_t key0 = 0, uint16_t key1 = 0);
-
-    void DependencyMet(tabletypes t) { (void) t; }
-    void DependencyChanged(tabletypes t) { (void) t; }
-
-    int           GPSOffset;
 
     SectionTracker Tracker;
     pullStatus     status;

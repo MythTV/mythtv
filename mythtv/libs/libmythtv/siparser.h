@@ -216,12 +216,14 @@ class SIParser : public QObject
 
     // Storage Objects (ATSC)
     QMap<uint,uint>     sourceid_to_channel;
+    uint                gps_utc_offset;
 
 #ifdef USING_DVB_EIT
     // Storage Objects (ATSC & DVB)
     QMap2D_Events       EventMapObject;
     QMap_Events         EventList;
 #endif //USING_DVB_EIT
+
 
     // Mutex Locks
     // TODO: Lock Events, and Services, Transports, etc

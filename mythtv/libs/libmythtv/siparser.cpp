@@ -20,12 +20,6 @@
 #include "siparser.h"
 #include "dvbtypes.h"
 
-//QMap<uint,uint> SIParser::sourceid_to_channel;
-
-/// \TODO Remove this bcd2int conversion if possible to clean up the date
-/// functions since this is used by the dvbdatetime function
-#define bcdtoint(i) ((((i & 0xf0) >> 4) * 10) + (i & 0x0f))
-
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
 //#define EIT_DEBUG_SID 1602
 
@@ -55,6 +49,8 @@ SIParser::SIParser(const char *name) :
     SIStandard(SI_STANDARD_AUTO),
     CurrentTransport(0),            RequestedServiceID(0),
     RequestedTransportID(0),        NITPID(0),
+    // ATSC Storage
+    gps_utc_offset(13),
     // Mutex Locks
     pmap_lock(false),
     // State variables
@@ -69,7 +65,6 @@ SIParser::SIParser(const char *name) :
     Table[PAT]      = new PATHandler();
     Table[PMT]      = new PMTHandler();
     Table[MGT]      = new MGTHandler();
-    Table[STT]      = new STTHandler();
     Table[SERVICES] = new ServiceHandler();
     Table[NETWORK]  = new NetworkHandler();
 #ifdef USING_DVB_EIT
@@ -181,6 +176,9 @@ void SIParser::CheckTrackers()
 #endif // USING_DVB_EIT
                 AddPid(pid, mask, filter, true, bufferFactor);
             }
+            // for ATSC SystemTimeTable
+            if (SIStandard == SI_STANDARD_ATSC)
+                AddPid(0x1FFB, 0x00, 0xFF, true, 10 /*bufferFactor*/);
         }
     }
 
@@ -396,8 +394,7 @@ void SIParser::DelAllPids()
  *
  *   For ATSC this adds the PAT (0) and MGT (0x1ffb) pids.
  *
- *   For DVB this adds the PAT(0), SDT (0x11), STT (?), and
- *       NIT (0x10) pids.
+ *   For DVB this adds the PAT(0), SDT (0x11), and NIT (0x10) pids.
  *
  *   Note: This actually adds all of the above so as to simplify channel
  *         scanning, but this may change as this can break ATSC.
@@ -414,7 +411,6 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
     Table[PAT]->Request(0);
     Table[SERVICES]->Request(0);
     Table[MGT]->Request(0);
-    Table[STT]->Request(0);
     Table[NETWORK]->Request(0);
 
     for (int x = 0 ; x < NumHandlers ; x++)
@@ -615,8 +611,7 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             const VirtualChannelTable vct(psip);
             HandleVCT(pid, &vct);
         }
-        else if (TableID::STT == psip.TableID() &&
-                 !Table[STT]->AddSection(&head, 0, 0))
+        else if (TableID::STT == psip.TableID())
         {
             const SystemTimeTable stt(psip);
             HandleSTT(&stt);
@@ -2016,8 +2011,14 @@ void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
  */
 void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
-    VERBOSE(VB_SIPARSER, LOC + "GPS offset: "<<stt->GPSOffset()<<" seconds");
-    ((STTHandler*) Table[STT])->GPSOffset = stt->GPSOffset();
+    if (stt->GPSOffset() != gps_utc_offset)
+    {
+        gps_utc_offset = stt->GPSOffset();
+        VERBOSE(VB_GENERAL, "GPS2UTC_Offset changed to "<<gps_utc_offset);
+    }
+    Table[EVENTS]->DependencyMet(STT);
+
+    VERBOSE(VB_SIPARSER, LOC + stt->toString());
 }
 
 void SIParser::PrintDescriptorStatistics(void) const
