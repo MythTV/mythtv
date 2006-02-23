@@ -7,6 +7,9 @@
 #include "mpegtables.h"
 #include "dvbdescriptors.h"
 
+QDateTime dvbdate2qt(const unsigned char*);
+uint dvbdate2key(const unsigned char *);
+
 /** \class NetworkInformationTable
  *  \brief This table tells the decoder on which PIDs to find other tables.
  *  \todo This is just a stub.
@@ -181,5 +184,84 @@ class SelectionInformationTable : public PSIPTable
     // }
     // CRC_32 32 rpchof 
 };
+
+class DVBEventInformationTable : public PSIPTable
+{
+  public:
+    DVBEventInformationTable(const PSIPTable& table) : PSIPTable(table)
+    {
+    // table_id                 8   0.0       0xC7
+        assert(IsEIT(TableID()));
+    // section_syntax_indicator 1   1.0          1
+    // private_indicator        1   1.1          1
+    // reserved                 2   1.2          3
+    // section_length          12   1.4
+    // reserved                 2   5.0          3
+    // version_number           5   5.2
+    // current_next_indicator   1   5.7          1
+    // section_number           8   6.0
+    // last_section_number      8   7.0
+        Parse();
+    }
+
+    // service_id              16   3.0
+    uint ServiceID(void) const { return TableIDExtension(); }
+
+    // original_network_id     16   8.0
+    uint OriginalNetworkID(void) const
+        { return (psipdata()[0]<<8) | psipdata()[1]; }
+
+    // segment_last_section_num 8  10.0
+    uint SegmentLastSectionNumber(void) const
+        { return psipdata()[2]; }
+    // last_table_id            8  11.0
+    uint LastTableID(void) const
+        { return psipdata()[3]; }
+
+    uint EventCount() const { return _ptrs.size()-1; }
+
+    // for(i=0;i<N;i++) {
+    //   event_id              16   0.0+x
+    uint EventID(uint i) const
+        { return (_ptrs[i][0]<<8) | _ptrs[i][1]; }
+    //   start_time            40   2.0+x
+    const unsigned char *StartTime(uint i) const
+        { return _ptrs[i]+2; }
+    QDateTime StartTimeUTC(uint i) const
+        { return dvbdate2qt(StartTime(i)); }
+    /// Returns 32 bit key representing time
+    uint StartTimeKey(uint i) const
+        { return dvbdate2key(StartTime(i)); }
+    //   duration              24   7.0+x
+    const unsigned char *Duration(uint i) const
+        { return _ptrs[i]+7; }
+    uint DurationInSeconds(uint i) const
+    {
+        return ((byteBCD2int(Duration(i)[0]) * 3600) +
+                (byteBCD2int(Duration(i)[1]) * 60) +
+                (byteBCD2int(Duration(i)[2])));
+    }
+    //   running_status         3  10.0+x
+    uint RunningStatus(uint i) const { return _ptrs[i][10] >> 5; }
+    //   free_CA_mode           1  10.3+x
+    bool HasFreeCA(uint i) const { return bool(_ptrs[i][10] & 0x10); }
+    //   descriptors_loop_len  12  10.4+x
+    uint DescriptorsLength(uint i) const
+        { return ((_ptrs[i][10]<<8) | (_ptrs[i][11])) & 0xfff; }
+    //   for(i=0;i<N;i++)       y  12.0+x
+    //     { descriptor() }
+    const unsigned char* Descriptors(uint i) const
+        { return _ptrs[i] + 12; }
+    //   }
+    //CRC_32 32 rpchof
+
+    void Parse(void) const;
+
+    static bool IsEIT(uint table_id);
+
+  private:
+    mutable vector<const unsigned char*> _ptrs; // used to parse
+};
+
 
 #endif // _DVB_TABLES_H_

@@ -638,21 +638,70 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
 
 #ifdef USING_DVB_EIT
     // Parse any embedded guide data
-    if (SIStandard == SI_STANDARD_DVB)
+    if (SIStandard == SI_STANDARD_DVB &&
+        DVBEventInformationTable::IsEIT(head.table_id))
     {
-        bool process_eit = false;
-        // Standard Now/Next Event Information Tables for this transport
-        process_eit |= TableID::PF_EIT == head.table_id;
-        // Standard Now/Next Event Information Tables for other transport
-        process_eit |= TableID::PF_EITo == head.table_id;
-        // Standard Future Event Information Tables for this transport
-        process_eit |= (TableID::SC_EITbeg <= head.table_id &&
-                        TableID::SC_EITend >= head.table_id);
-        // Standard Future Event Information Tables for other transports
-        process_eit |= (TableID::SC_EITbego <= head.table_id &&
-                        TableID::SC_EITendo >= head.table_id);
-        if (process_eit)
-            ParseDVBEIT(pid, &head, &buffer[8], size - 8);
+        EventHandler *eh         = (EventHandler*) Table[EVENTS];
+        uint tableid             = head.table_id;
+        uint serviceid           = head.table_id_ext;
+        uint last_segment_number = buffer[8+2];
+        uint last_table_id       = buffer[8+3];
+
+        if (!eh->TrackerSetup[serviceid])
+        {
+            if (PrivateTypes.CustomGuideRanges)
+            {
+                // current
+                uint cstart = PrivateTypes.CurrentTransportTableMin;
+                uint cend   = PrivateTypes.CurrentTransportTableMax;
+                if ((tableid >= cstart) && (tableid <= cend))
+                {
+                    for (uint i = cstart; i <= cend; i++)
+                        eh->Tracker[serviceid][i].Reset();
+                }
+
+                // other
+                uint ostart = PrivateTypes.OtherTransportTableMin;
+                uint oend   = PrivateTypes.OtherTransportTableMax;
+                if ((tableid >= ostart) && (tableid <= oend))
+                {
+                    for (uint i = ostart; i <= oend; i++)
+                        eh->Tracker[serviceid][i].Reset();
+                }
+            }
+            else
+            {
+                // current
+                if ((tableid & 0xF0) == 0x50)
+                {
+                    for (uint i = 0; i < (last_table_id & 0x0F); i++)
+                        eh->Tracker[serviceid][0x50|i].Reset();
+                }
+                // other
+                if ((tableid & 0xF0) == 0x60)
+                {
+                    for (uint i = 0; i < (last_table_id & 0x0F); i++)
+                        eh->Tracker[serviceid][0x60|i].Reset();
+                }
+            }
+            eh->TrackerSetup[serviceid] = true;
+        }
+        
+        if (!Table[EVENTS]->AddSection(&head, serviceid, tableid))
+        {
+            if (last_segment_number != head.section_last)
+            {
+                uint start = last_segment_number + 1;
+                uint end   = head.section_number | 7;
+                for (uint i = start; i <= end; i++)
+                    eh->Tracker[serviceid][tableid].MarkUnused(i);
+            }
+
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+            const DVBEventInformationTable eit(psip);
+            HandleEIT(&eit);
+        }
     }
 #endif // USING_DVB_EIT
 }
@@ -1123,92 +1172,24 @@ uint SIParser::GetLanguagePriority(const QString &language)
     return *it;
 }
 
-void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
-                           uint8_t *buffer, uint size)
+void SIParser::HandleEIT(const DVBEventInformationTable *eit)
 {
-    (void) pid;
-    (void) head;
-    (void) buffer;
-    (void) size;
 #ifdef USING_DVB_EIT
-    uint8_t last_segment_number  = buffer[4];
-    uint8_t last_table_id        = buffer[5];
+    uint bestPrioritySE   = UINT_MAX;
+    uint bestPriorityEE   = UINT_MAX;
+    QMap2D_Events &events = ((EventHandler*) Table[EVENTS])->Events;
 
-    if (!((EventHandler*) Table[EVENTS])->TrackerSetup[head->table_id_ext])
-    {
-        if (PrivateTypes.CustomGuideRanges)
-        {
-            if ((head->table_id >= PrivateTypes.CurrentTransportTableMin)
-                && (head->table_id <= PrivateTypes.CurrentTransportTableMax))
-            {
-                for (int x = PrivateTypes.CurrentTransportTableMin;
-                     x <= PrivateTypes.CurrentTransportTableMax; x++)
-                    ((EventHandler*) Table[EVENTS])->
-                        Tracker[head->table_id_ext][x].Reset();
-            }
-            else if ((head->table_id >= PrivateTypes.OtherTransportTableMin)
-                && (head->table_id <= PrivateTypes.OtherTransportTableMax))
-            {
-                for (int x = PrivateTypes.OtherTransportTableMin;
-                     x <= PrivateTypes.OtherTransportTableMax; x++)
-                    ((EventHandler*) Table[EVENTS])->
-                        Tracker[head->table_id_ext][x].Reset();
-            }
-            
-        }
-        else
-        {
-            if ((head->table_id & 0xF0) == 0x50)
-            {
-                for (int x = 0x50 ; x < (last_table_id & 0x0F) + 0x50 ; x++)
-                   ((EventHandler*) Table[EVENTS])->
-                       Tracker[head->table_id_ext][x].Reset();
-            }
-
-            if ((head->table_id & 0xF0) == 0x60)
-            {
-                for (int x = 0x60 ; x < (last_table_id & 0x0F) + 0x60 ; x++)
-                    ((EventHandler*) Table[EVENTS])->
-                        Tracker[head->table_id_ext][x].Reset();
-            }
-        }
-        ((EventHandler*) Table[EVENTS])->
-            TrackerSetup[head->table_id_ext] = true;
-    }
-
-    if (Table[EVENTS]->AddSection(head,head->table_id_ext,head->table_id))
-        return;
-
-    if (last_segment_number != head->section_last)
-    {
-        for (int x = (last_segment_number+1);
-             x < ((head->section_number&0xF8)+8); x++)
-            ((EventHandler*) Table[EVENTS])->
-                Tracker[head->table_id_ext][head->table_id].MarkUnused(x);
-    }
-
-    uint pos                = 6;
-    uint des_pos            = 0;
-    uint descriptors_length = 0;
-    uint bestPrioritySE     = UINT_MAX;
-    uint bestPriorityEE     = UINT_MAX;
-
-    // Loop through table (last 4 bytes are CRC)
-    while (pos + 4 < size)
+    for (uint i = 0; i < eit->EventCount(); i++)
     {
         // Event to use temporarily to fill in data
         Event event;
-        event.ServiceID   = head->table_id_ext;
-        event.TransportID = buffer[0] << 8 | buffer[1];
-        event.NetworkID   = buffer[2] << 8 | buffer[3];
-        event.EventID     = buffer[pos] << 8 | buffer[pos+1];
-        event.StartTime   = ConvertDVBDate(&buffer[pos+2]);
-
-        uint lenInSeconds = ((bcdtoint(buffer[pos+7] & 0xFF) * 3600) +
-                             (bcdtoint(buffer[pos+8] & 0xFF) * 60) +
-                             (bcdtoint(buffer[pos+9] & 0xFF)));
-
-        event.EndTime     = event.StartTime.addSecs(lenInSeconds);
+        event.ServiceID   = eit->ServiceID();
+        event.TransportID = eit->OriginalNetworkID();
+        event.NetworkID   = ((eit->SegmentLastSectionNumber() << 8) |
+                             eit->LastTableID());
+        event.EventID     = eit->EventID(i);
+        event.StartTime   = MythUTCToLocal(eit->StartTimeUTC(i));
+        event.EndTime     = event.StartTime.addSecs(eit->DurationInSeconds(i));
 
 #ifdef EIT_DEBUG_SID
         if (event.ServiceID == EIT_DEBUG_SID)
@@ -1226,30 +1207,28 @@ void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
         vector<const unsigned char*> bestDescriptorsEE;
 
         // Parse descriptors
-        descriptors_length = ((buffer[pos+10] & 0x0F) << 8) | buffer[pos+11];
-        pos += 12;
-        des_pos = pos;
+        desc_list_t list = MPEGDescriptor::Parse(
+            eit->Descriptors(i), eit->DescriptorsLength(i));
 
-        // Pick out EIT descriptors for later parsing, and parse others.
-        while ((des_pos < (pos + descriptors_length)) && (des_pos <= size)) 
+        for (uint j = 0; j < list.size(); j++)
         { 
-            des_pos += ProcessDVBEventDescriptors(
-                pid,
-                &buffer[des_pos],
+            // Pick out EIT descriptors for later parsing, and parse others.
+            ProcessDVBEventDescriptors(
+                0 /* pid */, list[j],
                 bestPrioritySE, bestDescriptorSE,
                 bestPriorityEE, bestDescriptorsEE, event);
         }
 
         // Parse extended event descriptions for the most preferred language
-        for (uint i = 0; i < bestDescriptorsEE.size(); ++i)
+        for (uint j = 0; j < bestDescriptorsEE.size(); j++)
         {
-            if (!bestDescriptorsEE[i])
+            if (!bestDescriptorsEE[j])
             {
                 event.Description = "";
                 break;
             }
 
-            ExtendedEventDescriptor eed(bestDescriptorsEE[i]);
+            ExtendedEventDescriptor eed(bestDescriptorsEE[j]);
             event.Description += eed.Text();
         }
 
@@ -1276,10 +1255,7 @@ void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
                     .arg(event.Description));
         }
 #endif
-
-        QMap2D_Events &events = ((EventHandler*) Table[EVENTS])->Events;
-        events[head->table_id_ext][event.EventID] = event;
-        pos += descriptors_length;
+        events[eit->ServiceID()][eit->EventID(i)] = event;
     }
 #endif //USING_DVB_EIT
 }

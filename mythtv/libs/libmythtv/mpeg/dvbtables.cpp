@@ -132,3 +132,67 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
 
     return NULL;
 }
+
+void DVBEventInformationTable::Parse(void) const
+{
+    _ptrs.clear();
+    _ptrs.push_back(psipdata() + 4);
+    uint i = 0;
+    while ((_ptrs[i] + 12) < (pesdata() + Length()))
+    {
+        _ptrs.push_back(_ptrs[i] + 12 + DescriptorsLength(i));
+        i++;
+    }
+}
+
+bool DVBEventInformationTable::IsEIT(uint table_id)
+{
+    bool is_eit = false;
+
+    // Standard Now/Next Event Information Tables for this transport
+    is_eit |= TableID::PF_EIT  == table_id;
+    // Standard Now/Next Event Information Tables for other transport
+    is_eit |= TableID::PF_EITo == table_id;
+    // Standard Future Event Information Tables for this transport
+    is_eit |= (TableID::SC_EITbeg  <= table_id &&
+               TableID::SC_EITend  >= table_id);
+    // Standard Future Event Information Tables for other transports
+    is_eit |= (TableID::SC_EITbego <= table_id &&
+               TableID::SC_EITendo >= table_id);
+
+    return is_eit;
+}
+
+/** \fn dvbdate2qt(const unsigned char*)
+ *  \return UTC time
+ */
+QDateTime dvbdate2qt(const unsigned char *buf)
+{
+    // TODO: clean this up some since its sort of a mess right now
+    // Original function taken from dvbdate.c in linuxtv-apps code
+
+    // Use the routine specified in ETSI EN 300 468 V1.4.1,
+    // "Specification for Service Information in Digital Video Broadcasting"
+    // to convert from Modified Julian Date to Year, Month, Day.
+
+    float mjd = (buf[0] << 8) | buf[1];
+    int year  = (int) ((mjd - 15078.2) / 365.25);
+    int month = (int) ((mjd - 14956.1 - (int) (year * 365.25)) / 30.6001);
+    int day   = mjd - 14956 - (int) (year * 365.25) - (int) (month * 30.6001);
+    int i     = (month == 14 || month == 15) ? 1 : 0;
+
+    QDate date(1900 + year + i, month - 1 - i * 12, day);
+    QTime time(byteBCD2int(buf[2]), byteBCD2int(buf[3]),
+               byteBCD2int(buf[4]));
+
+    return QDateTime(date, time);
+}
+
+uint dvbdate2key(const unsigned char *buf)
+{
+    uint dt = (((uint)buf[0]) << 24) | (((uint)buf[1]) << 16); // 16 bits
+    uint tm = ((byteBCD2int(buf[2]) * 3600) +
+               (byteBCD2int(buf[3]) * 60) +
+               (byteBCD2int(buf[4]))); // 17 bits
+    return (dt | (tm>>1)) ^ ((tm & 1)<<31);
+}
