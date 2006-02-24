@@ -1,0 +1,686 @@
+// -*- Mode: c++ -*-
+// Copyright (c) 2003-2005, Daniel Kristjansson 
+
+#include <cassert>
+
+#include "mythcontext.h"
+#include "cc708decoder.h"
+
+#define LOC QString("CC708: ")
+#define LOC_ERR QString("CC708, Error: ")
+
+#define DEBUG_CC_SERVICE_2     0
+#define DEBUG_CC_RAWPACKET     0
+#define DEBUG_CC_SERVICE_BLOCK 0
+
+typedef enum
+{
+    NTSC_CC_f1         = 0,
+    NTSC_CC_f2         = 1,
+    DTVCC_PACKET_DATA  = 2,
+    DTVCC_PACKET_START = 3,
+};
+
+const char* cc_types[4] =
+{
+    "NTSC line 21 field 1 closed captions"
+    "NTSC line 21 field 2 closed captions"
+    "DTVCC Channel Packet Data"
+    "DTVCC Channel Packet Start"
+};
+
+static void parse_cc_packet(CC708Reader *cb_cbs, CaptionPacket *pkt);
+
+CC708Reader::CC708Reader()
+{
+    for (uint i=0; i<64; i++)
+    {
+        buf_alloc[i] = 512;
+        buf[i]       = (unsigned char*) malloc(buf_alloc[i]);
+        buf_size[i]  = 0;
+        delayed[i]   = 0;
+
+        temp_str_alloc[i] = 512;
+        temp_str_size[i]  = 0;
+        temp_str[i]       = (short*) malloc(temp_str_alloc[i] * sizeof(short));
+    }
+}
+
+CC708Reader::~CC708Reader()
+{
+    for (uint i=0; i<64; i++)
+    {
+        free(buf[i]);
+        free(temp_str[i]);
+    }
+}
+
+void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
+{
+    if (DTVCC_PACKET_START == cc_type)
+    {
+        //VERBOSE(VB_IMPORTANT, LOC + QString("CC ST data(0x%1 0x%2)")
+        //        .arg(data1,0,16).arg(data2,0,16));
+
+        if (partialPacket.size && reader)
+            parse_cc_packet(reader, &partialPacket);
+
+        partialPacket.data[0] = data1;
+        partialPacket.data[1] = data2;
+        partialPacket.size   = 2;
+    }
+    else if (DTVCC_PACKET_DATA == cc_type)
+    {
+        //VERBOSE(VB_IMPORTANT, LOC + QString("CC Ex data(0x%1 0x%2)")
+        //        .arg(data1,0,16).arg(data2,0,16));
+
+        partialPacket.data[partialPacket.size + 0] = data1;
+        partialPacket.data[partialPacket.size + 1] = data2;
+        partialPacket.size += 2;
+    }
+}
+
+#define DEBUG_CAPTIONS 0
+
+typedef enum
+{
+    NUL  = 0x00,
+    EXT1 = 0x01,
+    ETX  = 0x03,
+    BS   = 0x08,
+    FF   = 0x0C,
+    CR   = 0x0D,
+    HCR  = 0x0E,
+    P16  = 0x18,
+} C0;
+
+typedef enum
+{
+    CW0=0x80, CW1, CW2, CW3, CW4, CW5, CW6, CW7,      
+    CLW,      DSW, HDW, TGW, DLW, DLY, DLC, RST,
+    SPA=0x90, SPC, SPL,                     SWA=0x97,
+    DF0,      DF1, DF2, DF3, DF4, DF5, DF6, DF7,
+} C1;
+
+extern ushort CCtableG0[0x60];
+extern ushort CCtableG1[0x60];
+extern ushort CCtableG2[0x60];
+extern ushort CCtableG3[0x60];
+
+static void append_character(CC708Reader *cc, uint service_num, short ch);
+static void parse_cc_service_stream(CC708Reader *cc, uint service_num);
+static int handle_cc_c0_ext1_p16(CC708Reader *cc, uint service_num, int i);
+static int handle_cc_c1(CC708Reader *cc, uint service_num, int i);
+static int handle_cc_c2(CC708Reader *cc, uint service_num, int i);
+static int handle_cc_c3(CC708Reader *cc, uint service_num, int i);
+
+#define SEND_STR \
+do { \
+    if (cc->temp_str_size[service_num]) \
+    { \
+        cc->TextWrite(service_num, \
+                      cc->temp_str[service_num], \
+                      cc->temp_str_size[service_num]); \
+        cc->temp_str_size[service_num] = 0; \
+    } \
+} while (0)
+
+static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
+{
+    const int blk_size = cc->buf_size[service_num];
+    int blk_start = 0, i = 0;
+
+    for (i = 0; i < blk_size; i++)
+    {
+        if (RST == cc->buf[service_num][i])
+        {        
+            cc->Reset(service_num);
+            blk_start = i+1;
+            cc->delayed[service_num] = 0;
+            break;
+        }
+        else if (DLC == cc->buf[service_num][i])
+        {
+            cc->DelayCancel(service_num);
+            cc->delayed[service_num] = 0;
+            break;
+        }
+    }
+    if (cc->buf_size[service_num] >= 126)
+        cc->delayed[service_num] = 0;
+    
+/*
+  av_log(NULL, AV_LOG_ERROR,
+  "cc_ss delayed(%i) blk_start(%i) blk_size(%i)\n",
+  cc->delayed, blk_start, blk_size);
+*/
+
+    for (int i = (cc->delayed[service_num]) ? blk_size : blk_start;
+         i < blk_size; )
+    {
+        const int old_i = i;
+        const int code = cc->buf[service_num][i];
+        if (0x0 == code)
+        { 
+            i++; 
+        }
+        else if (code <= 0x1f)
+        {
+            // C0 code -- ASCII commands + ext1: C2,C3,G2,G3 + p16: 16 chars
+            i = handle_cc_c0_ext1_p16(cc, service_num, i);
+        }
+        else if (code <= 0x7f)
+        {
+            // G0 code -- mostly ASCII printables
+            short character = CCtableG0[code-0x20];
+            append_character(cc, service_num, character);
+            i++;
+        }
+        else if (code <= 0x9f)
+        {
+            // C1 code -- caption control codes
+            i = handle_cc_c1(cc, service_num, i);
+        }
+        else if (code <= 0xff)
+        {
+            // G1 code -- ISO 8859-1 Latin 1 characters
+            short character = CCtableG1[code-0xA0];
+            append_character(cc, service_num, character);
+            i++;
+        }
+        if ((old_i == i) || cc->delayed[service_num])
+            break;
+    }
+
+    assert(((int)cc->buf_size[service_num] - i) >= 0);
+    if ((cc->buf_size[service_num] - i)>0)
+    {
+        memmove(cc->buf[service_num], cc->buf[service_num] + i,
+                cc->buf_size[service_num] - i);
+        cc->buf_size[service_num] -= i;
+    }
+    else
+    {
+        if (0!=(cc->buf_size[service_num] - i))
+        {
+            fprintf(stderr, "parse_cc_service_stream buffer error "
+                    "i(%i) buf_size(%i)\n", i, cc->buf_size[service_num]);
+            for (i=0; (uint)i < cc->buf_size[service_num]; i++)
+                fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
+            fprintf(stderr, "\n");
+        }
+        cc->buf_size[service_num] = 0;
+    }
+}
+
+static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
+{
+    // C0 code -- subset of ASCII misc. control codes
+    const int code = cc->buf[service_num][i];
+    if (code<=0xf)
+    {
+        // single byte code
+        if (ETX==code)
+            SEND_STR;
+        else if (BS==code)
+            append_character(cc, service_num, 0x08);
+        else if (FF==code)
+            append_character(cc, service_num, 0x0c);
+        else if (CR==code)
+            append_character(cc, service_num, 0x0d);
+        else if (HCR==code)
+            append_character(cc, service_num, 0x0d);
+        i++;
+    }
+    else if (code<=0x17)
+    {
+        // double byte code
+        const int blk_size = cc->buf_size[service_num];
+        if (EXT1==code && ((i+1)<blk_size))
+        {
+            const int code2 = cc->buf[service_num][i+1];
+            if (code2<=0x1f)
+            {
+                // C2 code -- nothing in EIA-708-A
+                i = handle_cc_c2(cc, service_num, i+1);
+            }
+            else if (code2<=0x7f)
+            {
+                // G2 code -- fractions, drawing, symbols
+                append_character(cc, service_num, CCtableG2[code2-0x20]);
+                i+=2;
+            }
+            else if (code2<=0x9f)
+            {
+                // C3 code -- nothing in EIA-708-A
+                i = handle_cc_c3(cc, service_num, i);
+            }
+            else if (code2<=0xff)
+            {
+                // G3 code -- one symbol in EIA-708-A "[cc]"
+                append_character(cc, service_num, CCtableG3[code2-0xA0]);
+                i+=2;
+            }
+        }
+        else if ((i+1)<blk_size)
+            i+=2;
+    }
+    else if (code<=0x1f)
+    {
+        // triple byte code
+        const int blk_size = cc->buf_size[service_num];
+        if (P16==code && ((i+2)<blk_size))
+        {
+            // reserved for large alphabets, but not yet defined
+        }
+        if ((i+2)<blk_size)
+            i+=3;
+    }
+    return i;
+}
+
+static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
+{
+    const int blk_size = cc->buf_size[service_num];
+    const int code = cc->buf[service_num][i];
+
+    const unsigned char* blk_buf = cc->buf[service_num];
+    if (code<=CW7)
+    { // no paramaters
+        SEND_STR;
+        cc->SetCurrentWindow(service_num, code-0x80);
+        i+=1;
+    }
+    else if (DLC == cc->buf[service_num][i])
+    {
+        cc->DelayCancel(service_num);
+        cc->delayed[service_num] = 0;
+        i+=1;
+    }
+    else if (code>=CLW && code<=DLY && ((i+1)<blk_size))
+    { // 1 byte of paramaters
+        int param1 = blk_buf[i+1];
+        SEND_STR;
+        if (CLW==code)
+            cc->ClearWindows(service_num, param1);
+        else if (DSW==code)
+            cc->DisplayWindows(service_num, param1);
+        else if (HDW==code)
+            cc->HideWindows(service_num, param1);
+        else if (TGW==code)
+            cc->ToggleWindows(service_num, param1);
+        else if (DLW==code)
+            cc->DeleteWindows(service_num, param1);
+        else if (DLY==code)
+        {
+            cc->Delay(service_num, param1);
+            cc->delayed[service_num] = 1;
+        }
+        i+=2;
+    }
+    else if (SPA==code && ((i+2)<blk_size))
+    {
+        int pen_size  = (blk_buf[i+1]   ) & 0x3;
+        int offset    = (blk_buf[i+1]>>2) & 0x3;
+        int text_tag  = (blk_buf[i+1]>>4) & 0xf;
+        int font_tag  = (blk_buf[i+2]   ) & 0x7;
+        int edge_type = (blk_buf[i+2]>>3) & 0x7;
+        int underline = (blk_buf[i+2]>>4) & 0x1;
+        int italic    = (blk_buf[i+2]>>5) & 0x1;
+        SEND_STR;
+        cc->SetPenAttributes(service_num, pen_size, offset, text_tag,
+                             font_tag, edge_type, underline, italic);
+        i+=3;
+    }
+    else if (SPC==code && ((i+3)<blk_size))
+    {
+        int fg_color   = (blk_buf[i+1]   ) & 0x3f;
+        int fg_opacity = (blk_buf[i+1]>>6) & 0x03;
+        int bg_color   = (blk_buf[i+2]   ) & 0x3f;
+        int bg_opacity = (blk_buf[i+2]>>6) & 0x03;
+        int edge_color = (blk_buf[i+3]>>6) & 0x3f;
+        SEND_STR;
+        cc->SetPenColor(service_num, fg_color, fg_opacity,
+                        bg_color, bg_opacity, edge_color);
+        i+=4;
+    }
+    else if (SPL==code && ((i+2)<blk_size))
+    {
+        int row = blk_buf[i+1] & 0x0f;
+        int col = blk_buf[i+2] & 0x3f;
+        SEND_STR;
+        cc->SetPenLocation(service_num, row, col);
+        i+=3;
+    }
+    else if (SWA==code && ((i+4)<blk_size))
+    {
+        int fill_color    = (blk_buf[i+1]   ) & 0x3f;
+        int fill_opacity  = (blk_buf[i+1]>>6) & 0x03;
+        int border_color  = (blk_buf[i+2]   ) & 0x3f;
+        int border_type01 = (blk_buf[i+2]>>6) & 0x03;
+        int justify       = (blk_buf[i+3]   ) & 0x03;
+        int scroll_dir    = (blk_buf[i+3]>>2) & 0x03;
+        int print_dir     = (blk_buf[i+3]>>4) & 0x03;
+        int word_wrap     = (blk_buf[i+3]>>6) & 0x01;
+        int border_type   = (blk_buf[i+3]>>5) | border_type01;
+        int display_eff   = (blk_buf[i+4]   ) & 0x03;
+        int effect_dir    = (blk_buf[i+4]>>2) & 0x03;
+        int effect_speed  = (blk_buf[i+4]>>4) & 0x0f;
+        SEND_STR;
+        cc->SetWindowAttributes(
+            service_num, fill_color, fill_opacity, border_color, border_type,
+            scroll_dir,     print_dir,    effect_dir,
+            display_eff,    effect_speed, justify, word_wrap);
+        i+=5;
+    }
+    else if ((code>=DF0) && (code<=DF7) && ((i+6)<blk_size))
+    {
+        // param1
+        int priority = ( blk_buf[i+1]  ) & 0x7;
+        int col_lock = (blk_buf[i+1]>>3) & 0x1;
+        int row_lock = (blk_buf[i+1]>>4) & 0x1;
+        int visible  = (blk_buf[i+1]>>5) & 0x1;
+        // param2
+        int anchor_vertical = blk_buf[i+2] & 0x7f;
+        int relative_pos = (blk_buf[i+2]>>7);
+        // param3
+        int anchor_horizontal = blk_buf[i+3];
+        // param4
+        int row_count = blk_buf[i+4] & 0xf;
+        int anchor_point = blk_buf[i+4]>>4;
+        // param5
+        int col_count = blk_buf[i+5] & 0x3f;
+        // param6
+        int pen_style = blk_buf[i+6] & 0x7;
+        int win_style = (blk_buf[i+6]>>3) & 0x7;
+        SEND_STR;
+        cc->DefineWindow(service_num, code-0x98, priority, visible,
+                         anchor_point, relative_pos,
+                         anchor_vertical, anchor_horizontal,
+                         row_count, col_count, row_lock, col_lock,
+                         pen_style, win_style);
+        i+=7;
+    }
+    else
+    {
+        fprintf(stderr, "handle_cc_c1: (NOT HANDLED) "
+                "code(0x%02x) i(%i) blk_size(%i)\n", code, i, blk_size);
+    }
+
+    return i;
+}
+
+static int handle_cc_c2(CC708Reader* cc, uint service_num, int i)
+{
+    const int blk_size = cc->buf_size[service_num];
+    const int code = cc->buf[service_num][i+1];
+
+    if ((code<=0x7) && ((i+1)<blk_size)){
+        i+=2;
+        SEND_STR;
+    }
+    else if ((code<=0xf) && ((i+2)<blk_size))
+    {
+        i+=3;
+        SEND_STR;
+    }
+    else if ((code<=0x17) && ((i+3)<blk_size))
+    {
+        i+=4;
+        SEND_STR;
+    }
+    else if ((code<=0x1f) && ((i+4)<blk_size))
+    {
+        i+=5;
+        SEND_STR;
+    }
+    return i;
+}
+
+static int handle_cc_c3(CC708Reader* cc, uint service_num, int i)
+{
+    const unsigned char* blk_buf = cc->buf[service_num];
+    const int blk_size = cc->buf_size[service_num];
+    const int code = cc->buf[service_num][i+1];
+
+    if ((code<=0x87) && ((i+5)<blk_size))
+    {
+        i+=6;
+        SEND_STR;
+    }
+    else if ((code<=0x8f) && ((i+6)<blk_size))
+    {
+        i+=7;
+        SEND_STR;
+    }
+    else if ((i+2)<blk_size)
+    { // varible length commands
+        int length = blk_buf[i+2]&0x3f;
+        if ((i+length)<blk_size)
+        {
+            i+=1+length;
+            SEND_STR;
+        }
+    }
+    return i;
+}
+
+static void append_cc(CC708Reader* cc, uint service_num,
+                      const unsigned char* blk_buf, int block_size)
+{
+    assert(cc);
+    assert(block_size + cc->buf_size[service_num] <
+           cc->buf_alloc[service_num]);
+
+    memcpy(cc->buf[service_num] + cc->buf_size[service_num],
+           blk_buf, block_size);
+
+    cc->buf_size[service_num] += block_size;
+#if DEBUG_CC_SERVICE_2
+    {
+        uint i;
+        fprintf(stderr, "append_cc: ");
+        for (i = 0; i < cc->buf_size[service_num]; i++)
+            fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
+        fprintf(stderr, "\n");
+    }
+#endif
+    parse_cc_service_stream(cc, service_num);
+}
+
+static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
+{
+    const unsigned char* pkt_buf = pkt->data;
+    const int pkt_size = pkt->size;
+    int off = 1;
+    int service_number = 0;
+    int block_data_offset = 0;
+    int len = ((((int)pkt_buf[0])&0x3f)*2-1)&0xff;
+    int seq_num = (((int)pkt_buf[0])>>6)&0x3;
+
+#if DEBUG_CC_RAWPACKET
+    {
+        int j;
+        fprintf(stderr, "CC length(%2i) seq_num(%i) ", len, seq_num);
+        for (j=1; j<pkt_size; j++)
+            fprintf(stderr, "0x%x ", pkt_buf[j]);
+        fprintf(stderr, "\n");
+    }
+#else
+    (void) seq_num;
+#endif
+
+    assert(pkt_size<127);
+    assert(len<128);
+
+    while (pkt_buf[off] && off<pkt_size)
+    { // service_block
+        int block_size = pkt_buf[off] & 0x1f;
+        service_number = (pkt_buf[off]>>5) & 0x7;
+        block_data_offset = (0x7==service_number && block_size!=0) ?
+            off+2 : off+1;
+#if DEBUG_CC_SERVICE_BLOCK
+        fprintf(stderr, "service_block size(%i) num(%i) off(%i) ",
+                block_size, service_number, block_data_offset);
+#endif
+        if (off+2 == block_data_offset)
+        {
+            int extended_service_number = pkt_buf[off+2] & 0x3f;
+#if DEBUG_CC_SERVICE_BLOCK
+            fprintf(stderr, "ext_svc_num(%i) ", extended_service_number);
+#endif
+            service_number =  extended_service_number;
+        }
+        if (service_number)
+        {
+#if DEBUG_CC_SERVICE
+            int i;
+            if (!(2==block_size &&
+                  0==pkt_buf[block_data_offset] &&
+                  0==pkt_buf[block_data_offset+1]))
+            {
+                fprintf(stderr, "service %i: ", service_number);
+                for (i=0; i<block_size; i++)
+                    fprintf(stderr, "0x%x ", pkt_buf[block_data_offset+i]);
+                fprintf(stderr, "\n");
+            }
+#endif
+            append_cc(cb_cbs, service_number,
+                      &pkt_buf[block_data_offset], block_size);
+        }
+        off+=block_size+1;
+    }
+    if (off<pkt_size) // must end in null service block, if packet is not full.
+        assert(pkt_buf[off]==0);
+}
+
+static void append_character(CC708Reader *cc, uint service_num, short ch)
+{
+    if (cc->temp_str_size[service_num]+2 > cc->temp_str_alloc[service_num])
+    {
+        int new_alloc = (cc->temp_str_alloc[service_num]) ?
+            cc->temp_str_alloc[service_num] * 2 : 64;
+
+        cc->temp_str[service_num] = (short*)
+            realloc(cc->temp_str[service_num], new_alloc * sizeof(short));
+
+        assert(cc->temp_str[service_num]);
+        cc->temp_str_alloc[service_num] = new_alloc; // shorts allocated
+    }
+
+    if (cc->temp_str[service_num])
+    {
+        int i = cc->temp_str_size[service_num];
+        cc->temp_str[service_num][i] = ch;
+        cc->temp_str_size[service_num]++;
+    }
+    else
+    {
+        cc->temp_str_size[service_num] = 0;
+        cc->temp_str_alloc[service_num]=0;
+    }
+}
+
+ushort CCtableG0[0x60] =
+{
+//   0    1    2    3       4    5    6    7
+//   8    9    a    b       c    d    e    f  
+    ' ', '!','\"', '#',    '$', '%', '&', '\'', /* 0x20-0x27 */
+    '(', ')', '*', '+',    ',', '-', '.', '/',  /* 0x28-0x2f */
+    '0', '1', '2', '3',    '4', '5', '6', '7',  /* 0x30-0x37 */
+    '8', '9', ':', ';',    '<', '=', '>', '?',  /* 0x38-0x3f */
+
+    '@', 'A', 'B', 'C',    'D', 'E', 'F', 'G',  /* 0x40-0x47 */
+    'H', 'I', 'J', 'K',    'L', 'M', 'N', 'O',  /* 0x48-0x4f */
+    'P', 'Q', 'R', 'S',    'T', 'U', 'V', 'W',  /* 0x50-0x57 */
+    'X', 'Y', 'Z', '[',    '\\',']', '^', '_',  /* 0x58-0x5f */
+
+    '`', 'a', 'b', 'c',    'd', 'e', 'f', 'g',  /* 0x60-0x67 */
+    'h', 'i', 'j', 'k',    'l', 'm', 'n', 'o',  /* 0x68-0x6f */
+    'p', 'q', 'r', 's',    't', 'u', 'v', 'w',  /* 0x70-0x77 */
+    'x', 'y', 'z', '{',    '|', '}', '~',  0x1d16, // music note/* 0x78-0x7f */
+};
+
+ushort CCtableG1[0x60] =
+{
+//   0    1    2    3       4    5    6    7
+//   8    9    a    b       c    d    e    f  
+    0xA0, // unicode non-breaking space
+         '¡', '¢', '£',    '¤', '¥', '¦', '§', /* 0xa0-0xa7 */
+    '¨', '©', 'ª', '«',    '¬', '­', '®', '¯', /* 0xa8-0xaf */
+    '°', '±', '²', '³',    '´', 'µ', '¶', '·', /* 0xb0-0xb7 */
+    '¸', '¹', 'º', '»',    '¼', '½', '¾', '¿', /* 0xbf-0xbf */
+
+    'À', 'Á', 'Â', 'Ã',    'Ä', 'Å', 'Æ', 'Ç', /* 0xc0-0xc7 */
+    'È', 'É', 'Ê', 'Ë',    'Ì', 'Í', 'Î', 'Ï', /* 0xcf-0xcf */
+    'Ð', 'Ñ', 'Ò', 'Ó',    'Ô', 'Õ', 'Ö', '×', /* 0xd0-0xd7 */
+    'Ø', 'Ù', 'Ú', 'Û',    'Ü', 'Ý', 'Þ', 'ß', /* 0xdf-0xdf */
+
+    'à', 'á', 'â', 'ã',    'ä', 'å', 'æ', 'ç', /* 0xe0-0xe7 */
+    'è', 'é', 'ê', 'ë',    'ì', 'í', 'î', 'ï', /* 0xef-0xef */
+    'ð', 'ñ', 'ò', 'ó',    'ô', 'õ', 'ö', '÷', /* 0xf0-0xf7 */
+    'ø', 'ù', 'ú', 'û',    'ü', 'ý', 'þ', 'ÿ', /* 0xff-0xff */
+};
+
+ushort CCtableG2[0x60] =
+{
+    ' ', /* transparent space */
+                        0xA0, /* non-breaking transparent space */
+    0,                  0,                     /* 0x20-0x23 */
+    0,                  0x2026,/* elipsis */
+    0,                  0,                     /* 0x24-0x27 */
+    0,                  0,
+    0x160,/*S under \/*/0,                     /* 0x28-0x2b */
+    0x152, /* CE */     0,
+    0,                  0,                     /* 0x2c-0x2f */
+    0x2DA, /*super dot*/0x2018,/* open ' */
+    0x2019,/*close ' */ 0x201c,/* open " */    /* 0x30-0x33 */
+    0x201d,/*close " */ '*',   /* dot */
+    0,                  0,                     /* 0x34-0x37 */
+    0,                  '#',   /* super TM */
+    0x161,/*s under \/*/0,                     /* 0x38-0x3b */
+    0x153, /* ce */     '#',   /* super SM */
+    0,                  0x178,/*Y w/umlout*/   /* 0x3c-0x3f */
+    
+//  0         1         2         3
+//  4         5         6         7
+//  8         9         a         b
+//  c         d         e         f  
+    0,        0,        0,        0,
+    0,        0,        0,        0, /* 0x40-0x47 */
+    0,        0,        0,        0,
+    0,        0,        0,        0, /* 0x48-0x4f */
+
+    0,        0,        0,        0,
+    0,        0,        0,        0, /* 0x50-0x57 */
+    0,        0,        0,        0,
+    0,        0,        0,        0, /* 0x58-0x5f */
+
+    0,        0,        0,        0,
+    0,        0,        0,        0, /* 0x60-0x67 */
+    0,        0,        0,        0,
+    0,        0,        0,        0, /* 0x68-0x6f */
+
+    0,                  0,
+    0,                  0,           /* 0x70-0x73 */
+    0,                  0,
+    0x215b, /* 1/8 */   0x215c, /* 3/8 */    /* 0x74-0x77 */
+    0x215d, /* 5/8 */   0x215e, /* 7/8 */
+    0x2502, /*line | */ 0x2510, /*line ~| */ /* 0x78-0x7b */
+    0x2514, /*line |_*/ 0x2500, /*line -*/
+    0x2518, /*line _|*/ 0x250c, /*line |~ */ /* 0x7c-0x7f */
+};
+
+ushort CCtableG3[0x60] =
+{
+//   0 1  2  3    4  5  6  7     8  9  a  b    c  d  e  f  
+    '#', /* [CC] closed captioning logo */
+       0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xa0-0xaf */
+    0, 0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xb0-0xbf */
+
+    0, 0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xc0-0xcf */
+    0, 0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xd0-0xdf */
+
+    0, 0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xe0-0xff */
+    0, 0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xf0-0xff */
+};

@@ -16,6 +16,9 @@
 #include "teletextdecoder.h"
 #include "tv_play.h"
 #include "yuv2rgb.h"
+#include "ccdecoder.h"
+#include "cc708decoder.h"
+#include "cc708window.h"
 
 extern "C" {
 #include "filter.h"
@@ -62,7 +65,7 @@ enum TCTypes
 };
 #define TCTYPESMAX 4
 
-class NuppelVideoPlayer
+class NuppelVideoPlayer : public CCReader, public CC708Reader
 {
  public:
     NuppelVideoPlayer(QString inUseID = "Unknown",
@@ -117,6 +120,9 @@ class NuppelVideoPlayer
     void Zoom(int direction);
     void ClearBookmark(void);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
+
+    void SetOSDFontName(const QString osdfonts[22], const QString &prefix);
+    void SetOSDThemeName(const QString themename);
 
     // Toggle Sets
     void ToggleLetterbox(int letterboxMode = -1);
@@ -202,6 +208,7 @@ class NuppelVideoPlayer
 
     // Closed caption and teletext stuff
     void ToggleCC(uint mode, uint arg);
+    void ToggleEIA708(uint service);
     void FlushTxtBuffers(void) { rtxt = wtxt; }
 
     // Edit mode stuff
@@ -235,8 +242,49 @@ class NuppelVideoPlayer
     void AddAudioData(char *buffer, int len, long long timecode);
     void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
                       long long timecode);
-    void AddTextData(char *buffer, int len, long long timecode, char type);
+    void AddTextData(unsigned char *buffer, int len,
+                     long long timecode, char type);
     void AddSubtitle(const AVSubtitle& subtitle);
+
+    // ATSC EIA-708 Captions
+    CC708Window &GetCCWin(uint service_num, uint window_id)
+        { return CC708services[service_num].windows[window_id]; }
+    CC708Window &GetCCWin(uint svc_num)
+        { return GetCCWin(svc_num, CC708services[svc_num].current_window); }
+
+    void SetCurrentWindow(uint service_num, int window_id);
+    void DefineWindow(uint service_num,     int window_id,
+                      int priority,         int visible,
+                      int anchor_point,     int relative_pos,
+                      int anchor_vertical,  int anchor_horizontal,
+                      int row_count,        int column_count,
+                      int row_lock,         int column_lock,
+                      int pen_style,        int window_style);
+    void DeleteWindows( uint service_num,   int window_map);
+    void DisplayWindows(uint service_num,   int window_map);
+    void HideWindows(   uint service_num,   int window_map);
+    void ClearWindows(  uint service_num,   int window_map);
+    void ToggleWindows( uint service_num,   int window_map);
+    void SetWindowAttributes(uint service_num,
+                             int fill_color,     int fill_opacity,
+                             int border_color,   int border_type,
+                             int scroll_dir,     int print_dir,
+                             int effect_dir,
+                             int display_effect, int effect_speed,
+                             int justify,        int word_wrap);
+    void SetPenAttributes(uint service_num, int pen_size,
+                          int offset,       int text_tag,  int font_tag,
+                          int edge_type,    int underline, int italics);
+    void SetPenColor(uint service_num,
+                     int fg_color, int fg_opacity,
+                     int bg_color, int bg_opacity,
+                     int edge_color);
+    void SetPenLocation(uint service_num, int row, int column);
+
+    void Delay(uint service_num, int tenths_of_seconds);
+    void DelayCancel(uint service_num);
+    void Reset(uint service_num);
+    void TextWrite(uint service_num, short* unicode_string, short len);
 
     // Audio Track Selection
     void incCurrentAudioTrack(void);
@@ -495,6 +543,14 @@ class NuppelVideoPlayer
     long long osdSubtitlesExpireAt;
     MythDeque<AVSubtitle> nonDisplayedSubtitles;
     TeletextDecoder *tt_decoder;
+
+    CC708Service CC708services[64];
+    QString    osdfontname;
+    QString    osdccfontname;
+    QString    osd708fontnames[20];
+    QString    osdprefix;
+    QString    osdtheme;
+    bool       eia708on;
 
     // OSD stuff
     OSD      *osd;

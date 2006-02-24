@@ -119,6 +119,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Support for captions, teletext, etc. decoded by libav
       osdHasSubtitles(false),       osdSubtitlesExpireAt(-1),
       tt_decoder(NULL),
+      // Support for EIA-708 DTV captions
+      eia708on(false),
       // OSD stuff
       osd(NULL),                    timedisplay(NULL),
       dialogname(""),               dialogtype(0),
@@ -959,7 +961,7 @@ void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     videoOutput->DrawSlice(frame, x, y, w, h);
 }
 
-void NuppelVideoPlayer::AddTextData(char *buffer, int len,
+void NuppelVideoPlayer::AddTextData(unsigned char *buffer, int len,
                                     long long timecode, char type)
 {
     if (!ringBuffer->isDVD())
@@ -1300,6 +1302,31 @@ void NuppelVideoPlayer::ToggleCC(uint mode, uint arg)
 
     if (osd)
         osd->SetSettingsText(msg, 3);
+}
+
+void NuppelVideoPlayer::ToggleEIA708(uint service)
+{
+    service &= 0x3f;
+    eia708on = !eia708on || (service!=0);
+
+    if (service)
+        osd->SetCC708Service(&CC708services[service]);
+
+    if (!eia708on)
+    {
+        for (uint i = 1; i < 64; i++)
+            DeleteWindows(i, 0xff);
+    }
+
+    if (osd)
+    {
+        QString msg = "ATSC Caption";
+        if (eia708on)
+            msg += (service) ? QString(" Service %1").arg(service) : "s On";
+        else
+            msg += "s Off";
+        osd->SetSettingsText(msg, 3);
+    }
 }
 
 void NuppelVideoPlayer::ShowText(void)
@@ -2505,6 +2532,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         {            
             osd->DisableFade();
         }
+        osd->SetCC708Service(&CC708services[1]);
     }
 
     playing = true;
@@ -5377,3 +5405,262 @@ void NuppelVideoPlayer::GoToDVDProgram(bool direction)
     else
         ringBuffer->DVD()->GoToNextProgram();
 }
+
+// EIA-708 caption support -- begin
+void NuppelVideoPlayer::SetCurrentWindow(uint service_num, int window_id)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("SetCurrentWindow(%1, %2)")
+            .arg(service_num).arg(window_id));
+    CC708services[service_num].current_window = window_id;
+}
+
+void NuppelVideoPlayer::DefineWindow(
+    uint service_num,     int window_id,
+    int priority,         int visible,
+    int anchor_point,     int relative_pos,
+    int anchor_vertical,  int anchor_horizontal,
+    int row_count,        int column_count,
+    int row_lock,         int column_lock,
+    int pen_style,        int window_style)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("DefineWindow(%1, %2)")
+            .arg(service_num).arg(window_id));
+
+    GetCCWin(service_num, window_id)
+        .DefineWindow(priority,         visible,
+                      anchor_point,     relative_pos,
+                      anchor_vertical,  anchor_horizontal,
+                      row_count,        column_count,
+                      row_lock,         column_lock,
+                      pen_style,        window_style);
+
+    CC708services[service_num].current_window = window_id;
+}
+
+void NuppelVideoPlayer::DeleteWindows(uint service_num, int window_map)
+{
+    VERBOSE(VB_VBI, LOC + QString("DeleteWindows(%1, 0x%2)")
+            .arg(service_num).arg(window_map,0,16));
+
+    for (uint i=0; i<8; i++)
+    {
+        if ((1<<i) & window_map)
+        {
+            CC708Window &win = GetCCWin(service_num, i);
+            win.exists = false;
+            if (win.text)
+            {
+                delete [] win.text;
+                win.text = NULL;
+            }
+        }
+    }
+}
+
+void NuppelVideoPlayer::DisplayWindows(uint service_num, int window_map)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("DisplayWindows(%1, 0x%2)")
+            .arg(service_num).arg(window_map,0,16));
+
+    for (uint i=0; i<8; i++)
+    {
+        if ((1<<i) & window_map)
+            GetCCWin(service_num, i).visible = true;
+    }
+}
+
+void NuppelVideoPlayer::HideWindows(uint service_num, int window_map)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("HideWindows(%1, 0x%2)")
+            .arg(service_num).arg(window_map,0,16));
+
+    for (uint i=0; i<8; i++)
+    {
+        if ((1<<i) & window_map)
+            GetCCWin(service_num, i).visible = false;
+    }
+}
+
+void NuppelVideoPlayer::ClearWindows(uint service_num, int window_map)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("ClearWindows(%1, 0x%2)")
+            .arg(service_num).arg(window_map,0,16));
+
+    for (uint i=0; i<8; i++)
+    {
+        if ((1<<i) & window_map)
+            GetCCWin(service_num, i).Clear();
+    }
+}
+
+void NuppelVideoPlayer::ToggleWindows(uint service_num, int window_map)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("ToggleWindows(%1, 0x%2)")
+            .arg(service_num).arg(window_map,0,16));
+
+    for (uint i=0; i<8; i++)
+    {
+        if ((1<<i) & window_map)
+        {
+            GetCCWin(service_num, i).visible =
+                !GetCCWin(service_num, i).visible;
+        }
+    }
+}
+
+void NuppelVideoPlayer::SetWindowAttributes(
+    uint service_num,
+    int fill_color,     int fill_opacity,
+    int border_color,   int border_type,
+    int scroll_dir,     int print_dir,
+    int effect_dir,
+    int display_effect, int effect_speed,
+    int justify,        int word_wrap)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("SetWindowAttributes(%1...)")
+            .arg(service_num));
+
+    CC708Window &win = GetCCWin(service_num);
+
+    win.fill_color     = fill_color   & 0x3f;
+    win.fill_opacity   = fill_opacity;
+    win.border_color   = border_color & 0x3f;
+    win.border_type    = border_type;
+    win.scroll_dir     = scroll_dir;
+    win.print_dir      = print_dir;
+    win.effect_dir     = effect_dir;
+    win.display_effect = display_effect;
+    win.effect_speed   = effect_speed;
+    win.justify        = justify;
+    win.word_wrap      = word_wrap;
+}
+
+void NuppelVideoPlayer::SetPenAttributes(
+    uint service_num, int pen_size,
+    int offset,       int text_tag,  int font_tag,
+    int edge_type,    int underline, int italics)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("SetPenAttributes(%1...)")
+            .arg(service_num));
+
+    CC708CharacterAttribute &attr = GetCCWin(service_num).pen.attr;
+
+    attr.pen_size  = pen_size;
+    attr.offset    = offset;
+    attr.text_tag  = text_tag;
+    attr.font_tag  = font_tag;
+    attr.edge_type = edge_type;
+    attr.underline = underline;
+    attr.italics   = italics;
+}
+
+void NuppelVideoPlayer::SetPenColor(
+    uint service_num,
+    int fg_color, int fg_opacity,
+    int bg_color, int bg_opacity,
+    int edge_color)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("SetPenColor(%1...)")
+            .arg(service_num));
+
+    CC708CharacterAttribute &attr = GetCCWin(service_num).pen.attr;
+
+    attr.fg_color   = fg_color;
+    attr.fg_opacity = fg_opacity;
+    attr.bg_color   = bg_color;
+    attr.bg_opacity = bg_opacity;
+    attr.edge_color = edge_color;
+}
+
+void NuppelVideoPlayer::SetPenLocation(uint service_num, int row, int column)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("SetPenLocation(%1, (c %2, r %3))")
+            .arg(service_num).arg(column).arg(row));
+    GetCCWin(service_num).SetPenLocation(row, column);
+}
+
+void NuppelVideoPlayer::Delay(uint service_num, int tenths_of_seconds)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("Delay(%1, %2 seconds)")
+            .arg(service_num).arg(tenths_of_seconds * 0.1f));
+}
+
+void NuppelVideoPlayer::DelayCancel(uint service_num)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("DelayCancel(%1)").arg(service_num));
+}
+
+void NuppelVideoPlayer::Reset(uint service_num)
+{
+    if (!eia708on)
+        return;
+
+    VERBOSE(VB_VBI, LOC + QString("Reset(%1)").arg(service_num));
+    DeleteWindows(service_num, 0x7);
+    DelayCancel(service_num);
+}
+
+void NuppelVideoPlayer::TextWrite(uint service_num,
+                                  short* unicode_string, short len)
+{
+    if (!eia708on)
+        return;
+
+    for (uint i = 0; i < (uint)len; i++)
+        GetCCWin(service_num).AddChar(QChar(unicode_string[i]));
+
+    if (GetOSD())
+        GetOSD()->CC708Updated();
+}
+
+void NuppelVideoPlayer::SetOSDFontName(const QString osdfonts[22],
+                                       const QString &prefix)
+{
+    osdfontname   = QDeepCopy<QString>(osdfonts[0]);
+    osdccfontname = QDeepCopy<QString>(osdfonts[1]); 
+    for (int i = 2; i < 22; i++)
+        osd708fontnames[i - 2] = QDeepCopy<QString>(osdfonts[i]);
+    osdprefix = QDeepCopy<QString>(prefix);
+}
+
+void NuppelVideoPlayer::SetOSDThemeName(const QString themename)
+{
+    osdtheme = QDeepCopy<QString>(themename);
+}
+// EIA-708 caption support -- begin

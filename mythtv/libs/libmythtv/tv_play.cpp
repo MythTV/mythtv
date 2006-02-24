@@ -125,6 +125,8 @@ void TV::InitKeys(void)
             "W");
     REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
             "T");
+    REG_KEY("TV Playback", "TOGGLECC708",
+            "Toggle ATSC CC", "#");
     REG_KEY("TV Playback", "MENURED",
             "Menu Red",    "F2");
     REG_KEY("TV Playback", "MENUGREEN",
@@ -137,10 +139,10 @@ void TV::InitKeys(void)
             "Menu White",  "F6");
     REG_KEY("TV Playback", "REVEAL",
             "Teletext reveal hidden Text", "F12");
-    REG_KEY("TV Playback", "DISPCC1", "Display CC1", "");
-    REG_KEY("TV Playback", "DISPCC2", "Display CC2", "");
-    REG_KEY("TV Playback", "DISPCC3", "Display CC3", "");
-    REG_KEY("TV Playback", "DISPCC4", "Display CC4", "");
+    REG_KEY("TV Playback", "DISPCC608_1", "Display CC1", "");
+    REG_KEY("TV Playback", "DISPCC608_2", "Display CC2", "");
+    REG_KEY("TV Playback", "DISPCC608_3", "Display CC3", "");
+    REG_KEY("TV Playback", "DISPCC608_4", "Display CC4", "");
     REG_KEY("TV Playback", "DISPTXT1", "Display TXT1", "");
     REG_KEY("TV Playback", "DISPTXT2", "Display TXT2", "");
     REG_KEY("TV Playback", "DISPTXT3", "Display TXT3", "");
@@ -187,7 +189,7 @@ void TV::InitKeys(void)
   Frontend:    D          OP R  U  X   01 3   7 9
   Editing:    C E   I       Q        Z
 
-  Playback: <>,.?/|[]{}\+-*
+  Playback: <>,.?/|[]{}\+-*#
   Frontend: <>,.?/
   Editing:  <>,.
 
@@ -2188,6 +2190,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 AddKeyToInputQueue(0);
             }
         }
+        else if (action == "TOGGLECC708")
+            nvp->ToggleEIA708(0);
         else if (action == "SKIPCOMMERCIAL")
             DoSkipCommercials(1);
         else if (action == "SKIPCOMMBACK")
@@ -5741,7 +5745,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
     if (action == "TOGGLECC")
         nvp->ToggleCC(vbimode, 0);
-    else if (action.left(6) == "DISPCC")
+    if (action == "TOGGLECC708")
+        nvp->ToggleEIA708(0);
+    else if (action.left(9) == "DISPCC708")
+        nvp->ToggleEIA708(action.right(2).toInt());
+    else if (action.left(9) == "DISPCC608")
         nvp->ToggleCC(vbimode, action.right(1).toInt());
     else if (action.left(7) == "DISPTXT")
         nvp->ToggleCC(vbimode, action.right(1).toInt() + 4);
@@ -6007,11 +6015,17 @@ void TV::BuildOSDTreeMenu(void)
     {
         item    = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
         subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
-        for (uint i = 1; i <= 4; i++)
+        for (uint i = 1; i <= 2; i++)
         {
             subitem = new OSDGenericTree(
-                item, QString("%1%2").arg(tr("CC")).arg(i),
-                QString("DISPCC%1").arg(i));
+                item, QString("%1%2").arg(tr("VBI CC")).arg(i),
+                QString("DISPCC608_%1").arg(i));
+        }
+        for (uint i = 1; i <= 2; i++)
+        {
+            subitem = new OSDGenericTree(
+                item, QString("%1%2").arg(tr("ATSC CC")).arg(i),
+                QString("DISPCC708_0%1").arg(i));
         }
         for (uint i = 1; i <= 4; i++)
         {

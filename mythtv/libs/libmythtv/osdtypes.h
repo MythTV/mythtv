@@ -9,6 +9,8 @@
 #include <qobject.h>
 #include <qregexp.h>
 #include <cmath>
+#include <qcolor.h>
+#include "cc708window.h"
 
 using namespace std;
 
@@ -501,6 +503,35 @@ class OSDTypeCC : public OSDType
     OSDTypeBox *m_box;
     int m_ccbackground;
     float m_wmult, m_hmult;
+    int xoffset, yoffset, displaywidth, displayheight;
+};
+
+class OSDType708CC : public OSDType
+{
+  public:
+    OSDType708CC(const QString &name, TTFFont *fonts[60],
+                 int xoff, int yoff, int dispw, int disph);
+    virtual ~OSDType708CC() {}
+
+    void Reinit(float, float) {}
+    void Reinit(int xoff, int yoff, int dispw, int disph);
+
+    void SetCCService(const CC708Service *service)
+        { cc708data = service; }
+
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
+
+  private:
+    QRect CalcBounds(const OSDSurface*, const CC708Window&,
+                     const vector<CC708String*>&);
+    void  Draw(OSDSurface*,        const QPoint&,
+               const CC708Window&, const vector<CC708String*>&);
+
+    const CC708Service *cc708data;
+
+    TTFFont *m_fonts[60];
+    QColor   colors[64];
+
     int xoffset, yoffset, displaywidth, displayheight;
 };
 

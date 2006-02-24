@@ -17,6 +17,7 @@ extern "C" {
 #include "../libavformat/avformat.h"
 }
 
+class CC708Decoder;
 class ProgramInfo;
 class MythSqlDatabase;
 
@@ -78,7 +79,7 @@ class AudioInfo
 /// The AvFormatDecoder is used to decode non-NuppleVideo files.
 /// It's used a a decoder of last resort after trying the NuppelDecoder
 /// and IvtvDecoder (if "USING_IVTV" is defined).
-class AvFormatDecoder : public DecoderBase, public CCReader
+class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
   public:
@@ -146,6 +147,8 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
+    uint handle_cc608_data(uint cc_state, uint cc_type,
+                           uint data1, uint data2);
   protected:
     /// Attempt to find the optimal audio stream to use based on the number of channels,
     /// and if we're doing AC3/DTS passthrough.  This will select the highest stream
@@ -236,6 +239,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     // Caption/Subtitle/Teletext decoders
     CCDecoder        *ccd;
+    CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
 
     // Audio

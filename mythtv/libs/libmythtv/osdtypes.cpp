@@ -1,7 +1,6 @@
 #include <qimage.h>
 #include <qmap.h>
 #include <qregexp.h>
-#include <math.h>
 
 #include <iostream>
 using namespace std;
@@ -181,6 +180,8 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
         if (OSDTypeCC *cc608 = dynamic_cast<OSDTypeCC*>(*iter))
             cc608->Reinit(xoff, yoff, displaywidth, displayheight,
                           wmult, hmult);
+        else if (OSDType708CC *cc708 = dynamic_cast<OSDType708CC*>(*iter))
+            cc708->Reinit(xoff, yoff, displaywidth, displayheight);
         else
             (*iter)->Reinit(wmult, hmult);
     }
@@ -1887,5 +1888,207 @@ void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
             m_font->DrawString(surface, x, y + 2, cc->text, maxx, maxy, 255); 
         }
+    }
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void OSDType708CC::Reinit(int x, int y, int dispw, int disph)
+{
+    xoffset = x;
+    yoffset = y;
+    displaywidth = dispw;
+    displayheight = disph;
+}
+
+OSDType708CC::OSDType708CC(const QString &name, TTFFont *fonts[60],
+			   int xoff, int yoff, int dispw, int disph) : 
+    OSDType(name)
+{
+    xoffset = xoff;
+    yoffset = yoff;
+    displaywidth  = dispw;
+    displayheight = disph;
+
+    int c[4] = {0, 85, 170, 255};
+
+    for (int i = 0; i < 64; i++)
+	colors[i].setRgb(c[(i>>4)&3], c[(i>>2)&3], c[i&3]);
+
+    for (int i = 0; i < 60; i++)
+    {
+        m_fonts[i] = fonts[i];
+    }
+}
+
+QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
+                               const CC708Window &win,
+                               const vector<CC708String*> &list)
+{
+    uint max_width = 0, total_height = 0, i = 0;
+    for (uint row = 0; (row < win.true_row_count) && (i < list.size()); row++)
+    {
+        uint tot_width = 0, max_height = 0;
+        for (; (i < list.size()) && list[i] && (list[i]->y <= row); i++)
+        {
+            int text_length;
+            if (list[i]->y < row)
+                continue;
+
+            TTFFont *font = m_fonts[0];
+
+            if (list[i]->str.stripWhiteSpace().isEmpty())
+            {
+                max_height = max(max_height, (uint)font->Size() * 3 / 2);
+                continue;
+            }
+
+            font->CalcWidth(list[i]->str, &text_length);
+
+            tot_width  += max(text_length, 0);
+            max_height  = max(max_height, (uint)font->Size() * 3 / 2);
+
+            VERBOSE(VB_VBI, "Row#"<<row<<" str#"<<i<<" "
+                    <<"w/x("<<list[i]->x<<"): "
+                    <<"W,H ("<<text_length<<","<<max_height<<") "
+                    <<"'"<<list[i]->str<<"'");
+        }
+        max_width     = max(max_width, tot_width);
+        total_height += max_height;
+    }
+    if (!max_width || !total_height)
+        return QRect(0,0,0,0);
+
+    // add some padding..
+    max_width    += 4;
+    total_height += 4;
+    //VERBOSE(VB_VBI, "Window size: ("<<max_width<<", "<<total_height<<")");
+
+    // 16:9
+    float xrange = 210.0f;
+    float yrange = 75.0f; 
+    // 4:3
+    //float xrange = 160.0f;
+    //float yrange = 75.0f;
+
+    // relative position
+    xrange = (win.relative_pos) ? 100.0f : xrange;
+    yrange = (win.relative_pos) ? 100.0f : yrange;
+
+    float xmult = (surface->width  - 4) / xrange;
+    float ymult = (surface->height - 4) / yrange;
+
+    uint anchor_x = (uint) xmult * win.anchor_horizontal + 2;
+    uint anchor_y = (uint) ymult * win.anchor_vertical   + 2;
+    //VERBOSE(VB_VBI, "Raw Anchor loc:  ("
+    //        <<anchor_x<<", "<<anchor_y<<")");
+
+
+    bool center = (win.anchor_point % 3 == 1);
+    bool right  = (win.anchor_point % 3 == 2);
+    bool middle = (win.anchor_point / 3 == 1);
+    bool bottom = (win.anchor_point / 3 == 2);
+    if (center)
+        anchor_x = max(0, ((int)anchor_x) - (((int)max_width) / 2));
+    if (right)
+        anchor_x = max(0, ((int)anchor_x) - ((int)max_width));
+    if (middle)
+        anchor_y = max(0, ((int)anchor_y) - (((int)total_height) / 2));
+    if (bottom)
+        anchor_y = max(0, ((int)anchor_y) - ((int)total_height));
+    //VERBOSE(VB_VBI, "Adj Anchor loc:  ("
+    //        <<anchor_x<<", "<<anchor_y<<")");
+
+
+    // Make sure bounds are within window by adjusting anchor point
+    int x_adj = (int)(anchor_x + max_width) - (surface->width  - 4);
+    if (x_adj > 0)
+        anchor_x = max(0, (int)anchor_x - x_adj);
+
+    int y_adj = (int)(anchor_y + total_height) - (surface->height  - 4);
+    if (y_adj > 0)
+        anchor_y = max(0, (int)anchor_y - y_adj);
+    //VERBOSE(VB_VBI, "Bnd Anchor loc:  ("
+    //        <<anchor_x<<", "<<anchor_y<<")");
+
+    // If it is still out of bounds, shrink the surface
+    if (anchor_x + max_width > (uint)surface->width)
+        max_width = surface->width - anchor_x;
+
+    if (anchor_y + total_height > (uint)surface->height)
+        total_height = surface->height - anchor_y;
+
+    return QRect(anchor_x, anchor_y, max_width, total_height);
+}
+
+void OSDType708CC::Draw(OSDSurface *surface,
+                        const QPoint &ul, /* upper left corner */
+                        const CC708Window &win,
+                        const vector<CC708String*> &list)
+{
+    int maxx = surface->width;
+    int maxy = surface->height;
+    uint max_width = 0, total_height = 0, i = 0;
+    for (uint row = 0; (row < win.true_row_count) && (i < list.size()); row++)
+    {
+        uint tot_width = 0, max_height = 0;
+        for (; (i < list.size() && list[i] && (list[i]->y == row)); i++)
+        {
+            int text_length;
+
+            if (list[i]->str.isEmpty())
+                continue;
+
+            TTFFont *font = m_fonts[0];
+
+            font->CalcWidth(list[i]->str, &text_length);
+            font->setColor(Qt::white, kTTF_Normal);
+            font->DrawString(surface,
+                             ul.x() + tot_width, ul.y() + total_height + 2,
+                             list[i]->str, maxx, maxy, 255);
+
+            tot_width  += max(text_length, 0);
+            max_height  = max(max_height, (uint)font->Size() * 3 / 2);
+        }
+        max_width     = max(max_width, tot_width);
+        total_height += max_height;
+    }
+}
+
+void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
+                        int /*xoff*/, int /*yoff*/)
+{
+    float wmult = 1.0f;
+    float hmult = 1.0f;
+
+    if (!cc708data || surface->width < 4 || surface->height < 4)
+        return;
+
+    for (uint i = 0; i < 8; i++)
+    {
+        const CC708Window &win = cc708data->windows[i];
+        if (!win.exists)
+            continue;
+
+        QMutexLocker locker(&win.lock);
+
+        //VERBOSE(VB_VBI, "Window #"<<i);
+        vector<CC708String*> list = win.GetStrings();
+        QRect bounds = CalcBounds(surface, win, list);
+        QPoint ul(0,0);
+        if (bounds.width())
+        {
+            QRect rect(0,0, bounds.width(), bounds.height());
+            OSDTypeBox box(QString("cc708_background%1").arg(i),
+                           rect, wmult, hmult);
+            box.SetRect(rect, wmult, hmult);
+            box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
+                     bounds.left()/*xoff*/, bounds.top()/*yoff*/);
+            Draw(surface, bounds.topLeft(), win, list);
+        }
+        //VERBOSE(VB_VBI, "");
+
+        for (uint i = 0; i < list.size(); i++)
+            delete list[i];
     }
 }

@@ -18,6 +18,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "iso639.h"
 #include "pespacket.h"
+#include "cc708decoder.h"
 #include "DVDRingBuffer.h"
 
 #ifdef USING_XVMC
@@ -263,7 +264,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
       maxkeyframedist(-1), 
-      ccd(new CCDecoder(this)),
+      // Closed Caption & Teletext decoders
+      ccd(new CCDecoder(parent)),   ccd708(new CC708Decoder(parent)),
       ttd(NULL),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
@@ -1439,108 +1441,112 @@ void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
     nd->lastccptsu = utc;
 }
 
-void decode_cc_atsc(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
+uint AvFormatDecoder::handle_cc608_data(uint cc_state, uint cc_type,
+                                        uint data1, uint data2)
 {
-    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
-    unsigned long long utc = nd->lastccptsu;
+    AvFormatDecoder *nd = this;
+    // EIA-608 field-1/2
+    int data = (data2 << 8) | data1;
+    unsigned int tc;
 
-    const uint8_t *current = buf;
-    int curbytes = 0;
-    int curcount = 0;
-    uint8_t data1, data2;
-    uint8_t cc_count;
-    uint8_t cc_code;
-    int  cc_state;
-
-    if (buf_size < 2)
-        return;
-
-    // check process_cc_data_flag
-    if (!(*current & 0x40))
-        return;
-    cc_count = *current & 0x1f;
-    current++;  curbytes++;
-
-    // skip em_data
-    current++;  curbytes++;
-
-    cc_state = 0;
-    while (curbytes < buf_size && curcount < cc_count)
+    if ((cc_state & cc_type) == cc_type)
     {
-        cc_code = *current++;
-        curbytes++;
-    
-        if (buf_size - curbytes < 2)
-            break;
-    
-        data1 = *current++;
-        data2 = *current++;
-        curbytes += 2;
-        curcount++;
+        // another field of same type -- assume
+        // it's for the next frame
+        nd->lastccptsu += 33367;
+        cc_state = 0;
+    }
+    cc_state |= cc_type;
+    tc = nd->lastccptsu / 1000;
 
-        // check cc_valid
-        if (!(cc_code & 0x04))
-            continue;
+    // For some reason, one frame can be out of order.
+    // We need to save the CC codes for at least one
+    // frame so we can send the correct sequence to the
+    // decoder.
 
-        cc_code &= 0x03;
-        if (cc_code <= 0x1)
+    if (nd->save_cctc[cc_type])
+    {
+        if (nd->save_cctc[cc_type] < tc)
         {
-            // EIA-608 field-1/2
-            int data = (data2 << 8) | data1;
-            unsigned int tc;
-
-            if ((cc_state & cc_code) == cc_code)
-            {
-                // another field of same type -- assume
-                // it's for the next frame
-                utc += 33367;
-                cc_state = 0;
-            }
-            cc_state |= cc_code;
-            tc = utc / 1000;
-
-            // For some reason, one frame can be out of order.
-            // We need to save the CC codes for at least one
-            // frame so we can send the correct sequence to the
-            // decoder.
-
-            if (nd->save_cctc[cc_code])
-            {
-                if (nd->save_cctc[cc_code] < tc)
-                {
-                    // send saved code to decoder
-                    nd->ccd->FormatCCField(nd->save_cctc[cc_code],
-                                           cc_code,
-                                           nd->save_ccdata[cc_code]);
-                    nd->save_cctc[cc_code] = 0;
-                }
-                else if ((nd->save_cctc[cc_code] - tc) > 1000)
-                {
-                    // saved code is too far in the future; probably bad
-                    // - discard it
-                    nd->save_cctc[cc_code] = 0;
-                }
-                else
-                {
-                    // send new code to decoder
-                    nd->ccd->FormatCCField(tc, cc_code, data);
-                }
-            }
-            if (!nd->save_cctc[cc_code])
-            {
-                // no saved code
-                // - save new code since it may be out of order
-                nd->save_cctc[cc_code] = tc;
-                nd->save_ccdata[cc_code] = data;
-            }
+            // send saved code to decoder
+            nd->ccd->FormatCCField(nd->save_cctc[cc_type],
+                                   cc_type,
+                                   nd->save_ccdata[cc_type]);
+            nd->save_cctc[cc_type] = 0;
+        }
+        else if ((nd->save_cctc[cc_type] - tc) > 1000)
+        {
+            // saved code is too far in the future; probably bad
+            // - discard it
+            nd->save_cctc[cc_type] = 0;
         }
         else
         {
-            // TODO:  EIA-708 DTVCC packet data
+            // send new code to decoder
+            nd->ccd->FormatCCField(tc, cc_type, data);
         }
-
     }
-    nd->lastccptsu = utc;
+    if (!nd->save_cctc[cc_type])
+    {
+        // no saved code
+        // - save new code since it may be out of order
+        nd->save_cctc[cc_type] = tc;
+        nd->save_ccdata[cc_type] = data;
+    }
+    return cc_state;
+}
+
+void decode_cc_atsc(struct AVCodecContext *s, const uint8_t *buf, int sz)
+{
+    if (sz < 2)
+        return;
+
+    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
+    uint buf_size       = sz;
+
+    // closed caption data
+    //cc_data() {
+    // reserved                1 0.0   1  
+    // process_cc_data_flag    1 0.1   bslbf 
+    bool process_cc_data = buf[0] & 0x40;
+    if (!process_cc_data)
+        return; // early exit if process_cc_data_flag false
+
+    // additional_data_flag    1 0.2   bslbf 
+    //bool additional_data = buf[0] & 0x20;
+    // cc_count                5 0.3   uimsbf 
+    uint cc_count = buf[0] & 0x1f;
+    // reserved                8 1.0   0xff
+    // em_data                 8 2.0
+
+    uint index    = 2; // skip reserved & em_data
+    uint curcount = 0;
+    uint cc_state = 0;
+
+    while (index < buf_size && curcount < cc_count)
+    {
+        if (buf_size < index + 3)
+            break;
+    
+        uint cc_code = buf[index];
+        uint data1   = buf[index+1];
+        uint data2   = buf[index+2];
+
+        index += 3;
+        curcount++;
+
+        bool cc_valid = cc_code & 0x04;
+        uint cc_type  = cc_code & 0x03;
+
+        // check cc_valid
+        if (!cc_valid)
+            continue;
+
+        if (cc_type <= 0x1)
+            cc_state = nd->handle_cc608_data(cc_state, cc_type, data1, data2);
+        else // EIA-708 CC data
+            nd->ccd708->decode_cc_data(cc_type, data1, data2);
+    }
 }
 
 void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
@@ -2948,12 +2954,6 @@ static int encode_frame(bool dts, unsigned char *data, int len,
     return enc_len;
 }
 
-void AvFormatDecoder::AddTextData(unsigned char *buf, int len,
-                                  long long timecode, char type)
-{
-    m_parent->AddTextData((char*)buf, len, timecode, type);
-}
-  
 static int DTS_SAMPLEFREQS[16] =
 {
     0,      8000,   16000,  32000,  64000,  128000, 11025,  22050,

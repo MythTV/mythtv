@@ -46,6 +46,7 @@ class OSDListTreeType;
 class QKeyEvent;
 class OSDGenericTree;
 class ccText;
+class CC708Service;
 
 class OSD : public QObject
 {
@@ -68,12 +69,19 @@ class OSD : public QObject
                      const QString &callsign, const QString &iconpath,
                      int length);
     void SetChannumText(const QString &text, int length);
+
+    // CC-608 and DVB text captions (not DVB/DVD subtitles).
     void AddCCText(const QString &text, int x, int y, int color, 
                    bool teletextmode = false);
     void ClearAllCCText();
     void UpdateCCText(vector<ccText*> *ccbuf,
-                      int replace = 0, int scroll = 0, bool scroll_prsv = false,
+                      int replace = 0, int scroll = 0,
+                      bool scroll_prsv = false,
                       int scroll_yoff = 0, int scroll_ymax = 15);
+    // CC-708 text captions (for ATSC)
+    void SetCC708Service(const CC708Service *service);
+    void CC708Updated(void);
+
     void SetSettingsText(const QString &text, int length);
 
     void NewDialogBox(const QString &name, const QString &message, 
@@ -140,7 +148,13 @@ class OSD : public QObject
     QRect GetSubtitleBounds();
 
  private:
-    void SetDefaults();
+    bool InitDefaults(void);
+    bool InitCC608(void);
+    bool InitCC708(void);
+    bool InitTeletext(void);
+    bool InitDVBSub(void);
+    bool InitMenu(void);
+
     TTFFont *LoadFont(QString name, int size); 
     QString FindTheme(QString name);
 
@@ -201,6 +215,12 @@ class OSD : public QObject
 
     OSDListTreeType *runningTreeMenu;
     QString treeMenuContainer;
+
+    // EIA-708 captions
+    QString fontname;
+    QString ccfontname;
+    QString cc708fontnames[20];
+    QString fontSizeType;
 };
     
 #endif

@@ -1149,7 +1149,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             if (getrawframes)
                 StoreRawData(strm);
 
-            GetNVP()->AddTextData((char *)strm, frameheader.packetlength,
+            GetNVP()->AddTextData(strm, frameheader.packetlength,
                                   frameheader.timecode, frameheader.comptype);
         }
     }
