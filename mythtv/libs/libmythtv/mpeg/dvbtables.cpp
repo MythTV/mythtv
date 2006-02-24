@@ -6,28 +6,12 @@
 
 void NetworkInformationTable::Parse(void) const
 {
-    _ptrs.clear();
-
-    VERBOSE(VB_IMPORTANT, "NIT("<<((void*)pesdata())<<")::Parse() "
-            <<"nit("<<NetworkID()<<") "
-            <<"ndl("<<NetworkDescriptorsLength()<<")");
-    for (uint i = 0; i < Length(); i++)
-        cerr<<QString("0x%1").arg(pesdata()[i]);
-    cerr<<endl;
-
     _tsc_ptr = pesdata() + 10 + NetworkDescriptorsLength();
-    VERBOSE(VB_IMPORTANT, "NIT("<<((void*)pesdata())<<"): "
-            <<"tsc_ptr("<<((void*)_tsc_ptr)<<")");
-    VERBOSE(VB_IMPORTANT, "NIT("<<((void*)pesdata())<<"): "
-            <<"tsc("<<TransportStreamCount()<<")");
 
+    _ptrs.clear();
     _ptrs.push_back(_tsc_ptr + 2);
-    for (uint i = 0; i < TransportStreamCount(); i++)
-    {
-        VERBOSE(VB_IMPORTANT, "NIT("<<((void*)pesdata())<<"): "
-                <<"_ptrs["<<i<<"]("<<((void*)_ptrs[i])<<")");
+    for (uint i=0; _ptrs[i] + 6 <= _ptrs[0] + TransportStreamDataLength(); i++)
         _ptrs.push_back(_ptrs[i] + 6 + TransportDescriptorsLength(i));
-    }
 }
 
 QString NetworkInformationTable::toString(void) const

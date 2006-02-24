@@ -50,8 +50,10 @@ class NetworkInformationTable : public PSIPTable
 
     // reserved_future_use      4  0.0+ndl     0xf
     /// trans_stream_loop_len  12  0.4+ndl
-    uint TransportStreamCount(void) const
+    uint TransportStreamDataLength(void) const
         { return ((_tsc_ptr[0]<<8) | _tsc_ptr[1]) & 0xfff; }
+    uint TransportStreamCount(void) const
+        { return _ptrs.size() - 1; }
     // for(i=0; i<N; i++) { 
     ///  transport_stream_id   16  0.0+p
     uint TSID(uint i) const { return (_ptrs[i][0]<<8) | _ptrs[i][1]; }
