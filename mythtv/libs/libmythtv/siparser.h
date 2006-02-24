@@ -172,15 +172,8 @@ class SIParser : public QObject
                                 QMap_uint16_t     &clist);
     void ParseDescService      (const uint8_t* buf, int sz,
                                 SDTObject       &s);
-    void ParseDescFrequencyList(const uint8_t* buf, int sz,
-                                TransportObject &t);
-    void ParseDescUKChannelList(const uint8_t* buf, int sz,
-                                QMap_uint16_t   &num);
-    TransportObject ParseDescTerrestrial     (const uint8_t* buf, int sz);
-    TransportObject ParseDescSatellite       (const uint8_t* buf, int sz);
-    TransportObject ParseDescCable           (const uint8_t* buf, int sz);
-    void ParseDescTeletext                   (const uint8_t* buf, int sz);
-    void ParseDescSubtitling                 (const uint8_t* buf, int sz);
+    void ParseDescTeletext     (const uint8_t* buf, int sz);
+    void ParseDescSubtitling   (const uint8_t* buf, int sz);
 
 #ifdef USING_DVB_EIT
     // DVB EIT Table Descriptor processors

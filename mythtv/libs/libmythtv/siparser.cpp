@@ -919,29 +919,55 @@ void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
     {
         if (DescriptorID::cable_delivery_system == dlist[i][0])
         {
-            tobj = ParseDescCable(dlist[i], dlist[i][1]);
+            CableDeliverySystemDescriptor cdsd(dlist[i]);
+            tobj.Type             = "DVB-C";
+            tobj.Frequency        = cdsd.FrequencyHz();
+            tobj.FEC_Outer        = cdsd.FECOuterString();
+            tobj.Modulation       = cdsd.ModulationString();
+            tobj.SymbolRate       = cdsd.SymbolRateHz();
+            tobj.FEC_Inner        = cdsd.FECInnerString();
         }
         else if (DescriptorID::terrestrial_delivery_system == dlist[i][0])
         {
-            tobj = ParseDescTerrestrial(dlist[i], dlist[i][1]);
+            TerrestrialDeliverySystemDescriptor tdsd(dlist[i]);
+            tobj.Type             = "DVB-T";
+            tobj.Frequency        = tdsd.FrequencyHz();
+            tobj.Bandwidth        = tdsd.BandwidthString();
+            tobj.Constellation    = tdsd.ConstellationString();
+            tobj.Hiearchy         = tdsd.HierarchyString();
+            tobj.CodeRateHP       = tdsd.CodeRateHPString();
+            tobj.CodeRateLP       = tdsd.CodeRateLPString();
+            tobj.GuardInterval    = tdsd.GuardIntervalString();
+            tobj.TransmissionMode = tdsd.TransmissionModeString();
         }
         else if (DescriptorID::satellite_delivery_system == dlist[i][0])
         {
-            tobj = ParseDescSatellite(dlist[i], dlist[i][1]);
+            SatelliteDeliverySystemDescriptor sdsd(dlist[i]);
+            tobj.Type             = "DVB-S";
+            tobj.Frequency        = sdsd.FrequencyHz();
+            tobj.OrbitalLocation  = sdsd.OrbitalPositionString();
+            tobj.Polarity         = sdsd.PolarizationString();
+            tobj.Modulation       = sdsd.ModulationString();
+            tobj.SymbolRate       = sdsd.SymbolRateHz();
+            tobj.FEC_Inner        = sdsd.FECInnerString();
         }
         else if (DescriptorID::frequency_list == dlist[i][0])
         {
-            ParseDescFrequencyList(dlist[i], dlist[i][1], tobj);
+            FrequencyListDescriptor fld(dlist[i]);
+            for (uint i = 0; i < fld.FrequencyCount(); i++)
+                tobj.frequencies.push_back(fld.FrequencyHz(i));
         }
         else if (DescriptorID::dvb_uk_channel_list == dlist[i][0] &&
                  DescriptorID::dvb_uk_channel_list ==
                  PrivateTypes.ChannelNumbers)
         {
-            ParseDescUKChannelList(dlist[i], dlist[i][1], clist);
+            UKChannelListDescriptor ucld(dlist[i]);
+            for (uint i = 0; i < ucld.ChannelCount(); i++)
+                clist[ucld.ServiceID(i)] = ucld.ChannelNumber(i);
         }
         else
         {
-            ProcessUnusedDescriptor(0, dlist[i], dlist[i][1] + 2);
+            ProcessUnusedDescriptor(0x10, dlist[i], dlist[i][1] + 2);
         }
     }
 }
@@ -1223,55 +1249,6 @@ CAPMTObject SIParser::ParseDescCA(const uint8_t *buffer, int size)
  *   DVB DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
 
-// Descriptor 0x62 - Frequency List - NIT
-void SIParser::ParseDescFrequencyList(const uint8_t *buffer, int size,
-                                      TransportObject &t)
-{
-    int i = 2;
-    uint8_t coding = buffer[i++] & 0x3;
-    unsigned frequency;
-    QString FrequencyTemp;
-    for (; i < size ; i+=4)
-    {
-         switch (coding)
-         {
-         case 0x3:  //DVB-T
-             frequency*=10;
-             frequency = (((buffer[i] << 24) | (buffer[i+1] << 16) |
-                           (buffer[i+2] << 8 ) | buffer[i+3]))*10;
-             break;
-         default:
-              FrequencyTemp = QString("%1%2%3%4%5%6%7%800")
-             .arg((buffer[i] & 0xF0) >> 4)
-             .arg( buffer[i] & 0x0F)
-             .arg((buffer[i+1] & 0xF0) >> 4)
-             .arg( buffer[i+1] & 0x0F)
-             .arg((buffer[i+2] & 0xF0) >> 4)
-             .arg( buffer[i+2] & 0x0F)
-             .arg((buffer[i+3] & 0xF0) >> 4)
-             .arg( buffer[i+3] & 0x0F);
-             frequency=FrequencyTemp.toInt();
-         }
-         t.frequencies+=frequency;
-    }
-}
-
-//Descriptor 0x83 UK specific channel list
-void SIParser::ParseDescUKChannelList(const uint8_t *buffer, int size,
-                                      QMap_uint16_t &numbers)
-{
-    int i = 2;
-
-    for (; i < size ; i+=4)
-    {
-
-        uint16_t service_id = (buffer[i]<<8)|(buffer[i+1]&0xff);
-        uint16_t channel_num = (buffer[i+2]&0x03<<8)|(buffer[i+3]&0xff);
-
-        numbers[service_id] = channel_num;
-    }
-}
-
 // Desctiptor 0x48 - Service - SDT
 void SIParser::ParseDescService(const uint8_t *buffer, int, SDTObject &s)
 {
@@ -1286,351 +1263,6 @@ void SIParser::ParseDescService(const uint8_t *buffer, int, SDTObject &s)
     s.ProviderName = dvb_decode_text(buffer + 1, buffer[0]);
     buffer += buffer[0] + 1;
     s.ServiceName = dvb_decode_text(buffer + 1, buffer[0]);
-}
-
-// Descriptor 0x5A - DVB-T Transport - NIT
-TransportObject SIParser::ParseDescTerrestrial(const uint8_t *buffer, int)
-{
-    TransportObject retval;
-
-    retval.Type = QString("DVB-T");
-
-    retval.Frequency = ((buffer[2] << 24) | (buffer[3] << 16) |
-                        (buffer[4] << 8 ) | buffer[5]) * 10;
-
-    // Bandwidth
-    switch ((buffer[6] & 0xE0) >> 5) {
-       case 0:
-               retval.Bandwidth = "8";
-               break;
-       case 1:
-               retval.Bandwidth = "7";
-               break;
-       case 2:
-               retval.Bandwidth = "6";
-               break;
-       default:
-               retval.Bandwidth = "auto";
-               break;
-    }
-
-    // Consetellation
-    switch ((buffer[7] & 0xC0) >> 6) {
-       case 0:
-               retval.Constellation = "qpsk";
-               break;
-       case 1:
-               retval.Constellation = "qam_16";
-               break;
-       case 2:
-               retval.Constellation = "qam_64";
-               break;
-       default:
-               retval.Constellation = "auto";
-               break;
-    }
-
-    // Heiarchy
-    switch ((buffer[7] & 0x38) >> 3) {
-       case 0:
-               retval.Hiearchy = "n";
-               break;
-       case 1:
-               retval.Hiearchy = "1";
-               break;
-       case 2:
-               retval.Hiearchy = "2";
-               break;
-       case 3:
-               retval.Hiearchy = "4";
-               break;
-       default:
-               retval.Hiearchy = "a";
-               break;
-    }
-
-    // CoderateHP
-    switch (buffer[7] & 0x03) 
-    {
-    case 0:
-        retval.CodeRateHP = "1/2";
-        break;
-    case 1:
-        retval.CodeRateHP = "2/3";
-        break;
-    case 2:
-        retval.CodeRateHP = "3/4";
-        break;
-    case 3:
-        retval.CodeRateHP = "5/6";
-        break;
-    case 4:
-        retval.CodeRateHP = "7/8";
-        break;
-    default:
-        retval.CodeRateHP = "auto";
-    }
-
-    // CoderateLP
-    switch ((buffer[8] & 0xC0) >> 6) 
-    {
-    case 0:
-        retval.CodeRateLP = "1/2";
-        break;
-    case 1:
-        retval.CodeRateLP = "2/3";
-        break;
-    case 2:
-        retval.CodeRateLP = "3/4";
-        break;
-    case 3:
-        retval.CodeRateLP = "5/6";
-        break;
-    case 4:
-        retval.CodeRateLP = "7/8";
-        break;
-    default:
-        retval.CodeRateLP = "auto";
-    }    
-    
-    //Guard Interval
-    switch ((buffer[8] & 0x18) >> 3) 
-    {
-    case 0:
-        retval.GuardInterval = "1/32";
-        break;
-    case 1:
-        retval.GuardInterval = "1/16";
-        break;
-    case 2:
-        retval.GuardInterval = "1/8";
-        break;
-    case 3:
-        retval.GuardInterval = "1/4";
-        break;
-    } 
-       
-    //TransmissionMode
-    switch ((buffer[8] & 0x06) >> 1) 
-    {
-    case 0:
-        retval.TransmissionMode = "2";
-        break;
-    case 1:
-        retval.TransmissionMode = "8";
-        break;
-    default:
-        retval.TransmissionMode = "auto";
-    }    
-    return retval;
-}
-
-// Desctiptor 0x43 - Satellite Delivery System - NIT
-TransportObject SIParser::ParseDescSatellite(const uint8_t *buffer, int)
-{
-    TransportObject retval;
-
-    retval.Type = QString("DVB-S");
-
-    QString FrequencyTemp = QString("%1%2%3%4%5%6%7%80")
-             .arg((buffer[2] & 0xF0) >> 4)
-             .arg( buffer[2] & 0x0F)
-             .arg((buffer[3] & 0xF0) >> 4)
-             .arg( buffer[3] & 0x0F)
-             .arg((buffer[4] & 0xF0) >> 4)
-             .arg( buffer[4] & 0x0F)
-             .arg((buffer[5] & 0xF0) >> 4)
-             .arg( buffer[5] & 0x0F);
-
-    // TODO: Use real BCD conversion on Frequency
-    retval.Frequency=FrequencyTemp.toInt();
-
-    retval.OrbitalLocation = QString("%1%2.%3")
-        .arg( buffer[6], 0, 16)
-        .arg((buffer[7] & 0xF0) >> 4)
-        .arg( buffer[7] & 0x0F);
-
-    // This isn't reported correctly by some carriers
-    switch ((buffer[8] & 0x80) >> 7)
-    {
-       case 0:
-           retval.OrbitalLocation += " West";
-           break;
-       case 1:
-           retval.OrbitalLocation += " East";
-           break;
-    }
-
-    switch ((buffer[8] & 0x60) >> 5)
-    {
-        case 0:
-            retval.Polarity = "h";
-            break;
-        case 1:
-            retval.Polarity = "v";
-            break;
-        case 2:
-            retval.Polarity = "l";
-            break;
-        case 3:
-            retval.Polarity = "r";
-            break;
-    }
-
-    switch (buffer[8] & 0x1F)
-    {
-        case 0:  // Some SAT Providers use this for QPSK for some reason
-            // Bell ExpressVu is an example
-        case 1:
-            retval.Modulation = "qpsk";
-            break;
-        case 2:
-            retval.Modulation = "qpsk_8";
-            break;
-        case 3:
-            retval.Modulation = "qam_16";
-            break;
-        default:
-            retval.Modulation = "auto";
-    }
-
-    QString SymbolRateTemp = QString("%1%2%3%4%5%6%700")
-        .arg((buffer[9] & 0xF0) >> 4)
-        .arg( buffer[9] & 0x0F)
-        .arg((buffer[10] & 0xF0) >> 4)
-        .arg( buffer[10] & 0x0F)
-        .arg((buffer[11] & 0xF0) >> 4)
-        .arg( buffer[11] & 0x0F)
-        .arg((buffer[12] & 0xF0) >> 4);
-
-    retval.SymbolRate = SymbolRateTemp.toInt();
-
-    switch (buffer[12] & 0x0F)
-    {
-        case 1:
-            retval.FEC_Inner = "1/2";
-            break;
-        case 2:
-            retval.FEC_Inner = "2/3";
-            break;
-        case 3:
-            retval.FEC_Inner = "3/4";
-            break;
-        case 4:
-            retval.FEC_Inner = "5/6";
-            break;
-        case 5:
-            retval.FEC_Inner = "7/8";
-            break;
-        case 6:
-            retval.FEC_Inner = "8/9";
-            break;
-        case 0x0F:
-            retval.FEC_Inner = "none";
-            break;
-        default:
-            retval.FEC_Inner = "auto";
-    }
-
-    return retval;
-}
-
-// Descriptor 0x44 - Cable Delivery System - NIT
-// DVB-C - Descriptor Parser written by Ian Caulfield
-TransportObject SIParser::ParseDescCable(const uint8_t *buffer, int)
-{
-     TransportObject retval;
-
-     retval.Type = QString("DVB-C");
-
-     QString FrequencyTemp = QString("%1%2%3%4%5%6%7%800")
-         .arg((buffer[2] & 0xF0) >> 4)
-         .arg( buffer[2] & 0x0F)
-         .arg((buffer[3] & 0xF0) >> 4)
-         .arg( buffer[3] & 0x0F)
-         .arg((buffer[4] & 0xF0) >> 4)
-         .arg( buffer[4] & 0x0F)
-         .arg((buffer[5] & 0xF0) >> 4)
-         .arg( buffer[5] & 0x0F);
-
-     // TODO: Use real BCD conversion on Frequency
-     retval.Frequency=FrequencyTemp.toInt();
-
-     switch (buffer[7] & 0x0F)
-     {
-         case 1:
-             retval.FEC_Outer = "None";
-             break;
-         case 2:
-             retval.FEC_Outer = "RS(204/188)";
-             break;
-         default:
-             retval.FEC_Outer = "unknown";
-             break;
-     }
-
-     switch (buffer[8])
-     {
-         case 1:
-             retval.Modulation = "qam_16";
-             break;
-         case 2:
-             retval.Modulation = "qam_32";
-             break;
-         case 3:
-             retval.Modulation = "qam_64";
-             break;
-         case 4:
-             retval.Modulation = "qam_128";
-             break;
-         case 5:
-             retval.Modulation = "qam_256";
-             break;
-         default:
-             retval.Modulation = "auto";
-             break;
-     }
-
-     QString SymbolRateTemp=QString("%1%2%3%4%5%6%700")
-         .arg((buffer[9] & 0xF0) >> 4)
-         .arg( buffer[9] & 0x0F)
-         .arg((buffer[10] & 0xF0) >> 4)
-         .arg( buffer[10] & 0x0F)
-         .arg((buffer[11] & 0xF0) >> 4)
-         .arg( buffer[11] & 0x0F)
-         .arg((buffer[12] & 0xF0) >> 4);
-
-     retval.SymbolRate = SymbolRateTemp.toInt();
-
-     switch (buffer[12] & 0x0F)
-     {
-         case 1:
-             retval.FEC_Inner = "1/2";
-             break;
-         case 2:
-             retval.FEC_Inner = "2/3";
-             break;
-         case 3:
-             retval.FEC_Inner = "3/4";
-             break;
-         case 4:
-             retval.FEC_Inner = "5/6";
-             break;
-         case 5:
-             retval.FEC_Inner = "7/8";
-             break;
-         case 6:
-             retval.FEC_Inner = "8/9";
-             break;
-         case 0x0F:
-             retval.FEC_Inner = "none";
-             break;
-         default:
-             retval.FEC_Inner = "auto";
-             break;
-     }
-
-     return retval;
 }
 
 #ifdef USING_DVB_EIT
