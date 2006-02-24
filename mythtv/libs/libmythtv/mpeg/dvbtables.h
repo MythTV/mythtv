@@ -209,16 +209,20 @@ class DVBEventInformationTable : public PSIPTable
     // service_id              16   3.0
     uint ServiceID(void) const { return TableIDExtension(); }
 
-    // original_network_id     16   8.0
-    uint OriginalNetworkID(void) const
+    // transport_stream_id     16   8.0
+    uint TSID(void) const
         { return (psipdata()[0]<<8) | psipdata()[1]; }
 
-    // segment_last_section_num 8  10.0
+    // original_network_id     16  10.0
+    uint OriginalNetworkID(void) const
+        { return (psipdata()[2]<<8) | psipdata()[3]; }
+
+    // segment_last_section_num 8  12.0
     uint SegmentLastSectionNumber(void) const
-        { return psipdata()[2]; }
-    // last_table_id            8  11.0
+        { return psipdata()[4]; }
+    // last_table_id            8  13.0
     uint LastTableID(void) const
-        { return psipdata()[3]; }
+        { return psipdata()[5]; }
 
     uint EventCount() const { return _ptrs.size()-1; }
 

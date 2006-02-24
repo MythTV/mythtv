@@ -136,7 +136,7 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
 void DVBEventInformationTable::Parse(void) const
 {
     _ptrs.clear();
-    _ptrs.push_back(psipdata() + 4);
+    _ptrs.push_back(psipdata() + 6);
     uint i = 0;
     while ((_ptrs[i] + 12) < (pesdata() + Length()))
     {

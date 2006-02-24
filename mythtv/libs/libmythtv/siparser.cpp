@@ -630,8 +630,8 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         EventHandler *eh         = (EventHandler*) Table[EVENTS];
         uint tableid             = head.table_id;
         uint serviceid           = head.table_id_ext;
-        uint last_segment_number = buffer[8+2];
-        uint last_table_id       = buffer[8+3];
+        uint last_segment_number = buffer[8+4];
+        uint last_table_id       = buffer[8+5];
 
         if (!eh->TrackerSetup[serviceid])
         {
@@ -1124,9 +1124,8 @@ void SIParser::HandleEIT(const DVBEventInformationTable *eit)
         // Event to use temporarily to fill in data
         Event event;
         event.ServiceID   = eit->ServiceID();
-        event.TransportID = eit->OriginalNetworkID();
-        event.NetworkID   = ((eit->SegmentLastSectionNumber() << 8) |
-                             eit->LastTableID());
+        event.TransportID = eit->TSID();
+        event.NetworkID   = eit->OriginalNetworkID();
         event.EventID     = eit->EventID(i);
         event.StartTime   = MythUTCToLocal(eit->StartTimeUTC(i));
         event.EndTime     = event.StartTime.addSecs(eit->DurationInSeconds(i));
