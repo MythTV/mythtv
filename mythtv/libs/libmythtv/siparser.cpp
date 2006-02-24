@@ -2008,7 +2008,9 @@ void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
  */
 void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
+#ifdef USING_DVB_EIT
     Table[EVENTS]->DependencyMet(STT);
+#endif //USING_DVB_EIT
     VERBOSE(VB_SIPARSER, LOC + stt->toString());
 }
 
