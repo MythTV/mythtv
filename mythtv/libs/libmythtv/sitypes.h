@@ -366,7 +366,7 @@ public:
     uint16_t TransportID;
 
     // DVB Global
-    uint32_t Frequency;
+    uint64_t Frequency;
     QString Modulation;
     uint32_t SymbolRate;
     QString FEC_Inner;
@@ -390,7 +390,7 @@ public:
     QString Inversion;
 
     //Additional frequencies
-    QValueList<unsigned> frequencies;
+    QValueList<uint64_t> frequencies;
 };
 
 class NetworkObject
