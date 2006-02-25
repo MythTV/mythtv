@@ -1896,8 +1896,9 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
 
-            if (name.left(6) == "pcHDTV")
-                buttonAnalog->setVisible(true);
+            buttonAnalog->setVisible(name.left(6)  == "pcHDTV"       ||
+                                     name.left(12) == "Oren OR51132" ||
+                                     name.left(12) == "Oren OR51211");
 
             break;
         default:
