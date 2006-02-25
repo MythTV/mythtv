@@ -1687,26 +1687,29 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                                ":CONSTELLATION,:BANDWIDTH,:HIERARCHY,"
                                ":HP_CODE_RATE,:LP_CODE_RATE,:GUARD_INTERVAL,"
                                ":TRANSMISSION_MODE,:INVERSION,:SOURCEID);");
-                               query.bindValue(":TRANSPORTID",(*t).TransportID);
-                               query.bindValue(":NETWORKID",(*t).NetworkID);
-                               query.bindValue(":FREQUENCY",(*t).Frequency);
-                               query.bindValue(":SYMBOLRATE",(*t).SymbolRate);
-                               query.bindValue(":FEC",(*t).FEC_Inner);
-                               query.bindValue(":POLARITY",(*t).Polarity);
-                               query.bindValue(":MODULATION",(*t).Modulation);
-                               query.bindValue(":CONSTELLATION",(*t).Constellation);
-                               query.bindValue(":BANDWIDTH",(*t).Bandwidth);
-                               query.bindValue(":HIERARCHY",(*t).Hiearchy);
-                               query.bindValue(":HP_CODE_RATE",(*t).CodeRateHP);
-                               query.bindValue(":LP_CODE_RATE",(*t).CodeRateLP);
-                               query.bindValue(":GUARD_INTERVAL",(*t).GuardInterval);
-                               query.bindValue(":TRANSMISSION_MODE",(*t).TransmissionMode);
-                               query.bindValue(":INVERSION",(*t).Inversion);
-                               query.bindValue(":SOURCEID",sourceID);
-            if (!query.exec())
+            query.bindValue(":TRANSPORTID",(*t).TransportID);
+            query.bindValue(":NETWORKID",(*t).NetworkID);
+#if QT_VERSION >= 0x030200
+            query.bindValue(":FREQUENCY", ((Q_ULLONG) (*t).Frequency));
+#else
+            query.bindValue(":FREQUENCY", ((uint) (*t).Frequency));
+#endif
+            query.bindValue(":SYMBOLRATE",(*t).SymbolRate);
+            query.bindValue(":FEC",(*t).FEC_Inner);
+            query.bindValue(":POLARITY",(*t).Polarity);
+            query.bindValue(":MODULATION",(*t).Modulation);
+            query.bindValue(":CONSTELLATION",(*t).Constellation);
+            query.bindValue(":BANDWIDTH",(*t).Bandwidth);
+            query.bindValue(":HIERARCHY",(*t).Hiearchy);
+            query.bindValue(":HP_CODE_RATE",(*t).CodeRateHP);
+            query.bindValue(":LP_CODE_RATE",(*t).CodeRateLP);
+            query.bindValue(":GUARD_INTERVAL",(*t).GuardInterval);
+            query.bindValue(":TRANSMISSION_MODE",(*t).TransmissionMode);
+            query.bindValue(":INVERSION",(*t).Inversion);
+            query.bindValue(":SOURCEID",sourceID);
+
+            if (!query.exec() || !query.isActive())
                 MythContext::DBError("Inserting new transport", query);
-            if (!query.isActive())
-                MythContext::DBError("Adding transport to Database.", query);
         }
         else
         {
