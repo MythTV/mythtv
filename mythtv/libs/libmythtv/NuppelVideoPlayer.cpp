@@ -716,7 +716,7 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
 int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                                 bool allow_libmpeg2)
 {
-    if (ringBuffer->isDVD())
+    if (ringBuffer && ringBuffer->isDVD())
         allow_libmpeg2 = false;
 
     if (!skipDsp)
@@ -751,6 +751,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
             return -1;
         }
     }
+
+    if (!ringBuffer)
+        return -1;
 
     ringBuffer->Start();
     char testbuf[kDecoderProbeBufferSize];
