@@ -46,6 +46,7 @@ class CC708Window;
 class CC708Character
 {
   public:
+    CC708Character() : character(' ') {}
     CC708Character(const CC708Window &win);
     CC708CharacterAttribute attr;
     QChar character;

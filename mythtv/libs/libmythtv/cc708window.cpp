@@ -178,9 +178,11 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     if (!text)
     {
         uint num   = true_row_count * true_column_count;
-        text       = new CC708Character[num](*this);
+        text       = new CC708Character[num];
         pen.column = 0;
         pen.row    = 0;
+        for (uint i = 0; i < num; i++)
+            text[i].attr = pen.attr;
     }
 
     exists = true;
