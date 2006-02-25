@@ -127,8 +127,9 @@ static HostLineEdit *MythShutdownNvramRestartCmd()
     gc->setValue("/sbin/grub-set-default 1");
     gc->setHelpText(QObject::tr("Command to run if your bios requires you to "
                                 "reboot to allow nvram-wakeup settings to "
-                                "take effect. " 
-                                "See the README file for more examples."));
+                                "take effect. Leave blank if your bios does not "
+                                "require a reboot. See the README file for more "
+                                "examples."));
     return gc;
 };
 

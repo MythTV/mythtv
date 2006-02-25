@@ -370,6 +370,8 @@ int shutdown()
     //return 0;
       
     int shutdownmode = 0; // default to poweroff no reboot 
+    QString nvramRestartCmd = 
+            gContext->GetSetting("MythShutdownNvramRestartCmd", "");
 
     if (dtWakeupTime.isValid())
     {
@@ -390,8 +392,19 @@ int shutdown()
 
             VERBOSE(VB_IMPORTANT, QString("%1 exited with code %2").arg(nvramCommand)
                                                              .arg(shutdownmode)); 
-            VERBOSE(VB_IMPORTANT, "Currently we don't trust exit code 0, forcing to 1..."); 
-            shutdownmode = 1;
+
+            if (shutdownmode == 2)
+            {
+                VERBOSE(VB_IMPORTANT, "nvram-wakeup failed to set time in bios");
+                return 1;
+            }
+            
+            // we don't trust the return code from nvram-wakeup so only reboot
+            // if the user has set a restart command
+            if (nvramRestartCmd == "")
+                shutdownmode = 0;
+            else
+                shutdownmode = 1;
         }    
         else
         {    
@@ -420,8 +433,6 @@ int shutdown()
         }
         case 1:     
         {    
-            QString nvramRestartCmd = 
-                    gContext->GetSetting("MythShutdownNvramRestartCmd", "grub-set-default 1");
             VERBOSE(VB_IMPORTANT, "everything looks fine, but reboot is needed"); 
             VERBOSE(VB_IMPORTANT, "sending command to bootloader ..."); 
             VERBOSE(VB_IMPORTANT, nvramRestartCmd);

@@ -68,7 +68,10 @@ nvram-wakeup command -  command to set wakeup time in bios
 nvram-wakeup restart  - command to set which bootloader menu option to use
 command                 after next reboot. This command is run if your bios 
                         requires you to reboot to allow nvram-wakeup settings 
-                        to take effect.
+                        to take effect. If your bios does not require a reboot
+                        then leave this setting blank and mythshutdown will 
+                        shutdown normally using the command set in 'Poweroff
+                        Command'.
 
                         older versions of grub require something like this
                         "echo 'savedefault --default=1 --once quit' | /sbin/grub"
