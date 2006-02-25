@@ -261,7 +261,8 @@ static uint delete_overlapping_in_db(
 static bool has_program(MSqlQuery &query, int chanid, const Event &event)
 {
     query.prepare(
-        "SELECT subtitle FROM program "
+        "SELECT subtitle, description "
+        "FROM program "
         "WHERE chanid    = :CHANID    AND "
         "      starttime = :STARTTIME AND "
         "      endtime   = :ENDTIME   AND "
@@ -277,14 +278,25 @@ static bool has_program(MSqlQuery &query, int chanid, const Event &event)
         return true; // return true on error
     }
 
-    QString eSubtitle = event.Event_Subtitle.lower();
-    if (eSubtitle.isEmpty())
-        return query.size(); // assume subtitle would be the same
-    else if (!query.size())
+    if (!query.size())
         return false; // if there is nothing in db, then we don't have program
 
     if (!query.next())
         return true; // return true on error
+
+    QString dbDescription = query.value(1).toString();
+    if (event.Description.length() > dbDescription.length())
+    {
+        VERBOSE(VB_EIT, "EITHelper: Update DB description " +
+                QString("oldsize=%1 newsize=%2")
+                .arg(dbDescription.length())
+                .arg(event.Description.length()));
+        return false; // description needs to be updated
+    }
+
+    QString eSubtitle = event.Event_Subtitle.lower();
+    if (eSubtitle.isEmpty())
+        return query.size(); // assume subtitle would be the same
 
     QString dbSubtitle = query.value(0).toString().lower();
 
