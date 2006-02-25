@@ -2048,7 +2048,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
-    if(dbver == "1128")
+    if(dbver == "1127")
     {
        const QString updates[] = {
 "ALTER TABLE cardinput ADD COLUMN dishnet_eit TINYINT(1) NOT NULL DEFAULT 0;",
