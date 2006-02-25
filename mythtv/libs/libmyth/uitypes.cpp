@@ -2901,13 +2901,12 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             // add max of lcd height menu items either side of the selected node
             // let the lcdserver figure out which ones to display
             GenericTree *lnode;
-            QPtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
+            int pos = parent->getChildPosition(current_node, visual_order);
+            bool selected;
 
+            QPtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
             QPtrList<LCDMenuItem> menuItems;
             menuItems.setAutoDelete(true);
-
-            bool selected;
-            int pos = current_node->getPosition();
 
             if (pos > (int)lcddev->getLCDHeight())
                 lnode = nodes->at(pos - lcddev->getLCDHeight());
