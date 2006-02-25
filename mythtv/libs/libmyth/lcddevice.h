@@ -61,12 +61,14 @@ class LCDTextItem
   public:
     LCDTextItem() {}
     LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, QString text,
-                QString screen = "Generic", bool scroll = false)
+                QString screen = "Generic", bool scroll = false,
+                QString widget = "textWidget")
     {
         itemRow = row;
         itemAlignment = align;
         itemText = text;
         itemScreen = screen;
+        itemWidget = widget;
         itemScrollable = scroll;
     }
 
@@ -76,12 +78,14 @@ class LCDTextItem
     TEXT_ALIGNMENT getAlignment() { return itemAlignment; }
     QString getText() { return itemText; }
     QString getScreen() { return itemScreen; }
+    QString getWidget() { return itemWidget; }
     int getScroll() { return itemScrollable; }
 
     void setRow(unsigned int value) { itemRow = value; }
     void setAlignment(TEXT_ALIGNMENT value) { itemAlignment = value; }
     void setText(QString value) { itemText = value; }
     void setScreen(QString value) { itemScreen = value; }
+    void setWidget(QString value) { itemWidget = value; }
     void setScrollable(bool value) { itemScrollable = value; }
 
   private:
@@ -89,6 +93,7 @@ class LCDTextItem
     TEXT_ALIGNMENT itemAlignment;
     QString itemText;
     QString itemScreen;
+    QString itemWidget;
     bool itemScrollable;
 };
 

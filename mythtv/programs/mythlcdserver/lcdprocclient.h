@@ -80,12 +80,12 @@ class LCDProcClient : public QObject
     void outputRecStatus();        
     void scrollMenuText();         // Scroll the menu items if need be
     void beginScrollingMenuText(); // But only after a bit of time has gone by
-    void scrollText();             // Scroll the topline text
-    void beginScrollingText();     // But only after a bit of time has gone by
     void unPopMenu();              // Remove the Pop Menu display
     void scrollList();             // display a list line by line
     void updateRecordingList(void);
     void removeStartupMessage(void);
+    void beginScrollingWidgets(void);
+    void scrollWidgets(void);
           
   private:
     void outputCenteredText(QString theScreen, QString theText,
@@ -110,10 +110,13 @@ class LCDProcClient : public QObject
     void setHeartbeat (const QString &screen, bool onoff);
 
     void init();
-    void assignScrollingText(QString theText, QString theScreen,
-                             QString theWidget = "topWidget", int theRox = 1);
     void assignScrollingList(QStringList theList, QString theScreen, 
                              QString theWidget = "topWidget", int theRow = 1);
+
+    // Scroll 1 or more widgets on a screen
+    void assignScrollingWidgets(QString theText, QString theScreen,
+                             QString theWidget = "topWidget", int theRow = 1);
+    void formatScrollingWidgets(void);
                              
     void startTime();
     void startMusic(QString artist, QString album, QString track);
@@ -128,8 +131,8 @@ class LCDProcClient : public QObject
 
     QSocket *socket;
     QTimer *timeTimer;
-    QTimer *scrollTimer;
-    QTimer *preScrollTimer;
+    QTimer *scrollWTimer;
+    QTimer *preScrollWTimer;
     QTimer *menuScrollTimer;
     QTimer *menuPreScrollTimer;
     QTimer *popMenuTimer;
@@ -183,9 +186,9 @@ class LCDProcClient : public QObject
     int music_repeat;
     int music_shuffle;
 
+    QPtrList<LCDTextItem> *lcdTextItems;
     QString scrollingText;
-    QString scrollScreen, scrollWidget;
-    int scrollRow;
+    QString scrollScreen;
     unsigned int scrollPosition;
     QString timeformat;
 
