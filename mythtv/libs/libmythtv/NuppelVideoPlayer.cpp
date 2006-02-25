@@ -3532,6 +3532,12 @@ bool NuppelVideoPlayer::EnableEdit(void)
 {
     editmode = false;
 
+    if (!hasFullPositionMap)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot edit - no full position map");
+        return false;
+    }
+
     if (!hasFullPositionMap || !m_playbackinfo || !osd)
         return false;
 
