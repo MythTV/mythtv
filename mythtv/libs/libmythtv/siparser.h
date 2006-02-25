@@ -121,6 +121,9 @@ class SIParser : public QObject
     void ParseTable(uint8_t* buffer, int size, uint16_t pid);
     void CheckTrackers(void);
 
+    void SetDishNetEIT(bool on)
+        { eit_dn_long = on; }
+
   public slots:
     virtual void deleteLater(void);
 
@@ -230,6 +233,8 @@ class SIParser : public QObject
     TableSourcePIDObject TableSourcePIDs;
     bool                ParserInReset;
     bool                standardChange;
+    /// Decode DishNet's long-term DVB EIT
+    bool                eit_dn_long;
 
     // New tracking objects
     TableHandler       *Table[NumHandlers+1];

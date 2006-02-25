@@ -79,6 +79,8 @@ const uint TVRec::kEITScanStartTimeout = 60; /* 1 minute */
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
+static bool is_dishnet_eit(int cardid);
+
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
  *
@@ -1088,6 +1090,12 @@ void TVRec::CreateSIParser(int program_num)
             (program_num >= 0) ? program_num : service_id);
 
 #ifdef USING_DVB_EIT
+        if (is_dishnet_eit(GetCaptureCardNum()))
+        {
+            VERBOSE(VB_EIT, "Enabling DishNet Long Term EIT Support");
+            dvbsiparser->SetDishNetEIT(true);
+        }
+
         if (scanner)
             scanner->StartPassiveScan(dvbc, dvbsiparser);
 #endif // USING_DVB_EIT
@@ -1144,6 +1152,26 @@ bool get_use_eit(uint cardid)
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("get_use_eit", query);
+        return false;
+    }
+    else if (query.next())
+        return query.value(0).toBool();
+    return false;
+}
+
+static bool is_dishnet_eit(int cardid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT SUM(dishnet_eit) "
+        "FROM videosource, cardinput "
+        "WHERE videosource.sourceid = cardinput.sourceid AND"
+        "      cardinput.cardid     = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("is_dishnet_eit", query);
         return false;
     }
     else if (query.next())

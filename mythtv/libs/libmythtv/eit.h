@@ -31,6 +31,7 @@ class Event
     uint    SourcePID;
     uint    TransportID;
     uint    NetworkID;
+    uint    TableID;
     uint    ServiceID;    ///< NOT the Virtual Channel Number used by ATSC
     uint    EventID;
     bool    Stereo;

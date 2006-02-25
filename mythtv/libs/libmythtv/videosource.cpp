@@ -1353,6 +1353,22 @@ class DVBLNBChooser: public ComboBoxSetting {
 private:
 };
 
+class DishNetEIT: public CheckBoxSetting, public CISetting
+{
+  public:
+    DishNetEIT(const CardInput& parent)
+        : CISetting(parent, "dishnet_eit")
+    {
+        setLabel(QObject::tr("Use DishNet Long-term EIT Data"));
+        setValue(false);
+        setHelpText(
+            QObject::tr(
+                "If you point your satellite dish toward DishNet's birds, "
+                "you may wish to enable this feature. For best results, "
+                "enable general EIT collection as well."));
+    };
+};
+
 CardInput::CardInput(bool isDVBcard)
 {
     addChild(id = new ID());
@@ -1397,23 +1413,26 @@ CardInput::CardInput(bool isDVBcard)
     group->addChild(startchan);
     group->addChild(new InputPreference(*this));
 
+    addChild(group);
+
 #ifdef USING_DVB
     if (isDVBcard)
     {
-        group->addChild(diseqcpos    = new DiSEqCPos(*this));
-        group->addChild(diseqcport   = new DiSEqCPort(*this));
-        group->addChild(lnblofswitch = new LNBLofSwitch(*this));
-        group->addChild(lnblofhi = new LNBLofHi(*this));
-        group->addChild(lnbloflo = new LNBLofLo(*this));
-        HorizontalConfigurationGroup *h1 =
-            new HorizontalConfigurationGroup(false, false, true, true);
-        h1->addChild(new FreeToAir(*this));
-        h1->addChild(new RadioServices(*this));
-        group->addChild(h1);
+        ConfigurationGroup *dvbgroup =
+          new VerticalConfigurationGroup(false, false, true, true);
+   
+        dvbgroup->addChild(diseqcpos    = new DiSEqCPos(*this));
+        dvbgroup->addChild(diseqcport   = new DiSEqCPort(*this));
+        dvbgroup->addChild(lnblofswitch = new LNBLofSwitch(*this));
+        dvbgroup->addChild(lnblofhi = new LNBLofHi(*this));
+        dvbgroup->addChild(lnbloflo = new LNBLofLo(*this));
+
+        dvbgroup->addChild(new FreeToAir(*this));
+        dvbgroup->addChild(new RadioServices(*this));
+        dvbgroup->addChild(new DishNetEIT(*this));
+        addChild(dvbgroup);
     }
 #endif
-
-    addChild(group);
 
     childid = new ChildID(*this);
     addChild(childid);

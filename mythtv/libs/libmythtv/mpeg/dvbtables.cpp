@@ -159,6 +159,9 @@ bool DVBEventInformationTable::IsEIT(uint table_id)
     // Standard Future Event Information Tables for other transports
     is_eit |= (TableID::SC_EITbego <= table_id &&
                TableID::SC_EITendo >= table_id);
+    // Dish Network Long Term Future Event Information for all transports
+    is_eit |= (TableID::DN_EITbego <= table_id &&
+               TableID::DN_EITendo >= table_id);
 
     return is_eit;
 }

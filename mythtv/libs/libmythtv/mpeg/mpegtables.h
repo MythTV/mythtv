@@ -183,6 +183,9 @@ enum
     DVB_RST_PID   = 0x0013,
     DVB_TOT_PID   = 0x0013,
 
+    // Dishnet longterm EIT is on pid 0x300
+    DVB_DNLONG_EIT_PID = 0x0300,
+
     ATSC_PSIP_PID = 0x1ffb,
 };
 
@@ -224,6 +227,10 @@ class TableID
         MPEFEC   = 0x78,
         DIT      = 0x7e, // always on pid 0x1e
         SIT      = 0x7f, // always on pid 0x1f
+
+        // Dishnet Longterm EIT data
+        DN_EITbego = 0x80, // always on pid 0x300
+        DN_EITendo = 0xfe, // always on pid 0x300
 
         // ATSC
         STUFFING = 0x80,

@@ -57,6 +57,7 @@ SIParser::SIParser(const char *name) :
     // State variables
     ThreadRunning(false),           exitParserThread(false),
     ParserInReset(false),           standardChange(false),
+    eit_dn_long(false),
     PrivateTypesLoaded(false)
 {
     /* Set the PrivateTypes to default values */
@@ -1085,6 +1086,8 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     Table[EVENTS]->DependencyMet(SERVICES);
     //Table[EVENTS]->AddPid(0x12,0x00,0x00,true); // see ticket #755
     Table[EVENTS]->AddPid(0x12,0x7F,0x80,0x12); // see ticket #755
+    if (eit_dn_long)
+        Table[EVENTS]->AddPid(0x300,0x00,0x00,true);
 #endif // USING_DVB_EIT
 }
 
@@ -1150,6 +1153,7 @@ void SIParser::HandleEIT(const DVBEventInformationTable *eit)
         // Event to use temporarily to fill in data
         Event event;
         event.ServiceID   = eit->ServiceID();
+        event.TableID     = eit->TableID();
         event.TransportID = eit->TSID();
         event.NetworkID   = eit->OriginalNetworkID();
         event.EventID     = eit->EventID(i);
@@ -1346,6 +1350,34 @@ uint SIParser::ProcessDVBEventDescriptors(
             ContentDescriptor content(data);
             event.ContentDescription = content.GetDescription(0);
             event.CategoryType       = content.GetMythCategory(0);
+        }
+        break;
+
+        case DescriptorID::dish_ename:
+        {
+            int ht = (event.TableID > 0x80) ? 2 : 1;
+            if (data[1] > 1)
+                event.Event_Name =
+                    atsc_huffman2_to_string(data+3, data[1]-1, ht);
+        }
+        break;
+
+        case DescriptorID::dish_edescription:
+        {
+            int ht = (event.TableID > 0x80) ? 2 : 1;
+            if (data[1] > 2) 
+            {
+                if ((data[3] & 0xf8) == 0x80)
+                {
+                    event.Description =
+                        atsc_huffman2_to_string(data+4, data[1]-2, ht);
+                }
+                else
+                {
+                    event.Description =
+                        atsc_huffman2_to_string(data+3, data[1]-1, ht);
+                }
+            }
         }
         break;
 
