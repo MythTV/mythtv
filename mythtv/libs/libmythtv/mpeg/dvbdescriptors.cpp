@@ -1,5 +1,6 @@
 #include "dvbdescriptors.h"
 
+#include <unistd.h>
 #include <qtextcodec.h>
 #include <qdeepcopy.h>
 
