@@ -626,13 +626,14 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     int frag, blocksize = 4096;
     int tmp;
 
-#if !defined (HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
-    VERBOSE(VB_IMPORTANT, QString("NVR::AudioInit() This Unix doesn't support"
-                                  " device files for audio access. Skipping"));
-    return 1;
-#else
     if (!skipdevice)
     {
+#if !defined (HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
+        VERBOSE(VB_IMPORTANT,
+		        QString("NVR::AudioInit() This Unix doesn't support"
+                        " device files for audio access. Skipping"));
+        return 1;
+#else
         if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK)))
         {
             VERBOSE(VB_IMPORTANT, QString("NVR: Error, cannot open DSP '%1'").
@@ -678,8 +679,8 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         }
 
         close(afd);
-    }
 #endif
+    }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
     blocksize *= 4;
