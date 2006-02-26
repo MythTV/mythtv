@@ -5228,7 +5228,7 @@ void TV::customEvent(QCustomEvent *e)
             QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
 
             if ((playbackinfo->chanid == evchanid) &&
-                (playbackinfo->startts == evstartts))
+                (playbackinfo->recstartts == evstartts))
             {
                 QMap<long long, int> newMap;
                 QStringList mark;
