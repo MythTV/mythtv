@@ -10,6 +10,7 @@
 #include "lcddevice.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
+#include "libmythui/mythmainwindow.h"
 
 #include <unistd.h>
 #include <sys/wait.h>	// For WIFEXITED on Mac OS X

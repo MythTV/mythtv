@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 
     print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
 
-    MythMainWindow *mainWindow = new MythMainWindow();
+    MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 

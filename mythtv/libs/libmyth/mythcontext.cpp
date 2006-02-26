@@ -33,6 +33,7 @@
 #include "langsettings.h"
 #include "mythdbcon.h"
 #include "util-x11.h"
+#include "libmythui/mythmainwindow.h"
 
 // These defines provide portability for different
 // plugin file names.
@@ -722,7 +723,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
 #endif
         parent->LoadQtConfig();
    
-        MythMainWindow *mainWindow = new MythMainWindow();
+        MythMainWindow *mainWindow = GetMythMainWindow();
         parent->SetMainWindow(mainWindow);
 
         // ask user for language settings
@@ -737,7 +738,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
 
         // tear down temporary main window
         parent->SetMainWindow(NULL);
-        delete mainWindow;
+        DestroyMythMainWindow();
     }
     else
     {

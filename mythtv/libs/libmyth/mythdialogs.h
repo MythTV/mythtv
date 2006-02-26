@@ -43,94 +43,9 @@ class MythLineEdit;
 class MythRemoteLineEdit;
 class MythListBox; 
 struct fontProp;
+class MythMainWindow;
 
-const int kExternalKeycodeEventType = 33213;
-const int kExitToMainMenuEventType = 33214;
-
-class ExternalKeycodeEvent : public QCustomEvent
-{
-  public:
-    ExternalKeycodeEvent(const int key) 
-           : QCustomEvent(kExternalKeycodeEventType), keycode(key) {}
-
-    int getKeycode() { return keycode; }
-
-  private:
-    int keycode;
-};
-
-class ExitToMainMenuEvent : public QCustomEvent
-{
-  public:
-    ExitToMainMenuEvent(void) : QCustomEvent(kExitToMainMenuEventType) {}
-};
-
-#define REG_KEY(a, b, c, d) gContext->GetMainWindow()->RegisterKey(a, b, c, d)
-#define GET_KEY(a, b) gContext->GetMainWindow()->GetKey(a, b)
-#define REG_JUMP(a, b, c, d) gContext->GetMainWindow()->RegisterJump(a, b, c, d)
-#define REG_MEDIA_HANDLER(a, b, c, d, e) gContext->GetMainWindow()->RegisterMediaHandler(a, b, c, d, e)
-#define REG_MEDIAPLAYER(a,b,c) gContext->GetMainWindow()->RegisterMediaPlugin(a, b, c)
-
-typedef  int (*MediaPlayCallback)(const char*, const char*, const char*, const char*, int, const char*);
-
-class MythMainWindowPrivate;
-
-class MythMainWindow : public QDialog
-{
-  public:
-    MythMainWindow(QWidget *parent = 0, const char *name = 0, 
-                   bool modal = FALSE, WFlags flags = 0);
-    virtual ~MythMainWindow();
-
-    void Init(void);
-    void Show(void);
-
-    void attach(QWidget *child);
-    void detach(QWidget *child);
-
-    QWidget *currentWidget(void);
-
-    bool TranslateKeyPress(const QString &context, QKeyEvent *e, 
-                           QStringList &actions, bool allowJumps = true);
-
-    void ClearKey(const QString &context, const QString &action);
-    void BindKey(const QString &context, const QString &action,
-		 const QString &key);
-    void RegisterKey(const QString &context, const QString &action,
-                     const QString &description, const QString &key);
-    QString GetKey(const QString &context, const QString &action) const;
-
-    void ClearJump(const QString &destination);
-    void BindJump(const QString &destination, const QString &key);
-    void RegisterJump(const QString &destination, const QString &description,
-                      const QString &key, void (*callback)(void));
-    void RegisterMediaHandler(const QString &destination, 
-                              const QString &description, const QString &key, 
-                              void (*callback)(MythMediaDevice* mediadevice), 
-                              int mediaType);
-
-    void RegisterMediaPlugin(const QString &name, const QString &desc,
-                             MediaPlayCallback fn);
-    bool HandleMedia(QString& handler, const QString& mrl, const QString& plot="",
-                     const QString& title="", const QString& director="", int lenMins=120, 
-                     const QString& year="1895");
-
-    void JumpTo(const QString &destination);
-    bool DestinationExists(const QString &destination) const;
-
-    bool IsExitingToMain(void) const;
-
-  protected:
-    void keyPressEvent(QKeyEvent *e);
-    void customEvent(QCustomEvent *ce);
-    void closeEvent(QCloseEvent *e);
-    
-    void ExitToMainMenu();
-
-    QObject *getTarget(QKeyEvent &key);
-
-    MythMainWindowPrivate *d;
-};
+#include "libmythui/mythmainwindow.h"
 
 class MythDialog : public QFrame
 {

@@ -1,6 +1,6 @@
 #include <qapplication.h>
 
-#include "dialogbox.h"
+#include "mythdialogbox.h"
 #include "mythlistbutton.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"

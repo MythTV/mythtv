@@ -986,7 +986,7 @@ int main(int argc, char **argv)
 
     gContext->LoadQtConfig();
 
-    MythMainWindow *mainWindow = new MythMainWindow();
+    MythMainWindow *mainWindow = GetMythMainWindow();
     gContext->SetMainWindow(mainWindow);
     LanguageSettings::prompt();
 
@@ -1084,7 +1084,7 @@ int main(int argc, char **argv)
     if (networkControl)
         delete networkControl;
 
-    delete mainWindow;
+    DestroyMythMainWindow();
     delete gContext;
     return FRONTEND_EXIT_OK;
 }

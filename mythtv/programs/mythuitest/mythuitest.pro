@@ -29,7 +29,7 @@ macx {
 DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
 
 QMAKE_CLEAN += $(TARGET)
-
+ 
 # Input
 HEADERS = test1.h btnlisttest.h
 

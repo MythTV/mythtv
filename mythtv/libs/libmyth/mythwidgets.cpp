@@ -14,6 +14,7 @@ using namespace std;
 #include "util.h"
 #include "mythdialogs.h"
 #include "virtualkeyboard.h"
+#include "libmythui/mythmainwindow.h"
 
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {

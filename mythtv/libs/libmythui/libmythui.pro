@@ -8,7 +8,7 @@ target.path = $${LIBDIR}
 INSTALLS = target
 
 INCLUDEPATH += ../libmyth
-INCLUDEPATH += ../..
+INCLUDEPATH += ../.. ../
 
 DEPENDPATH += ../libmyth .
 
@@ -21,16 +21,16 @@ HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
 HEADERS += mythpainter_ogl.h mythpainter_qt.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 HEADERS += mythuitext.h mythuistatetype.h mythgesture.h
-HEADERS += mythuibutton.h mythlistbutton.h themedmenu.h dialogbox.h
+HEADERS += mythuibutton.h mythlistbutton.h myththemedmenu.h mythdialogbox.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp
 SOURCES += mythpainter_ogl.cpp mythpainter_qt.cpp
 SOURCES += mythscreenstack.cpp mythscreentype.cpp mythgesture.cpp
 SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp
 SOURCES += mythuistatetype.cpp mythlistbutton.cpp mythfontproperties.cpp
-SOURCES += mythuibutton.cpp themedmenu.cpp dialogbox.cpp
+SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 
-inc.path = $${PREFIX}/include/mythui/
+inc.path = $${PREFIX}/include/mythtv/libmythui/
 
 inc.files  = mythmainwindow.h mythpainter.h mythimage.h
 inc.files += mythpainter_ogl.h mythpainter_qt.h mythuistatetype.h

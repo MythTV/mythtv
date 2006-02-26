@@ -6,10 +6,10 @@
 #include "mythuitext.h"
 #include "mythmainwindow.h"
 #include "mythlistbutton.h"
-#include "dialogbox.h"
+#include "mythdialogbox.h"
 #include "mythfontproperties.h"
 #include "mythcontext.h"
-#include "themedmenu.h"
+#include "myththemedmenu.h"
 
 TestScreen1::TestScreen1(MythScreenStack *parent, const char *name)
            : MythScreenType(parent, name)
@@ -146,8 +146,9 @@ void TestScreen1::LaunchMenu(void)
         return;
     }
 
-    ThemedMenu *menu = new ThemedMenu(themedir.local8Bit(), "mainmenu.xml",
-                                      m_ScreenStack, "mainmenu");
+    MythThemedMenu *menu = new MythThemedMenu(themedir.local8Bit(), 
+                                              "mainmenu.xml", m_ScreenStack, 
+                                              "mainmenu");
     if (menu->foundTheme())
     {
         menu->setKillable();

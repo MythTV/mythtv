@@ -2,12 +2,13 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
 TEMPLATE = app
-CONFIG += thread
+CONFIG += thread opengl
 TARGET = mtd
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS -lmythdvdnav-$$LIBVERSION
+LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS 
+LIBS += -lmythdvdnav-$$LIBVERSION
 
 HEADERS += ../mythdvd/dbcheck.h logging.h mtd.h 
 HEADERS += serversocket.h jobthread.h dvdprobe.h fileobs.h threadevents.h

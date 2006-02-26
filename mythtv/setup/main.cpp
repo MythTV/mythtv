@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    MythMainWindow *mainWindow = new MythMainWindow();
+    MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
 

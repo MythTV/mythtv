@@ -8,13 +8,13 @@
 using namespace std;
 
 #include "exitcodes.h"
-#include "themedmenu.h"
+#include "myththemedmenu.h"
 #include "mythcontext.h"
 #include "util.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythimage.h"
-#include "dialogbox.h"
+#include "mythdialogbox.h"
 
 struct TextAttributes
 {
@@ -103,13 +103,13 @@ static QString getFirstText(QDomElement &element)
     return "";
 }
 
-class ThemedMenuPrivate;
+class MythThemedMenuPrivate;
 
-class ThemedMenuState
+class MythThemedMenuState
 {
   public:
-    ThemedMenuState();
-   ~ThemedMenuState();
+    MythThemedMenuState();
+   ~MythThemedMenuState();
 
     bool parseSettings(const QString &dir, const QString &menuname);
 
@@ -188,12 +188,12 @@ class ThemedMenuState
 //    LCD *lcddev;
 };
 
-class ThemedMenuPrivate
+class MythThemedMenuPrivate
 {
   public:
-    ThemedMenuPrivate(ThemedMenu *lparent, const char *cdir, 
-                      ThemedMenuState *lstate);
-   ~ThemedMenuPrivate();
+    MythThemedMenuPrivate(MythThemedMenu *lparent, const char *cdir, 
+                      MythThemedMenuState *lstate);
+   ~MythThemedMenuPrivate();
 
     bool keyPressHandler(QKeyEvent *e);
     bool ReloadTheme(void);
@@ -224,9 +224,9 @@ class ThemedMenuPrivate
                       const QString &password_setting,
                       const QString &text);
 
-    ThemedMenu *parent;
+    MythThemedMenu *parent;
 
-    ThemedMenuState *m_state;
+    MythThemedMenuState *m_state;
     bool allocedstate;
 
     vector<ThemedButton> buttonList;
@@ -254,7 +254,7 @@ class ThemedMenuPrivate
 
 /////////////////////////////////////////////////////////////////////////////
 
-ThemedMenuState::ThemedMenuState()
+MythThemedMenuState::MythThemedMenuState()
 {
     allowreorder = true;
     balancerows = true;
@@ -271,12 +271,12 @@ ThemedMenuState::ThemedMenuState()
 //    lcddev = gContext->GetLCDDevice();
 }
 
-ThemedMenuState::~ThemedMenuState()
+MythThemedMenuState::~MythThemedMenuState()
 {
     Reset();
 }
 
-void ThemedMenuState::Reset(void)
+void MythThemedMenuState::Reset(void)
 {
     if (logo)
         logo->DownRef();
@@ -320,7 +320,7 @@ void ThemedMenuState::Reset(void)
     loaded = false;
 }
 
-void ThemedMenuState::setTitleIcon(const QString &menumode)
+void MythThemedMenuState::setTitleIcon(const QString &menumode)
 {
     if (titleIcons.contains(menumode))
     {
@@ -335,14 +335,14 @@ void ThemedMenuState::setTitleIcon(const QString &menumode)
     }
 }
 
-ButtonIcon *ThemedMenuState::getButtonIcon(const QString &type)
+ButtonIcon *MythThemedMenuState::getButtonIcon(const QString &type)
 {
     if (allButtonIcons.find(type) != allButtonIcons.end())
         return &(allButtonIcons[type]);
     return NULL;
 }
 
-void ThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
+void MythThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
 {
     // bool tiledbackground = false;
     // QPixmap *bground = NULL;    
@@ -406,7 +406,7 @@ void ThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                             "background").arg(info.tagName()));
                 return;
             }
@@ -415,12 +415,12 @@ void ThemedMenuState::parseBackground(const QString &dir, QDomElement& element)
 
     if (!hasarea)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing buttonaread in background");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing buttonaread in background");
         return;
     }
 }
 
-void ThemedMenuState::parseShadow(TextAttributes &attributes, 
+void MythThemedMenuState::parseShadow(TextAttributes &attributes, 
                                   QDomElement &element)
 {
     attributes.font.hasShadow = true;
@@ -455,7 +455,7 @@ void ThemedMenuState::parseShadow(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                             "text/shadow").arg(info.tagName()));
                 return;
             }
@@ -464,24 +464,24 @@ void ThemedMenuState::parseShadow(TextAttributes &attributes,
 
     if (!hascolor)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing color tag in shadow");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing color tag in shadow");
         return;
     }
 
     if (!hasalpha)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing alpha tag in shadow");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing alpha tag in shadow");
         return;
     }
 
     if (!hasoffset)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing offset tag in shadow");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing offset tag in shadow");
         return;
     }
 }
 
-void ThemedMenuState::parseOutline(TextAttributes &attributes, 
+void MythThemedMenuState::parseOutline(TextAttributes &attributes, 
                                    QDomElement &element)
 {
     attributes.font.hasOutline = true;
@@ -510,7 +510,7 @@ void ThemedMenuState::parseOutline(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                             "text/shadow").arg(info.tagName()));
                 return;
             }
@@ -519,18 +519,18 @@ void ThemedMenuState::parseOutline(TextAttributes &attributes,
 
     if (!hassize)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing size in outline");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing size in outline");
         return;
     }
 
     if (!hascolor)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing color in outline");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing color in outline");
         return;
     }
 }
 
-void ThemedMenuState::parseText(TextAttributes &attributes, 
+void MythThemedMenuState::parseText(TextAttributes &attributes, 
                                 QDomElement &element)
 {
     bool hasarea = false;
@@ -610,7 +610,7 @@ void ThemedMenuState::parseText(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in text").arg(info.tagName()));
                 return;
             }
@@ -623,13 +623,13 @@ void ThemedMenuState::parseText(TextAttributes &attributes,
 
     if (!hasarea)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing 'area' "
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'area' "
                 "tag in 'text' element of 'genericbutton'");
         return;
     }
 }
 
-void ThemedMenuState::parseButtonDefinition(const QString &dir, 
+void MythThemedMenuState::parseButtonDefinition(const QString &dir, 
                                             QDomElement &element)
 {
     bool hasnormal = false;
@@ -670,7 +670,7 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
             {
                 if (!hasnormal)
                 {
-                    VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: The 'normal' "
+                    VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: The 'normal' "
                             "tag needs to come before the 'normaltext' tag");
                     return;
                 }
@@ -680,7 +680,7 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
             {
                 if (!hasactive)
                 {
-                    VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: The 'active' "
+                    VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: The 'active' "
                             "tag needs to come before the 'activetext' tag");
                     return;
                 }
@@ -694,7 +694,7 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
             else
             {
                 VERBOSE(VB_GENERAL,
-                        QString("ThemedMenuPrivate: Unknown tag %1 in "
+                        QString("MythThemedMenuPrivate: Unknown tag %1 in "
                                 "genericbutton").arg(info.tagName()));
                 return;
             }
@@ -703,13 +703,13 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
 
     if (!hasnormal)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: No normal button image defined");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: No normal button image defined");
         return;
     }
 
     if (!hasactive)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: No active button image defined");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: No active button image defined");
         return;
     }
 
@@ -721,7 +721,7 @@ void ThemedMenuState::parseButtonDefinition(const QString &dir,
     watermarkRect = QRect(watermarkPos, QSize(0, 0));
 }
 
-void ThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
+void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
 {
     bool hasimage = false;
     bool hasposition = false;
@@ -751,7 +751,7 @@ void ThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in logo").arg(info.tagName()));
                 return;
             }
@@ -760,13 +760,13 @@ void ThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
 
     if (!hasimage)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing image tag in logo");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing image tag in logo");
         return;
     }
 
     if (!hasposition)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in logo");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing position tag in logo");
         return;
     }
 
@@ -774,7 +774,7 @@ void ThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
                      logo->height());
 }
 
-void ThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
+void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
 {
     bool hasimage = false;
     bool hasposition = false;
@@ -800,7 +800,7 @@ void ThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: "
+                    VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: "
                             "Missing mode in titles/image");
                     return;
                 }
@@ -814,7 +814,7 @@ void ThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in logo").arg(info.tagName()));
                 return;
             }
@@ -823,18 +823,18 @@ void ThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
 
     if (!hasimage)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing image tag in titles");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing image tag in titles");
         return;
     }
 
     if (!hasposition)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in titles");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing position tag in titles");
         return;
     }
 }
 
-void ThemedMenuState::parseArrow(const QString &dir, QDomElement &element, 
+void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element, 
                                    bool up)
 {
     QRect arrowrect;
@@ -864,7 +864,7 @@ void ThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in arrow").arg(info.tagName()));
                 return;
             }
@@ -873,13 +873,13 @@ void ThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
 
     if (!hasimage)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing image tag in arrow");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing image tag in arrow");
         return;
     }
 
     if (!hasposition)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in arrow");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing position tag in arrow");
         return;
     }
 
@@ -898,7 +898,7 @@ void ThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
     }
 }
 
-void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
+void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
 {
     bool hasname = false;
     bool hasoffset = false;
@@ -944,7 +944,7 @@ void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             }    
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in buttondef").arg(info.tagName()));
                 return;
             }
@@ -953,20 +953,20 @@ void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
 
     if (!hasname)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing name in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing name in button");
         return;
     }
 
     if (!hasoffset)
     {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Missing offset "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Missing offset "
                                       "in buttondef %1").arg(name));
         return;
     }
 
     if (!hasicon) 
     {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Missing image "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Missing image "
                                       "in buttondef %1").arg(name));
         return;
     }
@@ -992,7 +992,7 @@ void ThemedMenuState::parseButton(const QString &dir, QDomElement &element)
     allButtonIcons[name] = newbutton;
 }
 
-void ThemedMenuState::setDefaults(void)
+void MythThemedMenuState::setDefaults(void)
 {
     logo = NULL;
     buttonnormal = buttonactive = NULL;
@@ -1011,7 +1011,7 @@ void ThemedMenuState::setDefaults(void)
     watermarkRect = QRect(0, 0, 0, 0);
 }
 
-bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
+bool MythThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
 {
     QString filename = dir + menuname;
 
@@ -1020,7 +1020,7 @@ bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
 
     if (!f.open(IO_ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate::parseSettings(): "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate::parseSettings(): "
                                       "Can't open: %1").arg(filename));
         return false;
     }
@@ -1031,7 +1031,7 @@ bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Error, parsing %1\n"
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Error, parsing %1\n"
                                       "at line: %2  column: %3 msg: %4").
                 arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
@@ -1084,7 +1084,7 @@ bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown "
                                             "element %1").arg(e.tagName()));
             }
         }
@@ -1093,14 +1093,14 @@ bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
 
     if (!setbackground)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing background element");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing background element");
         return false;
     }
 
     if (!setbuttondef)
     {
         VERBOSE(VB_IMPORTANT,
-                "ThemedMenuPrivate: Missing genericbutton definition");
+                "MythThemedMenuPrivate: Missing genericbutton definition");
         return false;
     }
 
@@ -1108,7 +1108,7 @@ bool ThemedMenuState::parseSettings(const QString &dir, const QString &menuname)
     return true;
 }
 
-void ThemedMenuState::drawScrollArrows(MythPainter *p, int alpha, bool up,
+void MythThemedMenuState::drawScrollArrows(MythPainter *p, int alpha, bool up,
                                        bool down)
 {
     if (!uparrow || !downarrow)
@@ -1123,25 +1123,25 @@ void ThemedMenuState::drawScrollArrows(MythPainter *p, int alpha, bool up,
         p->DrawImage(downarrowRect.topLeft(), downarrow, alpha);
 }
 
-void ThemedMenuState::paintLogo(MythPainter *p, int alpha)
+void MythThemedMenuState::paintLogo(MythPainter *p, int alpha)
 {
     if (logo)
         p->DrawImage(logoRect.topLeft(), logo, alpha);
 }
 
-void ThemedMenuState::paintTitle(MythPainter *p, int alpha)
+void MythThemedMenuState::paintTitle(MythPainter *p, int alpha)
 {
     if (curTitle)
         p->DrawImage(titleRect.topLeft(), curTitle, alpha);
 }
 
-void ThemedMenuState::paintButtonBackground(MythPainter *p, int alpha)
+void MythThemedMenuState::paintButtonBackground(MythPainter *p, int alpha)
 {
     if (buttonBackground)
         p->DrawImage(buttonArea.topLeft(), buttonBackground, alpha);
 }
 
-void ThemedMenuState::paintWatermark(MythPainter *p, int alpha, 
+void MythThemedMenuState::paintWatermark(MythPainter *p, int alpha, 
                                      MythImage *watermark)
 {
     if (watermark)
@@ -1152,12 +1152,12 @@ void ThemedMenuState::paintWatermark(MythPainter *p, int alpha,
 
 /////////////////////////////////////////////////////////////////////////////
 
-ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, const char *cdir,
-                                     ThemedMenuState *lstate)
+MythThemedMenuPrivate::MythThemedMenuPrivate(MythThemedMenu *lparent, const char *cdir,
+                                     MythThemedMenuState *lstate)
 {
     if (!lstate)
     {
-        m_state = new ThemedMenuState();
+        m_state = new MythThemedMenuState();
         allocedstate = true;
     }
     else
@@ -1173,13 +1173,13 @@ ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, const char *cdir,
     m_state->themeDir = cdir;
 }
 
-ThemedMenuPrivate::~ThemedMenuPrivate()
+MythThemedMenuPrivate::~MythThemedMenuPrivate()
 {
     if (allocedstate)
         delete m_state;
 }
 
-void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
+void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
 {
     QString type = "";
     QString text = "";
@@ -1252,7 +1252,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
                                             "in button").arg(info.tagName()));
                 return;
             }
@@ -1261,13 +1261,13 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
 
     if (text == "")
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing 'text' in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'text' in button");
         return;
     }
    
     if (action.empty())
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing 'action' in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'action' in button");
         return;
     }
 
@@ -1275,7 +1275,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
         addButton(type, text, alttext, action);
 }
 
-bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
+bool MythThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 {
     QString filename = findMenuFile(menuname);
 
@@ -1284,7 +1284,7 @@ bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     if (!f.open(IO_ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Couldn't read "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Couldn't read "
                                       "menu file %1").arg(menuname));
         if (menuname == "mainmenu.xml" )
         {
@@ -1353,7 +1353,7 @@ bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Unknown "
+                VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Unknown "
                                               "element %1").arg(e.tagName()));
                 return false;
             }
@@ -1363,7 +1363,7 @@ bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     if (buttonList.size() == 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: No buttons "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: No buttons "
                                       "for menu %1").arg(menuname));
         return false;
     }
@@ -1436,7 +1436,7 @@ bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     return true;
 }
 
-void ThemedMenuPrivate::addButton(const QString &type, const QString &text, 
+void MythThemedMenuPrivate::addButton(const QString &type, const QString &text, 
                                   const QString &alttext, 
                                   const QStringList &action)
 {
@@ -1452,7 +1452,7 @@ void ThemedMenuPrivate::addButton(const QString &type, const QString &text,
     buttonList.push_back(newbutton);
 }
 
-bool ThemedMenuPrivate::layoutButtons(void)
+bool MythThemedMenuPrivate::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
   
@@ -1463,14 +1463,14 @@ bool ThemedMenuPrivate::layoutButtons(void)
 
     if (maxrows < 1)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Must have "
                 "room for at least 1 row of buttons");
         return false;
     }
     
     if (columns < 1)
     {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Must have "
                 "room for at least 1 column of buttons");
         return false;
     }
@@ -1533,7 +1533,7 @@ bool ThemedMenuPrivate::layoutButtons(void)
     return true; 
 }
 
-void ThemedMenuPrivate::positionButtons(bool resetpos)
+void MythThemedMenuPrivate::positionButtons(bool resetpos)
 {
     QRect buttonArea = m_state->buttonArea;
     int buttonHeight = m_state->buttonnormal->height();
@@ -1618,7 +1618,7 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
     }
 }
 
-bool ThemedMenuPrivate::makeRowVisible(int newrow, int oldrow, bool forcedraw)
+bool MythThemedMenuPrivate::makeRowVisible(int newrow, int oldrow, bool forcedraw)
 {
     if (buttonRows[newrow].visible)
         return true;
@@ -1654,14 +1654,14 @@ bool ThemedMenuPrivate::makeRowVisible(int newrow, int oldrow, bool forcedraw)
     return true;
 }
 
-void ThemedMenuPrivate::clearToBackground(void)
+void MythThemedMenuPrivate::clearToBackground(void)
 {
 #if 0
     drawInactiveButtons();
 #endif
 }
 
-void ThemedMenuPrivate::drawInactiveButtons(void)
+void MythThemedMenuPrivate::drawInactiveButtons(void)
 {
 #if 0
     QPainter tmp(&bground);
@@ -1694,7 +1694,7 @@ void ThemedMenuPrivate::drawInactiveButtons(void)
 #endif
 }
 
-void ThemedMenuPrivate::drawScrollArrows(MythPainter *p, int alpha)
+void MythThemedMenuPrivate::drawScrollArrows(MythPainter *p, int alpha)
 {
     bool needup = false;
     bool needdown = false;
@@ -1710,7 +1710,7 @@ void ThemedMenuPrivate::drawScrollArrows(MythPainter *p, int alpha)
     m_state->drawScrollArrows(p, alpha, needup, needdown);
 }
 
-void ThemedMenuPrivate::paintWatermark(MythPainter *p, int alpha)
+void MythThemedMenuPrivate::paintWatermark(MythPainter *p, int alpha)
 {
     if (activebutton && activebutton->buttonicon &&
         activebutton->buttonicon->watermark)
@@ -1719,7 +1719,7 @@ void ThemedMenuPrivate::paintWatermark(MythPainter *p, int alpha)
     }
 }
 
-void ThemedMenuPrivate::paintButton(unsigned int button, MythPainter *p, 
+void MythThemedMenuPrivate::paintButton(unsigned int button, MythPainter *p, 
                                     int alpha)
 {
     TextAttributes attributes;
@@ -1803,7 +1803,7 @@ void ThemedMenuPrivate::paintButton(unsigned int button, MythPainter *p,
     }
 }
 
-bool ThemedMenuPrivate::ReloadTheme(void)
+bool MythThemedMenuPrivate::ReloadTheme(void)
 {
     buttonList.clear();
     buttonRows.clear();
@@ -1825,7 +1825,7 @@ bool ThemedMenuPrivate::ReloadTheme(void)
     return parseMenu(file, row, col);
 }
 
-bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
+bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 {
     ThemedButton *lastbutton = activebutton;
     int oldrow = currentrow;
@@ -1993,7 +1993,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     return true;
 } 
 
-QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
+QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
     QString testdir = MythContext::GetConfDir() + "/" + menuname;
     QFile file(testdir);
@@ -2024,7 +2024,7 @@ QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
     return "";
 }
 
-bool ThemedMenuPrivate::handleAction(const QString &action)
+bool MythThemedMenuPrivate::handleAction(const QString &action)
 {
     if (action.left(5) == "EXEC ")
     {
@@ -2056,7 +2056,7 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
         else
         {
             if (cardid == -2)
-                VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Card %1 is "
+                VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Card %1 is "
                                               "already locked").arg(cardid));
            
 #if 0 
@@ -2086,7 +2086,7 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
 
         MythScreenStack *stack = parent->GetScreenStack();
 
-        ThemedMenu *newmenu = new ThemedMenu(m_state->themeDir.local8Bit(),
+        MythThemedMenu *newmenu = new MythThemedMenu(m_state->themeDir.local8Bit(),
                                              rest, stack, "menu", 
                                              m_state->allowreorder, m_state);
         stack->AddScreen(newmenu);
@@ -2137,7 +2137,7 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
     return true;   
 }
 
-bool ThemedMenuPrivate::findDepends(const QString &file)
+bool MythThemedMenuPrivate::findDepends(const QString &file)
 {
     QString filename = findMenuFile(file);
     if (filename != "")
@@ -2152,7 +2152,7 @@ bool ThemedMenuPrivate::findDepends(const QString &file)
     return false;
 }
 
-bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting, 
+bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting, 
                               const QString &password_setting,
                               const QString& /* text */)
 {
@@ -2166,7 +2166,7 @@ bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     if (last_time_stamp.length() < 1)
     {
         VERBOSE(VB_IMPORTANT,
-                "ThemedMenuPrivate: Could not read password/pin time stamp.\n"
+                "MythThemedMenuPrivate: Could not read password/pin time stamp.\n"
                 "This is only an issue if it happens repeatedly.");
     }
     else
@@ -2207,7 +2207,7 @@ bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     return false;
 }
 
-void ThemedMenuPrivate::DrawSelf(MythPainter *p, 
+void MythThemedMenuPrivate::DrawSelf(MythPainter *p, 
                                  int /* xoffset */, 
                                  int /* yoffset */, 
                                  int alphaMod)
@@ -2228,18 +2228,18 @@ void ThemedMenuPrivate::DrawSelf(MythPainter *p,
 
 ////////////////////////////////////////////////////////////////////////////
 
-ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
+MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
                        MythScreenStack *parent, const char *name,
-                       bool allowreorder, ThemedMenuState *state)
+                       bool allowreorder, MythThemedMenuState *state)
           : MythScreenType(parent, name)
 {
-    d = new ThemedMenuPrivate(this, cdir, state);
+    d = new MythThemedMenuPrivate(this, cdir, state);
     d->m_state->allowreorder = allowreorder;
 
     Init(cdir, menufile);
 }
 
-void ThemedMenu::Init(const char *cdir, const char *menufile)
+void MythThemedMenu::Init(const char *cdir, const char *menufile)
 {
     QString dir = QString(cdir) + "/";
     QString filename = dir + "theme.xml";
@@ -2263,34 +2263,34 @@ void ThemedMenu::Init(const char *cdir, const char *menufile)
         d->parseMenu(menufile);
 }
 
-ThemedMenu::~ThemedMenu(void)
+MythThemedMenu::~MythThemedMenu(void)
 {
     if (d)
         delete d;
 }
 
-bool ThemedMenu::foundTheme(void)
+bool MythThemedMenu::foundTheme(void)
 {
     return d->foundtheme;
 }
 
-void ThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
+void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
 {
     d->m_state->callback = lcallback;
     d->m_state->callbackdata = data;
 }
 
-void ThemedMenu::setKillable(void)
+void MythThemedMenu::setKillable(void)
 {
     d->m_state->killable = true;
 }
 
-QString ThemedMenu::getSelection(void)
+QString MythThemedMenu::getSelection(void)
 {
     return d->selection;
 }
 
-void ThemedMenu::ReloadExitKey(void)
+void MythThemedMenu::ReloadExitKey(void)
 {
     int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
     d->m_state->killable = (allowsd == 4);
@@ -2305,7 +2305,7 @@ void ThemedMenu::ReloadExitKey(void)
         d->exitModifier = -1;
 }
 
-void ThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+void MythThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
                           int alphaMod, QRect clipRect)
 {
 #if 0
@@ -2316,13 +2316,13 @@ void ThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     d->DrawSelf(p, xoffset, yoffset, alpha);
 }
 
-void ThemedMenu::ReloadTheme(void)
+void MythThemedMenu::ReloadTheme(void)
 {
     if (!d->ReloadTheme())
         d->foundtheme = false;
 }
 
-bool ThemedMenu::keyPressEvent(QKeyEvent *e)
+bool MythThemedMenu::keyPressEvent(QKeyEvent *e)
 {
     if (d->ignorekeys)
         return false;

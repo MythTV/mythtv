@@ -33,9 +33,8 @@ SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
 SOURCES += virtualkeyboard.cpp mythobservable.cpp
 
-INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
-DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
-
+INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../
+DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
 
 LIBS += -L../libmythsamplerate -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch -lmythsoundtouch-$${LIBVERSION}

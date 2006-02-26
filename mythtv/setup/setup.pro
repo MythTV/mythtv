@@ -2,18 +2,18 @@ include ( ../config.mak )
 include ( ../settings.pro )
 
 TEMPLATE = app
-CONFIG += thread
+CONFIG += thread opengl
 TARGET = mythtv-setup
 target.path = $${PREFIX}/bin
 
 INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth
 
 LIBS += -L../libs/libmyth -L../libs/libmythtv -L../libs/libavcodec
-LIBS += -L../libs/libavformat -L../libs/libavutil
+LIBS += -L../libs/libavformat -L../libs/libavutil -L../libs/libmythui
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION -lmythavutil-$$LIBVERSION
-LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 
 LIBS += `freetype-config --libs`
 
@@ -23,6 +23,7 @@ isEmpty(QMAKE_EXTENSION_SHLIB) {
 isEmpty(QMAKE_EXTENSION_LIB) {
   QMAKE_EXTENSION_LIB=a
 }
+TARGETDEPS += ../libs/libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libs/libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libs/libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
@@ -30,7 +31,7 @@ TARGETDEPS += ../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENS
 TARGETDEPS += ../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 DEPENDPATH += ../libs/libmythtv ../libs/libmyth ../libs/libavcodec
-DEPENDPATH += ../libs/libavformat ../libs/libavutil
+DEPENDPATH += ../libs/libavformat ../libs/libavutil ../libs/libmythui
 
 INCLUDEPATH += ../libs/libmythtv/dvbdev
 

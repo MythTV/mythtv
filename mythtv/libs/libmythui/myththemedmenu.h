@@ -1,20 +1,20 @@
-#ifndef THEMEDMENU_H_
-#define THEMEDMENU_H_
+#ifndef MYTHTHEMEDMENU_H_
+#define MYTHTHEMEDMENU_H_
 
 #include "mythscreentype.h"
 
 class MythMainWindow;
-class ThemedMenuPrivate;
-class ThemedMenuState;
+class MythThemedMenuPrivate;
+class MythThemedMenuState;
 
-class ThemedMenu : public MythScreenType
+class MythThemedMenu : public MythScreenType
 {
     Q_OBJECT
   public:
-    ThemedMenu(const char *cdir, const char *menufile,
+    MythThemedMenu(const char *cdir, const char *menufile,
                MythScreenStack *parent, const char *name, 
-               bool allowreorder = true, ThemedMenuState *state = NULL);
-   ~ThemedMenu();
+               bool allowreorder = true, MythThemedMenuState *state = NULL);
+   ~MythThemedMenu();
 
     bool foundTheme(void);
 
@@ -34,7 +34,7 @@ class ThemedMenu : public MythScreenType
   private:
     void Init(const char *cdir, const char *menufile);
 
-    ThemedMenuPrivate *d;
+    MythThemedMenuPrivate *d;
 };
 
 #endif
