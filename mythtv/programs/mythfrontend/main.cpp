@@ -847,6 +847,8 @@ int main(int argc, char **argv)
                 for (unsigned int index = 0; index < pairs.size(); ++index)
                 {
                     QStringList tokens = QStringList::split("=", pairs[index]);
+                    tokens[0].replace(QRegExp("^[\"']"), "");
+                    tokens[0].replace(QRegExp("[\"']$"), "");
                     tokens[1].replace(QRegExp("^[\"']"), "");
                     tokens[1].replace(QRegExp("[\"']$"), "");
                     settingsOverride[tokens[0]] = tokens[1];
