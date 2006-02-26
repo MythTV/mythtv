@@ -253,6 +253,11 @@ class MythContextPrivate
     QMutex *m_priv_mutex;
     queue<MythPrivRequest> m_priv_requests;
     QWaitCondition m_priv_queued;
+
+    bool useSettingsCache;
+    QMutex settingsCacheLock;
+    QMap <QString, QString> settingsCache;      // permanent settings in the DB
+    QMap <QString, QString> overriddenSettings; // overridden this session only
 };
 
 
@@ -283,7 +288,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       screensaverEnabled(false),
       display_res(NULL),
-      m_priv_mutex(new QMutex(true))
+      m_priv_mutex(new QMutex(true)),
+      useSettingsCache(false)
 {
     char *tmp_installprefix = getenv("MYTHTVDIR");
     if (tmp_installprefix)
@@ -790,8 +796,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
 }
 
 MythContext::MythContext(const QString &binversion)
-    : QObject(), d(NULL), app_binary_version(binversion),
-      useSettingsCache(false)
+    : QObject(), d(NULL), app_binary_version(binversion)
 {
     qInitNetworkProtocols();
 }
@@ -1056,30 +1061,36 @@ QString MythContext::GetMasterHostPrefix(void)
 
 void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 {
-    cacheLock.lock();
-    if (myKey != "" && settingsCache.contains(myKey))
+    if (!d)
+        return;
+
+    d->settingsCacheLock.lock();
+    if (myKey != "" && d->settingsCache.contains(myKey))
     {
         VERBOSE(VB_DATABASE, QString("Clearing Settings Cache for '%1'.")
                                     .arg(myKey));
-        settingsCache.remove(myKey);
-        settingsCache[myKey] = newVal;
+        d->settingsCache.remove(myKey);
+        d->settingsCache[myKey] = newVal;
     }
     else
     {
         VERBOSE(VB_DATABASE, "Clearing Settings Cache.");
-        settingsCache.clear();
+        d->settingsCache.clear();
     }
-    cacheLock.unlock();
+    d->settingsCacheLock.unlock();
 }
 
 void MythContext::ActivateSettingsCache(bool activate)
 {
+    if (!d)
+        return;
+
     if (activate)
         VERBOSE(VB_DATABASE, "Enabling Settings Cache.");
     else
         VERBOSE(VB_DATABASE, "Disabling Settings Cache.");
 
-    useSettingsCache = activate;
+    d->useSettingsCache = activate;
     ClearSettingsCache();
 }
 
@@ -1768,16 +1779,23 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     bool found = false;
     QString value;
 
-    if (useSettingsCache)
+    // By putting this code here, we override settings even when we're
+    // not using the settings cache.
+    if (d && d->overriddenSettings.contains(key)) {
+        value = d->overriddenSettings[key];
+        return value;
+    }
+
+    if (d && d->useSettingsCache)
     {
-        cacheLock.lock();
-        if (settingsCache.contains(key))
+        d->settingsCacheLock.lock();
+        if (d->settingsCache.contains(key))
         {
-            value = settingsCache[key];
-            cacheLock.unlock();
+            value = d->settingsCache[key];
+            d->settingsCacheLock.unlock();
             return value;
         }
-        cacheLock.unlock();
+        d->settingsCacheLock.unlock();
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1820,11 +1838,11 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     if (!found)
         value = d->m_settings->GetSetting(key, defaultval); 
 
-    if (useSettingsCache)
+    if (d && d->useSettingsCache)
     {
-        cacheLock.lock();
-        settingsCache[key] = value;
-        cacheLock.unlock();
+        d->settingsCacheLock.lock();
+        d->settingsCache[key] = value;
+        d->settingsCacheLock.unlock();
     }
 
     return value;
@@ -1852,17 +1870,17 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
     bool found = false;
     QString value = defaultval;
 
-    if (useSettingsCache)
+    if (d && d->useSettingsCache)
     {
         QString myKey = host + " " + key;
-        cacheLock.lock();
-        if (settingsCache.contains(myKey))
+        d->settingsCacheLock.lock();
+        if (d->settingsCache.contains(myKey))
         {
-            value = settingsCache[myKey];
-            cacheLock.unlock();
+            value = d->settingsCache[myKey];
+            d->settingsCacheLock.unlock();
             return value;
         }
-        cacheLock.unlock();
+        d->settingsCacheLock.unlock();
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1887,11 +1905,11 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
                                 .arg(key));
     }
 
-    if (found && useSettingsCache)
+    if (found && d && d->useSettingsCache)
     {
-        cacheLock.lock();
-        settingsCache[host + " " + key] = value;
-        cacheLock.unlock();
+        d->settingsCacheLock.lock();
+        d->settingsCache[host + " " + key] = value;
+        d->settingsCacheLock.unlock();
     }
 
     return value;
@@ -2292,6 +2310,19 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
     d->m_settings->SetSetting(key, newValue);
     ClearSettingsCache(key, newValue);
 }
+
+/** \fn MythContext::OverrideSettingForSession()
+ *  \brief Overrides the given setting for the execution time of the process.
+ *
+ * This allows defining settings for the session only, without touching the
+ * settings in the data base.
+ */
+void MythContext::OverrideSettingForSession(const QString &key, 
+                                            const QString &value)
+{
+    d->overriddenSettings[key] = value;
+}
+
 
 bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout, bool block)
 {
@@ -2817,3 +2848,4 @@ QString MythContext::getCurrentLocation(void)
     return currentLocation.last();
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

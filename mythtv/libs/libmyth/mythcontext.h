@@ -216,7 +216,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20060225-1"
+#define MYTH_BINARY_VERSION "0.19.20060226-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -250,6 +250,7 @@ class MythContext : public QObject, public MythObservable
 
     void ClearSettingsCache(QString myKey = "", QString newVal = "");
     void ActivateSettingsCache(bool activate = true);
+    void OverrideSettingForSession(const QString &key, const QString &newValue);
 
     bool ConnectToMasterServer(bool blockingClient = true);
     QSocketDevice *ConnectServer(QSocket *eventSocket,
@@ -424,10 +425,6 @@ class MythContext : public QObject, public MythObservable
     MythContextPrivate *d;
     QString app_binary_version;
 
-    bool useSettingsCache;
-    QMutex cacheLock;
-    QMap <QString, QString> settingsCache;
-
     QMutex locationLock;
     QValueList <QString> currentLocation;
 };
@@ -439,3 +436,5 @@ extern MythContext *gContext;
 extern QMutex avcodeclock;
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

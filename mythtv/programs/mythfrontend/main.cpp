@@ -755,6 +755,7 @@ int main(int argc, char **argv)
     QString logfile = "";
 
     QString pluginname = "";
+    QMap<QString, QString> settingsOverride;
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -820,6 +821,45 @@ int main(int argc, char **argv)
         {
             ResetSettings = true;
         }
+        else if (!strcmp(a.argv()[argpos],"-w") ||
+                 !strcmp(a.argv()[argpos],"--windowed"))
+        {
+            settingsOverride["RunFrontendInWindow"] = "1";
+        }
+        else if (!strcmp(a.argv()[argpos],"-nw") ||
+                 !strcmp(a.argv()[argpos],"--no-windowed"))
+        {
+            settingsOverride["RunFrontendInWindow"] = "0";
+        }
+        else if (!strcmp(a.argv()[argpos],"-O") ||
+                 !strcmp(a.argv()[argpos],"--override-setting"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                QString tmpArg = a.argv()[argpos+1];
+                if (tmpArg.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                } 
+ 
+                QStringList pairs = QStringList::split(",", tmpArg);
+                for (unsigned int index = 0; index < pairs.size(); ++index)
+                {
+                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    tokens[1].replace(QRegExp("^[\"']"), "");
+                    tokens[1].replace(QRegExp("[\"']$"), "");
+                    settingsOverride[tokens[0]] = tokens[1];
+                }
+            }
+            else
+            {
+                cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
                  !strcmp(a.argv()[argpos],"--geometry"))
         {
@@ -859,6 +899,11 @@ int main(int argc, char **argv)
                     "--geometry WxH+X+Y             Override window size and position\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
                     "-r or --reset                  Resets frontend appearance settings and language" << endl <<
+                    "-w or --windowed               Run in windowed mode" << endl <<
+                    "-nw or --no-windowed           Run in non-windowed mode " << endl <<
+                    "-O or " << endl <<
+                    "  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'" << endl <<
+                    "                               This option may be repeated multiple times" << endl <<
                     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
 
                     "--version                      Version information" << endl <<
@@ -931,6 +976,17 @@ int main(int argc, char **argv)
         VERBOSE(VB_IMPORTANT,
                 QString("Illegal -geometry argument '%1' (ignored)")
                 .arg(geometry));
+    }
+
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(it.data()));
+            gContext->OverrideSettingForSession(it.key(), it.data());
+        }
     }
 
     // Create priveleged thread, then drop privs

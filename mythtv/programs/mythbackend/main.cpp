@@ -226,7 +226,7 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv, false);
 
-    
+    QMap<QString, QString> settingsOverride;
     QString binname = basename(a.argv()[0]);
 
     bool daemonize = false;
@@ -279,6 +279,35 @@ int main(int argc, char **argv)
         {
             daemonize = true;
 
+        }
+        else if (!strcmp(a.argv()[argpos],"-O") ||
+                 !strcmp(a.argv()[argpos],"--override-setting"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                QString tmpArg = a.argv()[argpos+1];
+                if (tmpArg.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                } 
+ 
+                QStringList pairs = QStringList::split(",", tmpArg);
+                for (unsigned int index = 0; index < pairs.size(); ++index)
+                {
+                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    tokens[1].replace(QRegExp("^[\"']"), "");
+                    tokens[1].replace(QRegExp("[\"']$"), "");
+                    settingsOverride[tokens[0]] = tokens[1];
+                }
+            }
+            else
+            {
+                cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
@@ -412,6 +441,17 @@ int main(int argc, char **argv)
     gContext->SetBackend(true);
 
     close(0);
+
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(it.data()));
+            gContext->OverrideSettingForSession(it.key(), it.data());
+        }
+    }
 
     gContext->ActivateSettingsCache(false);
     if (!UpgradeTVDatabaseSchema())
@@ -580,3 +620,5 @@ int main(int argc, char **argv)
 
     return BACKEND_EXIT_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
