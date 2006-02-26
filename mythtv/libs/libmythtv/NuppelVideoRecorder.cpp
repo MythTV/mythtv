@@ -630,7 +630,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     {
 #if !defined (HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
         VERBOSE(VB_IMPORTANT,
-		        QString("NVR::AudioInit() This Unix doesn't support"
+                QString("NVR::AudioInit() This Unix doesn't support"
                         " device files for audio access. Skipping"));
         return 1;
 #else
