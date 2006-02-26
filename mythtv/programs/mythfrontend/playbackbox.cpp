@@ -3731,7 +3731,7 @@ void PlaybackBox::showIconHelp(void)
     iconMap["inuse"]       = tr("Recording is in use");
     iconMap["transcoded"]  = tr("Recording has been transcoded");
     iconMap["stereo"]      = tr("Recording is in Stereo");
-    iconMap["cc"]          = tr("Recording is Close Captioned");
+    iconMap["cc"]          = tr("Recording is Closed Captioned");
     iconMap["hdtv"]        = tr("Recording is in High Definition");
 
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
