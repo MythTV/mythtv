@@ -3232,7 +3232,7 @@ void ProgramInfo::showDetails(void) const
     if (hdtv)
         attr += QObject::tr("HDTV") + ", ";
     if (closecaptioned)
-        attr += QObject::tr("CC","Close Captioned") + ", ";
+        attr += QObject::tr("CC","Closed Captioned") + ", ";
     if (subtitled)
         attr += QObject::tr("Subtitled") + ", ";
     if (stereo)
