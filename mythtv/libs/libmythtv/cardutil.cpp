@@ -798,7 +798,7 @@ void CardUtil::GetCardInputs(
     if ("DVB" == cardtype)
     {
         QValueList<DVBDiSEqCInput> dvbinputs;
-        int diseq_type = 0; // TODO
+        int diseq_type = GetDISEqCType(cardid);
         dvbinputs = fillDVBInputsDiSEqC(diseq_type);
         QValueList<DVBDiSEqCInput>::iterator it;
         for (it = dvbinputs.begin(); it != dvbinputs.end(); ++it)
