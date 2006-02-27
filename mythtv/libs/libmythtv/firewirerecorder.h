@@ -17,13 +17,6 @@ class MPEGStreamData;
 class ProgramAssociationTable;
 class ProgramMapTable;
 
-#define FIREWIRE_TIMEOUT 15
-
-#define FIREWIRE_CONNECTION_P2P		0
-#define FIREWIRE_CONNECTION_BROADCAST	1
-
-#define FIREWIRE_CHANNEL_BROADCAST	63
-
 /** \class FirewireRecorder
  *  \brief This is a specialization of DTVRecorder used to
  *         handle DVB and ATSC streams from a firewire input.
@@ -35,49 +28,60 @@ class FirewireRecorder : public DTVRecorder
   Q_OBJECT
     friend class MPEGStreamData;
     friend class TSPacketProcessor;
+    friend int fw_tspacket_handler(unsigned char*,int,uint,void*);
 
   public:
     FirewireRecorder(TVRec *rec);
-    ~FirewireRecorder();
+   ~FirewireRecorder();
 
+    // Commands
     void StartRecording(void);
     bool Open(void); 
-    void ProcessTSPacket(const TSPacket &tspacket);
+    bool PauseAndWait(int timeout = 100);
+
+    // Sets
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev);
-
     void SetOption(const QString &name, const QString &value);
     void SetOption(const QString &name, int value);
-    QString FirewireSpeedString(int speed);
     void SetStreamData(MPEGStreamData*);
-    MPEGStreamData* StreamData(void) { return _mpeg_stream_data; }
 
-    bool PauseAndWait(int timeout = 100);
+    // Gets
+    MPEGStreamData* StreamData(void) { return _mpeg_stream_data; }
 
   public slots:
     void deleteLater(void);
+    void WritePAT(ProgramAssociationTable*);
+    void WritePMT(ProgramMapTable*);
         
   private:
     void Close(void);
-
-  private slots:
-    void WritePAT(ProgramAssociationTable*);
-    void WritePMT(ProgramMapTable*);
+    void ProcessTSPacket(const TSPacket &tspacket);
 
   private:
-    int fwport, fwchannel, fwspeed, fwbandwidth, fwfd, fwconnection;
-    int fwoplug, fwiplug;
-    QString fwmodel;
-    nodeid_t fwnode;
-    raw1394handle_t fwhandle;
+    int              fwport;
+    int              fwchannel;
+    int              fwspeed;
+    int              fwbandwidth;
+    int              fwfd;
+    int              fwconnection;
+    int              fwoplug;
+    int              fwiplug;
+    QString          fwmodel;
+    nodeid_t         fwnode;
+    raw1394handle_t  fwhandle;
     iec61883_mpeg2_t fwmpeg;
-    bool isopen;
-    time_t lastpacket;
-    MPEGStreamData *_mpeg_stream_data;
-    TSStats         _ts_stats;
-    
+    bool             isopen;
+    time_t           lastpacket;
+    MPEGStreamData  *_mpeg_stream_data;
+    TSStats          _ts_stats;  
+
+    static const int kBroadcastChannel;
+    static const int kTimeoutInSeconds;
+    static const int kConnectionP2P;
+    static const int kConnectionBroadcast;
 };
 
 #endif
