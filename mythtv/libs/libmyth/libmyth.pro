@@ -87,6 +87,9 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
 
+    # There is a dependence on some stuff in libmythui.
+    # It isn't built yet, so we have to ignore these for now:
+    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
 
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC6000000
 }

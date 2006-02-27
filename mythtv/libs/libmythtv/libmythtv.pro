@@ -61,6 +61,10 @@ macx {
         QMAKE_EXT_CPP += .mm
     }
 
+    # There is a dependence on some stuff in libmythui.
+    # It isn't built yet, so we have to ignore these for now:
+    QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
+
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
 
