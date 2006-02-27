@@ -126,6 +126,13 @@ bool FirewireRecorder::Open() {
          return false;
      }
      
+     // set buffer size
+     size_t buffer_size = gContext->GetNumSetting("HDRingbufferSize", 
+                                                  50 * TSPacket::SIZE);
+     iec61883_mpeg2_set_buffers(fwmpeg, buffer_size / 2);
+     VERBOSE(VB_IMPORTANT, QString("Firewire: Buffer size %1 KB")
+             .arg(buffer_size));
+
      // set speed if needed
      // probably shouldnt even allow user to set, 100Mbps should be more the enough
      int curspeed = iec61883_mpeg2_get_speed(fwmpeg);
@@ -227,6 +234,9 @@ void FirewireRecorder::StartRecording(void) {
     }        
 
     iec61883_mpeg2_recv_stop(fwmpeg);
+    VERBOSE(VB_IMPORTANT, QString("Firewire: Total dropped packets %1")
+            .arg(iec61883_mpeg2_get_dropped(fwmpeg)));
+
     FinishRecording();
     _recording = false;
 }  
