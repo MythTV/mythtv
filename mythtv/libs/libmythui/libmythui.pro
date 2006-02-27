@@ -60,3 +60,11 @@ macx {
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xCC000000
 }
 
+using_joystick_menu {
+    DEFINES += USE_JOYSTICK_MENU
+}
+
+using_lirc {
+    DEFINES += USE_LIRC
+}
+
