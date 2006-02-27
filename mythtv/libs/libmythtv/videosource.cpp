@@ -1865,6 +1865,41 @@ CardInputEditor::~CardInputEditor()
     // CardInput instances are deleted by Qt, no need to do that here
 }
 
+static QString remove_chaff(const QString &name)
+{
+    // Trim off some of the chaff.
+    QString short_name = name;
+    if (short_name.left(14) == "LG Electronics")
+        short_name = short_name.right(short_name.length() - 15);
+    if (short_name.left(4) == "Oren")
+        short_name = short_name.right(short_name.length() - 5);
+    if (short_name.right(8) == "Frontend")
+        short_name = short_name.left(short_name.length() - 9);
+    if (short_name.right(7) == "VSB/QAM")
+        short_name = short_name.left(short_name.length() - 8);
+    if (short_name.right(3) == "VSB")
+        short_name = short_name.left(short_name.length() - 4);
+
+    // It would be infinitely better if DVB allowed us to query
+    // the vendor ID. But instead we have to guess based on the
+    // demodulator name. This means cards like the Air2PC HD5000
+    // and DViCO Fusion HDTV cards are not identified correctly.
+    if (short_name.left(7).lower() == "or51211")
+        short_name = "pcHDTV HD-2000";
+    else if (short_name.left(7).lower() == "or51132")
+        short_name = "pcHDTV HD-3000";
+    else if (short_name.left(7).lower() == "bcm3510")
+        short_name = "Air2PC v1";
+    else if (short_name.left(7).lower() == "nxt2002")
+        short_name = "Air2PC v2";
+    else if (short_name.left(8).lower() == "lgdt3302")
+        short_name = "DViCO HDTV3";
+    else if (short_name.left(8).lower() == "lgdt3303")
+        short_name = "DViCO v2 or Air2PC v3";
+
+    return short_name;
+}
+
 void DVBConfigurationGroup::probeCard(const QString& cardNumber)
 {
 #ifdef USING_DVB
@@ -1910,16 +1945,18 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
             }
             break;
         case CardUtil::ATSC:
+        {
+            QString short_name = remove_chaff(name);
             cardtype->setValue("ATSC");
-            cardname->setValue(name);
+            cardname->setValue(short_name);
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
 
-            buttonAnalog->setVisible(name.left(6)  == "pcHDTV"       ||
-                                     name.left(12) == "Oren OR51132" ||
-                                     name.left(12) == "Oren OR51211");
-
-            break;
+            buttonAnalog->setVisible(
+                short_name.left(6).lower() == "pchdtv" ||
+                short_name.left(5).lower() == "dvico");
+        }
+        break;
         default:
             fEnable = false;
     }
@@ -2001,13 +2038,22 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
 
     TransButtonSetting *buttonDiSEqC = new TransButtonSetting();
     buttonDiSEqC->setLabel(tr("DiSEqC"));
+    buttonDiSEqC->setHelpText(tr("Input and satellite settings."));
 
     buttonAnalog = new TransButtonSetting();
     buttonAnalog->setLabel(tr("Analog Options"));
     buttonAnalog->setVisible(false);
+    buttonAnalog->setHelpText(
+        tr("Analog child card settings."
+           "\nWARNING: Do not press button if you are "
+           "using an Air2PC HD-5000 card!!!! "
+           "This card does not support analog tuning, "
+           "but the DVB drivers do not yet allow us to "
+           "detect this problem."));
 
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));    
+    buttonDiSEqC->setHelpText(tr("Various additional settings."));
 
     HorizontalConfigurationGroup *advcfg = 
         new HorizontalConfigurationGroup(false, false, true, true);
