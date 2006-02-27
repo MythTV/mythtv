@@ -465,12 +465,29 @@ static int handle_cc_c3(CC708Reader* cc, uint service_num, int i)
     return i;
 }
 
+static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
+{
+    uint min_new_size = block_size + cc->buf_size[service_num];
+    if (min_new_size >= cc->buf_alloc[service_num])
+    {
+        uint new_alloc    = cc->buf_alloc[service_num];
+        for (uint i = 0; (i < 32) && (new_alloc <= min_new_size); i++)
+            new_alloc *= 2;
+        cc->buf[service_num] = (unsigned char*) realloc(cc->buf, new_alloc);
+        cc->buf_alloc[service_num] = (cc->buf) ? new_alloc : 0;
+#if DEBUG_CC_SERVICE_2
+        fprintf(stderr, "rightsize_buf: srv %i to %i bytes",
+                service_num, cc->buf_alloc[service_num]);
+#endif
+    }
+    assert(min_new_size < cc->buf_alloc[service_num]);
+}
+
 static void append_cc(CC708Reader* cc, uint service_num,
                       const unsigned char* blk_buf, int block_size)
 {
     assert(cc);
-    assert(block_size + cc->buf_size[service_num] <
-           cc->buf_alloc[service_num]);
+    rightsize_buf(cc, service_num, block_size);
 
     memcpy(cc->buf[service_num] + cc->buf_size[service_num],
            blk_buf, block_size);
