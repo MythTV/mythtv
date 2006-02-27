@@ -519,7 +519,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
     {
         int j;
         fprintf(stderr, "CC length(%2i) seq_num(%i) ", len, seq_num);
-        for (j=1; j<pkt_size; j++)
+        for (j = 0; j < pkt_size; j++)
             fprintf(stderr, "0x%x ", pkt_buf[j]);
         fprintf(stderr, "\n");
     }
