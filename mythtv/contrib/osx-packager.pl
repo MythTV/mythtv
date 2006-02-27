@@ -116,7 +116,7 @@ our %depend = (
   =>
   {
     'url' 
-    => 'http://ftp.snt.utwente.nl/pub/software/mysql/Downloads/MySQL-4.1/mysql-4.1.18.tar.gz',
+    => 'http://mysql.binarycompass.org/Downloads/MySQL-4.1/mysql-4.1.18.tar.gz',
     'conf'
     =>  [
           '--without-debug',
