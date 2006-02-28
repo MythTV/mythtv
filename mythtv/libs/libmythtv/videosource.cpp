@@ -1864,6 +1864,7 @@ CardInputEditor::~CardInputEditor()
     // CardInput instances are deleted by Qt, no need to do that here
 }
 
+#ifdef USING_DVB
 static QString remove_chaff(const QString &name)
 {
     // Trim off some of the chaff.
@@ -1898,9 +1899,12 @@ static QString remove_chaff(const QString &name)
 
     return short_name;
 }
+#endif // USING_DVB
 
 void DVBConfigurationGroup::probeCard(const QString &videodevice)
 {
+    (void) videodevice;
+
 #ifdef USING_DVB
     uint dvbdev = videodevice.toUInt();
     QString frontend_name = CardUtil::ProbeDVBFrontendName(dvbdev);
@@ -1966,7 +1970,6 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             break;
     }
 #else
-    (void)cardNumber;
     cardtype->setValue(QString("Recompile with DVB-Support!"));
 #endif
 }
