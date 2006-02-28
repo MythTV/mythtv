@@ -2595,16 +2595,17 @@ bool Weather::GetAnimatedRadarMap()
          cerr << "MythWeather: Map File Prefix: " << fileprefix << endl;
 
      // delete existing radar maps
-     for (int x = 1; x <= 10; x++)
+     for (int x = 0; x < 10; x++)
          QFile::remove(QString(fileprefix + "/radar%1.jpg").arg(x));
 
      if (debug)
          cerr << "MythWeather: Copying Map Files from Server (" << imageLoc << ")...\n";
 
-     for (int x = 1; x <= imageCount; x++)
+     for (int x = 0; x < imageCount; x++)
      {
          QString sFile = QString(fileprefix + "/radar%1.jpg").arg(x);
-         sURL = QString("http://image.weather.com" + imageLoc + "%1L.jpg").arg(x);
+         sURL = QString("http://image.weather.com" + imageLoc + "%1L.jpg")
+		                .arg(x + 1);
          if (!HttpComms::getHttpFile(sFile, sURL, weatherTimeoutInt))
              cerr << "Failed to download image from:" << sURL << endl;
      }
