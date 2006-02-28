@@ -1324,6 +1324,10 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
             }
             else if (action == "MENU")
                 emit menuButtonPressed(currentItem());
+            else if (action == "EDIT")
+                emit editButtonPressed(currentItem());
+            else if (action == "DELETE")
+                emit deleteButtonPressed(currentItem());
             else if (action == "SELECT")
                 emit accepted(currentItem());
         }

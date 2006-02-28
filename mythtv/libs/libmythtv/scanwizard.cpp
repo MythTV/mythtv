@@ -398,15 +398,13 @@ void ScanWizardScanner::scan()
         if (device.isEmpty())
             return;
 
-        QString cn, card_type;
-        int nCardType = CardUtil::GetCardType(ccardid, cn, card_type);
-        (void) nCardType;
+        QString card_type = CardUtil::GetRawCardType(cardid, nVideoSource);
 #ifdef USING_DVB
-        if (CardUtil::IsDVB(cardid))
+        if ("DVB" == card_type)
             channel = new DVBChannel(device.toInt());
 #endif
 #ifdef USING_V4L
-        if (nCardType == CardUtil::HDTV)
+        if ("HDTV" == card_type)
             channel = new Channel(NULL, device);
 #endif
         if (!channel)
@@ -599,9 +597,10 @@ void ScanWizard::captureCard(const QString& str)
     if ((nCaptureCard != nNewCaptureCard) ||
         (nCardType == CardUtil::ERROR_OPEN))
     {
-        nCaptureCard = nNewCaptureCard;
-        nCardType = CardUtil::GetCardType(nCaptureCard);
-        QString fmt = SourceUtil::GetChannelFormat(videoSource());
+        nCaptureCard    = nNewCaptureCard;
+        QString subtype = CardUtil::ProbeSubTypeName(nCaptureCard, 0);
+        nCardType       = CardUtil::toCardType(subtype);
+        QString fmt     = SourceUtil::GetChannelFormat(videoSource());
         paneATSC->SetDefaultFormat(fmt);
         emit cardTypeChanged(QString::number(nCardType));
     }

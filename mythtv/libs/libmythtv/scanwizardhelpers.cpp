@@ -262,8 +262,9 @@ void ScanTypeSetting::refresh(const QString& card)
     if (nCard == nCaptureCard)
         return;
 
-    nCaptureCard = nCard;
-    int nCardType = CardUtil::GetCardType(nCard);
+    nCaptureCard    = nCard;
+    QString subtype = CardUtil::ProbeSubTypeName(nCard, 0);
+    int nCardType   = CardUtil::toCardType(subtype);
     clearSelections();
 
     switch (nCardType)

@@ -367,6 +367,8 @@ class MythListBox: public QListBox {
     void changeHelpText(QString);
     void accepted(int);
     void menuButtonPressed(int);
+    void editButtonPressed(int);
+    void deleteButtonPressed(int);
 
   private:
     QString helptext;

@@ -45,57 +45,66 @@ bool CardUtil::IsCardTypePresent(const QString &strType)
     return false;
 }
 
-/** \fn CardUtil::GetDVBType(uint, QString&, QString&)
- *  \brief Returns the card type from the video device
- *  \param device    DVB videodevice to be checked
- *  \param name      Returns the probed card name
- *  \param card_type Returns the card type as a string
- *  \return the card type
- */
-enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
-    uint device, QString &name, QString &card_type)
+QString CardUtil::ProbeDVBType(uint device)
 {
-    (void)device;
-    (void)name;
-    (void)card_type;
+    QString ret = "ERROR_UNKNOWN";
 
-    CARD_TYPES nRet = ERROR_OPEN;
 #ifdef USING_DVB
-    int fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, device),
-                           O_RDWR | O_NONBLOCK);
-    if (fd_frontend >= 0)
+    QString dvbdev = dvbdevice(DVB_DEV_FRONTEND, device);
+    int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
+    if (fd_frontend < 0)
+        return "ERROR_OPEN";
+
+    struct dvb_frontend_info info;
+    int err = ioctl(fd_frontend, FE_GET_INFO, &info);
+    if (err < 0)
     {
-        struct dvb_frontend_info info;
-        nRet = ERROR_PROBE;
-        if (ioctl(fd_frontend, FE_GET_INFO, &info) >= 0)
-        {
-            name = info.name;
-            switch(info.type)
-            {
-            case FE_QAM:
-                nRet = QAM;
-                card_type = "QAM";
-                break;
-            case FE_QPSK:
-                nRet = QPSK;
-                card_type = "QPSK";
-                break;
-            case FE_OFDM:
-                nRet = OFDM;
-                card_type = "OFDM";
-                break;
-#if (DVB_API_VERSION_MINOR == 1)
-            case FE_ATSC:
-                nRet = ATSC;
-                card_type = "ATSC";
-                break;
-#endif
-            }
-        }
         close(fd_frontend);
-    } 
-#endif
-    return nRet;
+        return "ERROR_PROBE";
+    }
+
+    if (FE_QAM == info.type)
+        ret = "QAM";
+    else if (FE_QPSK == info.type)
+        ret = "QPSK";
+    else if (FE_OFDM == info.type)
+        ret = "OFDM";
+    else if (FE_ATSC == info.type)
+        ret = "ATSC";
+
+    close(fd_frontend);
+#endif // USING_DVB
+
+    return ret;
+}
+
+/** \fn CardUtil::ProbeDVBFrontendName(uint)
+ *  \brief Returns the card type from the video device
+ */
+QString CardUtil::ProbeDVBFrontendName(uint device)
+{
+    QString ret = "ERROR_UNKNOWN";
+
+#ifdef USING_DVB
+    QString dvbdev = dvbdevice(DVB_DEV_FRONTEND, device);
+    int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
+    if (fd_frontend < 0)
+        return "ERROR_OPEN";
+
+    struct dvb_frontend_info info;
+    int err = ioctl(fd_frontend, FE_GET_INFO, &info);
+    if (err < 0)
+    {
+        close(fd_frontend);
+        return "ERROR_PROBE";
+    }
+
+    ret = info.name;
+
+    close(fd_frontend);
+#endif // USING_DVB
+
+    return ret;
 }
 
 /** \fn CardUtil::HasDVBCRCBug(uint)
@@ -103,87 +112,33 @@ enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
  *         PAT/PMT tables, and then doesn't fix the CRC.
  *
  *   Currently the list of broken DVB hardware and drivers includes:
- *   "Philips TDA10046H DVB-T", "VLSI VES1x93 DVB-S", and "ST STV0299 DVB-S"
+ *   "Philips TDA10046H DVB-T", "VLSI VES1x93 DVB-S", "DST DVB-S" and
+ *   "ST STV0299 DVB-S"
  *
  *  \param device video dev to be checked
  *  \return true iff the device munges tables, so that they fail a CRC check.
  */
 bool CardUtil::HasDVBCRCBug(uint device)
 {
-    QString name(""), type("");
-    GetDVBType(device, name, type);
+    QString name = ProbeDVBFrontendName(device);
     return ((name == "Philips TDA10046H DVB-T") || // munges PMT
             (name == "VLSI VES1x93 DVB-S")      || // munges PMT
             (name == "DST DVB-S")               || // munges PAT
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
-/** \fn CardUtil::GetCardType(uint, QString&, QString&)
- *  \brief Returns the card type from the video device
- *  \param nCardID   cardid of card to be checked
- *  \param name      Returns the probed card name
- *  \param card_type Returns the card type as a string
- *  \return the card type from CARD_TYPES enum
- */
-enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name,
-                                                QString &card_type)
+QString CardUtil::ProbeSubTypeName(uint cardid, const QString &inputname)
 {
-    CARD_TYPES nRet = ERROR_OPEN;
-    QString strDevice;
+    QString type = GetRawCardType(cardid, inputname);
+    if ("DVB" != type)
+        return type;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT videodevice, cardtype "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID");
-    query.bindValue(":CARDID", nCardID);
+    QString device = GetVideoDevice(cardid, inputname);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        strDevice = query.value(0).toString();
-        card_type = query.value(1).toString().upper();
-    }
-    else
-        return nRet;
+    if (device.isEmpty())
+        return "ERROR_OPEN";
 
-    if (card_type == "V4L")
-        nRet = V4L;
-    else if (card_type == "MPEG")
-        nRet = MPEG;
-    else if (card_type == "FIREWIRE")
-        nRet = FIREWIRE;
-    else if (card_type == "HDTV")
-        nRet = HDTV;
-#ifdef USING_DVB
-    else if (card_type == "DVB")
-        nRet = GetDVBType(strDevice.toInt(), name, card_type);
-#else
-    (void)name;
-#endif
-    return nRet;
-}
-
-/** \fn CardUtil::GetCardType(uint, QString&)
- *  \brief Returns the card type from the video device
- *  \param nCardID   cardid of card to be checked
- *  \param name      Returns the probed card name
- *  \return the card type
- */
-enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name)
-{
-    QString card_type;
-    return CardUtil::GetCardType(nCardID, name, card_type);
-}
-
-/** \fn CardUtil::GetCardType(uint)
- *  \brief Returns the card type from the video device
- *  \param nCardID   cardid of card to be checked
- *  \return the card type
- */
-enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID)
-{
-    QString name, card_type;
-    return CardUtil::GetCardType(nCardID, name, card_type);
+    return ProbeDVBType(device.toUInt());
 }
 
 /** \fn CardUtil::IsDVBCardType(const QString)
@@ -196,49 +151,71 @@ bool CardUtil::IsDVBCardType(const QString card_type)
         (ct == "OFDM") || (ct == "ATSC");
 }
 
-/** \fn CardUtil::GetVideoDevice(uint)
- *  \brief Returns the card type from the video device
- *  \param nCardID   cardid of card to be checked
- *  \return videodevice corresponding to cardid
- */
-QString CardUtil::GetVideoDevice(uint cardid)
+QString get_on_source(const QString &to_get, uint cardid, uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT videodevice "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID");
+    if (sourceid)
+    {
+        query.prepare(
+            QString("SELECT %1 ").arg(to_get) +
+            "FROM capturecard, cardinput "
+            "WHERE sourceid         = :SOURCEID AND "
+            "      cardinput.cardid = :CARDID   AND "
+            "      ( ( cardinput.childcardid != '0' AND "
+            "          cardinput.childcardid  = capturecard.cardid ) OR "
+            "        ( cardinput.childcardid  = '0' AND "
+            "          cardinput.cardid       = capturecard.cardid ) )");
+        query.bindValue(":SOURCEID", sourceid);
+    }
+    else
+    {
+        query.prepare(
+            QString("SELECT %1 ").arg(to_get) +
+            "FROM capturecard "
+            "WHERE capturecard.cardid = :CARDID");
+    }
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetVideoDevice() 1", query);
+        MythContext::DBError("CardUtil::get_on_source", query);
     else if (query.next())
         return query.value(0).toString();
 
     return QString::null;
 }
 
-QString CardUtil::GetVideoDevice(uint cardid, uint sourceid)
+QString get_on_input(const QString &to_get,
+                     uint cardid, const QString &input)
 {
-    QString device = QString::null;
-
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT videodevice "
-                  "FROM capturecard, cardinput "
-                  "WHERE sourceid         = :SOURCEID AND "
-                  "      cardinput.cardid = :CARDID   AND "
-                  "      ( ( cardinput.childcardid != '0' AND "
-                  "          cardinput.childcardid  = capturecard.cardid ) OR "
-                  "        ( cardinput.childcardid  = '0' AND "
-                  "          cardinput.cardid       = capturecard.cardid ) )");
+    if (!input.isEmpty())
+    {
+        query.prepare(
+            QString("SELECT %1 ").arg(to_get) +
+            "FROM capturecard, cardinput "
+            "WHERE inputname        = :INNAME AND "
+            "      cardinput.cardid = :CARDID AND "
+            "      ( ( cardinput.childcardid != '0' AND "
+            "          cardinput.childcardid  = capturecard.cardid ) OR "
+            "        ( cardinput.childcardid  = '0' AND "
+            "          cardinput.cardid       = capturecard.cardid ) )");
+        query.bindValue(":INNAME", input);
+    }
+    else
+    {
+        query.prepare(
+            QString("SELECT %1 ").arg(to_get) +
+            "FROM capturecard "
+            "WHERE capturecard.cardid = :CARDID");
+    }
     query.bindValue(":CARDID", cardid);
-    query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetVideoDevice() 2", query);
+        MythContext::DBError("CardUtil::get_on_input", query);
     else if (query.next())
-        device = query.value(0).toString();
+        return query.value(0).toString();
 
-    return device;    
+    return QString::null;
 }
 
 /** \fn CardUtil::GetCardID(const QString&, QString)
@@ -307,53 +284,15 @@ uint CardUtil::GetParentCardID(uint cardid)
     return ret;
 }
 
-/** \fn CardUtil::GetVideoDevice(uint, QString&, QString&)
- *  \brief Returns the the video device associated with the card id
- *  \param nCardID card id to check
- *  \param device the returned device
- *  \param vbi the returned vbi device
- *  \return true on success
- */
-bool CardUtil::GetVideoDevice(uint nCardID, QString& device, QString& vbi)
-{
-    bool fRet=false;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT videodevice, vbidevice "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID");
-    query.bindValue(":CARDID", nCardID);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetVideoDevice()", query);
-    else if (query.next())
-    {
-        device = query.value(0).toString();
-        vbi = query.value(1).toString();
-        fRet = true;
-    }
-    return fRet;
-}
-
-/** \fn CardUtil::IsDVB(uint)
+/** \fn CardUtil::IsDVB(uint, const QString&)
  *  \brief Returns true if the card is a DVB card
- *  \param nCardID card id to check
+ *  \param cardid card id to check
+ *  \param inputname input name of input to check
  *  \return true if the card is a DVB one
  */
-bool CardUtil::IsDVB(uint nCardID)
+bool CardUtil::IsDVB(uint cardid, const QString &inputname)
 {
-    bool fRet = false;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT cardtype "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid= :CARDID");
-    query.bindValue(":CARDID", nCardID);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::IsDVB()", query);
-    else if (query.next())
-        fRet = (query.value(0).toString() == "DVB");
-
-    return fRet;
+    return "DVB" == GetRawCardType(cardid, inputname);
 }
 
 /** \fn CardUtil::GetDISEqCType(uint)
@@ -786,7 +725,7 @@ void CardUtil::GetCardInputs(
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        CardInput* cardinput = new CardInput(true);
+        CardInput* cardinput = new CardInput(false);
         cardinput->loadByInput(rcardid, (*it));
         cardinput->SetChildCardID((parentid) ? cardid : 0);
         inputLabels.push_back(

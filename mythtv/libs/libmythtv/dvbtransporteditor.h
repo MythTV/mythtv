@@ -109,6 +109,7 @@ public:
 public slots:
     void menu(int);
     void del();
+    void del(int);
     void edit();
     void edit(int);
     void videoSource(const QString& str);

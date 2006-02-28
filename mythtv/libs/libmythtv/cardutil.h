@@ -47,6 +47,9 @@ enum DISEQC_TYPES
     DISEQC_SW64                    = 11,
 };
 
+QString get_on_source(const QString&, uint, uint);
+QString get_on_input(const QString&, uint, const QString&);
+
 /** \class CardUtil
  *  \brief Collection of helper utilities for capture card DB use
  */
@@ -57,6 +60,7 @@ class CardUtil
     enum CARD_TYPES
     {
         ERROR_OPEN = 0,
+        ERROR_UNKNOWN,
         ERROR_PROBE,
         QPSK,
         QAM,
@@ -68,6 +72,33 @@ class CardUtil
         FIREWIRE,
     };
 
+    static enum CARD_TYPES toCardType(const QString &name)
+    {
+        if ("ERROR_OPEN" == name)
+            return ERROR_OPEN;
+        if ("ERROR_UNKNOWN" == name)
+            return ERROR_UNKNOWN;
+        if ("ERROR_PROBE" == name)
+            return ERROR_PROBE;
+        if ("QPSK" == name)
+            return QPSK;
+        if ("QAM" == name)
+            return QAM;
+        if ("OFDM" == name)
+            return OFDM;
+        if ("ATSC" == name)
+            return ATSC;
+        if ("V4L" == name)
+            return V4L;
+        if ("MPEG" == name)
+            return MPEG;
+        if ("HDTV" == name)
+            return HDTV;
+        if ("FIREWIRE" == name)
+            return FIREWIRE;
+        return ERROR_UNKNOWN;
+    }
+
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
     static uint         GetChildCardID(uint cardid);
@@ -75,15 +106,19 @@ class CardUtil
 
     static bool         IsCardTypePresent(const QString &strType);
 
-    static CARD_TYPES   GetCardType(uint cardid, QString &name,
-                                    QString &card_type);
-    static CARD_TYPES   GetCardType(uint cardid, QString &name);
-    static CARD_TYPES   GetCardType(uint cardid);
+    static QString      GetRawCardType(uint cardid, uint sourceid)
+        { return get_on_source("cardtype", cardid, sourceid); }
+    static QString      GetVideoDevice(uint cardid, uint sourceid)
+        { return get_on_source("videodevice", cardid, sourceid); }
+    static bool         GetVBIDevice(uint cardid, uint sourceid)
+        { return get_on_source("vbidevice", cardid, sourceid); }
 
-    static bool         GetVideoDevice(uint cardid, QString& device,
-                                       QString& vbi);
-    static QString      GetVideoDevice(uint cardid);
-    static QString      GetVideoDevice(uint cardid, uint sourceid);
+    static QString      GetRawCardType(uint cardid, const QString &input)
+        { return get_on_input("cardtype", cardid, input); }
+    static QString      GetVideoDevice(uint cardid, const QString &input)
+        { return get_on_input("videodevice", cardid, input); }
+    static bool         GetVBIDevice(uint cardid, const QString &input)
+        { return get_on_input("vbidevice", cardid, input); }
 
     static QString      GetDefaultInput(uint cardid);
     static QString      GetInputName(uint cardid, uint sourceid);
@@ -91,6 +126,8 @@ class CardUtil
     static QString      GetDeviceLabel(uint    cardid,
                                        QString cardtype,
                                        QString videodevice);
+
+    static QString      ProbeSubTypeName(uint cardid, const QString &input);
 
     static QStringList  probeInputs(QString device,
                                     QString cardtype = QString::null,
@@ -109,10 +146,10 @@ class CardUtil
     static bool         TVOnly(uint cardid, const QString &inputname);
 
     // DVB info
-    static bool         IsDVB(uint cardid);
+    static bool         IsDVB(uint cardid, const QString &_inputname);
     static bool         IsDVBCardType(const QString card_type);
-    static CARD_TYPES   GetDVBType(uint device, QString &name,
-                                   QString &card_type);
+    static QString      ProbeDVBFrontendName(uint device);
+    static QString      ProbeDVBType(uint device);
     static bool         HasDVBCRCBug(uint device);
     static DISEQC_TYPES GetDISEqCType(uint cardid);
 

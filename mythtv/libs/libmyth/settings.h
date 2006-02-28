@@ -433,6 +433,8 @@ public:
 signals:
     void accepted(int);
     void menuButtonPressed(int);
+    void editButtonPressed(int);
+    void deleteButtonPressed(int);
 
 protected slots:
     void setValueByLabel(const QString& label);

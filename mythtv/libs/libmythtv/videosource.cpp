@@ -1536,30 +1536,29 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
         inputname->setValue(_inputname);
     }
 
-    if (CardUtil::IsDVB(_cardid))
+    if (CardUtil::IsDVB(_cardid, _inputname))
     {
-        CardUtil::CARD_TYPES dvbType;
-        if ((dvbType = CardUtil::GetCardType(_cardid))>CardUtil::ERROR_PROBE)
+        QString subtype = CardUtil::ProbeSubTypeName(_cardid, _inputname);
+        CardUtil::CARD_TYPES dvbType = CardUtil::toCardType(subtype);
+        
+        if ("QPSK" == subtype)
         {
-            if (dvbType == CardUtil::QPSK)
-            {
-                //Check for DiSEqC type
-                diseqcpos->setVisible(true);
-                lnblofswitch->setVisible(true);
-                lnbloflo->setVisible(true);
-                lnblofhi->setVisible(true);
+            //Check for DiSEqC type
+            diseqcpos->setVisible(true);
+            lnblofswitch->setVisible(true);
+            lnbloflo->setVisible(true);
+            lnblofhi->setVisible(true);
 
-                DISEQC_TYPES dt = CardUtil::GetDISEqCType(_cardid);
-                bool pos = (dt == DISEQC_POSITIONER_X);
-                diseqcpos->setEnabled(pos);
-            }
-            else
-            {
-                diseqcpos->setVisible(false);
-                lnblofswitch->setVisible(false);
-                lnbloflo->setVisible(false);
-                lnblofhi->setVisible(false);
-            }
+            DISEQC_TYPES dt = CardUtil::GetDISEqCType(_cardid);
+            bool pos = (dt == DISEQC_POSITIONER_X);
+            diseqcpos->setEnabled(pos);
+        }
+        else if (dvbType > CardUtil::ERROR_PROBE)
+        {
+            diseqcpos->setVisible(false);
+            lnblofswitch->setVisible(false);
+            lnbloflo->setVisible(false);
+            lnblofhi->setVisible(false);
         }
     }
 }
@@ -1900,65 +1899,71 @@ static QString remove_chaff(const QString &name)
     return short_name;
 }
 
-void DVBConfigurationGroup::probeCard(const QString& cardNumber)
+void DVBConfigurationGroup::probeCard(const QString &videodevice)
 {
 #ifdef USING_DVB
-    QString name, card_type;
-    bool fEnable=false;
-    switch (CardUtil::GetDVBType(cardNumber.toInt(), name, card_type))
+    uint dvbdev = videodevice.toUInt();
+    QString frontend_name = CardUtil::ProbeDVBFrontendName(dvbdev);
+    QString subtype       = CardUtil::ProbeDVBType(dvbdev);
+
+    QString err_open  = tr("Could not open card #%1").arg(dvbdev);
+    QString err_other = tr("Could not get card info for card #%1").arg(dvbdev);
+
+    switch (CardUtil::toCardType(subtype))
     {
         case CardUtil::ERROR_OPEN:
-            cardname->setValue(QString("Could not open card #%1!")
-                                       .arg(cardNumber));
+            cardname->setValue(err_open);
             cardtype->setValue(strerror(errno));
             break;
+        case CardUtil::ERROR_UNKNOWN:
+            cardname->setValue(err_other);
+            cardtype->setValue("Unknown error");
+            break;
         case CardUtil::ERROR_PROBE:
-            cardname->setValue(QString("Could not get card info for card #%1!")
-                                      .arg(cardNumber));
+            cardname->setValue(err_other);
             cardtype->setValue(strerror(errno));
             break;
         case CardUtil::QPSK:
             cardtype->setValue("DVB-S");
-            cardname->setValue(name);
+            cardname->setValue(frontend_name);
             signal_timeout->setValue(60000);
             channel_timeout->setValue(62500);
-            fEnable = true;
             break;
         case CardUtil::QAM:
             cardtype->setValue("DVB-C");
-            cardname->setValue(name);
+            cardname->setValue(frontend_name);
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
             break;
         case CardUtil::OFDM:
             cardtype->setValue("DVB-T");
-            cardname->setValue(name);
-            if (name.find("usb") >= 0)
+            cardname->setValue(frontend_name);
+            signal_timeout->setValue(500);
+            channel_timeout->setValue(3000);
+            if (frontend_name.lower().find("usb") >= 0)
             {
                 signal_timeout->setValue(40000);
                 channel_timeout->setValue(42500);
             }
-            else
-            {
-                signal_timeout->setValue(500);
-                channel_timeout->setValue(3000);
-            }
             break;
         case CardUtil::ATSC:
         {
-            QString short_name = remove_chaff(name);
+            QString short_name = remove_chaff(frontend_name);
             cardtype->setValue("ATSC");
             cardname->setValue(short_name);
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
 
-            buttonAnalog->setVisible(
-                short_name.left(6).lower() == "pchdtv" ||
-                short_name.left(5).lower() == "dvico");
+            if (frontend_name.lower().find("usb") < 0)
+            {
+                buttonAnalog->setVisible(
+                    short_name.left(6).lower() == "pchdtv" ||
+                    short_name.left(5).lower() == "dvico");
+            }
         }
         break;
         default:
-            fEnable = false;
+            break;
     }
 #else
     (void)cardNumber;
@@ -1977,11 +1982,8 @@ TunerCardInput::TunerCardInput(const CaptureCard &parent)
     if (cardid <= 0)
         return;
 
-    QString name;
-    CardUtil::GetCardType(cardid, name, last_cardtype);
-    bool isdvb    = CardUtil::IsDVBCardType(last_cardtype);
-    last_cardtype = (isdvb) ? "DVB" : last_cardtype;
-    last_device   = CardUtil::GetVideoDevice(cardid);
+    last_cardtype = CardUtil::GetRawCardType(cardid, 0);
+    last_device   = CardUtil::GetVideoDevice(cardid, 0);
 }
 
 void TunerCardInput::fillSelections(const QString& device)
@@ -2101,7 +2103,7 @@ void CaptureCard::analogPanel()
     uint    cardid       = getCardID();
     uint    child_cardid = CardUtil::GetChildCardID(cardid);
     QString devname = "Unknown";
-    QString dev = CardUtil::GetVideoDevice(cardid);
+    QString dev = CardUtil::GetVideoDevice(cardid, 0);
     if (!dev.isEmpty())
         devname = QString("[ DVB : %1 ]").arg(devname);
 

@@ -1101,6 +1101,10 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this, SIGNAL(accepted(int)));
     connect(widget, SIGNAL(menuButtonPressed(int)),
             this, SIGNAL(menuButtonPressed(int)));
+    connect(widget, SIGNAL(editButtonPressed(int)),
+            this, SIGNAL(editButtonPressed(int)));
+    connect(widget, SIGNAL(deleteButtonPressed(int)),
+            this, SIGNAL(deleteButtonPressed(int)));
     connect(this, SIGNAL(valueChanged(const QString&)),
             widget, SLOT(setCurrentItem(const QString&)));
     connect(widget, SIGNAL(highlighted(const QString&)),
