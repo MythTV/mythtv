@@ -156,13 +156,13 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "STRETCHDEC", "Decrease time stretch speed", "");
     REG_KEY("TV Playback", "TOGGLESTRETCH", "Toggle time stretch speed", "");
     REG_KEY("TV Playback", "TOGGLEAUDIOSYNC",
-            "Turn on audio sync adjustment controls", "Y");
+            "Turn on audio sync adjustment controls", "");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS", "Turn on the playback picture "
             "adjustment controls", "F");
     REG_KEY("TV Playback", "TOGGLERECCONTROLS", "Turn on the recording picture "
             "adjustment controls", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
-    REG_KEY("TV Playback", "CYCLECOMMSKIPMODE", "Cycle Commercial Skip mode", "R");
+    REG_KEY("TV Playback", "CYCLECOMMSKIPMODE", "Cycle Commercial Skip mode", "");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "#");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
