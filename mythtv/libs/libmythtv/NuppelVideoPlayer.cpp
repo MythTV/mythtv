@@ -3037,8 +3037,6 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
 
 void NuppelVideoPlayer::SetBookmark(void)
 {
-    if (livetv)
-        return;
     if (!m_playbackinfo || !osd)
         return;
 
@@ -3048,8 +3046,6 @@ void NuppelVideoPlayer::SetBookmark(void)
 
 void NuppelVideoPlayer::ClearBookmark(void)
 {
-    if (livetv)
-        return;
     if (!m_playbackinfo || !osd)
         return;
 

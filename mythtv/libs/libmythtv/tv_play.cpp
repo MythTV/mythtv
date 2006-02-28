@@ -2463,6 +2463,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (StateIsLiveTV(GetState()))
             {
+                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
+                    nvp->SetBookmark();
                 exitPlayer = true;
                 wantsToQuit = true;
             }
@@ -2576,7 +2578,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "TOGGLEFAV")
                 ToggleChannelFavorite();
             else if (action == "SELECT")
-                CommitQueuedInput();
+            {
+                if (!CommitQueuedInput())
+                    handled = false;
+            }
             else if (action == "TOGGLERECCONTROLS")
                 DoToggleRecPictureAttribute();
             else if (action == "TOGGLEBROWSE" && pseudoLiveTVState[aindx])
@@ -2589,6 +2594,31 @@ void TV::ProcessKeypress(QKeyEvent *e)
             BrowseStart();
     }
 
+    if (StateIsLiveTV(GetState()) || StateIsPlaying(internalState))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+    
+            if (action == "SELECT")
+            {
+                if (!was_doing_ff_rew)
+                {
+                    if (gContext->GetNumSetting("AltClearSavedPosition", 1)
+                        && nvp->GetBookmark())
+                        nvp->ClearBookmark(); 
+                    else
+                        nvp->SetBookmark(); 
+                }
+                else
+                    handled = false;
+            }
+            else
+                handled = false;
+        }
+    }
+    
     if (StateIsLiveTV(GetState()) && !pseudoLiveTVState[aindx])
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -2658,19 +2688,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     else if (action == "SELECT")
                         nvp->ActivateDVDButton();
                 }
-            }
-            else if (action == "SELECT")
-            {
-                if (!was_doing_ff_rew)
-                {
-                    if (gContext->GetNumSetting("AltClearSavedPosition", 1)
-                        && nvp->GetBookmark())
-                        nvp->ClearBookmark(); 
-                    else
-                        nvp->SetBookmark(); 
-                }
-                else
-                    handled = false;
             }
             else if (action == "DELETE")
             {
@@ -2856,7 +2873,7 @@ void TV::processNetworkControlCommand(QString command)
     }
     else if (tokens.size() == 2 && tokens[1] == "STOP")
     {
-        if (internalState != kState_WatchingLiveTV && nvp)
+        if (nvp)
             nvp->SetBookmark();
         exitPlayer = true;
         wantsToQuit = true;
@@ -3924,8 +3941,10 @@ void TV::UpdateOSDTextEntry(const QString &message)
     GetOSD()->SetText("channel_number", infoMap, 2);
 }
 
-void TV::CommitQueuedInput(void)
+bool TV::CommitQueuedInput(void)
 {
+    bool commited = false;
+
     VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedInput() " + 
             QString("livetv(%1) qchannum(%2) qchanid(%3)")
             .arg(StateIsLiveTV(GetState()))
@@ -3935,6 +3954,7 @@ void TV::CommitQueuedInput(void)
     if (ccInputMode)
     {
         bool valid = false;
+        commited = true;
         int page = GetQueuedInputAsInt(&valid, 16);
         if (valid && page)
             nvp->ToggleCC(vbimode, page);
@@ -3942,6 +3962,7 @@ void TV::CommitQueuedInput(void)
     }
     else if (asInputMode)
     {
+        commited = true;
         if (HasQueuedInput())
             DoArbSeek(ARBSEEK_FORWARD);
     }
@@ -3952,15 +3973,20 @@ void TV::CommitQueuedInput(void)
         QString chaninput = GetQueuedInput();
         if (browsemode)
         {
+            commited = true;
             BrowseChannel(channum);
             if (activenvp == nvp && GetOSD())
                 GetOSD()->HideSet("channel_number");
         }
         else if (GetQueuedChanID() || !channum.isEmpty())
+        {
+            commited = true;
             ChangeChannel(GetQueuedChanID(), channum);
+        }
     }
 
     ClearInputQueues(true);
+    return commited;
 }
 
 void TV::ChangeChannel(uint chanid, const QString &chan)
