@@ -152,6 +152,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
     REG_KEY("TV Playback", "SPEEDDEC", "Decrease the playback speed", "J");
     REG_KEY("TV Playback", "ADJUSTSTRETCH", "Turn on time stretch control", "A");
+    REG_KEY("TV Playback", "STRETCHINC", "Increase time stretch speed", "");
+    REG_KEY("TV Playback", "STRETCHDEC", "Decrease time stretch speed", "");
     REG_KEY("TV Playback", "TOGGLESTRETCH", "Toggle time stretch speed", "");
     REG_KEY("TV Playback", "TOGGLEAUDIOSYNC",
             "Turn on audio sync adjustment controls", "Y");
