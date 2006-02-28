@@ -119,7 +119,7 @@ class ChannelBase
     virtual bool SwitchToInput(const QString &input);
     virtual bool SwitchToInput(const QString &input, const QString &chan);
 
-    virtual void InitializeInputs(void);
+    virtual bool InitializeInputs(void);
 
     /// Saves current channel as the default channel for the current input.
     virtual void StoreInputChannels(void)

@@ -174,7 +174,12 @@ bool DVBChannel::Open()
 
     first_tune = true;
 
-    InitializeInputs();
+    if (!InitializeInputs())
+    {
+        Close();
+        return false;
+    }
+
     nextcapchannel = currentInputID;
 
     return (fd_frontend >= 0);

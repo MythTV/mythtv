@@ -113,55 +113,74 @@ bool setupTVs(bool ismaster, bool &error)
                "WHERE parentid = '0' "
                "ORDER BY cardid");
 
-    if (query.isActive() && query.size())
+    while (query.isActive() && query.next())
     {
-        while (query.next())
+        uint    cardid = query.value(0).toUInt();
+        QString host   = query.value(1).toString();
+        QString cidmsg = QString("Card %1").arg(cardid);
+
+        if (host.isEmpty())
         {
-            int cardid = query.value(0).toInt();
-            QString host = query.value(1).toString();
+            QString msg = cidmsg + " does not have a hostname defined.\n"
+                "Please run setup and confirm all of the capture cards.\n";
 
-            if (host.isNull() || host.isEmpty())
+            cerr << msg;
+            gContext->LogEntry("mythbackend", LP_CRITICAL,
+                               "Problem with capture cards", msg);
+            continue;
+        }
+
+        if (!ismaster)
+        {
+            if (host == localhostname)
             {
-                QString msg = "One of your capturecard entries does not have a "
-                              "hostname.\n  Please run setup and confirm all "
-                              "of the capture cards.\n";
-
-                cerr << msg;
-                gContext->LogEntry("mythbackend", LP_CRITICAL,
-                                   "Problem with capture cards", msg);
-                error = true;
-            }
-
-            if (!ismaster)
-            {
-                if (host == localhostname)
+                TVRec *tv = new TVRec(cardid);
+                if (tv->Init())
                 {
-                    TVRec *tv = new TVRec(cardid);
-                    tv->Init();
-                    EncoderLink *enc = new EncoderLink(cardid, tv);
-                    tvList[cardid] = enc;
-                }
-            }
-            else
-            {
-                if (host == localhostname)
-                {
-                    TVRec *tv = new TVRec(cardid);
-                    tv->Init();
                     EncoderLink *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
                 }
                 else
                 {
-                    EncoderLink *enc = new EncoderLink(cardid, NULL, host);
-                    tvList[cardid] = enc;
+                    gContext->LogEntry("mythbackend", LP_CRITICAL,
+                                       "Problem with capture cards",
+                                       cidmsg + "failed init");
+                    delete tv;
+                    // The master assumes card comes up so we need to
+                    // set error and exit if a non-master card fails.
+                    error = true;
                 }
             }
         }
+        else
+        {
+            if (host == localhostname)
+            {
+                TVRec *tv = new TVRec(cardid);
+                if (tv->Init())
+                {
+                    EncoderLink *enc = new EncoderLink(cardid, tv);
+                    tvList[cardid] = enc;
+                }
+                else
+                {
+                    gContext->LogEntry("mythbackend", LP_CRITICAL,
+                                       "Problem with capture cards",
+                                       cidmsg + "failed init");
+                    delete tv;
+                }
+            }
+            else
+            {
+                EncoderLink *enc = new EncoderLink(cardid, NULL, host);
+                tvList[cardid] = enc;
+            }
+        }
     }
-    else
+
+    if (tvList.empty())
     {
-        cerr << "ERROR: no capture cards are defined in the database.\n";
+        cerr << "ERROR: no valid capture cards are defined in the database.\n";
         cerr << "Perhaps you should read the installation instructions?\n";
         gContext->LogEntry("mythbackend", LP_CRITICAL,
                            "No capture cards are defined", 

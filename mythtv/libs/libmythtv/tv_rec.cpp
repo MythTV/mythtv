@@ -145,7 +145,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
 
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev.toInt(), this);
-        channel->Open();
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         connect(GetDVBChannel(), SIGNAL(UpdatePMTObject(const PMTObject*)),
                 this, SLOT(SetPMTObject(const PMTObject*)));
@@ -157,7 +158,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
     {
 #ifdef USING_FIREWIRE
         channel = new FirewireChannel(fwOpt, this);
-        channel->Open();
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
 #endif
@@ -166,7 +168,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
     {
 #ifdef USING_DBOX2
         channel = new DBox2Channel(this, &dboxOpt, cardid);
-        channel->Open();
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
 #endif
@@ -182,7 +185,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
     {
 #ifdef USING_V4L
         channel = new Channel(this, genOpt.videodev);
-        channel->Open();
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         CloseChannel();
         init_run = true;

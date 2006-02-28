@@ -23,8 +23,6 @@ DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
       http(new QHttp()),             httpChanger(new QHttp()),
       m_dbox2channelcount(0)
 {
-    InitializeInputs();
-
     connect(http,        SIGNAL(           done(bool)),
             this,        SLOT(  HttpRequestDone(bool)));
     connect(httpChanger, SIGNAL(                 done(bool)),
@@ -140,8 +138,11 @@ bool DBox2Channel::SetChannelByString(const QString &newChan)
     return true;
 }
 
-bool DBox2Channel::Open()
+bool DBox2Channel::Open(void)
 {
+    if (!InitializeInputs())
+        return false;
+
     Log(QString("Channel instantiated."));
     return true;
 }

@@ -47,44 +47,11 @@ FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts,
     : ChannelBase(parent), fw_opts(firewire_opts),
       fwhandle(NULL),      isopen(false)
 {
-    InitializeInputs();
-
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (!(*it)->externalChanger.isEmpty())
-        return;
-
-    if (!is_supported(fw_opts.model))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Model: '%1' ").arg(fw_opts.model) +
-                "is not supported by internal channel changer.");
-        return;
-    }
-
-    // Open channel
-    fwhandle = raw1394_new_handle_on_port(fw_opts.port);
-    if (!fwhandle)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to get handle " +
-                QString("for port: %1").arg(fw_opts.port));
-        return;
-    }
-
-    VERBOSE(VB_CHANNEL, LOC + "Allocated raw1394 handle " +
-            QString("for port %1").arg(fw_opts.port));
-
-    isopen = true;
 }
 
 FirewireChannel::~FirewireChannel(void)
 {
-    // Close channel
-    if (isopen)
-    {
-        VERBOSE(VB_CHANNEL, LOC + "Releasing raw1394 handle");
-        raw1394_destroy_handle(fwhandle);
-        isopen = false;
-    }
+    Close();
 }
 
 bool FirewireChannel::SetChannelByString(const QString &chan)
@@ -171,13 +138,48 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
     return true;
 }
 
-bool FirewireChannel::Open()
+bool FirewireChannel::Open(void)
 {
+    if (!InitializeInputs())
+        return false;
+
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (!(*it)->externalChanger.isEmpty())
+        return true;
+
+    if (!is_supported(fw_opts.model))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Model: '%1' ").arg(fw_opts.model) +
+                "is not supported by internal channel changer.");
+        return false;
+    }
+
+    // Open channel
+    fwhandle = raw1394_new_handle_on_port(fw_opts.port);
+    if (!fwhandle)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to get handle " +
+                QString("for port: %1").arg(fw_opts.port));
+        return false;
+    }
+
+    VERBOSE(VB_CHANNEL, LOC + "Allocated raw1394 handle " +
+            QString("for port %1").arg(fw_opts.port));
+
+    isopen = true;
     return true;
 }
 
-void FirewireChannel::Close()
+void FirewireChannel::Close(void)
 {
+    // Close channel
+    if (isopen)
+    {
+        VERBOSE(VB_CHANNEL, LOC + "Releasing raw1394 handle");
+        raw1394_destroy_handle(fwhandle);
+        isopen = false;
+    }
 }
 
 bool FirewireChannel::SwitchToInput(const QString &input, const QString &chan)

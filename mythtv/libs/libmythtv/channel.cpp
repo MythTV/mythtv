@@ -72,7 +72,12 @@ bool Channel::Open(void)
 
     usingv4l2 = CardUtil::hasV4L2(videofd);
 
-    InitializeInputs();
+    if (!InitializeInputs())
+    {
+        Close();
+        return false;
+    }
+
     SetFormat("Default");
 
     return true;
@@ -210,10 +215,11 @@ static QString mode_to_format(int mode, int v4l_version)
  *  if the parent pointer is valid retrieves the
  *  channels from the database.
  */
-void Channel::InitializeInputs(void)
+bool Channel::InitializeInputs(void)
 {
     // Get Inputs from DB
-    ChannelBase::InitializeInputs();
+    if (!ChannelBase::InitializeInputs())
+        return false;
 
     // Get global TVFormat setting
     QString fmt = gContext->GetSetting("TVFormat");
@@ -225,6 +231,7 @@ void Channel::InitializeInputs(void)
     InputNames v4l_inputs = CardUtil::probeV4LInputs(videofd, ok);
 
     // Insert info from hardware
+    uint valid_cnt = 0;
     InputMap::const_iterator it;
     for (it = inputs.begin(); it != inputs.end(); ++it)
     {
@@ -236,6 +243,7 @@ void Channel::InitializeInputs(void)
                 (*it)->inputNumV4L   = v4l_it.key();
                 (*it)->videoModeV4L1 = videomode_v4l1;
                 (*it)->videoModeV4L2 = videomode_v4l2;
+                valid_cnt++;
             }
         }
     }
@@ -250,6 +258,8 @@ void Channel::InitializeInputs(void)
                 .arg(mode_to_format((*it)->videoModeV4L1,1))
                 .arg(mode_to_format((*it)->videoModeV4L1,2)));
     }
+
+    return valid_cnt;
 }
 
 /** \fn Channel::SetFormat(const QString &format)

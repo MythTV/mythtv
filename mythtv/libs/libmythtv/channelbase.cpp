@@ -407,7 +407,7 @@ int ChannelBase::GetCardID(void) const
 /** \fn DVBChannel::InitializeInputs(void)
  *  \brief Fills in input map from DB
  */
-void ChannelBase::InitializeInputs(void)
+bool ChannelBase::InitializeInputs(void)
 {
     inputs.clear();
     
@@ -415,8 +415,8 @@ void ChannelBase::InitializeInputs(void)
     if (!cardid)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs(): "
-                "Programmer error cardid invalid.");
-        return;
+                "Programmer error, cardid invalid.");
+        return false;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -432,15 +432,15 @@ void ChannelBase::InitializeInputs(void)
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("InitializeInputs", query);
-        return;
+        return false;
     }
     else if (!query.size())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs()"
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs(): "
                 "\n\t\t\tCould not get inputs for the capturecard."
                 "\n\t\t\tPerhaps you have forgotten to bind video"
                 "\n\t\t\tsources to your card's inputs?");
-        return;
+        return false;
     }
 
     while (query.next())
@@ -470,6 +470,8 @@ void ChannelBase::InitializeInputs(void)
     }
     VERBOSE(VB_CHANNEL, LOC + QString("Current Input #%1: '%2'")
             .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
+
+    return inputs.size();
 }
 
 /** \fn ChannelBase::StoreInputChannels(const InputMap&)

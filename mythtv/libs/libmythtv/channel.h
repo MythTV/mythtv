@@ -76,7 +76,7 @@ class Channel : public ChannelBase
     // Helper Commands
     int  ChangeColourAttribute(int attrib, const char *name, bool up);
     bool TuneTo(const QString &chan, int finetune);
-    void InitializeInputs(void);
+    bool InitializeInputs(void);
 
   private:
     // Data
