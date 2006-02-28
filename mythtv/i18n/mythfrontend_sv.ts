@@ -381,6 +381,19 @@
         <source>Analog Options</source>
         <translation type="unfinished">Analoga inställningar</translation>
     </message>
+    <message>
+        <source>Input and satellite settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog child card settings.
+WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various additional settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVBSignalMonitor</name>
@@ -1127,11 +1140,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Recording is Close Captioned</source>
-        <translation>Inspelning är textad</translation>
+        <translation type="obsolete">Inspelning är textad</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
         <translation>Inspelning är högupplöst</translation>
+    </message>
+    <message>
+        <source>Recording is Closed Captioned</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4655,7 +4672,7 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation>Textning för hörselskadade</translation>
+        <translation type="obsolete">Textning för hörselskadade</translation>
     </message>
     <message>
         <source>Subtitled</source>
@@ -6115,11 +6132,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
-        <translation>Lagra inspelningar i TS-format.</translation>
+        <translation type="obsolete">Lagra inspelningar i TS-format.</translation>
     </message>
     <message>
         <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation>Använd transportströmsformat (TS) som lagringsformat i stället för konvertering till programström (PS). Konverteringen tappar data och tvingar MythTV att stänga av en del kanalbytessäkerhetskontroller.</translation>
+        <translation type="obsolete">Använd transportströmsformat (TS) som lagringsformat i stället för konvertering till programström (PS). Konverteringen tappar data och tvingar MythTV att stänga av en del kanalbytessäkerhetskontroller.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
@@ -6271,19 +6288,19 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
-        <translation>Använder MPEG hårdvaruavkodare</translation>
+        <translation type="obsolete">Använder MPEG hårdvaruavkodare</translation>
     </message>
     <message>
         <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
-        <translation>Reducera komplexiteten på den ström MythTV spelar in så att den kan matas in direkt i en hårdvaruavkodare.</translation>
+        <translation type="obsolete">Reducera komplexiteten på den ström MythTV spelar in så att den kan matas in direkt i en hårdvaruavkodare.</translation>
     </message>
     <message>
         <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
-        <translation>Specifikt kommer MythTV bara att spela in en ljud- och en undertextström.</translation>
+        <translation type="obsolete">Specifikt kommer MythTV bara att spela in en ljud- och en undertextström.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation>Ange även språk i uppspelningsklientens inställningar (Generellt, sida 3).</translation>
+        <translation type="obsolete">Ange även språk i uppspelningsklientens inställningar (Generellt, sida 3).</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6575,7 +6592,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
-        <translation>Kommando att köra om datorns BIOS kräver omstart för att uppvakningsinställningar ska träda i kraft. Se filen README för fler exempel.</translation>
+        <translation type="obsolete">Kommando att köra om datorns BIOS kräver omstart för att uppvakningsinställningar ska träda i kraft. Se filen README för fler exempel.</translation>
     </message>
     <message>
         <source>Command to reboot</source>
@@ -7093,6 +7110,80 @@ Myth kommer nu att avslutas.</translation>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>F</source>
+        <comment>RecStatusChar rsOffLine</comment>
+        <translation type="unfinished">h</translation>
+    </message>
+    <message>
+        <source>Recorder Off-Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the backend recorder is off-line.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use DishNet Long-term EIT Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single LNB / Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.2 Positioner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.3 Positioner (Goto X)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW21 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW64 Switch (3-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7598,7 +7689,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation>Textning</translation>
+        <translation type="obsolete">Textning</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -7852,7 +7943,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Previous Title/Chapter</source>
-        <translation>Föregående titel/kapitel</translation>
+        <translation type="obsolete">Föregående titel/kapitel</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
@@ -7877,6 +7968,22 @@ Inga andra detaljer</translation>
     <message>
         <source>Edit Recording Schedule</source>
         <translation>Ändra inspelningsschema</translation>
+    </message>
+    <message>
+        <source>Skipping Back Not Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC CC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

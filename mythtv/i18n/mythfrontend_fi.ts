@@ -381,6 +381,19 @@
         <source>Analog Options</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Input and satellite settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog child card settings.
+WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various additional settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVBSignalMonitor</name>
@@ -1127,11 +1140,11 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording is Close Captioned</source>
+        <source>Recording is in High Definition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording is in High Definition</source>
+        <source>Recording is Closed Captioned</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4656,7 +4669,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation>CC</translation>
+        <translation type="obsolete">CC</translation>
     </message>
     <message>
         <source>Subtitled</source>
@@ -6117,11 +6130,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
-        <translation>Tallenna nauhoitukset TS-formaatissa.</translation>
-    </message>
-    <message>
-        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Tallenna nauhoitukset TS-formaatissa.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
@@ -6273,19 +6282,15 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
-        <translation>Käyttää laitteiston MPEG purkua</translation>
-    </message>
-    <message>
-        <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Käyttää laitteiston MPEG purkua</translation>
     </message>
     <message>
         <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
-        <translation>MythTV nauhoittaa vain yhden ääniraidan ja yhden tekstityskielen.</translation>
+        <translation type="obsolete">MythTV nauhoittaa vain yhden ääniraidan ja yhden tekstityskielen.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation>Haluttu kieli  Mythfrontend:in asetuksista (Asetukset/TV:n Asetukset/Yleiset).</translation>
+        <translation type="obsolete">Haluttu kieli  Mythfrontend:in asetuksista (Asetukset/TV:n Asetukset/Yleiset).</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6574,10 +6579,6 @@ Myth lopetetaan.</translation>
     <message>
         <source>nvram-wakeup Restart Command</source>
         <translation>Nvram-wakeup Uudelleenkäynnistyskomento</translation>
-    </message>
-    <message>
-        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Command to reboot</source>
@@ -7082,6 +7083,80 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecStatusChar rsOffLine</comment>
+        <translation type="unfinished">F</translation>
+    </message>
+    <message>
+        <source>Recorder Off-Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the backend recorder is off-line.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use DishNet Long-term EIT Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single LNB / Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.2 Positioner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.3 Positioner (Goto X)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW21 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW64 Switch (3-Way)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7591,7 +7666,7 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation>CC</translation>
+        <translation type="obsolete">CC</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -7844,10 +7919,6 @@ Se ohitetaan</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous Title/Chapter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Skip Still Frame</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7870,6 +7941,22 @@ Se ohitetaan</translation>
     <message>
         <source>Edit Recording Schedule</source>
         <translation type="unfinished">Muuta Nauhoituksen Asetuksia</translation>
+    </message>
+    <message>
+        <source>Skipping Back Not Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC CC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

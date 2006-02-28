@@ -66,7 +66,7 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for </source>
-        <translation type="unfinished"></translation>
+        <translation>Analoge Opties voor </translation>
     </message>
 </context>
 <context>
@@ -380,6 +380,19 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Analog Options</source>
+        <translation>Analoge Opties</translation>
+    </message>
+    <message>
+        <source>Input and satellite settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog child card settings.
+WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various additional settings.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1120,18 +1133,22 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
+        <translation>De opname is omgezet</translation>
     </message>
     <message>
         <source>Recording is in Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>De opname is in Stereo</translation>
     </message>
     <message>
         <source>Recording is Close Captioned</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">De opname heeft ondertiteling</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
+        <translation>De opname is in Hoge Definitie</translation>
+    </message>
+    <message>
+        <source>Recording is Closed Captioned</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2433,7 +2450,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Yes, Exit and Shutdown</source>
-        <translation>Ja, afsluiten en uitschalen</translation>
+        <translation>Ja, afsluiten en uitschakelen</translation>
     </message>
     <message>
         <source>Not Flagged</source>
@@ -4540,7 +4557,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation>OND</translation>
+        <translation type="obsolete">OND</translation>
     </message>
     <message>
         <source>Subtitled</source>
@@ -6126,11 +6143,11 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
-        <translation>Opnames bewaren in TS-formaat</translation>
+        <translation type="obsolete">Opnames bewaren in TS-formaat</translation>
     </message>
     <message>
         <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation>Gebruik &apos;Transportstroom&apos; als opslagformaat in tegenstelling tot omzetting naar het verouderde &apos;Programmmastroom&apos;. Deze omzetting zorgt ervoor dat data verloren gaan en dat MythTV sommige veiligheidstesten m.b.t. het afstemmen uitschakelt.</translation>
+        <translation type="obsolete">Gebruik &apos;Transportstroom&apos; als opslagformaat in tegenstelling tot omzetting naar het verouderde &apos;Programmmastroom&apos;. Deze omzetting zorgt ervoor dat data verloren gaan en dat MythTV sommige veiligheidstesten m.b.t. het afstemmen uitschakelt.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
@@ -6282,19 +6299,19 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
-        <translation>Gebruik van hardware MPEG-decoder</translation>
+        <translation type="obsolete">Gebruik van hardware MPEG-decoder</translation>
     </message>
     <message>
         <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
-        <translation>Dit vermindert de complexiteit van de &apos;stream&apos; die MythTV opneemt zodat die onmiddellijk naar een hardware MPEG-decoder gestuurd kan worden.</translation>
+        <translation type="obsolete">Dit vermindert de complexiteit van de &apos;stream&apos; die MythTV opneemt zodat die onmiddellijk naar een hardware MPEG-decoder gestuurd kan worden.</translation>
     </message>
     <message>
         <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
-        <translation>Meer specifiek zal MythTV enkel een audiospoor en een ondertitelspoor opnemen.</translation>
+        <translation type="obsolete">Meer specifiek zal MythTV enkel een audiospoor en een ondertitelspoor opnemen.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation>U moet ook uw voorkeurstalen opgeven in Instellingen/Algemeen/TV-instellingen/Algemeen (Pagina 3) in mythfrontend.</translation>
+        <translation type="obsolete">U moet ook uw voorkeurstalen opgeven in Instellingen/Algemeen/TV-instellingen/Algemeen (Pagina 3) in mythfrontend.</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6586,7 +6603,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
-        <translation>Commando dat uitgevoerd dient te worden indien uw BIOS een herstart vereist om nvram-ontwaakinstellingen van kracht te laten gaan. Zie README voor meer voorbeelden.</translation>
+        <translation type="obsolete">Commando dat uitgevoerd dient te worden indien uw BIOS een herstart vereist om nvram-ontwaakinstellingen van kracht te laten gaan. Zie README voor meer voorbeelden.</translation>
     </message>
     <message>
         <source>Command to reboot</source>
@@ -6960,7 +6977,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Title Pronounce</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel Uitspraak</translation>
     </message>
     <message>
         <source>Recording Rule</source>
@@ -7008,106 +7025,180 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Spain</source>
-        <translation type="unfinished"></translation>
+        <translation>Spanje</translation>
     </message>
     <message>
         <source>Enable Network Remote Control interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Schakel Netwerk Afstands Bediening in</translation>
     </message>
     <message>
         <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit schakelt de mogelijkheid in om mythfrontend over het netwerk te bedienen.</translation>
     </message>
     <message>
         <source>Network Remote Control Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Netwerk Afstands Bediening Poort</translation>
     </message>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit geeft aan op welke poort de Netwerk Afstands Bediening moet luisteren voor nieuwe verbindingen.</translation>
     </message>
     <message>
         <source>You are close to an existing cut point. Would you like to:</source>
-        <translation type="unfinished"></translation>
+        <translation>U bent dicht bij een bestaand knip-punt. Wilt u:</translation>
     </message>
     <message>
         <source>Insert a new cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Een niew knip-punt invoegen</translation>
     </message>
     <message>
         <source>Too Far %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Te Ver %1</translation>
     </message>
     <message>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als de breedte op &apos;Auto&apos; is ingesteld, wordt de breedte uitgerekend op basis van de hoogte en de fysieke aspect ratio van de opname.</translation>
     </message>
     <message>
         <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als de hoogte op &apos;Auto&apos; is ingesteld, wordt de hoogte uitgerekend op basis van de breedte en de fysieke aspect ratio van de opname.</translation>
     </message>
     <message>
         <source>Radio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio kanalen.</translation>
     </message>
     <message>
         <source>If set, radio channels will also be included.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingesteld, zullen radio kanalen ook worden meegenomen.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Beschikbare Methodes</translation>
     </message>
     <message>
         <source>Blank Frame Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Lege Frame Detectie</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit bepaald de methode die MythTV gebruikt om te detecteren wanneer reclames beginnen en eindigen.</translation>
     </message>
     <message>
         <source>Maximum commercial skip (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximale reclame lengte (in seconden)</translation>
     </message>
     <message>
         <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the use to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV raadt het handmatig overslaan van reclames af. Het overslaan van stukken langer dan dit vereisen dat de SKIP knop twee keer wordt ingedrukt. Automatisch overslaan van reclames wordt niet beinvloed door deze instelling.</translation>
     </message>
     <message>
         <source>Weighted Time/Priority Combination</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewogen Tijd/Prioriteit Combinatie</translation>
     </message>
     <message>
         <source>Auto Expire Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch Vervallen Prioriteit Gewicht</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit geeft aan hoeveel dagen een programma bonus krijgt voor elk prioriteit punt. Dit wordt alleen gebruikt als de &apos;Gewogen Tijd/Prioriteit Combinatie&apos; gebruikt wordt voor het Autmatisch Vervallen van opnames.</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac hardware versnelling</translation>
     </message>
     <message>
         <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac hardware zal proberen de grafische processor te gebruiken - dit kan leiden tot het ophangen of crashen van je Mac!</translation>
     </message>
     <message>
         <source>Transcoder command</source>
-        <translation type="unfinished"></translation>
+        <translation>Transcodeer commando</translation>
     </message>
     <message>
         <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit programma zal worden gebruikt voor het omzetten van opnames. Als dit leeg gelaten wordt, zal &apos;mythtranscode&apos; worden gebruikt.</translation>
     </message>
     <message>
         <source>Commercial Flagger command</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclame Detectie commando</translation>
     </message>
     <message>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
+        <translation>Dit programma zal worden gebruikt voor het opsporen van reclames in opnames. Als dit leeg gelaten wordt, zal &apos;mythcommflag&apos; worden gebruikt.</translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecStatusChar rsOffLine</comment>
+        <translation type="unfinished">F</translation>
+    </message>
+    <message>
+        <source>Recorder Off-Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>the backend recorder is off-line.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation type="unfinished">OND</translation>
+    </message>
+    <message>
+        <source>Single LNB / Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.2 Positioner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.3 Positioner (Goto X)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW21 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW64 Switch (3-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use DishNet Long-term EIT Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7615,7 +7706,7 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation>OND</translation>
+        <translation type="obsolete">OND</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -7845,55 +7936,71 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Speed 16X</source>
-        <translation type="unfinished">Snelheid 16X</translation>
+        <translation>Snelheid 16X</translation>
     </message>
     <message>
         <source>Speed 8X</source>
-        <translation type="unfinished">Snelheid 8X</translation>
+        <translation>Snelheid 8X</translation>
     </message>
     <message>
         <source>Speed 4X</source>
-        <translation type="unfinished">Snelheid 4X</translation>
+        <translation>Snelheid 4X</translation>
     </message>
     <message>
         <source>Speed 1/2X</source>
-        <translation type="unfinished">Snelheid 1/2X</translation>
+        <translation>Snelheid 1/2X</translation>
     </message>
     <message>
         <source>Speed 1/4X</source>
-        <translation type="unfinished">Snelheid 1/4X</translation>
+        <translation>Snelheid 1/4X</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Wissel Pip/Hoofd video</translation>
     </message>
     <message>
         <source>Previous Title/Chapter</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Vorige Title/Hoofdstuk</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla Stilstaande Beelden over</translation>
     </message>
     <message>
         <source>Next Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Volgende Titel</translation>
     </message>
     <message>
         <source>DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Hoofd Menu</translation>
     </message>
     <message>
         <source>Schedule Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan Opnames</translation>
     </message>
     <message>
         <source>Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Programma Zoeker</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished">Opnameschema wijzigen</translation>
+        <translation>Opnameschema wijzigen</translation>
+    </message>
+    <message>
+        <source>Skipping Back Not Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC CC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

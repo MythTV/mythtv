@@ -66,7 +66,7 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for </source>
-        <translation type="unfinished"></translation>
+        <translation>Analoogparameetrid kaardile </translation>
     </message>
 </context>
 <context>
@@ -379,8 +379,24 @@
     </message>
     <message>
         <source>Analog Options</source>
+        <translation>Analoogparameetrid</translation>
+    </message>
+    <message>
+        <source>Input and satellite settings.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Analog child card settings.
+WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various additional settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBDiSEqCType</name>
 </context>
 <context>
     <name>DVBSignalMonitor</name>
@@ -1119,19 +1135,23 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvestis on transkodeeritud</translation>
     </message>
     <message>
         <source>Recording is in Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvestisel on stereoheli</translation>
     </message>
     <message>
         <source>Recording is Close Captioned</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Salvestisel on teleteksti subtiitrid</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvestis on kõrgeresulutsiooniline</translation>
+    </message>
+    <message>
+        <source>Recording is Closed Captioned</source>
+        <translation>Salvestisel on teleteksti subtiitrid</translation>
     </message>
 </context>
 <context>
@@ -1649,7 +1669,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>cut point</source>
-        <translation>lõikepunkt</translation>
+        <translation>lõikekoht</translation>
     </message>
     <message>
         <source>keyframe</source>
@@ -1696,20 +1716,16 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>lõika</translation>
     </message>
     <message>
-        <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation type="obsolete">Sa oled olemasoleva lõikekoha lähedal.  Kas sa soovid:</translation>
-    </message>
-    <message>
         <source>Delete this cut point</source>
-        <translation>selle lõikekoha kustutada</translation>
+        <translation>Kustuta see lõikekoht</translation>
     </message>
     <message>
         <source>Move this cut point to the current position</source>
-        <translation>nihutada see lõikekoht praegusele kohale</translation>
+        <translation>Nihuta see lõikekoht praegusele kohale</translation>
     </message>
     <message>
         <source>Flip directions - delete to the </source>
-        <translation>keerata ümber - kustutada </translation>
+        <translation>Keera ümber - kustuta </translation>
     </message>
     <message>
         <source>right</source>
@@ -1721,11 +1737,11 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>tühistada</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Insert a new cut point?</source>
-        <translation>lisada uue lõikekoha?</translation>
+        <translation>Lisa uus lõikekoht</translation>
     </message>
     <message>
         <source>Delete before this frame</source>
@@ -2581,47 +2597,47 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
-        <translation>S</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation>T</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation>W</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecTypeChar kChannelRecord</comment>
-        <translation>C</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
-        <translation>A</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>F</source>
         <comment>RecTypeChar kFindOneRecord</comment>
-        <translation>O</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>d</source>
         <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation>p</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>w</source>
         <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation>n</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
-        <translation>O</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -2666,62 +2682,62 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
-        <translation>R</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
-        <translation>X</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>P</source>
         <comment>RecStatusChar rsPreviousRecording</comment>
-        <translation>P</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsCurrentRecording</comment>
-        <translation>R</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>r</source>
         <comment>RecStatusChar rsRepeat</comment>
-        <translation>r</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation>E</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecStatusChar rsTooManyRecordings</comment>
-        <translation>T</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
-        <translation>C</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>L</source>
         <comment>RecStatusChar rsLaterShowing</comment>
-        <translation>L</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>K</source>
         <comment>RecStatusChar rsLowDiskSpace</comment>
-        <translation>K</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>B</source>
         <comment>RecStatusChar rsTunerBusy</comment>
-        <translation>B</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
-        <translation>x</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -2874,7 +2890,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation>Teletekst</translation>
+        <translation type="obsolete">Teletekst</translation>
     </message>
     <message>
         <source>Subtitled</source>
@@ -2891,8 +2907,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     <message>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation>Tüüp
-category_type</translation>
+        <translation>Tüüp</translation>
     </message>
     <message>
         <source>Episode Number</source>
@@ -3683,10 +3698,6 @@ category_type</translation>
         <translation>Reklaamide vahelejätmise meetod</translation>
     </message>
     <message>
-        <source>Blank Frame Detection (default)</source>
-        <translation type="obsolete">Tühja kaadri avastamine (vaikimisi)</translation>
-    </message>
-    <message>
         <source>Blank Frame + Scene Change Detection</source>
         <translation>Tühja kaadri + stseeni muutuse avastamine</translation>
     </message>
@@ -3701,10 +3712,6 @@ category_type</translation>
     <message>
         <source>All</source>
         <translation>Kõik</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Selle järgi leiab MythTV reklaamide algused ja lõpud.  Reklaamide automaatse märgistamise lubamiseta saab kasutada ainult tühjade kaadrite avastamist.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -5605,27 +5612,27 @@ category_type</translation>
     <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
-        <translation>A</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>c</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>M</source>
         <comment>RecStatusChar rsMissed</comment>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
-        <translation>N</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>V</source>
         <comment>RecStatusChar rsNeverRecord</comment>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Aborted</source>
@@ -5818,30 +5825,6 @@ category_type</translation>
     <message>
         <source>Signal Timeout (msec)</source>
         <translation>Signaali aegumine (msek)</translation>
-    </message>
-    <message>
-        <source>Using hardware MPEG decoder</source>
-        <translation>Riistvaralise MPEG dekoodri kasutamine</translation>
-    </message>
-    <message>
-        <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
-        <translation>See tekitab lihtsama voo, mida saab edastada otse MPEG dekoodrisse.</translation>
-    </message>
-    <message>
-        <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
-        <translation>MythTV salvestab vaid ühe heli ja ühe subtiitrite voo.</translation>
-    </message>
-    <message>
-        <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation>Keele eelistuse saab seada kasutajaliidese menüüs Utiliidid/Seaded -&gt; Seaded -&gt; TV seaded -&gt; Üldine(lk 3).</translation>
-    </message>
-    <message>
-        <source>Store recordings in TS format.</source>
-        <translation>Hoia salvestised TS formaadis.</translation>
-    </message>
-    <message>
-        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation>Kasuta salvestusformaadina transpordivoogu mitte ebasoovitatavat programmivoo teisendust. Teisendusega läheb kaduma andmeid ning see ei luba MythTV&apos;l teha mõningaid turvakontrolle.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
@@ -6470,14 +6453,6 @@ MythTV lõpetab töö.</translation>
         <translation>USAs olevatest kaablivõrkudest kasutab enamus QAM-256 või QAM-64 kodeeringut kuid mõned võrgud võivad kasutada ka 8-VSB õhu kaudu edastatavatel kanalitel.</translation>
     </message>
     <message>
-        <source>Could not query inputs.</source>
-        <translation type="obsolete">Ei leia sisendeid.</translation>
-    </message>
-    <message>
-        <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="obsolete">VIGA, sisendite leidmiseks kompileeri V4L toega</translation>
-    </message>
-    <message>
         <source>Subtype</source>
         <translation>Alamtüüp</translation>
     </message>
@@ -6504,14 +6479,6 @@ MythTV lõpetab töö.</translation>
     <message>
         <source>Speed</source>
         <translation>Kiirus</translation>
-    </message>
-    <message>
-        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="obsolete">Ei saa sisendite proovimiseks &apos;%1&apos; avada.</translation>
-    </message>
-    <message>
-        <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation type="obsolete">VIGA, sisendite leidmiseks kompileeri DVB toega</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.</source>
@@ -6575,7 +6542,7 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
-        <translation>Käsk, mida käivitada kui BIOS vajab nvram-käivituse õnnestumiseks arvuti taaskäivitamist. Näiteid leiab README failist.</translation>
+        <translation type="obsolete">Käsk, mida käivitada kui BIOS vajab nvram-käivituse õnnestumiseks arvuti taaskäivitamist. Näiteid leiab README failist.</translation>
     </message>
     <message>
         <source>Command to reboot</source>
@@ -6954,14 +6921,6 @@ MythTV lõpetab töö.</translation>
         <translation>Salvestatud faili suurus</translation>
     </message>
     <message>
-        <source>Preserve Aspect Ratio of Video when resizing</source>
-        <translation type="obsolete">Video suuruse muutmisel säilita kuvasuhe</translation>
-    </message>
-    <message>
-        <source>Preserve the aspect ratio of the original recording file by ignoring the height setting above, and calculating the new height based on the aspect ratio and width.</source>
-        <translation type="obsolete">Originaalsalvestise vaatamisel ignoreeritakse kõrguse seadeid ning arvutatakse uus kõrgus laiuse ning kuvasuhte kaudu.</translation>
-    </message>
-    <message>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Näites on toodud tänane kuupäev.</translation>
     </message>
@@ -7007,86 +6966,160 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>You are close to an existing cut point. Would you like to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Oled olemasolevale lõikekohale väga lähedal!</translation>
     </message>
     <message>
         <source>Insert a new cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa uus lõikekoht</translation>
     </message>
     <message>
         <source>Too Far %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Liiga kaugel %1</translation>
     </message>
     <message>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaatse laiuse kasutamisel arvutatakse see kõrgusest ning salvestise kuvasuhtest.</translation>
     </message>
     <message>
         <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaatse kõrguse kasutamisel arvutatakse see laiusest ning salvestise kuvasuhtest.</translation>
     </message>
     <message>
         <source>Radio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Raadiokanalid.</translation>
     </message>
     <message>
         <source>If set, radio channels will also be included.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kui on valitud, lisatakse ka raadiokanalid.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
-        <translation type="unfinished"></translation>
+        <translation>Kõik võimalikud meetodid</translation>
     </message>
     <message>
         <source>Blank Frame Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Tühja kaadri avastamine</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklaamide avastamiseks kasutatav meetod.</translation>
     </message>
     <message>
         <source>Maximum commercial skip (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimaalne reklaami vahelejätmine (sekundites)</translation>
     </message>
     <message>
         <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the use to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV hoidub pikkade reklaamide käsitsi vahelejätmisest.  Sellest pikema reklaami vahelejätmiseks tuleb vahelejätmisnuppu vajutada topelt.  Automaatne vahelejätmine sellest ei sõltu.</translation>
     </message>
     <message>
         <source>Weighted Time/Priority Combination</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaalutud aja-prioriteedi kombinatsioon</translation>
     </message>
     <message>
         <source>Auto Expire Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaatse aegumise prioriteedi kaal</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvestise prioriteedi iga taseme puhul lisatav päevade arv. Seda kasutatakse vaid juhul, kui on valitud kaalutud aja-prioriteedi kombinatsiooni kasutamine.</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac riistvaraline kiirendus</translation>
     </message>
     <message>
         <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac puhul püütakse kasutada riistvaralist graafikaprotsessorit - see võib Mac-i kokku jooksutada!</translation>
     </message>
     <message>
         <source>Transcoder command</source>
-        <translation type="unfinished"></translation>
+        <translation>Transkooderi käsk</translation>
     </message>
     <message>
         <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Transkodeerimiseks kasutatav programm. Puuduva väärtuse puhul kasutatakse vaikimisi käsku &quot;mythtranscode&quot;.</translation>
     </message>
     <message>
         <source>Commercial Flagger command</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklaamide märgistamise käsk</translation>
     </message>
     <message>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
+        <translation>Reklaamide avastamiseks kasutatav programm. Puuduva väärtuse puhul kasutatakse vaikimisi käsku &quot;mythcommflag&quot;.</translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecStatusChar rsOffLine</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorder Off-Line</source>
+        <translation>Salvestaja välja lülitatud</translation>
+    </message>
+    <message>
+        <source>the backend recorder is off-line.</source>
+        <translation>taustaserveri salvestaja on välja lülitatud.</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation>Teletekst (CC)</translation>
+    </message>
+    <message>
+        <source>Use DishNet Long-term EIT Data</source>
+        <translation>Kasuta DishNetilt tulevat telekava</translation>
+    </message>
+    <message>
+        <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
+        <translation>Kui võtad vastu DishNeti satelliitidelt, on võimalik saada sealt ka pikaajalist telekava. Parima tulemuse saavutamiseks tuleks lubada ka EIT.</translation>
+    </message>
+    <message>
+        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
+        <translation>Kui BIOS vajab nvram-äratuse aktiveerimiseks alglaadimist, siis tuleb siia sisestada alglaadmisiskäsk. Erinevaid näiteid tasub vaadata README failist.</translation>
+    </message>
+    <message>
+        <source>Single LNB / Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.0 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 Switch (4-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.2 Positioner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.3 Positioner (Goto X)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW21 Switch (2-Way)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW64 Switch (3-Way)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7638,7 +7671,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation>Teletekst</translation>
+        <translation type="obsolete">Teletekst</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -7844,35 +7877,47 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous Title/Chapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaheta</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Jäta vahele muutumatu kaader</translation>
     </message>
     <message>
         <source>Next Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Järgmine pealkiri</translation>
     </message>
     <message>
         <source>DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD peamenüü</translation>
     </message>
     <message>
         <source>Schedule Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Planeeri salvestusi</translation>
     </message>
     <message>
         <source>Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmileidja</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished">Muuda salvestuskava</translation>
+        <translation>Muuda salvestuskava</translation>
+    </message>
+    <message>
+        <source>Skipping Back Not Allowed</source>
+        <translation>Tagasi vahelejätmine pole lubatud</translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation>Eelmine pealkiri</translation>
+    </message>
+    <message>
+        <source>VBI CC</source>
+        <translation>VBI teletekst</translation>
+    </message>
+    <message>
+        <source>ATSC CC</source>
+        <translation>ATSC teletekst</translation>
     </message>
 </context>
 <context>
@@ -8082,7 +8127,7 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation>LAgab tekstiga</translation>
+        <translation>Algab tekstiga</translation>
     </message>
     <message>
         <source>Contains text</source>
