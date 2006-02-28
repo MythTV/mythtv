@@ -126,7 +126,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
             "T");
     REG_KEY("TV Playback", "TOGGLECC708",
-            "Toggle ATSC CC", "#");
+            "Toggle ATSC CC", "^");
     REG_KEY("TV Playback", "MENURED",
             "Menu Red",    "F2");
     REG_KEY("TV Playback", "MENUGREEN",
@@ -194,7 +194,7 @@ void TV::InitKeys(void)
   Frontend:    D          OP R  U  X   01 3   7 9
   Editing:    C E   I       Q        Z
 
-  Playback: <>,.?/|[]{}\+-*#
+  Playback: <>,.?/|[]{}\+-*#^
   Frontend: <>,.?/
   Editing:  <>,.
 
