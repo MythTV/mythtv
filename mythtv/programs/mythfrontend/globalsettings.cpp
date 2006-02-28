@@ -1,4 +1,13 @@
-#include "config.h"
+// -*- Mode: c++ -*-
+#include <qstylefactory.h>
+#include <qsqldatabase.h>
+#include <qfile.h>
+#include <qdialog.h>
+#include <qcursor.h>
+#include <qdir.h>
+#include <qimage.h>
+
+#include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dbsettings.h"
@@ -9,13 +18,6 @@
 #include "scheduledrecording.h"
 #include "util-x11.h"
 #include "DisplayRes.h"
-#include <qstylefactory.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <qdialog.h>
-#include <qcursor.h>
-#include <qdir.h>
-#include <qimage.h>
 #include "uitypes.h"
 
 static HostComboBox *AudioOutputDevice()
