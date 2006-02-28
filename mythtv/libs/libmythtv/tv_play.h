@@ -273,7 +273,13 @@ class TV : public QObject
     
     void DoQueueTranscode(void);  
 
-    void SetAutoCommercialSkip(int skipMode = 0);
+    enum commSkipMode {
+        CommSkipOff = 0,
+        CommSkipOn = 1,
+        CommSkipNotify = 2,
+        CommSkipModes = 3,      /* placeholder */
+    };
+    void SetAutoCommercialSkip(enum commSkipMode skipMode = CommSkipOff);
     void SetManualZoom(bool zoomON = false);
  
     bool ClearOSD(void);
@@ -349,7 +355,7 @@ class TV : public QObject
     int     osd_general_timeout;
     int     osd_prog_info_timeout;
 
-    int     autoCommercialSkip;
+    enum commSkipMode autoCommercialSkip;
     bool    tryUnflaggedSkip;
 
     bool    smartForward;

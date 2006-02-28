@@ -153,11 +153,14 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SPEEDDEC", "Decrease the playback speed", "J");
     REG_KEY("TV Playback", "ADJUSTSTRETCH", "Turn on time stretch control", "A");
     REG_KEY("TV Playback", "TOGGLESTRETCH", "Toggle time stretch speed", "");
+    REG_KEY("TV Playback", "TOGGLEAUDIOSYNC",
+            "Turn on audio sync adjustment controls", "Y");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS", "Turn on the playback picture "
             "adjustment controls", "F");
     REG_KEY("TV Playback", "TOGGLERECCONTROLS", "Turn on the recording picture "
             "adjustment controls", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
+    REG_KEY("TV Playback", "CYCLECOMMSKIPMODE", "Cycle Commercial Skip mode", "R");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "#");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
@@ -224,7 +227,7 @@ TV::TV(void)
       jumptime(0), usePicControls(false), smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
       osd_general_timeout(2), osd_prog_info_timeout(3),
-      autoCommercialSkip(false), tryUnflaggedSkip(false),
+      autoCommercialSkip(CommSkipOff), tryUnflaggedSkip(false),
       smartForward(false), stickykeys(0),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
       vbimode(VBIMode::None),
@@ -341,7 +344,8 @@ bool TV::Init(bool createWindow)
     persistentbrowsemode = gContext->GetNumSetting("PersistentBrowseMode", 0);
     osd_general_timeout  = gContext->GetNumSetting("OSDGeneralTimeout", 2);
     osd_prog_info_timeout= gContext->GetNumSetting("OSDProgramInfoTimeout", 3);
-    autoCommercialSkip   = gContext->GetNumSetting("AutoCommercialSkip", 0);
+    autoCommercialSkip   = (enum commSkipMode)gContext->GetNumSetting(
+                            "AutoCommercialSkip", CommSkipOff);
     tryUnflaggedSkip     = gContext->GetNumSetting("TryUnflaggedSkip", 0);
     smartForward         = gContext->GetNumSetting("SmartForward", 0);
     stickykeys           = gContext->GetNumSetting("StickyKeys");
@@ -2226,6 +2230,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 normal_speed = 1.0f;
             }
             ChangeTimeStretch(0, false);
+        }
+        else if (action == "CYCLECOMMSKIPMODE") {
+            SetAutoCommercialSkip((enum commSkipMode)
+                                  ((autoCommercialSkip + 1) % CommSkipModes));
         }
         else if (action == "TOGGLEAUDIOSYNC")
             ChangeAudioSync(0);   // just display
@@ -5835,7 +5843,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire();
         else if (action.left(14) == "TOGGLECOMMSKIP")
-            SetAutoCommercialSkip(action.right(1).toInt());
+            SetAutoCommercialSkip((enum commSkipMode)(action.right(1).toInt()));
         else if (action == "QUEUETRANSCODE")
             DoQueueTranscode();
         else if (action == "JUMPPREV")
@@ -6230,20 +6238,20 @@ void TV::ToggleAutoExpire(void)
     }
 }
 
-void TV::SetAutoCommercialSkip(int skipMode)
+void TV::SetAutoCommercialSkip(enum commSkipMode skipMode)
 {
     QString desc = "";
 
     autoCommercialSkip = skipMode;
 
-    if (autoCommercialSkip == 0)
+    if (autoCommercialSkip == CommSkipOff)
         desc = tr("Auto-Skip OFF");
-    else if (autoCommercialSkip == 1)
+    else if (autoCommercialSkip == CommSkipOn)
         desc = tr("Auto-Skip ON");
-    else if (autoCommercialSkip == 2)
+    else if (autoCommercialSkip == CommSkipNotify)
         desc = tr("Auto-Skip Notify");
 
-    nvp->SetAutoCommercialSkip(autoCommercialSkip);
+    nvp->SetAutoCommercialSkip((int)autoCommercialSkip);
 
     if (GetOSD() && activenvp == nvp && desc != "" )
     {

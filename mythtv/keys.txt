@@ -124,6 +124,10 @@ LiveTV Browse Mode:
 - R             Toggle recording of current program (cycles through types)
 - ESC/O         Exit Browse mode.
 
+Playback Recording
+- Y   Adjust Audio Sync
+- R   Cycle Commercial-Skip Mode
+
 Playback Recording Zoom Mode:
 - Left          Move video to Left
 - Right         Move video to Right

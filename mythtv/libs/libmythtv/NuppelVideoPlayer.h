@@ -92,7 +92,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void SetFileName(QString lfilename)       { filename = lfilename; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetAutoCommercialSkip(int autoskip);
-    void SetCommercialSkipMethod(int m)       { commercialskipmethod = m; }
     void SetCommBreakMap(QMap<long long, int> &newMap);
     void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
     void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
@@ -598,7 +597,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     QMutex     commBreakMapLock;
     int        skipcommercials;
     int        autocommercialskip;
-    int        commercialskipmethod;
     int        commrewindamount;
     int        commnotifyamount;
     int        lastCommSkipDirection;

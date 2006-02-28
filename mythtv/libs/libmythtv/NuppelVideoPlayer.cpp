@@ -142,7 +142,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       videoFilters(NULL),           FiltMan(new FilterManager()),
       // Commercial filtering
       skipcommercials(0),           autocommercialskip(0),
-      commercialskipmethod(0),      commrewindamount(0),
+      commrewindamount(0),
       commnotifyamount(0),          lastCommSkipDirection(0),
       lastCommSkipTime(0/*1970*/),  lastCommSkipStart(0),
       lastSkipTime(0 /*1970*/),
