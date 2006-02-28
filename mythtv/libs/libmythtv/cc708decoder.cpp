@@ -565,10 +565,15 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
     int off = 1;
     int service_number = 0;
     int block_data_offset = 0;
-    int len = ((((int)pkt_buf[0])&0x3f)*2-1)&0xff;
+    int len     = ((((int)pkt_buf[0]) & 0x3f)<<1) - 1;
     int seq_num = (((int)pkt_buf[0])>>6)&0x3;
 
+    if (len < 0)
+        return;
 #if DEBUG_CC_RAWPACKET
+#else
+    if (len > pkt_size)
+#endif
     {
         int j;
         fprintf(stderr, "CC length(%2i) seq_num(%i) ", len, seq_num);
@@ -576,12 +581,8 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
             fprintf(stderr, "0x%x ", pkt_buf[j]);
         fprintf(stderr, "\n");
     }
-#else
-    (void) seq_num;
-#endif
 
     assert(pkt_size<127);
-    assert(len<128);
 
     while (pkt_buf[off] && off<pkt_size)
     { // service_block
