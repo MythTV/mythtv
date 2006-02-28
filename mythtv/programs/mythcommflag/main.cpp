@@ -895,9 +895,6 @@ int main(int argc, char *argv[])
         return COMMFLAG_EXIT_INVALID_CMDLINE;
     }
 
-    if (queueJobInstead)
-        return QueueCommFlagJob(chanid, starttime);
-
     if (copyToCutlist)
         return CopySkipListToCutList(chanid, starttime);
 
@@ -1009,7 +1006,10 @@ int main(int argc, char *argv[])
 
                 if ( allRecorded )
                 {
-                    FlagCommercials(chanid, starttime);
+                    if (queueJobInstead)
+                        QueueCommFlagJob(chanid, starttime);
+                    else
+                        FlagCommercials(chanid, starttime);
                 }
                 else
                 {
@@ -1063,7 +1063,12 @@ int main(int argc, char *argv[])
 
                             if ((flagStatus == COMM_FLAG_NOT_FLAGGED) &&
                                 (marksFound == 0))
-                                FlagCommercials(chanid, starttime);
+                            {
+                                if (queueJobInstead)
+                                    QueueCommFlagJob(chanid, starttime);
+                                else
+                                    FlagCommercials(chanid, starttime);
+                            }
                         }
                     }
                 }
