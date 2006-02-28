@@ -1009,6 +1009,7 @@ static HostCheckBox *AltClearSavedPosition()
     return gc;
 }
 
+#ifdef USING_XV
 static HostCheckBox *UsePicControls()
 {
     HostCheckBox *gc = new HostCheckBox("UseOutputPictureControls");
@@ -1021,6 +1022,7 @@ static HostCheckBox *UsePicControls()
                     "some systems."));
     return gc;
 }
+#endif
 
 static HostCheckBox *AudioNagSetting()
 {
@@ -3092,7 +3094,9 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(EndOfRecordingExitPrompt());
     gen2->addChild(ClearSavedPosition());
     gen2->addChild(AltClearSavedPosition());
+#ifdef USING_XV
     gen2->addChild(UsePicControls());
+#endif
     gen2->addChild(AudioNagSetting());
     gen2->addChild(UDPNotifyPort());
     addChild(gen2);
