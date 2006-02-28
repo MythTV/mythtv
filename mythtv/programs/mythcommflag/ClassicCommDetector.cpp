@@ -487,7 +487,7 @@ bool ClassicCommDetector::go()
                       (((endTime.tv_sec - startTime.tv_sec) * 1000000) +
                        (endTime.tv_usec - startTime.tv_usec));
 
-            const int alwaysStayNSecondsBehind = 120;
+            const int alwaysStayNSecondsBehind = 30;
             
             int secondsRecorded =
                 recordingStartedAt.secsTo(QDateTime::currentDateTime());
