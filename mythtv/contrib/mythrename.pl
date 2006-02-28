@@ -244,9 +244,7 @@ EOF
     # Double-check the destination
         $dest ||= "$video_dir/show_names";
     # Alert the user
-        if (defined($verbose)) {
-            print "Link destination directory:  $dest\n";
-        }
+        vprint("Link destination directory:  $dest");
     # Create nonexistent paths
         unless (-e $dest) {
             mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
@@ -404,9 +402,7 @@ EOF
             }
             symlink "$video_dir/".$info{'basename'}, "$dest/$name"
                 or die "Can't create symlink $dest/$name:  $!\n";
-            if (defined($verbose)) {
-                print "$dest/$name\n";
-            }
+            vprint("$dest/$name");
         }
     # Rename the file, but only if it's a real file
         elsif (-f "$video_dir/".$info{'basename'}) {
@@ -429,13 +425,17 @@ EOF
                     $rows = $sh2->execute($info{'basename'}, $info{'chanid'}, $info{'starttime'});
                     die "Couldn't restore original basename in database for ".$info{'basename'}.":  ($q2)\n" unless ($rows == 1);
                 }
-                if (defined($verbose)) {
-                    print $info{'basename'}."\t-> $name\n";
-                }
+                vprint($info{'basename'}."\t-> $name");
             }
         }
     }
 
     $sh->finish;
     $sh2->finish if ($sh2);
+
+# Print the message, but only if verbosity is enabled
+    sub vprint {
+        return unless (defined($verbose));
+        print join("\n", @_), "\n";
+    }
 
