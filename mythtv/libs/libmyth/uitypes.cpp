@@ -1500,7 +1500,7 @@ UIAnimatedImageType::UIAnimatedImageType(const QString &name, const QString &fil
     m_imagecount = imagecount;
     m_interval = interval;
     m_startinterval = startinterval;
-    m_currentimage = 1;
+    m_currentimage = 0;
 
     // create the image cache
     imageList = NULL;
@@ -1550,7 +1550,7 @@ void UIAnimatedImageType::LoadImages()
 {
     InitImageCache();
 
-    for (int x = 1; x <= m_imagecount; x++)
+    for (int x = 0; x < m_imagecount; x++)
     {
         if (!LoadImage(x))
             cerr << "UIAnimatedImage: LoadImages() Failed to load image No.: " << x << endl;
@@ -1561,7 +1561,7 @@ void UIAnimatedImageType::LoadImages()
 
 bool UIAnimatedImageType::LoadImage(int imageNo)
 {
-    if (imageNo > m_imagecount)
+    if (imageNo >= m_imagecount)
         return false;
 
     bool bSuccess = false;
@@ -1604,7 +1604,7 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
 
     if (!filefound)
     {
-         return false;
+         return true;
     }
 
     if (m_force_x == -1 && m_force_y == -1)
@@ -1673,12 +1673,12 @@ void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
         if (drawlayer == m_order)
         {
             // sanity check
-            if ( !imageList || m_currentimage < 1 || m_currentimage > (int) imageList->size() )
+            if ( !imageList || m_currentimage < 0 || m_currentimage >= (int) imageList->size() )
                     return;
 
-            if (!((*imageList)[m_currentimage-1])->isNull())
+            if (!((*imageList)[m_currentimage])->isNull())
             {
-                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *(*imageList)[m_currentimage-1], m_drop_x, m_drop_y);
+                dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), *(*imageList)[m_currentimage], m_drop_x, m_drop_y);
             }
         }
     }
@@ -1712,12 +1712,12 @@ void UIAnimatedImageType::IntervalTimeout()
 {
     timer.stop();
     m_currentimage++;
-    if (m_currentimage > m_imagecount)
-        m_currentimage = 1;
+    if (m_currentimage >= (int)imageList->size())
+        m_currentimage = 0;
 
     refresh();
 
-    if (m_currentimage == m_imagecount)
+    if (m_currentimage == (int)(imageList->size() - 1))
         timer.start(m_startinterval, true);
     else
         timer.start(m_interval, true);
@@ -1739,8 +1739,8 @@ void UIAnimatedImageType::NextImage()
     if (!timer.isActive())
     {
         m_currentimage++;
-        if (m_currentimage > m_imagecount)
-            m_currentimage = 1;
+        if (m_currentimage >= (int)imageList->size())
+            m_currentimage = 0;
 
         refresh();
     }
@@ -1751,8 +1751,8 @@ void UIAnimatedImageType::PreviousImage()
     if (!timer.isActive())
     {
         m_currentimage--;
-        if (m_currentimage < 1)
-            m_currentimage = m_imagecount;
+        if (m_currentimage < 0)
+            m_currentimage = (int)imageList->size() - 1;
 
         refresh();
     }
