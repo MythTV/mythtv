@@ -16,6 +16,7 @@
 #include "atsctables.h"
 #include "atscstreamdata.h"
 #include "dvbtables.h"
+#include "dishdescriptors.h"
 
 // MythTV DVB headers
 #include "siparser.h"
@@ -1287,6 +1288,7 @@ uint SIParser::ProcessDVBEventDescriptors(
 {
     uint    descriptorTag    = data[0];
     uint    descriptorLength = data[1];
+    uint    descCompression  = (event.TableID > 0x80) ? 2 : 1;
 
     switch (descriptorTag)
     {
@@ -1353,31 +1355,19 @@ uint SIParser::ProcessDVBEventDescriptors(
         }
         break;
 
-        case DescriptorID::dish_ename:
+        case DescriptorID::dish_event_name:
         {
-            int ht = (event.TableID > 0x80) ? 2 : 1;
-            if (data[1] > 1)
-                event.Event_Name =
-                    atsc_huffman2_to_string(data+3, data[1]-1, ht);
+            DishEventNameDescriptor dend(data);
+            if (dend.HasName())
+                event.Event_Name = dend.Name(descCompression);
         }
         break;
 
-        case DescriptorID::dish_edescription:
+        case DescriptorID::dish_event_description:
         {
-            int ht = (event.TableID > 0x80) ? 2 : 1;
-            if (data[1] > 2) 
-            {
-                if ((data[3] & 0xf8) == 0x80)
-                {
-                    event.Description =
-                        atsc_huffman2_to_string(data+4, data[1]-2, ht);
-                }
-                else
-                {
-                    event.Description =
-                        atsc_huffman2_to_string(data+3, data[1]-1, ht);
-                }
-            }
+            DishEventDescriptionDescriptor dedd(data);
+            if (dedd.HasDescription())
+                event.Description = dedd.Description(descCompression);
         }
         break;
 

@@ -252,7 +252,7 @@ using_backend {
     HEADERS += mpeg/mpegstreamdata.h       mpeg/atscstreamdata.h
     HEADERS += mpeg/dvbstreamdata.h        mpeg/scanstreamdata.h
     HEADERS += mpeg/mpegdescriptors.h      mpeg/atscdescriptors.h
-    HEADERS += mpeg/dvbdescriptors.h
+    HEADERS += mpeg/dvbdescriptors.h       mpeg/dishdescriptors.h
     HEADERS += mpeg/atsc_huffman.h
     HEADERS += mpeg/tsstats.h 
     SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
@@ -260,7 +260,7 @@ using_backend {
     SOURCES += mpeg/mpegstreamdata.cpp     mpeg/atscstreamdata.cpp
     SOURCES += mpeg/dvbstreamdata.cpp      mpeg/scanstreamdata.cpp
     SOURCES += mpeg/mpegdescriptors.cpp    mpeg/atscdescriptors.cpp
-    SOURCES += mpeg/dvbdescriptors.cpp
+    SOURCES += mpeg/dvbdescriptors.cpp     mpeg/dishdescriptors.cpp
     SOURCES += mpeg/atsc_huffman.cpp
 
     # Listings downloading classes
