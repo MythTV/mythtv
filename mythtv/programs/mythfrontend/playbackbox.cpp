@@ -140,6 +140,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       // Main Recording List support
       fillListTimer(new QTimer(this)),  connected(false),
       titleIndex(0),                    progIndex(0),
+      progsInDB(0),
       // Other state
       curitem(NULL),                    delitem(NULL),
       lastProgram(NULL),
@@ -261,7 +262,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     setNoErase();
     gContext->addListener(this);
 
-    if (!recGroupPassword.isEmpty() || (titleList.count() <= 1) || initialFilt)
+    if ((!recGroupPassword.isEmpty()) ||
+        ((titleList.count() <= 1) && (progsInDB > 0)) ||
+        (initialFilt))
         showRecGroupChooser();
 
     gContext->addCurrentLocation((type == Delete)? "DeleteBox":"PlaybackBox");
@@ -1380,6 +1383,7 @@ bool PlaybackBox::FillList()
         asCache[asKey] = p->availableStatus;
     }
 
+    progsInDB = 0;
     titleList.clear();
     progLists.clear();
     // Clear autoDelete for the "all" list since it will share the
@@ -1402,6 +1406,7 @@ bool PlaybackBox::FillList()
         vector<ProgramInfo *>::iterator i = infoList->begin();
         for ( ; i != infoList->end(); i++)
         {
+            progsInDB++;
             p = *i;
             if ((((p->recgroup == recGroup) ||
                   ((recGroup == "All Programs") &&

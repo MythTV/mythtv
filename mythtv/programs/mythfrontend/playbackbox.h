@@ -337,6 +337,7 @@ class PlaybackBox : public MythDialog
     int                 progIndex;  ///< Index of selected item index on page
     QStringList         titleList;  ///< list of pages
     ProgramMap          progLists;  ///< lists of programs by page        
+    int                 progsInDB;  ///< total number of recordings in DB
 
     // Play List support
     QStringList         playList;   ///< list of selected items "play list"
