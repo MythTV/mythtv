@@ -36,7 +36,7 @@ Optionally:
 
    fftw   - A very nice library for Fast Fourier Transforms (helps analyze
             audio data for playback visualizations). Currently using 2.1.3.
-            Don't use version 3. http://www.fftw.org/
+            http://www.fftw.org/
 
    OpenGL - Just about everyone should have this already (?). 
             http://www.opengl.org
