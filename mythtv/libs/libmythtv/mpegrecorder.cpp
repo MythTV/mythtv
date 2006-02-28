@@ -481,6 +481,9 @@ void MpegRecorder::StartRecording(void)
                 continue;
             case 0:
                 printf("select timeout - ivtv driver has stopped responding\n");
+                if(close(readfd) != 0)
+                    perror("close");
+                readfd = -1; // Force PVR card to be reopened on next iteration
                 continue;
            default: break;
         }
