@@ -9,6 +9,7 @@
 #define LOC QString("CC708: ")
 #define LOC_ERR QString("CC708, Error: ")
 
+#define DEBUG_CC_SERVICE       0
 #define DEBUG_CC_SERVICE_2     0
 #define DEBUG_CC_RAWPACKET     0
 #define DEBUG_CC_SERVICE_BLOCK 0
@@ -128,27 +129,40 @@ do { \
 static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
 {
     const int blk_size = cc->buf_size[service_num];
-    int blk_start = 0, i = 0;
+    int blk_start = 0, dlc_loc = 0, rst_loc = 0, i = 0;
 
+    // find last reset or delay cancel in buffer
     for (i = 0; i < blk_size; i++)
     {
         if (RST == cc->buf[service_num][i])
-        {        
-            cc->Reset(service_num);
-            blk_start = i+1;
-            cc->delayed[service_num] = 0;
-            break;
-        }
+            rst_loc = dlc_loc = i;
         else if (DLC == cc->buf[service_num][i])
-        {
-            cc->DelayCancel(service_num);
-            cc->delayed[service_num] = 0;
-            break;
-        }
+            dlc_loc = i;
     }
-    if (cc->buf_size[service_num] >= 126)
+
+    // reset, process only data after reset
+    if (rst_loc)
+    {
+        cc->Reset(service_num);
+        cc->delayed[service_num] = 0; // Reset implicitly cancels delay
+        blk_start = rst_loc + 1;
+    }
+
+    // if we have a delay cancel, cancel any delay
+    if (dlc_loc && cc->delayed[service_num])
+    {
+        cc->DelayCancel(service_num);
         cc->delayed[service_num] = 0;
-    
+    }
+
+    // cancel delay if the buffer is full
+    if (cc->delayed[service_num] && blk_size >= 126)
+    {
+        cc->DelayCancel(service_num);
+        cc->delayed[service_num] = 0;
+        dlc_loc = blk_size - 1;
+    }
+
 /*
   av_log(NULL, AV_LOG_ERROR,
   "cc_ss delayed(%i) blk_start(%i) blk_size(%i)\n",
@@ -188,24 +202,58 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
             append_character(cc, service_num, character);
             i++;
         }
-        if ((old_i == i) || cc->delayed[service_num])
+
+#if DEBUG_CC_SERVICE
+        fprintf(stderr, "i %i, blk_size %i\n", i, blk_size);
+#endif
+
+        // loop continuation check
+        if (old_i == i)
+        {
+#if DEBUG_CC_SERVICE
+            fprintf(stderr, "old_i == i == %1\n", i);
+            for (int i=0; i < blk_size; i++)
+                fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
+            fprintf(stderr, "\n");
+#endif
+            if (blk_size - i > 10)
+            {
+                fprintf(stderr, "eia-708 decoding error...");
+                cc->Reset(service_num);
+                cc->delayed[service_num] = 0;
+                i = cc->buf_size[service_num];
+            }
+            // There must be an incomplete code in buffer...
             break;
+        }
+        else if (cc->delayed[service_num] && dlc_loc < i)
+        {
+            // delay in effect
+            break;
+        }
+        else if (cc->delayed[service_num])
+        {
+            // this delay has already been canceled..
+            cc->DelayCancel(service_num);
+            cc->delayed[service_num] = 0;
+        }
     }
 
-    assert(((int)cc->buf_size[service_num] - i) >= 0);
-    if ((cc->buf_size[service_num] - i)>0)
+    // get rid of remaining bytes...
+    assert(((int)blk_size - i) >= 0);
+    if ((blk_size - i) > 0)
     {
         memmove(cc->buf[service_num], cc->buf[service_num] + i,
-                cc->buf_size[service_num] - i);
+                blk_size - i);
         cc->buf_size[service_num] -= i;
     }
     else
     {
-        if (0!=(cc->buf_size[service_num] - i))
+        if (0 != (blk_size - i))
         {
             fprintf(stderr, "parse_cc_service_stream buffer error "
-                    "i(%i) buf_size(%i)\n", i, cc->buf_size[service_num]);
-            for (i=0; (uint)i < cc->buf_size[service_num]; i++)
+                    "i(%i) buf_size(%i)\n", i, blk_size);
+            for (i=0; i < blk_size; i++)
                 fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
             fprintf(stderr, "\n");
         }
@@ -293,8 +341,10 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     }
     else if (DLC == cc->buf[service_num][i])
     {
+/* processed out-of-band
         cc->DelayCancel(service_num);
         cc->delayed[service_num] = 0;
+*/
         i+=1;
     }
     else if (code>=CLW && code<=DLY && ((i+1)<blk_size))
@@ -473,8 +523,11 @@ static void rightsize_buf(CC708Reader* cc, uint service_num, uint block_size)
         uint new_alloc    = cc->buf_alloc[service_num];
         for (uint i = 0; (i < 32) && (new_alloc <= min_new_size); i++)
             new_alloc *= 2;
-        cc->buf[service_num] = (unsigned char*) realloc(cc->buf, new_alloc);
-        cc->buf_alloc[service_num] = (cc->buf) ? new_alloc : 0;
+
+        cc->buf[service_num] =
+            (unsigned char*) realloc(cc->buf[service_num], new_alloc);
+        cc->buf_alloc[service_num] = (cc->buf[service_num]) ? new_alloc : 0;
+
 #if DEBUG_CC_SERVICE_2
         fprintf(stderr, "rightsize_buf: srv %i to %i bytes",
                 service_num, cc->buf_alloc[service_num]);
