@@ -343,7 +343,6 @@ public:
     uint        PID;
     CAList      CA;
     desc_list_t Descriptors;
-    bool        Record;
 };
 typedef QValueList<ElementaryPIDObject> ComponentList;
 
@@ -455,7 +454,7 @@ class PMTObject
 class PATHandler : public TableHandler
 {
 public:
-    PATHandler() : TableHandler() {}
+    PATHandler() : TableHandler() { Reset(); }
     ~PATHandler() {}
 
     void Reset();

@@ -211,7 +211,6 @@ void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
     Orig_Type   = e.Orig_Type;
     PID         = e.PID;
     CA          = QDeepCopy<CAList>(e.CA);
-    Record      = e.Record;
 
     desc_list_t::iterator it = Descriptors.begin();
     for (; it != Descriptors.end(); ++it)
@@ -237,8 +236,6 @@ void ElementaryPIDObject::Reset()
     for (; it != Descriptors.end(); ++it)
         delete [] *it;
     Descriptors.clear();
-
-    Record = false;
 }
 
 void TransportObject::Reset()

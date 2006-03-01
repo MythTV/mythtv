@@ -87,8 +87,6 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       dvbchannel(advbchannel),
       _reset_pid_filters(true),
       _pid_lock(true),
-      // PS recorder stuff
-      _ps_rec_audio_id(0xC0), _ps_rec_video_id(0xE0),
       // Output stream info
       _pat(NULL), _pmt(NULL), _next_pmt_version(0),
       _ts_packets_until_psip_sync(0),
@@ -98,8 +96,6 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
 {
-    bzero(_ps_rec_buf, sizeof(unsigned char) * 3);
-
     _drb = new DeviceReadBuffer(this);
     _buffer_size = (1024*1024 / TSPacket::SIZE) * TSPacket::SIZE;
 
@@ -167,17 +163,11 @@ void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
     VERBOSE(VB_RECORD, LOC + "SetPMTObject()");
     _input_pmt = *_pmt;
 
-    AutoPID();
-
     /* Rev the PMT version since PIDs are changing */
     _next_pmt_version = (_next_pmt_version + 1) & 0x1f;
     _ts_packets_until_psip_sync = 0;
 
-    dvbchannel->SetCAPMT(&_input_pmt);
-
     _reset_pid_filters = true;
-
-    bzero(_ps_rec_buf, sizeof(unsigned char) * 3);
 }
 
 bool DVBRecorder::Open(void)
@@ -324,18 +314,12 @@ bool DVBRecorder::OpenFilters(void)
 
     QMutexLocker change_lock(&_pid_lock);
 
-    _ps_rec_audio_id = 0xC0;
-    _ps_rec_video_id = 0xE0;
-
     // Record all streams flagged for recording
     bool need_pcr_pid = true;
     QValueList<ElementaryPIDObject>::const_iterator es;
     for (es = _input_pmt.Components.begin();
          es != _input_pmt.Components.end(); ++es)
     {
-        if (!(*es).Record)
-            continue;
-
         OpenFilter((*es).PID, DMX_PES_OTHER, (*es).Orig_Type);
         need_pcr_pid &= ((*es).PID != _input_pmt.PCRPID);
     }
@@ -568,13 +552,10 @@ void DVBRecorder::CreatePMT(void)
     it = _input_pmt.Components.begin();
     for (; it != _input_pmt.Components.end(); ++it)
     {
-        if ((*it).Record)
-        {
-            pdesc.push_back((*it).Descriptors);
-            pids.push_back((*it).PID);
-            uint type = StreamID::Normalize((*it).Orig_Type,(*it).Descriptors);
-            types.push_back(type);
-        }
+        pdesc.push_back((*it).Descriptors);
+        pids.push_back((*it).PID);
+        uint type = StreamID::Normalize((*it).Orig_Type,(*it).Descriptors);
+        types.push_back(type);
     }
 
     if (_video_stream_fd >= 0)
@@ -938,66 +919,4 @@ void DVBRecorder::CreateFakeVideo(void)
         // Recursive call to pass the packet to the ring-buffer
         ProcessTSPacket(*pkt);
     }
-}
-
-////////////////////////////////////////////////////////////
-// Stuff below this comment will be phased out after 0.20 //
-////////////////////////////////////////////////////////////
-
-static void print_pmt_info(
-    QString pre, const QValueList<ElementaryPIDObject> &pmt_list,
-    bool fta, uint program_number, uint pcr_pid)
-{
-    if (!(print_verbose_messages&VB_RECORD))
-        return;
-
-    VERBOSE(VB_RECORD, pre +
-            QString("AutoPID for MPEG Program Number(%1), PCR PID(0x%2)")
-            .arg(program_number).arg((pcr_pid),0,16));
-
-    QValueList<ElementaryPIDObject>::const_iterator it;
-    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
-    {
-        VERBOSE(VB_RECORD, pre +
-                QString("AutoPID %1 PID 0x%2, %3")
-                .arg(((*it).Record) ? "recording" : "skipping")
-                .arg((*it).PID,0,16).arg((*it).GetDescription()));
-    }
-
-    VERBOSE(VB_RECORD, pre + "AutoPID Complete - PAT/PMT Loaded for service\n"
-            "\t\t\tA/V Streams are " + ((fta ? "unencrypted" : "ENCRYPTED")));
-}
-
-/** \fn DVBRecorder::AutoPID(void)
- *  \brief Process PMT and decide which components should be recorded
- *
- *   This is particularly for hardware decoders which don't
- *   like to see more than one audio or one video stream.
- *
- *   When the hardware decoder is not specified all components
- *   are recorded.
- */
-void DVBRecorder::AutoPID(void)
-{
-    QMutexLocker change_lock(&_pid_lock);
-    QValueList<ElementaryPIDObject> &pmt_list = _input_pmt.Components;
-    QValueList<ElementaryPIDObject>::iterator it;
-
-    // If this is not for a hardware decoder, record everything
-    // we know about (ffmpeg doesn't like some DVB streams).
-    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
-    {
-        const desc_list_t &list = (*it).Descriptors;
-        uint type = StreamID::Normalize((*it).Orig_Type, list);
-        const void *st = MPEGDescriptor::Find(list, DescriptorID::subtitling);
-        const void *tt = MPEGDescriptor::Find(list, DescriptorID::teletext);
-
-        (*it).Record |= StreamID::IsAudio(type);
-        (*it).Record |= StreamID::IsVideo(type);
-        (*it).Record |= (st != NULL);
-        (*it).Record |= (tt != NULL);
-    }
-
-    print_pmt_info(LOC, pmt_list,
-                   _input_pmt.FTA(), _input_pmt.ServiceID, _input_pmt.PCRPID);
 }

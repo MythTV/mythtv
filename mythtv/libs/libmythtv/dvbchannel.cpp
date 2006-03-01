@@ -563,20 +563,8 @@ void DVBChannel::SetPMT(const PMTObject *pmt)
     // Send the PMT to recorder (needs to be cleaned up some)
     if (pmt)
         emit UpdatePMTObject(&chan_opts.pmt);
-}
 
-/** \fn DVBChannel::SetCAPMT(const PMTObject*)
- *  \brief Tells the Conditional Access Module which streams we wish to decode.
- *
- *   If dvbcam exists and DVBCam::IsRunning() returns true we tell it
- *   about our PMT, otherwise we do nothing.
- */
-void DVBChannel::SetCAPMT(const PMTObject *pmt)
-{
-    // This is called from DVBRecorder
-    // when AutoPID is complete
-
-    // Set the PMT for the CAM
+    // Tells the Conditional Access Module which streams we wish to decode.
     if (dvbcam->IsRunning())
         dvbcam->SetPMT(pmt);
 }

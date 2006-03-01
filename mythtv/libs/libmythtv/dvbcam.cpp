@@ -347,9 +347,6 @@ cCiCaPmt CreateCAPMT(const PMTObject &pmt,
     QValueList<ElementaryPIDObject>::const_iterator es;
     for (es = pmt.Components.begin(); es != pmt.Components.end(); ++es)
     {
-        if (!(*es).Record)
-            continue;
-
         VERBOSE(VB_CHANNEL, QString("Adding elementary stream: %1, PID=%2")
                 .arg((*es).GetDescription()).arg((*es).PID));
             

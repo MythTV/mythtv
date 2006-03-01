@@ -59,7 +59,7 @@ SIParser::SIParser(const char *name) :
     pmap_lock(false),
     // State variables
     ThreadRunning(false),           exitParserThread(false),
-    ParserInReset(false),           standardChange(false),
+    standardChange(false),
     eit_dn_long(false),
     PrivateTypesLoaded(false)
 {
@@ -74,8 +74,6 @@ SIParser::SIParser(const char *name) :
 #ifdef USING_DVB_EIT
     Table[EVENTS]   = new EventHandler();
 #endif //USING_DVB_EIT
-
-    Reset();
 
     // Get a list of wanted languages and set up their priorities
     // (Lowest number wins)
@@ -168,12 +166,8 @@ void SIParser::deleteLater(void)
 }
 
 /* Resets all trackers, and closes all section filters */
-void SIParser::Reset()
+void SIParser::Reset(void)
 {
-    ParserInReset = true;
-
-    // Close all pids that are open
-
     VERBOSE(VB_SIPARSER, LOC + "About to do a reset");
 
     PrintDescriptorStatistics();
@@ -185,12 +179,12 @@ void SIParser::Reset()
     PrivateTypes.reset();
 
     VERBOSE(VB_SIPARSER, LOC + "Resetting all Table Handlers");
-    pmap_lock.lock();
 
-    for (int x = 0; x < NumHandlers ; x++)
-        Table[x]->Reset();
-
-    pmap_lock.unlock();
+    {
+        QMutexLocker locker(&pmap_lock);
+        for (int x = 0; x < NumHandlers ; x++)
+            Table[x]->Reset();
+    }
 
     atsc_stream_data->Reset(-1,-1);
     dvb_stream_data->Reset();

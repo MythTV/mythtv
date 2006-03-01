@@ -74,12 +74,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     bool IsOpen(void) const { return _stream_fd >= 0; }
     void Close(void);
 
-    bool RecordsTransportStream(void) const
-        { return _record_transport_stream_option; }
-
-    bool RecordsProgramStream(void) const
-        { return !_record_transport_stream_option; }
-
   public slots:
     void SetPMTObject(const PMTObject*);
     void deleteLater(void);
@@ -90,7 +84,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     uint ProcessDataTS(unsigned char *buffer, uint len);
     bool ProcessTSPacket(const TSPacket& tspacket);
 
-    void AutoPID(void);
     bool OpenFilters(void);
     void CloseFilters(void);
     void OpenFilter(uint pid,
@@ -117,7 +110,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
   private:
     // Options set in SetOption()
     int             _card_number_option;
-    bool            _record_transport_stream_option;
 
     // DVB stuff
     DVBChannel*     dvbchannel;
@@ -127,11 +119,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     bool            _reset_pid_filters;
     QMutex          _pid_lock;
     PIDInfoMap      _pid_infos;
-
-    // PS recorder stuff
-    int             _ps_rec_audio_id;
-    int             _ps_rec_video_id;
-    unsigned char   _ps_rec_buf[3];
 
     // TS recorder stuff
     ProgramAssociationTable *_pat;

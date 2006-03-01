@@ -34,7 +34,6 @@ class DVBChannel : public QObject, public ChannelBase
     // Sets
     bool SetChannelByString(const QString &chan);
     void SetFreqTable(const QString &name);
-    void SetCAPMT(const PMTObject *pmt);
 
     // Gets
     bool IsOpen(void)                   const { return GetFd() >= 0; }

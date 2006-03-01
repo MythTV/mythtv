@@ -222,7 +222,6 @@ class SIParser : public QObject
     int                 ThreadRunning;
     bool                exitParserThread;
     TableSourcePIDObject TableSourcePIDs;
-    bool                ParserInReset;
     bool                standardChange;
     /// Decode DishNet's long-term DVB EIT
     bool                eit_dn_long;
