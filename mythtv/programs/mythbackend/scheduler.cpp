@@ -1136,6 +1136,10 @@ void Scheduler::RunScheduler(void)
             
         if (reschedQueue.count())
         {
+            // We might have been inactive for a long time, so make
+            // sure our DB connection is fresh before continuing.
+            dbConn = MSqlQuery::SchedCon();
+
             gettimeofday(&fillstart, NULL);
             QString msg;
             while (reschedQueue.count())
