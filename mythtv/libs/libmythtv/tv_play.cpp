@@ -2595,6 +2595,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     if (StateIsLiveTV(GetState()) || StateIsPlaying(internalState))
+    if ((StateIsLiveTV(GetState()) || StateIsPlaying(internalState)) &&
+        (!prbuffer->InDVDMenuOrStillFrame()))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
