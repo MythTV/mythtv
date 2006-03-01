@@ -3136,6 +3136,11 @@ bool fillData(QValueList<Source> &sourcelist)
                 }
             }
         }
+        else if (xmltv_grabber == "/bin/true")
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Source configured with no grabber. Nothing to do.");
+        }
         else
         {
             VERBOSE(VB_IMPORTANT,

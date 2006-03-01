@@ -105,6 +105,18 @@ protected:
     UseEIT *useeit;
 };
 
+class NoGrabber_config: public VerticalConfigurationGroup
+{
+public:
+    NoGrabber_config(const VideoSource& _parent);
+
+    virtual void save();
+    virtual void save(QString) { save(); }
+
+protected:
+    UseEIT *useeit;
+};
+
 class XMLTVConfig: public VerticalConfigurationGroup, 
                    public TriggeredConfigurationGroup {
 public:

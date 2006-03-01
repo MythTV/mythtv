@@ -342,6 +342,23 @@ void EITOnly_config::save()
     useeit->save();
 }
 
+NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
+{
+    setUseLabel(false);
+    setUseFrame(false);
+
+    useeit = new UseEIT(_parent);
+    useeit->setValue(false);
+    useeit->setVisible(false);
+    addChild(useeit);
+}
+
+void NoGrabber_config::save()
+{
+    useeit->setValue(false);
+    useeit->save();
+}
+
 XMLTVConfig::XMLTVConfig(const VideoSource& parent) 
 {
     setUseLabel(false);
@@ -414,6 +431,9 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
 
     addTarget("tv_grab_cz", new XMLTV_generic_config(parent, "tv_grab_cz"));
     grabber->addSelection("Czech Republic", "tv_grab_cz");
+
+    addTarget("/bin/true", new NoGrabber_config(parent));
+    grabber->addSelection("No grabber", "/bin/true");
 }
 
 VideoSource::VideoSource() 
