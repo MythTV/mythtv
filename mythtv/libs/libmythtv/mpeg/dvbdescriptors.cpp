@@ -4,66 +4,88 @@
 #include <qtextcodec.h>
 #include <qdeepcopy.h>
 
-// Decode a text string according to ETSI EN 300 468 Annex A
-QString dvb_decode_text(const unsigned char *src, uint length)
+// Only some of the QTextCodec calls are reenterant.
+// If you use this please verify that you are using a reenterant call.
+static const QTextCodec *iso8859_codecs[16] =
 {
-    QString result;
+    QTextCodec::codecForName("Latin1"),
+    QTextCodec::codecForName("ISO8859-1"),  // Western
+    QTextCodec::codecForName("ISO8859-2"),  // Central European
+    QTextCodec::codecForName("ISO8859-3"),  // Central European
+    QTextCodec::codecForName("ISO8859-4"),  // Baltic
+    QTextCodec::codecForName("ISO8859-5"),  // Cyrillic
+    QTextCodec::codecForName("ISO8859-6"),  // Arabic
+    QTextCodec::codecForName("ISO8859-7"),  // Greek
+    QTextCodec::codecForName("ISO8859-8"),  // Hebrew, visually ordered
+    QTextCodec::codecForName("ISO8859-9"),  // Turkish
+    QTextCodec::codecForName("ISO8859-10"),
+    QTextCodec::codecForName("ISO8859-11"),
+    QTextCodec::codecForName("ISO8859-12"),
+    QTextCodec::codecForName("ISO8859-13"),
+    QTextCodec::codecForName("ISO8859-14"),
+    QTextCodec::codecForName("ISO8859-15"), // Western
+};
 
-    if (!length)
-        return QString("");
+// Decode a text string according to ETSI EN 300 468 Annex A
+QString dvb_decode_text(const unsigned char *src, uint raw_length)
+{
+    if (!raw_length)
+        return "";
 
-    unsigned char buf[length];
-    memcpy(buf, src, length);
-
-    if ((buf[0] <= 0x10) || (buf[0] >= 0x20))
+    if ((0x10 < src[0]) && (src[0] < 0x20))
     {
-        // Strip formatting characters
-        for (uint p = 0; p < length; p++)
-        {
-            if ((buf[p] >= 0x80) && (buf[p] <= 0x9F))
-                memmove(buf + p, buf + p + 1, --length - p);
-        }
+        // TODO: Handle multi-byte encodings
+        VERBOSE(VB_SIPARSER, "dvb_decode_text: "
+                "Multi-byte coded text is not yet supported.");
+        return "";
+    }
 
-        if (buf[0] >= 0x20)
+    // Strip formatting characters
+    char dst[raw_length];
+    uint length = 0;
+    for (uint i = 0; i < raw_length; i++)
+    {
+        if ((src[i] < 0x80) || (src[i] > 0x9F))
         {
-            result = QString::fromLatin1((const char*)buf, length);
+            dst[length] = src[i];
+            length++;
         }
-        else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
-        {
-            QString coding = "ISO8859-" + QString::number(4 + buf[0]);
-            QTextCodec *codec = QTextCodec::codecForName(coding);
-            result = codec->toUnicode((const char*)buf + 1, length - 1);
-        }
-        else if (buf[0] == 0x10)
-        {
-            // If the first byte of the text field has a value "0x10"
-            // then the following two bytes carry a 16-bit value (uimsbf) N
-            // to indicate that the remaining data of the text field is
-            // coded using the character code table specified by
-            // ISO Standard 8859, parts 1 to 9
+    }
+    const char *buf = dst;
 
-            uint code = 1;
-            swab(buf + 1, &code, 2);
-            QString coding = "ISO8859-" + QString::number(code);
-            QTextCodec *codec = QTextCodec::codecForName(coding);
-            result = codec->toUnicode((const char*)buf + 3, length - 3);
-        }
+    // Exit on empty string, sans formatting.
+    if (!length)
+        return "";
+
+    // Decode using the correct text codec
+    if (buf[0] >= 0x20)
+    {
+        return QString::fromLatin1(buf, length);
+    }
+    else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
+    {
+        return iso8859_codecs[4 + buf[0]]->toUnicode(buf + 1, length - 1);
+    }
+    else if (buf[0] == 0x10)
+    {
+        // If the first byte of the text field has a value "0x10"
+        // then the following two bytes carry a 16-bit value (uimsbf) N
+        // to indicate that the remaining data of the text field is
+        // coded using the character code table specified by
+        // ISO Standard 8859, parts 1 to 9
+
+        uint code = 1;
+        swab(buf + 1, &code, 2);
+        if (code <= 15)
+            return iso8859_codecs[code]->toUnicode(buf + 3, length - 3);
         else
-        {
-            // Unknown/invalid encoding - assume local8Bit
-            result = QString::fromLocal8Bit((const char*)buf + 1, length - 1);
-        }
+            return QString::fromLocal8Bit(buf + 3, length - 3);
     }
     else
     {
-        // TODO: Handle multi-byte encodings
-
-        VERBOSE(VB_SIPARSER, "dvbdescriptors.cpp: "
-                "Multi-byte coded text - not supported!");
-        result = "N/A";
+        // Unknown/invalid encoding - assume local8Bit
+        return QString::fromLocal8Bit(buf + 1, length - 1);
     }
-
-    return result;
 }
 
 QMutex            ContentDescriptor::categoryLock;
