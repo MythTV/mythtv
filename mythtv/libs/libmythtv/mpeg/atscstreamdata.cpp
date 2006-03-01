@@ -250,10 +250,8 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 void ATSCStreamData::SetEITSectionSeen(uint pid, uint atsc_source_id,
                                        uint section)
 {
-    static const unsigned char bit_sel[] =
-        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
     uint key = (pid<<16) | atsc_source_id;
-    QMap<uint, sections_t>::iterator it = _eit_section_seen.find(key);
+    sections_map_t::iterator it = _eit_section_seen.find(key);
     if (it == _eit_section_seen.end())
     {
         _eit_section_seen[key].resize(32, 0);
@@ -265,10 +263,8 @@ void ATSCStreamData::SetEITSectionSeen(uint pid, uint atsc_source_id,
 bool ATSCStreamData::EITSectionSeen(uint pid, uint atsc_source_id,
                                     uint section) const
 {
-    static const unsigned char bit_sel[] =
-        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
     uint key = (pid<<16) | atsc_source_id;
-    QMap<uint, sections_t>::const_iterator it = _eit_section_seen.find(key);
+    sections_map_t::const_iterator it = _eit_section_seen.find(key);
     if (it == _eit_section_seen.end())
         return false;
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);

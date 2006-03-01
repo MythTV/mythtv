@@ -91,6 +91,21 @@ SIParser::SIParser(const char *name) :
         }
     }
 
+    // MPEG table signals
+    connect(atsc_stream_data,
+            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+            this,
+            SLOT(  HandlePAT(const ProgramAssociationTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
+            this,
+            SLOT(  HandleCAT(const ConditionalAccessTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+            this,
+            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
+
+    // ATSC table signals
     connect(atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
             this,             SLOT(  HandleMGT(const MasterGuideTable*)));
     connect(atsc_stream_data,
@@ -559,23 +574,33 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         }
     }
 
+    // Parse tables for ATSC
+    if (SIStandard == SI_STANDARD_ATSC)
+    {
+        atsc_stream_data->HandleTables(pid, psip);
+        return;
+    }
+
     // Parse MPEG tables
-    if (TableID::PAT == psip.TableID() &&
-        !((PATHandler*) Table[PAT])->Tracker.AddSection(&head))
+    if (SIStandard == SI_STANDARD_DVB)
     {
-        ProgramAssociationTable pat(psip);
-        HandlePAT(&pat);
-    }
-    else if (TableID::CAT == psip.TableID())
-    {
-        ConditionalAccessTable cat(psip);
-        HandleCAT(&cat);
-    }
-    else if (TableID::PMT == psip.TableID() &&
-             !Table[PMT]->AddSection(&head, psip.TableIDExtension(), 0))
-    {
-        ProgramMapTable pmt(psip);
-        HandlePMT(pmt.ProgramNumber(), &pmt);
+        if (TableID::PAT == psip.TableID() &&
+            !((PATHandler*) Table[PAT])->Tracker.AddSection(&head))
+        {
+            ProgramAssociationTable pat(psip);
+            HandlePAT(&pat);
+        }
+        else if (TableID::CAT == psip.TableID())
+        {
+            ConditionalAccessTable cat(psip);
+            HandleCAT(&cat);
+        }
+        else if (TableID::PMT == psip.TableID() &&
+                 !Table[PMT]->AddSection(&head, psip.TableIDExtension(), 0))
+        {
+            ProgramMapTable pmt(psip);
+            HandlePMT(pmt.ProgramNumber(), &pmt);
+        }
     }
 
     // Parse DVB specific NIT and SDT tables
@@ -608,12 +633,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             if (!Table[SERVICES]->AddSection(&head, sect_tsid, 0))
                 HandleSDT(sect_tsid, &sdt);
         }
-    }
-
-    // Parse ATSC specific tables
-    if (SIStandard == SI_STANDARD_ATSC)
-    {
-        atsc_stream_data->HandleTables(pid, psip);
     }
 
 #ifdef USING_DVB_EIT

@@ -11,17 +11,21 @@ using namespace std;
 #include "util.h"
 
 class ProgramAssociationTable;
+class ConditionalAccessTable;
 class ProgramMapTable;
 class HDTVRecorder;
 class PSIPTable;
 class RingBuffer;
 class PESPacket;
 
-typedef QMap<unsigned int, PESPacket*> pid_pes_map_t;
-typedef QMap<const PSIPTable*, int>    psip_refcnt_map_t;
-typedef vector<const ProgramMapTable*> pmt_vec_t;
+typedef QMap<unsigned int, PESPacket*>  pid_pes_map_t;
+typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
+typedef vector<const ProgramMapTable*>  pmt_vec_t;
 typedef QMap<uint, const ProgramMapTable*> pmt_map_t;
-typedef QMap<uint, ProgramMapTable*>   pmt_cache_t;
+typedef QMap<uint, ProgramMapTable*>    pmt_cache_t;
+typedef vector<unsigned char>           uchar_vec_t;
+typedef uchar_vec_t                     sections_t;
+typedef QMap<uint, sections_t>          sections_map_t;
 
 class MPEGStreamData : public QObject
 {
@@ -63,11 +67,38 @@ class MPEGStreamData : public QObject
         { return _pids_listening; }
 
     // Table versions
-    virtual void SetVersionPAT(int version) { _pat_version = version;  }
-    virtual int  VersionPAT(void) const     { return _pat_version;     }
-    virtual void SetVersionPMT(uint program_num, int ver)
-        { _pmt_version[program_num] = ver; }
-    virtual inline int VersionPMT(uint program_num) const;
+    void SetVersionPAT(int version)
+    {
+        if (_pat_version == version)
+            return;
+        _pat_version = version;
+        _pat_section_seen.clear();
+        _pat_section_seen.resize(32, 0);
+    }
+    int  VersionPAT(void) const { return _pat_version; }
+
+    void SetVersionPMT(uint program_num, int version)
+    {
+        if (_pmt_version[program_num] == version)
+            return;
+        _pmt_version[program_num] = version;
+        _pmt_section_seen[program_num].clear();
+        _pmt_section_seen[program_num].resize(32, 0);
+    }
+    int  VersionPMT(uint prog_num) const
+    {
+        const QMap<uint, int>::const_iterator it = _pmt_version.find(prog_num);
+        if (it == _pmt_version.end())
+            return -1;
+        return *it;
+    }
+
+    // Sections seen
+    void SetPATSectionSeen(uint section);
+    bool PATSectionSeen(uint section) const;
+
+    void SetPMTSectionSeen(uint prog_num, uint section);
+    bool PMTSectionSeen(uint prog_num, uint section) const;
 
     // Caching
     virtual bool HasCachedPAT(void) const;
@@ -85,6 +116,7 @@ class MPEGStreamData : public QObject
 
   signals:
     void UpdatePAT(const ProgramAssociationTable*);
+    void UpdateCAT(const ConditionalAccessTable*);
     void UpdatePMT(uint program_num, const ProgramMapTable*);
 
   public:
@@ -161,6 +193,9 @@ class MPEGStreamData : public QObject
     int                       _pat_version;
     QMap<uint, int>           _pmt_version;
 
+    sections_t                _pat_section_seen;
+    sections_map_t            _pmt_section_seen;
+
     // PSIP construction 
     pid_pes_map_t             _partial_pes_packet_cache;
 
@@ -186,6 +221,9 @@ class MPEGStreamData : public QObject
     bool                      _invalid_pat_seen;
     bool                      _invalid_pat_warning;
     MythTimer                 _invalid_pat_timer;
+
+  protected:
+    static const unsigned char bit_sel[8];
 };
 
 #include "mpegtables.h"
@@ -218,12 +256,6 @@ inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
 {
     // TODO
     //AdaptationFieldControl afc(tspacket.data()+4);
-}
-
-inline int MPEGStreamData::VersionPMT(uint prog_num) const
-{
-    const QMap<uint, int>::const_iterator it = _pmt_version.find(prog_num);
-    return (it == _pmt_version.end()) ? -1 : *it;
 }
 
 #endif 

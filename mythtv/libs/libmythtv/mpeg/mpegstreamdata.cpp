@@ -5,6 +5,11 @@
 #include "RingBuffer.h"
 #include "mpegtables.h"
 
+const unsigned char MPEGStreamData::bit_sel[8] =
+{
+    0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
+};
+
 /** \class MPEGStreamData
  *  \brief Encapsulates data about MPEG stream and emits events for each table.
  */
@@ -27,6 +32,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _pat_single_program(NULL), _pmt_single_program(NULL),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
+    SetVersionPAT(-1);
     AddListeningPID(MPEG_PAT_PID);
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
@@ -35,8 +41,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
 MPEGStreamData::~MPEGStreamData()
 {
     Reset(-1);
-    SetPATSingleProgram(0);
-    SetPMTSingleProgram(0);
+    SetPATSingleProgram(NULL);
+    SetPMTSingleProgram(NULL);
 
     // Delete any cached tables that haven't been returned
     psip_refcnt_map_t::iterator it = _cached_slated_for_deletion.begin();
@@ -49,8 +55,10 @@ void MPEGStreamData::Reset(int desiredProgram)
     _desired_program = desiredProgram;
     _invalid_pat_seen = false;
 
-    SetPATSingleProgram(0);
-    SetPMTSingleProgram(0);
+    SetPATSingleProgram(NULL);
+    SetPMTSingleProgram(NULL);
+
+    SetVersionPAT(-1);
 
     pid_pes_map_t old = _partial_pes_packet_cache;
     pid_pes_map_t::iterator it = old.begin();
@@ -64,6 +72,7 @@ void MPEGStreamData::Reset(int desiredProgram)
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
     _pmt_version.clear();
+    _pmt_section_seen.clear();
 
     {
         QMutexLocker locker(&_cache_lock);
@@ -356,14 +365,26 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
  */
 bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
+    (void) pid;
     const int table_id = psip.TableID();
     const int version  = psip.Version();
 
     if (TableID::PAT == table_id)
-        return (version == VersionPATSingleProgram());
+    {
+        if (VersionPAT() != version)
+            return false;
+        return PATSectionSeen(psip.Section());
+    }
+
+    if (TableID::CAT == table_id)
+        return false;
 
     if (TableID::PMT == table_id)
-        return version == VersionPMT(psip.TableIDExtension());
+    {
+        if (VersionPMT(psip.TableIDExtension()) != version)
+            return false;
+        return PMTSectionSeen(psip.TableIDExtension(), psip.Section());
+    }
 
     return false;
 }
@@ -373,12 +394,15 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
  */
 bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
+    const int version = psip.Version();
     // If we get this far decode table
     switch (psip.TableID())
     {
         case TableID::PAT:
         { 
-            SetVersionPAT(psip.Version());
+            SetVersionPAT(version);
+            SetPATSectionSeen(psip.Section());
+
             if (_cache_tables)
             {
                 ProgramAssociationTable *pat =
@@ -393,9 +417,17 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             }
             return true;
         }
+        case TableID::CAT:
+        {
+            ConditionalAccessTable cat(psip);
+            emit UpdateCAT(&cat);
+            return true;
+        }
         case TableID::PMT:
         {
-            SetVersionPMT(psip.TableIDExtension(), psip.Version());
+            SetVersionPMT(psip.TableIDExtension(), version);
+            SetPMTSectionSeen(psip.TableIDExtension(), psip.Section());
+
             if (_cache_tables)
             {
                 ProgramMapTable *pmt = new ProgramMapTable(psip);
@@ -613,6 +645,39 @@ void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
         _partial_pes_packet_cache.replace(pid, packet);
         delete old;
     }
+}
+
+void MPEGStreamData::SetPATSectionSeen(uint section)
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    _pat_section_seen[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool MPEGStreamData::PATSectionSeen(uint section) const
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    return (bool) (_pat_section_seen[section>>3] & bit_sel[section & 0x7]);
+}
+
+void MPEGStreamData::SetPMTSectionSeen(uint prog_num, uint section)
+{
+    sections_map_t::iterator it = _pmt_section_seen.find(prog_num);
+    if (it == _pmt_section_seen.end())
+    {
+        _pmt_section_seen[prog_num].resize(32, 0);
+        it = _pmt_section_seen.find(prog_num);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool MPEGStreamData::PMTSectionSeen(uint prog_num, uint section) const
+{
+    sections_map_t::const_iterator it = _pmt_section_seen.find(prog_num);
+    if (it == _pmt_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
 bool MPEGStreamData::HasCachedPAT(void) const

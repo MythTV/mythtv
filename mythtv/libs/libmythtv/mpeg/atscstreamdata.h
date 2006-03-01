@@ -32,8 +32,6 @@ typedef vector<const TerrestrialVirtualChannelTable*> tvct_vec_t;
 typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
 typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
 typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
-typedef vector<unsigned char>           uchar_vec_t;
-typedef uchar_vec_t                     sections_t;
 
 class ATSCStreamData : public MPEGStreamData
 {
@@ -63,8 +61,10 @@ class ATSCStreamData : public MPEGStreamData
         { _cvct_version[tsid] = version; }
     void SetVersionEIT(uint pid, uint atsc_source_id, int version)
     {
-        _eit_version[(pid<<16) | atsc_source_id] = version;
-        _eit_section_seen.clear();
+        uint key = (pid<<16) | atsc_source_id;
+        _eit_version[key] = version;
+        _eit_section_seen[key].clear();
+        _eit_section_seen[key].resize(32, 0);
     }
     void SetEITSectionSeen(uint pid, uint atsc_source_id, uint section);
 
@@ -134,7 +134,7 @@ class ATSCStreamData : public MPEGStreamData
     QMap<uint, int> _tvct_version;
     QMap<uint, int> _cvct_version;
     QMap<uint, int> _eit_version;
-    QMap<uint, sections_t> _eit_section_seen;
+    sections_map_t  _eit_section_seen;
 
     // Caching
     mutable MasterGuideTable *_cached_mgt;
