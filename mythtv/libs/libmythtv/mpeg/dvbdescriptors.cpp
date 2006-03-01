@@ -74,8 +74,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length)
         // coded using the character code table specified by
         // ISO Standard 8859, parts 1 to 9
 
-        uint code = 1;
-        swab(buf + 1, &code, 2);
+        uint code = buf[1] << 8 | buf[2];
         if (code <= 15)
             return iso8859_codecs[code]->toUnicode(buf + 3, length - 3);
         else
