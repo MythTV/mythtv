@@ -301,7 +301,7 @@ class PSIPTable : public PESPacket
     bool PrivateIndicator(void) const { return pesdata()[1] & 0x40; }
     // reserved             2       1.2      10
 
-    // section_length      12       1.4      12   always less than 0xFFE
+    // section_length      12       1.4      12   always less than 0x3fd
     // adds 3 to the total section length to account for 3 bytes
     // before the end of the section length field.
     uint SectionLength(void) const { return Length() + 3; }
@@ -613,7 +613,7 @@ class ConditionalAccessTable : public PSIPTable
     // section_syntax_ind   1       1.0       8   should always be 1
     // private_indicator    1       1.1       9   should always be 0
     // reserved             2       1.2      10
-    // section_length      12       1.4      12   always less than 0xFFE
+    // section_length      12       1.4      12   always less than 0x3fd
     // table_id_extension  16       3.0      24   unused
     // reserved             2       5.0      40
     // version_number       5       5.2      42
@@ -624,7 +624,9 @@ class ConditionalAccessTable : public PSIPTable
 
     // for (i = 0; i < N; i++)      8.0      64
     //   { descriptor() }
-    const unsigned char *Descriptors() const { return psipdata(); }
+    uint DescriptorsLength(void) const
+        { return SectionLength() - PSIP_OFFSET - (HasCRC() ? 4 : 0); }
+    const unsigned char *Descriptors(void) const { return psipdata(); }
 
     // CRC_32 32 rpchof
 };

@@ -567,7 +567,10 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         HandlePAT(&pat);
     }
     else if (TableID::CAT == psip.TableID())
-        ParseCAT(pid, &head, &buffer[8], size - 8);
+    {
+        ConditionalAccessTable cat(psip);
+        HandleCAT(&cat);
+    }
     else if (TableID::PMT == psip.TableID() &&
              !Table[PMT]->AddSection(&head, psip.TableIDExtension(), 0))
     {
@@ -729,23 +732,22 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
     }
 }
 
-void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
-                        uint8_t *buffer, uint size)
+void SIParser::HandleCAT(const ConditionalAccessTable *cat)
 {
-    (void) head;
+    const desc_list_t list = MPEGDescriptor::Parse(
+        cat->Descriptors(), cat->DescriptorsLength());
 
-    CAPMTObject c;
-
-    int pos = -1;
-    while (pos < ((int)size - 4))
+    for (uint i = 0; i < list.size(); i++)
     {
-        if (buffer[pos+1] == 0x09)
+        if (DescriptorID::conditional_access != list[i][0])
         {
-            c = ParseDescCA(&buffer[pos+1],buffer[pos+2]);
-            VERBOSE(VB_SIPARSER, LOC + QString("CA System 0x%1, EMM PID = %2")
-                    .arg(c.CASystemID,0,16).arg(c.PID));
+            CountUnusedDescriptors(0x1, list[i]);
+            continue;
         }
-        pos += buffer[pos+2] + 2;
+
+        ConditionalAccessDescriptor ca(list[i]);
+        VERBOSE(VB_GENERAL, LOC + QString("CA System 0x%1, EMM PID = 0x%2")
+                .arg(ca.SystemID(),0,16).arg(ca.PID()));
     }
 }
 
@@ -769,7 +771,15 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     {
         if (DescriptorID::conditional_access == (*it)[0])
         {
-            CAPMTObject cad = ParseDescCA((*it), (*it)[1] + 2);
+            ConditionalAccessDescriptor ca(*it);
+
+            CAPMTObject cad;
+            cad.CASystemID  = ca.SystemID();
+            cad.PID         = ca.PID();
+            cad.Data_Length = ca.DataSize();
+            if (ca.DataSize())
+                memcpy(cad.Data, ca.Data(), ca.DataSize());
+
             p.CA.append(cad);
             p.hasCA = true;
         }
@@ -802,8 +812,16 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         {
             if (DescriptorID::conditional_access == (*it)[0])
             {
-                CAPMTObject cad = ParseDescCA(*it, (*it)[1] + 2);
-                e.CA.append(cad);
+                ConditionalAccessDescriptor ca(*it);
+
+                CAPMTObject cad;
+                cad.CASystemID  = ca.SystemID();
+                cad.PID         = ca.PID();
+                cad.Data_Length = ca.DataSize();
+                if (ca.DataSize())
+                    memcpy(cad.Data, ca.Data(), ca.DataSize());
+
+                p.CA.append(cad);
                 p.hasCA = true;
             }
             else if (DescriptorID::teletext == (*it)[0])
@@ -859,15 +877,6 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     ((PMTHandler*) Table[PMT])->pmt[pmt->ProgramNumber()] = p;
 }
 
-void SIParser::ProcessUnusedDescriptor(uint pid, const uint8_t *data, uint)
-{
-    if (print_verbose_messages & VB_SIPARSER)
-    {
-        QMutexLocker locker(&descLock);
-        descCount[pid<<8 | data[0]]++;
-    }
-}
-
 /*------------------------------------------------------------------------
  *   DVB TABLE PARSERS
  *------------------------------------------------------------------------*/
@@ -918,7 +927,7 @@ void SIParser::HandleNITDesc(const desc_list_t &dlist)
             continue;
         if (DescriptorID::linkage == dlist[i][0])
             continue;
-        ProcessUnusedDescriptor(0, dlist[i], dlist[i][1] + 2);
+        CountUnusedDescriptors(0x10, dlist[i]);
     }
 }
 
@@ -978,7 +987,7 @@ void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
         }
         else
         {
-            ProcessUnusedDescriptor(0x10, dlist[i], dlist[i][1] + 2);
+            CountUnusedDescriptors(0x10, dlist[i]);
         }
     }
 }
@@ -1065,9 +1074,9 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 
                 if (PrivateTypes.TVServiceTypes.contains(s.ServiceType))
                     s.ServiceType = PrivateTypes.TVServiceTypes[s.ServiceType];
+                continue;
             }
-            else
-                ProcessUnusedDescriptor(0, list[j], list[j][1] + 2);
+            CountUnusedDescriptors(0x11, list[j]);
         }
 
         // Check if we should collect EIT on this transport
@@ -1248,26 +1257,6 @@ void SIParser::HandleEIT(const DVBEventInformationTable *eit)
 }
 
 /*------------------------------------------------------------------------
- *   COMMON DESCRIPTOR PARSERS
- *------------------------------------------------------------------------*/
-// Descriptor 0x09 - Conditional Access Descriptor
-CAPMTObject SIParser::ParseDescCA(const uint8_t *buffer, int size)
-{
-    (void) size;
-    CAPMTObject retval;
-
-    retval.CASystemID = buffer[2] << 8 | buffer[3];
-    retval.PID = (buffer[4] & 0x1F) << 8 | buffer[5];
-    retval.Data_Length = buffer[1] - 4;
-    if (retval.Data_Length > 0)
-    {
-        memcpy(retval.Data, &buffer[6], retval.Data_Length);
-    }
-
-    return retval;
-}
-
-/*------------------------------------------------------------------------
  *   DVB DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
 
@@ -1373,7 +1362,7 @@ uint SIParser::ProcessDVBEventDescriptors(
         break;
 
         default:
-            ProcessUnusedDescriptor(pid, data, descriptorLength + 2);
+            CountUnusedDescriptors(pid, data);
             break;
     }
     return descriptorLength + 2;
@@ -1574,7 +1563,7 @@ void SIParser::HandleEIT(uint pid, const EventInformationTable *eit)
             }
             else
             {
-                ProcessUnusedDescriptor(pid, *it, (*it)[1] + 2);
+                CountUnusedDescriptors(pid, *it);
             }
         }
 
@@ -1625,6 +1614,15 @@ void SIParser::HandleSTT(const SystemTimeTable *stt)
     Table[EVENTS]->DependencyMet(STT);
 #endif //USING_DVB_EIT
     VERBOSE(VB_SIPARSER, LOC + stt->toString());
+}
+
+void SIParser::CountUnusedDescriptors(uint pid, const unsigned char *data)
+{
+    if (!(print_verbose_messages & VB_SIPARSER))
+        return;
+
+    QMutexLocker locker(&descLock);
+    descCount[pid<<8 | data[0]]++;
 }
 
 void SIParser::PrintDescriptorStatistics(void) const

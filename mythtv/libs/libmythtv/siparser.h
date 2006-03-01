@@ -38,6 +38,7 @@ typedef void QMap_Events;
 #endif // !USING_DVB_EIT
 
 class ProgramAssociationTable;
+class ConditionalAccessTable;
 class ProgramMapTable;
 
 class ATSCStreamData;
@@ -128,6 +129,7 @@ class SIParser : public QObject
     virtual void deleteLater(void);
 
     void HandlePAT(const ProgramAssociationTable*);
+    void HandleCAT(const ConditionalAccessTable*);
     void HandlePMT(uint pnum, const ProgramMapTable*);
     void HandleMGT(const MasterGuideTable*);
     void HandleSTT(const SystemTimeTable*);
@@ -148,6 +150,7 @@ class SIParser : public QObject
     void AllEventsPulled(void);
 
   protected:
+    void CountUnusedDescriptors(uint pid, const unsigned char *data);
     void PrintDescriptorStatistics(void) const;
 
   private:
@@ -159,12 +162,6 @@ class SIParser : public QObject
     // MPEG Transport Parsers (ATSC and DVB)
     tablehead_t       ParseTableHead(uint8_t* buffer, int size);
 
-    void ParseCAT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
-
-    void ProcessUnusedDescriptor(uint pid, const uint8_t *buffer, uint size);
-
-    // Common Descriptor Parsers
-    CAPMTObject ParseDescCA(const uint8_t* buffer, int size);
 
     // DVB Descriptor Parsers
     void HandleNITDesc(const desc_list_t &dlist);
