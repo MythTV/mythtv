@@ -139,6 +139,14 @@ SIParser::SIParser(const char *name) :
     connect(atsc_stream_data, SIGNAL(UpdateETT(uint,const ExtendedTextTable*)),
             this,             SLOT(HandleETT(uint,const ExtendedTextTable*)));
 #endif // USING_DVB_EIT
+
+    // DVB table signals
+#ifdef USING_DVB_EIT
+    connect(dvb_stream_data,
+            SIGNAL(UpdateEIT(const DVBEventInformationTable*)),
+            this,
+            SLOT(  HandleEIT(const DVBEventInformationTable*)));
+#endif // USING_DVB_EIT
 }
 
 SIParser::~SIParser()
@@ -247,12 +255,6 @@ void SIParser::CheckTrackers()
             switch (x)
             {
                 case PMT:
-                    while (Table[PMT]->GetEmitID(key0, key1))
-                    {
-                        PMTHandler *hdl = (PMTHandler*) Table[PMT];
-                        const PMTObject &pmt = hdl->pmt[key0];
-                        emit UpdatePMT(&pmt);
-                    }
                     break;
 #ifdef USING_DVB_EIT
                 case EVENTS:
@@ -451,15 +453,15 @@ void SIParser::DelAllPids()
  *   Note: This actually adds all of the above so as to simplify channel
  *         scanning, but this may change as this can break ATSC.
  */
-bool SIParser::FillPMap(SISTANDARD _SIStandard)
+void SIParser::FillPMap(SISTANDARD _SIStandard)
 {
     VERBOSE(VB_SIPARSER, QString("FillPMap(SIS %1)")
             .arg((SI_STANDARD_ATSC == _SIStandard) ? "atsc":"dvb"));
 
-    pmap_lock.lock();
+    QMutexLocker locker(&pmap_lock);
+
     VERBOSE(VB_SIPARSER, LOC + "Requesting PAT");
 
-    /* By default open only the PID for PAT */
     Table[PAT]->Request(0);
     Table[SERVICES]->Request(0);
     Table[NETWORK]->Request(0);
@@ -468,10 +470,6 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
         Table[x]->SetSIStandard(_SIStandard);
 
     SIStandard = _SIStandard;
-
-    pmap_lock.unlock();
-
-    return true;
 }
 
 /** \fn SIParser::FillPMap(const QString&)
@@ -480,71 +478,49 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
  *
  *   This is a convenience function that calls SIParser::FillPMap(SISTANDARD)
  */
-bool SIParser::FillPMap(const QString &si_std)
+void SIParser::FillPMap(const QString &si_std)
 {
     VERBOSE(VB_SIPARSER, QString("FillPMap(str %1)").arg(si_std));
     bool is_atsc = si_std.lower() == "atsc";
-    return FillPMap((is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB);
+    FillPMap((is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB);
 }
 
-/** \fn SIParser::AddPMT(uint16_t ServiceID)
- *  \brief Adds the pid associated with program number 'ServiceID' to the
- *         listening list if this is an ATSC stream and adds the pid associated
- *         with service with service id 'ServiceID' to the listending list if
- *         this is a DVB stream.
- *
- *   If the table standard is ATSC then this adds the pid of the PMT listed
- *   as program number 'ServiceID' in the PAT to the list of pids we want.
- *
- *   If the table standard is DVB then this looks up the program number
- *   of the service listed with the 'ServiceID' in the SDT, then it looks
- *   up that program number in the PAT table and adds the associated pid
- *   to the list of pids we want.
- *
- *   Further the pid is identified as carrying a PMT, so a UpdatePMT Qt
- *   signal is emitted when a table is seen on this pid. Normally this
- *   signal is connected to the DVBChannel class, which relays the update
- *   to the DVBCam class which handles decrypting encrypted services.
- *
- *  \param ServiceID Either the the MPEG Program Number or the DVB Service ID
- *  \return true on success, false on failure.
+/** \fn SIParser::SetDesiredProgram(uint mpeg_program_number)
  */
-bool SIParser::AddPMT(uint16_t ServiceID)
+void SIParser::SetDesiredProgram(uint mpeg_program_number)
 {
     VERBOSE(VB_SIPARSER, LOC +
-            QString("Adding PMT program number #%1 to the request list")
-            .arg(ServiceID));
+            QString("Making #%1 the requested MPEG program number")
+            .arg(mpeg_program_number));
 
     pmap_lock.lock();
-    Table[PMT]->RequestEmit(ServiceID);
+    Table[PMT]->RequestEmit(mpeg_program_number);
     pmap_lock.unlock();
 
     atsc_stream_data->Reset(-1, -1);
-    ((MPEGStreamData*)atsc_stream_data)->Reset(ServiceID);
+    ((MPEGStreamData*)atsc_stream_data)->Reset(mpeg_program_number);
     atsc_stream_data->AddListeningPID(ATSC_PSIP_PID);
 
     dvb_stream_data->Reset();
-    ((MPEGStreamData*)dvb_stream_data)->Reset(ServiceID);
+    ((MPEGStreamData*)dvb_stream_data)->Reset(mpeg_program_number);
     dvb_stream_data->AddListeningPID(DVB_NIT_PID);
     dvb_stream_data->AddListeningPID(DVB_SDT_PID);
-
-    return true;
 }
 
 /** \fn SIParser::ReinitSIParser(const QString&, uint)
  *  \brief Convenience function that calls FillPMap(SISTANDARD) and
- *         AddPMT(uint)
+ *         SetDesiredProgram(uint)
  */
-bool SIParser::ReinitSIParser(const QString &si_std, uint service_id)
+void SIParser::ReinitSIParser(const QString &si_std, uint mpeg_program_number)
 {
     VERBOSE(VB_SIPARSER, LOC + QString("ReinitSIParser(std %1, %2 #%3)")
              .arg(si_std)
              .arg((si_std.lower() == "atsc") ? "program" : "service")
-             .arg(service_id));
+             .arg(mpeg_program_number));
 
-    return FillPMap(si_std) & AddPMT(service_id);
+    FillPMap(si_std);
+    SetDesiredProgram(mpeg_program_number);
 }
-
 
 bool SIParser::FindTransports()
 {
@@ -641,73 +617,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
                 HandleSDT(sect_tsid, &sdt);
         }
     }
-
-#ifdef USING_DVB_EIT
-    // Parse any embedded guide data
-    if (SIStandard == SI_STANDARD_DVB &&
-        DVBEventInformationTable::IsEIT(psip.TableID()))
-    {
-        EventHandler *eh         = (EventHandler*) Table[EVENTS];
-        uint tableid             = psip.TableID();
-        uint serviceid           = psip.TableIDExtension();
-        uint last_segment_number = buffer[8+4];
-        uint last_table_id       = buffer[8+5];
-
-        if (!eh->TrackerSetup[serviceid])
-        {
-            if (PrivateTypes.CustomGuideRanges)
-            {
-                // current
-                uint cstart = PrivateTypes.CurrentTransportTableMin;
-                uint cend   = PrivateTypes.CurrentTransportTableMax;
-                if ((tableid >= cstart) && (tableid <= cend))
-                {
-                    for (uint i = cstart; i <= cend; i++)
-                        eh->Tracker[serviceid][i].Reset();
-                }
-
-                // other
-                uint ostart = PrivateTypes.OtherTransportTableMin;
-                uint oend   = PrivateTypes.OtherTransportTableMax;
-                if ((tableid >= ostart) && (tableid <= oend))
-                {
-                    for (uint i = ostart; i <= oend; i++)
-                        eh->Tracker[serviceid][i].Reset();
-                }
-            }
-            else
-            {
-                // current
-                if ((tableid & 0xF0) == 0x50)
-                {
-                    for (uint i = 0; i < (last_table_id & 0x0F); i++)
-                        eh->Tracker[serviceid][0x50|i].Reset();
-                }
-                // other
-                if ((tableid & 0xF0) == 0x60)
-                {
-                    for (uint i = 0; i < (last_table_id & 0x0F); i++)
-                        eh->Tracker[serviceid][0x60|i].Reset();
-                }
-            }
-            eh->TrackerSetup[serviceid] = true;
-        }
-        
-        if (!Table[EVENTS]->AddSection(&head, serviceid, tableid))
-        {
-            if (last_segment_number != head.section_last)
-            {
-                uint start = last_segment_number + 1;
-                uint end   = head.section_number | 7;
-                for (uint i = start; i <= end; i++)
-                    eh->Tracker[serviceid][tableid].MarkUnused(i);
-            }
-
-            const DVBEventInformationTable eit(psip);
-            HandleEIT(&eit);
-        }
-    }
-#endif // USING_DVB_EIT
 }
 
 tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
@@ -756,6 +665,8 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
         pmth->AddKey(pat->ProgramPID(i), 0);
         pmth->pmt[pat->ProgramNumber(i)].PMTPID = pat->ProgramPID(i);
     }
+    pmth->DependencyMet(PAT);
+    pmth->Request(0);
 }
 
 void SIParser::HandleCAT(const ConditionalAccessTable *cat)
@@ -821,7 +732,8 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     for (uint i = 0; i < pmt->StreamCount(); i++)
     {
         VERBOSE(VB_SIPARSER, LOC +
-                QString("PID: 0x%1").arg(pmt->StreamPID(i),0,16));
+                QString("Stream %1: pid(0x%2)")
+                .arg(i).arg(pmt->StreamPID(i),0,16));
 
         const unsigned char *si = pmt->StreamInfo(i);
         desc_list_t list = MPEGDescriptor::Parse(si, pmt->StreamInfoLength(i));
@@ -900,7 +812,16 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         p.hasAudio |= StreamID::IsAudio(type);
     }
 
-    ((PMTHandler*) Table[PMT])->pmt[pmt->ProgramNumber()] = p;
+    if (SI_STANDARD_ATSC == SIStandard)
+    {
+        if ((int)pmt->ProgramNumber() == atsc_stream_data->DesiredProgram())
+            emit UpdatePMT(&p);
+    }
+    if (SI_STANDARD_DVB == SIStandard)
+    {
+        if ((int)pmt->ProgramNumber() == dvb_stream_data->DesiredProgram())
+            emit UpdatePMT(&p);
+    }
 }
 
 /*------------------------------------------------------------------------
@@ -1136,11 +1057,10 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 
 #ifdef USING_DVB_EIT
     // TODO: This is temp
-    Table[EVENTS]->DependencyMet(SERVICES);
-    //Table[EVENTS]->AddPid(0x12,0x00,0x00,true); // see ticket #755
-    Table[EVENTS]->AddPid(0x12,0x7F,0x80,0x12); // see ticket #755
+    Table[EVENTS]->AddPid(0x12,0x00,0xFF,true);
     if (eit_dn_long)
-        Table[EVENTS]->AddPid(0x300,0x00,0x00,true);
+        Table[EVENTS]->AddPid(0x300,0x00,0xFF,true);
+    Table[EVENTS]->DependencyMet(SERVICES);
 #endif // USING_DVB_EIT
 }
 

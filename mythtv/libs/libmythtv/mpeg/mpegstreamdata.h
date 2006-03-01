@@ -79,7 +79,7 @@ class MPEGStreamData : public QObject
 
     void SetVersionPMT(uint program_num, int version)
     {
-        if (_pmt_version[program_num] == version)
+        if (VersionPMT(program_num) == version)
             return;
         _pmt_version[program_num] = version;
         _pmt_section_seen[program_num].clear();

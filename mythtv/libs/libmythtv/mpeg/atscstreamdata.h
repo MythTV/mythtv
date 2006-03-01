@@ -62,6 +62,8 @@ class ATSCStreamData : public MPEGStreamData
         { _cvct_version[tsid] = version; }
     void SetVersionEIT(uint pid, uint atsc_source_id, int version)
     {
+        if (VersionEIT(pid, atsc_source_id) == version)
+            return;
         uint key = (pid<<16) | atsc_source_id;
         _eit_version[key] = version;
         _eit_section_seen[key].clear();

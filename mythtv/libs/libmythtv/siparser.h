@@ -98,12 +98,12 @@ class SIParser : public QObject
     // SIStandard.
     bool FindTransports(void);
     bool FindServices(void);
-    bool FillPMap(SISTANDARD _SIStandard);
-    bool FillPMap(const QString&);
+    void FillPMap(SISTANDARD _SIStandard);
+    void FillPMap(const QString&);
 
-    bool AddPMT(uint16_t ServiceID);
+    void SetDesiredProgram(uint mpeg_program_number);
 
-    bool ReinitSIParser(const QString &si_std, uint service_id);
+    void ReinitSIParser(const QString &si_std, uint mpeg_program_number);
 
     // Stops all collection of data and clears all values (on a channel change for example)
     void Reset(void);

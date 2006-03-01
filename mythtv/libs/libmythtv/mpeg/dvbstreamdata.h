@@ -8,6 +8,7 @@
 class PSIPTable;
 class NetworkInformationTable;
 class ServiceDescriptionTable;
+class DVBEventInformationTable;
 
 typedef ServiceDescriptionTable*               sdt_ptr_t;
 typedef vector<const ServiceDescriptionTable*> sdt_vec_t;
@@ -48,7 +49,7 @@ class DVBStreamData : public MPEGStreamData
 
     void SetVersionSDT(uint tsid, int version)
     {
-        if (_sdt_versions[tsid] == version)
+        if (VersionSDT(tsid) == version)
             return;
         _sdt_versions[tsid] = version;
         _sdt_section_seen[tsid].clear();
@@ -78,6 +79,24 @@ class DVBStreamData : public MPEGStreamData
         return *it;
     }
 
+    void SetVersionEIT(uint tableid, uint serviceid, int version)
+    {
+        if (VersionEIT(tableid, serviceid) == version)
+            return;
+        uint key = (tableid << 16) | serviceid;
+        _eit_section_seen[key].clear();
+        _eit_section_seen[key].resize(32, 0);
+    }
+
+    int VersionEIT(uint tableid, uint serviceid) const
+    {
+        uint key = (tableid << 16) | serviceid;
+        const QMap<uint, int>::const_iterator it = _eit_version.find(key);
+        if (it == _eit_version.end())
+            return -1;
+        return *it;
+    }
+
     // Sections seen
     void SetNITSectionSeen(uint section);
     bool NITSectionSeen(uint section) const;
@@ -88,6 +107,9 @@ class DVBStreamData : public MPEGStreamData
     bool SDTSectionSeen(uint tsid, uint section) const;
     void SetSDToSectionSeen(uint tsid, uint section);
     bool SDToSectionSeen(uint tsid, uint section) const;
+
+    void SetEITSectionSeen(uint tableid, uint serviceid, uint section);
+    bool EITSectionSeen(uint tableid, uint serviceid, uint section) const;
 
     // Caching
     bool HasCachedNIT(bool current = true) const;
@@ -107,6 +129,8 @@ class DVBStreamData : public MPEGStreamData
     void UpdateNITo(const NetworkInformationTable*);
     void UpdateSDTo(uint tsid, const ServiceDescriptionTable*);
 
+    void UpdateEIT(const DVBEventInformationTable*);
+
   private slots:
     void PrintNIT(const NetworkInformationTable*) const;
     void PrintSDT(uint tsid, const ServiceDescriptionTable*) const;
@@ -121,6 +145,8 @@ class DVBStreamData : public MPEGStreamData
     QMap<uint, int>           _sdt_versions;
     sections_t                _nit_section_seen;
     sections_map_t            _sdt_section_seen;
+    QMap<uint, int>           _eit_version;
+    sections_map_t            _eit_section_seen;
 
     int                       _nito_version;
     QMap<uint, int>           _sdto_versions;

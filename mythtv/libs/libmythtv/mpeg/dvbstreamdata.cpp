@@ -32,18 +32,38 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         return NITSectionSeen(psip.Section());
     }
 
-    if (TableID::NITo == table_id)
-    {
-        if (VersionNITo() != version)
-            return false;
-        return NIToSectionSeen(psip.Section());
-    }
-
     if (TableID::SDT == table_id)
     {
         if (VersionSDT(psip.TableIDExtension()) != version)
             return false;
         return SDTSectionSeen(psip.TableIDExtension(), psip.Section());
+    }
+
+    bool is_eit = false;
+    if (DVB_EIT_PID == pid)
+    {
+        // Standard Now/Next Event Information Tables for this transport
+        is_eit |= TableID::PF_EIT  == table_id;
+        // Standard Future Event Information Tables for this transport
+        is_eit |= (TableID::SC_EITbeg  <= table_id &&
+                   TableID::SC_EITend  >= table_id);
+    }
+    if (is_eit)
+    {
+        uint service_id = psip.TableIDExtension();
+        if (VersionEIT(table_id, service_id) != version)
+            return false;
+        return EITSectionSeen(table_id, service_id, psip.Section());
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // Other transport tables
+
+    if (TableID::NITo == table_id)
+    {
+        if (VersionNITo() != version)
+            return false;
+        return NIToSectionSeen(psip.Section());
     }
 
     if (TableID::SDTo == table_id)
@@ -53,15 +73,45 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         return SDToSectionSeen(psip.TableIDExtension(), psip.Section());
     }
 
+    if (DVB_EIT_PID == pid)
+    {
+        // Standard Now/Next Event Information Tables for other transport
+        is_eit |= TableID::PF_EITo == table_id;
+        // Standard Future Event Information Tables for other transports
+        is_eit |= (TableID::SC_EITbego <= table_id &&
+                   TableID::SC_EITendo >= table_id);
+    }
+    if (DVB_DNLONG_EIT_PID == pid)
+    {
+        // Dish Network Long Term Future Event Information for all transports
+        is_eit |= (TableID::DN_EITbego <= table_id &&
+                   TableID::DN_EITendo >= table_id);
+    }
+    if (is_eit)
+    {
+        uint service_id = psip.TableIDExtension();
+        if (VersionEIT(table_id, service_id) != version)
+            return false;
+        return EITSectionSeen(table_id, service_id, psip.Section());
+    }
+
     return false;
 }
 
-void DVBStreamData::Reset()
+void DVBStreamData::Reset(void)
 {
     MPEGStreamData::Reset(-1);
-    _nit_version = -1;
+
+    SetVersionNIT(-1);
     _sdt_versions.clear();
-    
+    _sdt_section_seen.clear();
+    _eit_version.clear();
+    _eit_section_seen.clear();
+
+    SetVersionNITo(-1);
+    _sdto_versions.clear();
+    _sdto_section_seen.clear();
+
     {
         _cache_lock.lock();
 
@@ -133,6 +183,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             SetNIToSectionSeen(psip.Section());
             NetworkInformationTable nit(psip);
             emit UpdateNITo(&nit);
+            return true;
         }
         case TableID::SDTo:
         {
@@ -140,8 +191,21 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             SetSDToSectionSeen(psip.TableIDExtension(), psip.Section());
             ServiceDescriptionTable sdt(psip);
             emit UpdateSDTo(psip.TableIDExtension(), &sdt);
+            return true;
         }
     }
+
+    if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid) &&
+        DVBEventInformationTable::IsEIT(psip.TableID()))
+    {
+        uint service_id = psip.TableIDExtension();
+        SetVersionEIT(psip.TableID(), service_id, psip.Version());
+        SetEITSectionSeen(psip.TableID(), service_id, psip.Section());
+        DVBEventInformationTable eit(psip);
+        emit UpdateEIT(&eit);
+        return true;
+    }
+
     return false;
 }
 
@@ -207,6 +271,29 @@ bool DVBStreamData::SDToSectionSeen(uint tsid, uint section) const
 {
     sections_map_t::const_iterator it = _sdto_section_seen.find(tsid);
     if (it == _sdto_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+void DVBStreamData::SetEITSectionSeen(uint tableid, uint serviceid,
+                                      uint section)
+{
+    uint key = (tableid<<16) | serviceid;
+    sections_map_t::iterator it = _eit_section_seen.find(key);
+    if (it == _eit_section_seen.end())
+    {
+        _eit_section_seen[key].resize(32, 0);
+        it = _eit_section_seen.find(key);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::EITSectionSeen(uint tableid, uint serviceid,
+                                   uint section) const
+{
+    uint key = (tableid<<16) | serviceid;
+    sections_map_t::const_iterator it = _eit_section_seen.find(key);
+    if (it == _eit_section_seen.end())
         return false;
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
