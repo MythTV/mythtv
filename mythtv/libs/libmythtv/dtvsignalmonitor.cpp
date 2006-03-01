@@ -204,8 +204,12 @@ void DTVSignalMonitor::SetPAT(const ProgramAssociationTable *pat)
     {
         AddFlags(kDTVSigMon_PATMatch);
         GetStreamData()->AddListeningPID(pmt_pid);
+        return;
     }
-    else if (programNumber >= 0)
+
+    GetStreamData()->SetVersionPAT(-1);
+
+    if (programNumber >= 0)
     {
         QString errStr = QString("Program #%1 not found in PAT!")
             .arg(programNumber);
@@ -299,6 +303,7 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
         VERBOSE(VB_IMPORTANT, "Could not find channel "
                 <<majorChannel<<"_"<<minorChannel<<" in TVCT");
         VERBOSE(VB_IMPORTANT, endl<<tvct->toString());
+        GetATSCStreamData()->SetVersionTVCT(tvct->TransportStreamID(),-1);
         return;
     }
 
@@ -319,6 +324,7 @@ void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
         VERBOSE(VB_IMPORTANT, "Could not find channel "
                 <<majorChannel<<"_"<<minorChannel<<" in CVCT");
         VERBOSE(VB_IMPORTANT, endl<<cvct->toString());
+        GetATSCStreamData()->SetVersionCVCT(cvct->TransportStreamID(),-1);
         return;
     }
 
