@@ -1123,6 +1123,16 @@ void SIParser::HandleEIT(const DVBEventInformationTable *eit)
 
     for (uint i = 0; i < eit->EventCount(); i++)
     {
+        // Skip event if we have already processed it before...
+        if (!eitcache.IsNewEIT(
+                eit->TSID(),      eit->EventID(i),
+                eit->ServiceID(), eit->TableID(),
+                eit->Version(),
+                eit->Descriptors(i), eit->DescriptorsLength(i)))
+        {
+            continue;
+        }
+
         // Event to use temporarily to fill in data
         Event event;
         event.ServiceID   = eit->ServiceID();

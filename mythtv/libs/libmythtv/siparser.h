@@ -33,6 +33,7 @@ using namespace std;
 
 #ifdef USING_DVB_EIT
 #include "eitfixup.h"
+#include "eitcache.h"
 #else // if !USING_DVB_EIT
 typedef void QMap_Events;
 #endif // !USING_DVB_EIT
@@ -238,6 +239,7 @@ class SIParser : public QObject
 #ifdef USING_DVB_EIT
     /// EITFixUp instance
     EITFixUp            eitfixup;
+    EITCache            eitcache;
 #endif
 
     // statistics
