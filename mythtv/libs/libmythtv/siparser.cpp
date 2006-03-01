@@ -648,16 +648,9 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     {
         if (DescriptorID::conditional_access == (*it)[0])
         {
-            ConditionalAccessDescriptor ca(*it);
-
-            CAPMTObject cad;
-            cad.CASystemID  = ca.SystemID();
-            cad.PID         = ca.PID();
-            cad.Data_Length = ca.DataSize();
-            if (ca.DataSize())
-                memcpy(cad.Data, ca.Data(), ca.DataSize());
-
-            p.CA.append(cad);
+            unsigned char *tmp = new unsigned char[(*it)[1] + 2];
+            memcpy(tmp, *it, (*it)[1] + 2);
+            p.CA.push_back(tmp);
             p.hasCA = true;
         }
         else
@@ -690,16 +683,9 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         {
             if (DescriptorID::conditional_access == (*it)[0])
             {
-                ConditionalAccessDescriptor ca(*it);
-
-                CAPMTObject cad;
-                cad.CASystemID  = ca.SystemID();
-                cad.PID         = ca.PID();
-                cad.Data_Length = ca.DataSize();
-                if (ca.DataSize())
-                    memcpy(cad.Data, ca.Data(), ca.DataSize());
-
-                p.CA.append(cad);
+                unsigned char *tmp = new unsigned char[(*it)[1] + 2];
+                memcpy(tmp, *it, (*it)[1] + 2);
+                p.CA.push_back(tmp);
                 p.hasCA = true;
             }
             else if (DescriptorID::teletext == (*it)[0])

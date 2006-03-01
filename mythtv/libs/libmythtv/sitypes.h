@@ -295,19 +295,6 @@ public:
     int      MplexID;        /* Set if MplexID is know i.e.current service*/
 };
 
-class CAPMTObject
-{
-public:
-    CAPMTObject() { Reset(); }
-
-    void Reset();
-    uint16_t CASystemID;
-    uint16_t PID;
-    uint8_t  Data_Length;
-    uint8_t  Data[256];
-};
-typedef QValueList<CAPMTObject> CAList;
-
 class ElementaryPIDObject
 {
 public:
@@ -341,7 +328,7 @@ public:
 
     uint        Orig_Type;
     uint        PID;
-    CAList      CA;
+    desc_list_t CA;
     desc_list_t Descriptors;
 };
 typedef QValueList<ElementaryPIDObject> ComponentList;
@@ -440,7 +427,7 @@ class PMTObject
     uint16_t       PCRPID;
     uint16_t       ServiceID;
     uint16_t       PMTPID;
-    CAList         CA;
+    desc_list_t    CA;
     desc_list_t    Descriptors;
     ComponentList  Components;
 

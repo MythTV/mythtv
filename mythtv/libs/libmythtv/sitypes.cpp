@@ -193,14 +193,6 @@ void SDTObject::Reset()
     MplexID = 0;
 }
 
-void CAPMTObject::Reset()
-{
-    CASystemID = 0;
-    PID = 0;
-    Data_Length = 0;
-    memset(Data, 0, sizeof(Data));
-}
-
 ElementaryPIDObject::ElementaryPIDObject(const ElementaryPIDObject &other)
 {
     deepCopy(other);
@@ -208,17 +200,21 @@ ElementaryPIDObject::ElementaryPIDObject(const ElementaryPIDObject &other)
 
 void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
 {
-    Orig_Type   = e.Orig_Type;
-    PID         = e.PID;
-    CA          = QDeepCopy<CAList>(e.CA);
+    Reset();
 
-    desc_list_t::iterator it = Descriptors.begin();
-    for (; it != Descriptors.end(); ++it)
-        delete [] *it;
-    Descriptors.clear();
+    Orig_Type = e.Orig_Type;
+    PID       = e.PID;
 
-    desc_list_t::const_iterator cit = e.Descriptors.begin();
-    for (; cit != e.Descriptors.end(); ++cit)
+    desc_list_t::const_iterator cit;
+
+    for (cit = e.CA.begin(); cit != e.CA.end(); ++cit)
+    {
+        unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
+        memcpy(tmp, *cit, (*cit)[1] + 2);
+        CA.push_back(tmp);
+    }
+
+    for (cit = e.Descriptors.begin(); cit != e.Descriptors.end(); ++cit)
     {
         unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
         memcpy(tmp, *cit, (*cit)[1] + 2);
@@ -226,14 +222,17 @@ void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
     }
 }
 
-void ElementaryPIDObject::Reset()
+void ElementaryPIDObject::Reset(void)
 {
     Orig_Type = 0;
-    PID = 0;
+    PID       = 0;
+
+    desc_list_t::iterator it;
+    for (it = CA.begin(); it != CA.end(); ++it)
+        delete [] *it;
     CA.clear();
 
-    desc_list_t::iterator it = Descriptors.begin();
-    for (; it != Descriptors.end(); ++it)
+    for (it = Descriptors.begin(); it != Descriptors.end(); ++it)
         delete [] *it;
     Descriptors.clear();
 }
@@ -294,18 +293,21 @@ PMTObject &PMTObject::operator=(const PMTObject &other)
  */
 void PMTObject::deepCopy(const PMTObject &other)
 {
+    Reset();
+
     PCRPID      = other.PCRPID;
     ServiceID   = other.ServiceID;
     PMTPID      = other.PMTPID;
 
-    CA          = QDeepCopy<CAList>(other.CA);
+    desc_list_t::const_iterator cit = other.CA.begin();
+    for (; cit != other.CA.end(); ++cit)
+    {
+        unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
+        memcpy(tmp, *cit, (*cit)[1] + 2);
+        CA.push_back(tmp);
+    }
 
-    desc_list_t::iterator it = Descriptors.begin();
-    for (; it != Descriptors.end(); ++it)
-        delete [] *it;
-    Descriptors.clear();
-
-    desc_list_t::const_iterator cit = other.Descriptors.begin();
+    cit = other.Descriptors.begin();
     for (; cit != other.Descriptors.end(); ++cit)
     {
         unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
@@ -335,15 +337,20 @@ void PMTObject::Reset()
     PCRPID    = 0;
     ServiceID = 0;
     PMTPID    = 0;
+
+    desc_list_t::iterator it;
+
+    for (it = CA.begin(); it != CA.end(); ++it)
+        delete [] *it;
     CA.clear();
 
-    desc_list_t::iterator it = Descriptors.begin();
-    for (; it != Descriptors.end(); ++it)
+    for (it = Descriptors.begin(); it != Descriptors.end(); ++it)
         delete [] *it;
     Descriptors.clear();
+
     Components.clear();
 
-    hasCA = false;
+    hasCA    = false;
     hasAudio = false;
     hasVideo = false;
 }

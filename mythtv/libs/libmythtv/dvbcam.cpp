@@ -327,19 +327,21 @@ cCiCaPmt CreateCAPMT(const PMTObject &pmt,
     cCiCaPmt capmt(pmt.ServiceID, cplm);
 
     // Add CA descriptors for the service
-    CAList::const_iterator ca;
-    for (ca = pmt.CA.begin(); ca != pmt.CA.end(); ++ca)
+    desc_list_t::const_iterator it;
+
+    for (it = pmt.CA.begin(); it != pmt.CA.end(); ++it)
     {
+        ConditionalAccessDescriptor cad(*it);
         for (uint q = 0; casids[q]; q++)
         {
-            if ((*ca).CASystemID != casids[q])
+            if (cad.SystemID() != casids[q])
                 continue;
 
             VERBOSE(VB_CHANNEL, "Adding CA descriptor: " +
                     QString("CASID=0x%1, ECM PID=%2")
-                    .arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
-            capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID,
-                                  (*ca).Data_Length, (*ca).Data);
+                    .arg(cad.SystemID(), 0, 16).arg(cad.PID()));
+            capmt.AddCaDescriptor(cad.SystemID(), cad.PID(),
+                                  cad.DataSize(), cad.Data());
         }
     }
 
@@ -352,19 +354,20 @@ cCiCaPmt CreateCAPMT(const PMTObject &pmt,
             
         capmt.AddElementaryStream((*es).Orig_Type, (*es).PID);
 
-        for (ca = (*es).CA.begin(); ca != (*es).CA.end(); ++ca)
+        for (it = (*es).CA.begin(); it != (*es).CA.end(); ++it)
         {
+            ConditionalAccessDescriptor cad(*it);
             for (uint q = 0; casids[q]; q++)
             {
-                if ((*ca).CASystemID != casids[q])
+                if (cad.SystemID() != casids[q])
                     continue;
 
                 VERBOSE(VB_CHANNEL, "Adding elementary CA descriptor: " +
                         QString("CASID = 0x%1, ECM PID = %2")
-                        .arg((*ca).CASystemID, 0, 16).arg((*ca).PID));
+                        .arg(cad.SystemID(), 0, 16).arg(cad.PID()));
 
-                capmt.AddCaDescriptor((*ca).CASystemID, (*ca).PID,
-                                      (*ca).Data_Length, (*ca).Data);
+                capmt.AddCaDescriptor(cad.SystemID(), cad.PID(),
+                                      cad.DataSize(), cad.Data());
             }
         }
     }

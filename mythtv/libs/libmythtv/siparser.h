@@ -200,7 +200,6 @@ class SIParser : public QObject
     uint                NITPID;
 
     // Storage Objects (DVB)
-    QValueList<CAPMTObject> CATList;
     NITObject           NITList;
 
     // Storage Objects (ATSC)
