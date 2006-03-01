@@ -1143,7 +1143,7 @@ class ServiceDescriptor : public MPEGDescriptor
     // for (i=0;i<N;I++) { char 8 }
     QString ServiceName(void) const
     {
-        return dvb_decode_text(_data + 4 + ServiceProviderNameLength(),
+        return dvb_decode_text(_data + 5 + ServiceProviderNameLength(),
                                ServiceNameLength());
     }
     bool IsDTV(void) const
