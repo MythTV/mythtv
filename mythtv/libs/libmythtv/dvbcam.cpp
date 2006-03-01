@@ -271,15 +271,6 @@ void DVBCam::SetPMT(const PMTObject *pmt)
     pmt_updated = true;
 }
 
-void DVBCam::AddPMT(const PMTObject *pmt)
-{
-    VERBOSE(VB_CHANNEL, LOC + "AddPMT for ServiceID = " << pmt->ServiceID);
-
-    QMutexLocker locker(&pmt_lock);
-    PMTAddList.push_back(*pmt);
-    pmt_added = true;
-}
-
 static const char *cplm_info[] =
 {
     "CPLM_MORE",

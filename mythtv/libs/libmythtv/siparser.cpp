@@ -49,7 +49,7 @@
 SIParser::SIParser(const char *name) :
     QObject(NULL, name),
     // Common Variables
-    SIStandard(SI_STANDARD_AUTO),
+    table_standard(SI_STANDARD_AUTO),
     CurrentTransport(0),            RequestedServiceID(0),
     RequestedTransportID(0),        NITPID(0),
     // ATSC Storage
@@ -231,7 +231,7 @@ void SIParser::CheckTrackers()
             {
                 int bufferFactor = 10;
 #ifdef USING_DVB_EIT
-                if ((SIStandard == SI_STANDARD_DVB) && (x == EVENTS))
+                if ((SI_STANDARD_DVB == table_standard) && (x == EVENTS))
                     bufferFactor = 1000;
 #endif // USING_DVB_EIT
                 AddPid(pid, mask, filter, true, bufferFactor);
@@ -239,7 +239,7 @@ void SIParser::CheckTrackers()
         }
     }
     // for ATSC STT and MGT.
-    if (SIStandard == SI_STANDARD_ATSC)
+    if (SI_STANDARD_ATSC == table_standard)
         AddPid(ATSC_PSIP_PID, 0x00, 0xFF, true, 10 /*bufferFactor*/);
 
     uint16_t key0 = 0,key1 = 0;
@@ -286,9 +286,9 @@ void SIParser::LoadPrivateTypes(uint networkID)
     if (PrivateTypesLoaded)
         return;
 
-    QString stdStr = SIStandard_to_String(SIStandard);
+    QString stdStr = SIStandard_to_String(table_standard);
 
-    // If you don't know the SI Standard yet you need to bail out
+    // If you don't know the Table Standard yet you need to bail out
     if (stdStr == "auto")
         return;
 
@@ -420,72 +420,35 @@ bool SIParser::GetServiceObject(QMap_SDTObject &SDT)
     return true;
 }
 
-void SIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
-                      bool CheckCRC, int bufferFactor)
-{
-    (void) pid;
-    (void) mask;
-    (void) filter;
-    (void) CheckCRC;
-    (void) bufferFactor;
-    VERBOSE(VB_SIPARSER, LOC + "AddPid() does nothing");
-}
-
-void SIParser::DelPid(int pid)
-{
-    (void) pid;
-    VERBOSE(VB_SIPARSER, LOC + "DelPid() does nothing");
-}
-
-void SIParser::DelAllPids()
-{
-    VERBOSE(VB_SIPARSER, LOC + "DelAllPids does nothing");
-}
-
-/** \fn SIParser::FillPMap(SISTANDARD _SIStandard)
+/** \fn SIParser::SetTableStandard(const QString &)
  *  \brief Adds basic PID's corresponding to standard to the list
  *         of PIDs we are listening to.
  *
- *   For ATSC this adds the PAT (0) and MGT (0x1ffb) pids.
+ *   For ATSC this adds the PAT (0x0) and PSIP (0x1ffb) pids.
  *
- *   For DVB this adds the PAT(0), SDT (0x11), and NIT (0x10) pids.
+ *   For DVB this adds the PAT(0x0), SDT (0x11), and NIT (0x10) pids.
  *
  *   Note: This actually adds all of the above so as to simplify channel
  *         scanning, but this may change as this can break ATSC.
  */
-void SIParser::FillPMap(SISTANDARD _SIStandard)
+void SIParser::SetTableStandard(const QString &table_std)
 {
-    VERBOSE(VB_SIPARSER, QString("FillPMap(SIS %1)")
-            .arg((SI_STANDARD_ATSC == _SIStandard) ? "atsc":"dvb"));
+    VERBOSE(VB_SIPARSER, QString("SetTableStandard(%1)").arg(table_std));
+    bool is_atsc = table_std.lower() == "atsc";
 
     QMutexLocker locker(&pmap_lock);
 
-    VERBOSE(VB_SIPARSER, LOC + "Requesting PAT");
+    table_standard = (is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB;
 
     Table[PAT]->Request(0);
     Table[SERVICES]->Request(0);
     Table[NETWORK]->Request(0);
 
     for (int x = 0 ; x < NumHandlers ; x++)
-        Table[x]->SetSIStandard(_SIStandard);
-
-    SIStandard = _SIStandard;
+        Table[x]->SetSIStandard((SISTANDARD)table_standard);
 }
 
-/** \fn SIParser::FillPMap(const QString&)
- *  \brief Adds basic PID's corresponding to standard to the list
- *         of PIDs we are listening to.
- *
- *   This is a convenience function that calls SIParser::FillPMap(SISTANDARD)
- */
-void SIParser::FillPMap(const QString &si_std)
-{
-    VERBOSE(VB_SIPARSER, QString("FillPMap(str %1)").arg(si_std));
-    bool is_atsc = si_std.lower() == "atsc";
-    FillPMap((is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB);
-}
-
-/** \fn SIParser::SetDesiredProgram(uint mpeg_program_number)
+/** \fn SIParser::SetDesiredProgram(uint)
  */
 void SIParser::SetDesiredProgram(uint mpeg_program_number)
 {
@@ -508,8 +471,8 @@ void SIParser::SetDesiredProgram(uint mpeg_program_number)
 }
 
 /** \fn SIParser::ReinitSIParser(const QString&, uint)
- *  \brief Convenience function that calls FillPMap(SISTANDARD) and
- *         SetDesiredProgram(uint)
+ *  \brief Convenience function that calls SetTableStandard(const QString &)
+ *         and SetDesiredProgram(uint).
  */
 void SIParser::ReinitSIParser(const QString &si_std, uint mpeg_program_number)
 {
@@ -518,7 +481,7 @@ void SIParser::ReinitSIParser(const QString &si_std, uint mpeg_program_number)
              .arg((si_std.lower() == "atsc") ? "program" : "service")
              .arg(mpeg_program_number));
 
-    FillPMap(si_std);
+    SetTableStandard(si_std);
     SetDesiredProgram(mpeg_program_number);
 }
 
@@ -538,11 +501,10 @@ bool SIParser::FindServices()
  *   COMMON PARSER CODE
  *------------------------------------------------------------------------*/
 
-void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
+void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
 {
     QMutexLocker locker(&pmap_lock);
 
-    tablehead_t head = ParseTableHead(buffer, size);
     const PESPacket pes = PESPacket::ViewData(buffer);
     const PSIPTable psip(pes);
 
@@ -553,79 +515,38 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         return;
     }
 
-    // In Detection mode determine what SIStandard you are using.
-    if (SIStandard == SI_STANDARD_AUTO)
+    // In Detection mode determine what table_standard you are using.
+    if (table_standard == SI_STANDARD_AUTO)
     {
         if (TableID::MGT == psip.TableID()  ||
             TableID::TVCT == psip.TableID() ||
             TableID::CVCT == psip.TableID())
         {
-            SIStandard = SI_STANDARD_ATSC;
-            VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
+            table_standard = SI_STANDARD_ATSC;
+            VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: ATSC");
             standardChange = true;
         }
         else if (TableID::SDT  == psip.TableID() ||
                  TableID::SDTo == psip.TableID())
         {
-            SIStandard = SI_STANDARD_DVB;
-            VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: DVB");
+            table_standard = SI_STANDARD_DVB;
+            VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: DVB");
             standardChange = true;
         }
     }
 
     // Parse tables for ATSC
-    if (SIStandard == SI_STANDARD_ATSC)
+    if (SI_STANDARD_ATSC == table_standard)
     {
         atsc_stream_data->HandleTables(pid, psip);
         return;
     }
 
-    // Parse MPEG tables
-    if (SIStandard == SI_STANDARD_DVB)
-    {
-        dvb_stream_data->HandleTables(pid, psip);
-    }
+    // Parse MPEG tables for DVB
+    dvb_stream_data->HandleTables(pid, psip);
 
     // Parse DVB specific NIT and SDT tables
-    if (SIStandard == SI_STANDARD_DVB)
-    {
-        if (TableID::NIT == psip.TableID() &&
-            !Table[NETWORK]->AddSection(&head,0,0))
-        {
-            // Network Information Table
-            NetworkInformationTable nit(psip);
-            HandleNIT(&nit);
-        }
-        else if (TableID::SDT  == psip.TableID() ||
-                 TableID::SDTo == psip.TableID())
-        {
-            // Service Tables
-            ServiceDescriptionTable sdt(psip);
-
-            emit TableLoaded(); // Signal to keep scan wizard bars moving
-
-            LoadPrivateTypes(sdt.OriginalNetworkID());
-
-            bool cur =
-                (PrivateTypes.SDTMapping &&
-                 PrivateTypes.CurrentTransportID == sdt.TSID()) ||
-                (!PrivateTypes.SDTMapping && TableID::SDT == sdt.TableID());
-
-            uint sect_tsid = (cur) ? 0 : sdt.TSID();
-
-            if (!Table[SERVICES]->AddSection(&head, sect_tsid, 0))
-                HandleSDT(sect_tsid, &sdt);
-        }
-    }
-}
-
-tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
-{
-// TODO: Maybe handle the size but should be OK if CRC passes
-
-    (void) size;
     tablehead_t head;
-
     head.table_id       = buffer[0];
     head.section_length = ((buffer[1] & 0x0f)<<8) | buffer[2];
     head.table_id_ext   = (buffer[3] << 8) | buffer[4];
@@ -634,8 +555,33 @@ tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
     head.section_number = buffer[6];
     head.section_last   = buffer[7];
 
-    return head;
+    if (TableID::NIT == psip.TableID() &&
+        !Table[NETWORK]->AddSection(&head,0,0))
+    {
+        // Network Information Table
+        NetworkInformationTable nit(psip);
+        HandleNIT(&nit);
+    }
+    else if (TableID::SDT  == psip.TableID() ||
+             TableID::SDTo == psip.TableID())
+    {
+        // Service Tables
+        ServiceDescriptionTable sdt(psip);
 
+        emit TableLoaded(); // Signal to keep scan wizard bars moving
+
+        LoadPrivateTypes(sdt.OriginalNetworkID());
+
+        bool cur =
+            (PrivateTypes.SDTMapping &&
+             PrivateTypes.CurrentTransportID == sdt.TSID()) ||
+            (!PrivateTypes.SDTMapping && TableID::SDT == sdt.TableID());
+
+        uint sect_tsid = (cur) ? 0 : sdt.TSID();
+
+        if (!Table[SERVICES]->AddSection(&head, sect_tsid, 0))
+            HandleSDT(sect_tsid, &sdt);
+    }
 }
 
 void SIParser::HandlePAT(const ProgramAssociationTable *pat)
@@ -651,7 +597,7 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
     for (uint i = 0; i < pat->ProgramCount(); ++i)
     {
         // DVB Program 0 in the PAT represents the location of the NIT
-        if (0 == pat->ProgramNumber(i) && SI_STANDARD_ATSC != SIStandard)
+        if (0 == pat->ProgramNumber(i) && SI_STANDARD_ATSC != table_standard)
         {
             VERBOSE(VB_SIPARSER, LOC + "NIT Present on this transport " +
                     QString(" on PID 0x%1").arg(NITPID,0,16));
@@ -812,12 +758,12 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
         p.hasAudio |= StreamID::IsAudio(type);
     }
 
-    if (SI_STANDARD_ATSC == SIStandard)
+    if (SI_STANDARD_ATSC == table_standard)
     {
         if ((int)pmt->ProgramNumber() == atsc_stream_data->DesiredProgram())
             emit UpdatePMT(&p);
     }
-    if (SI_STANDARD_DVB == SIStandard)
+    if (SI_STANDARD_DVB == table_standard)
     {
         if ((int)pmt->ProgramNumber() == dvb_stream_data->DesiredProgram())
             emit UpdatePMT(&p);
@@ -1335,10 +1281,10 @@ uint SIParser::ProcessDVBEventDescriptors(
 void SIParser::HandleMGT(const MasterGuideTable *mgt)
 {
     VERBOSE(VB_SIPARSER, LOC + "HandleMGT()");
-    if (SI_STANDARD_AUTO == SIStandard)
+    if (SI_STANDARD_AUTO == table_standard)
     {
-        SIStandard = SI_STANDARD_ATSC;
-        VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
+        table_standard = SI_STANDARD_ATSC;
+        VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: ATSC");
         standardChange = true;
     }
 

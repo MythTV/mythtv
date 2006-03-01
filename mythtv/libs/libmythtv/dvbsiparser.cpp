@@ -103,8 +103,9 @@ void *DVBSIParser::SystemInfoThread(void *param)
     return NULL;
 }
 
-void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
-                         bool CheckCRC, int bufferFactor)
+void DVBSIParser::AddPid(uint pid,
+                         uint8_t mask, uint8_t filter,
+                         bool CheckCRC, uint bufferFactor)
 {
     struct dmx_sct_filter_params params;
     int fd;
@@ -177,7 +178,7 @@ void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
     pollLock.unlock();
 }
 
-void DVBSIParser::DelPid(int pid)
+void DVBSIParser::DelPid(uint pid)
 {
     PIDFDMap::Iterator it;
     int x = 0;

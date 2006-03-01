@@ -67,10 +67,10 @@ public:
     ~DVBSIParser();
 
     /* Control PIDs */
-    void AddPid(uint16_t pid,uint8_t mask = 0x00,uint8_t filter = 0xFF, bool CheckCRC = true,
-                int bufferFactor = 10);
-    void DelPid(int pid);
-    void DelAllPids();
+    virtual void AddPid(uint pid, uint8_t mask = 0x00, uint8_t filter = 0xFF,
+                        bool CheckCRC = true, uint bufferFactor = 10);
+    virtual void DelPid(uint pid);
+    virtual void DelAllPids(void);
 
     /* Thread control */
     void StartSectionReader();

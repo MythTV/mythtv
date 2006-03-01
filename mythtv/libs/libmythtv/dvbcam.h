@@ -22,7 +22,6 @@ class DVBCam
     bool Stop();
     bool IsRunning() const { return ciThreadRunning; }
     void SetPMT(const PMTObject *pmt);
-    void AddPMT(const PMTObject *pmt);
 
   private:
     static void *CiHandlerThreadHelper(void*);

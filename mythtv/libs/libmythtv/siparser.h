@@ -99,9 +99,8 @@ class SIParser : public QObject
     // SIStandard.
     bool FindTransports(void);
     bool FindServices(void);
-    void FillPMap(SISTANDARD _SIStandard);
-    void FillPMap(const QString&);
 
+    void SetTableStandard(const QString&);
     void SetDesiredProgram(uint mpeg_program_number);
 
     void ReinitSIParser(const QString &si_std, uint mpeg_program_number);
@@ -109,9 +108,10 @@ class SIParser : public QObject
     // Stops all collection of data and clears all values (on a channel change for example)
     void Reset(void);
 
-    virtual void AddPid(uint16_t pid,uint8_t mask,uint8_t filter,bool CheckCRC,int bufferFactor);
-    virtual void DelPid(int pid);
-    virtual void DelAllPids(void);
+    virtual void AddPid(uint pid, uint8_t mask, uint8_t filter,
+                        bool CheckCRC, uint bufferFactor) = 0;
+    virtual void DelPid(uint pid) = 0;
+    virtual void DelAllPids(void) = 0;
 
     // Functions that may become signals for communication with the outside world
     void ServicesComplete(void);
@@ -162,10 +162,6 @@ class SIParser : public QObject
     // Fixes for various DVB Network Spec Deviations
     void LoadPrivateTypes(uint networkID);
 
-    // MPEG Transport Parsers (ATSC and DVB)
-    tablehead_t       ParseTableHead(uint8_t* buffer, int size);
-
-
     // DVB Descriptor Parsers
     void HandleNITDesc(const desc_list_t &dlist);
     void HandleNITTransportDesc(const desc_list_t &dlist,
@@ -192,7 +188,7 @@ class SIParser : public QObject
     QDateTime EventSearchEndTime;
 
     // Common Variables
-    int                 SIStandard;
+    int                 table_standard;
     uint                CurrentTransport;
     uint                RequestedServiceID;
     uint                RequestedTransportID;

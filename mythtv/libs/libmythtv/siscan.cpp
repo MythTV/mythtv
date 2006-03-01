@@ -200,7 +200,7 @@ bool SIScan::ScanTransports(const QString _sistandard)
 #ifdef USE_SIPARSER
     if (siparser)
     {
-        siparser->FillPMap(_sistandard);
+        siparser->SetTableStandard(_sistandard);
         return siparser->FindTransports();
     }
 #endif // USE_SIPARSER
@@ -654,7 +654,7 @@ void SIScan::HandleActiveScan(void)
 #ifdef USE_SIPARSER
 #define SIP_RESET() do { if (siparser) siparser->Reset(); } while (false)
 #define SIP_PMAP() do { if (ok && siparser) \
-                   siparser->FillPMap(item.standard); } while (false)
+                   siparser->SetTableStandard(item.standard); } while (false)
 #else // if !USE_SIPARSER
 #define SIP_RESET()
 #define SIP_PMAP()
