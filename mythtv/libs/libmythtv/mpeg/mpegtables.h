@@ -314,7 +314,7 @@ class PSIPTable : public PESPacket
 
     // version_number       5       5.2      42
     // incremented modulo 32 when table info changes
-    uint Version(void) const { return (pesdata()[5]>>2) & 0x1f; }
+    uint Version(void) const { return (pesdata()[5]>>1) & 0x1f; }
 
     // current_next_ind     1       5.7      47
     // if 0 this table is not yet valid, but will be the next psip
@@ -349,9 +349,9 @@ class PSIPTable : public PESPacket
         pesdata()[4] = len & 0xff;
     }
     void SetVersionNumber(uint ver)
-        { pesdata()[5] = (pesdata()[6] & 0xc1) | ((ver & 0x1f)<<1); }
+        { pesdata()[5] = (pesdata()[5] & 0xc1) | ((ver & 0x1f)<<1); }
     void SetCurrent(bool cur)
-        { pesdata()[5] = (pesdata()[6] & 0xfe) | (cur ? 1 : 0); }
+        { pesdata()[5] = (pesdata()[5] & 0xfe) | (cur ? 1 : 0); }
     void SetSection(uint num) { pesdata()[6] = num; }
     void SetLastSection(uint num) { pesdata()[7] = num; }
 
