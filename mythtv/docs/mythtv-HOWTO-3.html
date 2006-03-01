@@ -648,7 +648,7 @@ pre-requisites required to compile MythTV.</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1+, there are no packages for
+<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.2+, there are no packages for
 Debian woody/stable.</CAPTION>
 </FIGURE>
 </P>
@@ -679,7 +679,7 @@ you will need <B>perl</B>.</P>
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.1 or higher, but less than Qt v4.0, is required.
+NOTE:  Qt v3.2 or higher, but less than Qt v4.0, is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
@@ -752,7 +752,7 @@ a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <CODE>lame</CODE> library without compiling from source.</P>
-<P>Open a shell, and execute the following, all on the same line. You may get
+<P>Open a shell, and execute the following. You may get
 asked a number of questions regarding dependencies.  It's best to answer
 "YES".
 <BLOCKQUOTE><CODE>
@@ -760,7 +760,7 @@ asked a number of questions regarding dependencies.  It's best to answer
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
-# urpmi libqt3-devel
+# urpmi libqt3-devel libMesaGLU1-devel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -773,10 +773,9 @@ NOTE for Mandriva 9.1+ users: execute the following command.
 </PRE>
 <HR>
 
-However, you might get this when you execute the command above:
+However, you might get this when you execute the commands above:
 <BLOCKQUOTE><CODE>
 <PRE>
-[root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
 everything already installed
 </PRE>
 </CODE></BLOCKQUOTE>

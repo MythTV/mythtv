@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-02-01, v0.19.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-03-01, v0.19.01
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -213,7 +213,7 @@ necessary.</EM>
 <LI><A NAME="toc23.11">23.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.11">Automatically starting mythfrontend at system boot time</A>
 <LI><A NAME="toc23.12">23.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.12">Automatically starting mythbackend at system boot time</A>
 <LI><A NAME="toc23.13">23.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.13">Advanced Backend Configurations </A>
-<LI><A NAME="toc23.14">23.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.14">What is this transcoder thing, and how do I use it?</A>
+<LI><A NAME="toc23.14">23.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.14">Using the transcoder.</A>
 <LI><A NAME="toc23.15">23.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.15">Changing your hostname</A>
 <LI><A NAME="toc23.16">23.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.16">Can I run MythTV on my TiVo?</A>
 <LI><A NAME="toc23.17">23.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.17">Can I run MythTV on my ReplayTV?</A>
@@ -322,6 +322,9 @@ like to install MythTV on a Xbox.</P>
 <P>See 
 <A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> for instructions tailored to RedHat's
 Fedora Core distribution.</P>
+<P>There is a MythTV wiki at 
+<A HREF="http://wiki.mythtv.org">http://wiki.mythtv.org</A>.</P>
+
 <H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Upgrading from previous versions</A>
 </H2>
 
@@ -1090,7 +1093,7 @@ pre-requisites required to compile MythTV.</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1+, there are no packages for
+<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.2+, there are no packages for
 Debian woody/stable.</CAPTION>
 </FIGURE>
 </P>
@@ -1121,7 +1124,7 @@ you will need <B>perl</B>.</P>
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.1 or higher, but less than Qt v4.0, is required.
+NOTE:  Qt v3.2 or higher, but less than Qt v4.0, is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
@@ -1194,7 +1197,7 @@ a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <CODE>lame</CODE> library without compiling from source.</P>
-<P>Open a shell, and execute the following, all on the same line. You may get
+<P>Open a shell, and execute the following. You may get
 asked a number of questions regarding dependencies.  It's best to answer
 "YES".
 <BLOCKQUOTE><CODE>
@@ -1202,7 +1205,7 @@ asked a number of questions regarding dependencies.  It's best to answer
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
-# urpmi libqt3-devel
+# urpmi libqt3-devel libMesaGLU1-devel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1215,10 +1218,9 @@ NOTE for Mandriva 9.1+ users: execute the following command.
 </PRE>
 <HR>
 
-However, you might get this when you execute the command above:
+However, you might get this when you execute the commands above:
 <BLOCKQUOTE><CODE>
 <PRE>
-[root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
 everything already installed
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -6723,7 +6725,7 @@ want to edit your <CODE>/etc/exports</CODE> file and use something like:
 add something like:
 <BLOCKQUOTE><CODE>
 <PRE>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3,actimeo=0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -6732,7 +6734,12 @@ masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=
 exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
 performance of NFS; "hard,intr" is there because that's the recommendation
-of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.</P>
+of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
+is used to turn off file attribute caching.  Attribute caching for a shared
+media point causes problems; you always want to see the latest state of the
+directory and files.  See 
+<A HREF="http://www.mythtv.org/wiki/index.php/Optimizing_Performance">http://www.mythtv.org/wiki/index.php/Optimizing_Performance</A> for
+additional information regarding performance optimization.</P>
 
 <H2><A NAME="ss23.11">23.11</A> <A HREF="#toc23.11">Automatically starting mythfrontend at system boot time</A>
 </H2>
@@ -6967,53 +6974,163 @@ be used.</P>
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
 
-<H2><A NAME="ss23.14">23.14</A> <A HREF="#toc23.14">What is this transcoder thing, and how do I use it?</A>
+<H2><A NAME="ss23.14">23.14</A> <A HREF="#toc23.14">Using the transcoder.</A>
 </H2>
 
-<P>The transcoder re-encodes files from one MythTV format to another.  The
-main purpose of the transcoder is to allow users with hardware
-encoders (PVR-250) or systems that can only record in RTjpeg due to
-performance reasons (multiple capture cards, slow system, etc) to create
-MPEG-4 streams to save space.</P>
-<P>The transcoder can be used in two ways:
-<UL>
-<LI>Automatically re-encode every file once it has completed recording</LI>
-<LI> After marking commercials, the transcoder can be run manually to
-delete the commercials from the file (thus further saving space)</LI>
-</UL>
+<P>MythTV's built-in transcoder re-encodes recordings from one codec to
+another.  The transcoder has three primary uses; it can transcode MPEG-2
+files captured using a hardware encoder (PVR cards, DVB cards, ATSC HD,
+etc.) to MPEG-4, it can be used to transcode RTjpeg files (usually only used
+on systems that can not real-time encode to MPEG-4 using a framegrabber) to
+MPEG-4, and finally it can be used to remove commercials from a MPEG-2 file
+while leaving the file in MPEG-2 format.</P>
+<P>When MythTV transcodes a file to MPEG-4 or RTjpeg the resulting file format
+is NuppelVideo (nuv).  NuppelVideo is a container which provides a method of
+keeping the audio and video in sync throughout the recording, which is why
+it is used instead of the <CODE>.avi</CODE> format.  You may have difficulty
+playing <CODE>.nuv</CODE> files in non-MythTV systems.</P>
 
-The two methods are independent.  The first is an automatic process that can be
-enabled/disabled through the setup program; the second is a manual method which
-must be invoked on each recording individually.</P>
+<P>The original file is removed when the transcoding process is complete. 
+Unless you're sure that you will be satisfied with the result you may want
+to enable the <B>mythtv-setup</B> option which causes <B>mythbackend</B>
+to keep the original file after transcoding.  This option is on the second
+page of the General section in mythtv-setup.  Enabling this allows you to
+compare the two files and restore the original if you like.  Outside of the
+initial setup phase it usually isn't necessary to leave this option enabled.
+A recording can be transcoded in two ways:</P>
+<P>
+<UL>
+<LI>Automatically transcode the file once it has completed
+recording.</LI>
+<LI>Manually choosing to transcode a recording, usually after
+importing a cutlist or manually marking commercials to be
+removed.</LI>
+</UL>
+</P>
 <P>The second method can be used on files that have already been transcoded (or
-files which were are already in the correct format), so only the frames
-immediately following a cut section will be re-encoded, resulting in a very
-minimal loss of quality.</P>
-<P>To enable automatic transcoding, do the following:
-start the setup program
-under the host-specific settings:
-set the Transcoder Auto-run checkbox</P>
-<P>For either manual or automatic transcoding:
-start mythbackend
-start mythfrontend
-select setup, and the Transcoding recording profile.
-now select either RTjpeg or MPEG-4 (selecting any of the hardware
-encoders will result in the transcoder not working).
-set the other parameters as you'd like.  For best performance, you
-should match the audio to the 'Default' profile.  If you plan to
-only use the manual transcoder, you can choose to set the video to
-be the same as the default profile too (as long as it is MPEG-4 or
-RTjpeg)</P>
-<P>Everything should now be setup properly.  If you elected to use the
-Auto-Run feature, the transcoder will automatically launch after each
-recording is complete.  The transcoder thread runs at a low priority, so it
-should not impact any critical tasks or other recordings.</P>
-<P>If you want to manually transcode a program, simply press 'X' while
-watching a recording (you should have already finished marking all
-commercials).  If you change your mind, hitting 'X' again will stop the
-transcoding.</P>
-<P>Once the transcode is complete, mythbackend will replace the old file
-with the new as soon as it is no longer in use.</P>
+files which were are already in the desired format), so only the frames
+immediately following a cut section will be re-encoded, resulting in a
+minimal loss of quality when removing commercials with the added benefit of
+being extremely quick.</P>
+<P>The current transcoding system has a lot flexibility, but there are
+a number of steps involved in setting it up.  In order to
+automatically transcode a given recording you must do the following:
+<OL>
+<LI>Configure recording profile for your capture source and enable
+transcoding on one or more profiles.</LI>
+<LI>Configure one or more transcoding profiles.</LI>
+<LI>Create or alter existing scheduled recordings to enable
+transcoding for that recording.</LI>
+</OL>
+</P>
+
+<H3>Configuring Recording Profiles to Allow Transcoding</H3>
+
+<P>Enter the Utilities/Setup > Setup > TV Settings > Recording Profiles
+section in <B>mythfrontend</B>.  Choose the option that corresponds to
+your capture source (ignore the Transcoders for now.) Choose the quality
+profile you are interested in using for transcoding.  Ensure that "Enable
+auto-transcode after recording" is checked.  </P>
+
+<H3>Configure Transcoding Profiles</H3>
+
+<P>Enter the Recording Profiles > Transcoders menu.  There are three quality
+settings to choose from and a two special Autodetect settings.  Later, when
+scheduling recordings you'll have to choose one of Autodetect, High, Medium,
+and Low Quality transcode settings in addition to the recording profile we
+set up above.  If you choose the Autodetect transcoding profile for a
+recording, MythTV will use the "Autodetect from RTjpeg/MPEG-4" profile for
+recordings which are RTjpeg/MPEG-4 files.  Otherwise, it will use the
+"Autodetect from MPEG-2" profile provided it's an MPEG-2 recording.  If you
+choose one of the others (High, Medium, Low) it will use the settings in
+that profile regardless of the codec of the original recording.</P>
+<P>There are a number of options for transcoding but the simplest is to enable
+lossless transcoding (the first option) which subsequently removes all other
+options. Enabling lossless encoding simply removes commercials (if you've
+marked them) and attempts to clean up MPEG-2 streams.  Note that with this
+option MythTV will not apply any sort of filters and will only attempt to
+normalize the stream into something cleaner and less likely to have trouble
+with other less forgiving MPEG-2 hardware/software (including players, video
+editors, etc.)</P>
+<P>If you enable resizing of the recording the next page has the settings for
+choosing the final resolution.  MythTV will scale the video as appropriate,
+not crop it to this resolution.</P>
+<P>The final two pages allow configuration of the video and audio codecs.
+Although RTjpeg is an option for video codec there is no reason to transcode
+<EM>to</EM> this format because it will produce larger files than MPEG-4 and
+the recording will take <EM>more</EM> CPU power to play back.  The MPEG-4
+settings are described in the documentation for the <B>ffmpeg</B> project
+at 
+<A HREF="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">http://ffmpeg.sourceforge.net/ffmpeg-doc.html</A>.  It's a matter of
+trial and error to discover which settings achieve a good compromise between
+size and quality.</P>
+<P>If you wish to return to the default settings, they are Bitrate: 2200-2500,
+MaxQ: 2, MinQ: 15, MaxQDiff: 3, and "Scale bitrate for frame size" is
+enabled.  The other options are unchecked.  </P>
+
+<H3>Create/Alter Scheduled Recordings to Enable Transcoding</H3>
+
+<P>Transcoding is actually enabled on a per-recording basis.  Two things
+must be true before any given recording will be auto-transcoded, however. 
+The first is that the recording must have been made with a recording profile
+that has auto-transcode enabled. Under "Storage Options" for the recording
+you must set the "Record using the "X" profile" to the profile you
+configured in the first step.  In addition, under the "Post Recording
+Options" section of the recording you must also set "Transcode new
+recordings." This is also where you specify the Transcoding profile to use
+(Auto, High, Medium, Low.)</P>
+<P>It may not be obvious from above but the flexibility of this system is
+primarily to make it possible to auto-transcode a show recorded via one
+source (ie: pcHDTV 3000), and not transcode that same show if it's recorded
+on another kind of card (ie: PVR-250.) There are other uses however.  You
+could have a PVR-250 and a V4L card.  You may want to transcode the MPEG-2
+from the PVR-250 but there is no need to transcode the recordings made with
+the V4L card, as it's already likely to be MPEG-4.</P>
+<P>As an example, you could configure the Default profile for "Hardware DVB
+Encoders" (the profile group used for DVB cards, including ATSC cards like
+the pcHDTV 3000) to "Enable auto-transcoding". In the Default profile for
+MPEG-2 Encoders (PVR cards) you'd leave "Enable auto-transcoding" unchecked. 
+For programs that are available on both kinds of cards you'd set the
+recording profile to Default and enable auto-transcoding in the record
+settings.  Then you pick your transcoding profile.  The result is that when
+a program is recorded on your DVB card, it will get transcoded.  When it
+plays on a channel available via your PVR card, it won't be.</P>
+
+<H3>Manual Transcoding</H3>
+
+<P>Manually transcoding is activated while watching a show by hitting 'x',
+from the OSD menu by choosing the Transcode option, or by choosing Job
+Options/Transcode from the info menu from the Watch or Delete
+Recordings screens.</P>
+<P>The transcoding profile used for manual transcoding is whatever was set when
+the recording was originally configured, even if you didn't enable
+auto-transcoding.  The only way to change what transcoding profile will be
+used is to alter the transcoder column in the recorded table in the
+database.  The transcoder column contains a number which corresponds with
+the id column in the recordingprofiles table.  You can find out the id
+number for each profile in the transcoder group with an SQL command like:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+mysql> select r.* from recordingprofiles r,profilegroups p where p.name='Transcoders' and p.id=r.profilegroup;
++----+----------------+------------+------------+--------------+
+| id | name           | videocodec | audiocodec | profilegroup |
++----+----------------+------------+------------+--------------+
+| 21 | RTjpeg/MPEG4   | MPEG-4     | MP3        |            6 |
+| 22 | MPEG2          | MPEG-4     | MP3        |            6 |
+| 27 | High Quality   | MPEG-4     | MP3        |            6 |
+| 28 | Medium Quality | MPEG-4     | MP3        |            6 |
+| 29 | Low Quality    | MPEG-4     | MP3        |            6 |
++----+----------------+------------+------------+--------------+
+5 rows in set (0.01 sec)
+
+mysql>                                                                        
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Armed with the knowledge of what the profile ID's are you can also choose to
+run mythtranscode from the command line and explicitly specify the transcoder
+profile.  Run <CODE>mythtranscode --help</CODE> for usage information.</P>
 
 <H2><A NAME="ss23.15">23.15</A> <A HREF="#toc23.15">Changing your hostname</A>
 </H2>
