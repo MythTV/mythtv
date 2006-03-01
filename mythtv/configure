@@ -2016,6 +2016,13 @@ if test x"$firewire_cable_box" = x"yes" ; then
             fi
         fi
     fi
+    if test x"$darwin" == x"yes" ; then
+        if test -d /Developer/FireWireSDK20/Examples/AVCVideoServices ; then
+            firewire_cable_box="yes"
+        else
+            echo Firewire being disabled. /Developer/FireWireSDK20 missing
+        fi
+    fi
 fi
 
 if test x"$x11" = x"yes" ; then
@@ -2816,7 +2823,9 @@ fi
 
 if test x"$firewire_cable_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_firewire"
-  echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >> $MYTH_CONFIG_MAK
+  if test x"$darwin" != x"yes" ; then
+      echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >>  $MYTH_CONFIG_MAK
+  fi
 fi
 
 if test x"$dbox2_dvb_box" = x"yes" ; then
