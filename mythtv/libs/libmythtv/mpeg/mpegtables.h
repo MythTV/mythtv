@@ -296,7 +296,9 @@ class PSIPTable : public PESPacket
     uint TableID(void) const { return StreamID(); }
 
     // section_syntax_ind   1       1.0       8   should always be 1
-    // private_indicator    1       1.1       9   should always be 1
+    bool SectionSyntaxIndicator(void) const { return pesdata()[1] & 0x80; }
+    // private_indicator    1       1.1       9
+    bool PrivateIndicator(void) const { return pesdata()[1] & 0x40; }
     // reserved             2       1.2      10
 
     // section_length      12       1.4      12   always less than 0xFFE
@@ -593,6 +595,38 @@ class ProgramMapTable : public PSIPTable
         SetProgramInfoLength(infoLength);
         memcpy(psipdata() + 4, streamInfo, infoLength);
     }
+};
+
+/** \class ConditionalAccessTable
+ *  \brief The CAT is used to transmit additional ConditionalAccessDescriptor
+ *         instances, in addition to the ones in the PMTs.
+ */
+class ConditionalAccessTable : public PSIPTable
+{
+  public:
+    ConditionalAccessTable(const PSIPTable &table) : PSIPTable(table)
+    {
+    // Section            Bits   Start Byte sbit
+    // -----------------------------------------
+    // table_id             8       0.0       0
+        assert(TableID::CAT == TableID());
+    // section_syntax_ind   1       1.0       8   should always be 1
+    // private_indicator    1       1.1       9   should always be 0
+    // reserved             2       1.2      10
+    // section_length      12       1.4      12   always less than 0xFFE
+    // table_id_extension  16       3.0      24   unused
+    // reserved             2       5.0      40
+    // version_number       5       5.2      42
+    // current_next_ind     1       5.3      47
+    // section_numben       8       6.0      48
+    // last_section_number  8       7.0      56
+    }
+
+    // for (i = 0; i < N; i++)      8.0      64
+    //   { descriptor() }
+    const unsigned char *Descriptors() const { return psipdata(); }
+
+    // CRC_32 32 rpchof
 };
 
 /** \class AdaptationFieldControl

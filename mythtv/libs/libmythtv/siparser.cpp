@@ -528,31 +528,30 @@ bool SIParser::FindServices()
 
 void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
 {
-    (void) pid;
-
-    if (!(buffer[1] & 0x80))
-    {
-        VERBOSE(VB_SIPARSER, LOC + 
-                QString("SECTION_SYNTAX_INDICATOR = 0 - Discarding Table (%1)")
-                .arg(buffer[0],2,16));
-        return;
-    }
-
     QMutexLocker locker(&pmap_lock);
 
     tablehead_t head = ParseTableHead(buffer, size);
+    const PESPacket pes = PESPacket::ViewData(buffer);
+    const PSIPTable psip(pes);
+
+    if (!psip.SectionSyntaxIndicator())
+    {
+        VERBOSE(VB_SIPARSER, LOC + "section_syntax_indicator == 0: " +
+                QString("Ignoring table 0x%1").arg(psip.TableID(),0,16));
+        return;
+    }
 
     // In Detection mode determine what SIStandard you are using.
     if (SIStandard == SI_STANDARD_AUTO)
     {
-        if (TableID::MGT == head.table_id)
+        if (TableID::MGT == psip.TableID())
         {
             SIStandard = SI_STANDARD_ATSC;
             VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
             standardChange = true;
         }
-        else if (TableID::SDT  == head.table_id ||
-                 TableID::SDTo == head.table_id)
+        else if (TableID::SDT  == psip.TableID() ||
+                 TableID::SDTo == psip.TableID())
         {
             SIStandard = SI_STANDARD_DVB;
             VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: DVB");
@@ -561,21 +560,17 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     }
 
     // Parse MPEG tables
-    if (TableID::PAT == head.table_id &&
+    if (TableID::PAT == psip.TableID() &&
         !((PATHandler*) Table[PAT])->Tracker.AddSection(&head))
     {
-        const PESPacket pes = PESPacket::ViewData(buffer);
-        const PSIPTable psip(pes);
         ProgramAssociationTable pat(psip);
         HandlePAT(&pat);
     }
-    else if (TableID::CAT == head.table_id)
+    else if (TableID::CAT == psip.TableID())
         ParseCAT(pid, &head, &buffer[8], size - 8);
-    else if (TableID::PMT == head.table_id &&
-             !Table[PMT]->AddSection(&head, head.table_id_ext, 0))
+    else if (TableID::PMT == psip.TableID() &&
+             !Table[PMT]->AddSection(&head, psip.TableIDExtension(), 0))
     {
-        const PESPacket pes = PESPacket::ViewData(buffer);
-        const PSIPTable psip(pes);
         ProgramMapTable pmt(psip);
         HandlePMT(pmt.ProgramNumber(), &pmt);
     }
@@ -583,21 +578,17 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     // Parse DVB specific NIT and SDT tables
     if (SIStandard == SI_STANDARD_DVB)
     {
-        if (TableID::NIT == head.table_id &&
+        if (TableID::NIT == psip.TableID() &&
             !Table[NETWORK]->AddSection(&head,0,0))
         {
             // Network Information Table
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
             NetworkInformationTable nit(psip);
             HandleNIT(&nit);
         }
-        else if (TableID::SDT  == head.table_id ||
-                 TableID::SDTo == head.table_id)
+        else if (TableID::SDT  == psip.TableID() ||
+                 TableID::SDTo == psip.TableID())
         {
             // Service Tables
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
             ServiceDescriptionTable sdt(psip);
 
             emit TableLoaded(); // Signal to keep scan wizard bars moving
@@ -619,19 +610,17 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     // Parse ATSC specific tables
     if (SIStandard == SI_STANDARD_ATSC)
     {
-        const PESPacket pes = PESPacket::ViewData(buffer);
-        const PSIPTable psip(pes);
         atsc_stream_data->HandleTables(pid, psip);
     }
 
 #ifdef USING_DVB_EIT
     // Parse any embedded guide data
     if (SIStandard == SI_STANDARD_DVB &&
-        DVBEventInformationTable::IsEIT(head.table_id))
+        DVBEventInformationTable::IsEIT(psip.TableID()))
     {
         EventHandler *eh         = (EventHandler*) Table[EVENTS];
-        uint tableid             = head.table_id;
-        uint serviceid           = head.table_id_ext;
+        uint tableid             = psip.TableID();
+        uint serviceid           = psip.TableIDExtension();
         uint last_segment_number = buffer[8+4];
         uint last_table_id       = buffer[8+5];
 
@@ -685,8 +674,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
                     eh->Tracker[serviceid][tableid].MarkUnused(i);
             }
 
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
             const DVBEventInformationTable eit(psip);
             HandleEIT(&eit);
         }
@@ -1403,6 +1390,13 @@ uint SIParser::ProcessDVBEventDescriptors(
 void SIParser::HandleMGT(const MasterGuideTable *mgt)
 {
     VERBOSE(VB_SIPARSER, LOC + "HandleMGT()");
+    if (SI_STANDARD_AUTO == SIStandard)
+    {
+        SIStandard = SI_STANDARD_ATSC;
+        VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
+        standardChange = true;
+    }
+
     for (uint i = 0 ; i < mgt->TableCount(); i++)
     {
         const int table_class = mgt->TableClass(i);
