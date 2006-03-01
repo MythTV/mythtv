@@ -42,6 +42,8 @@ class ConditionalAccessTable;
 class ProgramMapTable;
 
 class ATSCStreamData;
+class DVBStreamData;
+
 class MasterGuideTable;
 class VirtualChannelTable;
 class SystemTimeTable;
@@ -207,6 +209,7 @@ class SIParser : public QObject
     // Storage Objects (ATSC)
     QMap<uint,uint>     sourceid_to_channel;
     ATSCStreamData     *atsc_stream_data;
+    DVBStreamData      *dvb_stream_data;
 
 #ifdef USING_DVB_EIT
     // Storage Objects (ATSC & DVB)

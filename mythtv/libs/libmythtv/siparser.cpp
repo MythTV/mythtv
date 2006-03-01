@@ -15,6 +15,7 @@
 #include "pespacket.h"
 #include "atsctables.h"
 #include "atscstreamdata.h"
+#include "dvbstreamdata.h"
 #include "dvbtables.h"
 #include "dishdescriptors.h"
 
@@ -53,6 +54,7 @@ SIParser::SIParser(const char *name) :
     RequestedTransportID(0),        NITPID(0),
     // ATSC Storage
     atsc_stream_data(new ATSCStreamData(-1,-1)),
+    dvb_stream_data(new DVBStreamData()),
     // Mutex Locks
     pmap_lock(false),
     // State variables
@@ -101,6 +103,19 @@ SIParser::SIParser(const char *name) :
             this,
             SLOT(  HandleCAT(const ConditionalAccessTable*)));
     connect(atsc_stream_data,
+            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+            this,
+            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
+
+    connect(dvb_stream_data,
+            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+            this,
+            SLOT(  HandlePAT(const ProgramAssociationTable*)));
+    connect(dvb_stream_data,
+            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
+            this,
+            SLOT(  HandleCAT(const ConditionalAccessTable*)));
+    connect(dvb_stream_data,
             SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
             this,
             SLOT(  HandlePMT(uint, const ProgramMapTable*)));
@@ -170,6 +185,7 @@ void SIParser::Reset()
     pmap_lock.unlock();
 
     atsc_stream_data->Reset(-1,-1);
+    dvb_stream_data->Reset();
 
     VERBOSE(VB_SIPARSER, LOC + "SIParser Reset due to channel change");
 }
@@ -507,6 +523,11 @@ bool SIParser::AddPMT(uint16_t ServiceID)
     ((MPEGStreamData*)atsc_stream_data)->Reset(ServiceID);
     atsc_stream_data->AddListeningPID(ATSC_PSIP_PID);
 
+    dvb_stream_data->Reset();
+    ((MPEGStreamData*)dvb_stream_data)->Reset(ServiceID);
+    dvb_stream_data->AddListeningPID(DVB_NIT_PID);
+    dvb_stream_data->AddListeningPID(DVB_SDT_PID);
+
     return true;
 }
 
@@ -559,7 +580,9 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     // In Detection mode determine what SIStandard you are using.
     if (SIStandard == SI_STANDARD_AUTO)
     {
-        if (TableID::MGT == psip.TableID())
+        if (TableID::MGT == psip.TableID()  ||
+            TableID::TVCT == psip.TableID() ||
+            TableID::CVCT == psip.TableID())
         {
             SIStandard = SI_STANDARD_ATSC;
             VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
@@ -584,23 +607,7 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     // Parse MPEG tables
     if (SIStandard == SI_STANDARD_DVB)
     {
-        if (TableID::PAT == psip.TableID() &&
-            !((PATHandler*) Table[PAT])->Tracker.AddSection(&head))
-        {
-            ProgramAssociationTable pat(psip);
-            HandlePAT(&pat);
-        }
-        else if (TableID::CAT == psip.TableID())
-        {
-            ConditionalAccessTable cat(psip);
-            HandleCAT(&cat);
-        }
-        else if (TableID::PMT == psip.TableID() &&
-                 !Table[PMT]->AddSection(&head, psip.TableIDExtension(), 0))
-        {
-            ProgramMapTable pmt(psip);
-            HandlePMT(pmt.ProgramNumber(), &pmt);
-        }
+        dvb_stream_data->HandleTables(pid, psip);
     }
 
     // Parse DVB specific NIT and SDT tables
