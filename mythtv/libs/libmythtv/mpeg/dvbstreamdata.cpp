@@ -4,7 +4,9 @@
 #include "dvbtables.h"
 
 DVBStreamData::DVBStreamData(bool cacheTables)
-    : MPEGStreamData(-1, cacheTables), _nit_version(-1), _cached_nit(NULL)
+    : MPEGStreamData(-1, cacheTables),
+      _nit_version(-1), _nito_version(-1),
+      _cached_nit(NULL)
 {
     setName("DVBStreamData");
     AddListeningPID(DVB_NIT_PID);
@@ -19,6 +21,37 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
     if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
+
+    const int table_id = psip.TableID();
+    const int version  = psip.Version();
+
+    if (TableID::NIT == table_id)
+    {
+        if (VersionNIT() != version)
+            return false;
+        return NITSectionSeen(psip.Section());
+    }
+
+    if (TableID::NITo == table_id)
+    {
+        if (VersionNITo() != version)
+            return false;
+        return NIToSectionSeen(psip.Section());
+    }
+
+    if (TableID::SDT == table_id)
+    {
+        if (VersionSDT(psip.TableIDExtension()) != version)
+            return false;
+        return SDTSectionSeen(psip.TableIDExtension(), psip.Section());
+    }
+
+    if (TableID::SDTo == table_id)
+    {
+        if (VersionSDTo(psip.TableIDExtension()) != version)
+            return false;
+        return SDToSectionSeen(psip.TableIDExtension(), psip.Section());
+    }
 
     return false;
 }
@@ -58,8 +91,9 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     {
         case TableID::NIT:
         {
-            VERBOSE(VB_RECORD, "DVBStreamData: Got NIT");
             SetVersionNIT(psip.Version());
+            SetNITSectionSeen(psip.Section());
+
             if (_cache_tables)
             {
                 NetworkInformationTable *nit =
@@ -76,25 +110,105 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::SDT:
         {
-            VERBOSE(VB_RECORD, "DVBStreamData: Got SDT");
-            uint tsid = psip.TableIDExtension();
-            SetVersionSDT(tsid, psip.Version());
+            SetVersionSDT(psip.TableIDExtension(), psip.Version());
+            SetSDTSectionSeen(psip.TableIDExtension(), psip.Section());
+
             if (_cache_tables)
             {
                 ServiceDescriptionTable *sdt =
                     new ServiceDescriptionTable(psip);
-                CacheSDT(tsid, sdt);
-                emit UpdateSDT(tsid, sdt);
+                CacheSDT(psip.TableIDExtension(), sdt);
+                emit UpdateSDT(psip.TableIDExtension(), sdt);
             }
             else
             {
                 ServiceDescriptionTable sdt(psip);
-                emit UpdateSDT(tsid, &sdt);
+                emit UpdateSDT(psip.TableIDExtension(), &sdt);
             }
             return true;
         }
+        case TableID::NITo:
+        {
+            SetVersionNITo(psip.Version());
+            SetNIToSectionSeen(psip.Section());
+            NetworkInformationTable nit(psip);
+            emit UpdateNITo(&nit);
+        }
+        case TableID::SDTo:
+        {
+            SetVersionSDTo(psip.TableIDExtension(), psip.Version());
+            SetSDToSectionSeen(psip.TableIDExtension(), psip.Section());
+            ServiceDescriptionTable sdt(psip);
+            emit UpdateSDTo(psip.TableIDExtension(), &sdt);
+        }
     }
     return false;
+}
+
+void DVBStreamData::SetNITSectionSeen(uint section)
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    _nit_section_seen[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::NITSectionSeen(uint section) const
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    return (bool) (_nit_section_seen[section>>3] & bit_sel[section & 0x7]);
+}
+
+void DVBStreamData::SetNIToSectionSeen(uint section)
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    _nito_section_seen[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::NIToSectionSeen(uint section) const
+{
+    static const unsigned char bit_sel[] =
+        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
+    return (bool) (_nito_section_seen[section>>3] & bit_sel[section & 0x7]);
+}
+
+void DVBStreamData::SetSDTSectionSeen(uint tsid, uint section)
+{
+    sections_map_t::iterator it = _sdt_section_seen.find(tsid);
+    if (it == _sdt_section_seen.end())
+    {
+        _sdt_section_seen[tsid].resize(32, 0);
+        it = _sdt_section_seen.find(tsid);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::SDTSectionSeen(uint tsid, uint section) const
+{
+    sections_map_t::const_iterator it = _sdt_section_seen.find(tsid);
+    if (it == _sdt_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+void DVBStreamData::SetSDToSectionSeen(uint tsid, uint section)
+{
+    sections_map_t::iterator it = _sdto_section_seen.find(tsid);
+    if (it == _sdto_section_seen.end())
+    {
+        _sdto_section_seen[tsid].resize(32, 0);
+        it = _sdto_section_seen.find(tsid);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::SDToSectionSeen(uint tsid, uint section) const
+{
+    sections_map_t::const_iterator it = _sdto_section_seen.find(tsid);
+    if (it == _sdto_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
 bool DVBStreamData::HasCachedNIT(bool current) const

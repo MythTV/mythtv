@@ -42,7 +42,8 @@ class ATSCStreamData : public MPEGStreamData
                    bool cacheTables = false);
    ~ATSCStreamData();
 
-    void Reset(int desiredMajorChannel = -1, int desiredMinorChannel = -1);
+    void Reset(void) { Reset(-1, -1); }
+    void Reset(int desiredMajorChannel, int desiredMinorChannel);
     void SetDesiredChannel(int major, int minor);
 
     // Table processing

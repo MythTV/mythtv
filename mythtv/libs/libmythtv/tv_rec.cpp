@@ -1667,7 +1667,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
             GetCaptureCardNum(), channel->GetCurrentInput());
 
         sm->SetStreamData(sd);
-        sd->Reset(progNum);
+        ((MPEGStreamData*)sd)->Reset(progNum);
         sm->SetProgramNumber(progNum);
         sd->SetVideoStreamsRequired(0);
         sm->SetFTAOnly(fta);

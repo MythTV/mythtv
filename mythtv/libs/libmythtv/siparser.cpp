@@ -504,7 +504,7 @@ bool SIParser::AddPMT(uint16_t ServiceID)
     pmap_lock.unlock();
 
     atsc_stream_data->Reset(-1, -1);
-    atsc_stream_data->Reset(ServiceID);
+    ((MPEGStreamData*)atsc_stream_data)->Reset(ServiceID);
     atsc_stream_data->AddListeningPID(ATSC_PSIP_PID);
 
     return true;
