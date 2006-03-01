@@ -154,8 +154,6 @@ class SIParser : public QObject
     uint GetLanguagePriority(const QString &language);
 
     // Fixes for various DVB Network Spec Deviations
-    void LoadDVBSpecDeviations(uint16_t NetworkID);
-
     void LoadPrivateTypes(uint networkID);
 
     // MPEG Transport Parsers (ATSC and DVB)
@@ -173,10 +171,6 @@ class SIParser : public QObject
     void HandleNITTransportDesc(const desc_list_t &dlist,
                                 TransportObject   &tobj,
                                 QMap_uint16_t     &clist);
-    void ParseDescService      (const uint8_t* buf, int sz,
-                                SDTObject       &s);
-    void ParseDescTeletext     (const uint8_t* buf, int sz);
-    void ParseDescSubtitling   (const uint8_t* buf, int sz);
 
 #ifdef USING_DVB_EIT
     // DVB EIT Table Descriptor processors

@@ -821,11 +821,33 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
             }
             else if (DescriptorID::teletext == (*it)[0])
             {
-                ParseDescTeletext(*it, (*it)[1] + 2);
+                TeletextDescriptor ttd(*it);
+                // TODO remove printout, here to encourage error reporting
+                for (uint i = 0; i < ttd.StreamCount(); i++)
+                {
+                    VERBOSE(VB_GENERAL, LOC +
+                            QString("Teletext %1: lang(%2) "
+                                    "type(%3) mag(%4) page(%5)")
+                            .arg(i).arg(ttd.LanguageString(i))
+                            .arg(ttd.TeletextType(i))
+                            .arg(ttd.TeletextMagazineNum(i))
+                            .arg(ttd.TeletextPageNum(i)));
+                }
             }
             else if (DescriptorID::subtitling == (*it)[0])
             {
-                ParseDescSubtitling(*it, (*it)[1] + 2);
+                SubtitlingDescriptor sd(*it);
+                // TODO remove printout, here to encourage error reporting
+                for (uint i = 0; i < sd.StreamCount(); i++)
+                {
+                    VERBOSE(VB_GENERAL, LOC +
+                            QString("Subtitle %1: lang(%2) "
+                                    "type(%3) comp(%4) anc(%5)")
+                            .arg(i).arg(sd.LanguageString(i))
+                            .arg(sd.SubtitleType(i))
+                            .arg(sd.CompositionPageID(i))
+                            .arg(sd.AncillaryPageID(i)));
+                }
             }
         }
 
@@ -1048,7 +1070,15 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
         for (uint j = 0; j < list.size(); j++)
         {
             if (DescriptorID::service == list[j][0])
-                ParseDescService(list[j], list[j][1], s);
+            {
+                ServiceDescriptor sd(list[j]);
+                s.ServiceType  = sd.ServiceType();
+                s.ProviderName = sd.ServiceProviderName();
+                s.ServiceName  = sd.ServiceName();
+
+                if (PrivateTypes.TVServiceTypes.contains(s.ServiceType))
+                    s.ServiceType = PrivateTypes.TVServiceTypes[s.ServiceType];
+            }
             else
                 ProcessUnusedDescriptor(0, list[j], list[j][1] + 2);
         }
@@ -1254,22 +1284,6 @@ CAPMTObject SIParser::ParseDescCA(const uint8_t *buffer, int size)
  *   DVB DESCRIPTOR PARSERS
  *------------------------------------------------------------------------*/
 
-// Desctiptor 0x48 - Service - SDT
-void SIParser::ParseDescService(const uint8_t *buffer, int, SDTObject &s)
-{
-    uint8_t tempType = buffer[2];
-
-    if (PrivateTypes.TVServiceTypes.contains(tempType))
-        s.ServiceType = PrivateTypes.TVServiceTypes[tempType];
-    else
-        s.ServiceType = tempType;
-
-    buffer += 3;
-    s.ProviderName = dvb_decode_text(buffer + 1, buffer[0]);
-    buffer += buffer[0] + 1;
-    s.ServiceName = dvb_decode_text(buffer + 1, buffer[0]);
-}
-
 #ifdef USING_DVB_EIT
 /** \fn SIParser::ProcessDVBEventDescriptors(uint,const unsigned char*,const unsigned char*,uint,vector<const unsigned char*>&,Event&)
  *  \brief Processes non-language dependent DVB Event descriptors, and caches
@@ -1378,54 +1392,6 @@ uint SIParser::ProcessDVBEventDescriptors(
     return descriptorLength + 2;
 }
 #endif //USING_DVB_EIT
-
-void SIParser::ParseDescTeletext(const uint8_t *buffer, int size)
-{
-    VERBOSE(VB_SIPARSER, LOC + QString("Teletext Descriptor"));
-
-    buffer += 2;
-
-    while (size >= 5)
-    {
-        QString language = QString::fromLatin1((const char*) buffer, 3);
-        uint8_t teletext_type = buffer[3] >> 3;
-        uint8_t teletext_magazine_number = buffer[3] & 0x07;
-        uint8_t teletext_page_number = buffer[4];
-
-        VERBOSE(VB_SIPARSER, LOC + "ParseDescTT(): " +
-                QString("lang: %1, type: %2, mag: %3, page: %4")
-                .arg(language)
-                .arg(teletext_type)
-                .arg(teletext_magazine_number)
-                .arg(teletext_page_number));
-
-        buffer += 5;
-        size -= 5;
-    }
-}
-
-void SIParser::ParseDescSubtitling(const uint8_t *buffer, int size)
-{
-    VERBOSE(VB_SIPARSER, LOC + QString("Subtitling Descriptor"));
-
-    buffer += 2;
-
-    while (size >= 8)
-    {
-        QString language = QString::fromLatin1((const char*) buffer, 3);
-        uint8_t subtitling_type = buffer[3];
-        uint16_t composition_page_id = (buffer[4] << 8) | buffer[5];
-        uint16_t ancillary_page_id = (buffer[6] << 8) | buffer[7];
-
-        VERBOSE(VB_SIPARSER, LOC + "ParseDescSub(): " +
-                QString("lang: %1, type: %2, comp: %3, anc: %4")
-                .arg(language).arg(subtitling_type)
-                .arg(composition_page_id).arg(ancillary_page_id));
-
-        buffer += 8;
-        size -= 8;
-    }
-}
 
 /*------------------------------------------------------------------------
  *   ATSC TABLE PARSERS

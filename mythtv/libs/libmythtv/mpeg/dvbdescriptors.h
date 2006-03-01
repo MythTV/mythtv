@@ -38,14 +38,6 @@ using namespace std;
 
 static QString coderate_inner(uint coderate);
 
-static QString dvb_string(const unsigned char* data, uint length)
-{
-    QString name("");
-    for (uint i = 0; i < length; i++)
-        name.append((char)(data[i]));
-    return name;
-}
-
 extern QString dvb_decode_text(const unsigned char *src, uint length);
 
 #define byteBCDH2int(i) (i >> 4)
@@ -1139,24 +1131,24 @@ class ServiceDescriptor : public MPEGDescriptor
         kServiceTypeDVB_MHP                  = 0x10,
     };
     // service_type             8   2.0
-    uint ServiceType() const { return _data[2]; }
+    uint ServiceType(void) const { return _data[2]; }
     // svc_provider_name_len    8   3.0
-    uint ServiceProviderNameLength() const { return _data[3]; }
+    uint ServiceProviderNameLength(void) const { return _data[3]; }
     // for (i=0;i<N;I++) { char 8 }
-    QString ServiceProviderName() const
-        { return dvb_string(_data+4, ServiceProviderNameLength()); }
+    QString ServiceProviderName(void) const
+        { return dvb_decode_text(_data + 4, ServiceProviderNameLength()); }
     // service_name_length      8
-    uint ServiceNameLength() const
-        { return _data[4+ServiceProviderNameLength()]; }
+    uint ServiceNameLength(void) const
+        { return _data[4 + ServiceProviderNameLength()]; }
     // for (i=0;i<N;I++) { char 8 }
-    QString ServiceName() const
+    QString ServiceName(void) const
     {
-        return dvb_string(_data+4+ServiceProviderNameLength(),
-                          ServiceNameLength());
+        return dvb_decode_text(_data + 4 + ServiceProviderNameLength(),
+                               ServiceNameLength());
     }
-    bool IsDTV() const
+    bool IsDTV(void) const
         { return ServiceType() ==  kServiceTypeDigitalTelevision; }
-    bool IsDigitalAudio() const
+    bool IsDigitalAudio(void) const
         { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
     QString toString() const { return QString("ServiceDescriptor(stub)"); }
 };
@@ -1293,12 +1285,28 @@ class SubtitlingDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
+    uint StreamCount(void) const { return DescriptorLength() >> 3; }
     // for (i= 0;i<N;I++)
     // {
     //   ISO_639_language_code 24   0.0+p
+    int LanguageKey(uint i) const
+        { return iso639_str3_to_key(&_data[2 + (i<<3)]); }
+    QString LanguageString(uint i) const
+        { return iso639_key_to_str3(LanguageKey(i)); }
+    int CanonicalLanguageKey(uint i) const
+        { return iso639_key_to_canonical_key(LanguageKey(i)); }
+    QString CanonicalLanguageString(uint i) const
+        { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
+
     //   subtitling_type        8   3.0+p
+    uint SubtitleType(uint i) const
+        { return _data[5 + (i<<3)]; }
     //   composition_page_id   16   4.0+p
+    uint CompositionPageID(uint i) const
+        { return (_data[6 + (i<<3)] << 8) | _data[7 + (i<<3)]; }
     //   ancillary_page_id     16   6.0+p
+    uint AncillaryPageID(uint i) const
+        { return (_data[8 + (i<<3)] << 8) | _data[9 + (i<<3)]; }
     // }                            8.0
     QString toString() const { return QString("SubtitlingDescriptor(stub)"); }
 };
@@ -1348,12 +1356,29 @@ class TeletextDescriptor : public MPEGDescriptor
         assert(DescriptorID::teletext == DescriptorTag());
     // descriptor_length        8   1.0
     }
+
+    uint StreamCount(void) const { return DescriptorLength() / 5; }
+
     // for (i=0; i<N; i++)
     // {
     //   ISO_639_language_code 24  0.0
+    int LanguageKey(uint i) const
+        { return iso639_str3_to_key(&_data[2 + (i*5)]); }
+    QString LanguageString(uint i) const
+        { return iso639_key_to_str3(LanguageKey(i)); }
+    int CanonicalLanguageKey(uint i) const
+        { return iso639_key_to_canonical_key(LanguageKey(i)); }
+    QString CanonicalLanguageString(uint i) const
+        { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   teletext_type         5   3.0
+    uint TeletextType(uint i) const
+        { return _data[5 + (i*5)] >> 3; }
     //   teletext_magazine_num 3   3.5
+    uint TeletextMagazineNum(uint i) const
+        { return _data[5 + (i*5)] & 0x7; }
     //   teletext_page_num     8   4.0
+    uint TeletextPageNum(uint i) const
+        { return _data[6 + (i*5)]; }
     // }                           5.0
     QString toString() const { return QString("TeletextDescriptor(stub)"); }
 };
