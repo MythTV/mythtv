@@ -565,7 +565,7 @@ void DVBChannel::SetPMT(const PMTObject *pmt)
         emit UpdatePMTObject(&chan_opts.pmt);
 
     // Tells the Conditional Access Module which streams we wish to decode.
-    if (dvbcam->IsRunning())
+    if (pmt && dvbcam->IsRunning())
         dvbcam->SetPMT(pmt);
 }
 
