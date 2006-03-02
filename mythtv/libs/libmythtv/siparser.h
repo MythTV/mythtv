@@ -207,16 +207,13 @@ class SIParser : public QObject
     ATSCStreamData     *atsc_stream_data;
     DVBStreamData      *dvb_stream_data;
 
-#ifdef USING_DVB_EIT
-    // Storage Objects (ATSC & DVB)
-    QMap2D_Events       EventMapObject;
-    QMap_Events         EventList;
-#endif //USING_DVB_EIT
-
-
     // Mutex Locks
     // TODO: Lock Events, and Services, Transports, etc
     QMutex              pmap_lock;
+    pnum_pid_map_t      pnum_pid;
+    dvb_srv_eit_on_t    dvb_srv_collect_eit;
+    atsc_eit_pid_map_t  atsc_eit_pid;
+    atsc_ett_pid_map_t  atsc_ett_pid;
 
     int                 ThreadRunning;
     bool                exitParserThread;
@@ -234,6 +231,8 @@ class SIParser : public QObject
     /// EITFixUp instance
     EITFixUp            eitfixup;
     EITCache            eitcache;
+    QMap2D_Events       incomplete_events;
+    QMap2D_Events       complete_events;
 #endif
 
     // statistics

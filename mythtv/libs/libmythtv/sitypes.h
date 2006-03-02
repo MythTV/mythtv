@@ -47,37 +47,14 @@ static inline QString SIStandard_to_String(int std)
 
 typedef enum tabletypes
 {
-    PAT,                /* Program Association Table */
-    PMT,                /* Program Managemenet Table */
     SERVICES,           /* SDT or T/CVCT */
     NETWORK,            /* Current Network NIT */
-#ifdef USING_DVB_EIT
-    EVENTS,             /* EIT for DVB or ATSC */
-#endif // USING_DVB_EIT
-
     NumHandlers,        /* placeholder */
-
-    OTHER_SERVICES = NumHandlers, /* Other Network SDT */
-    OTHER_NETWORK,      /* Other Network NIT */
-    CAT,                /* Conditional Access Table */
-    MGT,                /* ATSC Management Table */
-    STT,                /* ATSC SystemTimeTable */
 };
 static QString tabletypes2string[] =
 {
-    "PAT",
-    "PMT",
     "SERVICES",
     "NETWORK",
-#ifdef USING_DVB_EIT
-    "EVENTS",
-#endif // USING_DVB_EIT
-
-    "OTHER_SERVICES",
-    "OTHER_NETWORK",
-    "CAT",
-    "MGT",
-    "STT",
 };
 
 
@@ -95,6 +72,10 @@ typedef QMap<uint16_t,QMap_QString>        QMap2D_QString;
 typedef QMap<uint16_t,SectionTracker>      QMap_SectionTracker;
 typedef QMap<uint16_t,QMap_SectionTracker> QMap2D_SectionTracker;
 typedef QMap<uint16_t,pidHandler>          QMap_pidHandler;
+typedef QMap<uint,uint>                    pnum_pid_map_t;
+typedef QMap<uint,bool>                    dvb_srv_eit_on_t;
+typedef QMap<uint,uint>                    atsc_eit_pid_map_t;
+typedef QMap<uint,uint>                    atsc_ett_pid_map_t;
 
 class pidHandler
 {
@@ -295,44 +276,6 @@ public:
     int      MplexID;        /* Set if MplexID is know i.e.current service*/
 };
 
-class ElementaryPIDObject
-{
-public:
-    ElementaryPIDObject() { Reset(); }
-    ~ElementaryPIDObject() { Reset(); }
-    ElementaryPIDObject(const ElementaryPIDObject &other);
-    ElementaryPIDObject& operator=(const ElementaryPIDObject &other);
-    void deepCopy(const ElementaryPIDObject&);
-    void Reset();
-
-    QString GetLanguage(void) const
-    {
-        const unsigned char *d;
-        d = MPEGDescriptor::Find(Descriptors, DescriptorID::ISO_639_language);
-        if (!d)
-            return QString::null;
-
-        ISO639LanguageDescriptor iso_lang(d);
-        return iso_lang.CanonicalLanguageString();
-    }
-
-    QString GetDescription(void) const
-    {
-        uint type = StreamID::Normalize(Orig_Type, Descriptors);
-        QString desc = StreamID::toString(type);
-        QString lang = GetLanguage();
-        if (!lang.isEmpty())
-            desc += QString(" (%1)").arg(lang);
-        return desc;
-    }
-
-    uint        Orig_Type;
-    uint        PID;
-    desc_list_t CA;
-    desc_list_t Descriptors;
-};
-typedef QValueList<ElementaryPIDObject> ComponentList;
-
 // DVB TransportObject - Used with NIT Scanning
 class TransportObject
 {
@@ -401,94 +344,6 @@ public:
     QValueList<NetworkObject> Network;
     QValueList<TransportObject> Transport;
 };
-
-/* PAT Handler */
-class PATHandler : public TableHandler
-{
-public:
-    PATHandler() : TableHandler() { Reset(); }
-    ~PATHandler() {}
-
-    void Reset();
-    bool RequirePIDs();
-    bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
-    void Request(uint16_t key = 0);
-    bool Complete();
-    void AddKey(uint16_t key0, uint16_t key1) { (void) key0; (void) key1; }
-    bool AddSection(tablehead_t *head, uint16_t key0 = 0, uint16_t key1 = 0);
-    void DependencyMet(tabletypes t) { (void) t; }
-    void DependencyChanged(tabletypes t) { (void) t; }
-
-    QMap_uint16_t pids;
-
-    SectionTracker Tracker;
-    pullStatus     status;
-};
-
-typedef QMap<uint,uint> pnum_pit_map_t;
-
-/* PMT Handler */
-class PMTHandler : public TableHandler
-{
-  public:
-    PMTHandler() : TableHandler() { Reset(); }
-    ~PMTHandler() {}
-
-    void Reset() { Tracker.clear(); status.clear(); patloaded = false; }
-    bool RequirePIDs();
-    bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
-    void Request(uint16_t key = 0) { (void) key; }
-    void RequestEmit(uint16_t key);
-    bool EmitRequired();
-    bool CompleteEmitRequired() { return false; }
-    bool GetEmitID(uint16_t& key0, uint16_t& key1);
-    bool AddSection(tablehead_t* head, uint16_t key0, uint16_t key1);
-    bool Complete() { return false; }
-    void AddKey(uint16_t key0, uint16_t key1);
-    void DependencyMet(tabletypes t);
-    void DependencyChanged(tabletypes t);
-
-    pnum_pit_map_t      pmtpid;
-
-  private:
-    QMap_SectionTracker Tracker;
-    bool                patloaded;
-    QMap_pullStatus     status;
-};
-
-#ifdef USING_DVB_EIT
-// TODO: Setup only for ATSC Guide right now
-class EventHandler : public TableHandler
-{
-public:
-    EventHandler() : TableHandler() { Reset(); }
-    ~EventHandler() {}
-    void Reset();
-    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
-    bool Complete();
-    void SetupTrackers();
-    bool RequirePIDs();
-    bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
-    void Request(uint16_t key) { (void) key; }
-    void RequestEmit(uint16_t key);
-    bool EmitRequired();
-    bool GetEmitID(uint16_t& key0, uint16_t& key1);
-    void DependencyMet(tabletypes t);
-    void AddPid(uint16_t pid,uint8_t filter, uint8_t mask, uint8_t key);
-    bool AddSection(tablehead_t *head, uint16_t key0, uint16_t key1);
-
-    QMap2D_SectionTracker  Tracker;
-    QMap_pullStatus        status;        /* Status of serviceIDs */
-    bool                   mgtloaded;
-    bool                   sttloaded;
-    bool                   servicesloaded;
-    bool                   CompleteSent;
-    QMap_pidHandler        EITpid;        /* for ATSC use this as a key */
-    QMap_pidHandler        ETTpid;
-    QMap2D_Events          Events;
-    QMap_bool              TrackerSetup;
-};
-#endif //USING_DVB_EIT
 
 class ServiceHandler : public TableHandler
 {
