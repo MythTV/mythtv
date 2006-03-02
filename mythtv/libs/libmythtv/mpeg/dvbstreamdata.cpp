@@ -137,6 +137,9 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     if (MPEGStreamData::HandleTables(pid, psip))
         return true;
 
+    if (IsRedundant(pid, psip))
+        return true;
+
     switch (psip.TableID())
     {
         case TableID::NIT:

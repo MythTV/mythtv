@@ -87,11 +87,11 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
  */
 bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
-    const int table_id = psip.TableID();
-    const int version = psip.Version();
-
     if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
+
+    const int table_id = psip.TableID();
+    const int version  = psip.Version();
 
     if (TableID::EIT == table_id)
     {
@@ -127,10 +127,10 @@ bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
 bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
-    if (IsRedundant(pid, psip))
+    if (MPEGStreamData::HandleTables(pid, psip))
         return true;
 
-    if (MPEGStreamData::HandleTables(pid, psip))
+    if (IsRedundant(pid, psip))
         return true;
 
     const int version = psip.Version();

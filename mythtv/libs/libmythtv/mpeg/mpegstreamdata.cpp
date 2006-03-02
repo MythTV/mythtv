@@ -394,6 +394,9 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
  */
 bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
+    if (IsRedundant(pid, psip))
+        return true;
+
     const int version = psip.Version();
     // If we get this far decode table
     switch (psip.TableID())
