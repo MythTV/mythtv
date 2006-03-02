@@ -75,7 +75,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     void Close(void);
 
   public slots:
-    void SetPMTObject(const PMTObject*);
+    void SetPMT(const ProgramMapTable*);
     void deleteLater(void);
 
   private:
@@ -91,7 +91,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
                     uint mpeg_stream_type);
 
     void SetPAT(ProgramAssociationTable*);
-    void SetPMT(ProgramMapTable*);
+    void SetOutputPMT(ProgramMapTable*);
 
     void CreatePAT(void);
     void CreatePMT(void);
@@ -120,15 +120,14 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     QMutex          _pid_lock;
     PIDInfoMap      _pid_infos;
 
+    /// PMT on input side
+    ProgramMapTable         *_input_pmt;
+
     // TS recorder stuff
     ProgramAssociationTable *_pat;
     ProgramMapTable         *_pmt;
     uint            _next_pmt_version;
     int             _ts_packets_until_psip_sync;
-
-    // Input Misc
-    /// PMT on input side
-    PMTObject       _input_pmt;
 
     // Fake video for audio-only streams
     uint            _audio_header_pos;

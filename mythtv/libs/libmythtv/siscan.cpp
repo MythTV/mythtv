@@ -132,8 +132,8 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
             SISCAN("Creating SIParser");
             siparser = new DVBSIParser(GetDVBChannel()->GetCardNum());
             pthread_create(&siparser_thread, NULL, SpawnSectionReader, siparser);
-            connect(siparser,        SIGNAL(UpdatePMT(const PMTObject*)),
-                    GetDVBChannel(), SLOT(SetPMT(const PMTObject*)));
+            connect(siparser,        SIGNAL(UpdatePMT(const ProgramMapTable*)),
+                    GetDVBChannel(), SLOT(  SetPMT(   const ProgramMapTable*)));
         }    
         if (siparser)
         {

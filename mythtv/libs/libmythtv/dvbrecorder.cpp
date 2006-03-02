@@ -129,7 +129,13 @@ void DVBRecorder::TeardownAll(void)
     }
 
     SetPAT(NULL);
-    SetPMT(NULL);
+    SetOutputPMT(NULL);
+
+    if (_input_pmt)
+    {
+        delete _input_pmt;
+        _input_pmt = NULL;
+    }
 }
 
 void DVBRecorder::deleteLater(void)
@@ -157,11 +163,11 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
     DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
 }
 
-void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
+void DVBRecorder::SetPMT(const ProgramMapTable *_pmt)
 {
     QMutexLocker change_lock(&_pid_lock);
-    VERBOSE(VB_RECORD, LOC + "SetPMTObject()");
-    _input_pmt = *_pmt;
+    VERBOSE(VB_RECORD, LOC + "SetPMT()");
+    _input_pmt = new ProgramMapTable(*_pmt);
 
     /* Rev the PMT version since PIDs are changing */
     _next_pmt_version = (_next_pmt_version + 1) & 0x1f;
@@ -189,8 +195,8 @@ bool DVBRecorder::Open(void)
     if (_drb)
         _drb->Reset(videodevice, _stream_fd);
 
-    connect(dvbchannel, SIGNAL(UpdatePMTObject(const PMTObject *)),
-            this, SLOT(SetPMTObject(const PMTObject *)));
+    connect(dvbchannel, SIGNAL(UpdatePMT(const ProgramMapTable*)),
+            this,       SLOT(  SetPMT(   const ProgramMapTable*)));
 
     VERBOSE(VB_RECORD, LOC + QString("Card opened successfully fd(%1)")
             .arg(_stream_fd));
@@ -316,16 +322,15 @@ bool DVBRecorder::OpenFilters(void)
 
     // Record all streams flagged for recording
     bool need_pcr_pid = true;
-    QValueList<ElementaryPIDObject>::const_iterator es;
-    for (es = _input_pmt.Components.begin();
-         es != _input_pmt.Components.end(); ++es)
+    for (uint i = 0; i < _input_pmt->StreamCount(); i++)
     {
-        OpenFilter((*es).PID, DMX_PES_OTHER, (*es).Orig_Type);
-        need_pcr_pid &= ((*es).PID != _input_pmt.PCRPID);
+        OpenFilter(_input_pmt->StreamPID(i), DMX_PES_OTHER,
+                   _input_pmt->StreamType(i));
+        need_pcr_pid &= (_input_pmt->StreamPID(i) != _input_pmt->PCRPID());
     }
 
-    if (need_pcr_pid && (_input_pmt.PCRPID))
-        OpenFilter(_input_pmt.PCRPID, DMX_PES_OTHER, (*es).Orig_Type);
+    if (need_pcr_pid && (_input_pmt->PCRPID()))
+        OpenFilter(_input_pmt->PCRPID(), DMX_PES_OTHER, StreamID::PrivData);
 
     if (_video_stream_fd >= 0)
     {
@@ -333,7 +338,10 @@ bool DVBRecorder::OpenFilters(void)
         _video_stream_fd = -1;
     }
 
-    if (!_input_pmt.hasVideo)
+    vector<uint> video_pids;
+    uint video_cnt = _input_pmt->FindPIDs(StreamID::AnyVideo, video_pids);
+
+    if (!video_cnt)
     {
         VERBOSE(VB_RECORD, LOC + "Creating dummy video");
         // Create a dummy video stream.
@@ -396,7 +404,7 @@ void DVBRecorder::StartRecording(void)
     _recording = true;
 
     SetPAT(NULL);
-    SetPMT(NULL);
+    SetOutputPMT(NULL);
     _ts_packets_until_psip_sync = 0;
 
     bool ok = _drb->Setup(videodevice, _stream_fd);
@@ -507,7 +515,7 @@ void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
         VERBOSE(VB_SIPARSER, "DVBRecorder::SetPAT(NULL)");
 }
 
-void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
+void DVBRecorder::SetOutputPMT(ProgramMapTable *new_pmt)
 {
     QMutexLocker change_lock(&_pid_lock);
 
@@ -517,9 +525,9 @@ void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
         delete old_pmt;
 
     if (_pmt)
-        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPMT()\n" + _pmt->toString());
+        VERBOSE(VB_SIPARSER, "DVBRecorder::SetOutputPMT()\n" + _pmt->toString());
     else
-        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPMT(NULL)");
+        VERBOSE(VB_SIPARSER, "DVBRecorder::SetOutputPMT(NULL)");
 }
 
 void DVBRecorder::CreatePAT(void)
@@ -541,21 +549,28 @@ void DVBRecorder::CreatePMT(void)
 {
     QMutexLocker read_lock(&_pid_lock);
 
+    VERBOSE(VB_RECORD, LOC + "CreatePMT(void) INPUT\n\n" +
+            _input_pmt->toString());
+
     // Figure out what goes into the PMT
     uint programNumber = 1; // MPEG Program Number
-    desc_list_t gdesc = _input_pmt.Descriptors;
+    
+    desc_list_t gdesc = MPEGDescriptor::ParseAndExclude(
+        _input_pmt->ProgramInfo(), _input_pmt->ProgramInfoLength(),
+        DescriptorID::conditional_access);
+
     vector<uint> pids;
     vector<uint> types;
     vector<desc_list_t> pdesc;
-    QValueList<ElementaryPIDObject>::iterator it;
 
-    it = _input_pmt.Components.begin();
-    for (; it != _input_pmt.Components.end(); ++it)
+    for (uint i = 0; i < _input_pmt->StreamCount(); i++)
     {
-        pdesc.push_back((*it).Descriptors);
-        pids.push_back((*it).PID);
-        uint type = StreamID::Normalize((*it).Orig_Type,(*it).Descriptors);
-        types.push_back(type);
+        desc_list_t desc = MPEGDescriptor::ParseAndExclude(
+            _input_pmt->StreamInfo(i), _input_pmt->StreamInfoLength(i),
+            DescriptorID::conditional_access);
+        pdesc.push_back(desc);
+        pids.push_back(_input_pmt->StreamPID(i));
+        types.push_back(StreamID::Normalize(_input_pmt->StreamType(i), desc));
     }
 
     if (_video_stream_fd >= 0)
@@ -568,7 +583,7 @@ void DVBRecorder::CreatePMT(void)
 
     // Create the PMT
     ProgramMapTable *pmt = ProgramMapTable::Create(
-        programNumber, PMT_PID, _input_pmt.PCRPID,
+        programNumber, PMT_PID, _input_pmt->PCRPID(),
         _next_pmt_version, gdesc,
         pids, types, pdesc);
 
@@ -579,7 +594,10 @@ void DVBRecorder::CreatePMT(void)
         pmt->tsheader()->SetContinuityCounter(cc);
     }
 
-    SetPMT(pmt);
+    VERBOSE(VB_RECORD, LOC + "CreatePMT(void) OUTPUT\n\n" +
+            pmt->toString());
+
+    SetOutputPMT(pmt);
 }
 
 void DVBRecorder::StopRecording(void)

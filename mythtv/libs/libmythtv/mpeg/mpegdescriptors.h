@@ -144,6 +144,10 @@ class MPEGDescriptor
     QString DescriptorTagString() const;
     uint DescriptorLength() const { return _data[1]; }
     static desc_list_t Parse(const unsigned char* data, uint len);
+    static desc_list_t ParseAndExclude(const unsigned char* data, uint len,
+                                       int descriptorid);
+    static desc_list_t ParseOnlyInclude(const unsigned char* data, uint len,
+                                        int descriptorid);
     static const unsigned char* Find(const desc_list_t& parsed, uint desc_tag);
     virtual QString toString() const;
   protected:

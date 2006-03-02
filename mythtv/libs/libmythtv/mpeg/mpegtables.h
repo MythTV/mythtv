@@ -545,7 +545,14 @@ class ProgramMapTable : public PSIPTable
     /// Returns true iff PMT contains a still-picture video stream
     bool IsStillPicture(void) const;
     /// Returns a string representation of type at stream index i
-    const QString StreamTypeString(uint i) const;
+    QString StreamTypeString(uint i) const
+        { return StreamID::toString(StreamType(i)); }
+    /// Returns a better (and more expensive) string representation
+    /// of type at stream index i than StreamTypeString(uint)
+    QString StreamDescription(uint i) const;
+    /// Returns the cannonical language if we find the iso639 descriptor
+    QString GetLanguage(uint i) const;
+
     uint FindPIDs(uint type, vector<uint>& pids) const;
     uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types) const;
 

@@ -18,6 +18,36 @@ desc_list_t MPEGDescriptor::Parse(
     return tmp;
 }
 
+desc_list_t MPEGDescriptor::ParseAndExclude(
+    const unsigned char* data, uint len, int excluded_descid)
+{
+    desc_list_t tmp;
+    uint off = 0;
+    while (off < len)
+    {
+        if ((data+off)[0] != excluded_descid)
+            tmp.push_back(data+off);
+        MPEGDescriptor desc(data+off);
+        off += desc.DescriptorLength() + 2;
+    }
+    return tmp;
+}
+
+desc_list_t MPEGDescriptor::ParseOnlyInclude(
+    const unsigned char* data, uint len, int excluded_descid)
+{
+    desc_list_t tmp;
+    uint off = 0;
+    while (off < len)
+    {
+        if ((data+off)[0] == excluded_descid)
+            tmp.push_back(data+off);
+        MPEGDescriptor desc(data+off);
+        off += desc.DescriptorLength() + 2;
+    }
+    return tmp;
+}
+
 const unsigned char* MPEGDescriptor::Find(const desc_list_t& parsed,
                                           uint desc_tag)
 {

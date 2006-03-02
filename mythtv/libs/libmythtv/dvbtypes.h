@@ -391,28 +391,23 @@ class DVBTuning
 class dvb_channel_t
 {
   public:
-    dvb_channel_t() : PMTSet(false), serviceID(0xffff), networkID(0xffff),
-        providerID(0xffff), transportID(0xffff), sistandard(""), version(255) {;}
+    dvb_channel_t() :
+        pmt(NULL),
+        serviceID(0xffff),  networkID(0xffff),
+        providerID(0xffff), transportID(0xffff),
+        sistandard(""),     version(255) {;}
 
     bool IsPMTSet() const
     {
-        lock.lock();
-        bool is_set = PMTSet;
-        lock.unlock();
-        return is_set;
+        QMutexLocker locker(&lock);
+        return pmt;
     }
 
-    void SetPMT(const PMTObject *_pmt)
+    void SetPMT(const ProgramMapTable *_pmt)
     {
-        lock.lock();
+        QMutexLocker locker(&lock);
         if (_pmt)
-        {
-            pmt = *_pmt;
-            PMTSet = true;
-        }
-        else
-            PMTSet = false;
-        lock.unlock();
+            pmt = new ProgramMapTable(*_pmt);
     }
 
     bool Parse(
@@ -427,7 +422,7 @@ class dvb_channel_t
 
     DVBTuning       tuning;
 
-    PMTObject       pmt;
+    ProgramMapTable *pmt;
     bool            PMTSet;
 
     uint16_t        serviceID; /// program number in PAT

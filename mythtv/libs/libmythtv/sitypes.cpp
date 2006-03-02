@@ -270,91 +270,6 @@ void NetworkObject::Reset()
     LinkagePresent = 0;
 }
 
-/** \fn PMTObject::PMTObject(const PMTObject&)
- *  \brief Performs deep copy.
- */
-PMTObject::PMTObject(const PMTObject &other)
-{
-    deepCopy(other);
-}
-
-/** \fn PMTObject::operator=(const PMTObject&)
- *  \brief Performs deep copy.
- */
-PMTObject &PMTObject::operator=(const PMTObject &other)
-{
-    deepCopy(other);
-    return *this;
-}
-
-/** \fn PMTObject::deepCopy(const PMTObject&)
- *  \brief Copies each simple field in PMT, and copies each element in the CA,
- *         Descriptors and Components QPtrVector fields into new QPtrVector's.
- */
-void PMTObject::deepCopy(const PMTObject &other)
-{
-    Reset();
-
-    PCRPID      = other.PCRPID;
-    ServiceID   = other.ServiceID;
-    PMTPID      = other.PMTPID;
-
-    desc_list_t::const_iterator cit = other.CA.begin();
-    for (; cit != other.CA.end(); ++cit)
-    {
-        unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
-        memcpy(tmp, *cit, (*cit)[1] + 2);
-        CA.push_back(tmp);
-    }
-
-    cit = other.Descriptors.begin();
-    for (; cit != other.Descriptors.end(); ++cit)
-    {
-        unsigned char *tmp = new unsigned char[(*cit)[1] + 2];
-        memcpy(tmp, *cit, (*cit)[1] + 2);
-        Descriptors.push_back(tmp);
-    }
-
-    Components.clear();
-    QValueList<ElementaryPIDObject>::const_iterator eit;
-    for (eit = other.Components.begin(); eit!=other.Components.end(); ++eit)
-    {
-        ElementaryPIDObject obj;
-        obj.deepCopy(*eit);
-        Components.append(obj);
-    }
-
-    hasCA       = other.hasCA;
-    hasAudio    = other.hasAudio;
-    hasVideo    = other.hasVideo;
-}
-
-/** \fn PMTObject::Reset()
- *  \brief Resets all values in the PMTObject to their initial values.
- */
-void PMTObject::Reset()
-{
-    PCRPID    = 0;
-    ServiceID = 0;
-    PMTPID    = 0;
-
-    desc_list_t::iterator it;
-
-    for (it = CA.begin(); it != CA.end(); ++it)
-        delete [] *it;
-    CA.clear();
-
-    for (it = Descriptors.begin(); it != Descriptors.end(); ++it)
-        delete [] *it;
-    Descriptors.clear();
-
-    Components.clear();
-
-    hasCA    = false;
-    hasAudio = false;
-    hasVideo = false;
-}
-
 void PATHandler::Reset()
 {
     status.Reset();
@@ -427,9 +342,9 @@ bool PMTHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
         if ((i.data().pulling == false) && (i.data().requested == true))
         {
             i.data().pulling = true;
-            pid = pmt[i.key()].PMTPID;
+            pid    = pmtpid[i.key()];
             filter = 0x02;
-            mask = 0xFF;
+            mask   = 0xFF;
             return true;
         }
     }

@@ -603,7 +603,7 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
         path->pids[pat->ProgramNumber(i)] = pat->ProgramPID(i);
 
         pmth->AddKey(pat->ProgramPID(i), 0);
-        pmth->pmt[pat->ProgramNumber(i)].PMTPID = pat->ProgramPID(i);
+        pmth->pmtpid[pat->ProgramNumber(i)] = pat->ProgramPID(i);
     }
     pmth->DependencyMet(PAT);
     pmth->Request(0);
@@ -635,118 +635,15 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) version(%2) cnt(%3)")
             .arg(pnum).arg(pmt->Version()).arg(pmt->StreamCount()));
 
-    // Create a PMTObject and populate it
-    PMTObject p;
-    p.PCRPID    = pmt->PCRPID();
-    p.ServiceID = pmt->ProgramNumber();
-
-    // Process Program Info Descriptors
-    const unsigned char *pi = pmt->ProgramInfo();
-    desc_list_t list = MPEGDescriptor::Parse(pi, pmt->ProgramInfoLength());
-    desc_list_t::const_iterator it = list.begin();
-    for (; it != list.end(); ++it)
-    {
-        if (DescriptorID::conditional_access == (*it)[0])
-        {
-            unsigned char *tmp = new unsigned char[(*it)[1] + 2];
-            memcpy(tmp, *it, (*it)[1] + 2);
-            p.CA.push_back(tmp);
-            p.hasCA = true;
-        }
-        else
-        {
-            unsigned char *tmp = new unsigned char[(*it)[1] + 2];
-            memcpy(tmp, *it, (*it)[1] + 2);
-            p.Descriptors.push_back(tmp);
-        }
-    }
-
-    // Process streams
-    for (uint i = 0; i < pmt->StreamCount(); i++)
-    {
-        VERBOSE(VB_SIPARSER, LOC +
-                QString("Stream %1: pid(0x%2)")
-                .arg(i).arg(pmt->StreamPID(i),0,16));
-
-        const unsigned char *si = pmt->StreamInfo(i);
-        desc_list_t list = MPEGDescriptor::Parse(si, pmt->StreamInfoLength(i));
-        uint type = StreamID::Normalize(pmt->StreamType(i), list);
-
-        // Reset Elementary PID object
-        ElementaryPIDObject e;
-        e.Reset();
-        e.PID         = pmt->StreamPID(i);
-        e.Orig_Type   = pmt->StreamType(i);
-
-        desc_list_t::const_iterator it = list.begin();
-        for (; it != list.end(); ++it)
-        {
-            if (DescriptorID::conditional_access == (*it)[0])
-            {
-                unsigned char *tmp = new unsigned char[(*it)[1] + 2];
-                memcpy(tmp, *it, (*it)[1] + 2);
-                p.CA.push_back(tmp);
-                p.hasCA = true;
-            }
-            else if (DescriptorID::teletext == (*it)[0])
-            {
-                TeletextDescriptor ttd(*it);
-                // TODO remove printout, here to encourage error reporting
-                for (uint i = 0; i < ttd.StreamCount(); i++)
-                {
-                    VERBOSE(VB_GENERAL, LOC +
-                            QString("Teletext %1: lang(%2) "
-                                    "type(%3) mag(%4) page(%5)")
-                            .arg(i).arg(ttd.LanguageString(i))
-                            .arg(ttd.TeletextType(i))
-                            .arg(ttd.TeletextMagazineNum(i))
-                            .arg(ttd.TeletextPageNum(i)));
-                }
-            }
-            else if (DescriptorID::subtitling == (*it)[0])
-            {
-                SubtitlingDescriptor sd(*it);
-                // TODO remove printout, here to encourage error reporting
-                for (uint i = 0; i < sd.StreamCount(); i++)
-                {
-                    VERBOSE(VB_GENERAL, LOC +
-                            QString("Subtitle %1: lang(%2) "
-                                    "type(%3) comp(%4) anc(%5)")
-                            .arg(i).arg(sd.LanguageString(i))
-                            .arg(sd.SubtitleType(i))
-                            .arg(sd.CompositionPageID(i))
-                            .arg(sd.AncillaryPageID(i)));
-                }
-            }
-        }
-
-        for (it = list.begin(); it != list.end(); ++it)
-        {
-            // Note: the saved streams have already been 
-            // descrambled by the CAM so any CA descriptors 
-            // should *not* be added to the descriptor list.
-            if (DescriptorID::conditional_access != (*it)[0])
-            {
-                unsigned char *tmp = new unsigned char[(*it)[1] + 2];
-                memcpy(tmp, *it, (*it)[1] + 2);
-                e.Descriptors.push_back(tmp);
-            }
-        }
-
-        p.Components += e; 
-        p.hasVideo |= StreamID::IsVideo(type);
-        p.hasAudio |= StreamID::IsAudio(type);
-    }
-
     if (SI_STANDARD_ATSC == table_standard)
     {
         if ((int)pmt->ProgramNumber() == atsc_stream_data->DesiredProgram())
-            emit UpdatePMT(&p);
+            emit UpdatePMT(pmt);
     }
     if (SI_STANDARD_DVB == table_standard)
     {
         if ((int)pmt->ProgramNumber() == dvb_stream_data->DesiredProgram())
-            emit UpdatePMT(&p);
+            emit UpdatePMT(pmt);
     }
 }
 

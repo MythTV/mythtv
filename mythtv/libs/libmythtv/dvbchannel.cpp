@@ -253,12 +253,12 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 }
 
 /** \fn DVBChannel::RecorderStarted()
- *  \brief Emits an UpdatePMTObject() signal if DVBChannel has a PMT.
+ *  \brief Emits an UpdatePMT() signal if DVBChannel has a PMT.
  */
 void DVBChannel::RecorderStarted()
 {
     if (chan_opts.IsPMTSet())
-        emit UpdatePMTObject(&chan_opts.pmt);
+        emit UpdatePMT(chan_opts.pmt);
 }
 
 bool DVBChannel::SwitchToInput(const QString &input, const QString &chan)
@@ -546,23 +546,23 @@ bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
   PMT Handler Code 
 *****************************************************************************/
 
-/** \fn DVBChannel::SetPMT(const PMTObject*)
- *  \brief Sets our PMT to a copy of the PMTObject, and emits
- *         a UpdatePMTObject(const PMTObject*) signal.
+/** \fn DVBChannel::SetPMT(const ProgramMapTable*)
+ *  \brief Sets our PMT to a copy of the ProgramMapTable, and emits
+ *         a UpdatePMT(const ProgramMapTable*) signal.
  */
-void DVBChannel::SetPMT(const PMTObject *pmt)
+void DVBChannel::SetPMT(const ProgramMapTable *pmt)
 {
     if (pmt)
     {
-        CHANNEL(QString("SetPMT  ServiceID=%1, PCRPID=%2 (0x%3)")
-                .arg(pmt->ServiceID).arg(pmt->PCRPID)
-                .arg(((uint)pmt->PCRPID),0,16));
+        VERBOSE(VB_CHANNEL, LOC +
+                QString("SetPMT() program number #%1, PCRPID(0x%2)")
+                .arg(pmt->ProgramNumber()).arg(pmt->PCRPID(),0,16));
     }
 
     chan_opts.SetPMT(pmt);
     // Send the PMT to recorder (needs to be cleaned up some)
     if (pmt)
-        emit UpdatePMTObject(&chan_opts.pmt);
+        emit UpdatePMT(chan_opts.pmt);
 
     // Tells the Conditional Access Module which streams we wish to decode.
     if (pmt && dvbcam->IsRunning())

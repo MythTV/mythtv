@@ -148,7 +148,7 @@ class SIParser : public QObject
     void FindServicesComplete(void);
     void FindEventsComplete(void);
     void TableLoaded(void);
-    void UpdatePMT(const PMTObject *pmt);
+    void UpdatePMT(const ProgramMapTable *pmt);
     void EventsReady(QMap_Events* Events);
     void AllEventsPulled(void);
 

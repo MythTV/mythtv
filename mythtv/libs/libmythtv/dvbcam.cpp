@@ -196,7 +196,7 @@ void DVBCam::HandlePMT(void)
         // Send added PMT
         while (PMTAddList.size() > 0)
         {
-            PMTObject pmt = PMTAddList.front();
+            ProgramMapTable pmt = PMTAddList.front();
             PMTAddList.pop_front();
 
             SendPMT(pmt, CPLM_ADD);
@@ -259,9 +259,9 @@ void DVBCam::CiHandlerLoop()
     VERBOSE(VB_CHANNEL, LOC + "CiHandler thread stopped");
 }
 
-void DVBCam::SetPMT(const PMTObject *pmt)
+void DVBCam::SetPMT(const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_CHANNEL, LOC + "SetPMT for ServiceID = " << pmt->ServiceID);
+    VERBOSE(VB_CHANNEL, LOC + "SetPMT() program num #"<<pmt->ProgramNumber());
 
     QMutexLocker locker(&pmt_lock);
     PMTList.clear();
@@ -281,12 +281,12 @@ static const char *cplm_info[] =
     "CPLM_UPDATE"
 };
 
-cCiCaPmt CreateCAPMT(const PMTObject&, const unsigned short*, uint);
+cCiCaPmt CreateCAPMT(const ProgramMapTable&, const unsigned short*, uint);
 
 /*
  * Send a CA_PMT object to the CAM (see EN50221, section 8.4.3.4)
  */
-void DVBCam::SendPMT(const PMTObject &pmt, uint cplm)
+void DVBCam::SendPMT(const ProgramMapTable &pmt, uint cplm)
 {
     for (uint s = 0; s < (uint)ciHandler->NumSlots(); s++)
     {
@@ -307,7 +307,7 @@ void DVBCam::SendPMT(const PMTObject &pmt, uint cplm)
         }
 
         VERBOSE(VB_CHANNEL, LOC + "Creating CA_PMT, ServiceID = "
-                << pmt.ServiceID);
+                << pmt.ProgramNumber());
 
         cCiCaPmt capmt = CreateCAPMT(pmt, casids, cplm);
 
@@ -320,16 +320,12 @@ void DVBCam::SendPMT(const PMTObject &pmt, uint cplm)
     }
 }
 
-cCiCaPmt CreateCAPMT(const PMTObject &pmt,
-                     const unsigned short *casids,
-                     uint cplm)
+void process_desc(cCiCaPmt &capmt,
+                  const unsigned short *casids,
+                  const desc_list_t &desc)
 {
-    cCiCaPmt capmt(pmt.ServiceID, cplm);
-
-    // Add CA descriptors for the service
     desc_list_t::const_iterator it;
-
-    for (it = pmt.CA.begin(); it != pmt.CA.end(); ++it)
+    for (it = desc.begin(); it != desc.end(); ++it)
     {
         ConditionalAccessDescriptor cad(*it);
         for (uint q = 0; casids[q]; q++)
@@ -337,39 +333,46 @@ cCiCaPmt CreateCAPMT(const PMTObject &pmt,
             if (cad.SystemID() != casids[q])
                 continue;
 
-            VERBOSE(VB_CHANNEL, "Adding CA descriptor: " +
-                    QString("CASID=0x%1, ECM PID=%2")
-                    .arg(cad.SystemID(), 0, 16).arg(cad.PID()));
+            VERBOSE(VB_CHANNEL,
+                    QString("Adding CA descriptor: "
+                            "CASID(0x%2), ECM PID(0x%3)")
+                    .arg(cad.SystemID(),0,16).arg(cad.PID(),0,16));
+
             capmt.AddCaDescriptor(cad.SystemID(), cad.PID(),
                                   cad.DataSize(), cad.Data());
         }
     }
 
+}
+
+cCiCaPmt CreateCAPMT(const ProgramMapTable &pmt,
+                     const unsigned short *casids,
+                     uint cplm)
+{
+    cCiCaPmt capmt(pmt.ProgramNumber(), cplm);
+
+    // Add CA descriptors for the service
+    desc_list_t gdesc = MPEGDescriptor::ParseOnlyInclude(
+        pmt.ProgramInfo(), pmt.ProgramInfoLength(),
+        DescriptorID::conditional_access);
+
+    process_desc(capmt, casids, gdesc);
+
     // Add elementary streams + CA descriptors
-    QValueList<ElementaryPIDObject>::const_iterator es;
-    for (es = pmt.Components.begin(); es != pmt.Components.end(); ++es)
+    for (uint i = 0; i < pmt.StreamCount(); i++)
     {
-        VERBOSE(VB_CHANNEL, QString("Adding elementary stream: %1, PID=%2")
-                .arg((*es).GetDescription()).arg((*es).PID));
+        VERBOSE(VB_CHANNEL,
+                QString("Adding elementary stream: %1, pid(0x%2)")
+                .arg(pmt.StreamDescription(i))
+                .arg(pmt.StreamPID(i),0,16));
             
-        capmt.AddElementaryStream((*es).Orig_Type, (*es).PID);
+        capmt.AddElementaryStream(pmt.StreamType(i), pmt.StreamPID(i));
 
-        for (it = (*es).CA.begin(); it != (*es).CA.end(); ++it)
-        {
-            ConditionalAccessDescriptor cad(*it);
-            for (uint q = 0; casids[q]; q++)
-            {
-                if (cad.SystemID() != casids[q])
-                    continue;
+        desc_list_t desc = MPEGDescriptor::ParseOnlyInclude(
+            pmt.StreamInfo(i), pmt.StreamInfoLength(i),
+            DescriptorID::conditional_access);
 
-                VERBOSE(VB_CHANNEL, "Adding elementary CA descriptor: " +
-                        QString("CASID = 0x%1, ECM PID = %2")
-                        .arg(cad.SystemID(), 0, 16).arg(cad.PID()));
-
-                capmt.AddCaDescriptor(cad.SystemID(), cad.PID(),
-                                      cad.DataSize(), cad.Data());
-            }
-        }
+        process_desc(capmt, casids, desc);
     }
     return capmt;
 }

@@ -402,41 +402,6 @@ public:
     QValueList<TransportObject> Transport;
 };
 
-class PMTObject
-{
-  public:
-    PMTObject() { Reset(); }
-    PMTObject(const PMTObject &other);
-    ~PMTObject() { Reset(); }
-
-    PMTObject& operator=(const PMTObject &other);
-    void deepCopy(const PMTObject &other);
-    void Reset();
-
-    /// \brief Returns true if PMT contains at least one audio stream
-    bool HasAudioService() const { return hasAudio; }
-    /// \brief Returns true if PMT contains at least one video stream
-    bool HasVideoService() const { return hasVideo; }
-    /// \brief Returns true if PMT contains at least one video stream
-    ///        and one audio stream
-    bool HasTelevisionService() const { return hasVideo && hasAudio; }
-    /// \brief Returns true if the streams are not encrypted ("Free-To-Air")
-    bool FTA() const { return !hasCA; }
-
-  public:
-    uint16_t       PCRPID;
-    uint16_t       ServiceID;
-    uint16_t       PMTPID;
-    desc_list_t    CA;
-    desc_list_t    Descriptors;
-    ComponentList  Components;
-
-    // helper variables
-    bool           hasCA;
-    bool           hasAudio;
-    bool           hasVideo;
-};
-
 /* PAT Handler */
 class PATHandler : public TableHandler
 {
@@ -460,16 +425,16 @@ public:
     pullStatus     status;
 };
 
-/* PMT Handler */
-typedef QMap<uint16_t,PMTObject> QMap_PMTObject;
+typedef QMap<uint,uint> pnum_pit_map_t;
 
+/* PMT Handler */
 class PMTHandler : public TableHandler
 {
-public:
+  public:
     PMTHandler() : TableHandler() { Reset(); }
     ~PMTHandler() {}
 
-    void Reset() { Tracker.clear();  pmt.clear();  status.clear(); patloaded = false; }
+    void Reset() { Tracker.clear(); status.clear(); patloaded = false; }
     bool RequirePIDs();
     bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
     void Request(uint16_t key = 0) { (void) key; }
@@ -483,9 +448,9 @@ public:
     void DependencyMet(tabletypes t);
     void DependencyChanged(tabletypes t);
 
-    QMap_PMTObject      pmt;
+    pnum_pit_map_t      pmtpid;
 
-private:
+  private:
     QMap_SectionTracker Tracker;
     bool                patloaded;
     QMap_pullStatus     status;

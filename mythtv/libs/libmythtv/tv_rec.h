@@ -35,7 +35,7 @@ class DBox2Channel;
 class DVBChannel;
 class Channel;
 
-class PMTObject;
+class ProgramMapTable;
 
 /// Used to request ProgramInfo for channel browsing.
 typedef enum
@@ -216,7 +216,7 @@ class TVRec : public QObject
 
   public slots:
     void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
-    void SetPMTObject(const PMTObject*) 
+    void SetPMT(const ProgramMapTable*) 
         { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
     void deleteLater(void);
 

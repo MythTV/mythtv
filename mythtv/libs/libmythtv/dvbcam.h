@@ -10,7 +10,7 @@ using namespace std;
 #include "dvbtypes.h"
 
 class cCiHandler;
-typedef deque<PMTObject> pmt_list_t;
+typedef deque<ProgramMapTable> pmt_list_t;
 
 class DVBCam
 {
@@ -21,7 +21,7 @@ class DVBCam
     bool Start();
     bool Stop();
     bool IsRunning() const { return ciThreadRunning; }
-    void SetPMT(const PMTObject *pmt);
+    void SetPMT(const ProgramMapTable *pmt);
 
   private:
     static void *CiHandlerThreadHelper(void*);
@@ -29,7 +29,7 @@ class DVBCam
     void HandleUserIO(void);
     void HandlePMT(void);
 
-    void SendPMT(const PMTObject &pmt, uint cplm);
+    void SendPMT(const ProgramMapTable &pmt, uint cplm);
 
     int             cardnum;
     int             numslots;

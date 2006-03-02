@@ -54,9 +54,6 @@ class DVBChannel : public QObject, public ChannelBase
     uint        GetServiceID(void)      const { return chan_opts.serviceID; }
     /// Returns true iff SetPMT has been called with a non-NULL value.
     bool        IsPMTSet(void)          const { return chan_opts.IsPMTSet(); }
-    /// Returns true iff PMT has video and audio
-    bool HasTelevisionService(void) const
-        { return chan_opts.pmt.HasTelevisionService(); }
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
 
@@ -77,12 +74,12 @@ class DVBChannel : public QObject, public ChannelBase
     // Messages to DVBChannel
   public slots:
     void RecorderStarted();
-    void SetPMT(const PMTObject *pmt);
+    void SetPMT(const ProgramMapTable *pmt);
     void deleteLater(void);
 
     // Messages from DVBChannel
   signals:
-    void UpdatePMTObject(const PMTObject *);
+    void UpdatePMT(const ProgramMapTable*);
 
   private:
     int  GetChanID(void) const;

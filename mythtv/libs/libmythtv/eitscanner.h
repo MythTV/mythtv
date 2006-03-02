@@ -16,7 +16,7 @@ class DVBChannel;
 class DVBSIParser;
 class EITHelper;
 class dvb_channel_t;
-class PMTObject;
+class ProgramMapTable;
 
 class EITScanner : public QObject
 {
@@ -32,7 +32,7 @@ class EITScanner : public QObject
     void StopActiveScan(void);        
 
   public slots:
-    void SetPMTObject(const PMTObject*);
+    void SetPMT(const ProgramMapTable*);
     void deleteLater(void);
 
   private:

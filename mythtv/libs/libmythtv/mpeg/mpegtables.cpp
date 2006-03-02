@@ -455,7 +455,31 @@ const char *StreamID::toString(uint streamID)
     return retval;
 }
 
-const QString ProgramMapTable::StreamTypeString(uint i) const
+QString ProgramMapTable::GetLanguage(uint i) const
 {
-    return QString( StreamID::toString(StreamType(i)) );
+    const desc_list_t list = MPEGDescriptor::Parse(
+        StreamInfo(i), StreamInfoLength(i));
+    const unsigned char *lang_desc = MPEGDescriptor::Find(
+        list, DescriptorID::ISO_639_language);
+
+    if (!lang_desc)
+        return QString::null;
+
+    ISO639LanguageDescriptor iso_lang(lang_desc);
+    return iso_lang.CanonicalLanguageString();
+}
+
+QString ProgramMapTable::StreamDescription(uint i) const
+{
+    desc_list_t list;
+
+    list         = MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+    uint    type = StreamID::Normalize(StreamType(i), list);
+    QString desc = StreamID::toString(type);
+    QString lang = GetLanguage(i);
+
+    if (!lang.isEmpty())
+        desc += QString(" (%1)").arg(lang);
+
+    return desc;
 }

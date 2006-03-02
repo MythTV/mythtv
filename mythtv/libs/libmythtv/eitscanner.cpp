@@ -61,7 +61,7 @@ void EITScanner::deleteLater(void)
     QObject::deleteLater();
 }
 
-void EITScanner::SetPMTObject(const PMTObject *)
+void EITScanner::SetPMT(const ProgramMapTable *)
 {
     eitHelper->ClearList();
 }
@@ -174,8 +174,8 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser)
     channel = _channel;
     connect(parser,    SIGNAL(EventsReady(QMap_Events*)),
             eitHelper, SLOT(HandleEITs(QMap_Events*)));
-    connect(channel,   SIGNAL(UpdatePMTObject(const PMTObject *)),
-            this,      SLOT(SetPMTObject(const PMTObject *)));
+    connect(channel,   SIGNAL(UpdatePMT(const ProgramMapTable*)),
+            this,      SLOT(  SetPMT(   const ProgramMapTable*)));
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
