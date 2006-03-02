@@ -246,7 +246,9 @@ bool ClassicCommDetector::go()
 {
     nvp->SetNullVideo();
     
-    int requiredHeadStart = 60;
+    int requiredBuffer = 3;
+    int requiredHeadStart = requiredBuffer;
+
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
         requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
@@ -313,8 +315,6 @@ bool ClassicCommDetector::go()
     QTime flagTime;
     flagTime.start();
     
-    long usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
-
     long long myTotalFrames;
     if (recordingStopsAt < QDateTime::currentDateTime() )
         myTotalFrames = nvp->GetTotalFrameCount();
@@ -477,7 +477,11 @@ bool ClassicCommDetector::go()
 
         if (stillRecording)
         {
-            usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
+            int secondsRecorded =
+                recordingStartedAt.secsTo(QDateTime::currentDateTime());
+            int secondsFlagged = (int)(framesProcessed / fps);
+            int secondsBehind = secondsRecorded - secondsFlagged;
+            long usecPerFrame = (long)(1.0 / nvp->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, NULL);
@@ -487,15 +491,9 @@ bool ClassicCommDetector::go()
                       (((endTime.tv_sec - startTime.tv_sec) * 1000000) +
                        (endTime.tv_usec - startTime.tv_usec));
 
-            const int alwaysStayNSecondsBehind = 30;
-            
-            int secondsRecorded =
-                recordingStartedAt.secsTo(QDateTime::currentDateTime());
-            int secondsFlagged = (int)(framesProcessed / fps);
-            
-            if ((secondsRecorded - secondsFlagged) > alwaysStayNSecondsBehind)
-                usecSleep = (long)(usecSleep * 0.5);
-            else
+            if (secondsBehind > requiredBuffer)
+                usecSleep = (long)(usecSleep * 0.25);
+            else if (secondsBehind < requiredBuffer)
                 usecSleep = (long)(usecPerFrame * 1.5);
             
             if (usecSleep > 0)
