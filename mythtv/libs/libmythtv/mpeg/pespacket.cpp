@@ -162,10 +162,9 @@ static bool is_188_block(unsigned char* ptr)
 static void return_188_block(unsigned char* ptr)
 {
     alloc188.erase(ptr);
-    if (alloc188.size())
-        free188.push_back(ptr);
+    free188.push_back(ptr);
     // free the allocator only if more than 1 block was used
-    else if (mem188.size() > 1)
+    if (mem188.size() > 1)
     {
         vector<unsigned char*>::iterator it;
         for (it = mem188.begin(); it != mem188.end(); ++it)
@@ -203,9 +202,7 @@ static bool is_4096_block(unsigned char* ptr)
 static void return_4096_block(unsigned char* ptr)
 {
     alloc4096.erase(ptr);
-    if (alloc4096.size())
-    {
-        free4096.push_back(ptr);
+    free4096.push_back(ptr);
 
 #if 0 // enable this to debug memory leaks
         cerr<<alloc4096.size()<<" 4096 blocks remain"<<endl;
@@ -223,9 +220,9 @@ static void return_4096_block(unsigned char* ptr)
             cerr<<endl;
         }
 #endif 
-    }
+
     // free the allocator only if more than 1 block was used
-    else if (mem4096.size() > 1)
+    if (mem4096.size() > 1)
     {
         vector<unsigned char*>::iterator it;
         for (it = mem4096.begin(); it != mem4096.end(); ++it)
