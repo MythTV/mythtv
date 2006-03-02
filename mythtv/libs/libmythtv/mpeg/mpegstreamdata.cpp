@@ -821,7 +821,7 @@ void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return;
     }
-    else if (TableID::PMT == psip->TableID())
+    else if (TableID::PAT == psip->TableID())
     {
         if (psip == _cached_pat)
             _cached_pat = NULL;
