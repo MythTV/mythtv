@@ -396,6 +396,11 @@ class dvb_channel_t
         serviceID(0xffff),  networkID(0xffff),
         providerID(0xffff), transportID(0xffff),
         sistandard(""),     version(255) {;}
+   ~dvb_channel_t()
+    {
+        if (pmt)
+            delete pmt;
+    }
 
     bool IsPMTSet() const
     {
@@ -406,8 +411,15 @@ class dvb_channel_t
     void SetPMT(const ProgramMapTable *_pmt)
     {
         QMutexLocker locker(&lock);
+        if (pmt)
+        {
+            delete pmt;
+            pmt = NULL;
+        }
         if (_pmt)
+        {
             pmt = new ProgramMapTable(*_pmt);
+        }
     }
 
     bool Parse(
