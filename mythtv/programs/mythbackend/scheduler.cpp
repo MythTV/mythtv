@@ -35,8 +35,7 @@ using namespace std;
 #define LOC_ERR QString("Scheduler, Error: ")
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-                     QString recordTbl, MSqlQueryInfo *databaseConnection,
-                     Scheduler *master_sched)
+                     QString recordTbl, Scheduler *master_sched)
 {
     hasconflicts = false;
     m_tvList = tvList;
@@ -48,8 +47,11 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         master_sched->getAllPending(&reclist);
     }
 
-    if (databaseConnection) dbConn = *databaseConnection;
-    else dbConn = MSqlQuery::SchedCon();
+    // Only the master scheduler should use SchedCon()
+    if (runthread)
+        dbConn = MSqlQuery::SchedCon();
+    else
+        dbConn = MSqlQuery::DDCon();
 
     recordTable = recordTbl;
 
