@@ -135,15 +135,16 @@ static vector<unsigned char*> mem4096;
 static vector<unsigned char*> free4096;
 static map<unsigned char*, bool> alloc4096;
 
-#define BLOCKS188 1000
+#define BLOCKS188 512
 static unsigned char* get_188_block()
 {
-    if (!free188.size())
+    if (free188.empty())
     {
         mem188.push_back((unsigned char*) malloc(188 * BLOCKS188));
         free188.reserve(BLOCKS188);
+        unsigned char* block_start = mem188.back();
         for (uint i = 0; i < BLOCKS188; ++i)
-            free188.push_back(i*188 + mem188.back());
+            free188.push_back(i*188 + block_start);
     }
 
     unsigned char *ptr = free188.back();
@@ -163,7 +164,8 @@ static void return_188_block(unsigned char* ptr)
     alloc188.erase(ptr);
     if (alloc188.size())
         free188.push_back(ptr);
-    else
+    // free the allocator only if more than 1 block was used
+    else if (mem188.size() > 1)
     {
         vector<unsigned char*>::iterator it;
         for (it = mem188.begin(); it != mem188.end(); ++it)
@@ -174,15 +176,16 @@ static void return_188_block(unsigned char* ptr)
     }
 }
 
-#define BLOCKS4096 256
+#define BLOCKS4096 128
 static unsigned char* get_4096_block()
 {
-    if (!free4096.size())
+    if (free4096.empty())
     {
         mem4096.push_back((unsigned char*) malloc(4096 * BLOCKS4096));
         free4096.reserve(BLOCKS4096);
+        unsigned char* block_start = mem4096.back();
         for (uint i = 0; i < BLOCKS4096; ++i)
-            free4096.push_back(i*4096 + mem4096.back());
+            free4096.push_back(i*4096 + block_start);
     }
 
     unsigned char *ptr = free4096.back();
@@ -221,7 +224,8 @@ static void return_4096_block(unsigned char* ptr)
         }
 #endif 
     }
-    else
+    // free the allocator only if more than 1 block was used
+    else if (mem4096.size() > 1)
     {
         vector<unsigned char*>::iterator it;
         for (it = mem4096.begin(); it != mem4096.end(); ++it)
