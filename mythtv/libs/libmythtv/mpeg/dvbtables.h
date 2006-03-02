@@ -17,12 +17,21 @@ uint dvbdate2key(const unsigned char *);
 class NetworkInformationTable : public PSIPTable
 {
   public:
+    NetworkInformationTable(const NetworkInformationTable& table)
+        : PSIPTable(table), _cached_network_name(QString::null)
+    {
+        assert(TableID::NIT == TableID() || TableID::NITo == TableID());
+        Parse();
+    }
     NetworkInformationTable(const PSIPTable& table)
         : PSIPTable(table), _cached_network_name(QString::null)
     {
-    // table_id                 8   0.0       0x40/0x41
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();
+    }
+    ~NetworkInformationTable() { ; }
+
+    // table_id                 8   0.0       0x40/0x41
     // section_syntax_indicator 1   1.0          1
     // reserved_future_use      1   1.1          1
     // reserved                 2   1.2          3
@@ -32,8 +41,6 @@ class NetworkInformationTable : public PSIPTable
     // current_next_indicator   1   5.7          1
     // section_number           8   6.0       0x00
     // last_section_number      8   7.0       0x00
-    }
-    ~NetworkInformationTable() { ; }
 
     /// network_id             16   3.0     0x0000
     uint NetworkID(void) const { return TableIDExtension(); }
@@ -84,14 +91,23 @@ class NetworkInformationTable : public PSIPTable
  *  \brief This table tells the decoder on which PIDs to find A/V data.
  *  \todo This is just a stub.
  */
-class ServiceDescriptionTable: public PSIPTable
+class ServiceDescriptionTable : public PSIPTable
 {
   public:
-    ServiceDescriptionTable(const PSIPTable& table) : PSIPTable(table)
+    ServiceDescriptionTable(const ServiceDescriptionTable& table)
+        : PSIPTable(table)
     {
-    // table_id                 8   0.0       0x42/0x46
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
+    }
+    ServiceDescriptionTable(const PSIPTable& table) : PSIPTable(table)
+    {
+        assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
+        Parse();
+    }
+    ~ServiceDescriptionTable() { ; }
+
+    // table_id                 8   0.0       0x42/0x46
     // section_syntax_indicator 1   1.0          1
     // reserved_future_use      1   1.1          1
     // reserved                 2   1.2          3
@@ -101,8 +117,6 @@ class ServiceDescriptionTable: public PSIPTable
     // current_next_indicator   1   5.7          1
     // section_number           8   6.0       0x00
     // last_section_number      8   7.0       0x00
-    }
-    ~ServiceDescriptionTable() { ; }
 
     /// transport_stream_id    16   3.0     0x0000
     uint TSID() const { return TableIDExtension(); }

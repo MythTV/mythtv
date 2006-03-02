@@ -396,6 +396,12 @@ class ProgramAssociationTable : public PSIPTable
         return pat;
     }
   public:
+    ProgramAssociationTable(const ProgramAssociationTable& table)
+        : PSIPTable(table)
+    {
+        assert(TableID::PMT == TableID());
+    }
+
     ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::PAT == TableID());
@@ -471,6 +477,12 @@ class ProgramMapTable : public PSIPTable
         ProgramMapTable *pmt = new ProgramMapTable(psip);
         delete tspacket;
         return pmt;
+    }
+
+    ProgramMapTable(const ProgramMapTable& table) : PSIPTable(table)
+    {
+        assert(TableID::PMT == TableID());
+        Parse();
     }
 
     ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
