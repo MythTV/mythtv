@@ -27,6 +27,8 @@ typedef vector<unsigned char>           uchar_vec_t;
 typedef uchar_vec_t                     sections_t;
 typedef QMap<uint, sections_t>          sections_map_t;
 
+void init_sections(sections_t &sect, uint last_section);
+
 class MPEGStreamData : public QObject
 {
     Q_OBJECT
@@ -67,23 +69,21 @@ class MPEGStreamData : public QObject
         { return _pids_listening; }
 
     // Table versions
-    void SetVersionPAT(int version)
+    void SetVersionPAT(int version, uint last_section)
     {
         if (_pat_version == version)
             return;
         _pat_version = version;
-        _pat_section_seen.clear();
-        _pat_section_seen.resize(32, 0);
+        init_sections(_pat_section_seen, last_section);
     }
     int  VersionPAT(void) const { return _pat_version; }
 
-    void SetVersionPMT(uint program_num, int version)
+    void SetVersionPMT(uint program_num, int version, uint last_section)
     {
         if (VersionPMT(program_num) == version)
             return;
         _pmt_version[program_num] = version;
-        _pmt_section_seen[program_num].clear();
-        _pmt_section_seen[program_num].resize(32, 0);
+        init_sections(_pmt_section_seen[program_num], last_section);
     }
     int  VersionPMT(uint prog_num) const
     {
@@ -96,9 +96,11 @@ class MPEGStreamData : public QObject
     // Sections seen
     void SetPATSectionSeen(uint section);
     bool PATSectionSeen(uint section) const;
+    bool HasAllPATSections(void) const;
 
     void SetPMTSectionSeen(uint prog_num, uint section);
     bool PMTSectionSeen(uint prog_num, uint section) const;
+    bool HasAllPMTSections(uint prog_num) const;
 
     // Caching
     virtual bool HasCachedPAT(void) const;

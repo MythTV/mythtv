@@ -48,8 +48,8 @@ static inline QString SIStandard_to_String(int std)
 typedef enum tabletypes
 {
     SERVICES,           /* SDT or T/CVCT */
-    NETWORK,            /* Current Network NIT */
     NumHandlers,        /* placeholder */
+    NETWORK = NumHandlers,
 };
 static QString tabletypes2string[] =
 {
@@ -368,31 +368,6 @@ public:
     bool                   nitloaded;
     bool                   CompleteSent;
     QMap2D_SDTObject       Services;
-};
-
-class NetworkHandler : public TableHandler
-{
-public:
-    NetworkHandler() : TableHandler() { Reset(); }
-    ~NetworkHandler() {}
-    void SetSIStandard(SISTANDARD _SIStandard) { SIStandard = _SIStandard; }
-    void Reset();
-    bool Complete();
-    bool RequirePIDs();
-    bool GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask);
-    void Request(uint16_t key);
-    void RequestEmit(uint16_t key);
-    bool EmitRequired();
-    bool GetEmitID(uint16_t& key0, uint16_t& key1);
-    bool AddSection(tablehead_t *head, uint16_t key0, uint16_t key1);
-    void DependencyMet(tabletypes t) { (void) t;}
-
-    SISTANDARD           SIStandard;
-    SectionTracker         Tracker;
-    pullStatus             status;
-    bool                 mgtloaded;
-    bool                   CompleteSent;
-    NITObject              NITList;
 };
 
 #endif // SITYPES_H

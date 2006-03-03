@@ -207,7 +207,7 @@ void DTVSignalMonitor::SetPAT(const ProgramAssociationTable *pat)
         return;
     }
 
-    GetStreamData()->SetVersionPAT(-1);
+    GetStreamData()->SetVersionPAT(-1,0);
 
     if (programNumber >= 0)
     {

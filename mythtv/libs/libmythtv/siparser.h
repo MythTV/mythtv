@@ -97,7 +97,7 @@ class SIParser : public QObject
 
     // Generic functions that will begin collection of tables based on the
     // SIStandard.
-    bool FindTransports(void);
+    bool FindTransports(void) { need_nit = true; return true; }
     bool FindServices(void);
 
     void SetTableStandard(const QString&);
@@ -105,18 +105,18 @@ class SIParser : public QObject
 
     void ReinitSIParser(const QString &si_std, uint mpeg_program_number);
 
-    // Stops all collection of data and clears all values (on a channel change for example)
+    // Stops all collection of data and clears all values
+    // (on a channel change for example)
     void Reset(void);
 
-    virtual void AddPid(uint pid, uint8_t mask, uint8_t filter,
-                        bool CheckCRC, uint bufferFactor) = 0;
-    virtual void DelPid(uint pid) = 0;
+    virtual void AddPid(uint, uint8_t, uint8_t, bool, uint) = 0;
+    virtual void DelPid(uint) = 0;
     virtual void DelAllPids(void) = 0;
 
-    // Functions that may become signals for communication with the outside world
+    // Functions that may become signals for communication
+    // with the outside world
     void ServicesComplete(void);
     void GuideComplete(void);
-//    void EventsReady(void);
 
     // Functions to get objects into other classes for manipulation
     bool GetTransportObject(NITObject &NIT);
@@ -214,6 +214,7 @@ class SIParser : public QObject
     dvb_srv_eit_on_t    dvb_srv_collect_eit;
     atsc_eit_pid_map_t  atsc_eit_pid;
     atsc_ett_pid_map_t  atsc_ett_pid;
+    bool                need_nit;
 
     int                 ThreadRunning;
     bool                exitParserThread;

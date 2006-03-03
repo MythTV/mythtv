@@ -27,33 +27,30 @@ class DVBStreamData : public MPEGStreamData
     bool IsRedundant(uint pid, const PSIPTable&) const;
 
     // Table versions
-    void SetVersionNIT(int version)
+    void SetVersionNIT(int version, uint last_section)
     {
         if (_nit_version == version)
             return;
         _nit_version = version;
-        _nit_section_seen.clear();
-        _nit_section_seen.resize(32, 0);
+        init_sections(_nito_section_seen, last_section);
     }
     int  VersionNIT() const { return _nit_version; }
 
-    void SetVersionNITo(int version)
+    void SetVersionNITo(int version, uint last_section)
     {
         if (_nito_version == version)
             return;
         _nito_version = version;
-        _nito_section_seen.clear();
-        _nito_section_seen.resize(32, 0);
+        init_sections(_nito_section_seen, last_section);
     }
     int  VersionNITo() const { return _nito_version; }
 
-    void SetVersionSDT(uint tsid, int version)
+    void SetVersionSDT(uint tsid, int version, uint last_section)
     {
         if (VersionSDT(tsid) == version)
             return;
         _sdt_versions[tsid] = version;
-        _sdt_section_seen[tsid].clear();
-        _sdt_section_seen[tsid].resize(32, 0);
+        init_sections(_sdt_section_seen[tsid], last_section);
     }
     int VersionSDT(uint tsid) const
     {
@@ -63,13 +60,12 @@ class DVBStreamData : public MPEGStreamData
         return *it;
     }
 
-    void SetVersionSDTo(uint tsid, int version)
+    void SetVersionSDTo(uint tsid, int version, uint last_section)
     {
         if (_sdto_versions[tsid] == version)
             return;
         _sdt_versions[tsid] = version;
-        _sdt_section_seen[tsid].clear();
-        _sdt_section_seen[tsid].resize(32, 0);
+        init_sections(_sdt_section_seen[tsid], last_section);
     }
     int VersionSDTo(uint tsid) const
     {
@@ -100,13 +96,19 @@ class DVBStreamData : public MPEGStreamData
     // Sections seen
     void SetNITSectionSeen(uint section);
     bool NITSectionSeen(uint section) const;
+    bool HasAllNITSections(void) const;
+
     void SetNIToSectionSeen(uint section);
     bool NIToSectionSeen(uint section) const;
+    bool HasAllNIToSections(void) const;
 
     void SetSDTSectionSeen(uint tsid, uint section);
     bool SDTSectionSeen(uint tsid, uint section) const;
+    bool HasAllSDTSections(uint tsid) const;
+
     void SetSDToSectionSeen(uint tsid, uint section);
     bool SDToSectionSeen(uint tsid, uint section) const;
+    bool HasAllSDToSections(uint tsid) const;
 
     void SetEITSectionSeen(uint tableid, uint serviceid, uint section);
     bool EITSectionSeen(uint tableid, uint serviceid, uint section) const;

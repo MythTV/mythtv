@@ -68,7 +68,6 @@ SIParser::SIParser(const char *name) :
 
     /* Initialize the Table Handlers */
     Table[SERVICES] = new ServiceHandler();
-    Table[NETWORK]  = new NetworkHandler();
 
     // Get a list of wanted languages and set up their priorities
     // (Lowest number wins)
@@ -134,6 +133,10 @@ SIParser::SIParser(const char *name) :
 #endif // USING_DVB_EIT
 
     // DVB table signals
+    connect(dvb_stream_data,
+            SIGNAL(UpdateNIT(const NetworkInformationTable*)),
+            this,
+            SLOT(  HandleNIT(const NetworkInformationTable*)));
 #ifdef USING_DVB_EIT
     connect(dvb_stream_data,
             SIGNAL(UpdateEIT(const DVBEventInformationTable*)),
@@ -241,6 +244,12 @@ void SIParser::CheckTrackers()
         }
         pnum_pid.clear();
     }
+    // for DVB NIT
+    if (SI_STANDARD_DVB == table_standard && need_nit)
+    {
+        AddPid(DVB_NIT_PID, 0xFF, TableID::NIT, true, 10 /*bufferFactor*/);
+        need_nit = false;
+    }
     // for DVB EIT
     if (SI_STANDARD_DVB == table_standard &&
         !dvb_srv_collect_eit.empty())
@@ -278,25 +287,12 @@ void SIParser::CheckTrackers()
         atsc_ett_pid.clear();
     }
 
-    uint16_t key0 = 0,key1 = 0;
-
-    /* See if any new objects require an emit */
-    for (int x = 0 ; x < NumHandlers ; x++)
+    if (SI_STANDARD_DVB == table_standard)
     {
-        if (Table[x]->EmitRequired())
+        if (dvb_stream_data->HasAllNITSections())
         {
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("Table[%1]->EmitRequired() == true")
-                    .arg((tabletypes) x));
-            switch (x)
-            {
-                case NETWORK:
-                    while(Table[NETWORK]->GetEmitID(key0,key1))
-                        emit FindTransportsComplete();
-                    break;
-                default:
-                    break;
-            }
+            emit FindTransportsComplete();
+            Table[SERVICES]->DependencyMet(NETWORK);
         }
     }
 
@@ -438,9 +434,8 @@ void SIParser::LoadPrivateTypes(uint networkID)
 
 bool SIParser::GetTransportObject(NITObject &NIT)
 {
-    pmap_lock.lock();
-    NIT = ((NetworkHandler*) Table[NETWORK])->NITList;
-    pmap_lock.unlock();
+    QMutexLocker locker(&pmap_lock);
+    NIT = NITList;
     return true;
 }
 
@@ -474,7 +469,9 @@ void SIParser::SetTableStandard(const QString &table_std)
     table_standard = (is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB;
 
     Table[SERVICES]->Request(0);
-    Table[NETWORK]->Request(0);
+
+    if (SI_STANDARD_DVB == table_standard)
+        need_nit = true;
 
     for (int x = 0 ; x < NumHandlers ; x++)
         Table[x]->SetSIStandard((SISTANDARD)table_standard);
@@ -511,12 +508,6 @@ void SIParser::ReinitSIParser(const QString &si_std, uint mpeg_program_number)
 
     SetTableStandard(si_std);
     SetDesiredProgram(mpeg_program_number);
-}
-
-bool SIParser::FindTransports()
-{
-    Table[NETWORK]->RequestEmit(0);
-    return true;
 }
 
 bool SIParser::FindServices()
@@ -570,28 +561,11 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
         return;
     }
 
-    // Parse MPEG tables for DVB
+    // Parse tables for DVB
     dvb_stream_data->HandleTables(pid, psip);
 
-    // Parse DVB specific NIT and SDT tables
-    tablehead_t head;
-    head.table_id       = buffer[0];
-    head.section_length = ((buffer[1] & 0x0f)<<8) | buffer[2];
-    head.table_id_ext   = (buffer[3] << 8) | buffer[4];
-    head.current_next   = (buffer[5] & 0x1);
-    head.version        = ((buffer[5] >> 1) & 0x1f);
-    head.section_number = buffer[6];
-    head.section_last   = buffer[7];
-
-    if (TableID::NIT == psip.TableID() &&
-        !Table[NETWORK]->AddSection(&head,0,0))
-    {
-        // Network Information Table
-        NetworkInformationTable nit(psip);
-        HandleNIT(&nit);
-    }
-    else if (TableID::SDT  == psip.TableID() ||
-             TableID::SDTo == psip.TableID())
+    // Parse DVB specific SDT tables
+    if (TableID::SDT  == psip.TableID() || TableID::SDTo == psip.TableID())
     {
         // Service Tables
         ServiceDescriptionTable sdt(psip);
@@ -606,6 +580,15 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
             (!PrivateTypes.SDTMapping && TableID::SDT == sdt.TableID());
 
         uint sect_tsid = (cur) ? 0 : sdt.TSID();
+
+        tablehead_t head;
+        head.table_id       = buffer[0];
+        head.section_length = ((buffer[1] & 0x0f)<<8) | buffer[2];
+        head.table_id_ext   = (buffer[3] << 8) | buffer[4];
+        head.current_next   = (buffer[5] & 0x1);
+        head.version        = ((buffer[5] >> 1) & 0x1f);
+        head.section_number = buffer[6];
+        head.section_last   = buffer[7];
 
         if (!Table[SERVICES]->AddSection(&head, sect_tsid, 0))
             HandleSDT(sect_tsid, &sdt);
@@ -715,7 +698,7 @@ void SIParser::HandleNITDesc(const desc_list_t &dlist)
     }
 
     if (n_set)
-       ((NetworkHandler*) Table[NETWORK])->NITList.Network += n;
+        NITList.Network += n;
 
     // count the unused descriptors for debugging.
     for (uint i = 0; i < dlist.size(); i++)
@@ -792,7 +775,6 @@ void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
 void SIParser::HandleNIT(const NetworkInformationTable *nit)
 {
     ServiceHandler *sh = (ServiceHandler*) Table[SERVICES];
-    NetworkHandler *nh = (NetworkHandler*) Table[NETWORK];
 
     const desc_list_t dlist = MPEGDescriptor::Parse(
         nit->NetworkDescriptors(), nit->NetworkDescriptorsLength());
@@ -822,7 +804,7 @@ void SIParser::HandleNIT(const NetworkInformationTable *nit)
                 slist[it.key()].ChanNum = it.data();
         }
 
-        nh->NITList.Transport += t;
+        NITList.Transport += t;
     }
 }
 

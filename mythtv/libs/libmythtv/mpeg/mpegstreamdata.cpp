@@ -5,6 +5,27 @@
 #include "RingBuffer.h"
 #include "mpegtables.h"
 
+void init_sections(sections_t &sect, uint last_section)
+{
+    static const unsigned char init_bits[8] =
+        { 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, };
+
+    sect.clear();
+
+    uint endz = last_section >> 3;
+    if (endz)
+        sect.resize(endz, 0x00);
+    sect.resize(33 - endz, 0xff);
+    sect[endz] = init_bits[last_section & 0x7];
+
+#if 0
+    cerr<<"init_sections ls("<<last_section<<"): "<<hex;
+    for (uint i = 0 ; i < 32; i++)
+        cerr<<((int)sect[i])<<" ";
+    cerr<<dec<<endl;
+#endif
+}
+
 const unsigned char MPEGStreamData::bit_sel[8] =
 {
     0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
@@ -25,17 +46,17 @@ const unsigned char MPEGStreamData::bit_sel[8] =
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     : QObject(NULL, "MPEGStreamData"), _have_CRC_bug(false),
-      _pat_version(-1), _cache_tables(cacheTables), _cache_lock(true),
+      _pat_version(-2), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
+      _pid_video_single_program(0xffffffff),
+      _pid_pmt_single_program(0xffffffff),      
       _pmt_single_program_num_video(1),
       _pmt_single_program_num_audio(0),
       _pat_single_program(NULL), _pmt_single_program(NULL),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
-    SetVersionPAT(-1);
+    SetVersionPAT(-1,0);
     AddListeningPID(MPEG_PAT_PID);
-
-    _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
 }
 
 MPEGStreamData::~MPEGStreamData()
@@ -58,7 +79,7 @@ void MPEGStreamData::Reset(int desiredProgram)
     SetPATSingleProgram(NULL);
     SetPMTSingleProgram(NULL);
 
-    SetVersionPAT(-1);
+    SetVersionPAT(-1,0);
 
     pid_pes_map_t old = _partial_pes_packet_cache;
     pid_pes_map_t::iterator it = old.begin();
@@ -403,7 +424,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
     {
         case TableID::PAT:
         { 
-            SetVersionPAT(version);
+            SetVersionPAT(version, psip.LastSection());
             SetPATSectionSeen(psip.Section());
 
             if (_cache_tables)
@@ -428,8 +449,9 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::PMT:
         {
-            SetVersionPMT(psip.TableIDExtension(), version);
-            SetPMTSectionSeen(psip.TableIDExtension(), psip.Section());
+            uint prog_num = psip.TableIDExtension();
+            SetVersionPMT(prog_num, version, psip.LastSection());
+            SetPMTSectionSeen(prog_num, psip.Section());
 
             if (_cache_tables)
             {
@@ -652,16 +674,20 @@ void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
 
 void MPEGStreamData::SetPATSectionSeen(uint section)
 {
-    static const unsigned char bit_sel[] =
-        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
     _pat_section_seen[section>>3] |= bit_sel[section & 0x7];
 }
 
 bool MPEGStreamData::PATSectionSeen(uint section) const
 {
-    static const unsigned char bit_sel[] =
-        { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, };
     return (bool) (_pat_section_seen[section>>3] & bit_sel[section & 0x7]);
+}
+
+bool MPEGStreamData::HasAllPATSections(void) const
+{
+    for (uint i = 0; i < 32; i++)
+        if (_pat_section_seen[i] != 0xff)
+            return false;
+    return true;
 }
 
 void MPEGStreamData::SetPMTSectionSeen(uint prog_num, uint section)
@@ -681,6 +707,17 @@ bool MPEGStreamData::PMTSectionSeen(uint prog_num, uint section) const
     if (it == _pmt_section_seen.end())
         return false;
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+bool MPEGStreamData::HasAllPMTSections(uint prog_num) const
+{
+    sections_map_t::const_iterator it = _pmt_section_seen.find(prog_num);
+    if (it == _pmt_section_seen.end())
+        return false;
+    for (uint i = 0; i < 32; i++)
+        if ((*it)[i] != 0xff)
+            return false;
+    return true;
 }
 
 bool MPEGStreamData::HasCachedPAT(void) const
