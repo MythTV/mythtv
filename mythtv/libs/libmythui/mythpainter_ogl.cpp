@@ -273,12 +273,13 @@ int MythOpenGLPainter::CalcAlpha(int alpha1, int alpha2)
     return (int)(alpha1 * (alpha2 / 255.0));
 }
 
-// XXX: Need to hash string with font properties
 MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg, 
                                                  int flags, const QRect &r, 
                                                  const MythFontProperties &font)
 {
-    QString incoming = font.GetHash() + msg;
+    QString incoming = font.GetHash() + QString::number(r.width()) + 
+                       QString::number(r.height()) + QString::number(flags) +
+                       msg;
 
     if (m_StringToImageMap.contains(incoming))
     {
