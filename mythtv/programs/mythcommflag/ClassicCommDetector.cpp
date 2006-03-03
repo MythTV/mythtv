@@ -492,7 +492,12 @@ bool ClassicCommDetector::go()
                        (endTime.tv_usec - startTime.tv_usec));
 
             if (secondsBehind > requiredBuffer)
-                usecSleep = (long)(usecSleep * 0.25);
+            {
+                if (fullSpeed)
+                    usecSleep = 0;
+                else
+                    usecSleep = (long)(usecSleep * 0.25);
+            }
             else if (secondsBehind < requiredBuffer)
                 usecSleep = (long)(usecPerFrame * 1.5);
             
