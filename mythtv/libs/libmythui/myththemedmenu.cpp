@@ -130,11 +130,10 @@ class MythThemedMenuState
     void Reset(void);
     void setDefaults(void);
 
-    void setTitleIcon(const QString &menumode);
     ButtonIcon *getButtonIcon(const QString &type);
 
     void paintLogo(MythPainter *p, int alpha);
-    void paintTitle(MythPainter *p, int alpha);
+    void paintTitle(MythPainter *p, int alpha, const QString &menumode);
     void paintButtonBackground(MythPainter *p, int alpha);
     void paintWatermark(MythPainter *p, int alpha, MythImage *watermark);
 
@@ -166,8 +165,6 @@ class MythThemedMenuState
     MythImage *curTitle;
     QString titleText;
     QPoint titlePos;
-    QRect titleRect;
-    bool drawTitle;
 
     MythImage *buttonBackground;
 
@@ -257,6 +254,7 @@ class MythThemedMenuPrivate
     bool wantpop;
 
     QString titleText;
+    QString menumode;
 };
 
 /* FIXME: remove */
@@ -336,21 +334,6 @@ void MythThemedMenuState::Reset(void)
     setDefaults();
 
     loaded = false;
-}
-
-void MythThemedMenuState::setTitleIcon(const QString &menumode)
-{
-    if (titleIcons.contains(menumode))
-    {
-        drawTitle = true;
-        curTitle = titleIcons[menumode];
-        titleRect = QRect(titlePos.x(), titlePos.y(), curTitle->width(),
-                          curTitle->height());
-    }
-    else
-    {
-        drawTitle = false;
-    }
 }
 
 ButtonIcon *MythThemedMenuState::getButtonIcon(const QString &type)
@@ -1254,7 +1237,6 @@ void MythThemedMenuState::setDefaults(void)
     titleIcons.clear();
     titleText = "";
     curTitle = NULL;
-    drawTitle = false;
     uparrow = NULL;
     downarrow = NULL;
     watermarkPos = QPoint(0, 0);
@@ -1385,10 +1367,14 @@ void MythThemedMenuState::paintLogo(MythPainter *p, int alpha)
         p->DrawImage(logoRect.topLeft(), logo, alpha);
 }
 
-void MythThemedMenuState::paintTitle(MythPainter *p, int alpha)
+void MythThemedMenuState::paintTitle(MythPainter *p, int alpha, 
+                                     const QString &menumode)
 {
+    if (titleIcons.contains(menumode))
+        curTitle = titleIcons[menumode];
+
     if (curTitle)
-        p->DrawImage(titleRect.topLeft(), curTitle, alpha);
+        p->DrawImage(titlePos, curTitle, alpha);
 }
 
 void MythThemedMenuState::paintButtonBackground(MythPainter *p, int alpha)
@@ -1597,7 +1583,7 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
 
     QDomElement docElem = doc.documentElement();
 
-    QString menumode = docElem.attribute("name", "");
+    menumode = docElem.attribute("name", "");
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -1629,8 +1615,6 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     if (!layoutButtons())
         return false;
     positionButtons(true);
-
-    m_state->setTitleIcon(menumode);
 
     if (LCD::Get())
     {
@@ -2350,7 +2334,7 @@ void MythThemedMenuPrivate::DrawSelf(MythPainter *p,
                                      int alphaMod)
 {
     m_state->paintLogo(p, alphaMod);
-    m_state->paintTitle(p, alphaMod);
+    m_state->paintTitle(p, alphaMod, menumode);
     m_state->paintButtonBackground(p, alphaMod);
 
     paintWatermark(p, alphaMod);
