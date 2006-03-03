@@ -376,7 +376,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
         } else if (!memcmp(&g, &ext_stream_header, sizeof(GUID))) {
             int ext_len, payload_ext_ct, stream_ct;
             uint32_t ext_d;
-            int64_t pos_ex_st, pos_curr;
+            int64_t pos_ex_st;
             pos_ex_st = url_ftell(pb);
 
             get_le64(pb);
@@ -802,7 +802,7 @@ static int64_t asf_read_pts(AVFormatContext *s, int stream_index, int64_t *ppos,
             return AV_NOPTS_VALUE;
         }
 
-        pts= pkt->pts * 1000 / AV_TIME_BASE;
+        pts= pkt->pts;
 
         av_free_packet(pkt);
         if(pkt->flags&PKT_FLAG_KEY){
@@ -813,7 +813,7 @@ static int64_t asf_read_pts(AVFormatContext *s, int stream_index, int64_t *ppos,
             assert((asf_st->packet_pos - s->data_offset) % asf->packet_size == 0);
             pos= asf_st->packet_pos;
 
-            av_add_index_entry(s->streams[i], pos, pts, pos - start_pos[i] + 1, AVINDEX_KEYFRAME);
+            av_add_index_entry(s->streams[i], pos, pkt->size, pts, pos - start_pos[i] + 1, AVINDEX_KEYFRAME);
             start_pos[i]= asf_st->packet_pos + 1;
 
             if(pkt->stream_index == stream_index)

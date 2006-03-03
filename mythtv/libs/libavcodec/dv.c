@@ -253,6 +253,7 @@ static int dvvideo_init(AVCodecContext *avctx)
 typedef struct BlockInfo {
     const uint8_t *shift_table;
     const uint8_t *scan_table;
+    const int *iweight_table;
     uint8_t pos; /* position in block */
     uint8_t dct_mode;
     uint8_t partial_bit_count;
@@ -295,6 +296,7 @@ static void dv_decode_ac(GetBitContext *gb, BlockInfo *mb, DCTELEM *block)
     int last_index = get_bits_size(gb);
     const uint8_t *scan_table = mb->scan_table;
     const uint8_t *shift_table = mb->shift_table;
+    const int *iweight_table = mb->iweight_table;
     int pos = mb->pos;
     int partial_bit_count = mb->partial_bit_count;
     int level, pos1, run, vlc_len, index;
@@ -342,9 +344,13 @@ static void dv_decode_ac(GetBitContext *gb, BlockInfo *mb, DCTELEM *block)
         if (pos >= 64)
             break;
 
-        assert(level);
         pos1 = scan_table[pos];
-        block[pos1] = level << shift_table[pos1];
+        level <<= shift_table[pos1];
+
+        /* unweigh, round, and shift down */
+        level = (level*iweight_table[pos] + (1 << (dv_iweight_bits-1))) >> dv_iweight_bits;
+
+        block[pos1] = level;
 
         UPDATE_CACHE(re, gb);
     }
@@ -410,6 +416,7 @@ static inline void dv_decode_video_segment(DVVideoContext *s,
             dct_mode = get_bits1(&gb);
             mb->dct_mode = dct_mode;
             mb->scan_table = s->dv_zigzag[dct_mode];
+            mb->iweight_table = dct_mode ? dv_iweight_248 : dv_iweight_88;
             class1 = get_bits(&gb, 2);
             mb->shift_table = s->dv_idct_shift[class1 == 3][dct_mode]
                 [quant + dv_quant_offset[class1]];
@@ -648,11 +655,25 @@ static always_inline PutBitContext* dv_encode_ac(EncBlockInfo* bi, PutBitContext
 }
 
 static always_inline void dv_set_class_number(DCTELEM* blk, EncBlockInfo* bi,
-                                              const uint8_t* zigzag_scan, int bias)
+                                              const uint8_t* zigzag_scan, const int *weight, int bias)
 {
     int i, area;
+    /* We offer two different methods for class number assignment: the
+       method suggested in SMPTE 314M Table 22, and an improved
+       method. The SMPTE method is very conservative; it assigns class
+       3 (i.e. severe quantization) to any block where the largest AC
+       component is greater than 36. ffmpeg's DV encoder tracks AC bit
+       consumption precisely, so there is no need to bias most blocks
+       towards strongly lossy compression. Instead, we assign class 2
+       to most blocks, and use class 3 only when strictly necessary
+       (for blocks whose largest AC component exceeds 255). */
+
+#if 0 /* SMPTE spec method */
     static const int classes[] = {12, 24, 36, 0xffff};
-    int max=12;
+#else /* improved ffmpeg method */
+    static const int classes[] = {-1, -1, 255, 0xffff};
+#endif
+    int max=classes[0];
     int prev=0;
 
     bi->mb[0] = blk[0];
@@ -665,7 +686,11 @@ static always_inline void dv_set_class_number(DCTELEM* blk, EncBlockInfo* bi,
 
           if (level+15 > 30U) {
               bi->sign[i] = (level>>31)&1;
-              bi->mb[i] = level= ABS(level)>>4;
+              /* weigh it and and shift down into range, adding for rounding */
+              /* the extra division by a factor of 2^4 reverses the 8x expansion of the DCT
+                 AND the 2x doubling of the weights */
+              level = (ABS(level) * weight[i] + (1<<(dv_weight_bits+3))) >> (dv_weight_bits+4);
+              bi->mb[i] = level;
               if(level>max) max= level;
               bi->bit_size[area] += dv_rl2vlc_size(i - prev  - 1, level);
               bi->next[prev]= i;
@@ -728,9 +753,10 @@ static always_inline int dv_guess_dct_mode(DCTELEM *blk) {
 static inline void dv_guess_qnos(EncBlockInfo* blks, int* qnos)
 {
     int size[5];
-    int i, j, k, a, prev;
+    int i, j, k, a, prev, a2;
     EncBlockInfo* b;
 
+    size[0] = size[1] = size[2] = size[3] = size[4] = 1<<24;
     do {
        b = blks;
        for (i=0; i<5; i++) {
@@ -745,12 +771,23 @@ static inline void dv_guess_qnos(EncBlockInfo* blks, int* qnos)
                     b->bit_size[a] = 1; // 4 areas 4 bits for EOB :)
                     b->area_q[a]++;
                     prev= b->prev[a];
+                    assert(b->next[prev] >= mb_area_start[a+1] || b->mb[prev]);
                     for (k= b->next[prev] ; k<mb_area_start[a+1]; k= b->next[k]) {
                        b->mb[k] >>= 1;
                        if (b->mb[k]) {
                            b->bit_size[a] += dv_rl2vlc_size(k - prev - 1, b->mb[k]);
                            prev= k;
                        } else {
+                           if(b->next[k] >= mb_area_start[a+1] && b->next[k]<64){
+                                for(a2=a+1; b->next[k] >= mb_area_start[a2+1]; a2++)
+                                    b->prev[a2] = prev;
+                                assert(a2<4);
+                                assert(b->mb[b->next[k]]);
+                                b->bit_size[a2] += dv_rl2vlc_size(b->next[k] - prev - 1, b->mb[b->next[k]])
+                                                  -dv_rl2vlc_size(b->next[k] -    k - 1, b->mb[b->next[k]]);
+                                assert(b->prev[a2]==k && (a2+1 >= 4 || b->prev[a2+1]!=k));
+                                b->prev[a2] = prev;
+                           }
                            b->next[prev] = b->next[k];
                        }
                     }
@@ -759,16 +796,29 @@ static inline void dv_guess_qnos(EncBlockInfo* blks, int* qnos)
                 size[i] += b->bit_size[a];
              }
           }
+          if(vs_total_ac_bits >= size[0] + size[1] + size[2] + size[3] + size[4])
+                return;
        }
-    } while ((vs_total_ac_bits < size[0] + size[1] + size[2] + size[3] + size[4]) &&
-             (qnos[0]|qnos[1]|qnos[2]|qnos[3]|qnos[4]));
+    } while (qnos[0]|qnos[1]|qnos[2]|qnos[3]|qnos[4]);
+
+
+    for(a=2; a==2 || vs_total_ac_bits < size[0]; a+=a){
+        b = blks;
+        size[0] = 5*6*4; //EOB
+        for (j=0; j<6*5; j++, b++) {
+            prev= b->prev[0];
+            for (k= b->next[prev]; k<64; k= b->next[k]) {
+                if(b->mb[k] < a && b->mb[k] > -a){
+                    b->next[prev] = b->next[k];
+                }else{
+                    size[0] += dv_rl2vlc_size(k - prev - 1, b->mb[k]);
+                    prev= k;
+                }
+            }
+        }
+    }
 }
 
-/*
- * This is a very rough initial implementaion. The performance is
- * horrible and the weighting is missing. But it's missing from the
- * decoding step also -- so at least we're on the same page with decoder ;-)
- */
 static inline void dv_encode_video_segment(DVVideoContext *s,
                                            uint8_t *dif,
                                            const uint16_t *mb_pos_ptr)
@@ -846,7 +896,9 @@ static inline void dv_encode_video_segment(DVVideoContext *s,
             s->fdct[enc_blk->dct_mode](block);
 
             dv_set_class_number(block, enc_blk,
-                                enc_blk->dct_mode ? ff_zigzag248_direct : ff_zigzag_direct, j/4);
+                                enc_blk->dct_mode ? ff_zigzag248_direct : ff_zigzag_direct,
+                                enc_blk->dct_mode ? dv_weight_248 : dv_weight_88,
+                                j/4);
 
             init_put_bits(pb, ptr, block_sizes[j]/8);
             put_bits(pb, 9, (uint16_t)(((enc_blk->mb[0] >> 3) - 1024 + 2) >> 2));
@@ -886,6 +938,8 @@ static inline void dv_encode_video_segment(DVVideoContext *s,
     for (j=0; j<5*6; j++) {
        if (enc_blks[j].partial_bit_count)
            pb=dv_encode_ac(&enc_blks[j], pb, &pbs[6*5]);
+       if (enc_blks[j].partial_bit_count)
+            av_log(NULL, AV_LOG_ERROR, "ac bitstream overflow\n");
     }
 
     for (j=0; j<5*6; j++)

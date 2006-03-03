@@ -3909,8 +3909,13 @@ static void idr(H264Context *h){
 static void flush_dpb(AVCodecContext *avctx){
     H264Context *h= avctx->priv_data;
     int i;
-    for(i=0; i<16; i++)
+    for(i=0; i<16; i++) {
+        if(h->delayed_pic[i])
+            h->delayed_pic[i]->reference= 0;
         h->delayed_pic[i]= NULL;
+    }
+    if(h->delayed_output_pic)
+        h->delayed_output_pic->reference= 0;
     h->delayed_output_pic= NULL;
     idr(h);
     if(h->s.current_picture_ptr)
@@ -5247,19 +5252,11 @@ static int decode_cabac_intra_mb_type(H264Context *h, int ctx_base, int intra_sl
         return 25;  /* PCM */
 
     mb_type = 1; /* I16x16 */
-    if( get_cabac( &h->cabac, &state[1] ) )
-        mb_type += 12;  /* cbp_luma != 0 */
-
-    if( get_cabac( &h->cabac, &state[2] ) ) {
-        if( get_cabac( &h->cabac, &state[2+intra_slice] ) )
-            mb_type += 4 * 2;   /* cbp_chroma == 2 */
-        else
-            mb_type += 4 * 1;   /* cbp_chroma == 1 */
-    }
-    if( get_cabac( &h->cabac, &state[3+intra_slice] ) )
-        mb_type += 2;
-    if( get_cabac( &h->cabac, &state[3+2*intra_slice] ) )
-        mb_type += 1;
+    mb_type += 12 * get_cabac( &h->cabac, &state[1] ); /* cbp_luma != 0 */
+    if( get_cabac( &h->cabac, &state[2] ) ) /* cbp_chroma */
+        mb_type += 4 + 4 * get_cabac( &h->cabac, &state[2+intra_slice] );
+    mb_type += 2 * get_cabac( &h->cabac, &state[3+intra_slice] );
+    mb_type += 1 * get_cabac( &h->cabac, &state[3+2*intra_slice] );
     return mb_type;
 }
 
@@ -5272,15 +5269,11 @@ static int decode_cabac_mb_type( H264Context *h ) {
         if( get_cabac( &h->cabac, &h->cabac_state[14] ) == 0 ) {
             /* P-type */
             if( get_cabac( &h->cabac, &h->cabac_state[15] ) == 0 ) {
-                if( get_cabac( &h->cabac, &h->cabac_state[16] ) == 0 )
-                    return 0; /* P_L0_D16x16; */
-                else
-                    return 3; /* P_8x8; */
+                /* P_L0_D16x16, P_8x8 */
+                return 3 * get_cabac( &h->cabac, &h->cabac_state[16] );
             } else {
-                if( get_cabac( &h->cabac, &h->cabac_state[17] ) == 0 )
-                    return 2; /* P_L0_D8x16; */
-                else
-                    return 1; /* P_L0_D16x8; */
+                /* P_L0_D8x16, P_L0_D16x8 */
+                return 2 - get_cabac( &h->cabac, &h->cabac_state[17] );
             }
         } else {
             return decode_cabac_intra_mb_type(h, 17, 0) + 5;
@@ -5291,11 +5284,9 @@ static int decode_cabac_mb_type( H264Context *h ) {
         int ctx = 0;
         int bits;
 
-        if( h->slice_table[mba_xy] == h->slice_num && !IS_SKIP( s->current_picture.mb_type[mba_xy] )
-                      && !IS_DIRECT( s->current_picture.mb_type[mba_xy] ) )
+        if( h->slice_table[mba_xy] == h->slice_num && !IS_DIRECT( s->current_picture.mb_type[mba_xy] ) )
             ctx++;
-        if( h->slice_table[mbb_xy] == h->slice_num && !IS_SKIP( s->current_picture.mb_type[mbb_xy] )
-                      && !IS_DIRECT( s->current_picture.mb_type[mbb_xy] ) )
+        if( h->slice_table[mbb_xy] == h->slice_num && !IS_DIRECT( s->current_picture.mb_type[mbb_xy] ) )
             ctx++;
 
         if( !get_cabac( &h->cabac, &h->cabac_state[27+ctx] ) )
@@ -5338,10 +5329,9 @@ static int decode_cabac_mb_skip( H264Context *h) {
     if( h->slice_table[mbb_xy] == h->slice_num && !IS_SKIP( s->current_picture.mb_type[mbb_xy] ))
         ctx++;
 
-    if( h->slice_type == P_TYPE || h->slice_type == SP_TYPE)
-        return get_cabac( &h->cabac, &h->cabac_state[11+ctx] );
-    else /* B-frame */
-        return get_cabac( &h->cabac, &h->cabac_state[24+ctx] );
+    if( h->slice_type == B_TYPE )
+        ctx += 13;
+    return get_cabac( &h->cabac, &h->cabac_state[11+ctx] );
 }
 
 static int decode_cabac_mb_intra4x4_pred_mode( H264Context *h, int pred_mode ) {
@@ -5398,14 +5388,17 @@ static const uint8_t block_idx_xy[4][4] = {
 };
 
 static int decode_cabac_mb_cbp_luma( H264Context *h) {
-    MpegEncContext * const s = &h->s;
-
     int cbp = 0;
+    int cbp_b = -1;
     int i8x8;
+
+    if( h->slice_table[h->top_mb_xy] == h->slice_num ) {
+        cbp_b = h->top_cbp;
+        tprintf("cbp_b = top_cbp = %x\n", cbp_b);
+    }
 
     for( i8x8 = 0; i8x8 < 4; i8x8++ ) {
         int cbp_a = -1;
-        int cbp_b = -1;
         int x, y;
         int ctx = 0;
 
@@ -5414,17 +5407,13 @@ static int decode_cabac_mb_cbp_luma( H264Context *h) {
 
         if( x > 0 )
             cbp_a = cbp;
-        else if( s->mb_x > 0 && (h->slice_table[h->left_mb_xy[0]] == h->slice_num)) {
+        else if( h->slice_table[h->left_mb_xy[0]] == h->slice_num ) {
             cbp_a = h->left_cbp;
             tprintf("cbp_a = left_cbp = %x\n", cbp_a);
         }
 
         if( y > 0 )
             cbp_b = cbp;
-        else if( s->mb_y > 0 && (h->slice_table[h->top_mb_xy] == h->slice_num)) {
-            cbp_b = h->top_cbp;
-            tprintf("cbp_b = top_cbp = %x\n", cbp_b);
-        }
 
         /* No need to test for skip as we put 0 for skip block */
         /* No need to test for IPCM as we put 1 for IPCM block */

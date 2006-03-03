@@ -108,6 +108,8 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_MPEG4, MKTAG('W', 'V', '1', 'F') },
     { CODEC_ID_MPEG4, MKTAG('S', 'E', 'D', 'G') },
 
+    { CODEC_ID_MPEG4, MKTAG('R', 'M', 'P', '4') },
+
     { CODEC_ID_MSMPEG4V3, MKTAG('D', 'I', 'V', '3'), .invalid_asf = 1 }, /* default signature when using MSMPEG4 */
     { CODEC_ID_MSMPEG4V3, MKTAG('M', 'P', '4', '3') },
 
@@ -147,6 +149,8 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_MJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_LJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('J', 'P', 'G', 'L') }, /* Pegasus lossless JPEG */
+    { CODEC_ID_MJPEG, MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - decoder */
+    { CODEC_ID_JPEGLS, MKTAG('M', 'J', 'L', 'S') }, /* JPEG-LS custom FOURCC for avi - encoder */
     { CODEC_ID_HUFFYUV, MKTAG('H', 'F', 'Y', 'U') },
     { CODEC_ID_FFVHUFF, MKTAG('F', 'F', 'V', 'H') },
     { CODEC_ID_CYUV, MKTAG('C', 'Y', 'U', 'V') },
@@ -197,12 +201,12 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_CSCD, MKTAG('C', 'S', 'C', 'D') },
     { CODEC_ID_ZMBV, MKTAG('Z', 'M', 'B', 'V') },
     { CODEC_ID_RAWVIDEO, 0 },
-    { 0, 0 },
+    { CODEC_ID_NONE, 0 },
 };
 
 unsigned int codec_get_tag(const CodecTag *tags, int id)
 {
-    while (tags->id != 0) {
+    while (tags->id != CODEC_ID_NONE) {
         if (tags->id == id)
             return tags->tag;
         tags++;
@@ -212,7 +216,7 @@ unsigned int codec_get_tag(const CodecTag *tags, int id)
 
 static unsigned int codec_get_asf_tag(const CodecTag *tags, unsigned int id)
 {
-    while (tags->id != 0) {
+    while (tags->id != CODEC_ID_NONE) {
         if (!tags->invalid_asf && tags->id == id)
             return tags->tag;
         tags++;
@@ -222,7 +226,7 @@ static unsigned int codec_get_asf_tag(const CodecTag *tags, unsigned int id)
 
 enum CodecID codec_get_id(const CodecTag *tags, unsigned int tag)
 {
-    while (tags->id != 0) {
+    while (tags->id != CODEC_ID_NONE) {
         if(   toupper((tag >> 0)&0xFF) == toupper((tags->tag >> 0)&0xFF)
            && toupper((tag >> 8)&0xFF) == toupper((tags->tag >> 8)&0xFF)
            && toupper((tag >>16)&0xFF) == toupper((tags->tag >>16)&0xFF)
@@ -374,8 +378,8 @@ static int avi_write_header(AVFormatContext *s)
     put_le32(pb, s->nb_streams); /* nb streams */
     put_le32(pb, 1024 * 1024); /* suggested buffer size */
     if(video_enc){
-    put_le32(pb, video_enc->width);
-    put_le32(pb, video_enc->height);
+        put_le32(pb, video_enc->width);
+        put_le32(pb, video_enc->height);
     } else {
         put_le32(pb, 0);
         put_le32(pb, 0);
@@ -515,8 +519,7 @@ static int avi_write_ix(AVFormatContext *s)
     unsigned char ix_tag[] = "ix00";
     int i, j;
 
-    if (url_is_streamed(pb))
-        return -1;
+    assert(!url_is_streamed(pb));
 
     if (avi->riff_id > AVI_MASTER_INDEX_SIZE)
         return -1;
@@ -610,22 +613,21 @@ static int avi_write_idx1(AVFormatContext *s)
         file_size = url_ftell(pb);
         nb_frames = 0;
         for(n=0;n<s->nb_streams;n++) {
-            if (avi->frames_hdr_strm[n] != 0) {
+            assert(avi->frames_hdr_strm[n]);
                 stream = s->streams[n]->codec;
                 url_fseek(pb, avi->frames_hdr_strm[n], SEEK_SET);
                 ff_parse_specific_params(stream, &au_byterate, &au_ssize, &au_scale);
                 if (au_ssize == 0) {
                     put_le32(pb, avi->packet_count[n]);
-                    nb_frames += avi->packet_count[n];
                 } else {
                     put_le32(pb, avi->audio_strm_length[n] / au_ssize);
                 }
-            }
+            if(stream->codec_type == CODEC_TYPE_VIDEO)
+                nb_frames = FFMAX(nb_frames, avi->packet_count[n]);
        }
-       if (avi->frames_hdr_all != 0) {
-           url_fseek(pb, avi->frames_hdr_all, SEEK_SET);
-           put_le32(pb, nb_frames);
-       }
+        assert(avi->frames_hdr_all);
+        url_fseek(pb, avi->frames_hdr_all, SEEK_SET);
+        put_le32(pb, nb_frames);
        url_fseek(pb, file_size, SEEK_SET);
     }
     return 0;

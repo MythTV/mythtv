@@ -794,6 +794,7 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->pix_fmt= PIX_FMT_NONE;
     s->frame_skip_cmp= FF_CMP_DCTMAX;
     s->nsse_weight= 8;
+    s->sample_fmt= SAMPLE_FMT_S16; // FIXME: set to NONE
 
     s->intra_quant_bias= FF_DEFAULT_QUANT_BIAS;
     s->inter_quant_bias= FF_DEFAULT_QUANT_BIAS;
@@ -851,9 +852,6 @@ int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
     if(avctx->codec)
         goto end;
 
-    avctx->codec = codec;
-    avctx->codec_id = codec->id;
-    avctx->frame_number = 0;
     if (codec->priv_data_size > 0) {
         avctx->priv_data = av_mallocz(codec->priv_data_size);
         if (!avctx->priv_data)
@@ -872,9 +870,13 @@ int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
         goto end;
     }
 
+    avctx->codec = codec;
+    avctx->codec_id = codec->id;
+    avctx->frame_number = 0;
     ret = avctx->codec->init(avctx);
     if (ret < 0) {
         av_freep(&avctx->priv_data);
+        avctx->codec= NULL;
         goto end;
     }
     ret=0;
