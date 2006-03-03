@@ -175,7 +175,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // LiveTVChain stuff
       livetvchain(NULL), m_tv(NULL),
       // DVD stuff
-      indvdstillframe(false),
+      indvdstillframe(false), hidedvdbutton(true),
       // Debugging variables
       output_jmeter(NULL)
 {
@@ -509,7 +509,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     ClearAfterSeek();
 
-    if (ringBuffer->InDVDMenuOrStillFrame())
+    if (ringBuffer->isDVD())
         ringBuffer->Seek(ringBuffer->DVD()->GetCellStartPos(), SEEK_SET);
 }
 
@@ -758,7 +758,12 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     ringBuffer->Start();
     char testbuf[kDecoderProbeBufferSize];
     ringBuffer->Unpause(); // so we can read testbuf if we were paused
-    if (ringBuffer->Read(testbuf, kDecoderProbeBufferSize) != kDecoderProbeBufferSize)
+
+    int readsize = kDecoderProbeBufferSize;
+    if (ringBuffer->isDVD())
+        readsize = 2048;
+
+    if (ringBuffer->Read(testbuf, readsize) != readsize)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("NVP::OpenFile(): Error, couldn't read file: %1")
@@ -775,11 +780,11 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     // delete any pre-existing recorder
     SetDecoder(NULL);
 
-    if (NuppelDecoder::CanHandle(testbuf))
+    if (NuppelDecoder::CanHandle(testbuf, readsize))
         SetDecoder(new NuppelDecoder(this, m_playbackinfo));
 #ifdef USING_IVTV
     else if (!using_null_videoout && IvtvDecoder::CanHandle(
-                 testbuf, ringBuffer->GetFilename()))
+                 testbuf, ringBuffer->GetFilename(), readsize))
     {
         SetDecoder(new IvtvDecoder(this, m_playbackinfo));
         no_audio_out = true; // no audio with ivtv.
@@ -795,7 +800,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         return -1;
     }
 #endif
-    else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
+    else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename(),
+                                        readsize))
         SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
                                        using_null_videoout, allow_libmpeg2));
 
@@ -829,7 +835,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
 
     // We want to locate decoder for video even if using_null_videoout
     // is true, only disable if no_video_decode is true.
-    int ret = GetDecoder()->OpenFile(ringBuffer, no_video_decode, testbuf);
+    int ret = GetDecoder()->OpenFile(ringBuffer, no_video_decode, testbuf,
+                                     readsize);
     if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't open decoder for: %1")
@@ -967,10 +974,9 @@ void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 void NuppelVideoPlayer::AddTextData(unsigned char *buffer, int len,
                                     long long timecode, char type)
 {
-    if (!ringBuffer->isDVD())
-        WrapTimecode(timecode, TC_CC);
+    WrapTimecode(timecode, TC_CC);
 
-    if (subtitlesOn)
+    if (subtitlesOn && !ringBuffer->isDVD())
     {
         if (!tbuffer_numfree())
         {
@@ -1954,7 +1960,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     video_actually_paused = false;
     resetvideo = false;
 
-    if (!ringBuffer->isDVD())
+    if (!ringBuffer->InDVDMenuOrStillFrame())
     {
         if (!PrebufferEnoughFrames())
             return;
@@ -2104,33 +2110,30 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 if (ringBuffer->DVD()->IsWaiting())
                 {
                     ringBuffer->DVD()->WaitSkip();
-                    usleep(100000);
                     continue;
                 }
+
                 if (ringBuffer->InDVDMenuOrStillFrame())
                 {
                     if (nbframes == 0)
                     {
-                        // wait to confirm there is no other frames been decoded.
-                        usleep(100000);
-                        nbframes = videoOutput->ValidVideoFrames();
-                        if (nbframes == 0)
-                        {
-                            ringBuffer->Seek(ringBuffer->DVD()->GetCellStartPos(),SEEK_SET);
-                            continue;
-                        }
+                        if (pausevideo)
+                            UnpauseVideo();
+                        continue;
                     }
-                    indvdstillframe = true;
                     if (!pausevideo && nbframes == 1)
+                    {
+                        indvdstillframe = true;
                         PauseVideo(false);
+                    }
                 }
             }
 
-            // restart playing after skipping still frame
             if (indvdstillframe && nbframes > 1)
             {
                 UnpauseVideo();
                 indvdstillframe = false;
+                continue;
             } 
         }
 
@@ -2925,7 +2928,7 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 
     int samples = len / samplesize;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer->InDVDMenuOrStillFrame())
     {
         audioOutput->Pause(false);
         audioOutput->Drain();
@@ -5201,21 +5204,38 @@ void NuppelVideoPlayer::DisplaySubtitles()
 
                 // scale the subtitle images which are scaled and positioned for
                 // a 720x576 video resolution to fit the current OSD resolution
+                float vsize = 576.0;
+                if (ringBuffer->isDVD())
+                    vsize = (float)video_height;
+
                 float hmult = osd->GetSubtitleBounds().width() / 720.0;
-                float vmult = osd->GetSubtitleBounds().height() / 576.0;
+                float vmult = osd->GetSubtitleBounds().height() / vsize;
+
                 rect->x = (int)(rect->x * hmult);
                 rect->y = (int)(rect->y * vmult);
                 rect->w = (int)(rect->w * hmult);
                 rect->h = (int)(rect->h * vmult);
-                QImage scaledImage = qImage.smoothScale(rect->w, rect->h);
+                
+                if (hmult < 0.98 || hmult > 1.02 || vmult < 0.98 || hmult > 1.02)
+                    qImage = qImage.smoothScale(rect->w, rect->h);
 
                 OSDTypeImage* image = new OSDTypeImage();
                 image->SetPosition(QPoint(rect->x, rect->y), hmult, vmult);
-                image->LoadFromQImage(scaledImage);
+                image->LoadFromQImage(qImage);
 
                 subtitleOSD->AddType(image);
 
                 osdSubtitlesExpireAt = subtitlePage.end_display_time;
+                // fix subtitles that don't display for very long (if at all).
+                if (subtitlePage.end_display_time <= 
+                    subtitlePage.start_display_time)
+                {
+                    if (nonDisplayedSubtitles.size() > 0)
+                        osdSubtitlesExpireAt = nonDisplayedSubtitles.front().start_display_time;
+                    else
+                        osdSubtitlesExpireAt += 4500;
+                }
+
                 setVisible = true;
                 osdHasSubtitles = true;
             }
@@ -5233,8 +5253,9 @@ void NuppelVideoPlayer::DisplaySubtitles()
     if (setVisible)
     {
         VERBOSE(VB_PLAYBACK,
-                QString("Setting subtitles visible, frame_timecode=%1")
-                .arg(currentFrame->timecode));
+                QString("Setting subtitles visible, frame_timecode=%1 "
+                        "expires=%2")
+                .arg(currentFrame->timecode).arg(osdSubtitlesExpireAt));
         osd->SetVisible(subtitleOSD, 0);
     }
 }
@@ -5317,19 +5338,20 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
     if (!ringBuffer->InDVDMenuOrStillFrame())
         return;
 
-    long long spupts = ringBuffer->DVD()->MenuSpuPts();
-    long long ptslow = spupts - 1000;
-    long long ptshigh = spupts + 1000;
     VideoFrame *buffer = videoOutput->GetLastShownFrame();
 
-    if (!osd->IsSetDisplaying("subtitles") &&
-        (buffer->timecode > 0) &&
-        ((buffer->timecode < ptslow) || 
-         (buffer->timecode > ptshigh)))
+    int numbuttons = ringBuffer->DVD()->NumMenuButtons();
+    bool osdshown = osd->IsSetDisplaying("subtitles");
+    long long menupktpts = ringBuffer->DVD()->GetMenuPktPts();
+
+    if ((numbuttons == 0) || (osdshown) ||
+        ((!osdshown) && (hidedvdbutton) &&
+         (buffer->timecode > 0) && (menupktpts != buffer->timecode)))
     {
         return; 
     }
 
+    hidedvdbutton = false;
     AVSubtitleRect *highlightButton;
     OSDSet *subtitleOSD = NULL;
     highlightButton = ringBuffer->DVD()->GetMenuButton();
@@ -5379,10 +5401,7 @@ void NuppelVideoPlayer::ActivateDVDButton(void)
     if (!ringBuffer->isDVD())
         return;
 
-    if (videoOutput->ValidVideoFrames() > 20)
-        DiscardVideoFrames(true);
     ringBuffer->DVD()->ActivateButton();
-    ringBuffer->DVD()->HideMenuButton(true);
 }
 
 void NuppelVideoPlayer::GoToDVDMenu(QString str)
@@ -5390,8 +5409,7 @@ void NuppelVideoPlayer::GoToDVDMenu(QString str)
     if (!ringBuffer->isDVD())
         return;
 
-    if (videoOutput->ValidVideoFrames() > 20)
-        DiscardVideoFrames(true);
+    subtitlesOn = false;
     ringBuffer->DVD()->GoToMenu(str);
 }
 
@@ -5403,8 +5421,6 @@ void NuppelVideoPlayer::GoToDVDProgram(bool direction)
     if (!ringBuffer->isDVD())
         return;
  
-    if (videoOutput->ValidVideoFrames() > 20)
-        DiscardVideoFrames(true);
     if (direction == 0)
         ringBuffer->DVD()->GoToPreviousProgram();
     else

@@ -233,7 +233,7 @@ bool IvtvDecoder::CheckDevice(void)
 }
 
 bool IvtvDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize], 
-                            const QString &filename)
+                            const QString &filename, int testbufsize)
 {
     if (!CheckDevice())
         return false;
@@ -244,7 +244,7 @@ bool IvtvDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
     probe.filename = (char *)(filename.ascii());
     probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = kDecoderProbeBufferSize;
+    probe.buf_size = testbufsize;
 
     AVInputFormat *fmt = av_probe_input_format(&probe, true);
 
@@ -254,7 +254,8 @@ bool IvtvDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 }
 
 int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
-                          char testbuf[kDecoderProbeBufferSize])
+                          char testbuf[kDecoderProbeBufferSize],
+                          int)
 {
     (void)novideo;
     (void)testbuf;

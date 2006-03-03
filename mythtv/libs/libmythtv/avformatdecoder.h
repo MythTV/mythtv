@@ -27,12 +27,14 @@ class StreamInfo
 {
   public:
     StreamInfo() : av_stream_index(-1), language(-2), language_index(0) {}
-    StreamInfo(int a, int b, uint c)
-        : av_stream_index(a), language(b), language_index(c) {}
+    StreamInfo(int a, int b, uint c, int d)
+        : av_stream_index(a), language(b), language_index(c), stream_id(d) {}
   public:
     int  av_stream_index;
     int  language; ///< ISO639 canonical language key
     uint language_index;
+    int  stream_id;
+    bool operator<(const StreamInfo& b) { return (this->stream_id < b.stream_id) ; }
 };
 typedef vector<StreamInfo> sinfo_vec_t;
 
@@ -94,11 +96,13 @@ class AvFormatDecoder : public DecoderBase
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
-                          const QString &filename);
+                          const QString &filename,
+                          int testbufsize = kDecoderProbeBufferSize);
 
     /// Open our file and set up or audio and video parameters.
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
-                 char testbuf[kDecoderProbeBufferSize]);
+                 char testbuf[kDecoderProbeBufferSize],
+                 int testbufsize = kDecoderProbeBufferSize);
 
     /// Decode a frame of video/audio. If onlyvideo is set, 
     /// just decode the video portion.
@@ -266,6 +270,7 @@ class AvFormatDecoder : public DecoderBase
 
     // DVD
     int lastdvdtitle;
+    bool dvdmenupktseen;
 };
 
 #endif

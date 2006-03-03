@@ -96,7 +96,8 @@ NuppelDecoder::~NuppelDecoder()
     CloseAVCodec();
 }
 
-bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize])
+bool NuppelDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
+                              int)
 {
     if (!strncmp(testbuf, "NuppelVideo", 11) ||
         !strncmp(testbuf, "MythTVVideo", 11))
@@ -155,7 +156,8 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
 }
 
 int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
-                            char testbuf[kDecoderProbeBufferSize])
+                            char testbuf[kDecoderProbeBufferSize],
+                            int)
 {
     (void)testbuf;
 

@@ -42,10 +42,12 @@ class IvtvDecoder : public DecoderBase
    ~IvtvDecoder();
 
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 
-                          const QString &filename);
+                          const QString &filename,
+                          int testbufsize = kDecoderProbeBufferSize);
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
-                 char testbuf[kDecoderProbeBufferSize]);
+                 char testbuf[kDecoderProbeBufferSize],
+                 int testbufsize = kDecoderProbeBufferSize);
     bool GetFrame(int onlyvideo);
 
     bool DoFastForward(long long desiredFrame, bool doflush = true);

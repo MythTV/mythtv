@@ -45,16 +45,18 @@ class DVDRingBufferPriv
     bool InStillFrame(void) { return cellHasStillFrame; }
     bool IsWaiting(void) { return dvdWaiting; }
     int    NumPartsInTitle(void) { return titleParts; }
-    void GetMenuSPUPkt(uint8_t *buf, int buf_size,long long pts);
+    void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
     AVSubtitleRect *GetMenuButton(void);
     bool IgnoringStillorWait(void) { return skipstillorwait; }
-    long long GetCellStartPos(void) { return cellstartPos; }
-    void HideMenuButton(bool hide);
+    long long GetCellStartPos(void);
     uint ButtonPosX(void) { return hl_startx; }
     uint ButtonPosY(void) { return hl_starty; }
     uint GetAudioLanguage(int id);
     uint GetSubtitleLanguage(int id);
-    long long MenuSpuPts(void) { return menuspupts; }
+    void SetMenuPktPts(long long pts) { menupktpts = pts; }
+    long long GetMenuPktPts(void) { return menupktpts; }
+    bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles, 
+                         const uint8_t * buf, int buf_size);
 
     // commands
     bool OpenFile(const QString &filename);
@@ -76,7 +78,12 @@ class DVDRingBufferPriv
     int NumMenuButtons(void);
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
     uint GetCurrentTime(void);
-    
+    void  SetAudioTrack(void);
+    void  SetSubtitleTrack(void);
+    uint8_t GetNumAudioChannels(int id);
+    void AutoSelectAudio(bool setting) { autoselectaudio = setting; }
+    void AutoSelectSubtitle(bool setting) { autoselectsubtitle = setting; }
+
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
     
   protected:
@@ -106,18 +113,24 @@ class DVDRingBufferPriv
     uint16_t       hl_width;
     uint16_t       hl_starty;
     uint16_t       hl_height;
-    bool           spuchanged;
     uint8_t       *menuSpuPkt;
     int            menuBuflength;
     uint8_t       *buttonBitmap;
-    AVSubtitleRect *dvdMenuButton;
-    int            buttonCoords;
+    AVSubtitle     dvdMenuButton;
     bool           skipstillorwait;
-    bool           spuStreamLetterbox;
     long long      cellstartPos;
     bool           buttonSelected;
     bool           buttonExists;
-    long long      menuspupts;
+    int            cellid;
+    int            lastcellid;
+    int            vobid;
+    int            lastvobid;
+    bool           cellRepeated;
+    int            buttonstreamid;
+    bool           gotoCellStart;
+    long long      menupktpts;
+    bool           autoselectaudio;
+    bool           autoselectsubtitle;
 
     NuppelVideoPlayer *parent;
 
@@ -126,6 +139,8 @@ class DVDRingBufferPriv
     void ClearMenuSPUParameters(void);
     bool MenuButtonChanged(void);
     uint ConvertLangCode(uint16_t code); // converts 2char key to 3char key
+    void SelectDefaultButton(void);
+    void ClearSubtitlesOSD(void);
     
     /* copied from dvdsub.c from ffmpeg */
     int get_nibble(const uint8_t *buf, int nibble_offset);

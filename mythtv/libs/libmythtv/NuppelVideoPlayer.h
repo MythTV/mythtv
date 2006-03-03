@@ -318,6 +318,8 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void ActivateDVDButton(void);
     void GoToDVDMenu(QString str);
     void GoToDVDProgram(bool direction);
+    void HideDVDButton(bool hide) { hidedvdbutton = hide; }
+    void SetSubtitleMode(bool setting) { subtitlesOn = setting; }
 
   protected:
     void DisplayPauseFrame(void);
@@ -664,6 +666,7 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
 
     // DVD
     bool indvdstillframe;
+    bool hidedvdbutton;
 
     // Debugging variables
     Jitterometer *output_jmeter;

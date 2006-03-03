@@ -276,7 +276,7 @@ typedef struct AVStream {
 #define AVFMTCTX_NOHEADER      0x0001 /* signal that no header is present
                                          (streams are added dynamically) */
 
-#define MAX_STREAMS 20
+#define MAX_STREAMS 40
 
 /* format I/O context */
 typedef struct AVFormatContext {

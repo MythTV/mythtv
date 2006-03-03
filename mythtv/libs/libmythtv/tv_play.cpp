@@ -2321,7 +2321,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (prbuffer->isDVD())
             {
                 if (prbuffer->InDVDMenuOrStillFrame())
-                    UpdateOSDSeekMessage(tr("Skipping Back Not Allowed"),
+                    UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
                                          osd_general_timeout);
                 else if (prbuffer->DVD()->NumPartsInTitle() < 2)
                 {
@@ -6187,6 +6187,9 @@ void TV::SetAudioTrack(int track)
 {
     if (activenvp)
     {
+        if (prbuffer->isDVD())
+            prbuffer->DVD()->AutoSelectAudio(false);
+
         activenvp->setCurrentAudioTrack(track - 1); 
 
         if (activenvp->getCurrentAudioTrack())
@@ -6226,6 +6229,9 @@ void TV::SetSubtitleTrack(int track)
 {
     if (activenvp)
     {
+        if (prbuffer->isDVD())
+            prbuffer->DVD()->AutoSelectSubtitle(false);
+
         activenvp->setCurrentSubtitleTrack(track - 1); 
 
         if (activenvp->getCurrentSubtitleTrack())

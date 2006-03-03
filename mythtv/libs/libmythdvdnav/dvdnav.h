@@ -550,6 +550,13 @@ uint8_t dvdnav_get_video_scale_permission(dvdnav_t *self);
 uint16_t dvdnav_audio_stream_to_lang(dvdnav_t *self, uint8_t stream);
 
 /*
+ * Get number of audio channels.
+ * (1 -> 2 channels , 5 -> 6 channels)
+ * (returns 0xff if no such stream).
+ */
+unsigned char dvdnav_audio_get_channels(dvdnav_t *self, uint8_t stream);
+
+/*
  * Converts a *logical* subpicture stream id into country code 
  * (returns 0xffff if no such stream).
  */
