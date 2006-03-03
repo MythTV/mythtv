@@ -12,12 +12,9 @@ MythDialogBox::MythDialogBox(const QString &text,
     m_id = "";
 
     MythFontProperties fontProp;
-    fontProp.face = CreateFont("Arial", 24, QFont::Bold);
-    fontProp.color = QColor(Qt::white);
-    fontProp.hasShadow = true;
-    fontProp.shadowOffset = NormPoint(QPoint(4, 4));
-    fontProp.shadowColor = QColor(Qt::black);
-    fontProp.shadowAlpha = 64;
+    fontProp.SetFace(CreateFont("Arial", 24, QFont::Bold));
+    fontProp.SetColor(Qt::white);
+    fontProp.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 
     QRect fullRect = GetMythMainWindow()->GetUIScreenRect();
     int xpad = NormX(60);
@@ -38,7 +35,7 @@ MythDialogBox::MythDialogBox(const QString &text,
     buttonList = new MythListButton(this, "listbutton", listarea, true, true);
 
     buttonList->SetFontActive(fontProp);
-    fontProp.color = QColor(qRgb(128, 128, 128));
+    fontProp.SetColor(QColor(qRgb(128, 128, 128)));
     buttonList->SetFontInactive(fontProp);
 
     buttonList->SetSpacing(NormX(10));

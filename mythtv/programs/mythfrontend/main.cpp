@@ -32,7 +32,6 @@ using namespace std;
 #include "networkcontrol.h"
 
 #include "exitcodes.h"
-#include "themedmenu.h"
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -47,11 +46,15 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 
+#include "libmythui/myththemedmenu.h"
+#include "libmythui/myththemebase.h"
+
 #define NO_EXIT  0
 #define QUIT     1
 #define HALT     2
 
-ThemedMenu *menu;
+static MythThemedMenu *menu;
+static MythThemeBase *themeBase;
 XBox *xbox = NULL;
 
 void startGuide(void)
@@ -373,20 +376,7 @@ void TVMenuCallback(void *data, QString &selection)
         AppearanceSettings settings;
         settings.exec();
 
-        LanguageSettings::reload();
-
-        gContext->LoadQtConfig();
-        gContext->GetMainWindow()->Init();
-        gContext->UpdateImageCache();
-        menu->ReloadTheme();
-        if (!menu->foundTheme())
-            exit(FRONTEND_BUGGY_EXIT_NO_THEME);
-
-        LCD::SetupLCD ();
-        if (class LCD * lcd = LCD::Get()) {
-            lcd->setupLEDs(RemoteGetRecordingMask);
-            lcd->resetServer();
-        }
+        GetMythMainWindow()->JumpTo("Reload Theme");
     } 
     else if (sel == "settings recording") 
     {
@@ -484,28 +474,20 @@ void haltnow()
         system(halt_cmd.ascii());
 }
 
-int RunMenu(QString themedir)
+bool RunMenu(QString themedir)
 {
-    menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml", 
-                          gContext->GetMainWindow(), "mainmenu");
+    menu = new MythThemedMenu(themedir.ascii(), "mainmenu.xml", 
+                              GetMythMainWindow()->GetMainStack(), "mainmenu");
     menu->setCallback(TVMenuCallback, gContext);
    
-    int exitstatus = NO_EXIT;
- 
     if (menu->foundTheme())
     {
-        do {
-            menu->exec();
-        } while (!(exitstatus = handleExit()));
-    }
-    else
-    {
-        cerr << "Couldn't find theme " << themedir << endl;
+        GetMythMainWindow()->GetMainStack()->AddScreen(menu);
+        return true;
     }
 
-    delete menu;
-    menu = NULL;
-    return exitstatus;
+    cerr << "Couldn't find theme " << themedir << endl;
+    return false;
 }   
 
 // If any settings are missing from the database, this will write
@@ -641,8 +623,30 @@ void gotoMainMenu(void)
     QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
 }
 
+void reloadTheme(void)
+{
+    LanguageSettings::reload();
+
+    gContext->LoadQtConfig();
+    gContext->GetMainWindow()->Init();
+    gContext->UpdateImageCache();
+
+    themeBase->Reload();
+    menu->ReloadTheme();
+
+    if (!menu->foundTheme())
+        exit(FRONTEND_BUGGY_EXIT_NO_THEME);
+
+    LCD::SetupLCD ();
+    if (class LCD * lcd = LCD::Get()) {
+        lcd->setupLEDs(RemoteGetRecordingMask);
+        lcd->resetServer();
+    }
+}
+
 void InitJumpPoints(void)
 {
+    REG_JUMP("Reload Theme", "", "", reloadTheme);
     REG_JUMP("Main Menu", "", "", gotoMainMenu);
     REG_JUMP("Program Guide", "", "", startGuide);
     REG_JUMP("Program Finder", "", "", startFinder);
@@ -951,7 +955,6 @@ int main(int argc, char **argv)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
@@ -1046,6 +1049,9 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     gContext->SetMainWindow(mainWindow);
+
+    themeBase = new MythThemeBase();
+
     LanguageSettings::prompt();
 
     InitJumpPoints();
@@ -1078,6 +1084,9 @@ int main(int argc, char **argv)
     {
         if (pmanager->run_plugin(pluginname))
         {
+            qApp->setMainWidget(mainWindow);
+            qApp->exec();
+
             qApp->unlock();
             return FRONTEND_EXIT_OK;
         }
@@ -1086,6 +1095,9 @@ int main(int argc, char **argv)
             pluginname = "myth" + pluginname;
             if (pmanager->run_plugin(pluginname))
             {
+                qApp->setMainWidget(mainWindow);
+                qApp->exec();
+
                 qApp->unlock();
                 return FRONTEND_EXIT_OK;
             }
@@ -1117,7 +1129,17 @@ int main(int argc, char **argv)
 
     gContext->addCurrentLocation("MainMenu");
 
-    int exitstatus = RunMenu(themedir);
+    int exitstatus = NO_EXIT;
+
+    do
+    {
+        if (!RunMenu(themedir))
+            break;
+
+        qApp->setMainWidget(mainWindow);
+        qApp->exec();
+        printf("loop!\n");
+    } while (!(exitstatus = handleExit()));
 
     if (exitstatus == HALT)
         haltnow();
@@ -1143,6 +1165,7 @@ int main(int argc, char **argv)
         delete networkControl;
 
     DestroyMythMainWindow();
+    delete themeBase;
     delete gContext;
     return FRONTEND_EXIT_OK;
 }

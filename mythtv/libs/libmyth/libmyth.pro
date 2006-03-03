@@ -11,7 +11,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
-HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
+HEADERS += remotefile.h settings.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h httpcomms.h mythmedia.h 
 HEADERS += uilistbtntype.h generictree.h screensaver.h
@@ -22,7 +22,7 @@ HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
 HEADERS += exitcodes.h virtualkeyboard.h mythobservable.h mythevent.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
-SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
+SOURCES += oldsettings.cpp remotefile.cpp settings.cpp
 SOURCES += util.cpp mythwizard.cpp uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp  
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp 
@@ -50,7 +50,7 @@ TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${LIBVERSION}.$${QMAKE_EXT
 TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h
+inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h

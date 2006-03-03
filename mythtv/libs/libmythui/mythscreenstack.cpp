@@ -12,12 +12,13 @@ using namespace std;
 
 const int kFadeVal = 10;
 
-MythScreenStack::MythScreenStack(MythMainWindow *parent, const char *name)
+MythScreenStack::MythScreenStack(MythMainWindow *parent, const char *name, 
+                                 bool mainstack)
                : QObject(parent, name)
 {
     assert(parent);
 
-    parent->AddScreenStack(this);
+    parent->AddScreenStack(this, mainstack);
 
     newTop = NULL;
     topScreen = NULL;
@@ -29,6 +30,11 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const char *name)
 
 MythScreenStack::~MythScreenStack()
 {
+}
+
+int MythScreenStack::TotalScreens(void)
+{
+    return m_Children.count();
 }
 
 void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
@@ -72,10 +78,12 @@ void MythScreenStack::PopScreen(void)
     if (!top || top->IsDeleting())
         return;
 
+    MythMainWindow *mainwindow = GetMythMainWindow();
+
     qApp->lock();
 
     removeChild(top);
-    if (m_DoTransitions)
+    if (m_DoTransitions && !mainwindow->IsExitingToMain())
     {
         top->SetFullscreen(false);
         top->SetDeleting(true);
@@ -88,7 +96,9 @@ void MythScreenStack::PopScreen(void)
         delete top;
         top = NULL;
 
-        reinterpret_cast<MythMainWindow *>(parent())->update();
+        mainwindow->update();
+        if (mainwindow->IsExitingToMain())
+            QApplication::postEvent(mainwindow, new ExitToMainMenuEvent());
     }
 
     topScreen = NULL;

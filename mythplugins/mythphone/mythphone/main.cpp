@@ -19,7 +19,6 @@ using namespace std;
 #include <netinet/in.h>
 #include <net/if.h>
 #include <linux/videodev.h>
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythplugin.h>

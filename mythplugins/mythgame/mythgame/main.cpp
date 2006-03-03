@@ -11,10 +11,10 @@ using namespace std;
 #include "gametree.h"
 #include "dbcheck.h"
 
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/libmythui/myththemedmenu.h>
 
 struct GameData
 {
@@ -53,8 +53,9 @@ void runMenu(QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
 
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu,
-                                      gContext->GetMainWindow(), "game menu");
+    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu,
+                                              GetMythMainWindow()->GetMainStack(), 
+                                              "game menu");
 
     GameData data;
 
@@ -67,11 +68,12 @@ void runMenu(QString which_menu)
         {
             lcd->switchToTime();
         }
-        diag->exec();
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
     }
     else
     {
         cerr << "Couldn't find theme " << themedir << endl;
+        delete diag;
     }
 
     delete diag;

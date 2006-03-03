@@ -564,9 +564,9 @@ void MythListButton::Init()
 
     m_initialized = true;
 
-    QFontMetrics fm(m_fontActive->face);
+    QFontMetrics fm(m_fontActive->face());
     QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
-    fm = QFontMetrics(m_fontInactive->face);
+    fm = QFontMetrics(m_fontInactive->face());
     QSize sz2 = fm.size(Qt::SingleLine, "XXXXX");
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
 

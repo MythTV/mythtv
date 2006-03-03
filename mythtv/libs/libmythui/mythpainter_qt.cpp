@@ -93,51 +93,62 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
     assert(painter);
     (void)alpha;
 
-    painter->setFont(font.face);
+    painter->setFont(font.face());
 
-    if (font.hasShadow)
+    if (font.hasShadow())
     {
-        QRect a = r;
-        a.moveBy(font.shadowOffset.x(), font.shadowOffset.y());
+        QPoint shadowOffset;
+        QColor shadowColor;
+        int shadowAlpha;
 
-        painter->setPen(font.shadowColor);
+        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
+
+        QRect a = r;
+        a.moveBy(shadowOffset.x(), shadowOffset.y());
+
+        painter->setPen(shadowColor);
         painter->drawText(a, flags, msg);
     }
 
-    if (font.hasOutline && alpha > 128)
+    if (font.hasOutline() && alpha > 128)
     {
-        painter->setPen(font.outlineColor);
+        QColor outlineColor;
+        int outlineSize, outlineAlpha;
+
+        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
+
+        painter->setPen(outlineColor);
 
         QRect a = r;
-        a.moveBy(0 - font.outlineSize, 0 - font.outlineSize);
+        a.moveBy(0 - outlineSize, 0 - outlineSize);
         painter->drawText(a, flags, msg);
 
-        for (int i = (0 - font.outlineSize + 1); i <= font.outlineSize; i++)
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
             a.moveBy(1, 0);
             painter->drawText(a, flags, msg);
         }
 
-        for (int i = (0 - font.outlineSize + 1); i <= font.outlineSize; i++)
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
             a.moveBy(0, 1);
             painter->drawText(a, flags, msg);
         }
 
-        for (int i = (0 - font.outlineSize + 1); i <= font.outlineSize; i++)
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
             a.moveBy(-1, 0);
             painter->drawText(a, flags, msg);
         }
 
-        for (int i = (0 - font.outlineSize + 1); i <= font.outlineSize; i++)
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
             a.moveBy(0, -1);
             painter->drawText(a, flags, msg);
         }
     }
 
-    painter->setPen(font.color);
+    painter->setPen(font.color());
     painter->drawText(r, flags, msg);
 }
 

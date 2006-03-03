@@ -126,6 +126,7 @@ class MythMainWindowPrivate
     bool ignore_joystick_keys;
 
     bool exitingtomain;
+    bool popwindows;
 
     QDict<KeyContext> keyContexts;
     QMap<int, JumpData*> jumpMap;
@@ -231,6 +232,7 @@ MythMainWindow::MythMainWindow()
     d->ignore_lirc_keys = false;
     d->ignore_joystick_keys = false;
     d->exitingtomain = false;
+    d->popwindows = true;
     d->exitmenucallback = false;
     d->exitmenumediadevicecallback = false;
     d->mediadeviceforcallback = NULL;
@@ -532,9 +534,13 @@ bool MythMainWindow::IsExitingToMain(void) const
 
 void MythMainWindow::ExitToMainMenu(void)
 {
-    QWidget *current = currentWidget();
+    bool jumpdone = !(d->popwindows);
 
-    if (current && d->exitingtomain)
+    d->exitingtomain = true;
+
+    /* compatability code, remove, FIXME */
+    QWidget *current = currentWidget();
+    if (current && d->exitingtomain && d->popwindows)
     {
         if (current->name() != QString("mainmenu"))
         {
@@ -542,7 +548,6 @@ void MythMainWindow::ExitToMainMenu(void)
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
                 QApplication::postEvent(current, me);
-                d->exitingtomain = true;
             }
             else if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
             {
@@ -551,26 +556,49 @@ void MythMainWindow::ExitToMainMenu(void)
                                                0, Qt::NoButton);
                 QObject *key_target = getTarget(*key);
                 QApplication::postEvent(key_target, key);
-                d->exitingtomain = true;
             }
         }
         else
-        {
-            d->exitingtomain = false;
-            if (d->exitmenucallback)
-            {
-                void (*callback)(void) = d->exitmenucallback;
-                d->exitmenucallback = NULL;
+            jumpdone = true;
+    }
 
-                callback();
-            }
-            else if (d->exitmenumediadevicecallback)
+    MythScreenStack *toplevel = GetMainStack();
+    if (toplevel && d->popwindows)
+    {
+        MythScreenType *screen = toplevel->GetTopScreen();
+        if (screen && screen->name() != QString("mainmenu"))
+        {
+            if (screen->name() == QString("video playback window"))
             {
-                void (*callback)(MythMediaDevice*) = d->exitmenumediadevicecallback;
-                MythMediaDevice * mediadevice = d->mediadeviceforcallback;
-                d->mediadeviceforcallback = NULL;
-                callback(mediadevice);
+                MythEvent *me = new MythEvent("EXIT_TO_MENU");
+                QApplication::postEvent(screen, me);
             }
+            else
+            {
+                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
+                                               0, Qt::NoButton);
+                QApplication::postEvent(this, key);
+            }
+        }
+        else
+            jumpdone = true;
+    }
+
+    if (jumpdone)
+    {
+        d->exitingtomain = false;
+        if (d->exitmenucallback)
+        {
+            void (*callback)(void) = d->exitmenucallback;
+            d->exitmenucallback = NULL;
+            callback();
+        }
+        else if (d->exitmenumediadevicecallback)
+        {
+            void (*callback)(MythMediaDevice*) = d->exitmenumediadevicecallback;
+            MythMediaDevice * mediadevice = d->mediadeviceforcallback;
+            d->mediadeviceforcallback = NULL;
+            callback(mediadevice);
         }
     }
 }
@@ -836,11 +864,12 @@ void MythMainWindow::RegisterJump(const QString &destination,
     BindJump(destination, keybind); 
 }
 
-void MythMainWindow::JumpTo(const QString& destination)
+void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
     if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
+        d->popwindows = pop;
         d->exitmenucallback = d->destinationMap[destination].callback;
         QApplication::postEvent(this, new ExitToMainMenuEvent());
         return;
@@ -1008,7 +1037,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                          it++)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
-                        if ((clicked = screen->GetChildAt(p)) != NULL)
+                        if (screen && (clicked = screen->GetChildAt(p)) != NULL)
                         {
                             cout << "UI Type: " << clicked->name() << endl;
                             break;
@@ -1064,8 +1093,10 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         QKeyEvent key(QEvent::KeyPress, keycode, 0, Qt::NoButton);
 
         QObject *key_target = getTarget(key);
-
-        QApplication::sendEvent(key_target, &key);
+        if (!key_target)
+            QApplication::sendEvent(this, &key);
+        else
+            QApplication::sendEvent(key_target, &key);
     }
     else if (ce->type() == kMediaEventType) 
     {
@@ -1140,8 +1171,10 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                           QEvent::KeyRelease, k, ascii, mod, text);
 
             QObject *key_target = getTarget(key);
-
-            QApplication::sendEvent(key_target, &key);
+            if (!key_target)
+                QApplication::sendEvent(this, &key);
+            else
+                QApplication::sendEvent(key_target, &key);
         }
         else
         {
@@ -1182,8 +1215,10 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                           QEvent::KeyRelease, k, ascii, mod, text);
 
             QObject *key_target = getTarget(key);
-
-            QApplication::sendEvent(key_target, &key);
+            if (!key_target)
+                QApplication::sendEvent(this, &key);
+            else
+                QApplication::sendEvent(key_target, &key);
         }
         else
         {
@@ -1231,6 +1266,9 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
 {
     QObject *key_target = NULL;
 
+    if (!currentWidget())
+        return key_target;
+
     key_target = QWidget::keyboardGrabber();
 
     if (!key_target)
@@ -1256,13 +1294,8 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
 QFont MythMainWindow::CreateFont(const QString &face, int pointSize, 
                                  int weight, bool italic)
 {
-    // Store w/h mult in MainWindow, and query here
-    //pointSize = pointSize * GetMythMainWindow()->GetHMult();
+    QPaintDeviceMetrics pdm(this);
 
-    // cache this in MainWindow as well.
-    QPaintDeviceMetrics pdm(GetMythMainWindow());
-
-    // Maybe just a helper function in MyhtMainWindow to calc this all?
     float desired = 100.0;
     pointSize = (int)(pointSize * desired / pdm.logicalDpiY());
     pointSize = (int)(pointSize * d->hmult);

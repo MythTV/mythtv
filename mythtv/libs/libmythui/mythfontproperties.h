@@ -6,29 +6,44 @@
 #include <qpoint.h>
 #include <qmap.h>
 
-struct MythFontProperties
+class MythFontProperties
 {
   public:
+    MythFontProperties();
 
-    MythFontProperties() :
-        color(QColor(Qt::white)),
-        hasShadow(false),
-        shadowAlpha(255),
-        hasOutline(false),
-        outlineAlpha(255) { }
+    void SetFace(const QFont &face);
+    void SetColor(const QColor &color);
+    void SetShadow(bool on, const QPoint &offset, const QColor &color, int alpha);
+    void SetOutline(bool on, const QColor &color, int size, int alpha);
 
-    QFont   face;
-    QColor  color;
+    QFont face(void) const { return m_face; }
+    QColor color(void) const { return m_color; }
 
-    bool    hasShadow;
-    QPoint  shadowOffset;
-    QColor  shadowColor;
-    int     shadowAlpha;
+    bool hasShadow(void) const { return m_hasShadow; }
+    void GetShadow(QPoint &offset, QColor &color, int &alpha) const;
 
-    bool    hasOutline;
-    QColor  outlineColor;
-    int     outlineSize;
-    int     outlineAlpha;
+    bool hasOutline(void) const { return m_hasOutline; }
+    void GetOutline(QColor &color, int &size, int &alpha) const;
+
+    QString GetHash(void) const { return m_hash; }
+
+  private:
+    void CalcHash(void);
+
+    QFont   m_face;
+    QColor  m_color;
+
+    bool    m_hasShadow;
+    QPoint  m_shadowOffset;
+    QColor  m_shadowColor;
+    int     m_shadowAlpha;
+
+    bool    m_hasOutline;
+    QColor  m_outlineColor;
+    int     m_outlineSize;
+    int     m_outlineAlpha;
+
+    QString m_hash;
 };
 
 class GlobalFontMap

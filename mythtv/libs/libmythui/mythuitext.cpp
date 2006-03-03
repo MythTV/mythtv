@@ -123,7 +123,10 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         bool multiline = (m_Justification & Qt::WordBreak);
 
         if (m_Cutdown)
-            m_CutMessage = cutDown(m_Message, &(m_Font->face), multiline);
+        {
+            QFont font = m_Font->face();
+            m_CutMessage = cutDown(m_Message, &font, multiline);
+        }
         else
             m_CutMessage = m_Message;
     }
@@ -157,9 +160,9 @@ void MythUIText::Pulse(void)
     }
 
     QColor newColor = QColor((int)curR, (int)curG, (int)curB);
-    if (newColor != m_Font->color)
+    if (newColor != m_Font->color())
     {
-        m_Font->color = newColor;
+        m_Font->SetColor(newColor);
         SetRedraw();
     }
 }
@@ -190,7 +193,7 @@ void MythUIText::StopCycling(void)
     if (!m_colorCycling)
         return;
 
-    m_Font->color = m_startColor;
+    m_Font->SetColor(m_startColor);
     m_colorCycling = false;
     SetRedraw();
 }

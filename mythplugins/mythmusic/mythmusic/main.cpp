@@ -23,11 +23,12 @@ using namespace std;
 #include "globalsettings.h"
 #include "dbcheck.h"
 
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythmedia.h>
 #include <mythtv/mythdbcon.h>
+
+#include <mythtv/libmythui/myththemedmenu.h>
 
 void CheckFreeDBServerFile(void)
 {
@@ -374,6 +375,7 @@ struct MusicData
     QString startdir;
     PlaylistsContainer *all_playlists;
     AllMusic *all_music;
+    bool runPost;
 };
 
 void RebuildMusicTree(MusicData *mdata)
@@ -389,6 +391,8 @@ void RebuildMusicTree(MusicData *mdata)
     mdata->all_playlists->postLoad();
     busy.Close();
 }
+
+static void postMusic(MusicData *mdata);
 
 void MusicCallback(void *data, QString &selection)
 {
@@ -435,13 +439,21 @@ void MusicCallback(void *data, QString &selection)
         MusicRipperSettings settings;
         settings.exec();
     }
+    else if (sel == "exiting_menu")
+    {
+        if (mdata->runPost)
+            postMusic(mdata);
+        delete mdata;
+    }
 }
 
 void runMenu(MusicData *mdata, QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
-                                      gContext->GetMainWindow(), "music menu");
+
+    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu,
+                                              GetMythMainWindow()->GetMainStack(),
+                                              "music menu");
 
     diag->setCallback(MusicCallback, mdata);
     diag->setKillable();
@@ -449,15 +461,16 @@ void runMenu(MusicData *mdata, QString which_menu)
     if (diag->foundTheme())
     {
         if (class LCD * lcd = LCD::Get())
+        {
             lcd->switchToTime();
-        diag->exec();
+        }
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
     }
     else
     {
         cerr << "Couldn't find theme " << themedir << endl;
+        delete diag;
     }
-
-    delete diag;
 }
 
 extern "C" {
@@ -590,7 +603,6 @@ static void preMusic(MusicData *mdata)
 static void postMusic(MusicData *mdata)
 {
     // Automagically save all playlists and metadata (ratings) that have changed
-
     if (mdata->all_music->cleanOutThreads())
     {
         mdata->all_music->save();
@@ -609,30 +621,32 @@ static void postMusic(MusicData *mdata)
 
 int mythplugin_run(void)
 {
-    MusicData mdata;
+    MusicData *mdata = new MusicData();
+    mdata->runPost = true;
 
-    preMusic(&mdata);
-    runMenu(&mdata, "musicmenu.xml");
-    postMusic(&mdata);
+    preMusic(mdata);
+    runMenu(mdata, "musicmenu.xml");
+    //postMusic(&mdata);
 
     return 0;
 }
 
 int mythplugin_config(void)
 {
-    MusicData mdata;
-    mdata.paths = gContext->GetSetting("TreeLevels");
-    mdata.startdir = gContext->GetSetting("MusicLocation");
-    mdata.startdir = QDir::cleanDirPath(mdata.startdir);
+    MusicData *mdata = new MusicData();
+    mdata->runPost = false;
+    mdata->paths = gContext->GetSetting("TreeLevels");
+    mdata->startdir = gContext->GetSetting("MusicLocation");
+    mdata->startdir = QDir::cleanDirPath(mdata->startdir);
     
-    if (!mdata.startdir.endsWith("/"))
-        mdata.startdir += "/";
+    if (!mdata->startdir.endsWith("/"))
+        mdata->startdir += "/";
 
-    Metadata::SetStartdir(mdata.startdir);
+    Metadata::SetStartdir(mdata->startdir);
 
     Decoder::SetLocationFormatUseTags();
 
-    runMenu(&mdata, "music_settings.xml");
+    runMenu(mdata, "music_settings.xml");
 
     return 0;
 }
@@ -647,8 +661,6 @@ void runMusicPlayback(void)
     postMusic(&mdata);
     gContext->removeCurrentLocation();
 }
-
-
 
 void runMusicSelection(void)
 {

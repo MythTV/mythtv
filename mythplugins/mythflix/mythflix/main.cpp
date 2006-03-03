@@ -28,10 +28,11 @@
 #include "mythflixqueue.h"
 #include "mythflixconfig.h"
 
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
+
+#include <mythtv/libmythui/myththemedmenu.h>
 
 using namespace std;
 
@@ -89,22 +90,23 @@ void runMenu()
 {
     QString themedir = gContext->GetThemeDir();
 
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "netflix_menu.xml", 
-                                      gContext->GetMainWindow(), "netflix menu");
+    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), 
+                                              "netflix_menu.xml", 
+                                              GetMythMainWindow()->GetMainStack(), 
+                                              "netflix menu");
 
     diag->setCallback(NetFlixCallback, NULL);
     diag->setKillable();
 
     if (diag->foundTheme())
     {
-        diag->exec();
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("MythFlix: Couldn't find theme %1").arg(themedir));
+        delete diag;
     }
-
-    delete diag;
 }
 
 void setupKeys(void)

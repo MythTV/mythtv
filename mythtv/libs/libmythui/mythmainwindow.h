@@ -80,7 +80,7 @@ class MythMainWindow : public QGLWidget
                      const QString& director="", int lenMins=120,
                      const QString& year="1895");
 
-    void JumpTo(const QString &destination);
+    void JumpTo(const QString &destination, bool pop = true);
     bool DestinationExists(const QString &destination) const;
 
     bool IsExitingToMain(void) const;
@@ -131,9 +131,6 @@ MythMainWindow *GetMythMainWindow();
 void DestroyMythMainWindow();
 
 MythPainter *GetMythPainter();
-
-QFont CreateFont(const QString &face, int pointSize = 12, 
-                 int weight = QFont::Normal, bool italic = FALSE);
 
 #endif
 

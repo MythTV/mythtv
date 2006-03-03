@@ -15,12 +15,9 @@ TestScreen1::TestScreen1(MythScreenStack *parent, const char *name)
            : MythScreenType(parent, name)
 {
     MythFontProperties fontProp1;
-    fontProp1.face = CreateFont("Arial", 48, QFont::Bold);
-    fontProp1.color = QColor(Qt::white);
-    fontProp1.hasShadow = true;
-    fontProp1.shadowOffset = NormPoint(QPoint(4, 4));
-    fontProp1.shadowColor = QColor(Qt::black);
-    fontProp1.shadowAlpha = 64;
+    fontProp1.SetFace(CreateFont("Arial", 48, QFont::Bold));
+    fontProp1.SetColor(QColor(Qt::white));
+    fontProp1.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 
     QRect mainRect = GetMythMainWindow()->GetUIScreenRect();
     MythUIText *main = new MythUIText("Welcome to MythTV", fontProp1, mainRect,
@@ -28,12 +25,9 @@ TestScreen1::TestScreen1(MythScreenStack *parent, const char *name)
     main->SetJustification(Qt::AlignCenter);
 
     MythFontProperties fontProp;
-    fontProp.face = CreateFont("Arial", 14);
-    fontProp.color = QColor(Qt::white);
-    fontProp.hasShadow = true;
-    fontProp.shadowOffset = NormPoint(QPoint(1, 1));
-    fontProp.shadowColor = QColor(Qt::black);
-    fontProp.shadowAlpha = 64;
+    fontProp.SetFace(CreateFont("Arial", 14));
+    fontProp.SetColor(QColor(Qt::white));
+    fontProp.SetShadow(true, NormPoint(QPoint(1, 1)), QColor(Qt::black), 64);
 
     QRect textRect = NormRect(QRect(0, mainRect.height() * 2 / 3, 
                                     mainRect.width(), mainRect.height() / 3));
@@ -281,10 +275,8 @@ TestMove::TestMove(MythUIType *parent, const char *name)
     QFont fontFace = CreateFont("Arial", 28, QFont::Bold);
 
     MythFontProperties fontProp;
-    fontProp.face = fontFace;
-    fontProp.color = QColor(qRgba(255, 255, 255, 255));
-    fontProp.hasShadow = false;
-    fontProp.hasOutline = false;
+    fontProp.SetFace(fontFace);
+    fontProp.SetColor(QColor(qRgba(255, 255, 255, 255)));
 
     new MythUIText("Hello!", fontProp,
                    NormRect(QRect(0, 0, 200, 200)),

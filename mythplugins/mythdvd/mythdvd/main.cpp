@@ -19,13 +19,13 @@ using namespace std;
 #include <qapplication.h>
 #include <qmutex.h>
 #include <qregexp.h>
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
 #include <mythtv/mythmedia.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/libmythui/myththemedmenu.h>
 
 #include "settings.h"
 #include "dvdripbox.h"
@@ -201,8 +201,9 @@ void runMenu(QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
 
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
-                                      gContext->GetMainWindow(), "dvd menu");
+    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
+                                              GetMythMainWindow()->GetMainStack(), 
+                                              "dvd menu");
 
     diag->setCallback(DVDCallback, NULL);
     diag->setKillable();
@@ -213,14 +214,13 @@ void runMenu(QString which_menu)
         {
             lcd->switchToTime();
         }
-        diag->exec();
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
     }
     else
     {
         cerr << "Couldn't find theme " << themedir << endl;
+        delete diag;
     }
-
-    delete diag;
 }
 
 extern "C" {

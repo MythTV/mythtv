@@ -12,8 +12,8 @@ class MythThemedMenu : public MythScreenType
     Q_OBJECT
   public:
     MythThemedMenu(const char *cdir, const char *menufile,
-               MythScreenStack *parent, const char *name, 
-               bool allowreorder = true, MythThemedMenuState *state = NULL);
+                   MythScreenStack *parent, const char *name, 
+                   bool allowreorder = true, MythThemedMenuState *state = NULL);
    ~MythThemedMenu();
 
     bool foundTheme(void);

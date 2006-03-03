@@ -20,8 +20,9 @@
 #include "libmyth/langsettings.h"
 #include "libmyth/dialogbox.h"
 #include "libmyth/exitcodes.h"
-#include "libmyth/themedmenu.h"
 #include "libmyth/util.h"
+#include "libmythui/myththemedmenu.h"
+#include "libmythui/myththemebase.h"
 
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/videosource.h"
@@ -60,16 +61,18 @@ void SetupMenu(void)
 {
     QString theme = gContext->GetSetting("Theme", "blue");
 
-    ThemedMenu* menu = new ThemedMenu(gContext->FindThemeDir(theme),
-                                      "setup.xml", gContext->GetMainWindow(),
-                                      false);
+    MythThemedMenu* menu = new MythThemedMenu(gContext->FindThemeDir(theme),
+                                              "setup.xml",
+                                              GetMythMainWindow()->GetMainStack(),
+                                              "mainmenu", false);
 
     menu->setCallback(SetupMenuCallback, gContext);
     menu->setKillable();
 
     if (menu->foundTheme()) {
-            menu->Show();
-            menu->exec();
+        GetMythMainWindow()->GetMainStack()->AddScreen(menu);
+        qApp->setMainWidget(GetMythMainWindow());
+        qApp->exec();
     } else {
         cerr << "Couldn't find theme " << theme << endl;
     }
@@ -189,6 +192,8 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
+
+    MythThemeBase *themeBase = new MythThemeBase();
 
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");

@@ -132,6 +132,8 @@ void MythUIImage::SetSkip(int x, int y)
 
 void MythUIImage::Load(void)
 {
+    Clear();
+
     for (int i = m_LowNum; i <= m_HighNum; i++)
     {
         MythImage *image = GetMythPainter()->GetFormatImage();

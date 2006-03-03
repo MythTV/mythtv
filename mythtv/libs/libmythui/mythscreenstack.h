@@ -10,7 +10,8 @@ class MythMainWindow;
 class MythScreenStack : public QObject
 {
   public:
-    MythScreenStack(MythMainWindow *parent, const char *name);
+    MythScreenStack(MythMainWindow *parent, const char *name,
+                    bool main = false);
     virtual ~MythScreenStack();
 
     void AddScreen(MythScreenType *screen, bool allowFade = true);
@@ -19,6 +20,7 @@ class MythScreenStack : public QObject
     MythScreenType *GetTopScreen(void);
 
     void GetDrawOrder(QValueVector<MythScreenType *> &screens);
+    int TotalScreens();
 
   protected:
     void RecalculateDrawOrder(void);

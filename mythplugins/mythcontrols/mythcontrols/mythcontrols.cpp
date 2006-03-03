@@ -38,7 +38,6 @@
 /* MythTV includes */
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
-#include <mythtv/themedmenu.h>
 
 using namespace std;
 

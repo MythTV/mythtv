@@ -21,7 +21,6 @@
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "oldsettings.h"
-#include "themedmenu.h"
 #include "util.h"
 #include "remotefile.h"
 #include "dialogbox.h"

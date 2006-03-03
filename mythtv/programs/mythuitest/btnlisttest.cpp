@@ -46,16 +46,13 @@ void TestWindow::setupVList(void)
     vbuttons = new MythListButton(this, "vlist", r, true, true);
 
     MythFontProperties fontProp;
-    fontProp.face = CreateFont("Arial", 24, QFont::Bold);
-    fontProp.color = QColor(Qt::white);
-    fontProp.hasShadow = true;
-    fontProp.shadowOffset = NormPoint(QPoint(4, 4));
-    fontProp.shadowColor = QColor(Qt::black);
-    fontProp.shadowAlpha = 64;
+    fontProp.SetFace(CreateFont("Arial", 24, QFont::Bold));
+    fontProp.SetColor(QColor(Qt::white));
+    fontProp.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 
     vbuttons->SetFontActive(fontProp);
 
-    fontProp.color = Qt::darkGray;
+    fontProp.SetColor(Qt::darkGray);
 
     vbuttons->SetFontInactive(fontProp);
     vbuttons->SetSpacing(NormX(10));
@@ -74,16 +71,13 @@ void TestWindow::setupHList(void)
     hbuttons = new MythHorizListButton(this,"hlist",r,true,true, 3);
 
     MythFontProperties fontProp;
-    fontProp.face = CreateFont("Arial", 24, QFont::Bold);
-    fontProp.color = QColor(Qt::white);
-    fontProp.hasShadow = true;
-    fontProp.shadowOffset = NormPoint(QPoint(4, 4));
-    fontProp.shadowColor = QColor(Qt::black);
-    fontProp.shadowAlpha = 64;
+    fontProp.SetFace(CreateFont("Arial", 24, QFont::Bold));
+    fontProp.SetColor(QColor(Qt::white));
+    fontProp.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
 
     hbuttons->SetFontActive(fontProp);
 
-    fontProp.color = Qt::darkGray;
+    fontProp.SetColor(Qt::darkGray);
 
     hbuttons->SetFontInactive(fontProp);
     hbuttons->SetSpacing(NormX(10));

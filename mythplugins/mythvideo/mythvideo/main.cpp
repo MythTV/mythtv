@@ -26,13 +26,12 @@ using namespace std;
 #include "dbcheck.h"
 #include "videoscan.h"
 
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/mythdbcon.h>
 
-
+#include <mythtv/libmythui/myththemedmenu.h>
 
 void runMenu(QString, const QString &);
 void VideoCallback(void *, QString &);
@@ -119,8 +118,9 @@ int mythplugin_config(void)
 
 void runMenu(QString themedir, const QString &menuname)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), menuname,
-                                      gContext->GetMainWindow(), "videomenu");
+    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), menuname,
+                                              GetMythMainWindow()->GetMainStack(),
+                                              "video menu");
 
     diag->setCallback(VideoCallback, NULL);
     diag->setKillable();
@@ -128,18 +128,16 @@ void runMenu(QString themedir, const QString &menuname)
     if (diag->foundTheme())
     {
         if (class LCD * lcd = LCD::Get())
+        {
             lcd->switchToTime();
-
-        qApp->unlock();
-        diag->exec();
-        qApp->lock();
+        }
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
     }
     else
     {
         cerr << "Couldn't find theme " << themedir << endl;
+        delete diag;
     }
-
-    delete diag;
 }
 
 bool checkParentPassword()
