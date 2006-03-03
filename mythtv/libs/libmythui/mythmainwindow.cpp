@@ -224,8 +224,10 @@ MythMainWindow::MythMainWindow()
 
     d->AllowInput = false;
 
-    d->painter = new MythOpenGLPainter();
-    //d->painter = new MythQtPainter();
+    if (gContext->GetNumSetting("UseOpenGLPainter", 1))
+        d->painter = new MythOpenGLPainter();
+    else
+        d->painter = new MythQtPainter();
 
     Init();
 
