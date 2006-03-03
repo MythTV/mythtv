@@ -4134,8 +4134,7 @@ void PlaybackBox::recGroupChooserListBoxChanged(void)
     if (!recGroupListBox)
         return;
 
-    QString item = 
-        recGroupListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
+    QString item = recGroupListBox->currentText().section(" [", 0, 0);
 
     if (item.left(5) == "-----")
     {
@@ -4152,8 +4151,7 @@ void PlaybackBox::recGroupChooserListBoxChanged(void)
 
 void PlaybackBox::setGroupFilter(void)
 {
-    recGroup =
-        recGroupListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
+    recGroup = recGroupListBox->currentText().section(" [", 0, 0);
 
     if (groupnameAsAllProg)
         groupDisplayName = recGroup;
