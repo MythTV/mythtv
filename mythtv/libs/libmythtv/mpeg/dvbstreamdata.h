@@ -32,7 +32,7 @@ class DVBStreamData : public MPEGStreamData
         if (_nit_version == version)
             return;
         _nit_version = version;
-        init_sections(_nito_section_seen, last_section);
+        init_sections(_nit_section_seen, last_section);
     }
     int  VersionNIT() const { return _nit_version; }
 
