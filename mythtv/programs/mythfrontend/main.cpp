@@ -1138,7 +1138,6 @@ int main(int argc, char **argv)
 
         qApp->setMainWidget(mainWindow);
         qApp->exec();
-        printf("loop!\n");
     } while (!(exitstatus = handleExit()));
 
     if (exitstatus == HALT)
