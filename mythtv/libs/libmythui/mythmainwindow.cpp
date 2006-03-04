@@ -241,7 +241,6 @@ MythMainWindow::MythMainWindow()
     d->escapekey = Key_Escape;
     d->mainStack = NULL;
 
-
     installEventFilter(this);
 
 #ifdef USE_LIRC

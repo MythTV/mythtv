@@ -213,7 +213,7 @@ class MythThemedMenuPrivate
     bool makeRowVisible(int newrow, int oldrow);
 
     bool handleAction(const QString &action);
-    bool findDepends(const QString &file);
+    bool findDepends(const QString &fileList);
     QString findMenuFile(const QString &menuname);
 
     void paintButton(unsigned int button, MythPainter *p, int alpha);
@@ -2258,17 +2258,23 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     return true;   
 }
 
-bool MythThemedMenuPrivate::findDepends(const QString &file)
+bool MythThemedMenuPrivate::findDepends(const QString &fileList)
 {
-    QString filename = findMenuFile(file);
-    if (filename != "" && filename.endsWith(".xml"))
-        return true;
+    QStringList files = QStringList::split(" ", fileList);
+    QString filename;
 
-    QString newname = gContext->FindPlugin(file);
+    for ( QStringList::Iterator it = files.begin(); it != files.end(); ++it ) 
+    {
+        QString filename = findMenuFile(*it);
+        if (filename != "" && filename.endsWith(".xml"))
+            return true;
 
-    QFile checkFile(newname);
-    if (checkFile.exists())
-        return true;
+        QString newname = gContext->FindPlugin(*it);
+
+        QFile checkFile(newname);
+        if (checkFile.exists())
+            return true;
+    }
 
     return false;
 }
