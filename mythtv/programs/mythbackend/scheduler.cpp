@@ -1833,10 +1833,10 @@ void Scheduler::UpdateMatches(int recordid) {
         QString query = QString(
 "INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
 "SELECT RECTABLE.recordid, program.chanid, program.starttime, "
-" IF(search = %1, recordid, 0) "
-"FROM RECTABLE, program ").arg(kManualSearch) + fromclauses[clause] + QString(
-" INNER JOIN channel ON (channel.chanid = program.chanid) "
-"WHERE ") + whereclauses[clause] + QString(" AND channel.visible = 1 AND "
+" IF(search = %1, recordid, 0) ").arg(kManualSearch) + QString(
+"FROM (RECTABLE, program INNER JOIN channel "
+"      ON channel.chanid = program.chanid) ") + fromclauses[clause] + QString(
+" WHERE ") + whereclauses[clause] + QString(" AND channel.visible = 1 AND "
 "((RECTABLE.type = %1 " // allrecord
 "OR RECTABLE.type = %2 " // findonerecord
 "OR RECTABLE.type = %3 " // finddailyrecord
