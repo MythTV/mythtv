@@ -246,7 +246,7 @@ bool ClassicCommDetector::go()
 {
     nvp->SetNullVideo();
     
-    int requiredBuffer = 3;
+    int requiredBuffer = 7;
     int requiredHeadStart = requiredBuffer;
 
     if (commDetectMethod & COMM_DETECT_LOGO)
