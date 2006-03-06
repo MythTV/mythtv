@@ -1646,93 +1646,57 @@ long long ProgramInfo::GetFilesize(void)
 /** \fn ProgramInfo::SetBookmark(long long pos) const
  *  \brief Sets a bookmark position in database.
  *
- *   If this is a %MythTV recording the bookmark is put in the "recorded"
- *   table, if not it is put in the "videobookmarks" table.
  */
 void ProgramInfo::SetBookmark(long long pos) const
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    ClearMarkupMap(MARK_BOOKMARK);
+    frm_dir_map_t bookmarkmap;
+    bookmarkmap[pos] = MARK_BOOKMARK;
+    SetMarkupMap(bookmarkmap);
 
-    // When using mythtv to play files not recorded by myth the title is empty
-    // so bookmark is saved to videobookmarks rather than recorded
-    if (isVideo) 
+    if (!isVideo)
     {
-        //delete any existing bookmark for this file
-        query.prepare("DELETE from videobookmarks"                      
-                      " WHERE filename = :FILENAME ;");                   
-        query.bindValue(":FILENAME", pathname);        
-        if (!query.exec() || !query.isActive())
-        MythContext::DBError("Save position update",
-                             query);
-        //insert new bookmark
-        query.prepare("INSERT into videobookmarks (filename, bookmark)"
-                      "VALUES (:FILENAME , :BOOKMARK);");
-        query.bindValue(":FILENAME", pathname);                                    
-    }
-    else
-    {
+        MSqlQuery query(MSqlQuery::InitCon());
+    
+        // For the time being, note whether a bookmark
+        // exists in the recorded table
         query.prepare("UPDATE recorded"
-                    " SET bookmark = :BOOKMARK"
-                    " WHERE chanid = :CHANID"
-                    " AND starttime = :STARTTIME ;");
+                      " SET bookmark = :BOOKMARKFLAG"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME ;");
+
+        query.bindValue(":BOOKMARKFLAG", pos == 0 ? 0 : 1);
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("bookmark flag update", query);
     }
-        
-    if (pos > 0)
-    {
-        char posstr[128];
-        sprintf(posstr, "%lld", pos);
-        query.bindValue(":BOOKMARK", posstr);
-    }
-    else
-        query.bindValue(":BOOKMARK", QString::null);
-    
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Save position update",
-                             query);
 }
 
 /** \fn ProgramInfo::GetBookmark(void) const
  *  \brief Gets any bookmark position in database,
  *         unless "ignoreBookmark" is set.
  *
- *   If this is a %MythTV recording the bookmark is queried from the "recorded"
- *   table, if not it is queried from the "videobookmarks" table.
  *  \return Bookmark position in bytes if the query is executed and succeeds,
  *          zero otherwise.
  */
 long long ProgramInfo::GetBookmark(void) const
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    QMap<long long, int>::Iterator i;
     long long pos = 0;
 
     if (ignoreBookmark)
         return pos;
+
+    frm_dir_map_t bookmarkmap;
+    GetMarkupMap(bookmarkmap, MARK_BOOKMARK);
     
-    // When using mythtv to play files not recorded by myth the title is empty
-    // so bookmark comes from videobookmarks rather than recorded
-    if (isVideo) 
-    {
-        query.prepare("SELECT bookmark FROM videobookmarks"
-                      " WHERE filename = :FILENAME;");                  
-        query.bindValue(":FILENAME", pathname);        
-    } 
-    else 
-    {
-        query.prepare("SELECT bookmark FROM recorded"
-                    " WHERE chanid = :CHANID"
-                    " AND starttime = :STARTTIME ;");
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts);
-    }
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        QString result = query.value(0).toString();
-        if (!result.isEmpty())
-            sscanf(result.ascii(), "%lld", &pos);
-    }
+    if (bookmarkmap.isEmpty())
+        return pos;
+
+    i = bookmarkmap.begin();
+    pos = i.key();
     
     return pos;
 }
@@ -2028,88 +1992,33 @@ bool ProgramInfo::UsesMaxEpisodes(void) const
 
 void ProgramInfo::GetCutList(frm_dir_map_t &delMap) const
 {
-//    GetMarkupMap(delMap, db, MARK_CUT_START);
-//    GetMarkupMap(delMap, db, MARK_CUT_END, true);
-
-    delMap.clear();
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT cutlist FROM recorded"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-
-        QString cutlist = query.value(0).toString();
-
-        if (cutlist.length() > 1)
-        {
-            QStringList strlist = QStringList::split("\n", cutlist);
-            QStringList::Iterator i;
-
-            for (i = strlist.begin(); i != strlist.end(); ++i)
-            {
-                long long start = 0, end = 0;
-                if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) != 2)
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Malformed cutlist list: %1").arg(*i));
-                }
-                else
-                {
-                    delMap[start] = 1;
-                    delMap[end] = 0;
-                }
-            }
-        }
-    }
+    GetMarkupMap(delMap, MARK_CUT_START);
+    GetMarkupMap(delMap, MARK_CUT_END, true);
 }
 
 void ProgramInfo::SetCutList(frm_dir_map_t &delMap) const
 {
-//    ClearMarkupMap(db, MARK_CUT_START);
-//    ClearMarkupMap(db, MARK_CUT_END);
-//    SetMarkupMap(delMap, db);
+    ClearMarkupMap(MARK_CUT_START);
+    ClearMarkupMap(MARK_CUT_END);
+    SetMarkupMap(delMap);
 
-    QString cutdata;
-    char tempc[256];
-
-    QMap<long long, int>::Iterator i;
-
-    for (i = delMap.begin(); i != delMap.end(); ++i)
+    if (!isVideo)
     {
-        long long frame = i.key();
-        int direction = i.data();
+        MSqlQuery query(MSqlQuery::InitCon());
+    
+        // Flag the existence of a cutlist
+        query.prepare("UPDATE recorded"
+                      " SET cutlist = :CUTLIST"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME ;");
+    
+        query.bindValue(":CUTLIST", delMap.isEmpty() ? 0 : 1);
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
 
-        if (direction == 1)
-        {
-            sprintf(tempc, "%lld - ", frame);
-            cutdata += tempc;
-        }
-        else if (direction == 0)
-        {
-            sprintf(tempc, "%lld\n", frame);
-            cutdata += tempc;
-        }
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("cutlist flag update", query);
     }
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("UPDATE recorded"
-                  " SET cutlist = :CUTLIST"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CUTLIST", cutdata);
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("cutlist update", 
-                             query);
 }
 
 void ProgramInfo::SetCommBreakList(frm_dir_map_t &frames) const
@@ -2167,8 +2076,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
     query.bindValue(":TYPE", type);
     
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("ClearMarkupMap deleting", 
-                             query);
+        MythContext::DBError("ClearMarkupMap deleting", query);
 }
 
 void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
@@ -2188,8 +2096,7 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
         query.bindValue(":STARTTIME", recstartts);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("SetMarkupMap checking record table",
-                                 query);
+            MythContext::DBError("SetMarkupMap checking record table", query);
 
         if (query.size() < 1 || !query.next())
             return;
@@ -2234,8 +2141,7 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
         query.bindValue(":TYPE", mark_type);
        
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("SetMarkupMap inserting", 
-                                 query);
+            MythContext::DBError("SetMarkupMap inserting", query);
     }
 }
 
@@ -3498,7 +3404,7 @@ int ProgramInfo::getProgramFlags(void) const
 {
     int flags = 0;
     MSqlQuery query(MSqlQuery::InitCon());
-    
+
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
                   "editing, bookmark, stereo, closecaptioned, hdtv "
                   "FROM recorded LEFT JOIN recordedprogram ON "
@@ -3513,12 +3419,12 @@ int ProgramInfo::getProgramFlags(void) const
         query.next();
 
         flags |= (query.value(0).toInt() == COMM_FLAG_DONE) ? FL_COMMFLAG : 0;
-        flags |= query.value(1).toString().length() > 1 ? FL_CUTLIST : 0;
+        flags |= (query.value(1).toInt() == 1) ? FL_CUTLIST : 0;
         flags |= query.value(2).toInt() ? FL_AUTOEXP : 0;
         if ((query.value(3).toInt()) ||
             (query.value(0).toInt() == COMM_FLAG_PROCESSING))
             flags |= FL_EDITING;
-        flags |= query.value(4).toString().length() > 1 ? FL_BOOKMARK : 0;
+        flags |= (query.value(4).toInt() == 1) ? FL_BOOKMARK : 0;
         flags |= (query.value(5).toInt() == 1) ? FL_STEREO : 0;
         flags |= (query.value(6).toInt() == 1) ? FL_CC : 0;
         flags |= (query.value(7).toInt() == 1) ? FL_HDTV : 0;

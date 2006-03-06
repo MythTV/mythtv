@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1128";
+const QString currentDatabaseVersion = "1129";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2055,6 +2055,60 @@ static bool doUpgradeTVDatabaseSchema(void)
 ""
 };
         if (!performActualUpdate(updates, "1128", dbver))
+            return false;
+    }
+
+    if (dbver == "1128")
+    {
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT chanid, startime, cutlist FROM recorded"
+                      " WHERE LENGTH(cutlist) > 1;"); 
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            MSqlQuery insert(MSqlQuery::InitCon());
+            while (query.next())
+            {
+                QString cutlist = query.value(2).toString();
+
+                QStringList strlist = QStringList::split("\n", cutlist);
+                QStringList::Iterator i;
+                for (i = strlist.begin(); i != strlist.end(); ++i)
+                {
+                    long long start = 0, end = 0;
+                    if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) == 2)
+                    {
+                        insert.prepare(QString(
+                               "INSERT INTO recordedmarkup (chanid, starttime,"
+                               " type, mark) VALUES (%1, %2, '1', %3);")
+                               .arg(query.value(0).toInt())
+                               .arg(query.value(1).toInt())
+                               .arg(start));
+                        insert.exec();
+
+                        insert.prepare(QString(
+                               "INSERT INTO recordedmarkup (chanid, starttime,"
+                               " type, mark) VALUES (%1, %2, '0', %3);")
+                               .arg(query.value(0).toInt())
+                               .arg(query.value(1).toInt())
+                               .arg(end));
+                        insert.exec();
+                    }
+                }
+            }
+        }
+
+        const QString updates[] = {
+"INSERT INTO recordedmarkup (chanid, starttime, type, mark) SELECT"
+" chanid, starttime, '2', bookmark FROM recorded WHERE bookmark <> 0;",
+"INSERT INTO filemarkup (filename, type, mark) SELECT filename,"
+" '2', bookmark FROM videobookmarks;",
+"DROP TABLE videobookmarks;",
+"ALTER TABLE recorded CHANGE cutlist cutlist TINYINT(1) NOT NULL DEFAULT 0",
+"ALTER TABLE recorded CHANGE bookmark bookmark TINYINT(1) NOT NULL DEFAULT 0",
+""
+};
+        if (!performActualUpdate(updates, "1129", dbver))
             return false;
     }
 

@@ -1046,9 +1046,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             // Taken out of programinfo.cpp just to reduce the number of queries
             int flags = 0;
             flags |= (query.value(10).toInt() == 1) ? FL_COMMFLAG : 0;
-            flags |= query.value(11).toString().length() > 1 ? FL_CUTLIST : 0;
+            flags |= (query.value(11).toInt() == 1) ? FL_CUTLIST : 0;
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
-            flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
+            flags |= (query.value(14).toInt() == 1) ? FL_BOOKMARK : 0;
             flags |= (query.value(32).toInt() == 1) ? FL_STEREO : 0;
             flags |= (query.value(33).toInt() == 1) ? FL_HDTV : 0;
             flags |= (query.value(34).toInt() == 1) ? FL_CC : 0;
