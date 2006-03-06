@@ -3257,6 +3257,10 @@ bool TV::DoNVPSeek(float time)
 
     bool res = false;
 
+    if (LONG_LONG_MIN != audiosyncBaseline)
+        activenvp->SaveAudioTimecodeOffset(activenvp->GetAudioTimecodeOffset()
+            - audiosyncBaseline);
+
     if (time > 0.0)
         res = activenvp->FastForward(time);
     else if (time < 0.0)

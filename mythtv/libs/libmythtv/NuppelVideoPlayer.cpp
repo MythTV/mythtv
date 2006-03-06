@@ -172,6 +172,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Time Code stuff
       prevtc(0),
       tc_avcheck_framecounter(0),   tc_diff_estimate(0),
+      savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
       livetvchain(NULL), m_tv(NULL),
       // DVD stuff
@@ -3465,6 +3466,12 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
         tc_wrap[j] = tc_lastval[j] = 0;
     }
     tc_avcheck_framecounter = 0;
+
+    if (savedAudioTimecodeOffset)
+    {
+        tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
+        savedAudioTimecodeOffset = 0;
+    }
 
     SetPrebuffering(true);
     if (audioOutput)
