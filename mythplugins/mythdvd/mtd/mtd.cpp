@@ -159,7 +159,7 @@ MTD::MTD(int port, bool log_stdout)
     max_concurrent_transcodings = gContext->GetNumSetting("MTDConcurrentTranscodings", 1);
 
     //
-    //  Create a timer to occassionally 
+    //  Create a timer to occasionally 
     //  clean out dead threads
     //
     
@@ -264,7 +264,7 @@ void MTD::cleanThreads()
             }
             else
             {
-                emit writeToLog(QString("job finished succesfully: %1").arg(job_command)); 
+                emit writeToLog(QString("job finished successfully: %1").arg(job_command)); 
             }
             
             //
@@ -856,7 +856,7 @@ void MTD::customEvent(QCustomEvent *ce)
     }
     else
     {
-        cerr << "mtd.o: receiving evenets I don't understand" << endl;
+        cerr << "mtd.o: receiving events I don't understand" << endl;
     }
 }
 

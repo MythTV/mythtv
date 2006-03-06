@@ -35,7 +35,7 @@ TitleDialog::TitleDialog(QSocket *a_socket,
     disc_name = d_name;
     if(disc_name.length() < 1)
     {
-        disc_name = tr("Unkown");
+        disc_name = tr("Unknown");
     }
     dvd_titles = titles;
 

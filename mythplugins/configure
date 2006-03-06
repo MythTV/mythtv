@@ -31,7 +31,7 @@ sdl="yes"
 aac="no"          # compile fails w/libfaad v2.0
 exif="yes"
 newexif="yes"
-festival="no"     # no config detection/setup rutine
+festival="no"     # no config detection/setup routine
 
 targetos=`uname -s`
 case $targetos in

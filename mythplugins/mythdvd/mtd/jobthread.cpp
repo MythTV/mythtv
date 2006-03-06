@@ -220,7 +220,7 @@ namespace
             if (!(m_mutex && m_mutex->locked()))
             {
                 VERBOSE(VB_IMPORTANT,
-                        QString("%1: Invalid mutext passed to MutexUnlocker")
+                        QString("%1: Invalid mutex passed to MutexUnlocker")
                         .arg(__FILE__));
             }
         }
@@ -890,7 +890,7 @@ void DVDTranscodeThread::run()
             }
             else
             {
-                problem("abandonded job because master control said we need to shut down");
+                problem("abandoned job because master control said we need to shut down");
                 return;
             }
         }

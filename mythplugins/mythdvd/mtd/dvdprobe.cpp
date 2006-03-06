@@ -68,7 +68,7 @@ void DVDAudio::fill(audio_attr_t *audio_attributes)
     char a_string[1025];
 
     //
-    //  this just travels down the audio_attributes stuct
+    //  this just travels down the audio_attributes struct
     //  (defined in libdvdread) and ticks off the right
     //  information
     //
@@ -218,7 +218,7 @@ DVDTitle::DVDTitle()
     aspect_ratio = "";
 
     letterbox = false;
-    video_format = "unkown";
+    video_format = "unknown";
     
     dvdinput_id = 0;
 }
@@ -231,7 +231,7 @@ void DVDTitle::setTime(uint h, uint m, uint s, double fr)
     frame_rate = fr;
     
     //
-    //  These are transocde frame rate codes
+    //  These are transcode frame rate codes
     //
     
     if(fr > 23.0 && fr < 24.0)
