@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
+    QMap<QString, QString> settingsOverride;
     QMap<long long, int> deleteMap;
     QMap<long long, long long> posMap;
     srand(time(NULL));
@@ -73,15 +74,6 @@ int main(int argc, char *argv[])
 
     print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";
-
-    //  Load the context
-    gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return TRANSCODE_EXIT_NO_MYTHCONTEXT;
-    }
 
     int found_starttime = 0;
     int found_chanid = 0;
@@ -291,6 +283,39 @@ int main(int argc, char *argv[])
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-O") ||
+                 !strcmp(a.argv()[argpos],"--override-setting"))
+        {
+            if ((a.argc() - 1) > argpos)
+            {
+                QString tmpArg = a.argv()[argpos+1];
+                if (tmpArg.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to "
+                            "-O/--override-setting option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                } 
+ 
+                QStringList pairs = QStringList::split(",", tmpArg);
+                for (unsigned int index = 0; index < pairs.size(); ++index)
+                {
+                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    tokens[0].replace(QRegExp("^[\"']"), "");
+                    tokens[0].replace(QRegExp("[\"']$"), "");
+                    tokens[1].replace(QRegExp("^[\"']"), "");
+                    tokens[1].replace(QRegExp("[\"']$"), "");
+                    settingsOverride[tokens[0]] = tokens[1];
+                }
+            }
+            else
+            { 
+                cerr << "Invalid or missing argument to -O/--override-setting "
+                        "option\n";
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -324,6 +349,26 @@ int main(int argc, char *argv[])
     {
          cerr << "Must specify --fifodir to use --fifosync\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
+    }
+
+    //  Load the context
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if (!gContext->Init(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return TRANSCODE_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(it.data()));
+            gContext->OverrideSettingForSession(it.key(), it.data());
+        }
     }
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));

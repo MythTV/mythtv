@@ -71,12 +71,90 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
+
+    QMap<QString, QString> settingsOverride;
+    int argpos = 1;
+    QString filename = "";
+
+    while (argpos < a.argc())
+    {
+        if (!strcmp(a.argv()[argpos],"-v") ||
+            !strcmp(a.argv()[argpos],"--verbose"))
+        {
+            if ((a.argc() - 1) > argpos)
+            {
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+                    return GENERIC_EXIT_INVALID_CMDLINE;
+
+                ++argpos;
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Missing argument to -v/--verbose option");
+                return COMMFLAG_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-O") ||
+                 !strcmp(a.argv()[argpos],"--override-setting"))
+        {
+            if ((a.argc() - 1) > argpos)
+            {
+                QString tmpArg = a.argv()[argpos+1];
+                if (tmpArg.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to "
+                            "-O/--override-setting option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                } 
+ 
+                QStringList pairs = QStringList::split(",", tmpArg);
+                for (unsigned int index = 0; index < pairs.size(); ++index)
+                {
+                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    tokens[0].replace(QRegExp("^[\"']"), "");
+                    tokens[0].replace(QRegExp("[\"']$"), "");
+                    tokens[1].replace(QRegExp("^[\"']"), "");
+                    tokens[1].replace(QRegExp("[\"']$"), "");
+                    settingsOverride[tokens[0]] = tokens[1];
+                }
+            }
+            else
+            { 
+                cerr << "Invalid or missing argument to -O/--override-setting "
+                        "option\n";
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
+        else if (a.argv()[argpos][0] != '-')
+        {
+            filename = a.argv()[argpos];
+        }
+
+        ++argpos;
+    }
+
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return TV_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(it.data()));
+            gContext->OverrideSettingForSession(it.key(), it.data());
+        }
     }
 
     // Create priveleged thread, then drop privs
@@ -110,8 +188,6 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_AUDIO;
     }
 
-    print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
-
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
@@ -125,10 +201,8 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_TV;
     }
 
-    if (a.argc() > 1)
+    if (filename != "")
     {
-        QString filename = a.argv()[1];
-
         ProgramInfo *pginfo = new ProgramInfo();
         pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
         pginfo->pathname = filename;
@@ -159,3 +233,5 @@ int main(int argc, char *argv[])
 
     return TV_EXIT_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
