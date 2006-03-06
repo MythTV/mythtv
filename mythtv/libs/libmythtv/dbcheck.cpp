@@ -2101,9 +2101,6 @@ static bool doUpgradeTVDatabaseSchema(void)
         const QString updates[] = {
 "INSERT INTO recordedmarkup (chanid, starttime, type, mark) SELECT"
 " chanid, starttime, '2', bookmark FROM recorded WHERE bookmark <> 0;",
-"INSERT INTO filemarkup (filename, type, mark) SELECT filename,"
-" '2', bookmark FROM videobookmarks;",
-"DROP TABLE videobookmarks;",
 "ALTER TABLE recorded CHANGE cutlist cutlist TINYINT(1) NOT NULL DEFAULT 0",
 "ALTER TABLE recorded CHANGE bookmark bookmark TINYINT(1) NOT NULL DEFAULT 0",
 ""
