@@ -149,7 +149,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_cfrom << "";
     m_csql << "program.stars >= 0.75 ";
 
-    m_clause->insertItem(tr("Person named in the credits"));
+    m_clause->insertItem(tr("Person named in the credits (Data Direct)"));
     m_cfrom << ", people, credits";
     m_csql << QString("people.name = 'Tom Hanks' \n"
                       "AND credits.person = people.person \n"
@@ -447,8 +447,8 @@ bool CustomRecord::checkSyntax(void)
     else
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(QString("SELECT NULL FROM program,channel %1 WHERE\n%2") 
-                              .arg(from).arg(desc));
+        query.prepare(QString("SELECT NULL FROM (program,channel) "
+                              "%1 WHERE\n%2").arg(from).arg(desc));
 
         if (query.exec() && query.isActive())
         {
