@@ -308,7 +308,7 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
         { tc_wrap[TC_AUDIO] = LONG_LONG_MIN; return 0L; }
     long long GetAudioTimecodeOffset(void) const 
         { return tc_wrap[TC_AUDIO]; }
-    long long SaveAudioTimecodeOffset(long long v)
+    void SaveAudioTimecodeOffset(long long v)
         { savedAudioTimecodeOffset = v; }
 
     // LiveTV public stuff
