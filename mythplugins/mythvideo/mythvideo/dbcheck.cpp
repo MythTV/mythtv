@@ -8,7 +8,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1007";
+const QString currentDatabaseVersion = "1008";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -202,6 +202,18 @@ void UpgradeVideoDatabaseSchema(void)
 };
 
         performActualUpdate(updates, "1007", dbver);
+    }
+
+    if (dbver == "1007")
+    {
+        const QString updates[] = {
+"INSERT INTO filemarkup (filename, type, mark) SELECT filename,"
+" '2', bookmark FROM videobookmarks;",
+"DROP TABLE videobookmarks;",
+""
+};
+
+        performActualUpdate(updates, "1008", dbver);
     }
 
 }
