@@ -96,7 +96,10 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
             doMenu(true);            
         else if (action == "MENU")
             doMenu(false);
-
+        else if (action == "INCPARENT")
+            setParentalLevel(current_parental_level + 1);
+        else if (action == "DECPARENT")
+            setParentalLevel(current_parental_level - 1);
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4")
         {
