@@ -5787,7 +5787,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
     if (action == "TOGGLECC")
         nvp->ToggleCC(vbimode, 0);
-    if (action == "TOGGLECC708")
+    else if (action == "TOGGLECC708")
         nvp->ToggleEIA708(0);
     else if (action.left(9) == "DISPCC708")
         nvp->ToggleEIA708(action.right(2).toInt());
