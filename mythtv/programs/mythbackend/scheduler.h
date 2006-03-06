@@ -23,8 +23,7 @@ class Scheduler : public QObject
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-              QString recordTbl = "record", MSqlQueryInfo *dbConnUse = NULL,
-              Scheduler *master_sched = NULL);
+              QString recordTbl = "record", Scheduler *master_sched = NULL);
     ~Scheduler();
 
     void Reschedule(int recordid);
