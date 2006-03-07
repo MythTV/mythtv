@@ -6060,7 +6060,7 @@ void TV::BuildOSDTreeMenu(void)
         
         subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
         if (lastProgram != NULL)
-            subitem = new OSDGenericTree(item, tr(lastProgram->title), "JUMPPREV");
+            subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
 
         pbinfoLock.lock();
 
