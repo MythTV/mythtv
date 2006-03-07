@@ -1776,6 +1776,7 @@ int MPEG2fixup::Start()
 
         if (vFrame.count() && (file_end || vFrame.getLast()->isSequence))
         {
+            MPEG2frame *seqFrame;
             if (ptsIncrement != vFrame.first()->mpeg2_seq.frame_period / 300)
             {
                 VERBOSE(MPF_IMPORTANT,
@@ -1785,6 +1786,11 @@ int MPEG2fixup::Start()
                          0, 'f', 2));
             }
             displayFrame->toFirst();
+
+            // since we might reorder the frames when coming out of a cutpoint
+            // me need to save the first frame here, as it is gauranteed to
+            // have a sequence header.
+            seqFrame = vFrame.current();
 
             while (vFrame.current() != vFrame.getLast())
             {
@@ -1941,7 +1947,7 @@ int MPEG2fixup::Start()
 
                         if (! new_discard_state)
                         {
-                            AddSequence(markedFrame, vFrame.first());
+                            AddSequence(markedFrame, seqFrame);
                             RenumberFrames(frame_pos + Lreorder.at(),
                                             - GetFrameNum(markedFrame));
                         }
