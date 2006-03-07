@@ -1922,14 +1922,15 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
         }
         while (tv->getJumpToProgram())
         {
+            lastProgram = tv->getLastProgram();
             ProgramInfo *tmpProgram = new ProgramInfo(*lastProgram);
 
-            if (lastProgram)
-                delete lastProgram;
             lastProgram = new ProgramInfo(*tvrec);
+            tv->setLastProgram(lastProgram);
 
             if (tvrec)
                 delete tvrec;
+
             tvrec = tmpProgram;
 
             if (tv->Playback(tvrec))

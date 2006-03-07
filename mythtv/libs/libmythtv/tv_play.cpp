@@ -172,6 +172,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "NEXTSUBTITLE", "Switch to the next subtitle track", "");
     REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
+    REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");   
  
@@ -246,7 +247,7 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       picAdjustment(kPictureAttribute_None),
       recAdjustment(kPictureAttribute_None),
-      ignoreKeys(false), needToSwapPIP(false),
+      ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
@@ -673,11 +674,6 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil,
 
     dialogname = "allowrecordingbox";
     GetOSD()->NewDialogBox(dialogname, message, options, timeuntil, sel);
-}
-
-void TV::setLastProgram(ProgramInfo *rcinfo)
-{
-    lastProgram = rcinfo;
 }
 
 int TV::Playback(ProgramInfo *rcinfo)
@@ -1697,6 +1693,12 @@ void TV::RunTV(void)
             SwapPIP();
             needToSwapPIP = false;
         }
+
+        if (needToJumpMenu)
+        {
+            DoDisplayJumpMenu();
+            needToJumpMenu = false;
+        }
     }
   
     if (!IsErrored() && (GetState() != kState_None))
@@ -2383,6 +2385,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             wantsToQuit = true;
             jumpToProgram = true;
         }
+        else if (action == "JUMPREC")
+            DisplayJumpMenuSoon();
         else if (action == "SIGNALMON")
         {
             if ((GetState() == kState_WatchingLiveTV) && activerecorder)
@@ -5892,6 +5896,17 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             wantsToQuit = true;
             jumpToProgram = true;
         }
+        else if (action == "JUMPREC")
+            DisplayJumpMenuSoon();
+        else if (action.left(8) == "JUMPPROG")
+        {
+            SetJumpToProgram(action.section(" ",1,-2),
+                             action.section(" ",-1,-1).toInt());
+            nvp->SetBookmark();
+            exitPlayer = true;
+            wantsToQuit = true;
+            jumpToProgram = true;
+        }
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -5911,6 +5926,73 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         tree->SetVisible(false);
         tree->disconnect();
     }
+}
+
+void TV::DoDisplayJumpMenu(void)
+{
+    if (treeMenu)
+        delete treeMenu;
+
+    treeMenu = new OSDGenericTree(NULL, "treeMenu");
+    OSDGenericTree *item, *subitem;
+
+    // Build jumpMenu of recorded program titles
+    ProgramInfo *p;
+    // QMap<QString,ProgramList> progLists;
+    progLists.clear();
+    vector<ProgramInfo *> *infoList;
+    infoList = RemoteGetRecordedList(false);
+
+    if (infoList)
+    {
+        vector<ProgramInfo *>::iterator i = infoList->begin();
+        for ( ; i != infoList->end(); i++)
+        {
+            p = *i;
+            progLists[p->title].prepend(p);
+        }
+
+        QMap<QString,ProgramList>::Iterator Iprog;
+        for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
+        {
+            ProgramList plist = Iprog.data();
+            int progIndex = plist.count();
+            if (progIndex == 1)
+            {
+                item = new OSDGenericTree(treeMenu, tr(Iprog.key()),
+                    QString("JUMPPROG %1 0").arg(Iprog.key()));
+            } 
+            else 
+            {
+                item = new OSDGenericTree(treeMenu, tr(Iprog.key()));
+                for (int i = 0; i < progIndex; i++)
+                {
+                    p = plist.at(i);
+                    if (p->subtitle != "")
+                        subitem = new OSDGenericTree(item, tr(p->subtitle), 
+                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
+                    else 
+                        subitem = new OSDGenericTree(item, tr(p->title), 
+                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
+                }
+            }
+        }
+    } 
+
+    if (GetOSD())
+    {
+        ClearOSD();
+
+        OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
+        if (tree)
+        {
+            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)), 
+                    this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
+
+            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
+                    this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *)));
+        }
+    } 
 }
 
 void TV::ShowOSDTreeMenu(void)
@@ -5974,8 +6056,11 @@ void TV::BuildOSDTreeMenu(void)
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
 
+        item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
+        
+        subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
         if (lastProgram != NULL)
-            item = new OSDGenericTree(treeMenu, tr("Previous Recording"), "JUMPPREV");
+            subitem = new OSDGenericTree(item, tr(lastProgram->title), "JUMPPREV");
 
         pbinfoLock.lock();
 
@@ -6328,6 +6413,16 @@ void TV::SetManualZoom(bool zoomON)
         GetOSD()->ShowStatus(posInfo, false, desc, 1);
         update_osd_pos = false;
     }
+}
+
+void TV::SetJumpToProgram(QString progKey, int progIndex)
+{
+    QMap<QString,ProgramList>::Iterator Iprog;
+    Iprog = progLists.find(progKey);
+    ProgramList plist = Iprog.data();
+    ProgramInfo *p = plist.at(progIndex);
+    VERBOSE(VB_IMPORTANT, QString("Switching to program: %1: %2").arg(p->title).arg(p->subtitle));
+    setLastProgram(p);
 }
 
 void TV::ToggleSleepTimer(const QString time)

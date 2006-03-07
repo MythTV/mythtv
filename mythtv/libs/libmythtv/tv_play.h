@@ -15,6 +15,7 @@
 #include "mythdeque.h"
 #include "tv.h"
 #include "util.h"
+#include "programinfo.h"
 
 #include <qobject.h>
 
@@ -108,7 +109,8 @@ class TV : public QObject
     // Recording commands
     int  PlayFromRecorder(int recordernum);
     int  Playback(ProgramInfo *rcinfo);
-    void setLastProgram(ProgramInfo *rcinfo);
+    void setLastProgram(ProgramInfo *rcinfo) { lastProgram = rcinfo; }
+    ProgramInfo *getLastProgram(void) { return lastProgram; }
 
     // Various commands
     void ShowNoRecorderDialog(void);
@@ -282,6 +284,9 @@ class TV : public QObject
     };
     void SetAutoCommercialSkip(enum commSkipMode skipMode = CommSkipOff);
     void SetManualZoom(bool zoomON = false);
+
+    void DoDisplayJumpMenu(void);
+    void SetJumpToProgram(QString progKey = "", int progIndex = 0);
  
     bool ClearOSD(void);
     void ToggleOSD(bool includeStatusOSD); 
@@ -308,6 +313,7 @@ class TV : public QObject
     void ToggleActiveWindow(void);
     void SwapPIP(void);
     void SwapPIPSoon(void) { needToSwapPIP = true; }
+    void DisplayJumpMenuSoon(void) { needToJumpMenu = true; }
 
     void ToggleAutoExpire(void);
 
@@ -396,6 +402,8 @@ class TV : public QObject
 
     bool ignoreKeys;
     bool needToSwapPIP;
+    bool needToJumpMenu;
+    QMap<QString,ProgramList> progLists;
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.
@@ -513,6 +521,7 @@ class TV : public QObject
     // OSD info
     QString         dialogname; ///< Name of current OSD dialog
     OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
+
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.
     UDPNotify      *udpnotify;
