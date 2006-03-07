@@ -653,6 +653,9 @@ int main(int argc, char *argv[])
     QString starttime;
     QString allStart = "19700101000000";
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
+    int jobID = -1;
+    int jobType = JOB_NONE;
+    QDir fullfile;
     time_t time_now;
     bool allRecorded = false;
     bool queueJobInstead = false;
@@ -700,28 +703,7 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos],"-f") ||
                  !strcmp(a.argv()[argpos],"--file"))
-        {
-            QDir fullfile(a.argv()[++argpos]);
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT chanid, starttime FROM recorded "
-                          "WHERE basename = :BASENAME ;");
-            query.bindValue(":BASENAME", fullfile.dirName());
-
-            if (query.exec() && query.isActive() && query.size() > 0 &&
-                query.next())
-            {
-                chanid = query.value(0).toString();
-                starttime =
-                    query.value(1).toDateTime().toString("yyyyMMddhhmmss");
-            }
-            else
-            {
-                cerr << "mythcommflag: ERROR: Unable to find DB info for "
-                     << fullfile.dirName() << endl;
-                return COMMFLAG_EXIT_NO_PROGRAM_DATA;
-            }
-        }
+            fullfile = a.argv()[++argpos];
         else if (!strcmp(a.argv()[argpos],"--video"))
         {
             filename = (a.argv()[++argpos]);
@@ -749,20 +731,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--setcutlist"))
             newCutList = (a.argv()[++argpos]);
         else if (!strcmp(a.argv()[argpos], "-j"))
-        {
-            int jobID = QString(a.argv()[++argpos]).toInt();
-            int jobType = JOB_NONE;
-
-            if ( !JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
-            {
-                cerr << "mythcommflag: ERROR: Unable to find DB info for "
-                     << "JobQueue ID# " << jobID << endl;
-                return COMMFLAG_EXIT_NO_PROGRAM_DATA;
-            }
-
-            inJobQueue = true;
-            force = true;
-        }
+            jobID = QString(a.argv()[++argpos]).toInt();
         else if (!strcmp(a.argv()[argpos], "--all"))
         {
             allRecorded = true;
@@ -970,6 +939,42 @@ int main(int argc, char *argv[])
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
                                           .arg(it.key()).arg(it.data()));
             gContext->OverrideSettingForSession(it.key(), it.data());
+        }
+    }
+
+    if (jobID != -1)
+    {
+        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
+        {
+            inJobQueue = true;
+            force = true;
+        }
+        else
+        {
+            cerr << "mythcommflag: ERROR: Unable to find DB info for "
+                 << "JobQueue ID# " << jobID << endl;
+            return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+        }
+    }
+
+    if (fullfile.path() != ".")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT chanid, starttime FROM recorded "
+                      "WHERE basename = :BASENAME ;");
+        query.bindValue(":BASENAME", fullfile.dirName());
+
+        if (query.exec() && query.isActive() && query.size() > 0 &&
+            query.next())
+        {
+            chanid = query.value(0).toString();
+            starttime = query.value(1).toDateTime().toString("yyyyMMddhhmmss");
+        }
+        else
+        {
+            cerr << "mythcommflag: ERROR: Unable to find DB info for "
+                 << fullfile.dirName() << endl;
+            return COMMFLAG_EXIT_NO_PROGRAM_DATA;
         }
     }
 

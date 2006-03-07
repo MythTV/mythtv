@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     int jobID = -1;
+    QDateTime startts;
+    int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
     bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
@@ -115,21 +117,7 @@ int main(int argc, char *argv[])
             }
         } 
         else if (!strcmp(a.argv()[argpos], "-j"))
-        { 
-            QDateTime startts;
             jobID = QString(a.argv()[++argpos]).toInt();
-            int jobType = JOB_NONE;
-            
-            if ( !JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
-            {
-                cerr << "mythtranscode: ERROR: Unable to find DB info for "
-                     << "JobQueue ID# " << jobID << endl;
-                return TRANSCODE_EXIT_NO_RECORDING_DATA;
-            }
-            starttime = startts.toString(Qt::ISODate);
-            found_starttime = 1;
-            found_chanid = 1;
-        }
         else if (!strcmp(a.argv()[argpos],"-i") ||
                  !strcmp(a.argv()[argpos],"--infile")) 
         {
@@ -324,6 +312,42 @@ int main(int argc, char *argv[])
         }
     }
 
+    //  Load the context
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if (!gContext->Init(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return TRANSCODE_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(it.data()));
+            gContext->OverrideSettingForSession(it.key(), it.data());
+        }
+    }
+
+    if (jobID != -1)
+    {
+        if (JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
+        {
+            starttime = startts.toString(Qt::ISODate);
+            found_starttime = 1;
+            found_chanid = 1;
+        }
+        else
+        {
+            cerr << "mythtranscode: ERROR: Unable to find DB info for "
+                 << "JobQueue ID# " << jobID << endl;
+            return TRANSCODE_EXIT_NO_RECORDING_DATA;
+        }
+    }
+
     if ((! found_infile && !(found_chanid && found_starttime)) ||
         (found_infile && (found_chanid || found_starttime)) ) 
     {
@@ -349,26 +373,6 @@ int main(int argc, char *argv[])
     {
          cerr << "Must specify --fifodir to use --fifosync\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
-    }
-
-    //  Load the context
-    gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init(false))
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return TRANSCODE_EXIT_NO_MYTHCONTEXT;
-    }
-
-    if (settingsOverride.size())
-    {
-        QMap<QString, QString>::iterator it;
-        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
-        }
     }
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
