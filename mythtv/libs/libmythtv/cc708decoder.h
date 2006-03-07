@@ -84,8 +84,7 @@ class CC708Decoder
   public:
     CC708Decoder(CC708Reader *ccr) : reader(ccr)
         { bzero(&partialPacket, sizeof(CaptionPacket)); }
-
-    ~CC708Decoder();
+   ~CC708Decoder() {}
 
     void decode_cc_data(uint cc_type, uint data1, uint data2);
 
