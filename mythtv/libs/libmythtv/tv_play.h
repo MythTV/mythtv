@@ -259,6 +259,7 @@ class TV : public QObject
     void DoArbSeek(ArbSeekWhence whence);
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
+    void ToggleTimeStretch(void);
     void ChangeTimeStretch(int dir, bool allowEdit = true);
     void ChangeAudioSync(int dir, bool allowEdit = true);
     float StopFFRew(void);

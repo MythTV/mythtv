@@ -2223,16 +2223,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "ADJUSTSTRETCH")
             ChangeTimeStretch(0);   // just display
         else if (action == "TOGGLESTRETCH")
-        {
-            if (normal_speed == 1.0f)
-                normal_speed = prev_speed;
-            else
-            {
-                prev_speed = normal_speed;
-                normal_speed = 1.0f;
-            }
-            ChangeTimeStretch(0, false);
-        }
+            ToggleTimeStretch();
         else if (action == "CYCLECOMMSKIPMODE") {
             SetAutoCommercialSkip((enum commSkipMode)
                                   ((autoCommercialSkip + 1) % CommSkipModes));
@@ -4902,6 +4893,18 @@ void TV::ChangeVolume(bool up)
     }
 }
 
+void TV::ToggleTimeStretch(void)
+{
+    if (normal_speed == 1.0f)
+        normal_speed = prev_speed;
+    else
+    {
+        prev_speed = normal_speed;
+        normal_speed = 1.0f;
+    }
+    ChangeTimeStretch(0, false);
+}
+
 void TV::ChangeTimeStretch(int dir, bool allowEdit)
 {
     float new_normal_speed = normal_speed + 0.05*dir;
@@ -5797,6 +5800,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         nvp->ToggleCC(vbimode, action.right(1).toInt() + 4);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
+    else if (action == "TOGGLESTRETCH")
+        ToggleTimeStretch();
     else if (action.left(13) == "ADJUSTSTRETCH")
     {
         bool floatRead;
@@ -6129,6 +6134,7 @@ void TV::BuildOSDTreeMenu(void)
     int speedX100 = (int)(round(normal_speed * 100));
 
     item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "ADJUSTSTRETCH");
+    subitem = new OSDGenericTree(item, tr("Toggle"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("Adjust"), "ADJUSTSTRETCH");
     subitem = new OSDGenericTree(item, tr("0.5X"), "ADJUSTSTRETCH0.5",
                                  (speedX100 == 50) ? 1 : 0, NULL,
