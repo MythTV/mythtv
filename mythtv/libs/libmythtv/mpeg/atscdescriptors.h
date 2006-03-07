@@ -15,23 +15,6 @@ using namespace std;
 
 typedef QMap<int, const unsigned char*> IntToBuf;
 
-class ISO639LanguageCode {
-  public:
-    ISO639LanguageCode(const unsigned char* data) : _data(data) { ; }
-    QString toString() const;
-
-    // 3 first bytes are code
-    const unsigned char* CodeRaw() const { return _data; }
-
-    // code in QString format
-    QString Code() const {
-        const char code[] = { _data[0], _data[1], _data[2], 0 };
-        return QString((const char*)code);
-    }
-  private:
-    const unsigned char* _data;
-};
-
 class MultipleStringStructure {
   public:
     MultipleStringStructure(const unsigned char* data) : _data(data) {
@@ -41,9 +24,15 @@ class MultipleStringStructure {
     int StringCount() const { return _data[0]; }
     //uimsbf for (i= 0;i< number_strings;i++) {
     //  ISO_639_language_code 24;
-    const ISO639LanguageCode LanguageCode(int i) const {
-        return ISO639LanguageCode(Offset(i,-1));
-    }
+    int LanguageKey(int i) const
+        { return iso639_str3_to_key(Offset(i,-1)); }
+    QString LanguageString(int i) const
+        { return iso639_key_to_str3(LanguageKey(i)); }
+    int CanonicalLanguageKey(int i) const
+        { return iso639_key_to_canonical_key(LanguageKey(i)); }
+    QString CanonicalLanguageString(int i) const
+        { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
+    //   uimsbf cc_type         1  3.0
 
     //  uimsbf number_segments 8;
     uint SegmentCount(int i) const {
@@ -78,73 +67,63 @@ class MultipleStringStructure {
     mutable IntToBuf _ptrs;
 };
 
-class CaptionServiceDescriptor : public MPEGDescriptor {
-    mutable IntToBuf _ptrs;
+class CaptionServiceDescriptor : public MPEGDescriptor
+{
   public:
     CaptionServiceDescriptor(const unsigned char* data) :
-        MPEGDescriptor(data) {
+        MPEGDescriptor(data)
+    {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
         assert(DescriptorID::caption_service == DescriptorTag());
+        Parse();
     // descriptor_length        8   1.0
     }
+
     // reserved                 3   2.0       0x07
     // number_of_services       5   2.3
     uint ServicesCount() const { return _data[2]&0x1f; }
     //uimsbf for (i=0;i<number_of_services;i++) {
     //   language             8*3  0.0
-    const ISO639LanguageCode Language(int i) const {
-        return ISO639LanguageCode(Offset(i,-1));
-    }
+    int LanguageKey(int i) const
+        { return iso639_str3_to_key(Offset(i,-1)); }
+    QString LanguageString(int i) const
+        { return iso639_key_to_str3(LanguageKey(i)); }
+    int CanonicalLanguageKey(int i) const
+        { return iso639_key_to_canonical_key(LanguageKey(i)); }
+    QString CanonicalLanguageString(int i) const
+        { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   uimsbf cc_type         1  3.0
-    bool Type(int i) const {
-        return ((Offset(i,-1)[3])>>7)&1;
-    }
+    bool Type(int i) const
+        { return ((Offset(i,-1)[3])>>7) & 1; }
     //   bslbf reserved         1  3.1           1
     //   if (cc_type==line21) {
     //      reserved            5  3.2        0x1f
     //      line21_field        1  3.7
-    bool Line21Field(int i) const {
-        return bool(((Offset(i,-1)[3]))&1);
-    }
+    bool Line21Field(int i) const
+        { return bool(((Offset(i,-1)[3])) & 1); }
     //   } else
     //      cap_service_number  6  3.2
-    int CaptionServiceNumber(int i) const {
-        return ((Offset(i,-1)[3]))&0x3f;
-    }
+    int CaptionServiceNumber(int i) const
+        { return ((Offset(i,-1)[3])) & 0x3f; }
     //   easy_reader            1  4.0
-    bool EasyReader(int i) const {
-        return bool(((Offset(i,-1)[4])>>7)&1);
-    }
+    bool EasyReader(int i) const
+        { return bool(((Offset(i,-1)[4])>>7) & 1); }
     //   wide_aspect_ratio      1  4.1
-    bool WideAspectRatio(int i) const {
-        return bool(((Offset(i,-1)[4])>>6)&1);
-    }
+    bool WideAspectRatio(int i) const
+        { return bool(((Offset(i,-1)[4])>>6) & 1); }
     //   reserved              14  4.2      0x3fff
     //}                            6.0
-    void Parse() const;
-    QString toString() const {
-        Parse();
-        QString str("Caption Service Descriptor  ");
-        str.append(QString("services(%2)").arg(ServicesCount()));
-        for (uint i=0; i<ServicesCount(); i++) {
-            str.append(QString("\n     lang(%1) type(%2) ").
-                       arg(Language(i).Code()).arg(Type(i)));
-            str.append(QString("easy_reader(%1) wide(%2) ").
-                       arg(EasyReader(i)).arg(WideAspectRatio(i)));
-            if (Type(i))
-                str.append(QString("service_num(%1)")
-                           .arg(CaptionServiceNumber(i)));
-            else
-                str.append(QString("line_21_field(%1)").arg(Line21Field(i)));
-        }
-        return str;
-    }
-  protected:
-    int Index(int i, int j) const { return (i<<8)|(j&0xff); }
-    const unsigned char* Offset(int i, int j) const {
-        return _ptrs[Index(i,j)];
-    }    
+    void Parse(void) const;
+    QString toString() const;
+
+  private:
+    int Index(int i, int j) const { return (i<<8) | (j & 0xff); }
+    const unsigned char* Offset(int i, int j) const
+        { return _ptrs[Index(i,j)]; }    
+
+  private:
+    mutable IntToBuf _ptrs;
 };
 
 class ContentAdvisoryDescriptor : public MPEGDescriptor

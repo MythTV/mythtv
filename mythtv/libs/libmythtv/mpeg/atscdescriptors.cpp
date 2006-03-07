@@ -78,11 +78,6 @@ QString AudioStreamDescriptor::toString() const {
     return str;
 }
 
-QString ISO639LanguageCode::toString() const
-{
-    return iso639_str_toName(_data);
-}
-
 QString MultipleStringStructure::CompressionTypeString(int i, int j) const {
     int ct = CompressionType(i, j);
     if (0==ct) return QString("no compression");
@@ -104,15 +99,37 @@ void MultipleStringStructure::Parse() const {
     }
 }
 
-void CaptionServiceDescriptor::Parse() const {
+void CaptionServiceDescriptor::Parse(void) const
+{
     _ptrs.clear();
     _ptrs[Index(0,-1)] = _data+3;
-    for (uint i=0; i<ServicesCount(); i++) {
+
+    for (uint i = 0; i < ServicesCount(); i++)
         _ptrs[Index(i+1,-1)] = Offset(i,-1) + 6;
-    }
 }
 
-void ContentAdvisoryDescriptor::Parse() const
+QString CaptionServiceDescriptor::toString(void) const
+{
+    QString str("Caption Service Descriptor  ");
+    str.append(QString("services(%2)").arg(ServicesCount()));
+
+    for (uint i = 0; i < ServicesCount(); i++)
+    {
+        str.append(QString("\n     lang(%1) type(%2) ")
+                   .arg(LanguageString(i)).arg(Type(i)));
+        str.append(QString("easy_reader(%1) wide(%2) ")
+                   .arg(EasyReader(i)).arg(WideAspectRatio(i)));
+        if (Type(i))
+            str.append(QString("service_num(%1)")
+                       .arg(CaptionServiceNumber(i)));
+        else
+            str.append(QString("line_21_field(%1)").arg(Line21Field(i)));
+    }
+
+    return str;
+}
+
+void ContentAdvisoryDescriptor::Parse(void) const
 {
     _ptrs.clear();
     _ptrs[Index(0,-1)] = _data + 2;
@@ -173,23 +190,33 @@ void MultipleStringStructure::printShort() const {
     }
 }
 */
-QString MultipleStringStructure::toString() const {
+
+QString MultipleStringStructure::toString() const
+{
     QString str;
-    if (1==StringCount() && 1==SegmentCount(0)) {
-        str.append(QString("lang(%1) ").arg(LanguageCode(0).toString()));
-        if (0!=Bytes(0,0))
+    if (1 == StringCount() && 1 == SegmentCount(0))
+    {
+        str.append(QString("lang(%1) ").arg(LanguageString(0)));
+        if (0 != Bytes(0,0))
             str.append(CompressedString(0,0));
         return str;
     }
-    str.append(QString("MultipleStringStructure    count(%1)").arg(StringCount()));
-    for (int i=0; i<StringCount(); i++) {
-        str.append(QString(" String #%1 lang(%2:%3)").arg(i).
-                   arg(LanguageCode(i).toString()).arg(LanguageCode(i).Code()));
-        if (SegmentCount(i)>1)
+
+    str.append(QString("MultipleStringStructure    count(%1)")
+               .arg(StringCount()));
+
+    for (int i = 0; i < StringCount(); i++)
+    {
+        str.append(QString(" String #%1 lang(%2:%3)")
+                   .arg(i).arg(LanguageString(i))
+                   .arg(LanguageKey(i)));
+
+        if (SegmentCount(i) > 1)
             str.append(QString("  segment count(%1)").arg(SegmentCount(i)));
+
         for (uint j=0; j<SegmentCount(i); j++)
-            str.append(QString("  Segment #%1  ct(%2) str(%3)").arg(j).
-                       arg(CompressionType(i,j)).arg(CompressedString(i,j)));
+            str.append(QString("  Segment #%1  ct(%2) str(%3)").arg(j)
+                       .arg(CompressionType(i,j)).arg(CompressedString(i,j)));
     }
     return str;
 }
