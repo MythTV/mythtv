@@ -178,10 +178,15 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     // "Specification for Service Information in Digital Video Broadcasting"
     // to convert from Modified Julian Date to Year, Month, Day.
 
+    const float tmpA = 1.0 / 365.25;
+    const float tmpB = 1.0 / 30.6001;
+
     float mjd = (buf[0] << 8) | buf[1];
-    int year  = (int) ((mjd - 15078.2) / 365.25);
-    int month = (int) ((mjd - 14956.1 - (int) (year * 365.25)) / 30.6001);
-    int day   = mjd - 14956 - (int) (year * 365.25) - (int) (month * 30.6001);
+    int year  = (int) truncf((mjd - 15078.2f) * tmpA);
+    int month = (int) truncf(
+        (mjd - 14956.1f - truncf(year * 365.25f)) * tmpB);
+    int day   = (int) truncf(
+        (mjd - 14956.0f - truncf(year * 365.25f) - truncf(month * 30.6001f)));
     int i     = (month == 14 || month == 15) ? 1 : 0;
 
     QDate date(1900 + year + i, month - 1 - i * 12, day);
