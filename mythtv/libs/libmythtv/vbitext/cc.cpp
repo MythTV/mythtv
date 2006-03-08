@@ -58,16 +58,16 @@ static int parityok(int n)	/* check parity for 2 bytes packed in n */
 }
 
 
-static int decodebit(unsigned char *data, int threshold)
+static int decodebit(unsigned char *data, int threshold, int scale1)
 {
     int i, sum = 0;
-    for (i = 0; i < 23; i++)
+    for (i = 0; i < scale1; i++)
 	sum += data[i];
-    return (sum > threshold * 23);
+    return (sum > threshold * scale1);
 }
 
 
-static int decode(unsigned char *vbiline)
+static int decode(unsigned char *vbiline, int scale0, int scale1)
 {
     int max[7], min[7], val[7], i, clk, tmp, sample, packedbits = 0;
 
@@ -107,9 +107,9 @@ static int decode(unsigned char *vbiline)
 
     for (i = min[6]; vbiline[i] < sample; i++);
 
-    tmp = i + 57;
+    tmp = i + scale0;
     for (i = 0; i < 16; i++)
-	if (decodebit(&vbiline[tmp + i * 57], sample))
+	if (decodebit(&vbiline[tmp + i * scale0], sample, scale1))
 	    packedbits |= 1 << i;
     return packedbits & parityok(packedbits);
 }
@@ -236,6 +236,6 @@ void cc_decode(struct cc *cc)
     int sl     = cc->start_line;
     int l21_f1 = spl * (21 - sl);
     int l21_f2 = spl * (cc->line_count + 21 - sl);
-    cc->code1 = decode((unsigned char *)(cc->buffer + l21_f1));
-    cc->code2 = decode((unsigned char *)(cc->buffer + l21_f2));
+    cc->code1 = decode((unsigned char *)(cc->buffer + l21_f1), cc->scale0, cc->scale1);
+    cc->code2 = decode((unsigned char *)(cc->buffer + l21_f2), cc->scale0, cc->scale1);
 }

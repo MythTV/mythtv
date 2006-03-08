@@ -16,6 +16,7 @@ struct cc
     int samples_per_line;
     int start_line;
     int line_count;
+    int scale0, scale1;
 };
 
 int cc_decode(unsigned char *vbiline);

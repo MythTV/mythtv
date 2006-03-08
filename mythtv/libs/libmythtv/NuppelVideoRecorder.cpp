@@ -2601,6 +2601,8 @@ void NuppelVideoRecorder::doVbiThread(void)
         ntsc_cc->samples_per_line = vfmt.samples_per_line;
         ntsc_cc->start_line       = vfmt.start[0];
         ntsc_cc->line_count       = vfmt.count[0];
+        ntsc_cc->scale0           = (vfmt.sampling_rate + 503488 / 2) / 503488;
+        ntsc_cc->scale1           = (ntsc_cc->scale0 * 2 + 3) / 5; /* 40% */
         ptr_end = ntsc_cc->buffer + sz;
         if (sz > CC_VBIBUFSIZE)
         {
