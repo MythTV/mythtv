@@ -5792,10 +5792,11 @@ void TV::DoDisplayJumpMenu(void)
 
     // Build jumpMenu of recorded program titles
     ProgramInfo *p;
-    // QMap<QString,ProgramList> progLists;
     progLists.clear();
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(false);
+
+    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
     if (infoList)
     {
@@ -5803,7 +5804,8 @@ void TV::DoDisplayJumpMenu(void)
         for ( ; i != infoList->end(); i++)
         {
             p = *i;
-            progLists[p->title].prepend(p);
+            if (p->recgroup != "LiveTV" || LiveTVInAllPrograms)
+                progLists[p->title].prepend(p);
         }
 
         QMap<QString,ProgramList>::Iterator Iprog;
