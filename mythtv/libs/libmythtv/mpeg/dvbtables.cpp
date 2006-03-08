@@ -1,5 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
+
+#include <cmath>
+
 #include "dvbtables.h"
 #include "dvbdescriptors.h"
 #include "qstring.h"
