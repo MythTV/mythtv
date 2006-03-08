@@ -59,7 +59,7 @@ class PESPacket
           _pesdataSize(0), _allocSize(0)
     {
         _badPacket = !VerifyCRC();
-        _pesdataSize = max(Length()-1 + (HasCRC() ? 4 : 0), (uint)0);
+        _pesdataSize = max(((int)Length())-1 + (HasCRC() ? 4 : 0), (int)0);
     }
 
   private:
@@ -211,6 +211,8 @@ class PESPacket
 
     uint CRC() const 
     {
+        if (!HasCRC() || (Length() < 1))
+            return 0;
         uint offset = Length() - 1;
         return ((_pesdata[offset+0]<<24) |
                 (_pesdata[offset+1]<<16) |
@@ -219,16 +221,13 @@ class PESPacket
     }
 
     uint CalcCRC() const
-        { return mpegts_crc32(_pesdata, Length()-1); }
-
-    void SetCRC(uint crc)
     {
-        uint offset = Length() - 1;
-        _pesdata[offset+0] = (crc & 0xff000000) >> 24;
-        _pesdata[offset+1] = (crc & 0x00ff0000) >> 16;
-        _pesdata[offset+2] = (crc & 0x0000ff00) >> 8;
-        _pesdata[offset+3] = (crc & 0x000000ff);
+        if (Length() < 1)
+            return 0xffffffff;
+        return mpegts_crc32(_pesdata, Length() - 1);
     }
+
+    void SetCRC(uint crc);
 
     void SetPSIOffset(uint offset)
     {

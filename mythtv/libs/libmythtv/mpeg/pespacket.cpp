@@ -78,7 +78,17 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
     return false;
 }
 
-/// These are pixel aspect ratios
+void PESPacket::SetCRC(uint crc)
+{
+    assert(Length() >= 1);
+    uint offset = Length() - 1;
+    _pesdata[offset+0] = (crc & 0xff000000) >> 24;
+    _pesdata[offset+1] = (crc & 0x00ff0000) >> 16;
+    _pesdata[offset+2] = (crc & 0x0000ff00) >> 8;
+    _pesdata[offset+3] = (crc & 0x000000ff);
+}
+
+// These are pixel aspect ratios
 const float SequenceHeader::mpeg1_aspect[16] =
 {
     0.0000f,       1.0000f,       0.6735f,       0.7031f,
