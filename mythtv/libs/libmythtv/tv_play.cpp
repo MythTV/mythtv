@@ -5665,9 +5665,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
     QString action = item->getAction();
 
-    handled = HandleTrackAction(action);
-
-    if (handled)
+    if (HandleTrackAction(action))
         ;
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
