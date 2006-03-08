@@ -78,7 +78,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     contentTotalLines = 0;
     contentSize = 0;
     contentMid = 0;
-    min_level = gContext->GetNumSetting("LogDefaultView",1);
+    min_level = gContext->GetNumSetting("LogDefaultView",5);
     my_parent = parent;
     clicked();
 
