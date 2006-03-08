@@ -174,9 +174,21 @@ bool DVBEventInformationTable::IsEIT(uint table_id)
  */
 QDateTime dvbdate2qt(const unsigned char *buf)
 {
-    // TODO: clean this up some since its sort of a mess right now
-    // Original function taken from dvbdate.c in linuxtv-apps code
+    uint mjd = (buf[0] << 8) | buf[1];
+    if (mjd >= 40587)
+    {
+        QDateTime result;
+ 	// Modified Julian date as number of days since 17th November 1858.
+ 	// 1st Jan 1970 was date 40587.
+ 	uint secsSince1970 = (mjd - 40587)   * 86400;
+ 	secsSince1970 += byteBCD2int(buf[2]) * 3600;
+        secsSince1970 += byteBCD2int(buf[3]) * 60;
+        secsSince1970 += byteBCD2int(buf[4]);
+ 	result.setTime_t(secsSince1970);
+ 	return result;
+    }
 
+    // Original function taken from dvbdate.c in linuxtv-apps code
     // Use the routine specified in ETSI EN 300 468 V1.4.1,
     // "Specification for Service Information in Digital Video Broadcasting"
     // to convert from Modified Julian Date to Year, Month, Day.
@@ -184,12 +196,12 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     const float tmpA = 1.0 / 365.25;
     const float tmpB = 1.0 / 30.6001;
 
-    float mjd = (buf[0] << 8) | buf[1];
-    int year  = (int) truncf((mjd - 15078.2f) * tmpA);
+    float mjdf = mjd;
+    int year  = (int) truncf((mjdf - 15078.2f) * tmpA);
     int month = (int) truncf(
-        (mjd - 14956.1f - truncf(year * 365.25f)) * tmpB);
+        (mjdf - 14956.1f - truncf(year * 365.25f)) * tmpB);
     int day   = (int) truncf(
-        (mjd - 14956.0f - truncf(year * 365.25f) - truncf(month * 30.6001f)));
+        (mjdf - 14956.0f - truncf(year * 365.25f) - truncf(month * 30.6001f)));
     int i     = (month == 14 || month == 15) ? 1 : 0;
 
     QDate date(1900 + year + i, month - 1 - i * 12, day);
