@@ -663,6 +663,15 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         for (idx = 0; idx < last_item; idx++)
             mpegts_add_stream(mpegts_ctx, &items[idx]);
 
+        /* cache pmt */
+        void *tmp0 = avctx->cur_pmt_sect;
+        void *tmp1 = av_malloc(section_len);
+        memcpy(tmp1, section, section_len);
+        avctx->cur_pmt_sect = (uint8_t*) tmp1;
+        avctx->cur_pmt_sect_len = section_len;
+        if (tmp0)
+            av_free(tmp0);
+
         /* notify stream_changed listeners */
         if (avctx->streams_changed)
         {

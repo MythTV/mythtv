@@ -2329,6 +2329,9 @@ void av_close_input_file(AVFormatContext *s)
         url_fclose(&s->pb);
     }
     av_freep(&s->priv_data);
+    /* free mpeg-ts pmt section */
+    if (s->cur_pmt_sect)
+        av_free(s->cur_pmt_sect);
     av_free(s);
 }
 

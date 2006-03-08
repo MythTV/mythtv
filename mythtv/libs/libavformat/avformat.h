@@ -338,8 +338,12 @@ typedef struct AVFormatContext {
     int max_delay;
 
     int build_index;
+
+    /* mpeg-ts support */
     void (*streams_changed)(void*);
     void *stream_change_data;
+    const uint8_t *cur_pmt_sect;
+    int cur_pmt_sect_len;
 
 #define AVFMT_NOOUTPUTLOOP -1
 #define AVFMT_INFINITEOUTPUTLOOP 0
