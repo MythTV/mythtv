@@ -1925,6 +1925,9 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
             lastProgram = tv->getLastProgram();
             ProgramInfo *tmpProgram = new ProgramInfo(*lastProgram);
 
+            if (lastProgram)
+                delete lastProgram;
+
             lastProgram = new ProgramInfo(*tvrec);
             tv->setLastProgram(lastProgram);
 

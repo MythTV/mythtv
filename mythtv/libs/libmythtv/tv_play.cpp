@@ -6248,7 +6248,7 @@ void TV::SetJumpToProgram(QString progKey, int progIndex)
     ProgramList plist = Iprog.data();
     ProgramInfo *p = plist.at(progIndex);
     VERBOSE(VB_IMPORTANT, QString("Switching to program: %1: %2").arg(p->title).arg(p->subtitle));
-    setLastProgram(p);
+    setLastProgram(new ProgramInfo(*p));
 }
 
 void TV::ToggleSleepTimer(const QString time)
