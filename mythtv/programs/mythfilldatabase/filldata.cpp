@@ -3858,7 +3858,6 @@ int main(int argc, char *argv[])
              VERBOSE(VB_IMPORTANT, "Failed to fetch some program info");
              gContext->LogEntry("mythfilldatabase", LP_WARNING,
                                 "Failed to fetch some program info", "");
-             return FILLDB_EXIT_DB_ERROR;
         }
         else
             VERBOSE(VB_IMPORTANT, "Data fetching complete.");
