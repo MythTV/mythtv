@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1129";
+const QString currentDatabaseVersion = "1130";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2109,6 +2109,17 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1129")
+    {
+        const QString updates[] = {
+"INSERT INTO dtv_privatetypes (sitype, networkid, private_type, private_value) "
+"       VALUES                ('dvb',  4096,     'guide_fixup', '5');",
+""
+};
+        if (!performActualUpdate(updates, "1130", dbver))
+            return false;
+    }
+
 //"ALTER TABLE capturecard DROP COLUMN dvb_recordts;" in 0.21
 //"ALTER TABLE capturecard DROP COLUMN dvb_hw_decoder;" in 0.21
 
@@ -2706,6 +2717,7 @@ bool InitializeDatabase(void)
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',4105,'guide_fixup','1');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',4106,'guide_fixup','1');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',4107,'guide_fixup','1');",
+"INSERT INTO  dtv_privatetypes  VALUES ('dvb',4096,'guide_fixup','5');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',4097,'guide_fixup','1');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',4098,'guide_fixup','1');",
 "INSERT INTO `dtv_privatetypes` VALUES ('dvb',94,'tv_types','1,128');",

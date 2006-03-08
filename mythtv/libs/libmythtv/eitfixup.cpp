@@ -49,6 +49,8 @@ void EITFixUp::Fix(Event &event, int fix_type) const
         FixPBS(event);
     else if (kFixComHem == fix_type)
         FixComHem(event);
+    else if (kFixAUStar == fix_type)
+        FixAUStar(event);
 
     event.Event_Name.stripWhiteSpace();
     event.Event_Subtitle.stripWhiteSpace();
@@ -518,4 +520,24 @@ void EITFixUp::FixComHem(Event &event) const
     // unknown date, posibly only a year.
     //fprintf(stdout,"EITFixUp::FixStyle4: "
     //"unknown rerun date: %s\n",list[1].ascii());
+}
+
+/** \fn EITFixUp::FixAUStar(Event&) const
+ *  \brief Use this to standardize DVB-S guide in Australia.
+ */
+void EITFixUp::FixAUStar(Event &event) const
+{
+    event.ContentDescription = event.Event_Subtitle;
+    /* Used for DVB-S Subtitles are seperated by a colon */
+    int position = event.Description.find(':');
+    if (position != -1)
+    {
+        const QString stmp   = event.Description;
+        event.Event_Subtitle = stmp.left(position);
+        event.Description    = stmp.right(stmp.length() - position - 2);
+    }
+    else
+    {
+        event.Event_Subtitle = "";
+    }
 }

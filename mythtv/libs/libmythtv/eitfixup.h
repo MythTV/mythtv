@@ -22,6 +22,7 @@ class EITFixUp
         kFixUK      = 2,
         kFixPBS     = 3,
         kFixComHem  = 4,
+        kFixAUStar  = 5,
     };
 
     EITFixUp();
@@ -38,6 +39,7 @@ class EITFixUp
     void FixUK(Event &event) const;            // UK DVB-T
     void FixPBS(Event &event) const;           // USA ATSC
     void FixComHem(Event &event) const;        // Sweden DVB-C
+    void FixAUStar(Event &event) const;        // Australia DVB-S
 
     /** List of ServiceID's for which to parse out subtitle
      *  from the description. Used in EITFixUpStyle4().
