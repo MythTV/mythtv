@@ -8,7 +8,6 @@
 #include "format.h"
 #include "decoderbase.h"
 #include "ccdecoder.h"
-#include "teletextdecoder.h"
 #include "vbilut.h"
 
 extern "C" {
@@ -17,26 +16,12 @@ extern "C" {
 #include "../libavformat/avformat.h"
 }
 
+class TeletextDecoder;
 class CC708Decoder;
 class ProgramInfo;
 class MythSqlDatabase;
 
 extern "C" void HandleStreamChange(void*);
-
-class StreamInfo
-{
-  public:
-    StreamInfo() : av_stream_index(-1), language(-2), language_index(0) {}
-    StreamInfo(int a, int b, uint c, int d)
-        : av_stream_index(a), language(b), language_index(c), stream_id(d) {}
-  public:
-    int  av_stream_index;
-    int  language; ///< ISO639 canonical language key
-    uint language_index;
-    int  stream_id;
-    bool operator<(const StreamInfo& b) { return (this->stream_id < b.stream_id) ; }
-};
-typedef vector<StreamInfo> sinfo_vec_t;
 
 class AudioInfo
 {
@@ -134,34 +119,28 @@ class AvFormatDecoder : public DecoderBase
     MythCodecID GetVideoCodecID() const { return video_codec_id; }
 
     virtual void SetDisablePassThrough(bool disable);
-    virtual void incCurrentAudioTrack();
-    virtual void decCurrentAudioTrack();
-    virtual bool setCurrentAudioTrack(int trackNo);    
-    virtual QStringList listAudioTracks() const;
-
     void AddTextData(unsigned char *buf, int len, long long timecode, char type);
 
-    virtual void incCurrentSubtitleTrack();
-    virtual void decCurrentSubtitleTrack();
-    virtual bool setCurrentSubtitleTrack(int trackNo);    
-    virtual QStringList listSubtitleTracks() const;
+    virtual QString GetTrackDesc(uint type, uint trackNo) const;
+    virtual int SetTrack(uint type, int trackNo);
 
     int ScanStreams(bool novideo);
 
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
+    virtual int  GetTeletextDecoderType(void) const;
+    virtual void SetTeletextDecoderViewer(OSDTypeTeletext*);
+
     uint handle_cc608_data(uint cc_state, uint cc_type,
                            uint data1, uint data2);
   protected:
-    /// Attempt to find the optimal audio stream to use based on the number of channels,
-    /// and if we're doing AC3/DTS passthrough.  This will select the highest stream
-    /// number that matches our criteria.
-    bool autoSelectAudioTrack();
-
-    bool autoSelectSubtitleTrack();
-
     RingBuffer *getRingBuf(void) { return ringBuffer; }
+
+    virtual int AutoSelectTrack(uint type);
+
+    void ScanATSCCaptionStreams(int av_stream_index);
+    int AutoSelectAudioTrack(void);
 
   private:
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -242,7 +221,7 @@ class AvFormatDecoder : public DecoderBase
     int maxkeyframedist;
 
     // Caption/Subtitle/Teletext decoders
-    CCDecoder        *ccd;
+    CCDecoder        *ccd608;
     CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
 
@@ -254,19 +233,6 @@ class AvFormatDecoder : public DecoderBase
 
     AudioInfo         audioIn;
     AudioInfo         audioOut;
-
-    // Audio stream selection
-    sinfo_vec_t       audioStreams;
-    StreamInfo        wantedAudioStream;
-    StreamInfo        selectedAudioStream;
-
-    // Subtitle stream selection
-    sinfo_vec_t       subtitleStreams;
-    StreamInfo        wantedSubtitleStream;
-    StreamInfo        selectedSubtitleStream;
-
-    // language preferences for auto-selection of streams
-    vector<int>       languagePreference;
 
     // DVD
     int lastdvdtitle;

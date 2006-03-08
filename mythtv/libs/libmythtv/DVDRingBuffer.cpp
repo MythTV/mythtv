@@ -885,7 +885,7 @@ void DVDRingBufferPriv::SetAudioTrack(void)
     
     int track = dvdnav_get_active_audio_stream(dvdnav);
     if (parent)
-        parent->setCurrentAudioTrack(track);
+        parent->SetTrack(kTrackTypeAudio, track);
 }
 
 void DVDRingBufferPriv::SetSubtitleTrack(void)
@@ -894,11 +894,8 @@ void DVDRingBufferPriv::SetSubtitleTrack(void)
         return;
 
     int track = dvdnav_get_active_spu_stream(dvdnav);
-    if (parent && track >=0 && !IsInMenu())
-    {
-        parent->setCurrentSubtitleTrack(track);
-        parent->SetSubtitleMode(true);
-    }
+    if (parent && track >= 0 && !IsInMenu())
+        parent->SetTrack(kTrackTypeSubtitle, track);
 }
 
 uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)

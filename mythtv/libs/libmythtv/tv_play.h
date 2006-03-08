@@ -92,6 +92,7 @@ class TV : public QObject
     void ProcessKeypress(QKeyEvent *e);
     void processNetworkControlCommand(QString command);
     void customEvent(QCustomEvent *e);
+    bool HandleTrackAction(const QString &action);
 
     // LiveTV commands
     int  LiveTV(bool showDialogs = true, bool startInGuide = false);
@@ -217,11 +218,9 @@ class TV : public QObject
     void ChangeColour(bool up, bool recorder);
     void ChangeHue(bool up, bool recorder);
 
-    void ChangeAudioTrack(int dir);
-    void SetAudioTrack(int track);
-
-    void ChangeSubtitleTrack(int dir);
-    void SetSubtitleTrack(int track);
+    bool FillMenuTracks(OSDGenericTree*, uint type);
+    void ChangeTrack(uint type, int dir);
+    void SetTrack(uint type, int trackNo);
 
     // key queue commands
     void AddKeyToInputQueue(char key);
@@ -270,10 +269,6 @@ class TV : public QObject
     void DoSkipCommercials(int direction);
     void DoEditMode(void);
 
-    void TeletextStart(void);
-    void TeletextNavigate(int num);
-    void TeletextStop(void);
-    
     void DoQueueTranscode(void);  
 
     enum commSkipMode {

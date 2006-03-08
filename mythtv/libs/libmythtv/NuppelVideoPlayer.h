@@ -65,6 +65,30 @@ enum TCTypes
 };
 #define TCTYPESMAX 4
 
+/// Track types
+enum
+{
+    kTrackTypeAudio = 0,
+    kTrackTypeSubtitle,
+    kTrackTypeCC608,
+    kTrackTypeCC708,
+    kTrackTypeCount,
+    kFakeTrackTypeTeletext,
+};
+QString track_type_to_string(uint type);
+int type_string_to_track_type(const QString &str);
+
+// Caption Display modes
+enum
+{
+    kDisplayNone      = 0x00,
+    kDisplayTeletextA = 0x01,
+    kDisplayTeletextB = 0x02,
+    kDisplaySubtitle  = 0x04,
+    kDisplayCC608     = 0x08,
+    kDisplayCC708     = 0x10,
+};
+
 class NuppelVideoPlayer : public CCReader, public CC708Reader
 {
  public:
@@ -170,7 +194,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
     LiveTVChain *GetTVChain(void)             { return livetvchain; }
-    TeletextDecoder *GetTeletextDecoder(void);
 
     // Start/Reset/Stop playing
     void StartPlaying(void);
@@ -204,11 +227,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     bool WriteStoredData(
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
-
-    // Closed caption and teletext stuff
-    void ToggleCC(uint mode, uint arg);
-    void ToggleEIA708(uint service);
-    void FlushTxtBuffers(void) { rtxt = wtxt; }
 
     // Edit mode stuff
     bool EnableEdit(void);
@@ -244,6 +262,24 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void AddTextData(unsigned char *buffer, int len,
                      long long timecode, char type);
     void AddSubtitle(const AVSubtitle& subtitle);
+
+    // Closed caption and teletext stuff
+    uint GetCaptionMode(void) const { return textDisplayMode; }
+    void ResetCaptions(uint mode_override = 0);
+    void DisableCaptions(uint mode, bool osd_msg = true);
+    void EnableCaptions(uint mode);
+    bool ToggleCaptions(void);
+    bool ToggleCaptions(uint mode);
+    void SetCaptionsEnabled(bool);
+
+    // TeletextA
+    bool HandleTeletextAction(const QString &action);
+
+    // TeletextB
+    void SetTeletextPage(uint page);
+
+    // EIA-608 && TeletextB
+    void FlushTxtBuffers(void) { rtxt = wtxt; }
 
     // ATSC EIA-708 Captions
     CC708Window &GetCCWin(uint service_num, uint window_id)
@@ -285,19 +321,12 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void Reset(uint service_num);
     void TextWrite(uint service_num, short* unicode_string, short len);
 
-    // Audio Track Selection
-    void incCurrentAudioTrack(void);
-    void decCurrentAudioTrack(void);
-    bool setCurrentAudioTrack(int trackNo);
-    int  getCurrentAudioTrack(void) const;
-    QStringList listAudioTracks(void) const;
-
-    // Subtitle Track Selection
-    void incCurrentSubtitleTrack(void);
-    void decCurrentSubtitleTrack(void);
-    bool setCurrentSubtitleTrack(int trackNo);
-    int  getCurrentSubtitleTrack(void) const;
-    QStringList listSubtitleTracks(void) const;
+    // Audio/Subtitle/EIA-608/EIA-708 stream selection
+    QStringList GetTracks(uint type) const;
+    int SetTrack(uint type, int trackNo);
+    int GetTrack(uint type) const;
+    int ChangeTrack(uint type, int dir);
+    void ChangeCaptionTrack(int dir);
 
     // Time Code adjustment stuff
     long long AdjustAudioTimecodeOffset(long long v)
@@ -321,7 +350,13 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void GoToDVDMenu(QString str);
     void GoToDVDProgram(bool direction);
     void HideDVDButton(bool hide) { hidedvdbutton = hide; }
-    void SetSubtitleMode(bool setting) { subtitlesOn = setting; }
+    void SetSubtitleMode(bool setting)
+    {
+        if (setting)
+            textDisplayMode = kTrackTypeSubtitle;
+        else
+            textDisplayMode &= ~kTrackTypeSubtitle;
+    }
 
   protected:
     void DisplayPauseFrame(void);
@@ -523,10 +558,12 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     bool       prebuffering;    ///< Iff true, don't play until done prebuf
     int        prebuffer_tries; ///< Number of times prebuf wait attempted
 
+    // General Caption/Teletext/Subtitle support
+    uint     textDisplayMode;
+
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
     uint     vbimode;         ///< VBI decoder to use
-    bool     subtitlesOn;     ///< true iff cc/tt display is enabled
     int      ttPageNum;       ///< VBI page to display when in PAL vbimode
     int      ccmode;          ///< VBI text to display when in NTSC vbimode
 
@@ -553,7 +590,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     QString    osd708fontnames[20];
     QString    osdprefix;
     QString    osdtheme;
-    bool       eia708on;
 
     // OSD stuff
     OSD      *osd;

@@ -15,8 +15,8 @@
 #include "osdsurface.h"
 #include "osdtypes.h"
 #include "osdlistbtntype.h"
-#include "osdtypeteletext.h"
-#include "teletextdecoder.h"
+//#include "osdtypeteletext.h"
+//#include "teletextdecoder.h"
 #include "mythcontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -123,10 +123,6 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SWAPPIP", "Swap PiP/Main", "N");
     REG_KEY("TV Playback", "TOGGLEASPECT", "Toggle the display aspect ratio",
             "W");
-    REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
-            "T");
-    REG_KEY("TV Playback", "TOGGLECC708",
-            "Toggle ATSC CC", "^");
     REG_KEY("TV Playback", "MENURED",
             "Menu Red",    "F2");
     REG_KEY("TV Playback", "MENUGREEN",
@@ -139,14 +135,32 @@ void TV::InitKeys(void)
             "Menu White",  "F6");
     REG_KEY("TV Playback", "REVEAL",
             "Teletext reveal hidden Text", "F12");
-    REG_KEY("TV Playback", "DISPCC608_1", "Display CC1", "");
-    REG_KEY("TV Playback", "DISPCC608_2", "Display CC2", "");
-    REG_KEY("TV Playback", "DISPCC608_3", "Display CC3", "");
-    REG_KEY("TV Playback", "DISPCC608_4", "Display CC4", "");
-    REG_KEY("TV Playback", "DISPTXT1", "Display TXT1", "");
-    REG_KEY("TV Playback", "DISPTXT2", "Display TXT2", "");
-    REG_KEY("TV Playback", "DISPTXT3", "Display TXT3", "");
-    REG_KEY("TV Playback", "DISPTXT4", "Display TXT4", "");
+
+    REG_KEY("TV Playback", "TOGGLECC",      "Toggle any captions",   "T");
+    REG_KEY("TV Playback", "TOGGLETT",      "Toggle Teletext Captions","");
+    REG_KEY("TV Playback", "TOGGLESUBTITLE","Toggle Subtitles",      "");
+    REG_KEY("TV Playback", "TOGGLECC608",   "Toggle VBI CC",         "");
+    REG_KEY("TV Playback", "TOGGLECC708",   "Toggle ATSC CC",        "");
+
+    REG_KEY("TV Playback", "SELECTAUDIO_0", "Play audio track 1",    "");
+    REG_KEY("TV Playback", "SELECTAUDIO_1", "Play audio track 2",    "");
+    REG_KEY("TV Playback", "SELECTSUBTITLE_0","Display subtitle 1",  "");
+    REG_KEY("TV Playback", "SELECTSUBTITLE_1","Display subtitle 2",  "");
+    REG_KEY("TV Playback", "SELECTCC608_0", "Display VBI CC1",       "");
+    REG_KEY("TV Playback", "SELECTCC608_1", "Display VBI CC2",       "");
+    REG_KEY("TV Playback", "SELECTCC708_0", "Display ATSC CC1",      "");
+    REG_KEY("TV Playback", "SELECTCC708_1", "Display ATSC CC2",      "");
+
+    REG_KEY("TV Playback", "NEXTAUDIO",    "Next audio track",         "+");
+    REG_KEY("TV Playback", "PREVAUDIO",    "Previous audio track",     "-");
+    REG_KEY("TV Playback", "NEXTSUBTITLE", "Next subtitle track",      "");
+    REG_KEY("TV Playback", "PREVSUBTITLE", "Previous subtitle track",  "");
+    REG_KEY("TV Playback", "NEXTCC608",    "Next VBI CC track",        "");
+    REG_KEY("TV Playback", "PREVCC608",    "Previous VBI CC track",    "");
+    REG_KEY("TV Playback", "NEXTCC708",    "Next ATSC CC track",       "");
+    REG_KEY("TV Playback", "PREVCC708",    "Previous ATSC CC track",   "");
+    REG_KEY("TV Playback", "NEXTCC",       "Next of any captions",     "");
+
     REG_KEY("TV Playback", "QUEUETRANSCODE", "Queue the current recording for "
             "transcoding", "X");
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
@@ -167,10 +181,6 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "#");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
     REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
-    REG_KEY("TV Playback", "NEXTAUDIO", "Switch to the next audio track", "+");
-    REG_KEY("TV Playback", "PREVAUDIO", "Switch to the previous audio track", "-");
-    REG_KEY("TV Playback", "NEXTSUBTITLE", "Switch to the next subtitle track", "");
-    REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
@@ -241,7 +251,7 @@ TV::TV(void)
       stretchAdjustment(false),
       audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
       editmode(false),     zoomMode(false),
-      teletextmode(false), sigMonMode(false),
+      sigMonMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
@@ -258,7 +268,7 @@ TV::TV(void)
       normal_speed(1.0f), prev_speed(1.5f), 
       // Estimated framerate from recorder
       frameRate(30.0f),
-      // CC/Teletex input state variables
+      // CC/Teletext input state variables
       ccInputMode(false), ccInputModeExpires(QTime::currentTime()),
       // Arbritary seek input state variables
       asInputMode(false), asInputModeExpires(QTime::currentTime()),
@@ -1117,17 +1127,7 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
 
     if (nvp->IsPlaying())
     {
-        TeletextDecoder *tt_dec = nvp->GetTeletextDecoder();
-	
-	// This is needed because the OSDType does the decoding/caching of
-	// the teletext pages 
-	OSDSet *oset = GetOSD()->GetSet("teletext");
-	if (oset)
-	{
-	    OSDType *traw = oset->GetType("teletext");
-	    OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-	    tt_dec->SetViewer(tt_view);
-	}
+        nvp->ResetCaptions();
 
         activenvp = nvp;
         activerbuffer = prbuffer;
@@ -1254,9 +1254,6 @@ void TV::SetupPlayer(bool isWatchingRecording)
     nvp->SetLiveTVChain(tvchain);
 
     nvp->SetAudioStretchFactor(normal_speed);
-
-    if (gContext->GetNumSetting("DefaultCCMode"))
-        nvp->ToggleCC(vbimode, 0);
 
     filters = GetFiltersForChannel();
     nvp->SetVideoFilters(filters);
@@ -1741,6 +1738,81 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     }
 }
 
+bool TV::HandleTrackAction(const QString &action)
+{
+    bool handled = false;
+    if (action == "TOGGLECC" && !browsemode)
+    {
+        handled = true;
+        if (ccInputMode)
+        {
+            bool valid = false;
+            int page = GetQueuedInputAsInt(&valid, 16);
+            if (vbimode == VBIMode::PAL_TT && valid)
+                activenvp->SetTeletextPage(page);
+            else if (vbimode == VBIMode::NTSC_CC)
+                activenvp->SetTrack(kTrackTypeCC608, max(min(page - 1, 1), 0));
+            ccInputModeExpires.start(); // expire ccInputMode now...
+            ClearInputQueues(true);
+        }
+        else if (activenvp->GetCaptionMode() & kDisplayTeletextB)
+        {
+            ccInputMode        = true;
+            ccInputModeExpires = QTime::currentTime()
+                .addMSecs(kInputModeTimeout);
+            asInputModeExpires = QTime::currentTime();
+            ClearInputQueues(false);
+            AddKeyToInputQueue(0);
+        }
+        else
+        {
+            activenvp->ToggleCaptions();
+        }
+    }
+    else if (action.left(6) == "TOGGLE")
+    {
+        int type = type_string_to_track_type(action.mid(6));
+        if (type >= kTrackTypeSubtitle)
+        {
+            handled = true;
+            activenvp->ToggleCaptions(type);
+        }
+    }
+    else if (action.left(6) == "SELECT")
+    {
+        int type = type_string_to_track_type(action.mid(6));
+        int mid  = (kTrackTypeSubtitle == type) ? 15 : 12;
+        if (type >= kTrackTypeAudio)
+        {
+            handled = true;
+            activenvp->SetTrack(type, action.mid(mid).toInt());
+        }
+    }
+    else if (action.left(4) == "NEXT" || action.left(4) == "PREV")
+    {
+        int dir = (action.left(4) == "NEXT") ? +1 : -1;
+        int type = type_string_to_track_type(action.mid(4));
+        if (type >= kTrackTypeAudio)
+        {
+            handled = true;
+            activenvp->ChangeTrack(type, dir);
+        }
+        else if (action.right(2) == "CC")
+        {
+            handled = true;
+            activenvp->ChangeCaptionTrack(dir);
+        }
+    }
+
+    if (!handled)
+    {
+        VERBOSE(VB_IMPORTANT, QString("HandleTrackAction(%1) not handled")
+                .arg(action));
+    }
+
+    return handled;
+}
+
 static bool has_action(QString action, const QStringList &actions)
 {
     QStringList::const_iterator it;
@@ -1880,48 +1952,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     //XXX ivtv/dvb teletext
-    if (teletextmode)
+    if (activenvp && (activenvp->GetCaptionMode() == kDisplayTeletextA))
     {
-        int passThru = 0;
+        for (uint i = 0; i < actions.size() && !handled; i++)
+            handled |= activenvp->HandleTeletextAction(actions[i]);
 
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
-            if (action == "UP")
-                TeletextNavigate(-1);
-            else if (action == "DOWN")
-                TeletextNavigate(-2);
-            else if (action == "RIGHT")
-                TeletextNavigate(-3);
-            else if (action == "LEFT")
-                TeletextNavigate(-4);
-            else if (action == "TOGGLEASPECT")
-                TeletextNavigate(-5);
-            else if (action == "MENURED")
-                TeletextNavigate(-6);
-            else if (action == "MENUGREEN")
-                TeletextNavigate(-7);
-            else if (action == "MENUYELLOW")
-                TeletextNavigate(-8);
-            else if (action == "MENUBLUE")
-                TeletextNavigate(-9);
-            else if (action == "MENUWHITE")
-                TeletextNavigate(-10);
-            else if (action == "REVEAL")
-                TeletextNavigate(-11);
-            else if (action == "0" || action == "1" || action == "2" ||
-                     action == "3" || action == "4" || action == "5" ||
-                     action == "6" || action == "7" || action == "8" ||
-                     action == "9")
-                TeletextNavigate(action.toInt());
-            else if (action == "MENU" || action == "TOGGLECC" ||
-                     action == "ESCAPE")
-                TeletextStop();
-            else
-                handled = false;
-        }
-        if (!passThru)
+        if (handled)
             return;
     }
 
@@ -2172,35 +2208,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         QString action = actions[i];
         handled = true;
 
-        if (action == "TOGGLECC" && !browsemode)
-	{
-            int dec_type = nvp->GetTeletextDecoder()->GetDecoderType();
-	    if (dec_type != -1)
-                TeletextStart();
-	    else if (vbimode == VBIMode::NTSC_CC)
-                nvp->ToggleCC(vbimode, 0);
-            else if (ccInputMode)
-            {
-                bool valid = false;
-                int page = GetQueuedInputAsInt(&valid, 16);
-                page = (valid) ? page : 0;
-                nvp->ToggleCC(vbimode, page);
-                ccInputModeExpires.start(); // expire ccInputMode now...
-                ClearInputQueues(true);
-            }
-            else
-            {
-                ccInputMode        = true;
-                ccInputModeExpires = QTime::currentTime()
-                    .addMSecs(kInputModeTimeout);
-                asInputModeExpires = QTime::currentTime();
-                ClearInputQueues(false);
-                AddKeyToInputQueue(0);
-            }
-        }
-        else if (action == "TOGGLECC708")
-            nvp->ToggleEIA708(0);
-        else if (action == "SKIPCOMMERCIAL")
+        if (action == "SKIPCOMMERCIAL")
             DoSkipCommercials(1);
         else if (action == "SKIPCOMMBACK")
             DoSkipCommercials(-1);
@@ -2208,14 +2216,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoQueueTranscode();
         else if (action == "PLAY")
             DoPlay();
-        else if (action == "NEXTAUDIO")
-            ChangeAudioTrack(1);
-        else if (action == "PREVAUDIO")
-            ChangeAudioTrack(-1);
-        else if (action == "NEXTSUBTITLE")
-            ChangeSubtitleTrack(1);
-        else if (action == "PREVSUBTITLE")
-            ChangeSubtitleTrack(-1);
         else if (action == "PAUSE") 
             DoPause();
         else if (action == "SPEEDINC")
@@ -2486,8 +2486,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ToggleLetterbox();
         else if (action == "MENU")
             ShowOSDTreeMenu();
-        else
-            handled = false;
+        else 
+            handled = HandleTrackAction(action);
     }
 
     if (!handled)
@@ -3745,14 +3745,6 @@ void TV::ChangeChannel(int direction)
             aud->ToggleMute();
             muted = true;
         }
-        OSDSet *oset = GetOSD()->GetSet("teletext");
-        if (oset)
-        {
-            OSDType *traw = oset->GetType("teletext");
-            OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-            if (tt_view)
-                tt_view->Reset();
-        }
     }
 
     if (nvp && (activenvp == nvp) && paused)
@@ -3768,6 +3760,9 @@ void TV::ChangeChannel(int direction)
         AddPreviousChannel();
 
     PauseLiveTV();
+
+    if (activenvp)
+        activenvp->ResetCaptions();
 
     activerecorder->ChangeChannel(direction);
     ClearInputQueues(false);
@@ -3954,12 +3949,9 @@ bool TV::CommitQueuedInput(void)
 
     if (ccInputMode)
     {
-        bool valid = false;
         commited = true;
-        int page = GetQueuedInputAsInt(&valid, 16);
-        if (valid && page)
-            nvp->ToggleCC(vbimode, page);
-        ccInputModeExpires.start(); // expire ccInputMode
+        if (HasQueuedInput())
+            HandleTrackAction("TOGGLECC");
     }
     else if (asInputMode)
     {
@@ -4079,14 +4071,6 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
             aud->ToggleMute();
             muted = true;
         }
-        OSDSet *oset = GetOSD()->GetSet("teletext");
-        if (oset)
-        {
-            OSDType *traw = oset->GetType("teletext");
-            OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-            if (tt_view)
-                tt_view->Reset();
-        }
     }
 
     if (nvp && (activenvp == nvp) && paused && GetOSD())
@@ -4101,6 +4085,9 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
         AddPreviousChannel();
 
     PauseLiveTV();
+
+    if (activenvp)
+        activenvp->ResetCaptions();
 
     activerecorder->SetChannel(channum);
 
@@ -5484,121 +5471,6 @@ void TV::ToggleRecord(void)
         GetOSD()->SetSettingsText(msg, 3);
 }
 
-//XXX new teletext
-void TV::TeletextStart(void)
-{
-    if (activenvp != nvp)
-        return;
-
-    if (paused || !GetOSD())
-        return;
-
-    TeletextDecoder *tt_dec = nvp->GetTeletextDecoder();
-    OSDSet *oset = GetOSD()->GetSet("teletext");
-    if (!oset)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext set available");
-        return;
-    }
-
-    OSDType *traw = oset->GetType("teletext");
-    OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-    if (!tt_view)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext type available");
-        return;
-    }
-
-    tt_dec->SetViewer(tt_view);
-    tt_view->SetDisplaying(true);
-
-    teletextmode = true;
-
-    oset->Display();
-    GetOSD()->SetVisible(oset, 0);
-}
-
-void TV::TeletextNavigate(int page)
-{
-    if (!GetOSD())
-        return;
-
-    OSDSet *oset = GetOSD()->GetSet("teletext");
-    if (!oset)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext set available");
-        return;
-    }
-
-    OSDType *traw = oset->GetType("teletext");
-    OSDTypeTeletext *tt = dynamic_cast<OSDTypeTeletext*>(traw);
-    if (!tt)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No teletext type available");
-        return;
-    }
-
-    switch (page)
-    {
-        case -1:
-            tt->KeyPress(TTKey::kNextPage);
-            break;
-        case -2:
-            tt->KeyPress(TTKey::kPrevPage);
-            break;
-        case -3:
-            tt->KeyPress(TTKey::kNextSubPage);
-            break;
-        case -4:
-            tt->KeyPress(TTKey::kPrevSubPage);
-            break;
-        case -5:
-            tt->KeyPress(TTKey::kTransparent);
-            break;
-        case -6:
-            tt->KeyPress(TTKey::kFlofRed);
-            break;
-        case -7:
-            tt->KeyPress(TTKey::kFlofGreen);
-            break;
-        case -8:
-            tt->KeyPress(TTKey::kFlofYellow);
-            break;
-        case -9:
-            tt->KeyPress(TTKey::kFlofBlue);
-            break;
-        case -10:
-            tt->KeyPress(TTKey::kFlofWhite);
-            break;
-        case -11:
-            tt->KeyPress(TTKey::kRevealHidden);
-            break;
-        case 0 ... 9:
-            tt->KeyPress(page);
-            break;
-    }
-}
-
-void TV::TeletextStop(void)
-{
-    if (!teletextmode || !GetOSD())
-        return;
-
-    OSDSet *oset = GetOSD()->GetSet("teletext");
-    if (oset)
-    {
-        OSDType *traw = oset->GetType("teletext");
-        OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-        if (tt_view)
-           tt_view->SetDisplaying(false);
-    }	
-    GetOSD()->HideSet("teletext");
-
-    // nvp->GetTeletextDecoder()->SetViewer(NULL);
-
-    teletextmode = false;
-}
-
 void TV::BrowseChannel(const QString &chan)
 {
     if (!activerecorder->CheckChannel(chan))
@@ -5789,19 +5661,14 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         return;
 
     bool hidetree = true;
+    bool handled  = true;
 
     QString action = item->getAction();
 
-    if (action == "TOGGLECC")
-        nvp->ToggleCC(vbimode, 0);
-    else if (action == "TOGGLECC708")
-        nvp->ToggleEIA708(0);
-    else if (action.left(9) == "DISPCC708")
-        nvp->ToggleEIA708(action.right(2).toInt());
-    else if (action.left(9) == "DISPCC608")
-        nvp->ToggleCC(vbimode, action.right(1).toInt());
-    else if (action.left(7) == "DISPTXT")
-        nvp->ToggleCC(vbimode, action.right(1).toInt() + 4);
+    handled = HandleTrackAction(action);
+
+    if (handled)
+        ;
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
     else if (action == "TOGGLESTRETCH")
@@ -5840,18 +5707,6 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         ToggleLetterbox(action.right(1).toInt());
         hidetree = false;
     }
-    else if (action == "NEXTAUDIO")
-        ChangeAudioTrack(1);
-    else if (action == "PREVAUDIO")
-        ChangeAudioTrack(-1);
-    else if (action.left(11) == "SELECTAUDIO")
-        SetAudioTrack(action.mid(11).toInt());
-    else if (action == "NEXTSUBTITLE")
-        ChangeSubtitleTrack(1);
-    else if (action == "PREVSUBTITLE")
-        ChangeSubtitleTrack(-1);
-    else if (action.left(14) == "SELECTSUBTITLE")
-        SetSubtitleTrack(action.mid(14).toInt());
     else if (action == "GUIDE")
         EditSchedule(kScheduleProgramGuide);
     else if (action == "FINDER")
@@ -5914,7 +5769,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             hidetree = false;
         }
     }
-    else
+
+    if (!handled)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Unknown menu action selected: " + action);
@@ -6101,71 +5957,14 @@ void TV::BuildOSDTreeMenu(void)
                                      "SCHEDULE");
     }
     
-    const QStringList atracks = activenvp->listAudioTracks();
-    if (atracks.count() > 1)
-    {
-        item = new OSDGenericTree(treeMenu, tr("Select Audio Track"),
-                                  "NEXTAUDIO");
+    FillMenuTracks(treeMenu, kTrackTypeAudio);
+    FillMenuTracks(treeMenu, kTrackTypeSubtitle);
+    FillMenuTracks(treeMenu, kTrackTypeCC708);
 
-        int atrack = activenvp->getCurrentAudioTrack();
-        QStringList::const_iterator it = atracks.begin();
-        for (uint i = 1; it != atracks.end(); ++it, ++i)
-        {
-            subitem = new OSDGenericTree(
-                item, *it, "SELECTAUDIO" + QString("%1").arg(i),
-                ((int)i == atrack) ? 1 : 0, NULL, "AUDIOGROUP");
-        }
-    }
-
-    const QStringList stracks = activenvp->listSubtitleTracks();
-    if (!stracks.empty())
-    {
-        item = new OSDGenericTree(
-            treeMenu, tr("Select Subtitles"), "TOGGLECC");
-
-        int strack = activenvp->getCurrentSubtitleTrack();
-
-        subitem = new OSDGenericTree(
-            item, "None", "SELECTSUBTITLE" + QString("%1").arg(0),
-            (0 == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
-
-        
-        QStringList::const_iterator it = stracks.begin();
-        for (uint i = 1; it != stracks.end(); ++it, ++i)
-        {
-            subitem = new OSDGenericTree(
-                item, *it, "SELECTSUBTITLE" + QString("%1").arg(i),
-                ((int)i == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
-        }
-    }
-    else if (vbimode == VBIMode::PAL_TT)
-    {
-        item = new OSDGenericTree(
-            treeMenu, tr("Toggle Teletext"), "TOGGLECC");
-    }
-    else if (vbimode == VBIMode::NTSC_CC)
-    {
-        item    = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
-        subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
-        for (uint i = 1; i <= 2; i++)
-        {
-            subitem = new OSDGenericTree(
-                item, QString("%1%2").arg(tr("VBI CC")).arg(i),
-                QString("DISPCC608_%1").arg(i));
-        }
-        for (uint i = 1; i <= 2; i++)
-        {
-            subitem = new OSDGenericTree(
-                item, QString("%1%2").arg(tr("ATSC CC")).arg(i),
-                QString("DISPCC708_0%1").arg(i));
-        }
-        for (uint i = 1; i <= 4; i++)
-        {
-            subitem = new OSDGenericTree(
-                item, QString("%1%2").arg(tr("TXT")).arg(i),
-                QString("DISPTXT%1").arg(i));
-        }
-    }
+    if (VBIMode::NTSC_CC == vbimode)
+        FillMenuTracks(treeMenu, kTrackTypeCC608);
+    else if (VBIMode::PAL_TT == vbimode)
+        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext"), "TOGGLETT");
 
     int letterbox = nvp->GetLetterbox();
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
@@ -6257,87 +6056,114 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, "120 " + tr("minutes"), "TOGGLESLEEP120");
 }
 
-void TV::ChangeAudioTrack(int dir)
+bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
 {
-    if (activenvp)
+    QString mainMsg = QString::null;
+    QString selStr  = QString::null;
+    QString grpStr  = QString::null;
+    QString typeStr = QString::null;
+    bool    sel     = true;
+
+    if (kTrackTypeAudio == type)
     {
-        if (dir > 0)
-            activenvp->incCurrentAudioTrack(); 
-        else
-            activenvp->decCurrentAudioTrack();
-
-        if (activenvp->getCurrentAudioTrack())
-        {
-            QString msg = QString("%1 %2")
-                          .arg(tr("Audio track"))
-                          .arg(activenvp->getCurrentAudioTrack());
-
-            if (GetOSD())
-                GetOSD()->SetSettingsText(msg, 3);
-        }
+        mainMsg = tr("Select Audio Track");
+        typeStr = "AUDIO";
+        selStr  = "SELECTAUDIO_";
+        grpStr  = "AUDIOGROUP";
     }
+    else if (kTrackTypeSubtitle == type)
+    {
+        mainMsg = tr("Select Subtitle");
+        typeStr = "SUBTITLE";
+        selStr  = "SELECTSUBTITLE_";
+        grpStr  = "SUBTITLEGROUP";
+        sel     = activenvp->GetCaptionMode() & kDisplaySubtitle;
+    }
+    else if (kTrackTypeCC608 == type)
+    {
+        mainMsg = tr("Select VBI CC");
+        typeStr = "CC608";
+        selStr  = "SELECTCC608_";
+        grpStr  = "CC608GROUP";
+        sel     = activenvp->GetCaptionMode() & kDisplayCC608;
+    }
+    else if (kTrackTypeCC708 == type)
+    {
+        mainMsg = tr("Select ATSC CC");
+        typeStr = "CC708";
+        selStr  = "SELECTCC708_";
+        grpStr  = "CC608GROUP";
+        sel     = activenvp->GetCaptionMode() & kDisplayCC708;
+    }
+    else
+    {
+        return false;
+    }
+    
+    const QStringList tracks = activenvp->GetTracks(type);
+    if (tracks.empty())
+        return false;
+
+    if ((kTrackTypeAudio == type) && tracks.size() <= 1)
+        return false;
+
+    OSDGenericTree *item = new OSDGenericTree(
+        treeMenu, mainMsg, "DUMMY" + QString::number(type));
+
+    if (kTrackTypeAudio != type)
+        new OSDGenericTree(item, tr("Toggle On/Off"), "TOGGLE"+typeStr);
+
+    uint curtrack = (uint) activenvp->GetTrack(type);
+    for (uint i = 0; i < tracks.size(); i++)
+    {
+        new OSDGenericTree(
+            item, tracks[i], selStr + QString::number(i),
+            (sel && (i == curtrack)) ? 1 : 0, NULL, grpStr);
+    }
+    return true;
 }
 
-void TV::SetAudioTrack(int track)
+void TV::ChangeTrack(uint type, int dir)
 {
-    if (activenvp)
+    if (!activenvp)
+        return;
+
+    if (prbuffer->isDVD())
     {
-        if (prbuffer->isDVD())
+        if (kTrackTypeAudio == type)
             prbuffer->DVD()->AutoSelectAudio(false);
-
-        activenvp->setCurrentAudioTrack(track - 1); 
-
-        if (activenvp->getCurrentAudioTrack())
-        {
-            QString msg = QString("%1 %2")
-                          .arg(tr("Audio track"))
-                          .arg(activenvp->getCurrentAudioTrack());
-
-            if (GetOSD())
-                GetOSD()->SetSettingsText(msg, 3);
-        }
-    }
-}
-
-void TV::ChangeSubtitleTrack(int dir)
-{
-    if (activenvp)
-    {
-        if (dir > 0)
-            activenvp->incCurrentSubtitleTrack(); 
-        else
-            activenvp->decCurrentSubtitleTrack();
-
-        if (activenvp->getCurrentSubtitleTrack())
-        {
-            QString msg = QString("%1 %2")
-                          .arg(tr("Subtitle track"))
-                          .arg(activenvp->getCurrentSubtitleTrack());
-
-            if (GetOSD())
-                GetOSD()->SetSettingsText(msg, 3);
-        }
-    }
-}
-
-void TV::SetSubtitleTrack(int track)
-{
-    if (activenvp)
-    {
-        if (prbuffer->isDVD())
+        else if (kTrackTypeSubtitle == type)
             prbuffer->DVD()->AutoSelectSubtitle(false);
+    }
 
-        activenvp->setCurrentSubtitleTrack(track - 1); 
+    int new_track = activenvp->ChangeTrack(type, dir) + 1;
+    if (new_track && GetOSD())
+    {
+        QString msg = track_type_to_string(type) + " " +
+            QString::number(new_track);
+        GetOSD()->SetSettingsText(msg, 3);
+    }
+}
 
-        if (activenvp->getCurrentSubtitleTrack())
-        {
-            QString msg = QString("%1 %2")
-                          .arg(tr("Subtitle track"))
-                          .arg(activenvp->getCurrentSubtitleTrack());
+void TV::SetTrack(uint type, int track)
+{
+    if (!activenvp)
+        return;
 
-            if (GetOSD())
-                GetOSD()->SetSettingsText(msg, 3);
-        }
+    if (prbuffer->isDVD())
+    {
+        if (kTrackTypeAudio == type)
+            prbuffer->DVD()->AutoSelectAudio(false);
+        else if (kTrackTypeSubtitle == type)
+            prbuffer->DVD()->AutoSelectSubtitle(false);
+    }
+
+    int new_track = activenvp->SetTrack(type, track - 1) + 1;
+    if (new_track && GetOSD())
+    {
+        QString msg = track_type_to_string(type) + " " +
+            QString::number(new_track);
+        GetOSD()->SetSettingsText(msg, 3);
     }
 }
 
