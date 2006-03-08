@@ -75,6 +75,7 @@ static bool handle_diseq(const DVBTuning&, DVBDiSEqC*, bool reset);
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     : QObject(NULL, "DVBChannel"), ChannelBase(parent),
+      dvb_recorder(NULL),
       diseqc(NULL),    dvbcam(NULL),
       fd_frontend(-1), cardnum(aCardNum), has_crc_bug(false),
       currentTID(-1),  first_tune(true)
@@ -106,6 +107,7 @@ void DVBChannel::deleteLater(void)
         delete dvbcam;
         dvbcam = NULL;
     }
+    dvb_recorder = NULL;
     QObject::deleteLater();
 }
 
@@ -252,13 +254,19 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     return true;
 }
 
-/** \fn DVBChannel::RecorderStarted()
- *  \brief Emits an UpdatePMT() signal if DVBChannel has a PMT.
+/** \fn DVBChannel::SetRecorder(DVBRecorder *rec)
+ *  \brief 
  */
-void DVBChannel::RecorderStarted()
+void DVBChannel::SetRecorder(DVBRecorder *rec)
 {
-    if (chan_opts.IsPMTSet())
-        emit UpdatePMT(chan_opts.pmt);
+    VERBOSE(VB_CHANNEL, LOC + "SetRecorder()");
+    dvb_recorder = rec;
+    if (chan_opts.IsPMTSet() && dvb_recorder)
+    {
+        dvb_recorder->SetPMT(chan_opts.pmtpid, chan_opts.pmt);
+        if (pParent)
+            pParent->DVBGotPMT();
+    }
 }
 
 bool DVBChannel::SwitchToInput(const QString &input, const QString &chan)
@@ -546,23 +554,27 @@ bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
   PMT Handler Code 
 *****************************************************************************/
 
-/** \fn DVBChannel::SetPMT(const ProgramMapTable*)
- *  \brief Sets our PMT to a copy of the ProgramMapTable, and emits
- *         a UpdatePMT(const ProgramMapTable*) signal.
+/** \fn DVBChannel::SetPMT(uint, const ProgramMapTable*)
+ *  \brief Sets our PMT to a copy of the ProgramMapTable,
+ *         if dvb_recorder is set then dvb_recorder->SetPMT() is called.
  */
-void DVBChannel::SetPMT(const ProgramMapTable *pmt)
+void DVBChannel::SetPMT(uint pid, const ProgramMapTable *pmt)
 {
     if (pmt)
     {
         VERBOSE(VB_CHANNEL, LOC +
-                QString("SetPMT() program number #%1, PCRPID(0x%2)")
-                .arg(pmt->ProgramNumber()).arg(pmt->PCRPID(),0,16));
+                QString("SetPMT(%1) program number #%2, PCRPID(0x%3)")
+                .arg(pid).arg(pmt->ProgramNumber()).arg(pmt->PCRPID(),0,16));
     }
 
-    chan_opts.SetPMT(pmt);
-    // Send the PMT to recorder (needs to be cleaned up some)
-    if (pmt)
-        emit UpdatePMT(chan_opts.pmt);
+    chan_opts.SetPMT(pid, pmt);
+
+    // Send the PMT to recorder
+    if (chan_opts.IsPMTSet() && dvb_recorder)
+        dvb_recorder->SetPMT(chan_opts.pmtpid, chan_opts.pmt);
+
+    if (pParent)
+        pParent->DVBGotPMT();
 
     // Tells the Conditional Access Module which streams we wish to decode.
     if (pmt && dvbcam->IsRunning())
@@ -595,7 +607,7 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
     }
 
     // We are now waiting for a new PMT to forward to Access Control (dvbcam).
-    SetPMT(NULL);
+    SetPMT(0, NULL);
 
     // Remove any events in queue before tuning.
     drain_dvb_events(fd_frontend);

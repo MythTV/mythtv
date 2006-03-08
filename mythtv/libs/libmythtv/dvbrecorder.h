@@ -74,8 +74,9 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     bool IsOpen(void) const { return _stream_fd >= 0; }
     void Close(void);
 
+    void SetPMT(uint pid, const ProgramMapTable*);
+
   public slots:
-    void SetPMT(const ProgramMapTable*);
     void deleteLater(void);
 
   private:
@@ -126,6 +127,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     // TS recorder stuff
     ProgramAssociationTable *_pat;
     ProgramMapTable         *_pmt;
+    uint            _pmt_pid;  ///< PID for rewritten PMT
     uint            _next_pmt_version;
     int             _ts_packets_until_psip_sync;
 
@@ -147,7 +149,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     mutable uint        _bad_packet_count;
 
     // Constants
-    static const int PMT_PID;
     static const int TSPACKETS_BETWEEN_PSIP_SYNC;
     static const int POLL_INTERVAL;
     static const int POLL_WARNING_TIMEOUT;

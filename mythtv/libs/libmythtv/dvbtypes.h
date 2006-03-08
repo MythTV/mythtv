@@ -392,7 +392,7 @@ class dvb_channel_t
 {
   public:
     dvb_channel_t() :
-        pmt(NULL),
+        pmtpid(0),          pmt(NULL),
         serviceID(0xffff),  networkID(0xffff),
         providerID(0xffff), transportID(0xffff),
         sistandard(""),     version(255) {;}
@@ -408,16 +408,18 @@ class dvb_channel_t
         return pmt;
     }
 
-    void SetPMT(const ProgramMapTable *_pmt)
+    void SetPMT(uint pid, const ProgramMapTable *_pmt)
     {
         QMutexLocker locker(&lock);
         if (pmt)
         {
+            pmtpid = 0;
             delete pmt;
             pmt = NULL;
         }
         if (_pmt)
         {
+            pmtpid = pid;
             pmt = new ProgramMapTable(*_pmt);
         }
     }
@@ -434,6 +436,7 @@ class dvb_channel_t
 
     DVBTuning       tuning;
 
+    uint            pmtpid;
     ProgramMapTable *pmt;
     bool            PMTSet;
 

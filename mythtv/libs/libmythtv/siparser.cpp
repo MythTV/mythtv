@@ -18,6 +18,7 @@
 #include "dvbstreamdata.h"
 #include "dvbtables.h"
 #include "dishdescriptors.h"
+#include "dvbrecorder.h"
 
 // MythTV DVB headers
 #include "siparser.h"
@@ -242,7 +243,7 @@ void SIParser::CheckTrackers()
             if (it.key() == pnum)
                 AddPid(*it, 0xFF, TableID::PMT, true, 10 /*bufferFactor*/);
         }
-        pnum_pid.clear();
+        //pnum_pid.clear();
     }
     // for DVB NIT
     if (SI_STANDARD_DVB == table_standard && need_nit)
@@ -642,18 +643,20 @@ void SIParser::HandleCAT(const ConditionalAccessTable *cat)
 //       to retune to correct transport or send an error tuning the channel
 void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) version(%2) cnt(%3)")
-            .arg(pnum).arg(pmt->Version()).arg(pmt->StreamCount()));
+    VERBOSE(VB_SIPARSER, LOC + QString(
+                "PMT pn(%1) version(%2) cnt(%3) pid(0x%4)")
+            .arg(pnum).arg(pmt->Version()).arg(pmt->StreamCount())
+            .arg(pnum_pid[pmt->ProgramNumber()],0,16));
 
     if (SI_STANDARD_ATSC == table_standard)
     {
         if ((int)pmt->ProgramNumber() == atsc_stream_data->DesiredProgram())
-            emit UpdatePMT(pmt);
+            emit UpdatePMT(pnum_pid[pmt->ProgramNumber()], pmt);
     }
     if (SI_STANDARD_DVB == table_standard)
     {
         if ((int)pmt->ProgramNumber() == dvb_stream_data->DesiredProgram())
-            emit UpdatePMT(pmt);
+            emit UpdatePMT(pnum_pid[pmt->ProgramNumber()], pmt);
     }
 }
 

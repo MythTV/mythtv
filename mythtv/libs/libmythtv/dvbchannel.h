@@ -20,6 +20,7 @@
 
 class TVRec;
 class DVBCam;
+class DVBRecorder;
 
 class DVBChannel : public QObject, public ChannelBase
 {
@@ -71,15 +72,12 @@ class DVBChannel : public QObject, public ChannelBase
     void SaveCachedPids(const pid_cache_t&) const;
     void GetCachedPids(pid_cache_t&) const;
 
+    void SetRecorder(DVBRecorder*);
+
     // Messages to DVBChannel
   public slots:
-    void RecorderStarted();
-    void SetPMT(const ProgramMapTable *pmt);
+    void SetPMT(uint pid, const ProgramMapTable *pmt);
     void deleteLater(void);
-
-    // Messages from DVBChannel
-  signals:
-    void UpdatePMT(const ProgramMapTable*);
 
   private:
     int  GetChanID(void) const;
@@ -92,6 +90,7 @@ class DVBChannel : public QObject, public ChannelBase
 
   private:
     // Data
+    DVBRecorder      *dvb_recorder; ///< Used to send PMT to recorder
     DVBDiSEqC*        diseqc; ///< Used to send commands to external devices
     DVBCam*           dvbcam; ///< Used to decrypt encrypted streams
 

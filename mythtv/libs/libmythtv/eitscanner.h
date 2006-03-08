@@ -18,9 +18,8 @@ class EITHelper;
 class dvb_channel_t;
 class ProgramMapTable;
 
-class EITScanner : public QObject
+class EITScanner
 {
-    Q_OBJECT
   public:
     EITScanner();
     ~EITScanner() { TeardownAll(); }
@@ -30,10 +29,6 @@ class EITScanner : public QObject
 
     void StartActiveScan(TVRec*, uint max_seconds_per_source);
     void StopActiveScan(void);        
-
-  public slots:
-    void SetPMT(const ProgramMapTable*);
-    void deleteLater(void);
 
   private:
     void TeardownAll(void);

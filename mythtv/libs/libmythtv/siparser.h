@@ -38,6 +38,8 @@ using namespace std;
 typedef void QMap_Events;
 #endif // !USING_DVB_EIT
 
+class DVBRecorder;
+
 class ProgramAssociationTable;
 class ConditionalAccessTable;
 class ProgramMapTable;
@@ -148,7 +150,7 @@ class SIParser : public QObject
     void FindServicesComplete(void);
     void FindEventsComplete(void);
     void TableLoaded(void);
-    void UpdatePMT(const ProgramMapTable *pmt);
+    void UpdatePMT(uint pid, const ProgramMapTable *pmt);
     void EventsReady(QMap_Events* Events);
     void AllEventsPulled(void);
 
@@ -188,6 +190,7 @@ class SIParser : public QObject
     QDateTime EventSearchEndTime;
 
     // Common Variables
+    DVBRecorder        *dvb_recorder;
     int                 table_standard;
     uint                CurrentTransport;
     uint                RequestedServiceID;

@@ -148,8 +148,6 @@ bool TVRec::CreateChannel(const QString &startchannel)
         if (!channel->Open())
             return false;
         InitChannel(genOpt.defaultinput, startchannel);
-        connect(GetDVBChannel(), SIGNAL(UpdatePMT(const ProgramMapTable*)),
-                this,            SLOT(  SetPMT(   const ProgramMapTable*)));
         CloseChannel(); // Close the channel if in dvb_on_demand mode
         init_run = true;
 #endif
@@ -273,7 +271,7 @@ void TVRec::TeardownAll(void)
 #ifdef USING_DVB_EIT
     if (scanner)
     {
-        scanner->deleteLater();
+        delete scanner;
         scanner = NULL;
     }
 #endif // USING_DVB_EIT
@@ -1086,9 +1084,9 @@ void TVRec::CreateSIParser(int program_num)
         {
             dvbsiparser = new DVBSIParser(dvbc->GetCardNum(), true);
             QObject::connect(dvbsiparser,
-                             SIGNAL(UpdatePMT(const ProgramMapTable*)),
+                             SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
                              dvbc,
-                             SLOT(   SetPMT(  const ProgramMapTable*)));
+                             SLOT(   SetPMT(  uint, const ProgramMapTable*)));
         }
 
         dvbsiparser->ReinitSIParser(
@@ -3618,7 +3616,7 @@ bool TVRec::TuningSignalCheck(void)
 #ifdef USING_DVB
     if (GetDVBChannel())
     {
-        GetDVBChannel()->SetPMT(NULL);
+        GetDVBChannel()->SetPMT(0, NULL);
         CreateSIParser(programNum);
         SetFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
     }

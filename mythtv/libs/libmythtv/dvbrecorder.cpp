@@ -69,7 +69,6 @@ using namespace std;
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
 
-const int DVBRecorder::PMT_PID = 0x1700; ///< PID for rewritten PMT
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
@@ -88,7 +87,9 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _reset_pid_filters(true),
       _pid_lock(true),
       // Output stream info
-      _pat(NULL), _pmt(NULL), _next_pmt_version(0),
+      _pat(NULL), _pmt(NULL),
+      _pmt_pid(0x1700),
+      _next_pmt_version(0),
       _ts_packets_until_psip_sync(0),
       // Fake video
       _video_stream_fd(-1),
@@ -163,10 +164,12 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
     DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
 }
 
-void DVBRecorder::SetPMT(const ProgramMapTable *_pmt)
+void DVBRecorder::SetPMT(uint pid, const ProgramMapTable *_pmt)
 {
     QMutexLocker change_lock(&_pid_lock);
-    VERBOSE(VB_RECORD, LOC + "SetPMT()");
+    VERBOSE(VB_RECORD, LOC + "SetPMT("<<pid<<")");
+
+    _pmt_pid = (pid) ? pid : _pmt_pid;
     _input_pmt = new ProgramMapTable(*_pmt);
 
     /* Rev the PMT version since PIDs are changing */
@@ -195,13 +198,10 @@ bool DVBRecorder::Open(void)
     if (_drb)
         _drb->Reset(videodevice, _stream_fd);
 
-    connect(dvbchannel, SIGNAL(UpdatePMT(const ProgramMapTable*)),
-            this,       SLOT(  SetPMT(   const ProgramMapTable*)));
-
     VERBOSE(VB_RECORD, LOC + QString("Card opened successfully fd(%1)")
             .arg(_stream_fd));
 
-    dvbchannel->RecorderStarted();
+    dvbchannel->SetRecorder(this);
 
     return true;
 }
@@ -226,6 +226,8 @@ void DVBRecorder::Close(void)
         close(_stream_fd);
         _stream_fd = -1;
     }
+
+    dvbchannel->SetRecorder(NULL);
 
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
 }
@@ -510,9 +512,9 @@ void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
         delete old_pat;
 
     if (_pat)
-        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPAT()\n" + _pat->toString());
+        VERBOSE(VB_RECORD, LOC + "SetPAT()\n" + _pat->toString());
     else
-        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPAT(NULL)");
+        VERBOSE(VB_RECORD, LOC + "SetPAT(NULL)");
 }
 
 void DVBRecorder::SetOutputPMT(ProgramMapTable *new_pmt)
@@ -525,9 +527,9 @@ void DVBRecorder::SetOutputPMT(ProgramMapTable *new_pmt)
         delete old_pmt;
 
     if (_pmt)
-        VERBOSE(VB_SIPARSER, "DVBRecorder::SetOutputPMT()\n" + _pmt->toString());
+        VERBOSE(VB_RECORD, LOC + "SetOutputPMT()\n" + _pmt->toString());
     else
-        VERBOSE(VB_SIPARSER, "DVBRecorder::SetOutputPMT(NULL)");
+        VERBOSE(VB_RECORD, LOC + "SetOutputPMT(NULL)");
 }
 
 void DVBRecorder::CreatePAT(void)
@@ -540,7 +542,7 @@ void DVBRecorder::CreatePAT(void)
     uint tsid = 1; // transport stream id
     vector<uint> pnum, pid;
     pnum.push_back(1); // program number / service id
-    pid.push_back(PMT_PID);
+    pid.push_back(_pmt_pid);
 
     SetPAT(ProgramAssociationTable::Create(tsid, cc, pnum, pid));
 }
@@ -583,7 +585,7 @@ void DVBRecorder::CreatePMT(void)
 
     // Create the PMT
     ProgramMapTable *pmt = ProgramMapTable::Create(
-        programNumber, PMT_PID, _input_pmt->PCRPID(),
+        programNumber, _pmt_pid, _input_pmt->PCRPID(),
         _next_pmt_version, gdesc,
         pids, types, pdesc);
 

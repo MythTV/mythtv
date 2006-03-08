@@ -214,10 +214,11 @@ class TVRec : public QObject
     void RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo);
     void RecorderPaused(void);
 
+    void DVBGotPMT(void)
+        { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
+
   public slots:
     void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
-    void SetPMT(const ProgramMapTable*) 
-        { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
     void deleteLater(void);
 
   protected:

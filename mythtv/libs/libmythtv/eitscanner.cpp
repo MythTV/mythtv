@@ -27,8 +27,7 @@ QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
 const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner()
-    : QObject(NULL, "EITScanner"),
-      channel(NULL), parser(NULL), eitHelper(new EITHelper()),
+    : channel(NULL), parser(NULL), eitHelper(new EITHelper()),
       exitThread(false), rec(NULL), activeScan(false)
 {
     pthread_create(&eventThread, NULL, SpawnEventLoop, this);
@@ -53,17 +52,6 @@ void EITScanner::TeardownAll(void)
         eitHelper->deleteLater();
         eitHelper = NULL;
     }
-}
-
-void EITScanner::deleteLater(void)
-{
-    TeardownAll();
-    QObject::deleteLater();
-}
-
-void EITScanner::SetPMT(const ProgramMapTable *)
-{
-    eitHelper->ClearList();
 }
 
 /** \fn EITScanner::SpawnEventLoop(void*)
@@ -172,10 +160,8 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser)
     eitHelper->ClearList();
     parser  = _parser;
     channel = _channel;
-    connect(parser,    SIGNAL(EventsReady(QMap_Events*)),
-            eitHelper, SLOT(HandleEITs(QMap_Events*)));
-    connect(channel,   SIGNAL(UpdatePMT(const ProgramMapTable*)),
-            this,      SLOT(  SetPMT(   const ProgramMapTable*)));
+    QObject::connect(parser,    SIGNAL(EventsReady(QMap_Events*)),
+                     eitHelper, SLOT(HandleEITs(QMap_Events*)));
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
