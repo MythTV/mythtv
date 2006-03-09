@@ -30,7 +30,7 @@ class VideoManager : public MythDialog
   public:
     VideoManager(MythMainWindow *parent, const char *name = 0);
     ~VideoManager(void);
-    void VideoManager::processEvents() { qApp->processEvents(); }
+    void processEvents() { qApp->processEvents(); }
     
   public slots:
     void slotManualIMDB();
