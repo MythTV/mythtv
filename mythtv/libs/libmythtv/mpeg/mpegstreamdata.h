@@ -18,11 +18,17 @@ class PSIPTable;
 class RingBuffer;
 class PESPacket;
 
+
 typedef QMap<unsigned int, PESPacket*>  pid_pes_map_t;
 typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
+
+typedef ProgramAssociationTable*        pat_ptr_t;
+
+typedef ProgramMapTable*                pmt_ptr_t;
 typedef vector<const ProgramMapTable*>  pmt_vec_t;
-typedef QMap<uint, const ProgramMapTable*> pmt_map_t;
+typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 typedef QMap<uint, ProgramMapTable*>    pmt_cache_t;
+
 typedef vector<unsigned char>           uchar_vec_t;
 typedef uchar_vec_t                     sections_t;
 typedef QMap<uint, sections_t>          sections_map_t;
@@ -103,14 +109,15 @@ class MPEGStreamData : public QObject
     bool HasAllPMTSections(uint prog_num) const;
 
     // Caching
-    virtual bool HasCachedPAT(void) const;
-    virtual bool HasCachedPMT(uint program_num) const;
-    virtual bool HasAllPMTsCached(void) const;
+    bool HasCachedPAT(void) const;
+    bool HasCachedAllPMT(uint program_num) const;
+    bool HasCachedAnyPMT(uint program_num) const;
+    bool HasCachedAllPMTs(void) const;
 
-    virtual const ProgramAssociationTable *GetCachedPAT(void) const;
-    virtual const ProgramMapTable *GetCachedPMT(uint program_num) const;
-    virtual pmt_vec_t GetCachedPMTs(void) const;
-    virtual pmt_map_t GetCachedPMTMap(void) const;
+    const pat_ptr_t GetCachedPAT(void) const;
+    const pmt_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
+    pmt_vec_t GetCachedPMTs(void) const;
+    pmt_map_t GetCachedPMTMap(void) const;
 
     virtual void ReturnCachedTable(const PSIPTable *psip) const;
     virtual void ReturnCachedTables(pmt_vec_t&) const;
@@ -179,8 +186,8 @@ class MPEGStreamData : public QObject
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
     virtual void DeleteCachedTable(PSIPTable *psip) const;
-    void CachePAT(ProgramAssociationTable *pat);
-    void CachePMT(uint program_num, ProgramMapTable *pmt);
+    void CachePAT(const ProgramAssociationTable *pat);
+    void CachePMT(const ProgramMapTable *pmt);
 
   protected:
     bool                      _have_CRC_bug;

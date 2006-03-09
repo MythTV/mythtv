@@ -37,11 +37,8 @@ class ScanStreamData : public ATSCStreamData
     void ReturnCachedSDTTables(sdt_vec_t &x) const
         { dvb.ReturnCachedSDTTables(x); }
 
-    operator DVBStreamData& ()
-    {
-        cerr<<"XcXcXc"<<endl;
-        return dvb;
-    }
+    operator DVBStreamData& () { return dvb; }
+    operator const DVBStreamData& () const { return dvb; }
 
   signals:
     // DVB

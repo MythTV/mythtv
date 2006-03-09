@@ -44,7 +44,9 @@
 #define SIPARSER_EXTRA_TIME 2000 /**< milliseconds to add for SIParser scan */
 
 #ifdef USING_DVB
+#ifdef USE_SIPARSER
 static bool ignore_encrypted_services(int db_mplexid, QString videodevice);
+#endif
 static int  create_dtv_multiplex_ofdm(
     const TransportScanItem& item, const DVBTuning& tuning);
 void delete_services(int db_mplexid, const ServiceDescriptionTable*);
@@ -132,8 +134,10 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
             SISCAN("Creating SIParser");
             siparser = new DVBSIParser(GetDVBChannel()->GetCardNum());
             pthread_create(&siparser_thread, NULL, SpawnSectionReader, siparser);
-            connect(siparser,        SIGNAL(UpdatePMT(const ProgramMapTable*)),
-                    GetDVBChannel(), SLOT(  SetPMT(   const ProgramMapTable*)));
+            connect(siparser,
+                    SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+                    GetDVBChannel(),
+                    SLOT(  SetPMT(   uint, const ProgramMapTable*)));
         }    
         if (siparser)
         {
@@ -305,14 +309,10 @@ void SIScan::HandleSDT(uint, const ServiceDescriptionTable*)
     HandleDVBDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
 
-void SIScan::HandleNIT(const NetworkInformationTable*)
+void SIScan::HandleNIT(const NetworkInformationTable *nit)
 {
     SISCAN(QString("Got a Network Information Table for %1")
            .arg((*current).FriendlyName));
-    const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
-    const NetworkInformationTable *nit = sd->GetCachedNIT();
-    if (!nit)
-        return;
 
     dvbChanNums.clear();
 
@@ -347,10 +347,14 @@ void SIScan::HandleNIT(const NetworkInformationTable*)
             }
         }
     }
-    sd->ReturnCachedTable(nit);
 
-    emit TransportScanUpdateText(tr("Finished processing Transport List"));
-    emit TransportScanComplete();
+    const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
+    const DVBStreamData &dsd = *sd;
+    if (dsd.HasAllNITSections())
+    {
+        emit TransportScanUpdateText(tr("Finished processing Transport List"));
+        emit TransportScanComplete();
+    }
 }
 
 void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
@@ -376,10 +380,10 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     }
 }
 
-void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_complete)
+void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd,
+                                   bool wait_until_complete)
 {
-    bool hasAll = sd->HasCachedAllVCTs();
-    if (wait_until_complete && !hasAll)
+    if (wait_until_complete && !sd->HasCachedAllVCTs())
         return;
 
     if ((*current).mplexid <= 0)
@@ -406,11 +410,12 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_com
     }
 }
 
-void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool)
+void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
+                                  bool wait_until_complete)
 {
-    //bool hasAll = sd->HasCachedAllSDTs();
-    //if (wait_until_complete && !hasAll)
-    //    return;
+    const DVBStreamData &dsd = (const DVBStreamData &)(*sd);
+    if (wait_until_complete && !dsd.HasCachedAllSDTs())
+        return;
 
     emit ServiceScanUpdateText(tr("Updating Services"));
 
@@ -422,7 +427,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool)
         UpdateSDTinDB((*current).mplexid, sdts[i], forceUpdate);
     sd->ReturnCachedSDTTables(sdts);
 
-    emit ServiceScanUpdateText(tr("Finished processing Transport"));
+    emit ServiceScanUpdateText(tr("Finished processing Services"));
 
     if (scanMode == TRANSPORT_LIST)
     {
@@ -452,11 +457,20 @@ bool SIScan::HandlePostInsertion(void)
     SISCAN(QString("HandlePostInsertion() pat(%1)")
             .arg(sd->HasCachedPAT()));
 
+    // TODO insert ATSC channels based on partial info
     const MasterGuideTable *mgt = sd->GetCachedMGT();
     if (mgt)
     {
         VERBOSE(VB_IMPORTANT, mgt->toString());
         sd->ReturnCachedTable(mgt);
+    }
+
+    // TODO insert DVB channels based on partial info
+    const NetworkInformationTable *nit = sd->GetCachedNIT();
+    if (nit)
+    {
+        VERBOSE(VB_IMPORTANT, nit->toString());
+        sd->ReturnCachedTable(nit);
     }
 
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
@@ -958,12 +972,74 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 
-/** \fn SIScan::UpdatePATinDB(int,const ProgramAssociationTable*,const PMTMap&,bool)
+void SIScan::UpdatePMTinDB(int db_mplexid,
+                           int db_source_id,
+                           int freqid, int pmt_indx,
+                           const ProgramMapTable *pmt,
+                           bool /*force_update*/)
+{
+    // See if service already in database based on program number
+    int chanid = ChannelUtil::GetChanID(
+        db_mplexid, -1, 0, 0, pmt->ProgramNumber());
+
+    QString chan_num = ChannelUtil::GetChanNum(chanid);
+    if (chan_num.isEmpty() || renameChannels)
+    {
+        chan_num = QString("%1#%2")
+            .arg((freqid) ? freqid : db_mplexid).arg(pmt_indx);
+    }
+        
+    QString callsign = ChannelUtil::GetCallsign(chanid);
+    if (callsign == QString::null || callsign == "")
+        callsign = tr("C%1", "Synthesized callsign").arg(chan_num);
+
+    QString service_name = ChannelUtil::GetServiceName(chanid);
+    if (service_name == QString::null || service_name == "")
+        service_name = callsign;
+
+    QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
+        .arg(service_name)
+        .arg(0).arg(0)
+        .arg(chan_num)
+        .arg((*current).FriendlyName).arg(freqid);
+
+    if (chanid < 0)
+    {   // The service is not in database, add it
+        emit ServiceScanUpdateText(
+            tr("Adding %1").arg(common_status_info));
+        chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
+        ChannelUtil::CreateChannel(
+            db_mplexid, db_source_id, chanid,
+            callsign,
+            service_name,
+            chan_num,
+            pmt->ProgramNumber(),
+            0, 0,
+            false, false, false, freqid);
+    }
+    else
+    {   // The service is in database, update it
+        emit ServiceScanUpdateText(
+            tr("Updating %1").arg(common_status_info));
+        ChannelUtil::UpdateChannel(
+            db_mplexid,
+            db_source_id,
+            chanid,
+            callsign,
+            service_name,
+            chan_num,
+            pmt->ProgramNumber(),
+            0, 0,
+            freqid);
+    }
+}
+
+/** \fn SIScan::UpdatePATinDB(int,const ProgramAssociationTable*,const pmt_map_t&,bool)
  */
 void SIScan::UpdatePATinDB(int tid_db,
                            const ProgramAssociationTable *pat,
-                           const PMTMap &pmt_map,
-                           bool)
+                           const pmt_map_t &pmt_map,
+                           bool /*force_update*/)
 {
     SISCAN(QString("UpdatePATinDB(): mplex: %1:%2")
             .arg(tid_db).arg((*current).mplexid));
@@ -993,77 +1069,26 @@ void SIScan::UpdatePATinDB(int tid_db,
                    .arg(pat->ProgramNumber(i)));
             continue;
         }
-
-        const ProgramMapTable *pmt = *it;
-        VERBOSE(VB_SIPARSER,
-                QString("UpdatePATinDB(): Prog %1 PID %2: PMT @")
-                .arg(pat->ProgramNumber(i))
-                .arg(pat->ProgramPID(i))<<pmt);
-
-        // ignore all services without PMT, and
-        // ignore services we have decided to ignore
-        if (!pmt)
-            continue;
-        else if (pmt->StreamCount() <= 0)
-            continue;
-        else if (ignoreAudioOnlyServices && pmt->IsStillPicture())
-            continue;
-        else if (ignoreEncryptedServices && pmt->IsEncrypted())
-            continue;
-        
-        // See if service already in database based on program number
-        int chanid = ChannelUtil::GetChanID(
-            db_mplexid, -1, 0, 0, pat->ProgramNumber(i));
-
-        QString chan_num = ChannelUtil::GetChanNum(chanid);
-        if (chan_num.isEmpty() || renameChannels)
+        pmt_vec_t::const_iterator vit = (*it).begin();
+        for (; vit != (*it).end(); ++vit)
         {
-            chan_num = QString("%1#%2")
-                .arg((freqid) ? freqid : db_mplexid).arg(i);
-        }
-        
-        QString callsign = ChannelUtil::GetCallsign(chanid);
-        if (callsign == QString::null || callsign == "")
-            callsign = tr("C%1", "Synthesized callsign").arg(chan_num);
+            VERBOSE(VB_SIPARSER,
+                    QString("UpdatePATinDB(): Prog %1 PID %2: PMT @")
+                    .arg(pat->ProgramNumber(i))
+                    .arg(pat->ProgramPID(i)) << *vit);
 
-        QString service_name = ChannelUtil::GetServiceName(chanid);
-        if (service_name == QString::null || service_name == "")
-            service_name = callsign;
+            // ignore all services without PMT, and
+            // ignore services we have decided to ignore
+            if (!(*vit))
+                continue;
+            else if ((*vit)->StreamCount() <= 0)
+                continue;
+            else if (ignoreAudioOnlyServices && (*vit)->IsStillPicture())
+                continue;
+            else if (ignoreEncryptedServices && (*vit)->IsEncrypted())
+                continue;
 
-        QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
-            .arg(service_name)
-            .arg(0).arg(0)
-            .arg(chan_num)
-            .arg((*current).FriendlyName).arg(freqid);
-
-        if (chanid < 0)
-        {   // The service is not in database, add it
-            emit ServiceScanUpdateText(
-                tr("Adding %1").arg(common_status_info));
-            chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
-            ChannelUtil::CreateChannel(
-                db_mplexid, db_source_id, chanid,
-                callsign,
-                service_name,
-                chan_num,
-                pat->ProgramNumber(i),
-                0, 0,
-                false, false, false, freqid);
-        }
-        else
-        {   // The service is in database, update it
-            emit ServiceScanUpdateText(
-                tr("Updating %1").arg(common_status_info));
-            ChannelUtil::UpdateChannel(
-                db_mplexid,
-                db_source_id,
-                chanid,
-                callsign,
-                service_name,
-                chan_num,
-                pat->ProgramNumber(i),
-                0, 0,
-                freqid);
+            UpdatePMTinDB(db_mplexid, db_source_id, freqid, i, *vit, false);
         }
     }    
 }
@@ -1815,6 +1840,7 @@ void SIScan::HandleSIParserEvents(void)
 // ///////////////////// Static DB helper methods /////////////////////
 // ///////////////////// Static DB helper methods /////////////////////
 
+#ifdef USE_SIPARSER
 static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1837,6 +1863,7 @@ static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
     }
     return true;
 }
+#endif // USE_SIPARSER
 
 #ifdef USING_DVB
 static int create_dtv_multiplex_ofdm(const TransportScanItem& item,

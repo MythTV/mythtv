@@ -399,7 +399,7 @@ class ProgramAssociationTable : public PSIPTable
     ProgramAssociationTable(const ProgramAssociationTable& table)
         : PSIPTable(table)
     {
-        assert(TableID::PMT == TableID());
+        assert(TableID::PAT == TableID());
     }
 
     ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table)

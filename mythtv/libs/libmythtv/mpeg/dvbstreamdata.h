@@ -10,9 +10,13 @@ class NetworkInformationTable;
 class ServiceDescriptionTable;
 class DVBEventInformationTable;
 
-typedef ServiceDescriptionTable*               sdt_ptr_t;
-typedef vector<const ServiceDescriptionTable*> sdt_vec_t;
-typedef QMap<uint, sdt_ptr_t>                  sdt_cache_t;
+typedef NetworkInformationTable* nit_ptr_t;
+typedef vector<const nit_ptr_t>  nit_vec_t;
+typedef QMap<uint, nit_ptr_t>    nit_cache_t;
+
+typedef ServiceDescriptionTable* sdt_ptr_t;
+typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
+typedef QMap<uint, ServiceDescriptionTable*>    sdt_cache_t;
 
 class DVBStreamData : public MPEGStreamData
 {
@@ -114,12 +118,15 @@ class DVBStreamData : public MPEGStreamData
     bool EITSectionSeen(uint tableid, uint serviceid, uint section) const;
 
     // Caching
-    bool HasCachedNIT(bool current = true) const;
-    bool HasCachedSDT(uint tsid, bool current = true) const;
+    bool HasCachedAnyNIT(bool current = true) const;
+    bool HasCachedAllNIT(bool current = true) const;
+    bool HasCachedAnySDT(uint tsid, bool current = true) const;
+    bool HasCachedAllSDT(uint tsid, bool current = true) const;
     bool HasCachedAllSDTs(bool current = true) const;
 
-    const NetworkInformationTable *GetCachedNIT(bool current = true) const;
-    const sdt_ptr_t GetCachedSDT(uint tsid, bool current = true) const;
+    const nit_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
+    const sdt_ptr_t GetCachedSDT(uint tsid, uint section_num,
+                                 bool current = true) const;
     sdt_vec_t GetAllCachedSDTs(bool current = true) const;
 
     void ReturnCachedSDTTables(sdt_vec_t&) const;
@@ -139,8 +146,8 @@ class DVBStreamData : public MPEGStreamData
 
   private:
     // Caching
-    void CacheNIT(NetworkInformationTable *);
-    void CacheSDT(uint tsid, ServiceDescriptionTable*);
+    void CacheNIT(const NetworkInformationTable*);
+    void CacheSDT(const ServiceDescriptionTable*);
 
     // Table versions
     int                       _nit_version;
@@ -156,7 +163,7 @@ class DVBStreamData : public MPEGStreamData
     sections_map_t            _sdto_section_seen;
 
     // Caching
-    NetworkInformationTable  *_cached_nit;
+    nit_cache_t               _cached_nit;
     sdt_cache_t               _cached_sdts; // pid->sdt
 };
 

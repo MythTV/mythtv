@@ -15,7 +15,7 @@
 #include "frequencytables.h"
 
 #ifdef USING_DVB
-#define USE_SIPARSER
+//#define USE_SIPARSER
 #include "sitypes.h"
 #include "dvbtypes.h"
 #endif // USING_DVB
@@ -48,7 +48,8 @@ typedef enum
     TRANSPORT_LIST, ///< Actively scan for channels
 } SCANMODE;
 
-typedef QMap<uint, const ProgramMapTable *> PMTMap;
+typedef vector<const ProgramMapTable*>  pmt_vec_t;
+typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 
 class SIScan : public QObject
 {
@@ -126,7 +127,13 @@ class SIScan : public QObject
     void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdatePATinDB(int mplexid,
                        const ProgramAssociationTable*,
-                       const PMTMap &,
+                       const pmt_map_t&,
+                       bool force_update);
+
+    void UpdatePMTinDB(int mplexid,
+                       int db_source_id,
+                       int freqid, int pmt_indx,
+                       const ProgramMapTable*,
                        bool force_update);
 
     void HandleATSCDBInsertion(const ScanStreamData *sd, bool wait);

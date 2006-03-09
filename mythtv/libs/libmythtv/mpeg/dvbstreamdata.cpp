@@ -5,8 +5,7 @@
 
 DVBStreamData::DVBStreamData(bool cacheTables)
     : MPEGStreamData(-1, cacheTables),
-      _nit_version(-2), _nito_version(-2),
-      _cached_nit(NULL)
+      _nit_version(-2), _nito_version(-2)
 {
     setName("DVBStreamData");
     SetVersionNIT(-1,0);
@@ -117,12 +116,14 @@ void DVBStreamData::Reset(void)
     {
         _cache_lock.lock();
 
-        DeleteCachedTable(_cached_nit);
-        _cached_nit = NULL;
+        nit_cache_t::iterator nit = _cached_nit.begin();
+        for (; nit != _cached_nit.end(); ++nit)
+            DeleteCachedTable(*nit);
+        _cached_nit.clear();
 
-        sdt_cache_t::iterator it = _cached_sdts.begin();
-        for (; it != _cached_sdts.end(); ++it)
-            DeleteCachedTable(*it);
+        sdt_cache_t::iterator sit = _cached_sdts.begin();
+        for (; sit != _cached_sdts.end(); ++sit)
+            DeleteCachedTable(*sit);
         _cached_sdts.clear();
 
         _cache_lock.unlock();
@@ -148,19 +149,13 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         {
             SetVersionNIT(psip.Version(), psip.LastSection());
             SetNITSectionSeen(psip.Section());
+            NetworkInformationTable nit(psip);
 
             if (_cache_tables)
-            {
-                NetworkInformationTable *nit =
-                    new NetworkInformationTable(psip);
-                CacheNIT(nit);
-                emit UpdateNIT(nit);
-            }
-            else
-            {
-                NetworkInformationTable nit(psip);
-                emit UpdateNIT(&nit);
-            }
+                CacheNIT(&nit);
+
+            emit UpdateNIT(&nit);
+
             return true;
         }
         case TableID::SDT:
@@ -168,19 +163,13 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             uint tsid = psip.TableIDExtension();
             SetVersionSDT(tsid, psip.Version(), psip.LastSection());
             SetSDTSectionSeen(tsid, psip.Section());
+            ServiceDescriptionTable sdt(psip);
 
             if (_cache_tables)
-            {
-                ServiceDescriptionTable *sdt =
-                    new ServiceDescriptionTable(psip);
-                CacheSDT(tsid, sdt);
-                emit UpdateSDT(tsid, sdt);
-            }
-            else
-            {
-                ServiceDescriptionTable sdt(psip);
-                emit UpdateSDT(tsid, &sdt);
-            }
+                CacheSDT(&sdt);
+
+            emit UpdateSDT(tsid, &sdt);
+
             return true;
         }
         case TableID::NITo:
@@ -334,88 +323,147 @@ bool DVBStreamData::EITSectionSeen(uint tableid, uint serviceid,
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
-bool DVBStreamData::HasCachedNIT(bool current) const
+bool DVBStreamData::HasCachedAnyNIT(bool current) const
 {
+    QMutexLocker locker(&_cache_lock);
+
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    return (bool)(_cached_nit);
+    return (bool)(_cached_nit.size());
 }
 
-bool DVBStreamData::HasCachedSDT(uint tsid, bool current) const
+bool DVBStreamData::HasCachedAllNIT(bool current) const
 {
+    QMutexLocker locker(&_cache_lock);
+
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    _cache_lock.lock();
-    sdt_cache_t::const_iterator it = _cached_sdts.find(tsid);
-    bool exists = (it != _cached_sdts.end());
-    _cache_lock.unlock();
-    return exists;
+    if (_cached_nit.empty())
+        return false;
+
+    uint last_section = (*_cached_nit.begin())->LastSection();
+    if (!last_section)
+        return true;
+
+    for (uint i = 1; i <= last_section; i++)
+        if (_cached_nit.find(i) == _cached_nit.end())
+            return false;
+
+    return true;
+}
+
+bool DVBStreamData::HasCachedAllSDT(uint tsid, bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    sdt_cache_t::const_iterator it = _cached_sdts.find(tsid << 8);
+    if (it == _cached_sdts.end())
+        return false;
+
+    uint last_section = (*it)->LastSection();
+    if (!last_section)
+        return true;
+
+    for (uint i = 1; i <= last_section; i++)
+        if (_cached_sdts.find((tsid << 8) | i) == _cached_sdts.end())
+            return false;
+
+    return true;
+}
+
+bool DVBStreamData::HasCachedAnySDT(uint tsid, bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    for (uint i = 0; i <= 255; i++)
+        if (_cached_sdts.find((tsid << 8) | i) != _cached_sdts.end())
+            return true;
+
+    return false;
 }
 
 bool DVBStreamData::HasCachedAllSDTs(bool current) const
 {
+    QMutexLocker locker(&_cache_lock);
+
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    if (!_cached_nit)
+    if (_cached_nit.empty())
         return false;
 
-    _cache_lock.lock();
-    bool ret = (bool)(_cached_nit);
-    for (uint i = 0; ret && (i < _cached_nit->TransportStreamCount()); ++i)
-        ret &= HasCachedSDT(_cached_nit->TSID(i));
-    _cache_lock.unlock();
+    nit_cache_t::const_iterator it = _cached_nit.begin();
+    for (; it != _cached_nit.end(); ++it)
+    {
+        if ((*it)->TransportStreamCount() > _cached_sdts.size())
+            return false;
 
-    return ret;
+        for (uint i = 0; i < (*it)->TransportStreamCount(); i++)
+            if (!HasCachedAllSDT((*it)->TSID(i), current))
+                return false;
+    }
+
+    return true;
 }
 
-const NetworkInformationTable *DVBStreamData::GetCachedNIT(bool current) const
+const nit_ptr_t DVBStreamData::GetCachedNIT(
+    uint section_num, bool current) const
 {
+    QMutexLocker locker(&_cache_lock);
+
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    _cache_lock.lock();
-    const NetworkInformationTable *nit = _cached_nit;
-    IncrementRefCnt(nit);
-    _cache_lock.unlock();
+    nit_ptr_t nit = NULL;
+
+    nit_cache_t::const_iterator it = _cached_nit.find(section_num);
+    if (it != _cached_nit.end())
+        IncrementRefCnt(nit = *it);
 
     return nit;
 }
 
-const sdt_ptr_t DVBStreamData::GetCachedSDT(uint tsid, bool current) const
+const sdt_ptr_t DVBStreamData::GetCachedSDT(
+    uint tsid, uint section_num, bool current) const
 {
+    QMutexLocker locker(&_cache_lock);
+
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    ServiceDescriptionTable *sdt = NULL;
+    sdt_ptr_t sdt = NULL;
 
-    _cache_lock.lock();
-    sdt_cache_t::const_iterator it = _cached_sdts.find(tsid);
+    uint key = (tsid << 8) | section_num;
+    sdt_cache_t::const_iterator it = _cached_sdts.find(key);
     if (it != _cached_sdts.end())
         IncrementRefCnt(sdt = *it);
-    _cache_lock.unlock();
 
     return sdt;
 }
 
 sdt_vec_t DVBStreamData::GetAllCachedSDTs(bool current) const
 {
+    QMutexLocker locker(&_cache_lock);
+
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    vector<const ServiceDescriptionTable*> sdts;
+    sdt_vec_t sdts;
 
-    _cache_lock.lock();
     sdt_cache_t::const_iterator it = _cached_sdts.begin();
     for (; it != _cached_sdts.end(); ++it)
     {
-        ServiceDescriptionTable* sdt = *it;
-        IncrementRefCnt(sdt);
-        sdts.push_back(sdt);
+        IncrementRefCnt(*it);
+        sdts.push_back(*it);
     }
-    _cache_lock.unlock();
 
     return sdts;
 }
@@ -427,22 +475,31 @@ void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
     sdts.clear();
 }
 
-void DVBStreamData::CacheNIT(NetworkInformationTable *nit)
+void DVBStreamData::CacheNIT(const NetworkInformationTable *_nit)
 {
-    _cache_lock.lock();
-    DeleteCachedTable(_cached_nit);
-    _cached_nit = nit;
-    _cache_lock.unlock();
+    NetworkInformationTable *nit = new NetworkInformationTable(*_nit);
+
+    QMutexLocker locker(&_cache_lock);
+
+    nit_cache_t::iterator it = _cached_nit.find(_nit->Section());
+    if (it != _cached_nit.end())
+        DeleteCachedTable(*it);
+
+    _cached_nit[_nit->Section()] = nit;
 }
 
-void DVBStreamData::CacheSDT(uint tsid, ServiceDescriptionTable *sdt)
+void DVBStreamData::CacheSDT(const ServiceDescriptionTable *_sdt)
 {
-    _cache_lock.lock();
-    sdt_cache_t::iterator it = _cached_sdts.find(tsid);
+    ServiceDescriptionTable *sdt = new ServiceDescriptionTable(*_sdt);
+    uint key = (_sdt->TSID() << 8) | _sdt->Section();
+
+    QMutexLocker locker(&_cache_lock);
+
+    sdt_cache_t::iterator it = _cached_sdts.find(key);
     if (it != _cached_sdts.end())
         DeleteCachedTable(*it);
-    _cached_sdts[tsid] = sdt;
-    _cache_lock.unlock();    
+
+    _cached_sdts[key] = sdt;
 }
 
 void DVBStreamData::PrintNIT(const NetworkInformationTable* nit) const
