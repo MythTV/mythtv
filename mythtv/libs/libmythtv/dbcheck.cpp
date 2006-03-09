@@ -2062,7 +2062,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT chanid, startime, cutlist FROM recorded"
+        query.prepare("SELECT chanid, starttime, cutlist FROM recorded"
                       " WHERE LENGTH(cutlist) > 1;"); 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -2078,20 +2078,20 @@ static bool doUpgradeTVDatabaseSchema(void)
                     long long start = 0, end = 0;
                     if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) == 2)
                     {
-                        insert.prepare(QString(
+                        insert.prepare(
                                "INSERT INTO recordedmarkup (chanid, starttime,"
-                               " type, mark) VALUES (%1, %2, '1', %3);")
-                               .arg(query.value(0).toInt())
-                               .arg(query.value(1).toInt())
-                               .arg(start));
+                               " type, mark) "
+                               "VALUES (:CHANID, :STARTTIME, :TYPE, :MARK);");
+                        insert.bindValue(":CHANID", query.value(0).toString());
+                        insert.bindValue(":STARTTIME",
+                                         query.value(1).toDateTime());
+
+                        insert.bindValue(":TYPE", 1);
+                        insert.bindValue(":MARK", start);
                         insert.exec();
 
-                        insert.prepare(QString(
-                               "INSERT INTO recordedmarkup (chanid, starttime,"
-                               " type, mark) VALUES (%1, %2, '0', %3);")
-                               .arg(query.value(0).toInt())
-                               .arg(query.value(1).toInt())
-                               .arg(end));
+                        insert.bindValue(":TYPE", 0);
+                        insert.bindValue(":MARK", end);
                         insert.exec();
                     }
                 }
