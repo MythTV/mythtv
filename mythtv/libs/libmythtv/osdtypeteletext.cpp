@@ -147,10 +147,9 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
                                     const unsigned char* buf,
                                     int vbimode, int lang, int flags)
 {
-    if (page < 256)
-        return;
-
     int magazine = MAGAZINE(page);
+    if (magazine < 1 || magazine > 8)
+        return;
     int lastPage = m_magazines[magazine - 1].current_page;
     int lastSubPage = m_magazines[magazine - 1].current_subpage;
 
@@ -228,7 +227,7 @@ void OSDTypeTeletext::AddTeletextData(int magazine, int row,
             if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
             {
                 for (int j = 0; j < 40; j++)
-                ttpage->data[row][j] = bitswap[buf[j]];
+                    ttpage->data[row][j] = bitswap[buf[j]];
             } 
             else 
             {
@@ -815,7 +814,7 @@ void OSDTypeTeletext::DrawCharacter(int x, int y, QChar ch, int doubleheight)
 
     m_font->DrawString(m_surface, x, y, line,
                        m_surface->width, m_surface->height,
-                       255, doubleheight!=0);
+                       255, doubleheight);
 }
 
 /** \fn OSDTypeTeletext::DrawMosaic(int, int, code, int)
@@ -842,10 +841,7 @@ void OSDTypeTeletext::DrawMosaic(int x, int y, int code, int doubleheight)
     int dy = (int)round(m_tt_rowspace / 3)+1;
 
     if (doubleheight != 0)
-    {
-        dx *= 2;
         dy *= 2;
-    }
 
     if (code & 0x10) DrawRect(x,      y + 2*dy, dx, dy);
     if (code & 0x40) DrawRect(x + dx, y + 2*dy, dx, dy);
@@ -904,7 +900,7 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
     {
         if (startbox)
         {
-            bgcolor = bgcolor = TTColor::BLACK;
+            bgcolor = TTColor::BLACK;
             startbox = false;
         }
 
@@ -939,7 +935,7 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
                     startbox = true;
                 goto ctrl;
             case 0x0c: // normal height
-                doubleheight = 0;
+                doubleheight = false;
                 goto ctrl;
             case 0x0d: // double height
                 doubleheight = row < kTeletextRows-1;
@@ -1001,8 +997,8 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
                 SetBackgroundColor(TTColor::TRANSPARENT);
 
             DrawBackground(x, row);
-            if (doubleheight != 0)
-                    DrawBackground(x, row +1);
+            if (doubleheight && row < kTeletextRows)
+                DrawBackground(x, row + 1);
 
             if ((mosaic) && (ch < 0x40 || ch > 0x5F))
             {
@@ -1011,12 +1007,10 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
             }
             else 
             {
-                if (doubleheight != 0)
-                    DrawCharacter(x, row+1, CharConversion(ch, lang),
-                                  doubleheight);
-                else
-                    DrawCharacter(x, row, CharConversion(ch, lang),
-                                  doubleheight);
+                char ch = CharConversion(ch, lang);
+                bool dh = doubleheight && row < kTeletextRows;
+                int  rw = (dh) ? row + 1 : row;
+                DrawCharacter(x, rw, ch, dh);
             }
         }
     }

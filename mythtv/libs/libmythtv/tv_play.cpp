@@ -123,18 +123,6 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SWAPPIP", "Swap PiP/Main", "N");
     REG_KEY("TV Playback", "TOGGLEASPECT", "Toggle the display aspect ratio",
             "W");
-    REG_KEY("TV Playback", "MENURED",
-            "Menu Red",    "F2");
-    REG_KEY("TV Playback", "MENUGREEN",
-            "Menu Green",  "F3");
-    REG_KEY("TV Playback", "MENUYELLOW",
-            "Menu Yellow", "F4");
-    REG_KEY("TV Playback", "MENUBLUE",
-            "Menu Blue",   "F5");
-    REG_KEY("TV Playback", "MENUWHITE",
-            "Menu White",  "F6");
-    REG_KEY("TV Playback", "REVEAL",
-            "Teletext reveal hidden Text", "F12");
 
     REG_KEY("TV Playback", "TOGGLECC",      "Toggle any captions",   "T");
     REG_KEY("TV Playback", "TOGGLETT",      "Toggle Teletext Captions","");
@@ -184,8 +172,9 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
-    REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");   
- 
+    REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
+
+    /* Editing keys */
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "INVERTMAP", "Invert Begin/End cut points", "I");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
@@ -197,6 +186,20 @@ void TV::InitKeys(void)
     REG_KEY("TV Editing", "BIGJUMPFWD", "Jump forward 10x the normal amount",
             ">,.");
     REG_KEY("TV Editing", "TOGGLEEDIT", "Exit out of Edit Mode", "E");
+
+    /* Teletext keys */
+    REG_KEY("Teletext Menu", "NEXTPAGE",    "Next Page",             "Down");
+    REG_KEY("Teletext Menu", "PREVPAGE",    "Previous Page",         "Up");
+    REG_KEY("Teletext Menu", "NEXTSUBPAGE", "Next Subpage",          "Right");
+    REG_KEY("Teletext Menu", "PREVSUBPAGE", "Previous Subpage",      "Left");
+    REG_KEY("Teletext Menu", "TOGGLECC",    "Toggle Teletext",       "T"); 
+    REG_KEY("Teletext Menu", "MENURED",     "Menu Red",              "F2");
+    REG_KEY("Teletext Menu", "MENUGREEN",   "Menu Green",            "F3");
+    REG_KEY("Teletext Menu", "MENUYELLOW",  "Menu Yellow",           "F4");
+    REG_KEY("Teletext Menu", "MENUBLUE",    "Menu Blue",             "F5");
+    REG_KEY("Teletext Menu", "MENUWHITE",   "Menu White",            "F6");
+    REG_KEY("Teletext Menu", "TOGGLEBACKGROUND","Toggle Background", "F7");
+    REG_KEY("Teletext Menu", "REVEAL",      "Reveal hidden Text",    "F8");
 /*
   keys already used:
 
@@ -204,6 +207,7 @@ void TV::InitKeys(void)
   Playback: ABCDEFGH JK  NOPQRSTUVWXYZ
   Frontend:    D          OP R  U  X   01 3   7 9
   Editing:    C E   I       Q        Z
+  Teletext:                    T
 
   Playback: <>,.?/|[]{}\+-*#^
   Frontend: <>,.?/
@@ -213,11 +217,13 @@ void TV::InitKeys(void)
   Playback: PgDown, PgUp,  Right, Left, Home, End, Up, Down, Backspace,
   Frontend:                Right, Left, Home, End
   Editing:  PgDown, PgUp,               Home, End
+  Teletext:                Right, Left,            Up, Down,
 
   Global:   Return, Enter, Space, Esc
 
   Global:          F1,
-  Playback: Ctrl-B,   F2,F3,F4,F5,F6,F7,F8,F9,F10,F11
+  Playback: Ctrl-B,                  F7,F8,F9,F10,F11
+  Teletext            F2,F3,F4,F5,F6,F7,F8
  */
 }
 
@@ -1948,11 +1954,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
     //XXX ivtv/dvb teletext
     if (activenvp && (activenvp->GetCaptionMode() == kDisplayTeletextA))
     {
-        for (uint i = 0; i < actions.size() && !handled; i++)
-            handled |= activenvp->HandleTeletextAction(actions[i]);
-
-        if (handled)
-            return;
+        QStringList tt_actions;
+        if (gContext->GetMainWindow()->TranslateKeyPress(
+                "Teletext Menu", e, tt_actions))
+        {
+            for (uint i = 0; i < tt_actions.size(); i++)
+                if (activenvp->HandleTeletextAction(tt_actions[i]))
+                    return;
+        }
     }
 
     if (zoomMode)

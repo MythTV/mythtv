@@ -309,7 +309,10 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
            ymin = 0;
        }
        else
-           ioff = (rmap->rows - ymin - 1) * rmap->cols;
+       {
+           int ym = (double_size) ? (ymin << 1) : ymin;
+           ioff   = (rmap->rows - ym - 1) * rmap->cols;
+       }
 
        if (ymax >= rmap->rows)
            ymax = rmap->rows - 1;
@@ -473,23 +476,25 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
       height = h;
 
    if (x < 0)
-     {
-	clipx = -x;
-	width += x;
-	x = 0;
-     }
+   {
+       clipx -= x;
+       width += x;
+       x = 0;
+   }
+
    if (y < 0)
-     {
-	clipy = -y;
-	height += y;
-	y = 0;
-     }
+   {
+       clipy  -= y;
+       height += y;
+       y = 0;
+   }
+
    if ((width <= 0) || (height <= 0))
-     {
-	destroy_font_raster(rmap);
-	destroy_font_raster(rtmp);
-	return;
-     }
+   {
+       destroy_font_raster(rmap);
+       destroy_font_raster(rtmp);
+       return;
+   }
 
    if (m_shadowxoff > 0 || m_shadowyoff > 0)
    {

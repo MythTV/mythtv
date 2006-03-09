@@ -1530,15 +1530,15 @@ bool NuppelVideoPlayer::HandleTeletextAction(const QString &action)
     if (!tt)
         return false;
 
-    if (action == "UP")
+    if (action == "NEXTPAGE")
         tt->KeyPress(TTKey::kNextPage);
-    else if (action == "DOWN")
+    else if (action == "PREVPAGE")
         tt->KeyPress(TTKey::kPrevPage);
-    else if (action == "RIGHT")
+    else if (action == "NEXTSUBPAGE")
         tt->KeyPress(TTKey::kNextSubPage);
-    else if (action == "LEFT")
+    else if (action == "PREVSUBPAGE")
         tt->KeyPress(TTKey::kPrevSubPage);
-    else if (action == "TOGGLEASPECT")
+    else if (action == "TOGGLEBACKGROUND")
         tt->KeyPress(TTKey::kTransparent);
     else if (action == "MENURED")
         tt->KeyPress(TTKey::kFlofRed);
