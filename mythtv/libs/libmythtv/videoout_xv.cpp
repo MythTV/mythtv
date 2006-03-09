@@ -2987,28 +2987,36 @@ int VideoOutputXv::ChangePictureAttribute(int attribute, int newValue)
     if (!attrName)
         return -1;
 
-    if (newValue < 0) newValue = 0;
-    if (newValue >= 100) newValue = 99;
+    newValue = max(newValue, 0);
+    newValue = min(newValue, 100);
 
     X11S(attributeAtom = XInternAtom (XJ_disp, attrName, False));
-    if (!attributeAtom) {
+    if (!attributeAtom)
         return -1;
-    }
 
     X11S(attributes = XvQueryPortAttributes(XJ_disp, xv_port, &howmany));
-    if (!attributes) {
+    if (!attributes)
         return -1;
-    }
 
-    for (i = 0; i < howmany; i++) {
-        if (!strcmp(attrName, attributes[i].name)) {
+    for (i = 0; i < howmany; i++)
+    {
+        if (!strcmp(attrName, attributes[i].name))
+        {
             port_min = attributes[i].min_value;
             port_max = attributes[i].max_value;
             range = port_max - port_min;
 
-            value = (int) (port_min + (range/100.0) * newValue);
+            int tmpval = (int) roundf(range * 0.01f * newValue);
+            value = min(tmpval + port_min, port_max);
 
-            X11S(XvSetPortAttribute(XJ_disp, xv_port, attributeAtom, value));
+            X11L;
+            XvSetPortAttribute(XJ_disp, xv_port, attributeAtom, value);
+#ifdef USING_XVMC
+            // Needed for VIA XvMC to commit change immediately.
+            if (video_output_subtype > XVideo)
+                XvMCSetAttribute(XJ_disp, xvmc_ctx, attributeAtom, value);
+#endif
+            X11U;
 
             return newValue;
         }

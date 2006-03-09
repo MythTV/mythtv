@@ -5539,8 +5539,7 @@ void TV::DoTogglePictureAttribute(void)
                 break;
             case kPictureAttribute_Volume:
                 aud = nvp->getAudioOutput();
-                value = (aud) ? (aud->GetCurrentVolume()) 
-                        : 99; 
+                value = (aud) ? (aud->GetCurrentVolume()) : 99;
                 title = tr("Adjust Volume");
                 picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);
                 break;
