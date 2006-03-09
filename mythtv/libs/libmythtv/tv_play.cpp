@@ -1804,12 +1804,6 @@ bool TV::HandleTrackAction(const QString &action)
         }
     }
 
-    if (!handled)
-    {
-        VERBOSE(VB_IMPORTANT, QString("HandleTrackAction(%1) not handled")
-                .arg(action));
-    }
-
     return handled;
 }
 
