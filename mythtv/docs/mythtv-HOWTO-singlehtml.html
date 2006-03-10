@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-03-01, v0.19.01
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-03-10, v0.19.02
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -213,7 +213,7 @@ necessary.</EM>
 <LI><A NAME="toc23.11">23.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.11">Automatically starting mythfrontend at system boot time</A>
 <LI><A NAME="toc23.12">23.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.12">Automatically starting mythbackend at system boot time</A>
 <LI><A NAME="toc23.13">23.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.13">Advanced Backend Configurations </A>
-<LI><A NAME="toc23.14">23.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.14">Using the transcoder.</A>
+<LI><A NAME="toc23.14">23.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.14">Using the transcoder</A>
 <LI><A NAME="toc23.15">23.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.15">Changing your hostname</A>
 <LI><A NAME="toc23.16">23.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.16">Can I run MythTV on my TiVo?</A>
 <LI><A NAME="toc23.17">23.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.17">Can I run MythTV on my ReplayTV?</A>
@@ -980,7 +980,7 @@ satisfying any prerequisites.</P>
 <IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
-MySQL must run on one of the MythTV boxes.</CAPTION>
+MySQL must run on one of the MythTV boxes.  The minimum MySQL version is 3.23.</CAPTION>
 </FIGURE>
 </P>
 
@@ -5859,6 +5859,11 @@ command line.</P>
 file.</P>
 <P>All of the output from <CODE>gdb.txt</CODE> should be posted to the mythtv-dev
 mailing list, along with the steps you followed to get the program to crash.</P>
+<P><B>NOTE</B>:  If you're trimming the <CODE>gdb.txt</CODE> file to remove
+extraneous information from the beginning of the file, make sure you include
+at least 10 lines <EM>prior</EM> to the point where the backtrace actually
+begins.  This ensures that there is some context to the backtrace, and so
+that it's possible to see what exactly caused the segfault.</P>
 <P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
 information.  </P>
 <P>Using the <CODE>gdbcommands</CODE> file in conjunction with a <B>while</B> loop
@@ -6240,11 +6245,6 @@ they run.  The following window managers are known to work correctly:</P>
 <P><B>NOTE</B>:  You do not need to use <B>irxevent</B> if you are using
 MythTV's native LIRC support, so the window manager focus issue does not
 apply in that case.</P>
-
-<H3>PVR-250 card doesn't show inputs in the setup screen.</H3>
-
-<P>See message 
-<A HREF="http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html">http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html</A></P>
 
 <H3>Where's "canada-cable"?</H3>
 
@@ -6974,7 +6974,7 @@ be used.</P>
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
 
-<H2><A NAME="ss23.14">23.14</A> <A HREF="#toc23.14">Using the transcoder.</A>
+<H2><A NAME="ss23.14">23.14</A> <A HREF="#toc23.14">Using the transcoder</A>
 </H2>
 
 <P>MythTV's built-in transcoder re-encodes recordings from one codec to

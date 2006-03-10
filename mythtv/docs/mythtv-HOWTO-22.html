@@ -145,6 +145,11 @@ command line.</P>
 file.</P>
 <P>All of the output from <CODE>gdb.txt</CODE> should be posted to the mythtv-dev
 mailing list, along with the steps you followed to get the program to crash.</P>
+<P><B>NOTE</B>:  If you're trimming the <CODE>gdb.txt</CODE> file to remove
+extraneous information from the beginning of the file, make sure you include
+at least 10 lines <EM>prior</EM> to the point where the backtrace actually
+begins.  This ensures that there is some context to the backtrace, and so
+that it's possible to see what exactly caused the segfault.</P>
 <P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
 information.  </P>
 <P>Using the <CODE>gdbcommands</CODE> file in conjunction with a <B>while</B> loop
@@ -526,11 +531,6 @@ they run.  The following window managers are known to work correctly:</P>
 <P><B>NOTE</B>:  You do not need to use <B>irxevent</B> if you are using
 MythTV's native LIRC support, so the window manager focus issue does not
 apply in that case.</P>
-
-<H3>PVR-250 card doesn't show inputs in the setup screen.</H3>
-
-<P>See message 
-<A HREF="http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html">http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html</A></P>
 
 <H3>Where's "canada-cable"?</H3>
 
