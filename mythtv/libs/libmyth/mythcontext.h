@@ -93,6 +93,10 @@ class MythContextPrivate;
       "VBI related messages")                    \
     F(VB_DATABASE,  0x00010000, "database",  1,  \
       "Display all SQL commands executed")       \
+    F(VB_DSMCC,     0x00020000, "dsmcc",     1,  \
+      "DSMCC carousel related messages")         \
+    F(VB_MHEG,      0x00040000, "mheg",      1,  \
+      "MHEG debugging messages")                 \
     F(VB_TIMESTAMP, 0x80000000, "timestamp", 1,  \
       "Conditional data driven messages")        \
     F(VB_NONE,      0x00000000, "none",      0,  \
