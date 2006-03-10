@@ -202,6 +202,8 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_MPEG2VBI:         return "MPEG2VBI";
         case CODEC_ID_DVB_VBI:          return "DVB_VBI";
 
+        case CODEC_ID_DSMCC_B:          return "DSMCC_B";
+
         case CODEC_ID_MPEG2TS:          return "MPEG2TS";
     }
     return "Unknown Codec ID";

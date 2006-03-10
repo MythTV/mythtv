@@ -39,6 +39,9 @@ extern "C" {
 /* descriptor ids */
 #define DVB_VBI_DESCID              0x56
 #define DVB_SUBT_DESCID             0x59
+#define DVB_BROADCAST_ID            0x66
+#define DVB_CAROUSEL_ID             0x13
+#define DVB_DATA_STREAM             0x52
 
 #define STREAM_TYPE_VIDEO_MPEG1     0x01
 #define STREAM_TYPE_VIDEO_MPEG2     0x02
@@ -46,6 +49,7 @@ extern "C" {
 #define STREAM_TYPE_AUDIO_MPEG2     0x04
 #define STREAM_TYPE_PRIVATE_SECTION 0x05
 #define STREAM_TYPE_PRIVATE_DATA    0x06
+#define STREAM_TYPE_DSMCC_B         0x0b
 #define STREAM_TYPE_AUDIO_AAC       0x0f
 #define STREAM_TYPE_VIDEO_MPEG4     0x10
 #define STREAM_TYPE_VIDEO_H264      0x1b

@@ -271,6 +271,8 @@ typedef struct AVStream {
 
     int got_frame;
     int64_t cur_frame_startpos;
+
+    int component_tag; ///< Component tag given in PMT, for MythTV MHEG
 } AVStream;
 
 #define AVFMTCTX_NOHEADER      0x0001 /* signal that no header is present
