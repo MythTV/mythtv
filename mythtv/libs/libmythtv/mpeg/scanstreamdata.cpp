@@ -50,6 +50,7 @@ void ScanStreamData::Reset(void)
 
     dvb.Reset();
     dvb.AddListeningPID(DVB_NIT_PID);
+    dvb.AddListeningPID(DVB_SDT_PID);
 }
 
 void ScanStreamData::ReturnCachedTable(const PSIPTable *psip) const

@@ -129,6 +129,7 @@ void DVBStreamData::Reset(void)
         _cache_lock.unlock();
     }
     AddListeningPID(DVB_NIT_PID);
+    AddListeningPID(DVB_SDT_PID);
 }
 
 /** \fn DVBStreamData::HandleTables(uint pid, const PSIPTable&)
