@@ -739,8 +739,7 @@ void StatusBox::doTunerStatus()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardid, cardtype, videodevice "
-        "FROM capturecard "
-        "WHERE parentid='0'");
+        "FROM capturecard WHERE parentid='0' ORDER BY cardid");
 
     if (!query.exec() || !query.isActive())
     {
@@ -764,7 +763,7 @@ void StatusBox::doTunerStatus()
   
         QString status = "";
         if (state == kState_Error)
-            status = tr("is not available");
+            status = tr("is unavailable");
         else if (state == kState_WatchingLiveTV)
             status = tr("is watching live TV");
         else if (state == kState_RecordingOnly ||
@@ -1328,21 +1327,27 @@ void StatusBox::doAutoExpireList()
     for (it = expList.begin(); it != expList.end(); it++)
     {
         pginfo = *it;
-        contentLine = pginfo->recstartts.toString(dateFormat) + " - " +
-                      pginfo->title + " (" + sm_str(pginfo->filesize / 1024) +
-                      ")";
-        detailInfo = staticInfo + pginfo->title;
+        contentLine = pginfo->recstartts.toString(dateFormat) + " - ";
+
+        if (pginfo->recgroup == "LiveTV")
+            contentLine += "(" + tr("LiveTV") + ") ";
+
+        contentLine += pginfo->title +
+                       " (" + sm_str(pginfo->filesize / 1024) + ")";
+
+        detailInfo = staticInfo;
+        detailInfo += pginfo->recstartts.toString(timeDateFormat) + " - " +
+                      pginfo->recendts.toString(timeDateFormat);
+
+        detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")";
+
+        if (pginfo->recgroup == "LiveTV")
+            detailInfo += " (" + tr("LiveTV") + ")";
+
+        detailInfo += "\n" + pginfo->title;
 
         if (pginfo->subtitle != "")
             detailInfo += " - " + pginfo->subtitle + "";
-
-        detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")\n";
-
-        if (pginfo->recgroup == "LiveTV")
-            contentLine += " (" + tr("LiveTV") + ")";
-
-        detailInfo += pginfo->recstartts.toString(timeDateFormat) + " - " +
-                      pginfo->recendts.toString(timeDateFormat) + "\n";
 
         contentLines[count] = contentLine;
         contentDetail[count] = detailInfo;

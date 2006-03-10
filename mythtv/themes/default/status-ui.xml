@@ -49,12 +49,12 @@
     <container name="topbar">
       <area>0,0,800,200</area>
       <textarea name="heading" draworder="0">
-        <area>30,10,760,40</area>
+        <area>30,10,740,40</area>
         <font>title</font>
         <value>System Status - Select a category to view the status</value>
       </textarea>
       <textarea name="helptext" draworder="0">
-        <area>30,60,760,120</area>
+        <area>30,60,740,150</area>
         <font>title</font>
         <value>This screen displays the status of various system components</value>
         <multiline>yes</multiline>
