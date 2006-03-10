@@ -2974,7 +2974,19 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         if (user_data_type_code == 0x03) { // caption data
             p += 5;
             len -= 5;
-            avctx->decode_cc_atsc(avctx, p, len);
+
+            Mpeg1Context   *s1 = avctx->priv_data;
+            MpegEncContext *s  = &s1->mpeg_enc_ctx;
+            int cccnt = p[0] & 0x1f;
+            int cclen = 3 * cccnt + 2;
+            int proc  = (p[0] >> 6) & 1;
+            int blen  = s->tmp_atsc_cc_len;
+
+            if ((cclen <= len) && ((cclen + blen) < ATSC_CC_BUF_SIZE)) {
+                uint8_t *dst = s->tmp_atsc_cc_buf + s->tmp_atsc_cc_len;
+                memcpy(dst, p, cclen);
+                s->tmp_atsc_cc_len += cclen;
+            }
         }
         else if (user_data_type_code == 0x06) {
             // bar data (letterboxing info)

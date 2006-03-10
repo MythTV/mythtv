@@ -7,7 +7,6 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
-#include "ccdecoder.h"
 #include "vbilut.h"
 
 extern "C" {
@@ -17,6 +16,7 @@ extern "C" {
 }
 
 class TeletextDecoder;
+class CCDecoder;
 class CC708Decoder;
 class ProgramInfo;
 class MythSqlDatabase;
@@ -132,8 +132,6 @@ class AvFormatDecoder : public DecoderBase
     virtual int  GetTeletextDecoderType(void) const;
     virtual void SetTeletextDecoderViewer(OSDTypeTeletext*);
 
-    uint handle_cc608_data(uint cc_state, uint cc_type,
-                           uint data1, uint data2);
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
@@ -152,7 +150,6 @@ class AvFormatDecoder : public DecoderBase
                                   int offset[4], int y, int type, int height);
 
     friend void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
-    friend void decode_cc_atsc(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
     friend int open_avf(URLContext *h, const char *filename, int flags);
     friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
@@ -160,6 +157,7 @@ class AvFormatDecoder : public DecoderBase
     friend offset_t seek_avf(URLContext *h, offset_t offset, int whence);
     friend int close_avf(URLContext *h);
 
+    void DecodeDTVCC(const uint8_t *buf);
     void InitByteContext(void);
     void InitVideoCodec(AVStream *stream, AVCodecContext *enc);
 
@@ -212,8 +210,6 @@ class AvFormatDecoder : public DecoderBase
     long long lastvpts;
     long long lastapts;
     long long lastccptsu;
-    unsigned int save_cctc[2];
-    int save_ccdata[2];
 
     bool using_null_videoout;
     MythCodecID video_codec_id;

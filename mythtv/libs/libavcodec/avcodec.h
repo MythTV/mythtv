@@ -671,7 +671,16 @@ typedef struct AVPanScan{
      * - encoding: set by user\
      * - decoding: set by lavc\
      */\
-    int8_t *ref_index[2];
+    int8_t *ref_index[2];\
+\
+    /** ATSC CC data\
+     * - encoding: unused\
+     * - decoding: set by lavc\
+     */\
+    uint8_t atsc_cc_buf[1024];\
+    int atsc_cc_len;\
+\
+
 
 #define FF_QSCALE_TYPE_MPEG1 0
 #define FF_QSCALE_TYPE_MPEG2 1
@@ -2027,8 +2036,6 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     void (*decode_cc_dvd)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
-    void (*decode_cc_atsc)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
-
 } AVCodecContext;
 
 /**

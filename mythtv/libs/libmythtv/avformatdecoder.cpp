@@ -19,6 +19,7 @@ using namespace std;
 #include "iso639.h"
 #include "mpegtables.h"
 #include "atscdescriptors.h"
+#include "ccdecoder.h"
 #include "cc708decoder.h"
 #include "DVDRingBuffer.h"
 
@@ -57,7 +58,6 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
 void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
-void decode_cc_atsc(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
 static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
 {
@@ -283,7 +283,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
 
-    save_cctc[0] = save_cctc[1] = 0;
     allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
 #ifdef CONFIG_DTS
     allow_dts_passthru = gContext->GetNumSetting("DTSPassThru", false);
@@ -444,7 +443,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         lastapts = 0;
         lastvpts = 0;
         lastccptsu = 0;
-        save_cctc[0] = save_cctc[1] = 0;
         av_read_frame_flush(ic);
 
         // Only reset the internal state if we're using our seeking,
@@ -1164,7 +1162,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 enc->decode_cc_dvd  = decode_cc_dvd;
-                enc->decode_cc_atsc = decode_cc_atsc;
 
                 ScanATSCCaptionStreams(i);
 
@@ -1531,69 +1528,8 @@ void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
     nd->lastccptsu = utc;
 }
 
-uint AvFormatDecoder::handle_cc608_data(uint cc_state, uint cc_type,
-                                        uint data1, uint data2)
+void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
 {
-    AvFormatDecoder *nd = this;
-    // EIA-608 field-1/2
-    int data = (data2 << 8) | data1;
-    unsigned int tc;
-
-    if ((cc_state & cc_type) == cc_type)
-    {
-        // another field of same type -- assume
-        // it's for the next frame
-        nd->lastccptsu += 33367;
-        cc_state = 0;
-    }
-    cc_state |= cc_type;
-    tc = nd->lastccptsu / 1000;
-
-    // For some reason, one frame can be out of order.
-    // We need to save the CC codes for at least one
-    // frame so we can send the correct sequence to the
-    // decoder.
-
-    if (nd->save_cctc[cc_type])
-    {
-        if (nd->save_cctc[cc_type] < tc)
-        {
-            // send saved code to decoder
-            nd->ccd608->FormatCCField(nd->save_cctc[cc_type],
-                                   cc_type,
-                                   nd->save_ccdata[cc_type]);
-            nd->save_cctc[cc_type] = 0;
-        }
-        else if ((nd->save_cctc[cc_type] - tc) > 1000)
-        {
-            // saved code is too far in the future; probably bad
-            // - discard it
-            nd->save_cctc[cc_type] = 0;
-        }
-        else
-        {
-            // send new code to decoder
-            nd->ccd608->FormatCCField(tc, cc_type, data);
-        }
-    }
-    if (!nd->save_cctc[cc_type])
-    {
-        // no saved code
-        // - save new code since it may be out of order
-        nd->save_cctc[cc_type] = tc;
-        nd->save_ccdata[cc_type] = data;
-    }
-    return cc_state;
-}
-
-void decode_cc_atsc(struct AVCodecContext *s, const uint8_t *buf, int sz)
-{
-    if (sz < 2)
-        return;
-
-    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
-    uint buf_size       = sz;
-
     // closed caption data
     //cc_data() {
     // reserved                1 0.0   1  
@@ -1609,33 +1545,22 @@ void decode_cc_atsc(struct AVCodecContext *s, const uint8_t *buf, int sz)
     // reserved                8 1.0   0xff
     // em_data                 8 2.0
 
-    uint index    = 2; // skip reserved & em_data
-    uint curcount = 0;
-    uint cc_state = 0;
-
-    while (index < buf_size && curcount < cc_count)
+    for (uint cur = 0; cur < cc_count; cur++)
     {
-        if (buf_size < index + 3)
-            break;
-    
-        uint cc_code = buf[index];
-        uint data1   = buf[index+1];
-        uint data2   = buf[index+2];
-
-        index += 3;
-        curcount++;
-
+        uint cc_code  = buf[2+(cur*3)];
         bool cc_valid = cc_code & 0x04;
-        uint cc_type  = cc_code & 0x03;
-
-        // check cc_valid
         if (!cc_valid)
             continue;
 
-        if (cc_type <= 0x1)
-            cc_state = nd->handle_cc608_data(cc_state, cc_type, data1, data2);
+        uint data1    = buf[3+(cur*3)];
+        uint data2    = buf[4+(cur*3)];
+        uint data     = (data2 << 8) | data1;
+        uint cc_type  = cc_code & 0x03;
+
+        if (cc_type <= 0x1) // EIA-608 field-1/2
+            ccd608->FormatCCField(lastccptsu / 1000, cc_type, data);
         else // EIA-708 CC data
-            nd->ccd708->decode_cc_data(cc_type, data1, data2);
+            ccd708->decode_cc_data(cc_type, data1, data2);
     }
 }
 
@@ -2613,6 +2538,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         ptr += ret;
                         len -= ret;
                         continue;
+                    }
+
+                    // Decode ATSC captions
+                    for (uint i = 0; i < (uint)mpa_pic.atsc_cc_len;
+                         i += ((mpa_pic.atsc_cc_buf[i] & 0x1f) * 3) + 2)
+                    {
+                        DecodeDTVCC(mpa_pic.atsc_cc_buf + i);
                     }
 
                     VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
