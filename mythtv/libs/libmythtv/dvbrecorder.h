@@ -24,6 +24,7 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbsiparser.h"
 
+class ATSCStreamData;
 class ProgramAssociationTable;
 class ProgramMapTable;
 class TSPacket;
@@ -76,6 +77,9 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     void SetPMT(uint pid, const ProgramMapTable*);
 
+    void SetStreamData(ATSCStreamData*);
+    ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
+
   public slots:
     void deleteLater(void);
 
@@ -117,6 +121,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     // general recorder stuff
     /// Set when we want to generate a new filter set
+    ATSCStreamData *_atsc_stream_data;
     bool            _reset_pid_filters;
     QMutex          _pid_lock;
     PIDInfoMap      _pid_infos;

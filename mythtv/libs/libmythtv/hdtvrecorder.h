@@ -55,7 +55,7 @@ class HDTVRecorder : public DTVRecorder
     bool Open(void);
 
     void SetStreamData(ATSCStreamData*);
-    ATSCStreamData* StreamData(void) { return _atsc_stream_data; }
+    ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
 
   public slots:
     void deleteLater(void);

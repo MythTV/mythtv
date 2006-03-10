@@ -56,6 +56,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mpegtables.h"
 #include "iso639.h"
+#include "atscstreamdata.h"
 
 // MythTV DVB includes
 #include "transform.h"
@@ -84,8 +85,10 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _card_number_option(0),
       // DVB stuff
       dvbchannel(advbchannel),
+      _atsc_stream_data(new ATSCStreamData(-1,-1)),
       _reset_pid_filters(true),
       _pid_lock(true),
+      _input_pmt(NULL),
       // Output stream info
       _pat(NULL), _pmt(NULL),
       _pmt_pid(0x1700),
@@ -232,6 +235,17 @@ void DVBRecorder::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
 }
 
+void DVBRecorder::SetStreamData(ATSCStreamData *stream_data)
+{
+    if (stream_data == _atsc_stream_data)
+        return;
+
+    ATSCStreamData *old_data = _atsc_stream_data;
+    _atsc_stream_data = stream_data;
+    if (old_data)
+        delete old_data;
+}
+
 void DVBRecorder::CloseFilters(void)
 {
     QMutexLocker change_lock(&_pid_lock);
@@ -321,6 +335,13 @@ bool DVBRecorder::OpenFilters(void)
     CloseFilters();
 
     QMutexLocker change_lock(&_pid_lock);
+
+    if (!_input_pmt)
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Recording will not commence until a PMT is set.");
+        return false;
+    }
 
     // Record all streams flagged for recording
     bool need_pcr_pid = true;

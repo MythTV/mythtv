@@ -735,7 +735,7 @@ void HDTVRecorder::WritePMT(ProgramMapTable* pmt)
 void HDTVRecorder::ProcessMGT(const MasterGuideTable *mgt)
 {
     for (unsigned int i=0; i<mgt->TableCount(); i++)
-        StreamData()->AddListeningPID(mgt->TablePID(i));
+        GetStreamData()->AddListeningPID(mgt->TablePID(i));
 }
 
 /** \fn HDTVRecorder::ProcessVCT(uint, const VirtualChannelTable*)
@@ -754,24 +754,26 @@ void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
 
     bool found = false;    
     VERBOSE(VB_RECORD, QString("Desired channel %1_%2")
-            .arg(StreamData()->DesiredMajorChannel())
-            .arg(StreamData()->DesiredMinorChannel()));
-    for (uint i=0; i<vct->ChannelCount(); i++)
+            .arg(GetStreamData()->DesiredMajorChannel())
+            .arg(GetStreamData()->DesiredMinorChannel()));
+    for (uint i = 0; i < vct->ChannelCount(); i++)
     {
-        if ((StreamData()->DesiredMajorChannel() == -1 ||
-             vct->MajorChannel(i)==(uint)StreamData()->DesiredMajorChannel()) &&
-            vct->MinorChannel(i)==(uint)StreamData()->DesiredMinorChannel())
+        int maj = GetStreamData()->DesiredMajorChannel();
+        int min = GetStreamData()->DesiredMinorChannel();
+        if ((maj == -1 || vct->MajorChannel(i) == (uint)maj) &&
+            (vct->MinorChannel(i) == (uint)min))
         {
-            if (vct->ProgramNumber(i) != (uint)StreamData()->DesiredProgram())
+            uint pnum = (uint) GetStreamData()->DesiredProgram();
+            if (vct->ProgramNumber(i) != pnum)
             {
                 VERBOSE(VB_RECORD, 
                         QString("Resetting desired program from %1"
                                 " to %2")
-                        .arg(StreamData()->DesiredProgram())
+                        .arg(GetStreamData()->DesiredProgram())
                         .arg(vct->ProgramNumber(i)));
                 // Do a (partial?) reset here if old desired
                 // program is not 0?
-                StreamData()->SetDesiredProgram(vct->ProgramNumber(i));
+                GetStreamData()->SetDesiredProgram(vct->ProgramNumber(i));
             }
             found = true;
         }
@@ -781,12 +783,12 @@ void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
         VERBOSE(VB_IMPORTANT, 
                 QString("Desired channel %1_%2 not found;"
                         " using %3_%4 instead.")
-                .arg(StreamData()->DesiredMajorChannel())
-                .arg(StreamData()->DesiredMinorChannel())
+                .arg(GetStreamData()->DesiredMajorChannel())
+                .arg(GetStreamData()->DesiredMinorChannel())
                 .arg(vct->MajorChannel(0))
                 .arg(vct->MinorChannel(0)));
         VERBOSE(VB_IMPORTANT, vct->toString());
-        StreamData()->SetDesiredProgram(vct->ProgramNumber(0));
+        GetStreamData()->SetDesiredProgram(vct->ProgramNumber(0));
     }
 }
 
@@ -796,23 +798,23 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     if (ok && !tspacket.ScramplingControl())
     {
         if (tspacket.HasAdaptationField())
-            StreamData()->HandleAdaptationFieldControl(&tspacket);
+            GetStreamData()->HandleAdaptationFieldControl(&tspacket);
         if (tspacket.HasPayload())
         {
             const unsigned int lpid = tspacket.PID();
             // Pass or reject frames based on PID, and parse info from them
-            if (lpid == StreamData()->VideoPIDSingleProgram())
+            if (lpid == GetStreamData()->VideoPIDSingleProgram())
             {
                 _buffer_packets = !FindKeyframes(&tspacket);
                 BufferedWrite(tspacket);
             }
-            else if (StreamData()->IsAudioPID(lpid))
+            else if (GetStreamData()->IsAudioPID(lpid))
                 BufferedWrite(tspacket);
-            else if (StreamData()->IsListeningPID(lpid))
-                StreamData()->HandleTSTables(&tspacket);
-            else if (StreamData()->IsWritingPID(lpid))
+            else if (GetStreamData()->IsListeningPID(lpid))
+                GetStreamData()->HandleTSTables(&tspacket);
+            else if (GetStreamData()->IsWritingPID(lpid))
                 BufferedWrite(tspacket);
-            else if (StreamData()->VersionMGT()>=0)
+            else if (GetStreamData()->VersionMGT()>=0)
                 _ts_stats.IncrPIDCount(lpid);
         }
     }

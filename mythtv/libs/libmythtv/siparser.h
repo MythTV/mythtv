@@ -46,6 +46,7 @@ class ProgramMapTable;
 
 class ATSCStreamData;
 class DVBStreamData;
+class MPEGStreamData;
 
 class MasterGuideTable;
 class VirtualChannelTable;
@@ -102,10 +103,15 @@ class SIParser : public QObject
     bool FindTransports(void) { need_nit = true; return true; }
     bool FindServices(void);
 
-    void SetTableStandard(const QString&);
-    void SetDesiredProgram(uint mpeg_program_number);
+    void SetATSCStreamData(ATSCStreamData*);
+    void SetDVBStreamData(DVBStreamData*);
+    void SetStreamData(MPEGStreamData*);
 
-    void ReinitSIParser(const QString &si_std, uint mpeg_program_number);
+    void SetTableStandard(const QString&);
+    void SetDesiredProgram(uint mpeg_program_number, bool reset = true);
+    void ReinitSIParser(const QString &si_std,
+                        MPEGStreamData *stream_data,
+                        uint mpeg_program_number);
 
     // Stops all collection of data and clears all values
     // (on a channel change for example)

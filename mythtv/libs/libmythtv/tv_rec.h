@@ -35,6 +35,7 @@ class DBox2Channel;
 class DVBChannel;
 class Channel;
 
+class MPEGStreamData;
 class ProgramMapTable;
 
 /// Used to request ProgramInfo for channel browsing.
@@ -262,7 +263,7 @@ class TVRec : public QObject
     bool WantDishNetEIT(int cardnum);
 #endif
 
-    void CreateSIParser(int num);
+    void CreateSIParser(MPEGStreamData*, int num);
     void TeardownSIParser(void);
 
     bool HasFlags(uint f) const { return (stateFlags & f) == f; }

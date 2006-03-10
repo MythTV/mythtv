@@ -54,8 +54,7 @@ SIParser::SIParser(const char *name) :
     CurrentTransport(0),            RequestedServiceID(0),
     RequestedTransportID(0),        NITPID(0),
     // ATSC Storage
-    atsc_stream_data(new ATSCStreamData(-1,-1)),
-    dvb_stream_data(new DVBStreamData()),
+    atsc_stream_data(NULL),         dvb_stream_data(NULL),
     // Mutex Locks
     pmap_lock(false),
     // State variables
@@ -64,6 +63,9 @@ SIParser::SIParser(const char *name) :
     eit_dn_long(false),
     PrivateTypesLoaded(false)
 {
+    SetATSCStreamData(new ATSCStreamData(-1,-1));
+    SetDVBStreamData(new DVBStreamData());
+
     /* Set the PrivateTypes to default values */
     PrivateTypes.reset();
 
@@ -85,65 +87,6 @@ SIParser::SIParser(const char *name) :
             LanguagePriority[*plit] = prio++;
         }
     }
-
-    // MPEG table signals
-    connect(atsc_stream_data,
-            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
-            this,
-            SLOT(  HandlePAT(const ProgramAssociationTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
-            this,
-            SLOT(  HandleCAT(const ConditionalAccessTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-            this,
-            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
-
-    connect(dvb_stream_data,
-            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
-            this,
-            SLOT(  HandlePAT(const ProgramAssociationTable*)));
-    connect(dvb_stream_data,
-            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
-            this,
-            SLOT(  HandleCAT(const ConditionalAccessTable*)));
-    connect(dvb_stream_data,
-            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-            this,
-            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
-
-    // ATSC table signals
-    connect(atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
-            this,             SLOT(  HandleMGT(const MasterGuideTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
-            this,
-            SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
-
-    connect(atsc_stream_data, SIGNAL(UpdateSTT(const SystemTimeTable*)),
-            this,             SLOT(  HandleSTT(const SystemTimeTable*)));
-
-#ifdef USING_DVB_EIT
-    connect(atsc_stream_data,
-            SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
-            this,
-            SLOT(  HandleEIT(uint, const EventInformationTable*)));
-    connect(atsc_stream_data, SIGNAL(UpdateETT(uint,const ExtendedTextTable*)),
-            this,             SLOT(HandleETT(uint,const ExtendedTextTable*)));
-#endif // USING_DVB_EIT
-
-    // DVB table signals
-    connect(dvb_stream_data,
-            SIGNAL(UpdateNIT(const NetworkInformationTable*)),
-            this,
-            SLOT(  HandleNIT(const NetworkInformationTable*)));
-#ifdef USING_DVB_EIT
-    connect(dvb_stream_data,
-            SIGNAL(UpdateEIT(const DVBEventInformationTable*)),
-            this,
-            SLOT(  HandleEIT(const DVBEventInformationTable*)));
-#endif // USING_DVB_EIT
 }
 
 SIParser::~SIParser()
@@ -449,6 +392,116 @@ bool SIParser::GetServiceObject(QMap_SDTObject &SDT)
     return true;
 }
 
+void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
+{
+    VERBOSE(VB_IMPORTANT, LOC + "Setting ATSCStreamData");
+
+    if (stream_data == atsc_stream_data)
+        return;
+
+    ATSCStreamData *old_data = atsc_stream_data;
+    atsc_stream_data = stream_data;
+
+    if (old_data && ((void*)old_data == (void*)dvb_stream_data))
+        dvb_stream_data = (DVBStreamData*) stream_data;
+
+    if (old_data)
+        delete old_data;
+
+    // MPEG table signals
+    connect(atsc_stream_data,
+            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+            this,
+            SLOT(  HandlePAT(const ProgramAssociationTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
+            this,
+            SLOT(  HandleCAT(const ConditionalAccessTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+            this,
+            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
+
+    // ATSC table signals
+    connect(atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
+            this,             SLOT(  HandleMGT(const MasterGuideTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
+            this,
+            SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
+
+    connect(atsc_stream_data, SIGNAL(UpdateSTT(const SystemTimeTable*)),
+            this,             SLOT(  HandleSTT(const SystemTimeTable*)));
+
+#ifdef USING_DVB_EIT
+    connect(atsc_stream_data,
+            SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
+            this,
+            SLOT(  HandleEIT(uint, const EventInformationTable*)));
+    connect(atsc_stream_data,
+            SIGNAL(UpdateETT(uint, const ExtendedTextTable*)),
+            this,
+            SLOT(  HandleETT(uint, const ExtendedTextTable*)));
+#endif // USING_DVB_EIT
+}
+
+void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
+{
+    VERBOSE(VB_IMPORTANT, LOC + "Setting DVBStreamData");
+
+    if (stream_data == dvb_stream_data)
+        return;
+
+    DVBStreamData *old_data = dvb_stream_data;
+    dvb_stream_data = stream_data;
+
+    if (old_data && ((void*)old_data == (void*)atsc_stream_data))
+        atsc_stream_data = (ATSCStreamData*) stream_data;
+
+    if (old_data)
+        delete old_data;
+
+    // MPEG table signals
+    connect(dvb_stream_data,
+            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+            this,
+            SLOT(  HandlePAT(const ProgramAssociationTable*)));
+    connect(dvb_stream_data,
+            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
+            this,
+            SLOT(  HandleCAT(const ConditionalAccessTable*)));
+    connect(dvb_stream_data,
+            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+            this,
+            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
+
+    // DVB table signals
+    connect(dvb_stream_data,
+            SIGNAL(UpdateNIT(const NetworkInformationTable*)),
+            this,
+            SLOT(  HandleNIT(const NetworkInformationTable*)));
+
+#ifdef USING_DVB_EIT
+    connect(dvb_stream_data,
+            SIGNAL(UpdateEIT(const DVBEventInformationTable*)),
+            this,
+            SLOT(  HandleEIT(const DVBEventInformationTable*)));
+#endif // USING_DVB_EIT
+}
+
+void SIParser::SetStreamData(MPEGStreamData *stream_data)
+{
+    VERBOSE(VB_IMPORTANT, LOC + "SetStreamData("<<stream_data<<")");
+
+    ATSCStreamData *atsc_sd = dynamic_cast<ATSCStreamData*>(stream_data);
+    if (atsc_sd && (atsc_sd != atsc_stream_data))
+        SetATSCStreamData(atsc_sd);
+
+    DVBStreamData *dvb_sd = dynamic_cast<DVBStreamData*>(stream_data);
+    if (dvb_sd && (dvb_sd != dvb_stream_data))
+        SetDVBStreamData(dvb_sd);
+}
+
 /** \fn SIParser::SetTableStandard(const QString &)
  *  \brief Adds basic PID's corresponding to standard to the list
  *         of PIDs we are listening to.
@@ -462,7 +515,7 @@ bool SIParser::GetServiceObject(QMap_SDTObject &SDT)
  */
 void SIParser::SetTableStandard(const QString &table_std)
 {
-    VERBOSE(VB_SIPARSER, QString("SetTableStandard(%1)").arg(table_std));
+    VERBOSE(VB_SIPARSER, LOC + QString("SetTableStandard(%1)").arg(table_std));
     bool is_atsc = table_std.lower() == "atsc";
 
     QMutexLocker locker(&pmap_lock);
@@ -480,35 +533,67 @@ void SIParser::SetTableStandard(const QString &table_std)
 
 /** \fn SIParser::SetDesiredProgram(uint)
  */
-void SIParser::SetDesiredProgram(uint mpeg_program_number)
+void SIParser::SetDesiredProgram(uint mpeg_program_number, bool reset)
 {
     VERBOSE(VB_SIPARSER, LOC +
             QString("Making #%1 the requested MPEG program number")
             .arg(mpeg_program_number));
 
-    atsc_stream_data->Reset(-1, -1);
-    ((MPEGStreamData*)atsc_stream_data)->Reset(mpeg_program_number);
+    if (reset)
+    {
+        atsc_stream_data->Reset(-1, -1);
+        ((MPEGStreamData*)atsc_stream_data)->Reset(mpeg_program_number);
+    }
     atsc_stream_data->AddListeningPID(ATSC_PSIP_PID);
 
-    dvb_stream_data->Reset();
-    ((MPEGStreamData*)dvb_stream_data)->Reset(mpeg_program_number);
+    if (reset)
+    {
+        dvb_stream_data->Reset();
+        ((MPEGStreamData*)dvb_stream_data)->Reset(mpeg_program_number);
+    }
     dvb_stream_data->AddListeningPID(DVB_NIT_PID);
     dvb_stream_data->AddListeningPID(DVB_SDT_PID);
+
+    if (reset)
+        return;
+
+    // Set just the desired program, without a reset
+    atsc_stream_data->SetDesiredProgram(mpeg_program_number);
+    dvb_stream_data->SetDesiredProgram(mpeg_program_number);
+
+    // Get needed tables from cache, currently only for atsc_stream_data
+    pat_ptr_t pat = atsc_stream_data->GetCachedPAT();
+    pmt_ptr_t pmt = atsc_stream_data->GetCachedPMT(mpeg_program_number, 0);
+
+    if (pat)
+    {
+        HandlePAT(pat);
+        atsc_stream_data->ReturnCachedTable(pat);
+    }
+
+    if (pmt)
+    {
+        HandlePMT(mpeg_program_number, pmt);
+        atsc_stream_data->ReturnCachedTable(pmt);
+    }
 }
 
-/** \fn SIParser::ReinitSIParser(const QString&, uint)
+/** \fn SIParser::ReinitSIParser(const QString&, MPEGStreamData*, uint)
  *  \brief Convenience function that calls SetTableStandard(const QString &)
  *         and SetDesiredProgram(uint).
  */
-void SIParser::ReinitSIParser(const QString &si_std, uint mpeg_program_number)
+void SIParser::ReinitSIParser(const QString  &si_std,
+                              MPEGStreamData *stream_data,
+                              uint            mpeg_program_number)
 {
     VERBOSE(VB_SIPARSER, LOC + QString("ReinitSIParser(std %1, %2 #%3)")
-             .arg(si_std)
-             .arg((si_std.lower() == "atsc") ? "program" : "service")
-             .arg(mpeg_program_number));
+            .arg(si_std)
+            .arg((si_std.lower() == "atsc") ? "program" : "service")
+            .arg(mpeg_program_number));
 
     SetTableStandard(si_std);
-    SetDesiredProgram(mpeg_program_number);
+    SetStreamData(stream_data);
+    SetDesiredProgram(mpeg_program_number, !stream_data);
 }
 
 bool SIParser::FindServices()

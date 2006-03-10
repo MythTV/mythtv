@@ -1068,42 +1068,38 @@ Channel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L
 }
 
-void TVRec::CreateSIParser(int program_num)
+void TVRec::CreateSIParser(MPEGStreamData *stream_data, int program_num)
 {
     (void) program_num;
 #ifdef USING_DVB
+
     DVBChannel *dvbc = GetDVBChannel();
-    if (dvbc)
+    if (!dvbc)
+        return;
+
+    if (!dvbsiparser)
     {
-        int service_id = dvbc->GetServiceID();
+        dvbsiparser = new DVBSIParser(dvbc->GetCardNum(), true);
+        QObject::connect(dvbsiparser,
+                         SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
+                         dvbc,
+                         SLOT(   SetPMT(  uint, const ProgramMapTable*)));
+    }
 
-        VERBOSE(VB_RECORD, LOC + QString("prog_num(%1) vs. dvbc->srv_id(%2)")
-                .arg(program_num).arg(service_id));
-
-        if (!dvbsiparser)
-        {
-            dvbsiparser = new DVBSIParser(dvbc->GetCardNum(), true);
-            QObject::connect(dvbsiparser,
-                             SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-                             dvbc,
-                             SLOT(   SetPMT(  uint, const ProgramMapTable*)));
-        }
-
-        dvbsiparser->ReinitSIParser(
-            dvbc->GetSIStandard(),
-            (program_num >= 0) ? program_num : service_id);
+    dvbsiparser->ReinitSIParser(dvbc->GetSIStandard(),
+                                stream_data, program_num);
 
 #ifdef USING_DVB_EIT
-        if (is_dishnet_eit(GetCaptureCardNum()))
-        {
-            VERBOSE(VB_EIT, "Enabling DishNet Long Term EIT Support");
-            dvbsiparser->SetDishNetEIT(true);
-        }
-
-        if (scanner)
-            scanner->StartPassiveScan(dvbc, dvbsiparser);
-#endif // USING_DVB_EIT
+    if (is_dishnet_eit(GetCaptureCardNum()))
+    {
+        VERBOSE(VB_EIT, "Enabling DishNet Long Term EIT Support");
+        dvbsiparser->SetDishNetEIT(true);
     }
+
+    if (scanner)
+        scanner->StartPassiveScan(dvbc, dvbsiparser);
+#endif // USING_DVB_EIT
+
 #endif // USING_DVB
 }
 
@@ -1618,10 +1614,18 @@ bool TVRec::SetupDTVSignalMonitor(void)
 #ifdef USING_V4L
     if (GetHDTVRecorder())
     {
-        sd = GetHDTVRecorder()->StreamData();
+        sd = GetHDTVRecorder()->GetStreamData();
         sd->SetCaching(true);
     }
 #endif // USING_V4L
+#ifdef USING_DVB
+    if (GetDVBRecorder())
+    {
+        sd = GetDVBRecorder()->GetStreamData();
+        sd->SetCaching(true);
+    }
+#endif // USING_DVB
+
     if (!sd)
         sd = new ATSCStreamData(-1, -1, true);
 
@@ -1743,26 +1747,12 @@ void TVRec::TeardownSignalMonitor()
 
     // If this is a DTV signal monitor, save any pids we know about.
     DTVSignalMonitor *dtvMon = GetDTVSignalMonitor();
-    if (dtvMon)
+    if (dtvMon && channel)
     {
-        if (channel)
-        {
-            pid_cache_t pid_cache;
-            GetPidsToCache(dtvMon, pid_cache);
-            if (pid_cache.size())
-                channel->SaveCachedPids(pid_cache);
-        }
-
-#ifdef USING_DVB
-        if (genOpt.cardtype == "DVB" && dtvMon->GetATSCStreamData())
-        {
-            dtvMon->Stop();
-            ATSCStreamData *sd = dtvMon->GetATSCStreamData();
-            dtvMon->SetStreamData(NULL);
-            sd->deleteLater();
-            sd = NULL;
-        }
-#endif // USING_DVB
+        pid_cache_t pid_cache;
+        GetPidsToCache(dtvMon, pid_cache);
+        if (pid_cache.size())
+            channel->SaveCachedPids(pid_cache);
     }
 
     if (signalMonitor)
@@ -3614,10 +3604,13 @@ bool TVRec::TuningSignalCheck(void)
 
     // tell recorder/siparser about useful DTV monitor info..
 #ifdef USING_DVB
+    if (GetDVBRecorder())
+        GetDVBRecorder()->SetStreamData(streamData);
+
     if (GetDVBChannel())
     {
         GetDVBChannel()->SetPMT(0, NULL);
-        CreateSIParser(programNum);
+        CreateSIParser(streamData, programNum);
         SetFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
     }
 #endif // USING_DVB
