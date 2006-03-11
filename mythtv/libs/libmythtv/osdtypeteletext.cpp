@@ -997,7 +997,7 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
                 SetBackgroundColor(TTColor::TRANSPARENT);
 
             DrawBackground(x, row);
-            if (doubleheight && row < kTeletextRows)
+            if (doubleheight && row < (uint)kTeletextRows)
                 DrawBackground(x, row + 1);
 
             if ((mosaic) && (ch < 0x40 || ch > 0x5F))
@@ -1008,7 +1008,7 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
             else 
             {
                 char ch = CharConversion(ch, lang);
-                bool dh = doubleheight && row < kTeletextRows;
+                bool dh = doubleheight && row < (uint)kTeletextRows;
                 int  rw = (dh) ? row + 1 : row;
                 DrawCharacter(x, rw, ch, dh);
             }
