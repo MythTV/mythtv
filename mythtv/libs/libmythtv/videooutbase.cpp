@@ -271,6 +271,24 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 }
 
 /**
+ * \fn VideoOutput::SetDeinterlacingEnabled(bool)
+ * \brief Attempts to enable/disable deinterlacing using
+ *        existing deinterlace method when enabling.
+ */
+bool VideoOutput::SetDeinterlacingEnabled(bool enable)
+{
+    if (enable && m_deinterlacing)
+        return m_deinterlacing;
+
+    // if enable and no deinterlacer allocated, attempt allocate one
+    if (enable && (!m_deintFiltMan || !m_deintFilter))
+        return SetupDeinterlace(enable);
+
+    m_deinterlacing = enable;
+    return m_deinterlacing;
+}
+
+/**
  * \fn VideoOutput::SetupDeinterlace(bool,const QString&)
  * \brief Attempts to enable or disable deinterlacing.
  * \return true if successful, false otherwise.

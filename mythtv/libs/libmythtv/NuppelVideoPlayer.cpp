@@ -154,7 +154,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       video_width(0), video_height(0), video_size(0),
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
       forced_video_aspect(-1),
-      m_scan(kScan_Detect), keyframedist(30),
+      m_scan(kScan_Interlaced),     m_scan_locked(false),
+      m_scan_tracker(0),
+      keyframedist(30),
       // RingBuffer stuff
       filename("output.nuv"), weMadeBuffer(false), ringBuffer(NULL),
       // Prebuffering (RingBuffer) control
@@ -685,6 +687,100 @@ void NuppelVideoPlayer::FallbackDeint(void)
      }
 }
 
+void NuppelVideoPlayer::AutoDeint(VideoFrame *frame)
+{
+    if (!frame || m_scan_locked)
+        return;
+
+    if (frame->interlaced_frame) 
+    {
+        if (m_scan_tracker < 0) 
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "interlaced frame seen after "
+                    << abs(m_scan_tracker) << " progressive frames");
+            m_scan_tracker = 0;
+        }
+        m_scan_tracker++;
+    } 
+    else 
+    {
+        if (m_scan_tracker > 0) 
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "progressive frame seen after "
+                    << m_scan_tracker << " interlaced  frames");
+            m_scan_tracker = 0;
+        }
+        m_scan_tracker--;
+    }
+        
+    if ((m_scan_tracker % 400) == 0) 
+    {
+        QString type = (m_scan_tracker < 0) ? "progressive" : "interlaced";
+        VERBOSE(VB_PLAYBACK, LOC + QString("%1 %2 frames seen.")
+                .arg(abs(m_scan_tracker)).arg(type));
+    }
+
+    if (abs(m_scan_tracker) > 2)
+        return;
+
+    SetScanType((m_scan_tracker >  2) ? kScan_Interlaced : kScan_Progressive);
+    m_scan_locked  = false;
+}
+
+void NuppelVideoPlayer::SetScanType(FrameScanType scan)
+{
+    QMutexLocker locker(&videofiltersLock);
+
+    if (!videoOutput || !videosync)
+        return; // hopefully this will be called again later...
+
+    m_scan_locked = (scan != kScan_Detect);
+
+    if (scan == m_scan)
+        return;
+
+    bool interlaced = scan == kScan_Interlaced || kScan_Intr2ndField == scan;
+    if (interlaced && !m_DeintSetting)
+    {
+        m_scan = scan;
+        return;
+    }
+
+    if (interlaced)
+    {
+        videoOutput->SetDeinterlacingEnabled(true);
+        if (videoOutput->NeedsDoubleFramerate())
+        {
+            m_double_framerate = true;
+            m_can_double = true;
+            videosync->SetFrameInterval(frame_interval, true);
+            // Make sure video sync can double frame rate
+            if (videosync->UsesFrameInterval())
+            {
+                VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
+                        "framerate (refresh rate too low for bob deint)");
+                FallbackDeint();
+                m_double_framerate = false;
+            }
+        }
+        VERBOSE(VB_PLAYBACK, "Enabled deinterlacing");
+    }
+
+    if (kScan_Progressive == scan)
+    {
+        if (m_double_framerate) 
+        {
+            m_double_framerate = false;
+            m_can_double = false;
+            videosync->SetFrameInterval(frame_interval, false);
+        }
+        videoOutput->SetDeinterlacingEnabled(false);
+        VERBOSE(VB_PLAYBACK, "Disabled deinterlacing");
+    }
+
+    m_scan = scan;
+}
+
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
                                        FrameScanType scan)
@@ -719,41 +815,9 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (IsErrored())
         return;
 
-    videofiltersLock.lock();
-
-    m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
-    VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")
-            .arg(toQString(m_scan)).arg(video_height)
-            .arg(fps));
-
-    // Set up deinterlacing in the video output method
-    m_double_framerate = false;
-    if (videoOutput)
-    {
-        videoOutput->SetupDeinterlace(false);
-        if ((m_scan == kScan_Interlaced)        &&
-            m_DeintSetting                      &&
-            videoOutput->SetupDeinterlace(true) &&
-            videoOutput->NeedsDoubleFramerate())
-        {
-            m_double_framerate = true;
-            m_can_double = true;
-        }
-    }
-
-    // Make sure video sync can double frame rate
-    if (videosync && m_double_framerate)
-    {
-        videosync->SetFrameInterval(frame_interval, m_double_framerate);
-        if (videosync->UsesFrameInterval())
-        {
-            VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
-                    "framerate (refresh rate too low for bob deint)");
-            FallbackDeint();
-        }
-    }
-
-    videofiltersLock.unlock();
+    SetScanType(detectInterlace(scan, m_scan, video_frame_rate, video_height));
+    m_scan_locked  = false;
+    m_scan_tracker = (m_scan == kScan_Interlaced) ? 2 : 0;
 }
 
 void NuppelVideoPlayer::SetFileLength(int total, int frames)
@@ -2254,6 +2318,9 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     else if (osdHasSubtitles || nonDisplayedSubtitles.size() > 20)
         ClearSubtitles();
 
+    // handle scan type changes
+    AutoDeint(frame);
+
     videofiltersLock.lock();
     videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
     videofiltersLock.unlock();
@@ -2290,6 +2357,16 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     if (videoOutput)
         rf_int = videoOutput->GetRefreshRate();
 
+    // Default to Interlaced playback to allocate the deinterlacer structures
+    // Enable autodetection of interlaced/progressive from video stream
+    // And initialoze m_scan_tracker to 2 which will immediately switch to
+    // progressive if the first frame is progressive in AutoDeint().
+    m_scan             = kScan_Interlaced;
+    m_scan_locked      = false;
+    m_double_framerate = false;
+    m_can_double       = false;
+    m_scan_tracker     = 2;
+
     if (using_null_videoout)
     {
         videosync = new USleepVideoSync(videoOutput, (int)fr_int, 0, false);
@@ -2297,14 +2374,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     else if (videoOutput)
     {
         // Set up deinterlacing in the video output method
-        m_double_framerate = false;
-        if (m_scan == kScan_Interlaced && m_DeintSetting &&
-            videoOutput->SetupDeinterlace(true) &&
-            videoOutput->NeedsDoubleFramerate())
-        {
-            m_double_framerate = true;
-            m_can_double       = true;
-        }
+        m_double_framerate = m_can_double =
+            (videoOutput->SetupDeinterlace(true) &&
+             videoOutput->NeedsDoubleFramerate());
 
         videosync = VideoSync::BestMethod(
             videoOutput, fr_int, rf_int, m_double_framerate);

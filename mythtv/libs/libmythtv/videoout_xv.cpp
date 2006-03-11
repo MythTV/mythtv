@@ -1374,6 +1374,14 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     }
 }
 
+// documented in videooutbase.cpp
+bool VideoOutputXv::SetDeinterlacingEnabled(bool enable)
+{
+    bool deint = VideoOutput::SetDeinterlacingEnabled(enable);
+    xv_need_bobdeint_repaint = (m_deintfiltername == "bobdeint");
+    return deint;
+}
+
 bool VideoOutputXv::SetupDeinterlace(bool interlaced,
                                      const QString& overridefilter)
 {
@@ -2469,8 +2477,11 @@ void VideoOutputXv::Show(FrameScanType scan)
         return;
     }
 
-    if (needrepaint && (VideoOutputSubType() >= XVideo))
+    if ((needrepaint || xv_need_bobdeint_repaint) &&
+        (VideoOutputSubType() >= XVideo))
+    {
         DrawUnusedRects(/* don't do a sync*/false);
+    }
 
     if (VideoOutputSubType() > XVideo)
         ShowXvMC(scan);
@@ -2483,10 +2494,13 @@ void VideoOutputXv::Show(FrameScanType scan)
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
-    int boboff = (int)round(((double)disphoff) / 456 - 0.00001);
-    boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
+    bool use_bob   = (m_deinterlacing && m_deintfiltername == "bobdeint");
+    int boboff_raw = (int)round(((double)disphoff) / 456 - 0.00001);
+    int boboff     = use_bob ? boboff_raw : 0;
 
-    if (chroma_osd && chroma_osd->GetImage() && needrepaint)
+    xv_need_bobdeint_repaint |= needrepaint;
+
+    if (chroma_osd && chroma_osd->GetImage() && xv_need_bobdeint_repaint)
     {
         X11L;
         XShmPutImage(XJ_disp, XJ_curwin, XJ_gc, chroma_osd->GetImage(),
@@ -2496,6 +2510,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
         X11U;
 
         needrepaint = false;
+        xv_need_bobdeint_repaint = false;
         return;
     }
 
@@ -2506,8 +2521,20 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
         XSetForeground(XJ_disp, XJ_gc, xv_colorkey);
         XFillRectangle(XJ_disp, XJ_curwin, XJ_gc, dispx, 
                        dispy + boboff, dispw, disph - 2 * boboff);
-        needrepaint = false;
     }
+    else if (xv_draw_colorkey && xv_need_bobdeint_repaint)
+    {
+        // if this is only for deinterlacing mode switching, draw
+        // the border areas, presumably the main image is undamaged.
+        XSetForeground(XJ_disp, XJ_gc, xv_colorkey);
+        XFillRectangle(XJ_disp, XJ_curwin, XJ_gc, dispx, 
+                       dispy, dispw, boboff_raw);
+        XFillRectangle(XJ_disp, XJ_curwin, XJ_gc, dispx, 
+                       disph - 2 * boboff_raw, dispw, disph);
+    }
+
+    needrepaint = false;
+    xv_need_bobdeint_repaint = false;
 
     // Draw black in masked areas
     XSetForeground(XJ_disp, XJ_gc, XJ_black);

@@ -49,6 +49,8 @@ class VideoOutputXv : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
+
+    bool SetDeinterlacingEnabled(bool);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
     bool ApproveDeintFilter(const QString& filtername) const;
 
@@ -203,6 +205,7 @@ class VideoOutputXv : public VideoOutput
     int                  xv_chroma;
     unsigned char       *xv_color_conv_buf;
     buffer_map_t         xv_buffers;
+    bool                 xv_need_bobdeint_repaint;
 
     // Chromakey OSD info
     ChromaKeyOSD        *chroma_osd;

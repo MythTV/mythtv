@@ -144,6 +144,11 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void ClearBookmark(void);
     void SetForcedAspectRatio(int mpeg2_aspect_value, int letterbox_permission);
 
+    void NextScanType(void)
+        { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
+    void SetScanType(FrameScanType);
+    FrameScanType GetScanType(void) const { return m_scan; }
+
     void SetOSDFontName(const QString osdfonts[22], const QString &prefix);
     void SetOSDThemeName(const QString themename);
 
@@ -371,6 +376,7 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void InitFilters(void);
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height);
+    void AutoDeint(VideoFrame*);
 
     // Private Sets
     void SetPrebuffering(bool prebuffer);
@@ -544,6 +550,10 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     float    forced_video_aspect; 
     /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
     FrameScanType m_scan;
+    /// Set when the user selects a scan type, overriding the detected one
+    bool     m_scan_locked;
+    /// Used for tracking of scan type for auto-detection of interlacing
+    int      m_scan_tracker;
     /// Video (input) Number of frames between key frames (often inaccurate)
     int keyframedist;
 

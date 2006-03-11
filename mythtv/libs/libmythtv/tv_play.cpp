@@ -149,6 +149,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PREVCC708",    "Previous ATSC CC track",   "");
     REG_KEY("TV Playback", "NEXTCC",       "Next of any captions",     "");
 
+    REG_KEY("TV Playback", "NEXTSCAN",    "Next video scan overidemode", "");
     REG_KEY("TV Playback", "QUEUETRANSCODE", "Queue the current recording for "
             "transcoding", "X");
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
@@ -2245,6 +2246,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoTogglePictureAttribute();
             }
         }
+        else if (action == "NEXTSCAN")
+            activenvp->NextScanType();
         else if (action == "ARBSEEK")
         {
             if (asInputMode)
@@ -5691,6 +5694,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
         ChangeTimeStretch(0, !floatRead);   // just display
     }
+    else if (action.left(11) == "SELECTSCAN_")
+        activenvp->SetScanType((FrameScanType) action.right(1).toInt());
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
         ChangeAudioSync(0);
     else if (action.left(11) == "TOGGLESLEEP")
@@ -6047,6 +6052,26 @@ void TV::BuildOSDTreeMenu(void)
                                  (speedX100 == 150) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
 
+    // add scan mode override settings to menu
+    int scan_type = kScan_Ignore;
+    if (activenvp)
+        scan_type = activenvp->GetScanType();
+
+    item = new OSDGenericTree(
+        treeMenu, tr("Video Scan"), "SCANMODE");
+    subitem = new OSDGenericTree(
+        item, tr("Detect"), "SELECTSCAN_3",
+        (scan_type == 3) ? 1 : 0, NULL, "SCANGROUP");
+    subitem = new OSDGenericTree(
+        item, tr("Progressive"), "SELECTSCAN_0",
+        (scan_type == 0) ? 1 : 0, NULL, "SCANGROUP");
+    subitem = new OSDGenericTree(
+        item, tr("Interlaced (Normal)"), "SELECTSCAN_1",
+        (scan_type == 1) ? 1 : 0, NULL, "SCANGROUP");
+    subitem = new OSDGenericTree(
+        item, tr("Interlaced (Reversed)"), "SELECTSCAN_2",
+        (scan_type == 2) ? 1 : 0, NULL, "SCANGROUP");
+    
     // add sleep items to menu
 
     item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
