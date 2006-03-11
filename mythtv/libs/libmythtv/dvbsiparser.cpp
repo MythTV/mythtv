@@ -293,7 +293,10 @@ void DVBSIParser::StartSectionReader(void)
 
                 int rsz = read(pollArray[i].fd, &buffer, MAX_SECTION_SIZE);
 
-                if (rsz > 0)
+                // Check that the buffer exceeds minimal section length
+                // Check that the size of the buffer matches section_length
+                if ((rsz >= 8) &&
+                    ((rsz - 3) == ((buffer[1] & 0x0f) << 8 | buffer[2])))
                 {
                     ParseTable(buffer, rsz,
                                PIDfilterManager[pollArray[i].fd].pid);
