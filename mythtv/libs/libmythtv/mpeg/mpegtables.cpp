@@ -3,10 +3,8 @@
 #include "mpegtables.h"
 #include "atscdescriptors.h"
 
-const unsigned char init_patheader[9] =
+const unsigned char DEFAULT_PAT_HEADER[8] =
 {
-    0x00,
-
     0x00, // TableID::PAT
     0xb0, // Syntax indicator
     0x00, // Length (set seperately)
@@ -18,10 +16,8 @@ const unsigned char init_patheader[9] =
     0x00, // Last Section
 };
 
-const unsigned char DEFAULT_PMT_HEADER[9] =
+const unsigned char DEFAULT_PMT_HEADER[12] =
 {
-    0x00,
-
     0x02, // TableID::PMT
     0xb0, // Syntax indicator
     0x00, // Length (set seperately)
@@ -31,6 +27,8 @@ const unsigned char DEFAULT_PMT_HEADER[9] =
     0xc1, // Version + Current/Next
     0x00, // Current Section
     0x00, // Last Section
+    0xff, 0xff, // PCR pid
+    0x00, 0x00, // Program Info Length
 };
 
 uint StreamID::Normalize(uint stream_id, const desc_list_t &desc)
@@ -59,6 +57,22 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc)
     return stream_id;
 }
 
+ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool small)
+{
+    (void) small; // currently always a small packet..
+    TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
+    memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
+           DEFAULT_PAT_HEADER, sizeof(DEFAULT_PAT_HEADER));
+    PSIPTable psip = PSIPTable::View(*tspacket);
+    psip.SetLength(TSPacket::PAYLOAD_SIZE
+                   - 1 /* for start of field pointer */
+                   - 3 /* for data before data last byte of pes length */);
+    ProgramAssociationTable *pat = new ProgramAssociationTable(psip);
+    pat->SetTotalLength(sizeof(DEFAULT_PAT_HEADER));
+    delete tspacket;
+    return pat;
+}
+
 ProgramAssociationTable* ProgramAssociationTable::Create(
     uint tsid, uint version,
     const vector<uint>& pnum, const vector<uint>& pid)
@@ -67,7 +81,7 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     ProgramAssociationTable* pat = CreateBlank();
     pat->SetVersionNumber(version);
     pat->SetTranportStreamID(tsid);
-    pat->SetLength(1 + PSIP_OFFSET + (count*4));
+    pat->SetTotalLength(PSIP_OFFSET + (count * 4));
 
     // create PAT data
     if ((count * 4) >= (184 - (PSIP_OFFSET+1)))
@@ -91,6 +105,22 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     pat->Finalize();
 
     return pat;
+}
+
+ProgramMapTable* ProgramMapTable::CreateBlank(bool small)
+{
+    (void) small; // currently always a small packet..
+    TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
+    memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
+           DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
+    PSIPTable psip = PSIPTable::View(*tspacket);
+    psip.SetLength(TSPacket::PAYLOAD_SIZE
+                   - 1 /* for start of field pointer */
+                   - 3 /* for data before data last byte of pes length */);
+    ProgramMapTable *pmt = new ProgramMapTable(psip);
+    pmt->SetTotalLength(sizeof(DEFAULT_PMT_HEADER));
+    delete tspacket;
+    return pmt;
 }
 
 ProgramMapTable* ProgramMapTable::Create(
@@ -183,7 +213,7 @@ void ProgramMapTable::AppendStream(
     SetStreamType(StreamCount(), type);
     SetStreamProgramInfo(StreamCount(), streamInfo, infoLength);
     _ptrs.push_back(_ptrs[StreamCount()]+5+StreamInfoLength(StreamCount()));
-    SetLength(1 + _ptrs[StreamCount()] - pesdata());
+    SetTotalLength(_ptrs[StreamCount()] - pesdata());
 }
 
 /** \fn ProgramMapTable::IsAudio(uint) const

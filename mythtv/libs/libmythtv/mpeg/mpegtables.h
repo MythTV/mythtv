@@ -381,20 +381,8 @@ class PSIPTable : public PESPacket
  *  \sa ProgramMapTable
  */
 
-extern const unsigned char init_patheader[9];
-
 class ProgramAssociationTable : public PSIPTable
 {
-    static ProgramAssociationTable* CreateBlank(void)
-    {
-        TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data() + 4, init_patheader, sizeof(init_patheader));
-        PSIPTable psip = PSIPTable::View(*tspacket);
-        psip.SetLength(sizeof(init_patheader));
-        ProgramAssociationTable *pat = new ProgramAssociationTable(psip);
-        delete tspacket;
-        return pat;
-    }
   public:
     ProgramAssociationTable(const ProgramAssociationTable& table)
         : PSIPTable(table)
@@ -452,9 +440,10 @@ class ProgramAssociationTable : public PSIPTable
     }
 
     const QString toString(void) const;
-};
 
-extern const unsigned char DEFAULT_PMT_HEADER[9];
+  private:
+    static ProgramAssociationTable* CreateBlank(bool small = true);
+};
 
 /** \class ProgramMapTable
  *  \brief A PMT table maps a program described in the ProgramAssociationTable
@@ -463,21 +452,7 @@ extern const unsigned char DEFAULT_PMT_HEADER[9];
  */
 class ProgramMapTable : public PSIPTable
 {
-    static const uint pmt_header = 4; // minimum PMT header offset
-    mutable vector<unsigned char*> _ptrs; // used to parse
-
   public:
-    static ProgramMapTable* CreateBlank(void)
-    {
-        TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data() + 4,
-               DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
-        PSIPTable psip = PSIPTable::View(*tspacket);
-        psip.SetLength(sizeof(DEFAULT_PMT_HEADER));
-        ProgramMapTable *pmt = new ProgramMapTable(psip);
-        delete tspacket;
-        return pmt;
-    }
 
     ProgramMapTable(const ProgramMapTable& table) : PSIPTable(table)
     {
@@ -614,6 +589,11 @@ class ProgramMapTable : public PSIPTable
         SetProgramInfoLength(infoLength);
         memcpy(psipdata() + 4, streamInfo, infoLength);
     }
+
+    static ProgramMapTable* CreateBlank(bool small = true);
+
+    static const uint pmt_header = 4; // minimum PMT header offset
+    mutable vector<unsigned char*> _ptrs; // used to parse
 };
 
 /** \class ConditionalAccessTable

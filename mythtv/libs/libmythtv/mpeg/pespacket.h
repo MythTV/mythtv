@@ -47,10 +47,11 @@ class PESPacket
   protected:
     // does not create it's own data
     PESPacket(const TSPacket* tspacket, bool)
-        : _pesdata(NULL), _fullbuffer(NULL), _pesdataSize(188), _allocSize(0)
+        : _pesdata(NULL), _fullbuffer(NULL), _pesdataSize(184), _allocSize(0)
     {
         InitPESPacket(const_cast<TSPacket&>(*tspacket));
         _fullbuffer = const_cast<unsigned char*>(tspacket->data());
+        _pesdataSize = TSPacket::SIZE - (_pesdata - _fullbuffer);
     }
     // does not create it's own data
     PESPacket(const unsigned char *pesdata, bool)
@@ -207,6 +208,12 @@ class PESPacket
     {
         _pesdata[1] = (_pesdata[1] & 0xf0) | ((len>>8) & 0x0f);
         _pesdata[2] = len & 0xff;
+    }
+    void SetTotalLength(uint len)
+    {
+        len += 4 /* for CRC */;
+        len -= 3 /* for data before data last byte of length */;
+        SetLength(len);
     }
 
     uint CRC() const 

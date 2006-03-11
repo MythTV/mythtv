@@ -125,6 +125,7 @@ class TSPacket : public TSHeader
         TSPacket *pkt = new TSPacket();
         pkt->InitHeader(PAYLOAD_ONLY_HEADER);
         memset(pkt->_tspayload, 0xFF, PAYLOAD_SIZE);
+        pkt->SetStartOfFieldPointer(0);
         return pkt;
     }
     
@@ -142,6 +143,7 @@ class TSPacket : public TSHeader
 
     //4.0  8 bits, iff payloadStart(), points to start of field
     unsigned int StartOfFieldPointer() const { return data()[AFCOffset()]; }
+    void SetStartOfFieldPointer(uint sof) { data()[AFCOffset()] = sof; }
 
     QString toString() const;
 
