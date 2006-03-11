@@ -11,6 +11,7 @@
 #include <cmath>
 #include <qcolor.h>
 #include "cc708window.h"
+#include "osdimagecache.h"
 
 using namespace std;
 
@@ -295,6 +296,8 @@ class OSDTypeImage : public OSDType
     int m_drawwidth;
     bool m_onlyusefirst;
     bool m_dontround;
+
+    OSDImageCache cache;
 };
 
 class OSDTypePosSlider : public OSDTypeImage
