@@ -274,7 +274,7 @@ class ScanFrequencyTable: public ComboBoxSetting, public TransientStorage
     {
         addSelection(QObject::tr("Broadcast"),        "us",            true);
         addSelection(QObject::tr("Cable")    +" 78+", "uscablehigh",   false);
-        addSelection(QObject::tr("Cable HRC")+" 78+", "uscablehrchigh",false);
+        addSelection(QObject::tr("Cable HRC")+" 67+", "uscablehrchigh",false);
         addSelection(QObject::tr("Cable"),            "uscable",       false);
         addSelection(QObject::tr("Cable HRC"),        "ushrc",         false);
 
