@@ -130,7 +130,7 @@ class AvFormatDecoder : public DecoderBase
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
     virtual int  GetTeletextDecoderType(void) const;
-    virtual void SetTeletextDecoderViewer(OSDTypeTeletext*);
+    virtual void SetTeletextDecoderViewer(TeletextViewer*);
 
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }

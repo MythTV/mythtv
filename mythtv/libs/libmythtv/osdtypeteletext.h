@@ -102,14 +102,15 @@ class TeletextMagazine
     std::map<int, TeletextPage> pages;
 };
 
-class OSDTypeTeletext : public OSDType 
+class OSDTypeTeletext : public OSDType, public TeletextViewer
 {
     Q_OBJECT
   public:
     OSDTypeTeletext(const QString &name, TTFFont *font,
                     QRect displayrect, float wmult, float hmult);
-    OSDTypeTeletext(const OSDTypeTeletext &other);
-    ~OSDTypeTeletext();
+    OSDTypeTeletext(const OSDTypeTeletext &other)
+        : OSDType(other.m_name), TeletextViewer() {}
+    virtual ~OSDTypeTeletext() {}
 
     void Reset();
 

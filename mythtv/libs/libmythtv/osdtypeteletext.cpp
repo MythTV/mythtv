@@ -85,15 +85,6 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
     Reset(); // initializes m_magazines
 }
 
-OSDTypeTeletext::OSDTypeTeletext(const OSDTypeTeletext &other)
-    : OSDType(other.m_name)
-{
-}
-
-OSDTypeTeletext::~OSDTypeTeletext()
-{
-}
-
 /** \fn OSDTypeTeletext::Reset(void)
  *  \brief Resets the teletext data cache
  */

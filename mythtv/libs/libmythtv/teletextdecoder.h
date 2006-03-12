@@ -7,38 +7,56 @@
 #include <qobject.h>
 #include <qmutex.h>
 
-class OSDTypeTeletext;
 class OSDType;
 class CCDecoder;
 
 class TeletextReader
 {
   public:
+    TeletextReader() { }
     virtual ~TeletextReader() { }
     virtual void AddTextData(unsigned char *buf, int len,
                              long long timecode, char type) = 0;
 };
 
-class TeletextDecoder : public QObject
+class TeletextViewer
 {
-    Q_OBJECT
-
   public:
-    TeletextDecoder();
-    ~TeletextDecoder();
+    TeletextViewer() { }
+    virtual ~TeletextViewer() { }
 
-    // Sets
-    void SetViewer(OSDTypeTeletext*);
+    virtual void AddPageHeader(int page,           int subpage,
+                               const uint8_t *buf, int vbimode,
+                               int lang,           int flags) = 0;
+    virtual void AddTeletextData(int magazine, int row,
+                                 const uint8_t* buf, int vbimode) = 0;
+};
 
-    // Gets
-    int GetDecoderType(void) const;
+class TeletextDecoder
+{
+  public:
+    TeletextDecoder() :  m_teletextviewer(NULL), m_decodertype(-1) {}
+    virtual ~TeletextDecoder() {}
+
+    /// Sets the TeletextViewer which will get the text from this decoder.
+    void SetViewer(TeletextViewer *viewer)
+        { m_teletextviewer = viewer; }
+
+    /**
+     *  \brief Returns the actual decoder type (DVB,IVTV,DVB_SUBTITLE...)
+     *
+     *   This is used for the decision in NuppelVideoPlayer
+     *   to this TeletextDecoder or the caption only decoder.
+     */
+    int GetDecoderType(void) const
+        { return m_decodertype; }
 
     void Decode(const unsigned char *buf, int vbimode);
 
   private:
 
-    OSDTypeTeletext *m_teletextviewer;
-    int              m_decodertype;
+    TeletextViewer *m_teletextviewer;
+    int             m_decodertype;
 };
 
 #endif

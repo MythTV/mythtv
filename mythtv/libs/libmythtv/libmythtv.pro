@@ -101,7 +101,7 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
 HEADERS += programinfo.h            proglist.h
-HEADERS += RingBuffer.h             DVDRingBuffer.h
+HEADERS += RingBuffer.h
 HEADERS += ThreadedFileWriter.h     previouslist.h
 HEADERS += dbcheck.h                
 HEADERS += remoteutil.h             tv.h
@@ -114,13 +114,13 @@ HEADERS += cc708decoder.h           cc708window.h
 HEADERS += sr_dialog.h              sr_root.h
 HEADERS += sr_items.h               scheduledrecording.h
 HEADERS += signalmonitorvalue.h     viewschdiff.h
-HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
-HEADERS += mpeg/iso639.h
 HEADERS += livetvchain.h
 HEADERS += playgroup.h              progdetails.h
+HEADERS += channeleditor.h          channelsettings.h
+HEADERS += previewgenerator.h       dvbtransporteditor.h
 
 SOURCES += programinfo.cpp          proglist.cpp
-SOURCES += RingBuffer.cpp           DVDRingBuffer.cpp
+SOURCES += RingBuffer.cpp
 SOURCES += ThreadedFileWriter.cpp   previouslist.cpp
 SOURCES += dbcheck.cpp              
 SOURCES += remoteutil.cpp           tv.cpp
@@ -133,12 +133,36 @@ SOURCES += cc708decoder.cpp         cc708window.cpp
 SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp             scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
-SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
-SOURCES += mpeg/iso639.cpp
 SOURCES += viewschdiff.cpp
 SOURCES += livetvchain.cpp
 SOURCES += playgroup.cpp
 SOURCES += progdetails.cpp
+SOURCES += channeleditor.cpp        channelsettings.cpp
+SOURCES += previewgenerator.cpp     dvbtransporteditor.cpp
+
+# Teletext stuff
+HEADERS += teletextdecoder.h        vbilut.h
+SOURCES += teletextdecoder.cpp      vbilut.cpp
+
+# MPEG parsing stuff
+HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
+HEADERS += mpeg/mpegtables.h        mpeg/atsctables.h
+HEADERS += mpeg/dvbtables.h
+HEADERS += mpeg/mpegstreamdata.h    mpeg/atscstreamdata.h
+HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
+HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
+HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
+HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
+HEADERS += mpeg/tsstats.h
+
+SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
+SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
+SOURCES += mpeg/dvbtables.cpp
+SOURCES += mpeg/mpegstreamdata.cpp  mpeg/atscstreamdata.cpp
+SOURCES += mpeg/dvbstreamdata.cpp   mpeg/scanstreamdata.cpp
+SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
+SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
+SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
 
 using_frontend {
     # Recording profile stuff
@@ -151,7 +175,9 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h                NuppelVideoPlayer.h
+    HEADERS += DVDRingBuffer.h
     SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
+    SOURCES += DVDRingBuffer.cpp
 
     # A/V decoders
     HEADERS += decoderbase.h
@@ -165,10 +191,12 @@ using_frontend {
     # On screen display (video output overlay)
     HEADERS += osd.h                    osdtypes.h
     HEADERS += osdsurface.h             osdlistbtntype.h
-    HEADERS += osdimagecache.h          udpnotify.h 
+    HEADERS += osdimagecache.h          osdtypeteletext.h
+    HEADERS += udpnotify.h 
     SOURCES += osd.cpp                  osdtypes.cpp
     SOURCES += osdsurface.cpp           osdlistbtntype.cpp
-    SOURCES += osdimagecache.cpp        udpnotify.cpp 
+    SOURCES += osdimagecache.cpp        osdtypeteletext.cpp
+    SOURCES += udpnotify.cpp 
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h
@@ -212,12 +240,6 @@ using_frontend {
     SOURCES += guidegrid.cpp            infostructs.cpp
     SOURCES += progfind.cpp             ttfont.cpp
 
-    # Teletext stuff
-    HEADERS += teletextdecoder.h        osdtypeteletext.h
-    HEADERS += vbilut.h
-    SOURCES += teletextdecoder.cpp      osdtypeteletext.cpp
-    SOURCES += vbilut.cpp
-
     # C stuff
     HEADERS += blend.h
     SOURCES += blend.c
@@ -245,23 +267,6 @@ using_backend {
     SOURCES += tv_rec.cpp
     SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
     SOURCES += dtvrecorder.cpp             dummydtvrecorder.cpp
-
-    # MPEG parsing stuff
-    HEADERS += mpeg/mpegtables.h           mpeg/atsctables.h
-    HEADERS += mpeg/dvbtables.h
-    HEADERS += mpeg/mpegstreamdata.h       mpeg/atscstreamdata.h
-    HEADERS += mpeg/dvbstreamdata.h        mpeg/scanstreamdata.h
-    HEADERS += mpeg/mpegdescriptors.h      mpeg/atscdescriptors.h
-    HEADERS += mpeg/dvbdescriptors.h       mpeg/dishdescriptors.h
-    HEADERS += mpeg/atsc_huffman.h
-    HEADERS += mpeg/tsstats.h 
-    SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
-    SOURCES += mpeg/dvbtables.cpp
-    SOURCES += mpeg/mpegstreamdata.cpp     mpeg/atscstreamdata.cpp
-    SOURCES += mpeg/dvbstreamdata.cpp      mpeg/scanstreamdata.cpp
-    SOURCES += mpeg/mpegdescriptors.cpp    mpeg/atscdescriptors.cpp
-    SOURCES += mpeg/dvbdescriptors.cpp     mpeg/dishdescriptors.cpp
-    SOURCES += mpeg/atsc_huffman.cpp
 
     # Listings downloading classes
     HEADERS += datadirect.h
@@ -342,13 +347,3 @@ using_backend {
 
     DEFINES += USING_BACKEND
 }
-
-# Files used by frontend and backend.
-using_frontend:HEADERS *= channeleditor.h      channelsettings.h
-using_frontend:HEADERS *= previewgenerator.h   dvbtransporteditor.h
-using_frontend:SOURCES *= channeleditor.cpp    channelsettings.cpp
-using_frontend:SOURCES *= previewgenerator.cpp dvbtransporteditor.cpp
-using_backend:HEADERS  *= channeleditor.h      channelsettings.h
-using_backend:HEADERS  *= previewgenerator.h   dvbtransporteditor.h
-using_backend:SOURCES  *= channeleditor.cpp    channelsettings.cpp
-using_backend:SOURCES  *= previewgenerator.cpp dvbtransporteditor.cpp

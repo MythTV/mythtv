@@ -10,7 +10,7 @@
 #include "videooutbase.h" // for MythCodecID
 
 class RingBuffer;
-class OSDTypeTeletext;
+class TeletextViewer;
 
 const int kDecoderProbeBufferSize = 65536;
 
@@ -123,7 +123,7 @@ class DecoderBase
     virtual bool InsertTrack(uint type, const StreamInfo&);
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
-    virtual void SetTeletextDecoderViewer(OSDTypeTeletext*) {;}
+    virtual void SetTeletextDecoderViewer(TeletextViewer*) {;}
 
   protected:
     virtual int  AutoSelectTrack(uint type);

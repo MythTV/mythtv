@@ -33,22 +33,11 @@ using namespace std;
 #include "teletextdecoder.h"
 #include "vbilut.h"
 #include "mythcontext.h"
-#include "osdtypeteletext.h"
 #include "ccdecoder.h"
 
 /******************************************************************/
 //Decoder section
 //
-
-TeletextDecoder::TeletextDecoder() :
-// private stuff
-    m_teletextviewer(NULL), m_decodertype(-1)
-{
-}
-
-TeletextDecoder::~TeletextDecoder()
-{
-}
 
 /** \fn TeletextDecoder::Decode(const unsigned char*, int)
  *  \brief Decodes teletext data
@@ -61,7 +50,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     int err = 0, latin1 = -1, zahl1, pagenum, subpagenum, lang, flags;
     uint magazine, packet, header;
 
-    if (m_teletextviewer == NULL)
+    if (!m_teletextviewer)
     {
         VERBOSE(VB_VBI, "TeletextDecoder: No Teletext Viewer defined!");
         return;
@@ -168,24 +157,4 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                                               buf, vbimode);
             break;
     }
-    return;
 }
-
-/** \fn TeletextDecoder::SetViewer(OSDTypeTeletext*)
- *  \brief Sets the Teletext Viewer Class
- */
-void TeletextDecoder::SetViewer(OSDTypeTeletext *view)
-{
-    m_teletextviewer = view;
-}
-
-/** \fn TeletextDecoder::GetDecoderType(void) const
- *  \brief returns the actual decoder type (DVB,IVTV,DVB_SUBTITLE...)
- *         At the moment, this is just for the decision in tv_play.cpp
- *         if to use the new TeletextDecoder class or the old one
- */
-int TeletextDecoder::GetDecoderType(void) const
-{
-    return m_decodertype;
-}
-

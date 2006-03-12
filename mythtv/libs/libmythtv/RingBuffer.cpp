@@ -162,6 +162,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 
     bool is_local = false;
     bool is_dvd = false;
+    (void) is_dvd; // not used when frontend is disabled.
 
     if ((filename.left(7) == "myth://") &&
         (filename.length() > 7 ))
@@ -181,6 +182,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             }
         }
     }
+#ifdef USING_FRONTEND
     else if (filename.left(4) == "dvd:")
     {
         is_dvd = true;
@@ -202,6 +204,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             filename = "/dev/dvd";
         }
     }
+#endif // USING_FRONTEND
     else
         is_local = true;
 
@@ -255,11 +258,13 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             oldfile = true;
         }
     }
+#ifdef USING_FRONTEND
     else if (is_dvd)
     {
         dvdPriv->OpenFile(filename);
         readblocksize = DVD_BLOCK_SIZE * 62;
     }
+#endif // USING_FRONTEND
     else
     {
         remotefile = new RemoteFile(filename);
@@ -284,7 +289,11 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
  */
 bool RingBuffer::IsOpen(void) const
 { 
+#ifdef USING_FRONTEND
     return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen());
+#else // if !USING_FRONTEND
+    return tfw || (fd2 > -1) || remotefile;
+#endif // !USING_FRONTEND
 }
 
 /** \fn RingBuffer::~RingBuffer(void)
@@ -313,11 +322,12 @@ RingBuffer::~RingBuffer(void)
         fd2 = -1;
     }
     
+#ifdef USING_FRONTEND
     if (dvdPriv)
     {
         delete dvdPriv;
     }
-    
+#endif // USING_FRONTEND    
 }
 
 /** \fn RingBuffer::Start(void)
@@ -746,11 +756,13 @@ void RingBuffer::ReadAheadThread(void)
                                 totfree);
                 internalreadpos += ret;
             }
+#ifdef USING_FRONTEND
             else if (dvdPriv)
             {                        
                 ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
                 internalreadpos += ret;
             }
+#endif // USING_FRONTEND
             else
             {
                 ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
@@ -1006,11 +1018,13 @@ int RingBuffer::Read(void *buf, int count)
             ret = safe_read(remotefile, buf, count);
             readpos += ret;
         }
+#ifdef USING_FRONTEND
         else if (dvdPriv)
         {                        
             ret = dvdPriv->safe_read(buf, count);
             readpos += ret;
         }
+#endif // USING_FRONTEND
         else
         {
             ret = safe_read(fd2, buf, count);
@@ -1097,10 +1111,12 @@ long long RingBuffer::Seek(long long pos, int whence)
     long long ret = -1;
     if (remotefile)
         ret = remotefile->Seek(pos, whence, readpos);
+#ifdef USING_FRONTEND
     else if (dvdPriv)
     {
         dvdPriv->Seek(pos, whence);
     }
+#endif // USING_FRONTEND
     else
     {
         if (whence == SEEK_SET)
@@ -1177,8 +1193,10 @@ void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
  */
 long long RingBuffer::GetReadPosition(void) const
 {
+#ifdef USING_FRONTEND
     if (dvdPriv)
         return dvdPriv->GetReadPosition();
+#endif // USING_FRONTEND
 
     return readpos;
 }
@@ -1226,8 +1244,9 @@ void RingBuffer::SetLiveMode(LiveTVChain *chain)
 
 bool RingBuffer::InDVDMenuOrStillFrame(void)
 {
+#ifdef USING_FRONTEND
     if (dvdPriv)
         return (dvdPriv->IsInMenu() || dvdPriv->InStillFrame());
+#endif // USING_FRONTEND
     return false;
 }
-

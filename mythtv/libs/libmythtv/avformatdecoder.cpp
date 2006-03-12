@@ -1935,7 +1935,7 @@ int AvFormatDecoder::GetTeletextDecoderType(void) const
     return ttd->GetDecoderType();
 }
 
-void AvFormatDecoder::SetTeletextDecoderViewer(OSDTypeTeletext *view)
+void AvFormatDecoder::SetTeletextDecoderViewer(TeletextViewer *view)
 {
     ttd->SetViewer(view);
 }
