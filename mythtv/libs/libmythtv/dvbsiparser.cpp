@@ -304,6 +304,13 @@ void DVBSIParser::StartSectionReader(void)
                     continue;
                 }
 
+                // Special case for partial reads. See #1493.
+                if (rsz > 0)
+                {
+                    processed = true;
+                    continue;
+                }
+
                 if (rsz == -1 && errno == EAGAIN)
                 {
                     i--;
