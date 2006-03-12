@@ -193,10 +193,10 @@ bool DVBConfParser::parseConfQPSK(QStringList& tokens)
     QStringList::Iterator end = tokens.end();
 
     if (i != end) c.name = *i++; else return false;
-    if (i != end) c.frequency = (*i++).toInt(); else return false;
+    if (i != end) c.frequency = (*i++).toUInt()*1000; else return false;
     if (i == end || !c.polarity.parseConf(*i++)) return false;
     if (i == end ) return false; else i++; //Sat num
-    if (i != end) c.symbolrate = (*i++).toInt(); else return false;
+    if (i != end) c.symbolrate = (*i++).toUInt()*1000; else return false;
     if (i == end ) return false; else i++;
     if (i == end ) return false; else i++;
     if (i != end) c.serviceid = (*i++).toInt(); else return false;
