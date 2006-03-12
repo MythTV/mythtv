@@ -315,7 +315,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
     int dvr_fd = open(dvr_fname.ascii(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_IMPORTANT, LOC +
                 QString("Failed to open DVR device %1 : %2")
                 .arg(dvr_fname).arg(strerror(errno)));
         delete[] buffer;
@@ -351,7 +351,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
         if (remainder > 0) // leftover bytes
             memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
     }
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "shutdown");
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "shutdown");
 
     if (GetStreamData())
     {
@@ -368,7 +368,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
     close(dvr_fd);
     delete[] buffer;
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "end");
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "end");
 }
 
 /** \fn DVBSignalMonitor::RunTableMonitorSR(void)
