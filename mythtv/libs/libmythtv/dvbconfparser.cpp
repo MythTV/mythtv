@@ -189,17 +189,45 @@ bool DVBConfParser::parseConfQAM(QStringList& tokens)
 bool DVBConfParser::parseConfQPSK(QStringList& tokens)
 {
     Channel c;
-    QStringList::Iterator i = tokens.begin();
-    QStringList::Iterator end = tokens.end();
+    QStringList::iterator it = tokens.begin();
 
-    if (i != end) c.name = *i++; else return false;
-    if (i != end) c.frequency = (*i++).toInt(); else return false;
-    if (i == end || !c.polarity.parseConf(*i++)) return false;
-    if (i == end ) return false; else i++; //Sat num
-    if (i != end) c.symbolrate = (*i++).toInt(); else return false;
-    if (i == end ) return false; else i++;
-    if (i == end ) return false; else i++;
-    if (i != end) c.serviceid = (*i++).toInt(); else return false;
+    if (it != tokens.end())
+        c.name = *it++;
+    else
+        return false;
+
+    if (it != tokens.end())
+        c.frequency = (*it++).toUInt() * 1000;
+    else
+        return false;
+
+    if (it == tokens.end() || !c.polarity.parseConf(*it++))
+        return false;
+
+    if (it == tokens.end())
+        return false;
+    else
+        it++; //Sat num
+
+    if (it != tokens.end())
+        c.symbolrate = (*it++).toUInt() * 1000;
+    else
+        return false;
+
+    if (it == tokens.end())
+        return false;
+    else
+        it++;
+
+    if (it == tokens.end())
+        return false;
+    else
+        it++;
+
+    if (it != tokens.end())
+        c.serviceid = (*it++).toInt();
+    else
+        return false;
     
     channels.append(c);
     return true;
