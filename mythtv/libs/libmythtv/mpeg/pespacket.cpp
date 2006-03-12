@@ -174,7 +174,7 @@ static void return_188_block(unsigned char* ptr)
     alloc188.erase(ptr);
     free188.push_back(ptr);
     // free the allocator only if more than 1 block was used
-    if (mem188.size() > 1)
+    if (alloc188.empty() && mem188.size() > 1)
     {
         vector<unsigned char*>::iterator it;
         for (it = mem188.begin(); it != mem188.end(); ++it)
@@ -232,7 +232,7 @@ static void return_4096_block(unsigned char* ptr)
 #endif 
 
     // free the allocator only if more than 1 block was used
-    if (mem4096.size() > 1)
+    if (alloc4096.empty() && mem4096.size() > 1)
     {
         vector<unsigned char*>::iterator it;
         for (it = mem4096.begin(); it != mem4096.end(); ++it)
