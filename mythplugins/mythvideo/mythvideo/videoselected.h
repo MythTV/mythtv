@@ -35,7 +35,7 @@ class VideoSelected : public MythDialog
     VideoSelected(VideoList *lvideolist,
                  MythMainWindow *parent, const char *name = 0, int index = 0);
     ~VideoSelected();
-    void VideoSelected::processEvents() { qApp->processEvents(); }
+    void processEvents() { qApp->processEvents(); }
     
 
   protected slots:
