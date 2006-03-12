@@ -283,15 +283,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
         "ATSC Channel %1", 70, 809000000, 887000000, 6000000, VSB_8);
 #endif // USING_DVB
 
-    // USA Cable, QAM 256
+    // USA Cable, QAM 256 ch 1-155, T.7-T.14
     fmap["atsc_qam256_uscable0"] = new FrequencyTable(
         "QAM-256 Channel %1",   1, 75000000,1005000000, 6000000, QAM_256);
     fmap["atsc_qam256_uscable1"] = new FrequencyTable(
         "QAM-256 Channel T-%1", 7, 10000000,  52000000, 6000000, QAM_256);
 
-    // USA Cable, QAM 256 ch 78+
+    // USA Cable, QAM 256 ch 78-155
     fmap["atsc_qam256_uscablehigh0"] = new FrequencyTable(
-        "QAM-256 Channel %1",  78,472000000,1005000000, 6000000, QAM_256);
+        "QAM-256 Channel %1",  78,537000000,1005000000, 6000000, QAM_256);
 
     // USA Cable HRC, QAM 256
     fmap["atsc_qam256_ushrc0"] = new FrequencyTable(
@@ -309,9 +309,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_qam256_ushrc6"] = new FrequencyTable(
         "QAM-256 HRC T-%1", 7,   8175000,  50750000, 6000000, QAM_256);
 
-    // USA Cable HRC, QAM 256 ch 78+
+    // USA Cable HRC, QAM 256 ch 67-125
     fmap["atsc_qam256_ushrchigh0"] = new FrequencyTable(
-        "QAM-256 HRC %1",  78, 601750000, 643750000, 6000000, QAM_256);
+        "QAM-256 HRC %1",  67, 535750000, 643750000, 6000000, QAM_256);
     fmap["atsc_qam256_ushrchigh1"] = new FrequencyTable(
         "QAM-256 HRC %1", 100, 649750000, 799750000, 6000000, QAM_256);
 
@@ -323,9 +323,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_qam128_uscable1"] = new FrequencyTable(
         "QAM-128 Channel T-%1", 7, 10000000,  52000000, 6000000, QAM_128);
 
-    // USA Cable, QAM 128 ch 78+
+    // USA Cable, QAM 128 ch 78-155
     fmap["atsc_qam128_uscablehigh0"] = new FrequencyTable(
-        "QAM-128 Channel %1",  78,472000000,1005000000, 6000000, QAM_128);
+        "QAM-128 Channel %1",  78,537000000,1005000000, 6000000, QAM_128);
 
     // USA Cable HRC, QAM 128
     fmap["atsc_qam128_ushrc0"] = new FrequencyTable(
@@ -343,9 +343,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_qam128_ushrc6"] = new FrequencyTable(
         "QAM-128 HRC T-%1", 7,   8175000,  50750000, 6000000, QAM_128);
 
-    // USA Cable HRC, QAM 128 ch 78+
+    // USA Cable HRC, QAM 128 ch 67-125
     fmap["atsc_qam128_ushrchigh0"] = new FrequencyTable(
-        "QAM-128 HRC %1",  78, 601750000, 643750000, 6000000, QAM_128);
+        "QAM-128 HRC %1",  67, 535750000, 643750000, 6000000, QAM_128);
     fmap["atsc_qam128_ushrchigh1"] = new FrequencyTable(
         "QAM-128 HRC %1", 100, 649750000, 799750000, 6000000, QAM_128);
 
@@ -360,7 +360,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // USA Cable, QAM 64 ch 78+
     fmap["atsc_qam64_uscablehigh0"] = new FrequencyTable(
-        "QAM-64 Channel %1",   78,472000000,1005000000, 6000000, QAM_64);
+        "QAM-64 Channel %1",   78,537000000,1005000000, 6000000, QAM_64);
 
     // USA Cable HRC, QAM 64
     fmap["atsc_qam64_ushrc0"] = new FrequencyTable(
@@ -378,9 +378,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_qam64_ushrc6"] = new FrequencyTable(
         "QAM-64 HRC T-%1", 7,   8175000,  50750000, 6000000, QAM_64);
 
-    // USA Cable HRC, QAM 64 ch 78+
+    // USA Cable HRC, QAM 64 ch 67-125
     fmap["atsc_qam64_ushrchigh0"] = new FrequencyTable(
-        "QAM-64 HRC %1",  78, 601750000, 643750000, 6000000, QAM_64);
+        "QAM-64 HRC %1",  67, 535750000, 643750000, 6000000, QAM_64);
     fmap["atsc_qam64_ushrchigh1"] = new FrequencyTable(
         "QAM-64 HRC %1", 100, 649750000, 799750000, 6000000, QAM_64);
 }
