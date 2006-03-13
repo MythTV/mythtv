@@ -138,7 +138,6 @@ void HouseKeeper::RunHouseKeeping(void)
 
     while (1)
     {
-        VERBOSE(VB_IMPORTANT, "Running HouseKeeping");
         gContext->LogEntry("mythbackend", LP_DEBUG,
                            "Running housekeeping thread", "");
 
