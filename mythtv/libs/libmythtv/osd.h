@@ -47,6 +47,7 @@ class QKeyEvent;
 class OSDGenericTree;
 class ccText;
 class CC708Service;
+class TeletextViewer;
 
 class OSD : public QObject
 {
@@ -81,6 +82,9 @@ class OSD : public QObject
     // CC-708 text captions (for ATSC)
     void SetCC708Service(const CC708Service *service);
     void CC708Updated(void);
+
+    // Teletext menus (for PAL)
+    TeletextViewer *GetTeletextViewer(void);
 
     void SetSettingsText(const QString &text, int length);
 

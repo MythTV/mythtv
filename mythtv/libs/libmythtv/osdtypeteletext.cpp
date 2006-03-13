@@ -998,10 +998,10 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
             }
             else 
             {
-                char ch = CharConversion(ch, lang);
+                char c2 = CharConversion(ch, lang);
                 bool dh = doubleheight && row < (uint)kTeletextRows;
                 int  rw = (dh) ? row + 1 : row;
-                DrawCharacter(x, rw, ch, dh);
+                DrawCharacter(x, rw, c2, dh);
             }
         }
     }

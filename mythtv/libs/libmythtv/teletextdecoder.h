@@ -25,6 +25,10 @@ class TeletextViewer
     TeletextViewer() { }
     virtual ~TeletextViewer() { }
 
+    virtual void KeyPress(uint key) { (void) key; }
+    virtual void SetDisplaying(bool displaying) { (void) displaying; }
+
+    virtual void Reset(void) = 0;
     virtual void AddPageHeader(int page,           int subpage,
                                const uint8_t *buf, int vbimode,
                                int lang,           int flags) = 0;

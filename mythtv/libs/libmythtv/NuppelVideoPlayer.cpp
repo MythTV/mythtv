@@ -1357,14 +1357,9 @@ void NuppelVideoPlayer::ResetCaptions(uint mode_override)
     // resets TeletextA
     if (GetOSD() && (kDisplayTeletextA == mode))
     {
-        OSDSet *oset = GetOSD()->GetSet("teletext");
-        if (oset)
-        {
-            OSDType *traw = oset->GetType("teletext");
-            OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-            if (tt_view)
-                tt_view->Reset();
-        }
+        TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+        if (tt_view)
+            tt_view->Reset();
     }
 
     // resets EIA-608 and TeletextB
@@ -1418,15 +1413,10 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
     if (!(origMode & kDisplayTeletextA) || !osd)
         return;
 
-    OSDSet *oset = osd->GetSet("teletext");
-    if (!oset)
-        return;
-
-    OSDType *traw = oset->GetType("teletext");
-    OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
+    TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
     if (tt_view)
         tt_view->SetDisplaying(false);
-    osd->HideSet("teletext");
+    GetOSD()->HideSet("teletext");
 }
 
 void NuppelVideoPlayer::EnableCaptions(uint mode)
@@ -1465,13 +1455,9 @@ void NuppelVideoPlayer::EnableCaptions(uint mode)
     if (!osd)
         return;
             
-    OSDSet  *oset = osd->GetSet("teletext");
-    OSDType *traw = NULL;
-    if (oset)
-        traw = oset->GetType("teletext");
-
-    OSDTypeTeletext *tt_view = dynamic_cast<OSDTypeTeletext*>(traw);
-    if (tt_view)
+    OSDSet         *oset    = GetOSD()->GetSet("teletext");
+    TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+    if (oset && tt_view)
     {
         decoder->SetTeletextDecoderViewer(tt_view);
         tt_view->SetDisplaying(true);
@@ -1586,11 +1572,7 @@ bool NuppelVideoPlayer::HandleTeletextAction(const QString &action)
 
     bool handled = true;
 
-    OSDSet  *oset = GetOSD()->GetSet("teletext");
-    OSDType *traw = NULL;
-    if (oset)
-        traw = oset->GetType("teletext");
-    OSDTypeTeletext *tt = dynamic_cast<OSDTypeTeletext*>(traw);
+    TeletextViewer *tt = GetOSD()->GetTeletextViewer();
     if (!tt)
         return false;
 
@@ -2850,6 +2832,14 @@ void NuppelVideoPlayer::StartPlaying(void)
             osd->DisableFade();
         }
         osd->SetCC708Service(&CC708services[1]);
+    
+        TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+        if (tt_view)
+        {
+            decoder->SetTeletextDecoderViewer(tt_view);
+            tt_view->SetDisplaying(false);
+        }
+        GetOSD()->HideSet("teletext");
     }
 
     playing = true;

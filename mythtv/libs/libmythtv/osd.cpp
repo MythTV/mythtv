@@ -1825,6 +1825,16 @@ void OSD::CC708Updated(void)
     }
 }
 
+TeletextViewer *OSD::GetTeletextViewer(void)
+{
+    OSDSet *oset = GetSet("teletext");
+    if (!oset)
+        return NULL;
+
+    OSDType *traw = oset->GetType("teletext");
+    return dynamic_cast<TeletextViewer*>(traw);
+}
+
 void OSD::SetSettingsText(const QString &text, int length)
 {
     HideAllExcept("settings");

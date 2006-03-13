@@ -112,7 +112,6 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
         : OSDType(other.m_name), TeletextViewer() {}
     virtual ~OSDTypeTeletext() {}
 
-    void Reset();
 
     void Reinit(float wmult, float hmult);
 
@@ -132,18 +131,19 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
 
     void NewsFlash(void) {};
 
-    void AddPageHeader(int page, int subpage,
-                       const uint8_t *buf, int vbimode, int lang, int flags);
-    void AddTeletextData(int magazine, int row,
-                         const uint8_t* buf, int vbimode);
-
     void PageUpdated(int page, int subpage);
     void HeaderUpdated(uint8_t* page, int lang);
     void StatusUpdated(void);
 
+    // Teletext Viewer methods
     void KeyPress(uint key);
-
     void SetDisplaying(bool display) { m_displaying = display; };
+
+    void Reset(void);
+    void AddPageHeader(int page, int subpage,
+                       const uint8_t *buf, int vbimode, int lang, int flags);
+    void AddTeletextData(int magazine, int row,
+                         const uint8_t* buf, int vbimode);
 
   private:
     char CharConversion(char ch, int lang);
