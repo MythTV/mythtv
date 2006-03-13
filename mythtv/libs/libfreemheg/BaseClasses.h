@@ -23,7 +23,10 @@
 #define BASECLASSES_H
 #include <stdio.h>
 #include <assert.h>
+#include "../../config.h"
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
+#endif
 
 #include <qstring.h>
 
