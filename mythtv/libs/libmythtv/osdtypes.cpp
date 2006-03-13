@@ -753,6 +753,13 @@ OSDTypeImage::OSDTypeImage(void)
 
 OSDTypeImage::~OSDTypeImage()
 {
+    if (!cache.InMemCache())
+    {
+	if (m_yuv)
+	    delete [] m_yuv;
+	if (m_alpha)
+	    delete [] m_alpha;    
+    }
     cache.Reset();
 }
 

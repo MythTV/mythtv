@@ -2315,7 +2315,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     // handle with DVB/DVD subtitles
     if (textDisplayMode & kDisplaySubtitle)
         DisplaySubtitles();
-    else if (osdHasSubtitles || nonDisplayedSubtitles.size() > 20)
+    else if (osdHasSubtitles)
         ClearSubtitles();
 
     // handle scan type changes
