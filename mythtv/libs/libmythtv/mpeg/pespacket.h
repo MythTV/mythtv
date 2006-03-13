@@ -92,11 +92,10 @@ class PESPacket
         InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
 
         int len     = (4*1024) - 256; /* ~4KB */
-        /* make alloc size multiple of 188 */
-        _allocSize  = ((len+_psiOffset+187)/188)*188;
+        _allocSize  = len + _psiOffset;
         _fullbuffer = pes_alloc(_allocSize);
         _pesdata    = _fullbuffer + _psiOffset + 1;
-        memcpy(_fullbuffer, tspacket.data(), 188);
+        memcpy(_fullbuffer, tspacket.data(), TSPacket::SIZE);
     }
 
     // At this point we should have the entire VCT table in buffer
@@ -149,6 +148,8 @@ class PESPacket
         { return reinterpret_cast<const TSHeader*>(_fullbuffer); }
     TSHeader* tsheader()
         { return reinterpret_cast<TSHeader*>(_fullbuffer); }
+
+    uint WriteAsTSPackets(unsigned char *buf, uint &cc) const;
 
     // _pesdata[-3] == 0, _pesdata[-2] == 0, _pesdata[-1] == 1
     uint StreamID()   const { return _pesdata[0]; }

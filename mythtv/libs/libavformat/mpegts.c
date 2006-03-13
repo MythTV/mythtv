@@ -20,7 +20,7 @@
 #include <pthread.h>
 #include "mpegts.h"
 
-//#define DEBUG_SI
+#define DEBUG_SI
 //#define DEBUG_SEEK
 
 /* 1.0 second at 24Mbit/s */
@@ -126,7 +126,7 @@ typedef struct MpegTSService {
 #define PAT_MAX_PMT 128
 
 /** maximum number of streams we expect to be described in a PMT */
-#define PMT_PIDS_MAX 64
+#define PMT_PIDS_MAX 256
 
 struct MpegTSContext {
     /* user data */
@@ -594,7 +594,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     mpegts_cleanup_streams(mpegts_ctx); /* in case someone else removed streams.. */
 
 #ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "PMT:\n");
+    av_log(NULL, AV_LOG_DEBUG, "PMT: len %i\n", section_len);
     av_hex_dump(stdout, (uint8_t *)section, section_len);
 #endif
 

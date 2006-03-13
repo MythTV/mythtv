@@ -502,9 +502,13 @@ void DVBRecorder::WritePATPMT(void)
             _pat->tsheader()->SetContinuityCounter(next_cc);
             BufferedWrite(*(reinterpret_cast<TSPacket*>(_pat->tsheader())));
 
-            next_cc = (_pmt->tsheader()->ContinuityCounter()+1)&0xf;
-            _pmt->tsheader()->SetContinuityCounter(next_cc);
-            BufferedWrite(*(reinterpret_cast<TSPacket*>(_pmt->tsheader())));
+            unsigned char buf[8 * 1024];
+            uint cc = _pmt->tsheader()->ContinuityCounter();
+            uint size = _pmt->WriteAsTSPackets(buf, cc);
+            _pmt->tsheader()->SetContinuityCounter(cc);
+
+            for (uint i = 0; i < size ; i += TSPacket::SIZE)
+                BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 
             _ts_packets_until_psip_sync = TSPACKETS_BETWEEN_PSIP_SYNC;
         }

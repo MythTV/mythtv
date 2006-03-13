@@ -31,6 +31,14 @@ const unsigned char DEFAULT_PMT_HEADER[12] =
     0x00, 0x00, // Program Info Length
 };
 
+static const uint len_for_alloc[] =
+{
+    TSPacket::PAYLOAD_SIZE
+    - 1 /* for start of field pointer */
+    - 3 /* for data before data last byte of pes length */,
+    4000,
+};
+
 uint StreamID::Normalize(uint stream_id, const desc_list_t &desc)
 {
     if (OpenCableVideo == stream_id)
@@ -109,15 +117,24 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
 
 ProgramMapTable* ProgramMapTable::CreateBlank(bool small)
 {
-    (void) small; // currently always a small packet..
+    ProgramMapTable *pmt = NULL;
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
            DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
-    PSIPTable psip = PSIPTable::View(*tspacket);
-    psip.SetLength(TSPacket::PAYLOAD_SIZE
-                   - 1 /* for start of field pointer */
-                   - 3 /* for data before data last byte of pes length */);
-    ProgramMapTable *pmt = new ProgramMapTable(psip);
+
+    if (small)
+    {
+        PSIPTable psip = PSIPTable::View(*tspacket);
+        psip.SetLength(len_for_alloc[0]);
+        pmt = new ProgramMapTable(psip);
+    }
+    else 
+    {
+        PSIPTable psip(*tspacket);
+        psip.SetLength(len_for_alloc[1]);
+        pmt = new ProgramMapTable(psip);
+    }
+
     pmt->SetTotalLength(sizeof(DEFAULT_PMT_HEADER));
     delete tspacket;
     return pmt;
@@ -128,7 +145,7 @@ ProgramMapTable* ProgramMapTable::Create(
     vector<uint> pids, vector<uint> types)
 {
     const uint count = min(pids.size(), types.size());
-    ProgramMapTable* pmt = CreateBlank();
+    ProgramMapTable* pmt = CreateBlank(false);
     pmt->tsheader()->SetPID(basepid);
 
     pmt->RemoveAllStreams();
@@ -151,7 +168,7 @@ ProgramMapTable* ProgramMapTable::Create(
     const vector<desc_list_t> &prog_desc)
 {
     const uint count = min(pids.size(), types.size());
-    ProgramMapTable* pmt = CreateBlank();
+    ProgramMapTable* pmt = CreateBlank(false);
     pmt->tsheader()->SetPID(basepid);
 
     pmt->RemoveAllStreams();
