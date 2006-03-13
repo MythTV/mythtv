@@ -160,9 +160,6 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
         SISCAN("Connecting up DTVSignalMonitor");
         MPEGStreamData *data = new ScanStreamData();
 
-        // Get NIT before we enable SDT in case of UK channel descriptor.
-        data->RemoveListeningPID(DVB_SDT_PID);
-
         dtvSigMon->SetStreamData(data);
         dtvSigMon->AddFlags(kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                             kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT);
@@ -524,19 +521,6 @@ bool SIScan::ScanServices(void)
     if (siparser)
         return siparser->FindServices();
 #endif // USE_SIPARSER
-#ifdef USING_DVB
-    if (GetDVBSignalMonitor())
-    {
-        // We are always scanning for VCTs, but we disable
-        // SDT scans until we hace an NIT since it the NIT may
-        // contain human friendly channel numbers to use in the
-        // SDT insertion.
-        GetDVBSignalMonitor()->GetScanStreamData()->
-            AddListeningPID(DVB_SDT_PID);
-        GetDVBSignalMonitor()->UpdateFiltersFromStreamData();
-        return true;
-    }
-#endif // USING_DVB
     return false;
 }
 
@@ -759,13 +743,6 @@ void SIScan::ScanTransport(const transport_scan_items_it_t transport)
     {
         GetDTVSignalMonitor()->GetScanStreamData()->Reset();
         GetDTVSignalMonitor()->SetChannel(-1,-1);
-
-        // Get NIT before we enable SDT in case of UK channel descriptor.
-#ifdef USE_SIPARSER
-        if (!siparser)
-#endif // USE_SIPARSER
-            GetDTVSignalMonitor()->GetScanStreamData()->
-                RemoveListeningPID(DVB_SDT_PID);
     }
 
     // Start signal monitor for this channel
