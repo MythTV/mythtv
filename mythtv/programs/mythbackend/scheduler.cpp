@@ -2006,7 +2006,7 @@ void Scheduler::AddNewRecords(void)
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-"channel.recpriority + cardinput.preference "
+"channel.recpriority + cardinput.recpriority "
 + QString(
 "FROM recordmatch "
 

@@ -3746,13 +3746,13 @@ Per channel -- Setup->TV Settings->Recording Priorities->Channel Priorities
 can be useful if you believe that you prefer any of the shows on certain
 channels. This would give all shows on a channel an advantage by default.
 
-Input preference -- in the MythTV "setup" program, the "Input Connections"
-section allows you to add additional priority in the "Input preference".
+Input priority -- in the MythTV "setup" program, the "Input Connections"
+section allows you to add additional priority in the "Input priority".
 This is simply another priority factor but has an interesting effect. If a
 card input has a higher value than the other cards, the scheduler will see
-that you would rather record showings of episodes on this card rather than a
+that you would rather record showings of episodes on this input rather than a
 showing on another card. If you have multiple cards of different quality,
-you may want to set input preference to encourage the scheduler to record
+you may want to set input priority to encourage the scheduler to record
 shows on your best card(s) whenever possible. This can also be useful if you
 have multiple video sources which include the same stations. For example,
 with digital and analog cable you could increase the digital cable input

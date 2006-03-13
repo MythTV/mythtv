@@ -1339,14 +1339,14 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     }
 }
 
-class InputPreference: public SpinBoxSetting, public CISetting {
+class InputPriority: public SpinBoxSetting, public CISetting {
   public:
-    InputPreference(const CardInput& parent):
+    InputPriority(const CardInput& parent):
         SpinBoxSetting(-99,99,1),
-        CISetting(parent, "preference") {
-        setLabel(QObject::tr("Input preference"));
+        CISetting(parent, "recpriority") {
+        setLabel(QObject::tr("Input priority"));
         setValue(0);
-        setHelpText(QObject::tr("If the input preference is not equal for "
+        setHelpText(QObject::tr("If the input priority is not equal for "
                     "all inputs, the scheduler may choose to record a show "
                     "at a later time so that it can record on an input with "
                     "a higher value."));
@@ -1431,7 +1431,7 @@ CardInput::CardInput(bool isDVBcard)
 
     startchan = new StartingChannel(*this);
     group->addChild(startchan);
-    group->addChild(new InputPreference(*this));
+    group->addChild(new InputPriority(*this));
 
     addChild(group);
 
