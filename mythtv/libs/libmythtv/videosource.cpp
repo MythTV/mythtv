@@ -756,7 +756,7 @@ class DVBTuningDelay: public SpinBoxSetting, public CCSetting
 {
   public:
     DVBTuningDelay(const CaptureCard& parent)
-      : SpinBoxSetting(0,3000,250), CCSetting(parent, "dvb_tuning_delay")
+      : SpinBoxSetting(0,2000,25), CCSetting(parent, "dvb_tuning_delay")
     {
         setLabel(QObject::tr("DVB Tuning Delay (msec)"));
         setHelpText(
@@ -1984,7 +1984,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
                 channel_timeout->setValue(42500);
             }
             if (frontend_name == "DiBcom 3000P/M-C DVB-T")
-                tuning_delay->setValue(2000);
+                tuning_delay->setValue(200);
             break;
         case CardUtil::ATSC:
         {
