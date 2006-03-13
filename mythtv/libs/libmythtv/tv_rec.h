@@ -74,8 +74,9 @@ class GeneralDBOptions
 class DVBDBOptions
 {
   public:
-    DVBDBOptions() : dvb_on_demand(false) {;}
+    DVBDBOptions() : dvb_on_demand(false), dvb_tuning_delay(0) {;}
     bool dvb_on_demand;
+    uint dvb_tuning_delay;
 };
 
 class FireWireDBOptions

@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1131";
+const QString currentDatabaseVersion = "1132";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2128,6 +2128,16 @@ static bool doUpgradeTVDatabaseSchema(void)
 ""
 };
         if (!performActualUpdate(updates, "1131", dbver))
+            return false;
+    }
+
+    if (dbver == "1131")
+    {
+        const QString updates[] = {
+"ALTER TABLE capturecard ADD COLUMN dvb_tuning_delay INT UNSIGNED NOT NULL DEFAULT 0;",
+""
+};
+        if (!performActualUpdate(updates, "1132", dbver))
             return false;
     }
 

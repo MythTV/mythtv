@@ -74,11 +74,12 @@ static bool handle_diseq(const DVBTuning&, DVBDiSEqC*, bool reset);
  *  \bug Only supports single input cards.
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
-    : QObject(NULL, "DVBChannel"), ChannelBase(parent),
+    : QObject(NULL, "DVBChannel"),  ChannelBase(parent),
       dvb_recorder(NULL),
-      diseqc(NULL),    dvbcam(NULL),
-      fd_frontend(-1), cardnum(aCardNum), has_crc_bug(false),
-      currentTID(-1),  first_tune(true)
+      diseqc(NULL),                 dvbcam(NULL),
+      fd_frontend(-1),              cardnum(aCardNum),
+      has_crc_bug(false),           tuning_delay(0),
+      currentTID(-1),               first_tune(true)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
@@ -633,6 +634,11 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
                   "Setting Frontend tuning parameters failed.");
             return false;
         }
+
+        // Extra delay to add for broken DVB drivers
+        if (tuning_delay)
+            usleep(tuning_delay * 1000);
+
         wait_for_backend(fd_frontend, 5 /* msec */);
 
         prev_tuning.params = params;

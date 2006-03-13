@@ -147,6 +147,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
         channel = new DVBChannel(genOpt.videodev.toInt(), this);
         if (!channel->Open())
             return false;
+        GetDVBChannel()->SetSlowTuning(dvbOpt.dvb_tuning_delay);
         InitChannel(genOpt.defaultinput, startchannel);
         CloseChannel(); // Close the channel if in dvb_on_demand mode
         init_run = true;
@@ -1388,14 +1389,18 @@ bool TVRec::GetDevices(int cardid,
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT videodevice,      vbidevice,           audiodevice,    "
-        "       audioratelimit,   defaultinput,        cardtype,       "
-        "       skipbtaudio,"
-        "       dvb_wait_for_seqstart, dvb_on_demand, "
-        "       firewire_port,    firewire_node,       firewire_speed, "
-        "       firewire_model,   firewire_connection,                 "
-        "       dbox2_port,       dbox2_host,          dbox2_httpport, "
-        "       signal_timeout,   channel_timeout                      "
+        "SELECT videodevice,      vbidevice,           audiodevice,     "
+        "       audioratelimit,   defaultinput,        cardtype,        "
+        "       skipbtaudio,      signal_timeout,      channel_timeout, "
+        "       dvb_wait_for_seqstart, "
+        ""
+        "       dvb_on_demand,    dvb_tuning_delay, "
+        ""
+        "       firewire_port,    firewire_node,       firewire_speed,  "
+        "       firewire_model,   firewire_connection,                  "
+        ""
+        "       dbox2_port,       dbox2_host,          dbox2_httpport   "
+        ""
         "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
@@ -1405,60 +1410,73 @@ bool TVRec::GetDevices(int cardid,
         MythContext::DBError("getdevices", query);
         return false;
     }
-    else if (query.size() > 0)
-    {
-        query.next();
 
-        test = query.value(0).toString();
-        if (test != QString::null)
-            gen_opts.videodev = QString::fromUtf8(test);
-        test = query.value(1).toString();
-        if (test != QString::null)
-            gen_opts.vbidev = QString::fromUtf8(test);
-        test = query.value(2).toString();
-        if (test != QString::null)
-            gen_opts.audiodev = QString::fromUtf8(test);
-        testnum = query.value(3).toInt();
-        if (testnum > 0)
-            gen_opts.audiosamplerate = testnum;
-        else
-            gen_opts.audiosamplerate = -1;
+    if (!query.next())
+        return false;
 
-        test = query.value(4).toString();
-        if (test != QString::null)
-            gen_opts.defaultinput = QString::fromUtf8(test);
-        test = query.value(5).toString();
-        if (test != QString::null)
-            gen_opts.cardtype = QString::fromUtf8(test);
+    // General options
+    test = query.value(0).toString();
+    if (test != QString::null)
+        gen_opts.videodev = QString::fromUtf8(test);
 
-        gen_opts.skip_btaudio = query.value(6).toInt();
+    test = query.value(1).toString();
+    if (test != QString::null)
+        gen_opts.vbidev = QString::fromUtf8(test);
 
-        gen_opts.wait_for_seqstart = query.value(7).toInt();
-        dvb_opts.dvb_on_demand = query.value(8).toInt();
+    test = query.value(2).toString();
+    if (test != QString::null)
+        gen_opts.audiodev = QString::fromUtf8(test);
 
-        firewire_opts.port     = query.value(9).toInt();
-        firewire_opts.node     = query.value(10).toInt(); 
-        firewire_opts.speed    = query.value(11).toInt();
-        test = query.value(12).toString();
-        if (test != QString::null)
-            firewire_opts.model = QString::fromUtf8(test);
-        firewire_opts.connection = query.value(13).toInt();
+    gen_opts.audiosamplerate = max(testnum, query.value(3).toInt());
 
-        dbox2_opts.port = query.value(14).toInt();
-        test = query.value(15).toString();
-        if (test != QString::null)
-           dbox2_opts.host = QString::fromUtf8(test);
-        dbox2_opts.httpport = query.value(16).toInt();
+    test = query.value(4).toString();
+    if (test != QString::null)
+        gen_opts.defaultinput = QString::fromUtf8(test);
 
-        gen_opts.signal_timeout  = (uint) max(query.value(17).toInt(), 0);
-        gen_opts.channel_timeout = (uint) max(query.value(18).toInt(), 0);
+    test = query.value(5).toString();
+    if (test != QString::null)
+        gen_opts.cardtype = QString::fromUtf8(test);
 
-        // We should have at least 100 ms to acquire tables...
-        int table_timeout = ((int)gen_opts.channel_timeout - 
-                             (int)gen_opts.signal_timeout);
-        if (table_timeout < 100)
-            gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
-    }
+    gen_opts.skip_btaudio = query.value(6).toUInt();
+
+    gen_opts.signal_timeout  = (uint) max(query.value(7).toInt(), 0);
+    gen_opts.channel_timeout = (uint) max(query.value(8).toInt(), 0);
+
+    // We should have at least 100 ms to acquire tables...
+    int table_timeout = ((int)gen_opts.channel_timeout - 
+                         (int)gen_opts.signal_timeout);
+    if (table_timeout < 100)
+        gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
+
+    gen_opts.wait_for_seqstart = query.value(9).toUInt();
+
+    // DVB options
+    uint dvboff = 10;
+    dvb_opts.dvb_on_demand    = query.value(dvboff + 0).toUInt();
+    dvb_opts.dvb_tuning_delay = query.value(dvboff + 1).toUInt();
+
+    // Firewire options
+    uint fireoff = dvboff + 2;
+    firewire_opts.port        = query.value(fireoff + 0).toUInt();
+    firewire_opts.node        = query.value(fireoff + 1).toUInt(); 
+    firewire_opts.speed       = query.value(fireoff + 2).toUInt();
+
+    test = query.value(fireoff + 3).toString();
+    if (test != QString::null)
+        firewire_opts.model = QString::fromUtf8(test);
+
+    firewire_opts.connection  = query.value(fireoff + 4).toUInt();
+
+    // DBOX2 options
+    uint dbox2off = fireoff + 5;
+    dbox2_opts.port = query.value(dbox2off + 0).toUInt();
+
+    test = query.value(dbox2off + 1).toString();
+    if (test != QString::null)
+        dbox2_opts.host = QString::fromUtf8(test);
+
+    dbox2_opts.httpport = query.value(dbox2off + 2).toUInt();
+
     return true;
 }
 

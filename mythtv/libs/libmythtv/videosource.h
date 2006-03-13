@@ -257,6 +257,7 @@ public:
 class TunerCardInput;
 class DVBCardName;
 class DVBCardType;
+class DVBTuningDelay;
 
 class DVBConfigurationGroup: public VerticalConfigurationGroup {
     Q_OBJECT
@@ -275,6 +276,7 @@ private:
     SignalTimeout      *signal_timeout;
     ChannelTimeout     *channel_timeout;
     TransButtonSetting *buttonAnalog;
+    DVBTuningDelay     *tuning_delay;
 };
 
 class CaptureCardGroup: public VerticalConfigurationGroup,

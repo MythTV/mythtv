@@ -752,6 +752,20 @@ class DVBDiSEqCType: public ComboBoxSetting, public CCSetting
     };
 };
 
+class DVBTuningDelay: public SpinBoxSetting, public CCSetting
+{
+  public:
+    DVBTuningDelay(const CaptureCard& parent)
+      : SpinBoxSetting(0,3000,250), CCSetting(parent, "dvb_tuning_delay")
+    {
+        setLabel(QObject::tr("DVB Tuning Delay (msec)"));
+        setHelpText(
+            QObject::tr("Some Linux DVB drivers, in particular for the "
+                        "Hauppauge Nova-T, require that we slow down "
+                        "the tuning process."));
+    };
+};
+
 class FirewireModel: public ComboBoxSetting, public CCSetting
 {
   public:
@@ -1969,6 +1983,8 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
                 signal_timeout->setValue(40000);
                 channel_timeout->setValue(42500);
             }
+            if (frontend_name == "DiBcom 3000P/M-C DVB-T")
+                tuning_delay->setValue(2000);
             break;
         case CardUtil::ATSC:
         {
@@ -2095,6 +2111,10 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     addChild(defaultinput);
     defaultinput->setVisible(false);
 
+    tuning_delay = new DVBTuningDelay(parent);
+    addChild(tuning_delay);
+    tuning_delay->setVisible(false);
+
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
     connect(buttonDiSEqC, SIGNAL(pressed()),
@@ -2166,6 +2186,8 @@ RecorderOptions::RecorderOptions(CaptureCard& parent)
 
     rec->addChild(new DVBNoSeqStart(parent));
     rec->addChild(new DVBOnDemand(parent));
+    rec->addChild(new DVBTuningDelay(parent));
+
     addChild(rec);
 }
 

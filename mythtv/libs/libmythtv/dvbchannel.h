@@ -35,6 +35,8 @@ class DVBChannel : public QObject, public ChannelBase
     // Sets
     bool SetChannelByString(const QString &chan);
     void SetFreqTable(const QString &name);
+    void SetSlowTuning(uint how_slow_in_ms)
+        { tuning_delay = how_slow_in_ms; }
 
     // Gets
     bool IsOpen(void)                   const { return GetFd() >= 0; }
@@ -101,6 +103,7 @@ class DVBChannel : public QObject, public ChannelBase
     volatile int      fd_frontend; ///< File descriptor for tuning hardware
     int               cardnum;     ///< DVB Card number
     bool              has_crc_bug; ///< true iff our driver munges PMT
+    uint              tuning_delay;///< Extra delay to add for broken drivers
     int               currentTID;  ///< Stores mplexid from database
 
     bool              first_tune;  ///< Used to force hardware reset
