@@ -86,7 +86,7 @@ uint PESPacket::WriteAsTSPackets(unsigned char *buf, uint &cc) const
 #define INCR_CC(_CC_) do { _CC_ = (_CC_ + 1) & 0xf; } while (0)
     uint last_byte_of_pesdata = Length() + 4 - 1;
     uint size = last_byte_of_pesdata + _pesdata - _fullbuffer;
-    VERBOSE(VB_IMPORTANT, "WriteAsTSPackets size: "<<size);
+
     if (_pesdata == _fullbuffer)
     {
         VERBOSE(VB_IMPORTANT, "WriteAsTSPackets _pesdata == _fullbuffer");
