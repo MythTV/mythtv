@@ -8,10 +8,14 @@
 
 #define ASSUME_WANT_AUDIO 1
 
-MediaError MythCDROMLinux::eject() 
+MediaError MythCDROMLinux::eject(bool open_close)
 {
-    return (ioctl(m_DeviceHandle, CDROMEJECT) == 0) ? MEDIAERR_OK : 
-                                                      MEDIAERR_FAILED;
+    if (open_close)
+        return (ioctl(m_DeviceHandle, CDROMEJECT) == 0) ? MEDIAERR_OK
+                                                        : MEDIAERR_FAILED;
+    else
+        return (ioctl(m_DeviceHandle, CDROMCLOSETRAY) == 0) ? MEDIAERR_OK
+                                                            : MEDIAERR_FAILED;
 }
 
 bool MythCDROMLinux::mediaChanged()
@@ -85,8 +89,9 @@ MediaStatus MythCDROMLinux::checkMedia()
         {
             case CDS_DISC_OK:
                 //cout << "disk ok - ";
-                if (isMounted(true))
-                    //cout << "it's mounted" << endl;
+                // If the disc is ok and we already know it's mediatype
+                // returns MOUNTED.
+                if (isMounted(true) && m_MediaType != MEDIATYPE_UNKNOWN)
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
                 // If the disk is ok but not yet mounted we'll test it further down after this switch exits.
                 break;
@@ -110,7 +115,8 @@ MediaStatus MythCDROMLinux::checkMedia()
         if (mediaChanged()) 
         {
             //cout << "media changed - ";
-            // Regardless of the actual status lie here and say it's open for now, so we can over the case of a missed open.
+            // Regardless of the actual status lie here and say
+            // it's open for now, so we can cover the case of a missed open.
             return setStatus(MEDIASTAT_OPEN, OpenedHere);
         } 
         else 
@@ -136,9 +142,28 @@ MediaStatus MythCDROMLinux::checkMedia()
                         this->m_KeyID = QString("%1%2")
                                       .arg(this->m_VolumeID)
                                       .arg(QString(buf.creation_date).left(16));
-                        // We'll return NOTMOUNTED  here because we're switching media.
-                        // The base class will try to mount the deivce causing the next pass to pick up the MOUNTED status.
-                        return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
+
+                        // attempt to mount the disc
+                        // the base class's onDeviceMounted will do fine
+                        // grained detection of the type of data on this disc
+                        mount();
+
+                        if (isMounted(true))
+                        {
+                            // pretend we're NOTMOUNTED so setStatus emits
+                            // a signal
+                            m_Status = MEDIASTAT_NOTMOUNTED;
+                            return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+                        }
+                        else if (m_MediaType == MEDIATYPE_DVD)
+                        {
+                            // pretend we're NOTMOUNTED so setStatus emits
+                            // a signal
+                            m_Status = MEDIASTAT_NOTMOUNTED;
+                            return setStatus(MEDIASTAT_USEABLE, OpenedHere);
+                        }
+                        else
+                            return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
                         break;
                     case CDS_AUDIO:
                         //cout << "found an audio disk" << endl;
@@ -154,7 +179,19 @@ MediaStatus MythCDROMLinux::checkMedia()
                             return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                         #else
                             mount();
-                            return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
+                            if (isMounted(true))
+                            {
+                                // pretend we're NOTMOUNTED so setStatus
+                                // emits a signal
+                                m_Status = MEDIASTAT_NOTMOUNTED;
+                                return setStatus(MEDIASTAT_MOUNTED,
+                                                 OpenedHere);
+                            }
+                            else
+                            {
+                                return setStatus(MEDIASTAT_USEABLE,
+                                                 OpenedHere);
+                            }
                         #endif
                         break;
                     case CDS_NO_INFO:
@@ -174,7 +211,10 @@ MediaStatus MythCDROMLinux::checkMedia()
                      m_Status == MEDIASTAT_NOTMOUNTED) 
             {
                 //cout << "current status == " << MythMediaDevice::MediaStatusStrings[m_Status] << " setting status to not mounted - ";
-                setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
+                if (isMounted(true))
+                    setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+                else
+                    setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
             }
 
             if (m_AllowEject)

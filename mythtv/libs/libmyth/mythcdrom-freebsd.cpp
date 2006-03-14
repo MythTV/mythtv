@@ -7,11 +7,13 @@
 
 #define ASSUME_WANT_AUDIO 1
 
-MediaError MythCDROMFreeBSD::eject() 
+MediaError MythCDROMFreeBSD::eject(bool open_close)
 {
-    if (ioctl(m_DeviceHandle, CDIOCEJECT) == 0)
-        return MEDIAERR_OK;
-    return MEDIAERR_FAILED;
+    if (open_close)
+        return (ioctl(m_DeviceHandle, CDIOCEJECT) == 0) ? MEDIAERR_OK :
+                                                          MEDIAERR_FAILED;
+    else
+        return MEDIAERR_UNSUPPORTED;
 }
 
 bool MythCDROMFreeBSD::mediaChanged()

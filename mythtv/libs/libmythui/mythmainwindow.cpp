@@ -281,6 +281,7 @@ MythMainWindow::MythMainWindow()
     RegisterKey("Global", "NEXTVIEW", "Next View", "End");
 
     RegisterKey("Global", "HELP", "Help", "F1");
+    RegisterKey("Global", "EJECT", "Eject Removable Media", "");
 
     RegisterKey("Global", "0", "0", "0");
     RegisterKey("Global", "1", "1", "1");

@@ -19,7 +19,7 @@ class MythCDROM : public MythMediaDevice
     virtual bool checkOK(void) = 0;
     virtual bool openDevice(void);
     virtual MediaStatus checkMedia(void) = 0;
-    //virtual MediaError eject(void) = 0;
+    //virtual MediaError eject(bool open_close = true) = 0;
     //virtual MediaError lock(void) = 0;
     //virtual MediaError unlock(void) = 0;
 
@@ -42,7 +42,7 @@ public:
     virtual bool mediaChanged(void);
     virtual bool checkOK(void);
     virtual MediaStatus checkMedia(void);
-    virtual MediaError eject(void);
+    virtual MediaError eject(bool open_close = true);
     virtual MediaError lock(void);
     virtual MediaError unlock(void);
 };
@@ -60,7 +60,7 @@ public:
     virtual bool mediaChanged(void);
     virtual bool checkOK(void);
     virtual MediaStatus checkMedia(void);
-    virtual MediaError eject(void);
+    virtual MediaError eject(bool open_close = true);
     virtual MediaError lock(void);
     virtual MediaError unlock(void);
 };

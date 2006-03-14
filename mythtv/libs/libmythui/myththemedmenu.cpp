@@ -15,6 +15,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythimage.h"
 #include "mythdialogbox.h"
+#include "mythmediamonitor.h"
 
 #include "lcddevice.h"
 #include "mythplugin.h"
@@ -2101,6 +2102,12 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
                 wantpop = true;
             }
             lastbutton = NULL;
+        }
+        else if (action == "EJECT")
+        {
+            MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+            if (mon)
+                mon->ChooseAndEjectMedia();
         }
         else
             handled = false;

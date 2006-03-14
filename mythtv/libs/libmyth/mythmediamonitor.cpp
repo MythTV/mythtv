@@ -1,23 +1,37 @@
-#include "mythmediamonitor.h"
-#include "mythcdrom.h"
-#include <qapplication.h>
-#include <sys/file.h>
-#include <fcntl.h>
-#include <dirent.h>
+// -*- Mode: c++ -*-
+
+// Standard C headers
 #include <cstdio>
+
+// POSIX headers
+#include <dirent.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <fstab.h>
-#include <iostream>
+
+// UNIX System headers
+#include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <sys/wait.h>
 
-#include "config.h"
+// C++ headers
+#include <iostream>
+using namespace std;
+
+// Qt headers
+#include <qapplication.h>
+#include <qprocess.h>
+#include <qdir.h>
+#include <qfile.h>
+
+// MythTV headers
+#include "mythmediamonitor.h"
 #include "mythcontext.h"
-
-// For testing
-#if 0
-#include <cstdlib>
-#endif
+#include "mythdialogs.h"
+#include "mythconfig.h"
+#include "mythcdrom.h"
+#include "mythhdd.h"
 
 #ifndef MNTTYPE_ISO9660
 #ifdef linux
@@ -40,24 +54,8 @@
 #endif
 #define SUPER_OPT_DEV "dev="
 
-using namespace std;
-
-MediaMonitor *theMonitor = NULL;
-
-
-MediaMonitor* MediaMonitor::getMediaMonitor()
-{
-    if (!theMonitor)
-    {
-        if (gContext->GetNumSetting("MonitorDrives") == 1)
-        {
-            theMonitor = new MediaMonitor(NULL, 500, true);
-            theMonitor->addFSTab();
-        }
-    }
-
-    return theMonitor;
-}
+const QString MediaMonitor::kUDEV_FIFO = "/tmp/mythtv_media";
+MediaMonitor *MediaMonitor::c_monitor = NULL;
 
 // MonitorThread
 MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) 
@@ -69,11 +67,11 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
 
 // Nice and simple, as long as our monitor is valid and active, 
 // loop and check it's devices.
-void MonitorThread::run()
+void MonitorThread::run(void)
 {
-    while (m_Monitor && m_Monitor->isActive())        
+    while (m_Monitor && m_Monitor->IsActive())        
     {
-        m_Monitor->checkDevices();
+        m_Monitor->CheckDevices();
         msleep(m_Interval);
     }
 }
@@ -81,34 +79,153 @@ void MonitorThread::run()
 ////////////////////////////////////////////////////////////////////////
 // MediaMonitor
 
+
+MediaMonitor* MediaMonitor::GetMediaMonitor(void)
+{
+    if (c_monitor)
+        return c_monitor;
+
+    if (gContext->GetNumSetting("MonitorDrives"))
+    {
+        c_monitor = new MediaMonitor(NULL, 500, true);
+        c_monitor->CheckFileSystemTable();
+        c_monitor->CheckMountable();
+    }
+
+    return c_monitor;
+}
+
+/** \fn MediaMonitor::ChooseAndEjectMedia(void)
+ *  \brief Unmounts and ejects removable media devices.
+ *
+ *  If no media devices are known to the MediaMonitor this function does
+ *  nothing. If a single device is known, it is unmounted and ejected if
+ *  possible. If multiple devices are known, a popup box is display so the
+ *  user can choose which device to eject.
+ */
+void MediaMonitor::ChooseAndEjectMedia(void)
+{
+    MythMediaDevice *selected = NULL;
+
+    if (m_Devices.count() == 1)
+    {
+        if (m_Devices.first()->getAllowEject())
+            selected = m_Devices.first();
+    }
+    else if (m_Devices.count() > 1)
+    {
+        MythPopupBox ejectbox(gContext->GetMainWindow(), "eject media");
+
+        ejectbox.addLabel(tr("Select removable media to eject"));
+
+        QValueList <MythMediaDevice *> shownDevices;
+        QValueList <MythMediaDevice *>::iterator it = m_Devices.begin();
+        while (it != m_Devices.end())
+        {
+            // if the device is ejectable (ie a CD or DVD device)
+            // or if it is mounted (ie a USB memory stick)
+            // then add it to the list of choices
+            if ((*it)->getAllowEject() || (*it)->isMounted(true))
+            {
+                shownDevices.append(*it);
+
+                if ((*it)->getVolumeID() != "")
+                    ejectbox.addButton((*it)->getVolumeID());
+                else
+                    ejectbox.addButton((*it)->getDevicePath());
+            }
+
+            it++;
+        }
+
+        ejectbox.addButton(tr("Cancel"))->setFocus();
+
+        int ret = ejectbox.ExecPopup();
+
+        if ((uint)ret < shownDevices.count())
+            selected = shownDevices[ret];
+    }
+    else
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  "nothing to eject ",
+                                  tr("No devices to eject"));
+    }
+
+    if (!selected)
+        return;
+
+    int status = selected->getStatus();
+    QString dev = selected->getDevicePath();
+
+    if (MEDIASTAT_OPEN == status)
+    {
+        selected->eject(false);
+    }
+    else if (MEDIASTAT_MOUNTED == status)
+    {
+        selected->unmount();
+
+        if (selected->isMounted(true))
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      "eject unmount fail",
+                                      tr("Failed to unmount %1").arg(dev));
+        }
+    }
+    else
+    {
+        selected->unlock();
+
+        if (selected->eject() == MEDIAERR_UNSUPPORTED)
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      "eject success",
+                                      tr("You may safely remove %1").arg(dev));
+        }
+        else if (selected->eject() == MEDIAERR_FAILED)
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      "eject fail",
+                                      tr("Failed to eject %1").arg(dev));
+        }
+    }
+}
+
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, 
                            bool allowEject) 
-            : QObject(par), m_Thread(NULL, interval)
+    : QObject(par), m_Active(false), m_Thread(NULL, interval),
+      m_AllowEject(allowEject), m_fifo(-1)
 {
-    m_AllowEject = allowEject;
-    m_Active = false;
-    m_Thread.setMonitor(this);
+}
+
+MediaMonitor::~MediaMonitor()
+{
+    if (m_fifo > 0)
+    {
+        close(m_fifo);
+        unlink(kUDEV_FIFO);
+    }
 }
 
 // Loop through the file system table and add any supported devices.
-bool MediaMonitor::addFSTab()
+bool MediaMonitor::CheckFileSystemTable(void)
 {
     struct fstab * mep = NULL;
     
     // Attempt to open the file system descriptor entry.
     if (!setfsent()) 
     {
-        perror("setfsent");
-        cerr << "MediaMonitor::addFSTab - Failed to open "
-                _PATH_FSTAB
-                " for reading." << endl;
+        VERBOSE(VB_IMPORTANT, QString("MediaMonitor") + 
+                "MediaMonitor::CheckFileSystemTable - Failed to open " +
+                _PATH_FSTAB + " for reading." + ENO);
         return false;
     }
     else 
     {
         // Add all the entries
         while ((mep = getfsent()) != NULL)
-            (void) addDevice(mep);
+            AddDevice(mep);
         
         endfsent();
     }
@@ -119,8 +236,117 @@ bool MediaMonitor::addFSTab()
     return true;
 }
 
+/** \fn MediaMonitor::CheckMountable(void)
+ *  \brief Search /sys/block for valid removable media devices.
+ *
+ *   This function creates MediaDevice instances for valid removable media
+ *   devices found under the /sys/block filesystem in Linux.  CD and DVD
+ *   devices are created as MythCDROM instances.  MythHDD instances will be
+ *   created for each partition on removable hard disk devices, if they exists.
+ *   Otherwise a single MythHDD instance will be created for the entire disc.
+ *
+ *   NOTE: Floppy disks are ignored.
+ */
+bool MediaMonitor::CheckMountable(void)
+{
+#ifdef linux
+    mkfifo(kUDEV_FIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    m_fifo = open(kUDEV_FIFO, O_RDONLY | O_NONBLOCK);
+
+    QDir sysfs("/sys/block");
+    sysfs.setFilter(QDir::Dirs);
+
+    QStringList devices = sysfs.entryList();
+
+    for (QStringList::iterator it = devices.begin(); it != devices.end(); ++it)
+    {
+        if (*it == "." || *it == "..")
+            continue;
+
+        // ignore floppies, too slow
+        if ((*it).startsWith("fd"))
+            continue;
+
+        sysfs.cd(*it);
+
+        QFile removable(sysfs.absFilePath("removable"));
+        if (removable.exists())
+        {
+            removable.open(IO_ReadOnly);
+            int c = removable.getch();
+            removable.close();
+
+            if (c == '1')
+                FindPartitions(sysfs.absPath(), true);
+        }
+        sysfs.cdUp();
+    }
+    return true;
+#else // if !linux
+    return false;
+#endif // !linux
+}
+
+/** \fn MediaMonitor::GetDeviceFile(const QString&)
+ *  \brief Returns the device special file associated with the /sys/block node.
+ *  \param sysfs system filesystem path of removable block device.
+ *  \return path to the device special file
+ */
+QString MediaMonitor::GetDeviceFile(const QString &sysfs)
+{
+#ifdef linux
+    QProcess udevinfo(this);
+    udevinfo.addArgument("udevinfo");
+    udevinfo.addArgument("-q");
+    udevinfo.addArgument("name");
+    udevinfo.addArgument("-rp");
+    udevinfo.addArgument(sysfs);
+    udevinfo.setCommunication(QProcess::Stdout);
+
+    udevinfo.start();
+
+    int status;
+    waitpid(udevinfo.processIdentifier(), &status, 0);
+
+    QString ret = udevinfo.readLineStdout();
+    if (ret != "device not found in database")
+        return ret;
+#endif // linux
+    return QString::null;
+}
+
+/** \fn MediaMonitor::GetCDROMBlockDevices(void)
+ *  \brief Reads the list devices known to be CD or DVD devices.
+ *  \return list of CD and DVD device names.
+ */
+QStringList MediaMonitor::GetCDROMBlockDevices(void)
+{
+    QStringList l;
+
+#ifdef linux
+    QFile file("/proc/sys/dev/cdrom/info");
+    if (file.open(IO_ReadOnly))
+    {
+        QTextStream stream(&file);
+        QString line;
+        while (!stream.atEnd())
+        {
+            line = stream.readLine();
+            if (line.startsWith("drive name:"))
+            {
+                QString s = line.section('\t', 2, 2);
+                l.append(s);
+            }
+        }
+        file.close();
+    }
+#endif // linux
+
+    return l;
+}
+
 // Given a media deivce add it to our collection.
-void MediaMonitor::addDevice(MythMediaDevice* pDevice)
+void MediaMonitor::AddDevice(MythMediaDevice* pDevice)
 {
     connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)), 
             this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
@@ -128,10 +354,10 @@ void MediaMonitor::addDevice(MythMediaDevice* pDevice)
 }
 
 // Given a fstab entry to a media device determine what type of device it is 
-bool MediaMonitor::addDevice(struct fstab * mep) 
+bool MediaMonitor::AddDevice(struct fstab * mep) 
 {
     QString devicePath( mep->fs_spec );
-    //cout << "addDevice - " << devicePath << endl;
+    //cout << "AddDevice - " << devicePath << endl;
 
     MythMediaDevice* pDevice = NULL;
     struct stat sbuf;
@@ -207,7 +433,7 @@ bool MediaMonitor::addDevice(struct fstab * mep)
                          .arg(pDevice->getDevicePath()));
          if (pDevice->testMedia() == MEDIAERR_OK) 
          {
-             addDevice(pDevice);
+             AddDevice(pDevice);
              return true;
          }
             else
@@ -219,10 +445,10 @@ bool MediaMonitor::addDevice(struct fstab * mep)
 
 // Given a path to a media device determine what type of device it is and 
 // add it to our collection.
-bool MediaMonitor::addDevice(const char* devPath ) 
+bool MediaMonitor::AddDevice(const char* devPath ) 
 {
     QString devicePath( devPath );
-    //cout << "addDevice - " << devicePath << endl;
+    //cout << "AddDevice - " << devicePath << endl;
 
     struct fstab * mep = NULL;
     char lpath[PATH_MAX];
@@ -236,7 +462,7 @@ bool MediaMonitor::addDevice(const char* devPath )
     if (!setfsent()) 
     {
         perror("setfsent");
-        cerr << "MediaMonitor::addDevice - Failed to open "
+        cerr << "MediaMonitor::AddDevice - Failed to open "
                 _PATH_FSTAB
                 " for reading." << endl;
         return false;
@@ -266,14 +492,158 @@ bool MediaMonitor::addDevice(const char* devPath )
     }
 
     if (mep) 
-       return addDevice(mep); 
+       return AddDevice(mep); 
 
     return false;
 }
 
-// Poll the devices in our list.
-void MediaMonitor::checkDevices()
+/** \fn MediaMonitor::FindPartitions(const QString&, bool)
+ *  \brief Creates MythMedia instances for sysfs removable media devices.
+ *
+ *   Block devices are represented as directories in sysfs with directories
+ *   for each partition underneath the parent device directory.
+ *
+ *   This function recursively calls itself to find all partitions on a block
+ *   device and creates a MythHDD instance for each partition found.  If no
+ *   partitions are found and the device is a CD or DVD device a MythCDROM
+ *   instance is created.  Otherwise a MythHDD instance is created for the
+ *   entire block device.
+ *
+ *  \param dev path to sysfs block device.
+ *  \param checkPartitions check for partitions on block device.
+ *  \return true if MythMedia instances are created.
+ */
+bool MediaMonitor::FindPartitions(const QString &dev, bool checkPartitions)
 {
+    if (checkPartitions)
+    {
+        // check for partitions
+        QDir sysfs(dev);
+        sysfs.setFilter(QDir::Dirs);
+
+        bool found_partitions = false;
+        QStringList parts = sysfs.entryList();
+        for (QStringList::iterator pit = parts.begin();
+             pit != parts.end(); pit++)
+        {
+            if (*pit == "." || *pit == "..")
+                continue;
+
+            found_partitions |= FindPartitions(sysfs.absFilePath(*pit), false);
+        }
+
+        // no partitions on block device, use main device
+        if (!found_partitions)
+            found_partitions |= FindPartitions(sysfs.absPath(), false);
+
+        return found_partitions;
+    }
+
+    QStringList cdroms = GetCDROMBlockDevices();
+
+    if (cdroms.contains(dev.section('/', -1)))
+    {
+        // found cdrom device
+        QString device_file = GetDeviceFile(dev);
+        if (!device_file.isNull())
+        {
+            AddDevice(MythCDROM::get(this, device_file, false, m_AllowEject));
+            return true;
+        }
+    }
+    else
+    {
+        // found block or partition device
+        QString device_file = GetDeviceFile(dev);
+        if (!device_file.isNull())
+        {
+            AddDevice(MythHDD::Get(this, device_file, false, false));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/** \fn MediaMonitor::RemoveDevice(const QString&)
+ *  \brief Remove a device from the media monitor.
+ *
+ *   This function is usually called after a hotpluggable device is unplugged.
+ *
+ *  \param dev path to device special file to remove.
+ *  \return true if device is removed from the Media Monitor.
+ */
+bool MediaMonitor::RemoveDevice(const QString &dev)
+{
+    QValueList<MythMediaDevice*>::iterator it;
+    for (it = m_Devices.begin(); it != m_Devices.end(); it++)
+    {
+        if ((*it)->getDevicePath() == dev)
+        {
+            m_Devices.remove(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+/** \fn MediaMonitor::CheckDeviceNotifications()
+ *  \brief Checks the named pipe, kUDEV_FIFO, for
+ *         hotplug events from the udev system.
+ *   NOTE: Currently only Linux w/udev 0.71+ provides these events.
+ */
+void MediaMonitor::CheckDeviceNotifications(void)
+{
+    char buffer[256];
+    QString qBuffer = "";
+
+    if (!m_fifo)
+        return;
+
+    int size = read(m_fifo, buffer, 255);
+    while (size > 0)
+    {
+        // append buffer to QString
+        buffer[size] = '\0';
+        qBuffer.append(buffer);
+        size = read(m_fifo, buffer, 255);
+    }
+    const QStringList list = QStringList::split('\n', qBuffer);
+
+    QStringList::const_iterator it = list.begin();
+    for (; it != list.end(); it++)
+    {
+        if ((*it).startsWith("add"))
+        {
+            QString dev = (*it).section(' ', 1, 1);
+            
+            // check if removeable
+            QFile removable(dev + "/removable");
+            if (removable.exists())
+            {
+                removable.open(IO_ReadOnly);
+                int c = removable.getch();
+                removable.close();
+
+                if (c == '1')
+                    FindPartitions((*it).section(' ', 1, 1), true);
+            }
+        }
+        else if ((*it).startsWith("remove"))
+        {
+            RemoveDevice((*it).section(' ', 2, 2));
+        }
+    }
+}
+
+/** \fn MediaMonitor::CheckDevices(void)
+ *  \brief Poll the devices in our list.
+ */
+void MediaMonitor::CheckDevices(void)
+{
+    /* check if new devices have been plugged in */
+    CheckDeviceNotifications();
+
     QValueList<MythMediaDevice*>::iterator itr = m_Devices.begin();
     MythMediaDevice* pDev;
     while (itr != m_Devices.end()) 
@@ -285,8 +655,10 @@ void MediaMonitor::checkDevices()
     }
 }
 
-// Start the monitoring thread if needed.
-void MediaMonitor::startMonitoring()
+/** \fn MediaMonitor::StartMonitoring(void)
+ *  \brief Start the monitoring thread if needed.
+ */
+void MediaMonitor::StartMonitoring(void)
 {
     // Sanity check
     if (m_Active)
@@ -296,31 +668,37 @@ void MediaMonitor::startMonitoring()
     m_Thread.start();
 }
 
-// Stop the monitoring thread if needed.
-void MediaMonitor::stopMonitoring()
+/** \fn MediaMonitor::StopMonitoring(void)
+ *  \brief Stop the monitoring thread if needed.
+ */
+void MediaMonitor::StopMonitoring(void)
 {
     // Sanity check
     if (!m_Active)
         return;
+
     m_Active = false;
     m_Thread.wait();
 }
 
 // Ask for available media
-QValueList <MythMediaDevice*> MediaMonitor::getMedias(MediaType mediatype)
+// this is not safe.. device could get deleted...
+QValueList <MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
 {
     QValueList <MythMediaDevice*> medias;
-    QValueList <MythMediaDevice*>::Iterator itr = m_Devices.begin();
-    MythMediaDevice* pDev;
-    while (itr!=m_Devices.end())
+
+    QValueList <MythMediaDevice*>::iterator it = m_Devices.begin();
+    for (;it != m_Devices.end(); it++)
     {
-        pDev = *itr;
-        if ((pDev->getMediaType()==mediatype) &&
-            ((pDev->getStatus()==MEDIASTAT_USEABLE) ||
-            (pDev->getStatus()==MEDIASTAT_MOUNTED)))
-            medias.push_back(pDev);
-        itr++;
+        if (((*it)->getMediaType() == mediatype) &&
+            (((*it)->getStatus() == MEDIASTAT_USEABLE) ||
+             ((*it)->getStatus() == MEDIASTAT_MOUNTED) ||
+             ((*it)->getStatus() == MEDIASTAT_NOTMOUNTED)))
+        {
+            medias.push_back(*it);
+        }
     }
+
     return medias;
 }
 // Signal handler.
@@ -332,16 +710,23 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
         return;
     
     VERBOSE(VB_IMPORTANT, QString("Media status changed...  New status is: %1 "
-                            "old status was %2")
-                 .arg(MythMediaDevice::MediaStatusStrings[pMedia->getStatus()])
-                 .arg(MythMediaDevice::MediaStatusStrings[oldStatus]));
-    // This gets called from outside the main thread so we need to post an event back to the main thread.
+                                  "old status was %2")
+            .arg(MythMediaDevice::MediaStatusStrings[pMedia->getStatus()])
+            .arg(MythMediaDevice::MediaStatusStrings[oldStatus]));
+
+    // This gets called from outside the main thread so we need
+    // to post an event back to the main thread.
     // We're only going to pass up events for useable media...
     if (pMedia->getStatus() == MEDIASTAT_USEABLE || 
         pMedia->getStatus() == MEDIASTAT_MOUNTED) 
     {
-        VERBOSE(VB_IMPORTANT, QString( "Posting MediaEvent"));
+        VERBOSE(VB_IMPORTANT, "Posting MediaEvent");
         QApplication::postEvent((QObject*)gContext->GetMainWindow(), 
                                 new MediaEvent(oldStatus, pMedia));
+    }
+    else if (pMedia->getStatus() == MEDIASTAT_OPEN ||
+             pMedia->getStatus() == MEDIASTAT_UNPLUGGED)
+    {
+        pMedia->clearData();
     }
 }

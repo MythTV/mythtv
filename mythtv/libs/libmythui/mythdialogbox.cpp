@@ -4,6 +4,8 @@
 #include "mythlistbutton.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
+#include "mythcontext.h"
+#include "mythmediamonitor.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
                      MythScreenStack *parent, const char *name) 

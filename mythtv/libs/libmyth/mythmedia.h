@@ -7,6 +7,7 @@
 typedef enum {
     MEDIASTAT_ERROR,
     MEDIASTAT_UNKNOWN,
+    MEDIASTAT_UNPLUGGED,
     MEDIASTAT_OPEN,
     MEDIASTAT_USEABLE,    
     MEDIASTAT_NOTMOUNTED,
@@ -65,7 +66,8 @@ class MythMediaDevice : public QObject
     virtual bool openDevice();
     virtual bool closeDevice();
     virtual MediaStatus checkMedia() = 0; // Derived classes MUST implement this.
-    virtual MediaError eject() { return MEDIAERR_UNSUPPORTED; }
+    virtual MediaError eject(bool open_close = true)
+        { (void) open_close; return MEDIAERR_UNSUPPORTED; }
     virtual MediaError lock();
     virtual MediaError unlock();
     virtual bool performMountCmd( bool DoMount );    
@@ -77,6 +79,8 @@ class MythMediaDevice : public QObject
     static const char* MediaStatusStrings[];
     static const char* MediaTypeStrings[];
     static const char* MediaErrorStrings[];
+
+    void clearData();
 
  signals:
     void statusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);

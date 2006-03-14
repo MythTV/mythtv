@@ -66,9 +66,9 @@ using_oss {
 }
 
 unix {
-    SOURCES += mythcdrom.cpp mythmediamonitor.cpp
-    HEADERS += mythcdrom.h   mythmediamonitor.h
-    inc.files += mythcdrom.h mythmediamonitor.h
+    SOURCES += mythhdd.cpp mythcdrom.cpp mythmediamonitor.cpp
+    HEADERS += mythhdd.h mythcdrom.h   mythmediamonitor.h
+    inc.files += mythhdd.h mythcdrom.h mythmediamonitor.h
 }
 
 macx {

@@ -1107,12 +1107,11 @@ int main(int argc, char **argv)
     qApp->unlock();
 
 #ifndef _WIN32
-    MediaMonitor *mon = NULL;
-    mon = MediaMonitor::getMediaMonitor();
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
         VERBOSE(VB_IMPORTANT, QString("Starting media monitor."));
-        mon->startMonitoring();
+        mon->StartMonitoring();
     }
 #endif
 
@@ -1148,7 +1147,7 @@ int main(int argc, char **argv)
 #ifndef _WIN32
     if (mon)
     {
-        mon->stopMonitoring();
+        mon->StopMonitoring();
         delete mon;
     }
 #endif

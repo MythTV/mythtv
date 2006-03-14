@@ -17,6 +17,8 @@ using namespace std;
 
 // end for testing
 
+static const QString PATHTO_PMOUNT("/usr/bin/pmount");
+static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
 static const QString PATHTO_MOUNT("/bin/mount");
 static const QString PATHTO_UNMOUNT("/bin/umount");
 static const QString PATHTO_MOUNTS("/proc/mounts");
@@ -25,6 +27,7 @@ const char* MythMediaDevice::MediaStatusStrings[] =
 {
     "MEDIASTAT_ERROR",
     "MEDIASTAT_UNKNOWN",
+    "MEDIASTAT_UNPLUGGED",
     "MEDIASTAT_OPEN",
     "MEDIASTAT_USEABLE",
     "MEDIASTAT_NOTMOUNTED",
@@ -57,7 +60,8 @@ MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath,
     m_Locked = false;
     m_DeviceHandle = -1;
     m_SuperMount = SuperMount;
-    m_Status = (isMounted(true)) ? MEDIASTAT_MOUNTED : MEDIASTAT_NOTMOUNTED;
+    m_Status = MEDIASTAT_UNKNOWN;
+    m_MediaType = MEDIATYPE_UNKNOWN;
 }
 
 bool MythMediaDevice::openDevice()
@@ -98,15 +102,23 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     if (!m_SuperMount) 
     {
         // Build a command line for mount/unmount and execute it...  Is there a better way to do this?
-        MountCommand = QString("%1 %2")
-            .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
-            .arg(m_DevicePath);
+        if (QFile(PATHTO_PMOUNT).exists() && QFile(PATHTO_PUMOUNT).exists())
+            MountCommand = QString("%1 %2")
+                .arg((DoMount) ? PATHTO_PMOUNT : PATHTO_PUMOUNT)
+                .arg(m_DevicePath);
+        else
+            MountCommand = QString("%1 %2")
+                .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
+                .arg(m_DevicePath);
     
         VERBOSE(VB_IMPORTANT,  QString("Executing '%1'").arg(MountCommand));
         if (0 == myth_system(MountCommand)) 
         {
             if (DoMount)
             {
+                // we cannot tell beforehand what the pmount mount point is
+                // so verify the mount status of the device
+                isMounted(true);
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
             }
@@ -213,20 +225,14 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
             // the disk is not / should not be mounted.
             case MEDIASTAT_ERROR:
             case MEDIASTAT_OPEN:
-                if (MEDIASTAT_MOUNTED == OldStatus)
-                    unmount();
-                break;
             case MEDIASTAT_NOTMOUNTED:
-                if (MEDIASTAT_MOUNTED == OldStatus)
+                if (isMounted(true))
                     unmount();
-                // If we're here it's possible there's unmounted media in the device so try to mount it.
-                // The case of no media in the deivce whould be handeled by derived classes and sent
-                // as MEDIASTAT_OPEN, MEDISTAT_ERROR or MEDIASTAT_UNKNOWN.
-                mount();
                 break;
             case MEDIASTAT_UNKNOWN:
             case MEDIASTAT_USEABLE:
             case MEDIASTAT_MOUNTED:
+            case MEDIASTAT_UNPLUGGED:
                 // get rid of the compiler warning...
                 break;
         }
@@ -243,3 +249,9 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
     return m_Status;
 }
 
+void MythMediaDevice::clearData()
+{
+    m_VolumeID = QString::null;
+    m_KeyID = QString::null;
+    m_MediaType = MEDIATYPE_UNKNOWN;
+}
