@@ -1519,10 +1519,8 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
     bool captions_found = true;
     if (decoder->GetTrackCount(kTrackTypeSubtitle))
         EnableCaptions(kDisplaySubtitle);
-/* enable this once EIA-708 reorder bug is fixed
     else if (decoder->GetTrackCount(kTrackTypeCC708))
         EnableCaptions(kDisplayCC708);
-*/
     else if (vbimode == VBIMode::PAL_TT)
     {
 /* not sure this makes sense, TeletextA does not seem to decode captions...

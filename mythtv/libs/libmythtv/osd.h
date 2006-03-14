@@ -223,7 +223,7 @@ class OSD : public QObject
     // EIA-708 captions
     QString fontname;
     QString ccfontname;
-    QString cc708fontnames[20];
+    QString cc708fontnames[16];
     QString fontSizeType;
 };
     

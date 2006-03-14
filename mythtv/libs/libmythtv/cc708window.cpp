@@ -442,3 +442,9 @@ bool CC708CharacterAttribute::operator==(
             (bg_opacity == other.bg_opacity) &&
             (edge_color == other.edge_color));
 }
+
+QColor CC708CharacterAttribute::ConvertToQColor(uint c)
+{
+    //int X[4] = {0, 85, 170, 255}; RGB( X[(c>>4)&3], X[(c>>2)&3], X[c&3] )
+    return QColor((c & 0x30) << 2, (c & 0x0c) << 4, (c & 0x3) << 6);
+}

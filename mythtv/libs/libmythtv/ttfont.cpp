@@ -496,7 +496,7 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
        return;
    }
 
-   if (m_shadowxoff > 0 || m_shadowyoff > 0)
+   if (m_shadowxoff != 0 || m_shadowyoff != 0)
    {
        merge_text(surface, rmap, clipx, clipy, x + m_shadowxoff,
                   y + m_shadowyoff, width, height, alphamod, kTTF_Shadow);

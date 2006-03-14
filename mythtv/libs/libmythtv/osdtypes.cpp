@@ -1363,11 +1363,11 @@ void OSDTypeBox::Reinit(float wmult, float hmult)
     size = bias(m_unbiasedsize, wmult, hmult);
 }
 
-void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
-                      int yoff)
+void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade,
+                      int xoff, int yoff, unsigned int xalpha)
 {
     unsigned char *dest, *destalpha;
-    unsigned char alpha = 192;
+    unsigned char alpha = xalpha & 0xff;
 
     QRect disprect = size;
     disprect.moveBy(xoff, yoff);
@@ -1915,7 +1915,7 @@ void OSDType708CC::Reinit(int x, int y, int dispw, int disph)
     displayheight = disph;
 }
 
-OSDType708CC::OSDType708CC(const QString &name, TTFFont *fonts[60],
+OSDType708CC::OSDType708CC(const QString &name, TTFFont *fonts[48],
 			   int xoff, int yoff, int dispw, int disph) : 
     OSDType(name)
 {
@@ -1924,15 +1924,8 @@ OSDType708CC::OSDType708CC(const QString &name, TTFFont *fonts[60],
     displaywidth  = dispw;
     displayheight = disph;
 
-    int c[4] = {0, 85, 170, 255};
-
-    for (int i = 0; i < 64; i++)
-	colors[i].setRgb(c[(i>>4)&3], c[(i>>2)&3], c[i&3]);
-
-    for (int i = 0; i < 60; i++)
-    {
+    for (uint i = 0; i < 48; i++)
         m_fonts[i] = fonts[i];
-    }
 }
 
 QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
@@ -1951,7 +1944,7 @@ QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
             if (list[i]->y < row)
                 continue;
 
-            TTFFont *font = m_fonts[0];
+            TTFFont *font = m_fonts[list[i]->attr.FontIndex()];
 
             if (list[i]->str.stripWhiteSpace().isEmpty())
             {
@@ -2060,13 +2053,34 @@ void OSDType708CC::Draw(OSDSurface *surface,
             if (list[i]->str.isEmpty())
                 continue;
 
-            TTFFont *font = m_fonts[0];
+            TTFFont *font = m_fonts[list[i]->attr.FontIndex()];
 
             font->CalcWidth(list[i]->str, &text_length);
-            font->setColor(Qt::white, kTTF_Normal);
+
+            font->setColor(list[i]->attr.GetFGColor(), kTTF_Normal);
+
+            font->setOutline(false);
+            font->setShadow(0,0);
+            if (list[i]->attr.edge_type == 3/*kEdgeUniform*/)
+            {
+                font->setColor(list[i]->attr.GetEdgeColor(), kTTF_Outline);
+                font->setOutline(true);
+            }
+            else if (list[i]->attr.edge_type == 4/*kEdgeLeftShadow*/)
+            {
+                font->setColor(list[i]->attr.GetEdgeColor(), kTTF_Shadow);
+                font->setShadow(-2, +2);
+            }
+            else if (list[i]->attr.edge_type == 5/*kEdgeRightShadow*/)
+            {
+                font->setColor(list[i]->attr.GetEdgeColor(), kTTF_Shadow);
+                font->setShadow(+2, +2);
+            }
+
             font->DrawString(surface,
                              ul.x() + tot_width, ul.y() + total_height + 2,
-                             list[i]->str, maxx, maxy, 255);
+                             list[i]->str, maxx, maxy,
+                             list[i]->attr.GetFGAlpha());
 
             tot_width  += max(text_length, 0);
             max_height  = max(max_height, (uint)font->Size() * 3 / 2);
@@ -2100,13 +2114,16 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
         QPoint ul(0,0);
         if (bounds.width())
         {
-            QRect rect(0,0, bounds.width(), bounds.height());
-            OSDTypeBox box(QString("cc708_background%1").arg(i),
-                           rect, wmult, hmult);
-            box.SetRect(rect, wmult, hmult);
-            box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
-                     bounds.left() + box_xoffset/*xoff*/,
-                     bounds.top()/*yoff*/);
+            if (list.size() && list[0]->attr.GetBGAlpha())
+            {
+                QRect rect(0,0, bounds.width(), bounds.height());
+                OSDTypeBox box(QString("cc708_background%1").arg(i),
+                               rect, wmult, hmult);
+                box.SetRect(rect, wmult, hmult);
+                box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
+                         bounds.left() + box_xoffset/*xoff*/,
+                         bounds.top()/*yoff*/, list[0]->attr.GetBGAlpha());
+            }
             Draw(surface, bounds.topLeft(), win, list);
         }
         //VERBOSE(VB_VBI, "");

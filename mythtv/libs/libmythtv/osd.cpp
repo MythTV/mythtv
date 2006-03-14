@@ -29,7 +29,7 @@ using namespace std;
 #include "osdtypeteletext.h"
 #include "osdlistbtntype.h"
 
-static char  *cc708_default_font_names[20];
+static char  *cc708_default_font_names[16];
 static bool   cc708_defaults_initialized = false;
 static QMutex cc708_init_lock;
 static void initialize_osd_fonts(void);
@@ -60,7 +60,7 @@ OSD::OSD(const QRect &osd_bounds, int   frameRate,
     if (!cc708_defaults_initialized)
         initialize_osd_fonts();
 
-    for (uint i = 0; i < 20; i++)
+    for (uint i = 0; i < 16; i++)
         cc708fontnames[i] = cc708_default_font_names[i];
 
     needPillarBox = visibleAspect > 1.51f;
@@ -201,18 +201,17 @@ bool OSD::InitCC708(void)
     }
 
     // Create fonts...
-    TTFFont* ccfonts[60];
-    for (uint i = 0; i < 60; i++)
+    TTFFont* ccfonts[48];
+    uint z = gContext->GetNumSetting("OSDCC708TextZoom", 100) * 480;
+    uint fontsizes[3] = { z / 3600, z / 2900, z / 2200 };
+    for (uint i = 0; i < 48; i++)
     {
-        TTFFont *ccfont = GetFont("cc_font");
-	//TTFFont *ccfont = GetFont(QString("cc708_font%1").arg(i));
+	TTFFont *ccfont = GetFont(QString("cc708_font%1").arg(i));
 	if (!ccfont)
 	{
 	    QString name = QString("cc708_font%1").arg(i);
-            int fontsizes[3] = { 480/36, 480/27, 480/20 };
             int fontsize = fontsizes[i%3];
-	    ccfont = LoadFont(gContext->GetSetting("OSDCCFont")
-                              /*cc708fontnames[i/3]*/, fontsize);
+	    ccfont = LoadFont(cc708fontnames[i/3], fontsize);
 	    if (ccfont)
 		fontMap[name] = ccfont;
 	    if (!ccfont)
@@ -2593,48 +2592,54 @@ static void initialize_osd_fonts(void)
         return;
     cc708_defaults_initialized = true;
 
+    QString default_font_type = gContext->GetSetting(
+        "OSDCC708DefaultFontType", "MonoSerif");
+
+    // 0
     cc708_default_font_names[0]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSerifFont"));
+        QString("OSDCC708%1Font").arg(default_font_type)));
     cc708_default_font_names[1]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSerifItalicFont"));
+        QString("OSDCC708%1ItalicFont").arg(default_font_type)));
+
+    // 1
     cc708_default_font_names[2]  = strdup(gContext->GetSetting(
-        "OSDCC708PropSerifFont"));
+        "OSDCC708MonoSerifFont"));
     cc708_default_font_names[3]  = strdup(gContext->GetSetting(
+        "OSDCC708MonoSerifItalicFont"));
+
+    // 2
+    cc708_default_font_names[4]  = strdup(gContext->GetSetting(
+        "OSDCC708PropSerifFont"));
+    cc708_default_font_names[5]  = strdup(gContext->GetSetting(
         "OSDCC708PropSerifItalicFont"));
 
-    cc708_default_font_names[4]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSansSerifFont"));
-    cc708_default_font_names[5]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSansSerifItalicFont"));
+    // 3
     cc708_default_font_names[6]  = strdup(gContext->GetSetting(
-        "OSDCC708PropSansSerifFont"));
+        "OSDCC708MonoSansSerifFont"));
     cc708_default_font_names[7]  = strdup(gContext->GetSetting(
+        "OSDCC708MonoSansSerifItalicFont"));
+
+    // 4
+    cc708_default_font_names[8]  = strdup(gContext->GetSetting(
+        "OSDCC708PropSansSerifFont"));
+    cc708_default_font_names[9]  = strdup(gContext->GetSetting(
         "OSDCC708PropSansSerifItalicFont"));
 
-    cc708_default_font_names[8]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoCasualFont"));
-    cc708_default_font_names[9]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoCasualItalicFont"));
-    cc708_default_font_names[10] = strdup(gContext->GetSetting(
-        "OSDCC708PropCasualFont"));
-    cc708_default_font_names[11] = strdup(gContext->GetSetting(
-        "OSDCC708PropCasualItalicFont"));
+    // 5
+    cc708_default_font_names[10]  = strdup(gContext->GetSetting(
+        "OSDCC708CasualFont"));
+    cc708_default_font_names[11]  = strdup(gContext->GetSetting(
+        "OSDCC708CasualItalicFont"));
 
+    // 6
     cc708_default_font_names[12] = strdup(gContext->GetSetting(
-        "OSDCC708MonoCursiveFont"));
+        "OSDCC708CursiveFont"));
     cc708_default_font_names[13] = strdup(gContext->GetSetting(
-        "OSDCC708MonoCursiveItalicFont"));
-    cc708_default_font_names[14] = strdup(gContext->GetSetting(
-        "OSDCC708PropCursiveFont"));
-    cc708_default_font_names[15] = strdup(gContext->GetSetting(
-        "OSDCC708PropCursiveItalicFont"));
+        "OSDCC708CursiveItalicFont"));
 
-    cc708_default_font_names[16] = strdup(gContext->GetSetting(
-        "OSDCC708MonoCapitalsFont"));
-    cc708_default_font_names[17] = strdup(gContext->GetSetting(
-        "OSDCC708MonoCapitalsItalicFont"));
-    cc708_default_font_names[18] = strdup(gContext->GetSetting(
-        "OSDCC708PropCapitalsFont"));
-    cc708_default_font_names[19] = strdup(gContext->GetSetting(
-        "OSDCC708PropCapitalsItalicFont"));
+    // 7
+    cc708_default_font_names[14] = strdup(gContext->GetSetting(
+        "OSDCC708CapitalsFont"));
+    cc708_default_font_names[15] = strdup(gContext->GetSetting(
+        "OSDCC708CapitalsItalicFont"));
 }

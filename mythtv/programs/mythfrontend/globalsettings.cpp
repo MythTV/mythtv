@@ -828,6 +828,119 @@ static HostComboBox *OSDCCFont()
     return gc;
 }
 
+static HostSpinBox *OSDCC708TextZoomPercentage(void)
+{
+    HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
+    gs->setLabel(QObject::tr("Text zoom percentage"));
+    gs->setValue(100);
+    gs->setHelpText(QObject::tr("Use this to enlage or shrink captions."));
+
+    return gs;
+}
+
+static HostComboBox *OSDCC708DefaultFontType(void)
+{
+    HostComboBox *hc = new HostComboBox("OSDCC708DefaultFontType");
+    hc->setLabel(QObject::tr("Default Caption Font Type"));
+    hc->setHelpText(
+        QObject::tr("This allows you to set which font type to use "
+                    "when the broadcaster does not specify a font."));
+
+    QString types[] =
+    {
+        "MonoSerif", "PropSerif", "MonoSansSerif", "PropSansSerif",
+        "Casual",    "Cursive",   "Capitals",
+    };
+    QString typeNames[] =
+    {
+        QObject::tr("Monospaced serif"),
+        QObject::tr("Proportional serif"),
+        QObject::tr("Monospaced sans serif"),
+        QObject::tr("Proportional sans serif"),
+        QObject::tr("Casual"),
+        QObject::tr("Cursive"),
+        QObject::tr("Capitals"),
+    };
+    for (uint i = 0; i < 7; i++)
+        hc->addSelection(typeNames[i], types[i]);
+    return hc;
+}
+
+static VerticalConfigurationGroup *OSDCC708Settings(void)
+{
+    VerticalConfigurationGroup *grp =
+        new VerticalConfigurationGroup(true, false, true, true);
+    grp->setLabel(QObject::tr("ATSC caption settings"));
+
+// default text zoom 1.0
+    grp->addChild(OSDCC708TextZoomPercentage());
+
+// force X lines of captions
+// force caption character color
+// force caption character border color
+// force background color
+// force background opacity
+
+// set default font type
+    grp->addChild(OSDCC708DefaultFontType());
+
+    return grp;
+}
+
+static HostComboBox *OSDCC708Font(QString subtype, QString subtypeName)
+{
+    HostComboBox *gc = new HostComboBox(
+        QString("OSDCC708%1Font").arg(subtype));
+
+    gc->setLabel(subtypeName);
+    QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
+    gc->fillSelectionsFromDir(ttf, false);
+    gc->setHelpText(QObject::tr("ATSC closed caption font"));
+
+    return gc;
+}
+
+static HorizontalConfigurationGroup *OSDCC708Fonts(void)
+{
+    HorizontalConfigurationGroup *grpmain =
+        new HorizontalConfigurationGroup(true, false, true, true);
+    grpmain->setLabel(QObject::tr("ATSC caption fonts"));
+    VerticalConfigurationGroup *col[] =
+    {
+        new VerticalConfigurationGroup(false, false, true, true),
+        new VerticalConfigurationGroup(false, false, true, true),
+    };
+    QString types[] =
+    {
+        "MonoSerif", "PropSerif", "MonoSansSerif", "PropSansSerif",
+        "Casual",    "Cursive",   "Capitals",
+    };
+    QString typeNames[] =
+    {
+        QObject::tr("Monospaced serif"),
+        QObject::tr("Proportional serif"),
+        QObject::tr("Monospaced sans serif"),
+        QObject::tr("Proportional sans serif"),
+        QObject::tr("Casual"),
+        QObject::tr("Cursive"),
+        QObject::tr("Capitals"),
+    };
+    QString subtypes[]     = { "%1", "%1Italic", };
+    QString subtypeNames[] = { "%1", "(italic)", };
+
+    for (uint i = 0; i < 2; i++)
+    {
+        for (uint j = 0; j < 7; j++)
+        {
+            col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]),
+                                          subtypeNames[i].arg(typeNames[j])));
+        }
+        grpmain->addChild(col[i]);
+    }
+
+    return grpmain;
+}
+
 static HostComboBox *OSDThemeFontSizeType()
 {
     HostComboBox *gc = new HostComboBox("OSDThemeFontSizeType");
@@ -942,23 +1055,25 @@ static HostCheckBox *UseVideoTimebase()
 static HostCheckBox *CCBackground()
 {
     HostCheckBox *gc = new HostCheckBox("CCBackground");
-    gc->setLabel(QObject::tr("Black background for Closed Captioning"));
+    gc->setLabel(QObject::tr("Black background for analog closed captioning"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, captions will be displayed "
-                    "over a black space for maximum contrast. Otherwise, "
-                    "captions will use outlined text over the picture."));
+    gc->setHelpText(QObject::tr(
+                        "If enabled, analog captions will be displayed "
+                        "over a black space for maximum contrast. Otherwise, "
+                        "captions will use outlined text over the picture."));
     return gc;
 }
 
 static HostCheckBox *DefaultCCMode()
 {
     HostCheckBox *gc = new HostCheckBox("DefaultCCMode");
-    gc->setLabel(QObject::tr("Always display Closed Captioning"));
+    gc->setLabel(QObject::tr("Always display closed captioning or subtitles"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, captions will be displayed "
-                    "when playing back recordings or watching "
-                    "live TV.  Closed Captioning can be turned on or off "
-                    "by pressing \"T\" during playback."));
+    gc->setHelpText(QObject::tr(
+                        "If enabled, captions will be displayed "
+                        "when playing back recordings or watching "
+                        "live TV.  Closed Captioning can be turned on or off "
+                        "by pressing \"T\" during playback."));
     return gc;
 }
 
@@ -3180,6 +3295,9 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(DefaultCCMode());
     osd->addChild(PersistentBrowseMode());
     addChild(osd);
+
+    addChild(OSDCC708Settings());
+    addChild(OSDCC708Fonts());
 
 #ifdef CONFIG_DARWIN
     VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);

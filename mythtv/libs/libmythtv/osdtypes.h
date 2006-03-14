@@ -399,7 +399,11 @@ class OSDTypeBox : public OSDType
     void Reinit(float wmult, float hmult);
     void SetRect(QRect newrect, float wmult, float hmult);
 
-    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade,
+              int xoff, int yoff, unsigned int alpha);
+
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff)
+        { Draw(surface, fade, maxfade, xoff, yoff, 192); }
 
   private:
     QRect size;
@@ -512,7 +516,7 @@ class OSDTypeCC : public OSDType
 class OSDType708CC : public OSDType
 {
   public:
-    OSDType708CC(const QString &name, TTFFont *fonts[60],
+    OSDType708CC(const QString &name, TTFFont *fonts[48],
                  int xoff, int yoff, int dispw, int disph);
     virtual ~OSDType708CC() {}
 
@@ -532,8 +536,7 @@ class OSDType708CC : public OSDType
 
     const CC708Service *cc708data;
 
-    TTFFont *m_fonts[60];
-    QColor   colors[64];
+    TTFFont *m_fonts[48];
 
     int xoffset, yoffset, displaywidth, displayheight;
 };

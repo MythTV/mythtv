@@ -9,6 +9,7 @@ using namespace std;
 
 #include <qstring.h>
 #include <qmutex.h>
+#include <qcolor.h>
 
 class CC708CharacterAttribute
 {
@@ -26,6 +27,31 @@ class CC708CharacterAttribute
     uint bg_color;
     uint bg_opacity;
     uint edge_color;
+
+    uint FontIndex(void) const
+    {
+        return (((font_tag & 0x7) * 6) + ((italics) ? 3 : 0) +
+                (pen_size & 0x3));
+    }
+    static QColor ConvertToQColor(uint eia708color);
+    QColor GetFGColor(void) const { return ConvertToQColor(fg_color); }
+    QColor GetBGColor(void) const { return ConvertToQColor(bg_color); }
+    QColor GetEdgeColor(void) const { return ConvertToQColor(edge_color); }
+
+    uint GetFGAlpha(void) const
+    {
+        //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
+        static uint alpha[4] = { 0xff, 0xff, 0xc0, 0x60, };
+        return alpha[fg_opacity & 0x3];
+    }
+
+    uint GetBGAlpha(void) const
+    {
+        //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
+        static uint alpha[4] = { 0xff, 0xff, 0xc0, 0x60, };
+        return alpha[bg_opacity & 0x3];
+    }
+
     bool operator==(const CC708CharacterAttribute &other) const;
     bool operator!=(const CC708CharacterAttribute &other) const
         { return !(*this == other); }
