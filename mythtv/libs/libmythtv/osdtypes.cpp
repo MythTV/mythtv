@@ -1937,15 +1937,17 @@ OSDType708CC::OSDType708CC(const QString &name, TTFFont *fonts[60],
 
 QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
                                const CC708Window &win,
-                               const vector<CC708String*> &list)
+                               const vector<CC708String*> &list,
+                               uint &min_xoffset)
 {
     uint max_width = 0, total_height = 0, i = 0;
+    min_xoffset = 0xffffffff;
     for (uint row = 0; (row < win.true_row_count) && (i < list.size()); row++)
     {
         uint tot_width = 0, max_height = 0;
         for (; (i < list.size()) && list[i] && (list[i]->y <= row); i++)
         {
-            int text_length;
+            int space_length, text_length;
             if (list[i]->y < row)
                 continue;
 
@@ -1958,18 +1960,23 @@ QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
             }
 
             font->CalcWidth(list[i]->str, &text_length);
+            font->CalcWidth(" ", &space_length);
 
+            min_xoffset = min(min_xoffset, space_length * list[i]->x);
             tot_width  += max(text_length, 0);
             max_height  = max(max_height, (uint)font->Size() * 3 / 2);
 
             VERBOSE(VB_VBI, "Row#"<<row<<" str#"<<i<<" "
                     <<"w/x("<<list[i]->x<<"): "
                     <<"W,H ("<<text_length<<","<<max_height<<") "
-                    <<"'"<<list[i]->str<<"'");
+                    <<"'"<<list[i]->str<<"'"
+                    <<" xoff: "<<space_length * list[i]->x);
         }
         max_width     = max(max_width, tot_width);
         total_height += max_height;
     }
+    min_xoffset = (min_xoffset == 0xffffffff) ? 0 : min_xoffset;
+
     if (!max_width || !total_height)
         return QRect(0,0,0,0);
 
@@ -2088,7 +2095,8 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
 
         //VERBOSE(VB_VBI, "Window #"<<i);
         vector<CC708String*> list = win.GetStrings();
-        QRect bounds = CalcBounds(surface, win, list);
+        uint box_xoffset = 0;
+        QRect bounds = CalcBounds(surface, win, list, box_xoffset);
         QPoint ul(0,0);
         if (bounds.width())
         {
@@ -2097,7 +2105,8 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
                            rect, wmult, hmult);
             box.SetRect(rect, wmult, hmult);
             box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
-                     bounds.left()/*xoff*/, bounds.top()/*yoff*/);
+                     bounds.left() + box_xoffset/*xoff*/,
+                     bounds.top()/*yoff*/);
             Draw(surface, bounds.topLeft(), win, list);
         }
         //VERBOSE(VB_VBI, "");

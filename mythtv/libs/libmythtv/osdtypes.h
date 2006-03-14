@@ -526,7 +526,7 @@ class OSDType708CC : public OSDType
 
   private:
     QRect CalcBounds(const OSDSurface*, const CC708Window&,
-                     const vector<CC708String*>&);
+                     const vector<CC708String*>&, uint &min_offset);
     void  Draw(OSDSurface*,        const QPoint&,
                const CC708Window&, const vector<CC708String*>&);
 
