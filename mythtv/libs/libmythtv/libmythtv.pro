@@ -153,6 +153,7 @@ HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
 HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
 HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
 HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
+HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
@@ -163,6 +164,7 @@ SOURCES += mpeg/dvbstreamdata.cpp   mpeg/scanstreamdata.cpp
 SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
 SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
+SOURCES += mpeg/iso6937tables.cpp
 
 using_frontend {
     # Recording profile stuff

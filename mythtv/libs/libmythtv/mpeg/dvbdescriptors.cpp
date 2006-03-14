@@ -1,4 +1,5 @@
 #include "dvbdescriptors.h"
+#include "iso6937tables.h"
 
 #include <unistd.h>
 #include <qtextcodec.h>
@@ -25,6 +26,41 @@ static const QTextCodec *iso8859_codecs[16] =
     QTextCodec::codecForName("ISO8859-14"),
     QTextCodec::codecForName("ISO8859-15"), // Western
 };
+
+static QString decode_iso6937(const unsigned char *buf, uint length)
+{
+    // ISO/IEC 6937 to unicode (UCS2) convertor...
+    // This is a composed encoding - accent first then plain character
+    QString result = "";
+    ushort ch = 0x20;
+    for (uint i = 0; (i < length) && buf[i]; i++)
+    {
+        if (ch == 0xFFFF)
+        {
+            // Process second byte of two byte character
+            ch = iso6937table_secondary[buf[i-1]][buf[i]];
+            if (ch == 0xFFFF)
+            {
+                // If no valid code found in secondary table,
+                // reprocess this second byte as first byte.
+                ch = iso6937table_base[buf[i]];
+                if (ch == 0xFFFF)
+                    continue; // process second byte
+            }
+        }
+        else
+        {
+            // Process first character of two possible characters.
+            // double byte characters have a sentinel (0xffff) in this table.
+            ch = iso6937table_base[buf[i]];
+            if (ch == 0xFFFF)
+                continue; // process second byte
+
+        }
+        result += QChar(ch);
+    }
+    return result;
+}
 
 // Decode a text string according to ETSI EN 300 468 Annex A
 QString dvb_decode_text(const unsigned char *src, uint raw_length)
@@ -60,7 +96,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length)
     // Decode using the correct text codec
     if (buf[0] >= 0x20)
     {
-        return QString::fromLatin1(buf, length);
+        return decode_iso6937((unsigned char*)buf, length);
     }
     else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
     {
