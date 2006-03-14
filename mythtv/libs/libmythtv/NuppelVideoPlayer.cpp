@@ -2355,7 +2355,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     {
         // Set up deinterlacing in the video output method
         m_double_framerate = m_can_double =
-            (videoOutput->SetupDeinterlace(true) &&
+            (m_DeintSetting &&
+             videoOutput->SetupDeinterlace(true) &&
              videoOutput->NeedsDoubleFramerate());
 
         videosync = VideoSync::BestMethod(
