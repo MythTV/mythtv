@@ -155,10 +155,13 @@ void playDVD(void)
             }
         }
         myth_system(command_string);
-        gContext->GetMainWindow()->raise();
-        gContext->GetMainWindow()->setActiveWindow();
-        gContext->GetMainWindow()->currentWidget()->setFocus();
-        
+        if (gContext->GetMainWindow())
+        {
+            gContext->GetMainWindow()->raise();
+            gContext->GetMainWindow()->setActiveWindow();
+            if (gContext->GetMainWindow()->currentWidget())
+                gContext->GetMainWindow()->currentWidget()->setFocus();
+        }
     }
     gContext->removeCurrentLocation();
 }
