@@ -750,10 +750,14 @@ OSDTypeImage::OSDTypeImage(void)
 
 OSDTypeImage::~OSDTypeImage()
 {
-    if (m_yuv)
-        delete [] m_yuv;
-    if (m_alpha)
-        delete [] m_alpha;
+    if (!cache.InMemCache())
+    {
+	if (m_yuv)
+	    delete [] m_yuv;
+	if (m_alpha)
+	    delete [] m_alpha;    
+    }
+    cache.Reset();
 }
 
 void OSDTypeImage::SetName(const QString &name)
@@ -781,16 +785,21 @@ void OSDTypeImage::Reinit(float wmult, float hmult)
 void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
                              int scalew, int scaleh)
 {
-    if (m_isvalid)
-    {
-        if (m_yuv)
-            delete [] m_yuv;
-        if (m_alpha)
-            delete [] m_alpha;
+    // Try to get it from the cache first
+    QString ckey = OSDImageCache::CreateKey(
+        filename, wmult, hmult, scalew, scaleh);
+    OSDImageCacheValue value = cache.Load(ckey, !filename.isEmpty());
 
-        m_isvalid = false;
-        m_yuv = NULL;
-        m_alpha = NULL;
+    if (value.IsValid())
+    {
+        m_yuv       = value.m_yuv;
+        m_ybuffer   = value.m_ybuffer;
+        m_ubuffer   = value.m_ubuffer;
+        m_vbuffer   = value.m_vbuffer;
+        m_alpha     = value.m_alpha;
+        m_imagesize = value.m_imagesize;
+        m_isvalid   = true;
+        return;
     }
 
     if (filename.length() < 2)
@@ -833,11 +842,18 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
                      imwidth, imheight, tmp2.width());
 
     m_imagesize = QRect(0, 0, imwidth, imheight);
+
+    cache.Save(ckey, !filename.isEmpty(),
+               OSDImageCacheValue(m_yuv,     m_ybuffer, m_ubuffer,
+                                  m_vbuffer, m_alpha,   m_imagesize));
 }
 
 void OSDTypeImage::LoadFromQImage(const QImage &img)
 {
-    if (m_isvalid)
+    // this method is not cached as it's used mostly for
+    // subtitles which are displayed only once anyways, caching
+    // would probably only slow things down overall
+    if (m_isvalid && !cache.InMemCache())
     {
         if (m_yuv)
             delete [] m_yuv;
@@ -1159,11 +1175,6 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
 OSDTypeEditSlider::~OSDTypeEditSlider()
 {
     delete [] m_drawMap;
-
-    if (m_ryuv)
-        delete [] m_ryuv;
-    if (m_ralpha)
-        delete [] m_ralpha;
 }
 
 void OSDTypeEditSlider::Reinit(float wmult, float hmult)
@@ -1184,10 +1195,13 @@ void OSDTypeEditSlider::Reinit(float wmult, float hmult)
 
     m_displaypos = m_displayrect.topLeft();
 
-    if (m_ryuv)
-        delete [] m_ryuv;
-    if (m_ralpha)
-        delete [] m_ralpha;
+    if (!cache.InMemCache())
+    {
+        if (m_ryuv)
+            delete [] m_ryuv;
+        if (m_ralpha)
+            delete [] m_ralpha;
+    }
 
     LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh);
     if (m_isvalid)

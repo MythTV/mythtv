@@ -144,10 +144,10 @@ using_frontend {
     # On screen display (video output overlay)
     HEADERS += osd.h                    osdtypes.h
     HEADERS += osdsurface.h             osdlistbtntype.h
-    HEADERS += udpnotify.h 
+    HEADERS += osdimagecache.h          udpnotify.h 
     SOURCES += osd.cpp                  osdtypes.cpp
     SOURCES += osdsurface.cpp           osdlistbtntype.cpp
-    SOURCES += udpnotify.cpp 
+    SOURCES += osdimagecache.cpp        udpnotify.cpp 
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h

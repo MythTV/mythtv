@@ -8,6 +8,7 @@
 #include <vector>
 #include <qobject.h>
 #include <qregexp.h>
+#include "osdimagecache.h"
 
 using namespace std;
 
@@ -272,6 +273,8 @@ class OSDTypeImage : public OSDType
 
     int m_drawwidth;
     bool m_onlyusefirst;
+
+    OSDImageCache cache;
 };
 
 class OSDTypePosSlider : public OSDTypeImage

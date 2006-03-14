@@ -1922,7 +1922,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         ShowText();
         DisplaySubtitles();
     }
-    else if (osdHasSubtitles || nonDisplayedSubtitles.size() > 20)
+    else if (osdHasSubtitles)
     {
         ClearSubtitles();
     }
