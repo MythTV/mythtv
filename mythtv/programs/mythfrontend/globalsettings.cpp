@@ -925,18 +925,20 @@ static HorizontalConfigurationGroup *OSDCC708Fonts(void)
         QObject::tr("Cursive"),
         QObject::tr("Capitals"),
     };
-    QString subtypes[]     = { "%1", "%1Italic", };
-    QString subtypeNames[] = { "%1", "(italic)", };
+    QString subtypes[] = { "%1", "%1Italic", };
 
-    for (uint i = 0; i < 2; i++)
+    uint i = 0;
+    for (uint j = 0; j < 7; j++)
     {
-        for (uint j = 0; j < 7; j++)
-        {
-            col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]),
-                                          subtypeNames[i].arg(typeNames[j])));
-        }
-        grpmain->addChild(col[i]);
+        col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]),
+                                      typeNames[j]));
     }
+    grpmain->addChild(col[i]);
+
+    i = 1;
+    for (uint j = 0; j < 7; j++)
+        col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]), "(italic)"));
+    grpmain->addChild(col[i]);
 
     return grpmain;
 }
