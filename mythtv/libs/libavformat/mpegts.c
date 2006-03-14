@@ -20,7 +20,7 @@
 #include <pthread.h>
 #include "mpegts.h"
 
-#define DEBUG_SI
+//#define DEBUG_SI
 //#define DEBUG_SEEK
 
 /* 1.0 second at 24Mbit/s */
