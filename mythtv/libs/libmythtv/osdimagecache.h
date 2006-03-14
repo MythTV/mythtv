@@ -39,6 +39,8 @@ class OSDImageCache
     OSDImageCache() : m_cacheLock(true), m_cached(false) {}
 
     bool InMemCache(void) const { return m_cached; }
+    bool InFileCache(const QString &key) const;
+
     bool Contains(const QString &key, bool useFile) const;
 
     OSDImageCacheValue Load(const QString &key, bool useFile);
@@ -51,6 +53,8 @@ class OSDImageCache
     static QString CreateKey(const QString &filename,
                              float wmult, float hmult,
                              int scalew,  int scaleh);
+
+    static QString ExtractOriginal(const QString &key);
 
   private:
     mutable QMutex m_cacheLock;

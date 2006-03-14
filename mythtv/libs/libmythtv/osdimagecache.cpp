@@ -10,6 +10,7 @@
 // Qt headers
 #include <qdir.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 #include <qdatastream.h>
 
 // MythTV headers
@@ -35,9 +36,37 @@ bool OSDImageCache::Contains(const QString &key, bool useFile) const
     if (!useFile)
         return false;
 
+    return InFileCache(key);
+}
+
+bool OSDImageCache::InFileCache(const QString &key) const
+{
+    // check if cache file exists
     QDir dir(MythContext::GetConfDir() + "/osdcache/");
-    QFile cacheFile(dir.path() + "/" + key);
-    return cacheFile.exists();
+    QFileInfo cFile(dir.path() + "/" + key);
+    if (!cFile.exists() || !cFile.isReadable())
+        return false;
+
+    // check if backing file exists
+    QString orig = ExtractOriginal(key);
+    if (orig.isEmpty())
+        return false;
+
+    QFileInfo oFile(orig);
+    if (!oFile.exists())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + QString("Can't find '%1'").arg(orig));
+        return false;
+    }
+
+    // if cache file is older than backing file, delete cache file
+    if (cFile.lastModified() < oFile.lastModified())
+    {
+        cFile.dir().remove(cFile.baseName(true));
+        return false;
+    } 
+
+    return true;
 }
 
 /** \fn OSDImageCache::Load(const QString&,bool)
@@ -48,23 +77,18 @@ bool OSDImageCache::Contains(const QString &key, bool useFile) const
  */
 OSDImageCacheValue OSDImageCache::Load(const QString &key, bool useFile)
 {
-    {
-        QMutexLocker locker(&m_cacheLock);
-        img_cache_t::const_iterator it = m_imageCache.find(key);
-        if (it != m_imageCache.end())
-            return *it;
-    }
+    QMutexLocker locker(&m_cacheLock);
+    img_cache_t::const_iterator it = m_imageCache.find(key);
+    if (it != m_imageCache.end())
+        return *it;
 
     OSDImageCacheValue val;
 
-    if (!useFile)
+    if (!useFile || !InFileCache(key))
         return val;
 
     QDir dir(MythContext::GetConfDir() + "/osdcache/");
     QFile cacheFile(dir.path() + "/" + key);
-    if (!cacheFile.exists())
-        return val;
-
     cacheFile.open(IO_ReadOnly);
     uint32_t imwidth  = 0;
     uint32_t imheight = 0;
@@ -151,10 +175,17 @@ void OSDImageCache::Save(const QString &key, bool useFile,
 QString OSDImageCache::CreateKey(const QString &filename, float wmult, 
                                  float hmult, int scalew, int scaleh)
 {
-    return QString("cache_%1_%2_%3_%4_%5")
-        .arg(filename).arg(wmult).arg(hmult).arg(scalew).arg(scaleh)
-        .replace(QChar('/'), ".").replace(QChar(' '), ".")
-        .replace(QChar(' '), ".");
+    QString tmp = filename;
+    return QString("cache_%1_%2_%3_%4_%5").arg(tmp.replace(QChar('/'), "+"))
+        .arg(wmult).arg(hmult).arg(scalew).arg(scaleh);
+}
+
+QString OSDImageCache::ExtractOriginal(const QString &key)
+{
+    QString tmp0 = key.mid(6);
+    QString tmp1 = tmp0.left(tmp0.find("_"));
+    QString tmp2 = tmp1.replace(QChar('+'), "/");
+    return tmp2;
 }
 
 void OSDImageCache::Reset(void)
