@@ -42,6 +42,8 @@ class QPSKPane;
 class ATSCPane;
 class QAMPane;
 class STPane;
+class ScanWizardScanType;
+class ScanWizardScanner;
 
 class ScanWizard : public ConfigurationWizard 
 {
