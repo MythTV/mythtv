@@ -259,8 +259,10 @@ using_backend {
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
     HEADERS += siscan.h                    frequencytables.h
+    HEADERS += scanwizardscanner.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
     SOURCES += siscan.cpp                  frequencytables.cpp
+    SOURCES += scanwizardscanner.cpp
 
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h

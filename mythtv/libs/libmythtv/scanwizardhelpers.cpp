@@ -30,13 +30,16 @@
  *
  */
 
-#include "scanwizardhelpers.h"
+// Qt headers
+#include <qlocale.h>
+
+// MythTV headers
 #include "mythcontext.h"
-#include "scanwizard.h"
+#include "frequencies.h"
 #include "cardutil.h"
-#include "mythdbcon.h"
-#include "channel.h"
-#include "qlocale.h"
+#include "scanwizardhelpers.h"
+#include "scanwizardscanner.h"
+#include "scanwizard.h"
 
 #if defined(USING_DVB) && defined(USING_V4L)
 #define CARDTYPES "('DVB','MPEG','V4L','HDTV')"
@@ -83,7 +86,8 @@ ScanProgressPopup::ScanProgressPopup(ScanWizardScanner *parent,
     cancel->setLabel(tr("Cancel"));
     addChild(cancel);
 
-    connect(cancel,SIGNAL(pressed(void)),parent,SLOT(cancelScan(void)));
+    connect(cancel, SIGNAL(pressed(void)),
+            parent, SLOT(  cancelScan(void)));
 
     //Seem to need to do this as the constructor doesn't seem enough
     setUseLabel(false);
