@@ -14,8 +14,6 @@ const int kMediaEventType = 30042;
 
 class MediaMonitor;
 
-MediaMonitor* getMediaMonitor();
-
 class MediaEvent : public QCustomEvent
 {
   public:
