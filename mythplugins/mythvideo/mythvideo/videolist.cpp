@@ -275,11 +275,11 @@ void VideoList::buildFsysList(bool flatlist, int parental_level)
     // See if there are removable media available, so we can add them
     // to the tree.
     //
-    MediaMonitor * mon = MediaMonitor::getMediaMonitor();
+    MediaMonitor * mon = getMediaMonitor();
     if (mon)
     {
         QValueList <MythMediaDevice*> medias =
-                                        mon->getMedias(MEDIATYPE_DATA);
+                                        mon->GetMedias(MEDIATYPE_DATA);
         QValueList <MythMediaDevice*>::Iterator itr = medias.begin();
         MythMediaDevice *pDev;
 

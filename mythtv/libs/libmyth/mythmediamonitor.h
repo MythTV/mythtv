@@ -66,6 +66,9 @@ class MediaMonitor : public QObject
 
     static MediaMonitor *GetMediaMonitor(void);
 
+    // this is not safe.. device could get deleted...
+    QValueList <MythMediaDevice*> GetMedias(MediaType mediatype);
+
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 
@@ -80,9 +83,6 @@ class MediaMonitor : public QObject
     bool AddDevice(const char* dev);
     bool AddDevice(struct fstab* mep);
     bool RemoveDevice(const QString &dev);
-
-    // this is not safe.. device could get deleted...
-    QValueList <MythMediaDevice*> GetMedias(MediaType mediatype);
 
     QString GetDeviceFile(const QString &sysfs);
 
