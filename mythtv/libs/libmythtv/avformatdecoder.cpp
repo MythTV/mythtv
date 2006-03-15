@@ -785,7 +785,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (-1 == ret)
         return ret;
 
-    AutoSelectTracks(); 
+    AutoSelectTracks(); // This is needed for transcoder
 
     // Try to get a position map from the recorder if we don't have one yet.
     if (!recordingHasPositionMap)
