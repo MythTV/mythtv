@@ -231,8 +231,10 @@ class AvFormatDecoder : public DecoderBase
     AudioInfo         audioOut;
 
     // DVD
-    int lastdvdtitle;
+    int  lastdvdtitle;
+    uint lastcellstart;
     bool dvdmenupktseen;
+    bool dvdvideopause;
 };
 
 #endif

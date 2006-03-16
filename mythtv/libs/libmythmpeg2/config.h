@@ -1,6 +1,11 @@
 /* Include config options from main configure script.         */
 #include "../../config.h"
 
+/* just uses ARCH_X86                                         */
+#ifdef ARCH_X86_64
+#define ARCH_X86
+#endif
+
 /* Enable CPU-specific optimizations.                         */
 #define ACCEL_DETECT
 

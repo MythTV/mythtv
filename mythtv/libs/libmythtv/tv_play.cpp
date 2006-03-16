@@ -2675,7 +2675,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
 
-            if (prbuffer->isDVD() && prbuffer->DVD()->IsInMenu())
+            if (prbuffer->InDVDMenuOrStillFrame())
             {
                 int nb_buttons = prbuffer->DVD()->NumMenuButtons();
                 if (nb_buttons > 0)

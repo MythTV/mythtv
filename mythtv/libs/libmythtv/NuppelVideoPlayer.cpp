@@ -227,6 +227,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       livetvchain(NULL), m_tv(NULL),
       // DVD stuff
       indvdstillframe(false), hidedvdbutton(true),
+      delaydvdbutton(0),
       // Debugging variables
       output_jmeter(NULL)
 {
@@ -554,9 +555,6 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     ClearAfterSeek();
 
-    if (ringBuffer->isDVD())
-        ringBuffer->Seek(ringBuffer->DVD()->GetCellStartPos(), SEEK_SET);
-
     if (textDisplayMode)
     {
         DisableCaptions(textDisplayMode);
@@ -829,9 +827,6 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
 int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                                 bool allow_libmpeg2)
 {
-    if (ringBuffer && ringBuffer->isDVD())
-        allow_libmpeg2 = false;
-
     if (!skipDsp)
     {
         if (!ringBuffer)
@@ -2861,7 +2856,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     decoder_thread = pthread_self();
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
-    if (!using_null_videoout)
+    if (!using_null_videoout && !ringBuffer->isDVD())
     {
         // Request that the video output thread run with realtime priority.
         // If mythyv/mythfrontend was installed SUID root, this will work.
@@ -5722,24 +5717,35 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
     int numbuttons = ringBuffer->DVD()->NumMenuButtons();
     bool osdshown = osd->IsSetDisplaying("subtitles");
     long long menupktpts = ringBuffer->DVD()->GetMenuPktPts();
+    bool instillframe = ringBuffer->DVD()->InStillFrame();
 
-    if ((numbuttons == 0) || (osdshown) ||
-        ((!osdshown) && (hidedvdbutton) &&
-         (buffer->timecode > 0) && (menupktpts != buffer->timecode)))
+    if ((numbuttons == 0) || 
+        (osdshown) ||
+        (instillframe && buffer->timecode > 0) ||
+        ((!osdshown) && 
+            (!indvdstillframe) &&
+            (hidedvdbutton) &&
+            (buffer->timecode > 0) && 
+            (menupktpts != buffer->timecode)))
     {
         return; 
     }
 
-    hidedvdbutton = false;
-    AVSubtitleRect *highlightButton;
     OSDSet *subtitleOSD = NULL;
-    highlightButton = ringBuffer->DVD()->GetMenuButton();
+    AVSubtitleRect *highlightButton = ringBuffer->DVD()->GetMenuButton();
 
-    subtitleLock.lock();
     if (highlightButton != NULL)
     {
         osd->HideSet("subtitles");
         osd->ClearAll("subtitles");
+        if (indvdstillframe)
+        {
+            delaydvdbutton++;
+            if (delaydvdbutton < 5)
+                return;
+        }
+
+        subtitleLock.lock();
         int h = highlightButton->h;
         int w = highlightButton->w;
         int linesize = highlightButton->linesize;
@@ -5770,9 +5776,10 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
 
         subtitleOSD->AddType(image);
         osd->SetVisible(subtitleOSD, 0);
-    }
 
-    subtitleLock.unlock();
+        hidedvdbutton = false;
+        subtitleLock.unlock();
+    }
 }
 
 void NuppelVideoPlayer::ActivateDVDButton(void)

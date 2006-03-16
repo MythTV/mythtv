@@ -713,7 +713,7 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
             SeekReset(framesPlayed, 0, true, true);
 
         // update frames played
-        long long played = (int)(elapsed * fps);
+        long long played = DVDCurrentFrameNumber();
 
         framesPlayed = played;
         GetNVP()->getVideoOutput()->SetFramesPlayed(played + 1);

@@ -1,6 +1,6 @@
 /*
  * mpeg2.h
- * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+ * Copyright (C) 2000-2004 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *
  * This file is part of mpeg2dec, a free MPEG-2 video stream decoder.
@@ -25,7 +25,7 @@
 #define MPEG2_H
 
 #define MPEG2_VERSION(a,b,c) (((a)<<16)|((b)<<8)|(c))
-#define MPEG2_RELEASE MPEG2_VERSION (0, 4, 0)	/* 0.4.0 */
+#define MPEG2_RELEASE MPEG2_VERSION (0, 5, 0)	/* 0.5.0 */
 
 #define SEQ_FLAG_MPEG2 1
 #define SEQ_FLAG_CONSTRAINED_PARAMETERS 2
@@ -83,6 +83,7 @@ typedef struct mpeg2_gop_s {
 #define PIC_FLAG_SKIP 64
 #define PIC_FLAG_TAGS 128
 #define PIC_MASK_COMPOSITE_DISPLAY 0xfffff000
+#define PIC_FLAG_REPEAT_FIELD 256
 
 typedef struct mpeg2_picture_s {
     unsigned int temporal_reference;
@@ -120,14 +121,15 @@ typedef enum {
     STATE_BUFFER = 0,
     STATE_SEQUENCE = 1,
     STATE_SEQUENCE_REPEATED = 2,
-    STATE_GOP = 3,
-    STATE_PICTURE = 4,
-    STATE_SLICE_1ST = 5,
-    STATE_PICTURE_2ND = 6,
-    STATE_SLICE = 7,
-    STATE_END = 8,
-    STATE_INVALID = 9,
-    STATE_INVALID_END = 10
+    STATE_SEQUENCE_MODIFIED = 3,
+    STATE_GOP = 4,
+    STATE_PICTURE = 5,
+    STATE_SLICE_1ST = 6,
+    STATE_PICTURE_2ND = 7,
+    STATE_SLICE = 8,
+    STATE_END = 9,
+    STATE_INVALID = 10,
+    STATE_INVALID_END = 11
 } mpeg2_state_t;
 
 typedef struct mpeg2_convert_init_s {
@@ -154,6 +156,8 @@ void mpeg2_custom_fbuf (mpeg2dec_t * mpeg2dec, int custom_fbuf);
 #define MPEG2_ACCEL_X86_MMX 1
 #define MPEG2_ACCEL_X86_3DNOW 2
 #define MPEG2_ACCEL_X86_MMXEXT 4
+#define MPEG2_ACCEL_X86_SSE2 8
+#define MPEG2_ACCEL_X86_SSE3 16
 #define MPEG2_ACCEL_PPC_ALTIVEC 1
 #define MPEG2_ACCEL_ALPHA 1
 #define MPEG2_ACCEL_ALPHA_MVI 2
@@ -179,6 +183,9 @@ void mpeg2_tag_picture (mpeg2dec_t * mpeg2dec, uint32_t tag, uint32_t tag2);
 void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
 		      uint8_t * forward_fbuf[3], uint8_t * backward_fbuf[3]);
 void mpeg2_slice (mpeg2_decoder_t * decoder, int code, const uint8_t * buffer);
+int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
+			unsigned int * pixel_width,
+			unsigned int * pixel_height);
 
 typedef enum {
     MPEG2_ALLOC_MPEG2DEC = 0,

@@ -35,6 +35,7 @@ typedef struct VideoFrame_
 
     int interlaced_frame; // 1 if interlaced.
     int top_field_first; // 1 if top field is first.
+    int repeat_pict;
     int forcekey; // hardware encoded .nuv
 } VideoFrame;
 

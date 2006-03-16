@@ -811,16 +811,10 @@ int DVDRingBufferPriv::NumMenuButtons(void)
 
 uint DVDRingBufferPriv::GetCurrentTime(void)
 {
-    // Macro to convert Binary Coded Decimal to Decimal
-    // Obtained from VLC Code.
-    #define BCD2D(__x__) (((__x__ & 0xf0) >> 4) * 10 + (__x__ & 0x0f))
-
     dsi_t *dvdnavDsi = dvdnav_get_current_nav_dsi(dvdnav);
     dvd_time_t timeFromCellStart = dvdnavDsi->dsi_gi.c_eltm;
-    uint8_t hours = BCD2D(timeFromCellStart.hour);
-    uint8_t minutes = BCD2D(timeFromCellStart.minute);
-    uint8_t seconds = BCD2D(timeFromCellStart.second);
-    uint currentTime = GetCellStart() + (hours * 3600) + (minutes * 60) + seconds;
+    uint currentTime = GetCellStart() +
+        (uint)(dvdnav_convert_time(&timeFromCellStart) / 90000);
     return currentTime;
 }
 

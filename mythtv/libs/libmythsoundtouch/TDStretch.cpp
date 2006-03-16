@@ -676,7 +676,7 @@ TDStretch * TDStretch::newInstance()
 
 #ifdef ALLOW_MMX
     // MMX routines available only with integer sample types
-    if (uExtensions & SUPPORT_MMX)
+    if (uExtensions & MM_MMX)
     {
         return ::new TDStretchMMX;
     }
@@ -685,7 +685,7 @@ TDStretch * TDStretch::newInstance()
 
 
 #ifdef ALLOW_SSE
-    if (uExtensions & SUPPORT_SSE)
+    if (uExtensions & MM_SSE)
     {
         // SSE support
         return ::new TDStretchSSE;
@@ -695,7 +695,7 @@ TDStretch * TDStretch::newInstance()
 
 
 #ifdef ALLOW_3DNOW
-    if (uExtensions & SUPPORT_3DNOW)
+    if (uExtensions & MM_3DNOW)
     {
         // 3DNow! support
         return ::new TDStretch3DNow;

@@ -234,7 +234,7 @@ FIRFilter * FIRFilter::newInstance()
 
 #ifdef ALLOW_MMX
     // MMX routines available only with integer sample types
-    if (uExtensions & SUPPORT_MMX)
+    if (uExtensions & MM_MMX)
     {
         return ::new FIRFilterMMX;
     }
@@ -242,7 +242,7 @@ FIRFilter * FIRFilter::newInstance()
 #endif // ALLOW_MMX
 
 #ifdef ALLOW_SSE
-    if (uExtensions & SUPPORT_SSE)
+    if (uExtensions & MM_SSE)
     {
         // SSE support
         return ::new FIRFilterSSE;
@@ -251,7 +251,7 @@ FIRFilter * FIRFilter::newInstance()
 #endif // ALLOW_SSE
 
 #ifdef ALLOW_3DNOW
-    if (uExtensions & SUPPORT_3DNOW)
+    if (uExtensions & MM_3DNOW)
     {
         // 3DNow! support
         return ::new FIRFilter3DNow;

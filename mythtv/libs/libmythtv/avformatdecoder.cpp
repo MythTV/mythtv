@@ -215,6 +215,9 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                         frm->interlaced_frame =
                             !(info->display_picture->flags &
                               PIC_FLAG_PROGRESSIVE_FRAME);
+                        frm->repeat_pict = 
+                            !!(info->display_picture->flags &
+                               PIC_FLAG_REPEAT_FIELD); 
                         partialFrames.enqueue(frm);
                         
                     }
@@ -274,7 +277,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       disable_passthru(false),
       // DVD
-      lastdvdtitle(0), dvdmenupktseen(false)
+      lastdvdtitle(0), lastcellstart(0),
+      dvdmenupktseen(false), dvdvideopause(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
@@ -1321,7 +1325,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
-    // Select a new tracks at the next opportunity.
+    // Select a new track at the next opportunity.
     ResetTracks();
 
     // We have to do this here to avoid the NVP getting stuck
@@ -1665,6 +1669,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 #define PICTURE_START 0x00000100
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
+#define SEQ_END_CODE  0x000001b7
 
 void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
@@ -1683,6 +1688,14 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         unsigned int last_state = state;
         state = ((state << 8) | v) & 0xFFFFFF;
+
+        if (ringBuffer->isDVD() && pkt->size == 4 &&
+            state == SEQ_END_CODE && !dvdvideopause)
+        {
+            dvdvideopause = true;
+            d->ResetMPEG2();
+            return;
+        }
 
         if (last_state != 0x000001)
             continue;
@@ -1712,6 +1725,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
                                          keyframedist, aspect, 
                                          kScan_Detect);
+
+                if (ringBuffer->InDVDMenuOrStillFrame())
+                {
+                    ScanStreams(true);
+                    ringBuffer->Seek(ringBuffer->DVD()->GetCellStartPos(),
+                                     SEEK_SET);
+                }
 
                 current_width  = width;
                 current_height = height;
@@ -2159,7 +2179,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
     bool allowedquit = false;
     bool storevideoframes = false;
-    bool dvdvideopause = false;
 
     avcodeclock.lock();
     AutoSelectTracks();
@@ -2178,24 +2197,31 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         }
 
         if (ringBuffer->isDVD())
-        { 
+        {
             int dvdtitle  = 0;
             int dvdpart = 0;
             ringBuffer->DVD()->GetPartAndTitle(dvdtitle,dvdpart);
-            if (dvdtitle != lastdvdtitle)
+            uint cellstart = ringBuffer->DVD()->GetCellStart();
+            if (GetNVP()->AtNormalSpeed() &&
+                ((lastcellstart != cellstart) || (lastdvdtitle != dvdtitle)))
             {
-                posmapStarted = false;
-                m_positionMap.clear();
-                SyncPositionMap();
+                if (dvdtitle != lastdvdtitle)
+                {
+                    posmapStarted = false;
+                    m_positionMap.clear();
+                    SyncPositionMap();
+                    VERBOSE(VB_PLAYBACK, LOC + "DVD Title Changed");
+                    ScanStreams(true);
+                    lastdvdtitle = dvdtitle;
+                }
                 framesPlayed = DVDCurrentFrameNumber();
                 framesRead = framesPlayed;
-                VERBOSE(VB_PLAYBACK,
-                    QString(LOC + "DVD Title Changed. Update framesPlayed: %1 ")
-                            .arg(framesPlayed));
-                ScanStreams(false);
+                VERBOSE(VB_PLAYBACK, QString(LOC + "DVD Cell Changed. "
+                                             "Update framesPlayed: %1 ")
+                                             .arg(framesPlayed));
+                lastcellstart = cellstart;
             }
-            lastdvdtitle = dvdtitle;
-            
+
             if (storedPackets.count() < 2 && !dvdvideopause)
                 storevideoframes = true;
             else
@@ -2216,12 +2242,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 allowedquit = true;
                 continue;
             }
-        }
-
-        if (ringBuffer->isDVD() && ringBuffer->DVD()->InStillFrame())
-        {
-            storevideoframes = false;
-            dvdvideopause = true;
         }
 
         if (!storevideoframes && storedPackets.count() > 0)
@@ -2273,11 +2293,24 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
             pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
-        if (ringBuffer->isDVD() && pkt->size == 4)
+        if (ringBuffer->isDVD() && 
+            curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
-            dvdvideopause = true;
-            av_free_packet(pkt);
-            continue;
+            if (pkt->size == 4)
+                MpegPreProcessPkt(curstream, pkt);
+            else if (!d->HasMPEG2Dec())
+            {
+                int current_width = curstream->codec->width;
+                int video_width = GetNVP()->GetVideoWidth();
+                if (video_width > 0 && video_width != current_width)
+                {
+                    av_free_packet(pkt);
+                    av_find_stream_info(ic);
+                    ScanStreams(false);
+                    allowedquit = true;
+                    continue;
+                }
+            }
         }
 
         if (storevideoframes &&
@@ -2316,6 +2349,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                 }
             }
+
+            if (len == 4 && dvdvideopause)
+                dvdvideopause = false;
 
             if (framesRead == 0 && !justAfterChange &&
                 !(pkt->flags & PKT_FLAG_KEY))
@@ -2521,7 +2557,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         ret = avcodec_decode_video(context, &mpa_pic,
                                                    &gotpicture, ptr, len);
                         // Reparse it to not drop the DVD still frame
-                        if (dvdvideopause && storedPackets.count() == 0)
+                        if (dvdvideopause)
                             ret = avcodec_decode_video(context, &mpa_pic,
                                                         &gotpicture, ptr, len);
                     }
@@ -2612,6 +2648,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     picframe->interlaced_frame = mpa_pic.interlaced_frame;
                     picframe->top_field_first = mpa_pic.top_field_first;
+                    picframe->repeat_pict = mpa_pic.repeat_pict;
 
                     picframe->frameNumber = framesPlayed;
                     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
