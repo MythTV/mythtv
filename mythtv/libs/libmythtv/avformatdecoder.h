@@ -235,6 +235,8 @@ class AvFormatDecoder : public DecoderBase
     uint lastcellstart;
     bool dvdmenupktseen;
     bool dvdvideopause;
+
+    int lastrepeat;
 };
 
 #endif
