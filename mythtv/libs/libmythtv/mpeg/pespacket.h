@@ -13,6 +13,8 @@ extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 #include "../libavutil/crc.h"
+#include "config.h"
+#include "../libavutil/bswap.h"
 }
 
 unsigned char *pes_alloc(uint size);
@@ -232,7 +234,7 @@ class PESPacket
     {
         if (Length() < 1)
             return 0xffffffff;
-        return av_crc(av_crc04C11DB7, (uint32_t)-1, _pesdata, Length() - 1);
+        return bswap_32(av_crc(av_crc04C11DB7, (uint32_t)-1, _pesdata, Length() - 1));
     }
 
     void SetCRC(uint crc);
