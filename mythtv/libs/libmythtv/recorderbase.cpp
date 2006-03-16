@@ -19,6 +19,7 @@ RecorderBase::RecorderBase(TVRec *rec, const char *name)
       curRecording(NULL), request_pause(false), paused(false),
       nextRingBuffer(NULL), nextRecording(NULL)
 {
+    avcodec_init(); // init CRC's
 }
 
 RecorderBase::~RecorderBase(void)
