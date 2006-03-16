@@ -4,6 +4,14 @@
 #include "mpegtables.h"
 #include "mythcontext.h"
 
+extern "C" {
+#include "mythconfig.h"
+#include "../libavcodec/avcodec.h"
+#include "../libavformat/avformat.h"
+#include "../libavutil/crc.h"
+#include "../libavutil/bswap.h"
+}
+
 #include <vector>
 #include <map>
 
@@ -134,14 +142,24 @@ uint PESPacket::WriteAsTSPackets(unsigned char *buf, uint &cc) const
 #undef INCR_CC
 }
 
-void PESPacket::SetCRC(uint crc)
+uint PESPacket::CalcCRC(void) const
 {
-    assert(Length() >= 1);
-    uint offset = Length() - 1;
-    _pesdata[offset+0] = (crc & 0xff000000) >> 24;
-    _pesdata[offset+1] = (crc & 0x00ff0000) >> 16;
-    _pesdata[offset+2] = (crc & 0x0000ff00) >> 8;
-    _pesdata[offset+3] = (crc & 0x000000ff);
+    if (Length() < 1)
+        return 0xffffffff;
+    return bswap_32(av_crc(av_crc04C11DB7, (uint32_t) -1,
+                           _pesdata, Length() - 1));
+}
+
+bool PESPacket::VerifyCRC(void) const
+{
+    bool ret = !HasCRC() || (CalcCRC() == CRC());
+    if (!ret)
+    {
+        VERBOSE(VB_SIPARSER,
+                QString("PESPacket: Failed CRC check 0x%1 != 0x%2")
+                .arg(CRC(),0,16).arg(CalcCRC(),0,16));
+    }
+    return ret;
 }
 
 // These are pixel aspect ratios
