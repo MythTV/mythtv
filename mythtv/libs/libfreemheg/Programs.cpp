@@ -32,6 +32,8 @@
 #include <sys/timeb.h>
 #include <time.h>
 
+#include "../../config.h"
+
 /*
  * Resident programs are subroutines to provide various string and date functions
  * but also interface to surrounding tuner.  They are defined in the UK MHEG profile.
@@ -121,7 +123,22 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         if (m_Name.Equal("GCD")) { // GetCurrentDate - returns local time.
             if (args.Size() == 2) {
                 struct timeb timebuffer;
+#ifdef HAVE_FTIME
                 ftime(&timebuffer);
+#else
+    #ifdef HAVE_GETTIMEOFDAY
+		struct timeval   time;
+                struct timezone  zone;
+
+                if (gettimeofday(&time,&zone) == -1)
+                    MHLOG(MHLogDetail, QString("gettimeofday() failed"));
+                timebuffer.time     = time.tv_sec;
+                timebuffer.timezone = zone.tz_minuteswest;
+                timebuffer.dstflag  = zone.tz_dsttime;
+    #else
+        #error Configuration error? No ftime() or gettimeofday()?
+    #endif
+#endif
                 // Adjust the time to local.  TODO: Check this.
                 timebuffer.time -= timebuffer.timezone * 60;
                 // Time as seconds since midnight.

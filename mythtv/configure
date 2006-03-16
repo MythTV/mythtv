@@ -1557,6 +1557,26 @@ if test "$_memalign" = "no" -a "$mmx" = "yes" -a "$memalignhack" != "yes"; then
 fi
 
 cat > $TMPC << EOF
+#include <sys/timeb.h>
+int main( void ) { ftime(0); }
+EOF
+
+ftime=no
+if $cc -o $TMPE $TMPC 2> /dev/null ; then
+  ftime=yes
+fi
+
+cat > $TMPC << EOF
+#include <sys/time.h>
+int main( void ) { gettimeofday(0, 0); }
+EOF
+
+gettimeofday=no
+if $cc -o $TMPE $TMPC 2> /dev/null ; then
+  gettimeofday=yes
+fi
+
+cat > $TMPC << EOF
 #include <time.h>
 int main( void ) { localtime_r(NULL, NULL); }
 EOF
@@ -2387,6 +2407,12 @@ fi
 if test "$gprof" = "yes" ; then
   echo "TARGET_GPROF=yes" >> $MYTH_CONFIG_MAK
   echo "#define HAVE_GPROF 1" >> $TMPH
+fi
+if test "$ftime" = "yes" ; then
+  echo "#define HAVE_FTIME 1" >> $TMPH
+fi
+if test "$gettimeofday" = "yes" ; then
+  echo "#define HAVE_GETTIMEOFDAY 1" >> $TMPH
 fi
 if test "$localtime_r" = "yes" ; then
   echo "#define HAVE_LOCALTIME_R 1" >> $TMPH
