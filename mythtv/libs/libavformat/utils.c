@@ -528,6 +528,12 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
 {
     int err;
     AVFormatContext *ic;
+    AVFormatParameters default_ap;
+
+    if (!ap){
+        ap=&default_ap;
+        memset(ap, 0, sizeof(default_ap));
+    }
 
     if (*ic_ptr) {
         ic = *ic_ptr;

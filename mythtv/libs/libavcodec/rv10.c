@@ -321,7 +321,7 @@ static int rv10_decode_picture_header(MpegEncContext *s)
     pb_frame = get_bits(&s->gb, 1);
 
 #ifdef DEBUG
-    printf("pict_type=%d pb_frame=%d\n", s->pict_type, pb_frame);
+    av_log(s->avctx, AV_LOG_DEBUG, "pict_type=%d pb_frame=%d\n", s->pict_type, pb_frame);
 #endif
 
     if (pb_frame){
@@ -342,7 +342,7 @@ static int rv10_decode_picture_header(MpegEncContext *s)
             s->last_dc[1] = get_bits(&s->gb, 8);
             s->last_dc[2] = get_bits(&s->gb, 8);
 #ifdef DEBUG
-            printf("DC:%d %d %d\n",
+            av_log(s->avctx, AV_LOG_DEBUG, "DC:%d %d %d\n",
                    s->last_dc[0],
                    s->last_dc[1],
                    s->last_dc[2]);
@@ -631,7 +631,7 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     }
 
 #ifdef DEBUG
-    printf("qscale=%d\n", s->qscale);
+    av_log(avctx, AV_LOG_DEBUG, "qscale=%d\n", s->qscale);
 #endif
 
     /* default quantization values */
@@ -672,7 +672,7 @@ static int rv10_decode_packet(AVCodecContext *avctx,
         int ret;
         ff_update_block_index(s);
 #ifdef DEBUG
-        printf("**mb x=%d y=%d\n", s->mb_x, s->mb_y);
+        av_log(avctx, AV_LOG_DEBUG, "**mb x=%d y=%d\n", s->mb_x, s->mb_y);
 #endif
 
         s->mv_dir = MV_DIR_FORWARD;
@@ -713,7 +713,7 @@ static int rv10_decode_frame(AVCodecContext *avctx,
     AVFrame *pict = data;
 
 #ifdef DEBUG
-    printf("*****frame %d size=%d\n", avctx->frame_number, buf_size);
+    av_log(avctx, AV_LOG_DEBUG, "*****frame %d size=%d\n", avctx->frame_number, buf_size);
 #endif
 
     /* no supplementary picture */
@@ -741,15 +741,16 @@ static int rv10_decode_frame(AVCodecContext *avctx,
         ff_er_frame_end(s);
         MPV_frame_end(s);
 
-        if(s->pict_type==B_TYPE || s->low_delay){
-            *pict= *(AVFrame*)&s->current_picture;
-            ff_print_debug_info(s, pict);
-        } else {
-            *pict= *(AVFrame*)&s->last_picture;
+        if (s->pict_type == B_TYPE || s->low_delay) {
+            *pict= *(AVFrame*)s->current_picture_ptr;
+        } else if (s->last_picture_ptr != NULL) {
+            *pict= *(AVFrame*)s->last_picture_ptr;
+        }
+
+        if(s->last_picture_ptr || s->low_delay){
+            *data_size = sizeof(AVFrame);
             ff_print_debug_info(s, pict);
         }
-        if(s->last_picture_ptr || s->low_delay)
-            *data_size = sizeof(AVFrame);
         s->current_picture_ptr= NULL; //so we can detect if frame_end wasnt called (find some nicer solution...)
     }
 

@@ -268,7 +268,7 @@ static const CodecTag codec_movaudio_tags[] = {
     { CODEC_ID_PCM_S16BE, MKTAG('t', 'w', 'o', 's') },
     { CODEC_ID_PCM_S16LE, MKTAG('s', 'o', 'w', 't') },
     { CODEC_ID_MP3, MKTAG('.', 'm', 'p', '3') },
-    { 0, 0 },
+    { CODEC_ID_NONE, 0 },
 };
 
 static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
@@ -358,6 +358,116 @@ static int mov_write_svq3_tag(ByteIOContext *pb)
     put_be32(pb, 0xc0000000);
     put_byte(pb, 0);
     return 0x15;
+}
+
+static uint8_t *avc_find_startcode( uint8_t *p, uint8_t *end )
+{
+    uint8_t *a = p + 4 - ((int)p & 3);
+
+    for( end -= 3; p < a && p < end; p++ ) {
+        if( p[0] == 0 && p[1] == 0 && p[2] == 1 )
+            return p;
+    }
+
+    for( end -= 3; p < end; p += 4 ) {
+        uint32_t x = *(uint32_t*)p;
+//      if( (x - 0x01000100) & (~x) & 0x80008000 ) // little endian
+//      if( (x - 0x00010001) & (~x) & 0x00800080 ) // big endian
+        if( (x - 0x01010101) & (~x) & 0x80808080 ) { // generic
+            if( p[1] == 0 ) {
+                if( p[0] == 0 && p[2] == 1 )
+                    return p;
+                if( p[2] == 0 && p[3] == 1 )
+                    return p+1;
+            }
+            if( p[3] == 0 ) {
+                if( p[2] == 0 && p[4] == 1 )
+                    return p+2;
+                if( p[4] == 0 && p[5] == 1 )
+                    return p+3;
+            }
+        }
+    }
+
+    for( end += 3; p < end; p++ ) {
+        if( p[0] == 0 && p[1] == 0 && p[2] == 1 )
+            return p;
+    }
+
+    return end + 3;
+}
+
+static void avc_parse_nal_units(uint8_t **buf, int *size)
+{
+    ByteIOContext pb;
+    uint8_t *p = *buf;
+    uint8_t *end = p + *size;
+    uint8_t *nal_start, *nal_end;
+
+    url_open_dyn_buf(&pb);
+    nal_start = avc_find_startcode(p, end);
+    while (nal_start < end) {
+        while(!*(nal_start++));
+        nal_end = avc_find_startcode(nal_start, end);
+        put_be32(&pb, nal_end - nal_start);
+        put_buffer(&pb, nal_start, nal_end - nal_start);
+        nal_start = nal_end;
+    }
+    av_freep(buf);
+    *size = url_close_dyn_buf(&pb, buf);
+}
+
+static int mov_write_avcc_tag(ByteIOContext *pb, MOVTrack *track)
+{
+    offset_t pos = url_ftell(pb);
+
+    put_be32(pb, 0);
+    put_tag(pb, "avcC");
+    if (track->vosLen > 6) {
+        /* check for h264 start code */
+        if (BE_32(track->vosData) == 0x00000001) {
+            uint8_t *buf, *end;
+            uint32_t sps_size=0, pps_size=0;
+            uint8_t *sps=0, *pps=0;
+
+            avc_parse_nal_units(&track->vosData, &track->vosLen);
+            buf = track->vosData;
+            end = track->vosData + track->vosLen;
+
+            put_byte(pb, 1); /* version */
+            put_byte(pb, 77); /* profile */
+            put_byte(pb, 64); /* profile compat */
+            put_byte(pb, 30); /* level */
+            put_byte(pb, 0xff); /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
+            put_byte(pb, 0xe1); /* 3 bits reserved (111) + 5 bits number of sps (00001) */
+
+            /* look for sps and pps */
+            while (buf < end) {
+                unsigned int size;
+                uint8_t nal_type;
+                size = BE_32(buf);
+                nal_type = buf[4] & 0x1f;
+                if (nal_type == 7) { /* SPS */
+                    sps = buf + 4;
+                    sps_size = size;
+                } else if (nal_type == 8) { /* PPS */
+                    pps = buf + 4;
+                    pps_size = size;
+                }
+                buf += size + 4;
+            }
+            assert(sps);
+            assert(pps);
+            put_be16(pb, sps_size);
+            put_buffer(pb, sps, sps_size);
+            put_byte(pb, 1); /* number of pps */
+            put_be16(pb, pps_size);
+            put_buffer(pb, pps, pps_size);
+        } else {
+            put_buffer(pb, track->vosData, track->vosLen);
+        }
+    }
+    return updateSize(pb, pos);
 }
 
 static unsigned int descrLength(unsigned int len)
@@ -471,9 +581,45 @@ static const CodecTag codec_movvideo_tags[] = {
     { CODEC_ID_MPEG4, MKTAG('m', 'p', '4', 'v') },
     { CODEC_ID_H263, MKTAG('s', '2', '6', '3') },
     { CODEC_ID_H264, MKTAG('a', 'v', 'c', '1') },
-    { CODEC_ID_DVVIDEO, MKTAG('d', 'v', 'c', ' ') },
-    { 0, 0 },
+    /* special handling in mov_find_video_codec_tag */
+    { CODEC_ID_DVVIDEO, MKTAG('d', 'v', 'c', ' ') }, /* DV NTSC */
+    { CODEC_ID_DVVIDEO, MKTAG('d', 'v', 'c', 'p') }, /* DV PAL */
+    { CODEC_ID_DVVIDEO, MKTAG('d', 'v', 'p', 'p') }, /* DVCPRO PAL */
+    { CODEC_ID_DVVIDEO, MKTAG('d', 'v', '5', 'n') }, /* DVCPRO50 NTSC */
+    { CODEC_ID_DVVIDEO, MKTAG('d', 'v', '5', 'p') }, /* DVCPRO50 PAL */
+    { CODEC_ID_NONE, 0 },
 };
+
+static int mov_find_video_codec_tag(MOVTrack* track)
+{
+    int tag;
+
+    tag = track->enc->codec_tag;
+    if (!tag) {
+        if (track->enc->codec_id == CODEC_ID_DVVIDEO) {
+            if (track->enc->height == 480) { /* NTSC */
+                if (track->enc->pix_fmt == PIX_FMT_YUV422P)
+                    tag = MKTAG('d', 'v', '5', 'n');
+                else
+                    tag = MKTAG('d', 'v', 'c', ' ');
+            } else { /* assume PAL */
+                if (track->enc->pix_fmt == PIX_FMT_YUV422P)
+                    tag = MKTAG('d', 'v', '5', 'p');
+                else if (track->enc->pix_fmt == PIX_FMT_YUV420P)
+                    tag = MKTAG('d', 'v', 'p', 'p');
+                else
+                    tag = MKTAG('d', 'v', 'c', 'p');
+            }
+        } else {
+            tag = codec_get_tag(codec_movvideo_tags, track->enc->codec_id);
+        }
+    }
+    // if no mac fcc found, try with Microsoft tags
+    if (!tag)
+        tag = codec_get_tag(codec_bmp_tags, track->enc->codec_id);
+    assert(tag);
+    return tag;
+}
 
 static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
 {
@@ -483,12 +629,7 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
 
     put_be32(pb, 0); /* size */
 
-    tag = track->enc->codec_tag;
-    if (!tag)
-    tag = codec_get_tag(codec_movvideo_tags, track->enc->codec_id);
-    // if no mac fcc found, try with Microsoft tags
-    if (!tag)
-        tag = codec_get_tag(codec_bmp_tags, track->enc->codec_id);
+    tag = mov_find_video_codec_tag(track);
     put_le32(pb, tag); // store it byteswapped
 
     put_be32(pb, 0); /* Reserved */
@@ -526,6 +667,8 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
         mov_write_d263_tag(pb);
     else if(track->enc->codec_id == CODEC_ID_SVQ3)
         mov_write_svq3_tag(pb);
+    else if(track->enc->codec_id == CODEC_ID_H264)
+        mov_write_avcc_tag(pb, track);
 
     return updateSize (pb, pos);
 }
@@ -786,7 +929,7 @@ static int mov_write_edts_tag(ByteIOContext *pb, MOVTrack *track)
 
     put_be32(pb, av_rescale_rnd(track->trackDuration, globalTimescale, track->timescale, AV_ROUND_UP)); /* duration   ... doesn't seem to effect psp */
 
-    put_be32(pb, 0x0);
+    put_be32(pb, track->sampleDuration);
     put_be32(pb, 0x00010000);
     return 0x24;
 }
@@ -816,7 +959,7 @@ static int mov_write_trak_tag(ByteIOContext *pb, MOVTrack* track)
     put_be32(pb, 0); /* size */
     put_tag(pb, "trak");
     mov_write_tkhd_tag(pb, track);
-    if (track->mode == MODE_PSP)
+    if (track->mode == MODE_PSP || track->hasBframes)
         mov_write_edts_tag(pb, track);  // PSP Movies require edts box
     mov_write_mdia_tag(pb, track);
     if (track->mode == MODE_PSP)
@@ -1490,6 +1633,22 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
         trk->vosLen = enc->extradata_size;
         trk->vosData = av_malloc(trk->vosLen);
         memcpy(trk->vosData, enc->extradata, trk->vosLen);
+    }
+
+    if (enc->codec_id == CODEC_ID_H264) {
+        if (trk->vosLen == 0) {
+            /* copy extradata */
+            trk->vosLen = enc->extradata_size;
+            trk->vosData = av_malloc(trk->vosLen);
+            memcpy(trk->vosData, enc->extradata, trk->vosLen);
+        }
+        if (*(uint8_t *)trk->vosData != 1) {
+            /* from x264 or from bytestream h264 */
+            /* nal reformating needed */
+            avc_parse_nal_units(&pkt->data, &pkt->size);
+            assert(pkt->size);
+            size = pkt->size;
+        }
     }
 
     cl = trk->entry / MOV_INDEX_CLUSTER_SIZE;

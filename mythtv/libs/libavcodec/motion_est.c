@@ -365,7 +365,7 @@ static int full_motion_search(MpegEncContext * s,
 #if 0
     if (*mx_ptr < -(2 * range) || *mx_ptr >= (2 * range) ||
         *my_ptr < -(2 * range) || *my_ptr >= (2 * range)) {
-        fprintf(stderr, "error %d %d\n", *mx_ptr, *my_ptr);
+        av_log(NULL, AV_LOG_ERROR, "error %d %d\n", *mx_ptr, *my_ptr);
     }
 #endif
     return dmin;
@@ -901,6 +901,8 @@ static int interlaced_search(MpegEncContext *s, int ref_index,
             int16_t (*mv_table)[2]= mv_tables[block][field_select];
 
             if(user_field_select){
+                assert(field_select==0 || field_select==1);
+                assert(field_select_tables[block][xy]==0 || field_select_tables[block][xy]==1);
                 if(field_select_tables[block][xy] != field_select)
                     continue;
             }

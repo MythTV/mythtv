@@ -23,10 +23,10 @@ QMAKE_CFLAGS_DEBUG += -O
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += mathematics.c integer.c rational.c intfloat_readwrite.c
+SOURCES += mathematics.c integer.c rational.c intfloat_readwrite.c crc.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
-inc.files = avutil.h common.h mathematics.h integer.h rational.h intfloat_readwrite.h
+inc.files = avutil.h common.h mathematics.h integer.h rational.h intfloat_readwrite.h crc.h
 
 INSTALLS += inc
 

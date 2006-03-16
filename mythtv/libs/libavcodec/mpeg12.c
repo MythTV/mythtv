@@ -2818,7 +2818,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
         dprintf("intra matrix present\n");
         for(i=0;i<64;i++)
             dprintf(" %d", s->intra_matrix[s->dsp.idct_permutation[i]]);
-        printf("\n");
+        dprintf("\n");
 #endif
     } else {
         for(i=0;i<64;i++) {
@@ -2843,7 +2843,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
         dprintf("non intra matrix present\n");
         for(i=0;i<64;i++)
             dprintf(" %d", s->inter_matrix[s->dsp.idct_permutation[i]]);
-        printf("\n");
+        dprintf("\n");
 #endif
     } else {
         for(i=0;i<64;i++) {

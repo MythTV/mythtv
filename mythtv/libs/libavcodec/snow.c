@@ -573,12 +573,12 @@ static void slice_buffer_destroy(slice_buffer * buf)
     for (i = buf->data_count - 1; i >= 0; i--)
     {
         assert(buf->data_stack[i]);
-        av_free(buf->data_stack[i]);
+        av_freep(&buf->data_stack[i]);
     }
     assert(buf->data_stack);
-    av_free(buf->data_stack);
+    av_freep(&buf->data_stack);
     assert(buf->line);
-    av_free(buf->line);
+    av_freep(&buf->line);
 }
 
 #ifdef __sgi
@@ -2520,11 +2520,11 @@ static void pred_block(SnowContext *s, uint8_t *dst, uint8_t *src, uint8_t *tmp,
             ff_emulated_edge_mc(tmp + MB_SIZE, src, stride, b_w+5, b_h+5, sx, sy, w, h);
             src= tmp + MB_SIZE;
         }
-        assert(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h);
-        assert(!(b_w&(b_w-1)));
+//        assert(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h);
+//        assert(!(b_w&(b_w-1)));
         assert(b_w>1 && b_h>1);
         assert(tab_index>=0 && tab_index<4 || b_w==32);
-        if((dx&3) || (dy&3))
+        if((dx&3) || (dy&3) || !(b_w == b_h || 2*b_w == b_h || b_w == 2*b_h) || (b_w&(b_w-1)))
             mc_block(dst, src, tmp, stride, b_w, b_h, dx, dy);
         else if(b_w==32){
             int y;
@@ -3256,9 +3256,9 @@ static always_inline int check_block(SnowContext *s, int mb_x, int mb_y, int p[3
 }
 
 /* special case for int[2] args we discard afterward, fixes compilation prob with gcc 2.95 */
-static always_inline int check_block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, int intra, const uint8_t *obmc_edged, int *best_rd){
+static always_inline int check_block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, const uint8_t *obmc_edged, int *best_rd){
     int p[2] = {p0, p1};
-    return check_block(s, mb_x, mb_y, p, intra, obmc_edged, best_rd);
+    return check_block(s, mb_x, mb_y, p, 0, obmc_edged, best_rd);
 }
 
 static always_inline int check_4block_inter(SnowContext *s, int mb_x, int mb_y, int p0, int p1, int *best_rd){
@@ -3303,6 +3303,17 @@ static void iterative_me(SnowContext *s){
     const int b_height= s->b_height << s->block_max_depth;
     const int b_stride= b_width;
     int color[3];
+
+    {
+        RangeCoder r = s->c;
+        uint8_t state[sizeof(s->block_state)];
+        memcpy(state, s->block_state, sizeof(s->block_state));
+        for(mb_y= 0; mb_y<s->b_height; mb_y++)
+            for(mb_x= 0; mb_x<s->b_width; mb_x++)
+                encode_q_branch(s, 0, mb_x, mb_y);
+        s->c = r;
+        memcpy(s->block_state, state, sizeof(s->block_state));
+    }
 
     for(pass=0; pass<50; pass++){
         int change= 0;
@@ -3395,13 +3406,13 @@ static void iterative_me(SnowContext *s){
                     int color0[3]= {block->color[0], block->color[1], block->color[2]};
                     check_block(s, mb_x, mb_y, color0, 1, *obmc_edged, &best_rd);
                 }else
-                    check_block_inter(s, mb_x, mb_y, block->mx, block->my, 0, *obmc_edged, &best_rd);
+                    check_block_inter(s, mb_x, mb_y, block->mx, block->my, *obmc_edged, &best_rd);
 
-                check_block_inter(s, mb_x, mb_y, 0, 0, 0, *obmc_edged, &best_rd);
-                check_block_inter(s, mb_x, mb_y, tb->mx, tb->my, 0, *obmc_edged, &best_rd);
-                check_block_inter(s, mb_x, mb_y, lb->mx, lb->my, 0, *obmc_edged, &best_rd);
-                check_block_inter(s, mb_x, mb_y, rb->mx, rb->my, 0, *obmc_edged, &best_rd);
-                check_block_inter(s, mb_x, mb_y, bb->mx, bb->my, 0, *obmc_edged, &best_rd);
+                check_block_inter(s, mb_x, mb_y, 0, 0, *obmc_edged, &best_rd);
+                check_block_inter(s, mb_x, mb_y, tb->mx, tb->my, *obmc_edged, &best_rd);
+                check_block_inter(s, mb_x, mb_y, lb->mx, lb->my, *obmc_edged, &best_rd);
+                check_block_inter(s, mb_x, mb_y, rb->mx, rb->my, *obmc_edged, &best_rd);
+                check_block_inter(s, mb_x, mb_y, bb->mx, bb->my, *obmc_edged, &best_rd);
 
                 /* fullpel ME */
                 //FIXME avoid subpel interpol / round to nearest integer
@@ -3409,10 +3420,10 @@ static void iterative_me(SnowContext *s){
                     dia_change=0;
                     for(i=0; i<FFMAX(s->avctx->dia_size, 1); i++){
                         for(j=0; j<i; j++){
-                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx+4*(i-j), block->my+(4*j), 0, *obmc_edged, &best_rd);
-                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx-4*(i-j), block->my-(4*j), 0, *obmc_edged, &best_rd);
-                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx+4*(i-j), block->my-(4*j), 0, *obmc_edged, &best_rd);
-                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx-4*(i-j), block->my+(4*j), 0, *obmc_edged, &best_rd);
+                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx+4*(i-j), block->my+(4*j), *obmc_edged, &best_rd);
+                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx-4*(i-j), block->my-(4*j), *obmc_edged, &best_rd);
+                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx+4*(i-j), block->my-(4*j), *obmc_edged, &best_rd);
+                            dia_change |= check_block_inter(s, mb_x, mb_y, block->mx-4*(i-j), block->my+(4*j), *obmc_edged, &best_rd);
                         }
                     }
                 }while(dia_change);
@@ -3421,7 +3432,7 @@ static void iterative_me(SnowContext *s){
                     static const int square[8][2]= {{+1, 0},{-1, 0},{ 0,+1},{ 0,-1},{+1,+1},{-1,-1},{+1,-1},{-1,+1},};
                     dia_change=0;
                     for(i=0; i<8; i++)
-                        dia_change |= check_block_inter(s, mb_x, mb_y, block->mx+square[i][0], block->my+square[i][1], 0, *obmc_edged, &best_rd);
+                        dia_change |= check_block_inter(s, mb_x, mb_y, block->mx+square[i][0], block->my+square[i][1], *obmc_edged, &best_rd);
                 }while(dia_change);
                 //FIXME or try the standard 2 pass qpel or similar
 #if 1
@@ -4053,7 +4064,8 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
         pict->pict_type= s->m.rc_context.entry[avctx->frame_number].new_pict_type;
         s->keyframe= pict->pict_type==FF_I_TYPE;
         s->m.picture_number= avctx->frame_number;
-        pict->quality= ff_rate_estimate_qscale(&s->m, 0);
+        if(!(avctx->flags&CODEC_FLAG_QSCALE))
+            pict->quality= ff_rate_estimate_qscale(&s->m, 0);
     }else{
         s->keyframe= avctx->gop_size==0 || avctx->frame_number % avctx->gop_size == 0;
         pict->pict_type= s->keyframe ? FF_I_TYPE : FF_P_TYPE;

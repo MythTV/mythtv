@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
+#include "crc.h"
 #include <pthread.h>
 #include "mpegts.h"
 
@@ -274,7 +275,7 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
         if (tss->section_h_size == -1 || tss->section_index < tss->section_h_size)
             break;
 
-        if (!tss->check_crc || mpegts_crc32(tss->section_buf, tss->section_h_size) == 0)
+        if (!tss->check_crc || av_crc(av_crc04C11DB7, -1, tss->section_buf, tss->section_h_size) == 0)
             tss->section_cb(tss->opaque, tss->section_buf, tss->section_h_size);
 
         if (tss->section_index > tss->section_h_size) {

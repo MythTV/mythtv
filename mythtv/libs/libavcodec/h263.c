@@ -1480,7 +1480,7 @@ void ff_h263_loop_filter(MpegEncContext * s){
 static int h263_pred_dc(MpegEncContext * s, int n, uint16_t **dc_val_ptr)
 {
     int x, y, wrap, a, c, pred_dc, scale;
-    int16_t *dc_val, *ac_val;
+    int16_t *dc_val;
 
     /* find prediction */
     if (n < 4) {
@@ -1488,14 +1488,12 @@ static int h263_pred_dc(MpegEncContext * s, int n, uint16_t **dc_val_ptr)
         y = 2 * s->mb_y + ((n & 2) >> 1);
         wrap = s->b8_stride;
         dc_val = s->dc_val[0];
-        ac_val = s->ac_val[0][0];
         scale = s->y_dc_scale;
     } else {
         x = s->mb_x;
         y = s->mb_y;
         wrap = s->mb_stride;
         dc_val = s->dc_val[n - 4 + 1];
-        ac_val = s->ac_val[n - 4 + 1][0];
         scale = s->c_dc_scale;
     }
     /* B C
@@ -4765,6 +4763,7 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
         i = 0;
       }else{
             i = -1;
+            ff_mpeg4_pred_dc(s, n, 0, &dc_pred_dir, 0);
       }
         if (!coded)
             goto not_coded;
@@ -4975,7 +4974,7 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
         if(s->qscale >= s->intra_dc_threshold){
             block[0] = ff_mpeg4_pred_dc(s, n, block[0], &dc_pred_dir, 0);
 
-            if(i == -1) i=0;
+            i -= i>>31; //if(i == -1) i=0;
         }
 
         mpeg4_pred_ac(s, block, n, dc_pred_dir);
@@ -5583,6 +5582,7 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
 
         s->progressive_sequence=
         s->progressive_frame= get_bits1(gb)^1;
+        s->interlaced_dct=0;
         if(!get_bits1(gb) && (s->avctx->debug & FF_DEBUG_PICT_INFO))
             av_log(s->avctx, AV_LOG_INFO, "MPEG4 OBMC not supported (very likely buggy encoder)\n");   /* OBMC Disable */
         if (vo_ver_id == 1) {
