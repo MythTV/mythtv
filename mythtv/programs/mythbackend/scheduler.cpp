@@ -378,7 +378,7 @@ void Scheduler::PrintList(bool onlyFutureRecordings)
 
     cout << "--- print list start ---\n";
     cout << "Title - Subtitle                    Chan ChID Day Start  End   "
-        "S C I  T N Pri" << endl;
+        "C I  T N   Pri" << endl;
 
     RecIter i = reclist.begin();
     for ( ; i != reclist.end(); i++)
@@ -416,11 +416,10 @@ void Scheduler::PrintRec(ProgramInfo *p, const char *prefix)
          << p->chanstr.rightJustify(4, ' ') << " " << p->chanid 
          << p->recstartts.toString("  dd hh:mm-").local8Bit()
          << p->recendts.toString("hh:mm  ").local8Bit()
-         << p->sourceid << " " << p->cardid << " "
-         << p->inputid << "  " << p->RecTypeChar() << " "
-         << p->RecStatusChar() << " "
-         << QString::number(p->recpriority + p->recpriority2)
-                           .rightJustify(3, ' ')
+         << p->cardid << " " << p->inputid << "  " 
+         << p->RecTypeChar() << " " << p->RecStatusChar() << " "
+         << (QString::number(p->recpriority) + "/" + 
+             QString::number(p->recpriority2)).rightJustify(5, ' ')
          << endl;
 }
 

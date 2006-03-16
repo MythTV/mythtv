@@ -19,7 +19,6 @@ class ProgramRecPriorityInfo : public ProgramInfo
     ProgramRecPriorityInfo& operator=(const ProgramInfo&);
 
 
-    int channelRecPriority;
     int recTypeRecPriority;
     RecordingType recType;
 };
@@ -71,9 +70,6 @@ class ProgramRecPriority : public MythDialog
     void parseContainer(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
-
-    QString channelFormat;
-    QString longChannelFormat;
 
     ProgramRecPriorityInfo *curitem;
 

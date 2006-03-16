@@ -665,62 +665,35 @@
         <font>grayinfo</font>
         <value>]</value>
       </textarea>
-      <textarea name="infochannel" draworder="6">
-        <area>0,110,160,30</area>
-        <font>info</font>
-        <value>Channel:</value>
-      </textarea>
-      <textarea name="longchannel" draworder="6">
-        <area>180,110,400,30</area>
-        <font>info</font>
-      </textarea>
-      <textarea name="channelbracketA" draworder="6">
-        <area>620,110,100,30</area>
-        <font>grayinfo</font>
-        <value>[</value>
-      </textarea>
-      <textarea name="channelsign" draworder="6">
-        <area>630,110,100,30</area>
-        <font>grayinfo</font>
-      </textarea>
-      <textarea name="channelrecpriority" draworder="6">
-        <area>643,110,100,30</area>
-        <font>grayinfo</font>
-      </textarea>
-      <textarea name="channelbracketB" draworder="6">
-        <area>668,110,100,30</area>
-        <font>grayinfo</font>
-        <value>]</value>
-      </textarea>
       <textarea name="inforecpriority" draworder="6">
-        <area>0,140,160,30</area>
+        <area>0,110,160,30</area>
         <font>info</font>
         <value>Priority:</value>
       </textarea>
       <textarea name="recpriority" draworder="6">
-        <area>180,140,400,30</area>
+        <area>180,110,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="recprioritybracketA" draworder="6">
-        <area>620,140,100,30</area>
+        <area>620,110,100,30</area>
         <font>grayinfo</font>
         <value>[</value>
       </textarea>
       <textarea name="recprioritysign" draworder="6">
-        <area>630,140,100,30</area>
+        <area>630,110,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="recpriorityB" draworder="6">
-        <area>643,140,100,30</area>
+        <area>643,110,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="recprioritybracketB" draworder="6">
-        <area>668,140,100,30</area>
+        <area>668,110,100,30</area>
         <font>grayinfo</font>
         <value>]  = </value>
       </textarea>
       <textarea name="finalrecpriority" draworder="6">
-        <area>709,140,150,30</area>
+        <area>709,110,150,30</area>
         <font>yellowinfo</font>
       </textarea>
     </container>

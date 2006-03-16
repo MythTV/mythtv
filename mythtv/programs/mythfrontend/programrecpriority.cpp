@@ -31,7 +31,6 @@ using namespace std;
 // have to hit the db mulitiple times
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) : ProgramInfo()
 {
-    channelRecPriority = 0;
     recTypeRecPriority = 0;
     recType = kNotRecording;
 }
@@ -39,7 +38,6 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) : ProgramInfo()
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other) 
                       : ProgramInfo::ProgramInfo(other)
 {
-    channelRecPriority = other.channelRecPriority;
     recTypeRecPriority = other.recTypeRecPriority;
     recType = other.recType;
 }
@@ -91,9 +89,6 @@ ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent,
     curitem = NULL;
     bgTransBackup = NULL;
     pageDowner = false;
-
-    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    longChannelFormat = gContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     listCount = 0;
     dataCount = 0;
@@ -720,19 +715,15 @@ void ProgramRecPriority::FillList(void)
     rtRecPriors[kFindWeeklyRecord] = 
         gContext->GetNumSetting("FindOneRecordRecPriority", -1);
     
-    // get channel recording priorities and recording types associated with each
-    // program from db
+    // get recording types associated with each program from db
     // (hope this is ok to do here, it's so much lighter doing
     // it all at once than once per program)
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid, record.title, record.chanid, "
                    "record.starttime, record.startdate, "
-                   "record.type, channel.recpriority,  "
-                   "record.inactive "
-                   "FROM record "
-                   "LEFT JOIN channel ON "
-                   "(record.chanid = channel.chanid);");
+                   "record.type, record.inactive "
+                   "FROM record;");
    
     int matches = 0;
 
@@ -746,16 +737,11 @@ void ProgramRecPriority::FillList(void)
             QString tempTime = result.value(3).toString();
             QString tempDate = result.value(4).toString();
             RecordingType recType = (RecordingType)result.value(5).toInt();
-            int channelRecPriority = result.value(6).toInt();
             int recTypeRecPriority = rtRecPriors[recType];
-            int inactive = result.value(7).toInt();
-
-            if (recType == kAllRecord || recType == kFindOneRecord ||
-                recType == kFindDailyRecord || recType == kFindWeeklyRecord)
-                channelRecPriority = 0;
+            int inactive = result.value(6).toInt();
 
             // find matching program in programData and set
-            // channelRecPriority, recTypeRecPriority and recType
+            // recTypeRecPriority and recType
             QMap<QString, ProgramRecPriorityInfo>::Iterator it;
             for (it = programData.begin(); it != programData.end(); ++it)
             {
@@ -766,7 +752,6 @@ void ProgramRecPriority::FillList(void)
                     progInfo->sortTitle = progInfo->title;
                     progInfo->sortTitle.remove(QRegExp(tr("^(The |A |An )")));
 
-                    progInfo->channelRecPriority = channelRecPriority;
                     progInfo->recTypeRecPriority = recTypeRecPriority;
                     progInfo->recType = recType;
                     progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
@@ -838,10 +823,8 @@ class programRecPrioritySort
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
             int finalA = a.prog->recpriority + 
-                         a.prog->channelRecPriority +
                          a.prog->recTypeRecPriority;
             int finalB = b.prog->recpriority + 
-                         b.prog->channelRecPriority +
                          b.prog->recTypeRecPriority;
 
             if (finalA == finalB)
@@ -1016,7 +999,6 @@ void ProgramRecPriority::updateList(QPainter *p)
 
                         int progRecPriority = progInfo->recpriority;
                         int finalRecPriority = progRecPriority + 
-                                        progInfo->channelRecPriority +
                                         progInfo->recTypeRecPriority;
         
                         QString tempSubTitle = progInfo->title;
@@ -1109,13 +1091,12 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
     if (programData.count() > 0 && curitem)
     {  
-        int progRecPriority, chanrecpriority, rectyperecpriority, finalRecPriority;
+        int progRecPriority, rectyperecpriority, finalRecPriority;
         RecordingType rectype; 
 
         progRecPriority = curitem->recpriority;
-        chanrecpriority = curitem->channelRecPriority;
         rectyperecpriority = curitem->recTypeRecPriority;
-        finalRecPriority = progRecPriority + chanrecpriority + rectyperecpriority;
+        finalRecPriority = progRecPriority + rectyperecpriority;
 
         rectype = curitem->recType;
 
@@ -1202,37 +1183,6 @@ void ProgramRecPriority::updateInfo(QPainter *p)
             type = (UITextType *)container->GetType("typesign");
             if (type) {
                 if (rectyperecpriority >= 0)
-                    type->SetText("+");
-                else
-                    type->SetText("-");
-            }
-
-            type = (UITextType *)container->GetType("channel");
-            if (type) {
-                if (rectype != kAllRecord && rectype != kFindOneRecord &&
-                    rectype != kFindDailyRecord && rectype != kFindWeeklyRecord)
-                    type->SetText(curitem->ChannelText(channelFormat));
-                else
-                    type->SetText(tr("Any"));
-            }
-
-            type = (UITextType *)container->GetType("longchannel");
-            if (type) {
-                if (rectype != kAllRecord && rectype != kFindOneRecord &&
-                    rectype != kFindDailyRecord && rectype != kFindWeeklyRecord)
-                    type->SetText(curitem->ChannelText(longChannelFormat));
-                else
-                    type->SetText(tr("Any"));
-            }
-
-            type = (UITextType *)container->GetType("channelrecpriority");
-            if (type) {
-                type->SetText(QString::number(abs(chanrecpriority)));
-            }
-
-            type = (UITextType *)container->GetType("channelsign");
-            if (type) {
-                if (chanrecpriority >= 0)
                     type->SetText("+");
                 else
                     type->SetText("-");

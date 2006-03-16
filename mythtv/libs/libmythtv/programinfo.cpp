@@ -513,28 +513,30 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     progMap["rec_str"] = RecTypeText();
     if (rectype != kNotRecording)
     {
+        QString tmp_rec;
         if (recendts > timeNow && recstatus <= rsWillRecord || 
             recstatus == rsConflict || recstatus == rsLaterShowing)
         {
-            int totalpri =  recpriority + recpriority2;
-            if (totalpri >= 0)       
-                progMap["rec_str"] += QString(" +%1 ").arg(totalpri);
-            else
-                progMap["rec_str"] += QString(" %1 ").arg(totalpri);
+            tmp_rec += QString().sprintf(" %+d", recpriority);
+            if (recpriority2)
+                tmp_rec += QString().sprintf("/%+d", recpriority2);
+            tmp_rec += " ";
         }
         else
         {
-            progMap["rec_str"] += " -- ";
+            tmp_rec += " -- ";
         }
         if (showrerecord && recstatus == rsRecorded && !duplicate)
-            progMap["rec_str"] += QObject::tr("Re-Record");
+            tmp_rec += QObject::tr("Re-Record");
         else
-            progMap["rec_str"] += RecStatusText();
+            tmp_rec += RecStatusText();
+        progMap["rec_str"] += tmp_rec;
     }
     progMap["recordingstatus"] = progMap["rec_str"];
     progMap["type"] = progMap["rec_str"];
 
-    progMap["recpriority"] = recpriority + recpriority2;
+    progMap["recpriority"] = recpriority;
+    progMap["recpriority2"] = recpriority2;
     progMap["recgroup"] = recgroup;
     progMap["playgroup"] = playgroup;
     progMap["programflags"] = programflags;
