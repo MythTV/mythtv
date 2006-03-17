@@ -2343,16 +2343,16 @@ elif test "$cpu" = "sh4" ; then
   echo "TARGET_ARCH_SH4=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_SH4 1" >> $TMPH
 elif test "$cpu" = "parisc" ; then
-  echo "TARGET_ARCH_PARISC=yes" >> config.mak
+  echo "TARGET_ARCH_PARISC=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_PARISC 1" >> $TMPH
 elif test "$cpu" = "s390" ; then
-  echo "TARGET_ARCH_S390=yes" >> config.mak
+  echo "TARGET_ARCH_S390=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_S390 1" >> $TMPH
 elif test "$cpu" = "m68k" ; then
-  echo "TARGET_ARCH_M68K=yes" >> config.mak
+  echo "TARGET_ARCH_M68K=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_M68K 1" >> $TMPH
 elif test "$cpu" = "ia64" ; then
-  echo "TARGET_ARCH_IA64=yes" >> config.mak
+  echo "TARGET_ARCH_IA64=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_IA64 1" >> $TMPH
 fi
 echo "#define TUNECPU $TUNECPU" >> $TMPH
@@ -2481,13 +2481,13 @@ echo "CONFIG_PROTOCOLS=yes" >> $MYTH_CONFIG_MAK
 # muxers
 if test "$muxers" = "yes" ; then
   echo "#define CONFIG_MUXERS 1" >> $TMPH
-  echo "CONFIG_MUXERS=yes" >> config.mak
+  echo "CONFIG_MUXERS=yes" >> $MYTH_CONFIG_MAK
 fi
 
 # demuxers
 if test "$demuxers" = "yes" ; then
   echo "#define CONFIG_DEMUXERS 1" >> $TMPH
-  echo "CONFIG_DEMUXERS=yes" >> config.mak
+  echo "CONFIG_DEMUXERS=yes" >> $MYTH_CONFIG_MAK
 fi
 
 # AC3
@@ -2604,7 +2604,7 @@ fi
 
 if test "$libgsm" = "yes" ; then
   echo "#define CONFIG_LIBGSM 1" >> $TMPH
-  echo "CONFIG_LIBGSM=yes" >> config.mak
+  echo "CONFIG_LIBGSM=yes" >> $MYTH_CONFIG_MAK
 fi
 
 if test "$mp3lame" = "yes" ; then
