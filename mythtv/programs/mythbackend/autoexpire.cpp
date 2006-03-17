@@ -417,10 +417,27 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
         if (CheckFile(*it, record_file_prefix, fsid))
         {
             // Print informative message 
-            msg = QString("Expiring: %1 %2 %3 MBytes")
+            msg = QString("Expiring \"%1\" from %2, %3 MBytes")
                 .arg((*it)->title).arg((*it)->startts.toString())
                 .arg((int)((*it)->filesize/1024/1024));
-            VERBOSE(VB_FILE, QString("    ") +  msg);
+
+            if (deleteAll)
+            {
+                msg += ", forced expire";
+                if ((*it)->recgroup == "LiveTV")
+                    msg += " (LiveTV recording)";
+            }
+            else
+                msg += QString(", free space is too low (have %1 MBytes free "
+                               ", but want %2 MBytes)")
+                               .arg(availFreeKB/1024)
+                               .arg(desiredFreeKB/1024);
+
+            if (print_verbose_messages & VB_IMPORTANT)
+                VERBOSE(VB_IMPORTANT, msg);
+            else
+                VERBOSE(VB_FILE, QString("    ") +  msg);
+
             gContext->LogEntry("autoexpire", LP_NOTICE,
                                "Expiring Program", msg);                
 
@@ -431,7 +448,7 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
 
             availFreeKB += ((*it)->filesize/1024); // add size to avail size
             VERBOSE(VB_FILE,
-                    QString("    After unlink we will have %1 MB free.")
+                    QString("    After unlink we should have %1 MB free.")
                     .arg(availFreeKB/1024));
 
         }
@@ -503,7 +520,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                            "profile using max episodes");
     for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
     {
-        query.prepare("SELECT chanid, starttime, title, progstart, progend "
+        query.prepare("SELECT chanid, starttime, title, progstart, progend, filesize "
                       "FROM recorded "
                       "WHERE recordid = :RECID AND preserve = 0 "
                       "AND recgroup <> 'LiveTV' "
@@ -539,11 +556,19 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     (!episodeParts.contains(episodeKey)) &&
                     (found > maxIter.data()))
                 {
-                    QString msg = QString("Expiring \"%1\" from %2, "
-                                          "too many episodes.")
-                                          .arg(title)
-                                          .arg(startts.toString());
-                    VERBOSE(VB_FILE, QString("    ") + msg);
+                    QString msg =
+                        QString("Expiring \"%1\" from %2, %3 MBytes,"
+                                "too many episodes (only want %4).")
+                                .arg(title)
+                                .arg(startts.toString())
+                                .arg(query.value(5).toInt()/1024/1024)
+                                .arg(maxIter.data());
+
+                    if (print_verbose_messages & VB_IMPORTANT)
+                        VERBOSE(VB_IMPORTANT, msg);
+                    else
+                        VERBOSE(VB_FILE, QString("    ") +  msg);
+
                     gContext->LogEntry("autoexpire", LP_NOTICE,
                                        "Expired program", msg);
 
