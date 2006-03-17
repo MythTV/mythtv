@@ -3838,6 +3838,14 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (!hasFullPositionMap)
     {
         VERBOSE(VB_IMPORTANT, "Cannot edit - no full position map");
+
+        if (osd)
+        {
+            struct StatusPosInfo posInfo;
+            calcSliderPos(posInfo);
+            osd->ShowStatus(posInfo, false, QObject::tr("No Seektable"), 2);
+        }
+
         return false;
     }
 
