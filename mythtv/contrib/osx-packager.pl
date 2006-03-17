@@ -47,7 +47,6 @@ our %depend_order = (
         'lame',
         'mysqlclient',
         'qt-mt',
-        'dvdnav'
       ],
   'mythplugins'
   =>  [
@@ -55,6 +54,15 @@ our %depend_order = (
         'exif',
         'dvdcss',
         'dvdread',
+# MythMusic needs these seven things:
+#        'libmad',
+#        'libid3tag',
+#        'libogg',
+#        'vorbis',
+#        'flac',
+# These CD ones don't compile on OS X. I doubt that they ever will.
+# MythMusic probably needs to have native OS X code to assess CDs
+#        'cddaparanoia',
 #        'cdaudio'
       ],
 );
@@ -68,13 +76,6 @@ our %depend = (
     =>  "$sourceforge/sourceforge/freetype/freetype-2.1.10.tar.gz",
   },
 
-  'dvdnav'
-  =>
-  {
-    'url'
-    =>  "$sourceforge/sourceforge/dvd/libdvdnav-0.1.10.tar.gz",
-  },
-  
   'lame'
   =>
   {
@@ -86,12 +87,40 @@ our %depend = (
         ],
   },
 
-#  'cdaudio'
-#  =>
-#  {
-#    'url'
-#    =>  "$sourceforge/sourceforge/libcdaudio/libcdaudio-0.99.12.tar.gz"
-#  },
+  'cdaudio' =>
+  {
+    'url' => "$sourceforge/sourceforge/libcdaudio/libcdaudio-0.99.12.tar.gz"
+  },
+
+  'libmad' =>
+  {
+    'url' => 'ftp://ftp.mars.org/pub/mpeg/libmad-0.15.0b.tar.gz'
+  },
+
+  'libid3tag' =>
+  {
+    'url' => 'ftp://ftp.mars.org/pub/mpeg/libid3tag-0.15.0b.tar.gz'
+  },
+
+  'cddaparanoia' =>
+  {
+    'url' => 'http://www.buserror.net/cdparanoia/cdparanoia-osx-5.tar.gz',
+  },
+
+  'libogg' =>
+  {
+    'url' => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.2.tar.gz'
+  },   
+
+  'vorbis' =>
+  {
+    'url' => 'http://downloads.xiph.org/releases/vorbis/libvorbis-1.1.1.tar.gz'
+  },
+
+  'flac' =>
+  {
+    'url' => "$sourceforge/sourceforge/flac/flac-1.1.2.tar.gz"
+  },
 
   'dvdcss'
   =>
