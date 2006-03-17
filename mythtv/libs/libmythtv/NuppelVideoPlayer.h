@@ -672,6 +672,7 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     QMap<long long, int>::Iterator blankIter;
     QMap<long long, int>::Iterator commBreakIter;
     QDateTime  lastIgnoredManualSkip;
+    bool       forcePositionMapSync;
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed
