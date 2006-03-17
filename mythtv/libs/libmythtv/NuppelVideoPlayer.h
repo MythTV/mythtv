@@ -544,6 +544,7 @@ class NuppelVideoPlayer
     QMap<long long, int>::Iterator deleteIter;
     QMap<long long, int>::Iterator blankIter;
     QMap<long long, int>::Iterator commBreakIter;
+    bool       forcePositionMapSync;
 
     // Playback (output) speed control
     /// Lock for next_play_speed and next_normal_speed

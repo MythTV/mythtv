@@ -147,6 +147,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       hascommbreaktable(false),
       deleteIter(deleteMap.end()),  blankIter(blankMap.end()),
       commBreakIter(commBreakMap.end()),
+      forcePositionMapSync(false),
       // Playback (output) speed control
       decoder_lock(true),
       next_play_speed(1.0f),        next_normal_speed(true),
@@ -2475,6 +2476,12 @@ void NuppelVideoPlayer::StartPlaying(void)
                 JumpToProgram();
         }
 
+        if (forcePositionMapSync)
+        {
+            forcePositionMapSync = false;
+            GetDecoder()->SyncPositionMap();
+        }
+
         if (IsErrored() || (nvr_enc && nvr_enc->GetErrorStatus()))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown error, exiting decoder");
@@ -4402,6 +4409,8 @@ void NuppelVideoPlayer::SetCommBreakMap(QMap<long long, int> &newMap)
     hascommbreaktable = !commBreakMap.isEmpty();
     SetCommBreakIter();
     commBreakMapLock.unlock();
+
+    forcePositionMapSync = true;
 }
 
 bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb, void* cbData)
