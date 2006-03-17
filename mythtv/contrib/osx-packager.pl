@@ -28,6 +28,11 @@ our $cleanLibs = 1;
 our $backend = 0;
 our $jobtools = 0;
 
+# Parallel makes?
+#
+#$ENV{'DISTCC_HOSTS'}   = "localhost 192.168.0.6";
+#$ENV{'DISTCC_VERBOSE'} = '1';
+
 # For faster downloads, change this to a local mirror.
 #
 our $sourceforge = 'http://internap.dl.sf.net';
@@ -477,6 +482,18 @@ my $qt_vers = $depend{'qt-mt'}{'url'};
 $qt_vers =~ s|^.*/([^/]+)\.tar\.gz$|$1|;
 $ENV{'QTDIR'} = "$SRCDIR/$qt_vers";
 
+# If environment is setup to use distcc, take advantage of it
+our $standard_make = '/usr/bin/make';
+our $parallel_make = $standard_make;
+
+if ( $ENV{'DISTCC_HOSTS'} )
+{
+  my @hosts = split m/\s+/, $ENV{'DISTCC_HOSTS'};
+  my $numhosts = $#hosts + 1;
+  &Verbose("Using $numhosts build hosts:", join ', ', @hosts);
+  $parallel_make .= ' -j' . $numhosts;
+}
+
 
 ### Distclean?
 if ($OPT{'distclean'})
@@ -616,7 +633,7 @@ foreach my $sw (@build_depends)
     &Verbose("Making $sw");
     my (@make);
     
-    push(@make, '/usr/bin/make');
+    push(@make, $standard_make);
     if ($pkg->{'make'})
     {
       push(@make, @{ $pkg->{'make'} });
@@ -751,7 +768,7 @@ foreach my $comp (@comps)
   if ($OPT{'clean'} && -e 'Makefile')
   {
     &Verbose("Cleaning $comp");
-    &Syscall([ '/usr/bin/make', 'distclean' ]) or die;
+    &Syscall([ $standard_make, 'distclean' ]) or die;
   }
   else
   {
@@ -762,7 +779,7 @@ foreach my $comp (@comps)
   # configure and make
   if ( $makecleanopt{$comp} && -e 'Makefile' )
   {
-    my @makecleancom= '/usr/bin/make';
+    my @makecleancom= $standard_make;
     push(@makecleancom, @{ $makecleanopt{$comp} }) if $makecleanopt{$comp};
     &Syscall([ @makecleancom ]) or die;
   }
@@ -774,6 +791,10 @@ foreach my $comp (@comps)
     if ( $comp eq 'mythtv' && $backend )
     {
       push @config, '--enable-backend'
+    }
+    if ( $comp eq 'mythtv' && ! $ENV{'DISTCC_HOSTS'} )
+    {
+      push @config, '--disable-distcc'
     }
     &Syscall([ @config ]) or die;
   }
@@ -796,7 +817,7 @@ foreach my $comp (@comps)
   }
   
   &Verbose("Making $comp");
-  &Syscall([ '/usr/bin/make' ]) or die;
+  &Syscall([ $parallel_make ]) or die;
   # install
   # This requires a change from the compiled-in relative
   # PREFIX to our absolute path of the temp install location.
@@ -807,7 +828,7 @@ foreach my $comp (@comps)
              @qmake_opts,
              "$comp.pro" ]) or die;
   &Verbose("Installing $comp");
-  &Syscall([ '/usr/bin/make',
+  &Syscall([ $standard_make,
              'install' ]) or die;
 }
 
