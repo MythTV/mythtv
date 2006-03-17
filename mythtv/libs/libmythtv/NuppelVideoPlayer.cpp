@@ -5026,7 +5026,8 @@ int NuppelVideoPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
-void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo)
+void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
+                                      bool paddedFields)
 {
     posInfo.desc = "";
     posInfo.position = 0;
@@ -5081,15 +5082,23 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo)
     int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
     QString text1, text2;
-    if (shours > 0)
+    if (paddedFields)
     {
-        text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
-        text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+        text1.sprintf("%02d:%02d:%02d", phours, pmins, psecs);
+        text2.sprintf("%02d:%02d:%02d", shours, smins, ssecs);
     }
     else
     {
-        text1.sprintf("%d:%02d", pmins, psecs);
-        text2.sprintf("%d:%02d", smins, ssecs);
+        if (shours > 0)
+        {
+            text1.sprintf("%d:%02d:%02d", phours, pmins, psecs);
+            text2.sprintf("%d:%02d:%02d", shours, smins, ssecs);
+        }
+        else
+        {
+            text1.sprintf("%d:%02d", pmins, psecs);
+            text2.sprintf("%d:%02d", smins, ssecs);
+        }
     }
 
     posInfo.desc = QObject::tr("%1 of %2").arg(text1).arg(text2);
@@ -6085,3 +6094,5 @@ void NuppelVideoPlayer::SetOSDThemeName(const QString themename)
     osdtheme = QDeepCopy<QString>(themename);
 }
 // EIA-708 caption support -- end
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

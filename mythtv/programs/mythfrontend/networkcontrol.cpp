@@ -477,7 +477,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             message = "NETWORK_CONTROL SEEK BACKWARD";
         else if (tokens[2].contains(QRegExp("^\\d\\d:\\d\\d:\\d\\d$")))
         {
-            int hours = tokens[2].left(0).toInt();
+            int hours   = tokens[2].mid(0, 2).toInt();
             int minutes = tokens[2].mid(3, 2).toInt();
             int seconds = tokens[2].mid(6, 2).toInt();
             message = QString("NETWORK_CONTROL SEEK POSITION %1")
