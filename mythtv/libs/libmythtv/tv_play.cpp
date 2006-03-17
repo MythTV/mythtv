@@ -2773,7 +2773,7 @@ void TV::processNetworkControlCommand(QString command)
                 speedStr = QString("%1X").arg(normal_speed);
 
             struct StatusPosInfo posInfo;
-            nvp->calcSliderPos(posInfo);
+            nvp->calcSliderPos(posInfo, true);
 
             QDateTime respDate = mythCurrentDateTime();
             QString infoStr = "";
