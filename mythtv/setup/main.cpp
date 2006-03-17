@@ -5,6 +5,8 @@
 #include <qdir.h>
 #include <qfile.h>
 #include <qstringlist.h>
+#include <qregexp.h>
+#include <qmap.h>
 
 #include <unistd.h>
 #include <cstdio>
@@ -97,6 +99,8 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
+    QMap<QString, QString> settingsOverride;
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-geometry") ||
@@ -133,7 +137,38 @@ int main(int argc, char *argv[])
                 cerr << "Missing argument to -v/--verbose option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
-        } 
+        }
+        else if (!strcmp(a.argv()[argpos],"-O") ||
+                 !strcmp(a.argv()[argpos],"--override-setting"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                QString tmpArg = a.argv()[argpos+1];
+                if (tmpArg.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                    return BACKEND_EXIT_INVALID_CMDLINE;
+                } 
+ 
+                QStringList pairs = QStringList::split(",", tmpArg);
+                for (unsigned int index = 0; index < pairs.size(); ++index)
+                {
+                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    tokens[0].replace(QRegExp("^[\"']"), "");
+                    tokens[0].replace(QRegExp("[\"']$"), "");
+                    tokens[1].replace(QRegExp("^[\"']"), "");
+                    tokens[1].replace(QRegExp("[\"']$"), "");
+                    settingsOverride[tokens[0]] = tokens[1];
+                }
+            }
+            else
+            {
+                cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
         else
         {
             if (!(!strcmp(a.argv()[argpos],"-h") ||
@@ -166,6 +201,17 @@ int main(int argc, char *argv[])
         if (!gContext->ParseGeometryOverride(geometry))
             cerr << "Illegal -geometry argument '"
                  << geometry << "' (ignored)\n";
+
+    if (settingsOverride.size())
+    {
+        QMap<QString, QString>::iterator it;
+        for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
+                                          .arg(it.key()).arg(it.data()));
+            gContext->OverrideSettingForSession(it.key(), it.data());
+        }
+    }   
 
     if (!MSqlQuery::testDBConnection())
     {
