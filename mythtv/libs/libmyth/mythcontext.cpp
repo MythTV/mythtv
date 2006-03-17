@@ -2621,9 +2621,13 @@ void MythContext::LogEntry(const QString &module, int priority,
         d->LoadLogSettings();
     if (d->m_logenable == 1)
     {
+        QString fullMsg = message;
+        if (!details.isEmpty())
+            fullMsg += ": " + details;
+
         if (message.left(21) != "Last message repeated")
         {
-            if (message == d->lastLogStrings[module])
+            if (fullMsg == d->lastLogStrings[module])
             {
                 d->lastLogCounts[module] += 1;
                 return;
@@ -2639,7 +2643,7 @@ void MythContext::LogEntry(const QString &module, int priority,
                 }
 
                 d->lastLogCounts[module] = 0;
-                d->lastLogStrings[module] = message;
+                d->lastLogStrings[module] = fullMsg;
             }
         }
 
@@ -2693,7 +2697,7 @@ void MythContext::LogEntry(const QString &module, int priority,
         }
 
         if (priority <= d->m_logprintlevel)
-            VERBOSE(VB_IMPORTANT, module + ": " + message);
+            VERBOSE(VB_IMPORTANT, module + ": " + fullMsg);
     }
 }
 
