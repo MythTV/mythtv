@@ -238,7 +238,9 @@ bool IvtvDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     if (!CheckDevice())
         return false;
 
+    avcodeclock.lock();
     av_register_all();
+    avcodeclock.unlock();
 
     AVProbeData probe;
 

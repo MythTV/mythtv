@@ -65,8 +65,11 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     int format = RTJ_YUV420;
     rtjd->SetFormat(&format);
 
+    avcodeclock.lock();
     avcodec_init();
     avcodec_register_all();
+    avcodeclock.unlock();
+
     if (lzo_init() != LZO_E_OK)
     {
         VERBOSE(VB_IMPORTANT, "NuppelDecoder: lzo_init() failed, aborting");

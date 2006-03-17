@@ -255,6 +255,10 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     bool valid = false;
     uint tmp = mypage.toInt(&valid, 16);
     ttPageNum = (valid) ? tmp : ttPageNum;
+
+    text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
+    for (int i = 0; i < MAXTBUFFER; i++)
+        txtbuffers[i].buffer = new unsigned char[text_size + 1];
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -936,7 +940,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     GetDecoder()->SetLowBuffers(decode_extra_audio && !using_null_videoout);
 
     eof = false;
-    text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
     // Set 'no_video_decode' to true for audio only decodeing
     bool no_video_decode = false;
@@ -2841,9 +2844,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = fftime = 0;
     skipcommercials = 0;
 
-    for (int i = 0; i < MAXTBUFFER; i++)
-        txtbuffers[i].buffer = new unsigned char[text_size];
-
     ClearAfterSeek();
 
     /* This thread will fill the video and audio buffers, it does all CPU
@@ -4640,9 +4640,6 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
         return NULL;
     }
 
-    for (int i = 0; i < MAXTBUFFER; i++)
-        txtbuffers[i].buffer = new unsigned char[text_size];
-
     ClearAfterSeek();
 
     number = (long long) (secondsin * video_frame_rate);
@@ -4800,9 +4797,6 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
         return;
     }
 
-    for (int i = 0; i < MAXTBUFFER; i++)
-        txtbuffers[i].buffer = new unsigned char[text_size];
-
     framesPlayed = 0;
     ClearAfterSeek();
 
@@ -4911,9 +4905,6 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
         playing = false;
         return 0;
     }
-
-    for (int i = 0; i < MAXTBUFFER; i++)
-        txtbuffers[i].buffer = new unsigned char[text_size];
 
     ClearAfterSeek();
 

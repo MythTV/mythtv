@@ -10,6 +10,8 @@
 #include "mythcontext.h"
 #include "signalmonitor.h"
 
+#include "libavcodec/avcodec.h"
+
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"
 #   include "dvbchannel.h"
@@ -54,6 +56,11 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     (void) channel;
 
     SignalMonitor *signalMonitor = NULL;
+
+    {
+        QMutexLocker locker(&avcodeclock);
+        avcodec_init();
+    }
 
 #ifdef USING_DVB
     if (CardUtil::IsDVBCardType(cardtype))

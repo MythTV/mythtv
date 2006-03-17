@@ -578,7 +578,9 @@ void AvFormatDecoder::Reset()
 bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize], 
                                 const QString &filename, int testbufsize)
 {
+    avcodeclock.lock();
     av_register_all();
+    avcodeclock.unlock();
 
     AVProbeData probe;
 
