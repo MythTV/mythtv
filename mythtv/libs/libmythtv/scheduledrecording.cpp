@@ -450,11 +450,10 @@ void ScheduledRecording::save(bool sendSig)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
             "UPDATE recorded "
-                "SET recpriority = :RECPRIORITY, recgroup = :RECGROUP, "
+                "SET recpriority = :RECPRIORITY, "
                     "transcoder = :TRANSCODER, playgroup = :PLAYGROUP "
                 "WHERE recordid = :RECORDID ;");
         query.bindValue(":RECPRIORITY", getRecPriority());
-        query.bindValue(":RECGROUP", recgroup->getValue());
         query.bindValue(":TRANSCODER", transcoder->getValue().toInt());
         query.bindValue(":PLAYGROUP", playgroup->getValue());
         query.bindValue(":RECORDID", getRecordID());
