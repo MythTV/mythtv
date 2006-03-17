@@ -109,8 +109,10 @@ bool AudioOutputCA::OpenDevice()
     bzero(&conv_in_desc, sizeof(AudioStreamBasicDescription));
     conv_in_desc.mSampleRate       = audio_samplerate;
     conv_in_desc.mFormatID         = kAudioFormatLinearPCM;
-    conv_in_desc.mFormatFlags      = kLinearPCMFormatFlagIsSignedInteger
-                                     | kLinearPCMFormatFlagIsBigEndian;
+    conv_in_desc.mFormatFlags      = kLinearPCMFormatFlagIsSignedInteger;
+#ifdef WORDS_BIGENDIAN
+    conv_in_desc.mFormatFlags     |= kLinearPCMFormatFlagIsBigEndian;
+#endif
     conv_in_desc.mBytesPerPacket   = audio_bytes_per_sample;
     conv_in_desc.mFramesPerPacket  = 1;
     conv_in_desc.mBytesPerFrame    = audio_bytes_per_sample;
