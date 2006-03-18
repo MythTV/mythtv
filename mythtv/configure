@@ -2242,7 +2242,9 @@ if test x"$frontend" = x"yes" ; then
   echo "XvMC support     $xvmc"
   echo "XvMC VLD support $xvmc_vld"
   echo "XvMC pro support $xvmc_pro"
+if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs        $VENDOR_XVMC_LIBS"
+fi
   echo "Mac accel.       $mac_accel"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $direct_fb"
