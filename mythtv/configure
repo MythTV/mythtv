@@ -2037,10 +2037,13 @@ if test x"$firewire_cable_box" = x"yes" ; then
         fi
     fi
     if test x"$darwin" == x"yes" ; then
-        if test -d /Developer/FireWireSDK20/Examples/AVCVideoServices ; then
+        # This should pick the newest. e.g. FireWireSDK21 instead of 20
+        mac_avc=`ls -d /Developer/FireWireSDK*/Examples/AVCVideoServices \
+                 | tail -n 1`
+        if test -d $mac_avc ; then
             firewire_cable_box="yes"
         else
-            echo Firewire being disabled. /Developer/FireWireSDK20 missing
+            echo Firewire being disabled. /Developer/FireWireSDK* missing
         fi
     fi
 fi
@@ -2849,7 +2852,9 @@ fi
 
 if test x"$firewire_cable_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_firewire"
-  if test x"$darwin" != x"yes" ; then
+  if test x"$darwin" = x"yes" ; then
+      echo "CONFIG_MAC_AVC=$mac_avc" >>  $MYTH_CONFIG_MAK
+  else
       echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >>  $MYTH_CONFIG_MAK
   fi
 fi
