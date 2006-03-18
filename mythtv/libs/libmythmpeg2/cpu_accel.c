@@ -162,7 +162,7 @@ static uint32_t arch_accel (uint32_t accel)
 
 	canjump = 1;
 
-#ifdef HAVE_ALTIVEC_H	/* gnu */
+#if defined(HAVE_ALTIVEC_H) && !defined(__APPLE__)	/* gnu */
 #define VAND(a,b,c) "vand " #a "," #b "," #c "\n\t"
 #else			/* apple */
 #define VAND(a,b,c) "vand v" #a ",v" #b ",v" #c "\n\t"
