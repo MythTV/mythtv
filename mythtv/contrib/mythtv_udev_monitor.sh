@@ -7,6 +7,6 @@
 
 MYTH_FIFO=/tmp/mythtv_media
 
-if [ -p $MYTH_FIFO ]; then
+if [ -p $MYTH_FIFO ] && /bin/ps -C mythfrontend > /dev/null ; then
     echo $ACTION /sys$DEVPATH $DEVNAME > $MYTH_FIFO
 fi
