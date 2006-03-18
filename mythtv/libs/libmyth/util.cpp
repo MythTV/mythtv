@@ -1006,15 +1006,19 @@ long long getDiskSpace(const QString &file_on_disk,
     long long freespace = -1;
     QCString cstr = file_on_disk.local8Bit();
 
-    if (statfs(cstr, &statbuf) == 0)
+    total = used = -1;
+
+    // there are cases where statfs will return 0 (good), but f_blocks and
+    // others are invalid and set to 0 (such as when an automounted directory
+    // is not mounted but still visible because --ghost was used),
+    // so check to make sure we can have a total size > 0
+    if ((statfs(cstr, &statbuf) == 0) &&
+        (statbuf.f_blocks > 0) &&
+        (statbuf.f_bsize > 0))
     {
         freespace = statbuf.f_bsize * (statbuf.f_bavail >> 10);
         total = statbuf.f_bsize * (statbuf.f_blocks >> 10);
         used  = total - freespace;
-    }
-    else
-    {
-        freespace = total = used = -1;
     }
 
     return freespace;

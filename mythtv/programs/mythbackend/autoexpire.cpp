@@ -291,7 +291,8 @@ void AutoExpire::ExpireLiveTV(int type)
 
     if ((availFreeKB = getDiskSpace(record_file_prefix, tKB, uKB)) < 0)
     {
-        QString msg = QString("ERROR: Could not calculate free space.");
+        QString msg = QString("ERROR: Could not calculate free space for %1.")
+                              .arg(record_file_prefix);
         VERBOSE(VB_IMPORTANT, LOC + msg);
         gContext->LogEntry("mythbackend", LP_WARNING,
                            "Autoexpire Recording", msg);
