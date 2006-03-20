@@ -35,14 +35,9 @@ class FirewireChannel : public FirewireChannelBase
         { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
 
   private:
-    bool OpenFirewire();
-    void CloseFirewire();
-
-  private:
     FireWireDBOptions  fw_opts;
     nodeid_t           fwnode;
     raw1394handle_t    fwhandle;
-    bool               isopen;
 };
 
 #endif
