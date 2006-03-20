@@ -148,6 +148,7 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
     void SetScanType(FrameScanType);
     FrameScanType GetScanType(void) const { return m_scan; }
+    bool IsScanTypeLocked(void) const { return m_scan_locked; }
 
     void SetOSDFontName(const QString osdfonts[22], const QString &prefix);
     void SetOSDThemeName(const QString themename);

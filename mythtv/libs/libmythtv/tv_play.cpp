@@ -2247,7 +2247,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
         }
         else if (action == "NEXTSCAN")
+        {
             activenvp->NextScanType();
+            if (GetOSD())
+            {
+                QString msg = frame_scan_to_string(activenvp->GetScanType());
+                GetOSD()->SetSettingsText(msg, 3);
+            }
+        }
         else if (action == "ARBSEEK")
         {
             if (asInputMode)
@@ -3197,6 +3204,11 @@ QString TV::PlayMesg()
         mesg += " %1X";
         mesg = mesg.arg(normal_speed);
     }
+
+    FrameScanType scan = activenvp->GetScanType();
+    if (is_progressive(scan) || is_interlaced(scan))
+        mesg += " (" + frame_scan_to_string(scan, true) + ")";
+
     return mesg;
 }
 
@@ -6053,24 +6065,40 @@ void TV::BuildOSDTreeMenu(void)
                                  "STRETCHGROUP");
 
     // add scan mode override settings to menu
-    int scan_type = kScan_Ignore;
+    FrameScanType scan_type = kScan_Ignore;
+    bool scan_type_locked = false;
+    QString cur_mode = "";
     if (activenvp)
+    {
         scan_type = activenvp->GetScanType();
+        scan_type_locked = activenvp->IsScanTypeLocked();        
+        if (!scan_type_locked)
+        {
+            if (kScan_Interlaced == scan_type)
+                cur_mode = tr("(I)", "Interlaced (Normal)");
+            else if (kScan_Intr2ndField == scan_type)
+                cur_mode = tr("(i)", "Interlaced (Reveresed)");
+            else if (kScan_Progressive == scan_type)
+                cur_mode = tr("(P)", "Progressive");
+            cur_mode = " " + cur_mode;
+            scan_type = kScan_Detect;
+        }
+    }
 
     item = new OSDGenericTree(
         treeMenu, tr("Video Scan"), "SCANMODE");
     subitem = new OSDGenericTree(
-        item, tr("Detect"), "SELECTSCAN_3",
-        (scan_type == 3) ? 1 : 0, NULL, "SCANGROUP");
+        item, tr("Detect") + cur_mode, "SELECTSCAN_3",
+        (scan_type == kScan_Detect) ? 1 : 0, NULL, "SCANGROUP");
     subitem = new OSDGenericTree(
         item, tr("Progressive"), "SELECTSCAN_0",
-        (scan_type == 0) ? 1 : 0, NULL, "SCANGROUP");
+        (scan_type == kScan_Progressive) ? 1 : 0, NULL, "SCANGROUP");
     subitem = new OSDGenericTree(
         item, tr("Interlaced (Normal)"), "SELECTSCAN_1",
-        (scan_type == 1) ? 1 : 0, NULL, "SCANGROUP");
+        (scan_type == kScan_Interlaced) ? 1 : 0, NULL, "SCANGROUP");
     subitem = new OSDGenericTree(
         item, tr("Interlaced (Reversed)"), "SELECTSCAN_2",
-        (scan_type == 2) ? 1 : 0, NULL, "SCANGROUP");
+        (scan_type == kScan_Intr2ndField) ? 1 : 0, NULL, "SCANGROUP");
     
     // add sleep items to menu
 

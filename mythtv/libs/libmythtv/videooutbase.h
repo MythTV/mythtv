@@ -116,6 +116,44 @@ enum FrameScanType {
     kScan_Detect      =  3
 };
 
+static inline bool is_interlaced(FrameScanType scan)
+{
+    return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);
+}
+
+static inline bool is_progressive(FrameScanType scan)
+{
+    return (kScan_Progressive == scan);
+}
+
+static inline QString frame_scan_to_string(FrameScanType scan,
+                                           bool brief = false)
+{
+    QString ret = QObject::tr("Unknown");
+    switch (scan)
+    {
+        case kScan_Ignore:
+            ret = QObject::tr("Ignore"); break;
+        case kScan_Detect:
+            ret = QObject::tr("Detect"); break;
+        case kScan_Interlaced:
+            if (brief)
+                ret = QObject::tr("Interlaced");
+            else
+                ret = QObject::tr("Interlaced (Normal)");
+            break;
+        case kScan_Intr2ndField:
+            if (brief)
+                ret = QObject::tr("Interlaced (Reversed)");
+            break;
+        case kScan_Progressive:
+            ret = QObject::tr("Progressive"); break;
+        default:
+            break;
+    }
+    return ret;
+}
+
 class VideoOutput
 {
   public:
