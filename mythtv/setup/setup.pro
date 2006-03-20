@@ -17,6 +17,8 @@ LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 
 LIBS += `freetype-config --libs`
 
+macx:using_firewire:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
+
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
 }

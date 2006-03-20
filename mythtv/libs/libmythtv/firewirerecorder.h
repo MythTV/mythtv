@@ -7,58 +7,41 @@
 #ifndef FIREWIRERECORDER_H_
 #define FIREWIRERECORDER_H_
 
-#include "dtvrecorder.h"
+#include "firewirerecorderbase.h"
 #include "tsstats.h"
 #include <libraw1394/raw1394.h>
 #include <libiec61883/iec61883.h>
-#include <time.h>
-
-class MPEGStreamData;
-class ProgramAssociationTable;
-class ProgramMapTable;
 
 /** \class FirewireRecorder
- *  \brief This is a specialization of DTVRecorder used to
- *         handle DVB and ATSC streams from a firewire input.
+ *  \brief Linux FirewireRFecorder
  *
- *  \sa DTVRecorder
+ *  \sa FirewireRecorderBase
  */
-class FirewireRecorder : public DTVRecorder
+class FirewireRecorder : public FirewireRecorderBase
 {
-  Q_OBJECT
-    friend class MPEGStreamData;
-    friend class TSPacketProcessor;
     friend int fw_tspacket_handler(unsigned char*,int,uint,void*);
 
   public:
-    FirewireRecorder(TVRec *rec);
-   ~FirewireRecorder();
+    FirewireRecorder(TVRec *rec) 
+        : FirewireRecorderBase(rec, "FirewireRecorder"), 
+        fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1), 
+        fwfd(-1),       fwconnection(kConnectionP2P), 
+        fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0), 
+        fwhandle(NULL), fwmpeg(NULL),  isopen(false) { } 
+   ~FirewireRecorder() { Close(); }
 
     // Commands
-    void StartRecording(void);
     bool Open(void); 
-    bool PauseAndWait(int timeout = 100);
 
     // Sets
-    void SetOptionsFromProfile(RecordingProfile *profile,
-                               const QString &videodev,
-                               const QString &audiodev,
-                               const QString &vbidev);
     void SetOption(const QString &name, const QString &value);
     void SetOption(const QString &name, int value);
-    void SetStreamData(MPEGStreamData*);
 
-    // Gets
-    MPEGStreamData* StreamData(void) { return _mpeg_stream_data; }
-
-  public slots:
-    void deleteLater(void);
-    void WritePAT(ProgramAssociationTable*);
-    void WritePMT(ProgramMapTable*);
-        
   private:
     void Close(void);
-    void ProcessTSPacket(const TSPacket &tspacket);
+    void start() { iec61883_mpeg2_recv_start(fwmpeg, fwchannel); } 
+    void stop() { iec61883_mpeg2_recv_stop(fwmpeg); } 
+    bool grab_frames();
 
   private:
     int              fwport;
@@ -74,14 +57,11 @@ class FirewireRecorder : public DTVRecorder
     raw1394handle_t  fwhandle;
     iec61883_mpeg2_t fwmpeg;
     bool             isopen;
-    time_t           lastpacket;
-    MPEGStreamData  *_mpeg_stream_data;
-    TSStats          _ts_stats;  
 
     static const int kBroadcastChannel;
-    static const int kTimeoutInSeconds;
     static const int kConnectionP2P;
     static const int kConnectionBroadcast;
+    static const uint kMaxBufferedPackets;
 };
 
 #endif

@@ -26,3 +26,5 @@ DEPENDPATH += ../../libs/libmyth ../../libs/libmythtv ../../libs/libsavcodec
 DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libmythui
 
 CONFIG += opengl
+
+macx:using_firewire:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices

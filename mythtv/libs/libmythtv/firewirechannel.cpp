@@ -44,8 +44,7 @@ static bool is_supported(const QString &model)
 
 FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts,
                                  TVRec *parent)
-    : ChannelBase(parent), fw_opts(firewire_opts),
-      fwhandle(NULL),      isopen(false)
+    : FirewireChannelBase(parent), fw_opts(firewire_opts), fwhandle(NULL)
 {
 }
 
@@ -54,16 +53,8 @@ FirewireChannel::~FirewireChannel(void)
     Close();
 }
 
-bool FirewireChannel::SetChannelByString(const QString &chan)
+bool FirewireChannel::SetChannelByNumber(int channel)
 {
-    inputs[currentInputID]->startChanNum = chan;
-    curchannelname = chan;
-
-    InputMap::const_iterator it = inputs.find(currentInputID);
-
-    if (!(*it)->externalChanger.isEmpty())
-        return ChangeExternalChannel(chan);
-
     // Change channel using internal changer
 
     if (!is_supported(fw_opts.model))
@@ -74,10 +65,6 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
         return false;
     }
 
-    if (!isopen)
-        return false;
-
-    int channel = chan.toInt();
     int dig[3];
     dig[0] = (channel % 1000) / 100;
     dig[1] = (channel % 100)  / 10;
@@ -140,13 +127,6 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
 
 bool FirewireChannel::Open(void)
 {
-    if (!InitializeInputs())
-        return false;
-
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (!(*it)->externalChanger.isEmpty())
-        return true;
-
     if (!is_supported(fw_opts.model))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -167,28 +147,11 @@ bool FirewireChannel::Open(void)
     VERBOSE(VB_CHANNEL, LOC + "Allocated raw1394 handle " +
             QString("for port %1").arg(fw_opts.port));
 
-    isopen = true;
     return true;
 }
 
-void FirewireChannel::Close(void)
+void FirewireChannel::CloseFirewire(void)
 {
-    // Close channel
-    if (isopen)
-    {
-        VERBOSE(VB_CHANNEL, LOC + "Releasing raw1394 handle");
-        raw1394_destroy_handle(fwhandle);
-        isopen = false;
-    }
-}
-
-bool FirewireChannel::SwitchToInput(const QString &input, const QString &chan)
-{
-    int inputNum = GetInputByName(input);
-    if (inputNum < 0)
-        return false;
-
-    // input switching code would go here
-
-    return SetChannelByString(chan);
+    VERBOSE(VB_CHANNEL, LOC + "Releasing raw1394 handle");
+    raw1394_destroy_handle(fwhandle);
 }

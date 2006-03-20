@@ -14,6 +14,8 @@
 #include "programinfo.h"
 #include "tv.h"
 
+#include "mythconfig.h"
+
 class QSocket;
 class NuppelVideoRecorder;
 class RingBuffer;

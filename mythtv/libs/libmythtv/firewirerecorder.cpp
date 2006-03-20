@@ -23,9 +23,9 @@ using namespace std;
 #define LOC_ERR QString("FireRec, Error: ")
 
 const int FirewireRecorder::kBroadcastChannel    = 63;
-const int FirewireRecorder::kTimeoutInSeconds    = 15;
 const int FirewireRecorder::kConnectionP2P       = 0;
 const int FirewireRecorder::kConnectionBroadcast = 1;
+const uint FirewireRecorder::kMaxBufferedPackets = 8000;
 
 // callback function for libiec61883
 int fw_tspacket_handler(unsigned char *tspacket, int /*len*/,
@@ -59,46 +59,10 @@ static QString speed_to_string(uint speed)
     return QString("%1Mbps").arg(speeds[speed]);
 }
 
-FirewireRecorder::FirewireRecorder(TVRec *rec)
-    : DTVRecorder(rec, "FirewireRecorder"),
-      fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1),
-      fwfd(-1),       fwconnection(kConnectionP2P),
-      fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0),
-      fwhandle(NULL), fwmpeg(NULL),  isopen(false), lastpacket(0),
-      _mpeg_stream_data(NULL)
-{
-    _mpeg_stream_data = new MPEGStreamData(1, true);
-    connect(_mpeg_stream_data,
-            SIGNAL(UpdatePATSingleProgram(ProgramAssociationTable*)),
-            this, SLOT(WritePAT(ProgramAssociationTable*)));
-    connect(_mpeg_stream_data,
-            SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)),
-            this, SLOT(WritePMT(ProgramMapTable*)));
-}
-
-FirewireRecorder::~FirewireRecorder()
-{
-   Close();
-   if (_mpeg_stream_data)
-   {
-       delete _mpeg_stream_data;
-       _mpeg_stream_data = NULL;
-   }
-}
-
-void FirewireRecorder::deleteLater(void)
-{
-    Close();
-    DTVRecorder::deleteLater();
-}
-
 bool FirewireRecorder::Open(void)
 {
      if (isopen)
          return true;
-
-     if (!_mpeg_stream_data)
-         return false;
 
      VERBOSE(VB_RECORD, LOC +
              QString("Initializing Port: %1, Node: %2, Speed: %3")
@@ -157,12 +121,14 @@ bool FirewireRecorder::Open(void)
          return false;
      }
 
-     // Set buffer size
+     // Set buffered packets size
      size_t buffer_size = gContext->GetNumSetting("HDRingbufferSize",
                                                   50 * TSPacket::SIZE);
-     iec61883_mpeg2_set_buffers(fwmpeg, buffer_size / 2);
+     size_t buffered_packets = min(buffer_size / 4, kMaxBufferedPackets); 
+     iec61883_mpeg2_set_buffers(fwmpeg, buffered_packets);
      VERBOSE(VB_IMPORTANT, LOC +
-             QString("Buffer size %1 KB").arg(buffer_size));
+             QString("Buffered packets %1 (%2 KB)"). 
+	             arg(buffered_packets).arg(buffered_packets * 4));
 
      // Set speed if needed.
      // Probably shouldn't even allow user to set,
@@ -186,17 +152,6 @@ bool FirewireRecorder::Open(void)
      fwfd = raw1394_get_fd(fwhandle);
 
      return isopen = true;
-}
-
-void FirewireRecorder::SetStreamData(MPEGStreamData *stream_data)
-{
-    if (stream_data == _mpeg_stream_data)
-        return;
-
-    MPEGStreamData *old_data = _mpeg_stream_data;
-    _mpeg_stream_data = stream_data;
-    if (old_data)
-        delete old_data;
 }
 
 void FirewireRecorder::Close(void)
@@ -223,144 +178,33 @@ void FirewireRecorder::Close(void)
     raw1394_destroy_handle(fwhandle);
 }
 
-void FirewireRecorder::StartRecording(void)
+void FirewireRecorder::grab_frames()
 {
     struct timeval tv;
     fd_set rfds;
 
-    VERBOSE(VB_RECORD, LOC + "StartRecording");
+    FD_ZERO(&rfds); 
+    FD_SET(fwfd, &rfds); 
+    tv.tv_sec = kTimeoutInSeconds; 
+    tv.tv_usec = 0;
 
-    if (!Open())
-    {
-        _error = true;
-        return;
+    if (select(fwfd + 1, &rfds, NULL, NULL, &tv)  <= 0) 
+    { 
+        VERBOSE(VB_IMPORTANT, LOC + 
+                QString("No Input in %1 seconds [P:%2 N:%3] (select)") 
+                .arg(kTimeoutInSeconds).arg(fwport).arg(fwnode)); 
+        return false; 
     }
 
-    _request_recording = true;
-    _recording = true;
-
-    iec61883_mpeg2_recv_start(fwmpeg,fwchannel);
-    lastpacket = time(NULL);
-    while (_request_recording)
+    int ret = raw1394_loop_iterate(fwhandle); 
+    if (ret)
     {
-       if (PauseAndWait())
-           continue;
-
-       if (time(NULL) - lastpacket > kTimeoutInSeconds)
-       {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    QString("No Input in %1 seconds [P:%2 N:%3] (time)")
-                    .arg(kTimeoutInSeconds).arg(fwport).arg(fwnode));
-
-            iec61883_mpeg2_recv_stop(fwmpeg);
-            _error = true;
-            return;
-       }
-
-       FD_ZERO(&rfds);
-       FD_SET(fwfd, &rfds);
-       tv.tv_sec = kTimeoutInSeconds;
-       tv.tv_usec = 0;
-
-       if (select(fwfd + 1, &rfds, NULL, NULL, &tv) > 0)
-       {
-           int ret = raw1394_loop_iterate(fwhandle);
-           if (ret)
-           {
-               VERBOSE(VB_IMPORTANT, LOC_ERR + "libraw1394_loop_iterate() " +
-                       QString("returned %1").arg(ret));
-
-               iec61883_mpeg2_recv_stop(fwmpeg);
-               _error = true;
-               return;	
-           }
-       }
-       else
-       {
-           VERBOSE(VB_IMPORTANT, LOC +
-                   QString("No Input in %1 seconds [P:%2 N:%3] (select)")
-                   .arg(kTimeoutInSeconds).arg(fwport).arg(fwnode));
-
-           iec61883_mpeg2_recv_stop(fwmpeg);
-           // to bad setting _error does nothing once recording has started..
-           _error = true;
-           return;
-       }
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "libraw1394_loop_iterate() " + 
+                QString("returned %1").arg(ret)); 
+        return false;
     }
 
-    iec61883_mpeg2_recv_stop(fwmpeg);
-
-    VERBOSE(VB_IMPORTANT, QString("Firewire: Total dropped packets %1")
-            .arg(iec61883_mpeg2_get_dropped(fwmpeg)));
-
-    FinishRecording();
-    _recording = false;
-}
-
-void FirewireRecorder::WritePAT(ProgramAssociationTable *pat)
-{
-    if (!pat)
-        return;
-
-    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-    pat->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader())));
-}
-
-void FirewireRecorder::WritePMT(ProgramMapTable *pmt)
-{
-    if (!pmt)
-        return;
-
-    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pmt->tsheader())));
-}
-
-void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
-{
-    if (tspacket.TransportError())
-        return;
-
-    if (tspacket.ScramplingControl())
-        return;
-
-    if (tspacket.HasAdaptationField())
-        StreamData()->HandleAdaptationFieldControl(&tspacket);
-
-    if (tspacket.HasPayload())
-    {
-        const unsigned int lpid = tspacket.PID();
-
-        // Pass or reject packets based on PID, and parse info from them
-        if (lpid == StreamData()->VideoPIDSingleProgram())
-        {
-            _buffer_packets = !FindKeyframes(&tspacket);
-            BufferedWrite(tspacket);
-        }
-        else if (StreamData()->IsAudioPID(lpid))
-            BufferedWrite(tspacket);
-        else if (StreamData()->IsListeningPID(lpid))
-            StreamData()->HandleTSTables(&tspacket);
-        else if (StreamData()->IsWritingPID(lpid))
-            BufferedWrite(tspacket);
-    }
-
-    lastpacket = time(NULL);
-    _ts_stats.IncrTSPacketCount();
-    if (0 == _ts_stats.TSPacketCount()%1000000)
-        VERBOSE(VB_RECORD, _ts_stats.toString());
-}
-
-void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
-                                             const QString &videodev,
-                                             const QString &audiodev,
-                                             const QString &vbidev)
-{
-    (void)videodev;
-    (void)audiodev;
-    (void)vbidev;
-    (void)profile;
+    return true;
 }
 
 void FirewireRecorder::SetOption(const QString &name, const QString &value)
@@ -402,29 +246,4 @@ void FirewireRecorder::SetOption(const QString &name, int value)
         }
 	fwconnection = value;
     }
-}
-
-// documented in recorderbase.cpp
-bool FirewireRecorder::PauseAndWait(int timeout)
-{
-    if (request_pause)
-    {
-        if (!paused)
-        {
-            iec61883_mpeg2_recv_stop(fwmpeg);
-            paused = true;
-            pauseWait.wakeAll();
-            if (tvrec)
-                tvrec->RecorderPaused();
-        }
-        unpauseWait.wait(timeout);
-    }
-
-    if (!request_pause && paused)
-    {
-        iec61883_mpeg2_recv_start(fwmpeg, fwchannel);
-        paused = false;
-    }
-
-    return paused;
 }

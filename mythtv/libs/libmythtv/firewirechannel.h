@@ -11,33 +11,32 @@
 
 #include <qstring.h>
 #include "tv_rec.h"
-#include "channelbase.h"
+#include "firewirechannelbase.h"
 #include <libavc1394/avc1394.h>
 
 using namespace std;
 
-class FirewireChannel : public ChannelBase
+class FirewireChannel : public FirewireChannelBase
 {
   public:
     FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
-    bool Open(void);
-    void Close(void);
+    bool OpenFirewire(void); 
+    void CloseFirewire(void); 
 
     // Sets
-    bool SetChannelByString(const QString &chan);
-    void SetExternalChanger(void);    
+    void SetExternalChanger(void);
+    bool SetChannelByNumber(int channel);
 
     // Gets
     bool IsOpen(void) const { return isopen; }
     QString GetDevice(void) const
         { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
 
-    // Commands
-    bool SwitchToInput(const QString &inputname, const QString &chan);
-    bool SwitchToInput(int newcapchannel, bool setstarting)
-        { (void)newcapchannel; (void)setstarting; return false; }
+  private:
+    bool OpenFirewire();
+    void CloseFirewire();
 
   private:
     FireWireDBOptions  fw_opts;

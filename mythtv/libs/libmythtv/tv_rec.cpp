@@ -59,8 +59,13 @@ using namespace std;
 #endif
 
 #ifdef USING_FIREWIRE
+#ifdef CONFIG_DARWIN
+#include "darwinfirewirerecorder.h"
+#include "darwinfirewirechannel.h"
+#else 
 #include "firewirerecorder.h"
 #include "firewirechannel.h"
+#endif 
 #endif
 
 #ifdef USING_DBOX2
@@ -156,7 +161,11 @@ bool TVRec::CreateChannel(const QString &startchannel)
     else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
+# ifdef CONFIG_DARWIN
+        channel = new DarwinFirewireChannel(fwOpt, this);
+# else 
         channel = new FirewireChannel(fwOpt, this);
+# endif
         if (!channel->Open())
             return false;
         InitChannel(genOpt.defaultinput, startchannel);
@@ -827,12 +836,16 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
+# ifdef CONFIG_DARWIN
+        recorder = new DarwinFirewireRecorder(this, this->channel);
+# else 
         recorder = new FirewireRecorder(this);
         recorder->SetOption("port",       fwOpt.port);
         recorder->SetOption("node",       fwOpt.node);
         recorder->SetOption("speed",      fwOpt.speed);
         recorder->SetOption("model",      fwOpt.model);
         recorder->SetOption("connection", fwOpt.connection);
+# endif // !CONFIG_DARWIN 
 #endif // USING_FIREWIRE
     }
     else if (genOpt.cardtype == "DBOX2")
