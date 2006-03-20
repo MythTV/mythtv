@@ -263,8 +263,8 @@ static uint delete_overlapping_in_db(
         VERBOSE(VB_EIT, QString("New: %1 %2 %3: %4")
                 .arg(event.StartTime.toString(timeFmtDB2))
                 .arg(event.EndTime.toString(timeFmtDB2))
-                .arg(event.Event_Name)
-                .arg(event.Event_Subtitle));
+                .arg(event.Event_Name.utf8())
+                .arg(event.Event_Subtitle.utf8()));
 
         // Delete the old program row
         delq.bindValue(":CHANID",    chanid);
@@ -305,7 +305,7 @@ static bool has_program(MSqlQuery &query, int chanid, const Event &event)
         return true; // return true on error
 
     QString dbDescription = query.value(1).toString();
-    if (event.Description.length() > dbDescription.length())
+    if (event.Description.utf8().length() > dbDescription.length())
     {
         VERBOSE(VB_EIT, "EITHelper: Update DB description " +
                 QString("oldsize=%1 newsize=%2")
@@ -314,12 +314,14 @@ static bool has_program(MSqlQuery &query, int chanid, const Event &event)
         return false; // description needs to be updated
     }
 
-    QString eSubtitle = event.Event_Subtitle.lower();
+    QString eSubtitle = event.Event_Subtitle.utf8().lower();
     if (eSubtitle.isEmpty())
         return query.size(); // assume subtitle would be the same
 
     QString dbSubtitle = query.value(0).toString().lower();
 
+    if (dbSubtitle != eSubtitle)
+        VERBOSE(VB_EIT, "EITHelper: Subtitles are different");
     return dbSubtitle == eSubtitle; // return true on match...
 }
 
