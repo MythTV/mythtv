@@ -53,10 +53,6 @@ macx {
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon -framework OpenGL
 
-    # Duplication of source with libmyth (e.g. oldsettings.cpp)
-    # means that the linker complains, so we have to ignore duplicates 
-    QMAKE_LFLAGS_SHLIB += -multiply_defined suppress
-
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xCC000000
 }
 
