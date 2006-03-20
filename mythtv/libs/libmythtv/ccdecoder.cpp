@@ -11,7 +11,8 @@ using namespace std;
 #define DEBUG_XDS 0
 
 CCDecoder::CCDecoder(CCReader *ccr)
-    : reader(ccr), rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
+    : reader(ccr),                  ignore_time_code(false),
+      rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
       vps_l(0),
       wss_flags(0),                 wss_valid(false),
       xds_current_packet(0),
@@ -132,7 +133,10 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
 
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
-//    printf("%10d:  %02x %02x\n", tc, b1, b2);
+    VERBOSE(VB_VBI, QString("Format CC @%1/%2 = %3 %4")
+                    .arg(tc).arg(field)
+                    .arg((data&0xff), 2, 16)
+                    .arg((data&0xff00)>>8, 2, 16));
     if (ccmode[field] >= 0)
     {
         mode = field << 2 |
@@ -146,50 +150,8 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
         len = 0;
     }
 
-    // bttv-0.9 VBI reads are pretty reliable (1 read/33367us).
-    // bttv-0.7 reads don't seem to work as well so if read intervals
-    // vary from this, be more conservative in detecting duplicate
-    // CC codes.
-    int dup_text_fudge, dup_ctrl_fudge;
-    if (badvbi[field] < 100 && b1 != 0 && b2 != 0)
-    {
-        int d = tc - lasttc[field];
-        if (d < 25 || d > 42)
-            badvbi[field]++;
-        else if (badvbi[field] > 0)
-            badvbi[field]--;
-    }
-    if (badvbi[field] < 4)
-    {
-        // this should pick up all codes
-        dup_text_fudge = -2;
-        // this should pick up 1st, 4th, 6th, 8th, ... codes
-        dup_ctrl_fudge = 33 - 4;
-    }
-    else
-    {
-        dup_text_fudge = 4;
-        dup_ctrl_fudge = 33 - 4;
-    }
-
-    if (data == lastcode[field])
-    {
-        int false_dup = 1;
-        if ((b1 & 0x70) == 0x10)
-        {
-            if (tc > (lastcodetc[field] + 67 + dup_ctrl_fudge))
-                false_dup = 0;
-        }
-        else if (b1)
-        {
-            // text, XDS
-            if (tc > (lastcodetc[field] + 33 + dup_text_fudge))
-                false_dup = 0;
-        }
-
-        if (false_dup)
-            goto skip;
-    }
+    if (FalseDup(tc, field, data))
+        goto skip;
 
     DecodeXDS(field, b1, b2);
 
@@ -429,7 +391,8 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
                             style[mode] = CC_STYLE_ROLLUP;
                             break;
                         case 0x2C:      //erase displayed memory
-                            if ((tc - lastclr[mode]) > 5000 ||
+                            if (ignore_time_code ||
+                                (tc - lastclr[mode]) > 5000 ||
                                 lastclr[mode] == 0)
                                 // don't overflow the frontend with
                                 // too many redundant erase codes
@@ -463,7 +426,8 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
                                     // flush
                                     BufferCC(mode, len, 0);
                             }
-                            else if ((tc - lastclr[mode]) > 5000 ||
+                            else if (ignore_time_code ||
+                                     (tc - lastclr[mode]) > 5000 ||
                                      lastclr[mode] == 0)
                                 // clear and flush
                                 BufferCC(mode, len, 1);
@@ -516,8 +480,8 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
     for (mode = field*4; mode < (field*4 + 4); mode++)
     {
         len = ccbuf[mode].length();
-        if (((tc - timecode[mode]) > 100) &&
-            (style[mode] != CC_STYLE_POPUP) && len)
+        if ((ignore_time_code || ((tc - timecode[mode]) > 100)) &&
+             (style[mode] != CC_STYLE_POPUP) && len)
         {
             // flush unfinished line if waiting too long
             // in paint-on or scroll-up mode
@@ -535,6 +499,69 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
         lastcodetc[field] = tc;
     }
     lasttc[field] = tc;
+}
+
+int CCDecoder::FalseDup(int tc, int field, int data)
+{
+    int b1, b2;
+
+    b1 = data & 0x7f;
+    b2 = (data >> 8) & 0x7f;
+
+    if (ignore_time_code)
+    {
+        // just suppress duplicate control codes
+        if ((data == lastcode[field]) &&
+            ((b1 & 0x70) == 0x10))
+            return 1;
+        else
+            return 0;
+    }
+
+    // bttv-0.9 VBI reads are pretty reliable (1 read/33367us).
+    // bttv-0.7 reads don't seem to work as well so if read intervals
+    // vary from this, be more conservative in detecting duplicate
+    // CC codes.
+    int dup_text_fudge, dup_ctrl_fudge;
+    if (badvbi[field] < 100 && b1 != 0 && b2 != 0)
+    {
+        int d = tc - lasttc[field];
+        if (d < 25 || d > 42)
+            badvbi[field]++;
+        else if (badvbi[field] > 0)
+            badvbi[field]--;
+    }
+    if (badvbi[field] < 4)
+    {
+        // this should pick up all codes
+        dup_text_fudge = -2;
+        // this should pick up 1st, 4th, 6th, 8th, ... codes
+        dup_ctrl_fudge = 33 - 4;
+    }
+    else
+    {
+        dup_text_fudge = 4;
+        dup_ctrl_fudge = 33 - 4;
+    }
+
+    if (data == lastcode[field])
+    {
+        if ((b1 & 0x70) == 0x10)
+        {
+            if (tc > (lastcodetc[field] + 67 + dup_ctrl_fudge))
+                return 0;
+        }
+        else if (b1)
+        {
+            // text, XDS
+            if (tc > (lastcodetc[field] + 33 + dup_text_fudge))
+                return 0;
+        }
+
+        return 1;
+    }
+
+    return 0;
 }
 
 void CCDecoder::ResetCC(int mode)
@@ -587,6 +614,41 @@ void CCDecoder::BufferCC(int mode, int len, int clr)
     }
     else
         len = sizeof(ccsubtitle);
+
+    VERBOSE(VB_VBI, QString("### %1 %2 %3 %4 %5 %6 %7 -")
+                           .arg(timecode[mode], 10)
+                           .arg(row[mode], 2).arg(rowcount[mode])
+                           .arg(style[mode]).arg(f, 2, 16)
+                           .arg(clr).arg(len, 3));
+    if ((print_verbose_messages & VB_VBI) != 0
+        && len)
+    {
+        QString dispbuf = QString::fromUtf8(tmpbuf, len);
+        VERBOSE(VB_VBI, QString("%1 '").arg(timecode[mode], 10));
+        QString vbuf = "";
+        unsigned int i = 0;
+        while (i < dispbuf.length()) {
+            QChar cp = dispbuf.at(i);
+            switch (cp.unicode())
+            {
+                case 0x2120 :  vbuf += "(SM)"; break;
+                case 0x2122 :  vbuf += "(TM)"; break;
+                case 0x2014 :  vbuf += "(--)"; break;
+                case 0x201C :  vbuf += "``"; break;
+                case 0x201D :  vbuf += "''"; break;
+                case 0x250C :  vbuf += "|-"; break;
+                case 0x2510 :  vbuf += "-|"; break;
+                case 0x2514 :  vbuf += "|_"; break;
+                case 0x2518 :  vbuf += "_|"; break;
+                case 0x2588 :  vbuf += "[]"; break;
+                case 0x266A :  vbuf += "o/~"; break;
+                case '\b'   :  vbuf += "\\b"; break;
+                default     :  vbuf += cp.latin1();
+            }
+            i++;
+        }
+        VERBOSE(VB_VBI, vbuf);
+    }
 
     reader->AddTextData(rbuf, len, timecode[mode], 'C');
 

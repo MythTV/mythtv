@@ -284,6 +284,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
+    ccd608->SetIgnoreTimecode(true);
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);

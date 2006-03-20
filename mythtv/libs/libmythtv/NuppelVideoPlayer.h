@@ -25,7 +25,7 @@ extern "C" {
 }
 using namespace std;
 
-#define MAXTBUFFER 21
+#define MAXTBUFFER 60
 
 #ifndef LONG_LONG_MIN
 #define LONG_LONG_MIN LLONG_MIN

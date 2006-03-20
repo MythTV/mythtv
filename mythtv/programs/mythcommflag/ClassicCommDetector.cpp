@@ -285,6 +285,7 @@ bool ClassicCommDetector::go()
                 "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
+    nvp->SetCaptionsEnabled(false);
 
     if ((commDetectMethod & COMM_DETECT_LOGO) &&
         ((nvp->GetLength() == 0) ||

@@ -41,9 +41,12 @@ class CCDecoder
 
     void FormatCC(int tc, int code1, int code2);
     void FormatCCField(int tc, int field, int data);
+    int FalseDup(int tc, int field, int data);
 
     void DecodeVPS(const unsigned char *buf);
     void DecodeWSS(const unsigned char *buf);
+
+    void SetIgnoreTimecode(bool val) { ignore_time_code = val; }
 
     uint GetRatingSystems(void) const { return xds_rating_systems; }
     uint GetRating(uint i) const { return xds_rating[i&3]&7; }
@@ -66,6 +69,8 @@ class CCDecoder
     void DecodeXDS(int field, int b1, int b2);
 
     CCReader *reader;
+
+    bool ignore_time_code;
 
     // per-field
     int badvbi[2];
