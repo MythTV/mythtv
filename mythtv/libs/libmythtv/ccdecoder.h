@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#include <vector>
+using namespace std;
+
 #include <qstringlist.h>
 
 #include "format.h"
@@ -13,6 +16,21 @@ class CCReader
     virtual ~CCReader() { }
     virtual void AddTextData(unsigned char *buf, int len,
                              long long timecode, char type) = 0;
+};
+
+enum
+{
+    kHasMPAA       = 0x1,
+    kHasTPG        = 0x2,
+    kHasCanEnglish = 0x4,
+    kHasCanFrench  = 0x8,
+};
+enum
+{
+    kRatingMPAA = 0,
+    kRatingTPG,
+    kRatingCanEnglish,
+    kRatingCanFrench,
 };
 
 class CCDecoder
@@ -27,12 +45,18 @@ class CCDecoder
     void DecodeVPS(const unsigned char *buf);
     void DecodeWSS(const unsigned char *buf);
 
+    uint GetRatingSystems(void) const { return xds_rating_systems; }
+    uint GetRating(uint i) const { return xds_rating[i&3]&7; }
+    QString GetRatingString(uint i) const;
+
   private:
     QChar CharCC(int code) const { return stdchar[code]; }
     void ResetCC(int mode);
     void BufferCC(int mode, int len, int clr);
     int NewRowCC(int mode, int len);
 
+    QString DecodeXDSString(const vector<unsigned char>&,
+                            uint string, uint end) const;
     void DecodeXDSStartTime(int b1, int b2);
     void DecodeXDSProgramLength(int b1, int b2);
     void DecodeXDSProgramName(int b1, int b2);
@@ -82,14 +106,29 @@ class CCDecoder
     bool            wss_valid;
 
     // XDS data
-    bool            xds_vchip;
-    bool            xds_ptype;
-    bool            xds_plength;
-    bool            xds_pname;
-    bool            xds_stime;
-    uint            xds_cnt;
-    QString         xds_ProgramName;
-    int             xds_buf[32];
+    enum
+    {
+        kXDSStartTime = 0x0101,
+        kXDSProgLen   = 0x0102,
+        kXDSProgName  = 0x0103,
+        kXDSProgType  = 0x0104,
+        kXDSVChip     = 0x0105,
+        kXDSNetName   = 0x8501,
+        kXDSNetCall   = 0x8502,
+        kXDSNetCallX  = 0x0501, // reverse engineered
+        kXDSNetNameX  = 0x0502, // reverse engineered
+        kXDSIgnore    = 0xFFFF,
+    };
+    uint            xds_current_packet;
+    vector<unsigned char> xds_buf;
+
+    uint            xds_rating_systems;
+    uint            xds_rating[4];
+    QString         xds_program_name;
+    QString         xds_net_call;
+    QString         xds_net_call_x;
+    QString         xds_net_name;
+    QString         xds_net_name_x;
 };
 
 #endif
