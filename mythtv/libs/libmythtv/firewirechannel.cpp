@@ -125,7 +125,7 @@ bool FirewireChannel::SetChannelByNumber(int channel)
     return true;
 }
 
-bool FirewireChannel::Open(void)
+bool FirewireChannel::OpenFirewire(void)
 {
     if (!is_supported(fw_opts.model))
     {

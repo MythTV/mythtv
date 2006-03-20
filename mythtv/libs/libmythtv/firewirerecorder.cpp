@@ -178,7 +178,7 @@ void FirewireRecorder::Close(void)
     raw1394_destroy_handle(fwhandle);
 }
 
-void FirewireRecorder::grab_frames()
+bool FirewireRecorder::grab_frames()
 {
     struct timeval tv;
     fd_set rfds;
