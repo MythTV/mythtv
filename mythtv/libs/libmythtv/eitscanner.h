@@ -24,10 +24,12 @@ class EITScanner
     EITScanner();
     ~EITScanner() { TeardownAll(); }
 
-    void StartPassiveScan(DVBChannel*, DVBSIParser*);
+    void StartPassiveScan(DVBChannel*, DVBSIParser*, bool ignore_source);
     void StopPassiveScan(void);
 
-    void StartActiveScan(TVRec*, uint max_seconds_per_source);
+    void StartActiveScan(TVRec*, uint max_seconds_per_source,
+                         bool ignore_source);
+
     void StopActiveScan(void);        
 
   private:
@@ -49,6 +51,8 @@ class EITScanner
     uint             activeScanTrigTime;
     QStringList      activeScanChannels;
     QStringList::iterator activeScanNextChan;
+
+    bool             ignore_source;
 
     static QMutex    resched_lock;
     static QDateTime resched_next_time;

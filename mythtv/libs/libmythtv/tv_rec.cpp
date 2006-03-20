@@ -1111,7 +1111,10 @@ void TVRec::CreateSIParser(MPEGStreamData *stream_data, int program_num)
     }
 
     if (scanner)
-        scanner->StartPassiveScan(dvbc, dvbsiparser);
+    {
+        uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
+        scanner->StartPassiveScan(dvbc, dvbsiparser, ignore);
+    }
 #endif // USING_DVB_EIT
 
 #endif // USING_DVB
@@ -1339,7 +1342,8 @@ void TVRec::RunTV(void)
             else
             {
                 uint ttMin = gContext->GetNumSetting("EITTransportTimeout", 5);
-                scanner->StartActiveScan(this, ttMin * 60);
+                uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
+                scanner->StartActiveScan(this, ttMin * 60, ignore);
                 SetFlags(kFlagEITScannerRunning);
                 eitScanStartTime = QDateTime::currentDateTime().addYears(1);
             }

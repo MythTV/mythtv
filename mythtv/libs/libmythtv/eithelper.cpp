@@ -6,7 +6,7 @@
 
 const uint EITHelper::kChunkSize = 20;
 
-static int get_chan_id_from_db(int tid_db, const Event&);
+static int get_chan_id_from_db(int tid_db, const Event&, bool ignore_source);
 static uint update_eit_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
 static uint delete_overlapping_in_db(MSqlQuery&, MSqlQuery&,
                                      int, const Event&);
@@ -65,7 +65,7 @@ uint EITHelper::GetListSize(void) const
  *  \param mplexid multiplex we are inserting events for.
  *  \return Returns number of events inserted into DB.
  */
-uint EITHelper::ProcessEvents(uint sourceid)
+uint EITHelper::ProcessEvents(uint sourceid, bool ignore_source)
 {
     QMutexLocker locker(&eitList_lock);
 
@@ -79,7 +79,7 @@ uint EITHelper::ProcessEvents(uint sourceid)
         eitList.pop_front();
 
         eitList_lock.unlock();
-        insertCount += UpdateEITList(sourceid, *events);
+        insertCount += UpdateEITList(sourceid, *events, ignore_source);
         QList_Events::iterator it = events->begin();
         for (; it != events->end(); ++it)
             delete *it;
@@ -97,7 +97,7 @@ uint EITHelper::ProcessEvents(uint sourceid)
         events->erase(events->begin(), subset_end);
         
         eitList_lock.unlock();
-        insertCount += UpdateEITList(sourceid, subset);
+        insertCount += UpdateEITList(sourceid, subset, ignore_source);
         QList_Events::iterator it = subset.begin();
         for (; it != subset.end(); ++it)
             delete *it;
@@ -112,7 +112,8 @@ uint EITHelper::ProcessEvents(uint sourceid)
     return insertCount;
 }
 
-int EITHelper::GetChanID(uint sourceid, const Event &event) const
+int EITHelper::GetChanID(uint sourceid, const Event &event,
+                         bool ignore_source) const
 {
     unsigned long long srv;
     srv  = ((unsigned long long) sourceid);
@@ -122,11 +123,15 @@ int EITHelper::GetChanID(uint sourceid, const Event &event) const
 
     int chanid = srv_to_chanid[srv];
     if (chanid == 0)
-        srv_to_chanid[srv] = chanid = get_chan_id_from_db(sourceid, event);
+    {
+        srv_to_chanid[srv] = chanid = get_chan_id_from_db(
+            sourceid, event, ignore_source);
+    }
     return chanid;
 }
 
-uint EITHelper::UpdateEITList(uint sourceid, const QList_Events &events) const
+uint EITHelper::UpdateEITList(uint sourceid, const QList_Events &events,
+                              bool ignore_source) const
 {
     MSqlQuery query1(MSqlQuery::InitCon());
     MSqlQuery query2(MSqlQuery::InitCon());
@@ -136,14 +141,15 @@ uint EITHelper::UpdateEITList(uint sourceid, const QList_Events &events) const
 
     QList_Events::const_iterator e = events.begin();
     for (; e != events.end(); ++e)
-        if ((chanid = GetChanID(sourceid, **e)) > 0)
+        if ((chanid = GetChanID(sourceid, **e, ignore_source)) > 0)
             counter += update_eit_in_db(query1, query2, chanid, **e);
 
     return counter;
 }
 
 // Figure out the chanid for this channel
-static int get_chan_id_from_db(int sourceid, const Event &event)
+static int get_chan_id_from_db(int sourceid, const Event &event,
+                               bool ignore_source)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -160,19 +166,24 @@ static int get_chan_id_from_db(int sourceid, const Event &event)
     else
     {
         // DVB Link to chanid
-        query.prepare(
+        QString qstr =
             "SELECT chanid, useonairguide "
             "FROM channel, dtv_multiplex "
             "WHERE serviceid        = :SERVICEID   AND "
             "      networkid        = :NETWORKID   AND "
             "      transportid      = :TRANSPORTID AND "
-            "      channel.sourceid = :SOURCEID    AND "
-            "      channel.mplexid = dtv_multiplex.mplexid");
+            "      channel.mplexid  = dtv_multiplex.mplexid";
+
+        if (!ignore_source)
+            qstr += " AND channel.sourceid = :SOURCEID";
+
+        query.prepare(qstr);
         query.bindValue(":SERVICEID",   event.ServiceID);
         query.bindValue(":NETWORKID",   event.NetworkID);
         query.bindValue(":TRANSPORTID", event.TransportID);
     }
-    query.bindValue(":SOURCEID", sourceid);
+    if (!ignore_source)
+        query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Looking up chanID", query);
@@ -181,6 +192,15 @@ static int get_chan_id_from_db(int sourceid, const Event &event)
         // Check to see if we are interseted in this channel
         bool useOnAirGuide = query.value(1).toBool();
         return (useOnAirGuide) ? query.value(0).toInt() : -1;        
+    }
+
+    if (ignore_source)
+    {
+        VERBOSE(VB_EIT, "EITHelper: " +
+                QString("chanid not found for service %1 on network %2,")
+                .arg(event.ServiceID).arg(event.NetworkID) +
+                "\n\t\t\tso event updates were skipped.");
+        return -1;
     }
 
     VERBOSE(VB_EIT, "EITHelper: " +

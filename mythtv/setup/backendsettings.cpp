@@ -238,6 +238,21 @@ static GlobalCheckBox *MasterBackendOverride()
     return gc;
 };
 
+static GlobalCheckBox *EITIgnoresSource()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("EITIgnoresSource");
+    gc->setLabel(QObject::tr("Cross Source EIT"));
+    gc->setValue(false);
+    QString help = QObject::tr(
+        "If enabled, listings data collected on one Video Source will be "
+        "applied to the first matching DVB channel on any Video Source. "
+        "This is sometimes useful for DVB-S, but may insert bogus "
+        "data into any ATSC listings stored in the same database.");
+    gc->setHelpText(help);
+    return gc;
+};
+
+
 static GlobalSpinBox *WOLbackendReconnectWaitTime()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("WOLbackendReconnectWaitTime", 0, 1200, 5);
@@ -647,10 +662,15 @@ BackendSettings::BackendSettings() {
     group2->addChild(VbiFormat());
     group2->addChild(FreqTable());
     group2->addChild(TimeOffset());
-    group2->addChild(EITTransportTimeout());
     group2->addChild(MasterBackendOverride());
     group2->addChild(DeletesFollowLinks());
     addChild(group2);
+
+    VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);
+    group2a1->setLabel(QObject::tr("EIT Scanner Options"));                
+    group2a1->addChild(EITTransportTimeout());
+    group2a1->addChild(EITIgnoresSource());
+    addChild(group2a1);
 
     VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);
     group3->setLabel(QObject::tr("Shutdown/Wakeup Options"));

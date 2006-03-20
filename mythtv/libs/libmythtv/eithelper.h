@@ -25,14 +25,17 @@ class EITHelper : public QObject
 
     void ClearList(void);
     uint GetListSize(void) const;
-    uint ProcessEvents(uint sourceid);
+    uint ProcessEvents(uint sourceid, bool ignore_source);
 
   public slots:
     void HandleEITs(QMap_Events* events);
 
   private:
-    int  GetChanID(uint sourceid, const Event &event) const;
-    uint UpdateEITList(uint sourceid, const QList_Events &events) const;
+    int  GetChanID(uint sourceid, const Event &event,
+                   bool ignore_source) const;
+
+    uint UpdateEITList(uint sourceid, const QList_Events &events,
+                       bool ignore_source) const;
 
     QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock

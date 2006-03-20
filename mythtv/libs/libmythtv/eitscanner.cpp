@@ -82,7 +82,7 @@ void EITScanner::RunEventLoop(void)
             uint sourceid = channel->GetCurrentSourceID();
             if (sourceid && parser && eitHelper->GetListSize())
             {
-                eitCount += eitHelper->ProcessEvents(sourceid);
+                eitCount += eitHelper->ProcessEvents(sourceid, ignore_source);
                 t.start();
             }
         }
@@ -155,11 +155,17 @@ void EITScanner::RescheduleRecordings(void)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
  */
-void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser)
+void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
+                                  bool _ignore_source)
 {
     eitHelper->ClearList();
-    parser  = _parser;
-    channel = _channel;
+    parser        = _parser;
+    channel       = _channel;
+    ignore_source = _ignore_source;
+
+    if (ignore_source)
+        VERBOSE(VB_EIT, LOC + "EIT scan ignoring sourceid..");
+
     QObject::connect(parser,    SIGNAL(EventsReady(QMap_Events*)),
                      eitHelper, SLOT(HandleEITs(QMap_Events*)));
 }
@@ -176,9 +182,11 @@ void EITScanner::StopPassiveScan(void)
     parser  = NULL;
 }
 
-void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
+void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
+                                 bool _ignore_source)
 {
-    rec = _rec;
+    rec           = _rec;
+    ignore_source = _ignore_source;
 
     if (!activeScanChannels.size())
     {
