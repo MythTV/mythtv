@@ -1644,7 +1644,9 @@ void CaptureCardEditor::load()
 {
     clearSelections();
     addSelection(QObject::tr("(New capture card)"), "0");
-    addSelection(QObject::tr("(Delete all capture cards)"), "-1");
+    addSelection(QObject::tr("(Delete all capture cards on %1)")
+                 .arg(gContext->GetHostName()), "-1");
+    addSelection(QObject::tr("(Delete all capture cards)"), "-2");
     CaptureCard::fillSelections(this, true);
 }
 
@@ -1686,6 +1688,51 @@ void CaptureCardEditor::edit(void)
 {
     const int cardid = getValue().toInt();
     if (-1 == cardid)
+    {
+        int val = MythPopupBox::show2ButtonPopup(
+            gContext->GetMainWindow(), "",
+            tr("Are you sure you want to delete "
+               "ALL capture cards on %1?").arg(gContext->GetHostName()),
+            tr("Yes, delete capture cards"),
+            tr("No, don't"), 2);
+
+        if (0 == val)
+        {
+            MSqlQuery cards(MSqlQuery::InitCon());
+            MSqlQuery query(MSqlQuery::InitCon());
+
+            cards.prepare("SELECT cardid FROM capturecard "
+                          "WHERE hostname = :HOSTNAME;");
+            cards.bindValue(":HOSTNAME", gContext->GetHostName());
+
+            if (!cards.exec() || !cards.isActive())
+            {
+                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                    tr("Error getting list of cards for this host"),
+                    tr("Unable to delete capturecards for %1")
+                       .arg(gContext->GetHostName()));
+                MythContext::DBError("Selecting cardids for deletion", cards);
+                return;
+            }
+
+            while (cards.next())
+            {
+                int cardid = cards.value(0).toInt();
+
+                query.prepare("DELETE FROM capturecard "
+                              "WHERE cardid   = :CARDID OR "
+                              "      parentid = :CARDID");
+                query.bindValue(":CARDID", cardid);
+                query.exec();
+
+                query.prepare("DELETE FROM cardinput "
+                              "WHERE cardid = :CARDID");
+                query.bindValue(":CARDID", cardid);
+                query.exec();
+            }
+        }
+    }
+    else if (-2 == cardid)
     {
         int val = MythPopupBox::show2ButtonPopup(
             gContext->GetMainWindow(), "",
