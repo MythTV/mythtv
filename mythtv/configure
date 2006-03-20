@@ -2038,8 +2038,11 @@ if test x"$firewire_cable_box" = x"yes" ; then
     fi
     if test x"$darwin" == x"yes" ; then
         # This should pick the newest. e.g. FireWireSDK21 instead of 20
-        mac_avc=`ls -d /Developer/FireWireSDK*/Examples/AVCVideoServices \
-                 | tail -n 1`
+        # Unfortunately, the location keeps changing:
+        #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
+        #/Developer/FireWireSDK21/Examples/Framework
+        mac_avc=`find /Developer/FireWireSDK* -name Framework \
+                 | head -n 1`
         if test -d $mac_avc ; then
             firewire_cable_box="yes"
         else
