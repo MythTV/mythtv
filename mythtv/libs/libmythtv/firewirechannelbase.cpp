@@ -9,68 +9,49 @@
 #include "mythcontext.h"
 #include "firewirechannelbase.h"
 
-bool FirewireChannelBase::UseExternalChanger()
-{ 
-    return !externalChanger[currentcapchannel].isEmpty(); 
-}
-
-FirewireChannelBase::FirewireChannelBase(TVRec *parent)
-  : ChannelBase(parent), isopen(false)
-{
-	
-    isopen = false;
-    channelnames[0] = "MPEG2TS";
-}
-
-FirewireChannelBase::~FirewireChannelBase(void)
-{
-    this->Close();
-}
-
 bool FirewireChannelBase::SetChannelByString(const QString &chan)
 {
-     inputChannel[currentcapchannel] = chan;
-     curchannelname = chan;
+    inputs[currentInputID]->startChanNum = chan; 
+    curchannelname = chan;
 
-     if (this->UseExternalChanger())
-         return ChangeExternalChannel(chan);
-     else
-         return isopen && SetChannelByNumber(chan.toInt());
+    InputMap::const_iterator it = inputs.find(currentInputID);
+
+    if (!(*it)->externalChanger.isEmpty()) 
+        return ChangeExternalChannel(chan);
+
+    return isopen && SetChannelByNumber(chan.toInt());
 }
 
 bool FirewireChannelBase::Open()
 {
-    if (this->UseExternalChanger())
-    {
-        this->SetExternalChanger();
+    if (!InitializeInputs()) 
+        return false; 
+
+    InputMap::const_iterator it = inputs.find(currentInputID); 
+    if (!(*it)->externalChanger.isEmpty()) 
         return true;
-    }
-    else
+
+    if (!isopen)
     {
-        if (!this->isopen)
-            this->isopen = this->OpenFirewire();
-        return this->isopen;
+        isopen = OpenFirewire(); 
+        return isopen; 
     }
+    return true;
 }
 
 void FirewireChannelBase::Close()
 {
-    if (this->isopen)
+    if (isopen)
         CloseFirewire();
-    this->isopen = false;
+    isopen = false;
 }
     
-bool FirewireChannelBase::SwitchToInput(const QString &input, const QString &chan)
+bool FirewireChannelBase::SwitchToInput(const QString &input,
+                                        const QString &chan)
 {
-    currentcapchannel = 0;
-    if (channelnames.empty())
-       channelnames[currentcapchannel] = input;
+    int inputNum = GetInputByName(input); 
+    if (inputNum < 0) 
+        return false;
 
     return SetChannelByString(chan);
-}
-
-void FirewireChannelBase::SetExternalChanger(void)
-{	
-    RetrieveInputChannels(inputChannel, inputTuneTo,
-                          externalChanger, sourceid);
 }

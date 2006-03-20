@@ -8,10 +8,12 @@
 #define FIREWIRERECORDERBASE_H_
 
 #include "dtvrecorder.h"
+#include "tsstats.h"
 #include "mpeg/tspacket.h"
-#include <time.h>
 
-#define FIREWIRE_TIMEOUT 15
+class MPEGStreamData; 
+class ProgramAssociationTable; 
+class ProgramMapTable;
 
 /** \class FirewireRecorderBase
  *  \brief This is a specialization of DTVRecorder used to
@@ -21,38 +23,45 @@
  */
 class FirewireRecorderBase : public DTVRecorder
 {
+  Q_OBJECT 
+    friend class MPEGStreamData; 
+    friend class TSPacketProcessor; 
+
   public:
-    FirewireRecorderBase(TVRec *rec, char const* name) :
-        DTVRecorder(rec, name),
-        lastpacket(0) 
-    {;}
-        
+    FirewireRecorderBase(TVRec *rec, char const* name); 
+    ~FirewireRecorderBase(); 
+ 
+    // Commands 
     void StartRecording(void);
     void ProcessTSPacket(const TSPacket &tspacket);
+    bool PauseAndWait(int timeout = 100); 
+
+    // Sets
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev);
+    void SetStreamData(MPEGStreamData*);
 
-    bool PauseAndWait(int timeout = 100);
+    // Gets 
+    MPEGStreamData* StreamData(void) { return _mpeg_stream_data; }
 
   public slots:
     void deleteLater(void);
+    void WritePAT(ProgramAssociationTable*); 
+    void WritePMT(ProgramMapTable*);
 
- protected:
-    static int read_tspacket (
-        unsigned char *tspacket, int len, uint dropped, void *callback_data);
-
- private:
+  private:
     virtual void Close() = 0;
-
     virtual void start() = 0;
     virtual void stop() = 0;
     virtual bool grab_frames() = 0;
-    virtual void no_data() = 0;
 
-  private:
-    time_t lastpacket;
+    MPEGStreamData  *_mpeg_stream_data; 
+    TSStats          _ts_stats;   
+
+  protected: 
+    static const int  kTimeoutInSeconds; 
 };
 
 #endif

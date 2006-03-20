@@ -7,35 +7,37 @@
 // MythTV includes
 #include "firewirerecorderbase.h"
 #include "mythcontext.h"
-#include "tspacket.h"
+#include "mpegtables.h" 
+#include "mpegstreamdata.h"
 #include "tv_rec.h"
 
-// callback function for libiec61883
-int FirewireRecorderBase::read_tspacket (unsigned char *tspacket, int /*len*/,
-                   uint dropped, void *callback_data)
-{
-    FirewireRecorderBase *fw = (FirewireRecorderBase*) callback_data;
+#define LOC QString("FireRecBase: ") 
+#define LOC_ERR QString("FireRecBase, Error: ")
 
-    if (!fw)
-        return 0;
+const int FirewireRecorderBase::kTimeoutInSeconds = 15;
 
-    if (dropped)
-    {
-        VERBOSE(VB_RECORD,
-                QString("Firewire: %1 packet(s) dropped.").arg(dropped));
-    }
+FirewireRecorderBase::FirewireRecorderBase(TVRec *rec, char const* name)  
+    : DTVRecorder(rec, name), 
+      _mpeg_stream_data(NULL) 
+{ 
+    _mpeg_stream_data = new MPEGStreamData(1, true); 
+    connect(_mpeg_stream_data, 
+            SIGNAL(UpdatePATSingleProgram(ProgramAssociationTable*)), 
+            this, SLOT(WritePAT(ProgramAssociationTable*))); 
+    connect(_mpeg_stream_data, 
+            SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)), 
+            this, SLOT(WritePMT(ProgramMapTable*))); 
+} 
 
-    if (SYNC_BYTE != tspacket[0])
-    {
-        VERBOSE(VB_IMPORTANT, "Firewire: Got out of sync TS Packet");
-        return 1;
-    }
+FirewireRecorderBase::~FirewireRecorderBase() 
+{ 
+   if (_mpeg_stream_data) 
+   { 
+       delete _mpeg_stream_data; 
+       _mpeg_stream_data = NULL; 
+   } 
+} 
 
-    fw->ProcessTSPacket(*(reinterpret_cast<TSPacket*>(tspacket)));
-
-    return 1;
-}
- 
 void FirewireRecorderBase::deleteLater(void)
 {
     Close();
@@ -44,7 +46,7 @@ void FirewireRecorderBase::deleteLater(void)
 
 void FirewireRecorderBase::StartRecording(void) {
   
-    VERBOSE(VB_RECORD, QString("StartRecording"));
+    VERBOSE(VB_RECORD, LOC + "StartRecording");
 
     if (!Open()) {
         _error = true;        
@@ -54,28 +56,20 @@ void FirewireRecorderBase::StartRecording(void) {
     _request_recording = true;
     _recording = true;
    
-    this->start();
+    start();
 
-    lastpacket = time(NULL);
     while(_request_recording) {
        if (PauseAndWait())
            continue;
 
-       if (time(NULL) - lastpacket > FIREWIRE_TIMEOUT) {
-           this->no_data();
-           this->stop();
-           _error = true;
-           return;
-       }
-
-       if (!this->grab_frames())
+       if (!grab_frames())
        {
            _error = true;
            return;
        }
     }        
     
-    this->stop();
+    stop();
     FinishRecording();
 
     _recording = false;
@@ -83,9 +77,36 @@ void FirewireRecorderBase::StartRecording(void) {
 
 void FirewireRecorderBase::ProcessTSPacket(const TSPacket &tspacket)
 {
-    lastpacket = time(NULL);
-    _buffer_packets = !FindKeyframes(&tspacket);
-    BufferedWrite(tspacket);
+    if (tspacket.TransportError()) 
+        return; 
+ 
+    if (tspacket.ScramplingControl()) 
+        return; 
+ 
+    if (tspacket.HasAdaptationField()) 
+        StreamData()->HandleAdaptationFieldControl(&tspacket); 
+ 
+    if (tspacket.HasPayload()) 
+    { 
+        const unsigned int lpid = tspacket.PID(); 
+ 
+        // Pass or reject packets based on PID, and parse info from them 
+        if (lpid == StreamData()->VideoPIDSingleProgram()) 
+        { 
+            _buffer_packets = !FindKeyframes(&tspacket); 
+            BufferedWrite(tspacket); 
+        } 
+        else if (StreamData()->IsAudioPID(lpid)) 
+            BufferedWrite(tspacket); 
+        else if (StreamData()->IsListeningPID(lpid)) 
+            StreamData()->HandleTSTables(&tspacket); 
+        else if (StreamData()->IsWritingPID(lpid)) 
+            BufferedWrite(tspacket); 
+    } 
+  
+    _ts_stats.IncrTSPacketCount(); 
+    if (0 == _ts_stats.TSPacketCount()%1000000) 
+        VERBOSE(VB_RECORD, _ts_stats.toString());
 }
 
 void FirewireRecorderBase::SetOptionsFromProfile(RecordingProfile *profile,
@@ -106,7 +127,7 @@ bool FirewireRecorderBase::PauseAndWait(int timeout)
     {
         if (!paused)
         {
-            this->stop();
+            stop();
             paused = true;
             pauseWait.wakeAll();
             if (tvrec)
@@ -116,8 +137,39 @@ bool FirewireRecorderBase::PauseAndWait(int timeout)
     }
     if (!request_pause && paused)
     {
-        this->start();
+        start();
         paused = false;
     }
     return paused;
+}
+
+void FirewireRecorderBase::SetStreamData(MPEGStreamData *stream_data) 
+{ 
+    if (stream_data == _mpeg_stream_data) 
+        return; 
+ 
+    MPEGStreamData *old_data = _mpeg_stream_data; 
+    _mpeg_stream_data = stream_data; 
+    if (old_data) 
+        delete old_data; 
+} 
+ 
+void FirewireRecorderBase::WritePAT(ProgramAssociationTable *pat) 
+{ 
+    if (!pat) 
+        return; 
+ 
+    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf; 
+    pat->tsheader()->SetContinuityCounter(next); 
+    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader()))); 
+} 
+ 
+void FirewireRecorderBase::WritePMT(ProgramMapTable *pmt) 
+{ 
+    if (!pmt) 
+        return; 
+ 
+    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf; 
+    pmt->tsheader()->SetContinuityCounter(next); 
+    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pmt->tsheader()))); 
 }

@@ -39,7 +39,7 @@ void DarwinFirewireRecorder::no_data()
 {
     VERBOSE(
         VB_IMPORTANT, 
-        QString("Firewire: No Input in %1 seconds").arg(FIREWIRE_TIMEOUT));
+        QString("Firewire: No Input in %1 seconds").arg(kTimeoutInSeconds));
 }
 
 namespace
@@ -111,22 +111,13 @@ namespace
 
 IOReturn DarwinFirewireRecorder::tspacket_callback(UInt32 tsPacketCount, UInt32 **ppBuf,void *pRefCon)
 {
-    for (UInt32 i = 0; i < tsPacketCount; ++i)
-    {
-        void* packet = ppBuf[i];
-        int ok = FirewireRecorderBase::read_tspacket( 
-            static_cast<unsigned char *>(packet), 
-              AVS::kMPEG2TSPacketSize,
-              0, // dropped
-              pRefCon);
+    DarwinFirewireRecorder* self = static_cast<DarwinFirewireRecorder*>(pRefCon); 
+    if (!self) 
+        return kIOReturnBadArgument;
 
-        // This is based on knowledge of what read_tspacket does --
-        // the only way it fails is with a NULL callback_data
-        // argument.
-        if (!ok)
-            return kIOReturnBadArgument;
-    }
-    
+    for (UInt32 i = 0; i < tsPacketCount; ++i)
+        self->ProcessTSPacket(*(reinterpret_cast<TSPacket*>(ppBuf[i])));
+
     return 0;
 }
 
@@ -181,8 +172,8 @@ bool DarwinFirewireRecorder::Open()
 
 	// Register a no-data notification callback
 	video_stream->pMPEGReceiver->registerNoDataNotificationCallback(
-        MPEGNoData, this, FIREWIRE_TIMEOUT * 1000);
-	
+        MPEGNoData, this, kTimeoutInSeconds * 1000);
+
      return true;
 }
 

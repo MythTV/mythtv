@@ -56,6 +56,14 @@ macx {
     LIBS           += -F/System/Library/PrivateFrameworks
     LIBS           += -framework $$join(PFWKS," -framework ")
 
+    using_firewire {
+        QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
+        LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
+        # Recent versions of this framework use /usr/lib/libstdc++.6.dylib
+        # which may clash with symbols in /usr/lib/gcc/darwin/3.3/libstdc++.a
+        # In that case, rebuild the framework with your (old) Xcode version
+    }
+
     using_mac_accel {
         # accel_utils uses Objective-C++, activated by .mm suffix
         QMAKE_EXT_CPP += .mm
@@ -290,10 +298,25 @@ using_backend {
         DEFINES += USING_V4L
     }
 
-    # Support for cable boxes that provide Firewire out on Linux
-    using_firewire:HEADERS += firewirerecorder.h   firewirechannel.h
-    using_firewire:SOURCES += firewirerecorder.cpp firewirechannel.cpp
-    using_firewire:DEFINES += USING_FIREWIRE
+    # Support for cable boxes that provide Firewire out
+    using_firewire  {
+        HEADERS += firewirechannelbase.h       firewirerecorderbase.h
+        SOURCES += firewirechannelbase.cpp     firewirerecorderbase.cpp
+
+        macx {
+            HEADERS += darwinfirewirechannel.h       darwinfirewirerecorder.h
+            SOURCES += darwinfirewirechannel.cpp     darwinfirewirerecorder.cpp
+            HEADERS += selectavcdevice.h
+            SOURCES += selectavcdevice.cpp
+        }
+        
+        !macx {
+            HEADERS += firewirechannel.h       firewirerecorder.h
+            SOURCES += firewirechannel.cpp     firewirerecorder.cpp
+        }
+
+        DEFINES += USING_FIREWIRE
+    }
 
     # Support for set top boxes (Nokia DBox2 etc.)
     using_dbox2:SOURCES += dbox2recorder.cpp dbox2channel.cpp dbox2epg.cpp

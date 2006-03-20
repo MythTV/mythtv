@@ -23,32 +23,30 @@ namespace AVS
 class FirewireChannelBase : public ChannelBase
 {
   public:
-    FirewireChannelBase(TVRec *parent);
-    ~FirewireChannelBase();
+    FirewireChannelBase(TVRec *parent)   
+        : ChannelBase(parent), isopen(false) { } 
+    ~FirewireChannelBase() { Close(); }
 
     bool Open(void);
     void Close(void);
 
     // Sets
     bool SetChannelByString(const QString &chan);
-    void SetExternalChanger(void);    
     virtual bool SetChannelByNumber(int channel) = 0;
 
     // Gets
     bool IsOpen(void) const { return isopen; }
-//    QString GetDevice(void) const;
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting)
         { (void)newcapchannel; (void)setstarting; return false; }
 
- private:
+  private:
     virtual bool OpenFirewire() = 0;
     virtual void CloseFirewire() = 0;
 
   protected:
-    bool UseExternalChanger();
     bool isopen;
 };
 

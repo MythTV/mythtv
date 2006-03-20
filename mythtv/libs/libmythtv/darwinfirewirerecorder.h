@@ -37,7 +37,6 @@ class DarwinFirewireRecorder : public FirewireRecorderBase
     ~DarwinFirewireRecorder();
 
     bool Open(void); 
-    void ProcessTSPacket(const TSPacket &tspacket);
 
     void SetOption(const QString &name, const QString &value);
     void SetOption(const QString &name, int value);
