@@ -297,13 +297,6 @@ bool VideoOutput::SetDeinterlacingEnabled(bool enable)
 bool VideoOutput::SetupDeinterlace(bool interlaced, 
                                    const QString& overridefilter)
 {
-    if (VideoOutputNull *null = dynamic_cast<VideoOutputNull *>(this))
-    {
-        (void)null;
-        // null vidout doesn't deinterlace
-        return !interlaced;
-    }
-
     if (m_deinterlacing == interlaced)
         return m_deinterlacing;
 
