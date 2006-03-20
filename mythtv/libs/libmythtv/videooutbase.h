@@ -144,6 +144,8 @@ static inline QString frame_scan_to_string(FrameScanType scan,
             break;
         case kScan_Intr2ndField:
             if (brief)
+                ret = QObject::tr("Interlaced");
+            else
                 ret = QObject::tr("Interlaced (Reversed)");
             break;
         case kScan_Progressive:
