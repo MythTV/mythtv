@@ -2041,9 +2041,9 @@ if test x"$firewire_cable_box" = x"yes" ; then
         # Unfortunately, the location keeps changing:
         #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
         #/Developer/FireWireSDK21/Examples/Framework
-        mac_avc=`find /Developer/FireWireSDK* -name Framework \
+        mac_avc=`find /Developer/FireWireSDK* -name Framework 2> /dev/null \
                  | tail -n 1`
-        if test -d $mac_avc ; then
+        if test -d "$mac_avc" ; then
             firewire_cable_box="yes"
         else
             echo Firewire being disabled. /Developer/FireWireSDK* missing
