@@ -158,6 +158,7 @@ class OSD : public QObject
     bool InitTeletext(void);
     bool InitDVBSub(void);
     bool InitMenu(void);
+    bool InitInteractiveTV(void);
 
     TTFFont *LoadFont(QString name, int size); 
     QString FindTheme(QString name);

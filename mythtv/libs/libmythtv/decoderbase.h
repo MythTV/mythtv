@@ -128,6 +128,9 @@ class DecoderBase
     // MHEG/MHI stuff
     virtual void ITVReset(const QRect& /*total*/, const QRect& /*visible*/) {}
     virtual bool ITVUpdate(bool /*visible*/) { return false; }
+    virtual bool ITVHandleAction(const QString& /*action*/) { return false; }
+    virtual void ITVRestart(uint /*chanid*/, bool /*livetv*/) {}
+
     virtual bool SetAudioByComponentTag(int) { return false; }
     virtual bool SetVideoByComponentTag(int) { return false; }
 

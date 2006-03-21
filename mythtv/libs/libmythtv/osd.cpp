@@ -136,6 +136,7 @@ bool OSD::InitDefaults(void)
     ok &= InitTeletext();
     ok &= InitMenu();
     ok &= InitDVBSub();
+    ok &= InitInteractiveTV();
     return ok;
 }
 
@@ -341,6 +342,22 @@ bool OSD::InitDVBSub(void)
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
     container->SetPriority(30);
+    AddSet(container, name);
+    return true;
+}
+
+bool OSD::InitInteractiveTV(void)
+{
+    // Create container for interactive TV
+    if  (GetSet("interactive"))
+        return true;
+    QString name = "interactive";
+    OSDSet *container =
+        new OSDSet(name, true,
+                   osdBounds.width(), osdBounds.height(),
+                   wmult, hmult, frameint);
+    container->SetPriority(25);
+    container->Display(true);
     AddSet(container, name);
     return true;
 }
@@ -2134,6 +2151,7 @@ bool OSD::HideAllExcept(const QString &other)
             QString name = (*i)->GetName();
             if (name != "cc_page" && name != "cc708_page" &&
                 name != "menu"    && name != "subtitles"  &&
+                name != "interactive" &&
                 name != other && (!oset || !oset->CanShowWith(name)))
             {
                 (*i)->Hide();

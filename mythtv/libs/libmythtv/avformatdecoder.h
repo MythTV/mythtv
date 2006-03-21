@@ -136,6 +136,9 @@ class AvFormatDecoder : public DecoderBase
     // MHEG stuff
     virtual void ITVReset(const QRect &total, const QRect& visible);
     virtual bool ITVUpdate(bool itvVisible);
+    virtual bool ITVHandleAction(const QString&);
+    virtual void ITVRestart(uint /*chanid*/, bool /*livetv*/);
+
     virtual bool SetAudioByComponentTag(int tag);
     virtual bool SetVideoByComponentTag(int tag);
 

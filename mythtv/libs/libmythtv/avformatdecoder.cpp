@@ -2054,6 +2054,22 @@ bool AvFormatDecoder::ITVUpdate(bool itvVisible)
     return itvVisible;
 }
 
+bool AvFormatDecoder::ITVHandleAction(const QString &action)
+{
+    QMutexLocker locker(&itvLock);
+    return itv->OfferKey(action);
+}
+
+/* \fn AvFormatDecoder::ITVRestart(bool isLive)
+ * \brief Restart the MHEG/MHP engine.
+ */
+void AvFormatDecoder::ITVRestart(uint chanid, bool isLiveTV)
+{
+    QMutexLocker locker(&itvLock);
+    QString chanidStr = (chanid) ? QString::number(chanid) : "-1";
+    itv->Restart(chanidStr, isLiveTV);
+}
+
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)
 {
     for (uint i = 0; i < tracks[kTrackTypeAudio].size(); i++)

@@ -2293,11 +2293,12 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         yuv_wait.wakeAll();
     }
 
-    if (GetDecoder())
-        itvVisible = GetDecoder()->ITVUpdate(itvVisible);
-
     if (ringBuffer->InDVDMenuOrStillFrame())
         DisplayDVDButton();
+
+    // handle Interactive TV
+    if (textDisplayMode & kDisplayITV)
+        itvVisible = GetDecoder()->ITVUpdate(itvVisible);
 
     // handle EIA-608 and Teletext
     if (textDisplayMode & (kDisplayTeletextB | kDisplayCC608))
@@ -5429,6 +5430,40 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     }
 
     return ret;
+}
+
+bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
+{
+    if (textDisplayMode != kDisplayITV)
+        return false;
+
+    if (GetDecoder())
+        return GetDecoder()->ITVHandleAction(action);
+
+    return false;
+}
+
+/* \fn NuppelVideoPlayer::ITVRestart(bool isLive)
+ * \brief Restart the MHEG/MHP engine.
+ */
+void NuppelVideoPlayer::ITVRestart(uint chanid, bool isLiveTV)
+{
+    OSD *osd = GetOSD();
+    if (!GetDecoder() || !osd)
+        return;
+
+    OSDSet *itvosd = osd->GetSet("interactive");
+    if (!itvosd)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No interactive TV set available");
+        return;
+    }
+
+    GetDecoder()->ITVRestart(chanid, isLiveTV);
+        
+    osd->ClearAll("interactive");
+    itvosd->Display();
+    osd->SetVisible(itvosd, 0);
 }
 
 /** \fn NuppelVideoPlayer::SetAudioByComponentTag(int tag)

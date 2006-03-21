@@ -334,6 +334,8 @@ class TV : public QObject
 
     void SetPseudoLiveTV(uint, const ProgramInfo*, PseudoState);
 
+    void ITVRestart(bool isLive);
+
     static QStringList GetValidRecorderList(uint chanid);
     static QStringList GetValidRecorderList(const QString &channum);
     static QStringList GetValidRecorderList(uint, const QString&);

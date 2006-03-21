@@ -105,6 +105,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
       channelTimeout(channel_timeout),
       // Settable
       ignoreAudioOnlyServices(false),
+      ignoreDataServices(false),
       ignoreEncryptedServices(false),
       forceUpdate(false),
       renameChannels(false),
@@ -1105,7 +1106,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
             continue;
         }
 
-        if (vct->ServiceType(i) == 0x04)
+        if (vct->ServiceType(i) == 0x04 && ignoreDataServices)
         {
             VERBOSE(VB_IMPORTANT, QString("Ignoring Data Service: %1 %2-%3")
                     .arg(vct->ShortChannelName(i))
@@ -1281,7 +1282,8 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
                 tr("Skipping %1 - Radio Service").arg(service_name));
             continue;
         }
-        else if (desc && !desc->IsDTV() && !desc->IsDigitalAudio())
+        else if (desc && !desc->IsDTV() && !desc->IsDigitalAudio() &&
+                 ignoreDataServices)
         {
             emit ServiceScanUpdateText(tr("Skipping %1 - not a Television or "
                                           "Radio Service").arg(service_name));
@@ -1467,7 +1469,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
             continue;
         }
         else if (((*s).ServiceType != SDTObject::TV) &&
-                 ((*s).ServiceType != SDTObject::RADIO))
+                 ((*s).ServiceType != SDTObject::RADIO) && ignoreDataServices)
         {
             emit ServiceScanUpdateText(tr("Skipping %1 - not a Television or "
                                           "Radio Service").arg(service_name));

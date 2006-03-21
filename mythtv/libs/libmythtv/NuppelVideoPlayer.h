@@ -88,6 +88,7 @@ enum
     kDisplaySubtitle  = 0x04,
     kDisplayCC608     = 0x08,
     kDisplayCC708     = 0x10,
+    kDisplayITV       = 0x20,
 };
 
 class NuppelVideoPlayer : public CCReader, public CC708Reader
@@ -337,6 +338,8 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void ChangeCaptionTrack(int dir);
 
     // MHEG/MHI stream selection
+    bool ITVHandleAction(const QString &action);
+    void ITVRestart(uint chanid, bool isLiveTV);
     bool SetAudioByComponentTag(int tag);
     bool SetVideoByComponentTag(int tag);
 

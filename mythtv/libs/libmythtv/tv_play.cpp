@@ -201,6 +201,13 @@ void TV::InitKeys(void)
     REG_KEY("Teletext Menu", "MENUWHITE",   "Menu White",            "F6");
     REG_KEY("Teletext Menu", "TOGGLEBACKGROUND","Toggle Background", "F7");
     REG_KEY("Teletext Menu", "REVEAL",      "Reveal hidden Text",    "F8");
+
+    /* Interactive Television keys */
+    REG_KEY("ITV Menu", "MENURED",    "Menu Red",    "F2");
+    REG_KEY("ITV Menu", "MENUGREEN",  "Menu Green",  "F3");
+    REG_KEY("ITV Menu", "MENUYELLOW", "Menu Yellow", "F4");
+    REG_KEY("ITV Menu", "MENUBLUE",   "Menu Blue",   "F5");
+    REG_KEY("ITV Menu", "TEXTEXIT",   "Menu Exit",   "F6");
 /*
   keys already used:
 
@@ -225,6 +232,7 @@ void TV::InitKeys(void)
   Global:          F1,
   Playback: Ctrl-B,                  F7,F8,F9,F10,F11
   Teletext            F2,F3,F4,F5,F6,F7,F8
+  ITV                 F2,F3,F4,F5,F6
  */
 }
 
@@ -1032,12 +1040,14 @@ void TV::HandleStateChange(void)
     {
         UpdateOSDInput();
         UpdateLCD();
+        ITVRestart(true);
     }
     else if (StateIsPlaying(internalState) && lastState == kState_None)
     {
         if (GetOSD() && (PlayGroup::GetCount() > 0))
             GetOSD()->SetSettingsText(tr("%1 Settings")
                                       .arg(tr(playbackinfo->playgroup)), 3);
+        ITVRestart(false);
     }
     if (recorder)
         recorder->FrontendReady();
@@ -1962,6 +1972,19 @@ void TV::ProcessKeypress(QKeyEvent *e)
             for (uint i = 0; i < tt_actions.size(); i++)
                 if (activenvp->HandleTeletextAction(tt_actions[i]))
                     return;
+        }
+    }
+
+    // Interactive television
+    if (activenvp && (activenvp->GetCaptionMode() == kDisplayITV))
+    {
+        QStringList itv_actions;
+        if (gContext->GetMainWindow()->TranslateKeyPress(
+                "ITV Menu", e, itv_actions))
+        for (uint i = 0; i < itv_actions.size(); i++)
+        {
+            if (activenvp->ITVHandleAction(itv_actions[i]))
+                return;
         }
     }
 
@@ -6535,6 +6558,8 @@ void TV::UnpauseLiveTV(void)
         activerbuffer->IgnoreLiveEOF(false);
     }
 
+    ITVRestart(true);
+
     if (!nvp || (nvp && activenvp == nvp))
     {
         UpdateOSDProgInfo("program_info");
@@ -6555,6 +6580,24 @@ void TV::SetCurrentlyPlaying(ProgramInfo *pginfo)
         playbackinfo = new ProgramInfo(*pginfo);
 
     pbinfoLock.unlock();
+}
+
+/* \fn TV::ITVRestart(bool isLive)
+ * \brief Restart the MHEG/MHP engine.
+ */
+void TV::ITVRestart(bool isLive)
+{
+    uint chanid = 0;
+
+    if (activenvp != nvp || paused || !GetOSD())
+        return;
+
+    pbinfoLock.lock();
+    if (playbackinfo)
+        chanid = playbackinfo->chanid.toUInt();
+    pbinfoLock.unlock();
+
+    nvp->ITVRestart(chanid, isLive);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

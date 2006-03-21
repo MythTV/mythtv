@@ -74,7 +74,8 @@ class SIScan : public QObject
 
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
     void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
-    void SetTVOnly(bool _tvOnly)      { ignoreAudioOnlyServices = _tvOnly;   }
+    void SetTVOnly(bool _tvOnly)
+        { ignoreAudioOnlyServices = ignoreDataServices = _tvOnly; }
     void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
     void SetRenameChannels(bool _r)   { renameChannels          = _r; }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
@@ -171,6 +172,7 @@ class SIScan : public QObject
 
     // Settable
     bool              ignoreAudioOnlyServices;
+    bool              ignoreDataServices;
     bool              ignoreEncryptedServices;
     bool              forceUpdate;
     bool              renameChannels;
