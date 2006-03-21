@@ -307,6 +307,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ccd608;
     delete ccd708;
     delete ttd;
+    delete itv;
     delete d;
     if (audioSamples)
         delete [] audioSamples;
