@@ -28,6 +28,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
+#include <mythtv/lcddevice.h>
 
 #include "singleview.h"
 #include "constants.h"
@@ -175,6 +176,11 @@ SingleView::~SingleView()
 
     if (mIntArray)
         delete [] mIntArray;
+
+    if (class LCD* lcd = LCD::Get())
+    {
+        lcd->switchToTime();
+    }
 }
 
 void SingleView::paintEvent(QPaintEvent *)
@@ -562,6 +568,15 @@ void SingleView::loadImage()
                                  QImage::ScaleMin));
           
         }
+      }
+      if (class LCD* lcd = LCD::Get())
+      {
+          QPtrList<LCDTextItem> textItems;
+          textItems.setAutoDelete(true);
+          textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->name, "Generic", true));
+          textItems.append(new LCDTextItem(2, ALIGN_CENTERED, QString::number(m_pos + 1) + 
+                  " / " + QString::number(m_itemList.count()), "Generic", false));
+          lcd->switchToGeneric(&textItems);
       }
     }
     else {

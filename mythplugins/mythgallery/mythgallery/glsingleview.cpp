@@ -31,6 +31,7 @@
 #include <qpainter.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/lcddevice.h>
 #include <mythtv/util.h>
 
 #include "glsingleview.h"
@@ -175,6 +176,11 @@ GLSingleView::~GLSingleView()
 
 void GLSingleView::cleanUp()
 {
+    if (class LCD* lcd = LCD::Get())
+    {
+        lcd->switchToTime();
+    }
+
     makeCurrent();
 
     m_timer->stop();
@@ -574,6 +580,16 @@ void GLSingleView::loadImage()
 
     QImage image(item->path);
     if (!image.isNull()) {
+
+        if (class LCD* lcd = LCD::Get())
+        {
+            QPtrList<LCDTextItem> textItems;
+            textItems.setAutoDelete(true);
+            textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->name, "Generic", true));
+            textItems.append(new LCDTextItem(2, ALIGN_CENTERED, QString::number(m_pos + 1) 
+                    + " / " + QString::number(m_itemList.count()), "Generic", false));
+            lcd->switchToGeneric(&textItems);
+        }
 
         int a  = m_tex1First ? 0 : 1;
         TexItem& t = m_texItem[a];
