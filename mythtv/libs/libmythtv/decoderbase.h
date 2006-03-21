@@ -125,6 +125,12 @@ class DecoderBase
     virtual int  GetTeletextDecoderType(void) const { return -1; }
     virtual void SetTeletextDecoderViewer(TeletextViewer*) {;}
 
+    // MHEG/MHI stuff
+    virtual void ITVReset(const QRect& /*total*/, const QRect& /*visible*/) {}
+    virtual bool ITVUpdate(bool /*visible*/) { return false; }
+    virtual bool SetAudioByComponentTag(int) { return false; }
+    virtual bool SetVideoByComponentTag(int) { return false; }
+
   protected:
     virtual int  AutoSelectTrack(uint type);
     inline  void AutoSelectTracks(void);

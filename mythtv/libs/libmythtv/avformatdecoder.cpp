@@ -21,6 +21,7 @@ using namespace std;
 #include "atscdescriptors.h"
 #include "ccdecoder.h"
 #include "cc708decoder.h"
+#include "interactivetv.h"
 #include "DVDRingBuffer.h"
 
 #ifdef USING_XVMC
@@ -272,6 +273,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       ccd608(new CCDecoder(parent)),
       ccd708(new CC708Decoder(parent)),
       ttd(new TeletextDecoder()),
+      // Interactive TV
+      itv(new InteractiveTV(parent)),
+      selectedVideoIndex(-1),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
@@ -795,6 +799,15 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     AutoSelectTracks(); // This is needed for transcoder
 
+    {
+        int initialAudio = -1, initialVideo = -1;
+        itv->GetInitialStreams(initialAudio, initialVideo);
+        if (initialAudio >= 0)
+            SetAudioByComponentTag(initialAudio);
+        if (initialVideo >= 0)
+            SetVideoByComponentTag(initialVideo);
+    }
+
     // Try to get a position map from the recorder if we don't have one yet.
     if (!recordingHasPositionMap)
     {
@@ -1098,6 +1111,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
+    selectedVideoIndex = -1;
 
     map<int,uint> lang_sub_cnt;
     map<int,uint> lang_aud_cnt;
@@ -1172,6 +1186,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 enc->decode_cc_dvd  = decode_cc_dvd;
+
+                // Set the default stream to the stream
+                // with the lowest component tag.
+                if (selectedVideoIndex < 0 ||
+                    ic->streams[i]->component_tag <
+                    ic->streams[selectedVideoIndex]->component_tag)
+                {
+                    selectedVideoIndex = i;
+                }
 
                 ScanATSCCaptionStreams(i);
 
@@ -1890,6 +1913,38 @@ void AvFormatDecoder::ProcessDVBDataPacket(
     }
 }
 
+/** \fn AvFormatDecoder::ProcessDSMCCPacket(const AVStream*, const AVPacket*)
+ *  \brief Process DSMCC object carousel packet.
+ */
+void AvFormatDecoder::ProcessDSMCCPacket(
+    const AVStream *str, const AVPacket *pkt)
+{
+    if (!itv)
+        return;
+
+    // The packet may contain several tables.
+    uint8_t *data = pkt->data;
+    int length = pkt->size;
+    avcodeclock.lock();
+    int componentTag = str->component_tag; //Contains component tag
+    unsigned carouselId = (unsigned)str->codec->sub_id; //Contains carousel Id
+    int dataBroadcastId = str->codec->flags; // Contains data broadcast Id.
+    avcodeclock.unlock();
+    while (length > 3)
+    {
+        uint16_t sectionLen = (((data[1] & 0xF) << 8) | data[2]) + 3;
+
+        if (sectionLen > length) // This may well be filler
+            return;
+
+        itv->ProcessDSMCCSection(data, sectionLen,
+                                 componentTag, carouselId,
+                                 dataBroadcastId);
+        length -= sectionLen;
+        data += sectionLen;
+    }
+}
+
 int AvFormatDecoder::SetTrack(uint type, int trackNo)
 {
     bool ret = DecoderBase::SetTrack(type, trackNo);
@@ -1964,6 +2019,71 @@ int AvFormatDecoder::GetTeletextDecoderType(void) const
 void AvFormatDecoder::SetTeletextDecoderViewer(TeletextViewer *view)
 {
     ttd->SetViewer(view);
+}
+
+void AvFormatDecoder::ITVReset(const QRect &total, const QRect &visible)
+{
+    (void) visible;
+    itv->Reinit(total);
+}
+
+bool AvFormatDecoder::ITVUpdate(bool itvVisible)
+{
+    QMutexLocker locker(&itvLock);
+
+    OSD *osd = GetNVP()->GetOSD();
+    if (!osd)
+        return itvVisible;
+
+    OSDSet *itvosd = osd->GetSet("interactive");
+    if (!itvosd)
+        return itvVisible;
+
+    bool visible = false;
+    if (itv->ImageHasChanged() || !itvVisible)
+    {
+        itv->UpdateOSD(itvosd);
+        visible = true;
+        itvVisible = true;
+    }
+
+    if (visible)
+        osd->SetVisible(itvosd, 0);
+
+    return itvVisible;
+}
+
+bool AvFormatDecoder::SetAudioByComponentTag(int tag)
+{
+    for (uint i = 0; i < tracks[kTrackTypeAudio].size(); i++)
+    {
+        AVStream *s  = ic->streams[tracks[kTrackTypeAudio][i].av_stream_index];
+        if (s)
+        {
+            if (s->component_tag == tag || tag <= 0 && s->component_tag <= 0)
+            {
+                return SetTrack(kTrackTypeAudio, i);
+            }
+        }
+    }
+    return false;
+}
+
+bool AvFormatDecoder::SetVideoByComponentTag(int tag)
+{
+    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        AVStream *s  = ic->streams[i];
+        if (s)
+        {
+            if (s->component_tag == tag)
+            {
+                selectedVideoIndex = i;
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 // documented in decoderbase.cpp
@@ -2326,7 +2446,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             continue;
         }
 
-        if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO &&
+            pkt->stream_index == selectedVideoIndex)
         {
             AVCodecContext *context = curstream->codec;
 
@@ -2386,6 +2507,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             curstream->codec->codec_id   == CODEC_ID_DVB_VBI)
         {
             ProcessDVBDataPacket(curstream, pkt);
+
+            av_free_packet(pkt);
+            continue;
+        }
+
+        if (len > 0 &&
+            curstream->codec->codec_type == CODEC_TYPE_DATA &&
+            curstream->codec->codec_id   == CODEC_ID_DSMCC_B)
+        {
+            ProcessDSMCCPacket(curstream, pkt);
 
             av_free_packet(pkt);
             continue;
@@ -2532,6 +2663,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_VIDEO:
                 {
+                    if (pkt->stream_index != selectedVideoIndex)
+                    {
+                        ptr += pkt->size;
+                        len -= pkt->size;
+                        continue;
+                    }
+
                     if (firstloop && pts != (int64_t) AV_NOPTS_VALUE)
                     {
                         lastccptsu = (long long)

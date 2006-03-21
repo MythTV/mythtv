@@ -10,9 +10,11 @@ INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth
 
 LIBS += -L../libs/libmyth -L../libs/libmythtv -L../libs/libavcodec
 LIBS += -L../libs/libavformat -L../libs/libavutil -L../libs/libmythui
+LIBS += -L../libs/libfreemheg
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION -lmythavutil-$$LIBVERSION
+LIBS += -lfreemheg-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 
 LIBS += `freetype-config --libs`

@@ -257,6 +257,10 @@ using_frontend {
     SOURCES += dsmcc.cpp                dsmcccache.cpp
     SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
 
+    # MHEG/MHI stuff
+    HEADERS += interactivetv.h          mhi.h
+    SOURCES += interactivetv.cpp        mhi.cpp
+
     # C stuff
     HEADERS += blend.h
     SOURCES += blend.c

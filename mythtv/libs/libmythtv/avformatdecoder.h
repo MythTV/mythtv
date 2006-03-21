@@ -18,6 +18,7 @@ extern "C" {
 class TeletextDecoder;
 class CCDecoder;
 class CC708Decoder;
+class InteractiveTV;
 class ProgramInfo;
 class MythSqlDatabase;
 
@@ -132,6 +133,12 @@ class AvFormatDecoder : public DecoderBase
     virtual int  GetTeletextDecoderType(void) const;
     virtual void SetTeletextDecoderViewer(TeletextViewer*);
 
+    // MHEG stuff
+    virtual void ITVReset(const QRect &total, const QRect& visible);
+    virtual bool ITVUpdate(bool itvVisible);
+    virtual bool SetAudioByComponentTag(int tag);
+    virtual bool SetVideoByComponentTag(int tag);
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
@@ -167,6 +174,7 @@ class AvFormatDecoder : public DecoderBase
 
     void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
+    void ProcessDSMCCPacket(const AVStream *stream, const AVPacket *pkt);
 
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
@@ -220,6 +228,11 @@ class AvFormatDecoder : public DecoderBase
     CCDecoder        *ccd608;
     CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
+
+    // MHEG
+    InteractiveTV    *itv;                ///< MHEG/MHP decoder
+    int               selectedVideoIndex; ///< MHEG/MHP video stream to use.
+    QMutex            itvLock;
 
     // Audio
     short int        *audioSamples;

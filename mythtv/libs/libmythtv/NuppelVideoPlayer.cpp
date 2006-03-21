@@ -171,6 +171,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Support for captions, teletext, etc. decoded by libav
       osdHasSubtitles(false),       osdSubtitlesExpireAt(-1),
 
+      // MHEG/MHI Interactive TV visible in OSD
+      itvVisible(false),
+
       // OSD stuff
       osd(NULL),                    timedisplay(NULL),
       dialogname(""),               dialogtype(0),
@@ -521,12 +524,18 @@ bool NuppelVideoPlayer::InitVideo(void)
 
 void NuppelVideoPlayer::ReinitOSD(void)
 {
-    if (osd)
+    if (videoOutput)
     {
         QRect visible, total;
         float aspect, scaling;
         videoOutput->GetOSDBounds(total, visible, aspect, scaling);
-        osd->Reinit(total, frame_interval, visible, aspect, scaling);
+        if (osd)
+            osd->Reinit(total, frame_interval, visible, aspect, scaling);
+        if (decoder)
+        {
+            decoder->ITVReset(total, visible);
+            itvVisible = false;
+        }
     }
 }
 
@@ -2283,6 +2292,9 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         yuv_need_copy = false;
         yuv_wait.wakeAll();
     }
+
+    if (GetDecoder())
+        itvVisible = GetDecoder()->ITVUpdate(itvVisible);
 
     if (ringBuffer->InDVDMenuOrStillFrame())
         DisplayDVDButton();
@@ -5417,6 +5429,28 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     }
 
     return ret;
+}
+
+/** \fn NuppelVideoPlayer::SetAudioByComponentTag(int tag)
+ *  \brief Selects the audio stream using the DVB component tag.
+ */
+bool NuppelVideoPlayer::SetAudioByComponentTag(int tag)
+{
+    if (GetDecoder())
+        return GetDecoder()->SetAudioByComponentTag(tag);
+
+    return false;
+}
+
+/** \fn NuppelVideoPlayer::SetVideoByComponentTag(int tag)
+ *  \brief Selects the video stream using the DVB component tag.
+ */
+bool NuppelVideoPlayer::SetVideoByComponentTag(int tag)
+{
+    if (GetDecoder())
+        return GetDecoder()->SetVideoByComponentTag(tag);
+
+    return false;
 }
 
 int NuppelVideoPlayer::GetTrack(uint type) const

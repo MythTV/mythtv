@@ -44,6 +44,7 @@ class VideoSync;
 class LiveTVChain;
 class TV;
 struct AVSubtitle;
+class InteractiveTV;
 
 struct TextContainer
 {
@@ -335,6 +336,10 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     int ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
 
+    // MHEG/MHI stream selection
+    bool SetAudioByComponentTag(int tag);
+    bool SetVideoByComponentTag(int tag);
+
     // Time Code adjustment stuff
     long long AdjustAudioTimecodeOffset(long long v)
         { tc_wrap[TC_AUDIO] += v;  return tc_wrap[TC_AUDIO]; }
@@ -608,6 +613,9 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     QString    osd708fontnames[20];
     QString    osdprefix;
     QString    osdtheme;
+
+    // Support for MHEG/MHI
+    bool       itvVisible;
 
     // OSD stuff
     OSD      *osd;
