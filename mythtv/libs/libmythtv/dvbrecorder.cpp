@@ -74,6 +74,9 @@ const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
 
+#define TS_TICKS_PER_SEC    90000
+#define DUMMY_VIDEO_PID     VIDEO_PID(0x20)
+
 #define LOC      QString("DVBRec(%1): ").arg(_card_number_option)
 #define LOC_WARN QString("DVBRec(%1) Warning: ").arg(_card_number_option)
 #define LOC_ERR  QString("DVBRec(%1) Error: ").arg(_card_number_option)
@@ -96,6 +99,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _ts_packets_until_psip_sync(0),
       // Fake video
       _video_stream_fd(-1),
+      _video_pid(DUMMY_VIDEO_PID),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -219,12 +223,7 @@ void DVBRecorder::Close(void)
     if (_drb)
         _drb->Reset(videodevice, -1);
 
-        if (_video_stream_fd >= 0)
-        {
-            close(_video_stream_fd);
-            _video_stream_fd = -1;
-        }
-
+        StopDummyVideo();
         CloseFilters();
         close(_stream_fd);
         _stream_fd = -1;
@@ -319,6 +318,7 @@ void DVBRecorder::OpenFilter(uint           pid,
     PIDInfo *info = new PIDInfo();
     // Set isVideo based on stream type
     info->isVideo = StreamID::IsVideo(stream_type);
+    info->isAudio = StreamID::IsAudio(stream_type);
     // Add the file descriptor to the filter list
     info->filter_fd = fd_tmp;
 
@@ -327,14 +327,12 @@ void DVBRecorder::OpenFilter(uint           pid,
     _pid_infos[pid] = info;
 }
 
-#define TS_TICKS_PER_SEC    90000
-#define DUMMY_VIDEO_PID     VIDEO_PID(0x20)
-
 bool DVBRecorder::OpenFilters(void)
 {
     CloseFilters();
 
     QMutexLocker change_lock(&_pid_lock);
+    _video_pid = 0;
 
     if (!_input_pmt)
     {
@@ -366,41 +364,31 @@ bool DVBRecorder::OpenFilters(void)
 
     if (!video_cnt)
     {
-        VERBOSE(VB_RECORD, LOC + "Creating dummy video");
-        // Create a dummy video stream.
-
-        QString p = gContext->GetThemesParentDir();
-        QString path[] =
-        {
-            p+gContext->GetSetting("Theme", "G.A.N.T.")+"/",
-            p+"default/",
-        };
-        uint width  = 768;
-        uint height = 576;
-        
-        _frames_per_sec = 50;
-
-        QString filename = QString("dummy%1x%2p%3.ts")
-            .arg(width).arg(height)
-            .arg(_frames_per_sec, 0, 'f', 2);
-
-        _video_stream_fd = open(path[0]+filename.ascii(), O_RDONLY);
-        if (_video_stream_fd < 0)
-            _video_stream_fd = open(path[1]+filename.ascii(), O_RDONLY);
-        _video_header_pos = 0;
-        _audio_header_pos = 0;
-        _audio_pid = 0;
-        _time_stamp = 0;
-        _next_time_stamp = 0;
-        _video_cc = 0;
-        _ts_change_count = 0;
-
+        VERBOSE(VB_RECORD, LOC + "Missing video - adding dummy to PMT");
+        // If there is no video in the PMT we need to add it here.
         PIDInfo *info = new PIDInfo();
         info->isVideo = true;
 
         QMutexLocker change_lock(&_pid_lock);    
-        _pid_infos[DUMMY_VIDEO_PID] = info;
+        _video_pid = DUMMY_VIDEO_PID;
+        _pid_infos[_video_pid] = info;
     }
+    else
+        _video_pid = video_pids[0];
+
+    _video_header_pos = 0;
+    _audio_header_pos = 0;
+    _audio_pid = 0;
+    _video_time_stamp = 0;
+    _synch_time_stamp = 0;
+    _audio_time_stamp = 0;
+    _video_cc = 0;
+    _ts_change_count = 0;
+
+    // Start the dummy video thread.
+    _stop_dummy = false;
+    int ret = pthread_create(&_video_thread, NULL, StartDummyVideo, this);
+    _dummy_stopped = (0 != ret);
 
     if (_pid_infos.empty())
     {        
@@ -589,6 +577,7 @@ void DVBRecorder::CreatePMT(void)
     vector<uint> pids;
     vector<uint> types;
     vector<desc_list_t> pdesc;
+    bool addVideoPid = true;
 
     for (uint i = 0; i < _input_pmt->StreamCount(); i++)
     {
@@ -596,15 +585,18 @@ void DVBRecorder::CreatePMT(void)
             _input_pmt->StreamInfo(i), _input_pmt->StreamInfoLength(i),
             DescriptorID::conditional_access);
         pdesc.push_back(desc);
-        pids.push_back(_input_pmt->StreamPID(i));
+        uint pid = _input_pmt->StreamPID(i);
+        pids.push_back(pid);
         types.push_back(StreamID::Normalize(_input_pmt->StreamType(i), desc));
+        if (pid == _video_pid)
+            addVideoPid = false;
     }
 
-    if (_video_stream_fd >= 0)
+    if (addVideoPid)
     {
         desc_list_t dummy;
         pdesc.push_back(dummy);
-        pids.push_back(DUMMY_VIDEO_PID);
+        pids.push_back(_video_pid);
         types.push_back(StreamID::MPEG2Video);
     }
 
@@ -733,27 +725,39 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
         }
     }
 
+    if (info->isVideo)
+        _stop_dummy = true;
+
+    if (info->isAudio)
+        GetTimeStamp(tspacket);
+
+    ProcessTSPacket2(tspacket);
+    return true;
+}
+
+void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
+{
+    const uint pid = tspacket.PID();
+
+    QMutexLocker locker(&_pid_lock);
+    PIDInfo *info = _pid_infos[pid];
+    if (!info)
+        info = _pid_infos[pid] = new PIDInfo();
+
     // Check for keyframes and count frames
     if (info->isVideo)
         _buffer_packets = !FindKeyframes(&tspacket);
 
-    // Create dummy video stream if needed
-    if (_video_stream_fd >= 0 && pid != DUMMY_VIDEO_PID)
-    {
-        GetTimeStamp(tspacket);
-        CreateFakeVideo();
-    }
-
     // Sync recording start to first keyframe
     if (_wait_for_keyframe_option && _first_keyframe<0)
-        return true;
+        return;
 
     // Sync streams to the first Payload Unit Start Indicator
     // _after_ first keyframe iff _wait_for_keyframe_option is true
     if (!info->payloadStartSeen)
     {
         if (!tspacket.PayloadStart())
-            return true; // not payload start - drop packet
+            return; // not payload start - drop packet
 
         VERBOSE(VB_RECORD,
                 QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
@@ -765,8 +769,6 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
 
     // Write Data
     BufferedWrite(tspacket);
-
-    return true;
 }
 
 void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
@@ -812,61 +814,68 @@ void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
                 break;
             case 9:
                 _audio_header_pos++;
-                _next_time_stamp = (k >> 1) & 0x7;
+                _audio_time_stamp = (k >> 1) & 0x7;
                 break;
             case 10:
                 _audio_header_pos++;
-                _next_time_stamp = (_next_time_stamp << 8) | k;
+                _audio_time_stamp = (_audio_time_stamp << 8) | k;
                 break;
             case 11:
                 _audio_header_pos++;
-                _next_time_stamp = (_next_time_stamp << 7) | ((k >> 1) & 0x7f);
+                _audio_time_stamp = (_audio_time_stamp << 7) |
+                    ((k >> 1) & 0x7f);
                 break;
             case 12:
                 _audio_header_pos++;
-                _next_time_stamp = (_next_time_stamp << 8) | k;
+                _audio_time_stamp = (_audio_time_stamp << 8) | k;
                 break;
             case 13:
-                _next_time_stamp = (_next_time_stamp << 7) | ((k >> 1) & 0x7f);
+                _audio_time_stamp = (_audio_time_stamp << 7) |
+                    ((k >> 1) & 0x7f);
                 _audio_header_pos = 0;
-
                 // We've found a time-stamp.
                 // Generally the time stamps will increase at a steady rate
                 // but they may jump or wrap round.  Because of errors in
                 // the stream we may get odd values out of sequence.
-                if (_next_time_stamp > _time_stamp+TS_TICKS_PER_SEC*5 ||
-                    _next_time_stamp+TS_TICKS_PER_SEC < _time_stamp)
                 {
-                    if (_ts_change_count != 0 &&
-                        _next_time_stamp > _new_time_stamp &&
-                        _next_time_stamp <=
-                        _new_time_stamp+TS_TICKS_PER_SEC*10)
+                    if (_synch_time_stamp != 0 &&
+                        (_audio_time_stamp >
+                         _synch_time_stamp + TS_TICKS_PER_SEC * 5 ||
+                         _audio_time_stamp + TS_TICKS_PER_SEC <
+                         _synch_time_stamp))
                     {
-                        _ts_change_count++;
-                        if (_ts_change_count == 4)
+                        if (_ts_change_count != 0 &&
+                            _audio_time_stamp > _new_time_stamp &&
+                            _audio_time_stamp <=
+                            _new_time_stamp + TS_TICKS_PER_SEC * 10)
                         {
-                            // We've seen 4 stamps in the new sequence.
-                            VERBOSE(VB_RECORD, LOC +
-                                    QString("Time stamp change: was %1 now %2")
-                                    .arg(_time_stamp).arg(_new_time_stamp));
-                            _time_stamp = _new_time_stamp;
-                            _ts_change_count = 0;
+                            _ts_change_count++;
+                            if (_ts_change_count == 4)
+                            {
+                                QMutexLocker lock(&_ts_lock);
+                                // We've seen 4 stamps in the new sequence.
+                                VERBOSE(VB_RECORD, LOC +
+                                        QString("Time stamp change: "
+                                                "was %1 now %2")
+                                        .arg(_synch_time_stamp)
+                                        .arg(_new_time_stamp));
+                                _synch_time_stamp = _new_time_stamp;
+                                _ts_change_count = 0;
+                            }
                         }
                         else
                         {
-                            _next_time_stamp = _time_stamp;
+                            _new_time_stamp = _audio_time_stamp;
+                            _ts_change_count = 1;
                         }
                     }
                     else
                     {
-                        _new_time_stamp = _next_time_stamp;
-                        _next_time_stamp = _time_stamp;
-                        _ts_change_count = 1;
+                        QMutexLocker lock(&_ts_lock);
+                        // Within the sequence or this is the first time stamp.
+                        _synch_time_stamp = _audio_time_stamp;
+                        _ts_change_count = 0;
                     }
-                }
-                else
-                {
-                    _ts_change_count = 0;
                 }
         }
     }
@@ -876,15 +885,90 @@ void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
         _audio_pid = pid;
 }
 
-void DVBRecorder::CreateFakeVideo(void)
+void *DVBRecorder::StartDummyVideo(void *param)
 {
-    if (_video_stream_fd < 0 ||
-        _next_time_stamp > _time_stamp + TS_TICKS_PER_SEC*5)
+    DVBRecorder *dvbrec = (DVBRecorder*) param;
+    dvbrec->RunDummyVideo();
+    dvbrec->_dummy_stopped = true;
+    dvbrec->_wait_stop.wakeAll();
+    return NULL;
+}
+
+void DVBRecorder::RunDummyVideo(void)
+{
+    QString p = gContext->GetThemesParentDir();
+    QString path[] =
     {
+        p + gContext->GetSetting("Theme", "G.A.N.T.") + "/",
+        p + "default/",
+    };
+
+    uint width = 720;
+    uint height = 576;
+    _frames_per_sec = 25;
+
+    QString filename = QString("dummy%1x%2p%3.ts")
+        .arg(width).arg(height).arg(_frames_per_sec, 0, 'f', 2);
+
+    _video_stream_fd = open(path[0] + filename.ascii(), O_RDONLY);
+
+    if (_video_stream_fd < 0)
+        _video_stream_fd = open(path[1] + filename.ascii(), O_RDONLY);
+
+    if (_video_stream_fd < 0)
         return;
+
+    unsigned long frameTime = (unsigned long)(1000 / _frames_per_sec);
+    int64_t last_synch = 0;
+    _wait_time.wait(frameTime * 4); // Initial wait
+
+    while (! _stop_dummy)
+    {
+        _wait_time.wait(frameTime);
+        _ts_lock.lock();
+        int64_t synch_ts = _synch_time_stamp;
+        _ts_lock.unlock();
+        if (synch_ts != last_synch) // The audio time stamp has changed.
+        {
+            // If the time stamp has jumped just catch up.
+            if (synch_ts > last_synch + TS_TICKS_PER_SEC*5 ||
+                synch_ts + TS_TICKS_PER_SEC < last_synch)
+                _video_time_stamp = synch_ts;
+            else
+            {
+                // Catch up if behind, otherwise skip a time.
+                while (_video_time_stamp < synch_ts)
+                    CreateVideoFrame();
+            }
+            last_synch = synch_ts;
+
+        }
+        else
+        {
+            CreateVideoFrame(); // Just generate one frame
+        }
     }
 
-    while (_next_time_stamp > _time_stamp)
+    close(_video_stream_fd);
+    _video_stream_fd = -1;
+}
+
+// Stop the dummy video thread
+void DVBRecorder::StopDummyVideo(void)
+{
+    while (!_dummy_stopped)
+    {
+        _stop_dummy = true;
+        _wait_time.wakeAll();
+        _wait_stop.wait(1000);
+    }
+}
+
+void DVBRecorder::CreateVideoFrame(void)
+{
+    bool foundStart = false;
+
+    while (!foundStart)
     {
         unsigned char buffer[TSPacket::SIZE];
         int len = read(_video_stream_fd, buffer, TSPacket::SIZE);
@@ -901,67 +985,82 @@ void DVBRecorder::CreateFakeVideo(void)
         TSPacket *pkt = reinterpret_cast<TSPacket*>(buffer);
         if (pkt->PID() != DUMMY_VIDEO_PID)
             continue; // Skip the tables
+
+        pkt->SetPID(_video_pid);
+
         // Find the time-stamp field and overwrite it.
         if (pkt->PayloadStart())
+        {
             _video_header_pos = 0;
+        }
+
         for (uint i = pkt->AFCOffset(); i < TSPacket::SIZE; i++)
         {
             const unsigned char k = buffer[i];
-            switch (_video_header_pos) {
-            case 0:
-                _video_header_pos = (k == 0x00) ? 1 : 0;
-                break;
-            case 1:
-                _video_header_pos = (k == 0x00) ? 2 : 0;
-                break;
-            case 2:
-                _video_header_pos = (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
-                break;
-            case 3:
-                if (k >= PESStreamID::MPEGVideoStreamBegin &&
-                    k <= PESStreamID::MPEGVideoStreamEnd)
-                {
+            switch (_video_header_pos)
+            {
+                case 0:
+                    _video_header_pos = (k == 0x00) ? 1 : 0;
+                    break;
+                case 1:
+                    _video_header_pos = (k == 0x00) ? 2 : 0;
+                    break;
+                case 2:
+                    _video_header_pos =
+                        (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
+                    break;
+                case 3:
+                    if (k >= PESStreamID::MPEGVideoStreamBegin &&
+                        k <= PESStreamID::MPEGVideoStreamEnd)
+                    {
+                        _video_header_pos++;
+                    }
+                    else if (k == PESStreamID::PictureStartCode)
+                    {
+                        _video_header_pos = 0;
+                        _video_time_stamp += (int)((double) TS_TICKS_PER_SEC /
+                                                   _frames_per_sec);
+                        foundStart = true;
+                    }
+                    else
+                    {
+                        _video_header_pos = 0;
+                    }
+                    break;
+                case 4: case 5: case 6: case 8:
                     _video_header_pos++;
-                }
-                else if (k == PESStreamID::PictureStartCode)
-                {
+                    break;
+                case 7:
+                    // Is there a time-stamp?
+                    _video_header_pos = (k & 0x80) ? 8 : 0;
+                    break;
+                case 9:
+                    buffer[i]  = (k & 0xf0);
+                    buffer[i] |= ((_video_time_stamp >> 29) & 0x0e);
+                    buffer[i] |= 1;
+                    _video_header_pos++;
+                    break;
+                case 10:
+                    buffer[i] = (_video_time_stamp >> 22) & 0xff;
+                    _video_header_pos++;
+                    break;
+                case 11:
+                    buffer[i] = ((_video_time_stamp >> 14) & 0xfe) | 1;
+                    _video_header_pos++;
+                    break;
+                case 12:
+                    buffer[i] = (_video_time_stamp >> 7) & 0xff; // 7..14
+                    _video_header_pos++;
+                    break;
+                case 13:
+                    buffer[i] = ((_video_time_stamp << 1) & 0xfe) | 1; // 0..6
                     _video_header_pos = 0;
-                    _time_stamp += (int)
-                        ((double)TS_TICKS_PER_SEC/_frames_per_sec);
-                }
-                else _video_header_pos = 0;
-                break;
-            case 4: case 5: case 6: case 8:
-                _video_header_pos++;
-                break;
-            case 7:
-                // Is there a time-stamp?
-                _video_header_pos = (k & 0x80) ? 8 : 0;
-                break;
-            case 9:
-                buffer[i] = (k & 0xf0) | ((_time_stamp >> 29) & 0x0e) | 1;
-                _video_header_pos++;
-                break;
-            case 10:
-                buffer[i] = (_time_stamp >> 22) & 0xff;
-                _video_header_pos++;
-                break;
-            case 11:
-                buffer[i] = ((_time_stamp >> 14) & 0xfe) | 1;
-                _video_header_pos++;
-                break;
-            case 12:
-                buffer[i] = (_time_stamp >> 7) & 0xff; // 7..14
-                _video_header_pos++;
-                break;
-            case 13:
-                buffer[i] = ((_time_stamp << 1) & 0xfe) | 1; // 0..6
-                _video_header_pos = 0;
             }
         }
         pkt->SetContinuityCounter(_video_cc);
         _video_cc = (_video_cc + 1) & 0xf;
-        // Recursive call to pass the packet to the ring-buffer
-        ProcessTSPacket(*pkt);
+
+        // Pass the packet to the ring-buffer
+        ProcessTSPacket2(*pkt);
     }
 }

@@ -33,12 +33,14 @@ class PIDInfo
 {
   public:
     PIDInfo() :
-        filter_fd(-1),  continuityCount(0xFF),
-        isVideo(false), isEncrypted(false),    payloadStartSeen(false) {;}
+        filter_fd(-1),      continuityCount(0xFF),
+        isVideo(false),     isAudio(false),
+        isEncrypted(false), payloadStartSeen(false) {;}
 
     int    filter_fd;         ///< Input filter file descriptor
     uint   continuityCount;   ///< last Continuity Count (sentinel 0xFF)
     bool   isVideo;
+    bool   isAudio;
     bool   isEncrypted;       ///< true if PID is marked as encrypted
     bool   payloadStartSeen;  ///< true if payload start packet seen on PID
 
@@ -88,6 +90,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     uint ProcessDataTS(unsigned char *buffer, uint len);
     bool ProcessTSPacket(const TSPacket& tspacket);
+    void ProcessTSPacket2(const TSPacket& tspacket);
 
     bool OpenFilters(void);
     void CloseFilters(void);
@@ -110,7 +113,10 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     DeviceReadBuffer *_drb;
 
     void GetTimeStamp(const TSPacket& tspacket);
-    void CreateFakeVideo(void);
+    void CreateVideoFrame(void);
+    static void *StartDummyVideo(void *param);
+    void RunDummyVideo(void);
+    void StopDummyVideo(void);
 
   private:
     // Options set in SetOption()
@@ -136,16 +142,24 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     uint            _next_pmt_version;
     int             _ts_packets_until_psip_sync;
 
-    // Fake video for audio-only streams
+    // Fake video for streams without video
     uint            _audio_header_pos;
     uint            _video_header_pos;
     uint            _audio_pid;
-    int64_t         _time_stamp;
-    int64_t         _next_time_stamp;
+    int64_t         _video_time_stamp;
+    int64_t         _synch_time_stamp;
+    int64_t         _audio_time_stamp;
     int64_t         _new_time_stamp;
     uint            _ts_change_count;
     int             _video_stream_fd;
     double          _frames_per_sec;
+    uint            _video_pid;
+    pthread_t       _video_thread;
+    bool            _stop_dummy;
+    bool            _dummy_stopped;
+    QWaitCondition  _wait_time;
+    QWaitCondition  _wait_stop;
+    QMutex          _ts_lock;
     uint            _video_cc;
 
     // Statistics
