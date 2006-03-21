@@ -250,6 +250,13 @@ using_frontend {
     SOURCES += guidegrid.cpp            infostructs.cpp
     SOURCES += progfind.cpp             ttfont.cpp
 
+    # DSMCC stuff
+    HEADERS += dsmcc.h                  dsmcccache.h
+    HEADERS += dsmccbiop.h              dsmccobjcarousel.h
+    HEADERS += dsmccreceiver.h
+    SOURCES += dsmcc.cpp                dsmcccache.cpp
+    SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
+
     # C stuff
     HEADERS += blend.h
     SOURCES += blend.c
