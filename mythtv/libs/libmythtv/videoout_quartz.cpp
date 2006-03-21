@@ -540,12 +540,14 @@ void VideoOutputQuartzView::Show(void)
     viewLock.lock();
     if (theCodec && thePort && parentData->pixmap)
     {
+      CodecFlags outFlags;
+
       // tell QuickTime to draw the current frame
       if (DecompressSequenceFrameWhen(theCodec,
                                       (Ptr)parentData->pixmap,
                                       parentData->pixmapSize,
                                       0,
-                                      NULL,
+                                      &outFlags,
                                       NULL,
                                       NULL))
       {
