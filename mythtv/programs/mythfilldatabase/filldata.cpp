@@ -225,37 +225,55 @@ unsigned int ELFHash(const char *s)
 
 void clearDataByChannel(int chanid, QDateTime from, QDateTime to) 
 {
+    int secs;
+    QDateTime newFrom, newTo;
+
     MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT tmoffset FROM channel where chanid = :CHANID ;");
+    query.bindValue(":CHANID", chanid);
+    query.exec();
+    if (!query.isActive() || query.size() != 1)
+    {
+        MythContext::DBError("clearDataByChannel", query);
+        return;
+    }
+    query.next();
+    secs = query.value(0).toInt();
+
+    secs *= 60;
+    newFrom = from.addSecs(secs);
+    newTo = to.addSecs(secs);
 
     query.prepare("DELETE FROM program "
                   "WHERE starttime >= :FROM AND starttime < :TO "
                   "AND chanid = :CHANID ;");
-    query.bindValue(":FROM", from);
-    query.bindValue(":TO", to);
+    query.bindValue(":FROM", newFrom);
+    query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
     query.exec();
 
     query.prepare("DELETE FROM programrating "
                   "WHERE starttime >= :FROM AND starttime < :TO "
                   "AND chanid = :CHANID ;");
-    query.bindValue(":FROM", from);
-    query.bindValue(":TO", to);
+    query.bindValue(":FROM", newFrom);
+    query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
     query.exec();
 
     query.prepare("DELETE FROM credits "
                   "WHERE starttime >= :FROM AND starttime < :TO "
                   "AND chanid = :CHANID ;");
-    query.bindValue(":FROM", from);
-    query.bindValue(":TO", to);
+    query.bindValue(":FROM", newFrom);
+    query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
     query.exec();
 
     query.prepare("DELETE FROM programgenres "
                   "WHERE starttime >= :FROM AND starttime < :TO "
                   "AND chanid = :CHANID ;");
-    query.bindValue(":FROM", from);
-    query.bindValue(":TO", to);
+    query.bindValue(":FROM", newFrom);
+    query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
     query.exec();
 }
@@ -988,29 +1006,39 @@ void DataDirectProgramUpdate()
                     "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
                     "originalairdate, colorcode, syndicatedepisodenumber, "
                     "programid) "
-                    "SELECT chanid, starttime, endtime, "
+                    "SELECT dd_v_program.chanid, "
+                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
+                    "DATE_ADD(endtime, INTERVAL channel.tmoffset MINUTE), "
                     "title, subtitle, description, "
                     "showtype, dd_genre.class, category_type, "
                     "airdate, stars, previouslyshown, stereo, subtitled, "
                     "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
                     "originalairdate, colorcode, syndicatedepisodenumber, "
-                    "dd_v_program.programid FROM dd_v_program "
+                    "dd_v_program.programid FROM dd_v_program, channel "
                     "LEFT JOIN dd_genre ON ("
                     "dd_v_program.programid = dd_genre.programid AND "
-                    "dd_genre.relevance = '0');"))
+                    "dd_genre.relevance = '0') "
+                    "WHERE dd_v_program.chanid = channel.chanid;"))
         MythContext::DBError("Inserting into program table", query);
 
     //cerr << "Finished adding rows to main program table...\n";
     //cerr << "Adding program ratings...\n";
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
-                    "system, rating) SELECT chanid, starttime, 'MPAA', "
-                    "mpaarating FROM dd_v_program WHERE mpaarating != '';"))
+                    "system, rating) SELECT dd_v_program.chanid, "
+                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
+                    " 'MPAA', "
+                    "mpaarating FROM dd_v_program, channel WHERE "
+                    "mpaarating != '' AND dd_v_program.chanid = "
+                    "channel.chanid"))
         MythContext::DBError("Inserting into programrating table", query);
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
-                    "system, rating) SELECT chanid, starttime, 'VCHIP', "
-                    "tvrating FROM dd_v_program WHERE tvrating != '';"))
+                    "system, rating) SELECT dd_v_program.chanid, "
+                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
+                    "'VCHIP', "
+                    "tvrating FROM dd_v_program, channel WHERE tvrating != ''"
+                    " AND dd_v_program.chanid = channel.chanid"))
         MythContext::DBError("Inserting into programrating table", query);
 
     //cerr << "Finished adding program ratings...\n";
@@ -1024,20 +1052,25 @@ void DataDirectProgramUpdate()
     //cerr << "Adding credits entries from production crew list...\n";
 
     if (!query.exec("INSERT IGNORE INTO credits (chanid, starttime, person, "
-                    "role) SELECT chanid, starttime, person, role "
-                    "FROM dd_productioncrew, dd_v_program, people "
+                    "role) SELECT dd_v_program.chanid, "
+                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
+                    "person, role "
+                    "FROM dd_productioncrew, dd_v_program, channel, people "
                     "WHERE "
                     "((dd_productioncrew.programid = dd_v_program.programid) "
-                    "AND (dd_productioncrew.fullname = people.name));"))
+                    "AND (dd_productioncrew.fullname = people.name)) "
+                    "AND dd_v_program.chanid = channel.chanid;"))
         MythContext::DBError("Inserting into credits table", query);
 
     //cerr << "Finished inserting credits...\n";
     //cerr << "Adding genres...\n";
 
     if (!query.exec("INSERT IGNORE INTO programgenres (chanid, starttime, "
-                    "relevance, genre) SELECT chanid, starttime, "
-                    "relevance, class FROM dd_v_program, dd_genre "
-                    "WHERE (dd_v_program.programid = dd_genre.programid);"))
+                    "relevance, genre) SELECT dd_v_program.chanid, "
+                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
+                    "relevance, class FROM dd_v_program, dd_genre, channel "
+                    "WHERE (dd_v_program.programid = dd_genre.programid) "
+                    "AND dd_v_program.chanid = channel.chanid"))
         MythContext::DBError("Inserting into programgenres table",query);
 
     //cerr << "Done...\n";

@@ -82,6 +82,19 @@ public:
     };
 };
 
+class TimeOffset: public SpinBoxSetting, public CSetting {
+public:
+    TimeOffset(const ChannelID& id):
+        SpinBoxSetting(-1440, 1440, 1), CSetting(id, "tmoffset") {
+        setLabel(QObject::tr("DataDirect") + " " + QObject::tr("Time Offset"));
+        setHelpText(QObject::tr("Offset (in minutes) to apply to the program "
+                    "guide data during import.  This can be used when the "
+                    "listings for a particular channel are in a different "
+                    "time zone.") + " " +
+                    QObject::tr("(Works for DataDirect listings only.)"));
+    };
+};
+
 class Rank: public SpinBoxSetting, public CSetting {
 public:
     Rank(const ChannelID& id):
@@ -284,6 +297,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
     connect(source,SIGNAL(valueChanged(const QString&)),this,SLOT(sourceChanged(const QString&)));
 #else
     addChild(new XmltvID(id));
+    addChild(new TimeOffset(id));
 #endif
 };
 
@@ -347,3 +361,5 @@ ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id)
     addChild(new Colour(id));
     addChild(new Hue(id));
 };
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1132";
+const QString currentDatabaseVersion = "1133";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -239,6 +239,11 @@ system.
 
 The 'xmltvid' field is used to identify this channel to the listings
 provider.
+
+The 'tmoffset' field is used to apply an offset (in minutes) from the listings
+provided by the provider to a new time in the MythTV program guide database.
+This is very handy when the listings provider has listings which are offset
+by a few hours on individual channels with the rest of them being correct.
 
 The 'recpriority' field is used tell the scheduler from which of two 
 otherwise equivalent programs on two different channels should be 
@@ -2138,6 +2143,17 @@ static bool doUpgradeTVDatabaseSchema(void)
 ""
 };
         if (!performActualUpdate(updates, "1132", dbver))
+            return false;
+    }
+
+    if (dbver == "1132")
+    {
+        const QString updates[] = {
+"ALTER TABLE channel ADD COLUMN tmoffset INT NOT NULL default '0';",
+""
+};
+
+        if (!performActualUpdate(updates, "1133", dbver))
             return false;
     }
 
