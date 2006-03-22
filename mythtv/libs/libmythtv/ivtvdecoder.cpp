@@ -270,7 +270,9 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     GetNVP()->SetVideoParams(720 /*width*/, (ntsc) ? 480 : 576 /*height*/,
                              (ntsc) ? 29.97f : 25.0f, keyframedist, 1.33);
-     
+
+    fps = (ntsc) ? 29.97f : 25.0f; // save for later length calculations
+
     ringBuffer->UpdateRawBitrate(8000);
 
     if (m_playbackinfo || livetv || watchingrecording)
