@@ -2297,7 +2297,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         DisplayDVDButton();
 
     // handle Interactive TV
-    if (textDisplayMode & kDisplayITV)
+    if ((textDisplayMode & kDisplayITV) && GetDecoder())
         itvVisible = GetDecoder()->ITVUpdate(itvVisible);
 
     // handle EIA-608 and Teletext

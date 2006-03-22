@@ -169,23 +169,23 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
     m_version_major = buf[off++];
     m_version_minor = buf[off++];
     off += 2; /* skip byte order & message type */
-    m_message_size  = (buf[off] << 24) | (buf[off+1] << 16) |
-        (buf[off + 2] << 8)  | buf[off + 3];
+    m_message_size  = ((buf[off + 0] << 24) | (buf[off+1] << 16) |
+                       (buf[off + 2] << 8)  | (buf[off + 3]));
     off += 4;
     uint nObjLen = buf[off++];
-    m_objkey.duplicate((const char*)data + off, nObjLen);
+    m_objkey.duplicate((const char*)buf + off, nObjLen);
     off += nObjLen;
-    m_objkind_len = (buf[off] << 24) | (buf[off + 1] << 16) |
-        (buf[off + 2] << 8) | buf[off + 3];
+    m_objkind_len = ((buf[off + 0] << 24) | (buf[off + 1] << 16) |
+                     (buf[off + 2] << 8)  | (buf[off + 3]));
 
     off += 4;
     m_objkind = (char*) malloc(m_objkind_len);
-    memcpy(m_objkind, data + off, m_objkind_len);
+    memcpy(m_objkind, buf + off, m_objkind_len);
     off += m_objkind_len;
     m_objinfo_len = buf[off] << 8 | buf[off + 1];
     off += 2;
     m_objinfo = (char*) malloc(m_objinfo_len);
-    memcpy(m_objinfo, data + off, m_objinfo_len);
+    memcpy(m_objinfo, buf + off, m_objinfo_len);
     off += m_objinfo_len;
     (*curp) += off;
 
@@ -233,7 +233,7 @@ bool BiopMessage::ProcessDir(
         BiopBinding binding;
         int ret = binding.Process(buf + off);
         if (ret > 0)
-            off+= ret;
+            off += ret;
         else
             return false; // Error
 
@@ -264,7 +264,7 @@ bool BiopMessage::ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *filecach
 
     /* skip service contect count */
 
-    off ++;
+    off++;
     msgbody_len = ((buf[off    ] << 24) | (buf[off + 1] << 16) |
                    (buf[off + 2] <<  8) | (buf[off + 3]));
     off += 4;
@@ -275,7 +275,7 @@ bool BiopMessage::ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *filecach
     (*curp) += off;
 
     DSMCCCacheReference ref(cachep->CarouselId(), cachep->ModuleId(),
-                       cachep->StreamId(), m_objkey);
+                            cachep->StreamId(), m_objkey);
 
     QByteArray filedata;
     filedata.duplicate((const char *)data+(*curp), content_len);
