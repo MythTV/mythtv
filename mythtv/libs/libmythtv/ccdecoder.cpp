@@ -1046,6 +1046,9 @@ void CCDecoder::DecodeXDSVChip(int b1, int b2)
 
     xds_current_packet = 0;
 
+    if (xds_buf.size() < 2)
+        return; // collected data too small to contain XDS VChip packet
+
     uint rating_system = ((xds_buf[0]>>3) & 0x7);
     // 0 == us mpaa, 1 == us tpg, 3 == ca english, 7 == ca french
 
