@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "mhi.h"
 #include "osd.h"
 
