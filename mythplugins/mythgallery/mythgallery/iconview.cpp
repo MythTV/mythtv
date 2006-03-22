@@ -1024,6 +1024,16 @@ void IconView::pressMenu()
 
 void IconView::actionMainMenu()
 {
+    if (m_showDevices)
+    {
+        QDir d(m_currDir);
+        if (!d.exists())
+            m_currDir = m_galleryDir;
+
+        loadDirectory(m_currDir);
+        m_showDevices = false;
+    }
+
     clearMenu(m_submenuType);
     m_submenuType->Reset();
 
@@ -1301,6 +1311,8 @@ void IconView::actionShowDevices(void)
         m_currDevice->disconnect(this);
         mon->Unlock(m_currDevice);
     }
+    else
+        m_currDir = m_galleryDir;
 #endif
 
     m_currDevice = NULL;
