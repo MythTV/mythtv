@@ -355,7 +355,7 @@ void UpdateSourceIcons(int sourceid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT ch.chanid, nim.url "
-            "FROM channel ch, callsignnetworkmap csm "
+            "FROM (channel ch, callsignnetworkmap csm) "
             "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
             "WHERE ch.callsign = csm.callsign AND "
             "(icon = :NOICON OR icon = '') AND ch.sourceid = :SOURCEID");
@@ -1014,7 +1014,7 @@ void DataDirectProgramUpdate()
                     "airdate, stars, previouslyshown, stereo, subtitled, "
                     "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
                     "originalairdate, colorcode, syndicatedepisodenumber, "
-                    "dd_v_program.programid FROM dd_v_program, channel "
+                    "dd_v_program.programid FROM (dd_v_program, channel) "
                     "LEFT JOIN dd_genre ON ("
                     "dd_v_program.programid = dd_genre.programid AND "
                     "dd_genre.relevance = '0') "
