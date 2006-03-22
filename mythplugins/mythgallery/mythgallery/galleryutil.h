@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 /* ============================================================
  * File  : exifutil.h
  * Description : 
@@ -23,7 +24,6 @@
 
 class GalleryUtil
 {
-
  public:
     static bool isImage(const char* filePath);
     static bool isMovie(const char* filePath);
@@ -34,6 +34,18 @@ class GalleryUtil
     static bool loadDirectory(ThumbList& itemList,
                               const QString& dir, bool recurse,
                               ThumbDict *itemDict, ThumbGenerator* thumbGen);
+
+    static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
+        { if (move) return Move(src, dst); else return Copy(src, dst); }
+
+    static bool Copy(const QFileInfo &src, QFileInfo &dst);
+    static bool Move(const QFileInfo &src, QFileInfo &dst);
+    static bool Delete(const QFileInfo &file);
+
+  private:
+    static bool CopyDirectory(const QFileInfo src, QFileInfo &dst);
+    static bool MoveDirectory(const QFileInfo src, QFileInfo &dst);
+    static bool DeleteDirectory(const QFileInfo &dir);
 };
 
 #endif /* EXIFUTIL_H */

@@ -286,13 +286,15 @@ void VideoList::buildFsysList(bool flatlist, int parental_level)
         while(itr != medias.end())
         {
             pDev = *itr;
-            if (pDev)
+            if (mon->ValidateAndLock(pDev))
             {
                 QString path = pDev->getMountPath();
-                QString name = path.right(path.length()
-                                                - path.findRev("/")-1);
+                int     tmp  = path.length() - path.findRev("/") - 1;
+                QString name = path.right(tmp);
                 nodespath.append(path);
                 nodesname.append(name);
+
+                mon->Unlock(pDev);
             }
             itr++;
         }

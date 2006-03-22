@@ -16,7 +16,6 @@
  * 
  * ============================================================ */
 
-
 #ifndef ICONVIEW_H
 #define ICONVIEW_H
 
@@ -26,6 +25,7 @@
 #include <qpixmap.h>
 
 #include <mythtv/mythdialogs.h>
+#include <mythtv/mythmedia.h>
 
 class XMLParse;
 class UIListBtnType;
@@ -34,17 +34,14 @@ class ThumbGenerator;
 
 class ThumbItem
 {
-public:
+  public:
+    ThumbItem() :
+        name(""),     caption(""),
+        path(""),     isDir(false),
+        pixmap(NULL), mediaDevice(NULL) { }
 
-    ThumbItem() {
-        pixmap = 0;
-        name   = "";
-        caption= "";
-        path   = "";
-        isDir  = false;
-    }
-
-    ~ThumbItem() {
+    ~ThumbItem()
+    {
         if (pixmap)
             delete pixmap;
     }
@@ -53,11 +50,12 @@ public:
     void SetRotationAngle(int angle);
     bool Remove();
 
-    QPixmap *pixmap;
     QString  name;
     QString  caption;
     QString  path;
     bool     isDir;
+    QPixmap *pixmap;
+    MythMediaDevice *mediaDevice;
 };
 
 typedef QPtrList<ThumbItem> ThumbList;
@@ -65,49 +63,64 @@ typedef QDict<ThumbItem>    ThumbDict;
 
 class IconView : public MythDialog
 {
-     Q_OBJECT
-
-public:
-
-    IconView(const QString& galleryDir, MythMainWindow* parent, 
-             const char* name = 0);
+    Q_OBJECT
+  public:
+    IconView(const QString& galleryDir, MythMediaDevice *initialDevice,
+             MythMainWindow* parent, const char* name = 0);
     ~IconView();
 
-protected:
-
+  protected:
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
     
-private:
-
-    void loadTheme();
+  private:
+    void loadTheme(void);
     void loadDirectory(const QString& dir, bool topleft = true);
 
-    void updateMenu();
-    void updateText();
-    void updateView();
+    void updateMenu(void);
+    void updateText(void);
+    void updateView(void);
 
-    bool moveUp();
-    bool moveDown();
-    bool moveLeft();
-    bool moveRight();
+    bool moveUp(void);
+    bool moveDown(void);
+    bool moveLeft(void);
+    bool moveRight(void);
 
-    void actionRotateCW();
-    void actionRotateCCW();
-    void actionDelete();
-    void actionSlideShow();
-    void actionRandomShow();
-    void actionSettings();
-    void actionImport();
+    void actionMainMenu(void);
+    void actionSubMenuMetadata(void);
+    void actionSubMenuMark(void);
+    void actionSubMenuFile(void);
 
-    void pressMenu();
+    void actionRotateCW(void);
+    void actionRotateCCW(void);
+    void actionDeleteCurrent(void);
+    void actionSlideShow(void);
+    void actionRandomShow(void);
+    void actionSettings(void);
+    void actionImport(void);
+#ifndef _WIN32
+    void actionShowDevices(void);
+#endif
+    void actionCopyHere(void);
+    void actionMoveHere(void);
+    void actionDelete(void);
+    void actionDeleteMarked(void);
+    void actionClearMarked(void);
+    void actionSelectAll(void);
+    void actionMkDir(void);
+
+    void pressMenu(void);
 
     void loadThumbnail(ThumbItem *item);
     void importFromDir(const QString &fromDir, const QString &toDir);
+    void CopyMarkedFiles(bool move = false);
+
+    void clearMenu(UIListBtnType *menu);
     
     QPtrList<ThumbItem> m_itemList;
     QDict<ThumbItem>    m_itemDict;
+    QStringList         m_itemMarked;
     QString             m_galleryDir;
 
     XMLParse           *m_theme;
@@ -116,15 +129,20 @@ private:
     QRect               m_viewRect;
 
     bool                m_inMenu;
+    bool                m_inSubMenu;
     UIListBtnType      *m_menuType;
+    UIListBtnType      *m_submenuType;
     
     QPixmap             m_backRegPix;
     QPixmap             m_backSelPix;
     QPixmap             m_folderRegPix;
     QPixmap             m_folderSelPix;
+    QPixmap             m_MrkPix;
 
     QString             m_currDir;
     bool                m_isGallery;
+    bool                m_showDevices;
+    MythMediaDevice    *m_currDevice;
 
     int                 m_currRow;
     int                 m_currCol;
@@ -142,7 +160,10 @@ private:
     ThumbGenerator     *m_thumbGen;
     int                 m_showcaption;
 
-    typedef void (IconView::*Action)();
+    typedef void (IconView::*Action)(void);
+
+  public slots:
+    void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 };
 
 

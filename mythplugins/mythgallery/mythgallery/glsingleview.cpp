@@ -19,8 +19,10 @@
  * 
  * ============================================================ */
 
-#include <iostream>
-#include <math.h>
+#include <cmath>
+
+#include <algorithm>
+using namespace std;
 
 #include <qtimer.h>
 #include <qimage.h>
@@ -36,6 +38,9 @@
 
 #include "glsingleview.h"
 #include "galleryutil.h"
+
+#define LOC QString("GLXDialog: ")
+#define LOC_ERR QString("GLXDialog, Error: ")
 
 GLSDialog::GLSDialog(const ThumbList& itemList, int pos, int slideShow, 
                      MythMainWindow *parent, const char *name)
@@ -72,11 +77,11 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     setFocusPolicy(QWidget::WheelFocus);
 
     int   xbase, ybase;
-    gContext->GetScreenSettings(xbase, screenwidth, wmult,
+    gContext->GetScreenSettings(xbase, screenwidth, wmult, 
                                 ybase, screenheight, hmult);
-    
-    m_w = QMIN( 1024, 1 << (int)ceil(log((float)screenwidth)/log((float)2)) );
-    m_h = QMIN( 1024, 1 << (int)ceil(log((float)screenheight)/log((float)2)) );
+
+    m_w = min(1024, 1 << (int)ceil(log((float)screenwidth)/log((float)2)));
+    m_h = min(1024, 1 << (int)ceil(log((float)screenheight)/log((float)2)));
 
     // --------------------------------------------------------------------
 
@@ -85,19 +90,24 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
 
     m_itemList.setAutoDelete(false);
     ThumbItem* item = m_itemList.first();
-    while (item) {
+    while (item)
+    {
         ThumbItem* next = m_itemList.next();
-        if (item->isDir) {
+        if (item->isDir)
+        {
             if (recurse)
-                GalleryUtil::loadDirectory(m_itemList, item->path, recurse, NULL, NULL);
+            {
+                GalleryUtil::loadDirectory(m_itemList, item->path, 
+                                           recurse, NULL, NULL);
+            }
             m_itemList.remove(item);
         }
         item = next;
     }
-    
+
     // since we remove dirs item position might have changed
     item = itemList.at(m_pos);
-    if (item) 
+    if (item)
         m_pos = m_itemList.find(item);
 
     if (!item || (m_pos == -1))
@@ -113,8 +123,8 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     // --------------------------------------------------------------------
 
     m_sx = m_sy = 0;
-    m_zoom = 1.0;       
-    
+    m_zoom = 1.0;
+
     // ---------------------------------------------------------------
 
     registerEffects();
@@ -124,12 +134,13 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     QString transType = gContext->GetSetting("SlideshowOpenGLTransition");
     if (!transType.isEmpty() && m_effectMap.contains(transType))
         m_effectMethod = m_effectMap[transType];
-    
-    if (!m_effectMethod || transType == QString("random (gl)")) {
+
+    if (!m_effectMethod || transType == QString("random (gl)"))
+    {
         m_effectMethod = getRandomEffect();
         m_effectRandom = true;
     }
-    
+
     // --------------------------------------------------------------------
 
     m_delay = gContext->GetNumSetting("SlideshowDelay", 0);
@@ -148,10 +159,10 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     // ---------------------------------------------------------------
 
     m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()),
+    connect(m_timer, SIGNAL(timeout()), 
             SLOT(slotTimeOut()));
 
-    if (slideShow > 1) 
+    if (slideShow > 1)
     {
         m_sequence = new SequenceShuffle(m_itemList.count());
         m_pos = 0;
@@ -160,7 +171,8 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
         m_sequence = new SequenceInc(m_itemList.count());
     m_pos = m_sequence->index(m_pos);
 
-    if (slideShow) {
+    if (slideShow)
+    {
         m_running = true;
         m_timer->start(m_tmout, true);
         gContext->DisableScreensaver();
@@ -169,12 +181,13 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
 
 GLSingleView::~GLSingleView()
 {
-    if( m_sequence ) {
+    if (m_sequence)
+    {
         delete m_sequence;
-    }    
+    }
 }
 
-void GLSingleView::cleanUp()
+void GLSingleView::cleanUp(void)
 {
     if (class LCD* lcd = LCD::Get())
     {
@@ -192,7 +205,7 @@ void GLSingleView::cleanUp()
         glDeleteTextures(1, &m_texItem[1].tex);
 }
 
-void GLSingleView::initializeGL()
+void GLSingleView::initializeGL(void)
 {
     // Enable Texture Mapping
     glEnable(GL_TEXTURE_2D);
@@ -202,7 +215,7 @@ void GLSingleView::initializeGL()
     // Turn Blending On
     glEnable(GL_BLEND);
     // Blending Function For Translucency Based On Source Alpha Value
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Enable perspective vision
     glClearDepth(1.0f);
@@ -210,16 +223,16 @@ void GLSingleView::initializeGL()
     loadImage();
 }
 
-void GLSingleView::resizeGL( int w, int h )
+void GLSingleView::resizeGL(int w, int h)
 {
     // Reset The Current Viewport And Perspective Transformation
-    glViewport(0, 0, (GLint)w, (GLint)h); 
+    glViewport(0, 0, (GLint)w, (GLint)h);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 }
 
-void GLSingleView::paintGL()
+void GLSingleView::paintGL(void)
 {
     if (m_movieState > 0)
     {
@@ -238,7 +251,7 @@ void GLSingleView::paintGL()
         }
         return;
     }
- 
+
     glDisable(GL_DEPTH_TEST);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -246,19 +259,21 @@ void GLSingleView::paintGL()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if (m_effectRunning && m_effectMethod) {
+    if (m_effectRunning && m_effectMethod)
+    {
         (this->*m_effectMethod)();
     }
-    else 
+    else
+    {
         paintTexture();
+    }
 
-    if (glGetError())  
-        std::cout << "Oops! I screwed up my OpenGL calls somewhere"
-                  << std::endl;
+    if (glGetError())
+        VERBOSE(VB_GENERAL, LOC_ERR + "OpenGL error detected");
 }
 
 void GLSingleView::keyPressEvent(QKeyEvent *e)
@@ -274,13 +289,13 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
     bool wasInfo = m_showInfo;
     m_showInfo = false;
-    
+
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-    float scrollX = 0.02;
-    float scrollY = 0.02;
-    
+    float scrollX = 0.02f;
+    float scrollY = 0.02f;
+
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -288,7 +303,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT" || action == "UP")
         {
-            m_zoom = 1.0;
+            m_zoom = 1.0f;
             m_sx   = 0;
             m_sy   = 0;
             retreatFrame();
@@ -296,7 +311,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "RIGHT" || action == "DOWN")
         {
-            m_zoom = 1.0;
+            m_zoom = 1.0f;
             m_sx   = 0;
             m_sy   = 0;
             advanceFrame();
@@ -306,7 +321,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             m_sx   = 0;
             m_sy   = 0;
-            if (m_zoom > 0.5) {
+            if (m_zoom > 0.5f)
+            {
                 m_zoom = m_zoom /2;
             }
             else
@@ -316,7 +332,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             m_sx   = 0;
             m_sy   = 0;
-            if (m_zoom < 4.0) {
+            if (m_zoom < 4.0f)
+            {
                 m_zoom = m_zoom * 2;
             }
             else
@@ -326,71 +343,79 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             m_sx = 0;
             m_sy = 0;
-            if (m_zoom != 1) {
-                m_zoom = 1.0;
+            if (m_zoom != 1)
+            {
+                m_zoom = 1.0f;
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLLEFT")
         {
-            if (m_zoom > 1.0 && m_sx < 1.0) {
+            if (m_zoom > 1.0f && m_sx < 1.0f)
+            {
                 m_sx += scrollX;
-                m_sx  = QMIN(m_sx, 1.0);
+                m_sx  = min(m_sx, 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLRIGHT")
         {
-            if (m_zoom > 1.0 && m_sx > -1.0) {
+            if (m_zoom > 1.0f && m_sx > -1.0f)
+            {
                 m_sx -= scrollX;
-                m_sx  = QMAX(m_sx, -1.0);
+                m_sx  = max(m_sx, -1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLUP")
         {
-            if (m_zoom > 1.0 && m_sy < 1.0) {
+            if (m_zoom > 1.0f && m_sy < 1.0f)
+            {
                 m_sy += scrollY;
-                m_sy  = QMIN(m_sy, 1.0);
+                m_sy  = min(m_sy, 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLDOWN")
         {
-            if (m_zoom > 1.0 && m_sy > -1.0) {
+            if (m_zoom > 1.0f && m_sy > -1.0f)
+            {
                 m_sy -= scrollY;
-                m_sy  = QMAX(m_sy, -1.0);
+                m_sy  = max(m_sy, -1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "RECENTER")
         {
-            if (m_zoom > 1.0) {
-                m_sx = 0.0;
-                m_sy = 0.0;
+            if (m_zoom > 1.0f)
+            {
+                m_sx = 0.0f;
+                m_sy = 0.0f;
             }
             else
                 handled = false;
         }
         else if (action == "UPLEFT")
         {
-            if (m_zoom > 1.0) {
-                m_sx  =  1.0;
-                m_sy  = -1.0;
+            if (m_zoom > 1.0f)
+            {
+                m_sx  =  1.0f;
+                m_sy  = -1.0f;
             }
             else
                 handled = false;
         }
         else if (action == "LOWRIGHT")
         {
-            if (m_zoom > 1.0) {
-                m_sx = -1.0;
-                m_sy =  1.0;
+            if (m_zoom > 1.0f)
+            {
+                m_sx = -1.0f;
+                m_sy =  1.0f;
             }
             else
                 handled = false;
@@ -410,41 +435,43 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         else if (action == "DELETE")
         {
             ThumbItem *item = m_itemList.at(m_pos);
-            if (item) {
-                if( item->Remove() ) {
-                    m_zoom = 1.0;
-                    m_sx   = 0;
-                    m_sy   = 0;
-        	    // Delete thumbnail for this
-                    if (item->pixmap)
-                        delete item->pixmap;
-                    item->pixmap = 0;
-                    advanceFrame();
-                    loadImage();
-                }
+            if (item && GalleryUtil::Delete(item->path))
+            {
+                m_zoom = 1.0f;
+                m_sx   = 0;
+                m_sy   = 0;
+                // Delete thumbnail for this
+                if (item->pixmap)
+                    delete item->pixmap;
+                item->pixmap = 0;
+                advanceFrame();
+                loadImage();
             }
         }
-        else if (action == "PLAY" || action == "SLIDESHOW" || action == "RANDOMSHOW")
+        else if (action == "PLAY" || action == "SLIDESHOW" ||
+                 action == "RANDOMSHOW")
         {
             m_sx   = 0;
             m_sy   = 0;
-            m_zoom = 1.0;
+            m_zoom = 1.0f;
             m_running = !wasRunning;
         }
         else if (action == "INFO")
         {
             m_showInfo = !wasInfo;
         }
-        else 
+        else
             handled = false;
     }
 
-    if (m_running) {
+    if (m_running)
+    {
         m_timer->start(m_tmout, true);
         gContext->DisableScreensaver();
     }
-    
-    if (handled) {
+
+    if (handled)
+    {
         updateGL();
         e->accept();
     }
@@ -453,63 +480,64 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void GLSingleView::paintTexture()
+void GLSingleView::paintTexture(void)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glTranslatef(m_sx, m_sy, 0.0);
-    glScalef(m_zoom, m_zoom, 1.0);
+    glTranslatef(m_sx, m_sy, 0.0f);
+    glScalef(m_zoom, m_zoom, 1.0f);
 
     TexItem& t = m_texItem[m_curr];
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(t.angle, 0.0, 0.0, 1.0);
+    glRotatef(t.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, t.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
-        glTexCoord2f(0, 0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 0.0f);
         glVertex3f(-t.cx, -t.cy, 0);
-        
-        glTexCoord2f(1, 0);
+
+        glTexCoord2f(1.0f, 0.0f);
         glVertex3f(t.cx, -t.cy, 0);
-        
-        glTexCoord2f(1, 1);
+
+        glTexCoord2f(1.0f, 1.0f);
         glVertex3f(t.cx, t.cy, 0);
-            
-        glTexCoord2f(0, 1);
+
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3f(-t.cx, t.cy, 0);
     }
     glEnd();
 
-    if (m_showInfo) {
+    if (m_showInfo)
+    {
 
         createTexInfo();
-    
+
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        
+
         glMatrixMode(GL_TEXTURE);
         glLoadIdentity();
-        
+
         glBindTexture(GL_TEXTURE_2D, m_texInfo);
         glBegin(GL_QUADS);
         {
-            glColor4f(1.0, 1.0, 1.0, 0.72);
-            glTexCoord2f(0, 0);
-            glVertex3f(-0.75, -0.75, 0);
-            
-            glTexCoord2f(1, 0);
-            glVertex3f(0.75, -0.75, 0);
-            
-            glTexCoord2f(1, 1);
-            glVertex3f(0.75, 0.75, 0);
-            
-            glTexCoord2f(0, 1);
-            glVertex3f(-0.75, 0.75, 0);
+            glColor4f(1.0f, 1.0f, 1.0f, 0.72f);
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex3f(-0.75f, -0.75f, 0.0f);
+
+            glTexCoord2f(1.0f, 0.0f);
+            glVertex3f(+0.75f, -0.75f, 0.0f);
+
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3f(+0.75f, +0.75f, 0.0f);
+
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex3f(-0.75f, +0.75f, 0.0f);
         }
         glEnd();
 
@@ -517,20 +545,25 @@ void GLSingleView::paintTexture()
 
 }
 
-void GLSingleView::advanceFrame()
+void GLSingleView::advanceFrame(void)
 {
-    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    // Search for next item that hasn't been deleted.
+    // Close viewer if none remain.
     ThumbItem *item;
     int oldpos = m_pos;
-    while( 1 ) {
+    while(1)
+    {
         m_pos = m_sequence->next();
         item = m_itemList.at(m_pos);
-        if( item ) {
-            if( QFile::exists(item->path) ) {
+        if (item)
+        {
+            if (QFile::exists(item->path))
+            {
                 break;
             }
 	}
-        if( m_pos == oldpos ) {
+        if (m_pos == oldpos)
+        {
             // No valid items!!!
             close();
         }
@@ -540,20 +573,25 @@ void GLSingleView::advanceFrame()
     m_curr      = (m_curr == 0) ? 1 : 0;
 }
 
-void GLSingleView::retreatFrame()
+void GLSingleView::retreatFrame(void)
 {
-    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    // Search for next item that hasn't been deleted.
+    // Close viewer in none remain.
     ThumbItem *item;
     int oldpos = m_pos;
-    while( 1 ) {
+    while(1)
+    {
         m_pos = m_sequence->prev();
         item = m_itemList.at(m_pos);
-        if( item ) {
-            if( QFile::exists(item->path) ) {
+        if (item)
+        {
+            if (QFile::exists(item->path))
+            {
                 break;
             }
 	}
-        if( m_pos == oldpos ) {
+        if (m_pos == oldpos)
+        {
             // No valid items!!!
             close();
         }
@@ -563,31 +601,36 @@ void GLSingleView::retreatFrame()
     m_curr = (m_curr == 0) ? 1 : 0;
 }
 
-void GLSingleView::loadImage()
+void GLSingleView::loadImage(void)
 {
     m_movieState = 0;
     ThumbItem *item = m_itemList.at(m_pos);
-    if (!item) {
-        std::cerr << "GLSingleView: The impossible happened. No item at "
-                  << m_pos << std::endl;
+    if (!item)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
         return;
     }
 
-    if (GalleryUtil::isMovie(item->path)) {
+    if (GalleryUtil::isMovie(item->path))
+    {
         m_movieState = 1;
         return;
     }
 
     QImage image(item->path);
-    if (!image.isNull()) {
+    if (!image.isNull())
+    {
 
         if (class LCD* lcd = LCD::Get())
         {
             QPtrList<LCDTextItem> textItems;
             textItems.setAutoDelete(true);
-            textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->name, "Generic", true));
-            textItems.append(new LCDTextItem(2, ALIGN_CENTERED, QString::number(m_pos + 1) 
-                    + " / " + QString::number(m_itemList.count()), "Generic", false));
+            textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->name, 
+                                             "Generic", true));
+            QString tmp = QString::number(m_pos + 1) + " / " +
+                QString::number(m_itemList.count());
+            textItems.append(new LCDTextItem(
+                                 2, ALIGN_CENTERED, tmp, "Generic", false));
             lcd->switchToGeneric(&textItems);
         }
 
@@ -602,22 +645,24 @@ void GLSingleView::loadImage()
         t.width  = image.width();
         t.height = image.height();
 
-        if (t.angle%180 != 0) {
+        if (t.angle%180 != 0)
+        {
             int tmp  = t.width;
             t.width  = t.height;
             t.height = tmp;
         }
 
-        QSize sz(t.width,t.height);
+        QSize sz(t.width, t.height);
         sz.scale(screenwidth, screenheight, QSize::ScaleMin);
-    
+
         t.cx = (float)sz.width()/(float)screenwidth;
         t.cy = (float)sz.height()/(float)screenheight;
 
         image = image.smoothScale(m_w, m_h);
         QImage tex = convertToGLFormat(image);
 
-        if (t.tex) {
+        if (t.tex)
+        {
             glDeleteTextures(1, &t.tex);
         }
 
@@ -626,11 +671,11 @@ void GLSingleView::loadImage()
         glBindTexture(GL_TEXTURE_2D, t.tex);
 
         /* actually generate the texture */
-        glTexImage2D( GL_TEXTURE_2D, 0, 3, tex.width(), tex.height(), 0,
-                      GL_RGBA, GL_UNSIGNED_BYTE, tex.bits() );
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, tex.width(), tex.height(), 0, 
+                     GL_RGBA, GL_UNSIGNED_BYTE, tex.bits());
         /* enable linear filtering  */
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     }
 }
@@ -647,7 +692,8 @@ void GLSingleView::rotate(int angle)
         ang += 360;
 
     ThumbItem *item = m_itemList.at(m_pos);
-    if (item) {
+    if (item)
+    {
         item->SetRotationAngle(ang);
 
         // Delete thumbnail for this
@@ -657,48 +703,48 @@ void GLSingleView::rotate(int angle)
     }
 
     TexItem& t = m_texItem[m_curr];
-    
+
     int tmp  = t.width;
     t.width  = t.height;
     t.height = tmp;
 
-    QSize sz(t.width,t.height);
+    QSize sz(t.width, t.height);
     sz.scale(screenwidth, screenheight, QSize::ScaleMin);
-    
+
     t.cx = (float)sz.width()/(float)screenwidth;
     t.cy = (float)sz.height()/(float)screenheight;
 }
 
-void GLSingleView::registerEffects()
+void GLSingleView::registerEffects(void)
 {
-    m_effectMap.insert("none", &GLSingleView::effectNone);
-    m_effectMap.insert("blend (gl)", &GLSingleView::effectBlend);
+    m_effectMap.insert("none",            &GLSingleView::effectNone);
+    m_effectMap.insert("blend (gl)",      &GLSingleView::effectBlend);
     m_effectMap.insert("zoom blend (gl)", &GLSingleView::effectZoomBlend);
-    m_effectMap.insert("fade (gl)", &GLSingleView::effectFade);
-    m_effectMap.insert("rotate (gl)", &GLSingleView::effectRotate);
-    m_effectMap.insert("bend (gl)", &GLSingleView::effectBend);
-    m_effectMap.insert("inout (gl)", &GLSingleView::effectInOut);
-    m_effectMap.insert("slide (gl)", &GLSingleView::effectSlide);
-    m_effectMap.insert("flutter (gl)", &GLSingleView::effectFlutter);
-    m_effectMap.insert("cube (gl)", &GLSingleView::effectCube);
+    m_effectMap.insert("fade (gl)",       &GLSingleView::effectFade);
+    m_effectMap.insert("rotate (gl)",     &GLSingleView::effectRotate);
+    m_effectMap.insert("bend (gl)",       &GLSingleView::effectBend);
+    m_effectMap.insert("inout (gl)",      &GLSingleView::effectInOut);
+    m_effectMap.insert("slide (gl)",      &GLSingleView::effectSlide);
+    m_effectMap.insert("flutter (gl)",    &GLSingleView::effectFlutter);
+    m_effectMap.insert("cube (gl)",       &GLSingleView::effectCube);
 }
 
-GLSingleView::EffectMethod GLSingleView::getRandomEffect()
+GLSingleView::EffectMethod GLSingleView::getRandomEffect(void)
 {
-    QMap<QString,EffectMethod>  tmpMap(m_effectMap);
+    QMap<QString, EffectMethod>  tmpMap(m_effectMap);
 
     tmpMap.remove("none");
     QStringList t = tmpMap.keys();
 
     int count = t.count();
 
-    int i = (int)((float)(count)*rand()/(RAND_MAX+1.0));
+    int i = (int)((float)(count) * rand()/(RAND_MAX+1.0));
     QString key = t[i];
 
     return tmpMap[key];
 }
 
-void GLSingleView::effectNone()
+void GLSingleView::effectNone(void)
 {
     paintTexture();
     m_effectRunning = false;
@@ -706,9 +752,10 @@ void GLSingleView::effectNone()
     return;
 }
 
-void GLSingleView::effectBlend()
+void GLSingleView::effectBlend(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
@@ -720,67 +767,70 @@ void GLSingleView::effectBlend()
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
+
     glBegin(GL_QUADS);
     {
         glColor4f(1.0, 1.0, 1.0, 1.0);
-        glTexCoord2f(0, 0);
-        glVertex3f(-ta.cx, -ta.cy, 0);
-        
-        glTexCoord2f(1, 0);
-        glVertex3f(ta.cx, -ta.cy, 0);
-                 
-        glTexCoord2f(1, 1);
-        glVertex3f(ta.cx, ta.cy, 0);
-        
-        glTexCoord2f(0, 1);
-        glVertex3f(-ta.cx, ta.cy, 0);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-ta.cx, -ta.cy, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(+ta.cx, -ta.cy, 0.0f);
+
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(+ta.cx, +ta.cy, 0.0f);
+
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-ta.cx, +ta.cy, 0.0f);
     }
     glEnd();
 
     glBegin(GL_QUADS);
     {
-        glColor4f(0.0, 0.0, 0.0, 1.0/(100.0)*(float)m_i);
-        glVertex3f(-1, -1, 0);
-        glVertex3f(1, -1, 0);
-        glVertex3f(1, 1, 0);
-        glVertex3f(-1, 1, 0);
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f / (100.0f) * (float)m_i);
+        glVertex3f(-1.0f, -1.0f, 0.0f);
+        glVertex3f(+1.0f, -1.0f, 0.0f);
+        glVertex3f(+1.0f, +1.0f, 0.0f);
+        glVertex3f(-1.0f, +1.0f, 0.0f);
     }
     glEnd();
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
+
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0/(100.0)*(float)m_i);
-        glTexCoord2f(0, 0);
-        glVertex3f(-tb.cx, -tb.cy, 0);
-        
-        glTexCoord2f(1, 0);
-        glVertex3f(tb.cx, -tb.cy, 0);
-                 
-        glTexCoord2f(1, 1);
-        glVertex3f(tb.cx, tb.cy, 0);
-        
-        glTexCoord2f(0, 1);
-        glVertex3f(-tb.cx, tb.cy, 0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f / (100.0f) * (float)m_i);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-tb.cx, -tb.cy, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(+tb.cx, -tb.cy, 0.0f);
+
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(+tb.cx, +tb.cy, 0.0f);
+
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-tb.cx, +tb.cy, 0.0f);
     }
     glEnd();
 
     m_i++;
 }
 
-void GLSingleView::effectZoomBlend()
+void GLSingleView::effectZoomBlend(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
@@ -789,68 +839,71 @@ void GLSingleView::effectZoomBlend()
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
-    float zf = 0.75;
+    float zf = 0.75f;
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
-	float t=1.0/(100.00)*(float)m_i;
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
+    float t = 1.0f / (100.00f) * (float)m_i;
     glBindTexture(GL_TEXTURE_2D, ta.tex);
+
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0-t);
-        glTexCoord2f(0, 0);
-        glVertex3f(-ta.cx*(1.0+zf*t), -ta.cy*(1.0+zf*t), 0);
-        
-        glTexCoord2f(1, 0);
-        glVertex3f(ta.cx*(1.0+zf*t), -ta.cy*(1.0+zf*t), 0);
-                 
-        glTexCoord2f(1, 1);
-        glVertex3f(ta.cx*(1.0+zf*t), ta.cy*(1.0+zf*t), 0);
-        
-        glTexCoord2f(0, 1);
-        glVertex3f(-ta.cx*(1.0+zf*t), ta.cy*(1.0+zf*t), 0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f - t);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-ta.cx * (1.0f + zf * t), -ta.cy * (1.0f + zf * t), 0);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(ta.cx * (1.0f + zf * t), -ta.cy * (1.0f + zf * t), 0);
+
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(ta.cx * (1.0f + zf * t), ta.cy * (1.0f + zf * t), 0);
+
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-ta.cx * (1.0f + zf * t), ta.cy * (1.0f + zf * t), 0);
     }
     glEnd();
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
+
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0/(100.0)*(float)m_i);
-        glTexCoord2f(0, 0);
-        glVertex3f(-tb.cx, -tb.cy, 0);
-        
-        glTexCoord2f(1, 0);
-        glVertex3f(tb.cx, -tb.cy, 0);
-                 
-        glTexCoord2f(1, 1);
-        glVertex3f(tb.cx, tb.cy, 0);
-        
-        glTexCoord2f(0, 1);
-        glVertex3f(-tb.cx, tb.cy, 0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f / (100.0f) * (float) m_i);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-tb.cx, -tb.cy, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(tb.cx, -tb.cy, 0.0f);
+
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(tb.cx, tb.cy, 0.0f);
+
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-tb.cx, tb.cy, 0.0f);
     }
     glEnd();
 
     m_i++;
 }
 
-void GLSingleView::effectRotate()
+void GLSingleView::effectRotate(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
         return;
     }
-    
-    if (m_i == 0) 
+
+    if (m_i == 0)
         m_dir = (int)((2.0*rand()/(RAND_MAX+1.0)));
 
     int a = (m_curr == 0) ? 1 : 0;
@@ -858,24 +911,24 @@ void GLSingleView::effectRotate()
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-tb.cx, -tb.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(tb.cx, -tb.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(tb.cx, tb.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-tb.cx, tb.cy, 0);
     }
@@ -883,29 +936,29 @@ void GLSingleView::effectRotate()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float rotate = 360.0/100.0*(float)m_i;
-    glRotatef( ((m_dir == 0) ? -1 : 1) * rotate,
-               0.0, 0.0, 1.0);
-    float scale = 1.0/100.0*(100.0-(float)(m_i));
-    glScalef(scale,scale,1.0);
-    
+    float rotate = 360.0f/100.0f*(float)m_i;
+    glRotatef(((m_dir == 0) ? -1 : 1) * rotate, 
+              0.0f, 0.0f, 1.0f);
+    float scale = 1.0f/100.0f*(100.0f-(float)(m_i));
+    glScalef(scale, scale, 1.0f);
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-ta.cx, -ta.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(ta.cx, -ta.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(ta.cx, ta.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-ta.cx, ta.cy, 0);
     }
@@ -915,41 +968,42 @@ void GLSingleView::effectRotate()
 
 }
 
-void GLSingleView::effectBend()
+void GLSingleView::effectBend(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
         return;
     }
 
-    if (m_i == 0) 
-        m_dir = (int)((2.0*rand()/(RAND_MAX+1.0)));
-    
+    if (m_i == 0)
+        m_dir = (int)((2.0f*rand()/(RAND_MAX+1.0f)));
+
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-tb.cx, -tb.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(tb.cx, -tb.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(tb.cx, tb.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-tb.cx, tb.cy, 0);
     }
@@ -957,28 +1011,28 @@ void GLSingleView::effectBend()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef(90.0/100.0*(float)m_i,
-              (m_dir == 0) ? 1.0 : 0.0,
-              (m_dir == 1) ? 1.0 : 0.0, 
-              0.0);
+    glRotatef(90.0f/100.0f*(float)m_i, 
+              (m_dir == 0) ? 1.0f : 0.0f, 
+              (m_dir == 1) ? 1.0f : 0.0f, 
+              0.0f);
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-ta.cx, -ta.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(ta.cx, -ta.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(ta.cx, ta.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-ta.cx, ta.cy, 0);
     }
@@ -987,9 +1041,10 @@ void GLSingleView::effectBend()
     m_i++;
 }
 
-void GLSingleView::effectFade()
+void GLSingleView::effectFade(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
@@ -998,12 +1053,13 @@ void GLSingleView::effectFade()
 
     int a;
     float opacity;
-    if (m_i <= 50) {
+    if (m_i <= 50)
+    {
         a =  (m_curr == 0) ? 1 : 0;
-        opacity = 1.0 - 1.0/50.0*(float)(m_i);
+        opacity = 1.0f - 1.0f/50.0f*(float)(m_i);
     }
     else {
-        opacity = 1.0/50.0*(float)(m_i-50.0);
+        opacity = 1.0f/50.0f*(float)(m_i-50.0f);
         a = m_curr;
     }
 
@@ -1011,21 +1067,21 @@ void GLSingleView::effectFade()
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, opacity);
+        glColor4f(1.0f, 1.0f, 1.0f, opacity);
         glTexCoord2f(0, 0);
         glVertex3f(-ta.cx, -ta.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(ta.cx, -ta.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(ta.cx, ta.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-ta.cx, ta.cy, 0);
     }
@@ -1033,29 +1089,33 @@ void GLSingleView::effectFade()
 
 
     m_i++;
-    
+
 }
 
-void GLSingleView::effectInOut()
+void GLSingleView::effectInOut(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
         return;
     }
 
-    if (m_i == 0) {
-        m_dir = 1 + (int)((4.0*rand()/(RAND_MAX+1.0)));
+    if (m_i == 0)
+    {
+        m_dir = 1 + (int)((4.0f*rand()/(RAND_MAX+1.0f)));
     }
-    
+
     int a;
     bool out;
-    if (m_i <= 50) {
+    if (m_i <= 50)
+    {
         a   = (m_curr == 0) ? 1 : 0;
         out = 1;
     }
-    else {
+    else
+    {
         a   = m_curr;
         out = 0;
     }
@@ -1064,32 +1124,35 @@ void GLSingleView::effectInOut()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float t = out ? 1.0/50.0*(50.0-m_i) : 1.0/50.0*(m_i-50.0);
-    glScalef(t, t, 1.0);
-    t = 1.0 - t;
-    glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * t : 0.0,
-                 (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * t : 0.0, 
-                 0.0);
-    
+    float t = (out) ?
+        1.0f / 50.0f * (50.0f - m_i) :
+        1.0f / 50.0f * (m_i - 50.0f);
+
+    glScalef(t, t, 1.0f);
+    t = 1.0f - t;
+    glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * t : 0.0f, 
+                 (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * t : 0.0f, 
+                 0.0f);
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
-        
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-ta.cx, -ta.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(ta.cx, -ta.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(ta.cx, ta.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-ta.cx, ta.cy, 0);
     }
@@ -1099,41 +1162,42 @@ void GLSingleView::effectInOut()
     m_i++;
 }
 
-void GLSingleView::effectSlide()
+void GLSingleView::effectSlide(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
         return;
     }
 
-    if (m_i == 0) 
-        m_dir = 1 + (int)((4.0*rand()/(RAND_MAX+1.0)));
+    if (m_i == 0)
+        m_dir = 1 + (int)((4.0f * rand() / (RAND_MAX + 1.0f)));
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
-    
+
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-tb.cx, -tb.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(tb.cx, -tb.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(tb.cx, tb.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-tb.cx, tb.cy, 0);
     }
@@ -1141,30 +1205,30 @@ void GLSingleView::effectSlide()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float trans = 2.0/100.0*(float)m_i;
-    glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * trans : 0.0,
-                 (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * trans : 0.0, 
-                 0.0);
+    float trans = 2.0f/100.0f*(float)m_i;
+    glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * trans : 0.0f, 
+                 (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * trans : 0.0f, 
+                 0.0f);
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
-        
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-ta.cx, -ta.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(ta.cx, -ta.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(ta.cx, ta.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-ta.cx, ta.cy, 0);
     }
@@ -1173,9 +1237,10 @@ void GLSingleView::effectSlide()
     m_i++;
 }
 
-void GLSingleView::effectFlutter()
+void GLSingleView::effectFlutter(void)
 {
-    if (m_i > 100) {
+    if (m_i > 100)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
@@ -1184,64 +1249,67 @@ void GLSingleView::effectFlutter()
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
-    
+
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
-    
 
-    if (m_i == 0) {
-        for (int x = 0; x<40; x++) {
-            for (int y = 0; y < 40; y++) {
+
+    if (m_i == 0)
+    {
+        for (int x = 0; x < 40; x++)
+        {
+            for (int y = 0; y < 40; y++)
+            {
                 m_points[x][y][0] = (float) (x / 20.0f - 1.0f) * ta.cx;
                 m_points[x][y][1] = (float) (y / 20.0f - 1.0f) * ta.cy;
-                m_points[x][y][2] = (float) sin((x / 20.0f - 1.0f) * 3.141592654*2.0f)/5.0;
+                m_points[x][y][2] = (float) sin((x / 20.0f - 1.0f) *
+                                                3.141592654f * 2.0f) / 5.0;
             }
         }
-    }        
+    }
 
-    
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glTexCoord2f(0, 0);
         glVertex3f(-tb.cx, -tb.cy, 0);
-        
+
         glTexCoord2f(1, 0);
         glVertex3f(tb.cx, -tb.cy, 0);
-                 
+
         glTexCoord2f(1, 1);
         glVertex3f(tb.cx, tb.cy, 0);
-        
+
         glTexCoord2f(0, 1);
         glVertex3f(-tb.cx, tb.cy, 0);
     }
     glEnd();
-    
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float rotate = 60.0/100.0*(float)m_i;
+    float rotate = 60.0f/100.0f*(float)m_i;
     glRotatef(rotate, 1.0f, 0.0f, 0.0f);
-    float scale = 1.0/100.0*(100.0-(float)m_i);
+    float scale = 1.0f/100.0f*(100.0f-(float)m_i);
     glScalef(scale, scale, scale);
-    glTranslatef(1.0/100.0*(float)m_i, 1.0/100.0*(float)m_i, 0.0);
+    glTranslatef(1.0f/100.0f*(float)m_i, 1.0f/100.0f*(float)m_i, 0.0f);
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         float float_x, float_y, float_xb, float_yb;
         int x, y;
-        
+
         for (x = 0; x < 39; x++)
         {
             for (y = 0; y < 39; y++)
@@ -1251,15 +1319,20 @@ void GLSingleView::effectFlutter()
                 float_xb = (float) (x + 1) / 40.0f;
                 float_yb = (float) (y + 1) / 40.0f;
                 glTexCoord2f(float_x, float_y);
-                glVertex3f(m_points[x][y][0], m_points[x][y][1], m_points[x][y][2]);
+                glVertex3f(m_points[x][y][0], 
+                           m_points[x][y][1], 
+                           m_points[x][y][2]);
                 glTexCoord2f(float_x, float_yb);
-                glVertex3f(m_points[x][y + 1][0], m_points[x][y + 1][1],
+                glVertex3f(m_points[x][y + 1][0], 
+                           m_points[x][y + 1][1], 
                            m_points[x][y + 1][2]);
                 glTexCoord2f(float_xb, float_yb);
-                glVertex3f(m_points[x + 1][y + 1][0], m_points[x + 1][y + 1][1],
+                glVertex3f(m_points[x + 1][y + 1][0], 
+                           m_points[x + 1][y + 1][1], 
                            m_points[x + 1][y + 1][2]);
                 glTexCoord2f(float_xb, float_y);
-                glVertex3f(m_points[x + 1][y][0], m_points[x + 1][y][1],
+                glVertex3f(m_points[x + 1][y][0], 
+                           m_points[x + 1][y][1], 
                            m_points[x + 1][y][2]);
             }
         }
@@ -1267,7 +1340,8 @@ void GLSingleView::effectFlutter()
     glEnd();
 
     // wave every two iterations
-    if (m_i%2 == 0) {
+    if (m_i%2 == 0)
+    {
 
         float hold;
         int x, y;
@@ -1284,12 +1358,13 @@ void GLSingleView::effectFlutter()
     m_i++;
 }
 
-void GLSingleView::effectCube()
+void GLSingleView::effectCube(void)
 {
     int tot = 200;
     int rotStart = 50;
-    
-    if (m_i > tot) {
+
+    if (m_i > tot)
+    {
         paintTexture();
         m_effectRunning = false;
         m_tmout = -1;
@@ -1303,7 +1378,7 @@ void GLSingleView::effectCube()
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
-    
+
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
 
@@ -1311,33 +1386,36 @@ void GLSingleView::effectCube()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    float PI = 4.0 * atan(1.0);
-    float znear = 3.0;
-    float theta = 2.0 * atan2((float)2.0/(float)2.0, (float)znear);
-    theta = theta * 180.0/PI;
+    float PI = 4.0f * atan(1.0f);
+    float znear = 3.0f;
+    float theta = 2.0f * atan2(2.0f / 2.0f, znear);
+    theta = theta * 180.0f/PI;
 
-    glFrustum(-1.0,1.0,-1.0,1.0, znear-0.01,10.0);
+    glFrustum(-1.0f, 1.0f, -1.0f, 1.0f, znear - 0.01f, 10.0f);
 
-
+    // TODO Remove this static usage
     static float xrot;
     static float yrot;
     static float zrot;
 
-    if (m_i == 0) {
-        xrot = 0.0;
-        yrot = 0.0;
-        zrot = 0.0;
+    if (m_i == 0)
+    {
+        xrot = 0.0f;
+        yrot = 0.0f;
+        zrot = 0.0f;
     }
 
-    glMatrixMode( GL_MODELVIEW );
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float trans = 5.0 * (float)((m_i <= tot/2) ? m_i : tot-m_i)/(float)tot;
-    glTranslatef(0.0,0.0, -znear - 1.0 - trans);
+    float trans = 5.0f *
+        (float) ((m_i <= tot / 2) ? m_i : tot - m_i) / (float)tot;
+
+    glTranslatef(0.0f, 0.0f, -znear - 1.0f - trans);
 
     glRotatef(xrot, 1.0f, 0.0f, 0.0f);
     glRotatef(yrot, 0.0f, 1.0f, 0.0f);
-    
+
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glBegin(GL_QUADS);
@@ -1345,128 +1423,130 @@ void GLSingleView::effectCube()
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
         /* Front Face */
-        glVertex3f( -1.00f, -1.00f,  0.99f );
-        glVertex3f(  1.00f, -1.00f,  0.99f );
-        glVertex3f(  1.00f,  1.00f,  0.99f );
-        glVertex3f( -1.00f,  1.00f,  0.99f );
+        glVertex3f(-1.00f, -1.00f,  0.99f);
+        glVertex3f( 1.00f, -1.00f,  0.99f);
+        glVertex3f( 1.00f,  1.00f,  0.99f);
+        glVertex3f(-1.00f,  1.00f,  0.99f);
 
         /* Back Face */
-        glVertex3f( -1.00f, -1.00f, -0.99f );
-        glVertex3f( -1.00f,  1.00f, -0.99f );
-        glVertex3f(  1.00f,  1.00f, -0.99f );
-        glVertex3f(  1.00f, -1.00f, -0.99f );
-  
+        glVertex3f(-1.00f, -1.00f, -0.99f);
+        glVertex3f(-1.00f,  1.00f, -0.99f);
+        glVertex3f( 1.00f,  1.00f, -0.99f);
+        glVertex3f( 1.00f, -1.00f, -0.99f);
+
         /* Top Face */
-        glVertex3f( -1.00f,  0.99f, -1.00f );
-        glVertex3f( -1.00f,  0.99f,  1.00f );
-        glVertex3f(  1.00f,  0.99f,  1.00f );
-        glVertex3f(  1.00f,  0.99f, -1.00f );
+        glVertex3f(-1.00f,  0.99f, -1.00f);
+        glVertex3f(-1.00f,  0.99f,  1.00f);
+        glVertex3f( 1.00f,  0.99f,  1.00f);
+        glVertex3f( 1.00f,  0.99f, -1.00f);
 
         /* Bottom Face */
-        glVertex3f( -1.00f, -0.99f, -1.00f );
-        glVertex3f(  1.00f, -0.99f, -1.00f );
-        glVertex3f(  1.00f, -0.99f,  1.00f );
-        glVertex3f( -1.00f, -0.99f,  1.00f );
+        glVertex3f(-1.00f, -0.99f, -1.00f);
+        glVertex3f( 1.00f, -0.99f, -1.00f);
+        glVertex3f( 1.00f, -0.99f,  1.00f);
+        glVertex3f(-1.00f, -0.99f,  1.00f);
 
         /* Right face */
-        glVertex3f( 0.99f, -1.00f, -1.00f );
-        glVertex3f( 0.99f,  1.00f, -1.00f );
-        glVertex3f( 0.99f,  1.00f,  1.00f );
-        glVertex3f( 0.99f, -1.00f,  1.00f );
+        glVertex3f(0.99f, -1.00f, -1.00f);
+        glVertex3f(0.99f,  1.00f, -1.00f);
+        glVertex3f(0.99f,  1.00f,  1.00f);
+        glVertex3f(0.99f, -1.00f,  1.00f);
 
         /* Left Face */
-        glVertex3f( -0.99f, -1.00f, -1.00f );
-        glVertex3f( -0.99f, -1.00f,  1.00f );
-        glVertex3f( -0.99f,  1.00f,  1.00f );
-        glVertex3f( -0.99f,  1.00f, -1.00f );
-        
+        glVertex3f(-0.99f, -1.00f, -1.00f);
+        glVertex3f(-0.99f, -1.00f,  1.00f);
+        glVertex3f(-0.99f,  1.00f,  1.00f);
+        glVertex3f(-0.99f,  1.00f, -1.00f);
+
     }
     glEnd();
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+    glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
 
 
     glBindTexture(GL_TEXTURE_2D, ta.tex);
     glBegin(GL_QUADS);
     {
-        glColor4d(1.0, 1.0, 1.0, 1.0);
+        glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
 
-        // Front Face 
-        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -ta.cx, -ta.cy,  1.00f );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  ta.cx, -ta.cy,  1.00f );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  ta.cx,  ta.cy,  1.00f );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -ta.cx,  ta.cy,  1.00f );
+        // Front Face
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-ta.cx, -ta.cy,  1.00f);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(+ta.cx, -ta.cy,  1.00f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(+ta.cx, +ta.cy,  1.00f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-ta.cx, +ta.cy,  1.00f);
 
-  
-        // Top Face 
-        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( -ta.cx,  1.00f, -ta.cy );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -ta.cx,  1.00f,  ta.cy );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex3f(  ta.cx,  1.00f,  ta.cy );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex3f(  ta.cx,  1.00f, -ta.cy );
+        // Top Face
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-ta.cx,  1.00f, -ta.cy);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(-ta.cx,  1.00f, +ta.cy);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(+ta.cx,  1.00f, +ta.cy);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(+ta.cx,  1.00f, -ta.cy);
 
-        // Bottom Face 
-        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -ta.cx, -1.00f, -ta.cy );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  ta.cx, -1.00f, -ta.cy );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  ta.cx, -1.00f,  ta.cy );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -ta.cx, -1.00f,  ta.cy );
+        // Bottom Face
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-ta.cx, -1.00f, -ta.cy);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(+ta.cx, -1.00f, -ta.cy);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(+ta.cx, -1.00f, +ta.cy);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-ta.cx, -1.00f, +ta.cy);
 
-        // Right face 
-        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( 1.00f, -ta.cx, -ta.cy );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( 1.00f, -ta.cx,  ta.cy );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( 1.00f,  ta.cx,  ta.cy );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( 1.00f,  ta.cx, -ta.cy );
+        // Right face
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(1.00f, -ta.cx, -ta.cy);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(1.00f, -ta.cx, +ta.cy);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(1.00f, +ta.cx, +ta.cy);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(1.00f, +ta.cx, -ta.cy);
 
-        // Left Face 
-        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -1.00f, -ta.cx, -ta.cy );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.00f,  ta.cx, -ta.cy );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -1.00f,  ta.cx,  ta.cy );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( -1.00f, -ta.cx,  ta.cy );
-        
+        // Left Face
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.00f, -ta.cx, -ta.cy);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.00f, +ta.cx, -ta.cy);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.00f, +ta.cx, +ta.cy);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.00f, -ta.cx, +ta.cy);
+
     }
     glEnd();
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
-    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+    glRotatef(tb.angle, 0.0f, 0.0f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, tb.tex);
     glBegin(GL_QUADS);
     {
-        glColor4d(1.0, 1.0, 1.0, 1.0);
-        
-        // Back Face 
-        glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -tb.cx, -tb.cy, -1.00f );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex3f( -tb.cx,  tb.cy, -1.00f );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex3f(  tb.cx,  tb.cy, -1.00f );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex3f(  tb.cx, -tb.cy, -1.00f );
+        glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
+
+        // Back Face
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(-tb.cx, -tb.cy, -1.00f);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-tb.cx, +tb.cy, -1.00f);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(+tb.cx, +tb.cy, -1.00f);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(+tb.cx, -tb.cy, -1.00f);
     }
     glEnd();
-    
-    if (m_i >= rotStart && m_i < (tot-rotStart)) {
-        xrot += 360.0f/(float)(tot-2*rotStart);
-        yrot += 180.0f/(float)(tot-2*rotStart);
+
+    if (m_i >= rotStart && m_i < (tot-rotStart))
+    {
+        xrot += 360.0f / (float)(tot - 2 * rotStart);
+        yrot += 180.0f / (float)(tot - 2 * rotStart);
     }
 
     m_i++;
 
 }
 
-void GLSingleView::slotTimeOut()
+void GLSingleView::slotTimeOut(void)
 {
     bool wasMovie = false, isMovie = false;
-    if (!m_effectMethod) {
-        std::cerr << "GLSlideShow: No transition method"
-                  << std::endl;
+    if (!m_effectMethod)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No transition method");
         return;
     }
 
-    if (m_effectRunning) {
+    if (m_effectRunning)
+    {
         m_tmout = 10;
     }
     else {
-        if (m_tmout == -1) {
+        if (m_tmout == -1)
+        {
             // effect was running and is complete now
             // run timer while showing current image
             m_tmout = m_delay * 1000;
@@ -1485,7 +1565,7 @@ void GLSingleView::slotTimeOut()
             wasMovie = m_movieState > 0;
             loadImage();
             isMovie = m_movieState > 0;
-            // If transitioning to/from a movie, don't do an effect,
+            // If transitioning to/from a movie, don't do an effect, 
             // and shorten timeout
             if (wasMovie || isMovie)
             {
@@ -1502,14 +1582,15 @@ void GLSingleView::slotTimeOut()
 
     updateGL();
     m_timer->start(m_tmout, true);
-    // If transitioning to/from a movie, no effect is running so 
+    // If transitioning to/from a movie, no effect is running so
     // next timeout should trigger proper immage delay.
-    if( wasMovie || isMovie ) {
+    if (wasMovie || isMovie)
+    {
         m_tmout = -1;
     }
 }
 
-void GLSingleView::createTexInfo()
+void GLSingleView::createTexInfo(void)
 {
     if (m_texInfo)
         glDeleteTextures(1, &m_texInfo);
@@ -1517,11 +1598,11 @@ void GLSingleView::createTexInfo()
     TexItem& t = m_texItem[m_curr];
     if (!t.tex || !t.item)
         return;
-    
+
     QPixmap pix(512, 512);
 
     QPainter p(&pix, this);
-    p.fillRect(0,0,pix.width(),pix.height(),Qt::black);
+    p.fillRect(0, 0, pix.width(), pix.height(), Qt::black);
     p.setPen(Qt::white);
 
     QFileInfo fi(t.item->path);
@@ -1532,16 +1613,15 @@ void GLSingleView::createTexInfo()
     info += "\n" + tr("Modified: ") + fi.lastModified().toString();
     info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
     info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
-             .arg(t.width);
+        .arg(t.width);
     info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
-            .arg(t.height);
-    info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
+        .arg(t.height);
+    info += "\n" + QString(tr("Pixel Count") + ": %1 " +
                            tr("megapixels"))
-            .arg((float) t.width * t.height / 1000000,
-                 0, 'f', 2);
+        .arg((float) t.width * t.height / 1000000.0f, 0, 'f', 2);
     info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
                            tr("degrees")).arg(t.angle);
-    p.drawText(10, 10, pix.width()-20, pix.height()-20,
+    p.drawText(10, 10, pix.width() - 20, pix.height() - 20, 
                Qt::AlignLeft, info);
     p.end();
 
@@ -1554,10 +1634,10 @@ void GLSingleView::createTexInfo()
     glGenTextures(1, &m_texInfo);
     glBindTexture(GL_TEXTURE_2D, m_texInfo);
     /* actually generate the texture */
-    glTexImage2D( GL_TEXTURE_2D, 0, 3, tex.width(), tex.height(), 0,
-                  GL_RGBA, GL_UNSIGNED_BYTE, tex.bits() );
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, tex.width(), tex.height(), 0, 
+                 GL_RGBA, GL_UNSIGNED_BYTE, tex.bits());
     /* enable linear filtering  */
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 

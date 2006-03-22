@@ -16,21 +16,26 @@
  * 
  * ============================================================ */
 
-#include <iostream>
+#include <cmath>
+
+#include <algorithm>
+using namespace std;
 
 #include <qevent.h>
 #include <qimage.h>
 #include <qdir.h>
 
-extern "C" {
-#include <math.h>
-}
-
+#include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdialogs.h>
+
+#ifndef _WIN32
+#include <mythtv/mythmediamonitor.h>
+#endif
 
 #include "galleryutil.h"
 #include "gallerysettings.h"
@@ -45,6 +50,8 @@ extern "C" {
 #include "glsingleview.h"
 #endif
 
+#define LOC QString("IconView: ")
+#define LOC_ERR QString("IconView, Error: ")
 
 int ThumbItem::GetRotationAngle()
 {
@@ -84,13 +91,14 @@ bool ThumbItem::Remove(void)
     return false;
 }
 
-IconView::IconView(const QString& galleryDir, MythMainWindow* parent, 
-                   const char* name )
+IconView::IconView(const QString& galleryDir, MythMediaDevice *initialDevice,
+                   MythMainWindow* parent, const char* name )
     : MythDialog(parent, name)
 {
     m_galleryDir = galleryDir;    
 
     m_inMenu     = false;
+    m_inSubMenu  = false;
     m_itemList.setAutoDelete(true);
     m_itemDict.setAutoDelete(false);
 
@@ -107,21 +115,37 @@ IconView::IconView(const QString& galleryDir, MythMainWindow* parent,
     m_lastRow = 0;
     m_lastCol = 0;
     m_topRow  = 0;
-    m_isGallery  = false;
+    m_isGallery   = false;
+    m_showDevices = false;
+    m_currDevice  = initialDevice;
 
     srand(time(NULL));
-    loadDirectory(galleryDir);
+
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
+    {
+        if (!m_currDevice->isMounted(true))
+            m_currDevice->mount();
+
+        connect(m_currDevice,
+                SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)),
+                SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
+
+        loadDirectory(m_currDevice->getMountPath());
+
+        mon->Unlock(m_currDevice);
+    }
+    else
+    {
+        m_currDevice = NULL;
+        loadDirectory(galleryDir);
+    }
 }
 
 IconView::~IconView()
 {
-    UIListBtnTypeItem* item = m_menuType->GetItemFirst();
-    while (item) {
-        Action *act = (Action*) item->getData();
-        if (act)
-            delete act;
-        item = m_menuType->GetItemNext(item);
-    }
+    clearMenu(m_submenuType);
+    clearMenu(m_menuType);
     
     delete m_thumbGen;
     delete m_theme;
@@ -258,6 +282,9 @@ void IconView::updateView()
                                  item->pixmap->height()/2-bh2+sh,
                                  bw-2*sw, bh-2*sh-(int)(15*hmult));
 
+                if (m_itemMarked.contains(item->path))
+                    p.drawPixmap(xpos, ypos, m_MrkPix);
+
             }
             else {
 
@@ -272,6 +299,9 @@ void IconView::updateView()
                                  item->pixmap->width()/2-bw2+sw,
                                  item->pixmap->height()/2-bh2+sh,
                                  bw-2*sw, bh-2*sh);
+
+                if (m_itemMarked.contains(item->path))
+                    p.drawPixmap(xpos, ypos, m_MrkPix);
             }
            
             curPos++;
@@ -297,40 +327,74 @@ void IconView::keyPressEvent(QKeyEvent *e)
     for (unsigned int i = 0; i < actions.size() && !handled && !menuHandled; i++)
     {
         QString action = actions[i];
-        if (action == "MENU") {
+        if (action == "MENU")
+        {
             m_inMenu = !m_inMenu;
-            m_menuType->SetActive(m_inMenu);
+            m_menuType->SetActive(m_inMenu & !m_inSubMenu);
+            m_submenuType->SetActive(m_inMenu & m_inSubMenu);
             menuHandled = true;
         }
-        else if (action == "UP") {
-            if (m_inMenu) {
+        else if (action == "ESCAPE")
+        {
+            if (m_inMenu & m_inSubMenu)
+            {
+                actionMainMenu();
+                m_menuType->SetActive(m_inMenu & !m_inSubMenu);
+                m_submenuType->SetActive(m_inMenu & m_inSubMenu);
+                menuHandled = true;
+            }
+        }
+        else if (action == "UP")
+        {
+            if (m_inMenu & !m_inSubMenu)
+            {
                 m_menuType->MoveUp();
                 menuHandled = true;
             }
-            else
-                handled = moveUp();
-        }
-        else if (action == "DOWN") {
-            if (m_inMenu) {
-                m_menuType->MoveDown();
+            else if (m_inMenu & m_inSubMenu)
+            {
+                m_submenuType->MoveUp();
                 menuHandled = true;
             }
             else
-                handled = moveDown();
+            {
+                handled = moveUp();
+            }
         }
-        else if (action == "LEFT") {
+        else if (action == "DOWN")
+        {
+            if (m_inMenu & !m_inSubMenu)
+            {
+                m_menuType->MoveDown();
+                menuHandled = true;
+            }
+            else if (m_inMenu & m_inSubMenu)
+            {
+                m_submenuType->MoveDown();
+                menuHandled = true;
+            }
+            else
+            {
+                handled = moveDown();
+            }
+        }
+        else if (action == "LEFT")
+        {
             handled = moveLeft();
         }
-        else if (action == "RIGHT") {
+        else if (action == "RIGHT")
+        {
             handled = moveRight();
         }
-        else if (action == "PAGEUP") {
+        else if (action == "PAGEUP")
+        {
             bool h = true;
             for (int i = 0; i < m_nRows && h; i++) 
                 h = moveUp();
             handled = true;
         }
-        else if (action == "PAGEDOWN") {
+        else if (action == "PAGEDOWN")
+        {
             bool h = true;
             for (int i = 0; i < m_nRows && h; i++)
                 h = moveDown();
@@ -363,48 +427,119 @@ void IconView::keyPressEvent(QKeyEvent *e)
             actionDelete();
             handled = true;
         }
-        else if (action == "SELECT" || action == "PLAY" || action == "SLIDESHOW" || action == "RANDOMSHOW" )
+        else if (action == "MARK")
         {
-            if (m_inMenu && (action == "SELECT" || action == "PLAY") ) {
+            int pos = m_currRow * m_nCols + m_currCol;
+            ThumbItem *item = m_itemList.at(pos);
+            if (!item)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "The impossible happened");
+                break;
+            }
+
+            if (!m_itemMarked.contains(item->path))
+                m_itemMarked.append(item->path);
+            else
+                m_itemMarked.remove(item->path);
+
+            handled = true;
+        }
+        else if (action == "SELECT" || action == "PLAY" ||
+                 action == "SLIDESHOW" || action == "RANDOMSHOW" )
+        {
+            if (m_inMenu && (action == "SELECT" || action == "PLAY"))
+            {
                 pressMenu();
                 menuHandled = true;
             }
             else {
                 int pos = m_currRow * m_nCols + m_currCol;
                 ThumbItem *item = m_itemList.at(pos);
-                if (!item) {
-                    std::cerr << "The impossible happened" << std::endl;
+                if (!item)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "The impossible happened");
                     break;
                 }
         
                 QFileInfo fi(item->path);
-                if (item->isDir && (action == "SELECT" || action == "PLAY") ) {
+
+                // if the selected item is a Media Device
+                // attempt to mount it if it isn't already
+                if (item->mediaDevice && (action == "SELECT" ||
+                                          action == "PLAY"))
+                {
+                    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+                    if (mon && mon->ValidateAndLock(item->mediaDevice))
+                    {
+                        m_currDevice = item->mediaDevice;
+
+                        if (!m_currDevice->isMounted())
+                            m_currDevice->mount();
+
+                        item->path = m_currDevice->getMountPath();
+
+                        connect(m_currDevice,
+                                SIGNAL(statusChanged(MediaStatus,
+                                                     MythMediaDevice*)),
+                                SLOT(mediaStatusChanged(MediaStatus,
+                                                        MythMediaDevice*)));
+
+                        mon->Unlock(m_currDevice);
+                    }
+                    else
+                    {
+                        // device was removed
+                        MythPopupBox::showOkPopup(
+                            gContext->GetMainWindow(),
+                            tr("Error"),
+                            tr("The selected device is no longer available"));
+
+                        actionShowDevices();
+                        m_currRow = 0;
+                        m_currCol = 0;
+                        handled = true;
+                        break;
+                    }
+                }
+
+                if (!handled && item->isDir &&
+                    (action == "SELECT" || action == "PLAY") )
+                {
                     loadDirectory(item->path);
                     handled = true;
                 }
-                else {
-          
+                else
+                {
                     handled = true;
                     
                     int slideShow = 0;
-                    if( action == "PLAY" || action == "SLIDESHOW" ) {
+                    if( action == "PLAY" || action == "SLIDESHOW" )
+                    {
                         slideShow = 1;
-                    } else if( action == "RANDOMSHOW" ) {
+                    }
+                    else if( action == "RANDOMSHOW" )
+                    {
                         slideShow = 2;
                     }
-#ifdef OPENGL_SUPPORT
-                    int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
-                    if (useOpenGL) {
 
-                        if (QGLFormat::hasOpenGL()) {
+#ifdef OPENGL_SUPPORT
+                    int useOpenGL =
+                        gContext->GetNumSetting("SlideshowUseOpenGL");
+                    if (useOpenGL)
+                    {
+
+                        if (QGLFormat::hasOpenGL())
+                        {
                             GLSDialog gv(m_itemList, pos, slideShow,
                                          gContext->GetMainWindow());
                             gv.exec();
                         }
-                        else {
-                            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                                      tr("Error"),
-                                                      tr("Sorry: OpenGL support not available"));
+                        else
+                        {
+                            MythPopupBox::showOkPopup(
+                                gContext->GetMainWindow(),
+                                tr("Error"),
+                                tr("Sorry: OpenGL support not available"));
                         }
                     }
                     else 
@@ -414,37 +549,109 @@ void IconView::keyPressEvent(QKeyEvent *e)
                                       gContext->GetMainWindow());
                         sv.exec();
                     }                         
+
+                    // if the user deleted files while in single view mode
+                    // the cached contents of the directory will be out of
+                    // sync, reload the current directory to refresh the view
+                    loadDirectory(m_currDir);
                 }
             }
         }
         
     }
     
-    if (!handled && !menuHandled) {
+    if (!handled && !menuHandled)
+    {
         gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
-            if (action == "ESCAPE") {
-                QDir d(m_currDir);
-                if (d != QDir(m_galleryDir)) {
-
-                    QString oldDirName = d.dirName();
-                    d.cdUp();
-                    loadDirectory(d.absPath());
-
-                    // make sure up-directory is visible and selected
-                    ThumbItem* item = m_itemDict.find(oldDirName);
-                    if (item) {
-                        int pos = m_itemList.find(item);
-                        if (pos != -1) {
-                            m_currRow = pos/m_nCols;
-                            m_currCol = pos-m_currRow*m_nCols;
-                            m_topRow  = QMAX(0, m_currRow-(m_nRows-1));
-                        }
-                    }
+            if (action == "ESCAPE")
+            {
+                if (m_showDevices)
+                {
+                    loadDirectory(m_galleryDir);
                     handled = true;
                 }
+                else
+                {
+                    QDir d(m_currDir);
+
+#ifndef _WIN32
+                    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+                    if (mon)
+                    {
+                        QValueList<MythMediaDevice*> removables =
+                            mon->GetMedias(MEDIATYPE_DATA);
+                    
+                        QValueList<MythMediaDevice*>::Iterator it =
+                            removables.begin();
+                        for (; it != removables.end(); it++)
+                        {
+                            if (mon->ValidateAndLock(*it))
+                            {
+                                if (d == QDir((*it)->getMountPath()))
+                                {
+                                    actionShowDevices();
+
+                                    // make sure previous devies is
+                                    // visible and selected
+                                    ThumbItem *item;
+                                    if ((*it)->getVolumeID() != "")
+                                        item = m_itemDict.find(
+                                            (*it)->getVolumeID());
+                                    else
+                                        item = m_itemDict.find(
+                                            (*it)->getDevicePath());
+
+                                    if (item)
+                                    {
+                                        int pos = m_itemList.find(item);
+                                        if (pos != -1)
+                                        {
+                                            m_currRow = pos / m_nCols;
+                                            m_currCol =
+                                                pos - m_currRow*m_nCols;
+                                            m_topRow =
+                                                QMAX(0, (m_currRow -
+                                                         (m_nRows - 1)));
+                                        }
+                                    }
+                                    handled = true;
+                                    mon->Unlock(*it);
+                                    break;
+                                }
+                                mon->Unlock(*it);
+                            }
+                        }
+                    }
+
+                    if (!handled)
+                    {
+#endif
+                        if (d != QDir(m_galleryDir))
+                        {
+                            QString oldDirName = d.dirName();
+                            d.cdUp();
+                            loadDirectory(d.absPath());
+
+                            // make sure up-directory is visible and selected
+                            ThumbItem* item = m_itemDict.find(oldDirName);
+                            if (item)
+                            {
+                                int pos = m_itemList.find(item);
+                                if (pos != -1) {
+                                    m_currRow = pos/m_nCols;
+                                    m_currCol = pos-m_currRow*m_nCols;
+                                    m_topRow  = QMAX(0, m_currRow-(m_nRows-1));
+                                }
+                            }
+                            handled = true;
+                        }
+#ifndef _WIN32
+                    }
+                }
+#endif
             }
         }
     }
@@ -456,7 +663,6 @@ void IconView::keyPressEvent(QKeyEvent *e)
     {
         MythDialog::keyPressEvent(e);
     }
-
 }
 
 void IconView::customEvent(QCustomEvent *e)
@@ -525,25 +731,33 @@ void IconView::loadTheme()
                 else if (name.lower() == "view")
                     m_viewRect = area;
             }
-            else {
-                std::cerr << "Unknown element: " << e.tagName()
-                          << std::endl;
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Unknown element: " << e.tagName());
                 exit(-1);
             }
         }
     }
 
     LayerSet *container = m_theme->GetSet("menu");
-    if (!container) {
-        std::cerr << "MythGallery: Failed to get menu container."
-                  << std::endl;
+    if (!container)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get menu container.");
         exit(-1);
     }
 
     m_menuType = (UIListBtnType*)container->GetType("menu");
-    if (!m_menuType) {
-        std::cerr << "MythGallery: Failed to get menu area."
-                  << std::endl;
+    if (!m_menuType)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get menu area.");
+        exit(-1);
+    }
+
+    m_submenuType = (UIListBtnType*)container->GetType("submenu");
+    if (!m_menuType)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get submenu area.");
         exit(-1);
     }
 
@@ -554,68 +768,79 @@ void IconView::loadTheme()
     item->setData(new Action(&IconView::actionSlideShow));
     item = new UIListBtnTypeItem(m_menuType, tr("Random"));
     item->setData(new Action(&IconView::actionRandomShow));
-    item = new UIListBtnTypeItem(m_menuType, tr("Rotate CW"));
-    item->setData(new Action(&IconView::actionRotateCW));
-    item = new UIListBtnTypeItem(m_menuType, tr("Rotate CCW"));
-    item->setData(new Action(&IconView::actionRotateCCW));
-    item = new UIListBtnTypeItem(m_menuType, tr("Delete"));
-    item->setData(new Action(&IconView::actionDelete));
-    item = new UIListBtnTypeItem(m_menuType, tr("Import"));
-    item->setData(new Action(&IconView::actionImport));
+    item = new UIListBtnTypeItem(m_menuType, tr("Meta Data..."));
+    item->setData(new Action(&IconView::actionSubMenuMetadata));
+    item = new UIListBtnTypeItem(m_menuType, tr("Marking..."));
+    item->setData(new Action(&IconView::actionSubMenuMark));
+    item = new UIListBtnTypeItem(m_menuType, tr("File..."));
+    item->setData(new Action(&IconView::actionSubMenuFile));
     item = new UIListBtnTypeItem(m_menuType, tr("Settings"));
     item->setData(new Action(&IconView::actionSettings));
     
     m_menuType->SetActive(false);
 
     container = m_theme->GetSet("view");
-    if (!container) {
-        std::cerr << "MythGallery: Failed to get view container."
-                  << std::endl;
+    if (!container)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get view container.");
         exit(-1);
     }
 
     UIBlackHoleType* bhType = (UIBlackHoleType*)container->GetType("view");
-    if (!bhType) {
-        std::cerr << "MythGallery: Failed to get view area."
-                  << std::endl;
+    if (!bhType)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get view area.");
         exit(-1);
     }
 
     {
         QImage *img = gContext->LoadScaleImage("gallery-back-reg.png");
-        if (!img) {
-            std::cerr << "Failed to load gallery-back-reg.png"
-                      << std::endl;
+        if (!img)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to load gallery-back-reg.png");
             exit(-1);
         }
         m_backRegPix = QPixmap(*img);
         delete img;
 
         img = gContext->LoadScaleImage("gallery-back-sel.png");
-        if (!img) {
-            std::cerr << "Failed to load gallery-back-sel.png"
-                      << std::endl;
+        if (!img)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to load gallery-back-sel.png");
             exit(-1);
         }
         m_backSelPix = QPixmap(*img);
         delete img;
 
         img = gContext->LoadScaleImage("gallery-folder-reg.png");
-        if (!img) {
-            std::cerr << "Failed to load gallery-folder-reg.png"
-                      << std::endl;
+        if (!img)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to load gallery-folder-reg.png");
             exit(-1);
         }
         m_folderRegPix = QPixmap(*img);
         delete img;
 
         img = gContext->LoadScaleImage("gallery-folder-sel.png");
-        if (!img) {
-            std::cerr << "Failed to load gallery-folder-sel.png"
-                      << std::endl;
+        if (!img)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to load gallery-folder-sel.png");
             exit(-1);
         }
         m_folderSelPix = QPixmap(*img);
+        delete img;
+
+        img = gContext->LoadScaleImage("gallery-mark.png");
+        if (!img)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load gallery-mark.png");
+            exit(-1);
+        }
+        m_MrkPix = QPixmap(*img);
         delete img;
 
         m_thumbW = m_backRegPix.width();
@@ -633,6 +858,8 @@ void IconView::loadDirectory(const QString& dir, bool topleft)
     QDir d(dir);
     if (!d.exists())
         return;
+
+    m_showDevices = false;
 
     m_currDir = d.absPath();
     m_itemList.clear();
@@ -778,13 +1005,85 @@ bool IconView::moveRight()
 
 void IconView::pressMenu()
 {
-    UIListBtnTypeItem* item = m_menuType->GetItemCurrent();
+    UIListBtnTypeItem* item;
+
+    if (m_inSubMenu)
+        item = m_submenuType->GetItemCurrent();
+    else
+        item = m_menuType->GetItemCurrent();
 
     if (!item || !item->getData())
         return;
 
     Action *act = (Action*) item->getData();
     (this->*(*act))();
+
+    m_menuType->SetActive(m_inMenu & !m_inSubMenu);
+    m_submenuType->SetActive(m_inMenu & m_inSubMenu);
+}
+
+void IconView::actionMainMenu()
+{
+    clearMenu(m_submenuType);
+    m_submenuType->Reset();
+
+    m_inSubMenu = false;
+}
+
+void IconView::actionSubMenuMetadata()
+{
+    clearMenu(m_submenuType);
+    m_submenuType->Reset();
+
+    UIListBtnTypeItem *item;
+    item = new UIListBtnTypeItem(m_submenuType, tr("Return"));
+    item->setData(new Action(&IconView::actionMainMenu));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Rotate CW"));
+    item->setData(new Action(&IconView::actionRotateCW));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Rotate CCW"));
+    item->setData(new Action(&IconView::actionRotateCCW));
+
+    m_inSubMenu = true;
+}
+
+void IconView::actionSubMenuMark()
+{
+    clearMenu(m_submenuType);
+    m_submenuType->Reset();
+
+    UIListBtnTypeItem *item;
+    item = new UIListBtnTypeItem(m_submenuType, tr("Return"));
+    item->setData(new Action(&IconView::actionMainMenu));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Clear Marked"));
+    item->setData(new Action(&IconView::actionClearMarked));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Select All"));
+    item->setData(new Action(&IconView::actionSelectAll));
+
+    m_inSubMenu = true;
+}
+
+void IconView::actionSubMenuFile()
+{
+    clearMenu(m_submenuType);
+    m_submenuType->Reset();
+
+    UIListBtnTypeItem *item;
+    item = new UIListBtnTypeItem(m_submenuType, tr("Return"));
+    item->setData(new Action(&IconView::actionMainMenu));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Show Devices"));
+    item->setData(new Action(&IconView::actionShowDevices));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Import"));
+    item->setData(new Action(&IconView::actionImport));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Copy here"));
+    item->setData(new Action(&IconView::actionCopyHere));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Move here"));
+    item->setData(new Action(&IconView::actionMoveHere));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Delete"));
+    item->setData(new Action(&IconView::actionDelete));
+    item = new UIListBtnTypeItem(m_submenuType, tr("Create Dir"));
+    item->setData(new Action(&IconView::actionMkDir));
+
+    m_inSubMenu = true;
 }
 
 void IconView::actionRotateCW()
@@ -833,15 +1132,28 @@ void IconView::actionRotateCCW()
     }
 }
 
-void IconView::actionDelete()
+void IconView::actionDeleteCurrent()
 {
-    ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
-                                    m_currCol);
-    if (!item || item->isDir)
+    ThumbItem* item = m_itemList.at(m_currRow * m_nCols + m_currCol);
+
+    if (!item)
         return;
 
-    if( item->Remove() ) {
-        loadDirectory(m_currDir, false);
+    QString title = tr("Delete Current File or Folder");
+    QString msg = (item->isDir) ?
+        tr("Deleting 1 folder, including any subfolders and files.") :
+        tr("Deleting 1 image.");
+
+    bool cont = MythPopupBox::showOkCancelPopup(
+        gContext->GetMainWindow(), title, msg, false);
+
+    if (cont)
+    {
+        QFileInfo fi;
+        fi.setFile(item->path);
+        GalleryUtil::Delete(fi);
+
+        loadDirectory(m_currDir);
     }
 }
 
@@ -980,6 +1292,144 @@ void IconView::actionImport()
     }
 }
 
+void IconView::actionShowDevices(void)
+{
+#ifndef _WIN32
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
+    {
+        m_currDevice->disconnect(this);
+        mon->Unlock(m_currDevice);
+    }
+#endif
+
+    m_currDevice = NULL;
+
+    m_showDevices = true;
+
+    m_itemList.clear();
+    m_itemDict.clear();
+
+    m_thumbGen->cancel();
+
+    // add gallery directory
+    ThumbItem *item = new ThumbItem;
+    item->name = QString("Gallery");
+    item->path = m_galleryDir;
+    item->isDir = true;
+    m_itemList.append(item);
+    m_itemDict.insert(item->name, item);
+
+#ifndef _WIN32
+    if (mon)
+    {
+        QValueList<MythMediaDevice*> removables =
+            mon->GetMedias(MEDIATYPE_DATA);
+        QValueList<MythMediaDevice*>::Iterator it = removables.begin();
+        for (; it != removables.end(); it++)
+        {
+            if (mon->ValidateAndLock(*it))
+            {
+                item = new ThumbItem;
+                if ((*it)->getVolumeID() != "")
+                    item->name = (*it)->getVolumeID();
+                else
+                    item->name = (*it)->getDevicePath();
+                item->path = (*it)->getMountPath();
+                item->isDir = true;
+                item->mediaDevice = *it;
+                m_itemList.append(item);
+                m_itemDict.insert(item->name, item);
+
+                mon->Unlock(*it);
+            }
+        }
+    }
+#endif
+
+    m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
+    m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
+}
+
+void IconView::actionCopyHere(void)
+{
+    CopyMarkedFiles(false);
+    actionClearMarked();
+}
+
+void IconView::actionMoveHere(void)
+{
+    CopyMarkedFiles(true);
+    actionClearMarked();
+}
+
+void IconView::actionDelete(void)
+{
+    if (m_itemMarked.isEmpty())
+        actionDeleteCurrent();
+    else
+        actionDeleteMarked();
+}
+
+void IconView::actionDeleteMarked(void)
+{
+    bool cont = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+                    tr("Delete Marked Files"),
+                    QString(tr("Deleting %1 images and folders, including "
+                               "any subfolders and files."))
+                            .arg(m_itemMarked.count()),
+                    false);
+
+    if (cont)
+    {
+        QStringList::iterator it;
+        QFileInfo fi;
+
+        for (it = m_itemMarked.begin(); it != m_itemMarked.end(); it++)
+        {
+            fi.setFile(*it);
+
+            GalleryUtil::Delete(fi);
+        }
+
+        m_itemMarked.clear();
+
+        loadDirectory(m_currDir);
+    }
+}
+
+void IconView::actionClearMarked(void)
+{
+    m_itemMarked.clear();
+}
+
+void IconView::actionSelectAll(void)
+{
+    ThumbItem *item;
+    for (item = m_itemList.first(); item; item = m_itemList.next())
+    {
+        if (!m_itemMarked.contains(item->path))
+            m_itemMarked.append(item->path);
+    }
+}
+
+void IconView::actionMkDir(void)
+{
+    QString folderName = tr("New Folder");
+
+    bool res = MythPopupBox::showGetTextPopup(
+        gContext->GetMainWindow(), tr("Create New Folder"),
+        tr("Create New Folder"), folderName);
+
+    if (res)
+    {
+        QDir cdir(m_currDir);
+        cdir.mkdir(folderName);
+
+        loadDirectory(m_currDir);
+    }
+}
+
 void IconView::importFromDir(const QString &fromDir, const QString &toDir)
 {
     QDir d(fromDir);
@@ -1017,5 +1467,66 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
                           "\" \"" + toDir.local8Bit() + "\"";
             myth_system(cmd);
         }
+    }
+}
+
+void IconView::CopyMarkedFiles(bool move)
+{
+    if (m_itemMarked.isEmpty())
+        return;
+
+    QStringList::iterator it;
+    QFileInfo fi;
+    QFileInfo dest;
+    int count = 0;
+
+    QString msg = (move) ?
+        tr("Moving marked images...") : tr("Copying marked images...");
+
+    MythProgressDialog *progress =
+        new MythProgressDialog(msg, m_itemMarked.count());
+
+    for (it = m_itemMarked.begin(); it != m_itemMarked.end(); it++)
+    {
+        fi.setFile(*it);
+        dest.setFile(QDir(m_currDir), fi.fileName());
+
+        if (fi.exists())
+            GalleryUtil::CopyMove(fi, dest, move);
+
+        progress->setProgress(++count);
+    }
+
+    progress->Close();
+    delete progress;
+
+    loadDirectory(m_currDir);
+}
+
+void IconView::clearMenu(UIListBtnType *menu)
+{
+    UIListBtnTypeItem* item = menu->GetItemFirst();
+    while (item)
+    {
+        Action *act = (Action*) item->getData();
+        if (act)
+            delete act;
+        item = menu->GetItemNext(item);
+    }
+}
+
+void IconView::mediaStatusChanged(MediaStatus oldStatus,
+                                  MythMediaDevice *pMedia)
+{
+    (void) oldStatus;
+    if (m_currDevice == pMedia)
+    {
+        actionShowDevices();
+
+        m_currRow = 0;
+        m_currCol = 0;
+
+        updateView();
+        updateText();
     }
 }

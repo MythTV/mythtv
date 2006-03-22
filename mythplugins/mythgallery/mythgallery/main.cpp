@@ -14,6 +14,7 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
+#include <mythtv/mythmedia.h>
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -33,12 +34,33 @@ void runGallery(void)
         diag.AddButton(QObject::tr("Ok"));
         diag.exec();
     }
-    else {
-        IconView icv(startdir, gContext->GetMainWindow(), "IconView");
+    else
+    {
+        IconView icv(startdir, NULL, gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
     gContext->removeCurrentLocation();
 }
+
+void handleMedia(MythMediaDevice *dev)
+{
+    QString galleryDir = gContext->GetSetting("GalleryDir");
+    QDir dir(galleryDir);
+    if (!dir.exists() || !dir.isReadable())
+    {
+        DialogBox diag(gContext->GetMainWindow(),
+                       QObject::tr("Gallery Directory does not "
+                                   "exist or is unreadable."));
+        diag.AddButton(QObject::tr("Ok"));
+        diag.exec();
+    }
+    else
+    {
+        IconView icv(galleryDir, dev, gContext->GetMainWindow(), "IconView");
+        icv.exec();
+    }
+}
+
 
 void setupKeys(void)
 {
@@ -67,7 +89,10 @@ void setupKeys(void)
     REG_KEY("Gallery", "LOWRIGHT", "Go to the lower-right corner of the image",
             "PgDown");
     REG_KEY("Gallery", "INFO", "Toggle Showing Information about Image", "I");
-    REG_KEY("Gallery", "DELETE", "Delete current image", "D");
+    REG_KEY("Gallery", "DELETE", "Delete marked images or current image if none are marked", "D");
+    REG_KEY("Gallery", "MARK", "Mark image", "T");
+
+    REG_MEDIA_HANDLER("MythGallery Media Handler", "", "", handleMedia, MEDIATYPE_DATA | MEDIATYPE_MIXED);
 }
 
 int mythplugin_init(const char *libversion)

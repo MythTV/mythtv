@@ -16,9 +16,12 @@
  * 
  * ============================================================ */
 
-#include <iostream>
 #include <qfileinfo.h>
 #include <qdir.h>
+
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+#include <mythtv/util.h>
 
 #include "config.h"
 #include "constants.h"
@@ -30,6 +33,15 @@
 #include <libexif/exif-entry.h>
 // include "exif.hpp"
 #endif // EXIF_SUPPORT
+
+#define LOC QString("GalleryUtil:")
+#define LOC_ERR QString("GalleryUtil, Error:")
+
+static QFileInfo MakeUnique(const QFileInfo &dest);
+static QFileInfo MakeUniqueDirectory(const QFileInfo &dest);
+static bool FileCopy(const QFileInfo &src, const QFileInfo &dst);
+static bool FileMove(const QFileInfo &src, const QFileInfo &dst);
+static bool FileDelete(const QFileInfo &file);
 
 bool GalleryUtil::isImage(const char* filePath)
 {
@@ -81,7 +93,9 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
         }
         else
         {
-                std::cerr << "Could not load exif data from " << filePath << std::endl;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Could not load exif data from '%1'")
+                    .arg(filePath));
         }
         
         delete [] exifvalue;
@@ -115,8 +129,9 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
     }
     catch (...)
     {
-        std::cerr << "GalleryUtil: Failed to extract EXIF headers from "
-        << filePath << std::endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to extract EXIF headers from '%1'")
+                .arg(filePath));
     }
 
     return rotateAngle;
@@ -249,7 +264,9 @@ QString GalleryUtil::getCaption(const QString& filePath)
         }
         else
         {
-           std::cerr << "Could not load exif data from " << filePath << std::endl;
+           VERBOSE(VB_IMPORTANT, LOC_ERR +
+                   QString("Could not load exif data from '%1'")
+                   .arg(filePath));
         }
         
         delete [] exifvalue;
@@ -257,9 +274,256 @@ QString GalleryUtil::getCaption(const QString& filePath)
     }
     catch (...)
     {
-        std::cerr << "GalleryUtil: Failed to extract EXIF headers from "
-        << filePath << std::endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to extract EXIF headers from '%1'")
+                .arg(filePath));
     }
 
     return caption;
+}
+
+bool GalleryUtil::Copy(const QFileInfo &src, QFileInfo &dst)
+{
+    if (src.isDir())
+        return CopyDirectory(src, dst);
+
+    dst = MakeUnique(dst);
+
+    if (!FileCopy(src, dst))
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO gallerymetadata (image, keywords, angle) "
+                  "SELECT :IMAGENEW , keywords, angle "
+                  "FROM gallerymetadata "
+                  "WHERE image = :IMAGEOLD");
+    query.bindValue(":IMAGENEW", dst.absFilePath().utf8());
+    query.bindValue(":IMAGEOLD", src.absFilePath().utf8());
+    if (query.exec())
+        return true;
+
+    // try to undo copy on DB failure
+    FileDelete(dst);
+    return false;
+}
+
+bool GalleryUtil::Move(const QFileInfo &src, QFileInfo &dst)
+{
+    if (src.isDir())
+        return MoveDirectory(src, dst);
+
+    dst = MakeUnique(dst);
+
+    if (!FileMove(src, dst))
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE gallerymetadata "
+                  "SET image = :IMAGENEW "
+                  "WHERE image = :IMAGEOLD");
+    query.bindValue(":IMAGENEW", dst.absFilePath().utf8());
+    query.bindValue(":IMAGEOLD", src.absFilePath().utf8());
+    if (query.exec())
+        return true;
+
+    // try to undo move on DB failure
+    FileMove(dst, src);
+    return false;
+}
+
+bool GalleryUtil::Delete(const QFileInfo &file)
+{
+    if (!file.exists())
+        return false;
+
+    if (file.isDir())
+        return DeleteDirectory(file);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM gallerymetadata "
+                  "WHERE image = :IMAGE ;");
+    query.bindValue(":IMAGE", file.absFilePath().utf8());
+    if (query.exec())
+        return FileDelete(file);
+
+    return false;
+}
+
+bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
+{
+    QDir srcDir(src.absFilePath());
+
+    dst = MakeUniqueDirectory(dst);
+    if (!dst.exists())
+    {
+        srcDir.mkdir(dst.absFilePath());
+        dst.refresh();
+    }
+
+    if (!dst.exists() || !dst.isDir())
+        return false;
+
+    bool ok = true;
+    QDir dstDir(dst.absFilePath());
+    QFileInfoListIterator it(*srcDir.entryInfoList());
+    for (; it.current(); ++it)
+    {
+        const QString fn = (it.current())->fileName();
+        if (fn != "." && fn != "..")
+        {
+            QFileInfo dfi(dstDir, fn);
+            ok &= Copy(*(it.current()), dfi);
+        }
+    }
+
+    return ok;
+}
+
+bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
+{
+    QDir srcDir(src.absFilePath());
+
+    dst = MakeUniqueDirectory(dst);
+    if (!dst.exists())
+    {
+        srcDir.mkdir(dst.absFilePath());
+        dst.refresh();
+    }
+
+    if (!dst.exists() || !dst.isDir())
+        return false;
+
+    bool ok = true;
+    QDir dstDir(dst.absFilePath());
+    QFileInfoListIterator it(*srcDir.entryInfoList());
+    for (; it.current(); ++it)
+    {
+        const QString fn = (it.current())->fileName();
+        if (fn != "." && fn != "..")
+        {
+            QFileInfo dfi(dstDir, fn);
+            ok &= Move(*(it.current()), dfi);
+        }
+    }
+
+    return ok && FileDelete(src);
+}
+
+bool GalleryUtil::DeleteDirectory(const QFileInfo &dir)
+{
+    if (!dir.exists())
+        return false;
+
+    QDir srcDir(dir.absFilePath());
+    QFileInfoListIterator it(*srcDir.entryInfoList());
+    for (; it.current(); ++it)
+    {
+        const QString fn = (it.current())->fileName();
+        if (fn != "." && fn != "..")
+            Delete(*(it.current()));
+    }
+
+    return FileDelete(dir);
+}
+
+static QFileInfo MakeUnique(const QFileInfo &dest)
+{
+    QFileInfo newDest = dest;
+
+    for (uint i = 0; newDest.exists(); i++)
+    {
+        QString basename = QString("%1_%2.%3")
+            .arg(dest.baseName(false)).arg(i).arg(dest.extension());
+
+        newDest.setFile(dest.dir(), basename);
+
+        VERBOSE(VB_GENERAL, LOC_ERR +
+                QString("Need to find a new name for '%1' trying '%2'")
+                .arg(dest.absFilePath()).arg(newDest.absFilePath()));
+    }
+
+    return newDest;
+}
+
+static QFileInfo MakeUniqueDirectory(const QFileInfo &dest)
+{
+    QFileInfo newDest = dest;
+
+    for (uint i = 0; newDest.exists() && !newDest.isDir(); i++)
+    {
+        QString fullname = QString("%1_%2").arg(dest.absFilePath()).arg(i);
+        newDest.setFile(fullname);
+
+        VERBOSE(VB_GENERAL, LOC_ERR +
+                QString("Need to find a new name for '%1' trying '%2'")
+                .arg(dest.absFilePath()).arg(newDest.absFilePath()));
+    }
+
+    return newDest;
+}
+
+static bool FileCopy(const QFileInfo &src, const QFileInfo &dst)
+{
+    const int bufferSize = 16*1024;
+
+    QFile s(src.absFilePath());
+    QFile d(dst.absFilePath());
+    char buffer[bufferSize];
+    int len;
+
+    if (!s.open(IO_ReadOnly))
+        return false;
+
+    if (!d.open(IO_WriteOnly))
+    {
+        s.close();
+        return false;
+    }
+
+    len = s.readBlock(buffer, bufferSize);
+    do
+    {
+        d.writeBlock(buffer, len);
+        len = s.readBlock(buffer, bufferSize);
+    } while (len > 0);
+
+    s.close();
+    d.close();
+
+    return true;
+}
+
+static bool FileMove(const QFileInfo &src, const QFileInfo &dst)
+{
+    // attempt to rename the file,
+    // this will fail if files are on different partitions
+    if (rename(src.absFilePath().local8Bit(),
+               dst.absFilePath().local8Bit()) == 0)
+    {
+        return true;
+    }
+
+    // src and dst are on different mount points, move manually.
+    if (errno == EXDEV)
+    {
+        if (FileCopy(src, dst))
+            return FileDelete(src);
+    }
+
+    return false;
+}
+
+static bool FileDelete(const QFileInfo &file)
+{
+    if (!file.isDir())
+        return QFile::remove(file.absFilePath());
+
+    // delete .thumbcache
+    QDir srcDir(file.absFilePath());
+    QFileInfo tc(srcDir, ".thumbcache");
+    GalleryUtil::Delete(tc);
+
+    srcDir.rmdir(srcDir.absPath());
+
+    return true;
 }

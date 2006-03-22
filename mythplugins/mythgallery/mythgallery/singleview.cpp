@@ -455,21 +455,21 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         else if (action == "DELETE")
         {
             ThumbItem *item = m_itemList.at(m_pos);
-            if (item) {
-                if( item->Remove() ) {
-                    m_zoom = 1.0;
-                    m_sx   = 0;
-                    m_sy   = 0;
-                    // Delete thumbnail for this
-                    if (item->pixmap)
-                        delete item->pixmap;
-                    item->pixmap = 0;
-                    advanceFrame();
-                    loadImage();
-                }
+            if (item && GalleryUtil::Delete(item->path))
+            {
+                m_zoom = 1.0;
+                m_sx   = 0;
+                m_sy   = 0;
+                // Delete thumbnail for this
+                if (item->pixmap)
+                    delete item->pixmap;
+                item->pixmap = 0;
+                advanceFrame();
+                loadImage();
             }
         }
-        else if (action == "PLAY" || action == "SLIDESHOW" || action == "RANDOMSHOW")
+        else if (action == "PLAY" || action == "SLIDESHOW" ||
+                 action == "RANDOMSHOW")
         {
             m_sx   = 0;
             m_sy   = 0;
