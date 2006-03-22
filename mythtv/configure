@@ -221,6 +221,23 @@ if test -f /proc/cpuinfo ; then
     processor_flags=`cat /proc/cpuinfo | grep "flags" | head -n 1`
 fi
 
+# Mac OS X equivalent
+if test -f /usr/bin/hostinfo ; then 
+    if test x"$processor" = x"" -o x"$processor" = x"$cpu_raw" -o \
+            x"$processor" = x"unknown" -o x"$processor" = x"powerpc" ; then 
+        processor=`/usr/bin/hostinfo | grep "Processor type:"` 
+        processor=${processor#Processor type: *} 
+        processor=${processor% (*} 
+        if test x"${processor:0:3}" = x"ppc" ; then 
+            tune=$processor 
+        else 
+            processor=`/usr/sbin/sysctl -n machdep.cpu.model_string` 
+            processor_flags=`/usr/sbin/sysctl -n machdep.cpu.features` 
+            processor_flags=`echo $processor_flags | tr "[A-Z]" "[a-z]"` 
+        fi 
+    fi 
+fi 
+
 # These have to be looked up early for some types of cross-compiling to work
 cpu_overide="no"
 for opt do
@@ -1210,6 +1227,10 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Celeron(R) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
        optimize="small"
+# P6, which includes Intel Core
+   elif expr "$processor" : ".*Intel P6 Family" > /dev/null ; then 
+       ARCHFLAGS="-march=pentium4" 
+       #cpu_raw="i686" 
 # P3
    elif expr "$processor" : "pentium3" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
@@ -1551,7 +1572,8 @@ EOF
 $cc -o $TMPE $TMPC 2> /dev/null || _memalign=no
 fi
 
-if test "$_memalign" = "no" -a "$mmx" = "yes" -a "$memalignhack" != "yes"; then
+if test "$_memalign" = "no" -a "$mmx" = "yes" -a \
+        "$memalignhack" != "yes" -a "$darwin" != "yes" ; then
     echo "error, no memalign() but sse enabled, either disable it or use --enable-memalign-hack"
     exit 1
 fi
