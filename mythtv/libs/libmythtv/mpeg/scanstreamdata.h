@@ -19,9 +19,23 @@ class ScanStreamData : public ATSCStreamData
     void Reset();
 
     void AddListeningPID(uint pid)
-        { ATSCStreamData::AddListeningPID(pid); dvb.AddListeningPID(pid); }
+    {
+        ATSCStreamData::AddListeningPID(pid);
+        dvb.AddListeningPID(pid);
+    }
+
     void RemoveListeningPID(uint pid)
-        { ATSCStreamData::RemoveListeningPID(pid); dvb.RemoveListeningPID(pid); }
+    {
+        ATSCStreamData::RemoveListeningPID(pid);
+        dvb.RemoveListeningPID(pid);
+    }
+
+    bool IsListeningPID(uint pid) const
+    {
+        return ATSCStreamData::IsListeningPID(pid) || dvb.IsListeningPID(pid);
+    }
+
+    QMap<uint, bool> ListeningPIDs(void) const;
 
     void ReturnCachedTable(const PSIPTable *psip) const;
     void ReturnCachedTables(pmt_vec_t&) const;

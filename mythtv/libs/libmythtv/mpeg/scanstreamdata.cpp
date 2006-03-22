@@ -45,12 +45,33 @@ bool ScanStreamData::HandleTables(uint pid, const PSIPTable &psip)
 void ScanStreamData::Reset(void)
 {
     ATSCStreamData::Reset(-1,-1);
-    ATSCStreamData::AddListeningPID(MPEG_PAT_PID);
-    ATSCStreamData::AddListeningPID(ATSC_PSIP_PID);
-
     dvb.Reset();
-    dvb.AddListeningPID(DVB_NIT_PID);
-    dvb.AddListeningPID(DVB_SDT_PID);
+
+    AddListeningPID(MPEG_PAT_PID);
+    AddListeningPID(ATSC_PSIP_PID);
+    AddListeningPID(DVB_NIT_PID);
+    AddListeningPID(DVB_SDT_PID);
+}
+
+QMap<uint, bool> ScanStreamData::ListeningPIDs(void) const
+{
+    QMap<uint, bool> a = ATSCStreamData::ListeningPIDs();
+    QMap<uint, bool> b = dvb.ListeningPIDs();
+
+    QMap<uint, bool>::const_iterator it = a.begin();
+    for (; it != a.end(); ++it)
+    {
+        if (*it)
+            b.remove(it.key());
+    }
+
+    for (it = b.begin(); it != b.end(); ++it)
+    {
+        if (*it)
+            a[it.key()] = true;
+    }
+
+    return a;
 }
 
 void ScanStreamData::ReturnCachedTable(const PSIPTable *psip) const

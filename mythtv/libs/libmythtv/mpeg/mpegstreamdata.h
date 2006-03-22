@@ -71,7 +71,7 @@ class MPEGStreamData : public QObject
     virtual bool IsWritingPID(uint pid) const;
     virtual bool IsAudioPID(uint pid) const;
 
-    virtual const QMap<uint, bool>& ListeningPIDs(void) const
+    virtual QMap<uint, bool> ListeningPIDs(void) const
         { return _pids_listening; }
 
     // Table versions
