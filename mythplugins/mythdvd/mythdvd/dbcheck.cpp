@@ -9,7 +9,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1002";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -269,6 +269,15 @@ void UpgradeDVDDatabaseSchema(void)
 ""
 };
       performActualUpdate(updates, "1001", dbver);
+    }
+
+    if (dbver == "1001")
+    {
+      const QString updates[] = {
+          "ALTER TABLE dvdtranscode ADD COLUMN tc_param VARCHAR(128);",
+          ""
+      };
+      performActualUpdate(updates, "1002", dbver);
     }
     
 }

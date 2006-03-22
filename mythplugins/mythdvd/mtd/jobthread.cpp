@@ -1011,7 +1011,8 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
                                      " a_bitrate,   "
                                      " input,       "
                                      " name,        "
-                                     " two_pass     "
+                                     " two_pass,    "
+                                     " tc_param     "
                                      
                                      " FROM dvdtranscode WHERE intid = %1 ;")
                                      .arg(quality);
@@ -1057,6 +1058,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     int   input_setting = a_query.value(21).toInt();
     QString        name = a_query.value(22).toString();
                two_pass = a_query.value(23).toBool();
+    QString    tc_param = a_query.value(24).toString();
     
     //
     //  And now, another query to get frame rate code and
@@ -1185,10 +1187,15 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     else
         tc_arguments.append(codec);
 
-    if(codec_param.length() > 0)
+    if(codec_param.length())
     {
         tc_arguments.append("-F");
         tc_arguments.append(codec_param);
+    }
+
+    if(tc_param.length())
+    {
+        tc_arguments += QStringList::split(" ", tc_param);
     }
     
     if(bitrate > 0)
