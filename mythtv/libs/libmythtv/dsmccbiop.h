@@ -5,6 +5,8 @@
 #ifndef DSMCC_BIOP_H
 #define DSMCC_BIOP_H
 
+#include <stdlib.h>
+
 #include "dsmcccache.h"
 
 #define BIOP_OBJ_OFFSET 11
@@ -126,8 +128,16 @@ class ProfileBodyLite: public ProfileBody
 class BiopIor
 {
   public:
-    BiopIor() { type_id_len = 0; type_id = 0; m_profile_body = NULL; }
-    ~BiopIor() { free(type_id); delete(m_profile_body); }
+    BiopIor() :
+        type_id_len(0),           type_id(NULL),
+        tagged_profiles_count(0), profile_id_tag(0),
+        m_profile_body(NULL) { }
+
+    ~BiopIor()
+    {
+        free(type_id);
+        delete m_profile_body;
+    }
  
     int Process(const unsigned char *);
     void AddTap(Dsmcc *pStatus);
