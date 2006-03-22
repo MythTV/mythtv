@@ -337,7 +337,7 @@ void UpdateSourceIcons(int sourceid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT ch.chanid, nim.url "
-            "FROM channel ch, callsignnetworkmap csm "
+            "FROM (channel ch, callsignnetworkmap csm) "
             "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
             "WHERE ch.callsign = csm.callsign AND "
             "(icon = :NOICON OR icon = '') AND ch.sourceid = :SOURCEID");
