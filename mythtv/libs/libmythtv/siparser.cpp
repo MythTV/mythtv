@@ -683,6 +683,8 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
 
 void SIParser::HandlePAT(const ProgramAssociationTable *pat)
 {
+    QMutexLocker locker(&pmap_lock);
+
     VERBOSE(VB_SIPARSER, LOC +
             QString("PAT Version: %1  Tuned to TransportID: %2")
             .arg(pat->Version()).arg(pat->TransportStreamID()));
@@ -728,6 +730,8 @@ void SIParser::HandleCAT(const ConditionalAccessTable *cat)
 //       to retune to correct transport or send an error tuning the channel
 void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 {
+    QMutexLocker lock(&pmap_lock);
+
     VERBOSE(VB_SIPARSER, LOC + QString(
                 "PMT pn(%1) version(%2) cnt(%3) pid(0x%4)")
             .arg(pnum).arg(pmt->Version()).arg(pmt->StreamCount())
