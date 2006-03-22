@@ -154,80 +154,40 @@ int CopySkipListToCutList(QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int ClearCutList(QString chanid, QString starttime)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("UPDATE recorded "
-                  "SET cutlist = NULL "
-                  "WHERE chanid = :CHANID "
-                      "AND starttime = :STARTTIME;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", starttime);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("clear cutlist",
-                             query);
-
-    VERBOSE(VB_IMPORTANT, "Cutlist cleared");
-
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
-}
-
 int SetCutList(QString chanid, QString starttime, QString newCutList)
 {
-    newCutList.replace(QRegExp(","), "\n");
-    newCutList.replace(QRegExp("-"), " - ");
+    QMap<long long, int> cutlist;
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    newCutList.replace(QRegExp(" "), "");
 
-    query.prepare("UPDATE recorded "
-                  "SET cutlist = :CUTLIST "
-                  "WHERE chanid = :CHANID "
-                      "AND starttime = :STARTTIME ;");
-    query.bindValue(":CUTLIST", newCutList);
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", starttime);
+    QStringList tokens = QStringList::split(",", newCutList);
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("clear cutlist",
-                             query);
+    for (unsigned int i = 0; i < tokens.size(); i++)
+    {
+        QStringList cutpair = QStringList::split("-", tokens[i]);
+        cutlist[cutpair[0].toInt()] = MARK_CUT_START;
+        cutlist[cutpair[1].toInt()] = MARK_CUT_END;
+    }
 
-    newCutList.replace(QRegExp("\n"), ",");
-    newCutList.replace(QRegExp(" - "), "-");
+    ProgramInfo *pginfo =
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+
+    if (!pginfo)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("No program data exists for channel %1 at %2")
+                .arg(chanid.ascii()).arg(starttime.ascii()));
+        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+    }
+
+    pginfo->SetCutList(cutlist);
 
     VERBOSE(VB_IMPORTANT, QString("Cutlist set to: %1").arg(newCutList));
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int GetCutList(QString chanid, QString starttime)
-{
-    QString result;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT cutlist FROM recorded "
-                  "WHERE chanid = :CHANID "
-                      "AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", starttime);
-
-    if (query.exec() && query.isActive() && query.size() > 0 && query.next())
-        result = query.value(0).toString();
-    else
-        MythContext::DBError("get cutlist",
-                             query);
-
-    result.replace(QRegExp("\n"), ",");
-    result.replace(QRegExp(" - "), "-");
-
-    cout << QString("Cutlist: %1\n").arg(result);
-
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
-}
-
-int GetSkipList(QString chanid, QString starttime)
+int GetMarkupList(QString list, QString chanid, QString starttime)
 {
     QMap<long long, int> cutlist;
     QMap<long long, int>::Iterator it;
@@ -244,10 +204,15 @@ int GetSkipList(QString chanid, QString starttime)
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
-    pginfo->GetCommBreakList(cutlist);
+    if (list == "cutlist")
+        pginfo->GetCutList(cutlist);
+    else
+        pginfo->GetCommBreakList(cutlist);
+
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
     {
-        if (it.data() == MARK_COMM_START)
+        if ((it.data() == MARK_COMM_START) ||
+            (it.data() == MARK_CUT_START))
         {
             if (result != "")
                 result += ",";
@@ -257,7 +222,10 @@ int GetSkipList(QString chanid, QString starttime)
             result += QString("%1").arg(it.key());
     }
 
-    cout << QString("Commercial Skip List: %1\n").arg(result);
+    if (list == "cutlist")
+        cout << QString("Cutlist: %1\n").arg(result);
+    else
+        cout << QString("Commercial Skip List: %1\n").arg(result);
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
@@ -663,7 +631,7 @@ int main(int argc, char *argv[])
     bool clearCutlist = false;
     bool getCutlist = false;
     bool getSkipList = false;
-    QString newCutList = "";
+    QString newCutList = QString::null;
     QMap<QString, QString> settingsOverride;
 
     QFileInfo finfo(a.argv()[0]);
@@ -990,16 +958,16 @@ int main(int argc, char *argv[])
         return CopySkipListToCutList(chanid, starttime);
 
     if (clearCutlist)
-        return ClearCutList(chanid, starttime);
+        return SetCutList(chanid, starttime, "");
+
+    if (!newCutList.isNull())
+        return SetCutList(chanid, starttime, newCutList);
 
     if (getCutlist)
-        return GetCutList(chanid, starttime);
+        return GetMarkupList("cutlist", chanid, starttime);
 
     if (getSkipList)
-        return GetSkipList(chanid, starttime);
-
-    if (newCutList != "")
-        return SetCutList(chanid, starttime, newCutList);
+        return GetMarkupList("commflag", chanid, starttime);
 
     if (inJobQueue)
     {
