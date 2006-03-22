@@ -100,6 +100,10 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 #undef DVB_IO
     AddFlags(newflags);
     DBG_SM("constructor()", QString("initial flags 0x%1").arg(newflags,0,16));
+
+    minimum_update_rate = _channel->GetMinSignalMonitorDelay();
+    if (minimum_update_rate > 30)
+        usleep(minimum_update_rate * 1000);
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()

@@ -127,6 +127,16 @@ bool CardUtil::HasDVBCRCBug(uint device)
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
+uint CardUtil::GetMinSignalMonitoringDelay(uint device)
+{
+    QString name = ProbeDVBFrontendName(device);
+    if (name.find("DVB-S") >= 0)
+        return 300;
+    if (name == "DiBcom 3000P/M-C DVB-T")
+        return 100;
+    return 25;
+}
+
 QString CardUtil::ProbeSubTypeName(uint cardid, const QString &inputname)
 {
     QString type = GetRawCardType(cardid, inputname);

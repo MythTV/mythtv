@@ -151,6 +151,7 @@ class CardUtil
     static QString      ProbeDVBFrontendName(uint device);
     static QString      ProbeDVBType(uint device);
     static bool         HasDVBCRCBug(uint device);
+    static uint         GetMinSignalMonitoringDelay(uint device);
     static DISEQC_TYPES GetDISEqCType(uint cardid);
 
     // V4L info

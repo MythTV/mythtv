@@ -78,12 +78,14 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
       dvb_recorder(NULL),
       diseqc(NULL),                 dvbcam(NULL),
       fd_frontend(-1),              cardnum(aCardNum),
-      has_crc_bug(false),           tuning_delay(0),
+      has_crc_bug(false),
+      tuning_delay(0),              sigmon_delay(25),
       currentTID(-1),               first_tune(true)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
     has_crc_bug = CardUtil::HasDVBCRCBug(aCardNum);
+    sigmon_delay = CardUtil::GetMinSignalMonitoringDelay(aCardNum);
 }
 
 DVBChannel::~DVBChannel()
@@ -808,6 +810,9 @@ static bool handle_diseq(const DVBTuning &ct, DVBDiSEqC *diseqc, bool reset)
     for (uint i = 0; i < 64 && !tuned; i++)
         if (!diseqc->Set(t, reset, tuned))
             return false;
-        
+
+    // Wait 10 ms, recommended by Marcus Metzler, see #1552
+    usleep(10 * 1000);
+
     return true;
 }
