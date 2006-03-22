@@ -107,6 +107,8 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 {
     MythMediaDevice *selected = NULL;
 
+    QMutexLocker locker(&m_DevicesLock);
+
     if (m_Devices.count() == 1)
     {
         if (m_Devices.first()->getAllowEject())
@@ -194,7 +196,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, 
                            bool allowEject) 
-    : QObject(par), m_Active(false), m_Thread(NULL, interval),
+    : QObject(par), m_Active(false), m_Thread(this, interval),
       m_AllowEject(allowEject), m_fifo(-1)
 {
 }
@@ -348,9 +350,12 @@ QStringList MediaMonitor::GetCDROMBlockDevices(void)
 // Given a media deivce add it to our collection.
 void MediaMonitor::AddDevice(MythMediaDevice* pDevice)
 {
+    QMutexLocker locker(&m_DevicesLock);
+
     connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)), 
             this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
     m_Devices.push_back( pDevice );
+    m_UseCount[pDevice] = 0;
 }
 
 // Given a fstab entry to a media device determine what type of device it is 
@@ -575,12 +580,28 @@ bool MediaMonitor::FindPartitions(const QString &dev, bool checkPartitions)
  */
 bool MediaMonitor::RemoveDevice(const QString &dev)
 {
+    QMutexLocker locker(&m_DevicesLock);
+
     QValueList<MythMediaDevice*>::iterator it;
     for (it = m_Devices.begin(); it != m_Devices.end(); it++)
     {
         if ((*it)->getDevicePath() == dev)
         {
-            m_Devices.remove(it);
+            if (m_UseCount[*it] == 0)
+            {
+                delete *it;
+                m_Devices.remove(it);
+                m_UseCount.remove(*it);
+            }
+            else
+            {
+                // Other threads are still using this device
+                // postpone actual delete until they finish.
+                disconnect(*it);
+                m_RemovedDevices.append(*it);
+                m_Devices.remove(it);
+            }
+
             return true;
         }
     }
@@ -681,13 +702,75 @@ void MediaMonitor::StopMonitoring(void)
     m_Thread.wait();
 }
 
-// Ask for available media
-// this is not safe.. device could get deleted...
-QValueList <MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
+/** \fn MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
+ *  \brief Validates the MythMediaDevice and increments its reference count
+ *
+ *   Returns true if pMedia device is valid, otherwise returns false.
+ *   If this function returns false the caller should gracefully recover.
+ *
+ *   NOTE: This function can block.
+ *
+ *  \sa Unlock(MythMediaDevice *pMedia), GetMedias(MediaType mediatype)
+ */
+bool MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
 {
-    QValueList <MythMediaDevice*> medias;
+    QMutexLocker locker(&m_DevicesLock);
 
-    QValueList <MythMediaDevice*>::iterator it = m_Devices.begin();
+    if (!m_Devices.contains(pMedia))
+        return false;
+
+    m_UseCount[pMedia]++;
+
+    return true;
+}
+
+/** \fn MediaMonitor::Unlock(MythMediaDevice *pMedia)
+ *  \brief decrements the MythMediaDevices reference count
+ *
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia), GetMedias(MediaType mediatype)
+ */
+void MediaMonitor::Unlock(MythMediaDevice *pMedia)
+{
+    QMutexLocker locker(&m_DevicesLock);
+
+    if (!m_UseCount.contains(pMedia))
+        return;
+
+    m_UseCount[pMedia]--;
+
+    if (m_UseCount[pMedia] == 0 && m_RemovedDevices.contains(pMedia))
+    {
+        m_RemovedDevices.remove(pMedia);
+        m_UseCount.remove(pMedia);
+        delete pMedia;
+    }
+}
+
+/** \fn MediaMonitor::GetMedias(MediaType mediatype)
+ *  \brief Ask for available media. Must be locked with ValidateAndLock().
+ *
+ *   This method returns a list of MythMediaDevice pointers which match
+ *   the given mediatype.
+ *
+ *   It is potentially unsafe to use the pointers returned by
+ *   this function. The devices may be removed and their
+ *   associated MythMediaDevice objects destroyed. It is the
+ *   responsibility of the caller to ensure that the pointers
+ *   are validated and the reference count is incremented by
+ *   calling MediaMonitor::ValidateAndLock() before the the
+ *   returned pointer is dereferenced and MediaMonitor::Unlock()
+ *   when done.
+ *
+ *  \sa ValidateAndLock(MythMediaDevice *pMedia)
+ *  \sa Unlock(MythMediaDevice *pMedia)
+ */
+QValueList<MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
+{
+    QMutexLocker locker(&m_DevicesLock);
+
+    QValueList<MythMediaDevice*> medias;
+
+    QValueList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); it++)
     {
         if (((*it)->getMediaType() == mediatype) &&
@@ -701,6 +784,7 @@ QValueList <MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
 
     return medias;
 }
+
 // Signal handler.
 void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus, 
                                       MythMediaDevice* pMedia)

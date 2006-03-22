@@ -43,8 +43,6 @@ class MonitorThread : public QThread
     unsigned long m_Interval;
 };
 
-class MediaMonitor;
-
 class MediaMonitor : public QObject
 {
     Q_OBJECT
@@ -64,8 +62,13 @@ class MediaMonitor : public QObject
 
     static MediaMonitor *GetMediaMonitor(void);
 
-    // this is not safe.. device could get deleted...
-    QValueList <MythMediaDevice*> GetMedias(MediaType mediatype);
+    bool ValidateAndLock(MythMediaDevice *pMedia);
+    void Unlock(MythMediaDevice *pMedia);
+
+    // To safely dereference the pointers returned by this function
+    // first validate the pointer with ValidateAndLock(), if true is returned
+    // it is safe to dereference the pointer. When finished call Unlock()
+    QValueList<MythMediaDevice*> GetMedias(MediaType mediatype);
 
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
@@ -87,7 +90,11 @@ class MediaMonitor : public QObject
     static QStringList GetCDROMBlockDevices(void);
 
   protected:
+    QMutex                       m_DevicesLock;
     QValueList<MythMediaDevice*> m_Devices;
+    QValueList<MythMediaDevice*> m_RemovedDevices;
+    QMap<MythMediaDevice*, int>  m_UseCount;
+
     bool                         m_Active;
     MonitorThread                m_Thread;
     bool                         m_AllowEject;

@@ -1110,7 +1110,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         QMap<QString, MHData>::Iterator itr = d->mediaHandlerMap.begin();
         MythMediaDevice *pDev = media_event->getDevice();
 
-        if (pDev) 
+        if (pDev)
         {
             /* FIXME, this needs rewritten */
             QWidget * activewidget = qApp->focusWidget();
@@ -1124,22 +1124,26 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
             }
             if (activedialog)
                 iscatched = activedialog->onMediaEvent(pDev);
-            if (!iscatched)
+
+            MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+            if (iscatched || !mon->ValidateAndLock(pDev))
+                mon = NULL;
+
+            while (mon && (itr != d->mediaHandlerMap.end()))
             {
-                while (itr != d->mediaHandlerMap.end())
+                if ((itr.data().MediaType & (int)pDev->getMediaType()))
                 {
-                   if ((itr.data().MediaType & (int)pDev->getMediaType()))
-                   {
-                       VERBOSE(VB_IMPORTANT, "Found a handler");
-                       d->exitingtomain = true;
-                       d->exitmenumediadevicecallback = itr.data().callback;
-                       d->mediadeviceforcallback = pDev;
-                       QApplication::postEvent(this, new ExitToMainMenuEvent());
-                       break;
-                   }
-                   itr++;
+                    VERBOSE(VB_IMPORTANT, "Found a handler");
+                    d->exitingtomain = true;
+                    d->exitmenumediadevicecallback = itr.data().callback;
+                    d->mediadeviceforcallback = pDev;
+                    QApplication::postEvent(this, new ExitToMainMenuEvent());
+                    break;
                 }
+                itr++;
             }
+            if (mon)
+                mon->Unlock(pDev);
         }
     }
 #ifdef USE_LIRC
