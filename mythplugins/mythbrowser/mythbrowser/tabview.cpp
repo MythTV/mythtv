@@ -40,16 +40,18 @@
 
 using namespace std;
 
-TabView::TabView(QStringList urls, int zoom, int width, int height, 
-                 WFlags flags)
+TabView::TabView(MythMainWindow *parent, const char *name, QStringList urls, 
+                 int zoom, int width, int height, WFlags flags)
+    :MythDialog(parent, name)
 {
+    setNoErase();
     menuIsOpen = false;
     menu = NULL;
-    
+
     mytab = new QTabWidget(this);
     mytab->setGeometry(0,0,width,height);
     QRect rect = mytab->childrenRect();
-    
+
     z=zoom;
     w=width;
     h=height-rect.height();
@@ -108,7 +110,6 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
 
     qApp->restoreOverrideCursor();
     qApp->installEventFilter(this);
-    mytab->show();
 }
 
 TabView::~TabView()
@@ -121,7 +122,7 @@ void TabView::openMenu()
 
     hadFocus = qApp->focusWidget();
 
-    menu = new MythPopupBox(this,"popupMenu");
+    menu = new MythPopupBox(GetMythMainWindow(),"popupMenu");
     menu->addLabel(tr("MythBrowser Menu"));
 
     if(mytab->count()==1) 
@@ -272,7 +273,7 @@ void TabView::actionAddBookmark()
     cancelMenu();
     hadFocus = qApp->focusWidget();
 
-    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(),
                                            "addbookmark_popup");
 
     QLabel *caption = popup->addLabel(tr("Add New Bookmark"), MythPopupBox::Medium);
@@ -357,7 +358,7 @@ void TabView::showEnterURLDialog()
 {
     hadFocus = qApp->focusWidget();
 
-    MythPopupBox *popup = new MythPopupBox(this, "enterURL");
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "enterURL");
     popup->addLabel(tr("Enter URL"));
 
     MythRemoteLineEdit *editor = new MythRemoteLineEdit(popup);
@@ -547,7 +548,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         QKeyEvent returnKey(ke->type(), Key_Return, '\r', ke->state(),QString::null, ke->isAutoRepeat(), ke->count());
 
         QStringList actions;
-        gContext->GetMainWindow()->TranslateKeyPress("Browser", ke, actions);
+        GetMythMainWindow()->TranslateKeyPress("Browser", ke, actions);
    
         bool handled = false;
         for (unsigned int i = 0; i < actions.size() && !handled; i++)

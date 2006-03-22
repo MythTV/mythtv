@@ -67,19 +67,23 @@ int main(int argc, char **argv)
     KCmdLineArgs::addCmdLineOptions(options);
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     zoom = args->getOption("z").toInt();
-    if(args->isSet("w"))
+    if (args->isSet("w"))
         width = args->getOption("w").toInt();
-    if(args->isSet("h"))
+    if (args->isSet("h"))
         height = args->getOption("h").toInt();
-    for(int i=0;i<args->count();i++) {
+    for (int i=0;i<args->count();i++) 
+    {
         urls += args->arg(i);
-     }
+    }
     args->clear();
 
+    if (urls.count() == 0)
+        urls += "http://www.mythtv.org";
+
     KApplication a(argc,argv);
-    if(width == -1)
+    if (width == -1)
         width = a.desktop()->width();
-    if(height == -1)
+    if (height == -1)
         height = a.desktop()->height();
 
     gContext = NULL;
@@ -98,26 +102,22 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythbrowser");
 
-    gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
-    
-//    MythMainWindow *mainWindow = new MythMainWindow();
-//    mainWindow->Show();
-//    gContext->SetMainWindow(mainWindow);
-//    a.setMainWidget(mainWindow);
+    setupKeys();
+
+
+    MythMainWindow *mainWindow = GetMythMainWindow();
+    mainWindow->Init();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     // Obtain width/height and x/y offset from context
     gContext->GetScreenSettings(x, width, xm, y, height, ym);
 
-    TabView *mainWindow = 
-        new TabView(urls, zoom, width, height, Qt::WStyle_Customize | Qt::WStyle_NoBorder);
-    gContext->SetMainWindow(mainWindow);
-    a.setMainWidget(mainWindow);
-    mainWindow->setGeometry(x, y, width, height);
-    mainWindow->setFixedSize(QSize(width, height));
-    mainWindow->Show();
-    
-    setupKeys();    
-    
-    return a.exec(); // exit(a.exec())
+    TabView *tabView = 
+            new TabView(mainWindow, "mythbrowser", urls, zoom, width, height,
+                        Qt::WStyle_Customize | Qt::WStyle_NoBorder);
+    tabView->exec();
+
+    return 0;
 }

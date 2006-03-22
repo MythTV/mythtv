@@ -18,7 +18,7 @@ using namespace std;
 typedef QPtrStack<QWidget> WIDGET_HISTORY;
 typedef QValueStack<QString> URL_HISTORY;
 
-class TabView : public MythMainWindow
+class TabView : public MythDialog
 {
     Q_OBJECT
 
@@ -26,7 +26,8 @@ protected:
     virtual bool eventFilter(QObject* object, QEvent* event);
 
 public:
-    TabView(QStringList urls, int zoom, int width, int height, WFlags flags);
+    TabView(MythMainWindow *parent, const char *name, QStringList urls, 
+            int zoom, int width, int height, WFlags flags);
     ~TabView();
 
 signals:
