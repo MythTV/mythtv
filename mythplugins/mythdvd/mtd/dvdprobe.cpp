@@ -555,7 +555,7 @@ bool DVDProbe::probe()
         //  Grab the title of this DVD
         //
         
-        int arbitrary = 1024;
+        const int arbitrary = 1024;
         char volume_name_buffr[arbitrary + 1];
         unsigned char set_name[arbitrary + 1];
         

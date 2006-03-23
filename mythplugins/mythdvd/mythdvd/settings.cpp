@@ -31,7 +31,7 @@ static HostLineEdit *SetVCDDevice()
                     "running MythDVD needs to have read permission "
                     "on the device."));
     return gc;
-};
+}
 
 static HostLineEdit *SetDVDDevice()
 {
@@ -42,7 +42,7 @@ static HostLineEdit *SetDVDDevice()
                     "running MythDVD needs to have read permission "
                     "on the device."));
     return gc;
-};
+}
 
 static HostComboBox *SetOnInsertDVD()
 {
@@ -55,7 +55,7 @@ static HostComboBox *SetOnInsertDVD()
     gc->setHelpText(QObject::tr("Media Monitoring should be turned on to "
                    "allow this feature (Setup -> General -> CD/DVD Monitor"));
     return gc;
-};
+}
 
 DVDGeneralSettings::DVDGeneralSettings()
 {
@@ -83,7 +83,7 @@ static HostLineEdit *PlayerCommand()
                     "(e.g. MPlayer, ogle, etc.). If present, %d will "
                     "be substituted for the DVD device (e.g. /dev/dvd)."));
     return gc;
-};
+}
 
 static HostLineEdit *VCDPlayerCommand()
 {
@@ -94,7 +94,7 @@ static HostLineEdit *VCDPlayerCommand()
                     "(e.g. MPlayer, xine, etc.). If present, %d will "
                     "be substituted for the VCD device (e.g. /dev/cdrom)."));
     return gc;
-};
+}
 
 
 DVDPlayerSettings::DVDPlayerSettings()
@@ -122,7 +122,7 @@ static HostLineEdit *SetRipDirectory()
                     "running MythDVD needs to have write permission "
                     "to the directory."));
     return gc;
-};
+}
 
 static HostLineEdit *TitlePlayCommand()
 {
@@ -134,7 +134,7 @@ static HostLineEdit *TitlePlayCommand()
                     "to the title, %d for device, %a for audio "
                     "track, %c for audio channels."));
     return gc;
-};
+}
 
 static HostLineEdit *SubTitleCommand()
 {
@@ -146,7 +146,7 @@ static HostLineEdit *SubTitleCommand()
                     "Command to allow previewing of subtitles. If  "
                     "present %s will be set to the subtitle track. "));
     return gc;
-};
+}
 
 static HostLineEdit *TranscodeCommand()
 {
@@ -156,7 +156,7 @@ static HostLineEdit *TranscodeCommand()
     gc->setHelpText(QObject::tr("This is the base (without arguments) command "
                     "to run transcode on your system."));
     return gc;
-};
+}
 
 static HostSpinBox *MTDPortNumber()
 {
@@ -167,7 +167,7 @@ static HostSpinBox *MTDPortNumber()
                     "communicating with the MTD (Myth Transcoding "
                     "Daemon)"));
     return gc;
-};
+}
 
 static HostCheckBox *MTDLogFlag()
 {
@@ -179,7 +179,7 @@ static HostCheckBox *MTDLogFlag()
                     "Otherwise, it will write to a file called  "
                     "mtd.log in the top level ripping directory."));
     return gc;
-};
+}
 
 
 static HostCheckBox *MTDac3Flag()
@@ -191,7 +191,7 @@ static HostCheckBox *MTDac3Flag()
                     "will, by default, preserve AC3 (Dolby "
                     "Digital) audio in transcoded files. "));
     return gc;
-};
+}
 
 
 static HostCheckBox *MTDxvidFlag()
@@ -203,7 +203,7 @@ static HostCheckBox *MTDxvidFlag()
                     "xvid codec rather than divx whenever "
                     "possible."));
     return gc;
-};
+}
 
 
 static HostSpinBox *MTDNiceLevel()
@@ -215,7 +215,7 @@ static HostSpinBox *MTDNiceLevel()
                     "Transcoding Daemon. Higher numbers mean "
                     "lower priority (more CPU to other tasks)."));
     return gc;
-};
+}
 
 static HostSpinBox *MTDConcurrentTranscodes()
 {
@@ -226,7 +226,7 @@ static HostSpinBox *MTDConcurrentTranscodes()
                     "transcode jobs. If set at 1 (the default), "
                     "there will only be one active job at a time."));
     return gc;
-};
+}
 
 static HostSpinBox *MTDRipSize()
 {
@@ -239,7 +239,7 @@ static HostSpinBox *MTDRipSize()
                     "quality recordings and intermediate files "
                     "used for transcoding."));
     return gc;
-};
+}
 
 DVDRipperSettings::DVDRipperSettings()
 {
