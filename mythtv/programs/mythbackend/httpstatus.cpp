@@ -170,11 +170,6 @@ void HttpStatus::PrintStatus(QSocket *socket, QDomDocument *pDoc )
        << "    padding:5px;\r\n"
        << "    border:thin dashed #000;\r\n"
        << "  }\r\n"
-       << "  div.diskstatus {\r\n"
-       << "    width:325px;\r\n"
-       << "    height:7em;\r\n"
-       << "    float:left;\r\n"
-       << "  }\r\n"
        << "  div.loadstatus {\r\n"
        << "    width:325px;\r\n"
        << "    height:7em;\r\n"
@@ -646,39 +641,9 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
     os << "<div class=\"content\">\r\n"
        << "    <h2>Machine information</h2>\r\n";
 
-    // drive space   ---------------------
-    
-    QDomNode node = info.namedItem( "Storage" );
-
-    if (!node.isNull())
-    {    
-        QDomElement e = node.toElement();
-
-        if (!e.isNull())
-        {
-            int nFree = e.attribute( "free" , "0" ).toInt();
-            int nTotal= e.attribute( "total", "0" ).toInt();
-            int nUsed = e.attribute( "used" , "0" ).toInt();
-
-             os << "    <div class=\"diskstatus\">\r\n";
-
-            os << "      Disk Usage:\r\n      <ul>\r\n        <li>Total Space: ";
-            sRep.sprintf(tr("%d,%03d MB "), (nTotal) / 1000, (nTotal) % 1000);
-            os << sRep << "</li>\r\n";
-
-            os << "        <li>Space Used: ";
-            sRep.sprintf(tr("%d,%03d MB "), (nUsed) / 1000, (nUsed) % 1000);
-            os << sRep << "</li>\r\n";
-
-            os << "        <li>Space Free: ";
-            sRep.sprintf(tr("%d,%03d MB "), (nFree) / 1000, (nFree) % 1000);
-            os << sRep << "</li>\r\n      </ul>\r\n    </div>\r\n\r\n";
-        }
-    }
-
     // load average ---------------------
 
-    node = info.namedItem( "Load" );
+    QDomNode node = info.namedItem( "Load" );
 
     if (!node.isNull())
     {    
@@ -698,6 +663,73 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                << "        <li>15 Minutes: " << dAvg3
                << "</li>\r\n      </ul>\r\n"
                << "    </div>\r\n";    
+        }
+    }
+
+    // local drive space   ---------------------
+    
+    node = info.namedItem( "Storage" );
+
+    if (!node.isNull())
+    {    
+        QDomElement e = node.toElement();
+
+        if (!e.isNull())
+        {
+            QString slaves = e.attribute("slaves", "_local_");
+            QStringList tokens = QStringList::split(",", slaves);
+
+            os << "      Disk Usage:<br />\r\n";
+            os << "      <ul>\r\n";
+
+            for (unsigned int i = 0; i < tokens.size(); i++)
+            {
+                int nFree = e.attribute(tokens[i] + ":free" , "0" ).toInt();
+                int nTotal= e.attribute(tokens[i] + ":total", "0" ).toInt();
+                int nUsed = e.attribute(tokens[i] + ":used" , "0" ).toInt();
+
+                if (slaves == "_local_")
+                {
+                    // do nothing
+                }
+                else if (tokens[i] == "_local_")
+                {
+                    os << "        <li>Master Backend:\r\n"
+                       << "          <ul>\r\n";
+                }
+                else if (tokens[i] == "_total_")
+                {
+                    os << "        <li>Total Disk Space:\r\n"
+                       << "          <ul>\r\n";
+                }
+                else
+                {
+                    os << "        <li>" << tokens[i] << ": ";
+
+                    if (e.attribute(tokens[i] + ":shared", "0").toInt())
+                        os << " (Shared with master)";
+
+                    os << "\r\n"
+                       << "          <ul>\r\n";
+                }
+
+                os << "            <li>Total Space: ";
+                sRep.sprintf(tr("%d,%03d MB "), (nTotal) / 1000, (nTotal) % 1000);
+                os << sRep << "</li>\r\n";
+
+                os << "            <li>Space Used: ";
+                sRep.sprintf(tr("%d,%03d MB "), (nUsed) / 1000, (nUsed) % 1000);
+                os << sRep << "</li>\r\n";
+
+                os << "            <li>Space Free: ";
+                sRep.sprintf(tr("%d,%03d MB "), (nFree) / 1000, (nFree) % 1000);
+                os << sRep << "</li>\r\n";
+
+                if (slaves != "_local_")
+                    os << "          </ul>\r\n"
+                       << "        </li>\r\n";
+            }
+            os << "      </ul>\r\n";
         }
     }
 
@@ -726,7 +758,6 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
             if (!text.isNull())
                 sMsg = text.nodeValue();
-
 
             os << "    Last mythfilldatabase run started on " << sStart
                << " and ";
@@ -763,10 +794,9 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
             if (!sMsg.isNull() && !sMsg.isEmpty())
                 os << "<br />\r\n    DataDirect Status: " << sMsg;
-
-            os << "\r\n  </div>\r\n";
         }
     }
+    os << "\r\n  </div>\r\n";
 
     return( 1 );
 }

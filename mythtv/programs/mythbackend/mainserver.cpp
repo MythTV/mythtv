@@ -3893,9 +3893,62 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
 
     iAvail = getDiskSpace(recordfileprefix, iTotal, iUsed);
 
-    storage.setAttribute("total", (int)(iTotal>>10));
-    storage.setAttribute("used" , (int)(iUsed>>10));
-    storage.setAttribute("free" , (int)(iAvail>>10));
+    storage.setAttribute("_local_:total", (int)(iTotal>>10));
+    storage.setAttribute("_local_:used" , (int)(iUsed>>10));
+    storage.setAttribute("_local_:free" , (int)(iAvail>>10));
+
+    if (ismaster)
+    {
+        long long mTotal =  0, mUsed =  0, mAvail =  0;
+        long long gTotal =  0, gUsed =  0, gAvail =  0;
+        QString hosts = "_local_";
+        QMap <QString, bool> backendsCounted;
+        QString encoderHost;
+        QMap<int, EncoderLink *>::Iterator eit;
+
+        gTotal = iTotal;
+        gUsed  = iUsed;
+        gAvail = iAvail;
+
+        for (eit = encoderList->begin(); eit != encoderList->end(); ++eit)
+        {
+            encoderHost = eit.data()->GetHostName();
+            if (eit.data()->IsConnected() &&
+                !eit.data()->IsLocal() &&
+                !backendsCounted.contains(encoderHost))
+            {
+                backendsCounted[encoderHost] = true;
+                hosts += "," + encoderHost;
+
+                eit.data()->GetFreeDiskSpace(mTotal, mUsed);
+                mAvail = mTotal - mUsed;
+
+                storage.setAttribute(encoderHost + ":total", (int)(mTotal>>10));
+                storage.setAttribute(encoderHost + ":used" , (int)(mUsed>>10));
+                storage.setAttribute(encoderHost + ":free" , (int)(mAvail>>10));
+
+                if ((mTotal == iTotal) &&
+                    (abs(mAvail - iAvail) < (iAvail * 0.05)))
+                {
+                    storage.setAttribute(encoderHost + ":shared" , 1);
+                }
+                else
+                {
+                    storage.setAttribute(encoderHost + ":shared" , 0);
+                    gTotal += mTotal;
+                    gUsed  += mUsed;
+                    gAvail += mAvail;
+                }
+            }
+        }
+        storage.setAttribute("_total_:total", (int)(gTotal>>10));
+        storage.setAttribute("_total_:used" , (int)(gUsed>>10));
+        storage.setAttribute("_total_:free" , (int)(gAvail>>10));
+
+        if (hosts != "_local_")
+            hosts += ",_total_";
+        storage.setAttribute("slaves", hosts);
+    }
 
     // load average ---------------------
 
