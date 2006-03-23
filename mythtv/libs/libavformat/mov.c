@@ -322,7 +322,7 @@ typedef struct MOVContext {
     int mp4; /* set to 1 as soon as we are sure that the file is an .mp4 file (even some header parsing depends on this) */
     AVFormatContext *fc;
     int time_scale;
-    int duration; /* duration of the longest track */
+    int64_t duration; /* duration of the longest track */
     int found_moov; /* when both 'moov' and 'mdat' sections has been found */
     int found_mdat; /* we suppose we have enough data to read the file */
     int64_t mdat_size;
@@ -668,24 +668,30 @@ static int mov_read_moov(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 
 static int mov_read_mdhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 {
-    int version;
+    AVStream *st = c->fc->streams[c->fc->nb_streams-1];
+    MOVStreamContext *sc = (MOVStreamContext *)st->priv_data;
+    int version = get_byte(pb);
     int lang;
 
-    version = get_byte(pb); /* version */
     if (version > 1)
         return 1; /* unsupported */
 
     get_byte(pb); get_byte(pb);
     get_byte(pb); /* flags */
 
-    (version==1)?get_be64(pb):get_be32(pb); /* creation time */
-    (version==1)?get_be64(pb):get_be32(pb); /* modification time */
+    if (version == 1) {
+        get_be64(pb);
+        get_be64(pb);
+    } else {
+        get_be32(pb); /* creation time */
+        get_be32(pb); /* modification time */
+    }
 
-    c->streams[c->fc->nb_streams-1]->time_scale = get_be32(pb);
-    c->fc->streams[c->fc->nb_streams-1]->duration = (version==1)?get_be64(pb):get_be32(pb); /* duration */
+    sc->time_scale = get_be32(pb);
+    st->duration = (version == 1) ? get_be64(pb) : get_be32(pb); /* duration */
 
     lang = get_be16(pb); /* language */
-    ff_mov_lang_to_iso639(lang, c->fc->streams[c->fc->nb_streams-1]->language);
+    ff_mov_lang_to_iso639(lang, st->language);
     get_be16(pb); /* quality */
 
     return 0;
@@ -693,16 +699,21 @@ static int mov_read_mdhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 
 static int mov_read_mvhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 {
-    get_byte(pb); /* version */
+    int version = get_byte(pb); /* version */
     get_byte(pb); get_byte(pb); get_byte(pb); /* flags */
 
-    get_be32(pb); /* creation time */
-    get_be32(pb); /* modification time */
+    if (version == 1) {
+        get_be64(pb);
+        get_be64(pb);
+    } else {
+        get_be32(pb); /* creation time */
+        get_be32(pb); /* modification time */
+    }
     c->time_scale = get_be32(pb); /* time scale */
 #ifdef DEBUG
     av_log(NULL, AV_LOG_DEBUG, "time scale = %i\n", c->time_scale);
 #endif
-    c->duration = get_be32(pb); /* duration */
+    c->duration = (version == 1) ? get_be64(pb) : get_be32(pb); /* duration */
     get_be32(pb); /* preferred scale */
 
     get_be16(pb); /* preferred volume */
@@ -1271,7 +1282,7 @@ av_log(NULL, AV_LOG_DEBUG, "track[%i].stts.entries = %i\n", c->fc->nb_streams-1,
 
         dprintf("sample_count=%d, sample_duration=%d\n",sample_count,sample_duration);
 
-        duration+=sample_duration*sample_count;
+        duration+=(int64_t)sample_duration*sample_count;
         total_sample_count+=sample_count;
     }
 
@@ -1334,11 +1345,8 @@ static int mov_read_trak(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 
 static int mov_read_tkhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 {
-    AVStream *st;
-
-    st = c->fc->streams[c->fc->nb_streams-1];
-
-    get_byte(pb); /* version */
+    AVStream *st = c->fc->streams[c->fc->nb_streams-1];
+    int version = get_byte(pb);
 
     get_byte(pb); get_byte(pb);
     get_byte(pb); /* flags */
@@ -1349,12 +1357,17 @@ static int mov_read_tkhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     MOV_TRACK_IN_POSTER 0x0008
     */
 
-    get_be32(pb); /* creation time */
-    get_be32(pb); /* modification time */
+    if (version == 1) {
+        get_be64(pb);
+        get_be64(pb);
+    } else {
+        get_be32(pb); /* creation time */
+        get_be32(pb); /* modification time */
+    }
     st->id = (int)get_be32(pb); /* track id (NOT 0 !)*/
     get_be32(pb); /* reserved */
     st->start_time = 0; /* check */
-    get_be32(pb); /* highlevel (considering edits) duration in movie timebase */
+    (version == 1) ? get_be64(pb) : get_be32(pb); /* highlevel (considering edits) duration in movie timebase */
     get_be32(pb); /* reserved */
     get_be32(pb); /* reserved */
 
@@ -1693,6 +1706,7 @@ static int mov_read_packet(AVFormatContext *s, AVPacket *pkt)
     int64_t offset = INT64_MAX;
     int64_t best_dts = INT64_MAX;
     int i, a, b, m;
+    int next_sample= -99;
     int size;
     int idx;
     size = 0x0FFFFFFF;
@@ -1708,7 +1722,8 @@ static int mov_read_packet(AVFormatContext *s, AVPacket *pkt)
         //size = (sc->sample_size)?sc->sample_size:sc->sample_sizes[sc->current_sample];
         size = (sc->sample_size > 1)?sc->sample_size:sc->sample_sizes[sc->current_sample];
 
-        sc->current_sample++;
+        next_sample= sc->current_sample+1;
+
         sc->left_in_chunk--;
 
         if (sc->left_in_chunk <= 0)
@@ -1734,13 +1749,13 @@ again:
                 int time= msc->sample_to_time_time;
                 int duration = msc->stts_data[index].duration;
                 int count = msc->stts_data[index].count;
-                if (sample + count < msc->current_sample) {
+                if (sample + count <= msc->current_sample) {
                     sample += count;
                     time   += count*duration;
                     index ++;
                     duration = msc->stts_data[index].duration;
                 }
-                dts = time + (msc->current_sample-1 - sample) * (int64_t)duration;
+                dts = time + (msc->current_sample - sample) * (int64_t)duration;
                 dts = av_rescale(dts, AV_TIME_BASE, msc->time_scale);
                 dprintf("stream: %d dts: %"PRId64" best_dts: %"PRId64" offset: %"PRId64"\n", i, dts, best_dts, offset);
                 if(dts < best_dts){
@@ -1817,10 +1832,11 @@ again:
             size = (sc->sample_size > 1)?sc->sample_size:sc->sample_sizes[sc->current_sample];
         }
 
-        sc->current_sample++;
-    }else if(idx + 1 < sc->sample_to_chunk_sz){
-        sc->current_sample += sc->sample_to_chunk[idx].count;
-    }
+        next_sample= sc->current_sample+1;
+    }else if(idx < sc->sample_to_chunk_sz){
+        next_sample= sc->current_sample + sc->sample_to_chunk[idx].count;
+    }else
+        next_sample= sc->current_sample;
 
 readchunk:
     dprintf("chunk: %"PRId64" -> %"PRId64" (%i)\n", offset, offset + size, size);
@@ -1864,19 +1880,19 @@ readchunk:
       uint64_t dts, pts;
       unsigned int duration = sc->stts_data[sc->sample_to_time_index].duration;
       count = sc->stts_data[sc->sample_to_time_index].count;
-      if ((sc->sample_to_time_sample + count) < sc->current_sample) {
+      if ((sc->sample_to_time_sample + count) <= sc->current_sample) {
         sc->sample_to_time_sample += count;
         sc->sample_to_time_time   += count*duration;
         sc->sample_to_time_index ++;
         duration = sc->stts_data[sc->sample_to_time_index].duration;
       }
-      dts = sc->sample_to_time_time + (sc->current_sample-1 - sc->sample_to_time_sample) * (int64_t)duration;
+      dts = sc->sample_to_time_time + (sc->current_sample - sc->sample_to_time_sample) * (int64_t)duration;
         /* find the corresponding pts */
         if (sc->sample_to_ctime_index < sc->ctts_count) {
             int duration = sc->ctts_data[sc->sample_to_ctime_index].duration;
             int count = sc->ctts_data[sc->sample_to_ctime_index].count;
 
-            if ((sc->sample_to_ctime_sample + count) < sc->current_sample) {
+            if ((sc->sample_to_ctime_sample + count) <= sc->current_sample) {
                 sc->sample_to_ctime_sample += count;
                 sc->sample_to_ctime_index ++;
                 duration = sc->ctts_data[sc->sample_to_ctime_index].duration;
@@ -1900,6 +1916,9 @@ readchunk:
                 , count
                 , duration);
     }
+
+    assert(next_sample>=0);
+    sc->current_sample= next_sample;
 
     return 0;
 }

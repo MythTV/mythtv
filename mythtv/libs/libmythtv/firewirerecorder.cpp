@@ -124,7 +124,7 @@ bool FirewireRecorder::Open(void)
      // Set buffered packets size
      size_t buffer_size = gContext->GetNumSetting("HDRingbufferSize",
                                                   50 * TSPacket::SIZE);
-     size_t buffered_packets = min(buffer_size / 4, kMaxBufferedPackets); 
+     size_t buffered_packets = min(buffer_size / 4, (size_t)kMaxBufferedPackets); 
      iec61883_mpeg2_set_buffers(fwmpeg, buffered_packets);
      VERBOSE(VB_IMPORTANT, LOC +
              QString("Buffered packets %1 (%2 KB)"). 

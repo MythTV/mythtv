@@ -17,6 +17,7 @@
 #  define REG_S "rsi"
 #  define REG_SP "rsp"
 #  define ALIGN_MASK "$0xFFFFFFFFFFFFFFF8"
+#  define PTR_SIZE "8"
 #else
 #  define REGa  eax
 #  define REGc  ecx
@@ -29,6 +30,7 @@
 #  define REG_S "esi"
 #  define REG_SP "esp"
 #  define ALIGN_MASK "$0xFFFFFFF8"
+#  define PTR_SIZE "4"
 #endif
 
 /*

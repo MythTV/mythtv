@@ -202,6 +202,11 @@ contains( CONFIG_SHORTEN_DECODER, yes ) {
     SOURCES += shorten.c
 }
 
+DO_SMACKER = $$CONFIG_SMACKER_DECODER $$CONFIG_SMACKAUD_DECODER
+contains( DO_SMACKER, yes ) {
+    SOURCES += smacker.c
+}
+
 contains( CONFIG_SMC_DECODER, yes ) {
     SOURCES += smc.c
 }
@@ -404,7 +409,7 @@ contains( TARGET_MMX, yes ) {
     SOURCES += i386/mpegvideo_mmx.c i386/idct_mmx.c i386/motion_est_mmx.c
     SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c i386/vp3dsp_mmx.c
     SOURCES += i386/vp3dsp_sse2.c i386/idct_mmx_xvid.c i386/fft_3dn.c
-    SOURCES += i386/fft_3dn2.c
+    SOURCES += i386/fft_3dn2.c i386/snowdsp_mmx.c
 #    contains( TARGET_BUILTIN_VECTOR, yes ) {
 #        QMAKE_CFLAGS_RELEASE += -msse
 #        QMAKE_CFLAGS_DEBUG += -msse

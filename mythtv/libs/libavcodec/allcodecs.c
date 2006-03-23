@@ -446,6 +446,12 @@ void avcodec_register_all(void)
 #ifdef CONFIG_MSZH_DECODER
     register_avcodec(&mszh_decoder);
 #endif //CONFIG_MSZH_DECODER
+#ifdef CONFIG_SMACKER_DECODER
+    register_avcodec(&smacker_decoder);
+#endif //CONFIG_SMACKER_DECODER
+#ifdef CONFIG_SMACKAUD_DECODER
+    register_avcodec(&smackaud_decoder);
+#endif //CONFIG_SMACKAUD_DECODER
 #ifdef CONFIG_ZLIB_DECODER
     register_avcodec(&zlib_decoder);
 #endif //CONFIG_ZLIB_DECODER

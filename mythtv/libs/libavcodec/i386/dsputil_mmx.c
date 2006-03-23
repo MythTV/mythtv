@@ -2494,6 +2494,18 @@ static void add_8x8basis_mmx(int16_t rem[64], int16_t basis[64], int scale){
     }
 }
 
+#define PREFETCH(name, op) \
+void name(void *mem, int stride, int h){\
+    const uint8_t *p= mem;\
+    do{\
+        asm volatile(#op" %0" :: "m"(*p));\
+        p+= stride;\
+    }while(--h);\
+}
+PREFETCH(prefetch_mmx2,  prefetcht0)
+PREFETCH(prefetch_3dnow, prefetch)
+#undef PREFETCH
+
 #include "h264dsp_mmx.c"
 
 /* external functions, from idct_mmx.c */
@@ -2567,6 +2579,17 @@ static void ff_idct_xvid_mmx2_add(uint8_t *dest, int line_size, DCTELEM *block)
     ff_idct_xvid_mmx2 (block);
     add_pixels_clamped_mmx(block, dest, line_size);
 }
+#endif
+
+#ifdef CONFIG_SNOW_ENCODER
+extern void ff_snow_horizontal_compose97i_sse2(DWTELEM *b, int width);
+extern void ff_snow_horizontal_compose97i_mmx(DWTELEM *b, int width);
+extern void ff_snow_vertical_compose97i_sse2(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width);
+extern void ff_snow_vertical_compose97i_mmx(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width);
+extern void ff_snow_inner_add_yblock_sse2(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
+                           int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
+extern void ff_snow_inner_add_yblock_mmx(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
+                          int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
 #endif
 
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
@@ -2743,6 +2766,8 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         c->h264_idct8_add= ff_h264_idct8_add_mmx;
 
         if (mm_flags & MM_MMXEXT) {
+            c->prefetch = prefetch_mmx2;
+
             c->put_pixels_tab[0][1] = put_pixels16_x2_mmx2;
             c->put_pixels_tab[0][2] = put_pixels16_y2_mmx2;
 
@@ -2842,6 +2867,8 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 
             c->avg_h264_chroma_pixels_tab[0]= avg_h264_chroma_mc8_mmx2;
             c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_mmx2;
+            c->avg_h264_chroma_pixels_tab[2]= avg_h264_chroma_mc2_mmx2;
+            c->put_h264_chroma_pixels_tab[2]= put_h264_chroma_mc2_mmx2;
             c->h264_v_loop_filter_luma= h264_v_loop_filter_luma_mmx2;
             c->h264_h_loop_filter_luma= h264_h_loop_filter_luma_mmx2;
             c->h264_v_loop_filter_chroma= h264_v_loop_filter_chroma_mmx2;
@@ -2871,6 +2898,8 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->sub_hfyu_median_prediction= sub_hfyu_median_prediction_mmx2;
 #endif //CONFIG_ENCODERS
         } else if (mm_flags & MM_3DNOW) {
+            c->prefetch = prefetch_3dnow;
+
             c->put_pixels_tab[0][1] = put_pixels16_x2_3dnow;
             c->put_pixels_tab[0][2] = put_pixels16_y2_3dnow;
 
@@ -2955,6 +2984,19 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->avg_h264_chroma_pixels_tab[0]= avg_h264_chroma_mc8_3dnow;
             c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_3dnow;
         }
+
+#ifdef CONFIG_SNOW_ENCODER
+        if(mm_flags & MM_SSE2){
+            c->horizontal_compose97i = ff_snow_horizontal_compose97i_sse2;
+            c->vertical_compose97i = ff_snow_vertical_compose97i_sse2;
+            c->inner_add_yblock = ff_snow_inner_add_yblock_sse2;
+        }
+        else{
+            c->horizontal_compose97i = ff_snow_horizontal_compose97i_mmx;
+            c->vertical_compose97i = ff_snow_vertical_compose97i_mmx;
+            c->inner_add_yblock = ff_snow_inner_add_yblock_mmx;
+        }
+#endif
     }
 
 #ifdef CONFIG_ENCODERS

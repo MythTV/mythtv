@@ -30,6 +30,7 @@
 #include "mpegvideo.h"
 #include "simple_idct.h"
 #include "faandct.h"
+#include "snow.h"
 
 /* snow.c */
 void ff_spatial_dwt(int *buffer, int width, int height, int stride, int type, int decomposition_count);
@@ -3772,6 +3773,8 @@ static void ff_jref_idct1_add(uint8_t *dest, int line_size, DCTELEM *block)
     dest[0] = cm[dest[0] + ((block[0] + 4)>>3)];
 }
 
+static void just_return() { return; }
+
 /* init static data */
 void dsputil_static_init(void)
 {
@@ -4046,6 +4049,14 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 
     c->try_8x8basis= try_8x8basis_c;
     c->add_8x8basis= add_8x8basis_c;
+
+#ifdef CONFIG_SNOW_ENCODER
+    c->vertical_compose97i = ff_snow_vertical_compose97i;
+    c->horizontal_compose97i = ff_snow_horizontal_compose97i;
+    c->inner_add_yblock = ff_snow_inner_add_yblock;
+#endif
+
+    c->prefetch= just_return;
 
 #ifdef HAVE_MMX
     dsputil_init_mmx(c, avctx);

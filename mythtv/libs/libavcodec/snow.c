@@ -19,22 +19,14 @@
 #include "avcodec.h"
 #include "common.h"
 #include "dsputil.h"
+#include "snow.h"
 
 #include "rangecoder.h"
-#define MID_STATE 128
 
 #include "mpegvideo.h"
 
 #undef NDEBUG
 #include <assert.h>
-
-#define MAX_DECOMPOSITIONS 8
-#define MAX_PLANES 4
-#define DWTELEM int
-#define QSHIFT 5
-#define QROOT (1<<QSHIFT)
-#define LOSSLESS_QLOG -128
-#define FRAC_BITS 8
 
 static const int8_t quant3[256]={
  0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -181,8 +173,6 @@ static const int8_t quant13[256]={
 -4,-4,-4,-4,-4,-4,-4,-4,-4,-3,-3,-3,-3,-2,-2,-1,
 };
 
-#define LOG2_OBMC_MAX 6
-#define OBMC_MAX (1<<(LOG2_OBMC_MAX))
 #if 0 //64*cubic
 static const uint8_t obmc32[1024]={
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -240,57 +230,57 @@ static const uint8_t obmc16[256]={
 };
 #elif 1 // 64*linear
 static const uint8_t obmc32[1024]={
- 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
- 0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 2, 2, 2, 1, 1, 1, 0,
- 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9,10,10, 9, 8, 8, 7, 7, 6, 5, 5, 4, 3, 3, 2, 2, 1, 0,
- 0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9,10,11,12,13,14,14,13,12,11,10, 9, 8, 7, 7, 6, 5, 4, 3, 2, 1, 0,
- 1, 2, 3, 4, 5, 6, 7, 8,10,11,12,13,14,15,16,17,17,16,15,14,13,12,11,10, 8, 7, 6, 5, 4, 3, 2, 1,
- 1, 2, 3, 5, 6, 8, 9,10,12,13,14,16,17,19,20,21,21,20,19,17,16,14,13,12,10, 9, 8, 6, 5, 3, 2, 1,
- 1, 2, 4, 6, 7, 9,11,12,14,15,17,19,20,22,24,25,25,24,22,20,19,17,15,14,12,11, 9, 7, 6, 4, 2, 1,
- 1, 3, 5, 7, 8,10,12,14,16,18,20,22,23,25,27,29,29,27,25,23,22,20,18,16,14,12,10, 8, 7, 5, 3, 1,
- 1, 3, 5, 7,10,12,14,16,18,20,22,24,27,29,31,33,33,31,29,27,24,22,20,18,16,14,12,10, 7, 5, 3, 1,
- 1, 4, 6, 8,11,13,15,18,20,23,25,27,30,32,34,37,37,34,32,30,27,25,23,20,18,15,13,11, 8, 6, 4, 1,
- 1, 4, 7, 9,12,14,17,20,22,25,28,30,33,35,38,41,41,38,35,33,30,28,25,22,20,17,14,12, 9, 7, 4, 1,
- 1, 4, 7,10,13,16,19,22,24,27,30,33,36,39,42,45,45,42,39,36,33,30,27,24,22,19,16,13,10, 7, 4, 1,
- 2, 5, 8,11,14,17,20,23,27,30,33,36,39,42,45,48,48,45,42,39,36,33,30,27,23,20,17,14,11, 8, 5, 2,
- 2, 5, 8,12,15,19,22,25,29,32,35,39,42,46,49,52,52,49,46,42,39,35,32,29,25,22,19,15,12, 8, 5, 2,
- 2, 5, 9,13,16,20,24,27,31,34,38,42,45,49,53,56,56,53,49,45,42,38,34,31,27,24,20,16,13, 9, 5, 2,
- 2, 6,10,14,17,21,25,29,33,37,41,45,48,52,56,60,60,56,52,48,45,41,37,33,29,25,21,17,14,10, 6, 2,
- 2, 6,10,14,17,21,25,29,33,37,41,45,48,52,56,60,60,56,52,48,45,41,37,33,29,25,21,17,14,10, 6, 2,
- 2, 5, 9,13,16,20,24,27,31,34,38,42,45,49,53,56,56,53,49,45,42,38,34,31,27,24,20,16,13, 9, 5, 2,
- 2, 5, 8,12,15,19,22,25,29,32,35,39,42,46,49,52,52,49,46,42,39,35,32,29,25,22,19,15,12, 8, 5, 2,
- 2, 5, 8,11,14,17,20,23,27,30,33,36,39,42,45,48,48,45,42,39,36,33,30,27,23,20,17,14,11, 8, 5, 2,
- 1, 4, 7,10,13,16,19,22,24,27,30,33,36,39,42,45,45,42,39,36,33,30,27,24,22,19,16,13,10, 7, 4, 1,
- 1, 4, 7, 9,12,14,17,20,22,25,28,30,33,35,38,41,41,38,35,33,30,28,25,22,20,17,14,12, 9, 7, 4, 1,
- 1, 4, 6, 8,11,13,15,18,20,23,25,27,30,32,34,37,37,34,32,30,27,25,23,20,18,15,13,11, 8, 6, 4, 1,
- 1, 3, 5, 7,10,12,14,16,18,20,22,24,27,29,31,33,33,31,29,27,24,22,20,18,16,14,12,10, 7, 5, 3, 1,
- 1, 3, 5, 7, 8,10,12,14,16,18,20,22,23,25,27,29,29,27,25,23,22,20,18,16,14,12,10, 8, 7, 5, 3, 1,
- 1, 2, 4, 6, 7, 9,11,12,14,15,17,19,20,22,24,25,25,24,22,20,19,17,15,14,12,11, 9, 7, 6, 4, 2, 1,
- 1, 2, 3, 5, 6, 8, 9,10,12,13,14,16,17,19,20,21,21,20,19,17,16,14,13,12,10, 9, 8, 6, 5, 3, 2, 1,
- 1, 2, 3, 4, 5, 6, 7, 8,10,11,12,13,14,15,16,17,17,16,15,14,13,12,11,10, 8, 7, 6, 5, 4, 3, 2, 1,
- 0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9,10,11,12,13,14,14,13,12,11,10, 9, 8, 7, 7, 6, 5, 4, 3, 2, 1, 0,
- 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9,10,10, 9, 8, 8, 7, 7, 6, 5, 5, 4, 3, 3, 2, 2, 1, 0,
- 0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3, 2, 2, 2, 1, 1, 1, 0,
- 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+  0,  0,  0,  0,  4,  4,  4,  4,  4,  4,  4,  4,  8,  8,  8,  8,  8,  8,  8,  8,  4,  4,  4,  4,  4,  4,  4,  4,  0,  0,  0,  0,
+  0,  4,  4,  4,  8,  8,  8, 12, 12, 16, 16, 16, 20, 20, 20, 24, 24, 20, 20, 20, 16, 16, 16, 12, 12,  8,  8,  8,  4,  4,  4,  0,
+  0,  4,  8,  8, 12, 12, 16, 20, 20, 24, 28, 28, 32, 32, 36, 40, 40, 36, 32, 32, 28, 28, 24, 20, 20, 16, 12, 12,  8,  8,  4,  0,
+  0,  4,  8, 12, 16, 20, 24, 28, 28, 32, 36, 40, 44, 48, 52, 56, 56, 52, 48, 44, 40, 36, 32, 28, 28, 24, 20, 16, 12,  8,  4,  0,
+  4,  8, 12, 16, 20, 24, 28, 32, 40, 44, 48, 52, 56, 60, 64, 68, 68, 64, 60, 56, 52, 48, 44, 40, 32, 28, 24, 20, 16, 12,  8,  4,
+  4,  8, 12, 20, 24, 32, 36, 40, 48, 52, 56, 64, 68, 76, 80, 84, 84, 80, 76, 68, 64, 56, 52, 48, 40, 36, 32, 24, 20, 12,  8,  4,
+  4,  8, 16, 24, 28, 36, 44, 48, 56, 60, 68, 76, 80, 88, 96,100,100, 96, 88, 80, 76, 68, 60, 56, 48, 44, 36, 28, 24, 16,  8,  4,
+  4, 12, 20, 28, 32, 40, 48, 56, 64, 72, 80, 88, 92,100,108,116,116,108,100, 92, 88, 80, 72, 64, 56, 48, 40, 32, 28, 20, 12,  4,
+  4, 12, 20, 28, 40, 48, 56, 64, 72, 80, 88, 96,108,116,124,132,132,124,116,108, 96, 88, 80, 72, 64, 56, 48, 40, 28, 20, 12,  4,
+  4, 16, 24, 32, 44, 52, 60, 72, 80, 92,100,108,120,128,136,148,148,136,128,120,108,100, 92, 80, 72, 60, 52, 44, 32, 24, 16,  4,
+  4, 16, 28, 36, 48, 56, 68, 80, 88,100,112,120,132,140,152,164,164,152,140,132,120,112,100, 88, 80, 68, 56, 48, 36, 28, 16,  4,
+  4, 16, 28, 40, 52, 64, 76, 88, 96,108,120,132,144,156,168,180,180,168,156,144,132,120,108, 96, 88, 76, 64, 52, 40, 28, 16,  4,
+  8, 20, 32, 44, 56, 68, 80, 92,108,120,132,144,156,168,180,192,192,180,168,156,144,132,120,108, 92, 80, 68, 56, 44, 32, 20,  8,
+  8, 20, 32, 48, 60, 76, 88,100,116,128,140,156,168,184,196,208,208,196,184,168,156,140,128,116,100, 88, 76, 60, 48, 32, 20,  8,
+  8, 20, 36, 52, 64, 80, 96,108,124,136,152,168,180,196,212,224,224,212,196,180,168,152,136,124,108, 96, 80, 64, 52, 36, 20,  8,
+  8, 24, 40, 56, 68, 84,100,116,132,148,164,180,192,208,224,240,240,224,208,192,180,164,148,132,116,100, 84, 68, 56, 40, 24,  8,
+  8, 24, 40, 56, 68, 84,100,116,132,148,164,180,192,208,224,240,240,224,208,192,180,164,148,132,116,100, 84, 68, 56, 40, 24,  8,
+  8, 20, 36, 52, 64, 80, 96,108,124,136,152,168,180,196,212,224,224,212,196,180,168,152,136,124,108, 96, 80, 64, 52, 36, 20,  8,
+  8, 20, 32, 48, 60, 76, 88,100,116,128,140,156,168,184,196,208,208,196,184,168,156,140,128,116,100, 88, 76, 60, 48, 32, 20,  8,
+  8, 20, 32, 44, 56, 68, 80, 92,108,120,132,144,156,168,180,192,192,180,168,156,144,132,120,108, 92, 80, 68, 56, 44, 32, 20,  8,
+  4, 16, 28, 40, 52, 64, 76, 88, 96,108,120,132,144,156,168,180,180,168,156,144,132,120,108, 96, 88, 76, 64, 52, 40, 28, 16,  4,
+  4, 16, 28, 36, 48, 56, 68, 80, 88,100,112,120,132,140,152,164,164,152,140,132,120,112,100, 88, 80, 68, 56, 48, 36, 28, 16,  4,
+  4, 16, 24, 32, 44, 52, 60, 72, 80, 92,100,108,120,128,136,148,148,136,128,120,108,100, 92, 80, 72, 60, 52, 44, 32, 24, 16,  4,
+  4, 12, 20, 28, 40, 48, 56, 64, 72, 80, 88, 96,108,116,124,132,132,124,116,108, 96, 88, 80, 72, 64, 56, 48, 40, 28, 20, 12,  4,
+  4, 12, 20, 28, 32, 40, 48, 56, 64, 72, 80, 88, 92,100,108,116,116,108,100, 92, 88, 80, 72, 64, 56, 48, 40, 32, 28, 20, 12,  4,
+  4,  8, 16, 24, 28, 36, 44, 48, 56, 60, 68, 76, 80, 88, 96,100,100, 96, 88, 80, 76, 68, 60, 56, 48, 44, 36, 28, 24, 16,  8,  4,
+  4,  8, 12, 20, 24, 32, 36, 40, 48, 52, 56, 64, 68, 76, 80, 84, 84, 80, 76, 68, 64, 56, 52, 48, 40, 36, 32, 24, 20, 12,  8,  4,
+  4,  8, 12, 16, 20, 24, 28, 32, 40, 44, 48, 52, 56, 60, 64, 68, 68, 64, 60, 56, 52, 48, 44, 40, 32, 28, 24, 20, 16, 12,  8,  4,
+  0,  4,  8, 12, 16, 20, 24, 28, 28, 32, 36, 40, 44, 48, 52, 56, 56, 52, 48, 44, 40, 36, 32, 28, 28, 24, 20, 16, 12,  8,  4,  0,
+  0,  4,  8,  8, 12, 12, 16, 20, 20, 24, 28, 28, 32, 32, 36, 40, 40, 36, 32, 32, 28, 28, 24, 20, 20, 16, 12, 12,  8,  8,  4,  0,
+  0,  4,  4,  4,  8,  8,  8, 12, 12, 16, 16, 16, 20, 20, 20, 24, 24, 20, 20, 20, 16, 16, 16, 12, 12,  8,  8,  8,  4,  4,  4,  0,
+  0,  0,  0,  0,  4,  4,  4,  4,  4,  4,  4,  4,  8,  8,  8,  8,  8,  8,  8,  8,  4,  4,  4,  4,  4,  4,  4,  4,  0,  0,  0,  0,
  //error:0.000020
 };
 static const uint8_t obmc16[256]={
- 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1, 0,
- 1, 2, 4, 5, 7, 8,10,11,11,10, 8, 7, 5, 4, 2, 1,
- 1, 4, 6, 9,11,14,16,19,19,16,14,11, 9, 6, 4, 1,
- 2, 5, 9,12,16,19,23,26,26,23,19,16,12, 9, 5, 2,
- 2, 7,11,16,20,25,29,34,34,29,25,20,16,11, 7, 2,
- 3, 8,14,19,25,30,36,41,41,36,30,25,19,14, 8, 3,
- 3,10,16,23,29,36,42,49,49,42,36,29,23,16,10, 3,
- 4,11,19,26,34,41,49,56,56,49,41,34,26,19,11, 4,
- 4,11,19,26,34,41,49,56,56,49,41,34,26,19,11, 4,
- 3,10,16,23,29,36,42,49,49,42,36,29,23,16,10, 3,
- 3, 8,14,19,25,30,36,41,41,36,30,25,19,14, 8, 3,
- 2, 7,11,16,20,25,29,34,34,29,25,20,16,11, 7, 2,
- 2, 5, 9,12,16,19,23,26,26,23,19,16,12, 9, 5, 2,
- 1, 4, 6, 9,11,14,16,19,19,16,14,11, 9, 6, 4, 1,
- 1, 2, 4, 5, 7, 8,10,11,11,10, 8, 7, 5, 4, 2, 1,
- 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1, 0,
+  0,  4,  4,  8,  8, 12, 12, 16, 16, 12, 12,  8,  8,  4,  4,  0,
+  4,  8, 16, 20, 28, 32, 40, 44, 44, 40, 32, 28, 20, 16,  8,  4,
+  4, 16, 24, 36, 44, 56, 64, 76, 76, 64, 56, 44, 36, 24, 16,  4,
+  8, 20, 36, 48, 64, 76, 92,104,104, 92, 76, 64, 48, 36, 20,  8,
+  8, 28, 44, 64, 80,100,116,136,136,116,100, 80, 64, 44, 28,  8,
+ 12, 32, 56, 76,100,120,144,164,164,144,120,100, 76, 56, 32, 12,
+ 12, 40, 64, 92,116,144,168,196,196,168,144,116, 92, 64, 40, 12,
+ 16, 44, 76,104,136,164,196,224,224,196,164,136,104, 76, 44, 16,
+ 16, 44, 76,104,136,164,196,224,224,196,164,136,104, 76, 44, 16,
+ 12, 40, 64, 92,116,144,168,196,196,168,144,116, 92, 64, 40, 12,
+ 12, 32, 56, 76,100,120,144,164,164,144,120,100, 76, 56, 32, 12,
+  8, 28, 44, 64, 80,100,116,136,136,116,100, 80, 64, 44, 28,  8,
+  8, 20, 36, 48, 64, 76, 92,104,104, 92, 76, 64, 48, 36, 20,  8,
+  4, 16, 24, 36, 44, 56, 64, 76, 76, 64, 56, 44, 36, 24, 16,  4,
+  4,  8, 16, 20, 28, 32, 40, 44, 44, 40, 32, 28, 20, 16,  8,  4,
+  0,  4,  4,  8,  8, 12, 12, 16, 16, 12, 12,  8,  8,  4,  4,  0,
 //error:0.000015
 };
 #else //64*cos
@@ -352,23 +342,23 @@ static const uint8_t obmc16[256]={
 
 //linear *64
 static const uint8_t obmc8[64]={
- 1, 3, 5, 7, 7, 5, 3, 1,
- 3, 9,15,21,21,15, 9, 3,
- 5,15,25,35,35,25,15, 5,
- 7,21,35,49,49,35,21, 7,
- 7,21,35,49,49,35,21, 7,
- 5,15,25,35,35,25,15, 5,
- 3, 9,15,21,21,15, 9, 3,
- 1, 3, 5, 7, 7, 5, 3, 1,
+  4, 12, 20, 28, 28, 20, 12,  4,
+ 12, 36, 60, 84, 84, 60, 36, 12,
+ 20, 60,100,140,140,100, 60, 20,
+ 28, 84,140,196,196,140, 84, 28,
+ 28, 84,140,196,196,140, 84, 28,
+ 20, 60,100,140,140,100, 60, 20,
+ 12, 36, 60, 84, 84, 60, 36, 12,
+  4, 12, 20, 28, 28, 20, 12,  4,
 //error:0.000000
 };
 
 //linear *64
 static const uint8_t obmc4[16]={
- 4,12,12, 4,
-12,36,36,12,
-12,36,36,12,
- 4,12,12, 4,
+ 16, 48, 48, 16,
+ 48,144,144, 48,
+ 48,144,144, 48,
+ 16, 48, 48, 16,
 //error:0.000000
 };
 
@@ -424,17 +414,6 @@ typedef struct Plane{
     int height;
     SubBand band[MAX_DECOMPOSITIONS][4];
 }Plane;
-
-/** Used to minimize the amount of memory used in order to optimize cache performance. **/
-typedef struct {
-    DWTELEM * * line; ///< For use by idwt and predict_slices.
-    DWTELEM * * data_stack; ///< Used for internal purposes.
-    int data_stack_top;
-    int line_count;
-    int line_width;
-    int data_count;
-    DWTELEM * base_buffer; ///< Buffer that this structure is caching.
-} slice_buffer;
 
 typedef struct SnowContext{
 //    MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to make the motion estimation eventually independant of MpegEncContext, so this will be removed then (FIXME/XXX)
@@ -741,6 +720,7 @@ static always_inline void lift(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst
     }
 }
 
+#ifndef lift5
 static always_inline void lift5(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
     const int mirror_left= !highpass;
     const int mirror_right= (width&1) ^ highpass;
@@ -770,7 +750,9 @@ static always_inline void lift5(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int ds
         dst[w*dst_step] = LIFT(src[w*src_step], ((r+add)>>shift), inverse);
     }
 }
+#endif
 
+#ifndef liftS
 static always_inline void liftS(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int dst_step, int src_step, int ref_step, int width, int mul, int add, int shift, int highpass, int inverse){
     const int mirror_left= !highpass;
     const int mirror_right= (width&1) ^ highpass;
@@ -793,6 +775,7 @@ static always_inline void liftS(DWTELEM *dst, DWTELEM *src, DWTELEM *ref, int ds
         dst[w*dst_step] = LIFTS(src[w*src_step], mul*2*ref[w*ref_step]+add, inverse);
     }
 }
+#endif
 
 
 static void inplace_lift(DWTELEM *dst, int width, int *coeffs, int n, int shift, int start, int inverse){
@@ -1111,76 +1094,6 @@ STOP_TIMER("vertical_decompose53i*")}
     }
 }
 
-#define liftS lift
-#define lift5 lift
-#if 1
-#define W_AM 3
-#define W_AO 0
-#define W_AS 1
-
-#undef liftS
-#define W_BM 1
-#define W_BO 8
-#define W_BS 4
-
-#define W_CM 1
-#define W_CO 0
-#define W_CS 0
-
-#define W_DM 3
-#define W_DO 4
-#define W_DS 3
-#elif 0
-#define W_AM 55
-#define W_AO 16
-#define W_AS 5
-
-#define W_BM 3
-#define W_BO 32
-#define W_BS 6
-
-#define W_CM 127
-#define W_CO 64
-#define W_CS 7
-
-#define W_DM 7
-#define W_DO 8
-#define W_DS 4
-#elif 0
-#define W_AM 97
-#define W_AO 32
-#define W_AS 6
-
-#define W_BM 63
-#define W_BO 512
-#define W_BS 10
-
-#define W_CM 13
-#define W_CO 8
-#define W_CS 4
-
-#define W_DM 15
-#define W_DO 16
-#define W_DS 5
-
-#else
-
-#define W_AM 203
-#define W_AO 64
-#define W_AS 7
-
-#define W_BM 217
-#define W_BO 2048
-#define W_BS 12
-
-#define W_CM 113
-#define W_CO 64
-#define W_CS 7
-
-#define W_DM 227
-#define W_DO 128
-#define W_DS 9
-#endif
 static void horizontal_decompose97i(DWTELEM *b, int width){
     DWTELEM temp[width];
     const int w2= (width+1)>>1;
@@ -1410,7 +1323,7 @@ static void spatial_compose53i(DWTELEM *buffer, int width, int height, int strid
 }
 
 
-static void horizontal_compose97i(DWTELEM *b, int width){
+void ff_snow_horizontal_compose97i(DWTELEM *b, int width){
     DWTELEM temp[width];
     const int w2= (width+1)>>1;
 
@@ -1463,7 +1376,7 @@ static void vertical_compose97iL1(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, int wid
     }
 }
 
-static void vertical_compose97i(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width){
+void ff_snow_vertical_compose97i(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width){
     int i;
 
     for(i=0; i<width; i++){
@@ -1504,7 +1417,7 @@ static void spatial_compose97i_init(dwt_compose_t *cs, DWTELEM *buffer, int heig
     cs->y = -3;
 }
 
-static void spatial_compose97i_dy_buffered(dwt_compose_t *cs, slice_buffer * sb, int width, int height, int stride_line){
+static void spatial_compose97i_dy_buffered(DSPContext *dsp, dwt_compose_t *cs, slice_buffer * sb, int width, int height, int stride_line){
     int y = cs->y;
 
     DWTELEM *b0= cs->b0;
@@ -1516,7 +1429,7 @@ static void spatial_compose97i_dy_buffered(dwt_compose_t *cs, slice_buffer * sb,
 
 {START_TIMER
     if(y>0 && y+4<height){
-        vertical_compose97i(b0, b1, b2, b3, b4, b5, width);
+        dsp->vertical_compose97i(b0, b1, b2, b3, b4, b5, width);
     }else{
         if(y+3<(unsigned)height) vertical_compose97iL1(b3, b4, b5, width);
         if(y+2<(unsigned)height) vertical_compose97iH1(b2, b3, b4, width);
@@ -1527,8 +1440,8 @@ if(width>400){
 STOP_TIMER("vertical_compose97i")}}
 
 {START_TIMER
-        if(y-1<(unsigned)height) horizontal_compose97i(b0, width);
-        if(y+0<(unsigned)height) horizontal_compose97i(b1, width);
+        if(y-1<(unsigned)height) dsp->horizontal_compose97i(b0, width);
+        if(y+0<(unsigned)height) dsp->horizontal_compose97i(b1, width);
 if(width>400 && y+0<(unsigned)height){
 STOP_TIMER("horizontal_compose97i")}}
 
@@ -1557,8 +1470,8 @@ if(width>400){
 STOP_TIMER("vertical_compose97i")}}
 
 {START_TIMER
-        if(y-1<(unsigned)height) horizontal_compose97i(b0, width);
-        if(y+0<(unsigned)height) horizontal_compose97i(b1, width);
+        if(y-1<(unsigned)height) ff_snow_horizontal_compose97i(b0, width);
+        if(y+0<(unsigned)height) ff_snow_horizontal_compose97i(b1, width);
 if(width>400 && b0 <= b2){
 STOP_TIMER("horizontal_compose97i")}}
 
@@ -1619,7 +1532,7 @@ static void ff_spatial_idwt_slice(dwt_compose_t *cs, DWTELEM *buffer, int width,
     }
 }
 
-static void ff_spatial_idwt_buffered_slice(dwt_compose_t *cs, slice_buffer * slice_buf, int width, int height, int stride_line, int type, int decomposition_count, int y){
+static void ff_spatial_idwt_buffered_slice(DSPContext *dsp, dwt_compose_t *cs, slice_buffer * slice_buf, int width, int height, int stride_line, int type, int decomposition_count, int y){
     const int support = type==1 ? 3 : 5;
     int level;
     if(type==2) return;
@@ -1627,7 +1540,7 @@ static void ff_spatial_idwt_buffered_slice(dwt_compose_t *cs, slice_buffer * sli
     for(level=decomposition_count-1; level>=0; level--){
         while(cs[level].y <= FFMIN((y>>level)+support, height>>level)){
             switch(type){
-            case 0: spatial_compose97i_dy_buffered(cs+level, slice_buf, width>>level, height>>level, stride_line<<level);
+            case 0: spatial_compose97i_dy_buffered(dsp, cs+level, slice_buf, width>>level, height>>level, stride_line<<level);
                     break;
             case 1: spatial_compose53i_dy_buffered(cs+level, slice_buf, width>>level, height>>level, stride_line<<level);
                     break;
@@ -2545,6 +2458,40 @@ static void pred_block(SnowContext *s, uint8_t *dst, uint8_t *src, uint8_t *tmp,
     }
 }
 
+void ff_snow_inner_add_yblock(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
+                              int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8){
+    int y, x;
+    DWTELEM * dst;
+    for(y=0; y<b_h; y++){
+        //FIXME ugly missue of obmc_stride
+        uint8_t *obmc1= obmc + y*obmc_stride;
+        uint8_t *obmc2= obmc1+ (obmc_stride>>1);
+        uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
+        uint8_t *obmc4= obmc3+ (obmc_stride>>1);
+        dst = slice_buffer_get_line(sb, src_y + y);
+        for(x=0; x<b_w; x++){
+            int v=   obmc1[x] * block[3][x + y*src_stride]
+                    +obmc2[x] * block[2][x + y*src_stride]
+                    +obmc3[x] * block[1][x + y*src_stride]
+                    +obmc4[x] * block[0][x + y*src_stride];
+
+            v <<= 8 - LOG2_OBMC_MAX;
+            if(FRAC_BITS != 8){
+                v += 1<<(7 - FRAC_BITS);
+                v >>= 8 - FRAC_BITS;
+            }
+            if(add){
+                v += dst[x + src_x];
+                v = (v + (1<<(FRAC_BITS-1))) >> FRAC_BITS;
+                if(v&(~255)) v= ~(v>>31);
+                dst8[x + y*src_stride] = v;
+            }else{
+                dst[x + src_x] -= v;
+            }
+        }
+    }
+}
+
 //FIXME name clenup (b_w, block_w, b_width stuff)
 static always_inline void add_yblock_buffered(SnowContext *s, slice_buffer * sb, DWTELEM *old_dst, uint8_t *dst8, uint8_t *src, uint8_t *obmc, int src_x, int src_y, int b_w, int b_h, int w, int h, int dst_stride, int src_stride, int obmc_stride, int b_x, int b_y, int add, int plane_index){
     DWTELEM * dst = NULL;
@@ -2669,36 +2616,7 @@ assert(src_stride > 2*MB_SIZE + 5);
 
     START_TIMER
 
-    for(y=0; y<b_h; y++){
-        //FIXME ugly missue of obmc_stride
-        uint8_t *obmc1= obmc + y*obmc_stride;
-        uint8_t *obmc2= obmc1+ (obmc_stride>>1);
-        uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
-        uint8_t *obmc4= obmc3+ (obmc_stride>>1);
-        dst = slice_buffer_get_line(sb, src_y + y);
-        for(x=0; x<b_w; x++){
-            int v=   obmc1[x] * block[3][x + y*src_stride]
-                    +obmc2[x] * block[2][x + y*src_stride]
-                    +obmc3[x] * block[1][x + y*src_stride]
-                    +obmc4[x] * block[0][x + y*src_stride];
-
-            v <<= 8 - LOG2_OBMC_MAX;
-            if(FRAC_BITS != 8){
-                v += 1<<(7 - FRAC_BITS);
-                v >>= 8 - FRAC_BITS;
-            }
-            if(add){
-//                v += old_dst[x + y*dst_stride];
-                v += dst[x + src_x];
-                v = (v + (1<<(FRAC_BITS-1))) >> FRAC_BITS;
-                if(v&(~255)) v= ~(v>>31);
-                dst8[x + y*src_stride] = v;
-            }else{
-//                old_dst[x + y*dst_stride] -= v;
-                dst[x + src_x] -= v;
-            }
-        }
-    }
+    s->dsp.inner_add_yblock(obmc, obmc_stride, block, b_w, b_h, src_x,src_y, src_stride, sb, add, dst8);
         STOP_TIMER("Inner add y block")
 }
 #endif
@@ -3044,7 +2962,7 @@ static int get_dc(SnowContext *s, int mb_x, int mb_y, int plane_index){
     }
     *b= backup;
 
-    return clip(((ab<<6) + aa/2)/aa, 0, 255); //FIXME we shouldnt need cliping
+    return clip(((ab<<LOG2_OBMC_MAX) + aa/2)/aa, 0, 255); //FIXME we shouldnt need cliping
 }
 
 static inline int get_block_bits(SnowContext *s, int x, int y, int w){
@@ -3104,10 +3022,10 @@ static int get_block_rd(SnowContext *s, int mb_x, int mb_y, int plane_index, con
     const int penalty_factor= get_penalty_factor(s->lambda, s->lambda2, s->avctx->me_cmp);
     int sx= block_w*mb_x - block_w/2;
     int sy= block_w*mb_y - block_w/2;
-    const int x0= FFMAX(0,-sx);
-    const int y0= FFMAX(0,-sy);
-    const int x1= FFMIN(block_w*2, w-sx);
-    const int y1= FFMIN(block_w*2, h-sy);
+    int x0= FFMAX(0,-sx);
+    int y0= FFMAX(0,-sy);
+    int x1= FFMIN(block_w*2, w-sx);
+    int y1= FFMIN(block_w*2, h-sy);
     int i,x,y;
 
     pred_block(s, cur, ref, tmp, ref_stride, sx, sy, block_w*2, block_w*2, &s->block[mb_x + mb_y*b_stride], plane_index, w, h);
@@ -3123,6 +3041,22 @@ static int get_block_rd(SnowContext *s, int mb_x, int mb_y, int plane_index, con
             if(v&(~255)) v= ~(v>>31);
             dst1[x] = v;
         }
+    }
+
+    /* copy the regions where obmc[] = (uint8_t)256 */
+    if(LOG2_OBMC_MAX == 8
+        && (mb_x == 0 || mb_x == b_stride-1)
+        && (mb_y == 0 || mb_y == b_height-1)){
+        if(mb_x == 0)
+            x1 = block_w;
+        else
+            x0 = block_w;
+        if(mb_y == 0)
+            y1 = block_w;
+        else
+            y0 = block_w;
+        for(y=y0; y<y1; y++)
+            memcpy(dst + sx+x0 + (sy+y)*ref_stride, cur + x0 + y*ref_stride, x1-x0);
     }
 
     //FIXME sad/ssd can be broken up, but wavelet cmp should be one 32x32 block
@@ -4399,7 +4333,7 @@ if(s->avctx->debug&2048){
 
 {   START_TIMER
         for(; yd<slice_h; yd+=4){
-            ff_spatial_idwt_buffered_slice(cs, &s->sb, w, h, 1, s->spatial_decomposition_type, s->spatial_decomposition_count, yd);
+            ff_spatial_idwt_buffered_slice(&s->dsp, cs, &s->sb, w, h, 1, s->spatial_decomposition_type, s->spatial_decomposition_count, yd);
         }
     STOP_TIMER("idwt slice");}
 

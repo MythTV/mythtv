@@ -2050,8 +2050,12 @@ int av_find_stream_info(AVFormatContext *ic)
         /* check if one codec still needs to be handled */
         for(i=0;i<ic->nb_streams;i++) {
             st = ic->streams[i];
-            if (!has_codec_parameters(st->codec))
+            if (!has_codec_parameters(st->codec)){
+                char buf[256];
+                avcodec_string(buf, sizeof(buf), st->codec, 0);
+                av_log(ic, AV_LOG_INFO, "Could not find codec parameters (%s)\n", buf);
                 break;
+            }
             /* variable fps and no guess at the real fps */
             if(   st->codec->time_base.den >= 101LL*st->codec->time_base.num
                && duration_count[i]<20 && st->codec->codec_type == CODEC_TYPE_VIDEO)

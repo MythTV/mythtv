@@ -715,7 +715,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
             }
             h->mv_cache_clean[list]= 0;
 
-            if(IS_INTER(top_type)){
+            if(USES_LIST(top_type, list)){
                 const int b_xy= h->mb2b_xy[top_xy] + 3*h->b_stride;
                 const int b8_xy= h->mb2b8_xy[top_xy] + h->b8_stride;
                 *(uint32_t*)h->mv_cache[list][scan8[0] + 0 - 1*8]= *(uint32_t*)s->current_picture.motion_val[list][b_xy + 0];
@@ -735,7 +735,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
             }
 
             //FIXME unify cleanup or sth
-            if(IS_INTER(left_type[0])){
+            if(USES_LIST(left_type[0], list)){
                 const int b_xy= h->mb2b_xy[left_xy[0]] + 3;
                 const int b8_xy= h->mb2b8_xy[left_xy[0]] + 1;
                 *(uint32_t*)h->mv_cache[list][scan8[0] - 1 + 0*8]= *(uint32_t*)s->current_picture.motion_val[list][b_xy + h->b_stride*left_block[0]];
@@ -749,7 +749,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
                 h->ref_cache[list][scan8[0] - 1 + 1*8]= left_type[0] ? LIST_NOT_USED : PART_NOT_AVAILABLE;
             }
 
-            if(IS_INTER(left_type[1])){
+            if(USES_LIST(left_type[1], list)){
                 const int b_xy= h->mb2b_xy[left_xy[1]] + 3;
                 const int b8_xy= h->mb2b8_xy[left_xy[1]] + 1;
                 *(uint32_t*)h->mv_cache[list][scan8[0] - 1 + 2*8]= *(uint32_t*)s->current_picture.motion_val[list][b_xy + h->b_stride*left_block[2]];
@@ -767,7 +767,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
             if(for_deblock || (IS_DIRECT(mb_type) && !h->direct_spatial_mv_pred))
                 continue;
 
-            if(IS_INTER(topleft_type)){
+            if(USES_LIST(topleft_type, list)){
                 const int b_xy = h->mb2b_xy[topleft_xy] + 3 + 3*h->b_stride;
                 const int b8_xy= h->mb2b8_xy[topleft_xy] + 1 + h->b8_stride;
                 *(uint32_t*)h->mv_cache[list][scan8[0] - 1 - 1*8]= *(uint32_t*)s->current_picture.motion_val[list][b_xy];
@@ -777,7 +777,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
                 h->ref_cache[list][scan8[0] - 1 - 1*8]= topleft_type ? LIST_NOT_USED : PART_NOT_AVAILABLE;
             }
 
-            if(IS_INTER(topright_type)){
+            if(USES_LIST(topright_type, list)){
                 const int b_xy= h->mb2b_xy[topright_xy] + 3*h->b_stride;
                 const int b8_xy= h->mb2b8_xy[topright_xy] + h->b8_stride;
                 *(uint32_t*)h->mv_cache[list][scan8[0] + 4 - 1*8]= *(uint32_t*)s->current_picture.motion_val[list][b_xy];
@@ -801,14 +801,14 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
 
             if( h->pps.cabac ) {
                 /* XXX beurk, Load mvd */
-                if(IS_INTER(topleft_type)){
+                if(USES_LIST(topleft_type, list)){
                     const int b_xy = h->mb2b_xy[topleft_xy] + 3 + 3*h->b_stride;
                     *(uint32_t*)h->mvd_cache[list][scan8[0] - 1 - 1*8]= *(uint32_t*)h->mvd_table[list][b_xy];
                 }else{
                     *(uint32_t*)h->mvd_cache[list][scan8[0] - 1 - 1*8]= 0;
                 }
 
-                if(IS_INTER(top_type)){
+                if(USES_LIST(top_type, list)){
                     const int b_xy= h->mb2b_xy[top_xy] + 3*h->b_stride;
                     *(uint32_t*)h->mvd_cache[list][scan8[0] + 0 - 1*8]= *(uint32_t*)h->mvd_table[list][b_xy + 0];
                     *(uint32_t*)h->mvd_cache[list][scan8[0] + 1 - 1*8]= *(uint32_t*)h->mvd_table[list][b_xy + 1];
@@ -820,7 +820,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
                     *(uint32_t*)h->mvd_cache [list][scan8[0] + 2 - 1*8]=
                     *(uint32_t*)h->mvd_cache [list][scan8[0] + 3 - 1*8]= 0;
                 }
-                if(IS_INTER(left_type[0])){
+                if(USES_LIST(left_type[0], list)){
                     const int b_xy= h->mb2b_xy[left_xy[0]] + 3;
                     *(uint32_t*)h->mvd_cache[list][scan8[0] - 1 + 0*8]= *(uint32_t*)h->mvd_table[list][b_xy + h->b_stride*left_block[0]];
                     *(uint32_t*)h->mvd_cache[list][scan8[0] - 1 + 1*8]= *(uint32_t*)h->mvd_table[list][b_xy + h->b_stride*left_block[1]];
@@ -828,7 +828,7 @@ static void fill_caches(H264Context *h, int mb_type, int for_deblock){
                     *(uint32_t*)h->mvd_cache [list][scan8[0] - 1 + 0*8]=
                     *(uint32_t*)h->mvd_cache [list][scan8[0] - 1 + 1*8]= 0;
                 }
-                if(IS_INTER(left_type[1])){
+                if(USES_LIST(left_type[1], list)){
                     const int b_xy= h->mb2b_xy[left_xy[1]] + 3;
                     *(uint32_t*)h->mvd_cache[list][scan8[0] - 1 + 2*8]= *(uint32_t*)h->mvd_table[list][b_xy + h->b_stride*left_block[2]];
                     *(uint32_t*)h->mvd_cache[list][scan8[0] - 1 + 3*8]= *(uint32_t*)h->mvd_table[list][b_xy + h->b_stride*left_block[3]];
@@ -1424,26 +1424,8 @@ static inline void write_back_motion(H264Context *h, int mb_type){
 
     for(list=0; list<2; list++){
         int y;
-        if(!USES_LIST(mb_type, list)){
-            if(1){ //FIXME skip or never read if mb_type doesn't use it
-                for(y=0; y<4; y++){
-                    *(uint64_t*)s->current_picture.motion_val[list][b_xy + 0 + y*h->b_stride]=
-                    *(uint64_t*)s->current_picture.motion_val[list][b_xy + 2 + y*h->b_stride]= 0;
-                }
-                if( h->pps.cabac ) {
-                    /* FIXME needed ? */
-                    for(y=0; y<4; y++){
-                        *(uint64_t*)h->mvd_table[list][b_xy + 0 + y*h->b_stride]=
-                        *(uint64_t*)h->mvd_table[list][b_xy + 2 + y*h->b_stride]= 0;
-                    }
-                }
-                for(y=0; y<2; y++){
-                    s->current_picture.ref_index[list][b8_xy + 0 + y*h->b8_stride]=
-                    s->current_picture.ref_index[list][b8_xy + 1 + y*h->b8_stride]= LIST_NOT_USED;
-                }
-            }
+        if(!USES_LIST(mb_type, list))
             continue;
-        }
 
         for(y=0; y<4; y++){
             *(uint64_t*)s->current_picture.motion_val[list][b_xy + 0 + y*h->b_stride]= *(uint64_t*)h->mv_cache[list][scan8[0]+0 + 8*y];
@@ -1455,17 +1437,22 @@ static inline void write_back_motion(H264Context *h, int mb_type){
                 *(uint64_t*)h->mvd_table[list][b_xy + 2 + y*h->b_stride]= *(uint64_t*)h->mvd_cache[list][scan8[0]+2 + 8*y];
             }
         }
-        for(y=0; y<2; y++){
-            s->current_picture.ref_index[list][b8_xy + 0 + y*h->b8_stride]= h->ref_cache[list][scan8[0]+0 + 16*y];
-            s->current_picture.ref_index[list][b8_xy + 1 + y*h->b8_stride]= h->ref_cache[list][scan8[0]+2 + 16*y];
+
+        {
+            uint8_t *ref_index = &s->current_picture.ref_index[list][b8_xy];
+            ref_index[0+0*h->b8_stride]= h->ref_cache[list][scan8[0]];
+            ref_index[1+0*h->b8_stride]= h->ref_cache[list][scan8[4]];
+            ref_index[0+1*h->b8_stride]= h->ref_cache[list][scan8[8]];
+            ref_index[1+1*h->b8_stride]= h->ref_cache[list][scan8[12]];
         }
     }
 
     if(h->slice_type == B_TYPE && h->pps.cabac){
         if(IS_8X8(mb_type)){
-            h->direct_table[b8_xy+1+0*h->b8_stride] = IS_DIRECT(h->sub_mb_type[1]) ? 1 : 0;
-            h->direct_table[b8_xy+0+1*h->b8_stride] = IS_DIRECT(h->sub_mb_type[2]) ? 1 : 0;
-            h->direct_table[b8_xy+1+1*h->b8_stride] = IS_DIRECT(h->sub_mb_type[3]) ? 1 : 0;
+            uint8_t *direct_table = &h->direct_table[b8_xy];
+            direct_table[1+0*h->b8_stride] = IS_DIRECT(h->sub_mb_type[1]) ? 1 : 0;
+            direct_table[0+1*h->b8_stride] = IS_DIRECT(h->sub_mb_type[2]) ? 1 : 0;
+            direct_table[1+1*h->b8_stride] = IS_DIRECT(h->sub_mb_type[3]) ? 1 : 0;
         }
     }
 }
@@ -2765,6 +2752,22 @@ static inline void mc_part(H264Context *h, int n, int square, int chroma_height,
                     x_offset, y_offset, qpix_put, chroma_put, qpix_avg, chroma_avg, list0, list1);
 }
 
+static inline void prefetch_motion(H264Context *h, int list){
+    /* fetch pixels for estimated mv 4 macroblocks ahead
+     * optimized for 64byte cache lines */
+    MpegEncContext * const s = &h->s;
+    const int refn = h->ref_cache[list][scan8[0]];
+    if(refn >= 0){
+        const int mx= (h->mv_cache[list][scan8[0]][0]>>2) + 16*s->mb_x + 8;
+        const int my= (h->mv_cache[list][scan8[0]][1]>>2) + 16*s->mb_y;
+        uint8_t **src= h->ref_list[list][refn].data;
+        int off= mx + (my + (s->mb_x&3)*4)*s->linesize + 64;
+        s->dsp.prefetch(src[0]+off, s->linesize, 4);
+        off= (mx>>1) + ((my>>1) + (s->mb_x&7))*s->uvlinesize + 64;
+        s->dsp.prefetch(src[1]+off, src[2]-src[1], 2);
+    }
+}
+
 static void hl_motion(H264Context *h, uint8_t *dest_y, uint8_t *dest_cb, uint8_t *dest_cr,
                       qpel_mc_func (*qpix_put)[16], h264_chroma_mc_func (*chroma_put),
                       qpel_mc_func (*qpix_avg)[16], h264_chroma_mc_func (*chroma_avg),
@@ -2774,6 +2777,8 @@ static void hl_motion(H264Context *h, uint8_t *dest_y, uint8_t *dest_cb, uint8_t
     const int mb_type= s->current_picture.mb_type[mb_xy];
 
     assert(IS_INTER(mb_type));
+
+    prefetch_motion(h, 0);
 
     if(IS_16X16(mb_type)){
         mc_part(h, 0, 1, 8, 0, dest_y, dest_cb, dest_cr, 0, 0,
@@ -2846,6 +2851,8 @@ static void hl_motion(H264Context *h, uint8_t *dest_y, uint8_t *dest_cb, uint8_t
             }
         }
     }
+
+    prefetch_motion(h, 1);
 }
 
 static void decode_init_vlc(H264Context *h){
