@@ -526,6 +526,11 @@ dvdnav_status_t dvdnav_spu_language_select(dvdnav_t *self,
 dvdnav_status_t dvdnav_get_title_string(dvdnav_t *self, const char **title_str);
 
 /*
+ * Return a string describing the serial number of the DVD
+ */
+dvdnav_status_t dvdnav_get_serial_number(dvdnav_t *self, const char **serial_str);
+ 
+/*
  * Get video aspect code.
  * The aspect code does only change on VTS boundaries.
  * See the DVDNAV_VTS_CHANGE event.
@@ -542,6 +547,12 @@ uint8_t dvdnav_get_video_aspect(dvdnav_t *self);
  * bit0 set = deny letterboxing, bit1 set = deny pan&scan
  */
 uint8_t dvdnav_get_video_scale_permission(dvdnav_t *self);
+
+/*
+ * Get video format
+ * 0 - NTSC , 1 - PAL
+ */
+uint8_t dvdnav_get_video_format(dvdnav_t *self);
 
 /*
  * Converts a *logical* audio stream id into language code

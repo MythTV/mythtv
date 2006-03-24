@@ -1486,6 +1486,9 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
     uint mode = track_type_to_display_mode[type];
     uint origMode = textDisplayMode;
 
+    if (ringBuffer->isDVD() && GetCaptionMode() > 0)
+        ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
+
     if (textDisplayMode)
         DisableCaptions(textDisplayMode, origMode & mode);
 
@@ -5401,6 +5404,9 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
 
     if (decoder)
         ret = decoder->SetTrack(type, trackNo);
+
+    if (ringBuffer->isDVD())
+        ringBuffer->DVD()->SetTrack(type, trackNo);
 
     if (kTrackTypeSubtitle == type)
     {

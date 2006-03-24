@@ -6206,14 +6206,6 @@ void TV::ChangeTrack(uint type, int dir)
     if (!activenvp)
         return;
 
-    if (prbuffer->isDVD())
-    {
-        if (kTrackTypeAudio == type)
-            prbuffer->DVD()->AutoSelectAudio(false);
-        else if (kTrackTypeSubtitle == type)
-            prbuffer->DVD()->AutoSelectSubtitle(false);
-    }
-
     int new_track = activenvp->ChangeTrack(type, dir) + 1;
     if (new_track && GetOSD())
     {
@@ -6227,14 +6219,6 @@ void TV::SetTrack(uint type, int track)
 {
     if (!activenvp)
         return;
-
-    if (prbuffer->isDVD())
-    {
-        if (kTrackTypeAudio == type)
-            prbuffer->DVD()->AutoSelectAudio(false);
-        else if (kTrackTypeSubtitle == type)
-            prbuffer->DVD()->AutoSelectSubtitle(false);
-    }
 
     int new_track = activenvp->SetTrack(type, track - 1) + 1;
     if (new_track && GetOSD())

@@ -107,6 +107,7 @@ bool DecoderBase::PosMapFromDb(void)
     {
         long long totframes;
         keyframedist = 15;
+        fps = ringBuffer->DVD()->GetFrameRate();
         if (fps < 26 && fps > 24)
            keyframedist = 12;
         totframes = (long long)(ringBuffer->DVD()->GetTotalTimeOfTitle() * fps);

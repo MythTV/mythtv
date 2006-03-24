@@ -88,6 +88,7 @@ typedef struct {
   dvd_state_t   state;
   int32_t       hop_channel;
   char          dvd_name[50];
+  char          serial_number[19];
   remap_t      *map;
   int           stopped;
 } vm_t;
@@ -168,6 +169,7 @@ void vm_get_video_res(vm_t *vm, int *width, int *height);
 #endif
 int  vm_get_video_aspect(vm_t *vm);
 int  vm_get_video_scale_permission(vm_t *vm);
+int  vm_get_video_format(vm_t *vm);
 video_attr_t vm_get_video_attr(vm_t *vm);
 audio_attr_t vm_get_audio_attr(vm_t *vm, int streamN);
 subp_attr_t  vm_get_subp_attr(vm_t *vm, int streamN);

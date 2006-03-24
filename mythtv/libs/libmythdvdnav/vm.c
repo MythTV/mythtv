@@ -124,7 +124,7 @@ static void vm_print_current_domain_state(vm_t *vm) {
 }
 #endif
 
-static void dvd_read_name(char *name, const char *device) {
+static void dvd_read_name(char *name, char *serial, const char *device) {
     /* Because we are compiling with _FILE_OFFSET_BITS=64
      * all off_t are 64bit.
      */
@@ -160,6 +160,7 @@ static void dvd_read_name(char *name, const char *device) {
               fprintf(MSG_OUT, " ");
             } 
           }
+          strncpy(serial, &data[73], 16);
           fprintf(MSG_OUT, "\nlibdvdnav: DVD Title (Alternative): ");
           for(i=89; i < 128; i++ ) {
             if((data[i] == 0)) break;
@@ -320,7 +321,7 @@ int vm_reset(vm_t *vm, const char *dvdroot) {
       fprintf(MSG_OUT, "libdvdnav: vm: faild to open/read the DVD\n");
       return 0;
     }
-    dvd_read_name(vm->dvd_name, dvdroot);
+    dvd_read_name(vm->dvd_name, vm->serial_number, dvdroot);
     vm->map  = remap_loadmap(vm->dvd_name);
     vm->vmgi = ifoOpenVMGI(vm->dvd);
     if(!vm->vmgi) {
@@ -858,6 +859,10 @@ int vm_get_video_aspect(vm_t *vm) {
 
 int vm_get_video_scale_permission(vm_t *vm) {
   return vm_get_video_attr(vm).permitted_df;
+}
+
+int vm_get_video_format(vm_t *vm) {
+  return vm_get_video_attr(vm).video_format;
 }
 
 video_attr_t vm_get_video_attr(vm_t *vm) {

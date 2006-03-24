@@ -36,8 +36,10 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       lastcellid(0), vobid(0), 
       lastvobid(0), cellRepeated(false), 
       buttonstreamid(0), gotoCellStart(false), 
-      menupktpts(0), autoselectaudio(true),
-      autoselectsubtitle(true), parent(0)
+      menupktpts(0), curAudioTrack(0),
+      curSubtitleTrack(0), autoselectaudio(true),
+      autoselectsubtitle(true), 
+      jumptotitle(true), parent(0)
 {
 }
 
@@ -125,8 +127,10 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
                         .arg(curTitle).arg(titleParts));
             }
         }
-
+        
         dvdnav_current_title_info(dvdnav, &title, &part);
+        dvdnav_get_title_string(dvdnav, &dvdname);
+        dvdnav_get_serial_number(dvdnav, &serialnumber);
         return true;
     }
 }
@@ -244,7 +248,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (parent && IsInMenu())
                 {
                     parent->HideDVDButton(true);
-                    parent->SetSubtitleMode(false);
                     autoselectaudio = true;
                     autoselectsubtitle = true;
                 }
@@ -275,6 +278,15 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 ClearMenuSPUParameters();
                 ClearSubtitlesOSD();
 
+                if (autoselectsubtitle)
+                    curSubtitleTrack = dvdnav_get_active_spu_stream(dvdnav);
+                
+                if (parent)
+                {
+                    if (IsInMenu() && parent->GetCaptionMode())
+                        parent->SetCaptionsEnabled(false);
+                }
+
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
@@ -289,7 +301,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         QString("DVDNAV_AUDIO_STREAM_CHANGE: "
                                 "physical==%1, logical==%2")
                         .arg(apu->physical).arg(apu->logical));
-                            
+                        
+                if (autoselectaudio)
+                    curAudioTrack = dvdnav_get_active_audio_stream(dvdnav);
+                
                 if (blockBuf != dvdBlockWriteBuf)
                 {
                     dvdnav_free_cache_block(dvdnav, blockBuf);
@@ -872,26 +887,29 @@ void DVDRingBufferPriv::SelectDefaultButton(void)
         dvdnav_button_select(dvdnav,pci,1);    
 }
 
-void DVDRingBufferPriv::SetAudioTrack(void)
+void DVDRingBufferPriv::SetTrack(uint type, int trackNo)
 {
-    if (!autoselectaudio)
-        return;
-    
-    int track = dvdnav_get_active_audio_stream(dvdnav);
-    if (parent)
-        parent->SetTrack(kTrackTypeAudio, track);
+    if (type == kTrackTypeSubtitle)
+    {
+        curSubtitleTrack = trackNo;
+        autoselectsubtitle = false;
+    }
+    else if (type == kTrackTypeAudio)
+    {
+        curAudioTrack = trackNo;
+        autoselectaudio = false;
+    }
 }
 
-void DVDRingBufferPriv::SetSubtitleTrack(void)
+int DVDRingBufferPriv::GetTrack(uint type)
 {
-    if (!autoselectsubtitle)
-        return;
+    if (type == kTrackTypeSubtitle)
+        return curSubtitleTrack;
+    else if (type == kTrackTypeAudio)
+        return curAudioTrack;
 
-    int track = dvdnav_get_active_spu_stream(dvdnav);
-    if (parent && track >= 0 && !IsInMenu())
-        parent->SetTrack(kTrackTypeSubtitle, track);
+    return 0;
 }
-
 uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
 {
     unsigned char channels = dvdnav_audio_get_channels(dvdnav,id);
@@ -907,6 +925,18 @@ void DVDRingBufferPriv::ClearSubtitlesOSD(void)
         parent->GetOSD()->HideSet("subtitles");
         parent->GetOSD()->ClearAll("subtitles");
     }
+}
+
+double DVDRingBufferPriv::GetFrameRate(void)
+{
+    float dvdfps = 0;
+    int format = dvdnav_get_video_format(dvdnav);
+    if (format)
+        dvdfps = 23.97;
+    else 
+        dvdfps = 29.97;
+
+    return dvdfps;
 }
 
 void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,

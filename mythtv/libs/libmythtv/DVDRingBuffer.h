@@ -39,12 +39,12 @@ class DVDRingBufferPriv
     long long GetTotalReadPosition(void) { return titleLength; }
     void GetDescForPos(QString &desc) const;
     void GetPartAndTitle(int &_part, int &_title) const
-        { _part  = part; _title = _title; }
+        { _part  = part; _title = title; }
     uint GetTotalTimeOfTitle(void);
     uint GetCellStart(void);
     bool InStillFrame(void) { return cellHasStillFrame; }
     bool IsWaiting(void) { return dvdWaiting; }
-    int    NumPartsInTitle(void) { return titleParts; }
+    int  NumPartsInTitle(void) { return titleParts; }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
     AVSubtitleRect *GetMenuButton(void);
     bool IgnoringStillorWait(void) { return skipstillorwait; }
@@ -57,9 +57,16 @@ class DVDRingBufferPriv
     long long GetMenuPktPts(void) { return menupktpts; }
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles, 
                          const uint8_t * buf, int buf_size);
+    void GetNameAndSerialNum(const char **_name, const char **_serial)
+        { (*_name) = dvdname; (*_serial) = serialnumber; }
 
+    bool JumpToTitle(void) { return jumptotitle; }
+    double GetFrameRate(void);
+    
     // commands
     bool OpenFile(const QString &filename);
+    void PlayTitleAndPart(int _title, int _part) 
+        { dvdnav_part_play(dvdnav, _title, _part); }
     void close(void);
     bool nextTrack(void);
     void prevTrack(void);
@@ -78,12 +85,11 @@ class DVDRingBufferPriv
     int NumMenuButtons(void);
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
     uint GetCurrentTime(void);
-    void  SetAudioTrack(void);
-    void  SetSubtitleTrack(void);
+    void  SetTrack(uint type, int trackNo);
+    int   GetTrack(uint type);
     uint8_t GetNumAudioChannels(int id);
-    void AutoSelectAudio(bool setting) { autoselectaudio = setting; }
-    void AutoSelectSubtitle(bool setting) { autoselectsubtitle = setting; }
-
+    void JumpToTitle(bool change) { jumptotitle = change; }
+    
     void SetParent(NuppelVideoPlayer *p) { parent = p; }
     
   protected:
@@ -129,8 +135,13 @@ class DVDRingBufferPriv
     int            buttonstreamid;
     bool           gotoCellStart;
     long long      menupktpts;
+    int            curAudioTrack;
+    int            curSubtitleTrack;
     bool           autoselectaudio;
     bool           autoselectsubtitle;
+    const char     *dvdname;
+    const char     *serialnumber;
+    bool           jumptotitle;
 
     NuppelVideoPlayer *parent;
 

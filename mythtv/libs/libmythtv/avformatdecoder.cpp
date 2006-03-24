@@ -1344,12 +1344,30 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (tracks[kTrackTypeAudio].size() > 1)
         {
             qBubbleSort(tracks[kTrackTypeAudio]);
-            ringBuffer->DVD()->SetAudioTrack();
+            int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
+            if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
+                trackNo = GetTrackCount(kTrackTypeAudio) - 1;
+            SetTrack(kTrackTypeAudio, trackNo);
         }
         if (tracks[kTrackTypeSubtitle].size() > 1)
         {
             qBubbleSort(tracks[kTrackTypeSubtitle]);
-            ringBuffer->DVD()->SetSubtitleTrack();
+            int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
+            bool captionmode = GetNVP()->GetCaptionMode();
+            if (captionmode &&
+               (trackNo < 0 || trackNo >= (int)GetTrackCount(kTrackTypeSubtitle)))
+            {
+                GetNVP()->SetCaptionsEnabled(false);
+            }
+            else
+            {
+                SetTrack(kTrackTypeSubtitle, trackNo);
+                if (!ringBuffer->InDVDMenuOrStillFrame() &&
+                        !captionmode && trackNo >= 0)
+                {
+                    GetNVP()->SetCaptionsEnabled(true);
+                }
+            }
         }
     }
 
@@ -1756,9 +1774,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 if (ringBuffer->InDVDMenuOrStillFrame())
                 {
-                    ScanStreams(true);
                     ringBuffer->Seek(ringBuffer->DVD()->GetCellStartPos(),
                                      SEEK_SET);
+                    av_read_frame_flush(ic);
                 }
 
                 current_width  = width;
@@ -2343,6 +2361,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             int dvdpart = 0;
             ringBuffer->DVD()->GetPartAndTitle(dvdtitle,dvdpart);
             uint cellstart = ringBuffer->DVD()->GetCellStart();
+            selectedVideoIndex = 0;
             if (GetNVP()->AtNormalSpeed() &&
                 ((lastcellstart != cellstart) || (lastdvdtitle != dvdtitle)))
             {

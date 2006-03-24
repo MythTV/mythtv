@@ -371,14 +371,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
             delaydvdbutton = 0;
     }
 
-    void SetSubtitleMode(bool setting)
-    {
-        if (setting)
-            textDisplayMode = kTrackTypeSubtitle;
-        else
-            textDisplayMode &= ~kTrackTypeSubtitle;
-    }
-
   protected:
     void DisplayPauseFrame(void);
     void DisplayNormalFrame(void);

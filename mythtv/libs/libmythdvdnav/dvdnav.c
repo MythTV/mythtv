@@ -817,6 +817,17 @@ dvdnav_status_t dvdnav_get_title_string(dvdnav_t *this, const char **title_str) 
   return DVDNAV_STATUS_OK;
 }
 
+dvdnav_status_t dvdnav_get_serial_number(dvdnav_t *this, const char **serial_str) {
+
+  if(!this || !serial_str) {
+     printerr("Passed a NULL pointer.");
+     return DVDNAV_STATUS_ERR;
+  }
+
+  (*serial_str) = this->vm->serial_number;
+  return DVDNAV_STATUS_OK;
+}
+
 uint8_t dvdnav_get_video_aspect(dvdnav_t *this) {
   uint8_t         retval;
   
@@ -852,6 +863,25 @@ uint8_t dvdnav_get_video_scale_permission(dvdnav_t *this) {
   retval = (uint8_t)vm_get_video_scale_permission(this->vm);
   pthread_mutex_unlock(&this->vm_lock);
   
+  return retval;
+}
+
+uint8_t dvdnav_get_video_format(dvdnav_t *this) {
+  uint8_t         retval;
+
+  if(!this) {
+    printerr("Passed a NULL pointer.");
+    return -1;
+  }
+  if(!this->started) {
+   printerr("Virtual DVD machine not started.");
+   return -1;
+  }
+  
+  pthread_mutex_lock(&this->vm_lock);
+  retval = (uint8_t)vm_get_video_format(this->vm);
+  pthread_mutex_unlock(&this->vm_lock);
+
   return retval;
 }
 
