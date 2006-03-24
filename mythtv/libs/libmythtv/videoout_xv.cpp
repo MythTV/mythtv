@@ -1092,6 +1092,9 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     bool use_xv = true, use_shm = true;
 
     QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+    if (dec != "libmpeg2" && height < 720 && 
+        gContext->GetNumSetting("UseXvMCForHDOnly", 0))
+        dec = "ffmpeg";
     if (dec == "xvmc")
         use_xvmc_idct = use_xvmc = true;
     else if (dec == "xvmc-vld")
