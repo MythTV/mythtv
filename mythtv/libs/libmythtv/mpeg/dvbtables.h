@@ -141,7 +141,7 @@ class ServiceDescriptionTable : public PSIPTable
     ///   running_status        3  3.0+p
     uint RunningStatus(uint i) const { return (_ptrs[i][3] & 0xE0) >> 5; }
     ///  free_CA_mode           1  3.3+p
-    bool HasFreeCA(uint i) const { return bool(_ptrs[i][3] & 0x10); }
+    bool IsEncrypted(uint i) const { return bool(_ptrs[i][3] & 0x10); }
     ///  desc_loop_length      12  3.4+p
     uint ServiceDescriptorsLength(uint i) const
         { return ((_ptrs[i][3]<<8) | (_ptrs[i][4])) & 0xfff; }
@@ -264,7 +264,7 @@ class DVBEventInformationTable : public PSIPTable
     //   running_status         3  10.0+x
     uint RunningStatus(uint i) const { return _ptrs[i][10] >> 5; }
     //   free_CA_mode           1  10.3+x
-    bool HasFreeCA(uint i) const { return bool(_ptrs[i][10] & 0x10); }
+    bool IsScrambled(uint i) const { return bool(_ptrs[i][10] & 0x10); }
     //   descriptors_loop_len  12  10.4+x
     uint DescriptorsLength(uint i) const
         { return ((_ptrs[i][10]<<8) | (_ptrs[i][11])) & 0xfff; }

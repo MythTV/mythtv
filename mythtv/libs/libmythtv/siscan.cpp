@@ -1289,7 +1289,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
                                           "Radio Service").arg(service_name));
             continue;
         }
-        else if (ignoreEncryptedServices && !sdt->HasFreeCA(i))
+        else if (ignoreEncryptedServices && sdt->IsEncrypted(i))
         {
             emit ServiceScanUpdateText(tr("Skipping %1 - Encrypted Service")
                 .arg(service_name));

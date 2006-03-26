@@ -922,7 +922,7 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
         has_eit        |= sdt->HasEITPresentFollowing(i);
         s.EITPresent    = (has_eit) ? 1 : 0;
         s.RunningStatus = sdt->RunningStatus(i);
-        s.CAStatus      = sdt->HasFreeCA(i) ? 1 : 0;
+        s.CAStatus      = sdt->IsEncrypted(i) ? 1 : 0;
 
         // Rename channel with info from DB
         if (slist.contains(sdt->ServiceID(i)))
