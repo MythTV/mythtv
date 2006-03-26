@@ -1247,10 +1247,10 @@ void PlaybackBox::cursorRight()
         paintSkipUpdate = false;
         update(drawTotalBounds);
     }
+    else if (arrowAccel)
+        showActionsSelected();
     else if (curitem && curitem->availableStatus != asAvailable)
         showAvailablePopup(curitem);
-    else if (arrowAccel)
-        showActionsSelected();    
 }
 
 void PlaybackBox::cursorDown(bool page, bool newview)
@@ -1863,7 +1863,8 @@ void PlaybackBox::showActionsSelected()
     if (inTitle && haveGroupInfoSet)
         return;
 
-    if (curitem->availableStatus != asAvailable)
+    if ((curitem->availableStatus != asAvailable) &&
+        (curitem->availableStatus != asFileNotFound))
         showAvailablePopup(curitem);
     else
         showActions(curitem);
@@ -2049,7 +2050,21 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 
     delitem = new ProgramInfo(*toExp);
 
-    if (delitem->availableStatus != asAvailable)
+    if (fileExists(delitem) == false)
+    {
+        QString msg =
+            QString("PlaybackBox::showActions(): Error, %1 file not found")
+            .arg(delitem->pathname);
+        VERBOSE(VB_IMPORTANT, msg);
+
+        ProgramInfo *tmpItem = findMatchingProg(delitem);
+        if (tmpItem)
+        {
+            tmpItem->availableStatus = asFileNotFound;
+            showFileNotFoundActionPopup(delitem);
+        }
+    }
+    else if (delitem->availableStatus != asAvailable)
         showAvailablePopup(delitem);
     else
         showActionPopup(delitem);
@@ -2624,6 +2639,34 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     popup->ShowPopup(this, SLOT(doCancel()));
 
     playButton->setFocus();
+
+    expectingPopup = true;
+}
+
+void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *program)
+{
+    if (!curitem || !program)
+        return;
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "action popup");
+
+    QString msg = QObject::tr("Recording Unavailable") + "\n";
+    msg += QObject::tr("The file for this recording can "
+                       "not be found") + "\n";
+
+    initPopup(popup, program, "", msg);
+
+    QButton *detailsButton;
+    detailsButton = popup->addButton(tr("Show Program Details"), this,
+                                     SLOT(showProgramDetails()));
+
+    popup->addButton(tr("Delete"), this, SLOT(askDelete()));
+
+    popup->ShowPopup(this, SLOT(doCancel()));
+
+    detailsButton->setFocus();
 
     expectingPopup = true;
 }

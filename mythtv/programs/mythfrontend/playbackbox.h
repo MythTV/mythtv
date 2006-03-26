@@ -237,6 +237,7 @@ class PlaybackBox : public MythDialog
     void promptEndOfRecording(ProgramInfo *);
     void showDeletePopup(ProgramInfo *, deletePopupType);
     void showActionPopup(ProgramInfo *program);
+    void showFileNotFoundActionPopup(ProgramInfo *program);
     void initPopup(MythPopupBox *popup, ProgramInfo *program, 
                    QString message, QString message2);
     void cancelPopup();
