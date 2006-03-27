@@ -452,6 +452,7 @@ macx {
     LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC3000000
+    QMAKE_LFLAGS_SHLIB += -read_only_relocs warning
 }
 
 contains( TARGET_ARCH_SPARC, yes ) {
