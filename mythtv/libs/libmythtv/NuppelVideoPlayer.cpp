@@ -231,7 +231,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       livetvchain(NULL), m_tv(NULL),
       // DVD stuff
       indvdstillframe(false), hidedvdbutton(true),
-      delaydvdbutton(0),
       // Debugging variables
       output_jmeter(NULL)
 {
@@ -2317,7 +2316,10 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     AutoDeint(frame);
 
     videofiltersLock.lock();
-    videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
+    if (ringBuffer->InDVDMenuOrStillFrame() && videoOutput->ValidVideoFrames() < 3)
+        videoOutput->ProcessFrame(frame, NULL, videoFilters, pipplayer);
+    else
+        videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
     videofiltersLock.unlock();
 
     if (audioOutput && !audio_paused && audioOutput->GetPause())
@@ -2422,8 +2424,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 {
                     if (nbframes == 0)
                     {
+                        ringBuffer->DVD()->IgnoreStillOrWait(true);
                         if (pausevideo)
                             UnpauseVideo();
+                        usleep(10000);
+                        ringBuffer->DVD()->IgnoreStillOrWait(false);
                         continue;
                     }
                     if (!pausevideo && nbframes == 1)
@@ -5830,13 +5835,6 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
     {
         osd->HideSet("subtitles");
         osd->ClearAll("subtitles");
-        if (indvdstillframe)
-        {
-            delaydvdbutton++;
-            if (delaydvdbutton < 5)
-                return;
-        }
-
         subtitleLock.lock();
         int h = highlightButton->h;
         int w = highlightButton->w;

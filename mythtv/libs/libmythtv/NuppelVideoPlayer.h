@@ -367,8 +367,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     void HideDVDButton(bool hide) 
     { 
         hidedvdbutton = hide;
-        if (hide)
-            delaydvdbutton = 0;
     }
 
   protected:
@@ -728,7 +726,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     // DVD
     bool indvdstillframe;
     bool hidedvdbutton;
-    int  delaydvdbutton;
 
     // Debugging variables
     Jitterometer *output_jmeter;
