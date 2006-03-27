@@ -59,6 +59,12 @@
 #define B2N_32(x) x = be32toh(x)
 #define B2N_64(x) x = be64toh(x)
 
+#elif defined(CONFIG_DARWIN)
+#include <libkern/OSByteOrder.h>
+#define B2N_16(x) x = OSSwapBigToHostConstInt16(x) 
+#define B2N_32(x) x = OSSwapBigToHostConstInt32(x)
+#define B2N_64(x) x = OSSwapBigToHostConstInt64(x)
+
 /* This is a slow but portable implementation, it has multiple evaluation 
  * problems so beware.
  * Old FreeBSD's and Solaris don't have <byteswap.h> or any other such 
