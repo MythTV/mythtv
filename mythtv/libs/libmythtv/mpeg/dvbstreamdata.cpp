@@ -391,12 +391,29 @@ bool DVBStreamData::HasCachedAnySDT(uint tsid, bool current) const
     return false;
 }
 
-bool DVBStreamData::HasCachedAllSDTs(bool current) const
+bool DVBStreamData::HasCachedSDT(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 
-    if (!current)
-        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+    if (_cached_nit.empty())
+        return false;
+
+    nit_cache_t::const_iterator it = _cached_nit.begin();
+    for (; it != _cached_nit.end(); ++it)
+    {
+        for (uint i = 0; i < (*it)->TransportStreamCount(); i++)
+        {
+            if (HasCachedAllSDT((*it)->TSID(i), current))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool DVBStreamData::HasCachedAllSDTs(bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
 
     if (_cached_nit.empty())
         return false;

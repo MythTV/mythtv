@@ -122,6 +122,7 @@ class DVBStreamData : public MPEGStreamData
     bool HasCachedAllNIT(bool current = true) const;
     bool HasCachedAnySDT(uint tsid, bool current = true) const;
     bool HasCachedAllSDT(uint tsid, bool current = true) const;
+    bool HasCachedSDT(bool current = true) const;
     bool HasCachedAllSDTs(bool current = true) const;
 
     const nit_ptr_t GetCachedNIT(uint section_num, bool current = true) const;

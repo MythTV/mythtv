@@ -412,7 +412,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
                                   bool wait_until_complete)
 {
     const DVBStreamData &dsd = (const DVBStreamData &)(*sd);
-    if (wait_until_complete && !dsd.HasCachedAllSDTs())
+    if (wait_until_complete && !dsd.HasCachedSDT())
         return;
 
     emit ServiceScanUpdateText(tr("Updating Services"));
@@ -463,12 +463,13 @@ bool SIScan::HandlePostInsertion(void)
         sd->ReturnCachedTable(mgt);
     }
 
-    // TODO insert DVB channels based on partial info
     const NetworkInformationTable *nit = sd->GetCachedNIT();
     if (nit)
     {
         VERBOSE(VB_IMPORTANT, nit->toString());
+        HandleDVBDBInsertion(sd, false);
         sd->ReturnCachedTable(nit);
+        return true;
     }
 
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
