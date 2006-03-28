@@ -2040,6 +2040,11 @@ void AvFormatDecoder::SetTeletextDecoderViewer(TeletextViewer *view)
     ttd->SetViewer(view);
 }
 
+QString AvFormatDecoder::GetXDS(const QString &key) const
+{
+    return ccd608->GetXDS(key);
+}
+
 void AvFormatDecoder::ITVReset(const QRect &total, const QRect &visible)
 {
     (void) visible;

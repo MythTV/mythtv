@@ -133,6 +133,8 @@ class AvFormatDecoder : public DecoderBase
     virtual int  GetTeletextDecoderType(void) const;
     virtual void SetTeletextDecoderViewer(TeletextViewer*);
 
+    virtual QString GetXDS(const QString&) const;
+
     // MHEG stuff
     virtual void ITVReset(const QRect &total, const QRect& visible);
     virtual bool ITVUpdate(bool itvVisible);

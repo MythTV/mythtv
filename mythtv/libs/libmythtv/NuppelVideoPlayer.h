@@ -174,6 +174,7 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     long long GetFramesPlayed(void) const     { return framesPlayed; }
     long long GetBookmark(void) const;
     QString   GetEncodingType(void) const;
+    QString   GetXDS(const QString &key) const;
 
     // Bool Gets
     bool    GetRawAudioState(void) const;

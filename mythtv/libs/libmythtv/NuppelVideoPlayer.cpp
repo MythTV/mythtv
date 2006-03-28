@@ -4791,6 +4791,13 @@ bool NuppelVideoPlayer::GetRawAudioState(void) const
     return GetDecoder()->GetRawAudioState();
 }
 
+QString NuppelVideoPlayer::GetXDS(const QString &key) const
+{
+    if (!GetDecoder())
+        return QString::null;
+    return GetDecoder()->GetXDS(key);
+}
+
 void NuppelVideoPlayer::TranscodeWriteText(void (*func)
                                            (void *, unsigned char *, int, int, int), void * ptr)
 {

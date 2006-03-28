@@ -125,6 +125,8 @@ class DecoderBase
     virtual int  GetTeletextDecoderType(void) const { return -1; }
     virtual void SetTeletextDecoderViewer(TeletextViewer*) {;}
 
+    virtual QString GetXDS(const QString&) const { return QString::null; }
+
     // MHEG/MHI stuff
     virtual void ITVReset(const QRect& /*total*/, const QRect& /*visible*/) {}
     virtual bool ITVUpdate(bool /*visible*/) { return false; }
