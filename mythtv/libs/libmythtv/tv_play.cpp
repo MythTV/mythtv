@@ -15,8 +15,6 @@
 #include "osdsurface.h"
 #include "osdtypes.h"
 #include "osdlistbtntype.h"
-//#include "osdtypeteletext.h"
-//#include "teletextdecoder.h"
 #include "mythcontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -37,6 +35,7 @@
 #include "livetvchain.h"
 #include "playgroup.h"
 #include "DVDRingBuffer.h"
+#include "datadirect.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -273,6 +272,8 @@ TV::TV(void)
       picAdjustment(kPictureAttribute_None),
       recAdjustment(kPictureAttribute_None),
       ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
+      // Channel Editing
+      chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
@@ -522,6 +523,12 @@ TV::~TV(void)
         piptvchain->DestroyChain();
         delete piptvchain;
     }    
+
+    if (ddMapLoaderRunning)
+    {
+        pthread_join(ddMapLoader, NULL);
+        ddMapLoaderRunning = false;
+    }
 }
 
 TVState TV::GetState(void) const
@@ -1893,6 +1900,38 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
 
+    if (GetOSD() && dialogname == "channel_editor")
+    {
+        ChannelEditKey(e);
+        return;
+    }
+
+    // Teletext menu
+    if (activenvp && (activenvp->GetCaptionMode() == kDisplayTeletextA))
+    {
+        QStringList tt_actions;
+        if (gContext->GetMainWindow()->TranslateKeyPress(
+                "Teletext Menu", e, tt_actions))
+        {
+            for (uint i = 0; i < tt_actions.size(); i++)
+                if (activenvp->HandleTeletextAction(tt_actions[i]))
+                    return;
+        }
+    }
+
+    // Interactive television
+    if (activenvp && (activenvp->GetCaptionMode() == kDisplayITV))
+    {
+        QStringList itv_actions;
+        if (gContext->GetMainWindow()->TranslateKeyPress(
+                "ITV Menu", e, itv_actions))
+        for (uint i = 0; i < itv_actions.size(); i++)
+        {
+            if (activenvp->ITVHandleAction(itv_actions[i]))
+                return;
+        }
+    }
+
     if (!gContext->GetMainWindow()->TranslateKeyPress(
             "TV Playback", e, actions))
     {
@@ -1960,32 +1999,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
         if (!passThru)
             return;
-    }
-
-    //XXX ivtv/dvb teletext
-    if (activenvp && (activenvp->GetCaptionMode() == kDisplayTeletextA))
-    {
-        QStringList tt_actions;
-        if (gContext->GetMainWindow()->TranslateKeyPress(
-                "Teletext Menu", e, tt_actions))
-        {
-            for (uint i = 0; i < tt_actions.size(); i++)
-                if (activenvp->HandleTeletextAction(tt_actions[i]))
-                    return;
-        }
-    }
-
-    // Interactive television
-    if (activenvp && (activenvp->GetCaptionMode() == kDisplayITV))
-    {
-        QStringList itv_actions;
-        if (gContext->GetMainWindow()->TranslateKeyPress(
-                "ITV Menu", e, itv_actions))
-        for (uint i = 0; i < itv_actions.size(); i++)
-        {
-            if (activenvp->ITVHandleAction(itv_actions[i]))
-                return;
-        }
     }
 
     if (zoomMode)
@@ -2691,6 +2704,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else
                     ChangeChannel(CHANNEL_DIRECTION_DOWN);
             }
+            else if (action == "TOGGLEEDIT")
+                StartChannelEditMode();
             else
                 handled = false;
         }
@@ -2739,7 +2754,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "FINDER")
                 EditSchedule(kScheduleProgramFinder);
             else if (action == "TOGGLEEDIT")
-                DoEditMode();
+                StartProgramEditMode();
             else if (action == "TOGGLEBROWSE")
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
@@ -5670,7 +5685,10 @@ void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
     (void)item;
 }
 
-void TV::DoEditMode(void)
+/** \fn TV::StartProgramEditMode(void)
+ *  \brief Starts Program Cut Map Editing mode
+ */
+void TV::StartProgramEditMode(void)
 {
     pbinfoLock.lock();
     bool isEditing = playbackinfo->IsEditing();
@@ -5693,6 +5711,301 @@ void TV::DoEditMode(void)
     }
 
     editmode = nvp->EnableEdit();
+}
+
+static void insert_map(InfoMap &infoMap, const InfoMap &newMap)
+{
+    InfoMap::const_iterator it = newMap.begin();
+    for (; it != newMap.end(); ++it)
+        infoMap.insert(it.key(), *it);
+}
+
+class load_dd_map
+{
+  public:
+    load_dd_map(TV *t, uint s) : tv(t), sourceid(s) {}
+    TV   *tv;
+    uint  sourceid;
+};
+
+void *TV::load_dd_map_thunk(void *param)
+{
+    load_dd_map *x = (load_dd_map*) param;
+    x->tv->RunLoadDDMap(x->sourceid);
+    delete x;
+    return NULL;
+}
+
+/** \fn TV::StartChannelEditMode(void)
+ *  \brief Starts channel editing mode.
+ */
+void TV::StartChannelEditMode(void)
+{
+    if (ddMapLoaderRunning)
+    {
+        pthread_join(ddMapLoader, NULL);
+        ddMapLoaderRunning = false;
+    }
+
+    if (!activerecorder || !GetOSD())
+        return;
+
+    QMutexLocker locker(&chanEditMapLock);
+
+    // Get the info available from the backend
+    activerecorder->GetChannelInfo(chanEditMap);
+    chanEditMap["dialog_label"]   = tr("Channel Editor");
+    chanEditMap["callsign_label"] = tr("Callsign");
+    chanEditMap["channum_label"]  = tr("Channel #");
+    chanEditMap["channame_label"] = tr("Channel Name");
+    chanEditMap["XMLTV_label"]    = tr("XMLTV ID");
+    chanEditMap["probe_all"]      = tr("[P]robe");
+    chanEditMap["ok"]             = tr("[O]k");
+
+    // Assuming the data is valid, try to load DataDirect listings.
+    uint sourceid = chanEditMap["sourceid"].toUInt();
+    if (sourceid && (sourceid != ddMapSourceId))
+    {
+        ddMapLoaderRunning = true;
+        pthread_create(&ddMapLoader, NULL, load_dd_map_thunk,
+                       new load_dd_map(this, sourceid));
+        return;
+    }
+
+    // Update with XDS and DataDirect Info
+    ChannelEditAutoFill(chanEditMap);
+
+    // Set proper initial values for channel editor, and make it visible..
+    GetOSD()->SetText(dialogname = "channel_editor", chanEditMap, -1);
+}
+
+/** \fn TV::ChannelEditKey(const QKeyEvent *e)
+ *  \brief Processes channel editing key.
+ */
+void TV::ChannelEditKey(const QKeyEvent *e)
+{
+    QMutexLocker locker(&chanEditMapLock);
+
+    bool     focus_change   = false;
+    QString  button_pressed = "";
+    OSDSet  *osdset         = NULL;
+
+    if (dialogname != "channel_editor")
+        return;
+
+    if (GetOSD())
+        osdset = GetOSD()->GetSet("channel_editor");
+
+    if (!osdset || !osdset->HandleKey(e, &focus_change, &button_pressed))
+        return;
+
+    if (button_pressed == "probe_all")
+    {
+        InfoMap infoMap;
+        osdset->GetText(infoMap);
+        ChannelEditAutoFill(infoMap);
+        insert_map(chanEditMap, infoMap);
+        osdset->SetText(chanEditMap);
+    }
+    else if (button_pressed == "ok")
+    {
+        InfoMap infoMap;
+        osdset->GetText(infoMap);
+        insert_map(chanEditMap, infoMap);
+        activerecorder->SetChannelInfo(chanEditMap);
+    }
+
+    if (!osdset->Displaying())
+    {
+        VERBOSE(VB_IMPORTANT, "hiding channel_editor");
+        GetOSD()->HideSet("channel_editor");
+        dialogname = "";
+    }
+}
+
+/** \fn TV::ChannelEditAutoFill(InfoMap &infoMap) const
+ *  \brief Automatically fills in as much information as possible.
+ */
+void TV::ChannelEditAutoFill(InfoMap &infoMap) const
+{
+    const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
+
+    QMutexLocker locker(&chanEditMapLock);
+    QMap<QString,bool> changed;
+    
+    // check if anything changed
+    for (uint i = 0; i < 4; i++)
+        changed[keys[i]] = infoMap[keys[i]] != chanEditMap[keys[i]];
+
+    // clean up case and extra spaces
+    infoMap["callsign"] = infoMap["callsign"].upper().stripWhiteSpace();
+    infoMap["channum"]  = infoMap["channum"].stripWhiteSpace();
+    infoMap["channame"] = infoMap["channame"].stripWhiteSpace();
+    infoMap["XMLTV"]    = infoMap["XMLTV"].stripWhiteSpace();
+
+    // make sure changes weren't just chaff
+    for (uint i = 0; i < 4; i++)
+        changed[keys[i]] &= infoMap[keys[i]] != chanEditMap[keys[i]];
+
+#if 0 /* XDS decoding is not reliable enough.. */
+    // fill in unchanged fields from XDS
+    const QString xds_keys[2] = { "callsign", "channame", };
+    for (uint i = 0; i < 2; i++)
+    {
+        if (changed[xds_keys[i]])
+            continue;
+
+        QString tmp = activenvp->GetXDS(xds_keys[i]).upper();
+        if (tmp.isEmpty())
+            continue;
+
+        if ((xds_keys[i] == "callsign") &&
+            ((tmp.length() > 5) || (tmp.find(" ") >= 0)))
+        {
+            continue;
+        }
+            
+        infoMap[xds_keys[i]] = tmp;
+    }
+#endif
+
+    // if not data direct info we're done..
+    if (!ddMapSourceId)
+        return;
+
+    // First check changed keys, then check unchanged keys for
+    // availability in our listings source
+    QString key = "", dd_xmltv = "";
+    for (uint j = 0; (j < 2) && dd_xmltv.isEmpty(); j++)
+    {
+        for (uint i = 0; (i < 4) && dd_xmltv.isEmpty(); i++)
+        {
+            key = keys[i];
+            if (((j == 1) ^ changed[key]) && !infoMap[key].isEmpty())
+                dd_xmltv = GetDataDirect(key, infoMap[key], "XMLTV");
+        }
+    }
+
+    // If we found the channel in the listings, fill in all the data we have
+    if (!dd_xmltv.isEmpty())
+    {
+        infoMap[keys[0]] = dd_xmltv;
+        for (uint i = 1; i < 4; i++)
+        {
+            QString tmp = GetDataDirect(key, infoMap[key], keys[i]);
+            if (!tmp.isEmpty())
+                infoMap[keys[i]] = tmp;
+        }
+    }
+}
+
+QString TV::GetDataDirect(QString key, QString value, QString field) const
+{
+    QMutexLocker locker(&chanEditMapLock);
+
+    uint sourceid = chanEditMap["sourceid"].toUInt();
+    if (!sourceid)
+        return QString::null;
+
+    if (sourceid != ddMapSourceId)
+        return QString::null;
+
+    DDKeyMap::const_iterator it_key = ddMap.find(key);
+    if (it_key == ddMap.end())
+        return QString::null;
+
+    DDValueMap::const_iterator it_val = (*it_key).find(value);
+    if (it_val == (*it_key).end())
+        return QString::null;
+
+    InfoMap::const_iterator it_field = (*it_val).find(field);
+    if (it_field == (*it_val).end())
+        return QString::null;
+
+    return QDeepCopy<QString>(*it_field);
+}
+
+void TV::RunLoadDDMap(uint sourceid)
+{
+    QMutexLocker locker(&chanEditMapLock);
+    const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
+
+    // Startup channel editor gui early, with "Loading..." text
+    if (GetOSD())
+    {
+        InfoMap tmp;
+        insert_map(tmp, chanEditMap);
+        for (uint i = 1; i < 4; i++)
+            tmp[keys[i]] = "Loading...";
+        GetOSD()->SetText(dialogname = "channel_editor", tmp, -1);
+    }
+
+    // Load DataDirect info
+    LoadDDMap(sourceid);
+
+    if (dialogname != "channel_editor")
+        return;
+
+    // Update with XDS and DataDirect Info
+    ChannelEditAutoFill(chanEditMap);
+
+    // Set proper initial values for channel editor, and make it visible..
+    if (GetOSD())
+        GetOSD()->SetText("channel_editor", chanEditMap, -1);
+}
+
+bool TV::LoadDDMap(uint sourceid)
+{
+    QMutexLocker locker(&chanEditMapLock);
+    const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
+
+    ddMap.clear();
+    ddMapSourceId = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT xmltvgrabber, userid, password "
+        "FROM videosource "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() && !query.isActive())
+    {
+        MythContext::DBError("TV::LoadDDMap", query);
+        return false;
+    }
+
+    if (!query.next() || query.value(0).toString() != "datadirect")
+    {
+        VERBOSE(VB_PLAYBACK, QString("TV::LoadDDMap() Grabber: '%1'")
+                .arg(query.value(0).toString()));
+        return false;
+    }
+
+    DataDirectProcessor ddp(sourceid);
+    ddp.setUserID(query.value(1).toString());
+    ddp.setPassword(query.value(2).toString());
+    ddp.grabLineupsOnly();
+    const QValueList<DataDirectStation> stations = ddp.getStations();
+
+    InfoMap tmp;
+    QValueList<DataDirectStation>::const_iterator it;
+    for (it = stations.begin(); it != stations.end(); ++it)
+    {
+        tmp["XMLTV"]    = (*it).stationid;
+        tmp["callsign"] = (*it).callsign;
+        tmp["channame"] = (*it).stationname;
+        tmp["channum"]  = (*it).fccchannelnumber;
+
+        for (uint j = 0; j < 4; j++)
+            for (uint i = 0; i < 4; i++)
+                ddMap[keys[j]][tmp[keys[j]]][keys[i]] = tmp[keys[i]];
+    }
+
+    if (!ddMap.empty())
+        ddMapSourceId = sourceid;
+
+    return !ddMap.empty();
 }
 
 void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
@@ -5777,7 +6090,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         if (action == "JUMPTODVDROOTMENU")
             nvp->GoToDVDMenu("menu");
         else if (action == "TOGGLEEDIT")
-            DoEditMode();
+            StartProgramEditMode();
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire();
         else if (action.left(14) == "TOGGLECOMMSKIP")

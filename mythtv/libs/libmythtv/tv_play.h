@@ -34,8 +34,10 @@ class OSDListTreeType;
 class OSDGenericTree;
 class LiveTVChain;
 
-typedef QValueVector<QString> str_vec_t;
-typedef QMap<QString, QString> InfoMap;
+typedef QValueVector<QString>    str_vec_t;
+typedef QMap<QString,QString>    InfoMap;
+typedef QMap<QString,InfoMap>    DDValueMap;
+typedef QMap<QString,DDValueMap> DDKeyMap;
 
 class VBIMode
 {
@@ -267,7 +269,16 @@ class TV : public QObject
     void ChangeFFRew(int direction);
     void SetFFRew(int index);
     void DoSkipCommercials(int direction);
-    void DoEditMode(void);
+    void StartProgramEditMode(void);
+
+    // Channel editing support
+    void StartChannelEditMode(void);
+    void ChannelEditKey(const QKeyEvent*);
+    void ChannelEditAutoFill(InfoMap&) const;
+    QString GetDataDirect(QString key, QString value, QString field) const;
+    bool LoadDDMap(uint sourceid);
+    void RunLoadDDMap(uint sourceid);
+    static void *load_dd_map_thunk(void*);
 
     void DoQueueTranscode(void);  
 
@@ -401,6 +412,13 @@ class TV : public QObject
     bool needToSwapPIP;
     bool needToJumpMenu;
     QMap<QString,ProgramList> progLists;
+
+    mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap
+    InfoMap   chanEditMap;          ///< Channel Editing initial map
+    DDKeyMap  ddMap;                ///< DataDirect channel map
+    uint      ddMapSourceId;        ///< DataDirect channel map sourceid
+    bool      ddMapLoaderRunning;   ///< Is DataDirect loader thread running
+    pthread_t ddMapLoader;          ///< DataDirect map loader thread
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.
