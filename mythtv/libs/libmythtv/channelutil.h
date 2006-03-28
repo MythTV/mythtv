@@ -32,9 +32,11 @@ class ChannelUtil
                    CreateMultiplexes(int sourceid,
                                      const NetworkInformationTable *nit);
 
-    static int     GetMplexID(int sourceid, uint freq);
-    static int     GetMplexID(int sourceid, uint frequency,
-                              int transport_id, int network_id);
+    static int     GetMplexID(uint sourceid,     uint frequency);
+    static int     GetMplexID(uint sourceid,     uint frequency,
+                              uint transport_id, uint network_id);
+    static int     GetMplexID(uint sourceid,
+                              uint transport_id, uint network_id);
     static int     GetBetterMplexID(int current_mplexid,
                                     int transport_id, int network_id);
 

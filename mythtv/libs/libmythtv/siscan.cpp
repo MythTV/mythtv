@@ -1225,14 +1225,14 @@ void SIScan::UpdateVCTinDB(int tid_db,
  *        mode you will want to issue a scan of the other transports
  *        that have the same networkID.
  */
-void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
+void SIScan::UpdateSDTinDB(int /*tid_db*/, const ServiceDescriptionTable *sdt,
                            bool force_update)
 {
     if (!sdt->ServiceCount())
         return;
 
-    int db_mplexid = ChannelUtil::GetBetterMplexID(
-        tid_db, sdt->TSID(), sdt->OriginalNetworkID());
+    int db_mplexid = ChannelUtil::GetMplexID(
+        sourceID, sdt->TSID(), sdt->OriginalNetworkID());
 
     if (db_mplexid == -1)
     {
@@ -1244,11 +1244,11 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
         return;
     }
 
-    //bool fta_only = ignore_encrypted_services(db_mplexid, videodevice);
-    int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
+    int db_source_id = ChannelUtil::GetSourceID(db_mplexid);
 
     /* This will be fixed post .17 to be more elegant */
-    bool upToDate = ChannelUtil::GetServiceVersion(db_mplexid) == (int)sdt->Version();
+    bool upToDate = (ChannelUtil::GetServiceVersion(db_mplexid) ==
+                     (int)sdt->Version());
     if (upToDate && !force_update)
     {
         emit ServiceScanUpdateText("Channels up to date");

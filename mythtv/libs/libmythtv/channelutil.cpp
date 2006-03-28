@@ -259,34 +259,43 @@ vector<uint> ChannelUtil::CreateMultiplexes(
     return muxes;
 }
 
-int ChannelUtil::GetMplexID(int sourceid, uint freq)
+int ChannelUtil::GetMplexID(uint sourceid, uint frequency)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     /* See if mplexid is already in the database */
-    QString theQuery = QString("SELECT mplexid FROM dtv_multiplex "
-                               "WHERE sourceid = %1 AND frequency = %2")
-        .arg(sourceid).arg(freq);
+    query.prepare(
+        "SELECT mplexid "
+        "FROM dtv_multiplex "
+        "WHERE sourceid  = :SOURCEID  AND "
+        "      frequency = :FREQUENCY");
 
-    query.prepare(theQuery);
+    query.bindValue(":SOURCEID",  sourceid);
+    query.bindValue(":FREQUENCY", frequency);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Check for existing transport", query);
-
-    if (query.size() <= 0)
+    {
+        MythContext::DBError("GetMplexID 1", query);
         return -1;
+    }
 
-    query.next();
-    return query.value(0).toInt();
+    if (query.next())
+        return query.value(0).toInt();
+
+    return -1;
 }
 
-int ChannelUtil::GetMplexID(int sourceid, uint frequency,
-                            int transport_id, int network_id)
+int ChannelUtil::GetMplexID(uint sourceid,     uint frequency,
+                            uint transport_id, uint network_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     // See if transport already in database
-    query.prepare("SELECT mplexid FROM dtv_multiplex "
-                  "WHERE networkid=:NETWORKID AND transportid=:TRANSPORTID AND "
-                  "      frequency=:FREQUENCY AND sourceid=:SOURCEID");
+    query.prepare(
+        "SELECT mplexid "
+        "FROM dtv_multiplex "
+        "WHERE networkid   = :NETWORKID   AND "
+        "      transportid = :TRANSPORTID AND "
+        "      frequency   = :FREQUENCY   AND "
+        "      sourceid    = :SOURCEID");
 
     query.bindValue(":SOURCEID",    sourceid);
     query.bindValue(":NETWORKID",   network_id);
@@ -295,11 +304,41 @@ int ChannelUtil::GetMplexID(int sourceid, uint frequency,
     
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Selecting transports", query);
+        MythContext::DBError("GetMplexID 2", query);
         return -1;
     }
-    if (query.size())
+
+    if (query.next())
         return query.value(0).toInt();
+
+    return -1;
+}
+
+int ChannelUtil::GetMplexID(uint sourceid,
+                            uint transport_id, uint network_id)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    // See if transport already in database
+    query.prepare(
+        "SELECT mplexid "
+        "FROM dtv_multiplex "
+        "WHERE networkid   = :NETWORKID   AND "
+        "      transportid = :TRANSPORTID AND "
+        "      sourceid    = :SOURCEID");
+
+    query.bindValue(":SOURCEID",    sourceid);
+    query.bindValue(":NETWORKID",   network_id);
+    query.bindValue(":TRANSPORTID", transport_id);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetMplexID 3", query);
+        return -1;
+    }
+
+    if (query.next())
+        return query.value(0).toInt();
+
     return -1;
 }
 
