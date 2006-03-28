@@ -830,6 +830,18 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             text->SetRightJustified(true);
     }
 
+    QString entry = element.attribute("entry", "");
+    if (!entry.isEmpty())
+    {
+        int entrynum = entry.toInt();
+        text->SetEntryNum(entrynum);
+        text->SetSelected(entrynum == 0);
+    }
+
+    QString button = element.attribute("button", "");
+    if (!button.isEmpty() && (button.lower() == "yes"))
+        text->SetButton(true);
+
     if (scroller)
     {
         if (scrollx == 0 && scrolly == 0)

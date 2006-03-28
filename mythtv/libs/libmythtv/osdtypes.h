@@ -17,8 +17,12 @@ using namespace std;
 
 class TTFFont;
 class OSDType;
+class OSDTypeText;
 class OSDSurface;
 class TV;
+
+typedef QMap<QString,QString> InfoMap;
+typedef QMap<int,uint>        HotKeyMap;
 
 static inline QRect unbias(QRect rect, float wmult, float hmult)
 {
@@ -45,56 +49,58 @@ class OSDSet : public QObject
     OSDSet(const OSDSet &other);
    ~OSDSet();
 
-    void Clear();
-
-    void SetCache(bool cache) { m_cache = cache; }
-    bool GetCache() { return m_cache; }
-
-    QString GetName() { return m_name; }
-    void SetName(const QString &name) { m_name = name; }
-
-    void SetAllowFade(bool allow) { m_allowfade = allow; }
-    bool GetAllowFade() { return m_allowfade; }
-
+    void Clear(void);
+    void ClearAllText(void);
     void AddType(OSDType *type);
     void Draw(OSDSurface *surface, bool actuallydraw);
-
-    void SetPriority(int priority) { m_priority = priority; }
-    int GetPriority() const { return m_priority; }
-
-    void SetFadeMovement(int x, int y) { m_xmove = x; m_ymove = y; }
-
-    int GetTimeLeft() { return m_timeleft; }
-
-    bool Displaying() { return m_displaying; }
-    bool HasDisplayed() { return m_hasdisplayed; }
-    bool Fading() { return m_fadetime > 0; }
-
     void Display(bool onoff = true, int osdFunctionalType = 0);
     void DisplayFor(int time, int osdFunctionalType = 0);
     void FadeFor(int time);
     void Hide(void);
+    bool HandleKey(const QKeyEvent *e, bool *focus_change = NULL,
+                   QString *button_pressed = NULL);
+    QString HandleHotKey(const QKeyEvent *e);
 
-    OSDType *GetType(const QString &name);
-
-    void SetFrameInterval(int frint) { m_frameint = frint; }
-    int GetFrameInterval() { return m_frameint; }
-
-    void ClearAllText(void);
-    void SetText(QMap<QString, QString> &infoMap);
-
-    void Reinit(int screenwidth, int screenheight, int xoff, int yoff, 
-                int displaywidth, int displayheight, float wmult, float hmult,
+    void Reinit(int screenwidth,  int screenheight,
+                int xoff,         int yoff, 
+                int displaywidth, int displayheight,
+                float wmult,      float hmult,
                 int frint);
 
-    void SetWantsUpdates(bool updates) { m_wantsupdates = updates; }
     bool NeedsUpdate(void) { return m_needsupdate; }
 
-    void SetDrawEveryFrame(bool draw) { m_draweveryframe = draw; }
+    // Gets 
+    QString  GetName(void)          const { return m_name;         }
+    bool     GetCache(void)         const { return m_cache;        }
+    bool     GetAllowFade(void)     const { return m_allowfade;    }
+    int      GetPriority(void)      const { return m_priority;     }
+    bool     Displaying(void)       const { return m_displaying;   }
+    bool     HasDisplayed(void)     const { return m_hasdisplayed; }
+    bool     Fading(void)           const { return m_fadetime > 0; }
+    int      GetTimeLeft(void)      const { return m_timeleft;     }
+    int      GetFrameInterval(void) const { return m_frameint;     }
+    void     GetText(InfoMap &infoMap) const;
+    bool     CanShowWith(const QString &name) const;
 
+    const OSDType     *GetType(const QString &name) const;
+    const OSDTypeText *GetSelected(void) const;
+
+    // non-const gets
+    OSDType     *GetType(const QString &name);
+    OSDTypeText *GetSelected(void);
+
+    // Sets
+    void SetCache(bool cache)           { m_cache = cache; }
+    void SetName(const QString &name)   { m_name = name; }
+    void SetAllowFade(bool allow)       { m_allowfade = allow; }
+    void SetPriority(int priority)      { m_priority = priority; }
+    void SetFadeMovement(int x, int y)  { m_xmove = x; m_ymove = y; }
+    void SetFrameInterval(int frint)    { m_frameint = frint; }
+    void SetWantsUpdates(bool updates)  { m_wantsupdates = updates; }
+    void SetDrawEveryFrame(bool draw)   { m_draweveryframe = draw; }
     void SetShowWith(const QString &re) { m_showwith = re; };
-    bool CanShowWith(const QString &name) const { 
-        return m_showwith.exactMatch(name); };
+    bool SetSelected(int index);
+    void SetText(const InfoMap &infoMap);
     
   signals:
     void OSDClosed(int);
@@ -168,6 +174,18 @@ class OSDType : public QObject
     OSDSet *m_parent;
 };
 
+class DrawInfo
+{
+  public:
+    DrawInfo(const QString &_msg, uint _width, bool _hilite)
+        : msg(_msg), width(_width), hilite(_hilite) {}
+
+  public:
+    QString msg;
+    uint    width;
+    bool    hilite;
+};
+
 class OSDTypeText : public OSDType
 {
   public:
@@ -202,14 +220,28 @@ class OSDTypeText : public OSDType
     void SetLineSpacing(float linespacing) { m_linespacing = linespacing; }
     float GetLineSpacing() { return m_linespacing; }
 
-    QRect DisplayArea() { return m_displaysize; }
-
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
+    bool MoveCursor(int dir);
+    bool Delete(int dir);
+    void InsertCharacter(QChar);
+
+    bool IsSelected(void)         const { return m_selected;        }
+    bool IsButton(void)           const { return m_button;          }
+    int  GetEntryNum(void)        const { return m_entrynum;        }
+    bool IsEntry(void)            const { return m_entrynum >= 0;   }
+    QRect DisplayArea(void)       const { return m_displaysize;     }
+
+    void SetSelected(bool is_selected)  { m_selected = is_selected; }
+    void SetButton(bool is_button)      { m_button = is_button;     }
+    void SetEntryNum(int entrynum)      { m_entrynum = entrynum;    }
 
   private:
     void DrawString(OSDSurface *surface, QRect rect, const QString &text,
                     int fade, int maxfade, int xoff, int yoff,
                     bool double_size=false);
+    void DrawHiLiteString(OSDSurface *surface, QRect xrect, 
+                          const QString &text, int fade, int maxfade, 
+                          int xoff, int yoff, bool double_size = false);
 
     QRect m_displaysize;
     QRect m_screensize;
@@ -226,6 +258,11 @@ class OSDTypeText : public OSDType
     bool m_multiline;
     bool m_usingalt;
 
+    bool m_selected;
+    bool m_button;
+    int  m_entrynum;
+    int  m_cursorpos;
+
     bool m_scroller;
     int m_scrollx;
     int m_scrolly;
@@ -241,6 +278,10 @@ class OSDTypeText : public OSDType
     bool m_scrollinit;
 
     float m_linespacing;
+
+    mutable QString m_draw_info_str;
+    mutable uint    m_draw_info_len;
+    mutable vector<DrawInfo> m_draw_info;
 };
     
 class OSDTypeImage : public OSDType
@@ -405,9 +446,11 @@ class OSDTypeBox : public OSDType
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff)
         { Draw(surface, fade, maxfade, xoff, yoff, 192); }
 
+    void SetColor(QColor c) { m_color = c; }
   private:
-    QRect size;
-    QRect m_unbiasedsize;
+    QRect  size;
+    QRect  m_unbiasedsize;
+    QColor m_color;
 };
 
 class OSDTypePositionIndicator

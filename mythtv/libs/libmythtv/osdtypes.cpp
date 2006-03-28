@@ -3,6 +3,7 @@
 #include <qregexp.h>
 
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 #include "yuv2rgb.h"
@@ -13,6 +14,7 @@ using namespace std;
 #include "osdtypeteletext.h"
 
 #include "mythcontext.h"
+#include "mythdialogs.h"
 
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
                int screenheight, float wmult, float hmult, int frint)
@@ -187,13 +189,46 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
     }
 }
 
+const OSDType *OSDSet::GetType(const QString &name) const
+{
+    QMap<QString,OSDType*>::const_iterator it = typeList.find(name);
+    if (it != typeList.end())
+        return *it;
+    return NULL;
+}
+
 OSDType *OSDSet::GetType(const QString &name)
 {
-    OSDType *ret = NULL;
-    if (typeList.contains(name))
-        ret = typeList[name];
+    QMap<QString,OSDType*>::iterator it = typeList.find(name);
+    if (it != typeList.end())
+        return *it;
+    return NULL;
+}
 
-    return ret;
+const OSDTypeText *OSDSet::GetSelected(void) const
+{
+    vector<OSDType*>::const_iterator it = allTypes->begin();
+    for (; it != allTypes->end(); it++)
+    {
+        const OSDTypeText *item = dynamic_cast<const OSDTypeText*>(*it);
+        if (item && item->IsEntry() && item->IsSelected())
+            return item;
+    }
+
+    return NULL;
+}
+
+OSDTypeText *OSDSet::GetSelected(void)
+{
+    vector<OSDType*>::iterator it = allTypes->begin();
+    for (; it != allTypes->end(); it++)
+    {
+        OSDTypeText *item = dynamic_cast<OSDTypeText*>(*it);
+        if (item && item->IsEntry() && item->IsSelected())
+            return item;
+    }
+
+    return NULL;
 }
 
 void OSDSet::ClearAllText(void)
@@ -212,47 +247,253 @@ void OSDSet::ClearAllText(void)
     }
 }
 
-void OSDSet::SetText(QMap<QString, QString> &infoMap)
+void OSDSet::SetText(const QMap<QString, QString> &infoMap)
 {
-    vector<OSDType *>::iterator iter = allTypes->begin();
-    for (; iter != allTypes->end(); iter++)
+    vector<OSDType *>::iterator it = allTypes->begin();
+    for (; it != allTypes->end(); it++)
     {
-        OSDType *type = (*iter);
-        if (OSDTypeText *item = dynamic_cast<OSDTypeText *>(type))
+        OSDTypeText *item = dynamic_cast<OSDTypeText*>(*it);
+        if (!item)
+            continue;
+
+        QMap<QString, QString>::const_iterator riter = infoMap.begin();
+        QString new_text = item->GetDefaultText();
+
+        if ((new_text == "") && (infoMap.contains(item->Name())))
         {
-            QMap<QString, QString>::Iterator riter = infoMap.begin();
-            QString new_text = item->GetDefaultText();
-            QString full_regex;
+            new_text = infoMap[item->Name()];
+        }
+        else if (new_text.contains(QRegExp("%.*%")))
+        {
+            for (; riter != infoMap.end(); riter++)
+            {
+                QString key  = riter.key().upper();
+                QString data = riter.data();
 
-            if ((new_text == "") &&
-                (infoMap.contains(item->Name())))
-            {
-                new_text = infoMap[item->Name()];
-            }
-            else if (new_text.contains(QRegExp("%.*%")))
-            {
-                for (; riter != infoMap.end(); riter++)
+                if (new_text.contains(key))
                 {
-                    QString key = riter.key().upper();
-                    QString data = riter.data();
+                    QRegExp full_regex(
+                        QString("%") + key +
+                        QString("(\\|([^%|]*))?") +
+                        QString("(\\|([^%|]*))?") +
+                        QString("(\\|([^%]*))?%"));
 
-                    if (new_text.contains(key))
+                    if (riter.data() != "")
                     {
-                        full_regex = QString("%") + key + QString("(\\|([^%|]*))?") + 
-                                     QString("(\\|([^%|]*))?") + QString("(\\|([^%]*))?%");
-                       if (riter.data() != "")
-                           new_text.replace(QRegExp(full_regex), 
-                                            QString("\\2") + data + "\\4");
-                       else
-                           new_text.replace(QRegExp(full_regex), "\\6");
+                        new_text.replace(full_regex,
+                                         QString("\\2") + data + "\\4");
+                    }
+                    else
+                    {
+                        new_text.replace(full_regex, "\\6");
                     }
                 }
             }
+        }
 
-            if (new_text != "")
-                item->SetText(new_text);
+        if (new_text != "")
+            item->SetText(new_text);
+    }
+    m_needsupdate = true;
+}
+
+void OSDSet::GetText(QMap<QString, QString> &infoMap) const
+{
+    vector<OSDType*>::const_iterator it = allTypes->begin();
+    for (; it != allTypes->end(); it++)
+    {
+        OSDTypeText *item = dynamic_cast<OSDTypeText *>(*it);
+        if (item && item->IsEntry())
+            infoMap[item->Name()] = item->GetText();
+    }
+}
+
+bool OSDSet::SetSelected(int index)
+{
+    bool success = false;
+
+    if (index < 0)
+    {
+        OSDTypeText *max_item = NULL;
+        int max_item_num = -1;
+
+        vector<OSDType*>::iterator it = allTypes->begin();
+        for (; it != allTypes->end(); it++)
+        {
+            OSDTypeText *item = dynamic_cast<OSDTypeText *>(*it);
+            if (item && item->IsEntry() && item->IsSelected())
+                item->SetSelected(false);
+            if (item && item->GetEntryNum() > max_item_num)
+            {
+                max_item = item;
+                max_item_num = item->GetEntryNum();
+            }
+        }
+        if (max_item)
+            max_item->SetSelected(success = true);
+
+        m_needsupdate = true;
+        return success;
+    }
+
+    vector<OSDType*>::iterator it = allTypes->begin();
+    for (; it != allTypes->end(); it++)
+    {
+        OSDTypeText *item = dynamic_cast<OSDTypeText *>(*it);
+        if (item && item->IsEntry() && item->IsSelected())
+            item->SetSelected(false);
+        if (item && (item->GetEntryNum() == index))
+            item->SetSelected(success = true);
+    }
+
+    m_needsupdate = true;
+    return success;
+}
+
+bool OSDSet::HandleKey(const QKeyEvent *e, bool *focus_change,
+                       QString *button_pressed)
+{
+    QStringList actions;
+    int move = 0;
+    int del  = 0;
+    int field_move = 0;
+
+    if (focus_change)
+        *focus_change = false;
+    if (button_pressed)
+        *button_pressed = "";
+
+    int     key = e->key();
+    QString txt = e->text();
+    if (key == Qt::Key_Escape)
+    {
+        SetSelected(0);
+        Hide();
+        return true;
+    }
+    else if (Qt::Key_Down == key || Qt::Key_Tab == key)
+        field_move = +1;
+    else if (Qt::Key_Up == key || Qt::Key_BackTab == key)
+        field_move = -1;
+    else if (Qt::Key_Right == key)
+        move = +1;
+    else if (Qt::Key_Left == key)
+        move = -1;
+    else if (Qt::Key_Delete == key)
+        del = +1;
+    else if (Qt::Key_BackSpace == key)
+        del = -1;
+    else if (e->state() == Qt::ControlButton)
+    {
+        if (Qt::Key_A == key)
+            move = -1000;
+        else if (Qt::Key_E == key)
+            move = +1000;
+        else if (Qt::Key_F == key)
+            move = +1;
+        else if (Qt::Key_B == key)
+            move = -1;
+        else if (Qt::Key_U == key)
+            del = -1000;
+        else if (Qt::Key_K == key)
+            del = +1000;
+        else if (Qt::Key_D == key)
+            del = +1;
+        else if (Qt::Key_H == key)
+            del = -1;
+        else
+        {
+            const QString btn = HandleHotKey(e);
+            if (!btn.isEmpty())
+            {
+                if ((btn == "ok") || (btn == "cancel"))
+                    Hide();
+
+                if (button_pressed)
+                    *button_pressed = btn;
+
+                return true;
+            }
         }
     }
+
+    OSDTypeText *item = GetSelected();
+    if (!item)
+        return false;
+
+    if (item->IsButton() && !field_move)
+    {
+        if (txt != "\n" && txt != "\r" && txt != " ")
+            return false;
+
+        const QString btn = item->Name().lower();
+        if ((btn == "ok") || (btn == "cancel"))
+            Hide();
+
+        if (button_pressed)
+            *button_pressed = btn;
+
+        return true;
+    }
+
+    if (!item->IsButton() && (Qt::Key_Return == key || Qt::Key_Enter == key))
+        field_move = +1;
+
+    if (field_move != 0)
+    {
+        if (focus_change)
+            *focus_change = true;
+
+        int next = (int)item->GetEntryNum() + field_move;
+        if (next >= 0 && SetSelected(next))
+            return true;
+
+        return SetSelected((field_move > 0) ? 0 : -1);
+    }
+
+    if (move != 0)
+        item->MoveCursor(move);
+    else if (del != 0)
+        item->Delete(del);
+    else if ((1 == txt.length()) && txt.at(0).isPrint() &&
+             (txt != "[") && (txt != "]"))
+    {
+        item->InsertCharacter(txt.at(0));
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "Unhandled event");
+        return false;
+    }
+
+    m_needsupdate = true;
+    return true;
+}
+
+static int extract_hot_key(const QString &text)
+{
+    int i = text.find("[");
+    if ((i < 0) || ((i + 1) >= (int)text.length()))
+        return 0;
+    int ch = text.at(i + 1).upper() - 'A' + Qt::Key_A;
+    if (ch >= Qt::Key_A && ch <= Qt::Key_Z)
+        return ch;
+    return 0;
+}
+
+QString OSDSet::HandleHotKey(const QKeyEvent *e)
+{
+    vector<OSDType*>::iterator it = allTypes->begin();
+    for (; it != allTypes->end(); it++)
+    {
+        OSDTypeText *item = dynamic_cast<OSDTypeText *>(*it);
+        if (item && item->IsButton() &&
+            extract_hot_key(item->GetText()) == e->key())
+        {
+            return item->Name().lower();
+        }
+    }
+    return QString::null;
 }
 
 void OSDSet::Display(bool onoff, int osdFunctionalType)
@@ -326,7 +567,7 @@ void OSDSet::Hide(void)
 
 void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
 {
-    if (actuallydraw)
+    if (actuallydraw && m_displaying)
     {
         vector<OSDType *>::iterator i = allTypes->begin();
         for (; i != allTypes->end(); i++)
@@ -339,14 +580,14 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
                 m_lastupdate = (m_timeleft + 999999) / 1000000;
         }
     }
+    if (actuallydraw)
+        m_needsupdate = false;
 
     m_hasdisplayed = true;
 
     if (m_wantsupdates &&
         ((m_timeleft + 999999) / 1000000 != m_lastupdate))
         m_needsupdate = true;
-    else
-        m_needsupdate = false;
 
     if (m_draweveryframe)
         m_needsupdate = true;
@@ -387,6 +628,12 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
         m_displaying = false;
 }
 
+
+bool OSDSet::CanShowWith(const QString &name) const
+{
+    return m_showwith.exactMatch(name);
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
 OSDType::OSDType(const QString &name)
@@ -419,6 +666,11 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_right = false;
     m_usingalt = false;
 
+    m_selected  = false;
+    m_button    = false;
+    m_entrynum  = -1;
+    m_cursorpos = 0;
+
     m_scroller = false;
     m_scrollx = m_scrolly = 0;
     m_scrollinit = false;
@@ -426,6 +678,9 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_linespacing = 1.5;
 
     m_unbiasedsize = unbias(m_screensize, wmult, hmult);
+
+    m_draw_info_str = "";
+    m_draw_info_len = 0;
 }
 
 OSDTypeText::OSDTypeText(const OSDTypeText &other)
@@ -445,6 +700,8 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other)
     m_scrollx = other.m_scrollx;
     m_scrolly = other.m_scrolly;
     m_linespacing = other.m_linespacing;
+    m_draw_info_str = "";
+    m_draw_info_len = 0;
 }
 
 OSDTypeText::~OSDTypeText()
@@ -459,6 +716,7 @@ void OSDTypeText::SetAltFont(TTFFont *font)
 void OSDTypeText::SetText(const QString &text)
 {
     m_message = text;
+    m_cursorpos = text.length();
     m_scrollinit = false;
 }
 
@@ -607,10 +865,130 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         DrawString(surface, m_displaysize, m_message, fade, maxfade, 
                    xoff + m_scrollposx, yoff + m_scrollposy);
     }
-    else       
-        DrawString(surface, m_displaysize, m_message, fade, maxfade, xoff, 
-                   yoff);
-}           
+    else if (!m_message.contains("["))
+    {
+        DrawString(surface, m_displaysize, m_message,
+                   fade, maxfade, xoff, yoff);
+    }
+    else
+    {
+        DrawHiLiteString(surface, m_displaysize, m_message,
+                         fade, maxfade, xoff, yoff);
+    }
+}
+
+void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect, 
+                                   const QString &text, int fade, int maxfade, 
+                                   int xoff, int yoff, bool double_size)
+{
+    if (m_draw_info_str != text)
+    {
+        m_draw_info_str = QDeepCopy<QString>(text);
+        m_draw_info.clear();
+        m_draw_info_len = 0;
+
+        bool    in_hilite = false;
+        QString str       = text;
+
+        while (!str.isEmpty())
+        {
+            QString tmp = str;
+            int loc = str.find((in_hilite) ? "]" : "[");
+
+            if (loc < 0)
+            {
+                str = QString::null;
+            }
+            else
+            {
+                tmp = str.left(loc);
+                str = str.mid(loc + 1);
+            }
+
+            if (!tmp.isEmpty())
+            {
+                int msgwidth = 0;
+                TTFFont *font = (in_hilite || m_selected) ? m_altfont : m_font;
+                if (font)
+                    font->CalcWidth(tmp, &msgwidth);
+                m_draw_info_len += msgwidth;
+                m_draw_info.push_back(DrawInfo(tmp, msgwidth, in_hilite));
+            }
+
+            in_hilite = !in_hilite;
+        }
+    }
+
+    if (m_centered || m_right)
+    {
+        int xoffset = rect.width() - m_draw_info_len;
+        if (m_centered)
+            xoffset /= 2;
+
+        if (xoffset > 0)
+            rect.moveBy(xoffset, 0);
+    }
+
+    rect.moveBy(xoff, yoff);
+    rect.setRight( min(rect.right(),  surface->width));
+    rect.setBottom(min(rect.bottom(), surface->height));
+
+    QRect off_rect = rect;
+    for (uint i = 0; i < m_draw_info.size(); i++)
+    {
+        int alphamod = 255;
+        if (maxfade > 0 && fade >= 0)
+            alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
+
+        bool use_alt = m_draw_info[i].hilite || m_selected;
+        TTFFont *font = (use_alt) ? m_altfont : m_font;
+        if (font && (off_rect.width() > 0) && (off_rect.height() > 0))
+        {
+            font->DrawString(surface, off_rect.left(), off_rect.top(),
+                             m_draw_info[i].msg,
+                             off_rect.right(), off_rect.bottom(),
+                             alphamod, double_size);
+
+            off_rect.moveBy(m_draw_info[i].width, 0);
+            rect.setRight( min(rect.right(),  surface->width));
+            rect.setBottom(min(rect.bottom(), surface->height));
+        }
+    }
+
+    // draw cursor
+    if (IsSelected() && !IsButton())
+    {
+        xoff = 0;
+        if (m_cursorpos > 0)
+        {
+            int i = 0, w = 0, len = 0, pos = m_cursorpos;
+            for (; i < (int) m_draw_info.size(); i++)
+            {
+                len += m_draw_info[i].msg.length();
+                if (len > m_cursorpos)
+                    break;
+                xoff += m_draw_info[i].width;
+                pos  -= m_draw_info[i].msg.length();
+            }
+            QString tmp = m_draw_info[i].msg.left(max(pos,0));
+            if (!tmp.isEmpty())
+            {
+                bool use_alt = m_draw_info[i].hilite || m_selected;
+                TTFFont *font = (use_alt) ? m_altfont : m_font;
+                font->CalcWidth(tmp, &w);
+                xoff += w;
+            }
+        }
+
+        QRect crect(rect.top(), rect.left(), 2, (m_font->Size() * 3) / 2);
+        if (crect.right() < surface->width && crect.right() < rect.right())
+        {
+            OSDTypeBox box("cursor", crect, 1.0f, 1.0f);
+            box.SetColor(Qt::white);
+            box.Draw(surface, fade, maxfade, xoff, 0, 200);
+        }
+    }
+}
   
 void OSDTypeText::DrawString(OSDSurface *surface, QRect rect, 
                              const QString &text, int fade, int maxfade, 
@@ -630,29 +1008,82 @@ void OSDTypeText::DrawString(OSDSurface *surface, QRect rect,
     }
 
     rect.moveBy(xoff, yoff);
-
-    int x = rect.left();
-    int y = rect.top();
-    int maxx = rect.right();
-    int maxy = rect.bottom();
-
-    if (maxx > surface->width)
-        maxx = surface->width;
-
-    if (maxy > surface->height)
-        maxy = surface->height;
+    rect.setRight( min(rect.right(),  surface->width));
+    rect.setBottom(min(rect.bottom(), surface->height));
 
     int alphamod = 255;
-
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
     TTFFont *font = m_font;
-    if (m_usingalt && m_altfont)
+    if ((m_usingalt || m_selected) && m_altfont)
         font = m_altfont;
 
-    font->DrawString(surface, x, y, text, maxx, maxy, alphamod, doubl);
+    font->DrawString(surface, rect.left(), rect.top(), text,
+                     rect.right(), rect.bottom(), alphamod, doubl);
+
+    // draw cursor
+    if (IsSelected() && !IsButton())
+    {
+        xoff = 0;
+        if (m_cursorpos > 0)
+            m_font->CalcWidth(text.left(m_cursorpos), &xoff);
+
+        QRect crect(rect.left(), rect.top(), 2, (m_font->Size() * 3) / 2);
+        if (crect.right() < surface->width && crect.right() < rect.right())
+        {
+            OSDTypeBox box("cursor", crect, 1.0f, 1.0f);
+            box.SetColor(Qt::white);
+            box.Draw(surface, fade, maxfade, xoff, 0, 200);
+        }
+    }
 } 
+
+int clamp(int val, int minimum, int maximum)
+{
+    return min(max(val, minimum), maximum);
+}
+
+bool OSDTypeText::MoveCursor(int dir)
+{
+    if (!IsEntry() || IsButton())
+        return false;
+
+    int new_pos = m_cursorpos + dir;
+    m_cursorpos = clamp(new_pos, 0, (int)m_message.length());
+    return new_pos == m_cursorpos;
+}
+
+bool OSDTypeText::Delete(int dir)
+{
+    if (!IsEntry() || IsButton())
+        return false;
+
+    if (dir > 0)
+    {
+        m_message.remove(m_cursorpos, dir);
+        return true;
+    }
+
+    if (dir < 0)
+    {
+        int cpos = max(m_cursorpos + dir, 0);
+        m_message.remove(cpos, abs(cpos - m_cursorpos));
+        m_cursorpos = cpos;
+        return true;
+    }
+
+    return false;
+}
+
+void OSDTypeText::InsertCharacter(QChar ch)
+{
+    if (!IsEntry() || IsButton())
+        return;
+
+    m_message.insert(m_cursorpos, ch);
+    MoveCursor(+1);
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1335,9 +1766,8 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
 
 OSDTypeBox::OSDTypeBox(const QString &name, QRect displayrect,
                        float wmult, float hmult)
-    : OSDType(name)
+    : OSDType(name), size(displayrect), m_color(Qt::black)
 {
-    size = displayrect;
     m_unbiasedsize = unbias(size, wmult, hmult);
 }
 
@@ -1401,6 +1831,9 @@ void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade,
 
     int ydestwidth;
 
+    int h,s,v;
+    m_color.getHsv(&h, &s, &v);
+
     alpha = ((alpha * alphamod) + 0x80) >> 8;
     if (!needblend)
     {
@@ -1411,13 +1844,11 @@ void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade,
             memset(surface->y + xstart + ydestwidth, 0, width);
             memset(surface->alpha + xstart + ydestwidth, alpha, width);
         }
-
         return;
     }
-
     dest = surface->y + ystart * surface->width + xstart;
     destalpha = surface->alpha + ystart * surface->width + xstart;
-    (surface->blendconstfunc) (0, 0, 0, alpha, dest, NULL, NULL, destalpha,
+    (surface->blendconstfunc) (v, 0, 0, alpha, dest, NULL, NULL, destalpha,
                                surface->width, width, height, 0,
                                surface->rec_lut, surface->pow_lut);
 }
