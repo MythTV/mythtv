@@ -916,12 +916,14 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         if (!availWait.wait(&availWaitMutex, 250))
         {
             int elapsed = t.elapsed();
-            if (((elapsed > 2000) && (elapsed < 2250)) ||
-                ((elapsed > 4000) && (elapsed < 4250)) ||
-                ((elapsed > 8000) && (elapsed < 8250)))
+            if  (((elapsed > 500)  && (elapsed < 750))  ||
+                 ((elapsed > 1000) && (elapsed < 1250)) ||
+                 ((elapsed > 2000) && (elapsed < 2250)) ||
+                 ((elapsed > 4000) && (elapsed < 4250)) ||
+                 ((elapsed > 8000) && (elapsed < 8250)))
             {
                 VERBOSE(VB_IMPORTANT, LOC + "Waited " +
-                        QString("%1").arg(elapsed/1000) +
+                        QString("%1").arg((elapsed / 500) * 0.5f, 3, 'f', 1) +
                         " seconds for data to become available...");
                 if (livetvchain)
                 {

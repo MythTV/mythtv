@@ -3639,12 +3639,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (!is_atsc)
             dummyRecorder = new DummyDTVRecorder(
-                this, true, ringBuffer, 768, 576, 50,
-                90, 30000000, false);
+                this, true, ringBuffer, 720, 576, 25,
+                75, 2000000, false);
         else
             dummyRecorder = new DummyDTVRecorder(
                 this, true, ringBuffer, 1920, 1088, 29.97,
-                90, 30000000, false);
+                90, 20000000, false);
         dummyRecorder->SetRecording(curRecording);
     }
 

@@ -242,14 +242,16 @@ int DummyDTVRecorder::ProcessData(unsigned char *buffer, int len)
             _packets_in_frame = 0;
 
             // sync so that these packets are seen...
-            if (_frames_seen_count < 20 || ((_frames_seen_count % 10) == 0))
+            if (_frames_seen_count < _non_buf_frames ||
+                ((_frames_seen_count % 10) == 0))
             {
                 //ringBuffer->WriterFlush();
                 ringBuffer->Sync();
             }
 
             // make sure we don't send too many frames
-            frame_delay(_frames_seen_count > _non_buf_frames, _frames_seen_count,
+            frame_delay(_frames_seen_count > _non_buf_frames,
+                        _frames_seen_count,
                         _next_frame_time, _next_5th_frame_time,
                         1000000.0 / GetFrameRate(), _request_recording);
         }
