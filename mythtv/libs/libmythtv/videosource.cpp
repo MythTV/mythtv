@@ -2030,8 +2030,15 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
                 signal_timeout->setValue(40000);
                 channel_timeout->setValue(42500);
             }
-            if (frontend_name == "DiBcom 3000P/M-C DVB-T")
+
+            // slow down tuning for buggy drivers
+            if ((frontend_name == "DiBcom 3000P/M-C DVB-T") ||
+                (frontend_name ==
+                 "TerraTec/qanu USB2.0 Highspeed DVB-T Receiver"))
+            {
                 tuning_delay->setValue(200);
+            }
+
             break;
         case CardUtil::ATSC:
         {
