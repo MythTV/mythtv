@@ -52,6 +52,8 @@ class CCDecoder
     uint GetRating(uint i) const { return xds_rating[i&3]&7; }
     QString GetRatingString(uint i) const;
 
+    QString GetXDS(const QString &key) const;
+
   private:
     QChar CharCC(int code) const { return stdchar[code]; }
     void ResetCC(int mode);

@@ -1016,11 +1016,14 @@ QString CCDecoder::GetRatingString(uint i) const
         { "E",  "C", "C8+", "G",     "PG",  "14+",   "18+", "NR" },
         { "E",  "G", "8+",  "13+",   "16+", "18+",   "NR",  "NR" },
     };
+
     QString main = prefix[i] + mainStr[i][GetRating(i)];
+
     if (kRatingTPG == i)
     {
         if (!(xds_rating[i]&0xF0))
-            return main;
+            return QDeepCopy<QString>(main);
+
         main += " ";
         // TPG flags
         if (xds_rating[i] & 0x80)
@@ -1032,7 +1035,24 @@ QString CCDecoder::GetRatingString(uint i) const
         if (xds_rating[i] & 0x10)
             main += "L"; // Language
     }
-    return main;
+
+    return QDeepCopy<QString>(main);
+}
+
+QString CCDecoder::GetXDS(const QString &key) const
+{
+    if (key == "ratings")
+        return QString::number(GetRatingSystems());
+    else if (key.left(11) == "has_rating_")
+        return ((1<<key.right(1).toUInt()) & GetRatingSystems()) ? "1" : "0";
+    else if (key.left(7) == "rating_")
+        return GetRatingString(key.right(1).toUInt());
+    else if (key == "callsign")
+        return QDeepCopy<QString>(xds_net_call_x);
+    else if (key == "channame")
+        return QDeepCopy<QString>(xds_net_name_x);
+
+    return QString::null;
 }
 
 void CCDecoder::DecodeXDSVChip(int b1, int b2)
