@@ -18,6 +18,7 @@ const QString DataDirectURLS[] =
 {
     "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService"
 };
+const uint NumDataDirectURLS = 1;
 
 // XXX Program duration should be stored as seconds, not as a QTime.
 //     limited to 24 hours this way.
@@ -451,94 +452,79 @@ void DataDirectProcessor::setInputFile(const QString &filename)
     inputfilename = filename;
 }
 
-FILE *DataDirectProcessor::getInputFile(bool plineupsOnly, QDateTime pstartDate,
-            QDateTime pendDate, QString &err_txt, QString &tmpfilename)
+FILE *DataDirectProcessor::getInputFile(
+    bool plineupsOnly, QDateTime pstartDate, QDateTime pendDate,
+    QString &err_txt, QString &tmpfilename)
 {
-    FILE *ret = NULL;
-    if (inputfilename.isNull())
-    {   
-        //QString ddurl("http://datadirect.webservices.zap2it.com/tvlistings/xtvdService");
-        QString ddurl(DataDirectURLS[source]);
-         
-        if (plineupsOnly) 
-        {
-            pstartDate = QDateTime(QDate::currentDate().addDays(2),
-                                   QTime::QTime(23, 59, 0));
-            pendDate = pstartDate;
-            pendDate = pendDate.addSecs(1);
-        }
-
-        QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
-        QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
-
-        char ctempfilename[] = "/tmp/mythpostXXXXXX";
-        if (mkstemp(ctempfilename) == -1) 
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Creating temp files -- %1").
-                    arg(strerror(errno)));
-            return NULL;
-        }
-
-        tmpfilename = QString(ctempfilename);
-        QFile postfile(tmpfilename);
-
-        if (postfile.open(IO_WriteOnly)) 
-        {
-            QTextStream poststream(&postfile);
-            poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-            poststream << "<SOAP-ENV:Envelope\n";
-            poststream << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-            poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-            poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-            poststream << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-            poststream << "<SOAP-ENV:Body>\n";
-            poststream << "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
-            poststream << "<startTime xsi:type='xsd:dateTime'>";
-            poststream << startdatestr << "</startTime>\n";
-            poststream << "<endTime xsi:type='xsd:dateTime'>";
-            poststream << enddatestr << "</endTime>\n";
-            poststream << "</ns1:download>\n";
-            poststream << "</SOAP-ENV:Body>\n";
-            poststream << "</SOAP-ENV:Envelope>\n";
-        }
-        else
-        {
-            err_txt = "Unable to open post data output file.";
-            return NULL;
-        }
-
-        postfile.close();
-
-        QString command = QString("wget --http-user='%1' --http-passwd='%2' "
-                                  "--post-file='%3' --header='Accept-Encoding:gzip'"
-                                  " %4 --output-document=- ")
-                                 .arg(getUserID())
-                                 .arg(getPassword())
-                                 .arg(tmpfilename)
-                                 .arg(ddurl);
-
-        if ((print_verbose_messages & VB_GENERAL) == 0)
-            command += " 2> /dev/null ";
-
-        command += " | gzip -df";
-
-        err_txt = command;
-
-        ret = popen(command.ascii(), "r");
-    }
-    else
+    if (!inputfilename.isNull())
     {
         err_txt = inputfilename;
-        ret = fopen(inputfilename.ascii(), "r");
+        return fopen(inputfilename.ascii(), "r");
     }
 
-    return ret;
+    QString ddurl(DataDirectURLS[source % NumDataDirectURLS]);
+    if (plineupsOnly) 
+    {
+        pstartDate = QDateTime(QDate::currentDate().addDays(2),
+                               QTime::QTime(23, 59, 0));
+        pendDate = pstartDate;
+        pendDate = pendDate.addSecs(1);
+    }
+
+    char ctempfilename[] = "/tmp/mythpostXXXXXX";
+    if (mkstemp(ctempfilename) == -1) 
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating temp files -- " + ENO);
+        return NULL;
+    }
+
+    QFile postfile(tmpfilename = QString(ctempfilename));
+    if (!postfile.open(IO_WriteOnly))
+    {
+        err_txt = "Unable to open post data output file.";
+        return NULL;
+    }
+
+    QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
+    QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
+    QTextStream poststream(&postfile);
+    poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
+    poststream << "<SOAP-ENV:Envelope\n";
+    poststream <<
+        "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+    poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+    poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+    poststream <<
+        "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+    poststream << "<SOAP-ENV:Body>\n";
+    poststream << "<ns1:download  xmlns:ns1='urn:TMSWebServices'>\n";
+    poststream << "<startTime xsi:type='xsd:dateTime'>";
+    poststream << startdatestr << "</startTime>\n";
+    poststream << "<endTime xsi:type='xsd:dateTime'>";
+    poststream << enddatestr << "</endTime>\n";
+    poststream << "</ns1:download>\n";
+    poststream << "</SOAP-ENV:Body>\n";
+    poststream << "</SOAP-ENV:Envelope>\n";
+    postfile.close();
+
+    QString command = QString(
+        "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
+        "--header='Accept-Encoding:gzip' %4 --output-document=- ")
+        .arg(getUserID()).arg(getPassword()).arg(tmpfilename).arg(ddurl);
+
+    if ((print_verbose_messages & VB_GENERAL) == 0)
+        command += " 2> /dev/null ";
+
+    command += " | gzip -df";
+
+    err_txt = command;
+
+    return popen(command.ascii(), "r");
 }
 
 bool DataDirectProcessor::getNextSuggestedTime(void)
 {
-    QString ddurl(DataDirectURLS[source]);
+    QString ddurl(DataDirectURLS[source % NumDataDirectURLS]);
          
     char ctempfilenamesend[] = "/tmp/mythpostXXXXXX";
     if (mkstemp(ctempfilenamesend) == -1) 
@@ -694,54 +680,52 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
 bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate, 
                                    QDateTime pendDate) 
 {
-    QString ferror;
-    QString tempfile;
-    FILE *fp = getInputFile(plineupsOnly, pstartDate, pendDate, ferror,
-                            tempfile);
+    QString err = "", tmpfile = "";
 
-    if (fp == NULL) 
+    FILE *fp = getInputFile(plineupsOnly, pstartDate, pendDate, err, tmpfile);
+    if (!fp)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to get data (%1) -- %2").
-                arg(ferror.ascii()).arg(strerror(errno)));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
+                QString("(%1) -- ").arg(err) + ENO);
         return false;
     }
 
     QFile f;
-
-    if (!f.open(IO_ReadOnly, fp)) 
+    if (f.open(IO_ReadOnly, fp)) 
+    {
+        DDStructureParser ddhandler(*this);
+        QXmlInputSource  xmlsource(&f);
+        QXmlSimpleReader xmlsimplereader;
+        xmlsimplereader.setContentHandler(&ddhandler);
+        xmlsimplereader.parse(xmlsource);
+        f.close();
+    }
+    else
     {
        VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
-       return false;
+       pclose(fp);
+       fp = NULL;
     }
-    
-    DDStructureParser ddhandler(*this);
 
-    QXmlInputSource xmlsource(&f);
-    QXmlSimpleReader xmlsimplereader;
-    xmlsimplereader.setContentHandler(&ddhandler);
-    xmlsimplereader.parse(xmlsource);
-    f.close();
-
-    if (!tempfile.isNull())
+    if (!tmpfile.isEmpty())
     {
-        QFile tmpfile(tempfile);
-        tmpfile.remove();
+        QFile tmp(tmpfile);
+        tmp.remove();
     }
-    return true;
+
+    return fp;
 }
 
 bool DataDirectProcessor::grabLineupsOnly() 
 {
-    bool ok = true;
-    if ((lastrunuserid != getUserID()) || (lastrunpassword != getPassword())) 
-    {
-        lastrunuserid = getUserID();
-        lastrunpassword = getPassword();
-        ok = grabData(true, QDateTime::currentDateTime(),
-                      QDateTime::currentDateTime());
-    }
-    return ok;
+    if ((lastrunuserid == getUserID()) && (lastrunpassword == getPassword())) 
+        return true;
+
+    lastrunuserid   = getUserID();
+    lastrunpassword = getPassword();
+
+    QDateTime now = QDateTime::currentDateTime();
+    return grabData(true, now, now);
 }   
 
 bool DataDirectProcessor::grabAllData() 
