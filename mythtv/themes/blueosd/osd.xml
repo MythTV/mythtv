@@ -90,6 +90,74 @@
     </textarea>
   </container>
 
+  <container name="channel_editor">
+    <image name="background">
+      <filename>osd-channel-edit.png</filename>
+      <position>102,99</position>
+    </image>
+    <textarea name="dialog_label" align="center">
+      <area>105,106,450,40</area>
+      <font>infofont</font>
+      <value>Channel Editor</value>
+    </textarea>
+    <textarea name="callsign_label" align="right">
+      <area>120,151,155,40</area>
+      <font>infofont</font>
+      <value>Callsign</value>
+    </textarea>
+    <textarea name="callsign" entry="0">
+      <area>310,151,220,40</area>
+      <font>infofontgray</font>
+      <altfont>infofont</altfont>
+      <value></value>
+    </textarea>
+    <textarea name="channum_label" align="right">
+      <area>120,200,155,40</area>
+      <font>infofont</font>
+      <value>Channel #</value>
+    </textarea>
+    <textarea name="channum" entry="1">
+      <area>310,200,220,40</area>
+      <font>infofontgray</font>
+      <altfont>infofont</altfont>
+      <value></value>
+    </textarea>
+    <textarea name="channame_label" align="right">
+      <area>120,246,155,40</area>
+      <font>infofont</font>
+      <value>Channel Name</value>
+    </textarea>
+    <textarea name="channame" entry="2">
+      <area>310,246,220,40</area>
+      <font>infofontgray</font>
+      <altfont>infofont</altfont>
+      <value></value>
+    </textarea>
+    <textarea name="XMLTV_label" align="right">
+      <area>120,295,155,40</area>
+      <font>infofont</font>
+      <value>XMLTV ID</value>
+    </textarea>
+    <textarea name="XMLTV" entry="3">
+      <area>310,295,220,40</area>
+      <font>infofontgray</font>
+      <altfont>infofont</altfont>
+      <value></value>
+    </textarea>
+    <textarea name="probe_all" entry="4" button="yes" align="center">
+      <area>120,342,185,40</area>
+      <font>infofontgray</font>
+      <altfont>infofont</altfont>
+      <value>[P]robe</value>
+    </textarea>
+    <textarea name="ok" entry="5" button="yes" align="center">
+      <area>330,342,185,40</area>
+      <font>infofontgray</font>
+      <altfont>infofont</altfont>
+      <value>[O]k</value>
+    </textarea>
+  </container>
+
   <container name="browse_info">
     <image name="background">
       <filename>osd-mid.png</filename>
