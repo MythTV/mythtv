@@ -915,6 +915,35 @@ void EncoderLink::GetNextProgram(int direction,
         VERBOSE(VB_IMPORTANT, "Should be local only query: GetNextProgram");
 }
 
+bool EncoderLink::GetChannelInfo(uint &chanid, uint &sourceid,
+                                 QString &callsign, QString &channum,
+                                 QString &channame, QString &xmltv) const
+{
+    if (!local)
+    {
+        VERBOSE(VB_IMPORTANT, "Should be local only query: GetChannelInfo");
+        return false;
+    }
+
+    return tv->GetChannelInfo(chanid, sourceid,
+                              callsign, channum, channame, xmltv);
+}
+
+bool EncoderLink::SetChannelInfo(uint chanid, uint sourceid,
+                                 QString oldchannum,
+                                 QString callsign, QString channum,
+                                 QString channame, QString xmltv)
+{
+    if (!local)
+    {
+        VERBOSE(VB_IMPORTANT, "Should be local only query: SetChannelInfo");
+        return false;
+    }
+
+    return tv->SetChannelInfo(chanid, sourceid, oldchannum,
+                              callsign, channum, channame, xmltv);
+}
+
 /** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *         <b>This only works on local recorders.</b>

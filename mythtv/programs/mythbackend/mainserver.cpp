@@ -410,6 +410,10 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
         else
             HandleRecorderQuery(listline, tokens, pbs);
     }
+    else if (command == "SET_CHANNEL_INFO")
+    {
+        HandleSetChannelInfo(listline, pbs);
+    }
     else if (command == "QUERY_REMOTEENCODER")
     {
         if (tokens.size() != 2)
@@ -2331,6 +2335,20 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
     SendResponse(pbssock, strlist);
 }
 
+static QString cleanup(const QString &str)
+{
+    if (str == " ")
+        return "";
+    return str;
+}
+
+static QString make_safe(const QString &str)
+{
+    if (str.isEmpty())
+        return " ";
+    return str;
+}
+
 void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
                                      PlaybackSock *pbs)
 {
@@ -2590,43 +2608,34 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
                             endtime, callsign, iconpath, channelname, chanid,
                             seriesid, programid);
 
-        if (title == "")
-            title = " ";
-        if (subtitle == "")
-            subtitle = " ";
-        if (desc == "")
-            desc = " ";
-        if (category == "")
-            category = " ";
-        if (starttime == "")
-            starttime = " ";
-        if (endtime == "")
-            endtime = " ";
-        if (callsign == "")
-            callsign = " ";
-        if (iconpath == "")
-            iconpath = " ";
-        if (channelname == "")
-            channelname = " ";
-        if (chanid == "")
-            chanid = " ";
-        if (seriesid == "")
-            seriesid = " ";
-        if (programid == "")
-            programid = " ";
+        retlist << make_safe(title);
+        retlist << make_safe(subtitle);
+        retlist << make_safe(desc);
+        retlist << make_safe(category);
+        retlist << make_safe(starttime);
+        retlist << make_safe(endtime);
+        retlist << make_safe(callsign);
+        retlist << make_safe(iconpath);
+        retlist << make_safe(channelname);
+        retlist << make_safe(chanid);
+        retlist << make_safe(seriesid);
+        retlist << make_safe(programid);
+    }
+    else if (command == "GET_CHANNEL_INFO")
+    {
+        uint chanid = slist[2].toUInt();
+        uint sourceid = 0;
+        QString callsign = "", channum = "", channame = "", xmltv = "";
 
-        retlist << title;
-        retlist << subtitle;
-        retlist << desc;
-        retlist << category;
-        retlist << starttime;
-        retlist << endtime;
-        retlist << callsign;
-        retlist << iconpath;
-        retlist << channelname;
-        retlist << chanid;
-        retlist << seriesid;
-        retlist << programid;
+        enc->GetChannelInfo(chanid, sourceid,
+                            callsign, channum, channame, xmltv);
+
+        retlist << QString::number(chanid);
+        retlist << QString::number(sourceid);
+        retlist << make_safe(callsign);
+        retlist << make_safe(channum);
+        retlist << make_safe(channame);
+        retlist << make_safe(xmltv);
     }
     else
     {
@@ -2635,6 +2644,40 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
 
     SendResponse(pbssock, retlist);    
+}
+
+void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
+{
+    bool     ok       = true;
+    QSocket *pbssock  = pbs->getSocket();
+    uint     chanid   = slist[1].toUInt();
+    uint     sourceid = slist[2].toUInt();
+    QString  oldcnum  = cleanup(slist[3]);
+    QString  callsign = cleanup(slist[4]);
+    QString  channum  = cleanup(slist[5]);
+    QString  channame = cleanup(slist[6]);
+    QString  xmltv    = cleanup(slist[7]);
+
+    QStringList retlist;
+    if (!chanid || !sourceid)
+    {
+        retlist << "0";
+        SendResponse(pbssock, retlist);
+        return;
+    }
+
+    QMap<int, EncoderLink *>::iterator it = encoderList->begin();
+    for (; it != encoderList->end(); ++it)
+    {
+        if (*it)
+        {
+            ok &= (*it)->SetChannelInfo(chanid, sourceid, oldcnum,
+                                        callsign, channum, channame, xmltv);
+        }
+    }
+
+    retlist << ((ok) ? "1" : "0");
+    SendResponse(pbssock, retlist);
 }
 
 void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,

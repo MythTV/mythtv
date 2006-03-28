@@ -3212,6 +3212,83 @@ void TVRec::GetNextProgram(int direction,
 
 }
 
+bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
+                           QString &callsign, QString &channum,
+                           QString &channame, QString &xmltvid) const
+{
+    callsign = "";
+    channum  = "";
+    channame = "";
+    xmltvid  = "";
+
+    if ((!chanid || !sourceid) && !channel)
+        return false;
+
+    if (!chanid)
+        chanid = (uint) max(channel->GetChanID(), 0);
+
+    if (!sourceid)
+        sourceid = channel->GetCurrentSourceID();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT callsign, channum, name, xmltvid "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetChannelInfo", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    callsign = query.value(0).toString();
+    channum  = query.value(1).toString();
+    channame = query.value(2).toString();
+    xmltvid  = query.value(3).toString();
+
+    return true;
+}
+
+bool TVRec::SetChannelInfo(uint chanid, uint sourceid,
+                           QString oldchannum,
+                           QString callsign, QString channum,
+                           QString channame, QString xmltvid)
+{
+    if (!chanid || !sourceid || channum.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE channel "
+        "SET callsign = :CALLSIGN, "
+        "    channum  = :CHANNUM,  "
+        "    name     = :CHANNAME, "
+        "    xmltvid  = :XMLTVID   "
+        "WHERE chanid   = :CHANID AND "
+        "      sourceid = :SOURCEID");
+    query.bindValue(":CALLSIGN", callsign);
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":CHANNAME", channame);
+    query.bindValue(":XMLTVID",  xmltvid);
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("SetChannelInfo", query);
+        return false;
+    }
+
+    if (channel)
+        channel->Renumber(sourceid, oldchannum, channum);
+
+    return true;
+}
+
 /** \fn TVRec::SetRingBuffer(RingBuffer*)
  *  \brief Sets "ringBuffer", deleting any existing RingBuffer.
  */

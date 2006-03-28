@@ -87,6 +87,7 @@ class ChannelBase
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const
         { return curchannelname; }
+    virtual int GetChanID(void) const;
     virtual int GetCurrentInputNum(void) const
         { return currentInputID; }
     virtual QString GetCurrentInput(void) const
@@ -111,6 +112,8 @@ class ChannelBase
     // Sets
     virtual void SetChannelOrdering(const QString &chanorder)
         { channelorder = chanorder; }
+    virtual void Renumber(uint srcid, const QString &oldChanNum,
+                          const QString &newChanNum);
 
     // Channel setting convenience method
     virtual bool SetChannelByDirection(ChannelChangeDirection);

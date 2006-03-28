@@ -209,6 +209,12 @@ class TVRec : public QObject
                         QString &callsign,    QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid,    QString &programid);
+    bool GetChannelInfo(uint &chanid, uint &sourceid,
+                        QString &callsign, QString &channum,
+                        QString &channame, QString &xmltvid) const;
+    bool SetChannelInfo(uint chanid, uint sourceid, QString oldchannum,
+                        QString callsign, QString channum,
+                        QString channame, QString xmltvid);
 
     /// \brief Returns the caputure card number
     int GetCaptureCardNum(void) { return cardid; }

@@ -355,33 +355,6 @@ int Channel::GetCurrentChannelNum(const QString &channame)
     return -1;
 }
 
-int Channel::GetChanID() const
-{
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
-        return false;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT chanid FROM channel "
-                  "WHERE channum  = :CHANNUM AND "
-                  "      sourceid = :SOURCEID");
-    query.bindValue(":CHANNUM", curchannelname);
-    query.bindValue(":SOURCEID", (*it)->sourceid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("fetching chanid", query);
-        return -1;
-    }
-
-    if (query.size() <= 0)
-        return -1;
-
-    query.next();
-    return query.value(0).toInt();
-}
-
 void Channel::SaveCachedPids(const pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();

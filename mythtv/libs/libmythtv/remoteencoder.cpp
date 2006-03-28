@@ -604,6 +604,20 @@ bool RemoteEncoder::CheckChannelPrefix(
     return strlist[0].toInt();
 }
 
+static QString cleanup(const QString &str)
+{
+    if (str == " ")
+        return "";
+    return str;
+}
+
+static QString make_safe(const QString &str)
+{
+    if (str.isEmpty())
+        return " ";
+    return str;
+}
+
 /** \fn RemoteEncoder::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
  *  \brief Returns information about the program that would be seen if we changed
  *         the channel using ChangeChannel(int) with "direction".
@@ -627,42 +641,50 @@ void RemoteEncoder::GetNextProgram(int direction,
 
     SendReceiveStringList(strlist);
 
-    title = strlist[0];
-    subtitle = strlist[1];
-    desc = strlist[2];
-    category = strlist[3];
-    starttime = strlist[4];
-    endtime = strlist[5];
-    callsign = strlist[6];
-    iconpath = strlist[7];
-    channelname = strlist[8];
-    chanid = strlist[9];
-    seriesid = strlist[10];
-    programid = strlist[11];
-
-    if (title == " ")
-        title = "";
-    if (subtitle == " ")
-        subtitle = "";
-    if (desc == " ")
-        desc = "";
-    if (category == " ")
-        category = "";
-    if (starttime == " ")
-        starttime = "";
-    if (endtime == " ")
-        endtime = "";
-    if (callsign == " ")
-        callsign = "";
-    if (iconpath == " ")
-        iconpath = "";
-    if (channelname == " ")
-        channelname = "";
-    if (chanid == " ")
-        chanid = "";
-    if (seriesid == " ")
-        seriesid = "";
-    if (programid == " ")
-        programid = "";
+    title       = cleanup(strlist[0]);
+    subtitle    = cleanup(strlist[1]);
+    desc        = cleanup(strlist[2]);
+    category    = cleanup(strlist[3]);
+    starttime   = cleanup(strlist[4]);
+    endtime     = cleanup(strlist[5]);
+    callsign    = cleanup(strlist[6]);
+    iconpath    = cleanup(strlist[7]);
+    channelname = cleanup(strlist[8]);
+    chanid      = cleanup(strlist[9]);
+    seriesid    = cleanup(strlist[10]);
+    programid   = cleanup(strlist[11]);
 }
 
+void RemoteEncoder::GetChannelInfo(InfoMap &infoMap, uint chanid)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "GET_CHANNEL_INFO";
+    strlist << QString::number(chanid);
+
+    SendReceiveStringList(strlist);
+
+    infoMap["chanid"]   = cleanup(strlist[0]);
+    infoMap["sourceid"] = cleanup(strlist[1]);
+    infoMap["callsign"] = cleanup(strlist[2]);
+    infoMap["channum"]  = cleanup(strlist[3]);
+    infoMap["channame"] = cleanup(strlist[4]);
+    infoMap["XMLTV"]    = cleanup(strlist[5]);
+
+    infoMap["oldchannum"] =  infoMap["channum"];
+}
+
+bool RemoteEncoder::SetChannelInfo(const InfoMap &infoMap)
+{
+    QStringList strlist = "SET_CHANNEL_INFO";
+    strlist << make_safe(infoMap["chanid"]);
+    strlist << make_safe(infoMap["sourceid"]);
+    strlist << make_safe(infoMap["oldchannum"]);
+    strlist << make_safe(infoMap["callsign"]);
+    strlist << make_safe(infoMap["channum"]);
+    strlist << make_safe(infoMap["channame"]);
+    strlist << make_safe(infoMap["XMLTV"]);
+
+    SendReceiveStringList(strlist);
+
+    return strlist[0].toInt();
+}

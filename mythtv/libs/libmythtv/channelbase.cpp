@@ -404,6 +404,33 @@ int ChannelBase::GetCardID(void) const
     return tmpcardid;
 }
 
+int ChannelBase::GetChanID() const
+{
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT chanid FROM channel "
+                  "WHERE channum  = :CHANNUM AND "
+                  "      sourceid = :SOURCEID");
+    query.bindValue(":CHANNUM", curchannelname);
+    query.bindValue(":SOURCEID", (*it)->sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("fetching chanid", query);
+        return -1;
+    }
+
+    if (query.size() <= 0)
+        return -1;
+
+    query.next();
+    return query.value(0).toInt();
+}
+
 /** \fn DVBChannel::InitializeInputs(void)
  *  \brief Fills in input map from DB
  */
@@ -472,6 +499,31 @@ bool ChannelBase::InitializeInputs(void)
             .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 
     return inputs.size();
+}
+
+/** \fn ChannelBase::Renumber(uint,const QString&,const QString&)
+ *  \brief Changes a channum if we have it cached anywhere.
+ */
+void ChannelBase::Renumber(uint sourceid,
+                           const QString &oldChanNum,
+                           const QString &newChanNum)
+{
+    InputMap::iterator it = inputs.begin();
+
+    for (; it != inputs.end(); ++it)
+    {
+        bool skip = ((*it)->name.isEmpty()                ||
+                     (*it)->startChanNum.isEmpty()        ||
+                     (*it)->startChanNum != oldChanNum ||
+                     (*it)->sourceid     != sourceid);
+        if (!skip)
+            (*it)->startChanNum = newChanNum;
+    }
+
+    if (GetCurrentSourceID() == sourceid && oldChanNum == curchannelname)
+        curchannelname = newChanNum;
+
+    StoreInputChannels(inputs);
 }
 
 /** \fn ChannelBase::StoreInputChannels(const InputMap&)

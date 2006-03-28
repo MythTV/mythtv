@@ -61,7 +61,8 @@ class RemoteEncoder
                         QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid);
-                        
+    void GetChannelInfo(QMap<QString, QString> &infoMap, uint chanid = 0);
+    bool SetChannelInfo(const QMap<QString, QString> &infoMap);
     bool GetErrorStatus(void) { bool v = backendError; backendError = false; 
                                 return v; }
  

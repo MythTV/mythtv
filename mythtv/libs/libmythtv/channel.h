@@ -68,7 +68,6 @@ class Channel : public ChannelBase
 
     // Helper Gets
     unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
-    int  GetChanID(void) const;
     int  GetCurrentChannelNum(const QString &channame);
     QString GetFormatForChannel(QString channum,
                                 QString inputname);
