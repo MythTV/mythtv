@@ -251,8 +251,6 @@ class DataDirectProcessor
     void setActualListingsFrom(QDateTime palf) { actuallistingsfrom = palf; };
     void setActualListingsTo(QDateTime palt) { actuallistingsto = palt; };
 
-    void retrieveStationsAndLineups();
-
     void createTempTables();
     void populateStationsLineupsTables();
     void populateMainDDTables();
