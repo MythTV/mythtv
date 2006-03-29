@@ -2064,10 +2064,11 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 #endif
 }
 
-TunerCardInput::TunerCardInput(const CaptureCard &parent)
+TunerCardInput::TunerCardInput(const CaptureCard &parent,
+                               QString dev, QString type)
     : CCSetting(parent, "defaultinput"),
-      last_device(QString::null),
-      last_cardtype(QString::null),
+      last_device(dev),
+      last_cardtype(type),
       last_diseqct(-1)
 {
     setLabel(QObject::tr("Default input"));
@@ -2161,7 +2162,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     addChild(diseqctype);
     diseqctype->setVisible(false);
 
-    TunerCardInput *defaultinput = new TunerCardInput(parent);
+    TunerCardInput *defaultinput = new TunerCardInput(parent, "0", "DVB");
     addChild(defaultinput);
     defaultinput->setVisible(false);
 
@@ -2171,6 +2172,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
+    connect(cardnum,      SIGNAL(valueChanged  (const QString&)),
+            defaultinput, SLOT(  fillSelections(const QString&)));
     connect(buttonDiSEqC, SIGNAL(pressed()),
             &parent,      SLOT(  DiSEqCPanel()));
     connect(buttonAnalog, SIGNAL(pressed()),
@@ -2180,8 +2183,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
             defaultinput, SLOT(  diseqcType  (const QString&)));
 
-    cardnum->setValue(0);
     defaultinput->diseqcType(diseqctype->getValue());
+    cardnum->setValue(0);
 }
 
 void CaptureCard::reload(void)

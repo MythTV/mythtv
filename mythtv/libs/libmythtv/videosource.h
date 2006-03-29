@@ -197,7 +197,9 @@ class TunerCardInput: public ComboBoxSetting, public CCSetting
 {
     Q_OBJECT
   public:
-    TunerCardInput(const CaptureCard &parent);
+    TunerCardInput(const CaptureCard &parent,
+                   QString dev  = QString::null,
+                   QString type = QString::null);
 
   public slots:
     void fillSelections(const QString &device);
