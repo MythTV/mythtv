@@ -282,19 +282,19 @@ void ScanTypeSetting::refresh(const QString& card)
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_OFDM), true);
         addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(FullTunedScan_OFDM));
+                     QString::number(NITAddScan_OFDM));
         addSelection(tr("Import channels.conf"),
                      QString::number(Import));
         break;
     case CardUtil::QPSK:
         addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(FullTunedScan_QPSK));
+                     QString::number(NITAddScan_QPSK));
         addSelection(tr("Import channels.conf"),
                      QString::number(Import));
         break;
     case CardUtil::QAM:
         addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(FullTunedScan_QAM));
+                     QString::number(NITAddScan_QAM));
         addSelection(tr("Import channels.conf"),
                      QString::number(Import));
         break;
@@ -378,11 +378,11 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
              new ErrorPane(QObject::tr("Failed to open the card")));
     addTarget(QString::number(ScanTypeSetting::Error_Probe),
              new ErrorPane(QObject::tr("Failed to probe the card")));
-    addTarget(QString::number(ScanTypeSetting::FullTunedScan_QAM),
+    addTarget(QString::number(ScanTypeSetting::NITAddScan_QAM),
               wizard->paneQAM);
-    addTarget(QString::number(ScanTypeSetting::FullTunedScan_QPSK),
+    addTarget(QString::number(ScanTypeSetting::NITAddScan_QPSK),
               wizard->paneQPSK);
-    addTarget(QString::number(ScanTypeSetting::FullTunedScan_OFDM),
+    addTarget(QString::number(ScanTypeSetting::NITAddScan_OFDM),
               wizard->paneOFDM);
     addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
               wizard->paneATSC);

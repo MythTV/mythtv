@@ -206,14 +206,20 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
     {
         Error_Open = 0,
         Error_Probe,
+        // Scans that check each frequency in a predefined list
         FullScan_Analog,
         FullScan_ATSC,
         FullScan_OFDM,
-        FullTunedScan_OFDM,
-        FullTunedScan_QPSK,
-        FullTunedScan_QAM,
+        // Scans starting on one frequency that adds each transport
+        // seen in the Network Information Tables to the scan.
+        NITAddScan_OFDM,
+        NITAddScan_QPSK,
+        NITAddScan_QAM,
+        // Scan of all transports already in the database
         FullTransportScan,
+        // Scan of one transport already in the database
         TransportScan,
+        // Imports lists from dvb-utils scanners
         Import
     };
     ScanTypeSetting() : nCaptureCard(-1)

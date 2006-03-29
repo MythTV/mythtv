@@ -116,6 +116,14 @@ class TransportScanItem
     TransportScanItem(int sourceid, const QString &std,
                       const QString &name, int mplexid,
                       uint tuneTimeout);
+#ifdef USING_DVB
+    TransportScanItem(int            _sourceid,
+                      const QString &_std,
+                      const QString &_name,
+                      DVBTuning     &_tuning,
+                      uint           _timeoutTune);
+#endif // USING_DVB
+
     TransportScanItem(int sourceid,           /* source id in DB */
                       const QString &std,     /* atsc/dvb */
                       const QString &strFmt,  /* fmt for info shown to user  */

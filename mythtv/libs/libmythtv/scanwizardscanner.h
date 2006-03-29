@@ -40,9 +40,6 @@
 
 // MythTV headers
 #include "settings.h"
-#ifdef USING_DVB
-#include "dvbtypes.h"
-#endif
 
 class ScanWizard;
 class AnalogScan;
@@ -96,13 +93,9 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     DVBChannel *GetDVBChannel(void);
     Channel    *GetChannel(void);
 
-    static void *SpawnTune(void *param);
-
   private:
     ScanWizard        *parent;
     LogList           *log;
-    bool               tunerthread_running;
-    pthread_t          tuner_thread;
     ChannelBase       *channel;
     ScanProgressPopup *popupProgress;
 
@@ -116,9 +109,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     // tranport info
     uint               frequency;
     QString            modulation;
-#ifdef USING_DVB
-    dvb_channel_t      chan_opts;
-#endif // USING_DVB
+    QMap<QString,QString> startChan;
 };
 
 #endif // _SCANWIZARDSCANNER_H_

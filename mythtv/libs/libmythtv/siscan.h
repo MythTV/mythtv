@@ -51,10 +51,10 @@ class SIScan : public QObject
     void StartScanner(void);
     void StopScanner(void);
 
-    bool ScanTransports(int SourceID,
-                        const QString std,
-                        const QString modulation,
-                        const QString country);
+    bool ScanTransports(
+        int src, const QString std, const QString mod, const QString country);
+    bool ScanTransportsStartingOn(
+        int sourceid, const QMap<QString,QString> &valueMap);
     bool ScanTransport(int mplexid);
 
     bool ScanServicesSourceID(int SourceID);

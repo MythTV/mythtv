@@ -743,6 +743,81 @@ bool SIScan::ScanTransports(int SourceID,
     return true;
 }
 
+/** \fn SIScan::ScanTransportsStartingOn(int,const QMap<QString,QString>&)
+ *  \brief Generates a list of frequencies to scan and adds it to the
+ *   scanTransport list, and then sets the scanMode to TRANSPORT_LIST.
+ */
+bool SIScan::ScanTransportsStartingOn(int sourceid,
+                                      const QMap<QString,QString> &startChan)
+{
+    QMap<QString,QString>::const_iterator it;
+
+    if (startChan.find("std")        == startChan.end() ||
+        startChan.find("modulation") == startChan.end())
+    {
+        return false;
+    }
+
+    QString std    = *startChan.find("std");
+    QString mod    = *startChan.find("modulation");
+    QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
+    QString name   = "";
+    bool    ok     = false;
+
+    if (scanMode == TRANSPORT_LIST)
+        return false;
+
+    scanTransports.clear();
+    nextIt = scanTransports.end();
+
+#ifdef USING_DVB
+    DVBTuning tuning;
+    bzero(&tuning, sizeof(DVBTuning));
+    if (std == "dvb" && mod == "ofdm")
+    {
+        ok = tuning.parseOFDM(
+            startChan["frequency"],   startChan["inversion"],
+            startChan["bandwidth"],   startChan["coderate_hp"],
+            startChan["coderate_lp"], startChan["constellation"],
+            startChan["trans_mode"],  startChan["guard_interval"],
+            startChan["hierarchy"]);
+    }
+    if (std == "dvb" && mod == "qpsk")
+    {
+        ok = tuning.parseQPSK(
+            startChan["frequency"],   startChan["inversion"],
+            startChan["symbolrate"],  startChan["fec"],
+            startChan["polarity"],
+            startChan["diseqc_type"], startChan["diseqc_port"],
+            startChan["diseqc_pos"],  startChan["lnb_lof_switch"],
+            startChan["lnb_lof_hi"],  startChan["lnb_lof_lo"]);
+    }
+    else if (std == "dvb" && mod.left(3) == "qam")
+    {
+        ok = tuning.parseQAM(
+            startChan["frequency"],   startChan["inversion"],
+            startChan["symbolrate"],  startChan["fec"],
+            startChan["modulation"]);
+    }
+#endif // USING_DVB
+
+    if (!ok)
+        return false;
+
+    scanTransports += TransportScanItem(
+        sourceid, si_std, tr("Frequency %1").arg(startChan["frequency"]),
+        tuning, signalTimeout);
+
+    timer.start();
+    waitingForTables = false;
+
+    nextIt            = scanTransports.begin();
+    transportsScanned = 0;
+    scanMode          = TRANSPORT_LIST;
+
+    return true;
+}
+
 bool SIScan::ScanTransport(int mplexid)
 {
     scanTransports.clear();

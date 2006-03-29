@@ -39,6 +39,22 @@ TransportScanItem::TransportScanItem(int sourceid,
 #endif
 }
 
+#ifdef USING_DVB
+TransportScanItem::TransportScanItem(int            _sourceid,
+                                     const QString &_std,
+                                     const QString &_name,
+                                     DVBTuning     &_tuning,
+                                     uint           _timeoutTune)
+    : mplexid(-1),         standard(_std),
+      FriendlyName(_name), friendlyNum(0),
+      SourceID(_sourceid), UseTimer(false),
+      scanning(false),     timeoutTune(_timeoutTune)
+{
+    bzero(freq_offsets, sizeof(int) * 3);
+    tuning = _tuning;
+}
+#endif // USING_DVB
+
 TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &std,
                                      const QString &fn,
