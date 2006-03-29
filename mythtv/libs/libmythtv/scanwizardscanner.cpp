@@ -662,6 +662,16 @@ void ScanWizardScanner::HandleTuneComplete(void)
             query.exec();
         }
         scanner->SetRenameChannels(parent->paneATSC->DoRenameChannels());
+
+        // HACK HACK HACK -- begin
+        // if using QAM we may need additional time... (at least with HD-3000)
+        if ((mod.left(3).lower() == "qam") &&
+            (scanner->GetSignalTimeout() < 1000))
+        {
+            scanner->SetSignalTimeout(1000);
+        }
+        // HACK HACK HACK -- end
+
         ok = scanner->ScanTransports(nVideoSource, std, mod, country);
     }
     else if ((nScanType == ScanTypeSetting::NITAddScan_OFDM) ||

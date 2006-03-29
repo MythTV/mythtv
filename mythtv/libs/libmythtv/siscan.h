@@ -66,6 +66,11 @@ class SIScan : public QObject
     void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
     void SetRenameChannels(bool _r)   { renameChannels          = _r; }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
+    void SetSignalTimeout(uint val)    { signalTimeout = val; }
+    void SetChannelTimeout(uint val)   { channelTimeout = val; }
+
+    uint GetSignalTimeout(void)  const { return signalTimeout; }
+    uint GetChannelTimeout(void) const { return channelTimeout; }
 
     SignalMonitor    *GetSignalMonitor(void) { return signalMonitor; }
     DTVSignalMonitor *GetDTVSignalMonitor(void);

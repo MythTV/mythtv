@@ -2017,7 +2017,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         case CardUtil::QAM:
             cardtype->setValue("DVB-C");
             cardname->setValue(frontend_name);
-            signal_timeout->setValue(500);
+            signal_timeout->setValue(1000);
             channel_timeout->setValue(3000);
             break;
         case CardUtil::OFDM:
