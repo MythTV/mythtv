@@ -50,40 +50,40 @@ static uint get_dtv_multiplex(
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(qstr);
 
-    query.bindValue(":SOURCEID",           db_source_id);
-    query.bindValue(":FREQUENCY",          frequency);
-    query.bindValue(":SISTANDARD",         sistandard);
+    query.bindValue(":SOURCEID",          db_source_id);
+    query.bindValue(":FREQUENCY",         frequency);
+    query.bindValue(":SISTANDARD",        sistandard);
 
     if (modnl)
-        query.bindValue(":MODULATION",     modulation);
+        query.bindValue(":MODULATION",    modulation);
     if (transport_id > 0)
-        query.bindValue(":TRANSPORTID",    transport_id);
+        query.bindValue(":TRANSPORTID",   transport_id);
     if (network_id > 0)
-        query.bindValue(":NETWORKID",      network_id);
+        query.bindValue(":NETWORKID",     network_id);
 
     if (symbol_rate >= 0)
-        query.bindValue(":SYMBOLRATE",     symbol_rate);
+        query.bindValue(":SYMBOLRATE",    symbol_rate);
     if (bandwidth >= 0)
-        query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
+        query.bindValue(":BANDWIDTH",     QString("%1").arg((char)bandwidth));
     if (polarity >= 0)
-        query.bindValue(":POLARITY",       QString("%1").arg(polarity));
+        query.bindValue(":POLARITY",      QString("%1").arg((char)polarity));
     if (inversion >= 0)
-        query.bindValue(":INVERSION",      QString("%1").arg(inversion));
+        query.bindValue(":INVERSION",     QString("%1").arg((char)inversion));
     if (trans_mode >= 0)
-        query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
+        query.bindValue(":TRANS_MODE",    QString("%1").arg((char)trans_mode));
 
     if (ifecn)
-        query.bindValue(":INNER_FEC",      inner_FEC);
+        query.bindValue(":INNER_FEC",     inner_FEC);
     if (consn)
-        query.bindValue(":CONSTELLATION",  constellation);
+        query.bindValue(":CONSTELLATION", constellation);
     if (hierarchy >= 0)
-        query.bindValue(":HIERARCHY",      QString("%1").arg(hierarchy));
+        query.bindValue(":HIERARCHY",     QString("%1").arg((char)hierarchy));
     if (hpcrn)
-        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
+        query.bindValue(":HP_CODE_RATE",  hp_code_rate);
     if (lpcrn)
-        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
+        query.bindValue(":LP_CODE_RATE",  lp_code_rate);
     if (ginul)
-        query.bindValue(":GUARD_INTERVAL", guard_interval);
+        query.bindValue(":GUARD_INTERVAL",guard_interval);
 
     if (!query.exec() || !query.isActive())
     {
@@ -148,40 +148,40 @@ static uint insert_dtv_multiplex(
         "   :INNER_FEC,      :CONSTELLATION,    :HIERARCHY, "
         "   :HP_CODE_RATE,   :LP_CODE_RATE,     :GUARD_INTERVAL);");
 
-    query.bindValue(":SOURCEID",       db_source_id);
-    query.bindValue(":SISTANDARD",     sistandard);
-    query.bindValue(":FREQUENCY",      frequency);
+    query.bindValue(":SOURCEID",          db_source_id);
+    query.bindValue(":SISTANDARD",        sistandard);
+    query.bindValue(":FREQUENCY",         frequency);
 
     if (!modulation.isNull())
-        query.bindValue(":MODULATION",     modulation);
+        query.bindValue(":MODULATION",    modulation);
     if (transport_id > 0)
-        query.bindValue(":TRANSPORTID",    transport_id);
+        query.bindValue(":TRANSPORTID",   transport_id);
     if (network_id > 0)
-        query.bindValue(":NETWORKID",      network_id);
+        query.bindValue(":NETWORKID",     network_id);
 
     if (symbol_rate >= 0)
-        query.bindValue(":SYMBOLRATE",     symbol_rate);
+        query.bindValue(":SYMBOLRATE",    symbol_rate);
     if (bandwidth >= 0)
-        query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
+        query.bindValue(":BANDWIDTH",     QString("%1").arg((char)bandwidth));
     if (polarity >= 0)
-        query.bindValue(":POLARITY",       QString("%1").arg(polarity));
+        query.bindValue(":POLARITY",      QString("%1").arg((char)polarity));
     if (inversion >= 0)
-        query.bindValue(":INVERSION",      QString("%1").arg(inversion));
+        query.bindValue(":INVERSION",     QString("%1").arg((char)inversion));
     if (trans_mode >= 0)
-        query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
+        query.bindValue(":TRANS_MODE",    QString("%1").arg((char)trans_mode));
 
     if (!inner_FEC.isNull())
-        query.bindValue(":INNER_FEC",      inner_FEC);
+        query.bindValue(":INNER_FEC",     inner_FEC);
     if (!constellation.isNull())
-        query.bindValue(":CONSTELLATION",  constellation);
+        query.bindValue(":CONSTELLATION", constellation);
     if (hierarchy >= 0)
-        query.bindValue(":HIERARCHY",      QString("%1").arg(hierarchy));
+        query.bindValue(":HIERARCHY",     QString("%1").arg((char)hierarchy));
     if (!hp_code_rate.isNull())
-        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
+        query.bindValue(":HP_CODE_RATE",  hp_code_rate);
     if (!lp_code_rate.isNull())
-        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
+        query.bindValue(":LP_CODE_RATE",  lp_code_rate);
     if (!guard_interval.isNull())
-        query.bindValue(":GUARD_INTERVAL", guard_interval);
+        query.bindValue(":GUARD_INTERVAL",guard_interval);
 
     if (!query.exec() || !query.isActive())
     {
