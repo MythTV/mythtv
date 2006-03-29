@@ -799,14 +799,17 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
             startChan["symbolrate"],  startChan["fec"],
             startChan["modulation"]);
     }
+
+    if (ok)
+    {
+        scanTransports += TransportScanItem(
+            sourceid, si_std, tr("Frequency %1").arg(startChan["frequency"]),
+            tuning, signalTimeout);
+    }
 #endif // USING_DVB
 
     if (!ok)
         return false;
-
-    scanTransports += TransportScanItem(
-        sourceid, si_std, tr("Frequency %1").arg(startChan["frequency"]),
-        tuning, signalTimeout);
 
     timer.start();
     waitingForTables = false;
