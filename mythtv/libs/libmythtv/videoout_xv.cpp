@@ -726,7 +726,7 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
         }
     }
     if (port == -1)
-        VERBOSE(VB_PLAYBACK, LOC + "No suitible XVideo port found");
+        VERBOSE(VB_PLAYBACK, LOC + "No suitable XVideo port found");
 
     // free list of Xv ports
     if (ai)
