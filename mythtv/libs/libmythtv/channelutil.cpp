@@ -6,6 +6,102 @@
 #include "mythdbcon.h"
 #include "dvbtables.h"
 
+static bool exists_dtv_multiplex(int db_source_id, QString sistandard,
+                                 uint frequency,   QString modulation,
+                                 // DVB specific
+                                 int transport_id,      int network_id,
+                                 bool set_odfm_info,
+                                 int symbol_rate,       char bandwidth,
+                                 char polarity,         char inversion,
+                                 char trans_mode,
+                                 QString inner_FEC,     QString constellation,
+                                 char hierarchy,        QString hp_code_rate,
+                                 QString lp_code_rate,  QString guard_interval)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString qstr = 
+        "SELECT mplexid "
+        "FROM dtv_multiplex "
+        "WHERE sourceid    = :SOURCEID ";
+    query.prepare(
+        qstr +
+        QString((transport_id > 0) ? " AND transportid = :TRANSPORTID " : "") +
+        QString((network_id   > 0) ? " AND networkid   = :NETWORKID   " : ""));
+
+    query.bindValue(":SOURCEID", db_source_id);
+    if (network_id > 0)
+        query.bindValue(":NETWORKID", network_id);
+    if (transport_id > 0)
+        query.bindValue(":TRANSPORTID", transport_id);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("check_for_matching_dtv_multiplex 1", query);
+        return false;
+    }
+
+    if (!query.size())
+        return false;
+
+    query.prepare(
+        qstr +
+        QString((transport_id > 0) ? " AND transportid = :TRANSPORTID " : "") +
+        QString((network_id   > 0) ? " AND networkid   = :NETWORKID   " : "") +
+        QString(" AND frequency  = :FREQUENCY  ") +
+        QString(!modulation.isNull()?" AND modulation  = :MODULATION  " : "") +
+        QString(" AND sistandard = :SISTANDARD ") +
+
+        QString((symbol_rate >= 0) ? " AND symbolrate  = :SYMBOLRATE  " : "") +
+        QString((polarity    >= 0) ? " AND polarity    = :POLARITY    " : "") +
+        QString(!inner_FEC.isNull()? " AND fec         = :FEC         " : "") +
+        QString((set_odfm_info) ?
+                " AND inversion         = :INVERSION      "
+                " AND bandwidth         = :BANDWIDTH      "
+                " AND hp_code_rate      = :HP_CODE_RATE   "
+                " AND lp_code_rate      = :LP_CODE_RATE   "
+                " AND constellation     = :CONSTELLATION  "
+                " AND transmission_mode = :TRANS_MODE     "
+                " AND guard_interval    = :GUARD_INTERVAL "
+                " AND hierarchy         = :HIERARCHY      " : ""));
+
+    query.bindValue(":SOURCEID",           db_source_id);
+    if (transport_id > 0)
+        query.bindValue(":TRANSPORTID",    transport_id);
+    if (network_id > 0)
+        query.bindValue(":NETWORKID",      network_id);
+    query.bindValue(":FREQUENCY",          frequency);
+    if (!modulation.isNull())
+        query.bindValue(":MODULATION",     modulation);
+    query.bindValue(":SISTANDARD",         sistandard);
+
+    if (symbol_rate >= 0)
+        query.bindValue(":SYMBOLRATE",     symbol_rate);
+    if (polarity >= 0)
+        query.bindValue(":POLARITY",       QString("%1").arg(polarity));
+    if (!inner_FEC.isNull())
+        query.bindValue(":FEC",            inner_FEC);
+
+    if (set_odfm_info)
+    {
+        query.bindValue(":INVERSION",      QString("%1").arg(inversion));
+        query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
+        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
+        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
+        query.bindValue(":CONSTELLATION",  constellation);
+        query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
+        query.bindValue(":GUARD_INTERVAL", guard_interval);
+        query.bindValue(":HIERARCHY",      QString("%1").arg(hierarchy));
+    }
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("check_for_matching_dtv_multiplex 2", query);
+        return false;
+    }
+
+    return query.size();
+}
+
 static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
                                  uint frequency,   QString modulation,
                                  // DVB specific
@@ -19,7 +115,26 @@ static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
                                  QString lp_code_rate,  QString guard_interval)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    // If transport not present add it, and move on to the next
+
+    VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex(%1, %2, %3, %4...)")
+            .arg(db_source_id).arg(sistandard)
+            .arg(frequency).arg(modulation));
+
+    // If transport is already present, skip insert
+    if (exists_dtv_multiplex(
+            db_source_id,  sistandard,    frequency,      modulation,
+            // DVB specific
+            transport_id,  network_id,
+            set_odfm_info,
+            symbol_rate,   bandwidth,     polarity,
+            inversion,     trans_mode,
+            inner_FEC,     constellation, hierarchy,
+            hp_code_rate,  lp_code_rate,  guard_interval))
+    {
+        VERBOSE(VB_SIPARSER, "insert_dtv_multiplex -- already exists");
+        return true;
+    }
+
     query.prepare(
         "INSERT INTO dtv_multiplex "
         "  (transportid, networkid, frequency, symbolrate, "
