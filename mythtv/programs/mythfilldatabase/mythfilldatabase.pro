@@ -9,6 +9,9 @@ TARGET = mythfilldatabase
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
+INCLUDEPATH += ../../libs/libmyth ./../libs/libmythtv
+DEPENDPATH  += ../../libs/libmyth ./../libs/libmythtv
+
 QMAKE_CLEAN += $(TARGET)
 
 # Input

@@ -6,113 +6,108 @@
 #include "mythdbcon.h"
 #include "dvbtables.h"
 
-static bool exists_dtv_multiplex(int db_source_id, QString sistandard,
-                                 uint frequency,   QString modulation,
-                                 // DVB specific
-                                 int transport_id,      int network_id,
-                                 bool set_odfm_info,
-                                 int symbol_rate,       char bandwidth,
-                                 char polarity,         char inversion,
-                                 char trans_mode,
-                                 QString inner_FEC,     QString constellation,
-                                 char hierarchy,        QString hp_code_rate,
-                                 QString lp_code_rate,  QString guard_interval)
+static uint get_dtv_multiplex(
+    int         db_source_id,  QString     sistandard,
+    uint        frequency,     QString     modulation,
+    // DVB specific
+    int         transport_id,  int         network_id,
+    int         symbol_rate,   signed char bandwidth,
+    signed char polarity,      signed char inversion,
+    signed char trans_mode,
+    QString     inner_FEC,     QString      constellation,
+    signed char hierarchy,     QString      hp_code_rate,
+    QString     lp_code_rate,  QString      guard_interval)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    bool modnl = !modulation.isNull();
+    bool ifecn = !inner_FEC.isNull();
+    bool consn = !constellation.isNull();
+    bool hpcrn = !hp_code_rate.isNull();
+    bool lpcrn = !lp_code_rate.isNull();
+    bool ginul = !guard_interval.isNull();
+
     QString qstr = 
-        "SELECT mplexid "
-        "FROM dtv_multiplex "
-        "WHERE sourceid    = :SOURCEID ";
-    query.prepare(
-        qstr +
-        QString((transport_id > 0) ? " AND transportid = :TRANSPORTID " : "") +
-        QString((network_id   > 0) ? " AND networkid   = :NETWORKID   " : ""));
+        QString("SELECT mplexid "
+                "FROM dtv_multiplex "
+                "WHERE sourceid     = :SOURCEID   "
+                "  AND sistandard   = :SISTANDARD "
+                "  AND frequency    = :FREQUENCY  ") +
+        QString((modnl)            ? "AND modulation   = :MODULATION  " : "") +
+        QString((transport_id > 0) ? "AND transportid  = :TRANSPORTID " : "") +
+        QString((network_id   > 0) ? "AND networkid    = :NETWORKID   " : "") +
+        QString((symbol_rate >= 0) ? "AND symbolrate   = :SYMBOLRATE  " : "") +
+        QString((bandwidth   >= 0) ? "AND bandwidth    = :BANDWIDTH   " : "") +
+        QString((polarity    >= 0) ? "AND polarity     = :POLARITY    " : "") +
+        QString((inversion   >= 0) ? "AND inversion    = :INVERSION   " : "") +
+        QString((trans_mode  >= 0) ? "AND transmission_mode=:TRANS_MODE ":"") +
+        QString((ifecn)            ? "AND fec          = :INNER_FEC   " : "") +
+        QString((consn)            ? "AND constellation= :CONSTELLATION ":"") +
+        QString((hierarchy   >= 0) ? "AND hierarchy    = :HIERARCHY   " : "") +
+        QString((hpcrn)            ? "AND hp_code_rate = :HP_CODE_RATE ": "") +
+        QString((lpcrn)            ? "AND lp_code_rate = :LP_CODE_RATE ": "") +
+        QString((ginul)            ? "AND guard_interval=:GUARD_INTERVAL ":"");
 
-    query.bindValue(":SOURCEID", db_source_id);
-    if (network_id > 0)
-        query.bindValue(":NETWORKID", network_id);
-    if (transport_id > 0)
-        query.bindValue(":TRANSPORTID", transport_id);
 
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("check_for_matching_dtv_multiplex 1", query);
-        return false;
-    }
-
-    if (!query.size())
-        return false;
-
-    query.prepare(
-        qstr +
-        QString((transport_id > 0) ? " AND transportid = :TRANSPORTID " : "") +
-        QString((network_id   > 0) ? " AND networkid   = :NETWORKID   " : "") +
-        QString(" AND frequency  = :FREQUENCY  ") +
-        QString(!modulation.isNull()?" AND modulation  = :MODULATION  " : "") +
-        QString(" AND sistandard = :SISTANDARD ") +
-
-        QString((symbol_rate >= 0) ? " AND symbolrate  = :SYMBOLRATE  " : "") +
-        QString((polarity    >= 0) ? " AND polarity    = :POLARITY    " : "") +
-        QString(!inner_FEC.isNull()? " AND fec         = :FEC         " : "") +
-        QString((set_odfm_info) ?
-                " AND inversion         = :INVERSION      "
-                " AND bandwidth         = :BANDWIDTH      "
-                " AND hp_code_rate      = :HP_CODE_RATE   "
-                " AND lp_code_rate      = :LP_CODE_RATE   "
-                " AND constellation     = :CONSTELLATION  "
-                " AND transmission_mode = :TRANS_MODE     "
-                " AND guard_interval    = :GUARD_INTERVAL "
-                " AND hierarchy         = :HIERARCHY      " : ""));
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(qstr);
 
     query.bindValue(":SOURCEID",           db_source_id);
+    query.bindValue(":FREQUENCY",          frequency);
+    query.bindValue(":SISTANDARD",         sistandard);
+
+    if (modnl)
+        query.bindValue(":MODULATION",     modulation);
     if (transport_id > 0)
         query.bindValue(":TRANSPORTID",    transport_id);
     if (network_id > 0)
         query.bindValue(":NETWORKID",      network_id);
-    query.bindValue(":FREQUENCY",          frequency);
-    if (!modulation.isNull())
-        query.bindValue(":MODULATION",     modulation);
-    query.bindValue(":SISTANDARD",         sistandard);
 
     if (symbol_rate >= 0)
         query.bindValue(":SYMBOLRATE",     symbol_rate);
+    if (bandwidth >= 0)
+        query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
     if (polarity >= 0)
         query.bindValue(":POLARITY",       QString("%1").arg(polarity));
-    if (!inner_FEC.isNull())
-        query.bindValue(":FEC",            inner_FEC);
-
-    if (set_odfm_info)
-    {
+    if (inversion >= 0)
         query.bindValue(":INVERSION",      QString("%1").arg(inversion));
-        query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
-        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
-        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
-        query.bindValue(":CONSTELLATION",  constellation);
+    if (trans_mode >= 0)
         query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
-        query.bindValue(":GUARD_INTERVAL", guard_interval);
+
+    if (ifecn)
+        query.bindValue(":INNER_FEC",      inner_FEC);
+    if (consn)
+        query.bindValue(":CONSTELLATION",  constellation);
+    if (hierarchy >= 0)
         query.bindValue(":HIERARCHY",      QString("%1").arg(hierarchy));
-    }
+    if (hpcrn)
+        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
+    if (lpcrn)
+        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
+    if (ginul)
+        query.bindValue(":GUARD_INTERVAL", guard_interval);
 
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("check_for_matching_dtv_multiplex 2", query);
-        return false;
+        return 0;
     }
 
-    return query.size();
+    if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
 }
 
-static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
-                                 uint frequency,   QString modulation,
-                                 // DVB specific
-                                 int transport_id,      int network_id,
-                                 bool set_odfm_info,
-                                 int symbol_rate,       char bandwidth,
-                                 char polarity,         char inversion,
-                                 char trans_mode,
-                                 QString inner_FEC,     QString constellation,
-                                 char hierarchy,        QString hp_code_rate,
-                                 QString lp_code_rate,  QString guard_interval)
+static uint insert_dtv_multiplex(
+    int         db_source_id,  QString     sistandard,
+    uint        frequency,     QString     modulation,
+    // DVB specific
+    int         transport_id,  int         network_id,
+    int         symbol_rate,   signed char bandwidth,
+    signed char polarity,      signed char inversion,
+    signed char trans_mode,
+    QString     inner_FEC,     QString      constellation,
+    signed char hierarchy,     QString      hp_code_rate,
+    QString     lp_code_rate,  QString      guard_interval)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -121,153 +116,116 @@ static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
             .arg(frequency).arg(modulation));
 
     // If transport is already present, skip insert
-    if (exists_dtv_multiplex(
-            db_source_id,  sistandard,    frequency,      modulation,
-            // DVB specific
-            transport_id,  network_id,
-            set_odfm_info,
-            symbol_rate,   bandwidth,     polarity,
-            inversion,     trans_mode,
-            inner_FEC,     constellation, hierarchy,
-            hp_code_rate,  lp_code_rate,  guard_interval))
+    uint mplex = get_dtv_multiplex(
+        db_source_id,  sistandard,    frequency,      modulation,
+        // DVB specific
+        transport_id,  network_id,
+        symbol_rate,   bandwidth,     polarity,
+        inversion,     trans_mode,
+        inner_FEC,     constellation, hierarchy,
+        hp_code_rate,  lp_code_rate,  guard_interval);
+
+    if (mplex)
     {
-        VERBOSE(VB_SIPARSER, "insert_dtv_multiplex -- already exists");
-        return true;
+        VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex -- ") +
+                QString("already exists %1").arg(mplex));
+        return mplex;
     }
 
     query.prepare(
         "INSERT INTO dtv_multiplex "
-        "  (transportid, networkid, frequency, symbolrate, "
-        "   fec, polarity, modulation, constellation, bandwidth, "
-        "   hierarchy, hp_code_rate, lp_code_rate, guard_interval, "
-        "   transmission_mode, inversion, sourceid, sistandard) "
+        "  (sourceid,        sistandard,        frequency,  "
+        "   modulation,      transportid,       networkid,  "
+        "   symbolrate,      bandwidth,         polarity,   "
+        "   inversion,       transmission_mode,             "
+        "   fec,             constellation,     hierarchy,  "
+        "   hp_code_rate,    lp_code_rate,      guard_interval) "
         "VALUES "
-        "  (:TRANSPORTID, :NETWORKID, :FREQUENCY, :SYMBOLRATE, "
-        "   :FEC, :POLARITY, :MODULATION, :CONSTELLATION, :BANDWIDTH, "
-        "   :HIERARCHY, :HP_CODE_RATE, :LP_CODE_RATE, :GUARD_INTERVAL, "
-        "   :TRANS_MODE, :INVERSION, :SOURCEID, :SISTANDARD);");
+        "  (:SOURCEID,       :SISTANDARD,       :FREQUENCY, "
+        "   :MODULATION,     :TRANSPORTID,      :NETWORKID, "
+        "   :SYMBOLRATE,     :BANDWIDTH,        :POLARITY,  "
+        "   :INVERSION,      :TRANS_MODE,                   "
+        "   :INNER_FEC,      :CONSTELLATION,    :HIERARCHY, "
+        "   :HP_CODE_RATE,   :LP_CODE_RATE,     :GUARD_INTERVAL);");
 
     query.bindValue(":SOURCEID",       db_source_id);
-    if (transport_id > 0)
-        query.bindValue(":TRANSPORTID",transport_id);
-    if (network_id > 0)
-        query.bindValue(":NETWORKID",  network_id);
-    query.bindValue(":FREQUENCY",      frequency);
-    if (modulation != QString::null)
-        query.bindValue(":MODULATION", modulation);
     query.bindValue(":SISTANDARD",     sistandard);
+    query.bindValue(":FREQUENCY",      frequency);
+
+    if (!modulation.isNull())
+        query.bindValue(":MODULATION",     modulation);
+    if (transport_id > 0)
+        query.bindValue(":TRANSPORTID",    transport_id);
+    if (network_id > 0)
+        query.bindValue(":NETWORKID",      network_id);
 
     if (symbol_rate >= 0)
-        query.bindValue(":SYMBOLRATE", symbol_rate);
-    if (polarity >= 0)
-        query.bindValue(":POLARITY",   QString("%1").arg(polarity));
-    if (inner_FEC != QString::null)
-        query.bindValue(":FEC",        inner_FEC);
-
-    if (set_odfm_info)
-    {
-        query.bindValue(":INVERSION",      QString("%1").arg(inversion));
+        query.bindValue(":SYMBOLRATE",     symbol_rate);
+    if (bandwidth >= 0)
         query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
-        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
-        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
-        query.bindValue(":CONSTELLATION",  constellation);
+    if (polarity >= 0)
+        query.bindValue(":POLARITY",       QString("%1").arg(polarity));
+    if (inversion >= 0)
+        query.bindValue(":INVERSION",      QString("%1").arg(inversion));
+    if (trans_mode >= 0)
         query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
-        query.bindValue(":GUARD_INTERVAL", guard_interval);
+
+    if (!inner_FEC.isNull())
+        query.bindValue(":INNER_FEC",      inner_FEC);
+    if (!constellation.isNull())
+        query.bindValue(":CONSTELLATION",  constellation);
+    if (hierarchy >= 0)
         query.bindValue(":HIERARCHY",      QString("%1").arg(hierarchy));
-    }
+    if (!hp_code_rate.isNull())
+        query.bindValue(":HP_CODE_RATE",   hp_code_rate);
+    if (!lp_code_rate.isNull())
+        query.bindValue(":LP_CODE_RATE",   lp_code_rate);
+    if (!guard_interval.isNull())
+        query.bindValue(":GUARD_INTERVAL", guard_interval);
 
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("Adding transport to Database.", query);
-        return false;
+        return 0;
     }
 
-    return true;
+    mplex = get_dtv_multiplex(
+        db_source_id,  sistandard,    frequency,      modulation,
+        // DVB specific
+        transport_id,  network_id,
+        symbol_rate,   bandwidth,     polarity,
+        inversion,     trans_mode,
+        inner_FEC,     constellation, hierarchy,
+        hp_code_rate,  lp_code_rate,  guard_interval);
+
+    VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex -- ") +
+            QString("inserted %1").arg(mplex));
+
+    return mplex;
 }
 
-static int get_max_mplex_id()
-{
-    // Query for mplexid of new multiplex
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT max(mplexid) FROM dtv_multiplex;");
-
-    if (!query.exec() || !query.isActive() || !query.size())
-    {
-        MythContext::DBError("Getting multiplex ID of new Transport", query);
-        return -1;
-    }
-
-    query.next();
-    return query.value(0).toInt();
-}
-
-int ChannelUtil::CreateMultiplex(int sourceid,   const QString &sistandard,
-                                 uint frequency, const QString &modulation)
-{
-    insert_dtv_multiplex(
-        sourceid,                   sistandard,
-        frequency,                  modulation,
-        -1,                         -1,
-        false,
-        -1,                         -1,
-        -1,                         -1,
-        -1,
-        QString::null, QString::null,
-        -1,            QString::null,
-        QString::null, QString::null);
-    
-    return get_max_mplex_id();
-}
-
-int ChannelUtil::CreateMultiplex(int sourceid, const QString &sistandard,
-                                 uint freq,    const QString &modulation,
-                                 // DVB specific
-                                 int transport_id,      int network_id,
-                                 bool set_odfm_info,
-                                 int symbol_rate,       signed char bandwidth,
-                                 signed char polarity,  signed char inversion,
-                                 signed char trans_mode,
-                                 QString inner_FEC,     QString constellation,
-                                 signed char hierarchy, QString hp_code_rate,
-                                 QString lp_code_rate,  QString guard_interval)
-{
-    insert_dtv_multiplex(sourceid,           sistandard,
-                         freq,               modulation,
-                         // DVB specific
-                         transport_id,       network_id,
-                         set_odfm_info,
-                         symbol_rate,        bandwidth,
-                         polarity,           inversion,
-                         trans_mode,
-                         inner_FEC,          constellation,
-                         hierarchy,          hp_code_rate,
-                         lp_code_rate,       guard_interval);
-
-    return get_max_mplex_id();
-}
-
-void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
-                               uint sourceid, uint tsid, uint netid)
+void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
+                           uint sourceid, uint tsid, uint netid)
 {
     uint tag = desc.DescriptorTag();
 
     if (tag == DescriptorID::terrestrial_delivery_system)
     {
         const TerrestrialDeliverySystemDescriptor cd(desc);
-        int mux = ChannelUtil::CreateMultiplex(
+
+        uint mux = ChannelUtil::CreateMultiplex(
             sourceid,            "dvb",
             cd.FrequencyHz(),     QString::null,
             // DVB specific
             tsid,                 netid,
-            true,
             -1,                   QChar(cd.BandwidthString()[0]),
             -1,                   -1,
             QChar(cd.TransmissionModeString()[0]),
-            QString::null,        cd.ConstellationString(),
+            QString::null,                  cd.ConstellationString(),
             QChar(cd.HierarchyString()[0]), cd.CodeRateHPString(),
-            cd.CodeRateLPString(),cd.GuardIntervalString());
+            cd.CodeRateLPString(),          cd.GuardIntervalString());
 
-        if (mux >= 0)
+        if (mux)
             muxes.push_back(mux);
 
         /* unused
@@ -282,12 +240,12 @@ void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
     else if (tag == DescriptorID::satellite_delivery_system)
     {
         const SatelliteDeliverySystemDescriptor cd(desc);
-        int mux = ChannelUtil::CreateMultiplex(
+
+        uint mux = ChannelUtil::CreateMultiplex(
             sourceid,             "dvb",
             cd.FrequencyHz(),     cd.ModulationString(),
             // DVB specific
             tsid,                 netid,
-            false,
             cd.SymbolRateHz(),    -1,
             QChar(cd.PolarizationString()[0]), -1,
             -1,
@@ -295,7 +253,7 @@ void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
             -1,                   QString::null,
             QString::null,        QString::null);
 
-        if (mux >= 0)
+        if (mux)
             muxes.push_back(mux);
 
         /* unused
@@ -305,12 +263,12 @@ void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
     else if (tag == DescriptorID::cable_delivery_system)
     {
         const CableDeliverySystemDescriptor cd(desc);
-        int mux = ChannelUtil::CreateMultiplex(
+
+        uint mux = ChannelUtil::CreateMultiplex(
             sourceid,             "dvb",
             cd.FrequencyHz(),     cd.ModulationString(),
             // DVB specific
             tsid,                 netid,
-            false,
             cd.SymbolRateHz(),    -1,
             -1,                   -1,
             -1,
@@ -318,32 +276,65 @@ void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
             -1,                   QString::null,
             QString::null,        QString::null);
 
-        if (mux >= 0)
+        if (mux)
             muxes.push_back(mux);
     }
     else if (tag == DescriptorID::frequency_list)
     {
         const FrequencyListDescriptor cd(desc);
         //uint ct = cd.CodingType(); //nd,sat,cable,terra
-        for (uint i = 0; i<cd.FrequencyCount(); i++)
+        for (uint i = 0; i < cd.FrequencyCount(); i++)
         {
-            int mux = ChannelUtil::CreateMultiplex(
+            uint mux = ChannelUtil::CreateMultiplex(
                 sourceid,             "dvb",
                 cd.FrequencyHz(i),    QString::null/*modulation*/,
-                // DVB specific
-                tsid,                 netid,
-                false,
-                -1,                   -1,
-                -1,                   -1,
-                -1,
-                QString::null,        QString::null,
-                -1,                   QString::null,
-                QString::null,        QString::null);
+                tsid,                 netid);
 
-            if (mux >= 0)
+            if (mux)
                 muxes.push_back(mux);
         }
     }
+}
+
+uint ChannelUtil::CreateMultiplex(int  sourceid,     QString sistandard,
+                                  uint frequency,    QString modulation,
+                                  int  transport_id, int     network_id)
+{
+    return CreateMultiplex(
+        sourceid,           sistandard,
+        frequency,          modulation,
+        transport_id,       network_id,
+        -1,                 -1,
+        -1,                 -1,
+        -1,
+        QString::null,      QString::null,
+        -1,                 QString::null,
+        QString::null,      QString::null);
+}
+
+uint ChannelUtil::CreateMultiplex(
+    int         sourceid,     QString     sistandard,
+    uint        freq,         QString     modulation,
+    // DVB specific
+    int         transport_id, int         network_id,
+    int         symbol_rate,  signed char bandwidth,
+    signed char polarity,     signed char inversion,
+    signed char trans_mode,
+    QString     inner_FEC,    QString     constellation,
+    signed char hierarchy,    QString     hp_code_rate,
+    QString     lp_code_rate, QString     guard_interval)
+{
+    return insert_dtv_multiplex(
+        sourceid,           sistandard,
+        freq,               modulation,
+        // DVB specific
+        transport_id,       network_id,
+        symbol_rate,        bandwidth,
+        polarity,           inversion,
+        trans_mode,
+        inner_FEC,          constellation,
+        hierarchy,          hp_code_rate,
+        lp_code_rate,       guard_interval);
 }
 
 /** \fn ChannelUtil::CreateMultiplexes(int, const NetworkInformationTable*)
@@ -368,7 +359,7 @@ vector<uint> ChannelUtil::CreateMultiplexes(
         for (uint j = 0; j < list.size(); ++j)
         {
             const MPEGDescriptor desc(list[j]);
-            HandleTransportDescriptor(muxes, desc, sourceid, tsid, netid);
+            handle_transport_desc(muxes, desc, sourceid, tsid, netid);
         }
     }
     return muxes;

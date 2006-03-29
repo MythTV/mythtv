@@ -15,22 +15,25 @@ class ChannelUtil
 {
   public:
     // Multiplex Stuff
-    static int     CreateMultiplex(int sourceid, const QString &sistandard,
-                                   uint freq,    const QString &modulation);
-    static int     CreateMultiplex(int sourceid, const QString &sistandard,
-                                   uint freq,    const QString &modulation,
-                                   // DVB specific
-                                   int transport_id,     int network_id,
-                                   bool set_odfm_info,
-                                   int symbol_rate,       signed char bandwidth,
-                                   signed char polarity,  signed char inversion,
-                                   signed char trans_mode,
-                                   QString inner_FEC,     QString constellation,
-                                   signed char hierarchy, QString hp_code_rate,
-                                   QString lp_code_rate, QString guard_interval);
-    static vector<uint>
-                   CreateMultiplexes(int sourceid,
-                                     const NetworkInformationTable *nit);
+    static uint    CreateMultiplex(
+        int  sourceid,          QString sistandard,
+        uint freq,              QString modulation,
+        int  transport_id = -1, int     network_id = -1);
+
+    static uint    CreateMultiplex(
+        int         sourceid,     QString     sistandard,
+        uint        freq,         QString     modulation,
+        // DVB specific
+        int         transport_id, int         network_id,
+        int         symbol_rate,  signed char bandwidth,
+        signed char polarity,     signed char inversion,
+        signed char trans_mode,
+        QString     inner_FEC,    QString     constellation,
+        signed char hierarchy,    QString     hp_code_rate,
+        QString     lp_code_rate, QString     guard_interval);
+
+    static vector<uint> CreateMultiplexes(
+        int sourceid, const NetworkInformationTable *nit);
 
     static int     GetMplexID(uint sourceid,     uint frequency);
     static int     GetMplexID(uint sourceid,     uint frequency,

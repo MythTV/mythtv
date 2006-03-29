@@ -47,8 +47,6 @@
 #ifdef USE_SIPARSER
 static bool ignore_encrypted_services(int db_mplexid, QString videodevice);
 #endif
-static int  create_dtv_multiplex_ofdm(
-    const TransportScanItem& item, const DVBTuning& tuning);
 void delete_services(int db_mplexid, const ServiceDescriptionTable*);
 #endif // USING_DVB
 
@@ -1744,11 +1742,20 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
 
         // Write the best info we have to the DB
         if (FE_OFDM == GetDVBChannel()->GetCardType())
-            mplexid = create_dtv_multiplex_ofdm(*transport, tuning);
+            mplexid = ChannelUtil::CreateMultiplex(
+                (*transport).SourceID,      (*transport).standard,
+                tuning.Frequency(),         tuning.ModulationDB(),
+                -1,                         -1,
+                -1,                         tuning.BandwidthChar(),
+                -1,                         tuning.InversionChar(),
+                tuning.TransmissionModeChar(),
+                QString::null,              tuning.ConstellationDB(),
+                tuning.HierarchyChar(),     tuning.HPCodeRateString(),
+                tuning.LPCodeRateString(),  tuning.GuardIntervalString());
         else
             mplexid = ChannelUtil::CreateMultiplex(
-                (*transport).SourceID, (*transport).standard,
-                tuning.Frequency(), tuning.ModulationDB());
+                (*transport).SourceID,      (*transport).standard,
+                tuning.Frequency(),         tuning.ModulationDB());
     }
 #endif // USING_DVB
 
@@ -1844,21 +1851,3 @@ static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
     return true;
 }
 #endif // USE_SIPARSER
-
-#ifdef USING_DVB
-static int create_dtv_multiplex_ofdm(const TransportScanItem& item,
-                                     const DVBTuning& tuning)
-{
-    return ChannelUtil::CreateMultiplex(
-        item.SourceID,              item.standard,
-        tuning.Frequency(),         tuning.ModulationDB(),
-        -1,                         -1,
-        true,
-        -1,                         tuning.BandwidthChar(),
-        -1,                         tuning.InversionChar(),
-        tuning.TransmissionModeChar(),
-        QString::null,              tuning.ConstellationDB(),
-        tuning.HierarchyChar(),     tuning.HPCodeRateString(),
-        tuning.LPCodeRateString(),  tuning.GuardIntervalString());
-}
-#endif // USING_DVB

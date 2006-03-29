@@ -25,18 +25,21 @@
 #include <ctime>
 #include <cerrno>
 
-#include "libmyth/exitcodes.h"
-#include "libmyth/mythcontext.h"
-#include "libmythtv/scheduledrecording.h"
-#include "libmythtv/datadirect.h"
-#include "libmythtv/channelutil.h"
-#include "libmyth/mythdbcon.h"
-#include "libmythtv/programinfo.h"
-#include "libmythtv/frequencytables.h"
-#include "libmythtv/channelutil.h"
-#include "libmythtv/sourceutil.h"
-#include "libmythtv/remoteutil.h"
-#include "libmyth/util.h"
+// libmyth headers
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
+
+// libmythtv headers
+#include "scheduledrecording.h"
+#include "datadirect.h"
+#include "channelutil.h"
+#include "programinfo.h"
+#include "frequencytables.h"
+#include "channelutil.h"
+#include "sourceutil.h"
+#include "remoteutil.h"
 
 using namespace std;
 
