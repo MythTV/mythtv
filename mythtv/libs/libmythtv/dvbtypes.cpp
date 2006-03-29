@@ -638,10 +638,7 @@ bool DVBTuning::parseOFDM(const QString& frequency,   const QString& inversion,
 
     params.inversion = parseInversion(inversion, ok);
     if (!ok)
-    {
-        ERROR_TUNING("Invalid inversion, aborting.");
-        return false;
-    }
+        WARNING_TUNING("Invalid inversion, aborting, falling back to 'auto'.");
 
     p.bandwidth             = parseBandwidth(bandwidth,          ok);
     p.code_rate_HP          = parseCodeRate(coderate_hp,         ok);
@@ -671,10 +668,7 @@ bool DVBTuning::parseQPSK(const QString& frequency,   const QString& inversion,
 
     params.inversion = parseInversion(inversion, ok);
     if (!ok)
-    {
-        ERROR_TUNING("Invalid inversion, aborting.");
-        return false;
-    }
+        WARNING_TUNING("Invalid inversion, aborting, falling back to 'auto'");
 
     p.symbol_rate = symbol_rate.toInt();
     if (!p.symbol_rate)
@@ -722,10 +716,7 @@ bool DVBTuning::parseQAM(const QString& frequency, const QString& inversion,
 
     params.inversion = parseInversion(inversion, ok);
     if (!ok)
-    {
-        ERROR_TUNING("Invalid inversion, aborting.");
-        return false;
-    }
+        WARNING_TUNING("Invalid inversion, aborting, falling back to 'auto'");
 
     p.symbol_rate = symbol_rate.toInt();
     if (!p.symbol_rate)
