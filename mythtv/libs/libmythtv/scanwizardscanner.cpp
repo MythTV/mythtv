@@ -56,10 +56,6 @@
 #include "dvbconfparser.h"
 #endif
 
-#ifdef USE_SIPARSER
-#include "dvbsiparser.h"
-#endif // USE_SIPARSER
-
 #define LOC QString("SWizScan: ")
 #define LOC_ERR QString("SWizScan, Error: ")
 
@@ -228,13 +224,6 @@ void *ScanWizardScanner::SpawnTune(void *param)
 
     QApplication::postEvent(scanner, scanEvent);
     return NULL;
-}
-
-void ScanWizardScanner::TableLoaded()
-{
-#ifdef USE_SIPARSER
-    QApplication::postEvent(this, new ScannerEvent(ScannerEvent::TableLoaded));
-#endif // USE_SIPARSER
 }
 
 void ScanWizardScanner::serviceScanPctComplete(int pct)
@@ -631,13 +620,6 @@ void ScanWizardScanner::HandleTuneComplete(void)
     }
 
     scanner->StartScanner();
-#ifdef USE_SIPARSER
-    if (scanner->siparser)
-    {
-        connect(scanner->siparser, SIGNAL(TableLoaded()),
-                this, SLOT(TableLoaded()));
-    }
-#endif // USE_SIPARSER
 
     popupProgress->status(tr("Scanning"));
     popupProgress->progress( (TUNED_PCT * PROGRESS_MAX) / 100 );
@@ -681,7 +663,8 @@ void ScanWizardScanner::HandleTuneComplete(void)
     {
         VERBOSE(VB_SIPARSER, LOC + "ScanTransports()");
         scanner->SetRenameChannels(false);
-        ok = scanner->ScanTransports("dvb");
+        // TODO construct list and do scan
+        //ok = scanner->ScanTransports("dvb");
     }
     else if (nScanType == ScanTypeSetting::FullTransportScan)
     {

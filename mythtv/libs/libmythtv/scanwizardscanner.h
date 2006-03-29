@@ -78,8 +78,6 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void dvbSNR(const SignalMonitorValue&);
     void dvbSignalStrength(const SignalMonitorValue&);
 
-    void TableLoaded(void);
-
     void serviceScanPctComplete(int pct);
 
   protected:

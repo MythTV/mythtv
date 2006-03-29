@@ -14,17 +14,6 @@
 // MythTV includes
 #include "frequencytables.h"
 
-#ifdef USING_DVB
-//#define USE_SIPARSER
-#include "sitypes.h"
-#include "dvbtypes.h"
-#endif // USING_DVB
-
-#define SISCAN(args...) \
-    if (channel) VERBOSE(VB_SIPARSER, QString("SIScan(%1): ") \
-                         .arg(channel->GetDevice()) << args); \
-    else VERBOSE(VB_SIPARSER, QString("SIScan(u): ") << args);
-
 class MSqlQuery;
 class ChannelBase;
 class Channel;
@@ -66,10 +55,8 @@ class SIScan : public QObject
                         const QString std,
                         const QString modulation,
                         const QString country);
-    bool ScanTransports(const QString sistandard);
     bool ScanTransport(int mplexid);
 
-    bool ScanServices(void);
     bool ScanServicesSourceID(int SourceID);
 
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
@@ -83,11 +70,6 @@ class SIScan : public QObject
     SignalMonitor    *GetSignalMonitor(void) { return signalMonitor; }
     DTVSignalMonitor *GetDTVSignalMonitor(void);
     DVBSignalMonitor *GetDVBSignalMonitor(void);
-
-  public slots:
-    // Handler for complete tables
-    void TransportTableComplete();
-    void ServiceTableComplete();
 
   signals:
     // Values from 1-100 of scan completion
@@ -151,15 +133,7 @@ class SIScan : public QObject
 
     void OptimizeNITFrequencies(NetworkInformationTable *nit);
 
-    // old stuff
-    void verifyTransport(TransportScanItem& t);
-#ifdef USE_SIPARSER
-    void HandleSIParserEvents(void);
-    void CheckNIT(NITObject& NIT);
-    void UpdateTransportsInDB(NITObject NIT);
-    void UpdateServicesInDB(int tid_db, QMap_SDTObject SDT);
-    static void *SpawnSectionReader(void*);
-#endif // USE_SIPARSER
+    static QString loc(const SIScan*);
 
   private:
     // Set in constructor
@@ -189,18 +163,6 @@ class SIScan : public QObject
     transport_scan_items_it_t   current;
     transport_scan_items_it_t   nextIt;
     QMap<uint, uint>            dvbChanNums;
-
-#ifdef USE_SIPARSER
-    bool serviceListReady;
-    bool transportListReady;
-
-    QMap_SDTObject SDT;
-    NITObject NIT;
-    pthread_t siparser_thread;
-  public:
-    DVBSIParser* siparser;
-  private:
-#endif // USE_SIPARSER
 
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;
