@@ -234,20 +234,41 @@ namespace
         QMutex *m_mutex;
     };
 
-    template <typename HTYPE, typename CLEANF_RET = void>
+    template <typename HTYPE>
+    struct is_handle_null
+    {
+        bool operator()(HTYPE handle)
+        {
+            return handle == NULL;
+        }
+    };
+
+    template <typename HTYPE>
+    struct is_bad_stdio_handle
+    {
+        bool operator()(HTYPE handle)
+        {
+            return handle == -1;
+        }
+    };
+
+
+    template <typename HTYPE, typename CLEANF_RET = void,
+             typename handle_checker = is_handle_null<HTYPE> >
     class SmartHandle
     {
       private:
         typedef CLEANF_RET (*clean_fun_t)(HTYPE);
 
       public:
-        SmartHandle(HTYPE handle, clean_fun_t cleaner) : m_handle(handle), 
-                m_cleaner(cleaner)
+        SmartHandle(HTYPE handle, clean_fun_t cleaner) : m_handle(handle),
+                                                         m_cleaner(cleaner)
         {
         }
 
         ~SmartHandle() {
-            if (m_handle)
+            handle_checker hc;
+            if (!hc(m_handle))
             {
                 m_cleaner(m_handle);
             }
@@ -656,15 +677,17 @@ bool DVDISOCopyThread::copyFullDisc(void)
 
     sendLoggingEvent(QString("ISO DVD image copy to: %1").arg(ripfile.name()));
 
-    int file = open( dvd_device_location, O_RDONLY );
-    if(file == -1)
+    SmartHandle<int, int, is_bad_stdio_handle<int> > file(
+            open(dvd_device_location, O_RDONLY), close);
+    if(file.get() == -1)
     {
-        problem(QString("DVDISOCopyThread could not open dvd device: %1").arg(dvd_device_location));
+        problem(QString("DVDISOCopyThread could not open dvd device: %1")
+                .arg(dvd_device_location));
         return false;
     }
 
-    off_t dvd_size = lseek(file, 0, SEEK_END);
-    lseek(file, 0, SEEK_SET);
+    off_t dvd_size = lseek(file.get(), 0, SEEK_END);
+    lseek(file.get(), 0, SEEK_SET);
 
     const int buf_size = 1024 * 1024;
     unsigned char buffer[buf_size];
@@ -675,7 +698,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
 
     while( 1 )
     {
-        int bytes_read = read(file, buffer, buf_size);
+        int bytes_read = read(file.get(), buffer, buf_size);
         if(bytes_read == -1)
         {
             perror("read");
