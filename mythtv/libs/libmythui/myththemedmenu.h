@@ -27,8 +27,6 @@ class MythThemedMenu : public MythScreenType
     void ReloadExitKey(void);
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
     virtual bool keyPressEvent(QKeyEvent *e);
 
   private:

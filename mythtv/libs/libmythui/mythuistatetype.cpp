@@ -2,15 +2,12 @@
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
-#include "mythcontext.h"
-
-#define LOC QString("MythUIStateType: ")
-#define LOC_ERR QString("MythUIStateType, Error: ")
 
 MythUIStateType::MythUIStateType(MythUIType *parent, const char *name)
                 : MythUIType(parent, name)
 {
     m_CurrentState = NULL;
+    m_ShowEmpty = false;
 }
 
 MythUIStateType::~MythUIStateType()
@@ -19,16 +16,8 @@ MythUIStateType::~MythUIStateType()
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
-    if (m_ObjectsByName.contains(name))
+    if (m_ObjectsByName.contains(name) || !image)
         return false;
-
-    if (!image)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("AddImage() failed to add '%1'").arg(name));
-
-        return false;
-    }
 
     MythUIImage *imType = new MythUIImage(this, name);
     imType->SetImage(image);
@@ -53,7 +42,7 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 
 bool MythUIStateType::AddImage(StateType type, MythImage *image)
 {
-    if (m_ObjectsByState.contains((int)type))
+    if (m_ObjectsByState.contains((int)type) || !image)
         return false;
 
     MythUIImage *imType = new MythUIImage(this, "stateimage");
@@ -79,9 +68,6 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
 
 bool MythUIStateType::DisplayState(const QString &name)
 {
-    if (name.isEmpty())
-        return false;
-
     MythUIType *old = m_CurrentState;
 
     QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
@@ -92,10 +78,13 @@ bool MythUIStateType::DisplayState(const QString &name)
 
     if (m_CurrentState != old)
     {
-        if (m_CurrentState)
-            m_CurrentState->SetVisible(true);
-        if (old)
-            old->SetVisible(false);
+        if (m_ShowEmpty || m_CurrentState != NULL)
+        {
+            if (m_CurrentState)
+                m_CurrentState->SetVisible(true);
+            if (old)
+                old->SetVisible(false);
+        }
     }
 
     return (m_CurrentState != NULL);
@@ -113,10 +102,13 @@ bool MythUIStateType::DisplayState(StateType type)
 
     if (m_CurrentState != old)
     {
-        if (m_CurrentState)
-            m_CurrentState->SetVisible(true);
-        if (old)
-            old->SetVisible(false);
+        if (m_ShowEmpty || m_CurrentState != NULL)
+        {
+            if (m_CurrentState)
+                m_CurrentState->SetVisible(true);
+            if (old)
+                old->SetVisible(false);
+        }
     }
 
     return (m_CurrentState != NULL);

@@ -18,6 +18,8 @@ class MythUIStateType : public MythUIType
     MythUIStateType(MythUIType *parent, const char *name);
    ~MythUIStateType();
 
+    void SetShowEmpty(bool showempty) { m_ShowEmpty = showempty; }
+
     bool AddImage(const QString &name, MythImage *image);
     bool AddImage(StateType type, MythImage *image);
 
@@ -36,6 +38,8 @@ class MythUIStateType : public MythUIType
     QMap<int, MythUIType *> m_ObjectsByState;
 
     MythUIType *m_CurrentState;
+
+    bool m_ShowEmpty;
 };
 
 #endif

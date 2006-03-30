@@ -49,8 +49,8 @@ class ThemedButton : public MythUIType
   public:
     ThemedButton(MythUIType *parent, const char *name)
         : MythUIType(parent, name),
-          background(NULL), icon(NULL), text(NULL), buttonicon(NULL),
-          message(QString::null), row(0), col(0), status(0)
+          background(NULL), icon(NULL), text(NULL),
+          row(0), col(0)
     {
     }
 
@@ -64,23 +64,20 @@ class ThemedButton : public MythUIType
             background->DisplayState(state);
         if (icon)
             icon->DisplayState(state);
-//        if (text)
-//            icon->DisplayState(state);
+        if (text)
+            text->DisplayState(state);
     }
 
     MythUIStateType *background;
     MythUIStateType *icon;
     MythUIStateType *text;
 
-    ButtonIcon *buttonicon;
-
     QStringList action;
     QString message;
+    QString type;
 
     int row;
     int col;
-
-    int status;
 };
 
 struct MenuRow
@@ -1630,14 +1627,16 @@ void MythThemedMenuPrivate::SetupUITypes(void)
 
     watermark = new MythUIStateType(parent, "menu watermarks");
     watermark->SetArea(m_state->watermarkRect);
+    watermark->SetShowEmpty(true);
     QMap<QString, ButtonIcon>::Iterator it = m_state->allButtonIcons.begin();
     for (; it != m_state->allButtonIcons.end(); ++it)
     {
-        ButtonIcon *icon = &(it.data()); 
-        watermark->AddImage(icon->name, icon->watermark);
+        ButtonIcon *icon = &(it.data());
+        if (icon->watermark)
+            watermark->AddImage(icon->name, icon->watermark);
     }
 
-    watermark->DisplayState(activebutton->buttonicon->name);
+    watermark->DisplayState(activebutton->type);
 
     uparrow = new MythUIImage(parent, "menu up arrow");
     if (m_state->uparrow)
@@ -1691,35 +1690,35 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
 {
     ThemedButton *newbutton = new ThemedButton(parent, type.ascii());
 
-    newbutton->buttonicon = m_state->getButtonIcon(type);
+    newbutton->type = type;
     newbutton->action = action;
     newbutton->message = text;
-    newbutton->status = -1;
 
     newbutton->background = new MythUIStateType(newbutton, "button background");
     if (m_state->buttonnormal)
-        newbutton->background->AddImage(MythUIStateType::Off, 
+        newbutton->background->AddImage(MythUIStateType::None, 
                                         m_state->buttonnormal);
     if (m_state->buttonactive)
         newbutton->background->AddImage(MythUIStateType::Full, 
                                         m_state->buttonactive);
-    newbutton->background->DisplayState(MythUIStateType::Off);
+    newbutton->background->DisplayState(MythUIStateType::None);
 
     newbutton->SetArea(QRect(0, 0, m_state->buttonnormal->width(),
                              m_state->buttonnormal->height()));
 
     newbutton->icon = NULL;
-    if (newbutton->buttonicon)
+    ButtonIcon *buttonicon = m_state->getButtonIcon(type);
+    if (buttonicon)
     {
         newbutton->icon = new MythUIStateType(newbutton, "button icon");
-        newbutton->icon->SetPosition(newbutton->buttonicon->offset);
-        if (newbutton->buttonicon->icon)
-            newbutton->icon->AddImage(MythUIStateType::Off,
-                                      newbutton->buttonicon->icon);
-        if (newbutton->buttonicon->activeicon)
+        newbutton->icon->SetPosition(buttonicon->offset);
+        if (buttonicon->icon)
+            newbutton->icon->AddImage(MythUIStateType::None,
+                                      buttonicon->icon);
+        if (buttonicon->activeicon)
             newbutton->icon->AddImage(MythUIStateType::Full,
-                                      newbutton->buttonicon->activeicon);
-        newbutton->icon->DisplayState(MythUIStateType::Off);
+                                      buttonicon->activeicon);
+        newbutton->icon->DisplayState(MythUIStateType::None);
     }
 
     newbutton->text = new MythUIStateType(newbutton, "button text state");
@@ -1741,7 +1740,8 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
         MythUIText *txt = new MythUIText(msg, m_state->normalAttributes.font,
                                          buttonTextRect, buttonTextRect,
                                          newbutton, "button normal text");
-        newbutton->text->AddObject(MythUIStateType::Off, txt);
+        txt->SetJustification(m_state->normalAttributes.textflags);
+        newbutton->text->AddObject(MythUIStateType::None, txt);
     }
     {
         QString msg = text;
@@ -1761,9 +1761,10 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
         MythUIText *txt = new MythUIText(msg, m_state->activeAttributes.font,
                                          buttonTextRect, buttonTextRect,
                                          newbutton, "button normal text");
+        txt->SetJustification(m_state->activeAttributes.textflags);
         newbutton->text->AddObject(MythUIStateType::Full, txt);
     }
-    newbutton->text->DisplayState(MythUIStateType::Off);
+    newbutton->text->DisplayState(MythUIStateType::None);
 
     newbutton->SetVisible(false);
 
@@ -1989,6 +1990,8 @@ bool MythThemedMenuPrivate::ReloadTheme(void)
     parent->ReloadExitKey();
  
     m_state->Reset();
+
+    parent->DeleteAllChildren();
  
     QString themedir = gContext->GetThemeDir();
     bool ok = m_state->parseSettings(themedir, "theme.xml");
@@ -2144,8 +2147,7 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     }
 
     activebutton = buttonRows[currentrow].buttons[currentcolumn];
-    if (activebutton && activebutton->buttonicon)
-        watermark->DisplayState(activebutton->buttonicon->name);
+    watermark->DisplayState(activebutton->type);
 
     if (lastbutton != activebutton && lastbutton && activebutton)
     {
@@ -2446,11 +2448,6 @@ void MythThemedMenu::ReloadExitKey(void)
         d->exitModifier = 0;
     else
         d->exitModifier = -1;
-}
-
-void MythThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
-                              int alphaMod, QRect clipRect)
-{
 }
 
 void MythThemedMenu::ReloadTheme(void)

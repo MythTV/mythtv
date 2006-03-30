@@ -60,6 +60,17 @@ QValueVector<MythUIType *> *MythUIType::GetAllChildren(void)
     return &m_ChildrenList;
 }
 
+void MythUIType::DeleteAllChildren(void)
+{
+    QValueVector<MythUIType*>::iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        (*it)->deleteLater();
+    }
+
+    m_ChildrenList.clear();
+}
+
 MythUIType *MythUIType::GetChildAt(const QPoint &p)
 {
     if (GetArea().contains(p)) 

@@ -27,6 +27,8 @@ class MythUIType : public QObject
     MythUIType *GetChildAt(const QPoint &p);
     QValueVector<MythUIType *> *GetAllChildren(void);
 
+    void DeleteAllChildren(void);
+
     // Check set dirty status
     bool NeedsRedraw(void);
     void SetRedraw();

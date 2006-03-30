@@ -1132,6 +1132,14 @@ int main(int argc, char **argv)
 
     do
     {
+        themename = gContext->GetSetting("Theme", "blue");
+        themedir = gContext->FindThemeDir(themename);
+        if (themedir == "")
+        {
+            cerr << "Couldn't find theme " << themename << endl;
+            return FRONTEND_EXIT_NO_THEME;
+        }
+
         if (!RunMenu(themedir))
             break;
 
