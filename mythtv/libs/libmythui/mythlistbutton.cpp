@@ -53,8 +53,13 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
 }
 
 MythListButton::~MythListButton()
-{    
-    Reset();
+{
+    m_clearing = true;
+    MythListButtonItem* item = 0;
+    for (item = m_itemList.first(); item; item = m_itemList.next())
+        delete item;
+    m_itemList.clear();
+
     delete m_topIterator;
     delete m_selIterator;
 

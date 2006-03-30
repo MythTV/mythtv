@@ -36,6 +36,7 @@ class MythQtPainter : public MythPainter
     QPainter *painter;
     QPainter *mainPainter;
     QPixmap *drawPixmap;
+    QRegion clipRegion;
 };
 
 #endif

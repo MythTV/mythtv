@@ -364,7 +364,7 @@ void MythMainWindow::drawTimeout(void)
         MythScreenType *top = (*it)->GetTopScreen();
         if (top && top->NeedsRedraw())
         {
-            QRect topDirty = top->GetDirtyArea();
+            QRegion topDirty = top->GetDirtyArea();
             d->repaintRegion = d->repaintRegion.unite(topDirty);
             redraw = true;
         }
@@ -380,24 +380,33 @@ void MythMainWindow::drawTimeout(void)
 
     d->painter->Begin(this);
 
-    d->painter->SetClipRect(d->repaintRegion.boundingRect());
+    QMemArray<QRect> rects = d->repaintRegion.rects();
 
-    for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+    for (unsigned int i = 0; i < rects.size(); i++)
     {
-        QValueVector<MythScreenType *> redrawList;
-        (*it)->GetDrawOrder(redrawList);
+        if (rects[i].width() == 0 || rects[i].height() == 0)
+            continue;
 
-        QValueVector<MythScreenType *>::Iterator screenit;
-        for (screenit = redrawList.begin(); screenit != redrawList.end(); 
-             ++screenit)
+        if (rects[i] != d->screenRect)
+            d->painter->SetClipRect(rects[i]);
+
+        for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
         {
-            (*screenit)->Draw(d->painter, 0, 0, 255, d->repaintRegion.boundingRect());
+            QValueVector<MythScreenType *> redrawList;
+            (*it)->GetDrawOrder(redrawList);
+
+            QValueVector<MythScreenType *>::Iterator screenit;
+            for (screenit = redrawList.begin(); screenit != redrawList.end(); 
+                 ++screenit)
+            {
+                (*screenit)->Draw(d->painter, 0, 0, 255, rects[i]);
+            }
         }
     }
 
     d->painter->End();
     
-    d->repaintRegion = QRegion(QRect(0,0,0,0));
+    d->repaintRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)

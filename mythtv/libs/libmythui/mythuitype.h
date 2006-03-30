@@ -48,7 +48,7 @@ class MythUIType : public QObject
     virtual void SetArea(const QRect &rect);
     virtual QRect GetArea(void) const;
 
-    virtual QRect GetDirtyArea(void) const;
+    virtual QRegion GetDirtyArea(void) const;
 
     QString cutDown(const QString &data, QFont *font,
                     bool multiline = false, int overload_width = -1,
@@ -65,8 +65,6 @@ class MythUIType : public QObject
     int GetAlpha(void);
 
     virtual bool keyPressEvent(QKeyEvent *);
-    void setDebug(bool y_or_n){ m_debug_mode = y_or_n; }
-    void setDebugColor(QColor c);
 
   protected:
     virtual void customEvent(QCustomEvent *);
@@ -97,7 +95,6 @@ class MythUIType : public QObject
     void AddFocusableChildrenToList(QPtrList<MythUIType> &focusList);
     void HandleAlphaPulse();
     void HandleMovementPulse();
-    void makeDebugImages();
 
     int CalcAlpha(int alphamod);
 
@@ -116,7 +113,7 @@ class MythUIType : public QObject
 
     QRect m_Area;
 
-    QRect m_DirtyRect;
+    QRegion m_DirtyRegion;
     bool m_NeedsRedraw;
 
     int m_Alpha;
@@ -130,11 +127,6 @@ class MythUIType : public QObject
     QPoint m_XYSpeed;
 
     MythUIType *m_Parent;
-
-    bool        m_debug_mode;
-    MythImage  *m_debug_hor_line;
-    MythImage  *m_debug_ver_line;
-    QColor      m_debug_color;
 };
 
 #endif

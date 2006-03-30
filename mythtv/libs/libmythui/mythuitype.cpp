@@ -29,34 +29,12 @@ MythUIType::MythUIType(QObject *parent, const char *name)
         if (m_Parent)
             m_Parent->AddChild(this);
     }
-    
-    //
-    //  Optional elements that draw a frame around any MythUIType if user sets
-    //  debug true in the xml
-    //
 
-    m_debug_mode = false;
-    m_debug_hor_line = NULL;
-    m_debug_ver_line = NULL;
-    m_debug_color = QColor(0,0,255);    // blue by default
+    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
 }
 
 MythUIType::~MythUIType()
 {
-    //
-    //  delete debugging images if they exist
-    //
-    
-    if (m_debug_hor_line)
-    {
-        m_debug_hor_line->DownRef();
-        m_debug_hor_line = NULL;
-    }
-    if (m_debug_ver_line)
-    {
-        m_debug_ver_line->DownRef();
-        m_debug_ver_line = NULL;
-    }
 }
 
 void MythUIType::AddChild(MythUIType *child)
@@ -112,28 +90,29 @@ bool MythUIType::NeedsRedraw(void)
 
 void MythUIType::SetRedraw(void)
 {
+    if (m_Area.width() == 0 || m_Area.height() == 0)
+        return;
+
     m_NeedsRedraw = true;
-    m_DirtyRect = m_Area;
+    m_DirtyRegion = QRegion(m_Area);
     if (m_Parent)
         m_Parent->SetChildNeedsRedraw(this);
 }
 
 void MythUIType::SetChildNeedsRedraw(MythUIType *child)
 {
+    QRegion childRegion = child->GetDirtyArea();
+    if (childRegion.isEmpty())
+        return;
+
+    childRegion.translate(m_Area.x(), m_Area.y());
+
     m_NeedsRedraw = true;
 
-    QRect childRect = child->GetDirtyArea();
-    childRect.moveBy(m_Area.x(), m_Area.y());
-
-    if (m_DirtyRect != QRect())
-        m_DirtyRect = m_DirtyRect.unite(childRect);
+    if (m_DirtyRegion.isEmpty())
+        m_DirtyRegion = childRegion;
     else
-        m_DirtyRect = childRect;
-
-    // For poorly defined items
-    QSize aSize = m_Area.size();
-    aSize = aSize.expandedTo(m_DirtyRect.size());
-    m_Area.setSize(aSize);
+        m_DirtyRegion = m_DirtyRegion.unite(childRegion);
 
     if (m_Parent)
         m_Parent->SetChildNeedsRedraw(this);
@@ -229,26 +208,6 @@ int MythUIType::CalcAlpha(int alphamod)
     return (int)(m_Alpha * (alphamod / 255.0));
 }
 
-void MythUIType::setDebugColor(QColor c)
-{
-    m_debug_color = c;
-}
-
-void MythUIType::makeDebugImages()
-{
-    //
-    //  MythImage::FromQImage() deletes the QImage's
-    //
-
-    QImage *temp_image = new QImage(m_Area.width(), 1, 32);
-    temp_image->fill(m_debug_color.rgb());
-    m_debug_hor_line = MythImage::FromQImage(&temp_image);
-
-    temp_image = new QImage(1, m_Area.height(), 32);
-    temp_image->fill(m_debug_color.rgb());
-    m_debug_ver_line = MythImage::FromQImage(&temp_image);
-}
-
 void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 {
 }
@@ -256,10 +215,11 @@ void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
                       QRect clipRect)
 {
+    m_NeedsRedraw = false;
+    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
+
     if (!m_Visible)
-    {
         return;
-    }
 
     QRect realArea = m_Area;
     realArea.moveBy(xoffset, yoffset);
@@ -274,37 +234,6 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     {
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(), 
                     CalcAlpha(alphaMod), clipRect);
-    }
-
-    m_NeedsRedraw = false;
-    m_DirtyRect = QRect();
- 
-    //
-    //  If I'm in debugging mode, draw a frame at the edge of my area
-    //
-    
-    if (m_debug_mode && m_Area.width() > 0 && m_Area.height() > 0)
-    {
-        if (!m_debug_hor_line || !m_debug_ver_line)
-        {
-            makeDebugImages();
-        }
-        
-        //
-        //  This is slow, but is only called when debug is set in the xml
-        //
-
-        QRect area = QRect(m_Area.left() + xoffset, m_Area.top() + yoffset, 1, m_Area.height());
-        p->DrawImage(area, m_debug_ver_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
-
-        area = QRect(m_Area.right() + xoffset, m_Area.top() + yoffset, 1, m_Area.height());
-        p->DrawImage(area, m_debug_ver_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
-
-        area = QRect(m_Area.left() + xoffset, m_Area.top() + yoffset, m_Area.width(), 1);
-        p->DrawImage(area, m_debug_hor_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
-
-        area = QRect(m_Area.left() + xoffset, m_Area.bottom() + yoffset, m_Area.width(), 1);
-        p->DrawImage(area, m_debug_hor_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
     }
 }
 
@@ -336,9 +265,9 @@ QRect MythUIType::GetArea(void) const
     return m_Area;
 }
 
-QRect MythUIType::GetDirtyArea(void) const
+QRegion MythUIType::GetDirtyArea(void) const
 {
-    return m_DirtyRect;
+    return m_DirtyRegion;
 }
 
 QString MythUIType::cutDown(const QString &data, QFont *font,
