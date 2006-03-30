@@ -75,8 +75,6 @@ void runMenu(QString which_menu)
         cerr << "Couldn't find theme " << themedir << endl;
         delete diag;
     }
-
-    delete diag;
 }
 
 extern "C" {
