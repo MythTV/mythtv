@@ -8,7 +8,6 @@
 #include <qmutex.h>
 
 class OSDType;
-class CCDecoder;
 
 class TeletextReader
 {

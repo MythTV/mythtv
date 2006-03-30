@@ -4,13 +4,13 @@ using namespace std;
 #include <qstringlist.h>
 
 #include "format.h"
-#include "ccdecoder.h"
+#include "cc608decoder.h"
 #include "mythcontext.h"
 #include "vbilut.h"
 
 #define DEBUG_XDS 0
 
-CCDecoder::CCDecoder(CCReader *ccr)
+CC608Decoder::CC608Decoder(CC608Reader *ccr)
     : reader(ccr),                  ignore_time_code(false),
       rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
       vps_l(0),
@@ -69,13 +69,13 @@ CCDecoder::CCDecoder(CCReader *ccr)
     bzero(xds_rating,   sizeof(xds_rating));
 }
 
-CCDecoder::~CCDecoder(void)
+CC608Decoder::~CC608Decoder(void)
 {
     if (rbuf)
         delete [] rbuf;
 }
 
-void CCDecoder::FormatCC(int tc, int code1, int code2)
+void CC608Decoder::FormatCC(int tc, int code1, int code2)
 {
     FormatCCField(tc, 0, code1);
     FormatCCField(tc, 1, code2);
@@ -110,7 +110,7 @@ static const QChar extendedchar3[] =
     'Å', 'å', 'Ø', 'ø', 0x250C, 0x2510, 0x2514, 0x2518 /* box drawing */
 };
 
-void CCDecoder::FormatCCField(int tc, int field, int data)
+void CC608Decoder::FormatCCField(int tc, int field, int data)
 {
     int b1, b2, len, x;
     int mode;
@@ -501,7 +501,7 @@ void CCDecoder::FormatCCField(int tc, int field, int data)
     lasttc[field] = tc;
 }
 
-int CCDecoder::FalseDup(int tc, int field, int data)
+int CC608Decoder::FalseDup(int tc, int field, int data)
 {
     int b1, b2;
 
@@ -564,7 +564,7 @@ int CCDecoder::FalseDup(int tc, int field, int data)
     return 0;
 }
 
-void CCDecoder::ResetCC(int mode)
+void CC608Decoder::ResetCC(int mode)
 {
 //    lastrow[mode] = 0;
 //    newrow[mode] = 0;
@@ -580,7 +580,7 @@ void CCDecoder::ResetCC(int mode)
     ccbuf[mode] = "";
 }
 
-void CCDecoder::BufferCC(int mode, int len, int clr)
+void CC608Decoder::BufferCC(int mode, int len, int clr)
 {
     QCString tmpbuf;
     if (len)
@@ -659,7 +659,7 @@ void CCDecoder::BufferCC(int mode, int len, int clr)
         lastclr[mode] = 0;
 }
 
-int CCDecoder::NewRowCC(int mode, int len)
+int CC608Decoder::NewRowCC(int mode, int len)
 {
     if (style[mode] == CC_STYLE_ROLLUP)
     {
@@ -798,7 +798,7 @@ void DumpPIL(int pil)
 #undef _PIL_
 }
 
-void CCDecoder::DecodeVPS(const unsigned char *buf)
+void CC608Decoder::DecodeVPS(const unsigned char *buf)
 {
     int cni, pcs, pty, pil;
 
@@ -838,7 +838,7 @@ void CCDecoder::DecodeVPS(const unsigned char *buf)
 // // // // // // // // // // //  WSS  // // // // // // // // // // //
 // // // // // // // // // // // // // // // // // // // // // // // //
 
-void CCDecoder::DecodeWSS(const unsigned char *buf)
+void CC608Decoder::DecodeWSS(const unsigned char *buf)
 {
     static const int wss_bits[8] = { 0, 0, 0, 1, 0, 1, 1, 1 };
     uint wss = 0;
@@ -878,7 +878,7 @@ void CCDecoder::DecodeWSS(const unsigned char *buf)
     }
 }
 
-QString CCDecoder::DecodeXDSString(const vector<unsigned char> &buf,
+QString CC608Decoder::DecodeXDSString(const vector<unsigned char> &buf,
                                    uint start, uint end) const
 {
 #if DEBUG_XDS
@@ -923,7 +923,7 @@ bool is_better(const QString &newStr, const QString &oldStr)
     return false;
 }
 
-void CCDecoder::DecodeXDSStartTime(int b1, int b2)
+void CC608Decoder::DecodeXDSStartTime(int b1, int b2)
 {
     if (b1 == 0x0F)
     {
@@ -937,7 +937,7 @@ void CCDecoder::DecodeXDSStartTime(int b1, int b2)
                             "Packet %1 %2").arg(b1).arg(b2));
 }
 
-void CCDecoder::DecodeXDSProgramLength(int b1, int b2)
+void CC608Decoder::DecodeXDSProgramLength(int b1, int b2)
 {
     if (b1 == 0x0F)
     {
@@ -970,7 +970,7 @@ void CCDecoder::DecodeXDSProgramLength(int b1, int b2)
     xds_buf.push_back(b2);
 }
 
-void CCDecoder::DecodeXDSProgramName(int b1, int b2)
+void CC608Decoder::DecodeXDSProgramName(int b1, int b2)
 {
     if (b1 != 0x0F)
     {
@@ -989,7 +989,7 @@ void CCDecoder::DecodeXDSProgramName(int b1, int b2)
     }
 }
 
-void CCDecoder::DecodeXDSProgramType(int b1, int b2)
+void CC608Decoder::DecodeXDSProgramType(int b1, int b2)
 {
     if (b1 == 0x0F)
     {
@@ -1006,7 +1006,7 @@ void CCDecoder::DecodeXDSProgramType(int b1, int b2)
             .arg(b1).arg(b2));
 }
 
-QString CCDecoder::GetRatingString(uint i) const
+QString CC608Decoder::GetRatingString(uint i) const
 {
     QString prefix[4] = { "MPAA-", "TV-", "CE-", "CF-" };
     QString mainStr[4][8] =
@@ -1039,7 +1039,7 @@ QString CCDecoder::GetRatingString(uint i) const
     return QDeepCopy<QString>(main);
 }
 
-QString CCDecoder::GetXDS(const QString &key) const
+QString CC608Decoder::GetXDS(const QString &key) const
 {
     if (key == "ratings")
         return QString::number(GetRatingSystems());
@@ -1055,7 +1055,7 @@ QString CCDecoder::GetXDS(const QString &key) const
     return QString::null;
 }
 
-void CCDecoder::DecodeXDSVChip(int b1, int b2)
+void CC608Decoder::DecodeXDSVChip(int b1, int b2)
 {
     if (b1 != 0x0F)
     {
@@ -1122,7 +1122,7 @@ void CCDecoder::DecodeXDSVChip(int b1, int b2)
     }
 }
 
-void CCDecoder::DecodeXDSPacket(int b1, int b2)
+void CC608Decoder::DecodeXDSPacket(int b1, int b2)
 {
 #if DEBUG_XDS
     VERBOSE(VB_VBI, QString("XDSPacket: 0x%1 0x%2 (cp 0x%3)")
@@ -1314,7 +1314,7 @@ void CCDecoder::DecodeXDSPacket(int b1, int b2)
     }
 }
 
-void CCDecoder::DecodeXDS(int field, int b1, int b2)
+void CC608Decoder::DecodeXDS(int field, int b1, int b2)
 {
     field = 1;
 #if DEBUG_XDS

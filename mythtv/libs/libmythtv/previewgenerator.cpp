@@ -259,7 +259,22 @@ bool PreviewGenerator::SavePreview(QString filename,
 
     QImage small_img = img.smoothScale((int) ppw, (int) pph);
 
-    return small_img.save(filename.ascii(), "PNG");
+    if (small_img.save(filename.ascii(), "PNG"))
+    {
+        chmod(filename.ascii(), 0666); // Let anybody update it
+        return true;
+    }
+    // Save failed; if file exists, try saving to .new and moving over
+    QString newfile=filename+".new";
+    if (QFileInfo(filename.ascii()).exists() &&
+        small_img.save(newfile.ascii(), "PNG"))
+    {
+        chmod(newfile.ascii(), 0666);
+        rename(newfile.ascii(), filename.ascii());
+        return true;
+    }
+    // Couldn't save, nothing else I can do?
+    return false;
 }
 
 void PreviewGenerator::LocalPreviewRun(void)
@@ -275,8 +290,9 @@ void PreviewGenerator::LocalPreviewRun(void)
     unsigned char *data = (unsigned char*)
         GetScreenGrab(&programInfo, programInfo.pathname, secsin,
                       sz, width, height, aspect);
-
-    if (SavePreview(programInfo.pathname+".png", data, width, height, aspect))
+    
+    bool success=SavePreview(programInfo.pathname+".png", data, width, height, aspect);
+    if (success)
     {
         QMutexLocker locker(&previewLock);
         emit previewReady(&programInfo);
@@ -286,6 +302,10 @@ void PreviewGenerator::LocalPreviewRun(void)
         delete[] data;
 
     programInfo.MarkAsInUse(false);
+    if (!success && !localOnly) // local update failed, try remote?
+    {
+        RemotePreviewRun();
+    }
 }
 
 bool PreviewGenerator::IsLocal(void) const

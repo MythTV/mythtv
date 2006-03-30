@@ -30,7 +30,7 @@ using namespace std;
 // MythTV headers
 #include "recorderbase.h"
 #include "format.h"
-#include "ccdecoder.h"
+#include "cc608decoder.h"
 
 struct video_audio;
 struct VBIData;
@@ -41,7 +41,7 @@ class ChannelBase;
 class FilterManager;
 class FilterChain;
 
-class NuppelVideoRecorder : public RecorderBase, public CCReader
+class NuppelVideoRecorder : public RecorderBase, public CC608Reader
 {
  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
@@ -284,7 +284,7 @@ class NuppelVideoRecorder : public RecorderBase, public CCReader
 
     int volume;
 
-    CCDecoder *ccd;
+    CC608Decoder *ccd;
 
     bool go7007;
     bool resetcapture;

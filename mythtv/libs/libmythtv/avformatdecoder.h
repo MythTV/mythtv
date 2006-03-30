@@ -16,7 +16,7 @@ extern "C" {
 }
 
 class TeletextDecoder;
-class CCDecoder;
+class CC608Decoder;
 class CC708Decoder;
 class InteractiveTV;
 class ProgramInfo;
@@ -231,7 +231,7 @@ class AvFormatDecoder : public DecoderBase
     int maxkeyframedist;
 
     // Caption/Subtitle/Teletext decoders
-    CCDecoder        *ccd608;
+    CC608Decoder     *ccd608;
     CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
 

@@ -47,9 +47,11 @@ struct ButtonIcon
 class ThemedButton : public MythUIType
 {
   public:
-    ThemedButton(MythUIType *parent, const char *name) : MythUIType(parent, name)
+    ThemedButton(MythUIType *parent, const char *name)
+        : MythUIType(parent, name),
+          background(NULL), icon(NULL), text(NULL), buttonicon(NULL),
+          message(QString::null), row(0), col(0), status(0)
     {
-        background = icon = text = NULL;
     }
 
     void SetActive(bool active)
@@ -62,8 +64,8 @@ class ThemedButton : public MythUIType
             background->DisplayState(state);
         if (icon)
             icon->DisplayState(state);
-        if (text)
-            icon->DisplayState(state);
+//        if (text)
+//            icon->DisplayState(state);
     }
 
     MythUIStateType *background;
@@ -2142,7 +2144,8 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     }
 
     activebutton = buttonRows[currentrow].buttons[currentcolumn];
-    watermark->DisplayState(activebutton->buttonicon->name);
+    if (activebutton && activebutton->buttonicon)
+        watermark->DisplayState(activebutton->buttonicon->name);
 
     if (lastbutton != activebutton && lastbutton && activebutton)
     {

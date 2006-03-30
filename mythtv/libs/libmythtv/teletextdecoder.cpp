@@ -33,7 +33,6 @@ using namespace std;
 #include "teletextdecoder.h"
 #include "vbilut.h"
 #include "mythcontext.h"
-#include "ccdecoder.h"
 
 /******************************************************************/
 //Decoder section

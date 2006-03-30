@@ -16,7 +16,7 @@
 #include "teletextdecoder.h"
 #include "tv_play.h"
 #include "yuv2rgb.h"
-#include "ccdecoder.h"
+#include "cc608decoder.h"
 #include "cc708decoder.h"
 #include "cc708window.h"
 
@@ -96,7 +96,7 @@ enum
     kDisplayTeletextMenu        = 0x40,
 };
 
-class NuppelVideoPlayer : public CCReader, public CC708Reader
+class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 {
  public:
     NuppelVideoPlayer(QString inUseID = "Unknown",

@@ -163,7 +163,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
 
     volume = 100;
 
-    ccd = new CCDecoder(this);
+    ccd = new CC608Decoder(this);
 
     go7007 = false;
     resetcapture = false;

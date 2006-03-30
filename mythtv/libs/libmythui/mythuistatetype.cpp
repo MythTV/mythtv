@@ -2,6 +2,10 @@
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
+#include "mythcontext.h"
+
+#define LOC QString("MythUIStateType: ")
+#define LOC_ERR QString("MythUIStateType, Error: ")
 
 MythUIStateType::MythUIStateType(MythUIType *parent, const char *name)
                 : MythUIType(parent, name)
@@ -17,6 +21,14 @@ bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
     if (m_ObjectsByName.contains(name))
         return false;
+
+    if (!image)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("AddImage() failed to add '%1'").arg(name));
+
+        return false;
+    }
 
     MythUIImage *imType = new MythUIImage(this, name);
     imType->SetImage(image);
@@ -67,6 +79,9 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
 
 bool MythUIStateType::DisplayState(const QString &name)
 {
+    if (name.isEmpty())
+        return false;
+
     MythUIType *old = m_CurrentState;
 
     QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);

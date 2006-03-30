@@ -20,7 +20,7 @@ using namespace std;
 #include "mpegtables.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
-#include "ccdecoder.h"
+#include "cc608decoder.h"
 #include "cc708decoder.h"
 #include "interactivetv.h"
 #include "DVDRingBuffer.h"
@@ -271,7 +271,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       video_codec_id(kCodec_NONE),
       maxkeyframedist(-1), 
       // Closed Caption & Teletext decoders
-      ccd608(new CCDecoder(parent)),
+      ccd608(new CC608Decoder(parent)),
       ccd708(new CC708Decoder(parent)),
       ttd(new TeletextDecoder()),
       // Interactive TV
@@ -1873,7 +1873,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 /** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
  *  \brief Process ivtv proprietary embedded vertical blanking
  *         interval captions.
- *  \sa CCDecoder, TeletextDecoder
+ *  \sa CC608Decoder, TeletextDecoder
  */
 void AvFormatDecoder::ProcessVBIDataPacket(
     const AVStream *stream, const AVPacket *pkt)

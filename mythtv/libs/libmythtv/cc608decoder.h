@@ -10,10 +10,10 @@ using namespace std;
 
 #include "format.h"
 
-class CCReader
+class CC608Reader
 {
   public:
-    virtual ~CCReader() { }
+    virtual ~CC608Reader() { }
     virtual void AddTextData(unsigned char *buf, int len,
                              long long timecode, char type) = 0;
 };
@@ -33,11 +33,11 @@ enum
     kRatingCanFrench,
 };
 
-class CCDecoder
+class CC608Decoder
 {
   public:
-    CCDecoder(CCReader *ccr);
-    ~CCDecoder();
+    CC608Decoder(CC608Reader *ccr);
+    ~CC608Decoder();
 
     void FormatCC(int tc, int code1, int code2);
     void FormatCCField(int tc, int field, int data);
@@ -70,7 +70,7 @@ class CCDecoder
     void DecodeXDSPacket(int b1, int b2);
     void DecodeXDS(int field, int b1, int b2);
 
-    CCReader *reader;
+    CC608Reader *reader;
 
     bool ignore_time_code;
 
