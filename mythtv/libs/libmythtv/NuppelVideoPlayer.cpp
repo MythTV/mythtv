@@ -88,9 +88,10 @@ QString track_type_to_string(uint type)
         str = QObject::tr("CC", "EIA-608 closed captions");
     else if (kTrackTypeCC708 == type)
         str = QObject::tr("ATSC CC", "EIA-708 closed captions");
-    else if (kFakeTrackTypeTeletext == type)
-        str = QObject::tr("TT", "Teletext closed captions");
-
+    else if (kTrackTypeTeletextCaptions == type)
+        str = QObject::tr("TT CC", "Teletext closed captions");
+    else if (kTrackTypeTeletextMenu == type)
+        str = QObject::tr("TT Menu", "Teletext Menu");
     return str;
 }
 
@@ -106,9 +107,10 @@ int type_string_to_track_type(const QString &str)
         ret = kTrackTypeCC608;
     else if (str.left(5) == "CC708")
         ret = kTrackTypeCC708;
-    else if (str.left(2) == "TT")
-        ret = kFakeTrackTypeTeletext;
-
+    else if (str.left(3) == "TTC")
+        ret = kTrackTypeTeletextCaptions;
+    else if (str.left(3) == "TTM")
+        ret = kTrackTypeTeletextMenu;
     return ret;
 }
 
@@ -118,8 +120,9 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
     kDisplaySubtitle,
     kDisplayCC608,
     kDisplayCC708,
+    kDisplayTeletextCaptions,
     kDisplayNone,
-    kDisplayTeletextB,
+    kDisplayNUVTeletextCaptions,
 };
 
 NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
@@ -1096,7 +1099,7 @@ void NuppelVideoPlayer::AddTextData(unsigned char *buffer, int len,
 {
     WrapTimecode(timecode, TC_CC);
 
-    if (!(textDisplayMode & (kDisplayTeletextB | kDisplayCC608)))
+    if (!(textDisplayMode & kDisplayNUVCaptions))
         return;
 
     if (!tbuffer_numfree())
@@ -1361,16 +1364,8 @@ void NuppelVideoPlayer::ResetCaptions(uint mode_override)
     uint mode       = (mode_override) ? mode_override : origMode;
     textDisplayMode = kDisplayNone;
 
-    // resets TeletextA
-    if (GetOSD() && (kDisplayTeletextA == mode))
-    {
-        TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
-        if (tt_view)
-            tt_view->Reset();
-    }
-
-    // resets EIA-608 and TeletextB
-    if ((kDisplayCC608 | kDisplayTeletextB) & mode)
+    // resets EIA-608 and Teletext NUV Captions
+    if (mode & kDisplayNUVCaptions)
         ResetCC();
 
     // resets EIA-708
@@ -1383,8 +1378,6 @@ void NuppelVideoPlayer::ResetCaptions(uint mode_override)
 
 void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
-    uint origMode = textDisplayMode;
-
     textDisplayMode &= ~mode;
 
     ResetCaptions(mode);
@@ -1392,15 +1385,20 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
     if (osd_msg && osd)
     {
         QString msg = " ";
+        if (kDisplayNUVTeletextCaptions & mode)
+            msg += QObject::tr("TXT CAP");
+        if (kDisplayTeletextCaptions & mode)
+        {
+            msg += decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
+                                         GetTrack(kTrackTypeTeletextCaptions));
+
+            DisableTeletext();
+        }
         if (kDisplaySubtitle & mode)
         {
             msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                          GetTrack(kTrackTypeSubtitle));
         }
-        if (kDisplayTeletextA & mode)
-            msg += QObject::tr("TXT MENU");
-        if (kDisplayTeletextB & mode)
-            msg += QObject::tr("TXT CAP");
         if (kDisplayCC608 & mode)
         {
             msg += decoder->GetTrackDesc(kTrackTypeCC608,
@@ -1415,15 +1413,6 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
 
         osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
     }
-
-    // disable TeletextA
-    if (!(origMode & kDisplayTeletextA) || !osd)
-        return;
-
-    TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
-    if (tt_view)
-        tt_view->SetDisplaying(false);
-    GetOSD()->HideSet("teletext");
 }
 
 void NuppelVideoPlayer::EnableCaptions(uint mode)
@@ -1434,9 +1423,7 @@ void NuppelVideoPlayer::EnableCaptions(uint mode)
         msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                      GetTrack(kTrackTypeSubtitle));
     }
-    if (kDisplayTeletextA & mode)
-        msg += QObject::tr("TXT MENU");
-    if (kDisplayTeletextB & mode)
+    if (kDisplayNUVTeletextCaptions & mode)
         msg += QObject::tr("TXT") + QString(" %1").arg(ttPageNum, 3, 16);
     if (kDisplayCC608 & mode)
     {
@@ -1448,30 +1435,72 @@ void NuppelVideoPlayer::EnableCaptions(uint mode)
         msg += decoder->GetTrackDesc(kTrackTypeCC708,
                                      GetTrack(kTrackTypeCC708));
     }
+    if (kDisplayTeletextCaptions & mode)
+    {
+        msg += decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
+                                     GetTrack(kTrackTypeTeletextCaptions));
+        
+        TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+        int page = decoder->GetTrackLanguageIndex(
+            kTrackTypeTeletextCaptions,
+            GetTrack(kTrackTypeTeletextCaptions));
+
+        if ((tt_view) && (page > 0))
+        {
+            EnableTeletext();
+            tt_view->SetPage(page, -1);
+            textDisplayMode = kDisplayTeletextCaptions;
+        }
+    }
 
     msg += " " + QObject::tr("On");
 
-    if (mode & ~kDisplayTeletextA)
-    {
-        textDisplayMode = mode;
-        if (osd)
-            osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
-        return;
-    }
+    textDisplayMode = mode;
+    if (osd)
+        osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
 
-    if (!osd)
+}
+
+void NuppelVideoPlayer::EnableTeletext(void)
+{
+    if (!GetOSD())
         return;
-            
+
     OSDSet         *oset    = GetOSD()->GetSet("teletext");
     TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
     if (oset && tt_view)
     {
         decoder->SetTeletextDecoderViewer(tt_view);
         tt_view->SetDisplaying(true);
+        tt_view->SetPage(0x100, -1);
         oset->Display();
         osd->SetVisible(oset, 0);
-        textDisplayMode = kDisplayTeletextA;
+        textDisplayMode = kDisplayTeletextMenu;
     }
+}
+
+void NuppelVideoPlayer::DisableTeletext(void)
+{
+    if (!GetOSD())
+        return;
+
+    TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+    if (tt_view)
+        tt_view->SetDisplaying(false);
+    GetOSD()->HideSet("teletext");
+
+    textDisplayMode = kDisplayNone;
+    
+}
+
+void NuppelVideoPlayer::ResetTeletext(void)
+{
+    if (!GetOSD())
+        return;
+
+    TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+    if (tt_view)
+        tt_view->Reset();
 }
 
 bool NuppelVideoPlayer::ToggleCaptions(void)
@@ -1494,14 +1523,8 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
     if (origMode & mode)
         return textDisplayMode;
 
-    if (kDisplayTeletextB & mode)
-        EnableCaptions(kDisplayTeletextB);
-
-    if (kDisplayTeletextA & mode)
-    {
-        if (decoder->GetTeletextDecoderType() > 0)
-            EnableCaptions(kDisplayTeletextA);
-    }
+    if (kDisplayNUVTeletextCaptions & mode)
+        EnableCaptions(kDisplayNUVTeletextCaptions);
 
     if (kDisplayCC608 & mode)
         EnableCaptions(kDisplayCC608);
@@ -1511,6 +1534,9 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
 
     if (kDisplaySubtitle & mode)
         EnableCaptions(kDisplaySubtitle);
+
+    if (kDisplayTeletextCaptions & mode)
+        EnableCaptions(kDisplayTeletextCaptions);
 
     return textDisplayMode;
 }
@@ -1531,15 +1557,10 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
         EnableCaptions(kDisplaySubtitle);
     else if (decoder->GetTrackCount(kTrackTypeCC708))
         EnableCaptions(kDisplayCC708);
+    else if (decoder->GetTrackCount(kTrackTypeTeletextCaptions))
+        EnableCaptions(kDisplayTeletextCaptions);
     else if (vbimode == VBIMode::PAL_TT)
-    {
-/* not sure this makes sense, TeletextA does not seem to decode captions...
-        if (decoder->GetTeletextDecoderType() >= 0)
-            EnableCaptions(kDisplayTeletextA);
-        else
-*/
-            EnableCaptions(kDisplayTeletextB);
-    }
+        EnableCaptions(kDisplayNUVTeletextCaptions);
     else if (vbimode == VBIMode::NTSC_CC)
     {
         if (decoder->GetTrackCount(kTrackTypeCC608))
@@ -1564,18 +1585,20 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
         DisableCaptions(origMode, false);
 }
 
-// TeletextB
+/** \fn NuppelVideoPlayer::SetTeletextPage(uint)
+ *  \brief Set Teletext NUV Caption page
+ */
 void NuppelVideoPlayer::SetTeletextPage(uint page)
 {
     DisableCaptions(textDisplayMode);
     ttPageNum = page;
-    textDisplayMode = kDisplayTeletextB;
+    textDisplayMode &= ~kDisplayAllCaptions;
+    textDisplayMode |= kDisplayNUVTeletextCaptions;
 }
 
-// TeletextA
 bool NuppelVideoPlayer::HandleTeletextAction(const QString &action)
 {
-    if ((textDisplayMode != kDisplayTeletextA) || !GetOSD())
+    if (!(textDisplayMode & kDisplayTeletextMenu) || !GetOSD())
         return false;
 
     bool handled = true;
@@ -1611,9 +1634,9 @@ bool NuppelVideoPlayer::HandleTeletextAction(const QString &action)
              action == "6" || action == "7" || action == "8" ||
              action == "9")
         tt->KeyPress(action.toInt());
-    else if (action == "MENU" || action == "TOGGLECC" ||
+    else if (action == "MENU" || action == "TOGGLETT" ||
              action == "ESCAPE")
-        DisableCaptions(kDisplayTeletextA);
+        DisableTeletext();
     else
         handled = false;
 
@@ -2303,7 +2326,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         itvVisible = GetDecoder()->ITVUpdate(itvVisible);
 
     // handle EIA-608 and Teletext
-    if (textDisplayMode & (kDisplayTeletextB | kDisplayCC608))
+    if (textDisplayMode & kDisplayNUVCaptions)
         ShowText();
 
     // handle with DVB/DVD subtitles
@@ -2505,7 +2528,7 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         else
         {
             // handle EIA-608 and Teletext
-            if (textDisplayMode & (kDisplayTeletextB | kDisplayCC608))
+            if (textDisplayMode & kDisplayNUVCaptions)
                 ShowText();
 
             videofiltersLock.lock();
@@ -5446,13 +5469,17 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
         DisableCaptions(textDisplayMode, false);
         EnableCaptions(kDisplayCC608);
     }
-
+    else if (kTrackTypeTeletextCaptions == type)
+    {
+        DisableCaptions(textDisplayMode, false);
+        EnableCaptions(kDisplayTeletextCaptions);
+    }
     return ret;
 }
 
 bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
 {
-    if (textDisplayMode != kDisplayITV)
+    if (!(textDisplayMode & kDisplayITV))
         return false;
 
     if (GetDecoder())
@@ -5533,11 +5560,10 @@ void NuppelVideoPlayer::ChangeCaptionTrack(int dir)
         {
             if (decoder->GetTrackCount(kTrackTypeSubtitle))
                 SetTrack(kTrackTypeSubtitle, 0);
+            else if (decoder->GetTrackCount(kTrackTypeTeletextCaptions))
+                SetTrack(kTrackTypeTeletextCaptions, 0);
             else
-            {
-                DisableCaptions(textDisplayMode, false);
-                EnableCaptions(kDisplayTeletextA);
-            }
+                EnableCaptions(kDisplayNUVTeletextCaptions);
         }
         else
         {
@@ -5560,15 +5586,28 @@ void NuppelVideoPlayer::ChangeCaptionTrack(int dir)
         else
         {
             DisableCaptions(textDisplayMode, false);
-            EnableCaptions(kDisplayTeletextA);
+            if (decoder->GetTrackCount(kTrackTypeTeletextCaptions))
+                SetTrack(kTrackTypeTeletextCaptions, 0);
+            else
+                EnableCaptions(kDisplayNUVTeletextCaptions);
         }
     }
-    else if (textDisplayMode & kDisplayTeletextA)
+    else if ((textDisplayMode & kDisplayTeletextCaptions) &&
+             (vbimode == VBIMode::PAL_TT))
     {
-        DisableCaptions(textDisplayMode, false);
-        EnableCaptions(kDisplayTeletextB);
+        if ((uint)GetTrack(kTrackTypeTeletextCaptions) + 1 <
+            decoder->GetTrackCount(kTrackTypeTeletextCaptions))
+        {
+            SetTrack(kTrackTypeTeletextCaptions,
+                     GetTrack(kTrackTypeTeletextCaptions) + 1);
+        }
+        else
+        {
+            DisableCaptions(textDisplayMode, false),
+            EnableCaptions(kDisplayNUVTeletextCaptions);
+        }
     }
-    else if (textDisplayMode & kDisplayTeletextB)
+    else if (textDisplayMode & kDisplayNUVTeletextCaptions)
         SetCaptionsEnabled(false);
     else if (textDisplayMode & kDisplayCC708)
     {

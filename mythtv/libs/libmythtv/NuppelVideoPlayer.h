@@ -73,8 +73,10 @@ enum
     kTrackTypeSubtitle,
     kTrackTypeCC608,
     kTrackTypeCC708,
+    kTrackTypeTeletextCaptions,
     kTrackTypeCount,
-    kFakeTrackTypeTeletext,
+
+    kTrackTypeTeletextMenu,
 };
 QString track_type_to_string(uint type);
 int type_string_to_track_type(const QString &str);
@@ -82,13 +84,16 @@ int type_string_to_track_type(const QString &str);
 // Caption Display modes
 enum
 {
-    kDisplayNone      = 0x00,
-    kDisplayTeletextA = 0x01,
-    kDisplayTeletextB = 0x02,
-    kDisplaySubtitle  = 0x04,
-    kDisplayCC608     = 0x08,
-    kDisplayCC708     = 0x10,
-    kDisplayITV       = 0x20,
+    kDisplayNone                = 0x00,
+    kDisplayNUVTeletextCaptions = 0x01,
+    kDisplayTeletextCaptions    = 0x02,
+    kDisplaySubtitle            = 0x04,
+    kDisplayCC608               = 0x08,
+    kDisplayCC708               = 0x10,
+    kDisplayNUVCaptions         = kDisplayNUVTeletextCaptions | kDisplayCC608,
+    kDisplayAllCaptions         = 0x1f,
+    kDisplayITV                 = 0x20,
+    kDisplayTeletextMenu        = 0x40,
 };
 
 class NuppelVideoPlayer : public CCReader, public CC708Reader
@@ -282,13 +287,16 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     bool ToggleCaptions(uint mode);
     void SetCaptionsEnabled(bool);
 
-    // TeletextA
+    // Teletext Menu and non-NUV teletext decoder
+    void EnableTeletext(void);
+    void DisableTeletext(void);
+    void ResetTeletext(void);
     bool HandleTeletextAction(const QString &action);
 
-    // TeletextB
+    // Teletext NUV Captions
     void SetTeletextPage(uint page);
 
-    // EIA-608 && TeletextB
+    // ATSC/NTSC EIA-608 captions and PAL Teletext NUV captions
     void FlushTxtBuffers(void) { rtxt = wtxt; }
 
     // ATSC EIA-708 Captions
@@ -599,7 +607,6 @@ class NuppelVideoPlayer : public CCReader, public CC708Reader
     bool      osdHasSubtitles;
     long long osdSubtitlesExpireAt;
     MythDeque<AVSubtitle> nonDisplayedSubtitles;
-    TeletextDecoder *tt_decoder;
 
     CC708Service CC708services[64];
     QString    osdfontname;

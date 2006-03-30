@@ -26,6 +26,7 @@ class TeletextViewer
     virtual ~TeletextViewer() { }
 
     virtual void KeyPress(uint key) { (void) key; }
+    virtual void SetPage(int page, int subpage) { (void) page; (void) subpage; }
     virtual void SetDisplaying(bool displaying) { (void) displaying; }
 
     virtual void Reset(void) = 0;

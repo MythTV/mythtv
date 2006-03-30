@@ -137,6 +137,7 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
 
     // Teletext Viewer methods
     void KeyPress(uint key);
+    void SetPage(int page, int subpage);
     void SetDisplaying(bool display) { m_displaying = display; };
 
     void Reset(void);

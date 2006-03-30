@@ -756,6 +756,14 @@ QStringList DecoderBase::GetTracks(uint type) const
     return list;
 }
 
+int DecoderBase::GetTrackLanguageIndex(uint type, uint trackNo) const
+{
+    if (trackNo >= tracks[type].size())
+        return 0;
+
+    return tracks[type][trackNo].language_index;
+}
+
 QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 {
     if (trackNo >= tracks[type].size())

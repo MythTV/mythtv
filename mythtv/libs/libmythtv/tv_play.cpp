@@ -124,10 +124,12 @@ void TV::InitKeys(void)
             "W");
 
     REG_KEY("TV Playback", "TOGGLECC",      "Toggle any captions",   "T");
-    REG_KEY("TV Playback", "TOGGLETT",      "Toggle Teletext Captions","");
+    REG_KEY("TV Playback", "TOGGLETTC",     "Toggle Teletext Captions","");
     REG_KEY("TV Playback", "TOGGLESUBTITLE","Toggle Subtitles",      "");
     REG_KEY("TV Playback", "TOGGLECC608",   "Toggle VBI CC",         "");
     REG_KEY("TV Playback", "TOGGLECC708",   "Toggle ATSC CC",        "");
+
+    REG_KEY("TV Playback", "TOGGLETTM",     "Toggle Teletext Menu",  "");
 
     REG_KEY("TV Playback", "SELECTAUDIO_0", "Play audio track 1",    "");
     REG_KEY("TV Playback", "SELECTAUDIO_1", "Play audio track 2",    "");
@@ -192,7 +194,7 @@ void TV::InitKeys(void)
     REG_KEY("Teletext Menu", "PREVPAGE",    "Previous Page",         "Up");
     REG_KEY("Teletext Menu", "NEXTSUBPAGE", "Next Subpage",          "Right");
     REG_KEY("Teletext Menu", "PREVSUBPAGE", "Previous Subpage",      "Left");
-    REG_KEY("Teletext Menu", "TOGGLECC",    "Toggle Teletext",       "T"); 
+    REG_KEY("Teletext Menu", "TOGGLETT",    "Toggle Teletext",       "T"); 
     REG_KEY("Teletext Menu", "MENURED",     "Menu Red",              "F2");
     REG_KEY("Teletext Menu", "MENUGREEN",   "Menu Green",            "F3");
     REG_KEY("Teletext Menu", "MENUYELLOW",  "Menu Yellow",           "F4");
@@ -1152,6 +1154,7 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
     if (nvp->IsPlaying())
     {
         nvp->ResetCaptions();
+        nvp->ResetTeletext();
 
         activenvp = nvp;
         activerbuffer = prbuffer;
@@ -1779,7 +1782,7 @@ bool TV::HandleTrackAction(const QString &action)
             ccInputModeExpires.start(); // expire ccInputMode now...
             ClearInputQueues(true);
         }
-        else if (activenvp->GetCaptionMode() & kDisplayTeletextB)
+        else if (activenvp->GetCaptionMode() & kDisplayNUVTeletextCaptions)
         {
             ccInputMode        = true;
             ccInputModeExpires = QTime::currentTime()
@@ -1796,7 +1799,12 @@ bool TV::HandleTrackAction(const QString &action)
     else if (action.left(6) == "TOGGLE")
     {
         int type = type_string_to_track_type(action.mid(6));
-        if (type >= kTrackTypeSubtitle)
+        if (type == kTrackTypeTeletextMenu)
+        {
+            handled = true;
+            activenvp->EnableTeletext();
+        }
+        else if (type >= kTrackTypeSubtitle)
         {
             handled = true;
             activenvp->ToggleCaptions(type);
@@ -1907,7 +1915,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     // Teletext menu
-    if (activenvp && (activenvp->GetCaptionMode() == kDisplayTeletextA))
+    if (activenvp && (activenvp->GetCaptionMode() == kDisplayTeletextMenu))
     {
         QStringList tt_actions;
         if (gContext->GetMainWindow()->TranslateKeyPress(
@@ -3818,7 +3826,10 @@ void TV::ChangeChannel(int direction)
     PauseLiveTV();
 
     if (activenvp)
+    {
         activenvp->ResetCaptions();
+        activenvp->ResetTeletext();
+    }
 
     activerecorder->ChangeChannel(direction);
     ClearInputQueues(false);
@@ -4143,7 +4154,10 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
     PauseLiveTV();
 
     if (activenvp)
+    {
         activenvp->ResetCaptions();
+        activenvp->ResetTeletext();
+    }
 
     activerecorder->SetChannel(channum);
 
@@ -6319,7 +6333,13 @@ void TV::BuildOSDTreeMenu(void)
     if (VBIMode::NTSC_CC == vbimode)
         FillMenuTracks(treeMenu, kTrackTypeCC608);
     else if (VBIMode::PAL_TT == vbimode)
-        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext"), "TOGGLETT");
+    {
+        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext Captions"),
+                                  "TOGGLETTC");
+        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext Menu"),
+                                  "TOGGLETTM");
+        FillMenuTracks(treeMenu, kDisplayTeletextCaptions);
+    }
 
     int letterbox = nvp->GetLetterbox();
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
@@ -6485,6 +6505,14 @@ bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
         selStr  = "SELECTCC708_";
         grpStr  = "CC608GROUP";
         sel     = activenvp->GetCaptionMode() & kDisplayCC708;
+    }
+    else if (kDisplayTeletextCaptions == type)
+    {
+        mainMsg = tr("Select DVB CC");
+        typeStr = "TTC";
+        selStr  = "SELECTTTC_";
+        grpStr  = "TTCGROUP";
+        sel     = activenvp->GetCaptionMode() & kDisplayTeletextCaptions;
     }
     else
     {

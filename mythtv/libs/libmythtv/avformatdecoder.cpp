@@ -19,6 +19,7 @@ using namespace std;
 #include "iso639.h"
 #include "mpegtables.h"
 #include "atscdescriptors.h"
+#include "dvbdescriptors.h"
 #include "ccdecoder.h"
 #include "cc708decoder.h"
 #include "interactivetv.h"
@@ -1104,6 +1105,55 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     default_captions(tracks, av_index);
 }
 
+void AvFormatDecoder::ScanTeletextCaptions(int av_index)
+{
+    tracks[kTrackTypeTeletextCaptions].clear();
+
+    if (!ic->cur_pmt_sect)
+        return;
+
+    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
+    const PSIPTable psip(pes);
+    const ProgramMapTable pmt(psip);
+    
+    uint i;
+    for (i = 0; i < pmt.StreamCount(); i++)
+    {
+        if (pmt.StreamType(i) == 6)
+            break;
+    }
+
+    if (!pmt.StreamType(i) == 6)
+        return;
+
+    const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
+        pmt.StreamInfo(i), pmt.StreamInfoLength(i),
+        DescriptorID::teletext);
+
+    for (uint j = 0; j < desc_list.size(); j++)
+    {
+        const TeletextDescriptor td(desc_list[j]);
+        for (uint k = 0; k < td.StreamCount(); k++)
+        {
+            int lang = td.CanonicalLanguageKey(k);
+            int type = td.TeletextType(k);
+            int magazine = td.TeletextMagazineNum(k)?:8;
+            int pagenum = td.TeletextPageNum(k);
+            if (type == 2)
+            {
+                StreamInfo si(av_index, lang, (magazine * 256 + pagenum), 0);
+                tracks[kTrackTypeTeletextCaptions].push_back(si);
+                VERBOSE(VB_PLAYBACK, LOC + QString(
+                            "Teletext caption #%1 "
+                            "is in the %2 language on page %3 %4.")
+                        .arg(k)
+                        .arg(iso639_key_toName(lang))
+                        .arg(magazine).arg(pagenum));
+            } 
+        }
+    }
+}
+
 int AvFormatDecoder::ScanStreams(bool novideo)
 {
     int scanerror = 0;
@@ -1234,6 +1284,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case CODEC_TYPE_DATA:
             {
+                ScanTeletextCaptions(i);
                 bitrate += enc->bit_rate;
                 VERBOSE(VB_PLAYBACK, LOC + QString("data codec (%1)")
                         .arg(codec_type_string(enc->codec_type)));

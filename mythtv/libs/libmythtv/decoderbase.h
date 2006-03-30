@@ -113,6 +113,7 @@ class DecoderBase
     virtual uint GetTrackCount(uint type) const
         { return tracks[type].size(); }
 
+    virtual int  GetTrackLanguageIndex(uint type, uint trackNo) const;
     virtual QString GetTrackDesc(uint type, uint trackNo) const;
     virtual int  SetTrack(uint type, int trackNo);
     int          GetTrack(uint type) const { return currentTrack[type]; }

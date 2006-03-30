@@ -69,10 +69,6 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
 {
     m_unbiasedrect  = bias(m_displayrect, wmult, hmult);
 
-    m_pageinput[0] = '1';
-    m_pageinput[1] = '0';
-    m_pageinput[2] = '0';
-
     // fill Bitswap
     for (int i = 0; i < 256; i++)
     {
@@ -113,6 +109,10 @@ void OSDTypeTeletext::Reset(void)
     m_curpage    = 0x100;
     m_cursubpage = -1;
     m_curpage_showheader = true;
+
+    m_pageinput[0] = '1';
+    m_pageinput[1] = '0';
+    m_pageinput[2] = '0';
 }
 
 /** \fn OSDTypeTeletext::CharConversion(char, int)
@@ -658,6 +658,25 @@ void OSDTypeTeletext::KeyPress(uint key)
     }
 }
 
+/** \fn OSDTypeTeletext::SetPage(uint)
+ *  \brief Set TeletextPage to display
+ *  \param page PageNr. (in hex)
+ *  \param subpage Subpage (-1 if first available)
+ */
+void OSDTypeTeletext::SetPage(int page, int subpage)
+{
+    if (page < 0x100 || page > 0x899)
+        return;
+
+    m_pageinput[0] = (page / 256) + '0';
+    m_pageinput[1] = ((page % 256) / 16) + '0';
+    m_pageinput[2] = (page % 16) + '0';
+
+    m_curpage = page;
+    m_cursubpage = subpage;
+    PageUpdated(m_curpage, m_cursubpage);
+}
+
 /** \fn OSDTypeTeletext::SetForegroundColor(int)
  *  \brief Set the font color to the given color.
  *
@@ -1012,7 +1031,9 @@ void OSDTypeTeletext::DrawHeader(const unsigned char* page, int lang)
     if (!m_displaying)
         return;
 
-    DrawLine(page, 1, lang);
+    if (page != NULL)
+        DrawLine(page, 1, lang);
+    
     StatusUpdated();
 }
 
@@ -1024,7 +1045,10 @@ void OSDTypeTeletext::DrawPage(void)
     TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage);
 
     if (ttpage == NULL)
+    {
+        DrawHeader(NULL,0);
         return;
+    }
 
     m_cursubpage = ttpage->subpagenum;
 

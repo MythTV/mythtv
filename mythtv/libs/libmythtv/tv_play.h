@@ -397,7 +397,6 @@ class TV : public QObject
     long long audiosyncBaseline;
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
-    bool teletextmode;   ///< Are we in teletext switching mode?
     bool sigMonMode;     ///< Are we in signal monitoring mode?
     bool update_osd_pos; ///< Redisplay osd?
     bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying(internalState)
