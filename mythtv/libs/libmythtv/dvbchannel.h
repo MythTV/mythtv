@@ -65,6 +65,7 @@ class DVBChannel : public QObject, public ChannelBase
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool Tune(const dvb_channel_t& channel, bool force_reset=false);
+    bool Retune(void);
 
     // Set/Get/Command just for SIScan/ScanWizardScanner
     void SetMultiplexID(int mplexid)          { currentTID = mplexid; };
@@ -111,6 +112,11 @@ class DVBChannel : public QObject, public ChannelBase
     bool              first_tune;  ///< Used to force hardware reset
 
     int               nextcapchannel; ///< Signal an input change
+
+    /// Last tuning options sent to hardware for retuning
+    DVBTuning         retune_tuning;
+    /// Retuning adjustment, required so drivers don't ignore retune request
+    int               retune_adj;
 };
 
 #endif
