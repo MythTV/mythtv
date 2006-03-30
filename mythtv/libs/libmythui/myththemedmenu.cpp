@@ -20,6 +20,10 @@ using namespace std;
 #include "lcddevice.h"
 #include "mythplugin.h"
 
+#include "mythuiimage.h"
+#include "mythuitext.h"
+#include "mythuistatetype.h"
+
 /* FIXME, remove, for globalFontMap */
 #include "uitypes.h"
 
@@ -40,25 +44,41 @@ struct ButtonIcon
     QPoint offset;
 };
 
-struct ThemedButton
+class ThemedButton : public MythUIType
 {
-    QPoint pos;
-    QRect  posRect;
-    QRect  paintRect;
+  public:
+    ThemedButton(MythUIType *parent, const char *name) : MythUIType(parent, name)
+    {
+        background = icon = text = NULL;
+    }
+
+    void SetActive(bool active)
+    {
+        MythUIStateType::StateType state = MythUIStateType::None;
+        if (active)
+            state = MythUIStateType::Full;
+
+        if (background)
+            background->DisplayState(state);
+        if (icon)
+            icon->DisplayState(state);
+        if (text)
+            icon->DisplayState(state);
+    }
+
+    MythUIStateType *background;
+    MythUIStateType *icon;
+    MythUIStateType *text;
 
     ButtonIcon *buttonicon;
-    QPoint iconPos;
-    QRect iconRect;
 
-    QString text;
-    QString altText;
     QStringList action;
+    QString message;
 
     int row;
     int col;
 
     int status;
-    bool visible;
 };
 
 struct MenuRow
@@ -133,13 +153,6 @@ class MythThemedMenuState
 
     ButtonIcon *getButtonIcon(const QString &type);
 
-    void paintLogo(MythPainter *p, int alpha);
-    void paintTitle(MythPainter *p, int alpha, const QString &menumode);
-    void paintButtonBackground(MythPainter *p, int alpha);
-    void paintWatermark(MythPainter *p, int alpha, MythImage *watermark);
-
-    void drawScrollArrows(MythPainter *p, int alpha, bool up, bool down);
-
     QRect buttonArea;
 
     QRect logoRect;
@@ -163,7 +176,6 @@ class MythThemedMenuState
     bool buttoncenter;
 
     QMap<QString, MythImage *> titleIcons;
-    MythImage *curTitle;
     QString titleText;
     QPoint titlePos;
 
@@ -218,14 +230,14 @@ class MythThemedMenuPrivate
     QString findMenuFile(const QString &menuname);
 
     void paintButton(unsigned int button, MythPainter *p, int alpha);
-    void paintWatermark(MythPainter *p, int alpha);
 
-    void DrawSelf(MythPainter *p, int xoffset, int yoffset, int alphaMod);
+    void checkScrollArrows(void);
 
-    void drawScrollArrows(MythPainter *p, int alpha);
     bool checkPinCode(const QString &timestamp_setting,
                       const QString &password_setting,
                       const QString &text);
+ 
+    void SetupUITypes();
 
     void updateLCD(void);
 
@@ -234,7 +246,7 @@ class MythThemedMenuPrivate
     MythThemedMenuState *m_state;
     bool allocedstate;
 
-    vector<ThemedButton> buttonList;
+    vector<ThemedButton *> buttonList;
     ThemedButton *activebutton;
     int currentrow;
     int currentcolumn;
@@ -256,6 +268,10 @@ class MythThemedMenuPrivate
 
     QString titleText;
     QString menumode;
+
+    MythUIStateType *watermark;
+    MythUIImage *uparrow;
+    MythUIImage *downarrow;
 };
 
 /* FIXME: remove */
@@ -1237,7 +1253,6 @@ void MythThemedMenuState::setDefaults(void)
 
     titleIcons.clear();
     titleText = "";
-    curTitle = NULL;
     uparrow = NULL;
     downarrow = NULL;
     watermarkPos = QPoint(0, 0);
@@ -1345,52 +1360,6 @@ bool MythThemedMenuState::parseSettings(const QString &dir, const QString &menun
     parseFonts = false;
     loaded = true;
     return true;
-}
-
-void MythThemedMenuState::drawScrollArrows(MythPainter *p, int alpha, bool up,
-                                           bool down)
-{
-    if (!uparrow || !downarrow)
-        return;
-
-    if (!up && !down)
-        return;
-
-    if (up)
-        p->DrawImage(uparrowRect.topLeft(), uparrow, alpha);
-    if (down)
-        p->DrawImage(downarrowRect.topLeft(), downarrow, alpha);
-}
-
-void MythThemedMenuState::paintLogo(MythPainter *p, int alpha)
-{
-    if (logo)
-        p->DrawImage(logoRect.topLeft(), logo, alpha);
-}
-
-void MythThemedMenuState::paintTitle(MythPainter *p, int alpha, 
-                                     const QString &menumode)
-{
-    if (titleIcons.contains(menumode))
-        curTitle = titleIcons[menumode];
-
-    if (curTitle)
-        p->DrawImage(titlePos, curTitle, alpha);
-}
-
-void MythThemedMenuState::paintButtonBackground(MythPainter *p, int alpha)
-{
-    if (buttonBackground)
-        p->DrawImage(buttonArea.topLeft(), buttonBackground, alpha);
-}
-
-void MythThemedMenuState::paintWatermark(MythPainter *p, int alpha, 
-                                         MythImage *watermark)
-{
-    if (watermark)
-    {
-        p->DrawImage(watermarkPos, watermark, alpha);
-    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1615,7 +1584,10 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
 
     if (!layoutButtons())
         return false;
+    activebutton = NULL;
     positionButtons(true);
+
+    SetupUITypes();
 
     if (LCD::Get())
     {
@@ -1625,8 +1597,63 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     }
 
     selection = "";
-    parent->SetRedraw();
     return true;
+}
+
+void MythThemedMenuPrivate::SetupUITypes(void)
+{
+    if (m_state->titleIcons.contains(menumode))
+    {
+        MythUIImage *curTitle;
+        curTitle = new MythUIImage(parent, "menu title image");
+        curTitle->SetImage(m_state->titleIcons[menumode]);
+        curTitle->SetPosition(m_state->titlePos);
+    }
+
+    if (m_state->logo)
+    {
+        MythUIImage *logo;
+        logo = new MythUIImage(parent, "menu logo");
+        logo->SetImage(m_state->logo);
+        logo->SetPosition(m_state->logoRect.topLeft());
+    }
+
+    if (m_state->buttonBackground)
+    {
+        MythUIImage *buttonBackground;
+        buttonBackground = new MythUIImage(parent, "menu button background");
+        buttonBackground->SetImage(m_state->buttonBackground);
+        buttonBackground->SetPosition(m_state->buttonArea.topLeft());
+    }
+
+    watermark = new MythUIStateType(parent, "menu watermarks");
+    watermark->SetArea(m_state->watermarkRect);
+    QMap<QString, ButtonIcon>::Iterator it = m_state->allButtonIcons.begin();
+    for (; it != m_state->allButtonIcons.end(); ++it)
+    {
+        ButtonIcon *icon = &(it.data()); 
+        watermark->AddImage(icon->name, icon->watermark);
+    }
+
+    watermark->DisplayState(activebutton->buttonicon->name);
+
+    uparrow = new MythUIImage(parent, "menu up arrow");
+    if (m_state->uparrow)
+    {
+        uparrow->SetArea(m_state->uparrowRect);
+        uparrow->SetImage(m_state->uparrow);
+    }
+    uparrow->SetVisible(false);
+
+    downarrow = new MythUIImage(parent, "menu down arrow");
+    if (m_state->downarrow)
+    {
+        downarrow->SetArea(m_state->downarrowRect);
+        downarrow->SetImage(m_state->downarrow);
+    }
+    downarrow->SetVisible(false);
+
+    checkScrollArrows();
 }
 
 void MythThemedMenuPrivate::updateLCD(void)
@@ -1649,7 +1676,7 @@ void MythThemedMenuPrivate::updateLCD(void)
 
         if (currentcolumn < buttonRows[r].numitems)
             menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
-                             buttonRows[r].buttons[currentcolumn]->text));
+                             buttonRows[r].buttons[currentcolumn]->message));
     }
 
     if (!menuItems.isEmpty())
@@ -1660,14 +1687,83 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
                                       const QString &alttext, 
                                       const QStringList &action)
 {
-    ThemedButton newbutton;
+    ThemedButton *newbutton = new ThemedButton(parent, type.ascii());
 
-    newbutton.buttonicon = m_state->getButtonIcon(type);
-    newbutton.text = text;
-    newbutton.altText = alttext;
-    newbutton.action = action;
-    newbutton.status = -1;
-    newbutton.visible = false;
+    newbutton->buttonicon = m_state->getButtonIcon(type);
+    newbutton->action = action;
+    newbutton->message = text;
+    newbutton->status = -1;
+
+    newbutton->background = new MythUIStateType(newbutton, "button background");
+    if (m_state->buttonnormal)
+        newbutton->background->AddImage(MythUIStateType::Off, 
+                                        m_state->buttonnormal);
+    if (m_state->buttonactive)
+        newbutton->background->AddImage(MythUIStateType::Full, 
+                                        m_state->buttonactive);
+    newbutton->background->DisplayState(MythUIStateType::Off);
+
+    newbutton->SetArea(QRect(0, 0, m_state->buttonnormal->width(),
+                             m_state->buttonnormal->height()));
+
+    newbutton->icon = NULL;
+    if (newbutton->buttonicon)
+    {
+        newbutton->icon = new MythUIStateType(newbutton, "button icon");
+        newbutton->icon->SetPosition(newbutton->buttonicon->offset);
+        if (newbutton->buttonicon->icon)
+            newbutton->icon->AddImage(MythUIStateType::Off,
+                                      newbutton->buttonicon->icon);
+        if (newbutton->buttonicon->activeicon)
+            newbutton->icon->AddImage(MythUIStateType::Full,
+                                      newbutton->buttonicon->activeicon);
+        newbutton->icon->DisplayState(MythUIStateType::Off);
+    }
+
+    newbutton->text = new MythUIStateType(newbutton, "button text state");
+    {
+        QString msg = text;
+        QRect buttonTextRect = m_state->normalAttributes.textRect;
+        QRect testBoundRect = buttonTextRect;
+        testBoundRect.setWidth(testBoundRect.width() + 40);
+
+        QFontMetrics tmp(m_state->normalAttributes.font.face());
+        QRect testBound = tmp.boundingRect(testBoundRect.x(), testBoundRect.y(),
+                                           testBoundRect.width(),
+                                           testBoundRect.height(),
+                                           m_state->normalAttributes.textflags,
+                                           text);
+        if (testBound.height() > buttonTextRect.height() && alttext != "")
+            msg = alttext;
+
+        MythUIText *txt = new MythUIText(msg, m_state->normalAttributes.font,
+                                         buttonTextRect, buttonTextRect,
+                                         newbutton, "button normal text");
+        newbutton->text->AddObject(MythUIStateType::Off, txt);
+    }
+    {
+        QString msg = text;
+        QRect buttonTextRect = m_state->activeAttributes.textRect;
+        QRect testBoundRect = buttonTextRect;
+        testBoundRect.setWidth(testBoundRect.width() + 40);
+
+        QFontMetrics tmp(m_state->activeAttributes.font.face());
+        QRect testBound = tmp.boundingRect(testBoundRect.x(), testBoundRect.y(),
+                                           testBoundRect.width(),
+                                           testBoundRect.height(),
+                                           m_state->activeAttributes.textflags,
+                                           text);
+        if (testBound.height() > buttonTextRect.height() && alttext != "")
+            msg = alttext;
+
+        MythUIText *txt = new MythUIText(msg, m_state->activeAttributes.font,
+                                         buttonTextRect, buttonTextRect,
+                                         newbutton, "button normal text");
+        newbutton->text->AddObject(MythUIStateType::Full, txt);
+    }
+    newbutton->text->DisplayState(MythUIStateType::Off);
+
+    newbutton->SetVisible(false);
 
     buttonList.push_back(newbutton);
 }
@@ -1716,7 +1812,7 @@ bool MythThemedMenuPrivate::layoutButtons(void)
         maxrows = m_state->visiblerowlimit / columns;
     }
                              
-    vector<ThemedButton>::iterator iter = buttonList.begin();
+    vector<ThemedButton *>::iterator iter = buttonList.begin();
 
     int rows = numbuttons / columns;
     rows++;
@@ -1732,9 +1828,9 @@ bool MythThemedMenuPrivate::layoutButtons(void)
              j++, iter++)
         {
             if (columns == 3 && j == 1 && m_state->allowreorder)
-                newrow.buttons.insert(newrow.buttons.begin(), &(*iter));
+                newrow.buttons.insert(newrow.buttons.begin(), *iter);
             else
-                newrow.buttons.push_back(&(*iter));
+                newrow.buttons.push_back(*iter);
             newrow.numitems++;
         }
 
@@ -1783,7 +1879,8 @@ void MythThemedMenuPrivate::positionButtons(bool resetpos)
             for (; biter != (*menuiter).buttons.end(); biter++)
             {
                 ThemedButton *tbutton = (*biter);
-                tbutton->visible = false;
+                tbutton->SetVisible(false);
+                tbutton->SetActive(false);
             }
             continue;
         }
@@ -1803,27 +1900,12 @@ void MythThemedMenuPrivate::positionButtons(bool resetpos)
 
             ThemedButton *tbutton = (*biter);
 
-            tbutton->visible = true;
+            tbutton->SetVisible(true);
+            tbutton->SetActive(false);
             tbutton->row = row;
             tbutton->col = col;
-            tbutton->pos = QPoint(xpos, ypos);
-            tbutton->posRect = QRect(tbutton->pos.x(), tbutton->pos.y(),
-                                     buttonWidth, buttonHeight);
+            tbutton->SetPosition(xpos, ypos);
 
-            if (tbutton->buttonicon)
-            {
-                tbutton->iconPos = tbutton->buttonicon->offset + tbutton->pos;
-                tbutton->iconRect = QRect(tbutton->iconPos.x(),
-                                          tbutton->iconPos.y(),
-                                          tbutton->buttonicon->icon->width(),
-                                          tbutton->buttonicon->icon->height());
-                tbutton->paintRect = tbutton->posRect.unite(tbutton->iconRect);
-            }
-            else
-            {
-                tbutton->paintRect = tbutton->posRect;
-            }
-            
             col++;
         }
 
@@ -1832,7 +1914,14 @@ void MythThemedMenuPrivate::positionButtons(bool resetpos)
 
     if (resetpos)
     {
-        activebutton = &(*(buttonList.begin()));
+        ThemedButton *old = activebutton;
+        activebutton = (*(buttonList.begin()));
+
+        if (activebutton != old && old)
+            old->SetActive(false);
+
+        activebutton->SetActive(true);
+
         currentrow = activebutton->row - 1;
         currentcolumn = activebutton->col - 1;
     }
@@ -1868,12 +1957,12 @@ bool MythThemedMenuPrivate::makeRowVisible(int newrow, int oldrow)
 
     positionButtons(false);
 
-    /* need to set which to draw.. */
+    checkScrollArrows();
 
     return true;
 }
 
-void MythThemedMenuPrivate::drawScrollArrows(MythPainter *p, int alpha)
+void MythThemedMenuPrivate::checkScrollArrows(void)
 {
     bool needup = false;
     bool needdown = false;
@@ -1883,76 +1972,8 @@ void MythThemedMenuPrivate::drawScrollArrows(MythPainter *p, int alpha)
     if (!buttonRows.back().visible)
         needdown = true;
 
-    if (!needup && !needdown)
-        return;
-
-    m_state->drawScrollArrows(p, alpha, needup, needdown);
-}
-
-void MythThemedMenuPrivate::paintWatermark(MythPainter *p, int alpha)
-{
-    if (activebutton && activebutton->buttonicon &&
-        activebutton->buttonicon->watermark)
-    {
-        m_state->paintWatermark(p, alpha,  activebutton->buttonicon->watermark);
-    }
-}
-
-void MythThemedMenuPrivate::paintButton(unsigned int button, MythPainter *p, 
-                                        int alpha)
-{
-    TextAttributes *attributes;
-    ThemedButton *tbutton = &(buttonList[button]);
-
-    if (!tbutton->visible)
-        return;
-
-    MythImage *buttonback = NULL;
-    if (tbutton == activebutton)
-    {
-        buttonback = m_state->buttonactive;
-        tbutton->status = 1;
-        attributes = &m_state->activeAttributes;
-    }
-    else
-    {
-        tbutton->status = 0;
-        buttonback = m_state->buttonnormal;
-        attributes = &m_state->normalAttributes;
-    }
-
-    p->DrawImage(tbutton->posRect.topLeft(), buttonback, alpha);
-
-    QRect buttonTextRect = attributes->textRect;
-    buttonTextRect.moveBy(tbutton->posRect.x(), tbutton->posRect.y());
-
-    QString message = tbutton->text;
-
-    QRect testBoundRect = buttonTextRect;
-    testBoundRect.addCoords(0, 0, 0, 40);
-
-    QFontMetrics tmp(attributes->font.face());
-    QRect testBound = tmp.boundingRect(testBoundRect.x(), testBoundRect.y(), 
-                                       testBoundRect.width(), 
-                                       testBoundRect.height(), 
-                                       attributes->textflags, 
-                                       message);
-
-    if (testBound.height() > buttonTextRect.height() && tbutton->altText != "")
-        message = buttonList[button].altText;
-
-    p->DrawText(buttonTextRect, message, attributes->textflags, 
-                attributes->font, alpha);
-
-    if (buttonList[button].buttonicon)
-    {
-        MythImage *blendImage = tbutton->buttonicon->icon;
-
-        if (tbutton == activebutton && tbutton->buttonicon->activeicon)
-            blendImage = tbutton->buttonicon->activeicon;
-
-        p->DrawImage(tbutton->iconRect.topLeft(), blendImage, alpha);
-    }
+    uparrow->SetVisible(needup);
+    downarrow->SetVisible(needdown);
 }
 
 bool MythThemedMenuPrivate::ReloadTheme(void)
@@ -2067,7 +2088,6 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
             lastbutton = activebutton;
             activebutton = NULL;
-            parent->SetRedraw();
 
             QStringList::Iterator it = lastbutton->action.begin();
             for (; it != lastbutton->action.end(); it++)
@@ -2119,13 +2139,19 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     if (!buttonRows[currentrow].visible)
     {
         makeRowVisible(currentrow, oldrow);
-        lastbutton = NULL;
     }
 
     activebutton = buttonRows[currentrow].buttons[currentcolumn];
+    watermark->DisplayState(activebutton->buttonicon->name);
+
+    if (lastbutton != activebutton && lastbutton && activebutton)
+    {
+        lastbutton->SetActive(false);
+        activebutton->SetActive(true);
+    }
+
     updateLCD();
 
-    parent->SetRedraw();
     return true;
 } 
 
@@ -2341,25 +2367,6 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     return false;
 }
 
-void MythThemedMenuPrivate::DrawSelf(MythPainter *p, 
-                                     int /* xoffset */, 
-                                     int /* yoffset */, 
-                                     int alphaMod)
-{
-    m_state->paintLogo(p, alphaMod);
-    m_state->paintTitle(p, alphaMod, menumode);
-    m_state->paintButtonBackground(p, alphaMod);
-
-    paintWatermark(p, alphaMod);
-
-    for (unsigned int i = 0; i < buttonList.size(); i++)
-    {
-        paintButton(i, p, alphaMod);
-    }
-
-    drawScrollArrows(p, alphaMod);
-}
-
 ////////////////////////////////////////////////////////////////////////////
 
 MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
@@ -2441,8 +2448,6 @@ void MythThemedMenu::ReloadExitKey(void)
 void MythThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
                               int alphaMod, QRect clipRect)
 {
-    int alpha = CalcAlpha(alphaMod);
-    d->DrawSelf(p, xoffset, yoffset, alpha);
 }
 
 void MythThemedMenu::ReloadTheme(void)
