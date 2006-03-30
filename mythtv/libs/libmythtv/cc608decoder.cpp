@@ -1,5 +1,6 @@
-#include <iostream>
-using namespace std;
+// -*- Mode: c++ -*-
+
+// Some of the XDS was inspired by code in TVTime. -- dtk 03/30/2006
 
 #include <qstringlist.h>
 
@@ -10,15 +11,17 @@ using namespace std;
 
 #define DEBUG_XDS 0
 
+static void init_xds_program_type(QString xds_program_type[96]);
+
 CC608Decoder::CC608Decoder(CC608Reader *ccr)
     : reader(ccr),                  ignore_time_code(false),
       rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
       vps_l(0),
       wss_flags(0),                 wss_valid(false),
-      xds_current_packet(0),
-      xds_rating_systems(0),        xds_program_name(QString::null),
-      xds_net_call(QString::null),  xds_net_call_x(QString::null),
-      xds_net_name(QString::null),  xds_net_name_x(QString::null)
+      xds_crc_passed(0),            xds_crc_failed(0),
+      xds_lock(true),
+      xds_net_call(QString::null),  xds_net_name(QString::null),
+      xds_tsid(0)
 {
     for (uint i = 0; i < 2; i++)
     {
@@ -66,7 +69,14 @@ CC608Decoder::CC608Decoder(CC608Reader *ccr)
     bzero(vps_label,    sizeof(vps_label));
 
     // XDS data
-    bzero(xds_rating,   sizeof(xds_rating));
+    bzero(xds_rating, sizeof(uint) * 2 * 4);
+    for (uint i = 0; i < 2; i++)
+    {
+        xds_rating_systems[i] = 0;
+        xds_program_name[i]   = QString::null;
+    }
+
+    init_xds_program_type(xds_program_type_string);
 }
 
 CC608Decoder::~CC608Decoder(void)
@@ -133,10 +143,12 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
+/*
     VERBOSE(VB_VBI, QString("Format CC @%1/%2 = %3 %4")
                     .arg(tc).arg(field)
                     .arg((data&0xff), 2, 16)
                     .arg((data&0xff00)>>8, 2, 16));
+*/
     if (ccmode[field] >= 0)
     {
         mode = field << 2 |
@@ -153,7 +165,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     if (FalseDup(tc, field, data))
         goto skip;
 
-    DecodeXDS(field, b1, b2);
+    XDSDecode(field, b1, b2);
 
     if (b1 & 0x60)
         // 0x20 <= b1 <= 0x7F
@@ -878,8 +890,8 @@ void CC608Decoder::DecodeWSS(const unsigned char *buf)
     }
 }
 
-QString CC608Decoder::DecodeXDSString(const vector<unsigned char> &buf,
-                                   uint start, uint end) const
+QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
+                                      uint start, uint end) const
 {
 #if DEBUG_XDS
     for (uint i = start; (i < buf.size()) && (i < end); i++)
@@ -899,7 +911,7 @@ QString CC608Decoder::DecodeXDSString(const vector<unsigned char> &buf,
     }
 
 #if DEBUG_XDS
-    VERBOSE(VB_IMPORTANT, QString("DecodeXDSString: '%1'").arg(tmp));
+    VERBOSE(VB_IMPORTANT, QString("XDSDecodeString: '%1'").arg(tmp));
 #endif // DEBUG_XDS
 
     return tmp.stripWhiteSpace();
@@ -923,91 +935,22 @@ bool is_better(const QString &newStr, const QString &oldStr)
     return false;
 }
 
-void CC608Decoder::DecodeXDSStartTime(int b1, int b2)
+uint CC608Decoder::GetRatingSystems(bool future) const
 {
-    if (b1 == 0x0F)
-    {
-        xds_current_packet = 0;
-        VERBOSE(VB_VBI, QString("XDS Packet: Start Time/Program ID: End"));
-        return;
-    }
-
-    // Process Start Time packets here
-    VERBOSE(VB_VBI, QString("XDS Packet: Start Time/Program ID: "
-                            "Packet %1 %2").arg(b1).arg(b2));
+    QMutexLocker locker(&xds_lock);
+    return xds_rating_systems[(future) ? 1 : 0];
 }
 
-void CC608Decoder::DecodeXDSProgramLength(int b1, int b2)
+uint CC608Decoder::GetRating(uint i, bool future) const
 {
-    if (b1 == 0x0F)
-    {
-        xds_current_packet = 0;
-        // Payload bytes 1 and 2 are minutes and hours in length
-        if (xds_buf.size() > 0)
-            VERBOSE(VB_VBI, "XDS Packet: " +
-                    QString("Program Length: %1 hours, %1 minutes")
-                    .arg(xds_buf[1]-64).arg(xds_buf[0]-64));
-        // Payload bytes 3 and 4 are elapsed minutes and hours in length
-        if (xds_buf.size() >= 2)
-            VERBOSE(VB_VBI, "XDS Packet: " +
-                    QString("Program Elapsed: %1 hours, %1 mintues")
-                    .arg(xds_buf[3]-64).arg(xds_buf[2]-64));
-        // If Payload byte 6 is filler 0x40,
-        // then payload byte 5 is elapsed seconds
-        if ((xds_buf.size() >= 4) && (xds_buf[5]==0x40))
-            VERBOSE(VB_VBI, "XDS Packet: " +
-                    QString("Program Elapsed: %1 seconds").arg(xds_buf[4]-64));
-
-        //VERBOSE(VB_VBI, "XDS Packet: Program Length/Time in Show: End");
-        return;
-    }
-
-    // Process Program Length packets here
-    //VERBOSE(VB_VBI, "XDS Packet: " +
-    //        QString("Program Length/Time in Show: Packet %1 %2")
-    //        .arg(b1).arg(b2));
-    xds_buf.push_back(b1);
-    xds_buf.push_back(b2);
+    QMutexLocker locker(&xds_lock);
+    return xds_rating[(future) ? 1 : 0][i & 0x3] & 0x7;
 }
 
-void CC608Decoder::DecodeXDSProgramName(int b1, int b2)
+QString CC608Decoder::GetRatingString(uint i, bool future) const
 {
-    if (b1 != 0x0F)
-    {
-        xds_buf.push_back(b1);
-        xds_buf.push_back(b2);
-        return;
-    }
+    QMutexLocker locker(&xds_lock);
 
-    xds_current_packet = 0;
-
-    QString tmp = DecodeXDSString(xds_buf, 0, xds_buf.size());
-    if (is_better(tmp, xds_program_name))
-    {
-        VERBOSE(VB_VBI, QString("XDS Packet: Program Name: '%1'").arg(tmp));
-        xds_program_name = tmp;
-    }
-}
-
-void CC608Decoder::DecodeXDSProgramType(int b1, int b2)
-{
-    if (b1 == 0x0F)
-    {
-        xds_current_packet = 0;
-        VERBOSE(VB_VBI, QString("XDS Packet: Program Type: End"));
-        return;
-    }
-
-    // Process Program Type packets here
-    if ((b1 == 0xA8) || (b2 == 0xA8))
-        VERBOSE(VB_VBI, "XDS Packet: Program Type: Advertisement");
-       
-    VERBOSE(VB_VBI, QString("XDS Packet: Program Type: %1 %2")
-            .arg(b1).arg(b2));
-}
-
-QString CC608Decoder::GetRatingString(uint i) const
-{
     QString prefix[4] = { "MPAA-", "TV-", "CE-", "CF-" };
     QString mainStr[4][8] =
     {
@@ -1017,339 +960,467 @@ QString CC608Decoder::GetRatingString(uint i) const
         { "E",  "G", "8+",  "13+",   "16+", "18+",   "NR",  "NR" },
     };
 
-    QString main = prefix[i] + mainStr[i][GetRating(i)];
+    QString main = prefix[i] + mainStr[i][GetRating(i, future)];
 
     if (kRatingTPG == i)
     {
-        if (!(xds_rating[i]&0xF0))
+        uint cf = (future) ? 1 : 0;
+        if (!(xds_rating[cf][i]&0xF0))
             return QDeepCopy<QString>(main);
 
         main += " ";
         // TPG flags
-        if (xds_rating[i] & 0x80)
+        if (xds_rating[cf][i] & 0x80)
             main += "D"; // Dialog
-        if (xds_rating[i] & 0x40)
+        if (xds_rating[cf][i] & 0x40)
             main += "V"; // Violence
-        if (xds_rating[i] & 0x20)
+        if (xds_rating[cf][i] & 0x20)
             main += "S"; // Sex
-        if (xds_rating[i] & 0x10)
+        if (xds_rating[cf][i] & 0x10)
             main += "L"; // Language
     }
 
     return QDeepCopy<QString>(main);
 }
 
+QString CC608Decoder::GetProgramName(bool future) const
+{
+    QMutexLocker locker(&xds_lock);
+    return QDeepCopy<QString>(xds_program_name[(future) ? 1 : 0]);
+}
+
+QString CC608Decoder::GetProgramType(bool future) const
+{
+    QMutexLocker locker(&xds_lock);
+    const vector<uint> &program_type = xds_program_type[(future) ? 1 : 0];
+    QString tmp = "";
+
+    for (uint i = 0; i < program_type.size(); i++)
+    {
+        if (i != 0)
+            tmp += ", ";
+        tmp += xds_program_type_string[program_type[i]];
+    }
+
+    return QDeepCopy<QString>(tmp);
+}
+
 QString CC608Decoder::GetXDS(const QString &key) const
 {
+    QMutexLocker locker(&xds_lock);
+
     if (key == "ratings")
-        return QString::number(GetRatingSystems());
+        return QString::number(GetRatingSystems(false));
     else if (key.left(11) == "has_rating_")
-        return ((1<<key.right(1).toUInt()) & GetRatingSystems()) ? "1" : "0";
+        return ((1<<key.right(1).toUInt()) & GetRatingSystems(false))?"1":"0";
     else if (key.left(7) == "rating_")
-        return GetRatingString(key.right(1).toUInt());
+        return GetRatingString(key.right(1).toUInt(), false);
+
+    else if (key == "future_ratings")
+        return QString::number(GetRatingSystems(true));
+    else if (key.left(11) == "has_future_rating_")
+        return ((1<<key.right(1).toUInt()) & GetRatingSystems(true))?"1":"0";
+    else if (key.left(14) == "future_rating_")
+        return GetRatingString(key.right(1).toUInt(), true);
+
+    else if (key == "programname")
+        return GetProgramName(false);
+    else if (key == "future_programname")
+        return GetProgramName(true);
+
+    else if (key == "programtype")
+        return GetProgramType(false);
+    else if (key == "future_programtype")
+        return GetProgramType(true);
+
     else if (key == "callsign")
-        return QDeepCopy<QString>(xds_net_call_x);
+        return QDeepCopy<QString>(xds_net_call);
     else if (key == "channame")
-        return QDeepCopy<QString>(xds_net_name_x);
+        return QDeepCopy<QString>(xds_net_name);
+    else if (key == "tsid")
+        return QString::number(xds_tsid);
 
     return QString::null;
 }
 
-void CC608Decoder::DecodeXDSVChip(int b1, int b2)
-{
-    if (b1 != 0x0F)
-    {
-        xds_buf.push_back(b1);
-        xds_buf.push_back(b2);
-        return;
-    }
-
-    xds_current_packet = 0;
-
-    if (xds_buf.size() < 2)
-        return; // collected data too small to contain XDS VChip packet
-
-    uint rating_system = ((xds_buf[0]>>3) & 0x7);
-    // 0 == us mpaa, 1 == us tpg, 3 == ca english, 7 == ca french
-
-    if (1 == rating_system)
-    {
-        uint rating = (xds_buf[1] & 0x07);
-        if (!(kHasTPG & xds_rating_systems) || rating != GetRating(kRatingTPG))
-        {
-            uint f = ((xds_buf[0]<<3) & 0x80) | ((xds_buf[1]<<1) & 0x70);
-            xds_rating_systems     |= kHasTPG;
-            xds_rating[kRatingTPG]  = rating | f;
-            VERBOSE(VB_GENERAL, "VChip: "<<GetRatingString(kRatingTPG));
-        }
-    }
-    else if (0 == rating_system)
-    {
-        uint rating = (xds_buf[0] & 0x07);
-        if (!(kHasMPAA & xds_rating_systems) ||
-            (rating != GetRating(kRatingMPAA)))
-        {
-            xds_rating_systems      |= kHasMPAA;
-            xds_rating[kRatingMPAA]  = rating;
-            VERBOSE(VB_GENERAL, "VChip: "<<GetRatingString(kRatingMPAA));
-        }
-    }
-    else if (3 == rating_system)
-    {
-        uint rating = (xds_buf[1] & 0x07);
-        if (!(kHasCanEnglish & xds_rating_systems) ||
-            (rating != GetRating(kRatingCanEnglish)))
-        {
-            xds_rating_systems            |= kHasCanEnglish;
-            xds_rating[kRatingCanEnglish]  = rating;
-            VERBOSE(VB_GENERAL, "VChip: "<<GetRatingString(kRatingCanEnglish));
-        }
-    }
-    else if (7 == rating_system)
-    {
-        uint rating = (xds_buf[1] & 0x07);
-        if (!(kHasCanFrench & xds_rating_systems) ||
-            (rating != GetRating(kRatingCanFrench)))
-        {
-            xds_rating_systems            |= kHasCanFrench;
-            xds_rating[kRatingCanFrench]  = rating;
-            VERBOSE(VB_GENERAL, "VChip: "<<GetRatingString(kRatingCanFrench));
-        }
-    }
-    else
-    {
-        VERBOSE(VB_VBI, "VChip: Unknown Rating System #" << rating_system);
-    }
-}
-
-void CC608Decoder::DecodeXDSPacket(int b1, int b2)
+void CC608Decoder::XDSDecode(int /*field*/, int b1, int b2)
 {
 #if DEBUG_XDS
-    VERBOSE(VB_VBI, QString("XDSPacket: 0x%1 0x%2 (cp 0x%3)")
-            .arg(b1,2,16).arg(b2,2,16).arg(xds_current_packet,0,16));
-#endif // DEBUG_XDS
-
-    bool handled = true;
-    if (kXDSIgnore == xds_current_packet)
-    {
-        if (b1 == 0x0f)
-            xds_current_packet = 0;
-    }
-    else if (kXDSNetName == xds_current_packet)
-    {
-        if (b1 == 0x0f)
-            xds_current_packet = 0;
-    }
-    else if (kXDSNetCall == xds_current_packet)
-    {
-        if (b1 == 0x0f)
-            xds_current_packet = 0;
-    }
-    else if (kXDSStartTime == xds_current_packet)
-        DecodeXDSStartTime(b1, b2);
-    else if (kXDSProgLen == xds_current_packet)
-        DecodeXDSProgramLength(b1, b2);
-    else if (kXDSProgName == xds_current_packet)
-        DecodeXDSProgramName(b1, b2);
-    else if (kXDSProgType == xds_current_packet)
-        DecodeXDSProgramType(b1, b2);
-    else if (kXDSVChip == xds_current_packet)
-        DecodeXDSVChip(b1, b2);
-    else if (kXDSNetCallX == xds_current_packet)
-    {
-        if (b1 == 0x0f)
-        {
-            xds_current_packet = 0;
-
-            QString tmp = DecodeXDSString(xds_buf, 0, xds_buf.size());
-            if (is_better(tmp, xds_net_call_x))
-            {
-                VERBOSE(VB_VBI, QString("XDS: Network Call '%1'").arg(tmp));
-                xds_net_call_x = tmp;
-            }
-        }
-        else
-        {
-            xds_buf.push_back(b1);
-            xds_buf.push_back(b2);
-        }
-    }
-    else if (kXDSNetNameX == xds_current_packet)
-    {
-        if (b1 == 0x0f)
-        {
-            xds_current_packet = 0;
-
-            QString tmp = DecodeXDSString(xds_buf, 0, xds_buf.size());
-            if (is_better(tmp, xds_net_name_x))
-            {
-                VERBOSE(VB_VBI, QString("XDS: Network Name '%1'").arg(tmp));
-                xds_net_name_x = tmp;
-            }
-        }
-        else
-        {
-            xds_buf.push_back(b1);
-            xds_buf.push_back(b2);
-        }
-    }
-    else if (b1 == 0x83) // cont code: 0x04
-    { // future class
-        VERBOSE(VB_VBI, "XDS Packet future start");
-        xds_current_packet = kXDSIgnore;
-    }
-    else if (b1 == 0x01) // cont code: 0x02
-    { // current class
-        if (b2 == 0x01)
-        {
-            // Detect start packets 
-            VERBOSE(VB_VBI, "XDS Packet: Start Time/Program ID");
-            xds_current_packet = kXDSStartTime;
-        }
-        else if (b2 == 0x02)
-        {
-            VERBOSE(VB_VBI, "XDS Packet: Program Length/Time in Show");
-            xds_current_packet = kXDSProgLen;
-            xds_buf.clear();
-        }
-        else if (b2 == 0x03)
-        {
-            xds_current_packet = kXDSProgName;
-            xds_buf.clear();
-        }
-        else if (b2 == 0x04)
-        {
-            VERBOSE(VB_VBI, "XDS Packet: Program Type");
-            xds_current_packet = kXDSProgType;
-        }
-        else if (b2 == 0x05)
-        {
-            xds_current_packet = kXDSVChip;
-            xds_buf.clear();
-        }
-        else if (b2 == 0x07)
-            xds_current_packet = kXDSIgnore; // caption
-        else if (b2 == 0x08)
-            xds_current_packet = kXDSIgnore; // cgms
-        else if (b2 == 0x09)
-            xds_current_packet = kXDSIgnore; // unknown
-        else if (b2 == 0x0c)
-            xds_current_packet = kXDSIgnore; // misc
-        else if (b2 == 0x10 || b2 == 0x13 || b2 == 0x15 || b2 == 0x16 ||
-                 b2 == 0x91 || b2 == 0x92 || b2 == 0x94 || b2 == 0x97)
-            xds_current_packet = kXDSIgnore; // program description
-        else if (b2 == 0x86)
-            xds_current_packet = kXDSIgnore; // audio
-        else if (b2 == 0x89)
-            xds_current_packet = kXDSIgnore; // aspect
-        else if (b2 == 0x8c)
-            xds_current_packet = kXDSIgnore; // program data
-        else
-            handled = false;
-    }
-    else if (b1 == 0x85) // cont code: 0x86
-    { // channel class
-        if (b2 == 0x01)
-        {
-            VERBOSE(VB_VBI, "XDS Packet: Network Name");
-            xds_current_packet = kXDSNetName;
-        }
-        else if (b2 == 0x02)
-        {
-            VERBOSE(VB_VBI, "XDS Packet: Network Call Letters");
-            xds_current_packet = kXDSNetCall;
-        }
-        else if (b2 == 0x04)
-        {
-            VERBOSE(VB_VBI, "XDS Packet: TSID");
-            xds_current_packet = kXDSIgnore;
-        }
-        else if (b2 == 0x83)
-            xds_current_packet = kXDSIgnore; // tape delay
-        else
-            handled = false;
-    }
-    else if (b1 == 0x07) // cont code: 0x08
-    { // misc.
-        xds_current_packet = kXDSIgnore;
-    }
-    else if (b1 == 0x89) // cont code: 0x8a
-    { // weather
-        xds_current_packet = kXDSIgnore;
-    }
-    else if (b1 == 0x0b) // cont code: 0x8c
-    { // reserved
-        xds_current_packet = kXDSIgnore;
-    }
-    else if (b1 == 0x0d) // cont code: 0x0e
-    { // undefined
-        xds_current_packet = kXDSIgnore;
-    }
-    else if (b1 == 0x05)
-    { // unknown ?cable?
-        if (b2 == 0x01 || b2 == 0x02)
-        {
-            xds_current_packet = ((uint)b1) << 8 | b2;
-            xds_buf.clear();
-        }
-        else
-        {
-            VERBOSE(VB_VBI, "XDS Packet: Unknown class 0x05, type "<<b2);
-            xds_current_packet = kXDSIgnore;
-        }
-    }
-    else
-        handled = false;
-
-    if ((b1 == 0x0f) && xds_current_packet)
-        xds_current_packet = 0;
-
-    if (!handled)
-    {
-#if DEBUG_XDS
-        VERBOSE(VB_VBI, QString("XDS: Unknown Packet 0x%1 0x%2 (cp 0x%3)")
-                .arg(b1,0,16).arg(b2,0,16).arg(xds_current_packet,0,16));
-#endif // DEBUG_XDS
-        xds_current_packet = 0;
-    }
-}
-
-void CC608Decoder::DecodeXDS(int field, int b1, int b2)
-{
-    field = 1;
-#if DEBUG_XDS
-    VERBOSE(VB_VBI, QString("DecodeXDS: 0x%1 0x%2 (cp 0x%3) '%4%5' "
+    VERBOSE(VB_VBI, QString("XDSDecode: 0x%1 0x%2 (cp 0x%3) '%4%5' "
                             "xds[%6]=%7")
             .arg(b1,2,16).arg(b2,2,16).arg(xds_current_packet,0,16)
             .arg(((int)CharCC(b1)>0x20) ? CharCC(b1) : QChar(' '))
             .arg(((int)CharCC(b2)>0x20) ? CharCC(b2) : QChar(' '))
             .arg(field).arg(xds[field]));
 #endif // DEBUG_XDS
-    // if (0x01 <= b1 <= 0x0F) -> start XDS or inside XDS packet
-    if ((field == 1) && (xds[field] || b1 && ((b1 & 0x70) == 0x00)))
-    {
-        bool xds_packet = true;
 
-        // VERBOSE(VB_VBI, QString("XDS Packet : %1 %2").arg(b1).arg(b2));
-        if (b1 == 0x0F)
+    if (xds_buf.empty() && (b1 > 0x0f))
+        return; // waiting for start of XDS
+
+    // Supports non-interleaved XDS packet continuation by ignoring cont.
+    if ((b1 < 0x0f) && (b1 > 0x0f))
+        return;
+
+    xds_buf.push_back(b1);
+    xds_buf.push_back(b2);
+
+    if (b1 == 0x0f)
+    {
+        if (XDSPacketCRC(xds_buf))
+            XDSPacketParse(xds_buf);
+        xds_buf.clear();
+    }
+}
+
+void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
+{
+    QMutexLocker locker(&xds_lock);
+
+    bool handled   = false;
+    int  xds_class = xds_buf[0];
+
+    if (!xds_class)
+        return;
+
+    if ((xds_class == 0x01) || (xds_class == 0x03)) // cont code 2 and 4, resp.
+        handled = XDSPacketParseProgram(xds_buf, (xds_class == 0x03));
+    else if (xds_class == 0x05) // cont code: 0x06
+        handled = XDSPacketParseChannel(xds_buf);
+    else if (xds_class == 0x07) // cont code: 0x08
+        ; // misc.
+    else if (xds_class == 0x09) // cont code: 0x0a
+        ; // public (aka weather)
+    else if (xds_class == 0x0b) // cont code: 0x0c
+        ; // reserved
+    else if (xds_class == 0x0d) // cont code: 0x0e
+        handled = true; // undefined
+
+    if (!handled)
+    {
+        VERBOSE(VB_IMPORTANT, QString("XDS: ") +
+                QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
+                .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
+                .arg(xds_buf.size())
+                .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
+    }
+}
+
+bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)
+{
+    /* Check the checksum for validity of the packet. */
+    int sum = 0;
+    for (uint i = 0; i < xds_buf.size() - 1; i++)
+        sum += xds_buf[i];
+
+    if ((((~sum) & 0x7f) + 1) != xds_buf[xds_buf.size() - 1])
+    {
+        xds_crc_failed++;
+
+        VERBOSE(VB_VBI, QString("XDS: failed CRC %1/%2")
+                .arg(xds_crc_failed).arg(xds_crc_failed + xds_crc_passed));
+
+        return false;
+    }
+
+    xds_crc_passed++;
+    return true;
+}
+
+bool CC608Decoder::XDSPacketParseProgram(
+    const vector<unsigned char> &xds_buf, bool future)
+{
+    bool handled = true;
+    int b2 = xds_buf[1];
+    int cf = (future) ? 1 : 0;
+    QString loc = (future) ? "XDS: Future " : "XDS: Current ";
+
+    if ((b2 == 0x01) && (xds_buf.size() >= 6))
+    {
+        uint min   = xds_buf[2] & 0x3f;
+        uint hour  = xds_buf[3] & 0x0f;
+        uint day   = xds_buf[4] & 0x1f;
+        uint month = xds_buf[5] & 0x0f;
+        month = (month < 1 || month > 12) ? 0 : month;
+
+        VERBOSE(VB_GENERAL, loc +
+                QString("Start Time %1/%2 %3:%4%5")
+                .arg(month).arg(day).arg(hour).arg(min / 10).arg(min % 10));
+    }
+    else if ((b2 == 0x02) && (xds_buf.size() >= 4))
+    {
+        uint length_min  = xds_buf[2] & 0x3f;
+        uint length_hour = xds_buf[3] & 0x3f;
+        uint length_elapsed_min  = 0;
+        uint length_elapsed_hour = 0;
+        uint length_elapsed_secs = 0;
+        if (xds_buf.size() > 6)
         {
-            // end XDS
-            xds[field] = 0;
-            xds_packet = true;
+            length_elapsed_min  = xds_buf[4] & 0x3f;
+            length_elapsed_hour = xds_buf[5] & 0x3f;
         }
-        else if ((b1 & 0x70) == 0x10)
+        if (xds_buf.size() > 8 && xds_buf[7] == 0x40)
+            length_elapsed_secs = xds_buf[6] & 0x3f;
+
+        QString msg = QString("Program Length %1:%2%3 "
+                              "Time in Show %4:%5%6.%7%8")
+            .arg(length_hour).arg(length_min / 10).arg(length_min % 10)
+            .arg(length_elapsed_hour)
+            .arg(length_elapsed_min / 10).arg(length_elapsed_min % 10)
+            .arg(length_elapsed_secs / 10).arg(length_elapsed_secs % 10);
+
+        VERBOSE(VB_GENERAL, loc + msg);
+    }
+    else if ((b2 == 0x03) && (xds_buf.size() >= 6))
+    {
+        QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
+        if (is_better(tmp, xds_program_name[cf]))
         {
-            // ctrl code -- interrupt XDS
-            xds[field] = 0;
-            xds_packet = false;
+            xds_program_name[cf] = tmp;
+            VERBOSE(VB_GENERAL, loc + QString("Program Name: '%1'")
+                    .arg(GetProgramName(future)));
+        }
+    }
+    else if ((b2 == 0x04) && (xds_buf.size() >= 6))
+    {
+        vector<uint> program_type;
+        for (uint i = 2; i < xds_buf.size() - 2; i++)
+        {
+            int cur = xds_buf[i] - 0x20;
+            if (cur >= 0 && cur < 96)
+                program_type.push_back(cur);
+        }
+
+        bool unchanged = xds_program_type[cf].size() == program_type.size();
+        for (uint i = 0; (i < program_type.size()) && unchanged; i++)
+            unchanged = xds_program_type[cf][i] == program_type[i];
+
+        if (!unchanged)
+        {
+            xds_program_type[cf] = program_type;
+            VERBOSE(VB_GENERAL, loc + QString("Program Type '%1'")
+                    .arg(GetProgramType(future)));
+        }
+    }
+    else if ((b2 == 0x05) && (xds_buf.size() >= 4))
+    {
+        uint movie_rating  = xds_buf[2] & 0x7;
+        uint rating_system = (xds_buf[2] >> 3) & 0x7;
+        uint tv_rating     = xds_buf[3] & 0x7;
+        uint VSL           = xds_buf[3] & (0x7 << 3);
+        uint sel           = VSL | rating_system;
+        if (sel == 3)
+        {
+            if (!(kHasCanEnglish & xds_rating_systems[cf]) ||
+                (tv_rating != GetRating(kRatingCanEnglish, future)))
+            {
+                xds_rating_systems[cf]            |= kHasCanEnglish;
+                xds_rating[cf][kRatingCanEnglish]  = tv_rating;
+                VERBOSE(VB_GENERAL, loc + "VChip "
+                        << GetRatingString(kRatingCanEnglish, future));
+            }
+        }
+        else if (sel == 7)
+        {
+            if (!(kHasCanFrench & xds_rating_systems[cf]) ||
+                (tv_rating != GetRating(kRatingCanFrench, future)))
+            {
+                xds_rating_systems[cf]           |= kHasCanFrench;
+                xds_rating[cf][kRatingCanFrench]  = tv_rating;
+                VERBOSE(VB_GENERAL, loc + "VChip "
+                        << GetRatingString(kRatingCanFrench, future));
+            }
+        }
+        else if (sel == 0x13 || sel == 0x1f)
+            ; // Reserved according to TVTime code
+        else if ((rating_system & 0x3) == 1)
+        {
+            if (!(kHasTPG & xds_rating_systems[cf]) ||
+                (tv_rating != GetRating(kRatingTPG, future)))
+            {
+                uint f = ((xds_buf[0]<<3) & 0x80) | ((xds_buf[1]<<1) & 0x70);
+                xds_rating_systems[cf]     |= kHasTPG;
+                xds_rating[cf][kRatingTPG]  = tv_rating | f;
+                VERBOSE(VB_GENERAL, loc + "VChip "
+                        << GetRatingString(kRatingTPG, future));
+            }
+        }
+        else if (rating_system == 0)
+        {
+            if (!(kHasMPAA & xds_rating_systems[cf]) ||
+                (movie_rating != GetRating(kRatingMPAA, future)))
+            {
+                xds_rating_systems[cf]      |= kHasMPAA;
+                xds_rating[cf][kRatingMPAA]  = movie_rating;
+                VERBOSE(VB_GENERAL, loc + "VChip "
+                        << GetRatingString(kRatingMPAA, future));
+            }
         }
         else
         {
-            xds[field] = 1;
-            xds_packet = true;
+            VERBOSE(VB_VBI, loc + "VChip Unhandled -- rs("<<rating_system
+                    <<") rating("<<tv_rating<<":"<<movie_rating<<")");
         }
-
-        if (xds_packet)
-            DecodeXDSPacket(b1, b2);
     }
+#if 0
+    else if (b2 == 0x07)
+        ; // caption
+    else if (b2 == 0x08)
+        ; // cgms
+    else if (b2 == 0x09)
+        ; // unknown
+    else if (b2 == 0x0c)
+        ; // misc
+    else if (b2 == 0x10 || b2 == 0x13 || b2 == 0x15 || b2 == 0x16 ||
+             b2 == 0x91 || b2 == 0x92 || b2 == 0x94 || b2 == 0x97)
+        ; // program description
+    else if (b2 == 0x86)
+        ; // audio
+    else if (b2 == 0x89)
+        ; // aspect
+    else if (b2 == 0x8c)
+        ; // program data
+#endif
+    else
+        handled = false;
+
+    return handled;
+}
+
+bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
+{
+    bool handled = true;
+
+    int b2 = xds_buf[1];
+    if ((b2 == 0x01) && (xds_buf.size() >= 6))
+    {
+        QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
+        if (is_better(tmp, xds_net_name))
+        {
+            VERBOSE(VB_GENERAL, QString("XDS: Network Name '%1'").arg(tmp));
+            xds_net_name = tmp;
+        }
+    }
+    else if ((b2 == 0x02) && (xds_buf.size() >= 6))
+    {
+        QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
+        if (is_better(tmp, xds_net_call) && (tmp.find(" ") < 0))
+        {
+            VERBOSE(VB_GENERAL, QString("XDS: Network Call '%1'").arg(tmp));
+            xds_net_call = tmp;
+        }
+    }
+    else if ((b2 == 0x04) && (xds_buf.size() >= 6))
+    {
+        uint tsid = (xds_buf[2] << 24 | xds_buf[3] << 16 |
+                     xds_buf[4] <<  8 | xds_buf[5]);
+        if (tsid != xds_tsid)
+        {
+            VERBOSE(VB_GENERAL, QString("XDS: TSID 0x%1").arg(tsid,0,16));
+            xds_tsid = tsid;
+        }
+    }
+    else
+        handled = false;
+
+    return handled;
+}
+
+static void init_xds_program_type(QString xds_program_type[96])
+{
+    xds_program_type[0]  = QObject::tr("Education");
+    xds_program_type[1]  = QObject::tr("Entertainment");
+    xds_program_type[2]  = QObject::tr("Movie");
+    xds_program_type[3]  = QObject::tr("News");
+    xds_program_type[4]  = QObject::tr("Religious");
+    xds_program_type[5]  = QObject::tr("Sports");
+    xds_program_type[6]  = QObject::tr("Other");
+    xds_program_type[7]  = QObject::tr("Action");
+    xds_program_type[8]  = QObject::tr("Advertisement");
+    xds_program_type[9]  = QObject::tr("Animated");
+    xds_program_type[10] = QObject::tr("Anthology");
+    xds_program_type[11] = QObject::tr("Automobile");
+    xds_program_type[12] = QObject::tr("Awards");
+    xds_program_type[13] = QObject::tr("Baseball");
+    xds_program_type[14] = QObject::tr("Basketball");
+    xds_program_type[15] = QObject::tr("Bulletin");
+    xds_program_type[16] = QObject::tr("Business");
+    xds_program_type[17] = QObject::tr("Classical");
+    xds_program_type[18] = QObject::tr("College");
+    xds_program_type[19] = QObject::tr("Combat");
+    xds_program_type[20] = QObject::tr("Comedy");
+    xds_program_type[21] = QObject::tr("Commentary");
+    xds_program_type[22] = QObject::tr("Concert");
+    xds_program_type[23] = QObject::tr("Consumer");
+    xds_program_type[24] = QObject::tr("Contemporary");
+    xds_program_type[25] = QObject::tr("Crime");
+    xds_program_type[26] = QObject::tr("Dance");
+    xds_program_type[27] = QObject::tr("Documentary");
+    xds_program_type[28] = QObject::tr("Drama");
+    xds_program_type[29] = QObject::tr("Elementary");
+    xds_program_type[30] = QObject::tr("Erotica");
+    xds_program_type[31] = QObject::tr("Exercise");
+    xds_program_type[32] = QObject::tr("Fantasy");
+    xds_program_type[33] = QObject::tr("Farm");
+    xds_program_type[34] = QObject::tr("Fashion");
+    xds_program_type[35] = QObject::tr("Fiction");
+    xds_program_type[36] = QObject::tr("Food");
+    xds_program_type[37] = QObject::tr("Football");
+    xds_program_type[38] = QObject::tr("Foreign");
+    xds_program_type[39] = QObject::tr("Fund Raiser");
+    xds_program_type[40] = QObject::tr("Game/Quiz");
+    xds_program_type[41] = QObject::tr("Garden");
+    xds_program_type[42] = QObject::tr("Golf");
+    xds_program_type[43] = QObject::tr("Government");
+    xds_program_type[44] = QObject::tr("Health");
+    xds_program_type[45] = QObject::tr("High School");
+    xds_program_type[46] = QObject::tr("History");
+    xds_program_type[47] = QObject::tr("Hobby");
+    xds_program_type[48] = QObject::tr("Hockey");
+    xds_program_type[49] = QObject::tr("Home");
+    xds_program_type[50] = QObject::tr("Horror");
+    xds_program_type[51] = QObject::tr("Information");
+    xds_program_type[52] = QObject::tr("Instruction");
+    xds_program_type[53] = QObject::tr("International");
+    xds_program_type[54] = QObject::tr("Interview");
+    xds_program_type[55] = QObject::tr("Language");
+    xds_program_type[56] = QObject::tr("Legal");
+    xds_program_type[57] = QObject::tr("Live");
+    xds_program_type[58] = QObject::tr("Local");
+    xds_program_type[59] = QObject::tr("Math");
+    xds_program_type[60] = QObject::tr("Medical");
+    xds_program_type[61] = QObject::tr("Meeting");
+    xds_program_type[62] = QObject::tr("Military");
+    xds_program_type[63] = QObject::tr("Miniseries");
+    xds_program_type[64] = QObject::tr("Music");
+    xds_program_type[65] = QObject::tr("Mystery");
+    xds_program_type[66] = QObject::tr("National");
+    xds_program_type[67] = QObject::tr("Nature");
+    xds_program_type[68] = QObject::tr("Police");
+    xds_program_type[69] = QObject::tr("Politics");
+    xds_program_type[70] = QObject::tr("Premiere");
+    xds_program_type[71] = QObject::tr("Prerecorded");
+    xds_program_type[72] = QObject::tr("Product");
+    xds_program_type[73] = QObject::tr("Professional");
+    xds_program_type[74] = QObject::tr("Public");
+    xds_program_type[75] = QObject::tr("Racing");
+    xds_program_type[76] = QObject::tr("Reading");
+    xds_program_type[77] = QObject::tr("Repair");
+    xds_program_type[78] = QObject::tr("Repeat");
+    xds_program_type[79] = QObject::tr("Review");
+    xds_program_type[80] = QObject::tr("Romance");
+    xds_program_type[81] = QObject::tr("Science");
+    xds_program_type[82] = QObject::tr("Series");
+    xds_program_type[83] = QObject::tr("Service");
+    xds_program_type[84] = QObject::tr("Shopping");
+    xds_program_type[85] = QObject::tr("Soap Opera");
+    xds_program_type[86] = QObject::tr("Special");
+    xds_program_type[87] = QObject::tr("Suspense");
+    xds_program_type[88] = QObject::tr("Talk");
+    xds_program_type[89] = QObject::tr("Technical");
+    xds_program_type[90] = QObject::tr("Tennis");
+    xds_program_type[91] = QObject::tr("Travel");
+    xds_program_type[92] = QObject::tr("Variety");
+    xds_program_type[93] = QObject::tr("Video");
+    xds_program_type[94] = QObject::tr("Weather");
+    xds_program_type[95] = QObject::tr("Western");
 }

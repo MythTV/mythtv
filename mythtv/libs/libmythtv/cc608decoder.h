@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef CCDECODER_H_
 #define CCDECODER_H_
 
@@ -6,6 +8,7 @@
 #include <vector>
 using namespace std;
 
+#include <qmutex.h>
 #include <qstringlist.h>
 
 #include "format.h"
@@ -48,10 +51,11 @@ class CC608Decoder
 
     void SetIgnoreTimecode(bool val) { ignore_time_code = val; }
 
-    uint GetRatingSystems(void) const { return xds_rating_systems; }
-    uint GetRating(uint i) const { return xds_rating[i&3]&7; }
-    QString GetRatingString(uint i) const;
-
+    uint    GetRatingSystems(bool future) const;
+    uint    GetRating(uint i, bool future) const;
+    QString GetRatingString(uint i, bool future) const;
+    QString GetProgramName(bool future) const;
+    QString GetProgramType(bool future) const;
     QString GetXDS(const QString &key) const;
 
   private:
@@ -60,15 +64,15 @@ class CC608Decoder
     void BufferCC(int mode, int len, int clr);
     int NewRowCC(int mode, int len);
 
-    QString DecodeXDSString(const vector<unsigned char>&,
+    QString XDSDecodeString(const vector<unsigned char>&,
                             uint string, uint end) const;
-    void DecodeXDSStartTime(int b1, int b2);
-    void DecodeXDSProgramLength(int b1, int b2);
-    void DecodeXDSProgramName(int b1, int b2);
-    void DecodeXDSProgramType(int b1, int b2);
-    void DecodeXDSVChip(int b1, int b2);
-    void DecodeXDSPacket(int b1, int b2);
-    void DecodeXDS(int field, int b1, int b2);
+    void XDSDecode(int field, int b1, int b2);
+
+    bool XDSPacketParseProgram(const vector<unsigned char> &xds_buf,
+                               bool future);
+    bool XDSPacketParseChannel(const vector<unsigned char> &xds_buf);
+    void XDSPacketParse(const vector<unsigned char> &xds_buf);
+    bool XDSPacketCRC(const vector<unsigned char> &xds_buf);
 
     CC608Reader *reader;
 
@@ -112,30 +116,21 @@ class CC608Decoder
     uint            wss_flags;
     bool            wss_valid;
 
-    // XDS data
-    enum
-    {
-        kXDSStartTime = 0x0101,
-        kXDSProgLen   = 0x0102,
-        kXDSProgName  = 0x0103,
-        kXDSProgType  = 0x0104,
-        kXDSVChip     = 0x0105,
-        kXDSNetName   = 0x8501,
-        kXDSNetCall   = 0x8502,
-        kXDSNetCallX  = 0x0501, // reverse engineered
-        kXDSNetNameX  = 0x0502, // reverse engineered
-        kXDSIgnore    = 0xFFFF,
-    };
-    uint            xds_current_packet;
     vector<unsigned char> xds_buf;
+    uint            xds_crc_passed;
+    uint            xds_crc_failed;
 
-    uint            xds_rating_systems;
-    uint            xds_rating[4];
-    QString         xds_program_name;
+    mutable QMutex  xds_lock;
+    uint            xds_rating_systems[2];
+    uint            xds_rating[2][4];
+    QString         xds_program_name[2];
+    vector<uint>    xds_program_type[2];
+
     QString         xds_net_call;
-    QString         xds_net_call_x;
     QString         xds_net_name;
-    QString         xds_net_name_x;
+    uint            xds_tsid;
+
+    QString         xds_program_type_string[96];
 };
 
 #endif
