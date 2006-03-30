@@ -469,6 +469,11 @@ void MythMainWindow::Init(void)
     }
 #endif
 
+    flags |= WRepaintNoErase;
+#ifdef QWS
+    flags |= WResizeNoErase;
+#endif
+
     reparent(parentWidget(), flags, pos());
 
     /* FIXME these two lines should go away */
@@ -1129,7 +1134,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
             {
                 activedialog = dynamic_cast<MythDialog*>(activewidget);
                 if (!activedialog)
-                       activewidget = activewidget->parentWidget();
+                    activewidget = activewidget->parentWidget();
             }
             if (activedialog)
                 iscatched = activedialog->onMediaEvent(pDev);
