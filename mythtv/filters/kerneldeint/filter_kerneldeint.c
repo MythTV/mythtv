@@ -249,11 +249,50 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 }
 #endif
 
+static void SetupSize(ThisFilter *filter, VideoFrameType inpixfmt,
+                      int *width, int *height)
+{
+    filter->width = *width;
+    filter->height = *height;
+    filter->cwidth = *width / 2;
+    filter->uoff = *width * *height;
+
+    switch (inpixfmt)
+    {
+        case FMT_YUV422P:
+            filter->voff = filter->uoff + *width * *height / 2;
+            filter->size = *width * *height * 2;
+            filter->cheight = *height;
+            break;
+        case FMT_YV12:
+            filter->voff = filter->uoff + *width * *height / 4;
+            filter->size = *width * *height * 3 / 2;
+            filter->cheight = *height / 2;
+            break;
+        default:
+            ;
+    }
+
+    if (filter->line)
+        free(filter->line);
+
+    filter->line = malloc(*width);
+}
+
 static int
 KernelDeint (VideoFilter * f, VideoFrame * frame)
 {
     ThisFilter *filter = (ThisFilter *) f;
     TF_VARS;
+
+    if (frame->width != filter->width || frame->height != filter->height)
+        SetupSize(filter, frame->codec, &frame->width, &frame->height);
+
+    if (!filter->line)
+    {
+        fprintf (stderr, "KernelDeint: failed to allocate line buffer.\n");
+        return -1;
+    }
 
     TF_START;
     (filter->filtfunc)(frame->buf, filter->line, filter->width,
@@ -307,10 +346,6 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     if (numopts < 1)
         filter->threshold = 12;
 
-    filter->width = *width;
-    filter->height = *height;
-    filter->cwidth = *width / 2;
-    filter->uoff = *width * *height;
 #ifdef MMX
     filter->mm_flags = mm_support();
     if (filter->mm_flags & MM_MMX)
@@ -321,23 +356,9 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 #endif
         filter->filtfunc = &KDP;
 
-    switch (inpixfmt)
-    {
-        case FMT_YUV422P:
-            filter->voff = filter->uoff + *width * *height / 2;
-            filter->size = *width * *height * 2;
-            filter->cheight = *height;
-            break;
-        case FMT_YV12:
-            filter->voff = filter->uoff + *width * *height / 4;
-            filter->size = *width * *height * 3 / 2;
-            filter->cheight = *height / 2;
-            break;
-        default:
-            ;
-    }
+    filter->line = NULL;
+    SetupSize(filter, inpixfmt, width, height);
 
-    filter->line = malloc(*width);
     if (filter->line == NULL)
     {
         fprintf (stderr, "KernelDeint: failed to allocate line buffer.\n");

@@ -50,6 +50,20 @@ int pp(VideoFilter *vf, VideoFrame *frame)
     if (frame->qscale_table == NULL)
         frame->qstride = 0;
 
+    tf->ysize = (frame->width) * (frame->height);
+    tf->csize = tf->ysize / 4;
+
+    tf->width = frame->width;
+    tf->height = frame->height;
+
+    tf->srcStride[0] = tf->ysize / (tf->height);
+    tf->srcStride[1] = tf->csize / (tf->height) * 2;
+    tf->srcStride[2] = tf->csize / (tf->height) * 2;
+
+    tf->dstStride[0] = tf->ysize / (tf->height);
+    tf->dstStride[1] = tf->csize / (tf->height) * 2;
+    tf->dstStride[2] = tf->csize / (tf->height) * 2;
+
     pp_postprocess( tf->src, tf->srcStride,
                     tf->dst, tf->dstStride,
                     frame->width, frame->height,
@@ -90,20 +104,6 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    filter->ysize = (*width) * (*height);
-    filter->csize = filter->ysize / 4;
-
-    filter->width = *width;
-    filter->height = *height;
-
-    filter->srcStride[0] = filter->ysize / (*height);
-    filter->srcStride[1] = filter->csize / (*height) * 2;
-    filter->srcStride[2] = filter->csize / (*height) * 2;
-
-    filter->dstStride[0] = filter->ysize / (*height);
-    filter->dstStride[1] = filter->csize / (*height) * 2;
-    filter->dstStride[2] = filter->csize / (*height) * 2;
-    
     printf("Filteroptions: %s\n", options);
     filter->mode = pp_get_mode_by_name_and_quality(options, PP_QUALITY_MAX);
     if (filter->mode == NULL)

@@ -37,6 +37,9 @@ typedef struct ThisFilter
     int yend;
     int cend;
 
+    int width;
+    int height;
+
 #ifdef MMX
     int yfilt;
     int cfilt;
@@ -138,10 +141,34 @@ void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
 }
 #endif /* MMX */
 
+static void SetupSize(ThisFilter *filter, VideoFrameType inpixfmt,
+                      int *width, int *height)
+{
+    filter->width = *width;
+    filter->height = *height;
+
+    filter->yend = *width * *height;
+
+    switch (inpixfmt)
+    {
+        case FMT_YV12:
+            filter->cend = filter->yend + *width * *height / 2;
+            break;
+        case FMT_YUV422P:
+            filter->cend = filter->yend + *width * *height;
+            break;
+        default:
+            break;
+    }
+}
+
 int adjustFilter (VideoFilter *vf, VideoFrame *frame)
 {
     ThisFilter *filter = (ThisFilter *) vf;
     TF_VARS;
+
+    if (frame->width != filter->width || frame->height != filter->height)
+        SetupSize(filter, frame->codec, &frame->width, &frame->height);
 
     TF_START;
 
@@ -278,19 +305,7 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     fillTable (filter->ctable, cmin, cmax, 16, 240, cgamma);
 #endif
 
-    filter->yend = *width * *height;
-    
-    switch (inpixfmt)
-    {
-        case FMT_YV12:
-            filter->cend = filter->yend + *width * *height / 2;
-            break;
-        case FMT_YUV422P:
-            filter->cend = filter->yend + *width * *height;
-            break;
-        default:
-            break;
-    }
+    SetupSize(filter, inpixfmt, width, height);
 
     filter->vf.filter = &adjustFilter;
     filter->vf.cleanup = NULL;

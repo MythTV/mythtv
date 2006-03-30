@@ -68,6 +68,36 @@ PrecalcCoefs (uint8_t * Ct, double Dist25)
     }
 }
 
+static void SetupSize(ThisFilter *filter, VideoFrameType inpixfmt,
+                      int *width, int *height)
+{
+    if (filter->line)
+        free(filter->line);
+
+    filter->line = (uint8_t *) malloc (*width);
+    if (filter->line == NULL )
+    {
+        fprintf (stderr, "Denoise3D: failed to allocate line buffer\n");
+        free (filter);
+    }
+
+    if (filter->prev)
+        free(filter->prev);
+
+    filter->prev = (uint8_t *) malloc (*width * *height * 3 / 2);
+    if (filter->prev == NULL )
+    {
+        fprintf (stderr, "Denoise3D: failed to allocate frame buffer\n");
+        free (filter->line);
+        filter->line = NULL;
+    }
+    filter->width = *width;
+    filter->height = *height;
+    filter->uoff = *width * *height;
+    filter->voff = *width * *height * 5 / 4;
+    filter->cwidth = *width / 2;
+    filter->cheight = *height / 2;
+}
 
 static void
 denoise (uint8_t * Frame,
@@ -282,6 +312,15 @@ denoise3DFilter (VideoFilter * f, VideoFrame * frame)
     ThisFilter *filter = (ThisFilter *) f;
     TF_VARS;
 
+    if (frame->width != filter->width || frame->height != filter->height)
+        SetupSize(filter, frame->codec, &frame->width, &frame->height);
+
+    if (!filter->line || !filter->prev)
+    {
+        fprintf(stderr, "denoise3d: failed to allocate buffers\n");
+        return -1;
+    }
+
     TF_START;
     if (filter->first)
     {
@@ -330,27 +369,10 @@ NewDenoise3DFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    filter->line = (uint8_t *) malloc (*width);
-    if (filter->line == NULL )
-    {
-        fprintf (stderr, "Denoise3D: failed to allocate line buffer\n");
-        free (filter);
-        return NULL;
-    }
-    filter->prev = (uint8_t *) malloc (*width * *height * 3 / 2);
-    if (filter->prev == NULL )
-    {
-        fprintf (stderr, "Denoise3D: failed to allocate frame buffer\n");
-        free (filter->line);
-        free (filter);
-        return NULL;
-    }
-    filter->width = *width;
-    filter->height = *height;
-    filter->uoff = *width * *height;
-    filter->voff = *width * *height * 5 / 4;
-    filter->cwidth = *width / 2;
-    filter->cheight = *height / 2;
+    filter->line = NULL;
+    filter->prev = NULL;
+
+    SetupSize(filter, inpixfmt, width, height);
 
 #ifdef MMX
     filter->mm_flags = mm_support();
