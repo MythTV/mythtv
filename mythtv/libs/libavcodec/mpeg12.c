@@ -3256,6 +3256,7 @@ static void mpeg12_flush(AVCodecContext *avctx)
 {
     Mpeg1Context *s = avctx->priv_data;
 
+    s->save_aspect_info = -1;
     ff_mpegcontext_flush(&s->mpeg_enc_ctx);
 }
 
