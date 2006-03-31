@@ -429,6 +429,13 @@ int VideoOutputXv::GetRefreshRate(void)
     if (rate == 0)
         rate = 60;
 
+    if (rate < 20 || rate > 200)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("Unreasonable refresh rate %1Hz "
+                                           "reported by X").arg(rate));
+        rate = 60;
+    }
+
     rate = 1000000.0 / rate;
 
     return (int)rate;
