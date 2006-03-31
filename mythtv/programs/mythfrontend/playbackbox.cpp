@@ -17,6 +17,7 @@
 #include <qsqldatabase.h>
 #include <qmap.h>
 
+#include <cmath>
 #include <unistd.h>
 
 #include <iostream>
@@ -893,9 +894,13 @@ void PlaybackBox::updateVideo(QPainter *p)
         !playingSomething)
     {
         QSize size = drawVideoBounds.size();
+        float saspect = ((float)size.width()) / ((float)size.height());
+        float vaspect = previewVideoNVP->GetVideoAspect();
+        size.setHeight((int) ceil(size.height() * (saspect / vaspect)));
+        size.setHeight(((size.height() + 7) / 8) * 8);
+        size.setWidth( ((size.width()  + 7) / 8) * 8);
         const QImage &img = previewVideoNVP->GetARGBFrame(size);
-        uint xoff = max((size.width() - drawVideoBounds.width()) / 2, 0);
-        p->drawImage(drawVideoBounds.x() + xoff, drawVideoBounds.y(), img);
+        p->drawImage(drawVideoBounds.x(), drawVideoBounds.y(), img);
     }
 
     /* have we timed out waiting for nvp to start? */

@@ -1116,7 +1116,7 @@ void NuppelVideoPlayer::ShutdownYUVResize(void)
 const unsigned char *NuppelVideoPlayer::GetScaledFrame(QSize &size)
 {
     QMutexLocker locker(&yuv_lock);
-    yuv_desired_size = size = QSize(size.width() & ~0x3, size.height() & ~0x3);
+    yuv_desired_size = size = QSize(size.width() & ~0x7, size.height() & ~0x7);
 
     if ((size.width() > 0) && (size.height() > 0))
     {
