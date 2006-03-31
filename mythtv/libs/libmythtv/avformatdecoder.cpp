@@ -774,7 +774,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         ringBuffer->DVD()->IgnoreStillOrWait(false);
     }
     else
+    {
+        QMutexLocker locker(&avcodeclock);
         ret = av_find_stream_info(ic);
+    }
 
     if (ret < 0)
     {

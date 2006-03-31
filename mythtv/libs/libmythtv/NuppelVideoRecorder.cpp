@@ -215,7 +215,10 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     }
 
     if (mpa_codec)
+    {
+        QMutexLocker locker(&avcodeclock);
         avcodec_close(mpa_ctx);
+    }
 
     if (mpa_ctx)
         av_free(mpa_ctx);
@@ -452,8 +455,11 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
         useavcodec = true;
 
     if (mpa_codec)
+    {
+        QMutexLocker locker(&avcodeclock);
         avcodec_close(mpa_ctx);
-    
+    }
+
     if (mpa_ctx)
         av_free(mpa_ctx);
     mpa_ctx = NULL;
