@@ -18,6 +18,7 @@
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")
+#define LOC_WARN QString("Preview Warning: ")
 
 /** \class Preview Generator
  *  \brief This class creates a preview image of a recording.
@@ -264,8 +265,9 @@ bool PreviewGenerator::SavePreview(QString filename,
         chmod(filename.ascii(), 0666); // Let anybody update it
         return true;
     }
+
     // Save failed; if file exists, try saving to .new and moving over
-    QString newfile=filename+".new";
+    QString newfile = filename + ".new";
     if (QFileInfo(filename.ascii()).exists() &&
         small_img.save(newfile.ascii(), "PNG"))
     {
@@ -273,6 +275,7 @@ bool PreviewGenerator::SavePreview(QString filename,
         rename(newfile.ascii(), filename.ascii());
         return true;
     }
+
     // Couldn't save, nothing else I can do?
     return false;
 }
@@ -291,8 +294,9 @@ void PreviewGenerator::LocalPreviewRun(void)
         GetScreenGrab(&programInfo, programInfo.pathname, secsin,
                       sz, width, height, aspect);
     
-    bool success=SavePreview(programInfo.pathname+".png", data, width, height, aspect);
-    if (success)
+    bool ok = SavePreview(programInfo.pathname + ".png",
+                          data, width, height, aspect);
+    if (ok)
     {
         QMutexLocker locker(&previewLock);
         emit previewReady(&programInfo);
@@ -302,8 +306,15 @@ void PreviewGenerator::LocalPreviewRun(void)
         delete[] data;
 
     programInfo.MarkAsInUse(false);
-    if (!success && !localOnly) // local update failed, try remote?
+
+    // local update failed, try remote...
+    if (!ok && !localOnly)
     {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to save preview."
+                "\n\t\t\tYou may need to check user and group ownership"
+                "\n\t\t\ton your frontend and backend for quicker previews."
+                "\n\n\t\t\tAttempting to regenerate preview on backend.\n");
+
         RemotePreviewRun();
     }
 }
