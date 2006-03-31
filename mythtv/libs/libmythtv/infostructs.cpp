@@ -11,8 +11,6 @@
 
 void ChannelInfo::LoadIcon(int size)
 {
-    icon = new QPixmap();
-
     QImage tempimage(iconpath);
 
     if (tempimage.width() == 0)
@@ -36,14 +34,15 @@ void ChannelInfo::LoadIcon(int size)
 
     if (tempimage.width() > 0)
     {
+        iconload = true;
         if (tempimage.width() != size || tempimage.height() != size)
         {
             QImage tmp2;
             tmp2 = tempimage.smoothScale(size, size);
-            icon->convertFromImage(tmp2);
+            icon.convertFromImage(tmp2);
         }
         else
-            icon->convertFromImage(tempimage);
+            icon.convertFromImage(tempimage);
     }
 }
 

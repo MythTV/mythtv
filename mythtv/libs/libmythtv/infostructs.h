@@ -8,8 +8,8 @@ class QPixmap;
 class ChannelInfo
 {
  public:
-    ChannelInfo() { icon = NULL; }
-   ~ChannelInfo() { if (icon) delete icon; }
+    ChannelInfo() {}
+   ~ChannelInfo() {}
 
     void LoadIcon(int size);
     QString Text(QString format);
@@ -23,7 +23,8 @@ class ChannelInfo
     int favid;
     QString recpriority;
 
-    QPixmap *icon;
+    QPixmap icon;
+    bool iconload;
 };
 
 class TimeInfo

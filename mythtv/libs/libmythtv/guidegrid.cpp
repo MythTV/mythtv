@@ -619,7 +619,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         val.iconpath = query.value(2).toString();
         val.favid    = query.value(4).toInt();
         val.channame = QString::fromUtf8(query.value(5).toString());
-        val.icon     = NULL;
+        val.iconload = false;
 
         // set starting channel index if it hasn't been set
         bool match   = gotostartchannel && !startingset;
@@ -1138,10 +1138,10 @@ void GuideGrid::paintChannels(QPainter *p)
                     iconsize = itype->GetSize();
                 else if (type)
                     iconsize = type->GetSize();
-                if (!chinfo->icon)
+                if (!chinfo->iconload)
                     chinfo->LoadIcon(iconsize);
-                if (chinfo->icon && itype)
-                    itype->SetImage(*(chinfo->icon));
+                if (chinfo->iconload && itype)
+                    itype->SetImage(chinfo->icon);
             }
         }
 
@@ -1158,10 +1158,10 @@ void GuideGrid::paintChannels(QPainter *p)
             {
                 int iconsize = 0;
                 iconsize = type->GetSize();
-                if (!chinfo->icon)
+                if (!chinfo->iconload)
                     chinfo->LoadIcon(iconsize);
-                if (chinfo->icon)
-                    type->SetIcon(y, *(chinfo->icon));
+                if (chinfo->iconload)
+                    type->SetIcon(y, chinfo->icon);
             }
             else
             {
