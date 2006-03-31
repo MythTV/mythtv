@@ -1095,7 +1095,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         if (ge != NULL)
         {
             MythScreenStack *toplevel = GetMainStack();
-            if (toplevel)
+            if (toplevel && !currentWidget())
             {
                 MythScreenType *screen = toplevel->GetTopScreen();
                 if (screen)
