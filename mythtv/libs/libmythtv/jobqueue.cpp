@@ -693,7 +693,7 @@ bool JobQueue::ResumeJob(int jobID)
     MythEvent me(message);
     gContext->dispatch(me);
 
-    return ChangeJobCmds(jobID, JOB_RUN);
+    return ChangeJobCmds(jobID, JOB_RESUME);
 }
 
 bool JobQueue::RestartJob(int jobID)

@@ -275,7 +275,7 @@ void commDetectorBreathe()
                 }
                 case JOB_RESUME:
                 {
-                    JobQueue::ChangeJobStatus(jobID, JOB_PAUSED,
+                    JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
                                               QObject::tr("Running"));
                     commDetector->resume();
                     break;

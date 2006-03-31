@@ -12,13 +12,11 @@ void CommDetectorBase::stop()
 void CommDetectorBase::pause()
 {
     m_bPaused = true;
-    emit(statusUpdate("Paused"));
 }
 
 void CommDetectorBase::resume()
 {
     m_bPaused = false;
-    emit(statusUpdate("Resume"));
 }
 
 
