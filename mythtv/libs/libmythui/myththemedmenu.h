@@ -28,6 +28,7 @@ class MythThemedMenu : public MythScreenType
 
   protected:
     virtual bool keyPressEvent(QKeyEvent *e);
+    virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
 
   private:
     void Init(const char *cdir, const char *menufile);

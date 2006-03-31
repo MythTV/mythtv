@@ -1055,7 +1055,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (screen && (clicked = screen->GetChildAt(p)) != NULL)
                         {
-                            cout << "UI Type: " << clicked->name() << endl;
+                            clicked->gestureEvent(clicked, ge);
                             break;
                         }
                     }
@@ -1094,6 +1094,13 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         MythGestureEvent *ge = dynamic_cast<MythGestureEvent*>(ce);
         if (ge != NULL)
         {
+            MythScreenStack *toplevel = GetMainStack();
+            if (toplevel)
+            {
+                MythScreenType *screen = toplevel->GetTopScreen();
+                if (screen)
+                    screen->gestureEvent(NULL, ge);
+            }
             cout << "Gesture: " << QString(*ge) << endl;
         }
     }

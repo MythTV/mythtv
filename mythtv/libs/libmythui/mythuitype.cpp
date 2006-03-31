@@ -390,6 +390,12 @@ void MythUIType::customEvent(QCustomEvent *)
     return;
 }
 
+void MythUIType::gestureEvent(MythUIType *origtype, MythGestureEvent *ge)
+{
+    if (m_Parent)
+        m_Parent->gestureEvent(origtype, ge);
+}
+
 void MythUIType::LoseFocus(void)
 {
     if (!m_CanHaveFocus || !m_HasFocus)

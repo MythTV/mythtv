@@ -20,6 +20,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "mythplugin.h"
 
+#include "mythgesture.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
@@ -212,6 +213,8 @@ class MythThemedMenuPrivate
    ~MythThemedMenuPrivate();
 
     bool keyPressHandler(QKeyEvent *e);
+    bool keyHandler(QStringList &actions, bool fullexit);
+
     bool ReloadTheme(void);
 
     bool parseMenu(const QString &menuname);
@@ -228,8 +231,6 @@ class MythThemedMenuPrivate
     bool findDepends(const QString &fileList);
     QString findMenuFile(const QString &menuname);
 
-    void paintButton(unsigned int button, MythPainter *p, int alpha);
-
     void checkScrollArrows(void);
 
     bool checkPinCode(const QString &timestamp_setting,
@@ -237,6 +238,8 @@ class MythThemedMenuPrivate
                       const QString &text);
  
     void SetupUITypes();
+
+    bool gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
 
     void updateLCD(void);
 
@@ -1645,6 +1648,7 @@ void MythThemedMenuPrivate::SetupUITypes(void)
         uparrow->SetImage(m_state->uparrow);
     }
     uparrow->SetVisible(false);
+    uparrow->SetCanTakeFocus(true);
 
     downarrow = new MythUIImage(parent, "menu down arrow");
     if (m_state->downarrow)
@@ -1653,6 +1657,7 @@ void MythThemedMenuPrivate::SetupUITypes(void)
         downarrow->SetImage(m_state->downarrow);
     }
     downarrow->SetVisible(false);
+    downarrow->SetCanTakeFocus(true);
 
     checkScrollArrows();
 }
@@ -1694,6 +1699,7 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
     newbutton->action = action;
     newbutton->message = text;
 
+    newbutton->SetCanTakeFocus(true);
     newbutton->background = new MythUIStateType(newbutton, "button background");
     if (m_state->buttonnormal)
         newbutton->background->AddImage(MythUIStateType::None, 
@@ -2003,12 +2009,18 @@ bool MythThemedMenuPrivate::ReloadTheme(void)
 
 bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 {
+    QStringList actions;
+    GetMythMainWindow()->TranslateKeyPress("menu", e, actions);
+
+    return keyHandler(actions, e->state() == exitModifier);
+}
+
+bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
+                                       bool fullexit)
+{
     ThemedButton *lastbutton = activebutton;
     int oldrow = currentrow;
     bool handled = false;
-
-    QStringList actions;
-    GetMythMainWindow()->TranslateKeyPress("menu", e, actions);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -2120,7 +2132,7 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
                 if (GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
                     QApplication::exit();
             }
-            else if (exitModifier >= 0 && e->state() == exitModifier &&
+            else if (exitModifier >= 0 && fullexit &&
                      GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
             {
                 QApplication::exit();
@@ -2159,6 +2171,61 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
     return true;
 } 
+
+bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
+                                         MythGestureEvent *ge)
+{
+    if (ge->gesture() == MythGestureEvent::Click)
+    {
+        if (origtype == uparrow)
+        {
+            QStringList action = "PAGEUP";
+            keyHandler(action, false);
+        }
+        else if (origtype == downarrow)
+        {
+            QStringList action = "PAGEDOWN";
+            keyHandler(action, false);
+        }
+        else
+        {
+            if (ThemedButton *button = reinterpret_cast<ThemedButton*>(origtype))
+            {
+                ThemedButton *lastbutton = activebutton;
+                activebutton = button;
+
+                if (LCD *lcddev = LCD::Get())
+                    lcddev->switchToTime();
+
+                QStringList::Iterator it = button->action.begin();
+                for (; it != button->action.end(); it++)
+                {
+                    if (handleAction(*it))
+                        break;
+                }
+
+                watermark->DisplayState(activebutton->type);
+
+                if (lastbutton != activebutton && lastbutton && activebutton)
+                {
+                    lastbutton->SetActive(false);
+                    activebutton->SetActive(true);
+                }
+            }
+        }
+       
+        return true;
+    }
+
+    if (ge->gesture() == MythGestureEvent::Left)
+    {
+        QStringList action = "ESCAPE";
+        keyHandler(action, true);
+        return true;
+    }
+
+    return false;
+}
 
 QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
@@ -2477,3 +2544,15 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *e)
 
     return ret;
 }
+
+void MythThemedMenu::gestureEvent(MythUIType *origtype, MythGestureEvent *ge)
+{
+    if (d->gestureEvent(origtype, ge))
+    {
+        if (d->wantpop)
+            m_ScreenStack->PopScreen();
+    }
+    else
+        MythScreenType::gestureEvent(origtype, ge);
+}
+

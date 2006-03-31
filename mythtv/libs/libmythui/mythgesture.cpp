@@ -95,10 +95,10 @@ MythGesture::MythGesture(size_t max_points, size_t min_points,
 /* comments in header */
 void MythGesture::adjustExtremes(int x, int y)
 {
-    x = min(min_x, x);
-    x = max(max_y, x);
-    y = min(min_y, y);
-    y = max(max_y, y);
+    min_x = min(min_x, x);
+    max_x = max(max_y, x);
+    min_y = min(min_y, y);
+    max_y = max(max_y, y);
 }
 
 bool MythGesture::recording(void) const

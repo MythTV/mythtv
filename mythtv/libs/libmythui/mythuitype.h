@@ -10,6 +10,7 @@
 
 class MythImage;
 class MythPainter;
+class MythGestureEvent;
 
 /**
  * Base UI type.  Children are drawn/processed in order added
@@ -67,6 +68,7 @@ class MythUIType : public QObject
     int GetAlpha(void);
 
     virtual bool keyPressEvent(QKeyEvent *);
+    virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
 
   protected:
     virtual void customEvent(QCustomEvent *);
