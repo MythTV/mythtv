@@ -113,7 +113,8 @@ void EITScanner::RunEventLoop(void)
             {
                 rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
                 VERBOSE(VB_GENERAL, LOC + 
-                        QString("Now looking for EIT data on channel %1")
+                        QString("Now looking for EIT data on "
+                                "multiplex of channel %1")
                         .arg(*activeScanNextChan));
             }
 
@@ -190,9 +191,10 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
 
     if (!activeScanChannels.size())
     {
+        // TODO get input name and use it in crawl.
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
-            "SELECT channum, mplexid "
+            "SELECT min(channum) "
             "FROM channel, cardinput, capturecard, videosource "
             "WHERE cardinput.sourceid   = channel.sourceid AND "
             "      videosource.sourceid = channel.sourceid AND "
@@ -201,7 +203,8 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
             "      useonairguide        = 1                AND "
             "      useeit               = 1                AND "
             "      cardinput.cardid     = :CARDID "
-            "ORDER BY cardinput.sourceid, atscsrcid");
+            "GROUP BY mplexid "
+            "ORDER BY cardinput.sourceid, atscsrcid, mplexid");
         query.bindValue(":CARDID", rec->GetCaptureCardNum());
 
         if (!query.exec() || !query.isActive())
@@ -210,49 +213,24 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
             return;
         }
 
-        // TODO make scan work with cards with multiple inputs
-        QMap<uint, MythDeque<QString> > chanByMplex;
         while (query.next())
-        {
-            uint mplexid = query.value(1).toUInt();
-            QString channum = query.value(0).toString();
-            chanByMplex[mplexid].push_back(channum);
-        }
+            activeScanChannels.push_back(query.value(0).toString());
 
-        // This creates a list of channels that visit each multiplex 
-        // as often and as soon as possible, but still ensures that
-        // each channel is visited individually.
-        QValueList<uint> keyList = chanByMplex.keys();
-        QValueList<uint>::iterator curMplex = keyList.begin();
-        int i = 0;
-        while (i < query.size())
-        {
-            if (chanByMplex[*curMplex].size() != 0)
-            {
-                activeScanChannels << chanByMplex[*curMplex].front();
-                chanByMplex[*curMplex].pop_front();
-                i++;
-            }
-            if (++curMplex == keyList.end())
-                curMplex = keyList.begin();
-        }
         activeScanNextChan = activeScanChannels.begin();
     }
 
-    VERBOSE(VB_EIT, "StartActiveScan called with "<<
-            activeScanChannels.size()<<" channels");
+    VERBOSE(VB_EIT, LOC +
+            QString("StartActiveScan called with %1 multiplexes")
+            .arg(activeScanChannels.size()));
 
-    // Start at a random channel.This is so that multiple cards with
+    // Start at a random channel. This is so that multiple cards with
     // the same source don't all scan the same channels in the same 
     // order when the backend is first started up.
     if (activeScanChannels.size())
     {
         uint randomStart = random() % activeScanChannels.size();
         activeScanNextChan = activeScanChannels.at(randomStart);
-    }
 
-    if (activeScanChannels.size())
-    {
         activeScanNextTrig = QDateTime::currentDateTime();
         activeScanTrigTime = max_seconds_per_source;
         // Add a little randomness to trigger time so multiple 
