@@ -148,6 +148,10 @@ SOURCES += progdetails.cpp
 SOURCES += channeleditor.cpp        channelsettings.cpp
 SOURCES += previewgenerator.cpp     dvbtransporteditor.cpp
 
+# Listings downloading classes
+HEADERS += datadirect.h
+SOURCES += datadirect.cpp
+
 # Teletext stuff
 HEADERS += teletextdecoder.h        vbilut.h
 SOURCES += teletextdecoder.cpp      vbilut.cpp
@@ -290,10 +294,6 @@ using_backend {
     SOURCES += tv_rec.cpp
     SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
     SOURCES += dtvrecorder.cpp             dummydtvrecorder.cpp
-
-    # Listings downloading classes
-    HEADERS += datadirect.h
-    SOURCES += datadirect.cpp
 
     # Simple NuppelVideo Recorder
     HEADERS += NuppelVideoRecorder.h       fifowriter.h
