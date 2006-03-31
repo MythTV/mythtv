@@ -725,7 +725,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
         return -1;
     }
 
+    /* av_find_stream_info() eventually makes calls to avcodec_open() and avcodec_close() 
+       so we have to use the avcodeclock */
+    avcodeclock.lock();
     int ret = av_find_stream_info(ic);
+    avcodeclock.unlock();
+
     if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not find codec parameters. " +
