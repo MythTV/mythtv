@@ -64,7 +64,12 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
     QString prefix   = gContext->GetSetting("RecordFilePrefix");
     QString localFN  = QString("%1/%2").arg(prefix).arg(baseName);
     if (!QFileInfo(localFN).exists())
-        return; // didn't find file locally, must use remote backend
+    {
+        // GetPlaybackURL tries to return a local filename if one exists
+        localFN = programInfo.GetPlaybackURL();
+        if (!(localFN.left(1) == "/" && QFileInfo(localFN).exists()))
+            return; // didn't find file locally, must use remote backend
+    }
 
     // Found file locally, so set the new pathname..
     QString msg = QString(
