@@ -441,7 +441,7 @@ end:
 
 
 // Transposes the sample rate of the given samples using linear interpolation. 
-// 'Mono' version of the routine. Returns the number of samples returned in 
+// 'Stereo' version of the routine. Returns the number of samples returned in 
 // the "dest" buffer
 uint RateTransposerInteger::transposeStereo(SAMPLETYPE *dest, const SAMPLETYPE *src, uint numSamples)
 {
@@ -553,6 +553,8 @@ uint RateTransposerFloat::transposeMono(SAMPLETYPE *dest, const SAMPLETYPE *src,
     }
     fSlopeCount -= 1.0f;
 
+    if (numSamples == 1) goto end;
+
     while (1)
     {
         while (fSlopeCount > 1.0f) 
@@ -595,6 +597,8 @@ uint RateTransposerFloat::transposeStereo(SAMPLETYPE *dest, const SAMPLETYPE *sr
     }
     // now always (iSlopeCount > 1.0f)
     fSlopeCount -= 1.0f;
+
+    if (numSamples == 1) goto end;
 
     while (1)
     {

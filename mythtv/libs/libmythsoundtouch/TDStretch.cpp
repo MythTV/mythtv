@@ -896,6 +896,9 @@ void TDStretch::calculateOverlapLength(uint overlapMs)
     newOvl = (sampleRate * overlapMs) / 1000;
     if (newOvl < 16) newOvl = 16;
 
+    // must be divisible by 8
+    newOvl -= newOvl % 8;
+
     acceptNewOverlapLength(newOvl);
 }
 

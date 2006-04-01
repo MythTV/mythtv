@@ -195,6 +195,9 @@ static int mm_support(void)
 /// Checks which instruction set extensions are supported by the CPU.
 uint detectCPUextensions(void)
 {
+#ifdef ARCH_X86_64
+    return 0;
+#endif
 #ifndef ARCH_X86
     return 0; // always disable extensions on non-x86 platforms.
 #else
