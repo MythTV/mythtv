@@ -41,11 +41,6 @@ class PreviewGenerator : public QObject
   public slots:
     void deleteLater();
 
-  protected slots:
-    void EventSocketConnected();
-    void EventSocketClosed();
-    void EventSocketRead();
-
   private:
     void TeardownAll(void);
     bool RemotePreviewSetup(void);

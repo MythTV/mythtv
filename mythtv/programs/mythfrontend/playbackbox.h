@@ -30,6 +30,7 @@ class LayerSet;
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
 typedef QMap<QString,PreviewGenerator*> PreviewMap;
+typedef QMap<QString,MythTimer>         LastCheckedMap;
 
 class PlaybackBox : public MythDialog
 {
@@ -189,8 +190,7 @@ class PlaybackBox : public MythDialog
     void doPlayList(void);
     void showViewChanger(void);
 
-    void previewThreadDone(const QString &fn, bool &success)
-        { success = SetPreviewGenerator(fn, NULL); }
+    void previewThreadDone(const QString &fn, bool &success);
     void previewReady(const ProgramInfo *pginfo);
 
   protected:
@@ -393,6 +393,7 @@ class PlaybackBox : public MythDialog
     bool                previewPixmapEnabled;
     QPixmap            *previewPixmap;
     QDateTime           previewLastModified;
+    LastCheckedMap      previewLastModifyCheck;
     QDateTime           previewFilets;
     QDateTime           previewStartts;
     bool                previewSuspend;

@@ -54,7 +54,7 @@
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    bool local_only)
     : programInfo(*pginfo), localOnly(local_only), isConnected(false),
-      createSockets(false), eventSock(NULL), serverSock(NULL)
+      createSockets(false), serverSock(NULL)
 {
     if (IsLocal())
         return;
@@ -82,6 +82,9 @@ PreviewGenerator::~PreviewGenerator()
 
 void PreviewGenerator::TeardownAll(void)
 {
+    if (!isConnected)
+        return;
+
     const QString filename = programInfo.pathname + ".png";
 
     MythTimer t;
@@ -174,22 +177,8 @@ bool PreviewGenerator::RemotePreviewSetup(void)
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port       = gContext->GetNumSetting("MasterServerPort", 6543);
 
-    eventSock  = new QSocket(0, "preview event socket");
-
-    QObject::connect(eventSock, SIGNAL(connected()), 
-                     this,      SLOT(  EventSocketConnected()));
-    QObject::connect(eventSock, SIGNAL(readyRead()), 
-                     this,      SLOT(  EventSocketRead()));
-    QObject::connect(eventSock, SIGNAL(connectionClosed()), 
-                     this,      SLOT(  EventSocketClosed()));
-
-    serverSock = gContext->ConnectServer(NULL/*eventSock*/, server, port);
-    if (!serverSock)
-    {
-        eventSock->deleteLater();
-        return false;
-    }
-    return true;
+    serverSock = gContext->ConnectServer(NULL, server, port);
+    return serverSock;
 }
 
 void PreviewGenerator::RemotePreviewRun(void)
@@ -233,8 +222,6 @@ void PreviewGenerator::RemotePreviewTeardown(void)
         delete serverSock;
         serverSock = NULL;
     }
-    if (eventSock)
-        eventSock->deleteLater();;
 }
 
 bool PreviewGenerator::SavePreview(QString filename,
@@ -322,37 +309,6 @@ void PreviewGenerator::LocalPreviewRun(void)
 bool PreviewGenerator::IsLocal(void) const
 {
     return QFileInfo(programInfo.pathname).exists();
-}
-
-void PreviewGenerator::EventSocketConnected(void)
-{
-    QString str = QString("ANN Playback %1 %2")
-        .arg(gContext->GetHostName()).arg(true);
-    QStringList strlist = str;
-    WriteStringList(eventSock, strlist);
-    ReadStringList(eventSock, strlist);
-}
-
-void PreviewGenerator::EventSocketClosed(void)
-{
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "Event socket closed.");
-    if (serverSock)
-    {
-        QSocketDevice *tmp = serverSock;
-        serverSock = NULL;
-        delete tmp;
-    }
-}
-
-void PreviewGenerator::EventSocketRead(void)
-{
-    while (eventSock->state() == QSocket::Connected &&
-           eventSock->bytesAvailable() > 0)
-    {
-        QStringList strlist;
-        if (!ReadStringList(eventSock, strlist))
-            continue;
-    }
 }
 
 /** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&,float&)

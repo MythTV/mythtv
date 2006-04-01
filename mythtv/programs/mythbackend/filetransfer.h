@@ -19,6 +19,8 @@ class FileTransfer
 {
   public:
     FileTransfer(QString &filename, QSocket *remote);
+    FileTransfer(QString &filename, QSocket *remote,
+                 bool usereadahead, int retries);
    ~FileTransfer();
 
     QSocket *getSocket() { return sock; }

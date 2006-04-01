@@ -10,12 +10,10 @@ class QSocketDevice;
 class RemoteFile
 {
   public:
-    RemoteFile(const QString &url);
+    RemoteFile(const QString &url, bool usereadahead = true, int retries = -1);
    ~RemoteFile();
 
-    QSocketDevice *getSocket();
-    bool isOpen(void);
-
+    bool Open();
     void Close(void);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
@@ -25,27 +23,33 @@ class RemoteFile
 
     bool SaveAs(QByteArray &data);
 
-    long long GetFileSize(void);
-
     void SetTimeout(bool fast);
+
+    bool isOpen(void) const
+        { return sock && controlSock; }
+    long long GetFileSize(void) const
+        { return filesize; }
+    const QSocketDevice *getSocket(void) const
+        { return sock; }
+
+    QSocketDevice *getSocket(void)
+        { return sock; }
 
   private:
     QSocketDevice *openSocket(bool control);
 
-    QString path;
+    QString         path;
+    bool            usereadahead;
+    int             retries;
+    long long       filesize;
+    bool            timeoutisfast;
+    long long       readposition;
+    int             recordernum;
 
-    QSocketDevice *sock;
-    QSocketDevice *controlSock;
-
-    long long readposition;
-    int recordernum;
-
-    QString query;
-
-    QMutex lock;
-
-    long long filesize;
-    bool timeoutisfast;
+    mutable QMutex  lock;
+    QSocketDevice  *controlSock;
+    QSocketDevice  *sock;
+    QString         query;
 };
 
 #endif

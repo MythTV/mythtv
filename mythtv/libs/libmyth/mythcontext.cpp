@@ -2271,7 +2271,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
     if ((d->imageCache.contains(url)) && (reCache == false))
         return &(d->imageCache[url]);
 
-    RemoteFile *rf = new RemoteFile(url);
+    RemoteFile *rf = new RemoteFile(url, false, 0);
 
     QByteArray data;
     bool ret = rf->SaveAs(data);

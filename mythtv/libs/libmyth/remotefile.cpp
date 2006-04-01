@@ -10,17 +10,16 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
-RemoteFile::RemoteFile(const QString &url)
+RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries) :
+    path(_path),
+    usereadahead(useRA),  retries(_retries),
+    filesize(-1),         timeoutisfast(false),
+    readposition(0),      recordernum(0),
+    lock(false),
+    controlSock(NULL),    sock(NULL),
+    query("QUERY_FILETRANSFER %1")
 {
-    path = url;
-    readposition = 0;
-    filesize = -1;
-    timeoutisfast = false;
-
-    query = "QUERY_FILETRANSFER %1";
-
-    controlSock = openSocket(true);
-    sock = openSocket(false);
+    Open();
 }
 
 RemoteFile::~RemoteFile()
@@ -65,7 +64,8 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     }
     else
     {
-        strlist = QString("ANN FileTransfer %1").arg(hostname);
+        strlist = QString("ANN FileTransfer %1 %2 %3")
+            .arg(hostname).arg(usereadahead).arg(retries);
         strlist << dir;
 
         WriteStringList(lsock, strlist);
@@ -78,19 +78,11 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     return lsock;
 }    
 
-long long RemoteFile::GetFileSize(void)
+bool RemoteFile::Open(void)
 {
-    return filesize;
-}
-
-bool RemoteFile::isOpen(void)
-{
-    return (sock != NULL && controlSock != NULL);
-}
-
-QSocketDevice *RemoteFile::getSocket(void)
-{
-    return sock;
+    controlSock = openSocket(true);
+    sock = openSocket(false);
+    return isOpen();
 }
 
 void RemoteFile::Close(void)

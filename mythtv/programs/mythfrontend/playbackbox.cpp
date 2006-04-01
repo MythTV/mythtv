@@ -47,7 +47,7 @@ using namespace std;
      ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
       ((rec)->recgroup != "LiveTV")))
 
-//#define USE_PREV_GEN_THREAD
+#define USE_PREV_GEN_THREAD
 
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
@@ -1646,7 +1646,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
             return;
         }
 
-        previewVideoRingBuf = new RingBuffer(rec->pathname, false, false);
+        previewVideoRingBuf = new RingBuffer(rec->pathname, false, false, 1);
         if (!previewVideoRingBuf->IsOpen())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -3553,28 +3553,32 @@ bool PlaybackBox::fileExists(ProgramInfo *pginfo)
 
 QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
 {
-    QString filename = pginfo->pathname;
-    filename += ".png";
+    QDateTime datetime;
+    QString filename = pginfo->pathname + ".png";
 
-    if (filename.left(7) == "myth://")
+    if (filename.left(7) != "myth://")
     {
-        Qt::DateFormat f = Qt::TextDate;
+        QFileInfo retfinfo(filename);
+        if (retfinfo.exists())
+            datetime = retfinfo.lastModified();
+    }
+    else
+    {
         QString filetime = RemoteGetPreviewLastModified(pginfo);
-        QDateTime retLastModified = QDateTime::fromString(filetime,f);
-        return retLastModified;
+        if (!filetime.isEmpty() && filetime.upper() != "BAD")
+            datetime = QDateTime::fromString(filetime, Qt::TextDate);
     }
 
-    QFileInfo retfinfo(filename);
-
-    return retfinfo.lastModified();
+    return datetime;
 }
 
 /** \fn PlaybackBox::SetPreviewGenerator(const QString&, PreviewGenerator*)
  *  \brief Sets the PreviewGenerator for a specific file.
  *  \return true iff call succeeded.
  */
-bool PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
+bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
+    QString fn = xfn.mid(max(xfn.findRev('/'),0));
     if (!g)
     {
         if (previewGeneratorLock.tryLock())
@@ -3598,14 +3602,20 @@ bool PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
  *  \brief Returns true if we have already started a
  *         PreviewGenerator to create this file.
  */
-bool PlaybackBox::IsGeneratingPreview(const QString &fn) const
+bool PlaybackBox::IsGeneratingPreview(const QString &xfn) const
 {
     QMap<QString, PreviewGenerator*>::const_iterator it;
     QMutexLocker locker(&previewGeneratorLock);
 
+    QString fn = xfn.mid(max(xfn.findRev('/'),0));
     if ((it = previewGenerator.find(fn)) == previewGenerator.end())
         return false;
     return *it;
+}
+
+void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
+{
+    success = SetPreviewGenerator(fn, NULL);
 }
 
 /** \fn PlaybackBox::previewReady(const ProgramInfo*)
@@ -3637,6 +3647,17 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
     qApp->unlock();
 }
 
+bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)
+{
+    LastCheckedMap::iterator it = elapsedtime.find(filename);
+
+    if (it != elapsedtime.end() && ((*it).elapsed() < 250))
+        return false;
+
+    elapsedtime[filename].restart();
+    return true;
+}
+
 QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
@@ -3653,14 +3674,33 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     }
 
     QString filename = pginfo->pathname + ".png";
+    bool check_date = check_lastmod(previewLastModifyCheck, filename);
 
-    previewLastModified = getPreviewLastModified(pginfo);
-    if (previewLastModified <  pginfo->lastmodified &&
-        previewLastModified >= pginfo->recendts &&
+    if (check_date)
+        previewLastModified = getPreviewLastModified(pginfo);
+
+    if (check_date &&
+        (!previewLastModified.isValid() ||
+         (previewLastModified <  pginfo->lastmodified &&
+          previewLastModified >= pginfo->recendts)) &&
         !pginfo->IsEditing() && 
         !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo) &&
         !IsGeneratingPreview(filename))
     {
+        VERBOSE(VB_PLAYBACK, QString("Starting preview generator ") +
+                QString("(%1 || ((%2<%3)->%4 && (%5>=%6)->%7)) && ")
+                .arg(!previewLastModified.isValid())
+                .arg(previewLastModified.toString(Qt::ISODate))
+                .arg(pginfo->lastmodified.toString(Qt::ISODate))
+                .arg(previewLastModified <  pginfo->lastmodified)
+                .arg(previewLastModified.toString(Qt::ISODate))
+                .arg(pginfo->recendts.toString(Qt::ISODate))
+                .arg(previewLastModified >= pginfo->recendts) +
+                QString("%1 && %2 && %3")
+                .arg(!pginfo->IsEditing())
+                .arg(!JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
+                .arg(!IsGeneratingPreview(filename)));
+
 #ifdef USE_PREV_GEN_THREAD
         SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
 #else
@@ -3691,7 +3731,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    previewPixmap = gContext->LoadScalePixmap(filename);
+    previewPixmap = gContext->LoadScalePixmap(filename, true /*fromcache*/);
     if (previewPixmap)
     {
         previewStartts = pginfo->recstartts;
@@ -3703,16 +3743,18 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     //if this is a remote frontend, then we need to refresh the pixmap
     //if another frontend has already regenerated the stale pixmap on the disk
-    bool refreshPixmap = false;    
-    if (previewLastModified >= previewFilets)
-        refreshPixmap = true;    
+    bool refreshPixmap      = (previewLastModified >= previewFilets);
+    bool generating_preview = IsGeneratingPreview(filename);
 
-    QImage *image = gContext->CacheRemotePixmap(filename, refreshPixmap);
+    QImage *image = NULL;
+    if (!generating_preview)
+        image = gContext->CacheRemotePixmap(filename, refreshPixmap);
 
     // If the image is not available remotely either, we need to generate it.
-    if (!image && !IsGeneratingPreview(filename))
+    if (!image && !generating_preview)
     {
 #ifdef USE_PREV_GEN_THREAD
+        VERBOSE(VB_PLAYBACK, "Starting preview generator");
         SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
 #else
         PreviewGenerator pg(pginfo, false);

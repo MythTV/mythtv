@@ -12,6 +12,14 @@ using namespace std;
 #include "RingBuffer.h"
 #include "libmyth/util.h"
 
+FileTransfer::FileTransfer(QString &filename, QSocket *remote,
+                           bool usereadahead, int retries) :
+    readthreadlive(true),
+    rbuffer(new RingBuffer(filename, false, usereadahead, retries)),
+    sock(remote), ateof(false)
+{
+}
+
 FileTransfer::FileTransfer(QString &filename, QSocket *remote)
 {
     rbuffer = new RingBuffer(filename, false);

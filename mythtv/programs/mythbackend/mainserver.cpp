@@ -282,7 +282,7 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     }
     else if (command == "ANN")
     {
-        if (tokens.size() < 3 || tokens.size() > 4)
+        if (tokens.size() < 3 || tokens.size() > 5)
             VERBOSE(VB_IMPORTANT, "Bad ANN query");
         else
             HandleAnnounce(listline, tokens, sock);
@@ -875,8 +875,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         QUrl qurl = slist[1];
         QString filename = LocalFilePath(qurl);
 
-        FileTransfer *ft = new FileTransfer(filename, socket);
+        FileTransfer *ft = NULL;
+        bool usereadahead = true;
+        int retries = -1;
+        if (commands.size() >= 5)
+        {
+            usereadahead = commands[3].toInt();
+            retries = commands[4].toInt();
+        }
 
+        if (retries >= 0)
+            ft = new FileTransfer(filename, socket, usereadahead, retries);
+        else
+            ft = new FileTransfer(filename, socket);
+        
         fileTransferList.push_back(ft);
 
         retlist << QString::number(socket->socket());
@@ -3158,33 +3170,19 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
-        if (!slave)
-            VERBOSE(VB_IMPORTANT, "MainServer::HandleGenPreviewPixmap()"
-                    "\n\t\t\tCouldn't find backend for: " +
-                    QString("\n\t\t\t%1 : \"%2\"")
-                    .arg(pginfo->title).arg(pginfo->subtitle));
-        else
+        if (slave)
         {
             slave->GenPreviewPixmap(pginfo);
             slave->DownRef();
+            QStringList outputlist = "OK";
+            SendResponse(pbssock, outputlist);
+            delete pginfo;
+            return;
         }
-
-        QStringList outputlist = "OK";
-        SendResponse(pbssock, outputlist);
-        delete pginfo;
-        return;
-    }
-
-    if (pginfo->hostname != gContext->GetHostName())
-    {
-        VERBOSE(VB_IMPORTANT, "Mainserver, Error: Got request to generate " +
-                QString("\n\t\t\tpreview pixmap for %1 on host %2.")
-                .arg(pginfo->hostname).arg(gContext->GetHostName()));
-
-        QStringList outputlist = "BAD";
-        SendResponse(pbssock, outputlist);
-        delete pginfo;
-        return;
+        VERBOSE(VB_IMPORTANT, "MainServer::HandleGenPreviewPixmap()"
+                "\n\t\t\tCouldn't find backend for: " +
+                QString("\n\t\t\t%1 : \"%2\"")
+                .arg(pginfo->title).arg(pginfo->subtitle));
     }
 
     QUrl qurl = pginfo->pathname;
@@ -3193,37 +3191,18 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (qurl.host() != "")
         filename = LocalFilePath(qurl);
 
-    EncoderLink *elink = NULL;
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-
-    for (; iter != encoderList->end(); ++iter)
-    {
-        if (iter.data()->IsLocal())
-            elink = iter.data();
-    }
-
-    if (elink == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find EncoderLink when trying to "
-                                "generate preview pixmap for: %1 : %2")
-                               .arg(pginfo->title).arg(pginfo->subtitle));
-        QStringList outputlist = "BAD";
-        SendResponse(pbssock, outputlist);
-        delete pginfo;
-        return;
-    }
-
     int len = 0;
     int width = 0, height = 0;
     float aspect = 0;
     int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
                     gContext->GetNumSetting("RecordPreRoll",0);
 
-    unsigned char *data = (unsigned char *)elink->GetScreenGrab(
-        pginfo, filename, secondsin, len, width, height, aspect);
+    unsigned char *data = (unsigned char *)
+        PreviewGenerator::GetScreenGrab(pginfo, filename, secondsin,
+                                        len, width, height, aspect);
 
-    if (PreviewGenerator::SavePreview(filename+".png", data,
-                                      width, height, aspect))
+    if (data && PreviewGenerator::SavePreview(filename + ".png", data,
+                                              width, height, aspect))
     {
         QStringList retlist = "OK";
         SendResponse(pbssock, retlist);    
@@ -3235,7 +3214,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         SendResponse(pbssock, outputlist);
     } 
 
-    delete [] data;
+    if (data)
+        delete [] data;
     delete pginfo;
 }
 
