@@ -215,7 +215,7 @@ static HostSpinBox *VideoGalleryRows()
 
 static HostSpinBox *VideoGalleryColumns()
 {
-    HostSpinBox *gc = new HostSpinBox("VideoGalleryColsPerPage", 2, 5, 1);
+    HostSpinBox *gc = new HostSpinBox("VideoGalleryColsPerPage", 2, 6, 1);
     gc->setLabel(QObject::tr("Columns to display"));
     gc->setValue(4);
     return gc;

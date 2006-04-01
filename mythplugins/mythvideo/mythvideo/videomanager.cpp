@@ -647,13 +647,8 @@ int VideoManager::GetMovieListing(const QString& movieName)
 
 void VideoManager::grayOut(QPainter *tmp)
 {
-   int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
-   if (transparentFlag == 0)
-       tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), 
-                     Dense4Pattern));
-   else if (transparentFlag == 1)
-       tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
-                       (int)(600*hmult));
+    tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), 
+                  Dense4Pattern));
 }
 
 void VideoManager::paintEvent(QPaintEvent *e)

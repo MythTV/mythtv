@@ -827,19 +827,8 @@ void Weather::setLocation(QString newLocale)
     // locale starts with "US" or locale is a zip code
     if (locale.left(2) == "US" || locale.left(5).contains(QRegExp("[0-9]{5,5}")) > 0)
     {
-        // update page to show US radar images
-        if (AnimatedImage)
-        {
-            AnimatedImage->SetSize(765, 500);
-            AnimatedImage->SetSkip(0, 58);
-        }
-
         if (container)
         {
-            texttype = (UITextType *) container->GetType("header5");
-            if (texttype)
-                texttype->SetText(tr("doppler radar"));
-
             for (int x = 1; x <= 9; x++)
             {
                 texttype = (UITextType *) container->GetType(QString("maplabel-%1")
@@ -855,37 +844,12 @@ void Weather::setLocation(QString newLocale)
                 if (texttype)
                     texttype->hide();
             }
-
-            imagetype = (UIImageType *) container->GetType("logo");
-            if (imagetype)
-            {
-                imagetype->SetSize(80, 60);
-                imagetype->LoadImage();
-            }
-
-            imagetype = (UIImageType *) container->GetType("radarbk");
-            if (imagetype)
-            {
-                imagetype->SetImage("mw-map.png");
-                imagetype->LoadImage();
-            }
         }
     }
     else
     {
-       // show satellite images
-       if (AnimatedImage)
-        {
-            AnimatedImage->SetSize(765, 500 - 58);
-            AnimatedImage->SetSkip(0, 0);
-        }
-
         if (container)
         {
-            texttype = (UITextType *) container->GetType("header5");
-            if (texttype)
-                texttype->SetText(tr("satellite image"));
-
             for (int x = 1; x <= 9; x++)
             {
                 texttype = (UITextType *) container->GetType(QString("maplabel-%1")
@@ -900,13 +864,6 @@ void Weather::setLocation(QString newLocale)
                            .arg(x));
                 if (texttype)
                     texttype->show();
-            }
-
-            imagetype = (UIImageType *) container->GetType("logo");
-            if (imagetype)
-            {
-                imagetype->SetSize(100, 80);
-                imagetype->LoadImage();
             }
 
             imagetype = (UIImageType *) container->GetType("radarbk");
