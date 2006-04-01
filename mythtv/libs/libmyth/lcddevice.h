@@ -106,7 +106,8 @@ class LCD : public QObject
 
     static bool m_server_unavailable;
     static class LCD * m_lcd;
-    
+    static bool m_enabled;
+
   public:
    ~LCD();
 

@@ -97,6 +97,8 @@ class MythContextPrivate;
       "DSMCC carousel related messages")         \
     F(VB_MHEG,      0x00040000, "mheg",      1,  \
       "MHEG debugging messages")                 \
+    F(VB_UPNP,      0x00080000, "upnp",      1,  \
+      "upnp debugging messages")                 \
     F(VB_TIMESTAMP, 0x80000000, "timestamp", 1,  \
       "Conditional data driven messages")        \
     F(VB_NONE,      0x00000000, "none",      0,  \
@@ -220,7 +222,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20060226-1"
+#define MYTH_BINARY_VERSION "0.19.20060331-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *

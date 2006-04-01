@@ -72,12 +72,13 @@ LCD::LCD()
     connect(LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
 }
 
+bool LCD::m_enabled = false;
 bool LCD::m_server_unavailable = false;
-class LCD * LCD::m_lcd = NULL;
+class LCD *LCD::m_lcd = NULL;
 
 class LCD * LCD::Get(void)
 {
-    if (m_lcd == NULL && m_server_unavailable == false)
+    if (m_enabled && m_lcd == NULL && m_server_unavailable == false)
         m_lcd = new LCD;
     return m_lcd;
 }
@@ -96,8 +97,9 @@ void LCD::SetupLCD (void)
 
     lcd_host = gContext->GetSetting("LCDServerHost", "localhost");
     lcd_port = gContext->GetNumSetting("LCDServerPort", 6545);
+    m_enabled = gContext->GetNumSetting("LCDEnable", 0);
 
-    if (lcd_host.length() > 0 && lcd_port > 1024)
+    if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
         class LCD * lcd = LCD::Get();
         if (lcd->connectToHost(lcd_host, lcd_port) == false) 
@@ -127,7 +129,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     port = lport;
     
     // Don't even try to connect if we're currently disabled.
-    if (!gContext->GetNumSetting("LCDEnable", 0))
+    if (!(m_enabled = gContext->GetNumSetting("LCDEnable", 0)))
     {
         connected = false;
         m_server_unavailable = true;

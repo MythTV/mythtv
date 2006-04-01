@@ -637,8 +637,9 @@ void reloadTheme(void)
     if (!menu->foundTheme())
         exit(FRONTEND_BUGGY_EXIT_NO_THEME);
 
-    LCD::SetupLCD ();
-    if (class LCD * lcd = LCD::Get()) {
+    LCD::SetupLCD();
+    if (LCD *lcd = LCD::Get()) 
+    {
         lcd->setupLEDs(RemoteGetRecordingMask);
         lcd->resetServer();
     }
@@ -1023,10 +1024,9 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
-    LCD::SetupLCD ();
-    if (class LCD *lcd = LCD::Get ()) {
-            lcd->setupLEDs(RemoteGetRecordingMask);
-    }
+    LCD::SetupLCD();
+    if (LCD *lcd = LCD::Get())
+        lcd->setupLEDs(RemoteGetRecordingMask);
 
     LanguageSettings::load("mythfrontend");
 
