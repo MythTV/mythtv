@@ -1813,7 +1813,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     if (query.isConnected())
     {
         query.prepare("SELECT data FROM settings WHERE value "
-                      " = :KEY AND hostname = :HOSTNAME ;");
+                      "= :KEY AND hostname = :HOSTNAME ;");
         query.bindValue(":KEY", key);
         query.bindValue(":HOSTNAME", d->m_localhostname);
         query.exec();
