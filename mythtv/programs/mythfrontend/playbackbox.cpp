@@ -3767,7 +3767,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     {
         previewPixmap = new QPixmap();
 
-        if (screenwidth != 800 || screenheight != 600)
+        if (wmult != 1.0f || hmult != 1.0f)
         {
             QImage tmp2 = image->smoothScale((int)(image->width() * wmult),
                                              (int)(image->height() * hmult));
