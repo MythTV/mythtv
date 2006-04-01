@@ -33,22 +33,16 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 
     fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
 
-    
-    // first try to load the theme from the current theme directory
-    QString themepath = gContext->GetThemeDir();
-    QString themefile = themepath + specialfile + "ui.xml";
-     
-    if (doLoadTheme(ele, winName, themefile))
-        return true;
-        
-    // not found so now try the default theme directory
-    themepath = gContext->GetShareDir() + "themes/default/";
-    themefile = themepath + specialfile + "ui.xml";
-
-    if (doLoadTheme(ele, winName, themefile))
-    {    
-        //cout << "XMLParse::LoadTheme(): Using default theme file" << endl;
-        return true;
+    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    for (QValueList<QString>::const_iterator ii = searchpath.begin();
+        ii != searchpath.end(); ii++)
+    {
+        QString themefile = *ii + specialfile + "ui.xml";
+        if (doLoadTheme(ele, winName, themefile))
+        {
+            VERBOSE(VB_GENERAL, "XMLParse::LoadTheme using " << themefile);
+            return true;
+        }
     }
     
     return false;
@@ -665,28 +659,32 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
 
 bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
 {
-    QString catColorFile = gContext->GetThemesParentDir() + "default/categories.xml";
-    
-    QDomDocument doc;
-    QFile f(catColorFile);
-    
-    if (!f.open(IO_ReadOnly))
+    QFile f;
+    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    for (QValueList<QString>::const_iterator ii = searchpath.begin();
+        ii != searchpath.end(); ii++)
     {
-        cerr << "Error: Unable to open " << catColorFile << endl;
+        f.setName(*ii + "categories.xml");
+        if (f.open(IO_ReadOnly))
+            break;
+    }
+    if (f.handle() == -1)
+    {
+        VERBOSE(VB_IMPORTANT, "Error: Unable to open " << f.name());
         return false;
     }
-    
+
+    QDomDocument doc;
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
     
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << catColorFile << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+        VERBOSE(VB_IMPORTANT, "Error parsing: " << f.name()
+                << " line: " << errorLine << "  column: " << errorColumn
+                << ": " << errorMsg);
         f.close();
-        
         return false;
     }
     
@@ -3855,3 +3853,5 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
         }
     }
 }
+
+// vim:set sw=4 expandtab:

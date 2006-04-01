@@ -300,6 +300,7 @@ class MythContext : public QObject, public MythObservable
 
     QString FindThemeDir(const QString &themename);
     QString GetThemeDir(void);
+    QValueList<QString> GetThemeSearchPath(void);
 
     QString GetMenuThemeDir(void);
 

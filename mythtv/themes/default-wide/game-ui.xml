@@ -1,0 +1,143 @@
+<mythuitheme>
+
+  <window name="gametree">
+
+    <font name="active" face="Trebuchet MS">
+        <color>#ffffff</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+
+    <font name="inactive" face="Trebuchet MS">
+        <color>#9999cc</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+
+    <font name="selectable" face="Trebuchet MS">
+        <color>#8cdeff</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+
+    <font name="largetitle" face="Trebuchet MS">
+        <color>#ffffff</color>
+        <dropcolor>#000000</dropcolor>
+        <size>32</size>
+        <shadow>3,3</shadow>
+        <bold>yes</bold>
+    </font>
+
+    <font name="infofont" face="Trebuchet MS">
+        <color>#ffffff</color>
+        <size>16</size>
+        <bold>yes</bold>
+    </font>
+
+    <container name="background">
+        <image name="filler" draworder="0" fleximage="yes">
+            <filename>background.png</filename> <!-- 1280x326 -->
+            <position>0,48</position>
+        </image>
+        <image name="titlelines" draworder="0" fleximage="no">
+            <filename>trans-titles.png</filename> <!-- 1280x326 -->
+            <position>0,48</position>
+        </image>
+        <image name="infofiller" draworder="0" fleximage="no">
+            <filename>pf-top.png</filename> <!-- 1152x260 -->
+            <position>64,412</position>
+        </image>
+    </container>
+
+    <container name="gameselector">
+        <area>8,52,1264,310</area>
+        <managedtreelist name="gametreelist" draworder="1" bins="2">
+            <area>32,0,1200,296</area>
+            <image function="selectionbar" filename="mv_selectionbar.png"></image>
+            <image function="uparrow" filename="mv_up_arrow.png"></image>
+            <image function="downarrow" filename="mv_down_arrow.png"></image>
+            <image function="leftarrow" filename="mv_left_arrow.png"></image>
+            <image function="rightarrow" filename="mv_right_arrow.png"></image>
+            <bin number="1">
+		<area>56,28,288,250</area>
+                <fcnfont name="active" function="active"></fcnfont>
+                <fcnfont name="inactive" function="inactive"></fcnfont>
+                <fcnfont name="active" function="selected"></fcnfont>
+                <fcnfont name="selectable" function="selectable"></fcnfont>
+            </bin>
+            <bin number="2">
+                <area>384,0,816,296</area>
+                <fcnfont name="active" function="active"></fcnfont>
+                <fcnfont name="active" function="selected"></fcnfont>
+                <fcnfont name="inactive" function="inactive"></fcnfont>
+                <fcnfont name="selectable" function="selectable"></fcnfont>
+            </bin>
+        </managedtreelist>
+
+	<image name="showinglines" draworder="2" fleximage="yes">
+            <filename>showings.png</filename>
+            <position>0,0</position>
+	</image>
+    </container>
+
+    <container name="game_info">
+      <area>64,412,1152,260</area>
+
+      <textarea name="gametitle" draworder="6">
+        <area>32,28,752,60</area>
+        <font>largetitle</font>
+      </textarea>
+
+      <textarea name="system" draworder="6">
+        <area>32,98,140,35</area>
+        <font>infofont</font>
+        <value>System:</value>
+      </textarea>
+
+      <textarea name="systemname" draworder="6">
+        <area>172,98,580,35</area>
+        <font>infofont</font>
+      </textarea>
+
+      <textarea name="year" draworder="6">
+        <area>32,133,140,35</area>
+        <font>infofont</font>
+        <value>Year:</value>
+      </textarea>
+
+      <textarea name="yearname" draworder="6">
+        <area>172,133,580,35</area>
+        <font>infofont</font>
+      </textarea>
+
+      <textarea name="genre" draworder="6">
+        <area>32,168,140,35</area>
+        <font>infofont</font>
+        <value>Genre:</value>
+      </textarea>
+
+      <textarea name="genrename" draworder="6">
+        <area>172,168,580,35</area>
+        <font>infofont</font>
+      </textarea>
+
+      <textarea name="favorite" draworder="6">
+        <area>32,203,140,35</area>
+        <font>infofont</font>
+        <value>Favorite:</value>
+      </textarea>
+
+      <textarea name="showfavorite" draworder="6">
+        <area>172,203,580,35</area>
+        <font>infofont</font>
+      </textarea>
+
+      <image name="gameimage" draworder="6" fleximage="no">
+          <position>816,36</position>
+          <staticsize>300,196</staticsize>
+      </image>
+    </container>
+  
+  </window>
+
+</mythuitheme>

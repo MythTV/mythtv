@@ -755,7 +755,7 @@ void IconView::loadTheme()
     }
 
     m_submenuType = (UIListBtnType*)container->GetType("submenu");
-    if (!m_menuType)
+    if (!m_submenuType)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get submenu area.");
         exit(-1);

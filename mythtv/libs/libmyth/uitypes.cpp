@@ -387,77 +387,57 @@ void UIBarType::SetIcon(int num, QPixmap myIcon)
 
 void UIBarType::LoadImage(int loc, QString myFile)
 {
+    QImage sourceImg;
+    int doX = 0;
+    int doY = 0;
+    QImage scalerImg;
+
     if (m_size == 0)
     {
-        cerr << "uitypes.cpp:UIBarType:LoadImage:m_size == 0";
+        VERBOSE(VB_IMPORTANT, "uitypes.cpp:UIBarType:LoadImage:m_size == 0");
         return;
     }
     QString filename = m_filename;
     if (loc != -1)
         filename = myFile;
 
-    QString file;
+    QString file = filename;
+    if (!gContext->FindThemeFile(file))
+        goto error;
 
-    QString themeDir = gContext->GetThemeDir();
-    QString baseDir = gContext->GetShareDir() + "themes/default/";
+    if (!sourceImg.load(file))
+        goto error;
 
-    QFile checkFile(themeDir + filename);
+    if (m_orientation == 1)
+    {
+        doX = m_displaysize.width() / m_size;
+        doY = m_displaysize.height();
+    }
+    else if (m_orientation == 2)
+    {
+        doX = m_displaysize.width();
+        doY = m_displaysize.height() / m_size;
+    }
+    if (loc != -1)
+    {
+        doX = m_iconsize.x();
+        doY = m_iconsize.y();
+    }
 
-    if (checkFile.exists())
-        file = themeDir + filename;
+    scalerImg = sourceImg.smoothScale(doX, doY);
+    if (loc == -1)
+        m_image.convertFromImage(scalerImg);
     else
-        file = baseDir + filename;
-    checkFile.setName(file);
-    if (!checkFile.exists())
-        file = "/tmp/" + filename;
-
-    checkFile.setName(file);
-    if (!checkFile.exists())
-        file = filename;
+        iconData[loc].convertFromImage(scalerImg);
 
     if (m_debug == true)
-        cerr << "     -Filename: " << file << endl;
+        VERBOSE(VB_IMPORTANT, "     -Image: " << file << " loaded.");
+    return;
 
-    QImage *sourceImg = new QImage();
-    if (sourceImg->load(file))
-    {
-        QImage scalerImg;
-        int doX = 0;
-        int doY = 0;
-        if (m_orientation == 1)
-        {
-            doX = m_displaysize.width() / m_size;
-            doY = m_displaysize.height();
-        }
-        else if (m_orientation == 2)
-        {
-            doX = m_displaysize.width();
-            doY = m_displaysize.height() / m_size;
-        }
-        if (loc != -1)
-        {
-            doX = m_iconsize.x();
-            doY = m_iconsize.y();
-        }
-
-        scalerImg = sourceImg->smoothScale(doX, doY);
-        if (loc == -1)
-            m_image.convertFromImage(scalerImg);
-        else
-            iconData[loc].convertFromImage(scalerImg);
-
-        if (m_debug == true)
-            cerr << "     -Image: " << file << " loaded.\n";
-    }
-    else
-    {
-      if (m_debug == true)
-          cerr << "     -Image: " << file << " failed to load.\n";
-      iconData[loc].resize(0, 0);
-    }
-
-    delete sourceImg;
-
+error:
+    if (m_debug == true)
+        VERBOSE(VB_IMPORTANT, "     -Image: " << file << " failed to load.");
+    iconData[loc].resize(0, 0);
 }
 
 void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
@@ -1313,27 +1293,15 @@ void UIImageType::LoadImage()
     QString file;
     if (m_flex == true)
     {
+        QString flexprefix = m_transparent ? "trans-" : "solid-";
         int pathStart = m_filename.findRev('/');
-        if (m_transparent)
-        {
-            if (pathStart < 0 )
-                m_filename = "trans-" + m_filename;
-            else
-                m_filename.replace(pathStart, 1, "/trans-");
-        }
+        if (pathStart < 0 )
+            m_filename = flexprefix + m_filename;
         else
-        {
-            if (pathStart < 0 )
-                m_filename = "solid-" + m_filename;
-            else
-                m_filename.replace(pathStart, 1, "/solid-");
-        }
+            m_filename.replace(pathStart, 1, "/" + flexprefix);
     }
 
-    QString themeDir = gContext->GetThemeDir();
-    QString baseDir = gContext->GetShareDir() + "themes/default/";
-
-    QString filename = themeDir + m_filename;
+    QString filename = gContext->GetThemeDir() + m_filename;
 
     if (m_force_x == -1 && m_force_y == -1)
     {
@@ -1354,13 +1322,14 @@ void UIImageType::LoadImage()
 
     if (!gContext->FindThemeFile(file))
     {
-        cerr << "UIImageType::LoadImage() - Cannot find image: " << m_filename << endl;
+        VERBOSE(VB_IMPORTANT, "UIImageType::LoadImage() - Cannot find image: "
+                << m_filename);
         m_show = false;
         return;
     }
 
     if (m_debug == true)
-        cerr << "     -Filename: " << file << endl;
+        VERBOSE(VB_GENERAL, "     -Filename: " << file);
 
     if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
     {
@@ -1379,13 +1348,13 @@ void UIImageType::LoadImage()
             {
                 doX = m_force_x;
                 if (m_debug == true)
-                    cerr << "         +Force X: " << doX << endl;
+                    VERBOSE(VB_GENERAL, "         +Force X: " << doX);
             }
             if (m_force_y != -1)
             {
                 doY = m_force_y;
                 if (m_debug == true)
-                    cerr << "         +Force Y: " << doY << endl;
+                    VERBOSE(VB_GENERAL, "         +Force Y: " << doY);
             }
 
             scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
@@ -1393,13 +1362,13 @@ void UIImageType::LoadImage()
             m_show = true;
             img.convertFromImage(scalerImg);
             if (m_debug == true)
-                    cerr << "     -Image: " << file << " loaded.\n";
+                VERBOSE(VB_GENERAL, "     -Image: " << file << " loaded.");
         }
         else
         {
             m_show = false;
             if (m_debug == true)
-                cerr << "     -Image: " << file << " failed to load.\n";
+                VERBOSE(VB_GENERAL, "     -Image: " << file << " failed to load.");
         }
         delete sourceImg;
     }
@@ -1564,49 +1533,11 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
     if (imageNo >= m_imagecount)
         return false;
 
-    bool bSuccess = false;
-    QString file;
-
-    file = m_filename.arg(imageNo);
-
-    // first try the absolute filename
-    bool  filefound = false;
-    QString filename;
-    QString themeDir = gContext->GetThemeDir();
-    QString baseDir = gContext->GetShareDir() + "themes/default/";
-    QFile checkFile(file);
-
-    if (checkFile.exists())
-    {
-        filefound = true;
-        filename = file;
-    }
-
-    if (!filefound)
-    {
-        checkFile.setName(baseDir + file);
-        if (checkFile.exists())
-        {
-            filefound = true;
-            filename = baseDir + file;
-        }
-    }
-
-    if (!filefound)
-    {
-        checkFile.setName(themeDir + file);
-        if (checkFile.exists())
-        {
-            filefound = true;
-            filename = themeDir + file;
-        }
-    }
-
-    if (!filefound)
-    {
+    QString filename = m_filename.arg(imageNo);
+    if (!gContext->FindThemeFile(filename))
          return true;
-    }
 
+    bool bSuccess = false;
     if (m_force_x == -1 && m_force_y == -1)
     {
         QPixmap *tmppix = gContext->LoadScalePixmap(filename);
@@ -1632,14 +1563,11 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
     }
     else
     {
-        QPixmap *img = new QPixmap();
-        QImage *sourceImg = new QImage();
-
-        if (sourceImg->load(filename))
+        QImage sourceImg(filename);
+        if (!sourceImg.isNull())
         {
-            QImage scalerImg;
-            int doX = sourceImg->width();
-            int doY = sourceImg->height();
+            int doX = sourceImg.width();
+            int doY = sourceImg.height();
             if (m_force_x != -1)
             {
                 doX = m_force_x;
@@ -1649,13 +1577,15 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
                 doY = m_force_y;
             }
 
-            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
+            QImage scalerImg = sourceImg.smoothScale((int)(doX * m_wmult),
                                                (int)(doY * m_hmult));
-            bSuccess = true;
+
+            QPixmap *img = new QPixmap();
             img->convertFromImage(scalerImg);
             imageList->push_back(img);
+
+            bSuccess = true;
         }
-        delete sourceImg;
     }
 
     return bSuccess;
@@ -5444,3 +5374,4 @@ void UIKeyboardType::AddKey(UIKeyType *key)
     }
 }
 
+// vim:set sw=4 expandtab:

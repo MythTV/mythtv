@@ -1358,13 +1358,13 @@ void MythContext::RemoveCacheDir(const QString &dirname)
     
 void MythContext::CacheThemeImages(void)
 {
-    QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
-
     if (d->m_screenwidth == d->m_baseWidth && d->m_screenheight == d->m_baseHeight)
         return;
 
     CacheThemeImagesDirectory(d->m_themepathname);
-    CacheThemeImagesDirectory(baseDir);
+    if (d->IsWideMode())
+        CacheThemeImagesDirectory(GetThemesParentDir() + "default-wide/");
+    CacheThemeImagesDirectory(GetThemesParentDir() + "default/");
 }
 
 void MythContext::CacheThemeImagesDirectory(const QString &dirname,
@@ -1644,7 +1644,7 @@ QString MythContext::FindThemeDir(const QString &themename)
     if (dir.exists())
         return testdir;
 
-    testdir = d->m_installprefix + "/share/mythtv/themes/" + themename;
+    testdir = GetThemesParentDir() + themename;
     dir.setPath(testdir);
     if (dir.exists())
         return testdir;
@@ -1658,13 +1658,13 @@ QString MythContext::FindThemeDir(const QString &themename)
     // Don't complain about the "default" theme being missing
     if (themename == QObject::tr("Default"))
     {
-        testdir = d->m_installprefix + "/share/mythtv/";
+        testdir = GetShareDir();
         dir.setPath(testdir);
         if (dir.exists())
             return testdir;
     }
 
-    testdir = d->m_installprefix + "/share/mythtv/themes/G.A.N.T.";
+    testdir = GetThemesParentDir() + "G.A.N.T.";
     dir.setPath(testdir);
     if (dir.exists())
         return testdir;
@@ -1680,6 +1680,18 @@ QString MythContext::GetMenuThemeDir(void)
 QString MythContext::GetThemeDir(void)
 {
     return d->m_themepathname;
+}
+
+QValueList<QString> MythContext::GetThemeSearchPath(void)
+{
+    QValueList<QString> searchpath;
+
+    searchpath.append(GetThemeDir());
+    if (d->IsWideMode())
+        searchpath.append(GetThemesParentDir() + "default-wide/");
+    searchpath.append(GetThemesParentDir() + "default/");
+    searchpath.append("/tmp/");
+    return searchpath;
 }
 
 MDBManager *MythContext::GetDBManager(void)
@@ -2038,52 +2050,29 @@ void MythContext::ThemeWidget(QWidget *widget)
 
 bool MythContext::FindThemeFile(QString &filename)
 {
-    QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
-    QString file;
+    // Given a full path, or in current working directory?
+    if (QFile::exists(filename))
+        return true;
+
     int pathStart = filename.findRev('/');
-    bool bFound = false;
+    QString basename;
+    if (pathStart > 0)
+        basename = filename.mid(pathStart + 1);
 
-    // Given a full path?
-    file = filename;
-    bFound = QFile::exists(file);
-
-    // look in theme directory first including any sub directory
-    if (!bFound)
+    QString file;
+    QValueList<QString> searchpath = GetThemeSearchPath();
+    for (QValueList<QString>::const_iterator ii = searchpath.begin();
+        ii != searchpath.end(); ii++)
     {
-        file = d->m_themepathname + filename;
-        bFound = QFile::exists(file);
+        if (QFile::exists((file = *ii + filename)))
+            goto found;
+        if (pathStart > 0 && QFile::exists((file = *ii + basename)))
+            goto found;
     }
 
-    if (!bFound && pathStart > 0)
-    {
-        // look in theme directory minus any sub directories
-        file = d->m_themepathname + filename.mid(pathStart + 1);
-        bFound = QFile::exists(file);
-    }
+    return false;
 
-    // look in default theme directory
-    if (!bFound)
-    {
-        file = baseDir + filename;
-        bFound = QFile::exists(file);
-    }
-
-    if (!bFound && pathStart > 0)
-    {
-        file = baseDir + filename.mid(pathStart + 1);
-        bFound = QFile::exists(file);
-    }
-
-    // look in tmp directory
-    if (!bFound)
-    {
-        file = "/tmp/" + filename;
-        bFound = QFile::exists(file);
-    }
-
-    if (!bFound)
-        return false;
-
+found:
     filename = file;
     return true;
 }
@@ -2092,7 +2081,6 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 {
     if (filename.left(5) == "myth:")
         return NULL;
-    QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
 
     if (d->themecachedir != "" && fromcache)
     {
@@ -2186,7 +2174,6 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 {
     if (filename.left(5) == "myth:")
         return NULL;
-    QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
 
     if (d->themecachedir != "" && fromcache)
     {

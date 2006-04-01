@@ -1,0 +1,651 @@
+<!--
+
+    This is a myth style theme file for mythmusic.
+
+    (c) 2003 by a whole bunch of people associated with MythTV
+
+-->
+<mythuitheme>
+
+    <!-- music selection screen -->
+    <window name="music_select">
+      <font name="active" face="Trebuchet MS">
+         <color>#ffffff</color>
+         <size>17</size>
+         <bold>no</bold>
+      </font>
+
+      <font name="inactive" face="Trebuchet MS">
+        <color>#9999cc</color>
+        <size>17</size>
+        <bold>no</bold>
+      </font>
+
+      <container name="musictree">
+        <area>64,36,1152,440</area>
+
+        <listtreearea name="musictree" draworder="0">
+          <area>0,0,1152,440</area>
+          <listsize>0,0,372,440</listsize>
+          <leveloffset>12</leveloffset>
+          <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+          </gradient>
+          <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+          </gradient>
+          <fcnfont name="active" function="active"></fcnfont>
+          <fcnfont name="inactive" function="inactive"></fcnfont>
+        </listtreearea>
+      </container>
+
+      <container name="info">
+        <area>64,484,1152,200</area>
+
+        <image name="background" draworder="0" fleximage="no">
+          <filename>music-sel-bg.png</filename>
+          <position>0,0</position>
+        </image>
+
+        <textarea name="line1" draworder="1" align="left">
+            <font>active</font>
+            <area>32,16,1088,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line2" draworder="1" align="left">
+            <font>active</font>
+            <area>32,46,1088,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line3" draworder="1" align="left">
+            <font>active</font>
+            <area>32,76,1088,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line4" draworder="1" align="left">
+            <font>active</font>
+            <area>32,106,1088,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line5" draworder="1" align="left">
+            <font>active</font>
+            <area>32,136,1088,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line6" draworder="1" align="left">
+            <font>active</font>
+            <area>32,166,1088,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+      </container>
+
+    </window>
+
+    <!--
+        The play music screen
+    -->
+    <window name="music_play">
+    
+        <!--
+            First, define all the fonts we need on this screen
+        -->
+        <font name="active" face="Trebuchet MS">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="inactive" face="Trebuchet MS">
+            <color>#9999cc</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+  
+        <font name="selected" face="Trebuchet MS">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="currenttitle" face="Trebuchet MS">
+            <color>#ffffff</color>
+            <size>20</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="currentartist" face="Trebuchet MS">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="infotext" face="Trebuchet MS">
+            <color>#ffffff</color>
+            <size>12</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="buttons" face="Trebuchet MS">
+            <color>#ffffff</color>
+            <size>12</size>
+            <bold>yes</bold>
+        </font>
+
+        <!--
+            The (unchanging) background
+        -->
+
+        <container name="background">
+            <image name="filler" draworder="0" fleximage="yes">
+                <filename>background.png</filename>
+                <position>0,16</position>
+            </image>
+            <image name="titlelines" draworder="0" fleximage="no">
+                <filename>trans-titles.png</filename>
+                <position>0,16</position>
+            </image>
+            <image name="track_info_background" draworder="0" fleximage="no">
+                <filename>track_info_background.png</filename>
+                <position>0,340</position>
+            </image>
+            <image name="mm_blackhole_border" draworder="0" fleximage="no">
+                <filename>mm_blackhole_border.png</filename>
+                <position>213,369</position>
+            </image>
+        </container>
+
+        <!--
+            The view of playlists; tracks at the top
+        -->
+        <container name="musicselector">
+            <area>8,20,1264,310</area> <!-- mm_waiting.png -->
+            <!--
+                First appearance of a managedtreelist
+                I'll explain as we go
+
+                bins is how many visible layers of the
+                tree there are. 
+            -->
+            <managedtreelist name="musictreelist" draworder="1" bins="4">
+                <!-- 
+                    regular area, but is only used if the user has
+                    ShowWholeTree set to false.
+                -->
+                <area>32,0,1200,296</area>
+                <!--
+                    An image to show the current navigation node
+                -->
+                <image function="selectionbar" filename="bar.png"></image>
+                <!--
+                    Some arrow images
+                -->
+                <image function="uparrow" filename="mm_up_arrow.png"></image>
+                <image function="downarrow" filename="mm_down_arrow.png"></image>
+                <image function="leftarrow" filename="mm_left_arrow.png"></image>
+                <image function="rightarrow" filename="mm_right_arrow.png"></image>
+                <!-- 
+                    the area of particular bins
+                    you can make them show right to left,
+                    top to bottom, and layer graphics on top 
+                    however you like
+
+                    NB: bins number 1 to # of bins inclusive
+                        not 0 to #-1
+                -->
+                <bin number="1">
+                    <area>56,28,288,250</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                    <fcnfont name="selected" function="selected"></fcnfont>
+                </bin>
+                <bin number="2">
+                    <area>384,0,208,296</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                </bin>
+                <bin number="3">
+                    <area>609,0,208,296</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                </bin>
+                <bin number="4">
+                    <area>834,0,366,296</area>
+                    <fcnfont name="active" function="active"></fcnfont>
+                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                </bin>
+            </managedtreelist>
+
+            <!--
+                An image that go "on top" of the list bins
+            -->
+
+            <image name="showinglines" draworder="2" fleximage="yes">
+                <context>1</context>
+                <filename>showings.png</filename>
+                <position>0,0</position>
+            </image>
+
+            <!--
+                An image for when we're waiting for data
+            -->
+            <image name="mm_waiting" draworder="0" fleximage="no">
+                <context>0</context>
+                <filename>mm_waiting.png</filename>
+                <position>0,0</position>
+            </image>
+            <textarea name="waiting_text" draworder="1" align="allcenter">
+                <context>0</context>
+                <font>currenttitle</font>
+                <area>32,0,1200,296</area>
+                <value>Please Wait ...</value>
+            </textarea>
+
+            <!--
+                An image for when we're only showing the last bin 
+                (ie. just the active playlist)
+            -->
+
+            <image name="mm_waiting" draworder="0" fleximage="no">
+                <context>2</context>
+                <filename>mm_waiting.png</filename> <!-- 1264x305 -->
+                <position>0,0</position>
+            </image>
+        </container>
+
+        <!--
+            An area to hold info about the playing track
+        -->
+
+        <container name="trackinfo">
+            <area>0,340,1136,200</area>
+
+            <blackhole name="visual_blackhole">
+                <area>216,33,138,136</area>
+            </blackhole>
+
+            <textarea name="title_text" draworder="1" align="left">
+                <font>currenttitle</font>
+                <area>386,24,684,34</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+
+            <textarea name="artist_text" draworder="1" align="left">
+                <font>currentartist</font>
+                <area>386,70,684,25</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+
+            <textarea name="album_text" draworder="1" align="left">
+                <font>currentartist</font>
+                <area>386,100,684,25</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+
+            <repeatedimage name="ratings_image" draworder="1" fleximage="no">
+                <filename>mm_rating.png</filename>
+                <position>386,143</position>
+                <orientation>LeftToRight</orientation>
+            </repeatedimage>
+
+            <textarea name="current_visualization_text" draworder="1" align="right">
+                <font>currentartist</font>
+                <area>885,70,185,25</area>
+                <cutdown>yes</cutdown>
+            </textarea>
+
+            <textarea name="info_text" draworder="1" align="right">
+                <font>infotext</font>
+                <area>571,100,499,25</area>
+            </textarea>
+
+            <textarea name="time_text" draworder="1" align="right">
+                <font>currentartist</font>
+                <area>885,143,185,25</area>
+            </textarea>
+
+        </container>
+
+        <!--
+            On screen volume display
+        -->
+
+        <container name="volumedisplay">
+            <area>1168,332,40,200</area>
+            <statusbar name="volume_status" draworder="-1" whitespace="5">
+                <container fleximage="no">mm_volume_background.png</container>
+                <fill>mm_volume_tick.png</fill>
+                <position>0,0</position>
+                <orientation>BottomToTop</orientation>
+            </statusbar>
+        </container>
+
+        <!--
+            All the buttons
+        -->
+
+        <container name="musicbuttons">
+            <area>64,554,1152,130</area>
+
+            <textbutton name="shuffle_button" draworder="0">
+                <position>32,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+
+            <textbutton name="repeat_button" draworder="0">
+                <position>312,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+
+            <textbutton name="pledit_button" draworder="0">
+                <position>592,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+
+            <textbutton name="vis_button" draworder="0">
+                <position>872,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+
+            <pushbutton name="prev_button" draworder="0">
+                <position>201,60</position>
+                <image function="on" filename="prev_button_on.png"></image>
+                <image function="off" filename="prev_button_off.png"></image>
+                <image function="pushed" filename="prev_button_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="rew_button" draworder="0">
+                <position>316,60</position>
+                <image function="on" filename="rew_button_on.png"></image>
+                <image function="off" filename="rew_button_off.png"></image>
+                <image function="pushed" filename="rew_button_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="pause_button" draworder="0">
+                <position>431,60</position>
+                <image function="on" filename="pause_button_on.png"></image>
+                <image function="off" filename="pause_button_off.png"></image>
+                <image function="pushed" filename="pause_button_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="play_button" draworder="0">
+                <position>546,60</position>
+                <image function="on" filename="play_button_on.png"></image>
+                <image function="off" filename="play_button_off.png"></image>
+                <image function="pushed" filename="play_button_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="stop_button" draworder="0">
+                <position>661,60</position>
+                <image function="on" filename="stop_button_on.png"></image>
+                <image function="off" filename="stop_button_off.png"></image>
+                <image function="pushed" filename="stop_button_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="ff_button" draworder="0">
+                <position>776,60</position>
+                <image function="on" filename="ff_button_on.png"></image>
+                <image function="off" filename="ff_button_off.png"></image>
+                <image function="pushed" filename="ff_button_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="next_button" draworder="0">
+                <position>891,60</position>
+                <image function="on" filename="next_button_on.png"></image>
+                <image function="off" filename="next_button_off.png"></image>
+                <image function="pushed" filename="next_button_pushed.png"></image>
+            </pushbutton>
+            
+        </container>
+
+  </window>
+  
+  <window name="edit_metadata">
+
+     <font name="title" face="Trebuchet MS">
+         <color>#33ff33</color>
+         <dropcolor>#000000</dropcolor>
+         <size>24</size>
+         <shadow>3,3</shadow>
+         <bold>yes</bold>
+     </font>
+
+     <font name="labels" face="Trebuchet MS">
+         <color>#33ff33</color>
+         <dropcolor>#000000</dropcolor>
+         <size>18</size>
+         <shadow>3,3</shadow>
+         <bold>yes</bold>
+     </font>
+
+     <font name="display" face="Trebuchet MS">
+         <color>#ffffff</color>
+         <dropcolor>#000000</dropcolor>
+         <size>18</size>
+         <shadow>3,3</shadow>
+         <bold>no</bold>
+     </font>
+
+     <container name="edit_container">
+            <area>64,36,1152,648</area>
+
+            <textarea name="title" draworder="1">
+                <area>260,20,892,50</area>
+                <font>title</font>
+                <value>Track Information</value>
+            </textarea>
+
+            <!--
+                    Labels
+            -->
+
+            <textarea name="compilation_label" draworder="1" align="right">
+                <area>0,70,250,30</area>
+                <font>labels</font>
+                <value>Compilation:</value>
+            </textarea>
+
+            <textarea name="compilation_artist_label" draworder="1" align="right">
+                <area>0,110,250,30</area>
+                <font>labels</font>
+                <value>Comp. Artist:</value>
+            </textarea>
+
+            <textarea name="artist_label" draworder="1" align="right">
+                <area>0,150,250,30</area>
+                <font>labels</font>
+                <value>Artist:</value>
+            </textarea>
+
+            <textarea name="album_label" draworder="1" align="right">
+                <area>0,190,250,30</area>
+                <font>labels</font>
+                <value>Album:</value>
+            </textarea>
+
+            <textarea name="title_text" draworder="1" align="right">
+                <area>0,230,250,30</area>
+                <font>labels</font>
+                <value>Title:</value>
+            </textarea>
+
+            <textarea name="track_label" draworder="1" align="right">
+                <area>0,270,250,30</area>
+                <font>labels</font>
+                <value>Track No.:</value>
+            </textarea>
+
+            <textarea name="genre_label" draworder="1" align="right">
+                <area>0,310,250,30</area>
+                <font>labels</font>
+                <value>Genre:</value>
+            </textarea>
+
+            <textarea name="year_label" draworder="1" align="right">
+                <area>0,350,250,30</area>
+                <font>labels</font>
+                <value>Year:</value>
+            </textarea>
+
+            <textarea name="rating_label" draworder="1" align="right">
+                <area>0,390,250,30</area>
+                <font>labels</font>
+                <value>Rating:</value>
+            </textarea>
+
+            <textarea name="playcount_label" draworder="1" align="right">
+                <area>0,430,250,30</area>
+                <font>labels</font>
+                <value>Play Count:</value>
+            </textarea>
+
+            <textarea name="lastplay_label" draworder="1" align="right">
+                <area>0,470,250,30</area>
+                <font>labels</font>
+                <value>Last Play:</value>
+            </textarea>
+
+            <textarea name="filename_label" draworder="1" align="right">
+                <area>0,510,250,138</area>
+                <font>labels</font>
+                <value>Filename:</value>
+            </textarea>
+
+            <!--
+                    edits
+            -->
+
+            <checkbox name="compilation_check" draworder="0">
+                <position>260,70</position>
+                <image function="checked" filename="mm_checked.png"></image>
+                <image function="unchecked" filename="mm_unchecked.png"></image>
+                <image function="checked_high" filename="mm_checked_high.png"></image>
+                <image function="unchecked_high" filename="mm_unchecked_high.png"></image>
+            </checkbox> 
+
+            <remoteedit name="compilation_artist_edit" draworder="1" align="left">
+                <area>260,110,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <pushbutton name="searchcompilation_artist_button" draworder="2">
+                <position>1048,110</position>
+                <image function="on" filename="mm_blankbutton_on.png"></image>
+                <image function="off" filename="mm_blankbutton_off.png"></image>
+                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+            </pushbutton>
+
+            <remoteedit name="artist_edit" draworder="1" align="left">
+                <area>260,150,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <pushbutton name="searchartist_button" draworder="2">
+                <position>1048,150</position>
+                <image function="on" filename="mm_blankbutton_on.png"></image>
+                <image function="off" filename="mm_blankbutton_off.png"></image>
+                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+            </pushbutton>
+
+            <remoteedit name="album_edit" draworder="1" align="left">
+                <area>260,190,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <pushbutton name="searchalbum_button" draworder="2">
+                <position>1048,190</position>
+                <image function="on" filename="mm_blankbutton_on.png"></image>
+                <image function="off" filename="mm_blankbutton_off.png"></image>
+                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+            </pushbutton>
+
+            <remoteedit name="title_edit" draworder="1" align="left">
+                <area>260,230,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <remoteedit name="track_edit" draworder="1" align="left">
+                <area>260,270,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <remoteedit name="genre_edit" draworder="1" align="left">
+                <area>260,310,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <pushbutton name="searchgenre_button" draworder="2">
+                <position>1048,310</position>
+                <image function="on" filename="mm_blankbutton_on.png"></image>
+                <image function="off" filename="mm_blankbutton_off.png"></image>
+                <image function="pushed" filename="mm_blankbutton_pushed.png"></image>
+            </pushbutton>
+
+            <remoteedit name="year_edit" draworder="1" align="left">
+                <area>260,350,782,35</area>
+                <font>display</font>
+            </remoteedit>
+
+            <repeatedimage name="rating_image" draworder="1" fleximage="no">
+                <filename>mm_rating.png</filename>
+                <position>260,400</position>
+                <orientation>LeftToRight</orientation>
+            </repeatedimage>
+
+            <selector name="rating_button" draworder="0">
+                <area>1048,390,30,30</area>
+                <font>display</font>
+                <image function="on" filename="mm_leftright_on.png"></image>
+                <image function="off" filename="mm_leftright_off.png"></image>
+                <image function="pushed" filename="mm_leftright_pushed.png"></image>
+            </selector>
+
+            <textarea name="playcount_text" draworder="1" align="left">
+                <area>260,430,122,30</area>
+                <font>display</font>
+            </textarea>
+
+            <textarea name="lastplay_text" draworder="1" align="left">
+                <area>260,470,400,30</area>
+                <font>display</font>
+            </textarea>
+
+            <textarea name="filename_text" draworder="1" align="left">
+                <area>260,510,782,138</area>
+                <multiline>yes</multiline>
+                <font>display</font>
+            </textarea>
+
+            <!--
+                    Push buttons
+            -->
+
+            <textbutton name="done_button" draworder="0">
+                <position>260,576</position>
+                <font>display</font>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+            </textbutton>
+
+      </container>
+   </window>
+   
+</mythuitheme>

@@ -1,0 +1,115 @@
+<mythuitheme>
+
+  <window name="status">
+
+    <font name="active" face="Trebuchet MS">
+      <color>#ffffff</color>
+      <size>17</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Trebuchet MS">
+      <color>#ffffff</color>
+      <size>18</size>
+      <bold>yes</bold>
+      <shadow>2,2</shadow>
+    </font>
+
+    <font name="selected" face="Trebuchet MS">
+      <color>#33ff33</color>
+      <size>17</size>
+      <bold>yes</bold>
+      <shadow>2,1</shadow>
+    </font>
+
+    <font name="status" face="Trebuchet MS">
+      <color>#ffffff</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="status_selected" face="Trebuchet MS">
+      <color>#33ff33</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="status_error" face="Trebuchet MS">
+      <color>#ff0000</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="status_warning" face="Trebuchet MS">
+      <color>#ff8429</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <container name="topbar">
+      <area>64,36,1152,200</area>
+      <textarea name="heading" draworder="0">
+        <area>0,10,1152,40</area>
+        <font>title</font>
+        <value>System Status - Select a category to view the status</value>
+      </textarea>
+      <textarea name="helptext" draworder="0">
+        <area>0,60,1152,160</area>
+        <font>title</font>
+        <value>This screen displays the status of various system components</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>64,256,336,444</area>
+      <image name="iconlines" draworder="0" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+        <staticsize>336,444</staticsize>
+      </image>
+      <image name="iconbg" draworder="1" fleximage="no">
+        <filename>trans-cr-background.png</filename>
+        <position>0,0</position>
+        <staticsize>336,444</staticsize>
+      </image>
+      <listarea name="icon_list" draworder="2">
+       <area>32,30,336,384</area>
+       <fcnfont name="active" function="active"></fcnfont>
+       <fcnfont name="active" function="inactive"></fcnfont>
+       <fcnfont name="selected" function="selected"></fcnfont>
+       <column number="1" width="336" context="-1"></column>
+       <items>10</items>
+      </listarea>
+    </container>
+
+    <container name="content">
+      <area>400,256,816,444</area>
+      <image name="datalines" draworder="0" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+        <staticsize>816,444</staticsize>
+      </image>
+      <image name="databg" draworder="1" fleximage="no">
+        <filename>trans-cr-background.png</filename>
+        <position>0,0</position>
+        <staticsize>816,444</staticsize>
+      </image>
+      <listarea name="list_area" draworder="2">
+       <area>32,30,816,360</area>
+       <fcnfont name="status" function="active"></fcnfont>
+       <fcnfont name="status" function="inactive"></fcnfont>
+       <fcnfont name="status_selected" function="selected"></fcnfont>
+       <fcnfont name="status_error" function="error"></fcnfont>
+       <fcnfont name="status_warning" function="warning"></fcnfont>
+       <column number="1" width="816" context="-1"></column>
+       <items>11</items>
+       <image function="selectionbar" filename="status-bar.png" location="-3,-2"></image>
+       <image function="uparrow" filename="uparrow.png" location="768,30"></image>
+       <image function="downarrow" filename="downarrow.png" location="768,336"></image>
+      </listarea>
+    </container>
+
+  </window>
+
+</mythuitheme>

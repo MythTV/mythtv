@@ -1,0 +1,96 @@
+<mythuitheme>
+
+  <window name="gallery">
+
+    <font name="active" face="Trebuchet MS">
+      <color>#ffffff</color>
+      <size>17</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive" face="Trebuchet MS">
+      <color>#9999cc</color>
+      <size>17</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Trebuchet MS">
+      <color>#ffffff</color>
+      <size>20</size>
+      <bold>yes</bold>
+    </font>
+
+    <container name="menu">
+      <area>64,36,180,240</area>
+
+      <listbtnarea name="menu" draworder="0">
+        <area>0,0,180,240</area>
+        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showarrow>no</showarrow>
+        <showscrollarrows>no</showscrollarrows>
+      </listbtnarea>
+
+      <listbtnarea name="submenu" draworder="0">
+        <area>0,260,180,240</area>
+        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showarrow>no</showarrow>
+        <showscrollarrows>no</showscrollarrows>
+      </listbtnarea>
+
+    </container>
+
+    <container name="text">
+      <area>256,36,960,35</area>
+      <textarea name="text" draworder="0">
+        <area>0,0,960,35</area>
+        <font>title</font>
+        <multiline>no</multiline>
+      </textarea>
+    </container>
+
+    <container name="view">
+      <area>256,72,960,630</area>
+
+      <blackhole name="view" draworder="0">
+            <area>0,0,960,630</area>
+      </blackhole>
+
+      <image name="scrollUpReg" draworder="0" fleximage="no">
+        <context>0</context>
+        <filename>lb-uparrow-reg.png</filename>
+        <position>930,572</position>
+      </image>
+
+      <image name="scrollUpSel" draworder="0" fleximage="no">
+        <context>1</context>
+        <filename>lb-uparrow-sel.png</filename>
+        <position>930,572</position>
+      </image>
+
+      <image name="scrollDnReg" draworder="1" fleximage="no">
+        <context>0</context>
+        <filename>lb-dnarrow-reg.png</filename>
+        <position>930,592</position>
+      </image>
+
+      <image name="scrollDnSel" draworder="1" fleximage="no">
+        <context>1</context>
+        <filename>lb-dnarrow-sel.png</filename>
+        <position>930,592</position>
+      </image>
+
+    </container>
+
+  </window>
+ 
+</mythuitheme>
