@@ -217,19 +217,32 @@ protected:
         setName(name);
     };
 
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
+    virtual QString setClause(MSqlBindings& bindings);
+    virtual QString whereClause(MSqlBindings& bindings);
 
     const DVBTID& id;
 };
 
-QString DvbTransSetting::whereClause(void) {
-    return QString("%1=%2").arg(id.getField()).arg(id.getValue());
+QString DvbTransSetting::whereClause(MSqlBindings& bindings) {
+    QString fieldTag(":WHERE" + id.getField().upper());
+    QString query(id.getField() + " = " + fieldTag);
+    
+    bindings.insert(fieldTag, id.getValue());
+
+    return query;
 }
 
-QString DvbTransSetting::setClause(void) {
-    return QString("%1=%2, %3='%4'").arg(id.getField()).arg(id.getValue())
-                   .arg(getName()).arg(getValue());
+QString DvbTransSetting::setClause(MSqlBindings& bindings) {
+    QString fieldTag = (":SET" + id.getField().upper());
+    QString nameTag = (":SET" + getName().upper());
+
+    QString query(id.getField() + " = " + fieldTag + ", " +
+                  getName() + " = " + nameTag);
+
+    bindings.insert(fieldTag, id.getValue());
+    bindings.insert(nameTag, getValue());
+
+    return query;
 }
 
 

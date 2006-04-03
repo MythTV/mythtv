@@ -1,12 +1,25 @@
 #include "channelsettings.h"
 
-QString CSetting::whereClause(void) {
-    return QString("%1=%2").arg(id.getField()).arg(id.getValue());
+QString CSetting::whereClause(MSqlBindings& bindings) {
+    QString fieldTag = (":WHERE" + id.getField().upper());
+    QString query(id.getField() + " = " + fieldTag);
+
+    bindings.insert(fieldTag, id.getValue());
+
+    return query;
 }
 
-QString CSetting::setClause(void) {
-    return QString("%1=%2, %3='%4'").arg(id.getField()).arg(id.getValue())
-                   .arg(getName()).arg(getValue());
+QString CSetting::setClause(MSqlBindings& bindings) {
+    QString fieldTag = (":SET" + id.getField().upper());
+    QString nameTag = (":SET" + getName().upper());
+
+    QString query(id.getField() + " = " + fieldTag + ", " +
+                  getName() + " = " + nameTag);
+
+    bindings.insert(fieldTag, id.getValue());
+    bindings.insert(nameTag, getValue());
+
+    return query;
 }
 
 /*****************************************************************************

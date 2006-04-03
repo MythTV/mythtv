@@ -52,30 +52,54 @@ class DVBDiSEqCConfigurationWizard: public ConfigurationWizard
     DVBDiSEqCConfigurationWizard(CaptureCard &parent);
 };
 
-QString VSSetting::whereClause(void)
+QString VSSetting::whereClause(MSqlBindings& bindings)
 {
-    return QString("sourceid = %1").arg(parent.getSourceID());
+    QString sourceidTag(":WHERESOURCEID");
+    
+    QString query("sourceid = " + sourceidTag);
+
+    bindings.insert(sourceidTag, parent.getSourceID());
+
+    return query;
 }
 
-QString VSSetting::setClause(void)
+QString VSSetting::setClause(MSqlBindings& bindings)
 {
-    return QString("sourceid = %1, %2 = '%3'")
-        .arg(parent.getSourceID())
-        .arg(getColumn())
-        .arg(getValue());
+    QString sourceidTag(":SETSOURCEID");
+    QString colTag(":SET" + getColumn().upper());
+
+    QString query("sourceid = " + sourceidTag + ", " + 
+            getColumn() + " = " + colTag);
+
+    bindings.insert(sourceidTag, parent.getSourceID());
+    bindings.insert(colTag, getValue());
+
+    return query;
 }
 
-QString CCSetting::whereClause(void)
+QString CCSetting::whereClause(MSqlBindings& bindings)
 {
-    return QString("cardid = %1").arg(parent.getCardID());
+    QString cardidTag(":WHERECARDID");
+    
+    QString query("cardid = " + cardidTag);
+
+    bindings.insert(cardidTag, parent.getCardID());
+
+    return query;
 }
 
-QString CCSetting::setClause(void)
+QString CCSetting::setClause(MSqlBindings& bindings)
 {
-    return QString("cardid = %1, %2 = '%3'")
-        .arg(parent.getCardID())
-        .arg(getColumn())
-        .arg(getValue());
+    QString cardidTag(":SETCARDID");
+    QString colTag(":SET" + getColumn().upper());
+
+    QString query("cardid = " + cardidTag + ", " +
+            getColumn() + " = " + colTag);
+
+    bindings.insert(cardidTag, parent.getCardID());
+    bindings.insert(colTag, getValue());
+
+    return query;
 }
 
 class XMLTVGrabber: public ComboBoxSetting, public VSSetting
@@ -859,7 +883,7 @@ class FirewireConfigurationGroup: public VerticalConfigurationGroup
         hg1->addChild(new FirewireNode(parent));
         hg1->addChild(new FirewireSpeed(parent));
         addChild(hg1);
-   	addChild(new FirewireInput(parent));
+        addChild(new FirewireInput(parent));
     };
   private:
     CaptureCard& parent;
@@ -1066,7 +1090,7 @@ void CaptureCard::fillSelections(SelectSetting* setting, bool no_children)
                     "Streaming-Port: " + query.value(5).toString() + ", " +
                     "Http-Port: " + query.value(7).toString() + 
                     "] ", query.value(2).toString());
-	    }
+            }
             else 
             {
                 setting->addSelection(
@@ -1531,17 +1555,29 @@ void CardInput::sourceFetch(void)
     }
 }
 
-QString CISetting::whereClause(void) 
+QString CISetting::whereClause(MSqlBindings& bindings) 
 {
-    return QString("cardinputid = %1").arg(parent.getInputID());
+    QString cardinputidTag(":WHERECARDINPUTID");
+    
+    QString query("cardinputid = " + cardinputidTag);
+
+    bindings.insert(cardinputidTag, parent.getInputID());
+
+    return query;
 }
 
-QString CISetting::setClause(void) 
+QString CISetting::setClause(MSqlBindings& bindings) 
 {
-    return QString("cardinputid = %1, %2 = '%3'")
-        .arg(parent.getInputID())
-        .arg(getColumn())
-        .arg(getValue());
+    QString cardinputidTag(":SETCARDINPUTID");
+    QString colTag(":SET" + getColumn().upper());
+
+    QString query("cardinputid = " + cardinputidTag + ", " + 
+            getColumn() + " = " + colTag);
+
+    bindings.insert(cardinputidTag, parent.getInputID());
+    bindings.insert(colTag, getValue());
+
+    return query;
 }
 
 void CardInput::loadByID(int inputid) 

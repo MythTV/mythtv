@@ -2,6 +2,7 @@
 #define RECORDINGPROFILE_H
 
 #include "libmyth/settings.h"
+#include "libmyth/mythdbcon.h"
 #include "libmyth/mythwidgets.h"
 
 const QString availProfiles[] =
@@ -32,7 +33,7 @@ protected:
         setName(name);
     };
 
-    virtual QString whereClause(void);
+    virtual QString whereClause(MSqlBindings& bindings);
 };
 
 class ImageSize;

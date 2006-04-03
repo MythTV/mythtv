@@ -20,8 +20,8 @@ protected:
         setName(name);
     };
 
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
+    virtual QString setClause(MSqlBindings& bindings);
+    virtual QString whereClause(MSqlBindings& bindings);
 
     const VideoSource& parent;
 };
@@ -187,8 +187,8 @@ protected:
     int getCardID(void) const;
 
 protected:
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
+    virtual QString setClause(MSqlBindings& bindings);
+    virtual QString whereClause(MSqlBindings& bindings);
 private:
     const CaptureCard& parent;
 };
@@ -360,8 +360,8 @@ protected:
     void fillSelections();
 
 protected:
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
+    virtual QString setClause(MSqlBindings& bindings);
+    virtual QString whereClause(MSqlBindings& bindings);
 private:
     const CardInput& parent;
 };

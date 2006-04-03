@@ -10,8 +10,13 @@
 
 #include "managedlist.h"
 
-QString RecordingProfileParam::whereClause(void) {
-  return QString("id = %1").arg(parentProfile.getProfileNum());
+QString RecordingProfileParam::whereClause(MSqlBindings& bindings) {
+    QString idTag(":WHEREID");
+    QString query("id = " + idTag);
+
+    bindings.insert(idTag, parentProfile.getProfileNum());
+
+    return query;
 }
 
 class CodecParam: public SimpleDBStorage,
@@ -24,20 +29,35 @@ protected:
         setName(name);
     };
 
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
+    virtual QString setClause(MSqlBindings& bindings);
+    virtual QString whereClause(MSqlBindings& bindings);
 };
 
-QString CodecParam::setClause(void) {
-  return QString("profile = %1, name = '%2', value = '%3'")
-    .arg(parentProfile.getProfileNum())
-    .arg(getName())
-    .arg(getValue());
+QString CodecParam::setClause(MSqlBindings& bindings) {
+    QString profileTag(":SETPROFILE");
+    QString nameTag(":SETNAME");
+    QString valueTag(":SETVALUE");
+
+    QString query("profile = " + profileTag + ", name = " + nameTag
+            + ", value = " + valueTag);
+
+    bindings.insert(profileTag, parentProfile.getProfileNum());
+    bindings.insert(nameTag, getName());
+    bindings.insert(valueTag, getValue());
+
+    return query;
 }
 
-QString CodecParam::whereClause(void) {
-  return QString("profile = %1 AND name = '%2'")
-    .arg(parentProfile.getProfileNum()).arg(getName());
+QString CodecParam::whereClause(MSqlBindings& bindings) {
+    QString profileTag(":WHEREPROFILE");
+    QString nameTag(":WHERENAME");
+
+    QString query("profile = " + profileTag + " AND name = " + nameTag);
+
+    bindings.insert(profileTag, parentProfile.getProfileNum());
+    bindings.insert(nameTag, getName());
+
+    return query;
 }
 
 class AudioCodecName: public ComboBoxSetting, public RecordingProfileParam {
@@ -55,7 +75,7 @@ public:
         SliderSetting(1,9,1) {
         setLabel(QObject::tr("MP3 Quality"));
         setValue(7);
-	setHelpText(QObject::tr("The higher the slider number, the lower the "
+        setHelpText(QObject::tr("The higher the slider number, the lower the "
                     "quality of the audio.  Better quality audio (lower "
                     "numbers) requires more CPU."));
     };
@@ -89,7 +109,7 @@ public:
             //addSelection("44100");
             //addSelection("32000");
         }
-	setHelpText(QObject::tr("Sets the audio sampling rate for your DSP. "
+        setHelpText(QObject::tr("Sets the audio sampling rate for your DSP. "
                     "Ensure that you choose a sampling rate appropriate "
                     "for your device.  btaudio may only allow 32000."));
     };
@@ -100,7 +120,7 @@ public:
    MPEG2audType(const RecordingProfile& parent):
         CodecParam(parent, "mpeg2audtype") {
         setLabel(QObject::tr("Type"));
-	setHelpText(QObject::tr("Sets the audio type"));
+        setHelpText(QObject::tr("Sets the audio type"));
     };
 };
 
@@ -271,7 +291,7 @@ public:
         SliderSetting(1,255,1) {
         setLabel(QObject::tr("RTjpeg Quality"));
         setValue(170);
-	setHelpText(QObject::tr("Higher is better quality."));
+        setHelpText(QObject::tr("Higher is better quality."));
     };
 };
 
@@ -282,7 +302,7 @@ public:
         SpinBoxSetting(0,31,1) {
         setLabel(QObject::tr("Luma filter"));
         setValue(0);
-	setHelpText(QObject::tr("Lower is better."));
+        setHelpText(QObject::tr("Lower is better."));
     };
 };
 
@@ -293,7 +313,7 @@ public:
         SpinBoxSetting(0,31,1) {
         setLabel(QObject::tr("Chroma filter"));
         setValue(0);
-	setHelpText(QObject::tr("Lower is better."));
+        setHelpText(QObject::tr("Lower is better."));
     };
 };
 
@@ -305,7 +325,7 @@ public:
 
         setLabel(QObject::tr("Bitrate"));
         setValue(2200);
-	setHelpText(QObject::tr("Bitrate in kilobits/second.  2200Kbps is "
+        setHelpText(QObject::tr("Bitrate in kilobits/second.  2200Kbps is "
                     "approximately 1 Gigabyte per hour."));
     };
 };
@@ -316,7 +336,7 @@ public:
         CodecParam(parent, "mpeg4scalebitrate") {
         setLabel(QObject::tr("Scale bitrate for frame size"));
         setValue(true);
-	setHelpText(QObject::tr("If set, the MPEG4 bitrate will be used for "
+        setHelpText(QObject::tr("If set, the MPEG4 bitrate will be used for "
                     "640x480.  If other resolutions are used, the "
                     "bitrate will be scaled appropriately."));
     };
@@ -330,7 +350,7 @@ public:
 
         setLabel(QObject::tr("Minimum quality"));
         setValue(15);
-	setHelpText(QObject::tr("Modifying the default may have severe "
+        setHelpText(QObject::tr("Modifying the default may have severe "
                     "consequences."));
     };
 };
@@ -343,7 +363,7 @@ public:
 
         setLabel(QObject::tr("Maximum quality"));
         setValue(2);
-	setHelpText(QObject::tr("Modifying the default may have severe "
+        setHelpText(QObject::tr("Modifying the default may have severe "
                     "consequences."));
     };
 };
@@ -644,7 +664,7 @@ public:
         CodecParam(parent, "autotranscode") {
         setLabel(QObject::tr("Enable auto-transcode after recording"));
         setValue(false);
-	    setHelpText(QObject::tr("Automatically transcode when a recording is "
+        setHelpText(QObject::tr("Automatically transcode when a recording is "
                                 "made using this profile and the recording's "
                                 "schedule is configurd to allow transcoding."));
     };

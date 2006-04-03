@@ -44,8 +44,8 @@ protected:
         setName(name);
     };
 
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
+    virtual QString setClause(MSqlBindings &bindings);
+    virtual QString whereClause(MSqlBindings &bindings);
 
     const MythGamePlayerSettings& parent;
 };

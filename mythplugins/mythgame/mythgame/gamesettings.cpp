@@ -92,15 +92,26 @@ MythGameGeneralSettings::MythGameGeneralSettings()
 }
 
 // Player Settings
-QString MGSetting::whereClause(void) {
-    return QString("gameplayerid = %1").arg(parent.getGamePlayerID());
+QString MGSetting::whereClause(MSqlBindings &bindings) {
+    QString playerId(":PLAYERID");
+    QString query("gameplayerid = " + playerId);
+
+    bindings.insert(playerId, parent.getGamePlayerID());
+
+    return query;
 }
 
-QString MGSetting::setClause(void) {
-    return QString("gameplayerid = %1, %2 = '%3'")
-        .arg(parent.getGamePlayerID())
-        .arg(getColumn())
-        .arg(getValue());
+QString MGSetting::setClause(MSqlBindings &bindings) {
+    QString playerID(":SETPLAYERID");
+    QString colTag(":SET" + getColumn().upper());
+
+    QString query("gameplayerid = " + playerID + ", " +
+                  getColumn() + " = " + colTag);
+
+    bindings.insert(playerID, parent.getGamePlayerID());
+    bindings.insert(colTag, getValue());
+
+    return query;
 }
 
 class AllowMultipleRoms: virtual public MGSetting, virtual public CheckBoxSetting {

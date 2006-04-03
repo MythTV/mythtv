@@ -14,15 +14,29 @@ public:
         setName(name);
     }
 
-    virtual QString setClause(void)
+    virtual QString setClause(MSqlBindings &bindings)
     {
-        return QString("romname = \"%1\", %2 = '%3'")
-                      .arg(romname).arg(getColumn()).arg(getValue());
+        QString romTag(":SETROMNAME");
+        QString colTag(":SET" + getColumn().upper());
+
+        QString query("romname = " + romTag + ", " +
+                      getColumn() + " = " + colTag);
+
+        bindings.insert(romTag, romname);
+        bindings.insert(colTag, getValue());
+
+        return query;
     }
 
-    virtual QString whereClause(void)
+    virtual QString whereClause(MSqlBindings &bindings)
     {
-        return QString("romname = \"%1\"").arg(romname);
+        QString romTag(":ROMNAME");
+
+        QString query("romname = " + romTag);
+
+        bindings.insert(romTag, romname);
+
+        return query;
     }
 
     QString romname;

@@ -10,15 +10,26 @@
 #include <iostream>
 #include <qaccel.h>
 
-QString ProfileGroupParam::whereClause(void) {
-    return QString("id = %1").arg(parent.getProfileNum());
+QString ProfileGroupParam::whereClause(MSqlBindings& bindings) {
+    QString idTag(":WHEREID");
+    QString query("id = " + idTag);
+
+    bindings.insert(idTag, parent.getProfileNum());
+
+    return query;
 }
 
-QString ProfileGroupParam::setClause(void) {
-    return QString("id = %1, %2 = '%3'")
-        .arg(parent.getProfileNum())
-        .arg(getColumn())
-        .arg(getValue().utf8());
+QString ProfileGroupParam::setClause(MSqlBindings& bindings) {
+    QString idTag(":SETID");
+    QString colTag(":SET" + getColumn().upper());
+
+    QString query("id = " + idTag + ", " + 
+            getColumn() + " = " + colTag);
+
+    bindings.insert(idTag, parent.getProfileNum());
+    bindings.insert(colTag, getValue().utf8());
+
+    return query;
 }
 
 void ProfileGroup::HostName::fillSelections()

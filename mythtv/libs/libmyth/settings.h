@@ -9,6 +9,7 @@
 
 #include "mythwidgets.h"
 #include "mythdialogs.h"
+#include "mythdbcon.h"
 
 using namespace std;
 
@@ -629,10 +630,8 @@ public:
 
 protected:
 
-    virtual QString whereClause(void) = 0;
-    virtual QString setClause(void) {
-        return QString("%1 = '%2'").arg(column).arg(getValue());
-    };
+    virtual QString whereClause(MSqlBindings&) = 0;
+    virtual QString setClause(MSqlBindings& bindings);
 };
 
 class TransientStorage: virtual public Setting {
@@ -736,8 +735,8 @@ public:
     virtual ~HostSetting() { ; }
 
 protected:
-    virtual QString whereClause(void);
-    virtual QString setClause(void);
+    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString setClause(MSqlBindings& bindings);
 };
 
 class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
@@ -748,8 +747,8 @@ public:
     };
 
 protected:
-    virtual QString whereClause(void);
-    virtual QString setClause(void);
+    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString setClause(MSqlBindings& bindings);
 };
 
 class HostSlider: public SliderSetting, public HostSetting {

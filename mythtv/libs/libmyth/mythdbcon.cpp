@@ -378,6 +378,19 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
     }
 }
 
+QVariant MSqlQuery::lastInsertId()
+{
+    exec("SELECT LAST_INSERT_ID();");
+    if (!isActive() || size() < 1) 
+    {
+        MythContext::DBError("selecting last insert id", *this);
+        return QVariant();
+    }
+
+    next();
+    return value(0);
+}
+
 void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
 {
     MSqlBindings::Iterator it;

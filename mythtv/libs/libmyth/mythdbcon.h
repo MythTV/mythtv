@@ -117,6 +117,16 @@ class MSqlQuery : public QSqlQuery
     /// \brief Add all the bindings in the passed in bindings
     void bindValues(MSqlBindings &bindings);
 
+    /** \brief Return the id of the last inserted row
+     * 
+     * Note: Currently, this function is only implemented in Qt4 (in QSqlQuery
+     * and QSqlResult), and is implemented here until the switch to Qt4.  Also,
+     * the current implementation will only work for a DBMS that supports
+     * the function LAST_INSERT_ID() (i.e. MySQL), and will _not_ work
+     * in SQLite.
+     */
+    QVariant lastInsertId();
+
     /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();
 

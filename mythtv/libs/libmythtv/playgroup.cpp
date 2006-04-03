@@ -18,14 +18,19 @@ protected:
         setName(_name);
     };
 
-    virtual QString whereClause(void);
+    virtual QString whereClause(MSqlBindings& bindings);
 
     const PlayGroup &parent;
 };
 
-QString PlayGroupSetting::whereClause(void)
+QString PlayGroupSetting::whereClause(MSqlBindings& bindings)
 {
-    return QString("name = '%1'").arg(parent.getName());
+    QString nameTag(":WHERENAME");
+    QString query("name = " + nameTag);
+
+    bindings.insert(nameTag, parent.getName());
+
+    return query;
 }
 
 class TitleMatch: public LineEditSetting, public PlayGroupSetting {
