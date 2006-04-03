@@ -6337,7 +6337,7 @@ void TV::BuildOSDTreeMenu(void)
                                   "TOGGLETTC");
         item = new OSDGenericTree(treeMenu, tr("Toggle Teletext Menu"),
                                   "TOGGLETTM");
-        FillMenuTracks(treeMenu, kDisplayTeletextCaptions);
+        FillMenuTracks(treeMenu, kTrackTypeTeletextCaptions);
     }
 
     int letterbox = nvp->GetLetterbox();
@@ -6505,13 +6505,13 @@ bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
         grpStr  = "CC608GROUP";
         sel     = activenvp->GetCaptionMode() & kDisplayCC708;
     }
-    else if (kDisplayTeletextCaptions == type)
+    else if (kTrackTypeTeletextCaptions == type)
     {
         mainMsg = tr("Select DVB CC");
         typeStr = "TTC";
         selStr  = "SELECTTTC_";
         grpStr  = "TTCGROUP";
-        sel     = activenvp->GetCaptionMode() & kDisplayTeletextCaptions;
+        sel     = activenvp->GetCaptionMode() & kTrackTypeTeletextCaptions;
     }
     else
     {
