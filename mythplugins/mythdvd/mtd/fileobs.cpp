@@ -10,8 +10,6 @@
 */
 
 #include <unistd.h>
-#include <iostream>
-using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include "fileobs.h"
@@ -19,14 +17,12 @@ using namespace std;
 
 RipFile::RipFile(const QString &a_base, const QString &an_extension,
         bool auto_remove_bad) : base_name(a_base), extension(an_extension),
+                                   active_file(NULL), bytes_written(0),
+                                   use_multiple_files(true),
                                    auto_remove_bad_rips(auto_remove_bad)
 {
     filesize = gContext->GetNumSetting("MTDRipSize", 0) * 1024 * 1024;
-    active_file = NULL;
-    files.clear();
     files.setAutoDelete(true);
-    bytes_written = 0;
-    use_multiple_files = true;
 }
 
 bool RipFile::open(int mode, bool multiple_files)
@@ -34,9 +30,8 @@ bool RipFile::open(int mode, bool multiple_files)
     use_multiple_files = multiple_files;
     access_mode = mode;
     QString filename = base_name + "_001of"; 
-    QFile *new_file = new QFile(filename);
-    files.append(new_file);
-    active_file = new_file;
+    active_file = new QFile(filename);
+    files.append(active_file);
     return active_file->open(mode);
 /*
     if(!use_multiple_files)
@@ -46,8 +41,10 @@ bool RipFile::open(int mode, bool multiple_files)
 */
 }
 
-void RipFile::close()
+QStringList RipFile::close()
 {
+    QStringList output_file_names;
+
     auto_remove_bad_rips = false;
     if(active_file)
     {
@@ -56,8 +53,7 @@ void RipFile::close()
     if(files.count() == 1)
     {
         QString new_name = base_name + extension;
-        QDir stupid_qdir("this_is_stupid");
-        if(!stupid_qdir.rename(active_file->name(), new_name))
+        if(!QDir::current().rename(active_file->name(), new_name))
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Couldn't rename a ripped file on close ... "
@@ -69,17 +65,17 @@ void RipFile::close()
         else
         {
             active_file->setName(new_name);
+            output_file_names.push_back(new_name);
         }
     }
     else
     {
-        QDir stupid_qdir("this_is_stupid");
         QFile *iter;
         for(iter = files.first(); iter; iter = files.next())
         {
             QString new_name = iter->name() + QString("%1").arg(files.count()) +
                     extension;
-            if(!stupid_qdir.rename(iter->name(), new_name))
+            if(!QDir::current().rename(iter->name(), new_name))
             {
                 VERBOSE(VB_IMPORTANT, QString("Couldn't rename '%1' to '%2'")
                         .arg(iter->name()).arg(new_name));
@@ -87,9 +83,11 @@ void RipFile::close()
             else
             {
                 iter->setName(new_name);
+                output_file_names.push_back(new_name);
             }
         }
     }
+    return output_file_names;
 }
 
 void RipFile::remove()

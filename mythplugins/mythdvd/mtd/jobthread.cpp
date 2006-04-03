@@ -13,8 +13,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <iostream>
-using namespace std;
+#include <algorithm>
 
 #include <qdatetime.h>
 #include <qdir.h>
@@ -29,6 +28,15 @@ using namespace std;
 #include "mtd.h"
 #include "threadevents.h"
 #include "dvdprobe.h"
+
+namespace {
+    struct delete_file {
+        bool operator()(const QString &filename) {
+            VERBOSE(VB_GENERAL, QString("Deleting file: %1").arg(filename));
+            return QDir::current().remove(filename);
+        }
+    };
+}
 
 JobThread::JobThread(MTD *owner, const QString &start_string, int nice_priority)
           :QThread()
@@ -316,7 +324,8 @@ void DVDThread::run()
 bool DVDThread::ripTitle(int title_number,
                          const QString &to_location,
                          const QString &extension,
-                         bool multiple_files)
+                         bool multiple_files,
+                         QStringList *output_files)
 {
     //
     //  Can't do much until I have a
@@ -585,7 +594,9 @@ bool DVDThread::ripTitle(int title_number,
     //  Wow, we're done.
     //
 
-    ripfile.close();
+    QStringList sl = ripfile.close();
+    if (output_files) *output_files = sl;
+
     sendLoggingEvent("job thread finished ripping dvd title");
     return true;
 }
@@ -878,10 +889,11 @@ void DVDTranscodeThread::run()
     //  Rip VOB to working directory
     //
 
+    QStringList output_files;
     if(keepGoing())
     {
         QString rip_file_string = QString("%1/vob/%2").arg(working_directory->path()).arg(rip_name);
-        if(!ripTitle(dvd_title, rip_file_string, ".vob", true))
+        if(!ripTitle(dvd_title, rip_file_string, ".vob", true, &output_files))
         {
             cleanUp(); 
             return;
@@ -943,7 +955,13 @@ void DVDTranscodeThread::run()
                 wipeClean();
             }
         }
-    }    
+    }
+
+    if (!gContext->GetNumSetting("mythdvd.mtd.SaveTranscodeIntermediates", 0)) {
+        // remove any temporary titles that are now transcoded
+        std::for_each(output_files.begin(), output_files.end(), delete_file());
+    }
+
     cleanUp();
 }
 
@@ -1464,8 +1482,7 @@ void DVDTranscodeThread::wipeClean()
     //  partially created
     //
     cleanUp();
-    QDir d("stupid");
-    d.remove(QString("%1.avi").arg(destination_file_string));
+    QDir::current().remove(QString("%1.avi").arg(destination_file_string));
 }
 
 DVDTranscodeThread::~DVDTranscodeThread()

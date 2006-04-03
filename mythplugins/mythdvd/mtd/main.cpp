@@ -13,8 +13,6 @@
 #include <qfile.h>
 #include <qtextstream.h>
 
-#include <iostream>
-using namespace std;
 #include <unistd.h>
 
 #include <mythtv/exitcodes.h>

@@ -12,12 +12,12 @@
 */
 
 #include <qstring.h>
+#include <qstringlist.h>
 #include <qfile.h>
 #include <qptrlist.h>
 
 class RipFile
 {
-
 
   public:
   
@@ -26,13 +26,12 @@ class RipFile
     ~RipFile();
     
     bool    open(int mode, bool multiple_files);
-    void    close();
+    QStringList close();
     void    remove();
     QString name();
     bool    writeBlocks(unsigned char *the_data, int how_much);
 
   private:
-  
     QString         base_name;
     QString         extension;
     int             filesize;

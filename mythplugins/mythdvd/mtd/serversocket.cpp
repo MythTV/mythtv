@@ -11,8 +11,7 @@
 #include <qsocket.h>
 
 #include <stdlib.h>
-#include <iostream>
-using namespace std;
+#include <mythtv/mythcontext.h>
 
 #include "serversocket.h"
 
@@ -22,10 +21,12 @@ MTDServerSocket::MTDServerSocket(int port, QObject *parent)
 {
     if(!ok())
     {
-        cerr << "MTDServerSocket.o: Something is wrong trying to start with port=" << port << endl;
-        cerr << "MTDServerSocket.o: You've probably got another copy of mtd already running." << endl;
-        cerr << "MTDServerSocket.o: You might want to try \"ps ax | grep mtd\"." << endl ; 
-        cerr << "MTDServerSocker.o: This copy will now exit ... " << endl ;
+        VERBOSE(VB_IMPORTANT,
+                QString("MTDServerSocket Something is wrong trying to start "
+                        "with port=%1\nYou've probably got another copy of mtd "
+                        "already running.\nYou might want to try "
+                        "\"ps ax | grep mtd\".\nThis copy will now exit ...")
+                .arg(port));
         exit(0);
     }
 }

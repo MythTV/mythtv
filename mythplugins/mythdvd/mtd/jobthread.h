@@ -105,7 +105,8 @@ class DVDThread : public JobThread
     bool         ripTitle(int title_number,
                           const QString &to_location,
                           const QString &extension,
-                          bool multiple_files);
+                          bool multiple_files,
+                          QStringList *output_files = 0);
   
     QMutex       *dvd_device_access;
     QString      dvd_device_location;

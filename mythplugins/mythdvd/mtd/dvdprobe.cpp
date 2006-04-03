@@ -7,8 +7,6 @@
     implementation for dvd probing (libdvdread)
 */
 
-#include <iostream>
-using namespace std;
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
