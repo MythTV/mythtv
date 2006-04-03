@@ -1,15 +1,14 @@
+#include <unistd.h>
+
+#include <qfile.h>
+#include <qstring.h>
+#include <qregexp.h>
+
 #include "datadirect.h"
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "util.h"
-
-#include <unistd.h>
-#include <qfile.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <cerrno>
-
 
 #define LOC QString("DataDirect: ")
 #define LOC_ERR QString("DataDirect, Error: ")
@@ -19,6 +18,128 @@ const QString DataDirectURLS[] =
     "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService"
 };
 const uint NumDataDirectURLS = 1;
+
+DataDirectStation::DataDirectStation(void) :
+    stationid(""),              callsign(""),
+    stationname(""),            affiliate(""),
+    fccchannelnumber("")
+{
+}
+
+void DataDirectStation::Reset(void)
+{
+    stationid        = "";
+    callsign         = "";
+    stationname      = "";
+    affiliate        = "";
+    fccchannelnumber = "";
+}
+
+DataDirectLineup::DataDirectLineup() :
+    lineupid(""), name(""), displayname(""), type(""), postal(""), device("")
+{
+}   
+
+void DataDirectLineup::Reset(void)
+{
+    lineupid    = "";
+    name        = "";
+    displayname = "";
+    type        = "";
+    postal      = "";
+    device      = "";
+}   
+
+DataDirectLineupMap::DataDirectLineupMap() :
+    lineupid(""), stationid(""), channel(""), channelMinor("")
+{
+}
+
+void DataDirectLineupMap::Reset(void)
+{
+    lineupid     = "";
+    stationid    = "";
+    channel      = "";
+    channelMinor = "";
+}
+
+DataDirectSchedule::DataDirectSchedule() :
+    programid(""),              stationid(""),
+    time(QDateTime()),          duration(QTime()),
+    repeat(false),              stereo(false),
+    subtitled(false),           hdtv(false),
+    closecaptioned(false),      tvrating(""),
+    partnumber(0),              parttotal(0)
+{
+}
+
+void DataDirectSchedule::Reset(void)
+{
+    programid      = "";
+    stationid      = "";
+    time           = QDateTime();
+    duration       = QTime();
+    repeat         = false;
+    stereo         = false;
+    subtitled      = false;
+    hdtv           = false;
+    closecaptioned = false;
+    tvrating       = "";
+    partnumber     = 0;
+    parttotal      = 0;
+}   
+
+DataDirectProgram::DataDirectProgram() :
+    programid(""),  seriesid(""),      title(""),
+    subtitle(""),   description(""),   mpaaRating(""),
+    starRating(""), duration(QTime()), year(""),
+    showtype(""),   colorcode(""),     originalAirDate(QDate()),
+    syndicatedEpisodeNumber("")
+{
+}
+
+void DataDirectProgram::Reset(void) 
+{
+    programid       = "";
+    seriesid        = "";
+    title           = "";
+    subtitle        = "";
+    description     = "";
+    mpaaRating      = "";
+    starRating      = "";
+    duration        = QTime();
+    year            = "";
+    showtype        = "";
+    colorcode       = "";
+    originalAirDate = QDate();
+    syndicatedEpisodeNumber = "";
+}       
+
+DataDirectProductionCrew::DataDirectProductionCrew() :
+    programid(""), role(""), givenname(""), surname(""), fullname("")
+{
+}
+
+void DataDirectProductionCrew::Reset(void)
+{
+    programid = "";
+    role      = "";
+    givenname = "";
+    surname   = "";
+    fullname  = "";
+}   
+
+DataDirectGenre::DataDirectGenre() :
+    programid(""), gclass(""), relevance("")
+{
+}
+
+void DataDirectGenre::Reset(void) 
+{
+    programid = "";
+    gclass    = "";
+    relevance = "";
+}
 
 // XXX Program duration should be stored as seconds, not as a QTime.
 //     limited to 24 hours this way.
@@ -42,32 +163,32 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     }   
     else if (currtagname == "station") 
     {
-        curr_station.clearValues();
+        curr_station.Reset();
         curr_station.stationid = pxmlatts.value("id");
     }
     else if (currtagname == "lineup") 
     {
-        curr_lineup.clearValues();
+        curr_lineup.Reset();
         curr_lineup.name = pxmlatts.value("name");
         curr_lineup.type = pxmlatts.value("type");
         curr_lineup.device = pxmlatts.value("device");
         curr_lineup.postal = pxmlatts.value("postalCode");
         curr_lineup.lineupid = pxmlatts.value("id");
         curr_lineup.displayname = curr_lineup.name + "-" + curr_lineup.type + 
-                                  "-" + curr_lineup.device + "-" + 
-                                  curr_lineup.postal + "-" + 
-                                  curr_lineup.lineupid;
+            "-" + curr_lineup.device + "-" + 
+            curr_lineup.postal + "-" + 
+            curr_lineup.lineupid;
 
         if (curr_lineup.lineupid.isEmpty()) 
         {
             curr_lineup.lineupid = curr_lineup.name + curr_lineup.postal + 
-                                   curr_lineup.device + curr_lineup.type;
+                curr_lineup.device + curr_lineup.type;
         }
     }
     else if (currtagname == "map") 
     {
         int tmpindex;
-        curr_lineupmap.clearValues();
+        curr_lineupmap.Reset();
         curr_lineupmap.lineupid = curr_lineup.lineupid;
         curr_lineupmap.stationid = pxmlatts.value("station");
         curr_lineupmap.channel = pxmlatts.value("channel");
@@ -77,7 +198,7 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     } 
     else if (currtagname == "schedule") 
     {
-        curr_schedule.clearValues();
+        curr_schedule.Reset();
         curr_schedule.programid = pxmlatts.value("program");
         curr_schedule.stationid = pxmlatts.value("station");
 
@@ -96,7 +217,7 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_schedule.subtitled = (pxmlatts.value("subtitled") == "true");
         curr_schedule.hdtv = (pxmlatts.value("hdtv") == "true");
         curr_schedule.closecaptioned = (pxmlatts.value("closeCaptioned") == 
-                                                                      "true");
+                                        "true");
         curr_schedule.tvrating = pxmlatts.value("tvRating");
     }
     else if (currtagname == "part") 
@@ -106,17 +227,17 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     }
     else if (currtagname == "program") 
     {
-        curr_program.clearValues();
+        curr_program.Reset();
         curr_program.programid = pxmlatts.value("id");
     }
     else if (currtagname == "crew") 
     {
-        curr_program.clearValues();
+        curr_program.Reset();
         lastprogramid = pxmlatts.value("program");
     }
     else if (currtagname == "programGenre") 
     {
-        curr_genre.clearValues();
+        curr_genre.Reset();
         lastprogramid = pxmlatts.value("program");
     }        
 
@@ -136,30 +257,38 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     {
         parent.stations.append(curr_station);
 
-        query.prepare("INSERT INTO dd_station (stationid, callsign, "
-                      "stationname, affiliate, fccchannelnumber) "
-                      "VALUES(:STATIONID,:CALLSIGN,:STATIONNAME,:AFFILIATE,"
-                      ":FCCCHANNELNUMBER);");
-        query.bindValue(":STATIONID", curr_station.stationid);
-        query.bindValue(":CALLSIGN", curr_station.callsign);
+        query.prepare(
+            "INSERT INTO dd_station "
+            "     ( stationid,  callsign,  stationname, "
+            "       affiliate,  fccchannelnumber)       "
+            "VALUES "
+            "     (:STATIONID, :CALLSIGN, :STATIONNAME, "
+            "      :AFFILIATE, :FCCCHANNUM)");
+
+        query.bindValue(":STATIONID",   curr_station.stationid);
+        query.bindValue(":CALLSIGN",    curr_station.callsign);
         query.bindValue(":STATIONNAME", curr_station.stationname);
-        query.bindValue(":AFFILIATE", curr_station.affiliate);
-        query.bindValue(":FCCCHANNELNUMBER", curr_station.fccchannelnumber);
+        query.bindValue(":AFFILIATE",   curr_station.affiliate);
+        query.bindValue(":FCCCHANNUM",  curr_station.fccchannelnumber);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_station", query);
     }
-    else if (pqname == "lineup") 
+    else if (pqname == "lineup")
     {
         parent.lineups.append(curr_lineup);
 
-        query.prepare("INSERT INTO dd_lineup (lineupid, name, type, device, "
-                      "postal) VALUES(:LINEUPID,:NAME,:TYPE,:DEVICE,:POSTAL);");
-        query.bindValue(":LINEUPID", curr_lineup.lineupid);
-        query.bindValue(":NAME", curr_lineup.name);
-        query.bindValue(":TYPE", curr_lineup.type);
-        query.bindValue(":DEVICE", curr_lineup.device);
-        query.bindValue(":POSTAL", curr_lineup.postal);
+        query.prepare(
+            "INSERT INTO dd_lineup "
+            "     ( lineupid,  name,  type,  device,  postal) "
+            "VALUES "
+            "     (:LINEUPID, :NAME, :TYPE, :DEVICE, :POSTAL)");
+
+        query.bindValue(":LINEUPID",    curr_lineup.lineupid);
+        query.bindValue(":NAME",        curr_lineup.name);
+        query.bindValue(":TYPE",        curr_lineup.type);
+        query.bindValue(":DEVICE",      curr_lineup.device);
+        query.bindValue(":POSTAL",      curr_lineup.postal);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_lineup", query);
@@ -168,13 +297,16 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     {
         parent.lineupmaps.append(curr_lineupmap);
 
-        query.prepare("INSERT INTO dd_lineupmap (lineupid, stationid, "
-                      "channel, channelMinor) "
-                      "VALUES(:LINEUPID,:STATIONID,:CHANNEL,:CHANNELMINOR);");
-        query.bindValue(":LINEUPID", curr_lineupmap.lineupid);
-        query.bindValue(":STATIONID", curr_lineupmap.stationid);
-        query.bindValue(":CHANNEL", curr_lineupmap.channel);
-        query.bindValue(":CHANNELMINOR", curr_lineupmap.channelMinor);
+        query.prepare(
+            "INSERT INTO dd_lineupmap "
+            "     ( lineupid,  stationid,  channel,  channelMinor) "
+            "VALUES "
+            "     (:LINEUPID, :STATIONID, :CHANNEL, :CHANNELMINOR)");
+
+        query.bindValue(":LINEUPID",    curr_lineupmap.lineupid);
+        query.bindValue(":STATIONID",   curr_lineupmap.stationid);
+        query.bindValue(":CHANNEL",     curr_lineupmap.channel);
+        query.bindValue(":CHANNELMINOR",curr_lineupmap.channelMinor);
         if (!query.exec())
             MythContext::DBError("Inserting into dd_lineupmap", query);
     }
@@ -183,25 +315,33 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         QDateTime endtime = curr_schedule.time.addSecs(
             QTime().secsTo(curr_schedule.duration));
 
-        query.prepare("INSERT INTO dd_schedule (programid,stationid,"
-                      "scheduletime,duration,isrepeat,stereo,subtitled,hdtv,"
-                      "closecaptioned,tvrating,partnumber,parttotal,endtime) "
-                      "VALUES(:PROGRAMID,:STATIONID,:TIME,:DURATION,"
-                      ":ISREPEAT,:STEREO,:SUBTITLED,:HDTV,:CLOSECAPTIONED,"
-                      ":TVRATING,:PARTNUMBER,:PARTTOTAL,:ENDTIME);");
-        query.bindValue(":PROGRAMID", curr_schedule.programid);
-        query.bindValue(":STATIONID", curr_schedule.stationid);
-        query.bindValue(":TIME", curr_schedule.time);
-        query.bindValue(":DURATION", curr_schedule.duration);
-        query.bindValue(":ISREPEAT", curr_schedule.repeat);
-        query.bindValue(":STEREO", curr_schedule.stereo);
-        query.bindValue(":SUBTITLED", curr_schedule.subtitled);
-        query.bindValue(":HDTV", curr_schedule.hdtv);
-        query.bindValue(":CLOSECAPTIONED", curr_schedule.closecaptioned);
-        query.bindValue(":TVRATING", curr_schedule.tvrating);
-        query.bindValue(":PARTNUMBER", curr_schedule.partnumber);
-        query.bindValue(":PARTTOTAL", curr_schedule.parttotal);
-        query.bindValue(":ENDTIME", endtime);
+        query.prepare(
+            "INSERT INTO dd_schedule "
+            "     ( programid,  stationid,   scheduletime,   "
+            "       duration,   isrepeat,    stereo,         "
+            "       subtitled,  hdtv,        closecaptioned, "
+            "       tvrating,   partnumber,  parttotal,      "
+            "       endtime) "
+            "VALUES "
+            "     (:PROGRAMID, :STATIONID,  :TIME,           "
+            "      :DURATION,  :ISREPEAT,   :STEREO,         "
+            "      :SUBTITLED, :HDTV,       :CAPTIONED,      "
+            "      :TVRATING,  :PARTNUMBER, :PARTTOTAL,      "
+            "      :ENDTIME)");
+
+        query.bindValue(":PROGRAMID",   curr_schedule.programid);
+        query.bindValue(":STATIONID",   curr_schedule.stationid);
+        query.bindValue(":TIME",        curr_schedule.time);
+        query.bindValue(":DURATION",    curr_schedule.duration);
+        query.bindValue(":ISREPEAT",    curr_schedule.repeat);
+        query.bindValue(":STEREO",      curr_schedule.stereo);
+        query.bindValue(":SUBTITLED",   curr_schedule.subtitled);
+        query.bindValue(":HDTV",        curr_schedule.hdtv);
+        query.bindValue(":CAPTIONED",   curr_schedule.closecaptioned);
+        query.bindValue(":TVRATING",    curr_schedule.tvrating);
+        query.bindValue(":PARTNUMBER",  curr_schedule.partnumber);
+        query.bindValue(":PARTTOTAL",   curr_schedule.parttotal);
+        query.bindValue(":ENDTIME",     endtime);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_schedule", query);
@@ -220,38 +360,44 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         QString prefix = curr_program.programid.left(2);
 
         if (prefix == "MV")
-           cat_type = "movie";
+            cat_type = "movie";
         else if (prefix == "SP")
-           cat_type = "sports";
+            cat_type = "sports";
         else if (prefix == "EP" ||
                  curr_program.showtype.contains("series", false))
-           cat_type = "series";
+            cat_type = "series";
         else
-           cat_type = "tvshow";
+            cat_type = "tvshow";
 
-        query.prepare("INSERT INTO dd_program (programid, title, subtitle, "
-                      "description, showtype, category_type, mpaarating, "
-                      "starrating, stars, runtime, year, seriesid, colorcode, "
-                      "syndicatedepisodenumber, originalairdate) "
-                      "VALUES(:PROGRAMID,:TITLE,:SUBTITLE,:DESCRIPTION,"
-                      ":SHOWTYPE,:CATTYPE,:MPAARATING,:STARRATING,:STARS,"
-                      ":RUNTIME,:YEAR,:SERIESID,:COLORCODE,:SYNDNUM,"
-                      ":ORIGINALAIRDATE);");
-        query.bindValue(":PROGRAMID", curr_program.programid);
-        query.bindValue(":TITLE", curr_program.title.utf8());
-        query.bindValue(":SUBTITLE", curr_program.subtitle.utf8());
+        query.prepare(
+            "INSERT INTO dd_program "
+            "     ( programid,    title,       subtitle,       "
+            "       description,  showtype,    category_type,  "
+            "       mpaarating,   starrating,  stars,          "
+            "       runtime,      year,        seriesid,       "
+            "       colorcode,    syndicatedepisodenumber, originalairdate) "
+            "VALUES "
+            "     (:PROGRAMID,   :TITLE,      :SUBTITLE,       "
+            "      :DESCRIPTION, :SHOWTYPE,   :CATTYPE,        "
+            "      :MPAARATING,  :STARRATING, :STARS,          "
+            "      :RUNTIME,     :YEAR,       :SERIESID,       "
+            "      :COLORCODE,   :SYNDNUM,    :ORIGAIRDATE)    ");
+
+        query.bindValue(":PROGRAMID",   curr_program.programid);
+        query.bindValue(":TITLE",       curr_program.title.utf8());
+        query.bindValue(":SUBTITLE",    curr_program.subtitle.utf8());
         query.bindValue(":DESCRIPTION", curr_program.description.utf8());
-        query.bindValue(":SHOWTYPE", curr_program.showtype.utf8()); 
-        query.bindValue(":CATTYPE", cat_type);
-        query.bindValue(":MPAARATING", curr_program.mpaaRating);
-        query.bindValue(":STARRATING", curr_program.starRating);
-        query.bindValue(":STARS", staravg);
-        query.bindValue(":RUNTIME", curr_program.duration);
-        query.bindValue(":YEAR", curr_program.year);
-        query.bindValue(":SERIESID", curr_program.seriesid);
-        query.bindValue(":COLORCODE", curr_program.colorcode);
-        query.bindValue(":SYNDNUM", curr_program.syndicatedEpisodeNumber);
-        query.bindValue(":ORIGINALAIRDATE", curr_program.originalAirDate);
+        query.bindValue(":SHOWTYPE",    curr_program.showtype.utf8()); 
+        query.bindValue(":CATTYPE",     cat_type);
+        query.bindValue(":MPAARATING",  curr_program.mpaaRating);
+        query.bindValue(":STARRATING",  curr_program.starRating);
+        query.bindValue(":STARS",       staravg);
+        query.bindValue(":RUNTIME",     curr_program.duration);
+        query.bindValue(":YEAR",        curr_program.year);
+        query.bindValue(":SERIESID",    curr_program.seriesid);
+        query.bindValue(":COLORCODE",   curr_program.colorcode);
+        query.bindValue(":SYNDNUM",     curr_program.syndicatedEpisodeNumber);
+        query.bindValue(":ORIGAIRDATE", curr_program.originalAirDate);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_program", query);
@@ -265,25 +411,30 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             fullname += " ";
         fullname += curr_productioncrew.surname;
 
-        query.prepare("INSERT INTO dd_productioncrew (programid, role, "
-                      "givenname, surname, fullname) VALUES(:PROGRAMID,"
-                      ":ROLE,:GIVENNAME,:SURNAME,:FULLNAME);");
-        query.bindValue(":PROGRAMID", lastprogramid);
-        query.bindValue(":ROLE", roleunderlines.utf8());
-        query.bindValue(":GIVENNAME", curr_productioncrew.givenname.utf8());
-        query.bindValue(":SURNAME", curr_productioncrew.surname.utf8());
-        query.bindValue(":FULLNAME", fullname.utf8());
+        query.prepare(
+            "INSERT INTO dd_productioncrew "
+            "       ( programid,  role,  givenname,  surname,  fullname) "
+            "VALUES (:PROGRAMID, :ROLE, :GIVENNAME, :SURNAME, :FULLNAME)");
+
+        query.bindValue(":PROGRAMID",   lastprogramid);
+        query.bindValue(":ROLE",        roleunderlines.utf8());
+        query.bindValue(":GIVENNAME",   curr_productioncrew.givenname.utf8());
+        query.bindValue(":SURNAME",     curr_productioncrew.surname.utf8());
+        query.bindValue(":FULLNAME",    fullname.utf8());
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_productioncrew", query);
     }    
     else if (pqname == "genre") 
     {
-        query.prepare("INSERT INTO dd_genre (programid, class, relevance) "
-                      "VALUES(:PROGRAMID,:CLASS,:RELEVANCE);");
-        query.bindValue(":PROGRAMID", lastprogramid);
-        query.bindValue(":CLASS", curr_genre.gclass.utf8());
-        query.bindValue(":RELEVANCE", curr_genre.relevance);
+        query.prepare(
+            "INSERT INTO dd_genre "
+            "       ( programid,  class,  relevance) "
+            "VALUES (:PROGRAMID, :CLASS, :RELEVANCE)");
+
+        query.bindValue(":PROGRAMID",   lastprogramid);
+        query.bindValue(":CLASS",       curr_genre.gclass.utf8());
+        query.bindValue(":RELEVANCE",   curr_genre.relevance);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_genre", query);
@@ -313,27 +464,39 @@ bool DDStructureParser::characters(const QString& pchars)
     {
         if (pchars.contains("expire"))
         {
-           QString ExtractDateFromMessage = pchars.right(20);
-           QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage, Qt::ISODate);
-           QString ExpirationDate = EDFM.toString(Qt::LocalDate);
-           QString ExpirationDateMessage = "Your subscription expires on " + ExpirationDate;
+            QString ExtractDateFromMessage = pchars.right(20);
+            QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage,
+                                                   Qt::ISODate);
+            QString ExpirationDate = EDFM.toString(Qt::LocalDate);
+            QString ExpirationDateMessage = "Your subscription expires on " +
+                ExpirationDate;
 
-           QDateTime curTime = QDateTime::currentDateTime();
-           if (curTime.daysTo(EDFM) <= 5)
-               VERBOSE(VB_IMPORTANT, LOC + QString("WARNING: ") + ExpirationDateMessage);
-           else
-               VERBOSE(VB_IMPORTANT, LOC + ExpirationDateMessage);
+            QDateTime curTime = QDateTime::currentDateTime();
+            if (curTime.daysTo(EDFM) <= 5)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + QString("WARNING: ") +
+                        ExpirationDateMessage);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC + ExpirationDateMessage);
+            }
 
-           MSqlQuery query(MSqlQuery::DDCon());
+            MSqlQuery query(MSqlQuery::DDCon());
 
-           QString querystr = (QString("UPDATE settings SET data ='%1' "
-                              "WHERE value='DataDirectMessage'")
-                              .arg(ExpirationDateMessage));
-           // cout << "querystr is:" << querystr << endl;
-           query.prepare(querystr);
+            QString querystr = QString(
+                "UPDATE settings "
+                "SET data ='%1' "
+                "WHERE value='DataDirectMessage'")
+                .arg(ExpirationDateMessage);
 
-           if (!query.exec())
-               MythContext::DBError("Updating DataDirect Status Message", query);
+            query.prepare(querystr);
+
+            if (!query.exec())
+            {
+                MythContext::DBError("Updating DataDirect Status Message",
+                                     query);
+            }
         }
     }
     if (currtagname == "callSign") 
@@ -390,6 +553,14 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
+DataDirectProcessor::DataDirectProcessor(int listings_provider) :
+    source(listings_provider),
+    selectedlineupid(""),       userid(""),
+    password(""),               lastrunuserid(""),
+    lastrunpassword(""),        inputfilename("")
+{
+}
+
 void DataDirectProcessor::updateStationViewTable() 
 {
     MSqlQuery query(MSqlQuery::DDCon());
@@ -397,14 +568,18 @@ void DataDirectProcessor::updateStationViewTable()
     if (!query.exec("TRUNCATE TABLE dd_v_station;")) 
         MythContext::DBError("Truncating temporary table dd_v_station", query);
 
-    query.prepare("INSERT INTO dd_v_station (stationid, callsign, "
-                  "    stationname, affiliate, fccchannelnumber, channel, "
-                  "    channelMinor) "
-                  "SELECT dd_station.stationid, callsign, stationname, "
-                  "    affiliate, fccchannelnumber, channel, channelMinor "
-                  "FROM dd_station, dd_lineupmap WHERE "
-                  "    ( (dd_station.stationid = dd_lineupmap.stationid) AND "
-                  "    ( dd_lineupmap.lineupid = :LINEUP) );");
+    query.prepare(
+        "INSERT INTO dd_v_station "
+        "     ( stationid,            callsign,         stationname, "
+        "       affiliate,            fccchannelnumber, channel,     "
+        "       channelMinor) "
+        "SELECT dd_station.stationid, callsign,         stationname, "
+        "       affiliate,            fccchannelnumber, channel,     "
+        "       channelMinor "
+        "FROM dd_station, dd_lineupmap "
+        "WHERE ((dd_station.stationid  = dd_lineupmap.stationid) AND "
+        "       (dd_lineupmap.lineupid = :LINEUP))");
+
     query.bindValue(":LINEUP", getLineup());
 
     if (!query.exec())
@@ -418,23 +593,29 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
     if (!query.exec("TRUNCATE TABLE dd_v_program;"))
         MythContext::DBError("Truncating temporary table dd_v_program", query);
 
-    query.prepare("INSERT INTO dd_v_program (chanid, starttime, endtime, "
-                  "title, subtitle, description, airdate, stars, "
-                  "previouslyshown, stereo, subtitled, hdtv, "
-                  "closecaptioned, partnumber, parttotal, seriesid, "
-                  "originalairdate, showtype, category_type, colorcode, "
-                  "syndicatedepisodenumber, tvrating, mpaarating, "
-                  "programid) "
-                  "SELECT chanid, scheduletime, endtime, title, "
-                  "subtitle, description, year, stars, isrepeat, stereo, "
-                  "subtitled, hdtv, closecaptioned, partnumber, "
-                  "parttotal, seriesid, originalairdate, showtype, "
-                  "category_type, colorcode, syndicatedepisodenumber, "
-                  "tvrating, mpaarating, dd_program.programid "
-                  "FROM channel, dd_schedule, dd_program WHERE "
-                  " ( (dd_schedule.programid = dd_program.programid) AND "
-                  "   (channel.xmltvid = dd_schedule.stationid) AND "
-                  "   (channel.sourceid = :SOURCEID ));");
+    query.prepare(
+        "INSERT INTO dd_v_program "
+        "     ( chanid,         starttime,       endtime,         "
+        "       title,          subtitle,        description,     "
+        "       airdate,        stars,           previouslyshown, "
+        "       stereo,         subtitled,       hdtv,            "
+        "       closecaptioned, partnumber,      parttotal,       "
+        "       seriesid,       originalairdate, showtype,        "
+        "       category_type,  colorcode,       syndicatedepisodenumber, "
+        "       tvrating,       mpaarating,      programid )      "
+        "SELECT chanid,         scheduletime,    endtime,         "
+        "       title,          subtitle,        description,     "
+        "       year,           stars,           isrepeat,        "
+        "       stereo,         subtitled,       hdtv,            "
+        "       closecaptioned, partnumber,      parttotal,       "
+        "       seriesid,       originalairdate, showtype,        "
+        "       category_type,  colorcode,       syndicatedepisodenumber, "
+        "       tvrating,       mpaarating,      dd_program.programid "
+        "FROM channel, dd_schedule, dd_program "
+        "WHERE ((dd_schedule.programid = dd_program.programid)  AND "
+        "       (channel.xmltvid       = dd_schedule.stationid) AND "
+        "       (channel.sourceid      = :SOURCEID))");
+
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec())
@@ -456,9 +637,9 @@ FILE *DataDirectProcessor::getInputFile(
     bool plineupsOnly, QDateTime pstartDate, QDateTime pendDate,
     QString &err_txt, QString &tmpfilename)
 {
-    if (!inputfilename.isNull())
+    if (!inputfilename.isEmpty())
     {
-        err_txt = inputfilename;
+        err_txt = QString("Unable to open '%1'").arg(inputfilename);
         return fopen(inputfilename.ascii(), "r");
     }
 
@@ -475,6 +656,7 @@ FILE *DataDirectProcessor::getInputFile(
     if (mkstemp(ctempfilename) == -1) 
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating temp files -- " + ENO);
+        err_txt = "Unable to create temp files.";
         return NULL;
     }
 
@@ -532,7 +714,7 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Creating temp file for sending -- %1").
                 arg(strerror(errno)));
-        return FALSE;
+        return false;
     }
     QString tmpfilenamesend = QString(ctempfilenamesend);
 
@@ -542,42 +724,42 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Creating temp file for receiving -- %1").
                 arg(strerror(errno)));
-        return FALSE;
+        return false;
     }
     QString tmpfilenamereceive = QString(ctempfilenamerecv);
 
     QFile postfile(tmpfilenamesend);
-    if (postfile.open(IO_WriteOnly)) 
-    {
-        QTextStream poststream(&postfile);
-        poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
-        poststream << "<SOAP-ENV:Envelope\n";
-        poststream << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
-        poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
-        poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
-        poststream << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
-        poststream << "<SOAP-ENV:Body>\n";
-        poststream << "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
-        poststream << "</SOAP-ENV:Body>\n";
-        poststream << "</SOAP-ENV:Envelope>\n";
-    }
-    else
+    if (!postfile.open(IO_WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Creating tmpfilesend -- %1").
                 arg(strerror(errno)));
-        return FALSE;
+        return false;
     }
+
+    QTextStream poststream(&postfile);
+    poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
+    poststream << "<SOAP-ENV:Envelope\n";
+    poststream
+        << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+    poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+    poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+    poststream
+        << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+    poststream << "<SOAP-ENV:Body>\n";
+    poststream << "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
+    poststream << "</SOAP-ENV:Body>\n";
+    poststream << "</SOAP-ENV:Envelope>\n";
     postfile.close();
 
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                               "--post-file='%3' "
                               " %4 --output-document='%5'")
-                              .arg(getUserID())
-                              .arg(getPassword())
-                              .arg(tmpfilenamesend)
-                              .arg(ddurl)
-                              .arg(tmpfilenamereceive);
+        .arg(getUserID())
+        .arg(getPassword())
+        .arg(tmpfilenamesend)
+        .arg(ddurl)
+        .arg(tmpfilenamereceive);
 
     myth_system(command.ascii());
 
@@ -586,8 +768,8 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
 
     QFile file(tmpfilenamereceive);
 
-    bool GotNextSuggestedTime = FALSE;
-    bool GotBlockedTime = FALSE;
+    bool GotNextSuggestedTime = false;
+    bool GotBlockedTime = false;
 
     if (file.open(IO_ReadOnly)) 
     {
@@ -600,8 +782,8 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
             {
                 QString tmpStr = line;
                 tmpStr.replace(
-                      QRegExp(".*<suggestedTime>([^<]*)</suggestedTime>.*"),
-                              "\\1");
+                    QRegExp(".*<suggestedTime>([^<]*)</suggestedTime>.*"),
+                    "\\1");
 
                 GotNextSuggestedTime = TRUE;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
@@ -614,7 +796,7 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
             {
                 QString tmpStr = line;
                 tmpStr.replace(
-                      QRegExp(".*<blockedTime>([^<]*)</blockedTime>.*"), "\\1");
+                    QRegExp(".*<blockedTime>([^<]*)</blockedTime>.*"), "\\1");
 
                 GotBlockedTime = TRUE;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
@@ -631,7 +813,7 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     if (GotNextSuggestedTime)
     {
         int daysToSuggested =
-                QDateTime::currentDateTime().daysTo(NextSuggestedTime);
+            QDateTime::currentDateTime().daysTo(NextSuggestedTime);
         int desiredPeriod = gContext->GetNumSetting("MythFillPeriod", 1);
 
 
@@ -639,9 +821,10 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
         {
             QDateTime newTime =
                 NextSuggestedTime.addDays(desiredPeriod - daysToSuggested);
-            VERBOSE(VB_IMPORTANT, LOC + QString("Provider suggested running "
-                    "again at %1, but MythFillPeriod is %2.  Next run time "
-                    "will be adjusted to be %3.")
+            VERBOSE(VB_IMPORTANT, LOC + QString(
+                        "Provider suggested running again at %1, "
+                        "but MythFillPeriod is %2.  Next run time "
+                        "will be adjusted to be %3.")
                     .arg(NextSuggestedTime.toString(Qt::ISODate))
                     .arg(desiredPeriod)
                     .arg(newTime.toString(Qt::ISODate)));
@@ -670,9 +853,11 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
             MythContext::DBError("Updating DataDirect MythFillMaxHour", query);
 
         query.prepare(querystr.arg(NextSuggestedTime.toString(Qt::ISODate))
-                              .arg("MythFillSuggestedRunTime"));
+                      .arg("MythFillSuggestedRunTime"));
+
         if (!query.exec())
-            MythContext::DBError("Updating DataDirect Suggested RunTime", query);
+            MythContext::DBError("Updating DataDirect Suggested RunTime",
+                                 query);
     }
     return GotNextSuggestedTime;
 }
@@ -702,9 +887,9 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     }
     else
     {
-       VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
-       pclose(fp);
-       fp = NULL;
+        VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
+        pclose(fp);
+        fp = NULL;
     }
 
     if (!tmpfile.isEmpty())
@@ -740,7 +925,7 @@ void DataDirectProcessor::createATempTable(const QString &ptablename,
     MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
     querystr = "CREATE TEMPORARY TABLE IF NOT EXISTS " + ptablename + " " + 
-               ptablestruct + ";";
+        ptablestruct + ";";
 
     if (!query.exec(querystr))
         MythContext::DBError("Creating temporary table", query);
@@ -753,60 +938,81 @@ void DataDirectProcessor::createATempTable(const QString &ptablename,
 
 void DataDirectProcessor::createTempTables() 
 {
-    QString table;
+    QMap<QString,QString> dd_tables;
 
-    table = "( stationid char(12), callsign char(10), stationname varchar(40), "
-            "affiliate varchar(25), fccchannelnumber char(15) )";
-    createATempTable("dd_station", table);
+    dd_tables["dd_station"] =
+        "( stationid char(12),           callsign char(10),     "
+        "  stationname varchar(40),      affiliate varchar(25), "
+        "  fccchannelnumber char(15) )";
 
-    table = "( lineupid char(100), name char(42), type char(20), "
-            "postal char(6), device char(30) )";
-    createATempTable("dd_lineup", table);  
+    dd_tables["dd_lineup"] =
+        "( lineupid char(100),           name char(42),  "
+        "  type char(20),                postal char(6), "
+        "  device char(30) )";
 
-    table = "( lineupid char(100), stationid char(12), channel char(5), "
-        "channelMinor char(3) )";
-    createATempTable("dd_lineupmap", table);
+    dd_tables["dd_lineupmap"] =
+        "( lineupid char(100),           stationid char(12),   "
+        "  channel char(5),              channelMinor char(3) )";
 
-    table = "( stationid char(12), callsign char(10), stationname varchar(40), "
-            "affiliate varchar(25), fccchannelnumber char(15), "
-            "channel char(5), channelMinor char(3) )"; 
-    createATempTable ("dd_v_station", table);
 
-    table = "( programid char(12), stationid char(12), scheduletime datetime, "
-            "duration time, isrepeat bool, stereo bool, subtitled bool, "
-            "hdtv bool, closecaptioned bool, tvrating char(5), partnumber int, "
-            "parttotal int, endtime datetime, INDEX progidx (programid) )";
-    createATempTable("dd_schedule", table); 
+    dd_tables["dd_v_station"] =
+        "( stationid char(12),           callsign char(10),     "
+        "  stationname varchar(40),      affiliate varchar(25), "
+        "  fccchannelnumber char(15),    channel char(5),       "
+        "  channelMinor char(3) )";
 
-    table = "( programid char(12) NOT NULL, seriesid char(12), "
-            "title varchar(120), subtitle varchar(150), description text, "
-            "mpaarating char(5), starrating char(5), runtime time, "
-            "year char(4), showtype char(30), category_type char(64), "
-            "colorcode char(20), originalairdate date, "
-            "syndicatedepisodenumber char(20), stars float unsigned, "
-            "PRIMARY KEY (programid))";
-    createATempTable("dd_program", table); 
+    dd_tables["dd_schedule"] =
+        "( programid char(12),           stationid char(12), "
+        "  scheduletime datetime,        duration time,      "
+        "  isrepeat bool,                stereo bool,        "
+        "  subtitled bool,               hdtv bool,          "
+        "  closecaptioned bool,          tvrating char(5),   "
+        "  partnumber int,               parttotal int,      "
+        "  endtime datetime, "
+        "INDEX progidx (programid) )";
 
-    table = "( chanid int unsigned NOT NULL, starttime datetime NOT NULL, "
-            "endtime datetime, title varchar(128), subtitle varchar(128), "
-            "description text, category varchar(64), "
-            "category_type varchar(64), airdate year, stars float unsigned, "
-            "previouslyshown tinyint, isrepeat bool, stereo bool, "
-            "subtitled bool, hdtv bool,  closecaptioned bool, partnumber int, "
-            "parttotal int, seriesid char(12), originalairdate date, "
-            "showtype varchar(30), colorcode varchar(20), "
-            "syndicatedepisodenumber varchar(20), programid char(12), "
-            "tvrating char(5), mpaarating char(5), INDEX progidx (programid))";
-    createATempTable("dd_v_program", table);
+    dd_tables["dd_program"] =
+        "( programid char(12) NOT NULL,  seriesid char(12),     "
+        "  title varchar(120),           subtitle varchar(150), "
+        "  description text,             mpaarating char(5),    "
+        "  starrating char(5),           runtime time,          "
+        "  year char(4),                 showtype char(30),     "
+        "  category_type char(64),       colorcode char(20),    "
+        "  originalairdate date,         syndicatedepisodenumber char(20), "
+        "  stars float unsigned, "
+        "PRIMARY KEY (programid))";
 
-    table = "( programid char(12), role char(30), givenname char(20), "
-            "surname char(20), fullname char(41), INDEX progidx (programid), "
-            "INDEX nameidx (fullname))";
-    createATempTable("dd_productioncrew", table);  
+    dd_tables["dd_v_program"] =
+        "( chanid int unsigned NOT NULL, starttime datetime NOT NULL, "
+        "  endtime datetime,             title varchar(128),          "
+        "  subtitle varchar(128),        description text,            "
+        "  category varchar(64),         category_type varchar(64),   "
+        "  airdate year,                 stars float unsigned,        "
+        "  previouslyshown tinyint,      isrepeat bool,               "
+        "  stereo bool,                  subtitled bool,              "
+        "  hdtv bool,                    closecaptioned bool,         "
+        "  partnumber int,               parttotal int,               "
+        "  seriesid char(12),            originalairdate date,        "
+        "  showtype varchar(30),         colorcode varchar(20),       "
+        "  syndicatedepisodenumber varchar(20), programid char(12),   "
+        "  tvrating char(5),             mpaarating char(5),          "
+        "INDEX progidx (programid))";
 
-    table = "( programid char(12) NOT NULL, class char(30), "
-            "relevance char(1), INDEX progidx (programid))";
-    createATempTable("dd_genre", table);
+    dd_tables["dd_productioncrew"] =
+        "( programid char(12),           role char(30),    "
+        "  givenname char(20),           surname char(20), "
+        "  fullname char(41), "
+        "INDEX progidx (programid), "
+        "INDEX nameidx (fullname))";
+
+    dd_tables["dd_genre"] =
+        "( programid char(12) NOT NULL,  class char(30), "
+        "  relevance char(1), "
+        "INDEX progidx (programid))";
+
+    QMap<QString,QString>::const_iterator it;
+    for (it = dd_tables.begin(); it != dd_tables.end(); ++it)
+        createATempTable(it.key(), *it);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
