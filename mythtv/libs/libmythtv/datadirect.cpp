@@ -3,6 +3,7 @@
 #include <qfile.h>
 #include <qstring.h>
 #include <qregexp.h>
+#include <qfileinfo.h>
 
 #include "datadirect.h"
 #include "mythwidgets.h"
@@ -10,14 +11,12 @@
 #include "mythdbcon.h"
 #include "util.h"
 
+static QString get_setting(QString line, QString key);
+static bool    has_setting(QString line, QString key);
+static QString html_escape(QString str);
+
 #define LOC QString("DataDirect: ")
 #define LOC_ERR QString("DataDirect, Error: ")
-
-const QString DataDirectURLS[] =
-{
-    "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService"
-};
-const uint NumDataDirectURLS = 1;
 
 DataDirectStation::DataDirectStation(void) :
     stationid(""),              callsign(""),
@@ -26,41 +25,14 @@ DataDirectStation::DataDirectStation(void) :
 {
 }
 
-void DataDirectStation::Reset(void)
-{
-    stationid        = "";
-    callsign         = "";
-    stationname      = "";
-    affiliate        = "";
-    fccchannelnumber = "";
-}
-
 DataDirectLineup::DataDirectLineup() :
     lineupid(""), name(""), displayname(""), type(""), postal(""), device("")
 {
 }   
 
-void DataDirectLineup::Reset(void)
-{
-    lineupid    = "";
-    name        = "";
-    displayname = "";
-    type        = "";
-    postal      = "";
-    device      = "";
-}   
-
 DataDirectLineupMap::DataDirectLineupMap() :
     lineupid(""), stationid(""), channel(""), channelMinor("")
 {
-}
-
-void DataDirectLineupMap::Reset(void)
-{
-    lineupid     = "";
-    stationid    = "";
-    channel      = "";
-    channelMinor = "";
 }
 
 DataDirectSchedule::DataDirectSchedule() :
@@ -73,22 +45,6 @@ DataDirectSchedule::DataDirectSchedule() :
 {
 }
 
-void DataDirectSchedule::Reset(void)
-{
-    programid      = "";
-    stationid      = "";
-    time           = QDateTime();
-    duration       = QTime();
-    repeat         = false;
-    stereo         = false;
-    subtitled      = false;
-    hdtv           = false;
-    closecaptioned = false;
-    tvrating       = "";
-    partnumber     = 0;
-    parttotal      = 0;
-}   
-
 DataDirectProgram::DataDirectProgram() :
     programid(""),  seriesid(""),      title(""),
     subtitle(""),   description(""),   mpaaRating(""),
@@ -98,47 +54,14 @@ DataDirectProgram::DataDirectProgram() :
 {
 }
 
-void DataDirectProgram::Reset(void) 
-{
-    programid       = "";
-    seriesid        = "";
-    title           = "";
-    subtitle        = "";
-    description     = "";
-    mpaaRating      = "";
-    starRating      = "";
-    duration        = QTime();
-    year            = "";
-    showtype        = "";
-    colorcode       = "";
-    originalAirDate = QDate();
-    syndicatedEpisodeNumber = "";
-}       
-
 DataDirectProductionCrew::DataDirectProductionCrew() :
     programid(""), role(""), givenname(""), surname(""), fullname("")
 {
 }
 
-void DataDirectProductionCrew::Reset(void)
-{
-    programid = "";
-    role      = "";
-    givenname = "";
-    surname   = "";
-    fullname  = "";
-}   
-
 DataDirectGenre::DataDirectGenre() :
     programid(""), gclass(""), relevance("")
 {
-}
-
-void DataDirectGenre::Reset(void) 
-{
-    programid = "";
-    gclass    = "";
-    relevance = "";
 }
 
 // XXX Program duration should be stored as seconds, not as a QTime.
@@ -445,7 +368,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
  
 bool DDStructureParser::startDocument() 
 {
-    parent.createTempTables();
+    parent.CreateTempTables();
     return true;
 }
 
@@ -553,11 +476,25 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
-DataDirectProcessor::DataDirectProcessor(int listings_provider) :
-    source(listings_provider),
+DataDirectProcessor::DataDirectProcessor(uint listings_provider) :
+    listings_provider(listings_provider % DD_PROVIDER_COUNT),
     selectedlineupid(""),       userid(""),
     password(""),               lastrunuserid(""),
-    lastrunpassword(""),        inputfilename("")
+    lastrunpassword(""),        inputfilename(""),
+    tmpFile(""),                cookieFile("")
+{
+    DataDirectURLs urls0(
+        "Tribune Media Zip2It",
+        "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
+        "http://labs.zap2it.com",
+        "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
+    providers.push_back(urls0);
+
+    tmpFile = "/tmp/X";
+    cookieFile = "/tmp/Z";
+}
+
+DataDirectProcessor::~DataDirectProcessor()
 {
 }
 
@@ -633,17 +570,19 @@ void DataDirectProcessor::setInputFile(const QString &filename)
     inputfilename = filename;
 }
 
-FILE *DataDirectProcessor::getInputFile(
-    bool plineupsOnly, QDateTime pstartDate, QDateTime pendDate,
-    QString &err_txt, QString &tmpfilename)
+FILE *DataDirectProcessor::DDPost(
+    QString    ddurl,        QString    inputFile,
+    QString    userid,       QString    password,
+    bool       plineupsOnly,
+    QDateTime  pstartDate,   QDateTime  pendDate,
+    QString   &err_txt,      QString   &tmpfilename)
 {
-    if (!inputfilename.isEmpty())
+    if (!inputFile.isEmpty())
     {
-        err_txt = QString("Unable to open '%1'").arg(inputfilename);
-        return fopen(inputfilename.ascii(), "r");
+        err_txt = QString("Unable to open '%1'").arg(inputFile);
+        return fopen(inputFile.ascii(), "r");
     }
 
-    QString ddurl(DataDirectURLS[source % NumDataDirectURLS]);
     if (plineupsOnly) 
     {
         pstartDate = QDateTime(QDate::currentDate().addDays(2),
@@ -692,7 +631,7 @@ FILE *DataDirectProcessor::getInputFile(
     QString command = QString(
         "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
         "--header='Accept-Encoding:gzip' %4 --output-document=- ")
-        .arg(getUserID()).arg(getPassword()).arg(tmpfilename).arg(ddurl);
+        .arg(userid).arg(password).arg(tmpfilename).arg(ddurl);
 
     if ((print_verbose_messages & VB_GENERAL) == 0)
         command += " 2> /dev/null ";
@@ -706,14 +645,13 @@ FILE *DataDirectProcessor::getInputFile(
 
 bool DataDirectProcessor::getNextSuggestedTime(void)
 {
-    QString ddurl(DataDirectURLS[source % NumDataDirectURLS]);
+    QString ddurl = providers[listings_provider].webServiceURL;
          
     char ctempfilenamesend[] = "/tmp/mythpostXXXXXX";
     if (mkstemp(ctempfilenamesend) == -1) 
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Creating temp file for sending -- %1").
-                arg(strerror(errno)));
+                "Creating temp file for sending -- " + ENO);
         return false;
     }
     QString tmpfilenamesend = QString(ctempfilenamesend);
@@ -722,8 +660,7 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     if (mkstemp(ctempfilenamerecv) == -1) 
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Creating temp file for receiving -- %1").
-                arg(strerror(errno)));
+                "Creating temp file for receiving -- " + ENO);
         return false;
     }
     QString tmpfilenamereceive = QString(ctempfilenamerecv);
@@ -731,9 +668,7 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     QFile postfile(tmpfilenamesend);
     if (!postfile.open(IO_WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Creating tmpfilesend -- %1").
-                arg(strerror(errno)));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating tmpfilesend -- " + ENO);
         return false;
     }
 
@@ -755,8 +690,8 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                               "--post-file='%3' "
                               " %4 --output-document='%5'")
-        .arg(getUserID())
-        .arg(getPassword())
+        .arg(GetUserID())
+        .arg(GetPassword())
         .arg(tmpfilenamesend)
         .arg(ddurl)
         .arg(tmpfilenamereceive);
@@ -866,8 +801,11 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
                                    QDateTime pendDate) 
 {
     QString err = "", tmpfile = "";
+    QString ddurl = providers[listings_provider].webServiceURL;
 
-    FILE *fp = getInputFile(plineupsOnly, pstartDate, pendDate, err, tmpfile);
+    FILE *fp = DDPost(ddurl, inputfilename,
+                      GetUserID(), GetPassword(),
+                      plineupsOnly, pstartDate, pendDate, err, tmpfile);
     if (!fp)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
@@ -903,11 +841,11 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
 
 bool DataDirectProcessor::grabLineupsOnly() 
 {
-    if ((lastrunuserid == getUserID()) && (lastrunpassword == getPassword())) 
+    if ((lastrunuserid == GetUserID()) && (lastrunpassword == GetPassword())) 
         return true;
 
-    lastrunuserid   = getUserID();
-    lastrunpassword = getPassword();
+    lastrunuserid   = GetUserID();
+    lastrunpassword = GetPassword();
 
     QDateTime now = QDateTime::currentDateTime();
     return grabData(true, now, now);
@@ -919,7 +857,7 @@ bool DataDirectProcessor::grabAllData()
                     QDateTime(QDate::currentDate()).addDays(15));
 }
 
-void DataDirectProcessor::createATempTable(const QString &ptablename, 
+void DataDirectProcessor::CreateATempTable(const QString &ptablename, 
                                            const QString &ptablestruct) 
 {
     MSqlQuery query(MSqlQuery::DDCon());
@@ -936,7 +874,7 @@ void DataDirectProcessor::createATempTable(const QString &ptablename,
         MythContext::DBError("Truncating temporary table", query);
 }      
 
-void DataDirectProcessor::createTempTables() 
+void DataDirectProcessor::CreateTempTables() 
 {
     QMap<QString,QString> dd_tables;
 
@@ -1012,7 +950,439 @@ void DataDirectProcessor::createTempTables()
 
     QMap<QString,QString>::const_iterator it;
     for (it = dd_tables.begin(); it != dd_tables.end(); ++it)
-        createATempTable(it.key(), *it);
+        CreateATempTable(it.key(), *it);
+}
+
+bool DataDirectProcessor::GrabLoginCookiesAndLineups(void)
+{
+    PostList list;
+    list.push_back(PostItem("username", GetUserID()));
+    list.push_back(PostItem("password", GetPassword()));
+    list.push_back(PostItem("action",   "Login"));
+
+    QString labsURL   = providers[listings_provider].webURL;
+    QString loginPage = providers[listings_provider].loginPage;
+
+    bool ok = Post(labsURL + loginPage, list, tmpFile, "", cookieFile);
+
+    bool got_cookie = QFileInfo(cookieFile).size() > 100;
+    return ok && got_cookie && ParseLineups(tmpFile);
+}
+
+bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
+{
+    RawLineupMap::const_iterator it = rawlineups.find(lineupid);
+    if (it == rawlineups.end())
+        return false;
+
+    PostList list;
+    list.push_back(PostItem("udl_id",    GetRawUDLID(lineupid)));
+    list.push_back(PostItem("zipcode",   GetRawZipCode(lineupid)));
+    list.push_back(PostItem("lineup_id", lineupid));
+    list.push_back(PostItem("submit",    "Modify"));
+
+    QString labsURL = providers[listings_provider].webURL;
+    bool ok = Post(labsURL + (*it).get_action, list, tmpFile, cookieFile, "");
+
+    return ok && ParseLineup(lineupid, tmpFile);
+}
+
+void DataDirectProcessor::SetAll(const QString &lineupid, bool val)
+{
+    RawLineupMap::iterator lit = rawlineups.find(lineupid);
+    if (lit == rawlineups.end())
+        return;
+
+    RawLineupChannels &ch = (*lit).channels;
+    for (RawLineupChannels::iterator it = ch.begin(); it != ch.end(); ++it)
+        (*it).chk_checked = val;
+}
+
+bool DataDirectProcessor::GrabFullLineup(const QString &lineupid, bool restore)
+{
+    bool ok = GrabLoginCookiesAndLineups();
+    if (!ok)
+        return false;
+
+    ok = GrabLineupForModify(lineupid);
+    if (!ok)
+        return false;
+
+    RawLineupMap::iterator lit = rawlineups.find(lineupid);
+    if (lit == rawlineups.end())
+        return false;
+
+    const RawLineupChannels orig_channels = (*lit).channels;
+    SetAll(lineupid, true);
+    if (!SaveLineupChanges(lineupid))
+        return false;
+
+    ok = grabLineupsOnly();
+
+    (*lit).channels = orig_channels;
+    if (restore)
+        ok &= SaveLineupChanges(lineupid);
+
+    return ok;
+}
+
+bool DataDirectProcessor::SaveLineup(const QString &lineupid,
+                                     const QMap<QString,bool> &xmltvids)
+{
+    QMap<QString,bool> callsigns;
+    RawLineupMap::iterator lit = rawlineups.find(lineupid);
+    if (lit == rawlineups.end())
+        return false;
+
+    // Get callsigns based on xmltv ids (aka stationid)
+    DDLineupMap::const_iterator it;
+    for (it = lineupmaps.begin(); it != lineupmaps.end(); ++it)
+    {
+        if ((*it).lineupid != lineupid)
+            continue;
+
+        if (xmltvids.find((*it).stationid) != xmltvids.end())
+            callsigns[GetDDStation((*it).stationid).callsign] = true;
+    }
+
+    // Set checked mark based on whether the channel is mapped
+    RawLineupChannels &ch = (*lit).channels;
+    RawLineupChannels::iterator cit;
+    for (cit = ch.begin(); cit != ch.end(); ++cit)
+    {
+        bool chk = callsigns.find((*cit).lbl_callsign) != callsigns.end();
+        (*cit).chk_checked = chk;
+    }
+
+    // Save these changes
+    return SaveLineupChanges(lineupid);
+}
+
+bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
+{
+    RawLineupMap::const_iterator lit = rawlineups.find(lineupid);
+    if (lit == rawlineups.end())
+        return false;
+
+    const RawLineup &lineup = *lit;
+    const RawLineupChannels &ch = lineup.channels;
+    RawLineupChannels::const_iterator it;
+
+    PostList list;
+    for (it = ch.begin(); it != ch.end(); ++it)
+    {
+        if ((*it).chk_checked)
+            list.push_back(PostItem((*it).chk_name, (*it).chk_value));
+    }
+    list.push_back(PostItem("action", "Update"));
+
+    QString labsURL = providers[listings_provider].webURL;
+    return Post(labsURL + lineup.set_action, list, "", cookieFile, "");
+}
+
+DDStation DataDirectProcessor::GetDDStation(const QString &xmltvid) const
+{
+    DDStationList::const_iterator it;
+    for (it = stations.begin(); it != stations.end(); ++it)
+    {
+        if ((*it).stationid == xmltvid)
+            return *it;
+    }
+
+    DDStation tmp;
+    return tmp;
+}
+
+QString DataDirectProcessor::GetRawUDLID(const QString &lineupid) const
+{
+    RawLineupMap::const_iterator it = rawlineups.find(lineupid);
+    if (it == rawlineups.end())
+        return QString::null;
+    return (*it).udl_id;
+}
+
+QString DataDirectProcessor::GetRawZipCode(const QString &lineupid) const
+{
+    RawLineupMap::const_iterator it = rawlineups.find(lineupid);
+    if (it == rawlineups.end())
+        return QString::null;
+    return (*it).zipcode;
+}
+
+RawLineup DataDirectProcessor::GetRawLineup(const QString &lineupid) const
+{
+    RawLineup tmp;
+    RawLineupMap::const_iterator it = rawlineups.find(lineupid);
+    if (it == rawlineups.end())
+        return tmp;
+    return (*it);
+}
+
+bool DataDirectProcessor::Post(QString url, const PostList &list,
+                               QString documentFile,
+                               QString inCookieFile, QString outCookieFile)
+{
+    QString dfile = QString("'%1' ").arg(documentFile);
+    QString command = "wget ";
+
+    if (!inCookieFile.isEmpty())
+        command += QString("--load-cookies=%1 ").arg(inCookieFile);
+
+    if (!outCookieFile.isEmpty())
+    {
+        command += "--keep-session-cookies ";
+        command += QString("--save-cookies=%1 ").arg(outCookieFile);
+    }
+
+    QString post_data = "";
+    for (uint i = 0; i < list.size(); i++)
+    {
+        post_data += ((i) ? "&" : "") + list[i].key + "=";
+        post_data += html_escape(list[i].value);
+    }
+
+    if (post_data.length())
+        command += "--post-data='" + post_data + "' ";
+
+    command += url;
+    command += " ";
+
+    command += "--output-document=";
+    command += (documentFile.isEmpty()) ? "- " : dfile;
+
+#if 1
+    command += (documentFile.isEmpty()) ? "&> " : "2> ";
+    command += "/dev/null ";
+#endif
+
+    //cerr<<"command: "<<command<<endl;
+
+    myth_system(command.ascii());
+
+    return true;
+}
+
+bool DataDirectProcessor::ParseLineups(const QString &documentFile)
+{
+    QFile file(documentFile);
+    if (!file.open(IO_ReadOnly))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to open '%1'").arg(documentFile));
+        return false;
+    }
+
+    QTextStream stream(&file);
+    bool in_form = false;
+    QString get_action = QString::null;
+    QMap<QString,QString> name_value;
+
+    rawlineups.clear();
+
+    while (!stream.atEnd()) 
+    {
+        QString line = stream.readLine();
+        QString llow = line.lower();
+        int frm = llow.find("<form");
+        if (frm >= 0)
+        {
+            in_form = true;
+            get_action = get_setting(line.mid(frm + 5), "action");
+            name_value.clear();
+            //cerr<<QString("action: %1").arg(action)<<endl;
+        }
+
+        if (!in_form)
+            continue;
+
+        int inp = llow.find("<input");
+        if (inp >= 0)
+        {
+            QString input_line = line.mid(inp + 6);
+            //cerr<<QString("input: %1").arg(input_line)<<endl;
+            QString name  = get_setting(input_line, "name");
+            QString value = get_setting(input_line, "value");
+            //cerr<<QString("name: %1").arg(name)<<endl;
+            //cerr<<QString("value: %1").arg(value)<<endl;
+            if (!name.isEmpty() && !value.isEmpty())
+                name_value[name] = value;
+        }
+
+        if (llow.contains("</form>"))
+        {
+            in_form = false;
+            if (!get_action.isEmpty() &&
+                !name_value["udl_id"].isEmpty() &&
+                !name_value["zipcode"].isEmpty() &&
+                !name_value["lineup_id"].isEmpty())
+            {
+                RawLineup item(get_action, name_value["udl_id"],
+                               name_value["zipcode"]);
+
+                rawlineups[name_value["lineup_id"]] = item;
+#if 0
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("<%1> \t--> <%2,%3,%4>")
+                        .arg(name_value["lineup_id"])
+                        .arg(item.udl_id).arg(item.zipcode)
+                        .arg(item.action));
+#endif
+            }
+        }
+    }    
+    return true;
+}
+
+bool DataDirectProcessor::ParseLineup(const QString &lineupid,
+                                      const QString &documentFile)
+{
+    QFile file(documentFile);
+    if (!file.open(IO_ReadOnly))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to open '%1'").arg(documentFile));
+
+        return false;
+    }
+
+    QTextStream stream(&file);
+    bool in_form = false;
+    int in_label = 0;
+    QMap<QString,QString> settings;
+
+    RawLineup &lineup = rawlineups[lineupid];
+    RawLineupChannels &ch = lineup.channels;
+
+    while (!stream.atEnd()) 
+    {
+        QString line = stream.readLine();
+        QString llow = line.lower();
+        int frm = llow.find("<form");
+        if (frm >= 0)
+        {
+            in_form = true;
+            lineup.set_action = get_setting(line.mid(frm + 5), "action");
+            //cerr<<"set_action: "<<lineup.set_action<<endl;
+        }
+
+        if (!in_form)
+            continue;
+
+        int inp = llow.find("<input");
+        if (inp >= 0)
+        {
+            QString in_line = line.mid(inp + 6);
+            settings.clear();
+            settings["chk_name"]    = get_setting(in_line, "name");
+            settings["chk_id"]      = get_setting(in_line, "id");
+            settings["chk_value"]   = get_setting(in_line, "value");
+            settings["chk_checked"] = has_setting(in_line, "checked")?"1":"0";
+        }
+
+        int lbl = llow.find("<label");
+        if (lbl >= 0)
+        {
+            QString lbl_line = line.mid(inp + 6);
+            QString name = get_setting(lbl_line, "for");
+            in_label = (name == settings["chk_name"]) ? 1 : 0;
+        }
+        
+        if (in_label)
+        {
+            int start = (lbl >= 0) ? lbl + 6 : 0;
+            int beg = llow.find("<td>", start), end = -1;
+            if (beg)
+                end = llow.find("</td>", beg + 4);
+
+            if (end >= 0)
+            {
+                QString key = (in_label == 1) ? "lbl_ch" : "lbl_callsign";
+                QString val = line.mid(beg + 4, end - beg - 4);
+                settings[key] = val.replace("&nbsp;", "", false);
+                in_label++;
+            }
+        }
+
+        in_label = (llow.find("</label") >= 0) ? 0 : in_label;
+
+        if (!in_label &&
+            !settings["chk_name"].isEmpty() &&
+            !settings["chk_id"].isEmpty() &&
+            !settings["chk_value"].isEmpty() &&
+            !settings["chk_checked"].isEmpty() &&
+            !settings["lbl_ch"].isEmpty() &&
+            !settings["lbl_callsign"].isEmpty())
+        {
+            RawLineupChannel chan(
+                settings["chk_name"],  settings["chk_id"],
+                settings["chk_value"], settings["chk_checked"] == "1",
+                settings["lbl_ch"],    settings["lbl_callsign"]);
+
+#if 0
+            VERBOSE(VB_IMPORTANT, LOC +
+                    QString("name: %1  id: %2  value: %3  "
+                            "checked: %4  ch: %5  call: %6")
+                    .arg(settings["chk_name"]).arg(settings["chk_id"])
+                    .arg(settings["chk_value"]).arg(settings["chk_checked"])
+                    .arg(settings["lbl_ch"],4).arg(settings["lbl_callsign"]));
+#endif
+
+            ch.push_back(chan);
+            settings.clear();
+        }
+
+        if (llow.contains("</form>"))
+        {
+            in_form = false;
+        }
+    }
+    return true;
+}
+
+static QString html_escape(QString str)
+{
+    QString new_str = "";
+    for (uint i = 0; i < str.length(); i++)
+    {
+        if (str[i].isLetterOrNumber())
+            new_str += str[i];
+        else
+            new_str += QString("\%%1").arg((int)str[i].latin1());
+    }
+
+    return new_str;
+}
+
+static QString get_setting(QString line, QString key)
+{
+    QString llow = line.lower();
+    QString kfind = key + "=\"";
+    int beg = llow.find(kfind), end = -1;
+
+    if (beg >= 0)
+    {
+        end = llow.find("\"", beg + kfind.length());
+        return line.mid(beg + kfind.length(), end - beg - kfind.length());
+    }
+
+    kfind = key + "=";
+    beg = llow.find(kfind);
+    if (beg < 0)
+        return QString::null;
+
+    uint i = beg + kfind.length();
+    while (i < line.length() && !line[i].isSpace() && line[i] != '>')
+        i++;
+
+    if (i < line.length() && (line[i].isSpace() || line[i] == '>'))
+        return line.mid(beg + kfind.length(), i - beg - kfind.length());
+
+    return QString::null;
+}
+
+static bool has_setting(QString line, QString key)
+{
+    return (line.lower().find(key) >= 0);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
