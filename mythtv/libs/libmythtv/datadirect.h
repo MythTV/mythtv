@@ -19,9 +19,9 @@ class DataDirectURLs
 {
   public:
     DataDirectURLs(QString a, QString b, QString c, QString d) :
-        sourceName(a), webServiceURL(b), webURL(c), loginPage(d) {}
+        name(a), webServiceURL(b), webURL(c), loginPage(d) {}
 
-    QString sourceName;
+    QString name;
     QString webServiceURL;
     QString webURL;
     QString loginPage;
@@ -239,23 +239,26 @@ class DDStructureParser: public QXmlDefaultHandler
     QString                  lastprogramid;
 };
 
-typedef QValueList<DataDirectStation>   DDStationList;
-typedef QValueList<DataDirectLineup>    DDLineupList;
-typedef QValueList<DataDirectLineupMap> DDLineupMap;
+typedef QMap<QString,DataDirectStation>    DDStationList; // stationid ->
+typedef vector<DataDirectLineup>           DDLineupList;
+typedef vector<DataDirectLineupMap>        DDLineupChannels;
+typedef QMap<QString,DDLineupChannels>     DDLineupMap;   // lineupid ->
 
 class DataDirectProcessor
 {
     friend class DDStructureParser;
   public:
-    DataDirectProcessor(uint listings_provider = DD_ZAP2IT);
+    DataDirectProcessor(uint listings_provider = DD_ZAP2IT,
+                        QString userid = "", QString password = "");
    ~DataDirectProcessor();
 
     // web service commands
-    bool grabLineupsOnly(void);
-    bool grabData(bool plineupsonly, QDateTime pstartdate, QDateTime penddate);
-    bool grabAllData(void);
-    void updateStationViewTable(void);
-    void updateProgramViewTable(int sourceid);
+    bool GrabData(QDateTime pstartdate, QDateTime penddate);
+    bool GrabNextSuggestedTime(void);
+
+    // utility wrappers
+    bool GrabLineupsOnly(void);
+    bool GrabAllData(void);
 
     // screen scraper commands
     bool GrabLoginCookiesAndLineups(void);
@@ -268,34 +271,37 @@ class DataDirectProcessor
                     const QMap<QString,bool> &xmltvids);
 
     // gets
-    DDStationList getStations(void)       const { return stations;           }
-    DDLineupList  getLineups(void)        const { return lineups;            }
-    DDLineupMap   getLineupMaps(void)     const { return lineupmaps;         }
+    DDStationList GetStations(void)       const { return stations;           }
+    DDLineupList  GetLineups(void)        const { return lineups;            }
+    DDLineupMap   GetLineupMap(void)      const { return lineupmaps;         }
 
-    QString       GetUserID(void)         const { return userid;             }
-    QString       GetPassword(void)       const { return password;           }
-    QString       getLineup(void)         const { return selectedlineupid;   }
-    int           getSource(void)         const { return listings_provider;  }
-    QDateTime getActualListingsFrom(void) const { return actuallistingsfrom; }
-    QDateTime getActualListingsTo(void)   const { return actuallistingsto;   }
+    QString   GetUserID(void)             const { return userid;             }
+    QString   GetPassword(void)           const { return password;           }
+    uint      GetListingsProvider(void)   const { return listings_provider;  }
+    QString   GetListingsProviderName(void) const
+        { return providers[listings_provider % DD_PROVIDER_COUNT].name; }
 
-    DDStation     GetDDStation( const QString &xmltvid) const;
+    QDateTime GetDDProgramsStartAt(bool localtime = false) const;
+    QDateTime GetDDProgramsEndAt(bool localtime = false) const;
+    DDLineupChannels GetDDLineup(const QString &lineupid) const
+        { return lineupmaps[lineupid]; }
+    DDStation GetDDStation( const QString &xmltvid ) const
+        { return stations[xmltvid]; }
 
-    QString       GetRawUDLID(  const QString &lineupid) const;
-    QString       GetRawZipCode(const QString &lineupid) const;
-    RawLineup     GetRawLineup( const QString &lineupid) const;
-
-    // non-const gets
-    bool getNextSuggestedTime(void);
+    QString   GetRawUDLID(  const QString &lineupid) const;
+    QString   GetRawZipCode(const QString &lineupid) const;
+    RawLineup GetRawLineup( const QString &lineupid) const;
 
     // sets
-    void setUserID(QString uid)                 { userid             = uid;  }
-    void setPassword(QString pwd)               { password           = pwd;  }
-    void setLineup(QString lid)                 { selectedlineupid   = lid;  }
-    void setSource(int src)   { listings_provider = src % DD_PROVIDER_COUNT; }
-    void setActualListingsFrom(QDateTime palf)  { actuallistingsfrom = palf; }
-    void setActualListingsTo(QDateTime palt)    { actuallistingsto   = palt; }
-    void setInputFile(const QString &filename);
+    void SetUserID(QString uid)                 { userid             = uid;  }
+    void SetPassword(QString pwd)               { password           = pwd;  }
+    void SetListingsProvider(uint i)
+        { listings_provider = i % DD_PROVIDER_COUNT; }
+    void SetInputFile(const QString &file)      { inputfilename      = file; }
+
+    // static commands (these update temp DB tables)
+    static void UpdateStationViewTable(QString lineupid);
+    static void UpdateProgramViewTable(uint sourceid);
 
   private:
     void CreateTempTables(void);
@@ -306,13 +312,14 @@ class DataDirectProcessor
     bool ParseLineup(const QString &lineupid, const QString &documentFile);
 
     void SetAll(const QString &lineupid, bool val);
+    void SetDDProgramsStartAt(QDateTime begts)  { actuallistingsfrom = begts; }
+    void SetDDProgramsEndAt(QDateTime endts)    { actuallistingsto   = endts; }
 
     static bool Post(QString url, const PostList &list, QString documentFile,
                      QString inCookieFile, QString outCookieFile);
 
     static FILE *DDPost(QString    url,          QString    inputFilename,
                         QString    userid,       QString    password,
-                        bool       plineupsOnly,
                         QDateTime  pstartDate,   QDateTime  pendDate,
                         QString   &err_txt,      QString   &tmpfilename);
 
@@ -321,12 +328,9 @@ class DataDirectProcessor
     uint          listings_provider;
     DDProviders   providers;
 
-    QString       selectedlineupid;
     QString       userid;
     QString       password;
 
-    QString       lastrunuserid;
-    QString       lastrunpassword;
     QDateTime     actuallistingsfrom;
     QDateTime     actuallistingsto;
 

@@ -6,6 +6,7 @@
 // MythTV headers
 #include "sourceutil.h"
 #include "mythdbcon.h"
+#include "util.h"
 
 QString SourceUtil::GetChannelSeparator(uint sourceid)
 {
@@ -59,4 +60,49 @@ uint SourceUtil::GetChannelCount(uint sourceid)
     if (query.exec() && query.isActive() && query.next())
         return query.value(0).toUInt();
     return 0;
+}
+
+bool SourceUtil::GetListingsLoginData(uint sourceid,
+                                      QString &grabber, QString &userid,
+                                      QString &passwd,  QString &lineupid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT xmltvgrabber, userid, password, lineupid "
+        "FROM videosource "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() && !query.isActive())
+    {
+        MythContext::DBError("SourceUtil::GetListingsLoginData()", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    grabber  = query.value(0).toString();
+    userid   = query.value(1).toString();
+    passwd   = query.value(2).toString();
+    lineupid = query.value(3).toString();
+
+    return true;
+}
+
+bool SourceUtil::UpdateChannelsFromListings(uint sourceid)
+{
+/*
+    QString grabber, userid, passwd, lineupid;
+    if (!GetListingsLoginData(sourceid, grabber, userid, passwd, lineupid))
+        return false;
+
+    if (grabber != "datadirect")
+*/
+    {
+        myth_system(QString("mythfilldatabase --refresh-today --max-days 1 "
+                            "--sourceid %1").arg(sourceid));
+        return true;
+    }
+    // TODO implement channel only import w/data direct
 }

@@ -78,11 +78,13 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     currtagname = pqname;
     if (currtagname == "xtvd") 
     {
-        QDateTime from = QDateTime::fromString(pxmlatts.value("from"), 
-                                               Qt::ISODate);
-        QDateTime to = QDateTime::fromString(pxmlatts.value("to"),Qt::ISODate);
-        parent.setActualListingsFrom(from);
-        parent.setActualListingsTo(to);
+        QString   beg   = pxmlatts.value("from");
+        QDateTime begts = QDateTime::fromString(beg, Qt::ISODate);
+        parent.SetDDProgramsStartAt(begts);
+
+        QString   end   = pxmlatts.value("to");
+        QDateTime endts = QDateTime::fromString(end, Qt::ISODate);
+        parent.SetDDProgramsEndAt(endts);
     }   
     else if (currtagname == "station") 
     {
@@ -178,7 +180,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
 
     if (pqname == "station") 
     {
-        parent.stations.append(curr_station);
+        parent.stations[curr_station.stationid] = curr_station;
 
         query.prepare(
             "INSERT INTO dd_station "
@@ -199,7 +201,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     }
     else if (pqname == "lineup")
     {
-        parent.lineups.append(curr_lineup);
+        parent.lineups.push_back(curr_lineup);
 
         query.prepare(
             "INSERT INTO dd_lineup "
@@ -218,7 +220,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     }
     else if (pqname == "map") 
     {
-        parent.lineupmaps.append(curr_lineupmap);
+        parent.lineupmaps[curr_lineupmap.lineupid].push_back(curr_lineupmap);
 
         query.prepare(
             "INSERT INTO dd_lineupmap "
@@ -476,11 +478,10 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
-DataDirectProcessor::DataDirectProcessor(uint listings_provider) :
-    listings_provider(listings_provider % DD_PROVIDER_COUNT),
-    selectedlineupid(""),       userid(""),
-    password(""),               lastrunuserid(""),
-    lastrunpassword(""),        inputfilename(""),
+DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
+    listings_provider(lp % DD_PROVIDER_COUNT),
+    userid(user),               password(pass),
+    inputfilename(""),
     tmpFile(""),                cookieFile("")
 {
     DataDirectURLs urls0(
@@ -498,7 +499,7 @@ DataDirectProcessor::~DataDirectProcessor()
 {
 }
 
-void DataDirectProcessor::updateStationViewTable() 
+void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
 {
     MSqlQuery query(MSqlQuery::DDCon());
    
@@ -517,13 +518,13 @@ void DataDirectProcessor::updateStationViewTable()
         "WHERE ((dd_station.stationid  = dd_lineupmap.stationid) AND "
         "       (dd_lineupmap.lineupid = :LINEUP))");
 
-    query.bindValue(":LINEUP", getLineup());
+    query.bindValue(":LINEUP", lineupid);
 
     if (!query.exec())
         MythContext::DBError("Populating temporary table dd_v_station", query);
 }
 
-void DataDirectProcessor::updateProgramViewTable(int sourceid) 
+void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::DDCon());
    
@@ -565,15 +566,9 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
         MythContext::DBError("Analyzing table dd_productioncrew", query);
 }
 
-void DataDirectProcessor::setInputFile(const QString &filename)
-{
-    inputfilename = filename;
-}
-
 FILE *DataDirectProcessor::DDPost(
     QString    ddurl,        QString    inputFile,
     QString    userid,       QString    password,
-    bool       plineupsOnly,
     QDateTime  pstartDate,   QDateTime  pendDate,
     QString   &err_txt,      QString   &tmpfilename)
 {
@@ -581,14 +576,6 @@ FILE *DataDirectProcessor::DDPost(
     {
         err_txt = QString("Unable to open '%1'").arg(inputFile);
         return fopen(inputFile.ascii(), "r");
-    }
-
-    if (plineupsOnly) 
-    {
-        pstartDate = QDateTime(QDate::currentDate().addDays(2),
-                               QTime::QTime(23, 59, 0));
-        pendDate = pstartDate;
-        pendDate = pendDate.addSecs(1);
     }
 
     char ctempfilename[] = "/tmp/mythpostXXXXXX";
@@ -643,7 +630,7 @@ FILE *DataDirectProcessor::DDPost(
     return popen(command.ascii(), "r");
 }
 
-bool DataDirectProcessor::getNextSuggestedTime(void)
+bool DataDirectProcessor::GrabNextSuggestedTime(void)
 {
     QString ddurl = providers[listings_provider].webServiceURL;
          
@@ -797,15 +784,13 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     return GotNextSuggestedTime;
 }
 
-bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate, 
-                                   QDateTime pendDate) 
+bool DataDirectProcessor::GrabData(QDateTime pstartDate, QDateTime pendDate)
 {
     QString err = "", tmpfile = "";
     QString ddurl = providers[listings_provider].webServiceURL;
 
-    FILE *fp = DDPost(ddurl, inputfilename,
-                      GetUserID(), GetPassword(),
-                      plineupsOnly, pstartDate, pendDate, err, tmpfile);
+    FILE *fp = DDPost(ddurl, inputfilename, GetUserID(), GetPassword(),
+                      pstartDate, pendDate, err, tmpfile);
     if (!fp)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
@@ -839,21 +824,18 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
     return fp;
 }
 
-bool DataDirectProcessor::grabLineupsOnly() 
+bool DataDirectProcessor::GrabLineupsOnly(void)
 {
-    if ((lastrunuserid == GetUserID()) && (lastrunpassword == GetPassword())) 
-        return true;
+    const QDateTime start = QDateTime(QDate::currentDate().addDays(2),
+                                      QTime::QTime(23, 59, 0));
+    const QDateTime end   = start.addSecs(1);
 
-    lastrunuserid   = GetUserID();
-    lastrunpassword = GetPassword();
-
-    QDateTime now = QDateTime::currentDateTime();
-    return grabData(true, now, now);
+    return GrabData(start, end);
 }   
 
-bool DataDirectProcessor::grabAllData() 
+bool DataDirectProcessor::GrabAllData(void)
 {
-    return grabData(false, QDateTime(QDate::currentDate()).addDays(-2),
+    return GrabData(QDateTime(QDate::currentDate()).addDays(-2),
                     QDateTime(QDate::currentDate()).addDays(15));
 }
 
@@ -1017,7 +999,7 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid, bool restore)
     if (!SaveLineupChanges(lineupid))
         return false;
 
-    ok = grabLineupsOnly();
+    ok = GrabLineupsOnly();
 
     (*lit).channels = orig_channels;
     if (restore)
@@ -1035,12 +1017,10 @@ bool DataDirectProcessor::SaveLineup(const QString &lineupid,
         return false;
 
     // Get callsigns based on xmltv ids (aka stationid)
-    DDLineupMap::const_iterator it;
-    for (it = lineupmaps.begin(); it != lineupmaps.end(); ++it)
+    DDLineupMap::const_iterator ddit = lineupmaps.find(lineupid);
+    DDLineupChannels::const_iterator it;
+    for (it = (*ddit).begin(); it != (*ddit).end(); ++it)
     {
-        if ((*it).lineupid != lineupid)
-            continue;
-
         if (xmltvids.find((*it).stationid) != xmltvids.end())
             callsigns[GetDDStation((*it).stationid).callsign] = true;
     }
@@ -1080,17 +1060,18 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
     return Post(labsURL + lineup.set_action, list, "", cookieFile, "");
 }
 
-DDStation DataDirectProcessor::GetDDStation(const QString &xmltvid) const
+QDateTime  DataDirectProcessor::GetDDProgramsStartAt(bool localtime) const
 {
-    DDStationList::const_iterator it;
-    for (it = stations.begin(); it != stations.end(); ++it)
-    {
-        if ((*it).stationid == xmltvid)
-            return *it;
-    }
+    if (localtime)
+        return MythUTCToLocal(actuallistingsfrom);
+    return actuallistingsfrom;
+}
 
-    DDStation tmp;
-    return tmp;
+QDateTime  DataDirectProcessor::GetDDProgramsEndAt(bool localtime) const
+{
+    if (localtime)
+        return MythUTCToLocal(actuallistingsto);
+    return actuallistingsto;
 }
 
 QString DataDirectProcessor::GetRawUDLID(const QString &lineupid) const
@@ -1153,13 +1134,17 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
 #if 1
     command += (documentFile.isEmpty()) ? "&> " : "2> ";
     command += "/dev/null ";
+#else
+    VERBOSE(VB_GENERAL, "command: "<<command<<endl);
 #endif
-
-    //cerr<<"command: "<<command<<endl;
 
     myth_system(command.ascii());
 
-    return true;
+    if (documentFile.isEmpty())
+        return true;
+
+    QFileInfo fi(documentFile);
+    return fi.size();
 }
 
 bool DataDirectProcessor::ParseLineups(const QString &documentFile)
@@ -1222,10 +1207,10 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
                 rawlineups[name_value["lineup_id"]] = item;
 #if 0
                 VERBOSE(VB_IMPORTANT, LOC +
-                        QString("<%1> \t--> <%2,%3,%4>")
+                        QString("<%1>  \t--> <%2,%3,%4>")
                         .arg(name_value["lineup_id"])
                         .arg(item.udl_id).arg(item.zipcode)
-                        .arg(item.action));
+                        .arg(item.get_action));
 #endif
             }
         }
@@ -1347,7 +1332,7 @@ static QString html_escape(QString str)
         if (str[i].isLetterOrNumber())
             new_str += str[i];
         else
-            new_str += QString("\%%1").arg((int)str[i].latin1());
+            new_str += QString("\%%1").arg((int)str[i].latin1(),0,16);
     }
 
     return new_str;

@@ -27,7 +27,6 @@
 #include "videosource.h"
 #include "datadirect.h"
 #include "scanwizard.h"
-#include "util.h"
 #include "cardutil.h"
 #include "sourceutil.h"
 
@@ -182,32 +181,26 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 
     qApp->processEvents();
 
-    QString waitMsg;
-    if (_source == DD_ZAP2IT)
-    
-        waitMsg = tr("Fetching lineups from DataDirect service...");
-    else
-        waitMsg = tr("Fetching lineups from the Myth Plus service...");
+    DataDirectProcessor ddp(_source, uid, pwd);
+    QString waitMsg = tr("Fetching lineups from %1...")
+        .arg(ddp.GetListingsProviderName());
         
     VERBOSE(VB_GENERAL, waitMsg);
     MythProgressDialog pdlg(waitMsg, 2);
 
     clearSelections();
 
-    DataDirectProcessor ddp(_source);
-    ddp.setUserID(uid);
-    ddp.setPassword(pwd);
-
     pdlg.setProgress(1);
 
-    if (!ddp.grabLineupsOnly())
+    if (!ddp.GrabLineupsOnly())
     {
-        VERBOSE(VB_IMPORTANT, "DDLS: fillSelections did not successfully load selections");
+        VERBOSE(VB_IMPORTANT, "DDLS: fillSelections "
+                "did not successfully load selections");
         return;
     }
-    QValueList<DataDirectLineup> lineups = ddp.getLineups();
+    const DDLineupList lineups = ddp.GetLineups();
 
-    QValueList<DataDirectLineup>::iterator it;
+    DDLineupList::const_iterator it;
     for (it = lineups.begin(); it != lineups.end(); ++it)
         addSelection((*it).displayname, (*it).lineupid);
 
@@ -1544,7 +1537,7 @@ void CardInput::sourceFetch(void)
 
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
-    myth_system("mythfilldatabase --refresh-today --dont-refresh-tomorrow");
+    SourceUtil::UpdateChannelsFromListings(srcid);
 
     if (SourceUtil::GetChannelCount(srcid))
         startchan->SetSourceID(QString::number(srcid));        

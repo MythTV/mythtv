@@ -814,7 +814,7 @@ void DataDirectStationUpdate(Source source)
     MSqlQuery chan_update_q(MSqlQuery::DDCon());
     QString querystr;
 
-    ddprocessor.updateStationViewTable();
+    DataDirectProcessor::UpdateStationViewTable(source.lineupid);
 
     // Find all the channels in the dd_v_station temp table
     // where there is no channel with the same xmltvid in the
@@ -1081,10 +1081,9 @@ void DataDirectProgramUpdate()
 
 bool grabDDData(Source source, int poffset, QDate pdate, int ddSource) 
 {
-    ddprocessor.setLineup(source.lineupid);
-    ddprocessor.setUserID(source.userid);
-    ddprocessor.setPassword(source.password);
-    ddprocessor.setSource(ddSource);
+    ddprocessor.SetListingsProvider(ddSource);
+    ddprocessor.SetUserID(source.userid);
+    ddprocessor.SetPassword(source.password);
     
     bool needtoretrieve = true;
 
@@ -1108,7 +1107,7 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
         if (dd_grab_all) 
         {
             VERBOSE(VB_GENERAL, "Grabbing ALL available data.");
-            if (!ddprocessor.grabAllData())
+            if (!ddprocessor.GrabAllData())
             {
                 VERBOSE(VB_IMPORTANT, "Encountered error in grabbing data.");
                 return false;
@@ -1129,7 +1128,7 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
                                           .arg(fromdatetime.toString())
                                           .arg(todatetime.toString()));
 
-            if (!ddprocessor.grabData(false, fromdatetime, todatetime))
+            if (!ddprocessor.GrabData(fromdatetime, todatetime))
             {
                 VERBOSE(VB_IMPORTANT, "Encountered error in grabbing data.");
                 return false;
@@ -1146,8 +1145,8 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
 
     VERBOSE(VB_GENERAL,
             QString("Grab complete.  Actual data from %1 to %2 (UTC)")
-                    .arg(ddprocessor.getActualListingsFrom().toString())
-                    .arg(ddprocessor.getActualListingsTo().toString()));
+            .arg(ddprocessor.GetDDProgramsStartAt().toString())
+            .arg(ddprocessor.GetDDProgramsEndAt().toString()));
 
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
@@ -1160,7 +1159,7 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
     VERBOSE(VB_GENERAL, "Channels updated.");
 
     //cerr << "Creating program view table...\n";
-    ddprocessor.updateProgramViewTable(source.id);
+    DataDirectProcessor::UpdateProgramViewTable(source.id);
     //cerr <<  "Finished creating program view table...\n";
 
     query.exec("SELECT count(*) from dd_v_program;");
@@ -1180,8 +1179,8 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
     }
 
     VERBOSE(VB_GENERAL, "Clearing data for source.");
-    QDateTime fromlocaldt = MythUTCToLocal(ddprocessor.getActualListingsFrom());
-    QDateTime tolocaldt = MythUTCToLocal(ddprocessor.getActualListingsTo());
+    QDateTime fromlocaldt = ddprocessor.GetDDProgramsStartAt(true);
+    QDateTime tolocaldt = ddprocessor.GetDDProgramsEndAt(true);
 
     VERBOSE(VB_GENERAL, QString("Clearing from %1 to %2 (localtime)")
                                   .arg(fromlocaldt.toString())
@@ -2813,7 +2812,7 @@ void grabDataFromDDFile(int id, int offset, const QString &filename,
     if (!currentd)
         currentd = &qcd;
 
-    ddprocessor.setInputFile(filename);
+    ddprocessor.SetInputFile(filename);
     Source s;
     s.id = id;
     s.name = "";
@@ -3998,7 +3997,9 @@ int main(int argc, char *argv[])
 
     if ((usingDataDirect) &&
         (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
-        ddprocessor.getNextSuggestedTime();
+    {
+        ddprocessor.GrabNextSuggestedTime();
+    }
 
     VERBOSE(VB_IMPORTANT, "\n"
             "===============================================================\n"

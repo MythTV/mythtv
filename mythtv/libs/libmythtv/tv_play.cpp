@@ -36,6 +36,7 @@
 #include "playgroup.h"
 #include "DVDRingBuffer.h"
 #include "datadirect.h"
+#include "sourceutil.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -5975,40 +5976,39 @@ bool TV::LoadDDMap(uint sourceid)
     ddMap.clear();
     ddMapSourceId = 0;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT xmltvgrabber, userid, password "
-        "FROM videosource "
-        "WHERE sourceid = :SOURCEID");
-    query.bindValue(":SOURCEID", sourceid);
-
-    if (!query.exec() && !query.isActive())
+    QString grabber, userid, passwd, lineupid;
+    bool ok = SourceUtil::GetListingsLoginData(sourceid, grabber, userid,
+                                               passwd, lineupid);
+    if (!ok || (grabber != "datadirect"))
     {
-        MythContext::DBError("TV::LoadDDMap", query);
+        VERBOSE(VB_PLAYBACK, LOC + QString("LoadDDMap() g(%1)").arg(grabber));
         return false;
     }
 
-    if (!query.next() || query.value(0).toString() != "datadirect")
-    {
-        VERBOSE(VB_PLAYBACK, QString("TV::LoadDDMap() Grabber: '%1'")
-                .arg(query.value(0).toString()));
-        return false;
-    }
-
-    DataDirectProcessor ddp(sourceid);
-    ddp.setUserID(query.value(1).toString());
-    ddp.setPassword(query.value(2).toString());
-    ddp.grabLineupsOnly();
-    const QValueList<DataDirectStation> stations = ddp.getStations();
+    DataDirectProcessor ddp(DD_ZAP2IT, userid, passwd);
+    ddp.GrabFullLineup(lineupid);
+    const DDLineupChannels channels = ddp.GetDDLineup(lineupid);
 
     InfoMap tmp;
-    QValueList<DataDirectStation>::const_iterator it;
-    for (it = stations.begin(); it != stations.end(); ++it)
+    DDLineupChannels::const_iterator it;
+    for (it = channels.begin(); it != channels.end(); ++it)
     {
+        DDStation station = ddp.GetDDStation((*it).stationid);
         tmp["XMLTV"]    = (*it).stationid;
-        tmp["callsign"] = (*it).callsign;
-        tmp["channame"] = (*it).stationname;
-        tmp["channum"]  = (*it).fccchannelnumber;
+        tmp["callsign"] = station.callsign;
+        tmp["channame"] = station.stationname;
+        tmp["channum"]  = (*it).channel;
+        if (!(*it).channelMinor.isEmpty())
+        {
+            tmp["channum"] += SourceUtil::GetChannelSeparator(sourceid);
+            tmp["channum"] += (*it).channelMinor;
+        }
+
+#if 0
+        VERBOSE(VB_GENERAL, QString("Adding channel: %1 -- %2 -- %3 -- %4")
+                .arg(tmp["channum"],4).arg(tmp["callsign"],7)
+                .arg(tmp["XMLTV"]).arg(tmp["channame"]));
+#endif
 
         for (uint j = 0; j < 4; j++)
             for (uint i = 0; i < 4; i++)
