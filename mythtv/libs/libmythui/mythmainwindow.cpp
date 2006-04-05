@@ -810,9 +810,9 @@ void MythMainWindow::BindJump(const QString &destination, const QString &key)
 
     QKeySequence keyseq(key);
 
-    if (!keyseq.isEmpty())
+    for (unsigned int i = 0; i < keyseq.count(); i++)
     {
-        int keynum = keyseq[0];
+        int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
 
         if (d->jumpMap.count(keynum) == 0)
