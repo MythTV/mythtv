@@ -302,10 +302,12 @@ void ScanTypeSetting::refresh(const QString& card)
     case CardUtil::HDTV:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_ATSC), true);
+/* TODO disabled import to so we get some bug reports on scanner. dtk 4/6/2006
 #ifdef USING_DVB
         addSelection(tr("Import channels.conf"),
                      QString::number(Import));
 #endif
+*/
         break;
     case CardUtil::ERROR_PROBE:
         addSelection(QObject::tr("Failed to probe the card"),
