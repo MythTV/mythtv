@@ -300,6 +300,8 @@ void SIScan::HandleNIT(const NetworkInformationTable *nit)
         emit TransportScanUpdateText(tr("Finished processing Transport List"));
         emit TransportScanComplete();
     }
+
+    HandleDVBDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
 
 void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
