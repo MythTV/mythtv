@@ -759,6 +759,8 @@ void Scheduler::RestoreRecStatus(void)
 
 bool Scheduler::TryAnotherShowing(ProgramInfo *p)
 {
+    PrintRec(p, "     >");
+
     if (p->recstatus == rsRecording)
         return false;
 
@@ -792,10 +794,14 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
                 continue;
         }
 
+        PrintRec(q, "     #");
         RecList &cardlist = cardlistmap[q->cardid];
         RecIter k = cardlist.begin();
         if (FindNextConflict(cardlist, q, k))
+        {
+            PrintRec(*k, "        !");
             continue;
+        }
 
         q->recstatus = rsWillRecord;
         MarkOtherShowings(q);
