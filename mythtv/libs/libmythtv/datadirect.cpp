@@ -478,11 +478,30 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
+static QString makeTempFile(QString name_template)
+{
+    const char *tmp = name_template.ascii();
+    char *ctemplate = strdup(tmp);
+    int ret = mkstemp(ctemplate);
+    QString tmpFileName(ctemplate);
+    free(ctemplate);
+
+    if (ret == -1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating temp file from " +
+                QString("template '%1'").arg(name_template) + ENO);
+        return name_template;
+    }
+    close(ret);
+
+    return tmpFileName;
+}
+
 DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     listings_provider(lp % DD_PROVIDER_COUNT),
     userid(user),               password(pass),
-    inputfilename(""),
-    tmpFile(""),                cookieFile("")
+    inputfilename(""),          tmpPostFile(""),
+    tmpResultFile(""),          cookieFile("")
 {
     DataDirectURLs urls0(
         "Tribune Media Zip2It",
@@ -491,12 +510,17 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
         "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
     providers.push_back(urls0);
 
-    tmpFile = "/tmp/X";
-    cookieFile = "/tmp/Z";
+    QString tmpDir = "/tmp";
+    tmpPostFile   = makeTempFile(tmpDir + "/mythtv_post_XXXXXX");
+    tmpResultFile = makeTempFile(tmpDir + "/mythtv_result_XXXXXX");
+    cookieFile    = makeTempFile(tmpDir + "/mythtv_cookies_XXXXXX");
 }
 
 DataDirectProcessor::~DataDirectProcessor()
 {
+    unlink(tmpPostFile.ascii());
+    unlink(tmpResultFile.ascii());
+    unlink(cookieFile.ascii());
 }
 
 void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
@@ -567,10 +591,11 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
 }
 
 FILE *DataDirectProcessor::DDPost(
-    QString    ddurl,        QString    inputFile,
+    QString    ddurl,
+    QString    postFilename, QString    inputFile,
     QString    userid,       QString    password,
     QDateTime  pstartDate,   QDateTime  pendDate,
-    QString   &err_txt,      QString   &tmpfilename)
+    QString   &err_txt)
 {
     if (!inputFile.isEmpty())
     {
@@ -578,15 +603,7 @@ FILE *DataDirectProcessor::DDPost(
         return fopen(inputFile.ascii(), "r");
     }
 
-    char ctempfilename[] = "/tmp/mythpostXXXXXX";
-    if (mkstemp(ctempfilename) == -1) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating temp files -- " + ENO);
-        err_txt = "Unable to create temp files.";
-        return NULL;
-    }
-
-    QFile postfile(tmpfilename = QString(ctempfilename));
+    QFile postfile(postFilename);
     if (!postfile.open(IO_WriteOnly))
     {
         err_txt = "Unable to open post data output file.";
@@ -618,7 +635,7 @@ FILE *DataDirectProcessor::DDPost(
     QString command = QString(
         "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
         "--header='Accept-Encoding:gzip' %4 --output-document=- ")
-        .arg(userid).arg(password).arg(tmpfilename).arg(ddurl);
+        .arg(userid).arg(password).arg(postFilename).arg(ddurl);
 
     if ((print_verbose_messages & VB_GENERAL) == 0)
         command += " 2> /dev/null ";
@@ -634,28 +651,11 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 {
     QString ddurl = providers[listings_provider].webServiceURL;
          
-    char ctempfilenamesend[] = "/tmp/mythpostXXXXXX";
-    if (mkstemp(ctempfilenamesend) == -1) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Creating temp file for sending -- " + ENO);
-        return false;
-    }
-    QString tmpfilenamesend = QString(ctempfilenamesend);
-
-    char ctempfilenamerecv[] = "/tmp/mythpostXXXXXX";
-    if (mkstemp(ctempfilenamerecv) == -1) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Creating temp file for receiving -- " + ENO);
-        return false;
-    }
-    QString tmpfilenamereceive = QString(ctempfilenamerecv);
-
-    QFile postfile(tmpfilenamesend);
+    QFile postfile(tmpPostFile);
     if (!postfile.open(IO_WriteOnly))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating tmpfilesend -- " + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Opening '%1'")
+                .arg(tmpPostFile) + ENO);
         return false;
     }
 
@@ -675,20 +675,16 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     postfile.close();
 
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
-                              "--post-file='%3' "
-                              " %4 --output-document='%5'")
-        .arg(GetUserID())
-        .arg(GetPassword())
-        .arg(tmpfilenamesend)
-        .arg(ddurl)
-        .arg(tmpfilenamereceive);
+                              "--post-file='%3' %4 --output-document='%5'")
+        .arg(GetUserID()).arg(GetPassword()).arg(tmpPostFile)
+        .arg(ddurl).arg(tmpResultFile);
 
     myth_system(command.ascii());
 
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
 
-    QFile file(tmpfilenamereceive);
+    QFile file(tmpResultFile);
 
     bool GotNextSuggestedTime = false;
     bool GotBlockedTime = false;
@@ -729,8 +725,6 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         }
         file.close();
     }
-    unlink(tmpfilenamesend.ascii());
-    unlink(tmpfilenamereceive.ascii());
 
     if (GotNextSuggestedTime)
     {
@@ -786,11 +780,12 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
 bool DataDirectProcessor::GrabData(QDateTime pstartDate, QDateTime pendDate)
 {
-    QString err = "", tmpfile = "";
+    QString err = "";
     QString ddurl = providers[listings_provider].webServiceURL;
 
-    FILE *fp = DDPost(ddurl, inputfilename, GetUserID(), GetPassword(),
-                      pstartDate, pendDate, err, tmpfile);
+    FILE *fp = DDPost(ddurl, tmpPostFile, inputfilename,
+                      GetUserID(), GetPassword(),
+                      pstartDate, pendDate, err);
     if (!fp)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get data " +
@@ -813,12 +808,6 @@ bool DataDirectProcessor::GrabData(QDateTime pstartDate, QDateTime pendDate)
         VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
         pclose(fp);
         fp = NULL;
-    }
-
-    if (!tmpfile.isEmpty())
-    {
-        QFile tmp(tmpfile);
-        tmp.remove();
     }
 
     return fp;
@@ -945,10 +934,10 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(void)
     QString labsURL   = providers[listings_provider].webURL;
     QString loginPage = providers[listings_provider].loginPage;
 
-    bool ok = Post(labsURL + loginPage, list, tmpFile, "", cookieFile);
+    bool ok = Post(labsURL + loginPage, list, tmpResultFile, "", cookieFile);
 
     bool got_cookie = QFileInfo(cookieFile).size() > 100;
-    return ok && got_cookie && ParseLineups(tmpFile);
+    return ok && got_cookie && ParseLineups(tmpResultFile);
 }
 
 bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
@@ -964,9 +953,10 @@ bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
     list.push_back(PostItem("submit",    "Modify"));
 
     QString labsURL = providers[listings_provider].webURL;
-    bool ok = Post(labsURL + (*it).get_action, list, tmpFile, cookieFile, "");
+    bool ok = Post(labsURL + (*it).get_action, list, tmpResultFile,
+                   cookieFile, "");
 
-    return ok && ParseLineup(lineupid, tmpFile);
+    return ok && ParseLineup(lineupid, tmpResultFile);
 }
 
 void DataDirectProcessor::SetAll(const QString &lineupid, bool val)

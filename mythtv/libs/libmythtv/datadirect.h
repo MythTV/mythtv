@@ -318,10 +318,11 @@ class DataDirectProcessor
     static bool Post(QString url, const PostList &list, QString documentFile,
                      QString inCookieFile, QString outCookieFile);
 
-    static FILE *DDPost(QString    url,          QString    inputFilename,
+    static FILE *DDPost(QString    url,
+                        QString    postFilename, QString    inputFilename,
                         QString    userid,       QString    password,
                         QDateTime  pstartDate,   QDateTime  pendDate,
-                        QString   &err_txt,      QString   &tmpfilename);
+                        QString   &err_txt);
 
 
   private:
@@ -341,7 +342,8 @@ class DataDirectProcessor
     DDLineupMap   lineupmaps;
 
     RawLineupMap  rawlineups;
-    QString       tmpFile;
+    QString       tmpPostFile;
+    QString       tmpResultFile;
     QString       cookieFile;
 };
 
