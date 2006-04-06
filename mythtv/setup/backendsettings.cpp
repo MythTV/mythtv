@@ -252,6 +252,17 @@ static GlobalCheckBox *EITIgnoresSource()
     return gc;
 };
 
+static GlobalSpinBox *EITCrawIdleStart()
+{
+    GlobalSpinBox *gc = new GlobalSpinBox("EITCrawIdleStart", 30, 7200, 30);
+    gc->setLabel(QObject::tr("Backend Idle Before EIT Craw (seconds)"));
+    gc->setValue(60);
+    QString help = QObject::tr(
+        "The minimum number of seconds after a recorder becomes idle "
+        "to wait before MythTV begins collecting EIT listings data.");
+    gc->setHelpText(help);
+    return gc;
+}
 
 static GlobalSpinBox *WOLbackendReconnectWaitTime()
 {
@@ -670,6 +681,7 @@ BackendSettings::BackendSettings() {
     group2a1->setLabel(QObject::tr("EIT Scanner Options"));                
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITIgnoresSource());
+    group2a1->addChild(EITCrawIdleStart());
     addChild(group2a1);
 
     VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);

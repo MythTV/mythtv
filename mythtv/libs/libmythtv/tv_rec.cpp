@@ -78,9 +78,6 @@ using namespace std;
 #define LOC QString("TVRec(%1): ").arg(cardid)
 #define LOC_ERR QString("TVRec(%1) Error: ").arg(cardid)
 
-/// How many seconds after entering kState_None should we start EIT Scanner
-const uint TVRec::kEITScanStartTimeout = 60; /* 1 minute */
-
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
@@ -773,7 +770,8 @@ void TVRec::HandleStateChange(void)
     {
         // Add some randomness to avoid all cards starting
         // EIT scanning at nearly the same time.
-        uint timeout = kEITScanStartTimeout + random() % 59;
+        uint idle_start = gContext->GetNumSetting("EITCrawIdleStart", 60);
+        uint timeout = idle_start + (random() % 59);
         eitScanStartTime = eitScanStartTime.addSecs(timeout);
     }
     else
@@ -1212,7 +1210,8 @@ void TVRec::RunTV(void)
 
     // Add some randomness to avoid all cards starting
     // EIT scanning at nearly the same time.
-    uint timeout = kEITScanStartTimeout + random() % 59;
+    uint idle_start = gContext->GetNumSetting("EITCrawIdleStart", 60);
+    uint timeout = idle_start + (random() % 59);
     eitScanStartTime = QDateTime::currentDateTime().addSecs(timeout);
 
     while (HasFlags(kFlagRunMainLoop))

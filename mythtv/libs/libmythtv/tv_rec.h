@@ -408,7 +408,6 @@ class TVRec : public QObject
     int retune_requests;
 
   public:
-    static const uint kEITScanStartTimeout;
     static const uint kSignalMonitoringRate;
 
     // General State flags
