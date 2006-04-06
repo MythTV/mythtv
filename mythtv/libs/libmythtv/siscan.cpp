@@ -387,7 +387,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
     }    
 }
 
-/** \fn SIScan::HandlePostInsertion()
+/** \fn SIScan::HandlePostInsertion(void)
  *  \brief Insert channels based on any partial tables we do have.
  *  \return true if we insterted any channels.
  */
@@ -936,16 +936,19 @@ void SIScan::UpdatePMTinDB(int db_mplexid,
     }
         
     QString callsign = ChannelUtil::GetCallsign(chanid);
-    if (callsign == QString::null || callsign == "")
-        callsign = tr("C%1", "Synthesized callsign").arg(chan_num);
-
     QString service_name = ChannelUtil::GetServiceName(chanid);
-    if (service_name == QString::null || service_name == "")
-        service_name = callsign;
 
-    QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
+    if (callsign.isEmpty())
+    {
+        callsign = QObject::tr("UNKNOWN%1", "Synthesized callsign")
+            .arg(chan_num);
+    }
+    else if (service_name.isEmpty())
+        service_name = callsign; // only do this for real callsigns
+
+    QString common_status_info = tr("%1%2%3 on %4 (%5)")
         .arg(service_name)
-        .arg(0).arg(0)
+        .arg(service_name.isEmpty() ? "" : " as ")
         .arg(chan_num)
         .arg((*current).FriendlyName).arg(freqid);
 

@@ -275,10 +275,15 @@ class TV : public QObject
     void StartChannelEditMode(void);
     void ChannelEditKey(const QKeyEvent*);
     void ChannelEditAutoFill(InfoMap&) const;
-    QString GetDataDirect(QString key, QString value, QString field) const;
+    void ChannelEditAutoFill(InfoMap&, const QMap<QString,bool>&) const;
+    void ChannelEditXDSFill(InfoMap&) const;
+    void ChannelEditDDFill(InfoMap&, const QMap<QString,bool>&, bool) const;
+    QString GetDataDirect(QString key,   QString value,
+                          QString field, bool    allow_partial = false) const;
     bool LoadDDMap(uint sourceid);
     void RunLoadDDMap(uint sourceid);
     static void *load_dd_map_thunk(void*);
+    static void *load_dd_map_post_thunk(void*);
 
     void DoQueueTranscode(void);  
 

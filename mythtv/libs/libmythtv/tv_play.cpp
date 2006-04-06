@@ -531,6 +531,14 @@ TV::~TV(void)
     {
         pthread_join(ddMapLoader, NULL);
         ddMapLoaderRunning = false;
+
+        if (ddMapSourceId)
+        {            
+            int *src = new int;
+            *src = ddMapSourceId;
+            pthread_create(&ddMapLoader, NULL, load_dd_map_post_thunk, src);
+            pthread_detach(ddMapLoader);
+        }
     }
 }
 
@@ -5750,6 +5758,14 @@ void *TV::load_dd_map_thunk(void *param)
     return NULL;
 }
 
+void *TV::load_dd_map_post_thunk(void *param)
+{
+    uint *sourceid = (uint*) param;
+    SourceUtil::UpdateChannelsFromListings(*sourceid);
+    delete sourceid;
+    return NULL;
+}
+
 /** \fn TV::StartChannelEditMode(void)
  *  \brief Starts channel editing mode.
  */
@@ -5767,6 +5783,7 @@ void TV::StartChannelEditMode(void)
     QMutexLocker locker(&chanEditMapLock);
 
     // Get the info available from the backend
+    chanEditMap.clear();
     activerecorder->GetChannelInfo(chanEditMap);
     chanEditMap["dialog_label"]   = tr("Channel Editor");
     chanEditMap["callsign_label"] = tr("Callsign");
@@ -5837,36 +5854,73 @@ void TV::ChannelEditKey(const QKeyEvent *e)
     }
 }
 
-/** \fn TV::ChannelEditAutoFill(InfoMap &infoMap) const
+/** \fn TV::ChannelEditAutoFill(InfoMap&) const
  *  \brief Automatically fills in as much information as possible.
  */
 void TV::ChannelEditAutoFill(InfoMap &infoMap) const
 {
+    QMap<QString,bool> dummy;
+    ChannelEditAutoFill(infoMap, dummy);
+}
+
+/** \fn TV::ChannelEditAutoFill(InfoMap&,const QMap<QString,bool>&) const
+ *  \brief Automatically fills in as much information as possible.
+ */
+void TV::ChannelEditAutoFill(InfoMap &infoMap,
+                             const QMap<QString,bool> &changed) const
+{
     const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
 
-    QMutexLocker locker(&chanEditMapLock);
-    QMap<QString,bool> changed;
-    
-    // check if anything changed
-    for (uint i = 0; i < 4; i++)
-        changed[keys[i]] = infoMap[keys[i]] != chanEditMap[keys[i]];
+    // fill in uninitialized and unchanged fields from XDS
+    ChannelEditXDSFill(infoMap);
 
-    // clean up case and extra spaces
-    infoMap["callsign"] = infoMap["callsign"].upper().stripWhiteSpace();
-    infoMap["channum"]  = infoMap["channum"].stripWhiteSpace();
-    infoMap["channame"] = infoMap["channame"].stripWhiteSpace();
-    infoMap["XMLTV"]    = infoMap["XMLTV"].stripWhiteSpace();
+    // if no data direct info we're done..
+    if (!ddMapSourceId)
+        return;
 
-    // make sure changes weren't just chaff
-    for (uint i = 0; i < 4; i++)
-        changed[keys[i]] &= infoMap[keys[i]] != chanEditMap[keys[i]];
+    if (changed.size())
+    {
+        ChannelEditDDFill(infoMap, changed, false);
+    }
+    else
+    {
+        QMutexLocker locker(&chanEditMapLock);
+        QMap<QString,bool> chg;
+        // check if anything changed
+        for (uint i = 0; i < 4; i++)
+            chg[keys[i]] = infoMap[keys[i]] != chanEditMap[keys[i]];
 
-#if 0 /* XDS decoding is not reliable enough.. */
-    // fill in unchanged fields from XDS
+        // clean up case and extra spaces
+        infoMap["callsign"] = infoMap["callsign"].upper().stripWhiteSpace();
+        infoMap["channum"]  = infoMap["channum"].stripWhiteSpace();
+        infoMap["channame"] = infoMap["channame"].stripWhiteSpace();
+        infoMap["XMLTV"]    = infoMap["XMLTV"].stripWhiteSpace();
+
+        // make sure changes weren't just chaff
+        for (uint i = 0; i < 4; i++)
+            chg[keys[i]] &= infoMap[keys[i]] != chanEditMap[keys[i]];
+
+        ChannelEditDDFill(infoMap, chg, true);
+    }
+}
+
+void TV::ChannelEditXDSFill(InfoMap &infoMap) const
+{
+    QMap<QString,bool> modifiable;
+    if (!(modifiable["callsign"] = infoMap["callsign"].isEmpty()))
+    {
+        QString unsetsign = QObject::tr("UNKNOWN%1", "Synthesized callsign");
+        uint    unsetcmpl = unsetsign.length() - 2;
+        unsetsign = unsetsign.left(unsetcmpl);
+        if (infoMap["callsign"].left(unsetcmpl) == unsetcmpl)
+            modifiable["callsign"] = true;
+    }
+    modifiable["channame"] = infoMap["channame"].isEmpty();
+
     const QString xds_keys[2] = { "callsign", "channame", };
     for (uint i = 0; i < 2; i++)
     {
-        if (changed[xds_keys[i]])
+        if (!modifiable[xds_keys[i]])
             continue;
 
         QString tmp = activenvp->GetXDS(xds_keys[i]).upper();
@@ -5878,19 +5932,26 @@ void TV::ChannelEditAutoFill(InfoMap &infoMap) const
         {
             continue;
         }
-            
+
         infoMap[xds_keys[i]] = tmp;
     }
-#endif
+}
 
-    // if not data direct info we're done..
+void TV::ChannelEditDDFill(InfoMap &infoMap,
+                           const QMap<QString,bool> &changed,
+                           bool check_unchanged) const
+{
     if (!ddMapSourceId)
         return;
 
-    // First check changed keys, then check unchanged keys for
-    // availability in our listings source
+    QMutexLocker locker(&chanEditMapLock);
+    const QString keys[4] = { "XMLTV", "callsign", "channame", "channum", };
+
+    // First check changed keys for availability in our listings source.
+    // Then, if check_unchanged is set, check unchanged fields.
     QString key = "", dd_xmltv = "";
-    for (uint j = 0; (j < 2) && dd_xmltv.isEmpty(); j++)
+    uint endj = (check_unchanged) ? 2 : 1;
+    for (uint j = 0; (j < endj) && dd_xmltv.isEmpty(); j++)
     {
         for (uint i = 0; (i < 4) && dd_xmltv.isEmpty(); i++)
         {
@@ -5910,10 +5971,34 @@ void TV::ChannelEditAutoFill(InfoMap &infoMap) const
             if (!tmp.isEmpty())
                 infoMap[keys[i]] = tmp;
         }
+        return;
+    }
+
+    // If we failed to find an exact match, try partial matches.
+    // But only fill the current field since this data is dodgy.
+    key = "callsign";
+    if (!infoMap[key].isEmpty())
+    {
+        dd_xmltv = GetDataDirect(key, infoMap[key], "XMLTV", true);
+        VERBOSE(VB_IMPORTANT, QString("xmltv: %1 for key %2")
+                .arg(dd_xmltv).arg(key));
+        if (!dd_xmltv.isEmpty())
+            infoMap[key] = GetDataDirect("XMLTV", dd_xmltv, key);
+    }
+
+    key = "channame";
+    if (!infoMap[key].isEmpty())
+    {
+        dd_xmltv = GetDataDirect(key, infoMap[key], "XMLTV", true);
+        VERBOSE(VB_IMPORTANT, QString("xmltv: %1 for key %2")
+                .arg(dd_xmltv).arg(key));
+        if (!dd_xmltv.isEmpty())
+            infoMap[key] = GetDataDirect("XMLTV", dd_xmltv, key);
     }
 }
 
-QString TV::GetDataDirect(QString key, QString value, QString field) const
+QString TV::GetDataDirect(QString key, QString value, QString field,
+                          bool allow_partial_match) const
 {
     QMutexLocker locker(&chanEditMapLock);
 
@@ -5929,14 +6014,42 @@ QString TV::GetDataDirect(QString key, QString value, QString field) const
         return QString::null;
 
     DDValueMap::const_iterator it_val = (*it_key).find(value);
-    if (it_val == (*it_key).end())
+    if (it_val != (*it_key).end())
+    {
+        InfoMap::const_iterator it_field = (*it_val).find(field);
+        if (it_field != (*it_val).end())
+            return QDeepCopy<QString>(*it_field);
+    }
+
+    if (!allow_partial_match || value.isEmpty())
         return QString::null;
 
-    InfoMap::const_iterator it_field = (*it_val).find(field);
-    if (it_field == (*it_val).end())
-        return QString::null;
+    // Check for partial matches.. prefer early match, then short string
+    DDValueMap::const_iterator best_match = (*it_key).end();
+    int best_match_idx = INT_MAX, best_match_len = INT_MAX;
+    for (it_val = (*it_key).begin(); it_val != (*it_key).end(); ++it_val)
+    {
+        int match_idx = it_val.key().find(value);
+        if (match_idx < 0)
+            continue;
 
-    return QDeepCopy<QString>(*it_field);
+        int match_len = it_val.key().length();
+        if ((match_idx < best_match_idx) && (match_len < best_match_len))
+        {
+            best_match     = it_val;
+            best_match_idx = match_idx;
+            best_match_len = match_len;
+        }
+    }
+
+    if (best_match != (*it_key).end())
+    {
+        InfoMap::const_iterator it_field = (*best_match).find(field);
+        if (it_field != (*it_val).end())
+            return QDeepCopy<QString>(*it_field);
+    }
+
+    return QString::null;
 }
 
 void TV::RunLoadDDMap(uint sourceid)
@@ -5949,7 +6062,7 @@ void TV::RunLoadDDMap(uint sourceid)
     {
         InfoMap tmp;
         insert_map(tmp, chanEditMap);
-        for (uint i = 1; i < 4; i++)
+        for (uint i = 0; i < 4; i++)
             tmp[keys[i]] = "Loading...";
         GetOSD()->SetText(dialogname = "channel_editor", tmp, -1);
     }
