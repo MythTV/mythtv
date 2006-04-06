@@ -90,19 +90,31 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
     return true;
 }
 
+bool SourceUtil::IsAnalog(uint sourceid)
+{
+    bool analog = false;
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "SELECT cardtype "
+        "FROM capturecard, cardinput "
+        "WHERE capturecard.cardid = cardinput.cardid AND "
+        "      cardinput.sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (query.exec() && query.next())
+    {
+        analog = true;
+        do analog &= ((query.value(0).toString().upper() != "DVB") &&
+                      (query.value(0).toString().upper() != "HDTV"));
+        while (query.next());
+    }
+
+    return analog;
+}
+
 bool SourceUtil::UpdateChannelsFromListings(uint sourceid)
 {
-/*
-    QString grabber, userid, passwd, lineupid;
-    if (!GetListingsLoginData(sourceid, grabber, userid, passwd, lineupid))
-        return false;
-
-    if (grabber != "datadirect")
-*/
-    {
-        myth_system(QString("mythfilldatabase --refresh-today --max-days 1 "
-                            "--sourceid %1").arg(sourceid));
-        return true;
-    }
-    // TODO implement channel only import w/data direct
+    myth_system(QString("mythfilldatabase --only-update-channels "
+                        "--sourceid %1").arg(sourceid));
+    return true;
 }

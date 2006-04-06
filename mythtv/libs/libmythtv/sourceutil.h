@@ -14,6 +14,7 @@ class SourceUtil
     static bool    GetListingsLoginData(uint sourceid,
                                         QString &grabber, QString &userid,
                                         QString &passwd,  QString &lineupid);
+    static bool    IsAnalog(uint sourceid);
     static bool    UpdateChannelsFromListings(uint sourceid);
 };
 

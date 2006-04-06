@@ -253,7 +253,7 @@ class DataDirectProcessor
    ~DataDirectProcessor();
 
     // web service commands
-    bool GrabData(QDateTime pstartdate, QDateTime penddate);
+    bool GrabData(const QDateTime pstartdate, const QDateTime penddate);
     bool GrabNextSuggestedTime(void);
 
     // utility wrappers
@@ -269,6 +269,7 @@ class DataDirectProcessor
     bool GrabFullLineup(const QString &lineupid, bool restore = true);
     bool SaveLineup(const QString &lineupid,
                     const QMap<QString,bool> &xmltvids);
+    bool UpdateListings(uint sourceid);
 
     // gets
     DDStationList GetStations(void)       const { return stations;           }
@@ -302,6 +303,10 @@ class DataDirectProcessor
     // static commands (these update temp DB tables)
     static void UpdateStationViewTable(QString lineupid);
     static void UpdateProgramViewTable(uint sourceid);
+
+    // static commands (these update regular DB tables from temp DB tables)
+    static bool UpdateChannelsSafe(uint sourceid, bool insert_channels);
+    static bool UpdateChannelsUnsafe(uint sourceid);
 
   private:
     void CreateTempTables(void);
