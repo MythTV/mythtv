@@ -80,9 +80,6 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     gContext->GetScreenSettings(xbase, screenwidth, wmult, 
                                 ybase, screenheight, hmult);
 
-    m_w = min(1024, 1 << (int)ceil(log((float)screenwidth)/log((float)2)));
-    m_h = min(1024, 1 << (int)ceil(log((float)screenheight)/log((float)2)));
-
     // --------------------------------------------------------------------
 
     // remove all dirs from m_itemList;
@@ -187,6 +184,28 @@ GLSingleView::~GLSingleView()
     }
 }
 
+int GLSingleView::NearestGLTextureSize(int v)
+{
+    int n = 0, last = 0;
+    int s;
+
+    for (s = 0; s < 32; ++s)
+    {
+        if (((v >> s) & 1) == 1)
+        {
+            ++n;
+            last = s;
+        }
+    }
+
+    if (n > 1)
+        s = 1 << (last + 1);
+    else
+        s = 1 << last;
+
+    return min(s, m_maxTexDim);
+}
+
 void GLSingleView::cleanUp(void)
 {
     if (class LCD* lcd = LCD::Get())
@@ -219,6 +238,13 @@ void GLSingleView::initializeGL(void)
 
     // Enable perspective vision
     glClearDepth(1.0f);
+
+    GLint param;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &param);
+    m_maxTexDim = param;
+
+    m_w = NearestGLTextureSize(screenwidth);
+    m_h = NearestGLTextureSize(screenheight);
 
     loadImage();
 }

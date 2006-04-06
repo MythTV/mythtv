@@ -63,6 +63,12 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     //glTranslatef(0.2, 0.2, 0.0);
+
+    GLint param;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &param);
+    m_maxTexDim = param;
+    if (m_maxTexDim == 0)
+        m_maxTexDim = 512;
 }
 
 void MythOpenGLPainter::End(void)
@@ -82,8 +88,9 @@ void MythOpenGLPainter::End(void)
 int MythOpenGLPainter::NearestGLTextureSize(int v)
 {
     int n = 0, last = 0;
+    int s;
 
-    for (int s = 0; s < 32; ++s) 
+    for (s = 0; s < 32; ++s) 
     {
         if (((v >> s) & 1) == 1) 
         {
@@ -93,9 +100,11 @@ int MythOpenGLPainter::NearestGLTextureSize(int v)
     }
 
     if (n > 1)
-        return 1 << (last + 1);
+        s = 1 << (last + 1);
+    else
+        s = 1 << last;
 
-    return 1 << last;
+    return min(s, m_maxTexDim);
 }
 
 void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)

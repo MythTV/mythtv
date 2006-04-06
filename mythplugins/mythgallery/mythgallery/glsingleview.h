@@ -102,6 +102,7 @@ private:
 
     GLuint        m_texInfo;
     bool          m_showInfo;
+    int           m_maxTexDim;
     
     int           m_i;
     int           m_dir;
@@ -114,7 +115,7 @@ private:
     SequenceBase               *m_sequence;
 
 private:
-    
+    int   NearestGLTextureSize(int); 
     void  advanceFrame();
     void  retreatFrame();
     void  loadImage();
