@@ -520,7 +520,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     tmpResultFile(""),          cookieFile("")
 {
     DataDirectURLs urls0(
-        "Tribune Media Zip2It",
+        "Tribune Media Zap2It",
         "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
         "http://labs.zap2it.com",
         "/ztvws/ztvws_login/1,1059,TMS01-1,00.html");
