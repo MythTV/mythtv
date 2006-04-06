@@ -163,12 +163,13 @@ void DVBRecorder::SetOption(const QString &name, int value)
         DTVRecorder::SetOption(name, value);
 }
 
-void DVBRecorder::SetOptionsFromProfile(RecordingProfile*, 
+void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile, 
                                         const QString &videodev,
                                         const QString&, const QString&)
 {
     SetOption("cardnum", videodev.toInt());
     DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    SetStrOption(profile,  "recordingtype");
 }
 
 void DVBRecorder::SetPMT(uint pid, const ProgramMapTable *_pmt)
@@ -584,10 +585,22 @@ void DVBRecorder::CreatePMT(void)
         desc_list_t desc = MPEGDescriptor::ParseAndExclude(
             _input_pmt->StreamInfo(i), _input_pmt->StreamInfoLength(i),
             DescriptorID::conditional_access);
+        uint type = StreamID::Normalize(_input_pmt->StreamType(i), desc);
+
+        // Filter out streams not used for basic television
+        if (_recording_type == "tv" &&
+            !StreamID::IsAudio(type) &&
+            !StreamID::IsVideo(type) &&
+            !MPEGDescriptor::Find(desc, DescriptorID::teletext) &&
+            !MPEGDescriptor::Find(desc, DescriptorID::subtitling))
+        {
+            continue;
+        }
+
         pdesc.push_back(desc);
         uint pid = _input_pmt->StreamPID(i);
         pids.push_back(pid);
-        types.push_back(StreamID::Normalize(_input_pmt->StreamType(i), desc));
+        types.push_back(type);
         if (pid == _video_pid)
             addVideoPid = false;
     }

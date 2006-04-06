@@ -209,10 +209,14 @@ class RecorderBase : public QObject
     virtual void deleteLater(void);
 
   protected:
-    /** \brief Convenience function used to set integer options.
-     *  \sa SetOption(const QString&, const QString&)
+    /** \brief Convenience function used to set integer options from a profile.
+     *  \sa SetOption(const QString&, int)
      */
     void SetIntOption(RecordingProfile *profile, const QString &name);
+    /** \brief Convenience function used to set QString options from a profile.
+     *  \sa SetOption(const QString&, const QString&)
+     */
+    void SetStrOption(RecordingProfile *profile, const QString &name);
     virtual bool PauseAndWait(int timeout = 100);
 
     virtual void ResetForNewFile(void) = 0;

@@ -144,6 +144,16 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
                     "SetIntOption(...%1): Option not in profile.").arg(name));
 }
 
+void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
+{
+    const Setting *setting = profile->byName(name);
+    if (setting)
+        SetOption(name, setting->getValue());
+    else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                    "SetStrOption(...%1): Option not in profile.").arg(name));
+}
+
 /** \fn RecorderBase::WaitForPause(int)
  *  \brief WaitForPause blocks until StartRecording() is actually paused,
  *         or timeout milliseconds elapse.

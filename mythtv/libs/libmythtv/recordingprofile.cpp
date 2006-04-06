@@ -696,6 +696,29 @@ public:
     };
 };
 
+class RecordingType : public CodecParam, public ComboBoxSetting
+{
+  public:
+    RecordingType(const RecordingProfile& parent) :
+        CodecParam(parent, "recordingtype")
+    {
+        setLabel(QObject::tr("Recording Type"));
+
+        QString msg = QObject::tr(
+            "This option allows you to filter out unwanted streams. "
+            "'Normal' will record all relevant streams including "
+            "interactive television data. 'TV Only' will record only "
+            "audio, video and subtitle streams. ");
+        setHelpText(msg);
+
+        addSelection(tr("Normal"),     "all");
+        addSelection(tr("TV Only"),    "tv");
+        addSelection(tr("Audio Only"), "audio");
+        setValue(0);
+    };
+};
+
+
 class ImageSize: public VerticalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
@@ -874,6 +897,10 @@ void RecordingProfile::loadByID(int profileId)
             connect(tr_lossless, SIGNAL(valueChanged        (bool)),
                     this,        SLOT(  SetLosslessTranscode(bool)));
         }
+    }
+    else
+    {
+        addChild(new RecordingType(*this));
     }
 
     id->setValue(profileId);

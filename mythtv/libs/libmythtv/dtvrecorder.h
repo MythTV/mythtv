@@ -23,10 +23,7 @@ class DTVRecorder: public RecorderBase
     DTVRecorder(TVRec *rec, const char *name = "DTVRecorder");
     ~DTVRecorder();
 
-    void SetOption(const QString &opt, const QString &value)
-    {
-        RecorderBase::SetOption(opt, value);
-    }
+    virtual void SetOption(const QString &opt, const QString &value);
     virtual void SetOption(const QString &name, int value);
 
     virtual void StopRecording(void) { _request_recording = false; }
@@ -55,6 +52,8 @@ class DTVRecorder: public RecorderBase
 
     // file handle for stream
     int _stream_fd;
+
+    QString _recording_type;
 
     // used for scanning pes headers for keyframes
     uint      _header_pos;

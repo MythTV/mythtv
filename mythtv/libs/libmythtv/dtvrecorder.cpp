@@ -35,6 +35,7 @@ DTVRecorder::DTVRecorder(TVRec *rec, const char *name) :
     RecorderBase(rec, name),
     // file handle for stream
     _stream_fd(-1),
+    _recording_type("all"),
     // used for scanning pes headers for keyframes
     _header_pos(0),                 _first_keyframe(-1),
     _last_gop_seen(0),              _last_seq_seen(0),
@@ -56,6 +57,14 @@ DTVRecorder::DTVRecorder(TVRec *rec, const char *name) :
 
 DTVRecorder::~DTVRecorder()
 {
+}
+
+void DTVRecorder::SetOption(const QString &name, const QString &value)
+{
+    if (name == "recordingtype")
+        _recording_type = value;
+    else
+        RecorderBase::SetOption(name, value);
 }
 
 /** \fn DTVRecorder::SetOption(const QString&,int)

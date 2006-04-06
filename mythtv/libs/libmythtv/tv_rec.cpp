@@ -82,6 +82,7 @@ using namespace std;
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
 static bool is_dishnet_eit(int cardid);
+static QString load_profile(QString,void*,ProgramInfo*,RecordingProfile&);
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -1695,6 +1696,18 @@ bool TVRec::SetupDTVSignalMonitor(void)
     int progNum = channel->GetProgramNumber();
     if (progNum >= 0)
     {
+        uint neededVideo = 0;
+        uint neededAudio = 0;
+        ProgramInfo *rec = lastTuningRequest.program;
+        RecordingProfile profile;
+        load_profile(genOpt.cardtype, tvchain, rec, profile);
+        const Setting *setting = profile.byName("recordingtype");
+        if (setting)
+        {
+            neededVideo = (setting->getValue() == "tv") ? 1 : 0;
+            neededAudio = (setting->getValue() == "audio") ? 1 : 0;
+        }
+
         QString msg = QString("MPEG program number: %1").arg(progNum);
         VERBOSE(VB_RECORD, LOC + msg);
 
@@ -1712,7 +1725,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetStreamData(sd);
         ((MPEGStreamData*)sd)->Reset(progNum);
         sm->SetProgramNumber(progNum);
-        sd->SetVideoStreamsRequired(0);
+        sd->SetVideoStreamsRequired(neededVideo);
+        sd->SetVideoStreamsRequired(neededAudio);
         sm->SetFTAOnly(fta);
         sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
 
@@ -3830,6 +3844,28 @@ static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
     return jobs;
 }
 
+static QString load_profile(QString cardtype, void *tvchain,
+                            ProgramInfo *rec, RecordingProfile &profile)
+{
+    // Determine the correct recording profile.
+    // In LiveTV mode use "Live TV" profile, otherwise use the
+    // recording's specified profile. If the desired profile can't
+    // be found, fall back to the "Default" profile for card type.
+    QString profileName = (tvchain) ? QString("Live TV") :
+        rec->GetScheduledRecording()->getProfileName();
+
+    if (!profile.loadByType(profileName, cardtype))
+    {
+        profileName = "Default";
+        profile.loadByType(profileName, cardtype);
+    }
+
+    VERBOSE(VB_RECORD, QString("Using profile '%1' to record")
+            .arg(profileName));
+
+    return profileName;
+}
+
 /** \fn TVRec::TuningNewRecorder(void)
  *  \brief Creates a recorder instance.
  */
@@ -3849,20 +3885,8 @@ void TVRec::TuningNewRecorder(void)
 
     ProgramInfo *rec = lastTuningRequest.program;
 
-    // Load the correct recording profile.
-    // In LiveTV mode use "Live TV" profile, otherwise use the
-    // recording's specified profile. If the desired profile can't
-    // be found, fall back to the "Default" profile for card type.
-    QString profileName = (tvchain) ? QString("Live TV") :
-        rec->GetScheduledRecording()->getProfileName();
     RecordingProfile profile;
-    if (!profile.loadByType(profileName, genOpt.cardtype))
-    {
-        profileName = "Default";
-        profile.loadByType(profileName, genOpt.cardtype);
-    }
-    VERBOSE(VB_RECORD, LOC + QString("Using profile '%1' to record")
-            .arg(profileName));
+    QString profileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
 
     if (tvchain)
     {
