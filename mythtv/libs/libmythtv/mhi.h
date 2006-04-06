@@ -20,7 +20,7 @@
 
 // MythTV headers
 #include "../libavcodec/avcodec.h" // to decode single MPEG I-frames
-#include "../libfreemheg/freemheg.h"
+#include "../libmythfreemheg/freemheg.h"
 #include "interactivetv.h"
 #include "mhi.h"
 #include "dsmcc.h"

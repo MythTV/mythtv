@@ -3,12 +3,12 @@ INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat
-LIBS += -L../../libs/libfreemheg
+LIBS += -L../../libs/libmythfreemheg
 LIBS += -L../../libs/libmythui
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION 
-LIBS += -lfreemheg-$$LIBVERSION
+LIBS += -lmythfreemheg-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {

@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 INCLUDEPATH += ../libmythtv
 
 TEMPLATE = lib
-TARGET = freemheg-$$LIBVERSION
+TARGET = mythfreemheg-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
