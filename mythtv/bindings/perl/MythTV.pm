@@ -7,6 +7,33 @@
 # @author    $Author$
 #
 
+# Version
+    $VERSION = '.20 svn';
+
+# Load sub libraries
+    use MythTV::Recording;
+
+# Define some constants
+    use constant {
+                 # Constants for the recording types
+                  rectype_once       =>  1,
+                  rectype_daily      =>  2,
+                  rectype_channel    =>  3,
+                  rectype_always     =>  4,
+                  rectype_weekly     =>  5,
+                  rectype_findone    =>  6,
+                  rectype_override   =>  7,
+                  rectype_dontrec    =>  8,
+                  rectype_finddaily  =>  9,
+                  rectype_findweekly => 10,
+                 # And the search types
+                  searchtype_power   => 1,
+                  searchtype_title   => 2,
+                  searchtype_keyword => 3,
+                  searchtype_people  => 4,
+                  searchtype_manual  => 5,
+                 };
+
 package MythTV;
 
     use IO::Socket;
@@ -14,16 +41,41 @@ package MythTV;
     use DBI;
 
 # The character string used by the backend to separate records
-    our $BACKEND_SEP = '[]:[]';
+    our $BACKEND_SEP    = '[]:[]';
+    our $BACKEND_SEP_rx = qr/\[\]:\[\]/;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 # and should be the current MythTV protocol version.
-    our $PROTO_VERSION = 27;
+    our $PROTO_VERSION = 29;
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
 # ProgramInfo::ToSringList and ProgramInfo::FromStringList.
     our $NUMPROGRAMLINES = 41;
+
+# Reasons a recording wouldn't be happening (from libs/libmythtv/programinfo.h)
+    our %RecStatus_Types = (
+                            '-8' => 'TunerBusy',
+                            '-7' => 'LowDiskSpace',
+                            '-6' => 'Cancelled',
+                            '-5' => 'Deleted',
+                            '-4' => 'Aborted',
+                            '-3' => 'Recorded',
+                            '-2' => 'Recording',
+                            '-1' => 'WillRecord',
+                              0  => 'Unknown',
+                              1  => 'DontRecord',
+                              2  => 'PreviousRecording',
+                              3  => 'CurrentRecording',
+                              4  => 'EarlierShowing',
+                              5  => 'TooManyRecordings',
+                              6  => 'NotListed',
+                              7  => 'Conflict',
+                              8  => 'LaterShowing',
+                              9  => 'Repeat',
+                             10  => 'Inactive',
+                             11  => 'NeverRecord'
+                            );
 
 # Caches so we don't have to query too many hosts/ports
     our %setting_cache;
@@ -180,7 +232,6 @@ package MythTV;
         return $self->backend_command2($command, \$fp_cache{$host}{$port}, $host, $port);
     }
 
-
 # A second backend command, so we can allow certain routines to use their own file pointer
     sub backend_command2 {
         my $self    = shift;
@@ -252,7 +303,7 @@ package MythTV;
     # Query the version
         my $response = $self->backend_command('MYTH_PROTO_VERSION '.$PROTO_VERSION,
                                               $host, $port);
-        my ($code, $vers) = split($BACKEND_SEP, $response);
+        my ($code, $vers) = split($BACKEND_SEP_rx, $response);
     # Deal with the response
         if ($code eq 'ACCEPT') {
             return $proto_cache{$host}{$port} = 1;
@@ -271,7 +322,7 @@ package MythTV;
         my $offset  = (shift or 1);
         my $rows    = ();
     # Query the backend, and split the response into an array
-        my @recs = split($BACKEND_SEP, $self->backend_command($command));
+        my @recs = split($BACKEND_SEP_rx, $self->backend_command($command));
     # Parse the records, starting at the offset point
         my $row = 0;
         my $col = 0;
@@ -296,8 +347,6 @@ package MythTV;
         return %rows;
     }
 
-
+# Return true
 1;
-
-
 
