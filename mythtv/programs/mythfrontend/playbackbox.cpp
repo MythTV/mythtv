@@ -177,6 +177,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
     previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
     previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
+    previewFromBookmark= gContext->GetNumSetting("PreviewFromBookmark");
     drawTransPixmap    = gContext->LoadScalePixmap("trans-backup.png");
     if (!drawTransPixmap)
         drawTransPixmap = new QPixmap();
@@ -3679,7 +3680,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (check_date)
         previewLastModified = getPreviewLastModified(pginfo);
 
-    if (check_date &&
+    if (previewFromBookmark &&
+        check_date &&
         (!previewLastModified.isValid() ||
          (previewLastModified <  pginfo->lastmodified &&
           previewLastModified >= pginfo->recendts)) &&
@@ -3688,7 +3690,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         !IsGeneratingPreview(filename))
     {
         VERBOSE(VB_PLAYBACK, QString("Starting preview generator ") +
-                QString("(%1 || ((%2<%3)->%4 && (%5>=%6)->%7)) && ")
+                QString("%1 && (%2 || ((%3<%4)->%5 && (%6>=%7)->%8)) && ")
+                .arg(previewFromBookmark)
                 .arg(!previewLastModified.isValid())
                 .arg(previewLastModified.toString(Qt::ISODate))
                 .arg(pginfo->lastmodified.toString(Qt::ISODate))
