@@ -198,7 +198,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     {   // we are the new fork
         for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
             close(i);
-        int ret = execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
+        int ret = execl("/bin/sh", "sh", "-c", command.ascii(), (char *)NULL);
         QString msg("ChannelBase: ");
         if (EACCES == ret) {
             msg.append(QString("Access denied to /bin/sh"
