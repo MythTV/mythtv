@@ -224,10 +224,17 @@ MythMainWindow::MythMainWindow()
 
     d->AllowInput = false;
 
-    if (gContext->GetNumSetting("UseOpenGLPainter", 1))
+    QString painter = gContext->GetSetting("ThemePainter", "qt");
+    if (painter == "opengl")
+    {
+        VERBOSE(VB_GENERAL, "Using the OpenGL painter");
         d->painter = new MythOpenGLPainter();
+    }
     else
+    {
+        VERBOSE(VB_GENERAL, "Using the Qt painter");
         d->painter = new MythQtPainter();
+    }
 
     Init();
 

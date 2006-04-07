@@ -1812,6 +1812,16 @@ static HostComboBox *ThemeFontSizeType()
     return gc;
 }
 
+static HostComboBox *ThemePainter()
+{
+    HostComboBox *gc = new HostComboBox("ThemePainter");
+    gc->setLabel(QObject::tr("Paint Engine"));
+    gc->addSelection(QObject::tr("Qt"), "qt");
+    gc->addSelection(QObject::tr("OpenGL"), "opengl");
+    gc->setHelpText(QObject::tr("This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart."));
+    return gc;
+}
+
 ThemeSelector::ThemeSelector():
     HostImageSelect("Theme") {
 
@@ -3407,6 +3417,7 @@ AppearanceSettings::AppearanceSettings()
     theme->setLabel(QObject::tr("Theme"));
 
     theme->addChild(new ThemeSelector());
+    theme->addChild(ThemePainter());
     theme->addChild(new StyleSetting());
     theme->addChild(ThemeFontSizeType());
     theme->addChild(RandomTheme());
