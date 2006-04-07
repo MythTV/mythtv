@@ -159,10 +159,10 @@ QString PlayGroup::GetInitialName(const ProgramInfo *pi)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name FROM playgroup "
-                  "WHERE :TITLE = name OR "
-                  "      :CATEGORY = name OR "
+                  "WHERE name = :TITLE OR "
+                  "      name = :CATEGORY OR "
                   "      (titlematch <> '' AND "
-                  "        :TITLE REGEXP titlematch) ");
+                  "       titlematch REGEXP :TITLE) ");
     query.bindValue(":TITLE", pi->title);
     query.bindValue(":CATEGORY", pi->category);
     query.exec();
