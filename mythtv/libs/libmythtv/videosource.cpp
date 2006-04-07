@@ -226,12 +226,12 @@ void DataDirect_config::load()
     }
 }
 
-DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source)
-  : parent(_parent) 
+DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source) :
+    ConfigurationGroup(false, false, false, false),
+    VerticalConfigurationGroup(false, false, false, false),
+    parent(_parent) 
 {
     source = _source;
-    setUseLabel(false);
-    setUseFrame(false);
 
     HorizontalConfigurationGroup *lp =
         new HorizontalConfigurationGroup(false, false, true, true);
@@ -255,12 +255,11 @@ void DataDirect_config::fillDataDirectLineupSelector(void)
 }
 
 XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent, 
-                                           QString _grabber)
-                    : parent(_parent), grabber(_grabber) 
+                                           QString _grabber) :
+    ConfigurationGroup(false, false, false, false),
+    VerticalConfigurationGroup(false, false, false, false),
+    parent(_parent), grabber(_grabber) 
 {
-    setUseLabel(false);
-    setUseFrame(false);
-
     TransLabelSetting *label = new TransLabelSetting();
     label->setLabel(grabber);
     label->setValue(
@@ -330,8 +329,9 @@ void XMLTV_generic_config::save()
     pdlg.Close();
 }
 
-EITOnly_config::EITOnly_config(const VideoSource& _parent)
-    : VerticalConfigurationGroup(false, false, true, true)
+EITOnly_config::EITOnly_config(const VideoSource& _parent) :
+    ConfigurationGroup(false, false, true, true),
+    VerticalConfigurationGroup(false, false, true, true)
 {
     useeit = new UseEIT(_parent);
     useeit->setValue(true);
@@ -359,11 +359,10 @@ void EITOnly_config::save()
     useeit->save();
 }
 
-NoGrabber_config::NoGrabber_config(const VideoSource& _parent)
+NoGrabber_config::NoGrabber_config(const VideoSource& _parent) :
+    ConfigurationGroup(false, false, false, false),
+    VerticalConfigurationGroup(false, false, false, false)
 {
-    setUseLabel(false);
-    setUseFrame(false);
-
     useeit = new UseEIT(_parent);
     useeit->setValue(false);
     useeit->setVisible(false);
@@ -376,10 +375,10 @@ void NoGrabber_config::save()
     useeit->save();
 }
 
-XMLTVConfig::XMLTVConfig(const VideoSource& parent) 
+XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false)
 {
-    setUseLabel(false);
-
     XMLTVGrabber* grabber = new XMLTVGrabber(parent);
     addChild(grabber);
     setTrigger(grabber);
@@ -862,9 +861,11 @@ class FirewireInput: public ComboBoxSetting, public CCSetting
 class FirewireConfigurationGroup: public VerticalConfigurationGroup
 {
   public:
-    FirewireConfigurationGroup(CaptureCard& a_parent):
-        parent(a_parent) {
-        setUseLabel(false);
+    FirewireConfigurationGroup(CaptureCard& a_parent) :
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
+        parent(a_parent)
+    {
         HorizontalConfigurationGroup *hg0 =
             new HorizontalConfigurationGroup(false, false, true, true);
         hg0->addChild(new FirewireModel(parent));
@@ -912,16 +913,18 @@ class DBOX2Host: public LineEditSetting, public CCSetting {
 };
 
 class DBOX2ConfigurationGroup: public VerticalConfigurationGroup {
-public:
-   DBOX2ConfigurationGroup(CaptureCard& a_parent):
-       parent(a_parent) {
-       setUseLabel(false);
-       addChild(new DBOX2Port(parent));
-       addChild(new DBOX2HttpPort(parent));
-       addChild(new DBOX2Host(parent));
-   };
+  public:
+    DBOX2ConfigurationGroup(CaptureCard& a_parent):
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
+        parent(a_parent)
+    {
+        addChild(new DBOX2Port(parent));
+        addChild(new DBOX2HttpPort(parent));
+        addChild(new DBOX2Host(parent));
+    };
   private:
-     CaptureCard& parent;
+    CaptureCard &parent;
  };
 
 
@@ -931,9 +934,10 @@ class V4LConfigurationGroup: public VerticalConfigurationGroup
 {
   public:
     V4LConfigurationGroup(CaptureCard& a_parent):
-        parent(a_parent) {
-        setUseLabel(false);
-
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
+        parent(a_parent)
+    {
         VideoDevice* device;
         TunerCardInput* input;
 
@@ -961,10 +965,10 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
 {
   public:
     MPEGConfigurationGroup(CaptureCard& a_parent):
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
         parent(a_parent)
     {
-        setUseLabel(false);
-
         VideoDevice* device;
         TunerCardInput* input;
 
@@ -982,10 +986,10 @@ class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
 {
   public:
     pcHDTVConfigurationGroup(CaptureCard& a_parent): 
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
         parent(a_parent)
     {
-        setUseLabel(false);
-
         VideoDevice *atsc_device = new VideoDevice(parent, 0, 64);
         TunerCardInput *atsc_input = new TunerCardInput(parent);
         SignalTimeout *signal_timeout = new SignalTimeout(parent, 500);
@@ -1002,7 +1006,9 @@ class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard& parent;
 };
 
-CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
+CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
+    ConfigurationGroup(true, true, false, false),
+    VerticalConfigurationGroup(true, true, false, false)
 {
     setLabel(QObject::tr("Capture Card Setup"));
 
@@ -2135,11 +2141,11 @@ void TunerCardInput::diseqcType(const QString &diseqcType)
     }
 }
 
-DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
-    : parent(a_parent)
+DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent)
 {
-    setUseLabel(false);
-
     DVBCardNum* cardnum = new DVBCardNum(parent);
     cardname = new DVBCardName();
     cardtype = new DVBCardType();

@@ -177,7 +177,8 @@ class DeinterlaceSettings: public HorizontalConfigurationGroup,
                            public TriggeredConfigurationGroup {
 public:
     DeinterlaceSettings():
-        HorizontalConfigurationGroup(false, false),
+        ConfigurationGroup(false, false, false, false),
+        HorizontalConfigurationGroup(false, false, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Deinterlace settings"));
         setUseLabel(false);
@@ -1635,7 +1636,8 @@ class VideoModeSettings: public VerticalConfigurationGroup,
                          public TriggeredConfigurationGroup {
   public:
     VideoModeSettings():
-        VerticalConfigurationGroup(false),
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video Mode Settings"));
         setUseLabel(false);
@@ -2250,7 +2252,8 @@ class AudioSettings: public VerticalConfigurationGroup,
                      public TriggeredConfigurationGroup {
 public:
      AudioSettings():
-         VerticalConfigurationGroup(false),
+         ConfigurationGroup(false, true, false, false),
+         VerticalConfigurationGroup(false, true, false, false),
          TriggeredConfigurationGroup(false) {
          setLabel(QObject::tr("Audio"));
          setUseLabel(false);
@@ -2493,7 +2496,8 @@ class HwDecSettings: public  VerticalConfigurationGroup,
                      public TriggeredConfigurationGroup {
 public:
      HwDecSettings():
-         VerticalConfigurationGroup(false),
+         ConfigurationGroup(false, true, false, false),
+         VerticalConfigurationGroup(false, true, false, false),
          TriggeredConfigurationGroup(false) {
          setLabel(QObject::tr("Hardware Decoding Settings"));
          setUseLabel(false);
@@ -2690,7 +2694,8 @@ class MythLogSettings: public VerticalConfigurationGroup,
                        public TriggeredConfigurationGroup {
 public:
     MythLogSettings():
-         VerticalConfigurationGroup(false),
+         ConfigurationGroup(false, true, false, false),
+         VerticalConfigurationGroup(false, true, false, false),
          TriggeredConfigurationGroup(false) {
          setLabel(QObject::tr("Myth Database Logging"));
 //         setUseLabel(false);
@@ -2717,7 +2722,8 @@ class MythFillSettings: public VerticalConfigurationGroup,
                         public TriggeredConfigurationGroup {
 public:
      MythFillSettings():
-         VerticalConfigurationGroup(false),
+         ConfigurationGroup(false, true, false, false),
+         VerticalConfigurationGroup(false, true, false, false),
          TriggeredConfigurationGroup(false) {
          setLabel(QObject::tr("Mythfilldatabase"));
          setUseLabel(false);
@@ -2873,7 +2879,8 @@ class LcdSettings: public  VerticalConfigurationGroup,
                    public TriggeredConfigurationGroup {
 public:
      LcdSettings():
-         VerticalConfigurationGroup(false),
+         ConfigurationGroup(false, true, false, false),
+         VerticalConfigurationGroup(false, true, false, false),
          TriggeredConfigurationGroup(false) {
          setLabel(QObject::tr("LCD device display"));
          setUseLabel(false);
@@ -3000,7 +3007,8 @@ class MacMainSettings: public HorizontalConfigurationGroup,
                        public TriggeredConfigurationGroup {
 public:
     MacMainSettings():
-        HorizontalConfigurationGroup(false, false),
+        ConfigurationGroup(false, false, false, false),
+        HorizontalConfigurationGroup(false, false, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video in main window"));
         setUseLabel(false);
@@ -3056,7 +3064,8 @@ class MacFloatSettings: public HorizontalConfigurationGroup,
                         public TriggeredConfigurationGroup {
 public:
     MacFloatSettings():
-        HorizontalConfigurationGroup(false, false),
+        ConfigurationGroup(false, false, false, false),
+        HorizontalConfigurationGroup(false, false, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video in floating window"));
         setUseLabel(false);
@@ -3101,7 +3110,8 @@ class MacDockSettings: public HorizontalConfigurationGroup,
                        public TriggeredConfigurationGroup {
 public:
     MacDockSettings():
-        HorizontalConfigurationGroup(false, false),
+        ConfigurationGroup(false, false, false, false),
+        HorizontalConfigurationGroup(false, false, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video in the dock"));
         setUseLabel(false);
@@ -3142,7 +3152,8 @@ class MacDesktopSettings: public HorizontalConfigurationGroup,
                           public TriggeredConfigurationGroup {
 public:
     MacDesktopSettings():
-        HorizontalConfigurationGroup(false, false),
+        ConfigurationGroup(false, false, false, false),
+        HorizontalConfigurationGroup(false, false, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video on the desktop"));
         setUseLabel(false);

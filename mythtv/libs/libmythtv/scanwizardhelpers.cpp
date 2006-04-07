@@ -52,8 +52,9 @@
 #endif
 
 ScanProgressPopup::ScanProgressPopup(ScanWizardScanner *parent,
-                                     bool signalmonitors)
-    : VerticalConfigurationGroup(false,false)
+                                     bool signalmonitors) :
+    ConfigurationGroup(false, false, false, false),
+    VerticalConfigurationGroup(false, false, false, false)
 {
     setLabel(tr("Scan Progress"));
 
@@ -356,12 +357,12 @@ ScanCountry::ScanCountry()
 
 ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
                                       ScanTypeSetting *scanType) : 
-    VerticalConfigurationGroup(false,false,true,true),
+    ConfigurationGroup(false, false, true, true),
+    VerticalConfigurationGroup(false, false, true, true),
     country(new ScanCountry()),
     ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
     filename(new ScanFileImport())
 {
-    setUseLabel(false);
     setTrigger(scanType);
 
     // only save settings for the selected pane
@@ -405,8 +406,10 @@ void ScanOptionalConfig::triggerChanged(const QString& value)
     TriggeredConfigurationGroup::triggerChanged(value);
 }
 
-ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid)
-    : parent(_parent)
+ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid) :
+    ConfigurationGroup(true, true, false, false),
+    VerticalConfigurationGroup(true, true, false, false),
+    parent(_parent)
 {
     setLabel(tr("Scan Type"));
     setUseLabel(false);

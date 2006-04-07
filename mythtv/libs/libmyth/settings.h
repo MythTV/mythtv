@@ -109,10 +109,12 @@ class ConfigurationGroup: virtual public Configurable
 {
     Q_OBJECT
   public:
-    ConfigurationGroup(bool luselabel = true, bool luseframe = true,
-                       bool lzeroMargin = false, bool lzeroSpace = false) 
-              { uselabel = luselabel; useframe = luseframe; 
-               zeroMargin = lzeroMargin; zeroSpace = lzeroSpace; }
+    ConfigurationGroup(bool luselabel,   bool luseframe,
+                       bool lzeroMargin, bool lzeroSpace) :
+        uselabel(luselabel),     useframe(luseframe),
+        zeroMargin(lzeroMargin), zeroSpace(lzeroSpace)
+    {
+    }
     virtual ~ConfigurationGroup();
 
 
@@ -142,32 +144,43 @@ class ConfigurationGroup: virtual public Configurable
     bool zeroSpace;
 };
 
-class VerticalConfigurationGroup: virtual public ConfigurationGroup {
- public:
-    VerticalConfigurationGroup(bool uselabel = true, bool useframe = true,
-                                 bool zeroMargin = false, bool zeroSpace = false) 
-                : ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace) { }
+class VerticalConfigurationGroup : virtual public ConfigurationGroup
+{
+  public:
+    VerticalConfigurationGroup(
+        bool luselabel   = true,  bool luseframe  = true,
+        bool lzeroMargin = false, bool lzeroSpace = false) :
+        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
+    {
+    }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = 0);
+                                  const char* widgetName = NULL);
 };
 
-class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
- public:
-    HorizontalConfigurationGroup(bool uselabel = true, bool useframe = true,
-                                 bool zeroMargin = false, bool zeroSpace = false) 
-                : ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace) { }
+class HorizontalConfigurationGroup : virtual public ConfigurationGroup
+{
+  public:
+    HorizontalConfigurationGroup(
+        bool luselabel   = true,  bool luseframe  = true,
+        bool lzeroMargin = false, bool lzeroSpace = false) :
+        ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace)
+    {
+    }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = 0);
+                                  const char* widgetName = NULL);
 };
 
 class GridConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    GridConfigurationGroup(uint col, bool uselabel = true, bool useframe = true,
-                           bool zeroMargin = false, bool zeroSpace = false) 
-                : ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace), 
-                  columns(col) { }
+    GridConfigurationGroup(uint col,
+                           bool uselabel   = true,  bool useframe  = true,
+                           bool zeroMargin = false, bool zeroSpace = false) :
+        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace), 
+        columns(col)
+    {
+    }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
@@ -178,8 +191,11 @@ class GridConfigurationGroup: virtual public ConfigurationGroup {
 class StackedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
-    StackedConfigurationGroup(bool uselabel = true)
-                : ConfigurationGroup(uselabel) { top = 0; saveAll = true; };
+    StackedConfigurationGroup(bool uselabel = true) :
+        ConfigurationGroup(uselabel, true, false, false),
+        top(0), saveAll(true)
+    {
+    }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
@@ -226,12 +242,17 @@ protected:
     MythDialog *dialog;
 };
 
-// A wizard is a group with one child per page
+/** \class ConfigurationWizard
+ *  \brief A wizard is a group with one child per page.
+ */
 class ConfigurationWizard: public ConfigurationDialog,
-                           public ConfigurationGroup {
-public:
+                           public ConfigurationGroup
+{
+  public:
+    ConfigurationWizard() : ConfigurationGroup(true, true, false, false) {}
+
     virtual MythDialog* dialogWidget(MythMainWindow *parent,
-                                     const char* widgetName=0);
+                                     const char *widgetName = NULL);
 };
 
 // Read-only display of a setting
@@ -510,11 +531,11 @@ protected:
 class TriggeredConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
-    TriggeredConfigurationGroup(bool uselabel = true) 
-           : ConfigurationGroup(uselabel)
+    TriggeredConfigurationGroup(bool uselabel = true) :
+        ConfigurationGroup(uselabel, true, false, false),
+        configStack(NULL), trigger(NULL)
     {
-        trigger = configStack = NULL;
-    };
+    }
 
     void setTrigger(Configurable* _trigger);
 
@@ -532,9 +553,16 @@ protected:
     map<QString,Configurable*> triggerMap;
 };
     
-class TabbedConfigurationGroup: virtual public ConfigurationGroup {
+class TabbedConfigurationGroup: virtual public ConfigurationGroup
+{
     Q_OBJECT
-public:
+
+  public:
+    TabbedConfigurationGroup() :
+        ConfigurationGroup(true, true, false, false)
+    {
+    }
+
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
@@ -656,7 +684,8 @@ public:
 class ButtonSetting: virtual public Setting {
     Q_OBJECT
 public:
-    ButtonSetting() : button(NULL) {}
+    ButtonSetting(QString _name = "button") :
+        name(_name), button(NULL) {}
     virtual QWidget* configWidget(ConfigurationGroup* cg, QWidget* parent,
                                   const char* widgetName=0);
 
@@ -664,13 +693,19 @@ public:
 
 signals:
     void pressed();
+    void pressed(QString name);
+
+protected slots:
+    void SendPressedString();
+
 protected:
+    QString name;
     MythPushButton *button;
 };
 
 class TransButtonSetting: public ButtonSetting, public TransientStorage {
 public:
-    TransButtonSetting() {};
+    TransButtonSetting(QString name = "button") : ButtonSetting(name) {}
 };
 
 class ConfigPopupDialogWidget: public MythPopupBox {
@@ -890,6 +925,34 @@ class GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
             }
         }
     }
+};
+
+/** \class JumpConfigurationWizard
+ *  \brief A jump wizard is a group with one child per page, and jump buttons
+ */
+class JumpConfigurationWizard : public ConfigurationWizard
+{
+    Q_OBJECT
+
+  public:
+    virtual MythDialog* dialogWidget(MythMainWindow *parent,
+                                     const char *widgetName = NULL);
+  protected slots:
+    void showPage(QString);
+
+  protected:
+    vector<QWidget*> childWidgets;
+};
+
+class JumpPane : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    JumpPane(const QStringList &labels, const QStringList &helptext);
+
+  signals:
+    void pressed(QString);
 };
 
 #endif

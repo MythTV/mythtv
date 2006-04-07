@@ -126,49 +126,32 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     if (!useframe)
         widget->setFrameShape(QFrame::NoFrame);
 
-    QVBoxLayout *layout = NULL;
-
     float wmult = 0, hmult = 0;
-
     gContext->GetScreenSettings(wmult, hmult);
 
+    int space  = (zeroSpace) ? 4 : -1;
+    int margin = (int) ((uselabel) ? (28 * hmult) : (10 * hmult));
+    margin = (zeroMargin) ? 4 : margin;
+
+    QVBoxLayout *layout = new QVBoxLayout(widget, margin, space);
+
     if (uselabel)
-    {
-        int space = -1;
-        int margin = (int)(28 * hmult);
-        if (zeroSpace)
-            space = 4;
-        if (zeroMargin)
-            margin = 4;
-
-        layout = new QVBoxLayout(widget, margin, space);
-        // This makes weird and bad things happen in qt -mdz 2002/12/28
-        //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
-    }
-    else
-    {
-        int space = -1;
-        int margin = (int)(10 * hmult);
-        if (zeroSpace)
-            space = 4;
-        if (zeroMargin)
-            margin = 4;
-        layout = new QVBoxLayout(widget, margin, space);
-    }
 
-    for(unsigned i = 0 ; i < children.size() ; ++i)
+    for (uint i = 0; i < children.size(); i++)
+    {
         if (children[i]->isVisible())
         {
             QWidget *child = children[i]->configWidget(cg, widget, NULL);
             layout->add(child);
             children[i]->setEnabled(children[i]->isEnabled());
         }
+    }
       
     if (cg)
     {
-        connect(this, SIGNAL(changeHelpText(QString)), cg,
-                SIGNAL(changeHelpText(QString)));
+        connect(this, SIGNAL(changeHelpText(QString)),
+                cg,   SIGNAL(changeHelpText(QString)));
     } 
 
     return widget;
@@ -976,6 +959,68 @@ MythDialog* ConfigurationWizard::dialogWidget(MythMainWindow *parent,
     return wizard;
 }
 
+JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :
+    ConfigurationGroup(true, false, true, true),
+    VerticalConfigurationGroup(true, false, true, true)
+{
+    //setLabel(tr("Jump To Buttons"));
+    for (uint i = 0; i < labels.size(); i++)
+    {
+        TransButtonSetting *button =
+            new TransButtonSetting(QString::number(i));
+        button->setLabel(labels[i]);
+        button->setHelpText(helptext[i]);
+        connect(button, SIGNAL(pressed(QString)),
+                this,   SIGNAL(pressed(QString)));
+        addChild(button);
+    }
+}
+
+MythDialog *JumpConfigurationWizard::dialogWidget(MythMainWindow *parent,
+                                                  const char *widgetName)
+{
+    MythJumpWizard *wizard = new MythJumpWizard(parent, widgetName);
+    dialog = wizard;
+
+    connect(this,   SIGNAL(changeHelpText(QString)),
+            wizard, SLOT(  setHelpText(   QString)));
+
+    childWidgets.clear();
+    QStringList labels, helptext;
+    for (uint i = 0; i < children.size(); i++)
+    {
+        if (children[i]->isVisible())
+        {
+            childWidgets.push_back(children[i]->configWidget(this, parent));
+            labels.push_back(children[i]->getLabel());
+            helptext.push_back(children[i]->getHelpText());
+        }
+    }
+
+    JumpPane *jumppane = new JumpPane(labels, helptext);
+    QWidget  *widget   = jumppane->configWidget(this, parent);
+    wizard->addPage(widget, "");
+    wizard->setFinishEnabled(widget, true);
+    connect(jumppane, SIGNAL(pressed( QString)),
+            this,     SLOT(  showPage(QString)));
+
+    for (uint i = 0; i < childWidgets.size(); i++)
+    {
+        wizard->addPage(childWidgets[i], labels[i]);
+        wizard->setFinishEnabled(childWidgets[i], true);
+    }
+
+    return wizard;
+}
+
+void JumpConfigurationWizard::showPage(QString page)
+{
+    uint pagenum = page.toUInt();
+    if (pagenum >= childWidgets.size() || !dialog)
+        return;
+    ((MythJumpWizard*)(dialog))->showPage(childWidgets[pagenum]);
+}
+
 void SimpleDBStorage::load() 
 {
     MSqlBindings bindings;
@@ -1281,12 +1326,18 @@ QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
     //button->setHelpText(getHelpText());
 
     connect(button, SIGNAL(pressed()), this, SIGNAL(pressed()));
+    connect(button, SIGNAL(pressed()), this, SLOT(SendPressedString()));
 
     if (cg)
         connect(button, SIGNAL(changeHelpText(QString)),
                 cg, SIGNAL(changeHelpText(QString)));
 
     return button;
+}
+
+void ButtonSetting::SendPressedString(void)
+{
+    emit pressed(name);
 }
 
 void ButtonSetting::setEnabled(bool fEnabled)

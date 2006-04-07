@@ -189,11 +189,11 @@ public:
 class MPEG2AudioBitrateSettings: public VerticalConfigurationGroup,
                                  public TriggeredConfigurationGroup {
 public:
-    MPEG2AudioBitrateSettings(const RecordingProfile& parent)
-           : VerticalConfigurationGroup(false)
+    MPEG2AudioBitrateSettings(const RecordingProfile& parent) :
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false)
     {
         setLabel(QObject::tr("Bitrate Settings"));
-        setUseLabel(false);
         MPEG2audType* audType = new MPEG2audType(parent);
         addChild(audType);
         setTrigger(audType);
@@ -216,8 +216,9 @@ public:
 class AudioCompressionSettings: public VerticalConfigurationGroup,
                                 public TriggeredConfigurationGroup {
 public:
-    AudioCompressionSettings(const RecordingProfile& parent, QString profName)
-           : VerticalConfigurationGroup(false)
+    AudioCompressionSettings(const RecordingProfile& parent, QString profName) :
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false)
     {
         QString labelName;
         if (profName.isNull())
@@ -225,7 +226,6 @@ public:
         else
             labelName = profName + "->" + QObject::tr("Audio Quality");
         setName(labelName);
-        setUseLabel(false);
 
         codecName = new AudioCodecName(parent);
         addChild(codecName);
@@ -547,9 +547,10 @@ public:
 class VideoCompressionSettings: public VerticalConfigurationGroup,
                                 public TriggeredConfigurationGroup {
 public:
-    VideoCompressionSettings(const RecordingProfile& parent, QString profName)
-             : VerticalConfigurationGroup(false),
-               TriggeredConfigurationGroup(false)
+    VideoCompressionSettings(const RecordingProfile& parent, QString profName) :
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
+        TriggeredConfigurationGroup(false)
     {
         QString labelName;
         if (profName.isNull())
@@ -557,7 +558,6 @@ public:
         else
             labelName = profName + "->" + QObject::tr("Video Compression");
         setName(labelName);
-        setUseLabel(false);
 
         codecName = new VideoCodecName(parent);
         addChild(codecName);
@@ -756,8 +756,9 @@ public:
     };
 
     ImageSize(const RecordingProfile& parent, QString tvFormat,
-              QString profName) 
-         : VerticalConfigurationGroup(false) 
+              QString profName) :
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false)
     {
         ConfigurationGroup* imgSize = new HorizontalConfigurationGroup(false);
         QString labelName;
@@ -766,8 +767,6 @@ public:
         else
             labelName = profName + "->" + QObject::tr("Image size");
         setLabel(labelName);
-
-        setUseLabel(false);
 
         QString fullsize, halfsize;
         int maxwidth, maxheight;

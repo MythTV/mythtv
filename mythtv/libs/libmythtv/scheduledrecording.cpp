@@ -20,7 +20,8 @@
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function 
 // in recordingtypes.cpp.
 
-ScheduledRecording::ScheduledRecording() 
+ScheduledRecording::ScheduledRecording() :
+    ConfigurationGroup(true, true, false, false)
 {
     m_pginfo = NULL;
     type = NULL;

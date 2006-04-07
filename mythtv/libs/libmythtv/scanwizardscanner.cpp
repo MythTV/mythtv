@@ -92,7 +92,9 @@ Channel *ScanWizardScanner::GetChannel(void)
 }
 
 ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
-    : parent(_parent),
+    : ConfigurationGroup(false, true, false, false),
+      VerticalConfigurationGroup(false, true, false, false),
+      parent(_parent),
       log(new LogList()),
       channel(NULL),                popupProgress(NULL),
       scanner(NULL),                analogScanner(NULL),
@@ -101,7 +103,6 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
       frequency(0),                 modulation("8vsb")
 {
     setLabel(strTitle);
-    setUseLabel(false);
     addChild(log);
 }
 

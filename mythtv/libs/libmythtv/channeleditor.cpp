@@ -222,8 +222,10 @@ public:
     };
 };
 
-ChannelEditor::ChannelEditor():
-    VerticalConfigurationGroup(), ConfigurationDialog()
+ChannelEditor::ChannelEditor() :
+    ConfigurationGroup(true, true, false, false),
+    VerticalConfigurationGroup(true, true, false, false),
+    ConfigurationDialog()
 {
 
     setLabel(tr("Channels"));

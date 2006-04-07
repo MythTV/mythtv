@@ -613,3 +613,12 @@ void MythWizard::setHelpText(QString helptext)
     d->help->setMinimumWidth(screenwidth - (int)(40 * wmult));
     d->help->setMaximumHeight((int)(80 * hmult));
 }
+
+MythJumpWizard::MythJumpWizard(MythMainWindow *parent, const char *name) :
+    MythWizard(parent, name)
+{
+}
+
+MythJumpWizard::~MythJumpWizard()
+{
+}

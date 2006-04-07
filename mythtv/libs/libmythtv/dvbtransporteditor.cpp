@@ -91,8 +91,9 @@ public:
     };
 };
 
-DVBTransportsEditor::DVBTransportsEditor():
-    VerticalConfigurationGroup(false)
+DVBTransportsEditor::DVBTransportsEditor() :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(tr("DVB Transport Editor"));
     setUseLabel(true);
@@ -492,8 +493,9 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
     addChild(new DVBTransportPage(*dvbtid, nType));
 }
 
-DVBTransportPage::DVBTransportPage(const DVBTID& id, unsigned nType)
-                 : HorizontalConfigurationGroup(false,true), id(id)
+DVBTransportPage::DVBTransportPage(const DVBTID &_id, unsigned nType) :
+    ConfigurationGroup(false, true, false, false),
+    HorizontalConfigurationGroup(false, true, false, false), id(_id)
 {
     setLabel(QObject::tr("Transport Options"));
     setUseLabel(false);

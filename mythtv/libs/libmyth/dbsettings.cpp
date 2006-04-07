@@ -76,8 +76,9 @@ class LocalHostNameSettings: public VerticalConfigurationGroup,
                              public TriggeredConfigurationGroup {
 public:
     LocalHostNameSettings(Setting *checkbox, ConfigurationGroup *group):
-        VerticalConfigurationGroup(false),
-        TriggeredConfigurationGroup(false) {
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false)
+    {
         setLabel(QObject::tr("Use custom identifier for frontend preferences"));
         setUseLabel(false);
         setUseFrame(false);
@@ -93,7 +94,8 @@ class WOLsqlSettings: public VerticalConfigurationGroup,
                       public TriggeredConfigurationGroup {
 public:
     WOLsqlSettings(Setting *checkbox, ConfigurationGroup *group):
-        VerticalConfigurationGroup(false),
+        ConfigurationGroup(false, true, false, false),
+        VerticalConfigurationGroup(false, true, false, false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Wake-On-LAN settings"));
         setUseLabel(false);
@@ -106,8 +108,9 @@ public:
     }
 };
 
-MythDbSettings1::MythDbSettings1()
-               : VerticalConfigurationGroup(false)
+MythDbSettings1::MythDbSettings1() :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Database Configuration") + " 1/2");
     setUseLabel(false);
@@ -161,8 +164,9 @@ MythDbSettings1::MythDbSettings1()
     addChild(dbType);
 }
 
-MythDbSettings2::MythDbSettings2(void)
-               : VerticalConfigurationGroup(false)
+MythDbSettings2::MythDbSettings2(void) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Database Configuration") + " 2/2");
     setUseLabel(false);

@@ -546,7 +546,9 @@ class ScanHierarchy: public ComboBoxSetting, public TransientStorage
 class OFDMPane : public HorizontalConfigurationGroup
 {
   public:
-    OFDMPane() : HorizontalConfigurationGroup(false,false,true,true)
+    OFDMPane() :
+        ConfigurationGroup(false,false,true,true),
+        HorizontalConfigurationGroup(false,false,true,true)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -591,7 +593,9 @@ class OFDMPane : public HorizontalConfigurationGroup
 class QPSKPane : public HorizontalConfigurationGroup
 {
   public:
-    QPSKPane() : HorizontalConfigurationGroup(false,false,true,false) 
+    QPSKPane() :
+        ConfigurationGroup(false,false,true,false),
+        HorizontalConfigurationGroup(false,false,true,false)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -624,7 +628,9 @@ class QPSKPane : public HorizontalConfigurationGroup
 class QAMPane : public HorizontalConfigurationGroup
 {
   public:
-    QAMPane() : HorizontalConfigurationGroup(false,false,true,false) 
+    QAMPane() :
+        ConfigurationGroup(false,false,true,false),
+        HorizontalConfigurationGroup(false,false,true,false)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -657,7 +663,9 @@ class QAMPane : public HorizontalConfigurationGroup
 class ATSCPane : public VerticalConfigurationGroup
 {
   public:
-    ATSCPane() : VerticalConfigurationGroup(false,false,true,false)
+    ATSCPane() :
+        ConfigurationGroup(false,false,true,false),
+        VerticalConfigurationGroup(false,false,true,false)
     {
         addChild(atsc_table            = new ScanFrequencyTable());
         addChild(atsc_modulation       = new ScanATSCModulation());
@@ -691,6 +699,7 @@ class STPane : public VerticalConfigurationGroup
     Q_OBJECT
   public:
     STPane() :
+        ConfigurationGroup(false,false,true,false),
         VerticalConfigurationGroup(false,false,true,false),
         transport_setting(new MultiplexSetting()),
         atsc_format(new ScanATSCChannelFormat()),
@@ -727,10 +736,10 @@ class STPane : public VerticalConfigurationGroup
 class ErrorPane : public HorizontalConfigurationGroup
 {
   public:
-    ErrorPane(const QString& error)
-        : HorizontalConfigurationGroup(false, false, true, false)
+    ErrorPane(const QString& error) :
+        ConfigurationGroup(false, false, true, false),
+        HorizontalConfigurationGroup(false, false, true, false)
     {
-        setUseFrame(false);
         TransLabelSetting* label = new TransLabelSetting();
         label->setValue(error);
         addChild(label);

@@ -265,8 +265,9 @@ public:
     };
 };
 
-ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
-                    : VerticalConfigurationGroup(false,true)
+ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QObject::tr("Channel Options - Common"));
     setUseLabel(false);
@@ -362,8 +363,10 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     xmltvID->setEnabled(!uses_eit_only);
 }
 
-ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id)
-                 : VerticalConfigurationGroup(false,true) {
+ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false)
+{
     setLabel(QObject::tr("Channel Options - Video 4 Linux"));
     setUseLabel(false);
 

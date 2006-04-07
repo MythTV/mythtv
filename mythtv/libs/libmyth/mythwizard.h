@@ -51,7 +51,7 @@ class Q_EXPORT MythWizard : public MythDialog
 
 public:
     MythWizard(MythMainWindow* parent, const char* name = 0);
-    ~MythWizard();
+    virtual ~MythWizard();
 
     void Show();
 
@@ -104,7 +104,6 @@ protected:
     virtual void layOutButtonRow(QHBoxLayout *);
     virtual void layOutTitleRow(QHBoxLayout *, const QString &);
 
-private:
     void setBackEnabled(bool);
     void setNextEnabled(bool);
 
@@ -115,6 +114,16 @@ private:
     void layOut();
 
     MythWizardPrivate *d;
+};
+
+class Q_EXPORT MythJumpWizard : public MythWizard
+{
+    Q_OBJECT
+
+  public:
+    MythJumpWizard(MythMainWindow *parent, const char *name = NULL);
+    virtual ~MythJumpWizard();
+
 };
 
 #endif
