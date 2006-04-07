@@ -16,9 +16,9 @@ SQL='SELECT TO_DAYS(max(endtime)) - TO_DAYS(now()) FROM program;'
 DAYS_LEFT=`mysql --skip-column-names -B -D $DB --execute "$SQL"`
 
 if [ $DAYS_LEFT -lt $MIN_DAYS ]; then
-       mail -s "[MYTHTV] Only $DAYS_LEFT days of programs left!" $EMAIL <<-END
-               Maybe you should check if mythfilldatabase is configured
-               correctly or that your XMLTV service provider is still
-               on-line?
-       END
+	mail -s "[MYTHTV] Only $DAYS_LEFT days of programs left!" $EMAIL <<-END
+		Maybe you should check if mythfilldatabase is configured
+		correctly or that your XMLTV service provider is still
+		on-line?
+	END
 fi
