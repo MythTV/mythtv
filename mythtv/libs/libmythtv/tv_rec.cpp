@@ -3851,8 +3851,9 @@ static QString load_profile(QString cardtype, void *tvchain,
     // In LiveTV mode use "Live TV" profile, otherwise use the
     // recording's specified profile. If the desired profile can't
     // be found, fall back to the "Default" profile for card type.
-    QString profileName = (tvchain) ? QString("Live TV") :
-        rec->GetScheduledRecording()->getProfileName();
+    QString profileName = "Live TV";
+    if (!tvchain && rec)
+        profileName = rec->GetScheduledRecording()->getProfileName();
 
     if (!profile.loadByType(profileName, cardtype))
     {
