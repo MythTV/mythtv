@@ -254,7 +254,11 @@ Metadata* MetaIOID3v2::read(QString filename)
 
     // If we don't have title and artist or don't have the length return NULL
     if ((title.isEmpty() && artist.isEmpty()) || length<=0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("MetaIOID3v2: Failed to read metadata from '%1'")
+                .arg(filename));
         return NULL;
+    }
 
     Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
