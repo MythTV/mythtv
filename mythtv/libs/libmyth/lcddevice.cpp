@@ -153,7 +153,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (!connected)
     {
-        QTextStream os(socket);
+        QTextStream os(socket->socketDevice());
 
         int count = 0;
         do
@@ -216,7 +216,7 @@ void LCD::sendToServer(const QString &someText)
         return;
     }
 
-    QTextStream os(socket);
+    QTextStream os(socket->socketDevice());
    
     last_command = someText;
  
@@ -227,7 +227,7 @@ void LCD::sendToServer(const QString &someText)
 #endif
         // Just stream the text out the socket
 
-        os << someText << "\n" << flush;
+        os << someText << "\n";
     }
     else
     {
