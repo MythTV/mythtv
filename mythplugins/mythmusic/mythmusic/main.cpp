@@ -482,6 +482,7 @@ int mythplugin_config(void);
 void runMusicPlayback(void);
 void runMusicSelection(void);
 void runRipCD(void);
+void runScan(void);
 
 
 void handleMedia(MythMediaDevice *) 
@@ -497,6 +498,7 @@ void setupKeys(void)
     REG_JUMP("Play music",             "", "", runMusicPlayback);
     REG_JUMP("Select music playlists", "", "", runMusicSelection);
     REG_JUMP("Rip CD",                 "", "", runRipCD);
+    REG_JUMP("Scan music",             "", "", runScan);
 
     REG_KEY("Music", "DELETE",     "Delete track from playlist", "D");
     REG_KEY("Music", "NEXTTRACK",  "Move to the next track",     ">,.,Z,End");
@@ -688,4 +690,19 @@ void runRipCD(void)
     }
     postMusic(&mdata);
     gContext->removeCurrentLocation();
+}
+
+void runScan(void)
+{
+    MusicData mdata;
+
+    preMusic(&mdata);
+
+    if ("" != mdata.startdir)
+    {
+        SearchDir(mdata.startdir);
+        RebuildMusicTree(&mdata);
+    }
+
+    postMusic(&mdata);
 }
