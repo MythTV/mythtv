@@ -109,8 +109,8 @@ class ConfigurationGroup: virtual public Configurable
 {
     Q_OBJECT
   public:
-    ConfigurationGroup(bool luselabel,   bool luseframe,
-                       bool lzeroMargin, bool lzeroSpace) :
+    ConfigurationGroup(bool luselabel = true, bool luseframe = true,
+                       bool lzeroMargin = false, bool lzeroSpace = false) :
         uselabel(luselabel),     useframe(luseframe),
         zeroMargin(lzeroMargin), zeroSpace(lzeroSpace)
     {
