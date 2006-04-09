@@ -57,14 +57,15 @@ struct SmartPLOperator
 
 static SmartPLOperator SmartPLOperators[] = 
 {
-    { "is equal to",     1,  false, true },
-    { "is not equal to", 1,  false, true },
-    { "is greater than", 1,  false, false },
-    { "is less than",    1,  false, false },
-    { "starts with",     1,  true,  false },
-    { "ends with",       1,  true,  false },
-    { "contains",        1,  true,  false },
-    { "is between",      2,  false, false },
+    { "is equal to",      1,  false, true },
+    { "is not equal to",  1,  false, true },
+    { "is greater than",  1,  false, false },
+    { "is less than",     1,  false, false },
+    { "starts with",      1,  true,  false },
+    { "ends with",        1,  true,  false },
+    { "contains",         1,  true,  false },
+    { "does not contain", 1,  true,  false },
+    { "is between",       2,  false, false },
 };
 
 static int SmartPLOperatorsCount = sizeof(SmartPLOperators) / sizeof(SmartPLOperators[0]);
@@ -198,6 +199,10 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     else if (Operator->name == "contains")
     {
         result = result + " LIKE " + formattedFieldValue(QString("%") + value1 + "%");
+    }
+    else if (Operator->name == "does not contain")
+    {
+        result = result + " NOT LIKE " + formattedFieldValue(QString("%") + value1 + "%");
     }
     else if (Operator->name == "is between")
     {
