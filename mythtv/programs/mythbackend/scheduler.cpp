@@ -835,7 +835,11 @@ void Scheduler::SchedNewRecords(void)
                 PrintRec(p, "  +");
             }
             else
+            {
                 retrylist.push_front(p);
+                PrintRec(p, "  #");
+                PrintRec(*k, "     !");
+            }
         }
 
         int lastpri = p->recpriority;
@@ -1916,6 +1920,8 @@ void Scheduler::AddNewRecords(void)
     QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
 
+    int hdtvpriority = gContext->GetNumSetting("HDTVRecPriority", 0);
+
     QMap<int, bool> cardMap;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
@@ -2011,7 +2017,7 @@ void Scheduler::AddNewRecords(void)
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-"channel.recpriority + cardinput.recpriority "
+"channel.recpriority + cardinput.recpriority, program.hdtv "
 + QString(
 "FROM recordmatch "
 
@@ -2134,6 +2140,8 @@ void Scheduler::AddNewRecords(void)
         p->category = QString::fromUtf8(result.value(11).toString());
         p->recpriority = result.value(12).toInt();
         p->recpriority2 = result.value(39).toInt();
+        if (result.value(40).toInt())
+            p->recpriority2 += hdtvpriority;
         p->dupin = RecordingDupInType(result.value(13).toInt());
         p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
         p->rectype = RecordingType(result.value(16).toInt());

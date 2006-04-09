@@ -2174,6 +2174,16 @@ static GlobalSpinBox *GRAllRecordRecPriority()
     return bs;
 }
 
+static GlobalSpinBox *GRHDTVRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("HDTVRecPriority", -99, 99, 1);
+    bs->setLabel(QObject::tr("HDTV Recordings Priority"));
+    bs->setHelpText(QObject::tr("All HDTV programs will receive this "
+                    "additional recording priority value."));
+    bs->setValue(0);
+    return bs;
+}
+
 static GlobalSpinBox *GRFindOneRecordRecPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("FindOneRecordRecPriority",
@@ -3419,6 +3429,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     gr->addChild(GRTimeslotRecordRecPriority());
     gr->addChild(GRChannelRecordRecPriority());
     gr->addChild(GRAllRecordRecPriority());
+    gr->addChild(GRHDTVRecPriority());
     addChild(gr);
 }
 
