@@ -49,7 +49,7 @@ void EITScanner::TeardownAll(void)
 
     if (eitHelper)
     {
-        eitHelper->deleteLater();
+        delete eitHelper;
         eitHelper = NULL;
     }
 }
@@ -167,8 +167,7 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
     if (ignore_source)
         VERBOSE(VB_EIT, LOC + "EIT scan ignoring sourceid..");
 
-    QObject::connect(parser,    SIGNAL(EventsReady(QMap_Events*)),
-                     eitHelper, SLOT(HandleEITs(QMap_Events*)));
+    parser->SetEITHelper(eitHelper);
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
@@ -176,7 +175,7 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
  */
 void EITScanner::StopPassiveScan(void)
 {
-    eitHelper->disconnect();
+    parser->SetEITHelper(NULL);
     eitHelper->ClearList();
 
     channel = NULL;

@@ -16,18 +16,16 @@
 typedef MythDeque<Event*>                  QList_Events;
 typedef MythDeque<QList_Events*>           QListList_Events;
 
-class EITHelper : public QObject
+class EITHelper
 {
-    Q_OBJECT
-
   public:
-    EITHelper() : QObject(NULL, "EITHelper") { ; }
+    EITHelper() { ; }
+    virtual ~EITHelper() { ; }
 
     void ClearList(void);
     uint GetListSize(void) const;
     uint ProcessEvents(uint sourceid, bool ignore_source);
 
-  public slots:
     void HandleEITs(QMap_Events* events);
 
   private:

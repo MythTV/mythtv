@@ -19,6 +19,7 @@
 #include "dvbtables.h"
 #include "dishdescriptors.h"
 #include "dvbrecorder.h"
+#include "eithelper.h"
 
 // MythTV DVB headers
 #include "siparser.h"
@@ -235,17 +236,16 @@ void SIParser::CheckTrackers()
     {
         if (dvb_stream_data->HasAllNITSections())
         {
-            emit FindTransportsComplete();
             Table[SERVICES]->DependencyMet(NETWORK);
         }
     }
 
 #ifdef USING_DVB_EIT
-    if (!complete_events.empty())
+    if (!complete_events.empty() && eithelper)
     {
         QMap2D_Events::iterator it = complete_events.begin();
         for (; it != complete_events.end(); ++it)
-            emit EventsReady(&(*it));
+            eithelper->HandleEITs(&(*it));
         complete_events.clear();
     }
 #endif // USING_DVB_EIT
@@ -408,6 +408,34 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
     if (old_data)
         delete old_data;
 
+    // Use any cached tables
+    if (atsc_stream_data->HasCachedMGT())
+    {
+        const MasterGuideTable *mgt = atsc_stream_data->GetCachedMGT();
+        HandleMGT(mgt);
+        atsc_stream_data->ReturnCachedTable(mgt);
+    }
+
+    tvct_vec_t tvcts = atsc_stream_data->GetAllCachedTVCTs();
+    for (uint i = 0; i < tvcts.size(); i++)
+        HandleVCT(0, tvcts[i]);
+    atsc_stream_data->ReturnCachedTVCTTables(tvcts);
+
+    cvct_vec_t cvcts = atsc_stream_data->GetAllCachedCVCTs();
+    for (uint i = 0; i < cvcts.size(); i++)
+        HandleVCT(0, cvcts[i]);
+    atsc_stream_data->ReturnCachedCVCTTables(cvcts);
+
+    pmt_map_t pmts = atsc_stream_data->GetCachedPMTMap();
+    pmt_map_t::const_iterator it = pmts.begin();
+    for (; it != pmts.end(); ++it)
+    {
+        pmt_vec_t::const_iterator vit = (*it).begin();
+        for (; vit != (*it).end(); ++vit)
+            HandlePMT(it.key(), *vit);
+    }
+    atsc_stream_data->ReturnCachedTables(pmts);
+
     // MPEG table signals
     connect(atsc_stream_data,
             SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
@@ -429,10 +457,10 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
             SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
             this,
             SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
-
+/*
     connect(atsc_stream_data, SIGNAL(UpdateSTT(const SystemTimeTable*)),
             this,             SLOT(  HandleSTT(const SystemTimeTable*)));
-
+*/
 #ifdef USING_DVB_EIT
     connect(atsc_stream_data,
             SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
@@ -460,6 +488,17 @@ void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
 
     if (old_data)
         delete old_data;
+
+    // Use any cached tables
+    pmt_map_t pmts = atsc_stream_data->GetCachedPMTMap();
+    pmt_map_t::const_iterator it = pmts.begin();
+    for (; it != pmts.end(); ++it)
+    {
+        pmt_vec_t::const_iterator vit = (*it).begin();
+        for (; vit != (*it).end(); ++vit)
+            HandlePMT(it.key(), *vit);
+    }
+    atsc_stream_data->ReturnCachedTables(pmts);
 
     // MPEG table signals
     connect(dvb_stream_data,
@@ -536,8 +575,8 @@ void SIParser::SetTableStandard(const QString &table_std)
 void SIParser::SetDesiredProgram(uint mpeg_program_number, bool reset)
 {
     VERBOSE(VB_SIPARSER, LOC +
-            QString("Making #%1 the requested MPEG program number")
-            .arg(mpeg_program_number));
+            QString("SetDesiredProgram(%1, %2)")
+            .arg(mpeg_program_number).arg((reset) ? "reset" : "no reset"));
 
     if (reset)
     {
@@ -655,8 +694,6 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
     {
         // Service Tables
         ServiceDescriptionTable sdt(psip);
-
-        emit TableLoaded(); // Signal to keep scan wizard bars moving
 
         LoadPrivateTypes(sdt.OriginalNetworkID());
 
@@ -968,9 +1005,6 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
                 .arg(s.EITPresent).arg(collect_eit)
                 .arg(s.ServiceName));
     }
-
-    if (cur)
-        emit FindServicesComplete();
 }
 
 /** \fn SIParser::GetLanguagePriority(const QString&)
@@ -1299,8 +1333,6 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
     VERBOSE(VB_SIPARSER, LOC + "HandleVCT("<<pid<<") cnt("
             <<vct->ChannelCount()<<")");
 
-    emit TableLoaded();
-
     for (uint chan_idx = 0; chan_idx < vct->ChannelCount() ; chan_idx++)
     {
         // Do not add in Analog Channels in the VCT
@@ -1341,8 +1373,6 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
 
         ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
     }
-
-    emit FindServicesComplete();
 }
 
 /*

@@ -38,6 +38,7 @@ using namespace std;
 typedef void QMap_Events;
 #endif // !USING_DVB_EIT
 
+class EITHelper;
 class DVBRecorder;
 
 class ProgramAssociationTable;
@@ -136,6 +137,9 @@ class SIParser : public QObject
     void SetDishNetEIT(bool on)
         { eit_dn_long = on; }
 
+    void SetEITHelper(EITHelper *helper)
+        { QMutexLocker locker(&pmap_lock); eithelper = helper; }
+
   public slots:
     virtual void deleteLater(void);
 
@@ -152,13 +156,7 @@ class SIParser : public QObject
     void HandleEIT(const DVBEventInformationTable*);
 
   signals:
-    void FindTransportsComplete(void);
-    void FindServicesComplete(void);
-    void FindEventsComplete(void);
-    void TableLoaded(void);
     void UpdatePMT(uint pid, const ProgramMapTable *pmt);
-    void EventsReady(QMap_Events* Events);
-    void AllEventsPulled(void);
 
   protected:
     void CountUnusedDescriptors(uint pid, const unsigned char *data);
@@ -243,6 +241,7 @@ class SIParser : public QObject
     EITCache            eitcache;
     QMap2D_Events       incomplete_events;
     QMap2D_Events       complete_events;
+    EITHelper          *eithelper;
 #endif
 
     // statistics
