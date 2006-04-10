@@ -178,6 +178,9 @@ SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
 SOURCES += mpeg/iso6937tables.cpp
 
+HEADERS += frequencytables.h        channelutil.h
+SOURCES += frequencytables.cpp      channelutil.cpp
+
 using_frontend {
     # Recording profile stuff
     HEADERS += profilegroup.h
@@ -274,17 +277,17 @@ using_frontend {
 
 using_backend {
     # Channel stuff
-    HEADERS += channelbase.h               channelutil.h
+    HEADERS += channelbase.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    SOURCES += channelbase.cpp             channelutil.cpp
+    SOURCES += channelbase.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
-    HEADERS += siscan.h                    frequencytables.h
+    HEADERS += siscan.h
     HEADERS += scanwizardscanner.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
-    SOURCES += siscan.cpp                  frequencytables.cpp
+    SOURCES += siscan.cpp
     SOURCES += scanwizardscanner.cpp
 
     # TVRec & Recorder base classes
