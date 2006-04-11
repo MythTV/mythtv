@@ -10,72 +10,94 @@ using namespace std;
 // MythTV includes
 #include "mythdbcon.h"
 #include "eit.h"
+#include "dvbdescriptors.h"
 
-void Event::Reset()
+DBPerson::DBPerson(Role _role, const QString &_name) :
+    role(_role), name(QDeepCopy<QString>(_name))
 {
-    ServiceID = 0;
-    TransportID = 0;
-    NetworkID = 0;
-    ATSC = false;
-    clearEventValues();
 }
 
-void Event::deepCopy(const Event &e)
+QString DBPerson::GetRole(void) const
 {
-    SourcePID       = e.SourcePID;
-    TransportID     = e.TransportID;
-    NetworkID       = e.NetworkID;
-    ServiceID       = e.ServiceID;
-    EventID         = e.EventID;
-    StartTime       = e.StartTime;
-    EndTime         = e.EndTime;
-    OriginalAirDate = e.OriginalAirDate;
-    Stereo          = e.Stereo;
-    HDTV            = e.HDTV;
-    SubTitled       = e.SubTitled;
-    ETM_Location    = e.ETM_Location;
-    ATSC            = e.ATSC;
-    PartNumber      = e.PartNumber;
-    PartTotal       = e.PartTotal;
-
-    // QString is not thread safe, so we must make deep copies
-    LanguageCode       = QDeepCopy<QString>(e.LanguageCode);
-    Event_Name         = QDeepCopy<QString>(e.Event_Name);
-    Event_Subtitle     = QDeepCopy<QString>(e.Event_Subtitle);
-    Description        = QDeepCopy<QString>(e.Description);
-    ContentDescription = QDeepCopy<QString>(e.ContentDescription);
-    Year               = QDeepCopy<QString>(e.Year);
-    CategoryType       = QDeepCopy<QString>(e.CategoryType);
-    Actors             = QDeepCopy<QStringList>(e.Actors);
-
-    Credits.clear();
-    QValueList<Person>::const_iterator pit = e.Credits.begin();
-    for (; pit != e.Credits.end(); ++pit)
-        Credits.push_back(Person(QDeepCopy<QString>((*pit).role),
-                                 QDeepCopy<QString>((*pit).name)));
+    static const char* roles[] =
+    {
+        "actor",     "director",    "producer", "executive_producer",
+        "writer",    "guest_star",  "host",     "adapter",
+        "presenter", "commentator", "guest",
+    };
+    if ((role < kActor) || (role > kGuest))
+        return "guest";
+    return roles[role];
 }
 
-void Event::clearEventValues()
+uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,
+                        const QDateTime &starttime) const
 {
-    SourcePID    = 0;
-    LanguageCode = "";
-    Event_Name   = "";
-    Description  = "";
-    EventID      = 0;
-    ETM_Location = 0;
-    Event_Subtitle     = "";
-    ContentDescription = "";
-    Year         = "";
-    SubTitled    = false;
-    Stereo       = false;
-    HDTV         = false;
-    ATSC         = false;
-    PartNumber   = 0;
-    PartTotal    = 0;
-    CategoryType = "";
-    OriginalAirDate = QDate();
-    Actors.clear();
-    Credits.clear();
+    uint personid = GetPersonDB(query);
+    if (!personid && InsertPersonDB(query))
+        personid = GetPersonDB(query);
+
+    return InsertCreditsDB(query, personid, chanid, starttime);
+}
+
+uint DBPerson::GetPersonDB(MSqlQuery &query) const
+{
+    query.prepare(
+        "SELECT person "
+        "FROM people "
+        "WHERE name = :NAME");
+    query.bindValue(":NAME", name.utf8());
+
+    if (!query.exec())
+        MythContext::DBError("get_person", query);
+    else if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
+}
+
+uint DBPerson::InsertPersonDB(MSqlQuery &query) const
+{
+    query.prepare(
+        "INSERT IGNORE INTO people (name) "
+        "VALUES (:NAME);");
+    query.bindValue(":NAME", name.utf8());
+
+    if (query.exec())
+        return 1;
+
+    MythContext::DBError("insert_person", query);
+    return 0;
+}
+
+uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint chanid,
+                               const QDateTime &starttime) const
+{
+    if (!personid)
+        return 0;
+
+    query.prepare(
+        "REPLACE INTO credits "
+        "       ( person,  chanid,  starttime,  role) "
+        "VALUES (:PERSON, :CHANID, :STARTTIME, :ROLE) ");
+    query.bindValue(":PERSON",    personid);
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", starttime);
+    query.bindValue(":ROLE",      GetRole().utf8());
+
+    if (query.exec())
+        return 1;
+
+    MythContext::DBError("insert_credits", query);
+    return 0;
+}
+
+void DBEvent::AddPerson(DBPerson::Role role, const QString &name)
+{
+    if (!credits)
+        credits = new DBCredits;
+
+    credits->push_back(DBPerson(role, name));
 }
 
 uint DBEvent::UpdateDB(MSqlQuery &query, int match_threshold) const
@@ -110,7 +132,8 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "SELECT title,          subtitle,      description, "
         "       category,       category_type, "
         "       starttime,      endtime, "
-        "       closecaptioned, subtitled,     stereo,      hdtv "
+        "       closecaptioned, subtitled,     stereo,      hdtv, "
+        "       partnumber,     parttotal "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -130,14 +153,20 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
 
     while (query.next())
     {
+        MythCategoryType category_type =
+            string_to_myth_category_type(query.value(4).toString());
+
         DBEvent prog(chanid,
                      query.value(0).toString(),   query.value(1).toString(),
                      query.value(2).toString(),
-                     query.value(3).toString(),   query.value(4).toString(),
+                     query.value(3).toString(),   category_type,
                      query.value(5).toDateTime(), query.value(6).toDateTime(),
                      fixup,
                      query.value(7).toBool(),     query.value(8).toBool(),
                      query.value(9).toBool(),     query.value(10).toBool());
+
+        prog.partnumber = query.value(11).toUInt();
+        prog.parttotal  = query.value(12).toUInt();
 
         programs.push_back(prog);
         count++;
@@ -248,7 +277,6 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     QString lsubtitle = subtitle;
     QString ldesc     = description;
     QString lcategory = category;
-    QString lcattype  = category_type;
 
     if (match.title.length() >= ltitle.length())
         ltitle = match.title;
@@ -259,16 +287,24 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     if (match.description.length() >= ldesc.length())
         ldesc = match.description;
 
-    if (match.category.length() >= lcategory.length())
+    if (lcategory.isEmpty() && !match.category.isEmpty())
         lcategory = match.category;
 
-    if (match.category_type.length() >= lcattype.length())
-        lcattype = match.category_type;
+    uint tmp = category_type;
+    if (!category_type && match.category_type)
+        tmp = match.category_type;
+
+    QString lcattype = myth_category_type_to_string(tmp);
 
     bool lcc        = IsCaptioned() | match.IsCaptioned();
     bool lstereo    = IsStereo()    | match.IsStereo();
     bool lsubtitled = IsSubtitled() | match.IsSubtitled();
     bool lhdtv      = IsHDTV()      | match.IsHDTV();
+
+    uint lpartnumber =
+        (!partnumber && match.partnumber) ? match.partnumber : partnumber;
+    uint lparttotal =
+        (!parttotal  && match.parttotal ) ? match.parttotal  : parttotal;
 
     query.prepare(
         "UPDATE program "
@@ -278,6 +314,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    starttime      = :STARTTIME, endtime       = :ENDTIME, "
         "    closecaptioned = :CC,        subtitled     = :SUBTITLED, "
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
+        "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
         "    listingsource  = :LSOURCE "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART ");
@@ -295,12 +332,20 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":SUBTITLED",   lsubtitled);
     query.bindValue(":STEREO",      lstereo);
     query.bindValue(":HDTV",        lhdtv);
+    query.bindValue(":PARTNO",      lpartnumber);
+    query.bindValue(":PARTTOTAL",   lparttotal);
     query.bindValue(":LSOURCE",     1);
 
     if (!query.exec())
     {
         MythContext::DBError("InsertDB", query);
         return 0;
+    }
+
+    if (credits)
+    {
+        for (uint i = 0; i < credits->size(); i++)
+            (*credits)[i].InsertDB(query, chanid, starttime);
     }
 
     return 1;
@@ -321,6 +366,21 @@ static bool delete_program(MSqlQuery &query, uint chanid, const QDateTime &st)
         MythContext::DBError("delete_program", query);
         return false;
     }
+
+    query.prepare(
+        "DELETE from credits "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", st);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("delete_credits", query);
+        return false;
+    }
+
     return true;
 }
 
@@ -344,6 +404,25 @@ static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
         MythContext::DBError("change_program", query);
         return false;
     }
+
+    query.prepare(
+        "UPDATE credits "
+        "SET starttime = :NEWSTART, "
+        "    endtime   = :NEWEND "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART");
+
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":OLDSTART", st);
+    query.bindValue(":NEWSTART", new_st);
+    query.bindValue(":NEWEND",   new_end);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("change_credits", query);
+        return false;
+    }
+
     return true;    
 }
 
@@ -378,26 +457,32 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  category,       category_type, "
         "  starttime,      endtime, "
         "  closecaptioned, subtitled,      stereo,          hdtv,"
+        "  partnumber,     parttotal, "
         "  listingsource ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
         " :STARTTIME,     :ENDTIME, "
         " :CC,            :SUBTITLED,     :STEREO,         :HDTV, "
+        " :PARTNUMBER,    :PARTTOTAL, "
         " :LSOURCE ) ");
+
+    QString cattype = myth_category_type_to_string(category_type);
 
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":TITLE",       title.utf8());
     query.bindValue(":SUBTITLE",    subtitle.utf8());
     query.bindValue(":DESCRIPTION", description.utf8());
     query.bindValue(":CATEGORY",    category.utf8());
-    query.bindValue(":CATTYPE",     category_type.utf8());
+    query.bindValue(":CATTYPE",     cattype.utf8());
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
     query.bindValue(":CC",          IsCaptioned());
     query.bindValue(":SUBTITLED",   IsSubtitled());
     query.bindValue(":STEREO",      IsStereo());
     query.bindValue(":HDTV",        IsHDTV());
+    query.bindValue(":PARTNUMBER",  partnumber);
+    query.bindValue(":PARTTOTAL",   parttotal);
     query.bindValue(":LSOURCE",     1);
 
     if (!query.exec())
@@ -405,5 +490,12 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         MythContext::DBError("InsertDB", query);
         return 0;
     }
+
+    if (credits)
+    {
+        for (uint i = 0; i < credits->size(); i++)
+            (*credits)[i].InsertDB(query, chanid, starttime);
+    }
+
     return 1;
 }

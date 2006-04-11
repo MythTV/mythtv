@@ -19,6 +19,7 @@ const uint EITHelper::kChunkSize = 20;
 static int get_chan_id_from_db(uint sourceid,  uint atscsrcid);
 static int get_chan_id_from_db(uint sourceid,  uint serviceid,
                                uint networkid, uint transportid);
+static void init_fixup(QMap<uint,uint> &fix);
 
 #define LOC QString("EITHelper: ")
 #define LOC_ERR QString("EITHelper, Error: ")
@@ -27,6 +28,7 @@ EITHelper::EITHelper() :
     eitfixup(new EITFixUp()), eitcache(new EITCache()),
     gps_offset(-13),          sourceid(0)
 {
+    init_fixup(fixup);
 }
 
 EITHelper::~EITHelper()
@@ -183,8 +185,10 @@ void EITHelper::AddETT(uint atscsrcid, const ExtendedTextTable *ett)
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
-    uint descCompression  = (eit->TableID() > 0x80) ? 2 : 1;
-    uint fix = fixup[0];
+    uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
+    uint fix = fixup[eit->OriginalNetworkID() << 16];
+    fix |= fixup[eit->OriginalNetworkID() << 16 | eit->ServiceID()];
+        
 
     for (uint i = 0; i < eit->EventCount(); i++)
     {
@@ -202,7 +206,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString subtitle      = QString::null;
         QString description   = QString::null;
         QString category      = QString::null;
-        QString category_type = QString::null;
+        MythCategoryType category_type = kCategoryNone;
         bool hdtv = false, stereo = false, subtitled = false;
 
         // Parse descriptors
@@ -416,4 +420,37 @@ static int get_chan_id_from_db(uint sourceid, uint serviceid,
     }
 
     return -1;
+}
+
+static void init_fixup(QMap<uint,uint> &fix)
+{
+    fix[  256 << 16] = EITFixUp::kFixBell;
+    fix[  257 << 16] = EITFixUp::kFixBell;
+    fix[ 4100 << 16] = EITFixUp::kFixBell;
+    fix[ 4101 << 16] = EITFixUp::kFixBell;
+    fix[ 4102 << 16] = EITFixUp::kFixBell;
+    fix[ 4103 << 16] = EITFixUp::kFixBell;
+    fix[ 4104 << 16] = EITFixUp::kFixBell;
+    fix[ 4105 << 16] = EITFixUp::kFixBell;
+    fix[ 4106 << 16] = EITFixUp::kFixBell;
+    fix[ 4107 << 16] = EITFixUp::kFixBell;
+    fix[ 4097 << 16] = EITFixUp::kFixBell;
+    fix[ 4098 << 16] = EITFixUp::kFixBell;
+
+    fix[ 9018 << 16] = EITFixUp::kFixUK;
+
+    fix[40999 << 16] = EITFixUp::kFixComHem;
+    fix[40999 << 16 | 1070] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1308] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1041] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1306] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1307] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1030] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1016] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1131] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1068] = EITFixUp::kFixSubtitle;
+    fix[40999 << 16 | 1069] = EITFixUp::kFixSubtitle;
+
+    fix[ 4096 << 16] = EITFixUp::kFixAUStar;
+    fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 }

@@ -34,8 +34,6 @@ class ATSCEvent
     const unsigned char *desc;
 };
 
-typedef MythDeque<Event*>                  QList_Events;
-typedef MythDeque<QList_Events*>           QListList_Events;
 typedef QMap<uint,ATSCEvent>               EventIDToATSCEvent;
 typedef QMap<uint,QString>                 EventIDToETT;
 typedef QMap<uint,EventIDToATSCEvent>      ATSCSRCToEvents;
@@ -57,8 +55,6 @@ class EITHelper
 
     uint GetListSize(void) const;
     uint ProcessEvents(void);
-
-    void HandleEITs(QMap_Events* events);
 
     uint GetGPSOffset(void) const { return (uint) (0 - gps_offset); }
 

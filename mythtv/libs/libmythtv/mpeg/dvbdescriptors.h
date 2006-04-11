@@ -360,6 +360,19 @@ class ComponentDescriptor : public MPEGDescriptor
     QString toString() const { return QString("ComponentDescriptor(stub)"); }
 };
 
+typedef enum
+{
+    kCategoryNone = 0,
+    kCategoryMovie,
+    kCategorySeries,
+    kCategorySports,
+    kCategoryTVShow,
+    kCategoryLast,
+} MythCategoryType;
+
+QString myth_category_type_to_string(uint category_type);
+MythCategoryType string_to_myth_category_type(const QString &type);
+
 class ContentDescriptor : public MPEGDescriptor
 {
   public:
@@ -388,7 +401,7 @@ class ContentDescriptor : public MPEGDescriptor
     uint UserNibble(uint i)  const { return _data[3 + (i<<1)]; }
     // }                            2.0
 
-    QString GetMythCategory(uint i) const;
+    MythCategoryType GetMythCategory(uint i) const;
     QString GetDescription(uint i) const;
     QString toString() const;
 

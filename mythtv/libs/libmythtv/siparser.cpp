@@ -57,14 +57,10 @@ SIParser::SIParser(const char *name) :
     pmap_lock(false),
     // State variables
     ThreadRunning(false),           exitParserThread(false),
-    eit_dn_long(false),
-    PrivateTypesLoaded(false)
+    eit_dn_long(false)
 {
     SetATSCStreamData(new ATSCStreamData(-1,-1));
     SetDVBStreamData(new DVBStreamData());
-
-    /* Set the PrivateTypes to default values */
-    PrivateTypes.reset();
 
     /* Initialize the Table Handlers */
     Table[SERVICES] = new ServiceHandler();
@@ -97,9 +93,6 @@ void SIParser::Reset(void)
 
     VERBOSE(VB_SIPARSER, LOC + "Closing all PIDs");
     DelAllPids();
-
-    PrivateTypesLoaded = false;
-    PrivateTypes.reset();
 
     VERBOSE(VB_SIPARSER, LOC + "Resetting all Table Handlers");
 
@@ -220,131 +213,6 @@ void SIParser::CheckTrackers()
     }
 
     pmap_lock.unlock();
-}
-
-void SIParser::LoadPrivateTypes(uint networkID)
-{
-    // If we've already loaded this stuff, do nothing
-    if (PrivateTypesLoaded)
-        return;
-
-    QString stdStr = SIStandard_to_String(table_standard);
-
-    // If you don't know the Table Standard yet you need to bail out
-    if (stdStr == "auto")
-        return;
-
-    PrivateTypesLoaded = true;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT private_type, private_value "
-        "FROM dtv_privatetypes "
-        "WHERE networkid = :NETID AND "
-        "      sitype    = :SITYPE");
-    query.bindValue(":NETID",  networkID);
-    query.bindValue(":SITYPE", stdStr);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("Loading Private Types for SIParser", query);
-        return;
-    }
-
-    if (!query.size())
-    {
-        VERBOSE(VB_SIPARSER, LOC + "No Private Types defined " +
-                QString("for NetworkID %1").arg(networkID));
-        return;
-    }
-
-    while (query.next())
-    {
-        QString key = query.value(0).toString();
-        QString val = query.value(1).toString();
-
-        VERBOSE(VB_SIPARSER, LOC +
-                QString("Private Type %1 = %2 defined for NetworkID %3")
-                .arg(key).arg(val).arg(networkID));
-
-        if (key == "sdt_mapping")
-        {
-            VERBOSE(VB_SIPARSER, LOC +
-                    "SDT Mapping Incorrect for this Service Fixup Loaded");
-
-            PrivateTypes.SDTMapping = true;
-        }
-        else if (key == "channel_numbers")
-        {
-            int cn = val.toInt();
-            VERBOSE(VB_SIPARSER, LOC + "ChannelNumbers Present using " +
-                    QString("Descriptor %1").arg(cn));
-
-            PrivateTypes.ChannelNumbers = cn;
-        }
-        else if (key == "force_guide_present" && val == "yes")
-        {
-            VERBOSE(VB_SIPARSER, LOC + "Forcing Guide Present");
-            PrivateTypes.ForceGuidePresent = true;
-        }
-        if (key == "guide_fixup")
-        {
-            int fxup = val.toInt();
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("Using Guide Fixup Scheme #%1").arg(fxup));
-
-            PrivateTypes.EITFixUp = fxup;
-        }
-        if (key == "guide_ranges")
-        {
-            const QStringList temp = QStringList::split(",", val);
-            PrivateTypes.CustomGuideRanges = true;
-            PrivateTypes.CurrentTransportTableMin = temp[0].toInt();
-            PrivateTypes.CurrentTransportTableMax = temp[1].toInt();
-            PrivateTypes.OtherTransportTableMin   = temp[2].toInt();
-            PrivateTypes.OtherTransportTableMax   = temp[3].toInt();
-                
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("Using Guide Custom Range; "
-                            "CurrentTransport: %1-%2, "
-                            "OtherTransport: %3-%4")
-                    .arg(PrivateTypes.CurrentTransportTableMin,2,16)
-                    .arg(PrivateTypes.CurrentTransportTableMax,2,16)
-                    .arg(PrivateTypes.OtherTransportTableMin,2,16)
-                    .arg(PrivateTypes.OtherTransportTableMax,2,16));
-        }
-        if (key == "tv_types")
-        {
-            PrivateTypes.TVServiceTypes.clear();
-            const QStringList temp = QStringList::split(",", val);
-            QStringList::const_iterator it = temp.begin();
-            for (; it != temp.end() ; it++)
-            {
-                int stype = (*it).toInt();
-                PrivateTypes.TVServiceTypes[stype] = 1;
-                VERBOSE(VB_SIPARSER, LOC +
-                        QString("Added TV Type %1").arg(stype));
-            }
-        }
-#ifdef USING_DVB_EIT
-#if 0
-        if (key == "parse_subtitle_list")
-        {
-            eitfixup.clearSubtitleServiceIDs();
-            const QStringList temp = QStringList::split(",", val);
-            QStringList::const_iterator it = temp.begin();
-            for (; it!=temp.end(); it++)
-            {
-                uint sid = (*it).toUInt();
-                VERBOSE(VB_SIPARSER, LOC + 
-                        QString("Added ServiceID %1 to list of "
-                                "channels to parse subtitle from").arg(sid));
-
-                eitfixup.addSubtitleServiceID(sid);
-            }
-        }
-#endif
-#endif //USING_DVB_EIT
-    }
 }
 
 void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
@@ -639,14 +507,7 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
         // Service Tables
         ServiceDescriptionTable sdt(psip);
 
-        LoadPrivateTypes(sdt.OriginalNetworkID());
-
-        bool cur =
-            (PrivateTypes.SDTMapping &&
-             PrivateTypes.CurrentTransportID == sdt.TSID()) ||
-            (!PrivateTypes.SDTMapping && TableID::SDT == sdt.TableID());
-
-        uint sect_tsid = (cur) ? 0 : sdt.TSID();
+        uint sect_tsid = (TableID::SDT == sdt.TableID()) ? 0 : sdt.TSID();
 
         tablehead_t head;
         head.table_id       = buffer[0];
@@ -668,7 +529,6 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
             QString("PAT Version: %1  Tuned to TransportID: %2")
             .arg(pat->Version()).arg(pat->TransportStreamID()));
 
-    PrivateTypes.CurrentTransportID = pat->TransportStreamID();
     pnum_pid.clear();
     for (uint i = 0; i < pat->ProgramCount(); ++i)
     {
@@ -824,9 +684,7 @@ void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
             for (uint i = 0; i < fld.FrequencyCount(); i++)
                 tobj.frequencies.push_back(fld.FrequencyHz(i));
         }
-        else if (DescriptorID::dvb_uk_channel_list == dlist[i][0] &&
-                 DescriptorID::dvb_uk_channel_list ==
-                 PrivateTypes.ChannelNumbers)
+        else if (DescriptorID::dvb_uk_channel_list == dlist[i][0])
         {
             UKChannelListDescriptor ucld(dlist[i]);
             for (uint i = 0; i < ucld.ChannelCount(); i++)
@@ -850,8 +708,6 @@ void SIParser::HandleNIT(const NetworkInformationTable *nit)
     TransportObject t;
     for (uint i = 0; i < nit->TransportStreamCount(); i++)
     {
-        LoadPrivateTypes(nit->OriginalNetworkID(i));
-
         const desc_list_t dlist = MPEGDescriptor::Parse(
             nit->TransportDescriptors(i), nit->TransportDescriptorsLength(i));
 
@@ -863,7 +719,7 @@ void SIParser::HandleNIT(const NetworkInformationTable *nit)
 
         sh->Request(nit->TSID(i));
     
-        if (PrivateTypes.ChannelNumbers && !(chanNums.empty()))
+        if (!chanNums.empty())
         {
             QMap_SDTObject &slist = sh->Services[nit->TSID(i)];
             QMap_uint16_t::const_iterator it = chanNums.begin();
@@ -883,10 +739,7 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     ServiceHandler *sh    = (ServiceHandler*) Table[SERVICES];
     QMap_SDTObject &slist = sh->Services[sdt->TSID()];
 
-    bool cur =
-        (PrivateTypes.SDTMapping &&
-         PrivateTypes.CurrentTransportID == sdt->TSID()) ||
-        (!PrivateTypes.SDTMapping && TableID::SDT == sdt->TableID());
+    bool cur = TableID::SDT == sdt->TableID();
 
     for (uint i = 0; i < sdt->ServiceCount(); i++)
     {
@@ -896,9 +749,8 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
         s.NetworkID     = sdt->OriginalNetworkID();
 
         s.ServiceID     = sdt->ServiceID(i);
-        bool has_eit    = PrivateTypes.ForceGuidePresent;
-        has_eit        |= sdt->HasEITSchedule(i);
-        has_eit        |= sdt->HasEITPresentFollowing(i);
+        bool has_eit    = (sdt->HasEITSchedule(i) ||
+                           sdt->HasEITPresentFollowing(i));
         s.EITPresent    = (has_eit) ? 1 : 0;
         s.RunningStatus = sdt->RunningStatus(i);
         s.CAStatus      = sdt->IsEncrypted(i) ? 1 : 0;
@@ -918,23 +770,12 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
                 s.ProviderName = sd.ServiceProviderName();
                 s.ServiceName  = sd.ServiceName();
 
-                if (PrivateTypes.TVServiceTypes.contains(s.ServiceType))
-                    s.ServiceType = PrivateTypes.TVServiceTypes[s.ServiceType];
                 continue;
             }
             CountUnusedDescriptors(0x11, list[j]);
         }
 
-        // Check if we should collect EIT on this transport
-        bool is_tv_or_radio = (s.ServiceType == SDTObject::TV ||
-                               s.ServiceType == SDTObject::RADIO);
-
-        bool is_eit_transport = !PrivateTypes.GuideOnSingleTransport;
-        is_eit_transport |= PrivateTypes.GuideOnSingleTransport && 
-            (PrivateTypes.GuideTransportID == PrivateTypes.CurrentTransportID);
-
-        bool collect_eit = (has_eit && is_tv_or_radio && is_eit_transport);
-        if (collect_eit)
+        if (has_eit)
             dvb_srv_collect_eit[sdt->ServiceID(i)] = true;
 
         uint sect_tsid = (cur) ? 0 : sdt->TSID();
@@ -942,10 +783,9 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 
         VERBOSE(VB_SIPARSER, LOC +
                 QString("SDT: sid=%1 type=%2 eit_present=%3 "
-                        "collect_eit=%4 name=%5")
+                        "name=%5")
                 .arg(s.ServiceID).arg(s.ServiceType)
-                .arg(s.EITPresent).arg(collect_eit)
-                .arg(s.ServiceName));
+                .arg(s.EITPresent).arg(s.ServiceName));
     }
 }
 
@@ -1033,8 +873,6 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
         s.CAStatus     = vct->IsAccessControlled(chan_idx);
         s.ServiceID    = vct->ProgramNumber(chan_idx);
         s.ATSCSourceID = vct->SourceID(chan_idx);
-
-        LoadPrivateTypes(s.TransportID);
 
 #ifdef USING_DVB_EIT
         if (!vct->IsHiddenInGuide(chan_idx))

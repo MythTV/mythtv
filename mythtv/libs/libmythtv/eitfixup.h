@@ -17,23 +17,18 @@ class EITFixUp
   public:
     enum FixUpType
     {
-        kFixNone    = 0,
-        kFixBell    = 1,
-        kFixUK      = 2,
-        kFixPBS     = 3,
-        kFixComHem  = 4,
-        kFixAUStar  = 5,
+        kFixNone    = 0x00,
+        kFixBell    = 0x01,
+        kFixUK      = 0x02,
+        kFixPBS     = 0x04,
+        kFixComHem  = 0x08,
+        kFixSubtitle= 0x10,
+        kFixAUStar  = 0x20,
     };
 
     EITFixUp();
 
-    void Fix(Event &event, int fix_type) const;
     void Fix(DBEvent &event) const;
-
-    void clearSubtitleServiceIDs(void)
-        { parseSubtitleServiceIDs.clear(); }
-    void addSubtitleServiceID(uint st_pid)
-        { parseSubtitleServiceIDs[st_pid] = 1; }
 
     static void TimeFix(QDateTime &dt)
     {
@@ -45,16 +40,11 @@ class EITFixUp
     }
 
   private:
-    void FixBellExpressVu(Event &event) const; // Canada DVB-S
-    void FixUK(Event &event) const;            // UK DVB-T
-    void FixPBS(Event &event) const;           // USA ATSC
-    void FixComHem(Event &event) const;        // Sweden DVB-C
-    void FixAUStar(Event &event) const;        // Australia DVB-S
-
-    /** List of ServiceID's for which to parse out subtitle
-     *  from the description. Used in EITFixUpStyle4().
-     */
-    QMap_uint_t parseSubtitleServiceIDs;
+    void FixBellExpressVu(DBEvent &event) const; // Canada DVB-S
+    void FixUK(DBEvent &event) const;            // UK DVB-T
+    void FixPBS(DBEvent &event) const;           // USA ATSC
+    void FixComHem(DBEvent &event, bool parse_subtitle) const; // Sweden DVB-C
+    void FixAUStar(DBEvent &event) const;        // Australia DVB-S
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;

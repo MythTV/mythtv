@@ -50,26 +50,6 @@ void pidHandler::reset()
     pulling = false;
 }
 
-void privateTypes::reset()
-{
-    ChannelNumbers = 0;
-    Descriptors.clear();
-    TVServiceTypes.clear();
-    EITFixUp = 0;
-    SDTMapping = false;
-    CurrentTransportID = 0;
-    ForceGuidePresent = false;
-    CustomGuideRanges = false;
-    CurrentTransportTableMin = 0;
-    CurrentTransportTableMax = 0;
-    OtherTransportTableMin = 0;
-    OtherTransportTableMax = 0;
-    GuidePID = 0;
-    GuideTransportID = 0;
-    CustomGuidePID = false;
-    GuideOnSingleTransport = false;
-}
-
 void pullStatus::Reset()
 {
     pulling = false;

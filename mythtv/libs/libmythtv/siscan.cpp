@@ -1179,6 +1179,10 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
     int db_mplexid = ChannelUtil::GetMplexID(
         sourceID, sdt->TSID(), sdt->OriginalNetworkID());
 
+    // HACK beg -- special exception for this network (dbver == "1067")
+    bool force_guide_present = (sdt->OriginalNetworkID() == 70);
+    // HACK end -- special exception for this network
+
     if (db_mplexid == -1)
     {
         VERBOSE(VB_IMPORTANT, "SDT: Error determing what transport this "
@@ -1259,7 +1263,9 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                     chan_num,
                     sdt->ServiceID(i),
                     0, 0,
-                    sdt->HasEITSchedule(i) || sdt->HasEITPresentFollowing(i),
+                    sdt->HasEITSchedule(i) ||
+                    sdt->HasEITPresentFollowing(i) ||
+                    force_guide_present,
                     false, false, -1);
             }
         }

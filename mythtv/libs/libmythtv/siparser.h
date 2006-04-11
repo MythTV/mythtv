@@ -31,10 +31,6 @@ using namespace std;
 // MythTV includes
 #include "sitypes.h"
 
-#ifndef USING_DVB_EIT
-typedef void QMap_Events;
-#endif // !USING_DVB_EIT
-
 class EITHelper;
 class DVBRecorder;
 
@@ -146,38 +142,17 @@ class SIParser : public QObject
     void PrintDescriptorStatistics(void) const;
 
   private:
-    // Fixes for various DVB Network Spec Deviations
-    void LoadPrivateTypes(uint networkID);
-
     // DVB Descriptor Parsers
     void HandleNITDesc(const desc_list_t &dlist);
     void HandleNITTransportDesc(const desc_list_t &dlist,
                                 TransportObject   &tobj,
                                 QMap_uint16_t     &clist);
 
-#ifdef USING_DVB_EIT
-    // DVB EIT Table Descriptor processors
-    uint ProcessDVBEventDescriptors(
-        uint                         pid,
-        const unsigned char          *data,
-        uint                         &bestPrioritySE,
-        const unsigned char*         &bestDescriptorSE, 
-        uint                         &bestPriorityEE,
-        vector<const unsigned char*> &bestDescriptorsEE,
-        Event                        &event);
-
-#endif //USING_DVB_EIT
-
   private:
-    // Timeout Variables
-    QDateTime TransportSearchEndTime;
-    QDateTime ServiceSearchEndTime;
-    QDateTime EventSearchEndTime;
-
     // Common Variables
     DVBRecorder        *dvb_recorder;
     int                 table_standard;
-    
+
     // Storage Objects (DVB)
     NITObject           NITList;
 
@@ -201,14 +176,8 @@ class SIParser : public QObject
 
     // New tracking objects
     TableHandler       *Table[NumHandlers+1];
-    privateTypes        PrivateTypes;
-    bool                PrivateTypesLoaded;
 
-#ifdef USING_DVB_EIT
-    QMap2D_Events       incomplete_events;
-    QMap2D_Events       complete_events;
     EITHelper          *eithelper;
-#endif
 
     // statistics
     QMap<uint,uint>     descCount;

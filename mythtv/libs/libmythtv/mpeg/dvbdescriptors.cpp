@@ -127,13 +127,32 @@ QMutex            ContentDescriptor::categoryLock;
 map<uint,QString> ContentDescriptor::categoryDesc;
 bool              ContentDescriptor::categoryDescExists = false;
 
-QString ContentDescriptor::GetMythCategory(uint i) const
+QString myth_category_type_to_string(uint category_type)
+{
+    static const char *cattype[] = { "movie", "series", "sports", "tvshow", };
+
+    if ((category_type > kCategoryNone) && (category_type < kCategoryLast))
+        return QString(cattype[category_type]);
+
+    return QString::null;
+}
+
+MythCategoryType string_to_myth_category_type(const QString &category_type)
+{
+    static const char *cattype[] = { "movie", "series", "sports", "tvshow", };
+    for (uint i = 0; i < 4; i++)
+        if (category_type == cattype[i])
+            return (MythCategoryType) i;
+    return kCategoryNone;
+}
+
+MythCategoryType ContentDescriptor::GetMythCategory(uint i) const
 {
     if (0x1 == Nibble1(i))
-        return "movie";
+        return kCategoryMovie;
     if (0x4 == Nibble1(i))
-        return "sports";
-    return "tvshow";
+        return kCategorySports;
+    return kCategoryTVShow;
 }
 
 QString ContentDescriptor::GetDescription(uint i) const

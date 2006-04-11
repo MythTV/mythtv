@@ -89,40 +89,6 @@ public:
     bool pulling;
 };
 
-/* Class for holding private types that are Network Specific and populated
-   from the dtv_privatetypes table.  This is for DVB and ATSC */
-class privateTypes
-{
-public:
-    privateTypes() { reset(); };
-    ~privateTypes() {};
-    void reset();
-    uint16_t      CurrentTransportID;
-
-    /* Services that send SDT 0x42 as other transport */
-    bool          SDTMapping;
-    /* Use of general custom Descriptors */
-    QStringList   Descriptors;
-    /* Non Standard TV Service Types */
-    QMap_uint16_t TVServiceTypes;
-    /* Use one of a collection of EIT Post Parsing Scripts to improve EIT */
-    int           EITFixUp;
-    /* DVB Channel numbers used in UK and Australia AKA LCN */
-    uint8_t       ChannelNumbers;
-    /* Use Custom Guide Ranges other than 0x50-0x5F & 0x60-0x6F in DVB */
-    bool          CustomGuideRanges;
-    uint8_t       CurrentTransportTableMin;
-    uint8_t       CurrentTransportTableMax;
-    uint8_t       OtherTransportTableMin;
-    uint8_t       OtherTransportTableMax;
-    /* Custom Guide Parameters */
-    bool          ForceGuidePresent;
-    bool          CustomGuidePID;
-    uint16_t      GuidePID;
-    bool          GuideOnSingleTransport;
-    uint16_t      GuideTransportID;
-};
-
 typedef struct tablehead
 {
     uint8_t    table_id;
