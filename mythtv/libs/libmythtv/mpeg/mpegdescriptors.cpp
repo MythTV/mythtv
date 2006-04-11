@@ -93,7 +93,7 @@ const unsigned char* MPEGDescriptor::FindBestMatch(
     {
         if (DescriptorID::short_event == parsed[i][0])
         {
-            ShortEventDescriptor sed(parsed[unmatched_idx]);
+            ShortEventDescriptor sed(parsed[i]);
             QMap<uint,uint>::const_iterator it =
                 langPrefs.find(sed.CanonicalLanguageKey());
 
@@ -109,7 +109,7 @@ const unsigned char* MPEGDescriptor::FindBestMatch(
     }
 
     if (match_pri)
-        return parsed[match_pri];
+        return parsed[match_idx];
 
     if ((desc_tag == DescriptorID::short_event) && (unmatched_idx >= 0))
     {
@@ -133,7 +133,7 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     {
         if (DescriptorID::extended_event == parsed[i][0])
         {
-            ExtendedEventDescriptor eed(parsed[unmatched_idx]);
+            ExtendedEventDescriptor eed(parsed[i]);
             QMap<uint,uint>::const_iterator it =
                 langPrefs.find(eed.CanonicalLanguageKey());
 
