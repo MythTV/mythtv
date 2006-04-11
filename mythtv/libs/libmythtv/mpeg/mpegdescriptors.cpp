@@ -48,7 +48,7 @@ desc_list_t MPEGDescriptor::ParseOnlyInclude(
     return tmp;
 }
 
-const unsigned char* MPEGDescriptor::Find(const desc_list_t& parsed,
+const unsigned char* MPEGDescriptor::Find(const desc_list_t &parsed,
                                           uint desc_tag)
 {
     desc_list_t::const_iterator it = parsed.begin();
@@ -59,6 +59,118 @@ const unsigned char* MPEGDescriptor::Find(const desc_list_t& parsed,
     }
     return NULL;
 }
+
+desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
+{
+    desc_list_t tmp;
+    desc_list_t::const_iterator it = parsed.begin();
+    for (; it != parsed.end(); ++it)
+    {
+        if ((*it)[0] == desc_tag)
+            tmp.push_back(*it);
+    }
+    return tmp;
+}
+
+static uint maxPriority(const QMap<uint,uint> &langPrefs)
+{
+    uint max_pri = 0;
+    QMap<uint,uint>::const_iterator it = langPrefs.begin();
+    for (; it != langPrefs.end(); ++it)
+        max_pri = max(max_pri, *it);
+    return max_pri;
+}
+
+const unsigned char* MPEGDescriptor::FindBestMatch(
+    const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPrefs)
+{
+    uint match_idx = 0;
+    uint match_pri = 0;
+    int  unmatched_idx = -1;
+
+    uint i = (desc_tag == DescriptorID::short_event) ? 0 : parsed.size();
+    for (; i < parsed.size(); i++)
+    {
+        if (DescriptorID::short_event == parsed[i][0])
+        {
+            ShortEventDescriptor sed(parsed[unmatched_idx]);
+            QMap<uint,uint>::const_iterator it =
+                langPrefs.find(sed.CanonicalLanguageKey());
+
+            if ((it != langPrefs.end()) && (*it > match_pri))
+            {
+                match_idx = i;
+                match_pri = *it;
+            }
+
+            if (unmatched_idx < 0)
+                unmatched_idx = i;
+        }
+    }
+
+    if (match_pri)
+        return parsed[match_pri];
+
+    if ((desc_tag == DescriptorID::short_event) && (unmatched_idx >= 0))
+    {
+        ShortEventDescriptor sed(parsed[unmatched_idx]);
+        langPrefs[sed.CanonicalLanguageKey()] = maxPriority(langPrefs) + 1;
+        return parsed[unmatched_idx];
+    }
+
+    return NULL;
+}
+
+desc_list_t MPEGDescriptor::FindBestMatches(
+    const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPrefs)
+{
+    uint match_pri = 0;
+    int  match_key = 0;
+    int  unmatched_idx = -1;
+
+    uint i = (desc_tag == DescriptorID::extended_event) ? 0 : parsed.size();
+    for (; i < parsed.size(); i++)
+    {
+        if (DescriptorID::extended_event == parsed[i][0])
+        {
+            ExtendedEventDescriptor eed(parsed[unmatched_idx]);
+            QMap<uint,uint>::const_iterator it =
+                langPrefs.find(eed.CanonicalLanguageKey());
+
+            if ((it != langPrefs.end()) && (*it > match_pri))
+            {
+                match_key = eed.LanguageKey();
+                match_pri = *it;
+            }
+
+            if (unmatched_idx < 0)
+                unmatched_idx = i;
+        }
+    }
+
+    if ((desc_tag == DescriptorID::extended_event) &&
+        (match_key == 0) && (unmatched_idx >= 0))
+    {
+        ExtendedEventDescriptor eed(parsed[unmatched_idx]);
+        langPrefs[eed.CanonicalLanguageKey()] = maxPriority(langPrefs) + 1;
+        match_key = eed.LanguageKey();
+    }
+
+    desc_list_t tmp;
+    for (uint i = (match_pri) ? 0 : parsed.size(); i < parsed.size(); i++)
+    {
+        if ((DescriptorID::extended_event == desc_tag) &&
+            (DescriptorID::extended_event == parsed[i][0]))
+        {
+            ExtendedEventDescriptor eed(parsed[i]);
+            if (eed.LanguageKey() == match_key)
+                tmp.push_back(parsed[i]);
+        }
+    }
+
+    return tmp;
+}
+
 
 QString MPEGDescriptor::DescriptorTagString() const
 {

@@ -148,7 +148,15 @@ class MPEGDescriptor
                                        int descriptorid);
     static desc_list_t ParseOnlyInclude(const unsigned char* data, uint len,
                                         int descriptorid);
-    static const unsigned char* Find(const desc_list_t& parsed, uint desc_tag);
+
+    static const unsigned char* Find(const desc_list_t &parsed, uint desc_tag);
+    static desc_list_t FindAll(const desc_list_t &parsed, uint desc_tag);
+
+    static const unsigned char* FindBestMatch(
+        const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPref);
+    static desc_list_t FindBestMatches(
+        const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPref);
+
     virtual QString toString() const;
   protected:
     const unsigned char* _data;

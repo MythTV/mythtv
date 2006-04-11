@@ -43,8 +43,11 @@ typedef QMap<uint,EventIDToETT>            ATSCSRCToETTs;
 typedef QMap<unsigned long long,int>       ServiceToChanID;
 
 class EITFixUp;
+class EITCache;
+
 class EventInformationTable;
 class ExtendedTextTable;
+class DVBEventInformationTable;
 
 class EITHelper
 {
@@ -52,9 +55,8 @@ class EITHelper
     EITHelper();
     virtual ~EITHelper();
 
-    void ClearList(void);
     uint GetListSize(void) const;
-    uint ProcessEvents(uint sourceid, bool ignore_source);
+    uint ProcessEvents(void);
 
     void HandleEITs(QMap_Events* events);
 
@@ -68,28 +70,29 @@ class EITHelper
     void AddEIT(uint atscsrcid, const EventInformationTable *eit);
     void AddETT(uint atscsrcid, const ExtendedTextTable     *ett);
 
-  private:
-    uint GetChanID(uint sourceid, uint atscsrcid);
-    int  GetChanID(uint sourceid, const Event &event,
-                   bool ignore_source) const;
+    void AddEIT(const DVBEventInformationTable *eit);
 
-    uint UpdateEITList(uint sourceid, const QList_Events &events,
-                       bool ignore_source) const;
+  private:
+    uint GetChanID(uint atscsrcid);
+    uint GetChanID(uint serviceid, uint networkid, uint transportid);
 
     void CompleteEvent(uint atscsrcid,
                        const ATSCEvent &event,
                        const QString   &ett);
 
-    QListList_Events  eitList;      ///< Event Information Tables List
+        //QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock
     mutable ServiceToChanID srv_to_chanid;
 
     EITFixUp               *eitfixup;
+    EITCache               *eitcache;
+
     int                     gps_offset;
     uint                    sourceid;
     QMap<uint,uint>         fixup;
     ATSCSRCToEvents         incomplete_events;
     ATSCSRCToETTs           unmatched_etts;
+
     MythDeque<DBEvent*>     db_events;
 
     QMap<uint,uint>         languagePreferences;

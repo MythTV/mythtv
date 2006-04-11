@@ -17,7 +17,6 @@
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
 #include "dvbtables.h"
-#include "dishdescriptors.h"
 #include "dvbrecorder.h"
 #include "eithelper.h"
 
@@ -52,15 +51,12 @@ SIParser::SIParser(const char *name) :
     QObject(NULL, name),
     // Common Variables
     table_standard(SI_STANDARD_AUTO),
-    CurrentTransport(0),            RequestedServiceID(0),
-    RequestedTransportID(0),        NITPID(0),
     // ATSC Storage
     atsc_stream_data(NULL),         dvb_stream_data(NULL),
     // Mutex Locks
     pmap_lock(false),
     // State variables
     ThreadRunning(false),           exitParserThread(false),
-    standardChange(false),
     eit_dn_long(false),
     PrivateTypesLoaded(false)
 {
@@ -72,22 +68,6 @@ SIParser::SIParser(const char *name) :
 
     /* Initialize the Table Handlers */
     Table[SERVICES] = new ServiceHandler();
-
-    // Get a list of wanted languages and set up their priorities
-    // (Lowest number wins)
-    QStringList langPref = iso639_get_language_list();
-    QStringList::Iterator plit;
-    uint prio = 1;
-    for (plit = langPref.begin(); plit != langPref.end(); ++plit)
-    {
-        if (!(*plit).isEmpty())
-        {
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("Added initial preferred language '%1' "
-                            "with priority %2").arg(*plit).arg(prio));
-            LanguagePriority[*plit] = prio++;
-        }
-    }
 }
 
 SIParser::~SIParser()
@@ -190,10 +170,9 @@ void SIParser::CheckTrackers()
         //pnum_pid.clear();
     }
     // for DVB NIT
-    if (SI_STANDARD_DVB == table_standard && need_nit)
+    if (SI_STANDARD_DVB == table_standard)
     {
         AddPid(DVB_NIT_PID, 0xFF, TableID::NIT, true, 10 /*bufferFactor*/);
-        need_nit = false;
     }
     // for DVB EIT
     if (SI_STANDARD_DVB == table_standard &&
@@ -239,16 +218,6 @@ void SIParser::CheckTrackers()
             Table[SERVICES]->DependencyMet(NETWORK);
         }
     }
-
-#ifdef USING_DVB_EIT
-    if (!complete_events.empty() && eithelper)
-    {
-        QMap2D_Events::iterator it = complete_events.begin();
-        for (; it != complete_events.end(); ++it)
-            eithelper->HandleEITs(&(*it));
-        complete_events.clear();
-    }
-#endif // USING_DVB_EIT
 
     pmap_lock.unlock();
 }
@@ -357,6 +326,7 @@ void SIParser::LoadPrivateTypes(uint networkID)
             }
         }
 #ifdef USING_DVB_EIT
+#if 0
         if (key == "parse_subtitle_list")
         {
             eitfixup.clearSubtitleServiceIDs();
@@ -372,24 +342,9 @@ void SIParser::LoadPrivateTypes(uint networkID)
                 eitfixup.addSubtitleServiceID(sid);
             }
         }
+#endif
 #endif //USING_DVB_EIT
     }
-}
-
-bool SIParser::GetTransportObject(NITObject &NIT)
-{
-    QMutexLocker locker(&pmap_lock);
-    NIT = NITList;
-    return true;
-}
-
-bool SIParser::GetServiceObject(QMap_SDTObject &SDT)
-{
-
-    pmap_lock.lock();
-    SDT = ((ServiceHandler*) Table[SERVICES])->Services[0];
-    pmap_lock.unlock();
-    return true;
 }
 
 void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
@@ -563,9 +518,6 @@ void SIParser::SetTableStandard(const QString &table_std)
 
     Table[SERVICES]->Request(0);
 
-    if (SI_STANDARD_DVB == table_standard)
-        need_nit = true;
-
     for (int x = 0 ; x < NumHandlers ; x++)
         Table[x]->SetSIStandard((SISTANDARD)table_standard);
 }
@@ -635,12 +587,6 @@ void SIParser::ReinitSIParser(const QString  &si_std,
     SetDesiredProgram(mpeg_program_number, !stream_data);
 }
 
-bool SIParser::FindServices()
-{
-    Table[SERVICES]->RequestEmit(0);
-    return true;
-}
-
 /*------------------------------------------------------------------------
  *   COMMON PARSER CODE
  *------------------------------------------------------------------------*/
@@ -668,14 +614,12 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
         {
             table_standard = SI_STANDARD_ATSC;
             VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: ATSC");
-            standardChange = true;
         }
         else if (TableID::SDT  == psip.TableID() ||
                  TableID::SDTo == psip.TableID())
         {
             table_standard = SI_STANDARD_DVB;
             VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: DVB");
-            standardChange = true;
         }
     }
 
@@ -732,9 +676,7 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
         if (0 == pat->ProgramNumber(i) && SI_STANDARD_ATSC != table_standard)
         {
             VERBOSE(VB_SIPARSER, LOC + "NIT Present on this transport " +
-                    QString(" on PID 0x%1").arg(NITPID,0,16));
-
-            NITPID = pat->ProgramPID(i);
+                    QString(" on PID 0x%1").arg(pat->ProgramPID(i),0,16));
             continue;
         }
 
@@ -1007,264 +949,11 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     }
 }
 
-/** \fn SIParser::GetLanguagePriority(const QString&)
- *  \brief Returns the desirability of a particular language to the user.
- *
- *   The lower the returned number the more preferred the language is.
- *
- *   If the language does not exist in our list of languages it is
- *   inserted as a less desirable language than any of the 
- *   previously inserted languages.
- *
- *  \param language Three character ISO-639 language code.
- */
-uint SIParser::GetLanguagePriority(const QString &language)
-{
-    QMap<QString,uint>::const_iterator it;
-    it = LanguagePriority.find(language);
-
-    // if this is an unknown language, check if the canonical version exists
-    if (it == LanguagePriority.end())
-    {
-        QString clang = iso639_str_to_canonoical_str(language);
-        it = LanguagePriority.find(clang);
-        if (it != LanguagePriority.end())
-        {
-            VERBOSE(VB_SIPARSER, LOC +
-                    QString("Added preferred language '%1' with same "
-                            "priority as '%2'").arg(language).arg(clang));
-            LanguagePriority[language] = *it;
-        }
-    }
-
-    // if this is an unknown language, insert into priority list
-    if (it == LanguagePriority.end())
-    {
-        // find maximum existing priority
-        uint max_priority = 0;
-        it = LanguagePriority.begin();
-        for (;it != LanguagePriority.end(); ++it)
-            max_priority = max(*it, max_priority);
-        // insert new language, and point iterator to it
-        VERBOSE(VB_SIPARSER, LOC +
-                QString("Added preferred language '%1' with priority %2")
-                .arg(language).arg(max_priority + 1));
-        LanguagePriority[language] = max_priority + 1;
-        it = LanguagePriority.find(language);
-    }
-
-    // return the priority
-    return *it;
-}
-
 void SIParser::HandleEIT(const DVBEventInformationTable *eit)
 {
-#ifdef USING_DVB_EIT
-    uint bestPrioritySE   = UINT_MAX;
-    uint bestPriorityEE   = UINT_MAX;
-
-    for (uint i = 0; i < eit->EventCount(); i++)
-    {
-        // Skip event if we have already processed it before...
-        if (!eitcache.IsNewEIT(
-                eit->TSID(),      eit->EventID(i),
-                eit->ServiceID(), eit->TableID(),
-                eit->Version(),
-                eit->Descriptors(i), eit->DescriptorsLength(i)))
-        {
-            continue;
-        }
-
-        // Event to use temporarily to fill in data
-        Event event;
-        event.ServiceID   = eit->ServiceID();
-        event.TableID     = eit->TableID();
-        event.TransportID = eit->TSID();
-        event.NetworkID   = eit->OriginalNetworkID();
-        event.EventID     = eit->EventID(i);
-        event.StartTime   = MythUTCToLocal(eit->StartTimeUTC(i));
-        event.EndTime     = event.StartTime.addSecs(eit->DurationInSeconds(i));
-
-#ifdef EIT_DEBUG_SID
-        if (event.ServiceID == EIT_DEBUG_SID)
-        {
-            VERBOSE(VB_EIT, "SIParser: DVB Events: " +
-                    QString("ServiceID %1 EventID: %2   Time: %3 - %4")
-                    .arg(event.ServiceID).arg(event.EventID)
-                    .arg(event.StartTime.toString(QString("MM/dd hh:mm")))
-                    .arg(event.EndTime.toString(QString("hh:mm"))));
-        }
-#endif
-
-        // Hold short & extended event information from descriptors.
-        const unsigned char *bestDescriptorSE = NULL;
-        vector<const unsigned char*> bestDescriptorsEE;
-
-        // Parse descriptors
-        desc_list_t list = MPEGDescriptor::Parse(
-            eit->Descriptors(i), eit->DescriptorsLength(i));
-
-        for (uint j = 0; j < list.size(); j++)
-        { 
-            // Pick out EIT descriptors for later parsing, and parse others.
-            ProcessDVBEventDescriptors(
-                0 /* pid */, list[j],
-                bestPrioritySE, bestDescriptorSE,
-                bestPriorityEE, bestDescriptorsEE, event);
-        }
-
-        // Parse extended event descriptions for the most preferred language
-        for (uint j = 0; j < bestDescriptorsEE.size(); j++)
-        {
-            if (!bestDescriptorsEE[j])
-            {
-                event.Description = "";
-                break;
-            }
-
-            ExtendedEventDescriptor eed(bestDescriptorsEE[j]);
-            event.Description += eed.Text();
-        }
-
-        // Parse short event descriptor for the most preferred language
-        if (bestDescriptorSE)
-        {
-            ShortEventDescriptor sed(bestDescriptorSE);
-            event.LanguageCode    = sed.CanonicalLanguageString();
-            event.Event_Name      = sed.EventName();
-            event.Event_Subtitle  = sed.Text();
-            if (event.Event_Subtitle == event.Event_Name)
-                event.Event_Subtitle = "";
-        }
-
-#ifdef EIT_DEBUG_SID
-        if (event.ServiceID == EIT_DEBUG_SID)
-        {
-            VERBOSE(VB_EIT, "SIParser: DVB Events: " +
-                    QString("LanguageCode='%1' "
-                            "\n\t\t\tEvent_Name='%2' Description='%3'")
-                    .arg(event.LanguageCode).arg(event.Event_Name)
-                    .arg(event.Description));
-        }
-#endif
-        eitfixup.Fix(event, PrivateTypes.EITFixUp);
-        complete_events[eit->ServiceID()][eit->EventID(i)] = event;
-    }
-#endif //USING_DVB_EIT
+    if (eithelper)
+        eithelper->AddEIT(eit);
 }
-
-/*------------------------------------------------------------------------
- *   DVB DESCRIPTOR PARSERS
- *------------------------------------------------------------------------*/
-
-#ifdef USING_DVB_EIT
-/** \fn SIParser::ProcessDVBEventDescriptors(uint,const unsigned char*,const unsigned char*,uint,vector<const unsigned char*>&,Event&)
- *  \brief Processes non-language dependent DVB Event descriptors, and caches
- *         language dependent DVB Event descriptors for the most preferred
- *         language.
- * \returns descriptor length + 2, aka total descriptor size
- */
-uint SIParser::ProcessDVBEventDescriptors(
-    uint                         pid,
-    const unsigned char          *data,
-    uint                         &bestPrioritySE,
-    const unsigned char*         &bestDescriptorSE, 
-    uint                         &bestPriorityEE,
-    vector<const unsigned char*> &bestDescriptorsEE,
-    Event                        &event)
-{
-    uint    descriptorTag    = data[0];
-    uint    descriptorLength = data[1];
-    uint    descCompression  = (event.TableID > 0x80) ? 2 : 1;
-
-    switch (descriptorTag)
-    {
-        case DescriptorID::short_event:
-        {
-            ShortEventDescriptor sed(data);
-            QString language = sed.CanonicalLanguageString();
-            uint    priority = GetLanguagePriority(language);
-            bestPrioritySE   = min(bestPrioritySE, priority);
-
-            // add the descriptor, and update the language
-            if (priority == bestPrioritySE)
-                bestDescriptorSE = data;
-        }
-        break;
-
-        case DescriptorID::extended_event:
-        {
-            ExtendedEventDescriptor eed(data);
-
-            uint last_desc_number = eed.LastNumber();
-            uint desc_number      = eed.DescriptorNumber();
-
-            // Break if the descriptor is out of bounds
-            if (desc_number > last_desc_number)
-                break;
-
-            QString language = eed.CanonicalLanguageString();
-            uint    priority = GetLanguagePriority(language);
-
-            // lower priority number is a higher priority...
-            if (priority < bestPriorityEE)
-            {
-                // found a language with better priority
-                // don't keep things from the wrong language
-                bestDescriptorsEE.clear();
-                bestPriorityEE = priority;
-            }
-
-            if (priority == bestPriorityEE)
-            {
-                // make sure the vector is big enough
-                bestDescriptorsEE.resize(last_desc_number + 1);
-                // add the descriptor, and update the language
-                bestDescriptorsEE[desc_number] = data;
-            }
-        }
-        break;
-
-        case DescriptorID::component:
-        {
-            ComponentDescriptor component(data);
-            event.HDTV      |= component.IsHDTV();
-            event.Stereo    |= component.IsStereo();
-            event.SubTitled |= component.IsReallySubtitled();
-        }
-        break;
-
-        case DescriptorID::content:
-        {
-            ContentDescriptor content(data);
-            event.ContentDescription = content.GetDescription(0);
-            event.CategoryType       = content.GetMythCategory(0);
-        }
-        break;
-
-        case DescriptorID::dish_event_name:
-        {
-            DishEventNameDescriptor dend(data);
-            if (dend.HasName())
-                event.Event_Name = dend.Name(descCompression);
-        }
-        break;
-
-        case DescriptorID::dish_event_description:
-        {
-            DishEventDescriptionDescriptor dedd(data);
-            if (dedd.HasDescription())
-                event.Description = dedd.Description(descCompression);
-        }
-        break;
-
-        default:
-            CountUnusedDescriptors(pid, data);
-            break;
-    }
-    return descriptorLength + 2;
-}
-#endif //USING_DVB_EIT
 
 /*------------------------------------------------------------------------
  *   ATSC TABLE PARSERS
@@ -1280,7 +969,6 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
     {
         table_standard = SI_STANDARD_ATSC;
         VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: ATSC");
-        standardChange = true;
     }
 
     for (uint i = 0 ; i < mgt->TableCount(); i++)
@@ -1290,21 +978,14 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
         QString msg = QString(" on PID 0x%2").arg(pid,0,16);
         if (table_class == TableClass::TVCTc)
         {
-            TableSourcePIDs.ServicesPID   = pid;
-            TableSourcePIDs.ServicesMask  = 0xFF;
-            TableSourcePIDs.ServicesTable = TableID::TVCT;
             VERBOSE(VB_SIPARSER, LOC + "TVCT" + msg);
         }
         else if (table_class == TableClass::CVCTc)
         {
-            TableSourcePIDs.ServicesPID   = pid;
-            TableSourcePIDs.ServicesMask  = 0xFF;
-            TableSourcePIDs.ServicesTable = TableID::CVCT;
             VERBOSE(VB_SIPARSER, LOC + "CVCT" + msg);
         }
         else if (table_class == TableClass::ETTc)
         {
-            TableSourcePIDs.ChannelETT = pid;
             VERBOSE(VB_SIPARSER, LOC + "Channel ETT" + msg);
         }
 #ifdef USING_DVB_EIT

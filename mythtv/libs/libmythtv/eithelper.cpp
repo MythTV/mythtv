@@ -1,148 +1,76 @@
 // -*- Mode: c++ -*-
 
+// Std C++ headers
 #include <algorithm>
 using namespace std;
 
 // MythTV includes
 #include "eithelper.h"
 #include "eitfixup.h"
+#include "eitcache.h"
 #include "mythdbcon.h"
 #include "atsctables.h"
+#include "dvbtables.h"
+#include "dishdescriptors.h"
 #include "util.h"
 
 const uint EITHelper::kChunkSize = 20;
 
-static int get_chan_id_from_db(uint sourceid, uint atscsrcid);
-static int get_chan_id_from_db(int tid_db, const Event&, bool ignore_source);
-static uint update_eit_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
-static uint delete_overlapping_in_db(MSqlQuery&, MSqlQuery&,
-                                     int, const Event&);
-static bool has_program(MSqlQuery&, int, const Event&);
-static bool insert_program(MSqlQuery&, int, const Event&);
-
-static const QString timeFmtDB  = "yyyy-MM-dd hh:mm:ss";
-static const QString timeFmtDB2 = "yyyy-MM-dd hh:mm:ss";
+static int get_chan_id_from_db(uint sourceid,  uint atscsrcid);
+static int get_chan_id_from_db(uint sourceid,  uint serviceid,
+                               uint networkid, uint transportid);
 
 #define LOC QString("EITHelper: ")
 #define LOC_ERR QString("EITHelper, Error: ")
 
 EITHelper::EITHelper() :
-    eitfixup(new EITFixUp()), gps_offset(-13), sourceid(0)
+    eitfixup(new EITFixUp()), eitcache(new EITCache()),
+    gps_offset(-13),          sourceid(0)
 {
 }
 
 EITHelper::~EITHelper()
 {
-    ClearList();
-
     QMutexLocker locker(&eitList_lock);
     for (uint i = 0; i < db_events.size(); i++)
         delete db_events.dequeue();
 
     delete eitfixup;
-}
-
-void EITHelper::HandleEITs(QMap_Events* eventList)
-{
-    QList_Events* events = new QList_Events();
-    QMap_Events::const_iterator it = eventList->begin();
-    for (; it != eventList->end(); ++it)
-    {
-        Event *event = new Event();
-        event->deepCopy((*it));
-        events->push_back(event);
-    }
-
-    eitList_lock.lock();
-    eitList.push_back(events);
-    eitList_lock.unlock();
-}
-
-void EITHelper::ClearList(void)
-{
-    QMutexLocker locker(&eitList_lock);
-
-    while (eitList.size())
-    {
-        QList_Events *events = eitList.front();
-        eitList.pop_front();
-
-        eitList_lock.unlock();
-        QList_Events::iterator it = events->begin();
-        for (; it != events->end(); ++it)
-            delete *it;
-        delete events;
-        eitList_lock.lock();
-    }
+    delete eitcache;
 }
 
 uint EITHelper::GetListSize(void) const
 {
     QMutexLocker locker(&eitList_lock);
-    return eitList.size() + db_events.size();
+    return db_events.size();
 }
 
-/** \fn EITHelper::ProcessEvents(uint)
+/** \fn EITHelper::ProcessEvents(void)
  *  \brief Inserts events in EIT list.
  *
  *  \param mplexid multiplex we are inserting events for.
  *  \return Returns number of events inserted into DB.
  */
-uint EITHelper::ProcessEvents(uint sourceid, bool ignore_source)
+uint EITHelper::ProcessEvents(void)
 {
     QMutexLocker locker(&eitList_lock);
-
     uint insertCount = 0;
 
-    if (eitList.size())
+    if (!db_events.size())
+        return 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    for (uint i = 0; (i < kChunkSize) && (i < db_events.size()); i++)
     {
-        if (eitList.front()->size() <= kChunkSize)
-        {
-            QList_Events *events = eitList.front();
-            eitList.pop_front();
+        DBEvent *event = db_events.dequeue();
+        eitList_lock.unlock();
 
-            eitList_lock.unlock();
-            insertCount += UpdateEITList(sourceid, *events, ignore_source);
-            QList_Events::iterator it = events->begin();
-            for (; it != events->end(); ++it)
-                delete *it;
-            delete events;
-            eitList_lock.lock();
-        }
-        else
-        {
-            QList_Events *events = eitList.front();
-            QList_Events  subset;
+        eitfixup->Fix(*event);
 
-            QList_Events::iterator subset_end = events->begin();
-            for (uint i = 0; i < kChunkSize; ++i) ++subset_end;
-            subset.insert(subset.end(), events->begin(), subset_end);
-            events->erase(events->begin(), subset_end);
+        insertCount += event->UpdateDB(query, 1000);
 
-            eitList_lock.unlock();
-            insertCount += UpdateEITList(sourceid, subset, ignore_source);
-            QList_Events::iterator it = subset.begin();
-            for (; it != subset.end(); ++it)
-                delete *it;
-            eitList_lock.lock();
-        }
-    }
-
-    if (db_events.size())
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        for (uint i = 0; (i < kChunkSize) && (i < db_events.size()); i++)
-        {
-            DBEvent *event = db_events.dequeue();
-            eitList_lock.unlock();
-
-            eitfixup->Fix(*event);
-
-            insertCount += event->UpdateDB(query, 1000);
-
-            delete event;
-            eitList_lock.lock();
-        }
+        delete event;
+        eitList_lock.lock();
     }
 
     if (!insertCount)
@@ -253,6 +181,121 @@ void EITHelper::AddETT(uint atscsrcid, const ExtendedTextTable *ett)
     }
 }
 
+void EITHelper::AddEIT(const DVBEventInformationTable *eit)
+{
+    uint descCompression  = (eit->TableID() > 0x80) ? 2 : 1;
+    uint fix = fixup[0];
+
+    for (uint i = 0; i < eit->EventCount(); i++)
+    {
+        // Skip event if we have already processed it before...
+        if (!eitcache->IsNewEIT(
+                eit->TSID(),      eit->EventID(i),
+                eit->ServiceID(), eit->TableID(),
+                eit->Version(),
+                eit->Descriptors(i), eit->DescriptorsLength(i)))
+        {
+            continue;
+        }
+
+        QString title         = QString::null;
+        QString subtitle      = QString::null;
+        QString description   = QString::null;
+        QString category      = QString::null;
+        QString category_type = QString::null;
+        bool hdtv = false, stereo = false, subtitled = false;
+
+        // Parse descriptors
+        desc_list_t list = MPEGDescriptor::Parse(
+            eit->Descriptors(i), eit->DescriptorsLength(i));
+
+        const unsigned char *dish_event_name =
+            MPEGDescriptor::Find(list, DescriptorID::dish_event_name);
+
+        if (dish_event_name)
+        {
+            DishEventNameDescriptor dend(dish_event_name);
+            if (dend.HasName())
+                title = dend.Name(descCompression);
+
+            const unsigned char *dish_event_description =
+                MPEGDescriptor::Find(list,
+                                     DescriptorID::dish_event_description);
+            if (dish_event_description)
+            {
+                DishEventDescriptionDescriptor dedd(dish_event_description);
+                if (dedd.HasDescription())
+                    description = dedd.Description(descCompression);
+            }
+        }
+        else
+        {
+            const unsigned char *bestShortEvent =
+                MPEGDescriptor::FindBestMatch(
+                    list, DescriptorID::short_event, languagePreferences);
+            if (bestShortEvent)
+            {
+                ShortEventDescriptor sed(bestShortEvent);
+                title    = sed.EventName();
+                subtitle = sed.Text();
+            }
+
+            vector<const unsigned char*> bestExtendedEvents =
+                MPEGDescriptor::FindBestMatches(
+                    list, DescriptorID::extended_event, languagePreferences);
+
+            description = "";
+            for (uint j = 0; j < bestExtendedEvents.size(); j++)
+            {
+                if (!bestExtendedEvents[j])
+                {
+                    description = "";
+                    break;
+                }
+
+                ExtendedEventDescriptor eed(bestExtendedEvents[j]);
+                description += eed.Text();
+            }
+        }
+
+        desc_list_t components =
+            MPEGDescriptor::FindAll(list, DescriptorID::component);
+        for (uint j = 0; j < components.size(); j++)
+        {
+            ComponentDescriptor component(components[j]);
+            hdtv      |= component.IsHDTV();
+            stereo    |= component.IsStereo();
+            subtitled |= component.IsReallySubtitled();
+        }
+
+        const unsigned char *content_data =
+            MPEGDescriptor::Find(list, DescriptorID::content);
+        if (content_data)
+        {
+            ContentDescriptor content(content_data);
+            category      = content.GetDescription(0);
+            category_type = content.GetMythCategory(0);
+        }
+
+        uint chanid = GetChanID(
+            eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
+
+        if (!chanid)
+            continue;
+
+        QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
+        QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
+
+        DBEvent *event = new DBEvent(chanid,
+                                     title,     subtitle,      description,
+                                     category,  category_type,
+                                     starttime, endtime,       fix,
+                                     false,     subtitled,
+                                     stereo,    hdtv);
+        db_events.enqueue(event);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////
 // private methods and functions below this line                    //
 //////////////////////////////////////////////////////////////////////
@@ -261,7 +304,7 @@ void EITHelper::CompleteEvent(uint atscsrcid,
                               const ATSCEvent &event,
                               const QString   &ett)
 {
-    uint chanid = GetChanID(sourceid, atscsrcid);
+    uint chanid = GetChanID(atscsrcid);
     if (!chanid)
         return;
 
@@ -282,7 +325,7 @@ void EITHelper::CompleteEvent(uint atscsrcid,
                                   fixup[atscsrcid], captioned, stereo));
 }
 
-uint EITHelper::GetChanID(uint sourceid, uint atscsrcid)
+uint EITHelper::GetChanID(uint atscsrcid)
 {
     uint key = sourceid << 16 | atscsrcid;
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
@@ -296,39 +339,23 @@ uint EITHelper::GetChanID(uint sourceid, uint atscsrcid)
     return max(chanid, 0);
 }
 
-int EITHelper::GetChanID(uint sourceid, const Event &event,
-                         bool ignore_source) const
+uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 {
-    unsigned long long srv;
-    srv  = ((unsigned long long) sourceid);
-    srv |= ((unsigned long long) event.ServiceID)   << 16;
-    srv |= ((unsigned long long) event.NetworkID)   << 32;
-    srv |= ((unsigned long long) event.TransportID) << 48;
+    uint64_t key;
+    key  = ((uint64_t) sourceid);
+    key |= ((uint64_t) serviceid) << 16;
+    key |= ((uint64_t) networkid) << 32;
+    key |= ((uint64_t) tsid)      << 48;
 
-    int chanid = srv_to_chanid[srv];
-    if (chanid == 0)
-    {
-        srv_to_chanid[srv] = chanid = get_chan_id_from_db(
-            sourceid, event, ignore_source);
-    }
-    return chanid;
-}
+    ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
+    if (it != srv_to_chanid.end())
+        return max(*it, 0);
 
-uint EITHelper::UpdateEITList(uint sourceid, const QList_Events &events,
-                              bool ignore_source) const
-{
-    MSqlQuery query1(MSqlQuery::InitCon());
-    MSqlQuery query2(MSqlQuery::InitCon());
+    int chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
+    if (chanid != 0)
+        srv_to_chanid[key] = chanid;
 
-    int  chanid  = 0;
-    uint counter = 0;
-
-    QList_Events::const_iterator e = events.begin();
-    for (; e != events.end(); ++e)
-        if ((chanid = GetChanID(sourceid, **e, ignore_source)) > 0)
-            counter += update_eit_in_db(query1, query2, chanid, **e);
-
-    return counter;
+    return max(chanid, 0);
 }
 
 static int get_chan_id_from_db(uint sourceid, uint atscsrcid)
@@ -354,41 +381,29 @@ static int get_chan_id_from_db(uint sourceid, uint atscsrcid)
 }
 
 // Figure out the chanid for this channel
-static int get_chan_id_from_db(int sourceid, const Event &event,
-                               bool ignore_source)
+static int get_chan_id_from_db(uint sourceid, uint serviceid,
+                               uint networkid, uint transportid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (event.ATSC)
-    {
-        // ATSC Link to chanid
-        query.prepare(
-            "SELECT chanid, useonairguide "
-            "FROM channel "
-            "WHERE atscsrcid = :ATSCSRCID AND "
-            "      sourceid  = :SOURCEID");
-        query.bindValue(":ATSCSRCID", event.ServiceID);
-    }
-    else
-    {
-        // DVB Link to chanid
-        QString qstr =
-            "SELECT chanid, useonairguide "
-            "FROM channel, dtv_multiplex "
-            "WHERE serviceid        = :SERVICEID   AND "
-            "      networkid        = :NETWORKID   AND "
-            "      transportid      = :TRANSPORTID AND "
-            "      channel.mplexid  = dtv_multiplex.mplexid";
+    // DVB Link to chanid
+    QString qstr =
+        "SELECT chanid, useonairguide "
+        "FROM channel, dtv_multiplex "
+        "WHERE serviceid        = :SERVICEID   AND "
+        "      networkid        = :NETWORKID   AND "
+        "      transportid      = :TRANSPORTID AND "
+        "      channel.mplexid  = dtv_multiplex.mplexid";
 
-        if (!ignore_source)
-            qstr += " AND channel.sourceid = :SOURCEID";
+    if (sourceid)
+        qstr += " AND channel.sourceid = :SOURCEID";
 
-        query.prepare(qstr);
-        query.bindValue(":SERVICEID",   event.ServiceID);
-        query.bindValue(":NETWORKID",   event.NetworkID);
-        query.bindValue(":TRANSPORTID", event.TransportID);
-    }
-    if (!ignore_source)
+    query.prepare(qstr);
+    query.bindValue(":SERVICEID",   serviceid);
+    query.bindValue(":NETWORKID",   networkid);
+    query.bindValue(":TRANSPORTID", transportid);
+
+    if (sourceid)
         query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -400,198 +415,5 @@ static int get_chan_id_from_db(int sourceid, const Event &event,
         return (useOnAirGuide) ? query.value(0).toInt() : -1;        
     }
 
-    if (ignore_source)
-    {
-        VERBOSE(VB_EIT, "EITHelper: " +
-                QString("chanid not found for service %1 on network %2,")
-                .arg(event.ServiceID).arg(event.NetworkID) +
-                "\n\t\t\tso event updates were skipped.");
-        return -1;
-    }
-
-    VERBOSE(VB_EIT, "EITHelper: " +
-            QString("chanid not found for service %1 on source %2,")
-            .arg(event.ServiceID).arg(sourceid) +
-            "\n\t\t\tso event updates were skipped.");
-
     return -1;
-}
-
-static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
-                             int chanid, const Event &event)
-{
-    if (has_program(query, chanid, event))
-        return 0;
-
-    delete_overlapping_in_db(query, query2, chanid, event);
-    return insert_program(query, chanid, event) ? 1 : 0;
-}
-
-static uint delete_overlapping_in_db(
-    MSqlQuery &query, MSqlQuery &delq, int chanid, const Event &event)
-{
-    uint counter = 0;
-    query.prepare(
-        "SELECT starttime, endtime, title, subtitle "
-        "FROM program "
-        "WHERE chanid = :CHANID AND manualid = 0 AND "
-        "      ( starttime >= :STIME AND starttime < :ETIME )");
-
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STIME",  event.StartTime.toString(timeFmtDB));
-    query.bindValue(":ETIME",  event.EndTime.toString(timeFmtDB));
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("Checking Rescheduled Event", query);
-        return 0;
-    }
-
-    delq.prepare(
-        "DELETE FROM program "
-        "WHERE chanid    = :CHANID AND "
-        "      starttime = :STARTTIME AND "
-        "      endtime   = :ENDTIME AND "
-        "      title     = :TITLE");
-
-    while (query.next())
-    {
-        counter++;
-        // New guide data overriding existing
-        // Possibly more than one conflict
-        VERBOSE(VB_EIT, QString("Schedule Change on Channel %1")
-                .arg(chanid));
-        VERBOSE(VB_EIT, QString("Old: %1 %2 %3: %4")
-                .arg(query.value(0).toString())
-                .arg(query.value(1).toString())
-                .arg(query.value(2).toString())
-                .arg(query.value(3).toString()));
-        VERBOSE(VB_EIT, QString("New: %1 %2 %3: %4")
-                .arg(event.StartTime.toString(timeFmtDB2))
-                .arg(event.EndTime.toString(timeFmtDB2))
-                .arg(event.Event_Name.utf8())
-                .arg(event.Event_Subtitle.utf8()));
-
-        // Delete the old program row
-        delq.bindValue(":CHANID",    chanid);
-        delq.bindValue(":STARTTIME", query.value(0).toString());
-        delq.bindValue(":ENDTIME",   query.value(1).toString());
-        delq.bindValue(":TITLE",     query.value(2).toString());
-        if (!delq.exec() || !delq.isActive())
-            MythContext::DBError("Deleting Rescheduled Event", delq);
-    }
-
-    return counter;
-}
-
-static bool has_program(MSqlQuery &query, int chanid, const Event &event)
-{
-    query.prepare(
-        "SELECT subtitle, description "
-        "FROM program "
-        "WHERE chanid    = :CHANID    AND "
-        "      starttime = :STARTTIME AND "
-        "      endtime   = :ENDTIME   AND "
-        "      title     = :TITLE");
-    query.bindValue(":CHANID",    chanid);
-    query.bindValue(":STARTTIME", event.StartTime.toString(timeFmtDB2));
-    query.bindValue(":ENDTIME",   event.EndTime.toString(timeFmtDB2));
-    query.bindValue(":TITLE",     event.Event_Name.utf8());
-
-    if (!query.exec())
-    {
-        MythContext::DBError("Checking If Event Exists", query);
-        return true; // return true on error
-    }
-
-    if (!query.size())
-        return false; // if there is nothing in db, then we don't have program
-
-    if (!query.next())
-        return true; // return true on error
-
-    QString dbDescription = query.value(1).toString();
-    if (event.Description.utf8().length() > dbDescription.length())
-    {
-        VERBOSE(VB_EIT, "EITHelper: Update DB description " +
-                QString("oldsize=%1 newsize=%2")
-                .arg(dbDescription.length())
-                .arg(event.Description.length()));
-        return false; // description needs to be updated
-    }
-
-    QString eSubtitle = event.Event_Subtitle.utf8().lower();
-    if (eSubtitle.isEmpty())
-        return query.size(); // assume subtitle would be the same
-
-    QString dbSubtitle = query.value(0).toString().lower();
-
-    if (dbSubtitle != eSubtitle)
-        VERBOSE(VB_EIT, "EITHelper: Subtitles are different");
-    return dbSubtitle == eSubtitle; // return true on match...
-}
-
-static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
-{
-    query.prepare(
-        "REPLACE INTO program ("
-        "  chanid,         starttime,  endtime,    title, "
-        "  description,    subtitle,   category,   stereo, "
-        "  closecaptioned, hdtv,       airdate,    originalairdate, "
-        "  partnumber,     parttotal,  category_type) "
-        "VALUES ("
-        "  :CHANID,        :STARTTIME, :ENDTIME,   :TITLE, "
-        "  :DESCRIPTION,   :SUBTITLE,  :CATEGORY,  :STEREO, "
-        "  :CC,            :HDTV,      :AIRDATE,   :ORIGAIRDATE, "
-        "  :PARTNUMBER,    :PARTTOTAL, :CATTYPE)");
-
-    QString begTime = event.StartTime.toString(timeFmtDB2);
-    QString endTime = event.EndTime.toString(timeFmtDB2);
-    QString airDate = event.OriginalAirDate.toString("yyyy-MM-dd");
-
-    query.bindValue(":CHANID",      chanid);
-    query.bindValue(":STARTTIME",   begTime);
-    query.bindValue(":ENDTIME",     endTime);
-    query.bindValue(":TITLE",       event.Event_Name.utf8());
-    query.bindValue(":DESCRIPTION", event.Description.utf8());
-    query.bindValue(":SUBTITLE",    event.Event_Subtitle.utf8());
-    query.bindValue(":CATEGORY",    event.ContentDescription.utf8());
-    query.bindValue(":STEREO",      event.Stereo);
-    query.bindValue(":CC",          event.SubTitled);
-    query.bindValue(":HDTV",        event.HDTV);
-    query.bindValue(":AIRDATE",     event.Year);
-    query.bindValue(":ORIGAIRDATE", airDate);
-    query.bindValue(":PARTNUMBER",  event.PartNumber);
-    query.bindValue(":PARTTOTAL",   event.PartTotal);
-    query.bindValue(":CATTYPE",     event.CategoryType.utf8());
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("Adding Event", query);
-        return false;
-    }
-
-    QValueList<Person>::const_iterator it = event.Credits.begin();
-    for (;it != event.Credits.end(); it++)
-    {
-        query.prepare("INSERT IGNORE INTO people (name) "
-                      "VALUES (:NAME);");
-        query.bindValue(":NAME", (*it).name.utf8());
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Adding Event (People)", query);
-
-        query.prepare("INSERT INTO credits "
-                      "(person, chanid, starttime, role) "
-                      "SELECT person, :CHANID, :STARTTIME, :ROLE "
-                      "FROM people WHERE people.name=:NAME");
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", event.StartTime.toString(timeFmtDB));
-        query.bindValue(":ROLE", (*it).role.utf8());
-        query.bindValue(":NAME", (*it).name.utf8());
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Adding Event (Credits)", query);
-    }
-    return true;
 }

@@ -31,10 +31,7 @@ using namespace std;
 // MythTV includes
 #include "sitypes.h"
 
-#ifdef USING_DVB_EIT
-#include "eitfixup.h"
-#include "eitcache.h"
-#else // if !USING_DVB_EIT
+#ifndef USING_DVB_EIT
 typedef void QMap_Events;
 #endif // !USING_DVB_EIT
 
@@ -99,11 +96,6 @@ class SIParser : public QObject
 
     int Start(void);
 
-    // Generic functions that will begin collection of tables based on the
-    // SIStandard.
-    bool FindTransports(void) { need_nit = true; return true; }
-    bool FindServices(void);
-
     void SetATSCStreamData(ATSCStreamData*);
     void SetDVBStreamData(DVBStreamData*);
     void SetStreamData(MPEGStreamData*);
@@ -121,15 +113,6 @@ class SIParser : public QObject
     virtual void AddPid(uint, uint8_t, uint8_t, bool, uint) = 0;
     virtual void DelPid(uint) = 0;
     virtual void DelAllPids(void) = 0;
-
-    // Functions that may become signals for communication
-    // with the outside world
-    void ServicesComplete(void);
-    void GuideComplete(void);
-
-    // Functions to get objects into other classes for manipulation
-    bool GetTransportObject(NITObject &NIT);
-    bool GetServiceObject(QMap_SDTObject &SDT);
 
     void ParseTable(uint8_t* buffer, int size, uint16_t pid);
     void CheckTrackers(void);
@@ -163,8 +146,6 @@ class SIParser : public QObject
     void PrintDescriptorStatistics(void) const;
 
   private:
-    uint GetLanguagePriority(const QString &language);
-
     // Fixes for various DVB Network Spec Deviations
     void LoadPrivateTypes(uint networkID);
 
@@ -196,16 +177,7 @@ class SIParser : public QObject
     // Common Variables
     DVBRecorder        *dvb_recorder;
     int                 table_standard;
-    uint                CurrentTransport;
-    uint                RequestedServiceID;
-    uint                RequestedTransportID;
     
-    // Preferred languages and their priority
-    QMap<QString,uint>  LanguagePriority;
-
-    // DVB Variables
-    uint                NITPID;
-
     // Storage Objects (DVB)
     NITObject           NITList;
 
@@ -221,12 +193,9 @@ class SIParser : public QObject
     dvb_srv_eit_on_t    dvb_srv_collect_eit;
     atsc_eit_pid_map_t  atsc_eit_pid;
     atsc_ett_pid_map_t  atsc_ett_pid;
-    bool                need_nit;
 
     int                 ThreadRunning;
     bool                exitParserThread;
-    TableSourcePIDObject TableSourcePIDs;
-    bool                standardChange;
     /// Decode DishNet's long-term DVB EIT
     bool                eit_dn_long;
 
@@ -236,9 +205,6 @@ class SIParser : public QObject
     bool                PrivateTypesLoaded;
 
 #ifdef USING_DVB_EIT
-    /// EITFixUp instance
-    EITFixUp            eitfixup;
-    EITCache            eitcache;
     QMap2D_Events       incomplete_events;
     QMap2D_Events       complete_events;
     EITHelper          *eithelper;

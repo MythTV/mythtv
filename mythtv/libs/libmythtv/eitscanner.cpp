@@ -80,14 +80,10 @@ void EITScanner::RunEventLoop(void)
     
     while (!exitThread)
     {
-        if (channel)
+        if (eitHelper->GetListSize())
         {
-            uint sourceid = channel->GetCurrentSourceID();
-            if (sourceid && parser && eitHelper->GetListSize())
-            {
-                eitCount += eitHelper->ProcessEvents(sourceid, ignore_source);
-                t.start();
-            }
+            eitCount += eitHelper->ProcessEvents();
+            t.start();
         }
 
         // If there have been any new events and we haven't
@@ -162,8 +158,7 @@ void EITScanner::RescheduleRecordings(void)
 void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
                                   bool _ignore_source)
 {
-    eitHelper->ClearList();
-    eitHelper->SetSourceID(_channel->GetCurrentSourceID());
+    uint sourceid = (_ignore_source) ? 0 : _channel->GetCurrentSourceID();
     parser        = _parser;
     channel       = _channel;
     ignore_source = _ignore_source;
@@ -171,6 +166,7 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
     if (ignore_source)
         VERBOSE(VB_EIT, LOC + "EIT scan ignoring sourceid..");
 
+    eitHelper->SetSourceID(sourceid);
     parser->SetEITHelper(eitHelper);
 }
 
@@ -179,12 +175,14 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
  */
 void EITScanner::StopPassiveScan(void)
 {
-    parser->SetEITHelper(NULL);
-    eitHelper->ClearList();
-    eitHelper->SetSourceID(0);
-
+    if (parser)
+    {
+        parser->SetEITHelper(NULL);
+        parser  = NULL;
+    }
     channel = NULL;
-    parser  = NULL;
+
+    eitHelper->SetSourceID(0);
 }
 
 void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,

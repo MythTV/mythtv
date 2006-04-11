@@ -73,16 +73,24 @@ class DBEvent
     DBEvent(uint             _chanid,
             const QString   &_title,     const QString   &_subtitle,
             const QString   &_desc,
+            const QString   &_category,  const QString   &_category_type,
             const QDateTime &_start,     const QDateTime &_end,
             uint             _fixup,
-            bool             _captioned, bool             _stereo) :
+            bool             _captioned, bool _subtitled,
+            bool             _stereo,    bool _hdtv) :
         title(_title),           subtitle(_subtitle),
         description(_desc),
+        category(_category),     category_type(_category_type),
         starttime(_start),       endtime(_end),
         chanid(_chanid),         fixup(_fixup),
-        captioned(_captioned),   stereo(_stereo)
+        flags(0)
     {
+        flags |= (_captioned) ? kCaptioned : 0;
+        flags |= (_subtitled) ? kSubtitled : 0;
+        flags |= (_stereo)    ? kStereo    : 0;
+        flags |= (_hdtv)      ? kHDTV      : 0;
     }
+
     DBEvent(uint             _chanid,
             const QString   &_title,     const QString   &_desc,
             const QDateTime &_start,     const QDateTime &_end,
@@ -90,12 +98,21 @@ class DBEvent
             bool             _captioned, bool             _stereo) :
         title(_title),           subtitle(QString::null),
         description(_desc),
+        category(QString::null), category_type(QString::null),
         starttime(_start),       endtime(_end),
         chanid(_chanid),         fixup(_fixup),
-        captioned(_captioned),   stereo(_stereo)
+        flags(0)
     {
+        flags |= (_captioned) ? kCaptioned : 0;
+        flags |= (_stereo)    ? kStereo    : 0;
     }
+
     uint UpdateDB(MSqlQuery &query, int match_threshold) const;
+
+    bool IsCaptioned(void) const { return flags & kCaptioned; }
+    bool IsSubtitled(void) const { return flags & kSubtitled; }
+    bool IsStereo(void)    const { return flags & kStereo;    }
+    bool IsHDTV(void)      const { return flags & kHDTV;      }
 
   private:
     uint GetOverlappingPrograms(MSqlQuery&, vector<DBEvent> &programs) const;
@@ -109,12 +126,18 @@ class DBEvent
     QString       title;
     QString       subtitle;
     QString       description;
+    QString       category;
+    QString       category_type;
     QDateTime     starttime;
     QDateTime     endtime;
     uint32_t      chanid;
     unsigned char fixup;
-    bool          captioned;
-    bool          stereo;
+    unsigned char flags;
+
+    static const unsigned char kCaptioned = 0x1;
+    static const unsigned char kSubtitled = 0x2;
+    static const unsigned char kStereo    = 0x4;
+    static const unsigned char kHDTV      = 0x8;
 };
 
 #endif // _EIT_H_

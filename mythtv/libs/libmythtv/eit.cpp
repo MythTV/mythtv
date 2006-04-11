@@ -107,8 +107,10 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
 {
     uint count = 0;
     query.prepare(
-        "SELECT title,     subtitle, description,           "
-        "       starttime, endtime,  closecaptioned, stereo "
+        "SELECT title,          subtitle,      description, "
+        "       category,       category_type, "
+        "       starttime,      endtime, "
+        "       closecaptioned, subtitled,     stereo,      hdtv "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -131,9 +133,11 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         DBEvent prog(chanid,
                      query.value(0).toString(),   query.value(1).toString(),
                      query.value(2).toString(),
-                     query.value(3).toDateTime(), query.value(4).toDateTime(),
+                     query.value(3).toString(),   query.value(4).toString(),
+                     query.value(5).toDateTime(), query.value(6).toDateTime(),
                      fixup,
-                     query.value(5).toBool(),     query.value(6).toBool());
+                     query.value(7).toBool(),     query.value(8).toBool(),
+                     query.value(9).toBool(),     query.value(10).toBool());
 
         programs.push_back(prog);
         count++;
@@ -243,6 +247,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     QString ltitle    = title;
     QString lsubtitle = subtitle;
     QString ldesc     = description;
+    QString lcategory = category;
+    QString lcattype  = category_type;
 
     if (match.title.length() >= ltitle.length())
         ltitle = match.title;
@@ -253,15 +259,25 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     if (match.description.length() >= ldesc.length())
         ldesc = match.description;
 
-    bool lcc     = captioned | match.captioned;
-    bool lstereo = stereo    | match.stereo;
+    if (match.category.length() >= lcategory.length())
+        lcategory = match.category;
+
+    if (match.category_type.length() >= lcattype.length())
+        lcattype = match.category_type;
+
+    bool lcc        = IsCaptioned() | match.IsCaptioned();
+    bool lstereo    = IsStereo()    | match.IsStereo();
+    bool lsubtitled = IsSubtitled() | match.IsSubtitled();
+    bool lhdtv      = IsHDTV()      | match.IsHDTV();
 
     query.prepare(
         "UPDATE program "
-        "SET title          = :TITLE,     subtitle    = :SUBTITLE, "
+        "SET title          = :TITLE,     subtitle      = :SUBTITLE, "
         "    description    = :DESC, "
-        "    starttime      = :STARTTIME, endtime     = :ENDTIME,  "
-        "    closecaptioned = :CC,        stereo      = :STEREO,   "
+        "    category       = :CAT,       category_type = :CATTYPE, "
+        "    starttime      = :STARTTIME, endtime       = :ENDTIME, "
+        "    closecaptioned = :CC,        subtitled     = :SUBTITLED, "
+        "    stereo         = :STEREO,    hdtv          = :HDTV, "
         "    listingsource  = :LSOURCE "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART ");
@@ -270,11 +286,15 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":OLDSTART",    match.starttime);
     query.bindValue(":TITLE",       ltitle.utf8());
     query.bindValue(":SUBTITLE",    lsubtitle.utf8());
-    query.bindValue(":DESCRIPTION", ldesc.utf8());
+    query.bindValue(":DESC",        ldesc.utf8());
+    query.bindValue(":CAT",         lcategory.utf8());
+    query.bindValue(":CATTYPE",     lcattype.utf8());
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
     query.bindValue(":CC",          lcc);
+    query.bindValue(":SUBTITLED",   lsubtitled);
     query.bindValue(":STEREO",      lstereo);
+    query.bindValue(":HDTV",        lhdtv);
     query.bindValue(":LSOURCE",     1);
 
     if (!query.exec())
@@ -354,22 +374,30 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
 {
     query.prepare(
         "REPLACE INTO program ("
-        "  chanid,       title,    subtitle,        description, "
-        "  starttime,    endtime,  closecaptioned,  stereo, "
+        "  chanid,         title,          subtitle,        description, "
+        "  category,       category_type, "
+        "  starttime,      endtime, "
+        "  closecaptioned, subtitled,      stereo,          hdtv,"
         "  listingsource ) "
         "VALUES ("
-        " :CHANID,    :TITLE,   :SUBTITLE,       :DESCRIPTION, "
-        " :STARTTIME, :ENDTIME, :CC,             :STEREO, "
+        " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
+        " :CATEGORY,      :CATTYPE, "
+        " :STARTTIME,     :ENDTIME, "
+        " :CC,            :SUBTITLED,     :STEREO,         :HDTV, "
         " :LSOURCE ) ");
 
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":TITLE",       title.utf8());
     query.bindValue(":SUBTITLE",    subtitle.utf8());
     query.bindValue(":DESCRIPTION", description.utf8());
+    query.bindValue(":CATEGORY",    category.utf8());
+    query.bindValue(":CATTYPE",     category_type.utf8());
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
-    query.bindValue(":CC",          captioned);
-    query.bindValue(":STEREO",      stereo);
+    query.bindValue(":CC",          IsCaptioned());
+    query.bindValue(":SUBTITLED",   IsSubtitled());
+    query.bindValue(":STEREO",      IsStereo());
+    query.bindValue(":HDTV",        IsHDTV());
     query.bindValue(":LSOURCE",     1);
 
     if (!query.exec())

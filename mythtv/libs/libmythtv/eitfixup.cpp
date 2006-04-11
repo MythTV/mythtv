@@ -33,6 +33,9 @@ EITFixUp::EITFixUp()
 
 void EITFixUp::Fix(Event &event, int fix_type) const
 {
+    if (event.Event_Subtitle == event.Event_Name)
+        event.Event_Subtitle = QString::null;
+
     event.Year = event.StartTime.toString(QString("yyyy"));
 
     if (event.Description.isEmpty() && !event.Event_Subtitle.isEmpty())
