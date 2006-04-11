@@ -153,8 +153,6 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (!connected)
     {
-        QTextStream os(socket->socketDevice());
-
         int count = 0;
         do
         {
@@ -179,6 +177,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                 {
                     lcd_ready = true;
                     connected = true;
+
+                    QTextStream os(socket->socketDevice());
                     os << "HELLO\n";
                     break;
                 }
