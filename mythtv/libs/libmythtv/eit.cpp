@@ -407,15 +407,13 @@ static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
 
     query.prepare(
         "UPDATE credits "
-        "SET starttime = :NEWSTART, "
-        "    endtime   = :NEWEND "
+        "SET starttime = :NEWSTART "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART");
 
     query.bindValue(":CHANID",   chanid);
     query.bindValue(":OLDSTART", st);
     query.bindValue(":NEWSTART", new_st);
-    query.bindValue(":NEWEND",   new_end);
 
     if (!query.exec())
     {
@@ -456,7 +454,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  chanid,         title,          subtitle,        description, "
         "  category,       category_type, "
         "  starttime,      endtime, "
-        "  closecaptioned, subtitled,      stereo,          hdtv,"
+        "  closecaptioned, subtitled,      stereo,          hdtv, "
         "  partnumber,     parttotal, "
         "  listingsource ) "
         "VALUES ("
