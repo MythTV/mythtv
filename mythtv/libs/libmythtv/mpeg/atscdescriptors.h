@@ -5,9 +5,11 @@
 
 #include <cassert>
 #include <vector>
-#include <iostream>
+using namespace std;
+
 #include <qstring.h>
 #include <qmap.h>
+
 #include "mythcontext.h"
 #include "mpegdescriptors.h"
 
@@ -15,34 +17,34 @@ using namespace std;
 
 typedef QMap<int, const unsigned char*> IntToBuf;
 
-class MultipleStringStructure {
+class MultipleStringStructure
+{
   public:
-    MultipleStringStructure(const unsigned char* data) : _data(data) {
+    MultipleStringStructure(const unsigned char* data) : _data(data)
+    {
         Parse();
     }
 
-    int StringCount() const { return _data[0]; }
+    uint StringCount(void) const { return _data[0]; }
     //uimsbf for (i= 0;i< number_strings;i++) {
     //  ISO_639_language_code 24;
-    int LanguageKey(int i) const
+    int LanguageKey(uint i) const
         { return iso639_str3_to_key(Offset(i,-1)); }
-    QString LanguageString(int i) const
+    QString LanguageString(uint i) const
         { return iso639_key_to_str3(LanguageKey(i)); }
-    int CanonicalLanguageKey(int i) const
+    int CanonicalLanguageKey(uint i) const
         { return iso639_key_to_canonical_key(LanguageKey(i)); }
-    QString CanonicalLanguageString(int i) const
+    QString CanonicalLanguageString(uint i) const
         { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   uimsbf cc_type         1  3.0
 
     //  uimsbf number_segments 8;
-    uint SegmentCount(int i) const {
-        return *(Offset(i,-1)+3);
-    }
+    uint SegmentCount(uint i) const { return *(Offset(i,-1)+3); }
 
     //  uimsbf for (j=0;j<number_segments;j++) {
     //    compression_type 8;
-    int CompressionType(int i, int j) const { return *Offset(i,j); }
-    QString CompressionTypeString(int i, int j) const;
+    uint CompressionType(uint i, uint j) const { return *Offset(i,j); }
+    QString CompressionTypeString(uint i, uint j) const;
     //    uimsbf mode 8;
     int Mode(int i, int j) const { return *(Offset(i,j)+1); }
     //    uimsbf number_bytes 8;
@@ -51,17 +53,23 @@ class MultipleStringStructure {
     //      compressed_string_byte [k] 8 bslbf;
     //  }
     //}
+
+    uint GetIndexOfBestMatch(QMap<uint,uint> &langPrefs) const;
+    QString GetBestMatch(QMap<uint,uint> &langPrefs) const;
+
+    QString GetSegment(uint i, uint j) const;
+    QString GetFullString(uint i) const;
+
+    void Parse(void) const;
+
+    QString toString() const;
+
   private:
     static QString Uncompressed(const unsigned char* buf, int len, int mode);
     static uint Index(int i, int j) { return (i<<8)|(j&0xff); }
     const unsigned char* Offset(int i, int j) const
         { return _ptrs[Index(i,j)]; }
 
-  public:
-    QString CompressedString(int i, int j) const;
-
-    void Parse() const;
-    QString toString() const;
   private:
     const unsigned char* _data;
     mutable IntToBuf _ptrs;

@@ -1,10 +1,15 @@
 #ifndef _EIT_H_
 #define _EIT_H_
 
+#include <vector>
+using namespace std;
+
 #include <qmap.h>
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qstringlist.h>
+
+class MSqlQuery;
 
 class Person
 {
@@ -61,5 +66,55 @@ class Event
 };
 typedef QMap<uint,Event>       QMap_Events;
 typedef QMap<uint,QMap_Events> QMap2D_Events;
+
+class DBEvent
+{
+  public:
+    DBEvent(uint             _chanid,
+            const QString   &_title,     const QString   &_subtitle,
+            const QString   &_desc,
+            const QDateTime &_start,     const QDateTime &_end,
+            uint             _fixup,
+            bool             _captioned, bool             _stereo) :
+        title(_title),           subtitle(_subtitle),
+        description(_desc),
+        starttime(_start),       endtime(_end),
+        chanid(_chanid),         fixup(_fixup),
+        captioned(_captioned),   stereo(_stereo)
+    {
+    }
+    DBEvent(uint             _chanid,
+            const QString   &_title,     const QString   &_desc,
+            const QDateTime &_start,     const QDateTime &_end,
+            uint             _fixup,
+            bool             _captioned, bool             _stereo) :
+        title(_title),           subtitle(QString::null),
+        description(_desc),
+        starttime(_start),       endtime(_end),
+        chanid(_chanid),         fixup(_fixup),
+        captioned(_captioned),   stereo(_stereo)
+    {
+    }
+    uint UpdateDB(MSqlQuery &query, int match_threshold) const;
+
+  private:
+    uint GetOverlappingPrograms(MSqlQuery&, vector<DBEvent> &programs) const;
+    int  GetMatch(const vector<DBEvent> &programs, int &bestmatch) const;
+    uint UpdateDB(MSqlQuery&, const vector<DBEvent> &p, int match) const;
+    uint UpdateDB(MSqlQuery&, const DBEvent &match) const;
+    bool MoveOutOfTheWayDB(MSqlQuery&, const DBEvent &nonmatch) const;
+    uint InsertDB(MSqlQuery&) const;
+
+  public:
+    QString       title;
+    QString       subtitle;
+    QString       description;
+    QDateTime     starttime;
+    QDateTime     endtime;
+    uint32_t      chanid;
+    unsigned char fixup;
+    bool          captioned;
+    bool          stereo;
+};
 
 #endif // _EIT_H_

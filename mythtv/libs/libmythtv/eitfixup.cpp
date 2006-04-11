@@ -57,6 +57,12 @@ void EITFixUp::Fix(Event &event, int fix_type) const
     event.Description.stripWhiteSpace();
 }
 
+void EITFixUp::Fix(DBEvent &event) const
+{
+    EITFixUp::TimeFix(event.starttime);
+    EITFixUp::TimeFix(event.endtime);
+}
+
 /** \fn EITFixUp::FixBellExpressVu(Event&) const
  *  \brief Use this for the Canadian BellExpressVu to standardize DVB-S guide.
  *  \TODO deal with events that don't have eventype at the begining?

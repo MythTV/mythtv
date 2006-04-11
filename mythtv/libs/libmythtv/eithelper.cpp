@@ -1,11 +1,18 @@
 // -*- Mode: c++ -*-
 
+#include <algorithm>
+using namespace std;
+
 // MythTV includes
 #include "eithelper.h"
+#include "eitfixup.h"
 #include "mythdbcon.h"
+#include "atsctables.h"
+#include "util.h"
 
 const uint EITHelper::kChunkSize = 20;
 
+static int get_chan_id_from_db(uint sourceid, uint atscsrcid);
 static int get_chan_id_from_db(int tid_db, const Event&, bool ignore_source);
 static uint update_eit_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
 static uint delete_overlapping_in_db(MSqlQuery&, MSqlQuery&,
@@ -13,11 +20,27 @@ static uint delete_overlapping_in_db(MSqlQuery&, MSqlQuery&,
 static bool has_program(MSqlQuery&, int, const Event&);
 static bool insert_program(MSqlQuery&, int, const Event&);
 
-// TODO w/GPS->UTF time conversion ':00' can become ':ss'
-static const QString timeFmtDB  = "yyyy-MM-dd hh:mm:00";
-static const QString timeFmtDB2 = "yyyy-MM-dd hh:mm:00";
-// To overwrite datadirect data with eit data use this instead
-//  static const QString timeFmtDB2 = "yyyy-MM-ddThh:mm:00";
+static const QString timeFmtDB  = "yyyy-MM-dd hh:mm:ss";
+static const QString timeFmtDB2 = "yyyy-MM-dd hh:mm:ss";
+
+#define LOC QString("EITHelper: ")
+#define LOC_ERR QString("EITHelper, Error: ")
+
+EITHelper::EITHelper() :
+    eitfixup(new EITFixUp()), gps_offset(-13), sourceid(0)
+{
+}
+
+EITHelper::~EITHelper()
+{
+    ClearList();
+
+    QMutexLocker locker(&eitList_lock);
+    for (uint i = 0; i < db_events.size(); i++)
+        delete db_events.dequeue();
+
+    delete eitfixup;
+}
 
 void EITHelper::HandleEITs(QMap_Events* eventList)
 {
@@ -56,7 +79,7 @@ void EITHelper::ClearList(void)
 uint EITHelper::GetListSize(void) const
 {
     QMutexLocker locker(&eitList_lock);
-    return eitList.size();
+    return eitList.size() + db_events.size();
 }
 
 /** \fn EITHelper::ProcessEvents(uint)
@@ -69,47 +92,208 @@ uint EITHelper::ProcessEvents(uint sourceid, bool ignore_source)
 {
     QMutexLocker locker(&eitList_lock);
 
-    if (!eitList.size())
+    uint insertCount = 0;
+
+    if (eitList.size())
+    {
+        if (eitList.front()->size() <= kChunkSize)
+        {
+            QList_Events *events = eitList.front();
+            eitList.pop_front();
+
+            eitList_lock.unlock();
+            insertCount += UpdateEITList(sourceid, *events, ignore_source);
+            QList_Events::iterator it = events->begin();
+            for (; it != events->end(); ++it)
+                delete *it;
+            delete events;
+            eitList_lock.lock();
+        }
+        else
+        {
+            QList_Events *events = eitList.front();
+            QList_Events  subset;
+
+            QList_Events::iterator subset_end = events->begin();
+            for (uint i = 0; i < kChunkSize; ++i) ++subset_end;
+            subset.insert(subset.end(), events->begin(), subset_end);
+            events->erase(events->begin(), subset_end);
+
+            eitList_lock.unlock();
+            insertCount += UpdateEITList(sourceid, subset, ignore_source);
+            QList_Events::iterator it = subset.begin();
+            for (; it != subset.end(); ++it)
+                delete *it;
+            eitList_lock.lock();
+        }
+    }
+
+    if (db_events.size())
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        for (uint i = 0; (i < kChunkSize) && (i < db_events.size()); i++)
+        {
+            DBEvent *event = db_events.dequeue();
+            eitList_lock.unlock();
+
+            eitfixup->Fix(*event);
+
+            insertCount += event->UpdateDB(query, 1000);
+
+            delete event;
+            eitList_lock.lock();
+        }
+    }
+
+    if (!insertCount)
         return 0;
 
-    uint insertCount = 0;
-    if (eitList.front()->size() <= kChunkSize)
+    if (incomplete_events.size() || unmatched_etts.size())
     {
-        QList_Events *events = eitList.front();
-        eitList.pop_front();
-
-        eitList_lock.unlock();
-        insertCount += UpdateEITList(sourceid, *events, ignore_source);
-        QList_Events::iterator it = events->begin();
-        for (; it != events->end(); ++it)
-            delete *it;
-        delete events;
-        eitList_lock.lock();
+        VERBOSE(VB_EIT, LOC +
+                QString("Added %1 events -- complete(%2) "
+                        "incomplete(%3) unmatched(%4)")
+                .arg(insertCount).arg(db_events.size())
+                .arg(incomplete_events.size()).arg(unmatched_etts.size()));
     }
     else
     {
-        QList_Events *events = eitList.front();
-        QList_Events  subset;
-
-        QList_Events::iterator subset_end = events->begin();
-        for (uint i = 0; i < kChunkSize; ++i) ++subset_end;
-        subset.insert(subset.end(), events->begin(), subset_end);
-        events->erase(events->begin(), subset_end);
-        
-        eitList_lock.unlock();
-        insertCount += UpdateEITList(sourceid, subset, ignore_source);
-        QList_Events::iterator it = subset.begin();
-        for (; it != subset.end(); ++it)
-            delete *it;
-        eitList_lock.lock();
+        VERBOSE(VB_EIT, LOC + QString("Added %1 events").arg(insertCount));
     }
 
-    if (insertCount != 0)
-    {
-        VERBOSE(VB_EIT, QString ("EITHelper: Added %1 events")
-                .arg(insertCount));
-    }
     return insertCount;
+}
+
+void EITHelper::SetFixup(uint atscsrcid, uint eitfixup)
+{
+    QMutexLocker locker(&eitList_lock);
+    fixup[atscsrcid] = eitfixup;
+}
+
+void EITHelper::SetLanguagePreferences(const QStringList &langPref)
+{
+    QMutexLocker locker(&eitList_lock);
+
+    uint priority = 1;
+    QStringList::const_iterator it;
+    for (it = langPref.begin(); it != langPref.end(); ++it)
+    {
+        if (!(*it).isEmpty())
+        {
+            uint language_key   = iso639_str3_to_key((*it).ascii());
+            uint canonoical_key = iso639_key_to_canonical_key(language_key);
+            languagePreferences[canonoical_key] = priority++;
+        }
+    }
+}
+
+void EITHelper::SetSourceID(uint _sourceid)
+{
+    QMutexLocker locker(&eitList_lock);
+    sourceid = _sourceid;
+}
+
+void EITHelper::AddEIT(uint atscsrcid, const EventInformationTable *eit)
+{
+    EventIDToATSCEvent &events = incomplete_events[atscsrcid];
+    EventIDToETT &etts = unmatched_etts[atscsrcid];
+
+    for (uint i = 0; i < eit->EventCount(); i++)
+    {
+        ATSCEvent ev(eit->StartTimeRaw(i), eit->LengthInSeconds(i),
+                     eit->ETMLocation(i),
+                     eit->title(i).GetBestMatch(languagePreferences),
+                     eit->Descriptors(i), eit->DescriptorsLength(i));
+
+        EventIDToETT::iterator it = etts.find(eit->EventID(i));
+
+        if (it != etts.end())
+        {
+            CompleteEvent(atscsrcid, ev, *it);
+            etts.erase(it);
+        }
+        else if (!ev.etm)
+        {
+            CompleteEvent(atscsrcid, ev, QString::null);
+        }
+        else
+        {
+            unsigned char *tmp = new unsigned char[ev.desc_length];
+            memcpy(tmp, eit->Descriptors(i), ev.desc_length);
+            ev.desc = tmp;
+            events[eit->EventID(i)] = ev;
+        }
+    }
+}
+
+void EITHelper::AddETT(uint atscsrcid, const ExtendedTextTable *ett)
+{
+    // Try to complete an Event
+    ATSCSRCToEvents::iterator eits_it = incomplete_events.find(atscsrcid);
+    if (eits_it != incomplete_events.end())
+    {
+        EventIDToATSCEvent::iterator it = (*eits_it).find(ett->EventID());
+        if (it != (*eits_it).end())
+        {
+            CompleteEvent(atscsrcid, *it, ett->ExtendedTextMessage()
+                          .GetBestMatch(languagePreferences));
+            if ((*it).desc)
+                delete [] (*it).desc;
+            (*eits_it).erase(it);
+            return;
+        }
+    }
+
+    // Couldn't find matching EIT. If not yet in unmatched ETT map, insert it.
+    EventIDToETT &elist = unmatched_etts[atscsrcid];
+    if (elist.find(ett->EventID()) == elist.end())
+    {
+        elist[ett->EventID()] = ett->ExtendedTextMessage()
+            .GetBestMatch(languagePreferences);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
+// private methods and functions below this line                    //
+//////////////////////////////////////////////////////////////////////
+
+void EITHelper::CompleteEvent(uint atscsrcid,
+                              const ATSCEvent &event,
+                              const QString   &ett)
+{
+    uint chanid = GetChanID(sourceid, atscsrcid);
+    if (!chanid)
+        return;
+
+    QDateTime starttime;
+    int t = secs_Between_1Jan1970_6Jan1980 + gps_offset + event.start_time;
+    starttime.setTime_t(t, Qt::UTC);
+    starttime = MythUTCToLocal(starttime);
+    QDateTime endtime = starttime.addSecs(event.length);
+
+    desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
+    bool captioned = MPEGDescriptor::Find(list, DescriptorID::caption_service);
+    bool stereo = false;
+
+    QMutexLocker locker(&eitList_lock);
+    db_events.enqueue(new DBEvent(chanid, QDeepCopy<QString>(event.title),
+                                  QDeepCopy<QString>(ett),
+                                  starttime, endtime,
+                                  fixup[atscsrcid], captioned, stereo));
+}
+
+uint EITHelper::GetChanID(uint sourceid, uint atscsrcid)
+{
+    uint key = sourceid << 16 | atscsrcid;
+    ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
+    if (it != srv_to_chanid.end())
+        return max(*it, 0);
+
+    int chanid = get_chan_id_from_db(sourceid, atscsrcid);
+    if (chanid != 0)
+        srv_to_chanid[key] = chanid;
+
+    return max(chanid, 0);
 }
 
 int EITHelper::GetChanID(uint sourceid, const Event &event,
@@ -145,6 +329,28 @@ uint EITHelper::UpdateEITList(uint sourceid, const QList_Events &events,
             counter += update_eit_in_db(query1, query2, chanid, **e);
 
     return counter;
+}
+
+static int get_chan_id_from_db(uint sourceid, uint atscsrcid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+            "SELECT chanid, useonairguide "
+            "FROM channel "
+            "WHERE atscsrcid = :ATSCSRCID AND "
+            "      sourceid  = :SOURCEID");
+    query.bindValue(":ATSCSRCID", atscsrcid);
+    query.bindValue(":SOURCEID",  sourceid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Looking up chanid 1", query);
+    else if (query.next())
+    {
+        bool useOnAirGuide = query.value(1).toBool();
+        return (useOnAirGuide) ? query.value(0).toInt() : -1;
+    }
+
+    return -1;
 }
 
 // Figure out the chanid for this channel

@@ -30,6 +30,9 @@ EITScanner::EITScanner()
     : channel(NULL), parser(NULL), eitHelper(new EITHelper()),
       exitThread(false), rec(NULL), activeScan(false)
 {
+    QStringList langPref = iso639_get_language_list();
+    eitHelper->SetLanguagePreferences(langPref);
+
     pthread_create(&eventThread, NULL, SpawnEventLoop, this);
 
     // Lower scheduling priority, to avoid problems with recordings.
@@ -160,6 +163,7 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
                                   bool _ignore_source)
 {
     eitHelper->ClearList();
+    eitHelper->SetSourceID(_channel->GetCurrentSourceID());
     parser        = _parser;
     channel       = _channel;
     ignore_source = _ignore_source;
@@ -177,6 +181,7 @@ void EITScanner::StopPassiveScan(void)
 {
     parser->SetEITHelper(NULL);
     eitHelper->ClearList();
+    eitHelper->SetSourceID(0);
 
     channel = NULL;
     parser  = NULL;

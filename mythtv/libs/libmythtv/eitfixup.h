@@ -28,11 +28,21 @@ class EITFixUp
     EITFixUp();
 
     void Fix(Event &event, int fix_type) const;
+    void Fix(DBEvent &event) const;
 
     void clearSubtitleServiceIDs(void)
         { parseSubtitleServiceIDs.clear(); }
     void addSubtitleServiceID(uint st_pid)
         { parseSubtitleServiceIDs[st_pid] = 1; }
+
+    static void TimeFix(QDateTime &dt)
+    {
+        int secs = dt.time().second();
+        if (secs < 5)
+            dt.addSecs(-secs);
+        if (secs > 55)
+            dt.addSecs(60 - secs);
+    }
 
   private:
     void FixBellExpressVu(Event &event) const; // Canada DVB-S

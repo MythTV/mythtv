@@ -502,13 +502,16 @@ class EventInformationTable : public PSIPTable
         return ((_ptrs[i][0]<<8) | _ptrs[i][1])&0x3fff;
     }
     //   start_time            32   2.0
+    uint StartTimeRaw(uint i) const
+    {
+        return ((_ptrs[i][2]<<24) | (_ptrs[i][3]<<16) |
+                (_ptrs[i][4]<<8)  | (_ptrs[i][5]));
+    }
     QDateTime StartTimeGPS(uint i) const
     {
         // Time in GPS seconds since 00:00:00 on January 6th, 1980 UTC
-        uint t = ((_ptrs[i][2]<<24) | (_ptrs[i][3]<<16) |
-                  (_ptrs[i][4]<<8)  | (_ptrs[i][5]));
         QDateTime dt;
-        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + t);
+        dt.setTime_t(secs_Between_1Jan1970_6Jan1980 + StartTimeRaw(i));
         return dt;
     }
     //   reserved               2   6.0    3
