@@ -129,7 +129,8 @@ bool              ContentDescriptor::categoryDescExists = false;
 
 QString myth_category_type_to_string(uint category_type)
 {
-    static const char *cattype[] = { "movie", "series", "sports", "tvshow", };
+    static const char *cattype[] =
+        { "", "movie", "series", "sports", "tvshow", };
 
     if ((category_type > kCategoryNone) && (category_type < kCategoryLast))
         return QString(cattype[category_type]);
@@ -139,8 +140,10 @@ QString myth_category_type_to_string(uint category_type)
 
 MythCategoryType string_to_myth_category_type(const QString &category_type)
 {
-    static const char *cattype[] = { "movie", "series", "sports", "tvshow", };
-    for (uint i = 0; i < 4; i++)
+    static const char *cattype[] =
+        { "", "movie", "series", "sports", "tvshow", };
+
+    for (uint i = 1; i < 5; i++)
         if (category_type == cattype[i])
             return (MythCategoryType) i;
     return kCategoryNone;
