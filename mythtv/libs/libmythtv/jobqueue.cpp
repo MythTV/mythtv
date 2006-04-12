@@ -1274,7 +1274,7 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
     return false;
 }
 
-int JobQueue::GetJobCmd(int jobID)
+enum JobCmds JobQueue::GetJobCmd(int jobID)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1284,18 +1284,17 @@ int JobQueue::GetJobCmd(int jobID)
 
     query.exec();
 
-    if (!query.isActive())
+    if (query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::GetJobCmd()", query);
-        return false;
+        if ((query.size() > 0) && query.next())
+            return (enum JobCmds)query.value(0).toInt();
     }
     else
     {
-        if ((query.size() > 0) && query.next())
-            return query.value(0).toInt();
+        MythContext::DBError("Error in JobQueue::GetJobCmd()", query);
     }
 
-    return JOB_UNKNOWN;
+    return JOB_RUN;
 }
 
 QString JobQueue::GetJobArgs(int jobID)
@@ -1308,21 +1307,20 @@ QString JobQueue::GetJobArgs(int jobID)
 
     query.exec();
 
-    if (!query.isActive())
-    {
-        MythContext::DBError("Error in JobQueue::GetJobArgs()", query);
-        return false;
-    }
-    else
+    if (query.isActive())
     {
         if ((query.numRowsAffected() > 0) && query.next())
             return query.value(0).toString();
+    }
+    else
+    {
+        MythContext::DBError("Error in JobQueue::GetJobArgs()", query);
     }
 
     return QString("");
 }
 
-int JobQueue::GetJobFlags(int jobID)
+enum JobFlags JobQueue::GetJobFlags(int jobID)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1332,21 +1330,20 @@ int JobQueue::GetJobFlags(int jobID)
 
     query.exec();
 
-    if (!query.isActive())
+    if (query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::GetJobFlags()", query);
-        return false;
+        if ((query.size() > 0) && query.next())
+            return (enum JobFlags)query.value(0).toInt();
     }
     else
     {
-        if ((query.size() > 0) && query.next())
-            return query.value(0).toInt();
+        MythContext::DBError("Error in JobQueue::GetJobFlags()", query);
     }
 
-    return JOB_UNKNOWN;
+    return JOB_NO_FLAGS;
 }
 
-int JobQueue::GetJobStatus(int jobID)
+enum JobStatus JobQueue::GetJobStatus(int jobID)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1356,21 +1353,20 @@ int JobQueue::GetJobStatus(int jobID)
 
     query.exec();
 
-    if (!query.isActive())
+    if (query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
-        return false;
+        if ((query.size() > 0) && query.next())
+            return (enum JobStatus)query.value(0).toInt();
     }
     else
     {
-        if ((query.size() > 0) && query.next())
-            return query.value(0).toInt();
+        MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
     }
-
     return JOB_UNKNOWN;
 }
 
-int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
+enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
+    QDateTime startts)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -1383,16 +1379,14 @@ int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
 
     query.exec();
 
-    if (!query.isActive())
+    if (query.isActive())
+    {
+        if (query.size() > 0 && query.next())
+            return (enum JobStatus)query.value(0).toInt();
+    }
+    else
     {
         MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
-        return false;
-    }
-    if (query.size() > 0 && query.next())
-    {
-        int tmpStatus;
-        tmpStatus = query.value(0).toInt();
-        return tmpStatus;
     }
     return JOB_UNKNOWN;
 }
@@ -1839,7 +1833,10 @@ void JobQueue::DoTranscodeThread(void)
         {
             msg = QString("Transcode %1")
                           .arg(StatusText(GetJobStatus(jobID)));
-            gContext->LogEntry("transcode", LP_NOTICE, msg, details);
+
+            details = QString("%1%2: (%3)")
+                              .arg(program_info->title).arg(subtitle)
+                              .arg(transcoderName);
 
             if (status == JOB_FINISHED)
             {
@@ -1851,40 +1848,38 @@ void JobQueue::DoTranscodeThread(void)
                 filename = program_info->GetRecordFilename(fileprefix);
 
                 if (stat(filename.ascii(), &st) == 0)
+                {
                     filesize = st.st_size;
 
-                if (filesize != origfilesize)
-                {
                     QString comment = QString("%1: %2 => %3")
                                             .arg(transcoderName)
                                             .arg(PrettyPrint(origfilesize))
                                             .arg(PrettyPrint(filesize));
                     ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
-                    details = QString("%1%2")
-                                      .arg(program_info->title).arg(subtitle);
-
                     if (filesize > 0)
-                    {
                         program_info->SetFilesize(filesize);
 
-                        details += QString(": %1 (%2)")
-                                          .arg(PrettyPrint(filesize))
-                                          .arg(transcoderName);
-                    }
-
-                    VERBOSE(VB_GENERAL, LOC +
-                            QString("%1 for %2%3: %4 => %5 (%6)")
-                            .arg(msg).arg(program_info->title).arg(subtitle)
-                            .arg(PrettyPrint(origfilesize))
-                            .arg(PrettyPrint(filesize)).arg(transcoderName));
+                    details = QString("%1%2: %3 (%4)")
+                                      .arg(program_info->title)
+                                      .arg(subtitle)
+                                      .arg(PrettyPrint(filesize))
+                                      .arg(transcoderName);
                 }
+
+                VERBOSE(VB_GENERAL, LOC +
+                        QString("%1 for %2%3: %4 => %5 (%6)")
+                        .arg(msg).arg(program_info->title).arg(subtitle)
+                        .arg(PrettyPrint(origfilesize))
+                        .arg(PrettyPrint(filesize)).arg(transcoderName));
 
                 MythEvent me("RECORDING_LIST_CHANGE");
                 gContext->dispatch(me);
 
                 program_info->SetTranscoded(TRANSCODING_COMPLETE);
             }
+
+            gContext->LogEntry("transcode", LP_NOTICE, msg, details);
         }
     }
 

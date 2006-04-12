@@ -140,10 +140,11 @@ class JobQueue : public QObject
     static bool StopJob(int jobID);
     static bool DeleteJob(int jobID);
 
-    static int GetJobCmd(int jobID);
-    static int GetJobFlags(int jobID);
-    static int GetJobStatus(int jobID);
-    static int GetJobStatus(int jobType, QString chanid, QDateTime starttime);
+    static enum JobCmds GetJobCmd(int jobID);
+    static enum JobFlags GetJobFlags(int jobID);
+    static enum JobStatus GetJobStatus(int jobID);
+    static enum JobStatus GetJobStatus(int jobType, QString chanid,
+                        QDateTime starttime);
     static QString GetJobArgs(int jobID);
     static int UserJobTypeToIndex(int JobType);
 
