@@ -510,7 +510,7 @@ static GlobalSpinBox *MaximumCommercialSkip()
     bs->setLabel(QObject::tr("Maximum commercial skip (in seconds)"));
     bs->setHelpText(QObject::tr("MythTV will discourage long manual commercial "
                     "skips.  Skips which are longer than this will require the "
-                    "use to hit the SKIP key twice.  Automatic commercial "
+                    "user to hit the SKIP key twice.  Automatic commercial "
                     "skipping is not affected by this limit."));
     bs->setValue(3600);
     return bs;
