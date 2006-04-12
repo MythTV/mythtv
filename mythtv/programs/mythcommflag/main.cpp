@@ -739,6 +739,10 @@ int main(int argc, char *argv[])
         {
             fullSpeed = false;
         }
+        else if (!strcmp(a.argv()[argpos], "--nopercentage"))
+        {
+            showPercentage = false;
+        }
         else if (!strcmp(a.argv()[argpos], "--rebuild"))
         {
             rebuildSeekTable = true;
@@ -849,6 +853,7 @@ int main(int argc, char *argv[])
                     "-f OR --file filename        Flag recording with specific filename\n"
                     "--video filename             Rebuild the seektable for a video (non-recording) file\n"
                     "--sleep                      Give up some CPU time after processing each frame\n"
+                    "--nopercentage               Don't print percentage done\n"
                     "--rebuild                    Do not flag commercials, just rebuild seektable\n"
                     "--gencutlist                 Copy the commercial skip list to the cutlist\n"
                     "--clearcutlist               Clear the cutlist\n"
