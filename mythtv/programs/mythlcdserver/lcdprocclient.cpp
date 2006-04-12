@@ -2164,12 +2164,13 @@ void LCDProcClient::updateRecordingList(void)
     QStringList strlist;
     
     // are we currently recording
-    QString querytext = QString("SELECT cardid FROM capturecard;");
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(querytext);
+    query.prepare(
+        "SELECT cardid FROM capturecard "
+        "WHERE parentid='0' ORDER BY cardid");
     QString Status = "";
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.exec() && query.isActive() && query.numRowsAffected())
     {
         while(query.next())
         {
