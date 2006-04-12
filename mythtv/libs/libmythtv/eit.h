@@ -1,6 +1,7 @@
 #ifndef _EIT_H_
 #define _EIT_H_
 
+#include <stdint.h>
 #include <vector>
 using namespace std;
 
