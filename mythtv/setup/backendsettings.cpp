@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "backendsettings.h"
+#include "frequencies.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
 #include <unistd.h>
@@ -110,23 +111,10 @@ static GlobalComboBox *FreqTable()
 {
     GlobalComboBox *gc = new GlobalComboBox("FreqTable");
     gc->setLabel(QObject::tr("Channel frequency table"));
-    gc->addSelection("us-cable");
-    gc->addSelection("us-bcast");
-    gc->addSelection("us-cable-hrc");
-    gc->addSelection("us-cable-irc");
-    gc->addSelection("japan-bcast");
-    gc->addSelection("japan-cable");
-    gc->addSelection("europe-west");
-    gc->addSelection("europe-east");
-    gc->addSelection("italy");
-    gc->addSelection("newzealand");
-    gc->addSelection("australia");
-    gc->addSelection("ireland");
-    gc->addSelection("france");
-    gc->addSelection("china-bcast");
-    gc->addSelection("southafrica");
-    gc->addSelection("argentina");
-    gc->addSelection("australia-optus");
+
+    for (uint i = 0; chanlists[i].name; i++)
+        gc->addSelection(chanlists[i].name);
+
     gc->setHelpText(QObject::tr("Select the appropriate frequency table for "
                     "your system.  If you have an antenna, use a \"-bcast\" "
                     "frequency."));
