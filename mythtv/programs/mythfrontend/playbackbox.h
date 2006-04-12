@@ -112,6 +112,16 @@ class PlaybackBox : public MythDialog
     void showPlayFromPopup();
     void showRecordingPopup();
     void showJobPopup();
+    void showTranscodingProfiles();
+    void changeProfileAndTranscode(QString profile);
+    void changeProfileAndTranscodeAuto()
+             { changeProfileAndTranscode("Autodetect"); }
+    void changeProfileAndTranscodeHigh()
+             { changeProfileAndTranscode("High Quality"); }
+    void changeProfileAndTranscodeMedium()
+             { changeProfileAndTranscode("Medium Quality"); }
+    void changeProfileAndTranscodeLow()
+             { changeProfileAndTranscode("Low Quality"); }
     void showStoragePopup();
     void showPlaylistPopup();
     void showPlaylistJobPopup();
@@ -409,3 +419,4 @@ class PlaybackBox : public MythDialog
 };
 
 #endif
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

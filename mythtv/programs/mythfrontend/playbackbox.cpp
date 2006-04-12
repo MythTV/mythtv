@@ -2522,7 +2522,7 @@ void PlaybackBox::showJobPopup()
                          SLOT(doBeginTranscoding()));
     else
         jobButton = popup->addButton(tr("Begin Transcoding"), this,
-                         SLOT(doBeginTranscoding()));
+                         SLOT(showTranscodingProfiles()));
 
     if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG, curitem->chanid,
                                                   curitem->recstartts))
@@ -2588,6 +2588,45 @@ void PlaybackBox::showJobPopup()
     jobButton->setFocus();
     
     expectingPopup = true;
+}
+
+void PlaybackBox::showTranscodingProfiles()
+{
+    if (expectingPopup)
+        cancelPopup();
+
+    if (!curitem)
+        return;
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
+                             drawPopupFgColor, drawPopupBgColor,
+                             drawPopupSelColor, "transcode popup");
+
+    initPopup(popup, delitem, "", "");
+
+    QButton *defaultButton;
+
+    defaultButton = popup->addButton(tr("Default"), this,
+                                 SLOT(doBeginTranscoding()));
+    popup->addButton(tr("Autodetect"), this,
+                     SLOT(changeProfileAndTranscodeAuto()));
+    popup->addButton(tr("High Quality"), this,
+                     SLOT(changeProfileAndTranscodeHigh()));
+    popup->addButton(tr("Medium Quality"), this,
+                     SLOT(changeProfileAndTranscodeMedium()));
+    popup->addButton(tr("Low Quality"), this,
+                     SLOT(changeProfileAndTranscodeLow()));
+
+    popup->ShowPopup(this, SLOT(doCancel()));
+    defaultButton->setFocus();
+    
+    expectingPopup = true;
+}
+
+void PlaybackBox::changeProfileAndTranscode(QString profile)
+{
+    curitem->ApplyTranscoderProfileChange(profile);
+    doBeginTranscoding();
 }
 
 void PlaybackBox::showActionPopup(ProgramInfo *program)

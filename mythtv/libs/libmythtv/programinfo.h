@@ -152,6 +152,7 @@ class ProgramInfo
     void ApplyRecordPlayGroupChange(const QString &newrecgroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,
                                    const QString &newSubtitle);
+    void ApplyTranscoderProfileChange(QString);
 
     // Quick gets
     bool SetRecordBasename(QString basename);

@@ -1128,6 +1128,59 @@ void ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QStri
     subtitle = newSubtitle;
 }
 
+/* \fn ProgramInfo::ApplyTranscoderProfileChange(QString profile) 
+ * \brief Sets the transcoder profile for a recording
+ * \param profile Descriptive name of the profile. ie: Autodetect
+ */
+void ProgramInfo::ApplyTranscoderProfileChange(QString profile)
+{
+    if(profile == "Default") // use whatever is already in the transcoder
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    if(profile == "Autodetect")
+    {
+        query.prepare("UPDATE recorded "
+                      "SET transcoder = 0 "
+                      "WHERE chanid = :CHANID "
+                      "AND starttime = :START");
+        query.bindValue(":CHANID",  chanid);
+        query.bindValue(":START",  recstartts);
+    
+        if (!query.exec())
+            MythContext::DBError("ProgramInfo: unable to update transcoder "
+                                 "in recorded table", query);
+    }
+    else
+    {
+        MSqlQuery pidquery(MSqlQuery::InitCon());
+        pidquery.prepare("SELECT r.id "
+                         "FROM recordingprofiles r, profilegroups p "
+                         "WHERE r.profilegroup = p.id "
+                             "AND p.name = 'Transcoders' "
+                             "AND r.name = :PROFILE ");
+        pidquery.bindValue(":PROFILE",  profile);
+
+        if (pidquery.exec() && pidquery.isActive() && pidquery.next())
+        {
+            query.prepare("UPDATE recorded "
+                          "SET transcoder = :TRANSCODER "
+                          "WHERE chanid = :CHANID "
+                              "AND starttime = :START");
+            query.bindValue(":TRANSCODER", pidquery.value(0).toInt());
+            query.bindValue(":CHANID",  chanid);
+            query.bindValue(":START",  recstartts);
+    
+            if (!query.exec())
+                MythContext::DBError("ProgramInfo: unable to update transcoder "
+                                     "in recorded table", query);
+        }
+        else
+            MythContext::DBError("PlaybackBox: unable to query transcoder "
+                                 "profile ID", query);
+    }
+}
 
 /** \fn ProgramInfo::ToggleRecord(void)
  *  \brief Cycles through recording types.

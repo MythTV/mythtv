@@ -2270,7 +2270,15 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "SKIPCOMMBACK")
             DoSkipCommercials(-1);
         else if (action == "QUEUETRANSCODE")
-            DoQueueTranscode();
+            DoQueueTranscode("Default");
+        else if (action == "QUEUETRANSCODE_AUTO")
+            DoQueueTranscode("Autodetect");
+        else if (action == "QUEUETRANSCODE_HIGH")
+            DoQueueTranscode("High Quality");
+        else if (action == "QUEUETRANSCODE_MEDIUM")
+            DoQueueTranscode("Medium Quality");
+        else if (action == "QUEUETRANSCODE_LOW")
+            DoQueueTranscode("Low Quality");
         else if (action == "PLAY")
             DoPlay();
         else if (action == "PAUSE") 
@@ -3511,7 +3519,7 @@ void TV::SetFFRew(int index)
     UpdateOSDSeekMessage(mesg, -1);
 }
 
-void TV::DoQueueTranscode(void)
+void TV::DoQueueTranscode(QString profile)
 {
     QMutexLocker lock(&pbinfoLock);
 
@@ -3538,6 +3546,7 @@ void TV::DoQueueTranscode(void)
         }
         else
         {
+            playbackinfo->ApplyTranscoderProfileChange(profile);
             QString jobHost = "";
 
             if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
@@ -6222,7 +6231,15 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         else if (action.left(14) == "TOGGLECOMMSKIP")
             SetAutoCommercialSkip((enum commSkipMode)(action.right(1).toInt()));
         else if (action == "QUEUETRANSCODE")
-            DoQueueTranscode();
+            DoQueueTranscode("Default");
+        else if (action == "QUEUETRANSCODE_AUTO")
+            DoQueueTranscode("Autodetect");
+        else if (action == "QUEUETRANSCODE_HIGH")
+            DoQueueTranscode("High Quality");
+        else if (action == "QUEUETRANSCODE_MEDIUM")
+            DoQueueTranscode("Medium Quality");
+        else if (action == "QUEUETRANSCODE_LOW")
+            DoQueueTranscode("Low Quality");
         else if (action == "JUMPPREV")
         {
             nvp->SetBookmark();
@@ -6405,7 +6422,19 @@ void TV::BuildOSDTreeMenu(void)
                                    playbackinfo->chanid, playbackinfo->startts))
             item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
         else
-            item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"), "QUEUETRANSCODE");
+        {
+            item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
+            subitem = new OSDGenericTree(item, tr("Default"),
+                                         "QUEUETRANSCODE");
+            subitem = new OSDGenericTree(item, tr("Autodetect"),
+                                         "QUEUETRANSCODE_AUTO");
+            subitem = new OSDGenericTree(item, tr("High Quality"),
+                                         "QUEUETRANSCODE_HIGH");
+            subitem = new OSDGenericTree(item, tr("Medium Quality"),
+                                         "QUEUETRANSCODE_MEDIUM");
+            subitem = new OSDGenericTree(item, tr("Low Quality"),
+                                         "QUEUETRANSCODE_LOW");
+        }
 
 
         item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));

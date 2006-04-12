@@ -285,7 +285,7 @@ class TV : public QObject
     static void *load_dd_map_thunk(void*);
     static void *load_dd_map_post_thunk(void*);
 
-    void DoQueueTranscode(void);  
+    void DoQueueTranscode(QString profile);  
 
     enum commSkipMode {
         CommSkipOff = 0,
