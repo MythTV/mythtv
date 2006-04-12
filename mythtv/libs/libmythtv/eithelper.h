@@ -84,7 +84,7 @@ class EITHelper
 
     int                     gps_offset;
     uint                    sourceid;
-    QMap<uint,uint>         fixup;
+    QMap<uint64_t,uint>     fixup;
     ATSCSRCToEvents         incomplete_events;
     ATSCSRCToETTs           unmatched_etts;
 

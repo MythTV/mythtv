@@ -20,7 +20,7 @@ const uint EITHelper::kChunkSize = 20;
 static int get_chan_id_from_db(uint sourceid,  uint atscsrcid);
 static int get_chan_id_from_db(uint sourceid,  uint serviceid,
                                uint networkid, uint transportid);
-static void init_fixup(QMap<uint,uint> &fix);
+static void init_fixup(QMap<uint64_t,uint> &fix);
 
 #define LOC QString("EITHelper: ")
 #define LOC_ERR QString("EITHelper, Error: ")
@@ -188,8 +188,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
     uint fix = fixup[eit->OriginalNetworkID() << 16];
-    fix |= fixup[eit->OriginalNetworkID() << 16 | eit->ServiceID()];
-        
+    fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
+                 (eit->OriginalNetworkID() << 16)];
+    fix |= fixup[(eit->OriginalNetworkID() << 16) | eit->ServiceID()];
 
     for (uint i = 0; i < eit->EventCount(); i++)
     {
@@ -439,8 +440,9 @@ static int get_chan_id_from_db(uint sourceid, uint serviceid,
     return -1;
 }
 
-static void init_fixup(QMap<uint,uint> &fix)
+static void init_fixup(QMap<uint64_t,uint> &fix)
 {
+    // transport_id<<32 | netword_id<<16 | service_id
     fix[  256 << 16] = EITFixUp::kFixBell;
     fix[  257 << 16] = EITFixUp::kFixBell;
     fix[ 4100 << 16] = EITFixUp::kFixBell;
@@ -471,5 +473,5 @@ static void init_fixup(QMap<uint,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
-    fix[ 8468 << 16 |  769] = EITFixUp::kEFixPro7Sat;
+    fix[769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat;
 }
