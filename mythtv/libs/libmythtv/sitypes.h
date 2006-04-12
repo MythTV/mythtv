@@ -21,10 +21,6 @@ using namespace std;
 #include <stdint.h>
 #endif
 
-#ifdef USING_DVB_EIT
-#include "eit.h"
-#endif
-
 /* This file will contain all of the common objects for DVB SI and 
    ATSC PSIP parsing */
 

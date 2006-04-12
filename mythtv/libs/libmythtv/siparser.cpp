@@ -24,9 +24,6 @@
 #include "siparser.h"
 #include "dvbtypes.h"
 
-// Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
-//#define EIT_DEBUG_SID 1602
-
 #define LOC QString("SIParser: ")
 #define LOC_ERR QString("SIParser, Error: ")
 
@@ -284,7 +281,7 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
     connect(atsc_stream_data, SIGNAL(UpdateSTT(const SystemTimeTable*)),
             this,             SLOT(  HandleSTT(const SystemTimeTable*)));
 
-#ifdef USING_DVB_EIT
+    // EIT table signals
     connect(atsc_stream_data,
             SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
             this,
@@ -293,7 +290,6 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
             SIGNAL(UpdateETT(uint, const ExtendedTextTable*)),
             this,
             SLOT(  HandleETT(uint, const ExtendedTextTable*)));
-#endif // USING_DVB_EIT
 }
 
 void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
@@ -343,12 +339,11 @@ void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
             this,
             SLOT(  HandleNIT(const NetworkInformationTable*)));
 
-#ifdef USING_DVB_EIT
+    // EIT table signal
     connect(dvb_stream_data,
             SIGNAL(UpdateEIT(const DVBEventInformationTable*)),
             this,
             SLOT(  HandleEIT(const DVBEventInformationTable*)));
-#endif // USING_DVB_EIT
 }
 
 void SIParser::SetStreamData(MPEGStreamData *stream_data)
@@ -828,7 +823,6 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
         {
             VERBOSE(VB_SIPARSER, LOC + "Channel ETT" + msg);
         }
-#ifdef USING_DVB_EIT
         else if (table_class == TableClass::EIT)
         {
             const uint num = mgt->TableType(i) - 0x100;
@@ -840,7 +834,6 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
             const uint num = mgt->TableType(i) - 0x200;
             atsc_ett_pid[num] = pid;
         }
-#endif // USING_DVB_EIT
         else
         {
             VERBOSE(VB_SIPARSER, LOC + "Unused Table " +
@@ -874,7 +867,6 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
         s.ServiceID    = vct->ProgramNumber(chan_idx);
         s.ATSCSourceID = vct->SourceID(chan_idx);
 
-#ifdef USING_DVB_EIT
         if (!vct->IsHiddenInGuide(chan_idx))
         {
             VERBOSE(VB_EIT, LOC + "Adding Source #"<<s.ATSCSourceID
@@ -888,7 +880,6 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
             VERBOSE(VB_EIT, LOC + "ATSC chan "<<vct->MajorChannel(chan_idx)
                     <<"-"<<vct->MinorChannel(chan_idx)<<" is hidden in guide");
         }
-#endif
 
         ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
     }

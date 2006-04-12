@@ -293,10 +293,6 @@ class TVRec : public QObject
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 
-#ifdef USING_DVB_EIT
-    bool WantDishNetEIT(int cardnum);
-#endif
-
     void CreateSIParser(MPEGStreamData*, int num);
     void TeardownSIParser(void);
 

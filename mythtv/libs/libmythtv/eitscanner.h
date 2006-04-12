@@ -12,7 +12,7 @@
 #include <qwaitcondition.h>
 
 class TVRec;
-class DVBChannel;
+class ChannelBase;
 class DVBSIParser;
 class EITHelper;
 class dvb_channel_t;
@@ -24,7 +24,7 @@ class EITScanner
     EITScanner();
     ~EITScanner() { TeardownAll(); }
 
-    void StartPassiveScan(DVBChannel*, DVBSIParser*, bool ignore_source);
+    void StartPassiveScan(ChannelBase*, DVBSIParser*, bool ignore_source);
     void StopPassiveScan(void);
 
     void StartActiveScan(TVRec*, uint max_seconds_per_source,
@@ -38,7 +38,7 @@ class EITScanner
     static void *SpawnEventLoop(void*);
     static void RescheduleRecordings(void);
 
-    DVBChannel      *channel;
+    ChannelBase     *channel;
     DVBSIParser     *parser;
     EITHelper       *eitHelper;
     pthread_t        eventThread;

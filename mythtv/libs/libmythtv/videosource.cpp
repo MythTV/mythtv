@@ -378,10 +378,8 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
     addTarget("datadirect", new DataDirect_config(parent));
     grabber->addSelection("North America (DataDirect)", "datadirect");
     
-#ifdef USING_DVB_EIT
     addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
-#endif
 
     addTarget("tv_grab_de_tvtoday", new XMLTV_generic_config(parent, "tv_grab_de_tvtoday"));
     grabber->addSelection("Germany (tvtoday)", "tv_grab_de_tvtoday");

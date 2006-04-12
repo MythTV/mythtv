@@ -51,7 +51,6 @@ ivtv="yes"
 ivtv_header="no"
 dvb="no"
 dvb_path="/usr/include"
-dvb_eit="default"
 lirc="yes"
 joystick_menu="yes"
 firewire_cable_box="yes"
@@ -181,7 +180,6 @@ echo "  --enable-dvb             enable DVB support (must supply header director
 echo "  --dvb-path=HDRLOC        location of directory containing"
 echo "                           'linux/dvb/frontend.h', not the"
 echo "                           directory with frontend.h [$dvb_path]"
-echo "  --disable-dvb-eit        disable DVB EIT support (--enable-dvb is required)"
 echo "  --disable-x11            disable X11 support"
 echo "  --x11-path=X11LOC	 location of X11 include files [$x11_include_path-path]"
 echo "  --disable-xrandr         disable X11 resolution switching"
@@ -814,10 +812,6 @@ for opt do
   --disable-dvb) dvb="no"
   ;;
   --dvb-path=*) dvb_path=`echo $opt | cut -d '=' -f 2`
-  ;;
-  --enable-dvb-eit) dvb_eit="yes"
-  ;;
-  --disable-dvb-eit) dvb_eit="no"
   ;;
   --enable-x11) x11="yes"
   ;;
@@ -2006,13 +2000,6 @@ if test x"$dvb" = x"yes" ; then
     fi
 fi
 
-if test x"$dvb_eit" = x"default" ; then
-    dvb_eit="no"
-    if test x"$dvb" = x"yes" ; then
-        dvb_eit="yes"
-    fi
-fi
-
 lamemp3="no"
 if has_library libmp3lame ; then
     if has_header lame/lame.h ; then
@@ -2845,7 +2832,6 @@ if test x"$backend" = x"no" ; then
     ivtv_header="no"
     dbox2_dvb_box="no"
     dvb="no"
-    dvb_eit="no"
 fi
 
 if test x"$proc_opt" = x"yes"; then
@@ -2903,10 +2889,6 @@ fi
 if test x"$dvb" = x"yes" ; then
   CCONFIG="$CCONFIG using_dvb"
   CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $dvb_path"
-fi
-
-if test x"$dvb_eit" = x"yes" ; then
-  CCONFIG="$CCONFIG using_dvb_eit"
 fi
 
 if test x"$x11" = x"yes" ; then

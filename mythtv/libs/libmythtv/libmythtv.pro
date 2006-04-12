@@ -290,6 +290,14 @@ using_backend {
     SOURCES += siscan.cpp
     SOURCES += scanwizardscanner.cpp
 
+    # EIT stuff
+    HEADERS += eithelper.h                 eitscanner.h
+    HEADERS += eitfixup.h                  eitcache.h
+    HEADERS += eit.h
+    SOURCES += eithelper.cpp               eitscanner.cpp
+    SOURCES += eitfixup.cpp                eitcache.cpp
+    SOURCES += eit.cpp
+
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
     HEADERS += recorderbase.h              DeviceReadBuffer.h
@@ -371,15 +379,6 @@ using_backend {
         SOURCES += dvbconfparser.cpp      dvbdev/dvbci.cpp
 
         DEFINES += USING_DVB
-        using_dvb_eit {
-            HEADERS += eithelper.h    eitscanner.h
-            HEADERS += eitfixup.h     eitcache.h
-            HEADERS += eit.h
-            SOURCES += eithelper.cpp  eitscanner.cpp
-            SOURCES += eitfixup.cpp   eitcache.cpp
-            SOURCES += eit.cpp
-            DEFINES += USING_DVB_EIT
-        }
     }
 
     # C stuff

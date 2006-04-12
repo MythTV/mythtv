@@ -1,14 +1,13 @@
 // -*- Mode: c++ -*-
 
-#ifndef USING_DVB
-#error USING_DVB must be defined to compile eitscanner.cpp
+#include "tv_rec.h"
+
+#ifdef USING_DVB
+#   include "dvbsiparser.h"
 #endif
 
-#include "tv_rec.h"
-#include "dvbchannel.h"
-#include "dvbsiparser.h"
-#include "dvbtypes.h"
-
+#include "channelbase.h"
+#include "iso639.h"
 #include "eitscanner.h"
 #include "eithelper.h"
 #include "scheduledrecording.h"
@@ -16,7 +15,7 @@
 #define LOC QString("EITScanner: ")
 
 /** \class EITScanner
- *  \brief Acts as glue between DVBChannel, DVBSIParser, and EITHelper.
+ *  \brief Acts as glue between ChannelBase, DVBSIParser, and EITHelper.
  *
  *   This is the class where the "EIT Crawl" is implemented.
  *
@@ -151,13 +150,14 @@ void EITScanner::RescheduleRecordings(void)
     ScheduledRecording::signalChange(-1);
 }
 
-/** \fn EITScanner::StartPassiveScan(DVBChannel*, DVBSIParser*)
+/** \fn EITScanner::StartPassiveScan(ChannelBase*, DVBSIParser*)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
  */
-void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
+void EITScanner::StartPassiveScan(ChannelBase *_channel, DVBSIParser *_parser,
                                   bool _ignore_source)
 {
+    
     uint sourceid = (_ignore_source) ? 0 : _channel->GetCurrentSourceID();
     parser        = _parser;
     channel       = _channel;
@@ -167,7 +167,9 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser,
         VERBOSE(VB_EIT, LOC + "EIT scan ignoring sourceid..");
 
     eitHelper->SetSourceID(sourceid);
+#ifdef USING_DVB
     parser->SetEITHelper(eitHelper);
+#endif // USING_DVB
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
@@ -177,7 +179,9 @@ void EITScanner::StopPassiveScan(void)
 {
     if (parser)
     {
+#ifdef USING_DVB
         parser->SetEITHelper(NULL);
+#endif // USING_DVB
         parser  = NULL;
     }
     channel = NULL;

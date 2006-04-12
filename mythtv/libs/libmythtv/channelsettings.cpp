@@ -301,18 +301,18 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id) :
     addChild(new VideoFilters(id));
     addChild(new OutputFilters(id));
 
-#ifdef USING_DVB_EIT
-    HorizontalConfigurationGroup *bottomhoz = new HorizontalConfigurationGroup(false,true);
+    HorizontalConfigurationGroup *bottomhoz =
+        new HorizontalConfigurationGroup(false, true);
+
     bottomhoz->addChild(onairguide = new OnAirGuide(id));
     bottomhoz->addChild(xmltvID = new XmltvID(id));
+    bottomhoz->addChild(new TimeOffset(id));
     addChild(bottomhoz);
 
-    connect(onairguide,SIGNAL(valueChanged(bool)),this,SLOT(onAirGuideChanged(bool)));
-    connect(source,SIGNAL(valueChanged(const QString&)),this,SLOT(sourceChanged(const QString&)));
-#else
-    addChild(new XmltvID(id));
-    addChild(new TimeOffset(id));
-#endif
+    connect(onairguide, SIGNAL(valueChanged(     bool)),
+            this,       SLOT(  onAirGuideChanged(bool)));
+    connect(source,     SIGNAL(valueChanged( const QString&)),
+            this,       SLOT(  sourceChanged(const QString&)));
 };
 
 void ChannelOptionsCommon::load()

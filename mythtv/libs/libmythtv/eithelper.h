@@ -2,15 +2,13 @@
 
 #ifndef EIT_HELPER_H
 #define EIT_HELPER_H
-#ifdef USING_DVB
 
 // Qt includes
+#include <qmutex.h>
 #include <qobject.h>
 #include <qstring.h>
 
 // MythTV includes
-#include "dvbtypes.h"
-#include "sitypes.h"
 #include "mythdeque.h"
 
 class MSqlQuery;
@@ -40,6 +38,7 @@ typedef QMap<uint,EventIDToATSCEvent>      ATSCSRCToEvents;
 typedef QMap<uint,EventIDToETT>            ATSCSRCToETTs;
 typedef QMap<unsigned long long,int>       ServiceToChanID;
 
+class DBEvent;
 class EITFixUp;
 class EITCache;
 
@@ -96,7 +95,5 @@ class EITHelper
     /// Maximum number of DB inserts per ProcessEvents call.
     static const uint kChunkSize;
 };
-
-#endif // USING_DVB
 
 #endif // EIT_HELPER_H

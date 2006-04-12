@@ -146,10 +146,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
     bool init_run = false;
     if (genOpt.cardtype == "DVB")
     {
-#ifdef USING_DVB_EIT
         if (!scanner)
             scanner = new EITScanner();
-#endif // USING_DVB_EIT
 
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev.toInt(), this);
@@ -281,13 +279,12 @@ void TVRec::TeardownAll(void)
 
     TeardownSignalMonitor();
     TeardownSIParser();
-#ifdef USING_DVB_EIT
+
     if (scanner)
     {
         delete scanner;
         scanner = NULL;
     }
-#endif // USING_DVB_EIT
 
 #ifdef USING_DVB
     if (GetDVBChannel())
@@ -723,9 +720,7 @@ void TVRec::HandleStateChange(void)
     // to avoid race condition with it's tuning requests.
     if (HasFlags(kFlagEITScannerRunning))
     {
-#ifdef USING_DVB_EIT
         scanner->StopActiveScan();
-#endif // USING_DVB_EIT
         ClearFlags(kFlagEITScannerRunning);
     }
 
@@ -1107,7 +1102,6 @@ void TVRec::CreateSIParser(MPEGStreamData *stream_data, int program_num)
     dvbsiparser->ReinitSIParser(dvbc->GetSIStandard(),
                                 stream_data, program_num);
 
-#ifdef USING_DVB_EIT
     if (is_dishnet_eit(GetCaptureCardNum()))
     {
         VERBOSE(VB_EIT, "Enabling DishNet Long Term EIT Support");
@@ -1119,17 +1113,15 @@ void TVRec::CreateSIParser(MPEGStreamData *stream_data, int program_num)
         uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
         scanner->StartPassiveScan(dvbc, dvbsiparser, ignore);
     }
-#endif // USING_DVB_EIT
 
 #endif // USING_DVB
 }
 
 void TVRec::TeardownSIParser(void)
 {
-#ifdef USING_DVB_EIT
     if (scanner)
         scanner->StopPassiveScan();
-#endif // USING_DVB_EIT
+
 #ifdef USING_DVB
     if (dvbsiparser)
     {
@@ -1334,7 +1326,6 @@ void TVRec::RunTV(void)
             ClearFlags(kFlagExitPlayer);
         }
 
-#ifdef USING_DVB_EIT
         if (channel && scanner &&
             QDateTime::currentDateTime() > eitScanStartTime)
         {
@@ -1353,7 +1344,6 @@ void TVRec::RunTV(void)
                 eitScanStartTime = QDateTime::currentDateTime().addYears(1);
             }
         }
-#endif // USING_DVB_EIT
 
         // We should be no more than a few thousand milliseconds,
         // as the end recording code does not have a trigger...
@@ -3487,13 +3477,11 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     QString channum, inputname;
     uint newCardID = TuningCheckForHWChange(request, channum, inputname);
 
-#ifdef USING_DVB_EIT
     if (!(request.flags & kFlagEITScan) && HasFlags(kFlagEITScannerRunning))
     {
         scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning);
     }
-#endif // USING_DVB_EIT
 
 #ifdef USING_DVB
     if (HasFlags(kFlagSIParserRunning))

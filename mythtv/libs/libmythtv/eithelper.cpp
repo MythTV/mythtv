@@ -5,6 +5,7 @@
 using namespace std;
 
 // MythTV includes
+#include "eit.h"
 #include "eithelper.h"
 #include "eitfixup.h"
 #include "eitcache.h"
