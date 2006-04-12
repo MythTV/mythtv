@@ -3653,6 +3653,17 @@ bool PlaybackBox::IsGeneratingPreview(const QString &xfn) const
     return *it;
 }
 
+/** \fn PlaybackBox::IncPreviewGeneratorAttempts(const QString&)
+ *  \brief Increments and returns number of times we have
+ *         started a PreviewGenerator to create this file.
+ */
+uint PlaybackBox::IncPreviewGeneratorAttempts(const QString &xfn)
+{
+    QMutexLocker locker(&previewGeneratorLock);
+    QString fn = xfn.mid(max(xfn.findRev('/'),0));
+    return previewGeneratorAttempts[fn]++;
+}
+
 void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
 {
     success = SetPreviewGenerator(fn, NULL);
@@ -3744,7 +3755,18 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
                 .arg(!IsGeneratingPreview(filename)));
 
 #ifdef USE_PREV_GEN_THREAD
-        SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+        uint attempts = IncPreviewGeneratorAttempts(filename);
+        if (attempts < 5)
+        {
+            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+        }
+        else if (attempts == 5)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Attempted to generate preview for '%1'")
+                    .arg(filename) + " 5 times, giving up.");
+            return retpixmap;
+        }
 #else
         PreviewGenerator pg(pginfo, false);
         pg.Run();
@@ -3796,8 +3818,19 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (!image && !generating_preview)
     {
 #ifdef USE_PREV_GEN_THREAD
-        VERBOSE(VB_PLAYBACK, "Starting preview generator");
-        SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+        uint attempts = IncPreviewGeneratorAttempts(filename);
+        if (attempts < 5)
+        {
+            VERBOSE(VB_PLAYBACK, "Starting preview generator");
+            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+        }
+        else if (attempts == 5)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Attempted to generate preview for '%1'")
+                    .arg(filename) + " 5 times, giving up.");
+            return retpixmap;
+        }
 #else
         PreviewGenerator pg(pginfo, false);
         pg.Run();

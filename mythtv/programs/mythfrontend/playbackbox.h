@@ -209,6 +209,7 @@ class PlaybackBox : public MythDialog
 
     bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
     bool IsGeneratingPreview(const QString &fn) const;
+    uint IncPreviewGeneratorAttempts(const QString &fn);
 
   private:
     bool FillList(void);
@@ -411,6 +412,7 @@ class PlaybackBox : public MythDialog
     QString             previewChanid;
     mutable QMutex      previewGeneratorLock;
     PreviewMap          previewGenerator;
+    QMap<QString,uint>  previewGeneratorAttempts;
 
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      ncLock;
