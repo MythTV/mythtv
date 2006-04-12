@@ -29,6 +29,7 @@
 #include "scanwizard.h"
 #include "cardutil.h"
 #include "sourceutil.h"
+#include "frequencies.h"
 
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
@@ -116,22 +117,10 @@ FreqTableSelector::FreqTableSelector(const VideoSource& parent)
 {
     setLabel(QObject::tr("Channel frequency table"));
     addSelection("default");
-    addSelection("us-cable");
-    addSelection("us-bcast");
-    addSelection("us-cable-hrc");
-    addSelection("japan-bcast");
-    addSelection("japan-cable");
-    addSelection("europe-west");
-    addSelection("europe-east");
-    addSelection("italy");
-    addSelection("newzealand");
-    addSelection("australia");
-    addSelection("ireland");
-    addSelection("france");
-    addSelection("china-bcast");
-    addSelection("southafrica");
-    addSelection("argentina");
-    addSelection("australia-optus");
+
+    for (uint i = 0; chanlists[i].name; i++)
+        addSelection(chanlists[i].name);
+
     setHelpText(QObject::tr("Use default unless this source uses a "
                 "different frequency table than the system wide table "
                 "defined in the General settings."));
