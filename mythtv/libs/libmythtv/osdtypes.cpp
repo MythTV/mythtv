@@ -2545,7 +2545,7 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
         QPoint ul(0,0);
         if (bounds.width())
         {
-            if (list.size() && list[0]->attr.GetBGAlpha())
+            if (list.size() && win.GetFillAlpha())
             {
                 QRect rect(0,0, bounds.width(), bounds.height());
                 OSDTypeBox box(QString("cc708_background%1").arg(i),
@@ -2553,7 +2553,7 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
                 box.SetRect(rect, wmult, hmult);
                 box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
                          bounds.left() + box_xoffset/*xoff*/,
-                         bounds.top()/*yoff*/, list[0]->attr.GetBGAlpha());
+                         bounds.top()/*yoff*/, win.GetFillAlpha());
             }
             Draw(surface, bounds.topLeft(), win, list);
         }

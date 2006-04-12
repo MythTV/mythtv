@@ -5978,8 +5978,17 @@ void NuppelVideoPlayer::DefineWindow(
     if (!(textDisplayMode & kDisplayCC708))
         return;
 
-    VERBOSE(VB_VBI, LOC + QString("DefineWindow(%1, %2)")
-            .arg(service_num).arg(window_id));
+    VERBOSE(VB_VBI, LOC + QString("DefineWindow(%1, %2,\n\t\t\t\t\t")
+            .arg(service_num).arg(window_id) +
+            QString("  prio %1, vis %2, ap %3, rp %4, av %5, ah %6")
+            .arg(priority).arg(visible).arg(anchor_point).arg(relative_pos)
+            .arg(anchor_vertical).arg(anchor_horizontal) +
+            QString("\n\t\t\t\t\t  row_cnt %1, row_lck %2, "
+                    "col_cnt %3, col_lck %4 ")
+            .arg(row_count).arg(row_lock)
+            .arg(column_count).arg(column_lock) +
+            QString("\n\t\t\t\t\t  pen style %1, win style %2)")
+            .arg(pen_style).arg(window_style));
 
     GetCCWin(service_num, window_id)
         .DefineWindow(priority,         visible,
@@ -6113,18 +6122,16 @@ void NuppelVideoPlayer::SetPenAttributes(
     if (!(textDisplayMode & kDisplayCC708))
         return;
 
-    VERBOSE(VB_VBI, LOC + QString("SetPenAttributes(%1...)")
-            .arg(service_num));
+    VERBOSE(VB_VBI, LOC + QString("SetPenAttributes(%1, %2,")
+            .arg(service_num).arg(CC708services[service_num].current_window) +
+            QString("\n\t\t\t\t\t      pen_size %1, offset %2, text_tag %3, "
+                    "font_tag %4,"
+                    "\n\t\t\t\t\t      edge_type %5, underline %6, italics %7")
+            .arg(pen_size).arg(offset).arg(text_tag).arg(font_tag)
+            .arg(edge_type).arg(underline).arg(italics));
 
-    CC708CharacterAttribute &attr = GetCCWin(service_num).pen.attr;
-
-    attr.pen_size  = pen_size;
-    attr.offset    = offset;
-    attr.text_tag  = text_tag;
-    attr.font_tag  = font_tag;
-    attr.edge_type = edge_type;
-    attr.underline = underline;
-    attr.italics   = italics;
+    GetCCWin(service_num).pen.SetAttributes(
+        pen_size, offset, text_tag, font_tag, edge_type, underline, italics);
 }
 
 void NuppelVideoPlayer::SetPenColor(

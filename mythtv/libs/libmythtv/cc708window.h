@@ -41,14 +41,14 @@ class CC708CharacterAttribute
     uint GetFGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
-        static uint alpha[4] = { 0xff, 0xff, 0xc0, 0x60, };
+        static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
         return alpha[fg_opacity & 0x3];
     }
 
     uint GetBGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
-        static uint alpha[4] = { 0xff, 0xff, 0xc0, 0x60, };
+        static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
         return alpha[bg_opacity & 0x3];
     }
 
@@ -61,6 +61,18 @@ class CC708Pen
 {
   public:
     void SetPenStyle(uint style);
+    void SetAttributes(int pen_size,
+                       int offset,       int text_tag,  int font_tag,
+                       int edge_type,    int underline, int italics)
+    {
+        attr.pen_size  = pen_size;
+        attr.offset    = offset;
+        attr.text_tag  = text_tag;
+        attr.font_tag  = font_tag;
+        attr.edge_type = edge_type;
+        attr.underline = underline;
+        attr.italics   = italics;
+    }
   public:
     CC708CharacterAttribute attr;
 
@@ -114,6 +126,13 @@ class CC708Window
     }
     CC708Character &GetCCChar(void) const;
     vector<CC708String*> GetStrings(void) const;
+
+    uint GetFillAlpha(void) const
+    {
+        //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
+        static uint alpha[4] = { 0xff, 0xff, 0x7f, 0x00, };
+        return alpha[fill_opacity & 0x3];
+    }
 
   private:
     void Scroll(int row, int col);

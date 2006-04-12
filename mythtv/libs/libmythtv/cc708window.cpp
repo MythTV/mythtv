@@ -127,18 +127,10 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
                                int _row_lock,         int _column_lock,
                                int _pen_style,        int _window_style)
 {
-    VERBOSE(VB_VBI, "DefineWindow" +
-            QString("\n\t\t\t     prio %1, vis %2, ap %3, rp %4, av %5, ah %6")
-            .arg(_priority).arg(_visible).arg(_anchor_point).arg(_relative_pos)
-            .arg(_anchor_vertical).arg(_anchor_horizontal) +
-            QString("\n\t\t\t     row_cnt %1, row_lck %2, "
-                    "col_cnt %3, col_lck %4 ")
-            .arg(_row_count).arg(_row_lock)
-            .arg(_column_count).arg(_column_lock) +
-            QString("\n\t\t\t     pen style %1, win style %2")
-            .arg(_pen_style).arg(_window_style));
-
     QMutexLocker locker(&lock);
+
+    _row_count++;
+    _column_count++;
 
     priority          = _priority;
     visible           = _visible;
@@ -150,23 +142,18 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     column_count      = _column_count;
     row_lock          = _row_lock;
     column_lock       = _column_lock;
+    
+    if ((!_pen_style && !exists) || _pen_style)
+        pen.SetPenStyle(_pen_style ? _pen_style : 1);
 
-    if ((!pen_style && !exists) || pen_style)
-        pen.SetPenStyle(pen_style ? pen_style : 1);
-
-    if ((!window_style && !exists) || window_style)
-        SetWindowStyle(window_style ? window_style : 1);
+    if ((!_window_style && !exists) || _window_style)
+        SetWindowStyle(_window_style ? _window_style : 1);
 
     uint old_row = true_row_count;
     uint old_col = true_column_count;
     // these could be bigger if row/column lock is false, resp.
-    true_row_count    = row_count;
+    true_row_count    = (row_lock) ? row_count : max(row_count + 1, (uint)2);
     true_column_count = column_count;
-    if ((true_row_count <= 1))
-    {
-        VERBOSE(VB_VBI, "Overriding row count "<<true_row_count<<" -> 2");
-        true_row_count = 2;
-    }
 
     if (text && (!exists || (old_row != true_row_count) ||
                  (old_col != true_column_count)))
@@ -197,7 +184,11 @@ CC708Window::~CC708Window()
 
 void CC708Window::Clear(void)
 {
-    // TODO
+    for (uint i = 0; i < true_row_count * true_column_count; i++)
+    {
+        text[i].character = QChar(' ');
+        text[i].attr = pen.attr;
+    }
 }
 
 CC708Character &CC708Window::GetCCChar(void) const
