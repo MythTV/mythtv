@@ -72,6 +72,9 @@ void *EITScanner::SpawnEventLoop(void *param)
  */
 void EITScanner::RunEventLoop(void)
 {
+    static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
+    static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
+
     exitThread = false;
 
     MythTimer t;
@@ -79,7 +82,26 @@ void EITScanner::RunEventLoop(void)
     
     while (!exitThread)
     {
-        if (eitHelper->GetListSize())
+        uint list_size = eitHelper->GetListSize();
+
+        float rate = 1.0f;
+        for (uint i = 0; i < 5; i++)
+        {
+            if (list_size >= sz[i])
+            {
+                rate = rt[i];
+                break;
+            }
+        }
+
+#ifdef USING_DVB
+        lock.lock();
+        if (parser)
+            parser->SetEITRate(rate);
+        lock.unlock();
+#endif // USING_DVB
+
+        if (list_size)
         {
             eitCount += eitHelper->ProcessEvents();
             t.start();
@@ -157,6 +179,7 @@ void EITScanner::RescheduleRecordings(void)
 void EITScanner::StartPassiveScan(ChannelBase *_channel, DVBSIParser *_parser,
                                   bool _ignore_source)
 {
+    QMutexLocker locker(&lock);
     
     uint sourceid = (_ignore_source) ? 0 : _channel->GetCurrentSourceID();
     parser        = _parser;
@@ -177,6 +200,8 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel, DVBSIParser *_parser,
  */
 void EITScanner::StopPassiveScan(void)
 {
+    QMutexLocker locker(&lock);
+
     if (parser)
     {
 #ifdef USING_DVB

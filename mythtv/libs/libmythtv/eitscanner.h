@@ -38,8 +38,10 @@ class EITScanner
     static void *SpawnEventLoop(void*);
     static void RescheduleRecordings(void);
 
+    QMutex           lock;
     ChannelBase     *channel;
     DVBSIParser     *parser;
+
     EITHelper       *eitHelper;
     pthread_t        eventThread;
     bool             exitThread;

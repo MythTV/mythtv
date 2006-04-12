@@ -111,13 +111,14 @@ class SIParser : public QObject
     virtual void DelAllPids(void) = 0;
 
     void ParseTable(uint8_t* buffer, int size, uint16_t pid);
-    void CheckTrackers(void);
 
     void SetDishNetEIT(bool on)
         { eit_dn_long = on; }
 
     void SetEITHelper(EITHelper *helper)
-        { QMutexLocker locker(&pmap_lock); eithelper = helper; }
+        { QMutexLocker locker(&pmap_lock); eit_helper = helper; }
+    void SetEITRate(float rate)
+        { QMutexLocker locker(&pmap_lock); eit_rate = rate; }
 
   public slots:
     virtual void deleteLater(void);
@@ -140,6 +141,9 @@ class SIParser : public QObject
   protected:
     void CountUnusedDescriptors(uint pid, const unsigned char *data);
     void PrintDescriptorStatistics(void) const;
+
+    void CheckTrackers(void);
+    void AdjustEITPids(void);
 
   private:
     // DVB Descriptor Parsers
@@ -168,16 +172,22 @@ class SIParser : public QObject
     dvb_srv_eit_on_t    dvb_srv_collect_eit;
     atsc_eit_pid_map_t  atsc_eit_pid;
     atsc_ett_pid_map_t  atsc_ett_pid;
+    atsc_eit_pid_map_t  atsc_eit_inuse_pid;
+    atsc_ett_pid_map_t  atsc_ett_inuse_pid;
 
     int                 ThreadRunning;
     bool                exitParserThread;
-    /// Decode DishNet's long-term DVB EIT
-    bool                eit_dn_long;
 
     // New tracking objects
     TableHandler       *Table[NumHandlers+1];
 
-    EITHelper          *eithelper;
+    bool                eit_reset;
+    /// Rate at which EIT data is collected
+    float               eit_rate;
+    /// Decode DishNet's long-term DVB EIT
+    bool                eit_dn_long;
+    /// Sink for eit events
+    EITHelper          *eit_helper;
 
     // statistics
     QMap<uint,uint>     descCount;

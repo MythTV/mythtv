@@ -1,5 +1,6 @@
 // Std C++ headers
 #include <algorithm>
+#include <cmath>
 
 // Qt headers
 #include <qdatetime.h>
@@ -54,7 +55,9 @@ SIParser::SIParser(const char *name) :
     pmap_lock(false),
     // State variables
     ThreadRunning(false),           exitParserThread(false),
-    eit_dn_long(false)
+    // EIT variables
+    eit_reset(false),               eit_rate(1.0f),
+    eit_dn_long(false),             eit_helper(NULL)
 {
     SetATSCStreamData(new ATSCStreamData(-1,-1));
     SetDVBStreamData(new DVBStreamData());
@@ -90,6 +93,11 @@ void SIParser::Reset(void)
 
     VERBOSE(VB_SIPARSER, LOC + "Closing all PIDs");
     DelAllPids();
+    atsc_eit_inuse_pid.clear();
+    atsc_ett_inuse_pid.clear();
+    atsc_eit_pid.clear();
+    atsc_ett_pid.clear();
+    sourceid_to_channel.clear();
 
     VERBOSE(VB_SIPARSER, LOC + "Resetting all Table Handlers");
 
@@ -164,42 +172,10 @@ void SIParser::CheckTrackers()
     {
         AddPid(DVB_NIT_PID, 0xFF, TableID::NIT, true, 10 /*bufferFactor*/);
     }
-    // for DVB EIT
-    if (SI_STANDARD_DVB == table_standard &&
-        !dvb_srv_collect_eit.empty())
-    {
-        AddPid(DVB_EIT_PID, 0x00, 0xFF, true, 1000 /*bufferFactor*/);
-        if (eit_dn_long)
-        {
-            AddPid(DVB_DNLONG_EIT_PID, 0x00, 0xFF,
-                   true, 1000 /*bufferFactor*/);
-        }
-    }
+
     // for ATSC STT and MGT.
     if (SI_STANDARD_ATSC == table_standard)
         AddPid(ATSC_PSIP_PID, 0x00, 0xFF, true, 10 /*bufferFactor*/);
-
-    if (SI_STANDARD_ATSC == table_standard &&
-        !sourceid_to_channel.empty())
-    {
-        atsc_eit_pid_map_t::const_iterator it = atsc_eit_pid.begin();
-        for (; it != atsc_eit_pid.end(); ++it)
-        {
-            VERBOSE(VB_SIPARSER, LOC + QString("EIT-%1 on pid(0x%2)")
-                    .arg(it.key(),2).arg(*it,0,16));
-            AddPid(*it, 0xFF, TableID::EIT, true, 10 /*bufferFactor*/);
-        }
-        atsc_eit_pid.clear();
-
-        atsc_ett_pid_map_t::const_iterator it2 = atsc_ett_pid.begin();
-        for (; it2 != atsc_ett_pid.end(); ++it2)
-        {
-            VERBOSE(VB_SIPARSER, LOC + QString("ETT-%1 on pid(0x%2)")
-                    .arg(it2.key(),2).arg(*it2,0,16));
-            AddPid(*it2, 0xFF, TableID::ETT, true, 10 /*bufferFactor*/);
-        }
-        atsc_ett_pid.clear();
-    }
 
     if (SI_STANDARD_DVB == table_standard)
     {
@@ -209,8 +185,71 @@ void SIParser::CheckTrackers()
         }
     }
 
+    AdjustEITPids();
+
     pmap_lock.unlock();
 }
+
+void SIParser::AdjustEITPids(void)
+{
+    if (SI_STANDARD_ATSC == table_standard)
+    {
+        uint i, eit_count = (uint) round(atsc_eit_pid.size() * eit_rate);
+        if (atsc_eit_inuse_pid.size() == eit_count && !eit_reset)
+            return;
+
+        eit_reset = false;
+
+        // delete old pids
+        for (i = 0; i < atsc_eit_inuse_pid.size(); i++)
+            DelPid(atsc_eit_inuse_pid[i]);
+        for (i = 0; i < atsc_ett_inuse_pid.size(); i++)
+            DelPid(atsc_ett_inuse_pid[i]);
+        atsc_eit_inuse_pid.clear();
+        atsc_ett_inuse_pid.clear();
+
+        if (sourceid_to_channel.empty())
+            return;
+
+        // add new pids
+        uint bufferFactor = 10;
+        atsc_eit_pid_map_t::const_iterator it = atsc_eit_pid.begin();
+        for (i = 0; it != atsc_eit_pid.end() && (i < eit_count); (++it),(i++))
+        {
+            VERBOSE(VB_SIPARSER, LOC + QString("EIT-%1 on pid(0x%2)")
+                    .arg(it.key(),2).arg(*it, 0, 16));
+            atsc_eit_inuse_pid[it.key()] = *it;
+            AddPid(*it, 0xFF, TableID::EIT, true, bufferFactor);
+        }
+
+        uint ett_count = (uint) round(atsc_ett_pid.size() * eit_rate);
+        atsc_ett_pid_map_t::const_iterator it2 = atsc_ett_pid.begin();
+        for (i = 0; it2 != atsc_ett_pid.end() && (i < ett_count);(++it2),(i++))
+        {
+            VERBOSE(VB_SIPARSER, LOC + QString("ETT-%1 on pid(0x%2)")
+                    .arg(it2.key(),2).arg(*it2, 0, 16));
+            atsc_ett_inuse_pid[it2.key()] = *it2;
+            AddPid(*it2, 0xFF, TableID::ETT, true, bufferFactor);
+        }
+    }
+    else if (SI_STANDARD_DVB == table_standard)
+    {
+        uint bufferFactor = 1000;
+        if (eit_rate >= 0.5f && !dvb_srv_collect_eit.empty())
+        {
+            AddPid(DVB_EIT_PID, 0x00, 0xFF, true, bufferFactor);
+            if (eit_dn_long)
+                AddPid(DVB_DNLONG_EIT_PID, 0x00, 0xFF, true, bufferFactor);
+        }
+        else
+        {
+            DelPid(DVB_EIT_PID);
+            if (eit_dn_long)
+                DelPid(DVB_DNLONG_EIT_PID);
+        }
+    }    
+}
+
 
 void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
 {
@@ -786,8 +825,8 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 
 void SIParser::HandleEIT(const DVBEventInformationTable *eit)
 {
-    if (eithelper)
-        eithelper->AddEIT(eit);
+    if (eit_helper)
+        eit_helper->AddEIT(eit);
 }
 
 /*------------------------------------------------------------------------
@@ -806,6 +845,9 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
         VERBOSE(VB_SIPARSER, LOC + "Table Standard Detected: ATSC");
     }
 
+    eit_reset = true;
+    atsc_eit_pid.clear();
+    atsc_ett_pid.clear();
     for (uint i = 0 ; i < mgt->TableCount(); i++)
     {
         const int table_class = mgt->TableClass(i);
@@ -827,7 +869,6 @@ void SIParser::HandleMGT(const MasterGuideTable *mgt)
         {
             const uint num = mgt->TableType(i) - 0x100;
             atsc_eit_pid[num] = pid;
-            
         }
         else if (table_class == TableClass::ETTe)
         {
@@ -847,6 +888,7 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
     VERBOSE(VB_SIPARSER, LOC + "HandleVCT("<<pid<<") cnt("
             <<vct->ChannelCount()<<")");
 
+    sourceid_to_channel.clear();
     for (uint chan_idx = 0; chan_idx < vct->ChannelCount() ; chan_idx++)
     {
         // Do not add in Analog Channels in the VCT
@@ -891,8 +933,8 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
 void SIParser::HandleEIT(uint /*pid*/, const EventInformationTable *eit)
 {
     const uint atscsrcid = sourceid_to_channel[eit->SourceID()];
-    if (atscsrcid && eithelper)
-        eithelper->AddEIT(atscsrcid, eit);
+    if (atscsrcid && eit_helper)
+        eit_helper->AddEIT(atscsrcid, eit);
 }
 
 /*
@@ -903,8 +945,8 @@ void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
     if (ett->IsEventETM()) // decode guide ETTs
     {
         const uint atscsrcid = sourceid_to_channel[ett->SourceID()];
-        if (atscsrcid && eithelper)
-            eithelper->AddETT(atscsrcid, ett);
+        if (atscsrcid && eit_helper)
+            eit_helper->AddETT(atscsrcid, ett);
     }
 }
 
@@ -913,11 +955,11 @@ void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
  */
 void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
-    if (eithelper &&
-        (atsc_stream_data->GPSOffset() != eithelper->GetGPSOffset()))
+    if (eit_helper &&
+        (atsc_stream_data->GPSOffset() != eit_helper->GetGPSOffset()))
     {
         VERBOSE(VB_SIPARSER, LOC + stt->toString());
-        eithelper->SetGPSOffset(atsc_stream_data->GPSOffset());
+        eit_helper->SetGPSOffset(atsc_stream_data->GPSOffset());
     }
 }
 
