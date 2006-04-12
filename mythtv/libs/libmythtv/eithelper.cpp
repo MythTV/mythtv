@@ -470,5 +470,5 @@ static void init_fixup(QMap<uint,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
-    fix[  769 << 16 | 8468] = EITFixUp::kEFixPro7Sat;
+    fix[ 8468 << 16 |  769] = EITFixUp::kEFixPro7Sat;
 }
