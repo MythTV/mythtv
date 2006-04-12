@@ -237,11 +237,24 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             const unsigned char *bestShortEvent =
                 MPEGDescriptor::FindBestMatch(
                     list, DescriptorID::short_event, languagePreferences);
+
+            unsigned char enc_ch[1] = { 0x05 };
+            const unsigned char *enc =
+                (fix & EITFixUp::kEFixPro7Sat) ? enc_ch : NULL;
+
             if (bestShortEvent)
             {
                 ShortEventDescriptor sed(bestShortEvent);
-                title    = sed.EventName();
-                subtitle = sed.Text();
+                if (enc)
+                {
+                    title    = sed.EventName(enc, 1);
+                    subtitle = sed.Text(enc, 1);
+                }
+                else
+                {
+                    title    = sed.EventName();
+                    subtitle = sed.Text();
+                }
             }
 
             vector<const unsigned char*> bestExtendedEvents =
@@ -258,7 +271,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 }
 
                 ExtendedEventDescriptor eed(bestExtendedEvents[j]);
-                description += eed.Text();
+                if (enc)
+                    description += eed.Text(enc, 1);
+                else
+                    description += eed.Text();
             }
         }
 
@@ -453,4 +469,6 @@ static void init_fixup(QMap<uint,uint> &fix)
 
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
+
+    fix[  769 << 16 | 8468] = EITFixUp::kEFixPro7Sat;
 }

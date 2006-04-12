@@ -38,7 +38,14 @@ using namespace std;
 
 static QString coderate_inner(uint coderate);
 
-extern QString dvb_decode_text(const unsigned char *src, uint length);
+extern QString dvb_decode_text(const unsigned char *src, uint length,
+                               const unsigned char *encoding_override,
+                               uint encoding_override_length);
+
+inline QString dvb_decode_text(const unsigned char *src, uint length)
+{
+    return dvb_decode_text(src, length, NULL, 0);
+}
 
 #define byteBCDH2int(i) (i >> 4)
 #define byteBCDL2int(i) (i & 0x0f)
@@ -838,6 +845,16 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     // for (i=0; i<N; i++) { text_char 8 } 
     QString Text(void) const
         { return dvb_decode_text(&_data[8 + _data[6]], TextLength()); }
+
+    // HACK beg -- Pro7Sat is missing encoding
+    QString Text(const unsigned char *encoding_override,
+                 uint encoding_length) const
+    {
+        return dvb_decode_text(&_data[8 + _data[6]], TextLength(),
+                               encoding_override, encoding_length);
+    }
+    // HACK end -- Pro7Sat is missing encoding
+
     QString toString() const { return QString("ExtendedEventDescriptor(stub)"); }
 };
 
@@ -1249,6 +1266,22 @@ class ShortEventDescriptor : public MPEGDescriptor
     // for (i=0;i<text_length;i++) { text_char 8 }
     QString Text(void) const
         { return dvb_decode_text(&_data[7 + _data[5]], TextLength()); }
+
+    // HACK beg -- Pro7Sat is missing encoding
+    QString EventName(const unsigned char *encoding_override,
+                      uint encoding_length) const
+    {
+        return dvb_decode_text(&_data[6], _data[5],
+                               encoding_override, encoding_length);
+    }
+
+    QString Text(const unsigned char *encoding_override,
+                 uint encoding_length) const
+    {
+        return dvb_decode_text(&_data[7 + _data[5]], TextLength(),
+                               encoding_override, encoding_length);
+    }
+    // HACK end -- Pro7Sat is missing encoding
 
     QString toString() const
         { return LanguageString() + " : " + EventName() + " : " + Text(); }

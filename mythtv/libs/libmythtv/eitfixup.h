@@ -24,6 +24,7 @@ class EITFixUp
         kFixComHem  = 0x08,
         kFixSubtitle= 0x10,
         kFixAUStar  = 0x20,
+        kEFixPro7Sat= 0x40,
     };
 
     EITFixUp();
