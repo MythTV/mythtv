@@ -3,6 +3,8 @@
 #ifndef EIT_HELPER_H
 #define EIT_HELPER_H
 
+#include <stdint.h>
+
 // Qt includes
 #include <qmutex.h>
 #include <qobject.h>
