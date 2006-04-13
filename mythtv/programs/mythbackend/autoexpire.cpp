@@ -740,7 +740,7 @@ void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
                "       progend,         filesize,    recgroup "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-               "WHERE %1 "
+               "WHERE %1 AND deletepending = 0 "
                "ORDER BY autoexpire DESC, %2").arg(where).arg(orderby);
 
     query.prepare(querystr);
