@@ -650,19 +650,7 @@ bool TV::RequestNextRecorder(bool showDialogs)
     if (!testrec->IsValidRecorder())
     {
         if (showDialogs)
-        {
-            QString title = tr("MythTV is already using all available "
-                               "inputs for recording.  If you want to "
-                               "watch an in-progress recording, select one "
-                               "from the playback menu.  If you want to "
-                               "watch live TV, cancel one of the "
-                               "in-progress recordings from the delete "
-                               "menu.");
-            
-            DialogBox diag(gContext->GetMainWindow(), title);
-            diag.AddButton(tr("Cancel and go back to the TV menu"));
-            diag.exec();
-        }        
+            ShowNoRecorderDialog();
         
         delete testrec;
         
@@ -6955,9 +6943,18 @@ void TV::ShowNoRecorderDialog(void)
                            "in-progress recordings from the delete "
                            "menu.");
 
-    MythPopupBox::showOkPopup(
+    if (GetOSD())
+    {
+        dialogname = "infobox";
+        QStringList options("OK");
+        GetOSD()->NewDialogBox(dialogname, errorText, options, 0);
+    }
+    else
+    {
+        MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), QObject::tr("Channel Change Error"),
             errorText);
+    }
 }
 
 /** \fn TV::PauseLiveTV(void)
