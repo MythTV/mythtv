@@ -145,6 +145,12 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     VERBOSE(VB_PLAYBACK, LOC + QString("OpenFile(%1, %1)")
             .arg(lfilename).arg(retryCount));
 
+    if ((filename.right(4).lower() == ".png") ||
+        (filename.right(4).lower() == ".gif"))
+    {
+        retryCount = 0;
+    }
+
     uint openAttempts = retryCount + 1;
 
     filename = lfilename;
