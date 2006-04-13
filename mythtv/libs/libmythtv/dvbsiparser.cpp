@@ -114,7 +114,8 @@ void DVBSIParser::AddPid(uint pid,
 
      /* Set flag so other processes can get past pollLock */
     filterChange = true;
-    pollLock.lock();
+
+    QMutexLocker locker(&pollLock);
 
     filterChange = false;
 
@@ -124,7 +125,6 @@ void DVBSIParser::AddPid(uint pid,
     {
        if (it.data().pid == pid)
        {
-          pollLock.unlock();
           return;
        }
     }
@@ -147,20 +147,18 @@ void DVBSIParser::AddPid(uint pid,
     if (fd == -1)
     {
         ERRNO(QString("Failed to open section filter (pid %1)").arg(pid));
-        pollLock.unlock();
         return;
     }
 
-    if (ioctl(fd, DMX_SET_BUFFER_SIZE, sect_buf_size) < 0) {
+    if (ioctl(fd, DMX_SET_BUFFER_SIZE, sect_buf_size) < 0)
+    {
         ERRNO(QString("Failed to set demux buffer size (pid %1)").arg(pid));
-        pollLock.unlock();
         return;
     }
 
     if (ioctl(fd, DMX_SET_FILTER, &params) < 0)
     {
         ERRNO(QString("Failed to set section filter (pid %1)").arg(pid));
-        pollLock.unlock();
         return;
     }
 
@@ -174,8 +172,6 @@ void DVBSIParser::AddPid(uint pid,
     pollArray[pollLength].events = POLLIN | POLLPRI;
     pollArray[pollLength].revents = 0;
     pollLength++;
-
-    pollLock.unlock();
 }
 
 void DVBSIParser::DelPid(uint pid)
@@ -187,7 +183,7 @@ void DVBSIParser::DelPid(uint pid)
 
     filterChange = true;
 
-    pollLock.lock();
+    QMutexLocker locker(&pollLock);
 
     filterChange = false;
 
@@ -220,8 +216,6 @@ void DVBSIParser::DelPid(uint pid)
        pollArray[x].revents = 0;
        x++;
     }
-
-    pollLock.unlock();
 }
 
 void DVBSIParser::DelAllPids(void)
@@ -229,7 +223,9 @@ void DVBSIParser::DelAllPids(void)
     PIDFDMap::Iterator it;
 
     filterChange = true;
-    pollLock.lock();
+
+    QMutexLocker locker(&pollLock);
+
     filterChange = false;
 
     for (it = PIDfilterManager.begin() ; it != PIDfilterManager.end() ; ++it)
@@ -239,8 +235,6 @@ void DVBSIParser::DelAllPids(void)
     free(pollArray);
     pollLength = 0;
     pollArray = NULL;
-
-    pollLock.unlock();
 }
 
 void DVBSIParser::StopSectionReader(void)
@@ -248,11 +242,14 @@ void DVBSIParser::StopSectionReader(void)
    VERBOSE(VB_SIPARSER, LOC + "Stopping DVB Section Reader");
    exitSectionThread = true;
    DelAllPids();
+
    filterChange = true;
-   pollLock.lock();
+
+   QMutexLocker locker(&pollLock);
+
    filterChange = false;
+
    free(pollArray);
-   pollLock.unlock();
 }
 
 void DVBSIParser::StartSectionReader(void)
@@ -273,7 +270,7 @@ void DVBSIParser::StartSectionReader(void)
            usleep(250);
         processed = false;
 
-        pollLock.lock();
+        QMutexLocker locker(&pollLock);
 
         int ret = poll(pollArray, pollLength, 1000);
 
@@ -326,8 +323,6 @@ void DVBSIParser::StartSectionReader(void)
                 pollArray[i].revents = 0;
             }
         }
-
-        pollLock.unlock();
     }
 
     sectionThreadRunning = false;
