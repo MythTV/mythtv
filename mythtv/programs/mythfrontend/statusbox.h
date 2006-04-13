@@ -6,6 +6,7 @@
 #include "mythdialogs.h"
 #include "uitypes.h"
 #include "xmlparse.h"
+#include "programinfo.h"
 
 typedef QMap<QString, unsigned int> recprof2bps_t;
 
@@ -63,6 +64,8 @@ class StatusBox : public MythDialog
     QMap<int, QString> contentFont;
     QMap<int, QString> contentData;
     recprof2bps_t      recordingProfilesBPS;
+
+    vector<ProgramInfo *> expList;
 
     MythMainWindow *my_parent;
 

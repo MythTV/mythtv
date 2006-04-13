@@ -24,6 +24,12 @@ using namespace std;
 #include "mythdbcon.h"
 #include "cardutil.h"
 
+#define REC_CAN_BE_DELETED(rec) \
+    ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
+     ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
+      ((rec)->recgroup != "LiveTV")))
+
+
 /** \class StatusBox
  *  \brief Reports on various status items.
  *
@@ -611,7 +617,43 @@ void StatusBox::clicked()
                 }
             }
         }
+        else if (currentItem == QObject::tr("AutoExpire List"))
+        {
+            ProgramInfo* rec;
 
+            rec = expList[contentPos];
+
+            if (rec) 
+            {
+                QStringList msgs;
+                int retval;
+
+                msgs << QObject::tr("Delete Now");
+                msgs << QObject::tr("Disable AutoExpire");
+                msgs << QObject::tr("No Change");
+                
+                retval = MythPopupBox::showButtonPopup(my_parent,
+                             QString("AutoExpirePopup"),
+                             QObject::tr("AutoExpire Actions:"),
+                             msgs, 2);
+
+                if (retval == 0 && REC_CAN_BE_DELETED(rec))
+                {
+                    RemoteDeleteRecording(rec, false, false);
+                }
+                else if (retval == 1)
+                {
+                    rec->SetAutoExpire(0);
+                    if ((rec)->recgroup == "LiveTV")
+                        rec->ApplyRecordRecGroupChange("Default");
+                }
+
+                // Update list, prevent selected item going off bottom
+                doAutoExpireList();
+                if (contentPos >= (int)expList.size())  
+                    contentPos = max((int)expList.size()-1,0);
+            }
+        }
         return;
     }
     
@@ -1286,7 +1328,6 @@ void StatusBox::doMachineStatus()
 void StatusBox::doAutoExpireList()
 {
     int                   count(0);
-    vector<ProgramInfo *> expList;
     ProgramInfo*          pginfo;
     QString               contentLine;
     QString               detailInfo;
@@ -1300,9 +1341,13 @@ void StatusBox::doAutoExpireList()
     contentFont.clear();
     doScroll = true;
 
+    vector<ProgramInfo *>::iterator it;
+    for (it = expList.begin(); it != expList.end(); it++)
+        delete *it;
+    expList.clear();
+
     RemoteGetAllExpiringRecordings(expList);
 
-    vector<ProgramInfo *>::iterator it;
     for (it = expList.begin(); it != expList.end(); it++)
     {
         pginfo = *it;
