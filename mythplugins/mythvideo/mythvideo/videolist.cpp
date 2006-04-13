@@ -195,6 +195,9 @@ void VideoList::buildDbList(bool flatlist, int parental_level)
             Metadata *myData = metaptrs.take(0);
             QString sTitle = myData->Title();
             sTitle.remove(prefixes);
+
+            // Append the video ID to allow multiple videos with the same title
+            sTitle += QString().sprintf("%.7d", myData->ID());
             stringsort[sTitle] = myData;
         }
 
