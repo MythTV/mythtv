@@ -123,14 +123,19 @@ class SIParser : public QObject
   public slots:
     virtual void deleteLater(void);
 
+    // MPEG
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*);
     void HandlePMT(uint pnum, const ProgramMapTable*);
+
+    // ATSC
     void HandleMGT(const MasterGuideTable*);
     void HandleSTT(const SystemTimeTable*);
     void HandleVCT(uint pid, const VirtualChannelTable*);
     void HandleEIT(uint pid, const EventInformationTable*);
     void HandleETT(uint pid, const ExtendedTextTable*);
+
+    // DVB
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
     void HandleEIT(const DVBEventInformationTable*);
@@ -139,9 +144,6 @@ class SIParser : public QObject
     void UpdatePMT(uint pid, const ProgramMapTable *pmt);
 
   protected:
-    void CountUnusedDescriptors(uint pid, const unsigned char *data);
-    void PrintDescriptorStatistics(void) const;
-
     void CheckTrackers(void);
     void AdjustEITPids(void);
 
@@ -188,10 +190,6 @@ class SIParser : public QObject
     bool                eit_dn_long;
     /// Sink for eit events
     EITHelper          *eit_helper;
-
-    // statistics
-    QMap<uint,uint>     descCount;
-    mutable QMutex      descLock;
 };
 
 #endif // SIPARSER_H

@@ -52,7 +52,7 @@ SIParser::SIParser(const char *name) :
     // ATSC Storage
     atsc_stream_data(NULL),         dvb_stream_data(NULL),
     // Mutex Locks
-    pmap_lock(false),
+    pmap_lock(true),
     // State variables
     ThreadRunning(false),           exitParserThread(false),
     // EIT variables
@@ -68,19 +68,18 @@ SIParser::SIParser(const char *name) :
 
 SIParser::~SIParser()
 {
-    pmap_lock.lock();
+    QMutexLocker locker(&pmap_lock);
     for (uint i = 0; i < NumHandlers; ++i)
     {
         if (Table[i])
             delete Table[i];
     }
-    pmap_lock.unlock();
 }
 
 void SIParser::deleteLater(void)
 {
+    QMutexLocker locker(&pmap_lock);
     disconnect(); // disconnect signals we may be sending...
-    PrintDescriptorStatistics();
     QObject::deleteLater();
 }
 
@@ -88,8 +87,7 @@ void SIParser::deleteLater(void)
 void SIParser::Reset(void)
 {
     VERBOSE(VB_SIPARSER, LOC + "About to do a reset");
-
-    PrintDescriptorStatistics();
+    QMutexLocker locker(&pmap_lock);
 
     VERBOSE(VB_SIPARSER, LOC + "Closing all PIDs");
     DelAllPids();
@@ -101,11 +99,8 @@ void SIParser::Reset(void)
 
     VERBOSE(VB_SIPARSER, LOC + "Resetting all Table Handlers");
 
-    {
-        QMutexLocker locker(&pmap_lock);
-        for (int x = 0; x < NumHandlers ; x++)
-            Table[x]->Reset();
-    }
+    for (int x = 0; x < NumHandlers ; x++)
+        Table[x]->Reset();
 
     atsc_stream_data->Reset(-1,-1);
     dvb_stream_data->Reset();
@@ -113,13 +108,12 @@ void SIParser::Reset(void)
     VERBOSE(VB_SIPARSER, LOC + "SIParser Reset due to channel change");
 }
 
-void SIParser::CheckTrackers()
+void SIParser::CheckTrackers(void)
 {
+    QMutexLocker locker(&pmap_lock);
 
     uint16_t pid;
     uint8_t filter,mask;
-
-    pmap_lock.lock();
 
     /* Check Dependencies and update if necessary */
     for (int x = 0 ; x < NumHandlers ; x++)
@@ -186,10 +180,13 @@ void SIParser::CheckTrackers()
     }
 
     AdjustEITPids();
-
-    pmap_lock.unlock();
 }
 
+/** \fn SIParser::AdjustEITPids(void)
+ *  \brief Adjusts EIT PID monitoring to monitor the right number of EIT PIDs.
+ *
+ *   NOTE: Must be called with a pmap lock
+ */
 void SIParser::AdjustEITPids(void)
 {
     if (SI_STANDARD_ATSC == table_standard)
@@ -254,6 +251,7 @@ void SIParser::AdjustEITPids(void)
 void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
 {
     VERBOSE(VB_IMPORTANT, LOC + "Setting ATSCStreamData");
+    QMutexLocker locker(&pmap_lock);
 
     if (stream_data == atsc_stream_data)
         return;
@@ -334,6 +332,7 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
 void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
 {
     VERBOSE(VB_IMPORTANT, LOC + "Setting DVBStreamData");
+    QMutexLocker locker(&pmap_lock);
 
     if (stream_data == dvb_stream_data)
         return;
@@ -432,6 +431,8 @@ void SIParser::SetDesiredProgram(uint mpeg_program_number, bool reset)
             QString("SetDesiredProgram(%1, %2)")
             .arg(mpeg_program_number).arg((reset) ? "reset" : "no reset"));
 
+    QMutexLocker locker(&pmap_lock);
+
     if (reset)
     {
         atsc_stream_data->Reset(-1, -1);
@@ -483,6 +484,8 @@ void SIParser::ReinitSIParser(const QString  &si_std,
             .arg(si_std)
             .arg((si_std.lower() == "atsc") ? "program" : "service")
             .arg(mpeg_program_number));
+
+    QMutexLocker locker(&pmap_lock);
 
     SetTableStandard(si_std);
     SetStreamData(stream_data);
@@ -557,6 +560,10 @@ void SIParser::ParseTable(uint8_t *buffer, int /*size*/, uint16_t pid)
     }
 }
 
+/*------------------------------------------------------------------------
+ * MPEG Table handlers
+ *------------------------------------------------------------------------*/
+
 void SIParser::HandlePAT(const ProgramAssociationTable *pat)
 {
     VERBOSE(VB_SIPARSER, LOC +
@@ -580,17 +587,12 @@ void SIParser::HandlePAT(const ProgramAssociationTable *pat)
 
 void SIParser::HandleCAT(const ConditionalAccessTable *cat)
 {
-    const desc_list_t list = MPEGDescriptor::Parse(
-        cat->Descriptors(), cat->DescriptorsLength());
+    const desc_list_t list = MPEGDescriptor::ParseOnlyInclude(
+        cat->Descriptors(), cat->DescriptorsLength(),
+        DescriptorID::conditional_access);
 
     for (uint i = 0; i < list.size(); i++)
     {
-        if (DescriptorID::conditional_access != list[i][0])
-        {
-            CountUnusedDescriptors(0x1, list[i]);
-            continue;
-        }
-
         ConditionalAccessDescriptor ca(list[i]);
         VERBOSE(VB_GENERAL, LOC + QString("CA System 0x%1, EMM PID = 0x%2")
                 .arg(ca.SystemID(),0,16).arg(ca.PID()));
@@ -619,7 +621,7 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 }
 
 /*------------------------------------------------------------------------
- *   DVB TABLE PARSERS
+ * DVB Table handlers
  *------------------------------------------------------------------------*/
 
 // Parse Network Descriptors (Name, Linkage)
@@ -660,16 +662,6 @@ void SIParser::HandleNITDesc(const desc_list_t &dlist)
 
     if (n_set)
         NITList.Network += n;
-
-    // count the unused descriptors for debugging.
-    for (uint i = 0; i < dlist.size(); i++)
-    {
-        if (DescriptorID::network_name == dlist[i][0])
-            continue;
-        if (DescriptorID::linkage == dlist[i][0])
-            continue;
-        CountUnusedDescriptors(0x10, dlist[i]);
-    }
 }
 
 void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
@@ -723,10 +715,6 @@ void SIParser::HandleNITTransportDesc(const desc_list_t &dlist,
             UKChannelListDescriptor ucld(dlist[i]);
             for (uint i = 0; i < ucld.ChannelCount(); i++)
                 clist[ucld.ServiceID(i)] = ucld.ChannelNumber(i);
-        }
-        else
-        {
-            CountUnusedDescriptors(0x10, dlist[i]);
         }
     }
 }
@@ -793,20 +781,16 @@ void SIParser::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
         if (slist.contains(sdt->ServiceID(i)))
             s.ChanNum = slist[sdt->ServiceID(i)].ChanNum;
 
-        const desc_list_t list = MPEGDescriptor::Parse(
-            sdt->ServiceDescriptors(i), sdt->ServiceDescriptorsLength(i));
+        const desc_list_t list = MPEGDescriptor::ParseOnlyInclude(
+            sdt->ServiceDescriptors(i), sdt->ServiceDescriptorsLength(i),
+            DescriptorID::service);
+
         for (uint j = 0; j < list.size(); j++)
         {
-            if (DescriptorID::service == list[j][0])
-            {
-                ServiceDescriptor sd(list[j]);
-                s.ServiceType  = sd.ServiceType();
-                s.ProviderName = sd.ServiceProviderName();
-                s.ServiceName  = sd.ServiceName();
-
-                continue;
-            }
-            CountUnusedDescriptors(0x11, list[j]);
+            ServiceDescriptor sd(list[j]);
+            s.ServiceType  = sd.ServiceType();
+            s.ProviderName = sd.ServiceProviderName();
+            s.ServiceName  = sd.ServiceName();
         }
 
         if (has_eit)
@@ -830,12 +814,9 @@ void SIParser::HandleEIT(const DVBEventInformationTable *eit)
 }
 
 /*------------------------------------------------------------------------
- *   ATSC TABLE PARSERS
+ * ATSC Table handlers
  *------------------------------------------------------------------------*/
 
-/*
- *  ATSC Table 0xC7 - Master Guide Table - PID 0x1FFB
- */
 void SIParser::HandleMGT(const MasterGuideTable *mgt)
 {
     VERBOSE(VB_SIPARSER, LOC + "HandleMGT()");
@@ -891,45 +872,33 @@ void SIParser::HandleVCT(uint pid, const VirtualChannelTable *vct)
     sourceid_to_channel.clear();
     for (uint chan_idx = 0; chan_idx < vct->ChannelCount() ; chan_idx++)
     {
-        // Do not add in Analog Channels in the VCT
-        if (1 == vct->ModulationMode(chan_idx))
+        if (vct->IsHiddenInGuide(chan_idx))
+        {
+            VERBOSE(VB_EIT, LOC + QString("%1 chan %2-%3 is hidden in guide")
+                    .arg(vct->ModulationMode(chan_idx) == 1 ? "NTSC" : "ATSC")
+                    .arg(vct->MajorChannel(chan_idx))
+                    .arg(vct->MinorChannel(chan_idx)));
             continue;
-
-        // Create SDTObject from info in VCT
-        SDTObject s;
-        s.Version      = vct->Version();
-        s.ServiceType  = 1;
-        s.EITPresent   = !vct->IsHiddenInGuide(chan_idx);
-
-        s.ServiceName  = vct->ShortChannelName(chan_idx);
-        s.ChanNum      =(vct->MajorChannel(chan_idx) * 10 +
-                         vct->MinorChannel(chan_idx));
-        s.TransportID  = vct->ChannelTransportStreamID(chan_idx);
-        s.CAStatus     = vct->IsAccessControlled(chan_idx);
-        s.ServiceID    = vct->ProgramNumber(chan_idx);
-        s.ATSCSourceID = vct->SourceID(chan_idx);
-
-        if (!vct->IsHiddenInGuide(chan_idx))
-        {
-            VERBOSE(VB_EIT, LOC + "Adding Source #"<<s.ATSCSourceID
-                    <<" ATSC chan "<<vct->MajorChannel(chan_idx)
-                    <<"-"<<vct->MinorChannel(chan_idx));
-            sourceid_to_channel[s.ATSCSourceID] =
-                vct->MajorChannel(chan_idx) << 8 | vct->MinorChannel(chan_idx);
-        }
-        else
-        {
-            VERBOSE(VB_EIT, LOC + "ATSC chan "<<vct->MajorChannel(chan_idx)
-                    <<"-"<<vct->MinorChannel(chan_idx)<<" is hidden in guide");
         }
 
-        ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
+        if (1 == vct->ModulationMode(chan_idx))
+        {
+            VERBOSE(VB_EIT, LOC + QString("Ignoring NTSC chan %1-%2")
+                    .arg(vct->MajorChannel(chan_idx))
+                    .arg(vct->MinorChannel(chan_idx)));
+            continue;
+        }
+
+        VERBOSE(VB_EIT, LOC + QString("Adding Source #%1 ATSC chan %2-%3")
+                .arg(vct->SourceID(chan_idx))
+                .arg(vct->MajorChannel(chan_idx))
+                .arg(vct->MinorChannel(chan_idx)));
+
+        sourceid_to_channel[vct->SourceID(chan_idx)] =
+            vct->MajorChannel(chan_idx) << 8 | vct->MinorChannel(chan_idx);
     }
 }
 
-/*
- *  ATSC Table 0xCB - Event Information Table - PID Varies
- */
 void SIParser::HandleEIT(uint /*pid*/, const EventInformationTable *eit)
 {
     const uint atscsrcid = sourceid_to_channel[eit->SourceID()];
@@ -937,9 +906,6 @@ void SIParser::HandleEIT(uint /*pid*/, const EventInformationTable *eit)
         eit_helper->AddEIT(atscsrcid, eit);
 }
 
-/*
- *  ATSC Table 0xCC - Extended Text Table - PID Varies
- */
 void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
 {
     if (ett->IsEventETM()) // decode guide ETTs
@@ -950,9 +916,6 @@ void SIParser::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
     }
 }
 
-/*
- *  ATSC Table 0xCD - System Time Table - PID 0x1FFB
- */
 void SIParser::HandleSTT(const SystemTimeTable *stt)
 {
     if (eit_helper &&
@@ -961,37 +924,6 @@ void SIParser::HandleSTT(const SystemTimeTable *stt)
         VERBOSE(VB_SIPARSER, LOC + stt->toString());
         eit_helper->SetGPSOffset(atsc_stream_data->GPSOffset());
     }
-}
-
-void SIParser::CountUnusedDescriptors(uint pid, const unsigned char *data)
-{
-    if (!(print_verbose_messages & VB_SIPARSER))
-        return;
-
-    QMutexLocker locker(&descLock);
-    descCount[pid<<8 | data[0]]++;
-}
-
-void SIParser::PrintDescriptorStatistics(void) const
-{
-    if (!(print_verbose_messages & VB_SIPARSER))
-        return;
-
-    QMutexLocker locker(&descLock);
-    VERBOSE(VB_SIPARSER, LOC + "Descriptor Stats -- begin");
-    QMap<uint,uint>::const_iterator it = descCount.begin();
-    for (;it != descCount.end(); ++it)
-    {
-        uint pid = it.key() >> 8;
-        uint cnt = (*it);
-        unsigned char sid = it.key() & 0xff;
-        VERBOSE(VB_SIPARSER, LOC +
-                QString("On PID 0x%1: Found %2, %3 Descriptor%4")
-                .arg(pid,0,16).arg(cnt)
-                .arg(MPEGDescriptor(&sid).DescriptorTagString())
-                .arg((cnt>1) ? "s" : ""));
-    }
-    VERBOSE(VB_SIPARSER, LOC + "Descriptor Stats -- end");
 }
 
 /* vim: set sw=4 expandtab: */
