@@ -6942,8 +6942,11 @@ void TV::ShowNoRecorderDialog(void)
                            "want to watch live TV, cancel one of the "
                            "in-progress recordings from the delete "
                            "menu.");
-
-    if (GetOSD())
+    if (embedWinID)
+    {
+        VERBOSE(VB_IMPORTANT, errorText);
+    }
+    else if (GetOSD())
     {
         dialogname = "infobox";
         QStringList options("OK");
