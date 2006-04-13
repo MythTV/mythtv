@@ -34,9 +34,6 @@ EITFixUp::EITFixUp()
 
 void EITFixUp::Fix(DBEvent &event) const
 {
-    EITFixUp::TimeFix(event.starttime);
-    EITFixUp::TimeFix(event.endtime);
-
     if (event.fixup)
     {
         if (event.subtitle == event.title)

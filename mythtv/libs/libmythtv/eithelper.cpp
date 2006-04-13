@@ -306,6 +306,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             continue;
 
         QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
+        EITFixUp::TimeFix(starttime);
         QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
 
         DBEvent *event = new DBEvent(chanid,
@@ -333,7 +334,7 @@ void EITHelper::CompleteEvent(uint atscsrcid,
     QDateTime starttime;
     int t = secs_Between_1Jan1970_6Jan1980 + gps_offset + event.start_time;
     starttime.setTime_t(t, Qt::UTC);
-    starttime = MythUTCToLocal(starttime);
+    EITFixUp::TimeFix(starttime);
     QDateTime endtime = starttime.addSecs(event.length);
 
     desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
