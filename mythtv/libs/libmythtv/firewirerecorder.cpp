@@ -124,11 +124,12 @@ bool FirewireRecorder::Open(void)
      // Set buffered packets size
      size_t buffer_size = gContext->GetNumSetting("HDRingbufferSize",
                                                   50 * TSPacket::SIZE);
-     size_t buffered_packets = min(buffer_size / 4, (size_t)kMaxBufferedPackets); 
+     size_t buffered_packets = min(buffer_size / 4,
+                                   (size_t) kMaxBufferedPackets);
      iec61883_mpeg2_set_buffers(fwmpeg, buffered_packets);
      VERBOSE(VB_IMPORTANT, LOC +
-             QString("Buffered packets %1 (%2 KB)"). 
-	             arg(buffered_packets).arg(buffered_packets * 4));
+             QString("Buffered packets %1 (%2 KB)")
+             .arg(buffered_packets).arg(buffered_packets * 4));
 
      // Set speed if needed.
      // Probably shouldn't even allow user to set,
