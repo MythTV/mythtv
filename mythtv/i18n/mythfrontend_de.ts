@@ -3916,8 +3916,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Während der Wiedergabe wird MythTV auf Verbindungen von &quot;mythtvosd&quot; oder &quot;mythudprelay&quot; auf diesem Port reagieren. Näheres dazu finden Sie in der README Datei in contrib/mythnotify.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Vorschaubild von Aufnahmen</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Vorschaubild von Aufnahmen</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>

@@ -3915,8 +3915,8 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
         <translation>Jos tämä on asetettu, MythTV kuuntelee katsomisen aikana porttia, odottaen yhteyksiä mythtvosd:ltä tai mythhudprelay:lta.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Tee nauhoituksista esikatselukuvat</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Tee nauhoituksista esikatselukuvat</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>

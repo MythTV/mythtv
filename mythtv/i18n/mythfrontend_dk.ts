@@ -3914,8 +3914,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Lav thumbnail preview billeder af optagelserne</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Lav thumbnail preview billeder af optagelserne</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>

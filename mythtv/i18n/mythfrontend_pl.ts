@@ -4791,7 +4791,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
+        <source>Display thumbnail preview images of recordings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

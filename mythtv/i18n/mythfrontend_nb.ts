@@ -3892,8 +3892,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Er dette på vil en meny med valg om å slette opptaket vises når opptaket har blitt sett ferdig.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Generer et bilde som forhåndsvisning av opptak</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Generer et bilde som forhåndsvisning av opptak</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>

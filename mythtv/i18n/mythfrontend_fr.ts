@@ -3479,8 +3479,8 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
         <translation>Durant la lecture, MythTV est à l&apos;affût des connections des programmes &quot;mythtvosd&quot; et &quot;mythudprelay&quot; sur ce port.  Voir le fichier README dans contrib/mythnotify/ pour plus d&apos;informations.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Générer des vignettes de pré-visualisation des enregistrements</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Générer des vignettes de pré-visualisation des enregistrements</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>

@@ -3912,8 +3912,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>再生時、このポートを経由する&quot;mythtvosd&quot;あるいは&quot;mythudprelay&quot;からの接続を監視します。README(contrib/mythnotify/)参照。</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>サムネイルのプレビューイメージを作成する</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">サムネイルのプレビューイメージを作成する</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>

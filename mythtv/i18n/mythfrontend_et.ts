@@ -4018,8 +4018,8 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
         <translation>Mahamängimise lõpetamisel kuvatakse menüü, kus saab salvestise kustutada.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Tekita salvestistest eelvaate pisipildid</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Tekita salvestistest eelvaate pisipildid</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>

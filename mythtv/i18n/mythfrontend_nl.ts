@@ -1968,7 +1968,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Display the channel icon</source>
-        <translation>Zendericoon tonen</translation>
+        <translation type="unfinished">Zendericoon tonen</translation>
     </message>
     <message>
         <source>Channels to Display</source>
@@ -3925,7 +3925,7 @@ Uitschakelen wanneer sommige reclameblokken niet worden gedetecteerd.</translati
 Zie README in contrib/mythnotify voor aanvullende informatie.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
+        <source>Display thumbnail preview images of recordings</source>
         <translation>Maak preview-afbeeldingen van opnames</translation>
     </message>
     <message>

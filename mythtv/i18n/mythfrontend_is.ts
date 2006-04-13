@@ -3905,7 +3905,7 @@ Dagskrárupplýsingaveitan veitir þér ekki stöðvanúmer þannig að þú ver
         <translation type="unfinished">eða.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
+        <source>Display thumbnail preview images of recordings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

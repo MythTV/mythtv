@@ -1195,7 +1195,7 @@ static HostCheckBox *EndOfRecordingExitPrompt()
 static HostCheckBox *GeneratePreviewPixmaps()
 {
     HostCheckBox *gc = new HostCheckBox("GeneratePreviewPixmaps");
-    gc->setLabel(QObject::tr("Generate thumbnail preview images of "
+    gc->setLabel(QObject::tr("Display thumbnail preview images of "
                  "recordings"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, a static image of the recording will "

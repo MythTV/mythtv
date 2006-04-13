@@ -1834,7 +1834,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Display live preview of recordings</source>
-        <translation>Visa en rörlig förhandsvisning för inspelningar</translation>
+        <translation type="unfinished">Visa en rörlig förhandsvisning för inspelningar</translation>
     </message>
     <message>
         <source>Use Transparent Boxes</source>
@@ -3906,7 +3906,7 @@ som du startade detta programmet ifrån.</translation>
         <translation>Under uppspelning lyssnar MythTV på anslutningar från programmen &quot;mythtvosd&quot; eller &quot;mythudprelay&quot; på denna port. Se README i contrib/mythnotify/ för mer information.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
+        <source>Display thumbnail preview images of recordings</source>
         <translation>Skapa förhandsvisningsbilder av inspelningar</translation>
     </message>
     <message>

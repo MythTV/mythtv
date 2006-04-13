@@ -3918,8 +3918,8 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
         <translation>Durante la reproducción, MythTV escuchará conexiones de &quot;mythtvosd&quot; o &quot;mythudprelay&quot; en este puerto.  Lea el README en contrib/mythnotify/ para más información.</translation>
     </message>
     <message>
-        <source>Generate thumbnail preview images of recordings</source>
-        <translation>Generar imágenes de vista previa de las grabaciones.</translation>
+        <source>Display thumbnail preview images of recordings</source>
+        <translation type="unfinished">Generar imágenes de vista previa de las grabaciones.</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
