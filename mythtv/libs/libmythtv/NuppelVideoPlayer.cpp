@@ -313,6 +313,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         argb_buf = NULL;
     }
 
+    if (output_jmeter)
+        delete output_jmeter;
+
     ShutdownYUVResize();
 }
 

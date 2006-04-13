@@ -304,6 +304,14 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 
 AvFormatDecoder::~AvFormatDecoder()
 {
+    while (storedPackets.count() > 0)
+    {
+        AVPacket *pkt = storedPackets.first();
+        storedPackets.removeFirst();
+        av_free_packet(pkt);
+        delete pkt;
+    }
+
     CloseContext();
     delete ccd608;
     delete ccd708;
@@ -2486,6 +2494,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 ateof = true;
                 GetNVP()->SetEof();
+                if (pkt)
+                    delete pkt;
                 return false;
             }
 

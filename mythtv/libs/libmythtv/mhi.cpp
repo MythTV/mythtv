@@ -94,6 +94,7 @@ void MHIContext::StopEngine()
             m_engine_wait.wakeAll();
             usleep(1000);
         }
+        pthread_join(m_engineThread, NULL);
     }
 }
 
