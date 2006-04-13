@@ -686,20 +686,33 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
 OSDTypeText::OSDTypeText(const OSDTypeText &other)
            : OSDType(other.m_name)
 {
-    m_displaysize = other.m_displaysize;
-    m_screensize = other.m_screensize;
     m_message = other.m_message;
     m_default_msg = other.m_default_msg;
     m_font = other.m_font;
+
     m_altfont = other.m_altfont;
-    m_centered = other.m_centered;
+
+    m_displaysize = other.m_displaysize;
+    m_screensize = other.m_screensize; 
     m_multiline = other.m_multiline;
-    m_usingalt = other.m_usingalt;
+    m_centered = other.m_centered;
     m_right = other.m_right;
+    m_usingalt = other.m_usingalt; 
+   
+    m_selected = other.m_selected; 
+    m_button   = other.m_button; 
+    m_entrynum = other.m_entrynum; 
+    m_cursorpos = other.m_cursorpos; 
+ 
     m_scroller = other.m_scroller;
     m_scrollx = other.m_scrollx;
     m_scrolly = other.m_scrolly;
+    m_scrollinit = other.m_scrollinit;
+
     m_linespacing = other.m_linespacing;
+
+    m_unbiasedsize = other.m_unbiasedsize;
+
     m_draw_info_str = "";
     m_draw_info_len = 0;
 }
