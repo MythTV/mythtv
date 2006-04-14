@@ -558,7 +558,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     (found > maxIter.data()))
                 {
                     QString msg =
-                        QString("Expiring \"%1\" from %2, %3 MBytes,"
+                        QString("Expiring \"%1\" from %2, %3 MBytes, "
                                 "too many episodes (only want %4).")
                                 .arg(title)
                                 .arg(startts.toString())
