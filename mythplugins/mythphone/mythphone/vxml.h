@@ -10,7 +10,7 @@ class vxmlVariable
 {
   public:
     vxmlVariable(QString N, QString V);             
-    vxmlVariable::vxmlVariable(QString N, short *wav, int S);
+    vxmlVariable(QString N, short *wav, int S);
     virtual ~vxmlVariable() {}; 
     bool isType(QString t) { return (t == Type); };
     QString getName() { return Name; };

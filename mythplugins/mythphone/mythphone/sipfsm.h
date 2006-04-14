@@ -618,7 +618,7 @@ class SipFsm : public QWidget
     SipWatcher *CreateWatcherFsm(QString Url);
     SipIM *CreateIMFsm(QString Url="", QString callIdStr="");
     void StopWatchers();
-    void SipFsm::KickWatcher(SipUrl *Url);
+    void KickWatcher(SipUrl *Url);
     void SendIM(QString destUrl, QString CallId, QString imMsg);
     int numCalls();
     int getPrimaryCall() { return primaryCall; };
