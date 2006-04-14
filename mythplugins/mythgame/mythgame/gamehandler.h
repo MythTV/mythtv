@@ -106,7 +106,7 @@ class GameHandler
 
   protected:
     static GameHandler* GetHandler(RomInfo *rominfo);
-    static GameHandler* GameHandler::GetHandlerByName(QString systemname);
+    static GameHandler* GetHandlerByName(QString systemname);
 
     bool rebuild;
     int spandisks;
