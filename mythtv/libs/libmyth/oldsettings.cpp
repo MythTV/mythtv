@@ -111,25 +111,10 @@ void Settings::SetSetting(QString strSetting, float fNewVal)
 
 bool Settings::LoadSettingsFiles(QString filename, QString prefix)
 {
-    QString setname = prefix + "/share/mythtv/" + filename;
-    bool result = false;
-
-    if (ReadSettings(setname))
-         result = true;
-
-    setname = prefix + "/etc/mythtv/" + filename;
-    if (ReadSettings(setname))
-         result = true;
-
-    setname = MythContext::GetConfDir() + "/" + filename;
-
-    if (ReadSettings(setname))
-         result = true;
-
-    setname = "./" + filename;
-    if (ReadSettings(setname))
-         result = true;
-
+    int result = ReadSettings(prefix + "/share/mythtv/" + filename);
+    result += ReadSettings(prefix + "/etc/mythtv/" + filename);
+    result += ReadSettings(MythContext::GetConfDir() + "/" + filename);
+    result += ReadSettings("./" + filename);
     return result;
 }
 
