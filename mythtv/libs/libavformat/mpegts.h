@@ -33,14 +33,14 @@ extern "C" {
 
 /* table ids */
 #define PAT_TID   0x00
-#define PMT_TID   0x02 
+#define PMT_TID   0x02
 #define SDT_TID   0x42
 
 /* descriptor ids */
+#define DVB_CAROUSEL_ID             0x13
 #define DVB_VBI_DESCID              0x56
 #define DVB_SUBT_DESCID             0x59
 #define DVB_BROADCAST_ID            0x66
-#define DVB_CAROUSEL_ID             0x13
 #define DVB_DATA_STREAM             0x52
 
 #define STREAM_TYPE_VIDEO_MPEG1     0x01
