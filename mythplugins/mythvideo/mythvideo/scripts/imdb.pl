@@ -12,9 +12,16 @@
 # v1.1
 # - Added amazon.com covers and improved handling for imdb posters
 # v1.2
-#     - when searching amazon, try searching for main movie name and if nothing is found, search for informal name
-#     - better handling for amazon posters, see if movie title is a substring in the search results returned by amazon
+#     - when searching amazon, try searching for main movie name and if nothing
+#       is found, search for informal name
+#     - better handling for amazon posters, see if movie title is a substring
+#       in the search results returned by amazon
 #     - fixed redirects for some movies on impawards
+# v1.3
+#     - fixed search for low res images (imdb changed the page layout)
+#     - added cinemablend poster search
+#     - added nexbase poster search
+#     - removed amazon.com searching for now
 
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
@@ -26,7 +33,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.2";
+$version = "v1.3";
 $author = "Tim Harvey, Andrei Rjeousski";
 
 # display usage
@@ -275,6 +282,36 @@ sub getMoviePoster {
       if (defined $opt_d) { print "# found ipmawards poster: $uri\n"; }
    }
 
+   # try looking on nexbase
+   if ($uri eq "" && $response =~ m/<a href="([^"]*)">([^"]*?)nexbase/i) {
+      if ($1 ne "") {
+         if (defined $opt_d) { print "# found nexbase poster page: $1 \n"; }
+         my $cinres = get $1;
+         if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
+         if (defined $opt_r) { printf("%s", $cinres); }
+
+         if ($cinres =~ m/<a id="photo_url" href="([^"]*?)" ><\/a>/i) {
+            if (defined $opt_d) { print "# nexbase url retreived\n"; }
+            $uri = $1;
+         }
+      }
+   }
+
+   # try looking on cinemablend
+   if ($uri eq "" && $response =~ m/<a href="([^"]*)">([^"]*?)cinemablend/i) {
+      if ($1 ne "") {
+         if (defined $opt_d) { print "# found cinemablend poster page: $1 \n"; }
+         my $cinres = get $1;
+         if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
+         if (defined $opt_r) { printf("%s", $cinres); }
+
+         if ($cinres =~ m/<td align=center><img src="([^"]*?)" border=1><\/td>/i) {
+            if (defined $opt_d) { print "# cinemablend url retreived\n"; }
+            $uri = "http://www.cinemablend.com/".$1;   
+         }
+      }
+   }
+
    # if the impawards site attempt didn't give a filename grab it from imdb
    if ($uri eq "") {
        if (defined $opt_d) { print "# looking for imdb posters\n"; }
@@ -287,9 +324,8 @@ sub getMoviePoster {
           if (defined $opt_d) { print "# no poster found\n"; }
        }
    }
-   
-   # now we couldnt even find lowres poster from IMDB, lets try looking for dvd
-   # cover on amazon.com   
+
+
 
    my @movie_titles;
    my $found_low_res = 0;
@@ -297,12 +333,21 @@ sub getMoviePoster {
    
    # no poster found, take lowres image from imdb
    if ($uri eq "") {
-       if (defined $opt_d) { print "# looking for lowres imdb posters\n"; }
-       my $host = "http://www.imdb.com/title/tt" . $movieid . "/";
-       $response = get $host;
+      if (defined $opt_d) { print "# looking for lowres imdb posters\n"; }
+      my $host = "http://www.imdb.com/title/tt" . $movieid . "/";
+      $response = get $host;
 
-       $uri = parseBetween($response, "alt=\"cover\" src=\"http://ia.imdb.com/media/imdb/", "\"");
-       
+      # Better handling for low resolution posters
+      # 
+      if ($response =~ m/<a name="poster".*<img.*src="([^"]*).*<\/a>/ig) {
+         if (defined $opt_d) { print "# found low res poster at: $1\n"; }
+         $uri = $1;
+         $found_low_res = 1;
+      } else {
+         if (defined $opt_d) { print "# no low res poster found\n"; }
+         $uri = "";
+      }
+
       if (defined $opt_d) { print "# starting to look for movie title\n"; }
       
       # get main title
@@ -319,90 +364,8 @@ sub getMoviePoster {
          if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
       }
        
-       if ($uri ne "" ) {
-           $uri = "http://ia.imdb.com/media/imdb/".$uri;
-           $found_low_res = 1;
-       } else {
-          if (defined $opt_d) { print "# no poster found\n"; }
-       }
    }
    
-   # now we couldnt even find lowres poster from IMDB, lets try looking for dvd
-   # cover on amazon.com
-   if ($uri eq "" or $found_low_res) {
-      if (defined $opt_d) { print "# starting to look for poster on Amazon.com\n"; }
-
-      my $titleid = 0;
-      my $found = 0;
-      my $ama_uri = "";
-      my $xml_parser = XML::Simple->new();
-      
-         
-      do {
-         # get rid of the year
-         $movie_titles[$titleid] =~ s/ ?\([^\)]+\) ?//g;
-         $movie_titles[$titleid] =~ /(.*), The$/i;
-         if ($1) { $movie_titles[$titleid] = $1; }
-
-         $movie_titles[$titleid] =~ s/[\"\']//g; # if we give amazon quotes they give them back
-      
-         if (defined $opt_d) { print "# Searching for: $movie_titles[$titleid]\n"; }
-
-         # Encode the movie title to be save
-         my $safe_movie_title = $movie_titles[$titleid];
-         $safe_movie_title =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;      
-         # request XML info from amazon
-         my $xml_uri = "http://xml.amazon.com/onca/xml3?t=000&dev-t=000&KeywordSearch=".$safe_movie_title."&mode=dvd&type=lite&page=1&f=xml";
-         if (defined $opt_d) { print "# Amazon request string is: $xml_uri\n";}
-
-         # get the response
-         $response = get $xml_uri;
-         if (defined $opt_r) { printf("%s", $response); }
-      
-         # parse the response
-         my $xml_doc = $xml_parser->XMLin($response);
-
-         # if we only got one result, fake it as array
-         if (ref($xml_doc->{Details}) ne 'ARRAY') {
-            my @tmpArray = ($xml_doc->{Details});
-            $xml_doc->{Details} = \@tmpArray;
-         }
-
-         $k = 0;
-         do {
-            if (ref($xml_doc->{Details}->[$k]) eq 'HASH') {
-               my $tmp_movie_title = $xml_doc->{Details}->[$k]->{ProductName};
-               $tmp_movie_title =~ s/[\"\']//g;
-               if (defined $opt_d) { print "# Amazon: comparing (" . $tmp_movie_title . ") to (" . $movie_titles[$titleid] . ")\n"; }
-               if ($tmp_movie_title =~ /.*$movie_titles[$titleid].*/) {
-                  if (defined $opt_d) { print "# Amazon: found poster " . $xml_doc->{Details}->[$k]->{ImageUrlLarge} . "\n"; }
-                  $ama_uri = $xml_doc->{Details}->[$k]->{ImageUrlLarge};
-                  $found = 1;
-               }
-            }
-
-           $k++;
-        } until ($found || $k == 5);
-        #only search through first 5 matches
-
-         $titleid++;
-      } until ($found || $titleid > $#movie_titles);
-      
-      my $image = get $ama_uri if (defined($ama_uri) && $ama_uri ne "");
-      if ($ama_uri ne "" && length($image) eq "807") {
-         if (defined $opt_d) { printf("# this image is blank\n"); }
-         $ama_uri = "";
-      }
-      
-      if (!defined($ama_uri)) {
-         $ama_uri = "";
-      }
-	
-      if ($ama_uri ne "") {
-	$uri = $ama_uri;
-      }
-   }
-
    print "$uri\n";
 }
 
@@ -634,3 +597,4 @@ elsif (defined $opt_M) {
    }
    getMovieList($query, $options);
 }
+# vim: set expandtab ts=3 sw=3 :
