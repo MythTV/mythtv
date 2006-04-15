@@ -17,7 +17,21 @@ package MythTV::Recording;
         bless($self, $class);
 
     # Figure out how the data was passed in
-        my $rows = (ref $_[0]) ? $_[0] : \@_;
+        my $rows;
+        if (ref $_[0]) {
+            $rows              = $_[0];
+            $self->{'_mythtv'} = $_[0];
+        }
+        else {
+            $rows = \@_;
+        }
+        $self->{'_mythtv'} ||= $MythTV::last;
+
+    # No connection to the backend?
+        unless ($self->{'_mythtv'}) {
+            die "Attempted to create a MythTV::Recording object with no defined"
+               ." MythTV object.\n";
+        }
 
     # Load the passed-in data
         $self->{'title'}           = $rows->[0];  # program name/title
@@ -59,11 +73,23 @@ package MythTV::Recording;
         $self->{'timestretch'}     = $rows->[39]; #
         $self->{'recpriority2'}    = $rows->[40]; #
 
+    # These fields will only be set for recorded programs
+        $self->{'cutlist'}         = '';
+        $self->{'last_frame'}      = 0;
+        $self->{'cutlist_frames'}  = 0;
+
     # Is this a previously-recorded program?
         if ($self->{'filename'}) {
-        #Calculate the filesize
+            my $sh;
+        # Calculate the filesize
             $self->{'filesize'} = ($self->{'fs_high'} + ($self->{'fs_low'} < 0)) * 4294967296
                                   + $self->{'fs_low'};
+        # Pull the last known frame from the database, to help guestimate the
+        # total frame count.
+            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT MAX(mark) FROM recordedmarkup WHERE chanid=? AND starttime=FROM_UNIXTIME(?)');
+            $sh->execute($self->{'chanid'}, $self->{'recstartts'});
+            ($self->{'last_frame'}) = $sh->fetchrow_array();
+            $sh->finish();
         }
     # Assign the program flags
         $self->{'has_commflag'} = ($self->{'progflags'} & 0x01) ? 1 : 0;    # FL_COMMFLAG  = 0x01
@@ -73,6 +99,33 @@ package MythTV::Recording;
         $self->{'bookmark'}     = ($self->{'progflags'} & 0x10) ? 1 : 0;    # FL_BOOKMARK  = 0x10
     # And some other calculated fields
         $self->{'will_record'} = ($self->{'rectype'} && $self->{'rectype'} != rectype_dontrec) ? 1 : 0;
+
+    # Pull the cutlist info from the database
+        if ($self->{'has_cutlist'}) {
+            my $last_mark = 0;
+            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT type, mark FROM recordedmarkup WHERE chanid=? AND starttime=FROM_UNIXTIME(?) AND type IN (0,1) ORDER BY mark');
+            $sh->execute($self->{'chanid'}, $self->{'recstartts'});
+            while (my ($type, $mark) = $sh->fetchrow_array) {
+                if ($type == 1) {
+                    $self->{'cutlist'} .= " $mark";
+                    $last_mark          = $mark;
+                }
+                elsif ($type == 0) {
+                    $self->{'cutlist'}        .= "-$mark";
+                    $self->{'cutlist_frames'} += $mark - $last_mark;
+                }
+            }
+            if ($type && $type == 1) {
+                $info{'cutlist'}          .= '-'.$self->{'last_frame'};
+                $self->{'cutlist_frames'} += $self->{'last_frame'} - $last_mark;
+            }
+            $sh->finish();
+        }
+
+    # Defaults
+        $self->{'title'}       = 'Untitled'       unless ($self->{'title'} =~ /\S/);
+        $self->{'subtitle'}    = 'Untitled'       unless ($self->{'subtitle'} =~ /\S/);
+        $self->{'description'} = 'No Description' unless ($self->{'description'} =~ /\S/);
 
     # Return
         return $self;

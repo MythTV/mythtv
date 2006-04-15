@@ -77,6 +77,9 @@ package MythTV;
                              11  => 'NeverRecord'
                             );
 
+# The most recent MythTV object created
+    our $last;
+
 # Caches so we don't have to query too many hosts/ports
     our %setting_cache;
     our %proto_cache;
@@ -189,6 +192,9 @@ package MythTV;
         if ($self->backend_command('ANN Monitor '.$self->{'hostname'}.' 0') ne 'OK') {
             die "Unable to connect to mythbackend, is it running?\n";
         }
+
+    # Cache the database handle
+        $MythTV::last = $self;
 
     # Return
         return $self;
