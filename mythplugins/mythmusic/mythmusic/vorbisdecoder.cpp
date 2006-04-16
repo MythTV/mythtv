@@ -241,7 +241,7 @@ void VorbisDecoder::run()
             seekTime = -1.0;
         }
 
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
         len = ov_read(&oggfile, (char *) (output_buf + output_at), bks, 1, 2, 1,
                       &section);
 #else
