@@ -12,6 +12,7 @@ using namespace std;
 #include "metadata.h"
 #include "metaiooggvorbiscomment.h"
 
+#include <mythtv/mythconfig.h>
 #include <mythtv/mythcontext.h>
 
 // static functions for OggVorbis
@@ -240,8 +241,13 @@ void VorbisDecoder::run()
             seekTime = -1.0;
         }
 
+#ifdef WORDS_BIGENDIAN
+        len = ov_read(&oggfile, (char *) (output_buf + output_at), bks, 1, 2, 1,
+                      &section);
+#else
         len = ov_read(&oggfile, (char *) (output_buf + output_at), bks, 0, 2, 1,
                       &section);
+#endif
 
         if (len > 0) {
             bitrate = ov_bitrate_instant(&oggfile) / 1000;
