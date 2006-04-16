@@ -56,7 +56,7 @@ macx {
     LIBS           += -F/System/Library/PrivateFrameworks
     LIBS           += -framework $$join(PFWKS," -framework ")
 
-    using_firewire {
+    using_firewire:using_backend {
         QMAKE_CXXFLAGS += -F$${CONFIG_MAC_AVC}
         LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
         # Recent versions of this framework use /usr/lib/libstdc++.6.dylib
@@ -178,7 +178,10 @@ SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
 SOURCES += mpeg/iso6937tables.cpp
 
+# C stuff
+HEADERS += frequencies.h
 HEADERS += frequencytables.h        channelutil.h
+SOURCES += frequencies.c
 SOURCES += frequencytables.cpp      channelutil.cpp
 
 using_frontend {
@@ -380,10 +383,6 @@ using_backend {
 
         DEFINES += USING_DVB
     }
-
-    # C stuff
-    HEADERS += frequencies.h
-    SOURCES += frequencies.c
 
     DEFINES += USING_BACKEND
 }
