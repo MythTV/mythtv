@@ -12,6 +12,7 @@ using namespace std;
 #include "metadata.h"
 #include "metaioflacvorbiscomment.h"
 
+#include <mythtv/mythconfig.h>
 #include <mythtv/mythcontext.h>
 
 #include <qtimer.h>
@@ -102,7 +103,11 @@ void FlacDecoder::doWrite(const FLAC__Frame *frame,
             for (channel = 0; channel < chan; channel++)
             {
                sample = (FLAC__int8)buffer[channel][cursamp];
+#ifdef WORDS_BIGENDIAN
+               *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+#else
                *(output_buf + output_at++) = ((sample >> 0) & 0xff);
+#endif
                output_bytes += 1;
             }
         }   
@@ -114,8 +119,13 @@ void FlacDecoder::doWrite(const FLAC__Frame *frame,
             for (channel = 0; channel < chan; channel++)
             { 
                sample = (FLAC__int16)buffer[channel][cursamp];             
+#ifdef WORDS_BIGENDIAN
+               *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+               *(output_buf + output_at++) = ((sample >> 0) & 0xff);
+#else
                *(output_buf + output_at++) = ((sample >> 0) & 0xff);
                *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+#endif
                output_bytes += 2;
             }
         }

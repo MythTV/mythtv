@@ -16,6 +16,7 @@ using namespace std;
 #include <mythtv/audiooutput.h>
 #include "metaioid3v2.h"
 
+#include <mythtv/mythconfig.h>
 #include <mythtv/mythcontext.h>
 
 #define XING_MAGIC     (('X' << 24) | ('i' << 16) | ('n' << 8) | 'g')
@@ -407,7 +408,7 @@ void MadDecoder::run()
         flush(TRUE);
 
         if (output()) {
-	    output()->Drain();
+            output()->Drain();
         }
 
         done = TRUE;
@@ -488,15 +489,25 @@ enum mad_flow MadDecoder::madOutput()
             flush();
         }
         sample = fix_sample(16, *left++);
+#ifdef WORDS_BIGENDIAN
+        *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+        *(output_buf + output_at++) = ((sample >> 0) & 0xff);
+#else
         *(output_buf + output_at++) = ((sample >> 0) & 0xff);
         *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+#endif
         output_bytes += 2;
 
         if (channels == 2)
         {
             sample = fix_sample(16, *right++);
+#ifdef WORDS_BIGENDIAN
+            *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+            *(output_buf + output_at++) = ((sample >> 0) & 0xff);
+#else
             *(output_buf + output_at++) = ((sample >> 0) & 0xff);
             *(output_buf + output_at++) = ((sample >> 8) & 0xff);
+#endif
             output_bytes += 2;
         }
     }
