@@ -761,57 +761,82 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
     return -1;
 }
 
+static uint get_max_chanid(uint sourceid)
+{
+    QString qstr = "SELECT MAX(chanid) FROM channel ";
+    qstr += (sourceid) ? "WHERE sourceid = :SOURCEID" : "";
+
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(qstr);
+
+    if (sourceid)
+        query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Getting chanid for new channel (2)", query);
+    else if (!query.next())
+        VERBOSE(VB_IMPORTANT, "Error getting chanid for new channel.");
+    else
+        return query.value(0).toUInt();
+
+    return 0;
+}
+
+static bool chanid_available(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "SELECT chanid "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("is_chan_id_available", query);
+    else if (query.size() == 0)
+        return true;
+
+    return false;
+}
+
 /** \fn ChannelUtil::CreateChanID(uint, const QString&)
  *  \brief Creates a unique channel ID for database use.
  *  \return chanid if successful, -1 if not
  */
 int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
 {
-    MSqlQuery query(MSqlQuery::DDCon());
-
-    uint desired_chanid = 0;
+    // first try to base it on the channel number for human readability
+    uint chanid = 0;
     int chansep = chan_num.find(QRegExp("\\D"));
     if (chansep > 0)
     {
-        desired_chanid =
+        chanid =
             sourceid * 1000 +
             chan_num.left(chansep).toInt() * 10 +
             chan_num.right(chan_num.length()-chansep-1).toInt();
     }
     else
     {
-        desired_chanid = sourceid * 1000 + chan_num.toInt();
+        chanid = sourceid * 1000 + chan_num.toInt();
     }
 
-    if (desired_chanid > sourceid * 1000)
-    {
-        query.prepare(
-            QString("SELECT chanid FROM channel "
-                    "WHERE chanid = '%1'").arg(desired_chanid));
-        if (!query.exec() || !query.isActive())
-        {
-            MythContext::DBError("Getting chanid for new channel (1)", query);
-            return -1;
-        }
-        if (query.size() == 0)
-            return desired_chanid;
-    }
+    if ((chanid > sourceid * 1000) && (chanid_available(chanid)))
+        return chanid;
 
-    query.prepare("SELECT MAX(chanid) FROM channel "
-                  "WHERE sourceid = :SOURCEID");
-    query.bindValue(":SOURCEID", sourceid);
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("Getting chanid for new channel (2)", query);
-        return -1;
-    }
-    if (!query.next())
-    {
-        VERBOSE(VB_IMPORTANT, "Error getting chanid for new channel.");
-        return -1;
-    }
-    uint max_db_val = query.value(0).toInt() + 1;    
-    return max(max_db_val, desired_chanid = sourceid * 1000 + 1);
+    // try to at least base it on the sourceid for human readability
+    chanid = max(get_max_chanid(sourceid) + 1, sourceid * 1000);
+    
+    if (chanid_available(chanid))
+        return chanid;
+
+    // just get a chanid we know should work
+    chanid = get_max_chanid(0) + 1;
+
+    if (chanid_available(chanid))
+        return chanid;
+
+    // failure
+    return -1;
 }
 
 bool ChannelUtil::CreateChannel(uint db_mplexid,
