@@ -296,11 +296,13 @@ void DummyDTVRecorder::FinishRecording(void)
 
 void DummyDTVRecorder::StopRecordingThread(void)
 {
-    VERBOSE(VB_RECORD, "DummyDTVRecorder::StopRecordingThread(void)");
+    VERBOSE(VB_RECORD, "DummyDTVRecorder::StopRecordingThread(void) -- beg");
     if (_recording)
     {
         StopRecording();
+        pthread_join(_rec_thread, NULL);
         while (_recording)
             usleep(100);
     }
+    VERBOSE(VB_RECORD, "DummyDTVRecorder::StopRecordingThread(void) -- end");
 }

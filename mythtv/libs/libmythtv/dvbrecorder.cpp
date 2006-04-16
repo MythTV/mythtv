@@ -974,6 +974,7 @@ void DVBRecorder::StopDummyVideo(void)
         _stop_dummy = true;
         _wait_time.wakeAll();
         _wait_stop.wait(1000);
+        pthread_join(_video_thread, NULL);
     }
 }
 
