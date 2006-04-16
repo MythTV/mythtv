@@ -11,7 +11,9 @@
     $VERSION = '.20 svn';
 
 # Load sub libraries
+    use MythTV::Program;
     use MythTV::Recording;
+    use MythTV::Channel;
 
 # Define some constants
     use constant {
@@ -151,6 +153,7 @@ package MythTV;
                      'master_port' => undef,
                      'dbh'         => undef,
 
+                     'channels'    => {},
                      'scheduled'   => [],
                      'recorded'    => [],
 
@@ -192,6 +195,10 @@ package MythTV;
         if ($self->backend_command('ANN Monitor '.$self->{'hostname'}.' 0') ne 'OK') {
             die "Unable to connect to mythbackend, is it running?\n";
         }
+
+    # Find the directory where the recordings are located
+        $self->{'video_dir'} = $self->backend_setting('RecordFilePrefix', $self->{'hostname'});
+        $self->{'video_dir'} =~ s/\/+$//;
 
     # Cache the database handle
         $MythTV::last = $self;
@@ -351,6 +358,27 @@ package MythTV;
         }
     # Return the data
         return %rows;
+    }
+
+# Return a channel object
+    sub channel {
+        my $self   = shift;
+        my $chanid = shift;
+        $self->_load_channels() unless ($self->{'channels'}{$chanid});
+        return $self->{'channels'}{$chanid};
+    }
+
+# Load all of the known channels for this connection
+    sub _load_channels {
+        my $self = shift;
+        return if (%{$self->{'channels'}});
+    # Load the channels
+        my $sh = $self->{'dbh'}->prepare('SELECT * FROM channel');
+        $sh->execute();
+        while (my $row = $sh->fetchrow_hashref) {
+            $self->{'channels'}{$row->{'chanid'}} = new MythTV::Channel($row);
+        }
+        $sh->finish;
     }
 
 # Return true
