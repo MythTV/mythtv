@@ -28,24 +28,7 @@
 #undef ASSERT
 #endif
 
-#ifdef _DEBUG
-
-#define THIS_FILE          __FILE__
-#define ASSERT(f) \
-    do \
-    { \
-        if (!(f)) { Q_ASSERT(f); _asm { int 3 } } \
-    } while (0) \
-
-#define VERIFY(f)          ASSERT(f)
-#else
 #define ASSERT(f)          Q_ASSERT(f)
-#define VERIFY(f)          ((void)(f))
-#endif
-
-// A number of MHEG actions do not appear to actually be used.  ASSERT(UNTESTED("Action name")) is used to give
-// some idea of those that still need to be tested.
-#define UNTESTED(x) (false)
 
 extern int __mhlogoptions;
 extern void __mhlog(QString logtext);
@@ -61,7 +44,6 @@ do { \
 do { \
     if (MHLogError & __mhlogoptions) \
         __mhlog(__text); \
-    ASSERT(false); \
     throw "Failed"; \
 } while (0)
 

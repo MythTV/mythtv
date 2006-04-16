@@ -81,9 +81,12 @@ int MHEngine::RunAll()
         // if one of the containing directories is updated.
         if (! Launch(startObj))
         {
-            startObj.m_GroupId.Copy(MHOctetString("~//startup"));
-            if (! Launch(startObj))
-                return CONTENT_CHECK_TIME; // Perhaps we should return failure here.
+             startObj.m_GroupId.Copy(MHOctetString("~//startup"));
+             if (! Launch(startObj))
+             {
+                 MHLOG(MHLogError, "Unable to launch application");
+                 return -1;
+             }
         }
         m_fBooting = false;
     }
@@ -188,40 +191,46 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
     if (! m_Context->GetCarouselData(csPath, text)) return false;
 
     m_fInTransition = true; // Starting a transition
-    if (CurrentApp()) {
-        if (fIsSpawn) { // Run the CloseDown actions.
-            AddActions(CurrentApp()->m_CloseDown);
-            RunActions();
+    try {
+        if (CurrentApp()) {
+            if (fIsSpawn) { // Run the CloseDown actions.
+                AddActions(CurrentApp()->m_CloseDown);
+                RunActions();
+            }
+            if (CurrentScene()) CurrentScene()->Destruction(this);
+            CurrentApp()->Destruction(this);
+            if (! fIsSpawn) m_ApplicationStack.remove(); // Pop and delete the current app.
         }
-        if (CurrentScene()) CurrentScene()->Destruction(this);
-        CurrentApp()->Destruction(this);
-        if (! fIsSpawn) m_ApplicationStack.remove(); // Pop and delete the current app.
+
+        MHApplication *pProgram = (MHApplication*)ParseProgram(text);
+
+        if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0) { // Print it so we know what's going on.
+            pProgram->PrintMe(__mhlogStream, 0);
+        }
+
+        if (! pProgram->m_fIsApp) MHERROR("Expected an application");
+
+        // Save the path we use for this app.
+        pProgram->m_Path = csPath; // Record the path
+        int nPos = pProgram->m_Path.findRev('/');
+        if (nPos < 0) pProgram->m_Path = "";
+        else pProgram->m_Path = pProgram->m_Path.left(nPos);
+       // Have now got the application.
+       m_ApplicationStack.push(pProgram);
+
+       // This isn't in the standard as far as I can tell but we have to do this because
+       // we may have events referring to the old application.
+       m_EventQueue.clear();
+
+       // Activate the application. ....
+       CurrentApp()->Activation(this);
+       m_fInTransition = false; // The transition is complete
+       return true;
     }
-
-    MHApplication *pProgram = (MHApplication*)ParseProgram(text);
-
-    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0) { // Print it so we know what's going on.
-        pProgram->PrintMe(__mhlogStream, 0);
+    catch (...) {
+       m_fInTransition = false; // The transition is complete
+       return false;
     }
-
-    if (! pProgram->m_fIsApp) MHERROR("Expected an application");
-
-    // Save the path we use for this app.
-    pProgram->m_Path = csPath; // Record the path
-    int nPos = pProgram->m_Path.findRev('/');
-    if (nPos < 0) pProgram->m_Path = "";
-    else pProgram->m_Path = pProgram->m_Path.left(nPos);
-    // Have now got the application.
-    m_ApplicationStack.push(pProgram);
-
-    // This isn't in the standard as far as I can tell but we have to do this because
-    // we may have events referring to the old application.
-    m_EventQueue.clear();
-
-    // Activate the application. ....
-    CurrentApp()->Activation(this);
-    m_fInTransition = false; // The transition is complete
-    return true;
 }
 
 void MHEngine::Quit()
@@ -579,6 +588,7 @@ void MHEngine::DrawRegion(QRegion toDraw, int nStackPos)
 // Redraw an area of the display.  This will be called via the context from Redraw.
 void MHEngine::DrawDisplay(QRegion toDraw)
 {
+    if (m_fBooting) return;
     int nTopStack = CurrentApp() == NULL ? -1 : CurrentApp()->m_DisplayStack.Size()-1;
     DrawRegion(toDraw, nTopStack);
 }
