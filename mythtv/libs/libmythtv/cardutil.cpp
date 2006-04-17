@@ -515,8 +515,12 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype,
 {
     QStringList ret;
 
-    if (("FIREWIRE" == cardtype) || ("DBOX2" == cardtype))
+    if (("FIREWIRE"  == cardtype) ||
+        ("DBOX2"     == cardtype) ||
+        ("HDHOMERUN" == cardtype))
+    {
         ret += "MPEG2TS";
+    }
     else if ("DVB" == cardtype)
         ret += probeDVBInputs(device, diseqctype);
     else
@@ -680,7 +684,7 @@ QString CardUtil::GetDeviceLabel(uint cardid,
             "WHERE cardid = :CARDID");
         query.bindValue(":CARDID", cardid);
 
-        if (!query.exec() || !query.isActive() || !query.size())
+        if (!query.exec() || !query.isActive() || !query.next())
             label = "[ DB ERROR ]";
         else
             label = QString("[ FIREWIRE : Port %2 Node %3 ]")
@@ -697,13 +701,28 @@ QString CardUtil::GetDeviceLabel(uint cardid,
             "WHERE cardid = :CARDID");
         query.bindValue(":CARDID", cardid);
 
-        if (!query.exec() || !query.isActive() || !query.size())
+        if (!query.exec() || !query.isActive() || !query.next())
             label = "[ DB ERROR ]";
         else
             label = QString("[ DBOX2 : IP %1 Port %2 HttpPort %3 ]")
                 .arg(query.value(0).toString())
                 .arg(query.value(1).toString())
                 .arg(query.value(2).toString());
+    }
+    else if (cardtype == "HDHOMERUN")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "SELECT dbox2_port "
+            "FROM capturecard "
+            "WHERE cardid = :CARDID");
+        query.bindValue(":CARDID", cardid);
+
+        if (!query.exec() || !query.isActive() || !query.next())
+            label = "[ DB ERROR ]";
+        else
+            label = QString("[ HDHomeRun : ID %1 Port %2 ]")
+                .arg(videodevice).arg(query.value(0).toString());
     }
     else
     {
@@ -724,8 +743,12 @@ void CardUtil::GetCardInputs(
     int rcardid = (parentid) ? parentid : cardid;
     QStringList inputs;
 
-    if (("FIREWIRE" == cardtype) || ("DBOX2" == cardtype))
+    if (("FIREWIRE"  == cardtype) ||
+        ("DBOX2"     == cardtype) ||
+        ("HDHOMERUN" == cardtype))
+    {
         inputs += "MPEG2TS";
+    }
     else if ("DVB" != cardtype)
         inputs += probeV4LInputs(device);
 

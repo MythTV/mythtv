@@ -73,6 +73,11 @@ using namespace std;
 #include "dbox2channel.h"
 #endif
 
+#ifdef USING_HDHOMERUN
+#include "hdhrrecorder.h"
+#include "hdhrchannel.h"
+#endif
+
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
 #define LOC QString("TVRec(%1): ").arg(cardid)
@@ -179,6 +184,15 @@ bool TVRec::CreateChannel(const QString &startchannel)
         channel = new DBox2Channel(this, &dboxOpt, cardid);
         if (!channel->Open())
             return false;
+        InitChannel(genOpt.defaultinput, startchannel);
+        init_run = true;
+#endif
+    }
+    else if (genOpt.cardtype == "HDHOMERUN")
+    {
+#ifdef USING_HDHOMERUN
+        channel = new HDHRChannel(this, genOpt.videodev, dboxOpt.port);
+        channel->Open();
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
 #endif
@@ -856,6 +870,14 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOption("httpport", dboxOpt.httpport);
 #endif // USING_DBOX2
     }
+    else if (genOpt.cardtype == "HDHOMERUN")
+    {
+#ifdef USING_HDHOMERUN
+        recorder = new HDHRRecorder(this, GetHDHRChannel());
+        ringBuffer->SetWriteBufferSize(4*1024*1024);
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+#endif // USING_HDHOMERUN
+    }
     else if (genOpt.cardtype == "DVB")
     {
 #ifdef USING_DVB
@@ -1002,6 +1024,15 @@ HDTVRecorder *TVRec::GetHDTVRecorder(void)
 #endif // USING_V4L
 }
 
+HDHRRecorder *TVRec::GetHDHRRecorder(void)
+{
+#ifdef USING_HDHOMERUN
+    return dynamic_cast<HDHRRecorder*>(recorder);
+#else // if !USING_HDHOMERUN
+    return NULL;
+#endif // !USING_HDHOMERUN
+}
+
 /** \fn TVRec::InitChannel(const QString&, const QString&)
  *  \brief Performs ChannelBase instance init from database and 
  *         tuner hardware (requires that channel be open).
@@ -1061,6 +1092,15 @@ DBox2Channel *TVRec::GetDBox2Channel(void)
 #else
     return NULL;
 #endif // USING_DBOX2
+}
+
+HDHRChannel *TVRec::GetHDHRChannel(void)
+{
+#ifdef USING_HDHOMERUN
+    return dynamic_cast<HDHRChannel*>(channel);
+#else
+    return NULL;
+#endif // USING_HDHOMERUN
 }
 
 DVBChannel *TVRec::GetDVBChannel(void)
@@ -1391,10 +1431,10 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 }
 
 bool TVRec::GetDevices(int cardid,
-                       GeneralDBOptions  &gen_opts,
-                       DVBDBOptions      &dvb_opts,
-                       FireWireDBOptions &firewire_opts,
-                       DBox2DBOptions    &dbox2_opts)
+                       GeneralDBOptions   &gen_opts,
+                       DVBDBOptions       &dvb_opts,
+                       FireWireDBOptions  &firewire_opts,
+                       DBox2DBOptions     &dbox2_opts)
 {
     int testnum = 0;
     QString test;
@@ -1479,7 +1519,7 @@ bool TVRec::GetDevices(int cardid,
 
     firewire_opts.connection  = query.value(fireoff + 4).toUInt();
 
-    // DBOX2 options
+    // DBOX2/HDHomeRun options
     uint dbox2off = fireoff + 5;
     dbox2_opts.port = query.value(dbox2off + 0).toUInt();
 
@@ -1655,6 +1695,13 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sd->SetCaching(true);
     }
 #endif // USING_DVB
+#ifdef USING_HDHOMERUN
+    if (GetHDHRRecorder())
+    {
+        sd = GetHDHRRecorder()->GetStreamData();
+        sd->SetCaching(true);
+    }
+#endif // USING_HDHOMERUN
 
     if (!sd)
         sd = new ATSCStreamData(-1, -1, true);
@@ -3388,6 +3435,15 @@ void TVRec::HandleTuning(void)
             GetDVBRecorder()->SetRingBuffer(NULL);
         }
 #endif // USING_DVB
+#ifdef USING_HDHOMERUN
+        if (GetHDHRRecorder())
+        {
+            // We currently need to close the file descriptor for
+            // HDHomeRun signal monitoring to work.
+            GetHDHRRecorder()->Close();
+            GetHDHRRecorder()->SetRingBuffer(NULL);
+        }
+#endif // USING_HDHOMERUN
         TuningFrequency(lastTuningRequest);
     }
 
@@ -3770,6 +3826,10 @@ bool TVRec::TuningSignalCheck(void)
     if (GetHDTVRecorder())
         GetHDTVRecorder()->SetStreamData(streamData);
 #endif // USING_V4L
+#ifdef USING_HDHOMERUN
+    if (GetHDHRRecorder())
+        GetHDHRRecorder()->SetStreamData(streamData);
+#endif // USING_HDHOMERUN
 
     return true;
 }
@@ -4035,6 +4095,17 @@ void TVRec::TuningRestartRecorder(void)
         GetDVBRecorder()->Open();
     }
 #endif // USING_DVB
+
+#ifdef USING_HDHOMERUN
+    if (GetHDHRRecorder())
+    {
+        pauseNotify = false;
+        GetHDHRRecorder()->Close();
+        pauseNotify = true;
+        GetHDHRRecorder()->Open();
+        GetHDHRRecorder()->StartData();
+    }
+#endif // USING_HDHOMERUN
 
     // Set file descriptor of channel from recorder for V4L
     channel->SetFd(recorder->GetVideoFd());

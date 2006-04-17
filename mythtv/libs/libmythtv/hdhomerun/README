@@ -1,0 +1,7 @@
+
+This directory contains Silicondust Engineering's hdhomerun
+library used for communicating with the HDHomeRun hardware.
+
+The files in this directory are released under the GNU LESSER GENERAL PUBLIC LICENSE
+For details see the lgpl.txt file which should be located in this directory.
+If you can not find it, it can also be seen at http://www.gnu.org/licenses/lgpl.txt

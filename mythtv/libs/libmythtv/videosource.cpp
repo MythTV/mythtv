@@ -914,8 +914,55 @@ class DBOX2ConfigurationGroup: public VerticalConfigurationGroup {
     CaptureCard &parent;
  };
 
+class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
+{
+  public:
+    HDHomeRunDeviceID(const CaptureCard& parent):
+        CCSetting(parent, "videodevice")
+    {
+        setValue("FFFFFFFF");
+        setLabel(QObject::tr("Device ID"));
+        setHelpText(QObject::tr("Device ID from the back of "
+                                "the HDHomeRun unit."));
+    }
+};
 
+class HDHomeRunTunerIndex: public ComboBoxSetting, public CCSetting
+{
+  public:
+    HDHomeRunTunerIndex(const CaptureCard& parent):
+        CCSetting(parent, "dbox2_port")
+    {
+        setLabel(QObject::tr("Tuner"));
+        addSelection("0");
+        addSelection("1");
+    }
+};
 
+void HDHRCardInput::fillSelections(const QString&)
+{
+    clearSelections();
+    addSelection("MPEG2TS");
+}
+
+class HDHomeRunConfigurationGroup: public VerticalConfigurationGroup
+{
+  public:
+    HDHomeRunConfigurationGroup(CaptureCard& a_parent):
+        parent(a_parent)
+    {
+        setUseLabel(false);
+        addChild(new HDHomeRunDeviceID(parent));
+        addChild(new HDHomeRunTunerIndex(parent));
+
+        HDHRCardInput *defaultinput = new HDHRCardInput(parent);
+        addChild(defaultinput);
+        defaultinput->setVisible(false);
+    };
+
+  private:
+    CaptureCard& parent;
+};
 
 class V4LConfigurationGroup: public VerticalConfigurationGroup
 {
@@ -1006,12 +1053,29 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
     setSaveAll(false);
     
     
-    addTarget("V4L", new V4LConfigurationGroup(parent));
-    addTarget("DVB", new DVBConfigurationGroup(parent));
-    addTarget("HDTV", new pcHDTVConfigurationGroup(parent));
-    addTarget("MPEG", new MPEGConfigurationGroup(parent));
-    addTarget("FIREWIRE", new FirewireConfigurationGroup(parent));
-    addTarget("DBOX2", new DBOX2ConfigurationGroup(parent));
+#ifdef USING_V4L
+    addTarget("V4L",       new V4LConfigurationGroup(parent));
+    addTarget("HDTV",      new pcHDTVConfigurationGroup(parent));
+# ifdef USING_IVTV
+    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
+# endif // USING_IVTV
+#endif // USING_V4L
+
+#ifdef USING_DVB
+    addTarget("DVB",       new DVBConfigurationGroup(parent));
+#endif // USING_DVB
+
+#ifdef USING_FIREWIRE
+    addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
+#endif // USING_FIREWIRE
+
+#ifdef USING_DBOX2
+    addTarget("DBOX2",     new DBOX2ConfigurationGroup(parent));
+#endif // USING_DBOX2
+
+#ifdef USING_HDHOMERUN
+    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
+#endif // USING_HDHOMERUN
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
@@ -1044,9 +1108,7 @@ void CaptureCard::fillSelections(SelectSetting* setting, bool no_children)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
-        "SELECT cardtype, videodevice, cardid, "
-        "       firewire_port, firewire_node, "
-        "       dbox2_port, dbox2_host, dbox2_httpport "
+        "SELECT cardid, cardtype, videodevice "
         "FROM capturecard "
         "WHERE hostname = :HOSTNAME";
     if (no_children)
@@ -1055,37 +1117,23 @@ void CaptureCard::fillSelections(SelectSetting* setting, bool no_children)
     query.prepare(qstr);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
     {
-        while (query.next())
-        { 
-            // dont like doing this..
-            if (query.value(0).toString() == "FIREWIRE") 
-            {
-                setting->addSelection(
-                      "[ " + query.value(0).toString() + " Port: " +
-                             query.value(3).toString() + ", Node: " +
-                             query.value(4).toString() + "]",
-                             query.value(2).toString());
-            } 
-            else if (query.value(0).toString() == "DBOX2")
-            {
-                setting->addSelection(
-                    "[ " + query.value(0).toString() + " " + 
-                    "Host IP: " + query.value(6).toString() +  ", " +
-                    "Streaming-Port: " + query.value(5).toString() + ", " +
-                    "Http-Port: " + query.value(7).toString() + 
-                    "] ", query.value(2).toString());
-            }
-            else 
-            {
-                setting->addSelection(
-                       "[ " + query.value(0).toString() + " : " +
-                              query.value(1).toString() + " ]",
-                              query.value(2).toString());
-            }
-        }
-    }   
+        MythContext::DBError("CaptureCard::fillSelections", query);
+        return;
+    }
+    if (query.size() == 0)
+        return;
+
+    while (query.next())
+    {
+        QString label = CardUtil::GetDeviceLabel(
+            query.value(0).toUInt(),
+            query.value(1).toString(),
+            query.value(2).toString());
+
+        setting->addSelection(label);
+    }
 }
 
 void CaptureCard::loadByID(int cardid) 
@@ -1105,23 +1153,47 @@ CardType::CardType(const CaptureCard& parent)
 
 void CardType::fillSelections(SelectSetting* setting)
 {
+#ifdef USING_V4L
     setting->addSelection(
         QObject::tr("Analog V4L capture card"), "V4L");
     setting->addSelection(
         QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
+# ifdef USING_IVTV
     setting->addSelection(
         QObject::tr("MPEG-2 encoder card (PVR-x50, PVR-500)"), "MPEG");
+# endif // USING_IVTV
+#endif // USING_V4L
+
+#ifdef USING_DVB
     setting->addSelection(
         QObject::tr("DVB DTV capture card (v3.x)"), "DVB");
+#endif // USING_DVB
+
+#ifdef USING_V4L
     setting->addSelection(
         QObject::tr("pcHDTV DTV capture card (w/V4L drivers)"), "HDTV");
+#endif // USING_V4L
+
+#ifdef USING_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
+#endif // USING_FIREWIRE
+
+#ifdef USING_V4L
     setting->addSelection(
         QObject::tr("USB MPEG-4 encoder box (Plextor ConvertX, etc)"),
         "GO7007");
+#endif // USING_V4L
+
+#ifdef USING_DBOX2
     setting->addSelection(
         QObject::tr("DBox2 TCP/IP cable box"), "DBOX2");
+#endif // USING_DBOX2
+
+#ifdef USING_HDHOMERUN
+    setting->addSelection(
+        QObject::tr("HDHomeRun DTV tuner box"), "HDHOMERUN");
+#endif // USING_HDHOMERUN
 }
 
 class CardID: public SelectLabelSetting, public CISetting {

@@ -29,12 +29,14 @@ class LiveTVChain;
 class RecorderBase;
 class DVBRecorder;
 class HDTVRecorder;
+class HDHRRecorder;
 
 class SignalMonitor;
 class DTVSignalMonitor;
 
 class ChannelBase;
 class DBox2Channel;
+class HDHRChannel;
 class DVBChannel;
 class Channel;
 
@@ -279,12 +281,14 @@ class TVRec : public QObject
     bool SetupRecorder(RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     HDTVRecorder *GetHDTVRecorder(void);
+    HDHRRecorder *GetHDHRRecorder(void);
     DVBRecorder  *GetDVBRecorder(void);
     
     bool CreateChannel(const QString &startChanNum);
     void InitChannel(const QString &inputname, const QString &startchannel);
     void CloseChannel(void);
     DBox2Channel *GetDBox2Channel(void);
+    HDHRChannel  *GetHDHRChannel(void);
     DVBChannel   *GetDVBChannel(void);
     Channel      *GetV4LChannel(void);
 
@@ -360,10 +364,10 @@ class TVRec : public QObject
     bool              ispip;
 
     // Configuration variables from database, based on cardid
-    GeneralDBOptions  genOpt;
-    DVBDBOptions      dvbOpt;
-    FireWireDBOptions fwOpt;
-    DBox2DBOptions    dboxOpt;
+    GeneralDBOptions   genOpt;
+    DVBDBOptions       dvbOpt;
+    FireWireDBOptions  fwOpt;
+    DBox2DBOptions     dboxOpt;
 
     // State variables
     QMutex         stateChangeLock;

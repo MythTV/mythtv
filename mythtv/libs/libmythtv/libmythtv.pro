@@ -12,7 +12,7 @@ INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
 INCLUDEPATH += ./dvbdev ./mpeg
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
 DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav
-DEPENDPATH  += ./dvbdev ./mpeg
+DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
@@ -346,6 +346,27 @@ using_backend {
     # Support for set top boxes (Nokia DBox2 etc.)
     using_dbox2:SOURCES += dbox2recorder.cpp dbox2channel.cpp dbox2epg.cpp
     using_dbox2:HEADERS += dbox2recorder.h dbox2channel.h dbox2epg.h
+    using_dbox2:DEFINES += USING_DBOX2
+
+    # Support for HDHomeRun box
+    using_hdhr {
+        # MythTV HDHomeRun glue
+        HEADERS += hdhrsignalmonitor.h   hdhrchannel.h
+        HEADERS += hdhrrecorder.h
+
+        SOURCES += hdhrsignalmonitor.cpp hdhrchannel.cpp
+        SOURCES += hdhrrecorder.cpp
+
+        DEFINES += USING_HDHOMERUN
+
+        # HDHomeRun library
+        HEADERS += hdhomerun/hdhomerun_pkt.h   hdhomerun/hdhomerun_discover.h
+        HEADERS += hdhomerun/hdhomerun_video.h hdhomerun/hdhomerun_control.h
+        HEADERS += hdhomerun/hdhomerun_os.h
+
+        SOURCES += hdhomerun/hdhomerun_pkt.c   hdhomerun/hdhomerun_discover.c
+        SOURCES += hdhomerun/hdhomerun_video.c hdhomerun/hdhomerun_control.c
+    }
 
     # Support for PVR-150/250/350/500, etc. on Linux
     using_ivtv:HEADERS += mpegrecorder.h

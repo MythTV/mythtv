@@ -248,12 +248,9 @@ inline QString sm_flags_to_string(uint flags)
 
 inline bool SignalMonitor::IsSupported(QString cardtype)
 {
-    if (CardUtil::IsDVBCardType(cardtype))
-        return true;
-    if (cardtype.upper() == "HDTV")
-        return true;
-
-    return false;
+    return (CardUtil::IsDVBCardType(cardtype) ||
+            (cardtype.upper() == "HDTV")      ||
+            (cardtype.upper() == "HDHOMERUN"));
 }
 
 

@@ -414,6 +414,7 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
         newtype |= entry.cardtype == "HDTV";
         newtype |= entry.cardtype == "FIREWIRE";
         newtype |= entry.cardtype == "DBOX2";
+        newtype |= entry.cardtype == "HDHOMERUN";
     }
 
     m_switchid = -1;

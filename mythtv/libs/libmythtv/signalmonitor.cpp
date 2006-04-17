@@ -22,6 +22,11 @@
 #   include "channel.h"
 #endif
 
+#ifdef USING_HDHOMERUN
+#   include "hdhrsignalmonitor.h"
+#   include "hdhrchannel.h"
+#endif
+
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
@@ -79,6 +84,16 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
             signalMonitor = new pcHDTVSignalMonitor(db_cardnum, hdtvc);
     }
 #endif
+
+#ifdef USING_HDHOMERUN
+    if (cardtype.upper() == "HDHOMERUN")
+    {
+        HDHRChannel *hdhrc = dynamic_cast<HDHRChannel*>(channel);
+        if (hdhrc)
+            signalMonitor = new HDHRSignalMonitor(db_cardnum, hdhrc);
+    }
+#endif
+
     if (!signalMonitor)
     {
         VERBOSE(VB_IMPORTANT,

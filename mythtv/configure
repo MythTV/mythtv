@@ -55,6 +55,7 @@ lirc="yes"
 joystick_menu="yes"
 firewire_cable_box="yes"
 dbox2_dvb_box="yes"
+hdhomerun_box="yes"
 x11_include_path="/usr/X11R6/include"
 x11="yes"
 xrandr="yes"
@@ -173,6 +174,7 @@ echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
 echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
 echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
+echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
 echo "  --disable-v4l            disable Video4Linux support"
 echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
 #echo "  --enable-ivtv-sys-header use ivtv system headers instead of myth headers"
@@ -457,6 +459,7 @@ audio_jack="no"
 dv1394="no"
 ivtv="no"
 dbox2_dvb_box="no"
+hdhomerun_box="yes"
 dvb="no"
 backend="no"
 make="gmake"
@@ -806,6 +809,10 @@ for opt do
   --enable-dbox2) dbox2_dvb_box="yes"
   ;;
   --disable-dbox2) dbox2_dvb_box="no"
+  ;;
+  --enable-hdhomerun) hdhomerun_box="yes"
+  ;;
+  --disable-hdhomerun) hdhomerun_box="no"
   ;;
   --enable-dvb) dvb="yes"
   ;;
@@ -2236,6 +2243,7 @@ if test x"$backend" = x"yes" ; then
   echo "FireWire support $firewire_cable_box"
   echo "DVB support      $dvb [$dvb_path]"
   echo "DBox2 support    $dbox2_dvb_box"
+  echo "HDHomeRun sup.   $hdhomerun_box"
 fi
 
 if test x"$frontend" = x"yes" ; then
@@ -2831,6 +2839,7 @@ if test x"$backend" = x"no" ; then
     ivtv="no"
     ivtv_header="no"
     dbox2_dvb_box="no"
+    hdhomerun_box="no"
     dvb="no"
 fi
 
@@ -2874,7 +2883,10 @@ fi
 
 if test x"$dbox2_dvb_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_dbox2"
-  CONFIG_DEFINES="$CONFIG_DEFINES USING_DBOX2"
+fi
+
+if test x"$hdhomerun_box" = x"yes" ; then
+  CCONFIG="$CCONFIG using_hdhr"
 fi
 
 if test x"$lirc" = x"yes" ; then

@@ -211,6 +211,19 @@ class TunerCardInput: public ComboBoxSetting, public CCSetting
     int     last_diseqct;
 };
 
+class HDHRCardInput: public TunerCardInput
+{
+    Q_OBJECT
+  public:
+    HDHRCardInput(const CaptureCard& parent) : TunerCardInput(parent)
+    {
+        addSelection("MPEG2TS");
+    }
+
+  public slots:
+    void fillSelections(const QString& device);
+};
+
 class DVBAudioDevice: public LineEditSetting, public CCSetting {    
     Q_OBJECT
 public:
