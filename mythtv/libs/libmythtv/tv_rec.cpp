@@ -911,6 +911,17 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
             return false;
         }
 
+#ifdef USING_HDHOMERUN
+        HDHRChannel  *hdhr_channel  = GetHDHRChannel();
+        HDHRRecorder *hdhr_recorder = GetHDHRRecorder();
+        if (hdhr_channel && hdhr_recorder && !scanner)
+        {
+            uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
+            scanner = new EITScanner();
+            scanner->StartPassiveScan(hdhr_channel, hdhr_recorder, ignore);
+        }
+#endif // USING_HDHOMERUN
+
         return true;
     }
 
@@ -966,6 +977,14 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (GetV4LChannel())
             channel->SetFd(-1);
+
+        if (GetHDHRChannel() && scanner)
+        {
+            scanner->StopPassiveScan();
+            delete scanner;
+            scanner = NULL;
+        }
+
         recorder->deleteLater();
         recorder = NULL;
     }

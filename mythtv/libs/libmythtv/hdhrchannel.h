@@ -21,11 +21,10 @@
 
 typedef struct hdhomerun_control_sock_t hdhr_socket_t;
 
-class HDHRChannel : public QObject, public ChannelBase
+class HDHRChannel : public ChannelBase
 {
     friend class HDHRSignalMonitor;
     friend class HDHRRecorder;
-    Q_OBJECT
 
   public:
     HDHRChannel(TVRec *parent, const QString &device, uint tuner);

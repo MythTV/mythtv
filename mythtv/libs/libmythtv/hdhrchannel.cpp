@@ -30,8 +30,7 @@ using namespace std;
 #define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
-    : QObject(NULL, "HDHRChannel"),
-      ChannelBase(parent),      _control_socket(NULL),
+    : ChannelBase(parent),      _control_socket(NULL),
       _device_id(0),            _device_ip(0),
       _tuner(tuner)
 {

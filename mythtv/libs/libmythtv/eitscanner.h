@@ -18,13 +18,20 @@ class EITHelper;
 class dvb_channel_t;
 class ProgramMapTable;
 
+class EITSource
+{
+  public:
+    virtual void SetEITHelper(EITHelper*) = 0;
+    virtual void SetEITRate(float rate) = 0;
+};
+
 class EITScanner
 {
   public:
     EITScanner();
     ~EITScanner() { TeardownAll(); }
 
-    void StartPassiveScan(ChannelBase*, DVBSIParser*, bool ignore_source);
+    void StartPassiveScan(ChannelBase*, EITSource*, bool ignore_source);
     void StopPassiveScan(void);
 
     void StartActiveScan(TVRec*, uint max_seconds_per_source,
@@ -40,7 +47,7 @@ class EITScanner
 
     QMutex           lock;
     ChannelBase     *channel;
-    DVBSIParser     *parser;
+    EITSource       *eitSource;
 
     EITHelper       *eitHelper;
     pthread_t        eventThread;

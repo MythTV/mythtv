@@ -15,7 +15,7 @@
 #define LOC QString("EITScanner: ")
 
 /** \class EITScanner
- *  \brief Acts as glue between ChannelBase, DVBSIParser, and EITHelper.
+ *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.
  *
  *   This is the class where the "EIT Crawl" is implemented.
  *
@@ -26,7 +26,7 @@ QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
 const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner()
-    : channel(NULL), parser(NULL), eitHelper(new EITHelper()),
+    : channel(NULL), eitSource(NULL), eitHelper(new EITHelper()),
       exitThread(false), rec(NULL), activeScan(false)
 {
     QStringList langPref = iso639_get_language_list();
@@ -94,12 +94,10 @@ void EITScanner::RunEventLoop(void)
             }
         }
 
-#ifdef USING_DVB
         lock.lock();
-        if (parser)
-            parser->SetEITRate(rate);
+        if (eitSource)
+            eitSource->SetEITRate(rate);
         lock.unlock();
-#endif // USING_DVB
 
         if (list_size)
         {
@@ -172,17 +170,18 @@ void EITScanner::RescheduleRecordings(void)
     ScheduledRecording::signalChange(-1);
 }
 
-/** \fn EITScanner::StartPassiveScan(ChannelBase*, DVBSIParser*)
+/** \fn EITScanner::StartPassiveScan(ChannelBase*, EITSource*, bool)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
  */
-void EITScanner::StartPassiveScan(ChannelBase *_channel, DVBSIParser *_parser,
+void EITScanner::StartPassiveScan(ChannelBase *_channel,
+                                  EITSource *_eitSource,
                                   bool _ignore_source)
 {
     QMutexLocker locker(&lock);
     
     uint sourceid = (_ignore_source) ? 0 : _channel->GetCurrentSourceID();
-    parser        = _parser;
+    eitSource     = _eitSource;
     channel       = _channel;
     ignore_source = _ignore_source;
 
@@ -190,9 +189,7 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel, DVBSIParser *_parser,
         VERBOSE(VB_EIT, LOC + "EIT scan ignoring sourceid..");
 
     eitHelper->SetSourceID(sourceid);
-#ifdef USING_DVB
-    parser->SetEITHelper(eitHelper);
-#endif // USING_DVB
+    eitSource->SetEITHelper(eitHelper);
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
@@ -202,12 +199,10 @@ void EITScanner::StopPassiveScan(void)
 {
     QMutexLocker locker(&lock);
 
-    if (parser)
+    if (eitSource)
     {
-#ifdef USING_DVB
-        parser->SetEITHelper(NULL);
-#endif // USING_DVB
-        parser  = NULL;
+        eitSource->SetEITHelper(NULL);
+        eitSource  = NULL;
     }
     channel = NULL;
 

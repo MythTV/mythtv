@@ -1,6 +1,7 @@
 // Std C++ headers
 #include <algorithm>
 #include <cmath>
+using namespace std;
 
 // Qt headers
 #include <qdatetime.h>
@@ -23,7 +24,6 @@
 
 // MythTV DVB headers
 #include "siparser.h"
-#include "dvbtypes.h"
 
 #define LOC QString("SIParser: ")
 #define LOC_ERR QString("SIParser, Error: ")

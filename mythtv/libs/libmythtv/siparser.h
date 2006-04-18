@@ -15,10 +15,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-// C++ includes
-#include <iostream>
-using namespace std;
-
 // Qt includes
 #include <qstringlist.h>
 #include <qobject.h>
@@ -29,6 +25,7 @@ using namespace std;
 #include <qmutex.h>
 
 // MythTV includes
+#include "eitscanner.h"
 #include "sitypes.h"
 
 class EITHelper;
@@ -52,38 +49,7 @@ class NetworkInformationTable;
 class ServiceDescriptionTable;
 class DVBEventInformationTable;
 
-/**
- *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
- *  DVB providers who use Huffman compressed guide in the 9x descriptors.
- */
-#define CUSTOM_DESC_HUFFMAN_TEXT               1
-
-/**
- *  Custom descriptors allow or disallow CHANNEL_NUMBERS - For the UK where
- *  channel numbers are sent in one of the SDT tables (at least per scan.c docs)
- */
-#define CUSTOM_DESC_CHANNEL_NUMBERS         2
-
-/**
- * The guide source pid.
- */
-#define GUIDE_STANDARD                0
-
-/**
- *  GUIDE_DATA_PID is for nonstandard PID being used for EIT style guide
- *  this is seen in North America (this only applies to DVB)
- */
-#define GUIDE_DATA_PID                1
-
-/**
- *  Post processing of the guide.  Some carriers put all of the event text
- *  into the description (subtitle, acotors, etc).  You can post processes these
- *  types of carriers EIT data using some simple RegExps to get more powerful
- *  guide data.  BellExpressVu in Canada is one example.
- */
-#define GUIDE_POST_PROCESS_EXTENDED        1
-
-class SIParser : public QObject
+class SIParser : public QObject, public EITSource
 {
     Q_OBJECT
   public:
