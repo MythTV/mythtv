@@ -2645,7 +2645,10 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     }
 
     if (eof)
+    {
         discontinuity = true;
+        ClearSubtitles();
+    }
 
     livetvchain->SetProgram(pginfo);
 
@@ -2734,6 +2737,8 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
+
+    ClearSubtitles();
 
     livetvchain->SetProgram(pginfo);
 
