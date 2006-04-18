@@ -249,9 +249,9 @@ int get_closest_freqid(
         if ((min_freqid <= freqid) && (freqid <= max_freqid))
             return freqid;
     }
-    VERBOSE(VB_IMPORTANT, "get_closest_freqid("<<format<<", "
-            <<modulation<<", "<<country<<", "<<centerfreq
-            <<") Failed sz("<<list.size()<<")");
+    //VERBOSE(VB_IMPORTANT, "get_closest_freqid("<<format<<", "
+    //        <<modulation<<", "<<country<<", "<<centerfreq
+    //        <<") Failed sz("<<list.size()<<")");
     return -1;
 }
 
