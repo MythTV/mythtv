@@ -15,7 +15,31 @@
 #define XVMC_VLD 0x0020000
 #endif
 
+#define GUID_IA44 0x34344941
+#define GUID_AI44 0x34344149
+
+// This is for an nVidia only feature
+#define XVMC_COPY_TO_PBUFFER 0x00000010
+extern "C" {
+Status
+XvMCCopySurfaceToGLXPbuffer (
+  Display *display,
+  XvMCSurface *surface,
+  XID pbuffer_id,
+  short src_x, // in X11 coords
+  short src_y, // in X11 coords
+  unsigned short width,
+  unsigned short height,
+  short dst_x, // in open gl coords
+  short dst_y, // in open gl  coords
+  unsigned int gl_buffer, // GL_FRONT_LEFT, GL_BACK_LEFT, GL_FRONT_RIGHT, etc
+  int flags
+);
+}
+
 typedef enum { XvVLD, XvIDCT, XvMC } XvMCAccelID;
+
+QString XvImageFormatToString(const XvImageFormatValues &fmt);
 
 class XvMCSurfaceTypes 
 {
@@ -52,27 +76,33 @@ class XvMCSurfaceTypes
 
     bool hasOverlay(int surface) const 
     {
-        return XVMC_OVERLAID_SURFACE == 
-            (surfaces[surface].flags & XVMC_OVERLAID_SURFACE);
+        return surfaces[surface].flags & XVMC_OVERLAID_SURFACE;
     }
 
     bool hasBackendSubpicture(int surface) const 
     {
-        return XVMC_BACKEND_SUBPICTURE == 
-            (surfaces[surface].flags & XVMC_BACKEND_SUBPICTURE);
+        return surfaces[surface].flags & XVMC_BACKEND_SUBPICTURE;
     }
 
     bool hasSubpictureScaling(int surface) const 
     {
-        return (XVMC_SUBPICTURE_INDEPENDENT_SCALING ==
-               (surfaces[surface].flags & XVMC_SUBPICTURE_INDEPENDENT_SCALING));
+        return surfaces[surface].flags & XVMC_SUBPICTURE_INDEPENDENT_SCALING;
     }
 
     // Format for motion compensation acceleration
     bool isIntraUnsigned(int surface) const 
     {
-        return XVMC_INTRA_UNSIGNED == 
-               (surfaces[surface].flags & XVMC_INTRA_UNSIGNED);
+        return surfaces[surface].flags & XVMC_INTRA_UNSIGNED;
+    }
+
+    bool hasCopyToPBuffer(int surface) const
+    {
+#ifdef USING_XVMC_PBUFFER
+        (void) surface;
+        return true;
+#else
+        return surfaces[surface].flags & XVMC_COPY_TO_PBUFFER;
+#endif
     }
 
     bool hasMotionCompensationAcceleration(int surface) const 
@@ -156,10 +186,10 @@ class XvMCSurfaceTypes
     static bool has(Display *pdisp,
                     XvMCAccelID accel_type, uint stream_type, int chroma,
                     uint width, uint height, uint osd_width, uint osd_height);
-        
-    ostream& print(ostream& os, int s) const;
-    ostream& print(ostream& os) const;
-    ostream& operator<<(ostream& os) const { return print(os); }
+
+    static QString XvMCDescription(Display *pdisp = NULL);
+    QString toString(Display *pdisp = NULL, XvPortID p = 0) const;
+    ostream& operator<<(ostream& os) const { return os << toString(); }
 
   private:
     int num;

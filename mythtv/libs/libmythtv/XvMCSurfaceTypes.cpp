@@ -1,5 +1,7 @@
 #ifdef USING_XVMC
 #include "XvMCSurfaceTypes.h"
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
 
 static inline Display* createXvMCDisplay() 
 {
@@ -132,6 +134,8 @@ bool XvMCSurfaceTypes::has(Display *pdisp,
     if (!pdisp)
         disp = createXvMCDisplay();
 
+    //VERBOSE(VB_IMPORTANT, "\n\n\n" << XvMCDescription(disp) << "\n\n\n");
+
     XvAdaptorInfo *ai = 0;
     unsigned int p_num_adaptors = 0;
 
@@ -141,7 +145,7 @@ bool XvMCSurfaceTypes::has(Display *pdisp,
 
     if (ret != Success) 
     {
-        printf("XvQueryAdaptors failed.\n");
+        VERBOSE(VB_IMPORTANT, "XvQueryAdaptors failed.");
         if (!pdisp)
             X11S(XCloseDisplay(disp));
         return false;
@@ -188,77 +192,195 @@ bool XvMCSurfaceTypes::has(Display *pdisp,
     return false;
 }
 
-ostream& XvMCSurfaceTypes::print(ostream& os, int s) const
+QString XvImageFormatToString(const XvImageFormatValues &fmt)
 {
-    os<<"Surface #"<<s<<endl<<"  ";
+    QString id = QString("0x%1").arg(fmt.id,0,16);
+    id = (fmt.id == GUID_IA44) ? "IA44" : id;
+    id = (fmt.id == GUID_AI44) ? "AI44" : id;
 
-    if (hasChroma420(s))
-        os<<"chroma 420, ";
-    else if (hasChroma422(s))
-        os<<"chroma 422, ";
-    else if (hasChroma444(s))
-        os<<"chroma 444, ";
-        
-    os<<"overlay? "<<( (hasOverlay(s))? "yes, " : "no, " );
+    QString type = "UNK";
+    type = (XvRGB == fmt.type) ? "RGB" : type;
+    type = (XvYUV == fmt.type) ? "YUV" : type;
 
-    os<<endl<<"  ";
-    os<<"subpicture: ";
-    os<<((hasBackendSubpicture(s))? "backend, ":"frontend, ");
-    os<<((hasSubpictureScaling(s))? "allows scaling":"no scaling");
-        
-    os<<endl<<"  ";
-    os<<"intra format: "<<((isIntraUnsigned(s))?"unsigned":"signed");
-        
-    os<<endl<<"  ";
-    os<<"acceleration: "<<((hasIDCTAcceleration(s))?"IDCT":"MV");
-        
-    os<<endl<<"  ";
-    os<<"codec support:";
-    if (hasMPEG1Support(s))
-        os<<" MPEG-1";
-    if (hasMPEG2Support(s))
-        os<<" MPEG-2";
-    if (hasMPEG4Support(s))
-        os<<" MPEG-4";
-    if (hasH263Support(s))
-        os<<" H263";
+    QString byte_order = "UNK";
+    byte_order = (LSBFirst == fmt.type) ? "LSB" : byte_order;
+    byte_order = (MSBFirst == fmt.type) ? "MSB" : byte_order;
 
-    os<<endl<<"  ";
-    os<<"max dim: "<< maxWidth(s)<<"x"<<maxHeight(s);
-    os<<"  for subpict: "<< maxSubpictureWidth(s)<<"x"<<maxSubpictureHeight(s);
-
-    os<<endl<<endl;
-
-    return os;
-}
-   
-ostream& XvMCSurfaceTypes::print(ostream& os) const
-{
-    if (0 == surfaces || 0 == size())
-            return os<<"surfaces("<<surfaces<<") size("<<size()<<")"<<endl;
-    for (int s = 0; s < size(); s++)
-        print(os, s);
-    return os;
-}
-
-#if 0
-// want to print everything?
-void printAll()
-{
-    for (i = 0; i < p_num_adaptors; i++) 
+    QString guid = "";
+    for (uint i = 0; i < 16; i++)
     {
-        XvPortID p;
-        if (ai[i].type == 0)
-            continue;
-        cerr<<"Adaptor #"<<i<<endl;
-        for (p = ai[i].base_id; p < ai[i].base_id + ai[i].num_ports; p++) {
-            XvMCSurfaceTypes st(data->XJ_disp, p);
-            cerr<<"Port #"<<p<<endl;
-            st.print(cerr);
-            cerr<<endl;
+        guid += QString("%1%2")
+            .arg((fmt.guid[i] / 16) & 0xf, 0, 16)
+            .arg(fmt.guid[i] & 0xf, 0, 16);
+    }
+
+    QString format = "unknown";
+    format = (XvPacked == fmt.format) ? "packed" : format;
+    format = (XvPlanar == fmt.format) ? "planar" : format;
+
+    QString addl = "";
+    if (XvYUV == fmt.type)
+    {
+        addl = "\n\t\t\tYUV ";
+        addl += QString("bits: %1,%2,%3 ").arg(fmt.y_sample_bits)
+            .arg(fmt.u_sample_bits).arg(fmt.v_sample_bits);
+        addl += QString("horz: %1,%2,%3 ").arg(fmt.horz_y_period)
+            .arg(fmt.horz_u_period).arg(fmt.horz_v_period);
+        addl += QString("vert: %1,%2,%3 ").arg(fmt.vert_y_period)
+            .arg(fmt.vert_u_period).arg(fmt.vert_v_period);
+
+        QString slo = "unknown";
+        slo = (fmt.scanline_order == XvTopToBottom) ? "top->bot" : slo;
+        slo = (fmt.scanline_order == XvBottomToTop) ? "bot->top" : slo;
+
+        addl += QString("scan order: %1").arg(slo);
+
+        //char component_order[32];    /* eg. UYVY */
+    }
+
+    return QString("id: %1  type: %2  order: %3  fmt: %4  bbp: %5"
+                   "%7")
+                   //"\n\t\t\tguid: %6 %7")
+        .arg(id).arg(type).arg(byte_order).arg(format)
+        .arg(fmt.bits_per_pixel)
+        //.arg(guid)
+        .arg(addl);
+}
+
+
+QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
+{
+    ostringstream os;
+    for (int j = 0; j < size(); j++)
+    {
+        QString chroma = "unknown";
+        chroma = hasChroma420(j) ? "420" : chroma;
+        chroma = hasChroma422(j) ? "422" : chroma;
+        chroma = hasChroma444(j) ? "444" : chroma;
+
+        QString accel = "";
+        accel += hasMotionCompensationAcceleration(j)?"MC, " : "";
+        accel += hasIDCTAcceleration(j) ? "IDCT, "  : "";
+        accel += hasVLDAcceleration(j)  ? "VLD, "   : "";
+        accel += hasMPEG1Support(j)     ? "MPEG1, " : "";
+        accel += hasMPEG2Support(j)     ? "MPEG2, " : "";
+        accel += hasMPEG4Support(j)     ? "MPEG4-1, " : "";
+        accel += hasH263Support(j)      ? "MPEG1-AVC, " : "";
+
+        bool backend = hasBackendSubpicture(j);
+        bool overlay = hasOverlay(j);
+        bool indep   = hasSubpictureScaling(j);
+        bool intrau  = isIntraUnsigned(j);
+        bool copytop = hasCopyToPBuffer(j);
+        QString flags = QString("0x%1 ")
+            .arg(surfaces[j].flags,0,16);
+        flags += (backend) ? "backend" : "blend";
+        flags += (overlay) ? ", overlay" : "";
+        flags += (indep)   ? ", independent_scaling" : "";
+        flags += (intrau)  ? ", intra_unsigned" : ", intra_signed";
+        flags += (copytop) ? ", copy_to_pbuf" : "";
+
+        os<<"\t\t"
+          <<QString("type_id: 0x%1").arg(surfaceTypeID(j))
+          <<"  chroma: "<<chroma
+          <<"  max_size: "
+          <<maxWidth(j)<<"x"<<maxHeight(j)
+          <<"  sub_max_size: "
+          <<maxSubpictureWidth(j)<<"x"
+          <<maxSubpictureHeight(j)
+          <<endl<<"\t\t"
+          <<"accel: "<<accel<<"  flags: "<<flags<<endl;
+
+        if (pdisp && p)
+        {
+            int num = 0;
+            XvImageFormatValues *xvfmv = NULL;
+            X11S(xvfmv = XvMCListSubpictureTypes(pdisp, p,
+                                                 surfaceTypeID(j),
+                                                 &num));
+            for (int k = (xvfmv) ? 0 : num; k < num; k++)
+                os<<"\t\t\t"<<XvImageFormatToString(xvfmv[k])<<endl;
+
+            if (xvfmv)
+                X11S(XFree(xvfmv));
         }
     }
+    if (size())
+        os<<endl;
+
+    return QString(os.str());
 }
-#endif
+
+QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
+{
+    Display* disp = pdisp;
+    if (!pdisp)
+        disp = createXvMCDisplay();
+
+    XvAdaptorInfo *ai = 0;
+    unsigned int p_num_adaptors = 0;
+
+    Window root = DefaultRootWindow(disp);
+    int ret = Success;
+    X11S(ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai));
+
+    if (ret != Success) 
+    {
+        if (!pdisp)
+            X11S(XCloseDisplay(disp));
+        return "XvQueryAdaptors failed.";
+    }
+
+    if (!ai) 
+    {
+        if (!pdisp)
+            X11S(XCloseDisplay(disp));
+        return "No XVideo Capable Adaptors.";
+    }
+
+    ostringstream os;
+    for (uint i = 0; i < p_num_adaptors; i++) 
+    {
+        QString type = "";
+        type += (ai[i].type & XvInputMask)  ? "input, " : "";
+        type += (ai[i].type & XvOutputMask) ? "output, " : "";
+        type += (ai[i].type & XvImageMask)  ? "image, " : "";
+
+        os<<QString("Adaptor #%1  ").arg(i) +
+            QString("name: %1  base_id: %2  num_ports: %3  type: %4"
+                    "num_fmt: %5")
+            .arg(ai[i].name).arg(ai[i].base_id)
+            .arg(ai[i].num_ports).arg(type)
+            .arg(ai[i].num_formats)<<endl;
+
+        for (uint j = 0; j < ai[i].num_formats; j++)
+        {
+            XvFormat &fmt = ai[i].formats[j];
+            os<<QString("\tFormat #%1  ").arg(j,2)
+                <<QString("depth: %1  ").arg((int)fmt.depth,2)
+                <<QString("visual id: 0x%1").arg(fmt.visual_id,0,16)<<endl;
+        }
+        os<<endl;
+
+        XvPortID portMin = ai[i].base_id;
+        XvPortID portMax = ai[i].base_id + ai[i].num_ports - 1;
+        for (XvPortID p = portMin; p <= portMax; p++) 
+        {
+            XvMCSurfaceTypes surf(pdisp, p);
+            os<<"\tPort #"<<p<<"  size: "<<surf.size()<<endl;
+            os<<surf.toString(pdisp, p);
+        }
+        os<<endl<<endl;
+    }
+
+    X11L;
+    if (p_num_adaptors > 0)
+        XvFreeAdaptorInfo(ai);
+    if (!pdisp)
+        XCloseDisplay(disp);
+    X11U;
+
+    return QString(os.str());
+}
 
 #endif // USING_XVMC

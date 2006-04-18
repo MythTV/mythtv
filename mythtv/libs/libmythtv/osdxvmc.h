@@ -13,9 +13,6 @@
 #include <X11/extensions/Xvlib.h>
 #include "XvMCSurfaceTypes.h"
 
-#define GUID_IA44        0x34344941
-#define GUID_AI44        0x34344149
-
 class XvMCOSD
 {
   public:

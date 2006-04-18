@@ -253,6 +253,9 @@ using_frontend {
     using_xvmc:DEFINES += USING_XVMC
     using_xvmcw:DEFINES += USING_XVMCW
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
+    using_xvmc_pbuffer:DEFINES += USING_XVMC_PBUFFER
+    HEADERS += pbuffer.h
+    SOURCES += pbuffer.cpp glh/glh_extensions.cpp
 
     # Misc. frontend
     HEADERS += guidegrid.h              infostructs.h
