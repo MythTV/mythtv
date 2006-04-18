@@ -228,6 +228,34 @@ long long get_center_frequency(
     return -1;
 }
 
+int get_closest_freqid(
+    QString format, QString modulation, QString country, long long centerfreq)
+{
+    modulation = (modulation == "8vsb") ? "vsb8" : modulation;
+
+    freq_table_list_t list =
+        get_matching_freq_tables(format, modulation, country);
+    
+    for (uint i = 0; i < list.size(); ++i)
+    {
+        int min_freqid = list[i]->name_offset;
+        int max_freqid = min_freqid +
+            ((list[i]->frequencyEnd - list[i]->frequencyStart) /
+             list[i]->frequencyStep);
+        int freqid =
+            ((centerfreq - list[i]->frequencyStart) /
+             list[i]->frequencyStep) + min_freqid;
+
+        if ((min_freqid <= freqid) && (freqid <= max_freqid))
+            return freqid;
+    }
+    VERBOSE(VB_IMPORTANT, "get_closest_freqid("<<format<<", "
+            <<modulation<<", "<<country<<", "<<centerfreq
+            <<") Failed sz("<<list.size()<<")");
+    return -1;
+}
+
+
 static void init_freq_tables(freq_table_map_t &fmap)
 {
 #ifdef USING_DVB

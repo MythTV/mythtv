@@ -37,6 +37,10 @@
 #include "dvbtypes.h"
 #endif // USING_DVB
 
+#ifdef USING_HDHOMERUN
+#include "hdhrchannel.h"
+#endif // USING_HDHOMERUN
+
 QString SIScan::loc(const SIScan *siscan)
 {
     if (siscan && siscan->channel)
@@ -455,6 +459,15 @@ DVBChannel *SIScan::GetDVBChannel(void)
 #endif
 }
 
+HDHRChannel *SIScan::GetHDHRChannel(void)
+{
+#ifdef USING_HDHOMERUN
+    return dynamic_cast<HDHRChannel*>(channel);
+#else
+    return NULL;
+#endif
+}
+
 Channel *SIScan::GetChannel(void)
 {
 #ifdef USING_V4L
@@ -622,6 +635,19 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
         }
     }
 #endif // USING_V4L
+
+#ifdef USING_HDHOMERUN
+    if (GetHDHRChannel())
+    {
+        if (item.mplexid > 0)
+            ok = GetHDHRChannel()->TuneMultiplex(item.mplexid);
+        else 
+        {
+            QString inputname = ChannelUtil::GetInputName(item.SourceID);
+            ok = GetHDHRChannel()->Tune(freq, inputname, "8vsb");
+        }        
+    }
+#endif // USING_HDHOMERUN
 
     return ok;
 }
@@ -1340,6 +1366,15 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
             (*transport).SourceID, (*transport).standard, freq_vis, "8vsb");
     }
 #endif // USING_V4L
+
+#ifdef USING_HDHOMERUN
+    if (GetHDHRChannel())
+    {
+        const uint freq = (*transport).freq_offset(transport.offset());
+        mplexid = ChannelUtil::CreateMultiplex(
+            (*transport).SourceID, (*transport).standard, freq, "8vsb");
+    }
+#endif
 
     return mplexid;
 }

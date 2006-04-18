@@ -39,6 +39,9 @@ freq_table_list_t get_matching_freq_tables(
 long long get_center_frequency(
     QString format, QString modulation, QString country, int freqid);
 
+int get_closest_freqid(
+    QString format, QString modulation, QString country, long long centerfreq);
+
 class FrequencyTable
 {
   public:

@@ -160,6 +160,9 @@ class ChannelBase
     virtual int GetMinorChannel(void) const
         { return currentATSCMinorChannel; };
 
+    // \brief Set cardid for scanning
+    void SetCardID(uint _cardid) { cardid = _cardid; }
+
   protected:
     /// \brief Switches to another input on hardware, 
     ///        and sets the channel is setstarting is true.

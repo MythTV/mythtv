@@ -56,6 +56,11 @@
 #include "dvbconfparser.h"
 #endif
 
+#ifdef USING_HDHOMERUN
+#include "hdhrchannel.h"
+#include "hdhrsignalmonitor.h"
+#endif
+
 #define LOC QString("SWizScan: ")
 #define LOC_ERR QString("SWizScan, Error: ")
 
@@ -500,16 +505,27 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
         channel = new Channel(NULL, device);
 #endif
 
+#ifdef USING_HDHOMERUN
+    if ("HDHOMERUN" == card_type)
+    {
+        uint tuner = CardUtil::GetHDHRTuner(cardid, sourceid);
+        channel = new HDHRChannel(NULL, device, tuner);
+    }
+#endif // USING_HDHOMERUN
+
     if (!channel)
     {
-        VERBOSE(VB_IMPORTANT, "Error, Channel not created");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Channel not created");
         return;
     }
 
-    // If the backend is running this will may fail...
+    // explicitly set the cardid
+    channel->SetCardID(cardid);
+
+    // If the backend is running this may fail...
     if (!channel->Open())
     {
-        VERBOSE(VB_IMPORTANT, "Error, Channel could not be opened");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Channel could not be opened");
         return;
     }
 

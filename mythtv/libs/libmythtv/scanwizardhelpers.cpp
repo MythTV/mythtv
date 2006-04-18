@@ -41,15 +41,34 @@
 #include "scanwizardscanner.h"
 #include "scanwizard.h"
 
-#if defined(USING_DVB) && defined(USING_V4L)
-#define CARDTYPES "('DVB','MPEG','V4L','HDTV')"
-#elif defined(USING_DVB)
-#define CARDTYPES "('DVB')"
-#elif defined(USING_V4L)
-#define CARDTYPES "('MPEG','V4L','HDTV')"
-#else
-#define CARDTYPES "('DUMMY')"
-#endif
+static QString card_types(void)
+{
+    QString cardTypes = "";
+
+#ifdef USING_DVB
+    cardTypes += "'DVB'";
+#endif // USING_DVB
+
+#ifdef USING_V4L
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'V4L','HDTV'";
+# ifdef USING_IVTV
+    cardTypes += ",'MPEG'";
+# endif // USING_IVTV
+#endif // USING_V4L
+
+#ifdef USING_HDHOMERUN
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'HDHOMERUN'";
+#endif // USING_HDHOMERUN
+
+    if (cardTypes.isEmpty())
+        cardTypes = "'DUMMY'";
+
+    return QString("(%1)").arg(cardTypes);
+}
 
 ScanProgressPopup::ScanProgressPopup(ScanWizardScanner *parent,
                                      bool signalmonitors) :
@@ -137,10 +156,11 @@ void VideoSourceSetting::load()
         "FROM cardinput, videosource, capturecard "
         "WHERE cardinput.sourceid=videosource.sourceid AND "
         "      cardinput.cardid=capturecard.cardid AND "
-        "      capturecard.cardtype in " CARDTYPES " AND "
-        "      capturecard.hostname = '%1'").arg(gContext->GetHostName());
+        "      capturecard.cardtype in %1 AND "
+        "      capturecard.hostname = :HOSTNAME").arg(card_types());
     
     query.prepare(querystr);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive() || query.size() <= 0)
         return;
@@ -223,18 +243,22 @@ void CaptureCardSetting::refresh()
     clearSelections();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
+
+    QString qstr =
         "SELECT DISTINCT cardtype, videodevice, capturecard.cardid "
         "FROM capturecard, videosource, cardinput "
         "WHERE videosource.sourceid = :SOURCEID            AND "
         "      cardinput.sourceid   = videosource.sourceid AND "
-        "      capturecard.cardtype in " CARDTYPES "       AND "
+        "      capturecard.cardtype in ";
+    qstr += card_types() + "       AND "
         "      capturecard.hostname = :HOSTNAME            AND "
         "      ( ( cardinput.childcardid != '0' AND "
         "          cardinput.childcardid  = capturecard.cardid ) OR "
         "        ( cardinput.childcardid  = '0' AND "
         "          cardinput.cardid       = capturecard.cardid ) "
-        "      )");
+        "      )";
+
+    query.prepare(qstr);
     query.bindValue(":SOURCEID", nSourceID);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
@@ -301,6 +325,7 @@ void ScanTypeSetting::refresh(const QString& card)
         break;
     case CardUtil::ATSC:
     case CardUtil::HDTV:
+    case CardUtil::HDHOMERUN:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_ATSC), true);
 /* TODO disabled import to so we get some bug reports on scanner. dtk 4/6/2006

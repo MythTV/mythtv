@@ -23,10 +23,11 @@ using namespace std;
 #include "mythcontext.h"
 #include "hdhrchannel.h"
 #include "videosource.h"
+#include "channelutil.h"
+#include "frequencytables.h"
 
-#define LOC QString("HDHRChan(%1): ").arg(pParent->GetCaptureCardNum())
-#define LOC_ERR QString("HDHRChan(%1), Error: ") \
-                    .arg(pParent->GetCaptureCardNum())
+#define LOC QString("HDHRChan(%1): ").arg(GetDevice())
+#define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
     : QObject(NULL, "HDHRChannel"),
@@ -53,11 +54,8 @@ HDHRChannel::~HDHRChannel(void)
 
 bool HDHRChannel::Open(void)
 {
-    if (_control_socket)
-    {
-        VERBOSE(VB_RECORD, LOC + QString("Card already open (channel)"));
+    if (IsOpen())
         return true;
-    }
 
     if (!FindDevice())
         return false;
@@ -146,14 +144,14 @@ bool HDHRChannel::Connect(void)
         return false;
     }
 
-    VERBOSE(VB_RECORD, LOC + "Successfully connected to device");
+    VERBOSE(VB_CHANNEL, LOC + "Successfully connected to device");
     return true;
 }
 
 QString HDHRChannel::DeviceGet(const QString &name)
 {
     QMutexLocker locker(&_lock);
-    //VERBOSE(VB_RECORD, LOC + QString("DeviceGet(%1)").arg(name));
+    //VERBOSE(VB_CHANNEL, LOC + QString("DeviceGet(%1)").arg(name));
 
     if (!_control_socket)
     {
@@ -203,7 +201,7 @@ QString HDHRChannel::DeviceGet(const QString &name)
         }
     }
 
-    //VERBOSE(VB_RECORD, LOC + QString("DeviceGet(%1) -> '%2' len(%3)")
+    //VERBOSE(VB_CHANNEL, LOC + QString("DeviceGet(%1) -> '%2' len(%3)")
     //        .arg(name).arg(ret).arg(len));
 
     return ret;
@@ -284,22 +282,23 @@ bool HDHRChannel::DeviceClearTarget()
     return TunerSet("target", "0.0.0.0:0");
 }
 
-bool HDHRChannel::DeviceSetChannel(int newChannel)
+bool HDHRChannel::TuneTo(uint freqid)
 {
-    return TunerSet("channel", QString::number(newChannel));
+    VERBOSE(VB_CHANNEL, LOC + "TuneTo("<<freqid<<")");
+    return TunerSet("channel", QString::number(freqid));
 }
 
 bool HDHRChannel::SetChannelByString(const QString &channum)
 {
-    VERBOSE(VB_RECORD, LOC + QString("Set channel '%1'").arg(channum));
-    if (!_control_socket)
+    VERBOSE(VB_CHANNEL, LOC + QString("Set channel '%1'").arg(channum));
+    if (!Open())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Set channel request without active connection");
         return false;
     }
 
-    QString inputName = GetCurrentInput();
+    QString inputName;
     if (!CheckChannel(channum, inputName))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "CheckChannel failed. " +
@@ -316,43 +315,68 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
 
     SetCachedATSCInfo("");
 
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT freqid, atscsrcid, mplexid "
+    QString thequery = QString(
+        "SELECT finetune, freqid, tvformat, freqtable, "
+        "       atscsrcid, commfree, mplexid "
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
-        "      channum              = :CHANNUM         AND "
-        "      channel.sourceid     = :SOURCEID");
-    query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":SOURCEID", GetCurrentSourceID());
+        "      channum = '%1' AND channel.sourceid = '%2'")
+        .arg(channum).arg((*it)->sourceid);
+
+    query.prepare(thequery);
 
     if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("fetching_tuning_params", query);
-        return false;
-    }
-
+        MythContext::DBError("fetchtuningparams", query);
     if (!query.next())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                     "CheckChannel failed because it could not\n"
-                    "\t\t\tfind channel number '%1' in DB for source '%2'.")
-                .arg(channum).arg(GetCurrentSourceID()));
+                    "\t\t\tfind channel number '%2' in DB for source '%3'.")
+                .arg(channum).arg((*it)->sourceid));
         return false;
     }
 
-    QString freqid = query.value(0).toString();
-    uint atscsrcid = query.value(1).toInt();
-    uint mplexid   = query.value(2).toInt();
+    int     finetune  = query.value(0).toInt();
+    QString freqid    = query.value(1).toString();
+    QString tvformat  = query.value(2).toString();
+    QString freqtable = query.value(3).toString();
+    uint    atscsrcid = query.value(4).toInt();
+    commfree          = query.value(5).toBool();
+    uint    mplexid   = query.value(6).toInt();
+
+    QString modulation;
+    int frequency = ChannelUtil::GetTuningParams(mplexid, modulation);
+    bool ok = (frequency > 0);
+
+    if (!ok)
+    {
+        frequency = (freqid.toInt(&ok) + finetune) * 1000;
+        mplexid = 0;
+    }
+    bool isFrequency = ok && (frequency > 10000000);
 
     curchannelname = channum;
     inputs[currentInputID]->startChanNum = curchannelname;
 
-    VERBOSE(VB_RECORD, LOC +
+    VERBOSE(VB_CHANNEL, LOC +
             QString("freqid = %1, atscsrcid = %2, mplexid = %3")
             .arg(freqid).arg(atscsrcid).arg(mplexid));
 
-    DeviceSetChannel(freqid.toInt());
+    if (isFrequency)
+    {
+        if (!Tune(frequency, inputName, modulation))
+            return false;
+    }
+    else
+    {
+        if (!TuneTo(freqid.toInt()))
+            return false;
+    }
 
     QString min_maj = QString("%1_0").arg(channum);
     if (atscsrcid > 255)
@@ -362,6 +386,60 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     SetCachedATSCInfo(min_maj);
 
     return true;
+}
+
+bool HDHRChannel::TuneMultiplex(uint mplexid)
+{
+    VERBOSE(VB_CHANNEL, LOC + QString("TuneMultiplex(%1)").arg(mplexid));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int cardid = GetCardID();
+    if (cardid < 0)
+        return false;
+
+    // Query for our tuning params
+    QString thequery(
+        "SELECT frequency, inputname, modulation "
+        "FROM dtv_multiplex, cardinput, capturecard "
+        "WHERE dtv_multiplex.sourceid = cardinput.sourceid AND "
+        "      cardinput.cardid = capturecard.cardid AND ");
+
+    thequery += QString("mplexid = '%1' AND cardinput.cardid = '%2'")
+        .arg(mplexid).arg(cardid);
+
+    query.prepare(thequery);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError(
+            LOC + QString("TuneMultiplex(): Error, could not find tuning "
+                          "parameters for transport %1.").arg(mplexid),query);
+        return false;
+    }
+    if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "TuneMultiplex(): " +
+                QString("Could not find tuning parameters for transport %1.")
+                .arg(mplexid));
+        return false;
+    }
+
+    uint    frequency  = query.value(0).toInt();
+    QString inputname  = query.value(1).toString();
+    QString modulation = query.value(2).toString();
+
+    if (!Tune(frequency, inputname, modulation))
+        return false;
+
+    return true;
+}
+
+bool HDHRChannel::Tune(uint frequency, QString /*input*/, QString modulation)
+{
+    int freqid = get_closest_freqid("atsc", modulation, "us", frequency);
+    if (freqid > 0)
+        return TuneTo(freqid);
+    return false;
 }
 
 bool HDHRChannel::SwitchToInput(const QString &inputname,

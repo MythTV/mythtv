@@ -70,6 +70,7 @@ class CardUtil
         MPEG,
         HDTV,
         FIREWIRE,
+        HDHOMERUN,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -96,6 +97,8 @@ class CardUtil
             return HDTV;
         if ("FIREWIRE" == name)
             return FIREWIRE;
+        if ("HDHOMERUN" == name)
+            return HDHOMERUN;
         return ERROR_UNKNOWN;
     }
 
@@ -112,12 +115,16 @@ class CardUtil
         { return get_on_source("videodevice", cardid, sourceid); }
     static bool         GetVBIDevice(uint cardid, uint sourceid)
         { return get_on_source("vbidevice", cardid, sourceid); }
+    static uint         GetDBOX2Port(uint cardid, uint sourceid)
+        { return get_on_source("dbox2_port", cardid, sourceid).toUInt(); }
+    static uint         GetHDHRTuner(uint cardid, uint sourceid)
+        { return get_on_source("dbox2_port", cardid, sourceid).toUInt(); }
 
     static QString      GetRawCardType(uint cardid, const QString &input)
         { return get_on_input("cardtype", cardid, input); }
     static QString      GetVideoDevice(uint cardid, const QString &input)
         { return get_on_input("videodevice", cardid, input); }
-    static bool         GetVBIDevice(uint cardid, const QString &input)
+    static QString      GetVBIDevice(uint cardid, const QString &input)
         { return get_on_input("vbidevice", cardid, input); }
 
     static QString      GetDefaultInput(uint cardid);

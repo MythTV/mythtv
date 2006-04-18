@@ -18,6 +18,7 @@ class MSqlQuery;
 class ChannelBase;
 class Channel;
 class DVBChannel;
+class HDHRChannel;
 class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
@@ -97,6 +98,8 @@ class SIScan : public QObject
     // some useful gets
     Channel          *GetChannel(void);
     DVBChannel       *GetDVBChannel(void);
+    HDHRChannel      *GetHDHRChannel(void);
+
 
     /// \brief Called by SpawnScanner to run scanning thread
     void RunScanner(void);
