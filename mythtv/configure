@@ -61,6 +61,7 @@ x11="yes"
 xrandr="yes"
 xv="yes"
 xvmc="no"
+xvmcw="yes"
 xvmc_vld="yes"
 xvmc_pro="no"
 mac_accel="no"
@@ -837,6 +838,10 @@ for opt do
   --enable-xvmc) xvmc="yes"
   ;;
   --disable-xvmc) xvmc="no"
+  ;;
+  --enable-xvmcw) xvmcw="yes"
+  ;;
+  --disable-xvmcw) xvmcw="no"
   ;;
   --enable-xvmc-vld) xvmc_vld="yes"
   ;;
@@ -2097,13 +2102,22 @@ fi
 VENDOR_XVMC_LIBS=""
 if test x"$xvmc" = x"yes"; then
     xvmc="no"
-    if has_library libXvMCW ; then
+    if ! has_ibrary libXvMCW ; then
+        xvmcw="no"
+    fi
+    if test x"$xvmcw" = x"yes" ; then
         CCONFIG="$CCONFIG using_xvmcw"
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
         if has_header X11/extensions/vldXvMC.h ; then
             echo > /dev/null
         else
+            xvmc_vld="no"
+        fi
+    elif has_library libXvMCNVIDIA ; then
+        VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
+        xvmc="yes"
+        if test x"$xvmc_vld" = x"yes"; then
             xvmc_vld="no"
         fi
     elif test x"$xvmc_pro" = x"yes"; then
@@ -2115,12 +2129,6 @@ if test x"$xvmc" = x"yes"; then
     elif has_library libviaXvMC ; then
         VENDOR_XVMC_LIBS="-lviaXvMC"
         xvmc="yes"
-    elif has_library libXvMCNVIDIA ; then
-        VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
-        xvmc="yes"
-        if test x"$xvmc_vld" = x"yes"; then
-            xvmc_vld="no"
-        fi
     elif has_library libI810XvMC ; then
         VENDOR_XVMC_LIBS="-lI810XvMC"
         xvmc="yes"
@@ -2930,6 +2938,9 @@ fi
 
 if test x"$VENDOR_XVMC_LIBS" != x"" ; then
   echo "CONFIG_XVMC_LIBS=$VENDOR_XVMC_LIBS -lXvMC" >> $MYTH_CONFIG_MAK
+  if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
+      CCONFIG="$CCONFIG using_xvmc_pbuffer"
+  fi
 fi
 
 if test x"$direct_fb" = x"yes" ; then
