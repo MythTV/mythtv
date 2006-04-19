@@ -2102,7 +2102,7 @@ fi
 VENDOR_XVMC_LIBS=""
 if test x"$xvmc" = x"yes"; then
     xvmc="no"
-    if ! has_ibrary libXvMCW ; then
+    if ! has_library libXvMCW ; then
         xvmcw="no"
     fi
     if test x"$xvmcw" = x"yes" ; then
