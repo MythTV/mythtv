@@ -733,6 +733,24 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
         }
     }
 
+   // ACPI temperature ------------------
+
+    node = info.namedItem( "Thermal" );
+
+    if (!node.isNull())
+    {
+        QDomElement e = node.toElement();
+
+        if (!e.isNull())
+        {
+            std::string temperature = e.attribute( "temperature" , "0" );
+
+            os << "      Current CPU temperature: "
+               << temperature
+               << ".<br />\r\n";
+        }
+    }
+	
     // Guide Info ---------------------
 
     node = info.namedItem( "Guide" );

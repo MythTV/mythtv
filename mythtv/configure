@@ -2160,6 +2160,11 @@ if test x"$direct_fb" = x"yes" ; then
     fi
 fi
 
+lmsensors="no"
+if has_header "sensors/sensors.h" && has_library libsensors ; then
+    lmsensors="yes"
+fi
+                                    
 echo "# Basic Settings"
 echo "Compile type     $compile_type"
 echo "Compiler cache   $ccache"
@@ -2457,6 +2462,10 @@ if test "$freetype2" = "yes" ; then
   echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
   echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
+fi
+if test "$lmsensors" = "yes" ; then
+  CCONFIG="$CCONFIG using_lmsensors"
+  echo "#define HAVE_LMSENSORS 1" >> $TMPH
 fi
 if test "$sunmlib" = "yes" ; then
   echo "HAVE_MLIB=yes" >> $MYTH_CONFIG_MAK

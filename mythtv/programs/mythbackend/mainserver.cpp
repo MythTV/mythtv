@@ -45,6 +45,11 @@ using namespace std;
 #include "jobqueue.h"
 #include "autoexpire.h"
 #include "previewgenerator.h"
+#ifdef HAVE_LMSENSORS
+    #define LMSENSOR_DEFAULT_CONFIG_FILE "/etc/sensors.conf"
+    #include <sensors/sensors.h>
+    #include <sensors/chips.h>
+#endif
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -3903,6 +3908,7 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
     QDomElement mInfo   = pDoc->createElement("MachineInfo");
     QDomElement storage = pDoc->createElement("Storage"    );
     QDomElement load    = pDoc->createElement("Load"       );
+    QDomElement thermal = pDoc->createElement("Thermal"    );
     QDomElement guide   = pDoc->createElement("Guide"      );
 
     root.appendChild (mInfo  );
@@ -3984,6 +3990,76 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
         load.setAttribute("avg3", rgdAverages[2]);
     }
 
+    //temperature -----------------
+    // Try ACPI first, then lmsensor 2nd
+    QDir dir("/proc/acpi/thermal_zone");
+    bool found_acpi = false;
+    QString acpiTempDir;
+    if (dir.exists())
+    {
+        QStringList lst = dir.entryList();
+        QRegExp rxp = QRegExp ("TH?M?", TRUE, FALSE);
+        QString line, temp;
+        for (QStringList::Iterator it = lst.begin(); it != lst.end(); ++it)
+        {
+            if ( (*it).contains(rxp))
+            {
+                acpiTempDir = dir.absFilePath(*it);
+            }
+        }
+       
+        QFile acpiTempFile(acpiTempDir.append("/temperature"));
+        if (acpiTempFile.open(IO_ReadOnly))
+        {
+            QTextStream stream (&acpiTempFile);
+            line = stream.readLine();
+            rxp = QRegExp ("(\\d+)", TRUE, FALSE);
+            if (rxp.search(line) != -1 )
+            {
+                temp = rxp.cap(1);
+                temp += " &#8451;"; // print degress Celsius 
+                mInfo.appendChild(thermal);
+                thermal.setAttribute("temperature", temp);
+                found_acpi = true;
+            }
+        } 
+        acpiTempFile.close();
+    }
+#ifdef HAVE_LMSENSORS
+    if (!found_acpi)
+    {
+        int chip_nr, a, b;
+        char *label = NULL;
+        double value;
+        const sensors_chip_name *chip;
+        const sensors_feature_data *data;
+        char* lmsensorConfigName = LMSENSOR_DEFAULT_CONFIG_FILE;
+        a = b = 0;
+        FILE *lmsensorConfigFile = fopen(lmsensorConfigName, "r");
+        sensors_init(lmsensorConfigFile);
+        fclose(lmsensorConfigFile);
+        for (chip_nr = 0 ; (chip = sensors_get_detected_chips(&chip_nr)) ; )
+        {
+            while ((data = sensors_get_all_features(*chip, &a, &b)))
+            {
+                if ((!sensors_get_label(*chip, data->number, &label)) && 
+                    (!sensors_get_feature(*chip, data->number, &value)))
+                {
+                    // Find label matching "CPU Temp" or "Temp/CPU"
+                    QRegExp rxp = QRegExp ("(CPU.+Temp)|(Temp.+CPU)", FALSE, FALSE);
+                    if (rxp.search(QString(label)) != -1  && value > 0)
+                    {
+                        QString temp = QString("%1").arg(value);
+                        temp += " &#8451;";
+                        mInfo.appendChild(thermal);
+                        thermal.setAttribute("temperature", temp);
+                    }
+                }
+            }
+        } 
+        sensors_cleanup();
+    }
+#endif
     // Guide Data ---------------------
 
     QDateTime GuideDataThrough;
