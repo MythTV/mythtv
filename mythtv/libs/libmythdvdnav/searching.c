@@ -74,8 +74,10 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
 
       /* fprintf(MSG_OUT, "libdvdnav: Found block %u\n", next_vobu); */
 
-      if(vobu_start <= seekto_block &&
-          next_vobu > seekto_block) {
+      if (next_vobu == seekto_block) {
+		vobu_start = next_vobu;
+        found = 1;
+      } else if (vobu_start < seekto_block && next_vobu > seekto_block) {
         found = 1;
       } else {
         vobu_start = next_vobu;
