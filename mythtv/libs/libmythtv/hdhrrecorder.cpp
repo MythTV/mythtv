@@ -33,7 +33,7 @@ using namespace std;
                     .arg(tvrec->GetCaptureCardNum())
 
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
-    : DTVRecorder(rec, "HDHRRecorder"),
+    : DTVRecorder(rec),
       _channel(channel), _video_socket(NULL),
       _atsc_stream_data(NULL),
       _eit_helper(NULL), _eit_rate(1.0f), _eit_old_rate(0.0f)
@@ -52,15 +52,9 @@ void HDHRRecorder::TeardownAll(void)
     Close();
     if (_atsc_stream_data)
     {
-        _atsc_stream_data->deleteLater();
+        delete _atsc_stream_data;
         _atsc_stream_data = NULL;
     }
-}
-
-void HDHRRecorder::deleteLater(void)
-{
-    TeardownAll();
-    DTVRecorder::deleteLater();
 }
 
 void HDHRRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -146,37 +140,27 @@ void HDHRRecorder::ProcessTSData(const uint8_t *buffer, int len)
     }
 }
 
-void HDHRRecorder::SetStreamData(ATSCStreamData *stream_data)
+void HDHRRecorder::SetStreamData(ATSCStreamData *data)
 {
-    if (stream_data == _atsc_stream_data)
+    if (data == _atsc_stream_data)
         return;
 
     ATSCStreamData *old_data = _atsc_stream_data;
-    _atsc_stream_data = stream_data;
+    _atsc_stream_data = data;
     if (old_data)
-        old_data->deleteLater();
+        delete old_data;
 
-    if (_atsc_stream_data)
+    if (data)
     {
-        connect(_atsc_stream_data,
-                SIGNAL(UpdatePATSingleProgram(ProgramAssociationTable*)),
-                this, SLOT(WritePAT(ProgramAssociationTable*)));
-        connect(_atsc_stream_data,
-                SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)),
-                this, SLOT(WritePMT(ProgramMapTable*)));
-        connect(_atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
-                this, SLOT(ProcessMGT(const MasterGuideTable*)));
-        connect(_atsc_stream_data,
-                SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
-                this, SLOT(ProcessVCT(uint, const VirtualChannelTable*)));
+        data->AddMPEGSPListener(this);
+        data->AddATSCMainListener(this);
     }
     if (_eit_helper)
         SetEITHelper(_eit_helper);
 }
 
-void HDHRRecorder::WritePAT(ProgramAssociationTable *pat)
+void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 {
-    //VERBOSE(VB_IMPORTANT, "ProcessPAT()");
     if (!pat)
         return;
 
@@ -185,9 +169,8 @@ void HDHRRecorder::WritePAT(ProgramAssociationTable *pat)
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
 }
 
-void HDHRRecorder::WritePMT(ProgramMapTable* pmt)
+void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable* pmt)
 {
-    //VERBOSE(VB_IMPORTANT, "ProcessPMT()");
     if (!pmt)
         return;
 
@@ -196,13 +179,13 @@ void HDHRRecorder::WritePMT(ProgramMapTable* pmt)
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pmt->tsheader())));
 }
 
-/** \fn HDHRRecorder::ProcessMGT(const MasterGuideTable*)
+/** \fn HDHRRecorder::HandleMGT(const MasterGuideTable*)
  *  \brief Processes Master Guide Table, by enabling the 
  *         scanning of all PIDs listed.
  */
-void HDHRRecorder::ProcessMGT(const MasterGuideTable *mgt)
+void HDHRRecorder::HandleMGT(const MasterGuideTable *mgt)
 {
-    //VERBOSE(VB_IMPORTANT, "ProcessMGT()");
+    //VERBOSE(VB_IMPORTANT, "HandleMGT()");
     for (unsigned int i = 0; i < mgt->TableCount(); i++)
     {
         GetStreamData()->AddListeningPID(mgt->TablePID(i));
@@ -211,19 +194,19 @@ void HDHRRecorder::ProcessMGT(const MasterGuideTable *mgt)
     _channel->UpdateFilters();
 }
 
-/** \fn HDHRRecorder::ProcessVCT(uint, const VirtualChannelTable*)
+/** \fn HDHRRecorder::HandleVCT(uint, const VirtualChannelTable*)
  *  \brief Processes Virtual Channel Tables by finding the program
  *         number to use.
  *  \bug Assumes there is only one VCT, may break on Cable.
  */
-void HDHRRecorder::ProcessVCT(uint /*tsid*/,
+void HDHRRecorder::HandleVCT(uint /*tsid*/,
                               const VirtualChannelTable *vct)
 {
-    //VERBOSE(VB_IMPORTANT, "ProcessVCT()");
+    //VERBOSE(VB_IMPORTANT, "HandleVCT()");
     if (vct->ChannelCount() < 1)
     {
         VERBOSE(VB_IMPORTANT,
-                "HDHRRecorder::ProcessVCT: table has no channels");
+                "HDHRRecorder::HandleVCT: table has no channels");
         return;
     }
 
@@ -388,18 +371,14 @@ void HDHRRecorder::StartRecording(void)
 void HDHRRecorder::SetEITHelper(EITHelper *helper)
 {
     QMutexLocker locker(&_lock);
+
+    if (!helper && _eit_helper && _atsc_stream_data)
+        _atsc_stream_data->RemoveATSCEITListener(this);
+
     _eit_helper = helper;
+
     if (_eit_helper && _atsc_stream_data)
-    {
-        connect(_atsc_stream_data,
-                SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
-                this,
-                SLOT(  HandleEIT(uint, const EventInformationTable*)));
-        connect(_atsc_stream_data,
-                SIGNAL(UpdateETT(uint, const ExtendedTextTable*)),
-                this,
-                SLOT(  HandleETT(uint, const ExtendedTextTable*)));
-    }
+        _atsc_stream_data->AddATSCEITListener(this);
 }
 
 void HDHRRecorder::SetEITRate(float rate)

@@ -18,9 +18,8 @@ class TSPacket;
 
 class DTVRecorder: public RecorderBase
 {
-    Q_OBJECT
   public:
-    DTVRecorder(TVRec *rec, const char *name = "DTVRecorder");
+    DTVRecorder(TVRec *rec);
     ~DTVRecorder();
 
     virtual void SetOption(const QString &opt, const QString &value);
@@ -40,6 +39,7 @@ class DTVRecorder: public RecorderBase
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*);
 
     virtual void Reset();
+
   protected:
     void FinishRecording(void);
     void ResetForNewFile(void);

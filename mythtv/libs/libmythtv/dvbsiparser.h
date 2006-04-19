@@ -39,31 +39,24 @@
 #include "dvbtypes.h"
 #include "siparser.h"
 
-/*
- *  Class used for PID Filter Management.
- */
+class DVBChannel;
+
+/** Class used for PID Filter Management. */
 class PIDFilterManager
 {
-
-    public:
-        PIDFilterManager()
-        {
-           pid = 0;
-           running = false;
-        }
-        PIDFilterManager(const int inputPID)
-        {
-            pid = inputPID;
-            running = true;
-        }
-        uint16_t pid;
-        bool running;
+  public:
+    PIDFilterManager() : pid(0), running(false) {}
+    PIDFilterManager(uint _pid) : pid(_pid), running(true) {}
+  public:
+    uint pid;
+    bool running;
 };
+typedef QMap<int,PIDFilterManager> PIDFDMap;
 
 class DVBSIParser : public SIParser
 {
-public:
-    DVBSIParser(int cardnum, bool start_thread = false);
+  public:
+    DVBSIParser(DVBChannel*, bool start_thread = false);
     ~DVBSIParser();
 
     /* Control PIDs */
@@ -76,28 +69,24 @@ public:
     void StartSectionReader();
     void StopSectionReader();
 
-public slots:
-    void deleteLater(void);
-
-private:
+  private:
     /// System information thread thunk, runs DVBSIParser::StartSectionReader()
     static void *SystemInfoThread(void *param);
 
-    int                                cardnum;
+    int             cardnum;
 
     /* Thread related */
-    bool                               exitSectionThread;
-    bool                               sectionThreadRunning;
-    bool                               selfStartedThread;
-    QMutex                             pollLock;
-    pthread_t                          siparser_thread;
+    bool            exitSectionThread;
+    bool            sectionThreadRunning;
+    bool            selfStartedThread;
+    QMutex          pollLock;
+    pthread_t       siparser_thread;
 
     /* Filter / fd management */
-    typedef QMap<int,PIDFilterManager> PIDFDMap;
-    PIDFDMap                           PIDfilterManager;
-    int                                pollLength;
-    pollfd                            *pollArray;
-    bool                               filterChange;
+    PIDFDMap        PIDfilterManager;
+    int             pollLength;
+    pollfd         *pollArray;
+    bool            filterChange;
 };
 
 #endif //DVBSIPARSER_H

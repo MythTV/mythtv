@@ -27,34 +27,22 @@
 // MythTV includes
 #include "eitscanner.h"
 #include "sitypes.h"
+#include "streamlisteners.h"
 
 class EITHelper;
 class DVBRecorder;
+class MPEGStreamListener;
 
-class ProgramAssociationTable;
-class ConditionalAccessTable;
-class ProgramMapTable;
-
-class ATSCStreamData;
-class DVBStreamData;
-class MPEGStreamData;
-
-class MasterGuideTable;
-class VirtualChannelTable;
-class SystemTimeTable;
-class EventInformationTable;
-class ExtendedTextTable;
-
-class NetworkInformationTable;
-class ServiceDescriptionTable;
-class DVBEventInformationTable;
-
-class SIParser : public QObject, public EITSource
+class SIParser : public EITSource,
+                 public MPEGStreamListener,
+                 public ATSCMainStreamListener,
+                 public DVBMainStreamListener,
+                 public ATSCEITStreamListener,
+                 public DVBEITStreamListener
 {
-    Q_OBJECT
   public:
-    SIParser(const char *name = "SIParser");
-    ~SIParser();
+    SIParser(MPEGStreamListener*);
+    virtual ~SIParser();
 
     int Start(void);
 
@@ -81,33 +69,32 @@ class SIParser : public QObject, public EITSource
     void SetDishNetEIT(bool on)
         { eit_dn_long = on; }
 
-    void SetEITHelper(EITHelper *helper)
-        { QMutexLocker locker(&pmap_lock); eit_helper = helper; }
-    void SetEITRate(float rate)
-        { QMutexLocker locker(&pmap_lock); eit_rate = rate; }
-
-  public slots:
-    virtual void deleteLater(void);
-
     // MPEG
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*);
     void HandlePMT(uint pnum, const ProgramMapTable*);
 
-    // ATSC
-    void HandleMGT(const MasterGuideTable*);
+    // ATSC Main
     void HandleSTT(const SystemTimeTable*);
+    void HandleMGT(const MasterGuideTable*);
     void HandleVCT(uint pid, const VirtualChannelTable*);
+
+    // DVB Main
+    void HandleNIT(const NetworkInformationTable*);
+    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
+
+    // EIT Source
+    void SetEITHelper(EITHelper *helper)
+        { QMutexLocker locker(&pmap_lock); eit_helper = helper; }
+    void SetEITRate(float rate)
+        { QMutexLocker locker(&pmap_lock); eit_rate = rate; }
+
+    // ATSC EIT
     void HandleEIT(uint pid, const EventInformationTable*);
     void HandleETT(uint pid, const ExtendedTextTable*);
 
-    // DVB
-    void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
+    // DVB EIT
     void HandleEIT(const DVBEventInformationTable*);
-
-  signals:
-    void UpdatePMT(uint pid, const ProgramMapTable *pmt);
 
   protected:
     void CheckTrackers(void);
@@ -122,7 +109,7 @@ class SIParser : public QObject, public EITSource
 
   private:
     // Common Variables
-    DVBRecorder        *dvb_recorder;
+    MPEGStreamListener *pmt_listener;
     int                 table_standard;
 
     // Storage Objects (DVB)

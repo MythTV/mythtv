@@ -13,24 +13,18 @@
 
 // MythTV includes
 #include "frequencytables.h"
+#include "streamlisteners.h"
 
 class MSqlQuery;
+
 class ChannelBase;
 class Channel;
 class DVBChannel;
 class HDHRChannel;
+
 class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
-class ProgramAssociationTable;
-class ProgramMapTable;
-class ServiceDescriptionTable;
-class NetworkInformationTable;
-class VirtualChannelTable;
-class MasterGuideTable;
-class ScanStreamData;
-class EITHelper;
-class DVBSIParser;
 
 typedef enum
 {
@@ -41,7 +35,10 @@ typedef enum
 typedef vector<const ProgramMapTable*>  pmt_vec_t;
 typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 
-class SIScan : public QObject
+class SIScan : public QObject,
+               public MPEGStreamListener,
+               public ATSCMainStreamListener,
+               public DVBMainStreamListener
 {
     Q_OBJECT
   public:
@@ -77,6 +74,20 @@ class SIScan : public QObject
     DTVSignalMonitor *GetDTVSignalMonitor(void);
     DVBSignalMonitor *GetDVBSignalMonitor(void);
 
+    // MPEG
+    void HandlePAT(const ProgramAssociationTable*);
+    void HandleCAT(const ConditionalAccessTable*) { }
+    void HandlePMT(uint, const ProgramMapTable*) { }
+
+    // ATSC Main
+    void HandleSTT(const SystemTimeTable*) {}
+    void HandleMGT(const MasterGuideTable*);
+    void HandleVCT(uint tsid, const VirtualChannelTable*);
+
+    // DVB Main
+    void HandleNIT(const NetworkInformationTable*);
+    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
+
   signals:
     // Values from 1-100 of scan completion
     void PctServiceScanComplete(int pct);
@@ -86,13 +97,6 @@ class SIScan : public QObject
     void TransportScanUpdateText(const QString& status);
     void ServiceScanComplete(void);
     void TransportScanComplete(void);
-
-  private slots:
-    void HandlePAT(const ProgramAssociationTable*);
-    void HandleVCT(uint tsid, const VirtualChannelTable*);
-    void HandleMGT(const MasterGuideTable*);
-    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
-    void HandleNIT(const NetworkInformationTable*);
 
   private:
     // some useful gets

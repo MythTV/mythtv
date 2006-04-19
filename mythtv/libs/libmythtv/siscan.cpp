@@ -126,21 +126,15 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
     if (dtvSigMon)
     {
         VERBOSE(VB_SIPARSER, LOC + "Connecting up DTVSignalMonitor");
-        MPEGStreamData *data = new ScanStreamData();
+        ScanStreamData *data = new ScanStreamData();
 
         dtvSigMon->SetStreamData(data);
         dtvSigMon->AddFlags(kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                             kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT);
-        connect(data, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
-                this, SLOT(  HandlePAT(const ProgramAssociationTable*)));
-        connect(data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
-                this, SLOT(  HandleMGT(const MasterGuideTable*)));
-        connect(data, SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
-                this, SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
-        connect(data, SIGNAL(UpdateNIT(const NetworkInformationTable*)),
-                this, SLOT(  HandleNIT(const NetworkInformationTable*)));
-        connect(data, SIGNAL(UpdateSDT(uint, const ServiceDescriptionTable*)),
-                this, SLOT(  HandleSDT(uint, const ServiceDescriptionTable*)));
+
+        data->AddMPEGListener(this);
+        data->AddATSCMainListener(this);
+        data->AddDVBMainListener(this);
     }
 }
 
@@ -416,7 +410,7 @@ bool SIScan::HandlePostInsertion(void)
         sd->ReturnCachedTable(mgt);
     }
 
-    const NetworkInformationTable *nit = sd->GetCachedNIT();
+    const NetworkInformationTable *nit = sd->GetCachedNIT(0);
     if (nit)
     {
         VERBOSE(VB_IMPORTANT, nit->toString());

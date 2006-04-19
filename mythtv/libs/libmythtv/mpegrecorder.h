@@ -41,9 +41,6 @@ class MpegRecorder : public RecorderBase
 
     void SetNextRecording(const ProgramInfo*, RingBuffer*);
 
-  public slots:
-    void deleteLater(void);
-
   private:
     bool SetupRecording();
     void FinishRecording();

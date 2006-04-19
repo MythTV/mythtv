@@ -1,24 +1,17 @@
+// -*- Mode: c++ -*-
+
 #ifndef DTVSIGNALMONITOR_H
 #define DTVSIGNALMONITOR_H
 
 #include "signalmonitor.h"
 #include "signalmonitorvalue.h"
+#include "streamlisteners.h"
 
-class MPEGStreamData;
-class ATSCStreamData;
-class DVBStreamData;
-class ScanStreamData;
-
-class TSPacket;
-class ProgramAssociationTable;
-class ProgramMapTable;
-class MasterGuideTable;
-class TerrestrialVirtualChannelTable;
-class CableVirtualChannelTable;
-class NetworkInformationTable;
-class ServiceDescriptionTable;
-
-class DTVSignalMonitor: public SignalMonitor
+class DTVSignalMonitor : public SignalMonitor,
+                         public MPEGStreamListener,
+                         public ATSCMainStreamListener,
+                         public ATSCAuxStreamListener,
+                         public DVBMainStreamListener
 {
     Q_OBJECT
   public:
@@ -26,7 +19,12 @@ class DTVSignalMonitor: public SignalMonitor
                      ChannelBase *_channel,
                      uint wait_for_mask,
                      const char *name = "DTVSignalMonitor");
+    ~DTVSignalMonitor();
 
+  public slots:
+    void deleteLater(void);
+
+  public:
     virtual QStringList GetStatusList(bool kick = true);
 
     void SetChannel(int major, int minor);
@@ -68,14 +66,27 @@ class DTVSignalMonitor: public SignalMonitor
 
     bool WaitForLock(int timeout=-1);
 
-  private slots:
-    void SetPAT(const ProgramAssociationTable*);
-    void SetPMT(uint, const ProgramMapTable*);
-    void SetMGT(const MasterGuideTable*);
-    void SetVCT(uint, const TerrestrialVirtualChannelTable*);
-    void SetVCT(uint, const CableVirtualChannelTable*);
-    void SetNIT(const NetworkInformationTable*);
-    void SetSDT(uint, const ServiceDescriptionTable*);
+    // MPEG
+    void HandlePAT(const ProgramAssociationTable*);
+    void HandleCAT(const ConditionalAccessTable*) {}
+    void HandlePMT(uint, const ProgramMapTable*);
+
+    // ATSC Main
+    void HandleSTT(const SystemTimeTable*) {}
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
+    void HandleMGT(const MasterGuideTable*);
+
+    // ATSC Aux
+    void HandleTVCT(uint, const TerrestrialVirtualChannelTable*);
+    void HandleCVCT(uint, const CableVirtualChannelTable*);
+    void HandleRRT(const RatingRegionTable*) {}
+    void HandleDCCT(const DirectedChannelChangeTable*) {}
+    void HandleDCCSCT(
+        const DirectedChannelChangeSelectionCodeTable*) {}
+
+    // DVB Main
+    void HandleNIT(const NetworkInformationTable*);
+    void HandleSDT(uint, const ServiceDescriptionTable*);
 
   private:
     void UpdateMonitorValues();

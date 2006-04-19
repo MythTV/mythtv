@@ -74,7 +74,7 @@ static bool handle_diseq(const DVBTuning&, DVBDiSEqC*, bool reset);
  *  \bug Only supports single input cards.
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
-    : QObject(NULL, "DVBChannel"),  ChannelBase(parent),
+    : ChannelBase(parent),
       dvb_recorder(NULL),
       diseqc(NULL),                 dvbcam(NULL),
       fd_frontend(-1),              cardnum(aCardNum),
@@ -97,22 +97,7 @@ DVBChannel::~DVBChannel()
         delete dvbcam;
         dvbcam = NULL;
     }
-}
-
-/** \fn DVBChannel::deleteLater(void)
- *  \brief Safer alternative to just deleting DVBChannel directly.
- */
-void DVBChannel::deleteLater(void)
-{
-    disconnect(); // disconnect signals we may be sending...
-    Close();
-    if (dvbcam)
-    {
-        delete dvbcam;
-        dvbcam = NULL;
-    }
     dvb_recorder = NULL;
-    QObject::deleteLater();
 }
 
 void DVBChannel::Close()
@@ -558,11 +543,11 @@ bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
   PMT Handler Code 
 *****************************************************************************/
 
-/** \fn DVBChannel::SetPMT(uint, const ProgramMapTable*)
+/** \fn DVBChannel::HandlePMT(uint, const ProgramMapTable*)
  *  \brief Sets our PMT to a copy of the ProgramMapTable,
  *         if dvb_recorder is set then dvb_recorder->SetPMT() is called.
  */
-void DVBChannel::SetPMT(uint pid, const ProgramMapTable *pmt)
+void DVBChannel::HandlePMT(uint pid, const ProgramMapTable *pmt)
 {
     if (pmt)
     {
@@ -614,7 +599,7 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
     }
 
     // We are now waiting for a new PMT to forward to Access Control (dvbcam).
-    SetPMT(0, NULL);
+    HandlePMT(0, NULL);
 
     // Remove any events in queue before tuning.
     drain_dvb_events(fd_frontend);

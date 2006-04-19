@@ -14,6 +14,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "channelbase.h"
+#include "streamlisteners.h"
 
 #include "dvbtypes.h"
 #include "dvbdiseqc.h"
@@ -22,9 +23,8 @@ class TVRec;
 class DVBCam;
 class DVBRecorder;
 
-class DVBChannel : public QObject, public ChannelBase
+class DVBChannel : public ChannelBase, public MPEGStreamListener
 {
-    Q_OBJECT
   public:
     DVBChannel(int cardnum, TVRec *parent = NULL);
     ~DVBChannel();
@@ -79,9 +79,9 @@ class DVBChannel : public QObject, public ChannelBase
     void SetRecorder(DVBRecorder*);
 
     // Messages to DVBChannel
-  public slots:
-    void SetPMT(uint pid, const ProgramMapTable *pmt);
-    void deleteLater(void);
+    void HandlePAT(const ProgramAssociationTable*) {}
+    void HandleCAT(const ConditionalAccessTable*) {}
+    void HandlePMT(uint pid, const ProgramMapTable *pmt);
 
   private:
     int  GetChanID(void) const;

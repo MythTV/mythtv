@@ -53,7 +53,7 @@ extern "C" {
 #define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
-                   : RecorderBase(rec, "NuppelVideoRecorder")
+    : RecorderBase(rec)
 {
     channelObj = channel;
 
@@ -230,16 +230,6 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete FiltMan;
     if (ccd)
         delete ccd;
-}
-
-void NuppelVideoRecorder::deleteLater(void)
-{
-    if (fd >= 0)
-    {
-        close(fd);
-        fd = -1;
-    }
-    RecorderBase::deleteLater();
 }
 
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)

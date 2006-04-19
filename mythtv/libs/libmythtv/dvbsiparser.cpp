@@ -53,8 +53,9 @@ using namespace std;
 #define LOC QString("DVBSIParser: ")
 #define LOC_ERR QString("DVBSIParser, Error: ")
 
-DVBSIParser::DVBSIParser(int cardNum, bool start_thread)
-    : SIParser("DVBSIParser"),  cardnum(cardNum), 
+DVBSIParser::DVBSIParser(DVBChannel *_channel, bool start_thread)
+    : SIParser(_channel),
+      cardnum(_channel->GetCardNum()),
       exitSectionThread(false), sectionThreadRunning(false),
       selfStartedThread(false), pollLength(0), pollArray(NULL),
       filterChange(false)
@@ -76,19 +77,6 @@ DVBSIParser::~DVBSIParser()
         pthread_join(siparser_thread, NULL);
         selfStartedThread = false;
     }
-}
-
-void DVBSIParser::deleteLater()
-{
-    disconnect(); // disconnect signals we may be sending...
-    if (selfStartedThread)
-    {
-        StopSectionReader();
-        pthread_join(siparser_thread, NULL);
-        selfStartedThread = false;
-    }
-    
-    SIParser::deleteLater();
 }
 
 /** \fn DVBSIParser::SystemInfoThread(void*)

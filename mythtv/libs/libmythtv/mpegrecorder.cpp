@@ -50,7 +50,7 @@ const char* MpegRecorder::aspectRatio[] = { "Square", "4:3", "16:9",
 #define BUILDBUFFERMAX (1024 * 1024)
 
 MpegRecorder::MpegRecorder(TVRec *rec) :
-    RecorderBase(rec, "MpegRecorder")
+    RecorderBase(rec)
 {
     errored = false;
     recording = false;
@@ -87,12 +87,6 @@ MpegRecorder::~MpegRecorder()
 {
     TeardownAll();
     delete [] buildbuffer;
-}
-
-void MpegRecorder::deleteLater(void)
-{
-    TeardownAll();
-    RecorderBase::deleteLater();
 }
 
 void MpegRecorder::TeardownAll(void)

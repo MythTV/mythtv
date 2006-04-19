@@ -12,7 +12,7 @@
 #include <AVCVideoServices/AVCVideoServices.h>
 
 DarwinFirewireRecorder::DarwinFirewireRecorder(TVRec *rec, ChannelBase* tuner)
- : FirewireRecorderBase(rec, "DarwinFirewireRecorder"),
+ : FirewireRecorderBase(rec),
    capture_device(
        dynamic_cast<DarwinFirewireChannel*>(tuner)->GetAVCDevice()
    ),

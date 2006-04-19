@@ -9,11 +9,8 @@
 
 #include "dtvrecorder.h"
 #include "tsstats.h"
-#include "mpeg/tspacket.h"
-
-class MPEGStreamData; 
-class ProgramAssociationTable; 
-class ProgramMapTable;
+#include "tspacket.h"
+#include "streamlisteners.h"
 
 /** \class FirewireRecorderBase
  *  \brief This is a specialization of DTVRecorder used to
@@ -21,14 +18,14 @@ class ProgramMapTable;
  *
  *  \sa DTVRecorder
  */
-class FirewireRecorderBase : public DTVRecorder
+class FirewireRecorderBase : public DTVRecorder,
+                             public MPEGSingleProgramStreamListener
 {
-  Q_OBJECT 
     friend class MPEGStreamData; 
     friend class TSPacketProcessor; 
 
   public:
-    FirewireRecorderBase(TVRec *rec, char const* name); 
+    FirewireRecorderBase(TVRec *rec);
     ~FirewireRecorderBase(); 
  
     // Commands 
@@ -46,10 +43,9 @@ class FirewireRecorderBase : public DTVRecorder
     // Gets 
     MPEGStreamData* StreamData(void) { return _mpeg_stream_data; }
 
-  public slots:
-    void deleteLater(void);
-    void WritePAT(ProgramAssociationTable*); 
-    void WritePMT(ProgramMapTable*);
+    // MPEG Single Program
+    void HandleSingleProgramPAT(ProgramAssociationTable*); 
+    void HandleSingleProgramPMT(ProgramMapTable*);
 
   private:
     virtual void Close() = 0;

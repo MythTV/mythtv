@@ -37,10 +37,26 @@ typedef struct stream_meta_{
     int      bufferIndex;
 } stream_meta;
 
+class DBox2Recorder;
+class DBox2Relay : public QObject
+{
+    Q_OBJECT
+
+  public:
+    DBox2Relay(DBox2Recorder *rec) : m_rec(rec) {}
+    void SetRecorder(DBox2Recorder*);
+
+  public slots:
+    void httpRequestFinished(int id, bool error);
+
+  private:
+    DBox2Recorder *m_rec;
+    QMutex         m_lock;
+};
 
 class DBox2Recorder : public DTVRecorder
 {
-    Q_OBJECT
+        friend class DBox2Relay;
     public:
         DBox2Recorder(TVRec *rec, DBox2Channel *channel);
         ~DBox2Recorder() { TeardownAll(); }
@@ -56,17 +72,12 @@ class DBox2Recorder : public DTVRecorder
 	void SetOption(const QString &name, const QString &value);
 	void SetOption(const QString &name, int value);
 	
-    signals:
-        void RecorderAlive(bool);
-
-    public slots:
-        void httpRequestFinished ( int id, bool error );
-	void ChannelChanged();
-	void ChannelChanging();
-        void deleteLater(void);
+	void ChannelChanged(void);
+	void ChannelChanging(void);
     
     private:
 	// Methods
+        void httpRequestFinished(int id, bool error);
         void TeardownAll(void);
 	void CreatePAT(uint8_t *ts_packet);
 	int  getPMTSectionID(uint8_t* buffer, int pmtPID);
@@ -96,6 +107,7 @@ class DBox2Recorder : public DTVRecorder
 	QString ip;
 	bool isOpen;
 	QHttp* http;
+        DBox2Relay   *m_relay;
 	int m_lastPIDRequestID;
 	int m_lastInfoRequestID;
 	time_t lastpacket;

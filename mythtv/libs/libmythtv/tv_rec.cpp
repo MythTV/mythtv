@@ -300,25 +300,17 @@ void TVRec::TeardownAll(void)
         scanner = NULL;
     }
 
-#ifdef USING_DVB
-    if (GetDVBChannel())
-        GetDVBChannel()->deleteLater();
-    else
-#endif // USING_DVB
-#ifdef USING_DBOX2
-    if (GetDBox2Channel())
-        GetDBox2Channel()->deleteLater();
-    else
-#endif // USING_DBOX2
     if (channel)
+    {
         delete channel;
-    channel = NULL;
+        channel = NULL;
+    }
 
     TeardownRecorder(true);
 
     if (dummyRecorder)
     {
-        dummyRecorder->deleteLater();
+        delete dummyRecorder;
         dummyRecorder = NULL;
     }
 
@@ -906,7 +898,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         if (recorder->IsErrored())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to initialize recorder!");
-            recorder->deleteLater();
+            delete recorder;
             recorder = NULL;
             return false;
         }
@@ -985,7 +977,7 @@ void TVRec::TeardownRecorder(bool killFile)
             scanner = NULL;
         }
 
-        recorder->deleteLater();
+        delete recorder;
         recorder = NULL;
     }
 
@@ -1150,13 +1142,7 @@ void TVRec::CreateSIParser(MPEGStreamData *stream_data, int program_num)
         return;
 
     if (!dvbsiparser)
-    {
-        dvbsiparser = new DVBSIParser(dvbc->GetCardNum(), true);
-        QObject::connect(dvbsiparser,
-                         SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-                         dvbc,
-                         SLOT(   SetPMT(  uint, const ProgramMapTable*)));
-    }
+        dvbsiparser = new DVBSIParser(dvbc, true);
 
     dvbsiparser->ReinitSIParser(dvbc->GetSIStandard(),
                                 stream_data, program_num);
@@ -1184,7 +1170,7 @@ void TVRec::TeardownSIParser(void)
 #ifdef USING_DVB
     if (dvbsiparser)
     {
-        dvbsiparser->deleteLater();
+        delete dvbsiparser;
         dvbsiparser = NULL;
     }
 #endif // USING_DVB
@@ -3377,7 +3363,7 @@ void TVRec::SetRingBuffer(RingBuffer *rb)
     {
         if (dummyRecorder)
         {
-            dummyRecorder->deleteLater();
+            delete dummyRecorder;
             dummyRecorder = NULL;
             ClearFlags(kFlagDummyRecorderRunning);
         }
@@ -3835,7 +3821,7 @@ bool TVRec::TuningSignalCheck(void)
 
     if (GetDVBChannel())
     {
-        GetDVBChannel()->SetPMT(0, NULL);
+        GetDVBChannel()->HandlePMT(0, NULL);
         CreateSIParser(streamData, programNum);
         SetFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
     }

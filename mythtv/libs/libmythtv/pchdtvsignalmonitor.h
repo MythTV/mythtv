@@ -10,6 +10,7 @@ class Channel;
 
 class pcHDTVSignalMonitor: public DTVSignalMonitor
 {
+    Q_OBJECT
   public:
     pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
                         uint _flags = kDTVSigMon_WaitForSig,

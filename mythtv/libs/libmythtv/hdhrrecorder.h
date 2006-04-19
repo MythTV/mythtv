@@ -9,25 +9,17 @@
 
 #include <qmutex.h>
 #include "dtvrecorder.h"
+#include "streamlisteners.h"
 #include "eitscanner.h"
-#include "tspacket.h"
-#include "transform.h"
-#include "mpeg/tspacket.h"
-#include "mpeg/mpegtables.h"
 
-class ATSCStreamData;
-class ProgramAssociationTable;
-class ProgramMapTable;
-class VirtualChannelTable;
-class MasterGuideTable;
-class SystemTimeTable;
-class EventInformationTable;
-class ExtendedTextTable;
 class HDHRChannel;
 
-class HDHRRecorder : public DTVRecorder, public EITSource
+class HDHRRecorder : public DTVRecorder,
+                     public MPEGSingleProgramStreamListener,
+                     public ATSCMainStreamListener,
+                     public EITSource,
+                     public ATSCEITStreamListener
 {
-    Q_OBJECT
     friend class ATSCStreamData;
 
   public:
@@ -45,22 +37,23 @@ class HDHRRecorder : public DTVRecorder, public EITSource
 
     void StartRecording(void);
 
-    void SetEITHelper(EITHelper*);
-    void SetEITRate(float);
-
     void SetStreamData(ATSCStreamData*);
     ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
 
-  public slots:
-    void deleteLater(void);
+    // MPEG Single Program
+    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
+    void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
-  private slots:
-    void WritePAT(ProgramAssociationTable  *pat);
-    void WritePMT(ProgramMapTable          *pmt);
-    void ProcessMGT(const MasterGuideTable *mgt);
-    void ProcessVCT(uint, const VirtualChannelTable*);
-
+    // ATSC
     void HandleSTT(const SystemTimeTable*);
+    void HandleMGT(const MasterGuideTable *mgt);
+    void HandleVCT(uint, const VirtualChannelTable*);
+
+    // EIT Source
+    void SetEITHelper(EITHelper*);
+    void SetEITRate(float);
+
+    // ATSC EIT
     void HandleEIT(uint pid, const EventInformationTable*);
     void HandleETT(uint pid, const ExtendedTextTable*);
 

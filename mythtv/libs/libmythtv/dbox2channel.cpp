@@ -10,38 +10,52 @@
 #include "mythdbcon.h"
 #include "mythcontext.h"
 #include "dbox2channel.h"
+#include "dbox2recorder.h"
 
 //#define DBOX2_CHANNEL_DEBUG
 
+void DBox2CRelay::SetChannel(DBox2Channel *ch)
+{
+    QMutexLocker locker(&m_lock);
+    m_ch = ch;
+}
+
+void DBox2CRelay::HttpChannelChangeDone(bool error)
+{
+    QMutexLocker locker(&m_lock);
+    if (m_ch)
+        m_ch->HttpChannelChangeDone(error);
+}
+
+void DBox2CRelay::HttpRequestDone(bool error)
+{
+    QMutexLocker locker(&m_lock);
+    if (m_ch)
+        m_ch->HttpRequestDone(error);
+}
+
 DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
                            int cardid)
-    : QObject(NULL, "DBox2Channel"), ChannelBase(parent),
+    : ChannelBase(parent),
       m_dbox2options(dbox2_options), m_cardid(cardid),
       m_channelListReady(false),     m_lastChannel("1"),
       m_requestChannel(""),          m_epg(new DBox2EPG()),
       m_recorderAlive(false),
       http(new QHttp()),             httpChanger(new QHttp()),
+      m_relay(new DBox2CRelay(this)),
       m_dbox2channelcount(0)
 {
-    connect(http,        SIGNAL(           done(bool)),
-            this,        SLOT(  HttpRequestDone(bool)));
-    connect(httpChanger, SIGNAL(                 done(bool)),
-            this,        SLOT(  HttpChannelChangeDone(bool)));
+    QObject::connect(http,        SIGNAL(           done(bool)),
+                     m_relay,     SLOT(  HttpRequestDone(bool)));
+    QObject::connect(httpChanger, SIGNAL(                 done(bool)),
+                     m_relay,     SLOT(  HttpChannelChangeDone(bool)));
 
     // Load channel names and ids from the dbox
     LoadChannels();
 }
 
-void DBox2Channel::deleteLater(void)
-{
-    TeardownAll();
-    QObject::deleteLater();
-}
-
 void DBox2Channel::TeardownAll(void)
 {
-    disconnect(); // disconnect signals we may be sending...
-
     // Shutdown EPG
     if (m_epg)
     {
@@ -70,6 +84,19 @@ void DBox2Channel::TeardownAll(void)
         http->deleteLater();
         http = NULL;
     }
+
+    if (m_relay)
+    {
+        m_relay->SetChannel(NULL);
+        m_relay->deleteLater();
+        m_relay = NULL;
+    }
+}
+
+void DBox2Channel::SetRecorder(DBox2Recorder *rec)
+{
+    QMutexLocker locker(&m_lock);
+    m_recorder = rec;
 }
 
 void DBox2Channel::SwitchToLastChannel() 
@@ -133,7 +160,11 @@ bool DBox2Channel::SetChannelByString(const QString &newChan)
     Log(QString("Channel ID for %1 is %2.").arg(chan).arg(channelID));
 
     // Request channel change
-    emit ChannelChanging();
+    m_lock.lock();
+    if (m_recorder)
+        m_recorder->ChannelChanging();
+    m_lock.unlock();
+
     RequestChannelChange(channelID);
     return true;
 }
@@ -247,8 +278,13 @@ void DBox2Channel::HttpChannelChangeDone(bool error)
     if (line == "ok")
     {
         Log(QString("Changing channel succeeded..."));
+
 	// Send signal to record that channel has changed.
-	emit ChannelChanged();
+        m_lock.lock();
+        if (m_recorder)
+            m_recorder->ChannelChanged();
+        m_lock.unlock();
+
 	// Request EPG for this channel if recorder is not alive
 	if (!m_recorderAlive)
 	  m_epg->ScheduleRequestEPG(curchannelname);

@@ -25,6 +25,19 @@ using namespace std;
 //#define DEBUG_DBOX2_PMT 
 //#define DEBUG_DBOX2_PID
 
+void DBox2Relay::SetRecorder(DBox2Recorder *rec)
+{
+    QMutexLocker locker(&m_lock);
+    m_rec = rec;
+}
+
+void DBox2Relay::httpRequestFinished(int id, bool error)
+{
+    QMutexLocker locker(&m_lock);
+    if (m_rec)
+        m_rec->httpRequestFinished(id, error);
+}
+
 int socketConnect(int socket, sockaddr* addr, int len) {
   return connect(socket, addr, len);
 }
@@ -114,7 +127,7 @@ typedef struct  ts_packet_{
  */
 
 DBox2Recorder::DBox2Recorder(TVRec *rec, DBox2Channel *channel)
-    : DTVRecorder(rec, "DBox2Recorder"), m_cardid(rec->GetCaptureCardNum()),
+    : DTVRecorder(rec), m_cardid(rec->GetCaptureCardNum()),
       // MPEG stuff
       m_patPacket(new uint8_t[TSPacket::SIZE]), pat_cc(0), pkts_until_pat(0),
       m_pidPAT(0x0), m_pidCount(0), m_pmtPID(-1), m_ac3PID(-1),
@@ -123,6 +136,7 @@ DBox2Recorder::DBox2Recorder(TVRec *rec, DBox2Channel *channel)
       m_channel(channel),
       // Connection relevant members
       port(-1), httpPort(-1), ip(""), isOpen(false), http(new QHttp()),
+      m_relay(new DBox2Relay(this)),
       m_lastPIDRequestID(-1), m_lastInfoRequestID(-1), lastpacket(0),
       // Buffer info
       bufferSize(1024 * 1024),
@@ -143,23 +157,11 @@ DBox2Recorder::DBox2Recorder(TVRec *rec, DBox2Channel *channel)
     transportStream.bufferIndex = 0;
 
     // Inter-object signaling
-    connect (http,      SIGNAL(requestFinished    (int,bool)),
-             this,      SLOT(  httpRequestFinished(int,bool)));
-    connect (m_channel, SIGNAL(ChannelChanged()),
-             this,      SLOT(  ChannelChanged()));
-    connect (m_channel, SIGNAL(ChannelChanging()),
-             this,      SLOT(  ChannelChanging()));
+    QObject::connect(http,      SIGNAL(requestFinished    (int,bool)),
+                     m_relay,   SLOT(  httpRequestFinished(int,bool)));
 
-    connect (this,      SIGNAL(RecorderAlive(bool)),
-             m_channel, SLOT(  RecorderAlive(bool)));
-
-    emit RecorderAlive(true);
-}
-
-void DBox2Recorder::deleteLater(void)
-{
-    TeardownAll();
-    DTVRecorder::deleteLater();
+    m_channel->SetRecorder(this);
+    m_channel->RecorderAlive(true);
 }
 
 void DBox2Recorder::TeardownAll(void)
@@ -167,17 +169,14 @@ void DBox2Recorder::TeardownAll(void)
     VERBOSE(VB_RECORD, QString("DBOX#%1: Shutting down recorder.")
             .arg(m_cardid));
 
-    emit RecorderAlive(false);
-
-    disconnect(); // disconnect signals we may be sending...
+    m_channel->RecorderAlive(false);
 
     // Abort any pending http operation
     if (http)
     {
         http->abort();
         http->closeConnection();
-        disconnect(http,      SIGNAL(requestFinished    (int,bool)),
-                   this,      SLOT(  httpRequestFinished(int,bool)));
+        http->disconnect();
     }
 
     Close();
@@ -190,9 +189,18 @@ void DBox2Recorder::TeardownAll(void)
 
     if (http)
     {
-        delete http;
+        http->deleteLater();
         http = NULL;
     }
+
+    if (m_relay)
+    {
+        m_relay->SetRecorder(NULL);
+        m_relay->deleteLater();
+        m_relay = NULL;
+    }
+
+    m_channel->SetRecorder(NULL);
 }
 
 void DBox2Recorder::Close() 
@@ -217,7 +225,7 @@ bool DBox2Recorder::Open()
     if (isOpen) 
         Close();
 
-    emit RecorderAlive(true);
+    m_channel->RecorderAlive(true);
     return RequestStream();
 }
 

@@ -110,21 +110,11 @@ using namespace std;
 #endif
 
 HDTVRecorder::HDTVRecorder(TVRec *rec)
-    : DTVRecorder(rec, "HDTVRecorder"),
+    : DTVRecorder(rec),
       _atsc_stream_data(NULL),
       _resync_count(0)
 {
-    _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
-    connect(_atsc_stream_data, SIGNAL(UpdatePATSingleProgram(
-                                          ProgramAssociationTable*)),
-            this, SLOT(WritePAT(ProgramAssociationTable*)));
-    connect(_atsc_stream_data, SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)),
-            this, SLOT(WritePMT(ProgramMapTable*)));
-    connect(_atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
-            this, SLOT(ProcessMGT(const MasterGuideTable*)));
-    connect(_atsc_stream_data,
-            SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
-            this, SLOT(ProcessVCT(uint, const VirtualChannelTable*)));
+    SetStreamData(new ATSCStreamData(-1, DEFAULT_SUBCHANNEL));
 
     _buffer_size = TSPacket::SIZE * 1500;
     if ((_buffer = new unsigned char[_buffer_size])) {
@@ -151,11 +141,9 @@ void HDTVRecorder::TeardownAll(void)
         close(_stream_fd);
         _stream_fd = -1;
     }
-    if (_atsc_stream_data)
-    {
-        delete _atsc_stream_data;
-        _atsc_stream_data = NULL;
-    }
+    
+    SetStreamData(NULL);
+
     if (_buffer)
     {
         delete[] _buffer;
@@ -168,12 +156,6 @@ HDTVRecorder::~HDTVRecorder()
     TeardownAll();
     pthread_mutex_destroy(&ringbuf.lock);
     pthread_mutex_destroy(&ringbuf.lock_stats);
-}
-
-void HDTVRecorder::deleteLater(void)
-{
-    TeardownAll();
-    DTVRecorder::deleteLater();
 }
 
 void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -221,15 +203,21 @@ bool HDTVRecorder::Open()
     return (_stream_fd>0);
 }
 
-void HDTVRecorder::SetStreamData(ATSCStreamData *stream_data)
+void HDTVRecorder::SetStreamData(ATSCStreamData *data)
 {
-    if (stream_data == _atsc_stream_data)
+    if (data == _atsc_stream_data)
         return;
 
     ATSCStreamData *old_data = _atsc_stream_data;
-    _atsc_stream_data = stream_data;
+    _atsc_stream_data = data;
     if (old_data)
         delete old_data;
+
+    if (data)
+    {
+        data->AddMPEGSPListener(this);
+        data->AddATSCMainListener(this);
+    }
 }
 
 bool readchan(int chanfd, unsigned char* buffer, int dlen) {
@@ -708,7 +696,7 @@ int HDTVRecorder::ResyncStream(const unsigned char *buffer,
     return pos;
 }
 
-void HDTVRecorder::WritePAT(ProgramAssociationTable *pat)
+void HDTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 {
     if (!pat)
         return;
@@ -718,7 +706,7 @@ void HDTVRecorder::WritePAT(ProgramAssociationTable *pat)
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
 }
 
-void HDTVRecorder::WritePMT(ProgramMapTable* pmt)
+void HDTVRecorder::HandleSingleProgramPMT(ProgramMapTable* pmt)
 {
     if (!pmt)
         return;
@@ -728,27 +716,27 @@ void HDTVRecorder::WritePMT(ProgramMapTable* pmt)
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pmt->tsheader())));
 }
 
-/** \fn HDTVRecorder::ProcessMGT(const MasterGuideTable*)
- *  \brief Processes Master Guide Table, by enabling the 
+/** \fn HDTVRecorder::HandleMGT(const MasterGuideTable*)
+ *  \brief Handles Master Guide Table, by enabling the 
  *         scanning of all PIDs listed.
  */
-void HDTVRecorder::ProcessMGT(const MasterGuideTable *mgt)
+void HDTVRecorder::HandleMGT(const MasterGuideTable *mgt)
 {
     for (unsigned int i=0; i<mgt->TableCount(); i++)
         GetStreamData()->AddListeningPID(mgt->TablePID(i));
 }
 
-/** \fn HDTVRecorder::ProcessVCT(uint, const VirtualChannelTable*)
- *  \brief Processes Virtual Channel Tables by finding the program
+/** \fn HDTVRecorder::HandleVCT(uint, const VirtualChannelTable*)
+ *  \brief Handles Virtual Channel Tables by finding the program
  *         number to use.
  *  \bug Assumes there is only one VCT, may break on Cable.
  */
-void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
+void HDTVRecorder::HandleVCT(uint /*tsid*/, const VirtualChannelTable *vct)
 {
     if (vct->ChannelCount() < 1)
     {
         VERBOSE(VB_IMPORTANT,
-                "HDTVRecorder::ProcessVCT: table has no channels");
+                "HDTVRecorder::HandleVCT: table has no channels");
         return;
     }
 

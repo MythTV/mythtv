@@ -33,9 +33,6 @@ class DummyDTVRecorder: public DTVRecorder
     void StartRecordingThread(unsigned long long required_frames = 0);
     void StopRecordingThread(void);
 
-  public slots:
-    void deleteLater(void);
-
   private:
     void Close(void);
     int ProcessData(unsigned char *buffer, int len);

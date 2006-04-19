@@ -166,7 +166,7 @@ HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
 HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
 HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
 HEADERS += mpeg/iso6937tables.h
-HEADERS += mpeg/tsstats.h
+HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp

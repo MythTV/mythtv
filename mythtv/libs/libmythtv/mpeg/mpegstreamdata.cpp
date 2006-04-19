@@ -45,7 +45,7 @@ const unsigned char MPEGStreamData::bit_sel[8] =
  *  \param cacheTables    If true PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
-    : QObject(NULL, "MPEGStreamData"), _have_CRC_bug(false),
+    : _have_CRC_bug(false),
       _pat_version(-2), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
       _pid_video_single_program(0xffffffff),
@@ -69,6 +69,10 @@ MPEGStreamData::~MPEGStreamData()
     psip_refcnt_map_t::iterator it = _cached_slated_for_deletion.begin();
     for (; it != _cached_slated_for_deletion.end(); ++it)
         delete it.key();
+
+    QMutexLocker locker(&_listener_lock);
+    _mpeg_listeners.clear();
+    _mpeg_sp_listeners.clear();
 }
 
 void MPEGStreamData::Reset(int desiredProgram)
@@ -438,7 +442,12 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::CAT:
         {
             ConditionalAccessTable cat(psip);
-            emit UpdateCAT(&cat);
+
+            _listener_lock.lock();
+            for (uint i = 0; i < _mpeg_listeners.size(); i++)
+                _mpeg_listeners[i]->HandleCAT(&cat);
+            _listener_lock.unlock();
+
             return true;
         }
         case TableID::PMT:
@@ -464,12 +473,15 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
 {
     bool foundProgram = pat->FindPID(_desired_program);
 
-    if (_desired_program < 0)
-    {
-        emit UpdatePAT(pat);
-        return;
-    }
+    _listener_lock.lock();
+    for (uint i = 0; i < _mpeg_listeners.size(); i++)
+        _mpeg_listeners[i]->HandlePAT(pat);
+    _listener_lock.unlock();
 
+    if (_desired_program < 0)
+        return;
+
+    bool send_single_program = false;
     if (!_invalid_pat_seen && !foundProgram)
     {
         _invalid_pat_seen = true;
@@ -486,10 +498,7 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
         VERBOSE(VB_IMPORTANT, "ProcessPAT: Program not found in PAT. "
                 "\n\t\t\tRescan your transports.");
 
-        // This will trigger debug PAT print
-        emit UpdatePAT(pat);
-        if (CreatePATSingleProgram(*pat))
-            emit UpdatePATSingleProgram(PATSingleProgram());
+        send_single_program = CreatePATSingleProgram(*pat);
     }
     else if (foundProgram)
     {
@@ -497,19 +506,32 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
             VERBOSE(VB_RECORD, "ProcessPAT: Good PAT seen after a bad PAT");
 
         _invalid_pat_seen = false;
-        emit UpdatePAT(pat);
-        if (CreatePATSingleProgram(*pat))
-            emit UpdatePATSingleProgram(PATSingleProgram());
+
+        send_single_program = CreatePATSingleProgram(*pat);
+    }
+
+    if (send_single_program)
+    {
+        QMutexLocker locker(&_listener_lock);
+        ProgramAssociationTable *pat_sp = PATSingleProgram();
+        for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
+            _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp);
     }
 }
 
 void MPEGStreamData::ProcessPMT(const uint pid, const ProgramMapTable *pmt)
 {
-    emit UpdatePMT(pmt->ProgramNumber(), pmt);
-    if (pid == _pid_pmt_single_program)
+    _listener_lock.lock();
+    for (uint i = 0; i < _mpeg_listeners.size(); i++)
+        _mpeg_listeners[i]->HandlePMT(pmt->ProgramNumber(), pmt);
+    _listener_lock.unlock();
+
+    if (pid == _pid_pmt_single_program && CreatePMTSingleProgram(*pmt))
     {
-        if (CreatePMTSingleProgram(*pmt))
-            emit UpdatePMTSingleProgram(PMTSingleProgram());
+        QMutexLocker locker(&_listener_lock);
+        ProgramMapTable *pmt_sp = PMTSingleProgram();
+        for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
+            _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp);
     }
 }
 
@@ -556,10 +578,20 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     if (IsRedundant(tspacket->PID(), *psip))
     {
         if (TableID::PAT == psip->TableID())
-            emit UpdatePATSingleProgram(PATSingleProgram());
+        {
+            QMutexLocker locker(&_listener_lock);
+            ProgramAssociationTable *pat_sp = PATSingleProgram();
+            for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
+                _mpeg_sp_listeners[i]->HandleSingleProgramPAT(pat_sp);
+        }
         if (TableID::PMT == psip->TableID() &&
             tspacket->PID() == _pid_pmt_single_program)
-            emit UpdatePMTSingleProgram(PMTSingleProgram());
+        {
+            QMutexLocker locker(&_listener_lock);
+            ProgramMapTable *pmt_sp = PMTSingleProgram();
+            for (uint i = 0; i < _mpeg_sp_listeners.size(); i++)
+                _mpeg_sp_listeners[i]->HandleSingleProgramPMT(pmt_sp);
+        }
         DONE_WITH_PES_PACKET(); // already parsed this table, toss it.
     }
 
@@ -909,4 +941,58 @@ void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)
         DeleteCachedTable(*it);
 
     _cached_pmts[key] = pmt;
+}
+
+void MPEGStreamData::AddMPEGListener(MPEGStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    mpeg_listener_vec_t::iterator it = _mpeg_listeners.begin();
+    for (; it != _mpeg_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _mpeg_listeners.push_back(val);
+}
+
+void MPEGStreamData::RemoveMPEGListener(MPEGStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    mpeg_listener_vec_t::iterator it = _mpeg_listeners.begin();
+    for (; it != _mpeg_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _mpeg_listeners.erase(it);
+            return;
+        }
+    }
+}
+
+void MPEGStreamData::AddMPEGSPListener(MPEGSingleProgramStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    mpeg_sp_listener_vec_t::iterator it = _mpeg_sp_listeners.begin();
+    for (; it != _mpeg_sp_listeners.end(); ++it)
+        if (((void*)val) == ((void*)*it))
+            return;
+
+    _mpeg_sp_listeners.push_back(val);
+}
+
+void MPEGStreamData::RemoveMPEGSPListener(MPEGSingleProgramStreamListener *val)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    mpeg_sp_listener_vec_t::iterator it = _mpeg_sp_listeners.begin();
+    for (; it != _mpeg_sp_listeners.end(); ++it)
+    {
+        if (((void*)val) == ((void*)*it))
+        {
+            _mpeg_sp_listeners.erase(it);
+            return;
+        }
+    }
 }

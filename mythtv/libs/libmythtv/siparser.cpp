@@ -21,6 +21,7 @@ using namespace std;
 #include "dvbtables.h"
 #include "dvbrecorder.h"
 #include "eithelper.h"
+#include "streamlisteners.h"
 
 // MythTV DVB headers
 #include "siparser.h"
@@ -45,9 +46,9 @@ using namespace std;
  *  is also possible with this class if their specs are ever known.
  *
  */
-SIParser::SIParser(const char *name) :
-    QObject(NULL, name),
+SIParser::SIParser(MPEGStreamListener *_pmt_listener) :
     // Common Variables
+    pmt_listener(_pmt_listener),
     table_standard(SI_STANDARD_AUTO),
     // ATSC Storage
     atsc_stream_data(NULL),         dvb_stream_data(NULL),
@@ -68,19 +69,13 @@ SIParser::SIParser(const char *name) :
 
 SIParser::~SIParser()
 {
+    SetStreamData(NULL);
     QMutexLocker locker(&pmap_lock);
     for (uint i = 0; i < NumHandlers; ++i)
     {
         if (Table[i])
             delete Table[i];
     }
-}
-
-void SIParser::deleteLater(void)
-{
-    QMutexLocker locker(&pmap_lock);
-    disconnect(); // disconnect signals we may be sending...
-    QObject::deleteLater();
 }
 
 /* Resets all trackers, and closes all section filters */
@@ -247,7 +242,6 @@ void SIParser::AdjustEITPids(void)
     }    
 }
 
-
 void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
 {
     VERBOSE(VB_IMPORTANT, LOC + "Setting ATSCStreamData");
@@ -260,10 +254,19 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
     atsc_stream_data = stream_data;
 
     if (old_data && ((void*)old_data == (void*)dvb_stream_data))
+    {
         dvb_stream_data = (DVBStreamData*) stream_data;
+    }
 
     if (old_data)
-        delete old_data;
+    {
+        old_data->RemoveMPEGListener(this);
+        old_data->RemoveATSCMainListener(this);
+        old_data->RemoveATSCEITListener(this);
+    }
+
+    if (!atsc_stream_data)
+        return;
 
     // Use any cached tables
     if (atsc_stream_data->HasCachedMGT())
@@ -293,40 +296,10 @@ void SIParser::SetATSCStreamData(ATSCStreamData *stream_data)
     }
     atsc_stream_data->ReturnCachedTables(pmts);
 
-    // MPEG table signals
-    connect(atsc_stream_data,
-            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
-            this,
-            SLOT(  HandlePAT(const ProgramAssociationTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
-            this,
-            SLOT(  HandleCAT(const ConditionalAccessTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-            this,
-            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
-
-    // ATSC table signals
-    connect(atsc_stream_data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
-            this,             SLOT(  HandleMGT(const MasterGuideTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
-            this,
-            SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
-
-    connect(atsc_stream_data, SIGNAL(UpdateSTT(const SystemTimeTable*)),
-            this,             SLOT(  HandleSTT(const SystemTimeTable*)));
-
-    // EIT table signals
-    connect(atsc_stream_data,
-            SIGNAL(UpdateEIT(uint, const EventInformationTable*)),
-            this,
-            SLOT(  HandleEIT(uint, const EventInformationTable*)));
-    connect(atsc_stream_data,
-            SIGNAL(UpdateETT(uint, const ExtendedTextTable*)),
-            this,
-            SLOT(  HandleETT(uint, const ExtendedTextTable*)));
+    // signals
+    atsc_stream_data->AddMPEGListener(this);
+    atsc_stream_data->AddATSCMainListener(this);
+    atsc_stream_data->AddATSCEITListener(this);
 }
 
 void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
@@ -341,13 +314,22 @@ void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
     dvb_stream_data = stream_data;
 
     if (old_data && ((void*)old_data == (void*)atsc_stream_data))
+    {
         atsc_stream_data = (ATSCStreamData*) stream_data;
+    }
 
     if (old_data)
-        delete old_data;
+    {
+        old_data->RemoveMPEGListener(this);
+        old_data->RemoveDVBMainListener(this);
+        old_data->RemoveDVBEITListener(this);
+    }
+
+    if (!dvb_stream_data)
+        return;
 
     // Use any cached tables
-    pmt_map_t pmts = atsc_stream_data->GetCachedPMTMap();
+    pmt_map_t pmts = dvb_stream_data->GetCachedPMTMap();
     pmt_map_t::const_iterator it = pmts.begin();
     for (; it != pmts.end(); ++it)
     {
@@ -355,38 +337,23 @@ void SIParser::SetDVBStreamData(DVBStreamData *stream_data)
         for (; vit != (*it).end(); ++vit)
             HandlePMT(it.key(), *vit);
     }
-    atsc_stream_data->ReturnCachedTables(pmts);
+    dvb_stream_data->ReturnCachedTables(pmts);
 
-    // MPEG table signals
-    connect(dvb_stream_data,
-            SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
-            this,
-            SLOT(  HandlePAT(const ProgramAssociationTable*)));
-    connect(dvb_stream_data,
-            SIGNAL(UpdateCAT(const ConditionalAccessTable*)),
-            this,
-            SLOT(  HandleCAT(const ConditionalAccessTable*)));
-    connect(dvb_stream_data,
-            SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-            this,
-            SLOT(  HandlePMT(uint, const ProgramMapTable*)));
-
-    // DVB table signals
-    connect(dvb_stream_data,
-            SIGNAL(UpdateNIT(const NetworkInformationTable*)),
-            this,
-            SLOT(  HandleNIT(const NetworkInformationTable*)));
-
-    // EIT table signal
-    connect(dvb_stream_data,
-            SIGNAL(UpdateEIT(const DVBEventInformationTable*)),
-            this,
-            SLOT(  HandleEIT(const DVBEventInformationTable*)));
+    // signals
+    dvb_stream_data->AddMPEGListener(this);
+    dvb_stream_data->AddDVBMainListener(this);
+    dvb_stream_data->AddDVBEITListener(this);
 }
 
 void SIParser::SetStreamData(MPEGStreamData *stream_data)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "SetStreamData("<<stream_data<<")");
+    VERBOSE(VB_SIPARSER, LOC + "SetStreamData("<<stream_data<<")");
+
+    if (!stream_data)
+    {
+        SetATSCStreamData(NULL);
+        SetDVBStreamData(NULL);
+    }
 
     ATSCStreamData *atsc_sd = dynamic_cast<ATSCStreamData*>(stream_data);
     if (atsc_sd && (atsc_sd != atsc_stream_data))
@@ -611,12 +578,12 @@ void SIParser::HandlePMT(uint pnum, const ProgramMapTable *pmt)
     if (SI_STANDARD_ATSC == table_standard)
     {
         if ((int)pmt->ProgramNumber() == atsc_stream_data->DesiredProgram())
-            emit UpdatePMT(pnum_pid[pmt->ProgramNumber()], pmt);
+            pmt_listener->HandlePMT(pnum_pid[pmt->ProgramNumber()], pmt);
     }
     if (SI_STANDARD_DVB == table_standard)
     {
         if ((int)pmt->ProgramNumber() == dvb_stream_data->DesiredProgram())
-            emit UpdatePMT(pnum_pid[pmt->ProgramNumber()], pmt);
+            pmt_listener->HandlePMT(pnum_pid[pmt->ProgramNumber()], pmt);
     }
 }
 

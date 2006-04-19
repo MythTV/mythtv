@@ -57,7 +57,6 @@ typedef QMap<uint,PIDInfo*> PIDInfoMap;
  */
 class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 {
-    Q_OBJECT
   public:
     DVBRecorder(TVRec *rec, DVBChannel* dvbchannel);
    ~DVBRecorder();
@@ -81,9 +80,6 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     void SetStreamData(ATSCStreamData*);
     ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
-
-  public slots:
-    void deleteLater(void);
 
   private:
     void TeardownAll(void);

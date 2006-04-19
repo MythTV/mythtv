@@ -19,11 +19,30 @@
 #include "sitypes.h"
 #include "dbox2epg.h"
 
+class DBox2Recorder;
+class DBox2Channel;
 class DBox2EPG;
 
-class DBox2Channel : public QObject, public ChannelBase
+class DBox2CRelay : public QObject
 {
     Q_OBJECT
+
+  public:
+    DBox2CRelay(DBox2Channel *ch) : m_ch(ch) {}
+    void SetChannel(DBox2Channel*);
+
+  public slots:
+    void HttpChannelChangeDone(bool error);
+    void HttpRequestDone(bool error);
+
+  private:
+    DBox2Channel *m_ch;
+    QMutex        m_lock;
+};
+
+class DBox2Channel : public ChannelBase
+{
+    friend class DBox2CRelay;
   public:
     DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options, int cardid);
     ~DBox2Channel(void) { TeardownAll(); }
@@ -42,18 +61,13 @@ class DBox2Channel : public QObject, public ChannelBase
     QString GetChannelID(const QString&);
 
     void EPGFinished();
-
-  signals:
-    void ChannelChanged();
-    void ChannelChanging();
-
-  public slots:
-    void HttpChannelChangeDone(bool error);
-    void HttpRequestDone(bool error);
     void RecorderAlive(bool);
-    void deleteLater(void);
+
+    void SetRecorder(DBox2Recorder*);
 
   private:
+    void HttpChannelChangeDone(bool error);
+    void HttpRequestDone(bool error);
     void TeardownAll(void);
     void Log(QString string);
     void LoadChannels();
@@ -71,10 +85,14 @@ class DBox2Channel : public QObject, public ChannelBase
 
     QHttp            *http;
     QHttp            *httpChanger;
+    DBox2CRelay      *m_relay;
 
     int               m_dbox2channelcount;
     QMap<int,QString> m_dbox2channelids;
     QMap<int,QString> m_dbox2channelnames;
+
+    DBox2Recorder    *m_recorder;
+    QMutex            m_lock;
 };
 
 #endif

@@ -23,7 +23,7 @@ class FirewireRecorder : public FirewireRecorderBase
 
   public:
     FirewireRecorder(TVRec *rec) 
-        : FirewireRecorderBase(rec, "FirewireRecorder"), 
+        : FirewireRecorderBase(rec),
         fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1), 
         fwfd(-1),       fwconnection(kConnectionP2P), 
         fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0), 

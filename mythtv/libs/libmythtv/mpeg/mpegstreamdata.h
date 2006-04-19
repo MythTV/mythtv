@@ -9,11 +9,8 @@ using namespace std;
 #include <qmap.h>
 #include "tspacket.h"
 #include "util.h"
+#include "streamlisteners.h"
 
-class ProgramAssociationTable;
-class ConditionalAccessTable;
-class ProgramMapTable;
-class HDTVRecorder;
 class PSIPTable;
 class RingBuffer;
 class PESPacket;
@@ -33,11 +30,13 @@ typedef vector<unsigned char>           uchar_vec_t;
 typedef uchar_vec_t                     sections_t;
 typedef QMap<uint, sections_t>          sections_map_t;
 
+typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
+typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
+
 void init_sections(sections_t &sect, uint last_section);
 
-class MPEGStreamData : public QObject
+class MPEGStreamData
 {
-    Q_OBJECT
   public:
     MPEGStreamData(int desiredProgram, bool cacheTables);
     virtual ~MPEGStreamData();
@@ -123,10 +122,18 @@ class MPEGStreamData : public QObject
     virtual void ReturnCachedTables(pmt_vec_t&) const;
     virtual void ReturnCachedTables(pmt_map_t&) const;
 
-  signals:
+    // "signals"
+    void AddMPEGListener(MPEGStreamListener*);
+    void RemoveMPEGListener(MPEGStreamListener*);
     void UpdatePAT(const ProgramAssociationTable*);
     void UpdateCAT(const ConditionalAccessTable*);
     void UpdatePMT(uint program_num, const ProgramMapTable*);
+
+    // Single Program Stuff, signals with processed tables
+    void AddMPEGSPListener(MPEGSingleProgramStreamListener*);
+    void RemoveMPEGSPListener(MPEGSingleProgramStreamListener*);
+    void UpdatePATSingleProgram(ProgramAssociationTable*);
+    void UpdatePMTSingleProgram(ProgramMapTable*);
 
   public:
     // Single program stuff, sets
@@ -163,11 +170,6 @@ class MPEGStreamData : public QObject
     bool CreatePATSingleProgram(const ProgramAssociationTable&);
     bool CreatePMTSingleProgram(const ProgramMapTable&);
 
-  signals:
-    // Single Program Stuff, signals with processed tables
-    void UpdatePATSingleProgram(ProgramAssociationTable*);
-    void UpdatePMTSingleProgram(ProgramMapTable*);
-
   protected:
     // Table processing -- for internal use
     PSIPTable* AssemblePSIP(const TSPacket* tspacket, bool& moreTablePackets);
@@ -197,6 +199,11 @@ class MPEGStreamData : public QObject
     QMap<uint, bool>          _pids_notlistening;
     QMap<uint, bool>          _pids_writing;
     QMap<uint, bool>          _pids_audio;
+
+    // Signals
+    mutable QMutex            _listener_lock;
+    mpeg_listener_vec_t       _mpeg_listeners;
+    mpeg_sp_listener_vec_t    _mpeg_sp_listeners;
 
     // Table versions
     int                       _pat_version;

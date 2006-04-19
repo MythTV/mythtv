@@ -52,7 +52,7 @@ DummyDTVRecorder::DummyDTVRecorder(TVRec *rec,
                                    uint non_buf_frames,
                                    uint bitrate,
                                    bool autoStart)
-    : DTVRecorder(rec, "DummyDTVRecorder"), _tsmode(tsmode),
+    : DTVRecorder(rec), _tsmode(tsmode),
       _desired_width(desired_width), _desired_height(desired_height),
       _desired_frame_rate(desired_frame_rate), _desired_bitrate(bitrate),
       _non_buf_frames(max(non_buf_frames,(uint)1)),
@@ -80,18 +80,6 @@ DummyDTVRecorder::~DummyDTVRecorder()
         delete [] _buffer;
         _buffer = NULL;
     }
-}
-
-void DummyDTVRecorder::deleteLater(void)
-{
-    StopRecordingThread();
-    Close();
-    if (_buffer)
-    {
-        delete [] _buffer;
-        _buffer = NULL;
-    }
-    DTVRecorder::deleteLater();
 }
 
 /** \fn DummyDTVRecorder::SetDesiredAttributes(uint,uint,double)

@@ -31,8 +31,8 @@ const uint DTVRecorder::kMaxKeyFrameDistance = 32;
  *  \sa DVBRecorder, HDTVRecorder, FirewireRecorder, DBox2Recorder
  */
 
-DTVRecorder::DTVRecorder(TVRec *rec, const char *name) : 
-    RecorderBase(rec, name),
+DTVRecorder::DTVRecorder(TVRec *rec) : 
+    RecorderBase(rec),
     // file handle for stream
     _stream_fd(-1),
     _recording_type("all"),

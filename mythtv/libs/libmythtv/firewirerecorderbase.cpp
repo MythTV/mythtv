@@ -16,32 +16,15 @@
 
 const int FirewireRecorderBase::kTimeoutInSeconds = 15;
 
-FirewireRecorderBase::FirewireRecorderBase(TVRec *rec, char const* name)  
-    : DTVRecorder(rec, name), 
-      _mpeg_stream_data(NULL) 
-{ 
-    _mpeg_stream_data = new MPEGStreamData(1, true); 
-    connect(_mpeg_stream_data, 
-            SIGNAL(UpdatePATSingleProgram(ProgramAssociationTable*)), 
-            this, SLOT(WritePAT(ProgramAssociationTable*))); 
-    connect(_mpeg_stream_data, 
-            SIGNAL(UpdatePMTSingleProgram(ProgramMapTable*)), 
-            this, SLOT(WritePMT(ProgramMapTable*))); 
-} 
-
-FirewireRecorderBase::~FirewireRecorderBase() 
-{ 
-   if (_mpeg_stream_data) 
-   { 
-       delete _mpeg_stream_data; 
-       _mpeg_stream_data = NULL; 
-   } 
-} 
-
-void FirewireRecorderBase::deleteLater(void)
+FirewireRecorderBase::FirewireRecorderBase(TVRec *rec)
+    : DTVRecorder(rec), _mpeg_stream_data(NULL)
 {
-    Close();
-    DTVRecorder::deleteLater();
+    SetStreamData(new MPEGStreamData(1, true));
+}
+
+FirewireRecorderBase::~FirewireRecorderBase()
+{
+    SetStreamData(NULL);
 }
 
 void FirewireRecorderBase::StartRecording(void) {
@@ -143,18 +126,23 @@ bool FirewireRecorderBase::PauseAndWait(int timeout)
     return paused;
 }
 
-void FirewireRecorderBase::SetStreamData(MPEGStreamData *stream_data) 
-{ 
-    if (stream_data == _mpeg_stream_data) 
-        return; 
- 
-    MPEGStreamData *old_data = _mpeg_stream_data; 
-    _mpeg_stream_data = stream_data; 
-    if (old_data) 
-        delete old_data; 
-} 
- 
-void FirewireRecorderBase::WritePAT(ProgramAssociationTable *pat) 
+void FirewireRecorderBase::SetStreamData(MPEGStreamData *data)
+{
+    if (data == _mpeg_stream_data)
+        return;
+
+    MPEGStreamData *old_data = _mpeg_stream_data;
+    _mpeg_stream_data = data;
+
+    if (data)
+        data->AddMPEGSPListener(this);
+
+    if (old_data)
+        delete old_data;
+}
+
+void FirewireRecorderBase::HandleSingleProgramPAT(
+    ProgramAssociationTable *pat) 
 { 
     if (!pat) 
         return; 
@@ -164,7 +152,7 @@ void FirewireRecorderBase::WritePAT(ProgramAssociationTable *pat)
     BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader()))); 
 } 
  
-void FirewireRecorderBase::WritePMT(ProgramMapTable *pmt) 
+void FirewireRecorderBase::HandleSingleProgramPMT(ProgramMapTable *pmt) 
 { 
     if (!pmt) 
         return; 

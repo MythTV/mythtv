@@ -5,25 +5,6 @@
 
 #include "mpegstreamdata.h"
 
-class PESPacket;
-class ProgramAssociationTable;
-class ProgramMapTable;
-class TSPacket_nonconst;
-class HDTVRecorder;
-class PSIPTable;
-class RingBuffer;
-class MasterGuideTable;
-class VirtualChannelTable;
-class TerrestrialVirtualChannelTable;
-class CableVirtualChannelTable;
-class EventInformationTable;
-class ExtendedTextTable;
-class SystemTimeTable;
-class CensorshipTable;
-class RatingRegionTable;
-class DirectedChannelChangeTable;
-class DirectedChannelChangeSelectionCodeTable;
-
 typedef vector<uint>                    uint_vec_t;
 typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
 typedef TerrestrialVirtualChannelTable* tvct_ptr_t;
@@ -33,9 +14,12 @@ typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
 typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
 typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
 
-class ATSCStreamData : public MPEGStreamData
+typedef vector<ATSCMainStreamListener*> atsc_main_listener_vec_t;
+typedef vector<ATSCAuxStreamListener*>  atsc_aux_listener_vec_t;
+typedef vector<ATSCEITStreamListener*>  atsc_eit_listener_vec_t;
+
+class ATSCStreamData : virtual public MPEGStreamData
 {
-    Q_OBJECT
   public:
     ATSCStreamData(int desiredMajorChannel,
                    int desiredMinorChannel,
@@ -99,30 +83,14 @@ class ATSCStreamData : public MPEGStreamData
     // Single channel stuff
     int DesiredMajorChannel(void) const { return _desired_major_channel; }
     int DesiredMinorChannel(void) const { return _desired_minor_channel; }
-  signals:
-    void UpdateMGT(   const MasterGuideTable*);
-    void UpdateSTT(   const SystemTimeTable*);
-    void UpdateRRT(   const RatingRegionTable*);
-    void UpdateDCCT(  const DirectedChannelChangeTable*);
-    void UpdateDCCSCT(const DirectedChannelChangeSelectionCodeTable*);
 
-    void UpdateVCT( uint pid, const VirtualChannelTable*);
-    void UpdateTVCT(uint pid, const TerrestrialVirtualChannelTable*);
-    void UpdateCVCT(uint pid, const CableVirtualChannelTable*);
-    void UpdateEIT( uint pid, const EventInformationTable*);
-    void UpdateETT( uint pid, const ExtendedTextTable*);
+    void AddATSCMainListener(ATSCMainStreamListener*);
+    void AddATSCAuxListener(ATSCAuxStreamListener*);
+    void AddATSCEITListener(ATSCEITStreamListener*);
 
-  private slots:
-    void PrintMGT(   const MasterGuideTable*) const;
-    void PrintSTT(   const SystemTimeTable*) const;
-    void PrintRRT(   const RatingRegionTable*) const;
-    void PrintDCCT(  const DirectedChannelChangeTable*) const;
-    void PrintDCCSCT(const DirectedChannelChangeSelectionCodeTable*) const;
-
-    void PrintTVCT(uint pid, const TerrestrialVirtualChannelTable*) const;
-    void PrintCVCT(uint pid, const CableVirtualChannelTable*) const;
-    void PrintEIT( uint pid, const EventInformationTable*) const;
-    void PrintETT( uint pid, const ExtendedTextTable*) const;
+    void RemoveATSCMainListener(ATSCMainStreamListener*);
+    void RemoveATSCAuxListener(ATSCAuxStreamListener*);
+    void RemoveATSCEITListener(ATSCEITStreamListener*);
 
   private:
     // Caching
@@ -133,6 +101,13 @@ class ATSCStreamData : public MPEGStreamData
 
   private:
     uint            _GPS_UTC_offset;
+
+    // Signals
+    atsc_main_listener_vec_t  _atsc_main_listeners;
+    atsc_aux_listener_vec_t   _atsc_aux_listeners;
+    atsc_eit_listener_vec_t   _atsc_eit_listeners;
+
+    // Table versions
     int             _mgt_version;
     QMap<uint, int> _tvct_version;
     QMap<uint, int> _cvct_version;

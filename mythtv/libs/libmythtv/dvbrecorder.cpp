@@ -82,7 +82,7 @@ const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
 #define LOC_ERR  QString("DVBRec(%1) Error: ").arg(_card_number_option)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
-    : DTVRecorder(rec, "DVBRecorder"),
+    : DTVRecorder(rec),
       _drb(NULL),
       // Options set in SetOption()
       _card_number_option(0),
@@ -144,12 +144,6 @@ void DVBRecorder::TeardownAll(void)
         delete _input_pmt;
         _input_pmt = NULL;
     }
-}
-
-void DVBRecorder::deleteLater(void)
-{
-    TeardownAll();
-    DTVRecorder::deleteLater();
 }
 
 void DVBRecorder::SetOption(const QString &name, int value)
@@ -235,13 +229,13 @@ void DVBRecorder::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
 }
 
-void DVBRecorder::SetStreamData(ATSCStreamData *stream_data)
+void DVBRecorder::SetStreamData(ATSCStreamData *data)
 {
-    if (stream_data == _atsc_stream_data)
+    if (data == _atsc_stream_data)
         return;
 
     ATSCStreamData *old_data = _atsc_stream_data;
-    _atsc_stream_data = stream_data;
+    _atsc_stream_data = data;
     if (old_data)
         delete old_data;
 }

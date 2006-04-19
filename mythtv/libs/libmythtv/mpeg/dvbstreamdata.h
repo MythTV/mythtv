@@ -5,24 +5,23 @@
 
 #include "mpegstreamdata.h"
 
-class PSIPTable;
-class NetworkInformationTable;
-class ServiceDescriptionTable;
-class DVBEventInformationTable;
-
 typedef NetworkInformationTable* nit_ptr_t;
 typedef vector<const nit_ptr_t>  nit_vec_t;
 typedef QMap<uint, nit_ptr_t>    nit_cache_t;
 
 typedef ServiceDescriptionTable* sdt_ptr_t;
 typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
-typedef QMap<uint, ServiceDescriptionTable*>    sdt_cache_t;
+typedef QMap<uint, sdt_ptr_t>    sdt_cache_t;
 
-class DVBStreamData : public MPEGStreamData
+typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
+typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
+typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
+
+class DVBStreamData : virtual public MPEGStreamData
 {
-    Q_OBJECT
   public:
     DVBStreamData(bool cacheTables = false);
+    ~DVBStreamData();
 
     void Reset();
 
@@ -128,27 +127,28 @@ class DVBStreamData : public MPEGStreamData
     const nit_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
     const sdt_ptr_t GetCachedSDT(uint tsid, uint section_num,
                                  bool current = true) const;
-    sdt_vec_t GetAllCachedSDTs(bool current = true) const;
+    const sdt_vec_t GetAllCachedSDTs(bool current = true) const;
 
     void ReturnCachedSDTTables(sdt_vec_t&) const;
 
-  signals:
-    void UpdateNIT(const NetworkInformationTable*);
-    void UpdateSDT(uint tsid, const ServiceDescriptionTable*);
+    void AddDVBMainListener(DVBMainStreamListener*);
+    void AddDVBOtherListener(DVBOtherStreamListener*);
+    void AddDVBEITListener(DVBEITStreamListener*);
 
-    void UpdateNITo(const NetworkInformationTable*);
-    void UpdateSDTo(uint tsid, const ServiceDescriptionTable*);
-
-    void UpdateEIT(const DVBEventInformationTable*);
-
-  private slots:
-    void PrintNIT(const NetworkInformationTable*) const;
-    void PrintSDT(uint tsid, const ServiceDescriptionTable*) const;
+    void RemoveDVBMainListener(DVBMainStreamListener*);
+    void RemoveDVBOtherListener(DVBOtherStreamListener*);
+    void RemoveDVBEITListener(DVBEITStreamListener*);
 
   private:
     // Caching
-    void CacheNIT(const NetworkInformationTable*);
-    void CacheSDT(const ServiceDescriptionTable*);
+    void CacheNIT(NetworkInformationTable*);
+    void CacheSDT(ServiceDescriptionTable*);
+
+  private:
+    // Signals
+    dvb_main_listener_vec_t   _dvb_main_listeners;
+    dvb_other_listener_vec_t  _dvb_other_listeners;
+    dvb_eit_listener_vec_t    _dvb_eit_listeners;
 
     // Table versions
     int                       _nit_version;
@@ -164,8 +164,8 @@ class DVBStreamData : public MPEGStreamData
     sections_map_t            _sdto_section_seen;
 
     // Caching
-    nit_cache_t               _cached_nit;
-    sdt_cache_t               _cached_sdts; // pid->sdt
+    nit_cache_t               _cached_nit;  // section -> sdt
+    sdt_cache_t               _cached_sdts; // tsid+section -> sdt
 };
 
 #endif // DVBSTREAMDATA_H_

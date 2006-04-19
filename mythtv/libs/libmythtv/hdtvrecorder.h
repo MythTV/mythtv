@@ -12,14 +12,10 @@
 
 #include "dtvrecorder.h"
 #include "tsstats.h"
+#include "streamlisteners.h"
 
 struct AVFormatContext;
 struct AVPacket;
-class ATSCStreamData;
-class ProgramAssociationTable;
-class ProgramMapTable;
-class VirtualChannelTable;
-class MasterGuideTable;
 
 /** \class HDTVRecorder
  *  \brief This is a specialization of DTVRecorder used to 
@@ -28,11 +24,13 @@ class MasterGuideTable;
  *
  *  \sa DTVRecorder, DVBRecorder
  */
-class HDTVRecorder : public DTVRecorder
+class HDTVRecorder : public DTVRecorder,
+                     public MPEGSingleProgramStreamListener,
+                     public ATSCMainStreamListener
 {
-    Q_OBJECT
     friend class ATSCStreamData;
     friend class TSPacketProcessor;
+
   public:
     enum {report_loops = 20000};
 
@@ -57,8 +55,12 @@ class HDTVRecorder : public DTVRecorder
     void SetStreamData(ATSCStreamData*);
     ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
 
-  public slots:
-    void deleteLater(void);
+    void HandleSingleProgramPAT(ProgramAssociationTable*);
+    void HandleSingleProgramPMT(ProgramMapTable*);
+
+    void HandleSTT(const SystemTimeTable*) {}
+    void HandleMGT(const MasterGuideTable*);
+    void HandleVCT(uint, const VirtualChannelTable*);
 
   private:
     void TeardownAll(void);
@@ -71,11 +73,6 @@ class HDTVRecorder : public DTVRecorder
     void fill_ringbuffer(void);
     int ringbuf_read(unsigned char *buffer, size_t count);
 
- private slots:
-    void WritePAT(ProgramAssociationTable*);
-    void WritePMT(ProgramMapTable*);
-    void ProcessMGT(const MasterGuideTable*);
-    void ProcessVCT(uint, const VirtualChannelTable*);
  private:
     ATSCStreamData* _atsc_stream_data;
 

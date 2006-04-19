@@ -5,21 +5,10 @@
 #include "dvbtables.h"
 
 ScanStreamData::ScanStreamData()
-    : ATSCStreamData(-1,-1, true), dvb(true)
+    : MPEGStreamData(-1, true),
+      ATSCStreamData(-1,-1, true),
+      DVBStreamData(true)
 {
-    setName("ScanStreamData");
-
-    // MPEG
-    connect(&dvb, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
-            SLOT(RelayPAT(const ProgramAssociationTable*)));
-    connect(&dvb, SIGNAL(UpdatePMT(uint, const ProgramMapTable*)),
-            SLOT(RelayPMT(uint, const ProgramMapTable*)));
-
-    // DVB
-    connect(&dvb, SIGNAL(UpdateNIT(const NetworkInformationTable*)),
-             SLOT(RelayNIT(const NetworkInformationTable*)));
-    connect(&dvb, SIGNAL(UpdateSDT(uint, const ServiceDescriptionTable*)),
-             SLOT(RelaySDT(uint, const ServiceDescriptionTable*)));
 }
 
 ScanStreamData::~ScanStreamData() { ; }
@@ -29,7 +18,8 @@ ScanStreamData::~ScanStreamData() { ; }
  */
 bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
-    return ATSCStreamData::IsRedundant(pid,psip) || dvb.IsRedundant(pid,psip);
+    return (ATSCStreamData::IsRedundant(pid,psip) ||
+            DVBStreamData::IsRedundant(pid,psip));
 }
 
 /** \fn ScanStreamData::HandleTables(uint, const PSIPTable&)
@@ -38,14 +28,15 @@ bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 bool ScanStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
     bool h0 = ATSCStreamData::HandleTables(pid, psip);
-    bool h1 = dvb.HandleTables(pid, psip);
+    bool h1 = DVBStreamData::HandleTables(pid, psip);
     return h0 || h1;
 }
 
 void ScanStreamData::Reset(void)
 {
+    MPEGStreamData::Reset(-1);
     ATSCStreamData::Reset(-1,-1);
-    dvb.Reset();
+    DVBStreamData::Reset();
 
     AddListeningPID(MPEG_PAT_PID);
     AddListeningPID(ATSC_PSIP_PID);
@@ -53,41 +44,20 @@ void ScanStreamData::Reset(void)
     AddListeningPID(DVB_SDT_PID);
 }
 
-QMap<uint, bool> ScanStreamData::ListeningPIDs(void) const
-{
-    QMap<uint, bool> a = ATSCStreamData::ListeningPIDs();
-    QMap<uint, bool> b = dvb.ListeningPIDs();
-
-    QMap<uint, bool>::const_iterator it = a.begin();
-    for (; it != a.end(); ++it)
-    {
-        if (*it)
-            b.remove(it.key());
-    }
-
-    for (it = b.begin(); it != b.end(); ++it)
-    {
-        if (*it)
-            a[it.key()] = true;
-    }
-
-    return a;
-}
-
 void ScanStreamData::ReturnCachedTable(const PSIPTable *psip) const
 {
     ATSCStreamData::ReturnCachedTable(psip);
-    dvb.ReturnCachedTable(psip);
+    DVBStreamData::ReturnCachedTable(psip);
 }
 
 void ScanStreamData::ReturnCachedTables(pmt_vec_t &x) const
 {
     ATSCStreamData::ReturnCachedTables(x);
-    dvb.ReturnCachedTables(x);
+    DVBStreamData::ReturnCachedTables(x);
 }
 
 void ScanStreamData::ReturnCachedTables(pmt_map_t &x) const
 {
     ATSCStreamData::ReturnCachedTables(x);
-    dvb.ReturnCachedTables(x);
+    DVBStreamData::ReturnCachedTables(x);
 }
