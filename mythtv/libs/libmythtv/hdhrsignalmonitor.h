@@ -8,6 +8,8 @@
 
 class HDHRChannel;
 
+typedef QMap<uint,int> FilterMap;
+
 class HDHRSignalMonitor: public DTVSignalMonitor
 {
     Q_OBJECT
@@ -18,6 +20,8 @@ class HDHRSignalMonitor: public DTVSignalMonitor
     virtual ~HDHRSignalMonitor();
 
     void Stop(void);
+
+    bool UpdateFiltersFromStreamData(void);
 
   public slots:
     void deleteLater(void);
@@ -37,6 +41,8 @@ class HDHRSignalMonitor: public DTVSignalMonitor
   protected:
     bool               dtvMonitorRunning;
     pthread_t          table_monitor_thread;
+
+    FilterMap          filters; ///< PID filters for table monitoring
 };
 
 #endif // HDHRSIGNALMONITOR_H

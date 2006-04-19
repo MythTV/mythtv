@@ -44,6 +44,10 @@ class HDHRChannel : public ChannelBase
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
+    bool AddPID(uint pid, bool do_update = true);
+    bool DelPID(uint pid, bool do_update = true);
+    bool DelAllPIDs(void);
+    bool UpdateFilters(void);
 
     // ATSC scanning stuff
     bool TuneMultiplex(uint mplexid);
@@ -65,11 +69,12 @@ class HDHRChannel : public ChannelBase
     QString TunerSet(const QString &name, const QString &value);
 
   private:
-    hdhr_socket_t *_control_socket;
-    uint           _device_id;
-    uint           _device_ip;
-    uint           _tuner;
-    mutable QMutex _lock;
+    hdhr_socket_t  *_control_socket;
+    uint            _device_id;
+    uint            _device_ip;
+    uint            _tuner;
+    vector<uint>    _pids;
+    mutable QMutex  _lock;
 };
 
 #endif

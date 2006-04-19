@@ -88,13 +88,53 @@ void *HDHRSignalMonitor::TableMonitorThread(void *param)
     return NULL;
 }
 
+bool HDHRSignalMonitor::UpdateFiltersFromStreamData(void)
+{
+    vector<int> add_pids;
+    vector<int> del_pids;
+
+    if (!GetStreamData())
+        return false;
+
+    const QMap<uint, bool> &listening = GetStreamData()->ListeningPIDs();
+
+    // PIDs that need to be added..
+    QMap<uint, bool>::const_iterator lit = listening.constBegin();
+    for (; lit != listening.constEnd(); ++lit)
+        if (lit.data() && (filters.find(lit.key()) == filters.end()))
+            add_pids.push_back(lit.key());
+
+    // PIDs that need to be removed..
+    FilterMap::const_iterator fit = filters.constBegin();
+    for (; fit != filters.constEnd(); ++fit)
+        if (listening.find(fit.key()) == listening.end())
+            del_pids.push_back(fit.key());
+
+    HDHRChannel *hdhr = dynamic_cast<HDHRChannel*>(channel);
+    // Remove PIDs
+    bool ok = true;
+    vector<int>::iterator dit = del_pids.begin();
+    for (; dit != del_pids.end(); ++dit)
+    {
+        ok &= hdhr->DelPID(*dit);
+        filters.erase(filters.find(*dit));
+    }
+
+    // Add PIDs
+    vector<int>::iterator ait = add_pids.begin();
+    for (; ait != add_pids.end(); ++ait)
+    {
+        ok &= hdhr->AddPID(*ait);
+        filters[*ait] = 1;
+    }
+
+    return ok;
+}
+
 void HDHRSignalMonitor::RunTableMonitor(void)
 {
     dtvMonitorRunning = true;
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- begin");
-
-#if 1
     struct hdhomerun_video_sock_t *_video_socket;
     _video_socket = hdhomerun_video_create();
     if (!_video_socket)
@@ -112,8 +152,14 @@ void HDHRSignalMonitor::RunTableMonitor(void)
         return;
     }
 
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): " +
+            QString("begin (# of pids %1)")
+            .arg(GetStreamData()->ListeningPIDs().size()));
+
     while (dtvMonitorRunning && GetStreamData())
     {
+        UpdateFiltersFromStreamData();
+
         struct hdhomerun_video_data_t data;
 
         int ret = hdhomerun_video_recv(_video_socket, &data, 100);
@@ -130,12 +176,6 @@ void HDHRSignalMonitor::RunTableMonitor(void)
 
     hdrc->DeviceClearTarget();
     hdhomerun_video_destroy(_video_socket);
-#else
-    AddFlags(kDTVSigMon_PATSeen | kDTVSigMon_PATMatch);
-    AddFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch);
-    AddFlags(kDTVSigMon_MGTSeen | kDTVSigMon_MGTMatch);
-    AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_VCTMatch);
-#endif
 
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- shutdown");
 

@@ -15,7 +15,7 @@
 #include <fcntl.h>
 
 // C++ includes
-#include <iostream>
+#include <algorithm>
 using namespace std;
 
 // MythTV includes
@@ -32,7 +32,7 @@ using namespace std;
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
     : ChannelBase(parent),      _control_socket(NULL),
       _device_id(0),            _device_ip(0),
-      _tuner(tuner)
+      _tuner(tuner),            _lock(true)
 {
     bool valid;
     _device_id = device.toUInt(&valid, 16);
@@ -474,4 +474,123 @@ bool HDHRChannel::SwitchToInput(int newInputNum, bool setstarting)
         return false;
 
     return SwitchToInput((*it)->name, (*it)->startChanNum);
+}
+
+bool HDHRChannel::AddPID(uint pid, bool do_update)
+{
+    QMutexLocker locker(&_lock);
+
+    vector<uint>::iterator it;
+    it = lower_bound(_pids.begin(), _pids.end(), pid);
+    if (it != _pids.end() && *it == pid)
+    {
+        //VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<") NOOP");
+        return true;
+    }
+
+    _pids.insert(it, pid);
+
+#if 0
+    VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<")");
+    for (uint i = 0; i < _pids.size(); i++)
+        VERBOSE(VB_CHANNEL, "PID#"<<i<<": 0x"<<hex<<_pids[i]<<dec);
+    VERBOSE(VB_CHANNEL, "");
+#endif
+
+    if (do_update)
+        return UpdateFilters();
+    return true;
+}
+
+bool HDHRChannel::DelPID(uint pid, bool do_update)
+{
+    QMutexLocker locker(&_lock);
+
+    vector<uint>::iterator it;
+    it = upper_bound(_pids.begin(), _pids.end(), pid);
+    if (it == _pids.end())
+    {
+        //VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") NOOP");
+        return true;
+    }
+
+    if (*it == pid)
+        _pids.erase(it);
+
+#if 0
+    VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<")");
+    for (uint i = 0; i < _pids.size(); i++)
+        VERBOSE(VB_CHANNEL, "PID#"<<i<<": 0x"<<hex<<_pids[i]<<dec);
+    VERBOSE(VB_CHANNEL, "");
+#endif
+    if (do_update)
+        return UpdateFilters();
+    return true;
+}
+
+bool HDHRChannel::DelAllPIDs(void)
+{
+    QMutexLocker locker(&_lock);
+
+    VERBOSE(VB_CHANNEL, "DelAllPID()");
+    _pids.clear();
+
+    return UpdateFilters();
+}
+
+bool HDHRChannel::UpdateFilters(void)
+{
+    QMutexLocker locker(&_lock);
+
+    QString filter = "";
+
+    vector<uint> range_min;
+    vector<uint> range_max;
+
+    for (uint i = 0; i < _pids.size(); i++)
+    {
+        uint pid_min = _pids[i];
+        uint pid_max  = pid_min;
+        for (uint j = i + 1; j < _pids.size(); j++)
+        {
+            if (pid_max + 1 != _pids[j])
+                break;
+            pid_max++;
+            i++;
+        }
+        range_min.push_back(pid_min);
+        range_max.push_back(pid_max);
+    }
+
+    if (range_min.size() > 16)
+    {
+        range_min.resize(16);
+        uint pid_max = range_max.back();
+        range_max.resize(15);
+        range_max.push_back(pid_max);
+    }
+
+    for (uint i = 0; i < range_min.size(); i++)
+    {
+        if (range_min[i] == range_max[i])
+            filter += QString("0x%1 ").arg(range_min[i],0,16);
+        else
+        {
+            filter += QString("0x%1-0x%2 ")
+                .arg(range_min[i],0,16).arg(range_max[i],0,16);
+        }
+    }
+
+    filter = filter.stripWhiteSpace();
+
+    VERBOSE(VB_CHANNEL, "Filter: '"<<filter<<"'");
+
+#if 0
+    QString new_filter = TunerSet("filter", filter);
+
+    VERBOSE(VB_CHANNEL, QString("Filter: '%1' : '%2'")
+            .arg(filter).arg(new_filter));
+    return filter == new_filter;
+#endif
+    return true;
 }

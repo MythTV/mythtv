@@ -203,8 +203,12 @@ void HDHRRecorder::WritePMT(ProgramMapTable* pmt)
 void HDHRRecorder::ProcessMGT(const MasterGuideTable *mgt)
 {
     //VERBOSE(VB_IMPORTANT, "ProcessMGT()");
-    for (unsigned int i=0; i<mgt->TableCount(); i++)
+    for (unsigned int i = 0; i < mgt->TableCount(); i++)
+    {
         GetStreamData()->AddListeningPID(mgt->TablePID(i));
+        _channel->AddPID(mgt->TablePID(i), false);
+    }
+    _channel->UpdateFilters();
 }
 
 /** \fn HDHRRecorder::ProcessVCT(uint, const VirtualChannelTable*)
