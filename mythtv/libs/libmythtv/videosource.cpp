@@ -1285,7 +1285,7 @@ class LNBLofHi: public LineEditSetting, public CISetting {
         setLabel(QObject::tr("LNB LOF High"));
         setValue("10600000");
         setHelpText(QObject::tr("This defines the offset (in Hz) the "
-                    "frequency coming from the lnb will be in high "
+                    "frequency coming from the LNB will be in high "
                     "setting."));
     };
 };
@@ -1297,7 +1297,7 @@ class LNBLofLo: public LineEditSetting, public CISetting {
         setLabel(QObject::tr("LNB LOF Low"));
         setValue("9750000");
         setHelpText(QObject::tr("This defines the offset (in Hz) the "
-                    "frequency coming from the lnb will be in low "
+                    "frequency coming from the LNB will be in low "
                     "setting."));
     };
 };
