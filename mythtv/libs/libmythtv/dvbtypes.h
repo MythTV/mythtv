@@ -454,25 +454,4 @@ class dvb_channel_t
 
 typedef map<uint16_t, ipack*> pid_ipack_t;
 
-#define ERROR(args...) \
-    VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(cardnum) << args);
-
-#define ERRNO(args...) \
-    VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(cardnum) << args\
-               << endl << QString("          (%1) ").arg(errno) << strerror(errno));
-
-#define WARNING(args...) \
-    VERBOSE(VB_GENERAL, QString("DVB#%1 WARNING - ").arg(cardnum) << args);
-
-#define GENERAL(args...) \
-    VERBOSE(VB_GENERAL, QString("DVB#%1 ").arg(cardnum) << args);
-
-#define CHANNEL(args...) \
-    VERBOSE(VB_CHANNEL, QString("DVB#%1 ").arg(cardnum) << args);
-
-#define ERROR_TUNING(args...) \
-    VERBOSE(VB_IMPORTANT, QString("DVB ERROR - ")<< args);
-#define WARNING_TUNING(args...) \
-    VERBOSE(VB_GENERAL, QString("DVB WARNING - ") << args);
-
 #endif // DVB_TYPES_H

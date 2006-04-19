@@ -374,6 +374,9 @@ bool equal_type(const struct dvb_frontend_parameters &p,
     return false;
 }
 
+#define LOC_WARN QString("DVBTuning Warning: ")
+#define LOC_ERR QString("DVBTuning Error: ")
+
 char DVBTuning::InversionChar() const
 {
     switch (params.inversion)
@@ -601,8 +604,10 @@ bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
     p.modulation = parseModulation(modulation, ok);
     if (QAM_AUTO == p.modulation)
     {
-        WARNING_TUNING(QString("Invalid modulationulation parameter '%1', "
-                               "falling back to '8-VSB'.").arg(modulation));
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                QString("Invalid modulationulation parameter '%1', "
+                        "falling back to '8-VSB'.").arg(modulation));
+
         p.modulation = VSB_8;
         ok = true;
     }
@@ -638,7 +643,10 @@ bool DVBTuning::parseOFDM(const QString& frequency,   const QString& inversion,
 
     params.inversion = parseInversion(inversion, ok);
     if (!ok)
-        WARNING_TUNING("Invalid inversion, aborting, falling back to 'auto'.");
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Invalid inversion, aborting, falling back to 'auto'.");
+    }
 
     p.bandwidth             = parseBandwidth(bandwidth,          ok);
     p.code_rate_HP          = parseCodeRate(coderate_hp,         ok);
@@ -668,20 +676,25 @@ bool DVBTuning::parseQPSK(const QString& frequency,   const QString& inversion,
 
     params.inversion = parseInversion(inversion, ok);
     if (!ok)
-        WARNING_TUNING("Invalid inversion, aborting, falling back to 'auto'");
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Invalid inversion, aborting, falling back to 'auto'");
+    }
 
     p.symbol_rate = symbol_rate.toInt();
     if (!p.symbol_rate)
     {
-        ERROR_TUNING(QString("Invalid symbol rate parameter '%1', aborting.")
-                     .arg(symbol_rate));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid symbol rate " +
+                QString("parameter '%1', aborting.").arg(symbol_rate));
+
         return false;
     }
 
     voltage = parsePolarity(pol, ok);
     if (SEC_VOLTAGE_OFF == voltage)
     {
-        ERROR_TUNING("Invalid polarization, aborting.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid polarization, aborting.");
+
         return false;
     }
 
@@ -716,13 +729,17 @@ bool DVBTuning::parseQAM(const QString& frequency, const QString& inversion,
 
     params.inversion = parseInversion(inversion, ok);
     if (!ok)
-        WARNING_TUNING("Invalid inversion, aborting, falling back to 'auto'");
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Invalid inversion, aborting, falling back to 'auto'");
+    }
 
     p.symbol_rate = symbol_rate.toInt();
     if (!p.symbol_rate)
     {
-        ERROR_TUNING(QString("Invalid symbol rate parameter '%1', aborting.")
-                     .arg(symbol_rate));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid symbol rate " +
+                QString("parameter '%1', aborting.").arg(symbol_rate));
+
         return false;
     }
 
@@ -745,8 +762,9 @@ fe_bandwidth DVBTuning::parseBandwidth(const QString &bw, bool &ok)
     }
     ok = false;
 
-    WARNING_TUNING(QString("Invalid bandwidth parameter '%1', "
-                           "falling back to 'auto'.").arg(bandwidth));
+    VERBOSE(VB_GENERAL, LOC_WARN +
+            QString("Invalid bandwidth parameter '%1', "
+                    "falling back to 'auto'.").arg(bandwidth));
 
     return BANDWIDTH_AUTO;
 }
@@ -777,8 +795,9 @@ fe_guard_interval DVBTuning::parseGuardInterval(const QString &gi, bool &ok)
 
     ok = false;
 
-    WARNING_TUNING(QString("Invalid guard interval parameter '%1', "
-                           "falling back to 'auto'.").arg(gi));
+    VERBOSE(VB_GENERAL, LOC_WARN +
+            QString("Invalid guard interval parameter '%1', "
+                    "falling back to 'auto'.").arg(gi));
 
     return GUARD_INTERVAL_AUTO;
 }
@@ -795,8 +814,9 @@ fe_transmit_mode DVBTuning::parseTransmission(const QString &tm, bool &ok)
     }
     ok = false;
 
-    WARNING_TUNING(QString("Invalid transmission mode parameter '%1', "
-                           "falling back to 'auto'.").arg(tm));
+    VERBOSE(VB_GENERAL, LOC_WARN +
+            QString("Invalid transmission mode parameter '%1', "
+                    "falling back to 'auto'.").arg(tm));
 
     return TRANSMISSION_MODE_AUTO;
 }
@@ -815,8 +835,9 @@ fe_hierarchy DVBTuning::parseHierarchy(const QString &hier, bool &ok)
     }
     ok = false;
 
-    WARNING_TUNING(QString("Invalid hierarchy parameter '%1', "
-                           "falling back to 'auto'.").arg(hier));
+    VERBOSE(VB_GENERAL, LOC_WARN +
+            QString("Invalid hierarchy parameter '%1', "
+                    "falling back to 'auto'.").arg(hier));
 
     return HIERARCHY_AUTO;
 }
@@ -852,8 +873,9 @@ fe_code_rate DVBTuning::parseCodeRate(const QString &cr, bool &ok)
 
     ok = false;
 
-    WARNING_TUNING(QString("Invalid code rate parameter '%1', "
-                           "falling back to 'auto'.").arg(cr));
+    VERBOSE(VB_GENERAL, LOC_WARN +
+            QString("Invalid code rate parameter '%1', "
+                    "falling back to 'auto'.").arg(cr));
 
     return FEC_AUTO;
 }
@@ -883,11 +905,14 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
 
     ok = false;
 
-    WARNING_TUNING(QString("Invalid constellation/modulation parameter '%1', "
-                           "falling back to 'auto'.").arg(mod));
+    VERBOSE(VB_GENERAL, LOC_WARN +
+            QString("Invalid constellation/modulation parameter '%1', "
+                    "falling back to 'auto'.").arg(mod));
 
     return QAM_AUTO;
 }
+#undef LOC_WARN
+#undef LOC_ERR
 
 bool dvb_channel_t::Parse(
     fe_type_t type,

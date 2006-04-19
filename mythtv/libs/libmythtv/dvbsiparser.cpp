@@ -60,7 +60,7 @@ DVBSIParser::DVBSIParser(DVBChannel *_channel, bool start_thread)
       selfStartedThread(false), pollLength(0), pollArray(NULL),
       filterChange(false)
 {
-    GENERAL("DVB SI Table Parser Started");
+    VERBOSE(VB_SIPARSER, LOC + "DVB SI Table Parser Started");
 
     siparser_thread = PTHREAD_CREATE_JOINABLE;
     if (start_thread)
@@ -134,19 +134,22 @@ void DVBSIParser::AddPid(uint pid,
 
     if (fd == -1)
     {
-        ERRNO(QString("Failed to open section filter (pid %1)").arg(pid));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open section filter " +
+                QString("(pid 0x%1)").arg(pid,0,16) + ENO);
         return;
     }
 
     if (ioctl(fd, DMX_SET_BUFFER_SIZE, sect_buf_size) < 0)
     {
-        ERRNO(QString("Failed to set demux buffer size (pid %1)").arg(pid));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux buffer size " +
+                QString("(pid 0x%1)").arg(pid,0,16) + ENO);
         return;
     }
 
     if (ioctl(fd, DMX_SET_FILTER, &params) < 0)
     {
-        ERRNO(QString("Failed to set section filter (pid %1)").arg(pid));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set section filter " +
+                QString("(pid 0x%1)").arg(pid,0,16) + ENO);
         return;
     }
 
@@ -265,7 +268,10 @@ void DVBSIParser::StartSectionReader(void)
         if (ret < 0)
         {
             if ((errno != EAGAIN) && (errno != EINTR))
-                ERRNO("Poll failed while waiting for Section");
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Poll failed while waiting for Section" + ENO);
+            }
         }
         else if (ret > 0)
         {
@@ -304,7 +310,7 @@ void DVBSIParser::StartSectionReader(void)
 
                 if (rsz < 0)
                 {
-                    ERRNO("Reading Section.");
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Reading Section." + ENO);
                 }
 
                 pollArray[i].events = POLLIN | POLLPRI;
