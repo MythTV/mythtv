@@ -17,7 +17,7 @@
 InteractiveTV::InteractiveTV(NuppelVideoPlayer *nvp)
     : m_context(new MHIContext(this)), m_nvp(nvp)
 {
-    Restart("", false);
+    Restart(0, 0, false);
 
     if (print_verbose_messages & VB_MHEG)
     {
@@ -35,9 +35,9 @@ InteractiveTV::~InteractiveTV()
 }
 
 // Start or restart the MHEG engine.
-void InteractiveTV::Restart(QString chanid, bool isLive)
+void InteractiveTV::Restart(uint chanid, uint cardid, bool isLive)
 {
-    m_context->Restart(chanid, isLive);
+    m_context->Restart(chanid, cardid, isLive);
 }
 
 // Called by the video player to see if the image needs to be updated

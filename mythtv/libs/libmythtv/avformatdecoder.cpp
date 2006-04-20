@@ -275,7 +275,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       ccd708(new CC708Decoder(parent)),
       ttd(new TeletextDecoder()),
       // Interactive TV
-      itv(new InteractiveTV(parent)),
+      itv(NULL),
       selectedVideoIndex(-1),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
@@ -300,6 +300,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 #endif
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
+    itv = GetNVP()->GetInteractiveTV();
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -316,7 +317,6 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ccd608;
     delete ccd708;
     delete ttd;
-    delete itv;
     delete d;
     if (audioSamples)
         delete [] audioSamples;
@@ -814,7 +814,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     {
         int initialAudio = -1, initialVideo = -1;
-        itv->GetInitialStreams(initialAudio, initialVideo);
+        if (itv)
+            itv->GetInitialStreams(initialAudio, initialVideo);
         if (initialAudio >= 0)
             SetAudioByComponentTag(initialAudio);
         if (initialVideo >= 0)
@@ -2107,12 +2108,6 @@ QString AvFormatDecoder::GetXDS(const QString &key) const
     return ccd608->GetXDS(key);
 }
 
-void AvFormatDecoder::ITVReset(const QRect &total, const QRect &visible)
-{
-    (void) visible;
-    itv->Reinit(total);
-}
-
 bool AvFormatDecoder::ITVUpdate(bool itvVisible)
 {
     QMutexLocker locker(&itvLock);
@@ -2123,6 +2118,9 @@ bool AvFormatDecoder::ITVUpdate(bool itvVisible)
 
     OSDSet *itvosd = osd->GetSet("interactive");
     if (!itvosd)
+        return itvVisible;
+
+    if (!itv)
         return itvVisible;
 
     bool visible = false;
@@ -2142,17 +2140,20 @@ bool AvFormatDecoder::ITVUpdate(bool itvVisible)
 bool AvFormatDecoder::ITVHandleAction(const QString &action)
 {
     QMutexLocker locker(&itvLock);
-    return itv->OfferKey(action);
+    if (itv)
+        return itv->OfferKey(action);
+    return false;
 }
 
-/* \fn AvFormatDecoder::ITVRestart(bool isLive)
- * \brief Restart the MHEG/MHP engine.
+/** \fn AvFormatDecoder::ITVRestart(uint,uint,bool)
+ *  \brief Restart the MHEG/MHP engine.
  */
-void AvFormatDecoder::ITVRestart(uint chanid, bool isLiveTV)
+void AvFormatDecoder::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
 {
     QMutexLocker locker(&itvLock);
-    QString chanidStr = (chanid) ? QString::number(chanid) : "-1";
-    itv->Restart(chanidStr, isLiveTV);
+    itv = GetNVP()->GetInteractiveTV();
+    if (itv)
+        itv->Restart(chanid, cardid, isLiveTV);
 }
 
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)

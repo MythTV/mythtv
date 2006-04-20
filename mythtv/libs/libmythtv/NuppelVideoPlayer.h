@@ -92,8 +92,7 @@ enum
     kDisplayCC708               = 0x10,
     kDisplayNUVCaptions         = kDisplayNUVTeletextCaptions | kDisplayCC608,
     kDisplayAllCaptions         = 0x1f,
-    kDisplayITV                 = 0x20,
-    kDisplayTeletextMenu        = 0x40,
+    kDisplayTeletextMenu        = 0x20,
 };
 
 class NuppelVideoPlayer : public CC608Reader, public CC708Reader
@@ -209,6 +208,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
     LiveTVChain *GetTVChain(void)             { return livetvchain; }
+    InteractiveTV *GetInteractiveTV(void);
 
     // Start/Reset/Stop playing
     void StartPlaying(void);
@@ -348,7 +348,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // MHEG/MHI stream selection
     bool ITVHandleAction(const QString &action);
-    void ITVRestart(uint chanid, bool isLiveTV);
+    void ITVRestart(uint chanid, uint cardid, bool isLiveTV);
     bool SetAudioByComponentTag(int tag);
     bool SetVideoByComponentTag(int tag);
 
@@ -617,6 +617,8 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Support for MHEG/MHI
     bool       itvVisible;
+    InteractiveTV *interactiveTV;
+    bool       itvEnabled;
 
     // OSD stuff
     OSD      *osd;

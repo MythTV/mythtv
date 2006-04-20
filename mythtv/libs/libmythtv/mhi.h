@@ -45,7 +45,7 @@ class MHIContext : public MHContext
     void QueueDSMCCPacket(unsigned char *data, int length, int componentTag,
         unsigned carouselId, int dataBroadcastId);
     /// Restart the MHEG engine.
-    void Restart(QString chanid, bool isLive);
+    void Restart(uint chanid, uint cardid, bool isLive);
     // Offer a key press.  Returns true if it accepts it.
     // This will depend on the current profile.
     bool OfferKey(QString key);
@@ -164,6 +164,7 @@ class MHIContext : public MHContext
 
     int              m_currentChannel;
     bool             m_isLive;
+    int              m_currentCard;
 
     int              m_audioTag;
     int              m_videoTag;

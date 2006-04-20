@@ -210,6 +210,7 @@ void TV::InitKeys(void)
     REG_KEY("ITV Menu", "MENUYELLOW", "Menu Yellow", "F4");
     REG_KEY("ITV Menu", "MENUBLUE",   "Menu Blue",   "F5");
     REG_KEY("ITV Menu", "TEXTEXIT",   "Menu Exit",   "F6");
+    REG_KEY("ITV Menu", "MENUTEXT",   "Menu Text",   "F7");
 /*
   keys already used:
 
@@ -234,7 +235,7 @@ void TV::InitKeys(void)
   Global:          F1,
   Playback: Ctrl-B,                  F7,F8,F9,F10,F11
   Teletext            F2,F3,F4,F5,F6,F7,F8
-  ITV                 F2,F3,F4,F5,F6
+  ITV                 F2,F3,F4,F5,F6,F7
  */
 }
 
@@ -1925,7 +1926,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     // Interactive television
-    if (activenvp && (activenvp->GetCaptionMode() == kDisplayITV))
+    if (activenvp && activenvp->GetInteractiveTV())
     {
         QStringList itv_actions;
         if (gContext->GetMainWindow()->TranslateKeyPress(
@@ -3766,6 +3767,8 @@ void TV::SwitchCards(uint chanid, QString channum)
     // If activenvp is main nvp, show input in on-screen-display
     if (nvp && activenvp == nvp)
         UpdateOSDInput();
+
+    ITVRestart(true);
 }
 
 void TV::ToggleInputs(void)
@@ -7054,6 +7057,7 @@ void TV::SetCurrentlyPlaying(ProgramInfo *pginfo)
 void TV::ITVRestart(bool isLive)
 {
     uint chanid = 0;
+    uint cardid = 0;
 
     if (activenvp != nvp || paused || !GetOSD())
         return;
@@ -7061,9 +7065,13 @@ void TV::ITVRestart(bool isLive)
     pbinfoLock.lock();
     if (playbackinfo)
         chanid = playbackinfo->chanid.toUInt();
+
+    if (activerecorder)
+        cardid = activerecorder->GetRecorderNumber();
+
     pbinfoLock.unlock();
 
-    nvp->ITVRestart(chanid, isLive);
+    nvp->ITVRestart(chanid, cardid, isLive);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

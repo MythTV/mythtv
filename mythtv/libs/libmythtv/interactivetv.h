@@ -15,7 +15,7 @@ class InteractiveTV
     InteractiveTV(NuppelVideoPlayer *nvp);
     virtual ~InteractiveTV();
 
-    void Restart(QString chanid, bool isLive);
+    void Restart(uint chanid, uint cardid, bool isLive);
     // Process an incoming DSMCC packet.
     void ProcessDSMCCSection(unsigned char *data, int length,
                              int componentTag, unsigned carouselId,

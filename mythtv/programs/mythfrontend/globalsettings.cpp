@@ -1080,6 +1080,18 @@ static HostCheckBox *DefaultCCMode()
     return gc;
 }
 
+static HostCheckBox *EnableMHEG()
+{
+    HostCheckBox *gc = new HostCheckBox("EnableMHEG");
+    gc->setLabel(QObject::tr("Enable Interactive TV"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr(
+                        "If enabled, interactive TV applications (MHEG) will "
+                        "be activated.  This is used for teletext and logos for "
+                        "radio and channels that are currently off-air."));
+    return gc;
+}
+
 static HostCheckBox *PersistentBrowseMode()
 {
     HostCheckBox *gc = new HostCheckBox("PersistentBrowseMode");
@@ -3327,6 +3339,7 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
     osd->addChild(PersistentBrowseMode());
+    osd->addChild(EnableMHEG());
     addChild(osd);
 
     addChild(OSDCC708Settings());

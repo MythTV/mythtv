@@ -41,6 +41,7 @@ using namespace std;
 #include "DVDRingBuffer.h"
 #include "NuppelVideoRecorder.h"
 #include "tv_play.h"
+#include "interactivetv.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -176,6 +177,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
 
       // MHEG/MHI Interactive TV visible in OSD
       itvVisible(false),
+      interactiveTV(NULL),
+      itvEnabled(false),
 
       // OSD stuff
       osd(NULL),                    timedisplay(NULL),
@@ -249,6 +252,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
     m_DeintSetting   = gContext->GetNumSetting("Deinterlace", 0);
     decode_extra_audio=gContext->GetNumSetting("DecodeExtraAudio", 0);
+    itvEnabled       = gContext->GetNumSetting("EnableMHEG", 0);
 
     lastIgnoredManualSkip = QDateTime::currentDateTime().addSecs(-10);
 
@@ -294,6 +298,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     }
 
     SetDecoder(NULL);
+
+    if (interactiveTV)
+        delete interactiveTV;
 
     if (FiltMan)
         delete FiltMan;
@@ -536,9 +543,10 @@ void NuppelVideoPlayer::ReinitOSD(void)
         videoOutput->GetOSDBounds(total, visible, aspect, scaling);
         if (osd)
             osd->Reinit(total, frame_interval, visible, aspect, scaling);
-        if (decoder)
+
+        if (GetInteractiveTV())
         {
-            decoder->ITVReset(total, visible);
+            GetInteractiveTV()->Reinit(total);
             itvVisible = false;
         }
     }
@@ -2325,7 +2333,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         DisplayDVDButton();
 
     // handle Interactive TV
-    if ((textDisplayMode & kDisplayITV) && GetDecoder())
+    if (GetInteractiveTV() && GetDecoder())
         itvVisible = GetDecoder()->ITVUpdate(itvVisible);
 
     // handle EIA-608 and Teletext
@@ -2890,6 +2898,9 @@ void NuppelVideoPlayer::StartPlaying(void)
             tt_view->SetDisplaying(false);
         }
         GetOSD()->HideSet("teletext");
+
+        if (GetInteractiveTV())
+            GetInteractiveTV()->Reinit(total);
     }
 
     playing = true;
@@ -5485,9 +5496,16 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     return ret;
 }
 
+InteractiveTV *NuppelVideoPlayer::GetInteractiveTV(void)
+{
+    if (!interactiveTV && osd && itvEnabled)
+        interactiveTV = new InteractiveTV(this);
+    return interactiveTV;
+}
+
 bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
 {
-    if (!(textDisplayMode & kDisplayITV))
+    if (!GetInteractiveTV())
         return false;
 
     if (GetDecoder())
@@ -5496,10 +5514,10 @@ bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
     return false;
 }
 
-/* \fn NuppelVideoPlayer::ITVRestart(bool isLive)
- * \brief Restart the MHEG/MHP engine.
+/** \fn NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLive)
+ *  \brief Restart the MHEG/MHP engine.
  */
-void NuppelVideoPlayer::ITVRestart(uint chanid, bool isLiveTV)
+void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
 {
     OSD *osd = GetOSD();
     if (!GetDecoder() || !osd)
@@ -5512,7 +5530,7 @@ void NuppelVideoPlayer::ITVRestart(uint chanid, bool isLiveTV)
         return;
     }
 
-    GetDecoder()->ITVRestart(chanid, isLiveTV);
+    GetDecoder()->ITVRestart(chanid, cardid, isLiveTV);
         
     osd->ClearAll("interactive");
     itvosd->Display();
