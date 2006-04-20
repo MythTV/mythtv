@@ -99,7 +99,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _ts_packets_until_psip_sync(0),
       // Fake video
       _video_stream_fd(-1),
-      _video_pid(DUMMY_VIDEO_PID),
+      _dummy_output_video_pid(0),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -327,7 +327,7 @@ bool DVBRecorder::OpenFilters(void)
     CloseFilters();
 
     QMutexLocker change_lock(&_pid_lock);
-    _video_pid = 0;
+    _dummy_output_video_pid = 0;
 
     if (!_input_pmt)
     {
@@ -365,11 +365,11 @@ bool DVBRecorder::OpenFilters(void)
         info->isVideo = true;
 
         QMutexLocker change_lock(&_pid_lock);    
-        _video_pid = DUMMY_VIDEO_PID;
-        _pid_infos[_video_pid] = info;
+        _dummy_output_video_pid = _input_pmt->FindUnusedPID(DUMMY_VIDEO_PID);
+        _pid_infos[_dummy_output_video_pid] = info;
     }
     else
-        _video_pid = video_pids[0];
+        _dummy_output_video_pid = video_pids[0];
 
     _video_header_pos = 0;
     _audio_header_pos = 0;
@@ -595,7 +595,7 @@ void DVBRecorder::CreatePMT(void)
         uint pid = _input_pmt->StreamPID(i);
         pids.push_back(pid);
         types.push_back(type);
-        if (pid == _video_pid)
+        if (pid == _dummy_output_video_pid)
             addVideoPid = false;
     }
 
@@ -603,7 +603,7 @@ void DVBRecorder::CreatePMT(void)
     {
         desc_list_t dummy;
         pdesc.push_back(dummy);
-        pids.push_back(_video_pid);
+        pids.push_back(_dummy_output_video_pid);
         types.push_back(StreamID::MPEG2Video);
     }
 
@@ -994,7 +994,7 @@ void DVBRecorder::CreateVideoFrame(void)
         if (pkt->PID() != DUMMY_VIDEO_PID)
             continue; // Skip the tables
 
-        pkt->SetPID(_video_pid);
+        pkt->SetPID(_dummy_output_video_pid);
 
         // Find the time-stamp field and overwrite it.
         if (pkt->PayloadStart())

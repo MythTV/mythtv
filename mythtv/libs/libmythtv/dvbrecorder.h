@@ -149,7 +149,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     uint            _ts_change_count;
     int             _video_stream_fd;
     double          _frames_per_sec;
-    uint            _video_pid;
+    uint            _dummy_output_video_pid;
     pthread_t       _video_thread;
     bool            _stop_dummy;
     bool            _dummy_stopped;

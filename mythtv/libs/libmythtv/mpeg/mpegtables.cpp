@@ -373,6 +373,29 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
     return pids.size();
 }
 
+uint ProgramMapTable::FindUnusedPID(uint desired_pid)
+{
+    uint pid = desired_pid;
+    while (FindPID(pid) >= 0)
+        pid += 0x10;
+
+    if (desired_pid <= 0x1fff)
+        return pid;
+
+    pid = desired_pid;
+    while (FindPID(desired_pid) >= 0)
+        desired_pid += 1;
+
+    if (desired_pid <= 0x1fff)
+        return pid;
+
+    pid = 0x20;
+    while (FindPID(desired_pid) >= 0)
+        desired_pid += 1;
+
+    return desired_pid & 0x1fff;
+}
+
 const QString PSIPTable::toString() const
 {
     QString str;

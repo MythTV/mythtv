@@ -552,6 +552,7 @@ class ProgramMapTable : public PSIPTable
                 return i;
         return -1;
     }
+    uint FindUnusedPID(uint desired_pid = 0x20);
 
     void RemoveAllStreams(void)
     {
