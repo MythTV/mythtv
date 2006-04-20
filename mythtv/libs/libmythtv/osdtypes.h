@@ -338,7 +338,8 @@ class OSDTypeImage : public OSDType
     bool m_onlyusefirst;
     bool m_dontround;
 
-    OSDImageCache cache;
+    static OSDImageCache  c_cache;
+    OSDImageCacheValue   *m_cacheitem;
 };
 
 class OSDTypePosSlider : public OSDTypeImage
