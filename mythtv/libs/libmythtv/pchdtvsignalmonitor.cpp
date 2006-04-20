@@ -108,8 +108,8 @@ void pcHDTVSignalMonitor::RunTableMonitor()
 
         len += remainder;
         remainder = GetStreamData()->ProcessData(buffer, len);
-        if (remainder > 0) // leftover bytes
-            memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
+        if (remainder > 0 && (len > remainder)) // leftover bytes
+            memmove(buffer, &(buffer[len - remainder]), remainder);
     }
     DBG_SM("RunTableMonitor()", "end");
 }
