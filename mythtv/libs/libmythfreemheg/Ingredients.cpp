@@ -256,14 +256,28 @@ void MHSetData::Initialise(MHParseNode *p, MHEngine *engine)
         m_fIsIncluded = false;
         m_fSizePresent = m_fCCPriorityPresent = false;
         m_Referenced.Initialise(pContent->GetSeqN(0), engine);
-        if (pContent->GetSeqCount() > 1 && pContent->GetSeqN(1)->m_nNodeType == MHParseNode::PNInt) {
-            // It may be NULL as a place-holder
-            m_fSizePresent = true;
-            m_ContentSize.Initialise(pContent->GetSeqN(1), engine);
+
+        if (pContent->GetSeqCount() > 1) {
+            MHParseNode *pArg = pContent->GetSeqN(1);
+            if (pArg->m_nNodeType == MHParseNode::PNTagged && pArg->GetTagNo() == C_NEW_CONTENT_SIZE) {
+                MHParseNode *pVal = pArg->GetArgN(0);
+                // It may be NULL as a place-holder
+                if (pVal->m_nNodeType == MHParseNode::PNInt) {
+                    m_fSizePresent = true;
+                    m_ContentSize.Initialise(pVal, engine);
+                }
+            }
         }
+
         if (pContent->GetSeqCount() > 2) {
-            m_fCCPriorityPresent = true;
-            m_CCPriority.Initialise(pContent->GetSeqN(2), engine);
+            MHParseNode *pArg = pContent->GetSeqN(2);
+            if (pArg->m_nNodeType == MHParseNode::PNTagged && pArg->GetTagNo() == C_NEW_CONTENT_CACHE_PRIO) {
+                MHParseNode *pVal = pArg->GetArgN(0);
+                if (pVal->m_nNodeType == MHParseNode::PNInt) {
+                    m_fCCPriorityPresent = true;
+                    m_CCPriority.Initialise(pVal, engine);
+                }
+            }
         }
     }
     else {
@@ -277,9 +291,14 @@ void MHSetData::PrintArgs(FILE *fd, int) const
     if (m_fIsIncluded) m_Included.PrintMe(fd, 0);
     else {
         m_Referenced.PrintMe(fd, 0);
-        if (m_fSizePresent) m_ContentSize.PrintMe(fd, 0);
-        else if (m_fCCPriorityPresent) fprintf(fd, " NULL ");
-        if (m_fCCPriorityPresent) m_CCPriority.PrintMe(fd, 0);
+        if (m_fSizePresent){
+            fprintf(fd, " :NewContentSize ");
+            m_ContentSize.PrintMe(fd, 0);
+        }
+        if (m_fCCPriorityPresent) {
+            fprintf(fd, " :NewCCPriority ");
+            m_CCPriority.PrintMe(fd, 0);
+        }
     }
 }
 
