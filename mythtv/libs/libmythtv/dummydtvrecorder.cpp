@@ -125,7 +125,8 @@ void DummyDTVRecorder::StartRecording(void)
     // TRANSFER DATA
     while (_request_recording || _frames_seen_count <= 5)
     {
-        len = read(_stream_fd, &(_buffer[remainder]), _buffer_size - remainder);
+        len = read(_stream_fd, &(_buffer[remainder]),
+                   _buffer_size - remainder);
 
         if (len == 0)
         {
@@ -137,9 +138,8 @@ void DummyDTVRecorder::StartRecording(void)
 
         len += remainder;
         remainder = ProcessData(_buffer, len);
-        if (remainder > 0) // leftover bytes
-            memmove(_buffer, &(_buffer[_buffer_size - remainder]),
-                    remainder);
+        if (remainder > 0 && (len > remainder)) // leftover bytes
+            memmove(_buffer, &(_buffer[len - remainder]), remainder);
     }
 
     FinishRecording();
