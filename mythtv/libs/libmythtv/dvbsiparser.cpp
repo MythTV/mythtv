@@ -170,8 +170,6 @@ void DVBSIParser::DelPid(uint pid)
     PIDFDMap::Iterator it;
     int x = 0;
 
-    VERBOSE(VB_SIPARSER, LOC + QString("Deleting PID %1").arg(pid,4,16));
-
     filterChange = true;
 
     QMutexLocker locker(&pollLock);
@@ -190,6 +188,8 @@ void DVBSIParser::DelPid(uint pid)
 
     if (stack.isEmpty())
        return;
+
+    VERBOSE(VB_SIPARSER, LOC + QString("Deleting PID %1").arg(pid,4,16));
 
     while (!stack.isEmpty())
     {
