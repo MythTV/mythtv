@@ -415,7 +415,6 @@ void TVMenuCallback(void *data, QString &selection)
     {
         GeneralRecPrioritiesSettings settings;
         settings.exec();
-        ScheduledRecording::signalChange(0);
     } 
     else if (sel == "settings channelrecpriorities") 
     {
@@ -437,6 +436,10 @@ void TVMenuCallback(void *data, QString &selection)
 
         gContext->ActivateSettingsCache(true);
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+
+        if (sel == "settings general" ||
+            sel == "settings generalrecpriorities")
+            ScheduledRecording::signalChange(0);
     }
 }
 
