@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef MPEGRECORDER_H_
 #define MPEGRECORDER_H_
 
@@ -15,35 +17,35 @@ class MpegRecorder : public RecorderBase
 
     void SetOption(const QString &opt, int value);
     void SetOption(const QString &name, const QString &value);
-    void SetVideoFilters(QString &filters);
+    void SetVideoFilters(QString&) {}
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev, 
                                const QString &audiodev,
                                const QString &vbidev);
 
-    void Initialize(void);
+    void Initialize(void) {}
     void StartRecording(void);
     void StopRecording(void);
     void Reset(void);
 
     void Pause(bool clear = true);
 
-    bool IsRecording(void);
+    bool IsRecording(void) { return recording; }
     bool IsErrored(void) { return errored; }
 
-    long long GetFramesWritten(void);
+    long long GetFramesWritten(void) { return framesWritten; }
 
     bool Open(void);
-    int GetVideoFd(void);
+    int GetVideoFd(void) { return chanfd; }
 
     long long GetKeyframePosition(long long desired);
 
     void SetNextRecording(const ProgramInfo*, RingBuffer*);
 
   private:
-    bool SetupRecording();
-    void FinishRecording();
+    bool SetupRecording(void);
+    void FinishRecording(void);
     void HandleKeyframe(void);
     void SavePositionMap(bool force);
 
@@ -54,45 +56,53 @@ class MpegRecorder : public RecorderBase
 
     void ResetForNewFile(void);
 
-    bool errored;
     bool deviceIsMpegFile;
     int bufferSize;
 
+    // State
     bool recording;
     bool encoding;
+    bool errored;
 
+    // Pausing state
     bool paused;
     bool mainpaused;
     bool cleartimeonpause;
 
+    // Number of frames written
     long long framesWritten;
 
+    // Encoding info
     int width, height;
     int bitrate, maxbitrate, streamtype, aspectratio;
     int audtype, audsamplerate, audbitratel1, audbitratel2;
     int audvolume;
 
+    // Input file descriptors
     int chanfd;
     int readfd;
 
+    // Keyframe tracking inforamtion
     int keyframedist;
     bool gopset;
-
-    QMutex                     positionMapLock;
-    QMap<long long, long long> positionMap;
-    QMap<long long, long long> positionMapDelta;
-
-    static const int audRateL1[];
-    static const int audRateL2[];
-    static const char* streamType[];
-    static const char* aspectRatio[];
-
     unsigned int leftovers;
     long long lastpackheaderpos;
     long long lastseqstart;
     long long numgops;
 
+    // Position map support
+    QMutex                     positionMapLock;
+    QMap<long long, long long> positionMap;
+    QMap<long long, long long> positionMapDelta;
+
+    // buffer used for ...
     unsigned char *buildbuffer;
     unsigned int buildbuffersize;
+
+    static const int   audRateL1[];
+    static const int   audRateL2[];
+    static const char *streamType[];
+    static const char *aspectRatio[];
+    static const unsigned int kBuildBufferMaxSize;
 };
 #endif
