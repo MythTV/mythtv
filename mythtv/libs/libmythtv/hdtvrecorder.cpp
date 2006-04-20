@@ -615,9 +615,8 @@ void HDTVRecorder::StartRecording(void)
 
         len += remainder;
         remainder = ProcessData(_buffer, len);
-        if (remainder > 0) // leftover bytes
-            memmove(_buffer, &(_buffer[_buffer_size - remainder]),
-                    remainder);
+        if (remainder > 0 && (len > remainder)) // leftover bytes
+            memmove(_buffer, &(_buffer[len - remainder]), remainder);
     }
 
     FinishRecording();

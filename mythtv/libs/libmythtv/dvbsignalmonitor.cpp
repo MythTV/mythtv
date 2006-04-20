@@ -352,8 +352,8 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
 
         len += remainder;
         remainder = GetStreamData()->ProcessData(buffer, len);
-        if (remainder > 0) // leftover bytes
-            memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
+        if (remainder > 0 && (len > remainder)) // leftover bytes
+            memmove(buffer, &(buffer[len - remainder]), remainder);
     }
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "shutdown");
 
