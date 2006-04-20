@@ -1175,8 +1175,8 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
         {
             long long frame = GetDecoder()->GetFramesRead() + real_skip;
             GetDecoder()->DoFastForward(frame, false);
-            stopFFREW = (CalcMaxFFTime(100, false) < 100);
         }
+        stopFFREW = (CalcMaxFFTime(100, false) < 100);
     }
     else if (CalcRWTime(-ffrew_skip) >= 0)
     {
