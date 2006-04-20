@@ -7,16 +7,15 @@
 #ifndef DBOX2EPG_H_
 #define DBOX2EPG_H_
 
+// Qt headers
 #include <qmap.h>
-#include <qhttp.h>
 #include <qobject.h>
 #include <qthread.h>
+#include <qdatetime.h>
 
-#include "mythcontext.h"
-#include "tv_rec.h"
-#include "dbox2channel.h"
-
+class QHttp;
 class DBox2Channel;
+class DBox2DBOptions;
 
 class DBox2EPG : public QObject, public QThread
 {
@@ -28,9 +27,8 @@ class DBox2EPG : public QObject, public QThread
 
     void Init(DBox2DBOptions* dbox2_options, int cardid, 
               DBox2Channel* channel);
-    void RequestEPG(const QString& channelNumber);
     void ScheduleRequestEPG(const QString& channelNumber);
-    void Shutdown();
+    void Shutdown(void);
 
   public slots:
     void httpRequestFinished(int requestID, bool error);
@@ -48,8 +46,9 @@ class DBox2EPG : public QObject, public QThread
         const QByteArray &buffer, int &pos, int size);
     static bool UseOnAirGuide(uint chanid);
 
+    void RequestEPG(const QString& channelNumber);
     int  GetChannelID(const QString& channelnumber);
-    void run();
+    void run(void);
 
     QHttp             *http;
     DBox2DBOptions    *m_dbox2options;

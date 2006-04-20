@@ -4,15 +4,23 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <qdeepcopy.h>
 #include <qdatetime.h>
+#include <qhttp.h>
+
+#include "dbox2channel.h"
 #include "dbox2epg.h"
-#include "mythdbcon.h"
+#include "mythcontext.h"
+#include "tv_rec.h"
 
 #define DEBUG_DBOX2EPG
 //#define DEBUG_DBOX2EPG_SHOWS
 //#define DEBUG_DBOX2EPG_PARSER
 
-#define LOC QString("DBOXEPG#%1: ").arg(m_cardid)
+#define LOC      QString("DBox2EPG(%1): ").arg(m_cardid)
+#define LOC_WARN QString("DBox2EPG(%1) Warning: ").arg(m_cardid)
+#define LOC_ERR  QString("DBox2EPG(%1) Error: ").arg(m_cardid)
+
 DBox2EPG::DBox2EPG()
     : http(new QHttp()),
       m_dbox2options(NULL),
@@ -53,7 +61,7 @@ void DBox2EPG::TeardownAll(void)
         // Abort any pending http operation
         http->abort();
         http->closeConnection();
-        // Disconnect from http 
+        // Disconnect from http
         disconnect(http, SIGNAL(requestFinished    (int,bool)),
                    this, SLOT(  httpRequestFinished(int,bool)));
         // Delete http
@@ -64,7 +72,7 @@ void DBox2EPG::TeardownAll(void)
 void DBox2EPG::Init(DBox2DBOptions* dbox2_options, int cardid,
                     DBox2Channel* channel)
 {
-    VERBOSE(VB_RECORD, LOC + "Init run");
+    VERBOSE(VB_EIT, LOC + "Init run");
 
     m_dbox2options = dbox2_options;
     m_dbox2channel = channel;
@@ -80,22 +88,22 @@ void DBox2EPG::Shutdown()
     m_isRunning = false;
 }
 
-void DBox2EPG::run() 
+void DBox2EPG::run()
 {
-    VERBOSE(VB_RECORD, LOC + "Starting Thread....");
+    VERBOSE(VB_EIT, LOC + "Starting Thread....");
     long waitTime = 15 * 1000 * 1000;
 
     // Process all channel ids and retrieve EPG
-    while (m_isRunning) 
+    while (m_isRunning)
     {
         usleep(1000);
 
         // If operation is in progress, do not request epg
         if (!m_pendingRequest)
-	    continue;
+            continue;
 
         // Wait before processing
-	usleep(waitTime);
+        usleep(waitTime);
 
         int chanid = GetChannelID(m_requestedChannel);
 
@@ -103,45 +111,45 @@ void DBox2EPG::run()
         if (chanid < 0)
             continue;
 
-	// Only grab the EPG for this channel if useonairguide is set to 1
-	if (UseOnAirGuide((uint)chanid))
+        // Only grab the EPG for this channel if useonairguide is set to 1
+        if (UseOnAirGuide((uint)chanid))
         {
             RequestEPG(m_requestedChannel);
             m_pendingRequest = false;
         }
-	else
+        else
         {
-            VERBOSE(VB_RECORD, LOC + QString("EPG disabled for %1.")
+            VERBOSE(VB_EIT, LOC + QString("EPG disabled for %1.")
                     .arg(m_requestedChannel));
             m_dbox2channel->EPGFinished();
         }
     }
-    VERBOSE(VB_RECORD, LOC + "Exiting Thread....");
+    VERBOSE(VB_EIT, LOC + "Exiting Thread....");
 }
 
 
-void DBox2EPG::ScheduleRequestEPG(const QString& channelNumber) 
+void DBox2EPG::ScheduleRequestEPG(const QString& channelNumber)
 {
-    m_requestedChannel = channelNumber;
+    m_requestedChannel = QDeepCopy<QString>(channelNumber);
     m_pendingRequest = true;
 }
 
 void DBox2EPG::RequestEPG(const QString& channelNumber)
 {
-    // Prepare request 
+    // Prepare request
     QString requestString, channelName, dbox2ChannelID;
     channelName    = m_dbox2channel->GetChannelNameFromNumber(channelNumber);
     dbox2ChannelID = m_dbox2channel->GetChannelID(channelName);
     requestString  = QString("/control/epg?id=%1").arg(dbox2ChannelID);
 
-    VERBOSE(VB_RECORD, LOC +
+    VERBOSE(VB_EIT, LOC +
             QString("Requesting EPG for channel %2 (%3): %4%5")
-	    .arg(m_cardid)
-	    .arg(channelNumber)
-	    .arg(channelName)
-	    .arg(m_dbox2options->host)
-	    .arg(requestString));
-    
+            .arg(m_cardid)
+            .arg(channelNumber)
+            .arg(channelName)
+            .arg(m_dbox2options->host)
+            .arg(requestString));
+
     // Request EPG via http. Signal will be emmited when request is done.
     QHttpRequestHeader header("GET", requestString);
     header.setValue("Host", m_dbox2options->host);
@@ -204,27 +212,27 @@ void DBox2EPG::UpdateDB(uint chanid,
 
 void DBox2EPG::httpRequestFinished(int requestID, bool error)
 {
-    if (error) 
+    if (error)
     {
-        VERBOSE(VB_RECORD, LOC + "Reading EPG failed.");
+        VERBOSE(VB_EIT, LOC + "Reading EPG failed.");
         m_dbox2channel->EPGFinished();
         return;
     }
 
     if (requestID != m_currentEPGRequestID)
     {
-        VERBOSE(VB_RECORD, LOC + "Got EPG for old channel. Ignoring");
-	return;
+        VERBOSE(VB_EIT, LOC + "Got EPG for old channel. Ignoring");
+        return;
     }
 
     QByteArray buffer = http->readAll();
     int size   = buffer.size();
     int chanid = GetChannelID(m_currentEPGRequestChannel);
 
-    VERBOSE(VB_RECORD, LOC + "EPG received. " +
+    VERBOSE(VB_EIT, LOC + "EPG received. " +
             QString("Parsing %2 bytes...").arg(size));
 
-    // Parse 
+    // Parse
     int showCount = 0;
     int index     = 0;
 
@@ -237,13 +245,13 @@ void DBox2EPG::httpRequestFinished(int requestID, bool error)
         // Next section must not start with an empty line
         QString line = ParseNextLine(buffer, index, size);
 
-	if (line == "") 
-	  continue;
+        if (line.isEmpty())
+          continue;
 
         // Parse info
-	epgID    = line.section(" ", 0, 0);
-	startTime.setTime_t(line.section(" ", 1, 1).toInt());
-	endTime  = startTime.addSecs(line.section(" ", 2, 2).toInt());
+        epgID    = line.section(" ", 0, 0);
+        startTime.setTime_t(line.section(" ", 1, 1).toInt());
+        endTime  = startTime.addSecs(line.section(" ", 2, 2).toInt());
 
         title    = ParseNextLine(buffer, index, size);
         category = ParseNextLine(buffer, index, size);
@@ -251,20 +259,20 @@ void DBox2EPG::httpRequestFinished(int requestID, bool error)
 
 
         // Print debug
-	VERBOSE(VB_RECORD, LOC + 
+        VERBOSE(VB_EIT, LOC +
                 QString("Found show. Start Time: %1, End Time: %2, "
                         "Title: %3, Description: %4.")
                 .arg(m_cardid)
                 .arg(startTime.toString()).arg(endTime.toString())
                 .arg(title).arg(desc));
 
-	// Update database
-	UpdateDB(chanid, startTime, endTime, title, desc, category);
+        // Update database
+        UpdateDB(chanid, startTime, endTime, title, desc, category);
 
-	showCount++;
+        showCount++;
     }
 
-    VERBOSE(VB_RECORD, LOC + "EPG parsing done. " +
+    VERBOSE(VB_EIT, LOC + "EPG parsing done. " +
             QString("Got %2 shows for channel %3.")
             .arg(showCount).arg(m_currentEPGRequestChannel));
 
@@ -274,20 +282,20 @@ void DBox2EPG::httpRequestFinished(int requestID, bool error)
 QString DBox2EPG::ParseNextLine(const QByteArray &buf, int &pos, int size)
 {
     QString string;
-    while (pos < size) 
+    while (pos < size)
     {
-	char current = buf[pos];
-	pos++;
-	if (current == '\n')
-	    break;
-	string += current;
+        char current = buf[pos];
+        pos++;
+        if (current == '\n')
+            break;
+        string += current;
     }
     return string;
 }
 
-int DBox2EPG::GetChannelID(const QString& channum) 
+int DBox2EPG::GetChannelID(const QString& channum)
 {
-    MSqlQuery query(MSqlQuery::InitCon());   
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare(
         "SELECT chanid "

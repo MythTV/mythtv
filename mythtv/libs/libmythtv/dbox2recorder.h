@@ -7,34 +7,20 @@
 #ifndef DBOX2RECORDER_H_
 #define DBOX2RECORDER_H_
 
-#include "dtvrecorder.h"
+// POSIX headers
 #include <time.h>
-#include "dbox2channel.h"
-#include "sitypes.h"
-#include "qhttp.h"
-#include "mpeg/tspacket.h"
 
-#define DBOX2_TIMEOUT 15
-#define DBOX_MAX_PID_COUNT 32
-#define PAT_TID   0x00
-#define PMT_TID   0x02
-#define STREAM_TYPE_VIDEO_MPEG1     0x01
-#define STREAM_TYPE_VIDEO_MPEG2     0x02
-#define STREAM_TYPE_AUDIO_MPEG1     0x03
-#define STREAM_TYPE_AUDIO_MPEG2     0x04
-#define STREAM_TYPE_PRIVATE_SECTION 0x05
-#define STREAM_TYPE_PRIVATE_DATA    0x06
-#define STREAM_TYPE_AUDIO_AAC       0x0f
-#define STREAM_TYPE_VIDEO_MPEG4     0x10
-#define STREAM_TYPE_VIDEO_H264      0x1b
+// MythTV headers
+#include "dtvrecorder.h"
 
-#define STREAM_TYPE_AUDIO_AC3       0x81
-#define STREAM_TYPE_AUDIO_DTS       0x8a
+class DBox2Channel;
+class QHttp;
 
-typedef struct stream_meta_{
-    int      socket;
-    uint8_t* buffer;
-    int      bufferIndex;
+typedef struct stream_meta_
+{
+    int            socket;
+    int            bufferIndex;
+    unsigned char *buffer;
 } stream_meta;
 
 class DBox2Recorder;
@@ -56,67 +42,71 @@ class DBox2Relay : public QObject
 
 class DBox2Recorder : public DTVRecorder
 {
-        friend class DBox2Relay;
-    public:
-        DBox2Recorder(TVRec *rec, DBox2Channel *channel);
-        ~DBox2Recorder() { TeardownAll(); }
+    friend class DBox2Relay;
 
-	void StartRecording(void);
-	bool Open(void); 
-	void ProcessTSPacket(unsigned char *tspacket, int len);
-	void SetOptionsFromProfile(RecordingProfile *profile,
-				   const QString &videodev,
-				   const QString &audiodev,
-				   const QString &vbidev);
-	
-	void SetOption(const QString &name, const QString &value);
-	void SetOption(const QString &name, int value);
-	
-	void ChannelChanged(void);
-	void ChannelChanging(void);
-    
-    private:
-	// Methods
-        void httpRequestFinished(int id, bool error);
-        void TeardownAll(void);
-	void CreatePAT(uint8_t *ts_packet);
-	int  getPMTSectionID(uint8_t* buffer, int pmtPID);
-	void updatePMTSectionID(uint8_t* buffer, int pmtPID);
-	int  processStream(stream_meta* stream);
-	void initStream(stream_meta* meta);
-	int  OpenStream();
-	bool RequestStream();
-	bool RequestInfo();
-	int  findTSHeader(uint8_t* buffer, int len);
-	void Close();
-	// Members for creating/handling PAT and PMT
-	int m_cardid;
-	uint8_t *m_patPacket;
-	int pat_cc;
-	int pkts_until_pat;
-	int m_pidPAT;
-	int m_pids[DBOX_MAX_PID_COUNT];
-	int m_pidCount;
-	int m_pmtPID;
-	int m_ac3PID;
-	int m_sectionID;
-	DBox2Channel *m_channel;
-	// Connection relevant members
-	int port;
-	int httpPort;
-	QString ip;
-	bool isOpen;
-	QHttp* http;
-        DBox2Relay   *m_relay;
-	int m_lastPIDRequestID;
-	int m_lastInfoRequestID;
-	time_t lastpacket;
-	int bufferSize;
-	stream_meta transportStream;
-	int m_videoWidth;
-	int m_videoHeight;
-	QString m_videoFormat;
-	bool _request_abort;
+  public:
+    DBox2Recorder(TVRec *rec, DBox2Channel *channel);
+    ~DBox2Recorder() { TeardownAll(); }
+
+    // Sets
+    void SetOption(const QString &name, const QString &value);
+    void SetOption(const QString &name, int value);
+    void SetOptionsFromProfile(RecordingProfile *profile,
+                               const QString &videodev,
+                               const QString &audiodev,
+                               const QString &vbidev);
+
+    // Commands
+    void StartRecording(void);
+    bool Open(void); 
+    void ChannelChanged(void);
+    void ChannelChanging(void);
+
+  private:
+    // Methods
+    void httpRequestFinished(int id, bool error);
+    void TeardownAll(void);
+    void CreatePAT(unsigned char *ts_packet);
+    int  getPMTSectionID(unsigned char *buffer, int pmtPID);
+    void updatePMTSectionID(unsigned char *buffer, int pmtPID);
+    int  processStream(stream_meta *stream);
+    void initStream(stream_meta *meta);
+    int  OpenStream(void);
+    bool RequestStream(void);
+    bool RequestInfo(void);
+    int  findTSHeader(unsigned char *buffer, int len);
+    void Close(void);
+    void ProcessTSPacket(unsigned char *tspacket, int len);
+
+  private:
+    // Members for creating/handling PAT and PMT
+    int             m_cardid;
+    unsigned char  *m_patPacket;
+    int             pat_cc;
+    int             pkts_until_pat;
+    int             m_pidPAT;
+    vector<int>     m_pids;
+    int             m_pmtPID;
+    int             m_ac3PID;
+    int             m_sectionID;
+    DBox2Channel   *m_channel;
+
+    // Connection relevant members
+    int             port;
+    int             httpPort;
+    QString         ip;
+    bool            isOpen;
+    QHttp          *http;
+    DBox2Relay     *m_relay;
+    int             m_lastPIDRequestID;
+    int             m_lastInfoRequestID;
+    time_t          lastpacket;
+    int             bufferSize;
+    stream_meta     transportStream;
+    int             m_videoWidth;
+    int             m_videoHeight;
+    QString         m_videoFormat;
+    bool            _request_abort;
 };
 
 #endif

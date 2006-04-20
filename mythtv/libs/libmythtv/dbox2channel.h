@@ -4,24 +4,24 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-
 #ifndef DBOX2CHANNEL_H
 #define DBOX2CHANNEL_H
 
-#include <qstring.h>
-
+// POSIX headers
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
-#include "tv_rec.h"
+// Qt headers
+#include <qstring.h>
+
+// MythTV headers
 #include "channelbase.h"
-#include "sitypes.h"
-#include "dbox2epg.h"
 
 class DBox2Recorder;
 class DBox2Channel;
 class DBox2EPG;
+class QHttp;
 
 class DBox2CRelay : public QObject
 {
@@ -43,24 +43,25 @@ class DBox2CRelay : public QObject
 class DBox2Channel : public ChannelBase
 {
     friend class DBox2CRelay;
+
   public:
     DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options, int cardid);
     ~DBox2Channel(void) { TeardownAll(); }
 
     bool SetChannelByString(const QString &chan);
-    bool Open();
+    bool Open(void);
     bool IsOpen(void) const { return m_recorderAlive; }
-    void Close();
-    void SwitchToLastChannel();
+    void Close(void);
+    void SwitchToLastChannel(void);
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting)
         { (void)newcapchannel; (void)setstarting; return false; }
 
     QString GetChannelNameFromNumber(const QString&);
-    QString GetChannelNumberFromName(const QString& channelName);
+    QString GetChannelNumberFromName(const QString &channelName);
     QString GetChannelID(const QString&);
 
-    void EPGFinished();
+    void EPGFinished(void);
     void RecorderAlive(bool);
 
     void SetRecorder(DBox2Recorder*);
@@ -69,10 +70,9 @@ class DBox2Channel : public ChannelBase
     void HttpChannelChangeDone(bool error);
     void HttpRequestDone(bool error);
     void TeardownAll(void);
-    void Log(QString string);
-    void LoadChannels();
+    void LoadChannels(void);
     void RequestChannelChange(QString);
-    QString GetDefaultChannel();
+    QString GetDefaultChannel(void);
 
   private:
     DBox2DBOptions   *m_dbox2options;
