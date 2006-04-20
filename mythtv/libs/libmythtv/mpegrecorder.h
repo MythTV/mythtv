@@ -65,8 +65,6 @@ class MpegRecorder : public RecorderBase
     bool errored;
 
     // Pausing state
-    bool paused;
-    bool mainpaused;
     bool cleartimeonpause;
 
     // Number of frames written

@@ -76,7 +76,6 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     recording(false),         encoding(false),
     errored(false),
     // Pausing state
-    paused(false),            mainpaused(false),
     cleartimeonpause(false),
     // Number of frames written
     framesWritten(0),
