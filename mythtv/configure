@@ -64,6 +64,7 @@ xvmc="no"
 xvmcw="yes"
 xvmc_vld="yes"
 xvmc_pro="no"
+xvmc_lib=""
 mac_accel="no"
 opengl_vsync="no"
 direct_fb="no"
@@ -189,6 +190,7 @@ echo "  --disable-xrandr         disable X11 resolution switching"
 echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
 echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
 echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
+echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
 #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
 echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
 echo "  --enable-opengl-vsync    enable OpenGL vsync method"
@@ -850,6 +852,8 @@ for opt do
   --enable-xvmc-pro) xvmc_pro="yes"
   ;;
   --disable-xvmc-pro) xvmc_pro="no"
+  ;;
+  --xvmc-lib=*) xvmc_lib=`echo $opt | cut -d '=' -f 2`
   ;;
   --enable-mac-accel) mac_accel="yes"
   ;;
@@ -2105,7 +2109,16 @@ if test x"$xvmc" = x"yes"; then
     if ! has_library libXvMCW ; then
         xvmcw="no"
     fi
-    if test x"$xvmcw" = x"yes" ; then
+    if test x"$xvmc_lib" != x""; then
+        VENDOR_XVMC_LIBS="-l"$xvmc_lib
+        xvmc="yes"
+        xvmcw="no"
+        if has_header X11/extensions/vldXvMC.h ; then
+            echo > /dev/null
+        else
+            xvmc_vld="no"
+        fi
+    elif test x"$xvmcw" = x"yes" ; then
         CCONFIG="$CCONFIG using_xvmcw"
         VENDOR_XVMC_LIBS="-lXvMCW"
         xvmc="yes"
