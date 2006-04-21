@@ -61,14 +61,26 @@ class RecordingProfile: public ConfigurationWizard
         };
     };
 
-    class Name: public LineEditSetting, public RecordingProfileParam {
+    class Name: public LineEditSetting, public RecordingProfileParam
+    {
       public:
         Name(const RecordingProfile& parent):
             LineEditSetting(false),
-            RecordingProfileParam(parent, "name") {
-
+            RecordingProfileParam(parent, "name")
+        {
+            setEnabled(false);
             setLabel(QObject::tr("Profile name"));
-        };
+        }
+
+      public slots:
+        virtual void setValue(const QString &newValue)
+        {
+            bool editable = (newValue != "Default") && (newValue != "Live TV");
+            setRW(editable);
+            setEnabled(editable);
+
+            LineEditSetting::setValue(newValue);
+        }
     };
 
   public:
@@ -81,7 +93,8 @@ class RecordingProfile: public ConfigurationWizard
 
     // sets
     void setCodecTypes();
-    void setName(const QString& newName);
+    void setName(const QString& newName)
+        { name->setValue(newName); }
 
     // gets
     const ImageSize& getImageSize(void) const { return *imageSize;       }

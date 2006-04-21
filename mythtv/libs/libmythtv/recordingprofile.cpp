@@ -974,12 +974,6 @@ void RecordingProfile::setCodecTypes()
         audioSettings->selectCodecs(groupType());
 }
 
-void RecordingProfile::setName(const QString& newName)
-{
-    name->setValue(newName);
-    name->setRW(isEncoder);
-}
-
 int RecordingProfile::exec()
 {
     MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
@@ -1032,116 +1026,118 @@ int RecordingProfileEditor::exec() {
     return QDialog::Rejected;
 }
 
-void RecordingProfile::fillSelections(SelectSetting* setting, int group,
+void RecordingProfile::fillSelections(SelectSetting *setting, int group,
                                       bool foldautodetect)
 {
-    if (group == 0)
+    if (!group)
     {
-       for(int i = 0; availProfiles[i] != ""; i++)
+       for (uint i = 0; !availProfiles[i].isEmpty(); i++)
            setting->addSelection(availProfiles[i], availProfiles[i]);
+       return;
     }
-    else
-    {
-        MSqlQuery result(MSqlQuery::InitCon());
-        QString querystr = QString("SELECT name, id FROM recordingprofiles "
-                                "WHERE profilegroup = %1 ORDER BY id;")
-                                .arg(group);
-        result.prepare(querystr);
 
-        if (result.exec() && result.isActive() && result.size() > 0)
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT name, id "
+        "FROM recordingprofiles "
+        "WHERE profilegroup = :GROUP "
+        "ORDER BY id");
+    result.bindValue(":GROUP", group);
+
+    if (!result.exec() || !result.isActive())
+    {
+        MythContext::DBError("RecordingProfile::fillSelections 1", result);
+        return;
+    }
+    else if (!result.size())
+        return;
+
+    if (group == RecordingProfile::TranscoderGroup && foldautodetect)
+    {
+        QString id = QString::number(RecordingProfile::TranscoderAutodetect);
+        setting->addSelection(QObject::tr("Autodetect"), id);
+    }
+
+    while (result.next())
+    {
+        QString name = result.value(0).toString();
+        QString id   = result.value(1).toString();
+
+        if (group == RecordingProfile::TranscoderGroup)
         {
-            if (group == RecordingProfile::TranscoderGroup && foldautodetect)
+            if (name == "RTjpeg/MPEG4" || name == "MPEG2")
             {
-                setting->addSelection(QObject::tr("Autodetect"),
-                                      QString::number(
-                                      RecordingProfile::TranscoderAutodetect));
-            }
-            while (result.next())
-            {
-                if (group == RecordingProfile::TranscoderGroup)
+                if (!foldautodetect)
                 {
-                    if (result.value(0).toString() == "RTjpeg/MPEG4" ||
-                        result.value(0).toString() == "MPEG2")
-                    {
-                        if (foldautodetect)
-                        {
-                            /* Hide; used by "Autodetect". */
-                        }
-                        else
-                        {
-                            setting->addSelection(QObject::tr("Autodetect from %1")
-                                              .arg(result.value(0).toString()),
-                                              result.value(1).toString());
-                        }
-                    }
-                    else
-                    {
-                        setting->addSelection(result.value(0).toString(),
-                                              result.value(1).toString());
-                    }
-                }
-                else
-                {
-                    setting->addSelection(result.value(0).toString(),
-                                          result.value(1).toString());    
+                    setting->addSelection(
+                        QObject::tr("Autodetect from %1").arg(name), id);
                 }
             }
+            else
+            {
+                setting->addSelection(name, id);
+            }
+            continue;
         }
+
+        setting->addSelection(name, id);
     }
 }
 
-void RecordingProfile::fillSelections(SelectManagedListItem* setting, int group)
+void RecordingProfile::fillSelections(SelectManagedListItem *setting,
+                                      int group)
 {
-    if (group == 0)
+    if (!group)
     {
-       for(int i = 0; availProfiles[i] != ""; i++)
-       {
-          QString tempLabel(QObject::tr("Record using the \"%1\" profile"));
-          setting->addSelection(QString(tempLabel).arg(availProfiles[i]), availProfiles[i], false);
-       }
-    }
-    else
-    {
-        MSqlQuery result(MSqlQuery::InitCon());
-        QString querystr = QString("SELECT name, id FROM recordingprofiles "
-                                "WHERE profilegroup = %1 ORDER BY id;")
-                                .arg(group);
-        result.prepare(querystr);
-
-        if (result.exec() && result.isActive() && result.size() > 0)
+        for (uint i = 0; !availProfiles[i].isEmpty(); i++)
         {
-            if (group == RecordingProfile::TranscoderGroup)
-            {
-                setting->addSelection(QObject::tr("Transcode using Autodetect"),
-                                      QString::number(
-                                      RecordingProfile::TranscoderAutodetect));
-            }
-            while (result.next())
-            {
-                if (group == RecordingProfile::TranscoderGroup)
-                {
-                    /* RTjpeg/MPEG4 and MPEG2 are used by "Autodetect". */
-                    if (result.value(0).toString() != "RTjpeg/MPEG4" &&
-                        result.value(0).toString() != "MPEG2")
-                    {
-                        QString tempLabel(QObject::tr(
-                                          "Transcode using \"%1\""));
-                        setting->addSelection(QString(tempLabel)
-                                              .arg(result.value(0).toString()),
-                                              result.value(1).toString(),
-                                              false);
-                    }
-                }
-                else
-                {
-                    QString tempLabel(QObject::tr(
-                                      "Record using the \"%1\" profile"));
-                    setting->addSelection(QString(tempLabel)
-                                          .arg(result.value(0).toString()),
-                                          result.value(1).toString(), false);
-                }
-            }
+            QString lbl = QObject::tr("Record using the \"%1\" profile")
+                .arg(availProfiles[i]);
+            setting->addSelection(lbl, availProfiles[i], false);
         }
+        return;
+    }
+
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT name, id "
+        "FROM recordingprofiles "
+        "WHERE profilegroup = :GROUP "
+        "ORDER BY id");
+    result.bindValue(":GROUP", group);
+
+    if (!result.exec() || !result.isActive())
+    {
+        MythContext::DBError("RecordingProfile::fillSelections 2", result);
+        return;
+    }
+    else if (!result.size())
+        return;
+
+    if (group == RecordingProfile::TranscoderGroup)
+    {
+        QString id = QString::number(RecordingProfile::TranscoderAutodetect);
+        setting->addSelection(QObject::tr("Transcode using Autodetect"), id);
+    }
+
+    while (result.next())
+    {
+        QString name = result.value(0).toString();
+        QString id   = result.value(1).toString();
+
+        if (group == RecordingProfile::TranscoderGroup)
+        {
+            /* RTjpeg/MPEG4 and MPEG2 are used by "Autodetect". */
+            if (name != "RTjpeg/MPEG4" && name != "MPEG2")
+            {
+                QString lbl = QObject::tr("Transcode using \"%1\"").arg(name);
+                setting->addSelection(lbl, id, false);
+            }
+            continue;
+        }
+
+        QString lbl = QObject::tr("Record using the \"%1\" profile").arg(name);
+        setting->addSelection(lbl, result.value(1).toString(), false);
     }
 }
 

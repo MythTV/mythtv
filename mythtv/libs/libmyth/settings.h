@@ -271,8 +271,14 @@ public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 
-    void setRW(bool readwrite = true) { rw = readwrite; edit->setRW(rw); };
-    void setRO() { rw = false; edit->setRO(); };
+    void setRW(bool readwrite = true)
+    {
+        rw = readwrite;
+        if (edit)
+            edit->setRW(rw);
+    }
+
+    void setRO(void) { setRW(false); }
 
     virtual void setEnabled(bool b);
     virtual void setVisible(bool b);
