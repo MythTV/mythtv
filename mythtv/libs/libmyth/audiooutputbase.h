@@ -129,8 +129,6 @@ class AudioOutputBase : public AudioOutput
 
     bool blocking; // do AddSamples calls block?
 
-    int lastaudiolen;
-
     pthread_t output_audio;
     pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and
                                       raud can only be made while holding this
@@ -148,8 +146,10 @@ class AudioOutputBase : public AudioOutput
     /* Audio circular buffer */
     unsigned char audiobuffer[AUDBUFSIZE];  /* buffer */
     int raud, waud;     /* read and write positions */
-    int audbuf_timecode;    /* timecode of audio most recently placed into
-                   buffer */
+
+    long long specified_timecode; // timecode specified
+    long long soundcard_position; // position of data sent to soundcard (bytes)
+                                  // (relative to specified_timecode)
 
     int numlowbuffer;
 
