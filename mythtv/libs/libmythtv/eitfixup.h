@@ -17,14 +17,19 @@ class EITFixUp
   public:
     enum FixUpType
     {
-        kFixNone    = 0x00,
-        kFixBell    = 0x01,
-        kFixUK      = 0x02,
-        kFixPBS     = 0x04,
-        kFixComHem  = 0x08,
-        kFixSubtitle= 0x10,
-        kFixAUStar  = 0x20,
-        kEFixPro7Sat= 0x40,
+        kFixNone       = 0x0000,
+
+        // Regular fixups
+        kFixGenericDVB = 0x0001,
+        kFixBell       = 0x0002,
+        kFixUK         = 0x0004,
+        kFixPBS        = 0x0008,
+        kFixComHem     = 0x0010,
+        kFixSubtitle   = 0x0020,
+        kFixAUStar     = 0x0040,
+
+        // Early fixups
+        kEFixPro7Sat   = 0x0100,
     };
 
     EITFixUp();

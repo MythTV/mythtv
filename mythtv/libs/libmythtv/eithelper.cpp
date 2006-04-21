@@ -205,6 +205,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
                  (eit->OriginalNetworkID() << 16)];
     fix |= fixup[(eit->OriginalNetworkID() << 16) | eit->ServiceID()];
+    fix |= EITFixUp::kFixGenericDVB;
 
     for (uint i = 0; i < eit->EventCount(); i++)
     {
@@ -490,7 +491,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     fix[769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat;
 }
-
 
 static int calc_eit_utc_offset(void)
 {
