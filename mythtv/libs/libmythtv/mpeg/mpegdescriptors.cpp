@@ -1,6 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
+#include <limits.h>
+
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
 
@@ -85,7 +87,7 @@ const unsigned char* MPEGDescriptor::FindBestMatch(
     const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPrefs)
 {
     uint match_idx = 0;
-    uint match_pri = 0;
+    uint match_pri = UINT_MAX;
     int  unmatched_idx = -1;
 
     uint i = (desc_tag == DescriptorID::short_event) ? 0 : parsed.size();
@@ -97,7 +99,7 @@ const unsigned char* MPEGDescriptor::FindBestMatch(
             QMap<uint,uint>::const_iterator it =
                 langPrefs.find(sed.CanonicalLanguageKey());
 
-            if ((it != langPrefs.end()) && (*it > match_pri))
+            if ((it != langPrefs.end()) && (*it < match_pri))
             {
                 match_idx = i;
                 match_pri = *it;
@@ -124,7 +126,7 @@ const unsigned char* MPEGDescriptor::FindBestMatch(
 desc_list_t MPEGDescriptor::FindBestMatches(
     const desc_list_t &parsed, uint desc_tag, QMap<uint,uint> &langPrefs)
 {
-    uint match_pri = 0;
+    uint match_pri = UINT_MAX;
     int  match_key = 0;
     int  unmatched_idx = -1;
 
@@ -137,7 +139,7 @@ desc_list_t MPEGDescriptor::FindBestMatches(
             QMap<uint,uint>::const_iterator it =
                 langPrefs.find(eed.CanonicalLanguageKey());
 
-            if ((it != langPrefs.end()) && (*it > match_pri))
+            if ((it != langPrefs.end()) && (*it < match_pri))
             {
                 match_key = eed.LanguageKey();
                 match_pri = *it;
