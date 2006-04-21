@@ -143,10 +143,8 @@ static GlobalCheckBox *DeletesFollowLinks()
     return gc;
 };
 
-static GlobalComboBox *TimeOffset()
+static void init_time_offsets(GlobalComboBox *gc)
 {
-    GlobalComboBox *gc = new GlobalComboBox("TimeOffset");
-    gc->setLabel(QObject::tr("Time offset for XMLTV listings"));
     gc->addSelection("None");
     gc->addSelection("Auto");
     gc->addSelection("+0030");
@@ -195,10 +193,35 @@ static GlobalComboBox *TimeOffset()
     gc->addSelection("-0130");
     gc->addSelection("-0100");
     gc->addSelection("-0030");
-    gc->setHelpText(QObject::tr("Adjust the relative timezone of the XMLTV EPG data read "
-                    "by mythfilldatabase.  'Auto' converts the XMLTV time to local time "
-                    "using your computer's timezone.  'None' ignores the "
-                    "XMLTV timezone, interpreting times as local."));
+}
+
+static GlobalComboBox *TimeOffset()
+{
+    GlobalComboBox *gc = new GlobalComboBox("TimeOffset");
+    gc->setLabel(QObject::tr("Time offset for XMLTV listings"));
+    init_time_offsets(gc);
+    QString helptext = QObject::tr(
+        "Adjust the relative timezone of the XMLTV EPG data read "
+        "by mythfilldatabase.  "
+        "'Auto' converts the XMLTV time to local time using your "
+        "computer's timezone.  "
+        "'None' ignores the XMLTV timezone, interpreting times as local.");
+    gc->setHelpText(helptext);
+    return gc;
+};
+
+static GlobalComboBox *EITTimeOffset()
+{
+    GlobalComboBox *gc = new GlobalComboBox("EITTimeOffset");
+    gc->setLabel(QObject::tr("Time offset for EIT listings"));
+    init_time_offsets(gc);
+    gc->setValue(1);
+    QString helptext = QObject::tr(
+        "Adjust the relative timezone of the EIT EPG data.  "
+        "'Auto' converts the EIT time to local time using your "
+        "computer's timezone.  "
+        "'None' ignores the EIT timezone, interpreting times as local.");
+    gc->setHelpText(helptext);
     return gc;
 };
 
@@ -667,6 +690,7 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);
     group2a1->setLabel(QObject::tr("EIT Scanner Options"));                
+    group2a1->addChild(EITTimeOffset());
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITIgnoresSource());
     group2a1->addChild(EITCrawIdleStart());

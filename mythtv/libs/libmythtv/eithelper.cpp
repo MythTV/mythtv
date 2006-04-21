@@ -21,15 +21,29 @@ static int get_chan_id_from_db(uint sourceid,  uint atscsrcid);
 static int get_chan_id_from_db(uint sourceid,  uint serviceid,
                                uint networkid, uint transportid);
 static void init_fixup(QMap<uint64_t,uint> &fix);
+static int calc_eit_utc_offset(void);
 
 #define LOC QString("EITHelper: ")
 #define LOC_ERR QString("EITHelper, Error: ")
 
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()), eitcache(new EITCache()),
-    gps_offset(-13),          sourceid(0)
+    gps_offset(-13),          utc_offset(0),
+    sourceid(0)
 {
     init_fixup(fixup);
+
+    utc_offset = calc_eit_utc_offset();
+
+    int sign    = utc_offset < 0 ? -1 : +1;
+    int diff    = abs(utc_offset);
+    int hours   = diff / (60 * 60);
+    int minutes = ((diff) / 60) % 60;
+    int seconds = diff % 60;
+    VERBOSE(VB_IMPORTANT, LOC + QString("localtime offset %1%2:%3%4:%5%6 ")
+            .arg((sign < 0) ? "-" : "")
+            .arg(hours).arg(minutes/10).arg(minutes%10)
+            .arg(seconds/10).arg(seconds%10));
 }
 
 EITHelper::~EITHelper()
@@ -332,8 +346,8 @@ void EITHelper::CompleteEvent(uint atscsrcid,
         return;
 
     QDateTime starttime;
-    int t = secs_Between_1Jan1970_6Jan1980 + gps_offset + event.start_time;
-    starttime.setTime_t(t, Qt::UTC);
+    int off = secs_Between_1Jan1970_6Jan1980 + gps_offset + utc_offset;
+    starttime.setTime_t(off + event.start_time, Qt::LocalTime);
     EITFixUp::TimeFix(starttime);
     QDateTime endtime = starttime.addSecs(event.length);
 
@@ -475,4 +489,35 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
     fix[769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat;
+}
+
+
+static int calc_eit_utc_offset(void)
+{
+    QString config_offset = gContext->GetSetting("EITTimeOffset", "Auto");
+    if (config_offset == "Auto")
+    {
+        QDateTime loc = QDateTime::currentDateTime(Qt::LocalTime);
+        QDateTime utc = QDateTime::currentDateTime(Qt::UTC);
+
+        int utc_offset = MythSecsTo(utc, loc);
+
+        // clamp to nearest minute if within 10 seconds
+        int off = utc_offset % 60;
+        if (abs(off) < 10)
+            utc_offset -= off;
+        if (off < -50 && off > -60)
+            utc_offset -= 60 + off;
+        if (off > +50 && off < +60)
+            utc_offset += 60 - off;
+
+        return utc_offset;
+    }
+    if (config_offset == "None")
+        return 0;
+
+    int sign    = config_offset.left(1) == "-" ? -1 : +1;
+    int hours   = config_offset.mid(1,2).toInt();
+    int minutes = config_offset.right(2).toInt();
+    return sign * (hours * 60 * 60) + (minutes * 60);
 }
