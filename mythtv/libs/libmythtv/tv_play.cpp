@@ -4984,7 +4984,8 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
 
     normal_speed = new_normal_speed;
 
-    activenvp->Play(normal_speed, true);
+    if (!paused)
+        activenvp->Play(normal_speed, true);
 
     QString text = QString(tr("Time Stretch %1X")).arg(normal_speed);
 
