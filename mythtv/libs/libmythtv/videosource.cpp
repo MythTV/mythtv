@@ -1132,7 +1132,7 @@ void CaptureCard::fillSelections(SelectSetting* setting, bool no_children)
             query.value(1).toString(),
             query.value(2).toString());
 
-        setting->addSelection(label);
+        setting->addSelection(label, query.value(0).toString());
     }
 }
 
@@ -1793,37 +1793,28 @@ void CaptureCardEditor::edit(void)
         if (0 == val)
         {
             MSqlQuery cards(MSqlQuery::InitCon());
-            MSqlQuery query(MSqlQuery::InitCon());
 
-            cards.prepare("SELECT cardid FROM capturecard "
-                          "WHERE hostname = :HOSTNAME;");
+            cards.prepare(
+                "SELECT cardid "
+                "FROM capturecard "
+                "WHERE hostname = :HOSTNAME AND "
+                "      parentid = '0'");
             cards.bindValue(":HOSTNAME", gContext->GetHostName());
 
             if (!cards.exec() || !cards.isActive())
             {
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                MythPopupBox::showOkPopup(
+                    gContext->GetMainWindow(),
                     tr("Error getting list of cards for this host"),
                     tr("Unable to delete capturecards for %1")
-                       .arg(gContext->GetHostName()));
+                    .arg(gContext->GetHostName()));
+
                 MythContext::DBError("Selecting cardids for deletion", cards);
                 return;
             }
 
             while (cards.next())
-            {
-                int cardid = cards.value(0).toInt();
-
-                query.prepare("DELETE FROM capturecard "
-                              "WHERE cardid   = :CARDID OR "
-                              "      parentid = :CARDID");
-                query.bindValue(":CARDID", cardid);
-                query.exec();
-
-                query.prepare("DELETE FROM cardinput "
-                              "WHERE cardid = :CARDID");
-                query.bindValue(":CARDID", cardid);
-                query.exec();
-            }
+                CardUtil::DeleteCard(cards.value(0).toUInt());
         }
     }
     else if (-2 == cardid)
@@ -1854,27 +1845,15 @@ void CaptureCardEditor::edit(void)
 
 void CaptureCardEditor::del(void)
 {
-    int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
-                                          tr("Are you sure you want to delete "
-                                             "this capture card?"),
-                                             tr("Yes, delete capture card"),
-                                             tr("No, don't"), 2);
+    int val = MythPopupBox::show2ButtonPopup(
+        gContext->GetMainWindow(), "",
+        tr("Are you sure you want to delete this capture card?"),
+        tr("Yes, delete capture card"),
+        tr("No, don't"), 2);
+
     if (val == 0)
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        query.prepare("DELETE FROM capturecard "
-                      "WHERE cardid   = :CARDID OR "
-                      "      parentid = :CARDID");
-        query.bindValue(":CARDID", getValue());
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Deleting Capture Card", query);
-
-        query.prepare("DELETE FROM cardinput WHERE cardid = :CARDID");
-        query.bindValue(":CARDID", getValue());
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Deleting Card Input", query);
-        
+        CardUtil::DeleteCard(getValue().toUInt());
         load();
     }
 }

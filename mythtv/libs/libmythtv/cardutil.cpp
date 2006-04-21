@@ -806,3 +806,53 @@ void CardUtil::GetCardInputs(
                       inputLabels, cardInputs, cardid);
     }
 }
+
+bool CardUtil::DeleteCard(uint cardid)
+{
+    if (!cardid)
+        return true;
+
+    // delete any children
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardid "
+        "FROM capturecard "
+        "WHERE parentid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("DeleteCard -- find child cards", query);
+        return false;
+    }
+
+    bool ok = true;
+    while (query.next())
+        ok &= DeleteCard(query.value(0).toUInt());
+
+    if (!ok)
+        return false;
+
+    // delete all connected inputs
+    query.prepare(
+        "DELETE FROM cardinput "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+    if (!query.exec())
+    {
+        MythContext::DBError("DeleteCard -- delete inputs", query);
+        return false;
+    }
+        
+    // delete the card itself
+    query.prepare(
+        "DELETE FROM capturecard "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+    if (!query.exec())
+    {
+        MythContext::DBError("DeleteCard -- deleting capture card", query);
+        return false;
+    }
+
+    return true;
+}

@@ -145,6 +145,9 @@ class CardUtil
                                       QStringList        &inputLabels,
                                       vector<CardInput*> &cardInputs,
                                       int                 parentid = 0);
+
+    static bool         DeleteCard(uint cardid);
+
     // DTV info
     static bool         GetTimeouts(uint cardid,
                                     uint &signal_timeout,
