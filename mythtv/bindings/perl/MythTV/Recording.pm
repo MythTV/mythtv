@@ -238,16 +238,17 @@ package MythTV::Recording;
         $info{'aspect'}   = aspect_str($info{'aspect'});
         $info{'aspect_f'} = aspect_float($info{'aspect'});
     # Return
-        return %info;
+        return \%info;
     }
 
 # Uses one of two mpeg info programs to load data about mpeg-based nuv files
     sub _mpeg_info {
-        my $file = shift;
+        my $self = shift;
+        my $file = $self->{'local_path'};
         $file =~ s/'/'\\''/sg;
         my %info;
     # First, we check for the existence of  an mpeg info program
-        my $program = find_program('mplayer');
+        my $program = MythTV::find_program('mplayer');
     # Nothing found?  Die
         die "You need mplayer to use this script on mpeg-based files.\n\n" unless ($program);
     # Set the is_mpeg flag
@@ -263,27 +264,20 @@ package MythTV::Recording;
         ($info{'audio_bitrate'})         = $data =~ m/^ID_AUDIO_BITRATE=(\d+)/m;
         ($info{'audio_bits_per_sample'}) = $data =~ m/^AUDIO:.+?ch,\s*[su](8|16)/mi;
         ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=(\d+)/m;
-        ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
+        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:[\.\,]\d*)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
+        ($info{'mpeg_stream_type'})      = $data =~ m/^ID_DEMUXER=(\w+)/mi;
     # Stream type
-        if ($data =~ m/\bMPEG-(PE?S) file format detected/m) {
-            $info{'mpeg_stream_type'} = lc($1);
+        $info{'mpeg_stream_type'} = lc($info{'mpeg_stream_type'});
+        if ($info{'mpeg_stream_type'} && $info{'mpeg_stream_type'} !~ /^mpeg/) {
+            die "Stream type '$info{'mpeg_stream_type'}' is not an mpeg, and will\n"
+               ."not work with this program.\n";
         }
-        elsif ($data =~ m/^TS file format detected/m) {
-            $info{'mpeg_stream_type'} = 'ts';
-        }
-    # French localisation
-        elsif ($data =~ m/Fichier de type MPEG-(PE?S) détecté./m) {
-            $info{'mpeg_stream_type'} = lc($1);
-        }
-        elsif ($data =~ m/Fichier de type TS détecté./m) {
-            $info{'mpeg_stream_type'} = 'ts';
-        }
-        else {
-            die "Unrecognized mpeg stream type.  Please execute the following and see if you\n"
-               ."notice errors (make sure that you don't have the \"really quiet\" option set\n"
-               ."in your mplayer config).  If not, create a ticket at\n"
+        elsif (!$info{'mpeg_stream_type'}) {
+            die "Unrecognized stream type.  Please execute the following and see if you\n"
+               ."notice errors (make sure that you don't have the \"really quiet\" option\n"
+               ."set in your mplayer config).  If not, create a ticket at\n"
                ."http://svn.mythtv.org/trac/newticket and attach the output from:\n\n"
                ."    $program -v -v -v -v -nolirc -nojoystick -vo null -ao null \\\n"
                ."             -frames 0 -identify '$file'\n\n";
@@ -295,7 +289,7 @@ package MythTV::Recording;
 # ID_AUDIO_FORMAT=80
 # ID_LENGTH=3554
     # Return
-        return %info;
+        return \%info;
     }
 
     sub aspect_str {
@@ -305,10 +299,10 @@ package MythTV::Recording;
     # European decimals...
         $aspect =~ s/\,/\./;
     # Parse out decimal formats
-        if ($aspect == 1)          { return '1:1';        }
-        elsif ($aspect =~ m/^1.3/) { return '4:3';        }
-        elsif ($aspect =~ m/^1.7/) { return '16:9';       }
-        elsif ($aspect == 2.21)    { return '2.21:1';     }
+        if ($aspect == 1)          { return '1:1';    }
+        elsif ($aspect =~ m/^1.3/) { return '4:3';    }
+        elsif ($aspect =~ m/^1.7/) { return '16:9';   }
+        elsif ($aspect == 2.21)    { return '2.21:1'; }
     # Unknown aspect
         print STDERR "Unknown aspect ratio:  $aspect\n";
         return $aspect.':1';

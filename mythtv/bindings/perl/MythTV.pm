@@ -87,6 +87,9 @@ package MythTV;
     our %proto_cache;
     our %fp_cache;
 
+# Cache the results from find_program
+    our %find_program_cache;
+
 # Get the user's login and home directory, so we can look for config files
     my ($username, $homedir) = (getpwuid $>)[0,7];
     $username = $ENV{'USER'} if ($ENV{'USER'});
@@ -379,6 +382,48 @@ package MythTV;
             $self->{'channels'}{$row->{'chanid'}} = new MythTV::Channel($row);
         }
         $sh->finish;
+    }
+
+# Find the requested program in the path
+# This searches the path for the specified programs, and returns the
+#   lowest-index-value program found, caching the results
+    sub find_program {
+    # Get the hash id
+        my $hash_id = join("\n", @_);
+    # No cache?
+        if (!defined($MythTV::find_program_cache{$hash_id})) {
+        # Load the programs, and get a count of the priorities
+            my (%programs, $num_programs);
+            foreach my $program (@_) {
+                $programs{$program} = ++$num_programs;
+            }
+        # No programs requested?
+            return undef unless ($num_programs > 0);
+        # Need a path?
+            $ENV{'PATH'} ||= '/usr/local/bin:/usr/bin:/bin';
+        # Search for the program(s)
+            my %found;
+            foreach my $path ('.', split(/:/, $ENV{'PATH'})) {
+                foreach my $program (keys %programs) {
+                    if (-e "$path/$program" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
+                        $found{'name'} = $program;
+                        $found{'path'} = $path;
+                    }
+                    elsif ($^O eq "darwin" && -e "$path/$program.app" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
+                        $found{'name'} = $program;
+                        $found{'path'} = "$path/$program.app/Contents/MacOS";
+                    }
+                # Leave early if we found the highest priority program
+                    last if ($found{'name'} && $programs{$found{'name'}} == 1);
+                }
+            }
+        # Set the cache
+            $MythTV::find_program_cache{$hash_id} = ($found{'path'} && $found{'name'})
+                                                    ? $found{'path'}.'/'.$found{'name'}
+                                                    : '';
+        }
+    # Return
+        return $MythTV::find_program_cache{$hash_id};
     }
 
 # Return true
