@@ -119,9 +119,21 @@ sub getMovieData {
    $writer = parseBetween($writer, "/\">", "</");
 
    # parse plot
-   my $plot = parseBetween($response, ">Plot Outline:</b> ", "<a href=\"");
+   my $plot = parseBetween($response, ">Plot Outline:</b> ", "<br>");
    if (!$plot) {
-      $plot = parseBetween($response, ">Plot Summary:</b> ", "<a href=\"");
+      $plot = parseBetween($response, ">Plot Summary:</b> ", "<br>");
+   }
+
+   if ($plot) {
+      # replace name links in plot (example 0388795)
+      my $name_link_pat = qr!<a href="/name/[^"]*">([^<]*)</a>!m;
+      $plot =~ s/$name_link_pat/$1/g;
+
+      # plot ends at first remaining link
+      my $plot_end = index($plot, "<a href=\"");
+      if ($plot_end != -1) {
+         $plot = substr($plot, 0, $plot_end);
+      }
    }
 
    # parse user rating
@@ -171,28 +183,12 @@ sub getMovieData {
    
    
    # parse genres 
-   my @genres;
    my $lgenres = "";
    $count = 0;
    $data = parseBetween($response, "<b class=\"ch\">Genre:</b>","<b class=\"ch\">User Comments:</b>"); 
    if ($data) {
-      my $beg = "/\">"; 
-      my $end = "</a>";
-      my $start = index($data, $beg);
-      my $finish = index($data, $end, $start);
-      my $genre;
-      while ($start != -1) {
-         $start += length($beg);
-         $genre = substr($data, $start, $finish - $start);
-         # add to array
-         $genres[$count++] = $genre;
-
-         # advance data to next movie
-         $data = substr($data, - (length($data) - $finish));
-         $start = index($data, $beg);
-         $finish = index($data, $end, $start + 1); 
-      }
-      $lgenres = join(',', @genres);
+      my $genre_pat = qr'/Sections/Genres/(?:[a-z ]+/)*">([^<]+)<'im;
+      $lgenres = join(',', ($data =~ /$genre_pat/g));
    }
    
    # parse countries 
