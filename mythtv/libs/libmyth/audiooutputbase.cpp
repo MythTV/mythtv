@@ -116,6 +116,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     pthread_mutex_lock(&audio_buflock);
     pthread_mutex_lock(&avsync_lock);
 
+    lastaudiolen = 0;
     waud = raud = 0;
     audio_actually_paused = false;
     
@@ -163,8 +164,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     if (!gContext->GetNumSetting("AggressiveSoundcardBuffer", 0))
         audio_buffer_unused = 0;
 
-    soundcard_position = 0;
-    specified_timecode = 0;
+    audbuf_timecode = 0;
     audiotime = 0;
     effdsp = audio_samplerate * 100;
     gettimeofday(&audiotime_updated, NULL);
@@ -269,8 +269,7 @@ void AudioOutputBase::Reset()
     pthread_mutex_lock(&avsync_lock);
 
     raud = waud = 0;
-    soundcard_position = 0;
-    specified_timecode = 0;
+    audbuf_timecode = 0;
     audiotime = 0;
     current_seconds = -1;
     was_paused = !pauseaudio;
@@ -287,15 +286,7 @@ void AudioOutputBase::Reset()
 void AudioOutputBase::SetTimecode(long long timecode)
 {
     pthread_mutex_lock(&audio_buflock);
-    specified_timecode = timecode;
-    soundcard_position = -audiolen(false);
-
-    if (pSoundStretch)
-    {
-        // add the effect of unprocessed samples in time stretch algo
-        soundcard_position += (long long)((pSoundStretch->numUnprocessedSamples() *
-                                           audio_bytes_per_sample) / audio_stretchfactor);
-    }
+    audbuf_timecode = timecode;
     pthread_mutex_unlock(&audio_buflock);
 }
 
@@ -370,7 +361,11 @@ int AudioOutputBase::GetAudiotime(void)
 
 void AudioOutputBase::SetAudiotime(void)
 {
-    int soundcard_buffer;
+    if (audbuf_timecode == 0)
+        return;
+
+    int soundcard_buffer = 0;
+    int totalbuffer;
 
     /* We want to calculate 'audiotime', which is the timestamp of the audio
        which is leaving the sound card at this instant.
@@ -384,19 +379,28 @@ void AudioOutputBase::SetAudiotime(void)
        written into the buffer.
 
        'totalbuffer' is the total # of bytes in our audio buffer, and the
-       sound card's bulong longffer.
+       sound card's buffer.
 
        'ms/byte' is given by '25000/effdsp'...
      */
 
     pthread_mutex_lock(&audio_buflock);
     pthread_mutex_lock(&avsync_lock);
-
+ 
     soundcard_buffer = getBufferedOnSoundcard(); // bytes
-
-    audiotime = specified_timecode + (100000 * (soundcard_position - soundcard_buffer)) /
-                                     (audio_bytes_per_sample * effdspstretched);
-
+    totalbuffer = audiolen(false) + soundcard_buffer;
+ 
+    // include algorithmic latencies
+    if (pSoundStretch)
+    {
+        // add the effect of unprocessed samples in time stretch algo
+        totalbuffer += (int)((pSoundStretch->numUnprocessedSamples() *
+                              audio_bytes_per_sample) / audio_stretchfactor);
+    }
+               
+    audiotime = audbuf_timecode - (int)(totalbuffer * 100000.0 /
+                                   (audio_bytes_per_sample * effdspstretched));
+ 
     gettimeofday(&audiotime_updated, NULL);
 
     pthread_mutex_unlock(&avsync_lock);
@@ -544,24 +548,6 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     
     len = WaitForFreeSpace(samples);
 
-    if (timecode >= 0)
-    {
-        specified_timecode = timecode;
-        soundcard_position = -audiolen(false);
-
-        if (pSoundStretch)
-        {
-            // add the effect of unprocessed samples in time stretch algo
-            soundcard_position -= (long long)((pSoundStretch->numUnprocessedSamples() *
-                                               audio_bytes_per_sample) / audio_stretchfactor);
-        }
-    }
-    else
-    {
-        timecode = specified_timecode + (100000 * (soundcard_position + audiolen(false))) /
-                                        (audio_bytes_per_sample * effdsp);
-    }
-
     if (interleaved) 
     {
         char *mybuf = (char*)buffer;
@@ -644,7 +630,16 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     }
 
     waud = org_waud;
+    lastaudiolen = audiolen(false);
 
+    if (timecode < 0) 
+        timecode = audbuf_timecode; // add to current timecode
+    
+    /* we want the time at the end -- but the file format stores
+       time at the start of the chunk. */
+    // even with timestretch, timecode is still calculated from original
+    // sample count
+    audbuf_timecode = timecode + (int)((samples * 100000.0) / effdsp);
     if (interleaved)
         dispatchVisual((unsigned char *)buffer, len, timecode, audio_channels, audio_bits);
 
@@ -653,7 +648,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
 
 void AudioOutputBase::Status()
 {
-    long long ct = GetAudiotime();
+    long ct = GetAudiotime();
 
     if (ct < 0)
         ct = 0;
@@ -831,7 +826,6 @@ int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool full
 
         /* update raud */
         raud = (raud + fragment_size) % AUDBUFSIZE;
-        soundcard_position += fragment_size;
         VERBOSE(VB_AUDIO, "Broadcasting free space avail");
         pthread_cond_broadcast(&audio_bufsig);
 
