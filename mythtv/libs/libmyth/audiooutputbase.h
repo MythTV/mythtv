@@ -130,7 +130,8 @@ class AudioOutputBase : public AudioOutput
     bool blocking; // do AddSamples calls block?
 
     int lastaudiolen;
-
+    long long samples_buffered;
+    
     pthread_t output_audio;
     pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and
                                       raud can only be made while holding this

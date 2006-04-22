@@ -166,6 +166,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
 
     audbuf_timecode = 0;
     audiotime = 0;
+    samples_buffered = 0;
     effdsp = audio_samplerate * 100;
     gettimeofday(&audiotime_updated, NULL);
     current_seconds = -1;
@@ -271,6 +272,7 @@ void AudioOutputBase::Reset()
     raud = waud = 0;
     audbuf_timecode = 0;
     audiotime = 0;
+    samples_buffered = 0;
     current_seconds = -1;
     was_paused = !pauseaudio;
 
@@ -287,6 +289,7 @@ void AudioOutputBase::SetTimecode(long long timecode)
 {
     pthread_mutex_lock(&audio_buflock);
     audbuf_timecode = timecode;
+    samples_buffered = (long long)((timecode * effdsp) / 100000.0);
     pthread_mutex_unlock(&audio_buflock);
 }
 
@@ -632,14 +635,20 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     waud = org_waud;
     lastaudiolen = audiolen(false);
 
-    if (timecode < 0) 
-        timecode = audbuf_timecode; // add to current timecode
+    samples_buffered += samples;
+    
+    if (timecode < 0)
+    {
+        // mythmusic doesn't give timestamps..
+        timecode = (int)((samples_buffered * 100000.0) / effdsp);
+    }
     
     /* we want the time at the end -- but the file format stores
        time at the start of the chunk. */
     // even with timestretch, timecode is still calculated from original
     // sample count
     audbuf_timecode = timecode + (int)((samples * 100000.0) / effdsp);
+
     if (interleaved)
         dispatchVisual((unsigned char *)buffer, len, timecode, audio_channels, audio_bits);
 
