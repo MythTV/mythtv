@@ -609,7 +609,7 @@ void LCDProcClient::setVersion(const QString &sversion, const QString &pversion)
     // version LCDd is using:
 
     if (serverVersion.startsWith ("CVS-current") ||
-            serverVersion.startsWith ("0.5dev"))
+            serverVersion.startsWith ("0.5"))
     {
         // Latest CVS versions of LCDd has priorities switched
         pVersion = LCD_VERSION_5;
