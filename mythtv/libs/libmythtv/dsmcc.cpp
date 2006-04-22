@@ -2,6 +2,7 @@
  *  Copyright (C) David C.J. Matthews 2005, 2006
  *     Derived from libdsmcc by Richard Palmer 
  */
+#include <stdint.h>
 
 #include "mythcontext.h"
 
@@ -30,7 +31,7 @@
 #define DSMCC_DDB_OFFSET        20
 #define DSMCC_BIOP_OFFSET       24
 
-static unsigned long crc32(const unsigned char *data, int len);
+static uint32_t crc32(const unsigned char *data, int len);
 
 Dsmcc::Dsmcc()
 {
@@ -536,10 +537,10 @@ static unsigned long crc_table[256] =
     0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
-static unsigned long crc32(const unsigned char *data, int len)
+static uint32_t crc32(const unsigned char *data, int len)
 {
     register int i;
-    unsigned long crc = 0xffffffff;
+    uint32_t crc = 0xffffffff;
 
     for (i = 0; i < len; i++)
         crc = (crc << 8) ^ crc_table[((crc >> 24) ^ *data++) & 0xff];
