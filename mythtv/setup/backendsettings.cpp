@@ -266,7 +266,7 @@ static GlobalCheckBox *EITIgnoresSource()
 static GlobalSpinBox *EITCrawIdleStart()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("EITCrawIdleStart", 30, 7200, 30);
-    gc->setLabel(QObject::tr("Backend Idle Before EIT Craw (seconds)"));
+    gc->setLabel(QObject::tr("Backend Idle Before EIT Crawl (seconds)"));
     gc->setValue(60);
     QString help = QObject::tr(
         "The minimum number of seconds after a recorder becomes idle "
@@ -280,7 +280,7 @@ static GlobalSpinBox *WOLbackendReconnectWaitTime()
     GlobalSpinBox *gc = new GlobalSpinBox("WOLbackendReconnectWaitTime", 0, 1200, 5);
     gc->setLabel(QObject::tr("Reconnect wait time (secs)"));
     gc->setValue(0);
-    gc->setHelpText(QObject::tr("Length of time the frontend waits between the "
+    gc->setHelpText(QObject::tr("Length of time the frontend waits between "
                     "tries to wake up the master backend. This should be the "
                     "time your masterbackend needs to startup. Set 0 to "
                     "disable."));
