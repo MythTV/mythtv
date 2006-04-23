@@ -96,6 +96,19 @@ class WelcomeDialog : public MythThemedDialog
     
     QPtrList<TunerStatus>    m_tunerList;
     QPtrList<ProgramDetail>  m_scheduledList;        
+
+    QMutex      m_RecListUpdateMuxtex;
+    bool        m_pendingRecListUpdate;
+
+    bool pendingRecListUpdate() const           { return m_pendingRecListUpdate; }
+    void setPendingRecListUpdate(bool newState) { m_pendingRecListUpdate = newState; }
+       
+    QMutex      m_SchedUpdateMuxtex;
+    bool        m_pendingSchedUpdate;
+
+    bool pendingSchedUpdate() const           { return m_pendingSchedUpdate; }
+    void setPendingSchedUpdate(bool newState) { m_pendingSchedUpdate = newState; }
+	   
 };
 
 #endif

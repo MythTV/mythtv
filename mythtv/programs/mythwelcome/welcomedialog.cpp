@@ -116,13 +116,35 @@ void WelcomeDialog::customEvent(QCustomEvent *e)
         if (me->Message().left(21) == "RECORDING_LIST_CHANGE")
         {
             VERBOSE(VB_GENERAL, "MythWelcome received a RECORDING_LIST_CHANGE event");
-            // we can't query the backend from inside a customEvent 
-            QTimer::singleShot(500, this, SLOT(updateRecordingList()));               
+
+            QMutexLocker lock(&m_RecListUpdateMuxtex);
+
+            if (pendingRecListUpdate())
+            {
+                VERBOSE(VB_GENERAL, "            [deferred to pending handler]");
+            }
+            else
+            {
+                // we can't query the backend from inside a customEvent
+                QTimer::singleShot(500, this, SLOT(updateRecordingList()));
+                setPendingRecListUpdate(true);
+            }
         }
         else if (me->Message().left(15) == "SCHEDULE_CHANGE")
         {
             VERBOSE(VB_GENERAL, "MythWelcome received a SCHEDULE_CHANGE event");
-            QTimer::singleShot(500, this, SLOT(updateScheduledList()));   
+
+            QMutexLocker lock(&m_SchedUpdateMuxtex);
+
+            if (pendingSchedUpdate())
+            {
+                VERBOSE(VB_GENERAL, "            [deferred to pending handler]");
+            }
+            else
+            {
+                QTimer::singleShot(500, this, SLOT(updateScheduledList()));
+                setPendingSchedUpdate(true);
+            }
         }
         else if (me->Message().left(18) == "SHUTDOWN_COUNTDOWN")
         {
@@ -430,6 +452,13 @@ void WelcomeDialog::updateAll(void)
 
 bool WelcomeDialog::updateRecordingList()
 {
+    {
+        // clear pending flag early in case something happens while
+        // we're updating
+        QMutexLocker lock(&m_RecListUpdateMuxtex);
+        setPendingRecListUpdate(false);
+    }
+
     m_tunerList.clear();
     m_isRecording = false;
     m_screenTunerNo = 0;
@@ -506,6 +535,13 @@ bool WelcomeDialog::updateRecordingList()
 
 bool WelcomeDialog::updateScheduledList()
 {    
+    {
+        // clear pending flag early in case something happens while
+        // we're updating
+        QMutexLocker lock(&m_SchedUpdateMuxtex);
+        setPendingSchedUpdate(false);
+    }
+
     m_scheduledList.clear();
     m_screenScheduledNo = 0;
     
