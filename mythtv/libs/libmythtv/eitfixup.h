@@ -40,9 +40,9 @@ class EITFixUp
     {
         int secs = dt.time().second();
         if (secs < 5)
-            dt.addSecs(-secs);
+            dt = dt.addSecs(-secs);
         if (secs > 55)
-            dt.addSecs(60 - secs);
+            dt = dt.addSecs(60 - secs);
     }
 
   private:
