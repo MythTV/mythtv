@@ -765,7 +765,7 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
         y_pos++;
 
     while (buf < buf_end) {
-        if (x_pos > region->width || y_pos > region->height) {
+        if (x_pos >= region->width || y_pos >= region->height) {
             av_log(avctx, AV_LOG_ERROR, "Invalid object location!\n");
             return;
         }
