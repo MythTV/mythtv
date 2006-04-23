@@ -43,7 +43,11 @@
  *   updated version_number for that EIT, updating the data.
  */
 
+/** Seconds between start of GPS time and the start of UNIX time. */
 #define secs_Between_1Jan1970_6Jan1980 315982800
+
+/** Leap seconds as of Jan 1st, 2006. */
+#define GPS_LEAP_SECONDS 14
 
 class TableClass
 {

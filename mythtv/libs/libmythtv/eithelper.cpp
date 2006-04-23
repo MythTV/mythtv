@@ -28,7 +28,7 @@ static int calc_eit_utc_offset(void);
 
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()), eitcache(new EITCache()),
-    gps_offset(-13),          utc_offset(0),
+    gps_offset(-1 * GPS_LEAP_SECONDS),          utc_offset(0),
     sourceid(0)
 {
     init_fixup(fixup);
