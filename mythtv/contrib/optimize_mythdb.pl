@@ -4,7 +4,7 @@
 # $Revision$
 # $Author$
 #
-#  epair_optimize.pl:
+#  optimize_mythdb.pl:
 #
 #   Connects to the mythtv database and repairs/optimizes the tables that it
 #   finds.  Suggested use is to cron it to run once per day.
