@@ -765,7 +765,7 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
         y_pos++;
 
     while (buf < buf_end) {
-        if (x_pos >= region->width || y_pos >= region->height) {
+        if (x_pos > region->width || y_pos > region->height) {
             av_log(avctx, AV_LOG_ERROR, "Invalid object location!\n");
             return;
         }
@@ -778,6 +778,11 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
                 map_table = map2to4;
             else
                 map_table = NULL;
+
+            if (y_pos >= region->height) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid y position!\n");
+                return;
+            }
 
             x_pos += dvbsub_read_2bit_string(pbuf + (y_pos * region->width) + x_pos,
                                                 region->width - x_pos, &buf, buf_size,
@@ -794,6 +799,11 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
             else
                 map_table = NULL;
 
+            if (y_pos >= region->height) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid y position!\n");
+                return;
+            }
+
             x_pos += dvbsub_read_4bit_string(pbuf + (y_pos * region->width) + x_pos,
                                                 region->width - x_pos, &buf, buf_size,
                                                 non_mod, map_table);
@@ -801,6 +811,11 @@ static void dvbsub_parse_pixel_data_block(AVCodecContext *avctx, DVBSubObjectDis
         case 0x12:
             if (region->depth < 8) {
                 av_log(avctx, AV_LOG_ERROR, "8-bit pixel string in %d-bit region!\n", region->depth);
+                return;
+            }
+
+            if (y_pos >= region->height) {
+                av_log(avctx, AV_LOG_ERROR, "Invalid y position!\n");
                 return;
             }
 
