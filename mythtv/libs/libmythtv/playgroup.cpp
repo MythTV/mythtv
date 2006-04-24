@@ -162,7 +162,7 @@ QString PlayGroup::GetInitialName(const ProgramInfo *pi)
                   "WHERE name = :TITLE OR "
                   "      name = :CATEGORY OR "
                   "      (titlematch <> '' AND "
-                  "       titlematch REGEXP :TITLE) ");
+                  "       :TITLE REGEXP titlematch) ");
     query.bindValue(":TITLE", pi->title);
     query.bindValue(":CATEGORY", pi->category);
     query.exec();
