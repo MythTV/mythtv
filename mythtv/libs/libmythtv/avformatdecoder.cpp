@@ -2427,7 +2427,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         {
             int dvdtitle  = 0;
             int dvdpart = 0;
-            ringBuffer->DVD()->GetPartAndTitle(dvdtitle,dvdpart);
+            ringBuffer->DVD()->GetPartAndTitle(dvdpart, dvdtitle);
             uint cellstart = ringBuffer->DVD()->GetCellStart();
             selectedVideoIndex = 0;
             if (GetNVP()->AtNormalSpeed() &&
