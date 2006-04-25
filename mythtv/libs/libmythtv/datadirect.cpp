@@ -1174,7 +1174,7 @@ bool DataDirectProcessor::SaveLineupChanges(const QString &lineupid)
     list.push_back(PostItem("action", "Update"));
 
     VERBOSE(VB_GENERAL, QString("Saving lineup %1 with %2 channels")
-            .arg(lineupid).arg(list.size()));
+            .arg(lineupid).arg(list.size() - 1));
 
     QString labsURL = providers[listings_provider].webURL;
     return Post(labsURL + lineup.set_action, list, "", cookieFile, "");
