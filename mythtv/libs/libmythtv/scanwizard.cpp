@@ -518,7 +518,9 @@ void ScanWizardScanner::scan()
                     "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
                     "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
                     "FROM cardinput, capturecard "
-                    "WHERE capturecard.cardid=%1 and cardinput.sourceid=%2")
+                    "WHERE capturecard.cardid = %1 AND "
+                    "      cardinput.sourceid = %2 AND "
+                    "      capturecard.cardid = cardinput.cardid")
                 .arg(parent->captureCard()).arg(nVideoSource));
 
             if (query.exec() && query.isActive() && query.size() > 0)
