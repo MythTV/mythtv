@@ -64,6 +64,7 @@ bool dddataretrieved = false;
 bool mark_repeats = true;
 bool channel_updates = false;
 bool channel_update_run = false;
+bool remove_new_channels = false;
 bool only_update_channels = false;
 bool need_post_grab_proc = true;
 QString logged_in = "";
@@ -817,7 +818,8 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
 
     bool insert_channels = channel_updates;
     if (!insert_channels)
-        insert_channels = SourceUtil::IsAnalog(source.id);
+        insert_channels = (SourceUtil::IsAnalog(source.id) &&
+                           !remove_new_channels);
 
     DataDirectProcessor::UpdateChannelsSafe(source.id, insert_channels);
 
@@ -3373,6 +3375,10 @@ int main(int argc, char *argv[])
         {
             channel_updates = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--remove-new-channels"))
+        {
+            remove_new_channels = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--graboptions"))
         {
             if (((argpos + 1) >= a.argc()))
@@ -3581,6 +3587,17 @@ int main(int argc, char *argv[])
             cout << "   values available from the data source. This will \n";
             cout << "   override custom channel names, which is why it is\n";
             cout << "   off by default.\n";
+            cout << "\n";
+            cout << "--remove-new-channels\n";
+            cout << "   When using DataDirect, ask mythfilldatabase to\n";
+            cout << "   remove new channels (those not in the database)\n";
+            cout << "   from the DataDirect lineup.  These channels are\n";
+            cout << "   removed from the lineup as if you had done so\n";
+            cout << "   via the DataDirect website's Lineup Wizard, but\n";
+            cout << "   may be re-added manually and incorporated into\n";
+            cout << "   MythTV by running mythfilldatabase without this\n";
+            cout << "   option.  New channels are automatically removed\n";
+            cout << "   for DVB and HDTV sources that use DataDirect.\n";
             cout << "\n";
             cout << "--graboptions <\"options\">\n";
             cout << "   Pass options to grabber\n";
