@@ -823,7 +823,7 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
 
     DataDirectProcessor::UpdateChannelsSafe(source.id, insert_channels);
 
-    //  User must pass "--do_channel_update" for these updates
+    //  User must pass "--do-channel-updates" for these updates
     if (channel_updates)
         DataDirectProcessor::UpdateChannelsUnsafe(source.id);
     // TODO delete any channels which no longer exist in listings source
@@ -3371,7 +3371,8 @@ int main(int argc, char *argv[])
                  cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
         }
-        else if (!strcmp(a.argv()[argpos], "--do_channel_updates"))
+        else if ((!strcmp(a.argv()[argpos], "--do-channel-updates")) ||
+                 (!strcmp(a.argv()[argpos], "--do_channel_updates")))
         {
             channel_updates = true;
         }
@@ -3581,7 +3582,7 @@ int main(int argc, char *argv[])
             cout << "   <sourceid>    = cardinput\n";
             cout << "   <xawtvrcfile> = file to read\n";
             cout << "\n";
-            cout << "--do_channel_updates\n";
+            cout << "--do-channel-updates\n";
             cout << "   When using DataDirect, ask mythfilldatabase to\n";
             cout << "   overwrite channel names, frequencies, etc. with the\n";
             cout << "   values available from the data source. This will \n";
