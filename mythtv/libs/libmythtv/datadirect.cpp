@@ -1650,7 +1650,7 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
 
     // The channel doesn't exist in the DB, insert it...
     int mplexid = -1, majorC, minorC, chanid = 0;
-    long long freq;
+    long long freq = -1;
     get_atsc_stuff(channum, sourceid, freqid,
                    majorC, minorC, freq);
 
