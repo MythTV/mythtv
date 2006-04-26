@@ -345,6 +345,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     int GetTrack(uint type) const;
     int ChangeTrack(uint type, int dir);
     void ChangeCaptionTrack(int dir);
+    void TracksChanged(uint trackType);
 
     // MHEG/MHI stream selection
     bool ITVHandleAction(const QString &action);
@@ -604,6 +605,9 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Support for captions, teletext, etc. decoded by libav
     QMutex    subtitleLock;
+    /// This allows us to enable captions/subtitles later if the streams
+    /// are not immediately available when the video starts playing.
+    bool      textDesired;
     bool      osdHasSubtitles;
     long long osdSubtitlesExpireAt;
     MythDeque<AVSubtitle> nonDisplayedSubtitles;

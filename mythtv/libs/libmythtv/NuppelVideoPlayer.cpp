@@ -1420,9 +1420,12 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
             msg += decoder->GetTrackDesc(kTrackTypeCC708,
                                          GetTrack(kTrackTypeCC708));
         }
-        msg += " " + QObject::tr("Off");
 
-        osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
+        if (msg != " ")
+        {
+            msg += " " + QObject::tr("Off");
+            osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
+        }
     }
 }
 
@@ -1555,6 +1558,8 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
 void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
 {
     uint origMode = textDisplayMode;
+
+    textDesired = enable;
 
     if (!enable)
     {
@@ -5494,6 +5499,20 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
         EnableCaptions(kDisplayTeletextCaptions);
     }
     return ret;
+}
+
+/** \fn NuppelVideoPlayer::TracksChanged(uint)
+ *  \brief This tries to re-enables captions/subtitles if the user
+ *         wants them and one of the captions/subtitles tracks has
+ *         changed.
+ */
+void NuppelVideoPlayer::TracksChanged(uint trackType)
+{
+    if (trackType >= kTrackTypeSubtitle &&
+        trackType <= kTrackTypeTeletextCaptions && textDesired)
+    {
+	SetCaptionsEnabled(textDesired);
+    }
 }
 
 InteractiveTV *NuppelVideoPlayer::GetInteractiveTV(void)

@@ -824,13 +824,17 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
             return false;
 
     tracks[type].push_back(info);
+
+    if (GetNVP())
+	GetNVP()->TracksChanged(type);
+
     return true;
 }
 
 /** \fn DecoderBase::AutoSelectTrack(uint)
  *  \brief Select best track.
  *
- *   If case there's only one track available, always choose it.
+ *   In case there's only one track available, always choose it.
  *
  *   If there is a user selected track we try to find it.
  *
@@ -904,6 +908,7 @@ int DecoderBase::AutoSelectTrack(uint type)
         selTrack = 0;
     }
 
+    int oldTrack = currentTrack[type];
     currentTrack[type] = (selTrack < 0) ? -1 : selTrack;
     StreamInfo tmp = tracks[type][currentTrack[type]];
     selectedTrack[type] = tmp;
@@ -916,6 +921,9 @@ int DecoderBase::AutoSelectTrack(uint type)
             QString("Selected track #%1 in the %2 language(%3)")
             .arg(currentTrack[type]+1)
             .arg(iso639_key_toName(lang)).arg(lang));
+
+    if (GetNVP() && (oldTrack != currentTrack[type]))
+        GetNVP()->TracksChanged(type);
 
     return selTrack;
 }
