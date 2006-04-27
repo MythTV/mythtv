@@ -690,6 +690,8 @@ void SIParser::HandleNIT(const NetworkInformationTable *nit)
 {
     ServiceHandler *sh = (ServiceHandler*) Table[SERVICES];
 
+    VERBOSE(VB_SIPARSER, LOC + nit->toString());
+
     const desc_list_t dlist = MPEGDescriptor::Parse(
         nit->NetworkDescriptors(), nit->NetworkDescriptorsLength());
     HandleNITDesc(dlist);

@@ -242,11 +242,12 @@ void SIScan::HandleMGT(const MasterGuideTable*)
     HandleATSCDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
 
-void SIScan::HandleSDT(uint, const ServiceDescriptionTable*)
+void SIScan::HandleSDT(uint, const ServiceDescriptionTable* sdt)
 {
     VERBOSE(VB_SIPARSER, LOC +
             QString("Got a Service Description Table for %1")
             .arg((*current).FriendlyName));
+    VERBOSE(VB_SIPARSER, LOC + sdt->toString());
 
     HandleDVBDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
@@ -256,6 +257,7 @@ void SIScan::HandleNIT(const NetworkInformationTable *nit)
     VERBOSE(VB_SIPARSER, LOC +
             QString("Got a Network Information Table for %1")
             .arg((*current).FriendlyName));
+    VERBOSE(VB_SIPARSER, LOC + nit->toString());
 
     dvbChanNums.clear();
 
