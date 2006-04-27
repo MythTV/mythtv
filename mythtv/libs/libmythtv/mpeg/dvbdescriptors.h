@@ -899,7 +899,7 @@ class FrequencyListDescriptor : public MPEGDescriptor
             ((kCodingTypeTerrestrial == CodingType()) ? 10 : 100);
     }
 
-    QString toString() const { return QString("FrequencyListDescriptor(stub)"); }
+    QString toString() const;
 };
 
 class LocalTimeOffsetDescriptor : public MPEGDescriptor
@@ -1180,7 +1180,8 @@ class ServiceDescriptor : public MPEGDescriptor
         { return ServiceType() ==  kServiceTypeDigitalTelevision; }
     bool IsDigitalAudio(void) const
         { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
-    QString toString() const { return QString("ServiceDescriptor(stub)"); }
+
+    QString toString() const;
 };
 
 class ServiceAvailabilityDescriptor : public MPEGDescriptor

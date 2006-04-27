@@ -304,3 +304,27 @@ void ContentDescriptor::Init(void)
 
     categoryDescExists = true;
 }
+
+QString FrequencyListDescriptor::toString() const
+{
+    QString str = "FrequencyListDescriptor: frequencies: ";
+
+    for (uint i = 0; i < FrequencyCount(); i++)
+        str.append(QString(" %1").arg(Frequency(i)));
+
+    return str;
+}
+
+QString ServiceDescriptor::toString() const
+{
+    QString str = QString("ServiceDescriptor: %1").arg(ServiceName());
+
+    if (IsDTV())
+        str.append(" (TV)");
+    else if (IsDigitalAudio())
+        str.append(" (Radio)");
+    else
+        str.append(QString(" (Unknown %1)").arg(ServiceType()));
+
+    return str;
+}
