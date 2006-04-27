@@ -212,10 +212,20 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
     if (tag == DescriptorID::terrestrial_delivery_system)
     {
         const TerrestrialDeliverySystemDescriptor cd(desc);
+        uint64_t freq = cd.FrequencyHz();
+
+        // Use the frequency we already have for this mplex
+        // as it may be one of the other_frequencies for this mplex
+        if (cd.OtherFrequencyInUse())
+        {
+            QString modulation;
+            uint mux = ChannelUtil::GetMplexID(sourceid, tsid, netid);
+            freq     = ChannelUtil::GetTuningParams(mux, modulation);
+        }
 
         uint mux = ChannelUtil::CreateMultiplex(
             sourceid,            "dvb",
-            cd.FrequencyHz(),     QString::null,
+            freq,                 QString::null,
             // DVB specific
             tsid,                 netid,
             -1,                   QChar(cd.BandwidthString()[0]),
@@ -234,7 +244,6 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
            IsMPE_FECUsed()
            NativeInterleaver()
            Alpha()
-           OtherFrequencyInUse()
         */
     }
     else if (tag == DescriptorID::satellite_delivery_system)
