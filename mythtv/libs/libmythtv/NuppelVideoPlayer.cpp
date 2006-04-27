@@ -1453,13 +1453,13 @@ void NuppelVideoPlayer::EnableCaptions(uint mode)
     {
         msg += decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
                                      GetTrack(kTrackTypeTeletextCaptions));
-        
-        TeletextViewer *tt_view = GetOSD()->GetTeletextViewer();
+
         int page = decoder->GetTrackLanguageIndex(
             kTrackTypeTeletextCaptions,
             GetTrack(kTrackTypeTeletextCaptions));
 
-        if ((tt_view) && (page > 0))
+        TeletextViewer *tt_view = NULL;
+        if (osd && (tt_view = osd->GetTeletextViewer()) && (page > 0))
         {
             EnableTeletext();
             tt_view->SetPage(page, -1);
