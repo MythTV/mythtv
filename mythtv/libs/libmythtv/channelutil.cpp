@@ -288,6 +288,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
         if (mux)
             muxes.push_back(mux);
     }
+#if 0
     else if (tag == DescriptorID::frequency_list)
     {
         const FrequencyListDescriptor cd(desc);
@@ -303,6 +304,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
                 muxes.push_back(mux);
         }
     }
+#endif
 }
 
 uint ChannelUtil::CreateMultiplex(int  sourceid,     QString sistandard,
