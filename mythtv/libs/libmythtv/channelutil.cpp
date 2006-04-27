@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 #include <qregexp.h>
+#include <stdint.h>
 
 #include "channelutil.h"
 #include "mythdbcon.h"
