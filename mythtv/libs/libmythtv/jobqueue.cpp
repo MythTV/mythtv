@@ -1774,8 +1774,7 @@ void JobQueue::DoTranscodeThread(void)
         ChangeJobStatus(jobID, JOB_STARTING);
         program_info->SetTranscoded(TRANSCODING_RUNNING);
 
-        QString fileprefix = gContext->GetFilePrefix();
-        QString filename = program_info->GetRecordFilename(fileprefix);
+        QString filename = program_info->GetPlaybackURL();
 
         origfilesize = 0;
         filesize = 0;
@@ -1845,7 +1844,7 @@ void JobQueue::DoTranscodeThread(void)
                 // Clear the pathname to force rechecking the DB in case 
                 // mythtranscode renamed the file.
                 program_info->pathname = "";
-                filename = program_info->GetRecordFilename(fileprefix);
+                filename = program_info->GetPlaybackURL();
 
                 if (stat(filename.ascii(), &st) == 0)
                 {

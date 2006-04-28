@@ -576,8 +576,6 @@ int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
 void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode)
 {
     int status = JobQueue::GetJobStatus(jobID);
-    QString fileprefix = gContext->GetFilePrefix();
-    QString filename = pginfo->GetRecordFilename(fileprefix);
 
     if (!pginfo)
     {
@@ -585,6 +583,8 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                   "Job errored, unable to find Program Info for job");
         return;
     }
+
+    QString filename = pginfo->GetPlaybackURL();
 
     if (status == JOB_STOPPING)
     {
