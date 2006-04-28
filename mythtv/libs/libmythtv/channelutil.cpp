@@ -7,88 +7,42 @@
 #include "mythdbcon.h"
 #include "dvbtables.h"
 
-static uint get_dtv_multiplex(
-    int         db_source_id,  QString     sistandard,
-    uint        frequency,     QString     modulation,
-    // DVB specific
-    int         transport_id,  int         network_id,
-    int         symbol_rate,   signed char bandwidth,
-    signed char polarity,      signed char inversion,
-    signed char trans_mode,
-    QString     inner_FEC,     QString      constellation,
-    signed char hierarchy,     QString      hp_code_rate,
-    QString     lp_code_rate,  QString      guard_interval)
+static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
+                              uint frequency,
+                              // DVB specific
+                              int  transport_id,  int     network_id)
 {
-    bool modnl = !modulation.isNull();
-    bool ifecn = !inner_FEC.isNull();
-    bool consn = !constellation.isNull();
-    bool hpcrn = !hp_code_rate.isNull();
-    bool lpcrn = !lp_code_rate.isNull();
-    bool ginul = !guard_interval.isNull();
-
     QString qstr = 
-        QString("SELECT mplexid "
-                "FROM dtv_multiplex "
-                "WHERE sourceid     = :SOURCEID   "
-                "  AND sistandard   = :SISTANDARD "
-                "  AND frequency    = :FREQUENCY  ") +
-        QString((modnl)            ? "AND modulation   = :MODULATION  " : "") +
-        QString((transport_id > 0) ? "AND transportid  = :TRANSPORTID " : "") +
-        QString((network_id   > 0) ? "AND networkid    = :NETWORKID   " : "") +
-        QString((symbol_rate >= 0) ? "AND symbolrate   = :SYMBOLRATE  " : "") +
-        QString((bandwidth   >= 0) ? "AND bandwidth    = :BANDWIDTH   " : "") +
-        QString((polarity    >= 0) ? "AND polarity     = :POLARITY    " : "") +
-        QString((inversion   >= 0) ? "AND inversion    = :INVERSION   " : "") +
-        QString((trans_mode  >= 0) ? "AND transmission_mode=:TRANS_MODE ":"") +
-        QString((ifecn)            ? "AND fec          = :INNER_FEC   " : "") +
-        QString((consn)            ? "AND constellation= :CONSTELLATION ":"") +
-        QString((hierarchy   >= 0) ? "AND hierarchy    = :HIERARCHY   " : "") +
-        QString((hpcrn)            ? "AND hp_code_rate = :HP_CODE_RATE ": "") +
-        QString((lpcrn)            ? "AND lp_code_rate = :LP_CODE_RATE ": "") +
-        QString((ginul)            ? "AND guard_interval=:GUARD_INTERVAL ":"");
+        "SELECT mplexid "
+        "FROM dtv_multiplex "
+        "WHERE sourceid     = :SOURCEID   "
+        "  AND sistandard   = :SISTANDARD ";
 
+    if (sistandard.lower() != "dvb")
+        qstr += "AND frequency    = :FREQUENCY   ";
+    else
+    {
+        qstr += "AND transportid  = :TRANSPORTID ";
+        qstr += "AND networkid    = :NETWORKID   ";
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(qstr);
 
     query.bindValue(":SOURCEID",          db_source_id);
-    query.bindValue(":FREQUENCY",         frequency);
     query.bindValue(":SISTANDARD",        sistandard);
 
-    if (modnl)
-        query.bindValue(":MODULATION",    modulation);
-    if (transport_id > 0)
+    if (sistandard.lower() != "dvb")
+        query.bindValue(":FREQUENCY",     frequency);
+    else
+    {
         query.bindValue(":TRANSPORTID",   transport_id);
-    if (network_id > 0)
         query.bindValue(":NETWORKID",     network_id);
-
-    if (symbol_rate >= 0)
-        query.bindValue(":SYMBOLRATE",    symbol_rate);
-    if (bandwidth >= 0)
-        query.bindValue(":BANDWIDTH",     QString("%1").arg((char)bandwidth));
-    if (polarity >= 0)
-        query.bindValue(":POLARITY",      QString("%1").arg((char)polarity));
-    if (inversion >= 0)
-        query.bindValue(":INVERSION",     QString("%1").arg((char)inversion));
-    if (trans_mode >= 0)
-        query.bindValue(":TRANS_MODE",    QString("%1").arg((char)trans_mode));
-
-    if (ifecn)
-        query.bindValue(":INNER_FEC",     inner_FEC);
-    if (consn)
-        query.bindValue(":CONSTELLATION", constellation);
-    if (hierarchy >= 0)
-        query.bindValue(":HIERARCHY",     QString("%1").arg((char)hierarchy));
-    if (hpcrn)
-        query.bindValue(":HP_CODE_RATE",  hp_code_rate);
-    if (lpcrn)
-        query.bindValue(":LP_CODE_RATE",  lp_code_rate);
-    if (ginul)
-        query.bindValue(":GUARD_INTERVAL",guard_interval);
+    }
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("check_for_matching_dtv_multiplex 2", query);
+        MythContext::DBError("get_dtv_multiplex", query);
         return 0;
     }
 
@@ -118,22 +72,30 @@ static uint insert_dtv_multiplex(
 
     // If transport is already present, skip insert
     uint mplex = get_dtv_multiplex(
-        db_source_id,  sistandard,    frequency,      modulation,
+        db_source_id,  sistandard,    frequency,
         // DVB specific
-        transport_id,  network_id,
-        symbol_rate,   bandwidth,     polarity,
-        inversion,     trans_mode,
-        inner_FEC,     constellation, hierarchy,
-        hp_code_rate,  lp_code_rate,  guard_interval);
+        transport_id,  network_id);
 
-    if (mplex)
-    {
-        VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex -- ") +
-                QString("already exists %1").arg(mplex));
-        return mplex;
-    }
+    QString updateStr =
+        "UPDATE dtv_multiplex "
+        "SET sourceid         = :SOURCEID,      sistandard   = :SISTANDARD, "
+        "    frequency        = :FREQUENCY,     modulation   = :MODULATION, "
+        "    transportid      = :TRANSPORTID,   networkid    = :NETWORKID, "
+        "    symbolrate       = :SYMBOLRATE,    bandwidth    = :BANDWIDTH, "
+        "    polarity         = :POLARITY,      inversion    = :INVERSION, "
+        "    transmission_mode= :TRANS_MODE,    fec          = :INNER_FEC, "
+        "    constellation    = :CONSTELLATION, hierarchy    = :HIERARCHY, "
+        "    hp_code_rate     = :HP_CODE_RATE,  lp_code_rate = :LP_CODE_RATE, "
+        "    guard_interval   = :GUARD_INTERVAL "
+        "WHERE sourceid    = :SOURCEID     AND "
+        "      sistandard  = :SISTANDARD   AND "
+        "      transportid = :TRANSPORTID  AND "
+        "      networkid   = :NETWORKID ";
 
-    query.prepare(
+    if (sistandard.lower() != "dvb")
+        updateStr += " AND frequency = :FREQUENCY ";
+
+    QString insertStr =
         "INSERT INTO dtv_multiplex "
         "  (sourceid,        sistandard,        frequency,  "
         "   modulation,      transportid,       networkid,  "
@@ -147,7 +109,12 @@ static uint insert_dtv_multiplex(
         "   :SYMBOLRATE,     :BANDWIDTH,        :POLARITY,  "
         "   :INVERSION,      :TRANS_MODE,                   "
         "   :INNER_FEC,      :CONSTELLATION,    :HIERARCHY, "
-        "   :HP_CODE_RATE,   :LP_CODE_RATE,     :GUARD_INTERVAL);");
+        "   :HP_CODE_RATE,   :LP_CODE_RATE,     :GUARD_INTERVAL);";
+
+    query.prepare((mplex) ? updateStr : insertStr);
+
+    VERBOSE(VB_SIPARSER, "insert_dtv_multiplex -- "
+            <<((mplex) ? "update" : "insert") << " " << mplex);
 
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
@@ -190,14 +157,13 @@ static uint insert_dtv_multiplex(
         return 0;
     }
 
+    if (mplex)
+        return mplex;
+
     mplex = get_dtv_multiplex(
-        db_source_id,  sistandard,    frequency,      modulation,
+        db_source_id,  sistandard,    frequency,
         // DVB specific
-        transport_id,  network_id,
-        symbol_rate,   bandwidth,     polarity,
-        inversion,     trans_mode,
-        inner_FEC,     constellation, hierarchy,
-        hp_code_rate,  lp_code_rate,  guard_interval);
+        transport_id,  network_id);
 
     VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex -- ") +
             QString("inserted %1").arg(mplex));
@@ -230,7 +196,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             // DVB specific
             tsid,                 netid,
             -1,                   QChar(cd.BandwidthString()[0]),
-            -1,                   -1,
+            -1,                   'a',
             QChar(cd.TransmissionModeString()[0]),
             QString::null,                  cd.ConstellationString(),
             QChar(cd.HierarchyString()[0]), cd.CodeRateHPString(),
