@@ -223,7 +223,10 @@ void SIScan::HandlePAT(const ProgramAssociationTable *pat)
     // Add pmts to list, so we can do MPEG scan properly.
     ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
     for (uint i = 0; i < pat->ProgramCount(); i++)
-        sd->AddListeningPID(pat->ProgramPID(i));
+    {
+        if (pat->ProgramPID(i)) // don't add NIT "program", MPEG/ATSC safe.
+            sd->AddListeningPID(pat->ProgramPID(i));
+    }
 }
 
 void SIScan::HandleVCT(uint, const VirtualChannelTable*)
@@ -361,7 +364,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
                                   bool wait_until_complete)
 {
     const DVBStreamData &dsd = (const DVBStreamData &)(*sd);
-    if (wait_until_complete && !dsd.HasCachedSDT())
+    if (wait_until_complete && !dsd.HasCachedSDT() && !dsd.HasCachedAllNIT())
         return;
 
     emit ServiceScanUpdateText(tr("Updating Services"));
@@ -391,7 +394,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
 
 /** \fn SIScan::HandlePostInsertion(void)
  *  \brief Insert channels based on any partial tables we do have.
- *  \return true if we insterted any channels.
+ *  \return true if we saw any tables
  */
 bool SIScan::HandlePostInsertion(void)
 {
@@ -404,19 +407,23 @@ bool SIScan::HandlePostInsertion(void)
     VERBOSE(VB_SIPARSER, LOC + "HandlePostInsertion() " +
             QString("pat(%1)").arg(sd->HasCachedPAT()));
 
-    // TODO insert ATSC channels based on partial info
     const MasterGuideTable *mgt = sd->GetCachedMGT();
     if (mgt)
     {
         VERBOSE(VB_IMPORTANT, mgt->toString());
+        HandleATSCDBInsertion(sd, false);
         sd->ReturnCachedTable(mgt);
+        return true;
     }
 
     const NetworkInformationTable *nit = sd->GetCachedNIT(0);
-    if (nit)
+    sdt_vec_t sdts = sd->GetAllCachedSDTs();
+    if (nit || sdts.size())
     {
-        VERBOSE(VB_IMPORTANT, nit->toString());
+        if (nit)
+            VERBOSE(VB_IMPORTANT, nit->toString());
         HandleDVBDBInsertion(sd, false);
+        sd->ReturnCachedSDTTables(sdts);
         sd->ReturnCachedTable(nit);
         return true;
     }
