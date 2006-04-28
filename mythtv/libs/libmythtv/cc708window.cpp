@@ -184,6 +184,7 @@ CC708Window::~CC708Window()
 
 void CC708Window::Clear(void)
 {
+    QMutexLocker locker(&lock);
     for (uint i = 0; i < true_row_count * true_column_count; i++)
     {
         text[i].character = QChar(' ');
