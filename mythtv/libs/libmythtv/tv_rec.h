@@ -22,7 +22,6 @@ class NuppelVideoRecorder;
 class RingBuffer;
 class EITScanner;
 class DVBSIParser;
-class DummyDTVRecorder;
 class RecordingProfile;
 class LiveTVChain;
 
@@ -342,7 +341,6 @@ class TVRec : public QObject
     SignalMonitor    *signalMonitor;
     EITScanner       *scanner;
     DVBSIParser      *dvbsiparser;
-    DummyDTVRecorder *dummyRecorder;
 
     // Various threads
     /// Event processing thread, runs RunTV().

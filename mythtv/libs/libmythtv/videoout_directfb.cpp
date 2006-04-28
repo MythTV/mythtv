@@ -632,9 +632,10 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 }
 
-void VideoOutputDirectfb::InputChanged(int width, int height, float aspect)
+void VideoOutputDirectfb::InputChanged(int width, int height, float aspect,
+                                       MythCodecID av_codec_id)
 {
-    VideoOutput::InputChanged(width, height, aspect);
+    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
 
     DFBSurfaceDescription desc;
     desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);

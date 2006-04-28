@@ -1994,6 +1994,9 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
 /** Absolute maximum size we read until we abort. */
 #define MAX_READ_SIZE        5000000
 
+/** Number of frames to read, max. */
+#define MAX_FRAMES           15
+
 /** Maximum duration until we stop analysing the stream. */
 #define MAX_STREAM_DURATION  ((int)(AV_TIME_BASE * 2.0))
 
@@ -2010,13 +2013,14 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
  */
 int av_find_stream_info(AVFormatContext *ic)
 {
-    int i, count, ret, read_size, j;
+    int i, count, ret, read_size, j, read_packets;
     AVStream *st;
     AVPacket pkt1, *pkt;
     AVPacketList *pktl=NULL, **ppktl;
     int64_t last_dts[MAX_STREAMS];
     int64_t duration_sum[MAX_STREAMS];
     int duration_count[MAX_STREAMS]={0};
+    int hasaudio = 0, hasvideo = 0;
 
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
@@ -2062,20 +2066,26 @@ int av_find_stream_info(AVFormatContext *ic)
                 break;
             if(st->parser && st->parser->parser->split && !st->codec->extradata)
                 break;
+            if (st->codec->codec_type == CODEC_TYPE_VIDEO)
+                hasvideo = 1;
+            else if (st->codec->codec_type == CODEC_TYPE_AUDIO)
+                hasaudio = 1;
         }
 
         if (i == ic->nb_streams) {
             /* NOTE: if the format has no header, then we need to read
                some packets to get most of the streams, so we cannot
                stop here */
-            if (!(ic->ctx_flags & AVFMTCTX_NOHEADER)) {
+            if (!(ic->ctx_flags & AVFMTCTX_NOHEADER) ||
+                (read_size >= MAX_READ_SIZE || read_packets >= MAX_FRAMES) ||
+                (hasvideo && hasaudio)) {
                 /* if we found the info for all the codecs, we can stop */
                 ret = count;
                 break;
             }
         } else {
             /* we did not get all the codec info, but we read too much data */
-            if (read_size >= MAX_READ_SIZE) {
+            if (read_size >= MAX_READ_SIZE || read_packets >= MAX_FRAMES) {
                 ret = count;
                 break;
             }
@@ -2096,6 +2106,7 @@ int av_find_stream_info(AVFormatContext *ic)
                 ret = 0;
             break;
         }
+        read_packets++;
 
         pktl = av_mallocz(sizeof(AVPacketList));
         if (!pktl) {

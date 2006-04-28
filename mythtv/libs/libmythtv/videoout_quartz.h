@@ -16,7 +16,8 @@ class VideoOutputQuartz : public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType t);
     void Show(FrameScanType);
 
-    void InputChanged(int width, int height, float aspect);
+    void InputChanged(int width, int height, float aspect,
+                      MythCodecID av_codec_id);
     void VideoAspectRatioChanged(float aspect);
     void Zoom(int direction);
 

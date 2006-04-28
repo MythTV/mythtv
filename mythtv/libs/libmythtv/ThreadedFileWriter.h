@@ -52,6 +52,7 @@ class ThreadedFileWriter
     uint            rpos;    ///< points to end of data written to disk
     uint            wpos;    ///< points to end of data added to buffer
     QMutex          buflock; ///< lock needed to update rpos and wpos
+    long long       written;
 
     // buffer
     char           *buf;

@@ -64,7 +64,8 @@ class VideoOutputXv : public VideoOutput
     void ClearAfterSeek(void);
 
     void MoveResize(void);
-    void InputChanged(int width, int height, float aspect);
+    void InputChanged(int width, int height, float aspect, 
+                      MythCodecID av_codec_id);
     void Zoom(int direction);
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
@@ -137,6 +138,8 @@ class VideoOutputXv : public VideoOutput
     void CreatePauseFrame(void);
 
     void DeleteBuffers(VOSType subtype, bool delete_pause_frame);
+
+    bool InitSetupBuffers(void);
 
     // XvMC specific helper functions
     static bool IsDisplaying(VideoFrame* frame);

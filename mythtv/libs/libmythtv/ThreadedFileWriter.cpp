@@ -118,6 +118,7 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     tfw_min_write_size(0),
     // buffer position state
     rpos(0),                             wpos(0),
+    written(0),
     // buffer
     buf(NULL),                           tfw_buf_size(0)
 {
@@ -327,7 +328,7 @@ void ThreadedFileWriter::SyncLoop(void)
 {
     while (!in_dtor)
     {
-        bufferSyncWait.wait(1000);
+        bufferSyncWait.wait(written > tfw_min_write_size ? 1000 : 100);
         Sync();
     }
 }
@@ -337,7 +338,8 @@ void ThreadedFileWriter::SyncLoop(void)
  */
 void ThreadedFileWriter::DiskLoop(void)
 {
-    uint size = 0, written = 0;
+    uint size = 0;
+    written = 0;
 
     while (!in_dtor || BufUsed() > 0)
     {

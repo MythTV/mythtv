@@ -91,7 +91,7 @@ RingBuffer::RingBuffer(const QString &lfilename,
       rbrpos(0),                rbwpos(0),
       internalreadpos(0),       ateof(false),
       readsallowed(false),      wantseek(false), setswitchtonext(false),
-      rawbitrate(8000),         playspeed(1.0f),
+      rawbitrate(4000),         playspeed(1.0f),
       fill_threshold(-1),       fill_min(-1),
       readblocksize(128000),    wanttoread(0),
       numfailures(0),           commserror(false),
@@ -115,7 +115,8 @@ RingBuffer::RingBuffer(const QString &lfilename,
         return;
     }
 
-    OpenFile(filename, read_retries);
+    if (read_retries != (uint)-1)
+        OpenFile(filename, read_retries);
 }
 
 /** \fn check_permissions(const QString&)
@@ -211,10 +212,15 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     if (is_local)
     {
         char buf[kReadTestSize];
-        while (openAttempts > 0)
+        int timetowait = 500 * openAttempts;
+        int lasterror = 0;
+
+        MythTimer openTimer;
+        openTimer.start();
+
+        while (openTimer.elapsed() < timetowait)
         {
-            openAttempts--;
-                
+            lasterror = 0;
             fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
                 
             if (fd2 < 0)
@@ -222,34 +228,43 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
                 if (!check_permissions(filename))
                     break;
 
-                VERBOSE(VB_IMPORTANT,
-                        QString("Could not open %1.  %2 retries remaining.")
-                        .arg(filename).arg(openAttempts));
-
-                usleep(500000);
+                lasterror = 1;
+                usleep(1000);
             }
             else
             {
                 int ret = read(fd2, buf, kReadTestSize);
                 if (ret != (int)kReadTestSize)
                 {
-                    VERBOSE(VB_IMPORTANT, LOC +
-                            QString("Invalid file (fd %1) when opening '%2'.")
-                            .arg(fd2).arg(filename) + 
-                            QString(" %2 retries remaining.")
-                            .arg(openAttempts));
-
+                    lasterror = 2;
                     close(fd2);
                     fd2 = -1;
-                    usleep(500000);
+                    usleep(1000);
                 }
                 else
                 {
                     lseek(fd2, 0, SEEK_SET);
                     openAttempts = 0;
+                    break;
                 }
             }
         }
+
+        switch (lasterror)
+        {
+            case 1:
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("Could not open %1.").arg(filename));
+                break;
+            case 2:
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("Invalid file (fd %1) when opening '%2'.")
+                        .arg(fd2).arg(filename));
+                break;
+            default:
+                break;
+        }
+
 
         QFileInfo fileInfo(filename);
         if (fileInfo.lastModified().secsTo(QDateTime::currentDateTime()) >
@@ -282,6 +297,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     ateof = false;
     commserror = false;
     numfailures = 0;
+
+    rawbitrate = 4000;
+    CalcReadAheadThresh();
 }
 
 /** \fn RingBuffer::IsOpen(void) const
@@ -517,6 +535,7 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
 void RingBuffer::CalcReadAheadThresh(void)
 {
     const uint KB32  =  32*1024;
+    const uint KB64  =  64*1024;
     const uint KB128 = 128*1024;
     const uint KB256 = 256*1024;
     const uint KB512 = 512*1024;
@@ -530,7 +549,9 @@ void RingBuffer::CalcReadAheadThresh(void)
     wantseek       = false;
     readsallowed   = false;
     fill_min       = 1;
-    readblocksize  = (estbitrate > 9000)  ? KB256 : KB128;
+    readblocksize  = (estbitrate > 2500)  ? KB64  : KB32;
+    readblocksize  = (estbitrate > 5000)  ? KB128 : readblocksize;
+    readblocksize  = (estbitrate > 9000)  ? KB256 : readblocksize;
     readblocksize  = (estbitrate > 18000) ? KB512 : readblocksize;
 
     uint  secs_thr = 300; // seconds of buffering desired
@@ -747,6 +768,9 @@ void RingBuffer::ReadAheadThread(void)
             if (rbwpos + totfree > kBufferSize)
                 totfree = kBufferSize - rbwpos;
 
+            if (internalreadpos == 0)
+                totfree = fill_min;
+
             if (remotefile)
             {
                 if (livetvchain && livetvchain->HasNext())
@@ -852,14 +876,28 @@ long long RingBuffer::SetAdjustFilesize(void)
     return readAdjust;
 }
 
+int RingBuffer::Peek(void *buf, int count)
+{
+    // really only works with readahead, but DVD doesn't readahead
+    if (!readaheadrunning)
+    {
+        int ret = Read(buf, count);
+        Seek(0, SEEK_SET);
+        return ret;
+    }
+
+    return ReadFromBuf(buf, count, true);
+}
+
 /** \fn RingBuffer::ReadFromBuf(void*, int)
  *  \brief Reads from the read-ahead buffer, this is called by
  *         Read(void*, int) when the read-ahead thread is running.
  *  \param buf   Pointer to where data will be written
  *  \param count Number of bytes to read
+ *  \param peek  If true, don't increment read count
  *  \return Returns number of bytes read
  */
-int RingBuffer::ReadFromBuf(void *buf, int count)
+int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
 {
     if (commserror)
         return 0;
@@ -916,7 +954,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         if (!availWait.wait(&availWaitMutex, 250))
         {
             int elapsed = t.elapsed();
-            if  (((elapsed > 500)  && (elapsed < 750))  ||
+            if  (/*((elapsed > 500)  && (elapsed < 750))  ||*/
                  ((elapsed > 1000) && (elapsed < 1250)) ||
                  ((elapsed > 2000) && (elapsed < 2250)) ||
                  ((elapsed > 4000) && (elapsed < 4250)) ||
@@ -980,9 +1018,12 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     else
         memcpy(buf, readAheadBuffer + rbrpos, count);
 
-    readAheadLock.lock();
-    rbrpos = (rbrpos + count) % kBufferSize;
-    readAheadLock.unlock();
+    if (!peek)
+    {
+        readAheadLock.lock();
+        rbrpos = (rbrpos + count) % kBufferSize;
+        readAheadLock.unlock();
+    }
 
     if (readone)
     {

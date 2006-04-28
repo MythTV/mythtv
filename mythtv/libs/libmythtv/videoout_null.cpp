@@ -35,11 +35,12 @@ void VideoOutputNull::Zoom(int direction)
     MoveResize();
 }
 
-void VideoOutputNull::InputChanged(int width, int height, float aspect)
+void VideoOutputNull::InputChanged(int width, int height, float aspect,
+                                   MythCodecID av_codec_id)
 {
     VERBOSE(VB_PLAYBACK, "InputChanged(w "<<width<<", h"
             <<height<<", a"<<aspect<<")");
-    VideoOutput::InputChanged(width, height, aspect);
+    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
 
     if (width == vbuffers.GetScratchFrame()->width &&
         height == vbuffers.GetScratchFrame()->height)

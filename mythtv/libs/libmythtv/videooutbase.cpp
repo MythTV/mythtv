@@ -422,13 +422,16 @@ void VideoOutput::VideoAspectRatioChanged(float aspect)
 }
 
 /**
- * \fn VideoOutput::InputChanged(int, int, float)
+ * \fn VideoOutput::InputChanged(int, int, float, MythCodecID)
  * \brief Tells video output to discard decoded frames and wait for new ones.
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-void VideoOutput::InputChanged(int width, int height, float aspect)
+void VideoOutput::InputChanged(int width, int height, float aspect,
+                               MythCodecID av_codec_id)
 {
+    (void)av_codec_id;
+
     XJ_width = width;
     XJ_height = height;
     SetVideoAspectRatio(aspect);
@@ -1264,7 +1267,8 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
     to->frameNumber = from->frameNumber;
 
     // guaranteed to be correct sizes.
-    memcpy(to->buf, from->buf, from->size);
+    if (from->size == to->size)
+        memcpy(to->buf, from->buf, from->size);
 
 /* XXX: Broken.
     if (from->qstride > 0 && from->qscale_table != NULL)

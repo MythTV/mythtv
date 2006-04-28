@@ -125,6 +125,8 @@ void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
 {
     global_lock.lock();
 
+    Reset();
+
     uint numcreate = numdecode + ((extra_for_pause) ? 1 : 0);
 
     // make a big reservation, so that things that depend on

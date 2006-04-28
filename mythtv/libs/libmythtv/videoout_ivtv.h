@@ -20,7 +20,8 @@ class VideoOutputIvtv: public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
-    void InputChanged(int width, int height, float aspect);
+    void InputChanged(int width, int height, float aspect,
+                      MythCodecID av_codec_id);
 
     int GetRefreshRate(void);
 

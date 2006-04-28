@@ -95,9 +95,10 @@ void VideoOutputDX::MoveResize()
     DirectXUpdateOverlay();
 }
 
-void VideoOutputDX::InputChanged(int width, int height, float aspect)
+void VideoOutputDX::InputChanged(int width, int height, float aspect,
+                                 MythCodecID av_codec_id)
 {
-    VideoOutput::InputChanged(width, height, aspect);
+    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
 
     vbuffers.DeleteBuffers();
     

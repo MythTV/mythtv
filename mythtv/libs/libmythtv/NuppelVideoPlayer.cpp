@@ -37,6 +37,7 @@ using namespace std;
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
+#include "dummydecoder.h"
 #include "jobqueue.h"
 #include "DVDRingBuffer.h"
 #include "NuppelVideoRecorder.h"
@@ -234,7 +235,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       tc_avcheck_framecounter(0),   tc_diff_estimate(0),
       savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
-      livetvchain(NULL), m_tv(NULL),
+      livetvchain(NULL),            m_tv(NULL), 
+      isDummy(false),               
       // DVD stuff
       indvdstillframe(false), hidedvdbutton(true),
       // Debugging variables
@@ -560,7 +562,8 @@ void NuppelVideoPlayer::ReinitVideo(void)
     videofiltersLock.lock();
 
     float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
-    videoOutput->InputChanged(video_width, video_height, aspect);
+    videoOutput->InputChanged(video_width, video_height, aspect, 
+                              GetDecoder()->GetVideoCodecID());
     if (videoOutput->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, "ReinitVideo(): videoOutput->IsErrored()");
@@ -851,9 +854,32 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
     totalFrames = frames;
 }
 
+void NuppelVideoPlayer::OpenDummy(void)
+{
+    isDummy = true;
+
+    if (!videoOutput)
+    {
+        SetVideoParams(720, 576, 25.00, 15);
+    }
+
+    SetDecoder(new DummyDecoder(this, m_playbackinfo));
+}
+
 int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                                 bool allow_libmpeg2)
 {
+    isDummy = false;
+
+    if (livetvchain)
+    {
+        if (livetvchain->GetCardType(livetvchain->GetCurPos()) == "DUMMY")
+        {
+            OpenDummy();
+            return 0;
+        }
+    }
+
     if (!skipDsp)
     {
         if (!ringBuffer)
@@ -894,23 +920,14 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     char testbuf[kDecoderProbeBufferSize];
     ringBuffer->Unpause(); // so we can read testbuf if we were paused
 
-    int readsize = kDecoderProbeBufferSize;
-    if (ringBuffer->isDVD())
-        readsize = 2048;
-
-    if (ringBuffer->Read(testbuf, readsize) != readsize)
+    int readsize = 2048;
+    if (ringBuffer->Peek(testbuf, readsize) != readsize)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("NVP::OpenFile(): Error, couldn't read file: %1")
                 .arg(ringBuffer->GetFilename()));
         return -1;
     }
-
-    // Seek back to begining so that OpenFile can find PAT/PMT more quickly
-    ringBuffer->Pause();
-    ringBuffer->WaitForPause();
-    ringBuffer->Seek(0, SEEK_SET);
-    ringBuffer->Unpause();
 
     // delete any pre-existing recorder
     SetDecoder(NULL);
@@ -971,6 +988,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     // is true, only disable if no_video_decode is true.
     int ret = GetDecoder()->OpenFile(ringBuffer, no_video_decode, testbuf,
                                      readsize);
+
     if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't open decoder for: %1")
@@ -2017,8 +2035,8 @@ void NuppelVideoPlayer::AVSync(void)
     FrameScanType ps = (m_double_framerate) ? kScan_Interlaced : kScan_Ignore;
     if (diverge < -MAXDIVERGE)
     {
-        // If video is way ahead of audio, adjust for it...
-        QString dbg = QString("Video is %1 frames ahead of audio, ")
+        // If video is way behind of audio, adjust for it...
+        QString dbg = QString("Video is %1 frames behind audio (too slow), ")
             .arg(-diverge);
 
         // Reset A/V Sync
@@ -2038,7 +2056,7 @@ void NuppelVideoPlayer::AVSync(void)
         else
         {
             // If we are using software decoding, skip this frame altogether.
-            VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame.");
+            VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame to catch up.");
         }
     }
     else if (!using_null_videoout)
@@ -2090,14 +2108,14 @@ void NuppelVideoPlayer::AVSync(void)
 
     if (diverge > MAXDIVERGE)
     {
-        // If audio is way ahead of video, adjust for it...
+        // If audio is way behind of video, adjust for it...
         // by cutting the frame rate in half for the length of this frame
 
         avsync_adjustment = frame_interval;
         lastsync = true;
         VERBOSE(VB_PLAYBACK, LOC + 
-                QString("Audio is %1 frames ahead of video,\n"
-                        "\t\t\tdoubling video frame interval.").arg(diverge));
+                QString("Video is %1 frames ahead of audio,\n"
+                        "\t\t\tdoubling video frame interval to slow down.").arg(diverge));
     }
 
     if (audioOutput && normal_speed)
@@ -2224,6 +2242,13 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
     prebuffering_lock.lock();
     if (prebuffering)
     {
+        if (!audio_paused && audioOutput)
+        {
+           if (prebuffering)
+                audioOutput->Pause(prebuffering);
+            audio_paused = prebuffering;
+        }
+
         VERBOSE(VB_PLAYBACK, LOC + QString("Waiting for prebuffer.. %1 %2")
                 .arg(prebuffer_tries).arg(videoOutput->GetFrameStatus()));
         if (!prebuffering_wait.wait(&prebuffering_lock,
@@ -2248,6 +2273,7 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
         }
         prebuffering_lock.unlock();
         videosync->Start();
+
         return false;
     }
     prebuffering_lock.unlock();
@@ -2293,7 +2319,15 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     if (!ringBuffer->InDVDMenuOrStillFrame())
     {
         if (!PrebufferEnoughFrames())
+        {
+            // When going to switch channels
+            if (paused)
+            {
+                usleep(frame_interval);
+                DisplayPauseFrame();
+            }
             return;
+        }
     }
 
     videoOutput->StartDisplayingFrame();
@@ -2486,7 +2520,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             } 
         }
 
-        if (pausevideo)
+        if (pausevideo || isDummy)
         {
             usleep(frame_interval);
             DisplayPauseFrame();
@@ -2632,9 +2666,13 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     VERBOSE(VB_PLAYBACK, "SwitchToProgram(void)");
 
     bool discontinuity = false, newtype = false;
-    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
+    int newid = -1;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype,
+                                                        newid);
     if (!pginfo)
         return;
+
+    bool newIsDummy = livetvchain->GetCardType(newid) == "DUMMY";
 
     if (m_playbackinfo)
     {
@@ -2647,6 +2685,15 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
+
+    if (newIsDummy)
+    {
+        OpenDummy();
+        ResetPlaying();
+        DoPause();
+        eof = false;
+        return;
+    }
 
     ringBuffer->OpenFile(pginfo->pathname, 10 /* retries -- about 5 seconds */);
     if (!ringBuffer->IsOpen())
@@ -2733,11 +2780,14 @@ void NuppelVideoPlayer::JumpToProgram(void)
 {
     VERBOSE(VB_PLAYBACK, "JumpToProgram(void)");
     bool discontinuity = false, newtype = false;
-    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
+    int newid = -1;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype,
+                                                        newid);
     if (!pginfo)
         return;
 
     long long nextpos = livetvchain->GetJumpPos();
+    bool newIsDummy = livetvchain->GetCardType(newid) == "DUMMY";
     
     if (m_playbackinfo)
     {
@@ -2756,6 +2806,16 @@ void NuppelVideoPlayer::JumpToProgram(void)
     livetvchain->SetProgram(pginfo);
 
     ringBuffer->Reset(true);
+
+    if (newIsDummy)
+    {
+        OpenDummy();
+        ResetPlaying();
+        DoPause();
+        eof = false;
+        return;
+    }
+
     ringBuffer->OpenFile(pginfo->pathname);
     if (!ringBuffer->IsOpen())
     {
@@ -2765,10 +2825,14 @@ void NuppelVideoPlayer::JumpToProgram(void)
         return;
     }
 
-    if (newtype)
+    bool wasDummy = isDummy;
+    if (newtype || wasDummy)
         errored = (OpenFile() >= 0) ? errored : true;
     else
         ResetPlaying();
+
+    if (wasDummy)
+        DoPlay();
 
     if (errored || !GetDecoder())
     {
@@ -2964,17 +3028,31 @@ void NuppelVideoPlayer::StartPlaying(void)
     }
     commBreakMapLock.unlock();
 
+    if (isDummy)
+    {
+        DoPause();
+    }
+
     while (!killplayer && !errored)
     {
         if (m_playbackinfo)
             m_playbackinfo->UpdateInUseMark();
 
-        if ((!paused || eof) && livetvchain && !GetDecoder()->GetWaitForChange())
+        if (isDummy && livetvchain && livetvchain->HasNext())
+        {
+            livetvchain->JumpToNext(true, 1);
+            JumpToProgram();
+        }
+        else if ((!paused || eof) && livetvchain && !GetDecoder()->GetWaitForChange())
         {
             if (livetvchain->NeedsToSwitch())
                 SwitchToProgram();
-            else if (livetvchain->NeedsToJump())
-                JumpToProgram();
+        }
+
+        if (livetvchain && livetvchain->NeedsToJump() && 
+            !GetDecoder()->GetWaitForChange())
+        {
+            JumpToProgram();
         }
 
         if (forcePositionMapSync)
@@ -2990,7 +3068,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             break;
         }
 
-        if (play_speed != next_play_speed)
+        if (play_speed != next_play_speed && 
+            (!livetvchain || (livetvchain && !livetvchain->NeedsToJump())))
         {
             decoder_lock.lock();
 
@@ -3023,11 +3102,19 @@ void NuppelVideoPlayer::StartPlaying(void)
                     livetvchain->JumpToNext(true, 1);
                     continue;
                 }
-                VERBOSE(VB_PLAYBACK, "Ignoring livetv eof in decoder loop");
+                if (!paused)
+                    VERBOSE(VB_PLAYBACK, "Ignoring livetv eof in decoder loop");
                 usleep(50000);
             }
             else
                 break;
+        }
+
+        if (isDummy)
+        {
+            decoderThreadPaused.wakeAll();
+            usleep(500);
+            continue;
         }
 
         if (rewindtime < 0)

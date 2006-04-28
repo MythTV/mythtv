@@ -177,7 +177,8 @@ class VideoOutput
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType) = 0;
     virtual void Show(FrameScanType) = 0;
 
-    virtual void InputChanged(int width, int height, float aspect);
+    virtual void InputChanged(int width, int height, float aspect,
+                              MythCodecID av_codec_id);
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void EmbedInWidget(WId wid, int x, int y, int w, int h);

@@ -800,7 +800,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags &= ~AVFMT_NOFILE;
 
-    if (!ringBuffer->isDVD())
+    if (!ringBuffer->isDVD() && !livetv)
         av_estimate_timings(ic);
 
     av_read_frame_flush(ic);
@@ -2458,7 +2458,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (gotvideo)
         {
-            if (lowbuffers && onlyvideo == 0 && lastapts < lastvpts + 100 &&
+            if (lowbuffers && onlyvideo == 0 && 
+                lastapts < lastvpts + 100 &&
                 lastapts > lastvpts - 10000 && 
                 !ringBuffer->InDVDMenuOrStillFrame())
             {
@@ -2696,7 +2697,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (skipaudio)
                     {
-                        if (lastapts < lastvpts - 30 || lastvpts == 0)
+                        if ((lastapts < lastvpts - (10.0 / fps)) || 
+                            lastvpts == 0)
                         {
                             ptr += len;
                             len = 0;

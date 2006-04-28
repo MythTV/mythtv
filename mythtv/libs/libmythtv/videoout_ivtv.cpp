@@ -164,10 +164,11 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
                 "Failed to set ivtv alpha values." + ENO);
 }
 
-void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
+void VideoOutputIvtv::InputChanged(int width, int height, float aspect,
+                                   MythCodecID av_codec_id)
 {
     VERBOSE(VB_PLAYBACK, LOC + "InputChanged() -- begin");
-    VideoOutput::InputChanged(width, height, aspect);
+    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
     MoveResize();
     VERBOSE(VB_PLAYBACK, LOC + "InputChanged() -- end");
 }

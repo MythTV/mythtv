@@ -901,7 +901,10 @@ void TV::HandleStateChange(void)
             QString playbackURL = playbackinfo->GetPlaybackURL();
 
             tvchain->SetProgram(playbackinfo);
-            prbuffer = new RingBuffer(playbackURL, false);
+
+            bool opennow = (tvchain->GetCardType(-1) != "DUMMY");
+            prbuffer = new RingBuffer(playbackURL, false, true,
+                                      opennow ? 12 : (uint)-1);
             prbuffer->SetLiveMode(tvchain);
         }
 
@@ -6975,9 +6978,9 @@ void TV::PauseLiveTV(void)
 
     if (activenvp && activerbuffer)
     {
+        activerbuffer->IgnoreLiveEOF(true);
         activerbuffer->StopReads();
         activenvp->PauseDecoder();
-        activerbuffer->IgnoreLiveEOF(true);
         activerbuffer->StartReads();
     }
 

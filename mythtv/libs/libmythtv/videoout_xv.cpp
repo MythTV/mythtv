@@ -338,19 +338,21 @@ void VideoOutputXv::MoveResize(void)
 }
 
 // documented in videooutbase.cpp
-void VideoOutputXv::InputChanged(int width, int height, float aspect)
+void VideoOutputXv::InputChanged(int width, int height, float aspect,
+                                 MythCodecID av_codec_id)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3)")
             .arg(width).arg(height).arg(aspect));
 
     QMutexLocker locker(&global_lock);
 
+    bool cid_changed = (myth_codec_id != av_codec_id);
     bool res_changed = (width != XJ_width) || (height != XJ_height);
     bool asp_changed = aspect != videoAspect;
 
-    VideoOutput::InputChanged(width, height, aspect);
+    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
 
-    if (!res_changed)
+    if (!res_changed && !cid_changed)
     {
         if (VideoOutputSubType() == XVideo)
             clear_xv_buffers(vbuffers, XJ_width, XJ_height, xv_chroma);
@@ -359,9 +361,30 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
         return;
     }
 
-    DeleteBuffers(VideoOutputSubType(), false);
+    bool ok = true;
+
+    DeleteBuffers(VideoOutputSubType(), cid_changed);
     ResizeForVideo((uint) width, (uint) height);
-    bool ok = CreateBuffers(VideoOutputSubType());
+    if (cid_changed)
+    {
+        myth_codec_id = av_codec_id;
+
+        // ungrab port...
+        if (xv_port >= 0)
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
+            X11L;
+            XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+            del_open_xv_port(xv_port);
+            X11U;
+            xv_port = -1;
+        }
+
+        ok = InitSetupBuffers();
+    }
+    else
+        ok = CreateBuffers(VideoOutputSubType());
+
     MoveResize();
 
     if (!ok)
@@ -1131,7 +1154,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     }
 
     bool ok = true;
-    if (test_surface && ret>kCodec_NORMAL_END)
+    if (test_surface && ret > kCodec_NORMAL_END)
     {
         Window root;
         XvMCSurfaceInfo info;
@@ -1140,7 +1163,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
         X11S(root = DefaultRootWindow(disp));
         int port = GrabSuitableXvPort(disp, root, ret, width, height,
                                       xvmc_chroma, &info);
-        if (port>=0)
+        if (port >= 0)
         {
             XvMCContext *ctx =
                 CreateXvMCContext(disp, port, info.surface_type_id,
@@ -1190,45 +1213,9 @@ do { \
     } \
 } while (false)
 
-/**
- * \fn VideoOutputXv::Init(int,int,float,WId,int,int,int,int,WId)
- * Initializes class for video output.
- *
- * \return success or failure.
- */
-bool VideoOutputXv::Init(
-    int width, int height, float aspect, 
-    WId winid, int winx, int winy, int winw, int winh, WId embedid)
+bool VideoOutputXv::InitSetupBuffers(void)
 {
-    needrepaint = true;
-
-    XV_INIT_FATAL_ERROR_TEST(winid <= 0, "Invalid Window ID.");
-
-    X11S(XJ_disp = XOpenDisplay(NULL));
-    XV_INIT_FATAL_ERROR_TEST(!XJ_disp, "Failed to open display.");
-
-    // Initialize X stuff
-    X11L;
-    XJ_screen     = DefaultScreenOfDisplay(XJ_disp);
-    XJ_screen_num = DefaultScreen(XJ_disp);
-    XJ_white      = XWhitePixel(XJ_disp, XJ_screen_num);
-    XJ_black      = XBlackPixel(XJ_disp, XJ_screen_num);
-    XJ_curwin     = winid;
-    XJ_win        = winid;
-    XJ_root       = DefaultRootWindow(XJ_disp);
-    XJ_gc         = XCreateGC(XJ_disp, XJ_win, 0, 0);
-    XJ_depth      = DefaultDepthOfScreen(XJ_screen);
-    X11U;
-
-    // Basic setup
-    VideoOutput::Init(width, height, aspect,
-                      winid, winx, winy, winw, winh,
-                      embedid);
-
-    // Set resolution/measurements (check XRandR, Xinerama, config settings)
-    InitDisplayMeasurements(width, height);
-
-    // Set use variables...
+   // Set use variables...
     bool vld, idct, mc, xv, shm;
     myth2av_codecid(myth_codec_id, vld, idct, mc);
     xv = shm = !vld && !idct;
@@ -1237,10 +1224,6 @@ bool VideoOutputXv::Init(
     bool use_chroma_key_osd = gContext->GetNumSettingOnHost(
         "UseChromaKeyOSD", gContext->GetHostName(), 0);
     use_chroma_key_osd &= (xv || vld || idct || mc);
-
-    // Set embedding window id
-    if (embedid > 0)
-        XJ_curwin = XJ_win = embedid;
 
     // create chroma key osd structure if needed
     if (use_chroma_key_osd && ((32 == XJ_depth) || (24 == XJ_depth)))
@@ -1298,6 +1281,54 @@ bool VideoOutputXv::Init(
         XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
 #endif // USING_XVMC
     }
+
+    return true;
+}
+
+/**
+ * \fn VideoOutputXv::Init(int,int,float,WId,int,int,int,int,WId)
+ * Initializes class for video output.
+ *
+ * \return success or failure.
+ */
+bool VideoOutputXv::Init(
+    int width, int height, float aspect, 
+    WId winid, int winx, int winy, int winw, int winh, WId embedid)
+{
+    needrepaint = true;
+
+    XV_INIT_FATAL_ERROR_TEST(winid <= 0, "Invalid Window ID.");
+
+    X11S(XJ_disp = XOpenDisplay(NULL));
+    XV_INIT_FATAL_ERROR_TEST(!XJ_disp, "Failed to open display.");
+
+    // Initialize X stuff
+    X11L;
+    XJ_screen     = DefaultScreenOfDisplay(XJ_disp);
+    XJ_screen_num = DefaultScreen(XJ_disp);
+    XJ_white      = XWhitePixel(XJ_disp, XJ_screen_num);
+    XJ_black      = XBlackPixel(XJ_disp, XJ_screen_num);
+    XJ_curwin     = winid;
+    XJ_win        = winid;
+    XJ_root       = DefaultRootWindow(XJ_disp);
+    XJ_gc         = XCreateGC(XJ_disp, XJ_win, 0, 0);
+    XJ_depth      = DefaultDepthOfScreen(XJ_screen);
+    X11U;
+
+    // Basic setup
+    VideoOutput::Init(width, height, aspect,
+                      winid, winx, winy, winw, winh,
+                      embedid);
+
+    // Set resolution/measurements (check XRandR, Xinerama, config settings)
+    InitDisplayMeasurements(width, height);
+
+    // Set embedding window id
+    if (embedid > 0)
+        XJ_curwin = XJ_win = embedid;
+
+    if (!InitSetupBuffers())
+        return false;
 
     MoveResize(); 
 
@@ -2658,6 +2689,8 @@ void VideoOutputXv::VideoAspectRatioChanged(float aspect)
 
 void VideoOutputXv::UpdatePauseFrame(void)
 {
+    QMutexLocker locker(&global_lock);
+
     if (VideoOutputSubType() <= XVideo)
     {
         // Try used frame first, then fall back to scratch frame.

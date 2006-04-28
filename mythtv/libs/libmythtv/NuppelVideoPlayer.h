@@ -107,6 +107,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool InitVideo(void);
     int  OpenFile(bool skipDsp = false, uint retries = 4,
                   bool allow_libmpeg2 = true);
+    void OpenDummy(void);
 
     // Windowing stuff
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
@@ -736,6 +737,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // LiveTV
     LiveTVChain *livetvchain;
     TV *m_tv;
+    bool isDummy;
 
     // DVD
     bool indvdstillframe;

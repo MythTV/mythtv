@@ -29,7 +29,6 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "channelbase.h"
 #include "dtvsignalmonitor.h"
-#include "dummydtvrecorder.h"
 #include "mythdbcon.h"
 #include "jobqueue.h"
 #include "scheduledrecording.h"
@@ -116,7 +115,7 @@ static QString load_profile(QString,void*,ProgramInfo*,RecordingProfile&);
 TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
-      scanner(NULL), dvbsiparser(NULL), dummyRecorder(NULL),
+      scanner(NULL), dvbsiparser(NULL),
       // Configuration variables from database
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
@@ -307,12 +306,6 @@ void TVRec::TeardownAll(void)
     }
 
     TeardownRecorder(true);
-
-    if (dummyRecorder)
-    {
-        delete dummyRecorder;
-        dummyRecorder = NULL;
-    }
 
     SetRingBuffer(NULL);
 }
@@ -2521,7 +2514,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 bool TVRec::IsReallyRecording(void)
 {
     return ((recorder && recorder->IsRecording()) ||
-            (dummyRecorder && dummyRecorder->IsRecording()));
+            HasFlags(kFlagDummyRecorderRunning));
 }
 
 /** \fn TVRec::IsBusy()
@@ -3361,12 +3354,8 @@ void TVRec::SetRingBuffer(RingBuffer *rb)
 
     if (rb_old && (rb_old != rb))
     {
-        if (dummyRecorder)
-        {
-            delete dummyRecorder;
-            dummyRecorder = NULL;
+        if (HasFlags(kFlagDummyRecorderRunning))
             ClearFlags(kFlagDummyRecorderRunning);
-        }
         delete rb_old;
     }
 }
@@ -3568,7 +3557,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     {
         if (HasFlags(kFlagDummyRecorderRunning))
         {
-            dummyRecorder->StopRecordingThread();
             ClearFlags(kFlagDummyRecorderRunning);
             FinishedRecording(curRecording);
             curRecording->MarkAsInUse(false);
@@ -3708,44 +3696,32 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     bool antadj = request.flags & kFlagAntennaAdjust;
     bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
     bool use_dr = use_sm && (livetv || antadj);
+    bool has_dummy = false;
+
     if (use_dr)
     {
         // We need there to be a ringbuffer for these modes
         bool ok;
         ProgramInfo *tmp = pseudoLiveTVRecording;
         pseudoLiveTVRecording = NULL;
+
+        tvchain->SetCardType("DUMMY");
+
         if (!ringBuffer)
             ok = CreateLiveTVRingBuffer();
         else
             ok = SwitchLiveTVRingBuffer(true, false);
         pseudoLiveTVRecording = tmp;
+
+        tvchain->SetCardType(genOpt.cardtype);
+
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 1");
             return;
         }
 
-        // Start dummy recorder for devices capable of signal monitoring.
-        bool is_atsc = genOpt.cardtype == "HDTV";
-#if (DVB_API_VERSION_MINOR == 1)
-        if (genOpt.cardtype == "DVB")
-        {
-            struct dvb_frontend_info info;
-            int fd = channel->GetFd();
-            if (fd >= 0 && (ioctl(fd, FE_GET_INFO, &info) >= 0))
-                is_atsc = (info.type == FE_ATSC);
-        }
-#endif // if (DVB_API_VERSION_MINOR == 1)
-
-        if (!is_atsc)
-            dummyRecorder = new DummyDTVRecorder(
-                this, true, ringBuffer, 720, 576, 25,
-                75, 2000000, false);
-        else
-            dummyRecorder = new DummyDTVRecorder(
-                this, true, ringBuffer, 1920, 1088, 29.97,
-                90, 20000000, false);
-        dummyRecorder->SetRecording(curRecording);
+        has_dummy = true;
     }
 
     // Start signal monitoring for devices capable of monitoring
@@ -3768,9 +3744,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                 SetFlags(kFlagWaitingForSignal);
         }
 
-        if (dummyRecorder && ringBuffer)
+        if (has_dummy && ringBuffer)
         {
-            dummyRecorder->StartRecordingThread(5);
             SetFlags(kFlagDummyRecorderRunning);
             VERBOSE(VB_RECORD, "DummyDTVRecorder -- started");
             SetFlags(kFlagRingBufferReady);
@@ -3930,7 +3905,6 @@ void TVRec::TuningNewRecorder(void)
     bool had_dummyrec = false;
     if (HasFlags(kFlagDummyRecorderRunning))
     {
-        dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
         FinishedRecording(curRecording);
         curRecording->MarkAsInUse(false);
@@ -4069,7 +4043,6 @@ void TVRec::TuningRestartRecorder(void)
     bool had_dummyrec = false;
     if (HasFlags(kFlagDummyRecorderRunning))
     {
-        dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
         had_dummyrec = true;
     }

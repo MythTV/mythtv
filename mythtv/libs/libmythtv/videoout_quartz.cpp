@@ -132,7 +132,8 @@ class VideoOutputQuartzView
     virtual void SetFrameSkip(int numskip);
     virtual void Show(void);
 
-    virtual void InputChanged(int width, int height, float aspect);
+    virtual void InputChanged(int width, int height, float aspect,
+                              MythCodecID av_codec_id);
     virtual void VideoAspectRatioChanged(float aspect);
     virtual void Zoom(int direction);
 
@@ -557,7 +558,8 @@ void VideoOutputQuartzView::Show(void)
     viewLock.unlock();
 }
 
-void VideoOutputQuartzView::InputChanged(int width, int height, float aspect)
+void VideoOutputQuartzView::InputChanged(int width, int height, float aspect,
+                                         MythCodecID av_codec_id)
 {
     (void)width;
     (void)height;
@@ -1217,13 +1219,14 @@ void VideoOutputQuartz::Zoom(int direction)
     }
 }
 
-void VideoOutputQuartz::InputChanged(int width, int height, float aspect)
+void VideoOutputQuartz::InputChanged(int width, int height, float aspect,
+                                     MythCodecID av_codec_id)
 {
     VERBOSE(VB_PLAYBACK,
             QString("VideoOutputQuartz::InputChanged(width=%1, height=%2, aspect=%3")
                    .arg(width).arg(height).arg(aspect));
 
-    VideoOutput::InputChanged(width, height, aspect);
+    VideoOutput::InputChanged(width, height, aspect, av_codec_id);
 
     DeleteQuartzBuffers();
 
@@ -1238,7 +1241,7 @@ void VideoOutputQuartz::InputChanged(int width, int height, float aspect)
          view;
          view = data->views.next())
     {
-        view->InputChanged(width, height, aspect);
+        view->InputChanged(width, height, aspect, av_codec_id);
     }
 
     MoveResize();    

@@ -50,6 +50,8 @@ class RingBuffer
     // General Commands
     void OpenFile(const QString &lfilename, uint retryCount = 12/*4*/);
     int  Read(void *buf, int count);
+    int  Peek(void *buf, int count); // only works with readahead
+
     void Reset(bool full          = false,
                bool toAdjust      = false,
                bool resetInternal = false);
@@ -99,7 +101,7 @@ class RingBuffer
     int safe_read(int fd, void *data, uint sz);
     int safe_read(RemoteFile *rf, void *data, uint sz);
 
-    int ReadFromBuf(void *buf, int count);
+    int ReadFromBuf(void *buf, int count, bool peek = false);
 
     int ReadBufFree(void) const;
     int ReadBufAvail(void) const;
