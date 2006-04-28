@@ -929,7 +929,8 @@ static int UDFGetPVD(dvd_reader_t *device, struct pvd_t *pvd)
     return 1;
   }
 
-  if(!UDFGetDescriptor( device, 1, pvd_buf, sizeof(pvd_buf))) {
+  if(!UDFGetDescriptor( device, 1, pvd_buf,
+                  sizeof(pvd_buf_base) - (pvd_buf - pvd_buf_base))) {
     return 0;
   }
   
