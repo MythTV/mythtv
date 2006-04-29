@@ -1042,6 +1042,9 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             if (d->gestureTimer->isActive())
                 d->gestureTimer->stop();
 
+            if (currentWidget())
+                break;
+
             if (d->gesture.recording())
             {
                 d->gesture.stop();
