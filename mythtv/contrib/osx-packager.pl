@@ -239,14 +239,12 @@ our %depend = (
   'exif'
   =>
   {
-    'url'
-    =>  "$sourceforge/sourceforge/libexif/libexif-0.6.12.tar.gz",
-    'conf'
-    =>  [
-          '--disable-nls',
-        ],
-  },
-  
+    'url'  => "$sourceforge/sourceforge/libexif/libexif-0.6.13.tar.bz2",
+    'conf' => [ '--disable-nls' ],
+    'post-conf' => 'echo "install-apidocs:
+install-apidocs-internals:
+" >> doc/Makefile.in'
+  }
 );
 
 
@@ -491,7 +489,7 @@ if ( $ENV{'DISTCC_HOSTS'} )
   my @hosts = split m/\s+/, $ENV{'DISTCC_HOSTS'};
   my $numhosts = $#hosts + 1;
   &Verbose("Using $numhosts build hosts:", join ', ', @hosts);
-  $parallel_make .= ' -j' . $numhosts;
+  $parallel_make .= ' -j' . $numhosts * 2;
 }
 
 
