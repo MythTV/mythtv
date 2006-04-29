@@ -17,19 +17,19 @@ class DummyDecoder : public DecoderBase
   public:
     DummyDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo) : 
         DecoderBase(parent, pginfo) {}
-   ~DummyDecoder() {}
+    virtual ~DummyDecoder() {}
 
-    int OpenFile(RingBuffer *, bool, char *, int) { return 0; }
-    bool GetFrame(int) { usleep(10000); return false; }
+    virtual int OpenFile(RingBuffer *, bool, char *, int) { return 0; }
+    virtual bool GetFrame(int) { usleep(10000); return false; }
 
-    bool isLastFrameKey(void) { return true; }
-    void WriteStoredData(RingBuffer *, bool, long) {}
+    virtual bool isLastFrameKey(void) { return true; }
+    virtual void WriteStoredData(RingBuffer *, bool, long) {}
 
-    long UpdateStoredFrameNum(long) { return 0; }
+    virtual long UpdateStoredFrameNum(long) { return 0; }
 
-    QString GetEncodingType(void) const { return QString("MPEG-2"); }
+    virtual QString GetEncodingType(void) const { return QString("MPEG-2"); }
 
-    bool SyncPositionMap(void) { return false; }
+    virtual bool SyncPositionMap(void) { return false; }
 };
 
 #endif
