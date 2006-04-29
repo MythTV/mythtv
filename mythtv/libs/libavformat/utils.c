@@ -2013,7 +2013,7 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
  */
 int av_find_stream_info(AVFormatContext *ic)
 {
-    int i, count, ret, read_size, j, read_packets;
+    int i, count, ret, read_size, j, read_packets = 0;
     AVStream *st;
     AVPacket pkt1, *pkt;
     AVPacketList *pktl=NULL, **ppktl;
@@ -2085,7 +2085,7 @@ int av_find_stream_info(AVFormatContext *ic)
             }
         } else {
             /* we did not get all the codec info, but we read too much data */
-            if (read_size >= MAX_READ_SIZE || read_packets >= MAX_FRAMES) {
+            if (read_size >= MAX_READ_SIZE) {
                 ret = count;
                 break;
             }
