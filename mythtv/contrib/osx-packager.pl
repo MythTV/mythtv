@@ -431,7 +431,7 @@ our %conf = (
         '--prefix=' . $PREFIX,
         '--enable-opengl',
         '--disable-mythbrowser',
-        '--disable-mythdvd',
+        '--enable-mythdvd',
         '--enable-vcd',
         '--disable-transcode',
         '--enable-mythgallery',
@@ -828,6 +828,20 @@ foreach my $comp (@comps)
   &Verbose("Installing $comp");
   &Syscall([ $standard_make,
              'install' ]) or die;
+
+  if ($cleanLibs && $comp eq 'mythtv')
+  {
+    # If we cleaned the libs, make install will have recopied them,
+    # which means any dynamic libraries that the static libraries depend on
+    # are newer than the table of contents. Hence we need to regenerate it:
+    my @mythlibs = glob "$PREFIX/lib/libmyth*.a";
+    if (scalar @mythlibs)
+    {
+      &Verbose("Running ranlib on reinstalled static libraries");
+      foreach my $lib (@mythlibs)
+      { &Syscall("ranlib $lib") or die }
+    }
+  }
 }
 
 ### Build version string
@@ -877,6 +891,16 @@ foreach my $target ( @targets )
   &RecursiveCopy("$PREFIX/share/mythtv",
                  "$finalTarget/Contents/Resources/share");
  }
+
+  if ( $target eq "MythFrontend" )
+  {
+     my $mtd = "$svndir/mythplugins/mythdvd/mtd/mtd.app/Contents/MacOS/mtd";
+     if ( -e $mtd )
+     {
+       &Verbose("Installing $mtd into $target");
+       &Syscall([ 'cp', $mtd, "$finalTarget/Contents/MacOS" ]) or die;
+     }
+  }
 }
 
 if ( $backend )
