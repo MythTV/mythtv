@@ -2536,7 +2536,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (StateIsPlaying(internalState) &&
                      gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
-                     playbackinfo && playbackinfo->isVideo)
+                     playbackinfo && playbackinfo->isVideo && 
+                     !prbuffer->InDVDMenuOrStillFrame())
             {
                 nvp->Pause();
 
