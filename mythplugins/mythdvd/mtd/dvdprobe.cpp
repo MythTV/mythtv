@@ -11,7 +11,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <linux/cdrom.h>
+#endif
 #include <fcntl.h>
 #include <unistd.h>
 #include "dvdprobe.h"
@@ -474,6 +476,7 @@ bool DVDProbe::probe()
         return false;
     }
 
+#if defined(__linux__) || defined(__FreeBSD__)
     //
     //  I have no idea if the following code block
     //  is anywhere close to the "right way" of doing
@@ -537,6 +540,7 @@ bool DVDProbe::probe()
             }
         }
     }
+#endif
 
     //
     //  Try to open the disc
