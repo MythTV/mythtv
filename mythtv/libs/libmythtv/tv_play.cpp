@@ -2252,16 +2252,43 @@ void TV::ProcessKeypress(QKeyEvent *e)
     if (handled)
         return;
 
+    if (prbuffer->isDVD() && prbuffer->DVD()->IsInMenu())
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            int nb_buttons = prbuffer->DVD()->NumMenuButtons();
+            if (nb_buttons > 0)
+            {
+                handled = true;
+                if (action == "UP" || action == "CHANNELUP")
+                    prbuffer->DVD()->MoveButtonUp();
+                else if (action == "DOWN" || action == "CHANNELDOWN")
+                    prbuffer->DVD()->MoveButtonDown();
+                else if (action == "LEFT" || action == "SEEKRWND")
+                    prbuffer->DVD()->MoveButtonLeft();
+                else if (action == "RIGHT" || action == "SEEKFFWD")
+                    prbuffer->DVD()->MoveButtonRight();
+                else if (action == "SELECT")
+                    nvp->ActivateDVDButton();
+                else
+                    handled = false;
+            }
+            if (handled)
+                return;
+       }
+    }
+             
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "SKIPCOMMERCIAL")
+        if (action == "SKIPCOMMERCIAL" && !prbuffer->isDVD())
             DoSkipCommercials(1);
-        else if (action == "SKIPCOMMBACK")
+        else if (action == "SKIPCOMMBACK" && !prbuffer->isDVD())
             DoSkipCommercials(-1);
-        else if (action == "QUEUETRANSCODE")
+        else if (action == "QUEUETRANSCODE" && !prbuffer->isDVD())
             DoQueueTranscode("Default");
         else if (action == "QUEUETRANSCODE_AUTO")
             DoQueueTranscode("Autodetect");
@@ -2275,9 +2302,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoPlay();
         else if (action == "PAUSE") 
             DoPause();
-        else if (action == "SPEEDINC")
+        else if (action == "SPEEDINC" && !prbuffer->InDVDMenuOrStillFrame())
             ChangeSpeed(1);
-        else if (action == "SPEEDDEC")
+        else if (action == "SPEEDDEC" && !prbuffer->InDVDMenuOrStillFrame())
             ChangeSpeed(-1);
         else if (action == "ADJUSTSTRETCH")
             ChangeTimeStretch(0);   // just display
@@ -2428,7 +2455,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
             }
         }
-        else if (action == "JUMPBKMRK")
+        else if (action == "JUMPBKMRK" && !prbuffer->isDVD())
         {
             int bookmark = activenvp->GetBookmark();
             if (bookmark > frameRate)
@@ -2736,24 +2763,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
 
-            if (prbuffer->InDVDMenuOrStillFrame())
-            {
-                int nb_buttons = prbuffer->DVD()->NumMenuButtons();
-                if (nb_buttons > 0)
-                {
-                    if (action == "UP" || action == "CHANNELUP")
-                        prbuffer->DVD()->MoveButtonUp();
-                    else if (action == "DOWN" || action == "CHANNELDOWN")
-                        prbuffer->DVD()->MoveButtonDown();
-                    else if (action == "LEFT" || action == "SEEKRWND")
-                        prbuffer->DVD()->MoveButtonLeft();
-                    else if (action == "RIGHT" || action == "SEEKFFWD")
-                        prbuffer->DVD()->MoveButtonRight();
-                    else if (action == "SELECT")
-                        nvp->ActivateDVDButton();
-                }
-            }
-            else if (action == "DELETE")
+            if (action == "DELETE" && !prbuffer->isDVD())
             {
                 NormalSpeed();
                 StopFFRew();
@@ -2769,7 +2779,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 EditSchedule(kScheduleProgramGuide);
             else if (action == "FINDER")
                 EditSchedule(kScheduleProgramFinder);
-            else if (action == "TOGGLEEDIT")
+            else if (action == "TOGGLEEDIT" && !prbuffer->isDVD())
                 StartProgramEditMode();
             else if (action == "TOGGLEBROWSE")
                 ShowOSDTreeMenu();
