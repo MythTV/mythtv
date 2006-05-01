@@ -136,7 +136,7 @@ QString TransportScanItem::ModulationDB(void) const
 #else
     switch (modulation)
     {
-        case QPSK:     return "qpsk";
+//        case QPSK:     return "qpsk";
         case QAM_AUTO: return "auto";
         case QAM_16:   return "qam_16";
         case QAM_32:   return "qam_32";

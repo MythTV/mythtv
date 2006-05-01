@@ -17,6 +17,9 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbtypes.h"
 #else // if ! USING_DVB
+//#define QPSK     0
+#define QAM_16   1
+#define QAM_32   2
 #define QAM_64   3
 #define QAM_128  4
 #define QAM_256  5
