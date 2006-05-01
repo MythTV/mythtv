@@ -241,6 +241,13 @@
    </button>
 
    <button>
+       <type>ARCHIVE</type>
+       <text>Archive Files</text>
+       <action>PLUGIN mytharchive</action>
+       <depends>mytharchive</depends>
+   </button>
+
+   <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
      <text lang="FI">Elokuvien Ajat</text>

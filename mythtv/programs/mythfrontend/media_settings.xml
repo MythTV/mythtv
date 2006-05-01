@@ -145,4 +145,11 @@
       <depends>mythburn</depends>
    </button>
 
+   <button>
+      <type>SETTINGS_ARCHIVE</type>
+      <text>Archive Files Settings</text>
+      <action>CONFIGPLUGIN mytharchive</action>
+      <depends>mytharchive</depends>
+   </button>
+
 </mythmenu>

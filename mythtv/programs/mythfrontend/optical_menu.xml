@@ -84,6 +84,13 @@
    </button>
 
    <button>
+      <type>ARCHIVE</type>
+      <text>Archive Files</text>
+      <action>PLUGIN mytharchive</action>
+      <depends>mytharchive</depends>
+   </button>
+
+   <button>
       <type>MUSIC_RIP</type>
       <text>Import CD</text>
       <text lang="IT">Importa un CD</text>
