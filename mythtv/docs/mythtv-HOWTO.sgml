@@ -2343,8 +2343,9 @@ address, you must use real IP addresses in both fields, otherwise your
 frontend machines will generate "Unexpected response to MYTH_PROTO_VERSION"
 errors.
 
-It is very strongly discouraged that you make any changes to the port
-settings from the defaults.
+Changing any of the port settings is very strongly discouraged.
+(If you do accidentally change them, the defaults are 6543 for
+the master/backend server, and 6544 for the HTTP requests)
 
 Once you're satisfied with the values, move the focus down to Next and hit
 the space bar.
