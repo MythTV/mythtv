@@ -634,7 +634,8 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
         {
             const uint freq_vis = freq - 1750000; // to visual carrier
             QString inputname = ChannelUtil::GetInputName(item.SourceID);
-            ok = GetChannel()->Tune(freq_vis, inputname, "8vsb");
+            ok = GetChannel()->Tune(freq_vis, inputname,
+                                    item.ModulationDB());
         }
     }
 #endif // USING_V4L
@@ -647,7 +648,8 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
         else 
         {
             QString inputname = ChannelUtil::GetInputName(item.SourceID);
-            ok = GetHDHRChannel()->Tune(freq, inputname, "8vsb");
+            ok = GetHDHRChannel()->Tune(freq, inputname,
+                                        item.ModulationDB());
         }        
     }
 #endif // USING_HDHOMERUN
@@ -1346,17 +1348,18 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
                 tuning.Frequency(),         tuning.ModulationDB(),
-                -1,                         -1,
-                -1,                         tuning.BandwidthChar(),
-                -1,                         tuning.InversionChar(),
+                -1 /* transport id */,      -1 /* network id */,
+                -1 /* symbol rate */,       tuning.BandwidthChar(),
+                -1 /* polarity */,          tuning.InversionChar(),
                 tuning.TransmissionModeChar(),
-                QString::null,              tuning.ConstellationDB(),
+                QString::null /*inner FEC*/,tuning.ConstellationDB(),
                 tuning.HierarchyChar(),     tuning.HPCodeRateString(),
                 tuning.LPCodeRateString(),  tuning.GuardIntervalString());
         else
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
-                tuning.Frequency(),         tuning.ModulationDB());
+                tuning.Frequency(),         (*transport).ModulationDB(),
+                -1 /* transport id */,      -1 /* network id */);
     }
 #endif // USING_DVB
 
@@ -1366,7 +1369,8 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
         const uint freq = (*transport).freq_offset(transport.offset());
         const uint freq_vis = freq - 1750000; // convert to visual carrier
         mplexid = ChannelUtil::CreateMultiplex(
-            (*transport).SourceID, (*transport).standard, freq_vis, "8vsb");
+            (*transport).SourceID, (*transport).standard,
+            freq_vis, (*transport).ModulationDB());
     }
 #endif // USING_V4L
 
@@ -1375,7 +1379,8 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
     {
         const uint freq = (*transport).freq_offset(transport.offset());
         mplexid = ChannelUtil::CreateMultiplex(
-            (*transport).SourceID, (*transport).standard, freq, "8vsb");
+            (*transport).SourceID, (*transport).standard,
+            freq, (*transport).ModulationDB());
     }
 #endif
 

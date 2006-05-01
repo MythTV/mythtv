@@ -140,6 +140,8 @@ class TransportScanItem
 
     uint freq_offset(uint i) const;
 
+    QString ModulationDB(void) const;
+
   private:
     int GetMultiplexIdFromDB() const;
 

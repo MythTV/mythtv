@@ -495,6 +495,26 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
 
     QString card_type = CardUtil::GetRawCardType(cardid, sourceid);
 
+    if ("DVB" == card_type)
+    {
+        QString sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+        bool need_nit = (("QAM"  == sub_type) ||
+                         ("QPSK" == sub_type) ||
+                         ("OFDM" == sub_type));
+
+        // Ugh, Some DVB drivers don't fully support signal monitoring...
+        if (ScanTypeSetting::TransportScan == parent->scanType() ||
+            ScanTypeSetting::FullTransportScan == parent->scanType())
+        {
+            signal_timeout = (parent->ignoreSignalTimeout()) ?
+                channel_timeout * 10 : signal_timeout;
+        }
+
+        // Since we the NIT is only sent every 10 seconds, we add an
+        // extra 20 + 2 seconds to the scan time for DVB countries.
+        channel_timeout += (need_nit) ? 22 * 1000 : 0;
+    }
+
 #ifdef USING_DVB
     if ("DVB" == card_type)
         channel = new DVBChannel(device.toInt());
@@ -527,15 +547,6 @@ void ScanWizardScanner::PreScanCommon(uint cardid, uint sourceid)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Channel could not be opened");
         return;
-    }
-
-    // Ugh, Some DVB drivers in DVB countries don't fully support
-    // signal monitoring...
-    if (ScanTypeSetting::TransportScan == parent->scanType() ||
-        ScanTypeSetting::FullTransportScan == parent->scanType())
-    {
-        signal_timeout = (parent->ignoreSignalTimeout()) ?
-            channel_timeout * 10 : signal_timeout;
     }
 
     scanner = new SIScan(card_type, channel, parent->videoSource(),

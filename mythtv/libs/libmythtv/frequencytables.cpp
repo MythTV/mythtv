@@ -129,6 +129,28 @@ uint TransportScanItem::freq_offset(uint i) const
     return (uint) (freq + freq_offsets[i]);
 }
 
+QString TransportScanItem::ModulationDB(void) const
+{
+#ifdef USING_DVB
+    return tuning.ModulationDB();
+#else
+    switch (modulation)
+    {
+        case QPSK:     return "qpsk";
+        case QAM_AUTO: return "auto";
+        case QAM_16:   return "qam_16";
+        case QAM_32:   return "qam_32";
+        case QAM_64:   return "qam_64";
+        case QAM_128:  return "qam_128";
+        case QAM_256:  return "qam_256";
+        case VSB_8:    return "8vsb";
+        case VSB_16:   return "16vsb";
+        default:       return "auto";
+    }
+#endif
+}
+
+
 QString TransportScanItem::toString() const
 {
     QString str = QString("Transport Scan Item '%1' #%2\n")
