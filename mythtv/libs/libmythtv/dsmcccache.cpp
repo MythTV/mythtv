@@ -208,7 +208,7 @@ void DSMCCCache::AddFileInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
     pDir->m_Files.insert(name, *entry);
 
     VERBOSE(VB_DSMCC,
-            QString("[DSMCCCache] Adding file with name %1s reference %2")
+            QString("[DSMCCCache] Adding file with name %1 reference %2")
             .arg(name.ascii()).arg(entry->toString()));
 }
 
@@ -287,7 +287,7 @@ int DSMCCCache::GetObject(QStringList &objectPath, QByteArray &result)
             QMap<QString, DSMCCCacheReference>::Iterator ref =
                 dir->m_Files.find(name);
 
-            if (ref == NULL)
+            if (ref == dir->m_Files.end())
                 return -1; // Not there.
 
             DSMCCCacheFile *fil = FindFileData(*ref);
@@ -303,7 +303,7 @@ int DSMCCCache::GetObject(QStringList &objectPath, QByteArray &result)
             QMap<QString, DSMCCCacheReference>::Iterator ref =
                 dir->m_SubDirectories.find(name);
 
-            if (ref == NULL)
+            if (ref == dir->m_SubDirectories.end())
                 return -1; // Not there
 
             dir = FindDir(*ref);
