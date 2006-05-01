@@ -1077,7 +1077,7 @@ void find_all_pids_file(struct replex *rx)
 		
 	memset (vpid , 0 , MAXVPID*sizeof(uint16_t));
 	memset (apid , 0 , MAXAPID*sizeof(uint16_t));
-	memset (ac3pid , 0 , MAXAC3PID*sizeof(uint16_t));
+    memset (ac3pid , 0 , MAXAC3PID*sizeof(uint16_t));
 
 	fprintf(stderr,"Trying to find PIDs\n");
 	while (count < rx->inflength-IN_SIZE){
@@ -1771,12 +1771,12 @@ void fix_audio(struct replex *rx, multiplex_t *mx)
 			} else break;
 
 		} while (1);
-		mx->apts_off[i] = aiu.pts;
-		mx->aframes[i] = aiu.framesize;
+		mx->extpts_off[i] = aiu.pts;
+		mx->extframes[i] = aiu.framesize;
 		
 		fprintf(stderr,"Audio%d  offset: ",i);
-		printpts(mx->apts_off[i]);
-		printpts(rx->first_apts[i]+mx->apts_off[i]);
+		printpts(mx->extpts_off[i]);
+		printpts(rx->first_apts[i]+mx->extpts_off[i]);
 		fprintf(stderr,"\n");
 	}
 			  
@@ -1797,11 +1797,11 @@ void fix_audio(struct replex *rx, multiplex_t *mx)
 				ring_skip(&rx->ac3rbuffer[i], aiu.length);
 			} else break;
 		} while (1);
-		mx->ac3pts_off[i] = aiu.pts;
+		mx->extpts_off[i] = aiu.pts;
 		
 		fprintf(stderr,"AC3%d  offset: ",i);
-		printpts(mx->ac3pts_off[i]);
-		printpts(rx->first_ac3pts[i]+mx->ac3pts_off[i]);
+		printpts(mx->extpts_off[i]);
+		printpts(rx->first_ac3pts[i]+mx->extpts_off[i]);
 		fprintf(stderr,"\n");
 
 	}
@@ -2032,16 +2032,14 @@ void do_demux(struct replex *rx)
 void do_replex(struct replex *rx)
 {
 	int video_ok = 0;
-	int audio_ok[N_AUDIO];
-	int ac3_ok[N_AC3];
+	int ext_ok[N_AUDIO];
 	int start=1;
 	multiplex_t mx;
 
 
 	fprintf(stderr,"STARTING REPLEX\n");
 	memset(&mx, 0, sizeof(mx));
-	memset(audio_ok, 0, N_AUDIO*sizeof(int));
-	memset(ac3_ok, 0, N_AC3*sizeof(int));
+	memset(ext_ok, 0, N_AUDIO*sizeof(int));
 
 	while (!replex_all_set(rx)){
 		if (replex_fill_buffers(rx, 0)< 0) {
@@ -2050,14 +2048,32 @@ void do_replex(struct replex *rx)
 		}
 	}
 
-	mx.priv = (void *) rx;
+ int i; 
+   for (i = 0; i < rx->apidn; i++){
+        rx->exttype[i] = 2;
+        rx->extframe[i] = rx->aframe[i];
+        rx->extrbuffer[i] = rx->arbuffer[i];
+        rx->index_extrbuffer[i] = rx->index_arbuffer[i];
+        rx->exttypcnt[i+1] = i;
+    }
+
+    int ac3Count = 1;
+    for (i = rx->apidn; i < rx->apidn + rx->ac3n; i++){
+        rx->exttype[i] = 1;
+        rx->extframe[i] = rx->ac3frame[i];
+        rx->extrbuffer[i] = rx->ac3rbuffer[i];
+        rx->index_extrbuffer[i] = rx->index_ac3rbuffer[i];
+        rx->exttypcnt[i] = ac3Count++;
+    }
+
+    mx.priv = (void *) rx;
 	rx->priv = (void *) &mx;
-	init_multiplex(&mx, &rx->seq_head, rx->aframe, rx->ac3frame, 
-		       rx->apidn, rx->ac3n, rx->video_delay, 
-		       rx->audio_delay, rx->fd_out, fill_buffers,
-		       &rx->vrbuffer, &rx->index_vrbuffer,	
-		       rx->arbuffer, rx->index_arbuffer,
-		       rx->ac3rbuffer, rx->index_ac3rbuffer, rx->otype);
+    init_multiplex(&mx, &rx->seq_head, rx->extframe,
+                 rx->exttype, rx->exttypcnt, rx->video_delay, 
+                 rx->audio_delay, rx->fd_out, fill_buffers,
+                 &rx->vrbuffer, &rx->index_vrbuffer,  
+                 rx->extrbuffer, rx->index_extrbuffer,
+                 rx->otype);
 
 	if (!rx->ignore_pts){ 
 		fix_audio(rx, &mx);
@@ -2065,11 +2081,10 @@ void do_replex(struct replex *rx)
 	setup_multiplex(&mx);
 
 	while(1){
-		check_times( &mx, &video_ok, audio_ok, ac3_ok, &start);
+		check_times( &mx, &video_ok, ext_ok, &start);
 
-		write_out_packs( &mx, video_ok, audio_ok, ac3_ok);
+		write_out_packs( &mx, video_ok, ext_ok);
 	}
-	
 }
 
 

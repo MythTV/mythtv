@@ -70,6 +70,13 @@ struct replex {
 	int ac3buf;
 	int videobuf;
 
+    int ext_count;
+    int exttype[N_AUDIO];
+    int exttypcnt[N_AUDIO];
+    audio_frame_t extframe[N_AUDIO];
+    ringbuffer extrbuffer[N_AUDIO];
+    ringbuffer index_extrbuffer[N_AUDIO];
+
   //ac3 
 	int ac3n;
 	uint16_t ac3_id[N_AC3];
