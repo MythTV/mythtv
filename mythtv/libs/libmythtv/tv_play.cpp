@@ -2409,17 +2409,27 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (prbuffer->InDVDMenuOrStillFrame())
                     UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
                                          osd_general_timeout);
-                else if (prbuffer->DVD()->NumPartsInTitle() < 2)
-                {
-                    nvp->GoToDVDProgram(0);
-                    UpdateOSDSeekMessage(tr("Previous Title"),
-                            osd_general_timeout);
-                }
-                else
+                else if (prbuffer->DVD()->NumPartsInTitle() > 2)
                 {
                     nvp->ChangeDVDTrack(0);
                     UpdateOSDSeekMessage(tr("Previous Chapter"),
-                            osd_general_timeout);
+                                            osd_general_timeout);
+                }
+                else
+                {
+                    uint titleLength = prbuffer->DVD()->GetTotalTimeOfTitle();
+                    uint chapterLength = prbuffer->DVD()->GetChapterLength();
+                    if ((titleLength == chapterLength) &&
+                        chapterLength > 300)
+                    {
+                        DoSeek(-jumptime * 60, tr("Jump Back"));
+                    } 
+                    else
+                    {                        
+                        nvp->GoToDVDProgram(0);
+                        UpdateOSDSeekMessage(tr("Previous Title"),
+                                                osd_general_timeout);
+                    }
                 }
             }
             else
@@ -2443,11 +2453,23 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     UpdateOSDSeekMessage(tr("Next Chapter"),
                             osd_general_timeout);
                 }
-                else 
+                else
                 {
-                    nvp->GoToDVDProgram(1);
-                    UpdateOSDSeekMessage(tr("Next Title"), 
+                    uint titleLength = prbuffer->DVD()->GetTotalTimeOfTitle();
+                    uint chapterLength = prbuffer->DVD()->GetChapterLength();
+                    uint currentTime = prbuffer->DVD()->GetCurrentTime();
+                    if ((titleLength == chapterLength) &&
+                        (currentTime < (chapterLength - (jumptime * 60))) &&
+                        chapterLength > 300)
+                    {
+                        DoSeek(jumptime * 60, tr("Jump Ahead"));
+                    }
+                    else
+                    {
+                        nvp->GoToDVDProgram(1);
+                        UpdateOSDSeekMessage(tr("Next Title"), 
                             osd_general_timeout);
+                    }
                 }
             }
             else
