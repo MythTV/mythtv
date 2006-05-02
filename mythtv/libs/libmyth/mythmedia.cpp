@@ -101,7 +101,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 
     if (!m_SuperMount) 
     {
-        // Build a command line for mount/unmount and execute it...  Is there a better way to do this?
+        // Build a command line for mount/unmount and execute it...
+        // Is there a better way to do this?
         if (QFile(PATHTO_PMOUNT).exists() && QFile(PATHTO_PUMOUNT).exists())
             MountCommand = QString("%1 %2")
                 .arg((DoMount) ? PATHTO_PMOUNT : PATHTO_PUMOUNT)
@@ -134,7 +135,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     } 
     else 
     {
-        VERBOSE( VB_IMPORTANT,  "Disk iserted on a supermount device" );
+        VERBOSE( VB_IMPORTANT,  "Disk inserted on a supermount device" );
         // If it's a super mount then the OS will handle mounting /  unmounting.
         // We just need to give derived classes a chance to perform their 
         // mount / unmount logic.
@@ -149,7 +150,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 
 MediaError MythMediaDevice::lock() 
 { 
-    // We just open the device here, which may or may not do the trick, derived classes can do more...
+    // We just open the device here, which may or may not do the trick,
+    // derived classes can do more...
     if (openDevice()) 
     {
         m_Locked = true;
@@ -187,7 +189,8 @@ bool MythMediaDevice::isMounted(bool Verify)
             
             // Extract the mount point and device name.
             stream >> DeviceName >> MountPoint;
-            //cout << "Found Device: " << DeviceName << "  Mountpoint: " << MountPoint << endl; 
+            //cout << "Found Device: " << DeviceName
+            //     << "  Mountpoint: " << MountPoint << endl; 
 
             // Skip the rest of the line
             line = stream.readLine();
@@ -217,7 +220,8 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
 
     m_Status = NewStatus;
 
-    // If the status is changed we need to take some actions depending on the old and new status.
+    // If the status is changed we need to take some actions
+    // depending on the old and new status.
     if (NewStatus != OldStatus) 
     {
         switch (NewStatus) 
