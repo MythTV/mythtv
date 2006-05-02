@@ -205,9 +205,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 VERBOSE(VB_PLAYBACK,
                         QString("DVDNAV_CELL_CHANGE: "
                                 "pg_length == %1, pgc_length == %2, "
-                                "cell_start == %3, pg_start == %4")
+                                "cell_start == %3, pg_start == %4, "
+                                "title == %5 part == %6")
                         .arg(pgLength).arg(pgcLength)
-                        .arg(cellStart).arg(pgStart));
+                        .arg(cellStart).arg(pgStart)
+                        .arg(title).arg(part));
 
                 if (dvdnav_get_next_still_flag(dvdnav) > 0)
                 {
@@ -910,6 +912,7 @@ int DVDRingBufferPriv::GetTrack(uint type)
 
     return 0;
 }
+
 uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
 {
     unsigned char channels = dvdnav_audio_get_channels(dvdnav,id);
@@ -927,6 +930,10 @@ void DVDRingBufferPriv::ClearSubtitlesOSD(void)
     }
 }
 
+/** \fn DVDRingBufferPriv::GetFrameRate()
+ * \brief used by DecoderBase for the total frame number calculation for position map support and ffw/rew.
+ * FPS for a dvd is determined by AFD::normalized_fps
+ */
 double DVDRingBufferPriv::GetFrameRate(void)
 {
     float dvdfps = 0;
@@ -939,6 +946,9 @@ double DVDRingBufferPriv::GetFrameRate(void)
     return dvdfps;
 }
 
+/** \fn DVDRingBufferPriv::guess_palette(uint32_t, uint8_t, uint8_t)
+ * \brief converts palette values from YUV to RGB
+ */
 void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
                                         uint8_t *alpha)
 {
@@ -967,6 +977,9 @@ void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
     }
 }
 
+/** \fn DVDRingBufferPriv::decode_rle(uint8_t, int, int, int, int, const uint8_t, int, int)
+ * \brief copied from ffmpeg's dvdsub.c. decodes the bitmap from the subtitle packet.
+ */
 int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h, 
                                   const uint8_t *buf, int nibble_offset, int buf_size)
 {
@@ -1013,6 +1026,9 @@ int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h,
     return 0;
 }
 
+/** \fn DVDRingBufferPriv::get_nibble(const uint8_t , int)
+ * \brief copied from ffmpeg's dvdsub.c
+ */
 int DVDRingBufferPriv::get_nibble(const uint8_t *buf, int nibble_offset)
 {
     return (buf[nibble_offset >> 1] >> ((1 - (nibble_offset & 1)) << 2)) & 0xf;

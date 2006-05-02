@@ -17,9 +17,6 @@
  *  \brief RingBuffer class for DVD's
  *
  *   A spiffy little class to allow a RingBuffer to read from DVDs.
- *   This should really be a specialized version of the RingBuffer, but
- *   until it's all done and tested I'm not real sure about what stuff
- *   needs to be in a RingBufferBase class.
  */
 
 class NuppelVideoPlayer;
@@ -41,6 +38,7 @@ class DVDRingBufferPriv
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = part; _title = title; }
     uint GetTotalTimeOfTitle(void);
+    uint GetChapterLength(void) { return pgLength / 90000; }
     uint GetCellStart(void);
     bool InStillFrame(void) { return cellHasStillFrame; }
     bool IsWaiting(void) { return dvdWaiting; }
@@ -134,6 +132,8 @@ class DVDRingBufferPriv
     bool           cellRepeated;
     int            buttonstreamid;
     bool           gotoCellStart;
+    /// this pts is of the first video frame decoded just after reading a menu pkt. 
+    /// menu pkt pts is not reliable
     long long      menupktpts;
     int            curAudioTrack;
     int            curSubtitleTrack;
@@ -149,11 +149,10 @@ class DVDRingBufferPriv
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
     bool MenuButtonChanged(void);
-    uint ConvertLangCode(uint16_t code); // converts 2char key to 3char key
+    uint ConvertLangCode(uint16_t code); /// converts 2char key to 3char key
     void SelectDefaultButton(void);
     void ClearSubtitlesOSD(void);
     
-    /* copied from dvdsub.c from ffmpeg */
     int get_nibble(const uint8_t *buf, int nibble_offset);
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                     const uint8_t *buf, int nibble_offset, int buf_size);
