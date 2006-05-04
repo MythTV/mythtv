@@ -9,7 +9,9 @@ system restoring all the associated metadata.
 PREREQUISITES
 =============
 
-You need to have already installed the external dependencies required
+This plugin requires at least SVN Revision 9846 to run.
+
+You also need to have already installed the external dependencies required
 by the mythburn script.
 
 Python2.3.5
