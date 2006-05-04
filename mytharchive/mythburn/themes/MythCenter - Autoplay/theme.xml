@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+	<!-- Example theme for MythBurn - creates an autoplay DVD with no menus-->
+	<fonts>
+		<font size="23">FreeSans.ttf</font>
+		<font size="18">FreeSans.ttf</font>
+		<font size="16">FreeSans.ttf</font>
+	</fonts>
+
+    <intro filename="mythlogo_intro.mpg"/>
+
+    <detailspage background="MythCenter-Background.png">
+        <graphic filename="%thumbnail" x="40" y="40" w="290" h="220" static="False"/>
+        <text x="350" y="50" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+        <text x="350" y="80" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+        <text x="350" y="105" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+        <text x="350" y="130" w="450" h="25" value="Duration %duration" font="2" colour="white" static="False" align="left"/>
+        <text x="50" y="300" w="600" h="250" value="%description" font="2" colour="white" static="False" align="left"/>
+    </detailspage>
+
+</mythburntheme>

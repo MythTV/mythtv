@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+	<!-- Example theme for MythBurn 3 recordings per page, with scene selection submenu -->
+	<fonts>
+		<font size="23">FreeSans.ttf</font>
+		<font size="18">FreeSans.ttf</font>
+		<font size="16">FreeSans.ttf</font>
+	</fonts>
+
+    <intro filename="mythtv_intro.mpg"/>
+
+    <menu background="GANT-Background.png">
+		<!-- item holds the position of a menu item ie. recording -->
+		<item>
+			<text x="80" y="15" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
+			<previous filename="%myfolderprevious.png" x="300" y="445" w="48" h="48" mask="%myfolderprevious_mask.png" static="True"/>
+			<graphic filename="%thumbnail" x="80" y="35" w="145" h="110" static="True"/>
+			<text x="235" y="60" w="450" h="25" value="%subtitle" font="1" colour="white" static="True" align="left"/>
+			<text x="235" y="80" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="True" align="left"/>
+			<text x="235" y="100" w="450" h="60" value="%description" font="2" colour="white" static="True" align="left"/>
+            <button x="235" y="35" w="450" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="235" y="35" w="450" h="28" value="%title" font="0" colour="white" align="left"/>
+                <textselected x="235" y="35" w="450" h="28" value="%title" font="0" colour="orange" align="left"/>
+            </button>
+        </item>
+		<item>
+			<graphic filename="%thumbnail" x="80" y="175" w="145" h="110" static="True" align="left"/>
+			<text x="235" y="200" w="450" h="25" value="%subtitle" font="1" colour="white" static="True" align="left"/>
+			<text x="235" y="220" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="True" align="left"/>
+			<text x="235" y="240" w="450" h="60" value="%description" font="2" colour="white" static="True" align="left"/>
+            <button x="235" y="175" w="450" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="235" y="175" w="450" h="28" value="%title" font="0" colour="white" align="left"/>
+                <textselected x="235" y="175" w="450" h="28" value="%title" font="0" colour="orange" align="left"/>
+            </button>
+        </item>
+		<item>
+			<graphic filename="%thumbnail" x="80" y="315" w="145" h="110" static="True"/>
+			<text x="235" y="340" w="450" h="25" value="%subtitle" font="1" colour="white" static="True" align="left"/>
+			<text x="235" y="360" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="True" align="left"/>
+			<text x="235" y="380" w="450" h="60" value="%description" font="2" colour="white" static="True" align="left"/>
+            <button x="235" y="315" w="450" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="235" y="315" w="450" h="28" value="%title" font="0" colour="white" align="left"/>
+                <textselected x="235" y="315" w="450" h="28" value="%title" font="0" colour="orange" align="left"/>
+            </button>
+            <next filename="%myfoldernext.png" x="375" y="445" w="48" h="48" mask = "%myfoldernext_mask.png" static="True"/>
+        </item>
+	</menu>
+	
+    <submenu background="GANT-Background.png">
+		<!-- Describes a menu or short video that will appear after the recording has been selected -->
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="50" y="45" w="145" h="110" static="True"/>
+            <!--<text x="50" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+			<text x="50" y="330" w="500" h="28" value="%title" font="0" colour="yellow" static="True" align="left"/>
+			<text x="50" y="350" w="600" h="28" value="%subtitle" font="1" colour="white" static="True" align="left"/>
+			<text x="50" y="350" w="600" h="28" value="%recordingdate %recordingtime (%duration)" font="1" colour="white" static="True" align="right"/>
+			<text x="50" y="375" w="600" h="100" value="%description" font="2" colour="white" static="True" align="left"/>
+            <button x="50" y="155" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="50" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="50" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="200" y="45" w="145" h="110" static="True"/>
+			<!--<text x="200" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="200" y="155" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="200" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="200" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+           </chapter>
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="350" y="45" w="145" h="110" static="True"/>
+            <!--<text x="350" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="350" y="155" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="350" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="350" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="500" y="45" w="145" h="110" static="True"/>
+			<!--<text x="500" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="500" y="155" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="500" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="500" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+		<!-- Row 2 -->
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="50" y="190" w="145" h="110" static="True"/>
+            <!--<text x="50" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="50" y="300" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="50" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="50" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="200" y="190" w="145" h="110" static="True"/>
+            <!--<text x="200" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="200" y="300" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="200" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="200" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="350" y="190" w="145" h="110" static="True"/>
+            <!--<text x="350" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="350" y="300" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="350" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="350" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+		<chapter>
+			<graphic filename="%chapterthumbnail" x="500" y="190" w="145" h="110" static="True"/>
+            <!--<text x="500" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>-->
+            <button x="500" y="300" w="145" h="28" filename="%myfolderblank.png" mask="%myfolderblank.png" static="False">
+                <textnormal x="500" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="white" align="center"/>
+                <textselected x="500" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="orange" align="center"/>
+            </button>
+        </chapter>
+	</submenu>
+
+    <detailspage background="GANT-Background.png">
+        <graphic filename="%thumbnail" x="40" y="40" w="290" h="220" static="False"/>
+        <text x="350" y="50" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+        <text x="350" y="80" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+        <text x="350" y="105" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+        <text x="350" y="130" w="450" h="25" value="Duration %duration" font="2" colour="white" static="False" align="left"/>
+        <text x="50" y="300" w="600" h="250" value="%description" font="2" colour="white" static="False" align="left"/>
+    </detailspage>
+
+</mythburntheme>

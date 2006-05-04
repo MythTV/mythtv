@@ -1,0 +1,21 @@
+<mythmenu name="ARCHIVE">
+
+   <button>
+      <type>ARCHIVE_FINDER</type>
+      <text>Find Files To Archive</text>
+      <action>ARCHIVE_FINDER</action>
+   </button>
+
+   <button>
+      <type>ARCHIVE_EXPORT_VIDEO</type>
+      <text>Export Video Files</text>
+      <action>ARCHIVE_EXPORT_VIDEO</action>
+   </button>
+
+   <button>
+       <type>ARCHIVE_IMPORT_VIDEO</type>
+       <text>Import Video Files</text>
+       <action>ARCHIVE_IMPORT_VIDEO</action>
+   </button>
+
+</mythmenu>

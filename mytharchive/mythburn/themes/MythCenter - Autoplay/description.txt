@@ -1,0 +1,1 @@
+Creates an auto play DVD with no menus. Shows an intro movie then for each title shows a details page followed by the video in sequence.

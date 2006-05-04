@@ -1,0 +1,21 @@
+<mythmenu name="ARCHIVESELECT">
+
+   <button>
+      <type>ARCHIVE_SELECT_RECORDINGS</type>
+      <text>Select Recordings</text>
+      <action>ARCHIVE_SELECT_RECORDINGS</action>
+   </button>
+
+   <button>
+      <type>ARCHIVE_SELECT_VIDEOS</type>
+      <text>Select Video Files</text>
+      <action>ARCHIVE_SELECT_VIDEOS</action>
+   </button>
+
+   <button>
+       <type>ARCHIVE_SELECT_FILES</type>
+       <text>Select Files</text>
+       <action>ARCHIVE_SELECT_FILES</action>
+   </button>
+
+</mythmenu>

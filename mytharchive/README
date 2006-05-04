@@ -1,0 +1,101 @@
+MythArchive
+===========
+MythArchive is a MythTV style plugin that uses the Mythburn Script to
+create and burn DVD's from MythTV recordings, MythVideo files or any
+video files available on a MythTV system. It can also export recordings 
+to a native archive format that can then be imported back into a mythtv 
+system restoring all the associated metadata.
+
+PREREQUISITES
+=============
+
+You need to have already installed the external dependencies required
+by the mythburn script.
+
+Python2.3.5
+python2.3-mysqldb
+python2.3-imaging (PIL)
+mjpegtools mplex-2 version 1.6.2 (2.2.3)
+ffmpeg version 0.4.9-pre1
+DVDAuthor::dvdauthor, version 0.6.11
+mkisofs 2.01a34-unofficial-iconv
+growisofs
+tcrequant (optional)
+
+COMPILE AND INSTALL MYTHARCHIVE
+===============================
+
+Do the usual install routine. (change the prefix to suit your system)
+
+$ ./configure --prefix=/usr
+$ make
+# make install
+
+
+FEATURES / HOW-TO-USE
+=====================
+
+If you run mythfrontend there should now be two extra menu items.
+One runs the MythArchive plugin the other shows MythArchive's settings
+page. 
+
+IMPORTANT - The first thing you should do is check the settings.
+Make sure you set the temp directory setting. There should be a lot
+of space at this location for the script to create all its work files.
+
+
+Now you can run the MythArchive plugin. First you need to cue some
+files for archiving from the "Find Files To Archive" menu. You can 
+choose MythTV recordings, MythVideo files or any media file accessible
+from your filesystem.
+
+Next you select items you would like to burn from the "Export Video File" 
+menu. If available you can tell MythArchive to use the cut list to cut
+out commercials etc. If you need to edit the details of an item. Press
+'MENU' and select "Edit Details" to show the 'Edit Details Dialog'.
+
+Next select a menu theme.
+
+Finally review what files have been selected and if you are happy
+click 'Finish' to start the DVD creation process. You can monitor
+the progress in the log viewer or exit the log viewer and continue
+to use myth.
+
+Keys:-
+* Up/Down/Left/Right - move focus/change selection
+* Select             - activate push button/toggle selection 
+* Exit               - return to myth main menu  
+* C                  - toggle use cut list
+
+TROUBLESHOOTING
+===============
+
+1. The script fails with "ERROR: Failed to init mythcontext." message.
+----------------------------------------------------------------------
+
+The most likely cause of the error is the MythContext cannot find a valid 'mysql.txt' file.
+You are most likely to see this problem when using the web interface and the user that 
+your web server is using doesn't have a home directory.
+
+There are two ways to fix this error:
+    a) Create a home directory for the user running your web server and copy a valid 'mysql.txt'
+       file into that directory.
+    b) or copy a valid 'mysql.txt' file to either INSTALL_PREFIX/share/mythtv/ or /etc/mythtv/
+
+You should find a copy of your mysql.txt file in one of the following locations:-
+    INSTALL_PREFIX/share/mythtv/mysql.txt
+    /etc/mythtv/mysql.txt
+    ~/.mythtv/mysql.txt
+
+
+2. The script fails with "ERROR: Failed while running growisofs." message.
+--------------------------------------------------------------------------
+
+The most likely cause of the error is insufficient file permissions on the cdrom device.
+Make sure the user that is running the script can both read and write to the device that 
+you use to burn dvd's.
+
+How you do that is dependent on how your distribution sets things up. It may be sufficient to
+add the user to the 'cdrom' group. You may also have to relax the permissions on the device
+itself to allow the cdrom group read/write access to it.
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+	<!-- Example theme for MythBurn - show intro & main menu with 6 recordings -->
+	<fonts>
+		<font size="23">FreeSans.ttf</font>
+		<font size="18">FreeSans.ttf</font>
+		<font size="16">FreeSans.ttf</font>
+	</fonts>
+
+    <intro filename="mythlogo_intro.mpg"/>
+
+    <menu background="Compact-Background.png">
+		<!-- item holds the position of a menu item ie. recording -->
+		<item>
+			<text x="60" y="50" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
+			<previous filename="%myfolderprevious.png" x="300" y="450" w="48" h="48" mask="%myfolderprevious_mask.png" static="True"/>
+			
+			<text x="135" y="95" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
+			<text x="135" y="120" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
+		</item>
+		<item>
+			<text x="135" y="155" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
+			<text x="135" y="180" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
+		</item>
+		<item>
+			<text x="135" y="215" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
+			<text x="135" y="240" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
+		</item>
+		<item>
+			<text x="135" y="275" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
+			<text x="135" y="300" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
+		</item>
+		<item>
+			<text x="135" y="335" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
+			<text x="135" y="360" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
+		</item>
+		<item>
+			<next filename="%myfoldernext.png" x="372" y="450" w="48" h="48" mask="%myfoldernext_mask.png" static="False"/>
+			<text x="135" y="395" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
+			<text x="135" y="420" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
+		</item>
+	</menu>
+</mythburntheme>

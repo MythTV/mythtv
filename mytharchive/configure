@@ -1,0 +1,144 @@
+#!/bin/sh
+#
+# Configure script for mytharchive
+#
+
+# 
+#    default parameters
+#
+
+prefix="/usr/local"
+libdir_name="lib"
+
+cc="gcc"
+
+if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
+cat << EOF
+
+Usage:   configure [options]
+Options: [defaults in brackets after descriptions]
+NB:      all --enable-* options can be reversed with --disable-*
+
+Generic options:
+  --prefix=PREFIX          MythTV install location PREFIX [$prefix]"
+  --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]"
+  --help                   print this message
+  --previous               use previous configure parameters if possible
+
+EOF
+exit 1
+fi
+
+if [ -e config.log ] ; then
+    PCONF=`cat config.log | tail -n 1 | grep configure`
+    if test x"$PCONF" != x"" ; then
+        PCONF=`echo $PCONF | sed 's/.\/configure//g'`
+    fi
+    for opt do
+        if test x"$opt" = x"--prev" -o x"$opt" = x"--previous" ; then
+            if test x"$PCONF" != "--prev" ; then
+                echo "Options: $PCONF"
+                ./configure $PCONF
+                exit
+            fi
+        fi
+    done
+fi
+
+CONFIGURATION_OPTS=""
+for opt do
+  CONFIGURATION_OPTS="$CONFIGURATION_OPTS ""$opt"
+done
+
+date >> config.log
+echo "   $0$CONFIGURATION_OPTS" >> config.log
+
+for opt do
+  case "$opt" in
+  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --libdir-name=*) libdir_name=`echo $opt | cut -d '=' -f 2`;
+  ;;
+  esac
+done
+
+# set temporary file name
+if test ! -z "$TMPDIR" ; then
+    TMPDIR1="${TMPDIR}"
+elif test ! -z "$TEMPDIR" ; then
+    TMPDIR1="${TEMPDIR}"
+else
+    TMPDIR1="/tmp"
+fi
+
+TMPC="${TMPDIR1}/myth-comp-${RANDOM}-$$-${RANDOM}.c"
+TMPE="${TMPDIR1}/myth-conf-${RANDOM}-$$-${RANDOM}"
+
+has_library()
+{
+    if test -f /etc/ld.so.conf ; then
+        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    else
+        LIBPATHS=''
+    fi
+
+    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+    # Mac OS X has a different variable for this:
+    LIBPATHS="$LIBPATHS `echo $DYLD_LIBRARY_PATH | sed s/':'/' '/g` "
+
+    # recurse down just one level, should be enough in most cases
+    if test -f /etc/ld.so.conf ; then
+        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "^include"`
+        SRCH=`echo $INCL | sed s/"^include "//g`
+        for x in $SRCH ; do
+            LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "^include"`
+            LIBPATHS="$LIBPATHS $LP_APPEND"
+        done
+    fi
+
+    LIBPATHS="`echo $LIBPATHS $prefix/$libdir_name /$libdir_name /usr/$libdir_name /usr/local/$libdir_name /usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
+
+    HAS_IT="no"
+    for LIBPATH in $LIBPATHS ; do
+        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
+has_header()
+{
+    HPATHS="$prefix/include /usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /usr/kde/3.3/include /"
+    INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
+    HPATHS="$HPATHS `echo $INCL | sed s/$libdir_name/include/g` "
+
+    HAS_IT="no"
+    for HPATH in $HPATHS ; do
+        if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
+
+cat > $TMPC << EOF
+#include <stdint.h>
+int main( void ) { return 0; }
+EOF
+
+_stdint_h=no
+if $cc -o $TMPE $TMPC 2> /dev/null ; then
+  _stdint_h=yes
+fi
+
+rm -f $TMPC $TMPE
+
+# bring in mythtv config
+rm mythconfig.mak 2> /dev/null
+ln -s $prefix/include/mythtv/mythconfig.mak mythconfig.mak
+
+echo ""
+
+qmake mytharchive.pro

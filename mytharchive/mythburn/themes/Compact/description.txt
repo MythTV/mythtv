@@ -1,0 +1,1 @@
+Has an intro and contains a main menu with 6 recordings per page. Does not have a scene selection submenu.

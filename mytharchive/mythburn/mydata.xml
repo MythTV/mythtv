@@ -1,0 +1,8 @@
+<!DOCTYPE mythburn>
+<mythburn>
+    <job theme="MythCenter" >
+        <media>
+            <file type="recording" >1099_20051223163100.mpg</file>
+        </media>
+    </job>
+</mythburn>
