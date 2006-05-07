@@ -27,7 +27,8 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       pgLength(0),      pgcLength(0),
       cellStart(0),     pgStart(0),
       lastNav(NULL),    part(0),
-      title(0),         gotStop(false),
+      title(0),         titleParts(0),
+      gotStop(false),
       cellHasStillFrame(false), dvdWaiting(false),
       titleLength(0), menuBuflength(0),
       skipstillorwait(true),
@@ -97,7 +98,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_set_PGC_positioning_flag(dvdnav, 1);
 
         int numTitles  = 0;
-        int titleParts = 0;
+        titleParts = 0;
         dvdnav_title_play(dvdnav, 0);
         dvdRet = dvdnav_get_number_of_titles(dvdnav, &numTitles);
         if (numTitles == 0 )
@@ -202,15 +203,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 cellStart = cell_event->cell_start;
                 pgStart   = cell_event->pg_start;
 
-                VERBOSE(VB_PLAYBACK,
-                        QString("DVDNAV_CELL_CHANGE: "
-                                "pg_length == %1, pgc_length == %2, "
-                                "cell_start == %3, pg_start == %4, "
-                                "title == %5 part == %6")
-                        .arg(pgLength).arg(pgcLength)
-                        .arg(cellStart).arg(pgStart)
-                        .arg(title).arg(part));
-
                 if (dvdnav_get_next_still_flag(dvdnav) > 0)
                 {
                     if (dvdnav_get_next_still_flag(dvdnav) < 0xff)
@@ -230,6 +222,16 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 dvdnav_get_position(dvdnav, &pos, &length);
                 titleLength = length *DVD_BLOCK_SIZE;
                 cellstartPos = GetReadPosition();
+
+                VERBOSE(VB_PLAYBACK,
+                        QString("DVDNAV_CELL_CHANGE: "
+                                "pg_length == %1, pgc_length == %2, "
+                                "cell_start == %3, pg_start == %4, "
+                                "title == %5, part == %6 ")
+                            .arg(pgLength).arg(pgcLength)
+                            .arg(cellStart).arg(pgStart)
+                            .arg(title).arg(part));
+                                
                 buttonSelected = false;
                 if (gotoCellStart)
                 {
