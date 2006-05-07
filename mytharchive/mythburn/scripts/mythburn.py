@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060507-2"
+VERSION="0.1.20060507-3"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -184,6 +184,10 @@ def getDatabaseConnection():
 def doesFileExist(file):
     """Returns true/false if a given file or path exists."""
     return os.path.exists( file )
+
+def quoteFilename(filename):
+    filename = filename.replace('"', '\\"')
+    return '"%s"' % filename
 
 def getText(node):
     """Returns the text contents from a given XML element."""
@@ -606,7 +610,7 @@ def getFileInformation(file, outputfile):
     top_element = infoDOM.documentElement
 
     # if the jobfile has amended file details use them
-    details = jobDOM.getElementsByTagName("details")
+    details = file.getElementsByTagName("details")
     if details.length > 0:
         node = infoDOM.createElement("type")
         node.appendChild(infoDOM.createTextNode(file.attributes["type"].value))
@@ -965,8 +969,8 @@ def multiplexMPEGStream(video, audio1, audio2, destination):
 
 def getStreamInformation(filename, xmlFilename):
     """create a stream.xml file for filename"""
-
-    command = "mytharchivehelper -i '%s' '%s'" % (filename, xmlFilename)
+    filename = quoteFilename(filename)
+    command = "mytharchivehelper -i %s %s" % (filename, xmlFilename)
 
     result = runCommand(command)
 
@@ -1022,7 +1026,9 @@ def extractVideoFrame(source, destination, seconds):
         else:
             fr=framerateNTSC
 
-        command = "mytharchivehelper -t '" + source + "' '%s' %s " % (seconds, destination)
+        source = quoteFilename(source)
+
+        command = "mytharchivehelper -t  %s '%s' %s" % (source, seconds, destination)
         result = runCommand(command)
         if result <> 0:
             fatalError("Failed while running mytharchivehelper to get thumbnails.\n"
@@ -1042,34 +1048,12 @@ def extractVideoFrames(source, destination, thumbList):
     write("Extracting thumbnail images from: %s - at %s" % (source, thumbList))
     write("Destination file %s" % destination)
 
-    command = "mytharchivehelper -v important -t '" + source + "' '%s'  %s " % (thumbList, destination)
+    source = quoteFilename(source)
+
+    command = "mytharchivehelper -v important -t %s '%s' %s" % (source, thumbList, destination)
     result = runCommand(command)
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get thumbnails")
-
-def encodeHDTVToMPEG2(source, destvideofile):
-    """Encodes an HDTV video source file DVD MPEG2 video and AC3 audio, use ffmpeg"""
-    #MPEG-2 resolutions: 720x480, 720x576, 352x480, 352x576        
-
-    #Use full DVD resolution rather than Half D1 specification for HDTV recordings
-    if videomode=="ntsc":
-        encoderesolution=dvdNTSCD1
-        fr=framerateNTSC
-    else:
-        encoderesolution=dvdPALD1
-        fr=frameratePAL
-
-    #ac3 audio is copied through preserving 5.1 sound
-    #4000 is the kbit rate for the MPEG2 video
-
-    command = path_ffmpeg[0] + " -v 1 -i '%s' -r %s -target dvd -b 4000 -s %s -acodec copy "   \
-              "-aspect 16:9 -copyts -deinterlace %s"  % (source, videomode, encoderesolution, destvideofile)
-    write(command)
-    result = runCommand(command)
-
-    if result!=0:
-        fatalError("Failed while running ffmpeg to re-encode video.\n"
-                   "Result: %d, Command was %s" % (result, command))
 
 def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio):
     """Encodes an unknown video source file eg. AVI to MPEG2 video and AC3 audio, use ffmpeg"""
@@ -1083,7 +1067,9 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
     #192 is the kbit rate for the ac3 audio
     #3000 is the kbit rate for the MPEG2 video
 
-    command = path_ffmpeg[0] + " -v 1 -i '%s' -r %s -target dvd -b 3000 -s %s -ab 192 -copyts "   \
+    source = quoteFilename(source)
+
+    command = path_ffmpeg[0] + " -v 1 -i %s -r %s -target dvd -b 3000 -s %s -ab 192 -copyts "   \
               "-aspect %s %s"  % (source, videomode, encoderesolution, aspectratio, destvideofile)
 
     #add second audio track if required
@@ -1152,7 +1138,7 @@ def BurnDVDISO():
 def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
     checkCancelFlag()
 
-    command = "mythreplex --demux  -o '%s' " % (folder + "/stream")
+    command = "mythreplex --demux  -o %s " % (folder + "/stream")
     command += "-v %d " % (video[VIDEO_ID] & 255)
 
     if audio1[AUDIO_ID] != -1: 
@@ -1167,6 +1153,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
         elif audio2[AUDIO_CODEC] == 'AC3':
             command += "-c %d " % (audio2[AUDIO_ID] & 255)
 
+    mediafile = quoteFilename(mediafile)
     command += mediafile
     write("Running: " + command)
 
