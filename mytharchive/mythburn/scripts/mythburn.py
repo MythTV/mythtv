@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.200604-1"
+VERSION="0.1.20060507-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -129,6 +129,7 @@ themeFonts = [0,0,0,0,0,0,0,0,0,0]
 def write(text, progress=True):
     """Simple place to channel all text output through"""
     sys.stdout.write(text + "\n")
+    sys.stdout.flush()
 
     if progress == True and progresslog != "":
         progressfile.write(time.strftime("%Y-%m-%d %H:%M:%S ") + text + "\n")
