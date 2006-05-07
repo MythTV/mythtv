@@ -158,7 +158,10 @@ void MediaMonitor::ChooseAndEjectMedia(void)
         return;
 
     int status = selected->getStatus();
-    QString dev = selected->getDevicePath();
+    QString dev = selected->getVolumeID();
+
+    if (dev == "")
+        dev = selected->getDevicePath();
 
     if (MEDIASTAT_OPEN == status)
     {
@@ -314,6 +317,7 @@ QString MediaMonitor::GetDeviceFile(const QString &sysfs)
     if (ret != "device not found in database")
         return ret;
 #endif // linux
+    (void)sysfs;
     return QString::null;
 }
 
@@ -350,6 +354,12 @@ QStringList MediaMonitor::GetCDROMBlockDevices(void)
 // Given a media deivce add it to our collection.
 void MediaMonitor::AddDevice(MythMediaDevice* pDevice)
 {
+    if ( ! pDevice )
+    {
+        VERBOSE(VB_IMPORTANT, "Error - MediaMonitor::AddDevice(null)");
+        return;
+    }
+
     QMutexLocker locker(&m_DevicesLock);
 
     connect(pDevice, SIGNAL(statusChanged(MediaStatus, MythMediaDevice*)), 
