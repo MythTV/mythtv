@@ -46,6 +46,8 @@ class MythMediaDevice : public QObject
     MediaStatus getStatus() const { return m_Status; }
 
     const QString& getVolumeID() const { return m_VolumeID; }
+    void  setVolumeID(const char *vol)  { m_VolumeID = vol; }
+
     const QString& getKeyID() const { return m_KeyID; }
 
     bool getAllowEject() const { return m_AllowEject; }
