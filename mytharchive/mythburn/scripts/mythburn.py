@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060507-3"
+VERSION="0.1.20060508-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -215,7 +215,7 @@ def isResolutionHDTV(videoresolution):
     return (videoresolution[0]==1920 and videoresolution[1]==1080) or (videoresolution[0]==1280 and videoresolution[1]==720)
 
 def isResolutionOkayForDVD(videoresolution):
-    if videomode=="pal":
+    if videomode=="ntsc":
         return videoresolution==(720,480) or videoresolution==(704,480) or videoresolution==(352,480) or videoresolution==(352,240)
     else:
         return videoresolution==(720,576) or videoresolution==(704,576) or videoresolution==(352,576) or videoresolution==(352,288)

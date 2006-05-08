@@ -641,6 +641,52 @@ void MythburnWizard::updateArchiveList(void)
     archive_list->refresh();
 }
 
+bool MythburnWizard::isArchiveItemValid(QString &type, QString &filename)
+{
+    if (type == "Recording")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT title FROM recorded WHERE basename = :FILENAME");
+        query.bindValue(":FILENAME", filename);
+        query.exec();
+        if (query.isActive() && query.numRowsAffected())
+            return true;
+        else
+        {
+            doRemoveArchiveItem(filename);
+            VERBOSE(VB_IMPORTANT, QString("MythArchive: Recording not found (%1)").arg(filename));
+        }
+    }
+    else if (type == "Video")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT title FROM videometadata WHERE filename = :FILENAME");
+        query.bindValue(":FILENAME", filename);
+        query.exec();
+        if (query.isActive() && query.numRowsAffected())
+            return true;
+        else
+        {
+            doRemoveArchiveItem(filename);
+            VERBOSE(VB_IMPORTANT, QString("MythArchive: Video not found (%1)").arg(filename));
+        }
+    }
+    else if (type == "File")
+    {
+        if (QFile::exists(filename))
+            return true;
+        else
+        {
+            doRemoveArchiveItem(filename);
+            VERBOSE(VB_IMPORTANT, QString("MythArchive: File not found (%1)").arg(filename));
+        }
+    }
+
+    VERBOSE(VB_IMPORTANT, "MythArchive: Archive item removed from list");
+
+    return false;
+}
+
 vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
 {
     vector<ArchiveItem*> *archiveList = new vector<ArchiveItem*>;
@@ -654,22 +700,29 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
     {
         while (query.next())
         {
-            ArchiveItem *item = new ArchiveItem;
+            // check this item is still available
+            QString type = query.value(1).toString();
+            QString filename = QString::fromUtf8(query.value(8).toString());
 
-            item->id = query.value(0).toInt();
-            item->type = QString::fromUtf8(query.value(1).toString());
-            item->title = QString::fromUtf8(query.value(2).toString());
-            item->subtitle = QString::fromUtf8(query.value(3).toString());
-            item->description = QString::fromUtf8(query.value(4).toString());
-            item->size = query.value(5).toLongLong();
-            item->startDate = QString::fromUtf8(query.value(6).toString());
-            item->startTime = QString::fromUtf8(query.value(7).toString());
-            item->filename = QString::fromUtf8(query.value(8).toString()); // Utf8 ??
-            item->hasCutlist = (query.value(9).toInt() > 0);
-            item->useCutlist = false;
-            item->editedDetails = false;
+            if (isArchiveItemValid(type, filename))
+            {
+                ArchiveItem *item = new ArchiveItem;
 
-            archiveList->push_back(item);
+                item->id = query.value(0).toInt();
+                item->type = type;
+                item->title = QString::fromUtf8(query.value(2).toString());
+                item->subtitle = QString::fromUtf8(query.value(3).toString());
+                item->description = QString::fromUtf8(query.value(4).toString());
+                item->size = query.value(5).toLongLong();
+                item->startDate = QString::fromUtf8(query.value(6).toString());
+                item->startTime = QString::fromUtf8(query.value(7).toString());
+                item->filename = filename;
+                item->hasCutlist = (query.value(9).toInt() > 0);
+                item->useCutlist = false;
+                item->editedDetails = false;
+
+                archiveList->push_back(item);
+            }
         }
     }
     else
@@ -905,16 +958,20 @@ void MythburnWizard::removeItem()
     if (!curItem)
         return;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM archiveitems WHERE filename = :FILENAME;");
-    query.bindValue(":FILENAME", curItem->filename);
-    query.exec();
-    if (query.isActive() && query.numRowsAffected())
-    {
+    if (doRemoveArchiveItem(curItem->filename))
         getArchiveList();
-    }
 
     closePopupMenu();
+}
+
+bool MythburnWizard::doRemoveArchiveItem(QString &filename)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM archiveitems WHERE filename = :FILENAME;");
+    query.bindValue(":FILENAME", filename);
+    query.exec();
+
+    return (query.isActive() && query.numRowsAffected());
 }
 
 void MythburnWizard::showEditMetadataDialog()

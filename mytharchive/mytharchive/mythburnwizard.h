@@ -89,6 +89,8 @@ class MythburnWizard : public MythThemedDialog
     void showEditMetadataDialog();
     QString loadFile(const QString &filename);
     vector<ArchiveItem *>  *getArchiveListFromDB(void);
+    bool doRemoveArchiveItem(QString &filename);
+    bool isArchiveItemValid(QString &type, QString &filename);
 
     vector<ArchiveItem *>  *archiveList;
     QPtrList<ArchiveItem> selectedList;
