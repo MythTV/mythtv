@@ -48,4 +48,10 @@
       <action>DVD_RIP</action>
    </button>
 
+   <button>
+      <type>EJECT</type>
+      <text>Eject media</text>
+      <action>EJECT</action>
+   </button>
+
 </mythmenu>
