@@ -39,6 +39,10 @@
 #include "replex.h"
 #include "pes.h"
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 static int replex_all_set(struct replex *rx);
 
 int replex_check_id(struct replex *rx, uint16_t id)
