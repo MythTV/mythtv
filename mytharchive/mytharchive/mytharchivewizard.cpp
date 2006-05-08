@@ -320,9 +320,13 @@ void MythArchiveWizard::runMythBurnWizard()
         return;
     }
 
-    // remove existing progress.log if prescent
+    // remove existing progress.log if present
     if (QFile::exists(logDir + "/progress.log"))
         QFile::remove(logDir + "/progress.log");
+
+    // remove cancel flag file if present
+    if (QFile::exists(logDir + "/mythburncancel.lck"))
+        QFile::remove(logDir + "/mythburncancel.lck");
 
     wiz->createConfigFile(configDir + "/mydata.xml");
     commandline = "python " + gContext->GetShareDir() + "mytharchive/scripts/mythburn.py";
