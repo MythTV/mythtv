@@ -191,7 +191,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
     {
 #ifdef USING_HDHOMERUN
         channel = new HDHRChannel(this, genOpt.videodev, dboxOpt.port);
-        channel->Open();
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
 #endif
