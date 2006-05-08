@@ -2348,6 +2348,12 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
             wantpop = true;
         }
     }
+    else if (action.left(5) == "EJECT")
+    {
+        MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+        if (mon)
+            mon->ChooseAndEjectMedia();
+    }
     else if (action.left(5) == "JUMP ")
     {
         QString rest = action.right(action.length() - 5);
