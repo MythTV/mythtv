@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060508-1"
+VERSION="0.1.20060508-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -314,7 +314,7 @@ def getFormatedLengthOfVideo(index):
     hours = int(minutes / 60)
     minutes %= 60
 
-    return '%s:%s:%s' % (hours, minutes, seconds)
+    return '%02d:%02d:%02d' % (hours, minutes, seconds)
 
 def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):      
     """Returns numofchapters chapter marks even spaced through a certain time period"""
