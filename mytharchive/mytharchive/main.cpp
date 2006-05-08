@@ -126,6 +126,19 @@ void runRecordingSelector(void)
 
 void runVideoSelector(void)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT title FROM videometadata");
+    query.exec();
+    if (query.isActive() && query.numRowsAffected())
+    {
+    }
+    else
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Video Selector"),
+                                  QObject::tr("You don't have any videos!"));
+        return;
+    }
+
     VideoSelector selector(gContext->GetMainWindow(),
                           "video_selector", "mytharchive-", "video selector");
     qApp->unlock();

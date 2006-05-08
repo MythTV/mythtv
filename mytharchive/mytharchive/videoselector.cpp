@@ -287,6 +287,9 @@ void VideoSelector::cancelPressed()
 
 void VideoSelector::updateVideoList(void)
 {
+    if (!videoList)
+        return;
+
     video_list->Reset();
 
     if (category_selector)
@@ -424,6 +427,9 @@ void VideoSelector::setCategory(int item)
 
 void VideoSelector::updateSelectedList()
 {
+    if (!videoList)
+        return;
+
     selectedList.clear();
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM archiveitems WHERE type = 'Video'");
