@@ -762,7 +762,11 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
 
     for (uint x = 0; x < list.count(); x++)
     {
-        QString filename = outFile.arg(x + 1);
+        QString filename = outFile;
+
+        if (outFile.contains("%1"))
+            filename = outFile.arg(x + 1);
+
         float video_aspect = 0;
         int len, width, height, sz;
         int pos = list[x].stripWhiteSpace().toInt();

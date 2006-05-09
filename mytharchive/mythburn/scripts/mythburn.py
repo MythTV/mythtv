@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060509-1"
+VERSION="0.1.20060509-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -1602,7 +1602,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         if itemNum == numberofitems:
             post.appendChild(dvddom.createTextNode("exit;"))
         else:
-            post.appendChild(dvddom.createTextNode("jump title %s chapter 1;" % itemNum + 1))
+            post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 1)))
 
         pgc.appendChild(post)
         fileCount +=1
