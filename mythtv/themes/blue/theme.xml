@@ -231,6 +231,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="EJECT">
+    <image>eject.png</image>
+    <offset>25,10</offset>
+  </buttondef>
+
 <!-- #####################################-->
 <!-- ########  game_settings.xml  ########-->
 <!-- #####################################-->
