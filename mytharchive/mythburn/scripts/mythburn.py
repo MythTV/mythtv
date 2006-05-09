@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060509-2"
+VERSION="0.1.20060509-3"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -57,7 +57,7 @@ debug_secondrunthrough = False
 import os, string, socket, sys, getopt, traceback
 import xml.dom.minidom
 import Image, ImageDraw, ImageFont
-import MySQLdb
+import MySQLdb, codecs
 import time, datetime, tempfile
 
 # media types (should match the enum in mytharchivewizard.h)
@@ -555,7 +555,7 @@ def paintText( draw, x,y,width, height,text, font, colour, alignment):
 
     for i in lines:
         if (j*h) < (height-h):
-            write( "Wrapped text  = " + i, False)
+            write( "Wrapped text  = " + i.encode("ascii", "replace"), False)
 
             if alignment=="left":
                 indent=0
@@ -567,7 +567,7 @@ def paintText( draw, x,y,width, height,text, font, colour, alignment):
                 indent=0
             draw.text( (x+indent,y+j*h),i , font=font, fill=colour)
         else:
-            write( "Truncated text = " + i, False)
+            write( "Truncated text = " + i.encode("ascii", "replace"), False)
         #Move to next line
         j = j + 1
 
@@ -691,7 +691,7 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("title")
-            node.appendChild(infoDOM.createTextNode(record[6]))
+            node.appendChild(infoDOM.createTextNode(unicode(record[6], "UTF-8")))
             top_element.appendChild(node)
 
             #date time is returned as 2005-12-19 00:15:00            
@@ -706,11 +706,11 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("subtitle")
-            node.appendChild(infoDOM.createTextNode(record[5]))
+            node.appendChild(infoDOM.createTextNode(unicode(record[5], "UTF-8")))
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("description")
-            node.appendChild(infoDOM.createTextNode(record[4]))
+            node.appendChild(infoDOM.createTextNode(unicode(record[4], "UTF-8")))
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("rating")
@@ -791,7 +791,7 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("title")
-            node.appendChild(infoDOM.createTextNode(record[0]))
+            node.appendChild(infoDOM.createTextNode(unicode(record[0], "UTF-8")))
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("recordingdate")
@@ -807,7 +807,7 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("description")
-            node.appendChild(infoDOM.createTextNode(record[2]))
+            node.appendChild(infoDOM.createTextNode(unicode(record[2], "UTF-8")))
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("rating")
@@ -874,7 +874,7 @@ def getFileInformation(file, outputfile):
 def WriteXMLToFile(myDOM, filename):
     #Save the XML file to disk for use later on
     f=open(filename, 'w')
-    f.write(myDOM.toxml())
+    f.write(myDOM.toxml("UTF-8"))
     f.close()
 
 

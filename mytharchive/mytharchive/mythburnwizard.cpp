@@ -811,11 +811,11 @@ void MythburnWizard::createConfigFile(const QString &filename)
         {
             QDomElement details = doc.createElement("details");
             file.appendChild(details);
-            details.setAttribute("title", a->title);
-            details.setAttribute("subtitle", a->subtitle);
-            details.setAttribute("startdate", a->startDate);
-            details.setAttribute("starttime", a->startTime);
-            QDomText desc = doc.createTextNode(a->description);
+            details.setAttribute("title", a->title.utf8());
+            details.setAttribute("subtitle", a->subtitle.utf8());
+            details.setAttribute("startdate", a->startDate.utf8());
+            details.setAttribute("starttime", a->startTime.utf8());
+            QDomText desc = doc.createTextNode(a->description.utf8());
             details.appendChild(desc);
         }
 
