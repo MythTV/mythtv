@@ -895,7 +895,8 @@ bool getFileInfo(QString inFile, QString outFile)
 
     root.appendChild(streams);
     streams.setAttribute("count", inputFC->nb_streams);
-
+    int ffmpegIndex = 0;
+    
     for (int i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
@@ -911,6 +912,7 @@ bool getFileInfo(QString inFile, QString outFile)
                 QString codec = param[0].remove("Video:", false);
                 QDomElement stream = doc.createElement("video");
                 stream.setAttribute("streamindex", i);
+                stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.stripWhiteSpace());
                 stream.setAttribute("width", st->codec->width);
                 stream.setAttribute("height", st->codec->height);
@@ -943,6 +945,7 @@ bool getFileInfo(QString inFile, QString outFile)
 
                 QDomElement stream = doc.createElement("audio");
                 stream.setAttribute("streamindex", i);
+                stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.stripWhiteSpace());
                 stream.setAttribute("channels", st->codec->channels);
                 if (strlen(st->language) > 0)
@@ -955,6 +958,30 @@ bool getFileInfo(QString inFile, QString outFile)
                 stream.setAttribute("samplerate", st->codec->sample_rate);
                 stream.setAttribute("bitrate", st->codec->bit_rate);
 
+                streams.appendChild(stream);
+
+                break;
+            }
+
+            case CODEC_TYPE_SUBTITLE:
+            {
+                QStringList param = QStringList::split(',', QString(buf));
+                QString codec = param[0].remove("Subtitle:", false);
+
+                QDomElement stream = doc.createElement("subtitle");
+                stream.setAttribute("streamindex", i);
+                stream.setAttribute("ffmpegindex", ffmpegIndex++);
+                stream.setAttribute("codec", codec.stripWhiteSpace());
+                streams.appendChild(stream);
+
+                break;
+            }
+
+            case CODEC_TYPE_DATA:
+            {
+                QDomElement stream = doc.createElement("data");
+                stream.setAttribute("streamindex", i);
+                stream.setAttribute("codec", buf);
                 streams.appendChild(stream);
 
                 break;

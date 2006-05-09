@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060508-2"
+VERSION="0.1.20060509-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -2155,7 +2155,7 @@ def selectStreams(folder):
     if nodes.length > 1:
         write("Found more than one video element in stream info file.!!!")
     node = nodes[0]
-    video = (int(node.attributes["streamindex"].value), node.attributes["codec"].value, int(node.attributes["id"].value))
+    video = (int(node.attributes["ffmpegindex"].value), node.attributes["codec"].value, int(node.attributes["id"].value))
 
     #get audioID's - we choose the best 2 audio streams using this algorithm
     # 1. if there is one or more stream(s) using the 1st preferred language we use that
@@ -2176,7 +2176,7 @@ def selectStreams(folder):
     found = False
     # first try to find a stream with ac3 and preferred language 1
     for node in nodes:
-        index = int(node.attributes["streamindex"].value)
+        index = int(node.attributes["ffmpegindex"].value)
         lang = node.attributes["language"].value
         format = string.upper(node.attributes["codec"].value)
         pid = int(node.attributes["id"].value)
@@ -2191,7 +2191,7 @@ def selectStreams(folder):
     # second try to find a stream with mp2 and preferred language 1
     if not found:
         for node in nodes:
-            index = int(node.attributes["streamindex"].value)
+            index = int(node.attributes["ffmpegindex"].value)
             lang = node.attributes["language"].value
             format = string.upper(node.attributes["codec"].value)
             pid = int(node.attributes["id"].value)
@@ -2206,7 +2206,7 @@ def selectStreams(folder):
     # finally use the stream with the lowest pid, prefer ac3 over mp2
     if not found:
         for node in nodes:
-            int(node.attributes["streamindex"].value)
+            int(node.attributes["ffmpegindex"].value)
             format = string.upper(node.attributes["codec"].value)
             pid = int(node.attributes["id"].value)
             if not found:
@@ -2224,7 +2224,7 @@ def selectStreams(folder):
         found = False
         # first try to find a stream with ac3 and preferred language 2
         for node in nodes:
-            index = int(node.attributes["streamindex"].value)
+            index = int(node.attributes["ffmpegindex"].value)
             lang = node.attributes["language"].value
             format = string.upper(node.attributes["codec"].value)
             pid = int(node.attributes["id"].value)
@@ -2239,7 +2239,7 @@ def selectStreams(folder):
         # second try to find a stream with mp2 and preferred language 2
         if not found:
             for node in nodes:
-                index = int(node.attributes["streamindex"].value)
+                index = int(node.attributes["ffmpegindex"].value)
                 lang = node.attributes["language"].value
                 format = string.upper(node.attributes["codec"].value)
                 pid = int(node.attributes["id"].value)
@@ -2254,7 +2254,7 @@ def selectStreams(folder):
         # finally use the stream with the lowest pid, prefer ac3 over mp2
         if not found:
             for node in nodes:
-                index = int(node.attributes["streamindex"].value)
+                index = int(node.attributes["ffmpegindex"].value)
                 format = string.upper(node.attributes["codec"].value)
                 pid = int(node.attributes["id"].value)
                 if not found:
