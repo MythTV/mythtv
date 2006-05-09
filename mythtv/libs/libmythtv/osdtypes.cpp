@@ -14,6 +14,9 @@ using namespace std;
 
 #include "mythcontext.h"
 
+/// Shared OSD image cache
+OSDImageCache OSDTypeImage::c_cache;
+
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
                int screenheight, float wmult, float hmult, int frint)
       : QObject()
@@ -674,6 +677,7 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
 
     m_scalew = scalew;
     m_scaleh = scaleh;
+    m_cacheitem = NULL;
 
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
@@ -691,6 +695,7 @@ OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
     m_name = other.m_name;
     m_scalew = other.m_scalew;
     m_scaleh = other.m_scaleh;
+    m_cacheitem = NULL;
 
     m_alpha = m_yuv = NULL;
     if (m_isvalid)
@@ -719,6 +724,7 @@ OSDTypeImage::OSDTypeImage(const QString &name)
 
     m_displaypos = QPoint(0, 0);
     m_unbiasedpos = QPoint(0, 0);
+    m_cacheitem = NULL;
 
     m_yuv = NULL;
     m_alpha = NULL;
@@ -750,19 +756,17 @@ OSDTypeImage::OSDTypeImage(void)
 
 OSDTypeImage::~OSDTypeImage()
 {
-    if (!cache.InMemCache())
-    {
-	if (m_yuv)
-	    delete [] m_yuv;
-	if (m_alpha)
-	    delete [] m_alpha;    
-    }
-    cache.Reset();
+    // In case we have a cache item in hand, it's safe to delete it,
+    // as it should not be in OSDImageCache anymore and it should have
+    // been written to the file cache for faster access in the future.
+    delete m_cacheitem;
+    m_cacheitem = NULL;
 }
 
 void OSDTypeImage::SetName(const QString &name)
 {
     m_name = name;
+    m_cacheitem = NULL;
 }
 
 void OSDTypeImage::SetPosition(QPoint pos, float wmult, float hmult)
@@ -785,25 +789,44 @@ void OSDTypeImage::Reinit(float wmult, float hmult)
 void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
                              int scalew, int scaleh)
 {
-    // Try to get it from the cache first
-    QString ckey = OSDImageCache::CreateKey(
-        filename, wmult, hmult, scalew, scaleh);
-    OSDImageCacheValue value = cache.Load(ckey, !filename.isEmpty());
-
-    if (value.IsValid())
+    QString ckey;
+   
+    if (!filename.isEmpty() && filename.length() >= 2)
     {
-        m_yuv       = value.m_yuv;
-        m_ybuffer   = value.m_ybuffer;
-        m_ubuffer   = value.m_ubuffer;
-        m_vbuffer   = value.m_vbuffer;
-        m_alpha     = value.m_alpha;
-        m_imagesize = value.m_imagesize;
-        m_isvalid   = true;
+        ckey = OSDImageCache::CreateKey(
+            filename, wmult, hmult, scalew, scaleh);
+    }
+    else 
+    {
+        // this method requires a backing file
         return;
     }
+  
+    // Get the item from the cache so it's not freed while in use
+    OSDImageCacheValue* value = c_cache.Get(ckey, true);
+  
+    if (value != NULL)
+    {
+        m_yuv       = value->m_yuv;
+        m_ybuffer   = value->m_ybuffer;
+        m_ubuffer   = value->m_ubuffer;
+        m_vbuffer   = value->m_vbuffer;
+        m_alpha     = value->m_alpha;
+        m_imagesize = value->m_imagesize;
+        m_isvalid   = true;
 
-    if (filename.length() < 2)
+        // Put the old image back to the cache so it can be reused in the
+        // future, and possibly freed by the cache system if the size limit
+        // is reached
+        if (!m_cacheitem)
+            c_cache.Insert(m_cacheitem);
+        m_cacheitem = value;
+
         return;
+    }
+   
+    // scaled image was not found in cache, have to create it
+  
 
     QImage tmpimage(filename);
 
@@ -843,9 +866,20 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     m_imagesize = QRect(0, 0, imwidth, imheight);
 
-    cache.Save(ckey, !filename.isEmpty(),
-               OSDImageCacheValue(m_yuv,     m_ybuffer, m_ubuffer,
-                                  m_vbuffer, m_alpha,   m_imagesize));
+    // put the old image back to the cache so it can be reused in the
+    // future, and possibly freed by the cache system if the size limit
+    // is reached
+    if (m_cacheitem)
+        c_cache.Insert(m_cacheitem);
+  
+    m_cacheitem = new OSDImageCacheValue(
+        ckey,
+        m_yuv,     m_ybuffer, m_ubuffer,
+        m_vbuffer, m_alpha,   m_imagesize);
+ 
+    // save the new cache item to the file cache
+    if (!filename.isEmpty())
+        c_cache.SaveToDisk(m_cacheitem);
 }
 
 void OSDTypeImage::LoadFromQImage(const QImage &img)
@@ -853,13 +887,10 @@ void OSDTypeImage::LoadFromQImage(const QImage &img)
     // this method is not cached as it's used mostly for
     // subtitles which are displayed only once anyways, caching
     // would probably only slow things down overall
-    if (m_isvalid && !cache.InMemCache())
+    if (m_isvalid)
     {
-        if (m_yuv)
-            delete [] m_yuv;
-        if (m_alpha)
-            delete [] m_alpha;
-
+        delete m_cacheitem;
+        m_cacheitem = NULL;
         m_isvalid = false;
         m_yuv = NULL;
         m_alpha = NULL;
@@ -1153,6 +1184,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
 
     m_scalew = scalew;
     m_scaleh = scaleh;
+    m_cacheitem = NULL;
 
     LoadImage(m_redname, wmult, hmult, scalew, scaleh);
     if (m_isvalid)
@@ -1194,14 +1226,6 @@ void OSDTypeEditSlider::Reinit(float wmult, float hmult)
          m_drawMap[i] = 0;
 
     m_displaypos = m_displayrect.topLeft();
-
-    if (!cache.InMemCache())
-    {
-        if (m_ryuv)
-            delete [] m_ryuv;
-        if (m_ralpha)
-            delete [] m_ralpha;
-    }
 
     LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh);
     if (m_isvalid)
