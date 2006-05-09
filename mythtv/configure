@@ -2179,7 +2179,15 @@ lmsensors="no"
 if has_header "sensors/sensors.h" && has_library libsensors ; then
     lmsensors="yes"
 fi
-                                    
+
+if test x"$darwin" == x"yes" ; then
+    # So far, only OS X 10.4 has this as a non-private framework
+    if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
+        darwin_da="yes"
+    fi
+fi
+
+
 echo "# Basic Settings"
 echo "Compile type     $compile_type"
 echo "Compiler cache   $ccache"
@@ -2745,6 +2753,11 @@ fi
 if test "$darwin" = "yes"; then
   echo "#define CONFIG_DARWIN 1"  >> $TMPH
   echo "CONFIG_DARWIN=yes" >> $MYTH_CONFIG_MAK
+fi
+
+if test "$darwin_da" = "yes"; then
+  echo "#define CONFIG_DARWIN_DA 1"  >> $TMPH
+  echo "CONFIG_DARWIN_DA=yes" >> $MYTH_CONFIG_MAK
 fi
 
 if test "$_stdint_h" = "yes" ; then
