@@ -322,23 +322,25 @@
    </button>
 
    <button>
-      <type>SETTINGS_BURN</type>
-      <text>Burn DVD Settings</text>
-      <text lang="FR">Gravure DVD</text>
-      <text lang="PT">Configurar Gravação de DVDs</text>
-      <text lang="ET">DVD-kirjutaja seaded</text>
-      <text lang="ES">Config. Grabación DVD</text>
-      <text lang="NL">DVD Branden Instellingen</text>
-      <text lang="PL">Konfiguracja nagrywarki DVD</text>
-      <action>CONFIGPLUGIN mythburn</action>
-      <depends>mythburn</depends>
+     <type>SETTINGS_BURN</type>
+     <text>Burn DVD Settings</text>
+     <text lang="FR">Gravure DVD</text>
+     <text lang="PT">Configurar Gravação de DVDs</text>
+     <text lang="ET">DVD-kirjutaja seaded</text>
+     <text lang="ES">Config. Grabación DVD</text>
+     <text lang="NL">DVD Branden Instellingen</text>
+     <text lang="PL">Konfiguracja nagrywarki DVD</text>
+     <text lang="SV">DVD-br�nning</text>
+     <action>CONFIGPLUGIN mythburn</action>
+     <depends>mythburn</depends>
    </button>
 
    <button>
-       <type>SETTINGS_ARCHIVE</type>
-       <text>Archive Files Settings</text>
-       <action>CONFIGPLUGIN mytharchive</action>
-       <depends>mytharchive</depends>
+     <type>SETTINGS_ARCHIVE</type>
+     <text>Archive Files Settings</text>
+     <text lang="SV">Filarkivering</text>
+     <action>CONFIGPLUGIN mytharchive</action>
+     <depends>mytharchive</depends>
    </button>
 
 </mythmenu>
