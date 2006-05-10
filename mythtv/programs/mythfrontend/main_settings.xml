@@ -86,7 +86,7 @@
      <text lang="PT">Configurar Multimédia</text>
      <text lang="CZ">Nastavení multimédií</text>
      <action>MENU media_settings.xml</action>
-     <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
+     <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
    </button>
 
    <button>

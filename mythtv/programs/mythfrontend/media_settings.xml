@@ -141,6 +141,7 @@
       <text lang="PT">Conf. Grav. de DVDs</text>
       <text lang="DE">DVD brennen</text>
       <text lang="NL">DVD Branden Instellingen</text>
+      <text lang="SV">DVD-bränning</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -148,6 +149,7 @@
    <button>
       <type>SETTINGS_ARCHIVE</type>
       <text>Archive Files Settings</text>
+      <text lang="SV">Filarkivering</text>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

@@ -122,7 +122,7 @@
      <text lang="PT">CD/DVD</text>
      <text lang="CZ">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
-     <depends>mythmusic mythdvd</depends>
+     <depends>mythmusic mythdvd mytharchive mythburn</depends>
    </button>
 
    <button>
