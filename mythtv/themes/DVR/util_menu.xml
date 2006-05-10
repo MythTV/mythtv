@@ -212,7 +212,15 @@
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
-   
+
+   <button>
+       <type>ARCHIVE</type>
+       <text>Archive Files</text>
+       <text lang="SV">Arkivera filer</text>
+       <action>PLUGIN mytharchive</action>
+       <depends>mytharchive</depends>
+   </button>
+
    <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
