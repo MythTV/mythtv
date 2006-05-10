@@ -615,9 +615,29 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 
         if (!gContext->GetNumSetting("SaveTranscoding", 0))
         {
-            if (unlink(oldfile) == -1)
-                perror(QString("mythtranscode: Error Deleting '%1'")
-                       .arg(oldfile).ascii());
+            int err;
+            bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
+
+            VERBOSE(VB_FILE, QString("mythtranscode: About to unlink/delete "
+                                     "file: %1").arg(oldfile));
+            if (followLinks)
+            {
+                QFileInfo finfo(oldfile);
+                if ((finfo.isSymLink()) &&
+                    (err = unlink(finfo.readLink().local8Bit())))
+                {
+                     VERBOSE(VB_IMPORTANT,
+                             QString("Error deleting '%1' link pointing to "
+                                     "'%2', %3").arg(oldfile)
+                                     .arg(finfo.readLink().local8Bit())
+                                     .arg(strerror(errno)));
+                }
+            }
+ 
+            if ((err = unlink(oldfile.local8Bit())))
+                VERBOSE(VB_IMPORTANT, QString("mythtranscode: Error deleting "
+                                              "'%1', %2").arg(oldfile)
+                                              .arg(strerror(errno)));
         }
 
         oldfile = filename + ".png";
