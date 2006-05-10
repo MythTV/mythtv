@@ -1119,50 +1119,51 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 {
-    tracks[kTrackTypeTeletextCaptions].clear();
-
-    if (!ic->cur_pmt_sect)
+    // ScanStreams() calls tracks[kTrackTypeTeletextCaptions].clear()
+    if (!ic->cur_pmt_sect || tracks[kTrackTypeTeletextCaptions].size())
         return;
 
     const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
     const PSIPTable psip(pes);
     const ProgramMapTable pmt(psip);
     
-    uint i;
-    for (i = 0; i < pmt.StreamCount(); i++)
+    for (uint i = 0; i < pmt.StreamCount(); i++)
     {
-        if (pmt.StreamType(i) == 6)
-            break;
-    }
+        if (pmt.StreamType(i) != 6)
+            continue;
 
-    if (!pmt.StreamType(i) == 6)
-        return;
+        const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
+            pmt.StreamInfo(i), pmt.StreamInfoLength(i),
+            DescriptorID::teletext);
 
-    const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
-        pmt.StreamInfo(i), pmt.StreamInfoLength(i),
-        DescriptorID::teletext);
-
-    for (uint j = 0; j < desc_list.size(); j++)
-    {
-        const TeletextDescriptor td(desc_list[j]);
-        for (uint k = 0; k < td.StreamCount(); k++)
+        for (uint j = 0; j < desc_list.size(); j++)
         {
-            int lang = td.CanonicalLanguageKey(k);
-            int type = td.TeletextType(k);
-            int magazine = td.TeletextMagazineNum(k)?:8;
-            int pagenum = td.TeletextPageNum(k);
-            if (type == 2)
+            const TeletextDescriptor td(desc_list[j]);
+            for (uint k = 0; k < td.StreamCount(); k++)
             {
-                StreamInfo si(av_index, lang, (magazine * 256 + pagenum), 0);
+                int type = td.TeletextType(k);
+                if (type != 2)
+                    continue;
+
+                int language = td.CanonicalLanguageKey(k);
+                int magazine = td.TeletextMagazineNum(k)?:8;
+                int pagenum  = td.TeletextPageNum(k);
+                int lang_idx = (magazine << 8) | pagenum;
+
+                StreamInfo si(av_index, language, lang_idx, 0);
                 tracks[kTrackTypeTeletextCaptions].push_back(si);
+
                 VERBOSE(VB_PLAYBACK, LOC + QString(
-                            "Teletext caption #%1 "
-                            "is in the %2 language on page %3 %4.")
-                        .arg(k)
-                        .arg(iso639_key_toName(lang))
+                            "Teletext caption #%1 is in the %2 language "
+                            "on page %3 %4.")
+                        .arg(k).arg(iso639_key_toName(language))
                         .arg(magazine).arg(pagenum));
-            } 
+            }
         }
+
+        // Assume there is only one multiplexed teletext stream in PMT..
+        if (tracks[kTrackTypeTeletextCaptions].size())
+            break;
     }
 }
 
@@ -1174,6 +1175,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     tracks[kTrackTypeAudio].clear();
     tracks[kTrackTypeSubtitle].clear();
+    tracks[kTrackTypeTeletextCaptions].clear();
     selectedVideoIndex = -1;
 
     map<int,uint> lang_sub_cnt;
@@ -1973,8 +1975,6 @@ void AvFormatDecoder::ProcessDVBDataPacket(
     {
         if (*buf == 0x10)
             buf++; // skip
-        if (*buf == 0xff)
-            buf += 3; // skip
 
         if (*buf == 0x02)
         {
@@ -1985,6 +1985,10 @@ void AvFormatDecoder::ProcessDVBDataPacket(
         {
             buf += 3;
             ttd->Decode(buf+1, VBI_DVB_SUBTITLE);
+        }
+        else if (*buf == 0xff)
+        {
+            buf += 3;
         }
         else
         {
