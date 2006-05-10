@@ -1,6 +1,7 @@
 #include "mythcdrom.h"
 #include <sys/stat.h>
 
+#include "mythconfig.h"
 #include "mythcontext.h"
 
 // For testing
@@ -31,6 +32,8 @@ MythCDROM* MythCDROM::get(QObject* par, const char* devicePath, bool SuperMount,
     return new MythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
     return new MythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
+#elif defined(CONFIG_DARWIN)
+    return new MythCDROM(par, devicePath, SuperMount, AllowEject);
 #else
     return NULL;
 #endif

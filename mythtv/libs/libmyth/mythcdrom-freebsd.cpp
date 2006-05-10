@@ -16,18 +16,6 @@ MediaError MythCDROMFreeBSD::eject(bool open_close)
         return MEDIAERR_UNSUPPORTED;
 }
 
-bool MythCDROMFreeBSD::mediaChanged()
-{  
-    // Not implemented
-    return false;
-}
-
-bool MythCDROMFreeBSD::checkOK()
-{
-    // Not implemented
-    return true;
-}
-
 // Helper function, perform a sanity check on the device
 MediaError MythCDROMFreeBSD::testMedia()
 {
@@ -58,11 +46,6 @@ MediaError MythCDROMFreeBSD::testMedia()
         closeDevice();
 
     return MEDIAERR_OK;
-}
-
-MediaStatus MythCDROMFreeBSD::checkMedia()
-{
-    return setStatus(MEDIASTAT_UNKNOWN, false);
 }
 
 MediaError MythCDROMFreeBSD::lock() 
