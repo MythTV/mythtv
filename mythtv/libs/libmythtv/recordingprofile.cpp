@@ -719,6 +719,20 @@ class RecordingType : public CodecParam, public ComboBoxSetting
 };
 
 
+class TranscodeFilters: public CodecParam, public LineEditSetting {
+public:
+    TranscodeFilters(const RecordingProfile& parent):
+        CodecParam(parent, "transcodefilters"),
+        LineEditSetting() {
+        setLabel(QObject::tr("Custom Filters"));
+        setHelpText(QObject::tr("Filters used when transcoding with this "
+                                "profile. This value must be blank to perform "
+                                "lossless transcoding.  Format: "
+                                "[[<filter>=<options>,]...]"
+                                ));
+    };
+};
+
 class ImageSize: public VerticalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
@@ -811,6 +825,7 @@ RecordingProfile::RecordingProfile(QString profName)
     profile->setLabel(labelName);
     profile->addChild(name);
 
+    tr_filters = NULL;
     tr_lossless = NULL;
     tr_resize = NULL;
 
@@ -818,8 +833,10 @@ RecordingProfile::RecordingProfile(QString profName)
     {
         if (profName.left(11) == "Transcoders")
         {
+            tr_filters = new TranscodeFilters(*this);
             tr_lossless = new TranscodeLossless(*this);
             tr_resize = new TranscodeResize(*this);
+            profile->addChild(tr_filters);
             profile->addChild(tr_lossless);
             profile->addChild(tr_resize);
         }
@@ -828,8 +845,10 @@ RecordingProfile::RecordingProfile(QString profName)
     }
     else
     {
+        tr_filters = new TranscodeFilters(*this);
         tr_lossless = new TranscodeLossless(*this);
         tr_resize = new TranscodeResize(*this);
+        profile->addChild(tr_filters);
         profile->addChild(tr_lossless);
         profile->addChild(tr_resize);
         profile->addChild(new AutoTranscode(*this));
@@ -841,6 +860,8 @@ RecordingProfile::RecordingProfile(QString profName)
 void RecordingProfile::ResizeTranscode(bool resize)
 {
     MythWizard *wizard = (MythWizard *)dialog;
+    if (!wizard)
+        return;
     //page '1' is the Image Size page
     QWidget *size_page = wizard->page(1);
     wizard->setAppropriate(size_page, resize);
@@ -849,6 +870,8 @@ void RecordingProfile::ResizeTranscode(bool resize)
 void RecordingProfile::SetLosslessTranscode(bool lossless)
 {
     MythWizard *wizard = (MythWizard *)dialog;
+    if (!wizard)
+        return;
 
     bool show_size = (lossless) ? false : tr_resize->boolValue();
     wizard->setAppropriate(wizard->page(1), show_size);
@@ -858,6 +881,8 @@ void RecordingProfile::SetLosslessTranscode(bool lossless)
     wizard->setNextEnabled(wizard->page(0), ! lossless);
     wizard->setFinishEnabled(wizard->page(0), lossless);
     
+    if (tr_filters)
+        tr_filters->setEnabled(!lossless);
 }
 
 void RecordingProfile::loadByID(int profileId) 
@@ -894,7 +919,9 @@ void RecordingProfile::loadByID(int profileId)
             connect(tr_resize, SIGNAL(valueChanged   (bool)),
                     this,      SLOT(  ResizeTranscode(bool)));
             connect(tr_lossless, SIGNAL(valueChanged        (bool)),
-                    this,        SLOT(  SetLosslessTranscode(bool)));
+                    this,      SLOT(  SetLosslessTranscode(bool)));
+            connect(tr_filters, SIGNAL(valueChanged(const QString &)),
+                    this,      SLOT(FiltersChanged(const QString &)));
         }
     }
     else
@@ -904,6 +931,20 @@ void RecordingProfile::loadByID(int profileId)
 
     id->setValue(profileId);
     load();
+}
+
+void RecordingProfile::FiltersChanged(const QString &val)
+{
+    if (!tr_filters || !tr_lossless)
+      return;
+   
+    // If there are filters, we can not do lossless transcoding 
+    if (val.stripWhiteSpace().length() > 0) {
+       tr_lossless->setValue(false);
+       tr_lossless->setEnabled(false);
+    } else {
+       tr_lossless->setEnabled(true);
+    }
 }
 
 bool RecordingProfile::loadByType(QString name, QString cardtype) 
@@ -977,10 +1018,16 @@ void RecordingProfile::setCodecTypes()
 int RecordingProfile::exec()
 {
     MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
+
     dialog->Show();
     if (tr_lossless)
         SetLosslessTranscode(tr_lossless->boolValue());
-
+    if (tr_resize)
+        ResizeTranscode(tr_resize->boolValue());
+    // Filters should be set last because it might disable lossless
+    if (tr_filters)
+        FiltersChanged(tr_filters->getValue());
+    
     int ret = dialog->exec();
 
     delete dialog;
@@ -1176,3 +1223,4 @@ QString RecordingProfile::getName(int id)
     return NULL;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -39,6 +39,7 @@ protected:
 class ImageSize;
 class TranscodeResize;
 class TranscodeLossless;
+class TranscodeFilters;
 
 class RecordingProfile: public ConfigurationWizard
 {
@@ -116,6 +117,7 @@ class RecordingProfile: public ConfigurationWizard
   private slots:
     void ResizeTranscode(bool resize); 
     void SetLosslessTranscode(bool lossless);
+    void FiltersChanged(const QString &val);
 
   private:
     ID                       *id;
@@ -123,6 +125,7 @@ class RecordingProfile: public ConfigurationWizard
     ImageSize                *imageSize;
     TranscodeResize          *tr_resize;
     TranscodeLossless        *tr_lossless;
+    TranscodeFilters         *tr_filters;
     VideoCompressionSettings *videoSettings;
     AudioCompressionSettings *audioSettings;
     QString                   profileName;

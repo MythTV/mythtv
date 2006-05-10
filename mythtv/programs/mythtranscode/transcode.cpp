@@ -378,7 +378,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     QString encodingType = nvp->GetEncodingType();
     bool copyvideo = false, copyaudio = false;
 
-    QString vidsetting = NULL, audsetting = NULL;
+    QString vidsetting = NULL, audsetting = NULL, vidfilters = NULL;
 
     int video_width = nvp->GetVideoWidth();
     int video_height = nvp->GetVideoHeight();
@@ -397,6 +397,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         vidsetting = profile.byName("videocodec")->getValue();
         audsetting = profile.byName("audiocodec")->getValue();
+        vidfilters = profile.byName("transcodefilters")->getValue();
 
         if (encodingType == "MPEG-2" &&
             profile.byName("transcodelossless")->getValue().toInt())
@@ -413,6 +414,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         else if (profile.byName("transcoderesize")->getValue().toInt())
         {
+            nvp->SetVideoFilters(vidfilters);
             newWidth = profile.byName("width")->getValue().toInt();
             newHeight = profile.byName("height")->getValue().toInt();
 
@@ -443,6 +445,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     .arg(video_width).arg(video_height)
                     .arg(newWidth).arg(newHeight));
         }
+        else  // lossy and no resize
+            nvp->SetVideoFilters(vidfilters);
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
         nvr->SetOption("inpixfmt", FMT_YV12);

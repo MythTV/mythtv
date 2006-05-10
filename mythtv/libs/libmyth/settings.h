@@ -231,6 +231,9 @@ signals:
 
 class ConfigurationDialog: virtual public Configurable {
 public:
+    ConfigurationDialog() : 
+        Configurable(), dialog(NULL) {};
+
     // Make a modal dialog containing configWidget
     virtual MythDialog* dialogWidget(MythMainWindow *parent,
                                      const char* widgetName = 0);
