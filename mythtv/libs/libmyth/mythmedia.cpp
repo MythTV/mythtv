@@ -10,6 +10,7 @@
 
 // MythTV headers
 #include "mythmedia.h"
+#include "mythconfig.h"
 #include "mythcontext.h"
 #include "util.h"
 
@@ -146,6 +147,25 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         return true;
     }
     return false;
+}
+
+MediaError MythMediaDevice::eject(bool open_close)
+{
+    (void) open_close;
+
+#ifdef CONFIG_DARWIN
+    // Backgrounding this is a bit naughty, but it can take up to five
+    // seconds to execute, and freezing the frontend for that long is bad
+
+    QString  command = "disktool -e " + m_DevicePath + " &";
+
+    if (myth_system(command) > 0)
+        return MEDIAERR_FAILED;
+
+    return MEDIAERR_OK;
+#endif
+
+    return MEDIAERR_UNSUPPORTED;
 }
 
 MediaError MythMediaDevice::lock() 

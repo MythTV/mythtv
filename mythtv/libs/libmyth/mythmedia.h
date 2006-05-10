@@ -68,8 +68,7 @@ class MythMediaDevice : public QObject
     virtual bool openDevice();
     virtual bool closeDevice();
     virtual MediaStatus checkMedia() = 0; // Derived classes MUST implement this.
-    virtual MediaError eject(bool open_close = true)
-        { (void) open_close; return MEDIAERR_UNSUPPORTED; }
+    virtual MediaError eject(bool open_close = true);
     virtual MediaError lock();
     virtual MediaError unlock();
     virtual bool performMountCmd( bool DoMount );    
