@@ -175,6 +175,12 @@ VideoOutput::VideoOutput() :
     piph_out(-1),             pipw_out(-1),
     piptmpbuf(NULL),          pipscontext(NULL),
 
+    // Video resizing (for ITV)
+    vsz_enabled(false),
+    vsz_desired_display_rect(0,0,0,0),  vsz_display_size(0,0),
+    vsz_video_size(0,0),
+    vsz_tmp_buf(NULL),                  vsz_scale_context(NULL),
+
     // Deinterlacing
     m_deinterlacing(false),   m_deintfiltername("linearblend"),
     m_deintFiltMan(NULL),     m_deintFilter(NULL),
@@ -197,6 +203,8 @@ VideoOutput::VideoOutput() :
 VideoOutput::~VideoOutput()
 {
     ShutdownPipResize();
+
+    ShutdownVideoResize();
 
     if (m_deintFilter)
         delete m_deintFilter;
@@ -1192,6 +1200,132 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 }
 
 /**
+ * \fn VideoOutput::DoVideoResize(int,int)
+ * \brief Sets up Picture in Picture image resampler.
+ * \param pipwidth  input width
+ * \param pipheight input height
+ * \sa ShutdownPipResize(), ShowPip(VideoFrame*,NuppelVideoPlayer*)
+ */
+void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
+{
+    if ((inDim == vsz_video_size) && (outDim == vsz_display_size))
+        return;
+
+    ShutdownVideoResize();
+
+    vsz_video_size   = inDim;
+    vsz_display_size = outDim;
+
+    int sz = vsz_display_size.height() * vsz_display_size.width() * 3 / 2;
+    vsz_tmp_buf = new unsigned char[sz];
+
+    vsz_scale_context = img_resample_init(
+        vsz_display_size.width(), vsz_display_size.height(),
+        vsz_video_size.width(),   vsz_video_size.height());
+}
+
+void VideoOutput::ResizeVideo(VideoFrame *frame)
+{
+    if (vsz_desired_display_rect.isNull() || frame->codec !=  FMT_YV12)
+        return;
+
+    QRect resize = vsz_desired_display_rect;
+    QSize frameDim(frame->width, frame->height);
+
+    // if resize is outside existing frame, abort
+    bool abort =
+        (resize.right() > frame->width || resize.bottom() > frame->height ||
+         resize.width() > frame->width || resize.height() > frame->height);
+    // if resize == existing frame, no need to carry on
+    abort |= !resize.left() && !resize.top() && (resize.size() == frameDim);
+
+    if (abort)
+    {
+        vsz_enabled = false;
+        ShutdownVideoResize();
+        vsz_desired_display_rect.setRect(0,0,0,0);
+        return;
+    }
+
+    DoVideoResize(frameDim, resize.size());
+
+    if (vsz_tmp_buf && vsz_scale_context)
+    {
+        AVPicture img_in, img_out;
+
+        avpicture_fill(&img_out, (uint8_t *)vsz_tmp_buf, PIX_FMT_YUV420P,
+                       resize.width(), resize.height());
+        avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
+                       frame->width, frame->height);
+        img_resample(vsz_scale_context, &img_out, &img_in);
+    }
+
+    int xoff = resize.left();
+    int yoff = resize.top();
+    int resw = resize.width();
+
+    // Copy Y (intensity values)
+    for (int i = 0; i < resize.height(); i++)
+    {
+        memcpy(frame->buf + (i + yoff) * frame->width + xoff,
+               vsz_tmp_buf + i * resw, resw);
+    }
+
+    // Copy U & V (half plane chroma values)
+    xoff /= 2;
+    yoff /= 2;
+
+    unsigned char *uptr = frame->buf + frame->width * frame->height;
+    unsigned char *vptr = frame->buf + frame->width * frame->height * 5 / 4;
+    int vidw = frame->width / 2;
+
+    unsigned char *videouptr = vsz_tmp_buf + resw * resize.height();
+    unsigned char *videovptr = vsz_tmp_buf + resw * resize.height() * 5 / 4;
+    resw /= 2;
+    for (int i = 0; i < resize.height() / 2; i ++)
+    {
+        memcpy(uptr + (i + yoff) * vidw + xoff, videouptr + i * resw, resw);
+        memcpy(vptr + (i + yoff) * vidw + xoff, videovptr + i * resw, resw);
+    }
+}
+
+void VideoOutput::ShutdownVideoResize(void)
+{
+    if (vsz_tmp_buf)
+    {
+        delete [] vsz_tmp_buf;
+        vsz_tmp_buf = NULL;
+    }
+
+    if (vsz_scale_context)
+    {
+        img_resample_close(vsz_scale_context);
+        vsz_scale_context = NULL;
+    }
+
+    vsz_video_size   = QSize(0,0);
+    vsz_display_size = QSize(0,0);
+    vsz_enabled      = false;
+}
+
+void VideoOutput::SetVideoResize(const QRect &videoRect)
+{
+    if (!videoRect.isValid()    ||
+         videoRect.width()  < 1 || videoRect.height() < 1 ||
+         videoRect.left()   < 0 || videoRect.top()    < 0)
+    {
+        vsz_enabled = false;
+        ShutdownVideoResize();
+        vsz_desired_display_rect.setRect(0,0,0,0);
+    }
+    else
+    {
+        vsz_enabled = true;
+        vsz_desired_display_rect = videoRect;
+    }
+}
+
+/**
  * \fn VideoOutput::DisplayOSD(VideoFrame*,OSD *,int,int)
  * \brief If the OSD has changed, this will convert the OSD buffer
  *        to the OSDSurface's color format.
@@ -1206,6 +1340,9 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
 {
     if (!osd)
         return -1;
+
+    if (vsz_enabled)
+        ResizeVideo(frame);
 
     OSDSurface *surface = osd->Display();
     if (!surface)

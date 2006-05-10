@@ -415,7 +415,9 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
 // e.g. part of the video may be clipped within the displayRect.
 void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 {
-    (void) videoRect;
+    // tell the video player to resize the video stream
+    if (m_parent->GetNVP())
+        m_parent->GetNVP()->SetVideoResize(videoRect);
 
     QMutexLocker locker(&m_display_lock);
     QRect displayRect(dispRect.x() * m_displayWidth/StdDisplayWidth,

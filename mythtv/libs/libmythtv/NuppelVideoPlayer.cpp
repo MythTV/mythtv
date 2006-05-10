@@ -5643,6 +5643,12 @@ void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
     osd->SetVisible(itvosd, 0);
 }
 
+void NuppelVideoPlayer::SetVideoResize(const QRect &videoRect)
+{
+    if (videoOutput)
+        videoOutput->SetVideoResize(videoRect);
+}
+
 /** \fn NuppelVideoPlayer::SetAudioByComponentTag(int tag)
  *  \brief Selects the audio stream using the DVB component tag.
  */

@@ -311,6 +311,9 @@ class VideoOutput
     /// \brief Updates frame displayed when video is paused.
     virtual void UpdatePauseFrame(void) = 0;
 
+    /// \brief Tells the player to resize the video frame (used for ITV)
+    void SetVideoResize(const QRect &videoRect);
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
@@ -327,6 +330,10 @@ class VideoOutput
 
     void DoPipResize(int pipwidth, int pipheight);
     void ShutdownPipResize(void);
+
+    void ResizeVideo(VideoFrame *frame);
+    void DoVideoResize(const QSize &inDim, const QSize &outDim);
+    void ShutdownVideoResize(void);
 
     void SetVideoAspectRatio(float aspect);
 
@@ -391,6 +398,14 @@ class VideoOutput
     int pipw_out;
     unsigned char      *piptmpbuf;
     ImgReSampleContext *pipscontext;
+
+    // Video resizing (for ITV)
+    bool    vsz_enabled;
+    QRect   vsz_desired_display_rect;
+    QSize   vsz_display_size;
+    QSize   vsz_video_size;
+    unsigned char      *vsz_tmp_buf;
+    ImgReSampleContext *vsz_scale_context;
 
     // Deinterlacing
     bool           m_deinterlacing;

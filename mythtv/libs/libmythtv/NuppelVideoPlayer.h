@@ -159,6 +159,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     void SetOSDFontName(const QString osdfonts[22], const QString &prefix);
     void SetOSDThemeName(const QString themename);
+    void SetVideoResize(const QRect &videoRect);
 
     // Toggle Sets
     void ToggleLetterbox(int letterboxMode = -1);
