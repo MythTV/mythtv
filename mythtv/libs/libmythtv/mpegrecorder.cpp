@@ -40,6 +40,7 @@ extern "C" {
 }
 
 #define LOC QString("MPEGRec(%1): ").arg(videodevice)
+#define LOC_WARN QString("MPEGRec(%1) Warning: ").arg(videodevice)
 #define LOC_ERR QString("MPEGRec(%1) Error: ").arg(videodevice)
 
 const int MpegRecorder::audRateL1[] =
@@ -389,8 +390,10 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error setting ctrl params" + ENO);
-        return false;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+		        "Unable to set recording volume" + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+		        "If you are using an AverMedia M179 card this is normal.");
     }
 
     if (vbimode)
