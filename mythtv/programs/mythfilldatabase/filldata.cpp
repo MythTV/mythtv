@@ -2083,7 +2083,8 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                         0 /*service id*/, major,            minor,
                         false /*use on air guide*/, false /*hidden*/,
                         false /*hidden in guide*/,
-                        freqid,           localfile,        (*i).tvformat))
+                        freqid,           localfile,        (*i).tvformat,
+                        (*i).xmltvid))
                 {
                     cout << "### " << endl;
                     cout << "### Channel inserted" << endl;
