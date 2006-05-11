@@ -8,6 +8,7 @@
 #include "format.h"
 #include "decoderbase.h"
 #include "vbilut.h"
+#include "h264utils.h"
 
 extern "C" {
 #include "frame.h"
@@ -115,8 +116,7 @@ class AvFormatDecoder : public DecoderBase
     /// This is a No-op for this class.
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
 
-    QString GetEncodingType(void) const { return QString("MPEG-2"); }
-
+    QString GetEncodingType(void) const;
     MythCodecID GetVideoCodecID() const { return video_codec_id; }
 
     virtual void SetDisablePassThrough(bool disable);
@@ -174,8 +174,8 @@ class AvFormatDecoder : public DecoderBase
     void InitVideoCodec(AVStream *stream, AVCodecContext *enc);
 
     /// Preprocess a packet, setting the video parms if nessesary.
-    /// Also feeds HandleGopStart for MPEG2 files.
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
+    void H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
 
     void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
@@ -188,10 +188,12 @@ class AvFormatDecoder : public DecoderBase
 
     bool SetupAudioStream(void);
 
-    // Update our position map, keyframe distance, and the like.  Called for key frame packets.
+    /// Update our position map, keyframe distance, and the like.
+    /// Called for key frame packets.
     void HandleGopStart(AVPacket *pkt);
 
     class AvFormatDecoderPrivate *d;
+    H264::KeyframeSequencer *h264_kf_seq;
 
     AVFormatContext *ic;
     AVFormatParameters params;

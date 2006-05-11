@@ -3338,6 +3338,9 @@ CodecID myth2av_codecid(MythCodecID codec_id,
         case kCodec_MPEG4:
             ret = CODEC_ID_MPEG4;
             break;
+        case kCodec_H264:
+            ret = CODEC_ID_H264;
+            break;
 
         case kCodec_MPEG1_XVMC:
             mc = true;
@@ -3352,6 +3355,9 @@ CodecID myth2av_codecid(MythCodecID codec_id,
             break;
         case kCodec_MPEG4_XVMC:
             VERBOSE(VB_IMPORTANT, "Error: XvMC MPEG4 not supported by ffmpeg");
+            break;
+        case kCodec_H264_XVMC:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC H264 not supported by ffmpeg");
             break;
 
         case kCodec_MPEG1_IDCT:
@@ -3368,6 +3374,9 @@ CodecID myth2av_codecid(MythCodecID codec_id,
         case kCodec_MPEG4_IDCT:
             VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT MPEG4 not supported by ffmpeg");
             break;
+        case kCodec_H264_IDCT:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC-IDCT H264 not supported by ffmpeg");
+            break;
 
         case kCodec_MPEG1_VLD:
             vld = true;
@@ -3382,6 +3391,9 @@ CodecID myth2av_codecid(MythCodecID codec_id,
             break;
         case kCodec_MPEG4_VLD:
             VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD MPEG4 not supported by ffmpeg");
+            break;
+        case kCodec_H264_VLD:
+            VERBOSE(VB_IMPORTANT, "Error: XvMC-VLD H264 not supported by ffmpeg");
             break;
         default:
             VERBOSE(VB_IMPORTANT, QString("Error: MythCodecID %1 has not been "

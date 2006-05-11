@@ -338,16 +338,19 @@ enum v4l2_mpeg_audiotype {
 	V4L2_MPEG_AU_2_III,	/* MPEG-2 layer 3 */
 	V4L2_MPEG_AC3,		/* AC3 */
 	V4L2_MPEG_LPCM,		/* LPCM */
+	V4L2_MPEG_AUDIO_UNKNOWN = 0xff,
 };
 enum v4l2_mpeg_videotype {
 	V4L2_MPEG_VI_1,		/* MPEG-1 */
 	V4L2_MPEG_VI_2,		/* MPEG-2 */
+	V4L2_MPEG_VIDEO_UNKNOWN = 0xff,
 };
 enum v4l2_mpeg_aspectratio {
 	V4L2_MPEG_ASPECT_SQUARE = 1,   /* square pixel */
 	V4L2_MPEG_ASPECT_4_3    = 2,   /*  4 : 3       */
 	V4L2_MPEG_ASPECT_16_9   = 3,   /* 16 : 9       */
 	V4L2_MPEG_ASPECT_1_221  = 4,   /*  1 : 2,21    */
+	V4L2_MPEG_ASPECT_UNKNOWN = 0xff,
 };
 
 struct v4l2_mpeg_compression {

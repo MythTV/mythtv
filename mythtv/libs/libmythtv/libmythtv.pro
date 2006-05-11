@@ -167,6 +167,7 @@ HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
 HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
 HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
+HEADERS += mpeg/h264utils.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
@@ -177,6 +178,9 @@ SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
 SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
 SOURCES += mpeg/iso6937tables.cpp
+SOURCES += mpeg/h264utils.cpp
+
+DEFINES += USING_H264TOOLS
 
 # C stuff
 HEADERS += frequencies.h

@@ -258,6 +258,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  bool allow_libmpeg2)
     : DecoderBase(parent, pginfo),
       d(new AvFormatDecoderPrivate(allow_libmpeg2)),
+      h264_kf_seq(new H264::KeyframeSequencer()),
       ic(NULL),
       frame_decoded(0),             decoded_video_frame(NULL),
       directrendering(false),       drawband(false),
@@ -318,6 +319,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ccd708;
     delete ttd;
     delete d;
+    delete h264_kf_seq;
     if (audioSamples)
         delete [] audioSamples;
 }
@@ -341,6 +343,7 @@ void AvFormatDecoder::CloseContext()
         ic = NULL;
     }
     d->DestroyMPEG2();
+    h264_kf_seq->Reset();
 }
 
 static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
@@ -985,6 +988,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
 
     if (align_width == 0 && align_height == 0)
     {
+        VERBOSE(VB_PLAYBACK, LOC + "InitVideoCodec "
+                "failed to align dimensions, resetting decoder.");
         align_width = 640;
         align_height = 480;
         fps = 29.97;
@@ -1011,6 +1016,8 @@ static int xvmc_stream_type(int codec_id)
         case CODEC_ID_H263:
             return 3;
         case CODEC_ID_MPEG4:
+            return 4;
+        case CODEC_ID_H264:
             return 4;
 #endif
     }
@@ -1185,10 +1192,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         AVCodecContext *enc = ic->streams[i]->codec;
         VERBOSE(VB_PLAYBACK, LOC +
-                QString("Stream #%1, has id 0x%2 codec id %3, type %4 at 0x")
+                QString("Stream #%1, has id 0x%2 codec id %3, "
+                        "type %4, bitrate %5 at 0x")
                 .arg(i).arg((int)ic->streams[i]->id)
                 .arg(codec_id_string(enc->codec_id))
                 .arg(codec_type_string(enc->codec_type))
+                .arg(enc->bit_rate)
                 <<((void*)ic->streams[i]));
 
         switch (enc->codec_type)
@@ -1196,11 +1205,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_VIDEO:
             {
                 assert(enc->codec_id);
+
+                // HACK -- begin
+                // ffmpeg is unable to compute H.264 bitrates in mpegts?
+                if (CODEC_ID_H264 == enc->codec_id && enc->bit_rate == 0)
+                    enc->bit_rate = 500000;
+                // HACK -- end
+
                 bitrate += enc->bit_rate;
                 if (novideo)
                     break;
 
                 d->DestroyMPEG2();
+                h264_kf_seq->Reset();
 #ifdef USING_XVMC
                 if (!using_null_videoout && xvmc_stream_type(enc->codec_id))
                 {
@@ -1230,9 +1247,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
                 else
-                    video_codec_id = kCodec_MPEG2; // default to MPEG2
+                {
+                    if (CODEC_ID_H264 == enc->codec_id)
+                        video_codec_id = kCodec_H264;
+                    else
+                        video_codec_id = kCodec_MPEG2; // default to MPEG2
+                }
 #else
-                video_codec_id = kCodec_MPEG2; // default to MPEG2
+                if (CODEC_ID_H264 == enc->codec_id)
+                    video_codec_id = kCodec_H264;
+                else
+                    video_codec_id = kCodec_MPEG2; // default to MPEG2
 #endif // USING_XVMC
                 if (enc->codec)
                 {
@@ -1715,6 +1740,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             keyframedist    = tempKeyFrameDist;
             maxkeyframedist = max(keyframedist, maxkeyframedist);
 
+            // FIXME: this needs to go
             bool is_ivtv    = (keyframedist == 15) || (keyframedist == 12);
             positionMapType = (is_ivtv) ? MARK_GOP_START : MARK_GOP_BYFRAME;
 
@@ -1882,6 +1908,72 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     }
 
     memcpy(prvpkt, pkt->data + pkt->size - 3, 3);
+}
+
+void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
+{
+    AVCodecContext *context = stream->codec;
+    const uint8_t  *buf     = pkt->data;
+    const uint8_t  *buf_end = pkt->data + pkt->size;
+
+    while (buf < buf_end)
+    {
+        uint32_t bytes_used = h264_kf_seq->AddBytes(buf, buf_end - buf, 0);
+        buf += bytes_used;
+
+        if (!h264_kf_seq->HasStateChanged() || !h264_kf_seq->IsOnKeyframe())
+            continue;
+
+        float aspect_ratio;
+        if (context->sample_aspect_ratio.num == 0)
+            aspect_ratio = 0.0f;
+        else
+            aspect_ratio = av_q2d(context->sample_aspect_ratio) *
+                context->width / context->height;
+
+        if (aspect_ratio <= 0.0f || aspect_ratio > 6.0f)
+            aspect_ratio = (float)context->width / context->height;
+
+        uint  width  = context->width;
+        uint  height = context->height;
+        float seqFPS = normalized_fps(stream, context);
+
+        bool changed = (seqFPS > fps+0.01) || (seqFPS < fps-0.01);
+        changed |= (width  != (uint)current_width );
+        changed |= (height != (uint)current_height);
+        changed |= (aspect_ratio != current_aspect);
+
+        if (changed)
+        {
+            uint awidth = width, aheight = height;
+            align_dimensions(context, awidth, aheight);
+
+            GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
+                                     keyframedist, aspect_ratio,
+                                     kScan_Detect);
+
+            current_width  = width;
+            current_height = height;
+            current_aspect = aspect_ratio;
+            fps            = seqFPS;
+
+            gopset = false;
+            prevgoppos = 0;
+            lastapts = lastvpts = lastccptsu = 0;
+
+            // fps debugging info
+            float avFPS = normalized_fps(stream, context);
+            if ((seqFPS > avFPS+0.01) || (seqFPS < avFPS-0.01))
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                        QString("avFPS(%1) != seqFPS(%2)")
+                        .arg(avFPS).arg(seqFPS));
+            }
+        }
+
+        HandleGopStart(pkt);
+        pkt->flags |= PKT_FLAG_KEY;
+    }
 }
 
 /** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
@@ -2569,6 +2661,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 MpegPreProcessPkt(curstream, pkt);
             }
+            else if (context->codec_id == CODEC_ID_H264)
+            {
+                H264PreProcessPkt(curstream, pkt);
+            }
             else
             {
                 if (pkt->flags & PKT_FLAG_KEY)
@@ -2997,6 +3093,33 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         delete pkt;
 
     return true;
+}
+
+QString AvFormatDecoder::GetEncodingType(void) const
+{
+    switch (video_codec_id)
+    {
+        case kCodec_MPEG1:
+        case kCodec_MPEG1_XVMC:
+        case kCodec_MPEG1_VLD:
+        case kCodec_MPEG2:
+        case kCodec_MPEG2_IDCT:
+        case kCodec_MPEG2_VLD:
+            return QString("MPEG-2");
+
+        case kCodec_H264:
+        case kCodec_H264_XVMC:
+        case kCodec_H264_IDCT:
+        case kCodec_H264_VLD:
+            return QString("H.264");
+
+        default:
+            // defaults to MPEG-2
+            return QString("MPEG-2");
+    }
+
+    // defaults to MPEG-2
+    return QString("MPEG-2");
 }
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
