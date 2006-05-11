@@ -720,79 +720,59 @@ bool DVBDiSEqC::PositionerGotoAngular(DVBTuning& tuning, bool reset,
     if (prev_tuning.diseqc_pos != tuning.diseqc_pos)
         VERBOSE(VB_CHANNEL, LOC + "DiSEqC Motor Moving");
 
-    int CMD1=0x00 , CMD2=0x00;        // Bytes sent to motor
-    double USALS=0.0;
-    int DecimalLookup[10] =
-        { 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x0A, 0x0B, 0x0D, 0x0E };
-
-    // Equation lifted from VDR rotor plugin by
-    // Thomas Bergwinkl <Thomas.Bergwinkl@t-online.de>
-
-    double P = gContext->GetSetting("Latitude", "").toFloat() * TO_RADS;           // Earth Station Latitude
-    double Ue = gContext->GetSetting("Longitude", "").toFloat() * TO_RADS;           // Earth Station Longitude
-    double Us = tuning.diseqc_pos * TO_RADS;          // Satellite Longitude
-
-    double az = M_PI + atan( tan (Us-Ue) / sin(P) );
-    double x = acos( cos(Us-Ue) * cos(P) );
-    double el = atan( (cos(x) - 0.1513 ) /sin(x) );
-    double Azimuth = atan((-cos(el)*sin(az))/(sin(el)*cos(P)-cos(el)*sin(P)*cos(az)))* TO_DEC;
-
-//    printf("Offset = %f\n",Azimuth);
-
-    if (Azimuth > 0.0)
-        CMD1=0xE0;    // East
-    else 
-        CMD1=0xD0;      // West
-
-    USALS = fabs(Azimuth);
- 
-    while (USALS > 16) 
-    {
-        CMD1++;
-   	USALS -=16;
-    }
-
-    while (USALS >= 1.0) 
-    {
-   	CMD2+=0x10;
-        USALS--;
-    }
-
-    CMD2 += DecimalLookup[(int)round(USALS*10)];
-  
     if (!DiseqcReset()) 
     {
       	VERBOSE(VB_IMPORTANT, LOC_ERR + "DiseqcReset() failed");
     	return false;
     }
 
-    // required db changes - get lat and lon for ground station location in db 
-    // and added to tuning
-    // sat_pos be passed into tuning, and be a float not an int./
-
     VERBOSE(VB_CHANNEL, LOC + QString("1.3 Motor - Goto Angular Position %1")
             .arg(tuning.diseqc_pos));
 
+    // Equation lifted from VDR rotor plugin by
+    // Thomas Bergwinkl <Thomas.Bergwinkl@t-online.de>
+
+    // Earth Station Latitude and Longitude in radians
+    double P  = gContext->GetSetting("Latitude",  "").toFloat() * TO_RADS;
+    double Ue = gContext->GetSetting("Longitude", "").toFloat() * TO_RADS;
+
+    // Satellite Longitude in radians
+    double Us = tuning.diseqc_pos * TO_RADS;
+
+    double az      = M_PI + atan( tan(Us - Ue) / sin(P) );
+    double x       = acos( cos(Us - Ue) * cos(P) );
+    double el      = atan( (cos(x) - 0.1513) / sin(x) );
+    double tmp_a   = -cos(el) * sin(az);
+    double tmp_b   = (sin(el) * cos(P)) - (cos(el) * sin(P) * cos(az));
+    double azimuth = atan(tmp_a / tmp_b) * TO_DEC;
+
+    // Bytes sent to motor
+    // cmd1 high nibble is 1110b/0xE0 for east or 1101b/0xD0 for west
+    // cmd1 low  nibble is angle / 16
+    // cmd2 high nibble is angle % 16
+    // cmd2 low  nibble is (angle * 16) % 16
+    uint az16 = (unsigned int) (abs(azimuth) * 16.0);
+    uint cmd1 = ((azimuth > 0.0) ? 0xE0 : 0xD0) | ((az16 >> 8) & 0x0f);
+    uint cmd2 = (az16 & 0xff);
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, GOTO_ANGULAR, cmd1, cmd2, 0x00}, 5};
+  
     if ((prev_tuning.diseqc_port != tuning.diseqc_port  ||
          prev_tuning.tone        != tuning.tone         ||
          prev_tuning.diseqc_pos  != tuning.diseqc_pos   ||
          prev_tuning.voltage     != tuning.voltage    ) || reset)
     {
-
-        dvb_diseqc_master_cmd cmd = 
-            {{CMD_FIRST, MASTER_TO_POSITIONER, GOTO_ANGULAR, CMD1 , CMD2 , 
-              0x00}, 5};
-
-        if (!SendDiSEqCMessage(tuning,cmd)) 
+        if (!SendDiSEqCMessage(tuning, cmd))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting DiSEqC failed.");
             return false;
         }
 
         prev_tuning.diseqc_port = tuning.diseqc_port;
-        prev_tuning.diseqc_pos = tuning.diseqc_pos;
-        prev_tuning.tone = tuning.tone;
-        prev_tuning.voltage = tuning.voltage;
+        prev_tuning.diseqc_pos  = tuning.diseqc_pos;
+        prev_tuning.tone        = tuning.tone;
+        prev_tuning.voltage     = tuning.voltage;
     }
 
     havetuned |=
