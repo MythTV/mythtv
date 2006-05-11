@@ -116,9 +116,6 @@ class MythNativeWizard : public MythThemedDialog
     UICheckBoxType   *doBurn_check;
     UICheckBoxType   *eraseDvdRw_check;
 
-    QPixmap          *cutPixmap;
-    QPixmap          *blankPixmap;
-
     MythPopupBox     *popupMenu;
 };
 

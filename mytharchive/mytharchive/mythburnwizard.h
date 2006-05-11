@@ -131,9 +131,6 @@ class MythburnWizard : public MythThemedDialog
 
     UIStatusBarType  *size_bar;
 
-    QPixmap          *cutPixmap;
-    QPixmap          *blankPixmap;
-
     MythPopupBox     *popupMenu;
 };
 

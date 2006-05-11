@@ -1,7 +1,6 @@
 include ( ../mythconfig.mak )
 include ( ../settings.pro )
 
-
 TEMP = $${SRC_PATH}
 TEMP ~= s/'//
 

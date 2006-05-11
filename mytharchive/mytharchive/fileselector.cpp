@@ -210,7 +210,7 @@ void FileSelector::wireUpTheme()
     }
 
     // load pixmaps
-    m_directoryPixmap = gContext->LoadScalePixmap("mb_folder.png");
+    m_directoryPixmap = gContext->LoadScalePixmap("ma_folder.png");
 
     buildFocusList();
     assignFirstFocus();

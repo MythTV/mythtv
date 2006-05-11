@@ -35,9 +35,6 @@ MythburnWizard::MythburnWizard(ArchiveDestination destination,
     archiveDestination = destination;
     themeDir = gContext->GetShareDir() + "mytharchive/themes/";
 
-    cutPixmap = gContext->LoadScalePixmap("cutlist.png");
-    blankPixmap = gContext->LoadScalePixmap("blank.png");
-
     archiveList = NULL;
     popupMenu = NULL;
     setContext(1);
@@ -62,12 +59,6 @@ MythburnWizard::~MythburnWizard(void)
 
     if (archiveList)
         delete archiveList;
-
-    if (cutPixmap)
-        delete cutPixmap;
-
-    if (blankPixmap)
-        delete blankPixmap;
 }
 
 void MythburnWizard::keyPressEvent(QKeyEvent *e)

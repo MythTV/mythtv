@@ -110,9 +110,9 @@ MythTV Archive GUI theme
           <context>1</context>
           <area>45,120,300,40</area>
           <font>description</font>
-          <image function="on" filename="mv_leftright_on.png"></image>
-          <image function="off" filename="mv_leftright_off.png"></image>
-          <image function="pushed" filename="mv_leftright_pushed.png"></image>
+          <image function="on" filename="ma_leftright_on.png"></image>
+          <image function="off" filename="ma_leftright_off.png"></image>
+          <image function="pushed" filename="ma_leftright_pushed.png"></image>
       </selector>
       <textarea name="format_text" draworder="1">
           <context>1</context>
@@ -143,9 +143,9 @@ MythTV Archive GUI theme
           <context>1</context>
           <area>45,280,300,40</area>
           <font>description</font>
-          <image function="on" filename="mv_leftright_on.png"></image>
-          <image function="off" filename="mv_leftright_off.png"></image>
-          <image function="pushed" filename="mv_leftright_pushed.png"></image>
+          <image function="on" filename="ma_leftright_on.png"></image>
+          <image function="off" filename="ma_leftright_off.png"></image>
+          <image function="pushed" filename="ma_leftright_pushed.png"></image>
       </selector>
 
       <textarea name="destination_text" draworder="1">
@@ -159,10 +159,10 @@ MythTV Archive GUI theme
       <checkbox name="erase_check" draworder="4">
           <context>1</context>
           <position>45,400</position>
-          <image function="checked" filename="mv_checked.png"></image>
-          <image function="unchecked" filename="mv_unchecked.png"></image>
-          <image function="checked_high" filename="mv_checked_high.png"></image>
-          <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+          <image function="checked" filename="ma_checked.png"></image>
+          <image function="unchecked" filename="ma_unchecked.png"></image>
+          <image function="checked_high" filename="ma_checked_high.png"></image>
+          <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
       </checkbox>
       <textarea name="erase_text" draworder="1" align="left">
           <context>1</context>
@@ -179,9 +179,9 @@ MythTV Archive GUI theme
       <textbutton name="find_button" draworder="1">
           <position>590,395</position>
           <context>1</context>
-          <image function="on" filename="text_button_on.png"></image>
-          <image function="off" filename="text_button_off.png"></image>
-          <image function="pushed" filename="text_button_pushed.png"></image>
+          <image function="on" filename="ma_text_button_on.png"></image>
+          <image function="off" filename="ma_text_button_off.png"></image>
+          <image function="pushed" filename="ma_text_button_pushed.png"></image>
           <font>buttons</font>
       </textbutton>
 
@@ -208,25 +208,25 @@ MythTV Archive GUI theme
 
       <textbutton name="cancel_button" draworder="1">
         <position>35,0</position>
-        <image function="on" filename="text_button_on.png"></image>
-        <image function="off" filename="text_button_off.png"></image>
-        <image function="pushed" filename="text_button_pushed.png"></image>
+        <image function="on" filename="ma_text_button_on.png"></image>
+        <image function="off" filename="ma_text_button_off.png"></image>
+        <image function="pushed" filename="ma_text_button_pushed.png"></image>
         <font>buttons</font>
       </textbutton>
 
       <textbutton name="prev_button" draworder="1">
         <position>440,0</position>
-        <image function="on" filename="text_button_on.png"></image>
-        <image function="off" filename="text_button_off.png"></image>
-        <image function="pushed" filename="text_button_pushed.png"></image>
+        <image function="on" filename="ma_text_button_on.png"></image>
+        <image function="off" filename="ma_text_button_off.png"></image>
+        <image function="pushed" filename="ma_text_button_pushed.png"></image>
         <font>buttons</font>
       </textbutton>
 
       <textbutton name="next_button" draworder="1">
         <position>610,0</position>
-        <image function="on" filename="text_button_on.png"></image>
-        <image function="off" filename="text_button_off.png"></image>
-        <image function="pushed" filename="text_button_pushed.png"></image>
+        <image function="on" filename="ma_text_button_on.png"></image>
+        <image function="off" filename="ma_text_button_off.png"></image>
+        <image function="pushed" filename="ma_text_button_pushed.png"></image>
         <font>buttons</font>
       </textbutton>
 
@@ -324,9 +324,9 @@ MythTV Archive GUI theme
           <selector name="category_selector" draworder="1">
               <area>265,80,480,40</area>
               <font>description</font>
-              <image function="on" filename="mv_leftright_on.png"></image>
-              <image function="off" filename="mv_leftright_off.png"></image>
-              <image function="pushed" filename="mv_leftright_pushed.png"></image>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
           </selector>
 
           <listbtnarea name="recordinglist"  draworder="1">
@@ -376,10 +376,10 @@ MythTV Archive GUI theme
 
           <checkbox name="usecutlist_check" draworder="4">
               <position>45,500</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="nocutlist_text" draworder="4" align="left">
@@ -411,17 +411,17 @@ MythTV Archive GUI theme
 
           <textbutton name="cancel_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="ok_button" draworder="1">
               <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -494,16 +494,16 @@ MythTV Archive GUI theme
 
           <textbutton name="back_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
           <textbutton name="home_button" draworder="1">
               <position>200,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
           <textarea name="location_label" draworder="0" align="right">
@@ -540,16 +540,16 @@ MythTV Archive GUI theme
           <area>0,550,800,50</area>
           <textbutton name="cancel_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
           <textbutton name="ok_button" draworder="1">
               <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
       </container>
@@ -647,9 +647,9 @@ MythTV Archive GUI theme
           <selector name="category_selector" draworder="1">
               <area>265,80,480,40</area>
               <font>description</font>
-              <image function="on" filename="mv_leftright_on.png"></image>
-              <image function="off" filename="mv_leftright_off.png"></image>
-              <image function="pushed" filename="mv_leftright_pushed.png"></image>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
           </selector>
 
           <listbtnarea name="videolist"  draworder="1">
@@ -694,7 +694,7 @@ MythTV Archive GUI theme
           <image name="cover_background" draworder="0">
               <position>615,318</position>
               <staticsize>140,200</staticsize>
-              <filename>mb_coverback.png</filename>
+              <filename>ma_coverback.png</filename>
           </image>
           <image name="cover_image" draworder="0">
               <position>620,323</position>
@@ -711,17 +711,17 @@ MythTV Archive GUI theme
 
           <textbutton name="cancel_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="ok_button" draworder="1">
               <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -830,9 +830,9 @@ MythTV Archive GUI theme
               <context>1</context>
               <area>265,80,480,40</area>
               <font>description</font>
-              <image function="on" filename="mv_leftright_on.png"></image>
-              <image function="off" filename="mv_leftright_off.png"></image>
-              <image function="pushed" filename="mv_leftright_pushed.png"></image>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
           </selector>
 
           <listbtnarea name="archivelist"  draworder="1">
@@ -889,8 +889,8 @@ MythTV Archive GUI theme
 
           <statusbar name="size_bar" draworder="1" whitespace="5">
               <context>1</context>
-              <container fleximage="no">mm_volume_background.png</container>
-              <fill>mm_volume_tick.png</fill>
+              <container fleximage="no">ma_size_background.png</container>
+              <fill>ma_size_tick.png</fill>
               <position>670,355</position>
               <orientation>bottomtotop</orientation>
           </statusbar>
@@ -980,10 +980,10 @@ MythTV Archive GUI theme
           <checkbox name="makeisoimage" draworder="1">
               <context>2</context>
               <position>45,315</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="title" draworder="2" align="left">
@@ -996,10 +996,10 @@ MythTV Archive GUI theme
           <checkbox name="burntodvdr" draworder="2">
               <context>2</context>
               <position>45,355</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="title" draworder="3" align="left">
@@ -1012,10 +1012,10 @@ MythTV Archive GUI theme
           <checkbox name="erasedvdrw" draworder="3">
               <context>2</context>
               <position>45,405</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
       </container>
@@ -1028,25 +1028,25 @@ MythTV Archive GUI theme
 
           <textbutton name="cancel_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="prev_button" draworder="1">
               <position>440,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="next_button" draworder="1">
               <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -1158,9 +1158,9 @@ MythTV Archive GUI theme
               <context>1</context>
               <area>265,80,480,40</area>
               <font>description</font>
-              <image function="on" filename="mv_leftright_on.png"></image>
-              <image function="off" filename="mv_leftright_off.png"></image>
-              <image function="pushed" filename="mv_leftright_pushed.png"></image>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
           </selector>
 
           <listbtnarea name="archivelist"  draworder="1">
@@ -1217,10 +1217,10 @@ MythTV Archive GUI theme
           <checkbox name="usecutlist_check" draworder="4">
               <context>1</context>
               <position>45,475</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="nocutlist_text" draworder="4" align="left">
@@ -1240,8 +1240,8 @@ MythTV Archive GUI theme
 
           <statusbar name="size_bar" draworder="1" whitespace="5">
               <context>1</context>
-              <container fleximage="no">mm_volume_background.png</container>
-              <fill>mm_volume_tick.png</fill>
+              <container fleximage="no">ma_size_background.png</container>
+              <fill>ma_size_tick.png</fill>
               <position>670,355</position>
               <orientation>bottomtotop</orientation>
           </statusbar>
@@ -1308,9 +1308,9 @@ MythTV Archive GUI theme
               <context>2</context>
               <area>45,170,300,40</area>
               <font>description</font>
-              <image function="on" filename="mv_leftright_on.png"></image>
-              <image function="off" filename="mv_leftright_off.png"></image>
-              <image function="pushed" filename="mv_leftright_pushed.png"></image>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
           </selector>
 
           <image name="theme_image" draworder="2">
@@ -1427,7 +1427,7 @@ MythTV Archive GUI theme
               <context>3</context>
               <position>55,75</position>
               <staticsize>25,25</staticsize>
-              <filename>mb_cutlist.png</filename>
+              <filename>ma_cutlist.png</filename>
           </image>
 
           <listbtnarea name="selectedlist"  draworder="1">
@@ -1446,9 +1446,9 @@ MythTV Archive GUI theme
           <textbutton name="advanced_button" draworder="1">
               <position>35,300</position>
               <context>3</context>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -1462,25 +1462,25 @@ MythTV Archive GUI theme
 
           <textbutton name="cancel_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="prev_button" draworder="1">
               <position>440,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
           <textbutton name="next_button" draworder="1">
               <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
@@ -1594,16 +1594,16 @@ MythTV Archive GUI theme
           <textbutton name="ok_button" draworder="0">
               <position>250,540</position>
               <font>display</font>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
           </textbutton>
           <textbutton name="cancel_button" draworder="0">
               <position>450,540</position>
               <font>display</font>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
           </textbutton>
 
       </container>
@@ -1702,10 +1702,10 @@ MythTV Archive GUI theme
 
           <checkbox name="makeisoimage" draworder="1">
               <position>45,75</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="title" draworder="2" align="left">
@@ -1716,10 +1716,10 @@ MythTV Archive GUI theme
 
           <checkbox name="burntodvdr" draworder="2">
               <position>45,115</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
           <textarea name="title" draworder="3" align="left">
@@ -1730,10 +1730,10 @@ MythTV Archive GUI theme
 
           <checkbox name="erasedvdrw" draworder="3">
               <position>45,155</position>
-              <image function="checked" filename="mv_checked.png"></image>
-              <image function="unchecked" filename="mv_unchecked.png"></image>
-              <image function="checked_high" filename="mv_checked_high.png"></image>
-              <image function="unchecked_high" filename="mv_unchecked_high.png"></image>
+              <image function="checked" filename="ma_checked.png"></image>
+              <image function="unchecked" filename="ma_unchecked.png"></image>
+              <image function="checked_high" filename="ma_checked_high.png"></image>
+              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
           </checkbox>
 
       </container>
@@ -1746,16 +1746,16 @@ MythTV Archive GUI theme
 
           <textbutton name="cancel_button" draworder="1">
               <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
           <textbutton name="ok_button" draworder="1">
               <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
 
