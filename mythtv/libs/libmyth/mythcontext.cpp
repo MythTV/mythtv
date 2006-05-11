@@ -1790,8 +1790,6 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     bool found = false;
     QString value;
 
-    // By putting this code here, we override settings even when we're
-    // not using the settings cache.
     if (d && d->overriddenSettings.contains(key)) {
         value = d->overriddenSettings[key];
         return value;
@@ -1880,10 +1878,26 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
 {
     bool found = false;
     QString value = defaultval;
+    QString myKey = host + " " + key;
+
+    if (d)
+    {
+        if (d->overriddenSettings.contains(myKey))
+        {
+            value = d->overriddenSettings[myKey];
+            return value;
+        }
+
+        if ((host == d->m_localhostname) &&
+            (d->overriddenSettings.contains(key)))
+        {
+            value = d->overriddenSettings[key];
+            return value;
+        }
+    }
 
     if (d && d->useSettingsCache)
     {
-        QString myKey = host + " " + key;
         d->settingsCacheLock.lock();
         if (d->settingsCache.contains(myKey))
         {
