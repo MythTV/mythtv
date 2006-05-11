@@ -411,6 +411,8 @@ frame_queue_t *VideoBuffers::queue(BufferType type)
         q = &limbo;
     else if (type == kVideoBuffer_pause)
         q = &pause;
+    else if (type == kVideoBuffer_decode)
+        q = &decode;
     global_lock.unlock();
 
     return q;
@@ -431,6 +433,8 @@ const frame_queue_t *VideoBuffers::queue(BufferType type) const
         q = &limbo;
     else if (type == kVideoBuffer_pause)
         q = &pause;
+    else if (type == kVideoBuffer_decode)
+        q = &decode;
     global_lock.unlock();
 
     return q;
@@ -505,6 +509,8 @@ void VideoBuffers::remove(BufferType type, VideoFrame *frame)
             limbo.remove(frame);
         if ((type & kVideoBuffer_pause) == kVideoBuffer_pause)
             pause.remove(frame);
+        if ((type & kVideoBuffer_decode) == kVideoBuffer_decode)
+            decode.remove(frame);
         global_lock.unlock();
     }
 }

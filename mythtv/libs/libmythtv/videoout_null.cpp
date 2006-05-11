@@ -49,14 +49,13 @@ void VideoOutputNull::InputChanged(int width, int height, float aspect,
         return;
     }
 
-    XJ_width = width;
-    XJ_height = height;
+    video_dim = QSize(width, height);
 
     vbuffers.DeleteBuffers();
 
     MoveResize();
 
-    if (!vbuffers.CreateBuffers(XJ_width, XJ_height))
+    if (!vbuffers.CreateBuffers(width, height))
     {
         VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
                 "Failed to recreate buffers");
@@ -92,8 +91,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
-    XJ_width = width;
-    XJ_height = height;
+    video_dim = QSize(width, height);
+
     if (!vbuffers.CreateBuffers(width, height))
         return false;
 

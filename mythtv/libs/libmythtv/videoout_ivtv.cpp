@@ -254,9 +254,9 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
         struct ivtv_osd_coords osdcoords;
         bzero(&osdcoords, sizeof(osdcoords));
-        osdcoords.lines = XJ_height;
+        osdcoords.lines = video_dim.height();
         osdcoords.offset = 0;
-        osdcoords.pixel_stride = XJ_width * 2;
+        osdcoords.pixel_stride = video_dim.width() * 2;
 
         if (ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords) < 0)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting active buffer" + ENO);
@@ -354,29 +354,32 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
     unsigned char *pipbuf = pipimage->buf;
 
-    if (pipw != desired_pipw || piph != desired_piph)
+    if (pipw != pip_desired_display_size.width() ||
+        piph != pip_desired_display_size.height())
     {
         DoPipResize(pipw, piph);
 
-        if (piptmpbuf && pipscontext)
+        if (pip_tmp_buf && pip_scaling_context)
         {
             AVPicture img_in, img_out;
 
-            avpicture_fill(&img_out, (uint8_t *)piptmpbuf, PIX_FMT_YUV420P,
-                           pipw_out, piph_out);
+            avpicture_fill(
+                &img_out, (uint8_t *)pip_tmp_buf, PIX_FMT_YUV420P,
+                pip_display_size.width(), pip_display_size.height());
+
             avpicture_fill(&img_in, (uint8_t *)pipimage->buf, PIX_FMT_YUV420P,
                            pipw, piph);
 
-            img_resample(pipscontext, &img_out, &img_in);
+            img_resample(pip_scaling_context, &img_out, &img_in);
 
-            pipw = pipw_out;
-            piph = piph_out;
+            pipw = pip_display_size.width();
+            piph = pip_display_size.height();
 
-            pipbuf = piptmpbuf;
+            pipbuf = pip_tmp_buf;
         }
     }
 
-    switch (PIPLocation)
+    switch (db_pip_location)
     {
         default:
         case kPIPTopLeft:
@@ -407,7 +410,7 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     pipplayer->ReleaseCurrentFrame(pipimage);
 
     if (frame->width < 0)
-        frame->width = XJ_width;
+        frame->width = video_dim.width();
 
     for (int i = 0; i < piph; i++)
     {
@@ -443,7 +446,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     tmpframe.codec = FMT_ARGB32;
     tmpframe.buf = (unsigned char *)osdbuf_aligned;
     tmpframe.width = stride;
-    tmpframe.height = XJ_height;
+    tmpframe.height = video_dim.height();
 
     OSDSurface *surface = NULL;
     if (osd)
@@ -461,7 +464,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     bool drawanyway = false;
     if (clear)
     {
-        bzero(tmpframe.buf, XJ_height * stride);
+        bzero(tmpframe.buf, video_dim.height() * stride);
         drawanyway = true;
     }
 
@@ -485,7 +488,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         if (!clear || pipon)
         {
             VERBOSE(VB_PLAYBACK, "clearing buffer");
-            bzero(tmpframe.buf, XJ_height * stride);
+            bzero(tmpframe.buf, video_dim.height() * stride);
             // redraw PiP...
             if (pipPlayer)
                 ShowPip(&tmpframe, pipPlayer);
@@ -520,7 +523,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
     bzero(&prep, sizeof(prep));
     prep.source = osdbuf_aligned;
-    prep.count  = XJ_height * stride;
+    prep.count  = video_dim.height() * stride;
 
     if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to process frame" + ENO);

@@ -25,9 +25,9 @@
 class VideoOutput;
 
 typedef unsigned long GLXDrawable;
-#ifdef USING_OPENGL_VSYNC
+#ifdef USING_OPENGL
 typedef struct __GLXcontextRec *GLXContext;
-#else 
+#else
 typedef void *GLXContext;
 #endif
 

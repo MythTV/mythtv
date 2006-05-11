@@ -16,26 +16,31 @@
 #undef HAVE_AV_CONFIG_H
 #include "../libavcodec/avcodec.h"
 
-#ifdef USING_XVMC
-class XvMCBufferSettings;
-class XvMCOSD;
-#include "XvMCSurfaceTypes.h"
-#include "../libavcodec/xvmc_render.h"
-typedef struct
-{
-    XvMCSurface         surface;
-    XvMCBlockArray      blocks;
-    XvMCMacroBlockArray macro_blocks;
-} xvmc_vo_surf_t;
-#else // if !USING_XVMC
-class XvMCContext;
-class XvMCSurfaceInfo;
-#endif // !USING_XVMC
-
 class NuppelVideoPlayer;
 class ChromaKeyOSD;
 
-typedef enum VideoOutputSubType {
+class XvMCBufferSettings;
+class XvMCSurfaceTypes;
+class XvMCTextures;
+class XvMCOSD;
+
+#ifdef USING_XVMC
+#   include "XvMCSurfaceTypes.h"
+#   include "../libavcodec/xvmc_render.h"
+    typedef struct
+    {
+        XvMCSurface         surface;
+        XvMCBlockArray      blocks;
+        XvMCMacroBlockArray macro_blocks;
+    } xvmc_vo_surf_t;
+#else // if !USING_XVMC
+    typedef int xvmc_vo_surf_t;
+    typedef int XvMCSurfaceInfo;
+    struct XvMCContext;
+#endif // !USING_XVMC
+
+typedef enum VideoOutputSubType
+{
     XVUnknown = 0, Xlib, XShm, XVideo, XVideoMC, XVideoIDCT, XVideoVLD,
 } VOSType;
 
@@ -43,6 +48,7 @@ class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
     friend class OpenGLVideoSync;
+    friend class XvMCOSD;
   public:
     VideoOutputXv(MythCodecID av_codec_id);
    ~VideoOutputXv();
@@ -83,6 +89,8 @@ class VideoOutputXv : public VideoOutput
     virtual bool hasVLDAcceleration(void) const
         { return XVideoVLD == VideoOutputSubType(); }
 
+    void CheckFrameStates(void);
+
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
                                              uint stream_type, int xvmc_chroma,
@@ -114,7 +122,7 @@ class VideoOutputXv : public VideoOutput
                          FilterChain *filterList,
                          NuppelVideoPlayer *pipPlayer);
 
-    void PrepareFrameXvMC(VideoFrame *);
+    void PrepareFrameXvMC(VideoFrame *, FrameScanType);
     void PrepareFrameXv(VideoFrame *);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 
@@ -136,6 +144,7 @@ class VideoOutputXv : public VideoOutput
     vector<void*> CreateXvMCSurfaces(uint num, bool create_xvmc_blocks);
     vector<unsigned char*> CreateShmImages(uint num, bool use_xv);
     void CreatePauseFrame(void);
+    void CopyFrame(VideoFrame *to, const VideoFrame *from);
 
     void DeleteBuffers(VOSType subtype, bool delete_pause_frame);
 
@@ -146,7 +155,7 @@ class VideoOutputXv : public VideoOutput
     static bool IsRendering(VideoFrame* frame);
     static void SyncSurface(VideoFrame* frame, int past_future = 0);
     static void FlushSurface(VideoFrame* frame);
-    void CheckDisplayedFramesForAvailability(void);
+
 #ifdef USING_XVMC 
     XvMCOSD* GetAvailableOSD();
     void ReturnAvailableOSD(XvMCOSD*);
@@ -187,19 +196,19 @@ class VideoOutputXv : public VideoOutput
     int                  non_xv_av_format;
     time_t               non_xv_stop_time;
 
-#ifdef USING_XVMC 
     // Basic XvMC drawing info
     XvMCBufferSettings  *xvmc_buf_attr;
-    XvMCSurfaceInfo      xvmc_surf_info;
     int                  xvmc_chroma;
     XvMCContext         *xvmc_ctx;
     vector<void*>        xvmc_surfs;
-
-    // Basic XvMC drawing info
     QMutex               xvmc_osd_lock;
     MythDeque<XvMCOSD*>  xvmc_osd_available;
-    friend class XvMCOSD;
+#ifdef USING_XVMC 
+    XvMCSurfaceInfo      xvmc_surf_info;
 #endif // USING_XVMC
+
+    // Support for nVidia XvMC copy to texture feature
+    XvMCTextures        *xvmc_tex;
 
     // Basic Xv drawing info
     int                  xv_port;

@@ -6602,7 +6602,7 @@ void TV::BuildOSDTreeMenu(void)
             if (kScan_Interlaced == scan_type)
                 cur_mode = tr("(I)", "Interlaced (Normal)");
             else if (kScan_Intr2ndField == scan_type)
-                cur_mode = tr("(i)", "Interlaced (Reveresed)");
+                cur_mode = tr("(i)", "Interlaced (Reversed)");
             else if (kScan_Progressive == scan_type)
                 cur_mode = tr("(P)", "Progressive");
             cur_mode = " " + cur_mode;
@@ -6613,10 +6613,10 @@ void TV::BuildOSDTreeMenu(void)
     item = new OSDGenericTree(
         treeMenu, tr("Video Scan"), "SCANMODE");
     subitem = new OSDGenericTree(
-        item, tr("Detect") + cur_mode, "SELECTSCAN_3",
+        item, tr("Detect") + cur_mode, "SELECTSCAN_0",
         (scan_type == kScan_Detect) ? 1 : 0, NULL, "SCANGROUP");
     subitem = new OSDGenericTree(
-        item, tr("Progressive"), "SELECTSCAN_0",
+        item, tr("Progressive"), "SELECTSCAN_3",
         (scan_type == kScan_Progressive) ? 1 : 0, NULL, "SCANGROUP");
     subitem = new OSDGenericTree(
         item, tr("Interlaced (Normal)"), "SELECTSCAN_1",

@@ -174,6 +174,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       ttPageNum(0x888),             ccmode(CC_CC1),
       wtxt(0), rtxt(0), text_size(0), ccline(""), cccol(0), ccrow(0),
       // Support for captions, teletext, etc. decoded by libav
+      textDesired(false),
       osdHasSubtitles(false),       osdSubtitlesExpireAt(-1),
 
       // MHEG/MHI Interactive TV visible in OSD
@@ -2032,7 +2033,10 @@ void NuppelVideoPlayer::AVSync(void)
         diverge = min(diverge, +DIVERGELIMIT);
     }
 
-    FrameScanType ps = (m_double_framerate) ? kScan_Interlaced : kScan_Ignore;
+    FrameScanType ps = m_scan;
+    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+        ps = kScan_Progressive;
+
     if (diverge < -MAXDIVERGE)
     {
         // If video is way behind of audio, adjust for it...
@@ -2049,8 +2053,8 @@ void NuppelVideoPlayer::AVSync(void)
         {
             // If we are using hardware decoding, so we've already done the
             // decoding; display the frame, but don't wait for A/V Sync.
-            videoOutput->PrepareFrame(buffer, ps);
-            videoOutput->Show(m_scan);
+            videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
+            videoOutput->Show(kScan_Intr2ndField);
             VERBOSE(VB_PLAYBACK, LOC + dbg + "skipping A/V wait.");
         }
         else
@@ -2067,7 +2071,7 @@ void NuppelVideoPlayer::AVSync(void)
 
         videosync->WaitForFrame(avsync_adjustment);
         if (!resetvideo)
-            videoOutput->Show(m_scan);
+            videoOutput->Show(ps);
 
         if (videoOutput->IsErrored())
         {
@@ -2079,15 +2083,19 @@ void NuppelVideoPlayer::AVSync(void)
 
         if (m_double_framerate)
         {
-            // XvMC does not need the frame again
-            if (!videoOutput->hasMCAcceleration() && buffer)
-                videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
+            ps = (kScan_Intr2ndField == ps) ?
+                kScan_Interlaced : kScan_Intr2ndField;
+
+            if (buffer)
+                videoOutput->PrepareFrame(buffer, ps);
 
             // Display the second field
             videosync->AdvanceTrigger();
             videosync->WaitForFrame(0);
             if (!resetvideo)
-                videoOutput->Show(kScan_Intr2ndField);
+            {
+                videoOutput->Show(ps);
+            }
         }
     }
     else
@@ -2282,6 +2290,9 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
     if (!videoOutput->EnoughPrebufferedFrames())
     {
         VERBOSE(VB_GENERAL, LOC + "prebuffering pause");
+        if (videoOutput)
+            videoOutput->CheckFrameStates();
+
         SetPrebuffering(true);
 #if FAST_RESTART
         if (!m_playing_slower && audio_channels <= 2)
@@ -3851,7 +3862,6 @@ bool NuppelVideoPlayer::DoFastForward(void)
     GetDecoder()->DoFastForward(desiredFrame);
     GetDecoder()->setExactSeeks(exactseeks);
 
-    ClearAfterSeek();
     lastSkipTime = time(NULL);
     return true;
 }

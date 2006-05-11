@@ -542,8 +542,9 @@ void OSDSet::DisplayFor(int time, int osdFunctionalType)
     currentOSDFunctionalType = osdFunctionalType;
 }
  
-void OSDSet::FadeFor(int time)
+/*void OSDSet::FadeFor(int time)
 {
+    cerr<<"fadefor("<<time<<")"<<endl;
     if (m_allowfade)
     {
         m_timeleft = -1;
@@ -553,6 +554,7 @@ void OSDSet::FadeFor(int time)
         m_notimeout = false;
     }
 }
+*/
 
 void OSDSet::Hide(void)
 {
@@ -568,8 +570,16 @@ void OSDSet::Hide(void)
     }
 }
 
+static int round_uts(int time) { return (time + 999999) / 1000000; }
+
 void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
 {
+    // We need to prevent m_fade from being zeroed earlier to force
+    // one more blanking draw, so we force a lower bound of one in the
+    // fade time calc below, here we fix this so that the OSD can fade
+    // out completely (Otherwise IA44 OSD can leave a ghost behind).
+    m_fadetime = (1 == m_fadetime) ? 0 : m_fadetime;
+
     if (actuallydraw && m_displaying)
     {
         vector<OSDType *>::iterator i = allTypes->begin();
@@ -580,55 +590,50 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
                        m_yoff + m_yoffsetbase);
 
             if (m_wantsupdates)
-                m_lastupdate = (m_timeleft + 999999) / 1000000;
+                m_lastupdate = round_uts(m_timeleft);
         }
     }
-    if (actuallydraw)
-        m_needsupdate = false;
 
-    m_hasdisplayed = true;
+    m_hasdisplayed |= m_displaying;
 
-    if (m_wantsupdates &&
-        ((m_timeleft + 999999) / 1000000 != m_lastupdate))
-        m_needsupdate = true;
+    // If we needed an update and draw was processed, we no longer need draw
+    m_needsupdate  &= !actuallydraw;
+    // If m_draweveryframe is set or one second has elapsed since
+    // the last deaw m_wantupdates is set.
+    m_needsupdate  |= m_draweveryframe ||
+        (m_wantsupdates && (round_uts(m_timeleft) != m_lastupdate));
 
-    if (m_draweveryframe)
-        m_needsupdate = true;
-
-    if (m_notimeout)
-        return;
-
-    if (m_timeleft > 0)
+    // If OSD is still visible and we have time outs, count down
+    // timeouts and do any animation and/or emit that must be done.
+    if (!m_notimeout && m_displaying)
     {
-        m_timeleft -= m_frameint;
-        if (m_timeleft < 0)
-            m_timeleft = 0;
-    }
+        // Count down pre-fade time 
+        m_timeleft = max(m_timeleft - m_frameint, 0);
 
-    if (m_fadetime > 0)
-    {
-        m_fadetime -= m_frameint;
-
-        if (m_xmove || m_ymove)
+        // If fading, start counting down fade time
+        if (IsFading())
+            m_fadetime = max(m_fadetime - m_frameint, 1);
+        // Do a move animation if a fade and (m_xmove or m_ymove) exist
+        if (IsFading() && (m_xmove || m_ymove))
         {
             m_xoff += (m_xmove * m_frameint * 30) / 1000000;
             m_yoff += (m_ymove * m_frameint * 30) / 1000000;
-            m_fadetime -= (4 * m_frameint);
+            m_fadetime = max(m_fadetime - (4 * m_frameint), 1);
         }
 
-        if (m_fadetime <= 0) 
+        // The OSD is displaying up until the two timeouts are <= zero
+        m_displaying   = m_timeleft > 0 || m_fadetime > 0;
+
+        // Make sure we repaint if the OSD is now gone
+        m_needsupdate |= !m_displaying;
+
+        // Emit any functional type if the OSD is now gone.
+        if (!m_displaying && currentOSDFunctionalType)
         {
-            m_fadetime = 0;
-            if (currentOSDFunctionalType)
-            {
-                emit OSDClosed(currentOSDFunctionalType);
-                currentOSDFunctionalType = 0;
-            }
+            emit OSDClosed(currentOSDFunctionalType);
+            currentOSDFunctionalType = 0;
         }
     }
-
-    if (m_timeleft <= 0 && m_fadetime <= 0)
-        m_displaying = false;
 }
 
 

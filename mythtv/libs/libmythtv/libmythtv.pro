@@ -226,9 +226,6 @@ using_frontend {
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
 
-    using_opengl_vsync:CONFIG +=  opengl
-    using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
-
     macx:HEADERS +=               videoout_quartz.h
     macx:SOURCES +=               videoout_quartz.cpp
 
@@ -246,14 +243,26 @@ using_frontend {
     using_ivtv:HEADERS +=         videoout_ivtv.h
     using_ivtv:SOURCES +=         videoout_ivtv.cpp
 
-    using_xv:HEADERS += videoout_xv.h   XvMCSurfaceTypes.h   osdxvmc.h
-    using_xv:SOURCES += videoout_xv.cpp XvMCSurfaceTypes.cpp osdxvmc.cpp
+    using_xv:HEADERS += videoout_xv.h   XvMCSurfaceTypes.h
+    using_xv:HEADERS += osdxvmc.h       osdchromakey.h
+    using_xv:HEADERS += xvmctextures.h  util-xvmc.h
+    using_xv:HEADERS += util-xv.h
+    using_xv:SOURCES += videoout_xv.cpp  XvMCSurfaceTypes.cpp
+    using_xv:SOURCES += osdxvmc.cpp      osdchromakey.cpp
+    using_xv:SOURCES += xvmctextures.cpp util-xvmc.cpp
+    using_xv:SOURCES += util-xv.cpp
+
     using_xv:DEFINES += USING_XV
 
     using_xvmc:DEFINES += USING_XVMC
     using_xvmcw:DEFINES += USING_XVMCW
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
     using_xvmc_pbuffer:DEFINES += USING_XVMC_PBUFFER
+
+    using_opengl:CONFIG += opengl
+    using_opengl:DEFINES += USING_OPENGL
+    using_xvmc_opengl:DEFINES += USING_XVMC_OPENGL
+    using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 
     # Misc. frontend
     HEADERS += guidegrid.h              infostructs.h

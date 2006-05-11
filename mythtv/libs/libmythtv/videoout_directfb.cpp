@@ -495,9 +495,12 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     //display video output
     DFBCHECK(data->videoLayer->SetOpacity(data->videoLayer, 0xff));
 
-    w_mm = (myth_dsw != 0) ? myth_dsw : data->screen_width;
-    h_mm = (myth_dsh != 0) ? myth_dsh : data->screen_height;
-    display_aspect = ((float)w_mm) / ((float)h_mm);
+    display_dim = QSize(data->screen_width, data->screen_height);
+    if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
+        display_dim = db_display_dim;
+
+    display_aspect = (((float)display_dim.width()) /
+                      ((float)display_dim.height()));
 
     XJ_started = true;
     return true;
@@ -669,24 +672,27 @@ void VideoOutputDirectfb::MoveResize(void)
 {
     VideoOutput::MoveResize();
 
-    VERBOSE(VB_GENERAL, QString("DirectFB MoveResize : screen size %1x%2, proposed x : %3, y : %4, w : %5, h : %6")
-            .arg(data->screen_width)
-            .arg(data->screen_height)
-            .arg(dispxoff)
-            .arg(dispyoff)
-            .arg(dispwoff)
-            .arg(disphoff));
-    //**FIXME support for zooming when dispwoff > screenwidth || disphoff > screenheight
-    if (data->videoLayerDesc.caps & DLCAPS_SCREEN_LOCATION) {
+    VERBOSE(VB_GENERAL,
+            QString("DirectFB MoveResize : screen size %1x%2, "
+                    "proposed x : %3, y : %4, w : %5, h : %6")
+            .arg(data->screen_width).arg(data->screen_height)
+            .arg(display_video_rect.left()).arg(display_video_rect.top())
+            .arg(display_video_rect.width()).arg(display_video_rect.height()));
+
+    // TODO FIXME support for zooming when 
+    // dispwoff > screenwidth || disphoff > screenheight
+
+    if (data->videoLayerDesc.caps & DLCAPS_SCREEN_LOCATION)
+    {
+        float dispxoff = display_video_rect.left();
+        float dispyoff = display_video_rect.top();
+        float dispwoff = display_video_rect.width();
+        float disphoff = display_video_rect.height();
         DFBCHECK(data->videoLayer->SetScreenLocation(data->videoLayer,
-                 (float)dispxoff/(float)data->screen_width,
-                 (float)dispyoff/(float)data->screen_height,
-                 (float)dispwoff/(float)data->screen_width,
-                 (float)disphoff/(float)data->screen_height));
+                 dispxoff/data->screen_width, dispyoff/data->screen_height,
+                 dispwoff/data->screen_width, disphoff/data->screen_height));
     }
 }
-
-
 
 bool VideoOutputDirectfb::CreateDirectfbBuffers(DFBSurfaceDescription desc)
 {

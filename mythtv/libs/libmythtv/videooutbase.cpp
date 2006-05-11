@@ -35,6 +35,9 @@
 
 #include "filtermanager.h"
 
+static QSize fix_1080i(QSize raw);
+static float fix_aspect(float raw);
+
 /**
  * \fn VideoOutput::InitVideoOut(VideoOutputType, MythCodecID)
  * \brief Creates a VideoOutput class compatible with both "type" and
@@ -140,40 +143,38 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 VideoOutput::VideoOutput() :
+    // DB Settings
+    db_display_dim(0,0),                db_move(0,0),
+    db_scale_horiz(0.0f),               db_scale_vert(0.0f),
+    db_pip_location(0),                 db_pip_size(26),
+    db_pict_brightness(0),              db_pict_contrast(0),
+    db_pict_colour(0),                  db_pict_hue(0),
+    db_letterbox(kLetterbox_Off),       db_deint_filtername(QString::null),
+
+    // Manual Zoom
+    mz_scale(0),                        mz_move(0,0),
 
     // Physical dimensions
-    w_mm(400),                h_mm(300),                display_aspect(1.3333),
-    myth_dsw(0),              myth_dsh(0),
+    display_dim(400,300),               display_aspect(1.3333f),
 
-    // Pixel dimensions
-    XJ_width(640),            XJ_height(480),           videoAspect(1.3333),
+    // Video dimensions
+    video_dim(640,480),                 video_aspect(1.3333f),
 
     // Aspect override
-    XJ_aspect(1.3333),        letterbox(kLetterbox_Off),
+    letterboxed_video_aspect(1.3333f),  letterbox(kLetterbox_Off),
 
     // Screen settings
-    img_xoff(0),              img_yoff(0),
-    img_hscanf(0.0f),         img_vscanf(0.0f),
-
-    imgx(0),     imgy(0),     imgw(0),     imgh(0),
-    dispxoff(0), dispyoff(0), dispwoff(0), disphoff(0),
-
-    dispx(0),    dispy(0),    dispw(0),    disph(0),
-    olddispx(0), olddispy(0), olddispw(0), olddisph(0),
+    video_rect(0,0,0,0),                display_video_rect(0,0,0,0),
+    display_visible_rect(0,0,0,0),      tmp_display_visible_rect(0,0,0,0),
 
     // Picture settings
-    brightness(0),            contrast(0),
-    colour(0),                hue(0),
-
-    // Zoom
-    ZoomedIn(0),              ZoomedUp(0),              ZoomedRight(0),
+    brightness(0),                      contrast(0),
+    colour(0),                          hue(0),
 
     // Picture-in-Picture stuff
-    PIPLocation(0),           desired_pipsize(26),
-    desired_piph(128),        desired_pipw(160),
-    piph_in(-1),              pipw_in(-1),
-    piph_out(-1),             pipw_out(-1),
-    piptmpbuf(NULL),          pipscontext(NULL),
+    pip_desired_display_size(160,128),  pip_display_size(0,0),
+    pip_video_size(0,0),
+    pip_tmp_buf(NULL),                  pip_scaling_context(NULL),
 
     // Video resizing (for ITV)
     vsz_enabled(false),
@@ -182,18 +183,35 @@ VideoOutput::VideoOutput() :
     vsz_tmp_buf(NULL),                  vsz_scale_context(NULL),
 
     // Deinterlacing
-    m_deinterlacing(false),   m_deintfiltername("linearblend"),
-    m_deintFiltMan(NULL),     m_deintFilter(NULL),
+    m_deinterlacing(false),             m_deintfiltername("linearblend"),
+    m_deintFiltMan(NULL),               m_deintFilter(NULL),
     m_deinterlaceBeforeOSD(true),
 
     // Various state variables
-    embedding(false),         needrepaint(false),
-    allowpreviewepg(true),    framesPlayed(0),
-
-    errored(false)
+    embedding(false),                   needrepaint(false),
+    allowpreviewepg(true),              errored(false),
+    framesPlayed(0)
 {
-    myth_dsw = gContext->GetNumSetting("DisplaySizeWidth", 0);
-    myth_dsh = gContext->GetNumSetting("DisplaySizeHeight", 0);
+    db_display_dim = QSize(gContext->GetNumSetting("DisplaySizeWidth",  0),
+                           gContext->GetNumSetting("DisplaySizeHeight", 0));
+
+    db_move        = QPoint(gContext->GetNumSetting("xScanDisplacement", 0),
+                            gContext->GetNumSetting("yScanDisplacement", 0));
+
+    db_scale_vert  = gContext->GetNumSetting("VertScanPercentage",  5) / 100.0;
+    db_scale_horiz = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+
+    db_pip_location    = gContext->GetNumSetting("PIPLocation",        0);
+    db_pip_size        = gContext->GetNumSetting("PIPSize",           26);
+
+    db_pict_brightness = gContext->GetNumSetting("PlaybackBrightness",50);
+    db_pict_contrast   = gContext->GetNumSetting("PlaybackContrast",  50);
+    db_pict_colour     = gContext->GetNumSetting("PlaybackColour",    50);
+    db_pict_hue        = gContext->GetNumSetting("PlaybackHue",        0);
+
+    db_letterbox       = gContext->GetNumSetting("AspectOverride",     0);
+    db_deint_filtername= gContext->GetSetting("DeinterlaceFilter",
+                                              "linearblend");
 }
 
 /**
@@ -223,53 +241,23 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     (void)winid;
     (void)embedid;
 
-    XJ_width = width;
-    XJ_height = height;
-
-    QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
-    QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
-
-    img_hscanf = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
-    img_vscanf = gContext->GetNumSetting("VertScanPercentage", 5) / 100.0;
-
-    img_xoff = gContext->GetNumSetting("xScanDisplacement", 0);
-    img_yoff = gContext->GetNumSetting("yScanDisplacement", 0);
-
-    PIPLocation = gContext->GetNumSetting("PIPLocation", 0);
-
-    if (VertScanMode == "underscan")
-    {
-        img_vscanf = 0 - img_vscanf;
-    }
-    if (HorizScanMode == "underscan")
-    {
-        img_hscanf = 0 - img_hscanf;
-    }
-
     if (winw && winh)
+    {
         VERBOSE(VB_PLAYBACK,
                 QString("Over/underscan. V: %1, H: %2, XOff: %3, YOff: %4")
-                .arg(img_vscanf).arg(img_hscanf).arg(img_xoff).arg(img_yoff));
+                .arg(db_scale_vert).arg(db_scale_horiz)
+                .arg(db_move.x()).arg(db_move.y()));
+    }
 
-    dispx = 0; dispy = 0;
-    dispw = winw; disph = winh;
+    display_visible_rect = QRect(0, 0, winw, winh);
+    video_dim            = QSize(width, height);
+    video_rect           = QRect(QPoint(winx, winy), fix_1080i(video_dim));
 
-    imgx = winx; imgy = winy;
-    imgw = XJ_width; imgh = XJ_height;
-
-    if (imgw == 1920 && imgh == 1088)
-        imgh = 1080; // ATSC 1920x1080
-
-    brightness = gContext->GetNumSettingOnHost(
-        "PlaybackBrightness", gContext->GetHostName(), 50);
-    contrast   = gContext->GetNumSettingOnHost(
-        "PlaybackContrast",   gContext->GetHostName(), 50);
-    colour     = gContext->GetNumSettingOnHost(
-        "PlaybackColour",     gContext->GetHostName(), 50);
-    hue        = gContext->GetNumSettingOnHost(
-        "PlaybackHue",        gContext->GetHostName(), 0);
-    letterbox  = gContext->GetNumSettingOnHost(
-        "AspectOverride",     gContext->GetHostName(), kLetterbox_Off);
+    brightness = db_pict_brightness;
+    contrast   = db_pict_contrast;
+    colour     = db_pict_colour;
+    hue        = db_pict_hue;
+    letterbox  = db_letterbox;
 
     VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
 
@@ -329,18 +317,19 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         VideoFrameType otmp = FMT_YV12;
         int btmp;
         
-        m_deintfiltername = gContext->GetSetting("DeinterlaceFilter", 
-                                                 "linearblend");
-        if (overridefilter != "")
-            m_deintfiltername = overridefilter;
+        m_deintfiltername = QDeepCopy<QString>(
+            overridefilter.isEmpty() ? db_deint_filtername : overridefilter);
 
         m_deintFiltMan = new FilterManager;
         m_deintFilter = NULL;
 
         if (ApproveDeintFilter(m_deintfiltername))
         {
+            int width  = video_dim.width();
+            int height = video_dim.height();
             m_deintFilter = m_deintFiltMan->LoadFilters(
-                m_deintfiltername, itmp, otmp, XJ_width, XJ_height, btmp);
+                m_deintfiltername, itmp, otmp, width, height, btmp);
+            video_dim = QSize(width, height);
         }
 
         if (m_deintFilter == NULL) 
@@ -388,32 +377,26 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
 
 /**
  * \fn VideoOutput::SetVideoAspectRatio(float aspect)
- * \brief Sets VideoOutput::videoAspect to aspect, and sets 
- *        VideoOutput::XJ_aspect the letterbox type, unless
+ * \brief Sets VideoOutput::video_aspect to aspect, and sets 
+ *        VideoOutput::letterboxed_video_aspect the letterbox type, unless
  *        the letterbox type is kLetterbox_Fill.
  * 
  * \param aspect video aspect ratio to use
  */
 void VideoOutput::SetVideoAspectRatio(float aspect)
 {
-    videoAspect = aspect;
-    XJ_aspect = aspect;
+    letterboxed_video_aspect = video_aspect = aspect;
     
     // Override video's aspect if configured to do so
-    switch (letterbox) 
+    if ((kLetterbox_4_3      == letterbox) ||
+        (kLetterbox_4_3_Zoom == letterbox))
     {
-        default:
-        case kLetterbox_Off:
-        case kLetterbox_Fill:
-        case kLetterbox_16_9_Stretch:   XJ_aspect = videoAspect;
-                                        break;
-
-        case kLetterbox_4_3:
-        case kLetterbox_4_3_Zoom:       XJ_aspect = (4.0 / 3);
-                                        break;
-        case kLetterbox_16_9:
-        case kLetterbox_16_9_Zoom:      XJ_aspect = (16.0 / 9);
-                                        break;
+        letterboxed_video_aspect = 4.0f / 3.0f;
+    }
+    else if ((kLetterbox_16_9      == letterbox) ||
+             (kLetterbox_16_9_Zoom == letterbox))
+    {
+        letterboxed_video_aspect = 16.0f / 9.0f;
     }
 }
 
@@ -440,8 +423,7 @@ void VideoOutput::InputChanged(int width, int height, float aspect,
 {
     (void)av_codec_id;
 
-    XJ_width = width;
-    XJ_height = height;
+    video_dim = QSize(width, height);
     SetVideoAspectRatio(aspect);
     
     DiscardFrames(true);
@@ -463,15 +445,9 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
 
     embedding = true;
 
-    olddispx = dispx;
-    olddispy = dispy;
-    olddispw = dispw;
-    olddisph = disph;
-
-    dispxoff = dispx = x;
-    dispyoff = dispy = y;
-    dispwoff = dispw = w;
-    disphoff = disph = h;
+    tmp_display_visible_rect = display_visible_rect;
+    display_visible_rect     = QRect(x, y, w, h);
+    display_video_rect       = QRect(x, y, w, h);
 
     MoveResize();
 }
@@ -483,10 +459,7 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
  */ 
 void VideoOutput::StopEmbedding(void)
 {
-    dispx = olddispx;
-    dispy = olddispy;
-    dispw = olddispw;
-    disph = olddisph;
+    display_visible_rect = tmp_display_visible_rect;
 
     MoveResize();
 
@@ -517,10 +490,10 @@ void VideoOutput::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
  */
 void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
 {
-    xoff = imgx;
-    yoff = imgy;
-    width = imgw;
-    height = imgh;
+    xoff   = video_rect.left();
+    yoff   = video_rect.top();
+    width  = video_rect.width();
+    height = video_rect.height();
 }
 
 void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
@@ -544,23 +517,23 @@ static float sq(float a) { return a*a; }
 QRect VideoOutput::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling) const
 {
-    float dv_w = ((float)XJ_width)  / dispwoff;
-    float dv_h = ((float)XJ_height) / disphoff;
+    float dv_w = ((float)video_dim.width())  / display_video_rect.width();
+    float dv_h = ((float)video_dim.height()) / display_video_rect.height();
 
-    uint right_overflow = max((dispwoff + dispxoff) - dispw, 0);
-    uint lower_overflow = max((disphoff + dispyoff) - disph, 0);
+    uint right_overflow = max((display_video_rect.width() + display_video_rect.left()) - display_visible_rect.width(), 0);
+    uint lower_overflow = max((display_video_rect.height() + display_video_rect.top()) - display_visible_rect.height(), 0);
 
     // top left and bottom right corners respecting letterboxing
-    QPoint tl = QPoint((uint) ceil(max(-dispxoff,0)*dv_w),
-                       (uint) ceil(max(-dispyoff,0)*dv_h));
-    QPoint br = QPoint((uint) floor(XJ_width-(right_overflow*dv_w)),
-                       (uint) floor(XJ_height-(lower_overflow*dv_h)));
+    QPoint tl = QPoint((uint) ceil(max(-display_video_rect.left(),0)*dv_w),
+                       (uint) ceil(max(-display_video_rect.top(),0)*dv_h));
+    QPoint br = QPoint((uint) floor(video_dim.width()-(right_overflow*dv_w)),
+                       (uint) floor(video_dim.height()-(lower_overflow*dv_h)));
     // adjust for overscan
-    if ((img_vscanf > 0.0f) || (img_hscanf > 0.0f))
+    if ((db_scale_vert > 0.0f) || (db_scale_horiz > 0.0f))
     {
         QRect v(tl, br);
-        float xs = (img_hscanf > 0.0f) ? img_hscanf : 0.0f;
-        float ys = (img_vscanf > 0.0f) ? img_vscanf : 0.0f;
+        float xs = (db_scale_horiz > 0.0f) ? db_scale_horiz : 0.0f;
+        float ys = (db_scale_vert > 0.0f) ? db_scale_vert : 0.0f;
         QPoint s((int)(v.width() * xs), (int)(v.height() * ys));
         tl += s*0.5f;
         br -= s*1.5f;
@@ -573,15 +546,15 @@ QRect VideoOutput::GetVisibleOSDBounds(
     vb = QRect(vb.x(), vb.y(), abs(vb.width()), abs(vb.height()));
 
     // set the physical aspect ratio of the displayable area
-    float dispPixelAdj = (GetDisplayAspect() * disph) / dispw;
+    float dispPixelAdj = (GetDisplayAspect() * display_visible_rect.height()) / display_visible_rect.width();
     // now adjust for scaling of the video on the aspect ratio
     float vs = ((float)vb.width())/vb.height();
-    visible_aspect = 1.3333f * (vs/XJ_aspect) * dispPixelAdj;
+    visible_aspect = 1.3333f * (vs/letterboxed_video_aspect) * dispPixelAdj;
 
     // now adjust for scaling of the video on the size
     font_scaling = 1.0f/sqrtf(2.0/(sq(visible_aspect / 1.3333f) + 1.0f));
     // now adjust for aspect ratio effect on font size (should be in osd.cpp?)
-    font_scaling *= sqrtf(XJ_aspect/1.3333f);
+    font_scaling *= sqrtf(letterboxed_video_aspect/1.3333f);
     return vb;
 }
 
@@ -591,283 +564,340 @@ QRect VideoOutput::GetVisibleOSDBounds(
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    return QRect(0, 0, XJ_width, XJ_height);
+    return QRect(QPoint(0, 0), video_dim);
+}
+
+/** \fn VideoOutput::ApplyDBScaleAndMove(void)
+ *  \brief Apply scales and moves from "Zoom Mode" settings.
+ */
+void VideoOutput::ApplyManualScaleAndMove(void)
+{
+    if (mz_scale)
+    {
+        QSize  newsz  = display_video_rect.size() * (1.0f + (mz_scale*0.01f));
+        QSize  tmp    = (display_video_rect.size() - newsz) / 2;
+        QPoint chgloc = QPoint(tmp.width(), tmp.height());
+        QPoint newloc = display_video_rect.topLeft() + chgloc;
+
+        display_video_rect = QRect(newloc, newsz);
+    }
+
+    if (mz_move.y())
+    {
+        int move_vert = mz_move.y() * display_video_rect.height() / 100;
+        display_video_rect.moveTop(display_video_rect.top() + move_vert);
+    }
+
+    if (mz_move.x())
+    {
+        int move_horiz = mz_move.x() * display_video_rect.width() / 100;
+        display_video_rect.moveLeft(display_video_rect.left() + move_horiz);
+    }
+}
+
+/** \fn VideoOutput::ApplyDBScaleAndMove(void)
+ *  \brief Apply scales and moves for "Overscan" and "Underscan" DB settings.
+ *
+ *  It doesn't make any sense to me to offset an image such that it is clipped.
+ *  Therefore, we only apply offsets if there is an underscan or overscan which
+ *  creates "room" to move the image around. That is, if we overscan, we can
+ *  move the "viewport". If we underscan, we change where we place the image
+ *  into the display window. If no over/underscanning is performed, you just
+ *  get the full original image scaled into the full display area.
+ */
+void VideoOutput::ApplyDBScaleAndMove(void)
+{
+    if (db_scale_vert > 0) 
+    {
+        // Veritcal overscan. Move the Y start point in original image.
+        float tmp = 1.0f - 2.0f * db_scale_vert;
+        video_rect.moveTop((int) round(video_rect.height() * db_scale_vert));
+        video_rect.setHeight((int) round(video_rect.height() * tmp));
+
+        // If there is an offset, apply it now that we have a room.
+        int yoff = db_move.y();
+        if (yoff > 0)
+        {
+            // To move the image down, move the start point up.
+            // Don't offset the image more than we have overscanned.
+            yoff = min(video_rect.top(), yoff);
+            video_rect.moveTop(video_rect.top() - yoff);
+        }
+        else if (yoff < 0)
+        {
+            // To move the image up, move the start point down.
+            // Don't offset the image more than we have overscanned.
+            if (abs(yoff) > video_rect.top())
+                yoff = 0 - video_rect.top();
+            video_rect.moveTop(video_rect.top() - yoff);
+        }
+    }
+    else if (db_scale_vert < 0) 
+    {
+        // Vertical underscan. Move the starting Y point in the display window.
+        // Use the abolute value of scan factor.
+        float vscanf = fabs(db_scale_vert);
+        float tmp = 1.0f - 2.0f * vscanf;
+
+        display_video_rect.moveTop(
+            (int) round(display_visible_rect.height() * vscanf) +
+            display_visible_rect.top());
+
+        display_video_rect.setHeight(
+            (int) round(display_visible_rect.height() * tmp));
+
+        // Now offset the image within the extra blank space created by
+        // underscanning. To move the image down, increase the Y offset
+        // inside the display window.
+        int yoff = db_move.y();
+        if (yoff > 0) 
+        {
+            // Don't offset more than we have underscanned.
+            yoff = min(display_video_rect.top(), yoff);
+            display_video_rect.moveTop(display_video_rect.top() + yoff);
+        }
+        else if (yoff < 0) 
+        {
+            // Don't offset more than we have underscanned.
+            if (abs(yoff) > display_video_rect.top()) 
+                yoff = 0 - display_video_rect.top();
+            display_video_rect.moveTop(display_video_rect.top() + yoff);
+        }
+    }
+
+    // Horizontal.. comments, same as vertical...
+    if (db_scale_horiz > 0) 
+    {
+        float tmp = 1.0f - 2.0f * db_scale_horiz;
+        video_rect.moveLeft((int) round(video_dim.width() * db_scale_horiz));
+        video_rect.setWidth((int) round(video_dim.width() * tmp));
+
+        int xoff = db_move.x();
+        if (xoff > 0) 
+        {
+            xoff = min(video_rect.left(), xoff);
+            video_rect.moveLeft(video_rect.left() - xoff);
+        }
+        else if (xoff < 0) 
+        {
+            if (abs(xoff) > video_rect.left()) 
+                xoff = 0 - video_rect.left();
+            video_rect.moveLeft(video_rect.left() - xoff);
+        }
+    }
+    else if (db_scale_horiz < 0) 
+    {
+        float hscanf = fabs(db_scale_horiz);
+        float tmp = 1.0f - 2.0f * hscanf;
+
+        display_video_rect.moveLeft(
+            (int) round(display_visible_rect.width() * hscanf) +
+            display_visible_rect.left());
+
+        display_video_rect.setWidth(
+            (int) round(display_visible_rect.width() * tmp));
+
+        int xoff = db_move.x();
+        if (xoff > 0) 
+        {
+            xoff = min(display_video_rect.left(), xoff);
+            display_video_rect.moveLeft(display_video_rect.left() + xoff);
+        }
+        else if (xoff < 0) 
+        {
+            if (abs(xoff) > display_video_rect.left()) 
+                xoff = 0 - display_video_rect.left();
+            display_video_rect.moveLeft(display_video_rect.left() + xoff);
+        }
+    }
+
+}
+
+// Code should take into account the aspect ratios of both the video as
+// well as the actual screen to allow proper letterboxing to take place.
+void VideoOutput::ApplyLetterboxing(void)
+{
+    float disp_aspect = fix_aspect(GetDisplayAspect());
+    float aspect_diff = disp_aspect - letterboxed_video_aspect;
+    bool  aspects_match = abs(aspect_diff / disp_aspect) <= 0.1f;
+    bool  nomatch_with_fill = !aspects_match && (letterbox == kLetterbox_Fill);
+    bool  nomatch_without_fill = (!aspects_match) && !nomatch_with_fill;
+
+    // Adjust for video/display aspect ratio mismatch
+    if (nomatch_with_fill && (disp_aspect > letterboxed_video_aspect))
+    {
+        float pixNeeded =
+            ((disp_aspect / letterboxed_video_aspect) *
+             (float)display_video_rect.height()) + 0.5f;
+
+        display_video_rect.moveTop(
+            display_video_rect.top() +
+            (display_video_rect.height() - (int)pixNeeded) / 2);
+        display_video_rect.setHeight((int)pixNeeded);
+    }
+    else if (nomatch_with_fill)
+    {
+        float pixNeeded =
+            ((letterboxed_video_aspect / disp_aspect) * 
+             (float)display_video_rect.width()) + 0.5f;
+
+        display_video_rect.moveLeft(
+            display_video_rect.left() +
+            (display_video_rect.width() - (int)pixNeeded) / 2);
+
+        display_video_rect.setWidth((int)pixNeeded);
+    }
+    else if (nomatch_without_fill && (disp_aspect > letterboxed_video_aspect))
+    {
+        float pixNeeded =
+            ((letterboxed_video_aspect / disp_aspect) *
+             (float)display_video_rect.width()) + 0.5f;
+
+        display_video_rect.moveLeft(
+            display_video_rect.left() +
+            (display_video_rect.width() - (int)pixNeeded) / 2);
+
+        display_video_rect.setWidth((int)pixNeeded);
+    }
+    else if (nomatch_without_fill)
+    {
+        float pixNeeded =
+            ((disp_aspect / letterboxed_video_aspect) *
+             (float)display_video_rect.height()) + 0.5f;
+
+        display_video_rect.moveTop(
+            display_video_rect.top() +
+            (display_video_rect.height() - (int)pixNeeded) / 2);
+
+        display_video_rect.setHeight((int)pixNeeded);
+    }
+
+    // Process letterbox zoom modes
+    if ((letterbox == kLetterbox_4_3_Zoom) ||
+        (letterbox == kLetterbox_16_9_Zoom))
+    {
+        // Zoom mode -- Expand by 4/3 and overscan.
+        // 1/6 of original is 1/8 of new
+        display_video_rect = QRect(
+            display_video_rect.left() - (display_video_rect.width()  / 6),
+            display_video_rect.top()  - (display_video_rect.height() / 6),
+            display_video_rect.width()  * 4 / 3,
+            display_video_rect.height() * 4 / 3);
+    }
+    else if (letterbox == kLetterbox_16_9_Stretch)
+    {
+        // Stretch mode -- intended to be used to eliminate side
+        //                 bars on 4:3 material encoded to 16:9.
+        // 1/6 of original is 1/8 of new
+        display_video_rect.moveLeft(
+            display_video_rect.left() - (display_video_rect.width() / 6));
+        
+        display_video_rect.setWidth(display_video_rect.width() * 4 / 3);
+    }
+}
+
+/** \fn VideoOutput::ApplySnapToVideoRect(void)
+ *  \brief Snap displayed rectagle to video rectange if they are close.
+ *
+ *  If our display rectangle is within 5% of the video rectangle in
+ *  either dimension then snap the display rectangle in that dimension
+ *  to the video rectangle. The idea is to avoid scaling if it will
+ *  result in only moderate distortion.
+ */
+void VideoOutput::ApplySnapToVideoRect(void)
+{
+    float ydiff = abs(display_video_rect.height() - video_rect.height());
+    if ((ydiff / display_video_rect.height()) < 0.05)
+    {
+        display_video_rect.moveTop(
+            display_video_rect.top() +
+            (display_video_rect.height() - video_rect.height()) / 2);
+
+        display_video_rect.setHeight(video_rect.height());
+
+        VERBOSE(VB_PLAYBACK,
+                QString("Snapping height to avoid scaling: "
+                        "height: %1, top: %2")
+                .arg(display_video_rect.height())
+                .arg(display_video_rect.top()));
+    }
+
+    float xdiff = abs(display_video_rect.width() - video_rect.width());
+    if ((xdiff / display_video_rect.width()) < 0.05)
+    {
+        display_video_rect.moveLeft(
+            display_video_rect.left() +
+            (display_video_rect.width() - video_rect.width()) / 2);
+
+        display_video_rect.setWidth(video_rect.width());
+
+        VERBOSE(VB_PLAYBACK,
+                QString("Snapping width to avoid scaling: "
+                        "width: %1, left: %2")
+                .arg(display_video_rect.width())
+                .arg(display_video_rect.left()));
+    }
+}
+
+void VideoOutput::PrintMoveResizeDebug(void)
+{
+#if 0
+    printf("VideoOutput::MoveResize:\n");
+    printf("Img(%d,%d %d,%d)\n",
+           video_rect.left(), video_rect.top(),
+           video_rect.width(), video_rect.height());
+    printf("Disp(%d,%d %d,%d)\n",
+           display_video_rect.left(), display_video_rect.top(),
+           display_video_rect.width(), display_video_rect.height());
+    printf("Offset(%d,%d)\n", xoff, yoff);
+    printf("Vscan(%f, %f)\n", db_scale_vert, db_scale_vert);
+    printf("DisplayAspect: %f\n", GetDisplayAspect());
+    printf("VideoAspect(%f)\n", video_aspect);
+    printf("letterboxed_video_aspect(%f)\n", letterboxed_video_aspect);
+    printf("CDisplayAspect: %f\n", fix_aspect(GetDisplayAspect()));
+    printf("Letterbox: %d\n", letterbox);
+#endif
+
+    VERBOSE(VB_PLAYBACK,
+            QString("Display Rect  left: %1, top: %2, width: %3, "
+                    "height: %4, aspect: %5")
+            .arg(display_video_rect.left()).arg(display_video_rect.top())
+            .arg(display_video_rect.width()).arg(display_video_rect.height())
+            .arg(fix_aspect(GetDisplayAspect())));
+
+    VERBOSE(VB_PLAYBACK,
+            QString("Video Rect    left: %1, top: %2, width: %3, "
+                    "height: %4, aspect: %5")
+            .arg(video_rect.left()).arg(video_rect.top())
+            .arg(video_rect.width()).arg(video_rect.height())
+            .arg(letterboxed_video_aspect));
+
 }
 
 /**
  * \fn VideoOutput::MoveResize(void)
  * \brief performs all the calculations for video framing and any resizing.
  *
+ * First we apply playback over/underscanning and offsetting,
+ * then we letterbox settings, and finally we apply manual
+ * scale & move properties for "Zoom Mode".
+ *
  * \sa Zoom(int), ToggleLetterbox(int)
  */
 void VideoOutput::MoveResize(void)
 {
-    int yoff, xoff;
-    float displayAspect;
-
     // Preset all image placement and sizing variables.
-    imgx = 0; imgy = 0;
-    imgw = XJ_width; imgh = XJ_height;
-    xoff = img_xoff; yoff = img_yoff;
-    dispxoff = dispx; dispyoff = dispy;
-    dispwoff = dispw; disphoff = disph;
-    if (imgw == 1920 && imgh == 1088)
-        imgh = 1080; // ATSC 1920x1080
+    video_rect         = QRect(QPoint(0, 0), fix_1080i(video_dim));
+    display_video_rect = display_visible_rect;
 
-    // Get display aspect and correct for rounding errors
-    displayAspect = GetDisplayAspect();
+    // Apply various modifications
+    ApplyDBScaleAndMove();
+    ApplyLetterboxing();
+    ApplyManualScaleAndMove();
+    if ((db_scale_vert == 0) && (db_scale_horiz == 0) && (mz_scale == 0))
+        ApplySnapToVideoRect();
 
-    // Check if close to 4:3
-    if (fabs(displayAspect - 1.333333) < 0.05)
-        displayAspect = 1.333333;
-
-    // Check if close to 16:9
-    if (fabs(displayAspect - 1.777777) < 0.05)
-        displayAspect = 1.777777;
-
-/*
-    Here we apply playback over/underscanning and offsetting (if any apply).
-
-    It doesn't make any sense to me to offset an image such that it is clipped.
-    Therefore, we only apply offsets if there is an underscan or overscan which
-    creates "room" to move the image around. That is, if we overscan, we can
-    move the "viewport". If we underscan, we change where we place the image
-    into the display window. If no over/underscanning is performed, you just
-    get the full original image scaled into the full display area.
-*/
-
-    if (img_vscanf > 0) 
-    {
-        // Veritcal overscan. Move the Y start point in original image.
-        imgy = (int)floor(0.5 + imgh * img_vscanf);
-        imgh = (int)floor(0.5 + imgh * (1 - 2 * img_vscanf));
-
-        // If there is an offset, apply it now that we have a room.
-        // To move the image down, move the start point up.
-        if (yoff > 0) 
-        {
-            // Can't offset the image more than we have overscanned.
-            if (yoff > imgy)
-                yoff = imgy;
-            imgy -= yoff;
-        }
-        // To move the image up, move the start point down.
-        if (yoff < 0) 
-        {
-            // Again, can't offset more than overscanned.
-            if (abs(yoff) > imgy)
-                yoff = 0 - imgy;
-            imgy -= yoff;
-        }
-    }
-
-    if (img_hscanf > 0) 
-    {
-        // Horizontal overscan. Move the X start point in original image.
-        imgx = (int)floor(0.5 + XJ_width * img_hscanf);
-        imgw = (int)floor(0.5 + XJ_width * (1 - 2 * img_hscanf));
-        if (xoff > 0) 
-        {
-            if (xoff > imgx) 
-                xoff = imgx;
-            imgx -= xoff;
-        }
-        if (xoff < 0) 
-        {
-            if (abs(xoff) > imgx) 
-                xoff = 0 - imgx;
-            imgx -= xoff;
-        }
-    }
-
-    float vscanf, hscanf;
-    if (img_vscanf < 0) 
-    {
-        // Vertical underscan. Move the starting Y point in the display window.
-        // Use the abolute value of scan factor.
-        vscanf = fabs(img_vscanf);
-        dispyoff = (int)floor(0.5 + disph * vscanf) + dispy;
-        disphoff = (int)floor(0.5 + disph * (1 - 2 * vscanf));
-        // Now offset the image within the extra blank space created by
-        // underscanning.
-        // To move the image down, increase the Y offset inside the display
-        // window.
-        if (yoff > 0) 
-        {
-            // Can't offset more than we have underscanned.
-            if (yoff > dispyoff) 
-                yoff = dispyoff;
-            dispyoff += yoff;
-        }
-        if (yoff < 0) 
-        {
-            if (abs(yoff) > dispyoff) 
-                yoff = 0 - dispyoff;
-            dispyoff += yoff;
-        }
-    }
-
-    if (img_hscanf < 0) 
-    {
-        hscanf = fabs(img_hscanf);
-        dispxoff = (int)floor(0.5 + dispw * hscanf) + dispx;
-        dispwoff = (int)floor(0.5 + dispw * (1 - 2 * hscanf));
-        if (xoff > 0) 
-        {
-            if (xoff > dispxoff) 
-                xoff = dispxoff;
-            dispxoff += xoff;
-        }
-
-        if (xoff < 0) 
-        {
-            if (abs(xoff) > dispxoff) 
-                xoff = 0 - dispxoff;
-            dispxoff += xoff;
-        }
-    }
-
-    // Manage aspect ratio and letterbox settings.  Code should take into
-    // account the aspect ratios of both the video as well as the actual
-    // screen to allow proper letterboxing to take place.
-    
-    //cout << "XJ aspect " << XJ_aspect << endl;
-    //cout << "Display aspect " << GetDisplayAspect() << endl;
-    //printf("Before: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
-    //    dispyoff);
-    
-    if ((fabs(displayAspect - XJ_aspect) / displayAspect) > 0.1){
-        if (letterbox == kLetterbox_Fill){
-            if (displayAspect > XJ_aspect)
-            {
-                float pixNeeded = ((displayAspect / XJ_aspect) * (float)disphoff) + 0.5;
-
-                dispyoff += (disphoff - (int)pixNeeded) / 2;
-                disphoff = (int)pixNeeded;
-            }
-            else
-            {
-                float pixNeeded = ((XJ_aspect / displayAspect) * (float)dispwoff) + 0.5;
-
-                dispxoff += (dispwoff - (int)pixNeeded) / 2;
-                dispwoff = (int)pixNeeded;
-            }
-        }
-        else {
-            if (displayAspect > XJ_aspect)
-            {
-                float pixNeeded = ((XJ_aspect / displayAspect) * (float)dispwoff) + 0.5;
-
-                dispxoff += (dispwoff - (int)pixNeeded) / 2;
-                dispwoff = (int)pixNeeded;
-            }
-            else
-            {
-                float pixNeeded = ((displayAspect / XJ_aspect) * (float)disphoff) + 0.5;
-
-                dispyoff += (disphoff - (int)pixNeeded) / 2;
-                disphoff = (int)pixNeeded;
-            }
-        }
-    }
-
-
-    if ((letterbox == kLetterbox_4_3_Zoom) ||
-        (letterbox == kLetterbox_16_9_Zoom))
-    {
-        // Zoom mode
-        //printf("Before zoom: %dx%d%+d%+d\n", dispwoff, disphoff,
-        //dispxoff, dispyoff);
-        // Expand by 4/3 and overscan
-        dispxoff -= (dispwoff/6); // 1/6 of original is 1/8 of new
-        dispwoff = dispwoff*4/3;
-        dispyoff -= (disphoff/6);
-        disphoff = disphoff*4/3;
-    }
-
-    if (letterbox == kLetterbox_16_9_Stretch)
-    {
-        //Stretch mode
-        //Should be used to eliminate side bars on 4:3 material
-        //encoded to 16:9. Basically crop a 16:9 to 4:3
-        //printf("Before zoom: %dx%d%+d%+d\n", dispwoff, disphoff,
-        //dispxoff, dispyoff);
-        dispxoff -= (dispwoff/6); // 1/6 of original is 1/8 of new
-        dispwoff = dispwoff*4/3;
-    }
-
-    if ((double(abs(disphoff - imgh)) / disphoff) < 0.05){
-      /* Calculated height is within 5% of the source height. Accept
-        slight distortion/overscan/underscan to avoid scaling */
-
-      dispyoff += (disphoff - imgh) / 2;
-      disphoff = imgh;
-
-      VERBOSE(VB_PLAYBACK,
-             QString("Snapping height to avoid scaling: disphoff %1, dispyoff: %2")
-             .arg(disphoff).arg(dispyoff));
-    }
-
-    if ((double(abs(dispwoff - imgw)) / dispwoff) < 0.05){
-      /* Calculated width is within 5% of the source width. Accept
-        slight distortion/overscan/underscan to avoid scaling */
-
-      dispxoff += (dispwoff - imgw) / 2;
-      dispwoff = imgw;
-
-      VERBOSE(VB_PLAYBACK,
-             QString("Snapping width to avoid scaling: dispwoff %1, dispxoff: %2")
-             .arg(dispwoff).arg(dispxoff));
-    }
-
-    if (ZoomedIn)
-    {
-        int oldDW = dispwoff;
-        int oldDH = disphoff;
-        dispwoff = (int)(dispwoff * (1 + (ZoomedIn * .01)));
-        disphoff = (int)(disphoff * (1 + (ZoomedIn * .01)));
-
-        dispxoff += (oldDW - dispwoff) / 2;
-        dispyoff += (oldDH - disphoff) / 2;
-    }
-
-    if (ZoomedUp)
-    {
-        dispyoff = (int)(dispyoff * (1 - (ZoomedUp * .01)));
-    }
-
-    if (ZoomedRight)
-    {
-        dispxoff = (int)(dispxoff * (1 - (ZoomedRight * .01)));
-    }
-
-    //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
-    //dispyoff);
-
-#if 0
-    printf("VideoOutput::MoveResize:\n");
-    printf("Img(%d,%d %d,%d)\n", imgx, imgy, imgw, imgh);
-    printf("Disp(%d,%d %d,%d)\n", dispxoff, dispyoff, dispwoff, disphoff);
-    printf("Offset(%d,%d)\n", xoff, yoff);
-    printf("Vscan(%f, %f)\n", img_vscanf, img_vscanf);
-    printf("DisplayAspect: %f\n", GetDisplayAspect());
-    printf("VideoAspect(%f)\n", videoAspect);
-    printf("XJ_aspect(%f)\n", XJ_aspect);
-    printf("CDisplayAspect: %f\n", displayAspect);
-    printf("Letterbox: %d\n", letterbox);
-#endif
- 
-    VERBOSE(VB_PLAYBACK,
-            QString("Image size. dispxoff %1, dispyoff: %2, dispwoff: %3, "
-                    "disphoff: %4, dispaspect: %5")
-            .arg(dispxoff).arg(dispyoff).arg(dispwoff).arg(disphoff)
-            .arg(displayAspect));
-
-    VERBOSE(VB_PLAYBACK,
-            QString("Image size. imgx %1, imgy: %2, imgw: %3, imgh: %4, "
-                    "aspect: %5")
-           .arg(imgx).arg(imgy).arg(imgw).arg(imgh).arg(XJ_aspect));
-
+    PrintMoveResizeDebug();
     needrepaint = true;
 }
 
@@ -879,42 +909,33 @@ void VideoOutput::MoveResize(void)
  */
 void VideoOutput::Zoom(int direction)
 {
-    switch (direction)
+    if (kZoomHome == direction)
     {
-        case kZoomHome:
-                ZoomedIn = 0;
-                ZoomedUp = 0;
-                ZoomedRight = 0;
-                break;
-        case kZoomIn:
-                if (ZoomedIn < 200)
-                    ZoomedIn += 10;
-                else
-                    ZoomedIn = 0;
-                break;
-        case kZoomOut:
-                if (ZoomedIn > -50)
-                    ZoomedIn -= 10;
-                else
-                    ZoomedIn = 0;
-                break;
-        case kZoomUp:
-                if (ZoomedUp < 100)
-                    ZoomedUp += 10;
-                break;
-        case kZoomDown:
-                if (ZoomedUp > -100)
-                    ZoomedUp -= 10;
-                break;
-        case kZoomLeft:
-                if (ZoomedRight < 100)
-                    ZoomedRight += 10;
-                break;
-        case kZoomRight:
-                if (ZoomedRight > -100)
-                    ZoomedRight -= 10;
-                break;
+        mz_scale = 0;
+        mz_move = QPoint(0,0);
+    }        
+    else if (kZoomIn == direction)
+    {
+        if (mz_scale < 200)
+            mz_scale += 10;
+        else
+            mz_scale = 0;
     }
+    else if (kZoomOut == direction)
+    {
+        if (mz_scale > -50)
+            mz_scale -= 10;
+        else
+            mz_scale = 0;
+    }
+    else if (kZoomUp == direction && (mz_move.y() <= 50))
+        mz_move.setY(mz_move.y() + 2);
+    else if (kZoomDown == direction && (mz_move.y() >= -50))
+        mz_move.setY(mz_move.y() - 2);
+    else if (kZoomLeft == direction && (mz_move.x() <= 50))
+        mz_move.setX(mz_move.x() + 2);
+    else if (kZoomRight == direction && (mz_move.x() >= -50))
+        mz_move.setX(mz_move.x() - 2);
 }
 
 /**
@@ -936,7 +957,7 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
         letterbox = letterboxMode;
     }
 
-    VideoAspectRatioChanged(videoAspect);
+    VideoAspectRatioChanged(video_aspect);
 }
 
 /**
@@ -1031,20 +1052,21 @@ int VideoOutput::ChangeHue(bool up)
  */
 void VideoOutput::DoPipResize(int pipwidth, int pipheight)
 {
-    if (pipwidth != desired_piph || pipheight != desired_pipw)
-    {
-        ShutdownPipResize();
+    QSize vid_size = QSize(pipwidth, pipheight);
+    if (vid_size == pip_desired_display_size)
+        return;
 
-        piptmpbuf = new unsigned char[desired_piph * desired_pipw * 3 / 2];
+    ShutdownPipResize();
 
-        piph_in = pipheight;
-        pipw_in = pipwidth;
+    pip_video_size   = vid_size;
+    pip_display_size = pip_desired_display_size;
 
-        piph_out = desired_piph;
-        pipw_out = desired_pipw;
+    int sz = pip_display_size.height() * pip_display_size.width() * 3 / 2;
+    pip_tmp_buf = new unsigned char[sz];
 
-        pipscontext = img_resample_init(pipw_out, piph_out, pipw_in, piph_in);
-    }
+    pip_scaling_context = img_resample_init(
+        pip_display_size.width(), pip_display_size.height(),
+        pip_video_size.width(),   pip_video_size.height());
 }
 
 /**
@@ -1055,16 +1077,20 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
  */
 void VideoOutput::ShutdownPipResize(void)
 {
-    if (piptmpbuf)
-        delete [] piptmpbuf;
-    if (pipscontext)
-        img_resample_close(pipscontext);
+    if (pip_tmp_buf)
+    {
+        delete [] pip_tmp_buf;
+        pip_tmp_buf   = NULL;
+    }
 
-    piptmpbuf = NULL;
-    pipscontext = NULL;
+    if (pip_scaling_context)
+    {
+        img_resample_close(pip_scaling_context);
+        pip_scaling_context = NULL;
+    }
 
-    piph_in = piph_out = -1;
-    pipw_in = pipw_out = -1;
+    pip_video_size   = QSize(0,0);
+    pip_display_size = QSize(0,0);
 }
 
 /**
@@ -1088,7 +1114,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     uint  pipVideoHeight = pipplayer->GetVideoHeight();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
-    if ((videoAspect <= 0) || (pipVideoAspect <= 0) || 
+    if ((video_aspect <= 0) || (pipVideoAspect <= 0) || 
         (frame->height <= 0) || (frame->width <= 0) ||
         !pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
     {
@@ -1096,8 +1122,9 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         return;
     }
 
-    desired_piph = (frame->height * desired_pipsize) / 100;
-    desired_piph -= desired_piph % 2;
+    // set height
+    int tmph = (frame->height * db_pip_size) / 100;
+    pip_desired_display_size.setHeight((tmph >> 1) << 1);
 
     // adjust for letterbox modes...
     int letterXadj = 0;
@@ -1105,43 +1132,53 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     float letterAdj = 1.0f;
     if (letterbox != kLetterbox_Off)
     {
-        letterXadj = (int) (max(-dispxoff, 0) * ((float)imgw / dispw));
-        letterYadj = (int) (max(-dispyoff, 0) * ((float)imgh / disph));
-        letterAdj  = videoAspect / XJ_aspect;
+        letterXadj = max(-display_video_rect.left(), 0);
+        float xadj = (float) video_rect.width() / display_visible_rect.width();
+        letterXadj = (int) (letterXadj * xadj);
+
+        float yadj = (float)video_rect.height() /display_visible_rect.height();
+        letterYadj = max(-display_video_rect.top(), 0);
+        letterYadj = (int) (letterYadj * yadj);
+
+        letterAdj  = video_aspect / letterboxed_video_aspect;
     }
 
     // adjust for non-square pixels on screen
-    float dispPixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
+    float dispPixelAdj = (GetDisplayAspect() * video_dim.height()) /
+        video_dim.width();
 
     // adjust for non-square pixels in video
     float vidPixelAdj  = pipVideoWidth / (pipVideoAspect * pipVideoHeight);
 
-    // set width and height
-    desired_pipw = (int) (desired_piph * pipVideoAspect * vidPixelAdj *
-                          dispPixelAdj * letterAdj);
-    desired_pipw -= desired_pipw % 2;
+    // set width
+    int tmpw = (int) (pip_desired_display_size.height() * pipVideoAspect *
+                      vidPixelAdj * dispPixelAdj * letterAdj);
+    pip_desired_display_size.setWidth((tmpw >> 1) << 1);
 
     // Scale the image if we have to...
     unsigned char *pipbuf = pipimage->buf;
-    if (pipw != desired_pipw || piph != desired_piph)
+    if (pipw != pip_desired_display_size.width() ||
+        piph != pip_desired_display_size.height())
     {
         DoPipResize(pipw, piph);
 
-        if (piptmpbuf && pipscontext)
+        if (pip_tmp_buf && pip_scaling_context)
         {
             AVPicture img_in, img_out;
 
-            avpicture_fill(&img_out, (uint8_t *)piptmpbuf, PIX_FMT_YUV420P,
-                           pipw_out, piph_out);
+            avpicture_fill(
+                &img_out, (uint8_t *)pip_tmp_buf, PIX_FMT_YUV420P,
+                pip_display_size.width(), pip_display_size.height());
+
             avpicture_fill(&img_in, (uint8_t *)pipimage->buf, PIX_FMT_YUV420P,
                            pipw, piph);
 
-            img_resample(pipscontext, &img_out, &img_in);
+            img_resample(pip_scaling_context, &img_out, &img_in);
 
-            pipw = pipw_out;
-            piph = piph_out;
+            pipw = pip_display_size.width();
+            piph = pip_display_size.height();
 
-            pipbuf = piptmpbuf;
+            pipbuf = pip_tmp_buf;
         }
     }
 
@@ -1149,7 +1186,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     // Figure out where to put the Picture-in-Picture window
     int xoff = 0;
     int yoff = 0;
-    switch (PIPLocation)
+    switch (db_pip_location)
     {
         default:
         case kPIPTopLeft:
@@ -1361,25 +1398,25 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
         case FMT_AI44:
         {
             if (stride < 0)
-                stride = XJ_width; // 8 bits per pixel
+                stride = video_dim.width(); // 8 bits per pixel
             if (changed)
-                surface->DitherToAI44(frame->buf, stride, XJ_height);
+                surface->DitherToAI44(frame->buf, stride, video_dim.height());
             break;
         }
         case FMT_IA44:
         {
             if (stride < 0)
-                    stride = XJ_width; // 8 bits per pixel
+                    stride = video_dim.width(); // 8 bits per pixel
             if (changed)
-                surface->DitherToIA44(frame->buf, stride, XJ_height);
+                surface->DitherToIA44(frame->buf, stride, video_dim.height());
             break;
         }
         case FMT_ARGB32:
         {
             if (stride < 0)
-                stride = XJ_width*4; // 32 bits per pixel
+                stride = video_dim.width()*4; // 32 bits per pixel
             if (changed)
-                surface->BlendToARGB(frame->buf, stride, XJ_height);
+                surface->BlendToARGB(frame->buf, stride, video_dim.height());
             break;
         }
         default:
@@ -1426,3 +1463,24 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 */
 }
 
+/// Correct for a 1920x1080 frames reported as 1920x1088
+static QSize fix_1080i(QSize raw)
+{
+    if (QSize(1920, 1088) == raw)
+        return QSize(1920, 1080);
+    return raw;
+}
+
+/// Correct for rounding errors
+static float fix_aspect(float raw)
+{
+    // Check if close to 4:3
+    if (fabs(raw - 1.333333f) < 0.05f)
+        raw = 1.333333f;
+
+    // Check if close to 16:9
+    if (fabs(raw - 1.777777f) < 0.05f)
+        raw = 1.777777f;
+
+    return raw;
+}

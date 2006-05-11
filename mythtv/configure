@@ -64,6 +64,7 @@ xvmc="no"
 xvmcw="yes"
 xvmc_vld="yes"
 xvmc_pro="no"
+xvmc_opengl="yes"
 xvmc_lib=""
 mac_accel="no"
 opengl_vsync="no"
@@ -77,6 +78,7 @@ v4l="no"
 valgrind="no"
 frontend="yes"
 backend="no"
+opengl="no"
 
 if test x"$CC" != x"" ; then
     cc="$CC"
@@ -190,6 +192,7 @@ echo "  --disable-xrandr         disable X11 resolution switching"
 echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
 echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
 echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
+echo "  --disable-xvmc-opengl    disable nVidia XvMC OpenGL texture method"
 echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
 #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
 echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
@@ -852,6 +855,10 @@ for opt do
   --enable-xvmc-pro) xvmc_pro="yes"
   ;;
   --disable-xvmc-pro) xvmc_pro="no"
+  ;;
+  --enable-xvmc-opengl) xvmc_opengl="yes"
+  ;;
+  --disable-xvmc-opengl) xvmc_opengl="no"
   ;;
   --xvmc-lib=*) xvmc_lib=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -2155,15 +2162,28 @@ else
     xvmc_vld="no"
 fi
 
+if test x"$VENDOR_XVMC_LIBS" != x"-lXvMCNVIDIA" ; then
+    xvmc_opengl="no"
+fi
+
+if ! has_library libGL ; then
+    xvmc_opengl="no"
+    opengl_vsync="no"
+fi
+
+if test x"$opengl_vsync" == x"yes" ; then
+    opengl="yes"
+fi
+
+if test x"$xvmc_opengl" == x"yes" ; then
+    opengl="yes"
+fi
+
 if test x"$mac_accel" = x"yes" ; then
     # Can only do Mac accel on Mac platform
     if test $targetos != Darwin; then
         mac_accel="no"
     fi
-fi
-
-if test x"$opengl_vsync" = x"yes" ; then
-    CONFIG_OPENGL_VSYNC_LIBS="-lGL -lGLU"
 fi
 
 if test x"$direct_fb" = x"yes" ; then
@@ -2298,6 +2318,7 @@ if test x"$frontend" = x"yes" ; then
   echo "XvMC support     $xvmc"
   echo "XvMC VLD support $xvmc_vld"
   echo "XvMC pro support $xvmc_pro"
+  echo "XvMC OpenGL sup. $xvmc_opengl"
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs        $VENDOR_XVMC_LIBS"
 fi
@@ -2973,6 +2994,10 @@ if test x"$xvmc_vld" = x"yes" ; then
   CCONFIG="$CCONFIG using_xvmc_vld"
 fi
 
+if test x"$xvmc_opengl" = x"yes" ; then
+  CCONFIG="$CCONFIG using_xvmc_opengl"
+fi
+
 if test x"$VENDOR_XVMC_LIBS" != x"" ; then
   echo "CONFIG_XVMC_LIBS=$VENDOR_XVMC_LIBS -lXvMC" >> $MYTH_CONFIG_MAK
   if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
@@ -2993,7 +3018,11 @@ fi
 
 if test x"$opengl_vsync" = x"yes" ; then
   CCONFIG="$CCONFIG using_opengl_vsync"
-  echo "CONFIG_OPENGL_VSYNC_LIBS=$CONFIG_OPENGL_VSYNC_LIBS" >> $MYTH_CONFIG_MAK
+fi
+
+if test x"$opengl" = x"yes" ; then
+  CCONFIG="$CCONFIG using_opengl"
+  echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
 fi
 
 if test x"$valgrind" = x"yes" ; then

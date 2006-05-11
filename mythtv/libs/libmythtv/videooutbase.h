@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef VIDEOOUTBASE_H_
 #define VIDEOOUTBASE_H_
 
@@ -95,7 +97,7 @@ enum ZoomDirections
     kZoomRight
 };
 
-enum letterboxModes
+enum LetterboxModes
 {
     kLetterbox_Toggle = -1,
     kLetterbox_Off = 0,
@@ -108,12 +110,13 @@ enum letterboxModes
     kLetterbox_END
 };
 
-enum FrameScanType {
+enum FrameScanType
+{
     kScan_Ignore      = -1,
-    kScan_Progressive =  0,
-    kScan_Interlaced  =  1,
-    kScan_Intr2ndField=  2,
-    kScan_Detect      =  3
+    kScan_Detect      =  0,
+    kScan_Interlaced  =  1, // == XVMC_TOP_PICTURE
+    kScan_Intr2ndField=  2, // == XVMC_BOTTOM_PICTURE
+    kScan_Progressive =  3, // == XVMC_FRAME_PICTURE
 };
 
 static inline bool is_interlaced(FrameScanType scan)
@@ -298,6 +301,8 @@ class VideoOutput
     ///        onto the queue of frames ready for decoding onto.
     virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
 
+    virtual void CheckFrameStates(void) { }
+
     /// \bug not implemented correctly. vpos is not updated.
     VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
 
@@ -337,67 +342,66 @@ class VideoOutput
 
     void SetVideoAspectRatio(float aspect);
 
-    /// Physical width of playback window in millimeters, used to compute display_aspect
-    int w_mm;
-    /// Physical height of playback window in millimeters, used to compute display_aspect
-    int h_mm;
-    /// Physical aspect ratio of playback window
-    float display_aspect;
+    void ApplyManualScaleAndMove(void);
+    void ApplyDBScaleAndMove(void);
+    void ApplyLetterboxing(void);
+    void ApplySnapToVideoRect(void);
+    void PrintMoveResizeDebug(void);
 
-    /// Physical width according to database. (deprecated?)
-    int myth_dsw;
-    /// Physical height according to database. (deprecated?)
-    int myth_dsh;
+    QSize   db_display_dim;   ///< Screen dimensions in millimeters from DB
+    QPoint  db_move;          ///< Percentage move from database
+    float   db_scale_horiz;   ///< Horizontal Overscan/Underscan percentage
+    float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
+    int     db_pip_location;
+    int     db_pip_size;      ///< percentage of full window to use for PiP
+    int     db_pict_brightness;
+    int     db_pict_contrast;
+    int     db_pict_colour;
+    int     db_pict_hue;
+    int     db_letterbox;
+    QString db_deint_filtername;
 
+    // Manual Zoom
+    int     mz_scale;         ///< Manually applied percentage scaling.
+    QPoint  mz_move;          ///< Manually applied percentage move.
 
-    /// Width of video in pixels
-    int XJ_width;
-    /// Height of video window in pixels
-    int XJ_height;
-    /// Aspect ratio of video
-    float videoAspect;
+    // Physical dimensions
+    QSize   display_dim;      ///< Screen dimensions of playback window in mm
+    float   display_aspect;   ///< Physical aspect ratio of playback window
+
+    // Video dimensions
+    QSize   video_dim;        ///< Pixel dimensions of video
+    float   video_aspect;     ///< Physical aspect ratio of video
 
     /// Normally this is the same as videoAspect, but may not be
     /// if the user has toggled to a different "letterbox" mode.
-    float XJ_aspect;
+    float   letterboxed_video_aspect;
+    /// LetterboxMode to use to modify letterboxed_video_aspect
+    int     letterbox;
 
-    /// letterboxMode to use to modify XJ_aspect
-    int letterbox;
-
-    /// Horizontal video displacement
-    int img_xoff;
-    /// Vertical video displacement
-    int img_yoff;
-    /// Horizontal Overscan/Underscan percentage
-    float img_hscanf;
-    /// Vertical Overscan/Underscan percentage
-    float img_vscanf;
-
-    int imgx, imgy, imgw, imgh;
-    int dispxoff, dispyoff, dispwoff, disphoff;
-
-    int dispx, dispy, dispw, disph;
-    int olddispx, olddispy, olddispw, olddisph;
+    /// Pixel rectangle in video frame to display
+    QRect   video_rect;
+    /// Pixel rectangle in display window into which video_rect maps to
+    QRect   display_video_rect;
+    /// Visible portion of display window in pixels.
+    /// This may be bigger or smaller than display_video_rect.
+    QRect   display_visible_rect;
+    /// Used to save the display_visible_rect for
+    /// restoration after video embedding ends.
+    QRect   tmp_display_visible_rect;
 
     // Picture settings
-    int brightness, contrast, colour, hue;
-
-    // Zoom
-    int ZoomedIn;
-    int ZoomedUp;
-    int ZoomedRight;
+    int     brightness;
+    int     contrast;
+    int     colour;
+    int     hue;
 
     // Picture-in-Picture
-    int PIPLocation;
-    int desired_pipsize; ///< percentage of full window to use for PiP
-    int desired_piph;
-    int desired_pipw;
-    int piph_in;
-    int pipw_in;
-    int piph_out;
-    int pipw_out;
-    unsigned char      *piptmpbuf;
-    ImgReSampleContext *pipscontext;
+    QSize   pip_desired_display_size;
+    QSize   pip_display_size;
+    QSize   pip_video_size;
+    unsigned char      *pip_tmp_buf;
+    ImgReSampleContext *pip_scaling_context;
 
     // Video resizing (for ITV)
     bool    vsz_enabled;
@@ -418,12 +422,11 @@ class VideoOutput
     VideoBuffers vbuffers;
 
     // Various state variables
-    bool embedding;
-    bool needrepaint;
-    bool allowpreviewepg;
+    bool    embedding;
+    bool    needrepaint;
+    bool    allowpreviewepg;
+    bool    errored;
     long long framesPlayed;
-
-    bool errored;
 };
 
 #endif

@@ -2380,19 +2380,14 @@ OSDSurface *OSD::Display(void)
                 }
             }
 
-            if (container->Fading())
-                changed = true;
+            int fadetime = container->GetFadeTime();
+            if (!container->IsFading() && (totalfadetime != fadetime))
+                container->SetFadeTime(totalfadetime);
 
             container->Draw(drawSurface, actuallydraw);
             anytodisplay = true;
-            if (container->GetTimeLeft() == 0 && totalfadetime > 0)
-            {
-                container->FadeFor(totalfadetime);
-                changed = true;
-            }
 
-            if (container->NeedsUpdate())
-                changed = true;
+            changed |= container->IsFading() || container->NeedsUpdate();
         }
         else if (container->HasDisplayed())
         {

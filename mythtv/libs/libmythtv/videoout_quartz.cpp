@@ -1193,7 +1193,7 @@ void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 
     data->srcAspect = aspect;
-    data->srcMode   = letterbox;
+    data->srcMode   = db_letterbox;
 
     VideoOutputQuartzView *view = NULL;
     for (view = data->views.first(); view; view = data->views.next())
@@ -1207,9 +1207,9 @@ void VideoOutputQuartz::Zoom(int direction)
 
     VideoOutput::Zoom(direction);
     MoveResize();
-    data->ZoomedIn = ZoomedIn;
-    data->ZoomedUp = ZoomedUp;
-    data->ZoomedRight = ZoomedRight;
+    data->ZoomedIn    = mz_scale;
+    data->ZoomedUp    = mz_move.y();
+    data->ZoomedRight = mz_move.x();
 
     for (VideoOutputQuartzView *view = data->views.first();
          view;
@@ -1233,7 +1233,7 @@ void VideoOutputQuartz::InputChanged(int width, int height, float aspect,
     data->srcWidth  = width;
     data->srcHeight = height;
     data->srcAspect = aspect;
-    data->srcMode   = letterbox;
+    data->srcMode   = db_letterbox;
 
     CreateQuartzBuffers();
 
@@ -1281,7 +1281,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->srcWidth  = width;
     data->srcHeight = height;
     data->srcAspect = aspect;
-    data->srcMode   = letterbox;
+    data->srcMode   = db_letterbox;
     
     data->ZoomedIn = 0;
     data->ZoomedUp = 0;
@@ -1422,10 +1422,11 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
     for (int i = 0; i < vbuffers.allocSize(); i++)
     {
-        vbuffers.at(i)->width  = XJ_width;
-        vbuffers.at(i)->height = XJ_height;
+        vbuffers.at(i)->width  = video_dim.width();
+        vbuffers.at(i)->height = video_dim.height();
         vbuffers.at(i)->bpp    = 12;
-        vbuffers.at(i)->size   = XJ_width * XJ_height * vbuffers.at(i)->bpp / 8;
+        vbuffers.at(i)->size   = (video_dim.width() * video_dim.height() *
+                                  vbuffers.at(i)->bpp / 8);
         vbuffers.at(i)->codec  = FMT_YV12;
 
         vbuffers.at(i)->buf = new unsigned char[vbuffers.at(i)->size + 64];

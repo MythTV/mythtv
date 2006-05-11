@@ -55,7 +55,6 @@ class OSDSet : public QObject
     void Draw(OSDSurface *surface, bool actuallydraw);
     void Display(bool onoff = true, int osdFunctionalType = 0);
     void DisplayFor(int time, int osdFunctionalType = 0);
-    void FadeFor(int time);
     void Hide(void);
     bool HandleKey(const QKeyEvent *e, bool *focus_change = NULL,
                    QString *button_pressed = NULL);
@@ -76,7 +75,9 @@ class OSDSet : public QObject
     int      GetPriority(void)      const { return m_priority;     }
     bool     Displaying(void)       const { return m_displaying;   }
     bool     HasDisplayed(void)     const { return m_hasdisplayed; }
-    bool     Fading(void)           const { return m_fadetime > 0; }
+    int      GetFadeTime(void)      const { return m_fadetime;     }
+    bool     IsFading(void)         const
+        { return (m_fadetime > 0) && (m_timeleft <= 0); }
     int      GetTimeLeft(void)      const { return m_timeleft;     }
     int      GetFrameInterval(void) const { return m_frameint;     }
     void     GetText(InfoMap &infoMap) const;
@@ -90,6 +91,7 @@ class OSDSet : public QObject
     OSDTypeText *GetSelected(void);
 
     // Sets
+    void SetFadeTime(int time)          { m_fadetime = m_maxfade = time; }
     void SetCache(bool cache)           { m_cache = cache; }
     void SetName(const QString &name)   { m_name = name; }
     void SetAllowFade(bool allow)       { m_allowfade = allow; }
