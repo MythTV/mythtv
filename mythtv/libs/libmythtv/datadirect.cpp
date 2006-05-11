@@ -606,9 +606,11 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
         MythContext::DBError("Analyzing table dd_productioncrew", query);
 }
 
-bool DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
-                                             bool insert_channels)
+int DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
+                                            bool insert_channels)
 {
+    int new_channels = 0;
+
     // Find all the channels in the dd_v_station temp table
     // where there is no channel with the same xmltvid in the
     // DB using the same source.
@@ -626,7 +628,7 @@ bool DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
     if (!query.exec())
     {
         MythContext::DBError("Selecting new channels", query);
-        return false;
+        return -1;
     }
 
     while (query.next())
@@ -641,9 +643,16 @@ bool DataDirectProcessor::UpdateChannelsSafe(uint sourceid,
         update_channel_basic(sourceid, insert_channels,
                              xmltvid, callsign, name, freqid,
                              chan_major, chan_minor);
+
+        if (!insert_channels)
+        {
+            VERBOSE(VB_GENERAL, LOC + QString("Not adding channel %1 (%2).")
+                    .arg(name).arg(callsign));
+        }
+        new_channels++;
     }
 
-    return true;
+    return new_channels;
 }
 
 bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)

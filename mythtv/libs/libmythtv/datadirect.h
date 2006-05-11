@@ -305,7 +305,7 @@ class DataDirectProcessor
     static void UpdateProgramViewTable(uint sourceid);
 
     // static commands (these update regular DB tables from temp DB tables)
-    static bool UpdateChannelsSafe(uint sourceid, bool insert_channels);
+    static int  UpdateChannelsSafe(uint sourceid, bool insert_channels);
     static bool UpdateChannelsUnsafe(uint sourceid);
 
   private:

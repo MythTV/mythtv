@@ -821,7 +821,8 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
         insert_channels = (SourceUtil::IsAnalog(source.id) &&
                            !remove_new_channels);
 
-    DataDirectProcessor::UpdateChannelsSafe(source.id, insert_channels);
+    int new_channels = DataDirectProcessor::UpdateChannelsSafe(
+        source.id, insert_channels);
 
     //  User must pass "--do-channel-updates" for these updates
     if (channel_updates)
@@ -832,7 +833,7 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
         UpdateSourceIcons(source.id);
 
     // Unselect channels not in users lineup for DVB, HDTV
-    if (!insert_channels)
+    if (!insert_channels && (new_channels > 0))
     {
         bool ok0 = (logged_in == source.userid);
         bool ok1 = (raw_lineup == source.id);
@@ -847,7 +848,11 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
             ok1 = ddprocessor.GrabLineupForModify(source.lineupid);
         }
         if (ok1)
+        {
             ddprocessor.UpdateListings(source.id);
+            VERBOSE(VB_GENERAL, QString("Removed %1 channel(s) from lineup.")
+                    .arg(new_channels));
+        }
     }
 }
 
