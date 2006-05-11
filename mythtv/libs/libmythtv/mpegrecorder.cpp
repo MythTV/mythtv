@@ -363,9 +363,9 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
-        cerr << "Error setting codec params\n";
+        cerr << "Warning, unable to set recording volume\n";
+        cerr << "This is normal if you have an AVerMedia M179 card.\n";
         perror("VIDIOC_S_CTRL:");
-        return false;
     }
 
     if (vbimode) {
