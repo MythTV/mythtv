@@ -1212,8 +1212,11 @@ OSDTypeImage::~OSDTypeImage()
     // In case we have a cache item in hand, it's safe to delete it,
     // as it should not be in OSDImageCache anymore and it should have
     // been written to the file cache for faster access in the future.
-    delete m_cacheitem;
-    m_cacheitem = NULL;    
+    if (m_cacheitem)
+    {
+        delete m_cacheitem;
+        m_cacheitem = NULL;
+    }
 }
 
 void OSDTypeImage::SetName(const QString &name)
