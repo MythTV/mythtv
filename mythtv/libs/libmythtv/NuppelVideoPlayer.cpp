@@ -3862,6 +3862,10 @@ bool NuppelVideoPlayer::DoFastForward(void)
     GetDecoder()->DoFastForward(desiredFrame);
     GetDecoder()->setExactSeeks(exactseeks);
 
+    // Note: The video output will be reset by what the the decoder 
+    //       does, so we only need to reset the audio, subtitles, etc.
+    ClearAfterSeek(false);
+
     lastSkipTime = time(NULL);
     return true;
 }
@@ -3906,19 +3910,24 @@ bool NuppelVideoPlayer::IsSkipTooCloseToEnd(int frames) const
 }
 #endif
 
-/** \fn NuppelVideoPlayer::ClearAfterSeek(void)
+/** \fn NuppelVideoPlayer::ClearAfterSeek(bool)
  *  \brief This is to support seeking...
  *
  *   This resets the output classes and discards all
  *   frames no longer being used by the decoder class.
  *
  *   Note: caller should not hold any locks
+ *
+ *  \param clearvideobuffers This clears the videooutput buffers as well,
+ *                           this is only safe if no old frames are
+ *                           required to continue decoding.
  */
-void NuppelVideoPlayer::ClearAfterSeek(void)
+void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
+    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek("<<clearvideobuffers<<")");
 
-    videoOutput->ClearAfterSeek();
+    if (clearvideobuffers)
+        videoOutput->ClearAfterSeek();
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].timecode = 0;

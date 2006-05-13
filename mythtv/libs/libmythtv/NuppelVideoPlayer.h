@@ -430,7 +430,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool DoRewind(void);
 
     // Private seeking stuff
-    void ClearAfterSeek(void);
+    void ClearAfterSeek(bool clearvideobuffers = true);
     bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
