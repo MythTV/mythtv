@@ -104,7 +104,7 @@ void GameHandler::InitMetaDataMap(QString GameType)
     MSqlQuery query(MSqlQuery::InitCon());
     QString thequery = QString("SELECT crc, category, year, country, name, "
                                "description, publisher, platform, version, "
-                               "binfile FROM romdb WHERE platform = \"%1\"; ")
+                               "binfile FROM romdb WHERE platform = \"%1\";")
                               .arg(GameType);
     query.exec(thequery);
 
@@ -127,7 +127,10 @@ void GameHandler::InitMetaDataMap(QString GameType)
         }
     }
 
-
+    if (romDB.count() == 0)
+        cerr << "No romDB data read from database. Not imported?" << endl;
+    else
+        cerr << "Loaded " << romDB.count() << " items from romDB Database" << endl;
 
 }
 
