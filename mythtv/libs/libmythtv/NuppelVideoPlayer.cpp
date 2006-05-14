@@ -2401,7 +2401,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     videofiltersLock.lock();
     if (ringBuffer->InDVDMenuOrStillFrame() && videoOutput->ValidVideoFrames() < 3)
-        videoOutput->ProcessFrame(frame, NULL, videoFilters, pipplayer);
+        videoOutput->ProcessFrame(frame, NULL, NULL, pipplayer);
     else
         videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
     videofiltersLock.unlock();
@@ -2517,6 +2517,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                     }
                     if (!pausevideo && nbframes == 1)
                     {
+                        videoOutput->SetDeinterlacingEnabled(false);
                         indvdstillframe = true;
                         PauseVideo(false);
                     }
