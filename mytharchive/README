@@ -9,7 +9,8 @@ system restoring all the associated metadata.
 PREREQUISITES
 =============
 
-This plugin requires at least SVN Revision 9846 to run.
+This plugin requires at least SVN Revision 9846 from trunk to run. It will
+NOT work with the 0.19-fixes branch.
 
 You also need to have already installed the external dependencies required
 by the mythburn script.
