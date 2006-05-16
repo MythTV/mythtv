@@ -49,7 +49,7 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     dir = QDir(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
-    
+
     zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
                                    gContext->GetInstallPrefix() +
@@ -68,10 +68,25 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     setNoErase();
     loadTheme();
 
+    // Now do the actual work
+    m_RetrieveTimer = new QTimer(this);
+    connect(m_RetrieveTimer, SIGNAL(timeout()),
+            this, SLOT(slotRetrieveNews()));
+    m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
+
     // Load sites from database
+    loadSites();
+
+    m_RetrieveTimer->start(m_TimerTimeout, false);
+}
+
+void MythNews::loadSites(void)
+{
+    m_NewsSites.clear();
+    m_UISites->Reset();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT name, url, updated FROM newssites ORDER BY name");
+    query.exec("SELECT name, url, ico, updated FROM newssites ORDER BY name");
 
     if (!query.isActive()) {
         cerr << "MythNews: Error in loading Sites from DB" << endl;
@@ -79,11 +94,13 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
     else {
         QString name;
         QString url;
+        QString icon;
         QDateTime time;
         while ( query.next() ) {
             name = QString::fromUtf8(query.value(0).toString());
             url  = QString::fromUtf8(query.value(1).toString());
-            time.setTime_t(query.value(2).toUInt());
+            icon = QString::fromUtf8(query.value(2).toString());
+            time.setTime_t(query.value(3).toUInt());
             m_NewsSites.append(new NewsSite(name,url,time));
         }
     }
@@ -94,13 +111,6 @@ MythNews::MythNews(MythMainWindow *parent, const char *name )
             new UIListBtnTypeItem(m_UISites, site->name());
         item->setData(site);
     }
-    
-    // Now do the actual work
-    m_RetrieveTimer = new QTimer(this);
-    connect(m_RetrieveTimer, SIGNAL(timeout()),
-            this, SLOT(slotRetrieveNews()));
-    m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
-    m_RetrieveTimer->start(m_TimerTimeout, false);
 
     slotRetrieveNews();
 
@@ -324,10 +334,10 @@ void MythNews::updateInfoView()
 
             if (site)
             {
-                QString text(tr("Updated") + "\n");
+                QString text(tr("Updated") + " - ");
                 QDateTime updated(site->lastUpdated());
                 if (updated.toTime_t() != 0) {
-                    text += site->lastUpdated().toString(dateFormat) + "\n";
+                    text += site->lastUpdated().toString(dateFormat) + " ";
                     text += site->lastUpdated().toString(timeFormat);
                 }
                 else
@@ -384,9 +394,9 @@ void MythNews::keyPressEvent(QKeyEvent *e)
         else if(action == "SELECT")
             slotViewArticle();
         else if (action == "CANCEL")
-        {
             cancelRetrieve();
-        }
+        else if (action == "MENU")
+            showMenu();
         else
             handled = false;
     }
@@ -584,4 +594,212 @@ void MythNews::slotViewArticle()
             myth_system(cmd);
         }
     } 
+}
+
+bool MythNews::showEditDialog(bool edit)
+{
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit news site");
+
+    QVBoxLayout *vbox = new QVBoxLayout(NULL, 0, (int)(10 * hmult));
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+
+    QString title;
+    if (edit)
+        title = tr("Edit Site Details");
+    else
+        title = tr("Enter Site Details");
+
+    QLabel *label = new QLabel(title, popup);
+    QFont font = label->font();
+    font.setPointSize(int (font.pointSize() * 1.2));
+    font.setBold(true);
+    label->setFont(font);
+    label->setPaletteForegroundColor(QColor("yellow"));
+    label->setAlignment(Qt::AlignCenter);
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred)));
+    label->setMinimumWidth((int)(500 * wmult));
+    label->setMaximumWidth((int)(500 * wmult));
+    hbox->addWidget(label);
+
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    label = new QLabel(tr("Name:"), popup, "nopopsize");
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    label->setMinimumWidth((int)(110 * wmult));
+    label->setMaximumWidth((int)(110 * wmult));
+    hbox->addWidget(label);
+
+    MythRemoteLineEdit *titleEditor = new MythRemoteLineEdit(popup);
+    titleEditor->setFocus(); 
+    hbox->addWidget(titleEditor);
+
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    label = new QLabel(tr("URL:"), popup, "nopopsize");
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    label->setMinimumWidth((int)(110 * wmult));
+    label->setMaximumWidth((int)(110 * wmult));
+    hbox->addWidget(label);
+
+    MythRemoteLineEdit *urlEditor = new MythRemoteLineEdit(popup);
+    hbox->addWidget(urlEditor);
+
+    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
+    label = new QLabel(tr("Icon:"), popup, "nopopsize");
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    label->setMinimumWidth((int)(110 * wmult));
+    label->setMaximumWidth((int)(110 * wmult));
+    hbox->addWidget(label);
+
+    MythRemoteLineEdit *iconEditor = new MythRemoteLineEdit(popup);
+    hbox->addWidget(iconEditor);
+
+    popup->addLayout(vbox, 0);
+
+    popup->addButton(tr("OK"));
+    popup->addButton(tr("Cancel"));
+
+    QString siteName = "";
+    if (edit)
+    {
+        UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+
+        if (siteUIItem && siteUIItem->getData())
+        {
+            NewsSite *site = (NewsSite*) siteUIItem->getData();
+            if(site)
+            {
+                siteName = site->name();
+                titleEditor->setText(site->name());
+                urlEditor->setText(site->url());
+            }
+        }
+    }
+
+    int res = popup->ExecPopup();
+
+    if (res == 0)
+    {
+        if (edit && siteName != "")
+            removeFromDB(siteName);
+        insertInDB(titleEditor->text(), urlEditor->text(), iconEditor->text(), "custom");
+        loadSites();
+    }
+
+    delete popup;
+
+    return (res == 0);
+}
+
+void MythNews::showMenu()
+{
+    menu = new MythPopupBox(GetMythMainWindow(),"popupMenu");
+
+    QButton *temp = menu->addButton(tr("Edit News Site"), this, SLOT(editNewsSite()));
+    menu->addButton(tr("Add News Site"), this, SLOT(addNewsSite()));
+    menu->addButton(tr("Delete News Site"), this, SLOT(deleteNewsSite()));
+    menu->addButton(tr("Cancel"), this, SLOT(cancelMenu()));
+    temp->setFocus();
+
+    menu->ShowPopup(this, SLOT(cancelMenu()));
+}
+
+void MythNews::cancelMenu()
+{
+    if (menu) 
+    {
+        menu->hide();
+        delete menu;
+        menu=NULL;
+    }
+}
+
+void MythNews::editNewsSite()
+{
+    cancelMenu();
+    showEditDialog(true);
+}
+
+void MythNews::addNewsSite()
+{
+    cancelMenu();
+    showEditDialog(false);
+}
+
+void MythNews::deleteNewsSite()
+{
+    cancelMenu();
+
+    UIListBtnTypeItem *siteUIItem = m_UISites->GetItemCurrent();
+
+    QString siteName;
+    if (siteUIItem && siteUIItem->getData())
+    {
+        NewsSite *site = (NewsSite*) siteUIItem->getData();
+        if(site)
+        {
+            siteName = site->name();
+
+            if (MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), QObject::tr("MythNews"),
+                                      QObject::tr("Are you sure you want to delete this news site\n\n%1")
+                                              .arg(siteName), true))
+            {
+                removeFromDB(siteName);
+                loadSites();
+            }
+        }
+    }
+}
+
+bool MythNews::findInDB(const QString& name)
+{
+    bool val = false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
+    query.bindValue(":NAME", name.utf8());
+    if (!query.exec() || !query.isActive()) {
+        MythContext::DBError("new find in db", query);
+        return val;
+    }
+
+    val = query.numRowsAffected() > 0;
+
+    return val;
+}
+
+bool MythNews::insertInDB(const QString &name, const QString &url, 
+                          const QString &icon, const QString &category)
+{
+    if (findInDB(name))
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO newssites (name,category,url,ico) "
+            " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
+    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":CATEGORY", category.utf8());
+    query.bindValue(":URL", url.utf8());
+    query.bindValue(":ICON", icon.utf8());
+    if (!query.exec() || !query.isActive()) {
+        MythContext::DBError("news: inserting in DB", query);
+        return false;
+    }
+
+    return (query.numRowsAffected() > 0);
+}
+
+bool MythNews::removeFromDB(const QString &name)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
+    query.bindValue(":NAME", name.utf8());
+    if (!query.exec() || !query.isActive()) {
+        MythContext::DBError("news: delete from db", query);
+        return false;
+    }
+
+    return (query.numRowsAffected() > 0);
 }

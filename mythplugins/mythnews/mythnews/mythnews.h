@@ -60,6 +60,12 @@ private:
 
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
+    void loadSites();
+    bool findInDB(const QString& name);
+    bool insertInDB(const QString &name, const QString &url, 
+                    const QString &icon, const QString &category);
+
+    bool removeFromDB(const QString &name);
 
     XMLParse      *m_Theme;
 
@@ -80,7 +86,8 @@ private:
     QString        dateFormat;
     QString        zoom;
     QString        browser;
-    
+    MythPopupBox   *menu;
+
 private slots:
     void slotViewArticle();
     void slotRetrieveNews();
@@ -90,6 +97,14 @@ private slots:
     void slotSiteSelected(NewsSite*);
     
     void slotArticleSelected(UIListBtnTypeItem *item);
+
+    // menu stuff
+    void showMenu();
+    void addNewsSite();
+    void editNewsSite();
+    void deleteNewsSite();
+    void cancelMenu();
+    bool showEditDialog(bool edit);
 };
 
 #endif /* MYTHNEWS_H */

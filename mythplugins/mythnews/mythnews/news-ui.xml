@@ -31,7 +31,7 @@
     <font name="updated" face="Arial Narrow">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
-      <size>14</size>
+      <size>12</size>
       <bold>no</bold>
     </font>
 
@@ -74,7 +74,6 @@
 
       <area>0,340,800,260</area>
 
-
       <textarea name="title" draworder="1">
         <area>20,10,760,70</area>
         <font>title</font>
@@ -82,7 +81,7 @@
       </textarea>
 
       <textarea name="description" draworder="1">
-        <area>20,75,760,100</area>
+        <area>20,75,760,150</area>
         <font>desc</font>
         <multiline>yes</multiline>
       </textarea>
@@ -93,9 +92,9 @@
       </image>
 
       <textarea name="updated" align="right" draworder="1">
-        <area>650,160,120,100</area>
+        <area>180,220,600,30</area>
         <font>updated</font>
-        <multiline>yes</multiline>
+        <multiline>no</multiline>
       </textarea>
 
     </container>
