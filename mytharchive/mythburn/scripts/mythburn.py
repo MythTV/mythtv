@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060509-3"
+VERSION="0.1.20060516-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -501,6 +501,14 @@ def expandItemText(infoDOM, text, itemnumber, pagenumber, keynumber,chapternumbe
 
     return text
 
+def getScaledAttribute(node, attribute):
+    """ Returns a value taken from attribute in node scaled for the current video mode"""
+
+    if videomode == "pal" or attribute == "x" or attribute == "w":
+        return int(node.attributes[attribute].value)
+    else:
+        return int(float(node.attributes[attribute].value) / 1.2)
+
 def intelliDraw(drawer,text,font,containerWidth):
     """Based on http://mail.python.org/pipermail/image-sig/2004-December/003064.html"""
     #Args:
@@ -546,7 +554,7 @@ def intelliDraw(drawer,text,font,containerWidth):
     (width,height) = drawer.textsize(lines[0],font)
     return (lines,width,height)
 
-def paintText( draw, x,y,width, height,text, font, colour, alignment):
+def paintText(draw, x, y, width, height, text, font, colour, alignment):
     """Takes a piece of text and draws it onto an image inside a bounding box."""
     #The text is wider than the width of the bounding box
 
@@ -575,18 +583,20 @@ def checkBoundaryBox(boundarybox, node):
     # We work out how much space all of our graphics and text are taking up
     # in a bounding rectangle so that we can use this as an automatic highlight
     # on the DVD menu   
-    if getText(node.attributes["static"])=="False":
-        if int(node.attributes["x"].value) < boundarybox[0]:
-            boundarybox = int(node.attributes["x"].value),boundarybox[1],boundarybox[2],boundarybox[3]
+    if getText(node.attributes["static"]) == "False":
+        if getScaledAttribute(node, "x") < boundarybox[0]:
+            boundarybox = getScaledAttribute(node, "x"), boundarybox[1], boundarybox[2], boundarybox[3]
 
-        if int(node.attributes["y"].value) < boundarybox[1]:
-            boundarybox = boundarybox[0],int(node.attributes["y"].value),boundarybox[2],boundarybox[3]
+        if getScaledAttribute(node, "y") < boundarybox[1]:
+            boundarybox = boundarybox[0], getScaledAttribute(node, "y"), boundarybox[2], boundarybox[3]
 
-        if (int(node.attributes["x"].value)+int(node.attributes["w"].value)) > boundarybox[2]:
-            boundarybox = boundarybox[0],boundarybox[1],int(node.attributes["x"].value)+int(node.attributes["w"].value),boundarybox[3]
+        if (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")) > boundarybox[2]:
+            boundarybox = boundarybox[0], boundarybox[1], getScaledAttribute(node, "x") + \
+                          getScaledAttribute(node, "w"), boundarybox[3]
 
-        if (int(node.attributes["y"].value)+int(node.attributes["h"].value)) > boundarybox[3]:
-            boundarybox = boundarybox[0],boundarybox[1],boundarybox[2],int(node.attributes["y"].value)+int(node.attributes["h"].value)
+        if (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")) > boundarybox[3]:
+            boundarybox = boundarybox[0], boundarybox[1], boundarybox[2], \
+                          getScaledAttribute(node, "y") + getScaledAttribute(node, "h")
 
     return boundarybox
 
@@ -599,7 +609,7 @@ def loadFonts(themeDOM):
     fontnumber=0
     for nodefont in nodelistfonts:
         fontname = getText(nodefont)
-        fontsize = int(nodefont.attributes["size"].value)
+        fontsize = getScaledAttribute(nodefont, "size")
         themeFonts[fontnumber]=ImageFont.truetype(getFontPathName(fontname),fontsize )
         write( "Loading font %s, %s size %s" % (fontnumber,getFontPathName(fontname),fontsize) )
         fontnumber+=1
@@ -1639,9 +1649,9 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
             imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage, chapternumber, chapterlist)
 
             if doesFileExist(imagefilename):
-                picture = Image.open(imagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
                 picture = picture.convert("RGBA")
-                bgimage.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
                 del picture
                 write( "Added image %s" % imagefilename)
 
@@ -1654,10 +1664,10 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
             text=expandItemText(infoDOM,node.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
             if text>"":
                 paintText( draw,
-                           int(node.attributes["x"].value),
-                           int(node.attributes["y"].value),
-                           int(node.attributes["w"].value),
-                           int(node.attributes["h"].value),
+                           getScaledAttribute(node, "x"),
+                           getScaledAttribute(node, "y"),
+                           getScaledAttribute(node, "w"),
+                           getScaledAttribute(node, "h"),
                            text,
                            themeFonts[int(node.attributes["font"].value)],
                            node.attributes["colour"].value,
@@ -1675,24 +1685,24 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
                 if not doesFileExist(maskimagefilename):
                     fatalError("Cannot find mask image for previous button (%s)." % maskimagefilename)
 
-                picture=Image.open(imagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+                picture=Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
                 picture=picture.convert("RGBA")
-                bgimage.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
                 del picture
                 write( "Added previous button image %s" % imagefilename)
 
-                picture=Image.open(maskimagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
                 picture=picture.convert("RGBA")
-                bgimagemask.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
                 del picture
                 write( "Added previous button mask image %s" % imagefilename)
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","previous")
-                button.setAttribute("x0","%s" % int(node.attributes["x"].value))
-                button.setAttribute("y0","%s" % int(node.attributes["y"].value))
-                button.setAttribute("x1","%s" % (int(node.attributes["x"].value)+int(node.attributes["w"].value)))
-                button.setAttribute("y1","%s" % (int(node.attributes["y"].value)+int(node.attributes["h"].value)))
+                button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
+                button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
 
 
@@ -1706,24 +1716,24 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
                 if not doesFileExist(maskimagefilename):
                     fatalError("Cannot find mask image for next button (%s)." % maskimagefilename)
 
-                picture = Image.open(imagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+                picture = Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
                 picture = picture.convert("RGBA")
-                bgimage.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+                bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
                 del picture
                 write( "Added next button image %s " % imagefilename)
 
-                picture=Image.open(maskimagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+                picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
                 picture=picture.convert("RGBA")
-                bgimagemask.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+                bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
                 del picture
                 write( "Added next button mask image %s" % imagefilename)
 
                 button = spumuxdom.createElement("button")
                 button.setAttribute("name","next")
-                button.setAttribute("x0","%s" % int(node.attributes["x"].value))
-                button.setAttribute("y0","%s" % int(node.attributes["y"].value))
-                button.setAttribute("x1","%s" % (int(node.attributes["x"].value) + int(node.attributes["w"].value)))
-                button.setAttribute("y1","%s" % (int(node.attributes["y"].value) + int(node.attributes["h"].value)))
+                button.setAttribute("x0","%s" % getScaledAttribute(node, "x"))
+                button.setAttribute("y0","%s" % getScaledAttribute(node, "y"))
+                button.setAttribute("x1","%s" % (getScaledAttribute(node, "x") + getScaledAttribute(node, "w")))
+                button.setAttribute("y1","%s" % (getScaledAttribute(node, "y") + getScaledAttribute(node, "h")))
                 spunode.appendChild(button)
 
         elif node.nodeName=="button":
@@ -1737,9 +1747,9 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
             if not doesFileExist(maskimagefilename):
                     fatalError("Cannot find mask image for menu button (%s)." % maskimagefilename)
 
-            picture=Image.open(imagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+            picture=Image.open(imagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
             picture=picture.convert("RGBA")
-            bgimage.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+            bgimage.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")), picture)
             del picture
 
             # if we have some text paint that over the image
@@ -1749,10 +1759,10 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
                 text=expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
                 if text>"":
                     paintText( draw,
-                           int(textnode.attributes["x"].value),
-                           int(textnode.attributes["y"].value),
-                           int(textnode.attributes["w"].value),
-                           int(textnode.attributes["h"].value),
+                           getScaledAttribute(textnode, "x"),
+                           getScaledAttribute(textnode, "y"),
+                           getScaledAttribute(textnode, "w"),
+                           getScaledAttribute(textnode, "h"),
                            text,
                            themeFonts[int(textnode.attributes["font"].value)],
                            textnode.attributes["colour"].value,
@@ -1762,9 +1772,9 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
 
             write( "Added button image %s" % imagefilename)
 
-            picture=Image.open(maskimagefilename,"r").resize((int(node.attributes["w"].value), int(node.attributes["h"].value)))
+            picture=Image.open(maskimagefilename,"r").resize((getScaledAttribute(node, "w"), getScaledAttribute(node, "h")))
             picture=picture.convert("RGBA")
-            bgimagemask.paste(picture,(int(node.attributes["x"].value), int(node.attributes["y"].value)),picture)
+            bgimagemask.paste(picture, (getScaledAttribute(node, "x"), getScaledAttribute(node, "y")),picture)
             #del picture
 
             # if we have some text paint that over the image
@@ -1777,16 +1787,15 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
 
                 if text>"":
                     paintText(textDraw,
-                           int(node.attributes["x"].value) - int(textnode.attributes["x"].value),
-                           int(node.attributes["y"].value) - int(textnode.attributes["y"].value),
-                           int(textnode.attributes["w"].value),
-                           int(textnode.attributes["h"].value),
+                           getScaledAttribute(node, "x") - getScaledAttribute(textnode, "x"),
+                           getScaledAttribute(node, "y") - getScaledAttribute(textnode, "y"),
+                           getScaledAttribute(textnode, "w"),
+                           getScaledAttribute(textnode, "h"),
                            text,
                            themeFonts[int(textnode.attributes["font"].value)],
                            "white",
                            textnode.attributes["align"].value )
-                bgimagemask.paste(textnode.attributes["colour"].value, (int(textnode.attributes["x"].value), int(textnode.attributes["y"].value)),textImage)
-#               bgimagemask.paste(textImage, (int(textnode.attributes["x"].value), int(textnode.attributes["y"].value)),textImage)
+                bgimagemask.paste(textnode.attributes["colour"].value, (getScaledAttribute(textnode, "x"), getScaledAttribute(textnode, "y")), textImage)
                 boundarybox=checkBoundaryBox(boundarybox, node)
                 textImage.save(os.path.join(getTempPath(),"textimage-%s.png" % itemnum),"PNG",quality=99,optimize=0)
 
