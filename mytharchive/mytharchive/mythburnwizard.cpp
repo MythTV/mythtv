@@ -678,6 +678,65 @@ bool MythburnWizard::isArchiveItemValid(QString &type, QString &filename)
     return false;
 }
 
+bool MythburnWizard::hasCutList(QString &type, QString &filename)
+{
+    bool res = false;
+
+    if (type.lower() == "recording")
+    {
+        QString chanID, startTime;
+
+        if (extractDetailsFromFilename(filename, chanID, startTime))
+        {
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(chanID, startTime);
+
+            if (pinfo)
+            {
+                res = (pinfo->programflags & FL_CUTLIST);
+                delete pinfo;
+            }
+        }
+    }
+
+    return res;
+}
+
+bool MythburnWizard::extractDetailsFromFilename(const QString &inFile,
+                                QString &chanID, QString &startTime)
+{
+    QString filename = inFile;
+
+    chanID = "";
+    startTime = "";
+    bool res = false;
+
+    // remove any path
+    int pathStart = filename.findRev('/');
+    if (pathStart > 0)
+        filename = filename.mid(pathStart + 1);
+
+    int sep = filename.find('_');
+    if (sep != -1)
+    {
+        chanID = filename.left(sep);
+        startTime = filename.mid(sep + 1, filename.length() - sep - 5);
+        if (startTime.length() == 14)
+        {
+            QString year, month, day, hour, minute, second;
+            year = startTime.mid(0, 4);
+            month = startTime.mid(4, 2);
+            day = startTime.mid(6, 2);
+            hour = startTime.mid(8, 2);
+            minute = startTime.mid(10, 2);
+            second = startTime.mid(12, 2);
+            startTime = QString("%1-%2-%3T%4:%5:%6").arg(year).arg(month).arg(day)
+                    .arg(hour).arg(minute).arg(second);
+            res = true;
+        }
+    }
+    return res;
+}
+
 vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
 {
     vector<ArchiveItem*> *archiveList = new vector<ArchiveItem*>;
@@ -708,7 +767,7 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
                 item->startDate = QString::fromUtf8(query.value(6).toString());
                 item->startTime = QString::fromUtf8(query.value(7).toString());
                 item->filename = filename;
-                item->hasCutlist = (query.value(9).toInt() > 0);
+                item->hasCutlist = hasCutList(type, filename);
                 item->useCutlist = false;
                 item->editedDetails = false;
 

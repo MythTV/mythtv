@@ -91,6 +91,9 @@ class MythburnWizard : public MythThemedDialog
     vector<ArchiveItem *>  *getArchiveListFromDB(void);
     bool doRemoveArchiveItem(QString &filename);
     bool isArchiveItemValid(QString &type, QString &filename);
+    bool hasCutList(QString &type, QString &filename);
+    bool extractDetailsFromFilename(const QString &inFile,
+                                    QString &chanID, QString &startTime);
 
     vector<ArchiveItem *>  *archiveList;
     QPtrList<ArchiveItem> selectedList;

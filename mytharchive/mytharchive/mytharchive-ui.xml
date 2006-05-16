@@ -233,8 +233,10 @@ MythTV Archive GUI theme
     </container>
   </window>
 
-  <!--
+  <!-- 
+      *******************************************************************************
       Recording Selector
+      *******************************************************************************
   -->
   <window name="recording_selector">
 
@@ -368,25 +370,11 @@ MythTV Archive GUI theme
               <multiline>yes</multiline>
           </textarea>
 
-          <textarea name="usecutlist_text" draworder="4" align="left">
-              <area>80,505,500,40</area>
-              <font>detail</font>
-              <value>Use Cut List</value>
-          </textarea>
-
-          <checkbox name="usecutlist_check" draworder="4">
-              <position>45,500</position>
-              <image function="checked" filename="ma_checked.png"></image>
-              <image function="unchecked" filename="ma_unchecked.png"></image>
-              <image function="checked_high" filename="ma_checked_high.png"></image>
-              <image function="unchecked_high" filename="ma_unchecked_high.png"></image>
-          </checkbox>
-
-          <textarea name="nocutlist_text" draworder="4" align="left">
-              <area>40,505,500,40</area>
-              <font>detail</font>
-              <value>No Cutlist Available</value>
-          </textarea>
+          <image name="cutlist_image" draworder="5">
+              <position>45,505</position>
+              <staticsize>25,25</staticsize>
+              <filename>ma_cutlist.png</filename>
+          </image>
 
           <textarea name="filesize" draworder="5" align="right">
               <area>650,505,100,40</area>

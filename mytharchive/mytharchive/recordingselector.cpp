@@ -45,7 +45,7 @@ void RecordingSelector::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Burn", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Archive", e, actions);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -113,14 +113,6 @@ void RecordingSelector::keyPressEvent(QKeyEvent *e)
             else
                 activateCurrent();
         }
-        else if (action == "TOGGLECUT")
-        {
-            if (getContext() == 1 && usecutlist_check)
-            {
-                usecutlist_check->setState(!usecutlist_check->getState()); 
-                toggleUseCutlist(usecutlist_check->getState());
-            }
-        }
         else
             handled = false;
     }
@@ -179,16 +171,9 @@ void RecordingSelector::wireUpTheme()
     datetime_text = getUITextType("progdatetime");
     description_text = getUITextType("progdescription");
     filesize_text = getUITextType("filesize");
-    usecutlist_text = getUITextType("usecutlist_text");
-    nocutlist_text = getUITextType("nocutlist_text");
     preview_image = getUIImageType("preview_image");
+    cutlist_image = getUIImageType("cutlist_image");
 
-    usecutlist_check = getUICheckBoxType("usecutlist_check");
-    if (usecutlist_check)
-    {
-        connect(usecutlist_check, SIGNAL(pushed(bool)),
-                this, SLOT(toggleUseCutlist(bool)));
-    }
 
     recording_list = getUIListBtnType("recordinglist");
     if (recording_list)
@@ -202,31 +187,6 @@ void RecordingSelector::wireUpTheme()
     updateRecordingList();
 
     buildFocusList();
-}
-
-void RecordingSelector::toggleUseCutlist(bool state)
-{
-    UIListBtnTypeItem *item = recording_list->GetItemCurrent();
-    ProgramInfo *p = (ProgramInfo *) item->getData();
-
-    if (!p)
-        return; 
-
-    if (!(p->programflags) & FL_CUTLIST)
-        return;
-
-    if (state)
-    {
-        // add program to useCutlist list
-        if (useCutlistList.find(p) == -1)
-            useCutlistList.append(p);
-    }
-    else
-    {
-        // remove program from useCutlist list
-        if (useCutlistList.find(p) != -1)
-            useCutlistList.remove(p);
-    }
 }
 
 void RecordingSelector::titleChanged(UIListBtnTypeItem *item)
@@ -253,34 +213,12 @@ void RecordingSelector::titleChanged(UIListBtnTypeItem *item)
         filesize_text->SetText(formatSize(p->filesize / 1024));
     }
 
-    if (p->programflags & FL_CUTLIST)
+    if (cutlist_image)
     {
-        // program has a cut list
-        if (usecutlist_text) 
-            usecutlist_text->show();
-
-        if (usecutlist_check)
-        {
-            usecutlist_check->show();
-            // have we already set the useCutlist flag for this program
-            if (useCutlistList.find(p) != -1)
-                usecutlist_check->setState(true);
-            else
-                usecutlist_check->setState(false);
-        }
-
-        if (nocutlist_text)
-            nocutlist_text->hide();
-    }
-    else
-    {
-        // no cut list found
-        if (usecutlist_text) 
-            usecutlist_text->hide();
-        if (usecutlist_check)
-            usecutlist_check->hide();
-        if (nocutlist_text)
-            nocutlist_text->show();
+        if (p->programflags & FL_CUTLIST)
+            cutlist_image->show();
+        else
+            cutlist_image->hide();
     }
 
     if (preview_image)
@@ -322,7 +260,19 @@ void RecordingSelector::OKPressed()
         query.exec();
         if (query.isActive() && query.numRowsAffected())
         {
-            //already there
+            query.prepare("UPDATE archiveitems SET type = :TYPE, title = :TITLE, "
+                    "subtitle = :SUBTITLE, description = :DESCRIPTION, "
+                    "startdate = :STARTDATE, starttime = :STARTTIME, size = :SIZE, "
+                    "hascutlist = :HASCUTLIST WHERE filename = :FILENAME;");
+            query.bindValue(":TYPE", "Recording");
+            query.bindValue(":TITLE", p->title);
+            query.bindValue(":SUBTITLE", p->subtitle);
+            query.bindValue(":DESCRIPTION", p->description);
+            query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
+            query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
+            query.bindValue(":SIZE", p->filesize);
+            query.bindValue(":FILENAME", p->GetRecordBasename());
+            query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
         }
         else
         {

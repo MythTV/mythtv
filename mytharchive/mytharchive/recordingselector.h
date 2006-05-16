@@ -31,7 +31,6 @@ class RecordingSelector : public MythThemedDialog
 
     void setCategory(int);
     void titleChanged(UIListBtnTypeItem *item);
-    void toggleUseCutlist(bool state);
 
     private:
     QString themeDir; 
@@ -43,7 +42,6 @@ class RecordingSelector : public MythThemedDialog
 
     vector<ProgramInfo *>  *recordingList;
     QPtrList<ProgramInfo> selectedList;
-    QPtrList<ProgramInfo> useCutlistList;
 
     UIListBtnType    *recording_list;
 
@@ -55,10 +53,8 @@ class RecordingSelector : public MythThemedDialog
     UITextType       *datetime_text;
     UITextType       *filesize_text;
     UITextType       *description_text;
-    UITextType       *usecutlist_text;
-    UICheckBoxType   *usecutlist_check;
-    UITextType       *nocutlist_text;
     UIImageType      *preview_image;
+    UIImageType      *cutlist_image;
 };
 
 #endif
