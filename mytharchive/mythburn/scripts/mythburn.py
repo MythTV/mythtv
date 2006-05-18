@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060516-1"
+VERSION="0.1.20060518-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -348,12 +348,13 @@ def getDefaultParametersFromMythTVDB():
     write( "Obtaining MythTV settings from MySQL database for hostname " + configHostname)
 
     #TVFormat is not dependant upon the hostname.
-    sqlstatement="""select value, data from settings where value in('TVFormat', 'DBSchemaVer') 
+    sqlstatement="""select value, data from settings where value in('DBSchemaVer') 
                     or (hostname='""" + configHostname + """' and value in(
                         'RecordFilePrefix',
                         'VideoStartupDir',
                         'GalleryDir',
                         'MusicLocation',
+                        'MythArchiveVideoFormat',
                         'MythArchiveTempDir',
                         'MythArchiveFfmpegCmd',
                         'MythArchiveMplexCmd',
@@ -2613,8 +2614,18 @@ def processJob(job):
             #Move the created iso image to the given location
             if mediatype == FILE and savefilename != "":
                 write("Moving ISO image to: %s" % savefilename)
-                os.rename(os.path.join(getTempPath(), 'mythburn.iso'), savefilename)
-
+                try:
+                    os.rename(os.path.join(getTempPath(), 'mythburn.iso'), savefilename)
+                except:
+                    f1 = open(os.path.join(getTempPath(), 'mythburn.iso'), 'rb')
+                    f2 = open(savefilename, 'wb')
+                    data = f1.read(1024 * 1024)
+                    while data:
+                        f2.write(data)
+                        data = f1.read(1024 * 1024)
+                    f1.close()
+                    f2.close()
+                    os.unlink(os.path.join(getTempPath(), 'mythburn.iso'))
         else:
             write( "Nothing to do! (files)")
     else:
@@ -2696,7 +2707,7 @@ videopath = defaultsettings.get("VideoStartupDir", None)
 recordingpath = defaultsettings.get("RecordFilePrefix", None)
 gallerypath = defaultsettings.get("GalleryDir", None)
 musicpath = defaultsettings.get("MusicLocation", None)
-videomode = string.lower(defaultsettings["TVFormat"])
+videomode = string.lower(defaultsettings["MythArchiveVideoFormat"])
 temppath = defaultsettings["MythArchiveTempDir"] + "/work"
 logpath = defaultsettings["MythArchiveTempDir"] + "/logs"
 dvddrivepath = defaultsettings["MythArchiveDVDLocation"]
