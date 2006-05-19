@@ -184,16 +184,7 @@ class TVRec : public QObject
     /// \sa IsReallyRecording()
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
-    void SetChannelValue(QString &field_name,int value, ChannelBase *chan,
-                         const QString &channum);
-    int GetChannelValue(const QString &channel_field, ChannelBase *chan, 
-                        const QString &channum);
-    bool SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum);
-    QString GetNextChannel(ChannelBase *chan, int channeldirection);
-    QString GetNextRelativeChanID(QString channum, int channeldirection);
-    void DoGetNextChannel(QString &channum, QString channelinput,
-                          int cardid, QString channelorder,
-                          int channeldirection, QString &chanid);
+    bool SetVideoFiltersForChannel(uint sourceid, const QString &channum);
 
     bool IsBusy(void);
     bool IsReallyRecording(void);

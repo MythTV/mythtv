@@ -54,7 +54,6 @@ using namespace std;
 #include "cardutil.h"
 
 #include "dvbtypes.h"
-#include "dvbdev.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 #include "dvbdiseqc.h"
@@ -126,8 +125,8 @@ bool DVBChannel::Open()
     if (fd_frontend >= 0)
         return true;
 
-    fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, cardnum),
-                       O_RDWR | O_NONBLOCK);
+    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, cardnum);
+    fd_frontend = open(devname.ascii(), O_RDWR | O_NONBLOCK);
 
     if (fd_frontend < 0)
     {

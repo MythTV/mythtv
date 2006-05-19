@@ -25,6 +25,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythdbcon.h"
 #include "cardutil.h"
+#include "channelutil.h"
 
 #define LOC QString("ChannelBase(%1): ").arg(GetCardID())
 #define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
@@ -45,14 +46,21 @@ ChannelBase::~ChannelBase(void)
 bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
 {
     bool fTune = false;
+    uint chanid;
     QString start, nextchan;
-    start = nextchan = pParent->GetNextChannel(this, dir);
+    start = nextchan = ChannelUtil::GetNextChannel(
+        GetCardID(), GetCurrentInput(), GetCurrentName(),
+        dir,         channelorder,      chanid);
 
     do
     {
        fTune = SetChannelByString(nextchan);
        if (!fTune)
-           nextchan = pParent->GetNextChannel(this, dir);
+       {
+           nextchan = ChannelUtil::GetNextChannel(
+               GetCardID(), GetCurrentInput(), GetCurrentName(),
+               dir,         channelorder,      chanid);
+       }
     }
     while (!fTune && nextchan != start);
 

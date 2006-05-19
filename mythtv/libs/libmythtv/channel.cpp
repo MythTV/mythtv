@@ -493,7 +493,7 @@ bool Channel::SetChannelByString(const QString &chan)
     curchannelname = chan;
 
     if (pParent)
-        pParent->SetVideoFiltersForChannel(this, chan);
+        pParent->SetVideoFiltersForChannel(GetCurrentSourceID(), chan);
 
     SetContrast();
     SetColour();
@@ -930,7 +930,8 @@ void Channel::SetColourAttribute(int attrib, const char *name)
         return;
 
     QString field_name = name;
-    int field = pParent->GetChannelValue(field_name, this, curchannelname);
+    int field = ChannelUtil::GetChannelValueInt(
+        field_name, GetCurrentSourceID(), curchannelname);
 
     if (usingv4l2)
     {
@@ -1031,8 +1032,8 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
                      // in the case that we're just over or under 65535
 
     QString channel_field = name;
-    int current_value = pParent->GetChannelValue(channel_field, this, 
-                                                 curchannelname);
+    int current_value = ChannelUtil::GetChannelValueInt(
+        channel_field, GetCurrentSourceID(), curchannelname);
 
     int card_value;
 
@@ -1105,8 +1106,8 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
     if (current_value >= 0)
     {
         // tell the DB about the new attributes
-        pParent->SetChannelValue(channel_field, newvalue,
-                                 this, curchannelname);
+        ChannelUtil::SetChannelValue(channel_field, QString::number(newvalue),
+                                     GetCurrentSourceID(), curchannelname);
     }
 
     if (usingv4l2)
