@@ -11,7 +11,6 @@
 
 #ifdef USING_DVB
 #include "dvbchannel.h"
-#include "dvbdev.h"
 #endif
 
 #ifdef USING_V4L
@@ -48,9 +47,10 @@ bool CardUtil::IsCardTypePresent(const QString &strType)
 QString CardUtil::ProbeDVBType(uint device)
 {
     QString ret = "ERROR_UNKNOWN";
+    (void) device;
 
 #ifdef USING_DVB
-    QString dvbdev = dvbdevice(DVB_DEV_FRONTEND, device);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
         return "ERROR_OPEN";
@@ -84,9 +84,10 @@ QString CardUtil::ProbeDVBType(uint device)
 QString CardUtil::ProbeDVBFrontendName(uint device)
 {
     QString ret = "ERROR_UNKNOWN";
+    (void) device;
 
 #ifdef USING_DVB
-    QString dvbdev = dvbdevice(DVB_DEV_FRONTEND, device);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
         return "ERROR_OPEN";
@@ -564,6 +565,7 @@ QStringList CardUtil::probeV4LInputs(QString device)
 QStringList CardUtil::probeDVBInputs(QString device, int diseqc_type)
 {
     QStringList ret;
+
 #ifdef USING_DVB
     if (diseqc_type < 0)
     {
@@ -580,8 +582,11 @@ QStringList CardUtil::probeDVBInputs(QString device, int diseqc_type)
     for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
         ret += (*it).input;
 #else
+    (void) device;
+    (void) diseqc_type;
     ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
 #endif
+
     return ret;
 }
 
@@ -855,4 +860,22 @@ bool CardUtil::DeleteCard(uint cardid)
     }
 
     return true;
+}
+
+QString CardUtil::GetDeviceName(dvb_dev_type_t type, uint cardnum)
+{
+    if (DVB_DEV_FRONTEND == type)
+        return QString("/dev/dvb/adapter%1/frontend0").arg(cardnum);
+    else if (DVB_DEV_DVR == type)
+        return QString("/dev/dvb/adapter%1/dvr0").arg(cardnum);
+    else if (DVB_DEV_DEMUX == type)
+        return QString("/dev/dvb/adapter%1/demux0").arg(cardnum);
+    else if (DVB_DEV_CA == type)
+        return QString("/dev/dvb/adapter%1/ca0").arg(cardnum);
+    else if (DVB_DEV_AUDIO == type)
+        return QString("/dev/dvb/adapter%1/audio0").arg(cardnum);
+    else if (DVB_DEV_VIDEO == type)
+        return QString("/dev/dvb/adapter%1/video0").arg(cardnum);
+
+    return "";
 }

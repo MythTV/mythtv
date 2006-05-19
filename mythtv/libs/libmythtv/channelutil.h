@@ -35,6 +35,7 @@ class ChannelUtil
     static vector<uint> CreateMultiplexes(
         int sourceid, const NetworkInformationTable *nit);
 
+    static uint    GetMplexID(uint sourceid, const QString &channum);
     static int     GetMplexID(uint sourceid,     uint frequency);
     static int     GetMplexID(uint sourceid,     uint frequency,
                               uint transport_id, uint network_id);
@@ -44,7 +45,8 @@ class ChannelUtil
                                     int transport_id, int network_id);
 
     static int     GetTuningParams(int mplexid, QString &modulation);
-
+    static bool    GetATSCChannel(uint sourceid, const QString &channum,
+                                  uint &major,   uint          &minor);
     // Channel/Service Stuff
     static int     CreateChanID(uint sourceid, const QString &chan_num);
 
@@ -75,14 +77,57 @@ class ChannelUtil
                                  uint atsc_major_channel,
                                  uint atsc_minor_channel,
                                  int freqid);
+
     static bool    SetServiceVersion(int mplexid, int version);
 
     static int     GetChanID(int db_mplexid,    int service_transport_id,
                              int major_channel, int minor_channel,
                              int program_number);
+
     static int     GetServiceVersion(int mplexid);
 
-    // Misc
+    // Misc gets
+
+    static int     GetChanID(uint sourceid, const QString &channum)
+        { return GetChannelValueInt("chanid", sourceid, channum); }
+    static int     GetATSCSRCID(uint sourceid, const QString &channum)
+        { return GetChannelValueInt("atscsrcid", sourceid, channum); }
+    static int     GetProgramNumber(uint sourceid, const QString &channum)
+        { return GetChannelValueInt("serviceid", sourceid, channum); }
+    static QString GetVideoFilters(uint sourceid, const QString &channum)
+        { return GetChannelValueStr("videofilters", sourceid, channum); }
+
+    static QString GetNextChannel(uint           cardid,
+                                  const QString &inputname,
+                                  const QString &channum,
+                                  int            direction,
+                                  QString       &channelorder,
+                                  uint          &chanid);
+
+    static uint    GetNextChannel(uint           cardid,
+                                  const QString &inputname,
+                                  const QString &channum,
+                                  int            direction,
+                                  QString       &channelorder)
+    {
+        uint chanid = 0;
+        GetNextChannel(cardid,    inputname,    channum,
+                       direction, channelorder, chanid);
+        return chanid;
+    }
+
+    static QString GetChannelValueStr(const QString &channel_field,
+                                      uint           sourceid,
+                                      const QString &channum);
+
+    static int     GetChannelValueInt(const QString &channel_field,
+                                      uint           sourceid,
+                                      const QString &channum);
+
+    static bool    IsOnSameMultiplex(uint sourceid,
+                                     const QString &new_channum,
+                                     const QString &old_channum);
+
     /**
      * \brief Returns the channel-number string of the given channel.
      * \param chanid primary key for channel record
@@ -103,8 +148,24 @@ class ChannelUtil
     static QString GetDTVPrivateType(uint networkid, const QString &key,
                                      const QString sitype = "dvb");
 
+    // Misc sets
+    static bool    SetChannelValue(const QString &field_name,
+                                   QString        value,
+                                   uint           sourceid,
+                                   const QString &channum);
+
   private:
-      static QString GetChannelStringField(int chanid, const QString &field);
+    static QString GetChannelStringField(int chanid, const QString &field);
+    static QString GetChannelValueStr(const QString &channel_field,
+                                      uint           cardid,
+                                      const QString &input,
+                                      const QString &channum);
+
+    static int     GetChannelValueInt(const QString &channel_field,
+                                      uint           cardid,
+                                      const QString &input,
+                                      const QString &channum);
+
 };
 
 #endif // CHANUTIL_H

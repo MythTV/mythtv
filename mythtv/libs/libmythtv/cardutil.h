@@ -50,6 +50,16 @@ enum DISEQC_TYPES
 QString get_on_source(const QString&, uint, uint);
 QString get_on_input(const QString&, uint, const QString&);
 
+typedef enum
+{
+    DVB_DEV_FRONTEND = 1,
+    DVB_DEV_DVR,
+    DVB_DEV_DEMUX,
+    DVB_DEV_CA,
+    DVB_DEV_AUDIO,
+    DVB_DEV_VIDEO,
+} dvb_dev_type_t;
+
 /** \class CardUtil
  *  \brief Collection of helper utilities for capture card DB use
  */
@@ -163,6 +173,7 @@ class CardUtil
     static bool         HasDVBCRCBug(uint device);
     static uint         GetMinSignalMonitoringDelay(uint device);
     static DISEQC_TYPES GetDISEqCType(uint cardid);
+    static QString      GetDeviceName(dvb_dev_type_t, uint cardnum);
 
     // V4L info
     static bool         hasV4L2(int videofd);

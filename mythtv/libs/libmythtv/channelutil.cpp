@@ -1,11 +1,18 @@
 // -*- Mode: c++ -*-
 
+#include <algorithm>
+using namespace std;
+
 #include <qregexp.h>
 #include <stdint.h>
 
 #include "channelutil.h"
 #include "mythdbcon.h"
 #include "dvbtables.h"
+#include "tv.h" // for CHANNEL_DIRECTION
+
+#define LOC QString("ChanUtil: ")
+#define LOC_ERR QString("ChanUtil, Error: ")
 
 static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
                               uint frequency,
@@ -255,23 +262,6 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
         if (mux)
             muxes.push_back(mux);
     }
-#if 0
-    else if (tag == DescriptorID::frequency_list)
-    {
-        const FrequencyListDescriptor cd(desc);
-        //uint ct = cd.CodingType(); //nd,sat,cable,terra
-        for (uint i = 0; i < cd.FrequencyCount(); i++)
-        {
-            uint mux = ChannelUtil::CreateMultiplex(
-                sourceid,             "dvb",
-                cd.FrequencyHz(i),    QString::null/*modulation*/,
-                tsid,                 netid);
-
-            if (mux)
-                muxes.push_back(mux);
-        }
-    }
-#endif
 }
 
 uint ChannelUtil::CreateMultiplex(int  sourceid,     QString sistandard,
@@ -341,6 +331,27 @@ vector<uint> ChannelUtil::CreateMultiplexes(
         }
     }
     return muxes;
+}
+
+uint ChannelUtil::GetMplexID(uint sourceid, const QString &channum)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    /* See if mplexid is already in the database */
+    query.prepare(
+        "SELECT mplexid "
+        "FROM channel "
+        "WHERE sourceid  = :SOURCEID  AND "
+        "      channum   = :CHANNUM");
+
+    query.bindValue(":SOURCEID",  sourceid);
+    query.bindValue(":CHANNUM",   channum);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("GetMplexID 0", query);
+    else if (query.next())
+        return query.value(0).toInt();
+
+    return 0;
 }
 
 int ChannelUtil::GetMplexID(uint sourceid, uint frequency)
@@ -638,6 +649,7 @@ int ChannelUtil::GetSourceID(int db_mplexid)
 
 /** \fn ChannelUtil::GetInputName(int)
  *  \brief Returns input name for a card input
+ *  NOTE: This is BROKEN, it does not specify which card the input is on.
  */
 QString ChannelUtil::GetInputName(int source_id)
 {
@@ -655,6 +667,318 @@ QString ChannelUtil::GetInputName(int source_id)
         inputname = query.value(0).toString();
     }
     return inputname;
+}
+
+QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
+                                        uint           cardid,
+                                        const QString &input,
+                                        const QString &channum)
+{
+    QString retval = QString::null;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        QString(
+            "SELECT channel.%1 "
+            "FROM channel, capturecard, cardinput "
+            "WHERE channel.channum      = :CHANNUM           AND "
+            "      channel.sourceid     = cardinput.sourceid AND "
+            "      cardinput.inputname  = :INPUT             AND "
+            "      cardinput.cardid     = capturecard.cardid AND "
+            "      capturecard.cardid   = :CARDID ")
+        .arg(channel_field));
+
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":INPUT",    input);
+    query.bindValue(":CHANNUM",  channum);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("getchannelvalue", query);
+    else if (query.next())
+        retval = query.value(0).toString();
+
+    return retval;
+}
+
+QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
+                                        uint           sourceid,
+                                        const QString &channum)
+{
+    QString retval = QString::null;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        QString(
+            "SELECT channel.%1 "
+            "FROM channel "
+            "WHERE channum  = :CHANNUM AND "
+            "      sourceid = :SOURCEID")
+        .arg(channel_field));
+
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":CHANNUM",  channum);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("getchannelvalue", query);
+    else if (query.next())
+        retval = query.value(0).toString();
+
+    return retval;
+}
+
+int ChannelUtil::GetChannelValueInt(const QString &channel_field,
+                                    uint           cardid,
+                                    const QString &input,
+                                    const QString &channum)
+{
+    QString val = GetChannelValueStr(channel_field, cardid, input, channum);
+
+    int retval = 0;
+    if (!val.isEmpty())
+        retval = val.toInt();
+
+    return (retval) ? retval : -1;
+}
+
+int ChannelUtil::GetChannelValueInt(const QString &channel_field,
+                                    uint           sourceid,
+                                    const QString &channum)
+{
+    QString val = GetChannelValueStr(channel_field, sourceid, channum);
+
+    int retval = 0;
+    if (!val.isEmpty())
+        retval = val.toInt();
+
+    return (retval) ? retval : -1;
+}
+
+bool ChannelUtil::IsOnSameMultiplex(uint srcid,
+                                    const QString &new_channum,
+                                    const QString &old_channum)
+{
+    if (new_channum.isEmpty() || old_channum.isEmpty())
+        return false;
+
+    if (new_channum == old_channum)
+        return true;
+
+    uint old_mplexid = GetMplexID(srcid, old_channum);
+    if (!old_mplexid)
+        return false;
+
+    uint new_mplexid = GetMplexID(srcid, new_channum);
+    if (!new_mplexid)
+        return false;
+
+    return old_mplexid == new_mplexid;
+}
+
+bool ChannelUtil::SetChannelValue(const QString &field_name,
+                                  QString        value,
+                                  uint           sourceid,
+                                  const QString &channum)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        QString("UPDATE channel SET channel.%1=:VALUE "
+                "WHERE channel.channum  = :CHANNUM AND "
+                "      channel.sourceid = :SOURCEID").arg(field_name));
+
+    query.bindValue(":VALUE",    value);
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":SOURCEID", sourceid);
+
+    return query.exec();
+}
+
+QString ChannelUtil::GetNextChannel(
+    uint           cardid,       const QString &inputname,
+    const QString &channum,      int            direction,
+    QString       &channelorder, uint          &chanid)
+{
+    chanid = 0;
+    bool isNum = true;
+    channum.toULong(&isNum);
+
+    if (!isNum && channelorder == "channum + 0")
+    {
+        bool has_atsc = GetChannelValueInt("atscsrcid", cardid,
+                                           inputname, channum);
+        channelorder = (has_atsc) ? "atscsrcid" : "channum";
+        if (!has_atsc)
+        {
+            QString msg = QString(
+                "Your channel ordering method \"channel number (numeric)\"\n"
+                "\t\t\twill not work with channels like: '%1' \n"
+                "\t\t\tConsider switching to order by \"database order\"  \n"
+                "\t\t\tor \"channel number (alpha)\" in the general       \n"
+                "\t\t\tsettings section of the frontend setup             \n"
+                "\t\t\tSwitched to '%2' order.")
+                .arg(channum).arg(channelorder);
+            VERBOSE(VB_IMPORTANT, LOC + msg);
+        }
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString(
+        "SELECT %1 "
+        "FROM channel,capturecard,cardinput "
+        "WHERE channel.channum      = :CHANNUM           AND "
+        "      channel.sourceid     = cardinput.sourceid AND "
+        "      cardinput.cardid     = capturecard.cardid AND "
+        "      capturecard.cardid   = :CARDID            AND "
+        "      capturecard.hostname = :HOSTNAME").arg(channelorder);
+    query.prepare(querystr);
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+    QString id = QString::null;
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("getnextchannel 1", query);
+    else if (query.next())
+        id = query.value(0).toString();
+
+    if (id.isEmpty())
+    {
+        QString msg = QString(
+            "Channel: '%1' was not found in the database.\n"
+            "\t\t\tMost likely, the default channel set for this input\n"
+            "\t\t\tcardid %2, input '%3'\n"
+            "\t\t\tin setup is wrong\n")
+            .arg(channum).arg(cardid).arg(inputname);
+        VERBOSE(VB_IMPORTANT, LOC + msg);
+
+        querystr = QString(
+            "SELECT %1 "
+            "FROM channel, capturecard, cardinput "
+            "WHERE channel.sourceid     = cardinput.sourceid AND "
+            "      cardinput.cardid     = capturecard.cardid AND "
+            "      capturecard.cardid   = :CARDID            AND "
+            "      capturecard.hostname = :HOSTNAME "
+            "ORDER BY %2 "
+            "LIMIT 1").arg(channelorder).arg(channelorder);
+        query.prepare(querystr);
+        query.bindValue(":CARDID",   cardid);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("getnextchannel 2", query);
+        else if (query.next())
+            id = query.value(0).toString();
+    }
+
+    if (id.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Couldn't find any channels in the database,\n"
+                "\t\t\tplease make sure your inputs are associated\n"
+                "\t\t\tproperly with your cards.");
+        return "";
+    }
+
+    // Now let's try finding the next channel in the desired direction
+    QString comp = ">";
+    QString ordering = "";
+    QString fromfavorites = "";
+    QString wherefavorites = "";
+
+    if (direction == CHANNEL_DIRECTION_DOWN)
+    {
+        comp = "<";
+        ordering = " DESC ";
+    }
+    else if (direction == CHANNEL_DIRECTION_FAVORITE)
+    {
+        fromfavorites = ",favorites";
+        wherefavorites = "AND favorites.chanid = channel.chanid";
+    }
+    else if (direction == CHANNEL_DIRECTION_SAME)
+    {
+        comp = "=";
+    }
+
+    QString wherepart = QString(
+        "cardinput.cardid     = capturecard.cardid AND "
+        "capturecard.cardid   = :CARDID            AND "
+        "capturecard.hostname = :HOSTNAME          AND "
+        "channel.visible      = 1                  AND "
+        "cardinput.sourceid = channel.sourceid ");
+
+    querystr = QString(
+        "SELECT channel.channum, channel.chanid "
+        "FROM channel, capturecard, cardinput%1 "
+        "WHERE channel.%2 %3 :ID %4 AND "
+        "      %5 "
+        "ORDER BY channel.%6 %7 "
+        "LIMIT 1")
+        .arg(fromfavorites).arg(channelorder)
+        .arg(comp).arg(wherefavorites)
+        .arg(wherepart).arg(channelorder).arg(ordering);
+
+    query.prepare(querystr);
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":ID",       id);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("getnextchannel 3", query);
+    }
+    else if (query.next())
+    {
+        chanid = query.value(1).toUInt();
+        return query.value(0).toString();
+    }
+    else
+    {
+        // Couldn't find the channel going in the desired direction, 
+        // so loop around and find it on the flip side...
+        comp = "<";
+        if (direction == CHANNEL_DIRECTION_DOWN) 
+            comp = ">";
+
+        // again, %9 is the limit for this
+        querystr = QString(
+            "SELECT channel.channum, channel.chanid "
+            "FROM channel, capturecard, cardinput%1 "
+            "WHERE channel.%2 %3 :ID %4 AND "
+            "      %5 "
+            "ORDER BY channel.%6 %7 "
+            "LIMIT 1")
+            .arg(fromfavorites).arg(channelorder)
+            .arg(comp).arg(wherefavorites)
+            .arg(wherepart).arg(channelorder).arg(ordering);
+
+        query.prepare(querystr);
+        query.bindValue(":CARDID",   cardid);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":ID",       id); 
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("getnextchannel", query);
+        }
+        else if (query.next())
+        {
+            chanid = query.value(1).toUInt();
+            return query.value(0).toString();
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "getnextchannel, query failed: "<<querystr);
+        }
+    }
+
+    // just stay on same channel
+    chanid = max(GetChannelValueInt("chanid", cardid, inputname, channum), 0);
+    return channum;
 }
 
 int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
