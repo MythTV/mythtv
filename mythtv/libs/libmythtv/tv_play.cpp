@@ -6136,7 +6136,7 @@ bool TV::LoadDDMap(uint sourceid)
     }
 
     DataDirectProcessor ddp(DD_ZAP2IT, userid, passwd);
-    ddp.GrabFullLineup(lineupid);
+    ddp.GrabFullLineup(lineupid, true, 36*60*60);
     const DDLineupChannels channels = ddp.GetDDLineup(lineupid);
 
     InfoMap tmp;

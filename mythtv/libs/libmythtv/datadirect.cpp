@@ -1,10 +1,16 @@
 #include <unistd.h>
 
+// POSIX headers
+#include <sys/types.h> // for chmod
+#include <sys/stat.h>  // for chmod
+
+// Qt headers
 #include <qfile.h>
 #include <qstring.h>
 #include <qregexp.h>
 #include <qfileinfo.h>
 
+// MythTV headers
 #include "datadirect.h"
 #include "sourceutil.h"
 #include "channelutil.h"
@@ -517,7 +523,8 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     listings_provider(lp % DD_PROVIDER_COUNT),
     userid(user),               password(pass),
     inputfilename(""),          tmpPostFile(""),
-    tmpResultFile(""),          cookieFile("")
+    tmpResultFile(""),          cookieFile(""),
+    cookieFileDT()
 {
     DataDirectURLs urls0(
         "Tribune Media Zap2It",
@@ -1052,7 +1059,7 @@ void DataDirectProcessor::CreateTempTables()
         CreateATempTable(it.key(), *it);
 }
 
-bool DataDirectProcessor::GrabLoginCookiesAndLineups(void)
+bool DataDirectProcessor::GrabLoginCookiesAndLineups(bool parse_lineups)
 {
     VERBOSE(VB_GENERAL, "Grabbing login cookies and lineups");
 
@@ -1067,7 +1074,12 @@ bool DataDirectProcessor::GrabLoginCookiesAndLineups(void)
     bool ok = Post(labsURL + loginPage, list, tmpResultFile, "", cookieFile);
 
     bool got_cookie = QFileInfo(cookieFile).size() > 100;
-    return ok && got_cookie && ParseLineups(tmpResultFile);
+
+    ok &= got_cookie && (!parse_lineups || ParseLineups(tmpResultFile));
+    if (ok)
+        cookieFileDT = QDateTime::currentDateTime();
+
+    return ok;
 }
 
 bool DataDirectProcessor::GrabLineupForModify(const QString &lineupid)
@@ -1106,8 +1118,175 @@ void DataDirectProcessor::SetAll(const QString &lineupid, bool val)
         (*it).chk_checked = val;
 }
 
-bool DataDirectProcessor::GrabFullLineup(const QString &lineupid, bool restore)
+static QString get_cache_filename(const QString &lineupid)
 {
+    return QString("/tmp/.mythtv_cached_lineup_") + lineupid;
+}
+
+QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
+{
+    QDateTime cache_dt(QDate(1971, 1, 1));
+    QFile lfile(get_cache_filename(lineupid));
+    if (!lfile.exists())
+    {
+        VERBOSE(VB_GENERAL, "GrabLineupCacheAge("<<lineupid<<") failed -- "
+                <<QString("file '%1' doesn't exist")
+                .arg(get_cache_filename(lineupid)));
+        return cache_dt;
+    }
+    if (lfile.size() < 8)
+    {
+        VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("<<lineupid<<") failed -- "
+                <<QString("file '%1' size %2 too small")
+                .arg(get_cache_filename(lineupid)).arg(lfile.size()));
+        return cache_dt;
+    }
+    if (!lfile.open(IO_ReadOnly))
+    {
+        VERBOSE(VB_IMPORTANT, "GrabLineupCacheAge("<<lineupid<<") failed -- "
+                <<QString("can not open file '%1'")
+                .arg(get_cache_filename(lineupid)));
+        return cache_dt;
+    }
+
+    QString tmp;
+    QTextStream io(&lfile);
+    io >> tmp;
+    cache_dt = QDateTime::fromString(tmp, Qt::ISODate);
+
+    VERBOSE(VB_GENERAL, "GrabLineupCacheAge("<<lineupid<<") -> "
+            <<cache_dt.toString(Qt::ISODate));
+
+    return cache_dt;
+}
+
+bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
+{
+    QFile lfile(get_cache_filename(lineupid));
+    if (!lfile.exists() || (lfile.size() < 8) || !lfile.open(IO_ReadOnly))
+    {
+        VERBOSE(VB_IMPORTANT, "GrabLineupFromCache("<<lineupid<<") -- failed");
+        return false;
+    }
+
+    QString tmp;
+    uint size;
+    QTextStream io(&lfile);
+    io >> tmp; // read in date
+    io >> size; // read in number of channels mapped
+
+    for (uint i = 0; i < 14; i++)
+        io.readLine(); // read extra lines
+
+    DDLineupChannels &channels = lineupmaps[lineupid];
+    channels.clear();
+
+    for (uint i = 0; i < size; i++)
+    {
+        io.readLine(); // read "start record" string
+
+        DataDirectLineupMap chan;
+        chan.lineupid     = lineupid;
+        chan.stationid    = io.readLine();
+        chan.channel      = io.readLine();
+        chan.channelMinor = io.readLine();
+
+        chan.mapFrom = QDate();
+        tmp = io.readLine();
+        if (!tmp.isEmpty())
+            chan.mapFrom.fromString(tmp, Qt::ISODate);
+
+        chan.mapTo = QDate();
+        tmp = io.readLine();
+        if (!tmp.isEmpty())
+            chan.mapTo.fromString(tmp, Qt::ISODate);
+
+        channels.push_back(chan);
+
+        DDStation station;
+        station.stationid   = chan.stationid;
+        station.callsign    = io.readLine();
+        station.stationname = io.readLine();
+        station.affiliate   = io.readLine();
+        station.fccchannelnumber = io.readLine();
+        tmp = io.readLine(); // read "end record" string
+
+        stations[station.stationid] = station;
+    }
+
+    VERBOSE(VB_GENERAL, "GrabLineupFromCache("<<lineupid<<") -- success");
+
+    return true;
+}
+
+bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
+{
+    QString fn = get_cache_filename(lineupid);
+    QFile lfile(fn.ascii());
+    if (!lfile.open(IO_WriteOnly))
+    {
+        VERBOSE(VB_IMPORTANT, "SaveLineupToCache("<<lineupid<<") -- failed");
+        return false;
+    }
+
+    QTextStream io(&lfile);
+    io << QDateTime::currentDateTime().toString(Qt::ISODate) << endl;
+    
+    const DDLineupChannels channels = GetDDLineup(lineupid);
+    io << channels.size() << endl;
+
+    io << endl;
+    io << "# start record"       << endl;
+    io << "#   stationid"        << endl;
+    io << "#   channel"          << endl;
+    io << "#   channelMinor"     << endl;
+    io << "#   mapped from date" << endl;
+    io << "#   mapped to date"   << endl;
+    io << "#   callsign"         << endl;
+    io << "#   stationname"      << endl;
+    io << "#   affiliate"        << endl;
+    io << "#   fccchannelnumber" << endl;
+    io << "# end record"         << endl;
+    io << endl;
+
+    DDLineupChannels::const_iterator it;
+    for (it = channels.begin(); it != channels.end(); ++it)
+    {
+        io << "# start record"    << endl;
+        io << (*it).stationid     << endl;
+        io << (*it).channel       << endl;
+        io << (*it).channelMinor  << endl;
+        io << (*it).mapFrom.toString(Qt::ISODate) << endl;
+        io << (*it).mapTo.toString(Qt::ISODate)   << endl;
+
+        DDStation station = GetDDStation((*it).stationid);
+        io << station.callsign    << endl;
+        io << station.stationname << endl;
+        io << station.affiliate   << endl;
+        io << station.fccchannelnumber << endl;
+        io << "# end record"      << endl;
+    }
+
+    VERBOSE(VB_GENERAL, "SaveLineupToCache("<<lineupid<<") -- success");
+
+    chmod(fn.ascii(), 0666); // Let anybody update it
+
+    return true;
+}
+
+bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
+                                         bool restore,
+                                         uint cache_age_allowed_in_seconds)
+{
+    if (cache_age_allowed_in_seconds)
+    {
+        QDateTime exp_time = GetLineupCacheAge(lineupid)
+            .addSecs(cache_age_allowed_in_seconds);
+        bool valid = exp_time > QDateTime::currentDateTime();
+        if (valid && GrabLineupsFromCache(lineupid))
+            return true;
+    }
+
     bool ok = GrabLoginCookiesAndLineups();
     if (!ok)
         return false;
@@ -1127,6 +1306,9 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid, bool restore)
 
     ok = GrabLineupsOnly();
 
+    if (ok)
+        SaveLineupToCache(lineupid);
+
     (*lit).channels = orig_channels;
     if (restore)
         ok &= SaveLineupChanges(lineupid);
@@ -1141,6 +1323,14 @@ bool DataDirectProcessor::SaveLineup(const QString &lineupid,
     RawLineupMap::iterator lit = rawlineups.find(lineupid);
     if (lit == rawlineups.end())
         return false;
+
+    // Grab login cookies if they are more than 5 minutes old
+    if ((!cookieFileDT.isValid() ||
+         cookieFileDT.addSecs(5*60) < QDateTime::currentDateTime()) &&
+        !GrabLoginCookiesAndLineups(false))
+    {
+        return false;
+    }        
 
     // Get callsigns based on xmltv ids (aka stationid)
     DDLineupMap::const_iterator ddit = lineupmaps.find(lineupid);
@@ -1219,7 +1409,7 @@ bool DataDirectProcessor::UpdateListings(uint sourceid)
     bool ok = SaveLineup(lineupid, xmltvids);
 
     if (!ok)
-        VERBOSE(VB_IMPORTANT, "Failed to update DataDirect listings.");
+        VERBOSE(VB_GENERAL, "Failed to update DataDirect listings.");
 
     return ok;
 }

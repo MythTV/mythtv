@@ -261,20 +261,26 @@ class DataDirectProcessor
     bool GrabAllData(void);
 
     // screen scraper commands
-    bool GrabLoginCookiesAndLineups(void);
+    bool GrabLoginCookiesAndLineups(bool parse_lineups = true);
     bool GrabLineupForModify(const QString &lineupid);
     bool SaveLineupChanges(const QString &lineupid);
 
     // combined commands
-    bool GrabFullLineup(const QString &lineupid, bool restore = true);
+    bool GrabFullLineup(const QString &lineupid, bool restore = true,
+                        uint cache_age_allowed_in_seconds = 0);
     bool SaveLineup(const QString &lineupid,
                     const QMap<QString,bool> &xmltvids);
     bool UpdateListings(uint sourceid);
+
+    // cache commands
+    bool GrabLineupsFromCache(const QString &lineupid);
+    bool SaveLineupToCache(const QString &lineupid) const;
 
     // gets
     DDStationList GetStations(void)       const { return stations;           }
     DDLineupList  GetLineups(void)        const { return lineups;            }
     DDLineupMap   GetLineupMap(void)      const { return lineupmaps;         }
+    QDateTime     GetLineupCacheAge(const QString &lineupid) const;
 
     QString   GetUserID(void)             const { return userid;             }
     QString   GetPassword(void)           const { return password;           }
@@ -350,6 +356,7 @@ class DataDirectProcessor
     QString       tmpPostFile;
     QString       tmpResultFile;
     QString       cookieFile;
+    QDateTime     cookieFileDT;
 };
 
 #endif
