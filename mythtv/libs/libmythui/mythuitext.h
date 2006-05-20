@@ -42,6 +42,11 @@ class MythUIText : public MythUIType
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
 
+    virtual bool ParseElement(QDomElement &element);
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
+
     int m_Justification;
     QRect m_OrigDisplayRect;
     QRect m_AltDisplayRect;

@@ -1,7 +1,6 @@
 #include <qapplication.h>
 #include <qimage.h>
 #include <qdir.h>
-#include <qdom.h>
 
 #include <iostream>
 #include <cmath>
@@ -24,10 +23,7 @@ using namespace std;
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
-
-/* FIXME, remove, for globalFontMap */
-#include "uitypes.h"
-
+#include "xmlparsebase.h"
 
 struct TextAttributes
 {
@@ -88,45 +84,9 @@ struct MenuRow
     vector<ThemedButton *> buttons;
 };
 
-static QPoint parsePoint(const QString &text)
-{
-    int x, y;
-    QPoint retval;
-    if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
-        retval = QPoint(x, y);
-
-    retval = GetMythMainWindow()->NormPoint(retval);
-
-    return retval;
-}
-
-static QRect parseRect(const QString &text)
-{
-    int x, y, w, h;
-    QRect retval;
-    if (sscanf(text.data(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
-        retval = QRect(x, y, w, h);
-
-    retval = GetMythMainWindow()->NormRect(retval);
-
-    return retval;
-}
-
-static QString getFirstText(QDomElement &element)
-{
-    for (QDomNode dname = element.firstChild(); !dname.isNull();
-         dname = dname.nextSibling())
-    {
-        QDomText t = dname.toText();
-        if (!t.isNull())
-            return t.data();
-    }
-    return "";
-}
-
 class MythThemedMenuPrivate;
 
-class MythThemedMenuState
+class MythThemedMenuState: public XMLParseBase
 {
   public:
     MythThemedMenuState();
@@ -144,9 +104,6 @@ class MythThemedMenuState
     void parseText(TextAttributes &attributes, QDomElement &element);
     void parseOutline(TextAttributes &attributes, QDomElement &element);
     void parseShadow(TextAttributes &attributes, QDomElement &element);
-
-    /* FIXME: remove, compatability only */
-    void parseFont(QDomElement &element);
 
     void Reset(void);
     void setDefaults(void);
@@ -200,12 +157,11 @@ class MythThemedMenuState
 
     /* FIXME, remove */
     static bool parseFonts;
-    QString fontSizeType;
 };
 
 bool MythThemedMenuState::parseFonts = true;
 
-class MythThemedMenuPrivate
+class MythThemedMenuPrivate: public XMLParseBase
 {
   public:
     MythThemedMenuPrivate(MythThemedMenu *lparent, const char *cdir, 
@@ -276,9 +232,6 @@ class MythThemedMenuPrivate
     MythUIImage *downarrow;
 };
 
-/* FIXME: remove */
-extern QMap<QString, fontProp> globalFontMap;
-
 /////////////////////////////////////////////////////////////////////////////
 
 MythThemedMenuState::MythThemedMenuState()
@@ -298,9 +251,6 @@ MythThemedMenuState::MythThemedMenuState()
     callback = NULL;
 
     killable = false;
-
-    if (parseFonts)
-        fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
 }
 
 MythThemedMenuState::~MythThemedMenuState()
@@ -384,7 +334,7 @@ void MythThemedMenuState::parseBackground(const QString &dir, QDomElement& eleme
             }
             else if (info.tagName() == "buttonarea")
             {
-                buttonArea = parseRect(getFirstText(info));
+                buttonArea = parseRect(info);
                 hasarea = true;
 
                 if (info.hasAttribute("background"))
@@ -463,7 +413,7 @@ void MythThemedMenuState::parseShadow(TextAttributes &attributes,
             }
             else if (info.tagName() == "offset")
             {
-                offset = parsePoint(getFirstText(info));
+                offset = parsePoint(info);
                 hasoffset = true;
             }
             else if (info.tagName() == "alpha")
@@ -573,7 +523,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
             if (info.tagName() == "area") 
             {
                 hasarea = true;
-                attributes.textRect = parseRect(getFirstText(info));
+                attributes.textRect = parseRect(info);
                 attributes.textRect = QRect(attributes.textRect.x(), 
                                             attributes.textRect.y(),
                                             buttonnormal->width() - 
@@ -655,232 +605,6 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
     }
 }
 
-void MythThemedMenuState::parseFont(QDomElement &element)
-{
-    QString name;
-    QString face;
-    QString bold;
-    QString ital;
-    QString under;
-
-    int size = -1;
-    int sizeSmall = -1;
-    int sizeBig = -1;
-
-    QPoint shadowOffset = QPoint(0, 0);
-    QString color = "#ffffff";
-    QString dropcolor = "#000000";
-    QString hint;
-    QFont::StyleHint styleHint = QFont::AnyStyle;
-
-    bool haveSizeSmall = false;
-    bool haveSizeBig = false;
-    bool haveSize = false;
-    bool haveFace = false;
-    bool haveColor = false;
-    bool haveDropColor = false;
-    bool haveBold = false;
-    bool haveShadow = false;
-    bool haveItal = false;
-    bool haveUnder = false;
-
-    fontProp *baseFont = NULL;
-
-    name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT, "Font needs a name");
-        return;
-    }
-    QString base = element.attribute("base", "");
-    if (!base.isNull() && !base.isEmpty())
-    {
-        if (globalFontMap.contains(base))
-            baseFont = &globalFontMap[base];
-
-        if (!baseFont)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("ThemedMenuPrivate: Specified base font '%1' does not "
-                            "exist for font %2").arg(base).arg(face));
-            return;
-        }
-    }
-
-    face = element.attribute("face", "");
-    if (face.isNull() || face.isEmpty())
-    {
-        if (!baseFont)
-        {
-            VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Font needs a face");
-            return;
-        }
-    }
-    else
-    {
-        haveFace = true;
-    }
-
-    hint = element.attribute("stylehint", "");
-    if (!hint.isNull() && !hint.isEmpty())
-    {
-        styleHint = (QFont::StyleHint)hint.toInt();
-    }
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "size")
-            {
-                haveSize = true;
-                size = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "size:small")
-            {
-                haveSizeSmall = true;
-                sizeSmall = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "size:big")
-            {
-                haveSizeBig = true;
-                sizeBig = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "color")
-            {
-                haveColor = true;
-                color = getFirstText(info);
-            }
-            else if (info.tagName() == "dropcolor")
-            {
-                haveDropColor = true;
-                dropcolor = getFirstText(info);
-            }
-            else if (info.tagName() == "shadow")
-            {
-                haveShadow = true;
-                shadowOffset = parsePoint(getFirstText(info));
-            }
-            else if (info.tagName() == "bold")
-            {
-                haveBold = true;
-                bold = getFirstText(info);
-            }
-            else if (info.tagName() == "italics")
-            {
-                haveItal = true;
-                ital = getFirstText(info);
-            }
-            else if (info.tagName() == "underline")
-            {
-                haveUnder = true;
-                under = getFirstText(info);
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Unknown tag %1 in "
-                                              "font").arg(info.tagName()));
-                return;
-            }
-        }
-    }
-
-    if (globalFontMap.contains(name))
-    {
-        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Error, already have a "
-                                      "global font called: %1").arg(name));
-        return;
-    }
-
-    fontProp newFont;
-
-    if (baseFont)
-        newFont = *baseFont;
-
-    if (haveSizeSmall && fontSizeType == "small")
-    {
-        if (sizeSmall > 0)
-            size = sizeSmall;
-    }
-    else if (haveSizeBig && fontSizeType == "big")
-    {
-        if (sizeBig > 0)
-            size = sizeBig;
-    }
-
-    if (size < 0 && !baseFont)
-    {
-        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Error, font size must be > 0");
-        return;
-    }
-
-    if (baseFont && !haveSize)
-        size = baseFont->face.pointSize();
-
-    // If we don't have to, don't load the font.
-    if (!haveFace && baseFont)
-    {
-        newFont.face = baseFont->face;
-        if (haveSize)
-            newFont.face.setPointSize(size);
-    }
-    else
-    {
-        QFont temp = GetMythMainWindow()->CreateFont(face, size);
-        temp.setStyleHint(styleHint);
-        newFont.face = temp;
-    }
-
-    if (baseFont && !haveBold)
-        newFont.face.setBold(baseFont->face.bold());
-    else
-    {
-        if (bold.lower() == "yes")
-            newFont.face.setBold(true);
-        else
-            newFont.face.setBold(false);
-    }
-
-    if (baseFont && !haveItal)
-        newFont.face.setItalic(baseFont->face.italic());
-    else
-    {
-        if (ital.lower() == "yes")
-            newFont.face.setItalic(true);
-        else
-            newFont.face.setItalic(false);
-    }
-
-    if (baseFont && !haveUnder)
-        newFont.face.setUnderline(baseFont->face.underline());
-    else
-    {
-        if (under.lower() == "yes")
-            newFont.face.setUnderline(true);
-        else
-            newFont.face.setUnderline(false);
-    }
-
-    if (haveColor)
-    {
-        QColor foreColor(color);
-        newFont.color = foreColor;
-    }
-
-    if (haveDropColor)
-    {
-        QColor dropColor(dropcolor);
-        newFont.dropColor = dropColor;
-    }
-
-    if (haveShadow)
-        newFont.shadowOffset = shadowOffset;
-
-    globalFontMap[name] = newFont;
-}
-
 void MythThemedMenuState::parseButtonDefinition(const QString &dir, 
                                                 QDomElement &element)
 {
@@ -941,7 +665,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
             }
             else if (info.tagName() == "watermarkposition")
             {
-                watermarkPos = parsePoint(getFirstText(info));
+                watermarkPos = parsePoint(info);
             }
             else
             {
@@ -998,7 +722,7 @@ void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
             }
             else if (info.tagName() == "position")
             {
-                logopos = parsePoint(getFirstText(info));
+                logopos = parsePoint(info);
                 hasposition = true;
             }
             else
@@ -1061,7 +785,7 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
             }
             else if (info.tagName() == "position")
             {
-                titlePos = parsePoint(getFirstText(info));
+                titlePos = parsePoint(info);
                 hasposition = true;
             }
             else
@@ -1111,7 +835,7 @@ void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
             }
             else if (info.tagName() == "position")
             {
-                arrowpos = parsePoint(getFirstText(info));
+                arrowpos = parsePoint(info);
                 hasposition = true;
             }
             else
@@ -1186,7 +910,7 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             }
             else if (info.tagName() == "offset")
             {
-                offset = parsePoint(getFirstText(info));
+                offset = parsePoint(info);
                 hasoffset = true;
             }
             else if (info.tagName() == "watermarkimage")
@@ -1335,7 +1059,11 @@ bool MythThemedMenuState::parseSettings(const QString &dir, const QString &menun
             else if (e.tagName() == "font")
             {
                 if (parseFonts)
-                    parseFont(e);
+                {
+                    MythFontProperties *font;
+                    font = MythFontProperties::ParseFromXml(e, true);
+                    delete font;
+                }
             }
             else
             {
@@ -1987,7 +1715,7 @@ void MythThemedMenuPrivate::checkScrollArrows(void)
 
 bool MythThemedMenuPrivate::ReloadTheme(void)
 {
-    globalFontMap.clear();
+    GetGlobalFontMap()->Clear();
     m_state->parseFonts = true;
 
     buttonList.clear();

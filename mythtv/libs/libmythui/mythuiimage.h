@@ -8,6 +8,8 @@
 #include "mythuitype.h"
 #include "mythimage.h"
 
+class MythScreenType;
+
 class MythUIImage : public MythUIType
 {
   public:
@@ -44,16 +46,18 @@ class MythUIImage : public MythUIType
     void Init(void);
     void Clear(void);
 
+    virtual bool ParseElement(QDomElement &element);
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
+
     QString m_Filename;
     QString m_OrigFilename;
 
     QValueVector<MythImage *> m_Images;
 
-    int m_SkipX;
-    int m_SkipY;
-
-    int m_ForceW;
-    int m_ForceH;
+    QPoint m_Skip;
+    QSize  m_ForceSize;
 
     int m_Delay;
     int m_LowNum;
@@ -61,6 +65,8 @@ class MythUIImage : public MythUIType
 
     unsigned int m_CurPos;
     QTime m_LastDisplay;
+
+    bool m_NeedLoad;
 };
 
 #endif

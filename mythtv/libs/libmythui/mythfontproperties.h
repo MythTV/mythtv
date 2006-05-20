@@ -6,7 +6,9 @@
 #include <qpoint.h>
 #include <qmap.h>
 
-class MythFontProperties
+#include "xmlparsebase.h"
+
+class MythFontProperties: public XMLParseBase
 {
   public:
     MythFontProperties();
@@ -27,7 +29,13 @@ class MythFontProperties
 
     QString GetHash(void) const { return m_hash; }
 
+    static MythFontProperties *ParseFromXml(QDomElement &element,
+                                            bool addToGlobal = false);
+
   private:
+    void Freeze(void); // no hash updates
+    void Unfreeze(void);
+
     void CalcHash(void);
 
     QFont   m_face;
@@ -44,6 +52,10 @@ class MythFontProperties
     int     m_outlineAlpha;
 
     QString m_hash;
+
+    bool    m_bFreeze;
+
+    friend class GlobalFontMap;
 };
 
 class GlobalFontMap
@@ -55,6 +67,7 @@ class GlobalFontMap
   public:
     MythFontProperties *GetFont(const QString &text);
     bool AddFont(const QString &text, MythFontProperties *fontProp);
+    bool Contains(const QString &text);
 
     void Clear(void);
 

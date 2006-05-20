@@ -485,3 +485,44 @@ int MythUIType::NormY(const int y)
     return GetMythMainWindow()->NormY(y);
 }
 
+void MythUIType::CopyFrom(MythUIType *base)
+{
+    m_Visible = base->m_Visible;
+    m_CanHaveFocus = base->m_CanHaveFocus;
+
+    m_Alpha = base->m_Alpha;
+    m_AlphaChangeMode = base->m_AlphaChangeMode;
+    m_AlphaChange = base->m_AlphaChange;
+    m_AlphaMin = base->m_AlphaMin;
+    m_AlphaMax = base->m_AlphaMax;
+
+    m_Moving = base->m_Moving;
+    m_XYDestination = base->m_XYDestination;
+    m_XYSpeed = base->m_XYSpeed;
+
+    QValueVector<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+         (*it)->CreateCopy(this);
+    }
+}
+
+void MythUIType::CreateCopy(MythUIType *parent)
+{
+}
+
+//FIXME add alpha/movement/etc.
+bool MythUIType::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "position")
+        SetPosition(parsePoint(element));
+    else
+        return false;
+
+    return true;
+}
+
+void MythUIType::Finalize(void)
+{
+}
+

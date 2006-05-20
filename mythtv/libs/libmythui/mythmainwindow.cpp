@@ -1328,8 +1328,7 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
     return key_target;
 }
 
-QFont MythMainWindow::CreateFont(const QString &face, int pointSize, 
-                                 int weight, bool italic)
+int MythMainWindow::NormalizeFontSize(int pointSize)
 {
     QPaintDeviceMetrics pdm(this);
 
@@ -1337,7 +1336,13 @@ QFont MythMainWindow::CreateFont(const QString &face, int pointSize,
     pointSize = (int)(pointSize * desired / pdm.logicalDpiY());
     pointSize = (int)(pointSize * d->hmult);
 
-    return QFont(face, pointSize, weight, italic);
+    return pointSize;
+}
+
+QFont MythMainWindow::CreateFont(const QString &face, int pointSize, 
+                                 int weight, bool italic)
+{
+    return QFont(face, NormalizeFontSize(pointSize), weight, italic);
 }
 
 QRect MythMainWindow::NormRect(const QRect &rect)
@@ -1357,6 +1362,15 @@ QPoint MythMainWindow::NormPoint(const QPoint &point)
     QPoint ret;
     ret.setX((int)(point.x() * d->wmult));
     ret.setY((int)(point.y() * d->hmult));
+
+    return ret;
+}
+
+QSize MythMainWindow::NormSize(const QSize &size)
+{
+    QSize ret;
+    ret.setWidth((int)(size.width() * d->wmult));
+    ret.setHeight((int)(size.height() * d->hmult));
 
     return ret;
 }

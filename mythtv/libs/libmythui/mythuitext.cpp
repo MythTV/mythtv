@@ -1,7 +1,11 @@
+#include <qapplication.h>
+
 #include "mythuitext.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
+
+#include "mythcontext.h"
 
 MythUIText::MythUIText(MythUIType *parent, const char *name)
           : MythUIType(parent, name)
@@ -39,6 +43,15 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_Justification = (Qt::AlignLeft | Qt::AlignTop);
 
     m_colorCycling = false;
+}
+
+MythUIText::~MythUIText()
+{
+    if (m_Font)
+    {
+        delete m_Font;
+        m_Font = NULL;
+    }
 }
 
 void MythUIText::SetText(const QString &text)
@@ -194,11 +207,136 @@ void MythUIText::StopCycling(void)
     SetRedraw();
 }
 
-MythUIText::~MythUIText()
+bool MythUIText::ParseElement(QDomElement &element)
 {
-    if (m_Font)
+    if (element.tagName() == "area")
+        SetArea(parseRect(element));
+    else if (element.tagName() == "altarea")
+        m_AltDisplayRect = parseRect(element);
+    else if (element.tagName() == "font")
     {
-        delete m_Font;
-        m_Font = NULL;
+        // add local fonts to each uitype
     }
+    else if (element.tagName() == "value")
+    {
+        if ((m_Message.isNull() || m_Message.isEmpty()) &&
+            element.attribute("lang","") == "")
+        {
+            m_Message = qApp->translate("ThemeUI", getFirstText(element));
+        }
+        else if (element.attribute("lang","").lower() ==
+                 gContext->GetLanguageAndVariant())
+        {
+            m_Message = getFirstText(element);
+        }
+        else if (element.attribute("lang","").lower() ==
+                 gContext->GetLanguage())
+        {
+            m_Message = getFirstText(element);
+        }
+    }
+    else if (element.tagName() == "cutdown")
+    {
+        m_Cutdown = parseBool(element);
+    }
+    else if (element.tagName() == "multiline")
+    {
+        if (parseBool(element))
+            m_Justification |= Qt::WordBreak;
+        else
+            m_Justification &= ~Qt::WordBreak;
+    }
+    else if (element.tagName() == "align")
+    {
+        QString align = getFirstText(element).lower();
+
+        // preserve the wordbreak attribute, drop everything else
+        m_Justification = m_Justification & Qt::WordBreak;
+
+        if (align == "center")
+            m_Justification |= Qt::AlignCenter;
+        else if (align == "right")
+            m_Justification |= Qt::AlignRight;
+        else if (align == "left")
+            m_Justification |= Qt::AlignLeft;
+        else if (align == "allcenter")
+            m_Justification |= Qt::AlignHCenter | Qt::AlignVCenter;
+        else if (align == "vcenter")
+            m_Justification |= Qt::AlignVCenter;
+        else if (align == "hcenter")
+            m_Justification |= Qt::AlignHCenter;
+    }
+    else if (element.tagName() == "colorcycle")
+    {
+        if (GetMythPainter()->SupportsAnimation())
+        {
+            QString tmp = element.attribute("start");
+            if (!tmp.isEmpty())
+                m_startColor = QColor(tmp);
+            tmp = element.attribute("end");
+            if (!tmp.isEmpty())
+                m_endColor = QColor(tmp);
+            tmp = element.attribute("steps");
+            if (!tmp.isEmpty())
+                m_numSteps = tmp.toInt();
+
+            // initialize the rest of the stuff
+            CycleColor(m_startColor, m_endColor, m_numSteps);
+        }
+        else
+            m_colorCycling = false;
+
+        if (!element.attribute("disable").isEmpty())
+            m_colorCycling = false;
+    }
+    else
+        return MythUIType::ParseElement(element);
+
+    return true;
 }
+
+void MythUIText::CopyFrom(MythUIType *base)
+{
+    MythUIText *text = dynamic_cast<MythUIText *>(base);
+    if (!text)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    m_Justification = text->m_Justification;
+    m_OrigDisplayRect = text->m_OrigDisplayRect;
+    m_AltDisplayRect = m_AltDisplayRect;
+
+    m_Message = text->m_Message;
+    m_CutMessage = text->m_CutMessage;
+    m_DefaultMessage = text->m_DefaultMessage;
+
+    m_Cutdown = text->m_Cutdown;
+
+    *m_Font = *(text->m_Font);
+
+    m_colorCycling = text->m_colorCycling;
+    m_startColor = text->m_startColor;
+    m_endColor = text->m_endColor;
+    m_numSteps = text->m_numSteps;
+    m_curStep = text->m_curStep;
+    curR = text->curR;
+    curG = text->curG;
+    curB = text->curB;
+    incR = text->incR;
+    incG = text->incG;
+    incB = text->incB;
+}
+
+void MythUIText::CreateCopy(MythUIType *parent)
+{
+    MythUIText *text = new MythUIText(parent, name());
+    text->CopyFrom(this);
+}
+
+void MythUIText::Finalize(void)
+{
+    m_CutMessage = "";
+}
+

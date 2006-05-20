@@ -5,6 +5,9 @@ using namespace std;
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
+#include "mythcontext.h"
+#include "mythscreentype.h"
+
 MythUIImage::MythUIImage(const QString &filepattern,
                          int low, int high, int delayms,
                          MythUIType *parent, const char *name)
@@ -36,6 +39,10 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
 MythUIImage::MythUIImage(MythUIType *parent, const char *name)
            : MythUIType(parent, name)
 {
+    m_LowNum = 0;
+    m_HighNum = 0;
+    m_Delay = -1;
+
     Init();
 }
 
@@ -55,8 +62,8 @@ void MythUIImage::Clear(void)
 
 void MythUIImage::Init(void)
 {
-    m_SkipX = m_SkipY = 0;
-    m_ForceW = m_ForceH = -1;
+    m_Skip = QPoint(0, 0);
+    m_ForceSize = QSize(-1, -1);
 
     m_CurPos = 0;
     m_LastDisplay = QTime::currentTime();
@@ -68,7 +75,7 @@ void MythUIImage::SetFilename(const QString &filename)
 }
 
 void MythUIImage::SetFilepattern(const QString &filepattern, int low,
-                                         int high)
+                                 int high)
 {
     m_Filename = filepattern;
     m_LowNum = low;
@@ -120,14 +127,12 @@ void MythUIImage::SetImages(QValueVector<MythImage *> &m_Images)
 
 void MythUIImage::SetSize(int width, int height)
 {
-    m_ForceW = width;
-    m_ForceH = height;
+    m_ForceSize = QSize(width, height);
 }
 
 void MythUIImage::SetSkip(int x, int y)
 {
-    m_SkipX = x;
-    m_SkipY = y;
+    m_Skip = QPoint(x, y);
 }
 
 void MythUIImage::Load(void)
@@ -143,10 +148,10 @@ void MythUIImage::Load(void)
 
         image->Load(filename);
 
-        if (m_ForceW != -1 || m_ForceH != -1)
+        if (!m_ForceSize.isNull())
         {
-            int w = (m_ForceW != -1) ? m_ForceW : image->width();
-            int h = (m_ForceH != -1) ? m_ForceH : image->height();
+            int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : image->width();
+            int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : image->height();
 
             image->Assign(image->smoothScale(w, h));
         }
@@ -201,9 +206,77 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         int alpha = CalcAlpha(alphaMod); 
 
         QRect srcRect = m_Images[m_CurPos]->rect();
-        srcRect.setTopLeft(QPoint(m_SkipX, m_SkipY));
+        srcRect.setTopLeft(m_Skip);
 
         p->DrawImage(area, m_Images[m_CurPos], srcRect, alpha);
     }
 }
 
+bool MythUIImage::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "filename")
+        m_OrigFilename = m_Filename = getFirstText(element);
+    else if (element.tagName() == "filepattern")
+    {
+        m_OrigFilename = m_Filename = getFirstText(element);
+        QString tmp = element.attribute("low");
+        if (!tmp.isEmpty())
+            m_LowNum = tmp.toInt();
+        tmp = element.attribute("high");
+        if (!tmp.isEmpty())
+            m_HighNum = tmp.toInt();
+    }
+    else if (element.tagName() == "staticsize")
+        m_ForceSize = parseSize(element);
+    else if (element.tagName() == "skipin")
+        m_Skip = parsePoint(element);
+    else if (element.tagName() == "delay")
+        m_Delay = getFirstText(element).toInt();
+    else
+        return MythUIType::ParseElement(element);
+
+    m_NeedLoad = true;
+    return true;
+}
+
+void MythUIImage::CopyFrom(MythUIType *base)
+{
+    MythUIImage *im = dynamic_cast<MythUIImage *>(base);
+    if (!im)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    m_Filename = im->m_Filename;
+    m_OrigFilename = im->m_OrigFilename;
+
+    m_Skip = im->m_Skip;
+    m_ForceSize = im->m_ForceSize;
+
+    m_Delay = im->m_Delay;
+    m_LowNum = im->m_LowNum;
+    m_HighNum = im->m_HighNum;
+
+    m_LastDisplay = QTime::currentTime();
+    m_CurPos = 0;
+
+    SetImages(im->m_Images);
+
+    MythUIType::CopyFrom(base);
+}
+
+void MythUIImage::CreateCopy(MythUIType *parent)
+{
+    MythUIImage *im = new MythUIImage(parent, name());
+    im->CopyFrom(this);
+}
+
+void MythUIImage::Finalize(void)
+{
+    if (m_NeedLoad)
+        Load();
+
+    MythUIType::Finalize();
+}
+  

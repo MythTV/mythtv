@@ -8,6 +8,8 @@
 #include <qvaluevector.h>
 #include <qfont.h>
 
+#include "xmlparsebase.h"
+
 class MythImage;
 class MythPainter;
 class MythGestureEvent;
@@ -15,7 +17,7 @@ class MythGestureEvent;
 /**
  * Base UI type.  Children are drawn/processed in order added
  */
-class MythUIType : public QObject
+class MythUIType : public QObject, public XMLParseBase
 {
     Q_OBJECT
 
@@ -61,7 +63,7 @@ class MythUIType : public QObject
     void SetVisible(bool visible);
 
     void MoveTo(QPoint destXY, QPoint speedXY);
-    // make mode enum
+    //FIXME: make mode enum
     void AdjustAlpha(int mode, int alphachange, int minalpha = 0,
                      int maxalpha = 255);
     void SetAlpha(int newalpha);
@@ -109,6 +111,11 @@ class MythUIType : public QObject
     int NormX(const int width);
     int NormY(const int height);
 
+    virtual bool ParseElement(QDomElement &element);
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
+
     QValueVector<MythUIType *> m_ChildrenList;
 
     bool m_Visible;
@@ -131,6 +138,9 @@ class MythUIType : public QObject
     QPoint m_XYSpeed;
 
     MythUIType *m_Parent;
+
+    friend class XMLParseBase;
 };
+
 
 #endif
