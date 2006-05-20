@@ -229,6 +229,32 @@ QString get_on_input(const QString &to_get,
     return QString::null;
 }
 
+bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
+                   const QString value)
+{
+    QString tmp = get_on_source("capturecard.cardid", cardid, sourceid);
+    if (tmp.isEmpty())
+        return false;
+
+    bool ok;
+    uint input_cardid = tmp.toUInt(&ok);
+    if (!ok)
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("UPDATE capturecard SET %1 = :VALUE ").arg(to_set) +
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", input_cardid);
+    query.bindValue(":VALUE",  value);
+
+    if (query.exec())
+        return true;
+
+    MythContext::DBError("CardUtil::set_on_source", query);
+    return false;
+}
+
 /** \fn CardUtil::GetCardID(const QString&, QString)
  *  \brief Returns the cardid of the card that uses the specified
  *         videodevice, and optionally a non-local hostname.
@@ -444,6 +470,33 @@ bool CardUtil::hasV4L2(int videofd)
 #else // if !USING_V4L
     return false;
 #endif // !USING_V4L
+}
+
+bool CardUtil::GetV4LInfo(int videofd, QString &card, QString &driver)
+{
+    card = driver = QString::null;
+
+    if (videofd < 0)
+        return false;
+
+#ifdef USING_V4L
+    // First try V4L2 query
+    struct v4l2_capability capability;
+    bzero(&capability, sizeof(struct v4l2_capability));
+    if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
+    {
+        card.setAscii((char*)capability.card);
+        driver.setAscii((char*)capability.driver);
+    }
+    else // Fallback to V4L1 query
+    {
+        struct video_capability capability;
+        if (ioctl(videofd, VIDIOCGCAP, &capability) >= 0)
+            card.setAscii((char*)capability.name);
+    }
+#endif // !USING_V4L
+
+    return !card.isEmpty();
 }
 
 InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)

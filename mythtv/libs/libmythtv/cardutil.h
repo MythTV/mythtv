@@ -50,6 +50,8 @@ enum DISEQC_TYPES
 QString get_on_source(const QString&, uint, uint);
 QString get_on_input(const QString&, uint, const QString&);
 
+bool set_on_source(const QString&, uint, uint, const QString);
+
 typedef enum
 {
     DVB_DEV_FRONTEND = 1,
@@ -137,6 +139,17 @@ class CardUtil
     static QString      GetVBIDevice(uint cardid, const QString &input)
         { return get_on_input("vbidevice", cardid, input); }
 
+
+    static int          GetValueInt(const QString &col, uint cid, uint sid)
+        { return get_on_source(col, cid, sid).toInt(); }
+    static bool         SetValue(const QString &col, uint cid,
+                                 uint sid, int val)
+        { return set_on_source(col, cid, sid, QString::number(val)); }
+    static bool         SetValue(const QString &col, uint cid,
+                                 uint sid, const QString &val)
+        { return set_on_source(col, cid, sid, val); }
+
+
     static QString      GetDefaultInput(uint cardid);
     static QString      GetInputName(uint cardid, uint sourceid);
 
@@ -177,6 +190,7 @@ class CardUtil
 
     // V4L info
     static bool         hasV4L2(int videofd);
+    static bool         GetV4LInfo(int videofd, QString &card,QString &driver);
     static InputNames   probeV4LInputs(int videofd, bool &ok);
 
   private:
