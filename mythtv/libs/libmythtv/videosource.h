@@ -269,6 +269,57 @@ public:
     static void fillSelections(SelectSetting* setting);
 };
 
+class VBIDevice;
+
+class V4LConfigurationGroup : public VerticalConfigurationGroup
+{
+   Q_OBJECT
+
+  public:
+     V4LConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *cardinfo;
+    VBIDevice         *vbidev;
+    TunerCardInput    *input;
+};
+
+class MPEGConfigurationGroup: public VerticalConfigurationGroup
+{
+   Q_OBJECT
+
+  public:
+    MPEGConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *cardinfo;
+    TunerCardInput    *input;
+};
+
+class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    pcHDTVConfigurationGroup(CaptureCard& a_parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *cardinfo;
+    TunerCardInput    *input;
+};
+
 class TunerCardInput;
 class DVBCardName;
 class DVBCardType;

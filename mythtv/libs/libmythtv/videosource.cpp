@@ -500,88 +500,155 @@ void VideoSource::loadByID(int sourceid)
 class VideoDevice: public PathSetting, public CCSetting
 {
   public:
-    VideoDevice(const CaptureCard& parent,
-                uint minor_min=0, uint minor_max=UINT_MAX)
+    VideoDevice(const CaptureCard &parent,
+                uint    minor_min = 0,
+                uint    minor_max = UINT_MAX,
+                QString card      = QString::null,
+                QString driver    = QString::null)
       : PathSetting(true), CCSetting(parent, "videodevice")
     {
         setLabel(QObject::tr("Video device"));
 
         // /dev/v4l/video*
         QDir dev("/dev/v4l", "video*", QDir::Name, QDir::System);
-        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+        fillSelectionsFromDir(dev, minor_min, minor_max,
+                              card, driver, false);
 
         // /dev/video*
         dev.setPath("/dev");
-        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+        fillSelectionsFromDir(dev, minor_min, minor_max,
+                              card, driver, false);
 
         // /dev/dtv/video*
         dev.setPath("/dev/dtv");
-        fillSelectionsFromDir(dev, minor_min, minor_max, false);
+        fillSelectionsFromDir(dev, minor_min, minor_max,
+                              card, driver, false);
 
         // /dev/dtv*
         dev.setPath("/dev");
         dev.setNameFilter("dtv*");
-        fillSelectionsFromDir(dev, minor_min, minor_max, false);
-
-        VERBOSE(VB_IMPORTANT, "");
+        fillSelectionsFromDir(dev, minor_min, minor_max,
+                              card, driver, false);
     };
 
-    void fillSelectionsFromDir(const QDir& dir,
+    uint fillSelectionsFromDir(const QDir& dir,
                                uint minor_min, uint minor_max,
+                               QString card, QString driver,
                                bool allow_duplicates)
     {
+        uint cnt = 0;
         const QFileInfoList *il = dir.entryInfoList();
         if (!il)
-            return;
+            return cnt;
         
         QFileInfoListIterator it( *il );
         QFileInfo *fi;
-        
-        for(; (fi = it.current()) != 0; ++it)
+
+        for (; (fi = it.current()) != 0; ++it)
         {
             struct stat st;
             QString filepath = fi->absFilePath();
             int err = lstat(filepath, &st);
-            if (0==err)
-            {
-                if (S_ISCHR(st.st_mode))
-                {
-                    uint minor_num = minor(st.st_rdev);
-                    // this is a character device, if in minor range to list
-                    if (minor_min<=minor_num && 
-                        minor_max>=minor_num &&
-                        (allow_duplicates ||
-                         (minor_list.find(minor_num)==minor_list.end())))
-                    {
-                        addSelection(filepath);
-                        minor_list[minor_num]=1;
-                    }
-                }
-            }
-            else
+
+            if (0 != err)
             {
                 VERBOSE(VB_IMPORTANT,
                         QString("Could not stat file: %1").arg(filepath));
+                continue;
             }
+
+            // is this is a character device?
+            if (!S_ISCHR(st.st_mode))
+                continue;
+
+            // is this device is in our minor range?
+            uint minor_num = minor(st.st_rdev);
+            if (minor_min > minor_num || minor_max < minor_num)
+                continue;
+
+            // ignore duplicates if allow_duplicates not set
+            if (!allow_duplicates && minor_list[minor_num])
+                continue;
+
+            // if the driver returns any info add this device to our list
+            int videofd = open(filepath.ascii(), O_RDWR);
+            if (videofd >= 0)
+            {
+                QString cn, dn;
+                if (CardUtil::GetV4LInfo(videofd, cn, dn) &&
+                    (driver.isEmpty() || (dn == driver))  &&
+                    (card.isEmpty()   || (cn == card)))
+                {
+                    addSelection(filepath);
+                    cnt++;
+                }
+                close(videofd);
+            }
+
+            // add to list of minors discovered to avoid duplicates
+            minor_list[minor_num] = 1;
         }
+
+        return cnt;
     }
 
   private:
     QMap<uint, uint> minor_list;
 };
 
-class VbiDevice: public PathSetting, public CCSetting
+class VBIDevice: public PathSetting, public CCSetting
 {
   public:
-    VbiDevice(const CaptureCard& parent)
+    VBIDevice(const CaptureCard& parent)
       : PathSetting(true), CCSetting(parent, "vbidevice")
     {
         setLabel(QObject::tr("VBI device"));
-        QDir dev("/dev", "vbi*", QDir::Name, QDir::System);
-        fillSelectionsFromDir(dev);
-        dev.setPath("/dev/v4l");
-        fillSelectionsFromDir(dev);
+        setFilter(QString::null, QString::null);
     };
+
+    void setFilter(const QString &card, const QString &driver)
+    {
+        clearSelections();
+        QDir dev("/dev/v4l", "vbi*", QDir::Name, QDir::System);
+        if (!fillSelectionsFromDir(dev, card, driver))
+        {
+            dev.setPath("/v4l");
+            fillSelectionsFromDir(dev, card, driver);
+        }
+    }
+
+    uint fillSelectionsFromDir(const QDir &dir, const QString &card,
+                               const QString &driver)
+    {
+        uint cnt = 0;
+        const QFileInfoList *il = dir.entryInfoList();
+        if (!il)
+            return cnt;
+
+        QFileInfoListIterator it(*il);
+        QFileInfo *fi;
+
+        for (; (fi = it.current()) != 0; ++it)
+        {
+            QString device = fi->absFilePath();
+            int vbifd = open(device.ascii(), O_RDWR);
+            if (vbifd < 0)
+                continue;
+
+            QString cn, dn;
+            if (CardUtil::GetV4LInfo(vbifd, cn, dn)  &&
+                (driver.isEmpty() || (dn == driver)) &&
+                (card.isEmpty()   || (cn == card)))
+            {
+                addSelection(device);
+                cnt++;
+            }
+
+            close(vbifd);
+        }
+
+        return cnt;
+    }
 };
 
 class AudioDevice: public PathSetting, public CCSetting
@@ -964,81 +1031,132 @@ class HDHomeRunConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard& parent;
 };
 
-class V4LConfigurationGroup: public VerticalConfigurationGroup
+V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent),
+    cardinfo(new TransLabelSetting()),  vbidev(new VBIDevice(parent)),
+    input(new TunerCardInput(parent))
 {
-  public:
-    V4LConfigurationGroup(CaptureCard& a_parent):
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false),
-        parent(a_parent)
-    {
-        VideoDevice* device;
-        TunerCardInput* input;
+    VideoDevice *device = new VideoDevice(parent);
+    HorizontalConfigurationGroup *audgrp =
+        new HorizontalConfigurationGroup(false, false, true, true);
 
-        addChild(device = new VideoDevice(parent));
-        addChild(new VbiDevice(parent));
-        addChild(new AudioDevice(parent));
+    cardinfo->setLabel(tr("Probed info"));
+    audgrp->addChild(new AudioRateLimit(parent));
+    audgrp->addChild(new SkipBtAudio(parent));
 
-        HorizontalConfigurationGroup *ag;
-        ag = new HorizontalConfigurationGroup(false, false);
-        ag->addChild(new AudioRateLimit(parent));
-        ag->addChild(new SkipBtAudio(parent));
-        addChild(ag);
+    addChild(device);
+    addChild(cardinfo);
+    addChild(vbidev);
+    addChild(new AudioDevice(parent));
+    addChild(audgrp);
+    addChild(input);
 
-        addChild(input = new TunerCardInput(parent));
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
 
-        connect(device, SIGNAL(valueChanged(const QString&)),
-                input, SLOT(fillSelections(const QString&)));
-        input->fillSelections(device->getValue());
-    };
-  private:
-    CaptureCard& parent;
+    probeCard(device->getValue());
 };
 
-class MPEGConfigurationGroup: public VerticalConfigurationGroup
+void V4LConfigurationGroup::probeCard(const QString &device)
 {
-  public:
-    MPEGConfigurationGroup(CaptureCard& a_parent):
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false),
-        parent(a_parent)
+    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+
+    int videofd = open(device.ascii(), O_RDWR);
+    if (videofd >= 0)
     {
-        VideoDevice* device;
-        TunerCardInput* input;
+        if (!CardUtil::GetV4LInfo(videofd, cn, dn))
+            ci = cn = tr("Failed to probe");
+        else if (!dn.isEmpty())
+            ci = cn + "  [" + dn + "]";
+        close(videofd);
+    }
 
-        addChild(device = new VideoDevice(parent, 0, 15));
-        addChild(input = new TunerCardInput(parent));
-        connect(device, SIGNAL(valueChanged(const QString&)),
-                input, SLOT(fillSelections(const QString&)));
-        input->fillSelections(device->getValue());
-    };
-  private:
-    CaptureCard& parent;
-};
+    cardinfo->setValue(ci);
+    vbidev->setFilter(cn, dn);
+    input->fillSelections(device);
+}
 
-class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
+
+MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent), cardinfo(new TransLabelSetting()),
+    input(new TunerCardInput(parent))
 {
-  public:
-    pcHDTVConfigurationGroup(CaptureCard& a_parent): 
-        ConfigurationGroup(false, true, false, false),
-        VerticalConfigurationGroup(false, true, false, false),
-        parent(a_parent)
+    VideoDevice *device =
+        new VideoDevice(parent, 0, 15, QString::null, "ivtv");
+
+    cardinfo->setLabel(tr("Probed info"));
+
+    addChild(device);
+    addChild(cardinfo);
+    addChild(input);
+
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
+
+    probeCard(device->getValue());
+}
+
+void MPEGConfigurationGroup::probeCard(const QString &device)
+{
+    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+
+    int videofd = open(device.ascii(), O_RDWR);
+    if (videofd >= 0)
     {
-        VideoDevice *atsc_device = new VideoDevice(parent, 0, 64);
-        TunerCardInput *atsc_input = new TunerCardInput(parent);
-        SignalTimeout *signal_timeout = new SignalTimeout(parent, 500);
-        ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000);
-        addChild(atsc_device);
-        addChild(signal_timeout);
-        addChild(channel_timeout);
-        addChild(atsc_input);
-        connect(atsc_device, SIGNAL(valueChanged(const QString&)),
-                atsc_input, SLOT(fillSelections(const QString&)));
-        atsc_input->fillSelections(atsc_device->getValue());
-    };
-  private:
-    CaptureCard& parent;
-};
+        if (!CardUtil::GetV4LInfo(videofd, cn, dn))
+            ci = cn = tr("Failed to probe");
+        else if (!dn.isEmpty())
+            ci = cn + "  [" + dn + "]";
+        close(videofd);
+    }
+
+    cardinfo->setValue(ci);
+    input->fillSelections(device);
+}
+
+pcHDTVConfigurationGroup::pcHDTVConfigurationGroup(CaptureCard& a_parent) :
+    ConfigurationGroup(false, true, false, false),
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent), cardinfo(new TransLabelSetting()),
+    input(new TunerCardInput(parent))
+{
+    VideoDevice    *atsc_device     = new VideoDevice(parent, 0, 64);
+    SignalTimeout  *signal_timeout  = new SignalTimeout(parent, 500);
+    ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000);
+
+    addChild(atsc_device);
+    addChild(cardinfo);
+    addChild(signal_timeout);
+    addChild(channel_timeout);
+    addChild(input);
+
+    connect(atsc_device, SIGNAL(valueChanged(const QString&)),
+            this,        SLOT(  probeCard(   const QString&)));
+
+    probeCard(atsc_device->getValue());
+}
+
+void pcHDTVConfigurationGroup::probeCard(const QString &device)
+{
+    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+
+    int videofd = open(device.ascii(), O_RDWR);
+    if (videofd >= 0)
+    {
+        if (!CardUtil::GetV4LInfo(videofd, cn, dn))
+            ci = cn = tr("Failed to probe");
+        else if (!dn.isEmpty())
+            ci = cn + "  [" + dn + "]";
+        close(videofd);
+    }
+
+    cardinfo->setValue(ci);
+    input->fillSelections(device);
+}
 
 CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
     ConfigurationGroup(true, true, false, false),
