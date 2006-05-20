@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060520-1"
+VERSION="0.1.20060520-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -59,6 +59,9 @@ import xml.dom.minidom
 import Image, ImageDraw, ImageFont
 import MySQLdb, codecs
 import time, datetime, tempfile
+from fcntl import ioctl
+from CDROM import CDROMEJECT
+from CDROM import CDROMCLOSETRAY
 
 # media types (should match the enum in mytharchivewizard.h)
 DVD_SL = 0
@@ -1131,18 +1134,28 @@ def BurnDVDISO():
         command = path_growisofs[0] + " -Z " + dvddrivepath + \
                   " -dvd-video -V 'MythTV BurnDVD' " + os.path.join(getTempPath(),'dvd')
 
-    result = os.system(command)
+    if os.system(command) != 0:
+        write("ERROR: Retrying to start growisofs after reload.")
+        f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+        r = ioctl(f,CDROMEJECT, 0)
+        os.close(f)
+        f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+        r = ioctl(f,CDROMCLOSETRAY, 0)
+        os.close(f)
+        result = os.system(command)
+        if result != 0:
+            write("-"*60)
+            write("ERROR: Failed while running growisofs")
+            write("Result %d, Command was: %s" % (result, command))
+            write("Please check the troubleshooting section of the README for ways to fix this error")
+            write("-"*60)
+            write("")
+            sys.exit(1)
 
-    if result <> 0:
-        write("-"*60)
-        write("ERROR: Failed while running growisofs")
-        write("Result %d, Command was: %s" % (result, command))
-        write("Please check the troubleshooting section of the README for ways to fix this error")
-        write("-"*60)
-        write("")
-        os.exit(2)
-
-    os.spawnlp(os.P_WAIT, 'eject', 'eject', dvddrivepath)
+    # eject the burned disc
+    f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+    r = ioctl(f,CDROMEJECT, 0)
+    os.close(f)
 
     write("Finished burning ISO image")
 
@@ -2178,7 +2191,7 @@ def selectStreams(folder):
     if nodes.length == 0:
         write("Didn't find any video elements in stream info file.!!!")
         write("");
-        os.exit(1)
+        sys.exit(1)
     if nodes.length > 1:
         write("Found more than one video element in stream info file.!!!")
     node = nodes[0]
@@ -2198,7 +2211,7 @@ def selectStreams(folder):
     if nodes.length == 0:
         write("Didn't find any audio elements in stream info file.!!!")
         write("");
-        os.exit(1)
+        sys.exit(1)
 
     found = False
     # first try to find a stream with ac3 and preferred language 1
@@ -2321,7 +2334,7 @@ def selectAspectRatio(folder):
     if nodes.length == 0:
         write("Didn't find any video elements in stream info file.!!!")
         write("");
-        os.exit(1)
+        sys.exit(1)
     if nodes.length > 1:
         write("Found more than one video element in stream info file.!!!")
     node = nodes[0]
@@ -2354,7 +2367,7 @@ def getVideoCodec(folder):
     if nodes.length == 0:
         write("Didn't find any video elements in stream info file!!!")
         write("");
-        os.exit(1)
+        sys.exit(1)
     if nodes.length > 1:
         write("Found more than one video element in stream info file!!!")
     node = nodes[0]
@@ -2373,7 +2386,7 @@ def getFileType(folder):
     if nodes.length == 0:
         write("Didn't find any file elements in stream info file!!!")
         write("");
-        os.exit(1)
+        sys.exit(1)
     if nodes.length > 1:
         write("Found more than one file element in stream info file!!!")
     node = nodes[0]
