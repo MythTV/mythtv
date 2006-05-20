@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060518-1"
+VERSION="0.1.20060520-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -1149,20 +1149,37 @@ def BurnDVDISO():
 def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
     checkCancelFlag()
 
-    command = "mythreplex --demux  -o %s " % (folder + "/stream")
-    command += "-v %d " % (video[VIDEO_ID] & 255)
+    if getFileType(folder) == "mpegts":
+        command = "mythreplex --demux  -t TS -o %s " % (folder + "/stream")
+        command += "-v %d " % (video[VIDEO_ID])
 
-    if audio1[AUDIO_ID] != -1: 
-        if audio1[AUDIO_CODEC] == 'MP2':
-            command += "-a %d " % (audio1[AUDIO_ID] & 255)
-        elif audio1[AUDIO_CODEC] == 'AC3':
-            command += "-c %d " % (audio1[AUDIO_ID] & 255)
+        if audio1[AUDIO_ID] != -1: 
+            if audio1[AUDIO_CODEC] == 'MP2':
+                command += "-a %d " % (audio1[AUDIO_ID])
+            elif audio1[AUDIO_CODEC] == 'AC3':
+                command += "-c %d " % (audio1[AUDIO_ID])
 
-    if audio2[AUDIO_ID] != -1: 
-        if audio2[AUDIO_CODEC] == 'MP2':
-            command += "-a %d " % (audio2[AUDIO_ID] & 255)
-        elif audio2[AUDIO_CODEC] == 'AC3':
-            command += "-c %d " % (audio2[AUDIO_ID] & 255)
+        if audio2[AUDIO_ID] != -1: 
+            if audio2[AUDIO_CODEC] == 'MP2':
+                command += "-a %d " % (audio2[AUDIO_ID])
+            elif audio2[AUDIO_CODEC] == 'AC3':
+                command += "-c %d " % (audio2[AUDIO_ID])
+
+    else:
+        command = "mythreplex --demux  -o %s " % (folder + "/stream")
+        command += "-v %d " % (video[VIDEO_ID] & 255)
+
+        if audio1[AUDIO_ID] != -1: 
+            if audio1[AUDIO_CODEC] == 'MP2':
+                command += "-a %d " % (audio1[AUDIO_ID] & 255)
+            elif audio1[AUDIO_CODEC] == 'AC3':
+                command += "-c %d " % (audio1[AUDIO_ID] & 255)
+
+        if audio2[AUDIO_ID] != -1: 
+            if audio2[AUDIO_CODEC] == 'MP2':
+                command += "-a %d " % (audio2[AUDIO_ID] & 255)
+            elif audio2[AUDIO_CODEC] == 'AC3':
+                command += "-c %d " % (audio2[AUDIO_ID] & 255)
 
     mediafile = quoteFilename(mediafile)
     command += mediafile
@@ -2343,6 +2360,26 @@ def getVideoCodec(folder):
     node = nodes[0]
     return node.attributes["codec"].value
 
+def getFileType(folder):
+    """Get the overall file type from the streaminfo.xml for the file"""
+
+    #open the XML containing information about this file
+    infoDOM = xml.dom.minidom.parse(os.path.join(folder, 'streaminfo.xml'))
+    #error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "file":
+        fatalError("This does not look like a stream info file (%s)" % os.path.join(folder, 'streaminfo.xml'))
+
+    nodes = infoDOM.getElementsByTagName("file")
+    if nodes.length == 0:
+        write("Didn't find any file elements in stream info file!!!")
+        write("");
+        os.exit(1)
+    if nodes.length > 1:
+        write("Found more than one file element in stream info file!!!")
+    node = nodes[0]
+
+    return node.attributes["type"].value
+
 def isFileOkayForDVD(folder):
     """return true if the file is dvd compliant"""
 
@@ -2393,7 +2430,8 @@ def processFile(file, folder):
     #run mythtranscode to cut out commercials etc
     if file.attributes["type"].value == "recording":
         #can only use mythtranscode to cut commercials on mpeg2 files
-        write("File codec is '%s'" % getVideoCodec(folder))
+        write("File type is '%s'" % getFileType(folder))
+        write("Video codec is '%s'" % getVideoCodec(folder))
         if string.lower(getVideoCodec(folder)) == "mpeg2video": 
             if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
                 write("File has a cut list - attempting to run mythtrancode to remove unwanted segments")
@@ -2406,7 +2444,7 @@ def processFile(file, folder):
             else:
                 #does the user always want to run recordings through mythtranscode?
                 #may help to fix any errors in the file 
-                if alwaysRunMythtranscode == True:
+                if alwaysRunMythtranscode == True or getFileType(folder) == "mpegts":
                     write("Attempting to run mythtranscode --mpeg2 to fix any errors")
                     chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                     starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
