@@ -10,7 +10,8 @@
 #include <qtimer.h>
 
 #include "mythdbcon.h"
-#include "tv.h"
+#include "tv_play.h"
+#include "tv_rec.h"
 #include "osd.h"
 #include "osdsurface.h"
 #include "osdtypes.h"

@@ -17,7 +17,6 @@ using namespace std;
 #include "dbox2channel.h"
 #include "dbox2recorder.h"
 #include "dbox2epg.h"
-#include "tv_rec.h"
 
 //#define DBOX2_CHANNEL_DEBUG
 

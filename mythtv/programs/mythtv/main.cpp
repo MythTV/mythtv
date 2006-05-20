@@ -1,8 +1,11 @@
+#include <unistd.h>
+
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qstring.h>
-#include <unistd.h>
-#include "tv.h"
+#include <qregexp.h>
+
+#include "tv_play.h"
 #include "programinfo.h"
 
 #include "libmyth/exitcodes.h"

@@ -1,6 +1,8 @@
 #ifndef TV_H
 #define TV_H
 
+#include <qstring.h>
+
 /** \brief ChannelChangeDirection is an enumeration of possible channel
  *         changing directions.
  */
@@ -49,9 +51,6 @@ typedef enum
 } TVState;
 
 const int kLiveTVAutoExpire = 10000;
-
-#include "tv_play.h"
-#include "tv_rec.h"
 
 QString StateToString(TVState state);
 

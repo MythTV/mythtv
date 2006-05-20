@@ -9,6 +9,7 @@
 
 #include <pthread.h>
 
+class TV;
 class QListViewItem;
 class QLabel;
 class QProgressBar;

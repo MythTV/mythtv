@@ -45,7 +45,7 @@ using namespace std;
 #include "udpnotify.h"
 #include "mythcontext.h"
 #include "osd.h"
-#include "tv.h"
+#include "tv_play.h"
 
 UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name)
 {

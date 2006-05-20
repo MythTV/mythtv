@@ -4,7 +4,9 @@
 #include <qstring.h>
 
 #include "tv.h"
+#include "programinfo.h"
 
+class TVRec;
 class MainServer;
 class PlaybackSock;
 class LiveTVChain;

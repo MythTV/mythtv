@@ -25,6 +25,7 @@ using namespace std;
 #include "encoderlink.h"
 #include "mainserver.h"
 #include "remoteutil.h"
+#include "libmyth/util.h"
 #include "libmyth/exitcodes.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"

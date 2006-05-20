@@ -2,6 +2,7 @@
 #include <qsqldatabase.h>
 #include <qfile.h>
 #include <qmap.h>
+#include <qregexp.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -19,7 +20,7 @@
 #include <fstream>
 using namespace std;
 
-#include "tv.h"
+#include "tv_rec.h"
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "mainserver.h"

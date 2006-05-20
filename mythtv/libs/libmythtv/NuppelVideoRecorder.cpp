@@ -26,6 +26,8 @@ using namespace std;
 #include "channelbase.h"
 #include "filtermanager.h"
 #include "recordingprofile.h"
+#include "tv_rec.h"
+#include "tv_play.h"
 
 extern "C" {
 #include "vbitext/vbi.h"

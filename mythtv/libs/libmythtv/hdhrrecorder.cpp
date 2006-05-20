@@ -27,6 +27,7 @@ using namespace std;
 #include "atsctables.h"
 #include "atscstreamdata.h"
 #include "eithelper.h"
+#include "tv_rec.h"
 
 #define LOC QString("HDHRRec(%1): ").arg(tvrec->GetCaptureCardNum())
 #define LOC_ERR QString("HDHRRec(%1), Error: ") \

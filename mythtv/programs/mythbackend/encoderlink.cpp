@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "encoderlink.h"
 #include "playbacksock.h"
-#include "tv.h"
+#include "tv_rec.h"
 #include "programinfo.h"
 #include "util.h"
 #include "previewgenerator.h"

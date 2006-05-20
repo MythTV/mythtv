@@ -14,9 +14,11 @@
 
 // Qt headers
 #include <qstring.h>
+#include <qmutex.h>
 
 // MythTV headers
 #include "channelbase.h"
+#include "tv_rec.h"
 
 class DBox2Recorder;
 class DBox2Channel;

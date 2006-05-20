@@ -20,7 +20,7 @@ using namespace std;
 #include "videodev_myth.h"
 #include "channel.h"
 #include "frequencies.h"
-#include "tv.h"
+#include "tv_rec.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "mythdbcon.h"

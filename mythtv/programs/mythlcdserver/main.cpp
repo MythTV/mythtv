@@ -19,6 +19,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "tv_play.h"
 
 #include "lcdserver.h"
 
