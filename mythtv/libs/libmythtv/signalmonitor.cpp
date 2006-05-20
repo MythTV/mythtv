@@ -11,6 +11,7 @@
 #include "signalmonitor.h"
 
 #include "libavcodec/avcodec.h"
+#include "libmyth/util.h"
 
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"
