@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060521-1"
+VERSION="0.1.20060521-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -1654,7 +1654,9 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
     #Destroy the DOM and free memory
     dvddom.unlink()
 
-def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgimagemask, drawmask, spumuxdom, spunode, numberofitems, chapternumber, chapterlist):
+def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
+                  bgimagemask, drawmask, highlightcolor, spumuxdom, spunode,
+                  numberofitems, chapternumber, chapterlist):
     """Draws text and graphics onto a dvd menu, called by createMenu and createChapterMenu"""
     #Get the XML containing information about this item
     infoDOM = xml.dom.minidom.parse( os.path.join(getItemTempPath(itemnum),"info.xml") )
@@ -1843,12 +1845,12 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw, bgima
         #Make the boundary box bigger than the content to avoid over write(ing (2 pixels)
         boundarybox=boundarybox[0]-1,boundarybox[1]-1,boundarybox[2]+1,boundarybox[3]+1
         #draw.rectangle(boundarybox,outline="white")
-        drawmask.rectangle(boundarybox,outline="red")
+        drawmask.rectangle(boundarybox,outline=highlightcolor)
 
         #Draw another line to make the box thicker - PIL does not support linewidth
         boundarybox=boundarybox[0]-1,boundarybox[1]-1,boundarybox[2]+1,boundarybox[3]+1
         #draw.rectangle(boundarybox,outline="white")
-        drawmask.rectangle(boundarybox,outline="red")
+        drawmask.rectangle(boundarybox,outline=highlightcolor)
 
     node = spumuxdom.createElement("button")
     #Fiddle this for chapter marks....
@@ -1886,6 +1888,10 @@ def createMenu(screensize, numberofitems):
     if not doesFileExist(backgroundfilename):
         fatalError("Background image not found (%s)" % backgroundfilename)
 
+    #Get highlight color
+    highlightcolor = "red"
+    if menunode.hasAttribute("highlightcolor"):
+        highlightcolor = menunode.attributes["highlightcolor"].value
 
     #Page number counter
     page=1
@@ -1922,7 +1928,7 @@ def createMenu(screensize, numberofitems):
 
             drawThemeItem(page, itemsonthispage,
                         itemnum, menuitem, bgimage,
-                        draw, bgimagemask, drawmask,
+                        draw, bgimagemask, drawmask, highlightcolor,
                         spumuxdom, spunode, numberofitems, 0,"")
 
             #On to the next item
@@ -1987,6 +1993,11 @@ def createChapterMenu(screensize, numberofitems):
     if not doesFileExist(backgroundfilename):
         fatalError("Background image not found (%s)" % backgroundfilename)
 
+    #Get highlight color
+    highlightcolor = "red"
+    if menunode.hasAttribute("highlightcolor"):
+        highlightcolor = menunode.attributes["highlightcolor"].value
+
     #Page number counter
     page=1
 
@@ -2021,7 +2032,7 @@ def createChapterMenu(screensize, numberofitems):
 
             drawThemeItem(page, itemsperpage, page, menuitem, 
                         bgimage, draw, 
-                        bgimagemask, drawmask, 
+                        bgimagemask, drawmask, highlightcolor,
                         spumuxdom, spunode, 
                         999, chapter, chapterlist)
 
@@ -2092,7 +2103,7 @@ def createDetailsPage(screensize, numberofitems):
         spunode = spumuxdom.documentElement.firstChild.firstChild
 
         drawThemeItem(0, 0, itemnum, detailnode, bgimage, draw, None, None,
-                      spumuxdom, spunode, numberofitems, 0, "")
+                      "", spumuxdom, spunode, numberofitems, 0, "")
 
         #Save this details image
         bgimage.save(os.path.join(getTempPath(),"details-%s.png" % itemnum),"PNG",quality=99,optimize=0)
