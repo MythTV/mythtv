@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060520-2"
+VERSION="0.1.20060521-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -300,11 +300,6 @@ def getLengthOfVideo(index):
         duration = int(file.attributes["duration"].value)
     else:
         duration = 0;
-
-    ### Temp hack until we can get an accurate playing time ###
-    duration -= 60 * 5
-    if duration <= 0:
-        duration = 60
 
     return duration
 
@@ -2350,7 +2345,7 @@ def selectAspectRatio(folder):
             write("Unknown aspect ratio %f - Using 16:9" % ar)
             aspectratio = "16:9"
     except:
-        aspectratio = "16/9"
+        aspectratio = "16:9"
 
     return aspectratio
 

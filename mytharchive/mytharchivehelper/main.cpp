@@ -836,6 +836,26 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     return true;
 }
 
+int getFrameCount(AVFormatContext *inputFC, int vid_id)
+{
+    AVPacket pkt;
+    int count = 0;
+
+    VERBOSE(VB_JOBQUEUE, "Calculating frame count");
+
+    av_init_packet(&pkt);
+
+    while (av_read_frame(inputFC, &pkt) >= 0)
+    {
+        if (pkt.stream_index == vid_id)
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 bool getFileInfo(QString inFile, QString outFile)
 {
     const char *type = NULL;
@@ -849,14 +869,8 @@ bool getFileInfo(QString inFile, QString outFile)
     if (type)
         fmt = av_find_input_format(type);
 
-    if (fmt)
-        VERBOSE(VB_JOBQUEUE, QString("Found format for %1").arg(type));
-    else
-        VERBOSE(VB_JOBQUEUE, QString("Did not find format for %1").arg(type));
-
     // Open recording
     VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
-
 
     ret = av_open_input_file(&inputFC, inFile.ascii(), fmt, 0, NULL);
 
@@ -879,7 +893,9 @@ bool getFileInfo(QString inFile, QString outFile)
         return 0;
     }
 
+    VERBOSE(VB_JOBQUEUE, "av_estimate_timings - Start");
     av_estimate_timings(inputFC);
+    VERBOSE(VB_JOBQUEUE, "av_estimate_timings - Stop");
 
     // Dump stream information
     dump_format(inputFC, 0, inFile.ascii(), 0);
@@ -890,17 +906,13 @@ bool getFileInfo(QString inFile, QString outFile)
     doc.appendChild(root);
     root.setAttribute("type", inputFC->iformat->name);
     root.setAttribute("filename", inFile);
-    if (inputFC->duration != (uint) AV_NOPTS_VALUE) 
-        root.setAttribute("duration", (uint) inputFC->duration / AV_TIME_BASE);
-    else
-        root.setAttribute("duration", "N/A");
 
     QDomElement streams = doc.createElement("streams");
 
     root.appendChild(streams);
     streams.setAttribute("count", inputFC->nb_streams);
     int ffmpegIndex = 0;
-    
+
     for (int i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
@@ -922,10 +934,13 @@ bool getFileInfo(QString inFile, QString outFile)
                 stream.setAttribute("height", st->codec->height);
                 stream.setAttribute("bitrate", st->codec->bit_rate);
 
+                float fps;
                 if (st->r_frame_rate.den && st->r_frame_rate.num)
-                    stream.setAttribute("fps", av_q2d(st->r_frame_rate));
+                    fps = av_q2d(st->r_frame_rate);
                 else
-                    stream.setAttribute("fps", 1/av_q2d(st->time_base));
+                    fps = 1/av_q2d(st->time_base);
+
+                stream.setAttribute("fps", fps);
 
                 if (st->codec->sample_aspect_ratio.den && st->codec->sample_aspect_ratio.num)
                 {
@@ -939,6 +954,14 @@ bool getFileInfo(QString inFile, QString outFile)
                 stream.setAttribute("id", st->id);
 
                 streams.appendChild(stream);
+
+                // calc duration of the file by counting the video frames
+                int duration = getFrameCount(inputFC, i);
+                VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(duration));
+                duration = duration / fps;
+                VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
+                root.setAttribute("duration", duration);
+
                 break;
             }
 
@@ -1010,6 +1033,10 @@ bool getFileInfo(QString inFile, QString outFile)
     QTextStream t(&f);
     t << doc.toString(4);
     f.close();
+
+    // Close input file
+    av_close_input_file(inputFC);
+    inputFC = NULL;
 
     return true;
 }
