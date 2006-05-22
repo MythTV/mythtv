@@ -14,6 +14,9 @@ using namespace std;
 #define LOC QString("ChanUtil: ")
 #define LOC_ERR QString("ChanUtil, Error: ")
 
+#define LOC QString("ChanUtil: ")
+#define LOC_ERR QString("ChanUtil, Error: ")
+
 static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
                               uint frequency,
                               // DVB specific
