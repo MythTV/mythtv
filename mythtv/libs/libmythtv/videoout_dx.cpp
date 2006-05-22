@@ -178,13 +178,10 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     if (!outputpictures)
         return false;
 
-    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
-    {
-        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-        ChangePictureAttribute(kPictureAttribute_Colour, colour);
-        ChangePictureAttribute(kPictureAttribute_Hue, hue);
-    }
+    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+    ChangePictureAttribute(kPictureAttribute_Colour, colour);
+    ChangePictureAttribute(kPictureAttribute_Hue, hue);
 
     MoveResize();
     

@@ -129,14 +129,9 @@ class ChannelBase
         { StoreInputChannels(inputs); }
 
     // Picture attribute settings
-    virtual void SetBrightness(void) {};
-    virtual void SetColour(void) {};
-    virtual void SetContrast(void) {};
-    virtual void SetHue(void) {};
-    virtual int  ChangeBrightness(bool up) { (void)up; return 0; };
-    virtual int  ChangeColour(bool up)     { (void)up; return 0; };
-    virtual int  ChangeContrast(bool up)   { (void)up; return 0; };
-    virtual int  ChangeHue(bool up)        { (void)up; return 0; };
+    virtual bool InitPictureAttributes(void) { return false; }
+    virtual int  GetPictureAttribute(const QString) const { return 0; }
+    virtual int  ChangePictureAttribute(int,const QString,bool) { return 0; }
 
     bool CheckChannel(const QString &channum, QString& inputName) const;
 

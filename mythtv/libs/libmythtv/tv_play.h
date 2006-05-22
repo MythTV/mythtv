@@ -215,10 +215,6 @@ class TV : public QObject
     void ChangeVolume(bool up);
     void ToggleMute(void);
     void ToggleLetterbox(int letterboxMode = -1);
-    void ChangeContrast(bool up, bool recorder);
-    void ChangeBrightness(bool up, bool recorder);
-    void ChangeColour(bool up, bool recorder);
-    void ChangeHue(bool up, bool recorder);
 
     bool FillMenuTracks(OSDGenericTree*, uint type);
     void ChangeTrack(uint type, int dir);
@@ -334,9 +330,8 @@ class TV : public QObject
     void ToggleRecord(void);
     void BrowseChannel(const QString &channum);
 
-    void DoTogglePictureAttribute(void);
-    void DoToggleRecPictureAttribute(void);
-    void DoChangePictureAttribute(int control, bool up, bool rec);
+    void DoTogglePictureAttribute(int type);
+    void DoChangePictureAttribute(int type, int control, bool up);
 
     void BuildOSDTreeMenu(void);
     void ShowOSDTreeMenu(void);
@@ -368,7 +363,6 @@ class TV : public QObject
     int     fftime;
     int     rewtime;
     int     jumptime;
-    bool    usePicControls;
     bool    smartChannelChange;
     bool    MuteIndividualChannels;
     bool    arrowAccel;
@@ -409,8 +403,9 @@ class TV : public QObject
     bool doSmartForward;
     bool queuedTranscode;
     bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
-    int picAdjustment;   ///< Player pict attr to modify (on arrow left or right)
-    int recAdjustment;   ///< Which recorder picture attribute to modify...
+    int adjustingPicture;
+    ; ///< picture attribute to modify (on arrow left or right)
+    int adjustingPictureAttribute;
 
     bool ignoreKeys;
     bool needToSwapPIP;

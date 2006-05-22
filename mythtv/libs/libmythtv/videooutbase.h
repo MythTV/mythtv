@@ -70,18 +70,6 @@ enum MythCodecID
     kCodec_SPECIAL_END,
 };
 
-enum PictureAttribute
-{
-    kPictureAttribute_None = 0,
-    kPictureAttribute_MIN = 1,
-    kPictureAttribute_Brightness = 1,
-    kPictureAttribute_Contrast,
-    kPictureAttribute_Colour,
-    kPictureAttribute_Hue,
-    kPictureAttribute_Volume,
-    kPictureAttribute_MAX
-};
-
 enum PIPLocations
 {
     kPIPTopLeft = 0,

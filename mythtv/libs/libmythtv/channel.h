@@ -40,14 +40,9 @@ class Channel : public ChannelBase
     bool SwitchToInput(int newcapchannel, bool setstarting);
 
     // Picture attributes.
-    void SetBrightness(void);
-    void SetContrast(void);
-    void SetColour(void);
-    void SetHue(void);
-    int  ChangeBrightness(bool up);
-    int  ChangeColour(bool up);
-    int  ChangeContrast(bool up);
-    int  ChangeHue(bool up);
+    bool InitPictureAttributes(void);
+    int  GetPictureAttribute(const QString db_col_name) const;
+    int  ChangePictureAttribute(int, const QString db_col_name, bool up);
 
     // PID caching
     void SaveCachedPids(const pid_cache_t&) const;
@@ -61,19 +56,17 @@ class Channel : public ChannelBase
     bool IsTuned(void) const;
   private:
     // Helper Sets
-    void SetColourAttribute(int attrib, const char *name);
     void SetFreqTable(const int index);
     int  SetFreqTable(const QString &name);
     bool SetInputAndFormat(int newcapchannel, QString newFmt);
 
     // Helper Gets
-    unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
     int  GetCurrentChannelNum(const QString &channame);
     QString GetFormatForChannel(QString channum,
                                 QString inputname);
 
     // Helper Commands
-    int  ChangeColourAttribute(int attrib, const char *name, bool up);
+    bool InitPictureAttribute(const QString db_col_name);
     bool TuneTo(const QString &chan, int finetune);
     bool InitializeInputs(void);
 
@@ -81,6 +74,9 @@ class Channel : public ChannelBase
     // Data
     QString     device;
     int         videofd;
+    QString     device_name;
+    QString     driver_name;
+    QMap<QString,int> pict_attr_default;
 
     struct CHANLIST *curList;  
     int         totalChannels;

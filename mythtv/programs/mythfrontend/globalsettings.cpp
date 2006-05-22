@@ -1141,21 +1141,6 @@ static HostCheckBox *AltClearSavedPosition()
     return gc;
 }
 
-#ifdef USING_XV
-static HostCheckBox *UsePicControls()
-{
-    HostCheckBox *gc = new HostCheckBox("UseOutputPictureControls");
-    gc->setLabel(QObject::tr("Use Xv picture controls"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, Xv picture controls (brightness, "
-                    "contrast, etc.) are used during playback. These are "
-                    "independent of the Video4Linux controls used for "
-                    "recording. The Xv controls may not work properly on "
-                    "some systems."));
-    return gc;
-}
-#endif
-
 static HostCheckBox *AudioNagSetting()
 {
     HostCheckBox *gc = new HostCheckBox("AudioNag");
@@ -3256,9 +3241,6 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(EndOfRecordingExitPrompt());
     gen2->addChild(ClearSavedPosition());
     gen2->addChild(AltClearSavedPosition());
-#ifdef USING_XV
-    gen2->addChild(UsePicControls());
-#endif
     gen2->addChild(AudioNagSetting());
     gen2->addChild(UDPNotifyPort());
     addChild(gen2);

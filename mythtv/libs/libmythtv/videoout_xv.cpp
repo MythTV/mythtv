@@ -36,6 +36,8 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "filtermanager.h"
+#define IGNORE_TV_PLAY_REC
+#include "tv.h"
 
 #define LOC QString("VideoOutputXv: ")
 #define LOC_ERR QString("VideoOutputXv Error: ")
@@ -711,16 +713,6 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     // Fall back to plain old X calls
     if (!done)
         done = InitXlib();
-
-    // XVideo & XvMC output methods allow the picture to be adjusted
-    if (done && VideoOutputSubType() >= XVideo &&
-        gContext->GetNumSetting("UseOutputPictureControls", 0))
-    {
-        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-        ChangePictureAttribute(kPictureAttribute_Colour, colour);
-        ChangePictureAttribute(kPictureAttribute_Hue, hue);
-    }
 
     return done;
 }

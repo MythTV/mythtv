@@ -750,84 +750,46 @@ void EncoderLink::SetChannel(const QString &name)
         VERBOSE(VB_IMPORTANT, "Should be local only query: SetChannel");
 }
 
-/** \fn EncoderLink::ChangeContrast(bool)
- *  \brief Changes contrast of a recording.
+/** \fn EncoderLink::GetPictureAttribute(PictureAttribute)
+ *  \brief Changes brightness/contrast/colour/hue of a recording.
  *         <b>This only works on local recorders.</b>
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
- *  \return contrast if it succeeds, -1 otherwise.
+ *  \return current value if it succeeds, -1 otherwise.
  */
-int EncoderLink::ChangeContrast(bool direction)
+int EncoderLink::GetPictureAttribute(PictureAttribute attr)
 {
-    int ret = -1;
+    if (!local)
+    {
+        VERBOSE(VB_IMPORTANT, "Should be local only query: "
+                "GetPictureAttribute");
+        return -1;
+    }
 
-    if (local)
-        ret = tv->ChangeContrast(direction);
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeContrast");
-
-    return ret;
+    return tv->GetPictureAttribute(attr);
 }
 
-/** \fn EncoderLink::ChangeBrightness(bool)
- *  \brief Changes the brightness of a recording.
+/** \fn EncoderLink::ChangePictureAttribute(PictureAdjustType,PictureAttribute,bool)
+ *  \brief Changes brightness/contrast/colour/hue of a recording.
  *         <b>This only works on local recorders.</b>
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
- *  \return brightness if it succeeds, -1 otherwise.
+ *  \return current value if it succeeds, -1 otherwise.
  */
-int EncoderLink::ChangeBrightness(bool direction)
+int EncoderLink::ChangePictureAttribute(PictureAdjustType type,
+                                        PictureAttribute  attr,
+                                        bool              direction)
 {
-    int ret = -1;
+    if (!local)
+    {
+        VERBOSE(VB_IMPORTANT, "Should be local only query: "
+                "ChangePictureAttribute");
+        return -1;
+    }
 
-    if (local)
-        ret = tv->ChangeBrightness(direction);
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeBrightness");
-
-    return ret;
-}
-
-/** \fn EncoderLink::ChangeColour(bool)
- *  \brief Changes the colour phase of a recording.
- *         <b>This only works on local recorders.</b>
- *
- *  Note: In practice this only works with frame grabbing recorders.
- *
- *  \return colour if it succeeds, -1 otherwise.
- */
-int EncoderLink::ChangeColour(bool direction)
-{
-    int ret = -1;
-
-    if (local)
-        ret = tv->ChangeColour(direction);
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeColor");
-
-    return ret;
-}
-
-/** \fn EncoderLink::ChangeHue(bool)
- *  \brief Changes the hue of a recording.
- *         <b>This only works on local recorders.</b>
- *
- *  Note: In practice this only works with frame grabbing recorders.
- *
- *  \return hue if it succeeds, -1 otherwise.
- */
-int EncoderLink::ChangeHue(bool direction)
-{
-    int ret = -1;
-
-    if (local)
-        ret = tv->ChangeHue(direction);
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: ChangeHue");
-
-    return ret;
+    return tv->ChangePictureAttribute(type, attr, direction);
 }
 
 /** \fn EncoderLink::CheckChannel(const QString&)

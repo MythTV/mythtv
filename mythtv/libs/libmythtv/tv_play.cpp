@@ -163,10 +163,12 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLESTRETCH", "Toggle time stretch speed", "");
     REG_KEY("TV Playback", "TOGGLEAUDIOSYNC",
             "Turn on audio sync adjustment controls", "");
-    REG_KEY("TV Playback", "TOGGLEPICCONTROLS", "Turn on the playback picture "
-            "adjustment controls", "F");
-    REG_KEY("TV Playback", "TOGGLERECCONTROLS", "Turn on the recording picture "
-            "adjustment controls", "G");
+    REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
+            "Playback picture adjustments",                    "F");
+    REG_KEY("TV Playback", "TOGGLECHANCONTROLS",
+            "Recording picture adjustments for this channel",  "Ctrl+G");
+    REG_KEY("TV Playback", "TOGGLERECCONTROLS",
+            "Recording picture adjustments for this recorder", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "CYCLECOMMSKIPMODE", "Cycle Commercial Skip mode", "");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
@@ -233,11 +235,13 @@ void TV::InitKeys(void)
 
   Global:   Return, Enter, Space, Esc
 
-  Global:          F1,
-  Playback: Ctrl-B,                  F7,F8,F9,F10,F11
-  Teletext            F2,F3,F4,F5,F6,F7,F8
-  ITV                 F2,F3,F4,F5,F6,F7
- */
+  Global:   F1,
+  Playback:                   F7,F8,F9,F10,F11
+  Teletext     F2,F3,F4,F5,F6,F7,F8
+  ITV          F2,F3,F4,F5,F6,F7
+
+  Playback: Ctrl-B,Ctrl-G
+*/
 }
 
 void *SpawnDecode(void *param)
@@ -256,7 +260,7 @@ TV::TV(void)
     : QObject(NULL, "TV"),
       // Configuration variables from database
       baseFilters(""), fftime(0), rewtime(0),
-      jumptime(0), usePicControls(false), smartChannelChange(false),
+      jumptime(0), smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
       osd_general_timeout(2), osd_prog_info_timeout(3),
       autoCommercialSkip(CommSkipOff), tryUnflaggedSkip(false),
@@ -274,8 +278,8 @@ TV::TV(void)
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
-      picAdjustment(kPictureAttribute_None),
-      recAdjustment(kPictureAttribute_None),
+      adjustingPicture(kAdjustingPicture_None),
+      adjustingPictureAttribute(kPictureAttribute_None),
       ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
       // Channel Editing
       chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
@@ -371,7 +375,6 @@ bool TV::Init(bool createWindow)
     }
 
     baseFilters         += gContext->GetSetting("CustomFilters");
-    usePicControls       = gContext->GetNumSetting("UseOutputPictureControls",0);
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
     arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
@@ -2164,7 +2167,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         return;
     }
 
-    if (picAdjustment != kPictureAttribute_None)
+    if (adjustingPicture)
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
@@ -2172,25 +2175,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
             handled = true;
 
             if (action == "LEFT")
-                DoChangePictureAttribute(picAdjustment, false, false);
+                DoChangePictureAttribute(adjustingPicture,
+                                         adjustingPictureAttribute, false);
             else if (action == "RIGHT")
-                DoChangePictureAttribute(picAdjustment, true, false);
-            else
-                handled = false;
-        }
-    }
-    
-    if (recAdjustment)
-    {
-        for (unsigned int i = 0; i < actions.size(); i++)
-        {
-            QString action = actions[i];
-            handled = true;
-
-            if (action == "LEFT")
-                DoChangePictureAttribute(recAdjustment, false, true);
-            else if (action == "RIGHT")
-                DoChangePictureAttribute(recAdjustment, true, true);
+                DoChangePictureAttribute(adjustingPicture,
+                                         adjustingPictureAttribute, true);
             else
                 handled = false;
         }
@@ -2319,13 +2308,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ChangeAudioSync(0);   // just display
         else if (action == "TOGGLEPICCONTROLS")
         {
-            if (usePicControls)
-            {
-                picAdjustment += 1;
-                if (picAdjustment >= kPictureAttribute_MAX)
-                    picAdjustment = kPictureAttribute_MIN;
-                DoTogglePictureAttribute();
-            }
+            DoTogglePictureAttribute(kAdjustingPicture_Playback);
         }
         else if (action == "NEXTSCAN")
         {
@@ -2694,8 +2677,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (!CommitQueuedInput())
                     handled = false;
             }
+            else if (action == "TOGGLECHANCONTROLS")
+                DoTogglePictureAttribute(kAdjustingPicture_Channel);
             else if (action == "TOGGLERECCONTROLS")
-                DoToggleRecPictureAttribute();
+                DoTogglePictureAttribute(kAdjustingPicture_Recording);
             else if (action == "TOGGLEBROWSE" && pseudoLiveTVState[aindx])
                 ShowOSDTreeMenu();
             else
@@ -4885,114 +4870,6 @@ void TV::EditSchedule(int editType)
     }
 }
 
-void TV::ChangeBrightness(bool up, bool recorder)
-{
-    int brightness;
-    QString text;
-
-    if (GetOSD())
-    {
-        if (recorder)
-        {
-            brightness = activerecorder->ChangeBrightness(up);
-            text = QString(tr("Brightness (REC) %1 %")).arg(brightness);
-            GetOSD()->ShowStatus(brightness * 10, true, tr("Adjust Recording"),
-                text, 5, kOSDFunctionalType_RecPictureAdjust);
-        }
-        else
-        {
-            brightness = nvp->getVideoOutput()->ChangeBrightness(up);
-            gContext->SaveSetting("PlaybackBrightness", brightness);
-            text = QString(tr("Brightness %1 %")).arg(brightness);
-            GetOSD()->ShowStatus(brightness * 10, true, tr("Adjust Picture"),
-                text, 5, kOSDFunctionalType_PictureAdjust);
-        }
-
-        update_osd_pos = false;
-    }
-}
-
-void TV::ChangeContrast(bool up, bool recorder)
-{
-    int contrast;
-    QString text;
-
-    if (GetOSD())
-    {
-        if (recorder)
-        {
-            contrast = activerecorder->ChangeContrast(up);
-            text = QString(tr("Contrast (REC) %1 %")).arg(contrast);
-            GetOSD()->ShowStatus(contrast * 10, true, tr("Adjust Recording"),
-                text, 5, kOSDFunctionalType_RecPictureAdjust);
-        }
-        else
-        {
-            contrast = nvp->getVideoOutput()->ChangeContrast(up);
-            gContext->SaveSetting("PlaybackContrast", contrast);
-            text = QString(tr("Contrast %1 %")).arg(contrast);
-            GetOSD()->ShowStatus(contrast * 10, true, tr("Adjust Picture"),
-                text, 5, kOSDFunctionalType_PictureAdjust);
-        }
-
-        update_osd_pos = false;
-    }
-}
-
-void TV::ChangeColour(bool up, bool recorder)
-{
-    int colour;
-    QString text;
-
-    if (GetOSD())
-    {
-        if (recorder)
-        {
-            colour = activerecorder->ChangeColour(up);
-            text = QString(tr("Colour (REC) %1 %")).arg(colour);
-            GetOSD()->ShowStatus(colour * 10, true, tr("Adjust Recording"),
-                text, 5, kOSDFunctionalType_RecPictureAdjust);
-        }
-        else
-        {
-            colour = nvp->getVideoOutput()->ChangeColour(up);
-            gContext->SaveSetting("PlaybackColour", colour);
-            text = QString(tr("Colour %1 %")).arg(colour);
-            GetOSD()->ShowStatus(colour * 10, true, tr("Adjust Picture"),
-                text, 5, kOSDFunctionalType_PictureAdjust);
-        }
-
-        update_osd_pos = false;
-    }
-}
-
-void TV::ChangeHue(bool up, bool recorder)
-{
-    int hue;
-    QString text;
-
-    if (GetOSD())
-    {
-        if (recorder)
-        {
-            hue = activerecorder->ChangeHue(up);
-            text = QString(tr("Hue (REC) %1 %")).arg(hue);
-            GetOSD()->ShowStatus(hue * 10, true, tr("Adjust Recording"),
-                text, 5, kOSDFunctionalType_RecPictureAdjust);
-        }
-        else
-        {
-            hue = nvp->getVideoOutput()->ChangeHue(up);
-            gContext->SaveSetting("PlaybackHue", hue);
-            text = QString(tr("Hue %1 %")).arg(hue);
-            GetOSD()->ShowStatus(hue * 10, true, tr("Adjust Picture"),
-                text, 5, kOSDFunctionalType_PictureAdjust);
-        }
-
-        update_osd_pos = false;
-    }
-}
-
 void TV::ChangeVolume(bool up)
 {
     AudioOutput *aud = nvp->getAudioOutput();
@@ -5616,11 +5493,9 @@ void TV::HandleOSDClosed(int osdType)
 {
     switch (osdType)
     {
-        case kOSDFunctionalType_RecPictureAdjust:
-            recAdjustment = kPictureAttribute_None;
-            break;
         case kOSDFunctionalType_PictureAdjust:
-            picAdjustment = kPictureAttribute_None;
+            adjustingPicture = kAdjustingPicture_None;
+            adjustingPictureAttribute = kPictureAttribute_None;
             break;
         case kOSDFunctionalType_SmartForward:
             doSmartForward = false;
@@ -5636,115 +5511,109 @@ void TV::HandleOSDClosed(int osdType)
     }
 }
 
-void TV::DoTogglePictureAttribute(void)
+void TV::DoTogglePictureAttribute(int itype)
 {
-    OSDSet *oset;
-    int value = 0;
+    PictureAdjustType type = (PictureAdjustType) itype;
 
-    if (GetOSD())
+    adjustingPicture = type;
+
+    adjustingPictureAttribute += 1;
+    if ((adjustingPictureAttribute >= kPictureAttribute_MAX) ||
+        ((type >= kAdjustingPicture_Channel) &&
+         (adjustingPictureAttribute > kPictureAttribute_Hue)))
     {
-        oset = GetOSD()->GetSet("status");
-        QString title = tr("Adjust Picture");
-        QString picName;
-
-        AudioOutput *aud = NULL;
-        switch (picAdjustment)
-        {
-            case kPictureAttribute_Brightness:
-                value = nvp->getVideoOutput()->GetCurrentBrightness();
-                picName = QString("%1 %2 %").arg(tr("Brightness")).arg(value);
-                break;
-            case kPictureAttribute_Contrast:
-                value = nvp->getVideoOutput()->GetCurrentContrast();
-                picName = QString("%1 %2 %").arg(tr("Contrast")).arg(value);
-                break;
-            case kPictureAttribute_Colour:
-                value = nvp->getVideoOutput()->GetCurrentColour();
-                picName = QString("%1 %2 %").arg(tr("Colour")).arg(value);
-                break;
-            case kPictureAttribute_Hue:
-                value = nvp->getVideoOutput()->GetCurrentHue();
-                picName = QString("%1 %2 %").arg(tr("Hue")).arg(value);
-                break;
-            case kPictureAttribute_Volume:
-                aud = nvp->getAudioOutput();
-                value = (aud) ? (aud->GetCurrentVolume()) : 99;
-                title = tr("Adjust Volume");
-                picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);
-                break;
-        }
-        GetOSD()->ShowStatus(value*10, true, title, picName, 5, 
-                        kOSDFunctionalType_PictureAdjust);
-        update_osd_pos = false;
+        adjustingPictureAttribute = kPictureAttribute_MIN;
     }
-}
 
-void TV::DoToggleRecPictureAttribute(void)
-{
-    OSDSet *oset;
-    int value = 0;
-   
-    recAdjustment = (recAdjustment % 4) + 1;
-   
-    if (GetOSD())
+    PictureAttribute attr = (PictureAttribute) adjustingPictureAttribute;
+    QString title = toTitleString(type);
+
+    if (!GetOSD())
+        return;
+
+    GetOSD()->GetSet("status");
+
+    int value = 99;
+    if (nvp && (kAdjustingPicture_Playback == type))
     {
-        oset = GetOSD()->GetSet("status");
-        QString title = tr("Adjust Recording");
-        QString recName;
-      
-        switch (recAdjustment)
+        if (kPictureAttribute_Brightness == adjustingPictureAttribute)
+            value = nvp->getVideoOutput()->GetCurrentBrightness();
+        else if (kPictureAttribute_Contrast == adjustingPictureAttribute)
+            value = nvp->getVideoOutput()->GetCurrentContrast();
+        else if (kPictureAttribute_Colour == adjustingPictureAttribute)
+            value = nvp->getVideoOutput()->GetCurrentColour();
+        else if (kPictureAttribute_Hue == adjustingPictureAttribute)
+            value = nvp->getVideoOutput()->GetCurrentHue();
+        else if ((kPictureAttribute_Volume == adjustingPictureAttribute) &&
+                 nvp->getAudioOutput())
         {
-            case kPictureAttribute_Brightness:
-                activerecorder->ChangeBrightness(true);
-                value = activerecorder->ChangeBrightness(false);
-                recName = QString("%1 %2 %3 %").arg(tr("Brightness"))
-                                  .arg(tr("(REC)")).arg(value);
-                break;
-            case kPictureAttribute_Contrast:
-                activerecorder->ChangeContrast(true);
-                value = activerecorder->ChangeContrast(false);
-                recName = QString("%1 %2 %3 %").arg(tr("Contrast"))
-                                  .arg(tr("(REC)")).arg(value);
-                break;
-            case kPictureAttribute_Colour:
-                activerecorder->ChangeColour(true);
-                value = activerecorder->ChangeColour(false);
-                recName = QString("%1 %2 %3 %").arg(tr("Colour"))
-                                  .arg(tr("(REC)")).arg(value);
-                break;
-            case kPictureAttribute_Hue:
-                activerecorder->ChangeHue(true);
-                value = activerecorder->ChangeHue(false);
-                recName = QString("%1 %2 %3 %").arg(tr("Hue"))
-                                  .arg(tr("(REC)")).arg(value);
-                break;
+            value = nvp->getAudioOutput()->GetCurrentVolume();
+            title = tr("Adjust Volume");
         }
-        GetOSD()->ShowStatus(value * 10, true, title, recName, 5,
-                        kOSDFunctionalType_RecPictureAdjust);
-        update_osd_pos = false;
     }
+    else if (activerecorder && (kAdjustingPicture_Playback != type))
+    {
+        value = activerecorder->GetPictureAttribute(attr);
+    }
+
+    QString text = toString(attr) + " " + toTypeString(type) +
+        QString(" %1 %").arg(value);
+
+    GetOSD()->ShowStatus(value * 10, true, title, text, 5,
+                         kOSDFunctionalType_PictureAdjust);
+
+    update_osd_pos = false;
 }
    
-void TV::DoChangePictureAttribute(int control, bool up, bool rec)
+void TV::DoChangePictureAttribute(int itype, int control, bool up)
 {
-    switch (control)
+    if (!GetOSD())
+        return;
+
+    PictureAdjustType type = (PictureAdjustType) itype;
+    PictureAttribute  attr = (PictureAttribute)  control;
+    int value = 99;
+
+    if (nvp && (kAdjustingPicture_Playback == type))
     {
-        case kPictureAttribute_Brightness:
-            ChangeBrightness(up, rec);
-            break;
-        case kPictureAttribute_Contrast:
-            ChangeContrast(up, rec);
-            break;
-        case kPictureAttribute_Colour:
-            ChangeColour(up, rec);
-            break;
-        case kPictureAttribute_Hue:
-            ChangeHue(up, rec);
-            break;
-        case kPictureAttribute_Volume:
+        if (kPictureAttribute_Brightness == control)
+        {
+            value = nvp->getVideoOutput()->ChangeBrightness(up);
+            gContext->SaveSetting("PlaybackBrightness", value);
+        }
+        else if (kPictureAttribute_Contrast == control)
+        {
+            value = nvp->getVideoOutput()->ChangeContrast(up);
+            gContext->SaveSetting("PlaybackContrast", value);
+        }
+        else if (kPictureAttribute_Colour == control)
+        {
+            value = nvp->getVideoOutput()->ChangeColour(up);
+            gContext->SaveSetting("PlaybackColour", value);
+        }
+        else if (kPictureAttribute_Hue == control)
+        {
+            value = nvp->getVideoOutput()->ChangeHue(up);
+            gContext->SaveSetting("PlaybackHue", value);
+        }
+        else if (kPictureAttribute_Volume == control)
+        {
             ChangeVolume(up);
-            break;
+            return;
+        }
     }
+    else if (activerecorder && (kAdjustingPicture_Playback != type))
+    {
+        value = activerecorder->ChangePictureAttribute(type, attr, up);
+    }
+
+    QString text = toString(attr) + " " + toTypeString(type) +
+        QString(" %1 %").arg(value);
+
+    GetOSD()->ShowStatus(value * 10, true, toTitleString(type), text, 5,
+                         kOSDFunctionalType_PictureAdjust);
+
+    update_osd_pos = false;
 }
 
 OSD *TV::GetOSD(void)
@@ -6232,8 +6101,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (action.left(17) == "TOGGLEPICCONTROLS")
     {
-        picAdjustment = action.right(1).toInt();
-        DoTogglePictureAttribute();
+        adjustingPictureAttribute = action.right(1).toInt() - 1;
+        DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
     else if (action.left(12) == "TOGGLEASPECT")
     {
@@ -6550,26 +6419,23 @@ void TV::BuildOSDTreeMenu(void)
                                  (letterbox == kLetterbox_16_9_Stretch) ? 1 : 0,
                                  NULL, "ASPECTGROUP");
 
-    if (usePicControls)
-    {
-        item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
-        subitem = new OSDGenericTree(item, tr("Brightness"),
-                                     "TOGGLEPICCONTROLS" +
-                                     QString("%1")
-                                           .arg(kPictureAttribute_Brightness));
-        subitem = new OSDGenericTree(item, tr("Contrast"),
-                                     "TOGGLEPICCONTROLS" +
-                                     QString("%1")
-                                           .arg(kPictureAttribute_Contrast));
-        subitem = new OSDGenericTree(item, tr("Colour"),
-                                     "TOGGLEPICCONTROLS" +
-                                         QString("%1")
-                                           .arg(kPictureAttribute_Colour));
-        subitem = new OSDGenericTree(item, tr("Hue"),
-                                     "TOGGLEPICCONTROLS" +
-                                         QString("%1")
-                                           .arg(kPictureAttribute_Hue));
-    }
+    item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
+    subitem = new OSDGenericTree(item, tr("Brightness"),
+                                 "TOGGLEPICCONTROLS" +
+                                 QString("%1")
+                                 .arg(kPictureAttribute_Brightness));
+    subitem = new OSDGenericTree(item, tr("Contrast"),
+                                 "TOGGLEPICCONTROLS" +
+                                 QString("%1")
+                                 .arg(kPictureAttribute_Contrast));
+    subitem = new OSDGenericTree(item, tr("Colour"),
+                                 "TOGGLEPICCONTROLS" +
+                                 QString("%1")
+                                 .arg(kPictureAttribute_Colour));
+    subitem = new OSDGenericTree(item, tr("Hue"),
+                                 "TOGGLEPICCONTROLS" +
+                                 QString("%1")
+                                 .arg(kPictureAttribute_Hue));
 
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
                              "TOGGLEMANUALZOOM");

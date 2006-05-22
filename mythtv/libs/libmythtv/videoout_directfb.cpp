@@ -484,13 +484,10 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     VERBOSE(VB_GENERAL, QString("DirectFB output : screen size %1x%2").arg(data->screen_width).arg(data->screen_height));
     MoveResize();
 
-    if (gContext->GetNumSetting("UseOutputPictureControls", 0))
-    {
-        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-        ChangePictureAttribute(kPictureAttribute_Colour, colour);
-        ChangePictureAttribute(kPictureAttribute_Hue, hue);
-    }
+    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+    ChangePictureAttribute(kPictureAttribute_Colour, colour);
+    ChangePictureAttribute(kPictureAttribute_Hue, hue);
 
     //display video output
     DFBCHECK(data->videoLayer->SetOpacity(data->videoLayer, 0xff));

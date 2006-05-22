@@ -42,10 +42,8 @@ class RemoteEncoder
     QStringList GetInputs(void);
     QString GetInput(void);
     QString SetInput(QString);
-    int ChangeContrast(bool direction);
-    int ChangeBrightness(bool direction);
-    int ChangeColour(bool direction);
-    int ChangeHue(bool direction);
+    int  GetPictureAttribute(int attr);
+    int  ChangePictureAttribute(int type, int attr, bool direction);
     void ChangeChannel(int channeldirection);
     void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(void);

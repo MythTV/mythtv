@@ -84,10 +84,10 @@ class EncoderLink
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);
     void SetChannel(const QString &name);
-    int ChangeContrast(bool direction);
-    int ChangeBrightness(bool direction);
-    int ChangeColour(bool direction);
-    int ChangeHue(bool direction);
+    int  GetPictureAttribute(PictureAttribute attr);
+    int  ChangePictureAttribute(PictureAdjustType type,
+                                PictureAttribute  attr,
+                                bool              direction);
     bool CheckChannel(const QString &name);
     bool ShouldSwitchToAnotherCard(const QString &channelid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);

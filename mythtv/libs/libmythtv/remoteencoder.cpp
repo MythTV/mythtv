@@ -9,6 +9,7 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 #include "signalmonitor.h"
+#include "videooutbase.h"
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
@@ -449,75 +450,52 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
     return timeout;
 }
 
-/** \fn RemoteEncoder::ChangeContrast(bool)
- *  \brief Changes contrast of a recording.
+
+int RemoteEncoder::GetPictureAttribute(int attr)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+
+    if (kPictureAttribute_Contrast == attr)
+        strlist << "GET_CONTRAST";
+    else if (kPictureAttribute_Brightness == attr)
+        strlist << "GET_BRIGHTNESS";
+    else if (kPictureAttribute_Colour == attr)
+        strlist << "GET_COLOUR";
+    else if (kPictureAttribute_Hue == attr)
+        strlist << "GET_HUE";
+    else
+        return -1;
+
+    SendReceiveStringList(strlist);
+
+    int retval = strlist[0].toInt();
+    return retval;
+}
+
+/** \fn RemoteEncoder::ChangeContrast(int, int, bool)
+ *  \brief Changes brightness/contrast/colour/hue of a recording.
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
  *  \return contrast if it succeeds, -1 otherwise.
  */
-int RemoteEncoder::ChangeContrast(bool direction)
+int RemoteEncoder::ChangePictureAttribute(int type, int attr, bool up)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "CHANGE_CONTRAST";
-    strlist << QString::number((int)direction);
 
-    SendReceiveStringList(strlist);
+    if (kPictureAttribute_Contrast == attr)
+        strlist << "CHANGE_CONTRAST";
+    else if (kPictureAttribute_Brightness == attr)
+        strlist << "CHANGE_BRIGHTNESS";
+    else if (kPictureAttribute_Colour == attr)
+        strlist << "CHANGE_COLOUR";
+    else if (kPictureAttribute_Hue == attr)
+        strlist << "CHANGE_HUE";
+    else
+        return -1;
 
-    int retval = strlist[0].toInt();
-    return retval;
-}
-
-/** \fn RemoteEncoder::ChangeBrightness(bool)
- *  \brief Changes the brightness of a recording.
- *
- *   Note: In practice this only works with frame grabbing recorders.
- *
- *  \return brightness if it succeeds, -1 otherwise.
- */
-int RemoteEncoder::ChangeBrightness(bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "CHANGE_BRIGHTNESS";
-    strlist << QString::number((int)direction);
-
-    SendReceiveStringList(strlist);
-
-    int retval = strlist[0].toInt();
-    return retval;
-}
-
-/** \fn RemoteEncoder::ChangeColour(bool)
- *  \brief Changes the colour phase of a recording.
- *
- *   Note: In practice this only works with frame grabbing recorders.
- *
- *  \return colour if it succeeds, -1 otherwise.
- */
-int RemoteEncoder::ChangeColour(bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "CHANGE_COLOUR";
-    strlist << QString::number((int)direction);
-
-    SendReceiveStringList(strlist);
-
-    int retval = strlist[0].toInt();
-    return retval;
-}
-
-/** \fn RemoteEncoder::ChangeHue(bool)
- *  \brief Changes the hue of a recording.
- *
- *   Note: In practice this only works with frame grabbing recorders.
- *
- *  \return hue if it succeeds, -1 otherwise.
- */
-int RemoteEncoder::ChangeHue(bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "CHANGE_HUE";
-    strlist << QString::number((int)direction);
+    strlist << QString::number(type);
+    strlist << QString::number((int)up);
 
     SendReceiveStringList(strlist);
 

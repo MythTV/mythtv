@@ -2563,25 +2563,57 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         int oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
         retlist << QString::number(oldrate);
     }
+    else if (command == "GET_COLOUR")
+    {
+        int ret = enc->GetPictureAttribute(kPictureAttribute_Colour);
+        retlist << QString::number(ret);
+    }
+    else if (command == "GET_CONTRAST")
+    {
+        int ret = enc->GetPictureAttribute(kPictureAttribute_Contrast);
+        retlist << QString::number(ret);
+    }
+    else if (command == "GET_BRIGHTNESS")
+    {
+        int ret = enc->GetPictureAttribute(kPictureAttribute_Brightness);
+        retlist << QString::number(ret);
+    }
+    else if (command == "GET_HUE")
+    {
+        int ret = enc->GetPictureAttribute(kPictureAttribute_Hue);
+        retlist << QString::number(ret);
+    }
     else if (command == "CHANGE_COLOUR")
     {
-        bool up = slist[2].toInt(); 
-        retlist << QString::number(enc->ChangeColour(up));
+        int  type = slist[2].toInt();
+        bool up   = slist[3].toInt(); 
+        int  ret = enc->ChangePictureAttribute(
+            (PictureAdjustType) type, kPictureAttribute_Colour, up);
+        retlist << QString::number(ret);
     }
     else if (command == "CHANGE_CONTRAST")
     {
-        bool up = slist[2].toInt(); 
-        retlist << QString::number(enc->ChangeContrast(up));
+        int  type = slist[2].toInt();
+        bool up   = slist[3].toInt(); 
+        int  ret = enc->ChangePictureAttribute(
+            (PictureAdjustType) type, kPictureAttribute_Contrast, up);
+        retlist << QString::number(ret);
     }
     else if (command == "CHANGE_BRIGHTNESS")
     {
-        bool up = slist[2].toInt(); 
-        retlist << QString::number(enc->ChangeBrightness(up));
+        int  type= slist[2].toInt();
+        bool up  = slist[3].toInt(); 
+        int  ret = enc->ChangePictureAttribute(
+            (PictureAdjustType) type, kPictureAttribute_Brightness, up);
+        retlist << QString::number(ret);
     }
     else if (command == "CHANGE_HUE")
     {
-        bool up = slist[2].toInt(); 
-        retlist << QString::number(enc->ChangeHue(up));
+        int  type= slist[2].toInt();
+        bool up  = slist[3].toInt();
+        int  ret = enc->ChangePictureAttribute(
+            (PictureAdjustType) type, kPictureAttribute_Hue, up);
+        retlist << QString::number(ret);
     }
     else if (command == "CHECK_CHANNEL")
     {

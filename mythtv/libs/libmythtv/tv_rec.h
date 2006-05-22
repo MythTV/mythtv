@@ -219,10 +219,9 @@ class TVRec : public QObject
     void SetChannel(QString name, uint requestType = kFlagDetect);
 
     int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
-    int ChangeColour(bool direction);
-    int ChangeContrast(bool direction);
-    int ChangeBrightness(bool direction);
-    int ChangeHue(bool direction);
+    int  GetPictureAttribute(PictureAttribute attr);
+    int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
+                                bool direction);
     bool CheckChannel(QString name) const;
     bool ShouldSwitchToAnotherCard(QString chanid);
     bool CheckChannelPrefix(const QString&,uint&,bool&,QString&);

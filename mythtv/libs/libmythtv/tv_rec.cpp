@@ -2611,76 +2611,60 @@ void TVRec::ToggleChannelFavorite(void)
     }
 }
 
-/** \fn TVRec::ChangeContrast(bool)
- *  \brief Changes contrast of a recording.
+/** \fn TVRec::ChangePictureAttribute(PictureAdjustType,PictureAttribute,bool)
+ *  \brief Returns current value [0,100] if it succeeds, -1 otherwise.
  *
  *  Note: In practice this only works with frame grabbing recorders.
- *
- *  \return contrast if it succeeds, -1 otherwise.
  */
-int TVRec::ChangeContrast(bool direction)
+int TVRec::GetPictureAttribute(PictureAttribute attr)
 {
     QMutexLocker lock(&stateChangeLock);
-
     if (!channel)
         return -1;
 
-    int ret = channel->ChangeContrast(direction);
-    return ret;
+    int ret = -1;
+    if (kPictureAttribute_Brightness == attr)
+        ret = channel->GetPictureAttribute("brightness");
+    else if (kPictureAttribute_Contrast == attr)
+        ret = channel->GetPictureAttribute("contrast");
+    else if (kPictureAttribute_Colour == attr)
+        ret = channel->GetPictureAttribute("colour");
+    else if (kPictureAttribute_Hue == attr)
+        ret = channel->GetPictureAttribute("hue");
+
+    if (ret < 0)
+        return -1;
+    return ret / 655;
 }
 
-/** \fn TVRec::ChangeBrightness(bool)
- *  \brief Changes the brightness of a recording.
+/** \fn TVRec::ChangePictureAttribute(PictureAdjustType,PictureAttribute,bool)
+ *  \brief Changes brightness/contrast/colour/hue of a recording.
  *
  *  Note: In practice this only works with frame grabbing recorders.
  *
- *  \return brightness if it succeeds, -1 otherwise.
+ *  \return current value [0,100] if it succeeds, -1 otherwise.
  */
-int TVRec::ChangeBrightness(bool direction)
+int TVRec::ChangePictureAttribute(PictureAdjustType type,
+                                  PictureAttribute  attr,
+                                  bool              direction)
 {
     QMutexLocker lock(&stateChangeLock);
-
     if (!channel)
         return -1;
 
-    int ret = channel->ChangeBrightness(direction);
-    return ret;
-}
+    int ret = -1;
+    if (kPictureAttribute_Brightness == attr)
+        ret = channel->ChangePictureAttribute(type, "brightness", direction);
+    else if (kPictureAttribute_Contrast == attr)
+        ret = channel->ChangePictureAttribute(type, "contrast", direction);
+    else if (kPictureAttribute_Colour == attr)
+        ret = channel->ChangePictureAttribute(type, "colour", direction);
+    else if (kPictureAttribute_Hue == attr)
+        ret = channel->ChangePictureAttribute(type, "hue", direction);
 
-/** \fn TVRec::ChangeColour(bool)
- *  \brief Changes the colour phase of a recording.
- *
- *  Note: In practice this only works with frame grabbing recorders.
- *
- *  \return colour if it succeeds, -1 otherwise.
- */
-int TVRec::ChangeColour(bool direction)
-{
-    QMutexLocker lock(&stateChangeLock);
-
-    if (!channel)
+    if (ret < 0)
         return -1;
-
-    int ret = channel->ChangeColour(direction);
-    return ret;
-}
-
-/** \fn TVRec::ChangeHue(bool)
- *  \brief Changes the hue of a recording.
- *
- *  Note: In practice this only works with frame grabbing recorders.
- *
- *  \return hue if it succeeds, -1 otherwise.
- */
-int TVRec::ChangeHue(bool direction)
-{
-    QMutexLocker lock(&stateChangeLock);
-
-    if (!channel)
-        return -1;
-
-    int ret = channel->ChangeHue(direction);
-    return ret;
+    return ret / 655;
 }
 
 /** \fn TVRec::GetConnectedInputs(void) const
@@ -3695,10 +3679,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 #ifdef USING_V4L 
     if (GetV4LChannel())
     {
-        channel->SetBrightness();
-        channel->SetContrast();
-        channel->SetColour();
-        channel->SetHue();
+        channel->InitPictureAttributes();
         CloseChannel();
     }
 #endif
