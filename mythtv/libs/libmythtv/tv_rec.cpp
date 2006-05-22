@@ -54,6 +54,10 @@ using namespace std;
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
 
+#ifdef USING_CRC_IP_NETWORK_REC
+#include "crcipnetworkrecorder.h"
+#endif
+
 #ifdef USING_V4L
 #include "channel.h"
 #endif
@@ -141,6 +145,7 @@ TVRec::TVRec(int capturecardnum)
 
 bool TVRec::CreateChannel(const QString &startchannel)
 {
+    rbFileExt = "mpg";
     bool init_run = false;
     if (genOpt.cardtype == "DVB")
     {
@@ -195,6 +200,15 @@ bool TVRec::CreateChannel(const QString &startchannel)
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
     }
+    else if (genOpt.cardtype == "CRC_IP")
+    {
+#ifdef USING_CRC_IP_NETWORK_REC
+        channel = new DummyChannel(this);
+        InitChannel(genOpt.defaultinput, startchannel);
+        init_run = true;
+        rbFileExt = "mpg";
+#endif // USING_CRC_IP_NETWORK_REC
+    }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
 #ifdef USING_V4L
@@ -238,6 +252,7 @@ bool TVRec::Init(void)
     if (!GetDevices(cardid, genOpt, dvbOpt, fwOpt, dboxOpt))
         return false;
 
+    // configure the Channel instance
     QString startchannel = GetStartChannel(cardid, genOpt.defaultinput);
     if (!CreateChannel(startchannel))
         return false;
@@ -823,6 +838,14 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         ringBuffer->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_V4L
+    }
+    else if (genOpt.cardtype == "CRC_IP")
+    {
+#ifdef USING_CRC_IP_NETWORK_REC
+        recorder = new CRCIpNetworkRecorder(this);
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        ringBuffer->SetWriteBufferSize(4*1024*1024);
+#endif // USING_CRC_IP_NETWORK_REC
     }
     else if (genOpt.cardtype == "FIREWIRE")
     {

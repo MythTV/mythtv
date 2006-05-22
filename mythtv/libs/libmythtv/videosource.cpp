@@ -1030,6 +1030,45 @@ class HDHomeRunConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard& parent;
 };
 
+class CRCIpNetworkRecorderDeviceID: public LineEditSetting, public CCSetting
+{
+  public:
+    CRCIpNetworkRecorderDeviceID(const CaptureCard& parent):
+        CCSetting(parent, "videodevice")
+    {
+        setValue("udp://?localport=1234");
+        setLabel(QObject::tr("URL"));
+        setHelpText(QObject::tr("URL of the incomming stream "
+                                "(ex.: udp://?localport=1234)"));
+    }
+};
+
+void CRCIpNetworkRecorderInput::fillSelections(const QString&)
+{
+    clearSelections();
+    addSelection("MPEG2TS");
+}
+
+class CRCIpNetworkRecorderConfigurationGroup: public VerticalConfigurationGroup
+{
+  public:
+    CRCIpNetworkRecorderConfigurationGroup(CaptureCard& a_parent):
+        parent(a_parent)
+    {
+        setUseLabel(false);
+        addChild(new CRCIpNetworkRecorderDeviceID(parent));
+
+        CRCIpNetworkRecorderInput *defaultinput =
+            new CRCIpNetworkRecorderInput(parent);
+
+        addChild(defaultinput);
+        defaultinput->setVisible(false);
+    };
+
+  private:
+    CaptureCard& parent;
+};
+
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     ConfigurationGroup(false, true, false, false),
     VerticalConfigurationGroup(false, true, false, false),
@@ -1193,6 +1232,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
 #ifdef USING_HDHOMERUN
     addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
 #endif // USING_HDHOMERUN
+
+#ifdef USING_CRC_IP_NETWORK_REC
+    addTarget("CRC_IP",   new CRCIpNetworkRecorderConfigurationGroup(parent));
+#endif // USING_CRC_IP_NETWORK_REC
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
@@ -1311,6 +1354,11 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("HDHomeRun DTV tuner box"), "HDHOMERUN");
 #endif // USING_HDHOMERUN
+
+#ifdef USING_CRC_IP_NETWORK_REC
+    setting->addSelection(
+        QObject::tr("CRC IP Network Recorder"), "CRC_IP");
+#endif // USING_CRC_IP_NETWORK_REC
 }
 
 class CardID: public SelectLabelSetting, public CISetting {

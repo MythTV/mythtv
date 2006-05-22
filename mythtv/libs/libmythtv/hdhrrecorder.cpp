@@ -219,7 +219,7 @@ bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
             if (lpid == GetStreamData()->VideoPIDSingleProgram())
             {
                 //cerr<<"v";
-                _buffer_packets = !FindKeyframes(&tspacket);
+                _buffer_packets = !FindMPEG2Keyframes(&tspacket);
                 BufferedWrite(tspacket);
             }
             else if (GetStreamData()->IsAudioPID(lpid))

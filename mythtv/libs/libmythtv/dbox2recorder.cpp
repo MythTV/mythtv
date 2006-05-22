@@ -552,7 +552,7 @@ int DBox2Recorder::processStream(stream_meta *stream)
         const void     *data     = stream->buffer + readIndex + tsPos;
         const TSPacket *tspacket = reinterpret_cast<const TSPacket*>(data);
 
-        _buffer_packets = !FindKeyframes(tspacket);
+        _buffer_packets = !FindMPEG2Keyframes(tspacket);
 
         BufferedWrite(*tspacket);
 

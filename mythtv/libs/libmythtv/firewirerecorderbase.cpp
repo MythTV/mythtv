@@ -76,7 +76,7 @@ void FirewireRecorderBase::ProcessTSPacket(const TSPacket &tspacket)
         // Pass or reject packets based on PID, and parse info from them 
         if (lpid == StreamData()->VideoPIDSingleProgram()) 
         { 
-            _buffer_packets = !FindKeyframes(&tspacket); 
+            _buffer_packets = !FindMPEG2Keyframes(&tspacket); 
             BufferedWrite(tspacket); 
         } 
         else if (StreamData()->IsAudioPID(lpid)) 

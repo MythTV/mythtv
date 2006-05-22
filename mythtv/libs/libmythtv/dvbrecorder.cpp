@@ -903,7 +903,7 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
 
     // Check for keyframes and count frames
     if (StreamID::IsVideo(info->streamType))
-        _buffer_packets = !FindKeyframes(&tspacket);
+        _buffer_packets = !FindMPEG2Keyframes(&tspacket);
 
     // Sync recording start to first keyframe
     if (_wait_for_keyframe_option && _first_keyframe<0)
@@ -942,7 +942,7 @@ void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
         _audio_header_pos = 0;
 
     // Find the current audio time stamp.  This code is based on
-    // DTVRecorder::FindKeyframes.
+    // DTVRecorder::FindMPEG2Keyframes.
     if (tspacket.PayloadStart())
         _audio_header_pos = 0;
     for (uint i = tspacket.AFCOffset(); i < TSPacket::SIZE; i++)

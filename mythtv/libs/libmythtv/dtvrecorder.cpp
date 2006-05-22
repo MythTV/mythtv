@@ -40,6 +40,9 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _header_pos(0),                 _first_keyframe(-1),
     _last_gop_seen(0),              _last_seq_seen(0),
     _last_keyframe_seen(0),
+    // H.264 support
+    _pes_synced(false),
+    _seen_sps(false),
     // settings
     _request_recording(false),
     _wait_for_keyframe_option(true),
@@ -144,6 +147,9 @@ void DTVRecorder::Reset(void)
     //_buffer_size
     _frames_seen_count          = 0;
     _frames_written_count       = 0;
+    _pes_synced                 = false;
+    _seen_sps                   = false;
+    _h264_kf_seq.Reset();
     _position_map.clear();
     _position_map_delta.clear();
 }
@@ -176,7 +182,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
         ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
 }
 
-/** \fn DTVRecorder::FindKeyframes(const TSPacket* tspacket)
+/** \fn DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
  *  \brief Locates the keyframes and saves them to the position map.
  *
  *   This searches for three magic integers in the stream.
@@ -202,7 +208,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
  *
  *  \return Returns true if packet[s] should be output.
  */
-bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
+bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 {
     bool haveBufferedData = !_payload_buffer.empty();
     if (!tspacket->HasPayload()) // no payload to scan
@@ -364,3 +370,155 @@ void DTVRecorder::SavePositionMap(bool force)
             curRecording->SetFilesize(ringBuffer->GetWritePosition());
     }
 }
+
+/** \fn DTVRecorder::FindH264Keyframes(const TSPacket*)
+ *  \brief This searches the TS packet to identify keyframes.
+ *  \param TSPacket Pointer the the TS packet data.
+ *  \return Returns true if a keyframe has been found.
+ */
+bool DTVRecorder::FindH264Keyframes(const TSPacket* tspacket)
+{
+    if (!tspacket->HasPayload())
+        return false;
+
+    const bool payloadStart = tspacket->PayloadStart();
+    if (payloadStart)
+    {
+        // reset PES sync state
+        _pes_synced = false;
+        _header_pos = 0;
+    }
+
+    bool hasFrame = false;
+    bool hasKeyFrame = false;
+
+    // scan for PES packets and H.264 NAL units
+    uint i = tspacket->AFCOffset();
+    for (; i < TSPacket::SIZE; i++)
+    {
+        // special handling required when a new PES packet begins
+        if (payloadStart && !_pes_synced)
+        {
+            // bounds check
+            if (i + 2 >= TSPacket::SIZE)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "PES packet start code may overflow to next TS packet, aborting keyframe search");
+                break;
+            }
+
+            // must find the PES start code
+            if (tspacket->data()[i++] != 0x00 || 
+                tspacket->data()[i++] != 0x00 || 
+                tspacket->data()[i++] != 0x01)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "PES start code not found in TS packet with PUSI set");
+                break;
+            }
+
+            // bounds check
+            if (i + 5 >= TSPacket::SIZE)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "PES packet headers overflow to next TS packet, aborting keyframe search");
+                break;
+            }
+
+            // now we need to compute where the PES payload begins
+            // skip past the stream_id (+1)
+            // the next two bytes are the PES packet length (+2)
+            // after that, one byte of PES packet control bits (+1)
+            // after that, one byte of PES header flags bits (+1)
+            // and finally, one byte for the PES header length
+            const unsigned char pes_header_length = tspacket->data()[i + 5];
+
+            // bounds check
+            if ((i + 6 + pes_header_length) >= TSPacket::SIZE)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "PES packet headers overflow to next TS packet, aborting keyframe search");
+                break;
+            }
+
+            // we now know where the PES payload is
+            // normally, we should have used 6, but use 5 because the for loop will bump i
+            i += 5 + pes_header_length;
+            _pes_synced = true;
+
+            //VERBOSE(VB_RECORD, LOC + "PES synced");
+            continue;
+        }
+
+        // ain't going nowhere if we're not PES synced
+        if (!_pes_synced)
+            break;
+
+        // scan for a NAL unit start code
+        uint32_t bytes_used = _h264_kf_seq.AddBytes(tspacket->data() + i,
+                                                   TSPacket::SIZE - i,
+                                                   ringBuffer->GetWritePosition());
+        i += (bytes_used - 1);
+
+        // special handling when we've synced to a NAL unit
+        if (_h264_kf_seq.HasStateChanged())
+        {
+            if (_h264_kf_seq.DidReadNALHeaderByte() && _h264_kf_seq.LastSyncedType() == H264::NALUnitType::SPS)
+                _seen_sps = true;
+
+            if (_h264_kf_seq.IsOnKeyframe())
+            {
+                hasKeyFrame = true;
+                hasFrame = true;
+            }
+
+            if (_h264_kf_seq.IsOnFrame())
+                hasFrame = true;
+        }
+    } // for (; i < TSPacket::SIZE; i++)
+
+    if (hasKeyFrame)
+    {
+        _last_keyframe_seen = _frames_seen_count;
+        HandleH264Keyframe();
+    }
+
+    if (hasFrame)
+    {
+        _frames_seen_count++;
+        if (!_wait_for_keyframe_option || _first_keyframe >= 0)
+            _frames_written_count++;
+    }
+
+    return hasKeyFrame;
+}
+
+/** \fn DTVRecorder::HandleH264Keyframe(void)
+ *  \brief This save the current frame to the position maps
+ *         and handles ringbuffer switching.
+ */
+void DTVRecorder::HandleH264Keyframe(void)
+{
+    unsigned long long frameNum = _frames_written_count;
+
+    _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
+
+    // Add key frame to position map
+    bool save_map = false;
+    _position_map_lock.lock();
+    if (!_position_map.contains(frameNum))
+    {
+        _position_map_delta[frameNum] = _h264_kf_seq.KeyframeAUStreamOffset();
+        _position_map[frameNum]       = _h264_kf_seq.KeyframeAUStreamOffset();
+        save_map = true;
+    }
+    _position_map_lock.unlock();
+
+    // Save the position map delta, but don't force a save.
+    if (save_map)
+        SavePositionMap(false);
+
+    // Perform ringbuffer switch if needed.
+    CheckForRingBufferSwitch();
+}
+

@@ -83,6 +83,7 @@ class CardUtil
         HDTV,
         FIREWIRE,
         HDHOMERUN,
+        CRC_IP,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -111,6 +112,8 @@ class CardUtil
             return FIREWIRE;
         if ("HDHOMERUN" == name)
             return HDHOMERUN;
+        if ("CRC_IP" == name)
+            return CRC_IP;
         return ERROR_UNKNOWN;
     }
 

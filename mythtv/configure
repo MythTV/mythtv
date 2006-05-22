@@ -55,6 +55,7 @@ lirc="yes"
 joystick_menu="yes"
 firewire_cable_box="yes"
 dbox2_dvb_box="yes"
+ip_network_recorder="yes"
 hdhomerun_box="yes"
 x11_include_path="/usr/X11R6/include"
 x11="yes"
@@ -179,6 +180,7 @@ echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
 echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
 echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
+echo "  --disable-iprec          disable support for Network Recorder"
 echo "  --disable-v4l            disable Video4Linux support"
 echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
 #echo "  --enable-ivtv-sys-header use ivtv system headers instead of myth headers"
@@ -465,6 +467,7 @@ audio_jack="no"
 dv1394="no"
 ivtv="no"
 dbox2_dvb_box="no"
+ip_network_recorder="yes"
 hdhomerun_box="yes"
 dvb="no"
 backend="no"
@@ -819,6 +822,10 @@ for opt do
   --enable-hdhomerun) hdhomerun_box="yes"
   ;;
   --disable-hdhomerun) hdhomerun_box="no"
+  ;;
+  --enable-crciprec) ip_network_recorder="yes"
+  ;;
+  --disable-crciprec) ip_network_recorder="no"
   ;;
   --enable-dvb) dvb="yes"
   ;;
@@ -2300,6 +2307,7 @@ if test x"$backend" = x"yes" ; then
   echo "DVB support      $dvb [$dvb_path]"
   echo "DBox2 support    $dbox2_dvb_box"
   echo "HDHomeRun sup.   $hdhomerun_box"
+  echo "CRC Ip Rec sup.  $ip_network_recorder"
 fi
 
 if test x"$frontend" = x"yes" ; then
@@ -2906,6 +2914,7 @@ if test x"$backend" = x"no" ; then
     ivtv_header="no"
     dbox2_dvb_box="no"
     hdhomerun_box="no"
+    ip_network_recorder="no"
     dvb="no"
 fi
 
@@ -2953,6 +2962,10 @@ fi
 
 if test x"$hdhomerun_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_hdhr"
+fi
+
+if test "$ip_network_recorder" = "yes" ; then
+  CCONFIG="$CCONFIG using_ip_rec"
 fi
 
 if test x"$lirc" = x"yes" ; then

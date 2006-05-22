@@ -571,7 +571,8 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype,
 
     if (("FIREWIRE"  == cardtype) ||
         ("DBOX2"     == cardtype) ||
-        ("HDHOMERUN" == cardtype))
+        ("HDHOMERUN" == cardtype) ||
+        ("CRC_IP"    == cardtype)) 
     {
         ret += "MPEG2TS";
     }
@@ -803,7 +804,8 @@ void CardUtil::GetCardInputs(
 
     if (("FIREWIRE"  == cardtype) ||
         ("DBOX2"     == cardtype) ||
-        ("HDHOMERUN" == cardtype))
+        ("HDHOMERUN" == cardtype) ||
+        ("CRC_IP"    == cardtype))
     {
         inputs += "MPEG2TS";
     }

@@ -224,6 +224,19 @@ class HDHRCardInput: public TunerCardInput
     void fillSelections(const QString& device);
 };
 
+class CRCIpNetworkRecorderInput: public TunerCardInput
+{
+    Q_OBJECT
+  public:
+    CRCIpNetworkRecorderInput(const CaptureCard& parent) : TunerCardInput(parent)
+    {
+        addSelection("MPEG2TS");
+    }
+
+  public slots:
+    void fillSelections(const QString& device);
+};
+
 class DVBAudioDevice: public LineEditSetting, public CCSetting {    
     Q_OBJECT
 public:

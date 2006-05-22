@@ -327,6 +327,14 @@ using_backend {
     HEADERS += NuppelVideoRecorder.h       fifowriter.h
     SOURCES += NuppelVideoRecorder.cpp     fifowriter.cpp
 
+    # Support for Network Recorder
+    using_ip_rec {
+        HEADERS += crcipnetworkrecorder.h
+        SOURCES += crcipnetworkrecorder.cpp
+
+        DEFINES += USING_CRC_IP_NETWORK_REC
+    }
+
     # Support for Video4Linux devices
     using_v4l {
         HEADERS += channel.h                   pchdtvsignalmonitor.h

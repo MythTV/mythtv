@@ -799,7 +799,7 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
             // Pass or reject frames based on PID, and parse info from them
             if (lpid == GetStreamData()->VideoPIDSingleProgram())
             {
-                _buffer_packets = !FindKeyframes(&tspacket);
+                _buffer_packets = !FindMPEG2Keyframes(&tspacket);
                 BufferedWrite(tspacket);
             }
             else if (GetStreamData()->IsAudioPID(lpid))
