@@ -2193,6 +2193,18 @@ if test x"$mac_accel" = x"yes" ; then
     fi
 fi
 
+# Ubuntu Dapper installs NVIDIA GL headers to a weird location in order
+# not to overwrite the headers installed from Mesa, etc. We need to
+# add that path to include paths if that's the case. 
+if test -d /usr/share/doc/nvidia-glx-dev/include; then 
+    CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/doc/nvidia-glx-dev/include"
+fi
+
+# Same for Debian Sid.
+if test -d /usr/share/nvidia/include/GL; then 
+    CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/nvidia/include"
+fi
+
 if test x"$direct_fb" = x"yes" ; then
     direct_fb="no"
     if test x`which directfb-config 2> /dev/null` != x"" ; then
