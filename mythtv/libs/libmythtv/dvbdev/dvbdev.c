@@ -29,55 +29,79 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 const char* dvbdevice(int type, int cardnum)
 {
-    char* frontenddev[4] =
+    char* frontenddev[8] =
     {
         "/dev/dvb/adapter0/frontend0",
         "/dev/dvb/adapter1/frontend0",
         "/dev/dvb/adapter2/frontend0",
-        "/dev/dvb/adapter3/frontend0"
+        "/dev/dvb/adapter3/frontend0",
+        "/dev/dvb/adapter4/frontend0",
+        "/dev/dvb/adapter5/frontend0",
+        "/dev/dvb/adapter6/frontend0",
+        "/dev/dvb/adapter7/frontend0",
     };
 
-    char* dvrdev[4] =
+    char* dvrdev[8] =
     {
         "/dev/dvb/adapter0/dvr0",
         "/dev/dvb/adapter1/dvr0",
         "/dev/dvb/adapter2/dvr0",
-        "/dev/dvb/adapter3/dvr0"
+        "/dev/dvb/adapter3/dvr0",
+        "/dev/dvb/adapter4/dvr0",
+        "/dev/dvb/adapter5/dvr0",
+        "/dev/dvb/adapter6/dvr0",
+        "/dev/dvb/adapter7/dvr0",
     };
 
-    char* demuxdev[4] =
+    char* demuxdev[8] =
     {
         "/dev/dvb/adapter0/demux0",
         "/dev/dvb/adapter1/demux0",
         "/dev/dvb/adapter2/demux0",
-        "/dev/dvb/adapter3/demux0"
+        "/dev/dvb/adapter3/demux0",
+        "/dev/dvb/adapter4/demux0",
+        "/dev/dvb/adapter5/demux0",
+        "/dev/dvb/adapter6/demux0",
+        "/dev/dvb/adapter7/demux0",
     };
 
-    char* cadev[4] =
+    char* cadev[8] =
     {
         "/dev/dvb/adapter0/ca0",
         "/dev/dvb/adapter1/ca0",
         "/dev/dvb/adapter2/ca0",
-        "/dev/dvb/adapter3/ca0"
+        "/dev/dvb/adapter3/ca0",
+        "/dev/dvb/adapter4/ca0",
+        "/dev/dvb/adapter5/ca0",
+        "/dev/dvb/adapter6/ca0",
+        "/dev/dvb/adapter7/ca0",
     };
 
-    char* audiodev[4] =
+    char* audiodev[8] =
     {
         "/dev/dvb/adapter0/audio0",
         "/dev/dvb/adapter1/audio0",
         "/dev/dvb/adapter2/audio0",
-        "/dev/dvb/adapter3/audio0"
+        "/dev/dvb/adapter3/audio0",
+        "/dev/dvb/adapter4/audio0",
+        "/dev/dvb/adapter5/audio0",
+        "/dev/dvb/adapter6/audio0",
+        "/dev/dvb/adapter7/audio0",
     };
 
-    char* videodev[4] =
+    char* videodev[8] =
     {
         "/dev/dvb/adapter0/video0",
         "/dev/dvb/adapter1/video0",
         "/dev/dvb/adapter2/video0",
-        "/dev/dvb/adapter3/video0"
+        "/dev/dvb/adapter3/video0",
+        "/dev/dvb/adapter4/video0",
+        "/dev/dvb/adapter5/video0",
+        "/dev/dvb/adapter6/video0",
+        "/dev/dvb/adapter7/video0",
     };
 
-    if (cardnum > 3)
+    if (cardnum > 7)
         return 0;
 
     switch(type)
