@@ -1324,6 +1324,7 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
 #ifdef USING_DVB
     if (GetDVBChannel())
     {
+        DVBSignalMonitor *sm = GetDVBSignalMonitor();
         // Try to read the actual values back from the card
         DVBTuning tuning;
         if (!GetDVBChannel()->GetTuningParams(tuning))
@@ -1334,7 +1335,8 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
                 tuning.Frequency(),         tuning.ModulationDB(),
-                -1 /* transport id */,      -1 /* network id */,
+                sm->GetCurrentTransportID(),
+                sm->GetCurrentNetworkID(),
                 -1 /* symbol rate */,       tuning.BandwidthChar(),
                 -1 /* polarity */,          tuning.InversionChar(),
                 tuning.TransmissionModeChar(),
@@ -1345,7 +1347,8 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
                 tuning.Frequency(),         (*transport).ModulationDB(),
-                -1 /* transport id */,      -1 /* network id */);
+                sm->GetCurrentTransportID(),
+                sm->GetCurrentNetworkID());
     }
 #endif // USING_DVB
 
