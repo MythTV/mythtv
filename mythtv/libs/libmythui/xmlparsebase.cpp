@@ -57,7 +57,16 @@ QSize XMLParseBase::parseSize(const QString &text, bool normalize)
     int x, y;
     QSize retval;
     if (sscanf(text.data(), "%d,%d", &x, &y) == 2)
+    {
+        if (x == -1 || y == -1)
+        {
+            QRect uiSize = GetMythMainWindow()->GetUIScreenRect();
+            x = uiSize.width();
+            y = uiSize.height();
+        }
+        
         retval = QSize(x, y);
+    }
 
     if (normalize)
         retval = GetMythMainWindow()->NormSize(retval);
@@ -100,6 +109,7 @@ MythUIType *XMLParseBase::GetGlobalObjectStore(void)
 void XMLParseBase::ClearGlobalObjectStore(void)
 {
     delete globalObjectStore;
+    globalObjectStore = NULL;
     GetGlobalObjectStore();
 }
 
@@ -124,6 +134,9 @@ MythUIType *XMLParseBase::ParseChildren(QDomElement &element,
                     QString name = info.attribute("name");
                     parent->AddFont(name, font);
                 }
+
+                if (font)
+                    delete font;
             }
             else if (type == "imagetype" ||
                      type == "textarea" ||
@@ -147,6 +160,18 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     if (name.isNull() || name.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "element has no name");
+        return NULL;
+    }
+
+    if (parent && parent->GetChild(name))
+    {
+        // if we're the global object store, assume it's just a theme overriding
+        // the defaults..
+        if (parent == GetGlobalObjectStore())
+            return NULL;
+
+        VERBOSE(VB_IMPORTANT, QString("duplicate name: %1 in parent %2")
+                                     .arg(name).arg(parent->name()));
         return NULL;
     }
 
@@ -226,6 +251,9 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                     QString name = info.attribute("name");
                     uitype->AddFont(name, font);
                 }
+
+                if (font)
+                    delete font;
             }
             else if (info.tagName() == "imagetype" || 
                      info.tagName() == "textarea" || 
@@ -341,7 +369,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
         n = n.nextSibling();
     }
 
-    return false;
+    if (onlywindows)
+        return false;
+    return true;
 }
 
 bool XMLParseBase::LoadBaseTheme(void)
@@ -354,7 +384,6 @@ bool XMLParseBase::LoadBaseTheme(void)
         if (doLoad(QString::null, GetGlobalObjectStore(), themefile, false))
         {
             VERBOSE(VB_GENERAL, QString("Loading from: %1").arg(themefile));
-            return true;
         }
     }
 

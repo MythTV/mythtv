@@ -525,6 +525,18 @@ bool MythUIType::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "position")
         SetPosition(parsePoint(element));
+    else if (element.tagName() == "alpha")
+    {
+        m_Alpha = getFirstText(element).toInt();
+        m_AlphaChangeMode = 0;
+    }
+    else if (element.tagName() == "alphapulse")
+    {
+        m_AlphaChangeMode = 2;
+        m_AlphaMin = element.attribute("min", "0").toInt();
+        m_AlphaMax = element.attribute("max", "255").toInt();
+        m_AlphaChange = element.attribute("change", "5").toInt();
+    }
     else
         return false;
 

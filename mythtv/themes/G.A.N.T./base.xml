@@ -1,0 +1,17 @@
+<mythuitheme>
+
+  <window name="backgroundwindow">
+    <imagetype name="backimg">
+      <filename>bkg/grey.jpeg</filename>
+      <staticsize>-1,-1</staticsize>
+    </imagetype>
+
+    <imagetype name="logo">
+      <filename>myth_logo.png</filename>
+      <position>20,170</position>
+      <alphapulse min="0" max="255" change="1"/>
+    </imagetype>
+  </window>
+
+</mythuitheme>
+

@@ -3,6 +3,7 @@
 #include "mythmainwindow.h"
 #include "mythscreentype.h"
 #include "xmlparsebase.h"
+#include "mythfontproperties.h"
 
 #include "mythcontext.h"
 #include "oldsettings.h"
@@ -31,43 +32,60 @@ MythThemeBase::~MythThemeBase()
 
 void MythThemeBase::Reload(void)
 {
-    QRect uiSize = GetMythMainWindow()->GetUIScreenRect();
+    MythMainWindow *mainWindow = GetMythMainWindow();
+    QRect uiSize = mainWindow->GetUIScreenRect();
 
-    QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap"
-);
-    backgroundname = gContext->GetThemeDir() + backgroundname;
-
-    d->backimg->SetFilename(backgroundname);
-    d->backimg->SetPosition(GetMythMainWindow()->NormPoint(QPoint(0, 0)));
-    d->backimg->SetSize(uiSize.width(), uiSize.height());
-    d->backimg->Load();
-
+    GetGlobalFontMap()->Clear();
     XMLParseBase::ClearGlobalObjectStore();
     XMLParseBase::LoadBaseTheme();
+
+    d->background->PopScreen();
+
+    d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
+
+    if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
+                                          d->backgroundscreen))
+    {
+        QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap"
+);
+        backgroundname = gContext->GetThemeDir() + backgroundname;
+
+        d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
+                                     "backimg");
+        d->backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
+        d->backimg->SetSize(uiSize.width(), uiSize.height());
+        d->backimg->Load();
+    }
+
+    d->background->AddScreen(d->backgroundscreen, false);
 }
 
 void MythThemeBase::Init(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
-
     QRect uiSize = mainWindow->GetUIScreenRect();
 
     d->background = new MythScreenStack(mainWindow, "background");
-    d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
-
-    QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap"
-);
-    backgroundname = gContext->GetThemeDir() + backgroundname;
-
-    d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
-                                 "backimg");
-    d->backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
-    d->backimg->SetSize(uiSize.width(), uiSize.height());
-    d->backimg->Load();
-
-    d->background->AddScreen(d->backgroundscreen, false);
+    d->background->DisableEffects();
 
     XMLParseBase::LoadBaseTheme();
+    d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
+
+    if (!XMLParseBase::CopyWindowFromBase("backgroundwindow", 
+                                          d->backgroundscreen))
+    {
+        QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap"
+);
+        backgroundname = gContext->GetThemeDir() + backgroundname;
+
+        d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
+                                     "backimg");
+        d->backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
+        d->backimg->SetSize(uiSize.width(), uiSize.height());
+        d->backimg->Load();
+    }
+
+    d->background->AddScreen(d->backgroundscreen, false);
 
     new MythScreenStack(mainWindow, "main stack", true);
 }

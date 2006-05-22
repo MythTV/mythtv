@@ -22,6 +22,8 @@ class MythScreenStack : public QObject
     void GetDrawOrder(QValueVector<MythScreenType *> &screens);
     int TotalScreens();
 
+    void DisableEffects(void) { m_DoTransitions = false; }
+
   protected:
     void RecalculateDrawOrder(void);
     void DoNewFadeTransition();

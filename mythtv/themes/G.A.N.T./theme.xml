@@ -79,12 +79,6 @@
     </activetext>
   </genericbutton>
   
-  <logo>
-    <image>myth_logo.png</image>
-    <position>20,170</position>
-    <!--<position>540,510</position>-->
-  </logo>
-
   <uparrow>
     <image>arrow_up.png</image>
     <position>95,120</position>
