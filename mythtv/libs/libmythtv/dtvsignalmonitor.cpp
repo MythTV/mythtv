@@ -37,6 +37,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       matchingSDT(tr("Matching")+" SDT", "matching_sdt", 1, true, 0, 1, 0),
       majorChannel(-1), minorChannel(-1),
       networkID(0), transportID(0),
+      detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
       ignoreEncrypted(true),
       error("")
@@ -403,6 +404,9 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
 void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
 {
     AddFlags(kDTVSigMon_SDTSeen);
+
+    detectedNetworkID = sdt->OriginalNetworkID();
+    detectedTransportID = sdt->TSID();
 
     if (sdt->OriginalNetworkID() != networkID || sdt->TSID() != transportID)
     {

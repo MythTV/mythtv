@@ -1335,8 +1335,8 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
                 tuning.Frequency(),         tuning.ModulationDB(),
-                sm->GetCurrentTransportID(),
-                sm->GetCurrentNetworkID(),
+                sm->GetDetectedTransportID(),
+                sm->GetDetectedNetworkID(),
                 -1 /* symbol rate */,       tuning.BandwidthChar(),
                 -1 /* polarity */,          tuning.InversionChar(),
                 tuning.TransmissionModeChar(),
@@ -1347,8 +1347,8 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
                 tuning.Frequency(),         (*transport).ModulationDB(),
-                sm->GetCurrentTransportID(),
-                sm->GetCurrentNetworkID());
+                sm->GetDetectedTransportID(),
+                sm->GetDetectedNetworkID());
     }
 #endif // USING_DVB
 

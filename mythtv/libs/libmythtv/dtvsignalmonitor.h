@@ -42,6 +42,9 @@ class DTVSignalMonitor : public SignalMonitor,
     uint GetNetworkID(void)   const { return networkID;     }
     int  GetServiceID(void)   const { return programNumber; }
 
+    uint GetDetectedNetworkID(void)   const  { return detectedNetworkID; }
+    uint GetDetectedTransportID(void) const  { return detectedTransportID; }
+
     void SetFTAOnly(bool fta)    { ignoreEncrypted = fta;  }
     bool GetFTAOnly() const      { return ignoreEncrypted; }
 
@@ -113,11 +116,19 @@ class DTVSignalMonitor : public SignalMonitor,
     SignalMonitorValue matchingVCT;
     SignalMonitorValue matchingNIT;
     SignalMonitorValue matchingSDT;
+
+    // ATSC tuning info
     int                majorChannel;
     int                minorChannel;
+    // DVB tuning info
     uint               networkID;
     uint               transportID;
+    // DVB scanning info
+    uint               detectedNetworkID;
+    uint               detectedTransportID;
+    // MPEG/DVB/ATSC tuning info
     int                programNumber;
+
     bool               ignoreEncrypted;
     QString            error;
 };

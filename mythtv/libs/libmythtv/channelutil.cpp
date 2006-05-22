@@ -81,7 +81,7 @@ static uint insert_dtv_multiplex(
             .arg(frequency).arg(modulation));
 
     // If transport is already present, skip insert
-    uint mplex = get_dtv_multiplex(
+    int mplex = get_dtv_multiplex(
         db_source_id,  sistandard,    frequency,
         // DVB specific
         transport_id,  network_id);
@@ -193,14 +193,12 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
 
         // Use the frequency we already have for this mplex
         // as it may be one of the other_frequencies for this mplex
-        if (cd.OtherFrequencyInUse())
-        {
-            QString modulation;
-            uint mux = ChannelUtil::GetMplexID(sourceid, tsid, netid);
-            freq     = ChannelUtil::GetTuningParams(mux, modulation);
-        }
+        QString modulation;
+        int mux = ChannelUtil::GetMplexID(sourceid, tsid, netid);
+        if (mux != -1)
+            freq = ChannelUtil::GetTuningParams(mux, modulation);
 
-        uint mux = ChannelUtil::CreateMultiplex(
+        mux = ChannelUtil::CreateMultiplex(
             sourceid,            "dvb",
             freq,                 QString::null,
             // DVB specific
