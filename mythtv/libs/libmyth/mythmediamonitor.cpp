@@ -352,12 +352,52 @@ QStringList MediaMonitor::GetCDROMBlockDevices(void)
 }
 
 // Given a media deivce add it to our collection.
-void MediaMonitor::AddDevice(MythMediaDevice* pDevice)
+bool MediaMonitor::AddDevice(MythMediaDevice* pDevice)
 {
     if ( ! pDevice )
     {
         VERBOSE(VB_IMPORTANT, "Error - MediaMonitor::AddDevice(null)");
-        return;
+        return false;
+    }
+
+    dev_t new_rdev;
+    struct stat sb;
+
+    if (stat(pDevice->getDevicePath(), &sb) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "MediaMonitor::AddDevice() -- " +
+                QString("Failed to stat '%1'")
+                .arg(pDevice->getDevicePath()) + ENO);
+
+        return false;
+    }
+    new_rdev = sb.st_rdev;
+
+    //
+    // Check if this is a duplicate of a device we have already added
+    //
+    QValueList<MythMediaDevice*>::iterator itr = m_Devices.begin();
+    MythMediaDevice* pDev;
+    while (itr != m_Devices.end()) 
+    {
+        pDev = *itr;
+        if (stat(pDev->getDevicePath(), &sb) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, "MediaMonitor::AddDevice() -- " +
+                    QString("Failed to stat '%1'")
+                    .arg(pDevice->getDevicePath()) + ENO);
+
+            return false;
+        }
+
+        if (sb.st_rdev == new_rdev)
+        {
+            VERBOSE(VB_IMPORTANT, "Mediamonitor: AddDevice() -- " +
+                    QString("Not adding '%1', it appears to be a duplicate.")
+                    .arg(pDevice->getDevicePath()));
+
+            return false;
+        }
     }
 
     QMutexLocker locker(&m_DevicesLock);
@@ -366,6 +406,8 @@ void MediaMonitor::AddDevice(MythMediaDevice* pDevice)
             this, SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
     m_Devices.push_back( pDevice );
     m_UseCount[pDevice] = 0;
+
+    return true;
 }
 
 // Given a fstab entry to a media device determine what type of device it is 
@@ -434,7 +476,7 @@ bool MediaMonitor::AddDevice(struct fstab * mep)
              strncpy(devstr, dev, len);
              devstr[len] = 0;
              if (is_cdrom)
-                 MythCDROM::get(this, QString(devstr),
+                 pDevice = MythCDROM::get(this, QString(devstr),
                                 is_supermount, m_AllowEject);
          }
          else
@@ -448,11 +490,10 @@ bool MediaMonitor::AddDevice(struct fstab * mep)
                          .arg(pDevice->getDevicePath()));
          if (pDevice->testMedia() == MEDIAERR_OK) 
          {
-             AddDevice(pDevice);
-             return true;
+             if (AddDevice(pDevice))
+                return true;
          }
-            else
-                delete pDevice;
+         delete pDevice;
       }
 
      return false;
@@ -530,6 +571,8 @@ bool MediaMonitor::AddDevice(const char* devPath )
  */
 bool MediaMonitor::FindPartitions(const QString &dev, bool checkPartitions)
 {
+    MythMediaDevice* pDevice = NULL;
+
     if (checkPartitions)
     {
         // check for partitions
@@ -562,8 +605,10 @@ bool MediaMonitor::FindPartitions(const QString &dev, bool checkPartitions)
         QString device_file = GetDeviceFile(dev);
         if (!device_file.isNull())
         {
-            AddDevice(MythCDROM::get(this, device_file, false, m_AllowEject));
-            return true;
+            pDevice = MythCDROM::get(this, device_file, false, m_AllowEject);
+
+            if (AddDevice(pDevice))
+                return true;
         }
     }
     else
@@ -572,10 +617,14 @@ bool MediaMonitor::FindPartitions(const QString &dev, bool checkPartitions)
         QString device_file = GetDeviceFile(dev);
         if (!device_file.isNull())
         {
-            AddDevice(MythHDD::Get(this, device_file, false, false));
-            return true;
+            pDevice = MythHDD::Get(this, device_file, false, false);
+            if (AddDevice(pDevice))
+                return true;
         }
     }
+
+    if (pDevice)
+        delete pDevice;
 
     return false;
 }

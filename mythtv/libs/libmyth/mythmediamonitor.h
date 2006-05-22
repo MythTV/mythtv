@@ -80,7 +80,7 @@ class MediaMonitor : public QObject
     bool CheckMountable(void);
     bool FindPartitions(const QString &dev, bool checkPartitions);
 
-    void AddDevice(MythMediaDevice* pDevice);
+    bool AddDevice(MythMediaDevice* pDevice);
     bool AddDevice(const char* dev);
     bool AddDevice(struct fstab* mep);
     bool RemoveDevice(const QString &dev);
