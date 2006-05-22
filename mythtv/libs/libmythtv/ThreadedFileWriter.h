@@ -46,7 +46,7 @@ class ThreadedFileWriter
     bool            flush;
     bool            write_is_blocked;
     bool            in_dtor;
-    unsigned long   tfw_min_write_size;
+    long long       tfw_min_write_size;
 
     // buffer position state
     uint            rpos;    ///< points to end of data written to disk
