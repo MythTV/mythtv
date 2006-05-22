@@ -14,6 +14,7 @@ class MythListButton : public MythUIType
 {
     Q_OBJECT
   public:
+    MythListButton(MythUIType *parent, const char *name);
     MythListButton(MythUIType *parent, const char *name, 
                    const QRect &area, bool showArrow = true, 
                    bool showScrollArrows = false);
@@ -27,9 +28,6 @@ class MythListButton : public MythUIType
     void SetSpacing(int spacing);
     void SetMargin(int margin);
     void SetDrawFromBottom(bool draw);
-
-    void SetItemRegColor(const QColor& beg, const QColor& end, uint alpha);
-    void SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
 
     void SetActive(bool active);
     void Reset();
@@ -60,8 +58,9 @@ class MythListButton : public MythUIType
     void itemSelected(MythListButtonItem* item);
 
   protected:
+    void Const();
     void Init();
-    void LoadPixmap(MythImage **pix, const QString& fileName);
+    void LoadPixmap(MythImage **pix, QDomElement &element);
 
     void InsertItem(MythListButtonItem *item);
     void RemoveItem(MythListButtonItem *item);
@@ -71,12 +70,14 @@ class MythListButton : public MythUIType
     /* methods for subclasses to override */
     virtual uint ItemWidth() const { return m_contentsRect.width(); }
     virtual QRect CalculateContentsRect(const QRect &arrowsRect) const;
-    virtual void LoadArrowPixmaps(MythImage **prevReg, MythImage **prevAct,
-                                  MythImage **nextReg, MythImage **nextAct);
-
     virtual void CalculateVisibleItems(void);
     virtual const QRect PlaceArrows(const QSize &arrowSize);
     virtual QPoint GetButtonPosition(uint i) const;
+
+    virtual bool ParseElement(QDomElement &element);
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
 
     /**/
 
@@ -97,13 +98,6 @@ class MythListButton : public MythUIType
     MythUIStateType *m_downArrow;
 
     QValueVector<MythUIButton *> m_ButtonList;
-
-    QColor m_itemRegBeg;
-    QColor m_itemRegEnd;
-    QColor m_itemSelBeg;
-    QColor m_itemSelEnd;
-    uint m_itemRegAlpha;
-    uint m_itemSelAlpha;
 
     MythFontProperties *m_fontActive;
     MythFontProperties *m_fontInactive;
@@ -128,22 +122,23 @@ class MythListButton : public MythUIType
 
     int m_textFlags;
 
+    MythImage *arrowPix, *checkNonePix, *checkHalfPix, *checkFullPix;
+    MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;
+
     friend class MythListButtonItem;
 };
 
 class MythHorizListButton : public MythListButton
 {
   public:
+    MythHorizListButton(MythUIType *parent, const char *name);
     MythHorizListButton(MythUIType *parent, const char *name, 
-                             const QRect &area, bool showArrow = true, 
-                             bool showScrollArrows = false,
-                             uint horizontalItems = 3);
+                        const QRect &area, bool showArrow = true, 
+                        bool showScrollArrows = false,
+                        uint horizontalItems = 3);
 
   protected:
     inline void CalculateVisibleItems(void) { return; }
-
-    void LoadArrowPixmaps(MythImage **PrevReg, MythImage **PrevAct,
-                          MythImage **NextReg, MythImage **NextAct);
 
     const QRect PlaceArrows(const QSize & arrowSize);
 
@@ -151,7 +146,10 @@ class MythHorizListButton : public MythListButton
     inline uint ItemWidth(void) const { return m_itemWidth; }
     QPoint GetButtonPosition(uint i) const;
 
-  private:
+    virtual bool ParseElement(QDomElement &element);
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+
     int m_itemWidth;
 };
 
@@ -159,8 +157,8 @@ class MythListButtonItem
 {
   public:
     enum CheckState {
-        CantCheck=-1,
-        NotChecked=0,
+        CantCheck = -1,
+        NotChecked = 0,
         HalfChecked,
         FullChecked
     };

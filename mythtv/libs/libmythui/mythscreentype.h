@@ -15,6 +15,8 @@ class MythScreenType : public MythUIType
                    bool fullscreen = true);
     virtual ~MythScreenType();
 
+    virtual bool Create(void); // do the actual work of making the screen.
+
     // if the widget is full screen and obscures widgets below it
     bool IsFullscreen(void);
     void SetFullscreen(bool full);
@@ -33,6 +35,13 @@ class MythScreenType : public MythUIType
     void SetDeleting(bool deleting);
 
   protected:
+    // for the global store..
+    MythScreenType(MythUIType *parent, const char *name, 
+                   bool fullscreen = true);
+
+    virtual void CopyFrom(MythUIType *base);
+    virtual void CreateCopy(MythUIType *parent);
+
     bool m_FullScreen;
     bool m_IsDeleting;
 
@@ -40,6 +49,8 @@ class MythScreenType : public MythUIType
     QPtrList<MythUIType> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
+
+    friend class XMLParseBase;
 };
 
 #endif

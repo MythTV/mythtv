@@ -1,0 +1,73 @@
+<mythuitheme>
+
+  <font name="bigboldwhite" face="Ariel">
+    <size>24</size>
+    <color>white</color>
+    <shadowcolor>black</shadowcolor>
+    <shadowoffset>4,4</shadowoffset>
+    <shadowalpha>64</shadowalpha>
+    <bold>yes</bold>
+  </font>
+
+  <font name="bigboldgrey" base="bigboldwhite">
+    <color>grey</color>
+  </font>
+
+  <buttonlist name="basebuttonlist">
+    <area>0,0,10,10</area>
+    <activefont>bigboldwhite</activefont>
+    <inactivefont>bigboldgrey</inactivefont>
+    <scrollarrows show="yes">
+      <statetype name="upscrollarrow">
+        <state type="off">
+          <imagetype name="upon">
+            <filename>lb-uparrow-reg.png</filename>
+          </imagetype>
+        </state>
+        <state type="full">
+          <imagetype name="upoff">
+            <filename>lb-uparrow-sel.png</filename>
+          </imagetype>
+        </state>
+      </statetype>
+      <statetype name="downscrollarrow">
+        <state type="off">
+          <imagetype name="dnon">
+            <filename>lb-dnarrow-reg.png</filename>
+          </imagetype>
+        </state>
+        <state type="full">
+          <imagetype name="dnoff">
+            <filename>lb-dnarrow-sel.png</filename>
+          </imagetype>
+        </state>
+      </statetype>
+    </scrollarrows>
+    <showarrow>yes</showarrow>
+    <arrow filename="lb-arrow.png"/>
+    <check-empty filename="lb-check-empty.png"/>
+    <check-half filename="lb-check-half.png"/>
+    <check-full filename="lb-check-full.png"/>
+    <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="100"/>
+    <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
+    <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
+    <spacing>10</spacing>
+    <margin>6</margin>
+  </buttonlist>
+
+  <window name="MythDialogBox">
+    <textarea name="messagearea">
+      <area>60,60,680,240</area>
+      <font>bigboldwhite</font>
+      <multiline>yes</multiline>
+      <align>left</align>
+    </textarea>
+
+    <buttonlist name="list" from="basebuttonlist">
+      <area>60,335,680,210</area>
+      <drawfrombottom>yes</drawfrombottom>
+      <textflags>center</textflags>
+    </buttonlist>
+  </window>
+
+</mythuitheme>

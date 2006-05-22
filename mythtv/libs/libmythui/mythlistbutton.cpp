@@ -12,6 +12,15 @@
 #include "mythuistatetype.h"
 #include "mythuibutton.h"
 
+MythListButton::MythListButton(MythUIType *parent, const char *name)
+              : MythUIType(parent, name)
+{
+    m_showArrow = true;
+    m_showScrollArrows = false;
+
+    Const();
+}
+
 MythListButton::MythListButton(MythUIType *parent, const char *name, 
                                const QRect& area, bool showArrow, 
                                bool showScrollArrows)
@@ -22,6 +31,11 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
     m_showArrow        = showArrow;
     m_showScrollArrows = showScrollArrows;
 
+    Const();
+}
+
+void MythListButton::Const(void)
+{
     m_active           = false;
     m_drawFromBottom   = false;
 
@@ -45,11 +59,11 @@ MythListButton::MythListButton(MythUIType *parent, const char *name,
 
     m_textFlags = Qt::AlignLeft | Qt::AlignVCenter;
 
-    SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
-    SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
-
     m_fontActive = new MythFontProperties();
     m_fontInactive = new MythFontProperties();
+
+    arrowPix = checkNonePix = checkHalfPix = checkFullPix = NULL;
+    itemRegPix = itemSelActPix = itemSelInactPix = NULL;
 }
 
 MythListButton::~MythListButton()
@@ -67,24 +81,21 @@ MythListButton::~MythListButton()
        delete m_fontActive; 
     if (m_fontInactive)
        delete m_fontInactive; 
-}
 
-void MythListButton::SetItemRegColor(const QColor& beg, 
-                                     const QColor& end,
-                                     uint alpha)
-{
-    m_itemRegBeg   = beg;
-    m_itemRegEnd   = end;
-    m_itemRegAlpha = alpha;
-}
-
-void MythListButton::SetItemSelColor(const QColor& beg,
-                                     const QColor& end,
-                                     uint alpha)
-{
-    m_itemSelBeg   = beg;
-    m_itemSelEnd   = end;
-    m_itemSelAlpha = alpha;
+    if (itemRegPix)
+        itemRegPix->DownRef();
+    if (itemSelActPix)
+        itemSelActPix->DownRef();
+    if (itemSelInactPix)
+        itemSelInactPix->DownRef();
+    if (arrowPix)
+        arrowPix->DownRef();
+    if (checkNonePix)
+        checkNonePix->DownRef();
+    if (checkHalfPix)
+        checkHalfPix->DownRef();
+    if (checkFullPix)
+        checkFullPix->DownRef();
 }
 
 void MythListButton::SetFontActive(const MythFontProperties &font)
@@ -576,49 +587,26 @@ void MythListButton::Init()
     m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMargin);
 
     QRect arrowsRect;
-    if (m_showScrollArrows) 
-    {
-        m_upArrow = new MythUIStateType(this, "upscrollarrow");
-        m_downArrow = new MythUIStateType(this, "downscrollarrow");
-
-        MythImage *upReg, *upAct, *downReg, *downAct;
-        LoadArrowPixmaps(&upReg, &upAct, &downReg, &downAct);
-
-        m_upArrow->AddImage(MythUIStateType::Off, upReg);
-        m_upArrow->AddImage(MythUIStateType::Full, upAct);
-        m_downArrow->AddImage(MythUIStateType::Off, downReg);
-        m_downArrow->AddImage(MythUIStateType::Full, downAct);
-
-        arrowsRect = PlaceArrows(upAct->size());
-
-        upAct->DownRef();
-        upReg->DownRef();
-        downReg->DownRef();
-        downAct->DownRef();
-    }
-    else 
+    if (m_showScrollArrows && m_upArrow) 
+        arrowsRect = PlaceArrows(m_upArrow->GetArea().size());
+    else
         arrowsRect = QRect(0, 0, 0, 0);
- 
+
+    if (m_upArrow)
+        m_upArrow->SetVisible(m_showScrollArrows);
+    if (m_downArrow)
+        m_downArrow->SetVisible(m_showScrollArrows);
+
     m_contentsRect = CalculateContentsRect(arrowsRect);
 
     CalculateVisibleItems();
 
-    MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;
-    MythImage *arrowPix, *checkNonePix, *checkHalfPix, *checkFullPix;
-
-    LoadPixmap(&checkNonePix, "check-empty");
-    LoadPixmap(&checkHalfPix, "check-half");
-    LoadPixmap(&checkFullPix, "check-full");
-
-    LoadPixmap(&arrowPix, "arrow");
-
-    QSize gradsize(ItemWidth(), m_itemHeight);
-    itemRegPix = MythImage::Gradient(gradsize, m_itemRegBeg, m_itemRegEnd,
-                                     m_itemRegAlpha);
-    itemSelActPix = MythImage::Gradient(gradsize, m_itemSelBeg, m_itemSelEnd,
-                                        m_itemSelAlpha);
-    itemSelInactPix = MythImage::Gradient(gradsize, m_itemSelBeg, m_itemSelEnd,
-                                          m_itemRegAlpha);
+    if (itemRegPix)
+        itemRegPix->Resize(QSize(ItemWidth(), m_itemHeight));
+    if (itemSelActPix)
+        itemSelActPix->Resize(QSize(ItemWidth(), m_itemHeight));
+    if (itemSelInactPix)
+        itemSelInactPix->Resize(QSize(ItemWidth(), m_itemHeight));
 
     for (int i = 0; i < (int)m_itemsVisible; i++)
     {
@@ -645,14 +633,6 @@ void MythListButton::Init()
         m_ButtonList.push_back(button);
     }
 
-    itemRegPix->DownRef();
-    itemSelActPix->DownRef();
-    itemSelInactPix->DownRef();
-    arrowPix->DownRef();
-    checkNonePix->DownRef();
-    checkHalfPix->DownRef();
-    checkFullPix->DownRef();
-
     SetPositionArrowStates();
 }
 
@@ -661,20 +641,26 @@ QPoint MythListButton::GetButtonPosition(uint i) const
     return QPoint(0, i * (m_itemHeight + m_itemSpacing));
 }
 
-void MythListButton::LoadPixmap(MythImage **pix, const QString& fileName)
+// FIXME: add verbose
+void MythListButton::LoadPixmap(MythImage **pix, QDomElement &element)
 {
-    QString file = "lb-" + fileName + ".png";
-    QImage *p = gContext->LoadScaleImage(file);
-    *pix = MythImage::FromQImage(&p);
-}
+    if (*pix)
+        (*pix)->DownRef();
+    *pix = NULL;
 
-void MythListButton::LoadArrowPixmaps(MythImage **PrevReg, MythImage **PrevAct,
-                                      MythImage **NextReg, MythImage **NextAct)
-{
-    LoadPixmap(PrevReg, "uparrow-reg");
-    LoadPixmap(PrevAct, "uparrow-sel");
-    LoadPixmap(NextReg, "dnarrow-reg");
-    LoadPixmap(NextAct, "dnarrow-sel");
+    QString filename = element.attribute("filename");
+    if (!filename.isEmpty())
+    {
+        QImage *p = gContext->LoadScaleImage(filename);
+        *pix = MythImage::FromQImage(&p);
+        return;
+    }
+
+    QColor startcol = QColor(element.attribute("gradientstart", "#505050"));
+    QColor endcol = QColor(element.attribute("gradientend", "#000000"));
+    int alpha = element.attribute("gradientalpha", "100").toInt();
+
+    *pix = MythImage::Gradient(QSize(10, 10), startcol, endcol, alpha);
 }
 
 const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
@@ -703,7 +689,179 @@ void MythListButton::CalculateVisibleItems(void)
     }
 }
 
+bool MythListButton::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "area")
+        m_Area = parseRect(element);
+    else if (element.tagName() == "inactivefont")
+    {
+        QString fontname = getFirstText(element);
+        MythFontProperties *fp = GetFont(fontname);
+        if (!fp)
+            fp = GetGlobalFontMap()->GetFont(fontname);
+        if (fp)
+            *m_fontInactive = *fp;
+    }
+    else if (element.tagName() == "activefont")
+    {
+        QString fontname = getFirstText(element);
+        MythFontProperties *fp = GetFont(fontname);
+        if (!fp)
+            fp = GetGlobalFontMap()->GetFont(fontname);
+        if (fp)
+            *m_fontActive = *fp;
+    }
+    else if (element.tagName() == "scrollarrows")
+    {
+        m_showScrollArrows = parseBool(element.attribute("show", ""));
+        if (m_upArrow)
+            delete m_upArrow;
+        if (m_downArrow)
+            delete m_downArrow;
+        ParseChildren(element, this);
+        m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
+        m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+    }
+    else if (element.tagName() == "showarrow")
+        m_showArrow = parseBool(element);
+    else if (element.tagName() == "arrow")
+        LoadPixmap(&arrowPix, element);
+    else if (element.tagName() == "check-empty")
+        LoadPixmap(&checkNonePix, element);
+    else if (element.tagName() == "check-half")
+        LoadPixmap(&checkHalfPix, element);
+    else if (element.tagName() == "check-full")
+        LoadPixmap(&checkFullPix, element);
+    else if (element.tagName() == "regular-background")
+        LoadPixmap(&itemRegPix, element);
+    else if (element.tagName() == "selected-background")
+        LoadPixmap(&itemSelActPix, element);
+    else if (element.tagName() == "inactive-background")
+        LoadPixmap(&itemSelInactPix, element);
+    else if (element.tagName() == "spacing")
+        m_itemSpacing = NormY(getFirstText(element).toInt());
+    else if (element.tagName() == "margin")
+        m_itemMargin = NormX(getFirstText(element).toInt());
+    else if (element.tagName() == "drawfrombottom")
+        m_drawFromBottom = parseBool(element);
+    else if (element.tagName() == "textflags")
+    {
+        QString align = getFirstText(element).lower();
+
+        if (align == "center")
+            m_textFlags |= Qt::AlignCenter;
+        else if (align == "right")
+            m_textFlags |= Qt::AlignRight;
+        else if (align == "left")
+            m_textFlags |= Qt::AlignLeft;
+        else if (align == "allcenter")
+            m_textFlags |= Qt::AlignHCenter | Qt::AlignVCenter;
+        else if (align == "vcenter")
+            m_textFlags |= Qt::AlignVCenter;
+        else if (align == "hcenter")
+            m_textFlags |= Qt::AlignHCenter;
+    }
+    else
+        return MythUIType::ParseElement(element);
+
+    return true;
+}
+
+void MythListButton::CreateCopy(MythUIType *parent)
+{
+    MythListButton *lb = new MythListButton(parent, name());
+    lb->CopyFrom(this);
+}
+
+void MythListButton::CopyFrom(MythUIType *base)
+{
+    MythListButton *lb = dynamic_cast<MythListButton *>(base);
+    if (!lb)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    m_order = lb->m_order;
+    m_rect = lb->m_rect;
+    m_contentsRect = lb->m_contentsRect;
+
+    m_itemHeight = lb->m_itemHeight;
+    m_itemSpacing = lb->m_itemSpacing;
+    m_itemMargin = lb->m_itemMargin;
+    m_itemsVisible = lb->m_itemsVisible;
+
+    arrowPix = lb->arrowPix;
+    checkNonePix = lb->checkNonePix;
+    checkHalfPix = lb->checkHalfPix;
+    checkFullPix = lb->checkFullPix;
+    itemRegPix = lb->itemRegPix;
+    itemSelActPix = lb->itemSelActPix;
+    itemSelInactPix = lb->itemSelInactPix;
+
+    if (itemRegPix)
+        itemRegPix->UpRef();
+    if (itemSelActPix)
+        itemSelActPix->UpRef();
+    if (itemSelInactPix)
+        itemSelInactPix->UpRef();
+    if (arrowPix)
+        arrowPix->UpRef();
+    if (checkNonePix)
+        checkNonePix->UpRef();
+    if (checkHalfPix)
+        checkHalfPix->UpRef();
+    if (checkFullPix)
+        checkFullPix->UpRef();
+
+    m_active = lb->m_active;
+    m_showScrollArrows = lb->m_showScrollArrows;
+    m_showArrow = lb->m_showArrow;
+
+    *m_fontActive = *lb->m_fontActive;
+    *m_fontInactive = *lb->m_fontInactive;
+
+    m_drawoffset = lb->m_drawoffset;
+    m_drawFromBottom = lb->m_drawFromBottom;
+
+    m_textFlags = lb->m_textFlags;
+
+    m_clearing = false;
+    m_topItem = m_selItem = NULL;
+
+    m_selPosition = m_topPosition = m_itemCount = 0;
+
+    MythUIType::CopyFrom(base);
+
+    m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
+    m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+
+    for (int i = 0; i < (int)m_itemsVisible; i++)
+    {
+        MythUIType *deltype;
+        QString name = QString("buttonlist button %1").arg(i);
+        if ((deltype = GetChild(name)))
+            delete deltype;
+    }
+
+    m_ButtonList.clear();
+
+    m_initialized = false;
+}
+
+void MythListButton::Finalize(void)
+{
+    MythUIType::Finalize();
+}
+
 //////////////////////////////////////////////////////////////////////////////
+
+MythHorizListButton::MythHorizListButton(MythUIType *parent,
+                                         const char *name)
+                   : MythListButton(parent, name)
+{
+    m_itemsVisible = 3;
+}
 
 MythHorizListButton::MythHorizListButton(MythUIType *parent,
                                          const char *name, const QRect &area,
@@ -749,15 +907,34 @@ QPoint MythHorizListButton::GetButtonPosition(uint i) const
                   GetArea().height() / 2 - m_itemHeight / 2);
 }
 
-void MythHorizListButton::LoadArrowPixmaps(MythImage **PrevReg,
-                                           MythImage **PrevAct,
-                                           MythImage **NextReg,
-                                           MythImage **NextAct)
+bool MythHorizListButton::ParseElement(QDomElement &element)
 {
-    LoadPixmap(PrevReg, "ltarrow-reg");
-    LoadPixmap(PrevAct, "ltarrow-sel");
-    LoadPixmap(NextReg, "rtarrow-reg");
-    LoadPixmap(NextAct, "rtarrow-sel");
+    if (element.tagName() == "items")
+        m_itemsVisible = getFirstText(element).toInt();
+    else
+        return MythListButton::ParseElement(element);
+
+    return true;
+}
+
+void MythHorizListButton::CreateCopy(MythUIType *parent)
+{
+    MythHorizListButton *hlb = new MythHorizListButton(parent, name());
+    hlb->CopyFrom(this);
+}
+
+void MythHorizListButton::CopyFrom(MythUIType *base)
+{
+    MythHorizListButton *hlb = dynamic_cast<MythHorizListButton *>(base);
+    if (!hlb)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    MythListButton::CopyFrom(base);
+
+    m_itemWidth = hlb->m_itemWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////

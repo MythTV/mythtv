@@ -7,6 +7,9 @@ using namespace std;
 #include "mythimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
+#include "mythfontproperties.h"
+
+#include "mythcontext.h"
 
 MythUIType::MythUIType(QObject *parent, const char *name)
           : QObject(parent, name)
@@ -31,10 +34,13 @@ MythUIType::MythUIType(QObject *parent, const char *name)
     }
 
     m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
+
+    m_Fonts = new FontMap();
 }
 
 MythUIType::~MythUIType()
 {
+    delete m_Fonts;
 }
 
 void MythUIType::AddChild(MythUIType *child)
@@ -490,6 +496,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_Visible = base->m_Visible;
     m_CanHaveFocus = base->m_CanHaveFocus;
 
+    m_Area = base->m_Area;
     m_Alpha = base->m_Alpha;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
     m_AlphaChange = base->m_AlphaChange;
@@ -501,14 +508,16 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_XYSpeed = base->m_XYSpeed;
 
     QValueVector<MythUIType *>::Iterator it;
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end(); 
+         ++it)
     {
          (*it)->CreateCopy(this);
     }
 }
 
-void MythUIType::CreateCopy(MythUIType *parent)
+void MythUIType::CreateCopy(MythUIType *)
 {
+    VERBOSE(VB_IMPORTANT, "Copy called on base type?");
 }
 
 //FIXME add alpha/movement/etc.
@@ -524,5 +533,19 @@ bool MythUIType::ParseElement(QDomElement &element)
 
 void MythUIType::Finalize(void)
 {
+}
+
+MythFontProperties *MythUIType::GetFont(const QString &text)
+{
+    MythFontProperties *ret = m_Fonts->GetFont(text);
+    if (!ret && m_Parent)
+        return m_Parent->GetFont(text);
+
+    return ret;
+}
+
+bool MythUIType::AddFont(const QString &text, MythFontProperties *fontProp)
+{
+    return m_Fonts->AddFont(text, fontProp);
 }
 

@@ -23,6 +23,19 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 }
 
+MythScreenType::MythScreenType(MythUIType *parent, const char *name,
+                               bool fullscreen)
+              : MythUIType(parent, name)
+{
+    m_FullScreen = fullscreen;
+    m_CurrentFocusWidget = NULL;
+
+    m_ScreenStack = NULL;
+    m_IsDeleting = false;
+
+    m_Area = GetMythMainWindow()->GetUIScreenRect();
+}
+
 MythScreenType::~MythScreenType()
 {
 }
@@ -146,3 +159,32 @@ void MythScreenType::SetDeleting(bool deleting)
 {
     m_IsDeleting = deleting;
 }
+
+bool MythScreenType::Create(void)
+{
+    return true;
+}
+
+void MythScreenType::CopyFrom(MythUIType *base)
+{
+    MythScreenType *st = dynamic_cast<MythScreenType *>(base);
+    if (!st)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    m_FullScreen = st->m_FullScreen;
+    m_IsDeleting = false;
+
+    MythUIType::CopyFrom(base);
+
+    BuildFocusList();
+    SetFocusWidget(NULL);    
+};
+
+void MythScreenType::CreateCopy(MythUIType *)
+{
+    VERBOSE(VB_IMPORTANT, "CreateCopy called on screentype - bad.");
+}
+

@@ -106,12 +106,12 @@ void MythUIImage::SetImage(MythImage *img)
     m_CurPos = 0;
 }
 
-void MythUIImage::SetImages(QValueVector<MythImage *> &m_Images)
+void MythUIImage::SetImages(QValueVector<MythImage *> &images)
 {
     Clear();
 
     QValueVector<MythImage *>::iterator it;
-    for (it = m_Images.begin(); it != m_Images.end(); ++it)
+    for (it = images.begin(); it != images.end(); ++it)
     {
         MythImage *im = (*it);
         im->UpRef();

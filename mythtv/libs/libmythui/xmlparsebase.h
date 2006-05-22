@@ -25,9 +25,26 @@ class XMLParseBase
     static MythUIType *GetGlobalObjectStore(void);
     static void ClearGlobalObjectStore(void);
 
-    static MythUIType *parseUIType(QDomElement &element, const QString &type,
+    // if more than one, returns last one parsed.
+    static MythUIType *ParseChildren(QDomElement &element, MythUIType *parent);
+
+    // parse one and return it.
+    static MythUIType *ParseUIType(QDomElement &element, const QString &type,
                                    MythUIType *parent,
                                    MythScreenType *screen = NULL);
+
+    static bool LoadWindowFromXML(const QString &xmlfile, 
+                                  const QString &windowname,
+                                  MythUIType *parent);
+
+    static bool LoadBaseTheme(void);
+
+    static bool CopyWindowFromBase(const QString &windowname, 
+                                   MythScreenType *win);
+
+  private:
+    static bool doLoad(const QString &windowname, MythUIType *parent,
+                       const QString &filename, bool onlywindows = true);
 };
 
 #endif

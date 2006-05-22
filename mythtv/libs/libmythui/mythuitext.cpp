@@ -215,7 +215,12 @@ bool MythUIText::ParseElement(QDomElement &element)
         m_AltDisplayRect = parseRect(element);
     else if (element.tagName() == "font")
     {
-        // add local fonts to each uitype
+        QString fontname = getFirstText(element);
+        MythFontProperties *fp = GetFont(fontname);
+        if (!fp)
+            fp = GetGlobalFontMap()->GetFont(fontname);
+        if (fp)
+            *m_Font = *fp;
     }
     else if (element.tagName() == "value")
     {
@@ -327,6 +332,8 @@ void MythUIText::CopyFrom(MythUIType *base)
     incR = text->incR;
     incG = text->incG;
     incB = text->incB;
+
+    MythUIType::CopyFrom(base);   
 }
 
 void MythUIText::CreateCopy(MythUIType *parent)

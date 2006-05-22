@@ -1473,7 +1473,7 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
 
         MythUIText *txt = new MythUIText(msg, m_state->normalAttributes.font,
                                          buttonTextRect, buttonTextRect,
-                                         newbutton, "button normal text");
+                                         newbutton->text, "button normal text");
         txt->SetJustification(m_state->normalAttributes.textflags);
         newbutton->text->AddObject(MythUIStateType::None, txt);
     }
@@ -1494,7 +1494,7 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
 
         MythUIText *txt = new MythUIText(msg, m_state->activeAttributes.font,
                                          buttonTextRect, buttonTextRect,
-                                         newbutton, "button normal text");
+                                         newbutton->text, "button normal text");
         txt->SetJustification(m_state->activeAttributes.textflags);
         newbutton->text->AddObject(MythUIStateType::Full, txt);
     }

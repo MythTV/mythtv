@@ -55,28 +55,26 @@ class MythFontProperties: public XMLParseBase
 
     bool    m_bFreeze;
 
-    friend class GlobalFontMap;
+    friend class FontMap;
 };
 
-class GlobalFontMap
+class FontMap
 {
-  // singleton
-  protected:
-    GlobalFontMap() {}
-
   public:
+    FontMap() {}
+
     MythFontProperties *GetFont(const QString &text);
     bool AddFont(const QString &text, MythFontProperties *fontProp);
     bool Contains(const QString &text);
 
     void Clear(void);
 
-    static GlobalFontMap *GetGlobalFontMap(void);
+    static FontMap *GetGlobalFontMap(void);
 
   private:
-    QMap<QString, MythFontProperties> m_globalFontMap;
+    QMap<QString, MythFontProperties> m_FontMap;
 };
 
-GlobalFontMap *GetGlobalFontMap(void);
+FontMap *GetGlobalFontMap(void);
 
 #endif

@@ -3,6 +3,8 @@
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
+#include "mythcontext.h"
+
 MythUIStateType::MythUIStateType(MythUIType *parent, const char *name)
                 : MythUIType(parent, name)
 {
@@ -138,5 +140,95 @@ void MythUIStateType::ClearImages()
 {
     ClearMaps();
     SetRedraw();
+}
+
+bool MythUIStateType::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "showempty")
+        m_ShowEmpty = parseBool(element);
+    else if (element.tagName() == "state")
+    {
+        QString name = element.attribute("name", "").lower();
+        QString type = element.attribute("type", "").lower();
+
+        MythUIType *uitype = ParseChildren(element, this);
+
+        if (!type.isEmpty())
+        {
+            StateType stype = None;
+            if (type == "off")
+                stype = Off;
+            else if (type == "half")
+                stype = Half;
+            else if (type == "full")
+                stype = Full;
+
+            if (uitype && m_ObjectsByState.contains((int)stype))
+            {
+                delete m_ObjectsByState[(int)stype]; 
+                m_ObjectsByState.erase((int)stype);
+            }
+            AddObject(stype, uitype);
+        }
+        else if (!name.isEmpty())
+        {
+            if (uitype && m_ObjectsByName.contains(name))
+            {
+                delete m_ObjectsByName[name];
+                m_ObjectsByName.erase(name);
+            }
+            AddObject(name, uitype);
+        }
+    }
+    else
+        return MythUIType::ParseElement(element);
+
+    return true;
+}
+        
+void MythUIStateType::CopyFrom(MythUIType *base)
+{
+    MythUIStateType *st = dynamic_cast<MythUIStateType *>(base);
+    if (!st)
+    {
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        return;
+    }
+
+    ClearMaps();
+
+    m_ShowEmpty = st->m_ShowEmpty;
+
+    MythUIType::CopyFrom(base);
+
+    QMap<QString, MythUIType *>::iterator i;
+    for (i = st->m_ObjectsByName.begin(); i != st->m_ObjectsByName.end(); ++i)
+    {
+         MythUIType *other = i.data();
+         QString key = i.key();
+
+         MythUIType *newtype = GetChild(other->name());
+         AddObject(key, newtype);
+    }
+
+    QMap<int, MythUIType *>::iterator j;
+    for (j = st->m_ObjectsByState.begin(); j != st->m_ObjectsByState.end(); ++j)
+    {
+         MythUIType *other = j.data();
+         int key = j.key();
+
+         MythUIType *newtype = GetChild(other->name());
+         AddObject((StateType)key, newtype);
+    }
+}
+
+void MythUIStateType::CreateCopy(MythUIType *parent)
+{
+    MythUIStateType *st = new MythUIStateType(parent, name());
+    st->CopyFrom(this);
+}
+
+void MythUIStateType::Finalize(void)
+{
 }
 

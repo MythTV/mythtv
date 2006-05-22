@@ -1,3 +1,5 @@
+#include <qfile.h>
+
 #include "xmlparsebase.h"
 #include "mythmainwindow.h"
 
@@ -7,6 +9,7 @@
 #include "mythscreentype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythlistbutton.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -23,7 +26,7 @@ QString XMLParseBase::getFirstText(QDomElement &element)
 bool XMLParseBase::parseBool(const QString &text)
 {
     QString s = text.lower();
-    return (s == "yes" || s.toInt());
+    return (s == "yes" || s == "true" || s.toInt());
 }
 
 bool XMLParseBase::parseBool(QDomElement &element)
@@ -100,8 +103,43 @@ void XMLParseBase::ClearGlobalObjectStore(void)
     GetGlobalObjectStore();
 }
 
+MythUIType *XMLParseBase::ParseChildren(QDomElement &element, 
+                                        MythUIType *parent)
+{
+    MythUIType *ret = NULL;
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            QString type = info.tagName();
+            if (type == "font")
+            {
+                MythFontProperties *font;
+                bool global = (GetGlobalObjectStore() == parent);
+                font = MythFontProperties::ParseFromXml(info, global);
+                if (!global && font)
+                {
+                    QString name = info.attribute("name");
+                    parent->AddFont(name, font);
+                }
+            }
+            else if (type == "imagetype" ||
+                     type == "textarea" ||
+                     type == "buttonlist" ||
+                     type == "horizontalbuttonlist" ||
+                     type == "statetype")
+            {
+                ret = ParseUIType(info, type, parent);
+            }
+        }
+    }
 
-MythUIType *XMLParseBase::parseUIType(QDomElement &element, const QString &type,
+    return ret;
+}
+
+MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                                       MythUIType *parent, 
                                       MythScreenType *screen)
 {
@@ -112,18 +150,18 @@ MythUIType *XMLParseBase::parseUIType(QDomElement &element, const QString &type,
         return NULL;
     }
 
-    // check for name in 'screen' && parent
+    // check for name in parent
 
-    MythUIType *uitype;
-    MythUIType *base;
+    MythUIType *uitype = NULL;
+    MythUIType *base = NULL;
 
     QString inherits = element.attribute("from", "");
     if (!inherits.isEmpty())
     {
-        MythUIType *base = NULL;
         if (parent)
             base = parent->GetChild(inherits);
 
+        // might remove this
         if (screen && !base)
             base = screen->GetChild(inherits);
 
@@ -139,10 +177,23 @@ MythUIType *XMLParseBase::parseUIType(QDomElement &element, const QString &type,
         }
     }
 
-    if (type == "MythUIImage")
+    if (type == "imagetype")
         uitype = new MythUIImage(parent, name);
-    else if (type == "MythUIText")
+    else if (type == "textarea")
         uitype = new MythUIText(parent, name);
+    else if (type == "buttonlist")
+        uitype = new MythListButton(parent, name);
+    else if (type == "horizontalbuttonlist")
+        uitype = new MythHorizListButton(parent, name);
+    else if (type == "statetype")
+        uitype = new MythUIStateType(parent, name);
+    else if (type == "window" && parent == GetGlobalObjectStore())
+        uitype = new MythScreenType(parent, name);
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unknown widget type: %1").arg(type));
+        return NULL;
+    }
 
     if (base)
     {
@@ -165,17 +216,162 @@ MythUIType *XMLParseBase::parseUIType(QDomElement &element, const QString &type,
             if (uitype->ParseElement(info))
             {
             }
-            else
+            else if (info.tagName() == "font")
             {
-            // check other types, fonts
+                MythFontProperties *font;
+                bool global = (GetGlobalObjectStore() == parent);
+                font = MythFontProperties::ParseFromXml(info, global);
+                if (!global && font)
+                {
+                    QString name = info.attribute("name");
+                    uitype->AddFont(name, font);
+                }
+            }
+            else if (info.tagName() == "imagetype" || 
+                     info.tagName() == "textarea" || 
+                     info.tagName() == "buttonlist" ||
+                     info.tagName() == "horizontalbuttonlist" ||
+                     info.tagName() == "statetype")
+            {
+                ParseUIType(info, info.tagName(), uitype, screen);
             }
         }
     }
 
     uitype->Finalize();
-
-    // add to 'screen'
-    // add to global if asked
     return uitype;
 }
 
+bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
+                                     const QString &windowname,
+                                     MythUIType *parent)
+{
+    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    QValueList<QString>::iterator i;
+    for (i = searchpath.begin(); i != searchpath.end(); i++)
+    {
+        QString themefile = *i + xmlfile;
+        if (doLoad(windowname, parent, themefile))
+        {
+            VERBOSE(VB_GENERAL, QString("Loading from: %1").arg(themefile));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool XMLParseBase::doLoad(const QString &windowname,
+                          MythUIType *parent, 
+                          const QString &filename,
+                          bool onlywindows)
+{
+    QDomDocument doc;
+    QFile f(filename);
+
+    if (!f.open(IO_ReadOnly))
+    {
+        //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
+        return false;
+    }
+
+    QString errorMsg;
+    int errorLine = 0;
+    int errorColumn = 0;
+
+    if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
+    {
+        cerr << "Error parsing: " << filename << endl;
+        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cerr << errorMsg << endl;
+        f.close();
+        return false;
+    }
+
+    f.close();
+
+    QDomElement docElem = doc.documentElement();
+    QDomNode n = docElem.firstChild();
+    while (!n.isNull())
+    {
+        QDomElement e = n.toElement();
+        if (!e.isNull())
+        {
+            if (onlywindows && e.tagName() == "window")
+            {
+                QString name = e.attribute("name", "");
+                if (name.isNull() || name.isEmpty())
+                {
+                    cerr << "Window needs a name\n";
+                    return false;
+                }
+
+                if (name == windowname)
+                {
+                    ParseChildren(e, parent);
+                    return true;
+                }
+            }
+
+            if (!onlywindows)
+            {
+                QString type = e.tagName();
+                if (type == "font")
+                {
+                    MythFontProperties *font;
+                    bool global = (GetGlobalObjectStore() == parent);
+                    font = MythFontProperties::ParseFromXml(e, global);
+                    if (!global && font)
+                    {
+                        QString name = e.attribute("name");
+                        parent->AddFont(name, font);
+                    }
+                }
+                else if (type == "imagetype" ||
+                         type == "textarea" ||
+                         type == "buttonlist" ||
+                         type == "horizontalbuttonlist" ||
+                         type == "statetype" ||
+                         type == "window")
+                {
+                    ParseUIType(e, type, parent);
+                }
+            }
+        }
+        n = n.nextSibling();
+    }
+
+    return false;
+}
+
+bool XMLParseBase::LoadBaseTheme(void)
+{
+    QValueList<QString> searchpath = gContext->GetThemeSearchPath();
+    QValueList<QString>::iterator i;
+    for (i = searchpath.begin(); i != searchpath.end(); i++)
+    {
+        QString themefile = *i + "base.xml";
+        if (doLoad(QString::null, GetGlobalObjectStore(), themefile, false))
+        {
+            VERBOSE(VB_GENERAL, QString("Loading from: %1").arg(themefile));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
+                                      MythScreenType *win)
+{
+    MythUIType *ui = GetGlobalObjectStore()->GetChild(windowname);
+    if (!ui)
+        return false;
+
+    MythScreenType *st = dynamic_cast<MythScreenType *>(ui);
+    if (!st)
+        return false;
+
+    win->CopyFrom(st);
+    return true;
+}

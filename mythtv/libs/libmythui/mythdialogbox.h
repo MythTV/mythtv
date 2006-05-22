@@ -32,6 +32,8 @@ class MythDialogBox : public MythScreenType
     MythDialogBox(const QString &text,
                   MythScreenStack *parent, const char *name);
 
+    virtual bool Create(void);
+
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
 
     void AddButton(const QString &title);
@@ -47,6 +49,8 @@ class MythDialogBox : public MythScreenType
     MythListButton *buttonList;
     MythScreenType *m_retScreen;
     QString m_id;
+
+    QString m_text;
 };
 
 #endif

@@ -8,7 +8,10 @@ using namespace std;
 #include "mythuiimage.h"
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
+#include "myththemebase.h"
+
 #include "mythcontext.h"
+
 #include "test1.h"
 #include "oldsettings.h"
 //#include "btnlisttest.h"
@@ -36,31 +39,9 @@ int main(int argc, char *argv[])
     mainWindow->Init();
     mainWindow->Show();
 
-    QRect uiSize = mainWindow->GetUIScreenRect();
+    new MythThemeBase();
 
-    MythScreenStack *background = new MythScreenStack(mainWindow, "background");
-    MythScreenType *backgroundscreen = new MythScreenType(background, 
-                                                          "backgroundscreen");
-    QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap");
-    backgroundname = gContext->GetThemeDir() + backgroundname;
-
-    MythUIImage *backimg = new MythUIImage(backgroundname, backgroundscreen,
-                                           "backimg");
-    backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
-    backimg->SetSize(uiSize.width(), uiSize.height());
-    backimg->Load();
-
-    MythUIImage *logo = new MythUIImage("images/myth_logo.png", 
-                                        backgroundscreen, "logo");
-    QPoint logoPos = QPoint(mainWindow->NormX(20), 
-                            uiSize.height() - mainWindow->NormY(430));
-    logo->SetPosition(logoPos);
-    logo->AdjustAlpha(2, 2);
-    logo->Load();
-
-    background->AddScreen(backgroundscreen, false);
-
-    MythScreenStack *mainStack = new MythScreenStack(mainWindow, "main stack");
+    MythScreenStack *mainStack = mainWindow->GetMainStack();
 
 #ifdef BTNLISTTEST_H
     TestWindow *test = new TestWindow(mainStack);

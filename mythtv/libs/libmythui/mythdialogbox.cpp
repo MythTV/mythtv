@@ -8,45 +8,30 @@
 #include "mythmediamonitor.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
-                     MythScreenStack *parent, const char *name) 
+                             MythScreenStack *parent, const char *name) 
          : MythScreenType(parent, name)
 {
     m_id = "";
-
-    MythFontProperties fontProp;
-    fontProp.SetFace(CreateFont("Arial", 24, QFont::Bold));
-    fontProp.SetColor(Qt::white);
-    fontProp.SetShadow(true, NormPoint(QPoint(4, 4)), QColor(Qt::black), 64);
-
-    QRect fullRect = GetMythMainWindow()->GetUIScreenRect();
-    int xpad = NormX(60);
-    int ypad = NormY(60);
-
-    QRect textRect = QRect(xpad, ypad, fullRect.width() - xpad * 2, 
-                           fullRect.height() / 2 - ypad);
-
-    MythUIText *label = new MythUIText(text, fontProp, textRect, textRect, 
-                                       this, "label");
-    label->SetJustification(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
-
-    ypad = NormY(40);
-    QRect listarea = QRect(xpad, fullRect.height() / 2 + ypad, 
-                           fullRect.width() - xpad * 2,
-                           fullRect.height() / 3);
-
-    buttonList = new MythListButton(this, "listbutton", listarea, true, true);
-
-    buttonList->SetFontActive(fontProp);
-    fontProp.SetColor(QColor(qRgb(128, 128, 128)));
-    buttonList->SetFontInactive(fontProp);
-
-    buttonList->SetSpacing(NormX(10));
-    buttonList->SetMargin(NormX(6));
-    buttonList->SetDrawFromBottom(true);
-    buttonList->SetTextFlags(Qt::AlignCenter);
-
-    buttonList->SetActive(true);
     m_retScreen = NULL;
+    m_text = text;
+    buttonList = NULL;
+}
+
+bool MythDialogBox::Create(void)
+{
+    if (!CopyWindowFromBase("MythDialogBox", this))
+        return false;
+
+    MythUIText *textarea = dynamic_cast<MythUIText *>(GetChild("messagearea"));
+    buttonList = dynamic_cast<MythListButton *>(GetChild("list"));
+
+    if (!textarea || !buttonList)
+        return false;
+
+    textarea->SetText(m_text);
+    buttonList->SetActive(true);
+
+    return true;
 }
 
 void MythDialogBox::SetReturnEvent(MythScreenType *retscreen, 

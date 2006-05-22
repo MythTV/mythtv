@@ -92,7 +92,7 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
 
                 if (name == winName)
                 {
-            ele = e;
+                    ele = e;
                     return true;
                 }
             }

@@ -246,33 +246,33 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     return newFont;
 }
 
-static GlobalFontMap *gFontMap = NULL;
+static FontMap *gFontMap = NULL;
 
 // FIXME: remove
 extern QMap<QString, fontProp> globalFontMap;
 
-MythFontProperties *GlobalFontMap::GetFont(const QString &text)
+MythFontProperties *FontMap::GetFont(const QString &text)
 {
     if (text.isEmpty())
         return NULL;
 
-    if (m_globalFontMap.contains(text))
-        return &(m_globalFontMap[text]);
+    if (m_FontMap.contains(text))
+        return &(m_FontMap[text]);
     return NULL;
 }
 
-bool GlobalFontMap::AddFont(const QString &text, MythFontProperties *font)
+bool FontMap::AddFont(const QString &text, MythFontProperties *font)
 {
     if (!font || text.isEmpty())
         return false;
 
-    if (m_globalFontMap.contains(text))
+    if (m_FontMap.contains(text))
     {
         VERBOSE(VB_IMPORTANT, QString("Already have a font: %1").arg(text));
         return false;
     }
 
-    m_globalFontMap[text] = *font;
+    m_FontMap[text] = *font;
 
     {
         /* FIXME backwards compat, remove */
@@ -292,28 +292,28 @@ bool GlobalFontMap::AddFont(const QString &text, MythFontProperties *font)
     return true;
 }
 
-bool GlobalFontMap::Contains(const QString &text)
+bool FontMap::Contains(const QString &text)
 {
-    return m_globalFontMap.contains(text);
+    return m_FontMap.contains(text);
 }
 
-void GlobalFontMap::Clear(void)
+void FontMap::Clear(void)
 {
-    m_globalFontMap.clear();
+    m_FontMap.clear();
 
     //FIXME: remove
     globalFontMap.clear();
 }
 
-GlobalFontMap *GlobalFontMap::GetGlobalFontMap(void)
+FontMap *FontMap::GetGlobalFontMap(void)
 {
     if (!gFontMap)
-        gFontMap = new GlobalFontMap();
+        gFontMap = new FontMap();
     return gFontMap;
 }
 
-GlobalFontMap *GetGlobalFontMap(void)
+FontMap *GetGlobalFontMap(void)
 {
-    return GlobalFontMap::GetGlobalFontMap();
+    return FontMap::GetGlobalFontMap();
 }
 

@@ -2,6 +2,7 @@
 #include "mythuiimage.h"
 #include "mythmainwindow.h"
 #include "mythscreentype.h"
+#include "xmlparsebase.h"
 
 #include "mythcontext.h"
 #include "oldsettings.h"
@@ -40,6 +41,9 @@ void MythThemeBase::Reload(void)
     d->backimg->SetPosition(GetMythMainWindow()->NormPoint(QPoint(0, 0)));
     d->backimg->SetSize(uiSize.width(), uiSize.height());
     d->backimg->Load();
+
+    XMLParseBase::ClearGlobalObjectStore();
+    XMLParseBase::LoadBaseTheme();
 }
 
 void MythThemeBase::Init(void)
@@ -62,6 +66,8 @@ void MythThemeBase::Init(void)
     d->backimg->Load();
 
     d->background->AddScreen(d->backgroundscreen, false);
+
+    XMLParseBase::LoadBaseTheme();
 
     new MythScreenStack(mainWindow, "main stack", true);
 }

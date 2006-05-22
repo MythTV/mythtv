@@ -13,6 +13,8 @@
 class MythImage;
 class MythPainter;
 class MythGestureEvent;
+class FontMap;
+class MythFontProperties;
 
 /**
  * Base UI type.  Children are drawn/processed in order added
@@ -71,6 +73,9 @@ class MythUIType : public QObject, public XMLParseBase
 
     virtual bool keyPressEvent(QKeyEvent *);
     virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
+
+    MythFontProperties *GetFont(const QString &text);
+    bool AddFont(const QString &text, MythFontProperties *fontProp);
 
   protected:
     virtual void customEvent(QCustomEvent *);
@@ -136,6 +141,8 @@ class MythUIType : public QObject, public XMLParseBase
     bool m_Moving; 
     QPoint m_XYDestination;
     QPoint m_XYSpeed;
+
+    FontMap *m_Fonts;
 
     MythUIType *m_Parent;
 

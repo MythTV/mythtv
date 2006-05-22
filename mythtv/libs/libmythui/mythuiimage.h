@@ -29,7 +29,7 @@ class MythUIImage : public MythUIType
     void ResetFilename();
 
     void SetImage(MythImage *img);
-    void SetImages(QValueVector<MythImage *> &m_Images);
+    void SetImages(QValueVector<MythImage *> &images);
 
     void SetSize(int width, int height);
     void SetSkip(int x, int y);
