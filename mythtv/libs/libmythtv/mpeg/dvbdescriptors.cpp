@@ -323,8 +323,12 @@ QString ServiceDescriptor::toString() const
         str.append(" (TV)");
     else if (IsDigitalAudio())
         str.append(" (Radio)");
+    else if (IsHDTV())
+        str.append(" (HDTV)");
+    else if (IsTeletext())
+        str.append(" (Teletext)");
     else
-        str.append(QString(" (Unknown %1)").arg(ServiceType()));
+        str.append(QString(" (Unknown %1)").arg(ServiceType(),2,16));
 
     return str;
 }

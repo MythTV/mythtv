@@ -1159,6 +1159,7 @@ class ServiceDescriptor : public MPEGDescriptor
         kServiceTypeRCS_Map                  = 0x0E,
         kServiceTypeRCS_FLS                  = 0x0F,
         kServiceTypeDVB_MHP                  = 0x10,
+        kServiceTypeHDTV                     = 0x19,
     };
     // service_type             8   2.0
     uint ServiceType(void) const { return _data[2]; }
@@ -1180,6 +1181,10 @@ class ServiceDescriptor : public MPEGDescriptor
         { return ServiceType() ==  kServiceTypeDigitalTelevision; }
     bool IsDigitalAudio(void) const
         { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
+    bool IsHDTV(void) const
+        { return ServiceType() ==  kServiceTypeHDTV; }
+    bool IsTeletext(void) const
+        { return ServiceType() ==  kServiceTypeDataBroadcast; }
 
     QString toString() const;
 };
