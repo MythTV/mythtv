@@ -33,7 +33,10 @@ class PESPacket
         _pesdata = tspacket.data() + tspacket.AFCOffset() + 1;
 
         _badPacket = true;
-        if ((_pesdata - tspacket.data()) < (188-2-4))
+        // first check if Length() will return something useful and
+        // than check if the packet ends in the first TSPacket
+        if ((_pesdata - tspacket.data()) <= (188-3) &&
+            (_pesdata + Length() - tspacket.data()) <= (188-3))
         {
             _badPacket = !VerifyCRC();
         }

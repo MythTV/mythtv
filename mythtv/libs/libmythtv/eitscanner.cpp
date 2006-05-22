@@ -2,10 +2,6 @@
 
 #include "tv_rec.h"
 
-#ifdef USING_DVB
-#   include "dvbsiparser.h"
-#endif
-
 #include "channelbase.h"
 #include "iso639.h"
 #include "eitscanner.h"
@@ -190,6 +186,7 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
 
     eitHelper->SetSourceID(sourceid);
     eitSource->SetEITHelper(eitHelper);
+    eitSource->SetEITRate(1.0f);
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
@@ -228,6 +225,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
             "      channel.mplexid        IS NOT NULL      AND "
             "      useonairguide        = 1                AND "
             "      useeit               = 1                AND "
+            "      channum             != ''               AND "
             "      cardinput.cardid     = :CARDID "
             "GROUP BY mplexid "
             "ORDER BY cardinput.sourceid, atscsrcid, mplexid");

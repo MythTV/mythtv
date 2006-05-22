@@ -10,11 +10,14 @@ using namespace std;
 #include "tspacket.h"
 #include "util.h"
 #include "streamlisteners.h"
+#include "eitscanner.h"
 
+class EITHelper;
 class PSIPTable;
 class RingBuffer;
 class PESPacket;
 
+typedef vector<uint>                    uint_vec_t;
 
 typedef QMap<unsigned int, PESPacket*>  pid_pes_map_t;
 typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
@@ -35,7 +38,7 @@ typedef vector<MPEGSingleProgramStreamListener*> mpeg_sp_listener_vec_t;
 
 void init_sections(sections_t &sect, uint last_section);
 
-class MPEGStreamData
+class MPEGStreamData : public EITSource
 {
   public:
     MPEGStreamData(int desiredProgram, bool cacheTables);
@@ -43,6 +46,16 @@ class MPEGStreamData
 
     void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
     virtual void Reset(int desiredProgram);
+
+    // EIT Source
+    virtual void SetEITHelper(EITHelper *eit_helper);
+    virtual void SetEITRate(float rate);
+    virtual bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const
+        { return false; }
+    virtual bool GetEITPIDChanges(const uint_vec_t& /*in_use_pids*/,
+                                  uint_vec_t& /*add_pids*/,
+                                  uint_vec_t& /*del_pids*/) const
+        { return false; }
 
     // Table processing
     void SetIgnoreCRC(bool haveCRCbug) { _have_CRC_bug = haveCRCbug; }
@@ -108,6 +121,7 @@ class MPEGStreamData
     bool HasAllPMTSections(uint prog_num) const;
 
     // Caching
+    bool HasProgram(uint progNum) const;
     bool HasCachedPAT(void) const;
     bool HasCachedAllPMT(uint program_num) const;
     bool HasCachedAnyPMT(uint program_num) const;
@@ -137,7 +151,7 @@ class MPEGStreamData
 
   public:
     // Single program stuff, sets
-    void SetDesiredProgram(int p)           { _desired_program = p;    }
+    void SetDesiredProgram(int p);
     inline void SetPATSingleProgram(ProgramAssociationTable*);
     inline void SetPMTSingleProgram(ProgramMapTable*);
     void SetVideoStreamsRequired(uint num)
@@ -181,7 +195,7 @@ class MPEGStreamData
         { _partial_pes_packet_cache.remove(pid); }
     void DeletePartialPES(uint pid);
     void ProcessPAT(const ProgramAssociationTable *pat);
-    void ProcessPMT(const uint pid, const ProgramMapTable *pmt);
+    void ProcessPMT(const ProgramMapTable *pmt);
 
     static int ResyncStream(unsigned char *buffer, int curr_pos, int len);
 
@@ -193,6 +207,10 @@ class MPEGStreamData
 
   protected:
     bool                      _have_CRC_bug;
+
+    // Generic EIT stuff used for ATSC and DVB
+    EITHelper                *_eit_helper;
+    float                     _eit_rate;
 
     // Listening
     QMap<uint, bool>          _pids_listening;

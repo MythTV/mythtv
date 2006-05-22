@@ -312,11 +312,18 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     if ((*current).mplexid <= 0)
         (*current).mplexid = InsertMultiplex(current);
 
+    if ((*current).mplexid <= 0)
+        return;
+
+    int     mplexid = (*current).mplexid;
+    int     freqid  = (*current).friendlyNum;
+    QString fn      = (*current).FriendlyName;
+
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
     if (pat)
     {
         pmt_map_t pmt_map = sd->GetCachedPMTMap();
-        UpdatePATinDB((*current).mplexid, pat, pmt_map, true);
+        UpdatePATinDB(mplexid, fn, freqid, pat, pmt_map, true);
         sd->ReturnCachedTables(pmt_map);
         sd->ReturnCachedTable(pat);
     }
@@ -339,16 +346,23 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd,
     if ((*current).mplexid <= 0)
         (*current).mplexid = InsertMultiplex(current);
 
+    if ((*current).mplexid <= 0)
+        return;
+
+    int     mplexid = (*current).mplexid;
+    int     freqid  = (*current).friendlyNum;
+    QString fn      = (*current).FriendlyName;
+
     // Insert Terrestrial VCTs
     tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
     for (uint i = 0; i < tvcts.size(); i++)
-        UpdateVCTinDB((*current).mplexid, tvcts[i], true);
+        UpdateVCTinDB(mplexid, fn, freqid, tvcts[i], true);
     sd->ReturnCachedTVCTTables(tvcts);
 
     // Insert Cable VCTs
     cvct_vec_t cvcts = sd->GetAllCachedCVCTs();
     for (uint i = 0; i < cvcts.size(); i++)
-        UpdateVCTinDB((*current).mplexid, cvcts[i], true);
+        UpdateVCTinDB(mplexid, fn, freqid, cvcts[i], true);
     sd->ReturnCachedCVCTTables(cvcts);
 
     // tell UI we are done with these channels
@@ -615,12 +629,9 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
         }
         else
         {
-            dvb_channel_t dvbchan;
-            dvbchan.sistandard = item.standard;
-            dvbchan.tuning     = item.tuning;
-            dvbchan.tuning.params.frequency = freq;
-
-            ok = GetDVBChannel()->Tune(dvbchan, true);
+            DVBTuning tuning = item.tuning;
+            tuning.params.frequency = freq;
+            ok = GetDVBChannel()->Tune(tuning, true);
         }
     }
 #endif // USING_DVB
@@ -951,11 +962,10 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 
-void SIScan::UpdatePMTinDB(int db_mplexid,
-                           int db_source_id,
-                           int freqid, int pmt_indx,
-                           const ProgramMapTable *pmt,
-                           bool /*force_update*/)
+void SIScan::UpdatePMTinDB(
+    int db_source_id,
+    int db_mplexid, const QString &friendlyName, int freqid,
+    int pmt_indx, const ProgramMapTable *pmt, bool /*force_update*/)
 {
     // See if service already in database based on program number
     int chanid = ChannelUtil::GetChanID(
@@ -983,7 +993,7 @@ void SIScan::UpdatePMTinDB(int db_mplexid,
         .arg(service_name)
         .arg(service_name.isEmpty() ? "" : " as ")
         .arg(chan_num)
-        .arg((*current).FriendlyName).arg(freqid);
+        .arg(friendlyName).arg(freqid);
 
     if (chanid < 0)
     {   // The service is not in database, add it
@@ -1016,30 +1026,18 @@ void SIScan::UpdatePMTinDB(int db_mplexid,
     }
 }
 
-/** \fn SIScan::UpdatePATinDB(int,const ProgramAssociationTable*,const pmt_map_t&,bool)
+/** \fn SIScan::UpdatePATinDB(int,int,const ProgramAssociationTable*,const pmt_map_t&,bool)
  */
-void SIScan::UpdatePATinDB(int tid_db,
-                           const ProgramAssociationTable *pat,
-                           const pmt_map_t &pmt_map,
-                           bool /*force_update*/)
+void SIScan::UpdatePATinDB(
+    int db_mplexid, const QString &friendlyName, int freqid,
+    const ProgramAssociationTable *pat, const pmt_map_t &pmt_map,
+    bool force_update)
 {
-    VERBOSE(VB_SIPARSER, LOC + QString("UpdatePATinDB(): mplex: %1:%2")
-            .arg(tid_db).arg((*current).mplexid));
-
-    int db_mplexid = ChannelUtil::GetBetterMplexID(
-        tid_db, pat->TransportStreamID(), 1);
-
-    if (db_mplexid == -1)
-    {
-        VERBOSE(VB_IMPORTANT, "PAT: Warning couldn't find better mplex.");
-        emit ServiceScanUpdateText(
-            tr("Found channel, but it doesn't match existing tsid. You may "
-               "wish to delete existing channels and do a full scan."));
-        db_mplexid = tid_db;
-    }
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("UpdatePATinDB(): tsid: 0x%1  mplex: %2")
+            .arg(pat->TransportStreamID(),0,16).arg(db_mplexid));
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
-    int freqid         = (*current).friendlyNum;
 
     for (uint i = 0; i < pat->ProgramCount(); i++)
     {
@@ -1070,37 +1068,26 @@ void SIScan::UpdatePATinDB(int tid_db,
             else if (ignoreEncryptedServices && (*vit)->IsEncrypted())
                 continue;
 
-            UpdatePMTinDB(db_mplexid, db_source_id, freqid, i, *vit, false);
+            UpdatePMTinDB(db_source_id, db_mplexid, friendlyName, freqid,
+                          i, *vit, force_update);
         }
     }    
 }
 
-/** \fn SIScan::UpdateVCTinDB(int,const VirtualChannelTable*,bool)
+/** \fn SIScan::UpdateVCTinDB(int,const QString&,int,const VirtualChannelTable*,bool)
  */
-void SIScan::UpdateVCTinDB(int tid_db,
+void SIScan::UpdateVCTinDB(int db_mplexid,
+                           const QString &friendlyName, int freqid,
                            const VirtualChannelTable *vct,
                            bool force_update)
 {
     (void) force_update;
 
-    VERBOSE(VB_SIPARSER, LOC + QString("UpdateVCTinDB(): mplex: %1:%2")
-            .arg(tid_db).arg((*current).mplexid));
-
-    int db_mplexid = ChannelUtil::GetBetterMplexID(
-        tid_db, vct->TransportStreamID(), 1);
-
-    if (db_mplexid == -1)
-    {
-        VERBOSE(VB_IMPORTANT, "VCT: Error determing what transport this "
-                "service table is associated with so failing");
-        emit ServiceScanUpdateText(
-            tr("Found channel, but it doesn't match existing tsid. You may "
-               "wish to delete existing channels and do a full scan."));
-        return;
-    }
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("UpdateVCTinDB(): tsid: 0x%1  mplex: %1")
+            .arg(vct->TransportStreamID(),0,16).arg(db_mplexid));
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
-    int freqid         = (*current).friendlyNum;
 
     for (uint i = 0; i < vct->ChannelCount(); i++)
     {
@@ -1156,8 +1143,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
         QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
             .arg(vct->ShortChannelName(i))
             .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i))
-            .arg(chan_num)
-            .arg((*current).FriendlyName).arg(freqid);
+            .arg(chan_num).arg(friendlyName).arg(freqid);
 
         if (chanid < 0)
         {   // The service is not in database, add it

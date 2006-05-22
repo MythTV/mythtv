@@ -120,19 +120,17 @@ class SIScan : public QObject,
     inline void UpdateScanPercentCompleted(void);
 
     void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
-    void UpdatePATinDB(int mplexid,
-                       const ProgramAssociationTable*,
-                       const pmt_map_t&,
+    void UpdatePATinDB(int mplexid, const QString &friendlyName, int freqid,
+                       const ProgramAssociationTable*, const pmt_map_t&,
                        bool force_update);
 
-    void UpdatePMTinDB(int mplexid,
-                       int db_source_id,
-                       int freqid, int pmt_indx,
-                       const ProgramMapTable*,
+    void UpdatePMTinDB(int sourceid,
+                       int mplexid, const QString &friendlyName, int freqid,
+                       int pmt_indx, const ProgramMapTable*,
                        bool force_update);
 
     void HandleATSCDBInsertion(const ScanStreamData *sd, bool wait);
-    void UpdateVCTinDB(int mplexid,
+    void UpdateVCTinDB(int mplexid, const QString &friendlyName, int freqid,
                        const VirtualChannelTable*,
                        bool force_update);
 

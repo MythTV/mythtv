@@ -35,6 +35,7 @@ ChannelBase::ChannelBase(TVRec *parent)
     pParent(parent), channelorder("channum + 0"), curchannelname(""),
     currentInputID(-1), commfree(false), cardid(0),
     currentATSCMajorChannel(-1), currentATSCMinorChannel(-1),
+    currentOriginalNetworkID(-1), currentTransportID(-1),
     currentProgramNum(-1)
 {
 }
@@ -346,15 +347,20 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
 {
     int progsep = chan.find("-");
     int chansep = chan.find("_");
+
+    currentProgramNum        = -1;
+    currentOriginalNetworkID = -1;
+    currentTransportID       = -1;
+    currentATSCMajorChannel  = -1;
+    currentATSCMinorChannel  = -1;
+
     if (progsep >= 0)
     {
         currentProgramNum = chan.right(chan.length()-progsep-1).toInt();
-        currentATSCMinorChannel = -1;
         currentATSCMajorChannel = chan.left(progsep).toInt();
     }
     else if (chansep >= 0)
     {
-        currentProgramNum = -1;
         currentATSCMinorChannel = chan.right(chan.length()-chansep-1).toInt();
         currentATSCMajorChannel = chan.left(chansep).toInt();
     }
@@ -367,12 +373,8 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
             currentATSCMinorChannel = chanNum%10;
             currentATSCMajorChannel = chanNum/10;
         }
-        else
-        {
-            currentProgramNum = -1;
-            currentATSCMajorChannel = currentATSCMinorChannel = -1;
-        }
     }
+
     if (currentATSCMinorChannel >= 0)
         VERBOSE(VB_CHANNEL,
                 QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3_%4")

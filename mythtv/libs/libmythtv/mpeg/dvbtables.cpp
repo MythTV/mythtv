@@ -169,6 +169,23 @@ bool DVBEventInformationTable::IsEIT(uint table_id)
     return is_eit;
 }
 
+uint DVBEventInformationTable::StartTimeUnixUTC(uint i) const
+{
+    const unsigned char *buf = StartTime(i);
+
+    // Modified Julian date as number of days since 17th November 1858.
+    // The unix epoch, 1st Jan 1970, was day 40587.
+    uint mjd = (buf[0] << 8) | buf[1];
+    if (mjd < 40587)
+        return 0; // we don't handle pre-unix dates..
+
+    uint secsSince1970 = (mjd - 40587)   * 86400;
+    secsSince1970 += byteBCD2int(buf[2]) * 3600;
+    secsSince1970 += byteBCD2int(buf[3]) * 60;
+    secsSince1970 += byteBCD2int(buf[4]);
+    return secsSince1970;
+}
+
 /** \fn dvbdate2qt(const unsigned char*)
  *  \return UTC time
  */

@@ -64,10 +64,15 @@ class EITHelper
     void SetLanguagePreferences(const QStringList &langPref);
     void SetSourceID(uint _sourceid);
 
+#ifdef USING_BACKEND
     void AddEIT(uint atscsrcid, const EventInformationTable *eit);
     void AddETT(uint atscsrcid, const ExtendedTextTable     *ett);
-
     void AddEIT(const DVBEventInformationTable *eit);
+#else // if !USING_BACKEND
+    void AddEIT(uint, const EventInformationTable*) {}
+    void AddETT(uint, const ExtendedTextTable*) {}
+    void AddEIT(const DVBEventInformationTable*) {}
+#endif // !USING_BACKEND
 
   private:
     uint GetChanID(uint atscsrcid);

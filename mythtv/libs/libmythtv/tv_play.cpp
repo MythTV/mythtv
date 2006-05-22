@@ -4486,10 +4486,21 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     float snr  = 0.0f;
     uint  ber  = 0xffffffff;
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
+    QString err = QString::null, msg = QString::null;
     for (it = slist.begin(); it != slist.end(); ++it)
     {
-        if ("error" == it->GetShortName() || "message" == it->GetShortName())
+        if ("error" == it->GetShortName())
+        {
+            err = it->GetName();
             continue;
+        }
+
+        if ("message" == it->GetShortName())
+        {
+            msg = it->GetName();
+            VERBOSE(VB_IMPORTANT, "msg: "<<msg);
+            continue;
+        }
 
         infoMap[it->GetShortName()] = QString::number(it->GetValue());
         if ("signal" == it->GetShortName())
@@ -4540,6 +4551,11 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7) %8")
         .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
         .arg(nit).arg(sdt).arg(sigMsg);
+
+    if (!err.isEmpty())
+        sigDesc = err;
+    else if (!msg.isEmpty())
+        sigDesc = msg;
 
     //GetOSD()->ClearAllText("signal_info");
     //GetOSD()->SetText("signal_info", infoMap, -1);

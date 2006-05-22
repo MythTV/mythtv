@@ -78,11 +78,12 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
 
     if (("message" == name) || ("error" == name))
     {
-        noSpaceName = longString;
-        SetValue(0);
         SetRange(0, 1);
+        SetValue(0);
         SetThreshold( ("message" == name) ? 0 : 1, true );
         SetTimeout( ("message" == name) ? 0 : -1 );
+        noSpaceName = name;
+        name = longString;
 
         return true;
     }

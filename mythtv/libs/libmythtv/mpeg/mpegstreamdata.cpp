@@ -45,7 +45,8 @@ const unsigned char MPEGStreamData::bit_sel[8] =
  *  \param cacheTables    If true PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
-    : _have_CRC_bug(false),
+    : _have_CRC_bug(false), _eit_helper(NULL), _eit_rate(0.0f),
+      _listener_lock(true),
       _pat_version(-2), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
       _pid_video_single_program(0xffffffff),
@@ -73,6 +74,47 @@ MPEGStreamData::~MPEGStreamData()
     QMutexLocker locker(&_listener_lock);
     _mpeg_listeners.clear();
     _mpeg_sp_listeners.clear();
+}
+
+void MPEGStreamData::SetDesiredProgram(int p)
+{
+    bool reset = true;
+    uint pid = 0;
+    const pat_ptr_t pat = GetCachedPAT();
+
+    if (pat && (p >= 0))
+        pid = pat->FindPID(p);
+
+    if (pid)
+    {
+        reset = false;
+        _desired_program = p;
+        ProcessPAT(pat);
+        pmt_vec_t pmts = GetCachedPMTs();
+        for (uint i = 0; i < pmts.size(); i++)
+        {
+            if (pmts[i]->ProgramNumber() == (uint)p)
+                ProcessPMT(pmts[i]);
+        }
+        ReturnCachedTables(pmts);
+    }
+
+    ReturnCachedTable(pat);
+
+    if (reset)
+        Reset(p);
+}
+
+void MPEGStreamData::SetEITHelper(EITHelper *eit_helper)
+{
+    QMutexLocker locker(&_listener_lock);
+    _eit_helper = eit_helper;
+}
+
+void MPEGStreamData::SetEITRate(float rate)
+{
+    QMutexLocker locker(&_listener_lock);
+    _eit_rate = rate;
 }
 
 void MPEGStreamData::Reset(int desiredProgram)
@@ -154,10 +196,22 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     PESPacket* partial = GetPartialPES(tspacket->PID());
     if (partial && partial->AddTSPacket(tspacket))
     {
+        // Discard broken packets
+        bool buggy = _have_CRC_bug &&
+        ((TableID::PMT == partial->StreamID()) ||
+         (TableID::PAT == partial->StreamID()));
+        if (!buggy && !partial->IsGood())
+        {
+            VERBOSE(VB_SIPARSER, "Discarding broken PES packet");
+            ClearPartialPES(tspacket->PID());
+            return NULL;
+        }
+
         PSIPTable* psip = new PSIPTable(*partial);
 
         // Advance to the next packet
-        uint packetStart = partial->PSIOffset() + psip->SectionLength();
+        // pesdata starts only at PSIOffset()+1
+        uint packetStart = partial->PSIOffset() + 1 + psip->SectionLength();
         if (packetStart < partial->TSSizeInBuffer())
         {
             if (partial->pesdata()[psip->SectionLength()] != 0xff)
@@ -461,7 +515,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             if (_cache_tables)
                 CachePMT(&pmt);
 
-            ProcessPMT(pid, &pmt);
+            ProcessPMT(&pmt);
 
             return true;
         }
@@ -519,14 +573,15 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
     }
 }
 
-void MPEGStreamData::ProcessPMT(const uint pid, const ProgramMapTable *pmt)
+void MPEGStreamData::ProcessPMT(const ProgramMapTable *pmt)
 {
     _listener_lock.lock();
     for (uint i = 0; i < _mpeg_listeners.size(); i++)
         _mpeg_listeners[i]->HandlePMT(pmt->ProgramNumber(), pmt);
     _listener_lock.unlock();
 
-    if (pid == _pid_pmt_single_program && CreatePMTSingleProgram(*pmt))
+    bool desired = pmt->ProgramNumber() == (uint) _desired_program;
+    if (desired && CreatePMTSingleProgram(*pmt))
     {
         QMutexLocker locker(&_listener_lock);
         ProgramMapTable *pmt_sp = PMTSingleProgram();
@@ -740,6 +795,15 @@ bool MPEGStreamData::HasAllPMTSections(uint prog_num) const
         if ((*it)[i] != 0xff)
             return false;
     return true;
+}
+
+bool MPEGStreamData::HasProgram(uint progNum) const
+{
+    pmt_ptr_t pmt = GetCachedPMT(progNum, 0);
+    bool hasit = pmt;
+    ReturnCachedTable(pmt);
+
+    return hasit;
 }
 
 bool MPEGStreamData::HasCachedPAT(void) const

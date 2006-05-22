@@ -14,6 +14,7 @@ using namespace std;
 
 #include "recorderbase.h"
 
+class MPEGStreamData;
 class TSPacket;
 
 class DTVRecorder: public RecorderBase
@@ -37,6 +38,8 @@ class DTVRecorder: public RecorderBase
     int GetVideoFd(void) { return _stream_fd; }
 
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*);
+    virtual void SetStreamData(MPEGStreamData*) {}
+    virtual MPEGStreamData *GetStreamData(void) { return NULL; }
 
     virtual void Reset();
 

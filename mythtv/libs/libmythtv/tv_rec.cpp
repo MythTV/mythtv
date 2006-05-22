@@ -24,8 +24,6 @@ using namespace std;
 #include "recordingprofile.h"
 #include "util.h"
 #include "programinfo.h"
-#include "recorderbase.h"
-#include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "dtvsignalmonitor.h"
 #include "mythdbcon.h"
@@ -36,7 +34,7 @@ using namespace std;
 #include "previewgenerator.h"
 
 #include "atscstreamdata.h"
-#include "hdtvrecorder.h"
+#include "dvbstreamdata.h"
 #include "atsctables.h"
 
 #include "livetvchain.h"
@@ -44,19 +42,20 @@ using namespace std;
 #include "channelutil.h"
 #include "channelbase.h"
 #include "dummychannel.h"
+#include "dvbchannel.h"
+#include "dbox2channel.h"
+#include "hdhrchannel.h"
+
+#include "recorderbase.h"
+#include "NuppelVideoRecorder.h"
+#include "mpegrecorder.h"
+#include "hdtvrecorder.h"
+#include "dvbrecorder.h"
+#include "dbox2recorder.h"
+#include "hdhrrecorder.h"
 
 #ifdef USING_V4L
 #include "channel.h"
-#endif
-
-#ifdef USING_IVTV
-#include "mpegrecorder.h"
-#endif
-
-#ifdef USING_DVB
-#include "dvbchannel.h"
-#include "dvbrecorder.h"
-#include "dvbsiparser.h"
 #endif
 
 #ifdef USING_FIREWIRE
@@ -67,16 +66,6 @@ using namespace std;
 #include "firewirerecorder.h"
 #include "firewirechannel.h"
 #endif 
-#endif
-
-#ifdef USING_DBOX2
-#include "dbox2recorder.h"
-#include "dbox2channel.h"
-#endif
-
-#ifdef USING_HDHOMERUN
-#include "hdhrrecorder.h"
-#include "hdhrchannel.h"
 #endif
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
@@ -117,10 +106,13 @@ static QString load_profile(QString,void*,ProgramInfo*,RecordingProfile&);
 TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
-      scanner(NULL), dvbsiparser(NULL),
+      scanner(new EITScanner()),
       // Configuration variables from database
-      transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
-      audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
+      eitIgnoresSource(false),      transcodeFirst(false),
+      earlyCommFlag(false),         runJobOnHostOnly(false),
+      eitCrawlIdleStart(60),        eitTransportTimeout(5*60),
+      audioSampleRateDB(0),
+      overRecordSecNrml(0),         overRecordSecCat(0),
       overRecordCategory(""),
       // Configuration variables from setup rutines
       cardid(capturecardnum), ispip(false),
@@ -152,9 +144,6 @@ bool TVRec::CreateChannel(const QString &startchannel)
     bool init_run = false;
     if (genOpt.cardtype == "DVB")
     {
-        if (!scanner)
-            scanner = new EITScanner();
-
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev.toInt(), this);
         if (!channel->Open())
@@ -253,10 +242,13 @@ bool TVRec::Init(void)
     if (!CreateChannel(startchannel))
         return false;
 
+    eitIgnoresSource  = gContext->GetNumSetting("EITIgnoresSource", 0);
     transcodeFirst    =
         gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
     earlyCommFlag     = gContext->GetNumSetting("AutoCommflagWhileRecording", 0);
     runJobOnHostOnly  = gContext->GetNumSetting("JobsRunOnRecordHost", 0);
+    eitTransportTimeout=gContext->GetNumSetting("EITTransportTimeout", 5) * 60;
+    eitCrawlIdleStart = gContext->GetNumSetting("EITCrawIdleStart", 60);
     audioSampleRateDB = gContext->GetNumSetting("AudioSampleRate");
     overRecordSecNrml = gContext->GetNumSetting("RecordOverTime");
     overRecordSecCat  = gContext->GetNumSetting("CategoryOverTime") * 60;
@@ -294,7 +286,6 @@ void TVRec::TeardownAll(void)
     }
 
     TeardownSignalMonitor();
-    TeardownSIParser();
 
     if (scanner)
     {
@@ -768,8 +759,7 @@ void TVRec::HandleStateChange(void)
     {
         // Add some randomness to avoid all cards starting
         // EIT scanning at nearly the same time.
-        uint idle_start = gContext->GetNumSetting("EITCrawIdleStart", 60);
-        uint timeout = idle_start + (random() % 59);
+        uint timeout = eitCrawlIdleStart + (random() % 59);
         eitScanStartTime = eitScanStartTime.addSecs(timeout);
     }
     else
@@ -899,17 +889,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
             return false;
         }
 
-#ifdef USING_HDHOMERUN
-        HDHRChannel  *hdhr_channel  = GetHDHRChannel();
-        HDHRRecorder *hdhr_recorder = GetHDHRRecorder();
-        if (hdhr_channel && hdhr_recorder && !scanner)
-        {
-            uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
-            scanner = new EITScanner();
-            scanner->StartPassiveScan(hdhr_channel, hdhr_recorder, ignore);
-        }
-#endif // USING_HDHOMERUN
-
         return true;
     }
 
@@ -966,13 +945,6 @@ void TVRec::TeardownRecorder(bool killFile)
         if (GetV4LChannel())
             channel->SetFd(-1);
 
-        if (GetHDHRChannel() && scanner)
-        {
-            scanner->StopPassiveScan();
-            delete scanner;
-            scanner = NULL;
-        }
-
         delete recorder;
         recorder = NULL;
     }
@@ -1022,15 +994,6 @@ DVBRecorder *TVRec::GetDVBRecorder(void)
 #endif // !USING_DVB
 }
 
-HDTVRecorder *TVRec::GetHDTVRecorder(void)
-{
-#ifdef USING_V4L
-    return dynamic_cast<HDTVRecorder*>(recorder);
-#else // if !USING_V4L
-    return NULL;
-#endif // USING_V4L
-}
-
 HDHRRecorder *TVRec::GetHDHRRecorder(void)
 {
 #ifdef USING_HDHOMERUN
@@ -1038,6 +1001,11 @@ HDHRRecorder *TVRec::GetHDHRRecorder(void)
 #else // if !USING_HDHOMERUN
     return NULL;
 #endif // !USING_HDHOMERUN
+}
+
+DTVRecorder *TVRec::GetDTVRecorder(void)
+{
+    return dynamic_cast<DTVRecorder*>(recorder);
 }
 
 /** \fn TVRec::InitChannel(const QString&, const QString&)
@@ -1075,18 +1043,8 @@ void TVRec::CloseChannel(void)
     if (!channel)
         return;
 
-#ifdef USING_DVB
-    if (GetDVBChannel())
-    {
-        if (dvbOpt.dvb_on_demand)
-        {
-            TeardownSIParser();
-            ClearFlags(kFlagSIParserRunning);
-            GetDVBChannel()->Close();
-        }
+    if (GetDVBChannel() && !dvbOpt.dvb_on_demand)
         return;
-    }
-#endif // USING_DVB
 
     channel->Close();
 }
@@ -1125,50 +1083,6 @@ Channel *TVRec::GetV4LChannel(void)
 #else
     return NULL;
 #endif // USING_V4L
-}
-
-void TVRec::CreateSIParser(MPEGStreamData *stream_data, int program_num)
-{
-    (void) program_num;
-#ifdef USING_DVB
-
-    DVBChannel *dvbc = GetDVBChannel();
-    if (!dvbc)
-        return;
-
-    if (!dvbsiparser)
-        dvbsiparser = new DVBSIParser(dvbc, true);
-
-    dvbsiparser->ReinitSIParser(dvbc->GetSIStandard(),
-                                stream_data, program_num);
-
-    if (is_dishnet_eit(GetCaptureCardNum()))
-    {
-        VERBOSE(VB_EIT, "Enabling DishNet Long Term EIT Support");
-        dvbsiparser->SetDishNetEIT(true);
-    }
-
-    if (scanner)
-    {
-        uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
-        scanner->StartPassiveScan(dvbc, dvbsiparser, ignore);
-    }
-
-#endif // USING_DVB
-}
-
-void TVRec::TeardownSIParser(void)
-{
-    if (scanner)
-        scanner->StopPassiveScan();
-
-#ifdef USING_DVB
-    if (dvbsiparser)
-    {
-        delete dvbsiparser;
-        dvbsiparser = NULL;
-    }
-#endif // USING_DVB
 }
 
 /** \fn TVRec::EventThread(void*)
@@ -1377,9 +1291,8 @@ void TVRec::RunTV(void)
             }
             else
             {
-                uint ttMin = gContext->GetNumSetting("EITTransportTimeout", 5);
-                uint ignore = gContext->GetNumSetting("EITIgnoresSource", 0);
-                scanner->StartActiveScan(this, ttMin * 60, ignore);
+                scanner->StartActiveScan(
+                    this, eitTransportTimeout, eitIgnoresSource);
                 SetFlags(kFlagEITScannerRunning);
                 eitScanStartTime = QDateTime::currentDateTime().addYears(1);
             }
@@ -1680,31 +1593,12 @@ bool TVRec::SetupDTVSignalMonitor(void)
     VERBOSE(VB_RECORD, LOC + "Setting up table monitoring.");
 
     DTVSignalMonitor *sm = GetDTVSignalMonitor();
-    ATSCStreamData *sd = NULL;
-#ifdef USING_V4L
-    if (GetHDTVRecorder())
+    MPEGStreamData *sd = NULL;
+    if (GetDTVRecorder())
     {
-        sd = GetHDTVRecorder()->GetStreamData();
+        sd = GetDTVRecorder()->GetStreamData();
         sd->SetCaching(true);
     }
-#endif // USING_V4L
-#ifdef USING_DVB
-    if (GetDVBRecorder())
-    {
-        sd = GetDVBRecorder()->GetStreamData();
-        sd->SetCaching(true);
-    }
-#endif // USING_DVB
-#ifdef USING_HDHOMERUN
-    if (GetHDHRRecorder())
-    {
-        sd = GetHDHRRecorder()->GetStreamData();
-        sd->SetCaching(true);
-    }
-#endif // USING_HDHOMERUN
-
-    if (!sd)
-        sd = new ATSCStreamData(-1, -1, true);
 
     // Check if this is an ATSC Channel
     int major = channel->GetMajorChannel();
@@ -1714,8 +1608,16 @@ bool TVRec::SetupDTVSignalMonitor(void)
         QString msg = QString("ATSC channel: %1_%2").arg(major).arg(minor);
         VERBOSE(VB_RECORD, LOC + msg);
 
+        ATSCStreamData *asd = dynamic_cast<ATSCStreamData*>(sd);
+        if (!asd)
+        {
+            sd = asd = new ATSCStreamData(major, minor);
+            sd->SetCaching(true);
+            if (GetDTVRecorder())
+                GetDTVRecorder()->SetStreamData(asd);
+        }
+
         sm->SetStreamData(sd);
-        sd->Reset(major, minor);
         sm->SetChannel(major, minor);
         sd->SetVideoStreamsRequired(1);
         sm->SetFTAOnly(true);
@@ -1729,12 +1631,25 @@ bool TVRec::SetupDTVSignalMonitor(void)
         return true;
     }
 
-    // Check if this is an MPEG Channel
+    // Check if this is an DVB channel
     int progNum = channel->GetProgramNumber();
-    if (progNum >= 0)
+#ifdef USING_DVB
+    int netid   = channel->GetOriginalNetworkID();
+    int tsid    = channel->GetTransportID();
+    if (netid > 0 && tsid > 0 && progNum >= 0)
     {
         uint neededVideo = 0;
         uint neededAudio = 0;
+
+        DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(sd);
+        if (!dsd)
+        {
+            sd = dsd = new DVBStreamData(netid, tsid, progNum);
+            sd->SetCaching(true);
+            if (GetDTVRecorder())
+                GetDTVRecorder()->SetStreamData(dsd);
+        }
+
         ProgramInfo *rec = lastTuningRequest.program;
         RecordingProfile profile;
         load_profile(genOpt.cardtype, tvchain, rec, profile);
@@ -1743,6 +1658,43 @@ bool TVRec::SetupDTVSignalMonitor(void)
         {
             neededVideo = (setting->getValue() == "tv") ? 1 : 0;
             neededAudio = (setting->getValue() == "audio") ? 1 : 0;
+        }
+
+        VERBOSE(VB_RECORD, LOC +
+                QString("DVB service_id %1 on net_id %2 tsid %3")
+                .arg(progNum).arg(netid).arg(tsid));
+
+        // Some DVB devices munge the PMT and/or PAT so the CRC check fails.
+        // We need to tell the stream data class to not check the CRC on 
+        // these devices.
+        if (GetDVBChannel())
+            sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
+
+        bool fta = CardUtil::IgnoreEncrypted(
+            GetCaptureCardNum(), channel->GetCurrentInput());
+
+        sm->SetStreamData(sd);
+        sm->SetDVBService(netid, tsid, progNum);
+        sd->SetVideoStreamsRequired(neededVideo);
+        sd->SetVideoStreamsRequired(neededAudio);
+        sm->SetFTAOnly(fta);
+
+        sm->AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
+
+        VERBOSE(VB_RECORD, LOC + "Successfully set up DVB table monitoring.");
+        return true;
+    }
+#endif // USING_DVB
+
+    // Check if this is an MPEG channel
+    if (progNum >= 0)
+    {
+        if (!sd)
+        {
+            sd = new MPEGStreamData(progNum, true);
+            sd->SetCaching(true);
+            if (GetDTVRecorder())
+                GetDTVRecorder()->SetStreamData(sd);
         }
 
         QString msg = QString("MPEG program number: %1").arg(progNum);
@@ -1760,10 +1712,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
             GetCaptureCardNum(), channel->GetCurrentInput());
 
         sm->SetStreamData(sd);
-        ((MPEGStreamData*)sd)->Reset(progNum);
         sm->SetProgramNumber(progNum);
-        sd->SetVideoStreamsRequired(neededVideo);
-        sd->SetVideoStreamsRequired(neededAudio);
+        sd->SetVideoStreamsRequired(1);
         sm->SetFTAOnly(fta);
         sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
 
@@ -3050,6 +3000,89 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
     }
 }
 
+QString TVRec::TuningGetChanNum(const TuningRequest &request,
+                                QString &input) const
+{
+    QString channum = QString::null;
+
+    if (request.program)
+    {
+        request.program->GetChannel(channum, input);
+        return channum;
+    }
+
+    channum = request.channel;
+    input   = request.input;
+
+    // If this is Live TV startup, we need a channel...
+    if (channum.isEmpty() && (request.flags & kFlagLiveTV))
+    {
+        input   = genOpt.defaultinput;
+        channum = GetStartChannel(cardid, input);
+    }
+
+    if (channel && !channum.isEmpty() && (channum.find("NextChannel") >= 0))
+    {
+        int dir = channum.right(channum.length() - 12).toInt();
+        uint chanid;
+        QString channelordering = channel->GetOrdering();
+        channum = ChannelUtil::GetNextChannel(
+            cardid,                    channel->GetCurrentInput(),
+            channel->GetCurrentName(), dir,
+            channelordering,           chanid);
+    }
+
+    return channum;
+}
+
+bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
+{
+    if ((request.flags & kFlagAntennaAdjust) || !GetDTVRecorder() ||
+        signalMonitor || !channel || !channel->IsOpen())
+    {
+        return false;
+    }
+
+    if (!request.input.isEmpty())
+        return false;
+
+    uint    sourceid   = channel->GetCurrentSourceID();
+    QString oldchannum = channel->GetCurrentName();
+    QString newchannum = request.channel;
+
+    if (ChannelUtil::IsOnSameMultiplex(sourceid, newchannum, oldchannum))
+    {
+        MPEGStreamData *mpeg = GetDTVRecorder()->GetStreamData();
+        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
+
+        if (atsc)
+        {
+            uint atscsrcid = ChannelUtil::GetATSCSRCID(sourceid, newchannum);
+            uint major = atscsrcid >> 8;
+            uint minor = atscsrcid & 0xff;
+
+            if (minor && atsc->HasChannel(major, minor))
+            {
+                request.majorChan = major;
+                request.minorChan = minor;
+                return true;
+            }
+        }
+
+        if (mpeg)
+        {
+            uint progNum = ChannelUtil::GetProgramNumber(sourceid, newchannum);
+            if (mpeg->HasProgram(progNum))
+            {
+                request.progNum = progNum;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 /** \fn TVRec::HandleTuning(void)
  *  \brief Handles all tuning events.
  *
@@ -3059,21 +3092,33 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
  */
 void TVRec::HandleTuning(void)
 {
-    bool handle_done = false;
-
     if (tuningRequests.size())
     {
-        const TuningRequest *request = &tuningRequests.front();
-        VERBOSE(VB_RECORD, LOC + "Request: "<<request->toString());
-        TuningShutdowns(*request);
+        TuningRequest request = tuningRequests.front();
+        VERBOSE(VB_RECORD, LOC + "Request: "<<request.toString());
+
+        QString input;
+        request.channel = TuningGetChanNum(request, input);
+        request.input   = input;
+
+        if (TuningOnSameMultiplex(request))
+        {
+            VERBOSE(VB_IMPORTANT, "\n\n\tOn same multiplex\n\n");
+        }
+
+        TuningShutdowns(request);
+
+        // The dequeue isn't safe to do until now because we
+        // release the stateChangeLock to teardown a recorder
+        tuningRequests.dequeue();
 
         // Now we start new stuff
-        if (request->flags & (kFlagRecording|kFlagLiveTV|
-                              kFlagEITScan|kFlagAntennaAdjust))
+        if (request.flags & (kFlagRecording|kFlagLiveTV|
+                             kFlagEITScan|kFlagAntennaAdjust))
         {
             if (!recorder)
             {
-                TuningFrequency(*request);
+                TuningFrequency(request);
                 retune_timer->restart();
                 retune_timer->addMSecs(1);
                 retune_requests = 0;
@@ -3081,8 +3126,7 @@ void TVRec::HandleTuning(void)
             else
                 SetFlags(kFlagWaitingForRecPause);
         }
-
-        lastTuningRequest = tuningRequests.dequeue();
+        lastTuningRequest = request;
     }
 
     if (HasFlags(kFlagWaitingForRecPause))
@@ -3112,27 +3156,17 @@ void TVRec::HandleTuning(void)
         TuningFrequency(lastTuningRequest);
     }
 
-    if (HasFlags(kFlagWaitingForSignal))
-    {
-        if (!TuningSignalCheck())
-            handle_done = true;
-    }
+    MPEGStreamData *streamData = NULL;
+    bool handle_done = (HasFlags(kFlagWaitingForSignal) &&
+                        !(streamData = TuningSignalCheck()));
 
-    if (HasFlags(kFlagWaitingForSIParser))
+    // Just because we have signal, we may not have the right transponder.
+    if (HasFlags(kFlagWaitingForSignal) && !retune_timer->elapsed() &&
+        (retune_requests < 30))
     {
-        if (!TuningPMTCheck())
-            handle_done = true;
+        RetuneChannel();
+        retune_requests++;
     }
-
-#ifdef USING_DVB
-    if (HasFlags(kFlagWaitingForSignal) ||  // Just because we have signal, we
-        HasFlags(kFlagWaitingForSIParser))  // may not have the right transponder
-        if (!retune_timer->elapsed() && (retune_requests < 30))
-        {
-            RetuneChannel();
-            retune_requests++;
-        }
-#endif // USING_DVB
 
     if (handle_done)
         return;
@@ -3142,7 +3176,7 @@ void TVRec::HandleTuning(void)
         if (recorder)
             TuningRestartRecorder();
         else
-            TuningNewRecorder();
+            TuningNewRecorder(streamData);
 
         // If we got this far it is safe to set a new starting channel...
         if (channel)
@@ -3204,15 +3238,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         ClearFlags(kFlagEITScannerRunning);
     }
 
-#ifdef USING_DVB
-    if (HasFlags(kFlagSIParserRunning))
-    {
-        TeardownSIParser();
-        ClearFlags(kFlagSIParserRunning);
-    }
-    if (HasFlags(kFlagWaitingForSIParser))
-        ClearFlags(kFlagWaitingForSIParser);
-#endif // USING_DVB
+    if (scanner && !request.IsOnSameMultiplex())
+        scanner->StopPassiveScan();
 
     if (HasFlags(kFlagSignalMonitorRunning))
     {
@@ -3307,21 +3334,33 @@ bool TVRec::RetuneChannel(void)
  */
 void TVRec::TuningFrequency(const TuningRequest &request)
 {
-    QString channum, input;
-    if (request.program)
-        request.program->GetChannel(channum, input);
-    else
+    if (request.minorChan)
     {
-        channum = request.channel;
-        input   = request.input;
-
-        // If this is Live TV startup, we need a channel...
-        if (channum.isEmpty() && (request.flags & kFlagLiveTV))
-        {
-            input   = genOpt.defaultinput;
-            channum = GetStartChannel(cardid, input);
-        }
+        MPEGStreamData *mpeg = GetDTVRecorder()->GetStreamData();
+        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(mpeg);
+        channel->SetChannelByString(request.channel);
+        atsc->SetDesiredChannel(request.majorChan, request.minorChan);
     }
+    else if (request.progNum >= 0)
+    {
+        MPEGStreamData *mpeg = GetDTVRecorder()->GetStreamData();
+        channel->SetChannelByString(request.channel);
+        mpeg->SetDesiredProgram(request.progNum);
+    }
+    if (request.IsOnSameMultiplex())
+    {
+        QStringList slist;
+        slist<<"message"<<QObject::tr("On same multiplex...");
+        MythEvent me(QString("SIGNAL %1").arg(cardid), slist);
+        gContext->dispatch(me);
+
+        SetFlags(kFlagNeedToStartRecorder);
+        return;
+    }
+
+    QString input   = request.input;
+    QString channum = request.channel;
+
     bool ok = false;
     if (channel)
         channel->Open();
@@ -3330,17 +3369,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     if (channel && !channum.isEmpty())
     {
-        if (channum.find("NextChannel") >= 0)
-        {
-            int dir = channum.right(channum.length() - 12).toInt();
-            uint chanid;
-            QString channelordering = channel->GetOrdering();
-            channum = ChannelUtil::GetNextChannel(
-                cardid,                    channel->GetCurrentInput(),
-                channel->GetCurrentName(), dir,
-                channelordering,           chanid);
-        }
-
         if (!input.isEmpty())
             ok = channel->SwitchToInput(input, channum);
         else
@@ -3439,72 +3467,37 @@ void TVRec::TuningFrequency(const TuningRequest &request)
  *
  *   If we have a channel lock this shuts down the signal monitoring.
  *
- *   If this is a DVB recorder the we start the SIParser and add a
- *   kFlagWaitingForSIParser flag to the tuning state.
- *
- *  \return true iff we have a complete lock
+ *  \return MPEGStreamData pointer if we have a complete lock, NULL otherwise
  */
-bool TVRec::TuningSignalCheck(void)
+MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
     if (!signalMonitor->IsAllGood())
-        return false;
+        return NULL;
 
     VERBOSE(VB_RECORD, LOC + "Got good signal");
 
     // grab useful data from DTV signal monitor before we kill it...
-    int programNum = -1;
-    ATSCStreamData *streamData = NULL;
+    MPEGStreamData *streamData = NULL;
     if (GetDTVSignalMonitor())
+        streamData = GetDTVSignalMonitor()->GetStreamData();
+
+    if (!HasFlags(kFlagEITScannerRunning))
     {
-        programNum = GetDTVSignalMonitor()->GetProgramNumber();
-        streamData = GetDTVSignalMonitor()->GetATSCStreamData();
-        VERBOSE(VB_RECORD, LOC + "MPEG program num("<<programNum<<")");
+        // shut down signal monitoring
+        TeardownSignalMonitor();
+        ClearFlags(kFlagSignalMonitorRunning);
+    }
+    ClearFlags(kFlagWaitingForSignal);
+
+    if (streamData)
+    {
+        DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(streamData);
+        if (dsd)
+            dsd->SetDishNetEIT(is_dishnet_eit(cardid));
+        scanner->StartPassiveScan(channel, streamData, eitIgnoresSource);
     }
 
-    // shut down signal monitoring
-    TeardownSignalMonitor();
-    ClearFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
-
-    // tell recorder/siparser about useful DTV monitor info..
-#ifdef USING_DVB
-    if (GetDVBRecorder())
-        GetDVBRecorder()->SetStreamData(streamData);
-
-    if (GetDVBChannel())
-    {
-        GetDVBChannel()->HandlePMT(0, NULL);
-        CreateSIParser(streamData, programNum);
-        SetFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
-    }
-#endif // USING_DVB
-
-#ifdef USING_V4L
-    if (GetHDTVRecorder())
-        GetHDTVRecorder()->SetStreamData(streamData);
-#endif // USING_V4L
-#ifdef USING_HDHOMERUN
-    if (GetHDHRRecorder())
-        GetHDHRRecorder()->SetStreamData(streamData);
-#endif // USING_HDHOMERUN
-
-    return true;
-}
-
-/** \fn TVRec::TuningPMTCheck(void)
- *  \brief Clears the kFlagWaitingForSIParser flag
- *         when the SIParser has a PMT.
- *
- *  \return true if we have a PMT, or we don't need it.
- */
-bool TVRec::TuningPMTCheck(void)
-{
-#ifdef USING_DVB
-    if (!GetDVBChannel()->IsPMTSet())
-        return false;
-#endif // USING_DVB
-    VERBOSE(VB_RECORD, LOC + "Got SIParser PMT");
-    ClearFlags(kFlagWaitingForSIParser);
-    return true;
+    return streamData;
 }
 
 static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
@@ -3571,10 +3564,10 @@ static QString load_profile(QString cardtype, void *tvchain,
     return profileName;
 }
 
-/** \fn TVRec::TuningNewRecorder(void)
+/** \fn TVRec::TuningNewRecorder(MPEGStreamData*)
  *  \brief Creates a recorder instance.
  */
-void TVRec::TuningNewRecorder(void)
+void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 {
     VERBOSE(VB_RECORD, LOC + "Starting Recorder");
 
@@ -3659,6 +3652,9 @@ void TVRec::TuningNewRecorder(void)
         TeardownRecorder(true);
         goto err_ret;
     }
+
+    if (GetDTVRecorder() && streamData)
+        GetDTVRecorder()->SetStreamData(streamData);
 
     if (channel && genOpt.cardtype == "MJPEG")
         channel->Open(); // Needed because of NVR::MJPEGInit()
@@ -3863,8 +3859,6 @@ QString TVRec::FlagToString(uint f)
             msg += "WaitingForRecPause,";
         if (kFlagWaitingForSignal & f)
             msg += "WaitingForSignal,";
-        if (kFlagWaitingForSIParser & f)
-            msg += "WaitingForSIParser,";
         if (kFlagNeedToStartRecorder & f)
             msg += "NeedToStartRecorder,";
         if (kFlagKillRingBuffer & f)
@@ -3876,8 +3870,6 @@ QString TVRec::FlagToString(uint f)
     {
         if (kFlagSignalMonitorRunning & f)
             msg += "SignalMonitorRunning,";
-        if (kFlagSIParserRunning & f)
-            msg += "SIParserRunning,";
         if (kFlagEITScannerRunning & f)
             msg += "EITScannerRunning,";
         if ((kFlagAnyRecRunning & f) == kFlagAnyRecRunning)

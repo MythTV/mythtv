@@ -7,7 +7,7 @@
 ScanStreamData::ScanStreamData()
     : MPEGStreamData(-1, true),
       ATSCStreamData(-1,-1, true),
-      DVBStreamData(true)
+      DVBStreamData(0, 0, -1, true)
 {
 }
 
@@ -36,7 +36,7 @@ void ScanStreamData::Reset(void)
 {
     MPEGStreamData::Reset(-1);
     ATSCStreamData::Reset(-1,-1);
-    DVBStreamData::Reset();
+    DVBStreamData::Reset(0,0,-1);
 
     AddListeningPID(MPEG_PAT_PID);
     AddListeningPID(ATSC_PSIP_PID);

@@ -159,6 +159,12 @@ class ChannelBase
     /// \brief Returns minor channel, -1 if unknown.
     virtual int GetMinorChannel(void) const
         { return currentATSCMinorChannel; };
+    /// \brief Returns DVB original_network_id, -1 if unknown.
+    virtual int GetOriginalNetworkID(void) const
+        { return currentOriginalNetworkID; };
+    /// \brief Returns DVB transport_stream_id, -1 if unknown.
+    virtual int GetTransportID(void) const
+        { return currentTransportID; };
 
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { cardid = _cardid; }
@@ -186,6 +192,8 @@ class ChannelBase
     int     currentATSCMajorChannel;
     int     currentATSCMinorChannel;
     int     currentProgramNum;
+    int     currentOriginalNetworkID;
+    int     currentTransportID;
 };
 
 #endif

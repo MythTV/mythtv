@@ -5,7 +5,6 @@
 
 #include "mpegstreamdata.h"
 
-typedef vector<uint>                    uint_vec_t;
 typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
 typedef TerrestrialVirtualChannelTable* tvct_ptr_t;
 typedef CableVirtualChannelTable*       cvct_ptr_t;
@@ -13,6 +12,8 @@ typedef vector<const TerrestrialVirtualChannelTable*> tvct_vec_t;
 typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
 typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
 typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
+typedef QMap<uint, uint>                atsc_eit_pid_map_t;
+typedef QMap<uint, uint>                atsc_ett_pid_map_t;
 
 typedef vector<ATSCMainStreamListener*> atsc_main_listener_vec_t;
 typedef vector<ATSCAuxStreamListener*>  atsc_aux_listener_vec_t;
@@ -35,7 +36,14 @@ class ATSCStreamData : virtual public MPEGStreamData
     virtual bool IsRedundant(uint, const PSIPTable&) const;
 
     /// Current UTC to GPS time offset in seconds
-    uint GPSOffset() const { return _GPS_UTC_offset; }
+    uint GPSOffset(void) const { return _GPS_UTC_offset; }
+
+    inline uint GetATSCSRCID(uint eit_sourceid) const;
+    inline bool HasATSCSRCIDMap(void) const;
+    bool HasEITPIDChanges(const uint_vec_t &in_use_pid) const;
+    bool GetEITPIDChanges(const uint_vec_t &in_use_pid,
+                          uint_vec_t &pids_to_add,
+                          uint_vec_t &pids_to_del) const;
 
     // Table versions
     void SetVersionMGT(int version)
@@ -80,6 +88,8 @@ class ATSCStreamData : virtual public MPEGStreamData
     void ReturnCachedTVCTTables(tvct_vec_t&) const;
     void ReturnCachedCVCTTables(cvct_vec_t&) const;
 
+    bool HasChannel(uint major, uint minor) const;
+
     // Single channel stuff
     int DesiredMajorChannel(void) const { return _desired_major_channel; }
     int DesiredMinorChannel(void) const { return _desired_minor_channel; }
@@ -93,6 +103,11 @@ class ATSCStreamData : virtual public MPEGStreamData
     void RemoveATSCEITListener(ATSCEITStreamListener*);
 
   private:
+    void ProcessMGT(const MasterGuideTable*);
+    void ProcessVCT(uint tsid, const VirtualChannelTable*);
+    void ProcessTVCT(uint tsid, const TerrestrialVirtualChannelTable*);
+    void ProcessCVCT(uint tsid, const CableVirtualChannelTable*);
+
     // Caching
     void CacheMGT(MasterGuideTable*);
     void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
@@ -100,7 +115,13 @@ class ATSCStreamData : virtual public MPEGStreamData
     virtual void DeleteCachedTable(PSIPTable *psip) const;
 
   private:
-    uint            _GPS_UTC_offset;
+    uint                      _GPS_UTC_offset;
+    mutable bool              _atsc_eit_reset;
+    atsc_eit_pid_map_t        _atsc_eit_pids;
+    atsc_ett_pid_map_t        _atsc_ett_pids;
+
+    QMap<uint,uint>           _sourceid_to_atscsrcid;
+
 
     // Signals
     atsc_main_listener_vec_t  _atsc_main_listeners;
@@ -123,6 +144,19 @@ class ATSCStreamData : virtual public MPEGStreamData
     int _desired_major_channel;
     int _desired_minor_channel;
 };
+
+
+inline uint ATSCStreamData::GetATSCSRCID(uint eit_sourceid) const
+{
+    QMutexLocker locker(&_listener_lock);
+    return _sourceid_to_atscsrcid[eit_sourceid];
+}
+
+inline bool ATSCStreamData::HasATSCSRCIDMap(void) const
+{
+    QMutexLocker locker(&_listener_lock);
+    return _sourceid_to_atscsrcid.size();
+}
 
 inline int ATSCStreamData::VersionTVCT(uint tsid) const
 {

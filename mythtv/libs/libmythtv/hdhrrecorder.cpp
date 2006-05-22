@@ -36,10 +36,8 @@ using namespace std;
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec),
       _channel(channel), _video_socket(NULL),
-      _atsc_stream_data(NULL),
-      _eit_helper(NULL), _eit_rate(1.0f), _eit_old_rate(0.0f)
+      _atsc_stream_data(NULL)
 {
-    SetStreamData(new ATSCStreamData(-1, 1));
 }
 
 HDHRRecorder::~HDHRRecorder()
@@ -124,9 +122,6 @@ void HDHRRecorder::ProcessTSData(const uint8_t *buffer, int len)
     const uint8_t *data = buffer;
     const uint8_t *end = buffer + len;
 
-    if (_eit_rate != _eit_old_rate && _eit_helper && _atsc_stream_data)
-        _eit_old_rate = _eit_rate; //AdjustEITPids();
-
     while (data + 188 <= end)
     {
         if (data[0] != 0x47)
@@ -141,8 +136,11 @@ void HDHRRecorder::ProcessTSData(const uint8_t *buffer, int len)
     }
 }
 
-void HDHRRecorder::SetStreamData(ATSCStreamData *data)
+void HDHRRecorder::SetStreamData(MPEGStreamData *xdata)
 {
+    ATSCStreamData *data = dynamic_cast<ATSCStreamData*>(xdata);
+    VERBOSE(VB_IMPORTANT, LOC + "SetStreamData(xdata: "<<xdata<<") "<<data);
+
     if (data == _atsc_stream_data)
         return;
 
@@ -155,9 +153,14 @@ void HDHRRecorder::SetStreamData(ATSCStreamData *data)
     {
         data->AddMPEGSPListener(this);
         data->AddATSCMainListener(this);
+        data->SetDesiredChannel(data->DesiredMajorChannel(),
+                                data->DesiredMinorChannel());
     }
-    if (_eit_helper)
-        SetEITHelper(_eit_helper);
+}
+
+MPEGStreamData *HDHRRecorder::GetStreamData(void)
+{
+    return _atsc_stream_data;
 }
 
 void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
@@ -170,8 +173,15 @@ void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
 }
 
+static ProgramMapTable *lastPMT = NULL;
 void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable* pmt)
 {
+    if (lastPMT != pmt)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "HandleSingleProgramPMT("<<pmt<<")");
+        lastPMT = pmt;
+    }
+
     if (!pmt)
         return;
 
@@ -186,97 +196,13 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable* pmt)
  */
 void HDHRRecorder::HandleMGT(const MasterGuideTable *mgt)
 {
-    //VERBOSE(VB_IMPORTANT, "HandleMGT()");
+    VERBOSE(VB_IMPORTANT, LOC + "HandleMGT()");
     for (unsigned int i = 0; i < mgt->TableCount(); i++)
     {
         GetStreamData()->AddListeningPID(mgt->TablePID(i));
         _channel->AddPID(mgt->TablePID(i), false);
     }
     _channel->UpdateFilters();
-}
-
-/** \fn HDHRRecorder::HandleVCT(uint, const VirtualChannelTable*)
- *  \brief Processes Virtual Channel Tables by finding the program
- *         number to use.
- *  \bug Assumes there is only one VCT, may break on Cable.
- */
-void HDHRRecorder::HandleVCT(uint /*tsid*/,
-                              const VirtualChannelTable *vct)
-{
-    //VERBOSE(VB_IMPORTANT, "HandleVCT()");
-    if (vct->ChannelCount() < 1)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "HDHRRecorder::HandleVCT: table has no channels");
-        return;
-    }
-
-    bool found = false;    
-    VERBOSE(VB_RECORD, QString("Desired channel %1_%2")
-            .arg(GetStreamData()->DesiredMajorChannel())
-            .arg(GetStreamData()->DesiredMinorChannel()));
-    for (uint i=0; i<vct->ChannelCount(); i++)
-    {
-        if ((GetStreamData()->DesiredMajorChannel() == -1 ||
-             vct->MajorChannel(i)==
-             (uint)GetStreamData()->DesiredMajorChannel()) &&
-            vct->MinorChannel(i)==
-            (uint)GetStreamData()->DesiredMinorChannel())
-        {
-            if (vct->ProgramNumber(i) != 
-                (uint)GetStreamData()->DesiredProgram())
-            {
-                VERBOSE(VB_RECORD, 
-                        QString("Resetting desired program from %1"
-                                " to %2")
-                        .arg(GetStreamData()->DesiredProgram())
-                        .arg(vct->ProgramNumber(i)));
-                GetStreamData()->MPEGStreamData::Reset(vct->ProgramNumber(i));
-            }
-            found = true;
-        }
-    }
-    if (!found)
-    {
-        VERBOSE(VB_IMPORTANT, 
-                QString("Desired channel %1_%2 not found;"
-                        " using %3_%4 instead.")
-                .arg(GetStreamData()->DesiredMajorChannel())
-                .arg(GetStreamData()->DesiredMinorChannel())
-                .arg(vct->MajorChannel(0))
-                .arg(vct->MinorChannel(0)));
-        VERBOSE(VB_IMPORTANT, vct->toString());
-        GetStreamData()->MPEGStreamData::Reset(vct->ProgramNumber(0));
-    }
-
-    _eit_sourceid_to_channel.clear();
-    for (uint chan_idx = 0; chan_idx < vct->ChannelCount() ; chan_idx++)
-    {
-        if (vct->IsHiddenInGuide(chan_idx))
-        {
-            VERBOSE(VB_EIT, LOC + QString("%1 chan %2-%3 is hidden in guide")
-                    .arg(vct->ModulationMode(chan_idx) == 1 ? "NTSC" : "ATSC")
-                    .arg(vct->MajorChannel(chan_idx))
-                    .arg(vct->MinorChannel(chan_idx)));
-            continue;
-        }
-
-        if (1 == vct->ModulationMode(chan_idx))
-        {
-            VERBOSE(VB_EIT, LOC + QString("Ignoring NTSC chan %1-%2")
-                    .arg(vct->MajorChannel(chan_idx))
-                    .arg(vct->MinorChannel(chan_idx)));
-            continue;
-        }
-
-        VERBOSE(VB_EIT, LOC + QString("Adding Source #%1 ATSC chan %2-%3")
-                .arg(vct->SourceID(chan_idx))
-                .arg(vct->MajorChannel(chan_idx))
-                .arg(vct->MinorChannel(chan_idx)));
-
-        _eit_sourceid_to_channel[vct->SourceID(chan_idx)] =
-            vct->MajorChannel(chan_idx) << 8 | vct->MinorChannel(chan_idx);
-    }
 }
 
 bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
@@ -343,6 +269,8 @@ void HDHRRecorder::StartRecording(void)
         if (PauseAndWait())
             continue;
 
+        AdjustEITPIDs();
+
         struct hdhomerun_video_data_t data;
         int ret = hdhomerun_video_recv(_video_socket, &data, 100);
 
@@ -369,55 +297,8 @@ void HDHRRecorder::StartRecording(void)
     VERBOSE(VB_RECORD, LOC + "StartRecording -- end");
 }
 
-void HDHRRecorder::SetEITHelper(EITHelper *helper)
+void HDHRRecorder::AdjustEITPIDs(void)
 {
-    QMutexLocker locker(&_lock);
-
-    if (!helper && _eit_helper && _atsc_stream_data)
-        _atsc_stream_data->RemoveATSCEITListener(this);
-
-    _eit_helper = helper;
-
-    if (_eit_helper && _atsc_stream_data)
-        _atsc_stream_data->AddATSCEITListener(this);
+    // TODO
 }
 
-void HDHRRecorder::SetEITRate(float rate)
-{
-    QMutexLocker locker(&_lock);
-    _eit_rate = rate;
-}
-
-/*
-void HDHRRecorder::AdjustEITPids(void)
-{
-    _eit_old_rate = _eit_rate;
-}
-*/
-
-void HDHRRecorder::HandleEIT(uint /*pid*/, const EventInformationTable *eit)
-{
-    const uint atscsrcid = _eit_sourceid_to_channel[eit->SourceID()];
-    if (atscsrcid && _eit_helper)
-        _eit_helper->AddEIT(atscsrcid, eit);
-}
-
-void HDHRRecorder::HandleETT(uint /*pid*/, const ExtendedTextTable *ett)
-{
-    if (ett->IsEventETM()) // decode guide ETTs
-    {
-        const uint atscsrcid = _eit_sourceid_to_channel[ett->SourceID()];
-        if (atscsrcid && _eit_helper)
-            _eit_helper->AddETT(atscsrcid, ett);
-    }
-}
-
-void HDHRRecorder::HandleSTT(const SystemTimeTable *stt)
-{
-    if (_eit_helper &&
-        (_atsc_stream_data->GPSOffset() != _eit_helper->GetGPSOffset()))
-    {
-        VERBOSE(VB_SIPARSER, LOC + stt->toString());
-        _eit_helper->SetGPSOffset(_atsc_stream_data->GPSOffset());
-    }
-}

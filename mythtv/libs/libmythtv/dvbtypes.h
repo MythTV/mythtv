@@ -43,8 +43,8 @@ using namespace std;
 #    define VSB_16        (fe_modulation)(QAM_AUTO+2)
 #endif
 
-#include "transform.h"
-#include "sitypes.h"
+#include "mpegdescriptors.h"
+#include "mpegtables.h"
 
 #define MPEG_TS_PKT_SIZE 188
 #define DEF_DMX_BUF_SIZE  64 * 1024
@@ -372,16 +372,12 @@ class DVBTuning
                    const QString& trans_mode,     const QString& guard_interval,
                    const QString& hierarchy);
 
-    bool parseOFDM(const TransportObject&);
-
     bool parseQPSK(const QString& frequency,      const QString& inversion,
                    const QString& symbol_rate,    const QString& fec_inner,
                    const QString& pol,            const QString& diseqc_type,
                    const QString& diseqc_port,    const QString& diseqc_pos,
                    const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                    const QString& lnb_lof_lo);
-
-    bool parseQAM(const TransportObject&);
 
     bool parseQAM(const QString& frequency,       const QString& inversion,
                   const QString& symbol_rate,     const QString& fec_inner,
@@ -451,7 +447,5 @@ class dvb_channel_t
   private:
     mutable QMutex  lock;
 };
-
-typedef map<uint16_t, ipack*> pid_ipack_t;
 
 #endif // DVB_TYPES_H

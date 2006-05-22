@@ -3,6 +3,9 @@
 #ifndef DTVSIGNALMONITOR_H
 #define DTVSIGNALMONITOR_H
 
+#include <vector>
+using namespace std;
+
 #include "signalmonitor.h"
 #include "signalmonitorvalue.h"
 #include "streamlisteners.h"
@@ -33,6 +36,11 @@ class DTVSignalMonitor : public SignalMonitor,
 
     void SetProgramNumber(int progNum);
     int  GetProgramNumber() const { return programNumber; }
+
+    void SetDVBService(uint network_id, uint transport_id, int service_id);
+    uint GetTransportID(void) const { return transportID;   }
+    uint GetNetworkID(void)   const { return networkID;     }
+    int  GetServiceID(void)   const { return programNumber; }
 
     void SetFTAOnly(bool fta)    { ignoreEncrypted = fta;  }
     bool GetFTAOnly() const      { return ignoreEncrypted; }
@@ -88,9 +96,11 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(uint, const ServiceDescriptionTable*);
 
-  private:
-    void UpdateMonitorValues();
+  protected:
+    void UpdateMonitorValues(void);
+    void UpdateListeningForEIT(void);
     MPEGStreamData    *stream_data;
+    vector<uint>       eit_pids;
     SignalMonitorValue seenPAT;
     SignalMonitorValue seenPMT;
     SignalMonitorValue seenMGT;
@@ -105,6 +115,8 @@ class DTVSignalMonitor : public SignalMonitor,
     SignalMonitorValue matchingSDT;
     int                majorChannel;
     int                minorChannel;
+    uint               networkID;
+    uint               transportID;
     int                programNumber;
     bool               ignoreEncrypted;
     QString            error;

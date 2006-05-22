@@ -33,7 +33,6 @@
 
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
-#include "dvbdev.h"
 #endif
 
 #if defined(CONFIG_VIDEO4LINUX)

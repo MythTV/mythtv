@@ -52,7 +52,7 @@ using namespace std;
 
 #include "recorderbase.h"
 
-#include "dvbdev.h"
+#include "cardutil.h"
 
 #include "dvbcam.h"
 #include "dvbchannel.h"
@@ -68,7 +68,8 @@ DVBCam::DVBCam(int cardNum)
       have_pmt(false),        pmt_sent(false),
       pmt_updated(false),     pmt_added(false)
 {
-    int cafd = open(dvbdevice(DVB_DEV_CA, cardnum), O_RDWR);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, cardnum);
+    int cafd = open(dvbdev.ascii(), O_RDWR);
     if (cafd >= 0)
     {
         ca_caps_t caps;
@@ -94,7 +95,8 @@ bool DVBCam::Start()
     pmt_updated  = false;
     pmt_added    = false;
 
-    ciHandler = cCiHandler::CreateCiHandler(dvbdevice(DVB_DEV_CA, cardnum));
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, cardnum);
+    ciHandler = cCiHandler::CreateCiHandler(dvbdev.ascii());
     if (!ciHandler)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to initialize CI handler");

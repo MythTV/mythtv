@@ -207,14 +207,16 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     fix |= fixup[(eit->OriginalNetworkID() << 16) | eit->ServiceID()];
     fix |= EITFixUp::kFixGenericDVB;
 
+    uint networkid = eit->OriginalNetworkID();
+    uint tsid      = eit->TSID();
+    uint serviceid = eit->ServiceID();
+    uint tableid   = eit->TableID();
+    uint version   = eit->Version();
     for (uint i = 0; i < eit->EventCount(); i++)
     {
         // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(
-                eit->TSID(),      eit->EventID(i),
-                eit->ServiceID(), eit->TableID(),
-                eit->Version(),
-                eit->Descriptors(i), eit->DescriptorsLength(i)))
+        if (!eitcache->IsNewEIT(networkid, tsid, serviceid, tableid, version,
+                                eit->EventID(i), eit->EndTimeUnixUTC(i)))
         {
             continue;
         }

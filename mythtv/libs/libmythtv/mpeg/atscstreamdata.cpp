@@ -1,8 +1,17 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
+
+#include <cmath>
+
+#include <algorithm>
+using namespace std;
+
 #include "atscstreamdata.h"
 #include "atsctables.h"
 #include "RingBuffer.h"
+#include "eithelper.h"
+
+#define LOC QString("ATSCStream: ")
 
 /** \class ATSCStreamData
  *  \brief Encapsulates data about ATSC stream and emits events for most tables.
@@ -24,6 +33,7 @@ ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
                                bool cacheTables)
     : MPEGStreamData(-1, cacheTables),
       _GPS_UTC_offset(GPS_LEAP_SECONDS),
+      _atsc_eit_reset(false),
       _mgt_version(-1),
       _cached_mgt(NULL),
       _desired_major_channel(desiredMajorChannel),
@@ -44,16 +54,61 @@ ATSCStreamData::~ATSCStreamData()
 
 void ATSCStreamData::SetDesiredChannel(int major, int minor)
 {
-    // TODO this should reset only if it can't regen from cached tables.
-    _desired_major_channel = major;
-    _desired_minor_channel = minor;
-    _desired_program = -1;
+    bool reset = true;
+    const MasterGuideTable *mgt = GetCachedMGT();
+    tvct_vec_t tvcts = GetAllCachedTVCTs();
+    cvct_vec_t cvcts = GetAllCachedCVCTs();
+
+    if (mgt && (tvcts.size() || cvcts.size()))
+    {
+        const TerrestrialVirtualChannelTable *tvct = NULL;
+        const CableVirtualChannelTable       *cvct = NULL;
+        int chan_idx = -1;
+        for (uint i = 0; (i < tvcts.size()) && (chan_idx < 0); i++)
+        {
+            tvct = tvcts[i];
+            chan_idx = tvcts[i]->Find(major, minor);
+        }
+        for (uint i = (chan_idx < 0) ? 0 : cvcts.size();
+             (i < cvcts.size()) && (chan_idx < 0); i++)
+        {
+            cvct = cvcts[i];
+            chan_idx = cvcts[i]->Find(major, minor);
+        }
+
+        if (chan_idx >= 0)
+        {
+            _desired_major_channel = major;
+            _desired_minor_channel = minor;
+
+            ProcessMGT(mgt);
+
+            if (cvct)
+            {
+                ProcessCVCT(cvct->TransportStreamID(), cvct);
+                SetDesiredProgram(cvct->ProgramNumber(chan_idx));
+            }
+            else if (tvct)
+            {
+                ProcessTVCT(tvct->TransportStreamID(), tvct);
+                SetDesiredProgram(tvct->ProgramNumber(chan_idx));
+            }
+            reset = false;
+        }
+    }
+
+    ReturnCachedTable(mgt);
+    ReturnCachedTVCTTables(tvcts);
+    ReturnCachedCVCTTables(cvcts);
+
+    if (reset)
+        Reset(major, minor);
 }
 
-void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
+void ATSCStreamData::Reset(int major, int minor)
 {
-    _desired_major_channel = desiredMajorChannel;
-    _desired_minor_channel = desiredMinorChannel;
+    _desired_major_channel = major;
+    _desired_minor_channel = minor;
     
     MPEGStreamData::Reset(-1);
     _mgt_version = -1;
@@ -61,6 +116,10 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
     _cvct_version.clear();
     _eit_version.clear();
     _eit_section_seen.clear();
+
+    _sourceid_to_atscsrcid.clear();
+    _atsc_eit_pids.clear();
+    _atsc_ett_pids.clear();
 
     { 
         QMutexLocker locker(&_cache_lock);
@@ -149,16 +208,12 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             {
                 MasterGuideTable *mgt = new MasterGuideTable(psip);
                 CacheMGT(mgt);
-                QMutexLocker locker(&_listener_lock);
-                for (uint i = 0; i < _atsc_main_listeners.size(); i++)
-                    _atsc_main_listeners[i]->HandleMGT(mgt);
+                ProcessMGT(mgt);
             }
             else
             {
                 MasterGuideTable mgt(psip);
-                QMutexLocker locker(&_listener_lock);
-                for (uint i = 0; i < _atsc_main_listeners.size(); i++)
-                    _atsc_main_listeners[i]->HandleMGT(&mgt);
+                ProcessMGT(&mgt);
             }
             return true;
         }
@@ -171,20 +226,12 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 TerrestrialVirtualChannelTable *vct =
                     new TerrestrialVirtualChannelTable(psip); 
                 CacheTVCT(pid, vct);
-                QMutexLocker locker(&_listener_lock);
-                for (uint i = 0; i < _atsc_main_listeners.size(); i++)
-                    _atsc_main_listeners[i]->HandleVCT(tsid, vct);
-                for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
-                    _atsc_aux_listeners[i]->HandleTVCT(tsid, vct);
+                ProcessTVCT(tsid, vct);
             }
             else
             {
                 TerrestrialVirtualChannelTable vct(psip);
-                QMutexLocker locker(&_listener_lock);
-                for (uint i = 0; i < _atsc_main_listeners.size(); i++)
-                    _atsc_main_listeners[i]->HandleVCT(tsid, &vct);
-                for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
-                    _atsc_aux_listeners[i]->HandleTVCT(tsid, &vct);
+                ProcessTVCT(tsid, &vct);
             }
             return true;
         }
@@ -197,20 +244,12 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 CableVirtualChannelTable *vct =
                     new CableVirtualChannelTable(psip);
                 CacheCVCT(pid, vct);
-                QMutexLocker locker(&_listener_lock);
-                for (uint i = 0; i < _atsc_main_listeners.size(); i++)
-                    _atsc_main_listeners[i]->HandleVCT(tsid, vct);
-                for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
-                    _atsc_aux_listeners[i]->HandleCVCT(tsid, vct);
+                ProcessCVCT(tsid, vct);
             }
             else
             {
                 CableVirtualChannelTable vct(psip);
-                QMutexLocker locker(&_listener_lock);
-                for (uint i = 0; i < _atsc_main_listeners.size(); i++)
-                    _atsc_main_listeners[i]->HandleVCT(tsid, &vct);
-                for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
-                    _atsc_aux_listeners[i]->HandleCVCT(tsid, &vct);
+                ProcessCVCT(tsid, &vct);
             }
             return true;
         }
@@ -225,7 +264,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::EIT:
         {
             QMutexLocker locker(&_listener_lock);
-            if (!_atsc_eit_listeners.size())
+            if (!_atsc_eit_listeners.size() && !_eit_helper)
                 return true;
 
             if (VersionEIT(pid, psip.TableIDExtension()) != version)
@@ -236,6 +275,10 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             for (uint i = 0; i < _atsc_eit_listeners.size(); i++)
                 _atsc_eit_listeners[i]->HandleEIT(pid, &eit);
 
+            const uint atscsrcid = GetATSCSRCID(eit.SourceID());
+            if (atscsrcid && _eit_helper)
+                _eit_helper->AddEIT(atscsrcid, &eit);
+                
             return true;
         }
         case TableID::ETT:
@@ -245,6 +288,13 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             QMutexLocker locker(&_listener_lock);
             for (uint i = 0; i < _atsc_eit_listeners.size(); i++)
                 _atsc_eit_listeners[i]->HandleETT(pid, &ett);
+
+            if (ett.IsEventETM() && _eit_helper) // Guide ETTs
+            {
+                const uint atscsrcid = GetATSCSRCID(ett.SourceID());
+                if (atscsrcid)
+                    _eit_helper->AddETT(atscsrcid, &ett);
+            }
 
             return true;
         }
@@ -258,6 +308,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             for (uint i = 0; i < _atsc_main_listeners.size(); i++)
                 _atsc_main_listeners[i]->HandleSTT(&stt);
+
+            if (_eit_helper && GPSOffset() != _eit_helper->GetGPSOffset())
+                _eit_helper->SetGPSOffset(GPSOffset());
 
             return true;
         }
@@ -315,12 +368,166 @@ bool ATSCStreamData::EITSectionSeen(uint pid, uint atsc_source_id,
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
+bool ATSCStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
+{
+    QMutexLocker locker(&_listener_lock);
+    uint eit_count = (uint) round(_atsc_eit_pids.size() * _eit_rate);
+    uint ett_count = (uint) round(_atsc_ett_pids.size() * _eit_rate);
+    return (in_use_pids.size() != (eit_count + ett_count) || _atsc_eit_reset);
+}
+
+bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
+                                      uint_vec_t &add_pids,
+                                      uint_vec_t &del_pids) const
+{
+    QMutexLocker locker(&_listener_lock);
+
+    _atsc_eit_reset = false;
+
+    uint eit_count = (uint) round(_atsc_eit_pids.size() * _eit_rate);
+    uint ett_count = (uint) round(_atsc_ett_pids.size() * _eit_rate);
+    uint i;
+
+    atsc_eit_pid_map_t::const_iterator it = _atsc_eit_pids.begin();
+    for (i = 0; it != _atsc_eit_pids.end() && (i < eit_count); (++it),(i++))
+    {
+        if (find(cur_pids.begin(), cur_pids.end(), *it) == cur_pids.end())
+            add_pids.push_back(*it);
+    }
+
+    atsc_ett_pid_map_t::const_iterator it2 = _atsc_ett_pids.begin();
+    for (i = 0; it2 != _atsc_ett_pids.end() && (i < ett_count); (++it2),(i++))
+    {
+        if (find(cur_pids.begin(), cur_pids.end(), *it2) == cur_pids.end())
+            add_pids.push_back(*it2);
+    }
+
+    for (i = 0; i < cur_pids.size(); i++)
+    {
+        uint pid = cur_pids[i];
+        if (find(add_pids.begin(), add_pids.end(), pid) == add_pids.end())
+            del_pids.push_back(pid);
+    }
+
+    return add_pids.size() || del_pids.size();
+}
+
+void ATSCStreamData::ProcessMGT(const MasterGuideTable *mgt)
+{
+    QMutexLocker locker(&_listener_lock);
+
+    _atsc_eit_reset = true;
+    _atsc_eit_pids.clear();
+    _atsc_ett_pids.clear();
+
+    for (uint i = 0 ; i < mgt->TableCount(); i++)
+    {
+        const int table_class = mgt->TableClass(i);
+        const uint pid        = mgt->TablePID(i);
+
+        if (table_class == TableClass::EIT)
+        {
+            const uint num = mgt->TableType(i) - 0x100;
+            _atsc_eit_pids[num] = pid;
+        }
+        else if (table_class == TableClass::ETTe)
+        {
+            const uint num = mgt->TableType(i) - 0x200;
+            _atsc_ett_pids[num] = pid;
+        }
+    }
+
+    for (uint i = 0; i < _atsc_main_listeners.size(); i++)
+        _atsc_main_listeners[i]->HandleMGT(mgt);
+}
+
+void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
+{
+    for (uint i = 0; i < _atsc_main_listeners.size(); i++)
+        _atsc_main_listeners[i]->HandleVCT(tsid, vct);
+
+    _sourceid_to_atscsrcid.clear();
+    for (uint i = 0; i < vct->ChannelCount() ; i++)
+    {
+        if (vct->IsHiddenInGuide(i))
+        {
+            VERBOSE(VB_EIT, QString("%1 chan %2-%3 is hidden in guide")
+                    .arg(vct->ModulationMode(i) == 1 ? "NTSC" : "ATSC")
+                    .arg(vct->MajorChannel(i))
+                    .arg(vct->MinorChannel(i)));
+            continue;
+        }
+
+        if (1 == vct->ModulationMode(i))
+        {
+            VERBOSE(VB_EIT, QString("Ignoring NTSC chan %1-%2")
+                    .arg(vct->MajorChannel(i))
+                    .arg(vct->MinorChannel(i)));
+            continue;
+        }
+
+        VERBOSE(VB_EIT, QString("Adding Source #%1 ATSC chan %2-%3")
+                .arg(vct->SourceID(i))
+                .arg(vct->MajorChannel(i))
+                .arg(vct->MinorChannel(i)));
+
+        _sourceid_to_atscsrcid[vct->SourceID(i)] =
+            vct->MajorChannel(i) << 8 | vct->MinorChannel(i);
+    }
+}
+
+void ATSCStreamData::ProcessTVCT(uint tsid,
+                                 const TerrestrialVirtualChannelTable *vct)
+{
+    QMutexLocker locker(&_listener_lock);
+    ProcessVCT(tsid, vct);
+    for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
+        _atsc_aux_listeners[i]->HandleTVCT(tsid, vct);
+}
+
+void ATSCStreamData::ProcessCVCT(uint tsid,
+                                 const CableVirtualChannelTable *vct)
+{
+    QMutexLocker locker(&_listener_lock);
+    ProcessVCT(tsid, vct);
+    for (uint i = 0; i < _atsc_aux_listeners.size(); i++)
+        _atsc_aux_listeners[i]->HandleCVCT(tsid, vct);
+}
+
 bool ATSCStreamData::HasCachedMGT(bool current) const
 {
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
     return (bool)(_cached_mgt);
+}
+
+bool ATSCStreamData::HasChannel(uint major, uint minor) const
+{
+    bool hasit = false;
+
+    {
+        tvct_vec_t tvct = GetAllCachedTVCTs();
+        for (uint i = 0; i < tvct.size() && !hasit; i++)
+        {
+            if (tvct[i]->Find(major, minor) >= 0)
+                hasit |= HasProgram(tvct[i]->ProgramNumber(i));
+        }
+        ReturnCachedTVCTTables(tvct);
+    }
+
+    if (!hasit)
+    {
+        cvct_vec_t cvct = GetAllCachedCVCTs();
+        for (uint i = 0; i < cvct.size() && !hasit; i++)
+        {
+            if (cvct[i]->Find(major, minor) >= 0)
+                hasit |= HasProgram(cvct[i]->ProgramNumber(i));
+        }
+        ReturnCachedCVCTTables(cvct);
+    }
+
+    return hasit;
 }
 
 bool ATSCStreamData::HasCachedTVCT(uint pid, bool current) const

@@ -52,8 +52,9 @@ class HDTVRecorder : public DTVRecorder,
 
     bool Open(void);
 
-    void SetStreamData(ATSCStreamData*);
-    ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
+    void SetStreamData(MPEGStreamData*);
+    MPEGStreamData* GetStreamData(void);
+    ATSCStreamData* GetATSCStreamData(void) { return _atsc_stream_data; }
 
     void HandleSingleProgramPAT(ProgramAssociationTable*);
     void HandleSingleProgramPMT(ProgramMapTable*);

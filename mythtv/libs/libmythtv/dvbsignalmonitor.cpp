@@ -15,13 +15,10 @@
 #include "atscstreamdata.h"
 #include "mpegtables.h"
 #include "atsctables.h"
+#include "cardutil.h"
 
-#include "transform.h"
-#include "dvbtypes.h"
-#include "dvbdev.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
-#include "dvbtypes.h"
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
@@ -171,13 +168,13 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
 { 
     DBG_SM(QString("AddPIDFilter(0x%1)").arg(pid, 0, 16), "");
 
-    QString demux_fname = dvbdevice(DVB_DEV_DEMUX, GetDVBCardNum());
-    int mux_fd = open(demux_fname.ascii(), O_RDWR | O_NONBLOCK);
+    QString demux_fn = CardUtil::GetDeviceName(DVB_DEV_DEMUX, GetDVBCardNum());
+    int mux_fd = open(demux_fn.ascii(), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC +
                 QString("Failed to open demux device %1 for filter on pid %2")
-                .arg(demux_fname).arg(pid));
+                .arg(demux_fn).arg(pid));
         return false;
     }
 
@@ -262,13 +259,13 @@ bool DVBSignalMonitor::RemovePIDFilter(uint pid)
 
 bool DVBSignalMonitor::UpdateFiltersFromStreamData(void)
 {
-    vector<int> add_pids;
-    vector<int> del_pids;
-
     if (!GetStreamData())
         return false;
 
+    UpdateListeningForEIT();
+
     const QMap<uint, bool> &listening = GetStreamData()->ListeningPIDs();
+    vector<uint> add_pids, del_pids;
 
     // PIDs that need to be added..
     QMap<uint, bool>::const_iterator lit = listening.constBegin();
@@ -284,12 +281,12 @@ bool DVBSignalMonitor::UpdateFiltersFromStreamData(void)
 
     // Remove PIDs
     bool ok = true;
-    vector<int>::iterator dit = del_pids.begin();
+    vector<uint>::iterator dit = del_pids.begin();
     for (; dit != del_pids.end(); ++dit)
         ok &= RemovePIDFilter(*dit);
 
     // Add PIDs
-    vector<int>::iterator ait = add_pids.begin();
+    vector<uint>::iterator ait = add_pids.begin();
     for (; ait != add_pids.end(); ++ait)
         ok &= AddPIDFilter(*ait);
 
@@ -315,7 +312,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
         return;
     bzero(buffer, buffer_size);
 
-    QString dvr_fname = dvbdevice(DVB_DEV_DVR, GetDVBCardNum());
+    QString dvr_fname = CardUtil::GetDeviceName(DVB_DEV_DVR, GetDVBCardNum());
     int dvr_fd = open(dvr_fname.ascii(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
@@ -480,7 +477,7 @@ bool DVBSignalMonitor::SupportsTSMonitoring(void)
             return *it;
     }
 
-    QString dvr_fname = dvbdevice(DVB_DEV_DVR, GetDVBCardNum());
+    QString dvr_fname = CardUtil::GetDeviceName(DVB_DEV_DVR, GetDVBCardNum());
     int dvr_fd = open(dvr_fname.ascii(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {

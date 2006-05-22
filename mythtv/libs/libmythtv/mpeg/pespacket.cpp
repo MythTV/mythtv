@@ -56,6 +56,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
             memcpy(nbuf, _fullbuffer, _pesdataSize);
             pes_free(_fullbuffer);
             _fullbuffer = nbuf;
+            _pesdata    = _fullbuffer + _psiOffset + 1;
             _allocSize  = sz;
         }
 
@@ -156,8 +157,9 @@ bool PESPacket::VerifyCRC(void) const
     if (!ret)
     {
         VERBOSE(VB_SIPARSER,
-                QString("PESPacket: Failed CRC check 0x%1 != 0x%2")
-                .arg(CRC(),0,16).arg(CalcCRC(),0,16));
+                QString("PESPacket: Failed CRC check 0x%1 != 0x%2 "
+                        "for StreamID = 0x%3")
+                .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(StreamID(),0,16));
     }
     return ret;
 }

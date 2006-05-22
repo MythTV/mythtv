@@ -6,6 +6,7 @@
 #include <pthread.h>
 
 // Qt includes
+#include <qmutex.h>
 #include <qobject.h>
 #include <qdatetime.h>
 #include <qstringlist.h>

@@ -17,17 +17,36 @@ typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
 typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
 typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
 
+typedef QMap<uint, bool>                 dvb_has_eit_t;
+
 class DVBStreamData : virtual public MPEGStreamData
 {
   public:
-    DVBStreamData(bool cacheTables = false);
+    DVBStreamData(uint desired_netid, uint desired_tsid,
+                  int desired_program, bool cacheTables = false);
     ~DVBStreamData();
 
-    void Reset();
+    void Reset(void) { Reset(0, 0, -1); }
+    void Reset(uint desired_netid, uint desired_tsid, int desired_sid);
+
+    // DVB table monitoring
+    void SetDesiredService(uint netid, uint tsid, int serviceid);
+    uint DesiredNetworkID(void)   const { return _desired_netid; }
+    uint DesiredTransportID(void) const { return _desired_tsid;  }
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
     bool IsRedundant(uint pid, const PSIPTable&) const;
+    void ProcessSDT(uint tsid, const ServiceDescriptionTable*);
+
+    // EIT info/processing
+    inline void SetDishNetEIT(bool);
+    inline bool HasAnyEIT(void) const;
+    inline bool HasEIT(uint serviceid) const;
+    bool HasEITPIDChanges(const uint_vec_t &in_use_pids) const;
+    bool GetEITPIDChanges(const uint_vec_t &in_use_pids,
+                          uint_vec_t &add_pids,
+                          uint_vec_t &del_pids) const;
 
     // Table versions
     void SetVersionNIT(int version, uint last_section)
@@ -83,8 +102,7 @@ class DVBStreamData : virtual public MPEGStreamData
         if (VersionEIT(tableid, serviceid) == version)
             return;
         uint key = (tableid << 16) | serviceid;
-        _eit_section_seen[key].clear();
-        _eit_section_seen[key].resize(32, 0);
+        _eit_version[key] = version;
     }
 
     int VersionEIT(uint tableid, uint serviceid) const
@@ -145,6 +163,15 @@ class DVBStreamData : virtual public MPEGStreamData
     void CacheSDT(ServiceDescriptionTable*);
 
   private:
+    /// DVB table monitoring
+    uint                      _desired_netid;
+    uint                      _desired_tsid;
+    
+    /// Decode DishNet's long-term DVB EIT
+    bool                      _dvb_eit_dishnet_long;
+    /// Tell us if the DVB service has EIT
+    dvb_has_eit_t             _dvb_has_eit;
+
     // Signals
     dvb_main_listener_vec_t   _dvb_main_listeners;
     dvb_other_listener_vec_t  _dvb_other_listeners;
@@ -167,5 +194,28 @@ class DVBStreamData : virtual public MPEGStreamData
     nit_cache_t               _cached_nit;  // section -> sdt
     sdt_cache_t               _cached_sdts; // tsid+section -> sdt
 };
+
+inline void DVBStreamData::SetDishNetEIT(bool use_dishnet_eit)
+{
+    QMutexLocker locker(&_listener_lock);
+    _dvb_eit_dishnet_long = use_dishnet_eit;
+}
+
+inline bool DVBStreamData::HasAnyEIT(void) const
+{
+    QMutexLocker locker(&_listener_lock);
+    return _dvb_has_eit.size();
+}
+
+inline bool DVBStreamData::HasEIT(uint serviceid) const
+{
+    QMutexLocker locker(&_listener_lock);
+
+    dvb_has_eit_t::const_iterator it = _dvb_has_eit.find(serviceid);
+    if (it != _dvb_has_eit.end())
+        return *it;
+
+    return false;
+}
 
 #endif // DVBSTREAMDATA_H_

@@ -17,14 +17,10 @@ using namespace std;
 
 #include "dtvrecorder.h"
 #include "tspacket.h"
-#include "transform.h"
 #include "DeviceReadBuffer.h"
 
-#include "dvbtypes.h"
-#include "dvbchannel.h"
-#include "dvbsiparser.h"
-
-class ATSCStreamData;
+class DVBChannel;
+class MPEGStreamData;
 class ProgramAssociationTable;
 class ProgramMapTable;
 class TSPacket;
@@ -34,13 +30,13 @@ class PIDInfo
   public:
     PIDInfo() :
         filter_fd(-1),      continuityCount(0xFF),
-        isVideo(false),     isAudio(false),
+        streamType(0),      pesType(-1),
         isEncrypted(false), payloadStartSeen(false) {;}
 
     int    filter_fd;         ///< Input filter file descriptor
     uint   continuityCount;   ///< last Continuity Count (sentinel 0xFF)
-    bool   isVideo;
-    bool   isAudio;
+    uint   streamType;        ///< StreamID
+    int    pesType;           ///< PESStreamID
     bool   isEncrypted;       ///< true if PID is marked as encrypted
     bool   payloadStartSeen;  ///< true if payload start packet seen on PID
 
@@ -48,6 +44,7 @@ class PIDInfo
     inline bool CheckCC(uint cc);
 };
 typedef QMap<uint,PIDInfo*> PIDInfoMap;
+typedef vector<uint>        uint_vec_t;
 
 /** \class DVBRecorder
  *  \brief This is a specialization of DTVRecorder used to
@@ -55,7 +52,9 @@ typedef QMap<uint,PIDInfo*> PIDInfoMap;
  *
  *  \sa DTVRecorder, HDTVRecorder
  */
-class DVBRecorder: public DTVRecorder, private ReaderPausedCB
+class DVBRecorder : public DTVRecorder,
+                    private ReaderPausedCB,
+                    public MPEGStreamListener
 {
   public:
     DVBRecorder(TVRec *rec, DVBChannel* dvbchannel);
@@ -76,10 +75,12 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     bool IsOpen(void) const { return _stream_fd >= 0; }
     void Close(void);
 
-    void SetPMT(uint pid, const ProgramMapTable*);
+    void HandlePAT(const ProgramAssociationTable*);
+    void HandleCAT(const ConditionalAccessTable*) {}
+    void HandlePMT(uint pid, const ProgramMapTable*);
 
-    void SetStreamData(ATSCStreamData*);
-    ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
+    void SetStreamData(MPEGStreamData*);
+    MPEGStreamData* GetStreamData(void) { return _stream_data; }
 
   private:
     void TeardownAll(void);
@@ -88,13 +89,13 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     bool ProcessTSPacket(const TSPacket& tspacket);
     void ProcessTSPacket2(const TSPacket& tspacket);
 
-    bool OpenFilters(void);
+    bool AdjustFilters(void);
+    void AdjustEITPIDs(void);
     void CloseFilters(void);
-    void OpenFilter(uint pid,
-                    dmx_pes_type_t pes_type,
-                    uint mpeg_stream_type);
+    void OpenFilter(uint pid, int pes_type, uint mpeg_stream_type);
+    int  OpenFilterFd(uint pid, int pes_type, uint stream_type);
 
-    void SetPAT(ProgramAssociationTable*);
+    void SetOutputPAT(ProgramAssociationTable*);
     void SetOutputPMT(ProgramMapTable*);
 
     void CreatePAT(void);
@@ -110,7 +111,9 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     void GetTimeStamp(const TSPacket& tspacket);
     void CreateVideoFrame(void);
-    static void *StartDummyVideo(void *param);
+
+    void StartDummyVideo(void);
+    static void *run_dummy_video(void *param);
     void RunDummyVideo(void);
     void StopDummyVideo(void);
 
@@ -123,11 +126,14 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 
     // general recorder stuff
     /// Set when we want to generate a new filter set
-    ATSCStreamData *_atsc_stream_data;
+    MPEGStreamData *_stream_data;
     bool            _reset_pid_filters;
     QMutex          _pid_lock;
     PIDInfoMap      _pid_infos;
+    uint_vec_t      _eit_pids;
 
+    /// PAT on input side
+    ProgramAssociationTable *_input_pat;
     /// PMT on input side
     ProgramMapTable         *_input_pmt;
 
@@ -135,6 +141,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     ProgramAssociationTable *_pat;
     ProgramMapTable         *_pmt;
     uint            _pmt_pid;  ///< PID for rewritten PMT
+    uint            _next_pat_version;
     uint            _next_pmt_version;
     int             _ts_packets_until_psip_sync;
 

@@ -57,11 +57,10 @@ using namespace std;
 #include "mpegtables.h"
 #include "iso639.h"
 #include "atscstreamdata.h"
+#include "cardutil.h"
 
 // MythTV DVB includes
-#include "transform.h"
 #include "dvbtypes.h"
-#include "dvbdev.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
@@ -88,18 +87,25 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _card_number_option(0),
       // DVB stuff
       dvbchannel(advbchannel),
-      _atsc_stream_data(new ATSCStreamData(-1,-1)),
+      _stream_data(NULL),
       _reset_pid_filters(true),
       _pid_lock(true),
       _input_pmt(NULL),
       // Output stream info
       _pat(NULL), _pmt(NULL),
       _pmt_pid(0x1700),
+      _next_pat_version(0),
       _next_pmt_version(0),
       _ts_packets_until_psip_sync(0),
       // Fake video
-      _video_stream_fd(-1),
-      _dummy_output_video_pid(0),
+      _audio_header_pos(0),       _video_header_pos(0),
+      _audio_pid(0),             
+      _video_time_stamp(0),       _synch_time_stamp(0),
+      _audio_time_stamp(0),       _new_time_stamp(0),
+      _ts_change_count(0),        _video_stream_fd(-1),
+      _frames_per_sec(0.0f),      _dummy_output_video_pid(0),
+      _stop_dummy(true),          _dummy_stopped(true),
+      _video_cc(0xff),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -136,7 +142,7 @@ void DVBRecorder::TeardownAll(void)
         _drb = NULL;
     }
 
-    SetPAT(NULL);
+    SetOutputPAT(NULL);
     SetOutputPMT(NULL);
 
     if (_input_pmt)
@@ -166,19 +172,47 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetStrOption(profile,  "recordingtype");
 }
 
-void DVBRecorder::SetPMT(uint pid, const ProgramMapTable *_pmt)
+void DVBRecorder::HandlePAT(const ProgramAssociationTable *_pat)
 {
+    if (!_pat)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPAT(NULL)");
+        return;
+    }
+
     QMutexLocker change_lock(&_pid_lock);
-    VERBOSE(VB_RECORD, LOC + "SetPMT("<<pid<<")");
 
-    _pmt_pid = (pid) ? pid : _pmt_pid;
-    _input_pmt = new ProgramMapTable(*_pmt);
+    int progNum = _stream_data->DesiredProgram();
+    _pmt_pid = _pat->FindPID(progNum);
 
-    /* Rev the PMT version since PIDs are changing */
-    _next_pmt_version = (_next_pmt_version + 1) & 0x1f;
+    VERBOSE(VB_RECORD, LOC + QString("SetPAT(%1 on 0x%2)")
+            .arg(progNum).arg(_pmt_pid,0,16));
+
+    _input_pat = new ProgramAssociationTable(*_pat);
+
+    /* Rev the PAT version since PMT PID is changing */
+    _next_pat_version = (_next_pat_version + 1) & 0x1f;
     _ts_packets_until_psip_sync = 0;
 
     _reset_pid_filters = true;
+}
+
+void DVBRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
+{
+    QMutexLocker change_lock(&_pid_lock);
+
+    if ((int)progNum == _stream_data->DesiredProgram())
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
+        _input_pmt = new ProgramMapTable(*_pmt);
+        dvbchannel->SetPMT(_input_pmt);
+
+        /* Rev the PMT version since PIDs are changing */
+        _next_pmt_version = (_next_pmt_version + 1) & 0x1f;
+        _ts_packets_until_psip_sync = 0;
+
+        _reset_pid_filters = true;
+    }
 }
 
 bool DVBRecorder::Open(void)
@@ -189,8 +223,8 @@ bool DVBRecorder::Open(void)
         return true;
     }
 
-    _stream_fd = open(dvbdevice(DVB_DEV_DVR,_card_number_option),
-                      O_RDONLY | O_NONBLOCK);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_DVR, _card_number_option);
+    _stream_fd = open(dvbdev.ascii(), O_RDONLY | O_NONBLOCK);
     if (!IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open DVB device" + ENO);
@@ -202,8 +236,6 @@ bool DVBRecorder::Open(void)
 
     VERBOSE(VB_RECORD, LOC + QString("Card opened successfully fd(%1)")
             .arg(_stream_fd));
-
-    dvbchannel->SetRecorder(this);
 
     return true;
 }
@@ -224,20 +256,31 @@ void DVBRecorder::Close(void)
         _stream_fd = -1;
     }
 
-    dvbchannel->SetRecorder(NULL);
-
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
 }
 
-void DVBRecorder::SetStreamData(ATSCStreamData *data)
+void DVBRecorder::SetStreamData(MPEGStreamData *data)
 {
-    if (data == _atsc_stream_data)
+    if (data == _stream_data)
         return;
 
-    ATSCStreamData *old_data = _atsc_stream_data;
-    _atsc_stream_data = data;
+    MPEGStreamData *old_data = _stream_data;
+    _stream_data = data;
     if (old_data)
         delete old_data;
+
+    if (data)
+    {
+        data->AddMPEGListener(this);
+
+        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
+
+        if (atsc && atsc->DesiredMinorChannel())
+            atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
+                                    atsc->DesiredMinorChannel());
+        else if (data->DesiredProgram() >= 0)
+            data->SetDesiredProgram(data->DesiredProgram());
+    }
 }
 
 void DVBRecorder::CloseFilters(void)
@@ -251,11 +294,10 @@ void DVBRecorder::CloseFilters(void)
         delete *it;
     }
     _pid_infos.clear();
+    _eit_pids.clear();
 }
 
-void DVBRecorder::OpenFilter(uint           pid,
-                             dmx_pes_type_t pes_type,
-                             uint           stream_type)
+int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
 {
     // bits per millisecond
     uint bpms = (StreamID::IsVideo(stream_type)) ? 19200 : 500;
@@ -270,11 +312,14 @@ void DVBRecorder::OpenFilter(uint           pid,
             .arg((int)pid,0,16).arg(pid_buffer_size));
 
     // Open the demux device
-    int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
+    QString dvbdev = CardUtil::GetDeviceName(
+        DVB_DEV_DEMUX, _card_number_option);
+
+    int fd_tmp = open(dvbdev.ascii(), O_RDWR);
     if (fd_tmp < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);
-        return;
+        return -1;
     }
 
     // Try to make the demux buffer large enough to
@@ -290,9 +335,11 @@ void DVBRecorder::OpenFilter(uint           pid,
         sz     = ((sz+4095)/4096)*4096;
         usecs /= 2;
     }
+    /*
     VERBOSE(VB_RECORD, LOC + "Set demux buffer size for " +
             QString("pid 0x%1 to %2,\n\t\t\twhich gives us a %3 msec buffer.")
             .arg(pid,0,16).arg(sz).arg(usecs/1000));
+    */
 
     // Set the filter type
     struct dmx_pes_filter_params params;
@@ -301,97 +348,170 @@ void DVBRecorder::OpenFilter(uint           pid,
     params.output   = DMX_OUT_TS_TAP;
     params.flags    = DMX_IMMEDIATE_START;
     params.pid      = pid;
-    params.pes_type = pes_type;
+    params.pes_type = (dmx_pes_type_t) pes_type;
     if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
     {
         close(fd_tmp);
 
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux filter." + ENO);
+        return -1;
+    }
+
+    return fd_tmp;
+}
+
+void DVBRecorder::OpenFilter(uint pid, int pes_type, uint stream_type)
+{
+    PIDInfo *info   = NULL;
+    int      fd_tmp = -1;
+
+    QMutexLocker change_lock(&_pid_lock);
+    PIDInfoMap::iterator it = _pid_infos.find(pid);
+    if (it != _pid_infos.end())
+    {
+        info = *it;
+        if (info->pesType == pes_type)
+            fd_tmp = info->filter_fd;
+        else
+            info->Close();
+    }
+
+    if (fd_tmp < 0)
+        fd_tmp = OpenFilterFd(pid, pes_type, stream_type);
+
+    if (fd_tmp < 0)
+    {
+        if (info)
+        {
+            delete *it;
+            _pid_infos.erase(it);
+        }
         return;
     }
 
-    PIDInfo *info = new PIDInfo();
-    // Set isVideo based on stream type
-    info->isVideo = StreamID::IsVideo(stream_type);
-    info->isAudio = StreamID::IsAudio(stream_type);
+    if (!info)
+        info = new PIDInfo();
+
     // Add the file descriptor to the filter list
-    info->filter_fd = fd_tmp;
+    info->filter_fd  = fd_tmp;
+    info->streamType = stream_type;
+    info->pesType    = pes_type;
 
     // Add the new info to the map
-    QMutexLocker change_lock(&_pid_lock);    
     _pid_infos[pid] = info;
 }
 
-bool DVBRecorder::OpenFilters(void)
+bool DVBRecorder::AdjustFilters(void)
 {
-    CloseFilters();
-
     QMutexLocker change_lock(&_pid_lock);
-    _dummy_output_video_pid = 0;
 
-    if (!_input_pmt)
-    {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                "Recording will not commence until a PMT is set.");
+    if (!_input_pat || !_input_pmt)
         return false;
+
+    uint_vec_t add_pid, add_stream_type;
+
+    add_pid.push_back(PAT_PID);
+    add_stream_type.push_back(StreamID::PrivSec);
+    _stream_data->AddListeningPID(PAT_PID);
+
+    for (uint i = 0; i < _input_pat->ProgramCount(); i++)
+    {
+        add_pid.push_back(_input_pat->ProgramPID(i));
+        add_stream_type.push_back(StreamID::PrivSec);
+        _stream_data->AddListeningPID(_input_pat->ProgramPID(i));
     }
 
-    // Record all streams flagged for recording
+    // Record the streams in the PMT...
     bool need_pcr_pid = true;
     for (uint i = 0; i < _input_pmt->StreamCount(); i++)
     {
-        OpenFilter(_input_pmt->StreamPID(i), DMX_PES_OTHER,
-                   _input_pmt->StreamType(i));
+        add_pid.push_back(_input_pmt->StreamPID(i));
+        add_stream_type.push_back(_input_pmt->StreamType(i));
         need_pcr_pid &= (_input_pmt->StreamPID(i) != _input_pmt->PCRPID());
+        _stream_data->AddWritingPID(_input_pmt->StreamPID(i));
     }
 
     if (need_pcr_pid && (_input_pmt->PCRPID()))
-        OpenFilter(_input_pmt->PCRPID(), DMX_PES_OTHER, StreamID::PrivData);
-
-    if (_video_stream_fd >= 0)
     {
-        close(_video_stream_fd);
-        _video_stream_fd = -1;
+        add_pid.push_back(_input_pmt->PCRPID());
+        add_stream_type.push_back(StreamID::PrivData);
+        _stream_data->AddWritingPID(_input_pmt->PCRPID());
     }
 
-    vector<uint> video_pids;
-    uint video_cnt = _input_pmt->FindPIDs(StreamID::AnyVideo, video_pids);
-
-    if (!video_cnt)
+    // Adjust for EIT
+    AdjustEITPIDs();
+    for (uint i = 0; i < _eit_pids.size(); i++)
     {
-        VERBOSE(VB_RECORD, LOC + "Missing video - adding dummy to PMT");
-        // If there is no video in the PMT we need to add it here.
-        PIDInfo *info = new PIDInfo();
-        info->isVideo = true;
-
-        QMutexLocker change_lock(&_pid_lock);    
-        _dummy_output_video_pid = _input_pmt->FindUnusedPID(DUMMY_VIDEO_PID);
-        _pid_infos[_dummy_output_video_pid] = info;
+        add_pid.push_back(_eit_pids[i]);
+        add_stream_type.push_back(StreamID::PrivSec);
+        _stream_data->AddListeningPID(_eit_pids[i]);
     }
-    else
-        _dummy_output_video_pid = video_pids[0];
 
-    _video_header_pos = 0;
-    _audio_header_pos = 0;
-    _audio_pid = 0;
-    _video_time_stamp = 0;
-    _synch_time_stamp = 0;
-    _audio_time_stamp = 0;
-    _video_cc = 0;
-    _ts_change_count = 0;
+    // Delete filters for pids we no longer wish to monitor
+    PIDInfoMap::iterator it   = _pid_infos.begin();
+    PIDInfoMap::iterator next = it;
+    for (; it != _pid_infos.end(); it = next)
+    {
+        next = it; next++;
 
-    // Start the dummy video thread.
-    _stop_dummy = false;
-    int ret = pthread_create(&_video_thread, NULL, StartDummyVideo, this);
-    _dummy_stopped = (0 != ret);
+        if (find(add_pid.begin(), add_pid.end(), it.key()) == add_pid.end())
+        {
+            _stream_data->RemoveListeningPID(it.key());
+            _stream_data->RemoveWritingPID(it.key());
+            (*it)->Close();
+            delete *it;
+            _pid_infos.erase(it);
+        }
+    }
 
+    // Add or adjust filters for pids we wish to monitor
+    for (uint i = 0; i < add_pid.size(); i++)
+        OpenFilter(add_pid[i], DMX_PES_OTHER, add_stream_type[i]);
+
+
+    // [Re]start dummy video
+    StopDummyVideo();
+    StartDummyVideo();
+
+    // Report if there are no PIDs..
     if (_pid_infos.empty())
     {        
         VERBOSE(VB_GENERAL, LOC_WARN +
                 "Recording will not commence until a PID is set.");
         return false;
     }
+
     return true;
+}
+
+/** \fn DVBRecorder::AdjustEITPIDs(void)
+ *  \brief Adjusts EIT PID monitoring to monitor the right number of EIT PIDs.
+ */
+void DVBRecorder::AdjustEITPIDs(void)
+{
+    bool changes = false;
+    uint_vec_t add, del;
+
+    QMutexLocker change_lock(&_pid_lock);
+
+    if (GetStreamData()->HasEITPIDChanges(_eit_pids))
+        changes = GetStreamData()->GetEITPIDChanges(_eit_pids, add, del);
+
+    if (changes)
+    {
+        for (uint i = 0; i < del.size(); i++)
+        {
+            uint_vec_t::iterator it;
+            it = find(_eit_pids.begin(), _eit_pids.end(), del[i]);
+            if (it != _eit_pids.end())
+                _eit_pids.erase(it);
+        }
+
+        for (uint i = 0; i < add.size(); i++)
+        {
+            _eit_pids.push_back(add[i]);
+        }
+    }
 }
 
 void DVBRecorder::StartRecording(void)
@@ -409,8 +529,8 @@ void DVBRecorder::StartRecording(void)
     _request_recording = true;
     _recording = true;
 
-    SetPAT(NULL);
-    SetOutputPMT(NULL);
+    //SetOutputPAT(NULL);
+    //SetOutputPMT(NULL);
     _ts_packets_until_psip_sync = 0;
 
     bool ok = _drb->Setup(videodevice, _stream_fd);
@@ -434,11 +554,25 @@ void DVBRecorder::StartRecording(void)
             continue;
         }
 
+        if (!_input_pmt)
+        {
+            VERBOSE(VB_GENERAL, LOC_WARN +
+                    "Recording will not commence until a PMT is set.");
+            usleep(5000);
+            continue;
+        }
+
+        if (_stream_data)
+        {
+            QMutexLocker read_lock(&_pid_lock);
+            _reset_pid_filters |= _stream_data->HasEITPIDChanges(_eit_pids);
+        }
+
         if (_reset_pid_filters)
         {
             _reset_pid_filters = false;
             VERBOSE(VB_RECORD, LOC + "Resetting Demux Filters");
-            if (OpenFilters())
+            if (AdjustFilters())
             {
                 CreatePAT();
                 CreatePMT();
@@ -478,6 +612,11 @@ void DVBRecorder::WritePATPMT(void)
     if (_ts_packets_until_psip_sync <= 0)
     {
         QMutexLocker read_lock(&_pid_lock);
+
+        VERBOSE(VB_IMPORTANT, "Writing PAT & PMT @"
+                <<ringBuffer->GetWritePosition()<<" + "
+                <<(_payload_buffer.size()*188));
+
         uint next_cc;
         if (_pat && _pmt && ringBuffer)
         {
@@ -510,7 +649,7 @@ void DVBRecorder::Reset(void)
     }
 }
 
-void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
+void DVBRecorder::SetOutputPAT(ProgramAssociationTable *new_pat)
 {
     QMutexLocker change_lock(&_pid_lock);
 
@@ -520,9 +659,9 @@ void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
         delete old_pat;
 
     if (_pat)
-        VERBOSE(VB_RECORD, LOC + "SetPAT()\n" + _pat->toString());
+        VERBOSE(VB_RECORD, LOC + "SetOutputPAT()\n" + _pat->toString());
     else
-        VERBOSE(VB_RECORD, LOC + "SetPAT(NULL)");
+        VERBOSE(VB_RECORD, LOC + "SetOutputPAT(NULL)");
 }
 
 void DVBRecorder::SetOutputPMT(ProgramMapTable *new_pmt)
@@ -552,7 +691,13 @@ void DVBRecorder::CreatePAT(void)
     pnum.push_back(1); // program number / service id
     pid.push_back(_pmt_pid);
 
-    SetPAT(ProgramAssociationTable::Create(tsid, cc, pnum, pid));
+    ProgramAssociationTable *pat =
+        ProgramAssociationTable::Create(tsid, cc, pnum, pid);
+
+    pat->SetVersionNumber(_next_pat_version);
+    pat->SetCRC(pat->CalcCRC());
+
+    SetOutputPAT(pat);
 }
 
 void DVBRecorder::CreatePMT(void)
@@ -699,6 +844,10 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
     const uint pid = tspacket.PID();
 
     QMutexLocker locker(&_pid_lock);
+
+    if (!_pat || !_pmt)
+        return true;
+
     PIDInfo *info = _pid_infos[pid];
     if (!info)
        info = _pid_infos[pid] = new PIDInfo();
@@ -732,10 +881,10 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
         }
     }
 
-    if (info->isVideo)
+    if (StreamID::IsVideo(info->streamType))
         _stop_dummy = true;
 
-    if (info->isAudio)
+    if (StreamID::IsAudio(info->streamType))
         GetTimeStamp(tspacket);
 
     ProcessTSPacket2(tspacket);
@@ -747,35 +896,43 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
     const uint pid = tspacket.PID();
 
     QMutexLocker locker(&_pid_lock);
+
     PIDInfo *info = _pid_infos[pid];
     if (!info)
         info = _pid_infos[pid] = new PIDInfo();
 
     // Check for keyframes and count frames
-    if (info->isVideo)
+    if (StreamID::IsVideo(info->streamType))
         _buffer_packets = !FindKeyframes(&tspacket);
 
     // Sync recording start to first keyframe
     if (_wait_for_keyframe_option && _first_keyframe<0)
         return;
 
-    // Sync streams to the first Payload Unit Start Indicator
-    // _after_ first keyframe iff _wait_for_keyframe_option is true
-    if (!info->payloadStartSeen)
-    {
-        if (!tspacket.PayloadStart())
-            return; // not payload start - drop packet
-
-        VERBOSE(VB_RECORD,
-                QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
-        info->payloadStartSeen = true;
-    }
-
     // Write PAT & PMT tables occasionally
     WritePATPMT();
 
-    // Write Data
-    BufferedWrite(tspacket);
+    if (GetStreamData()->IsListeningPID(pid))
+        GetStreamData()->HandleTSTables(&tspacket);
+    else if (GetStreamData()->IsWritingPID(pid))
+    {
+        // Sync streams to the first Payload Unit Start Indicator
+        // _after_ first keyframe iff _wait_for_keyframe_option is true
+        if (!info->payloadStartSeen)
+        {
+            if (!tspacket.PayloadStart())
+                return; // not payload start - drop packet
+
+            VERBOSE(VB_RECORD,
+                    QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
+            info->payloadStartSeen = true;
+        }
+
+        BufferedWrite(tspacket);
+    }
+    else
+        VERBOSE(VB_IMPORTANT, LOC + QString("Unknown PID 0x%1")
+                .arg(pid,0,16));
 }
 
 void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
@@ -892,13 +1049,56 @@ void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
         _audio_pid = pid;
 }
 
-void *DVBRecorder::StartDummyVideo(void *param)
+void *DVBRecorder::run_dummy_video(void *param)
 {
     DVBRecorder *dvbrec = (DVBRecorder*) param;
     dvbrec->RunDummyVideo();
     dvbrec->_dummy_stopped = true;
     dvbrec->_wait_stop.wakeAll();
     return NULL;
+}
+
+void DVBRecorder::StartDummyVideo(void)
+{
+    QMutexLocker change_lock(&_pid_lock);
+
+    _dummy_output_video_pid = 0;
+
+    if (_video_stream_fd >= 0)
+    {
+        close(_video_stream_fd);
+        _video_stream_fd = -1;
+    }
+
+    vector<uint> video_pids;
+    uint video_cnt = _input_pmt->FindPIDs(StreamID::AnyVideo, video_pids);
+
+    if (!video_cnt)
+    {
+        VERBOSE(VB_RECORD, LOC + "Missing video - adding dummy to PMT");
+        // If there is no video in the PMT we need to add it here.
+        PIDInfo *info = new PIDInfo();
+        info->streamType = StreamID::MPEG2Video;
+
+        _dummy_output_video_pid = _input_pmt->FindUnusedPID(DUMMY_VIDEO_PID);
+        _pid_infos[_dummy_output_video_pid] = info;
+    }
+    else
+        _dummy_output_video_pid = video_pids[0];
+
+    _video_header_pos = 0;
+    _audio_header_pos = 0;
+    _audio_pid = 0;
+    _video_time_stamp = 0;
+    _synch_time_stamp = 0;
+    _audio_time_stamp = 0;
+    _video_cc = 0;
+    _ts_change_count = 0;
+
+    // Start the dummy video thread.
+    _stop_dummy = false;
+    int ret = pthread_create(&_video_thread, NULL, run_dummy_video, this);
+    _dummy_stopped = (0 != ret);
 }
 
 void DVBRecorder::RunDummyVideo(void)

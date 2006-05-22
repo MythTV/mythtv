@@ -617,19 +617,6 @@ bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
 #endif //!USE_ATSC
 }
 
-bool DVBTuning::parseOFDM(const TransportObject &transport)
-{
-    return parseOFDM(QString::number(transport.Frequency),
-                     transport.Inversion,
-                     transport.Bandwidth,
-                     transport.CodeRateHP,
-                     transport.CodeRateLP,
-                     transport.Constellation,
-                     transport.TransmissionMode,
-                     transport.GuardInterval,
-                     transport.Hiearchy);
-}
-
 bool DVBTuning::parseOFDM(const QString& frequency,   const QString& inversion,
                           const QString& bandwidth,   const QString& coderate_hp,
                           const QString& coderate_lp, const QString& constellation,
@@ -707,15 +694,6 @@ bool DVBTuning::parseQPSK(const QString& frequency,   const QString& inversion,
     lnb_lof_hi  = _lnb_lof_hi.toInt();
     lnb_lof_lo  = _lnb_lof_lo.toInt();
     return true;
-}
-
-bool DVBTuning::parseQAM(const TransportObject &transport)
-{
-    return parseQAM(QString::number(transport.Frequency),
-                    transport.Inversion,
-                    QString::number(transport.SymbolRate),
-                    transport.FEC_Inner,
-                    transport.Modulation);
 }
 
 bool DVBTuning::parseQAM(const QString& frequency, const QString& inversion,

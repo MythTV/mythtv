@@ -390,17 +390,9 @@ using_backend {
 
     # Support for Linux DVB drivers
     using_dvb {
-        # C files
-        HEADERS += dvbdev/dvbdev.h   dvbdev/transform.h   dvbdev/ringbuffy.h
-        SOURCES += dvbdev/dvbdev.c   dvbdev/transform.c   dvbdev/ringbuffy.c
-
         # Basic DVB types
-        HEADERS += sitypes.h              dvbtypes.h
-        SOURCES += sitypes.cpp            dvbtypes.cpp
-
-        # Section/Table/Descriptor parsers
-        HEADERS += siparser.h             dvbsiparser.h
-        SOURCES += siparser.cpp           dvbsiparser.cpp
+        HEADERS += dvbtypes.h
+        SOURCES += dvbtypes.cpp
 
         # Channel stuff
         HEADERS += dvbchannel.h           dvbsignalmonitor.h

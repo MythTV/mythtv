@@ -249,6 +249,9 @@ class DVBEventInformationTable : public PSIPTable
         { return _ptrs[i]+2; }
     QDateTime StartTimeUTC(uint i) const
         { return dvbdate2qt(StartTime(i)); }
+    uint StartTimeUnixUTC(uint i) const;
+    uint EndTimeUnixUTC(uint i) const
+        { return StartTimeUnixUTC(i) + DurationInSeconds(i); }
     /// Returns 32 bit key representing time
     uint StartTimeKey(uint i) const
         { return dvbdate2key(StartTime(i)); }

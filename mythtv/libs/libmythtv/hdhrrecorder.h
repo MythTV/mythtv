@@ -16,9 +16,7 @@ class HDHRChannel;
 
 class HDHRRecorder : public DTVRecorder,
                      public MPEGSingleProgramStreamListener,
-                     public ATSCMainStreamListener,
-                     public EITSource,
-                     public ATSCEITStreamListener
+                     public ATSCMainStreamListener
 {
     friend class ATSCStreamData;
 
@@ -37,28 +35,21 @@ class HDHRRecorder : public DTVRecorder,
 
     void StartRecording(void);
 
-    void SetStreamData(ATSCStreamData*);
-    ATSCStreamData* GetStreamData(void) { return _atsc_stream_data; }
+    void SetStreamData(MPEGStreamData*);
+    MPEGStreamData *GetStreamData(void);
+    ATSCStreamData *GetATSCStreamData(void) { return _atsc_stream_data; }
 
     // MPEG Single Program
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
     // ATSC
-    void HandleSTT(const SystemTimeTable*);
+    void HandleSTT(const SystemTimeTable*) {}
     void HandleMGT(const MasterGuideTable *mgt);
-    void HandleVCT(uint, const VirtualChannelTable*);
-
-    // EIT Source
-    void SetEITHelper(EITHelper*);
-    void SetEITRate(float);
-
-    // ATSC EIT
-    void HandleEIT(uint pid, const EventInformationTable*);
-    void HandleETT(uint pid, const ExtendedTextTable*);
+    void HandleVCT(uint, const VirtualChannelTable*) {}
 
   private:
-    void AdjustEITRate(void);
+    void AdjustEITPIDs(void);
     void ProcessTSData(const unsigned char *buffer, int len);
     bool ProcessTSPacket(const TSPacket& tspacket);
     void TeardownAll(void);
@@ -68,10 +59,6 @@ class HDHRRecorder : public DTVRecorder,
     struct hdhomerun_video_sock_t *_video_socket;
     ATSCStreamData                *_atsc_stream_data;
 
-    QMap<uint,uint>                _eit_sourceid_to_channel;
-    EITHelper                     *_eit_helper;
-    float                          _eit_rate;
-    float                          _eit_old_rate;
     mutable QMutex                 _lock;
 };
 

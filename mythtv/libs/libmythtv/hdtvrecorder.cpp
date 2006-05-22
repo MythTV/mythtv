@@ -203,8 +203,10 @@ bool HDTVRecorder::Open()
     return (_stream_fd>0);
 }
 
-void HDTVRecorder::SetStreamData(ATSCStreamData *data)
+void HDTVRecorder::SetStreamData(MPEGStreamData *xdata)
 {
+    ATSCStreamData *data = dynamic_cast<ATSCStreamData*>(xdata);
+
     if (data == _atsc_stream_data)
         return;
 
@@ -218,6 +220,11 @@ void HDTVRecorder::SetStreamData(ATSCStreamData *data)
         data->AddMPEGSPListener(this);
         data->AddATSCMainListener(this);
     }
+}
+
+MPEGStreamData *HDTVRecorder::GetStreamData(void)
+{
+    return _atsc_stream_data;
 }
 
 bool readchan(int chanfd, unsigned char* buffer, int dlen) {
@@ -741,26 +748,26 @@ void HDTVRecorder::HandleVCT(uint /*tsid*/, const VirtualChannelTable *vct)
 
     bool found = false;    
     VERBOSE(VB_RECORD, QString("Desired channel %1_%2")
-            .arg(GetStreamData()->DesiredMajorChannel())
-            .arg(GetStreamData()->DesiredMinorChannel()));
+            .arg(GetATSCStreamData()->DesiredMajorChannel())
+            .arg(GetATSCStreamData()->DesiredMinorChannel()));
     for (uint i = 0; i < vct->ChannelCount(); i++)
     {
-        int maj = GetStreamData()->DesiredMajorChannel();
-        int min = GetStreamData()->DesiredMinorChannel();
+        int maj = GetATSCStreamData()->DesiredMajorChannel();
+        int min = GetATSCStreamData()->DesiredMinorChannel();
         if ((maj == -1 || vct->MajorChannel(i) == (uint)maj) &&
             (vct->MinorChannel(i) == (uint)min))
         {
-            uint pnum = (uint) GetStreamData()->DesiredProgram();
+            uint pnum = (uint) GetATSCStreamData()->DesiredProgram();
             if (vct->ProgramNumber(i) != pnum)
             {
                 VERBOSE(VB_RECORD, 
                         QString("Resetting desired program from %1"
                                 " to %2")
-                        .arg(GetStreamData()->DesiredProgram())
+                        .arg(GetATSCStreamData()->DesiredProgram())
                         .arg(vct->ProgramNumber(i)));
                 // Do a (partial?) reset here if old desired
                 // program is not 0?
-                GetStreamData()->SetDesiredProgram(vct->ProgramNumber(i));
+                GetATSCStreamData()->SetDesiredProgram(vct->ProgramNumber(i));
             }
             found = true;
         }
@@ -770,12 +777,12 @@ void HDTVRecorder::HandleVCT(uint /*tsid*/, const VirtualChannelTable *vct)
         VERBOSE(VB_IMPORTANT, 
                 QString("Desired channel %1_%2 not found;"
                         " using %3_%4 instead.")
-                .arg(GetStreamData()->DesiredMajorChannel())
-                .arg(GetStreamData()->DesiredMinorChannel())
+                .arg(GetATSCStreamData()->DesiredMajorChannel())
+                .arg(GetATSCStreamData()->DesiredMinorChannel())
                 .arg(vct->MajorChannel(0))
                 .arg(vct->MinorChannel(0)));
         VERBOSE(VB_IMPORTANT, vct->toString());
-        GetStreamData()->SetDesiredProgram(vct->ProgramNumber(0));
+        GetATSCStreamData()->SetDesiredProgram(vct->ProgramNumber(0));
     }
 }
 
@@ -801,7 +808,7 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
                 GetStreamData()->HandleTSTables(&tspacket);
             else if (GetStreamData()->IsWritingPID(lpid))
                 BufferedWrite(tspacket);
-            else if (GetStreamData()->VersionMGT()>=0)
+            else if (GetATSCStreamData()->VersionMGT()>=0)
                 _ts_stats.IncrPIDCount(lpid);
         }
     }

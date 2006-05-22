@@ -21,11 +21,11 @@ class QSocket;
 class NuppelVideoRecorder;
 class RingBuffer;
 class EITScanner;
-class DVBSIParser;
 class RecordingProfile;
 class LiveTVChain;
 
 class RecorderBase;
+class DTVRecorder;
 class DVBRecorder;
 class HDTVRecorder;
 class HDHRRecorder;
@@ -135,19 +135,26 @@ class TuningRequest
   public:
     TuningRequest(uint f) :
         flags(f), program(NULL), channel(QString::null),
-        input(QString::null) {;}
+        input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, ProgramInfo *p) :
-        flags(f), program(p), channel(QString::null), input(QString::null) {;}
+        flags(f), program(p), channel(QString::null),
+        input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, QString ch, QString in = QString::null) :
-        flags(f), program(NULL), channel(ch), input(in) {;}
+        flags(f), program(NULL), channel(ch),
+        input(in), majorChan(0), minorChan(0), progNum(-1) {;}
 
     QString toString(void) const;
+
+    bool IsOnSameMultiplex(void) const { return minorChan || (progNum >= 0); }
 
   public:
     uint         flags;
     ProgramInfo *program;
     QString      channel;
     QString      input;
+    uint         majorChan;
+    uint         minorChan;
+    int          progNum;
 };
 typedef MythDeque<TuningRequest> TuningQueue;
 
@@ -241,9 +248,6 @@ class TVRec : public QObject
     void RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo);
     void RecorderPaused(void);
 
-    void DVBGotPMT(void)
-        { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
-
   public slots:
     void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
     void deleteLater(void);
@@ -270,7 +274,7 @@ class TVRec : public QObject
 
     bool SetupRecorder(RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
-    HDTVRecorder *GetHDTVRecorder(void);
+    DTVRecorder  *GetDTVRecorder(void);
     HDHRRecorder *GetHDHRRecorder(void);
     DVBRecorder  *GetDVBRecorder(void);
     
@@ -287,9 +291,6 @@ class TVRec : public QObject
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 
-    void CreateSIParser(MPEGStreamData*, int num);
-    void TeardownSIParser(void);
-
     bool HasFlags(uint f) const { return (stateFlags & f) == f; }
     void SetFlags(uint f);
     void ClearFlags(uint f);
@@ -298,14 +299,16 @@ class TVRec : public QObject
     void HandleTuning(void);
     void TuningShutdowns(const TuningRequest&);
     void TuningFrequency(const TuningRequest&);
-    bool TuningSignalCheck(void);
-    bool TuningPMTCheck(void);
-    void TuningNewRecorder(void);
+    MPEGStreamData *TuningSignalCheck(void);
+
+    void TuningNewRecorder(MPEGStreamData*);
     void TuningRestartRecorder(void);
     bool RetuneChannel(void);
+    QString TuningGetChanNum(const TuningRequest&, QString &input) const;
     uint TuningCheckForHWChange(const TuningRequest&,
                                 QString &channum,
                                 QString &inputname);
+    bool TuningOnSameMultiplex(TuningRequest &request);
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
@@ -331,7 +334,6 @@ class TVRec : public QObject
     ChannelBase      *channel;
     SignalMonitor    *signalMonitor;
     EITScanner       *scanner;
-    DVBSIParser      *dvbsiparser;
 
     // Various threads
     /// Event processing thread, runs RunTV().
@@ -340,9 +342,12 @@ class TVRec : public QObject
     pthread_t recorder_thread;
 
     // Configuration variables from database
+    bool    eitIgnoresSource;
     bool    transcodeFirst;
     bool    earlyCommFlag;
     bool    runJobOnHostOnly;
+    int     eitCrawlIdleStart;
+    int     eitTransportTimeout;
     int     audioSampleRateDB;
     int     overRecordSecNrml;
     int     overRecordSecCat;
@@ -431,13 +436,11 @@ class TVRec : public QObject
     // Waiting stuff
     static const uint kFlagWaitingForRecPause   = 0x00100000;
     static const uint kFlagWaitingForSignal     = 0x00200000;
-    static const uint kFlagWaitingForSIParser   = 0x00400000;
     static const uint kFlagNeedToStartRecorder  = 0x00800000;
     static const uint kFlagPendingActions       = 0x00F00000;
 
     // Running stuff
     static const uint kFlagSignalMonitorRunning = 0x01000000;
-    static const uint kFlagSIParserRunning      = 0x02000000;
     static const uint kFlagEITScannerRunning    = 0x04000000;
 
     static const uint kFlagDummyRecorderRunning = 0x10000000;
