@@ -283,7 +283,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       disable_passthru(false),
       // DVD
-      lastdvdtitle(0), lastcellstart(0),
+      lastdvdtitle(-1), lastcellstart(0),
       dvdmenupktseen(false), dvdvideopause(false),
       lastrepeat(0)
 {
@@ -2629,7 +2629,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 int current_width = curstream->codec->width;
                 int video_width = GetNVP()->GetVideoWidth();
-                if (video_width > 0 && video_width != current_width)
+                if (video_width > 0 && video_width != current_width &&
+                        !ringBuffer->DVD()->InStillFrame())
                 {
                     av_free_packet(pkt);
                     av_find_stream_info(ic);
