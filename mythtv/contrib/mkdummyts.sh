@@ -5,11 +5,11 @@
 create_ts()
 {
   convert /tmp/$1.png ppm:- | \
-    ppmtoy4m -n15 -F$3 -A$4 -I$5 -r | \
+    ppmtoy4m -n15 -F$3 -A$4 -I$5 -r -S 420mpeg2 | \
     mpeg2enc -c -n n -a$6 --no-constraints -s -o /tmp/tmp.es
   vlc /tmp/tmp.es --sout \
     '#std{access=file,mux=ts{pid-pmt=0x20,pid-video=0x21.tsid=1},\
-            url="/tmp/tmp.ts"}'
+            url="/tmp/tmp.ts"}' vlc:quit
   mv /tmp/tmp.ts /tmp/dummy$1$2.ts
 }
 
