@@ -7,15 +7,19 @@
 #ifndef DVBTYPES_H
 #define DVBTYPES_H
 
+// POSIX headers
+#include <sys/poll.h>
+#include <sys/ioctl.h>
+#include <sys/param.h>
+#include <stdint.h>
+#include <unistd.h>
+
+// C++ headers
 #include <vector>
 #include <map>
 using namespace std;
 
-#include <sys/poll.h>
-#include <sys/ioctl.h>
-#include <sys/param.h>
-#include <cerrno>
-#include <unistd.h>
+// Qt headers
 #include <qdatetime.h>
 #include <qstringlist.h>
 #include <qmutex.h>
