@@ -39,6 +39,9 @@ ScanWizard::ScanWizard(int sourceid)
     : paneOFDM(new OFDMPane()),     paneQPSK(new QPSKPane()),
       paneATSC(new ATSCPane()),     paneQAM(new QAMPane()),
       paneSingle(new STPane()),
+#ifdef FE_GET_EXTENDED_INFO
+      paneDVBS2(new DVBS2Pane()),
+#endif
       nVideoDev(-1),                nCardType(CardUtil::ERROR_PROBE),
       nCaptureCard(-1),
       configPane(new ScanWizardScanType(this, sourceid)),

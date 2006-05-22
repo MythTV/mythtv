@@ -91,6 +91,9 @@ class DVBChannel : public ChannelBase
 
     // Tuning State
     dvb_frontend_info info;        ///< Contains info on tuning hardware
+#ifdef FE_GET_EXTENDED_INFO
+    dvb_fe_caps_extended extinfo;  ///< Additional info on tuning hardware
+#endif
     DVBTuning         cur_tuning;  ///< Tuning options sent to tuning hardware
     DVBTuning         prev_tuning; ///< Last tuning options sent to hardware
     /// Last tuning options sent to hardware for retuning

@@ -51,8 +51,14 @@ using namespace std;
 #define MAX_SECTION_SIZE 4096
 #define DMX_DONT_FILTER 0x2000
 
+#ifdef FE_GET_EXTENDED_INFO
+  #define dvb_fe_params dvb_frontend_parameters_new
+#else
+  #define dvb_fe_params dvb_frontend_parameters
+#endif
+
 QString toString(const fe_type_t);
-QString toString(const struct dvb_frontend_parameters&, const fe_type_t);
+QString toString(const struct dvb_fe_params&, const fe_type_t);
 QString toString(fe_status);
 QString toString(const struct dvb_frontend_event&, const fe_type_t);
 
@@ -282,20 +288,25 @@ typedef vector<uint16_t> dvb_pid_t;
 typedef vector<uint16_t> dvb_caid_t;
 
 extern bool equal_qpsk(
-    const struct dvb_frontend_parameters &p,
-    const struct dvb_frontend_parameters &op, uint range);
+    const struct dvb_fe_params &p,
+    const struct dvb_fe_params &op, uint range);
+#ifdef FE_GET_EXTENDED_INFO
+extern bool equal_dvbs2(
+    const struct dvb_fe_params &p,
+    const struct dvb_fe_params &op, uint range);
+#endif
 extern bool equal_atsc(
-    const struct dvb_frontend_parameters &p,
-    const struct dvb_frontend_parameters &op, uint range);
+    const struct dvb_fe_params &p,
+    const struct dvb_fe_params &op, uint range);
 extern bool equal_qam(
-    const struct dvb_frontend_parameters &p,
-    const struct dvb_frontend_parameters &op, uint range);
+    const struct dvb_fe_params &p,
+    const struct dvb_fe_params &op, uint range);
 extern bool equal_ofdm(
-    const struct dvb_frontend_parameters &p,
-    const struct dvb_frontend_parameters &op, uint range);
+    const struct dvb_fe_params &p,
+    const struct dvb_fe_params &op, uint range);
 extern bool equal_type(
-    const struct dvb_frontend_parameters &p,
-    const struct dvb_frontend_parameters &op,
+    const struct dvb_fe_params &p,
+    const struct dvb_fe_params &op,
     fe_type_t type, uint freq_range);
 
 class DVBTuning
@@ -306,10 +317,10 @@ class DVBTuning
         diseqc_type(0), diseqc_port(0), diseqc_pos(0.0f),
         lnb_lof_switch(0), lnb_lof_hi(0), lnb_lof_lo(0)
     {
-        bzero(&params, sizeof(dvb_frontend_parameters));
+        bzero(&params, sizeof(dvb_fe_params));
     }
 
-    struct dvb_frontend_parameters params;
+    struct dvb_fe_params params;
     fe_sec_voltage_t    voltage;
     fe_sec_tone_mode_t  tone;
     unsigned int        diseqc_type;
@@ -382,6 +393,18 @@ class DVBTuning
     bool parseQAM(const QString& frequency,       const QString& inversion,
                   const QString& symbol_rate,     const QString& fec_inner,
                   const QString& modulation);
+
+#ifdef FE_GET_EXTENDED_INFO
+    bool equalDVBS2(const DVBTuning& other, uint range = 0) const
+        { return equal_dvbs2(params, other.params, range);  }
+    uint DVBS2SymbolRate() const { return params.u.qpsk2.symbol_rate; }
+    bool parseDVBS2(const QString& frequency,      const QString& inversion,
+                   const QString& symbol_rate,    const QString& fec_inner,
+                   const QString& pol,            const QString& diseqc_type,
+                   const QString& diseqc_port,    const QString& diseqc_pos,
+                   const QString& lnb_lof_switch, const QString& lnb_lof_hi,
+                   const QString& lnb_lof_lo,     const QString& modulation);
+#endif
 };
 
 class dvb_channel_t

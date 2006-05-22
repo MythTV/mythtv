@@ -147,11 +147,48 @@ bool DVBChannel::Open()
         return false;
     }
 
+#ifdef FE_GET_EXTENDED_INFO
+    if (info.caps & FE_HAS_EXTENDED_INFO)
+    {
+        if (ioctl(fd_frontend, FE_GET_EXTENDED_INFO, &extinfo) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to get frontend extended information." + ENO);
+            close(fd_frontend);
+            fd_frontend = -1;
+            return false;
+        }
+        if (extinfo.modulations & MOD_8PSK)
+        {
+            if (ioctl(fd_frontend, FE_SET_STANDARD, FE_DVB_S2) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Failed to get extended frontend information." + ENO);
+                close(fd_frontend);
+                fd_frontend = -1;
+                return false;
+            }
+            if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Failed to get frontend information." + ENO);
+                close(fd_frontend);
+                fd_frontend = -1;
+                return false;
+            }
+        }
+    }
+#endif
+
     VERBOSE(VB_RECORD, LOC + QString("Using DVB card %1, with frontend '%2'.")
             .arg(cardnum).arg(info.name));
 
     // Turn on the power to the LNB
+#ifdef FE_GET_EXTENDED_INFO
+    if (info.type == FE_QPSK || info.type == FE_DVB_S2)
+#else
     if (info.type == FE_QPSK)
+#endif
     {
         if (ioctl(fd_frontend, FE_SET_TONE, SEC_TONE_OFF) < 0)
         {
@@ -475,6 +512,20 @@ void DVBChannel::CheckOptions()
             }
             break;
 
+#ifdef FE_GET_EXTENDED_INFO
+        case FE_DVB_S2:
+            symbol_rate = t.DVBS2SymbolRate();
+
+            if (!CheckModulation(t.params.u.qpsk2.modulation))
+                VERBOSE(VB_GENERAL, LOC_WARN +
+                        "Unsupported modulation parameter.");
+
+            if (!CheckCodeRate(t.params.u.qpsk2.fec_inner))
+                VERBOSE(VB_GENERAL, LOC_WARN +
+                        "Unsupported fec_inner parameter.");
+            break;
+#endif
+
         case FE_QAM:
             symbol_rate = t.QAMSymbolRate();
 
@@ -543,6 +594,8 @@ void DVBChannel::CheckOptions()
        case FE_ATSC:
             // ATSC doesn't need any validation
             break;
+       default:
+            break;
     }
 
     if (info.type != FE_OFDM &&
@@ -574,6 +627,7 @@ bool DVBChannel::CheckCodeRate(fe_code_rate_t rate) const
         case FEC_8_9:  if (info.caps & FE_CAN_FEC_8_9)  return true;
         case FEC_AUTO: if (info.caps & FE_CAN_FEC_AUTO) return true;
         case FEC_NONE: return true;
+        default: return false;
     }
     return false;
 }
@@ -594,6 +648,11 @@ bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
         case QAM_AUTO: if (info.caps & FE_CAN_QAM_AUTO) return true;
         case VSB_8:    if (info.caps & FE_CAN_8VSB)     return true;
         case VSB_16:   if (info.caps & FE_CAN_16VSB)    return true;
+#ifdef FE_GET_EXTENDED_INFO
+        case MOD_8PSK: if (info.caps & FE_HAS_EXTENDED_INFO &&
+                           extinfo.modulations & MOD_8PSK) return true;
+#endif
+        default: return false;
     }
     return false;
 }
@@ -625,7 +684,11 @@ bool DVBChannel::Tune(const DVBTuning &tuning, bool force_reset)
 {
     bool reset = (force_reset || first_tune);
     bool has_diseq = (FE_QPSK == info.type) && diseqc;
-    struct dvb_frontend_parameters params = tuning.params;
+    struct dvb_fe_params params = tuning.params;
+
+#ifdef FE_GET_EXTENDED_INFO
+    has_diseq |= (FE_DVB_S2 == info.type) && diseqc;
+#endif // FE_GET_EXTENDED_INFO
 
     retune_tuning = tuning;
 
@@ -660,12 +723,25 @@ bool DVBChannel::Tune(const DVBTuning &tuning, bool force_reset)
 
         params.frequency = params.frequency + (retune_adj = -retune_adj);
 
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
+#ifdef FE_GET_EXTENDED_INFO
+        if (info.type == FE_DVB_S2)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
-                    "Setting Frontend tuning parameters failed." + ENO);
-
-            return false;
+            if (ioctl(fd_frontend, FE_SET_FRONTEND2, &params) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
+                        "Setting Frontend(2) tuning parameters failed." + ENO);
+                return false;
+            }
+        }
+        else
+#endif // FE_GET_EXTENDED_INFO
+        {
+            if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
+                        "Setting Frontend tuning parameters failed." + ENO);
+                return false;
+            }
         }
 
         // Extra delay to add for broken DVB drivers
@@ -781,8 +857,13 @@ static void drain_dvb_events(int fd)
 static uint tuned_frequency(const DVBTuning &tuning, fe_type_t type,
                             fe_sec_tone_mode_t *p_tone)
 {
+#ifdef FE_GET_EXTENDED_INFO
+    if (FE_QPSK != type && FE_DVB_S2 != type)
+        return tuning.Frequency();
+#else
     if (FE_QPSK != type)
         return tuning.Frequency();
+#endif
 
     uint freq   = tuning.Frequency();
     bool tone   = freq >= tuning.lnb_lof_switch;

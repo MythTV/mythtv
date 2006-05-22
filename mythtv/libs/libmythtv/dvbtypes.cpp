@@ -156,6 +156,9 @@ DVBParamHelper<fe_modulation_t>::Table DVBModulation::confTable[] =
    {"QAM_128",QAM_128},
    {"QAM_256",QAM_256},
    {"QPSK",QPSK},
+#ifdef FE_GET_EXTENDED_INFO
+   {"8PSK", MOD_8PSK},
+#endif
    {NULL,QAM_AUTO},
 };
 
@@ -182,6 +185,9 @@ DVBParamHelper<fe_modulation_t>::Table DVBModulation::parseTable[] =
    {"qpsk",QPSK},
    {"8vsb",VSB_8},
    {"16vsb",VSB_16},
+#ifdef FE_GET_EXTENDED_INFO
+   {"8psk", MOD_8PSK},
+#endif
    {NULL,QAM_AUTO},
 };
 
@@ -195,7 +201,10 @@ char *DVBModulation::stringLookup[] =
     "qam_256", //QAM_256,
     "auto",    //QAM_AUTO,
     "8vsb",    //VSB_8,
-    "16vsb"    //VSB_16
+    "16vsb",   //VSB_16
+#ifdef FE_GET_EXTENDED_INFO
+    "8psk",    //MOD_8PSK
+#endif
 };
 
 DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::confTable[] =
@@ -307,8 +316,8 @@ char *DVBHierarchy::stringLookup[] =
     "a"  //HIERARCHY_AUTO
 };
 
-bool equal_qpsk(const struct dvb_frontend_parameters &p,
-                const struct dvb_frontend_parameters &op, uint range)
+bool equal_qpsk(const struct dvb_fe_params &p,
+                const struct dvb_fe_params &op, uint range)
 {
     return
         p.frequency + range  >= op.frequency           &&
@@ -318,8 +327,21 @@ bool equal_qpsk(const struct dvb_frontend_parameters &p,
         p.u.qpsk.fec_inner   == op.u.qpsk.fec_inner;
 }
 
-bool equal_atsc(const struct dvb_frontend_parameters &p,
-                const struct dvb_frontend_parameters &op, uint range)
+#ifdef FE_GET_EXTENDED_INFO
+bool equal_dvbs2(const struct dvb_frontend_parameters_new &p,
+                const struct dvb_frontend_parameters_new &op, uint range)
+{
+    return
+        p.frequency + range  >= op.frequency           &&
+        p.frequency          <= op.frequency + range   &&
+        p.inversion          == op.inversion           &&
+        p.u.qpsk.symbol_rate == op.u.qpsk.symbol_rate  &&
+        p.u.qpsk.fec_inner   == op.u.qpsk.fec_inner;
+}
+#endif
+
+bool equal_atsc(const struct dvb_fe_params &p,
+                const struct dvb_fe_params &op, uint range)
 {
     bool ok =
         p.frequency + range  >= op.frequency           &&
@@ -330,8 +352,8 @@ bool equal_atsc(const struct dvb_frontend_parameters &p,
     return ok;
 }
 
-bool equal_qam(const struct dvb_frontend_parameters &p,
-               const struct dvb_frontend_parameters &op, uint range)
+bool equal_qam(const struct dvb_fe_params &p,
+               const struct dvb_fe_params &op, uint range)
 {
     return
         p.frequency + range  >= op.frequency            &&
@@ -342,8 +364,8 @@ bool equal_qam(const struct dvb_frontend_parameters &p,
         p.u.qam.modulation   == op.u.qam.modulation;
 }
 
-bool equal_ofdm(const struct dvb_frontend_parameters &p,
-                const struct dvb_frontend_parameters &op,
+bool equal_ofdm(const struct dvb_fe_params &p,
+                const struct dvb_fe_params &op,
                 uint range)
 {
     return 
@@ -359,8 +381,8 @@ bool equal_ofdm(const struct dvb_frontend_parameters &p,
         p.u.ofdm.hierarchy_information == op.u.ofdm.hierarchy_information;
 }
 
-bool equal_type(const struct dvb_frontend_parameters &p,
-                const struct dvb_frontend_parameters &op,
+bool equal_type(const struct dvb_fe_params &p,
+                const struct dvb_fe_params &op,
                 fe_type_t type, uint freq_range)
 {
     if (FE_QAM == type)
@@ -371,6 +393,10 @@ bool equal_type(const struct dvb_frontend_parameters &p,
         return equal_qpsk(p, op, freq_range);
     if (FE_ATSC == type)
         return equal_atsc(p, op, freq_range);
+#ifdef FE_GET_EXTENDED_INFO
+    if (FE_DVB_S2 == type)
+        return equal_dvbs2(p, op, freq_range);
+#endif
     return false;
 }
 
@@ -646,6 +672,56 @@ bool DVBTuning::parseOFDM(const QString& frequency,   const QString& inversion,
     return true;
 }
 
+#ifdef FE_GET_EXTENDED_INFO
+bool DVBTuning::parseDVBS2(
+    const QString& frequency,   const QString& inversion,
+    const QString& symbol_rate, const QString& fec_inner,
+    const QString& pol,         const QString& _diseqc_type,
+    const QString& _diseqc_port,
+    const QString& _diseqc_pos,
+    const QString& _lnb_lof_switch,
+    const QString& _lnb_lof_hi,
+    const QString& _lnb_lof_lo,
+    const QString &modulation)
+{
+    bool ok = true;
+
+    dvb_dvbs2_parameters& p = params.u.qpsk2;
+    params.frequency = frequency.toInt();
+
+    params.inversion = parseInversion(inversion, ok);
+    if (!ok)
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Invalid inversion, aborting, falling back to 'auto'");
+
+    p.symbol_rate = symbol_rate.toInt();
+    if (!p.symbol_rate)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid symbol rate " +
+                QString("parameter '%1', aborting.").arg(symbol_rate));
+        return false;
+    }
+
+    voltage = parsePolarity(pol, ok);
+    if (SEC_VOLTAGE_OFF == voltage)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid polarization, aborting.");
+        return false;
+    }
+
+    p.fec_inner = parseCodeRate(fec_inner, ok);
+
+    p.modulation = parseModulation(modulation, ok);
+    diseqc_type = _diseqc_type.toInt();
+    diseqc_port = _diseqc_port.toInt();
+    diseqc_pos  = _diseqc_pos.toFloat();
+    lnb_lof_switch = _lnb_lof_switch.toInt();
+    lnb_lof_hi  = _lnb_lof_hi.toInt();
+    lnb_lof_lo  = _lnb_lof_lo.toInt();
+    return true;
+}
+#endif
+
 // TODO: Add in DiseqcPos when diseqc class supports it
 bool DVBTuning::parseQPSK(const QString& frequency,   const QString& inversion,
                           const QString& symbol_rate, const QString& fec_inner,
@@ -880,7 +956,9 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
     else if (modulation ==  "qam-16") return QAM_16;
     else if (modulation ==   "8-vsb") return VSB_8;
     else if (modulation ==  "16-vsb") return VSB_16;
-
+#ifdef FE_GET_EXTENDED_INFO
+    else if (modulation ==    "8psk") return MOD_8PSK;
+#endif
     ok = false;
 
     VERBOSE(VB_GENERAL, LOC_WARN +
@@ -920,6 +998,13 @@ bool dvb_channel_t::Parse(
             hierarchy);
     else if (FE_ATSC == type)
         ok = tuning.parseATSC(frequency, modulation);
+#ifdef FE_GET_EXTENDED_INFO
+    else if (FE_DVB_S2 == type)
+        ok = tuning.parseDVBS2(
+            frequency,       inversion,     symbolrate,   fec,   polarity,
+            dvb_diseqc_type, diseqc_port,   diseqc_pos,
+            lnb_lof_switch,  lnb_lof_hi,    lnb_lof_lo, modulation);
+#endif
         
     sistandard = _sistandard;
     input_id   = _input_id.toInt();
@@ -941,6 +1026,9 @@ static QString mod2str(fe_modulation mod)
         case QAM_16:   return  "QAM-16";
         case VSB_8:    return   "8-VSB";
         case VSB_16:   return  "16-VSB";
+#ifdef FE_GET_EXTENDED_INFO
+	case MOD_8PSK: return    "8PSK";
+#endif
         default:      return "auto";
     }
     return "Unknown";
@@ -959,6 +1047,9 @@ static QString mod2dbstr(fe_modulation mod)
         case QAM_256:  return "qam_256";
         case VSB_8:    return "8vsb";
         case VSB_16:   return "16vsb";
+#ifdef FE_GET_EXTENDED_INFO
+	case MOD_8PSK: return "8psk";
+#endif
         default:       return "auto";
     }
 }
@@ -993,7 +1084,7 @@ QString toString(const fe_type_t type)
     return "Unknown";
 }
 
-QString toString(const struct dvb_frontend_parameters &params,
+QString toString(const struct dvb_fe_params &params,
                  const fe_type_t type)
 {
     return QString("freq(%1) type(%2)")
@@ -1016,6 +1107,9 @@ QString toString(fe_status status)
 QString toString(const struct dvb_frontend_event &event,
                  const fe_type_t type)
 {
+    const struct dvb_fe_params *params;
+    params = (const struct dvb_fe_params *)(&event.parameters);
     return QString("Event status(%1) %2")
-        .arg(toString(event.status)).arg(toString(event.parameters, type));
+        .arg(toString(event.status))
+        .arg(toString(*params, type));
 }

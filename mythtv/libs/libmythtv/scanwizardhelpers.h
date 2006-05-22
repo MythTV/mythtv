@@ -418,6 +418,9 @@ class ScanModulationSetting: public ComboBoxSetting
     {
         addSelection(QObject::tr("Auto"),"auto",true);
         addSelection("QPSK","qpsk");
+#ifdef FE_GET_EXTENDED_INFO
+        addSelection("8PSK","8psk");
+#endif
         addSelection("QAM 16","qam_16");
         addSelection("QAM 32","qam_32");
         addSelection("QAM 64","qam_64");
@@ -591,6 +594,43 @@ class OFDMPane : public HorizontalConfigurationGroup
     ScanGuardInterval    *pguard_interval;
     ScanHierarchy        *phierarchy;
 };
+#ifdef FE_GET_EXTENDED_INFO
+class DVBS2Pane : public HorizontalConfigurationGroup
+{
+  public:
+    DVBS2Pane() : HorizontalConfigurationGroup(false,false,true,false) 
+    {
+        setUseFrame(false);
+        VerticalConfigurationGroup *left =
+            new VerticalConfigurationGroup(false,true);
+        VerticalConfigurationGroup *right =
+            new VerticalConfigurationGroup(false,true);
+        left->addChild( pfrequency  = new ScanFrequency());
+        left->addChild( ppolarity   = new ScanPolarity());
+        left->addChild( psymbolrate = new ScanSymbolRate());
+        right->addChild(pfec        = new ScanFec());
+        right->addChild(pmodulation = new ScanModulation());
+        right->addChild(pinversion  = new ScanInversion());
+        addChild(left);
+        addChild(right);     
+    }
+
+    QString frequency(void)  const { return pfrequency->getValue();  }
+    QString symbolrate(void) const { return psymbolrate->getValue(); }
+    QString inversion(void)  const { return pinversion->getValue();  }
+    QString fec(void)        const { return pfec->getValue();        }
+    QString polarity(void)   const { return ppolarity->getValue();   }
+    QString modulation(void) const { return pmodulation->getValue(); }
+
+  protected:
+    ScanFrequency  *pfrequency;
+    ScanSymbolRate *psymbolrate;
+    ScanInversion  *pinversion;
+    ScanFec        *pfec;
+    ScanPolarity   *ppolarity;
+    ScanModulation *pmodulation;
+};
+#endif
 
 class QPSKPane : public HorizontalConfigurationGroup
 {
