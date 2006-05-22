@@ -480,6 +480,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Private subtitle stuff
     void  DisplaySubtitles(void);
     void  ClearSubtitles(void);
+    void  ExpireSubtitles(void);
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);

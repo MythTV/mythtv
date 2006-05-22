@@ -2395,6 +2395,8 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         DisplaySubtitles();
     else if (osdHasSubtitles)
         ClearSubtitles();
+    else
+        ExpireSubtitles();
 
     // handle scan type changes
     AutoDeint(frame);
@@ -5855,7 +5857,7 @@ void NuppelVideoPlayer::DisplaySubtitles()
 
             bool displaysub = true;
             if (nonDisplayedSubtitles.size() > 0 &&
-                nonDisplayedSubtitles.front().start_display_time < 
+                nonDisplayedSubtitles.front().end_display_time < 
                 currentFrame->timecode)
             {
                 displaysub = false;
@@ -5935,8 +5937,43 @@ void NuppelVideoPlayer::DisplaySubtitles()
     }
 }
 
-// hide subtitles and free the undisplayed subtitles
-void NuppelVideoPlayer::ClearSubtitles() 
+/** \fn NuppelVideoPlayer::ExpireSubtitles(void)
+ *  \brief Discard non-displayed subtitles.
+ */
+void NuppelVideoPlayer::ExpireSubtitles(void)
+{
+    QMutexLocker locker(&subtitleLock);
+
+    if (videoOutput)
+        return;
+
+    VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
+
+    while (nonDisplayedSubtitles.size() > 0)
+    {
+        const AVSubtitle subtitlePage = nonDisplayedSubtitles.front();
+
+        // Stop when we hit one old enough
+        if (subtitlePage.end_display_time > currentFrame->timecode)
+            break;
+
+        nonDisplayedSubtitles.pop_front();
+
+        for (std::size_t i = 0; i < subtitlePage.num_rects; ++i)
+        {
+            AVSubtitleRect* rect = &subtitlePage.rects[i];
+            av_free(rect->rgba_palette);
+            av_free(rect->bitmap);
+        }
+        if (subtitlePage.num_rects > 0)
+            av_free(subtitlePage.rects);
+    }
+}
+
+/** \fn NuppelVideoPlayer::ClearSubtitles(void)
+ *  \brief Hide subtitles and free the undisplayed subtitles.
+ */
+void NuppelVideoPlayer::ClearSubtitles(void)
 {
     subtitleLock.lock();
 
