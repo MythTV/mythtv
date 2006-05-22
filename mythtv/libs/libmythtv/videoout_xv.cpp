@@ -1139,6 +1139,16 @@ bool VideoOutputXv::InitSetupBuffers(void)
 #endif // USING_XVMC
     }
 
+    // The XVideo output methods sometimes allow the picture to
+    // be adjusted, if the chroma keying color can be discovered.
+    if (VideoOutputSubType() >= XVideo && xv_colorkey)
+    {
+        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
+        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
+        ChangePictureAttribute(kPictureAttribute_Colour, colour);
+        ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    }
+
     return true;
 }
 
