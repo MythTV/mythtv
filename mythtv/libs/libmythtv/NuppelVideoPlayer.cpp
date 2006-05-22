@@ -5944,7 +5944,7 @@ void NuppelVideoPlayer::ExpireSubtitles(void)
 {
     QMutexLocker locker(&subtitleLock);
 
-    if (videoOutput)
+    if (!videoOutput)
         return;
 
     VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
