@@ -1145,10 +1145,10 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
             .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i))
             .arg(chan_num).arg(friendlyName).arg(freqid);
 
+        QString msg = "";
         if (chanid < 0)
         {   // The service is not in database, add it
-            emit ServiceScanUpdateText(
-                tr("Adding %1").arg(common_status_info));
+            msg = tr("Adding %1").arg(common_status_info);
             chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
             if (chanid > 0)
             {
@@ -1168,8 +1168,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
         }
         else
         {   // The service is in database, update it
-            emit ServiceScanUpdateText(
-                tr("Updating %1").arg(common_status_info));
+            msg = tr("Updating %1").arg(common_status_info);
             ChannelUtil::UpdateChannel(
                 db_mplexid,
                 db_source_id,
@@ -1181,6 +1180,8 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
                 vct->MajorChannel(i), vct->MinorChannel(i),
                 freqid);
         }
+        emit ServiceScanUpdateText(msg);
+        VERBOSE(VB_SIPARSER, msg);
     }
 }
 
