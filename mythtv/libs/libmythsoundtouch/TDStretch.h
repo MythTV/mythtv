@@ -48,6 +48,10 @@
 #include "RateTransposer.h"
 #include "FIFOSamplePipe.h"
 
+#ifdef MULTICHANNEL
+#define USE_MULTI_MMX
+#endif
+
 namespace soundtouch
 {
 
@@ -100,6 +104,7 @@ protected:
     SAMPLETYPE *pMidBuffer;
     SAMPLETYPE *pRefMidBuffer;
     SAMPLETYPE *pRefMidBufferUnaligned;
+    uint midBufferLength;
     uint overlapLength;
     uint overlapDividerBits;
     uint slopingDivider;
@@ -123,21 +128,34 @@ protected:
     virtual void clearCrossCorrState();
     void calculateOverlapLength(uint overlapMs);
 
+#ifdef MULTICHANNEL
+    virtual LONG_SAMPLETYPE calcCrossCorrMulti(const SAMPLETYPE *mixingPos, const SAMPLETYPE *compare) const;
+#endif
     virtual LONG_SAMPLETYPE calcCrossCorrStereo(const SAMPLETYPE *mixingPos, const SAMPLETYPE *compare) const;
     virtual LONG_SAMPLETYPE calcCrossCorrMono(const SAMPLETYPE *mixingPos, const SAMPLETYPE *compare) const;
 
+#ifdef MULTICHANNEL
+    virtual uint seekBestOverlapPositionMulti(const SAMPLETYPE *refPos);
+    virtual uint seekBestOverlapPositionMultiQuick(const SAMPLETYPE *refPos);
+#endif
     virtual uint seekBestOverlapPositionStereo(const SAMPLETYPE *refPos);
     virtual uint seekBestOverlapPositionStereoQuick(const SAMPLETYPE *refPos);
     virtual uint seekBestOverlapPositionMono(const SAMPLETYPE *refPos);
     virtual uint seekBestOverlapPositionMonoQuick(const SAMPLETYPE *refPos);
     uint seekBestOverlapPosition(const SAMPLETYPE *refPos);
 
+#ifdef MULTICHANNEL
+    virtual void overlapMulti(SAMPLETYPE *output, const SAMPLETYPE *input) const;
+#endif
     virtual void overlapStereo(SAMPLETYPE *output, const SAMPLETYPE *input) const;
     virtual void overlapMono(SAMPLETYPE *output, const SAMPLETYPE *input) const;
 
     void clearMidBuffer();
     void overlap(SAMPLETYPE *output, const SAMPLETYPE *input, uint ovlPos) const;
 
+#ifdef MULTICHANNEL
+    void precalcCorrReference();
+#endif
     void precalcCorrReferenceMono();
     void precalcCorrReferenceStereo();
 
@@ -225,6 +243,11 @@ public:
     class TDStretchMMX : public TDStretch
     {
     protected:
+#ifdef USE_MULTI_MMX
+#ifdef MULTICHANNEL
+        long calcCrossCorrMulti(const short *mixingPos, const short *compare) const;
+#endif
+#endif
         long calcCrossCorrStereo(const short *mixingPos, const short *compare) const;
         virtual void overlapStereo(short *output, const short *input) const;
         virtual void clearCrossCorrState();
@@ -237,6 +260,9 @@ public:
     class TDStretch3DNow : public TDStretch
     {
     protected:
+#ifdef MULTICHANNEL
+        //double calcCrossCorrMulti(const float *mixingPos, const float *compare) const;
+#endif
         double calcCrossCorrStereo(const float *mixingPos, const float *compare) const;
     };
 #endif /// ALLOW_3DNOW
@@ -247,6 +273,9 @@ public:
     class TDStretchSSE : public TDStretch
     {
     protected:
+#ifdef MULTICHANNEL
+        //double calcCrossCorrMulti(const float *mixingPos, const float *compare) const;
+#endif
         double calcCrossCorrStereo(const float *mixingPos, const float *compare) const;
     };
 

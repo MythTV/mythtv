@@ -140,7 +140,11 @@ uint SoundTouch::getVersionId()
 // Sets the number of channels, 1 = mono, 2 = stereo
 void SoundTouch::setChannels(uint numChannels)
 {
+#ifdef MULTICHANNEL
+    if (numChannels < 1 || numChannels > MULTICHANNEL)
+#else
     if (numChannels != 1 && numChannels != 2) 
+#endif
     {
         throw std::runtime_error("Illegal number of channels");
     }

@@ -141,6 +141,124 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
     return tmp;
 }
 
+#ifdef USE_MULTI_MMX
+// Calculates cross correlation of two buffers
+long TDStretchMMX::calcCrossCorrMulti(const short *pV1, const short *pV2) const
+{
+    //static const unsigned long long int mm_half __attribute__ ((aligned(8))) = 0xffffffffULL;
+    static const __m64 mm_mask[4][8] __attribute__ ((aligned(8))) = {
+        {
+            // even bit
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0,
+            0,
+            0,
+            0
+        },
+        {
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0x0000ffffffffffffULL,
+            0,
+            0,
+            0,
+            0
+        },
+        {
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0x00000000ffffffffULL,
+            0,
+            0,
+            0,
+            0
+        },
+        {
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0xffffffffffffffffULL,
+            0x000000000000ffffULL,
+            0,
+            0,
+            0,
+            0
+        }
+    };
+    uint tmp; 
+    uint adjustedOverlapLength = overlapLength*channels;
+    uint counter = ((adjustedOverlapLength+15)>>4)-1;    // load counter to counter = overlapLength / 8 - 1
+    uint remainder = (16-adjustedOverlapLength)&0xf;     // since there are 1/3 sample per 1/2 quadword
+
+    __m64 *ph = (__m64*)&mm_mask[remainder&3][remainder>>2];
+    __m64 *pv1=(__m64*)pV1, *pv2=(__m64*)pV2;
+    GI(__m64 m0, m1, m2, m3, m4, m5, m6); // temporaries
+    uint shift = overlapDividerBits;
+
+    // prepare to the first round by loading 
+    SI(m1 = pv1[0],             movq_a2r(0, pv1, mm1)); // load m1 = pv1[0]
+    SI(m2 = pv1[1],             movq_a2r(8, pv1, mm2)); // load m2 = pv1[1]
+    SI(m0 = _mm_setzero_si64(), pxor_r2r(mm0, mm0));    // clear m0
+    SI(m5 = _mm_cvtsi32_si64(shift),movd_v2r(shift, mm5));   // shift in 64bit reg
+
+    do {
+        // Calculate cross-correlation between the tempOffset and tmpbid_buffer.
+        // Process 4 parallel batches of 2 * stereo samples each during one
+        // round to improve CPU-level parallellization.
+        SI(m1 = _mm_madd_pi16(m1, pv2[0]),pmaddwd_a2r(0, pv2, mm1)); // multiply-add m1 = m1 * pv2[0]
+        SI(m3 = pv1[2],                   movq_a2r(16, pv1, mm3));   // load mm3 = pv1[2]
+        SI(m2 = _mm_madd_pi16(m2, pv2[1]),pmaddwd_a2r(8, pv2, mm2)); // multiply-add m2 = m2 * pv2[1]
+        SI(m4 = pv1[3],                   movq_a2r(24, pv1, mm4));   // load mm4 = pv1[3]
+        SI(m3 = _mm_madd_pi16(m3, pv2[2]),pmaddwd_a2r(16, pv2, mm3));// multiply-add m3 = m3 * pv2[2]
+        SI(m2 = _mm_add_pi32(m2, m1),     paddd_r2r(mm1, mm2));      // add m2 += m1
+        SI(m4 = _mm_madd_pi16(m4, pv2[3]),pmaddwd_a2r(24, pv2, mm4));// multiply-add m4 = m4 * pv2[3]
+        SI(m1 = pv1[4],                   movq_a2r(32, pv1, mm1));   // mm1 = pv1[0] for next round
+        SI(m2 = _mm_srai_pi32(m2, m5),    psrad_r2r(mm5, mm2));      // m2 >>= shift (mm5)
+        pv1 += 4;                                                    // increment first pointer
+        SI(m3 = _mm_add_pi32(m3, m4),     paddd_r2r(mm4, mm3));      // m3 += m4
+        SI(m0 = _mm_add_pi32(m0, m2),     paddd_r2r(mm2, mm0));      // m0 += m2
+        SI(m2 = pv1[1],                   movq_a2r(8, pv1, mm2));    // mm2 = pv1[1] for next round
+        SI(m3 = _mm_srai_pi32(m3, m5),    psrad_r2r(mm5, mm3));    // m3 >>= shift (mm5)
+        pv2 += 4;                                                    // increment second pointer
+        SI(m0 = _mm_add_pi32(m0, m3),     paddd_r2r(mm3, mm0));      // add m0 += m3
+    } while ((--counter)!=0);
+
+    SI(m6 = ph[0], movq_a2r(0, ph, mm6));
+    // Finalize the last partial loop:
+    SI(m1 = _mm_madd_pi16(m1, pv2[0]), pmaddwd_a2r(0, pv2, mm1));
+    SI(m1 = _mm_and_si64(m1, m6),      pand_r2r(mm6, mm1));
+    SI(m3 = pv1[2],                    movq_a2r(16, pv1, mm3));
+    SI(m6 = ph[1], movq_a2r(8, ph, mm6));
+    SI(m2 = _mm_madd_pi16(m2, pv2[1]), pmaddwd_a2r(8, pv2, mm2));
+    SI(m2 = _mm_and_si64(m2, m6),      pand_r2r(mm6, mm2));
+    SI(m4 = pv1[3],                    movq_a2r(24, pv1, mm4));
+    SI(m6 = ph[2], movq_a2r(16, ph, mm6));
+    SI(m3 = _mm_madd_pi16(m3, pv2[2]), pmaddwd_a2r(16, pv2, mm3));
+    SI(m3 = _mm_and_si64(m3, m6),      pand_r2r(mm6, mm3));
+    SI(m2 = _mm_add_pi32(m2, m1),      paddd_r2r(mm1, mm2));
+    SI(m6 = ph[3], movq_a2r(24, ph, mm6));
+    SI(m4 = _mm_madd_pi16(m4, pv2[3]), pmaddwd_a2r(24, pv2, mm4));
+    SI(m4 = _mm_and_si64(m4, m6),      pand_r2r(mm6, mm4));
+    SI(m2 = _mm_srai_pi32(m2, m5),     psrad_r2r(mm5, mm2));
+    SI(m3 = _mm_add_pi32(m3, m4),      paddd_r2r(mm4, mm3));
+    SI(m0 = _mm_add_pi32(m0, m2),      paddd_r2r(mm2, mm0));
+    SI(m3 = _mm_srai_pi32(m3, m5),     psrad_r2r(mm5, mm3));
+    SI(m0 = _mm_add_pi32(m0, m3),      paddd_r2r(mm3, mm0));
+
+    // copy hi-dword of mm0 to lo-dword of mm1, then sum mm0+mm1
+    // and finally return the result
+    SI(m1 = m0,                        movq_r2r(mm0, mm1));
+    SI(m1 = _mm_srli_si64(m1, 32),     psrld_i2r(32, mm1));
+    SI(m0 = _mm_add_pi32(m0, m1),      paddd_r2r(mm1, mm0));
+    SI(tmp = _mm_cvtsi64_si32(m0),     movd_r2m(mm0, tmp));
+    return tmp;
+}
+#endif
+
 void TDStretchMMX::clearCrossCorrState()
 {
     _mm_empty();
@@ -223,6 +341,86 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
     } while ((--counter)!=0);
     _mm_empty();
 }
+
+#if 0
+// MMX-optimized version of the function overlapMulti
+void TDStretchMMX::overlapMulti(short *output, const short *input) const
+{
+    _mm_empty();
+    uint shift = overlapDividerBits;
+    uint counter = overlapLength>>2;                 // counter = overlapLength / 4
+    __m64 *inPtr = (__m64*) input;                   // load address of inputBuffer
+    __m64 *midPtr = (__m64*) pMidBuffer;             // load address of midBuffer
+    __m64 *outPtr = ((__m64*) output)-2;             // load address of outputBuffer
+    GI(__m64 m0, m1, m2, m3, m4, m5, m6, m7);        // temporaries
+
+    // load mixing value adder to mm5
+    uint tmp0 = 0x0002fffe;                                      // tmp0 = 0x0002 fffe
+    SI(m5 = _mm_cvtsi32_si64(tmp0),    movd_v2r(tmp0, mm5));     // mm5 = 0x0000 0000 0002 fffe
+    SI(m5 = _mm_unpacklo_pi32(m5,m5),  punpckldq_r2r(mm5, mm5)); // mm5 = 0x0002 fffe 0002 fffe
+    // load sliding mixing value counter to mm6
+    SI(m6 = _mm_cvtsi32_si64(overlapLength), movd_v2r(overlapLength, mm6));
+    SI(m6 = _mm_unpacklo_pi32(m6, m6), punpckldq_r2r(mm6, mm6)); // mm6 = 0x0000 OVL_ 0000 OVL_
+    // load sliding mixing value counter to mm7
+    uint tmp1 = (overlapLength-1)|0x00010000;                    // tmp1 = 0x0001 overlapLength-1
+    SI(m7 = _mm_cvtsi32_si64(tmp1),    movd_v2r(tmp1, mm7));     // mm7 = 0x0000 0000 0001 01ff
+    SI(m7 = _mm_unpacklo_pi32(m7, m7), punpckldq_r2r(mm7, mm7)); // mm7 = 0x0001 01ff 0001 01ff
+
+    do {
+        // Process two parallel batches of 2+2 stereo samples during each round 
+        // to improve CPU-level parallellization.
+        //
+        // Load [midPtr] into m0 and m1
+        // Load [inPtr] into m3
+        // unpack words of m0, m1 and m3 into m0 and m1
+        // multiply-add m0*m6 and m1*m7, store results into m0 and m1
+        // divide m0 and m1 by 512 (=right-shift by overlapDividerBits)
+        // pack the result into m0 and store into [edx]
+        //
+        // Load [midPtr+8] into m2 and m3
+        // Load [inPtr+8] into m4
+        // unpack words of m2, m3 and m4 into m2 and m3
+        // multiply-add m2*m6 and m3*m7, store results into m2 and m3
+        // divide m2 and m3 by 512 (=right-shift by overlapDividerBits)
+        // pack the result into m2 and store into [edx+8]
+        SI(m0 = midPtr[0],                movq_a2r(0, midPtr, mm0));// mm0 = m1l m1r m0l m0r
+        outPtr += 2;
+        SI(m3 = inPtr[0],                 movq_a2r(0, inPtr, mm3)); // mm3 = i1l i1r i0l i0r
+        SI(m1 = m0,                       movq_r2r(mm0, mm1));      // mm1 = m1l m1r m0l m0r
+        SI(m2 = midPtr[1],                movq_a2r(8, midPtr, mm2));// mm2 = m3l m3r m2l m2r
+        SI(m0 = _mm_unpacklo_pi16(m0, m3),punpcklwd_r2r(mm3, mm0)); // mm0 = i0l m0l i0r m0r
+        midPtr += 2;
+        SI(m4 = inPtr[1],                 movq_a2r(8, inPtr, mm4)); // mm4 = i3l i3r i2l i2r
+        SI(m1 = _mm_unpackhi_pi16(m1, m3),punpckhwd_r2r(mm3, mm1)); // mm1 = i1l m1l i1r m1r
+        inPtr+=2;
+        SI(m3 = m2,                       movq_r2r(mm2, mm3));      // mm3 = m3l m3r m2l m2r
+        SI(m2 = _mm_unpacklo_pi16(m2, m4),punpcklwd_r2r(mm4, mm2)); // mm2 = i2l m2l i2r m2r
+        // mm0 = i0l*m63+m0l*m62 i0r*m61+m0r*m60
+        SI(m0 = _mm_madd_pi16(m0, m6),    pmaddwd_r2r(mm6, mm0));
+        SI(m3 = _mm_unpackhi_pi16(m3, m4),punpckhwd_r2r(mm4, mm3)); // mm3 = i3l m3l i3r m3r
+        SI(m4 = _mm_cvtsi32_si64(shift),  movd_v2r(shift, mm4));    // mm4 = shift
+        // mm1 = i1l*m73+m1l*m72 i1r*m71+m1r*m70
+        SI(m1 = _mm_madd_pi16(m1, m7),    pmaddwd_r2r(mm7, mm1));
+        SI(m6 = _mm_add_pi16(m6, m5),     paddw_r2r(mm5, mm6));
+        SI(m7 = _mm_add_pi16(m7, m5),     paddw_r2r(mm5, mm7));
+        SI(m0 = _mm_srai_pi32(m0, m4),    psrad_r2r(mm4, mm0));    // mm0 >>= shift
+        // mm2 = i2l*m63+m2l*m62 i2r*m61+m2r*m60
+        SI(m2 = _mm_madd_pi16(m2, m6),    pmaddwd_r2r(mm6, mm2));
+        SI(m1 = _mm_srai_pi32(m1, m4),    psrad_r2r(mm4, mm1));    // mm1 >>= shift
+        // mm3 = i3l*m73+m3l*m72 i3r*m71+m3r*m70
+        SI(m3 = _mm_madd_pi16(m3, m7),    pmaddwd_r2r(mm7, mm3));
+        SI(m2 = _mm_srai_pi32(m2, m4),    psrad_r2r(mm4, mm2));    // mm2 >>= shift
+        SI(m0 = _mm_packs_pi32(m0, m1),   packssdw_r2r(mm1, mm0)); // mm0 = mm1h mm1l mm0h mm0l
+        SI(m3 = _mm_srai_pi32(m3, m4),    psrad_r2r(mm4, mm3));    // mm3 >>= shift
+        SI(m6 = _mm_add_pi16(m6, m5),     paddw_r2r(mm5, mm6));
+        SI(m2 = _mm_packs_pi32(m2, m3),   packssdw_r2r(mm3, mm2)); // mm2 = mm2h mm2l mm3h mm3l
+        SI(m7 = _mm_add_pi16(m7, m5),     paddw_r2r(mm5, mm7));
+        SI(outPtr[0] = m0,                movq_r2a(mm0, 0, outPtr));
+        SI(outPtr[1] = m2,                movq_r2a(mm2, 8, outPtr));
+    } while ((--counter)!=0);
+    _mm_empty();
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 //

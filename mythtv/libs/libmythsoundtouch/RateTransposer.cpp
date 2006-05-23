@@ -329,7 +329,11 @@ void RateTransposer::setChannels(const uint numchannels)
 {
     if (uChannels == numchannels) return;
 
+#ifdef MULTICHANNEL
+    assert(numchannels >= 1 && numchannels <= MULTICHANNEL);
+#else
     assert(numchannels == 1 || numchannels == 2);
+#endif
     uChannels = numchannels;
 
     storeBuffer.setChannels(uChannels);

@@ -52,6 +52,7 @@ typedef unsigned long   ulong;
 
 #endif  // _WINDEF_
 
+    #define MULTICHANNEL 6
 
 namespace soundtouch
 {
