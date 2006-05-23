@@ -376,12 +376,10 @@ bool MediaMonitor::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    QValueList<MythMediaDevice*>::iterator itr = m_Devices.begin();
-    MythMediaDevice* pDev;
-    while (itr != m_Devices.end()) 
+    QValueList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
+    for (; itr != m_Devices.end(); ++itr)
     {
-        pDev = *itr;
-        if (stat(pDev->getDevicePath(), &sb) < 0)
+        if (stat((*itr)->getDevicePath(), &sb) < 0)
         {
             VERBOSE(VB_IMPORTANT, "MediaMonitor::AddDevice() -- " +
                     QString("Failed to stat '%1'")
