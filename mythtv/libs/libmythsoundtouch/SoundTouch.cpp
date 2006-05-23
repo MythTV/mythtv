@@ -36,8 +36,8 @@
 ///   combining the two other controls.
 ///
 /// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai @ iki.fi
-/// SoundTouch WWW: http://www.iki.fi/oparviai/soundtouch
+/// Author e-mail : oparviai 'at' iki.fi
+/// SoundTouch WWW: http://www.surina.net/soundtouch
 ///
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -298,6 +298,7 @@ void SoundTouch::putSamples(const SAMPLETYPE *samples, uint numSamples)
     }
 
     // Transpose the rate of the new samples if necessary
+    /* Bypass the nominal setting - can introduce a click in sound when tempo/pitch control crosses the nominal value...
     if (rate == 1.0f) 
     {
         // The rate value is same as the original, simply evaluate the tempo changer. 
@@ -310,7 +311,8 @@ void SoundTouch::putSamples(const SAMPLETYPE *samples, uint numSamples)
         }
         pTDStretch->putSamples(samples, numSamples);
     } 
-    else if (rate < 1.0f) 
+    */
+    else if (rate <= 1.0f) 
     {
         // transpose the rate down, output the transposed sound to tempo changer buffer
         assert(output == pTDStretch);

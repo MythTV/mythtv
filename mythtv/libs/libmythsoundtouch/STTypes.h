@@ -3,8 +3,8 @@
 /// Common type definitions for SoundTouch audio processing library.
 ///
 /// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai @ iki.fi
-/// SoundTouch WWW: http://www.iki.fi/oparviai/soundtouch
+/// Author e-mail : oparviai 'at' iki.fi
+/// SoundTouch WWW: http://www.surina.net/soundtouch
 ///
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +45,7 @@ typedef unsigned long   ulong;
 #ifndef _WINDEF_
     // if these aren't defined already by Windows headers, define now
 
-    typedef unsigned int    BOOL;
+    typedef int BOOL;
 
     #define FALSE   0
     #define TRUE    1
@@ -55,12 +55,31 @@ typedef unsigned long   ulong;
 
 namespace soundtouch
 {
-    /// Enable one of the following defines to choose either 16bit integer or
-    /// 32bit float sample type. If you don't have opinion, using integer samples
-    /// is generally faster.
-    #define INTEGER_SAMPLES       //< 16bit integer samples
-    //#define FLOAT_SAMPLES       //< 32bit float samples
+/// Activate these undef's to overrule the possible sampletype 
+/// setting inherited from some other header file:
+//#undef INTEGER_SAMPLES
+//#undef FLOAT_SAMPLES
 
+#if !(INTEGER_SAMPLES || FLOAT_SAMPLES)
+   
+    /// Choose either 32bit floating point or 16bit integer sampletype
+    /// by choosing one of the following defines, unless this selection 
+    /// has already been done in some other file.
+    ////
+    /// Notes:
+    /// - In Windows environment, choose the sample format with the
+    ///   following defines.
+    /// - In GNU environment, the floating point samples are used by 
+    ///   default, but integer samples can be chosen by giving the 
+    ///   following switch to the configure script:
+    ///       ./configure --enable-integer-samples
+    ///   However, if you still prefer to select the sample format here 
+    ///   also in GNU environment, then please #undef the INTEGER_SAMPLE
+    ///   and FLOAT_SAMPLE defines first as in comments above.
+    #define INTEGER_SAMPLES     1    //< 16bit integer samples
+    //#define FLOAT_SAMPLES       1    //< 32bit float samples
+ 
+ #endif
 
     /// Define this to allow CPU-specific assembler optimizations. Notice that 
     /// having this enabled on non-x86 platforms doesn't matter; the compiler can 
@@ -69,6 +88,12 @@ namespace soundtouch
     /// compiled with your compler (e.g. some gcc compiler versions may be picky), 
     /// you may wish to disable the optimizations to make the library compile.
     #define ALLOW_OPTIMIZATIONS     1
+
+
+    // If defined, allows the SIMD-optimized routines to take minor shortcuts 
+    // for improved performance. Undefine to require faithfully similar SIMD 
+    // calculations as in normal C implementation.
+    #define ALLOW_NONEXACT_SIMD_OPTIMIZATION    1
 
 
     #ifdef INTEGER_SAMPLES
@@ -97,11 +122,14 @@ namespace soundtouch
         typedef double LONG_SAMPLETYPE;
 
         #ifdef ALLOW_OPTIMIZATIONS
-            #ifdef WIN32
                 // Allow 3DNow! and SSE optimizations
+            #if WIN32
                 #define ALLOW_3DNOW     1
+            #endif
+
+            #if WIN32 || __MMX__ || MMX
                 #define ALLOW_SSE       1
-            #endif // WIN32
+            #endif
         #endif
 
     #endif  // INTEGER_SAMPLES

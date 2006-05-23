@@ -21,8 +21,8 @@
 ///   function, calculates it's precise location and converts this reading to bpm's.
 ///
 /// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai @ iki.fi
-/// SoundTouch WWW: http://www.iki.fi/oparviai/soundtouch
+/// Author e-mail : oparviai 'at' iki.fi
+/// SoundTouch WWW: http://www.surina.net/soundtouch
 ///
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -58,6 +58,7 @@
 #define _BPMDetect_H_
 
 #include "STTypes.h"
+#include "FIFOSampleBuffer.h"
 
 /// Minimum allowed BPM rate. Used to restrict accepted result above a reasonable limit.
 #define MIN_BPM 45
@@ -65,9 +66,6 @@
 /// Maximum allowed BPM rate. Used to restrict accepted result below a reasonable limit.
 #define MAX_BPM 230
 
-
-/// Internal class prototype 
-class FIFOSampleBuffer;
 
 /// Class for calculating BPM rate for audio data.
 class BPMDetect
@@ -105,7 +103,7 @@ protected:
     int windowStart;
  
     /// FIFO-buffer for decimated processing samples.
-    FIFOSampleBuffer *buffer;
+    soundtouch::FIFOSampleBuffer *buffer;
 
     /// Initialize the class for processing.
     void init(int numChannels, int sampleRate);

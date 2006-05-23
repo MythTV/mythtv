@@ -7,8 +7,8 @@
 /// of this file.
 ///
 /// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai @ iki.fi
-/// SoundTouch WWW: http://www.iki.fi/oparviai/soundtouch
+/// Author e-mail : oparviai 'at' iki.fi
+/// SoundTouch WWW: http://www.surina.net/soundtouch
 ///
 ////////////////////////////////////////////////////////////////////////////////
 //

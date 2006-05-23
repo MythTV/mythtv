@@ -36,8 +36,8 @@
 ///   combining the two other controls.
 ///
 /// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai @ iki.fi
-/// SoundTouch WWW: http://www.iki.fi/oparviai/soundtouch
+/// Author e-mail : oparviai 'at' iki.fi
+/// SoundTouch WWW: http://www.surina.net/soundtouch
 ///
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -79,10 +79,10 @@ namespace soundtouch
 {
 
 /// Soundtouch library version string
-#define SOUNDTOUCH_VERSION          "1.3.0"
+#define SOUNDTOUCH_VERSION          "1.3.1"
 
 /// SoundTouch library version id
-#define SOUNDTOUCH_VERSION_ID       010300
+#define SOUNDTOUCH_VERSION_ID       010301
 
 //
 // Available setting IDs for the 'setSetting' & 'get_setting' functions:
@@ -209,7 +209,7 @@ public:
     /// the input of the object. Notice that sample rate _has_to_ be set before
     /// calling this function, otherwise throws a runtime_error exception.
     virtual void putSamples(
-            const soundtouch::SAMPLETYPE *samples,  ///< Pointer to sample buffer.
+            const SAMPLETYPE *samples,  ///< Pointer to sample buffer.
             uint numSamples                         ///< Number of samples in buffer. Notice
                                                     ///< that in case of stereo-sound a single sample
                                                     ///< contains data for both channels.
