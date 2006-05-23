@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060521-2"
+VERSION="0.1.20060523-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -200,7 +200,18 @@ def getText(node):
         return ""
 
 def getThemeFile(theme,file):
-    return os.path.join(sharepath, "mytharchive", "themes", theme, file)
+    """Find a theme file - first look in the specified theme directory then look in the
+       shared music and image directories"""
+    if os.path.exists(os.path.join(sharepath, "mytharchive", "themes", theme, file)):
+        return os.path.join(sharepath, "mytharchive", "themes", theme, file)
+
+    if os.path.exists(os.path.join(sharepath, "mytharchive", "images", file)):
+        return os.path.join(sharepath, "mytharchive", "images", file)
+
+    if os.path.exists(os.path.join(sharepath, "mytharchive", "music", file)):
+        return os.path.join(sharepath, "mytharchive", "music", file)
+
+    fatalError("Cannot find theme file '%s' in theme '%s'" % (file, theme))
 
 def getFontPathName(fontname):
     return os.path.join(sharepath, fontname)
@@ -248,14 +259,13 @@ def runCommand(command):
     checkCancelFlag()
     return result
 
-def encodeMenu(background, tempvideo, music, tempmovie, xmlfile, finaloutput):
+def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, finaloutput):
     if videomode=="pal":
         framespersecond=frameratePAL
     else:
         framespersecond=framerateNTSC
 
-    #Generate 15 seconds of menu
-    totalframes=int(15 * framespersecond)
+    totalframes=int(musiclength * framespersecond)
 
     command = path_png2yuv[0] + " -n %s -v0 -I p -f %s -j '%s' | %s -b 5000 -a 3 -v 1 -f 8 -o '%s'" \
                % (totalframes, framespersecond, background, path_mpeg2enc[0], tempvideo)
@@ -1461,6 +1471,11 @@ def createDVDAuthorXML(screensize, numberofitems):
                 vob.setAttribute("file",os.path.join(getTempPath(),"chaptermenu-%s.mpg" % itemnum))
                 mymenupgc.appendChild(vob)    
 
+                #Loop menu forever
+                post = dvddom.createElement("post")
+                post.appendChild(dvddom.createTextNode("jump cell 1;"))
+                mymenupgc.appendChild(post)
+
                 x=1
                 while x<=chapters:
                     #Add this recording to this page's menu...
@@ -1706,10 +1721,10 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         elif node.nodeName=="previous":
             if page>1:
                 #Overlay previous graphic button onto background
-                imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
                 if not doesFileExist(imagefilename):
                     fatalError("Cannot find image for previous button (%s)." % imagefilename)
-                maskimagefilename = expandItemText(infoDOM,node.attributes["mask"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
                 if not doesFileExist(maskimagefilename):
                     fatalError("Cannot find mask image for previous button (%s)." % maskimagefilename)
 
@@ -1737,10 +1752,10 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         elif node.nodeName=="next":
             if itemnum < numberofitems:
                 #Overlay next graphic button onto background
-                imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+                imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
                 if not doesFileExist(imagefilename):
                     fatalError("Cannot find image for next button (%s)." % imagefilename)
-                maskimagefilename = expandItemText(infoDOM,node.attributes["mask"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+                maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
                 if not doesFileExist(maskimagefilename):
                     fatalError("Cannot find mask image for next button (%s)." % maskimagefilename)
 
@@ -1768,10 +1783,10 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
             wantHighlightBox = False
 
             #Overlay item graphic/text button onto background
-            imagefilename = expandItemText(infoDOM,node.attributes["filename"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+            imagefilename = getThemeFile(themeName, node.attributes["filename"].value)
             if not doesFileExist(imagefilename):
                     fatalError("Cannot find image for menu button (%s)." % imagefilename)
-            maskimagefilename = expandItemText(infoDOM,node.attributes["mask"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
+            maskimagefilename = getThemeFile(themeName, node.attributes["mask"].value)
             if not doesFileExist(maskimagefilename):
                     fatalError("Cannot find mask image for menu button (%s)." % maskimagefilename)
 
@@ -1830,7 +1845,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                 del text, textImage, textDraw
             del picture
 
-        elif node.nodeName=="#text":
+        elif node.nodeName=="#text" or node.nodeName=="#comment":
             #Do nothing
             assert True
         else:
@@ -1892,6 +1907,18 @@ def createMenu(screensize, numberofitems):
     highlightcolor = "red"
     if menunode.hasAttribute("highlightcolor"):
         highlightcolor = menunode.attributes["highlightcolor"].value
+
+    #Get menu music
+    menumusic = "menumusic.mp2"
+    if menunode.hasAttribute("music"):
+        menumusic = menunode.attributes["music"].value
+
+    #Get menu length
+    menulength = 15
+    if menunode.hasAttribute("length"):
+        menulength = int(menunode.attributes["length"].value)
+
+    write("Music is %s, length is %s seconds" % (menumusic, menulength))
 
     #Page number counter
     page=1
@@ -1957,7 +1984,8 @@ def createMenu(screensize, numberofitems):
         write("Encoding Menu Page %s" % page)
         encodeMenu(os.path.join(getTempPath(),"background-%s.png" % page),
                     os.path.join(getTempPath(),"temp.m2v"),
-                    getThemeFile(themeName,"menumusic.mp2"),
+                    getThemeFile(themeName,menumusic),
+                    menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
                     os.path.join(getTempPath(),"spumux-%s.xml" % page),
                     os.path.join(getTempPath(),"menu-%s.mpg" % page))
@@ -1997,6 +2025,18 @@ def createChapterMenu(screensize, numberofitems):
     highlightcolor = "red"
     if menunode.hasAttribute("highlightcolor"):
         highlightcolor = menunode.attributes["highlightcolor"].value
+
+    #Get menu music
+    menumusic = "menumusic.mp2"
+    if menunode.hasAttribute("music"):
+        menumusic = menunode.attributes["music"].value
+
+    #Get menu length
+    menulength = 15
+    if menunode.hasAttribute("length"):
+        menulength = int(menunode.attributes["length"].value)
+
+    write("Music is %s, length is %s seconds" % (menumusic, menulength))
 
     #Page number counter
     page=1
@@ -2056,7 +2096,8 @@ def createChapterMenu(screensize, numberofitems):
         write("Encoding Chapter Menu Page %s" % page)
         encodeMenu(os.path.join(getTempPath(),"chaptermenu-%s.png" % page),
                     os.path.join(getTempPath(),"temp.m2v"),
-                    getThemeFile(themeName,"menumusic.mp2"),
+                    getThemeFile(themeName,menumusic),
+                    menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
                     os.path.join(getTempPath(),"chapterspumux-%s.xml" % page),
                     os.path.join(getTempPath(),"chaptermenu-%s.mpg" % page))
@@ -2089,6 +2130,18 @@ def createDetailsPage(screensize, numberofitems):
     if not doesFileExist(backgroundfilename):
         fatalError("Background image not found (%s)" % backgroundfilename)
 
+    #Get menu music
+    menumusic = "menumusic.mp2"
+    if detailnode.hasAttribute("music"):
+        menumusic = detailnode.attributes["music"].value
+
+    #Get menu length
+    menulength = 15
+    if detailnode.hasAttribute("length"):
+        menulength = int(detailnode.attributes["length"].value)
+
+    write("Music is %s, length is %s seconds" % (menumusic, menulength))
+
     #Item counter to indicate current video item
     itemnum=1
 
@@ -2118,7 +2171,8 @@ def createDetailsPage(screensize, numberofitems):
         write("Encoding Details Page %s" % itemnum)
         encodeMenu(os.path.join(getTempPath(),"details-%s.png" % itemnum),
                     os.path.join(getTempPath(),"temp.m2v"),
-                    getThemeFile(themeName,"menumusic.mp2"),
+                    getThemeFile(themeName,menumusic),
+                    menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
                     os.path.join(getTempPath(),"detailsspumux-%s.xml" % itemnum),
                     os.path.join(getTempPath(),"details-%s.mpg" % itemnum))
@@ -2315,10 +2369,9 @@ def selectStreams(folder):
                         if pid < audio2[AUDIO_ID] and pid != audio1[AUDIO_ID]:
                             audio2 = (index, format, pid, lang)
 
-
-    write("Video id: %x, Audio1: %x (%s, %s), Audio2: %x (%s, %s)" % \
-        (video[VIDEO_ID], audio1[AUDIO_ID], audio1[AUDIO_CODEC], audio1[AUDIO_LANG], \
-         audio2[AUDIO_ID], audio2[AUDIO_CODEC], audio2[AUDIO_LANG]))
+    write("Video id: 0x%x, Audio1: [%d] 0x%x (%s, %s), Audio2: [%d] - 0x%x (%s, %s)" % \
+        (video[VIDEO_ID], audio1[AUDIO_INDEX], audio1[AUDIO_ID], audio1[AUDIO_CODEC], audio1[AUDIO_LANG], \
+         audio2[AUDIO_INDEX], audio2[AUDIO_ID], audio2[AUDIO_CODEC], audio2[AUDIO_LANG]))
 
     return (video, audio1, audio2)
 
@@ -2463,7 +2516,7 @@ def processFile(file, folder):
             else:
                 #does the user always want to run recordings through mythtranscode?
                 #may help to fix any errors in the file 
-                if alwaysRunMythtranscode == True or getFileType(folder) == "mpegts":
+                if alwaysRunMythtranscode == True or (getFileType(folder) == "mpegts" and isFileOkayForDVD(folder)):
                     write("Attempting to run mythtranscode --mpeg2 to fix any errors")
                     chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                     starttime = getText(infoDOM.getElementsByTagName("starttime")[0])

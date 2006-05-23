@@ -9,11 +9,11 @@
 
     <intro filename="mythlogo_intro.mpg"/>
 
-    <menu background="MythCenter-Background.png" highlightcolor="yellow">
+    <menu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.mp2" length="15" >
 		<!-- item holds the position of a menu item ie. recording -->
 		<item>
 			<text x="80" y="15" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
-			<previous filename="%myfolderprevious.png" x="300" y="445" w="48" h="48" mask="%myfolderprevious_mask.png" static="True"/>
+			<previous filename="previous.png" x="300" y="445" w="48" h="48" mask="previous_mask.png" static="True"/>
 			<graphic filename="%thumbnail" x="80" y="35" w="145" h="110" static="False"/>
 			<text x="235" y="35" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
 			<text x="235" y="60" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
@@ -33,10 +33,10 @@
 			<text x="235" y="340" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
 			<text x="235" y="360" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
 			<text x="235" y="380" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
-			<next filename="%myfoldernext.png" x="375" y="445" w="48" h="48" mask="%myfoldernext_mask.png" static="False"/>
+			<next filename="next.png" x="375" y="445" w="48" h="48" mask="next_mask.png" static="False"/>
 		</item>
 	</menu>
-    <submenu background="MythCenter-Background.png" highlightcolor="yellow">
+    <submenu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.mp2" length="15" >
 		<!-- Describes a menu or short video that will appear after the recording has been selected -->
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="50" y="45" w="145" h="110" static="False"/>

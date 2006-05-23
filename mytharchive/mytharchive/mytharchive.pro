@@ -24,13 +24,19 @@ scriptfiles.files = ../mythburn/scripts/*
 introfiles.path = $${PREFIX}/share/mythtv/mytharchive/intro
 introfiles.files = ../mythburn/intro/*.mpg
 
+musicfiles.path = $${PREFIX}/share/mythtv/mytharchive/music
+musicfiles.files = ../mythburn/music/*.mp2
+
+imagefiles.path = $${PREFIX}/share/mythtv/mytharchive/images
+imagefiles.files = ../mythburn/images/*.png
+
 themefiles.path = $${PREFIX}/share/mythtv/mytharchive/themes
 themefiles.files = ../mythburn/themes/*
 
 #fontfiles.path = $${PREFIX}/share/mythtv
 #fontfiles.files = ../fonts/*.ttf
 
-INSTALLS += menufiles uifiles scriptfiles introfiles themefiles
+INSTALLS += menufiles uifiles scriptfiles introfiles themefiles imagefiles musicfiles 
 
 HEADERS += archivesettings.h mythburnwizard.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h editmetadata.h

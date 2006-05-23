@@ -13,7 +13,7 @@
 		<!-- item holds the position of a menu item ie. recording -->
 		<item>
 			<text x="60" y="50" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
-			<previous filename="%myfolderprevious.png" x="300" y="450" w="48" h="48" mask="%myfolderprevious_mask.png" static="True"/>
+			<previous filename="previous.png" x="300" y="450" w="48" h="48" mask="previous_mask.png" static="True"/>
 			
 			<text x="135" y="95" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
 			<text x="135" y="120" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
@@ -35,7 +35,7 @@
 			<text x="135" y="360" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
 		</item>
 		<item>
-			<next filename="%myfoldernext.png" x="372" y="450" w="48" h="48" mask="%myfoldernext_mask.png" static="False"/>
+			<next filename="next.png" x="372" y="450" w="48" h="48" mask="next_mask.png" static="False"/>
 			<text x="135" y="395" w="450" h="28" value="%keynumber. %title" font="0" colour="yellow" static="False" align="center"/>
 			<text x="135" y="420" w="450" h="25" value="%recordingdate %recordingtime" font="1" colour="white" static="False" align="center"/>
 		</item>
