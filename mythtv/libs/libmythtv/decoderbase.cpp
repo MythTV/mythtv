@@ -889,7 +889,7 @@ int DecoderBase::AutoSelectTrack(uint type)
         // Find first track stream that matches a language in
         // order of most preferred to least preferred language.
         vector<int>::iterator it = languagePreference.begin();
-        for (; it != languagePreference.end(); ++it)
+        for (; it != languagePreference.end() && (selTrack < 0); ++it)
         {
             for (uint i = 0; i < numStreams; i++)
             {
