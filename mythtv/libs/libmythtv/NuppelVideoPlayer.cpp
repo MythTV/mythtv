@@ -3672,10 +3672,13 @@ void NuppelVideoPlayer::DoPlay(void)
                     .arg((disable) ? "disable" : "allow"));
             decoder->SetDisablePassThrough(disable);
         }
-        audioOutput->SetStretchFactor(play_speed);
+        if (audioOutput)
+        {
+            audioOutput->SetStretchFactor(play_speed);
 #ifdef USING_DIRECTX
-        audioOutput->Reset();
+            audioOutput->Reset();
 #endif
+        }
     }
 
     //cout << "setting unpaused" << endl << endl;
