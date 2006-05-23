@@ -1,5 +1,6 @@
 #include <map>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 #include "mythcontext.h"
@@ -178,10 +179,7 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     if (!outputpictures)
         return false;
 
-    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-    ChangePictureAttribute(kPictureAttribute_Colour, colour);
-    ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    InitPictureAttributes();
 
     MoveResize();
     
@@ -441,21 +439,19 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
     DisplayOSD(frame, osd);
 }
 
-int VideoOutputDX::ChangePictureAttribute(int attribute, int newValue)
+int VideoOutputDX::SetPictureAttribute(int attribute, int newValue)
 {
     if (ccontrol == NULL)
         return -1;
         
-    if (newValue > 100)
-        newValue = 100;
-    if (newValue < 0)
-        newValue = 0;
+    newValue = min(max(newValue, 0), 100);
         
     DDCOLORCONTROL ddcc;
     memset(&ddcc, 0, sizeof(DDCOLORCONTROL));
     ddcc.dwSize = sizeof(DDCOLORCONTROL);
         
-    switch (attribute) {
+    switch (attribute)
+    {
         case kPictureAttribute_Brightness:
             ddcc.dwFlags = DDCOLOR_BRIGHTNESS;
             ddcc.lBrightness = (newValue * newValue * 17) / 10 - 70 * newValue;
@@ -480,10 +476,14 @@ int VideoOutputDX::ChangePictureAttribute(int attribute, int newValue)
     
     dxresult = IDirectDrawColorControl_SetColorControls(ccontrol, &ddcc);
     
-    if (dxresult != DD_OK) {
-        VERBOSE(VB_IMPORTANT, "Could not update colour controls: " << hex << dxresult << dec);
+    if (dxresult != DD_OK)
+    {
+        VERBOSE(VB_IMPORTANT, "Could not update colour controls: "
+                << hex << dxresult << dec);
         return -1;
     }
+
+    SetPictureAttributeDBValue(attribute, newValue);
     
     return newValue;
 }

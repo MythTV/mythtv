@@ -211,19 +211,10 @@ class VideoOutput
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void) { needrepaint = true; }
 
-    int ChangeBrightness(bool up);
-    int ChangeContrast(bool up);
-    int ChangeColour(bool up);
-    int ChangeHue(bool up);
-
-    /// \brief Returns current playback brightness
-    int GetCurrentBrightness(void) { return brightness; }
-    /// \brief Returns current playback contrast
-    int GetCurrentContrast(void) { return contrast; }
-    /// \brief Returns current playback colour
-    int GetCurrentColour(void) { return colour; }
-    /// \brief Returns current playback hue
-    int GetCurrentHue(void) { return hue; }
+    int         ChangePictureAttribute(int attributeType, bool direction);
+    virtual int SetPictureAttribute(int attributeType, int newValue);
+    int         GetPictureAttribute(int attributeType) const;
+    void        InitPictureAttributes(void);
 
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
@@ -319,7 +310,7 @@ class VideoOutput
     virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
-    virtual int ChangePictureAttribute(int attributeType, int newValue);
+    virtual void SetPictureAttributeDBValue(int attributeType, int newValue);
     virtual QRect GetVisibleOSDBounds(float&, float&) const;
     virtual QRect GetTotalOSDBounds(void) const;
 
@@ -346,10 +337,7 @@ class VideoOutput
     float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
     int     db_pip_location;
     int     db_pip_size;      ///< percentage of full window to use for PiP
-    int     db_pict_brightness;
-    int     db_pict_contrast;
-    int     db_pict_colour;
-    int     db_pict_hue;
+    QMap<int,int> db_pict_attr; ///< Picture settings
     int     db_letterbox;
     QString db_deint_filtername;
 
@@ -381,12 +369,6 @@ class VideoOutput
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
     QRect   tmp_display_visible_rect;
-
-    // Picture settings
-    int     brightness;
-    int     contrast;
-    int     colour;
-    int     hue;
 
     // Picture-in-Picture
     QSize   pip_desired_display_size;

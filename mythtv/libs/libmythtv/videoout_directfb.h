@@ -39,7 +39,7 @@ class VideoOutputDirectfb: public VideoOutput
                       FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
-    int ChangePictureAttribute(int attribute, int newValue);
+    int  SetPictureAttribute(int attribute, int newValue);
 
   private:
     bool CreateDirectfbBuffers(DFBSurfaceDescription);

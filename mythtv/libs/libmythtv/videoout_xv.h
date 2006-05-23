@@ -78,7 +78,7 @@ class VideoOutputXv : public VideoOutput
     void StopEmbedding(void);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
-    int ChangePictureAttribute(int attribute, int newValue);
+    int  SetPictureAttribute(int attribute, int newValue);
 
     int  GetRefreshRate(void);
 
@@ -100,7 +100,8 @@ class VideoOutputXv : public VideoOutput
                                   MythCodecID type,
                                   uint width, uint height,
                                   int xvmc_chroma = 0,
-                                  XvMCSurfaceInfo* si = NULL);
+                                  XvMCSurfaceInfo* si = NULL,
+                                  QString *adaptor_name = NULL);
 
     static XvMCContext* CreateXvMCContext(Display* disp, int port,
                                           int surf_type,
@@ -212,6 +213,7 @@ class VideoOutputXv : public VideoOutput
 
     // Basic Xv drawing info
     int                  xv_port;
+    int                  xv_hue_base;
     int                  xv_colorkey;
     bool                 xv_draw_colorkey;
     int                  xv_chroma;

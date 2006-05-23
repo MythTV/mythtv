@@ -97,8 +97,9 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xvmc_osd_lock(false),
       xvmc_tex(NULL),
 
-      xv_port(-1), xv_colorkey(0), xv_draw_colorkey(false), xv_chroma(0),
-      xv_color_conv_buf(NULL),
+      xv_port(-1),      xv_hue_base(0),
+      xv_colorkey(0),   xv_draw_colorkey(false),
+      xv_chroma(0),     xv_color_conv_buf(NULL),
 
       chroma_osd(NULL)
 {
@@ -474,7 +475,8 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
                                       MythCodecID mcodecid,
                                       uint width, uint height,
                                       int xvmc_chroma,
-                                      XvMCSurfaceInfo* xvmc_surf_info)
+                                      XvMCSurfaceInfo* xvmc_surf_info,
+                                      QString *adaptor_name)
 {
     uint neededFlags[] = { XvInputMask,
                            XvInputMask,
@@ -495,6 +497,9 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
         "XvMC surface found with MC support on port %1",
         "XVideo surface found on port %1"
     };
+
+    if (adaptor_name)
+        *adaptor_name = QString::null;
 
     // get the list of Xv ports
     XvAdaptorInfo *ai = NULL;
@@ -534,6 +539,7 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
             break;
     }
 
+    QString lastAdaptorName = QString::null;
     for (uint j = begin; j < end; ++j)
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2")
@@ -541,8 +547,10 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
 
         for (uint i = 0; i < p_num_adaptors && (port == -1); ++i) 
         {
-            VERBOSE(VB_PLAYBACK, LOC + QString("Adaptor: %1 has flag[s]: %2")
-                    .arg(i).arg(xvflags2str(ai[i].type)));
+            lastAdaptorName = ai[i].name;
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Adaptor#%1: %2 has flag[s]: %3")
+                    .arg(i).arg(lastAdaptorName).arg(xvflags2str(ai[i].type)));
 
             if ((ai[i].type & neededFlags[j]) != neededFlags[j])
                 continue;
@@ -614,6 +622,9 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
     // free list of Xv ports
     if (ai)
         X11S(XvFreeAdaptorInfo(ai));
+
+    if ((port != -1) && adaptor_name)
+        *adaptor_name = lastAdaptorName;
 
     return port;
 }
@@ -729,10 +740,10 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
 {
     (void)mcodecid;
 #ifdef USING_XVMC
+    QString adaptor_name = QString::null;
     xv_port = GrabSuitableXvPort(XJ_disp, XJ_root, mcodecid,
                                  video_dim.width(), video_dim.height(),
-                                 xvmc_chroma,
-                                 &xvmc_surf_info);
+                                 xvmc_chroma, &xvmc_surf_info, &adaptor_name);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -793,14 +804,22 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
  */
 bool VideoOutputXv::InitXVideo()
 {
+    QString adaptor_name = QString::null;
     xv_port = GrabSuitableXvPort(XJ_disp, XJ_root, kCodec_MPEG2,
-                                 video_dim.width(), video_dim.height());
+                                 video_dim.width(), video_dim.height(),
+                                 0, NULL, &adaptor_name);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Could not find suitable XVideo surface.");
         return false;
     }
+
+    VERBOSE(VB_IMPORTANT, LOC + QString("XVideo Adaptor Name: '%1'")
+            .arg(adaptor_name));
+
+    if (adaptor_name == "ATI Radeon Video Overlay")
+        xv_hue_base = 50;
 
     InstallXErrorHandler(XJ_disp);
 
@@ -1142,12 +1161,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     // The XVideo output methods sometimes allow the picture to
     // be adjusted, if the chroma keying color can be discovered.
     if (VideoOutputSubType() >= XVideo && xv_colorkey)
-    {
-        ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-        ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-        ChangePictureAttribute(kPictureAttribute_Colour, colour);
-        ChangePictureAttribute(kPictureAttribute_Hue, hue);
-    }
+        InitPictureAttributes();
 
     return true;
 }
@@ -2999,69 +3013,73 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
         ProcessFrameXvMC(frame, osd);
 }
 
-int VideoOutputXv::ChangePictureAttribute(int attribute, int newValue)
+// this is documented in videooutbase.cpp
+int VideoOutputXv::SetPictureAttribute(int attribute, int newValue)
 {
-    int value;
-    int i, howmany, port_min, port_max, range;
-    char *attrName = NULL;
-    Atom attributeAtom;
-    XvAttribute *attributes;
+    QString  attrName = QString::null;
+    int      valAdj   = 0;
 
-    switch (attribute)
+    if (kPictureAttribute_Brightness == attribute)
+        attrName = "XV_BRIGHTNESS";
+    else if (kPictureAttribute_Contrast == attribute)
+        attrName = "XV_CONTRAST";
+    else if (kPictureAttribute_Colour == attribute)
+        attrName = "XV_SATURATION";
+    else if (kPictureAttribute_Hue == attribute)
     {
-        case kPictureAttribute_Brightness:
-            attrName = "XV_BRIGHTNESS";
-            break;
-        case kPictureAttribute_Contrast:
-            attrName = "XV_CONTRAST";
-            break;
-        case kPictureAttribute_Colour:
-            attrName = "XV_SATURATION";
-            break;
-        case kPictureAttribute_Hue:
-            attrName = "XV_HUE";
-            break;
+        attrName = "XV_HUE";
+        valAdj   = xv_hue_base;
     }
 
-    if (!attrName)
+    if (attrName.isEmpty())
         return -1;
 
-    newValue = max(newValue, 0);
-    newValue = min(newValue, 100);
+    newValue = min(max(newValue, 0), 100);
 
-    X11S(attributeAtom = XInternAtom (XJ_disp, attrName, False));
-    if (!attributeAtom)
+    Atom attributeAtom = None;
+    X11S(attributeAtom = XInternAtom(XJ_disp, attrName.ascii(), False));
+    if (attributeAtom == None)
         return -1;
 
+    XvAttribute *attributes = NULL;
+    int howmany;
     X11S(attributes = XvQueryPortAttributes(XJ_disp, xv_port, &howmany));
     if (!attributes)
         return -1;
 
-    for (i = 0; i < howmany; i++)
+    bool value_set = false;
+    for (int i = 0; i < howmany; i++)
     {
-        if (!strcmp(attrName, attributes[i].name))
-        {
-            port_min = attributes[i].min_value;
-            port_max = attributes[i].max_value;
-            range = port_max - port_min;
+        if (attrName != attributes[i].name)
+            continue;
 
-            int tmpval = (int) roundf(range * 0.01f * newValue);
-            value = min(tmpval + port_min, port_max);
+        int port_min = attributes[i].min_value;
+        int port_max = attributes[i].max_value;
+        int range    = port_max - port_min;
 
-            X11L;
-            XvSetPortAttribute(XJ_disp, xv_port, attributeAtom, value);
+        int tmpval2 = (newValue + valAdj) % 100;
+        int tmpval3 = (int) roundf(range * 0.01f * tmpval2);
+        int value   = min(tmpval3 + port_min, port_max);
+        value_set = true;
+
+        X11L;
+        XvSetPortAttribute(XJ_disp, xv_port, attributeAtom, value);
 #ifdef USING_XVMC
-            // Needed for VIA XvMC to commit change immediately.
-            if (video_output_subtype > XVideo)
-                XvMCSetAttribute(XJ_disp, xvmc_ctx, attributeAtom, value);
+        // Needed for VIA XvMC to commit change immediately.
+        if (video_output_subtype > XVideo)
+            XvMCSetAttribute(XJ_disp, xvmc_ctx, attributeAtom, value);
 #endif
-            X11U;
-
-            return newValue;
-        }
+        X11U;
+        break;
     }
 
-    return -1;
+    X11S(XFree(attributes));
+
+    if (!value_set)
+        return -1;
+
+    SetPictureAttributeDBValue(attribute, newValue);
+    return newValue;
 }
 
 void VideoOutputXv::CheckFrameStates(void)

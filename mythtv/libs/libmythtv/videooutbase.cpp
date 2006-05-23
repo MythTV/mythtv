@@ -147,8 +147,6 @@ VideoOutput::VideoOutput() :
     db_display_dim(0,0),                db_move(0,0),
     db_scale_horiz(0.0f),               db_scale_vert(0.0f),
     db_pip_location(0),                 db_pip_size(26),
-    db_pict_brightness(0),              db_pict_contrast(0),
-    db_pict_colour(0),                  db_pict_hue(0),
     db_letterbox(kLetterbox_Off),       db_deint_filtername(QString::null),
 
     // Manual Zoom
@@ -166,10 +164,6 @@ VideoOutput::VideoOutput() :
     // Screen settings
     video_rect(0,0,0,0),                display_video_rect(0,0,0,0),
     display_visible_rect(0,0,0,0),      tmp_display_visible_rect(0,0,0,0),
-
-    // Picture settings
-    brightness(0),                      contrast(0),
-    colour(0),                          hue(0),
 
     // Picture-in-Picture stuff
     pip_desired_display_size(160,128),  pip_display_size(0,0),
@@ -204,10 +198,14 @@ VideoOutput::VideoOutput() :
     db_pip_location    = gContext->GetNumSetting("PIPLocation",        0);
     db_pip_size        = gContext->GetNumSetting("PIPSize",           26);
 
-    db_pict_brightness = gContext->GetNumSetting("PlaybackBrightness",50);
-    db_pict_contrast   = gContext->GetNumSetting("PlaybackContrast",  50);
-    db_pict_colour     = gContext->GetNumSetting("PlaybackColour",    50);
-    db_pict_hue        = gContext->GetNumSetting("PlaybackHue",        0);
+    db_pict_attr[kPictureAttribute_Brightness] =
+        gContext->GetNumSetting("PlaybackBrightness", 50);
+    db_pict_attr[kPictureAttribute_Contrast] =
+        gContext->GetNumSetting("PlaybackContrast",   50);
+    db_pict_attr[kPictureAttribute_Colour] =
+        gContext->GetNumSetting("PlaybackColour",     50);
+    db_pict_attr[kPictureAttribute_Hue] =
+        gContext->GetNumSetting("PlaybackHue",         0);
 
     db_letterbox       = gContext->GetNumSetting("AspectOverride",     0);
     db_deint_filtername= gContext->GetSetting("DeinterlaceFilter",
@@ -253,10 +251,6 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     video_dim            = QSize(width, height);
     video_rect           = QRect(QPoint(winx, winy), fix_1080i(video_dim));
 
-    brightness = db_pict_brightness;
-    contrast   = db_pict_contrast;
-    colour     = db_pict_colour;
-    hue        = db_pict_hue;
     letterbox  = db_letterbox;
 
     VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
@@ -960,87 +954,67 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
     VideoAspectRatioChanged(video_aspect);
 }
 
+int VideoOutput::ChangePictureAttribute(int attributeType, bool direction)
+{
+    int curVal = GetPictureAttribute(attributeType);
+    if (curVal < 0)
+        return -1;
+
+    int newVal = curVal + (direction) ? +1 : -1;
+
+    if (kPictureAttribute_Hue == attributeType)
+        newVal = newVal % 100;
+
+    newVal = min(max(newVal, 0), 100);
+
+    return SetPictureAttribute(attributeType, newVal);
+}
+
 /**
- * \fn VideoOutput::ChangePictureAttribute(int, int)
+ * \fn VideoOutput::SetPictureAttribute(int, int)
  * \brief Sets a specified picture attribute.
  * \param attribute Picture attribute to set.
  * \param newValue  Value to set attribute to.
  * \return Set value if it succeeds, -1 if it does not.
  */
-int VideoOutput::ChangePictureAttribute(int attribute, int newValue)
+int VideoOutput::SetPictureAttribute(int attribute, int newValue)
 {
     (void)attribute;
     (void)newValue;
     return -1;
 }
 
-/**
- * \fn VideoOutput::ChangeBrightness(bool)
- * \brief Increases brightenss if "up" is true, decreases it otherwise.
- * \return new value if it succeeds, old value if it does not.
- */
-int VideoOutput::ChangeBrightness(bool up)
+int VideoOutput::GetPictureAttribute(int attributeType) const
 {
-    int result;
-
-    result = this->ChangePictureAttribute(kPictureAttribute_Brightness, 
-                                          brightness + ((up) ? 1 : -1) );
-
-    brightness = (result == -1) ? brightness : result;
-
-    return brightness;
+    QMap<int,int>::const_iterator it = db_pict_attr.find(attributeType);
+    if (it == db_pict_attr.end())
+        return -1;
+    return *it;
 }
 
-/**
- * \fn VideoOutput::ChangeContrast(bool)
- * \brief Increases contrast if "up" is true, decreases it otherwise.
- * \return new value if it succeeds, old value if it does not.
- */
-int VideoOutput::ChangeContrast(bool up)
+void VideoOutput::InitPictureAttributes(void)
 {
-    int result;
-
-    result = this->ChangePictureAttribute(kPictureAttribute_Contrast, 
-                                          contrast + ((up) ? 1 : -1) );
-
-    contrast = (result == -1) ? contrast : result;
-
-    return contrast;
+    QMap<int,int>::const_iterator it = db_pict_attr.begin();
+    for (; it != db_pict_attr.end(); ++it)
+        SetPictureAttribute(it.key(), *it);
 }
 
-/**
- * \fn VideoOutput::ChangeColour(bool)
- * \brief Increases colour phase if "up" is true, decreases it otherwise.
- * \return new value if it succeeds, old value if it does not.
- */
-int VideoOutput::ChangeColour(bool up)
+void VideoOutput::SetPictureAttributeDBValue(int attributeType, int newValue)
 {
-    int result;
+    QString dbName = QString::null;
+    if (kPictureAttribute_Brightness == attributeType)
+        dbName = "PlaybackBrightness";
+    else if (kPictureAttribute_Contrast == attributeType)
+        dbName = "PlaybackContrast";
+    else if (kPictureAttribute_Colour == attributeType)
+        dbName = "PlaybackColour";
+    else if (kPictureAttribute_Hue == attributeType)
+        dbName = "PlaybackHue";
 
-    result = this->ChangePictureAttribute(kPictureAttribute_Colour, 
-                                          colour + ((up) ? 1 : -1) );
-    colour = (result == -1) ? colour : result;
+    if (!dbName.isEmpty())
+        gContext->SaveSetting(dbName, newValue);
 
-    return colour;
-}
-
-/**
- * \fn VideoOutput::ChangeHue(bool)
- * \brief Increases Hue phase if "up" is true, decreases it otherwise.
- * \return new value if it succeeds, old value if it does not.
- */
-int VideoOutput::ChangeHue(bool up)
-{
-    int newhue = hue + ((up) ? 1 : -1);
-
-    // wrap around the hue...
-    newhue = (newhue <  0) ? 99 : newhue;
-    newhue = (newhue > 99) ? 0  : newhue;
-
-    if (ChangePictureAttribute(kPictureAttribute_Hue, newhue) < 0)
-        return hue;
-
-    return hue = newhue;
+    db_pict_attr[attributeType] = newValue;
 }
 
 /**

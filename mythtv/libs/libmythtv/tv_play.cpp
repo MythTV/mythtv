@@ -5536,16 +5536,11 @@ void TV::DoTogglePictureAttribute(int itype)
     int value = 99;
     if (nvp && (kAdjustingPicture_Playback == type))
     {
-        if (kPictureAttribute_Brightness == adjustingPictureAttribute)
-            value = nvp->getVideoOutput()->GetCurrentBrightness();
-        else if (kPictureAttribute_Contrast == adjustingPictureAttribute)
-            value = nvp->getVideoOutput()->GetCurrentContrast();
-        else if (kPictureAttribute_Colour == adjustingPictureAttribute)
-            value = nvp->getVideoOutput()->GetCurrentColour();
-        else if (kPictureAttribute_Hue == adjustingPictureAttribute)
-            value = nvp->getVideoOutput()->GetCurrentHue();
-        else if ((kPictureAttribute_Volume == adjustingPictureAttribute) &&
-                 nvp->getAudioOutput())
+        if (kPictureAttribute_Volume != adjustingPictureAttribute)
+        {
+            value = nvp->getVideoOutput()->GetPictureAttribute(attr);
+        }
+        else if (nvp->getAudioOutput())
         {
             value = nvp->getAudioOutput()->GetCurrentVolume();
             title = tr("Adjust Volume");
@@ -5576,31 +5571,12 @@ void TV::DoChangePictureAttribute(int itype, int control, bool up)
 
     if (nvp && (kAdjustingPicture_Playback == type))
     {
-        if (kPictureAttribute_Brightness == control)
-        {
-            value = nvp->getVideoOutput()->ChangeBrightness(up);
-            gContext->SaveSetting("PlaybackBrightness", value);
-        }
-        else if (kPictureAttribute_Contrast == control)
-        {
-            value = nvp->getVideoOutput()->ChangeContrast(up);
-            gContext->SaveSetting("PlaybackContrast", value);
-        }
-        else if (kPictureAttribute_Colour == control)
-        {
-            value = nvp->getVideoOutput()->ChangeColour(up);
-            gContext->SaveSetting("PlaybackColour", value);
-        }
-        else if (kPictureAttribute_Hue == control)
-        {
-            value = nvp->getVideoOutput()->ChangeHue(up);
-            gContext->SaveSetting("PlaybackHue", value);
-        }
-        else if (kPictureAttribute_Volume == control)
+        if (kPictureAttribute_Volume == control)
         {
             ChangeVolume(up);
             return;
         }
+        value = nvp->getVideoOutput()->ChangePictureAttribute(attr, up);
     }
     else if (activerecorder && (kAdjustingPicture_Playback != type))
     {

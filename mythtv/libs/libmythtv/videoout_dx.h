@@ -34,7 +34,7 @@ class VideoOutputDX : public VideoOutput
                       NuppelVideoPlayer *pipPlayer);
 
     void MoveResize(void);
-    int ChangePictureAttribute(int attribute, int newValue);
+    int  SetPictureAttribute(int attribute, int newValue);
  
     float GetDisplayAspect(void) const { return ((float) dispw)/disph; }
     

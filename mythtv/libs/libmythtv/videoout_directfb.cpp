@@ -3,8 +3,8 @@
 * Use DirectFB for video output while watvhing TV
 * Most of this is ripped from videoout_* and mplayer's vo_directfb */
 
+#include <algortihm>
 #include <iostream>
-
 using namespace std;
 
 #include <qapplication.h>
@@ -484,10 +484,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     VERBOSE(VB_GENERAL, QString("DirectFB output : screen size %1x%2").arg(data->screen_width).arg(data->screen_height));
     MoveResize();
 
-    ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
-    ChangePictureAttribute(kPictureAttribute_Contrast, contrast);
-    ChangePictureAttribute(kPictureAttribute_Colour, colour);
-    ChangePictureAttribute(kPictureAttribute_Hue, hue);
+    InitPictureAttributes();
 
     //display video output
     DFBCHECK(data->videoLayer->SetOpacity(data->videoLayer, 0xff));
@@ -742,44 +739,48 @@ void VideoOutputDirectfb::DeleteDirectfbBuffers(void)
     data->buffers.clear();
 }
 
-int VideoOutputDirectfb::ChangePictureAttribute(int attribute, int newValue)
+int VideoOutputDirectfb::SetPictureAttribute(int attribute, int newValue)
 {
-    data->videoLayer->GetColorAdjustment(data->videoLayer, (DFBColorAdjustment*) &adj);
+    data->videoLayer->GetColorAdjustment(data->videoLayer,
+                                         (DFBColorAdjustment*) &adj);
     adj.flags = 0;
 
-    switch (attribute) {
-    case kPictureAttribute_Brightness:
-        if (data->videoLayerDesc.caps & DLCAPS_BRIGHTNESS ) {
-            adj.flags = DCAF_BRIGHTNESS;
-            adj.brightness = (unsigned short)(0xffff*newValue/100);
-        }
-        break;
-    case kPictureAttribute_Contrast:
-        if (data->videoLayerDesc.caps & DLCAPS_CONTRAST ) {
-            adj.flags = DCAF_CONTRAST;
-            adj.contrast = (unsigned short)(0xffff*newValue/100);
-        }
-        break;
-    case kPictureAttribute_Colour:
-        if (data->videoLayerDesc.caps & DLCAPS_SATURATION ) {
-            adj.flags = DCAF_SATURATION;
-            adj.saturation = (unsigned short)(0xffff*newValue/100);
-        }
-        break;
-    case kPictureAttribute_Hue:
-        if (data->videoLayerDesc.caps & DLCAPS_HUE ) {
-            adj.flags = DCAF_HUE;
-            adj.hue = (unsigned short)(0xffff*newValue/100);
-        }
-        break;
+    newValue   = min(max(newValue, 0), 100);
+    uint value = (0xffff * newValue) / 100;
+
+    if ((kPictureAttribute_Brightness == attribute) &&
+        (data->videoLayerDesc.caps & DLCAPS_BRIGHTNESS))
+    {
+        adj.flags = DCAF_BRIGHTNESS;
+        adj.brightness = value;
+    }
+    else if ((kPictureAttribute_Contrast == attribute) &&
+             (data->videoLayerDesc.caps & DLCAPS_CONTRAST))
+    {
+        adj.flags = DCAF_CONTRAST;
+        adj.contrast = value;
+    }
+    else if ((kPictureAttribute_Colour == attribute) &&
+             (data->videoLayerDesc.caps & DLCAPS_SATURATION))
+    {
+        adj.flags = DCAF_SATURATION;
+        adj.saturation = value;
+    }
+    else if ((kPictureAttribute_Hue == attribute) &&
+             (data->videoLayerDesc.caps & DLCAPS_HUE))
+    {
+        adj.flags = DCAF_HUE;
+        adj.hue = value;
     }
 
-    if (adj.flags) {
-        if (newValue < 0) newValue = 0;
-        if (newValue >= 100) newValue = 99;
-        data->videoLayer->SetColorAdjustment(data->videoLayer, (DFBColorAdjustment*) &adj);
+    if (adj.flags)
+    {
+        data->videoLayer->SetColorAdjustment(data->videoLayer,
+                                             (DFBColorAdjustment*) &adj);
+        SetPictureAttributeDBValue(attribute, newValue);
         return newValue;
     }
+
     return -1;
 }
 
