@@ -6097,8 +6097,22 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
                 hl_button.setPixel(x, y, pixel);
             }
         }
-        float hmult = osd->GetSubtitleBounds().width() / 720.0;
-        float vmult = osd->GetSubtitleBounds().height() / 480.0;
+
+        // scale highlight image to match OSD size, if required
+        float hmult = osd->GetSubtitleBounds().width() / (float)video_width;
+        float vmult = osd->GetSubtitleBounds().height() / (float)video_height;
+
+        if ((hmult < 0.99) || (hmult > 1.01) || (vmult < 0.99) || (vmult > 1.01)) 
+        {
+            btnX = (int)    (btnX * hmult);
+            btnY = (int)    (btnY * vmult);
+            w    = (int)ceil(w    * hmult);
+            h    = (int)ceil(h    * vmult);
+
+            hl_button = hl_button.smoothScale(w, h);
+        } 
+        else 
+            hmult = vmult = 1.0;
 
         OSDTypeImage* image = new OSDTypeImage();
         image->SetPosition(QPoint(btnX, btnY), hmult, vmult);
