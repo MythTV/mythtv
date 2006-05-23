@@ -489,7 +489,9 @@ TTFFont *OSD::LoadFont(QString name, int size)
                                   "No OSD will be displayed.").arg(name));
 
     delete font;
-    return NULL;
+    font = NULL;
+
+    return font;
 }
 
 QString OSD::getFirstText(QDomElement &element)
