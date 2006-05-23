@@ -1,0 +1,274 @@
+#!/bin/bash -w
+#
+# lircrc config file for the Microsoft Media Center Edition Remote, model 1039
+#
+# This file is intended to complement the lircd.conf.mceusb file included with
+# lirc 0.8 and above.
+#
+# Save this file in ~/.mythtv/lircrc
+#
+# @url       $URL$
+# @date      $Date$
+# @version   $Revision$
+# @author    $Author$
+#
+
+#
+# Program Navigation
+#
+
+begin
+    prog   = mythtv
+    button = Home
+    config = Alt+Home
+end
+
+begin
+    prog   = mythtv
+    button = RecTV
+    config = Alt+R
+end
+
+begin
+    prog   = mythtv
+    button = Guide
+    config = Alt+G
+end
+
+begin
+    prog   = mythtv
+    button = LiveTV
+    config = Alt+P
+end
+
+begin
+    prog   = mythtv
+    button = DVD
+    config = Alt+V
+end
+
+#
+# Menu Navigation
+#
+
+begin
+    prog   = mythtv
+    button = Back
+    config = Esc
+end
+
+begin
+    prog   = mythtv
+    button = OK
+    config = Space
+end
+
+begin
+    prog   = mythtv
+    button = More
+    config = I
+end
+
+begin
+    prog   = mythtv
+    button = Left
+    config = Left
+end
+
+begin
+    prog   = mythtv
+    button = Right
+    config = Right
+end
+
+begin
+    prog   = mythtv
+    button = Up
+    config = Up
+end
+
+begin
+    prog   = mythtv
+    button = Down
+    config = Down
+end
+
+#
+# TV Control
+#
+
+begin
+    prog   = mythtv
+    button = VolDown
+    config = F10
+end
+
+begin
+    prog   = mythtv
+    button = VolUp
+    config = F11
+end
+
+begin
+    prog   = mythtv
+    button = Mute
+    config = F9
+end
+
+begin
+    prog   = mythtv
+    button = ChanDown
+    config = Down
+end
+
+begin
+    prog   = mythtv
+    button = ChanUp
+    config = Up
+end
+
+#
+# Video Navigation
+#
+
+begin
+    prog   = mythtv
+    button = Play
+    config = P
+end
+
+begin
+    prog   = mythtv
+    button = Pause
+    config = P
+end
+
+begin
+    prog   = mythtv
+    button = Stop
+    config = Esc
+end
+
+begin
+    prog   = mythtv
+    button = Forward
+    config = >
+end
+
+begin
+    prog   = mythtv
+    button = Rewind
+    config = <
+end
+
+begin
+    prog   = mythtv
+    button = Replay
+    config = Q
+end
+
+begin
+    prog   = mythtv
+    button = Skip
+    config = Z
+end
+
+begin
+    prog   = mythtv
+    button = Record
+    config = R
+end
+
+#
+# Miscellaneous
+#
+
+# M for Menu
+begin
+    prog   = mythtv
+    button = Star
+    config = M
+end
+
+begin
+    prog   = mythtv
+    button = Hash
+    config = M
+end
+
+begin
+    prog   = mythtv
+    button = Clear
+    config = Esc
+end
+
+begin
+    prog   = mythtv
+    button = Enter
+    config = Space
+end
+
+#
+# Numbers
+#
+
+begin
+    prog   = mythtv
+    button = Zero
+    config = 0
+end
+
+begin
+    prog   = mythtv
+    button = One
+    config = 1
+end
+
+begin
+    prog   = mythtv
+    button = Two
+    config = 2
+end
+
+begin
+    prog   = mythtv
+    button = Three
+    config = 3
+end
+
+begin
+    prog   = mythtv
+    button = Four
+    config = 4
+end
+
+begin
+    prog   = mythtv
+    button = Five
+    config = 5
+end
+
+begin
+    prog   = mythtv
+    button = Six
+    config = 6
+end
+
+begin
+    prog   = mythtv
+    button = Seven
+    config = 7
+end
+
+begin
+    prog   = mythtv
+    button = Eight
+    config = 8
+end
+
+begin
+    prog   = mythtv
+    button = Nine
+    config = 9
+end
+
