@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060523-1"
+VERSION="0.1.20060523-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -814,7 +814,12 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("recordingdate")
-            node.appendChild(infoDOM.createTextNode("%s" % record[5]))
+            date = int(record[5])
+            if date != 1895:
+                node.appendChild(infoDOM.createTextNode("%s" % record[5]))
+            else:
+                node.appendChild(infoDOM.createTextNode(""))
+
             top_element.appendChild(node)
 
             node = infoDOM.createElement("recordingtime")
@@ -826,8 +831,13 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("description")
-            node.appendChild(infoDOM.createTextNode(unicode(record[2], "UTF-8")))
-            top_element.appendChild(node)   
+            desc = unicode(record[2], "UTF-8")
+            if desc != "None":
+                node.appendChild(infoDOM.createTextNode(desc))
+            else:
+                node.appendChild(infoDOM.createTextNode(""))
+
+            top_element.appendChild(node)
 
             node = infoDOM.createElement("rating")
             node.appendChild(infoDOM.createTextNode("%s" % record[6]))

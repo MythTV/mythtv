@@ -958,7 +958,7 @@ bool getFileInfo(QString inFile, QString outFile)
                 // calc duration of the file by counting the video frames
                 int duration = getFrameCount(inputFC, i);
                 VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(duration));
-                duration = duration / fps;
+                duration = (int)(duration / fps);
                 VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
                 root.setAttribute("duration", duration);
 
