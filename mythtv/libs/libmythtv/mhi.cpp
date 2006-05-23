@@ -636,26 +636,49 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
     QRgb qColour = qRgba(colour.red(), colour.green(),
                          colour.blue(), colour.alpha());
 
-    // This is a bit of a mess: we should be able to create a rectangle object.
-    // Scale the image to the current display size
-    int scaledWidth = width * GetWidth() / MHIContext::StdDisplayWidth;
-    int scaledHeight = height * GetHeight() / MHIContext::StdDisplayHeight;
+    QRgb qTransparent = qRgba(0,0,0,0);
+
+    int  scaledxPos   = xPos * GetWidth()  / MHIContext::StdDisplayWidth;
+    int  scaledyPos   = yPos * GetHeight() / MHIContext::StdDisplayHeight;
+    int  xboundary    = scaledxPos & 1;
+    int  yboundary    = scaledyPos & 1;
+    int  scaledWidth  = width  * GetWidth()  / MHIContext::StdDisplayWidth;
+    int  scaledHeight = height * GetHeight() / MHIContext::StdDisplayHeight;
+
+    if (xboundary)
+    {
+        scaledxPos--;
+        scaledWidth++;
+    }
+
+    if (yboundary)
+    {
+        scaledyPos--;
+        scaledHeight++;
+    }
+
     QImage qImage(scaledWidth, scaledHeight, 32);
     qImage.setAlphaBuffer(true);
 
-    // As far as I can tell this is the only way to draw with an
-    // intermediate transparency.
-    for (int i = 0; i < scaledHeight; i++)
+    if (xboundary)
     {
-        for (int j = 0; j < scaledWidth; j++)
-        {
-            qImage.setPixel(j, i, qColour);
-        }
+        for (int i = 0; i < scaledHeight; i++)
+            qImage.setPixel(0, i, qTransparent);
     }
 
-    AddToDisplay(qImage,
-        xPos * GetWidth() / MHIContext::StdDisplayWidth,
-        yPos * GetHeight() / MHIContext::StdDisplayHeight);
+    if (yboundary)
+    {
+        for (int j = 0; j < scaledWidth; j++)
+            qImage.setPixel(j, 0, qTransparent);
+    }
+
+    // As far as I can tell this is the only way to draw
+    // with an intermediate transparency. -- david mathews
+    for (int i = yboundary; i < scaledHeight; i++)
+        for (int j = xboundary; j < scaledWidth; j++)
+            qImage.setPixel(j, i, qColour);
+
+    AddToDisplay(qImage, scaledxPos, scaledyPos);
 }
 
 // Draw an image at the specified position.
