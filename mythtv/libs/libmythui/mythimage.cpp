@@ -1,4 +1,5 @@
 #include <cassert>
+#include <stdint.h>
 
 #include <qpainter.h>
 #include <qapplication.h>
