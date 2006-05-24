@@ -303,6 +303,9 @@ void SoundTouch::putSamples(const SAMPLETYPE *samples, uint numSamples)
 
     // Transpose the rate of the new samples if necessary
     /* Bypass the nominal setting - can introduce a click in sound when tempo/pitch control crosses the nominal value...
+     */
+    // NOTE: Removed the bypass change in soundtouch 1.3.1 for MythTV, this
+    //       caused clipping for Cougar with our MMX implementation. -- dtk
     if (rate == 1.0f) 
     {
         // The rate value is same as the original, simply evaluate the tempo changer. 
@@ -315,7 +318,6 @@ void SoundTouch::putSamples(const SAMPLETYPE *samples, uint numSamples)
         }
         pTDStretch->putSamples(samples, numSamples);
     } 
-    */
     else if (rate <= 1.0f) 
     {
         // transpose the rate down, output the transposed sound to tempo changer buffer
