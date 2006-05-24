@@ -474,9 +474,9 @@ TTFFont *OSD::LoadFont(QString name, int size)
                            wscale, hmult*fscale);
         if (font->isValid())
             return font;
-    }
 
-    delete font;
+        delete font;
+    }
 
     fullname = name;
     font = new TTFFont((char *)fullname.ascii(), size,
