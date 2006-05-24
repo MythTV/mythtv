@@ -42,7 +42,7 @@
 typedef unsigned int    uint;
 typedef unsigned long   ulong;
 
-#ifndef _WINDEF_
+#ifndef _WINDEF_H
     // if these aren't defined already by Windows headers, define now
 
     typedef int BOOL;
@@ -50,7 +50,7 @@ typedef unsigned long   ulong;
     #define FALSE   0
     #define TRUE    1
 
-#endif  // _WINDEF_
+#endif  // _WINDEF_H
 
     #define MULTICHANNEL 6
 
@@ -109,7 +109,7 @@ namespace soundtouch
         #endif // FLOAT_SAMPLES
 
         #ifdef ALLOW_OPTIMIZATIONS
-            #if WIN32 || __MMX__ || MMX
+            #if _WIN32 || __MMX__ || MMX
                 // Allow MMX optimizations
                 #define ALLOW_MMX   1
             #endif

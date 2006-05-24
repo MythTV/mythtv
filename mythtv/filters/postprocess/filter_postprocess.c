@@ -88,7 +88,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     if ( inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12 )
         return NULL;
 
-    filter = malloc(sizeof(ThisFilter));
+    filter = (ThisFilter*) malloc(sizeof(ThisFilter));
     if (filter == NULL)
     {
         fprintf(stderr,"Couldn't allocate memory for filter\n");

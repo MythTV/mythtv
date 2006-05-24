@@ -15,6 +15,10 @@ using namespace std;
 #include <OpenGL/glext.h>
 #endif
 
+#ifdef _WIN32
+#include <GL/glext.h>
+#endif
+
 #include "mythcontext.h"
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"

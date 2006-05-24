@@ -1,15 +1,18 @@
 #ifndef AUDIOOUTPUTDX
 #define AUDIOOUTPUTDX
 
+/* ACK! <windows.h> and <dsound.h> should only be in cpp's compiled
+ * in windows only. Some of the variables in AudioOutputDX need to
+ * be moved to a private class before removing these includes though.
+ */
+#include <windows.h> // HACK HACK HACK
+#include <dsound.h>  // HACK HACK HACK
+
+// Qt headers
 #include <qstring.h>
 
-using namespace std;
-
-#include "audiooutput.h"
-
-#include <windows.h>
-//#include <mmsystem.h>
-#include <dsound.h>
+// MythTV headers
+#include "audiooutputbase.h"
 
 class AudioOutputDX : public AudioOutputBase
 {
@@ -20,9 +23,18 @@ public:
                   bool set_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputDX();
 
+    /// BEGIN HACK HACK HACK HACK These need to actually be implemented!
+    bool OpenDevice(void) { return false; }
+    void CloseDevice(void) {}
+    void WriteAudio(unsigned char*, int) {}
+    virtual int getSpaceOnSoundcard(void) { return 0; }
+    virtual int getBufferedOnSoundcard(void) { return 0; }
+#warning Several methods in AudioOutputDX need to be implemented...
+    /// END HACK HACK HACK HACK
+	
     virtual void Reset(void);
-    virtual void Reconfigure(int audio_bits, 
-                         int audio_channels, int audio_samplerate);
+    virtual void Reconfigure(int audio_bits,       int audio_channels,
+                             int audio_samplerate, int audio_passthru);
     virtual void SetBlocking(bool blocking);
 
     virtual bool AddSamples(char *buffer, int samples, long long timecode);

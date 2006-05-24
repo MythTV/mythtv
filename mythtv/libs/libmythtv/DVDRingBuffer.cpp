@@ -97,7 +97,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_set_readahead_flag(dvdnav, 1);
         dvdnav_set_PGC_positioning_flag(dvdnav, 1);
 
-        int numTitles  = 0;
+        int32_t numTitles  = 0;
         titleParts = 0;
         dvdnav_title_play(dvdnav, 0);
         dvdRet = dvdnav_get_number_of_titles(dvdnav, &numTitles);
@@ -152,8 +152,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
     dvdnav_status_t dvdStat;
     unsigned char  *blockBuf     = NULL;
     uint            tot          = 0;
-    int             dvdEvent     = 0;
-    int             dvdEventSize = 0;
+    int32_t         dvdEvent     = 0;
+    int32_t         dvdEventSize = 0;
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
@@ -878,7 +878,7 @@ uint DVDRingBufferPriv::ConvertLangCode(uint16_t code)
 void DVDRingBufferPriv::SelectDefaultButton(void)
 {
     pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
-    int button = pci->hli.hl_gi.fosl_btnn;
+    int32_t button = pci->hli.hl_gi.fosl_btnn;
     if (button > 0 && !cellRepeated)
     {
         dvdnav_button_select(dvdnav,pci,button);

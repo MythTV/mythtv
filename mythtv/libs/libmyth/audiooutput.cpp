@@ -6,6 +6,12 @@ using namespace std;
 
 #include "config.h"
 #include "audiooutput.h"
+
+/* Required to define BOOL first with friendly _WINDEF_H */
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "audiooutputnull.h"
 #ifdef USING_DIRECTX
 #include "audiooutputdx.h"

@@ -1,13 +1,19 @@
 #ifndef AUDIOOUTPUTBASE
 #define AUDIOOUTPUTBASE
 
-#include <iostream>
+// POSIX headers
 #include <pthread.h>
+#include <sys/time.h> // for struct timeval
+
+// C++ headers
+#include <iostream>
 using namespace std;
 
+// Qt headers
 #include <qstring.h>
 #include <qmutex.h>
 
+// MythTV headers
 #include "audiooutput.h"
 #include "samplerate.h"
 #include "SoundTouch.h"

@@ -101,9 +101,9 @@ class DVDRingBufferPriv
     long long      cellStart;
     long long      pgStart;
     dvdnav_t      *lastNav; // This really belongs in the player.
-    int            part;
-    int            title;
-    int            titleParts;
+    int32_t        part;
+    int32_t        title;
+    int32_t        titleParts;
     bool           gotStop;
 
     bool           cellHasStillFrame;

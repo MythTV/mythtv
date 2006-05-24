@@ -250,12 +250,14 @@ typedef union drm_wait_vblank {
 
 static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 {
-    int ret;
+    int ret = -1;
 
+#ifndef _WIN32
     do {
        ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
        vbl->request.type &= ~DRM_VBLANK_RELATIVE;
     } while (ret && errno == EINTR);
+#endif
 
     return ret;
 }
