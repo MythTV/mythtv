@@ -2,9 +2,12 @@ d10control.pl:  Remote control of a DirecTV unit via the serial port
 By Josh Wilmes (http://www.hitchhiker.org/dss)
 Based on info from http://www.isd.net/mevenmo/audiovideo.html
 
+Use the box_type "HD300" for LG LSS-3200A/Sony SAT-HD300/Hughes HTL-HD 
+receivers.
+
 Usage: ./d10control.pl command ...
 Commands:
-  box_type RCA|D10-100|D10-200  - select set top box type
+  box_type RCA|D10-100|D10-200|HD300  - select set top box type
   delay number    - wait for number seconds. Floating point is valid
   key string      - send remote key string.  See source for supported keys
   last_param      - execute last parameter on command line at current location
@@ -20,6 +23,9 @@ Commands:
   get_channel          - print current channel
   get_datetime         - print date and time
   get_signal           - print signal strength
+  get_info             - print information (HD300 only)
+  enable_remote        - enable remote control (HD300 only)
+  disable_remote       - disable remote control (HD300 only)
   hide                 - hide text, will also prevent info button from working
   retries number       - set maximum number of retries on error
   set_system_datetime  - set PC clock from box.  ntp is more accurate

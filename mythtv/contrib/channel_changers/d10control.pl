@@ -32,6 +32,12 @@
 # Added many commands and tried to make flexible enough that users won't
 # have to edit this file
 # Added retry on errors since the D10-200 is not reliable
+#
+# Modified by Stacey Son <mythdev <at> son ,dot, org> Sept 9, 2005
+# Added codes for LG LSS-3200A/Sony SAT-HD300/Hughes HTL-HD receivers
+# Added get_info, enable_remote, and disable_remote (HD300 only) commands
+# Based on http://www.avsforum.com/avs-vb/showthread.php?p=3000174&&#post3000174 
+# (Use a straight through serial cable like RadioShack 26-117B to connect) 
 
 
 $|=1;
@@ -40,7 +46,7 @@ use Time::HiRes qw(usleep ualarm gettimeofday tv_interval );
 
 use FileHandle;
 
-$version = "1.1";
+$version = "1.2";
 
 #
 # Verbose output, change with verbose and quiet command.
@@ -93,6 +99,9 @@ $clear_osd_delay = .2;
       "get_channel" => \&get_channel,
       "get_signal" => \&get_signal,
       "get_datetime" => \&get_datetime,
+      "get_info" => \&get_info,
+      "enable_remote" => \&enable_remote,
+      "disable_remote" => \&disable_remote,
       "set_system_datetime" => \&set_system_datetime,
       "key" => \&key,
       "delay" => \&delay,
@@ -169,22 +178,42 @@ $clear_osd_delay = .2;
 # anything they do.
 );
 
+# Key to keycode map for LG LSS-3200A/Sony SAT-HD300/Hughes HTL-HD 
+%keymap_HD300 = (
+# it seems that the HD300 has a limited keymap
+         right => "0x9a",
+          left => "0x9b",
+            up => "0x9c",
+          down => "0x9d",
+        select => "0xc3",
+         enter => "0xc3",  # enter/select/info 
+          exit => "0xc5",  # power on
+         power => "0xd5",  # power toggle
+         guide => "0xe5",
+          menu => "0xf7"
+# Code 0xfa also brings up the menu
+);
+
+
 # From box name select correct key codes
 %boxes=("RCA" => \%keymap,
         "D10-100" => \%keymap_200,
-        "D10-200" => \%keymap_200
+        "D10-200" => \%keymap_200,
+        "HD300" => \%keymap_HD300
 ); 
 
 # From box name select extra bytes needed with key codes
 %keymap_extra=("RCA" => ["0x00", "0x00"],
            "D10-100" => ["0x00", "0x01"],
-           "D10-200" => ["0x00", "0x01"]
+           "D10-200" => ["0x00", "0x01"],
+           "HD300"   => ["0x00", "0x00"]
 ); 
 
 # From box name select extra bytes needed after sending command
 %cmd_extra=("RCA" => undef,
            "D10-100" => undef, 
-           "D10-200" => "0x0d"
+           "D10-200" => "0x0d",
+           "HD300" => undef
 ); 
 
 # From box name select if we should use the channel change command
@@ -192,7 +221,8 @@ $clear_osd_delay = .2;
 # change command and the D10-100 firmware 0x101B won't select below 100.
 %chan_change_key=("RCA" => 0,
                   "D10-100" => 1,
-                  "D10-200" => 1
+                  "D10-200" => 1,
+                  "HD300" => 0
 ); 
 # Override from command line for above
 my $chan_change_key_param;
@@ -234,7 +264,7 @@ exit(0);
 sub usage {
    print "Usage: $0 command ...\n";
    print "Commands:\n";
-   print "  box_type RCA|D10-100|D10-200  - select set top box type\n";
+   print "  box_type RCA|D10-100|D10-200|HD300  - select set top box type\n";
    print "  delay number    - wait for number seconds. Floating point is valid \n";
    print "  key string      - send remote key string.  See source for supported keys\n";
    print "  last_param      - execute last parameter on command line at current location\n";
@@ -250,6 +280,9 @@ sub usage {
    print "  get_channel          - print current channel\n";
    print "  get_datetime         - print date and time\n";
    print "  get_signal           - print signal strength\n";
+   print "  get_info             - print information (HD300 only?)\n";
+   print "  enable_remote        - enable remote control (HD300 only?)\n";
+   print "  disable_remote       - disable remote control (HD300 only?)\n";
    print "  hide                 - hide text, will also prevent info button from working\n";
    print "  retries number       - set maximum number of retries on error\n";
    print "  set_system_datetime  - set PC clock from box.  ntp is more accurate\n";
@@ -266,7 +299,12 @@ sub setup_channel {
    on();
    change_channel(shift(@ARGV)); 
    select(undef, undef, undef, $clear_osd_delay);
-   send_key("exit");
+   if ($box_type eq "HD300") {
+      # "exit" key doesn't seem clear the OSD on HD300
+      send_key("enter");
+   } else {
+      send_key("exit");
+   }
 }
 
 sub version {
@@ -329,16 +367,28 @@ sub clear_verbose {
 }
 
 sub on {
-  simple_command("0x82");
+  if ($box_type eq "HD300") {
+     return(command_response("0x82"));
+  } else {
+     return(simple_command("0x82"));
+  }
 }
 
 sub off {
-  simple_command("0x81");
+  if ($box_type eq "HD300") {
+     return(command_response("0x81"));
+  } else {
+     return(simple_command("0x81"));
+  }
 }
 
 sub get_channel {
   my @in = dss_command(4, "0x87");
-  return if($#in != 3);
+  if ($box_type eq "HD300") {
+     return if($#in != 4);
+  } else {
+     return if($#in != 3);
+  }
   my $sub = $in[2] * 256 + $in[3];
   print "channel " , $in[0]*256+$in[1];
   print "-$sub" if $sub != 65535;
@@ -354,7 +404,11 @@ sub get_signal {
 
 sub get_datetime {
     my @in = dss_command(7, "0x91");
-    return if($#in != 6);
+    if ($box_type eq "HD300") {
+       return if($#in != 8);
+    } else {
+       return if($#in != 6);
+    }
     $strTime = "$in[1]/$in[2] $in[3]:$in[4]:$in[5]";
     print("Date $strTime\n")# if ($verbose);
 }
@@ -368,6 +422,40 @@ sub set_system_datetime {
     `$cmd`;
 }
 
+sub enable_remote {
+  return(command_response("0x93")) if ($box_type eq "HD300");
+}
+
+sub disable_remote {
+  return(command_response("0x94")) if ($box_type eq "HD300");
+}
+
+sub get_info {
+    my @in = dss_command(46, "0x83");
+    return if($#in < 40);
+
+    # The HD300 info packet looks like the following:
+    #   [ 0 -  3] Channel Number
+    #   [ 4 - 15] Unknown
+    #   [16 - 24] Date/Time
+    #   [25 - 37] Unknown
+    #   [   38  ] Signal Strength 
+    #   [39 - 44] Unknown
+
+    # channel number... (offset 0 Len 4)
+    my $sub = $in[2] * 256 + $in[3];
+    print "channel " , $in[0]*256+$in[1];
+    print "-$sub" if $sub != 65535;
+    print "\n";
+
+    # Date/Time... (offset 16 Len 8)
+    $strTime = "$in[16 + 1]/$in[16 + 2] $in[16 + 3]:$in[16 + 4]:$in[16 + 5]";
+    print("Date $strTime\n");
+
+    # Signal... (offset 38 len 1) 
+    print "signal $in[38 + 0]\n";
+}
+
 sub text {
   my @tmp = unpack("H2" x length($ARGV[0]) ,$ARGV[0]);
   shift @ARGV;
@@ -375,7 +463,14 @@ sub text {
 }
 
 sub hide {
-  simple_command("0x86");
+  if ($box_type eq "HD300") {
+      # for some reason the "hide" command doesn't seem to work
+      # the following is a hack that works
+      send_key("enter");
+      send_key("enter");
+  } else {
+     return(simple_command("0x86"));
+  }
 }
 
 sub simple_command {
@@ -386,12 +481,34 @@ sub simple_command {
     }
 }
 
+sub command_response {
+    my @rc = dss_command(1, @_);
+    if (defined(@rc)) {
+       if ($rc[0] != 0) {
+          return(0);
+       } else {
+          return(1);
+       }
+    } else {
+       return(undef);
+    }	
+}
 
 sub dss_command {
     my $reply_size = shift(@_);
+    my $command_code = shift(@_);
+    my $rc;
+
     for (my $i = 0; $i < $retry_count; $i++) {
-       sendbytes("0xFA",@_);
-       my $rc = get_reply($reply_size);
+       if ($box_type eq "HD300" && $reply_size == 0) {
+          sendbytes("0xFA", $command_code);
+          $rc = get_reply($reply_size);
+          next if (!defined($rc));
+          sendbytes(@_);
+       } else {
+          sendbytes("0xFA", $command_code, @_);
+       }
+       $rc = get_reply($reply_size);
        if (defined($rc)) {
           return @{$rc};
        }
@@ -492,6 +609,12 @@ sub get_reply() {
            printf("$str(%3.3s) ",$_) if ($verbose);
            push (@ret,$_); 
        }
+
+       if ($box_type eq "HD300" && $reply_size == 0) {
+          # HD300 does a simple ack (F0 only) to say it's ready for more 
+          $ok=1 if ($str eq "0xF0"); 
+          last if ($str eq "0xF0");
+       }
        
        if ($found_start && $reply_size-- <= 0) {
           $ok=1 if ($terminal{$str} > 0);
@@ -499,6 +622,7 @@ sub get_reply() {
           last if ($last eq "0xFB" && $str eq "0xFB");
        }
        $found_start = 1 if ($str eq "0xF0");
+       $found_start = 1 if ($str eq "0xF2" && $box_type eq "HD300");
        $last=$str;
    }
    print "\n\n" if ($verbose);
