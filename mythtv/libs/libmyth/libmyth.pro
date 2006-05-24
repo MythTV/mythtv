@@ -17,7 +17,7 @@ HEADERS += mythdialogs.h audiooutput.h httpcomms.h mythmedia.h
 HEADERS += uilistbtntype.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
-HEADERS += langsettings.h audiooutputnull.h
+HEADERS += langsettings.h audiooutputnull.h mythsocket.h
 HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
 HEADERS += exitcodes.h virtualkeyboard.h mythobservable.h mythevent.h
 
@@ -31,7 +31,7 @@ SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
-SOURCES += virtualkeyboard.cpp mythobservable.cpp
+SOURCES += virtualkeyboard.cpp mythobservable.cpp mythsocket.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../.. ../
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch ../ ../libmythui
@@ -57,7 +57,7 @@ inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h generictree.h managedlist.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
-inc.files += mythevent.h mythobservable.h
+inc.files += mythevent.h mythobservable.h mythsocket.h
 
 using_oss {
     DEFINES += USING_OSS
