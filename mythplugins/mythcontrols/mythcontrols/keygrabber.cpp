@@ -149,9 +149,9 @@ UnsavedMenu::UnsavedMenu(MythMainWindow *window)
     : MythPopupBox(window, "unsavedmenu")
 {
     addLabel(tr("Unsaved Changes"), Large, false);
-    addLabel(tr("Would you like to save now?"));
-    addButton(tr("Save"), this, SLOT(save()))->setFocus();
-    addButton(tr("Exit"), this, SLOT(cancel()));
+    addLabel(tr("Exiting...") + "\n\n" + tr("Save Changes?"));
+    addButton(tr("Yes"), this, SLOT(save()))->setFocus();
+    addButton(tr("No"), this, SLOT(cancel()));
 }
 
 ConfirmMenu::ConfirmMenu(MythMainWindow *window, QString msg)
