@@ -1260,39 +1260,38 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     if (attributes)
         X11S(XFree(attributes));
 
-    if (xv_draw_colorkey)
+    if (!xv_draw_colorkey)
+        return;
+
+    QString msg = LOC + "Chromakeying not possible with this XVideo port.";
+    X11S(xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False));
+    if (xv_atom == None)
     {
-        X11S(xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False));
-        if (xv_atom != None)
+        VERBOSE(VB_PLAYBACK, msg);
+        xv_colorkey = 0;
+        return;
+    }
+
+    X11S(ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, &xv_colorkey));
+    if (ret == Success && xv_colorkey == 0)
+    {
+        const int default_colorkey = 1;
+        X11S(ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
+                                      default_colorkey));
+        if (ret == Success)
         {
-            X11S(ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, 
-                                          &xv_colorkey));
-
-            if (ret == Success && xv_colorkey == 0)
-            {
-                const int default_colorkey = 1;
-                X11S(ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
-                                              default_colorkey));
-                if (ret == Success)
-                {
-                    VERBOSE(VB_PLAYBACK, LOC +
-                            "0,0,0 is the only bad color key for MythTV, "
-                            "using "<<default_colorkey<<" instead.");
-                    xv_colorkey = default_colorkey;
-                }
-                ret = Success;
-            }
-
-            if (ret != Success)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Couldn't get the color key color,"
-                        "\n\t\t\tprobably due to a driver bug or limitation."
-                        "\n\t\t\tYou might not get any video, "
-                        "but we'll try anyway.");
-                xv_colorkey = 0;
-            }
+            VERBOSE(VB_PLAYBACK, LOC +
+                    "0,0,0 is the only bad color key for MythTV, "
+                    "using "<<default_colorkey<<" instead.");
+            xv_colorkey = default_colorkey;
         }
+        ret = Success;
+    }
+
+    if (ret != Success)
+    {
+        VERBOSE(VB_PLAYBACK, msg);
+        xv_colorkey = 0;
     }
 }
 
