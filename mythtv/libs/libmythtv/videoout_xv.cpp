@@ -818,8 +818,8 @@ bool VideoOutputXv::InitXVideo()
     VERBOSE(VB_IMPORTANT, LOC + QString("XVideo Adaptor Name: '%1'")
             .arg(adaptor_name));
 
-    if (adaptor_name == "ATI Radeon Video Overlay")
-        xv_hue_base = 50;
+    xv_hue_base = ((adaptor_name == "ATI Radeon Video Overlay") ||
+                   (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */)) ? 50 : 0;
 
     InstallXErrorHandler(XJ_disp);
 
