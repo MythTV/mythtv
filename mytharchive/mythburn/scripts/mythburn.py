@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060525-2"
+VERSION="0.1.20060525-3"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -1098,8 +1098,15 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
 
     source = quoteFilename(source)
 
-    command = path_ffmpeg[0] + " -v 1 -i %s -r %s -target dvd -b 3000 -s %s -ab 192 -copyts "   \
-              "-aspect %s %s"  % (source, videomode, encoderesolution, aspectratio, destvideofile)
+    command = path_ffmpeg[0] + " -v 1 -i %s -r %s -target dvd -b 3000 -s %s " % \
+              (source, videomode, encoderesolution)
+
+    if audio1[AUDIO_CODEC] != "AC3":
+        command += "-ab 192 -ac 2 -copyts "
+    else:
+        command += "-acodec copy "
+
+    command += "-aspect %s %s"  % (aspectratio, destvideofile)
 
     #add second audio track if required
     if audio2[AUDIO_ID] != -1:
