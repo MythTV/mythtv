@@ -29,11 +29,11 @@
 		</item>
 		<item>
 			<graphic filename="%thumbnail" x="60" y="315" w="145" h="110" static="False"/>
-			<text x="215" y="335" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
-			<text x="215" y="360" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
-			<text x="215" y="390" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
-			<text x="215" y="410" w="450" h="120" value="%description" font="2" colour="white" static="False" align="left"/>
-			<next filename="next.png" x="375" y="445" w="48" h="48" mask="next_mask.png" static="False"/>
+			<text x="215" y="315" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+			<text x="215" y="340" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+			<text x="215" y="360" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+			<text x="215" y="380" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+			<next filename="next.png" x="375" y="445" w="48" h="48" mask="next_mask.png" static="True"/>
 		</item>
 	</menu>
 
