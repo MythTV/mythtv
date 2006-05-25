@@ -12,68 +12,69 @@
     <menu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.mp2" length="15" >
 		<!-- item holds the position of a menu item ie. recording -->
 		<item>
-			<text x="80" y="15" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
+			<text x="60" y="15" w="200" h="25" value="Page %page" font="2" colour="white" static="True" align="left"/>
 			<previous filename="previous.png" x="300" y="445" w="48" h="48" mask="previous_mask.png" static="True"/>
-			<graphic filename="%thumbnail" x="80" y="35" w="145" h="110" static="False"/>
-			<text x="235" y="35" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
-			<text x="235" y="60" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
-			<text x="235" y="80" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
-			<text x="235" y="100" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+			<graphic filename="%thumbnail" x="60" y="35" w="145" h="110" static="False"/>
+			<text x="215" y="35" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+			<text x="215" y="60" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+			<text x="215" y="80" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+			<text x="215" y="100" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
 		</item>
 		<item>
-			<graphic filename="%thumbnail" x="80" y="175" w="145" h="110" static="False" align="left"/>
-			<text x="235" y="175" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
-			<text x="235" y="200" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
-			<text x="235" y="220" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
-			<text x="235" y="240" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+			<graphic filename="%thumbnail" x="60" y="175" w="145" h="110" static="False" align="left"/>
+			<text x="215" y="175" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+			<text x="215" y="200" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+			<text x="215" y="220" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+			<text x="215" y="240" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
 		</item>
 		<item>
-			<graphic filename="%thumbnail" x="80" y="315" w="145" h="110" static="False"/>
-			<text x="235" y="315" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
-			<text x="235" y="340" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
-			<text x="235" y="360" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
-			<text x="235" y="380" w="450" h="60" value="%description" font="2" colour="white" static="False" align="left"/>
+			<graphic filename="%thumbnail" x="60" y="315" w="145" h="110" static="False"/>
+			<text x="215" y="335" w="450" h="28" value="%title" font="0" colour="yellow" static="False" align="left"/>
+			<text x="215" y="360" w="450" h="25" value="%subtitle" font="1" colour="white" static="False" align="left"/>
+			<text x="215" y="390" w="450" h="25" value="%recordingdate %recordingtime" font="2" colour="white" static="False" align="left"/>
+			<text x="215" y="410" w="450" h="120" value="%description" font="2" colour="white" static="False" align="left"/>
 			<next filename="next.png" x="375" y="445" w="48" h="48" mask="next_mask.png" static="False"/>
 		</item>
 	</menu>
+
     <submenu background="MythCenter-Background.png" highlightcolor="yellow" music="menumusic.mp2" length="15" >
 		<!-- Describes a menu or short video that will appear after the recording has been selected -->
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="50" y="45" w="145" h="110" static="False"/>
-			<text x="50" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-			<text x="50" y="330" w="500" h="28" value="%title" font="0" colour="yellow" static="True" align="left"/>
-			<text x="50" y="350" w="600" h="28" value="%subtitle" font="1" colour="white" static="True" align="left"/>
-			<text x="50" y="350" w="600" h="28" value="%recordingdate %recordingtime (%duration)" font="1" colour="white" static="True" align="right"/>
-			<text x="50" y="375" w="600" h="100" value="%description" font="2" colour="white" static="True" align="left"/>
+            <text x="50" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+            <text x="50" y="365" w="500" h="28" value="%title" font="0" colour="yellow" static="True" align="left"/>
+			<text x="50" y="390" w="600" h="28" value="%subtitle" font="1" colour="white" static="True" align="left"/>
+			<text x="50" y="390" w="600" h="28" value="%recordingdate %recordingtime (%duration)" font="1" colour="white" static="True" align="right"/>
+			<text x="50" y="415" w="600" h="130" value="%description" font="2" colour="white" static="True" align="left"/>
 		</chapter>
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="200" y="45" w="145" h="110" static="False"/>
-			<text x="200" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+            <text x="200" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="350" y="45" w="145" h="110" static="False"/>
-			<text x="350" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+            <text x="350" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 		<chapter>
 			<graphic filename="%chapterthumbnail" x="500" y="45" w="145" h="110" static="False"/>
-			<text x="500" y="155" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+            <text x="500" y="160" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 		<!-- Row 2 -->
 		<chapter>
-			<graphic filename="%chapterthumbnail" x="50" y="190" w="145" h="110" static="False"/>
-			<text x="50" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+			<graphic filename="%chapterthumbnail" x="50" y="205" w="145" h="110" static="False"/>
+            <text x="50" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 		<chapter>
-			<graphic filename="%chapterthumbnail" x="200" y="190" w="145" h="110" static="False"/>
-			<text x="200" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+			<graphic filename="%chapterthumbnail" x="200" y="205" w="145" h="110" static="False"/>
+            <text x="200" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 		<chapter>
-			<graphic filename="%chapterthumbnail" x="350" y="190" w="145" h="110" static="False"/>
-			<text x="350" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+			<graphic filename="%chapterthumbnail" x="350" y="205" w="145" h="110" static="False"/>
+            <text x="350" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 		<chapter>
-			<graphic filename="%chapterthumbnail" x="500" y="190" w="145" h="110" static="False"/>
-			<text x="500" y="300" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
-		</chapter>
+			<graphic filename="%chapterthumbnail" x="500" y="205" w="145" h="110" static="False"/>
+            <text x="500" y="320" w="145" h="28" value="%chapternumber. %chaptertime" font="0" colour="yellow" static="False" align="center"/>
+        </chapter>
 	</submenu>
 </mythburntheme>

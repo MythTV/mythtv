@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060523-2"
+VERSION="0.1.20060525-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -1835,7 +1835,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
             if textnode.length > 0:
                 textnode = textnode[0]
                 text=expandItemText(infoDOM,textnode.attributes["value"].value, itemnum, page, itemsonthispage,chapternumber,chapterlist)
-                textImage=Image.new("1",picture.size)
+                textImage=Image.new("RGBA",picture.size)
                 textDraw=ImageDraw.Draw(textImage)
 
                 if text>"":
@@ -1848,9 +1848,19 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
                            themeFonts[int(textnode.attributes["font"].value)],
                            "white",
                            textnode.attributes["align"].value )
-                bgimagemask.paste(textnode.attributes["colour"].value, (getScaledAttribute(textnode, "x"), getScaledAttribute(textnode, "y")), textImage)
+                #convert the RGB image to a 1 bit image
+                (width, height) = textImage.size
+                for y in range(height):
+                    for x in range(width):
+                        if textImage.getpixel((x,y)) < (100, 100, 100, 255):
+                            textImage.putpixel((x,y), (0, 0, 0, 0))
+                        else:
+                            textImage.putpixel((x,y), (255, 255, 255, 255))
+
+                bgimagemask.paste(textnode.attributes["colour"].value, 
+                            (getScaledAttribute(textnode, "x"), getScaledAttribute(textnode, "y")), 
+                            textImage)
                 boundarybox=checkBoundaryBox(boundarybox, node)
-                textImage.save(os.path.join(getTempPath(),"textimage-%s.png" % itemnum),"PNG",quality=99,optimize=0)
 
                 del text, textImage, textDraw
             del picture
