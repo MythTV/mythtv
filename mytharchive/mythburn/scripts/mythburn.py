@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060525-1"
+VERSION="0.1.20060525-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -2326,18 +2326,18 @@ def selectStreams(folder):
     # finally use the stream with the lowest pid, prefer ac3 over mp2
     if not found:
         for node in nodes:
-            int(node.attributes["ffmpegindex"].value)
+            index = int(node.attributes["ffmpegindex"].value)
             format = string.upper(node.attributes["codec"].value)
             pid = int(node.attributes["id"].value)
             if not found:
                 audio1 = (index, format, pid, lang)
+                found = True
             else:
-                if format == "AC3" and audio1[1] == "MP2":
+                if format == "AC3" and audio1[AUDIO_CODEC] == "MP2":
                     audio1 = (index, format, pid, lang)
                 else:
                     if pid < audio1[AUDIO_ID]:
                         audio1 = (index, format, pid, lang)
-            found = True
 
     # do we need to find a second audio stream?
     if preferredlang1 != preferredlang2 and nodes.length > 1:
