@@ -260,6 +260,19 @@ bool DVBChannel::SetChannelByString(const QString &chan)
         return true;
     }
 
+    QString inputName;
+    if (!CheckChannel(chan, inputName))
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "CheckChannel failed. " +
+                QString("Please verify channel '%1'").arg(chan) +
+                " in the \"mythtv-setup\" Channel Editor.");
+        return false;
+    }
+    // If CheckChannel filled in the inputName we need to
+    // change inputs.
+    if (!inputName.isEmpty())
+        nextInputID = GetInputByName(inputName);
+    
     if (GetChannelOptions(chan) == false)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get channel options for " +
