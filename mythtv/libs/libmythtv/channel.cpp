@@ -932,7 +932,7 @@ static int get_v4l2_attribute(const QString &db_col_name)
     if ("brightness" == db_col_name)
         return V4L2_CID_BRIGHTNESS;
     else if ("contrast" == db_col_name)
-        return V4L2_CID_SATURATION;
+        return V4L2_CID_CONTRAST;
     else if ("colour" == db_col_name)
         return V4L2_CID_SATURATION;
     else if ("hue" == db_col_name)
