@@ -17,11 +17,20 @@
 #include "channelbase.h"
 #include "streamlisteners.h"
 
-#include "dvbdiseqc.h"
+#ifdef USING_DVB
+#include "dvbtypes.h"
+#else // if !USING_DVB
+typedef int fe_type_t;
+typedef int fe_modulation_t;
+typedef int fe_code_rate_t;
+typedef int DVBTuning;
+typedef struct { QString name; fe_type_t type; } dvb_frontend_info;
+#endif //!USING_DVB
 
 class TVRec;
 class DVBCam;
 class DVBRecorder;
+class DVBDiSEqC;
 
 class DVBChannel : public ChannelBase
 {

@@ -58,6 +58,7 @@ using namespace std;
 #include "iso639.h"
 #include "atscstreamdata.h"
 #include "cardutil.h"
+#include "tv_rec.h"
 
 // MythTV DVB includes
 #include "dvbtypes.h"

@@ -970,49 +970,6 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
 #undef LOC_WARN
 #undef LOC_ERR
 
-bool dvb_channel_t::Parse(
-    fe_type_t type,
-    QString frequency,         QString inversion,      QString symbolrate,
-    QString fec,               QString polarity,       QString dvb_diseqc_type,
-    QString diseqc_port,       QString diseqc_pos,     QString lnb_lof_switch,
-    QString lnb_lof_hi,        QString lnb_lof_lo,     QString _sistandard,
-    QString hp_code_rate,      QString lp_code_rate,   QString constellation,
-    QString trans_mode,        QString guard_interval, QString hierarchy,
-    QString modulation,        QString bandwidth,      QString _input_id)
-{
-    lock.lock();
-        
-    bool ok = false;
-    if (FE_QPSK == type)
-        ok = tuning.parseQPSK(
-            frequency,       inversion,     symbolrate,   fec,   polarity,
-            dvb_diseqc_type, diseqc_port,   diseqc_pos,
-            lnb_lof_switch,  lnb_lof_hi,    lnb_lof_lo);
-    else if (FE_QAM == type)
-        ok = tuning.parseQAM(
-            frequency,       inversion,     symbolrate,   fec,   modulation);
-    else if (FE_OFDM == type)
-        ok = tuning.parseOFDM(
-            frequency,       inversion,     bandwidth,    hp_code_rate,
-            lp_code_rate,    constellation, trans_mode,   guard_interval,
-            hierarchy);
-    else if (FE_ATSC == type)
-        ok = tuning.parseATSC(frequency, modulation);
-#ifdef FE_GET_EXTENDED_INFO
-    else if (FE_DVB_S2 == type)
-        ok = tuning.parseDVBS2(
-            frequency,       inversion,     symbolrate,   fec,   polarity,
-            dvb_diseqc_type, diseqc_port,   diseqc_pos,
-            lnb_lof_switch,  lnb_lof_hi,    lnb_lof_lo, modulation);
-#endif
-        
-    sistandard = _sistandard;
-    input_id   = _input_id.toInt();
-
-    lock.unlock();
-    return ok;
-}
-
 static QString mod2str(fe_modulation mod)
 {
     switch (mod)

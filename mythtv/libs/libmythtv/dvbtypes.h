@@ -39,7 +39,8 @@ using namespace std;
 #if (DVB_API_VERSION >= 3 && DVB_API_VERSION_MINOR >= 1)
 #    define USE_ATSC
 #else
-#warning DVB API version < 3.1, ATSC over DVB will not be supported.
+#warning DVB API version < 3.1
+#warning ATSC will not be supported using the Linux DVB drivers
 #    define FE_ATSC       (FE_OFDM+1)
 #    define FE_CAN_8VSB   0x200000
 #    define FE_CAN_16VSB  0x400000
@@ -409,70 +410,6 @@ class DVBTuning
                    const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                    const QString& lnb_lof_lo,     const QString& modulation);
 #endif
-};
-
-class dvb_channel_t
-{
-  public:
-    dvb_channel_t() :
-        pmtpid(0),          pmt(NULL),
-        serviceID(0xffff),  networkID(0xffff),
-        providerID(0xffff), transportID(0xffff),
-        sistandard(""),     version(255) {;}
-   ~dvb_channel_t()
-    {
-        if (pmt)
-            delete pmt;
-    }
-
-    bool IsPMTSet() const
-    {
-        QMutexLocker locker(&lock);
-        return pmt;
-    }
-
-    void SetPMT(uint pid, const ProgramMapTable *_pmt)
-    {
-        QMutexLocker locker(&lock);
-        if (pmt)
-        {
-            pmtpid = 0;
-            delete pmt;
-            pmt = NULL;
-        }
-        if (_pmt)
-        {
-            pmtpid = pid;
-            pmt = new ProgramMapTable(*_pmt);
-        }
-    }
-
-    bool Parse(
-        fe_type_t type,
-        QString frequency,         QString inversion,      QString symbolrate,
-        QString fec,               QString polarity,       QString dvb_diseqc_type,
-        QString diseqc_port,       QString diseqc_pos,     QString lnb_lof_switch,
-        QString lnb_lof_hi,        QString lnb_lof_lo,     QString _sistandard,
-        QString hp_code_rate,      QString lp_code_rate,   QString constellation,
-        QString transmission_mode, QString guard_interval, QString hierarchy,
-        QString modulation,        QString bandwidth,      QString _input_id);
-
-    DVBTuning       tuning;
-
-    uint            pmtpid;
-    ProgramMapTable *pmt;
-    bool            PMTSet;
-
-    uint16_t        serviceID; /// program number in PAT
-    uint16_t        networkID; /// network ID from PAT
-    uint16_t        providerID;
-    uint16_t        transportID;
-
-    QString         sistandard;
-    int             input_id;
-    uint8_t         version;
-  private:
-    mutable QMutex  lock;
 };
 
 #endif // DVB_TYPES_H

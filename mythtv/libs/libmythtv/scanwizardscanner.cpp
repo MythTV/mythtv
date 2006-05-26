@@ -354,8 +354,8 @@ void ScanWizardScanner::scan()
         startChan["hierarchy"]      = pane->hierarchy();
 
 #ifdef USING_DVB
-        dvb_channel_t chan_opts;
-        nit_scan_parse_failed = !chan_opts.tuning.parseOFDM(
+        DVBTuning tuning;
+        nit_scan_parse_failed = !tuning.parseOFDM(
             startChan["frequency"],   startChan["inversion"],
             startChan["bandwidth"],   startChan["coderate_hp"],
             startChan["coderate_lp"], startChan["constellation"],
@@ -380,8 +380,8 @@ void ScanWizardScanner::scan()
 #ifdef USING_DVB
         if (!nit_scan_parse_failed)
         {
-            dvb_channel_t chan_opts;
-            nit_scan_parse_failed = !chan_opts.tuning.parseQPSK(
+            DVBTuning tuning;
+            nit_scan_parse_failed = !tuning.parseQPSK(
                 startChan["frequency"],   startChan["inversion"],
                 startChan["symbolrate"],  startChan["fec"],
                 startChan["polarity"],
@@ -403,8 +403,8 @@ void ScanWizardScanner::scan()
         startChan["modulation"] = pane->modulation();
 
 #ifdef USING_DVB
-        dvb_channel_t chan_opts;
-        nit_scan_parse_failed = !chan_opts.tuning.parseQAM(
+        DVBTuning tuning;
+        nit_scan_parse_failed = !tuning.parseQAM(
             startChan["frequency"],   startChan["inversion"],
             startChan["symbolrate"],  startChan["fec"],
             startChan["modulation"]);

@@ -16,7 +16,6 @@ class TVRec;
 class ChannelBase;
 class DVBSIParser;
 class EITHelper;
-class dvb_channel_t;
 class ProgramMapTable;
 
 class EITSource
