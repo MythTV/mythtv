@@ -960,7 +960,7 @@ int VideoOutput::ChangePictureAttribute(int attributeType, bool direction)
     if (curVal < 0)
         return -1;
 
-    int newVal = curVal + (direction) ? +1 : -1;
+    int newVal = curVal + ((direction) ? +1 : -1);
 
     if (kPictureAttribute_Hue == attributeType)
         newVal = newVal % 100;
