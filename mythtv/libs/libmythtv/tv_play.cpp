@@ -1111,11 +1111,11 @@ void TV::ForceNextStateNone()
  */
 bool TV::StartRecorder(RemoteEncoder *rec, int maxWait)
 {
-    maxWait = (maxWait <= 0) ? 20000 : maxWait;
+    maxWait = (maxWait <= 0) ? 40000 : maxWait;
     MythTimer t;
     t.start();
     while (!rec->IsRecording() && !exitPlayer && t.elapsed() < maxWait)
-        usleep(50);
+        usleep(5000);
     if (!rec->IsRecording() || exitPlayer)
     {
         if (!exitPlayer)
