@@ -136,14 +136,22 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
     }
 }
 
+/** \fn DVDRingBufferPriv::GetReadPosition()
+ *  \brief returns current position in the PGC.
+ */
 long long DVDRingBufferPriv::GetReadPosition(void)
 {
-    uint32_t pos;
-    uint32_t length;
-
-    if (dvdnav)        
-        dvdnav_get_position(dvdnav, &pos, &length);
-
+    uint32_t pos = 0;
+    uint32_t length = 1;
+    if (dvdnav) 
+    {
+        if (dvdnav_get_position(dvdnav, &pos, &length) == DVDNAV_STATUS_ERR)
+        {
+            // try one more time
+            usleep(10000);
+            dvdnav_get_position(dvdnav, &pos, &length);
+        }
+    }
     return pos * DVD_BLOCK_SIZE;
 }
 
