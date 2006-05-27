@@ -132,6 +132,7 @@ IconView::IconView(const QString& galleryDir, MythMediaDevice *initialDevice,
                 SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
 
         loadDirectory(m_currDevice->getMountPath());
+        m_galleryDir = m_currDevice->getMountPath();
 
         mon->Unlock(m_currDevice);
     }
