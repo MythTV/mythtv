@@ -10,101 +10,101 @@
 22,Mostly Sunny,sunny.png
 24,Sunny,sunny.png
 25,Scattered Flurries,flurries.png
-26,AM Clouds/PM Sun,pcloudy.png
+26,AM Clouds/ PM Sun,pcloudy.png
 27,Isolated T-Storms,thunshowers.png
 28,Scattered Thunderstorms,thunshowers.png
 29,PM Showers,showers.png
-30,PM Showers/Wind,showers.png
-31,Rain/Snow Showers,rainsnow.png
+30,PM Showers/ Wind,showers.png
+31,Rain/ Snow Showers,rainsnow.png
 32,Few Snow Showers,flurries.png
-33,Cloudy/Wind,cloudy.png
-34,Flurries/Wind,flurries.png
-35,Mostly Cloudy/Windy,mcloudy.png
-36,Rain/Thunder,thunshowers.png
-37,Partly Cloudy/Windy,pcloudy.png
-38,AM Rain/Snow Showers,rainsnow.png
-40,Light Rain/Wind,lshowers.png
-41,Showers/Wind,showers.png
+33,Cloudy/ Wind,cloudy.png
+34,Flurries/ Wind,flurries.png
+35,Mostly Cloudy/ Windy,mcloudy.png
+36,Rain/ Thunder,thunshowers.png
+37,Partly Cloudy/ Windy,pcloudy.png
+38,AM Rain/ Snow Showers,rainsnow.png
+40,Light Rain/ Wind,lshowers.png
+41,Showers/ Wind,showers.png
 43,T-Showers,showers.png
-44,Mostly Sunny/Wind,sunny.png
+44,Mostly Sunny/ Wind,sunny.png
 45,Flurries,flurries.png
-47,Rain/Wind,showers.png
-49,Sct Flurries/Wind,flurries.png
+47,Rain/ Wind,showers.png
+49,Sct Flurries/ Wind,flurries.png
 50,Sct Strong Storms,thunshowers.png
 51,PM T-Storms,thunshowers.png
 53,Thunderstorms,thunshowers.png
-55,Sunny/Windy,sunny.png
+55,Sunny/ Windy,sunny.png
 56,AM Thunderstorms,thunshowers.png
 59,AM T-Showers,showers.png
 62,AM Rain,showers.png
-64,Iso T-Storms/Wind,thunshowers.png
-65,Rain/Snow,rainsnow.png
-66,Sct T-Storms/Wind,showers.png
-67,AM Showers/Wind,showers.png
+64,Iso T-Storms/ Wind,thunshowers.png
+65,Rain/ Snow,rainsnow.png
+66,Sct T-Storms/ Wind,showers.png
+67,AM Showers/ Wind,showers.png
 70,Sct Snow Showers,snowsHw.png
-71,Snow to Ice/Wind,snowshow.png
+71,Snow to Ice/ Wind,snowshow.png
 77,Snow to Rain,rainsnow.png
 80,AM Light Rain,lshowers.png
 81,PM Light Rain,lshowers.png
 82,PM Rain,showers.png
 84,Snow Showers,snowshow.png
 85,Rain to Snow,rainsnow.png
-86,PM Rain/Snow,snowshow.png
-88,Few Showers/Wind,showers.png
-90,Snow/Wind,snowshow.png
-91,PM Rain/Snow Showers,rainsnow.png
-92,PM Rain/Snow/Wind,rainsnow.png
-93,Rain/Snow Showers/Wind,rainsnow.png
-94,Rain/Snow/Wind,rainsnow.png
+86,PM Rain/ Snow,snowshow.png
+88,Few Showers/ Wind,showers.png
+90,Snow/ Wind,snowshow.png
+91,PM Rain/ Snow Showers,rainsnow.png
+92,PM Rain/ Snow/ Wind,rainsnow.png
+93,Rain/ Snow Showers/ Wind,rainsnow.png
+94,Rain/ Snow/ Wind,rainsnow.png
 98,Light Snow,flurries.png
 100,PM Snow,snowshow.png
-101,Few Snow Showers/Wind,snowshow.png
-103,Light Snow/Wind,flurries.png
+101,Few Snow Showers/ Wind,snowshow.png
+103,Light Snow/ Wind,flurries.png
 104,Wintry Mix,flurries.png
 105,AM Wintry Mix,rainsnow.png
-106,Hvy Rain/Freezing Rain,rainsnow.png
+106,Hvy Rain/ Freezing Rain,rainsnow.png
 108,AM Light Snow,flurries.png
-109,PM Rain/Snow/Wind,rainsnow.png
-114,Rain/Freezing Rain,showers.png
-118,T-Storms/Wind,thunshowers.png
+109,PM Rain/ Snow/ Wind,rainsnow.png
+114,Rain/ Freezing Rain,showers.png
+118,T-Storms/ Wind,thunshowers.png
 123,Sprinkles,lshowers.png
 125,AM Snow Showers,snowshow.png
-126,AM Clouds/PM Sun/Wind,pcloudy.png
-128,AM Rain/Snow/Wind,rainsnow.png
-130,Rain to Snow/Wind,rainsnow.png
+126,AM Clouds/ PM Sun/ Wind,pcloudy.png
+128,AM Rain/ Snow/ Wind,rainsnow.png
+130,Rain to Snow/ Wind,rainsnow.png
 132,Snow to Wintry Mix,snowshow.png
-133,PM Snow Showers/Wind,snowshow.png
+133,PM Snow Showers/ Wind,snowshow.png
 135,Snow and Ice to Rain,rainsnow.png
 137,Heavy Rain,showers.png
-138,AM Rain/Ice,showers.png
-145,AM Snow Showers/Wind,snowshow.png
-146,AM Light Snow/Wind,flurries.png
-150,PM Light Rain/Wind,lshowers.png
+138,AM Rain/ Ice,showers.png
+145,AM Snow Showers/ Wind,snowshow.png
+146,AM Light Snow/ Wind,flurries.png
+150,PM Light Rain/ Wind,lshowers.png
 152,AM Light Wintry Mix,rainsnow.png
-153,PM Light Snow/Wind,flurries.png
-154,Heavy Rain/Wind,showers.png
+153,PM Light Snow/ Wind,flurries.png
+154,Heavy Rain/ Wind,showers.png
 155,PM Snow Shower,snowshow.png
-158,Snow to Rain/Wind,rainsnow.png
-164,PM Light Rain/Ice,showers.png
+158,Snow to Rain/ Wind,rainsnow.png
+164,PM Light Rain/ Ice,showers.png
 167,AM Snow,snowshow.png
 171,Snow to Ice,snowshow.png
-172,Wintry Mix/Wind,rainsnow.png
+172,Wintry Mix/ Wind,rainsnow.png
 173,Strong Storms,thunshowers.png
 175,PM Light Snow,flurries.png
 178,AM Drizzle,lshowers.png
-188,AM Rain/Snow,rainsnow.png
-189,Strong Storms/Wind,thunshowers.png
+188,AM Rain/ Snow,rainsnow.png
+189,Strong Storms/ Wind,thunshowers.png
 193,PM Drizzle,lshowers.png
 194,Drizzle,lshowers.png
-201,AM Light Rain/Wind,lshowers.png
-204,AM Rain/Wind,showers.png
+201,AM Light Rain/ Wind,lshowers.png
+204,AM Rain/ Wind,showers.png
 223,Wintry Mix to Snow,rainsnow.png
 231,Rain,showers.png
-259,Hvy Rain/Freezing Rain,showers.png
-271,Snow Showers/Windy,snowshow.png
+259,Hvy Rain/ Freezing Rain,showers.png
+271,Snow Showers/ Windy,snowshow.png
 986,Heavy T-Storms,thunshowers.png
 987,Showers in the Vicinity,lshowers.png
-988,Partly Cloudy/Windy,pcloudy.png
+988,Partly Cloudy/ Windy,pcloudy.png
 989,Light Rain Shower,lshowers.png
 990,Light Rain with Thunder,thunshowers.png
 991,Light Drizzle,lshowers.png
@@ -112,7 +112,7 @@
 993,Smoke,fog.png
 994,Haze,fog.png
 995,Light Snow Shower,flurries.png
-996,Light Snow Shower/ Windy,flurries.png
+996,Light Snow Shower/  Windy,flurries.png
 997,Clear,fair.png
 998,A Few Clouds,pcloudy.png
 999,Fair,fair.png
