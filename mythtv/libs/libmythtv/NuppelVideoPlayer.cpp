@@ -129,7 +129,9 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
 
 NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     : forceVideoOutput(kVideoOutput_Default),
-      decoder(NULL), videoOutput(NULL), nvr_enc(NULL), m_playbackinfo(NULL),
+      decoder(NULL),                decoder_change_lock(true),
+      videoOutput(NULL),            nvr_enc(NULL), 
+      m_playbackinfo(NULL),
       // Window stuff
       parentWidget(NULL), embedid(0), embx(-1), emby(-1), embw(-1), embh(-1),
       // State
@@ -331,6 +333,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)
 {
+    QMutexLocker locker(&decoder_change_lock);
+
     watchingrecording = mode;
     if (GetDecoder())
         GetDecoder()->setWatchingRecording(mode);
@@ -374,6 +378,8 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     }
     if (ringBuffer)
         ringBuffer->Pause();
+
+    QMutexLocker locker(&decoder_change_lock);
 
     if (GetDecoder() && videoOutput)
     {
@@ -1406,6 +1412,7 @@ void NuppelVideoPlayer::ResetCaptions(uint mode_override)
     textDisplayMode = origMode;
 }
 
+// caller has decoder_changed_lock
 void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
     textDisplayMode &= ~mode;
@@ -1448,6 +1455,7 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
     }
 }
 
+// caller has decoder_changed_lock
 void NuppelVideoPlayer::EnableCaptions(uint mode)
 {
     QString msg = "";
@@ -1547,6 +1555,8 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
     uint mode = track_type_to_display_mode[type];
     uint origMode = textDisplayMode;
 
+    QMutexLocker locker(&decoder_change_lock);
+
     if (ringBuffer->isDVD() && GetCaptionMode() > 0)
         ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
 
@@ -1579,6 +1589,8 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
     uint origMode = textDisplayMode;
 
     textDesired = enable;
+
+    QMutexLocker locker(&decoder_change_lock);
 
     if (!enable)
     {
@@ -1625,6 +1637,8 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
  */
 void NuppelVideoPlayer::SetTeletextPage(uint page)
 {
+    QMutexLocker locker(&decoder_change_lock);
+
     DisableCaptions(textDisplayMode);
     ttPageNum = page;
     textDisplayMode &= ~kDisplayAllCaptions;
@@ -5564,14 +5578,17 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
 QStringList NuppelVideoPlayer::GetTracks(uint type) const
 {
-    if (decoder)
-        return decoder->GetTracks(type);
+    // needs lock?
+    if (GetDecoder())
+        return GetDecoder()->GetTracks(type);
     return QStringList();
 }
 
 int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
 {
     int ret = -1;
+
+    QMutexLocker locker(&decoder_change_lock);
 
     if (decoder)
         ret = decoder->SetTrack(type, trackNo);
@@ -5623,7 +5640,7 @@ void NuppelVideoPlayer::TracksChanged(uint trackType)
     if (trackType >= kTrackTypeSubtitle &&
         trackType <= kTrackTypeTeletextCaptions && textDesired)
     {
-	SetCaptionsEnabled(textDesired);
+        SetCaptionsEnabled(textDesired);
     }
 }
 
@@ -5639,6 +5656,8 @@ bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
     if (!GetInteractiveTV())
         return false;
 
+    QMutexLocker locker(&decoder_change_lock);
+
     if (GetDecoder())
         return GetDecoder()->ITVHandleAction(action);
 
@@ -5650,6 +5669,8 @@ bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
  */
 void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
 {
+    QMutexLocker locker(&decoder_change_lock);
+
     OSD *osd = GetOSD();
     if (!GetDecoder() || !osd)
         return;
@@ -5698,15 +5719,18 @@ bool NuppelVideoPlayer::SetVideoByComponentTag(int tag)
 
 int NuppelVideoPlayer::GetTrack(uint type) const
 {
-    if (decoder)
-        return decoder->GetTrack(type);
+    // needs lock?
+    if (GetDecoder())
+        return GetDecoder()->GetTrack(type);
     return -1;
 }
 
 int NuppelVideoPlayer::ChangeTrack(uint type, int dir)
 {
-    if (decoder)
-        return decoder->ChangeTrack(type, dir);
+    QMutexLocker locker(&decoder_change_lock);
+
+    if (GetDecoder())
+        return GetDecoder()->ChangeTrack(type, dir);
     return -1;
 }
 
@@ -5714,6 +5738,8 @@ int NuppelVideoPlayer::ChangeTrack(uint type, int dir)
 // so far only dir > 0 implemented
 void NuppelVideoPlayer::ChangeCaptionTrack(int dir)
 {
+    QMutexLocker locker(&decoder_change_lock);
+
     if (!decoder || (dir < 0))
         return;
 
@@ -6029,6 +6055,8 @@ void NuppelVideoPlayer::AddSubtitle(const AVSubtitle &subtitle)
 void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
 {
     //VERBOSE(VB_IMPORTANT, "SetDecoder("<<dec<<") was "<<decoder);
+    QMutexLocker locker(&decoder_change_lock);
+
     if (!decoder)
         decoder = dec;
     else

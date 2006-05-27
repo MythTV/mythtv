@@ -493,6 +493,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     VideoOutputType forceVideoOutput;
 
     DecoderBase   *decoder;
+    QMutex         decoder_change_lock;
     VideoOutput   *videoOutput;
     RemoteEncoder *nvr_enc;
     ProgramInfo   *m_playbackinfo;
