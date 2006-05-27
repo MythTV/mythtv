@@ -41,12 +41,12 @@ public:
     virtual void StartSpeaker() {};
     virtual void Open() {};
     virtual void Close() {};
-    virtual int  Write(short *data, int samples) {return 0;};
+    virtual int  Write(short *, int) {return 0;};
     virtual int  WriteSilence(int samples);
     virtual int  msOutQueued() {return 0;};
     virtual int  samplesOutSpaceRemaining() {return 0;};
     virtual bool anyMicrophoneData() {return false;};
-    virtual int  Read(short *buffer, int maxSamples) { return 0;};
+    virtual int  Read(short *, int) { return 0;};
 protected:
     int micCaptureSamples;
 };

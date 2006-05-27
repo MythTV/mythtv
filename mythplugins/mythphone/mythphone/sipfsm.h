@@ -90,7 +90,7 @@ private:
 
 
 // Call States
-#define SIP_IDLE		            0x1
+#define SIP_IDLE                0x1
 #define SIP_OCONNECTING1        0x2    // Invite sent, no response yet
 #define SIP_OCONNECTING2        0x3    // Invite sent, 1xx response
 #define SIP_ICONNECTING         0x4
@@ -159,8 +159,9 @@ private:
 #define SIP_USER_MESSAGE        0x1F00
 #define SIP_KICKWATCH           0x2000
 #define SIP_MODIFYSESSION       0x2100
+#define SIP_OPTIONS             0x2200
 
-#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE) || ((s)==SIP_INFO))
+#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE) || ((s)==SIP_INFO) || ((s)==SIP_OPTIONS))
 #define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) || ((s)==SIP_MESSAGESTATUS) || ((s)==SIP_INFOSTATUS) )
 #define SIP_MSG(s)              (SIP_CMD(s) || SIP_STATUS(s))
 
@@ -593,6 +594,23 @@ class SipIM : public SipFsmBase
 };
 
 
+class SipOptions : public SipFsmBase
+{
+  public:
+    SipOptions(SipFsm *par, QString localIp, int localPort, SipRegistration *reg, QString callIdStr="");
+    ~SipOptions();
+    virtual int FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type() { return "Options"; };
+
+  private:
+    QString sipLocalIp;
+    int sipLocalPort;
+    SipRegistration *regProxy;
+    int rxCseq;
+    int txCseq;
+};
+
+
 class SipFsm : public QWidget
 {
 
@@ -617,6 +635,7 @@ class SipFsm : public QWidget
     SipSubscriber *CreateSubscriberFsm();
     SipWatcher *CreateWatcherFsm(QString Url);
     SipIM *CreateIMFsm(QString Url="", QString callIdStr="");
+    SipOptions *CreateOptionsFsm(QString Url="", QString callIdStr="");
     void StopWatchers();
     void KickWatcher(SipUrl *Url);
     void SendIM(QString destUrl, QString CallId, QString imMsg);

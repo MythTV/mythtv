@@ -935,6 +935,7 @@ void SipFsm::CheckRxEvent()
             case SIP_REGISTER:    fsm = sipRegistrar;            break;
             case SIP_SUBSCRIBE:   fsm = CreateSubscriberFsm();   break;
             case SIP_MESSAGE:     fsm = CreateIMFsm();           break;
+            case SIP_OPTIONS:     fsm = CreateOptionsFsm();      break;
             default:              fsm = CreateCallFsm();         break;
             }
         }
@@ -980,6 +981,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
     if (Method == "NOTIFY")     return SIP_NOTIFY;
     if (Method == "MESSAGE")    return SIP_MESSAGE;
     if (Method == "INFO")       return SIP_INFO;
+    if (Method == "OPTIONS")    return SIP_OPTIONS;
 
     if (Method == "STATUS")
     {
@@ -1067,6 +1069,13 @@ SipIM *SipFsm::CreateIMFsm(QString Url, QString callIdStr)
     SipIM *im = new SipIM(this, natIp, localPort, sipRegistration, Url, callIdStr);
     FsmList.append(im);
     return im;
+}
+
+SipOptions *SipFsm::CreateOptionsFsm(QString Url, QString callIdStr)
+{
+    SipOptions *opt = new SipOptions(this, natIp, localPort, sipRegistration, callIdStr);
+    FsmList.append(opt);
+    return opt;
 }
 
 void SipFsm::StopWatchers()
@@ -3144,6 +3153,51 @@ void SipIM::SendMessage(SipMsg *authMsg, QString Text)
     (parent->Timer())->Start(this, t1, SIP_RETX);
 }
 
+
+
+/**********************************************************************
+SipOptions
+
+FSM to handle OPTIONS processing 
+**********************************************************************/
+
+SipOptions::SipOptions(SipFsm *par, QString localIp, int localPort, SipRegistration *reg, QString callIdStr) : SipFsmBase(par)
+{
+    sipLocalIp = localIp;
+    sipLocalPort = localPort;
+    regProxy = reg;
+
+    rxCseq = -1;
+    txCseq = 1;
+    if (callIdStr.length() > 0)
+        CallId.setValue(callIdStr);
+    else
+        CallId.Generate(sipLocalIp);
+    
+    if (regProxy)
+        MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
+    else
+        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, sipLocalPort);
+    MyContactUrl = new SipUrl("", "", sipLocalIp, sipLocalPort);
+}
+
+SipOptions::~SipOptions()
+{
+    if (MyUrl)
+        delete MyUrl;
+    if (MyContactUrl)
+        delete MyContactUrl;
+    MyUrl = MyContactUrl = 0;
+}
+
+int SipOptions::FSM(int Event, SipMsg *sipMsg, void *Value)
+{
+    // If we get an OPTIONS message, just send a 200 OK
+    ParseSipMsg(Event, sipMsg);
+    BuildSendStatus(200, "OPTIONS", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+
+    return SIP_IDLE;
+}
 
 
 /**********************************************************************

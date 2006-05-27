@@ -415,7 +415,7 @@ void SipMsg::decodeLine(QString line)
 void SipMsg::decodeRequestLine(QString line)
 {
     QString Token = line.section(' ', 0, 0);
-    if ((Token == "INVITE") || (Token == "ACK") || (Token == "BYE") || (Token == "CANCEL") || (Token == "REGISTER") || (Token == "SUBSCRIBE") || (Token == "NOTIFY") || (Token == "MESSAGE") || (Token == "INFO"))
+    if ((Token == "INVITE") || (Token == "ACK") || (Token == "BYE") || (Token == "CANCEL") || (Token == "REGISTER") || (Token == "SUBSCRIBE") || (Token == "NOTIFY") || (Token == "MESSAGE") || (Token == "INFO") || (Token == "OPTIONS"))
         thisMethod = Token;
     else if (Token == "SIP/2.0")
     {
