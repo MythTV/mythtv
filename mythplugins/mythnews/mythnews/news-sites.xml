@@ -125,7 +125,7 @@
 
     <item>
         <title>Freshmeat</title>
-        <url>http://freshmeat.net/backend/fm.rdf</url>
+        <url>http://rss.freshmeat.net/freshmeat/feeds/fm-releases-global</url>
         <ico>http://freshmeat.net/favicon.ico</ico>
     </item>
 
@@ -1154,7 +1154,7 @@
 
     <item>
         <title>Dilbert</title>
-        <url>http://dwlt.net/tapestry/dilbert.rdf</url>
+        <url>http://feeds.feedburner.com/tapestrydilbert</url>
     </item>
 
 </category>
