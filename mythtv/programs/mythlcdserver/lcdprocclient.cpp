@@ -183,6 +183,7 @@ void LCDProcClient::sendToServer(const QString &someText)
     }
 
     QTextStream os(socket);
+    os.setEncoding(QTextStream::Latin1);
    
     last_command = someText;
  

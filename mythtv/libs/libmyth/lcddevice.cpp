@@ -217,7 +217,8 @@ void LCD::sendToServer(const QString &someText)
     }
 
     QTextStream os(socket->socketDevice());
-   
+    os.setEncoding(QTextStream::Latin1);
+ 
     last_command = someText;
  
     if (connected)
