@@ -1896,6 +1896,10 @@ void LCDProcClient::outputMusic()
         {
             shuffle = "S:i ";
         }
+        else if (music_shuffle == 3)
+        {
+            shuffle = "S:a ";
+        }
 
         if (music_repeat == 1)
         {

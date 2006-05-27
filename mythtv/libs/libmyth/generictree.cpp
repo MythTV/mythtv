@@ -97,8 +97,8 @@ GenericTree::GenericTree(const QString &a_string, int an_int,
     m_selected_subnode = NULL;
     m_current_ordering_index = -1;
 
-    // Use 4 here, because we know that's what mythmusic wants (limits resizing)
-    m_attributes = new IntVector(4);
+    // Use 5 here, because we know that's what mythmusic wants (limits resizing)
+    m_attributes = new IntVector(5);
     
     m_string = a_string;
     m_int = an_int;

@@ -107,6 +107,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         setShuffleMode(SHUFFLE_RANDOM);
     else if (playmode.lower() == "intelligent")
         setShuffleMode(SHUFFLE_INTELLIGENT);
+    else if (playmode.lower() == "album")
+        setShuffleMode(SHUFFLE_ALBUM);
     else
         setShuffleMode(SHUFFLE_OFF);
 
@@ -233,6 +235,8 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
         gContext->SaveSetting("PlayMode", "intelligent");
     else if (shufflemode == SHUFFLE_RANDOM)
         gContext->SaveSetting("PlayMode", "random");
+    else if (shufflemode == SHUFFLE_ALBUM)
+        gContext->SaveSetting("PlayMode", "album");
     else
         gContext->SaveSetting("PlayMode", "none");
 
@@ -1417,6 +1421,19 @@ void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
             if (class LCD *lcd = LCD::Get())
                 lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_RAND);
             break;
+        case SHUFFLE_ALBUM:
+            if(shuffle_button)
+            {
+                if (keyboard_accelerators)
+                    shuffle_button->setText(tr("1 Shuffle: Album"));
+                else
+                    shuffle_button->setText(tr("Shuffle: Album"));
+            }
+            music_tree_list->scrambleParents(true);
+
+            if (class LCD *lcd = LCD::Get())
+                lcd->setMusicShuffle(LCD::MUSIC_SHUFFLE_ALBUM);
+            break;
         default:
             if(shuffle_button)
             {
@@ -1534,7 +1551,7 @@ void PlaybackBoxMusic::constructPlaylistTree()
     // We ask the playlist object to write out the whole tree (all playlists 
     // and all music). It will set attributes for nodes in the tree, such as 
     // whether a node is selectable, how it can be ordered (normal, random, 
-    // intelligent), etc. 
+    // intelligent, album), etc. 
 
     all_playlists->writeTree(playlist_tree);
     music_tree_list->assignTreeData(playlist_tree);

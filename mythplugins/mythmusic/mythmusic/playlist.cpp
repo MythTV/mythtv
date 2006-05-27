@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <inttypes.h>
 #include <iostream>
 using namespace std;
 #include "playlist.h"
@@ -883,6 +884,13 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     int playcountMax = 0;
     double lastplayMin = 0.0;
     double lastplayMax = 0.0;
+
+    typedef map<QString, uint32_t> AlbumMap;
+    AlbumMap                       album_map;
+    AlbumMap::iterator             Ialbum;
+    QString                        album;
+
+
     for(it = songs.first(); it; it = songs.next())
     {
         if(!it->getCDFlag())
@@ -957,9 +965,28 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                     double rating_value =  (RatingWeight * ratingValue + PlayCountWeight * playcountValue + 
                                             LastPlayWeight * lastplayValue + RandomWeight * (double)rand() / 
                                             (RAND_MAX + 1.0));
-                    int integer_rating = (int) (4000001 - rating_value * 10000);
+                    uint32_t integer_rating = (int) (4000001 - rating_value * 10000);
                     added_node->setAttribute(3, integer_rating); //  "intelligent" order
-					 }
+
+                    // "intellegent/album" order
+                    album = tmpdata->Artist() + "~" + tmpdata->Album();
+                    if ((Ialbum = album_map.find(album)) == album_map.end()) {
+                      // Add room for 100 albums with 100 tracks.
+                      integer_rating *= 10000;
+                      integer_rating += (a_counter * 100);
+
+                      album_map.insert(AlbumMap::value_type(album,
+                                                            integer_rating));
+
+                      integer_rating += tmpdata->Track();
+                      added_node->setAttribute(4, integer_rating);
+                    }
+                    else {
+                      integer_rating = Ialbum->second;
+                      integer_rating += tmpdata->Track();
+                      added_node->setAttribute(4, integer_rating);
+                    }
+                }
             }
             if(it->getValue() < 0)
             {

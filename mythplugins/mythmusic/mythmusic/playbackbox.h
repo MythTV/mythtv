@@ -129,6 +129,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     { SHUFFLE_OFF = 0, 
       SHUFFLE_RANDOM, 
       SHUFFLE_INTELLIGENT,
+      SHUFFLE_ALBUM,
       MAX_SHUFFLE_MODES 
     };
 
