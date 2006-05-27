@@ -168,6 +168,7 @@ class UIBarType : public UIType
 
     void SetJustification(int jst) { m_justification = jst; }
     void SetSize(int size) { m_size = size; LoadImage(); }
+    int GetNums(void) { return m_size; }
     void SetScreen(double w, double h) { m_wmult = w; m_hmult = h; }
     void SetFont(fontProp *font) { m_font = font; }
     void SetOrientation(int ori) { m_orientation = ori; }

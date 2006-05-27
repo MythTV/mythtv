@@ -229,13 +229,13 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     m_currentRow = (int)(desiredDisplayChans / 2);
     m_currentCol = 0;
 
-    for (int y = 0; y < DISPLAY_CHANS; y++)
+    for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
         m_programs[y] = NULL;
 
-    for (int x = 0; x < DISPLAY_TIMES; x++)
+    for (int x = 0; x < MAX_DISPLAY_TIMES; x++)
     {
         m_timeInfos[x] = NULL;
-        for (int y = 0; y < DISPLAY_CHANS; y++)
+        for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
             m_programInfos[y][x] = NULL;
     }
 
@@ -248,8 +248,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     maxchannel = max((int)m_channelInfos.size() - 1, 0);
     setStartChannel((int)(m_currentStartChannel) - 
                     (int)(desiredDisplayChans / 2));
-    if (DISPLAY_CHANS > maxchannel)
-        DISPLAY_CHANS = maxchannel;
+    DISPLAY_CHANS = min(DISPLAY_CHANS, maxchannel + 1);
 
     //int fillchannels = clock.elapsed();
     //clock.restart();
@@ -276,13 +275,13 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
 GuideGrid::~GuideGrid()
 {
     gContext->removeListener(this);
-    for (int x = 0; x < DISPLAY_TIMES; x++)
+    for (int x = 0; x < MAX_DISPLAY_TIMES; x++)
     {
         if (m_timeInfos[x])
             delete m_timeInfos[x];
     }
 
-    for (int y = 0; y < DISPLAY_CHANS; y++)
+    for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
     {
         if (m_programs[y])
             delete m_programs[y];
@@ -636,7 +635,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         m_channelInfos.push_back(val);
     }
     // set starting channel index to 0 if it hasn't been set
-    m_currentStartChannel = (startingset) ? m_currentStartChannel : 0;
+    if (gotostartchannel)
+        m_currentStartChannel = (startingset) ? m_currentStartChannel : 0;
 
     if (m_channelInfos.empty())
     {
@@ -1118,6 +1118,9 @@ void GuideGrid::paintChannels(QPainter *p)
     if (infocontainer)
         itype = (UIImageType *)container->GetType("icon");
 
+    if (type && type->GetNums() != DISPLAY_CHANS)
+        type->SetSize(DISPLAY_CHANS);
+
     ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
 
     for (unsigned int y = 0; y < (unsigned int)DISPLAY_CHANS; y++)
@@ -1237,6 +1240,9 @@ void GuideGrid::paintPrograms(QPainter *p)
 
 void GuideGrid::paintInfo(QPainter *p)
 {
+    if (m_currentRow < 0 || m_currentCol < 0)
+        return;
+
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
     if (!pginfo)
         return;
@@ -1307,8 +1313,7 @@ void GuideGrid::generateListings()
     DISPLAY_CHANS = desiredDisplayChans;
     fillChannelInfos();
     maxchannel = max((int)m_channelInfos.size() - 1, 0);
-    if (DISPLAY_CHANS > maxchannel)
-        DISPLAY_CHANS = maxchannel;
+    DISPLAY_CHANS = min(DISPLAY_CHANS, maxchannel + 1);
 
     m_recList.FromScheduler();
     fillProgramInfos();
@@ -1353,8 +1358,7 @@ void GuideGrid::toggleChannelFavorite()
         DISPLAY_CHANS = desiredDisplayChans;
         fillChannelInfos(false);
         maxchannel = max((int)m_channelInfos.size() - 1, 0);
-        if (DISPLAY_CHANS > maxchannel)
-            DISPLAY_CHANS = maxchannel;
+        DISPLAY_CHANS = min(DISPLAY_CHANS, maxchannel + 1);
 
         repaint(channelRect, false);
     }
