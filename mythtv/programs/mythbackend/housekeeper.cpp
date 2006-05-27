@@ -1,7 +1,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <unistd.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
@@ -17,14 +16,9 @@ using namespace std;
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
+#include "libmyth/util.h"
 
-bool HouseKeeper_filldb_running = false;
-
-void reapChild(int /* sig */)
-{
-    (void)wait(0);
-    HouseKeeper_filldb_running = false;
-}
+static bool HouseKeeper_filldb_running = false;
 
 HouseKeeper::HouseKeeper(bool runthread, bool master)
 {
@@ -275,7 +269,14 @@ void HouseKeeper::flushLogs()
     }
 }
 
-void HouseKeeper::runFillDatabase()
+void *HouseKeeper::runMFDThread(void *param)
+{
+    HouseKeeper *keep = (HouseKeeper *)param;
+    keep->RunMFD();
+    return NULL;
+}
+
+void HouseKeeper::RunMFD(void)
 {
     QString command;
 
@@ -290,15 +291,22 @@ void HouseKeeper::runFillDatabase()
     else
         command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);
 
-    signal(SIGCHLD, &reapChild);
+    myth_system(command.ascii(), MYTH_SYSTEM_DONT_BLOCK_LIRC | 
+                                 MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+
+    HouseKeeper_filldb_running = false;
+}
+
+void HouseKeeper::runFillDatabase()
+{
+    if (HouseKeeper_filldb_running)
+        return;
+
     HouseKeeper_filldb_running = true;
-    if (fork() == 0)
-    {
-        for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
-            close(i);
-        system(command.ascii());
-        _exit(0); // this exit is ok, non-error exit from system command.
-    }
+
+    pthread_t housekeep_thread;
+    pthread_create(&housekeep_thread, NULL, runMFDThread, this);
+    pthread_detach(housekeep_thread);
 }
 
 void HouseKeeper::CleanupMyOldRecordings(void)
