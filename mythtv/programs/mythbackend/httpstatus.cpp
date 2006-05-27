@@ -743,7 +743,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
         if (!e.isNull())
         {
-            std::string temperature = e.attribute( "temperature" , "0" );
+            QString temperature = e.attribute( "temperature" , "0" );
 
             os << "      Current CPU temperature: "
                << temperature
