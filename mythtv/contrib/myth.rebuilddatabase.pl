@@ -5,25 +5,22 @@
 ## I had trouble maintaining my catalog of recordings when upgrading to
 ## cvs and from cvs to more recent cvs, so I wrote this.
 ##
+##
 ## Here is what this program is supposed to do.
+##
 ## It first scans through your myth database and displays all shows listed
 ## in the recorded table.
-## It will then traverse your myth directory (set with --dir /YOURMYTHDIR) and
-## find all your .nuv files and check them against the database to make sure
-## they have an entry.  If no entry exists, you will be prompted for the title
-## and subtitle of the recording and a record will be created.
 ##
-## The following options are available to be changed from the command line
-## (I've put defaults in if you leave them out, except for $dir)
-## --dbhost DBHOSTNAME
-## --host HOSTNAME
-## --user DBUSERNAME
-## --pass DBPASSWORD
-## --dir /MYTHFILESARESTOREDHERE
-## --database DATABASENAME
+## It will then traverse your myth directory (queried from the myth
+## database or set with --dir /YOURMYTHDIR) and find all files with
+## video extensions (set with --ext) and check if they appear in the
+## database. If no entry exists you will be prompted for identifying
+## information and a recording entry will be created.
 ##
-## use at your own risk, i am not responsible for anything this program may
-## or may not do.
+## See the help message below for options.
+##
+## Use at your own risk. Standard gnu warranty, or lack therof,
+## applies.
 
 ## To run:
 ## Ensure that the script is executable
@@ -56,8 +53,6 @@ use Sys::Hostname;
 use File::Basename;
 use Date::Parse;
 use Time::Format qw(time_format);
-
-## get command line args
 
 my ($verbose, $dir);
 
@@ -100,13 +95,25 @@ sub GetAnswer {
     return $answer;
 }
 
+# there's a version of this in CPAN but I don't want to add another dependancy
+sub EscapeFilename {
+    my $fn = $_[0];
+    # escape everything that's possibly dangerous
+    $fn =~ s{([^[:alnum:]])}{\\\1}g;
+    # it's embarassing to escape / and . so put those back
+    $fn =~ s{\\([/.])}{\1}g;
+    return $fn;
+}
+
 my $script_name = $0;
 
 if ($0 =~ m/([^\/]+)$/) {
 	$script_name = $1;
 }
 
-my $script_version = "0.0.2";
+my $script_version = "0.0.3";
+
+## get command line args
 
 my $argc=@ARGV;
 if ($argc == 0) {
@@ -139,14 +146,24 @@ if ($argc == 0) {
         $script_name --try_default
 
     Example 2:
-      Assumption: The script is run on a backend other than the DB machine.
+      Assumption: The script is run on a backend other than the DB host.
 		
         $script_name --dbhost=mydbserver
 
     Example 3:
-      Import one specific file and first few supply answers.
-		
-        $script_name --file MyVideo.avi --answer y --answer 1041 --answer \"My Video\"
+      Import one specific file and supply first few answers.
+
+        $script_name --file MyVideo.avi --answer y \\
+                     --answer 1041 --answer \"My Video\"
+
+    The script chooses reasonable defaults for all values so it's possible
+    to do a quick import of a single video by taking input from null:
+
+        $script_name --file MyVideo.avi < /dev/null
+
+    this also works with multiple videos but because record start time is
+    synthesized from file modification time you have to be careful of
+    possible collisions.
 ";
 	exit(0);
 }
@@ -239,8 +256,15 @@ print "@files\n";
 foreach my $show (@files) {
     my $showBase = basename($show);
 
-    my $found_title = $dbh->selectrow_array("select title from recorded where basename=(?)",
-                                            undef, $showBase);
+    my $cnt = $dbh->selectrow_array("select count(*) from recorded where basename=(?)",
+                                    undef, $showBase);
+
+    my $found_title;
+
+    if ($cnt gt 0) {
+        $found_title = $dbh->selectrow_array("select title from recorded where basename=(?)",
+                                             undef, $showBase);
+    }
 
     if ($found_title) {
         print("Found a match between file and database\n");
@@ -281,7 +305,10 @@ foreach my $show (@files) {
             ($8, $9, $10, $11, $12, $13);
     }
 
-    my $guess_title = "Unknown";
+    my $guess_title = $showBase;
+    $guess_title =~ s/[.][^\.]*$//;
+    $guess_title =~ s/_/ /g;
+
     my $guess_subtitle = "";
     my $guess_description = "Recovered file " . $showBase;
 
@@ -310,6 +337,12 @@ foreach my $show (@files) {
     my $newsubtitle = $guess_subtitle;
     my $newdescription = $guess_description;
 
+    if (!$starttime) {
+        # use file time if we can't infer time from name
+        $starttime = time_format("yyyy-mm{on}-dd hh:mm{in}:ss",
+                                 (stat($show))[9]);
+    }
+
     if ($quick_run) {
 
         print("QuickRun defaults:\n");
@@ -331,7 +364,7 @@ foreach my $show (@files) {
             $duration = "60";
         }
         $duration = GetAnswer("... duration (in minutes)", $duration);
-        $endtime = time_format("yyyy-mm{on}-dd HH:mm{in}:ss", str2time($starttime) + $duration * 60);
+        $endtime = time_format("yyyy-mm{on}-dd hh:mm{in}:ss", str2time($starttime) + $duration * 60);
 
     }
 
@@ -380,7 +413,7 @@ foreach my $show (@files) {
         my $commflag = "mythcommflag --rebuild " .
             ($showBase =~ /[.]nuv$/ || ($showBase =~ /[.]mpg$/ && $ssecond)
              ? "--file" : "--video") .
-             " " . $mythfile;
+             " " . EscapeFilename($dir . "/" . $mythfile);
         if (!$test_mode) {
             system($commflag);
             print "\n"; # cursor isn't always on a new line after commflagging
