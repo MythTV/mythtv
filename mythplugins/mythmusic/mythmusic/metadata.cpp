@@ -95,7 +95,9 @@ bool Metadata::isInDatabase()
 {
     bool retval = false;
 
-    QString sqlfilename = filename.remove(0, m_startdir.length());
+    QString sqlfilename(filename);
+    if (!sqlfilename.contains("://"))
+        sqlfilename.remove(0, m_startdir.length());
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT artist,compilation_artist,album,title,genre,year,tracknum,"
@@ -141,7 +143,9 @@ void Metadata::dumpToDatabase()
     if (genre == "")
         genre = QObject::tr("Unknown Genre");
 
-    QString sqlfilename = filename.remove(0, m_startdir.length());
+    QString sqlfilename(filename);
+    if (!sqlfilename.contains("://"))
+        sqlfilename.remove(0, m_startdir.length());
 
     // Don't update the database if a song with the exact same
     // metadata is already there

@@ -459,10 +459,13 @@ void EditMetadataDialog::showSaveMenu()
 
     QButton *topButton = popup->addButton(tr("Save to Database Only"), this,
                          SLOT(saveToDatabase()));
-    popup->addButton(tr("Save to File Only"), this,
-                         SLOT(saveToFile()));
-    popup->addButton(tr("Save to File and Database"), this,
-                         SLOT(saveAll()));
+    if (!m_metadata->Filename().contains("://"))
+    {
+        popup->addButton(tr("Save to File Only"), this,
+                             SLOT(saveToFile()));
+        popup->addButton(tr("Save to File and Database"), this,
+                             SLOT(saveAll()));
+    }
     popup->addButton(tr("Exit/Do Not Save"), this,
                          SLOT(closeDialog()));
     popup->addButton(tr("Cancel"), this, SLOT(cancelPopup()));

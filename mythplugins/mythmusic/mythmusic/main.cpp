@@ -87,12 +87,13 @@ void AddFileToDB(const QString &filename)
 // Remove a file from the database
 void RemoveFileFromDB (const QString &directory, const QString &filename)
 {
-    QString name(filename);
-    name.remove(0, directory.length());
+    QString sqlfilename(filename);
+    // We know that the filename will not contain :// as the SQL limits this
+    sqlfilename.remove(0, directory.length());
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM musicmetadata WHERE "
                   "filename = :NAME ;");
-    query.bindValue(":NAME", filename.utf8());
+    query.bindValue(":NAME", sqlfilename.utf8());
     query.exec();
 }
 
