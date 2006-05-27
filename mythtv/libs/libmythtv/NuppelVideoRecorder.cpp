@@ -931,7 +931,7 @@ bool NuppelVideoRecorder::Open(void)
             correct_bttv = true;
 
         QString driver = (char *)vcap.driver;
-        if (driver == "cx8800" || driver == "go7007")
+        if (driver == "cx8800" || driver == "go7007" || driver == "em28xx")
         {
             channelfd = open(videodevice.ascii(), O_RDWR);
             if (channelfd < 0)
