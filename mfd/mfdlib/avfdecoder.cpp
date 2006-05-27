@@ -232,7 +232,7 @@ bool avfDecoder::initialize()
 
     if (output())
     {
-        output()->Reconfigure(16, audio_dec->channels, audio_dec->sample_rate);
+        output()->Reconfigure(16, audio_dec->channels, audio_dec->sample_rate, false);
         output()->SetSourceBitrate(audio_dec->bit_rate);
     }
 

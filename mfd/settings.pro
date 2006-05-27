@@ -5,7 +5,7 @@ isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
 
-LIBVERSION = 0.18
+LIBVERSION = 0.19
 
 INCLUDEPATH += $${PREFIX}/include
 

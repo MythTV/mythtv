@@ -132,7 +132,7 @@ bool MadDecoder::initialize()
 
     if (output())
     {
-        output()->Reconfigure(16, channels, freq);
+        output()->Reconfigure(16, channels, freq, false);
         output()->SetSourceBitrate(bitrate);
     }
 

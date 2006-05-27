@@ -146,7 +146,7 @@ bool WavDecoder::initialize()
 
     if (output()) 
     {
-        output()->Reconfigure(bits_per_sample, chan, freq);
+        output()->Reconfigure(bits_per_sample, chan, freq, false);
         output()->SetSourceBitrate(bitrate);
     }
 
