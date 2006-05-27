@@ -11,7 +11,7 @@ using_frontend {
 }
 
 using_backend {
-    SUBDIRS += mythbackend mythfilldatabase
+    SUBDIRS += mythbackend mythfilldatabase mythtv-setup
 }
 
 using_frontend:using_backend {

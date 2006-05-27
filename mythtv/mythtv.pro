@@ -14,9 +14,5 @@ include ( settings.pro )
 # Directories
 SUBDIRS += libs filters programs themes i18n
 
-using_backend {
-    SUBDIRS += setup
-}
-
 # clean up config on distclean, this must be the last sub-directory
 SUBDIRS += config
