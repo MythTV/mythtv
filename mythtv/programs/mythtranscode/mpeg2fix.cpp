@@ -1859,7 +1859,7 @@ int MPEG2fixup::Start()
                                     PTSdiscrep = 0;
                                     break;
                                 }
-                                if (tmpPTSdiscrep != AV_NOPTS_VALUE &&
+                                if (tmpPTSdiscrep != (int64_t)AV_NOPTS_VALUE &&
                                     tmpPTSdiscrep != PTSdiscrep)
                                     PTSdiscrep = tmpPTSdiscrep;
                             }

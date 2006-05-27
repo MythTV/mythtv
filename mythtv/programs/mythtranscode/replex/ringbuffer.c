@@ -49,7 +49,7 @@ int ring_init (ringbuffer *rbuf, int size)
 
 int ring_reinit (ringbuffer *rbuf, int size)
 {
-	if (size > rbuf->size) {
+	if (size > (int)(rbuf->size)) {
 		uint8_t *tmpalloc = (uint8_t *) realloc(rbuf->buffer,
 							sizeof(uint8_t)*size);
 		if (! tmpalloc)
