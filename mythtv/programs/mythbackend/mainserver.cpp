@@ -3290,14 +3290,14 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "MainServer::HandlePixmapLastModified()"
-                    "\n\t\t\t Couldn't find backend for: " +
-                    QString("\n\t\t\t%1 : \"%2\"").arg(pginfo->title)
+            VERBOSE(VB_IMPORTANT, QString("MainServer::HandlePixmapLastModified()"
+                    " - Couldn't find backend for: %1 : \"%2\"").arg(pginfo->title)
                     .arg(pginfo->subtitle));
         }
     }
 
-    if (pginfo->hostname != gContext->GetHostName())
+    if (!masterBackendOverride && // look locally if override is on
+        pginfo->hostname != gContext->GetHostName())
     {
         VERBOSE(VB_IMPORTANT, QString("Got requested for last modified date and time "
                                 "of preview pixmap on %1")
