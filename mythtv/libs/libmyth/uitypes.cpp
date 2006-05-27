@@ -3513,16 +3513,12 @@ bool UIManagedTreeListType::pushDown()
         return false;
     }
 
-    if (active_bin < bins)
-    {
-        ++active_bin;
-        current_node = current_node->getSelectedChild(visual_order);
-        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
-    }
-    else if (active_bin > 1)
-    {
-        --active_bin;
-    }
+    ++active_bin;
+    if (active_bin > bins)
+        active_bin = bins;
+
+    current_node = current_node->getSelectedChild(visual_order);
+    emit nodeEntered(current_node->getInt(), current_node->getAttributes());
 
     refresh();
     return true;
