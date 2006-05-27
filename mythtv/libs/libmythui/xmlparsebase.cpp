@@ -63,6 +63,7 @@ QSize XMLParseBase::parseSize(const QString &text, bool normalize)
             QRect uiSize = GetMythMainWindow()->GetUIScreenRect();
             x = uiSize.width();
             y = uiSize.height();
+            normalize = false;
         }
         
         retval = QSize(x, y);
