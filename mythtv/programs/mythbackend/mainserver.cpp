@@ -897,7 +897,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         fileTransferList.push_back(ft);
 
         retlist << QString::number(socket->socket());
+        ft->UpRef();
         encodeLongLong(retlist, ft->GetFileSize());
+        ft->DownRef();
     }
 
     WriteStringList(socket, retlist);
@@ -916,7 +918,8 @@ void MainServer::SendResponse(QSocket *socket, QStringList &commands)
     }
     else
     {
-        cerr << "Unable to write to client socket, as it's no longer there\n";
+        VERBOSE(VB_IMPORTANT, "SendResponse: Unable to write to client socket,"
+                " as it's no longer there");
     }
 }
 
@@ -3032,6 +3035,8 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
     QStringList retlist;
 
+    ft->UpRef();
+
     if (command == "IS_OPEN")
     {
         bool isopen = ft->isOpen();
@@ -3069,6 +3074,8 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         VERBOSE(VB_IMPORTANT, QString("Unknown command: %1").arg(command));
         retlist << "ok";
     }
+
+    ft->DownRef();
 
     SendResponse(pbssock, retlist);
 }
@@ -3447,8 +3454,7 @@ void MainServer::endConnection(RefSocket *socket)
         QSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            socket->DownRef();
-            delete (*ft);
+            (*ft)->DownRef();
             fileTransferList.erase(ft);
             return;
         }

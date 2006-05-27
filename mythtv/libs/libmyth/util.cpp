@@ -125,7 +125,7 @@ bool connectSocket(QSocketDevice *socket, const QString &host, uint port)
  */
 bool WriteStringList(QSocketDevice *socket, QStringList &list)
 {
-    if (!socket->isOpen() || socket->error())
+    if (!socket->isOpen() || !socket->isValid() || socket->error())
     {
         VERBOSE(VB_IMPORTANT, "WriteStringList: Bad socket");
         return false;
@@ -185,6 +185,11 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
             socket->close();
             return false;
         }
+        else if (!socket->isValid())
+        {
+            VERBOSE(VB_IMPORTANT,"WriteStringList: Socket became invalid");
+            return false;
+        }
         else
         {
             if (timer.elapsed() > 100000)
@@ -207,7 +212,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 {
     list.clear();
 
-    if (!socket->isOpen() || socket->error())
+    if (!socket->isOpen() || !socket->isValid() || socket->error())
     {
         VERBOSE(VB_IMPORTANT, "ReadStringList: Bad socket");
         return false;
@@ -284,6 +289,11 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
             socket->close();
             return false;
         }
+        else if (!socket->isValid())
+        {
+            VERBOSE(VB_IMPORTANT, "ReadStringList: Socket went invalid");
+            return false;
+        }
         else
         {
             elapsed = timer.elapsed();
@@ -339,7 +349,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 bool WriteBlock(QSocketDevice *socket, void *data, uint len)
 {
     
-    if (!socket->isOpen() || socket->error())
+    if (!socket->isOpen() || !socket->isValid() || socket->error())
     {
         VERBOSE(VB_IMPORTANT, "WriteBlock: Bad socket");
         return false;
@@ -370,6 +380,11 @@ bool WriteBlock(QSocketDevice *socket, void *data, uint len)
                     QString("Socket write error (writeBlock): %1")
                             .arg(SocDevErrStr(socket->error())));
             socket->close();
+            return false;
+        }
+        else if (!socket->isValid())
+        {
+            VERBOSE(VB_IMPORTANT,"WriteBlock: Socket went invalid");
             return false;
         }
         else 
