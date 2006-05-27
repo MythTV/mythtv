@@ -365,12 +365,19 @@ MetaIO* avfDecoder::doCreateTagger(void)
 
 bool avfDecoderFactory::supports(const QString &source) const
 {
-    return (source.right(extension().length()).lower() == extension());
+     QStringList list = QStringList::split("|", extension());
+     for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
+     {
+         if (*it == source.right((*it).length()).lower())
+             return true;
+     }
+
+     return false;
 }
 
 const QString &avfDecoderFactory::extension() const
 {
-    static QString ext(".wma");
+    static QString ext(".wma|.wav");
     return ext;
 }
 
