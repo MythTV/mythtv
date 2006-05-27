@@ -60,7 +60,6 @@ void DBox2EPG::TeardownAll(void)
     {
         // Abort any pending http operation
         http->abort();
-        http->closeConnection();
         // Disconnect from http
         disconnect(http, SIGNAL(requestFinished    (int,bool)),
                    this, SLOT(  httpRequestFinished(int,bool)));
