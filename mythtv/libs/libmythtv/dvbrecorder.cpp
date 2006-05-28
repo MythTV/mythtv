@@ -614,7 +614,7 @@ void DVBRecorder::WritePATPMT(void)
     {
         QMutexLocker read_lock(&_pid_lock);
 
-        VERBOSE(VB_IMPORTANT, "Writing PAT & PMT @"
+        VERBOSE(VB_RECORD, "Writing PAT & PMT @"
                 <<ringBuffer->GetWritePosition()<<" + "
                 <<(_payload_buffer.size()*188));
 
