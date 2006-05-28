@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qstring.h>
+#include <unistd.h>
 #include "mythcontext.h"
 #include "util.h"
 #include "mythsocket.h"
