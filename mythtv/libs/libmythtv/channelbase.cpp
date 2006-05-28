@@ -35,8 +35,8 @@ ChannelBase::ChannelBase(TVRec *parent)
     pParent(parent), channelorder("channum + 0"), curchannelname(""),
     currentInputID(-1), commfree(false), cardid(0),
     currentATSCMajorChannel(-1), currentATSCMinorChannel(-1),
-    currentOriginalNetworkID(-1), currentTransportID(-1),
-    currentProgramNum(-1)
+    currentProgramNum(-1), currentOriginalNetworkID(-1), 
+    currentTransportID(-1)
 {
 }
 
