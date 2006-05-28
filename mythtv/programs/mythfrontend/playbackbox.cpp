@@ -105,6 +105,61 @@ static int comp_originalAirDate_rev(ProgramInfo *a, ProgramInfo *b)
         return (dt1 > dt2 ? 1 : -1);
 }
 
+static PlaybackBox::ViewMask viewMaskToggle(PlaybackBox::ViewMask mask,
+        PlaybackBox::ViewMask toggle)
+{
+    // can only toggle a single bit at a time
+    if ((mask & toggle))
+        return (PlaybackBox::ViewMask)(mask & ~toggle);
+    return (PlaybackBox::ViewMask)(mask | toggle);
+}
+
+static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
+        PlaybackBox::ViewTitleSort titleSort, int recpriority)
+{
+    if (title == "")
+        return title;
+
+    QRegExp prefixes = QObject::tr("^(The |A |An )");
+    QString sTitle = title;
+
+    sTitle.remove(prefixes);
+    if (viewmask == PlaybackBox::VIEW_TITLES &&
+            titleSort == PlaybackBox::TitleSortRecPriority)
+    {
+        // Also incorporate recpriority (reverse numeric sort). In
+        // case different episodes of a recording schedule somehow
+        // have different recpriority values (e.g., manual fiddling
+        // with database), the title will appear once for each
+        // distinct recpriority value among its episodes.
+        //
+        // Deal with QMap sorting. Positive recpriority values have a
+        // '+' prefix (QMap alphabetically sorts before '-'). Positive
+        // recpriority values are "inverted" by substracting them from
+        // 1000, so that high recpriorities are sorted first (QMap
+        // alphabetically). For example:
+        //
+        //      recpriority =>  sort key
+        //          95          +905
+        //          90          +910
+        //          89          +911
+        //           1          +999
+        //           0          -000
+        //          -5          -005
+        //         -10          -010
+        //         -99          -099
+
+        QString sortprefix;
+        if (recpriority > 0)
+            sortprefix.sprintf("+%03u", 1000 - recpriority);
+        else
+            sortprefix.sprintf("-%03u", -recpriority);
+
+        sTitle = sortprefix + "-" + sTitle;
+    }
+    return sTitle;
+}
+
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
     : MythDialog(parent, name),
@@ -120,6 +175,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       groupDisplayName(tr("All Programs")),
       recGroup("All Programs"),
       recGroupPassword(""),             curGroupPassword(""),
+      viewMask(VIEW_TITLES),
       // Theme parsing
       theme(new XMLParse()),
       // Non-volatile drawing variables
@@ -183,7 +239,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         drawTransPixmap = new QPixmap();
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
-    int  defaultView = gContext->GetNumSetting("DisplayGroupDefaultView", 0);
+    ViewType defaultView = (ViewType)gContext->GetNumSetting(
+            "DisplayGroupDefaultView", TitlesOnly);
     int  initialFilt = gContext->GetNumSetting("QueryInitialFilter", 0);
 
     progLists[""];
@@ -348,26 +405,36 @@ PlaybackBox::~PlaybackBox(void)
     }
 }
 
-void PlaybackBox::setDefaultView(int defaultView)
+void PlaybackBox::setDefaultView(ViewType defaultView)
 {
+    int mask;
+
     switch (defaultView)
     {
         default:
-        case TitlesOnly: titleView = true; useCategories = false; 
-                         useRecGroups = false; break;
-        case TitlesCategories: titleView = true; useCategories = true; 
-                               useRecGroups = false; break;
-        case TitlesCategoriesRecGroups: titleView = true; useCategories = true;
-                                        useRecGroups = true; break;
-        case TitlesRecGroups: titleView = true; useCategories = false; 
-                              useRecGroups = true; break;
-        case Categories: titleView = false; useCategories = true; 
-                         useRecGroups = false; break;
-        case CategoriesRecGroups: titleView = false; useCategories = true; 
-                                  useRecGroups = true; break;
-        case RecGroups: titleView = false; useCategories = false; 
-                        useRecGroups = true; break;
+        case TitlesOnly:
+            mask = VIEW_TITLES;
+            break;
+        case TitlesCategories:
+            mask = VIEW_TITLES |    VIEW_CATEGORIES;
+            break;
+        case TitlesCategoriesRecGroups:
+            mask = VIEW_TITLES |    VIEW_CATEGORIES |   VIEW_RECGROUPS;
+            break;
+        case TitlesRecGroups:
+            mask = VIEW_TITLES |                        VIEW_RECGROUPS;
+            break;
+        case Categories:
+            mask =                  VIEW_CATEGORIES;
+            break;
+        case CategoriesRecGroups:
+            mask =                  VIEW_CATEGORIES |   VIEW_RECGROUPS;
+            break;
+        case RecGroups:
+            mask =                                      VIEW_RECGROUPS;
+            break;
     }
+    viewMask = (PlaybackBox::ViewMask)mask;
 }
 
 /* blocks until playing has stopped */
@@ -573,8 +640,22 @@ void PlaybackBox::grayOut(QPainter *tmp)
         tmp->fillRect(QRect(QPoint(0, 0), size()), 
                       QBrush(QColor(10, 10, 10), Dense4Pattern));
     else if (transparentFlag == 1)
-        tmp->drawPixmap(0, 0, *drawTransPixmap, 0, 0, (int)(800*wmult), 
-                        (int)(600*hmult));
+    {
+        int ww, hh;
+
+        if (d->IsWideMode())
+        {
+            ww = 1280;
+            hh = 720;
+        }
+        else
+        {
+            ww = 800;
+            hh = 600;
+        }
+        tmp->drawPixmap(0, 0, *drawTransPixmap, 0, 0, (int)(ww*wmult), 
+                        (int)(hh*hmult));
+    }
 */
 }
 void PlaybackBox::updateCurGroup(QPainter *p)
@@ -1121,7 +1202,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     ((titleList[titleIndex] != tempInfo->title) &&
                      ((titleList[titleIndex] == tempInfo->recgroup) ||
                       (titleList[titleIndex] == tempInfo->category))) ||
-                    (!(titleView)))
+                    (!(viewMask & VIEW_TITLES)))
                     tempSubTitle = tempInfo->title; 
                 else
                     tempSubTitle = tempInfo->subtitle;
@@ -1132,7 +1213,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                         ((titleList[titleIndex] != tempInfo->title) &&
                          ((titleList[titleIndex] == tempInfo->recgroup) ||
                           (titleList[titleIndex] == tempInfo->category))) ||
-                        (!(titleView))))
+                        (!(viewMask & VIEW_TITLES))))
                 {
                     tempSubTitle = tempSubTitle + " - \"" + 
                         tempInfo->subtitle + "\"";
@@ -1343,6 +1424,7 @@ bool PlaybackBox::FillList()
     QString oldprogramid;
     QDate oldoriginalAirDate;
     QDateTime oldstartts;
+    int oldrecpriority = 0;
     p = progLists[oldtitle].at(progIndex);
     if (p)
     {
@@ -1350,6 +1432,7 @@ bool PlaybackBox::FillList()
         oldstartts = p->recstartts;
         oldprogramid = p->programid;
         oldoriginalAirDate = p->originalAirDate;
+        oldrecpriority = p->recpriority;
     }
 
     QMap<QString, AvailableStatusType> asCache;
@@ -1370,8 +1453,10 @@ bool PlaybackBox::FillList()
 
     fillRecGroupPasswordCache();
 
+    ViewTitleSort titleSort = (ViewTitleSort)gContext->GetNumSetting(
+            "DisplayGroupTitleSort", TitleSortAlphabetical);
+
     QMap<QString, QString> sortedList;
-    QRegExp prefixes = tr("^(The |A |An )");
     QString sTitle = "";
 
     bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
@@ -1394,7 +1479,7 @@ bool PlaybackBox::FillList()
                  (p->category == recGroup ) &&
                  ( !recGroupPwCache.contains(p->recgroup))))
             {
-                if ((titleView) || (useCategories) || (useRecGroups))
+                if (viewMask != VIEW_NONE)
                     progLists[""].prepend(p);
 
                 asKey = p->MakeUniqueKey();
@@ -1403,31 +1488,35 @@ bool PlaybackBox::FillList()
                 else
                     p->availableStatus = asAvailable;
 
-                if (titleView) // Normal title view 
+                if ((viewMask & VIEW_TITLES)) // Show titles
                 {
                     progLists[p->title].prepend(p);
-                    sTitle = p->title;
-                    sTitle.remove(prefixes);
+                    sTitle = sortTitle(p->title, viewMask, titleSort,
+                            p->recpriority);
                     sTitle = sTitle.lower();
                     sortedList[sTitle] = p->title;
                 } 
 
-                if (useRecGroups && p->recgroup != "") // Show recording groups                 
+                if ((viewMask & VIEW_RECGROUPS) &&
+                    p->recgroup != "") // Show recording groups                 
                 { 
                     progLists[p->recgroup].prepend(p);
                     sortedList[p->recgroup.lower()] = p->recgroup;
 
-                    // If another view is also used, unset autodelete as another group will do it.
-                    if ((useCategories) || (titleView))
+                    // If another view is also used, unset autodelete as
+                    // another group will do it.
+                    if ((viewMask & ~VIEW_RECGROUPS))
                         progLists[p->recgroup].setAutoDelete(false);
                 }
 
-                if (useCategories && p->category != "") // Show categories
+                if ((viewMask & VIEW_CATEGORIES) &&
+                    p->category != "") // Show categories
                 {
                     progLists[p->category].prepend(p);
                     sortedList[p->category.lower()] = p->category;
-                    // If another view is also used, unset autodelete as another group will do it
-                    if ((useRecGroups) || (titleView)) 
+                    // If another view is also used, unset autodelete as
+                    // another group will do it
+                    if ((viewMask & ~VIEW_CATEGORIES))
                         progLists[p->category].setAutoDelete(false);
                 }
             }
@@ -1447,8 +1536,6 @@ bool PlaybackBox::FillList()
 
         return 0;
     }
-
-    titleList = sortedList.values();
 
     QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
 
@@ -1485,20 +1572,24 @@ bool PlaybackBox::FillList()
     // titles backwards until we find where we were or go past.  This
     // is somewhat inefficient, but it works.
 
-    QString oldsTitle = oldtitle;
-    oldsTitle.remove(prefixes);
+    QStringList sTitleList = sortedList.keys();
+    titleList = sortedList.values();
+
+    QString oldsTitle = sortTitle(oldtitle, viewMask, titleSort,
+            oldrecpriority);
     oldsTitle = oldsTitle.lower();
     titleIndex = titleList.count() - 1;
-    for (int i = titleIndex; i >= 0; i--)
+    for (titleIndex = titleList.count() - 1; titleIndex >= 0; titleIndex--)
     {
-        sTitle = titleList[i];
-        sTitle.remove(prefixes);
+        sTitle = sTitleList[titleIndex];
         sTitle = sTitle.lower();
         
         if (oldsTitle > sTitle)
+        {
+            if (titleIndex + 1 < (int)titleList.count())
+                titleIndex++;
             break;
-
-        titleIndex = i;
+        }
 
         if (oldsTitle == sTitle)
             break;
@@ -2255,7 +2346,7 @@ void PlaybackBox::showPlaylistPopup()
  
     if (inTitle)
     {
-        if (titleView)
+        if ((viewMask & VIEW_TITLES))
             popup->addButton(tr("Toggle playlist for this Category/Title"),
                              this, SLOT(togglePlayListTitle()));
         else 
@@ -3244,8 +3335,7 @@ void PlaybackBox::toggleTitleView(void)
     if (expectingPopup)
         cancelPopup();
 
-    if (titleView) titleView = false;
-    else titleView = true;
+    viewMask = viewMaskToggle(viewMask, VIEW_TITLES);
 
     playList.clear();
     connected = FillList();      
@@ -3494,8 +3584,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "TOGGLERECORD")
         {
-            if (titleView) titleView = false;
-            else titleView = true;
+            viewMask = viewMaskToggle(viewMask, VIEW_TITLES);
             connected = FillList();
             paintSkipUpdate = false;
             update(drawTotalBounds);
@@ -4040,7 +4129,7 @@ void PlaybackBox::showViewChanger(void)
     int result = recGroupPopup->ExecPopup();
 
     if (result == MythDialog::Accepted)
-        setDefaultView(recGroupComboBox->currentItem());
+        setDefaultView((ViewType)recGroupComboBox->currentItem());
 
     delete recGroupComboBox;
 

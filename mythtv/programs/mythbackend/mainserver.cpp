@@ -984,7 +984,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "recorded.basename, recorded.progstart, "
                        "recorded.progend, recorded.stars, "
                        "recordedprogram.stereo, recordedprogram.hdtv, "
-                       "recordedprogram.closecaptioned, transcoded "
+                       "recordedprogram.closecaptioned, transcoded, "
+                       "recorded.recpriority "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1102,6 +1103,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->recgroup = query.value(16).toString();
             proginfo->playgroup = query.value(27).toString();
+
+            proginfo->recpriority = query.value(36).toInt();
 
             proginfo->recstatus = rsRecorded;
             if (proginfo->recendts > rectime)

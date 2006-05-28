@@ -13,6 +13,7 @@
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "mpeg/iso639.h"
+#include "playbackbox.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
 #include "scheduledrecording.h"
@@ -305,13 +306,21 @@ static HostComboBox *DefaultView()
     HostComboBox *gc = new HostComboBox("DisplayGroupDefaultView");
     gc->setLabel(QObject::tr("Default View"));
 
-    gc->addSelection(QObject::tr("Show Titles only"), "0");
-    gc->addSelection(QObject::tr("Show Titles and Categories"), "1");
-    gc->addSelection(QObject::tr("Show Titles, Categories, and Recording Groups"), "2");
-    gc->addSelection(QObject::tr("Show Titles and Recording Groups"), "3");
-    gc->addSelection(QObject::tr("Show Categories only"), "4");
-    gc->addSelection(QObject::tr("Show Categories and Recording Groups"), "5");
-    gc->addSelection(QObject::tr("Show Recording Groups only"), "6");
+    gc->addSelection(QObject::tr("Show Titles only"),
+            QString::number(PlaybackBox::TitlesOnly));
+    gc->addSelection(QObject::tr("Show Titles and Categories"),
+            QString::number(PlaybackBox::TitlesCategories));
+    gc->addSelection(QObject::tr(
+                "Show Titles, Categories, and Recording Groups"),
+            QString::number(PlaybackBox::TitlesCategoriesRecGroups));
+    gc->addSelection(QObject::tr("Show Titles and Recording Groups"),
+            QString::number(PlaybackBox::TitlesRecGroups));
+    gc->addSelection(QObject::tr("Show Categories only"),
+            QString::number(PlaybackBox::Categories));
+    gc->addSelection(QObject::tr("Show Categories and Recording Groups"),
+            QString::number(PlaybackBox::CategoriesRecGroups));
+    gc->addSelection(QObject::tr("Show Recording Groups only"),
+            QString::number(PlaybackBox::RecGroups));
 
     gc->setHelpText(QObject::tr("Select what type of grouping to show on the Watch Recordings screen "
                     "by default."));
@@ -2443,6 +2452,35 @@ static HostCheckBox *EnableMediaMon()
     return gc;
 }
 
+class DefaultViewSettings: public VerticalConfigurationGroup,
+                           public TriggeredConfigurationGroup {
+public:
+    DefaultViewSettings():
+            VerticalConfigurationGroup(false, false, true, true),
+            TriggeredConfigurationGroup(false) {
+
+        HostComboBox *defaultView = DefaultView();
+        addChild(defaultView);
+        setTrigger(defaultView);
+
+        HostComboBox *titleSort = new HostComboBox("DisplayGroupTitleSort");
+        titleSort->setLabel(tr("Sort Titles"));
+        titleSort->addSelection(tr("Alphabetically"),
+                QString::number(PlaybackBox::TitleSortAlphabetical));
+        titleSort->addSelection(tr("By Recording Priority"),
+                QString::number(PlaybackBox::TitleSortRecPriority));
+
+        for (unsigned int ii = 0; ii < PlaybackBox::ViewTypes; ii++)
+        {
+            if (ii == PlaybackBox::TitlesOnly)
+                addTarget(QString::number(ii), titleSort);
+            else
+                addTarget(QString::number(ii),
+                        new VerticalConfigurationGroup(false, false));
+        }
+    }
+};
+
 static HostCheckBox *PVR350OutputEnable()
 {
     HostCheckBox *gc = new HostCheckBox("PVR350OutputEnable");
@@ -3266,7 +3304,7 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(RememberRecGroup());
     pbox2->addChild(UseGroupNameAsAllPrograms());
     pbox2->addChild(LiveTVInAllPrograms());
-    pbox2->addChild(DefaultView());
+    pbox2->addChild(new DefaultViewSettings());
     addChild(pbox2);
 
     addChild(new HwDecSettings());
@@ -3499,3 +3537,4 @@ XboxSettings::XboxSettings()
     addChild(xboxset);
 }
 
+// vim:set sw=4 ts=4 expandtab:

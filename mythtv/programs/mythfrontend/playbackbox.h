@@ -1,4 +1,5 @@
 // -*- Mode: c++ -*-
+// vim:set sw=4 ts=4 expandtab:
 #ifndef PLAYBACKBOX_H_
 #define PLAYBACKBOX_H_
 
@@ -42,16 +43,32 @@ class PlaybackBox : public MythDialog
         Delete,
     } BoxType;
 
-    typedef enum
-    {
-        TitlesOnly,
-        TitlesCategories,
-        TitlesCategoriesRecGroups,
-        TitlesRecGroups,
-        Categories,
-        CategoriesRecGroups,
-        RecGroups,
+    // ViewType values cannot change; they are stored in the database.
+    typedef enum {
+        TitlesOnly = 0,
+        TitlesCategories = 1,
+        TitlesCategoriesRecGroups = 2,
+        TitlesRecGroups = 3,
+        Categories = 4,
+        CategoriesRecGroups = 5,
+        RecGroups = 6,
+        ViewTypes,                  // placeholder value, not in database
     } ViewType;
+
+    // Sort function when TitlesOnly. Values are stored in database.
+    typedef enum {
+        TitleSortAlphabetical = 0,
+        TitleSortRecPriority = 1,
+        TitleSortMethods,           // placeholder value, not in database
+    } ViewTitleSort;
+
+    typedef enum {
+        VIEW_NONE       =  0x00,
+        VIEW_TITLES     =  0x01,
+        VIEW_CATEGORIES =  0x02,
+        VIEW_RECGROUPS  =  0x04,
+        VIEW_ALL        = ~0x00,
+    } ViewMask;
 
     typedef enum
     {
@@ -272,7 +289,7 @@ class PlaybackBox : public MythDialog
     void updateCurGroup(QPainter *p);
     void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix,
                          QString cont_name = "group_info");
-    void setDefaultView(int defaultView);
+    void setDefaultView(ViewType defaultView);
 
     // Settings ///////////////////////////////////////////////////////////////
     /// If "Play"  this is a recording playback selection UI,
@@ -304,6 +321,7 @@ class PlaybackBox : public MythDialog
     QString             recGroup;
     QString             recGroupPassword;
     QString             curGroupPassword;
+    ViewMask            viewMask;
 
     // Theme parsing variables
     XMLParse           *theme;
