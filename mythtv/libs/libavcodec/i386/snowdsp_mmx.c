@@ -21,35 +21,6 @@
 #include "../snow.h"
 #include "mmx.h"
 
-static void always_inline snow_interleave_line_header(int * i, int width, DWTELEM * low, DWTELEM * high){
-    (*i) = (width) - 2;
-
-    if (width & 1){
-        low[(*i)+1] = low[((*i)+1)>>1];
-        (*i)--;
-    }
-}
-
-static void always_inline snow_horizontal_compose_lift_lead_out(int i, DWTELEM * dst, DWTELEM * src, DWTELEM * ref, int width, int w, int lift_high, int mul, int add, int shift){
-    for(; i<w; i++){
-        dst[i] = src[i] - ((mul * (ref[i] + ref[i + 1]) + add) >> shift);
-    }
-
-    if((width^lift_high)&1){
-        dst[w] = src[w] - ((mul * 2 * ref[w] + add) >> shift);
-    }
-}
-
-static void always_inline snow_horizontal_compose_liftS_lead_out(int i, DWTELEM * dst, DWTELEM * src, DWTELEM * ref, int width, int w){
-        for(; i<w; i++){
-            dst[i] = src[i] - (((-(ref[i] + ref[(i+1)])+W_BO) - 4 * src[i]) >> W_BS);
-        }
-
-        if(width&1){
-            dst[w] = src[w] - (((-2 * ref[w] + W_BO) - 4 * src[w]) >> W_BS);
-        }
-}
-
 void ff_snow_horizontal_compose97i_sse2(DWTELEM *b, int width){
     const int w2= (width+1)>>1;
     // SSE2 code runs faster with pointers aligned on a 32-byte boundary.
@@ -717,7 +688,7 @@ void ff_snow_vertical_compose97i_mmx(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTE
              "jnz 1b                         \n\t"\
              :"+m"(dst8),"+m"(dst_array)\
              :\
-             "rm"((long)(src_x<<2)),"m"(obmc),"a"(block),"m"((long)b_h),"rm"((long)src_stride):\
+             "rm"((long)(src_x<<2)),"m"(obmc),"a"(block),"m"((long)b_h),"m"((long)src_stride):\
              "%"REG_b"","%"REG_c"","%"REG_S"","%"REG_D"","%"REG_d"");
 
 #define snow_inner_add_yblock_sse2_end_8\
@@ -890,7 +861,7 @@ snow_inner_add_yblock_sse2_end_16
              "jnz 1b                         \n\t"\
              :"+m"(dst8),"+m"(dst_array)\
              :\
-             "rm"((long)(src_x<<2)),"m"(obmc),"a"(block),"m"((long)b_h),"rm"((long)src_stride):\
+             "rm"((long)(src_x<<2)),"m"(obmc),"a"(block),"m"((long)b_h),"m"((long)src_stride):\
              "%"REG_b"","%"REG_c"","%"REG_S"","%"REG_D"","%"REG_d"");
 
 static void inner_add_yblock_bw_8_obmc_16_mmx(uint8_t *obmc, const long obmc_stride, uint8_t * * block, int b_w, long b_h,

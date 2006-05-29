@@ -550,12 +550,6 @@ static int encode_init(AVCodecContext *avctx)
     FFV1Context *s = avctx->priv_data;
     int i;
 
-    if(avctx->strict_std_compliance >FF_COMPLIANCE_EXPERIMENTAL){
-        av_log(avctx, AV_LOG_ERROR, "this codec is under development, files encoded with it may not be decodeable with future versions!!!\n"
-               "use vstrict=-2 / -strict -2 to use it anyway\n");
-        return -1;
-    }
-
     common_init(avctx);
 
     s->version=0;
@@ -694,7 +688,8 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     }
 }
 
-static void common_end(FFV1Context *s){
+static int common_end(AVCodecContext *avctx){
+    FFV1Context *s = avctx->priv_data;
     int i;
 
     for(i=0; i<s->plane_count; i++){
@@ -702,13 +697,6 @@ static void common_end(FFV1Context *s){
 
         av_freep(&p->state);
     }
-}
-
-static int encode_end(AVCodecContext *avctx)
-{
-    FFV1Context *s = avctx->priv_data;
-
-    common_end(s);
 
     return 0;
 }
@@ -1024,7 +1012,7 @@ AVCodec ffv1_decoder = {
     sizeof(FFV1Context),
     decode_init,
     NULL,
-    NULL,
+    common_end,
     decode_frame,
     CODEC_CAP_DR1 /*| CODEC_CAP_DRAW_HORIZ_BAND*/,
     NULL
@@ -1038,6 +1026,6 @@ AVCodec ffv1_encoder = {
     sizeof(FFV1Context),
     encode_init,
     encode_frame,
-    encode_end,
+    common_end,
 };
 #endif

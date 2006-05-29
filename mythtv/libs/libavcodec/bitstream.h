@@ -141,25 +141,34 @@ typedef struct RL_VLC_ELEM {
 
 /* used to avoid missaligned exceptions on some archs (alpha, ...) */
 #if defined(ARCH_X86) || defined(ARCH_X86_64)
+#    define unaligned16(a) (*(const uint16_t*)(a))
 #    define unaligned32(a) (*(const uint32_t*)(a))
+#    define unaligned64(a) (*(const uint64_t*)(a))
 #else
 #    ifdef __GNUC__
-static inline uint32_t unaligned32(const void *v) {
-    struct Unaligned {
-        uint32_t i;
-    } __attribute__((packed));
-
-    return ((const struct Unaligned *) v)->i;
+#    define unaligned(x)                                \
+static inline uint##x##_t unaligned##x(const void *v) { \
+    struct Unaligned {                                  \
+        uint##x##_t i;                                  \
+    } __attribute__((packed));                          \
+                                                        \
+    return ((const struct Unaligned *) v)->i;           \
 }
 #    elif defined(__DECC)
-static inline uint32_t unaligned32(const void *v) {
-    return *(const __unaligned uint32_t *) v;
+#    define unaligned(x)                                        \
+static inline uint##x##_t unaligned##x##(const void *v) {       \
+    return *(const __unaligned uint##x##_t *) v;                \
 }
 #    else
-static inline uint32_t unaligned32(const void *v) {
-    return *(const uint32_t *) v;
+#    define unaligned(x)                                        \
+static inline uint##x##_t unaligned##x##(const void *v) {       \
+    return *(const uint##x##_t *) v;                            \
 }
 #    endif
+unaligned(16)
+unaligned(32)
+unaligned(64)
+#undef unaligned
 #endif //!ARCH_X86
 
 #ifndef ALT_BITSTREAM_WRITER
@@ -574,21 +583,15 @@ static inline int get_bits_count(GetBitContext *s){
  * @author BERO
  */
 static inline int get_xbits(GetBitContext *s, int n){
-    register int tmp;
+    register int sign;
     register int32_t cache;
     OPEN_READER(re, s)
     UPDATE_CACHE(re, s)
     cache = GET_CACHE(re,s);
-    if ((int32_t)cache<0) { //MSB=1
-        tmp = NEG_USR32(cache,n);
-    } else {
-    //   tmp = (-1<<n) | NEG_USR32(cache,n) + 1; mpeg12.c algo
-    //   tmp = - (NEG_USR32(cache,n) ^ ((1 << n) - 1)); h263.c algo
-        tmp = - NEG_USR32(~cache,n);
-    }
+    sign=(~cache)>>31;
     LAST_SKIP_BITS(re, s, n)
     CLOSE_READER(re, s)
-    return tmp;
+    return (NEG_USR32(sign ^ cache, n) ^ sign) - sign;
 }
 
 static inline int get_sbits(GetBitContext *s, int n){

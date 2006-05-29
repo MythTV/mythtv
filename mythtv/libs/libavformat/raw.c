@@ -26,6 +26,20 @@ static int raw_write_header(struct AVFormatContext *s)
     return 0;
 }
 
+static int flac_write_header(struct AVFormatContext *s)
+{
+    static const uint8_t header[8] = {
+        0x66, 0x4C, 0x61, 0x43, 0x80, 0x00, 0x00, 0x22
+    };
+    uint8_t *streaminfo = s->streams[0]->codec->extradata;
+    int len = s->streams[0]->codec->extradata_size;
+    if(streaminfo != NULL && len > 0) {
+        put_buffer(&s->pb, header, 8);
+        put_buffer(&s->pb, streaminfo, len);
+    }
+    return 0;
+}
+
 static int raw_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
     put_buffer(&s->pb, pkt->data, pkt->size);
@@ -236,6 +250,22 @@ static int shorten_read_header(AVFormatContext *s,
     return 0;
 }
 
+/* flac read */
+static int flac_read_header(AVFormatContext *s,
+                            AVFormatParameters *ap)
+{
+    AVStream *st;
+
+    st = av_new_stream(s, 0);
+    if (!st)
+        return AVERROR_NOMEM;
+    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_id = CODEC_ID_FLAC;
+    st->need_parsing = 1;
+    /* the parameters will be extracted from the compressed bitstream */
+    return 0;
+}
+
 /* dts read */
 static int dts_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
@@ -369,6 +399,32 @@ AVInputFormat shorten_iformat = {
     raw_read_close,
     .extensions = "shn",
 };
+
+AVInputFormat flac_iformat = {
+    "flac",
+    "raw flac",
+    0,
+    NULL,
+    flac_read_header,
+    raw_read_partial_packet,
+    raw_read_close,
+    .extensions = "flac",
+};
+
+#ifdef CONFIG_MUXERS
+AVOutputFormat flac_oformat = {
+    "flac",
+    "raw flac",
+    "audio/x-flac",
+    "flac",
+    0,
+    CODEC_ID_FLAC,
+    0,
+    flac_write_header,
+    raw_write_packet,
+    raw_write_trailer,
+};
+#endif //CONFIG_MUXERS
 
 AVInputFormat ac3_iformat = {
     "ac3",
@@ -764,6 +820,8 @@ int raw_init(void)
 {
 
     av_register_input_format(&shorten_iformat);
+    av_register_input_format(&flac_iformat);
+    av_register_output_format(&flac_oformat);
 
     av_register_input_format(&ac3_iformat);
     av_register_output_format(&ac3_oformat);

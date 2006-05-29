@@ -267,6 +267,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_CSCD_DECODER
     register_avcodec(&cscd_decoder);
 #endif //CONFIG_CSCD_DECODER
+#ifdef CONFIG_NUV_DECODER
+    register_avcodec(&nuv_decoder);
+#endif //CONFIG_NUV_DECODER
 #ifdef CONFIG_ULTI_DECODER
     register_avcodec(&ulti_decoder);
 #endif //CONFIG_ULTI_DECODER
@@ -282,6 +285,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_LOCO_DECODER
     register_avcodec(&loco_decoder);
 #endif //CONFIG_LOCO_DECODER
+#ifdef CONFIG_KMVC_DECODER
+    register_avcodec(&kmvc_decoder);
+#endif //CONFIG_KMVC_DECODER
 #ifdef CONFIG_WNV1_DECODER
     register_avcodec(&wnv1_decoder);
 #endif //CONFIG_WNV1_DECODER
@@ -446,18 +452,18 @@ void avcodec_register_all(void)
 #ifdef CONFIG_MSZH_DECODER
     register_avcodec(&mszh_decoder);
 #endif //CONFIG_MSZH_DECODER
-#ifdef CONFIG_SMACKER_DECODER
-    register_avcodec(&smacker_decoder);
-#endif //CONFIG_SMACKER_DECODER
-#ifdef CONFIG_SMACKAUD_DECODER
-    register_avcodec(&smackaud_decoder);
-#endif //CONFIG_SMACKAUD_DECODER
 #ifdef CONFIG_ZLIB_DECODER
     register_avcodec(&zlib_decoder);
 #endif //CONFIG_ZLIB_DECODER
 #ifdef CONFIG_ZMBV_DECODER
     register_avcodec(&zmbv_decoder);
 #endif //CONFIG_ZMBV_DECODER
+#ifdef CONFIG_SMACKER_DECODER
+    register_avcodec(&smacker_decoder);
+#endif //CONFIG_SMACKER_DECODER
+#ifdef CONFIG_SMACKAUD_DECODER
+    register_avcodec(&smackaud_decoder);
+#endif //CONFIG_SMACKAUD_DECODER
 #ifdef CONFIG_SONIC_DECODER
     register_avcodec(&sonic_decoder);
 #endif //CONFIG_SONIC_DECODER
@@ -530,7 +536,7 @@ void avcodec_register_all(void)
 #endif //CONFIG_RAWVIDEO_DECODER
 #endif /* CONFIG_DECODERS */
 
-#ifdef AMR_NB
+#if defined(AMR_NB) || defined(AMR_NB_FIXED)
 #ifdef CONFIG_AMR_NB_DECODER
     register_avcodec(&amr_nb_decoder);
 #endif //CONFIG_AMR_NB_DECODER
@@ -539,7 +545,7 @@ void avcodec_register_all(void)
     register_avcodec(&amr_nb_encoder);
 #endif //CONFIG_AMR_NB_ENCODER
 #endif //CONFIG_ENCODERS
-#endif /* AMR_NB */
+#endif /* AMR_NB || AMR_NB_FIXED */
 
 #ifdef AMR_WB
 #ifdef CONFIG_AMR_WB_DECODER

@@ -33,6 +33,9 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <float.h>
+#ifdef CONFIG_WIN32
+#include <fcntl.h>
+#endif
 
 const uint8_t ff_reverse[256]={
 0x00,0x80,0x40,0xC0,0x20,0xA0,0x60,0xE0,0x10,0x90,0x50,0xD0,0x30,0xB0,0x70,0xF0,
@@ -739,6 +742,8 @@ static AVOption options[]={
 {"partp8x8", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_P8X8, INT_MIN, INT_MAX, V|E, "partitions"},
 {"partb8x8", NULL, 0, FF_OPT_TYPE_CONST, X264_PART_B8X8, INT_MIN, INT_MAX, V|E, "partitions"},
 {"sc_factor", NULL, OFFSET(scenechange_factor), FF_OPT_TYPE_INT, 6, 0, INT_MAX, V|E},
+{"mv0_threshold", NULL, OFFSET(mv0_threshold), FF_OPT_TYPE_INT, 256, 0, INT_MAX, V|E},
+{"ivlc", "intra vlc table", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_INTRA_VLC, INT_MIN, INT_MAX, V|E, "flags2"},
 {NULL},
 };
 
@@ -793,6 +798,7 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->frame_skip_cmp= FF_CMP_DCTMAX;
     s->nsse_weight= 8;
     s->sample_fmt= SAMPLE_FMT_S16; // FIXME: set to NONE
+    s->mv0_threshold= 256;
 
     s->intra_quant_bias= FF_DEFAULT_QUANT_BIAS;
     s->inter_quant_bias= FF_DEFAULT_QUANT_BIAS;
@@ -1352,4 +1358,40 @@ unsigned int av_xiphlacing(unsigned char *s, unsigned int v)
     *s = v;
     n++;
     return n;
+}
+
+/* Wrapper to work around the lack of mkstemp() on mingw/cygin.
+ * Also, tries to create file in /tmp first, if possible.
+ * *prefix can be a character constant; *filename will be allocated internally.
+ * Returns file descriptor of opened file (or -1 on error)
+ * and opened file name in **filename. */
+int av_tempfile(char *prefix, char **filename) {
+    int fd=-1;
+#ifdef CONFIG_WIN32
+    *filename = tempnam(".", prefix);
+#else
+    size_t len = strlen(prefix) + 12; /* room for "/tmp/" and "XXXXXX\0" */
+    *filename = av_malloc(len * sizeof(char));
+#endif
+    /* -----common section-----*/
+    if (*filename == NULL) {
+        av_log(NULL, AV_LOG_ERROR, "ff_tempfile: Cannot allocate file name\n");
+        return -1;
+    }
+#ifdef CONFIG_WIN32
+    fd = open(*filename, _O_RDWR | _O_BINARY | _O_CREAT, 0444);
+#else
+    snprintf(*filename, len, "/tmp/%sXXXXXX", prefix);
+    fd = mkstemp(*filename);
+    if (fd < 0) {
+        snprintf(*filename, len, "./%sXXXXXX", prefix);
+        fd = mkstemp(*filename);
+    }
+#endif
+    /* -----common section-----*/
+    if (fd < 0) {
+        av_log(NULL, AV_LOG_ERROR, "ff_tempfile: Cannot open temporary file %s\n", *filename);
+        return -1;
+    }
+    return fd; /* success */
 }

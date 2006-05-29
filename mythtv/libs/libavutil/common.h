@@ -140,6 +140,18 @@
 #define INT16_MAX       0x7fff
 #endif
 
+#ifndef INT32_MIN
+#define INT32_MIN       (-0x7fffffff-1)
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX       0x7fffffff
+#endif
+
+#ifndef UINT32_MAX
+#define UINT32_MAX      0xffffffff
+#endif
+
 #ifndef INT64_MIN
 #define INT64_MIN       (-0x7fffffffffffffffLL-1)
 #endif
@@ -415,6 +427,13 @@ static inline int mid_pred(int a, int b, int c)
 #endif
 }
 
+/**
+ * clip a signed integer value into the amin-amax range
+ * @param a value to clip
+ * @param amin minimum value of the clip range
+ * @param amax maximum value of the clip range
+ * @return cliped value
+ */
 static inline int clip(int a, int amin, int amax)
 {
     if (a < amin)
@@ -425,7 +444,12 @@ static inline int clip(int a, int amin, int amax)
         return a;
 }
 
-static inline int clip_uint8(int a)
+/**
+ * clip a signed integer value into the 0-255 range
+ * @param a value to clip
+ * @return cliped value
+ */
+static inline uint8_t clip_uint8(int a)
 {
     if (a&(~255)) return (-a)>>31;
     else          return a;

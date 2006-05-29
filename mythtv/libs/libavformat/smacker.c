@@ -63,6 +63,7 @@ typedef struct SmackerContext {
     int stream_id[7];
     int curstream;
     offset_t nextpos;
+    int64_t aud_pts[7];
 } SmackerContext;
 
 typedef struct SmackerFrame {
@@ -114,6 +115,13 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
     for(i = 0; i < 7; i++)
         smk->audio[i] = get_le32(pb);
     smk->treesize = get_le32(pb);
+
+    if(smk->treesize >= UINT_MAX/4){ // smk->treesize + 16 must not overflow (this check is probably redundant)
+        av_log(s, AV_LOG_ERROR, "treesize too large\n");
+        return -1;
+    }
+
+//FIXME remove extradata "rebuilding"
     smk->mmap_size = get_le32(pb);
     smk->mclr_size = get_le32(pb);
     smk->full_size = get_le32(pb);
@@ -149,7 +157,7 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->pix_fmt = PIX_FMT_PAL8;
     st->codec->codec_type = CODEC_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_SMACKVIDEO;
-    st->codec->codec_tag = smk->is_ver4;
+    st->codec->codec_tag = smk->magic;
     /* Smacker uses 100000 as internal timebase */
     if(smk->pts_inc < 0)
         smk->pts_inc = -smk->pts_inc;
@@ -164,15 +172,16 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
         if((smk->rates[i] & 0xFFFFFF) && !(smk->rates[i] & SMK_AUD_BINKAUD)){
             ast[i] = av_new_stream(s, 0);
             smk->indexes[i] = ast[i]->index;
-            av_set_pts_info(ast[i], 33, smk->pts_inc, tbase);
             ast[i]->codec->codec_type = CODEC_TYPE_AUDIO;
             ast[i]->codec->codec_id = (smk->rates[i] & SMK_AUD_PACKED) ? CODEC_ID_SMACKAUDIO : CODEC_ID_PCM_U8;
-            ast[i]->codec->codec_tag = 0;
+            ast[i]->codec->codec_tag = MKTAG('S', 'M', 'K', 'A');
             ast[i]->codec->channels = (smk->rates[i] & SMK_AUD_STEREO) ? 2 : 1;
             ast[i]->codec->sample_rate = smk->rates[i] & 0xFFFFFF;
             ast[i]->codec->bits_per_sample = (smk->rates[i] & SMK_AUD_16BITS) ? 16 : 8;
             if(ast[i]->codec->bits_per_sample == 16 && ast[i]->codec->codec_id == CODEC_ID_PCM_U8)
                 ast[i]->codec->codec_id = CODEC_ID_PCM_S16LE;
+            av_set_pts_info(ast[i], 64, 1, ast[i]->codec->sample_rate
+                    * ast[i]->codec->channels * ast[i]->codec->bits_per_sample / 8);
         }
     }
 
@@ -299,6 +308,8 @@ static int smacker_read_packet(AVFormatContext *s, AVPacket *pkt)
         memcpy(pkt->data, smk->bufs[smk->curstream], smk->buf_sizes[smk->curstream]);
         pkt->size = smk->buf_sizes[smk->curstream];
         pkt->stream_index = smk->stream_id[smk->curstream];
+        pkt->pts = smk->aud_pts[smk->curstream];
+        smk->aud_pts[smk->curstream] += LE_32(pkt->data);
         smk->curstream--;
     }
 

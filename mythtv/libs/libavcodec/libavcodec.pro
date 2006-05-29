@@ -134,6 +134,10 @@ contains( CONFIG_INTERPLAY_VIDEO_DECODER, yes ) {
     SOURCES += interplayvideo.c
 }
 
+contains( CONFIG_KMVC_DECODER, yes ) {
+    SOURCES += kmvc.c
+}
+
 DO_LCL = $$CONFIG_MSZH_DECODER $$CONFIG_ZLIB_DECODER $$CONFIG_ZLIB_ENCODER
 contains( DO_LCL, yes ) {
     SOURCES += lcl.c
@@ -248,6 +252,10 @@ contains( CONFIG_TSCC_DECODER, yes ) {
 
 contains( CONFIG_CSCD_DECODER, yes) {
     SOURCES += cscd.c
+}
+
+contains( CONFIG_NUV_DECODER, yes) {
+    SOURCES += nuv.c rtjpeg.c
 }
 
 contains( CONFIG_ULTI_DECODER, yes ) {
@@ -438,7 +446,7 @@ contains( TARGET_ARCH_POWERPC, yes ) {
 contains( TARGET_ALTIVEC, yes ) {
     SOURCES += ppc/dsputil_altivec.c ppc/mpegvideo_altivec.c ppc/idct_altivec.c
     SOURCES += ppc/gmc_altivec.c ppc/fdct_altivec.c ppc/fft_altivec.c
-    SOURCES += ppc/dsputil_h264_altivec.c
+    SOURCES += ppc/dsputil_h264_altivec.c ppc/dsputil_snow_altivec.c
   macx {
     QMAKE_CFLAGS_RELEASE += -faltivec
     QMAKE_CFLAGS_DEBUG   += -faltivec

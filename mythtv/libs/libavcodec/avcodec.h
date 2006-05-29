@@ -21,8 +21,8 @@ extern "C" {
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(8<<8)+0)
-#define LIBAVCODEC_VERSION      51.8.0
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(9<<8)+0)
+#define LIBAVCODEC_VERSION      51.9.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -120,6 +120,8 @@ enum CodecID {
     CODEC_ID_ZMBV,
     CODEC_ID_AVS,
     CODEC_ID_SMACKVIDEO,
+    CODEC_ID_NUV,
+    CODEC_ID_KMVC,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -230,55 +232,10 @@ enum CodecType {
     CODEC_TYPE_SUBTITLE,
 };
 
-/**
- * Pixel format. Notes:
- *
- * PIX_FMT_RGBA32 is handled in an endian-specific manner. A RGBA
- * color is put together as:
- *  (A << 24) | (R << 16) | (G << 8) | B
- * This is stored as BGRA on little endian CPU architectures and ARGB on
- * big endian CPUs.
- *
- * When the pixel format is palettized RGB (PIX_FMT_PAL8), the palettized
- * image data is stored in AVFrame.data[0]. The palette is transported in
- * AVFrame.data[1] and, is 1024 bytes long (256 4-byte entries) and is
- * formatted the same as in PIX_FMT_RGBA32 described above (i.e., it is
- * also endian-specific). Note also that the individual RGB palette
- * components stored in AVFrame.data[1] should be in the range 0..255.
- * This is important as many custom PAL8 video codecs that were designed
- * to run on the IBM VGA graphics adapter use 6-bit palette components.
- */
-enum PixelFormat {
-    PIX_FMT_NONE= -1,
-    PIX_FMT_YUV420P,   ///< Planar YUV 4:2:0 (1 Cr & Cb sample per 2x2 Y samples)
-    PIX_FMT_YUV422,    ///< Packed pixel, Y0 Cb Y1 Cr
-    PIX_FMT_RGB24,     ///< Packed pixel, 3 bytes per pixel, RGBRGB...
-    PIX_FMT_BGR24,     ///< Packed pixel, 3 bytes per pixel, BGRBGR...
-    PIX_FMT_YUV422P,   ///< Planar YUV 4:2:2 (1 Cr & Cb sample per 2x1 Y samples)
-    PIX_FMT_YUV444P,   ///< Planar YUV 4:4:4 (1 Cr & Cb sample per 1x1 Y samples)
-    PIX_FMT_RGBA32,    ///< Packed pixel, 4 bytes per pixel, BGRABGRA..., stored in cpu endianness
-    PIX_FMT_YUV410P,   ///< Planar YUV 4:1:0 (1 Cr & Cb sample per 4x4 Y samples)
-    PIX_FMT_YUV411P,   ///< Planar YUV 4:1:1 (1 Cr & Cb sample per 4x1 Y samples)
-    PIX_FMT_RGB565,    ///< always stored in cpu endianness
-    PIX_FMT_RGB555,    ///< always stored in cpu endianness, most significant bit to 1
-    PIX_FMT_GRAY8,
-    PIX_FMT_MONOWHITE, ///< 0 is white
-    PIX_FMT_MONOBLACK, ///< 0 is black
-    PIX_FMT_PAL8,      ///< 8 bit with RGBA palette
-    PIX_FMT_YUVJ420P,  ///< Planar YUV 4:2:0 full scale (jpeg)
-    PIX_FMT_YUVJ422P,  ///< Planar YUV 4:2:2 full scale (jpeg)
-    PIX_FMT_YUVJ444P,  ///< Planar YUV 4:4:4 full scale (jpeg)
-    PIX_FMT_XVMC_MPEG2_MC,///< XVideo Motion Acceleration via common packet passing(xvmc_render.h)
-    PIX_FMT_XVMC_MPEG2_IDCT,
-    PIX_FMT_UYVY422,   ///< Packed pixel, Cb Y0 Cr Y1
-    PIX_FMT_UYVY411,   ///< Packed pixel, Cb Y0 Y1 Cr Y2 Y3
-    PIX_FMT_NB,
-};
-
 /* currently unused, may be used if 24/32 bits samples ever supported */
 /* all in native endian */
 enum SampleFormat {
-    SAMPLT_FMT_NONE = -1,
+    SAMPLE_FMT_NONE = -1,
     SAMPLE_FMT_U8,              ///< unsigned 8 bits
     SAMPLE_FMT_S16,             ///< signed 16 bits
     SAMPLE_FMT_S24,             ///< signed 24 bits
@@ -392,6 +349,7 @@ extern int motion_estimation_method;
 #define CODEC_FLAG2_FASTPSKIP     0x00000100 ///< H.264 fast pskip
 #define CODEC_FLAG2_AUD           0x00000200 ///< H.264 access unit delimiters
 #define CODEC_FLAG2_BRDO          0x00000400 ///< b-frame rate-distortion optimization
+#define CODEC_FLAG2_INTRA_VLC     0x00000800 ///< use MPEG-2 intra VLC table
 
 /* Unsupported options :
  *              Syntax Arithmetic coding (SAC)
@@ -2029,6 +1987,14 @@ typedef struct AVCodecContext {
     int scenechange_factor;
 
     /**
+     *
+     * note: value depends upon the compare functin used for fullpel ME
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int mv0_threshold;
+
+    /**
      * XVMC_VLD (VIA CLE266) Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
@@ -2041,6 +2007,7 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     void (*decode_cc_dvd)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+
 } AVCodecContext;
 
 /**
@@ -2253,6 +2220,7 @@ extern AVCodec qtrle_decoder;
 extern AVCodec flac_decoder;
 extern AVCodec tscc_decoder;
 extern AVCodec cscd_decoder;
+extern AVCodec nuv_decoder;
 extern AVCodec ulti_decoder;
 extern AVCodec qdraw_decoder;
 extern AVCodec xl_decoder;
@@ -2274,6 +2242,7 @@ extern AVCodec zmbv_decoder;
 extern AVCodec avs_decoder;
 extern AVCodec smacker_decoder;
 extern AVCodec smackaud_decoder;
+extern AVCodec kmvc_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -2593,6 +2562,9 @@ void img_copy(AVPicture *dst, const AVPicture *src,
 
 int img_crop(AVPicture *dst, const AVPicture *src,
              int pix_fmt, int top_band, int left_band);
+
+int img_pad(AVPicture *dst, const AVPicture *src, int height, int width, int pix_fmt,
+            int padtop, int padbottom, int padleft, int padright, int *color);
 
 /* av_log API */
 

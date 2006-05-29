@@ -20,7 +20,7 @@
 // *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //
 // *
-// * $Id: idct_mmx_xvid.c,v 1.4 2006/01/12 22:43:18 diego Exp $
+// * $Id: idct_mmx_xvid.c 4842 2006-01-12 22:43:26Z diego $
 // *
 // ***************************************************************************/
 

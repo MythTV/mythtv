@@ -541,9 +541,6 @@ static int encode_init(AVCodecContext *avctx)
         }
         if(s->interlaced != ( s->height > 288 ))
             av_log(avctx, AV_LOG_INFO, "using huffyuv 2.2.0 or newer interlacing flag\n");
-    }else if(avctx->strict_std_compliance>FF_COMPLIANCE_EXPERIMENTAL){
-        av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodable with future versions!!! Set vstrict=-2 / -strict -2 to use it anyway.\n");
-        return -1;
     }
 
     ((uint8_t*)avctx->extradata)[0]= s->predictor;
@@ -1015,7 +1012,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     *picture= *p;
     *data_size = sizeof(AVFrame);
 
-    return (get_bits_count(&s->gb)+31)/32*4;
+    return (get_bits_count(&s->gb)+31)/32*4 + table_size;
 }
 
 static int common_end(HYuvContext *s){
