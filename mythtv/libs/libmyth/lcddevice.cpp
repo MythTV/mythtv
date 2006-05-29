@@ -10,6 +10,7 @@
 #include "lcddevice.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
+
 #include "libmythui/mythmainwindow.h"
 
 #include <unistd.h>
@@ -33,9 +34,9 @@
 
 LCD::LCD()
     : QObject(NULL, "LCD"),
-      socket(new QSocket(this)),    socketLock(true),
+      socket(NULL),                 socketLock(true),
       hostname("localhost"),        port(6545),
-      connected(false),
+      bConnected(false),
 
       retryTimer(new QTimer(this)), LEDTimer(new QTimer(this)),
 
@@ -66,8 +67,6 @@ LCD::LCD()
             "(LCD() was called)");
 #endif
 
-    connect(socket,     SIGNAL(error(int)),  this, SLOT(veryBadThings(int)));
-    connect(socket,     SIGNAL(readyRead()), this, SLOT(serverSendingData()));
     connect(retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
     connect(LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
 }
@@ -119,39 +118,33 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     VERBOSE(VB_IMPORTANT, "lcddevice: connecting to host: " 
             << lhostname << " - port: " << lport);
 #endif
-            
+
     // Open communications
     // Store the hostname and port in case we need to reconnect.
-
-    bool startedServer = false;
     int timeout = 1000;
     hostname = lhostname;
     port = lport;
-    
+
     // Don't even try to connect if we're currently disabled.
     if (!(m_enabled = gContext->GetNumSetting("LCDEnable", 0)))
     {
-        connected = false;
+        bConnected = false;
         m_server_unavailable = true;
-        return connected;
+        return bConnected;
     }
 
     // check if the 'mythlcdserver' is running
     int res = system("ret=`ps cax | grep -c mythlcdserver`; exit $ret");
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
-    
+
     if (res == 0)
     {
         // we need to start the mythlcdserver 
-        startedServer = true;
         system(gContext->GetInstallPrefix() + "/bin/mythlcdserver -v none&");
-        // have to disconnect the error signal otherwise we get connection refused
-        // errors while the server is starting up 
-        disconnect(socket, SIGNAL(error(int)), 0, 0);
     }
 
-    if (!connected)
+    if (!bConnected)
     {
         int count = 0;
         do
@@ -163,45 +156,49 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                     "%1:%2 (try %3 of 10)").arg(hostname).arg(port)
                                            .arg(count));
 
-            socket->connectToHost(hostname, port);
+            if (socket)
+                socket->DownRef();
+            socket = new MythSocket();
+            socket->setCallbacks(this);
+            socket->connect(hostname, port);
 
             timeout = 1000;
-            while (--timeout && socket->state() != QSocket::Idle)
+            while (--timeout && socket->state() != MythSocket::Idle)
             {
                 qApp->lock();
                 qApp->processEvents();
                 qApp->unlock();
                 usleep(1000);
 
-                if (socket->state() == QSocket::Connected)
+                if (socket->state() == MythSocket::Connected)
                 {
                     lcd_ready = true;
-                    connected = true;
+                    bConnected = true;
 
-                    QTextStream os(socket->socketDevice());
+                    QTextStream os(socket);
                     os << "HELLO\n";
                     break;
                 }
             }
         }
-        while (count <= 10 && !connected);
+        while (count < 10 && !bConnected);
     }
 
-    if (startedServer)
-        connect(socket, SIGNAL(error(int)), this, SLOT(veryBadThings(int)));
-
-    if (connected == false)
+    if (bConnected == false)
         m_server_unavailable = true;
 
-    return connected;
+    return bConnected;
 }
 
 void LCD::sendToServer(const QString &someText)
 {
     QMutexLocker locker(&socketLock);
 
+    if (!socket)
+        return;
+
     // Check the socket, make sure the connection is still up
-    if (socket->state() == QSocket::Idle)
+    if (socket->state() == MythSocket::Idle)
     {
         if (!lcd_ready)
             return;
@@ -213,15 +210,17 @@ void LCD::sendToServer(const QString &someText)
         retryTimer->start(10000, false);
         VERBOSE(VB_IMPORTANT, "lcddevice: Connection to LCDServer died unexpectedly.\n\t\t\t"
                          "Trying to reconnect every 10 seconds. . .");
+
+        bConnected = false;
         return;
     }
 
-    QTextStream os(socket->socketDevice());
+    QTextStream os(socket);
     os.setEncoding(QTextStream::Latin1);
- 
+
     last_command = someText;
- 
-    if (connected)
+
+    if (bConnected)
     {
 #if LCD_DEVICE_DEBUG > 9
         VERBOSE(VB_IMPORTANT, "lcddevice: Sending to Server: " << someText);
@@ -243,83 +242,81 @@ void LCD::restartConnection()
 {
     // Reset the flag
     lcd_ready = false;
-    connected = false;
+    bConnected = false;
     m_server_unavailable = false;
 
     // Retry to connect. . .  Maybe the user restarted LCDd?
     connectToHost(hostname, port);
 }
 
-void LCD::serverSendingData()
+void LCD::readyRead(MythSocket *sock)
 {
     QMutexLocker locker(&socketLock);
 
     QString lineFromServer, tempString;
     QStringList aList;
     QStringList::Iterator it;
-    
-    // This gets activated automatically by the QSocket class whenever
+
+    // This gets activated automatically by the MythSocket class whenever
     // there's something to read.
     //
     // We currently spend most of our time (except for the first line sent 
     // back) ignoring it.
-    //
-    // Note that if anyone has an LCDproc type lcd with buttons on it, this is 
-    // where we would want to catch button presses and make the rest of 
-    // mythTV/mythMusic do something (change tracks, channels, etc.)
-    
-    while(socket->canReadLine())
-    {
-        lineFromServer = socket->readLine();
-        lineFromServer = lineFromServer.replace( QRegExp("\n"), "" );
-        lineFromServer = lineFromServer.replace( QRegExp("\r"), "" );
-        lineFromServer.simplifyWhiteSpace();
+
+    int dataSize = socket->bytesAvailable() + 1; 
+    QCString data(dataSize);
+
+    socket->readBlock(data.data(), dataSize);
+
+    lineFromServer = data;
+    lineFromServer = lineFromServer.replace( QRegExp("\n"), " " );
+    lineFromServer = lineFromServer.replace( QRegExp("\r"), " " );
+    lineFromServer.simplifyWhiteSpace();
 
 #if LCD_DEVICE_DEBUG > 4
-        // Make debugging be less noisy
-        if (lineFromServer != "OK\n")
-            VERBOSE(VB_IMPORTANT, "lcddevice: Received from server: " << lineFromServer);
+    // Make debugging be less noisy
+    if (lineFromServer != "OK")
+        VERBOSE(VB_IMPORTANT, "lcddevice: Received from server: " << lineFromServer);
 #endif
 
-        aList = QStringList::split(" ", lineFromServer);
-        if (aList[0] == "CONNECTED")
+    aList = QStringList::split(" ", lineFromServer);
+    if (aList[0] == "CONNECTED")
+    {
+        // We got "CONNECTED", which is a response to "HELLO"
+        lcd_ready = true;
+
+        // get lcd width & height
+        if (aList.count() != 3)
         {
-            // We got "CONNECTED", which is a response to "HELLO"
-            lcd_ready = true;
-            
-            // get lcd width & height
-            if (aList.count() != 3)
-            {
-                VERBOSE(VB_IMPORTANT, "lcddevice: received bad no. of arguments "
-                                "in CONNECTED response from LCDServer");
-            }
-            
-            bool bOK;
-            lcd_width = aList[1].toInt(&bOK);
-            if (!bOK)
-            {
-                VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for width"
-                                "in CONNECTED response from LCDServer");
-            }
-             
-            lcd_height = aList[2].toInt(&bOK);
-            if (!bOK)
-            {
-                VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for height"
-                                "in CONNECTED response from LCDServer");
-            }
-            
-            init();
+            VERBOSE(VB_IMPORTANT, "lcddevice: received bad no. of arguments "
+                            "in CONNECTED response from LCDServer");
         }
-        else if (aList[0] == "HUH?")
+
+        bool bOK;
+        lcd_width = aList[1].toInt(&bOK);
+        if (!bOK)
         {
-            VERBOSE(VB_IMPORTANT, "lcddevice: WARNING: Something is getting passed"
-                            "to LCDServer that it doesn't understand");
-            VERBOSE(VB_IMPORTANT, "lcddevice: last command: " << last_command);
+            VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for width"
+                            "in CONNECTED response from LCDServer");
         }
-        else if (aList[0] == "KEY")
-           handleKeyPress(aList.last().stripWhiteSpace());
+
+        lcd_height = aList[2].toInt(&bOK);
+        if (!bOK)
+        {
+            VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for height"
+                            "in CONNECTED response from LCDServer");
+        }
+
+        init();
     }
+    else if (aList[0] == "HUH?")
+    {
+        VERBOSE(VB_IMPORTANT, "lcddevice: WARNING: Something is getting passed"
+                        "to LCDServer that it doesn't understand");
+        VERBOSE(VB_IMPORTANT, "lcddevice: last command: " << last_command);
+    }
+    else if (aList[0] == "KEY")
+        handleKeyPress(aList.last().stripWhiteSpace());
 }
 
 void LCD::handleKeyPress(QString key_pressed)
@@ -348,7 +345,7 @@ void LCD::init()
 {
     // Stop the timer
     retryTimer->stop();
-    
+
     // Get LCD settings
     lcd_showmusic = (gContext->GetSetting("LCDShowMusic", "1") == "1");
     lcd_showtime = (gContext->GetSetting("LCDShowTime", "1") == "1");
@@ -358,10 +355,10 @@ void LCD::init()
     lcd_showmenu = (gContext->GetSetting("LCDShowMenu", "1") == "1");
     lcd_showrecstatus = (gContext->GetSetting("LCDShowRecStatus", "1") == "1");
     lcd_keystring = gContext->GetSetting("LCDKeyString", "ABCDEF");    
-    
-    connected = TRUE;
+
+    bConnected = TRUE;
     lcd_ready = true;
- 
+
     // send buffer if there's anything in there
     if (send_buffer.length() > 0)
     {
@@ -370,26 +367,17 @@ void LCD::init()
     }
 }
 
-void LCD::veryBadThings(int anError)
+void LCD::connectionClosed(MythSocket *sock)
+{
+    (void) sock;
+    bConnected = false;
+}
+
+void LCD::connectionFailed(MythSocket *sock)
 {
     QMutexLocker locker(&socketLock);
-
-    // Deal with failures to connect and inabilities to communicate
-
-    QString err;
-
-    if (anError == QSocket::ErrConnectionRefused)
-        err = "connection refused.";
-    else if (anError == QSocket::ErrHostNotFound)
-        err = "host not found.";
-    else if (anError == QSocket::ErrSocketRead)
-        err = "socket read failed.";
-    else
-        err = "unknown error.";
-
+    QString err = sock->errorToString();
     VERBOSE(VB_IMPORTANT, QString("Could not connect to LCDServer: %1").arg(err));
-    socket->clearPendingData();
-    socket->close();
 }
 
 void LCD::stopAll()
@@ -400,8 +388,8 @@ void LCD::stopAll()
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: stopAll");
 #endif
-       
-    sendToServer("STOP_ALL");    
+
+    sendToServer("STOP_ALL");
 }
 
 void LCD::setChannelProgress(float value)
@@ -465,7 +453,7 @@ void LCD::setVolumeLevel(float value)
         value = 0.0;
     else if (value > 1.0)
         value = 1.0;
-        
+
     sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));    
 }
 
@@ -495,8 +483,8 @@ void LCD::switchToTime()
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToTime");
 #endif
-       
-    sendToServer("SWITCH_TO_TIME");    
+
+    sendToServer("SWITCH_TO_TIME");
 }
 
 void LCD::switchToMusic(const QString &artist, const QString &album, const QString &track)
@@ -507,7 +495,7 @@ void LCD::switchToMusic(const QString &artist, const QString &album, const QStri
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToMusic");
 #endif
-    
+
     sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + " " 
             + quotedString(album) + " " 
             + quotedString(track));
@@ -521,7 +509,7 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToChannel");
 #endif
-    
+
     sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + " " 
             + quotedString(title) + " " 
             + quotedString(subtitle));
@@ -541,11 +529,11 @@ void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
         return;
 
     QString s = "SWITCH_TO_MENU ";
-    
+
     s += quotedString(app_name);
     s += " " + QString(popMenu ? "TRUE" : "FALSE");
 
-    
+
     QPtrListIterator<LCDMenuItem> it(*menuItems);
     LCDMenuItem *curItem;
 
@@ -553,7 +541,7 @@ void LCD::switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
     {
         ++it;
         s += " " + quotedString(curItem->ItemName());
-        
+
         if (curItem->isChecked() == CHECKED)
             s += " CHECKED";    
         else if (curItem->isChecked() == UNCHECKED) 
@@ -579,12 +567,12 @@ void LCD::switchToGeneric(QPtrList<LCDTextItem> *textItems)
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToGeneric ");
 #endif
-    
+
     if (textItems->isEmpty())
         return;
 
     QString s = "SWITCH_TO_GENERIC";
-    
+
     QPtrListIterator<LCDTextItem> it(*textItems);
     LCDTextItem *curItem;
 
@@ -594,7 +582,7 @@ void LCD::switchToGeneric(QPtrList<LCDTextItem> *textItems)
         QString sRow;
         sRow.setNum(curItem->getRow());
         s += " " + sRow;
-     
+
         if (curItem->getAlignment() == ALIGN_LEFT)
             s += " ALIGN_LEFT";    
         else if (curItem->getAlignment() == ALIGN_RIGHT) 
@@ -618,7 +606,7 @@ void LCD::switchToVolume(QString app_name)
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToVolume ");
 #endif
-    
+
     sendToServer("SWITCH_TO_VOLUME " + quotedString(app_name));
 }
 
@@ -626,7 +614,7 @@ void LCD::switchToNothing()
 {
     if (!lcd_ready)
         return;
-    
+
 #if LCD_DEVICE_DEBUG > 1
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToNothing");
 #endif
@@ -642,10 +630,11 @@ void LCD::shutdown()
     VERBOSE(VB_IMPORTANT, "lcddevice: shutdown");
 #endif
 
-    socket->close();
+    if (socket)
+        socket->close();
 
     lcd_ready = false;
-    connected = false;
+    bConnected = false;
 }
 
 void LCD::resetServer()
@@ -670,10 +659,10 @@ LCD::~LCD()
     VERBOSE(VB_IMPORTANT, "lcddevice: An LCD device is being snuffed out of "
                     "existence (~LCD() was called)");
 #endif
-    
+
     if (socket)
     {
-        delete socket;
+        socket->DownRef();
         lcd_ready = false;
     }
 }
@@ -694,6 +683,6 @@ QString LCD::quotedString(const QString &s)
     QString sRes = s;
     sRes.replace(QRegExp("\""), QString("\"\""));
     sRes = "\"" + sRes + "\"";
-  
+
     return(sRes);
 }

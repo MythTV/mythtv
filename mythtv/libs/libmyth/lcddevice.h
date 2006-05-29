@@ -12,6 +12,8 @@ using namespace std;
 #include <qdatetime.h>
 #include <qmutex.h>
 
+#include "mythsocket.h"
+
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 
 class LCDMenuItem
@@ -97,7 +99,7 @@ class LCDTextItem
     bool itemScrollable;
 };
 
-class LCD : public QObject
+class LCD : public QObject, public MythSocketCBs
 {
     Q_OBJECT
 
@@ -132,7 +134,7 @@ class LCD : public QObject
 
     // When nothing else is going on, show the time
     void switchToTime();
-        
+
     // When playing music, switch to this and give artist and track name
     //
     // Note: the use of switchToMusic and setLevels is discouraged, because it 
@@ -142,7 +144,7 @@ class LCD : public QObject
 
     // You can set 10 (or less) equalizer values here (between 0.0 and 1.0)
     void setLevels(int numbLevels, float *values);
-    
+
     // For Live TV, supply the channel number, program title and subtitle
     //    
     // Note that the "channel" screen can be used for any kind of progress meter
@@ -155,7 +157,7 @@ class LCD : public QObject
     // much of the program has been seen (between 0.0 and 1.0)
     // (e.g. [current time - start time] / [end time - start time]  )
     void setChannelProgress(float percentViewed);
-        
+
     // Show the Menu
     // QPtrList is a pointer to a bunch of menu items
     // See mythmusic/databasebox.cpp for an example
@@ -201,55 +203,53 @@ class LCD : public QObject
     // mythMusic) we can use this to try and prevent and screens from showing 
     // up without having to actual destroy the LCD object
     void switchToNothing();
-        
+
     // If you want to be pleasant, call shutdown() before deleting your LCD 
     // device
     void shutdown();
-    
-    // outputText spins through the ptr list and outputs the text according to 
-    // the params set in the LCDTextItem object
-    // gContext->LCDsetGenericProgress(percent_heard) for an example
-//    void outputText(QPtrList<LCDTextItem> *textItems);
 
     void setupLEDs(int(*LedMaskFunc)(void));
 
     void stopAll(void);
-    
+
     uint getLCDHeight(void) { return lcd_height; }
     uint getLCDWidth(void) { return lcd_width; }
-    
-    void resetServer(void); // tell the mythlcdserver to reload its settings
-    
-  private slots: 
-    void veryBadThings(int);       // Communication Errors
-    void serverSendingData();      // Data coming back from LCDd
 
+    void resetServer(void); // tell the mythlcdserver to reload its settings
+
+  private slots: 
     void restartConnection();      // Try to re-establish the connection to 
                                    // LCDServer every 10 seconds
     void outputLEDs(); 
-         
+
   private:
     void sendToServer(const QString &someText);
     void init();
     void handleKeyPress(QString key);
     QString quotedString(const QString &s);
     void describeServer();
-    
-    QSocket *socket;
+
+    // mythsocket CB's
+    void connected(MythSocket *sock) { (void)sock; }
+    void connectionClosed(MythSocket *sock);
+    void readyRead(MythSocket *sock);
+    void connectionFailed(MythSocket *sock);
+
+    MythSocket *socket;
     QMutex   socketLock;
     QString  hostname;
     uint     port;
-    bool     connected;
+    bool     bConnected;
 
     QTimer *retryTimer;
     QTimer *LEDTimer;
-    
+
     QString send_buffer;
     QString last_command;
 
     int  lcd_width;
     int  lcd_height;
-    
+
     bool lcd_ready;
 
     bool lcd_showtime;
@@ -261,10 +261,10 @@ class LCD : public QObject
     bool lcd_showrecstatus;
     bool lcd_backlighton;
     bool lcd_heartbeaton;
-    int  lcd_popuptime;    
+    int  lcd_popuptime;
     QString lcd_showmusic_items;
     QString lcd_keystring;
-    
+
     int (*GetLEDMask)(void);
 };
 
