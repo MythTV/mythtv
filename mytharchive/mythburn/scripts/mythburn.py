@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060529-1"
+VERSION="0.1.20060529-2"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -676,10 +676,9 @@ def getFileInformation(file, outputfile):
     #progstart, stars, cutlist, category, description, subtitle, title, chanid
     #2005-12-20 00:00:00, 0.0, 
     elif file.attributes["type"].value=="recording":
-        # we need two versions of this depending on what db version we are using
         sqlstatement  = """SELECT progstart, stars, cutlist, category, description, subtitle, 
                            title, starttime, chanid
-                           FROM recorded WHERE basename = '%s'""" % file.attributes["filename"].value
+                           FROM recorded WHERE basename = '%s'""" % file.attributes["filename"].value.replace("'", "\\'")
 
         # connect
         db = getDatabaseConnection()
