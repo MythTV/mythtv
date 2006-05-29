@@ -263,9 +263,9 @@ void VideoSelector::OKPressed()
                         "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
                         ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
                 query.bindValue(":TYPE", "Video");
-                query.bindValue(":TITLE", v->title);
+                query.bindValue(":TITLE", v->title.utf8());
                 query.bindValue(":SUBTITLE", "");
-                query.bindValue(":DESCRIPTION", v->plot);
+                query.bindValue(":DESCRIPTION", v->plot.utf8());
                 query.bindValue(":STARTDATE", "");
                 query.bindValue(":STARTTIME", "");
                 query.bindValue(":SIZE", (long long)file.size());
