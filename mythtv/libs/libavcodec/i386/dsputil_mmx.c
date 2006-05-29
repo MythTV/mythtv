@@ -644,10 +644,10 @@ static inline void transpose4x4(uint8_t *dst, uint8_t *src, int dst_stride, int 
           "=m" (*(uint32_t*)(dst + 1*dst_stride)),
           "=m" (*(uint32_t*)(dst + 2*dst_stride)),
           "=m" (*(uint32_t*)(dst + 3*dst_stride))
-        :  "m" (*(uint32_t*)(src + 0*src_stride)),
-           "m" (*(uint32_t*)(src + 1*src_stride)),
-           "m" (*(uint32_t*)(src + 2*src_stride)),
-           "m" (*(uint32_t*)(src + 3*src_stride))
+        :  "m" (s0),
+           "m" (s1),
+           "m" (s2),
+           "m" (s3)
     );
 }
 
