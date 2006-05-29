@@ -704,37 +704,26 @@ bool MythburnWizard::hasCutList(QString &type, QString &filename)
 bool MythburnWizard::extractDetailsFromFilename(const QString &inFile,
                                 QString &chanID, QString &startTime)
 {
-    QString filename = inFile;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid, starttime FROM recorded "
+                  "WHERE basename = :BASENAME");
+    query.bindValue(":BASENAME", inFile);
 
-    chanID = "";
-    startTime = "";
-    bool res = false;
-
-    // remove any path
-    int pathStart = filename.findRev('/');
-    if (pathStart > 0)
-        filename = filename.mid(pathStart + 1);
-
-    int sep = filename.find('_');
-    if (sep != -1)
+    query.exec();
+    if (query.isActive() && query.numRowsAffected())
     {
-        chanID = filename.left(sep);
-        startTime = filename.mid(sep + 1, filename.length() - sep - 5);
-        if (startTime.length() == 14)
-        {
-            QString year, month, day, hour, minute, second;
-            year = startTime.mid(0, 4);
-            month = startTime.mid(4, 2);
-            day = startTime.mid(6, 2);
-            hour = startTime.mid(8, 2);
-            minute = startTime.mid(10, 2);
-            second = startTime.mid(12, 2);
-            startTime = QString("%1-%2-%3T%4:%5:%6").arg(year).arg(month).arg(day)
-                    .arg(hour).arg(minute).arg(second);
-            res = true;
-        }
+        query.first();
+        chanID = query.value(0).toString();
+        startTime= query.value(1).toString();
     }
-    return res;
+    else
+    {
+        VERBOSE(VB_IMPORTANT, 
+                QString("MythArchive: Cannot find details for %1").arg(inFile));
+        return false;
+    }
+
+    return true;
 }
 
 vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
