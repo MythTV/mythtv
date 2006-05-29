@@ -243,7 +243,10 @@ void NewsSite::process()
         title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
         QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));
         if (!descNode.isNull())
+        {
             description = descNode.toElement().text().simplifyWhiteSpace();
+            ReplaceHtmlChar(description);
+        }            
         else
             description = QString::null;
         QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
@@ -272,5 +275,16 @@ void NewsSite::slotGotData(const QByteArray& data,
         m_data.resize(size + len);
         memcpy(m_data.data()+size, charData, len);
     }
+}
+
+void NewsSite::ReplaceHtmlChar(QString &s)
+{
+    s.replace("&amp;", "&");
+    s.replace("&lt;", "<");
+    s.replace("&gt;", ">");
+    s.replace("&quot;", "\"");
+    s.replace("&apos;", "\'");
+    s.replace("&#8230;",QChar(8230));
+    s.replace("&#233;",QChar(233));
 }
 

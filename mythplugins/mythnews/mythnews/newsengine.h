@@ -108,6 +108,8 @@ private:
     NewsArticle::List m_articleList;
     QUrlOperator*     m_urlOp;
 
+    void ReplaceHtmlChar( QString &s);
+
 signals:
 
     void finished(NewsSite* item);
