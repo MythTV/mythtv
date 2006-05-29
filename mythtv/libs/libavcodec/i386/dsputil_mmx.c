@@ -2493,33 +2493,38 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int o
                 "pmullw %%mm5, %%mm2 \n\t" // (s-dx)*dy
                 "pmullw %%mm4, %%mm1 \n\t" // dx*(s-dy)
 
-                "movd   %4,    %%mm5 \n\t"
-                "movd   %3,    %%mm4 \n\t"
+                "movd   %1,    %%mm5 \n\t"
+                "movd   %0,    %%mm4 \n\t"
                 "punpcklbw %%mm7, %%mm5 \n\t"
                 "punpcklbw %%mm7, %%mm4 \n\t"
                 "pmullw %%mm5, %%mm3 \n\t" // src[1,1] * dx*dy
                 "pmullw %%mm4, %%mm2 \n\t" // src[0,1] * (s-dx)*dy
 
+                :
+                : "m"(src[stride]), "m"(src[stride+1])
+            );
+
+            asm volatile(
                 "movd   %2,    %%mm5 \n\t"
                 "movd   %1,    %%mm4 \n\t"
                 "punpcklbw %%mm7, %%mm5 \n\t"
                 "punpcklbw %%mm7, %%mm4 \n\t"
                 "pmullw %%mm5, %%mm1 \n\t" // src[1,0] * dx*(s-dy)
                 "pmullw %%mm4, %%mm0 \n\t" // src[0,0] * (s-dx)*(s-dy)
-                "paddw  %5,    %%mm1 \n\t"
+                "paddw  %3,    %%mm1 \n\t"
                 "paddw  %%mm3, %%mm2 \n\t"
                 "paddw  %%mm1, %%mm0 \n\t"
                 "paddw  %%mm2, %%mm0 \n\t"
 
-                "psrlw    %6,    %%mm0 \n\t"
+                "psrlw    %4,    %%mm0 \n\t"
                 "packuswb %%mm0, %%mm0 \n\t"
                 "movd     %%mm0, %0    \n\t"
 
                 : "=m"(dst[x+y*stride])
                 : "m"(src[0]), "m"(src[1]),
-                  "m"(src[stride]), "m"(src[stride+1]),
                   "m"(*r4), "m"(shift2)
             );
+
             src += stride;
         }
         src += 4-h*stride;
