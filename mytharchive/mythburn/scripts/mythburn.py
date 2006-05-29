@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060525-3"
+VERSION="0.1.20060529-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -1130,7 +1130,7 @@ def runDVDAuthor():
     checkCancelFlag()
     result=os.spawnlp(os.P_WAIT, path_dvdauthor[0],path_dvdauthor[1],'-x',os.path.join(getTempPath(),'dvdauthor.xml'))
     if result<>0:
-        fatalError("Failed while running dvdauthor")
+        fatalError("Failed while running dvdauthor. Result: %d" % result)
     write( "Finished  dvdauthor")
 
 def CreateDVDISO():
