@@ -40,6 +40,11 @@ class VideoSelector : public MythThemedDialog
     void OKPressed(void);
     void cancelPressed(void);
 
+    void showMenu(void);
+    void closePopupMenu(void);
+    void selectAll(void);
+    void clearAll(void);
+
     void setCategory(int);
     void titleChanged(UIListBtnTypeItem *item);
 
@@ -63,6 +68,8 @@ class VideoSelector : public MythThemedDialog
     UITextType       *filesize_text;
     UITextType       *plot_text;
     UIImageType      *cover_image;
+
+    MythPopupBox     *popupMenu;
 };
 
 #endif

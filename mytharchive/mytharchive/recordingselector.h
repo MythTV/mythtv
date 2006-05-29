@@ -29,10 +29,15 @@ class RecordingSelector : public MythThemedDialog
     void OKPressed(void);
     void cancelPressed(void);
 
+    void showMenu(void);
+    void closePopupMenu(void);
+    void selectAll(void);
+    void clearAll(void);
+
     void setCategory(int);
     void titleChanged(UIListBtnTypeItem *item);
 
-    private:
+  private:
     QString themeDir; 
     void updateRecordingList(void);
     void updateSelectedList(void);
@@ -55,6 +60,8 @@ class RecordingSelector : public MythThemedDialog
     UITextType       *description_text;
     UIImageType      *preview_image;
     UIImageType      *cutlist_image;
+
+    MythPopupBox     *popupMenu;
 };
 
 #endif

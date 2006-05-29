@@ -742,7 +742,6 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
             // check this item is still available
             QString type = query.value(1).toString();
             QString filename = QString::fromUtf8(query.value(8).toString());
-
             if (isArchiveItemValid(type, filename))
             {
                 ArchiveItem *item = new ArchiveItem;
@@ -766,7 +765,7 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
     }
     else
     {
-        cout << "MythburnWizard: Failed to get any archive items" << endl;
+        VERBOSE(VB_IMPORTANT, "MythburnWizard: Failed to get any archive items");
         return NULL;
     }
 

@@ -33,6 +33,7 @@ RecordingSelector::RecordingSelector(MythMainWindow *parent, QString window_name
     wireUpTheme();
     assignFirstFocus();
     updateForeground();
+    popupMenu = NULL;
 }
 
 RecordingSelector::~RecordingSelector(void)
@@ -113,12 +114,73 @@ void RecordingSelector::keyPressEvent(QKeyEvent *e)
             else
                 activateCurrent();
         }
+        else if (action == "MENU")
+        {
+            showMenu();
+        }
         else
             handled = false;
     }
 
     if (!handled)
             MythThemedDialog::keyPressEvent(e);
+}
+
+void RecordingSelector::showMenu()
+{
+    if (popupMenu)
+        return;
+
+    popupMenu = new MythPopupBox(gContext->GetMainWindow(),
+                                 "popupMenu");
+
+    QButton *button;
+    button = popupMenu->addButton(tr("Clear All"), this, SLOT(clearAll()));
+    button->setFocus();
+    popupMenu->addButton(tr("Select All"), this, SLOT(selectAll()));
+    popupMenu->addButton(tr("Cancel"), this, SLOT(closePopupMenu()));
+
+    popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
+}
+
+void RecordingSelector::closePopupMenu()
+{
+    if (!popupMenu)
+        return;
+
+    popupMenu->hide();
+    delete popupMenu;
+    popupMenu = NULL;
+}
+
+void RecordingSelector::selectAll()
+{
+    if (!popupMenu)
+        return;
+
+    selectedList.clear();
+
+    ProgramInfo *p;
+    vector<ProgramInfo *>::iterator i = recordingList->begin();
+    for ( ; i != recordingList->end(); i++)
+    {
+        p = *i;
+        selectedList.append(p);
+    }
+
+    updateRecordingList();
+    closePopupMenu();
+}
+
+void RecordingSelector::clearAll()
+{
+    if (!popupMenu)
+        return;
+
+    selectedList.clear();
+
+    updateRecordingList();
+    closePopupMenu();
 }
 
 void RecordingSelector::toggleSelectedState()
@@ -248,50 +310,31 @@ void RecordingSelector::OKPressed()
         return;
     }
 
+    // remove all recordings from archivelist
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM archiveitems WHERE type = 'Recording'");
+    query.exec();
+
     // loop though selected recordings and add them to the archiveitems table
     ProgramInfo *p;
 
     for (p = selectedList.first(); p; p = selectedList.next())
     {
-        //check this file is not already in the archiveitems table
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT * FROM archiveitems WHERE filename = :FILENAME");
+        query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
+                "description, startdate, starttime, size, filename, hascutlist) "
+                "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
+                ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
+        query.bindValue(":TYPE", "Recording");
+        query.bindValue(":TITLE", p->title.utf8());
+        query.bindValue(":SUBTITLE", p->subtitle.utf8());
+        query.bindValue(":DESCRIPTION", p->description.utf8());
+        query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
+        query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
+        query.bindValue(":SIZE", p->filesize);
         query.bindValue(":FILENAME", p->GetRecordBasename());
-        query.exec();
-        if (query.isActive() && query.numRowsAffected())
-        {
-            query.prepare("UPDATE archiveitems SET type = :TYPE, title = :TITLE, "
-                    "subtitle = :SUBTITLE, description = :DESCRIPTION, "
-                    "startdate = :STARTDATE, starttime = :STARTTIME, size = :SIZE, "
-                    "hascutlist = :HASCUTLIST WHERE filename = :FILENAME;");
-            query.bindValue(":TYPE", "Recording");
-            query.bindValue(":TITLE", p->title.utf8());
-            query.bindValue(":SUBTITLE", p->subtitle.utf8());
-            query.bindValue(":DESCRIPTION", p->description.utf8());
-            query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
-            query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
-            query.bindValue(":SIZE", p->filesize);
-            query.bindValue(":FILENAME", p->GetRecordBasename());
-            query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
-        }
-        else
-        {
-            query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
-                    "description, startdate, starttime, size, filename, hascutlist) "
-                    "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
-                    ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
-            query.bindValue(":TYPE", "Recording");
-            query.bindValue(":TITLE", p->title.utf8());
-            query.bindValue(":SUBTITLE", p->subtitle.utf8());
-            query.bindValue(":DESCRIPTION", p->description.utf8());
-            query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
-            query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
-            query.bindValue(":SIZE", p->filesize);
-            query.bindValue(":FILENAME", p->GetRecordBasename());
-            query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
-            if (!query.exec())
-                MythContext::DBError("archive item insert", query);
-        }
+        query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
+        if (!query.exec())
+            MythContext::DBError("archive item insert", query);
     }
 
     done(Accepted);
