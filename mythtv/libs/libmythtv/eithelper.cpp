@@ -476,17 +476,17 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     fix[ 9018 << 16] = EITFixUp::kFixUK;
 
-    fix[40999 << 16] = EITFixUp::kFixComHem;
-    fix[40999 << 16 | 1070] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1308] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1041] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1306] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1307] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1030] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1016] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1131] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1068] = EITFixUp::kFixSubtitle;
-    fix[40999 << 16 | 1069] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16] = EITFixUp::kFixComHem;
+    fix[40999U << 16 | 1070] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1308] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1041] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1306] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1307] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1030] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1016] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1131] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1068] = EITFixUp::kFixSubtitle;
+    fix[40999U << 16 | 1069] = EITFixUp::kFixSubtitle;
 
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
