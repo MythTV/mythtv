@@ -19,7 +19,7 @@ class DummyChannel : public ChannelBase
         { (void)parent; curchannelname = ""; curinputname = ""; return; }
     ~DummyChannel(void) { return; }
 
-    bool Open(void) { return true; }
+    bool Open(void) { return InitializeInputs(); }
     void Close(void) { return; }
 
     // Sets

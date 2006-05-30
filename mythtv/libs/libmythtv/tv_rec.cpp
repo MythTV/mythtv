@@ -204,9 +204,10 @@ bool TVRec::CreateChannel(const QString &startchannel)
     {
 #ifdef USING_CRC_IP_NETWORK_REC
         channel = new DummyChannel(this);
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
-        rbFileExt = "mpg";
 #endif // USING_CRC_IP_NETWORK_REC
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
