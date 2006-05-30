@@ -2,4 +2,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mytharchive mytharchivehelper
+SUBDIRS = mytharchive mytharchivehelper i18n
