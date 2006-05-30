@@ -40,6 +40,7 @@ class OSDSet;
 class OSDTypeImage;
 class OSDTypePositionIndicator;
 class OSDSurface;
+class OSDTypeText;
 class TV;
 class UDPNotifyOSDSet;
 class OSDListTreeType;
@@ -151,12 +152,14 @@ class OSD : public QObject
     bool HasSet(const QString &name);
     QRect GetSubtitleBounds();
 
+    void SetTextSubtitles(const QStringList&);
+    void ClearTextSubtitles(void);
  private:
     bool InitDefaults(void);
     bool InitCC608(void);
     bool InitCC708(void);
     bool InitTeletext(void);
-    bool InitDVBSub(void);
+    bool InitSubtitles(void);
     bool InitMenu(void);
     bool InitInteractiveTV(void);
 

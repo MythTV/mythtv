@@ -8,6 +8,7 @@
 #include <qregexp.h>
 #include <qfile.h>
 #include <qtimer.h>
+#include <qdir.h>
 
 #include "mythdbcon.h"
 #include "tv_play.h"
@@ -1283,6 +1284,7 @@ void TV::SetupPlayer(bool isWatchingRecording)
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking", 0));
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
+    LoadExternalSubtitles(nvp, prbuffer->GetFilename());
     nvp->SetLiveTVChain(tvchain);
 
     nvp->SetAudioStretchFactor(normal_speed);
@@ -6516,7 +6518,7 @@ bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
         typeStr = "SUBTITLE";
         selStr  = "SELECTSUBTITLE_";
         grpStr  = "SUBTITLEGROUP";
-        sel     = activenvp->GetCaptionMode() & kDisplaySubtitle;
+        sel     = activenvp->GetCaptionMode() & kDisplayAVSubtitle;
     }
     else if (kTrackTypeCC608 == type)
     {
@@ -6968,6 +6970,66 @@ void TV::ITVRestart(bool isLive)
     pbinfoLock.unlock();
 
     nvp->ITVRestart(chanid, cardid, isLive);
+}
+
+/* \fn TV::LoadExternalSubtitles(NuppelVideoPlayer*, const QString&)
+ * \brief Loads any external subtitles.
+ *
+ *  This tries to find an external subtitle file in the same directory
+ *  in which the video file is. It then tries to parse each found
+ *  candidate file until one is parsed succesfully.
+ */
+bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
+                               const QString &videoFile)
+{
+    if (videoFile.isEmpty())
+        return false;
+
+    QString fileName = videoFile;
+    QString dirName  = ".";
+
+    int dirPos = videoFile.findRev(QChar('/'));
+    if (dirPos > 0) 
+    {
+        fileName = videoFile.mid(dirPos + 1);
+        dirName = videoFile.left(dirPos);
+    }
+
+    QString baseName = fileName;
+    int suffixPos = fileName.findRev(QChar('.'));
+    if (suffixPos > 0) 
+        baseName = fileName.left(suffixPos);
+
+    // The dir listing does not work if the filename has the following chars,
+    // so we convert them to the wildcard '?'
+    baseName = baseName.replace("[", "?").replace("]", "?");
+    baseName = baseName.replace("(", "?").replace(")", "?");
+
+    // Some Qt versions do not accept paths in the search string of
+    // entryList() so we have to set the dir first
+    QDir dir;
+    dir.setPath(dirName);
+
+    // Try to find files with the same base name, but ending with
+    // '.srt', '.sub', or '.txt'
+    QStringList candidates = dir.entryList(
+        baseName + "*.srt; " + baseName + "*.sub; " + baseName + "*.txt;");
+
+    bool found = false;
+    QStringList::const_iterator it = candidates.begin();
+    for (; (it != candidates.end()) && !found; ++it)
+    {
+        if (nvp->LoadExternalSubtitles(dirName + "/" + *it))
+            found = true;
+    }
+
+    if (found)
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Loaded text subtitles from '%1'.").arg(*it));
+    }
+
+    return found;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

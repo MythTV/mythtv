@@ -3061,7 +3061,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         subtitle.start_display_time += pts;
                         subtitle.end_display_time += pts;
-                        GetNVP()->AddSubtitle(subtitle);
+                        GetNVP()->AddAVSubtitle(subtitle);
                     }
 
                     break;

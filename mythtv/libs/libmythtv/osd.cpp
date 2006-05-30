@@ -23,6 +23,7 @@ using namespace std;
 #include "osdtypes.h"
 #include "osdsurface.h"
 #include "mythcontext.h"
+#include "textsubtitleparser.h"
 #include "libmyth/oldsettings.h"
 #include "udpnotify.h"
 
@@ -135,7 +136,7 @@ bool OSD::InitDefaults(void)
     ok &= InitCC708();
     ok &= InitTeletext();
     ok &= InitMenu();
-    ok &= InitDVBSub();
+    ok &= InitSubtitles();
     ok &= InitInteractiveTV();
     return ok;
 }
@@ -274,6 +275,101 @@ bool OSD::InitTeletext(void)
     return true;
 }   
 
+void OSD::SetTextSubtitles(const QStringList &lines)
+{
+    const uint SUBTITLE_FONT_SIZE     = 18;
+    const uint SUBTITLE_LINE_HEIGHT   = 22;
+    const uint MAX_CHARACTERS_PER_ROW = 50;
+
+    OSDSet *subtitleSet = GetSet("subtitles");
+    if (!subtitleSet)
+        return;
+
+    QString subText = "";
+    int subLines = 0;
+    QStringList::const_iterator it = lines.begin();
+    for (; it != lines.end(); ++it)
+    {
+        const QString line = *it;
+
+        if (line.length() <= MAX_CHARACTERS_PER_ROW)
+        {
+            subText.append(line);
+            subText.append("\n");
+            ++subLines;
+            continue;
+        }
+
+        // wrap long lines at word spaces
+        QStringList words = QStringList::split(" ", line);
+        QString newString = "";
+
+        do
+        {
+            QString word = words.first();
+            words.pop_front();
+
+            uint totLen = newString.length() + word.length() + 1;
+            if (totLen > MAX_CHARACTERS_PER_ROW)
+            {
+                // next word won't fit anymore, create a new line
+                subText.append(newString + "\n");
+                ++subLines;
+                newString = "";
+            }
+            newString.append(word + " ");
+        }
+        while (!words.empty());
+
+        subText.append(newString);
+        subText.append("\n");
+        ++subLines;
+    }
+
+    ClearAll("subtitles");
+
+    QString name = "text_subtitles";
+
+    QRect area(0, displayheight - subLines * SUBTITLE_LINE_HEIGHT,
+               displaywidth, displayheight);
+
+    QString fontname = "text_subtitle_font";
+    TTFFont *font = GetFont(fontname);
+    if (!font)
+    {
+        font = LoadFont(gContext->GetSetting("OSDCCFont"), SUBTITLE_FONT_SIZE);
+
+        if (font) 
+        {
+            // set outline so we can see the font in white background video
+            font->setOutline(true);
+            fontMap[fontname] = font;
+        } 
+        else 
+        {
+            VERBOSE(VB_IMPORTANT, "Cannot load font for text subtitles.");
+            return;
+        }
+    }
+
+    OSDTypeText *text = new OSDTypeText(name, font, "", area, wmult, hmult);
+  
+    text->SetCentered(true);
+    text->SetMultiLine(true);
+    text->SetSelected(false);
+    text->SetText(subText);
+    text->SetSelected(false);
+    subtitleSet->AddType(text);
+
+    SetVisible(subtitleSet, 0);
+}   
+
+void OSD::ClearTextSubtitles() 
+{
+    HideSet("subtitles");
+    ClearAll("subtitles");
+}
+
 bool OSD::InitMenu(void)
 {
     if (GetSet("menu"))
@@ -330,9 +426,9 @@ bool OSD::InitMenu(void)
     return true;
 }
 
-bool OSD::InitDVBSub(void)
+bool OSD::InitSubtitles(void)
 {
-    // Create container for subtitles
+    // Create container for subtitles (DVB, DVD and external subs)
     if (GetSet("subtitles"))
         return true;
 
@@ -341,6 +437,7 @@ bool OSD::InitDVBSub(void)
         new OSDSet(name, true,
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
+
     container->SetPriority(30);
     AddSet(container, name);
     return true;

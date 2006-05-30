@@ -203,6 +203,10 @@ using_frontend {
     SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
     SOURCES += DVDRingBuffer.cpp
 
+    # Text subtitle parser
+    HEADERS += textsubtitleparser.h     xine_demux_sputext.h
+    SOURCES += textsubtitleparser.cpp   xine_demux_sputext.c
+
     # A/V decoders
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h

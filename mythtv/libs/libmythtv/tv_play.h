@@ -347,6 +347,9 @@ class TV : public QObject
 
     void ITVRestart(bool isLive);
 
+    static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,
+                                      const QString &videoFile);
+
     static QStringList GetValidRecorderList(uint chanid);
     static QStringList GetValidRecorderList(const QString &channum);
     static QStringList GetValidRecorderList(uint, const QString&);

@@ -14,6 +14,7 @@
 #include "recordingprofile.h"
 #include "videooutbase.h"
 #include "teletextdecoder.h"
+#include "textsubtitleparser.h"
 #include "tv_play.h"
 #include "yuv2rgb.h"
 #include "cc608decoder.h"
@@ -87,12 +88,13 @@ enum
     kDisplayNone                = 0x00,
     kDisplayNUVTeletextCaptions = 0x01,
     kDisplayTeletextCaptions    = 0x02,
-    kDisplaySubtitle            = 0x04,
+    kDisplayAVSubtitle          = 0x04,
     kDisplayCC608               = 0x08,
     kDisplayCC708               = 0x10,
     kDisplayNUVCaptions         = kDisplayNUVTeletextCaptions | kDisplayCC608,
-    kDisplayAllCaptions         = 0x1f,
-    kDisplayTeletextMenu        = 0x20,
+    kDisplayTextSubtitle        = 0x20,
+    kDisplayAllCaptions         = 0x3f,
+    kDisplayTeletextMenu        = 0x40,
 };
 
 class NuppelVideoPlayer : public CC608Reader, public CC708Reader
@@ -278,7 +280,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
                       long long timecode);
     void AddTextData(unsigned char *buffer, int len,
                      long long timecode, char type);
-    void AddSubtitle(const AVSubtitle& subtitle);
+    void AddAVSubtitle(const AVSubtitle& subtitle);
 
     // Closed caption and teletext stuff
     uint GetCaptionMode(void) const { return textDisplayMode; }
@@ -288,6 +290,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint mode);
     void SetCaptionsEnabled(bool);
+    bool LoadExternalSubtitles(const QString &subtitleFileName);
 
     // Teletext Menu and non-NUV teletext decoder
     void EnableTeletext(void);
@@ -478,7 +481,8 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void  UpdateCC(unsigned char *inpos);
 
     // Private subtitle stuff
-    void  DisplaySubtitles(void);
+    void  DisplayAVSubtitles(void);
+    void  DisplayTextSubtitles(void);
     void  ClearSubtitles(void);
     void  ExpireSubtitles(void);
 
@@ -614,7 +618,18 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool      textDesired;
     bool      osdHasSubtitles;
     long long osdSubtitlesExpireAt;
-    MythDeque<AVSubtitle> nonDisplayedSubtitles;
+
+    /// Subtitles loaded from the video stream by libavcodec.
+    /// This should contain only undisplayed subtitles, old
+    /// ones are deleted after displayed.
+    MythDeque<AVSubtitle> nonDisplayedAVSubtitles;
+
+    /// Subtitles loaded from an external subtitle file.
+    /// This contains all subtitles in textual format. No
+    /// subtitles are deleted after displaying (so they can
+    /// be displayed again after seeking). The list is ordered
+    /// by the subtitle display start time.
+    TextSubtitles textSubtitles;
 
     CC708Service CC708services[64];
     QString    osdfontname;

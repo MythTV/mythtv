@@ -119,7 +119,7 @@ int type_string_to_track_type(const QString &str)
 uint track_type_to_display_mode[kTrackTypeCount+2] =
 {
     kDisplayNone,
-    kDisplaySubtitle,
+    kDisplayAVSubtitle,
     kDisplayCC608,
     kDisplayCC708,
     kDisplayTeletextCaptions,
@@ -290,7 +290,7 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     if (weMadeBuffer)
         delete ringBuffer;
 
-    if (osdHasSubtitles || nonDisplayedSubtitles.size() > 0)
+    if (osdHasSubtitles || !nonDisplayedAVSubtitles.empty())
         ClearSubtitles();
 
     if (osd)
@@ -1431,10 +1431,14 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
 
             DisableTeletext();
         }
-        if (kDisplaySubtitle & mode)
+        if (kDisplayAVSubtitle & mode)
         {
             msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                          GetTrack(kTrackTypeSubtitle));
+        }
+        if (kDisplayTextSubtitle & mode)
+        {
+	    msg += QObject::tr("Text subtitles");
         }
         if (kDisplayCC608 & mode)
         {
@@ -1459,10 +1463,14 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
 void NuppelVideoPlayer::EnableCaptions(uint mode)
 {
     QString msg = "";
-    if (kDisplaySubtitle & mode)
+    if (kDisplayAVSubtitle & mode)
     {
         msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
                                      GetTrack(kTrackTypeSubtitle));
+    }
+    if (kDisplayTextSubtitle & mode)
+    {
+        msg += QObject::tr("Text Subtitles");
     }
     if (kDisplayNUVTeletextCaptions & mode)
         msg += QObject::tr("TXT") + QString(" %1").arg(ttPageNum, 3, 16);
@@ -1575,9 +1583,12 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
     if (kDisplayCC708 & mode)
         EnableCaptions(kDisplayCC708);
 
-    if (kDisplaySubtitle & mode)
-        EnableCaptions(kDisplaySubtitle);
-
+    if (kDisplayAVSubtitle & mode)
+        EnableCaptions(kDisplayAVSubtitle);
+    
+    if (kDisplayTextSubtitle & mode)
+        EnableCaptions(kDisplayTextSubtitle);
+    
     if (kDisplayTeletextCaptions & mode)
         EnableCaptions(kDisplayTeletextCaptions);
 
@@ -1601,7 +1612,9 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
     // figure out which text type to enable..
     bool captions_found = true;
     if (decoder->GetTrackCount(kTrackTypeSubtitle))
-        EnableCaptions(kDisplaySubtitle);
+        EnableCaptions(kDisplayAVSubtitle);
+    else if (textSubtitles.GetSubtitleCount() > 0)
+        EnableCaptions(kDisplayTextSubtitle);
     else if (decoder->GetTrackCount(kTrackTypeCC708))
         EnableCaptions(kDisplayCC708);
     else if (decoder->GetTrackCount(kTrackTypeTeletextCaptions))
@@ -2404,10 +2417,12 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     if (textDisplayMode & kDisplayNUVCaptions)
         ShowText();
 
-    // handle with DVB/DVD subtitles
-    if (textDisplayMode & kDisplaySubtitle)
-        DisplaySubtitles();
-    else if (osdHasSubtitles)
+    // handle DVB/DVD subtitles decoded by ffmpeg (in AVSubtitle format)
+    if (textDisplayMode & kDisplayAVSubtitle) 
+        DisplayAVSubtitles();
+    else if (textDisplayMode & kDisplayTextSubtitle)
+        DisplayTextSubtitles();
+    else if (osdHasSubtitles) 
         ClearSubtitles();
     else
         ExpireSubtitles();
@@ -2644,7 +2659,7 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (fftime <= 0)
         fftime = (int)(seconds * video_frame_rate);
 
-    if (osdHasSubtitles || nonDisplayedSubtitles.size() > 0)
+    if (osdHasSubtitles || !nonDisplayedAVSubtitles.empty())
        ClearSubtitles();
 
     return fftime > CalcMaxFFTime(fftime, false);
@@ -2658,7 +2673,7 @@ bool NuppelVideoPlayer::Rewind(float seconds)
     if (rewindtime <= 0)
         rewindtime = (int)(seconds * video_frame_rate);
 
-    if (osdHasSubtitles || nonDisplayedSubtitles.size() > 0)
+    if (osdHasSubtitles || !nonDisplayedAVSubtitles.empty())
        ClearSubtitles();
 
     return rewindtime >= framesPlayed;
@@ -5599,7 +5614,7 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
     if (kTrackTypeSubtitle == type)
     {
         DisableCaptions(textDisplayMode, false);
-        EnableCaptions(kDisplaySubtitle);
+        EnableCaptions(kDisplayAVSubtitle);
     }
     else if (kTrackTypeCC708 == type)
     {
@@ -5764,7 +5779,7 @@ void NuppelVideoPlayer::ChangeCaptionTrack(int dir)
                 SetTrack(kTrackTypeSubtitle, 0);
         }
     }
-    else if ((textDisplayMode & kDisplaySubtitle) &&
+    else if ((textDisplayMode & kDisplayAVSubtitle) &&
              (vbimode == VBIMode::PAL_TT))
     {
         if ((uint)GetTrack(kTrackTypeSubtitle) + 1 <
@@ -5824,7 +5839,7 @@ void NuppelVideoPlayer::ChangeCaptionTrack(int dir)
         else
             SetCaptionsEnabled(false);
     }
-    else if ((textDisplayMode & kDisplaySubtitle) &&
+    else if ((textDisplayMode & kDisplayAVSubtitle) &&
              (vbimode == VBIMode::NTSC_CC))
     {
         if ((uint)GetTrack(kTrackTypeSubtitle) + 1 <
@@ -5837,8 +5852,14 @@ void NuppelVideoPlayer::ChangeCaptionTrack(int dir)
     }
 }
 
-// updates new subtitles to the screen and clears old ones
-void NuppelVideoPlayer::DisplaySubtitles()
+#define MAX_SUBTITLE_DISPLAY_TIME_MS 4500
+/** \fn NuppelVideoPlayer::DisplayAVSubtitles(void)
+ *  \brief Displays new subtitles and removes old ones. 
+ *
+ *  This version is for AVSubtitles which are added with AddAVSubtitles()
+ *  when found in the input stream.
+ */
+void NuppelVideoPlayer::DisplayAVSubtitles(void)
 {
     OSDSet *subtitleOSD;
     bool setVisible = false;
@@ -5862,14 +5883,14 @@ void NuppelVideoPlayer::DisplaySubtitles()
         osdHasSubtitles = false;
     }
 
-    while (nonDisplayedSubtitles.size() > 0)
+    while (!nonDisplayedAVSubtitles.empty())
     {
-        const AVSubtitle subtitlePage = nonDisplayedSubtitles.front();
+        const AVSubtitle subtitlePage = nonDisplayedAVSubtitles.front();
 
         if (subtitlePage.start_display_time > currentFrame->timecode)
             break;
 
-        nonDisplayedSubtitles.pop_front();
+        nonDisplayedAVSubtitles.pop_front();
 
         // clear old subtitles
         if (osdHasSubtitles) 
@@ -5885,8 +5906,8 @@ void NuppelVideoPlayer::DisplaySubtitles()
             AVSubtitleRect* rect = &subtitlePage.rects[i];
 
             bool displaysub = true;
-            if (nonDisplayedSubtitles.size() > 0 &&
-                nonDisplayedSubtitles.front().end_display_time < 
+            if (nonDisplayedAVSubtitles.size() > 0 &&
+                nonDisplayedAVSubtitles.front().end_display_time < 
                 currentFrame->timecode)
             {
                 displaysub = false;
@@ -5936,10 +5957,11 @@ void NuppelVideoPlayer::DisplaySubtitles()
                 if (subtitlePage.end_display_time <= 
                     subtitlePage.start_display_time)
                 {
-                    if (nonDisplayedSubtitles.size() > 0)
-                        osdSubtitlesExpireAt = nonDisplayedSubtitles.front().start_display_time;
+                    if (nonDisplayedAVSubtitles.size() > 0)
+                        osdSubtitlesExpireAt = 
+                            nonDisplayedAVSubtitles.front().start_display_time;
                     else
-                        osdSubtitlesExpireAt += 4500;
+                        osdSubtitlesExpireAt += MAX_SUBTITLE_DISPLAY_TIME_MS;
                 }
 
                 setVisible = true;
@@ -5966,6 +5988,52 @@ void NuppelVideoPlayer::DisplaySubtitles()
     }
 }
 
+/** \fn NuppelVideoPlayer::DisplayTextSubtitles(void)
+ *  \brief Displays subtitles in textual format.
+ *
+ *  This version is for subtitles that are loaded from an external subtitle
+ *  file by using the LoadExternalSubtitles() method. Subtitles are not 
+ *  deleted after displaying so they can be displayed again after seeking.
+ */
+void NuppelVideoPlayer::DisplayTextSubtitles(void)
+{
+    VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
+
+    if (!osd || !currentFrame)
+    {
+        VERBOSE(VB_PLAYBACK, "osd or current video frame not found");
+        return;
+    }
+    
+    QMutexLocker locker(&subtitleLock);
+
+    // frame time code in frames shown or millisecs from the start
+    // depending on the timing type of the subtitles
+    uint64_t playPos = 0;
+    if (textSubtitles.IsFrameBasedTiming())
+    {
+        // frame based subtitles get out of synch after running mythcommflag
+        // for the file, i.e., the following number is wrong and does not
+        // match the subtitle frame numbers:
+        playPos = currentFrame->frameNumber;
+    }
+    else
+    {
+        playPos = currentFrame->timecode;
+    }
+
+    if (!textSubtitles.HasSubtitleChanged(playPos)) 
+        return;
+
+    QStringList subtitlesToShow = textSubtitles.GetSubtitles(playPos);
+
+    osdHasSubtitles = !subtitlesToShow.empty();
+    if (osdHasSubtitles)
+        osd->SetTextSubtitles(subtitlesToShow);
+    else
+        osd->ClearTextSubtitles();
+}
+
 /** \fn NuppelVideoPlayer::ExpireSubtitles(void)
  *  \brief Discard non-displayed subtitles.
  */
@@ -5978,15 +6046,15 @@ void NuppelVideoPlayer::ExpireSubtitles(void)
 
     VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
 
-    while (nonDisplayedSubtitles.size() > 0)
+    while (!nonDisplayedAVSubtitles.empty())
     {
-        const AVSubtitle subtitlePage = nonDisplayedSubtitles.front();
+        const AVSubtitle subtitlePage = nonDisplayedAVSubtitles.front();
 
         // Stop when we hit one old enough
         if (subtitlePage.end_display_time > currentFrame->timecode)
             break;
 
-        nonDisplayedSubtitles.pop_front();
+        nonDisplayedAVSubtitles.pop_front();
 
         for (std::size_t i = 0; i < subtitlePage.num_rects; ++i)
         {
@@ -6006,9 +6074,9 @@ void NuppelVideoPlayer::ClearSubtitles(void)
 {
     subtitleLock.lock();
 
-    while (nonDisplayedSubtitles.size() > 0) 
+    while (!nonDisplayedAVSubtitles.empty())
     {
-        AVSubtitle& subtitle = nonDisplayedSubtitles.front();
+        AVSubtitle& subtitle = nonDisplayedAVSubtitles.front();
 
         // Because the subtitles were not displayed, OSDSet does not
         // free the OSDTypeImages in ClearAll(), so we have to free
@@ -6023,7 +6091,7 @@ void NuppelVideoPlayer::ClearSubtitles(void)
         if (subtitle.num_rects > 0)
             av_free(subtitle.rects);
 
-        nonDisplayedSubtitles.pop_front();
+        nonDisplayedAVSubtitles.pop_front();
     }
 
     subtitleLock.unlock();
@@ -6040,12 +6108,17 @@ void NuppelVideoPlayer::ClearSubtitles(void)
     }
 }
 
-// adds a new subtitle to be shown
-// FIXME: Need to fix subtitles to use a 64bit timestamp
-void NuppelVideoPlayer::AddSubtitle(const AVSubtitle &subtitle) 
+/** \fn void NuppelVideoPlayer::AddAVSubtitle(const AVSubtitle&)
+ *  \brief Adds a new AVSubtitle to be shown.
+ *
+ *  NOTE: Assumes the subtitles are pushed in the order they should be shown.
+ *
+ *  FIXME: Need to fix subtitles to use a 64bit timestamp
+ */
+void NuppelVideoPlayer::AddAVSubtitle(const AVSubtitle &subtitle) 
 {
     subtitleLock.lock();
-    nonDisplayedSubtitles.push_back(subtitle);
+    nonDisplayedAVSubtitles.push_back(subtitle);
     subtitleLock.unlock();
 }
 
@@ -6065,6 +6138,18 @@ void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
         decoder = dec;
         delete d;
     }
+}
+
+/** \fn NuppelVideoPlayer::LoadExternalSubtitles(const QString&)
+ *  \brief Loads subtitles from an external file.
+ *
+ *  \return true iff the subtitle subtitles were loaded successfully.
+ */
+bool NuppelVideoPlayer::LoadExternalSubtitles(const QString &subtitleFileName)
+{
+    QMutexLocker locker(&subtitleLock);
+    textSubtitles.Clear();
+    return TextSubtitleParser::LoadSubtitles(subtitleFileName, textSubtitles);
 }
 
 void NuppelVideoPlayer::ChangeDVDTrack(bool ffw)
