@@ -777,43 +777,78 @@ bool Channel::SetInputAndFormat(int inputNum, QString newFmt)
     bool usingv4l1 = !usingv4l2;
     bool ok = true;
 
+    QString msg =
+        QString("SetInputAndFormat(%1, %2) ").arg(inputNum).arg(newFmt);
+
     if (usingv4l2)
     {
+        VERBOSE(VB_CHANNEL, LOC + msg + "(v4l v2)");
+
         int ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
-        if (ioctlval < 0)
+
+        // ConvertX (wis-go7007) requires streaming to be disabled
+        // before an input switch, do this if initial switch failed.
+        bool streamingDisabled = false;
+        int  streamType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        if ((ioctlval < 0) && (errno == EBUSY))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                        "SetInputAndFormat(%1, %2) "
-                        "\n\t\t\twhile setting input (v4l v2)")
-                    .arg(inputNum).arg(newFmt) + ENO);
-            ok = false;
+            ioctlval = ioctl(videofd, VIDIOC_STREAMOFF, &streamType);
+            if (ioctlval < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
+                        "\n\t\t\twhile disabling streaming (v4l v2)" + ENO);
+
+                ok = false;
+                ioctlval = 0;
+            }
+            else
+            {
+                streamingDisabled = true;
+
+                // Resend the input switch ioctl.
+                ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &inputNumV4L);
+            }
         }
 
-        VERBOSE(VB_CHANNEL, LOC + QString(
-                    "SetInputAndFormat(%1, %2) v4l v2")
-                .arg(inputNum).arg(newFmt));
+        if (ioctlval < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
+                    "\n\t\t\twhile setting input (v4l v2)" + ENO);
+
+            ok = false;
+        }
 
         v4l2_std_id vid_mode = format_to_mode(newFmt, 2);
         ioctlval = ioctl(videofd, VIDIOC_S_STD, &vid_mode);
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                        "SetInputAndFormat(%1, %2) "
-                        "\n\t\t\twhile setting format (v4l v2)")
-                    .arg(inputNum).arg(newFmt) + ENO);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
+                    "\n\t\t\twhile setting format (v4l v2)" + ENO);
 
             // Fall through to try v4l version 1, pcHDTV 1.4 (for HD-2000)
             // drivers don't work with VIDIOC_S_STD ioctl.
             usingv4l1 = true;
             ok = false;
         }
+
+        // ConvertX (wis-go7007) requires streaming to be disabled
+        // before an input switch, here we try to re-enable streaming.
+        if (streamingDisabled)
+        {
+            ioctlval = ioctl(videofd, VIDIOC_STREAMON, &streamType);
+            if (ioctlval < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
+                        "\n\t\t\twhile reenabling streaming (v4l v2)" + ENO);
+
+                ok = false;
+            }
+        }
     }
 
     if (usingv4l1)
     {
-        VERBOSE(VB_CHANNEL, LOC + QString(
-                    "SetInputAndFormat(%1, %2) v4l v1")
-                .arg(inputNum).arg(newFmt));
+        VERBOSE(VB_CHANNEL, LOC + msg + "(v4l v1)");
 
         // read in old settings
         struct video_channel set;
@@ -825,21 +860,16 @@ bool Channel::SetInputAndFormat(int inputNum, QString newFmt)
         set.norm    = format_to_mode(newFmt, 1);
         int ioctlval = ioctl(videofd, VIDIOCSCHAN, &set);
 
-        if (ioctlval < 0)
+        ok = (ioctlval >= 0);
+        if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                        "SetInputAndFormat(%1, %2) "
-                        "\n\t\t\twhile setting format (v4l v1)")
-                    .arg(inputNum).arg(newFmt) + ENO);
-            ok = false;
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg + 
+                    "\n\t\t\twhile setting format (v4l v1)" + ENO);
         }
         else if (usingv4l2)
         {
-            VERBOSE(VB_IMPORTANT, LOC + QString(
-                        "SetInputAndFormat(%1, %2) "
-                        "\n\t\t\tSetting video mode with v4l version 1 worked")
-                    .arg(inputNum).arg(newFmt));
-            ok = true;
+            VERBOSE(VB_IMPORTANT, LOC + msg +
+                    "\n\t\t\tSetting video mode with v4l version 1 worked");
         }
     }
     return ok;
