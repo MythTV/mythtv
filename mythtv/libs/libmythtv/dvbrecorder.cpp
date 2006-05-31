@@ -915,7 +915,8 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
 
     if (GetStreamData()->IsListeningPID(pid))
         GetStreamData()->HandleTSTables(&tspacket);
-    else if (GetStreamData()->IsWritingPID(pid))
+    else if (GetStreamData()->IsWritingPID(pid) ||
+             (_dummy_output_video_pid && (pid == _dummy_output_video_pid)))
     {
         // Sync streams to the first Payload Unit Start Indicator
         // _after_ first keyframe iff _wait_for_keyframe_option is true
