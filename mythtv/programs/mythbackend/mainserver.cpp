@@ -51,6 +51,11 @@ using namespace std;
     #include <sensors/chips.h>
 #endif
 
+
+// This is necessary for GCC 3.3, which has llabs(long long) but not abs(...)
+inline  long long  myAbs(long long  n)  { return n >= 0 ? n : -n; }
+
+
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
@@ -3998,7 +4003,7 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
                 storage.setAttribute(encoderHost + ":free" , (int)(mAvail>>10));
 
                 if ((mTotal == iTotal) &&
-                    (abs(mAvail - iAvail) < (iAvail * 0.05)))
+                    (myAbs(mAvail - iAvail - 0.0L) < (iAvail * 0.05)))
                 {
                     storage.setAttribute(encoderHost + ":shared" , 1);
                 }
