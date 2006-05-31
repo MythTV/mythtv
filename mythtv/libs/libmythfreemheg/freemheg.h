@@ -23,6 +23,8 @@
 #define FREEMHEG_H
 
 #include <qregion.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 class MHDLADisplay;
 class MHTextDisplay;
