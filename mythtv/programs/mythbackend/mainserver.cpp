@@ -4003,7 +4003,7 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
                 storage.setAttribute(encoderHost + ":free" , (int)(mAvail>>10));
 
                 if ((mTotal == iTotal) &&
-                    (myAbs(mAvail - iAvail - 0.0L) < (iAvail * 0.05)))
+                    (myAbs(mAvail - iAvail) < (iAvail * 0.05)))
                 {
                     storage.setAttribute(encoderHost + ":shared" , 1);
                 }
