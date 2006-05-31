@@ -17,6 +17,8 @@ class ScreenSaverX11 : public QObject, public ScreenSaverControl
     void Restore(void);
     void Reset(void);
 
+    bool Asleep(void);
+
   public slots:
     void resetSlot();
 

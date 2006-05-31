@@ -12,6 +12,8 @@ public:
     void Disable(void);
     void Restore(void);
     void Reset(void);
+
+    bool Asleep(void);
 };
 
 #endif // MYTH_SCREENSAVER_NULL_H

@@ -61,3 +61,8 @@ void ScreenSaverOSX::Reset(void)
     ScreenSaverOSXPrivate::timerCallback(NULL, NULL);
 }
 
+bool ScreenSaverOSX::Asleep(void)
+{
+    return 0;
+}
+

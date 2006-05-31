@@ -405,6 +405,7 @@ class MythContext : public QObject, public MythObservable
 
     // get the current status
     bool GetScreensaverEnabled(void);
+    bool GetScreenIsAsleep(void);
 
     void addPrivRequest(MythPrivRequest::Type t, void *data);
     void waitPrivRequest() const;

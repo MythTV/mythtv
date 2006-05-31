@@ -36,6 +36,8 @@ class ScreenSaverControl
     virtual void Disable(void) = 0;
     virtual void Restore(void) = 0;
     virtual void Reset(void) = 0;
+
+    virtual bool Asleep(void) = 0;
 };
 
 #endif // MYTH_SCREENSAVER_H

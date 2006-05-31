@@ -13,6 +13,8 @@ public:
     void Restore(void);
     void Reset(void);
 
+    bool Asleep(void);
+
 protected:
     class ScreenSaverOSXPrivate *d;
 };

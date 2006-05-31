@@ -2852,4 +2852,11 @@ QString MythContext::getCurrentLocation(void)
     return currentLocation.last();
 }
 
+bool MythContext::GetScreenIsAsleep(void)
+{
+    if (!d->screensaver)
+        return false;
+    return d->screensaver->Asleep();
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

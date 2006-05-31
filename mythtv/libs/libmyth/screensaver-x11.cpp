@@ -20,8 +20,10 @@ class ScreenSaverX11Private
         int interval;
         int preferblank;
         int allowexposure;
-        bool dpmsdisabled;
         bool xscreensaverRunning;
+        BOOL dpmsaware;
+        BOOL dpmsenabled;
+        bool dpmsdeactivated;
     } state;
 
     QTimer *resetTimer;
@@ -44,10 +46,40 @@ ScreenSaverX11::ScreenSaverX11()
         d->timeoutInterval = -1;
         VERBOSE(VB_GENERAL, "XScreenSaver support enabled");
     }
+
+    int dummy;
+    if ((d->state.dpmsaware = DPMSQueryExtension(qt_xdisplay(),&dummy,&dummy)))
+    {
+        CARD16 power_level;
+
+	    /* If someone runs into X server weirdness that goes away when
+	    * they externally disable DPMS, then the 'dpmsenabled' test should
+	    * be short circuited by a call to 'DPMSCapable()'. Be sure to
+	    * manually initialize dpmsenabled to false.
+	    */
+
+        DPMSInfo(qt_xdisplay(), &power_level, &(d->state.dpmsenabled));
+
+        if (d->state.dpmsenabled)
+            VERBOSE(VB_GENERAL, "DPMS is active.");
+        else
+            VERBOSE(VB_GENERAL, "DPMS is disabled.");
+
+    } else {
+        d->state.dpmsenabled = false;
+        VERBOSE(VB_GENERAL, "DPMS is not supported.");
+    }
+
+    d->state.dpmsdeactivated = false;
+
 }
 
 ScreenSaverX11::~ScreenSaverX11() 
 {
+    /* Ensure DPMS gets left as it was found. */
+    if (d->state.dpmsdeactivated)
+        Restore();
+
     delete d;
 }
 
@@ -65,20 +97,11 @@ void ScreenSaverX11::Disable(void)
     XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
 
-    int nothing;
-
-    if (DPMSQueryExtension(qt_xdisplay(), &nothing, &nothing))
+    if (d->state.dpmsenabled)
     {
-        BOOL on;
-        CARD16 power_level;
-
-        DPMSInfo(qt_xdisplay(), &power_level, &on);
-        if (on)
-        {
-            d->state.dpmsdisabled = true;
-            DPMSDisable(qt_xdisplay());       // monitor powersave off
-            VERBOSE(VB_GENERAL, "Disable DPMS");
-        }
+        d->state.dpmsdeactivated = true;
+        DPMSDisable(qt_xdisplay());
+        VERBOSE(VB_GENERAL, "DPMS Deactivated ");
     }
 
     if (d->state.xscreensaverRunning)
@@ -109,15 +132,11 @@ void ScreenSaverX11::Restore(void)
                     d->state.allowexposure);
     d->state.saved = false;
 
-    if (d->state.dpmsdisabled)
+    if (d->state.dpmsdeactivated)
     {
-        int nothing;
-        d->state.dpmsdisabled = false;
-        if (DPMSQueryExtension(qt_xdisplay(), &nothing, &nothing))
-        {
-            DPMSEnable(qt_xdisplay());
-            VERBOSE(VB_GENERAL, "Enable DPMS");
-        }
+        d->state.dpmsdeactivated = false;
+        DPMSEnable(qt_xdisplay());
+        VERBOSE(VB_GENERAL, "DPMS Reactivated.");
     }
 
     if (d->state.xscreensaverRunning && d->resetTimer)
@@ -130,18 +149,29 @@ void ScreenSaverX11::Reset(void)
     if (d->state.xscreensaverRunning)
         resetSlot();
 
-    int nothing;
-    if (DPMSQueryExtension(qt_xdisplay(), &nothing, &nothing))
+    if (Asleep())
     {
-        BOOL on;
-        CARD16 power_level;
-        if (!d->state.dpmsdisabled) 
-        {
-            DPMSInfo(qt_xdisplay(), &power_level, &on);
-            if (power_level != DPMSModeOn)
-                DPMSForceLevel(qt_xdisplay(), DPMSModeOn);
-        }
+        DPMSForceLevel(qt_xdisplay(), DPMSModeOn);
+	// Calling XSync is necessary for the case when Myth executes
+	// another application before the event loop regains control
+        XSync(qt_xdisplay(), false);
     }
+}
+
+bool ScreenSaverX11::Asleep(void)
+{
+    if (!d->state.dpmsenabled)
+        return 0;
+
+    if (d->state.dpmsdeactivated)
+        return 0;
+
+    BOOL on;
+    CARD16 power_level;
+
+    DPMSInfo(qt_xdisplay(), &power_level, &on);
+
+    return (power_level != DPMSModeOn);
 }
 
 void ScreenSaverX11::resetSlot() 

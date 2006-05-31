@@ -1186,6 +1186,8 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         if (keycode) 
         {
             gContext->ResetScreensaver();
+            if (gContext->GetScreenIsAsleep())
+                return;
 
             int mod = keycode & MODIFIER_MASK;
             int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
@@ -1235,6 +1237,8 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         if (keycode)
         {
             gContext->ResetScreensaver();
+            if (gContext->GetScreenIsAsleep())
+                return;
 
             int mod = keycode & MODIFIER_MASK;
             int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
