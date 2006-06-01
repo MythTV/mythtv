@@ -7,6 +7,7 @@
 
 // Qt Headers
 #include <qfile.h>
+#include <qdir.h>
 
 // MythTV headers
 #include "mythmedia.h"
@@ -42,7 +43,10 @@ const char* MythMediaDevice::MediaTypeStrings[] =
     "MEDIATYPE_MIXED",
     "MEDIATYPE_AUDIO",
     "MEDIATYPE_DVD",
-    "MEDIATYPE_VCD"
+    "MEDIATYPE_VCD",
+    "MEDIATYPE_MMUSIC",
+    "MEDIATYPE_MVIDEO",
+    "MEDIATYPE_MGALLERY",
 };
 
 const char* MythMediaDevice::MediaErrorStrings[] =
@@ -123,6 +127,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 isMounted(true);
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
+                VERBOSE(VB_IMPORTANT, "m_MediaType: "<<m_MediaType);
             }
             else
                 onDeviceUnmounted();
@@ -141,12 +146,115 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         // We just need to give derived classes a chance to perform their 
         // mount / unmount logic.
         if (DoMount)
+        {
             onDeviceMounted();
+            VERBOSE(VB_IMPORTANT, "m_MediaType: "<<m_MediaType);
+        }
         else
             onDeviceUnmounted();
         return true;
     }
     return false;
+}
+
+/** \fn MythMediaDevice::DetectMediaType(void)
+ *  \brief Returns guessed media type based on file extensions.
+ */
+MediaType MythMediaDevice::DetectMediaType(void)
+{
+    MediaType mediatype = MEDIATYPE_UNKNOWN;
+    ext_cnt_t ext_cnt;
+
+    if (!ScanMediaType(m_MountPath, ext_cnt))
+    {
+        VERBOSE(VB_GENERAL, QString("No files with extensions found in '%1'")
+                .arg(m_MountPath));
+        return mediatype;
+    }
+
+    QMap<uint, uint> media_cnts, media_cnt;
+
+    // convert raw counts to composite mediatype counts
+    ext_cnt_t::const_iterator it = ext_cnt.begin();
+    for (; it != ext_cnt.end(); ++it)
+    {
+        ext_to_media_t::const_iterator found = m_ext_to_media.find(it.key());
+        if (found != m_ext_to_media.end())
+            media_cnts[*found] += *it;
+    }
+
+    // break composite mediatypes into constituent components
+    QMap<uint, uint>::const_iterator cit = media_cnts.begin();
+    for (; cit != media_cnts.end(); ++cit)
+    {
+        for (uint key, j = 0; key != MEDIATYPE_END; j++)
+        {
+            if ((key = 1 << j) & cit.key())
+                media_cnt[key] += *cit;
+        }
+    }
+
+    // decide on mediatype based on which one has a handler for > # of files
+    uint max_cnt = 0;
+    for (cit = media_cnt.begin(); cit != media_cnt.end(); ++cit)
+    {
+        if (*cit > max_cnt)
+        {
+            mediatype = (MediaType) cit.key();
+            max_cnt   = *cit;
+        }
+    }
+
+    return mediatype;
+}
+
+/** \fn MythMediaDevice::ScanMediaType(const QString&, ext_cnt_t)
+ *  \brief Recursively scan directories and create an associative array
+ *         with the number of times we've seen each extension.
+ */
+bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
+{
+    QDir d(directory);
+    if (!d.exists())
+        return false;
+
+    const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return false;
+
+    QFileInfoListIterator it(*list);
+
+    for (; it.current(); ++it)
+    {
+        if (("." == (*it)->fileName()) || (".." == (*it)->fileName()))
+            continue;
+
+        if ((*it)->isDir())
+        {
+            ScanMediaType((*it)->absFilePath(), cnt);
+            continue;
+        }
+
+        const QString ext = (*it)->extension(false);
+        if (!ext.isEmpty())
+            cnt[ext.lower()]++;
+    }
+
+    return !cnt.empty();
+}
+
+/** \fn MythMediaDevice::RegisterMediaExtensions(uint,const QString&)
+ *  \brief Used to register media types with extensions.
+ *
+ *  \param mediatype  MediaType flag.
+ *  \param extensions Comma separated list of extensions like 'mp3,ogg,flac'.
+ */
+void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
+                                              const QString &extensions)
+{
+    const QStringList list = QStringList::split(",", extensions, "");
+    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
+        m_ext_to_media[*it] |= mediatype;
 }
 
 MediaError MythMediaDevice::eject(bool open_close)

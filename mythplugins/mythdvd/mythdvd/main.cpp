@@ -273,9 +273,13 @@ void handleVCDMedia(MythMediaDevice *)
 void initKeys(void)
 {
     REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
-    REG_MEDIA_HANDLER("MythDVD DVD Media Handler", "", "", handleDVDMedia, MEDIATYPE_DVD);
+    REG_MEDIA_HANDLER("MythDVD DVD Media Handler", "", "",
+                      handleDVDMedia, MEDIATYPE_DVD, QString::null);
+
     REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
-    REG_MEDIA_HANDLER("MythDVD VCD Media Handler", "", "", handleVCDMedia, MEDIATYPE_VCD);
+    REG_MEDIA_HANDLER("MythDVD VCD Media Handler", "", "",
+                      handleVCDMedia, MEDIATYPE_VCD, QString::null);
+
     REG_JUMP("Rip DVD", "Import a DVD into your MythVideo database", "", 
              startDVDRipper);
 }

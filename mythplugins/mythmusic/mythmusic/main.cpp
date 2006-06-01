@@ -520,8 +520,10 @@ void setupKeys(void)
     REG_KEY("Music", "INCSEARCH",     "Show incremental search dialog",     "Ctrl+S");
     REG_KEY("Music", "INCSEARCHNEXT", "Incremental search find next match", "Ctrl+N");
 
-    REG_MEDIA_HANDLER("MythMusic Media Handler", "", "", handleMedia,
-                      MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
+    REG_MEDIA_HANDLER("MythMusic Media Handler 1/2", "", "", handleMedia,
+                      MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER("MythMusic Media Handler 2/2", "", "", handleMedia,
+                      MEDIATYPE_MMUSIC, "ogg,mp3,aac,flac");
 }
 
 int mythplugin_init(const char *libversion)

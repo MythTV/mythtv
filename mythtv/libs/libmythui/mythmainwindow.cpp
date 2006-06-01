@@ -906,20 +906,23 @@ bool MythMainWindow::DestinationExists(const QString& destination) const
 
 void MythMainWindow::RegisterMediaHandler(const QString &destination,
                                           const QString &description,
-                                          const QString &key, 
-                              void (*callback)(MythMediaDevice*mediadevice),
-                                          int mediaType)
+                                          const QString &/*key*/,
+                                          void (*callback)(MythMediaDevice*),
+                                          int            mediaType,
+                                          const QString &extensions)
 {
-    (void)key;
-
     if (d->mediaHandlerMap.count(destination) == 0) 
     {
         MHData mhd = { callback, mediaType, destination, description };
 
-        VERBOSE(VB_GENERAL, QString("Registering %1 as a media handler")
-                                   .arg(destination));
+        VERBOSE(VB_GENERAL, QString("Registering %1 as a media handler %2")
+                .arg(destination).arg(QString("ext(%1)").arg(extensions)));
 
         d->mediaHandlerMap[destination] = mhd;
+
+        MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+        if (!extensions.isEmpty())
+            mon->MonitorRegisterExtensions(mediaType, extensions);
     }
     else 
     {

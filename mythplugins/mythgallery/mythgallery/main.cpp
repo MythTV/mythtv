@@ -92,7 +92,10 @@ void setupKeys(void)
     REG_KEY("Gallery", "DELETE", "Delete marked images or current image if none are marked", "D");
     REG_KEY("Gallery", "MARK", "Mark image", "T");
 
-    REG_MEDIA_HANDLER("MythGallery Media Handler", "", "", handleMedia, MEDIATYPE_DATA | MEDIATYPE_MIXED);
+    REG_MEDIA_HANDLER("MythGallery Media Handler 1/2", "", "", handleMedia,
+                      MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER("MythGallery Media Handler 2/2", "", "", handleMedia,
+                      MEDIATYPE_MGALLERY, "gif,jpg,png");
 }
 
 int mythplugin_init(const char *libversion)

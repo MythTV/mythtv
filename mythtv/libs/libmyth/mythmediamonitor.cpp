@@ -842,6 +842,23 @@ QValueList<MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
     return medias;
 }
 
+/** \fn MediaMonitor::MonitorRegisterExtensions(uint,const QString&)
+ *  \brief Register the extension list on all known devices
+ */
+void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
+                                             const QString &extensions)
+{
+    VERBOSE(VB_IMPORTANT, QString("MonitorRegisterExtensions(0x%1, %2)")
+            .arg(mediatype, 0, 16).arg(extensions));
+
+    QValueList<MythMediaDevice*>::iterator it = m_Devices.begin();
+    for (; it != m_Devices.end(); ++it)
+    {
+        if (*it)
+            (*it)->RegisterMediaExtensions(mediatype, extensions);
+    }
+}
+
 // Signal handler.
 void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus, 
                                       MythMediaDevice* pMedia)

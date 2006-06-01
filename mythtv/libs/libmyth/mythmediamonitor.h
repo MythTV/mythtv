@@ -70,6 +70,8 @@ class MediaMonitor : public QObject
     // it is safe to dereference the pointer. When finished call Unlock()
     QValueList<MythMediaDevice*> GetMedias(MediaType mediatype);
 
+    void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
+
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 
