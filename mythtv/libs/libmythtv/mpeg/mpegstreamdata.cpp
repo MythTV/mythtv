@@ -47,8 +47,9 @@ const unsigned char MPEGStreamData::bit_sel[8] =
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     : _have_CRC_bug(false), _eit_helper(NULL), _eit_rate(0.0f),
       _listener_lock(true),
-      _pat_version(-2), _cache_tables(cacheTables), _cache_lock(true),
-      _cached_pat(NULL), _desired_program(desiredProgram),
+      _cache_tables(cacheTables), _cache_lock(true),
+      // Single program stuff
+      _desired_program(desiredProgram),
       _pid_video_single_program(0xffffffff),
       _pid_pmt_single_program(0xffffffff),      
       _pmt_single_program_num_video(1),
@@ -56,7 +57,6 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _pat_single_program(NULL), _pmt_single_program(NULL),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
-    SetVersionPAT(-1,0);
     AddListeningPID(MPEG_PAT_PID);
 }
 
@@ -80,10 +80,14 @@ void MPEGStreamData::SetDesiredProgram(int p)
 {
     bool reset = true;
     uint pid = 0;
-    const pat_ptr_t pat = GetCachedPAT();
+    const ProgramAssociationTable* pat = NULL;
+    pat_vec_t pats = GetCachedPATs();
 
-    if (pat && (p >= 0))
-        pid = pat->FindPID(p);
+    for (uint i = (p) ? 0 : pats.size(); i < pats.size() && !pid; i++)
+    {
+        pat = pats[i];
+        pid = pats[i]->FindPID(p);
+    }
 
     if (pid)
     {
@@ -96,10 +100,10 @@ void MPEGStreamData::SetDesiredProgram(int p)
             if (pmts[i]->ProgramNumber() == (uint)p)
                 ProcessPMT(pmts[i]);
         }
-        ReturnCachedTables(pmts);
+        ReturnCachedPMTTables(pmts);
     }
 
-    ReturnCachedTable(pat);
+    ReturnCachedPATTables(pats);
 
     if (reset)
         Reset(p);
@@ -125,8 +129,6 @@ void MPEGStreamData::Reset(int desiredProgram)
     SetPATSingleProgram(NULL);
     SetPMTSingleProgram(NULL);
 
-    SetVersionPAT(-1,0);
-
     pid_pes_map_t old = _partial_pes_packet_cache;
     pid_pes_map_t::iterator it = old.begin();
     for (; it != old.end(); ++it)
@@ -138,18 +140,24 @@ void MPEGStreamData::Reset(int desiredProgram)
     _pids_writing.clear();
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
+
+    _pat_version.clear();
+    _pat_section_seen.clear();
+
     _pmt_version.clear();
     _pmt_section_seen.clear();
 
     {
         QMutexLocker locker(&_cache_lock);
 
-        DeleteCachedTable(_cached_pat);
-        _cached_pat = NULL;
+        pat_cache_t::iterator it1 = _cached_pats.begin();
+        for (; it1 != _cached_pats.end(); ++it1)
+            DeleteCachedTable(*it1);
+        _cached_pats.clear();
 
-        pmt_cache_t::iterator it = _cached_pmts.begin();
-        for (; it != _cached_pmts.end(); ++it)
-            DeleteCachedTable(*it);
+        pmt_cache_t::iterator it2 = _cached_pmts.begin();
+        for (; it2 != _cached_pmts.end(); ++it2)
+            DeleteCachedTable(*it2);
         _cached_pmts.clear();
     }
 
@@ -450,9 +458,9 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::PAT == table_id)
     {
-        if (VersionPAT() != version)
+        if (VersionPAT(psip.TableIDExtension()) != version)
             return false;
-        return PATSectionSeen(psip.Section());
+        return PATSectionSeen(psip.TableIDExtension(), psip.Section());
     }
 
     if (TableID::CAT == table_id)
@@ -481,9 +489,11 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
     switch (psip.TableID())
     {
         case TableID::PAT:
-        { 
-            SetVersionPAT(version, psip.LastSection());
-            SetPATSectionSeen(psip.Section());
+        {
+            uint tsid = psip.TableIDExtension();
+            SetVersionPAT(tsid, version, psip.LastSection());
+            SetPATSectionSeen(tsid, psip.Section());
+
             ProgramAssociationTable pat(psip);
 
             if (_cache_tables)
@@ -749,20 +759,32 @@ void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
     }
 }
 
-void MPEGStreamData::SetPATSectionSeen(uint section)
+void MPEGStreamData::SetPATSectionSeen(uint tsid, uint section)
 {
-    _pat_section_seen[section>>3] |= bit_sel[section & 0x7];
+    sections_map_t::iterator it = _pat_section_seen.find(tsid);
+    if (it == _pat_section_seen.end())
+    {
+        _pat_section_seen[tsid].resize(32, 0);
+        it = _pat_section_seen.find(tsid);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
 }
 
-bool MPEGStreamData::PATSectionSeen(uint section) const
+bool MPEGStreamData::PATSectionSeen(uint tsid, uint section) const
 {
-    return (bool) (_pat_section_seen[section>>3] & bit_sel[section & 0x7]);
+    sections_map_t::const_iterator it = _pat_section_seen.find(tsid);
+    if (it == _pat_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
-bool MPEGStreamData::HasAllPATSections(void) const
+bool MPEGStreamData::HasAllPATSections(uint tsid) const
 {
+    sections_map_t::const_iterator it = _pat_section_seen.find(tsid);
+    if (it == _pat_section_seen.end())
+        return false;
     for (uint i = 0; i < 32; i++)
-        if (_pat_section_seen[i] != 0xff)
+        if ((*it)[i] != 0xff)
             return false;
     return true;
 }
@@ -806,9 +828,40 @@ bool MPEGStreamData::HasProgram(uint progNum) const
     return hasit;
 }
 
-bool MPEGStreamData::HasCachedPAT(void) const
+bool MPEGStreamData::HasCachedAllPAT(uint tsid) const
 {
-    return (bool)(_cached_pat);
+    QMutexLocker locker(&_cache_lock);
+
+    pat_cache_t::const_iterator it = _cached_pats.find(tsid << 8);
+    if (it == _cached_pats.end())
+        return false;
+
+    uint last_section = (*it)->LastSection();
+    if (!last_section)
+        return true;
+
+    for (uint i = 1; i <= last_section; i++)
+        if (_cached_pats.find((tsid << 8) | i) == _cached_pats.end())
+            return false;
+
+    return true;
+}
+
+bool MPEGStreamData::HasCachedAnyPAT(uint tsid) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    for (uint i = 0; i <= 255; i++)
+        if (_cached_pats.find((tsid << 8) | i) != _cached_pats.end())
+            return true;
+
+    return false;
+}
+
+bool MPEGStreamData::HasCachedAnyPAT(void) const
+{
+    QMutexLocker locker(&_cache_lock);
+    return _cached_pats.size();
 }
 
 bool MPEGStreamData::HasCachedAllPMT(uint pnum) const
@@ -844,24 +897,50 @@ bool MPEGStreamData::HasCachedAnyPMT(uint pnum) const
 bool MPEGStreamData::HasCachedAllPMTs(void) const
 {
     QMutexLocker locker(&_cache_lock);
-    if (_cached_pat || (_cached_pat->ProgramCount() > _cached_pmts.size()))
-        return false;
 
-    for (uint i = 0; i < _cached_pat->ProgramCount(); i++)
-        if (!HasCachedAllPMT(_cached_pat->ProgramNumber(i)))
+    pat_cache_t::const_iterator it = _cached_pats.begin();
+    for (; it != _cached_pats.end(); ++it)
+    {
+        const ProgramAssociationTable *pat = *it;
+        if (!HasCachedAllPAT(pat->TransportStreamID()))
             return false;
+
+        for (uint i = 0; i < pat->ProgramCount(); i++)
+            if (!HasCachedAllPMT(pat->ProgramNumber(i)))
+                return false;
+    }
 
     return true;
 }
 
-const pat_ptr_t MPEGStreamData::GetCachedPAT(void) const
+const pat_ptr_t MPEGStreamData::GetCachedPAT(
+    uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
+    ProgramAssociationTable *pat = NULL;
 
-    const pat_ptr_t pat = _cached_pat;
-    IncrementRefCnt(pat);
+    uint key = (tsid << 8) | section_num;
+    pat_cache_t::const_iterator it = _cached_pats.find(key);
+    if (it != _cached_pats.end())
+        IncrementRefCnt(pat = *it);
 
     return pat;
+}
+
+pat_vec_t MPEGStreamData::GetCachedPATs(void) const
+{
+    QMutexLocker locker(&_cache_lock);
+    pat_vec_t pats;
+
+    pat_cache_t::const_iterator it = _cached_pats.begin();
+    for (; it != _cached_pats.end(); ++it)
+    {
+        ProgramAssociationTable* pat = *it;
+        IncrementRefCnt(pat);
+        pats.push_back(pat);
+    }
+
+    return pats;
 }
 
 const pmt_ptr_t MPEGStreamData::GetCachedPMT(
@@ -927,17 +1006,31 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
     }
 }
 
-void MPEGStreamData::ReturnCachedTables(pmt_vec_t &pmts) const
+void MPEGStreamData::ReturnCachedPATTables(pat_vec_t &pats) const
+{
+    for (pat_vec_t::iterator it = pats.begin(); it != pats.end(); ++it)
+        ReturnCachedTable(*it);
+    pats.clear();
+}
+
+void MPEGStreamData::ReturnCachedPATTables(pat_map_t &pats) const
+{
+    for (pat_map_t::iterator it = pats.begin(); it != pats.end(); ++it)
+        ReturnCachedPATTables(*it);
+    pats.clear();
+}
+
+void MPEGStreamData::ReturnCachedPMTTables(pmt_vec_t &pmts) const
 {
     for (pmt_vec_t::iterator it = pmts.begin(); it != pmts.end(); ++it)
         ReturnCachedTable(*it);
     pmts.clear();
 }
 
-void MPEGStreamData::ReturnCachedTables(pmt_map_t &pmts) const
+void MPEGStreamData::ReturnCachedPMTTables(pmt_map_t &pmts) const
 {
     for (pmt_map_t::iterator it = pmts.begin(); it != pmts.end(); ++it)
-        ReturnCachedTables(*it);
+        ReturnCachedPMTTables(*it);
     pmts.clear();
 }
 
@@ -960,10 +1053,10 @@ void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
         _cached_slated_for_deletion[psip] = 1;
         return;
     }
-    else if (TableID::PAT == psip->TableID())
+    else if (TableID::PAT == psip->TableID() &&
+             (_cached_pats[(tid << 8) | psip->Section()] == psip))
     {
-        if (psip == _cached_pat)
-            _cached_pat = NULL;
+        _cached_pats[(tid << 8) | psip->Section()] = NULL;
         delete psip;
     }
     else if ((TableID::PMT == psip->TableID()) &&
@@ -986,11 +1079,15 @@ void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
 void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)
 {
     ProgramAssociationTable *pat = new ProgramAssociationTable(*_pat);
+    uint key = (_pat->TransportStreamID() << 8) | _pat->Section();
 
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_pat);
-    _cached_pat = pat;
+    pat_cache_t::iterator it = _cached_pats.find(key);
+    if (it != _cached_pats.end())
+        DeleteCachedTable(*it);
+
+    _cached_pats[key] = pat;
 }
 
 void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)

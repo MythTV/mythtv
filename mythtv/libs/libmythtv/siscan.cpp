@@ -319,14 +319,12 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     int     freqid  = (*current).friendlyNum;
     QString fn      = (*current).FriendlyName;
 
-    const ProgramAssociationTable *pat = sd->GetCachedPAT();
-    if (pat)
-    {
-        pmt_map_t pmt_map = sd->GetCachedPMTMap();
-        UpdatePATinDB(mplexid, fn, freqid, pat, pmt_map, true);
-        sd->ReturnCachedTables(pmt_map);
-        sd->ReturnCachedTable(pat);
-    }
+    pat_vec_t pats = sd->GetCachedPATs();
+    pmt_map_t pmt_map = sd->GetCachedPMTMap();
+    for (uint i = 0; i < pats.size(); i++)
+        UpdatePATinDB(mplexid, fn, freqid, pats[i], pmt_map, true);
+    sd->ReturnCachedPMTTables(pmt_map);
+    sd->ReturnCachedPATTables(pats);
 
     // tell UI we are done with these channels
     if (scanMode == TRANSPORT_LIST)
@@ -419,7 +417,7 @@ bool SIScan::HandlePostInsertion(void)
     const ScanStreamData *sd = dtvSigMon->GetScanStreamData();
 
     VERBOSE(VB_SIPARSER, LOC + "HandlePostInsertion() " +
-            QString("pat(%1)").arg(sd->HasCachedPAT()));
+            QString("pat(%1)").arg(sd->HasCachedAnyPAT()));
 
     const MasterGuideTable *mgt = sd->GetCachedMGT();
     if (mgt)
@@ -442,12 +440,10 @@ bool SIScan::HandlePostInsertion(void)
         return true;
     }
 
-    const ProgramAssociationTable *pat = sd->GetCachedPAT();
-    if (pat)
+    if (sd->HasCachedAnyPAT())
     {
-        VERBOSE(VB_IMPORTANT, pat->toString());
+        VERBOSE(VB_IMPORTANT, LOC + "Post insertion found PAT..");
         HandleMPEGDBInsertion(sd, false);
-        sd->ReturnCachedTable(pat);
         return true;
     }
     return false;

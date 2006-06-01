@@ -184,7 +184,16 @@ void DVBRecorder::HandlePAT(const ProgramAssociationTable *_pat)
     QMutexLocker change_lock(&_pid_lock);
 
     int progNum = _stream_data->DesiredProgram();
-    _pmt_pid = _pat->FindPID(progNum);
+    uint pmtpid = _pat->FindPID(progNum);
+
+    if (!pmtpid)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPAT(): "
+                "Ignoring PAT not containing our desired program...");
+        return;
+    }
+
+    _pmt_pid = pmtpid;
 
     VERBOSE(VB_RECORD, LOC + QString("SetPAT(%1 on 0x%2)")
             .arg(progNum).arg(_pmt_pid,0,16));

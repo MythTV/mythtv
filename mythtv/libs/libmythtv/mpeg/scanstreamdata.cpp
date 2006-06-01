@@ -43,21 +43,3 @@ void ScanStreamData::Reset(void)
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
 }
-
-void ScanStreamData::ReturnCachedTable(const PSIPTable *psip) const
-{
-    ATSCStreamData::ReturnCachedTable(psip);
-    DVBStreamData::ReturnCachedTable(psip);
-}
-
-void ScanStreamData::ReturnCachedTables(pmt_vec_t &x) const
-{
-    ATSCStreamData::ReturnCachedTables(x);
-    DVBStreamData::ReturnCachedTables(x);
-}
-
-void ScanStreamData::ReturnCachedTables(pmt_map_t &x) const
-{
-    ATSCStreamData::ReturnCachedTables(x);
-    DVBStreamData::ReturnCachedTables(x);
-}

@@ -264,10 +264,16 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         return;
     }
 
-    GetStreamData()->SetVersionPAT(-1,0);
-
     if (programNumber >= 0)
     {
+        // BEGIN HACK HACK HACK
+        // Reset version in case we're physically on the wrong transport
+        // due to tuning hardware being in a transitional state or we
+        // are in the middle of something like a DiSEqC rotor turn.
+        uint tsid = pat->TransportStreamID();
+        GetStreamData()->SetVersionPAT(tsid, -1,0);
+        // END HACK HACK HACK
+
         QString errStr = QString("Program #%1 not found in PAT!")
             .arg(programNumber);
         VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString()<<endl);

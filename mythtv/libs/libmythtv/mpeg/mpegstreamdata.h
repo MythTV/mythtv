@@ -22,7 +22,10 @@ typedef vector<uint>                    uint_vec_t;
 typedef QMap<unsigned int, PESPacket*>  pid_pes_map_t;
 typedef QMap<const PSIPTable*, int>     psip_refcnt_map_t;
 
-typedef ProgramAssociationTable*        pat_ptr_t;
+typedef ProgramAssociationTable*               pat_ptr_t;
+typedef vector<const ProgramAssociationTable*> pat_vec_t;
+typedef QMap<uint, pat_vec_t>                  pat_map_t;
+typedef QMap<uint, ProgramAssociationTable*>   pat_cache_t;
 
 typedef ProgramMapTable*                pmt_ptr_t;
 typedef vector<const ProgramMapTable*>  pmt_vec_t;
@@ -87,14 +90,20 @@ class MPEGStreamData : public EITSource
         { return _pids_listening; }
 
     // Table versions
-    void SetVersionPAT(int version, uint last_section)
+    void SetVersionPAT(uint tsid, int version, uint last_section)
     {
-        if (_pat_version == version)
+        if (VersionPAT(tsid) == version)
             return;
-        _pat_version = version;
-        init_sections(_pat_section_seen, last_section);
+        _pat_version[tsid] = version;
+        init_sections(_pat_section_seen[tsid], last_section);
     }
-    int  VersionPAT(void) const { return _pat_version; }
+    int  VersionPAT(uint tsid) const
+    {
+        const QMap<uint, int>::const_iterator it = _pat_version.find(tsid);
+        if (it == _pat_version.end())
+            return -1;
+        return *it;
+    }
 
     void SetVersionPMT(uint program_num, int version, uint last_section)
     {
@@ -112,29 +121,38 @@ class MPEGStreamData : public EITSource
     }
 
     // Sections seen
-    void SetPATSectionSeen(uint section);
-    bool PATSectionSeen(uint section) const;
-    bool HasAllPATSections(void) const;
+    void SetPATSectionSeen(uint tsid, uint section);
+    bool PATSectionSeen(   uint tsid, uint section) const;
+    bool HasAllPATSections(uint tsid) const;
 
     void SetPMTSectionSeen(uint prog_num, uint section);
-    bool PMTSectionSeen(uint prog_num, uint section) const;
+    bool PMTSectionSeen(   uint prog_num, uint section) const;
     bool HasAllPMTSections(uint prog_num) const;
 
     // Caching
     bool HasProgram(uint progNum) const;
-    bool HasCachedPAT(void) const;
+
+    bool HasCachedAllPAT(uint tsid) const;
+    bool HasCachedAnyPAT(uint tsid) const;
+    bool HasCachedAnyPAT(void) const;
+    
     bool HasCachedAllPMT(uint program_num) const;
     bool HasCachedAnyPMT(uint program_num) const;
     bool HasCachedAllPMTs(void) const;
 
-    const pat_ptr_t GetCachedPAT(void) const;
+    const pat_ptr_t GetCachedPAT(uint tsid, uint section_num) const;
+    pat_vec_t       GetCachedPATs(void) const;
+    pat_map_t       GetCachedPATMap(void) const;
+
     const pmt_ptr_t GetCachedPMT(uint program_num, uint section_num) const;
     pmt_vec_t GetCachedPMTs(void) const;
     pmt_map_t GetCachedPMTMap(void) const;
 
     virtual void ReturnCachedTable(const PSIPTable *psip) const;
-    virtual void ReturnCachedTables(pmt_vec_t&) const;
-    virtual void ReturnCachedTables(pmt_map_t&) const;
+    virtual void ReturnCachedPATTables(pat_vec_t&) const;
+    virtual void ReturnCachedPATTables(pat_map_t&) const;
+    virtual void ReturnCachedPMTTables(pmt_vec_t&) const;
+    virtual void ReturnCachedPMTTables(pmt_map_t&) const;
 
     // "signals"
     void AddMPEGListener(MPEGStreamListener*);
@@ -224,10 +242,10 @@ class MPEGStreamData : public EITSource
     mpeg_sp_listener_vec_t    _mpeg_sp_listeners;
 
     // Table versions
-    int                       _pat_version;
+    QMap<uint, int>           _pat_version;
     QMap<uint, int>           _pmt_version;
 
-    sections_t                _pat_section_seen;
+    sections_map_t            _pat_section_seen;
     sections_map_t            _pmt_section_seen;
 
     // PSIP construction 
@@ -236,7 +254,7 @@ class MPEGStreamData : public EITSource
     // Caching
     bool                             _cache_tables;
     mutable QMutex                   _cache_lock;
-    mutable ProgramAssociationTable *_cached_pat;
+    mutable pat_cache_t              _cached_pats;
     mutable pmt_cache_t              _cached_pmts;
     mutable psip_refcnt_map_t        _cached_ref_cnt;
     mutable psip_refcnt_map_t        _cached_slated_for_deletion;
