@@ -500,7 +500,14 @@ void DVDRingBufferPriv::GoToMenu(const QString str)
         menuid = DVD_MENU_Part;
     else if (str.compare("menu") == 0)
         menuid = DVD_MENU_Root;
-    dvdnav_menu_call(dvdnav,menuid);
+    else
+        return;
+
+    if ((dvdnav_menu_call(dvdnav, menuid) == DVDNAV_STATUS_ERR) &&
+        (str == "menu"))
+    {
+        dvdnav_menu_call(dvdnav, DVD_MENU_Title);
+    }
 }
 
 void DVDRingBufferPriv::GoToNextProgram(void)
