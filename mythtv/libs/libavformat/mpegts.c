@@ -1097,6 +1097,14 @@ static void pat_cb(void *opaque, const uint8_t *section, int section_len)
         if (pmt_pids[i] < 0)
             break;
 
+        if (pmt_pids[i] == 0x0)
+        {
+            av_log(NULL, AV_LOG_ERROR, "Invalid PAT ignored "
+                   "MPEG Program Number=0x%x pid=0x%x req_sid=0x%x\n",
+                   pmt_pnums[i], pmt_pids[i], ts->req_sid);
+            return;
+        }
+
         pmt_count++;
 
 #ifdef DEBUG_SI
