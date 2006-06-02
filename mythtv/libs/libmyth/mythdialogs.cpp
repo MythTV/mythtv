@@ -155,9 +155,6 @@ void MythDialog::hide(void)
 
 void MythDialog::keyPressEvent( QKeyEvent *e )
 {
-    if (e->state() != 0)
-        return;
-
     bool handled = false;
     QStringList actions;
 
@@ -2355,9 +2352,6 @@ void MythScrollDialog::setResult(int r)
 
 void MythScrollDialog::keyPressEvent(QKeyEvent *e)
 {
-    if (e->state() != 0)
-        return;
-
     bool handled = false;
     QStringList actions;
 

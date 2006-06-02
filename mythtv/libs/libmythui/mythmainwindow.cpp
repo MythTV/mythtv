@@ -610,6 +610,7 @@ void MythMainWindow::ExitToMainMenu(void)
     if (jumpdone)
     {
         d->exitingtomain = false;
+        d->popwindows = true;
         if (d->exitmenucallback)
         {
             void (*callback)(void) = d->exitmenucallback;
