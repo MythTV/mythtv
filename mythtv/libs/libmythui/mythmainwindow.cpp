@@ -922,7 +922,7 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
         d->mediaHandlerMap[destination] = mhd;
 
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-        if (!extensions.isEmpty())
+        if (mon && !extensions.isEmpty())
             mon->MonitorRegisterExtensions(mediaType, extensions);
     }
     else 
