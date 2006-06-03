@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060529-2"
+VERSION="0.1.20060603-1"
 
 #useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
 #during multiplex operations but not supported on Windows platforms
@@ -50,6 +50,9 @@ alwaysRunMythtranscode = False
 ##the temp. files will not be deleted and it will run through
 ##very much quicker!
 debug_secondrunthrough = False
+
+#If set to true remote files are copied to local folder before processing.
+copyremoteFiles = False
 
 #*********************************************************************************
 #Dont change the stuff below!!
@@ -933,6 +936,9 @@ def preProcessFile(file, folder):
     #write( "Original file is",os.path.getsize(mediafile),"bytes in size")
     getFileInformation(file, os.path.join(folder, "info.xml"))
 
+    if file.hasAttribute("localfilename"):
+   	    mediafile = file.attributes["localfilename"].value
+
     getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"))
 
     videosize = getVideoSize(os.path.join(folder, "streaminfo.xml"))
@@ -1026,13 +1032,19 @@ def getVideoSize(xmlFilename):
 
     return (width, height)
 
-def runMythtranscode(chanid, starttime, destination, usecutlist):
+def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     """Use mythtrancode to cut commercials and/or clean up an mpeg2 file"""
 
-    if usecutlist == True:
-        command = "mythtranscode --mpeg2 --honorcutlist -c %s -s %s -o %s" % (chanid, starttime, destination)
+    if localfile != "":
+        if usecutlist == True:
+            command = "mythtranscode --mpeg2 --honorcutlist -i %s -o %s" % (localfile, destination)
+        else:
+            command = "mythtranscode --mpeg2 -i %s -o %s" % (localfile, destination)
     else:
-        command = "mythtranscode --mpeg2 -c %s -s %s -o %s" % (chanid, starttime, destination)
+        if usecutlist == True:
+            command = "mythtranscode --mpeg2 --honorcutlist -c %s -s %s -o %s" % (chanid, starttime, destination)
+        else:
+            command = "mythtranscode --mpeg2 -c %s -s %s -o %s" % (chanid, starttime, destination)
 
     result = runCommand(command)
 
@@ -2510,7 +2522,7 @@ def processFile(file, folder):
     mediafile=""
 
     if file.attributes["type"].value=="recording":
-        mediafile=os.path.join(recordingpath, file.attributes["filename"].value)
+        mediafile = os.path.join(recordingpath, file.attributes["filename"].value)
     elif file.attributes["type"].value=="video":
         mediafile=os.path.join(videopath, file.attributes["filename"].value)
     elif file.attributes["type"].value=="file":
@@ -2532,10 +2544,15 @@ def processFile(file, folder):
         write("Video codec is '%s'" % getVideoCodec(folder))
         if string.lower(getVideoCodec(folder)) == "mpeg2video": 
             if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
+                # Run from local file?
+                if file.hasAttribute("localfilename"):
+                    localfile = file.attributes["localfilename"].value
+                else:
+                    localfile = ""
                 write("File has a cut list - attempting to run mythtrancode to remove unwanted segments")
                 chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                 starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
-                if runMythtranscode(chanid, starttime, os.path.join(folder,'tmp'), True):
+                if runMythtranscode(chanid, starttime, os.path.join(folder,'tmp'), True, localfile):
                     mediafile = os.path.join(folder,'tmp')
                 else:
                     write("Failed to run mythtranscode to remove unwanted segments")
@@ -2543,10 +2560,15 @@ def processFile(file, folder):
                 #does the user always want to run recordings through mythtranscode?
                 #may help to fix any errors in the file 
                 if alwaysRunMythtranscode == True or (getFileType(folder) == "mpegts" and isFileOkayForDVD(folder)):
+                    # Run from local file?
+                    if file.hasAttribute("localfilename"):
+                        localfile = file.attributes["localfilename"].value
+                    else:
+                        localfile = ""
                     write("Attempting to run mythtranscode --mpeg2 to fix any errors")
                     chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                     starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
-                    if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False):
+                    if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False, localfile):
                         mediafile = os.path.join(folder, 'newfile.mpg')
                     else:
                         write("Failed to run mythtrancode to fix any errors")
@@ -2564,6 +2586,10 @@ def processFile(file, folder):
         aspectratio = selectAspectRatio(folder)
 
         write("File is not DVD compliant - Re-encoding audio and video")
+
+        # Run from local file?
+        if file.hasAttribute("localfilename"):
+            mediafile = file.attributes["localfilename"].value
 
         #do the re-encode 
         encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video, audio1, audio2, aspectratio)
@@ -2603,6 +2629,56 @@ def processFile(file, folder):
     write( "Finished processing file " + file.attributes["filename"].value)
     write( "*************************************************************")
 
+def copyRemote(files,tmpPath):
+    from shutil import copy
+
+    localTmpPath = os.path.join(tmpPath, "localcopy")
+    # Define remote filesystems
+    remotefs = ['nfs','smbfs']
+    remotemounts = []
+    # What does mount say?
+    mounts = os.popen('mount')
+    # Go through each line of mounts output
+    for line in mounts.readlines():
+        parts = line.split()
+        # mount says in this format
+        device, txt1, mountpoint, txt2, filesystem, options = parts
+        # only do if really remote
+        if filesystem in remotefs:
+            # add remote to list
+            remotemounts.append(string.split(mountpoint,'/'))
+            # go through files
+            for node in files:
+                # go through list
+                for mount in remotemounts:
+                    # Recordings have no path in xml file generated by mytharchive.
+                    #
+                    # Maybe better to put real path in xml like file and video have it.
+                    if node.attributes["type"].value == "recording":
+                        tmpfile = string.split(os.path.join(recordingpath, node.attributes["filename"].value), '/')
+                    else:
+                        tmpfile = string.split(node.attributes["filename"].value, '/')
+                    filename = tmpfile[len(tmpfile)-1]
+                    tmpfiledirs=""
+                    tmpremotedir=""
+                    # path has to be minimum length of mountpoint
+                    if len(tmpfile) > len(mount):
+                        for i in range(len(mount)):
+                            tmpfiledirs = tmpfiledirs + tmpfile[i] + "/"
+                        for i in range(len(mount)):
+                            tmpremotedir = tmpremotedir + mount[i] + "/"
+                        # Is it like the mount point?
+                        if tmpfiledirs == tmpremotedir:
+                            # Write that we copy
+                            write("Copying file from " +os.path.join(recordingpath, node.attributes["filename"].value))
+                            write("to " + os.path.join(localTmpPath, filename))
+                            # Copy file
+                            if not doesFileExist(os.path.join(localTmpPath, filename)):
+                                copy(os.path.join(recordingpath, node.attributes["filename"].value),os.path.join(localTmpPath, filename))
+                            # update node
+                            node.setAttribute("localfilename", os.path.join(localTmpPath, filename))
+			    print node.attributes["localfilename"].value
+    return files
 
 def processJob(job):
     """Starts processing a MythBurn job, expects XML nodes to be passed as input."""
@@ -2662,6 +2738,19 @@ def processJob(job):
             if debug_secondrunthrough==False:
                 #Delete all the temporary files that currently exist
                 deleteAllFilesInFolder(getTempPath())
+
+            #If User wants to, copy remote files to a tmp dir
+            if copyremoteFiles==True:
+                if debug_secondrunthrough==False:
+                    localCopyFolder=os.path.join(getTempPath(),"localcopy")
+                    #If it already exists destroy it to remove previous debris
+                    if os.path.exists(localCopyFolder):
+                        #Remove all the files first
+                        deleteAllFilesInFolder(localCopyFolder)
+                        #Remove the folder
+                        os.rmdir (localCopyFolder)
+                    os.makedirs(localCopyFolder)
+                files=copyRemote(files,getTempPath())
 
             #First pass through the files to be recorded - sense check
             #we dont want to find half way through this long process that
