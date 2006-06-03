@@ -580,6 +580,7 @@ void MythMainWindow::ExitToMainMenu(void)
                 QObject *key_target = getTarget(*key);
                 QApplication::postEvent(key_target, key);
             }
+            return;
         }
         else
             jumpdone = true;
@@ -602,6 +603,7 @@ void MythMainWindow::ExitToMainMenu(void)
                                                0, Qt::NoButton);
                 QApplication::postEvent(this, key);
             }
+            return;
         }
         else
             jumpdone = true;
