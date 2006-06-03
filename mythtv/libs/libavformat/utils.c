@@ -1995,7 +1995,7 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
 #define MAX_READ_SIZE        5000000
 
 /** Number of frames to read, max. */
-#define MAX_FRAMES           15
+#define MAX_FRAMES           45
 
 /** Maximum duration until we stop analysing the stream. */
 #define MAX_STREAM_DURATION  ((int)(AV_TIME_BASE * 2.0))
