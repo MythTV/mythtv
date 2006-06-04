@@ -31,18 +31,8 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060603-1"
+VERSION="0.1.20060604-1"
 
-#useFIFO enables the use of FIFO nodes on Linux - it saves time and disk space
-#during multiplex operations but not supported on Windows platforms
-useFIFO=True
-
-#do we always want to encode the audio streams to ac3
-encodetoac3 = False
-
-#if this is set to true them all mpeg2 mythtv recordings will be run though mythtranscode
-#which may clean up some audio problems on some files especially DVB files (experimental)
-alwaysRunMythtranscode = False
 
 ##You can use this debug flag when testing out new themes
 ##pick some small recordings, run them through as normal
@@ -50,9 +40,6 @@ alwaysRunMythtranscode = False
 ##the temp. files will not be deleted and it will run through
 ##very much quicker!
 debug_secondrunthrough = False
-
-#If set to true remote files are copied to local folder before processing.
-copyremoteFiles = False
 
 #*********************************************************************************
 #Dont change the stuff below!!
@@ -102,6 +89,10 @@ timeformat=""
 dbVersion=""
 preferredlang1=""
 preferredlang2=""
+useFIFO = True
+encodetoac3 = False
+alwaysRunMythtranscode = False
+copyremoteFiles = False
 
 #name of the default job file
 jobfile="mydata.xml"
@@ -379,6 +370,10 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchivePng2yuvCmd',
                         'MythArchiveSpumuxCmd',
                         'MythArchiveMpeg2encCmd',
+                        'MythArchiveEncodeToAc3',
+                        'MythArchiveCopyRemoteFiles',
+                        'MythArchiveAlwaysUseMythTranscode',
+                        'MythArchiveUseFIFO',
                         'ISO639Language0',
                         'ISO639Language1'
                         )) order by value"""
@@ -2939,6 +2934,10 @@ dvddrivepath = defaultsettings["MythArchiveDVDLocation"]
 dbVersion = defaultsettings["DBSchemaVer"]
 preferredlang1 = defaultsettings["ISO639Language0"]
 preferredlang2 = defaultsettings["ISO639Language1"]
+useFIFO = (defaultsettings["MythArchiveUseFIFO"] == '1')
+encodetoac3 = (defaultsettings["MythArchiveEncodeToAc3"] == '1')
+alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] == '1')
+copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
 
 # external commands
 path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]

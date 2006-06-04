@@ -57,6 +57,51 @@ static HostLineEdit *MythArchiveDVDLocation()
     return gc;
 };
 
+static HostCheckBox *MythArchiveEncodeToAc3()
+{
+    HostCheckBox *gc = new HostCheckBox("MythArchiveEncodeToAc3");
+    gc->setLabel(QObject::tr("Always Encode to AC3"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set audio tracks will always be "
+            "re-encoded to AC3 for better compatibility with DVD players in "
+            "NTSC countries."));
+    return gc;
+};
+
+static HostCheckBox *MythArchiveCopyRemoteFiles()
+{
+    HostCheckBox *gc = new HostCheckBox("MythArchiveCopyRemoteFiles");
+    gc->setLabel(QObject::tr("Copy remote files"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set files on remote filesystems "
+            "will be copied over to the local filesystem before processing. "
+            "Speeds processing and reduces bandwidth on the network"));
+    return gc;
+};
+
+static HostCheckBox *MythArchiveAlwaysUseMythTranscode()
+{
+    HostCheckBox *gc = new HostCheckBox("MythArchiveAlwaysUseMythTranscode");
+    gc->setLabel(QObject::tr("Always Use Mythtranscode"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If set mpeg2 files will always be passed"
+            " though mythtranscode to clean up any errors. May help to fix"
+            " some audio problems."));
+    return gc;
+};
+
+static HostCheckBox *MythArchiveUseFIFO()
+{
+    HostCheckBox *gc = new HostCheckBox("MythArchiveUseFIFO");
+    gc->setLabel(QObject::tr("Use FIFOs"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("The script will use FIFOs to pass the output"
+            " of mplex into dvdauthor rather than creating intermediate files."
+            " Saves time and disk space during multiplex operations but not supported"
+            " on Windows platform"));
+    return gc;
+};
+
 static HostLineEdit *MythArchiveFfmpegCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveFfmpegCmd");
@@ -150,19 +195,27 @@ ArchiveSettings::ArchiveSettings()
     addChild(vcg1);
 
     VerticalConfigurationGroup* vcg2 = new VerticalConfigurationGroup(false);
-    vcg2->setLabel(QObject::tr("MythArchive External Commands (1)"));
-    vcg2->addChild(MythArchiveFfmpegCmd());
-    vcg2->addChild(MythArchiveMplexCmd());
-    vcg2->addChild(MythArchiveDvdauthorCmd());
-    vcg2->addChild(MythArchiveSpumuxCmd());
-    vcg2->addChild(MythArchiveMpeg2encCmd());
+    vcg2->setLabel(QObject::tr("MythArchive Settings (2)"));
+    vcg2->addChild(MythArchiveEncodeToAc3());
+    vcg2->addChild(MythArchiveCopyRemoteFiles());
+    vcg2->addChild(MythArchiveAlwaysUseMythTranscode());
+    vcg2->addChild(MythArchiveUseFIFO());
     addChild(vcg2);
 
     VerticalConfigurationGroup* vcg3 = new VerticalConfigurationGroup(false);
-    vcg3->setLabel(QObject::tr("MythArchive External Commands (2)"));
-    vcg3->addChild(MythArchiveMkisofsCmd());
-    vcg3->addChild(MythArchiveGrowisofsCmd());
-    vcg3->addChild(MythArchiveTcrequantCmd());
-    vcg3->addChild(MythArchivePng2yuvCmd());
+    vcg3->setLabel(QObject::tr("MythArchive External Commands (1)"));
+    vcg3->addChild(MythArchiveFfmpegCmd());
+    vcg3->addChild(MythArchiveMplexCmd());
+    vcg3->addChild(MythArchiveDvdauthorCmd());
+    vcg3->addChild(MythArchiveSpumuxCmd());
+    vcg3->addChild(MythArchiveMpeg2encCmd());
     addChild(vcg3);
+
+    VerticalConfigurationGroup* vcg4 = new VerticalConfigurationGroup(false);
+    vcg4->setLabel(QObject::tr("MythArchive External Commands (2)"));
+    vcg4->addChild(MythArchiveMkisofsCmd());
+    vcg4->addChild(MythArchiveGrowisofsCmd());
+    vcg4->addChild(MythArchiveTcrequantCmd());
+    vcg4->addChild(MythArchivePng2yuvCmd());
+    addChild(vcg4);
 }
