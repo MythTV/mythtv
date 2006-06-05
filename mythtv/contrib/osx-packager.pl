@@ -193,7 +193,7 @@ our %depend = (
 #   },
   {
     'url'
-    =>  'ftp://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-free-3.3.5.tar.gz',
+    =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-free-3.3.5.tar.gz',
     'conf-cmd'
     =>  'echo yes | ./configure',
     'conf'
@@ -232,8 +232,7 @@ our %depend = (
   'tiff'
   =>
   {
-    'url'
-    =>  'ftp://ftp.remotesensing.org/pub/libtiff/old/tiff-3.7.1.tar.gz',
+    'url' => 'http://dl.maptools.org/dl/libtiff/tiff-3.8.2.tar.gz'
   },
   
   'exif'
