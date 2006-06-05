@@ -18,6 +18,7 @@
 
 // C++ includes
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 // MythTV includes
@@ -35,8 +36,8 @@ using namespace std;
 
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec),
-      _channel(channel), _video_socket(NULL),
-      _atsc_stream_data(NULL)
+      _channel(channel),        _video_socket(NULL),
+      _atsc_stream_data(NULL),  _pmt(NULL)
 {
 }
 
@@ -173,13 +174,45 @@ void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
     BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
 }
 
-static ProgramMapTable *lastPMT = NULL;
-void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable* pmt)
+void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 {
-    if (lastPMT != pmt)
+    if (_pmt != pmt)
     {
+        vector<uint> del_pids, add_pids;
+
+        if (_pmt)
+        {
+            for (uint i = 0; i < _pmt->StreamCount(); i++)
+                del_pids.push_back(_pmt->StreamPID(i));
+        }
+
         VERBOSE(VB_IMPORTANT, LOC + "HandleSingleProgramPMT("<<pmt<<")");
-        lastPMT = pmt;
+        _pmt = pmt;
+
+        if (_pmt)
+        {
+            for (uint i = 0; i < _pmt->StreamCount(); i++)
+            {
+                uint pid = _pmt->StreamPID(i);
+                vector<uint>::iterator it =
+                    find(del_pids.begin(), del_pids.end(), pid);
+
+                if (it != del_pids.end())
+                    del_pids.erase(it);
+                else
+                    add_pids.push_back(_pmt->StreamPID(i));
+            }
+        }
+
+        vector<uint>::const_iterator it;
+        for (it = del_pids.begin(); it != del_pids.end(); ++it)
+            _channel->DelPID(*it, false);
+
+        for (it = add_pids.begin(); it != add_pids.end(); ++it)
+            _channel->AddPID(*it, false);
+
+        if (del_pids.size() || add_pids.size())
+            _channel->UpdateFilters();
     }
 
     if (!pmt)

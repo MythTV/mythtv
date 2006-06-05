@@ -585,12 +585,9 @@ bool HDHRChannel::UpdateFilters(void)
 
     VERBOSE(VB_CHANNEL, "Filter: '"<<filter<<"'");
 
-#if 0
     QString new_filter = TunerSet("filter", filter);
 
     VERBOSE(VB_CHANNEL, QString("Filter: '%1' : '%2'")
             .arg(filter).arg(new_filter));
     return filter == new_filter;
-#endif
-    return true;
 }

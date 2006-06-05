@@ -13,6 +13,7 @@
 #include "eitscanner.h"
 
 class HDHRChannel;
+class ProgramMapTable;
 
 class HDHRRecorder : public DTVRecorder,
                      public MPEGSingleProgramStreamListener,
@@ -58,6 +59,7 @@ class HDHRRecorder : public DTVRecorder,
     HDHRChannel                   *_channel;
     struct hdhomerun_video_sock_t *_video_socket;
     ATSCStreamData                *_atsc_stream_data;
+    ProgramMapTable               *_pmt;
 
     mutable QMutex                 _lock;
 };
