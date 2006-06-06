@@ -167,7 +167,7 @@ static int hdhomerun_control_recv_process(struct hdhomerun_control_sock_t *cs, s
 
 	memcpy(result->buffer, cs->rx_buffer, length);
 	if (rx_length > length) {
-		memcpy(cs->rx_buffer, cs->rx_buffer, rx_length - length);
+		memcpy(cs->rx_buffer, cs->rx_buffer + length, rx_length - length);
 	}
 	cs->rx_pos = cs->rx_buffer + (rx_length - length);
 
