@@ -442,6 +442,10 @@ our %conf = (
         '--disable-mythphone',
         '--enable-mythweather',
       ],
+  'myththemes'
+  =>  [
+        '--prefix=' . $PREFIX,
+      ],
   'mythtv'
   =>  [
         '--prefix=' . $PREFIX,
@@ -995,7 +999,6 @@ sub PackagedExecutable($$)
     while (scalar @deps)
     {
         my $dep = shift @deps;
-        next if $dep =~ m/executable_path/;
 
         my $file = &MakeFramework(&FindLibraryFile($dep), $fw_dir);
         if ( $file )
