@@ -13,6 +13,7 @@
 #include "mythdeque.h"
 #include "programinfo.h"
 #include "tv.h"
+#include "util.h"
 
 class QSocket;
 class NuppelVideoRecorder;
@@ -47,6 +48,30 @@ typedef enum
     BROWSE_RIGHT,   ///< Fetch information on current channel in the future
     BROWSE_FAVORITE ///< Fetch information on the next favorite channel
 } BrowseDirections;
+
+class TuningTimer
+{
+  public:
+    TuningTimer() {}
+
+    void setTimeout(long t) { _timeout = t; }
+    long timeout(void) { return _timeout; }
+    void start() { t_timer.start(); }
+    int restart() { int ret = elapsed();
+                    t_timer.restart();
+                    return ret;
+                  }
+    int elapsed() { int ret = t_timer.elapsed();
+                    if (ret > _timeout) { ret = 0;  t_timer.restart(); }
+                    return ret;
+                  }
+
+    void addMSecs(int ms) { t_timer.addMSecs(ms); }
+
+  private:
+    QTime t_timer;
+    long _timeout;
+};
 
 class GeneralDBOptions
 {
@@ -275,6 +300,7 @@ class TVRec : public QObject
     bool TuningPMTCheck(void);
     void TuningNewRecorder(void);
     void TuningRestartRecorder(void);
+    bool RetuneChannel(void);
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
@@ -361,6 +387,10 @@ class TVRec : public QObject
     RingBuffer  *ringBuffer;
     QString      rbFilePrefix;
     QString      rbFileExt;
+
+    // Retune stuff
+    TuningTimer *retune_timer;
+    int          retune_requests;
 
   public:
     static const uint kEITScanStartTimeout;

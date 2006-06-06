@@ -130,6 +130,11 @@ TVRec::TVRec(int capturecardnum)
       // RingBuffer info
       ringBuffer(NULL), rbFilePrefix(""), rbFileExt("mpg")
 {
+      // Retune stuff
+      retune_timer = new TuningTimer();
+      retune_timer->setTimeout(10000);
+      retune_timer->start();
+      retune_requests = 0;
 }
 
 /** \fn TVRec::Init()
@@ -3221,6 +3226,8 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
  */
 void TVRec::HandleTuning(void)
 {
+    bool handle_done = false;
+
     if (tuningRequests.size())
     {
         const TuningRequest *request = &tuningRequests.front();
@@ -3232,7 +3239,12 @@ void TVRec::HandleTuning(void)
                               kFlagEITScan|kFlagAntennaAdjust))
         {
             if (!recorder)
+            {
                 TuningFrequency(*request);
+                retune_timer->restart();
+                retune_timer->addMSecs(1);
+                retune_requests = 0;
+            }
             else
                 SetFlags(kFlagWaitingForRecPause);
         }
@@ -3261,14 +3273,28 @@ void TVRec::HandleTuning(void)
     if (HasFlags(kFlagWaitingForSignal))
     {
         if (!TuningSignalCheck())
-            return;
+            handle_done = true;
     }
 
     if (HasFlags(kFlagWaitingForSIParser))
     {
         if (!TuningPMTCheck())
-            return;
+            handle_done = true;
     }
+
+#ifdef USING_DVB
+    // Just because we have signal, we may not have the right transponder
+    if ((HasFlags(kFlagWaitingForSignal) ||
+         HasFlags(kFlagWaitingForSIParser)) &&
+        (!retune_timer->elapsed() && (retune_requests < 30)))
+    {
+        RetuneChannel();
+        retune_requests++;
+    }
+#endif // USING_DVB
+
+    if (handle_done)
+        return;
 
     if (HasFlags(kFlagNeedToStartRecorder))
     { 
@@ -3352,6 +3378,19 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
     // Clear pending actions from last request
     ClearFlags(kFlagPendingActions);
+}
+
+/** \fn TVRec::RetuneChannel(void)
+ *  \brief Retunes a DVB channel
+ *  \return DVBChannel::Retune() or false if ifndef USING_DVB
+ */
+bool TVRec::RetuneChannel(void)
+{
+#ifdef USING_DVB
+    if (GetDVBChannel())
+        return GetDVBChannel()->Retune();
+#endif // USING_DVB
+    return false;
 }
 
 /** \fn TVRec::TuningFrequency(const TuningRequest&)
