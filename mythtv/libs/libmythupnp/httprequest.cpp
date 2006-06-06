@@ -166,6 +166,8 @@ long HTTPRequest::SendResponse( void )
 
             break;
         }
+        default:
+            break;
     }
 
     // Write out Response buffer.
@@ -433,6 +435,7 @@ QString HTTPRequest::GetResponseType( void )
     {
         case ResponseTypeXML    : return( "text/xml; charset=\"UTF-8\"" );
         case ResponseTypeHTML   : return( "text/html; charset=\"UTF-8\"" );
+        default: break;
     }
 
     return( "text/plain" );
@@ -1191,7 +1194,7 @@ Q_LONG  BufferedSocketDeviceRequest::ReadBlock( char *pData, Q_ULONG nMaxLen, in
         {
             bool bTimeout = false;
 
-            while ( (BytesAvailable() < nMaxLen) && !bTimeout )
+            while ( (BytesAvailable() < (int)nMaxLen) && !bTimeout )
                 m_pSocket->WaitForMore( msecs, &bTimeout );
 
             // Just return what we have even if timed out.

@@ -111,6 +111,7 @@ void SSDP::run()
                     switch( pRequest->m_eType )
                     {
                         case  RequestTypeMSearch:  ProcessSearchRequest( pRequest, peerAddress, peerPort ); break;
+                        default: break;
                     }
                 }
 
@@ -257,7 +258,7 @@ SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool SSDPExtension::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
+bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
 {
     if (pRequest)
     {
@@ -269,6 +270,7 @@ bool SSDPExtension::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReq
             case SSDPM_GetDeviceDesc: GetDeviceDesc( pRequest ); return( true );
             case SSDPM_GetCDSDesc   : GetFile( pRequest, "CDS_scpd.xml" );  return( true );
             case SSDPM_GetCMGRDesc  : GetFile( pRequest, "CMGR_scpd.xml" ); return( true );
+            default: break;
         }
     }
 

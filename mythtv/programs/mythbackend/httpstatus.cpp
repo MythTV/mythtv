@@ -112,6 +112,7 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
 
                 case HSM_GetRecording   : GetRecording   ( pThread, pRequest ); return( true );
                 case HSM_GetMusic       : GetMusic       ( pThread, pRequest ); return( true );
+                default: break;
             }
         }
     }

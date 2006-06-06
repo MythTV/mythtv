@@ -250,7 +250,9 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
                     pExtension = m_extensions.next();
                 }
+                break;
             }
+            default: break;
         }
     }
     else

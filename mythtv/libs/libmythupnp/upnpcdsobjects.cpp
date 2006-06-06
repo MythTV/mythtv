@@ -201,6 +201,7 @@ void CDSObject::toXml( QTextStream &os ) //, FilterMap &filter )
 
             break;
         }
+        default: break;
     }
 
     os << "<dc:title>"   << m_sTitle << "</dc:title>";
