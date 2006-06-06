@@ -1,4 +1,4 @@
-/**
+/** -*- Mode: c++ -*-
  *  HDHRRecorder
  *  Copyright (c) 2006 by Silicondust Engineering Ltd.
  *  Distributed as part of MythTV under GPL v2 and later.
@@ -15,9 +15,11 @@
 class HDHRChannel;
 class ProgramMapTable;
 
+typedef vector<uint>        uint_vec_t;
+
 class HDHRRecorder : public DTVRecorder,
-                     public MPEGSingleProgramStreamListener,
-                     public ATSCMainStreamListener
+                     public MPEGStreamListener,
+                     public MPEGSingleProgramStreamListener
 {
     friend class ATSCStreamData;
 
@@ -38,19 +40,28 @@ class HDHRRecorder : public DTVRecorder,
 
     void SetStreamData(MPEGStreamData*);
     MPEGStreamData *GetStreamData(void);
-    ATSCStreamData *GetATSCStreamData(void) { return _atsc_stream_data; }
+    ATSCStreamData *GetATSCStreamData(void) { return _stream_data; }
 
-    // MPEG Single Program
+    // MPEG Stream Listener
+    void HandlePAT(const ProgramAssociationTable*);
+    void HandleCAT(const ConditionalAccessTable*) {}
+    void HandlePMT(uint pid, const ProgramMapTable*);
+
+    // MPEG Single Program Stream Listener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
+    /*
     // ATSC
     void HandleSTT(const SystemTimeTable*) {}
     void HandleMGT(const MasterGuideTable *mgt);
     void HandleVCT(uint, const VirtualChannelTable*) {}
+    */
 
   private:
-    void AdjustEITPIDs(void);
+    bool AdjustFilters(void);
+    bool AdjustEITPIDs(void);
+
     void ProcessTSData(const unsigned char *buffer, int len);
     bool ProcessTSPacket(const TSPacket& tspacket);
     void TeardownAll(void);
@@ -58,11 +69,13 @@ class HDHRRecorder : public DTVRecorder,
   private:
     HDHRChannel                   *_channel;
     struct hdhomerun_video_sock_t *_video_socket;
-    ATSCStreamData                *_atsc_stream_data;
-    ProgramMapTable               *_pmt;
-    ProgramMapTable               *_pmt_copy;
+    ATSCStreamData                *_stream_data;
 
-    mutable QMutex                 _lock;
+    ProgramAssociationTable       *_input_pat;
+    ProgramMapTable               *_input_pmt;
+    bool                           _reset_pid_filters;
+    uint_vec_t                     _eit_pids;
+    mutable QMutex                 _pid_lock;
 };
 
 #endif

@@ -503,18 +503,13 @@ bool HDHRChannel::AddPID(uint pid, bool do_update)
     it = lower_bound(_pids.begin(), _pids.end(), pid);
     if (it != _pids.end() && *it == pid)
     {
-        //VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<") NOOP");
+        VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<") NOOP");
         return true;
     }
 
     _pids.insert(it, pid);
 
-#if 0
     VERBOSE(VB_CHANNEL, "AddPID(0x"<<hex<<pid<<dec<<")");
-    for (uint i = 0; i < _pids.size(); i++)
-        VERBOSE(VB_CHANNEL, "PID#"<<i<<": 0x"<<hex<<_pids[i]<<dec);
-    VERBOSE(VB_CHANNEL, "");
-#endif
 
     if (do_update)
         return UpdateFilters();
@@ -526,22 +521,23 @@ bool HDHRChannel::DelPID(uint pid, bool do_update)
     QMutexLocker locker(&_lock);
 
     vector<uint>::iterator it;
-    it = upper_bound(_pids.begin(), _pids.end(), pid);
+    it = lower_bound(_pids.begin(), _pids.end(), pid);
     if (it == _pids.end())
     {
-        //VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") NOOP");
+        VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") NOOP");
         return true;
     }
 
     if (*it == pid)
+    {
+        VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") -- found");
         _pids.erase(it);
+    }
+    else
+    {
+        VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<") -- failed");
+    }
 
-#if 0
-    VERBOSE(VB_CHANNEL, "DelPID(0x"<<hex<<pid<<dec<<")");
-    for (uint i = 0; i < _pids.size(); i++)
-        VERBOSE(VB_CHANNEL, "PID#"<<i<<": 0x"<<hex<<_pids[i]<<dec);
-    VERBOSE(VB_CHANNEL, "");
-#endif
     if (do_update)
         return UpdateFilters();
     return true;
@@ -612,7 +608,7 @@ bool HDHRChannel::UpdateFilters(void)
 
     QString new_filter = TunerSet("filter", filter);
 
-    VERBOSE(VB_CHANNEL, QString("Filter: '%1'\n\t\t\t\t'%2'")
+    VERBOSE(VB_IMPORTANT, QString("Filter: '%1'\n\t\t\t\t'%2'")
             .arg(filter).arg(new_filter));
 
     return filter == new_filter;

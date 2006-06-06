@@ -1,4 +1,4 @@
-/**
+/** -*- Mode: c++ -*-
  *  HDHRRecorder
  *  Copyright (c) 2006 by Silicondust Engineering Ltd, and
  *    Daniel Thor Kristjansson
@@ -37,8 +37,9 @@ using namespace std;
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec),
       _channel(channel),        _video_socket(NULL),
-      _atsc_stream_data(NULL),
-      _pmt(NULL),               _pmt_copy(NULL)
+      _stream_data(NULL),
+      _input_pat(NULL),         _input_pmt(NULL),
+      _reset_pid_filters(false),_pid_lock(true)
 {
 }
 
@@ -51,15 +52,22 @@ void HDHRRecorder::TeardownAll(void)
 {
     StopRecording();
     Close();
-    if (_atsc_stream_data)
+    if (_stream_data)
     {
-        delete _atsc_stream_data;
-        _atsc_stream_data = NULL;
+        delete _stream_data;
+        _stream_data = NULL;
     }
-    if (_pmt_copy)
+
+    if (_input_pat)
     {
-        delete _pmt_copy;
-        _pmt_copy = NULL;
+        delete _input_pat;
+        _input_pat = NULL;
+    }
+
+    if (_input_pmt)
+    {
+        delete _input_pmt;
+        _input_pmt = NULL;
     }
 }
 
@@ -125,7 +133,7 @@ void HDHRRecorder::Close(void)
 
 void HDHRRecorder::ProcessTSData(const uint8_t *buffer, int len)
 {
-    QMutexLocker locker(&_lock);
+    QMutexLocker locker(&_pid_lock);
     const uint8_t *data = buffer;
     const uint8_t *end = buffer + len;
 
@@ -148,18 +156,18 @@ void HDHRRecorder::SetStreamData(MPEGStreamData *xdata)
     ATSCStreamData *data = dynamic_cast<ATSCStreamData*>(xdata);
     VERBOSE(VB_IMPORTANT, LOC + "SetStreamData(xdata: "<<xdata<<") "<<data);
 
-    if (data == _atsc_stream_data)
+    if (data == _stream_data)
         return;
 
-    ATSCStreamData *old_data = _atsc_stream_data;
-    _atsc_stream_data = data;
+    ATSCStreamData *old_data = _stream_data;
+    _stream_data = data;
     if (old_data)
         delete old_data;
 
     if (data)
     {
         data->AddMPEGSPListener(this);
-        data->AddATSCMainListener(this);
+        data->AddMPEGListener(this);
         data->SetDesiredChannel(data->DesiredMajorChannel(),
                                 data->DesiredMinorChannel());
     }
@@ -167,7 +175,52 @@ void HDHRRecorder::SetStreamData(MPEGStreamData *xdata)
 
 MPEGStreamData *HDHRRecorder::GetStreamData(void)
 {
-    return _atsc_stream_data;
+    return _stream_data;
+}
+
+void HDHRRecorder::HandlePAT(const ProgramAssociationTable *_pat)
+{
+    if (!_pat)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPAT(NULL)");
+        return;
+    }
+
+    QMutexLocker change_lock(&_pid_lock);
+
+    int progNum = _stream_data->DesiredProgram();
+    uint pmtpid = _pat->FindPID(progNum);
+
+    if (!pmtpid)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPAT(): "
+                "Ignoring PAT not containing our desired program...");
+        return;
+    }
+
+    VERBOSE(VB_RECORD, LOC + QString("SetPAT(%1 on 0x%2)")
+            .arg(progNum).arg(pmtpid,0,16));
+
+    ProgramAssociationTable *oldpat = _input_pat;
+    _input_pat = new ProgramAssociationTable(*_pat);
+    delete oldpat;
+
+    _reset_pid_filters = true;
+}
+
+void HDHRRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
+{
+    QMutexLocker change_lock(&_pid_lock);
+
+    if ((int)progNum == _stream_data->DesiredProgram())
+    {
+        VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
+        ProgramMapTable *oldpmt = _input_pmt;
+        _input_pmt = new ProgramMapTable(*_pmt);
+        delete oldpmt;
+
+        _reset_pid_filters = true;
+    }
 }
 
 void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
@@ -182,47 +235,6 @@ void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 
 void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 {
-    if (_pmt != pmt)
-    {
-        vector<uint> del_pids, add_pids;
-
-        if (_pmt_copy)
-        {
-            for (uint i = 0; i < _pmt_copy->StreamCount(); i++)
-                del_pids.push_back(_pmt_copy->StreamPID(i));
-            delete _pmt_copy;
-        }
-
-        VERBOSE(VB_IMPORTANT, LOC + "HandleSingleProgramPMT("<<pmt<<")");
-        _pmt = pmt;
-        _pmt_copy = new ProgramMapTable(*pmt);
-
-        if (_pmt)
-        {
-            for (uint i = 0; i < _pmt->StreamCount(); i++)
-            {
-                uint pid = _pmt->StreamPID(i);
-                vector<uint>::iterator it =
-                    find(del_pids.begin(), del_pids.end(), pid);
-
-                if (it != del_pids.end())
-                    del_pids.erase(it);
-                else
-                    add_pids.push_back(_pmt->StreamPID(i));
-            }
-        }
-
-        vector<uint>::const_iterator it;
-        for (it = del_pids.begin(); it != del_pids.end(); ++it)
-            _channel->DelPID(*it, false);
-
-        for (it = add_pids.begin(); it != add_pids.end(); ++it)
-            _channel->AddPID(*it, false);
-
-        if (del_pids.size() || add_pids.size())
-            _channel->UpdateFilters();
-    }
-
     if (!pmt)
         return;
 
@@ -235,6 +247,7 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
  *  \brief Processes Master Guide Table, by enabling the 
  *         scanning of all PIDs listed.
  */
+/*
 void HDHRRecorder::HandleMGT(const MasterGuideTable *mgt)
 {
     VERBOSE(VB_IMPORTANT, LOC + "HandleMGT()");
@@ -245,6 +258,7 @@ void HDHRRecorder::HandleMGT(const MasterGuideTable *mgt)
     }
     _channel->UpdateFilters();
 }
+*/
 
 bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
 {
@@ -312,7 +326,18 @@ void HDHRRecorder::StartRecording(void)
         if (PauseAndWait())
             continue;
 
-        AdjustEITPIDs();
+        if (_stream_data)
+        {
+            QMutexLocker read_lock(&_pid_lock);
+            _reset_pid_filters |= _stream_data->HasEITPIDChanges(_eit_pids);
+        }
+
+        if (_reset_pid_filters)
+        {
+            _reset_pid_filters = false;
+            VERBOSE(VB_RECORD, LOC + "Resetting Demux Filters");
+            AdjustFilters();
+        }
 
         uint dbg = 0;
         if (timer.elapsed() > 10)
@@ -351,8 +376,104 @@ void HDHRRecorder::StartRecording(void)
     VERBOSE(VB_RECORD, LOC + "StartRecording -- end");
 }
 
-void HDHRRecorder::AdjustEITPIDs(void)
+bool HDHRRecorder::AdjustFilters(void)
 {
-    // TODO
+    QMutexLocker change_lock(&_pid_lock);
+
+    if (!_channel)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AdjustFilters() no channel");
+        return false;
+    }
+
+    if (!_input_pat || !_input_pmt)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "AdjustFilters() no pmt or no pat");
+        return false;
+    }
+
+    uint_vec_t add_pid;
+
+    add_pid.push_back(MPEG_PAT_PID);
+    _stream_data->AddListeningPID(MPEG_PAT_PID);
+
+    for (uint i = 0; i < _input_pat->ProgramCount(); i++)
+    {
+        add_pid.push_back(_input_pat->ProgramPID(i));
+        _stream_data->AddListeningPID(_input_pat->ProgramPID(i));
+    }
+
+    // Record the streams in the PMT...
+    bool need_pcr_pid = true;
+    for (uint i = 0; i < _input_pmt->StreamCount(); i++)
+    {
+        add_pid.push_back(_input_pmt->StreamPID(i));
+        need_pcr_pid &= (_input_pmt->StreamPID(i) != _input_pmt->PCRPID());
+        _stream_data->AddWritingPID(_input_pmt->StreamPID(i));
+    }
+
+    if (need_pcr_pid && (_input_pmt->PCRPID()))
+    {
+        add_pid.push_back(_input_pmt->PCRPID());
+        _stream_data->AddWritingPID(_input_pmt->PCRPID());
+    }
+
+    // Adjust for EIT
+    AdjustEITPIDs();
+    for (uint i = 0; i < _eit_pids.size(); i++)
+    {
+        add_pid.push_back(_eit_pids[i]);
+        _stream_data->AddListeningPID(_eit_pids[i]);
+    }
+
+    // Delete filters for pids we no longer wish to monitor
+    vector<uint>::const_iterator it;
+    vector<uint> pids = _channel->GetPIDs();
+    for (it = pids.begin(); it != pids.end(); ++it)
+    {
+        if (find(add_pid.begin(), add_pid.end(), *it) == add_pid.end())
+        {
+            _stream_data->RemoveListeningPID(*it);
+            _stream_data->RemoveWritingPID(*it);
+            _channel->DelPID(*it, false);
+        }
+    }
+
+    for (it = add_pid.begin(); it != add_pid.end(); ++it)
+        _channel->AddPID(*it, false);
+
+    _channel->UpdateFilters();
+
+    return add_pid.size();
+}
+
+/** \fn HDHRRecorder::AdjustEITPIDs(void)
+ *  \brief Adjusts EIT PID monitoring to monitor the right number of EIT PIDs.
+ */
+bool HDHRRecorder::AdjustEITPIDs(void)
+{
+    bool changes = false;
+    uint_vec_t add, del;
+
+    QMutexLocker change_lock(&_pid_lock);
+
+    if (GetStreamData()->HasEITPIDChanges(_eit_pids))
+        changes = GetStreamData()->GetEITPIDChanges(_eit_pids, add, del);
+
+    if (!changes)
+        return false;
+
+    for (uint i = 0; i < del.size(); i++)
+    {
+        uint_vec_t::iterator it;
+        it = find(_eit_pids.begin(), _eit_pids.end(), del[i]);
+        if (it != _eit_pids.end())
+            _eit_pids.erase(it);
+    }
+
+    for (uint i = 0; i < add.size(); i++)
+        _eit_pids.push_back(add[i]);
+
+    return true;
 }
 

@@ -40,6 +40,8 @@ class HDHRChannel : public ChannelBase
     bool IsOpen(void) const { return (_control_socket != NULL); }
     QString GetDevice(void) const
         { return QString("%1/%2").arg(_device_id).arg(_tuner); }
+    vector<uint> GetPIDs(void) const
+        { QMutexLocker locker(&_lock); return _pids; }
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
