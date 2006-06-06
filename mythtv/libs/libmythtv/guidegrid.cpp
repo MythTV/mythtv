@@ -28,6 +28,7 @@ using namespace std;
 #include "tv_rec.h"
 #include "progfind.h"
 #include "proglist.h"
+#include "customedit.h"
 #include "util.h"
 #include "remoteutil.h"
 
@@ -413,6 +414,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             }
             else if (action == "INFO")
                 editScheduled();
+            else if (action == "CUSTOMEDIT")
+                customEdit();
             else if (action == "UPCOMING")
                 upcoming();
             else if (action == "DETAILS")
@@ -1727,6 +1730,19 @@ void GuideGrid::editScheduled()
     fillProgramInfos();
 
     repaint(fullRect, false);
+}
+
+void GuideGrid::customEdit()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo)
+        return;
+
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
+                                    pginfo->getRecordID(), pginfo->title);
+    ce->exec();
+    delete ce;
 }
 
 void GuideGrid::upcoming()

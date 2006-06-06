@@ -19,6 +19,7 @@ class ViewScheduled : public MythDialog
 
   protected slots:
     void edit();
+    void customEdit();
     void upcoming();
     void details();
     void selected();

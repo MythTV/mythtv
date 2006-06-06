@@ -14,6 +14,7 @@ using namespace std;
 
 #include "viewscheduled.h"
 #include "scheduledrecording.h"
+#include "customedit.h"
 #include "proglist.h"
 #include "tv.h"
 
@@ -101,6 +102,8 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 selected();
             else if (action == "MENU" || action == "INFO")
                 edit();
+            else if (action == "CUSTOMEDIT")
+                customEdit();
             else if (action == "UPCOMING")
                 upcoming();
             else if (action == "DETAILS")
@@ -540,6 +543,18 @@ void ViewScheduled::edit()
         return;
 
     p->EditScheduled();
+}
+
+void ViewScheduled::customEdit()
+{
+    ProgramInfo *p = recList[listPos];
+    if (!p)
+        return;
+
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
+                                    p->getRecordID(), p->title);
+    ce->exec();
+    delete ce;
 }
 
 void ViewScheduled::upcoming()

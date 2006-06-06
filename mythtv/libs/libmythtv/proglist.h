@@ -47,6 +47,7 @@ class ProgLister : public MythDialog
     void setViewFromTime(void);
     void select(void);
     void edit(void);
+    void customEdit(void);
     void upcoming(void);
     void details(void);
     void chooseView(void);

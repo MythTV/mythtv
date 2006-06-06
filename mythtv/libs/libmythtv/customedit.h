@@ -1,5 +1,5 @@
-#ifndef CUSTOMRECORD_H_
-#define CUSTOMRECORD_H_
+#ifndef CUSTOMEDIT_H_
+#define CUSTOMEDIT_H_
 
 #include <qdatetime.h>
 #include <qhbox.h>
@@ -11,13 +11,14 @@
 class QLabel;
 class ProgramInfo;
 
-class CustomRecord : public MythDialog
+class CustomEdit : public MythDialog
 {
     Q_OBJECT
   public:
 
-    CustomRecord(MythMainWindow *parent, const char *name = 0);
-   ~CustomRecord(void);
+    CustomEdit(MythMainWindow *parent, const char *name = 0,
+                 int recid = 0, QString ltitle = "");
+   ~CustomEdit(void);
    
   signals:
     void dismissWindow();
@@ -29,12 +30,16 @@ class CustomRecord : public MythDialog
     void addClicked(void);
     void testClicked(void);
     void recordClicked(void);
+    void storeClicked(void);
     void cancelClicked(void);
 
   private:
     bool checkSyntax(void);
 
     int prevItem;
+    int maxex;
+
+    QString exSuffix;
 
     QStringList m_recid;
     QStringList m_recsub;
@@ -52,6 +57,7 @@ class CustomRecord : public MythDialog
     MythPushButton *m_addButton;
     MythPushButton *m_testButton;
     MythPushButton *m_recordButton;
+    MythPushButton *m_storeButton;
     MythPushButton *m_cancelButton;
 };
 

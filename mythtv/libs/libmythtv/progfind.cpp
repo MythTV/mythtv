@@ -22,6 +22,7 @@
 
 #include "progfind.h"
 #include "proglist.h"
+#include "customedit.h"
 #include "infostructs.h"
 #include "programinfo.h"
 #include "oldsettings.h"
@@ -189,6 +190,8 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
             pageDown();
         else if (action == "SELECT" || action == "INFO")
             select();
+        else if (action == "CUSTOMEDIT")
+            customEdit();
         else if (action == "UPCOMING")
             upcoming();
         else if (action == "DETAILS")
@@ -567,6 +570,25 @@ void ProgFinder::select()
 {
     if (inSearch == 2)
         getInfo();
+    else
+        cursorRight();
+}
+
+void ProgFinder::customEdit()
+{
+    if (inSearch == 2)
+    {
+        ProgramInfo *curPick = showData[curShow];
+
+        if (!curPick)
+            return;
+
+        CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
+                                        "customedit", curPick->getRecordID(),
+                                        curPick->title);
+        ce->exec();
+        delete ce;
+    }
     else
         cursorRight();
 }

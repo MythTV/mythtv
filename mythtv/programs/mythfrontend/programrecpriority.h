@@ -45,6 +45,7 @@ class ProgramRecPriority : public MythDialog
     void changeRecPriority(int howMuch);
     void saveRecPriority(void);
     void edit();
+    void customEdit();
     void deactivate();
     void upcoming();
 

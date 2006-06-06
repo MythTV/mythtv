@@ -17,6 +17,7 @@ using namespace std;
 
 #include "programrecpriority.h"
 #include "scheduledrecording.h"
+#include "customedit.h"
 #include "proglist.h"
 #include "tv.h"
 
@@ -254,6 +255,11 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
             {
                 saveRecPriority();
                 edit();
+            }
+            else if (action == "CUSTOMEDIT")
+            {
+                saveRecPriority();
+                customEdit();
             }
             else if (action == "UPCOMING")
             {
@@ -555,6 +561,23 @@ void ProgramRecPriority::edit(void)
             MythContext::DBError("Get new recording priority query", query);
 
         update(fullRect);
+    }
+}
+
+void ProgramRecPriority::customEdit(void)
+{
+    if (!curitem)
+        return;
+
+    ScheduledRecording record;
+    record.loadByID(curitem->recordid);
+
+    if (record.getSearchType() == kPowerSearch)
+    {
+        CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
+                                        "customedit", curitem->recordid, "");
+        ce->exec();
+        delete ce;
     }
 }
 

@@ -17,7 +17,7 @@
 #include <iostream>
 using namespace std;
 
-#include "customrecord.h"
+#include "customedit.h"
 
 #include "mythcontext.h"
 #include "dialogbox.h"
@@ -27,10 +27,13 @@ using namespace std;
 #include "recordingtypes.h"
 #include "mythdbcon.h"
 
-CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
+CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
+                         int recid, QString ltitle)
               : MythDialog(parent, name)
 {
     prevItem = 0;
+    maxex = 0;
+    exSuffix = QString(" (%1)").arg(tr("stored example"));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -59,6 +62,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
                    "FROM record WHERE search = :SEARCH ORDER BY title;");
     result.bindValue(":SEARCH", kPowerSearch);
 
+    int titlematch = -1;
     if (result.exec() && result.isActive())
     {
         while (result.next())
@@ -70,6 +74,9 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
             m_recid   << result.value(0).toString();
             m_recsub  << QString::fromUtf8(result.value(2).toString());
             m_recdesc << QString::fromUtf8(result.value(3).toString());
+
+            if (trimTitle == ltitle || result.value(0).toInt() == recid)
+                titlematch = m_rule->count() - 1;
         }
     }
     else
@@ -246,6 +253,21 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
               "AND DAYOFYEAR(program.originalairdate) = \n"
               "    DAYOFYEAR(program.starttime) ");
 
+    maxex = m_clause->count();
+
+    result.prepare("SELECT rulename,fromclause,whereclause "
+                  "FROM customexample;");
+
+    if (result.exec() && result.isActive())
+    {
+        while (result.next())
+        {
+            m_clause->insertItem(QString::fromUtf8(result.value(0).toString())
+                                 + exSuffix);
+            m_cfrom << QString::fromUtf8(result.value(1).toString());
+            m_csql << QString::fromUtf8(result.value(2).toString());
+        }
+    }
     vbox->addWidget(m_clause);
 
     // Preview box
@@ -298,6 +320,14 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
     hbox->addWidget(m_recordButton);
 
+    //  Store Button
+    // m_storeButton = new MythPushButton( this, "store" );
+    // m_storeButton->setBackgroundOrigin(WindowOrigin);
+    // m_storeButton->setText( tr( "Store" ) );
+    // m_storeButton->setEnabled(false);
+
+    // hbox->addWidget(m_storeButton);
+
     //  Cancel Button
     m_cancelButton = new MythPushButton( this, "cancel" );
     m_cancelButton->setBackgroundOrigin(WindowOrigin);
@@ -318,10 +348,25 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
             SLOT(textChanged(void)));
     connect(m_testButton, SIGNAL(clicked()), this, SLOT(testClicked()));
     connect(m_recordButton, SIGNAL(clicked()), this, SLOT(recordClicked()));
+    // connect(m_storeButton, SIGNAL(clicked()), this, SLOT(storeClicked()));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("CustomRecord");
+    gContext->addCurrentLocation("CustomEdit");
+
+    if (titlematch >= 0)
+    {
+        m_rule->setCurrentItem(titlematch);
+        ruleChanged();
+    }
+    else if (ltitle > "")
+    {
+        m_title->setText(ltitle);
+        m_subtitle->setText("");
+        m_description->setText("program.title = '" +
+                               ltitle.replace("\'","\'\'") + "' ");
+        textChanged();
+    }
 
     if (m_title->text().isEmpty())
         m_rule->setFocus();
@@ -331,13 +376,13 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     clauseChanged();
 }
 
-CustomRecord::~CustomRecord(void)
+CustomEdit::~CustomEdit(void)
 {
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
 }
 
-void CustomRecord::ruleChanged(void)
+void CustomEdit::ruleChanged(void)
 {
     int curItem = m_rule->currentItem();
     if (curItem == prevItem)
@@ -355,24 +400,32 @@ void CustomRecord::ruleChanged(void)
     textChanged();
 }
 
-void CustomRecord::textChanged(void)
+void CustomEdit::textChanged(void)
 {
     bool hastitle = !m_title->text().isEmpty();
     bool hasdesc = !m_description->text().isEmpty();
 
     m_testButton->setEnabled(hasdesc);
     m_recordButton->setEnabled(hastitle && hasdesc);
+    // m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
+    //                          (hastitle && hasdesc));
 }
 
-void CustomRecord::clauseChanged(void)
+void CustomEdit::clauseChanged(void)
 {
     QString msg = m_csql[m_clause->currentItem()];
     msg.replace("\n", " ");
     msg.replace(QRegExp(" [ ]*"), " ");
     m_preview->setText(msg);
+
+    bool hastitle = !m_title->text().isEmpty();
+    bool hasdesc = !m_description->text().isEmpty();
+
+    // m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
+    //                          (hastitle && hasdesc));
 }
 
-void CustomRecord::addClicked(void)
+void CustomEdit::addClicked(void)
 {
     QString clause = "";
 
@@ -384,7 +437,7 @@ void CustomRecord::addClicked(void)
     m_subtitle->append(m_cfrom[m_clause->currentItem()]);
 }
 
-void CustomRecord::testClicked(void)
+void CustomEdit::testClicked(void)
 {
     if (!checkSyntax())
     {
@@ -401,7 +454,7 @@ void CustomRecord::testClicked(void)
     m_testButton->setFocus();
 }
 
-void CustomRecord::recordClicked(void)
+void CustomEdit::recordClicked(void)
 {
     if (!checkSyntax())
     {
@@ -428,12 +481,126 @@ void CustomRecord::recordClicked(void)
         m_recordButton->setFocus();
 }
 
-void CustomRecord::cancelClicked(void)
+void CustomEdit::storeClicked(void)
+{
+    bool nameExists = false;
+    QString oldwhere = "";
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT rulename,whereclause FROM customexample "
+                  "WHERE rulename = :RULE;");
+    query.bindValue(":RULE", m_title->text());
+
+    if (query.exec() && query.isActive() && query.next())
+    {
+        nameExists = true;
+        oldwhere = QString::fromUtf8(query.value(1).toString());
+    }
+    QString msg = QString("%1: %2\n\n").arg(QObject::tr("Current Example"))
+                                       .arg(m_title->text());
+
+    if (m_subtitle->text() != "")
+        msg += m_subtitle->text() + "\n\n";
+
+    msg += m_description->text();
+
+    DialogBox *storediag = new DialogBox(gContext->GetMainWindow(), msg);
+    int button = 1, storebtn = -1, deletebtn = -1, cancelbtn = -1;
+
+    QString action = QObject::tr("Store");
+    if (nameExists)
+        action = QObject::tr("Replace");
+
+    QString str = QString("%1 \"%2\"").arg(action).arg(m_title->text());
+
+    if (!m_title->text().isEmpty())
+    {
+        storediag->AddButton(str);
+        storebtn = button++;
+    }
+    if (m_clause->currentItem() >= maxex)
+    {
+        str = QString("%1 \"%2\"").arg(QObject::tr("Delete"))
+                                  .arg(m_clause->currentText());
+
+        storediag->AddButton(str);
+        deletebtn = button++;
+    }
+    storediag->AddButton(QObject::tr("Cancel"));
+    cancelbtn = button++;
+
+    int ret = storediag->exec();
+    delete storediag;
+
+    if (ret == storebtn)
+    {
+        // Store the current strings
+        query.prepare("REPLACE INTO customexample "
+                       "(rulename,fromclause,whereclause) "
+                       "VALUES(:RULE,:FROMC,:WHEREC);");
+        query.bindValue(":RULE", m_title->text());
+        query.bindValue(":FROMC", m_subtitle->text());
+        query.bindValue(":WHEREC", m_description->text());
+
+        if (!query.exec())
+            MythContext::DBError("Store custom example", query);
+        else if (nameExists)
+        {
+            // replace item
+            unsigned i = maxex;
+            while (i < m_csql.count())
+            {
+                if (m_csql[i] == oldwhere)
+                {
+                    m_cfrom[i] = m_subtitle->text();
+                    m_csql[i] =  m_description->text();
+                    break;
+                }
+                i++;
+            }
+        }
+        else
+        {
+            // append item
+            m_clause->insertItem(m_title->text() + exSuffix);
+            m_cfrom << m_subtitle->text();
+            m_csql << m_description->text();
+        }
+    }
+    else if (ret == deletebtn)
+    {
+        query.prepare("DELETE FROM customexample "
+                      "WHERE rulename = :RULE;");
+        query.bindValue(":RULE", m_clause->currentText().remove(exSuffix));
+
+        if (!query.exec())
+            MythContext::DBError("Delete custom example", query);
+        else
+        {
+            // remove item
+            unsigned i = m_clause->currentItem();
+            m_clause->removeItem(i);
+            i++;
+            while (i < m_csql.count())
+            {
+                m_cfrom[i-1] = m_cfrom[i];
+                m_csql[i-1]  = m_csql[i];
+                i++;
+            }
+            m_cfrom.pop_back();
+            m_csql.pop_back();
+        }
+    }
+    clauseChanged();
+    // m_storeButton->setFocus();
+}
+
+void CustomEdit::cancelClicked(void)
 {
     accept();
 }
 
-bool CustomRecord::checkSyntax(void)
+bool CustomEdit::checkSyntax(void)
 {
     bool ret = false;
     QString msg = "";
