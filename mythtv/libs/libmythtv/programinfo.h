@@ -351,6 +351,8 @@ class ProgramList: public QPtrList<ProgramInfo> {
         return FromProgram(sql, bindings, dummySched);
     }
 
+    bool FromRecorded( bool bDescending, ProgramList *pSchedList );
+
     bool FromOldRecorded(const QString &sql, MSqlBindings &bindings);
 
     typedef int (*CompareFunc)(ProgramInfo *p1, ProgramInfo *p2);

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <URLBase></URLBase>
+   <device>
+      <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType>
+      <friendlyName>MythTV AV Media Server</friendlyName>
+      <manufacturer />
+      <modelURL>http://www.mythtv.org/</modelURL>
+      <UDN>uuid:a111a1b9-54f6-475a-bb06-57d83161c0b0</UDN>
+      <serviceList>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:CMGR_1-0</serviceId>
+            <SCPDURL>getCMGRDesc</SCPDURL>
+            <controlURL>_CMGR_1-0_control</controlURL>
+            <eventSubURL>_CMGR_1-0_event</eventSubURL>
+         </service>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:CDS_1-0</serviceId>
+            <SCPDURL>getCDSDesc</SCPDURL>
+            <controlURL>_CDS_1-0_control</controlURL>
+            <eventSubURL>_CDS_1-0_event</eventSubURL>
+         </service>
+      </serviceList>
+   </device>
+</root>

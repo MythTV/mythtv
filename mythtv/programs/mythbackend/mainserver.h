@@ -19,7 +19,6 @@ using namespace std;
 #include "livetvchain.h"
 #include "autoexpire.h"
 
-class HttpStatus;
 class ProcessRequestThread;
 
 class MainServer : public QObject
@@ -33,9 +32,6 @@ class MainServer : public QObject
    ~MainServer();
 
     void customEvent(QCustomEvent *e);
-
-    void FillProgramInfo(QDomDocument *pDoc, QDomElement &e, ProgramInfo *pInfo);
-    void FillStatusXML(QDomDocument *pDoc);
 
     bool isClientConnected();
     void ShutSlaveBackendsDown(QString &haltcmd);
@@ -160,8 +156,6 @@ class MainServer : public QObject
     vector<FileTransfer *> fileTransferList;
 
     QString recordfileprefix;
-
-    HttpStatus *statusserver;
 
     QTimer *masterServerReconnect;
     PlaybackSock *masterServer;

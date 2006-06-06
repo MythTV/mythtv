@@ -4056,6 +4056,201 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
     return true;
 }
 
+bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList ) 
+{
+    clear();
+                
+    QString     fs_db_name = "";
+    QDateTime   rectime    = QDateTime::currentDateTime().addSecs(
+                              -gContext->GetNumSetting("RecordOverTime"));
+
+    QString ip        = gContext->GetSetting("BackendServerIP");
+    QString port      = gContext->GetSetting("BackendServerPort");
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
+
+    // ----------------------------------------------------------------------
+
+    QMap<QString, int> inUseMap;
+
+    QString     inUseKey;
+    QString     inUseForWhat;
+    QDateTime   oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+
+    MSqlQuery   query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT DISTINCT chanid, starttime, recusage "
+                  " FROM inuseprograms WHERE lastupdatetime >= :ONEHOURAGO ;");
+    query.bindValue(":ONEHOURAGO", oneHourAgo);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            inUseKey = query.value(0).toString() + " " +
+                       query.value(1).toDateTime().toString(Qt::ISODate);
+            inUseForWhat = query.value(2).toString();
+
+            if (!inUseMap.contains(inUseKey))
+                inUseMap[inUseKey] = 0;
+
+            if ((inUseForWhat == "player") ||
+                (inUseForWhat == "preview player") ||
+                (inUseForWhat == "PIP player"))
+                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSEPLAYING;
+            else if (inUseForWhat == "recorder")
+                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSERECORDING;
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
+                       "recorded.title,recorded.subtitle,recorded.description,"
+                       "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
+                       "recorded.autoexpire,editing,bookmark,recorded.category,"
+                       "recorded.recgroup,record.dupin,record.dupmethod,"
+                       "record.recordid,outputfilters,"
+                       "recorded.seriesid,recorded.programid,recorded.filesize, "
+                       "recorded.lastmodified, recorded.findid, "
+                       "recorded.originalairdate, recorded.playgroup, "
+                       "recorded.basename, recorded.progstart, "
+                       "recorded.progend, recorded.stars, "
+                       "recordedprogram.stereo, recordedprogram.hdtv, "
+                       "recordedprogram.closecaptioned "
+                       "FROM recorded "
+                       "LEFT JOIN record ON recorded.recordid = record.recordid "
+                       "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+                       "LEFT JOIN recordedprogram ON (recorded.chanid = recordedprogram.chanid "
+                              "AND recorded.starttime = recordedprogram.starttime) "
+                       "WHERE (recorded.deletepending = 0 OR "
+                              "DATE_ADD(recorded.lastmodified, "
+                                       "INTERVAL 5 MINUTE) <= NOW()) "
+                       "ORDER BY recorded.starttime";
+
+    if ( bDescending )
+        thequery += " DESC";
+
+    thequery += ", " + chanorder + " DESC;";
+
+    query.prepare(thequery);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            ProgramInfo *proginfo = new ProgramInfo;
+
+            proginfo->chanid        = query.value(0).toString();
+            proginfo->startts       = query.value(29).toDateTime();
+            proginfo->endts         = query.value(30).toDateTime();
+            proginfo->recstartts    = query.value(1).toDateTime();
+            proginfo->recendts      = query.value(2).toDateTime();
+            proginfo->title         = QString::fromUtf8(query.value(3).toString());
+            proginfo->subtitle      = QString::fromUtf8(query.value(4).toString());
+            proginfo->description   = QString::fromUtf8(query.value(5).toString());
+            proginfo->hostname      = query.value(6).toString();
+
+            proginfo->dupin         = RecordingDupInType(query.value(17).toInt());
+            proginfo->dupmethod     = RecordingDupMethodType(query.value(18).toInt());
+            proginfo->recordid      = query.value(19).toInt();
+            proginfo->chanOutputFilters = query.value(20).toString();
+            proginfo->seriesid      = query.value(21).toString();
+            proginfo->programid     = query.value(22).toString();
+            proginfo->filesize      = stringToLongLong(query.value(23).toString());
+            proginfo->lastmodified  = QDateTime::fromString(query.value(24).toString(), Qt::ISODate);
+            proginfo->findid        = query.value(25).toInt();
+
+            if (query.value(26).isNull())
+            {
+                proginfo->originalAirDate = proginfo->startts.date();
+                proginfo->hasAirDate      = false;
+            }
+            else
+            {
+                proginfo->originalAirDate = QDate::fromString(query.value(26).toString(),Qt::ISODate);
+                proginfo->hasAirDate      = true;
+            }
+
+            proginfo->pathname = query.value(28).toString();
+
+
+            if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
+                proginfo->hostname = gContext->GetHostName();
+
+            if (!query.value(7).toString().isEmpty())
+            {
+                proginfo->chanstr  = query.value(7).toString();
+                proginfo->channame = QString::fromUtf8(query.value(8).toString());
+                proginfo->chansign = QString::fromUtf8(query.value(9).toString());
+            }
+            else
+            {
+                proginfo->chanstr  = "#" + proginfo->chanid;
+                proginfo->channame = "#" + proginfo->chanid;
+                proginfo->chansign = "#" + proginfo->chanid;
+            }
+
+            int flags = 0;
+
+            flags |= (query.value(10).toInt() == 1)           ? FL_COMMFLAG : 0;
+            flags |=  query.value(11).toString().length() > 1 ? FL_CUTLIST  : 0;
+            flags |=  query.value(12).toInt()                 ? FL_AUTOEXP  : 0;
+            flags |=  query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
+            flags |= (query.value(32).toInt() == 1)           ? FL_STEREO   : 0;
+            flags |= (query.value(34).toInt() == 1)           ? FL_CC       : 0;
+            flags |= (query.value(33).toInt() == 1)           ? FL_HDTV     : 0;
+
+            inUseKey = query.value(0).toString() + " " +
+                       query.value(1).toDateTime().toString(Qt::ISODate);
+
+            if (inUseMap.contains(inUseKey))
+                flags |= inUseMap[inUseKey];
+
+            if (query.value(13).toInt())
+            {
+                flags |= FL_EDITING;
+            }
+            else if (query.value(10).toInt() == COMM_FLAG_PROCESSING)
+            {
+                if (JobQueue::IsJobRunning(JOB_COMMFLAG, proginfo))
+                    flags |= FL_EDITING;
+                else
+                    proginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
+            }
+
+            proginfo->programflags = flags;
+            proginfo->category     = QString::fromUtf8(query.value(15).toString());
+            proginfo->recgroup     = query.value(16).toString();
+            proginfo->playgroup    = query.value(27).toString();
+            proginfo->recstatus    = rsRecorded;
+
+            if ((pSchedList != NULL) && (proginfo->recendts > rectime))
+            {
+                ProgramInfo *s;
+
+                for (s = pSchedList->first(); s; s = pSchedList->next())
+                {
+                    if (s && s->recstatus    == rsRecording &&
+                        proginfo->chanid     == s->chanid   &&
+                        proginfo->recstartts == s->recstartts)
+                    {
+                        proginfo->recstatus = rsRecording;
+                        break;
+                    }
+                }
+            }
+
+            proginfo->stars = query.value(31).toDouble();
+
+            append(proginfo);
+
+        }
+    }
+
+    return true;
+}
+
+
 bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
 {
     clear();
