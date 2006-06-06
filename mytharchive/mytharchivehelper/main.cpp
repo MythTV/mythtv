@@ -707,122 +707,161 @@ bool doNativeArchive(QString &jobFile)
 
 bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
 {
-    // try to extract chanID and starttime from inFile
-    QString chanID = "";
-    QString startTime = "";
+    int ret;
+
+    av_register_all();
+
+    AVFormatContext *inputFC = NULL;
+    AVInputFormat *fmt = NULL;
+
+    // Open recording
+    VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
+
+    if (av_open_input_file(&inputFC, inFile.ascii(), NULL, 0, NULL) != 0)
+    {
+        VERBOSE(VB_JOBQUEUE,
+                QString("Couldn't open input file, error #%1").arg(ret));
+        return false;
+    }
+
+    // Getting stream information
+    if (av_find_stream_info(inputFC) < 0)
+    {
+        VERBOSE(VB_JOBQUEUE,
+                QString("Couldn't get stream info, error #%1").arg(ret));
+        av_close_input_file(inputFC);
+        inputFC = NULL;
+        return false;
+    }
+
+    // find the first video stream
+    int videostream = -1, width, height;
+    float fps;
+
+    for (int i = 0; i < inputFC->nb_streams; i++)
+    {
+        AVStream *st = inputFC->streams[i];
+        if (inputFC->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+        {
+            videostream = i;
+            width = st->codec->width;
+            height = st->codec->height;
+            if (st->r_frame_rate.den && st->r_frame_rate.num)
+                fps = av_q2d(st->r_frame_rate);
+            else
+                fps = 1/av_q2d(st->time_base);
+            break;
+        }
+    }
+
+    if (videostream == -1)
+    {
+        VERBOSE(VB_JOBQUEUE, "Couldn't find a video stream");
+        return false;
+    }
+
+    // get the codec context for the video stream
+    AVCodecContext *codecCtx = inputFC->streams[videostream]->codec;
+
+    // get decoder for video stream
+    AVCodec * codec = avcodec_find_decoder(codecCtx->codec_id);
+
+    if (codec == NULL)
+    {
+        VERBOSE(VB_JOBQUEUE, "Couldn't find codec for video stream");
+        return false;
+    }
+
+    // open codec
+    if (avcodec_open(codecCtx, codec) < 0)
+    {
+        VERBOSE(VB_JOBQUEUE, "Couldn't open codec for video stream");
+        return false;
+    }
+
+    // get list of required thumbs
     QStringList list = QStringList::split(",", thumbList);
-    RingBuffer *rbuf = NULL;
-    NuppelVideoPlayer *nvp = NULL;
 
-    ProgramInfo *programInfo = getProgramInfoForFile(inFile);
+    AVFrame *frame = avcodec_alloc_frame();
+    AVPacket pkt;
+    AVPicture orig;
+    AVPicture retbuf; 
+    bzero(&orig, sizeof(AVPicture));
+    bzero(&retbuf, sizeof(AVPicture));
 
-    VERBOSE(VB_IMPORTANT, "programInfo->pathname: " + programInfo->pathname);
+    int bufflen = width * height * 4;
+    unsigned char *outputbuf = new unsigned char[bufflen];
 
-    programInfo->MarkAsInUse(true, "preview_generator");
+    int frameNo = -1, thumbCount = 0;
+    int frameFinished;
+    int keyFrame;
 
-    bool bCreatedMarkupMap = false;
-    bool bNeedMarkupMap = true;
-
-    // if we are only grabbing the first frame we don't neet a position map
-    if (list.count() == 1 && list[0].stripWhiteSpace().toInt() == 0)
-        bNeedMarkupMap = false;
-
-    // if this is not a myth recording we may have to build a position map
-    if (bNeedMarkupMap && programInfo->isVideo && !programInfo->CheckMarkupFlag(MARK_GOP_START))
+    while (av_read_frame(inputFC, &pkt) >= 0)
     {
-        rbuf = new RingBuffer(programInfo->pathname, false, false, 0);
-        if (!rbuf->IsOpen())
+        if (pkt.stream_index == videostream)
         {
-            VERBOSE(VB_IMPORTANT, "GetScreenGrab: could not open file: " +
-                    QString("'%1'").arg(programInfo->pathname));
-            delete rbuf;
-            return false;
+            frameNo++;
+            if (list[thumbCount].toInt() == (int)(frameNo / fps))
+            {
+                thumbCount++;
+                QString filename = outFile;
+
+                if (outFile.contains("%1"))
+                    filename = outFile.arg(thumbCount);
+
+                avcodec_flush_buffers(codecCtx);
+                avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
+                keyFrame = frame->key_frame;
+
+                while (!frameFinished || !keyFrame)
+                {
+                    av_free_packet(&pkt);
+                    int res = av_read_frame(inputFC, &pkt);
+                    if (res < 0)
+                        break;
+                    frameNo++;
+                    avcodec_decode_video(codecCtx, frame, &frameFinished, pkt.data, pkt.size);
+                    keyFrame = frame->key_frame;
+                }
+
+                if (frameFinished)
+                {
+                    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32, width, height);
+
+                    avpicture_deinterlace((AVPicture*)frame, (AVPicture*)frame,
+                                           codecCtx->pix_fmt, width, height);
+
+                    img_convert(&retbuf, PIX_FMT_RGBA32, 
+                                 (AVPicture*) frame, codecCtx->pix_fmt, width, height);
+
+                    QImage img(outputbuf, width, height, 32, NULL,
+                               65536 * 65536, QImage::LittleEndian);
+
+                    if (!img.save(filename.ascii(), "JPEG"))
+                    {
+                        VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + filename);
+                    }
+                }
+
+                if (thumbCount >= (int) list.count())
+                    break;
+            }
         }
 
-        nvp = new NuppelVideoPlayer("GetScreenGrab", programInfo);
-        nvp->SetRingBuffer(rbuf);
-
-        VERBOSE(VB_IMPORTANT, QString("Creating markup map for: %1").arg(programInfo->pathname));
-        nvp->RebuildSeekTable(true, NULL, NULL);
-
-        delete nvp;
-        delete rbuf;
-
-        bCreatedMarkupMap = true;
+        av_free_packet(&pkt);
     }
 
-    for (uint x = 0; x < list.count(); x++)
-    {
-        QString filename = outFile;
+    if (outputbuf)
+        delete[] outputbuf;
 
-        if (outFile.contains("%1"))
-            filename = outFile.arg(x + 1);
+    // free the frame
+    av_free(frame);
 
-        float video_aspect = 0;
-        int len, width, height, sz;
-        int pos = list[x].stripWhiteSpace().toInt();
-        len = width = height = sz = 0;
+    // close the codec
+    avcodec_close(codecCtx);
 
-        rbuf = new RingBuffer(programInfo->pathname, false, false, 0);
-        if (!rbuf->IsOpen())
-        {
-            VERBOSE(VB_IMPORTANT, "GetScreenGrab: could not open file: " +
-                    QString("'%1'").arg(programInfo->pathname));
-            delete rbuf;
-            return false;
-        }
-
-        nvp = new NuppelVideoPlayer("GetScreenGrab", programInfo);
-        nvp->SetRingBuffer(rbuf);
-
-        VERBOSE(VB_IMPORTANT, QString("Grabbing thumb: %1 from: %2").arg(filename).arg(pos));
-        unsigned char *data = (unsigned char*)
-                nvp->GetScreenGrab(pos, len, width, height, video_aspect);
-
-        if (!data || !width || !height)
-        {
-            VERBOSE(VB_IMPORTANT, "Failed to create thumb: " + filename);
-            continue;
-        }
-
-        QImage img((unsigned char*) data,
-                              width, height, 32, NULL, 65536 * 65536,
-                              QImage::LittleEndian);
-
-        if (!img.save(filename.ascii(), "JPEG"))
-        {
-            VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + filename);
-        }
-
-        if (data)
-            delete[] data;
-
-        delete nvp;
-        delete rbuf;
-    }
-
-    programInfo->MarkAsInUse(false);
-
-    // delete position map if we created one
-    if (programInfo->isVideo && bCreatedMarkupMap)
-    {
-        if (!MSqlQuery::testDBConnection())
-        {
-            VERBOSE(VB_IMPORTANT, "GetScreenGrab: could not connect to DB.");
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, "Deleting markup map for: " + programInfo->pathname);
-
-            MSqlQuery query(MSqlQuery::InitCon());
-
-            query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME;");
-            query.bindValue(":FILENAME", programInfo->pathname);
-            query.exec();
-        }
-    }
-
-    delete programInfo;
+    // close the video file
+    av_close_input_file(inputFC);
 
     return true;
 }
@@ -842,6 +881,7 @@ int getFrameCount(AVFormatContext *inputFC, int vid_id)
         {
             count++;
         }
+        av_free_packet(&pkt);
     }
 
     return count;
