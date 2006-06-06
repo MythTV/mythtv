@@ -74,14 +74,23 @@ static bool handle_diseq(const DVBTuning&, DVBDiSEqC*, bool reset);
  *  \bug Only supports single input cards.
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
-    : QObject(NULL, "DVBChannel"), ChannelBase(parent),
-      diseqc(NULL),    dvbcam(NULL),
-      fd_frontend(-1), cardnum(aCardNum), has_crc_bug(false),
-      currentTID(-1),  first_tune(true)
+    : QObject(NULL, "DVBChannel"),  ChannelBase(parent),
+      diseqc(NULL),                 dvbcam(NULL),
+      fd_frontend(-1),              cardnum(aCardNum),
+      has_crc_bug(false),           tuning_delay(0),
+      currentTID(-1),               first_tune(true)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
     has_crc_bug = CardUtil::HasDVBCRCBug(aCardNum);
+
+    QString name(""), type("");
+    CardUtil::GetDVBType(aCardNum, name, type);
+    if ((name == "DiBcom 3000P/M-C DVB-T") ||
+        (name == "TerraTec/qanu USB2.0 Highspeed DVB-T Receiver"))
+    {
+        tuning_delay = 200;
+    }
 }
 
 DVBChannel::~DVBChannel()
@@ -367,7 +376,7 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
     }
 
     bool found = false;
-    int mplexid;
+    int mplexid = 0;
     while (query.next())
     {
         int this_inputid = query.value(4).toInt();
@@ -675,6 +684,11 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
                   "Setting Frontend tuning parameters failed.");
             return false;
         }
+
+        // Extra delay to add for broken DVB drivers
+        if (tuning_delay)
+            usleep(tuning_delay * 1000);
+
         wait_for_backend(fd_frontend, 5 /* msec */);
 
         prev_tuning.params = params;

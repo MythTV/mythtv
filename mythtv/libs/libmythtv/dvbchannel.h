@@ -109,6 +109,7 @@ class DVBChannel : public QObject, public ChannelBase
     volatile int      fd_frontend; ///< File descriptor for tuning hardware
     int               cardnum;     ///< DVB Card number
     bool              has_crc_bug; ///< true iff our driver munges PMT
+    uint              tuning_delay;///< Extra delay to add for broken drivers
     int               currentTID;  ///< Stores mplexid from database
 
     bool              first_tune;  ///< Used to force hardware reset
