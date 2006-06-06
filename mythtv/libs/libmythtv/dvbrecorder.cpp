@@ -91,6 +91,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _stream_data(NULL),
       _reset_pid_filters(true),
       _pid_lock(true),
+      _input_pat(NULL),
       _input_pmt(NULL),
       // Output stream info
       _pat(NULL), _pmt(NULL),
@@ -146,6 +147,12 @@ void DVBRecorder::TeardownAll(void)
     SetOutputPAT(NULL);
     SetOutputPMT(NULL);
 
+    if (_input_pat)
+    {
+        delete _input_pat;
+        _input_pat = NULL;
+    }
+
     if (_input_pmt)
     {
         delete _input_pmt;
@@ -198,7 +205,9 @@ void DVBRecorder::HandlePAT(const ProgramAssociationTable *_pat)
     VERBOSE(VB_RECORD, LOC + QString("SetPAT(%1 on 0x%2)")
             .arg(progNum).arg(_pmt_pid,0,16));
 
+    ProgramAssociationTable *oldpat = _input_pat;
     _input_pat = new ProgramAssociationTable(*_pat);
+    delete oldpat;
 
     /* Rev the PAT version since PMT PID is changing */
     _next_pat_version = (_next_pat_version + 1) & 0x1f;
@@ -214,8 +223,10 @@ void DVBRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
     if ((int)progNum == _stream_data->DesiredProgram())
     {
         VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
+        ProgramMapTable *oldpmt = _input_pmt;
         _input_pmt = new ProgramMapTable(*_pmt);
         dvbchannel->SetPMT(_input_pmt);
+        delete oldpmt;
 
         /* Rev the PMT version since PIDs are changing */
         _next_pmt_version = (_next_pmt_version + 1) & 0x1f;
@@ -420,9 +431,9 @@ bool DVBRecorder::AdjustFilters(void)
 
     uint_vec_t add_pid, add_stream_type;
 
-    add_pid.push_back(PAT_PID);
+    add_pid.push_back(MPEG_PAT_PID);
     add_stream_type.push_back(StreamID::PrivSec);
-    _stream_data->AddListeningPID(PAT_PID);
+    _stream_data->AddListeningPID(MPEG_PAT_PID);
 
     for (uint i = 0; i < _input_pat->ProgramCount(); i++)
     {
@@ -497,7 +508,7 @@ bool DVBRecorder::AdjustFilters(void)
 /** \fn DVBRecorder::AdjustEITPIDs(void)
  *  \brief Adjusts EIT PID monitoring to monitor the right number of EIT PIDs.
  */
-void DVBRecorder::AdjustEITPIDs(void)
+bool DVBRecorder::AdjustEITPIDs(void)
 {
     bool changes = false;
     uint_vec_t add, del;
@@ -507,21 +518,21 @@ void DVBRecorder::AdjustEITPIDs(void)
     if (GetStreamData()->HasEITPIDChanges(_eit_pids))
         changes = GetStreamData()->GetEITPIDChanges(_eit_pids, add, del);
 
-    if (changes)
-    {
-        for (uint i = 0; i < del.size(); i++)
-        {
-            uint_vec_t::iterator it;
-            it = find(_eit_pids.begin(), _eit_pids.end(), del[i]);
-            if (it != _eit_pids.end())
-                _eit_pids.erase(it);
-        }
+    if (!changes)
+        return false;
 
-        for (uint i = 0; i < add.size(); i++)
-        {
-            _eit_pids.push_back(add[i]);
-        }
+    for (uint i = 0; i < del.size(); i++)
+    {
+        uint_vec_t::iterator it;
+        it = find(_eit_pids.begin(), _eit_pids.end(), del[i]);
+        if (it != _eit_pids.end())
+            _eit_pids.erase(it);
     }
+
+    for (uint i = 0; i < add.size(); i++)
+        _eit_pids.push_back(add[i]);
+
+    return true;
 }
 
 void DVBRecorder::StartRecording(void)

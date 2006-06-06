@@ -90,7 +90,7 @@ class DVBRecorder : public DTVRecorder,
     void ProcessTSPacket2(const TSPacket& tspacket);
 
     bool AdjustFilters(void);
-    void AdjustEITPIDs(void);
+    bool AdjustEITPIDs(void);
     void CloseFilters(void);
     void OpenFilter(uint pid, int pes_type, uint mpeg_stream_type);
     int  OpenFilterFd(uint pid, int pes_type, uint stream_type);
