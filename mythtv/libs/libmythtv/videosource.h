@@ -75,6 +75,7 @@ class CardUtil
 
     static CARD_TYPES   GetDVBType(uint device, QString &name, QString &card_type);
     static bool         HasDVBCRCBug(uint device);
+    static uint         GetMinSignalMonitoringDelay(uint device);
     static QString      GetDefaultInput(uint cardid);
 
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);

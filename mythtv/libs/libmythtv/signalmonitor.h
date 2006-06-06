@@ -7,6 +7,10 @@
 // C headers
 #include <pthread.h>
 
+// C++ headers
+#include <algorithm>
+using namespace std;
+
 // Qt headers
 #include <qobject.h>
 #include <qmutex.h>
@@ -125,7 +129,8 @@ class SignalMonitor: virtual public QObject
      *   Defaults to 25 milliseconds.
      *  \param msec Milliseconds between signal monitoring events.
      */
-    void SetUpdateRate(int msec) { update_rate = msec; }
+    void SetUpdateRate(int msec)
+        { update_rate = max(msec, (int)minimum_update_rate); }
 
   public slots:
     virtual void deleteLater(void);
@@ -164,6 +169,7 @@ class SignalMonitor: virtual public QObject
     int          capturecardnum;
     uint         flags;
     int          update_rate;
+    uint         minimum_update_rate;
     bool         running;
     bool         exit;
     bool         update_done;

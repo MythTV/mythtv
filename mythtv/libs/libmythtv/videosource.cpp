@@ -157,6 +157,17 @@ bool CardUtil::HasDVBCRCBug(uint device)
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
+uint CardUtil::GetMinSignalMonitoringDelay(uint device)
+{
+    QString name(""), type("");
+    GetDVBType(device, name, type);
+    if (name.find("DVB-S") >= 0)
+        return 300;
+    if (name == "DiBcom 3000P/M-C DVB-T")
+        return 100;
+    return 25;
+}
+
 /** \fn CardUtil::GetCardType(uint, QString&, QString&)
  *  \brief Returns the card type from the video device
  *  \param nCardID   cardid of card to be checked

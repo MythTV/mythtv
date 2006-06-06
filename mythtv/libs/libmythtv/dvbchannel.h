@@ -60,6 +60,7 @@ class DVBChannel : public QObject, public ChannelBase
         { return chan_opts.pmt.HasTelevisionService(); }
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
+    uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
@@ -110,6 +111,7 @@ class DVBChannel : public QObject, public ChannelBase
     int               cardnum;     ///< DVB Card number
     bool              has_crc_bug; ///< true iff our driver munges PMT
     uint              tuning_delay;///< Extra delay to add for broken drivers
+    uint              sigmon_delay;///< Minimum delay between FE_LOCK checks
     int               currentTID;  ///< Stores mplexid from database
 
     bool              first_tune;  ///< Used to force hardware reset
