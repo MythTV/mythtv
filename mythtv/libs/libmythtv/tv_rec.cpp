@@ -136,11 +136,6 @@ TVRec::TVRec(int capturecardnum)
       // RingBuffer info
       ringBuffer(NULL), rbFilePrefix(""), rbFileExt("mpg")
 {
-      // Retune stuff
-      retune_timer = new TuningTimer();
-      retune_timer->setTimeout(10000);
-      retune_timer->start();
-      retune_requests = 0;
 }
 
 bool TVRec::CreateChannel(const QString &startchannel)
@@ -3125,12 +3120,7 @@ void TVRec::HandleTuning(void)
                              kFlagEITScan|kFlagAntennaAdjust))
         {
             if (!recorder)
-            {
                 TuningFrequency(request);
-                retune_timer->restart();
-                retune_timer->addMSecs(1);
-                retune_requests = 0;
-            }
             else
                 SetFlags(kFlagWaitingForRecPause);
         }
@@ -3165,18 +3155,7 @@ void TVRec::HandleTuning(void)
     }
 
     MPEGStreamData *streamData = NULL;
-    bool handle_done = (HasFlags(kFlagWaitingForSignal) &&
-                        !(streamData = TuningSignalCheck()));
-
-    // Just because we have signal, we may not have the right transponder.
-    if (HasFlags(kFlagWaitingForSignal) && !retune_timer->elapsed() &&
-        (retune_requests < 30))
-    {
-        RetuneChannel();
-        retune_requests++;
-    }
-
-    if (handle_done)
+    if (HasFlags(kFlagWaitingForSignal) && !(streamData = TuningSignalCheck()))
         return;
 
     if (HasFlags(kFlagNeedToStartRecorder))
@@ -3308,19 +3287,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
     // Clear pending actions from last request
     ClearFlags(kFlagPendingActions);
-}
-
-/** \fn TVRec::RetuneChannel(void)
- *  \brief Retunes a DVB channel
- *  \return DVBChannel::Retune() or false if ifndef USING_DVB
- */
-bool TVRec::RetuneChannel(void)
-{
-#ifdef USING_DVB
-    if (GetDVBChannel())
-        return GetDVBChannel()->Retune();
-#endif // USING_DVB
-    return false;
 }
 
 /** \fn TVRec::TuningFrequency(const TuningRequest&)

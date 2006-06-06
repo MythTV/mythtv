@@ -29,6 +29,7 @@
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "videodev_myth.h"
+#include "util.h"
 
 // ivtv header
 extern "C" {

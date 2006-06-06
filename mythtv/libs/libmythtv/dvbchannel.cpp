@@ -78,7 +78,6 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
       // Helper classes
       diseqc(NULL),                 dvbcam(NULL),
       // Tuning
-      retune_adj(-10),
       tuning_delay(0),              sigmon_delay(25),
       first_tune(true),
       // Misc
@@ -703,8 +702,6 @@ bool DVBChannel::Tune(const DVBTuning &tuning, bool force_reset)
     has_diseq |= (FE_DVB_S2 == info.type) && diseqc;
 #endif // FE_GET_EXTENDED_INFO
 
-    retune_tuning = tuning;
-
     if (fd_frontend < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): Card not open!");
@@ -733,8 +730,6 @@ bool DVBChannel::Tune(const DVBTuning &tuning, bool force_reset)
     {
         // Adjust for Satelite recievers which offset the frequency.
         params.frequency = tuned_frequency(tuning, info.type, NULL);
-
-        params.frequency = params.frequency + (retune_adj = -retune_adj);
 
 #ifdef FE_GET_EXTENDED_INFO
         if (info.type == FE_DVB_S2)
@@ -770,22 +765,6 @@ bool DVBChannel::Tune(const DVBTuning &tuning, bool force_reset)
     VERBOSE(VB_CHANNEL, LOC + "Tune(): Frequency tuning successful.");
 
     return true;
-}
-
-/** \fn DVBChannel::Retune(void)
- *  \brief Calls DVBChannel::Tune() with the last known parameters
- *
- *   This is used to retune DVB-C hardware. DVB-C hardware
- *   sometimes does not successfully tune the first time
- *   despite reports of success from the drivers. This is
- *   probably a hardware problem and not a driver problem
- *   per say, so it is unlikely to be fixed at a lower level.
- *
- *  \return true iff drivers report that tuning was successful
- */
-bool DVBChannel::Retune(void)
-{
-    return Tune(retune_tuning, true);
 }
 
 /** \fn DVBChannel::GetTuningParams(DVBTuning& tuning) const

@@ -66,7 +66,6 @@ class DVBChannel : public ChannelBase
     bool SetChannelByString(const QString &chan);
     bool Tune(const DVBTuning &tuning, bool force_reset = false);
     bool TuneMultiplex(uint mplexid);
-    bool Retune(void);
 
     bool GetTuningParams(DVBTuning &tuning) const;
 
@@ -105,10 +104,6 @@ class DVBChannel : public ChannelBase
 #endif
     DVBTuning         cur_tuning;  ///< Tuning options sent to tuning hardware
     DVBTuning         prev_tuning; ///< Last tuning options sent to hardware
-    /// Last tuning options sent to hardware for retuning
-    DVBTuning         retune_tuning;
-    /// Retuning adjustment, required so drivers don't ignore retune request
-    int               retune_adj;
     uint              tuning_delay;///< Extra delay to add for broken drivers
     uint              sigmon_delay;///< Minimum delay between FE_LOCK checks
     bool              first_tune;  ///< Used to force hardware reset

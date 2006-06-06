@@ -7,6 +7,7 @@
 #include "eitscanner.h"
 #include "eithelper.h"
 #include "scheduledrecording.h"
+#include "util.h"
 
 #define LOC QString("EITScanner: ")
 

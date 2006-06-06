@@ -7,6 +7,7 @@ using namespace std;
 #include "RingBuffer.h"
 #include "programinfo.h"
 #include "recordingprofile.h"
+#include "util.h"
 
 #define LOC QString("RecBase(%1): ").arg(videodevice)
 #define LOC_ERR QString("RecBase(%1) Error: ").arg(videodevice)
