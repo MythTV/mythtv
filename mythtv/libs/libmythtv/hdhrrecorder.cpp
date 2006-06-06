@@ -37,7 +37,8 @@ using namespace std;
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec),
       _channel(channel),        _video_socket(NULL),
-      _atsc_stream_data(NULL),  _pmt(NULL)
+      _atsc_stream_data(NULL),
+      _pmt(NULL),               _pmt_copy(NULL)
 {
 }
 
@@ -54,6 +55,11 @@ void HDHRRecorder::TeardownAll(void)
     {
         delete _atsc_stream_data;
         _atsc_stream_data = NULL;
+    }
+    if (_pmt_copy)
+    {
+        delete _pmt_copy;
+        _pmt_copy = NULL;
     }
 }
 
@@ -180,14 +186,16 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     {
         vector<uint> del_pids, add_pids;
 
-        if (_pmt)
+        if (_pmt_copy)
         {
-            for (uint i = 0; i < _pmt->StreamCount(); i++)
-                del_pids.push_back(_pmt->StreamPID(i));
+            for (uint i = 0; i < _pmt_copy->StreamCount(); i++)
+                del_pids.push_back(_pmt_copy->StreamPID(i));
+            delete _pmt_copy;
         }
 
         VERBOSE(VB_IMPORTANT, LOC + "HandleSingleProgramPMT("<<pmt<<")");
         _pmt = pmt;
+        _pmt_copy = new ProgramMapTable(*pmt);
 
         if (_pmt)
         {
@@ -297,6 +305,8 @@ void HDHRRecorder::StartRecording(void)
         return;
     }
 
+    MythTimer timer;
+    timer.start();
     while (_request_recording && !_error)
     {
         if (PauseAndWait())
@@ -304,19 +314,30 @@ void HDHRRecorder::StartRecording(void)
 
         AdjustEITPIDs();
 
+        uint dbg = 0;
+        if (timer.elapsed() > 10)
+            dbg = timer.elapsed();
+
         struct hdhomerun_video_data_t data;
-        int ret = hdhomerun_video_recv(_video_socket, &data, 100);
+        int ret = hdhomerun_video_recv(_video_socket, &data, 50);
+
+        timer.start();
 
         if (ret > 0)
+        {
+            if (dbg)
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "msecs: "<<dbg
+                        <<" bufsize: "<<data.length);
+            }
             ProcessTSData(data.buffer, data.length);
+        }
         else if (ret < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Recv error" + ENO);
             if (_video_socket)
                 break;
         }
-        else
-            usleep(2500);
     }
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- ending...");

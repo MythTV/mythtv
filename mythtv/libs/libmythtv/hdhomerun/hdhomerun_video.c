@@ -76,6 +76,8 @@ unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs)
 
 int hdhomerun_video_recv(struct hdhomerun_video_sock_t *vs, struct hdhomerun_video_data_t *result, unsigned long timeout)
 {
+	int i = 0;
+	char *ptr = (char *) result->buffer;
 	struct timeval t;
 	t.tv_sec = timeout / 1000;
 	t.tv_usec = (timeout % 1000) * 1000;
@@ -91,10 +93,19 @@ int hdhomerun_video_recv(struct hdhomerun_video_sock_t *vs, struct hdhomerun_vid
 		return 0;
 	}
 
-	result->length = recv(vs->sock, (char *)result->buffer, sizeof(result->buffer), 0);
-	if (result->length <= 0) {
-		return -1;
+	result->length = 0;
+	for (i = 0; i < VIDEO_DATA_DMESG_COUNT; i++)
+	{
+		int length = recv(vs->sock, ptr, VIDEO_DATA_DMESG_SIZE,
+				  MSG_DONTWAIT);
+		if (length <= 0)
+			break;
+		ptr += length;
+		result->length += length;
 	}
+
+	if (result->length <= 0)
+		return -1;
 
 	return 1;
 }

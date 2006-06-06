@@ -60,6 +60,7 @@ class HDHRRecorder : public DTVRecorder,
     struct hdhomerun_video_sock_t *_video_socket;
     ATSCStreamData                *_atsc_stream_data;
     ProgramMapTable               *_pmt;
+    ProgramMapTable               *_pmt_copy;
 
     mutable QMutex                 _lock;
 };

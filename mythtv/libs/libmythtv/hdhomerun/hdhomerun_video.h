@@ -23,9 +23,12 @@ extern "C" {
 
 struct hdhomerun_video_sock_t;
 
+#define VIDEO_DATA_DMESG_SIZE  188*7
+#define VIDEO_DATA_DMESG_COUNT 100
+
 struct hdhomerun_video_data_t {
 	int length;
-	unsigned char buffer[188 * 7];
+	unsigned char buffer[VIDEO_DATA_DMESG_SIZE * VIDEO_DATA_DMESG_COUNT];
 };
 
 extern struct hdhomerun_video_sock_t *hdhomerun_video_create(void);

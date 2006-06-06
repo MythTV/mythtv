@@ -225,6 +225,7 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val)
 
     /* Wait for response. */
     struct hdhomerun_control_data_t response;
+    bzero(&response, sizeof(response));
     if (hdhomerun_control_recv(_control_socket, &response, 2000) <= 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (timeout)");
@@ -237,7 +238,25 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val)
         return QString::null;
     }
 
-    return QString("dummy");
+    QStringList list;
+    QString tmp = "";
+    unsigned char *ptr = response.ptr;
+    for (;ptr < response.end; ptr++)
+    {
+        if (*ptr)
+        {
+            tmp += QChar(*((char*)ptr));
+            continue;
+        }
+        list.push_back(tmp);
+        tmp = "";
+        ptr++;
+        ptr++;
+    }
+
+    if (list.size() >= 2)
+        return list[1];
+    return "";
 }
 
 QString HDHRChannel::TunerGet(const QString &name)
@@ -538,6 +557,17 @@ bool HDHRChannel::DelAllPIDs(void)
     return UpdateFilters();
 }
 
+QString filt_str(uint pid)
+{
+    uint pid0 = (pid / (16*16*16)) % 16;
+    uint pid1 = (pid / (16*16))    % 16;
+    uint pid2 = (pid / (16))        % 16;
+    uint pid3 = pid % 16;
+    return QString("0x%1%2%3%4")
+        .arg(pid0,0,16).arg(pid1,0,16)
+        .arg(pid2,0,16).arg(pid3,0,16);
+}
+
 bool HDHRChannel::UpdateFilters(void)
 {
     QMutexLocker locker(&_lock);
@@ -572,22 +602,18 @@ bool HDHRChannel::UpdateFilters(void)
 
     for (uint i = 0; i < range_min.size(); i++)
     {
-        if (range_min[i] == range_max[i])
-            filter += QString("0x%1 ").arg(range_min[i],0,16);
-        else
-        {
-            filter += QString("0x%1-0x%2 ")
-                .arg(range_min[i],0,16).arg(range_max[i],0,16);
-        }
+        filter += filt_str(range_min[i]);
+        if (range_min[i] != range_max[i])
+            filter += QString("-%1").arg(filt_str(range_max[i]));
+        filter += " ";
     }
 
     filter = filter.stripWhiteSpace();
 
-    VERBOSE(VB_CHANNEL, "Filter: '"<<filter<<"'");
-
     QString new_filter = TunerSet("filter", filter);
 
-    VERBOSE(VB_CHANNEL, QString("Filter: '%1' : '%2'")
+    VERBOSE(VB_CHANNEL, QString("Filter: '%1'\n\t\t\t\t'%2'")
             .arg(filter).arg(new_filter));
+
     return filter == new_filter;
 }
