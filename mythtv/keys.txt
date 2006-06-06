@@ -8,6 +8,8 @@ mythfrontend
 - Space or Enter to take action on the item under the highlight point.
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
+- E to enter the Custom Record editor for the selected title on the EPG,
+    "Program Finder", "Upcoming Recordings" and search results screens.
 - U to view details for the currently selected show on the Watch or
     Delete screens, EPG, "Program Finder", "Upcoming Recordings"
     and search results screens.

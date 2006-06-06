@@ -321,12 +321,12 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     hbox->addWidget(m_recordButton);
 
     //  Store Button
-    // m_storeButton = new MythPushButton( this, "store" );
-    // m_storeButton->setBackgroundOrigin(WindowOrigin);
-    // m_storeButton->setText( tr( "Store" ) );
-    // m_storeButton->setEnabled(false);
+    m_storeButton = new MythPushButton( this, "store" );
+    m_storeButton->setBackgroundOrigin(WindowOrigin);
+    m_storeButton->setText( tr( "Store" ) );
+    m_storeButton->setEnabled(false);
 
-    // hbox->addWidget(m_storeButton);
+    hbox->addWidget(m_storeButton);
 
     //  Cancel Button
     m_cancelButton = new MythPushButton( this, "cancel" );
@@ -348,7 +348,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
             SLOT(textChanged(void)));
     connect(m_testButton, SIGNAL(clicked()), this, SLOT(testClicked()));
     connect(m_recordButton, SIGNAL(clicked()), this, SLOT(recordClicked()));
-    // connect(m_storeButton, SIGNAL(clicked()), this, SLOT(storeClicked()));
+    connect(m_storeButton, SIGNAL(clicked()), this, SLOT(storeClicked()));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
     gContext->addListener(this);
@@ -407,8 +407,8 @@ void CustomEdit::textChanged(void)
 
     m_testButton->setEnabled(hasdesc);
     m_recordButton->setEnabled(hastitle && hasdesc);
-    // m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
-    //                          (hastitle && hasdesc));
+    m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
+                              (hastitle && hasdesc));
 }
 
 void CustomEdit::clauseChanged(void)
@@ -421,8 +421,8 @@ void CustomEdit::clauseChanged(void)
     bool hastitle = !m_title->text().isEmpty();
     bool hasdesc = !m_description->text().isEmpty();
 
-    // m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
-    //                          (hastitle && hasdesc));
+    m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
+                              (hastitle && hasdesc));
 }
 
 void CustomEdit::addClicked(void)
@@ -592,7 +592,7 @@ void CustomEdit::storeClicked(void)
         }
     }
     clauseChanged();
-    // m_storeButton->setFocus();
+    m_storeButton->setFocus();
 }
 
 void CustomEdit::cancelClicked(void)
