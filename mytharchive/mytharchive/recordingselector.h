@@ -10,7 +10,8 @@
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-#include "programinfo.h"
+
+class ProgramInfo;
 
 class RecordingSelector : public MythThemedDialog
 {

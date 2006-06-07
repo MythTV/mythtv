@@ -10,7 +10,6 @@
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-#include "programinfo.h"
 
 typedef struct
 {

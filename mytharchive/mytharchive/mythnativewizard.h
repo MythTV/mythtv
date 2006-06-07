@@ -4,7 +4,7 @@
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-#include "programinfo.h"
+#include <mythtv/libmythtv/programinfo.h>
 
 #include "mytharchivewizard.h"
 

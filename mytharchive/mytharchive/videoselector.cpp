@@ -19,6 +19,7 @@ using namespace std;
 // mythtv
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
+#include <mythtv/mythdbcon.h>
 
 // mytharchive
 #include "videoselector.h"

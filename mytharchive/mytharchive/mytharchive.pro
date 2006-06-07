@@ -1,10 +1,7 @@
 include ( ../mythconfig.mak )
 include ( ../settings.pro )
 
-TEMP = $${SRC_PATH}
-TEMP ~= s/'//
-
-INCLUDEPATH += $${TEMP}/libs/libmythtv $${TEMP}/libs/libmyth
+INCLUDEPATH += $${PREFIX}/include/mythtv
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread

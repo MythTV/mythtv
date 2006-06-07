@@ -9,16 +9,14 @@ using namespace std;
 #include <qdir.h>
 
 // MythTV headers
-#include "RingBuffer.h"
-#include "NuppelVideoPlayer.h"
-#include "mythcontext.h"
-#include "programinfo.h"
-#include "util.h"
-#include "mythcontext.h"
-#include "exitcodes.h"
-#include "mythdbcon.h"
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
+#include <mythtv/mythcontext.h>
+#include <mythtv/util.h>
+#include <mythtv/mythcontext.h>
+#include <mythtv/exitcodes.h>
+#include <mythtv/mythdbcon.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libmythtv/programinfo.h>
 
 // mytharchive headers
 #include "../mytharchive/mytharchivewizard.h"

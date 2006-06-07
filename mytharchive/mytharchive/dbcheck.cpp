@@ -5,8 +5,8 @@
 #include <qdir.h>
 
 // myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 // mytharchive
 #include "dbcheck.h"

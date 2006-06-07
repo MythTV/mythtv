@@ -12,7 +12,7 @@
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
-#include <remoteutil.h>
+#include <mythtv/libmythtv/remoteutil.h>
 
 // mytharchive
 #include "mytharchivewizard.h"

@@ -3,7 +3,6 @@
 
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
-#include "programinfo.h"
 
 class AdvancedOptions : public MythThemedDialog
 {
