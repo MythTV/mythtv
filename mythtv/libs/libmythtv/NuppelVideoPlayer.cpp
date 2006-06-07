@@ -1629,8 +1629,8 @@ void NuppelVideoPlayer::AVSync(void)
         {
             // If we are using hardware decoding, so we've already done the
             // decoding; display the frame, but don't wait for A/V Sync.
-            videoOutput->PrepareFrame(buffer, ps);
-            videoOutput->Show(m_scan);
+            videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
+            videoOutput->Show(kScan_Intr2ndField);
             VERBOSE(VB_PLAYBACK, LOC + dbg + "skipping A/V wait.");
         }
         else
@@ -1688,14 +1688,14 @@ void NuppelVideoPlayer::AVSync(void)
 
     if (diverge > MAXDIVERGE)
     {
-        // If audio is way ahead of video, adjust for it...
+        // If audio is way behind of video, adjust for it...
         // by cutting the frame rate in half for the length of this frame
 
         avsync_adjustment = frame_interval;
         lastsync = true;
         VERBOSE(VB_PLAYBACK, LOC + 
-                QString("Audio is %1 frames ahead of video,\n"
-                        "\t\t\tdoubling video frame interval.").arg(diverge));
+                QString("Video is %1 frames ahead of audio,\n"
+                        "\t\t\tdoubling video frame interval to slow down.").arg(diverge));
     }
 
     if (audioOutput && normal_speed)
@@ -1814,11 +1814,8 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
     videosync->Start();
 }
 
-void NuppelVideoPlayer::DisplayNormalFrame(void)
+bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
 {
-    video_actually_paused = false;
-    resetvideo = false;
-
     prebuffering_lock.lock();
     if (prebuffering)
     {
@@ -1846,14 +1843,29 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         }
         prebuffering_lock.unlock();
         videosync->Start();
-        return;
+
+        return false;
     }
     prebuffering_lock.unlock();
 
     //VERBOSE(VB_PLAYBACK, LOC + "fs: " + videoOutput->GetFrameStatus());
     if (!videoOutput->EnoughPrebufferedFrames())
     {
-        VERBOSE(VB_GENERAL, LOC + "prebuffering pause");
+        if (videoOutput)
+        {
+            videoOutput->CheckFrameStates();
+            if (videoOutput->hasMCAcceleration()   ||
+                videoOutput->hasIDCTAcceleration() ||
+                videoOutput->hasVLDAcceleration())
+            {
+                // Prebuffering fails w/XvMC's 8 surfaces..
+                usleep(5000);
+                return false;
+            }
+        }
+        VERBOSE(VB_GENERAL, LOC + "prebuffering pause" +
+                videoOutput->GetFrameStatus());
+
         SetPrebuffering(true);
 #if FAST_RESTART
         if (!m_playing_slower && audio_channels <= 2)
@@ -1864,7 +1876,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             VERBOSE(VB_GENERAL, "playing slower due to falling behind...");
         }
 #endif
-        return;
+        return false;
     }
 
 #if FAST_RESTART
@@ -1879,6 +1891,25 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     prebuffering_lock.lock();
     prebuffer_tries = 0;
     prebuffering_lock.unlock();
+
+    return true;
+}
+
+void NuppelVideoPlayer::DisplayNormalFrame(void)
+{
+    video_actually_paused = false;
+    resetvideo = false;
+
+    if (!PrebufferEnoughFrames())
+    {
+        // When going to switch channels
+        if (paused)
+        {
+            usleep(frame_interval);
+            DisplayPauseFrame();
+        }
+        return;
+    }
 
     videoOutput->StartDisplayingFrame();
 
@@ -3262,7 +3293,10 @@ bool NuppelVideoPlayer::DoFastForward(void)
     GetDecoder()->DoFastForward(desiredFrame);
     GetDecoder()->setExactSeeks(exactseeks);
 
-    ClearAfterSeek();
+    // Note: The video output will be reset by what the the decoder 
+    //       does, so we only need to reset the audio, subtitles, etc.
+    ClearAfterSeek(false);
+
     lastSkipTime = time(NULL);
     return true;
 }
@@ -3307,19 +3341,24 @@ bool NuppelVideoPlayer::IsSkipTooCloseToEnd(int frames) const
 }
 #endif
 
-/** \fn NuppelVideoPlayer::ClearAfterSeek(void)
+/** \fn NuppelVideoPlayer::ClearAfterSeek(bool)
  *  \brief This is to support seeking...
  *
  *   This resets the output classes and discards all
  *   frames no longer being used by the decoder class.
  *
  *   Note: caller should not hold any locks
+ *
+ *  \param clearvideobuffers This clears the videooutput buffers as well,
+ *                           this is only safe if no old frames are
+ *                           required to continue decoding.
  */
-void NuppelVideoPlayer::ClearAfterSeek(void)
+void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
+    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek("<<clearvideobuffers<<")");
 
-    videoOutput->ClearAfterSeek();
+    if (clearvideobuffers)
+        videoOutput->ClearAfterSeek();
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].timecode = 0;

@@ -298,6 +298,7 @@ class NuppelVideoPlayer
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
 
+    bool PrebufferEnoughFrames(void);
     void CheckPrebuffering(void);
     bool GetFrameNormal(int onlyvideo);
     bool GetFrameFFREW(void);
@@ -310,7 +311,7 @@ class NuppelVideoPlayer
     bool DoRewind(void);
 
     // Private seeking stuff
-    void ClearAfterSeek(void);
+    void ClearAfterSeek(bool clearvideobuffers = true);
     bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }

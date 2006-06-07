@@ -256,6 +256,8 @@ class VideoOutput
     ///        onto the queue of frames ready for decoding onto.
     virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
 
+    virtual void CheckFrameStates(void) { }
+
     /// \bug not implemented correctly. vpos is not updated.
     VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }
 

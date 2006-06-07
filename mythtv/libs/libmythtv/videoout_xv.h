@@ -80,6 +80,8 @@ class VideoOutputXv : public VideoOutput
     virtual bool hasVLDAcceleration(void) const
         { return XVideoVLD == VideoOutputSubType(); }
 
+    void CheckFrameStates(void);
+
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
                                              uint stream_type, int xvmc_chroma,
@@ -141,7 +143,7 @@ class VideoOutputXv : public VideoOutput
     static bool IsRendering(VideoFrame* frame);
     static void SyncSurface(VideoFrame* frame, int past_future = 0);
     static void FlushSurface(VideoFrame* frame);
-    void CheckDisplayedFramesForAvailability(void);
+
 #ifdef USING_XVMC 
     XvMCOSD* GetAvailableOSD();
     void ReturnAvailableOSD(XvMCOSD*);

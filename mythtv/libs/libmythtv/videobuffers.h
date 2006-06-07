@@ -40,6 +40,7 @@ enum BufferType
     kVideoBuffer_used      = 0x00000004,
     kVideoBuffer_pause     = 0x00000008,
     kVideoBuffer_displayed = 0x00000010,
+    kVideoBuffer_decode    = 0x00000020,
     kVideoBuffer_all       = 0x0000001F,
 };
 

@@ -1089,6 +1089,9 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     bool use_xv = true, use_shm = true;
 
     QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+    if (dec != "libmpeg2" && height < 720 && 
+        gContext->GetNumSetting("UseXvMCForHDOnly", 0))
+        dec = "ffmpeg";
     if (dec == "xvmc")
         use_xvmc_idct = use_xvmc = true;
     else if (dec == "xvmc-vld")
@@ -1335,39 +1338,38 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     if (attributes)
         X11S(XFree(attributes));
 
-    if (xv_draw_colorkey)
+    if (!xv_draw_colorkey)
+        return;
+
+    QString msg = LOC + "Chromakeying not possible with this XVideo port.";
+    X11S(xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False));
+    if (xv_atom == None)
     {
-        X11S(xv_atom = XInternAtom(XJ_disp, "XV_COLORKEY", False));
-        if (xv_atom != None)
+        VERBOSE(VB_PLAYBACK, msg);
+        xv_colorkey = 0;
+        return;
+    }
+
+    X11S(ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, &xv_colorkey));
+    if (ret == Success && xv_colorkey == 0)
+    {
+        const int default_colorkey = 1;
+        X11S(ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
+                                      default_colorkey));
+        if (ret == Success)
         {
-            X11S(ret = XvGetPortAttribute(XJ_disp, xv_port, xv_atom, 
-                                          &xv_colorkey));
-
-            if (ret == Success && xv_colorkey == 0)
-            {
-                const int default_colorkey = 1;
-                X11S(ret = XvSetPortAttribute(XJ_disp, xv_port, xv_atom,
-                                              default_colorkey));
-                if (ret == Success)
-                {
-                    VERBOSE(VB_PLAYBACK, LOC +
-                            "0,0,0 is the only bad color key for MythTV, "
-                            "using "<<default_colorkey<<" instead.");
-                    xv_colorkey = default_colorkey;
-                }
-                ret = Success;
-            }
-
-            if (ret != Success)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Couldn't get the color key color,"
-                        "\n\t\t\tprobably due to a driver bug or limitation."
-                        "\n\t\t\tYou might not get any video, "
-                        "but we'll try anyway.");
-                xv_colorkey = 0;
-            }
+            VERBOSE(VB_PLAYBACK, LOC +
+                    "0,0,0 is the only bad color key for MythTV, "
+                    "using "<<default_colorkey<<" instead.");
+            xv_colorkey = default_colorkey;
         }
+        ret = Success;
+    }
+
+    if (ret != Success)
+    {
+        VERBOSE(VB_PLAYBACK, msg);
+        xv_colorkey = 0;
     }
 }
 
@@ -1955,86 +1957,75 @@ void VideoOutputXv::ClearAfterSeek(void)
     } while (0)
 
 void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
-{ 
+{
+    VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
     if (VideoOutputSubType() <= XVideo)
     {
         vbuffers.DiscardFrames(next_frame_keyframe);
+        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
+                .arg(vbuffers.GetStatus()));
         return;
     }
 
 #ifdef USING_XVMC
     frame_queue_t::iterator it;
     frame_queue_t syncs;
-    frame_queue_t ula;
-    frame_queue_t discards;
 
+    // Print some debugging
+    vbuffers.begin_lock(kVideoBuffer_displayed); // Lock X
+    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 1: %1")
+            .arg(vbuffers.GetStatus()));
+    vbuffers.end_lock(); // Lock X
+
+    // Finish rendering all these surfaces and move them
+    // from the used queue to the displayed queue.
+    // This allows us to reuse these surfaces, if they
+    // get moved to the used list in CheckFrameStates().
+    // This will only happen if avlib isn't using them
+    // either and they are not currently being displayed.
+    vbuffers.begin_lock(kVideoBuffer_displayed); // Lock Y
+    DQ_COPY(syncs, kVideoBuffer_used);
+    for (it = syncs.begin(); it != syncs.end(); ++it)
     {
-        vbuffers.begin_lock(kVideoBuffer_displayed); // Lock X
-        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 1: %1")
-                .arg(vbuffers.GetStatus()));
-        vbuffers.end_lock(); // Lock X
+        SyncSurface(*it, -1); // sync past
+        SyncSurface(*it, +1); // sync future
+        SyncSurface(*it,  0); // sync current
+        vbuffers.safeEnqueue(kVideoBuffer_displayed, *it);
     }
+    syncs.clear();
+    vbuffers.end_lock(); // Lock Y
 
-    CheckDisplayedFramesForAvailability();
+    CheckFrameStates();
 
-    {
-        vbuffers.begin_lock(kVideoBuffer_displayed); // Lock Y
-
-        DQ_COPY(syncs, kVideoBuffer_displayed);
-        DQ_COPY(syncs, kVideoBuffer_pause);
-        for (it = syncs.begin(); it != syncs.end(); ++it)
-        {
-            SyncSurface(*it, -1); // sync past
-            SyncSurface(*it, +1); // sync future
-            SyncSurface(*it,  0); // sync current
-            //GetRender(*it)->p_past_surface   = NULL;
-            //GetRender(*it)->p_future_surface = NULL;
-        }
-        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 2: %1")
-                .arg(vbuffers.GetStatus()));
-#if 0
-        // Remove inheritence of all frames not in displayed or pause
-        DQ_COPY(ula, kVideoBuffer_used);
-        DQ_COPY(ula, kVideoBuffer_limbo);
-        DQ_COPY(ula, kVideoBuffer_avail);
-        
-        for (it = ula.begin(); it != ula.end(); ++it)
-            vbuffers.RemoveInheritence(*it);
-#endif
-
-        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1")
-                .arg(vbuffers.GetStatus()));
-        // create discard frame list
-        DQ_COPY(discards, kVideoBuffer_used);
-        DQ_COPY(discards, kVideoBuffer_limbo);
-
-        vbuffers.end_lock(); // Lock Y
-    }
-
-    for (it = discards.begin(); it != discards.end(); ++it)
-        DiscardFrame(*it);
-
+    // If the next frame is a keyframe we can clear out a lot more...
+    if (next_frame_keyframe)
     {
         vbuffers.begin_lock(kVideoBuffer_displayed); // Lock Z
 
-        syncs.clear();
-        DQ_COPY(syncs, kVideoBuffer_displayed);
-        DQ_COPY(syncs, kVideoBuffer_pause);
+        // Move all the limbo and pause frames to displayed
+        DQ_COPY(syncs, kVideoBuffer_limbo);
         for (it = syncs.begin(); it != syncs.end(); ++it)
         {
             SyncSurface(*it, -1); // sync past
             SyncSurface(*it, +1); // sync future
             SyncSurface(*it,  0); // sync current
-            //GetRender(*it)->p_past_surface   = NULL;
-            //GetRender(*it)->p_future_surface = NULL;
+            vbuffers.safeEnqueue(kVideoBuffer_displayed, *it);
         }
 
-        VERBOSE(VB_PLAYBACK, LOC +
-                QString("DiscardFrames() 4: %1 -- done() ")
+        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 2: %1")
                 .arg(vbuffers.GetStatus()));
-        
+
         vbuffers.end_lock(); // Lock Z
+
+        // Now call CheckFrameStates() to remove inheritence and
+        // move the surfaces to the used list if possible (i.e.
+        // if avlib is not using them and they are not currently
+        // being displayed on screen).
+        CheckFrameStates();
     }
+    VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
+            .arg(vbuffers.GetStatus()));
+        
 #endif // USING_XVMC
 }
 
@@ -2071,7 +2062,7 @@ void VideoOutputXv::DoneDisplayingFrame(void)
         if (osdframe)
             DiscardFrame(osdframe);
     }
-    CheckDisplayedFramesForAvailability();
+    CheckFrameStates();
 #endif
 }
 
@@ -2411,7 +2402,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
             DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
     }
     // clear any displayed frames not on screen
-    CheckDisplayedFramesForAvailability();
+    CheckFrameStates();
 
     // unlock the frame[s]
     vbuffers.UnlockFrame(osdframe, "ShowXvMC -- OSD");
@@ -2659,7 +2650,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
                     .arg(vbuffers.size(kVideoBuffer_pause)));
             while (vbuffers.size(kVideoBuffer_pause))
                 DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
-            CheckDisplayedFramesForAvailability();
+            CheckFrameStates();
         } else if (1 == vbuffers.size(kVideoBuffer_pause))
         {
             VideoFrame *frame = vbuffers.dequeue(kVideoBuffer_used);
@@ -2791,7 +2782,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
             // If there are no available buffer, try to toss old
             // displayed frames.
             if (!vbuffers.size(kVideoBuffer_avail))
-                CheckDisplayedFramesForAvailability();
+                CheckFrameStates();
 
             // If tossing doesn't work try hiding showing frames,
             // then tossing displayed frames.
@@ -2805,7 +2796,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
                                              GetRender(*it)->p_surface));
                 vbuffers.end_lock();
 
-                CheckDisplayedFramesForAvailability();
+                CheckFrameStates();
             }
 
             // If there is an available buffer grab it.
@@ -3013,7 +3004,7 @@ int VideoOutputXv::ChangePictureAttribute(int attribute, int newValue)
     return -1;
 }
 
-void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
+void VideoOutputXv::CheckFrameStates(void)
 {
 #ifdef USING_XVMC
     frame_queue_t::iterator it;
@@ -3083,6 +3074,13 @@ void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
                                     "as available.").arg(DebugString(*cit)));
                     }
                 }
+            }
+            else if (vbuffers.contains(kVideoBuffer_decode, pframe))
+            {
+                VERBOSE(VB_PLAYBACK, LOC + QString(
+                            "Frame %1 is in use by avlib and so is "
+                            "being held for later discarding.")
+                        .arg(DebugString(pframe, true)));
             }
             else
             {
