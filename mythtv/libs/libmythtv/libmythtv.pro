@@ -425,3 +425,9 @@ using_backend {
 
     DEFINES += USING_BACKEND
 }
+
+# install headers required by mytharchive
+inc.path = $${PREFIX}/include/mythtv/libmythtv/
+inc.files = programinfo.h remoteutil.h recordingtypes.h
+
+INSTALLS += inc
