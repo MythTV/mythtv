@@ -2024,6 +2024,14 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     while (text);
 
     int numoptions = options.size();
+
+    if (availoptions < numoptions)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Theme allows %1 options, "
+        "menu contains %2 options").arg(availoptions).arg(numoptions));
+        return;
+    }
+
     int offset = availoptions - numoptions;
     initial_selection = max(min(numoptions - 1, initial_selection), 0);
 
