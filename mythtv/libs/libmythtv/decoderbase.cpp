@@ -44,7 +44,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     ResetTracks();
     tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0));
     tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1));
-    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 1, 2));
+    tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3));
 
     if (pginfo)
         m_playbackinfo = new ProgramInfo(*pginfo);
@@ -773,12 +773,16 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 
     QString type_msg = track_type_to_string(type);
     int lang = tracks[type][trackNo].language;
+    int hnum = trackNo + 1;
+    if (kTrackTypeCC608 == type)
+        hnum = tracks[type][trackNo].stream_id;
+
     if (!lang)
-        return type_msg + QString("-%1").arg(trackNo + 1);
+        return type_msg + QString("-%1").arg(hnum);
     else
     {
         QString lang_msg = iso639_key_toName(lang);
-        return type_msg + QString(" %1: %2").arg(trackNo + 1).arg(lang_msg);
+        return type_msg + QString(" %1: %2").arg(hnum).arg(lang_msg);
     }
 }
 

@@ -1046,7 +1046,7 @@ void default_captions(sinfo_vec_t *tracks, int av_index)
     if (tracks[kTrackTypeCC608].empty())
     {
         tracks[kTrackTypeCC608].push_back(StreamInfo(av_index, 0, 0, 1));
-        tracks[kTrackTypeCC608].push_back(StreamInfo(av_index, 0, 1, 2));
+        tracks[kTrackTypeCC608].push_back(StreamInfo(av_index, 0, 2, 3));
     }
 }
 

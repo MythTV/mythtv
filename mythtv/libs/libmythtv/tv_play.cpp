@@ -141,8 +141,12 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SELECTSUBTITLE_1","Display subtitle 2",  "");
     REG_KEY("TV Playback", "SELECTCC608_0", "Display VBI CC1",       "");
     REG_KEY("TV Playback", "SELECTCC608_1", "Display VBI CC2",       "");
+    REG_KEY("TV Playback", "SELECTCC608_2", "Display VBI CC3",       "");
+    REG_KEY("TV Playback", "SELECTCC608_3", "Display VBI CC4",       "");
     REG_KEY("TV Playback", "SELECTCC708_0", "Display ATSC CC1",      "");
     REG_KEY("TV Playback", "SELECTCC708_1", "Display ATSC CC2",      "");
+    REG_KEY("TV Playback", "SELECTCC708_2", "Display ATSC CC3",      "");
+    REG_KEY("TV Playback", "SELECTCC708_3", "Display ATSC CC4",      "");
 
     REG_KEY("TV Playback", "NEXTAUDIO",    "Next audio track",         "+");
     REG_KEY("TV Playback", "PREVAUDIO",    "Previous audio track",     "-");

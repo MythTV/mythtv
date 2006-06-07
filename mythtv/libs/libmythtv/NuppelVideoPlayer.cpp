@@ -5632,7 +5632,9 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
         if (decoder)
         {
             int sid = decoder->GetTrackInfo(type, trackNo).stream_id;
-            ccmode = (sid == 1) ? CC_CC1 : CC_CC2;
+            ccmode = (sid <= 2) ?
+                ((sid == 1) ? CC_CC1 : CC_CC2) :
+                ((sid == 3) ? CC_CC3 : CC_CC4);
         }
         DisableCaptions(textDisplayMode, false);
         EnableCaptions(kDisplayCC608);
