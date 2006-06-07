@@ -193,7 +193,7 @@ void HttpWorkerThread::StartWork( int nSocket )
 void  HttpWorkerThread::ProcessWork()
 {
     VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:Begin( %1 ) socket=%2" )
-                                    .arg( QThread::currentThread() )
+                                    .arg( (long)QThread::currentThread() )
                                     .arg( m_nSocket ));
 
     bool                    bTimeout   = false;
@@ -294,7 +294,7 @@ void  HttpWorkerThread::ProcessWork()
     m_nSocket = 0;
 
     VERBOSE( VB_UPNP, QString( "HttpWorkerThread::ProcessWork:End( %1 )")
-                                    .arg( QThread::currentThread() ));
+                                    .arg( (long)QThread::currentThread() ));
 }
 
 

@@ -55,3 +55,11 @@ inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 
 INSTALLS += inc
 
+macx {
+    HEADERS += darwin-sendfile.h
+    SOURCES += darwin-sendfile.c
+
+    # This lib depends on libmythtv which depends on some stuff in libmythui.
+    LIBS += -L../libmythui -lmythui-$$LIBVERSION
+    #QMAKE_LFLAGS_SHLIB += -flat_namespace -undefined warning
+}
