@@ -19,9 +19,7 @@
 
 #include "mythconfig.h"
 #ifdef CONFIG_DARWIN
-extern "C" {
 #include "darwin-sendfile.h"
-}
 #else
 #include <sys/sendfile.h>
 #endif
@@ -32,6 +30,10 @@ extern "C" {
 
 #include "mythcontext.h"
 #include "upnp.h"
+
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
 
 static MIMETypes g_MIMETypes[] = 
 {
@@ -278,7 +280,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
         __off64_t offset = llStart;
-        int       file   = open( sFileName.ascii(), O_RDONLY );
+        int       file   = open( sFileName.ascii(), O_RDONLY | O_LARGEFILE );
         sendfile64( getSocketHandle(), file, &offset, llSize );
 
         close( file );
