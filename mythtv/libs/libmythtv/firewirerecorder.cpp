@@ -94,11 +94,14 @@ bool FirewireRecorder::Open(void)
      }
      else
      {
-         VERBOSE(VB_RECORD, LOC + "Creating Broadcast Connection" +
-                 QString("with Node: %1").arg(fwnode));
+         fwchannel = kBroadcastChannel - fwnode;
+
+         VERBOSE(VB_RECORD, LOC + "Creating Broadcast Connection " +
+                 QString("with Node: %1, Channel: %2").arg(fwnode)
+                 .arg(fwchannel));
          if (iec61883_cmp_create_bcast_output(fwhandle,
                                               fwnode | 0xffc0, 0,
-                                              kBroadcastChannel,
+                                              fwchannel,
                                               fwspeed) != 0)
          {
              VERBOSE(VB_IMPORTANT, LOC + "Failed to create connection");
@@ -106,7 +109,6 @@ bool FirewireRecorder::Open(void)
              raw1394_destroy_handle(fwhandle);
              return false;
          }
-         fwchannel   = kBroadcastChannel;
          fwbandwidth = 0;
      }
 
