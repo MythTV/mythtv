@@ -16,7 +16,15 @@
 #include <qurl.h>
 #include <qfile.h>
 #include <qfileinfo.h>
+
+#include "mythconfig.h"
+#ifdef CONFIG_DARWIN
+extern "C" {
+#include "darwin-sendfile.h"
+}
+#else
 #include <sys/sendfile.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -270,7 +278,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
         __off64_t offset = llStart;
-        int       file   = open( sFileName.ascii(), O_RDONLY | O_LARGEFILE );
+        int       file   = open( sFileName.ascii(), O_RDONLY );
         sendfile64( getSocketHandle(), file, &offset, llSize );
 
         close( file );
