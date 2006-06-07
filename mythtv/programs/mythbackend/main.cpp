@@ -610,44 +610,35 @@ int main(int argc, char **argv)
     else
         jobqueue = new JobQueue(ismaster);
 
-    // ----------------------------------------------------------------------
     // Initialize & Start the Mini HttpServer
-    // ----------------------------------------------------------------------
+    VERBOSE(VB_IMPORTANT, "Main::Starting HttpServer");
 
-    VERBOSE( VB_IMPORTANT, QString( "Main::Starting HttpServer" ));
-
-    g_pHttpServer = new HttpServer( statusport );
+    g_pHttpServer = new HttpServer(statusport);
 
     if (!g_pHttpServer->ok())
     { 
-        VERBOSE( VB_IMPORTANT, QString( "Main::HttpServer Create Error" ));
+        VERBOSE(VB_IMPORTANT, "Main::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);
     }
 
-    VERBOSE( VB_IMPORTANT, QString( "Main::Registering HttpStatus Extension" ));
+    VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
 
-    g_pHttpServer->RegisterExtension( new HttpStatus( &tvList, sched, ismaster ) );
+    g_pHttpServer->RegisterExtension(new HttpStatus(&tvList, sched, ismaster));
 
-    // ----------------------------------------------------------------------
     // Start UPnP Services For Master Backends Only
-    // ----------------------------------------------------------------------
-
     if (ismaster)
     {
-        g_pUPnp = new UPnp( ismaster, g_pHttpServer );
+        g_pUPnp = new UPnp(ismaster, g_pHttpServer);
 
-        VERBOSE( VB_UPNP, QString( "Main::Registering UPnpCDSTv Extension" ));
+        VERBOSE(VB_UPNP, "Main::Registering UPnpCDSTv Extension");
 
-        g_pUPnp->RegisterExtension( new UPnpCDSTv   ( ));
+        g_pUPnp->RegisterExtension(new UPnpCDSTv());
 
-        VERBOSE( VB_UPNP, QString( "Main::Registering UPnpCDSMusic Extension" ));
+        VERBOSE(VB_UPNP, "Main::Registering UPnpCDSMusic Extension");
 
-        g_pUPnp->RegisterExtension( new UPnpCDSMusic( ));
+        g_pUPnp->RegisterExtension(new UPnpCDSMusic());
     }
-
-    // ----------------------------------------------------------------------
     // End uPnP &  Mini HttpServer Initialization
-    // ----------------------------------------------------------------------
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
