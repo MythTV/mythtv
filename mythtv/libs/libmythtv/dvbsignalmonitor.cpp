@@ -380,59 +380,38 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
  */
 void DVBSignalMonitor::RunTableMonitorSR(void)
 {
-    int remainder   = 0;
     int buffer_size = 4192;  // maximum size of Section we handle
-    int header_size = 5;     // TSPacket::HEADER_SIZE + 1 for data pointer
-    unsigned char *buffer = new unsigned char[header_size + buffer_size];
+    unsigned char *buffer = new unsigned char[buffer_size];
     if (!buffer)
         return;
-
-    // "Constant" parts of stream header
-    buffer[0] = SYNC_BYTE;
-    buffer[3] = 0x10;   // Adaptation = 01 Scrambled = 00
-    buffer[4] = 0x00;   // Pointer to data in buffer
 
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " +
             QString("begin (# of pids %1)")
             .arg(GetStreamData()->ListeningPIDs().size()));
 
-    int len = 0;
     while (dtvMonitorRunning && GetStreamData())
     {
         UpdateFiltersFromStreamData();
 
         bool readSomething = false;
-        FilterMap::iterator fit = filters.begin();
+        FilterMap::const_iterator fit = filters.begin();
         for (; fit != filters.end(); ++fit)
         {
-            int mux_fd = fit.data();
-            len = read(mux_fd, &(buffer[header_size]),
-                       buffer_size - header_size);
-
+            int len = read(fit.data() /* mux_fd */, &buffer, buffer_size);
             if (len <= 0)
                 continue;
 
             readSomething = true;
-            // set pid and section start flag
-            // then pad buffer to next 188 byte boundary
-            buffer[1] = ( fit.key() >> 8 ) | 0x40;
-            buffer[2] = ( fit.key() & 0xff );
-            int pktEnd = ((len + 188 + header_size) / 188) * 188 ; 
-            memset(&buffer[header_size + len], 0xFF, pktEnd - len);
 
-            remainder = GetStreamData()->ProcessData(buffer, pktEnd);
-            if (remainder > 0)
-            {
-                // only happens on fragmented packet reads
-                VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " +
-                        QString("unhandled data (# bytes: %1)")
-                        .arg(remainder));
-            }
+            const PESPacket pes = PESPacket::ViewData(buffer);
+            const PSIPTable psip(pes);
+
+            if (psip.SectionSyntaxIndicator())
+                GetStreamData()->HandleTables(fit.key() /* pid */, psip);
         }
+
         if (!readSomething)
-        {
-            usleep(300);   // feed is slower than TS stream
-        }
+            usleep(3000);
     }
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "shutdown");
 
