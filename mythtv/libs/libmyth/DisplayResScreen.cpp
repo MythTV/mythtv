@@ -51,8 +51,8 @@ void DisplayResScreen::SetAspectRatio(double a)
 {
     if (a>0.0)
         aspect = a;
-    else if (Height())
-        aspect = ((double)(Width())) / ((double)(Height()));
+    else if (Height_mm())
+        aspect = ((double)(Width_mm())) / ((double)(Height_mm()));
 }
 
 QString DisplayResScreen::toString() const

@@ -26,8 +26,8 @@ class DisplayResScreen
     // Gets
     int Width() const { return width; }
     int Height() const { return height; }
-    int Width_mm() const { return width; }
-    int Height_mm() const { return height; }
+    int Width_mm() const { return width_mm; }
+    int Height_mm() const { return height_mm; }
     inline double AspectRatio() const;
     inline short RefreshRate() const;
     const vector<short>& RefreshRates() const { return refreshRates; }

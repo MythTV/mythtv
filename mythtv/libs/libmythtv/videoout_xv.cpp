@@ -426,10 +426,6 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
         display_dim.setWidth((int) round(300 * pixel_aspect));
     }
 
-    // If we are using XRandR, use the aspect ratio from it instead...
-    if (display_res)
-        display_aspect = display_res->GetAspectRatio();
-
     // If we are using Xinerama the display dimensions can not be trusted.
     // We need to use the Xinerama monitor aspect ratio from the DB to set
     // the physical screen width. This assumes the height is correct, which
@@ -458,6 +454,10 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     // Now that we know the physical monitor size, we can
     // calculate the display aspect ratio pretty simply...
     display_aspect = ((float)display_dim.width()) / display_dim.height();
+
+    // If we are using XRandR, use the aspect ratio from it instead...
+    if (display_res)
+        display_aspect = display_res->GetAspectRatio();
 
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
