@@ -2989,18 +2989,15 @@ void TV::processNetworkControlCommand(QString command)
 
             switch (speed_index)
             {
-                case  5: speedStr = "16x"; break;
-                case  4: speedStr = "8x";  break;
-                case  3: speedStr = "4x";  break;
+                case  4: speedStr = "16x"; break;
+                case  3: speedStr = "8x";  break;
                 case  2: speedStr = "3x";  break;
                 case  1: speedStr = "2x";  break;
                 case  0: speedStr = "1x";  break;
-                case -1: speedStr = "1/2x"; break;
-                case -2: speedStr = "1/3x"; break;
-                case -3: speedStr = "1/4x"; break;
-                case -4: speedStr = "1/8x"; break;
-                case -5: speedStr = "1/16x"; break;
-                case -6: speedStr = "0x"; break;
+                case -1: speedStr = "1/3x"; break;
+                case -2: speedStr = "1/8x"; break;
+                case -3: speedStr = "1/16x"; break;
+                case -4: speedStr = "0x"; break;
                 default: speedStr = "1x"; break;
             }
 
@@ -3420,7 +3417,7 @@ void TV::ChangeSpeed(int direction)
     int old_speed = speed_index;
 
     if (paused)
-        speed_index = -6;
+        speed_index = -4;
 
     speed_index += direction;
 
@@ -3430,18 +3427,15 @@ void TV::ChangeSpeed(int direction)
 
     switch (speed_index)
     {
-        case  5: speed = 16.0;     mesg = QString(tr("Speed 16X"));   break;
-        case  4: speed = 8.0;      mesg = QString(tr("Speed 8X"));    break;
-        case  3: speed = 4.0;      mesg = QString(tr("Speed 4X"));    break;
+        case  4: speed = 16.0;     mesg = QString(tr("Speed 16X"));    break;
+        case  3: speed = 8.0;      mesg = QString(tr("Speed 8X"));    break;
         case  2: speed = 3.0;      mesg = QString(tr("Speed 3X"));    break;
         case  1: speed = 2.0;      mesg = QString(tr("Speed 2X"));    break;
         case  0: speed = 1.0;      mesg = PlayMesg();                 break;
-        case -1: speed = 1.0 / 2;  mesg = QString(tr("Speed 1/2X"));  break;
-        case -2: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
-        case -3: speed = 1.0 / 4;  mesg = QString(tr("Speed 1/4X"));  break;
-        case -4: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
-        case -5: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
-        case -6: DoPause(); return; break;
+        case -1: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
+        case -2: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
+        case -3: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
+        case -4: DoPause(); return; break;
         default: speed_index = old_speed; return; break;
     }
 
