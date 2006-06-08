@@ -3,7 +3,7 @@
 * Use DirectFB for video output while watvhing TV
 * Most of this is ripped from videoout_* and mplayer's vo_directfb */
 
-#include <algortihm>
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
@@ -18,6 +18,7 @@ using namespace std;
 #include <fcntl.h>
 #include <unistd.h>
 #include <directfb_version.h>
+#include "tv.h"
 
 #define DFBCHECKFAIL(dfbcommand, returnstmt...)\
 {\
