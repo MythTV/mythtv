@@ -108,15 +108,15 @@ public:
     };
 };
 
-class Rank: public SpinBoxSetting, public CSetting {
+class Priority: public SpinBoxSetting, public CSetting {
 public:
-    Rank(const ChannelID& id):
-        SpinBoxSetting(-99,99,1), CSetting(id, "rank") {
-        setLabel(QObject::tr("Rank"));
+    Priority(const ChannelID& id):
+        SpinBoxSetting(-99,99,1), CSetting(id, "recpriority") {
+        setLabel(QObject::tr("Priority"));
         setHelpText(
-            QObject::tr("Number of bonus points to be added to any "
+            QObject::tr("Number of priority points to be added to any "
                         "recording on this channel during scheduling.")+" "+
-            QObject::tr("Use a positive number as the rank if you "
+            QObject::tr("Use a positive number as the priority if you "
                         "want this to be a preferred channel, a "
                         "negative one to deprecate this channel."));
     };
@@ -292,7 +292,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id) :
     VerticalConfigurationGroup* right = new VerticalConfigurationGroup(false, true);
     right->addChild(source = new Source(id));
     right->addChild(new ChannelTVFormat(id));
-    right->addChild(new Rank(id));
+    right->addChild(new Priority(id));
     group1->addChild(right);
 
     addChild(group1);
