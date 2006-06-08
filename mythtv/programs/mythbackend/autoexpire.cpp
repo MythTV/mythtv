@@ -418,8 +418,12 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
         if (CheckFile(*it, record_file_prefix, fsid))
         {
             // Print informative message 
-            msg = QString("Expiring \"%1\" from %2, %3 MBytes")
-                .arg((*it)->title).arg((*it)->startts.toString())
+            QString titlestr = (*it)->title;
+            if (!(*it)->subtitle.isEmpty())
+                titlestr += " \"" + (*it)->subtitle + "\"";
+            msg = QString("Expiring %1 from %2, %3 MBytes")
+                .arg(titlestr)
+                .arg((*it)->startts.toString())
                 .arg((int)((*it)->filesize/1024/1024));
 
             if (deleteAll)
