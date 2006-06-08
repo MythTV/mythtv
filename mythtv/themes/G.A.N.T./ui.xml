@@ -1693,7 +1693,8 @@
         <columnpadding>10</columnpadding>
         <column number="1" width="160" context="-1"></column>
         <column number="2" width="120" context="-1"></column>
-        <column number="3" width="420" context="-1"></column>
+        <column number="3" width="400" context="-1"></column>
+        <column number="4" width="20" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="760,20"></image>

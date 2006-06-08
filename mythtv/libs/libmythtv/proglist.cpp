@@ -1666,6 +1666,7 @@ void ProgLister::updateList(QPainter *p)
                 }
 
                 ltype->SetItemText(i, 3, tmptitle);
+                ltype->SetItemText(i, 4, pi->RecStatusChar());
 
                 if (pi->recstatus == rsConflict ||
                     pi->recstatus == rsOffLine)

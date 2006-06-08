@@ -590,6 +590,7 @@ void PreviousList::updateList(QPainter *p)
                 }
 
                 ltype->SetItemText(i, 3, tmptitle);
+                ltype->SetItemText(i, 4, pi->RecStatusChar());
 
                 if (pi->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");
