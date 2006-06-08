@@ -62,6 +62,43 @@ inline  long long  myAbs(long long  n)  { return n >= 0 ? n : -n; }
 /** Number of threads in process request thread pool at startup. */
 #define PRT_STARTUP_THREAD_COUNT 5
 
+namespace {
+
+int deleteFile(QString filename, bool followLinks, bool checkexists)
+{
+    /* Return 0 for success, non-zero for error. */
+    QFile checkFile(filename);
+    int success1, success2;
+
+    VERBOSE(VB_FILE, QString("About to delete file: %1").arg(filename));
+    success1 = true;
+    success2 = true;
+    if (followLinks)
+    {
+        QFileInfo finfo(filename);
+        if (finfo.isSymLink())
+        {
+            QString linktext = finfo.readLink();
+            QFile target(linktext);
+            if (!(success1 = target.remove()))
+            {
+                VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' -> '%2': %3")
+                        .arg(filename).arg(linktext.local8Bit())
+                        .arg(strerror(errno)));
+            }
+        }
+    }
+    if ((!checkexists || checkFile.exists()) &&
+            !(success2 = checkFile.remove()))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error deleting '%1': %2")
+                .arg(filename).arg(strerror(errno)));
+    }
+    return success1 && success2 ? 0 : -1;
+}
+
+};
+
 class ProcessRequestThread : public QThread
 {
   public:
@@ -1334,23 +1371,10 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         tvchain->DeleteProgram(pginfo);
 
     int err;
-    QString filename = ds->filename;
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
 
-    VERBOSE(VB_FILE, QString("About to unlink/delete file: %1").arg(filename));
-    if (followLinks)
-    {
-        QFileInfo finfo(filename);
-        if (finfo.isSymLink() && (err = unlink(finfo.readLink().local8Bit())))
-        {
-            VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' @ '%2', %3")
-                    .arg(filename).arg(finfo.readLink().local8Bit())
-                    .arg(strerror(errno)));
-        }
-    }
-    if ((err = unlink(filename.local8Bit())))
-        VERBOSE(VB_IMPORTANT, QString("Error deleting '%1', %2")
-                .arg(filename).arg(strerror(errno)));
+    /* Delete recording. */
+    err = deleteFile(ds->filename, followLinks, false);
     
     sleep(2);
 
@@ -1373,22 +1397,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         return;
     }
 
-    filename = ds->filename + ".png";
-    if (followLinks)
-    {
-        QFileInfo finfo(filename);
-        if (finfo.isSymLink() && (err = unlink(finfo.readLink().local8Bit())))
-        {
-            VERBOSE(VB_IMPORTANT, QString("Error deleting '%1' @ '%2', %3")
-                    .arg(filename).arg(finfo.readLink().local8Bit())
-                    .arg(strerror(errno)));
-        }
-    }
-
-    checkFile.setName(filename);
-    if (checkFile.exists() && (err = unlink(filename.local8Bit())))
-        VERBOSE(VB_IMPORTANT, QString("Error deleting '%1', %2")
-                .arg(filename).arg(strerror(errno)));
+    /* Delete preview thumbnail. */
+    err = deleteFile(ds->filename + ".png", followLinks, true);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
