@@ -225,13 +225,13 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
     while (socket->waitForMore(5) < 8)
     {
         elapsed = timer.elapsed();
-        if (!quickTimeout && elapsed >= 300000)
+        if (!quickTimeout && elapsed >= 30000)
         {
             VERBOSE(VB_GENERAL, "ReadStringList timeout.");
             socket->close();
             return false;
         }
-        else if (quickTimeout && elapsed >= 20000)
+        else if (quickTimeout && elapsed >= 7000)
         {
             VERBOSE(VB_GENERAL, "ReadStringList timeout (quick).");
             socket->close();
