@@ -484,8 +484,8 @@
         <column number="4" width="20" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+        <image function="downarrow" filename="downarrow.png" location="760,220"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
@@ -676,8 +676,8 @@
         <column number="5" width="20" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+        <image function="downarrow" filename="downarrow.png" location="760,220"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
@@ -806,8 +806,8 @@
         <column number="3" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+        <image function="downarrow" filename="downarrow.png" location="760,290"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
@@ -1005,8 +1005,8 @@
         <column number="6" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+        <image function="downarrow" filename="downarrow.png" location="760,290"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
@@ -1231,8 +1231,8 @@
         <column number="4" width="110" context="1"></column>
         <items>7</items>
         <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+        <image function="downarrow" filename="downarrow.png" location="760,220"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>showings.png</filename>
@@ -1696,8 +1696,8 @@
         <column number="3" width="420" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
-        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
-        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+        <image function="uparrow" filename="uparrow.png" location="760,20"></image>
+        <image function="downarrow" filename="downarrow.png" location="760,290"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
