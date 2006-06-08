@@ -397,7 +397,7 @@ void DVBSignalMonitor::RunTableMonitorSR(void)
         FilterMap::const_iterator fit = filters.begin();
         for (; fit != filters.end(); ++fit)
         {
-            int len = read(fit.data() /* mux_fd */, &buffer, buffer_size);
+            int len = read(fit.data() /* mux_fd */, buffer, buffer_size);
             if (len <= 0)
                 continue;
 
