@@ -159,29 +159,29 @@
   <container name="browse_info">
     <image name="background">
       <filename>osd-browse.png</filename>
-      <position>30,335</position>
+      <position>30,35</position>
     </image>
     <textarea name="title">
-      <area>212,349,290,27</area>
+      <area>212,49,290,27</area>
       <font>infofont</font>
     </textarea>
     <textarea name="description">
       <multiline>yes</multiline>
-      <area>44,399,555,122</area>
+      <area>44,99,555,122</area>
       <font>infofont</font>
       <value>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</value>
     </textarea>
     <image name="channelicon">
-      <position>37,343</position>
+      <position>37,43</position>
       <staticsize>36,36</staticsize>
     </image>
     <textarea name="callsign">
-       <area>78,349,112,27</area>
+       <area>78,49,112,27</area>
        <font>infofont</font>
        <value>%CALLSIGN% - %CHANNUM%</value>
     </textarea>
     <textarea name="time">
-       <area>538,349,60,27</area>
+       <area>538,49,60,27</area>
        <font>infofont</font>
     </textarea>
   </container>
