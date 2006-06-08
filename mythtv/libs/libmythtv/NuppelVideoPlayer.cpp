@@ -3545,6 +3545,10 @@ void NuppelVideoPlayer::SetBookmark(void)
 
     m_playbackinfo->SetBookmark(framesPlayed);
     osd->SetSettingsText(QObject::tr("Position Saved"), 1);
+
+    struct StatusPosInfo posInfo;
+    calcSliderPos(posInfo);
+    osd->ShowStatus(posInfo, false, QObject::tr("Position"), 2);
 }
 
 void NuppelVideoPlayer::ClearBookmark(void)
