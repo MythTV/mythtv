@@ -1,34 +1,10 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <qsocket.h>
 #include <qserversocket.h>
 #include <qmutex.h>
 
-class RefSocket : public QSocket
-{
-  public:
-    RefSocket(QObject *parent = 0, const char *name = 0) 
-           : QSocket(parent, name), refCount(0), inUse(false) { }
-    void UpRef(void) { refCount++; }
-    bool DownRef(void) { refCount--; 
-                         if (refCount < 0) { delete this; return true; }
-                         return false; 
-                       }
-
-    void SetInProcess(bool use) { inUse = use; }
-    bool IsInProcess(void) { return inUse; }
-
-    void Lock() { lock.lock(); }
-    void Unlock() { lock.unlock(); }
-
-  protected:
-    virtual ~RefSocket() {}
-
-    int refCount;
-    bool inUse;
-    QMutex lock;
-};
+class MythSocket;
 
 class MythServer : public QServerSocket
 {
@@ -39,11 +15,7 @@ class MythServer : public QServerSocket
     void newConnection(int socket);
 
   signals:
-    void newConnect(RefSocket *);
-    void endConnect(RefSocket *);
-
-  private slots:
-    void discardClient();
+    void newConnect(MythSocket *);
 };
 
 

@@ -5,6 +5,7 @@
 #include <qwaitcondition.h>
 #include <qtimer.h>
 #include <pthread.h>
+#include <qptrlist.h>
 
 class QHostAddress;
 class MythSocket;
@@ -12,6 +13,7 @@ class MythSocket;
 class MythSocketCBs
 {
   public:
+    virtual ~MythSocketCBs() {}
     virtual void connected(MythSocket*) = 0;
     virtual void readyRead(MythSocket*) = 0;
     virtual void connectionFailed(MythSocket*) = 0;
@@ -21,8 +23,7 @@ class MythSocketCBs
 class MythSocket : public QSocketDevice
 {
   public:
-    MythSocket(int socket = -1);
-    MythSocket(MythSocketCBs *cb, int socket = -1);
+    MythSocket(int socket = -1, MythSocketCBs *cb = NULL);
 
     enum State {
         Connected,
@@ -47,33 +48,54 @@ class MythSocket : public QSocketDevice
     void setSocket(int socket, Type type = QSocketDevice::Stream);
     void setCallbacks(MythSocketCBs *cb);
 
-    Q_LONG  readBlock(char *data, Q_ULONG len);
+    Q_LONG readBlock(char *data, Q_ULONG len);
     Q_LONG writeBlock(const char *data, Q_ULONG len);
 
-    bool  readStringList(QStringList &list, bool quickTimeout = false);
+    bool readStringList(QStringList &list, bool quickTimeout = false);
     bool writeStringList(QStringList &list);
     bool writeData(const char *data, Q_ULONG len);
 
     bool connect(const QHostAddress &addr, Q_UINT16 port);
     bool connect(const QString &host, Q_UINT16 port);
 
+    void Lock();
+    void Unlock();
+
   protected:
    ~MythSocket();  // force refcounting
 
     void  setState(const State state);
-    static void *readyReadThreadStart(void *param);
-    void  readyReadThread(void);
 
     MythSocketCBs  *m_cb;
     State           m_state;
     QHostAddress    m_addr;
     Q_UINT16        m_port;
     int             m_ref_count;
-    pthread_t       m_readyread_thread;
-    bool            m_readyread_run;
-    QWaitCondition  m_readyread_sleep;
+
+    bool            m_notifyread;
 
     static const uint kSocketBufferSize;
+
+    QMutex          m_ref_lock;
+    QMutex          m_lock;
+
+    static pthread_t            m_readyread_thread;
+    static bool                 m_readyread_run;
+    static QMutex               m_readyread_lock;
+    static QPtrList<MythSocket> m_readyread_list;
+    static QPtrList<MythSocket> m_readyread_dellist;
+    static QPtrList<MythSocket> m_readyread_addlist;
+    static int                  m_readyread_pipe[2];
+
+    static void StartReadyReadThread(void);
+    static void *readyReadThread(void *);
+
+    static void AddToReadyRead(MythSocket *sock);
+    static void RemoveFromReadyRead(MythSocket *sock);
+    static void WakeReadyReadThread(void);
+    static void ShutdownReadyReadThread(void);
+
+    friend class QPtrList<MythSocket>;
 };
 
 #endif

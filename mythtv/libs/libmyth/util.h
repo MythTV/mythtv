@@ -1,7 +1,6 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <qsocket.h>
 #include <qstringlist.h>
 #include <qdatetime.h>
 #include <qcolor.h>
@@ -38,24 +37,6 @@ class MythTimer
 };
 
 QDateTime mythCurrentDateTime();
-
-QString SocDevErrStr(int error);
-
-// QSockectDevice (frontend)
-bool connectSocket(QSocketDevice *socket, const QString &host, uint port);
-
-bool WriteStringList(QSocketDevice *socket, QStringList &list);
-bool ReadStringList(QSocketDevice *socket, QStringList &list,
-                    bool quickTimeout = false);
-
-bool WriteBlock(QSocketDevice *socket, void *data, uint len);
-
-// QSockect (backend)
-bool WriteStringList(QSocket *socket, QStringList &list);
-bool ReadStringList(QSocket *socket, QStringList &list);
-
-bool WriteBlock(QSocket *socket, void *data, uint len);
-int ReadBlock(QSocket *socket, void *data, uint maxlen);
 
 void encodeLongLong(QStringList &list, long long num);
 long long decodeLongLong(QStringList &list, uint offset);

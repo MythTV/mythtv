@@ -5,7 +5,7 @@
 #include <qmutex.h>
 
 class MythContext;
-class QSocketDevice;
+class MythSocket;
 
 class RemoteFile
 {
@@ -29,14 +29,14 @@ class RemoteFile
         { return sock && controlSock; }
     long long GetFileSize(void) const
         { return filesize; }
-    const QSocketDevice *getSocket(void) const
-        { return sock; }
 
-    QSocketDevice *getSocket(void)
+    const MythSocket *getSocket(void) const
+        { return sock; }
+    MythSocket *getSocket(void)
         { return sock; }
 
   private:
-    QSocketDevice *openSocket(bool control);
+    MythSocket     *openSocket(bool control);
 
     QString         path;
     bool            usereadahead;
@@ -47,8 +47,8 @@ class RemoteFile
     int             recordernum;
 
     mutable QMutex  lock;
-    QSocketDevice  *controlSock;
-    QSocketDevice  *sock;
+    MythSocket     *controlSock;
+    MythSocket     *sock;
     QString         query;
 };
 

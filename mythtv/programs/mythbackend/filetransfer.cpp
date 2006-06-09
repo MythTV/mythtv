@@ -11,8 +11,9 @@ using namespace std;
 #include "server.h"
 #include "RingBuffer.h"
 #include "libmyth/util.h"
+#include "libmyth/mythsocket.h"
 
-FileTransfer::FileTransfer(QString &filename, RefSocket *remote,
+FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int retries) :
     readthreadlive(true),
     rbuffer(new RingBuffer(filename, false, usereadahead, retries)),
@@ -20,7 +21,7 @@ FileTransfer::FileTransfer(QString &filename, RefSocket *remote,
 {
 }
 
-FileTransfer::FileTransfer(QString &filename, RefSocket *remote)
+FileTransfer::FileTransfer(QString &filename, MythSocket *remote)
 {
     rbuffer = new RingBuffer(filename, false);
     sock = remote;
@@ -106,7 +107,7 @@ int FileTransfer::RequestBlock(int size)
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
 
-        if (!WriteBlock(sock->socketDevice(), buf, (uint)ret))
+        if (!sock->writeData(buf, (uint)ret))
         {
             tot = -1;
             break;

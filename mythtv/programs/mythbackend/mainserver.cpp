@@ -104,7 +104,7 @@ class ProcessRequestThread : public QThread
   public:
     ProcessRequestThread(MainServer *ms) { parent = ms; }
    
-    void setup(RefSocket *sock)
+    void setup(MythSocket *sock)
     {
         lock.lock();
         socket = sock;
@@ -135,9 +135,9 @@ class ProcessRequestThread : public QThread
                 break;
 
             parent->ProcessRequest(socket);
-            parent->MarkUnused(this);
             socket->DownRef();
             socket = NULL;
+            parent->MarkUnused(this);
         }
 
         lock.unlock();
@@ -146,7 +146,7 @@ class ProcessRequestThread : public QThread
   private:
     MainServer *parent;
 
-    RefSocket *socket;
+    MythSocket *socket;
 
     QMutex lock;
     QWaitCondition waitCond;
@@ -185,10 +185,8 @@ MainServer::MainServer(bool master, int port, int /*statusport*/,
         exit(BACKEND_BUGGY_EXIT_NO_BIND_MAIN);
     }
 
-    connect(mythserver, SIGNAL(newConnect(RefSocket *)), 
-            SLOT(newConnection(RefSocket *)));
-    connect(mythserver, SIGNAL(endConnect(RefSocket *)), 
-            SLOT(endConnection(RefSocket *)));
+    connect(mythserver, SIGNAL(newConnect(MythSocket *)), 
+            SLOT(newConnection(MythSocket *)));
 
     gContext->addListener(this);
 
@@ -205,6 +203,10 @@ MainServer::MainServer(bool master, int port, int /*statusport*/,
             SLOT(deferredDeleteSlot()));
     deferredDeleteTimer->start(30 * 1000);
 
+    autoexpireUpdateTimer = new QTimer(this);
+    connect(autoexpireUpdateTimer, SIGNAL(timeout()), this,
+            SLOT(autoexpireUpdate()));
+
     if (sched)
         sched->SetMainServer(this);
 }
@@ -219,20 +221,27 @@ MainServer::~MainServer()
         delete deferredDeleteTimer;
 }
 
-void MainServer::newConnection(RefSocket *socket)
+void MainServer::autoexpireUpdate(void)
 {
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+    AutoExpire::Update(encoderList, false);
 }
 
-void MainServer::readSocket(void)
+void MainServer::newConnection(MythSocket *socket)
 {
-    RefSocket *socket = (RefSocket *)sender();
+    socket->setCallbacks(this);
+}
 
-    PlaybackSock *testsock = getPlaybackBySock(socket);
+void MainServer::readyRead(MythSocket *sock)
+{
+    PlaybackSock *testsock = getPlaybackBySock(sock);
     if (testsock && testsock->isExpectingReply())
+    {
         return;
+    }
 
     readReadyLock.lock();
+
+    sock->Lock();
 
     //if (socket->IsInProcess())
     //{
@@ -277,14 +286,15 @@ void MainServer::readSocket(void)
         threadPoolLock.unlock();
     }
 
-    prt->setup(socket);
+    prt->setup(sock);
 
     readReadyLock.unlock();
 }
 
-void MainServer::ProcessRequest(RefSocket *sock)
+void MainServer::ProcessRequest(MythSocket *sock)
 {
-    sock->Lock();
+    // locked above.
+    //sock->Lock();
 
     //while (sock->bytesAvailable() > 0)
     if (sock->bytesAvailable() > 0)
@@ -296,10 +306,10 @@ void MainServer::ProcessRequest(RefSocket *sock)
     //sock->SetInProcess(false);
 }
 
-void MainServer::ProcessRequestWork(RefSocket *sock)
+void MainServer::ProcessRequestWork(MythSocket *sock)
 {
     QStringList listline;
-    if (!ReadStringList(sock, listline))
+    if (!sock->readStringList(listline))
         return;
 
     QString line = listline[0];
@@ -609,7 +619,7 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     {
         VERBOSE(VB_IMPORTANT, "Unknown command: " + command);
 
-        QSocket *pbssock = pbs->getSocket();
+        MythSocket *pbssock = pbs->getSocket();
 
         QStringList strlist;
         strlist << "UNKNOWN_COMMAND";
@@ -767,30 +777,33 @@ void MainServer::customEvent(QCustomEvent *e)
 
             sentSet.append(pbs);
 
-            RefSocket *sock = pbs->getSocket();
-            sock->UpRef();
-
-            qApp->unlock();
-            sock->Lock();
-            qApp->lock();
+            bool reallysendit = false;
 
             if (broadcast[1] == "CLEAR_SETTINGS_CACHE")
             {
                 if ((ismaster) &&
                     (pbs->isSlaveBackend() || pbs->wantsEvents()))
-                    WriteStringList(sock, broadcast);
+                    reallysendit = true;
             }
             else if (sendGlobal)
             {
                 if (pbs->isSlaveBackend())
-                    WriteStringList(sock, broadcast);
+                    reallysendit = true;
             }
             else if (pbs->wantsEvents())
             {
-                WriteStringList(sock, broadcast);
+                reallysendit = true; 
             }
 
-            sock->Unlock();
+            MythSocket *sock = pbs->getSocket();
+            sock->UpRef();
+
+            if (reallysendit)
+            {
+                sock->Lock();
+                sock->writeStringList(broadcast);
+                sock->Unlock();
+            }
 
             if (sock->DownRef())
             {
@@ -808,7 +821,7 @@ void MainServer::customEvent(QCustomEvent *e)
     }
 }
 
-void MainServer::HandleVersion(QSocket *socket,QString version)
+void MainServer::HandleVersion(MythSocket *socket, QString version)
 {
     QStringList retlist;
     if (version != MYTH_PROTO_VERSION)
@@ -817,17 +830,17 @@ void MainServer::HandleVersion(QSocket *socket,QString version)
                 "MainServer::HandleVersion - Client speaks protocol version "
                 + version + " but we speak " + MYTH_PROTO_VERSION + "!");
         retlist << "REJECT" << MYTH_PROTO_VERSION;
-        WriteStringList(socket, retlist);
+        socket->writeStringList(retlist);
         HandleDone(socket);
         return;
     }
 
     retlist << "ACCEPT" << MYTH_PROTO_VERSION;
-    WriteStringList(socket, retlist);
+    socket->writeStringList(retlist);
 }
 
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands, 
-                                RefSocket *socket)
+                                MythSocket *socket)
 {
     QStringList retlist = "OK";
 
@@ -840,7 +853,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             VERBOSE(VB_IMPORTANT, QString("Client %1 is trying to announce a socket "
                                     "multiple times.")
                                     .arg(commands[2]));
-            WriteStringList(socket, retlist);
+            socket->writeStringList(retlist);
             return;
         }
     }
@@ -901,7 +914,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         playbackList.push_back(pbs);
 
-        AutoExpire::Update(encoderList, false);
+        autoexpireUpdateTimer->start(1000, true);
     }
     else if (commands[1] == "FileTransfer")
     {
@@ -933,19 +946,19 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         ft->DownRef();
     }
 
-    WriteStringList(socket, retlist);
+    socket->writeStringList(retlist);
 }
 
-void MainServer::HandleDone(QSocket *socket)
+void MainServer::HandleDone(MythSocket *socket)
 {
     socket->close();
 }
 
-void MainServer::SendResponse(QSocket *socket, QStringList &commands)
+void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
 {
     if (getPlaybackBySock(socket) || getFileTransferBySock(socket))
     {
-        WriteStringList(socket, commands);
+        socket->writeStringList(commands);
     }
     else
     {
@@ -956,7 +969,7 @@ void MainServer::SendResponse(QSocket *socket, QStringList &commands)
 
 void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     bool islocal = pbs->isLocal();
     QString playbackhost = pbs->getHostname();
 
@@ -1243,7 +1256,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
 void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QString playbackhost = slist[1];
 
@@ -1487,7 +1500,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 void MainServer::HandleCheckRecordingActive(QStringList &slist, 
                                             PlaybackSock *pbs)
 {
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -1535,7 +1548,7 @@ void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 {
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -1629,7 +1642,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
                                          bool forceMetadataDelete)
 {
     int resultCode = -1;
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -1769,7 +1782,7 @@ void MainServer::HandleRescheduleRecordings(int recordid, PlaybackSock *pbs)
 
     if (pbs)
     {
-        QSocket *pbssock = pbs->getSocket();
+        MythSocket *pbssock = pbs->getSocket();
         if (pbssock)
             SendResponse(pbssock, result);
     }
@@ -1780,7 +1793,7 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -1838,7 +1851,7 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
 
 void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QStringList strlist;
 
@@ -1855,7 +1868,7 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 
 void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 {
-    QSocket    *pbssock = pbs->getSocket();
+    MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
     time_t      uptime;
 
@@ -1869,7 +1882,7 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 
 void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 {
-    QSocket    *pbssock = pbs->getSocket();
+    MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
     int         totalMB, freeMB, totalVM, freeVM;
 
@@ -1884,7 +1897,7 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
 
 void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
@@ -1937,7 +1950,7 @@ void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)
 void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
 {
     QDateTime GuideDataThrough;
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     QStringList strlist;
 
     getGuideDataThrough(GuideDataThrough);
@@ -1952,7 +1965,7 @@ void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs, QString table, int recordid)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QStringList strList;
 
@@ -1995,7 +2008,7 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs, QString table, in
 
 void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QStringList strList;
 
@@ -2010,7 +2023,7 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 void MainServer::HandleGetConflictingRecordings(QStringList &slist,
                                                 PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
@@ -2029,7 +2042,7 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 
 void MainServer::HandleGetExpiringRecordings(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QStringList strList;
 
@@ -2043,7 +2056,7 @@ void MainServer::HandleGetExpiringRecordings(PlaybackSock *pbs)
 
 void MainServer::HandleLockTuner(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     QString pbshost = pbs->getHostname();
 
     QStringList strlist;
@@ -2125,7 +2138,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
 
 void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     QStringList strlist;
     EncoderLink *encoder = NULL;
     
@@ -2156,7 +2169,7 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
 
 void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     QString pbshost = pbs->getHostname();
 
     QStringList strlist;
@@ -2232,7 +2245,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
 void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QStringList strlist;
     int count = 0;
@@ -2257,7 +2270,7 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
 
 void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QStringList strlist;
 
@@ -2283,7 +2296,7 @@ void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
 void MainServer::HandleGetNextFreeRecorder(QStringList &slist, 
                                            PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     QString pbshost = pbs->getHostname();
 
     QStringList strlist;
@@ -2379,7 +2392,7 @@ static QString make_safe(const QString &str)
 void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
                                      PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     int recnum = commands[1].toInt();
 
@@ -2707,15 +2720,15 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
 void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
 {
-    bool     ok       = true;
-    QSocket *pbssock  = pbs->getSocket();
-    uint     chanid   = slist[1].toUInt();
-    uint     sourceid = slist[2].toUInt();
-    QString  oldcnum  = cleanup(slist[3]);
-    QString  callsign = cleanup(slist[4]);
-    QString  channum  = cleanup(slist[5]);
-    QString  channame = cleanup(slist[6]);
-    QString  xmltv    = cleanup(slist[7]);
+    bool        ok       = true;
+    MythSocket *pbssock  = pbs->getSocket();
+    uint        chanid   = slist[1].toUInt();
+    uint        sourceid = slist[2].toUInt();
+    QString     oldcnum  = cleanup(slist[3]);
+    QString     callsign = cleanup(slist[4]);
+    QString     channum  = cleanup(slist[5]);
+    QString     channame = cleanup(slist[6]);
+    QString     xmltv    = cleanup(slist[7]);
 
     QStringList retlist;
     if (!chanid || !sourceid)
@@ -2742,7 +2755,7 @@ void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
 void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
                                      PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     int recnum = commands[1].toInt();
 
@@ -2841,7 +2854,7 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
                                    const QString &starttime,
                                    PlaybackSock *pbs, bool commbreak)
 {
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -2920,7 +2933,7 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
 //   a ProgramInfo structure in a string list.
 // Return value is a long-long encoded as two separate values
 {
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -2952,7 +2965,7 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
 //   a ProgramInfo structure in a string list.  The two longs are the two
 //   portions of the bookmark value to set.
 
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -2983,7 +2996,7 @@ void MainServer::HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs)
 // Format: QUERY_SETTING <hostname> <setting>
 // Returns setting value as a string
 
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -3004,7 +3017,7 @@ void MainServer::HandleSetSetting(QStringList &tokens,
                                   PlaybackSock *pbs)
 {
 // Format: SET_SETTING <hostname> <setting> <value>
-    QSocket *pbssock = NULL;
+    MythSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
 
@@ -3026,7 +3039,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
                                          QStringList &commands,
                                          PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     int recnum = commands[1].toInt();
 
@@ -3089,7 +3102,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
 void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     int retval = -1;
 
@@ -3141,7 +3154,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
 void MainServer::HandleGetRecorderFromNum(QStringList &slist, 
                                           PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     int recordernum = slist[1].toInt();
     EncoderLink *encoder = NULL;
@@ -3179,7 +3192,7 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
 
 void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     QString message = slist[1];
 
@@ -3195,7 +3208,7 @@ void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
 {
     (void)slist;
 
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
     int RecordingsInProgress = 0;
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
@@ -3212,7 +3225,7 @@ void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
@@ -3272,7 +3285,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 {
-    QSocket *pbssock = pbs->getSocket();
+    MythSocket *pbssock = pbs->getSocket();
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
@@ -3338,7 +3351,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     delete pginfo;
 }
 
-void MainServer::HandleBackendRefresh(QSocket *socket)
+void MainServer::HandleBackendRefresh(MythSocket *socket)
 {
     gContext->RefreshBackendConfig();
 
@@ -3350,7 +3363,7 @@ void MainServer::HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs)
 {            
     pbs->setBlockShutdown(blockShutdown);
     
-    QSocket *socket = pbs->getSocket();
+    MythSocket *socket = pbs->getSocket();
     QStringList retlist = "OK";
     SendResponse(socket, retlist);    
 }
@@ -3383,14 +3396,22 @@ void MainServer::DeletePBS(PlaybackSock *sock)
     deferredDeleteList.push_back(dds);
 }
 
-void MainServer::endConnection(RefSocket *socket)
+void MainServer::connectionClosed(MythSocket *socket)
 {
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
     {
         PlaybackSock *pbs = (*it);
-        QSocket *sock = pbs->getSocket();
-        if (sock == socket)
+        MythSocket *sock = pbs->getSocket();
+        if (sock == socket && pbs == masterServer)
+        {
+            playbackList.erase(it);
+            masterServer->DownRef();
+            masterServer = NULL;
+            masterServerReconnect->start(1000, true);
+            return;
+        }
+        else if (sock == socket)
         {
             if (ismaster && pbs->isSlaveBackend())
             {
@@ -3458,7 +3479,7 @@ void MainServer::endConnection(RefSocket *socket)
     vector<FileTransfer *>::iterator ft = fileTransferList.begin();
     for (; ft != fileTransferList.end(); ++ft)
     {
-        QSocket *sock = (*ft)->getSocket();
+        MythSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
             (*ft)->DownRef();
@@ -3490,7 +3511,7 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
     return NULL;
 }
 
-PlaybackSock *MainServer::getPlaybackBySock(QSocket *sock)
+PlaybackSock *MainServer::getPlaybackBySock(MythSocket *sock)
 {
     PlaybackSock *retval = NULL;
 
@@ -3524,7 +3545,7 @@ FileTransfer *MainServer::getFileTransferByID(int id)
     return retval;
 }
 
-FileTransfer *MainServer::getFileTransferBySock(QSocket *sock)
+FileTransfer *MainServer::getFileTransferBySock(MythSocket *sock)
 {
     FileTransfer *retval = NULL;
 
@@ -3558,7 +3579,7 @@ LiveTVChain *MainServer::GetExistingChain(QString id)
     return NULL;
 }
 
-LiveTVChain *MainServer::GetExistingChain(QSocket *sock)
+LiveTVChain *MainServer::GetExistingChain(MythSocket *sock)
 {
     QMutexLocker lock(&liveTVChainsLock);
 
@@ -3643,59 +3664,25 @@ QString MainServer::LocalFilePath(QUrl &url)
     return lpath;
 }
 
-void MainServer::masterServerDied(void)
-{
-    bool deleted = false;
-
-    vector<PlaybackSock *>::iterator it = playbackList.begin();
-    for (; it != playbackList.end(); it++)
-    {
-        PlaybackSock *pbs = (*it);
-        if (pbs == masterServer)
-        {
-            playbackList.erase(it);
-            deleted = true;
-            break;
-        }
-    }
-
-    if (!deleted)
-        VERBOSE(VB_IMPORTANT, "Unable to find master server connection in pbs list.");
-    
-    masterServer->DownRef();
-    masterServer = NULL;
-    masterServerReconnect->start(1000, true);
-}
-
 void MainServer::reconnectTimeout(void)
 {
-    RefSocket *masterServerSock = new RefSocket();
+    MythSocket *masterServerSock = new MythSocket();
 
-    QString server = gContext->GetSetting("MasterServerIP", "localhost");
+    QString server = gContext->GetSetting("MasterServerIP", "127.0.0.1");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
 
     VERBOSE(VB_IMPORTANT, QString("Connecting to master server: %1:%2")
                            .arg(server).arg(port));
 
-    masterServerSock->connectToHost(server, port);
-
-    int num = 0;
-    while (masterServerSock->state() == QSocket::HostLookup ||
-           masterServerSock->state() == QSocket::Connecting)
+    if (!masterServerSock->connect(server, port))
     {
-        qApp->processEvents();
-        usleep(50);
-        num++;
-        if (num > 100)
-        {
-            VERBOSE(VB_IMPORTANT, "Connection to master server timed out.");
-            masterServerReconnect->start(1000, true);
-            masterServerSock->DownRef();
-            return;
-        }
+        VERBOSE(VB_IMPORTANT, "Connection to master server timed out.");
+        masterServerReconnect->start(1000, true);
+        masterServerSock->DownRef();
+        return;
     }
 
-    if (masterServerSock->state() != QSocket::Connected)
+    if (masterServerSock->state() != MythSocket::Connected)
     {
         VERBOSE(VB_IMPORTANT, "Could not connect to master server.");
         masterServerReconnect->start(1000, true);
@@ -3723,22 +3710,16 @@ void MainServer::reconnectTimeout(void)
         delete pinfo;
     }
 
-    WriteStringList(masterServerSock, strlist);
-    ReadStringList(masterServerSock, strlist);
-
-    connect(masterServerSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
-    connect(masterServerSock, SIGNAL(connectionClosed()), this, 
-            SLOT(masterServerDied()));
+    masterServerSock->writeStringList(strlist);
+    masterServerSock->readStringList(strlist);
+    masterServerSock->setCallbacks(this);
 
     masterServer = new PlaybackSock(this, masterServerSock, server, true);
     playbackList.push_back(masterServer);
 
     masterServerSock->Unlock();
 
-    // Handle any messages sent before the readyRead signal was connected.
-    ProcessRequest(masterServerSock);
-
-    AutoExpire::Update(encoderList, false);
+    autoexpireUpdateTimer->start(1000, true);
 }
 
 // returns true, if a client (slavebackends are not counted!)
@@ -3776,7 +3757,7 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
         for (; it != playbackList.end(); ++it)
         {
             if ((*it)->isSlaveBackend())
-                WriteStringList((*it)->getSocket(),bcast); 
+                (*it)->getSocket()->writeStringList(bcast); 
         }
     }
 }

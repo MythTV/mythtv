@@ -16,7 +16,6 @@
 
 #include "mythconfig.h"
 
-class QSocket;
 class NuppelVideoRecorder;
 class RingBuffer;
 class EITScanner;

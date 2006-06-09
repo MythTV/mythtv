@@ -8,7 +8,7 @@
 #include <qptrlist.h>
 
 class ProgramInfo;
-class QSocket;
+class MythSocket;
 
 struct LiveTVChainEntry
 {
@@ -76,10 +76,10 @@ class LiveTVChain
     int  GetJumpPos(void);
 
     // socket stuff
-    void SetHostSocket(QSocket *sock);
-    bool IsHostSocket(QSocket *sock);
+    void SetHostSocket(MythSocket *sock);
+    bool IsHostSocket(MythSocket *sock);
     int HostSocketCount(void);
-    void DelHostSocket(QSocket *sock);
+    void DelHostSocket(MythSocket *sock);
  
   private:
     void BroadcastUpdate();
@@ -104,7 +104,7 @@ class LiveTVChain
     int m_jumppos;
 
     QMutex m_sockLock;
-    QPtrList<QSocket> m_inUseSocks;
+    QPtrList<MythSocket> m_inUseSocks;
 };
 
 #endif

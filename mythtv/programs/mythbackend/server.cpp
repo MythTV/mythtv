@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "server.h"
+#include "libmyth/mythsocket.h"
 
 MythServer::MythServer(int port, QObject *parent)
           : QServerSocket(port, 1, parent)
@@ -11,19 +12,7 @@ MythServer::MythServer(int port, QObject *parent)
 
 void MythServer::newConnection(int socket)
 {
-    RefSocket *s = new RefSocket(this);
-    connect(s, SIGNAL(delayedCloseFinished()), this, SLOT(discardClient()));
-    connect(s, SIGNAL(connectionClosed()), this, SLOT(discardClient()));
-    s->setSocket(socket);
-
+    MythSocket *s = new MythSocket(socket);
     emit(newConnect(s)); 
 }
 
-void MythServer::discardClient(void)
-{
-    RefSocket *socket = (RefSocket *)sender();
-    if (socket)
-    {
-        emit(endConnect(socket));
-    }
-}

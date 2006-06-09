@@ -13,16 +13,16 @@ using namespace std;
 #include <qmutex.h>
 
 class RingBuffer;
-class RefSocket;
+class MythSocket;
 
 class FileTransfer
 {
   public:
-    FileTransfer(QString &filename, RefSocket *remote);
-    FileTransfer(QString &filename, RefSocket *remote,
+    FileTransfer(QString &filename, MythSocket *remote);
+    FileTransfer(QString &filename, MythSocket *remote,
                  bool usereadahead, int retries);
 
-    RefSocket *getSocket() { return sock; }
+    MythSocket *getSocket() { return sock; }
 
     bool isOpen(void);
 
@@ -48,7 +48,7 @@ class FileTransfer
     QMutex readthreadLock;
 
     RingBuffer *rbuffer;
-    RefSocket *sock;
+    MythSocket *sock;
     bool ateof;
 
     vector<char> requestBuffer;

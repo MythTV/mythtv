@@ -1,9 +1,8 @@
-#include <qsocket.h>
-
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "programinfo.h"
+#include "mythsocket.h"
 
 #define LOC QString("LiveTVChain(%1): ").arg(m_id)
 
@@ -531,7 +530,7 @@ QString LiveTVChain::GetCardType(int pos) const
     return entry.cardtype;
 }
 
-void LiveTVChain::SetHostSocket(QSocket *sock)
+void LiveTVChain::SetHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
 
@@ -539,7 +538,7 @@ void LiveTVChain::SetHostSocket(QSocket *sock)
         m_inUseSocks.append(sock);
 }
 
-bool LiveTVChain::IsHostSocket(QSocket *sock)
+bool LiveTVChain::IsHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
     return m_inUseSocks.containsRef(sock);
@@ -550,10 +549,9 @@ int LiveTVChain::HostSocketCount(void)
     return m_inUseSocks.count();
 }
 
-void LiveTVChain::DelHostSocket(QSocket *sock)
+void LiveTVChain::DelHostSocket(MythSocket *sock)
 {
     QMutexLocker lock(&m_sockLock);
-
     m_inUseSocks.removeRef(sock);
 }
 

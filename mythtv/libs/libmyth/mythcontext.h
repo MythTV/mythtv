@@ -9,7 +9,6 @@
 #include <qptrlist.h>
 #include <qevent.h>
 #include <qmutex.h>
-#include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
 #include <qmap.h>
@@ -20,6 +19,7 @@
 #include <vector>
 
 #include "mythobservable.h"
+#include "mythsocket.h"
 
 using namespace std;
 
@@ -31,8 +31,6 @@ class Settings;
 class QSqlDatabase;
 class QSqlQuery;
 class QSqlError;
-class QSocket;
-class QSocketDevice;
 class MythMainWindow;
 class MythPluginManager;
 class MediaMonitor;
@@ -224,7 +222,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20060631-1"
+#define MYTH_BINARY_VERSION "0.19.20060608-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -243,7 +241,7 @@ class MythPrivRequest
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MythContext : public QObject, public MythObservable
+class MythContext : public QObject, public MythObservable, public MythSocketCBs
 {
     Q_OBJECT
   public:
@@ -261,10 +259,10 @@ class MythContext : public QObject, public MythObservable
     void OverrideSettingForSession(const QString &key, const QString &newValue);
 
     bool ConnectToMasterServer(bool blockingClient = true);
-    QSocketDevice *ConnectServer(QSocket *eventSocket,
-                                 const QString &hostname,
-                                 int port,
-                                 bool blockingClient = false);
+    MythSocket *ConnectServer(MythSocket *eventSocket,
+                              const QString &hostname,
+                              int port,
+                              bool blockingClient = false);
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
     bool IsBackend(void);
@@ -388,8 +386,7 @@ class MythContext : public QObject, public MythObservable
     void SetPluginManager(MythPluginManager *pmanager);
     MythPluginManager *getPluginManager(void);
 
-    bool CheckProtoVersion(QSocketDevice* socket);
-    bool CheckProtoVersion(QSocket* socket);
+    bool CheckProtoVersion(MythSocket* socket);
 
     // event wrappers
     void DisableScreensaver(void);
@@ -417,11 +414,6 @@ class MythContext : public QObject, public MythObservable
 
     static QMutex verbose_mutex;
 
-  private slots:
-    void EventSocketRead();
-    void EventSocketConnected();
-    void EventSocketClosed();
-
   private:
     void SetPalette(QWidget *widget);
     void InitializeScreenSettings(void);
@@ -431,6 +423,11 @@ class MythContext : public QObject, public MythObservable
     void CacheThemeImagesDirectory(const QString &dirname, 
                                    const QString &subdirname = "");
     void RemoveCacheDir(const QString &dirname);
+
+    void connected(MythSocket *sock);
+    void connectionClosed(MythSocket *sock);
+    void readyRead(MythSocket *sock);
+    void connectionFailed(MythSocket *sock) { (void)sock; }
 
     MythContextPrivate *d;
     QString app_binary_version;

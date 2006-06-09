@@ -1,20 +1,19 @@
 #ifndef PLAYBACKSOCK_H_
 #define PLAYBACKSOCK_H_
 
-#include <qsocket.h>
 #include <qstring.h>
 #include <qmutex.h>
 
 #include "programinfo.h"
 
-class RefSocket;
+class MythSocket;
 class MainServer;
 class ProgramInfo;
 
 class PlaybackSock
 {
   public:
-    PlaybackSock(MainServer *parent, RefSocket *lsock, 
+    PlaybackSock(MainServer *parent, MythSocket *lsock, 
                  QString lhostname, bool wantevents);
     virtual ~PlaybackSock();
 
@@ -24,7 +23,7 @@ class PlaybackSock
     void SetDisconnected(void) { disconnected = true; }
     bool IsDisconnected(void) { return disconnected; }
 
-    RefSocket *getSocket(void) { return sock; }
+    MythSocket *getSocket(void) { return sock; }
     QString getHostname(void) { return hostname; }
 
     bool isLocal(void) { return local; }
@@ -64,7 +63,7 @@ class PlaybackSock
   private:
     bool SendReceiveStringList(QStringList &strlist);
 
-    RefSocket *sock;
+    MythSocket *sock;
     QString hostname;
     QString ip;
 

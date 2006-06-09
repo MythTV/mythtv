@@ -10,6 +10,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"
+#include "mythsocket.h"
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
@@ -21,7 +22,7 @@ RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
 RemoteEncoder::~RemoteEncoder()
 {
     if (controlSock)
-        delete controlSock;
+        controlSock->DownRef();
 }
 
 void RemoteEncoder::Setup(void)
@@ -50,8 +51,8 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
 
     backendError = false;
 
-    WriteStringList(controlSock, strlist);
-    if (!ReadStringList(controlSock, strlist, true))
+    controlSock->writeStringList(strlist);
+    if (!controlSock->readStringList(strlist, true))
     {
         VERBOSE(VB_IMPORTANT,
                 "RemoteEncoder::SendReceiveStringList(): No response.");
@@ -59,14 +60,14 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
     }
 }
 
-QSocketDevice *RemoteEncoder::openControlSocket(const QString &host, short port)
+MythSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
 {
-    QSocketDevice *sock = new QSocketDevice(QSocketDevice::Stream);
-    if (!connectSocket(sock, host, port))
+    MythSocket *sock = new MythSocket();
+    if (!sock->connect(host, port))
     {
         VERBOSE(VB_IMPORTANT,
                 "RemoteEncoder::openControlSocket(): Connection timed out.");
-        delete sock;
+        sock->DownRef();
         sock = NULL;
     }
     else
@@ -75,12 +76,12 @@ QSocketDevice *RemoteEncoder::openControlSocket(const QString &host, short port)
         {
             QString hostname = gContext->GetHostName();
             QStringList strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
-            WriteStringList(sock, strlist);
-            ReadStringList(sock, strlist, true);
+            sock->writeStringList(strlist);
+            sock->readStringList(strlist, true);
         }
         else
         {
-            delete sock;
+            sock->DownRef();
             sock = NULL;
         }
     }    

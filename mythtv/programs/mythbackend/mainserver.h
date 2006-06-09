@@ -2,7 +2,6 @@
 #define MAINSERVER_H_
 
 #include <qmap.h>
-#include <qsocket.h>
 #include <qtimer.h>
 #include <qurl.h>
 #include <qmutex.h>
@@ -18,10 +17,11 @@ using namespace std;
 #include "scheduler.h"
 #include "livetvchain.h"
 #include "autoexpire.h"
+#include "mythsocket.h"
 
 class ProcessRequestThread;
 
-class MainServer : public QObject
+class MainServer : public QObject, public MythSocketCBs
 {
     Q_OBJECT
   public:
@@ -36,20 +36,23 @@ class MainServer : public QObject
     bool isClientConnected();
     void ShutSlaveBackendsDown(QString &haltcmd);
 
-    void ProcessRequest(RefSocket *sock); 
+    void ProcessRequest(MythSocket *sock); 
     void MarkUnused(ProcessRequestThread *prt);
+
+    void readyRead(MythSocket *socket);
+    void connectionClosed(MythSocket *socket);
+    void connectionFailed(MythSocket *socket) { (void)socket; }
+    void connected(MythSocket *socket) { (void)socket; }
 
     void DeletePBS(PlaybackSock *pbs);
 
   protected slots:
     void reconnectTimeout(void);
-    void masterServerDied(void);
     void deferredDeleteSlot(void);
+    void autoexpireUpdate(void);
 
   private slots:
-    void newConnection(RefSocket *);
-    void endConnection(RefSocket *);
-    void readSocket();
+    void newConnection(MythSocket *);
 
   private:
     typedef struct deletestruct
@@ -63,10 +66,10 @@ class MainServer : public QObject
         bool forceMetadataDelete;
     } DeleteStruct;
 
-    void ProcessRequestWork(RefSocket *sock);
+    void ProcessRequestWork(MythSocket *sock);
     void HandleAnnounce(QStringList &slist, QStringList commands, 
-                        RefSocket *socket);
-    void HandleDone(QSocket *socket);
+                        MythSocket *socket);
+    void HandleDone(MythSocket *socket);
 
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
@@ -118,21 +121,21 @@ class MainServer : public QObject
     void HandleSetBookmark(QStringList &tokens, PlaybackSock *pbs);
     void HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs);
     void HandleSetSetting(QStringList &tokens, PlaybackSock *pbs);
-    void HandleVersion(QSocket *socket, QString version);
-    void HandleBackendRefresh(QSocket *socket);
+    void HandleVersion(MythSocket *socket, QString version);
+    void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
     void HandleQueryUptime(PlaybackSock *pbs);
     void HandleQueryMemStats(PlaybackSock *pbs);
     void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);
     
-    void SendResponse(QSocket *pbs, QStringList &commands);
+    void SendResponse(MythSocket *pbs, QStringList &commands);
 
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *getSlaveByHostname(QString &hostname);
-    PlaybackSock *getPlaybackBySock(QSocket *socket);
+    PlaybackSock *getPlaybackBySock(MythSocket *socket);
     FileTransfer *getFileTransferByID(int id);
-    FileTransfer *getFileTransferBySock(QSocket *socket);
+    FileTransfer *getFileTransferBySock(MythSocket *socket);
 
     QString LocalFilePath(QUrl &url);
 
@@ -140,7 +143,7 @@ class MainServer : public QObject
     void DoDeleteThread(DeleteStruct *ds);
 
     LiveTVChain *GetExistingChain(QString id);
-    LiveTVChain *GetExistingChain(QSocket *sock);
+    LiveTVChain *GetExistingChain(MythSocket *sock);
     LiveTVChain *GetChainWithRecording(ProgramInfo *pginfo);
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);
@@ -182,6 +185,8 @@ class MainServer : public QObject
     QMutex deferredDeleteLock;
     QTimer *deferredDeleteTimer;
     QValueList<DeferredDeleteStruct> deferredDeleteList;
+
+    QTimer *autoexpireUpdateTimer;
 };
 
 #endif

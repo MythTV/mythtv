@@ -6,10 +6,11 @@
 
 #include <qstring.h>
 #include <qmutex.h>
-#include <qsocket.h>
 
 #include "programinfo.h"
 #include "util.h"
+
+class MythSocket;
 
 class PreviewGenerator : public QObject
 {
@@ -57,8 +58,7 @@ class PreviewGenerator : public QObject
     bool               localOnly;
     bool               isConnected;
     bool               createSockets;
-    QSocket           *eventSock;
-    QSocketDevice     *serverSock;
+    MythSocket        *serverSock;
 };
 
 #endif // PREVIEW_GENERATOR_H_

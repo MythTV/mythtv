@@ -15,6 +15,7 @@
 #include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"
 #include "tv_rec.h"
+#include "mythsocket.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")
@@ -201,10 +202,10 @@ void PreviewGenerator::RemotePreviewRun(void)
         }
 
         if (serverSock)
-            WriteStringList(serverSock, strlist);
-
-        if (serverSock)
-            ok = ReadStringList(serverSock, strlist, false);
+        {
+            serverSock->writeStringList(strlist);
+            ok = serverSock->readStringList(strlist, false);
+        }
 
         RemotePreviewTeardown();
     }
@@ -224,7 +225,7 @@ void PreviewGenerator::RemotePreviewTeardown(void)
 {
     if (serverSock)
     {
-        delete serverSock;
+        serverSock->DownRef();
         serverSock = NULL;
     }
 }

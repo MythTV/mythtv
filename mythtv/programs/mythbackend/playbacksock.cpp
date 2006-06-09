@@ -12,7 +12,7 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 
-PlaybackSock::PlaybackSock(MainServer *parent, RefSocket *lsock, 
+PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock, 
                            QString lhostname, bool wantevents)
 {
     m_parent = parent;
@@ -65,8 +65,8 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     sockLock.lock();
     expectingreply = true;
 
-    WriteStringList(sock, strlist);
-    bool ok = ReadStringList(sock, strlist);
+    sock->writeStringList(strlist);
+    bool ok = sock->readStringList(strlist);
 
     while (ok && strlist[0] == "BACKEND_MESSAGE")
     {
@@ -77,14 +77,13 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
         MythEvent me(message, extra);
         gContext->dispatch(me);
 
-        ok = ReadStringList(sock, strlist);
+        ok = sock->readStringList(strlist);
     }
 
     expectingreply = false;
     sockLock.unlock();
 
     sock->Unlock();
-
     sock->DownRef();
 
     return ok;

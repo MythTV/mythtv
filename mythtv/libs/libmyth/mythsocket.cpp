@@ -5,162 +5,86 @@
 #include "util.h"
 #include "mythsocket.h"
 #include <sys/select.h>
+#include <cassert>
 
-
-#define LOC QString("MythSocket(%1:%2): ").arg((unsigned long)this, 0, 16)\
-                    .arg(this->socket())
+#define SLOC(a) QString("MythSocket(%1:%2): ").arg((unsigned long)a, 0, 16)\
+                    .arg(a->socket())
+#define LOC SLOC(this)
 
 const uint MythSocket::kSocketBufferSize = 128000;
 
-MythSocket::MythSocket(int socket)
-    : QSocketDevice(QSocketDevice::Stream),            m_cb(NULL),
-      m_state(Idle),         m_addr(),                 m_port(0),
-      m_ref_count(0),        m_readyread_thread(),     m_readyread_run(false) 
-{
-    VERBOSE(VB_SOCKET, LOC + "new socket");
-    if (socket > -1)
-        setSocket(socket);
-}
+pthread_t MythSocket::m_readyread_thread = (pthread_t)0;
+bool MythSocket::m_readyread_run = false;
+QMutex MythSocket::m_readyread_lock;
+QPtrList<MythSocket> MythSocket::m_readyread_list;
+QPtrList<MythSocket> MythSocket::m_readyread_dellist;
+QPtrList<MythSocket> MythSocket::m_readyread_addlist;
+int MythSocket::m_readyread_pipe[2] = {-1, -1};
 
-MythSocket::MythSocket(MythSocketCBs *cb, int socket)
-    : QSocketDevice(QSocketDevice::Stream),         m_cb(cb),
-      m_state(Idle),         m_addr(),              m_port(0),
-      m_ref_count(0),        m_readyread_thread(),  m_readyread_run(false)
+MythSocket::MythSocket(int socket, MythSocketCBs *cb)
+    : QSocketDevice(QSocketDevice::Stream),            m_cb(cb),
+      m_state(Idle),         m_addr(),                 m_port(0),
+      m_ref_count(0),        m_notifyread(0) 
 {
     VERBOSE(VB_SOCKET, LOC + "new socket");
     if (socket > -1)
         setSocket(socket);
 
     if (m_cb)
-    {
-        UpRef();
-        pthread_create(&m_readyread_thread, NULL, readyReadThreadStart, this);
-        pthread_detach(m_readyread_thread);
-    }
+        AddToReadyRead(this);
 }
 
 MythSocket::~MythSocket()
 {
-
     close();
-
-    m_cb = NULL;
-    if (m_readyread_run)
-    {
-      m_readyread_run = false;
-      m_readyread_sleep.wakeAll();
-      VERBOSE(VB_SOCKET, LOC + 
-              "shouldnt happen, being deleted while thread is still running");
-    }
-
-    m_ref_count--;
-    if (m_ref_count >= 0)
-        VERBOSE(VB_IMPORTANT, LOC + "socket deleted while still referenced");
-
     VERBOSE(VB_SOCKET, LOC + "delete socket");
 }
 
 void MythSocket::setCallbacks(MythSocketCBs *cb)
 {
-    // TODO: deal with m_cb already being defined, or passed cb being NULL
+    if (m_cb && cb)
+    {
+       m_cb = cb;
+       return;
+    }
+
     m_cb = cb;
+
     if (m_cb)
-    {
-        UpRef();
-        pthread_create(&m_readyread_thread, NULL, readyReadThreadStart, this);
-        pthread_detach(m_readyread_thread);
-    }
-}
-
-void *MythSocket::readyReadThreadStart(void *param)
-{
-    MythSocket *sock = (MythSocket *)param;
-    sock->readyReadThread();
-    sock->DownRef();
-    return NULL;
-}
-
-void MythSocket::readyReadThread(void)
-{
-    VERBOSE(VB_SOCKET, LOC + "readyread thread start");
-    fd_set rfds;
-    struct timeval timeout;
-
-    m_readyread_run = true;
-    while (m_readyread_run)
-    {
-        if (state() != Connected)
-        {
-            VERBOSE(VB_SOCKET, LOC + "readyread thread sleeping");
-            m_readyread_sleep.wait();
-            VERBOSE(VB_SOCKET, LOC + "readyread thread woke up");
-        }
-        else
-        {
-            // add check for bad fd?
-            FD_ZERO(&rfds);
-            FD_SET(socket(), &rfds);
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 10000;
-
-            int rval = select(socket() + 1, &rfds, NULL, NULL, &timeout);
-            if (rval == -1)
-            {
-                VERBOSE(VB_SOCKET, LOC + "select returned error");
-            }
-            else if(rval && FD_ISSET(socket(), &rfds))
-            {
-                VERBOSE(VB_SOCKET, LOC + "socket is readable");
-                if (bytesAvailable() == 0)
-                {
-                    VERBOSE(VB_SOCKET, LOC + "socket closed");
-                    close();
-
-                    if (m_cb)
-                    {
-                        VERBOSE(VB_SOCKET, LOC + "cb->connectionClosed()");
-                        m_cb->connectionClosed(this);
-                    }
-                }
-                else if (m_cb)
-                {
-                    VERBOSE(VB_SOCKET, LOC + "cb->readyRead()");
-                    m_cb->readyRead(this);
-                }
-                   
-            }
-            else
-            {
-//                VERBOSE(VB_SOCKET, LOC + "select timeout");
-            }
-        }
-    }
-    VERBOSE(VB_SOCKET, LOC + "readyread thread exit");
+        AddToReadyRead(this);
+    else
+        RemoveFromReadyRead(this);
 }
 
 void MythSocket::UpRef(void)
 {
+    m_ref_lock.lock();
     m_ref_count++;
+    m_ref_lock.unlock();
     VERBOSE(VB_SOCKET, LOC + QString("UpRef: %1").arg(m_ref_count));
 }
 
 bool MythSocket::DownRef(void)
 {
-    m_ref_count--;
+    m_ref_lock.lock();
+    int ref = --m_ref_count;
+    m_ref_lock.unlock();
+    
     VERBOSE(VB_SOCKET, LOC + QString("DownRef: %1").arg(m_ref_count));
 
-    if (m_readyread_run && m_ref_count == 0)
+    if (m_cb && ref == 0)
     {
-        m_readyread_run = false;
-        m_readyread_sleep.wakeAll();
-        // thread will delete obj
+        m_cb = NULL;
+        RemoveFromReadyRead(this);
+        // thread will downref & delete obj
         return true;
     } 
-    else if (m_ref_count < 0) 
+    else if (ref < 0) 
     {
         delete this;
         return true;
     }
+    
     return false;
 }
 
@@ -245,13 +169,10 @@ void MythSocket::setSocket(int socket, Type type)
     QSocketDevice::setSocket(socket, type);
     setBlocking(false);
     setState(Connected);
-    if (m_readyread_run)
-        m_readyread_sleep.wakeAll();
 }
 
 void MythSocket::close(void)
 {
-
     setState(Idle);
     QSocketDevice::close();
 }
@@ -259,24 +180,26 @@ void MythSocket::close(void)
 Q_LONG MythSocket::readBlock(char *data, Q_ULONG len)
 {
     // VERBOSE(VB_SOCKET, LOC + "readBlock called");
-    if(state() != Connected)
+    if (state() != Connected)
     {
         VERBOSE(VB_SOCKET, LOC + "readBlock called while not in " 
                 "connected state");
         return -1;
     }
 
-     Q_LONG rval = QSocketDevice::readBlock(data, len);
-     if (rval == 0)
-     {
-         close();
-         if (m_cb)
-         {
-             m_cb->connectionClosed(this);
-             VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
-         }
-     }
-     return rval;
+    m_notifyread = false;
+
+    Q_LONG rval = QSocketDevice::readBlock(data, len);
+    if (rval == 0)
+    {
+        close();
+        if (m_cb)
+        {
+            m_cb->connectionClosed(this);
+            VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
+        }
+    }
+    return rval;
 }
 
 /** \fn writeBlock(char*, Q_ULONG)
@@ -286,7 +209,7 @@ Q_LONG MythSocket::readBlock(char *data, Q_ULONG len)
 Q_LONG MythSocket::writeBlock(const char *data, Q_ULONG len)
 {
     //VERBOSE(VB_SOCKET, LOC + "writeBlock called");
-    if(state() != Connected)
+    if (state() != Connected)
     {
         VERBOSE(VB_SOCKET, LOC + "writeBlock called while not in " 
                 "connected state");
@@ -469,18 +392,49 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
     while (waitForMore(5) < 8)
     {
         elapsed = timer.elapsed();
-        if (!quickTimeout && elapsed >= 300000)
+        if (!quickTimeout && elapsed >= 30000)
         {
             VERBOSE(VB_GENERAL, LOC + "readStringList: Error, timeout.");
             close();
             return false;
         }
-        else if (quickTimeout && elapsed >= 20000)
+        else if (quickTimeout && elapsed >= 7000)
         {
             VERBOSE(VB_GENERAL, LOC + 
                     "readStringList: Error, timeout (quick).");
             close();
             return false;
+        }
+
+        if (state() != Connected)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "readStringList: Connection died.");
+            return false;
+        }
+
+        {
+            struct timeval tv;
+            int maxfd;
+            fd_set rfds;
+
+            FD_ZERO(&rfds);
+            FD_SET(socket(), &rfds);
+            maxfd = socket();
+
+            tv.tv_sec = 0;
+            tv.tv_usec = 0;
+
+            int rval = select(maxfd + 1, &rfds, NULL, NULL, &tv);
+            if (rval)
+            {
+                if (bytesAvailable() == 0)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC +
+                            "readStringList: Connection died (select).");
+                    return false;
+                }
+            }
         }
     }
 
@@ -590,7 +544,21 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
 
     list = QStringList::split("[]:[]", str, true);
 
+    m_notifyread = false;
+    WakeReadyReadThread();
     return true;
+}
+
+void MythSocket::Lock(void)
+{
+    m_lock.lock();
+    WakeReadyReadThread();
+}
+
+void MythSocket::Unlock(void)
+{
+    m_lock.unlock();
+    WakeReadyReadThread();
 }
 
 /** \fn connect(QString &, Q_UINT16)
@@ -637,6 +605,7 @@ bool MythSocket::connect(const QHostAddress &addr, Q_UINT16 port)
         {
             VERBOSE(VB_SOCKET, LOC + "cb->connected()");
             m_cb->connected(this);
+            WakeReadyReadThread();
         }
     }
     else
@@ -644,9 +613,179 @@ bool MythSocket::connect(const QHostAddress &addr, Q_UINT16 port)
         setState(Connected);
     }
 
-    if (m_readyread_run)
-        m_readyread_sleep.wakeAll();
-
     return true;
+}
+
+void MythSocket::ShutdownReadyReadThread(void)
+{
+    m_readyread_run = false;
+    WakeReadyReadThread();
+    pthread_join(m_readyread_thread, NULL);
+
+    ::close(m_readyread_pipe[0]);
+    ::close(m_readyread_pipe[1]);
+}
+
+void MythSocket::StartReadyReadThread(void)
+{
+    if (m_readyread_run == false)
+    {
+        QMutexLocker locker(&m_readyread_lock);
+        if (m_readyread_run == false)
+        {
+            int ret = pipe(m_readyread_pipe);
+            assert(ret >= 0);
+
+            pthread_create(&m_readyread_thread, NULL, readyReadThread, NULL);
+            m_readyread_run = true;
+
+            atexit(ShutdownReadyReadThread);
+        }
+    }   
+}
+
+void MythSocket::AddToReadyRead(MythSocket *sock)
+{
+    StartReadyReadThread();
+
+    sock->UpRef();
+    m_readyread_lock.lock();
+    m_readyread_addlist.append(sock);
+    m_readyread_lock.unlock();
+
+    WakeReadyReadThread();
+}
+
+void MythSocket::RemoveFromReadyRead(MythSocket *sock)
+{
+    m_readyread_lock.lock();
+    m_readyread_dellist.append(sock);
+    m_readyread_lock.unlock();
+
+    WakeReadyReadThread();
+}
+
+void MythSocket::WakeReadyReadThread(void)
+{
+    if (m_readyread_pipe[1] >= 0)
+    {
+        char buf[1] = { '0' };
+        write(m_readyread_pipe[1], &buf, 1);
+    }
+}
+
+void *MythSocket::readyReadThread(void *)
+{
+    VERBOSE(VB_SOCKET, "MythSocket: readyread thread start");
+    fd_set rfds;
+    struct timeval timeout;
+    MythSocket *sock;
+    int maxfd;
+    bool found;
+
+    m_readyread_run = true;
+    while (m_readyread_run)
+    {
+        m_readyread_lock.lock();
+        while (m_readyread_dellist.count() > 0)
+        {
+            sock = m_readyread_dellist.take();
+            bool del = m_readyread_list.removeRef(sock);
+
+            if (del)
+            {
+                m_readyread_lock.unlock();
+                sock->DownRef();
+                m_readyread_lock.lock();
+            }
+        }
+
+        while (m_readyread_addlist.count() > 0)
+        {
+            sock = m_readyread_addlist.take();
+            //sock->UpRef();  Did upref in AddToReadyRead()
+            m_readyread_list.append(sock);
+        }
+        m_readyread_lock.unlock();
+
+        // add check for bad fd?
+        FD_ZERO(&rfds);
+        maxfd = m_readyread_pipe[0];
+
+        FD_SET(m_readyread_pipe[0], &rfds);
+
+        QPtrListIterator<MythSocket> it(m_readyread_list);
+        while ((sock = it.current()) != 0)
+        {
+            if (sock->state() == Connected &&
+                sock->m_notifyread == false &&
+                !sock->m_lock.locked())
+            {
+                FD_SET(sock->socket(), &rfds);
+                maxfd = max(sock->socket(), maxfd);
+            }
+            ++it;
+        }
+
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 10000;
+
+        int rval = select(maxfd + 1, &rfds, NULL, NULL, &timeout);
+        if (rval == -1)
+        {
+            VERBOSE(VB_SOCKET, "MythSocket: select returned error");
+        }
+        else if (rval)
+        {
+            found = false;
+            QPtrListIterator<MythSocket> it(m_readyread_list);
+            while ((sock = it.current()) != 0)
+            {
+                if (sock->state() == Connected &&
+                    FD_ISSET(sock->socket(), &rfds) &&
+                    !sock->m_lock.locked())
+                {
+                    found = true;
+                    break;
+                }
+                ++it;
+            }
+
+            if (found)
+            {
+                VERBOSE(VB_SOCKET, SLOC(sock) + "socket is readable");
+                if (sock->bytesAvailable() == 0)
+                {
+                    VERBOSE(VB_SOCKET, SLOC(sock) + "socket closed");
+                    sock->close();
+
+                    if (sock->m_cb)
+                    {
+                        VERBOSE(VB_SOCKET, SLOC(sock) + "cb->connectionClosed()");
+                        sock->m_cb->connectionClosed(sock);
+                    }
+                }
+                else if (sock->m_cb)
+                {
+                    sock->m_notifyread = true;
+                    VERBOSE(VB_SOCKET, SLOC(sock) + "cb->readyRead()");
+                    sock->m_cb->readyRead(sock);
+                }
+            }
+            if (FD_ISSET(m_readyread_pipe[0], &rfds))
+            {
+                char buf[128];
+                read(m_readyread_pipe[0], buf, 128);
+            }
+        }
+        else
+        {
+//          VERBOSE(VB_SOCKET, SLOC + "select timeout");
+        }
+    }
+
+    VERBOSE(VB_SOCKET, "MythSocket: readyread thread exit");
+
+    return NULL;
 }
 

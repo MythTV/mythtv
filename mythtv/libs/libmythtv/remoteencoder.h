@@ -6,7 +6,7 @@
 #include <qmap.h>
 
 class ProgramInfo;
-class QSocketDevice;
+class MythSocket;
 
 class RemoteEncoder
 {
@@ -65,12 +65,12 @@ class RemoteEncoder
                                 return v; }
  
   private:
-    QSocketDevice *openControlSocket(const QString &host, short port);
+    MythSocket *openControlSocket(const QString &host, short port);
     void SendReceiveStringList(QStringList &strlist);
 
     int recordernum;
 
-    QSocketDevice *controlSock;
+    MythSocket *controlSock;
     QMutex lock;
 
     QString remotehost;

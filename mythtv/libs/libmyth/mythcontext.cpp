@@ -11,7 +11,6 @@
 #include <qwaitcondition.h>
 #include <qregexp.h>
 
-#include <qsocketdevice.h>
 #include <qhostaddress.h>
 
 #include <cmath>
@@ -32,6 +31,8 @@
 #include "langsettings.h"
 #include "mythdbcon.h"
 #include "util-x11.h"
+#include "mythsocket.h"
+
 #include "libmythui/mythmainwindow.h"
 
 // These defines provide portability for different
@@ -232,8 +233,8 @@ class MythContextPrivate
 
     int bigfontsize, mediumfontsize, smallfontsize;
 
-    QSocketDevice *serverSock;
-    QSocket *eventSock;
+    MythSocket *serverSock;
+    MythSocket *eventSock;
 
     bool disablelibrarypopup;
 
@@ -280,7 +281,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
       themecachedir(QString::null),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
-      serverSock(NULL), eventSock(new QSocket(0, "event socket")),
+      serverSock(NULL), eventSock(NULL),
       disablelibrarypopup(false),
       pluginmanager(NULL),
       screensaver(NULL),
@@ -448,9 +449,9 @@ MythContextPrivate::~MythContextPrivate()
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
     if (serverSock)
-        delete serverSock;
+        serverSock->DownRef();
     if (eventSock)
-        delete eventSock;
+        eventSock->DownRef();
     if (m_priv_mutex)
         delete m_priv_mutex;
     if (screensaver)
@@ -818,13 +819,6 @@ bool MythContext::Init(bool gui)
     if (!d->Init(gui))
         return false;
 
-    connect(d->eventSock, SIGNAL(connected()), 
-            this, SLOT(EventSocketConnected()));
-    connect(d->eventSock, SIGNAL(readyRead()), 
-            this, SLOT(EventSocketRead()));
-    connect(d->eventSock, SIGNAL(connectionClosed()), 
-            this, SLOT(EventSocketClosed()));
-
     ActivateSettingsCache(true);
 
     return true;
@@ -840,17 +834,25 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
 {
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
+
+    if (!d->eventSock)
+        d->eventSock = new MythSocket();
+
     if (!d->serverSock)
         d->serverSock = ConnectServer(d->eventSock, server, port, blockingClient);
+
+    if (d->eventSock)
+        d->eventSock->setCallbacks(this);
+
     return (bool) (d->serverSock);
 }
 
-QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
-                                          const QString &hostname,
-                                          int port,
-                                          bool blockingClient)
+MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
+                                       const QString &hostname,
+                                       int port,
+                                       bool blockingClient)
 {
-    QSocketDevice *serverSock = NULL;
+    MythSocket *serverSock = NULL;
     int cnt = 1;
 
     int sleepTime = GetNumSetting("WOLbackendReconnectWaitTime", 0);
@@ -863,11 +865,11 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
                                     .arg(hostname).arg(port).arg(cnt)
                                     .arg(maxConnTry));
 
-        serverSock = new QSocketDevice(QSocketDevice::Stream);
+        serverSock = new MythSocket();
 
-        if (!connectSocket(serverSock, hostname, port))
+        if (!serverSock->connect(hostname, port))
         {
-            delete serverSock;
+            serverSock->DownRef();
             serverSock = NULL;
         
             if (d->attemptingToConnect)
@@ -930,7 +932,7 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
 #ifndef IGNORE_PROTO_VER_MISMATCH
     if (serverSock && !CheckProtoVersion(serverSock))
     {
-        delete serverSock;
+        serverSock->DownRef();
         serverSock = NULL;
         return false;
     }
@@ -943,12 +945,25 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
             .arg(blockingClient ? "Playback" : "Monitor")
             .arg(d->m_localhostname).arg(false);
         QStringList strlist = str;
-        WriteStringList(serverSock, strlist);
-        ReadStringList(serverSock, strlist, true);
+        serverSock->writeStringList(strlist);
+        serverSock->readStringList(strlist, true);
 
-        if (eventSock &&
-            eventSock->state() == QSocket::Idle)    
-            eventSock->connectToHost(hostname, port);
+        if (eventSock && eventSock->state() == MythSocket::Idle)    
+        {
+            // Assume that since we _just_ connected the one socket, this one
+            // will work, too.
+            eventSock->connect(hostname, port);
+
+            eventSock->Lock();
+            
+            QString str = QString("ANN Monitor %1 %2")
+                                 .arg(d->m_localhostname).arg(true);
+            QStringList strlist = str;
+            eventSock->writeStringList(strlist);
+            eventSock->readStringList(strlist);
+
+            eventSock->Unlock();
+        }
     }
     return serverSock;
 }
@@ -966,23 +981,21 @@ void MythContext::BlockShutdown(void)
         return;
     
     strlist << "BLOCK_SHUTDOWN";
-    WriteStringList(d->serverSock, strlist);
-    ReadStringList(d->serverSock, strlist);
+    d->serverSock->writeStringList(strlist);
+    d->serverSock->readStringList(strlist);
 
-    // wait for the event socket to finish connecting if necessary
-    while (d->eventSock->state() == QSocket::HostLookup ||     
-           d->eventSock->state() == QSocket::Connecting)
-    {
-        qApp->processEvents();
-    }        
-    
-    if (d->eventSock->state() != QSocket::Connected)
+    if (d->eventSock == NULL || d->eventSock->state() != MythSocket::Connected)
         return;
 
     strlist.clear();
     strlist << "BLOCK_SHUTDOWN";
-    WriteStringList(d->eventSock, strlist);
-    ReadStringList(d->eventSock, strlist);
+
+    d->eventSock->Lock();
+    
+    d->eventSock->writeStringList(strlist);
+    d->eventSock->readStringList(strlist);
+
+    d->eventSock->Unlock();
 }
 
 void MythContext::AllowShutdown(void)
@@ -993,23 +1006,21 @@ void MythContext::AllowShutdown(void)
         return;        
     
     strlist << "ALLOW_SHUTDOWN";
-    WriteStringList(d->serverSock, strlist);
-    ReadStringList(d->serverSock, strlist);
+    d->serverSock->writeStringList(strlist);
+    d->serverSock->readStringList(strlist);
     
-    // wait for the eventSocket to finish connecting if necessary
-    while (d->eventSock->state() == QSocket::HostLookup ||     
-           d->eventSock->state() == QSocket::Connecting)
-    {
-        qApp->processEvents();
-    }        
-    
-    if (d->eventSock->state() != QSocket::Connected)
+    if (d->eventSock == NULL || d->eventSock->state() != MythSocket::Connected)
         return;
 
     strlist.clear();
     strlist << "ALLOW_SHUTDOWN";
-    WriteStringList(d->eventSock, strlist);
-    ReadStringList(d->eventSock, strlist);
+
+    d->eventSock->Lock();
+    
+    d->eventSock->writeStringList(strlist);
+    d->eventSock->readStringList(strlist);
+
+    d->eventSock->Unlock();
 }
 
 void MythContext::SetBackend(bool backend)
@@ -2338,15 +2349,22 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout,
     
     if (d->serverSock)
     {
-        WriteStringList(d->serverSock, strlist);
-        ok = ReadStringList(d->serverSock, strlist, quickTimeout);
+        d->serverSock->writeStringList(strlist);
+        ok = d->serverSock->readStringList(strlist, quickTimeout);
 
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, QString("Connection to backend server lost"));
+            d->serverSock->DownRef();
+            d->serverSock = NULL;
+
             ConnectToMasterServer(false);
-            WriteStringList(d->serverSock, strlist);
-            ok = ReadStringList(d->serverSock, strlist, quickTimeout);
+
+            if (d->serverSock)
+            {
+                d->serverSock->writeStringList(strlist);
+                ok = d->serverSock->readStringList(strlist, quickTimeout);
+            }
         }
 
         // this should not happen
@@ -2360,14 +2378,17 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout,
             MythEvent me(message, extra);
             dispatch(me);
 
-            ok = ReadStringList(d->serverSock, strlist, quickTimeout);
+            ok = d->serverSock->readStringList(strlist, quickTimeout);
         }
         // .
 
         if (!ok)
         {
-            delete d->serverSock;
-            d->serverSock = NULL;
+            if (d->serverSock)
+            {
+                d->serverSock->DownRef();
+                d->serverSock = NULL;
+            }
 
             qApp->lock();
             if (!block)
@@ -2390,18 +2411,20 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout,
     return ok;
 }
 
-void MythContext::EventSocketRead(void)
+void MythContext::readyRead(MythSocket *sock)
 {
-    while (d->eventSock->state() == QSocket::Connected &&
+    (void)sock;
+
+    while (d->eventSock->state() == MythSocket::Connected &&
            d->eventSock->bytesAvailable() > 0)
     {
         QStringList strlist;
-        if (!ReadStringList(d->eventSock, strlist))
+        if (!d->eventSock->readStringList(strlist))
             continue;
 
         QString prefix = strlist[0];
         QString message = strlist[1];
-        
+
         if (prefix == "OK")
         {
         }
@@ -2427,12 +2450,12 @@ void MythContext::EventSocketRead(void)
     }
 }
 
-bool MythContext::CheckProtoVersion(QSocketDevice* socket)
+bool MythContext::CheckProtoVersion(MythSocket* socket)
 {
     QStringList strlist = QString("MYTH_PROTO_VERSION %1")
                                  .arg(MYTH_PROTO_VERSION);
-    WriteStringList(socket, strlist);
-    ReadStringList(socket, strlist, true);
+    socket->writeStringList(strlist);
+    socket->readStringList(strlist, true);
         
     if (strlist[0] == "REJECT")
     {
@@ -2470,33 +2493,32 @@ bool MythContext::CheckProtoVersion(QSocketDevice* socket)
     return false;
 }
 
-bool MythContext::CheckProtoVersion(QSocket* socket) 
+void MythContext::connected(MythSocket *sock)
 {
-    return CheckProtoVersion(socket->socketDevice());
+    (void)sock;
 }
 
-void MythContext::EventSocketConnected(void)
+void MythContext::connectionClosed(MythSocket *sock)
 {
-/* Unnecessary, just checked on the serverSock connect */
-#if 0
-    if (!CheckProtoVersion(d->eventSock))
-        return;
-#endif
+    (void)sock;
 
-    QString str = QString("ANN Monitor %1 %2")
-                         .arg(d->m_localhostname).arg(true);
-    QStringList strlist = str;
-    WriteStringList(d->eventSock, strlist);
-    ReadStringList(d->eventSock, strlist);
-}
-
-void MythContext::EventSocketClosed(void)
-{
     VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
             "No connection to the backend."));
 
-    delete d->serverSock;
-    d->serverSock = NULL;
+    d->serverSockLock.lock();
+    if (d->serverSock)
+    {
+        d->serverSock->DownRef();
+        d->serverSock = NULL;
+    }
+
+    if (d->eventSock)
+    {
+        d->eventSock->DownRef();
+        d->eventSock = NULL;
+    }
+
+    d->serverSockLock.unlock();
 }
 
 QFont MythContext::GetBigFont(void)
