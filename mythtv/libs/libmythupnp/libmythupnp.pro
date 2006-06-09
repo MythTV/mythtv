@@ -4,7 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythupnp-$$LIBVERSION
 CONFIG += thread dll
-target.path = $${PREFIX}/lib
+target.path = $${LIBDIR}
 INSTALLS = target
 
 setting.path = $${PREFIX}/share/mythtv/
@@ -47,7 +47,7 @@ TARGETDEPS += ../libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
-inc.path = $${PREFIX}/include/mythupnp/
+inc.path = $${PREFIX}/include/mythtv/upnp/
 
 inc.files  = httprequest.h upnp.h ssdp.h taskqueue.h bufferedsocketdevice.h
 inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnpglobal.h
