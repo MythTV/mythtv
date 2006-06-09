@@ -1,0 +1,247 @@
+body {
+   font-family: tahoma, Arial;
+   font-size: 8pt;
+   margin:   0px;
+   border: 0px;
+   background-color: #F2F1EB;
+   cursor: default;
+}
+
+#header {
+  float:left;
+  width:100%;
+  background:#DAE0D2 url("bg.gif") repeat-x bottom;
+  font-size:10pt;
+  line-height:normal;
+  }
+#header ul {
+  margin:0;
+  padding:10px 10px 0;
+  list-style:none;
+  }
+#header li {
+  float:left;
+  background: url("left.gif") no-repeat left top;
+  margin:0;
+  padding:0 0 0 9px;
+  }
+#header a {
+  float:left;
+  display:block;
+  background: url("right.gif") no-repeat right top;
+  padding:5px 15px 4px 6px;
+  text-decoration:none;
+  font-weight:bold;
+  color:#765;
+  }
+/* Commented Backslash Hack
+   hides rule from IE5-Mac \*/
+#header a {float:none;}
+/* End IE5-Mac hack */
+#header a:hover {
+  color:#333;
+  }
+  
+#header li.selected {
+  background-image: url("left_on.gif");
+}
+
+#header li.selected a {
+  background-image: url("right_on.gif");
+  color:#333;
+  padding-bottom:5px;
+  }
+
+table.mnuBar
+{
+   color: #ffffff;
+/*   z-index: 0; */
+   height: 23px; 
+   width: 100%;
+   font-family: tahoma, Arial;
+   font-size: 10pt;
+/*   position: relative; */
+   background-color: #7288AC;
+   border: #abc0e7 1px solid;
+   border-right: #00377a 1px solid;
+   border-bottom: #00377a 1px solid;
+}
+
+div.panel {
+   font-family: tahoma, Arial;
+   font-size: 9pt;
+/*   position:absolute; */
+/*   top:0px; */
+/*	 top:50px;  */
+/*	 left:2%; 
+	 width:96%; */
+/*	 height:200px;  */
+/*    z-index:99;  */
+/*	 visibility:hidden; */
+}
+
+table.panel {
+/*   color: #ffffff; */
+/*   z-index: 0; */
+   width: 100%;
+/*   position: relative; */
+/*   background-color: #7288AC; */
+   border: #abc0e7 1px solid;
+   border-right: #00377a 1px solid;
+   border-bottom: #00377a 1px solid;
+}
+
+div.panelArea {
+   font-family: tahoma, Arial;
+   font-size: 9pt;
+/*   height:200px;  */
+   border: 1px solid #949e9c;
+   background-color: #fffbff;
+}
+
+
+div.Results {
+/*	position:absolute; 
+	top:275px; 
+	left:2%; 
+	width:96%; 
+	height:400px; 
+	visibility:show;
+*/	
+}
+
+.desc {
+   font-family: tahoma, Arial;
+   font-size: 9pt;
+}
+
+.method {
+	font-family: tahoma, Arial;
+	font-size: 10pt;
+	color: #0;
+	font-weight: bold;
+}
+
+.param {
+	font-family: tahoma, Arial;
+	font-size: 9pt;
+	color: #0;
+	font-weight: bold;
+}
+
+.label {
+	font-family: tahoma, Arial;
+	font-size: 10pt;
+	color: #7288AC;
+	font-weight: bold;
+	font-style: italic;
+}
+
+
+.formButton {
+   background-color:  #6699cc;
+   padding:          	2px 4px 3px 4px;
+   color:            	#000000;
+   font-size:        	10pt;
+   font-family:      	tahoma;
+   height:           	20px;
+   filter:						progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr=#B4C5DF, EndColorStr=#91A9D0);
+   border-width:     	0px;
+}
+
+.inputfields {
+   font-size:         10pt;
+   font-family:      tahoma;
+   width:            100%;
+   height:            19px;
+   border:            1px solid #7b9ebd;
+}
+
+INPUT.rad
+{
+   width:            15px;
+   border:            0px;
+   cursor:            hand;
+}
+
+TD.sec
+{
+   width:            100%;
+   color:            #606050;
+   font-weight:      bold;
+   padding-left:      0px;
+   padding-bottom:   2px;
+   padding-top:      10px;
+}
+
+TD.bar 
+{
+   border-bottom:      1px solid #838574;
+}
+
+TD.req 
+{
+   font-weight:      bold;
+   color:            #990000;
+}
+
+TD.statusBar
+{
+   background-color:   #365484;
+   color:            #ffffff;
+   padding-left:      5px;
+}
+
+TD.radioLabel 
+{
+   padding-left:      2px;
+   padding-right:      10px;
+}
+
+TABLE.layout
+{
+   table-layout:      fixed;
+   width:            100%;
+   height:            100%;
+}
+
+div.tab
+{
+   width: 100%;
+   height: 100%;
+   border: 1px solid #949e9c;
+   background-color: #fffbff;
+   display: none;
+}
+
+a
+{
+   color: #0000ff;
+   font-weight: bold;
+}
+
+
+span.menu
+{
+   height: 100%;
+   padding: 0px;
+   padding-left: 5px;
+   padding-right: 5px;
+   border: 1px solid #7288AC;
+}
+
+td.mnuTitle
+{
+   font-size: 9pt;
+   font-weight: bold;
+   letter-spacing: 1px;
+   cursor: default;
+   color: #ffff00;
+}
+
+td.mnuRight
+{
+   width: 100%;
+   text-align: right;
+   padding-right: 5px;
+}
