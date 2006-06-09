@@ -147,6 +147,9 @@ void MythUIType::SetCanTakeFocus(bool set)
 
 void MythUIType::HandleMovementPulse(void)
 {
+    if (!GetMythPainter()->SupportsAnimation())
+        return;
+
     if (!m_Moving)
         return;
 
@@ -185,6 +188,9 @@ void MythUIType::HandleMovementPulse(void)
 
 void MythUIType::HandleAlphaPulse(void)
 {
+    if (!GetMythPainter()->SupportsAlpha())
+        return;
+
     if (m_AlphaChangeMode == 0)
         return;
 
