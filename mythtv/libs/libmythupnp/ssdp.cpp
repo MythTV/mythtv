@@ -230,7 +230,9 @@ bool SSDP::ProcessSearchRequest( HTTPRequest  *pRequest,
 
 SSDPExtension::SSDPExtension( ) : HttpServerExtension( "SSDP" )
 {
-    m_sUPnpDescPath = gContext->GetSetting( "upnpDescXmlPath", "./" );
+    QString sSharePath = gContext->GetShareDir();
+
+    m_sUPnpDescPath = gContext->GetSetting("upnpDescXmlPath", sSharePath);
 }
 
 /////////////////////////////////////////////////////////////////////////////

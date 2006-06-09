@@ -42,7 +42,9 @@ UPnpDeviceDesc::~UPnpDeviceDesc()
 
 bool UPnpDeviceDesc::Load()
 {
-    m_sUPnpDescPath  = gContext->GetSetting( "upnpDescXmlPath", "./" );
+    QString sSharePath = gContext->GetShareDir();
+
+    m_sUPnpDescPath  = gContext->GetSetting("upnpDescXmlPath", sSharePath);
     m_sUPnpDescPath += "upnpavcd.xml";
 
     // ----------------------------------------------------------------------

@@ -7,7 +7,7 @@ CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-setting.path = $${PREFIX}/bin/
+setting.path = $${PREFIX}/share/mythtv/
 setting.files += upnpavcd.xml CDS_scpd.xml CMGR_scpd.xml 
 
 INSTALLS += setting
