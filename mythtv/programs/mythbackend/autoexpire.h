@@ -36,6 +36,7 @@ class AutoExpire : public QObject
     void FillExpireList();
     void PrintExpireList();
     void GetAllExpiring(QStringList &strList);
+    void GetAllExpiring(pginfolist_t &list);
 
     static void Update(QMap<int, EncoderLink*>*, bool immediately);
   protected:

@@ -34,11 +34,12 @@ inline  long long  myAbs(long long  n)  { return n >= 0 ? n : -n; }
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, bool bIsMaster )
+HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster )
           : HttpServerExtension( "HttpStatus" )
 {
     m_pEncoders = tvList;
     m_pSched    = sched;
+    m_pExpirer  = expirer;
     m_bIsMaster = bIsMaster;
 }
 
@@ -69,6 +70,7 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 
     if (sURI == "getChannelIcon"       ) return( HSM_GetChannelIcon  );
     if (sURI == "getRecorded"          ) return( HSM_GetRecorded     );
+    if (sURI == "getExpiring"          ) return( HSM_GetExpiring     );
     if (sURI == "getPreviewImage"      ) return( HSM_GetPreviewImage );
     if (sURI == "getRecording"         ) return( HSM_GetRecording    );
     if (sURI == "getMusic"             ) return( HSM_GetMusic        );
@@ -109,6 +111,7 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
                                                                        
                 case HSM_GetChannelIcon : GetChannelIcon ( pRequest ); return( true );
                 case HSM_GetRecorded    : GetRecorded    ( pRequest ); return( true );
+                case HSM_GetExpiring    : GetExpiring    ( pRequest ); return( true );
                 case HSM_GetPreviewImage: GetPreviewImage( pRequest ); return( true );
 
                 case HSM_GetRecording   : GetRecording   ( pThread, pRequest ); return( true );
@@ -615,6 +618,45 @@ void HttpStatus::GetRecorded( HTTPRequest *pRequest )
     pRequest->m_eResponseType = ResponseTypeXML;
     pRequest->m_response << doc.toString();
 
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//                  
+/////////////////////////////////////////////////////////////////////////////
+
+void HttpStatus::GetExpiring( HTTPRequest *pRequest )
+{
+    pginfolist_t  list;
+
+    m_pExpirer->GetAllExpiring( list );
+
+    // Build Response XML
+
+    QDomDocument doc( "Expiring" );                        
+
+    QDomElement root = doc.createElement("Expiring");
+    doc.appendChild(root);
+
+    root.setAttribute("asOf"      , QDateTime::currentDateTime().toString( Qt::ISODate ));
+    root.setAttribute("version"   , MYTH_BINARY_VERSION           );
+    root.setAttribute("protoVer"  , MYTH_PROTO_VERSION            );
+    root.setAttribute("totalCount", list.size()                   );
+
+    pginfolist_t::iterator it = list.begin();
+    for (; it !=list.end(); it++)
+    {
+        ProgramInfo *pInfo = (*it);
+
+        if (pInfo != NULL)
+        {
+            FillProgramInfo( &doc, root, pInfo, true );
+            delete pInfo;
+        }
+    }
+
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+    pRequest->m_eResponseType = ResponseTypeXML;
+    pRequest->m_response << doc.toString();
 }
 
 /////////////////////////////////////////////////////////////////////////////

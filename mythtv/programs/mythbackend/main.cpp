@@ -623,7 +623,7 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
 
-    g_pHttpServer->RegisterExtension(new HttpStatus(&tvList, sched, ismaster));
+    g_pHttpServer->RegisterExtension(new HttpStatus(&tvList, sched, expirer, ismaster ));
 
     // Start UPnP Services For Master Backends Only
     if (ismaster)

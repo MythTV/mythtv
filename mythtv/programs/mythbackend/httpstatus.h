@@ -16,6 +16,7 @@
 
 #include "httpserver.h"
 #include "mainserver.h"
+#include "autoexpire.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
 #include "programinfo.h"
@@ -44,7 +45,9 @@ typedef enum
     HSM_GetCDSDesc      = 14,
     HSM_GetCMGRDesc     = 15,
     
-    HSM_Asterisk        = 16
+    HSM_Asterisk        = 16,
+
+    HSM_GetExpiring     = 17
 
 } HttpStatusMethod;
 
@@ -122,6 +125,7 @@ class HttpStatus : public HttpServerExtension
 
         Scheduler                   *m_pSched;
         QMap<int, EncoderLink *>    *m_pEncoders;
+        AutoExpire                  *m_pExpirer;
         bool                         m_bIsMaster;
 
     private:
@@ -141,6 +145,8 @@ class HttpStatus : public HttpServerExtension
         void    GetChannelIcon ( HTTPRequest *pRequest );
         void    GetRecorded    ( HTTPRequest *pRequest );
         void    GetPreviewImage( HTTPRequest *pRequest );
+
+        void    GetExpiring    ( HTTPRequest *pRequest );
 
         void    GetRecording   ( HttpWorkerThread *pThread, 
                                  HTTPRequest      *pRequest );
@@ -168,7 +174,7 @@ class HttpStatus : public HttpServerExtension
         int     PrintMachineInfo  ( QTextStream &os, QDomElement info );
 
     public:
-                 HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, bool bIsMaster );
+                 HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster );
         virtual ~HttpStatus();
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

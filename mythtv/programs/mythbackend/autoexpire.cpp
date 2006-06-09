@@ -674,6 +674,25 @@ void AutoExpire::GetAllExpiring(QStringList &strList)
         (*it)->ToStringList(strList);
 }
 
+/** \fn AutoExpire::GetAllExpiring(pginfolist_t&)
+ *  \brief Gets the full list of programs that can expire in expiration order
+ */
+void AutoExpire::GetAllExpiring(pginfolist_t &list)
+{
+    QMutexLocker lockit(&instance_lock);
+
+    UpdateDontExpireSet();
+
+    ClearExpireList();
+    FillDBOrdered(emShortLiveTVPrograms, true);
+    FillDBOrdered(emNormalLiveTVPrograms, true);
+    FillDBOrdered(gContext->GetNumSetting("AutoExpireMethod", 1), true);
+
+    pginfolist_t::iterator it = expire_list.begin();
+    for (; it != expire_list.end(); it++)
+        list.push_back( new ProgramInfo( *(*it) ));
+}
+
 /** \fn AutoExpire::ClearExpireList()
  *  \brief Clears expire_list, freeing any ProgramInfo's.
  */
