@@ -1193,9 +1193,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
  
     iAvail = getDiskSpace( gContext->GetFilePrefix(), iTotal, iUsed); 
  
-    storage.setAttribute("_local_:total", (int)(iTotal>>10)); 
-    storage.setAttribute("_local_:used" , (int)(iUsed>>10)); 
-    storage.setAttribute("_local_:free" , (int)(iAvail>>10)); 
+    storage.setAttribute("_local_total", (int)(iTotal>>10)); 
+    storage.setAttribute("_local_used" , (int)(iUsed>>10)); 
+    storage.setAttribute("_local_free" , (int)(iAvail>>10)); 
  
     if (m_bIsMaster) 
     { 
@@ -1223,29 +1223,29 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 eit.data()->GetFreeDiskSpace(mTotal, mUsed); 
                 mAvail = mTotal - mUsed; 
  
-                storage.setAttribute(encoderHost + ":total", (int)(mTotal>>10)); 
-                storage.setAttribute(encoderHost + ":used" , (int)(mUsed>>10)); 
-                storage.setAttribute(encoderHost + ":free" , (int)(mAvail>>10)); 
+                storage.setAttribute(encoderHost + "_total", (int)(mTotal>>10)); 
+                storage.setAttribute(encoderHost + "_used" , (int)(mUsed>>10)); 
+                storage.setAttribute(encoderHost + "_free" , (int)(mAvail>>10)); 
  
                 if ((mTotal == iTotal) && 
                     (myAbs(mAvail - iAvail) < (iAvail * 0.05))) 
                 { 
-                    storage.setAttribute(encoderHost + ":shared" , 1); 
+                    storage.setAttribute(encoderHost + "_shared" , 1); 
                 } 
                 else 
                 { 
-                    storage.setAttribute(encoderHost + ":shared" , 0); 
+                    storage.setAttribute(encoderHost + "_shared" , 0); 
                     gTotal += mTotal; 
                     gUsed  += mUsed; 
                     gAvail += mAvail; 
                 } 
             } 
         } 
-        storage.setAttribute("_total_:total", (int)(gTotal>>10)); 
-        storage.setAttribute("_total_:used" , (int)(gUsed>>10)); 
-        storage.setAttribute("_total_:free" , (int)(gAvail>>10)); 
+        storage.setAttribute("_total_total", (int)(gTotal>>10)); 
+        storage.setAttribute("_total_used" , (int)(gUsed>>10)); 
+        storage.setAttribute("_total_free" , (int)(gAvail>>10)); 
  
-        if (hosts != "_local_") 
+        if (hosts != "") 
             hosts += ",_total_"; 
         storage.setAttribute("slaves", hosts); 
     } 
@@ -2072,9 +2072,9 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
             for (unsigned int i = 0; i < tokens.size(); i++)
             {
-                int nFree = e.attribute(tokens[i] + ":free" , "0" ).toInt();
-                int nTotal= e.attribute(tokens[i] + ":total", "0" ).toInt();
-                int nUsed = e.attribute(tokens[i] + ":used" , "0" ).toInt();
+                int nFree = e.attribute(tokens[i] + "free" , "0" ).toInt();
+                int nTotal= e.attribute(tokens[i] + "total", "0" ).toInt();
+                int nUsed = e.attribute(tokens[i] + "used" , "0" ).toInt();
 
                 if (slaves == "_local_")
                 {
@@ -2094,7 +2094,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                 {
                     os << "        <li>" << tokens[i] << ": ";
 
-                    if (e.attribute(tokens[i] + ":shared", "0").toInt())
+                    if (e.attribute(tokens[i] + "shared", "0").toInt())
                         os << " (Shared with master)";
 
                     os << "\r\n"
