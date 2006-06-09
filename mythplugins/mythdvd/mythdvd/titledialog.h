@@ -11,6 +11,7 @@
 #define TITLEDIALOG_H_
 
 #include <qtimer.h>
+#include <qsocket.h>
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythcontext.h>
