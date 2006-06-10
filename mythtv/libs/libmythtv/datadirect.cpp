@@ -758,8 +758,8 @@ FILE *DataDirectProcessor::DDPost(
         "--header='Accept-Encoding:gzip' %4 --output-document=- ")
         .arg(userid).arg(password).arg(postFilename).arg(ddurl);
 
-    if (!SHOW_WGET_OUTPUT)
-        command += " 2> /dev/null ";
+    // if (!SHOW_WGET_OUTPUT)
+    //    command += " 2> /dev/null ";
 
     command += " | gzip -df";
 
