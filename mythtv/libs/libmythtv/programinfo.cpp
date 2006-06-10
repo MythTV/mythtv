@@ -1213,6 +1213,30 @@ void ProgramInfo::ToggleRecord(void)
             ApplyRecordStateChange(kFindOneRecord);
             break;
         case kFindOneRecord:
+            ApplyRecordStateChange(kAllRecord);
+            break;
+        case kAllRecord:
+            ApplyRecordStateChange(kSingleRecord);
+            break;
+
+        case kOverrideRecord:
+            ApplyRecordStateChange(kDontRecord);
+            break;
+        case kDontRecord:
+            ApplyRecordStateChange(kOverrideRecord);
+            break;
+
+        default:
+            ApplyRecordStateChange(kAllRecord);
+            break;
+/*
+        case kNotRecording:
+            ApplyRecordStateChange(kSingleRecord);
+            break;
+        case kSingleRecord:
+            ApplyRecordStateChange(kFindOneRecord);
+            break;
+        case kFindOneRecord:
             ApplyRecordStateChange(kWeekslotRecord);
             break;
         case kWeekslotRecord:
@@ -1240,6 +1264,7 @@ void ProgramInfo::ToggleRecord(void)
         case kDontRecord:
             ApplyRecordStateChange(kOverrideRecord);
             break;
+*/
     }
 }
 
@@ -3670,10 +3695,15 @@ void ProgramInfo::ShowRecordingDialog(void)
 
         if (rectype == kOverrideRecord || rectype == kDontRecord)
         {
-            diag.AddButton(QObject::tr("Edit Override"));
-            ednorm = button++;
-            if (recstatus != rsRecording)
+            if (recstatus == rsRecording)
             {
+                diag.AddButton(QObject::tr("Change Ending Time"));
+                edend = button++;
+            }
+            else
+            {
+                diag.AddButton(QObject::tr("Edit Override"));
+                ednorm = button++;
                 diag.AddButton(QObject::tr("Clear Override"));
                 clearov = button++;
             }
