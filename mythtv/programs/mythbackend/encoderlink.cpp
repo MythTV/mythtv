@@ -265,7 +265,8 @@ long long EncoderLink::GetFreeDiskSpace(long long &totalKB, long long &usedKB,
  */
 long long EncoderLink::GetFreeDiskSpace(bool use_cache)
 {
-    long long totalKB, usedKB;
+    long long totalKB = 0LL;
+    long long usedKB  = 0LL;
     return GetFreeDiskSpace(totalKB, usedKB, use_cache);
 }
 

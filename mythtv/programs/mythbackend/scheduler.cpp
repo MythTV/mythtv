@@ -251,9 +251,16 @@ static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
 
 void Scheduler::FillEncoderFreeSpaceCache()
 {
+    long long frsp;
+
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
-        enciter.data()->GetFreeDiskSpace(false); // update cache value
+    {
+        frsp = enciter.data()->GetFreeDiskSpace(false); // update cache value
+        VERBOSE(VB_SCHEDULE, QString("Encoder card %1 free space %2")
+                                     .arg(enciter.data()->GetCardID())
+                                     .arg(frsp));
+    }
 }
 
 bool Scheduler::FillRecordList(void)
