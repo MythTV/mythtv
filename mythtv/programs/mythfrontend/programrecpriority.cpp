@@ -560,6 +560,7 @@ void ProgramRecPriority::edit(void)
         else
             MythContext::DBError("Get new recording priority query", query);
 
+        countMatches();
         update(fullRect);
     }
 }
@@ -787,6 +788,12 @@ void ProgramRecPriority::FillList(void)
     else
         MythContext::DBError("Get program recording priorities query", result);
 
+    countMatches();
+}
+
+void ProgramRecPriority::countMatches()
+{
+    listMatch.clear();
     conMatch.clear();
     nowMatch.clear();
     recMatch.clear();
@@ -856,9 +863,9 @@ class programRecPrioritySort
                 int typeB = RecTypePriority(b.prog->recType);
                 if (typeA == typeB)
                     if (m_reverse)
-                        return (a.prog->sortTitle < b.prog->sortTitle);
+                        return (a.prog->recordid < b.prog->recordid);
                     else
-                        return (a.prog->sortTitle > b.prog->sortTitle);
+                        return (a.prog->recordid > b.prog->recordid);
 
                 if (m_reverse)
                     return (typeA < typeB);
@@ -1058,15 +1065,15 @@ void ProgramRecPriority::updateList(QPainter *p)
                         ltype->SetItemText(cnt, 6, 
                                 QString::number(abs(finalRecPriority)));
 
-                        if (conMatch[progInfo->recordid] > 0)
+                        if (progInfo->recType == kDontRecord ||
+                            progInfo->recstatus == rsInactive)
+                            ltype->EnableForcedFont(cnt, "inactive");
+                        else if (conMatch[progInfo->recordid] > 0)
                             ltype->EnableForcedFont(cnt, "conflicting");
                         else if (nowMatch[progInfo->recordid] > 0)
                             ltype->EnableForcedFont(cnt, "recording");
                         else if (recMatch[progInfo->recordid] > 0)
                             ltype->EnableForcedFont(cnt, "record");
-                        else if (progInfo->recType == kDontRecord ||
-                            progInfo->recstatus == rsInactive)
-                            ltype->EnableForcedFont(cnt, "inactive");
 
                         cnt++;
                         listCount++;

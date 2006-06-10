@@ -55,9 +55,11 @@ class ProgramRecPriority : public MythDialog
 
   private:
     void FillList(void);
-    void SortList();
+    void SortList(void);
     QMap<QString, ProgramRecPriorityInfo> programData;
     QMap<int, int> origRecPriorityData;
+
+    void countMatches(void);
     QMap<int, int> conMatch;
     QMap<int, int> nowMatch;
     QMap<int, int> recMatch;
