@@ -714,8 +714,10 @@ void StatusBox::doListingsStatus()
 
     mfdNextRunStart.replace("T", " ");
 
+    extern const char *myth_source_version;
     contentLines[count++] = QObject::tr("Myth version:") + " " +
-                                        MYTH_BINARY_VERSION;
+                                        MYTH_BINARY_VERSION + "   " +
+                                        myth_source_version;
     contentLines[count++] = QObject::tr("Last mythfilldatabase guide update:");
     contentLines[count++] = QObject::tr("Started:   ") + mfdLastRunStart;
 
