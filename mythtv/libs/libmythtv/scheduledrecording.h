@@ -45,6 +45,7 @@ class SRCategory;
 class SRRecPriority;
 class SRRecGroup;
 class SRPlayGroup;
+class SRInput;
 class SRSeriesid;
 class SRProgramid;
 class SRFindDay;
@@ -160,6 +161,7 @@ public:
     void setRecPriorityObj(SRRecPriority* val) {recpriority = val;}
     void setRecGroupObj(SRRecGroup* val) {recgroup = val;}
     void setPlayGroupObj(SRPlayGroup* val) {playgroup = val;}
+    void setInputObj(SRInput* val) {prefinput = val;}
     void setSeriesIDObj(SRSeriesid* val) {seriesid = val;}
     void setProgramIDObj(SRProgramid* val) {programid = val;}
     void setFindDayObj(SRFindDay* val) {findday = val;}
@@ -228,6 +230,7 @@ protected:
     class SRRecPriority* recpriority;
     class SRRecGroup* recgroup;
     class SRPlayGroup* playgroup;
+    class SRInput* prefinput;
     class SRSeriesid* seriesid;
     class SRProgramid* programid;
     class SRFindDay* findday;

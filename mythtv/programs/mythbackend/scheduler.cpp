@@ -1928,7 +1928,10 @@ void Scheduler::AddNewRecords(void)
     QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
 
-    int hdtvpriority = gContext->GetNumSetting("HDTVRecPriority", 0);
+    int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
+    int prefinputpri    = gContext->GetNumSetting("PrefInputPriority", 2);
+    int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
+    int ccpriority      = gContext->GetNumSetting("CCRecPriority", 0);
 
     QMap<int, bool> cardMap;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -2025,7 +2028,8 @@ void Scheduler::AddNewRecords(void)
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-"channel.recpriority + cardinput.recpriority, program.hdtv "
+"channel.recpriority + cardinput.recpriority, "
+"RECTABLE.prefinput, program.hdtv, program.closecaptioned "
 + QString(
 "FROM recordmatch "
 
@@ -2147,9 +2151,6 @@ void Scheduler::AddNewRecords(void)
         p->channame = QString::fromUtf8(result.value(9).toString());
         p->category = QString::fromUtf8(result.value(11).toString());
         p->recpriority = result.value(12).toInt();
-        p->recpriority2 = result.value(39).toInt();
-        if (result.value(40).toInt())
-            p->recpriority2 += hdtvpriority;
         p->dupin = RecordingDupInType(result.value(13).toInt());
         p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
         p->rectype = RecordingType(result.value(16).toInt());
@@ -2189,6 +2190,23 @@ void Scheduler::AddNewRecords(void)
             recTypeRecPriorityMap[p->rectype] = 
                 p->GetRecordingTypeRecPriority(p->rectype);
         p->recpriority += recTypeRecPriorityMap[p->rectype];
+
+        p->recpriority2 += result.value(39).toInt();
+
+        if (p->inputid == result.value(40).toInt())
+            p->recpriority2 += prefinputpri;
+
+        if (result.value(41).toInt() > 0)
+            p->recpriority2 += hdtvpriority;
+
+        if (result.value(42).toInt() > 0)
+            p->recpriority2 += ccpriority;
+
+        if (complexpriority == 0)
+        {
+            p->recpriority += p->recpriority2;
+            p->recpriority2 = 0;
+        }
 
         if (p->recstartts >= p->recendts)
         {

@@ -288,6 +288,7 @@ class ProgramInfo
     RecStatusType recstatus;
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
+    int prefinput;
     int recpriority2;
     int reactivate;
 

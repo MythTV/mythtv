@@ -28,6 +28,9 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording *_rec, ManagedList* 
     addItem(dupLocItem->getItem(), -1);
     connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
 
+    prefInput = new SRInput(_rec, _parentList, this);
+    addItem(prefInput->getItem(), -1);
+
     inactive = new SRInactive(_rec, this, _parentList);
     addItem(inactive->getItem(), -1);
 }
@@ -199,3 +202,25 @@ void SRPlayGroup::fillSelections()
     }
 }
 
+void SRInput::fillSelections()
+{
+    addSelection(QString(QObject::tr("Use any available input")), 0);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardinputid,cardid,inputname,displayname "
+                  "FROM cardinput ORDER BY cardinputid");
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString input_name = query.value(3).toString();
+            if (input_name == "")
+                input_name = QString("%1: %2")
+                                     .arg(query.value(1).toInt())
+                                     .arg(query.value(2).toString());
+            addSelection(QObject::tr("Prefer input %1")
+                     .arg(input_name), query.value(0).toInt());
+        }
+    }
+}

@@ -378,12 +378,13 @@ class SRSchedOptionsGroup : public ManagedListGroup
     protected:
 
         friend class SRRootGroup;
-        class SRInactive* inactive;
         class SRRecPriority* recPriority;
         class SRStartOffset* startOffset;
         class SREndOffset* endOffset;
         class SRDupMethod* dupMethItem;
         class SRDupIn* dupLocItem;
+        class SRInput* prefInput;
+        class SRInactive* inactive;
 
         ScheduledRecording *schedRec;
 };
@@ -912,5 +913,30 @@ class SRPlayGroup: public SRSelectSetting
         virtual void fillSelections();
 };
 
-#endif
+class SRInput: public SRSelectSetting
+{
+    Q_OBJECT
 
+    public:
+        SRInput(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "inputList", QString("[ %1 ]")
+                              .arg(QObject::tr("Select Preferred Input")),
+                              _group, "prefinput", _list )
+        {
+            setValue(0);
+            _parent->setInputObj(this);
+        }
+
+        virtual void load() {
+            fillSelections();
+            SRSelectSetting::load();
+        }
+
+        virtual QString getValue(void) const {
+            return settingValue;
+        }
+
+        virtual void fillSelections();
+};
+
+#endif

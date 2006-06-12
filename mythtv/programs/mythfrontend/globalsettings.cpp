@@ -2121,8 +2121,82 @@ static GlobalCheckBox *GRSchedMoveHigher()
                     "can be used to record lower priority programs that "
                     "would otherwise not be recorded, but risks missing "
                     "a higher priority program if the schedule changes."));
+    bc->setValue(true);
+    return bc;
+}
+
+static GlobalSpinBox *GRDefaultStartOffset()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("DefaultStartOffset",
+                                          -10, 30, 5, true);
+    bs->setLabel(QObject::tr("Default 'Start Early' minutes for new "
+                             "recording rules"));
+    bs->setHelpText(QObject::tr("Set this to '0' unless you expect that the "
+                    "majority of your show times will not match your TV "
+                    "listings. This sets the initial start early or start "
+                    "late time when rules are created. These can then be "
+                    "adjusted per recording rule."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GRDefaultEndOffset()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("DefaultEndOffset",
+                                          -10, 30, 5, true);
+    bs->setLabel(QObject::tr("Default 'End Late' minutes for new "
+                             "recording rules"));
+    bs->setHelpText(QObject::tr("Set this to '0' unless you expect that the "
+                    "majority of your show times will not match your TV "
+                    "listings. This sets the initial end late or end early "
+                    "time when rules are created. These can then be adjusted "
+                    "per recording rule."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalCheckBox *GRComplexPriority()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("ComplexPriority");
+    bc->setLabel(QObject::tr("Complex Prioritization"));
+    bc->setHelpText(QObject::tr("If set, per rule plus type priorities "
+                    "will be used for primary prioritization with all other "
+                    "priorities having a secondary effect. Unset so that all "
+                    "are treated equally in a single total priority as "
+                    "described in the HOWTO."));
     bc->setValue(false);
     return bc;
+}
+
+static GlobalSpinBox *GRPrefInputRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("PrefInputPriority", 1, 99, 1);
+    bs->setLabel(QObject::tr("Preferred Input Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "matches the preferred input selected in the 'Scheduling "
+                    "Options' section of the recording rule."));
+    bs->setValue(2);
+    return bs;
+}
+
+static GlobalSpinBox *GRHDTVRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("HDTVRecPriority", -99, 99, 1);
+    bs->setLabel(QObject::tr("HDTV Recording Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as an HDTV broadcast in the TV listings."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GRCCRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("CCRecPriority", -99, 99, 1);
+    bs->setLabel(QObject::tr("Close Captioned Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as Close Captioned in the TV listings."));
+    bs->setValue(0);
+    return bs;
 }
 
 static GlobalSpinBox *GRSingleRecordRecPriority()
@@ -2175,16 +2249,6 @@ static GlobalSpinBox *GRAllRecordRecPriority()
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("All Recordings Priority"));
     bs->setHelpText(QObject::tr("All Recording types will receive this "
-                    "additional recording priority value."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRHDTVRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("HDTVRecPriority", -99, 99, 1);
-    bs->setLabel(QObject::tr("HDTV Recordings Priority"));
-    bs->setHelpText(QObject::tr("All HDTV programs will receive this "
                     "additional recording priority value."));
     bs->setValue(0);
     return bs;
@@ -3451,19 +3515,29 @@ EPGSettings::EPGSettings()
 
 GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 {
-    VerticalConfigurationGroup* gr = new VerticalConfigurationGroup(false);
-    gr->setLabel(QObject::tr("General Recording Priorities Settings"));
+    VerticalConfigurationGroup* sched = new VerticalConfigurationGroup(false);
+    sched->setLabel(QObject::tr("Scheduler Options"));
 
-    gr->addChild(GRSchedMoveHigher());
-    gr->addChild(GRSingleRecordRecPriority());
-    gr->addChild(GROverrideRecordRecPriority());
-    gr->addChild(GRFindOneRecordRecPriority());
-    gr->addChild(GRWeekslotRecordRecPriority());
-    gr->addChild(GRTimeslotRecordRecPriority());
-    gr->addChild(GRChannelRecordRecPriority());
-    gr->addChild(GRAllRecordRecPriority());
-    gr->addChild(GRHDTVRecPriority());
-    addChild(gr);
+    sched->addChild(GRSchedMoveHigher());
+    sched->addChild(GRDefaultStartOffset());
+    sched->addChild(GRDefaultEndOffset());
+    sched->addChild(GRComplexPriority());
+    sched->addChild(GRPrefInputRecPriority());
+    sched->addChild(GRHDTVRecPriority());
+    sched->addChild(GRCCRecPriority());
+    addChild(sched);
+
+    VerticalConfigurationGroup* rtype = new VerticalConfigurationGroup(false);
+    rtype->setLabel(QObject::tr("Recording Type Priority Settings"));
+
+    rtype->addChild(GRSingleRecordRecPriority());
+    rtype->addChild(GROverrideRecordRecPriority());
+    rtype->addChild(GRFindOneRecordRecPriority());
+    rtype->addChild(GRWeekslotRecordRecPriority());
+    rtype->addChild(GRTimeslotRecordRecPriority());
+    rtype->addChild(GRChannelRecordRecPriority());
+    rtype->addChild(GRAllRecordRecPriority());
+    addChild(rtype);
 }
 
 AppearanceSettings::AppearanceSettings()

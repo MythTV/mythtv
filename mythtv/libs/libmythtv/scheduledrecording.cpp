@@ -45,6 +45,7 @@ ScheduledRecording::ScheduledRecording() :
     recpriority = NULL;
     recgroup = NULL;
     playgroup = NULL;
+    prefinput = NULL;
     inactive = NULL;
     searchType = "";
     searchForWhat = "";
@@ -782,8 +783,8 @@ void ScheduledRecording::setDefault(bool haschannel)
     dupin->setValue(kDupsInAll);
     dupmethod->setValue(kDupCheckSubDesc);
     maxepisodes->setValue(0);
-    startoffset->setValue(0);
-    endoffset->setValue(0);   
+    startoffset->setValue(gContext->GetNumSetting("DefaultStartOffset", 0));
+    endoffset->setValue(gContext->GetNumSetting("DefaultEndOffset", 0));
     maxnewest->setValue(0);
     recpriority->setValue(0);
     
@@ -803,6 +804,8 @@ void ScheduledRecording::setDefault(bool haschannel)
     recgroup->setValue("Default");
     playgroup->fillSelections();    
     playgroup->setValue("Default");
+    prefinput->fillSelections();    
+    prefinput->setValue(0);
 
     inactive->setValue(0);
 }
