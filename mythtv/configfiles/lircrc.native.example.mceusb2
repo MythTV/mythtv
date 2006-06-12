@@ -1,15 +1,33 @@
 #
 # lircrc config file for the Microsoft Media Center Edition Remote, model 1039
 #
+# @url       $URL$
+# @date      $Date$
+# @version   $Revision$
+# @author    $Author$
+#
 # This file is intended to complement the lircd.conf.mceusb file included with
 # lirc 0.8 and above.
 #
 # Save this file in ~/.mythtv/lircrc
 #
-# @url       $URL$
-# @date      $Date$
-# @version   $Revision$
-# @author    $Author$
+# You will also need to make a few changes to the MythTV key bindings and jump
+# points as follows.
+#
+# Jump Points:
+#
+#   TV Recording Playback:                      Alt+R
+#   Program Guide:                              Alt+G
+#   Live TV:                                    Alt+P
+#   MythVideo -> The MythVideo default view:    Alt+V
+#   Main Menu:                                  Alt+Home
+#
+# Key Bindings:
+#
+#   TV Playback -> CHANNELDOWN:  Down,PgDown
+#   TV Playback -> CHANNELUP:    Up,PgUp
+#   TV Playback -> JUMPRWND:     Shift+PgUp
+#   TV Playback -> JUMPFFWD:     Shift+PgDown
 #
 
 #
@@ -117,13 +135,13 @@ end
 begin
     prog   = mythtv
     button = ChanDown
-    config = Down
+    config = PgDown
 end
 
 begin
     prog   = mythtv
     button = ChanUp
-    config = Up
+    config = PgUp
 end
 
 #
