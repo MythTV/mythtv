@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060604-1"
+VERSION="0.1.20060613-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -40,6 +40,9 @@ VERSION="0.1.20060604-1"
 ##the temp. files will not be deleted and it will run through
 ##very much quicker!
 debug_secondrunthrough = False
+
+# default encoding profile to use
+defaultEncodingProfile = "SP"
 
 #*********************************************************************************
 #Dont change the stuff below!!
@@ -147,6 +150,10 @@ def getTempPath():
 def getIntroPath():
     """This is the folder where all intro files are located."""
     return os.path.join(sharepath, "mytharchive", "intro")
+
+def getEncodingProfilePath():
+    """This is the folder where all encoder profile files are located."""
+    return os.path.join(sharepath, "mytharchive", "encoder_profiles")
 
 def getMysqlDBParameters():
     global mysql_host
@@ -279,6 +286,30 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
 
     os.remove(tempvideo)
     os.remove(tempmovie)
+
+def findEncodingProfile(profile):
+    """Returns the XML node for the given encoding profile"""
+
+    # which encoding file do we need
+    if videomode == "ntsc":
+        filename = getEncodingProfilePath() + "/ffmpeg_dvd_ntsc.xml"
+    else:
+        filename = getEncodingProfilePath() + "/ffmpeg_dvd_pal.xml"
+
+    DOM = xml.dom.minidom.parse(filename)
+
+    #Error out if its the wrong XML
+    if DOM.documentElement.tagName != "encoderprofiles":
+        fatalError("Profile xml file doesn't look right (%s)" % filename)
+
+    profiles = DOM.getElementsByTagName("profile")
+    for node in profiles:
+        if getText(node.getElementsByTagName("name")[0]) == profile:
+            write("Encoding profile (%s) found" % profile)
+            return node
+
+    fatalError("Encoding profile (%s) not found" % profile)
+    return None
 
 def getThemeConfigurationXML(theme):
     """Loads the XML file from disk for a specific theme"""
@@ -1090,29 +1121,43 @@ def extractVideoFrames(source, destination, thumbList):
     if result <> 0:
         fatalError("Failed while running mytharchivehelper to get thumbnails")
 
-def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio):
+def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio, profile):
     """Encodes an unknown video source file eg. AVI to MPEG2 video and AC3 audio, use ffmpeg"""
-    #MPEG-2 resolutions: 720x480, 720x576, 352x480, 352x576
 
-    if videomode=="ntsc":
-        encoderesolution=dvdNTSCD1
-    else:
-        encoderesolution=dvdPALD1
+    profileNode = findEncodingProfile(profile)
 
-    #192 is the kbit rate for the ac3 audio
-    #3000 is the kbit rate for the MPEG2 video
+    passes = int(getText(profileNode.getElementsByTagName("passes")[0]))
 
-    source = quoteFilename(source)
+    command = path_ffmpeg[0]
 
-    command = path_ffmpeg[0] + " -v 1 -i %s -r %s -target dvd -b 3000 -s %s " % \
-              (source, videomode, encoderesolution)
+    parameters = profileNode.getElementsByTagName("parameter")
 
-    if audio1[AUDIO_CODEC] != "AC3":
-        command += "-ab 192 -ac 2 -copyts "
-    else:
-        command += "-acodec copy "
+    for param in parameters:
+        name = param.attributes["name"].value
+        value = param.attributes["value"].value
 
-    command += "-aspect %s %s"  % (aspectratio, destvideofile)
+        # do some parameter substitution
+        if value == "%inputfile":
+            value = quoteFilename(source)
+        if value == "%outputfile":
+            value = quoteFilename(destvideofile)
+        if value == "%aspect":
+            value = aspectratio
+
+        # only re-encode the audio if it is not already in AC3 format
+        if audio1[AUDIO_CODEC] == "AC3":
+            if name == "-acodec":
+                value = "copy"
+            if name == "-ar" or name == "-ab" or name == "-ac":
+                name = ""
+                value = ""
+
+        if name != "":
+            command += " " + name
+
+        if value != "":
+            command += " " + value
+
 
     #add second audio track if required
     if audio2[AUDIO_ID] != -1:
@@ -1123,13 +1168,36 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
     if audio2[AUDIO_ID] != -1:
         command += "-map 0:%d" % (audio2[AUDIO_INDEX])
 
-    write(command)
+    if passes == 1:
+        write(command)
+        result = runCommand(command)
+        if result!=0:
+            fatalError("Failed while running ffmpeg to re-encode video.\n"
+                       "Command was %s" % command)
 
-    result = runCommand(command)
+    else:
+        passLog = os.path.join(getTempPath(), 'pass.log')
 
-    if result!=0:
-        fatalError("Failed while running ffmpeg to re-encode video.\n"
-                   "Command was %s" % command)
+        pass1 = string.replace(command, "%pass","1")
+        pass1 = string.replace(pass1, "%passlogfile", passLog)
+        write("Pass 1 - " + pass1)
+        result = runCommand(pass1)
+
+        if result!=0:
+            fatalError("Failed while running ffmpeg (Pass 1) to re-encode video.\n"
+                       "Command was %s" % command)
+
+        if os.path.exists(destvideofile):
+            os.remove(destvideofile)
+
+        pass2 = string.replace(command, "%pass","2")
+        pass2 = string.replace(pass2, "%passlogfile", passLog)
+        write("Pass 2 - " + pass2)
+        result = runCommand(pass2)
+
+        if result!=0:
+            fatalError("Failed while running ffmpeg (Pass 2) to re-encode video.\n"
+                       "Command was %s" % command)
 
 def runDVDAuthor():
     write( "Starting dvdauthor")
@@ -2485,7 +2553,7 @@ def getFileType(folder):
 
     return node.attributes["type"].value
 
-def isFileOkayForDVD(folder):
+def isFileOkayForDVD(file, folder):
     """return true if the file is dvd compliant"""
 
     if string.lower(getVideoCodec(folder)) != "mpeg2video":
@@ -2496,8 +2564,21 @@ def isFileOkayForDVD(folder):
 
     videosize = getVideoSize(os.path.join(folder, "streaminfo.xml"))
 
+    # has the user elected to re-encode the file
+    if file.hasAttribute("encodingprofile"):
+        if file.attributes["encodingprofile"].value != "NONE":
+            write("File will be re-encode using profile %s" % file.attributes["encodingprofile"].value)
+            return False
+
     if not isResolutionOkayForDVD(videosize):
-        return False
+        # file does not have a dvd resolution
+        if file.hasAttribute("encodingprofile"):
+            if file.attributes["encodingprofile"].value == "NONE":
+                write("WARNING: File does not have a DVD compliant resolution but "
+                      "you have selected not to re-encode the file")
+                return True
+        else:
+            return False
 
     return True
 
@@ -2554,7 +2635,8 @@ def processFile(file, folder):
             else:
                 #does the user always want to run recordings through mythtranscode?
                 #may help to fix any errors in the file 
-                if alwaysRunMythtranscode == True or (getFileType(folder) == "mpegts" and isFileOkayForDVD(folder)):
+                if (alwaysRunMythtranscode == True or 
+                        (getFileType(folder) == "mpegts" and isFileOkayForDVD(file, folder))):
                     # Run from local file?
                     if file.hasAttribute("localfilename"):
                         localfile = file.attributes["localfilename"].value
@@ -2569,7 +2651,7 @@ def processFile(file, folder):
                         write("Failed to run mythtrancode to fix any errors")
 
     #do we need to re-encode the file to make it DVD compliant?
-    if not isFileOkayForDVD(folder):
+    if not isFileOkayForDVD(file, folder):
         #we need to re-encode the file, make sure we get the right video/audio streams
         #would be good if we could also split the file at the same time
         getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"))
@@ -2580,14 +2662,21 @@ def processFile(file, folder):
         #choose which aspect ratio we should use
         aspectratio = selectAspectRatio(folder)
 
-        write("File is not DVD compliant - Re-encoding audio and video")
+        write("Re-encoding audio and video")
 
         # Run from local file?
         if file.hasAttribute("localfilename"):
             mediafile = file.attributes["localfilename"].value
 
+        # what encoding profile should we use
+        if file.hasAttribute("encodingprofile"):
+            profile = file.attributes["encodingprofile"].value
+        else:
+            profile = defaultEncodingProfile
+
         #do the re-encode 
-        encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video, audio1, audio2, aspectratio)
+        encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video,
+                           audio1, audio2, aspectratio, profile)
         mediafile = os.path.join(folder, 'newfile2.mpg')
 
     #remove an intermediate file

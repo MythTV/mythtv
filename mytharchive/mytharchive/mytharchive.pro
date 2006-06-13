@@ -30,10 +30,13 @@ imagefiles.files = ../mythburn/images/*.png
 themefiles.path = $${PREFIX}/share/mythtv/mytharchive/themes
 themefiles.files = ../mythburn/themes/*
 
+profilefiles.path = $${PREFIX}/share/mythtv/mytharchive/encoder_profiles
+profilefiles.files = ../mythburn/encoder_profiles/*.xml
+
 #fontfiles.path = $${PREFIX}/share/mythtv
 #fontfiles.files = ../fonts/*.ttf
 
-INSTALLS += menufiles uifiles scriptfiles introfiles themefiles imagefiles musicfiles 
+INSTALLS += menufiles uifiles scriptfiles introfiles themefiles imagefiles musicfiles profilefiles
 
 HEADERS += archivesettings.h mythburnwizard.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h editmetadata.h

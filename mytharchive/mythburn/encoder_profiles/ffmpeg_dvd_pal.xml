@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<encoderprofiles>
+    <profile>
+        <name>HQ</name>
+        <description>A high quality profile giving approx. 1 hour of video on a single layer DVD</description>
+        <bitrate>4121.19</bitrate>
+        <passes>2</passes>
+        <parameter name="-v"           value="1"/>
+        <parameter name="-i"           value="%inputfile"/>
+        <parameter name="-r"           value="pal"/>
+        <parameter name="-target"      value="dvd"/>
+        <parameter name="-b"           value="9000"/>
+        <parameter name="-s"           value="720x576"/>
+        <parameter name="-acodec"      value="ac3"/>
+        <parameter name="-ab"          value="192"/>
+        <parameter name="-ac"          value="2"/>
+        <parameter name="-copyts"      value=""/>
+        <parameter name="-aspect"      value="%aspect"/>
+        <parameter name=""             value="%outputfile"/>
+        <parameter name="-pass"        value="%passno"/>
+        <parameter name="-passlogfile" value="%passlogfile"/>
+    </profile>
+
+    <profile>
+        <name>SP</name>
+        <description>A standard play profile giving approx. 2 hour of video on a single layer DVD</description>
+        <bitrate>2096.63</bitrate>
+        <passes>1</passes>
+        <parameter name="-v"      value="1"/>
+        <parameter name="-i"      value="%inputfile"/>
+        <parameter name="-r"      value="pal"/>
+        <parameter name="-target" value="dvd"/>
+        <parameter name="-b"      value="4771"/>
+        <parameter name="-s"      value="720x576"/>
+        <parameter name="-acodec" value="ac3"/>
+        <parameter name="-ab"     value="192"/>
+        <parameter name="-ac"     value="2"/>
+        <parameter name="-copyts" value=""/>
+        <parameter name="-aspect" value="%aspect"/>
+        <parameter name=""        value="%outputfile"/>
+    </profile>
+
+    <profile>
+        <name>LP</name>
+        <description>A long play profile giving approx. 4 hour of video on a single layer DVD</description>
+        <bitrate>1030.07</bitrate>
+        <passes>1</passes>
+        <parameter name="-v"      value="1"/>
+        <parameter name="-i"      value="%inputfile"/>
+        <parameter name="-r"      value="pal"/>
+        <parameter name="-target" value="dvd"/>
+        <parameter name="-b"      value="2344"/>
+        <parameter name="-s"      value="352x576"/>
+        <parameter name="-acodec" value="ac3"/>
+        <parameter name="-ab"     value="192"/>
+        <parameter name="-ac"     value="2"/>
+        <parameter name="-copyts" value=""/>
+        <parameter name="-aspect" value="%aspect"/>
+        <parameter name=""        value="%outputfile"/>
+    </profile>
+
+    <profile>
+        <name>EP</name>
+        <description>A extended play profile giving approx. 6 hour of video on a single layer DVD</description>
+        <bitrate>671.48</bitrate>
+        <passes>1</passes>
+        <parameter name="-v"      value="1"/>
+        <parameter name="-i"      value="%inputfile"/>
+        <parameter name="-r"      value="pal"/>
+        <parameter name="-target" value="dvd"/>
+        <parameter name="-b"      value="1526"/>
+        <parameter name="-s"      value="352x288"/>
+        <parameter name="-acodec" value="ac3"/>
+        <parameter name="-ab"     value="128"/>
+        <parameter name="-ac"     value="2"/>
+        <parameter name="-copyts" value=""/>
+        <parameter name="-aspect" value="%aspect"/>
+        <parameter name=""        value="%outputfile"/>
+    </profile>
+
+</encoderprofiles>
