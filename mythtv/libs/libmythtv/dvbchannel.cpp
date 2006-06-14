@@ -478,7 +478,14 @@ bool DVBChannel::ParseTuningParams(
             hierarchy);
     else if (FE_ATSC == type)
         return cur_tuning.parseATSC(frequency, modulation);
-
+#ifdef FE_GET_EXTENDED_INFO
+    else if (FE_DVB_S2 == type)
+        return cur_tuning.parseDVBS2(
+            frequency,       inversion,     symbolrate,   fec,   polarity,
+            dvb_diseqc_type, diseqc_port,   diseqc_pos,
+            lnb_lof_switch,  lnb_lof_hi,    lnb_lof_lo, modulation);
+#endif // FE_GET_EXTENDED_INFO
+   
     return false;
 }
 
