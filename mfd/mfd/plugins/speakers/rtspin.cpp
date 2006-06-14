@@ -80,7 +80,8 @@ RtspIn::RtspIn(
         }
     }
 
-    audio_output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, AUDIOOUTPUT_MUSIC, false);
+    audio_output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
+                                          AUDIOOUTPUT_MUSIC, false);
     audio_output->setBufferSize(256 * 1024);
     audio_output->SetBlocking(false);
 

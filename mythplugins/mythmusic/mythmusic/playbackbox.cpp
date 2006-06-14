@@ -1815,7 +1815,7 @@ void PlaybackBoxMusic::openOutputDevice(void)
         adevice = gContext->GetSetting("MusicAudioDevice");
  
     // TODO: Error checking that device is opened correctly!
-    output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
+    output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
                                     AUDIOOUTPUT_MUSIC, true,
                                     false /* AC3/DTS pass through */);
     output->setBufferSize(outputBufferSize * 1024);

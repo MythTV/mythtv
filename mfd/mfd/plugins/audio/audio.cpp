@@ -45,7 +45,8 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     //  thr RTSP streamer can use to get PCM bits to send out.
     //
 
-    output = AudioOutput::OpenAudio("NULL", 16, 2, 44100, AUDIOOUTPUT_MUSIC, true, false );
+    output = AudioOutput::OpenAudio("NULL", "default", 16, 2, 44100,
+                                    AUDIOOUTPUT_MUSIC, true, false );
     output->bufferOutputData(true);
     output->setBufferSize(output_buffer_size * 1024);
     output->SetBlocking(false);
@@ -516,7 +517,8 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
 #else
             QString adevice = gContext->GetSetting("AudioDevice");
             // TODO: Error checking that device is opened correctly!
-            output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, AUDIOOUTPUT_MUSIC, true, false );
+            output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
+                                            AUDIOOUTPUT_MUSIC, true, false );
             output->setBufferSize(output_buffer_size * 1024);
             output->SetBlocking(false);
             output->addListener(audio_listener);
