@@ -13,7 +13,8 @@ using namespace std;
 class AudioOutputOSS : public AudioOutputBase
 {
 public:
-    AudioOutputOSS(QString audiodevice, int laudio_bits, 
+    AudioOutputOSS(QString audiodevice, QString passthrudevice,
+                   int laudio_bits,
                    int laudio_channels, int laudio_samplerate,
                    AudioOutputSource source, bool set_initial_vol,
                    bool laudio_passthru);

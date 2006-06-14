@@ -1931,12 +1931,17 @@ EOF
 
 audio_arts=no
 if (artsc-config --version) > /dev/null 2>&1; then
-audio_arts_libs=`artsc-config --libs`
-audio_arts_tmp=`artsc-config --cflags`
-audio_arts_cflags=`echo $audio_arts_tmp | sed "s/include\/artsc/include/g"`
-if $cc -o $TMPE $TMPC $audio_arts_cflags $audio_arts_libs > /dev/null 2>&1; then
-audio_arts=yes
-fi
+    audio_arts_libs=`artsc-config --libs`
+    audio_arts_tmp=`artsc-config --cflags`
+    if $cc -o $TMPE $TMPC $audio_arts_tmp $audio_arts_libs > /dev/null 2>&1; then
+        audio_arts_cflags=`echo $audio_arts_tmp`
+        audio_arts=yes
+    else
+        audio_arts_cflags=`echo $audio_arts_tmp | sed "s/include\/artsc/include/g"`
+        if $cc -o $TMPE $TMPC $audio_arts_cflags $audio_arts_libs > /dev/null 2>&1; then
+            audio_arts=yes
+        fi
+    fi
 fi
 
 fi

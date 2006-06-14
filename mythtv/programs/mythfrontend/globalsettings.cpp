@@ -43,6 +43,21 @@ static HostComboBox *AudioOutputDevice()
     return gc;
 }
 
+static HostComboBox *PassThroughOutputDevice()
+{
+    HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
+
+    gc->setLabel(QObject::tr("Passthrough output device"));
+    gc->addSelection(QObject::tr("Default"), "Default");
+    gc->addSelection("ALSA:iec958:{ AES0 0x02 }", "ALSA:iec958:{ AES0 0x02 }");
+
+    gc->setHelpText(QObject::tr("Audio output device to use for AC3 and "
+                    "DTS passthrough. Default is the same as Audio output "
+                    "device. This value is currently only used with ALSA "
+                    "sound output."));
+    return gc;
+}
+
 static HostCheckBox *MythControlsVolume()
 {
     HostCheckBox *gc = new HostCheckBox("MythControlsVolume");
@@ -2339,28 +2354,47 @@ public:
          setUseLabel(false);
 
          addChild(AudioOutputDevice());
-         addChild(AC3PassThrough());
+         addChild(PassThroughOutputDevice());
+
+         // General boolean settings
+         VerticalConfigurationGroup *vgrp0 =
+             new VerticalConfigurationGroup(false, false, true, true);
+         vgrp0->addChild(AC3PassThrough());
 #ifdef CONFIG_DTS
-         addChild(DTSPassThrough());
+         vgrp0->addChild(DTSPassThrough());
 #endif
-         addChild(AggressiveBuffer());
+
+         VerticalConfigurationGroup *vgrp1 =
+             new VerticalConfigurationGroup(false, false, true, true);
+         vgrp1->addChild(AggressiveBuffer());
 
          Setting* volumeControl = MythControlsVolume();
-         addChild(volumeControl);
+         vgrp1->addChild(volumeControl);
+
+         HorizontalConfigurationGroup *tgrp =
+             new HorizontalConfigurationGroup(false, false, true, true);
+         tgrp->addChild(vgrp0);
+         tgrp->addChild(vgrp1);
+         addChild(tgrp);
+
+         // Make volume control trigger for mixer settings
          setTrigger(volumeControl);
 
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         HorizontalConfigurationGroup *lr = new HorizontalConfigurationGroup(false, false);
-         lr->addChild(MixerDevice());
-         lr->addChild(MixerControl());
-         settings->addChild(lr);
+         // Mixer settings
+         ConfigurationGroup *settings =
+             new VerticalConfigurationGroup(false, false, false, false);
+         HorizontalConfigurationGroup *mixgrp =
+             new HorizontalConfigurationGroup(false, false, false, false);
+         mixgrp->addChild(MixerDevice());
+         mixgrp->addChild(MixerControl());
+         settings->addChild(mixgrp);
          settings->addChild(MixerVolume());
          settings->addChild(PCMVolume());
          settings->addChild(IndividualMuteControl());
-         addTarget("1", settings);
 
-         // show nothing if volumeControl is off
+         // Show Mixer config only if internal volume controls enabled
          addTarget("0", new VerticalConfigurationGroup(false, false));
+         addTarget("1", settings);
      };
 };
 

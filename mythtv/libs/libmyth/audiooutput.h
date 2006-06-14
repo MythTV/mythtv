@@ -18,7 +18,8 @@ class AudioOutput : public VolumeBase, public OutputListeners
 {
  public:
     // opens one of the concrete subclasses
-    static AudioOutput *OpenAudio(QString audiodevice, int audio_bits, 
+    static AudioOutput *OpenAudio(QString audiodevice, QString passthrudevice,
+                                  int audio_bits,
                                   int audio_channels, int audio_samplerate,
                                   AudioOutputSource source,
                                   bool set_initial_vol, bool audio_passthru);

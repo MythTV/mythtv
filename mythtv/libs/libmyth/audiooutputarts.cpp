@@ -7,19 +7,20 @@ using namespace std;
 #include "mythcontext.h"
 #include "audiooutputarts.h"
 
-AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits, 
-                                 int audio_channels, int audio_samplerate,
-                                 AudioOutputSource source,
-                                 bool set_initial_vol, bool audio_passthru)
-    : AudioOutputBase(audiodevice, audio_bits, audio_channels,
-                      audio_samplerate, source, set_initial_vol,
-                      audio_passthru)
+AudioOutputARTS::AudioOutputARTS(
+    QString laudio_main_device,     QString laudio_passthru_device,
+    int     laudio_bits,            int     laudio_channels,
+    int     laudio_samplerate,      AudioOutputSource lsource,
+    bool    lset_initial_vol,       bool    laudio_passthru) :
+    AudioOutputBase(laudio_main_device, laudio_passthru_device,
+                    laudio_bits,        laudio_channels,
+                    laudio_samplerate,  lsource,
+                    lset_initial_vol,   laudio_passthru),
+    pcm_handle(NULL), buff_size(-1), can_hw_pause(false)
 {
-    // our initalisation
-    pcm_handle = NULL;
-
     // Set everything up
-    Reconfigure(audio_bits, audio_channels, audio_samplerate, audio_passthru);
+    Reconfigure(laudio_bits,       laudio_channels,
+                laudio_samplerate, laudio_passthru);
 }
 
 AudioOutputARTS::~AudioOutputARTS()
@@ -49,7 +50,7 @@ bool AudioOutputARTS::OpenDevice()
     }
 
     VERBOSE(VB_GENERAL, QString("Opening ARTS audio device '%1'.")
-                        .arg(audiodevice));
+                        .arg(audio_main_device));
     err = arts_init();
     if (err < 0)
     {

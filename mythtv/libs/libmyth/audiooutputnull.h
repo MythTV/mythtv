@@ -24,10 +24,12 @@
 class AudioOutputNULL : public AudioOutputBase
 {
 public:
-    AudioOutputNULL(QString audiodevice, int laudio_bits, 
-                   int laudio_channels, int laudio_samplerate,
-                   AudioOutputSource source,
-                    bool set_initial_vol, bool laudio_passthru);
+    AudioOutputNULL(QString laudio_main_device,
+                    QString laudio_passthru_device,
+                    int laudio_bits,
+                    int laudio_channels, int laudio_samplerate,
+                    AudioOutputSource lsource,
+                    bool lset_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputNULL();
 
     virtual void Reset(void);

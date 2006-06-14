@@ -1284,8 +1284,9 @@ void TV::SetupPlayer(bool isWatchingRecording)
     nvp->SetParentPlayer(this);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
-    nvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate", 44100));
-    nvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
+    nvp->SetAudioInfo(gContext->GetSetting("AudioOutputDevice"),
+                      gContext->GetSetting("PassThruOutputDevice"),
+                      gContext->GetNumSetting("AudioSampleRate", 44100));
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking", 0));
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
@@ -1356,8 +1357,9 @@ void TV::SetupPipPlayer(void)
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(piprecorder);
-    pipnvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate", 44100));
-    pipnvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
+    pipnvp->SetAudioInfo(gContext->GetSetting("AudioOutputDevice"),
+                         gContext->GetSetting("PassThruOutputDevice"),
+                         gContext->GetNumSetting("AudioSampleRate", 44100));
     pipnvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking", 0));
     pipnvp->SetLiveTVChain(piptvchain);
 

@@ -37,16 +37,19 @@ OSStatus AuCA_AURender(void *inRefCon,
                        AudioBufferList *ioData);
 
 
-AudioOutputCA::AudioOutputCA(QString audiodevice, int laudio_bits, 
-                             int laudio_channels, int laudio_samplerate,
-                             AudioOutputSource source,
-                             bool set_initial_vol, bool laudio_passthru)
-    : AudioOutputBase(audiodevice, laudio_bits,
-                      laudio_channels, laudio_samplerate, source,
-                      set_initial_vol, laudio_passthru)
+AudioOutputCA::AudioOutputCA(
+    QString laudio_main_device, QString           laudio_passthru_device,
+    int     laudio_bits,        int               laudio_channels,
+    int     laudio_samplerate,  AudioOutputSource lsource,
+    bool    lset_initial_vol,   bool              laudio_passthru)
+    : AudioOutputBase(laudio_main_device, laudio_passthru_device,
+                      laudio_bits,        laudio_channels,
+                      laudio_samplerate,  lsource,
+                      lset_initial_vol,   laudio_passthru)
+    coreaudio_data(new CoreAudioData()),
+    bufferedBytes(0)
 {
     // Create private data
-    coreaudio_data = new CoreAudioData();
     coreaudio_data->output_unit = NULL;
     
     Reconfigure(laudio_bits, laudio_channels,

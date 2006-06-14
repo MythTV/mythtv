@@ -10,21 +10,22 @@ using namespace std;
 #include "audiooutputalsa.h"
     
 
-AudioOutputALSA::AudioOutputALSA(QString audiodevice, int laudio_bits, 
-                                 int laudio_channels, int laudio_samplerate,
-                                 AudioOutputSource source,
-                                 bool set_initial_vol, bool laudio_passthru)
-    : AudioOutputBase(audiodevice, laudio_bits,
-                      laudio_channels, laudio_samplerate, source,
-                      set_initial_vol, laudio_passthru)
+AudioOutputALSA::AudioOutputALSA(
+    QString laudio_main_device, QString           laudio_passthru_device,
+    int     laudio_bits,        int               laudio_channels,
+    int     laudio_samplerate,  AudioOutputSource lsource,
+    bool    lset_initial_vol,   bool              laudio_passthru) :
+    AudioOutputBase(laudio_main_device, laudio_passthru_device,
+                    laudio_bits,        laudio_channels,
+                    laudio_samplerate,  lsource,
+                    lset_initial_vol,   laudio_passthru),
+    pcm_handle(NULL),             numbadioctls(0),
+    killAudioLock(false),         mixer_handle(NULL),
+    mixer_control(QString::null), volume_range_multiplier(1.0f),
+    playback_vol_min(0),          playback_vol_max(1)
 {
-    // our initalisation
-    pcm_handle = NULL;
-    numbadioctls = 0;
-    mixer_handle = NULL;
-
     // Set everything up
-    Reconfigure(laudio_bits, laudio_channels,
+    Reconfigure(laudio_bits,       laudio_channels,
                 laudio_samplerate, laudio_passthru);
 }
 
@@ -45,17 +46,20 @@ bool AudioOutputALSA::OpenDevice()
     pcm_handle = NULL;
     numbadioctls = 0;
 
-    QString real_device = audiodevice;
-    if (audio_passthru)
-        real_device.append(":{ AES0 0x02 }");
-    
+    QString real_device = (audio_passthru) ?
+        audio_passthru_device : audio_main_device;
+
+    VERBOSE(VB_GENERAL, QString("Opening ALSA audio device '%1'.")
+            .arg(real_device));
+
     err = snd_pcm_open(&pcm_handle, real_device,
-          SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK); 
+                       SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
 
     if (err < 0)
     { 
         Error(QString("snd_pcm_open(%1): %2")
-              .arg(audiodevice).arg(snd_strerror(err)));
+              .arg(real_device).arg(snd_strerror(err)));
+
         if (pcm_handle)
             CloseDevice();
         return false;

@@ -1,49 +1,74 @@
-#include <qstring.h>
+// Std C headers
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
-#include <pthread.h>
 
-using namespace std;
+// POSIX headers
+#include <pthread.h>
+#include <unistd.h>
+#include <sys/time.h>
+
+// Qt headers
+#include <qdatetime.h>
+#include <qstring.h>
+#include <qdeepcopy.h>
+
+// MythTV headers
 #include "audiooutputbase.h"
 
-#include <iostream>
-#include <qdatetime.h>
-#include <sys/time.h>
-#include <unistd.h>
+AudioOutputBase::AudioOutputBase(
+    QString laudio_main_device,    QString           laudio_passthru_device,
+    int     /*laudio_bits*/,       int               /*laudio_channels*/,
+    int     /*laudio_samplerate*/, AudioOutputSource lsource,
+    bool    lset_initial_vol,      bool              /*laudio_passthru*/) :
 
+    effdsp(0),                  effdspstretched(0),
+    audio_channels(-1),         audio_bytes_per_sample(0),
+    audio_bits(-1),             audio_samplerate(-1),
+    audio_buffer_unused(0),
+    fragment_size(0),           soundcard_buffer_size(0),
 
-AudioOutputBase::AudioOutputBase(QString audiodevice, int, 
-                                 int, int,
-                                 AudioOutputSource source,
-                                 bool set_initial_vol,
-                                 bool /*laudio_passthru*/)
+    audio_main_device(QDeepCopy<QString>(laudio_main_device)),
+    audio_passthru_device(QDeepCopy<QString>(laudio_passthru_device)),
+    audio_passthru(false),      audio_stretchfactor(1.0f),
+
+    source(lsource),            killaudio(false),
+
+    pauseaudio(false),          audio_actually_paused(false),
+    was_paused(false),
+
+    set_initial_vol(lset_initial_vol),
+    buffer_output_data_for_use(false),
+    need_resampler(false),
+
+    src_ctx(NULL),
+
+    pSoundStretch(NULL),        blocking(false),
+
+    lastaudiolen(0),            samples_buffered(0),
+    audiotime(0),
+    raud(0),                    waud(0),
+    audbuf_timecode(0),
+
+    numlowbuffer(0),            killAudioLock(false),
+    current_seconds(-1),        source_bitrate(-1)
 {
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);
     pthread_cond_init(&audio_bufsig, NULL);
-    this->audiodevice = audiodevice;
 
-    output_audio = 0;
-    audio_bits = -1;
-    audio_channels = -1;
-    audio_samplerate = -1;    
-    current_seconds = -1;
-    source_bitrate = -1;
-    audio_stretchfactor = 1.0;
-    pSoundStretch = NULL;
-    blocking = false;
-    this->source = source;
-    this->set_initial_vol = set_initial_vol;
-    soundcard_buffer_size = 0;
-    buffer_output_data_for_use = false; // used by AudioOutputNULL
+    output_audio = 0; // TODO FIXME Not POSIX compatible!
 
+    bzero(&src_data,          sizeof(SRC_DATA));
+    bzero(src_in,             sizeof(float) * AUDIO_SRC_IN_SIZE);
+    bzero(src_out,            sizeof(float) * AUDIO_SRC_OUT_SIZE);
+    bzero(tmp_buff,           sizeof(short) * AUDIO_TMP_BUF_SIZE);
+    bzero(&audiotime_updated, sizeof(audiotime_updated));
+    bzero(audiobuffer,        sizeof(char)  * AUDBUFSIZE);
 
-    src_ctx = NULL;
-
-    // You need to call the next line from your concrete class.
-    // Virtuals cause problems in the base class constructors
-    // Reconfigure(laudio_bits, laudio_channels, laudio_samplerate, laudio_passthru);
+    // You need to call Reconfigure from your concrete class.
+    // Reconfigure(laudio_bits,       laudio_channels,
+    //             laudio_samplerate, laudio_passthru);
 }
 
 AudioOutputBase::~AudioOutputBase()
@@ -141,9 +166,6 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     
     numlowbuffer = 0;
 
-    VERBOSE(VB_GENERAL, QString("Opening audio device '%1'.")
-            .arg(audiodevice));
-    
     // Actually do the device specific open call
     if (!OpenDevice())
     {

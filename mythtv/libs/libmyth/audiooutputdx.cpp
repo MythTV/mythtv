@@ -96,31 +96,32 @@ DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
 
 
 AudioOutputDX::AudioOutputDX(
-    QString laudiodevice, int laudio_bits,
-    int laudio_channels, int laudio_samplerate,
-    AudioOutputSource lsource, bool lset_initial_vol, bool laudio_passthru)
-    : AudioOutputBase(laudiodevice, laudio_bits,
-                      laudio_channels, laudio_samplerate,
-                      lsource, lset_initial_vol, laudio_passthru),
-      dsound_dll(NULL),
-      dsobject(NULL),
-      dsbuffer(NULL),
-      write_cursor(0),
-      buffer_size(0),
-      blocking(false),
-      awaiting_data(false),
-      audiodevice(laudiodevice),
-      effdsp(0),                 /* Should this be audio_bits ? */
-      audio_bytes_per_sample(0), /* ACK! hides version in AudioOutputBase */
-      audio_bits(0),             /* ACK! hides version in AudioOutputBase */
-      audio_channels(0),         /* ACK! hides version in AudioOutputBase */
-      audbuf_timecode(0),
-      can_hw_pause(false),
-      paused(false)
+    QString laudio_main_device,  QString           laudio_passthru_device,
+    int     laudio_bits,         int               laudio_channels,
+    int     laudio_samplerate,   AudioOutputSource lsource,
+    bool    lset_initial_vol,    bool              laudio_passthru) :
+    AudioOutputBase(laudio_main_device, laudio_passthru_device,
+                    laudio_bits,        laudio_channels,
+                    laudio_samplerate,  lsource,
+                    lset_initial_vol,   laudio_passthru),
+    dsound_dll(NULL),
+    dsobject(NULL),
+    dsbuffer(NULL),
+    write_cursor(0),
+    buffer_size(0),
+    blocking(false),
+    awaiting_data(false),
+    effdsp(0),                 /* Should this be audio_bits ? */
+    audio_bytes_per_sample(0), /* ACK! hides version in AudioOutputBase */
+    audio_bits(0),             /* ACK! hides version in AudioOutputBase */
+    audio_channels(0),         /* ACK! hides version in AudioOutputBase */
+    audbuf_timecode(0),
+    can_hw_pause(false),
+    paused(false)
 {
     InitDirectSound();
     
-    Reconfigure(laudio_bits, laudio_channels,
+    Reconfigure(laudio_bits,       laudio_channels,
                 laudio_samplerate, laudio_passthru);
 }
 

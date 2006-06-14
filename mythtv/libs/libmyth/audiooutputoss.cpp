@@ -25,21 +25,20 @@ using namespace std;
 #include "audiooutputoss.h"
 #include "util.h"
 
-AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits, 
-                               int laudio_channels, int laudio_samplerate,
-                               AudioOutputSource source, bool set_initial_vol,
-                               bool laudio_passthru)
-    : AudioOutputBase(audiodevice, laudio_bits,
-                      laudio_channels, laudio_samplerate, source,
-                      set_initial_vol, laudio_passthru)
+AudioOutputOSS::AudioOutputOSS(
+    QString laudio_main_device, QString           laudio_passthru_device,
+    int     laudio_bits,        int               laudio_channels,
+    int     laudio_samplerate,  AudioOutputSource lsource,
+    bool    lset_initial_vol,   bool              laudio_passthru) :
+    AudioOutputBase(laudio_main_device, laudio_passthru_device,
+                    laudio_bits,        laudio_channels,
+                    laudio_samplerate,  lsource,
+                    lset_initial_vol,   laudio_passthru),
+    audiofd(-1), numbadioctls(0),
+    mixerfd(-1), control(SOUND_MIXER_VOLUME)
 {
-    // our initalisation
-    audiofd = -1;
-    mixerfd = -1;
-    numbadioctls = 0;
-
     // Set everything up
-    Reconfigure(laudio_bits, laudio_channels,
+    Reconfigure(laudio_bits,       laudio_channels,
                 laudio_samplerate, laudio_passthru);
 }
 
@@ -56,22 +55,22 @@ bool AudioOutputOSS::OpenDevice()
     timer.start();
 
     VERBOSE(VB_GENERAL, QString("Opening OSS audio device '%1'.")
-            .arg(audiodevice));
+            .arg(audio_main_device));
     
     while (timer.elapsed() < 2000 && audiofd == -1)
     {
-        audiofd = open(audiodevice.ascii(), O_WRONLY | O_NONBLOCK);
+        audiofd = open(audio_main_device.ascii(), O_WRONLY | O_NONBLOCK);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
         {
             if (errno == EBUSY)
             {
                 Error(QString("WARNING: something is currently"
-                              " using: %1, retrying.").arg(audiodevice));
+                              " using: %1, retrying.").arg(audio_main_device));
                 return false;
             }
             VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
-                    " error was: %2").arg(audiodevice).arg(strerror(errno)));
-            perror(audiodevice.ascii());
+                    " error was: %2").arg(audio_main_device).arg(strerror(errno)));
+            perror(audio_main_device.ascii());
         }
         if (audiofd < 0)
             usleep(50);
@@ -80,7 +79,7 @@ bool AudioOutputOSS::OpenDevice()
     if (audiofd == -1)
     {
         Error(QString("Error opening audio device (%1), the error was: %2")
-              .arg(audiodevice).arg(strerror(errno)));
+              .arg(audio_main_device).arg(strerror(errno)));
         return false;
     }
 
@@ -128,7 +127,7 @@ bool AudioOutputOSS::OpenDevice()
     if (err)
     {
         Error(QString("Unable to set audio device (%1) to %2 kHz / %3 bits"
-                      " / %4 channels").arg(audiodevice).arg(audio_samplerate)
+                      " / %4 channels").arg(audio_main_device).arg(audio_samplerate)
                       .arg(audio_bits).arg(audio_channels));
         close(audiofd);
         audiofd = -1;
@@ -229,7 +228,7 @@ void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
     if (lw < 0)
     {
         Error(QString("Error writing to audio device (%1), unable to"
-              " continue. The error was: %2").arg(audiodevice)
+              " continue. The error was: %2").arg(audio_main_device)
               .arg(strerror(errno)));
         close(audiofd);
         audiofd = -1;

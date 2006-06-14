@@ -17,10 +17,12 @@
 class AudioOutputDX : public AudioOutputBase
 {
 public:
-    AudioOutputDX(QString audiodevice, int audio_bits, 
-                  int audio_channels, int audio_samplerate,
-                  AudioOutputSource source,
-                  bool set_initial_vol, bool laudio_passthru);
+    AudioOutputDX(QString laudio_main_device,
+                  QString laudio_passthru_device,
+                  int laudio_bits,
+                  int laudio_channels, int laudio_samplerate,
+                  AudioOutputSource lsource,
+                  bool lset_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputDX();
 
     /// BEGIN HACK HACK HACK HACK These need to actually be implemented!
@@ -68,7 +70,6 @@ public:
     
     bool awaiting_data;
  
-    QString audiodevice;
     int effdsp; // from the recorded stream
     int audio_bytes_per_sample;
     int audio_bits;

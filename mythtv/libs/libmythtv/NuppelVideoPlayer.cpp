@@ -1,23 +1,32 @@
+// -*- Mode: c++ -*-
+
+// Std C headers
 #include <cstdio>
 #include <cstdlib>
-#include <unistd.h>
-#include <fcntl.h>
 #include <cassert>
 #include <cerrno>
-#include <sys/time.h>
 #include <ctime>
 #include <cmath>
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qmap.h>
-#include <sched.h>
 
+// POSIX headers
+#include <unistd.h>
+#include <fcntl.h>
+#include <sched.h>
+#include <sys/time.h>
 #include <sys/ioctl.h>
 
+// C++ headers
 #include <algorithm>
 #include <iostream>
 using namespace std;
 
+// Qt headers
+#include <qapplication.h>
+#include <qstringlist.h>
+#include <qdeepcopy.h>
+#include <qmap.h>
+
+// MythTV headers
 #include "config.h"
 #include "mythdbcon.h"
 #include "dialogbox.h"
@@ -188,7 +197,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       osd(NULL),                    timedisplay(NULL),
       dialogname(""),               dialogtype(0),
       // Audio stuff
-      audioOutput(NULL),            audiodevice("/dev/dsp"),
+      audioOutput(NULL),
+      audio_main_device(QString::null),
+      audio_passthru_device(QString::null),
       audio_channels(2),            audio_bits(-1),
       audio_samplerate(44100),      audio_stretchfactor(1.0f),
       // Picture-in-Picture
@@ -345,6 +356,21 @@ void NuppelVideoPlayer::SetRecorder(RemoteEncoder *recorder)
     nvr_enc = recorder;
     if (GetDecoder())
         GetDecoder()->setRecorder(recorder);
+}
+
+void NuppelVideoPlayer::SetAudioInfo(const QString &main_device,
+                                     const QString &passthru_device,
+                                     uint           samplerate)
+{
+    audio_main_device = audio_passthru_device = QString::null;
+
+    if (!main_device.isEmpty())
+        audio_main_device     = QDeepCopy<QString>(main_device);
+
+    if (!passthru_device.isEmpty())
+        audio_passthru_device = QDeepCopy<QString>(passthru_device);
+
+    audio_samplerate      = (int)samplerate;
 }
 
 void NuppelVideoPlayer::PauseDecoder(void)
@@ -623,8 +649,10 @@ QString NuppelVideoPlayer::ReinitAudio(void)
     if (!audioOutput && !using_null_videoout)
     {
         bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
-        audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
-                                             audio_channels, audio_samplerate, 
+        audioOutput = AudioOutput::OpenAudio(audio_main_device,
+                                             audio_passthru_device,
+                                             audio_bits, audio_channels,
+                                             audio_samplerate,
                                              AUDIOOUTPUT_VIDEO,
                                              setVolume, audio_passthru);
         if (!audioOutput)

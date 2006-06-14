@@ -116,22 +116,25 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void StopEmbedding(void);
     void ExposeEvent(void);
 
+    // Audio Sets
+    void SetNoAudio(void)                     { no_audio_out = true; }
+    void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
+    void SetAudioOutput(AudioOutput *ao)      { audioOutput = ao; }
+    void SetAudioInfo(const QString &main, const QString &passthru, uint rate);
+    void SetAudioParams(int bits, int channels, int samplerate, bool passthru);
+    void SetEffDsp(int dsprate);
+
     // Sets
     void SetParentWidget(QWidget *widget)     { parentWidget = widget; }
     void SetAsPIP(void)                       { SetNoAudio(); SetNullVideo(); }
-    void SetNoAudio(void)                     { no_audio_out = true; }
     void SetNullVideo(void)                   { using_null_videoout = true; }
-    void SetAudioDevice(QString device)       { audiodevice = device; }
     void SetFileName(QString lfilename)       { filename = lfilename; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetAutoCommercialSkip(int autoskip);
     void SetCommBreakMap(QMap<long long, int> &newMap);
     void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
     void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
-    void SetAudioSampleRate(int rate)         { audio_samplerate = rate; }
-    void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
     void SetLength(int len)                   { totalLength = len; }
-    void SetAudioOutput (AudioOutput *ao)     { audioOutput = ao; }
     void SetVideoFilters(QString &filters)    { videoFilterList = filters; }
     void SetFramesPlayed(long long played)    { framesPlayed = played; }
     void SetEof(void)                         { eof = true; }
@@ -146,8 +149,6 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps, int keydist,
                         float a = 1.33333, FrameScanType scan = kScan_Ignore);
-    void SetAudioParams(int bits, int channels, int samplerate, bool passthru);
-    void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
     void Zoom(int direction);
     void ClearBookmark(void);
@@ -651,7 +652,8 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Audio stuff
     AudioOutput *audioOutput;
-    QString  audiodevice;
+    QString  audio_main_device;
+    QString  audio_passthru_device;
     int      audio_channels;
     int      audio_bits;
     int      audio_samplerate;

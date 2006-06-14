@@ -14,7 +14,8 @@ using namespace std;
 class AudioOutputARTS : public AudioOutputBase
 {
   public:
-     AudioOutputARTS(QString audiodevice, int audio_bits, 
+     AudioOutputARTS(QString main_device, QString passthru_device,
+                     int audio_bits, 
                      int audio_channels, int audio_samplerate,
                      AudioOutputSource source,
                      bool set_initial_vol, bool laudio_passthru);
@@ -36,13 +37,9 @@ class AudioOutputARTS : public AudioOutputBase
      
 
   private:
-    QString audiodevice;
     arts_stream_t pcm_handle;
-//    int audbuf_timecode;    /* timecode of audio most recently placed into
-//                   buffer */
-    int buff_size;
-    bool can_hw_pause;
-    bool paused;
+    int           buff_size;
+    bool          can_hw_pause;
 };
 
 #endif // AUDIOOUTPUTARTS

@@ -19,14 +19,19 @@ using namespace std;
 #include "SoundTouch.h"
 
 #define AUDBUFSIZE 768000
+#define AUDIO_SRC_IN_SIZE   16384
+#define AUDIO_SRC_OUT_SIZE (16384*6)
+#define AUDIO_TMP_BUF_SIZE (16384*6)
 
 class AudioOutputBase : public AudioOutput
 {
  public:
-    AudioOutputBase(QString audiodevice, int laudio_bits,
+    AudioOutputBase(QString laudio_main_device,
+                    QString laudio_passthru_device,
+                    int laudio_bits,
                     int laudio_channels, int laudio_samplerate,
-                    AudioOutputSource source,
-                    bool set_initial_vol, bool laudio_passthru);
+                    AudioOutputSource lsource,
+                    bool lset_initial_vol, bool laudio_passthru);
     virtual ~AudioOutputBase();
 
     // reconfigure sound out for new params
@@ -109,7 +114,8 @@ class AudioOutputBase : public AudioOutput
     int audio_buffer_unused;
     int fragment_size;
     long soundcard_buffer_size;
-    QString audiodevice;
+    QString audio_main_device;
+    QString audio_passthru_device;
 
     bool audio_passthru;
 
@@ -127,8 +133,9 @@ class AudioOutputBase : public AudioOutput
     bool need_resampler;
     SRC_STATE *src_ctx;
     SRC_DATA src_data;
-    float src_in[16384], src_out[16384*6];
-    short tmp_buff[16384*6];
+    float src_in[AUDIO_SRC_IN_SIZE];
+    float src_out[AUDIO_SRC_OUT_SIZE];
+    short tmp_buff[AUDIO_TMP_BUF_SIZE];
 
     // timestretch
     soundtouch::SoundTouch * pSoundStretch;

@@ -21,19 +21,19 @@ extern "C"
 #include "bio2jack.h"
 }
 
-AudioOutputJACK::AudioOutputJACK(QString audiodevice, int laudio_bits, 
-                                 int laudio_channels, int laudio_samplerate,
-                                 AudioOutputSource source,
-                                 bool set_initial_vol, bool laudio_passthru)
-    : AudioOutputBase(audiodevice, laudio_bits,
-                      laudio_channels, laudio_samplerate, source,
-                      set_initial_vol, laudio_passthru)
+AudioOutputJACK::AudioOutputJACK(
+    QString laudio_main_device, QString           laudio_passthru_device,
+    int     laudio_bits,        int               laudio_channels,
+    int     laudio_samplerate,  AudioOutputSource lsource,
+    bool    lset_initial_vol,   bool              laudio_passthru) :
+    AudioOutputBase(laudio_main_device, laudio_passthru_device,
+                    laudio_bits,        laudio_channels,
+                    laudio_samplerate,  lsource,
+                    lset_initial_vol,   laudio_passthru),
+    audioid(-1)
 {
     // Initialise the Jack output layer
     JACK_Init();
-
-    // our initalisation
-    audioid = -1;
 
     // Set everything up
     Reconfigure(laudio_bits, laudio_channels,
@@ -54,11 +54,14 @@ bool AudioOutputJACK::OpenDevice()
     unsigned long jack_port_flags=JackPortIsPhysical;
     unsigned int jack_port_name_count=0;
     const char *jack_port_name=NULL;
-    
-    if (!audiodevice.isEmpty()) {
+
+    VERBOSE(VB_GENERAL, QString("Opening JACK audio device '%1'.")
+            .arg(audio_main_device));
+
+    if (!audio_main_device.isEmpty()) {
         jack_port_flags = 0;
         jack_port_name_count = 1;
-        jack_port_name = audiodevice.ascii();
+        jack_port_name = audio_main_device.ascii();
     }
 
     int err = -1;
@@ -70,7 +73,7 @@ bool AudioOutputJACK::OpenDevice()
                           jack_port_name_count, jack_port_flags);
         if (err == 1) {
             Error(QString("Error connecting to jackd:%1.  Is it running?")
-                  .arg(audiodevice));
+                  .arg(audio_main_device));
             return false;
         } else if (err == 2) {
             // need to resample
@@ -81,15 +84,15 @@ bool AudioOutputJACK::OpenDevice()
                               jack_port_name_count, jack_port_flags);
         } else if (err == ERR_PORT_NOT_FOUND) {
             VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), "
-                    " Port not found.").arg(audiodevice));
-            perror(audiodevice.ascii());
+                    " Port not found.").arg(audio_main_device));
+            perror(audio_main_device.ascii());
         }
 
         if (err != 0)
         {
             VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
-                    " error num was: %2").arg(audiodevice).arg(err));
-            perror(audiodevice.ascii());
+                    " error num was: %2").arg(audio_main_device).arg(err));
+            perror(audio_main_device.ascii());
         }
         if (audioid < 0)
             usleep(50);
@@ -98,7 +101,7 @@ bool AudioOutputJACK::OpenDevice()
     if (audioid == -1)
     {
         Error(QString("Error opening audio device (%1), the error num was: %2")
-              .arg(audiodevice).arg(err));
+              .arg(audio_main_device).arg(err));
         return false;
     }
     
