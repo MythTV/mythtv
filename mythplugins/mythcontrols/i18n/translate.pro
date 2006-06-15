@@ -6,4 +6,4 @@ SOURCES += ../mythcontrols/keygrabber.cpp
 SOURCES += ../mythcontrols/mythcontrols.cpp
 
 TRANSLATIONS  = mythcontrols_sv.ts mythcontrols_fi.ts mythcontrols_es.ts
-TRANSLATIONS += mythcontrols_de.ts mythcontrols_nl.ts
+TRANSLATIONS += mythcontrols_de.ts mythcontrols_nl.ts mythcontrols_dk.ts
