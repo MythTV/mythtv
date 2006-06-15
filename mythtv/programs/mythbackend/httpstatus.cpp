@@ -64,6 +64,7 @@ HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
     if (sURI == "getStatus"            ) return( HSM_GetStatusXML    );
     if (sURI == "xml"                  ) return( HSM_GetStatusXML    );
     if (sURI == "getProgramGuide"      ) return( HSM_GetProgramGuide );
+    if (sURI == "getProgramDetails"    ) return( HSM_GetProgramDetails);
 
     if (sURI == "getHosts"             ) return( HSM_GetHosts        );
     if (sURI == "getKeys"              ) return( HSM_GetKeys         );
@@ -105,6 +106,8 @@ bool HttpStatus::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pReques
                 case HSM_GetStatusHTML  : GetStatusHTML  ( pRequest ); return( true ); 
 
                 case HSM_GetProgramGuide: GetProgramGuide( pRequest ); return( true );
+
+                case HSM_GetProgramDetails: GetProgramDetails( pRequest ); return( true );
 
                 case HSM_GetHosts       : GetHosts       ( pRequest ); return( true );
                 case HSM_GetKeys        : GetKeys        ( pRequest ); return( true );
@@ -398,6 +401,7 @@ void HttpStatus::GetProgramGuide( HTTPRequest *pRequest )
     QString sEndTime       = pRequest->m_mapParams[ "EndTime"      ];
     int     iNumOfChannels = pRequest->m_mapParams[ "NumOfChannels"].toInt();
     int     iStartChanId   = pRequest->m_mapParams[ "StartChanId"  ].toInt();
+    bool    bDetails       = pRequest->m_mapParams[ "Details"      ].toInt();
     int     iEndChanId     = iStartChanId;
 
     QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
@@ -423,6 +427,9 @@ void HttpStatus::GetProgramGuide( HTTPRequest *pRequest )
 
     if (iNumOfChannels == 0)
         iNumOfChannels = 1;
+
+    if (iNumOfChannels == -1)
+        iNumOfChannels = SHRT_MAX;
 
     // Find the ending channel Id
 
@@ -516,10 +523,10 @@ void HttpStatus::GetProgramGuide( HTTPRequest *pRequest )
             channel = doc.createElement( "Channel" );
             channels.appendChild( channel );
 
-            FillChannelInfo( channel, pInfo );
+            FillChannelInfo( channel, pInfo, bDetails );
         }
 
-        FillProgramInfo( &doc, channel, pInfo, false );
+        FillProgramInfo( &doc, channel, pInfo, false, bDetails );
 
         pInfo = progList.next();
 
@@ -530,6 +537,63 @@ void HttpStatus::GetProgramGuide( HTTPRequest *pRequest )
     root.setAttribute("startChanId"  , iStartChanId );
     root.setAttribute("endChanId"    , iEndChanId   );
     root.setAttribute("numOfChannels", iChanCount   );
+    root.setAttribute("details"      , bDetails     );
+
+    pRequest->m_response << doc.toString();
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+//                  
+/////////////////////////////////////////////////////////////////////////////
+
+void HttpStatus::GetProgramDetails( HTTPRequest *pRequest )
+{
+    pRequest->m_eResponseType = ResponseTypeXML;
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+
+    QString sStartTime = pRequest->m_mapParams[ "StartTime" ];
+    QString sChanId    = pRequest->m_mapParams[ "ChanId"    ];
+
+    QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
+
+    if (!dtStart.isValid()) 
+    { 
+        pRequest->m_response <<  "<Error>StartTime is invalid</Error>";
+        return;
+    }
+    
+    // -=>TODO: Add support for getting Recorded Program Info
+    
+    // ----------------------------------------------------------------------
+    // Read Recording From Database
+    // ----------------------------------------------------------------------
+
+    ProgramInfo *pInfo = ProgramInfo::GetProgramAtDateTime( sChanId, 
+                                                            dtStart,
+                                                            false    );
+
+    if (pInfo==NULL)
+    { 
+        pRequest->m_response <<  "<Error>Error Reading Program Info/Error>";
+        return;
+    }
+
+    // Build Response XML
+
+    QDomDocument doc( "ProgramDetails" );                        
+
+    QDomElement root = doc.createElement("ProgramDetails");
+    doc.appendChild(root);
+
+    root.setAttribute("asOf"      , QDateTime::currentDateTime().toString( Qt::ISODate ));
+    root.setAttribute("version"   , MYTH_BINARY_VERSION           );
+    root.setAttribute("protoVer"  , MYTH_PROTO_VERSION            );
+    root.setAttribute("totalCount", 1                             );
+    root.setAttribute("startTime" , sStartTime   );
+    root.setAttribute("chanId"    , sChanId     );
+
+    FillProgramInfo( &doc, root, pInfo, true );
 
     pRequest->m_response << doc.toString();
 }
@@ -1371,8 +1435,11 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     guide.appendChild(dataDirectMessage);
 }
 
-void HttpStatus::FillProgramInfo(QDomDocument *pDoc, QDomElement &e, 
-                                 ProgramInfo *pInfo, bool bIncChannel /* = true */)
+void HttpStatus::FillProgramInfo(QDomDocument *pDoc, 
+                                 QDomElement  &e, 
+                                 ProgramInfo  *pInfo, 
+                                 bool          bIncChannel /* = true */,
+                                 bool          bDetails    /* = true */)
 {
     if ((pDoc == NULL) || (pInfo == NULL))
         return;
@@ -1382,26 +1449,32 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc, QDomElement &e,
     QDomElement program = pDoc->createElement( "Program" );
     e.appendChild( program );
 
-    program.setAttribute( "seriesId"    , pInfo->seriesid     );
-    program.setAttribute( "programId"   , pInfo->programid    );
+    program.setAttribute( "startTime"   , pInfo->startts.toString(Qt::ISODate));
+    program.setAttribute( "endTime"     , pInfo->endts.toString(Qt::ISODate));
     program.setAttribute( "title"       , pInfo->title        );
     program.setAttribute( "subTitle"    , pInfo->subtitle     );
     program.setAttribute( "category"    , pInfo->category     );
     program.setAttribute( "catType"     , pInfo->catType      );
-    program.setAttribute( "startTime"   , pInfo->startts.toString(Qt::ISODate));
-    program.setAttribute( "endTime"     , pInfo->endts.toString(Qt::ISODate));
     program.setAttribute( "repeat"      , pInfo->repeat       );
-    program.setAttribute( "stars"       , pInfo->stars        );
-    program.setAttribute( "fileSize"    , longLongToString( pInfo->filesize ));
-    program.setAttribute( "lastModified", pInfo->lastmodified.toString(Qt::ISODate) );
-    program.setAttribute( "programFlags", pInfo->programflags );
-    program.setAttribute( "hostname"    , pInfo->hostname     );
 
-    if (pInfo->hasAirDate)
-        program.setAttribute( "airdate"  , pInfo->originalAirDate.toString(Qt::ISODate) );
+    if (bDetails)
+    {
 
-    QDomText textNode = pDoc->createTextNode( pInfo->description );
-    program.appendChild( textNode );
+        program.setAttribute( "seriesId"    , pInfo->seriesid     );
+        program.setAttribute( "programId"   , pInfo->programid    );
+        program.setAttribute( "stars"       , pInfo->stars        );
+        program.setAttribute( "fileSize"    , longLongToString( pInfo->filesize ));
+        program.setAttribute( "lastModified", pInfo->lastmodified.toString(Qt::ISODate) );
+        program.setAttribute( "programFlags", pInfo->programflags );
+        program.setAttribute( "hostname"    , pInfo->hostname     );
+
+        if (pInfo->hasAirDate)
+            program.setAttribute( "airdate"  , pInfo->originalAirDate.toString(Qt::ISODate) );
+
+        QDomText textNode = pDoc->createTextNode( pInfo->description );
+        program.appendChild( textNode );
+
+    }
 
     if ( bIncChannel )
     {
@@ -1410,52 +1483,66 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc, QDomElement &e,
         QDomElement channel = pDoc->createElement( "Channel" );
         program.appendChild( channel );
 
-        FillChannelInfo( channel, pInfo );
+        FillChannelInfo( channel, pInfo, bDetails );
     }
 
     // Build Recording Child Element
 
-    QDomElement recording = pDoc->createElement( "Recording" );
-    program.appendChild( recording );
+    if ( pInfo->recstatus != rsUnknown )
+    { 
+        QDomElement recording = pDoc->createElement( "Recording" );
+        program.appendChild( recording );
 
-    recording.setAttribute( "recordId"      , pInfo->recordid    );
-    recording.setAttribute( "recStartTs"    , pInfo->recstartts.toString(Qt::ISODate));
-    recording.setAttribute( "recEndTs"      , pInfo->recendts.toString(Qt::ISODate));
-    recording.setAttribute( "recStatus"     , pInfo->recstatus   );
-    recording.setAttribute( "recPriority"   , pInfo->recpriority );
-    recording.setAttribute( "recGroup"      , pInfo->recgroup    );
-    recording.setAttribute( "playGroup"     , pInfo->playgroup   );
-    recording.setAttribute( "recType"       , pInfo->rectype     );
-    recording.setAttribute( "dupInType"     , pInfo->dupin       );
-    recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
-    recording.setAttribute( "encoderId"     , pInfo->cardid      );
-    recording.setAttribute( "preRollSeconds", m_nPreRollSeconds );
+        recording.setAttribute( "recStatus"     , pInfo->recstatus   );
+        recording.setAttribute( "recPriority"   , pInfo->recpriority );
+        recording.setAttribute( "recStartTs"    , pInfo->recstartts.toString(Qt::ISODate));
+        recording.setAttribute( "recEndTs"      , pInfo->recendts.toString(Qt::ISODate));
 
+        if (bDetails)
+        {
+            recording.setAttribute( "recordId"      , pInfo->recordid    );
+            recording.setAttribute( "recGroup"      , pInfo->recgroup    );
+            recording.setAttribute( "playGroup"     , pInfo->playgroup   );
+            recording.setAttribute( "recType"       , pInfo->rectype     );
+            recording.setAttribute( "dupInType"     , pInfo->dupin       );
+            recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
+            recording.setAttribute( "encoderId"     , pInfo->cardid      );
+            recording.setAttribute( "preRollSeconds", m_nPreRollSeconds );
+        }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpStatus::FillChannelInfo( QDomElement &channel, ProgramInfo *pInfo )
+void HttpStatus::FillChannelInfo( QDomElement &channel, 
+                                  ProgramInfo *pInfo, 
+                                  bool         bDetails  /* = true */ )
 {
     if (pInfo)
     {
+/*
         QString sHostName = gContext->GetHostName();
         QString sPort     = gContext->GetSettingOnHost( "BackendStatusPort", sHostName);
         QString sIconURL  = QString( "http://%1:%2/getChannelIcon?ChanId=%3" )
                                    .arg( sHostName )
                                    .arg( sPort )
                                    .arg( pInfo->chanid );
+*/
 
         channel.setAttribute( "chanId"     , pInfo->chanid      );
         channel.setAttribute( "callSign"   , pInfo->chansign    );
-        channel.setAttribute( "iconURL"    , sIconURL           );
+//        channel.setAttribute( "iconURL"    , sIconURL           );
         channel.setAttribute( "channelName", pInfo->channame    );
-        channel.setAttribute( "chanFilters", pInfo->chanOutputFilters );
-        channel.setAttribute( "sourceId"   , pInfo->sourceid    );
-        channel.setAttribute( "inputId"    , pInfo->inputid     );
-        channel.setAttribute( "commFree"   , pInfo->chancommfree);
+
+        if (bDetails)
+        {
+            channel.setAttribute( "chanFilters", pInfo->chanOutputFilters );
+            channel.setAttribute( "sourceId"   , pInfo->sourceid    );
+            channel.setAttribute( "inputId"    , pInfo->inputid     );
+            channel.setAttribute( "commFree"   , pInfo->chancommfree);
+        }
     }
 }
 

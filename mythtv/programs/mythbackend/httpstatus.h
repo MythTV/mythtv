@@ -47,7 +47,8 @@ typedef enum
     
     HSM_Asterisk        = 16,
 
-    HSM_GetExpiring     = 17
+    HSM_GetExpiring       = 17,
+    HSM_GetProgramDetails = 18
 
 } HttpStatusMethod;
 
@@ -137,6 +138,7 @@ class HttpStatus : public HttpServerExtension
         void    GetStatusHTML  ( HTTPRequest *pRequest );
 
         void    GetProgramGuide( HTTPRequest *pRequest );
+        void    GetProgramDetails( HTTPRequest *pRequest );
 
         void    GetHosts       ( HTTPRequest *pRequest );
         void    GetKeys        ( HTTPRequest *pRequest );
@@ -161,11 +163,13 @@ class HttpStatus : public HttpServerExtension
         void    FillProgramInfo ( QDomDocument *pDoc, 
                                   QDomElement  &e, 
                                   ProgramInfo  *pInfo,
-                                  bool          bIncChannel = true);
+                                  bool          bIncChannel = true,
+                                  bool          bDetails    = true );
 
         void    FillStatusXML   ( QDomDocument *pDoc);
         void    FillChannelInfo ( QDomElement  &channel, 
-                                  ProgramInfo  *pInfo );
+                                  ProgramInfo  *pInfo,
+                                  bool          bDetails = true );
 
     
         void    PrintStatus       ( QTextStream &os, QDomDocument *pDoc );

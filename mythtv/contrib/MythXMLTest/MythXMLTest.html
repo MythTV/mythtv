@@ -402,7 +402,8 @@ function OnLoad()
               </table></td>
           </tr>
           <tr> 
-            <td> <div class="panelArea"> 
+            <td> 
+              <div class="panelArea"> 
                 <table cellpadding=4 cellspacing=4 border=0 width='100%' >
                   <tr> 
                     <td width='40%' align="center" valign="top"> <form id="getProgramGuide" name="frmGetProgramGuide" method="post" action="" target="fraResults" onSubmit="SetFormAddress( 'getProgramGuide' )">
@@ -425,8 +426,15 @@ function OnLoad()
                           <tr>
                             <td class="param">NumOfChannels:</td>
                             <td><input class="inputfields" type="text" name="NumOfChannels"></td>
+                            <td>&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td class="param">Details:</td>
+                            <td class="param" width="70%"><input type="radio" name="Details" value='1' checked >True
+                            							  <input type="radio" name="Details" value='0'>False</td>
                             <td align="right"><input type="submit" class="formButton" value="getProgramGuide"/></td>
                           </tr>
+
                         <tr> 
                           <td colspan="3" class="desc"><em>* Note: maximum of 1000 programs returned per call</em></td>
                         </tr>
@@ -467,6 +475,53 @@ function OnLoad()
                           <td class="desc">Number of sequencal channels to return 
                             for requested time period. If omitted, 1 channel is 
                             returned. -1 returns all channels.</td>
+                        </tr>
+                        <tr> 
+                          <td colspan="2">&nbsp;</td>
+                          <td class="param">Details</td>
+                          <td>&nbsp;</td>
+                          <td class="desc">Should all attributes be returned</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan='2'><hr></td>
+                  </tr>
+                  <tr>
+                    <td> <form id="getProgramDetails" name="frmGetProgramDetails" method="post" action="" OnSubmit="SetFormAddress( 'getProgramDetails' )" target="fraResults">
+                        <table border="0" cellpadding="0" cellspacing="1"  cols="5" align="center">
+                          <tr>
+                            <td class="param" width="20%">ChanId:</td>
+                            <td width="65%"><input class="inputfields" type="text" name="ChanId"></td>
+                            <td width="15%">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td class="param">StartTime:</td>
+                            <td ><input class="inputfields" type="text" name="StartTime"></td>
+							<td align="right"><input name="getProgramDetails" type="submit" class="formButton" value="getProgramDetails"/></td>                          
+						  </tr>
+                        </table>
+                      </form></td>
+                    <td valign="top"> <table border="0" cellpadding="0" cellspacing="1" width="100%" >
+                        <tr> 
+                          <td width="10%" class="label">Method:</td>
+                          <td width="3%">&nbsp;</td>
+                          <td width="10%" class="method">getProgramDetails</td>
+                          <td width="7%">&nbsp;</td>
+                          <td width="70%" class="desc">Retrieves Details about a specific program.</td>
+                        </tr>
+                        <tr> 
+                          <td class="label" colspan="2" align="right">Params:</td>
+                          <td class="param">ChanId</td>
+                          <td>&nbsp;</td>
+                          <td class="desc">ChannelId of program. &lt;required&gt;</td>
+                        </tr>
+                        <tr> 
+                          <td colspan="2">&nbsp;</td>
+                          <td class="param">StartTime</td>
+                          <td>&nbsp;</td>
+                          <td class="desc">StartTime of program (CCYY-MM-DDTHH:MM). &lt;required&gt;</td>
                         </tr>
                       </table>
                     </td>
