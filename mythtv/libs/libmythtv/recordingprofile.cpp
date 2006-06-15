@@ -711,9 +711,9 @@ class RecordingType : public CodecParam, public ComboBoxSetting
             "audio, video and subtitle streams. ");
         setHelpText(msg);
 
-        addSelection(tr("Normal"),     "all");
-        addSelection(tr("TV Only"),    "tv");
-        addSelection(tr("Audio Only"), "audio");
+        addSelection(QObject::tr("Normal"),     "all");
+        addSelection(QObject::tr("TV Only"),    "tv");
+        addSelection(QObject::tr("Audio Only"), "audio");
         setValue(0);
     };
 };

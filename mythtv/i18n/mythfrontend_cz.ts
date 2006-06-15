@@ -107,6 +107,18 @@
         <source>Yes, delete capture cards</source>
         <translation>Ano, smazat zachytávací karty</translation>
     </message>
+    <message>
+        <source>Are you sure you want to delete ALL capture cards on %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error getting list of cards for this host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to delete capturecards for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CardInput</name>
@@ -190,170 +202,345 @@
     </message>
 </context>
 <context>
-    <name>CustomRecord</name>
+    <name>CustomEdit</name>
     <message>
-        <source>Rule Name</source>
-        <translation>Jméno pravidla</translation>
-    </message>
-    <message>
-        <source>Match an exact title</source>
-        <translation>Přesná shoda titulu</translation>
-    </message>
-    <message>
-        <source>Match an exact episode</source>
-        <translation>Přesná shoda epizody</translation>
-    </message>
-    <message>
-        <source>Match words in the title</source>
-        <translation>Shoda slov v titulu</translation>
-    </message>
-    <message>
-        <source>Match in any descriptive field</source>
-        <translation>Shoda v jakémkoliv popisném políčku</translation>
-    </message>
-    <message>
-        <source>Limit by category</source>
-        <translation>Omezit kategorií</translation>
-    </message>
-    <message>
-        <source>New episodes only</source>
-        <translation>Pouze nové díly</translation>
-    </message>
-    <message>
-        <source>Category type</source>
-        <translation>Typ kategorie</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation>nebo</translation>
-    </message>
-    <message>
-        <source>Limit movies by the year of release</source>
-        <translation>Omezit filmy rokem vydání</translation>
-    </message>
-    <message>
-        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation>Minimální hvězdné hodnocení (od 0.0 do 1.0, pouze pro filmy)</translation>
-    </message>
-    <message>
-        <source>Exclude one station</source>
-        <translation>Vyřadit jednu stanici</translation>
-    </message>
-    <message>
-        <source>Match related callsigns</source>
-        <translation>Shoda odpovídajících volacích značek</translation>
-    </message>
-    <message>
-        <source>Only channels from a specific video source</source>
-        <translation>Jen kanály z určitého zdroje obrazu</translation>
-    </message>
-    <message>
-        <source>Only channels marked as commercial free</source>
-        <translation>Pouze kanály označené jako bez reklam</translation>
-    </message>
-    <message>
-        <source>Only shows marked as HDTV</source>
-        <translation>Pouze šou označené jako HDTV</translation>
-    </message>
-    <message>
-        <source>Anytime on a specific day of the week</source>
-        <translation>Kdykoliv určitého dne v týdnu</translation>
-    </message>
-    <message>
-        <source>Only on weekdays (Monday through Friday)</source>
-        <translation>Pouze v pracovní dny (od pondělka do pátku)</translation>
-    </message>
-    <message>
-        <source>Only on weekends</source>
-        <translation>Pouze víkendy</translation>
-    </message>
-    <message>
-        <source>Only in primetime</source>
-        <translation>Pouze v hlavním čase</translation>
-    </message>
-    <message>
-        <source>Not in primetime</source>
-        <translation>Mimo hlavní čas</translation>
-    </message>
-    <message>
-        <source>Multiple sports teams (complete example)</source>
-        <translation>Vícero sportovních týmů (úplný příklad)</translation>
-    </message>
-    <message>
-        <source>Sci-fi B-movies (complete example)</source>
-        <translation>Béčkové sci-fi filmy (úplný příklad)</translation>
-    </message>
-    <message>
-        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation>Celonoční sportovní centrum (úplný příklad - použijte Denní hledání)</translation>
-    </message>
-    <message>
-        <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation>Film týdne (úplný příklad - použijte Týdenní hledání)</translation>
-    </message>
-    <message>
-        <source>Add this example clause</source>
-        <translation>Přidat tento příklad</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Test</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Nahrávat</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Zrušit</translation>
-    </message>
-    <message>
-        <source>An error was found when checking</source>
-        <translation>Při kontrole byla nalezena chyba</translation>
-    </message>
-    <message>
-        <source>The database error was</source>
-        <translation>Chyba databáze byla</translation>
+        <source>stored example</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit Rule</source>
-        <translation>Editovat pravidlo</translation>
+        <translation type="unfinished">Editovat pravidlo</translation>
     </message>
     <message>
         <source>&lt;New rule&gt;</source>
-        <translation>&lt;Nové pravidlo&gt;</translation>
+        <translation type="unfinished">&lt;Nové pravidlo&gt;</translation>
+    </message>
+    <message>
+        <source>Rule Name</source>
+        <translation type="unfinished">Jméno pravidla</translation>
+    </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="unfinished">Přesná shoda titulu</translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation type="unfinished">Přesná shoda epizody</translation>
+    </message>
+    <message>
+        <source>Match words in the title</source>
+        <translation type="unfinished">Shoda slov v titulu</translation>
+    </message>
+    <message>
+        <source>Match in any descriptive field</source>
+        <translation type="unfinished">Shoda v jakémkoliv popisném políčku</translation>
+    </message>
+    <message>
+        <source>Limit by category</source>
+        <translation type="unfinished">Omezit kategorií</translation>
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation>Všechny odpovídající žánru (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes</source>
-        <translation>Vyřadit nerozpoznané epizody</translation>
-    </message>
-    <message>
-        <source>Person named in the credits</source>
-        <translation>Osoba jmenovaná v titulcích</translation>
-    </message>
-    <message>
-        <source>Only on a specific station</source>
-        <translation>Pouze na určité stanici</translation>
-    </message>
-    <message>
-        <source>Only on channels marked as favorites</source>
-        <translation>Pouza na kanálech označených jako oblíbené</translation>
-    </message>
-    <message>
-        <source>First Episodes (complete example for Data Direct)</source>
-        <translation>První díly (úplný příklad pro Data Direct)</translation>
-    </message>
-    <message>
-        <source>Additional Tables</source>
-        <translation>Doplňkové tabulky</translation>
+        <translation type="unfinished">Všechny odpovídající žánru (Data Direct)</translation>
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
-        <translation>Omezeno MPAA nebo VCHIP hodnocením (Data Direct)</translation>
+        <translation type="unfinished">Omezeno MPAA nebo VCHIP hodnocením (Data Direct)</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation type="unfinished">Pouze nové díly</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Vyřadit nerozpoznané epizody</translation>
+    </message>
+    <message>
+        <source>Category type</source>
+        <translation type="unfinished">Typ kategorie</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished">nebo</translation>
+    </message>
+    <message>
+        <source>Limit movies by the year of release</source>
+        <translation type="unfinished">Omezit filmy rokem vydání</translation>
+    </message>
+    <message>
+        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
+        <translation type="unfinished">Minimální hvězdné hodnocení (od 0.0 do 1.0, pouze pro filmy)</translation>
+    </message>
+    <message>
+        <source>Person named in the credits (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on a specific station</source>
+        <translation type="unfinished">Pouze na určité stanici</translation>
+    </message>
+    <message>
+        <source>Exclude one station</source>
+        <translation type="unfinished">Vyřadit jednu stanici</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation type="unfinished">Shoda odpovídajících volacích značek</translation>
+    </message>
+    <message>
+        <source>Only on channels marked as favorites</source>
+        <translation type="unfinished">Pouza na kanálech označených jako oblíbené</translation>
+    </message>
+    <message>
+        <source>Only channels from a specific video source</source>
+        <translation type="unfinished">Jen kanály z určitého zdroje obrazu</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation type="unfinished">Pouze kanály označené jako bez reklam</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished">Pouze šou označené jako HDTV</translation>
+    </message>
+    <message>
+        <source>Anytime on a specific day of the week</source>
+        <translation type="unfinished">Kdykoliv určitého dne v týdnu</translation>
+    </message>
+    <message>
+        <source>Only on weekdays (Monday through Friday)</source>
+        <translation type="unfinished">Pouze v pracovní dny (od pondělka do pátku)</translation>
+    </message>
+    <message>
+        <source>Only on weekends</source>
+        <translation type="unfinished">Pouze víkendy</translation>
+    </message>
+    <message>
+        <source>Only in primetime</source>
+        <translation type="unfinished">Pouze v hlavním čase</translation>
+    </message>
+    <message>
+        <source>Not in primetime</source>
+        <translation type="unfinished">Mimo hlavní čas</translation>
+    </message>
+    <message>
+        <source>Multiple sports teams (complete example)</source>
+        <translation type="unfinished">Vícero sportovních týmů (úplný příklad)</translation>
+    </message>
+    <message>
+        <source>Sci-fi B-movies (complete example)</source>
+        <translation type="unfinished">Béčkové sci-fi filmy (úplný příklad)</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation type="unfinished">Celonoční sportovní centrum (úplný příklad - použijte Denní hledání)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation type="unfinished">Film týdne (úplný příklad - použijte Týdenní hledání)</translation>
+    </message>
+    <message>
+        <source>First Episodes (complete example for Data Direct)</source>
+        <translation type="unfinished">První díly (úplný příklad pro Data Direct)</translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation type="unfinished">Přidat tento příklad</translation>
+    </message>
+    <message>
+        <source>Additional Tables</source>
+        <translation type="unfinished">Doplňkové tabulky</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">Test</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation type="unfinished">Při kontrole byla nalezena chyba</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation type="unfinished">Chyba databáze byla</translation>
+    </message>
+</context>
+<context>
+    <name>CustomRecord</name>
+    <message>
+        <source>Rule Name</source>
+        <translation type="obsolete">Jméno pravidla</translation>
+    </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="obsolete">Přesná shoda titulu</translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation type="obsolete">Přesná shoda epizody</translation>
+    </message>
+    <message>
+        <source>Match words in the title</source>
+        <translation type="obsolete">Shoda slov v titulu</translation>
+    </message>
+    <message>
+        <source>Match in any descriptive field</source>
+        <translation type="obsolete">Shoda v jakémkoliv popisném políčku</translation>
+    </message>
+    <message>
+        <source>Limit by category</source>
+        <translation type="obsolete">Omezit kategorií</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation type="obsolete">Pouze nové díly</translation>
+    </message>
+    <message>
+        <source>Category type</source>
+        <translation type="obsolete">Typ kategorie</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="obsolete">nebo</translation>
+    </message>
+    <message>
+        <source>Limit movies by the year of release</source>
+        <translation type="obsolete">Omezit filmy rokem vydání</translation>
+    </message>
+    <message>
+        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
+        <translation type="obsolete">Minimální hvězdné hodnocení (od 0.0 do 1.0, pouze pro filmy)</translation>
+    </message>
+    <message>
+        <source>Exclude one station</source>
+        <translation type="obsolete">Vyřadit jednu stanici</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation type="obsolete">Shoda odpovídajících volacích značek</translation>
+    </message>
+    <message>
+        <source>Only channels from a specific video source</source>
+        <translation type="obsolete">Jen kanály z určitého zdroje obrazu</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation type="obsolete">Pouze kanály označené jako bez reklam</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="obsolete">Pouze šou označené jako HDTV</translation>
+    </message>
+    <message>
+        <source>Anytime on a specific day of the week</source>
+        <translation type="obsolete">Kdykoliv určitého dne v týdnu</translation>
+    </message>
+    <message>
+        <source>Only on weekdays (Monday through Friday)</source>
+        <translation type="obsolete">Pouze v pracovní dny (od pondělka do pátku)</translation>
+    </message>
+    <message>
+        <source>Only on weekends</source>
+        <translation type="obsolete">Pouze víkendy</translation>
+    </message>
+    <message>
+        <source>Only in primetime</source>
+        <translation type="obsolete">Pouze v hlavním čase</translation>
+    </message>
+    <message>
+        <source>Not in primetime</source>
+        <translation type="obsolete">Mimo hlavní čas</translation>
+    </message>
+    <message>
+        <source>Multiple sports teams (complete example)</source>
+        <translation type="obsolete">Vícero sportovních týmů (úplný příklad)</translation>
+    </message>
+    <message>
+        <source>Sci-fi B-movies (complete example)</source>
+        <translation type="obsolete">Béčkové sci-fi filmy (úplný příklad)</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation type="obsolete">Celonoční sportovní centrum (úplný příklad - použijte Denní hledání)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation type="obsolete">Film týdne (úplný příklad - použijte Týdenní hledání)</translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation type="obsolete">Přidat tento příklad</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="obsolete">Test</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="obsolete">Nahrávat</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="obsolete">Zrušit</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation type="obsolete">Při kontrole byla nalezena chyba</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation type="obsolete">Chyba databáze byla</translation>
+    </message>
+    <message>
+        <source>Edit Rule</source>
+        <translation type="obsolete">Editovat pravidlo</translation>
+    </message>
+    <message>
+        <source>&lt;New rule&gt;</source>
+        <translation type="obsolete">&lt;Nové pravidlo&gt;</translation>
+    </message>
+    <message>
+        <source>All matches for a genre (Data Direct)</source>
+        <translation type="obsolete">Všechny odpovídající žánru (Data Direct)</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="obsolete">Vyřadit nerozpoznané epizody</translation>
+    </message>
+    <message>
+        <source>Person named in the credits</source>
+        <translation type="obsolete">Osoba jmenovaná v titulcích</translation>
+    </message>
+    <message>
+        <source>Only on a specific station</source>
+        <translation type="obsolete">Pouze na určité stanici</translation>
+    </message>
+    <message>
+        <source>Only on channels marked as favorites</source>
+        <translation type="obsolete">Pouza na kanálech označených jako oblíbené</translation>
+    </message>
+    <message>
+        <source>First Episodes (complete example for Data Direct)</source>
+        <translation type="obsolete">První díly (úplný příklad pro Data Direct)</translation>
+    </message>
+    <message>
+        <source>Additional Tables</source>
+        <translation type="obsolete">Doplňkové tabulky</translation>
+    </message>
+    <message>
+        <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
+        <translation type="obsolete">Omezeno MPAA nebo VCHIP hodnocením (Data Direct)</translation>
     </message>
 </context>
 <context>
@@ -392,6 +579,14 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Various additional settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open card #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not get card info for card #%1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -445,11 +640,15 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Stahuji přehledy ze služby DataDirect...</translation>
+        <translation type="obsolete">Stahuji přehledy ze služby DataDirect...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation>Stahuji přehledy ze služby Myth Plus...</translation>
+        <translation type="obsolete">Stahuji přehledy ze služby Myth Plus...</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -520,6 +719,21 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <message>
         <source>Undefined</source>
         <translation>Nedefinované</translation>
+    </message>
+</context>
+<context>
+    <name>MPEGConfigurationGroup</name>
+    <message>
+        <source>Probed info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -757,10 +971,6 @@ Návrat do předchozího menu.</translation>
     <message>
         <source>, %1 GB free</source>
         <translation>, %1 GB volných</translation>
-    </message>
-    <message>
-        <source>^(The |A |An )</source>
-        <translation></translation>
     </message>
     <message>
         <source>Recording List Menu</source>
@@ -1146,6 +1356,22 @@ Návrat do předchozího menu.</translation>
         <source>Recording is Closed Captioned</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Autodetect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousList</name>
@@ -1467,7 +1693,7 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation>Kterýkoliv</translation>
+        <translation type="obsolete">Kterýkoliv</translation>
     </message>
 </context>
 <context>
@@ -1666,7 +1892,7 @@ Návrat do předchozího menu.</translation>
     </message>
     <message>
         <source>Rank</source>
-        <translation>Hodnocení</translation>
+        <translation type="obsolete">Hodnocení</translation>
     </message>
     <message>
         <source>Icon</source>
@@ -1944,15 +2170,15 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>TXT off</source>
-        <translation>Teletext vyp</translation>
+        <translation type="obsolete">Teletext vyp</translation>
     </message>
     <message>
         <source>CC off</source>
-        <translation>CC vyp</translation>
+        <translation type="obsolete">CC vyp</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation>CC</translation>
+        <translation type="obsolete">CC</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -2556,7 +2782,7 @@ Většina karet to dokáže automaticky detekovat, takže to nechte na Automatic
     </message>
     <message>
         <source>Scanning</source>
-        <translation>Načítá</translation>
+        <translation type="obsolete">Načítá</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3289,15 +3515,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LNB LOF Low</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3334,14 +3552,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Starting channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input preference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If the input preference is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3806,18 +4016,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Black background for Closed Captioning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If enabled, captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always display Closed Captioning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3843,14 +4041,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Xv picture controls</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4942,10 +5132,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Programový průvodce</translation>
     </message>
     <message>
-        <source>General Recording Priorities Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Screen settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5258,10 +5444,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Length of time the frontend waits between the tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Count of reconnect tries</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5546,14 +5728,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5575,7 +5749,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC/TXT enabled</source>
-        <translation>Teletext zapnut</translation>
+        <translation type="obsolete">Teletext zapnut</translation>
     </message>
     <message>
         <source>And, never ask again.</source>
@@ -6994,10 +7168,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the use to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Weighted Time/Priority Combination</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7107,6 +7277,796 @@ Myth will now exit.</source>
         <source>SW64 Switch (3-Way)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Education</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entertainment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>News</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Religious</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sports</source>
+        <translation type="unfinished">Sporty</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advertisement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anthology</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Awards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Baseball</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Basketball</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bulletin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Business</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Classical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>College</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comedy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commentary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Concert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Consumer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contemporary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Documentary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drama</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Elementary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erotica</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exercise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fantasy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Farm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fashion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fiction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Food</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Football</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Foreign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fund Raiser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game/Quiz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Garden</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Golf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Government</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Health</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High School</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hobby</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hockey</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instruction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>International</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Math</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meeting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Military</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miniseries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mystery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>National</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Police</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Politics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Premiere</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prerecorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Product</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Professional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Public</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Racing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Review</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Romance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Science</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Series</source>
+        <translation type="unfinished">Seriály</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Soap Opera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Special</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suspense</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Talk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Technical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tennis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Travel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Variety</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Western</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DataDirect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Works for DataDirect listings only.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Priorita</translation>
+    </message>
+    <message>
+        <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Example</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation type="unfinished">Zvuková stopa</translation>
+    </message>
+    <message>
+        <source>Subtitle track</source>
+        <translation type="unfinished">Stopa titulků</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>EIA-608 closed captions</comment>
+        <translation type="unfinished">CC</translation>
+    </message>
+    <message>
+        <source>ATSC CC</source>
+        <comment>EIA-708 closed captions</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TT CC</source>
+        <comment>Teletext closed captions</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TT Menu</source>
+        <comment>Teletext Menu</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TXT CAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No captions</source>
+        <comment>CC/Teletext/Subtitle text not available</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished">Pozice</translation>
+    </message>
+    <message>
+        <source>No Seektable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to filter out unwanted streams. &apos;Normal&apos; will record all relevant streams including interactive television data. &apos;TV Only&apos; will record only audio, video and subtitle streams. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable IRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Preferred Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UNKNOWN%1</source>
+        <comment>Synthesized callsign</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Tuning Delay (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some Linux DVB drivers, in particular for the Hauppauge Nova-T, require that we slow down the tuning process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device ID from the back of the HDHomeRun unit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDHomeRun DTV tuner box</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRC IP Network Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Delete all capture cards on %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passthrough output device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output device to use for AC3 and DTS passthrough. Default is the same as Audio output device. This value is currently only used with ALSA sound output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the user to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text zoom percentage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use this to enlage or shrink captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Caption Font Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This allows you to set which font type to use when the broadcaster does not specify a font.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proportional serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced sans serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proportional sans serif</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Casual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capitals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC caption settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC closed caption font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC caption fonts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black background for analog closed captioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, analog captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always display closed captioning or subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Interactive TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, interactive TV applications (MHEG) will be activated.  This is used for teletext and logos for radio and channels that are currently off-air.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paint Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Qt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenGL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;End Late&apos; minutes for new recording rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Complex Prioritization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, per rule plus type priorities will be used for primary prioritization with all other priorities having a secondary effect. Unset so that all are treated equally in a single total priority as described in the HOWTO.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preferred Input Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Captioned Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as Close Captioned in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alphabetically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduler Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Type Priority Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable AutoExpire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AutoExpire Actions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time offset for EIT listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust the relative timezone of the EIT EPG data.  &apos;Auto&apos; converts the EIT time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the EIT timezone, interpreting times as local.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cross Source EIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, listings data collected on one Video Source will be applied to the first matching DVB channel on any Video Source. This is sometimes useful for DVB-S, but may insert bogus data into any ATSC listings stored in the same database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Idle Before EIT Crawl (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EIT Scanner Options</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7188,31 +8148,31 @@ Myth will now exit.</source>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation>Načítá</translation>
+        <translation type="obsolete">Načítá</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation>Průvodce načítáním</translation>
+        <translation type="obsolete">Průvodce načítáním</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation>Chyba ladění na transport</translation>
+        <translation type="obsolete">Chyba ladění na transport</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation>Chyba rozboru parametrů</translation>
+        <translation type="obsolete">Chyba rozboru parametrů</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation>Chyba spouštění načítání</translation>
+        <translation type="obsolete">Chyba spouštění načítání</translation>
     </message>
     <message>
         <source>Failed to open : </source>
-        <translation>Nemohl otevřít : </translation>
+        <translation type="obsolete">Nemohl otevřít : </translation>
     </message>
     <message>
         <source>Failed to parse : </source>
-        <translation>Nemohl rozebrat : </translation>
+        <translation type="obsolete">Nemohl rozebrat : </translation>
     </message>
 </context>
 <context>
@@ -7241,7 +8201,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>is not available</source>
-        <translation>není dostupný</translation>
+        <translation type="obsolete">není dostupný</translation>
     </message>
     <message>
         <source>is watching live TV</source>
@@ -7295,16 +8255,20 @@ No other details</source>
         <source>%1 of these are LiveTV and consume %2</source>
         <translation>%1 z nich jsou živá TV a zabírají %2</translation>
     </message>
+    <message>
+        <source>is unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TV</name>
     <message>
         <source>MythTV is already using all available inputs for recording.  If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation>MythTV již používá všechny dostupné vstupy pro nahrávání.  Pokud chcete sledovat nahrávku za běhu, zvolte ji z přehrávacího menu.  Pokud chcete sledovat živou TV, zrušte jednu z probíhajících nahrávek v mazacím menu.</translation>
+        <translation type="obsolete">MythTV již používá všechny dostupné vstupy pro nahrávání.  Pokud chcete sledovat nahrávku za běhu, zvolte ji z přehrávacího menu.  Pokud chcete sledovat živou TV, zrušte jednu z probíhajících nahrávek v mazacím menu.</translation>
     </message>
     <message>
         <source>Cancel and go back to the TV menu</source>
-        <translation>Zrušit a jít zpět do menu TV</translation>
+        <translation type="obsolete">Zrušit a jít zpět do menu TV</translation>
     </message>
     <message>
         <source>Record and watch while it records</source>
@@ -7324,7 +8288,7 @@ No other details</source>
     </message>
     <message>
         <source>Audio track</source>
-        <translation>Zvuková stopa</translation>
+        <translation type="obsolete">Zvuková stopa</translation>
     </message>
     <message>
         <source>Forward</source>
@@ -7440,15 +8404,15 @@ No other details</source>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
-        <translation>Jas (Nahr.) %1 %</translation>
+        <translation type="obsolete">Jas (Nahr.) %1 %</translation>
     </message>
     <message>
         <source>Adjust Recording</source>
-        <translation>Upravit nahrávání</translation>
+        <translation type="obsolete">Upravit nahrávání</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
-        <translation>Jas %1 %</translation>
+        <translation type="obsolete">Jas %1 %</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -7456,27 +8420,27 @@ No other details</source>
     </message>
     <message>
         <source>Contrast (REC) %1 %</source>
-        <translation>Kontrast (nahrávání) %1 %</translation>
+        <translation type="obsolete">Kontrast (nahrávání) %1 %</translation>
     </message>
     <message>
         <source>Contrast %1 %</source>
-        <translation>Kontrast %1 %</translation>
+        <translation type="obsolete">Kontrast %1 %</translation>
     </message>
     <message>
         <source>Colour (REC) %1 %</source>
-        <translation>Barva (nahrávání) %1 %</translation>
+        <translation type="obsolete">Barva (nahrávání) %1 %</translation>
     </message>
     <message>
         <source>Colour %1 %</source>
-        <translation>Barva %1 %</translation>
+        <translation type="obsolete">Barva %1 %</translation>
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
-        <translation>Odstín (nahrávání) %1 %</translation>
+        <translation type="obsolete">Odstín (nahrávání) %1 %</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation>Odstín %1 %</translation>
+        <translation type="obsolete">Odstín %1 %</translation>
     </message>
     <message>
         <source>Volume %1 %</source>
@@ -7564,11 +8528,11 @@ No other details</source>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Hlasitost</translation>
+        <translation type="obsolete">Hlasitost</translation>
     </message>
     <message>
         <source>(REC)</source>
-        <translation>(Nahrávat)</translation>
+        <translation type="obsolete">(Nahrávat)</translation>
     </message>
     <message>
         <source>This program is currently being edited</source>
@@ -7644,15 +8608,15 @@ No other details</source>
     </message>
     <message>
         <source>Toggle Teletext</source>
-        <translation>Přepnout teletext</translation>
+        <translation type="obsolete">Přepnout teletext</translation>
     </message>
     <message>
         <source>Closed Captioning</source>
-        <translation>Skryté titulky</translation>
+        <translation type="obsolete">Skryté titulky</translation>
     </message>
     <message>
         <source>Toggle CC</source>
-        <translation>Přepnout CC</translation>
+        <translation type="obsolete">Přepnout CC</translation>
     </message>
     <message>
         <source>CC</source>
@@ -7660,7 +8624,7 @@ No other details</source>
     </message>
     <message>
         <source>TXT</source>
-        <translation>Teletext</translation>
+        <translation type="obsolete">Teletext</translation>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
@@ -7805,7 +8769,7 @@ No other details</source>
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation>Předchozí nahrávka</translation>
+        <translation type="obsolete">Předchozí nahrávka</translation>
     </message>
     <message>
         <source>Select Audio Track</source>
@@ -7813,11 +8777,11 @@ No other details</source>
     </message>
     <message>
         <source>Select Subtitles</source>
-        <translation>Zvolit titulky</translation>
+        <translation type="obsolete">Zvolit titulky</translation>
     </message>
     <message>
         <source>Subtitle track</source>
-        <translation>Stopa titulků</translation>
+        <translation type="obsolete">Stopa titulků</translation>
     </message>
     <message>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
@@ -7850,15 +8814,15 @@ No other details</source>
     </message>
     <message>
         <source>Speed 4X</source>
-        <translation>Rychlost 4X</translation>
+        <translation type="obsolete">Rychlost 4X</translation>
     </message>
     <message>
         <source>Speed 1/2X</source>
-        <translation>Rychlost 1/2X</translation>
+        <translation type="obsolete">Rychlost 1/2X</translation>
     </message>
     <message>
         <source>Speed 1/4X</source>
-        <translation>Rychlost 1/4X</translation>
+        <translation type="obsolete">Rychlost 1/4X</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
@@ -7889,19 +8853,134 @@ No other details</source>
         <translation type="unfinished">Editovat plán nahrávání</translation>
     </message>
     <message>
-        <source>Skipping Back Not Allowed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Previous Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>VBI CC</source>
+        <source>Skip Back Not Allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ATSC CC</source>
+        <source>Channel Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign</source>
+        <translation type="unfinished">Volací značka</translation>
+    </message>
+    <message>
+        <source>Channel #</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Name</source>
+        <translation type="unfinished">Jméno kanálu</translation>
+    </message>
+    <message>
+        <source>XMLTV ID</source>
+        <translation type="unfinished">XMLTV ID</translation>
+    </message>
+    <message>
+        <source>[P]robe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[O]k</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(I)</source>
+        <comment>Interlaced (Normal)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(i)</source>
+        <comment>Interlaced (Reversed)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(P)</source>
+        <comment>Progressive</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Progressive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced (Normal)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced (Reversed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Subtitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select ATSC CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select DVB CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle On/Off</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8124,6 +9203,21 @@ No other details</source>
     </message>
 </context>
 <context>
+    <name>V4LConfigurationGroup</name>
+    <message>
+        <source>Probed info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video Source Menu</source>
@@ -8307,6 +9401,17 @@ No other details</source>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
         <translation>Nelze vypnout protože MythTV začne probouzecí/vypínací fázi.</translation>
+    </message>
+</context>
+<context>
+    <name>pcHDTVConfigurationGroup</name>
+    <message>
+        <source>Failed to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

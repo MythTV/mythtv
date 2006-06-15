@@ -2562,10 +2562,10 @@ public:
         setTrigger(defaultView);
 
         HostComboBox *titleSort = new HostComboBox("DisplayGroupTitleSort");
-        titleSort->setLabel(tr("Sort Titles"));
-        titleSort->addSelection(tr("Alphabetically"),
+        titleSort->setLabel(QObject::tr("Sort Titles"));
+        titleSort->addSelection(QObject::tr("Alphabetically"),
                 QString::number(PlaybackBox::TitleSortAlphabetical));
-        titleSort->addSelection(tr("By Recording Priority"),
+        titleSort->addSelection(QObject::tr("By Recording Priority"),
                 QString::number(PlaybackBox::TitleSortRecPriority));
 
         for (unsigned int ii = 0; ii < PlaybackBox::ViewTypes; ii++)

@@ -202,146 +202,321 @@
     </message>
 </context>
 <context>
-    <name>CustomRecord</name>
+    <name>CustomEdit</name>
     <message>
-        <source>Rule Name</source>
-        <translation>Reegli nimi</translation>
-    </message>
-    <message>
-        <source>Match an exact title</source>
-        <translation>Leia pealkirja täpne vastavus</translation>
-    </message>
-    <message>
-        <source>Match an exact episode</source>
-        <translation>Leia episoodi täpne vastavus</translation>
-    </message>
-    <message>
-        <source>Match words in the title</source>
-        <translation>Leia pealkiras olevatest sõnadest</translation>
-    </message>
-    <message>
-        <source>Match in any descriptive field</source>
-        <translation>Leia suvaliselt kirjeldavalt väljalt</translation>
-    </message>
-    <message>
-        <source>Limit by category</source>
-        <translation>Piira kategooriaga</translation>
-    </message>
-    <message>
-        <source>New episodes only</source>
-        <translation>Ainult uued episoodid</translation>
-    </message>
-    <message>
-        <source>Category type</source>
-        <translation>Kategooria tüüp</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation>või</translation>
-    </message>
-    <message>
-        <source>Limit movies by the year of release</source>
-        <translation>Piira filme väljalaske aasta järgi</translation>
-    </message>
-    <message>
-        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation>Minimaalne reiting (0,0 kuni 1,0 ainult filmidele)</translation>
-    </message>
-    <message>
-        <source>Exclude one station</source>
-        <translation>Jäta üks jaam välja</translation>
-    </message>
-    <message>
-        <source>Match related callsigns</source>
-        <translation>Leia vastastikuses seoses olevad kutsungid</translation>
-    </message>
-    <message>
-        <source>Only channels from a specific video source</source>
-        <translation>Ainult kindla videoallika kanalid</translation>
-    </message>
-    <message>
-        <source>Only channels marked as commercial free</source>
-        <translation>Ainult reklaamivabad kanalid</translation>
-    </message>
-    <message>
-        <source>Only shows marked as HDTV</source>
-        <translation>Ainult HDTV saated</translation>
-    </message>
-    <message>
-        <source>Anytime on a specific day of the week</source>
-        <translation>Kindla nädalapäeva suvalisel ajal </translation>
-    </message>
-    <message>
-        <source>Only on weekdays (Monday through Friday)</source>
-        <translation>Ainult tööpäevadel (esmaspäev kuni reede)</translation>
-    </message>
-    <message>
-        <source>Only on weekends</source>
-        <translation>Ainult nädalavahetustel</translation>
-    </message>
-    <message>
-        <source>Only in primetime</source>
-        <translation>Ainult tippajal</translation>
-    </message>
-    <message>
-        <source>Not in primetime</source>
-        <translation>Mitte tippajal</translation>
-    </message>
-    <message>
-        <source>Multiple sports teams (complete example)</source>
-        <translation>Mitmed spordimeeskonnad (täielik näide)</translation>
-    </message>
-    <message>
-        <source>Sci-fi B-movies (complete example)</source>
-        <translation>Sci-fi B-filmid (täielik näide)</translation>
-    </message>
-    <message>
-        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation>SportsCenter Overnight (täielik näide - kasuta Päevaotsingut)</translation>
-    </message>
-    <message>
-        <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation>Nädala film (täielik näide - kasuta Nädalaotsingut)</translation>
-    </message>
-    <message>
-        <source>Add this example clause</source>
-        <translation>Lisa see näiteklausel</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Proovi</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Salvesta</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Tühista</translation>
-    </message>
-    <message>
-        <source>An error was found when checking</source>
-        <translation>Kontrollimisel leiti viga</translation>
-    </message>
-    <message>
-        <source>The database error was</source>
-        <translation>Andembaasi viga oli</translation>
+        <source>stored example</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit Rule</source>
-        <translation>Muuda reeglit</translation>
+        <translation type="unfinished">Muuda reeglit</translation>
     </message>
     <message>
         <source>&lt;New rule&gt;</source>
-        <translation>&lt;Uus reegel&gt;</translation>
+        <translation type="unfinished">&lt;Uus reegel&gt;</translation>
     </message>
     <message>
-        <source>First Episodes (complete example for Data Direct)</source>
-        <translation>Esimene episood (Täielik näide Data Direct-i baasil)</translation>
+        <source>Rule Name</source>
+        <translation type="unfinished">Reegli nimi</translation>
+    </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="unfinished">Leia pealkirja täpne vastavus</translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation type="unfinished">Leia episoodi täpne vastavus</translation>
+    </message>
+    <message>
+        <source>Match words in the title</source>
+        <translation type="unfinished">Leia pealkiras olevatest sõnadest</translation>
+    </message>
+    <message>
+        <source>Match in any descriptive field</source>
+        <translation type="unfinished">Leia suvaliselt kirjeldavalt väljalt</translation>
+    </message>
+    <message>
+        <source>Limit by category</source>
+        <translation type="unfinished">Piira kategooriaga</translation>
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation>Kõik žanri vastavused (Data Direct)</translation>
+        <translation type="unfinished">Kõik žanri vastavused (Data Direct)</translation>
+    </message>
+    <message>
+        <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
+        <translation type="unfinished">Piira MPAA või VCHIP reitinguga (Data Direct)</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation type="unfinished">Ainult uued episoodid</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Jäta välja identifitseerimata episoodid</translation>
+    </message>
+    <message>
+        <source>Category type</source>
+        <translation type="unfinished">Kategooria tüüp</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished">või</translation>
+    </message>
+    <message>
+        <source>Limit movies by the year of release</source>
+        <translation type="unfinished">Piira filme väljalaske aasta järgi</translation>
+    </message>
+    <message>
+        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
+        <translation type="unfinished">Minimaalne reiting (0,0 kuni 1,0 ainult filmidele)</translation>
+    </message>
+    <message>
+        <source>Person named in the credits (Data Direct)</source>
+        <translation type="unfinished">Osatäitja nimi (Data Direct)</translation>
+    </message>
+    <message>
+        <source>Only on a specific station</source>
+        <translation type="unfinished">Ainult teatud jaam</translation>
+    </message>
+    <message>
+        <source>Exclude one station</source>
+        <translation type="unfinished">Jäta üks jaam välja</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation type="unfinished">Leia vastastikuses seoses olevad kutsungid</translation>
+    </message>
+    <message>
+        <source>Only on channels marked as favorites</source>
+        <translation type="unfinished">Ainult lemmikkanalitelt</translation>
+    </message>
+    <message>
+        <source>Only channels from a specific video source</source>
+        <translation type="unfinished">Ainult kindla videoallika kanalid</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation type="unfinished">Ainult reklaamivabad kanalid</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="unfinished">Ainult HDTV saated</translation>
+    </message>
+    <message>
+        <source>Anytime on a specific day of the week</source>
+        <translation type="unfinished">Kindla nädalapäeva suvalisel ajal </translation>
+    </message>
+    <message>
+        <source>Only on weekdays (Monday through Friday)</source>
+        <translation type="unfinished">Ainult tööpäevadel (esmaspäev kuni reede)</translation>
+    </message>
+    <message>
+        <source>Only on weekends</source>
+        <translation type="unfinished">Ainult nädalavahetustel</translation>
+    </message>
+    <message>
+        <source>Only in primetime</source>
+        <translation type="unfinished">Ainult tippajal</translation>
+    </message>
+    <message>
+        <source>Not in primetime</source>
+        <translation type="unfinished">Mitte tippajal</translation>
+    </message>
+    <message>
+        <source>Multiple sports teams (complete example)</source>
+        <translation type="unfinished">Mitmed spordimeeskonnad (täielik näide)</translation>
+    </message>
+    <message>
+        <source>Sci-fi B-movies (complete example)</source>
+        <translation type="unfinished">Sci-fi B-filmid (täielik näide)</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation type="unfinished">SportsCenter Overnight (täielik näide - kasuta Päevaotsingut)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation type="unfinished">Nädala film (täielik näide - kasuta Nädalaotsingut)</translation>
+    </message>
+    <message>
+        <source>First Episodes (complete example for Data Direct)</source>
+        <translation type="unfinished">Esimene episood (Täielik näide Data Direct-i baasil)</translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation type="unfinished">Lisa see näiteklausel</translation>
+    </message>
+    <message>
+        <source>Additional Tables</source>
+        <translation type="unfinished">Lisatabelid</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">Proovi</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Salvesta</translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation type="unfinished">Kontrollimisel leiti viga</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation type="unfinished">Andembaasi viga oli</translation>
+    </message>
+</context>
+<context>
+    <name>CustomRecord</name>
+    <message>
+        <source>Rule Name</source>
+        <translation type="obsolete">Reegli nimi</translation>
+    </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="obsolete">Leia pealkirja täpne vastavus</translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
+        <translation type="obsolete">Leia episoodi täpne vastavus</translation>
+    </message>
+    <message>
+        <source>Match words in the title</source>
+        <translation type="obsolete">Leia pealkiras olevatest sõnadest</translation>
+    </message>
+    <message>
+        <source>Match in any descriptive field</source>
+        <translation type="obsolete">Leia suvaliselt kirjeldavalt väljalt</translation>
+    </message>
+    <message>
+        <source>Limit by category</source>
+        <translation type="obsolete">Piira kategooriaga</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation type="obsolete">Ainult uued episoodid</translation>
+    </message>
+    <message>
+        <source>Category type</source>
+        <translation type="obsolete">Kategooria tüüp</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="obsolete">või</translation>
+    </message>
+    <message>
+        <source>Limit movies by the year of release</source>
+        <translation type="obsolete">Piira filme väljalaske aasta järgi</translation>
+    </message>
+    <message>
+        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
+        <translation type="obsolete">Minimaalne reiting (0,0 kuni 1,0 ainult filmidele)</translation>
+    </message>
+    <message>
+        <source>Exclude one station</source>
+        <translation type="obsolete">Jäta üks jaam välja</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation type="obsolete">Leia vastastikuses seoses olevad kutsungid</translation>
+    </message>
+    <message>
+        <source>Only channels from a specific video source</source>
+        <translation type="obsolete">Ainult kindla videoallika kanalid</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation type="obsolete">Ainult reklaamivabad kanalid</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation type="obsolete">Ainult HDTV saated</translation>
+    </message>
+    <message>
+        <source>Anytime on a specific day of the week</source>
+        <translation type="obsolete">Kindla nädalapäeva suvalisel ajal </translation>
+    </message>
+    <message>
+        <source>Only on weekdays (Monday through Friday)</source>
+        <translation type="obsolete">Ainult tööpäevadel (esmaspäev kuni reede)</translation>
+    </message>
+    <message>
+        <source>Only on weekends</source>
+        <translation type="obsolete">Ainult nädalavahetustel</translation>
+    </message>
+    <message>
+        <source>Only in primetime</source>
+        <translation type="obsolete">Ainult tippajal</translation>
+    </message>
+    <message>
+        <source>Not in primetime</source>
+        <translation type="obsolete">Mitte tippajal</translation>
+    </message>
+    <message>
+        <source>Multiple sports teams (complete example)</source>
+        <translation type="obsolete">Mitmed spordimeeskonnad (täielik näide)</translation>
+    </message>
+    <message>
+        <source>Sci-fi B-movies (complete example)</source>
+        <translation type="obsolete">Sci-fi B-filmid (täielik näide)</translation>
+    </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation type="obsolete">SportsCenter Overnight (täielik näide - kasuta Päevaotsingut)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation type="obsolete">Nädala film (täielik näide - kasuta Nädalaotsingut)</translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation type="obsolete">Lisa see näiteklausel</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="obsolete">Proovi</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="obsolete">Salvesta</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="obsolete">Tühista</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation type="obsolete">Kontrollimisel leiti viga</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation type="obsolete">Andembaasi viga oli</translation>
+    </message>
+    <message>
+        <source>Edit Rule</source>
+        <translation type="obsolete">Muuda reeglit</translation>
+    </message>
+    <message>
+        <source>&lt;New rule&gt;</source>
+        <translation type="obsolete">&lt;Uus reegel&gt;</translation>
+    </message>
+    <message>
+        <source>First Episodes (complete example for Data Direct)</source>
+        <translation type="obsolete">Esimene episood (Täielik näide Data Direct-i baasil)</translation>
+    </message>
+    <message>
+        <source>All matches for a genre (Data Direct)</source>
+        <translation type="obsolete">Kõik žanri vastavused (Data Direct)</translation>
     </message>
     <message>
         <source>Person named in the credits</source>
@@ -349,27 +524,27 @@
     </message>
     <message>
         <source>Only on a specific station</source>
-        <translation>Ainult teatud jaam</translation>
+        <translation type="obsolete">Ainult teatud jaam</translation>
     </message>
     <message>
         <source>Only on channels marked as favorites</source>
-        <translation>Ainult lemmikkanalitelt</translation>
+        <translation type="obsolete">Ainult lemmikkanalitelt</translation>
     </message>
     <message>
         <source>Additional Tables</source>
-        <translation>Lisatabelid</translation>
+        <translation type="obsolete">Lisatabelid</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation>Jäta välja identifitseerimata episoodid</translation>
+        <translation type="obsolete">Jäta välja identifitseerimata episoodid</translation>
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
-        <translation>Piira MPAA või VCHIP reitinguga (Data Direct)</translation>
+        <translation type="obsolete">Piira MPAA või VCHIP reitinguga (Data Direct)</translation>
     </message>
     <message>
         <source>Person named in the credits (Data Direct)</source>
-        <translation>Osatäitja nimi (Data Direct)</translation>
+        <translation type="obsolete">Osatäitja nimi (Data Direct)</translation>
     </message>
 </context>
 <context>
@@ -549,6 +724,21 @@ HOIATUS: Air2PC HD-5000 kasutamisel ära nupule vajuta!!!! See kaart ei toeta an
     <message>
         <source>Undefined</source>
         <translation>Määramata</translation>
+    </message>
+</context>
+<context>
+    <name>MPEGConfigurationGroup</name>
+    <message>
+        <source>Probed info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -786,10 +976,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     <message>
         <source>, %1 GB free</source>
         <translation>, %1 GB vaba</translation>
-    </message>
-    <message>
-        <source>^(The |A |An )</source>
-        <translation></translation>
     </message>
     <message>
         <source>Recording List Menu</source>
@@ -1523,11 +1709,11 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     <name>QObject</name>
     <message>
         <source>No Menu File</source>
-        <translation type="obsolete">Menüüfail puudub</translation>
+        <translation type="unfinished">Menüüfail puudub</translation>
     </message>
     <message>
         <source>Bad Menu File</source>
-        <translation type="obsolete">Vigane menüüfail</translation>
+        <translation type="unfinished">Vigane menüüfail</translation>
     </message>
     <message>
         <source>Channel Name</source>
@@ -1559,7 +1745,7 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
     </message>
     <message>
         <source>Rank</source>
-        <translation>Järk</translation>
+        <translation type="obsolete">Järk</translation>
     </message>
     <message>
         <source>Icon</source>
@@ -4017,11 +4203,11 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Use Xv picture controls</source>
-        <translation>Kasuta Xv pildi seadistusi</translation>
+        <translation type="obsolete">Kasuta Xv pildi seadistusi</translation>
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation>Mahamängimisel kasutatakse Xv seadistusi (heledus, kontrast, jne.). Need on salvestamisel kasutatavatest Video4Linux seadistustest sõltumatud. Xv seadistused ei pruugi iga süüsteemi puhul korrektselt töötada.</translation>
+        <translation type="obsolete">Mahamängimisel kasutatakse Xv seadistusi (heledus, kontrast, jne.). Need on salvestamisel kasutatavatest Video4Linux seadistustest sõltumatud. Xv seadistused ei pruugi iga süüsteemi puhul korrektselt töötada.</translation>
     </message>
     <message>
         <source>UDP Notify Port</source>
@@ -5113,7 +5299,7 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>General Recording Priorities Settings</source>
-        <translation>Üldised salvestusprioriteedid</translation>
+        <translation type="obsolete">Üldised salvestusprioriteedid</translation>
     </message>
     <message>
         <source>Screen settings</source>
@@ -5601,11 +5787,11 @@ Sinu tõmbaja ei sisalda kanalite numbreid, pead need käsitsi panema.</translat
     </message>
     <message>
         <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
-        <translation>Boonuspuntide arv sellelt kanalilt salvestamise puhul</translation>
+        <translation type="obsolete">Boonuspuntide arv sellelt kanalilt salvestamise puhul</translation>
     </message>
     <message>
         <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation>Kasuta järguna positiivset numbrit selle kanali eelistamiseks ning negatiivset numbrit vältimiseks.</translation>
+        <translation type="obsolete">Kasuta järguna positiivset numbrit selle kanali eelistamiseks ning negatiivset numbrit vältimiseks.</translation>
     </message>
     <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
@@ -7756,11 +7942,11 @@ MythTV lõpetab töö.</translation>
     </message>
     <message>
         <source>HDTV Recordings Priority</source>
-        <translation>HDTV salvestuste prioriteet</translation>
+        <translation type="obsolete">HDTV salvestuste prioriteet</translation>
     </message>
     <message>
         <source>All HDTV programs will receive this additional recording priority value.</source>
-        <translation>Kõik kõrgresolutsiooniga (HDTV) salvestused saavad sellise lisaprioriteedi.</translation>
+        <translation type="obsolete">Kõik kõrgresolutsiooniga (HDTV) salvestused saavad sellise lisaprioriteedi.</translation>
     </message>
     <message>
         <source>Delete Now</source>
@@ -7806,20 +7992,176 @@ MythTV lõpetab töö.</translation>
         <source>EIT Scanner Options</source>
         <translation>EIT skaneerimisparameetrid</translation>
     </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Prioriteet</translation>
+    </message>
+    <message>
+        <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Example</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished">Positsioon</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation type="unfinished">Normaalne</translation>
+    </message>
+    <message>
+        <source>TV Only</source>
+        <translation type="unfinished">Ainult pilt</translation>
+    </message>
+    <message>
+        <source>Audio Only</source>
+        <translation type="unfinished">Ainult heli</translation>
+    </message>
+    <message>
+        <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Preferred Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRC IP Network Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passthrough output device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio output device to use for AC3 and DTS passthrough. Default is the same as Audio output device. This value is currently only used with ALSA sound output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;End Late&apos; minutes for new recording rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Complex Prioritization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, per rule plus type priorities will be used for primary prioritization with all other priorities having a secondary effect. Unset so that all are treated equally in a single total priority as described in the HOWTO.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preferred Input Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HDTV Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Captioned Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as Close Captioned in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alphabetically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduler Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Type Priority Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingType</name>
     <message>
         <source>Normal</source>
-        <translation>Normaalne</translation>
+        <translation type="obsolete">Normaalne</translation>
     </message>
     <message>
         <source>TV Only</source>
-        <translation>Ainult pilt</translation>
+        <translation type="obsolete">Ainult pilt</translation>
     </message>
     <message>
         <source>Audio Only</source>
-        <translation>Ainult heli</translation>
+        <translation type="obsolete">Ainult heli</translation>
     </message>
 </context>
 <context>
@@ -8158,15 +8500,15 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
-        <translation>Heledus (salvestamine) %1 %</translation>
+        <translation type="obsolete">Heledus (salvestamine) %1 %</translation>
     </message>
     <message>
         <source>Adjust Recording</source>
-        <translation>Kohanda salvestamist</translation>
+        <translation type="obsolete">Kohanda salvestamist</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
-        <translation>Heledus %1 %</translation>
+        <translation type="obsolete">Heledus %1 %</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -8174,27 +8516,27 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Contrast (REC) %1 %</source>
-        <translation>Kontrastsus (salvestamine) %1 %</translation>
+        <translation type="obsolete">Kontrastsus (salvestamine) %1 %</translation>
     </message>
     <message>
         <source>Contrast %1 %</source>
-        <translation>Kontrastsus %1 %</translation>
+        <translation type="obsolete">Kontrastsus %1 %</translation>
     </message>
     <message>
         <source>Colour (REC) %1 %</source>
-        <translation>Värvitugevus (salvestamine) %1 %</translation>
+        <translation type="obsolete">Värvitugevus (salvestamine) %1 %</translation>
     </message>
     <message>
         <source>Colour %1 %</source>
-        <translation>Värvitugevus %1 %</translation>
+        <translation type="obsolete">Värvitugevus %1 %</translation>
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
-        <translation>Toon (salvestamine) %1 %</translation>
+        <translation type="obsolete">Toon (salvestamine) %1 %</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation>Toon %1 %</translation>
+        <translation type="obsolete">Toon %1 %</translation>
     </message>
     <message>
         <source>Volume %1 %</source>
@@ -8282,11 +8624,11 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Helitugevus</translation>
+        <translation type="obsolete">Helitugevus</translation>
     </message>
     <message>
         <source>(REC)</source>
-        <translation>(salvestamine)</translation>
+        <translation type="obsolete">(salvestamine)</translation>
     </message>
     <message>
         <source>This program is currently being edited</source>
@@ -8568,15 +8910,15 @@ Rohkem andmeid pole</translation>
     </message>
     <message>
         <source>Speed 4X</source>
-        <translation>Kiirus 4X</translation>
+        <translation type="obsolete">Kiirus 4X</translation>
     </message>
     <message>
         <source>Speed 1/2X</source>
-        <translation>Kiirus 1/2X</translation>
+        <translation type="obsolete">Kiirus 1/2X</translation>
     </message>
     <message>
         <source>Speed 1/4X</source>
-        <translation>Kiirus 1/4X</translation>
+        <translation type="obsolete">Kiirus 1/4X</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
@@ -8700,11 +9042,6 @@ Rohkem andmeid pole</translation>
         <translation></translation>
     </message>
     <message>
-        <source>(i)</source>
-        <comment>Interlaced (Reveresed)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>(P)</source>
         <comment>Progressive</comment>
         <translation></translation>
@@ -8748,6 +9085,11 @@ Rohkem andmeid pole</translation>
     <message>
         <source>Toggle On/Off</source>
         <translation>Lülita sisse-välja</translation>
+    </message>
+    <message>
+        <source>(i)</source>
+        <comment>Interlaced (Reversed)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8969,6 +9311,21 @@ Rohkem andmeid pole</translation>
     </message>
 </context>
 <context>
+    <name>V4LConfigurationGroup</name>
+    <message>
+        <source>Probed info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video Source Menu</source>
@@ -9153,6 +9510,17 @@ Rohkem andmeid pole</translation>
     <message>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation>MythTV seisab jõude ning lülitub välja %1 sekundi pärast.</translation>
+    </message>
+</context>
+<context>
+    <name>pcHDTVConfigurationGroup</name>
+    <message>
+        <source>Failed to open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
