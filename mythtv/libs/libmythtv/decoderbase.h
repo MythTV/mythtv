@@ -129,11 +129,6 @@ class DecoderBase
     virtual QString GetXDS(const QString&) const { return QString::null; }
 
     // MHEG/MHI stuff
-    virtual bool ITVUpdate(bool /*visible*/) { return false; }
-    virtual bool ITVHandleAction(const QString& /*action*/) { return false; }
-    virtual void ITVRestart(uint /*chanid*/, uint /*cardid*/,
-                            bool /*livetv*/) { }
-
     virtual bool SetAudioByComponentTag(int) { return false; }
     virtual bool SetVideoByComponentTag(int) { return false; }
 

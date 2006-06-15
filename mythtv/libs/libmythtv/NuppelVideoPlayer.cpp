@@ -2439,7 +2439,29 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     // handle Interactive TV
     if (GetInteractiveTV() && GetDecoder())
-        itvVisible = GetDecoder()->ITVUpdate(itvVisible);
+    {
+        QMutexLocker locker(&itvLock);
+
+        OSD *osd = GetOSD();
+        if (osd)
+        {
+            OSDSet *itvosd = osd->GetSet("interactive");
+
+            if (itvosd)
+            {
+                bool visible = false;
+                if (interactiveTV->ImageHasChanged() || !itvVisible)
+                {
+                    interactiveTV->UpdateOSD(itvosd);
+                    visible = true;
+                    itvVisible = true;
+                }
+
+                if (visible)
+                    osd->SetVisible(itvosd, 0);
+            }
+        }
+    }
 
     // handle EIA-608 and Teletext
     if (textDisplayMode & kDisplayNUVCaptions)
@@ -5711,7 +5733,11 @@ bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
     QMutexLocker locker(&decoder_change_lock);
 
     if (GetDecoder())
-        return GetDecoder()->ITVHandleAction(action);
+    {
+        QMutexLocker locker(&itvLock);
+        if (GetInteractiveTV())
+            return interactiveTV->OfferKey(action);
+    }
 
     return false;
 }
@@ -5734,8 +5760,12 @@ void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
         return;
     }
 
-    GetDecoder()->ITVRestart(chanid, cardid, isLiveTV);
-        
+    {
+        QMutexLocker locker(&itvLock);
+        if (GetInteractiveTV())
+            interactiveTV->Restart(chanid, cardid, isLiveTV);
+    }
+       
     osd->ClearAll("interactive");
     itvosd->Display();
     osd->SetVisible(itvosd, 0);

@@ -136,10 +136,6 @@ class AvFormatDecoder : public DecoderBase
     virtual QString GetXDS(const QString&) const;
 
     // MHEG stuff
-    virtual bool ITVUpdate(bool itvVisible);
-    virtual bool ITVHandleAction(const QString&);
-    virtual void ITVRestart(uint chanid, uint cardid, bool livetv);
-
     virtual bool SetAudioByComponentTag(int tag);
     virtual bool SetVideoByComponentTag(int tag);
 
@@ -239,7 +235,6 @@ class AvFormatDecoder : public DecoderBase
     // MHEG
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
     int               selectedVideoIndex; ///< MHEG/MHP video stream to use.
-    QMutex            itvLock;
 
     // Audio
     short int        *audioSamples;

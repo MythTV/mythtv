@@ -2204,54 +2204,6 @@ QString AvFormatDecoder::GetXDS(const QString &key) const
     return ccd608->GetXDS(key);
 }
 
-bool AvFormatDecoder::ITVUpdate(bool itvVisible)
-{
-    QMutexLocker locker(&itvLock);
-
-    OSD *osd = GetNVP()->GetOSD();
-    if (!osd)
-        return itvVisible;
-
-    OSDSet *itvosd = osd->GetSet("interactive");
-    if (!itvosd)
-        return itvVisible;
-
-    if (!itv)
-        return itvVisible;
-
-    bool visible = false;
-    if (itv->ImageHasChanged() || !itvVisible)
-    {
-        itv->UpdateOSD(itvosd);
-        visible = true;
-        itvVisible = true;
-    }
-
-    if (visible)
-        osd->SetVisible(itvosd, 0);
-
-    return itvVisible;
-}
-
-bool AvFormatDecoder::ITVHandleAction(const QString &action)
-{
-    QMutexLocker locker(&itvLock);
-    if (itv)
-        return itv->OfferKey(action);
-    return false;
-}
-
-/** \fn AvFormatDecoder::ITVRestart(uint,uint,bool)
- *  \brief Restart the MHEG/MHP engine.
- */
-void AvFormatDecoder::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
-{
-    QMutexLocker locker(&itvLock);
-    itv = GetNVP()->GetInteractiveTV();
-    if (itv)
-        itv->Restart(chanid, cardid, isLiveTV);
-}
-
 bool AvFormatDecoder::SetAudioByComponentTag(int tag)
 {
     for (uint i = 0; i < tracks[kTrackTypeAudio].size(); i++)

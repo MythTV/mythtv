@@ -643,6 +643,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool       itvVisible;
     InteractiveTV *interactiveTV;
     bool       itvEnabled;
+    QMutex     itvLock;
 
     // OSD stuff
     OSD      *osd;
