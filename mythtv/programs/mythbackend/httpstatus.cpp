@@ -41,6 +41,8 @@ HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, Auto
     m_pSched    = sched;
     m_pExpirer  = expirer;
     m_bIsMaster = bIsMaster;
+
+    m_nPreRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1426,12 +1428,9 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc, QDomElement &e,
     recording.setAttribute( "recType"       , pInfo->rectype     );
     recording.setAttribute( "dupInType"     , pInfo->dupin       );
     recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
-
     recording.setAttribute( "encoderId"     , pInfo->cardid      );
+    recording.setAttribute( "preRollSeconds", m_nPreRollSeconds );
 
-    recording.setAttribute( "recProfile"    , pInfo->GetProgramRecordingProfile());
-
-    recording.setAttribute( "preRollSeconds", gContext->GetNumSetting("RecordPreRoll", 0));
 }
 
 /////////////////////////////////////////////////////////////////////////////

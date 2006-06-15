@@ -127,6 +127,7 @@ class HttpStatus : public HttpServerExtension
         QMap<int, EncoderLink *>    *m_pEncoders;
         AutoExpire                  *m_pExpirer;
         bool                         m_bIsMaster;
+        int                          m_nPreRollSeconds;
 
     private:
 
