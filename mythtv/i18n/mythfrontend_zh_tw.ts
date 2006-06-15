@@ -65,7 +65,7 @@
 <context>
     <name>CaptureCard</name>
     <message>
-        <source>Analog Options for </source>
+        <source>Analog Options for</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -375,9 +375,6 @@
         <source>The database error was</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>CustomRecord</name>
 </context>
 <context>
     <name>DTVSignalMonitor</name>
@@ -7923,9 +7920,6 @@ Myth will now exit.</source>
         <source>Scan Type</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
 </context>
 <context>
     <name>ScheduledRecording</name>

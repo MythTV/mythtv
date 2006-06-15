@@ -66,7 +66,11 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for </source>
-        <translation>Analoge Opties voor </translation>
+        <translation type="obsolete">Analoge Opties voor </translation>
+    </message>
+    <message>
+        <source>Analog Options for</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

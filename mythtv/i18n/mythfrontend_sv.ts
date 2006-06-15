@@ -7820,7 +7820,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lagra</translation>
     </message>
     <message>
         <source>Replace</source>
@@ -9047,15 +9047,15 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hög kvalité</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mediumkvalité</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Låg kvalité</translation>
     </message>
     <message>
         <source>Toggle Teletext Captions</source>
@@ -9548,11 +9548,11 @@ Inga andra detaljer</translation>
     <name>pcHDTVConfigurationGroup</name>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Misslyckades att öppna</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Misslyckades att undersöka</translation>
     </message>
 </context>
 </TS>

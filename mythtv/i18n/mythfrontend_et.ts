@@ -66,7 +66,11 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for </source>
-        <translation>Analoogparameetrid kaardile </translation>
+        <translation type="obsolete">Analoogparameetrid kaardile </translation>
+    </message>
+    <message>
+        <source>Analog Options for</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

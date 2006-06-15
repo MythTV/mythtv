@@ -65,7 +65,7 @@
 <context>
     <name>CaptureCard</name>
     <message>
-        <source>Analog Options for </source>
+        <source>Analog Options for</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7939,9 +7939,6 @@ Myth will now exit.</source>
         <source>Scan Type</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
 </context>
 <context>
     <name>ScheduledRecording</name>
