@@ -23,18 +23,16 @@ extern "C" {
 
 struct hdhomerun_video_sock_t;
 
-#define VIDEO_DATA_DMESG_SIZE  188*7
-#define VIDEO_DATA_DMESG_COUNT 100
+#define VIDEO_DATA_PACKET_SIZE (188 * 7)
+#define VIDEO_DATA_BUFFER_SIZE_1S (20000000 / 8)
 
-struct hdhomerun_video_data_t {
-	int length;
-	unsigned char buffer[VIDEO_DATA_DMESG_SIZE * VIDEO_DATA_DMESG_COUNT];
-};
-
-extern struct hdhomerun_video_sock_t *hdhomerun_video_create(void);
+extern struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size);
 extern void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 extern unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
-extern int hdhomerun_video_recv(struct hdhomerun_video_sock_t *vs, struct hdhomerun_video_data_t *result, unsigned long timeout);
+extern int hdhomerun_video_get_state(struct hdhomerun_video_sock_t *vs);
+extern unsigned long hdhomerun_video_recv_memcpy(struct hdhomerun_video_sock_t *vs, unsigned char *buffer, unsigned long size);
+extern unsigned char *hdhomerun_video_recv_inplace(struct hdhomerun_video_sock_t *vs, unsigned long max_size, unsigned long *pactual_size);
+extern void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs);
 
 #ifdef __cplusplus
 }

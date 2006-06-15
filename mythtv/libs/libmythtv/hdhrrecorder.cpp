@@ -100,7 +100,7 @@ bool HDHRRecorder::Open(void)
     }
 
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create();
+    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
@@ -321,9 +321,10 @@ void HDHRRecorder::StartRecording(void)
 
     MythTimer timer;
     timer.start();
+    hdhomerun_video_flush(_video_socket);
     while (_request_recording && !_error)
     {
-        if (PauseAndWait())
+        if (PauseAndWait(10))
             continue;
 
         if (_stream_data)
@@ -343,26 +344,31 @@ void HDHRRecorder::StartRecording(void)
         if (timer.elapsed() > 10)
             dbg = timer.elapsed();
 
-        struct hdhomerun_video_data_t data;
-        int ret = hdhomerun_video_recv(_video_socket, &data, 50);
+        unsigned long data_length;
+        unsigned char *data_buffer =
+            hdhomerun_video_recv_inplace(_video_socket,
+                                         VIDEO_DATA_BUFFER_SIZE_1S / 5,
+                                         &data_length);
 
         timer.start();
 
-        if (ret > 0)
+        if (!data_buffer)
         {
-            if (dbg)
+            if (hdhomerun_video_get_state(_video_socket) == 0)
             {
-                VERBOSE(VB_PLAYBACK, LOC + "msecs: "<<dbg
-                        <<" bufsize: "<<data.length);
-            }
-            ProcessTSData(data.buffer, data.length);
-        }
-        else if (ret < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Recv error" + ENO);
-            if (_video_socket)
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Recv error" + ENO);
                 break;
+            }
+	    continue;
+	}
+
+        if (dbg)
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "msecs: "<<dbg<<" bufsize: "
+                    <<data_length);
         }
+
+        ProcessTSData(data_buffer, data_length);
     }
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- ending...");

@@ -138,7 +138,7 @@ void HDHRSignalMonitor::RunTableMonitor(void)
     dtvMonitorRunning = true;
 
     struct hdhomerun_video_sock_t *_video_socket;
-    _video_socket = hdhomerun_video_create();
+    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get video socket");
@@ -162,18 +162,24 @@ void HDHRSignalMonitor::RunTableMonitor(void)
     {
         UpdateFiltersFromStreamData();
 
-        struct hdhomerun_video_data_t data;
+        unsigned long data_length;
+        unsigned char *data_buffer =
+            hdhomerun_video_recv_inplace(_video_socket,
+                                         VIDEO_DATA_BUFFER_SIZE_1S / 5,
+                                         &data_length);
 
-        int ret = hdhomerun_video_recv(_video_socket, &data, 100);
-        if (ret > 0)
-            GetStreamData()->ProcessData(data.buffer, data.length);
-        else if (ret < 0)
+        if (data_buffer)
+        {
+            GetStreamData()->ProcessData(data_buffer, data_length);
+            continue;
+        }
+
+        if (!hdhomerun_video_get_state(_video_socket))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Recv error" + ENO);
             break;
         }
-        else
-            usleep(2500);
+        usleep(2500);
     }
 
     hdrc->DeviceClearTarget();
