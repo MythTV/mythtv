@@ -66,7 +66,11 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for </source>
-        <translation type="unfinished">Analoga inställningar för </translation>
+        <translation type="obsolete">Analoga inställningar för </translation>
+    </message>
+    <message>
+        <source>Analog Options for</source>
+        <translation>Analoga inställningar för</translation>
     </message>
 </context>
 <context>
@@ -205,71 +209,71 @@
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
-        <translation type="unfinished"></translation>
+        <translation>lagrat exempel</translation>
     </message>
     <message>
         <source>Edit Rule</source>
-        <translation type="unfinished">Redigera regel</translation>
+        <translation>Redigera regel</translation>
     </message>
     <message>
         <source>&lt;New rule&gt;</source>
-        <translation type="unfinished">&lt;Ny regel&gt;</translation>
+        <translation>&lt;Ny regel&gt;</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished">Regelnamn</translation>
+        <translation>Regelnamn</translation>
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished">Matcha en specifik titel</translation>
+        <translation>Matcha en exakt titel</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished">Matcha ett specifikt avsnitt</translation>
+        <translation>Matcha ett specifikt avsnitt</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished">Matcha ord i titel</translation>
+        <translation>Matcha ord i titel</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished">Matcha i alla beskrivande fält</translation>
+        <translation>Matcha i alla beskrivande fält</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished">Begränsa med kategori</translation>
+        <translation>Begränsa med kategori</translation>
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation type="unfinished">Alla matchningar för en genre (Data Direct)</translation>
+        <translation>Alla matchningar för en genre (Data Direct)</translation>
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
-        <translation type="unfinished">Begränsa enligt MPAA- eller VCHIP-klassificering (Data Direct)</translation>
+        <translation>Begränsa enligt MPAA- eller VCHIP-klassificering (Data Direct)</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished">Endast nya avsnitt</translation>
+        <translation>Endast nya avsnitt</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">Exkludera oidentifierade avsnitt</translation>
+        <translation>Exkludera oidentifierade avsnitt</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished">Kategorityp</translation>
+        <translation>Kategorityp</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished">eller</translation>
+        <translation>eller</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished">Begränsa filmer efter år</translation>
+        <translation>Begränsa filmer efter år</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished">Minimumbetyg (0.0 till 1.0 endast för filmer)</translation>
+        <translation>Minimumbetyg (0.0 till 1.0 endast för filmer)</translation>
     </message>
     <message>
         <source>Person named in the credits (Data Direct)</source>
@@ -277,103 +281,103 @@
     </message>
     <message>
         <source>Only on a specific station</source>
-        <translation type="unfinished">Endast på en specifik kanal</translation>
+        <translation>Endast på en specifik kanal</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished">Uteslut en kanal</translation>
+        <translation>Uteslut en kanal</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished">Matcha relaterade kanalnamn</translation>
+        <translation>Matcha relaterade kanalnamn</translation>
     </message>
     <message>
         <source>Only on channels marked as favorites</source>
-        <translation type="unfinished">Endast på kanaler markerade som favoriter</translation>
+        <translation>Endast på kanaler markerade som favoriter</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished">Endast kanaler från en specifik videokälla</translation>
+        <translation>Endast kanaler från en specifik videokälla</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished">Endast reklamfria kanaler</translation>
+        <translation>Endast reklamfria kanaler</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished">Endast visningar markerade som HDTV</translation>
+        <translation>Endast visningar markerade som HDTV</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished">Specifik dag</translation>
+        <translation>Specifik dag</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished">Endast på vardagar</translation>
+        <translation>Endast på vardagar</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished">Endast på helger</translation>
+        <translation>Endast på helger</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished">Endast under bästa sändningstid</translation>
+        <translation>Endast under bästa sändningstid</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished">Ej under bästa sändningstid</translation>
+        <translation>Ej under bästa sändningstid</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished">Flera sportlag (komplett exempel)</translation>
+        <translation>Flera sportlag (komplett exempel)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished">Sci-fi B-filmer (komplett exempel)</translation>
+        <translation>Sci-fi B-filmer (komplett exempel)</translation>
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished">SportsCenter på natten (komplett exempel - använder Hitta dagligen)</translation>
+        <translation>SportsCenter på natten (komplett exempel - använder Hitta dagligen)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished">Veckans film (komplett exempel - använder Hitta veckovis)</translation>
+        <translation>Veckans film (komplett exempel - använder Hitta veckovis)</translation>
     </message>
     <message>
         <source>First Episodes (complete example for Data Direct)</source>
-        <translation type="unfinished">Första avsnitt (komplett exempel för Data Direct)</translation>
+        <translation>Första avsnitt (komplett exempel för Data Direct)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished">Lägg till detta exempel</translation>
+        <translation>Lägg till detta exempel</translation>
     </message>
     <message>
         <source>Additional Tables</source>
-        <translation type="unfinished">Ytterligare tabeller</translation>
+        <translation>Ytterligare tabeller</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished">Testa</translation>
+        <translation>Testa</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">Spela in</translation>
+        <translation>Spela in</translation>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagra</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished">Ett fel hittades</translation>
+        <translation>Ett fel hittades</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished">Databasfelet var</translation>
+        <translation>Databasfelet var</translation>
     </message>
 </context>
 <context>
@@ -566,7 +570,7 @@
     </message>
     <message>
         <source>Analog Options</source>
-        <translation type="unfinished">Analoga inställningar</translation>
+        <translation>Analoga inställningar</translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
@@ -648,7 +652,7 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Fetching lineups from %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hämtar programutbud från %1...</translation>
     </message>
 </context>
 <context>
@@ -729,11 +733,11 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att öppna</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att undersöka</translation>
     </message>
 </context>
 <context>
@@ -1362,23 +1366,23 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Recording is Closed Captioned</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelning är textad</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Autodetektera</translation>
+        <translation>Autodetektera</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Hög kvalité</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Mediumkvalité</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Låg kvalité</translation>
     </message>
 </context>
 <context>
@@ -8390,7 +8394,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>är otillgänglig</translation>
     </message>
 </context>
 <context>
@@ -9003,7 +9007,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Callsign</source>
-        <translation type="unfinished">Kortnamn</translation>
+        <translation>Kortnamn</translation>
     </message>
     <message>
         <source>Channel #</source>
@@ -9011,11 +9015,11 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Channel Name</source>
-        <translation type="unfinished">Kanalnamn</translation>
+        <translation>Kanalnamn</translation>
     </message>
     <message>
         <source>XMLTV ID</source>
-        <translation type="unfinished">XMLTV-ID</translation>
+        <translation>XMLTV-ID</translation>
     </message>
     <message>
         <source>[P]robe</source>
@@ -9035,11 +9039,11 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Autodetektera</translation>
+        <translation>Autodetektera</translation>
     </message>
     <message>
         <source>High Quality</source>
@@ -9347,11 +9351,11 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att öppna</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades att undersöka</translation>
     </message>
 </context>
 <context>

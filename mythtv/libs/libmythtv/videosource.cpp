@@ -2451,7 +2451,7 @@ void CaptureCard::analogPanel()
         card->loadByID(child_cardid);
     else
         card->setParentID(cardid);
-    card->setLabel(tr("Analog Options for ") + devname);
+    card->setLabel(tr("Analog Options for") + " " + devname);
     card->exec();
     delete card;
 }
