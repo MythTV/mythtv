@@ -2808,6 +2808,7 @@ fi
 if test "$darwin_da" = "yes"; then
   echo "#define CONFIG_DARWIN_DA 1"  >> $TMPH
   echo "CONFIG_DARWIN_DA=yes" >> $MYTH_CONFIG_MAK
+  CCONFIG="$CCONFIG darwin_da"
 fi
 
 if test "$_stdint_h" = "yes" ; then
