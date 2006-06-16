@@ -2413,10 +2413,12 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     widget->clearSelections();
     QString q = QString("ISO639Language%1").arg(i);
     QString lang = gContext->GetSetting(q, "").lower();
-    VERBOSE(VB_IMPORTANT, "lang"<<i<<": "<<lang);
-    if (lang.isEmpty() && !gContext->GetSetting("Language", "").isEmpty())
+
+    if ((lang.isEmpty() || lang == "aar") && 
+        !gContext->GetSetting("Language", "").isEmpty())
+    {
         lang = iso639_str2_to_str3(gContext->GetLanguage().lower());
-    VERBOSE(VB_IMPORTANT, "lang: "<<lang);
+    }
 
     QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();
     QMap<int,QString>::iterator ite = _iso639_key_to_english_name.end();
