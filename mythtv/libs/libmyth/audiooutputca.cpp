@@ -45,9 +45,9 @@ AudioOutputCA::AudioOutputCA(
     : AudioOutputBase(laudio_main_device, laudio_passthru_device,
                       laudio_bits,        laudio_channels,
                       laudio_samplerate,  lsource,
-                      lset_initial_vol,   laudio_passthru)
-    coreaudio_data(new CoreAudioData()),
-    bufferedBytes(0)
+                      lset_initial_vol,   laudio_passthru),
+      coreaudio_data(new CoreAudioData()),
+      bufferedBytes(0)
 {
     // Create private data
     coreaudio_data->output_unit = NULL;
