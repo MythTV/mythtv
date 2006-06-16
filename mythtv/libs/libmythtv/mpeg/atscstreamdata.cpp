@@ -388,25 +388,31 @@ bool ATSCStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
     uint ett_count = (uint) round(_atsc_ett_pids.size() * _eit_rate);
     uint i;
 
+    //VERBOSE(VB_IMPORTANT, QString("eit size: %1, rate: %2, cnt: %3")
+    //        .arg(_atsc_eit_pids.size()).arg(_eit_rate).arg(eit_count));
+
+    uint_vec_t add_pids_tmp;
     atsc_eit_pid_map_t::const_iterator it = _atsc_eit_pids.begin();
     for (i = 0; it != _atsc_eit_pids.end() && (i < eit_count); (++it),(i++))
-    {
-        if (find(cur_pids.begin(), cur_pids.end(), *it) == cur_pids.end())
-            add_pids.push_back(*it);
-    }
+        add_pids_tmp.push_back(*it);
 
     atsc_ett_pid_map_t::const_iterator it2 = _atsc_ett_pids.begin();
     for (i = 0; it2 != _atsc_ett_pids.end() && (i < ett_count); (++it2),(i++))
-    {
-        if (find(cur_pids.begin(), cur_pids.end(), *it2) == cur_pids.end())
-            add_pids.push_back(*it2);
-    }
+        add_pids_tmp.push_back(*it2);
 
+    uint_vec_t::const_iterator it3;
     for (i = 0; i < cur_pids.size(); i++)
     {
-        uint pid = cur_pids[i];
-        if (find(add_pids.begin(), add_pids.end(), pid) == add_pids.end())
-            del_pids.push_back(pid);
+        it3 = find(add_pids_tmp.begin(), add_pids_tmp.end(), cur_pids[i]);
+        if (it3 == add_pids_tmp.end())
+            del_pids.push_back(cur_pids[i]);
+    }
+
+    for (i = 0; i < add_pids_tmp.size(); i++)
+    {
+        it3 = find(cur_pids.begin(), cur_pids.end(), add_pids_tmp[i]);
+        if (it3 == cur_pids.end())
+            add_pids.push_back(add_pids_tmp[i]);
     }
 
     return add_pids.size() || del_pids.size();
