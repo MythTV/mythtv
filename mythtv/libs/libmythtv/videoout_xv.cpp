@@ -818,8 +818,13 @@ bool VideoOutputXv::InitXVideo()
     VERBOSE(VB_IMPORTANT, LOC + QString("XVideo Adaptor Name: '%1'")
             .arg(adaptor_name));
 
-    xv_hue_base = ((adaptor_name == "ATI Radeon Video Overlay") ||
-                   (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */)) ? 50 : 0;
+    xv_hue_base = 0; //< nVidia normal
+    if ((adaptor_name == "ATI Radeon Video Overlay") ||
+        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
+        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */))
+    {
+        xv_hue_base = 50;
+    }
 
     InstallXErrorHandler(XJ_disp);
 
