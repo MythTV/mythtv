@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060613-1"
+VERSION="0.1.20060617-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -876,9 +876,11 @@ def getFileInformation(file, outputfile):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("coverfile")
-            if record[8]!="" and record[8]!="No Cover":
+            if doesFileExist(record[8]):
                 node.appendChild(infoDOM.createTextNode(record[8]))
-            top_element.appendChild(node)   
+            else:
+                node.appendChild(infoDOM.createTextNode(""))
+            top_element.appendChild(node)
 
         db.close()
         del db
