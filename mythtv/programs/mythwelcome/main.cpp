@@ -81,8 +81,6 @@ int main(int argc, char **argv)
     LanguageSettings::load("mythfrontend");
 
     MythMainWindow *mainWindow = GetMythMainWindow();
-    mainWindow->Init();
-    mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
     
     initKeys();
