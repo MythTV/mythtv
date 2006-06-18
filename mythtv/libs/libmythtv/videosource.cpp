@@ -2286,6 +2286,14 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
 
+            // According to #1779 and #1935 the AverMedia 180 needs
+            // a 3000 ms signal timeout, at least for QAM tuning.
+            if (frontend_name = "Nextwave NXT200X VSB/QAM frontend")
+            {
+                signal_timeout->setValue(3000);
+                channel_timeout->setValue(5500);
+            }
+
             if (frontend_name.lower().find("usb") < 0)
             {
                 buttonAnalog->setVisible(
