@@ -148,6 +148,11 @@ class MainServer : public QObject, public MythSocketCBs
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);
 
+    static int  DeleteFile(const QString &filename, bool followLinks);
+    static int  OpenAndUnlink(const QString &filename);
+    static bool TruncateAndClose(const AutoExpire *expirer,
+                                 int fd, const QString &filename);
+
     QPtrList<LiveTVChain> liveTVChains;
     QMutex liveTVChainsLock;
 
@@ -187,6 +192,8 @@ class MainServer : public QObject, public MythSocketCBs
     QValueList<DeferredDeleteStruct> deferredDeleteList;
 
     QTimer *autoexpireUpdateTimer;
+
+    static QMutex truncate_and_close_lock;
 };
 
 #endif

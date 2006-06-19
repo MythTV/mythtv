@@ -53,8 +53,9 @@ extern AutoExpire *expirer;
  */
 AutoExpire::AutoExpire(bool runthread, bool master)
     : record_file_prefix("/"), desired_space(3*1024*1024),
-      desired_freq(10), expire_thread_running(runthread),
-      is_master_backend(master), update_pending(false)    
+      desired_freq(10), max_record_rate(5*1024*1024),
+      expire_thread_running(runthread), is_master_backend(master),
+      truncates_pending(0), update_pending(false)
 {
     if (runthread)
     {
@@ -179,6 +180,7 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
     instance_lock.lock();
     desired_space      = expireMinKB;
     desired_freq       = expireFreq;
+    max_record_rate    = (totalKBperMin * 1024)/60;
     record_file_prefix = recordFilePrefix;
     instance_lock.unlock();
     DBG_CALC_PARAM("CalcParams() -- end");
@@ -227,8 +229,9 @@ static inline bool operator!= (const fsid_t &a, const fsid_t &b) { return !(a==b
  */
 void AutoExpire::RunExpirer(void)
 {
-    QTime curTime;
     QTime timer;
+    QDateTime curTime;
+    QDateTime next_expire = QDateTime::currentDateTime().addSecs(60);
 
     // wait a little for main server to come up and things to settle down
     sleep(20);
@@ -243,15 +246,21 @@ void AutoExpire::RunExpirer(void)
 
         UpdateDontExpireSet();
 
-        curTime = QTime::currentTime();
+        curTime = QDateTime::currentDateTime();
 
         // Expire Short LiveTV files for this backend every 2 minutes
-        if ((curTime.minute() % 2) == 0)
+        if ((curTime.time().minute() % 2) == 0)
             ExpireLiveTV(emShortLiveTVPrograms);
 
         // Expire normal recordings depending on frequency calculated
-        if ((curTime.minute() % desired_freq) == 0)
+        if (curTime >= next_expire)
         {
+            // Wait for all pending truncates to finish
+            WaitForPendingTruncates();
+
+            next_expire =
+                QDateTime::currentDateTime().addSecs(desired_freq * 60);
+
             ExpireLiveTV(emNormalLiveTVPrograms);
 
             if (is_master_backend)
@@ -278,6 +287,38 @@ void AutoExpire::Sleep(int sleepTime)
         if (timeExpended > (sleepTime - minSleep))
             minSleep = sleepTime - timeExpended;
         timeExpended += minSleep - (int)sleep(minSleep);
+    }
+}
+
+void AutoExpire::TruncatePending(void)
+{
+    QMutexLocker locker(&truncate_monitor_lock);
+
+    truncates_pending++;
+
+    VERBOSE(VB_FILE, LOC<<truncates_pending<<" file truncates are pending");
+}
+
+void AutoExpire::TruncateFinished(void)
+{
+    QMutexLocker locker(&truncate_monitor_lock);
+
+    truncates_pending--;
+
+    if (truncates_pending <= 0)
+    {
+        VERBOSE(VB_FILE, LOC + "All file truncates have finished");
+        truncate_monitor_condition.wakeAll();
+    }
+}
+
+void AutoExpire::WaitForPendingTruncates(void)
+{
+    QMutexLocker locker(&truncate_monitor_lock);
+    while (truncates_pending > 0)
+    {
+        VERBOSE(VB_FILE, LOC + "Waiting for pending file truncates");
+        truncate_monitor_condition.wait(&truncate_monitor_lock);
     }
 }
 

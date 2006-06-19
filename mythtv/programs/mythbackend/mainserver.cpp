@@ -64,7 +64,8 @@ inline  long long  myAbs(long long  n)  { return n >= 0 ? n : -n; }
 
 namespace {
 
-int deleteFile(QString filename, bool followLinks, bool checkexists)
+int delete_file_immediately(const QString &filename,
+                            bool followLinks, bool checkexists)
 {
     /* Return 0 for success, non-zero for error. */
     QFile checkFile(filename);
@@ -98,6 +99,8 @@ int deleteFile(QString filename, bool followLinks, bool checkexists)
 }
 
 };
+
+QMutex MainServer::truncate_and_close_lock;
 
 class ProcessRequestThread : public QThread
 {
@@ -1383,15 +1386,12 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     if (tvchain)
         tvchain->DeleteProgram(pginfo);
 
-    int err;
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
 
     /* Delete recording. */
-    err = deleteFile(ds->filename, followLinks, false);
-    
-    sleep(2);
+    int fd = DeleteFile(ds->filename, followLinks);
 
-    if (checkFile.exists())
+    if ((fd < 0) && checkFile.exists())
     {
         VERBOSE(VB_IMPORTANT,
             QString("Error deleting file: %1. Keeping metadata in database.")
@@ -1411,7 +1411,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     }
 
     /* Delete preview thumbnail. */
-    err = deleteFile(ds->filename + ".png", followLinks, true);
+    delete_file_immediately(ds->filename + ".png", followLinks, true);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
@@ -1495,6 +1495,153 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     delete pginfo;
 
     deletelock.unlock();
+
+    if (fd != -1)
+    {
+        m_expirer->TruncatePending();
+        TruncateAndClose(m_expirer, fd, ds->filename);
+        m_expirer->TruncateFinished();
+    }
+}
+
+/** \fn DeleteFile(const QString&,bool)
+ *  \brief Deletes links and unlinks the main file and returns the descriptor.
+ *
+ *  This is meant to be used with TruncateAndClose() to slowly shrink a
+ *  large file and then eventually delete the file by closing the file
+ *  descriptor.
+ *
+ *  \return fd for success, negative number for error.
+ */
+int MainServer::DeleteFile(const QString &filename, bool followLinks)
+{
+    QFileInfo finfo(filename);
+    int fd = -1, err = 0;
+
+    VERBOSE(VB_FILE, QString("About to unlink/delete file: '%1'")
+            .arg(filename));
+
+    QString errmsg = QString("Delete Error '%1'").arg(filename.local8Bit());
+    if (finfo.isSymLink())
+        errmsg += QString(" -> '%2'").arg(finfo.readLink().local8Bit());
+
+    if (followLinks && finfo.isSymLink())
+    {
+        if (followLinks)
+            fd = OpenAndUnlink(finfo.readLink());
+        if (fd >= 0)
+            err = unlink(filename.local8Bit());
+    }
+    else if (!finfo.isSymLink())
+    {
+        fd = OpenAndUnlink(filename);
+    }
+    else // just delete symlinks immediately
+    {
+        err = unlink(filename.local8Bit());
+        if (err == 0)
+            return -1; // no error
+    }
+
+    if (fd < 0)
+        VERBOSE(VB_IMPORTANT, errmsg + ENO);
+
+    return fd;
+}
+
+/** \fn MainServer::OpenAndUnlink(const QString&)
+ *  \brief Opens a file, unlinks it and returns the file descriptor.
+ *
+ *  This is used by DeleteFile(const QString&,bool) to delete recordings.
+ *  In order to actually delete the file from the filesystem the user of
+ *  this function must close the return file descriptor.
+ *
+ *  \return fd for success, negative number for error.
+ */
+int MainServer::OpenAndUnlink(const QString &filename)
+{
+    QString msg = QString("Error deleting '%1'").arg(filename.local8Bit());
+    int fd = open(filename.local8Bit(), O_WRONLY);
+
+    if (fd == -1)
+    {
+        VERBOSE(VB_IMPORTANT, msg + " could not open " + ENO);
+        return -1;
+    }
+    
+    if (unlink(filename.local8Bit()))
+    {
+        VERBOSE(VB_IMPORTANT, msg + " could not unlink " + ENO);
+        close(fd);
+        return -1;
+    }
+
+    return fd;
+}
+
+/** \fn MainServer::TruncateAndClose(const AutoExpire*,int,const QString&)
+ *  \brief Repeatedly truncate an open file in small increments.
+ *
+ *   When the file is small enough this closes the file and returns.
+ *
+ *   NOTE: This aquires a lock so that only one instance of TruncateAndClose()
+ *         is running at a time.
+ */
+bool MainServer::TruncateAndClose(const AutoExpire *expirer,
+                                  int fd, const QString &filename)
+{
+    QMutexLocker locker(&truncate_and_close_lock);
+
+    // Time between truncation steps in milliseconds
+    const size_t sleep_time = 500;
+    const size_t min_tps    = 8 * 1024 * 1024;
+    const size_t min_trunc  = (size_t) (min_tps * (sleep_time * 0.001f));
+
+    // Compute the truncate increment such that we delete
+    // 20% faster than the maximum recording rate.
+    size_t increment;
+    increment = (expirer->GetMinTruncateRate() * sleep_time + 999) / 1000;
+    increment = max(increment, min_trunc);
+
+    VERBOSE(VB_FILE,
+            QString("Truncating '%1' by %2 MB every %3 milliseconds")
+            .arg(filename)
+            .arg(increment / (1024.0 * 1024.0), 0, 'f', 2)
+            .arg(sleep_time));
+
+    // Get the on disk file size and disk block size.
+    struct stat buf;
+    fstat(fd, &buf);
+    size_t fsize = buf.st_blksize * buf.st_blocks;
+
+    // Round truncate increment up to a blocksize, w/min of 1 block.
+    increment = ((increment / buf.st_blksize) + 1) * buf.st_blksize;
+
+    while (fsize > increment)
+    {
+        fsize -= increment;
+
+        //VERBOSE(VB_FILE, QString("Truncating '%1' to %2 MB")
+        //        .arg(filename).arg(fsize / (1024.0 * 1024.0), 0, 'f', 2));
+
+        int err = ftruncate(fd, fsize);
+        if (err)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Error truncating '%1'")
+                    .arg(filename) + ENO);
+            return 0 == close(fd);
+        }
+
+        usleep(sleep_time * 1000);
+    }
+
+    bool ok = (0 == close(fd));
+
+    usleep((sleep_time * fsize * 1000) / increment);
+
+    VERBOSE(VB_FILE, QString("Finished truncating '%1'").arg(filename));
+
+    return ok;
 }
 
 void MainServer::HandleCheckRecordingActive(QStringList &slist, 
