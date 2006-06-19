@@ -845,9 +845,12 @@ class FirewireModel: public ComboBoxSetting, public CCSetting
         addSelection(QObject::tr("Other"));
         addSelection("DCT-6200");
         addSelection("SA3250HD");
-        setHelpText(QObject::tr("Firewire Model is for future use in case "
-                                "there is a need to model specific "
-                                "workarounds.")); 
+	addSelection("SA4200HD");
+        QString help = QObject::tr(
+            "Choose the model that most closely resembles your set top box. "
+            "Depending on firmware revision SA4200HD may work better for a "
+            "SA3250HD box.");
+        setHelpText(help);
     }
 };
 

@@ -2,6 +2,7 @@
  *  FirewireChannel
  *  Copyright (c) 2005 by Jim Westfall
  *  SA3250HD support Copyright (c) 2005 by Matt Porter
+ *  SA4200HD/Alternate 3250 support Copyright (c) 2006 by Chris Ingrassia
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -39,7 +40,8 @@ class TVRec;
 static bool is_supported(const QString &model)
 {
     return ((model == "DCT-6200") ||
-            (model == "SA3250HD"));
+            (model == "SA3250HD") ||
+	    (model == "SA4200HD"));
 }
 
 FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts,
@@ -117,6 +119,23 @@ bool FirewireChannel::SetChannelByNumber(int channel)
                 .arg(dig[0] & 0xf).arg(dig[1] & 0xf)
                 .arg(dig[2] & 0xf)
                 .arg(cmd[0], 0, 16).arg(cmd[1], 0, 16)
+                .arg(cmd[2], 0, 16));
+
+        avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
+    }
+    else if (fw_opts.model == "SA4200HD")
+    {
+        quadlet_t cmd[3] =
+        {
+            SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS,
+            SA3250_CMD1 | (channel << 8),
+            SA3250_CMD2,
+        };
+
+        VERBOSE(VB_CHANNEL, LOC +
+                QString("SA4200Channel: %1 cmds: 0x%2 0x%3 0x%4")
+                .arg(channel).arg(cmd[0], 0, 16)
+                .arg(cmd[1], 0, 16)
                 .arg(cmd[2], 0, 16));
 
         avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
