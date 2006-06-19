@@ -160,7 +160,6 @@ class VideoBuffers
     uint                   vpos;
 
     mutable QMutex         global_lock;
-    QMutex                 inheritence_lock;
 
     bool                   use_frame_locks;
     QMutex                 frame_lock;

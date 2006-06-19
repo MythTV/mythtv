@@ -84,7 +84,7 @@ VideoBuffers::VideoBuffers()
     : numbuffers(0), needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),
       keepprebufferframes(0), need_extra_for_pause(false), rpos(0), vpos(0),
-      global_lock(true), inheritence_lock(false), use_frame_locks(true),
+      global_lock(true), use_frame_locks(true),
       frame_lock(true)
 {
 }
@@ -865,7 +865,7 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
 {
     (void)frame;
 #ifdef USING_XVMC
-    inheritence_lock.lock();
+    global_lock.lock();
     
     frame_map_t::iterator it = parents.find(frame);
     if (it == parents.end())
@@ -910,18 +910,18 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
             children[*it].push_back((VideoFrame*)frame);
     }
 
-    inheritence_lock.unlock();
+    global_lock.unlock();
 #endif // USING_XVMC
 }
 
 void VideoBuffers::RemoveInheritence(const VideoFrame *frame)
 {
-    inheritence_lock.lock();
+    global_lock.lock();
 
     frame_map_t::iterator it = parents.find(frame);
     if (it == parents.end())
     {
-        inheritence_lock.unlock();
+        global_lock.unlock();
         return;
     }
 
@@ -953,7 +953,7 @@ void VideoBuffers::RemoveInheritence(const VideoFrame *frame)
                     .arg(i).arg(DebugString(*pit)));
     }
 
-    inheritence_lock.unlock();
+    global_lock.unlock();
 }
 
 frame_queue_t VideoBuffers::Children(const VideoFrame *frame)
