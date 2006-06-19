@@ -132,7 +132,6 @@ IconView::IconView(const QString& galleryDir, MythMediaDevice *initialDevice,
                 SLOT(mediaStatusChanged(MediaStatus, MythMediaDevice*)));
 
         loadDirectory(m_currDevice->getMountPath());
-        m_galleryDir = m_currDevice->getMountPath();
 
         mon->Unlock(m_currDevice);
     }
@@ -313,6 +312,17 @@ void IconView::updateView()
     
     bitBlt(this, m_viewRect.left(), m_viewRect.top(),
            &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+static bool has_action(QString action, const QStringList &actions)
+{
+    QStringList::const_iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it)
+    {
+        if (action == *it)
+            return true;
+    }
+    return false;
 }
 
 void IconView::keyPressEvent(QKeyEvent *e)
@@ -564,106 +574,87 @@ void IconView::keyPressEvent(QKeyEvent *e)
     if (!handled && !menuHandled)
     {
         gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        if (has_action("ESCAPE", actions))
+            handled = HandleEscape();
+    }
+
+    if (handled || menuHandled)
+        update();
+    else
+        MythDialog::keyPressEvent(e);
+}
+
+bool IconView::HandleEscape(void)
+{
+    //VERBOSE(VB_IMPORTANT, "ESCAPE: showDevices("<<m_showDevices<<")");
+
+    if (m_showDevices)
+        return false;
+
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (!mon)
+        return false;
+
+    bool handled = false;
+    QDir curdir(m_currDir);
+    QValueList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+    QValueList<MythMediaDevice*>::iterator it = removables.begin();
+    for (; !handled && (it != removables.end()); it++)
+    {
+        if (!mon->ValidateAndLock(*it))
+            continue;
+
+        if (curdir == QDir((*it)->getMountPath()))
         {
-            QString action = actions[i];
-            if (action == "ESCAPE")
+            actionShowDevices();
+
+            // Make sure previous devices are visible and selected
+            ThumbItem *item = NULL;
+            if (!(*it)->getVolumeID().isEmpty())
+                item = m_itemDict.find((*it)->getVolumeID());
+            else
+                item = m_itemDict.find((*it)->getDevicePath());
+
+            if (item)
             {
-                if (m_showDevices)
+                int pos = m_itemList.find(item);
+                if (pos != -1)
                 {
-                    loadDirectory(m_galleryDir);
-                    handled = true;
+                    m_currRow = pos / m_nCols;
+                    m_currCol = pos - (m_currRow * m_nCols);
+                    m_topRow  = max(0, m_currRow + 1 - m_nRows);
                 }
-                else
-                {
-                    QDir d(m_currDir);
+            }
 
-#ifndef _WIN32
-                    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-                    if (mon)
-                    {
-                        QValueList<MythMediaDevice*> removables =
-                            mon->GetMedias(MEDIATYPE_DATA);
-                    
-                        QValueList<MythMediaDevice*>::Iterator it =
-                            removables.begin();
-                        for (; it != removables.end(); it++)
-                        {
-                            if (mon->ValidateAndLock(*it))
-                            {
-                                if (d == QDir((*it)->getMountPath()))
-                                {
-                                    actionShowDevices();
+            handled = true;
+        }
 
-                                    // make sure previous devies is
-                                    // visible and selected
-                                    ThumbItem *item;
-                                    if ((*it)->getVolumeID() != "")
-                                        item = m_itemDict.find(
-                                            (*it)->getVolumeID());
-                                    else
-                                        item = m_itemDict.find(
-                                            (*it)->getDevicePath());
+        mon->Unlock(*it);
+    }
 
-                                    if (item)
-                                    {
-                                        int pos = m_itemList.find(item);
-                                        if (pos != -1)
-                                        {
-                                            m_currRow = pos / m_nCols;
-                                            m_currCol =
-                                                pos - m_currRow*m_nCols;
-                                            m_topRow =
-                                                QMAX(0, (m_currRow -
-                                                         (m_nRows - 1)));
-                                        }
-                                    }
-                                    handled = true;
-                                    mon->Unlock(*it);
-                                    break;
-                                }
-                                mon->Unlock(*it);
-                            }
-                        }
-                    }
+    if (!handled && (curdir != QDir(m_galleryDir)))
+    {
+        QString oldDirName = curdir.dirName();
+        curdir.cdUp();
+        loadDirectory(curdir.absPath());
 
-                    if (!handled)
-                    {
-#endif
-                        if (d != QDir(m_galleryDir))
-                        {
-                            QString oldDirName = d.dirName();
-                            d.cdUp();
-                            loadDirectory(d.absPath());
-
-                            // make sure up-directory is visible and selected
-                            ThumbItem* item = m_itemDict.find(oldDirName);
-                            if (item)
-                            {
-                                int pos = m_itemList.find(item);
-                                if (pos != -1) {
-                                    m_currRow = pos/m_nCols;
-                                    m_currCol = pos-m_currRow*m_nCols;
-                                    m_topRow  = QMAX(0, m_currRow-(m_nRows-1));
-                                }
-                            }
-                            handled = true;
-                        }
-#ifndef _WIN32
-                    }
-                }
-#endif
+        // Make sure up-directory is visible and selected
+        ThumbItem *item = m_itemDict.find(oldDirName);
+        if (item)
+        {
+            int pos = m_itemList.find(item);
+            if (pos != -1)
+            {
+                m_currRow = pos / m_nCols;
+                m_currCol = pos - (m_currRow * m_nCols);
+                m_topRow  = max(0, m_currRow + 1 - m_nRows);
             }
         }
+
+        handled = true;
     }
 
-    if (handled || menuHandled) {
-        update();
-    }
-    else
-    {
-        MythDialog::keyPressEvent(e);
-    }
+    return handled;
 }
 
 void IconView::customEvent(QCustomEvent *e)

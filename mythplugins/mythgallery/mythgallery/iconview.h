@@ -73,7 +73,8 @@ class IconView : public MythDialog
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
-    
+    bool HandleEscape(void);
+
   private:
     void loadTheme(void);
     void loadDirectory(const QString& dir, bool topleft = true);
@@ -99,9 +100,7 @@ class IconView : public MythDialog
     void actionRandomShow(void);
     void actionSettings(void);
     void actionImport(void);
-#ifndef _WIN32
     void actionShowDevices(void);
-#endif
     void actionCopyHere(void);
     void actionMoveHere(void);
     void actionDelete(void);
