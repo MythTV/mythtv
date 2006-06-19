@@ -7,7 +7,7 @@
         <passes>2</passes>
         <parameter name="-v"           value="1"/>
         <parameter name="-i"           value="%inputfile"/>
-        <parameter name="-r"           value="pal"/>
+        <parameter name="-r"           value="ntsc"/>
         <parameter name="-target"      value="dvd"/>
         <parameter name="-b"           value="9000"/>
         <parameter name="-s"           value="720x480"/>
@@ -28,7 +28,7 @@
         <passes>1</passes>
         <parameter name="-v"      value="1"/>
         <parameter name="-i"      value="%inputfile"/>
-        <parameter name="-r"      value="pal"/>
+        <parameter name="-r"      value="ntsc"/>
         <parameter name="-target" value="dvd"/>
         <parameter name="-b"      value="4771"/>
         <parameter name="-s"      value="720x480"/>
@@ -47,7 +47,7 @@
         <passes>1</passes>
         <parameter name="-v"      value="1"/>
         <parameter name="-i"      value="%inputfile"/>
-        <parameter name="-r"      value="pal"/>
+        <parameter name="-r"      value="ntsc"/>
         <parameter name="-target" value="dvd"/>
         <parameter name="-b"      value="2344"/>
         <parameter name="-s"      value="352x480"/>
@@ -66,7 +66,7 @@
         <passes>1</passes>
         <parameter name="-v"      value="1"/>
         <parameter name="-i"      value="%inputfile"/>
-        <parameter name="-r"      value="pal"/>
+        <parameter name="-r"      value="ntsc"/>
         <parameter name="-target" value="dvd"/>
         <parameter name="-b"      value="1526"/>
         <parameter name="-s"      value="352x240"/>
