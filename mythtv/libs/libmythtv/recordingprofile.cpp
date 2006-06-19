@@ -590,7 +590,7 @@ public:
         inter->addChild(new MPEG4OptionIDCT(parent));
         inter->addChild(new MPEG4OptionIME(parent));
         params->addChild(inter);
-#ifdef HAVE_PTHREADS
+#ifdef USING_FFMPEG_THREADS
         params->addChild(new EncodingThreadCount(parent));
 #endif
         addTarget("MPEG-4", params);
@@ -605,7 +605,7 @@ public:
         //params->addChild(new MPEG4ScaleBitrate(parent));
         //params->addChild(new MPEG4OptionVHQ(parent));
         //params->addChild(new MPEG4Option4MV(parent));
-#ifdef HAVE_PTHREADS
+#ifdef USING_FFMPEG_THREADS
         params->addChild(new EncodingThreadCount(parent));
 #endif
         addTarget("MPEG-2", params);

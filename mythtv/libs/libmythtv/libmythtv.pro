@@ -328,6 +328,7 @@ using_backend {
     SOURCES += dtvrecorder.cpp
 
     # Simple NuppelVideo Recorder
+    using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
     HEADERS += NuppelVideoRecorder.h       fifowriter.h
     SOURCES += NuppelVideoRecorder.cpp     fifowriter.cpp
 

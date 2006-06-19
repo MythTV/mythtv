@@ -333,7 +333,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetIntOption(profile, "mpeg4maxquality");
         SetIntOption(profile, "mpeg4minquality");
         SetIntOption(profile, "mpeg4qualdiff");
-#ifdef HAVE_PTHREADS
+#ifdef USING_FFMPEG_THREADS
         SetIntOption(profile, "encodingthreadcount");
 #endif
         SetIntOption(profile, "mpeg4optionvhq");
@@ -526,7 +526,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
 
     QMutexLocker locker(&avcodeclock);
 
-#ifdef HAVE_PTHREADS
+#ifdef USING_FFMPEG_THREADS
     if ((encoding_thread_count > 1) &&
         avcodec_thread_init(mpa_ctx, encoding_thread_count))
     {
@@ -1690,7 +1690,7 @@ void NuppelVideoRecorder::KillChildren(void)
     pthread_join(audio_tid, NULL);
     if (vbimode)
         pthread_join(vbi_tid, NULL);
-#ifdef HAVE_PTHREADS
+#ifdef USING_FFMPEG_THREADS
     if (useavcodec && encoding_thread_count > 1)
         avcodec_thread_free(mpa_ctx); 
 #endif

@@ -2546,8 +2546,8 @@ if test "$sunmlib" = "yes" ; then
   extralibs="$extralibs -lmlib"
 fi
 if test "$pthreads" = "yes" ; then
+  CCONFIG="$CCONFIG using_ffmpeg_threads"
   echo "HAVE_PTHREADS=yes" >> $MYTH_CONFIG_MAK
-  echo "#define HAVE_PTHREADS 1" >> $TMPH
   echo "#define HAVE_THREADS 1" >> $TMPH
   if test $targetos != FreeBSD -a $targetos != OpenBSD ; then
      extralibs="$extralibs -lpthread"
