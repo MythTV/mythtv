@@ -137,6 +137,8 @@ class VideoBuffers
   private:
     frame_queue_t         *queue(BufferType type);
     const frame_queue_t   *queue(BufferType type) const;
+    VideoFrame            *GetNextFreeFrameInternal(
+        bool with_lock, bool allow_unsafe, BufferType enqueue_to);
 
     frame_queue_t          available, used, limbo, pause, displayed, decode;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
@@ -160,7 +162,6 @@ class VideoBuffers
     uint                   vpos;
 
     mutable QMutex         global_lock;
-    QMutex                 inheritence_lock;
 
     bool                   use_frame_locks;
     QMutex                 frame_lock;
