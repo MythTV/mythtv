@@ -67,12 +67,19 @@ class EITFixUp
     const QRegExp m_ukCC;
     const QRegExp m_ukYear;
     const QRegExp m_comHemCountry;
-    const QRegExp m_comHemPEnd;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;
+    const QRegExp m_comHemHost;
     const QRegExp m_comHemSub;
     const QRegExp m_comHemRerun1;
     const QRegExp m_comHemRerun2;
+    const QRegExp m_comHemTT;
+    const QRegExp m_comHemPersSeparator;
+    const QRegExp m_comHemPersons;
+    const QRegExp m_comHemSubEnd;
+    const QRegExp m_comHemSeries1;
+    const QRegExp m_comHemSeries2;
+    const QRegExp m_comHemTSub;
 };
 
 #endif // EITFIXUP_H

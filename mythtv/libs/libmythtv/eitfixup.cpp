@@ -22,13 +22,23 @@ EITFixUp::EITFixUp()
       m_ukCC("\\[(AD)(,(S)){,1}(,SL){,1}\\]|\\[(S)(,AD){,1}(,SL){,1}\\]|"
              "\\[(SL)(,AD){,1}(,(S)){,1}\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
-      m_comHemCountry("^(.+)\\.\\s(.+)\\.\\s(?:([0-9]{2,4})\\.\\s*)?"),
-      m_comHemPEnd("\\.$"),
+      m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
+                      "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
-      m_comHemActor("[Ss]kådespelare"),
-      m_comHemSub("[.\?] "),
+      m_comHemActor("[Ss]kådespelare|[Ii] rollerna"),
+      m_comHemHost("[Pp]rogramledare"),
+      m_comHemSub("[.\\?\\!] "),
       m_comHemRerun1("[Rr]epris\\sfrån\\s([^\\.]+)(?:\\.|$)"),
-      m_comHemRerun2("([0-9]+)/([0-9]+)(?:\\s-\\s([0-9]{4}))?")
+      m_comHemRerun2("([0-9]+)/([0-9]+)(?:\\s-\\s([0-9]{4}))?"),
+      m_comHemTT("[Tt]ext-[Tt][Vv]"),
+      m_comHemPersSeparator("(, |\\soch\\s)"),
+      m_comHemPersons("\\s?([Rr]egi|[Ss]kådespelare|[Pp]rogramledare|"
+                      "[Ii] rollerna):\\s([^\\.]+)\\."),
+      m_comHemSubEnd("\\s?\\.\\s?$"),
+      m_comHemSeries1("\\s?(?:[dD]el|[eE]pisode)\\s([0-9]+)"
+                      "(?:\\s?(?:/|:|av)\\s?([0-9]+))?\\."),
+      m_comHemSeries2("\\s?-?\\s?([Dd]el\\s+([0-9]+))"),
+      m_comHemTSub("\\s+-\\s+([^\\-]+)")
 {
 }
 
@@ -180,7 +190,7 @@ void EITFixUp::FixUK(DBEvent &event) const
 
     // BBC three case (could add another record here ?)
     event.description = event.description.replace(m_ukThen, "");
-    event.description = event.description.replace(m_ukThen, "");
+    event.description = event.description.replace(m_ukNew, "");
     event.title  = event.title.replace(m_ukT4, "");
 
     // This is trying to catch the case where the subtitle is in the main title
@@ -370,132 +380,172 @@ void EITFixUp::FixPBS(DBEvent &event) const
  */
 void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
 {
-    // the format of the subtitle is:
-    // country. category. year.
-    // the year is optional and if the subtitle is
-    // empty the same information is in the Description instead.
-
-    if (event.subtitle.length() == 0 && event.description.length() > 0)
+    // Reverse what EITFixUp::Fix() did
+    if (event.subtitle.isEmpty() && !event.description.isEmpty())
     {
         event.subtitle = event.description;
         event.description = "";
     }
 
-    // try to find country category and year
-    QRegExp tmpCountry = m_comHemCountry;
-    int pos = tmpCountry.search(event.subtitle);
-    if (pos != -1)
+    // Remove subtitle, it contains the category and we already know that
+    event.subtitle = "";
+
+    bool isSeries = false;
+    // Try to find episode numbers
+    int pos;
+    QRegExp tmpSeries1 = m_comHemSeries1;
+    QRegExp tmpSeries2 = m_comHemSeries2;
+    if ((pos = tmpSeries2.search(event.title)) != -1)
     {
-        QStringList list = tmpCountry.capturedTexts();
-
-        // sometimes the category is empty, in that case use the category from
-        // the subtitle. this category is in swedish and all others
-        // are in english
-        if (event.category.length() == 0)
+        QStringList list = tmpSeries2.capturedTexts();
+        event.partnumber = list[2].toUInt();
+        event.title = event.title.replace(list[0],"");
+    }
+    else if ((pos = tmpSeries1.search(event.description)) != -1)
+    {
+        QStringList list = tmpSeries1.capturedTexts();
+        if (!list[1].isEmpty())
         {
-            event.category = list[2].stripWhiteSpace();
+            event.partnumber = list[1].toUInt();
+        }
+        if (!list[2].isEmpty())
+        {
+            event.parttotal = list[2].toUInt();
         }
 
-        if (list[3].length() > 0)
-        {
-            bool ok;
-            uint y = list[3].stripWhiteSpace().toUInt(&ok);
-            if (ok)
-                event.originalairdate = QDate(y, 1, 1);
-        }
-
-        // not 100% sure about this one.
-        event.subtitle = "";
+        // Remove the episode numbers, but only if it's not at the begining
+        // of the description (subtitle code might use it)
+        if(pos > 0)
+            event.description = event.description.replace(list[0],"");
+        isSeries = true;
     }
 
+    // Add partnumber/parttotal to subtitle
+    // This will be overwritten if we find a better subtitle
+    if (event.partnumber > 0)
+    {
+        event.subtitle = QString("Del %1").arg(event.partnumber);
+        if (event.parttotal > 0)
+        {
+            event.subtitle += QString(" av %1").arg(event.parttotal);
+        }
+    }
+
+    // Move subtitle info from title to subtitle
+    QRegExp tmpTSub = m_comHemTSub;
+    if (tmpTSub.search(event.title) != -1)
+    {
+        event.subtitle = tmpTSub.cap(1);
+        event.title = event.title.replace(tmpTSub.cap(0),"");
+    }
+
+    // No need to continue without a description.
     if (event.description.length() <= 0)
         return;
 
-    // everything up to the first 3 spaces is duplicated from title and
-    // subtitle so remove it
-    pos = event.description.find("   ");
+    // Try to find country category, year and possibly other information
+    // from the begining of the description
+    QRegExp tmpCountry = m_comHemCountry;
+    pos = tmpCountry.search(event.description);
     if (pos != -1)
     {
-        event.description =
-            event.description.mid(pos + 3).stripWhiteSpace();
-        //fprintf(stdout, "EITFixUp::FixStyle4: New: %s\n",
-        //event.description.mid(pos + 3).stripWhiteSpace().ascii());
+        QStringList list = tmpCountry.capturedTexts();
+        QString replacement;
+
+        // Original title, usually english title
+        // note: list[1] contains extra () around the text that needs removing
+        if (list[1].length() > 0)
+        {
+            replacement = list[1] + " ";
+            //store it somewhere?
+        }
+
+        // Countr(y|ies)
+        if (list[2].length() > 0)
+        {
+            replacement += list[2] + " ";
+            //store it somewhere?
+        }
+
+        // Category
+        if (list[3].length() > 0)
+        {
+            replacement += list[3] + ".";
+            if(event.category.isEmpty())
+            {
+                event.category = list[3];
+            }
+
+            if(list[3].find("serie")!=-1)
+            {
+                isSeries = true;
+            }
+        }
+
+        // Year
+        if (list[4].length() > 0)
+        {
+            event.airdate = list[4].stripWhiteSpace();
+        }
+
+        // Actors
+        if (list[5].length() > 0)
+        {
+            QStringList actors;
+            actors=QStringList::split(m_comHemPersSeparator,list[5]);
+            for(QStringList::size_type i=0;i<actors.count();i++)
+            {
+                event.AddPerson(DBPerson::kActor, actors[i]);
+            }
+        }
+
+        // Remove year and actors.
+        // The reason category is left in the description is because otherwise
+        // the country would look wierd like "Amerikansk. Rest of description."
+        event.description = event.description.replace(list[0],replacement);
     }
 
-    // in the description at this point everything up to the first 4 spaces
-    // in a row is a list of director(s) and actors.
-    // different lists are separated by 3 spaces in a row
-    // end of all lists is when there is 4 spaces in a row
-    bool bDontRemove = false;
-    pos = event.description.find("    ");
-    if (pos != -1)
+    if (isSeries)
+        event.category_type = kCategorySeries;
+
+    // Look for additional persons in the description
+    QRegExp tmpPersons = m_comHemPersons;
+    while(pos = tmpPersons.search(event.description),pos!=-1)
     {
-        QStringList lists;
-        lists = QStringList::split("   ", event.description.left(pos));
-        QStringList::iterator it;
-        for (it = lists.begin(); it != lists.end(); it++)
+        DBPerson::Role role;
+        QStringList list = tmpPersons.capturedTexts();
+        
+        QRegExp tmpDirector = m_comHemDirector;
+        QRegExp tmpActor = m_comHemActor;
+        QRegExp tmpHost = m_comHemHost;
+        if (tmpDirector.search(list[1])!=-1)
         {
-            (*it).remove(m_comHemPEnd);
-            QStringList list = QStringList::split(": ", *it);
-            if (list.count() != 2)
-            {
-                // oops, improperly formated list, ignore it
-                //fprintf(stdout,"EITFixUp::FixStyle4:"
-                //"%s is not a properly formated list of persons\n",
-                //(*it).ascii());
-                bDontRemove = true;
-                continue;
-            }
-
-            if (list[0].find(m_comHemDirector) != -1)
-            {
-                // director(s)
-                QStringList persons = QStringList::split(", ",list[1]);
-                for (QStringList::const_iterator it2 = persons.begin();
-                     it2 != persons.end(); it2++)
-                {
-                    event.AddPerson(DBPerson::kDirector, *it2);
-                }
-                continue;
-            }
-
-            if (list[0].find(m_comHemActor) != -1)
-            {
-                // actor(s)
-                QStringList persons = QStringList::split(", ", list[1]);
-                for (QStringList::const_iterator it2 = persons.begin();
-                     it2 != persons.end(); it2++)
-                {
-                    event.AddPerson(DBPerson::kActor, *it2);
-                }
-                continue;
-            }
-
-            // unknown type, posibly a new one that
-            // this code shoud be updated to handle
-            VERBOSE(VB_EIT, "EITFixUp::FixComHem: " +
-                    QString("%1 is not actor or director")
-                    .arg(list[0]));
-            bDontRemove = true;
+            role = DBPerson::kDirector;
         }
-        // remove list of persons from description if
-        // we coud parse it properly
-        if (!bDontRemove)
+        else if(tmpActor.search(list[1])!=-1)
         {
-            event.description = event.description.mid(pos).stripWhiteSpace();
+            role = DBPerson::kActor;
         }
+        else if(tmpHost.search(list[1])!=-1)
+        {
+            role = DBPerson::kHost;
+        }
+
+        QStringList actors;
+        actors = QStringList::split(m_comHemPersSeparator, list[2]);
+        for(QStringList::size_type i=0;i<actors.count();i++)
+        {
+            event.AddPerson(role, actors[i]);
+        }
+
+        // Remove it
+        event.description=event.description.replace(list[0],"");
     }
-
-    //fprintf(stdout, "EITFixUp::FixStyle4: Number of persons: %d\n",
-    //event.Credits.count());
-
-    /*
-      a regexp like this coud be used to get the episode number, shoud be at
-      the begining of the description
-      "^(?:[dD]el|[eE]pisode)\\s([0-9]+)(?:\\s?(?:/|:|av)\\s?([0-9]+))?\\."
-    */
 
     // Is this event on a channel we shoud look for a subtitle?
+    // The subtitle is the first sentence in the description, but the
+    // subtitle can't be the only thing in the description and it must be
+    // shorter than 55 characters or we risk picking up the wrong thing.
     if (process_subtitle)
     {
         int pos = event.description.find(m_comHemSub);
@@ -508,11 +558,19 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
         }
     }
 
+    // Teletext subtitles?
+    int position = event.description.find(m_comHemTT);
+    if (position != -1)
+    {
+        event.flags |= DBEvent::kSubtitled;
+    }
+
     // Try to findout if this is a rerun and if so the date.
     QRegExp tmpRerun1 = m_comHemRerun1;
     if (tmpRerun1.search(event.description) == -1)
         return;
 
+    // Rerun from today
     QStringList list = tmpRerun1.capturedTexts();
     if (list[1] == "i dag")
     {
@@ -520,12 +578,14 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
         return;
     }
 
+    // Rerun from yesterday afternoon
     if (list[1] == "eftermiddagen")
     {
         event.originalairdate = event.starttime.date().addDays(-1);
         return;
     }
 
+    // Rerun with day, month and possibly year specified
     QRegExp tmpRerun2 = m_comHemRerun2;
     if (tmpRerun2.search(list[1]) != -1)
     {
@@ -546,16 +606,9 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
             if (date > event.starttime.date())
                 date = date.addYears(-1);
             event.originalairdate = date;
-            //fprintf(stdout, "EITFixUp::FixStyle4: "
-            //"OriginalAirDate set to: %s for '%s'\n",
-            //event.OriginalAirDate.toString(Qt::ISODate).ascii(),
-            //event.description.ascii());
         }
         return;
     }
-    // unknown date, posibly only a year.
-    //fprintf(stdout,"EITFixUp::FixStyle4: "
-    //"unknown rerun date: %s\n",list[1].ascii());
 }
 
 /** \fn EITFixUp::FixAUStar(DBEvent&) const

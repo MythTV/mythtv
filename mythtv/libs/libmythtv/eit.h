@@ -64,6 +64,7 @@ class DBEvent
         description(_desc),
         category(_category),
         starttime(_start),       endtime(_end),
+        airdate(QString::null),
         credits(NULL),
         chanid(_chanid),
         partnumber(0),           parttotal(0),
@@ -85,6 +86,7 @@ class DBEvent
         description(_desc),
         category(QString::null),
         starttime(_start),       endtime(_end),
+        airdate(QString::null),
         credits(NULL),
         chanid(_chanid),
         partnumber(0),           parttotal(0),
@@ -122,7 +124,8 @@ class DBEvent
     QString       category;
     QDateTime     starttime;
     QDateTime     endtime;
-    QDate         originalairdate;
+    QString       airdate;          ///< movie year / production year
+    QDate         originalairdate;  ///< origial broadcast date
     DBCredits    *credits;
     uint32_t      chanid;
     uint16_t      partnumber;

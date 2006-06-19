@@ -133,7 +133,8 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "       category,       category_type, "
         "       starttime,      endtime, "
         "       closecaptioned, subtitled,     stereo,      hdtv, "
-        "       partnumber,     parttotal "
+        "       partnumber,     parttotal, "
+        "       airdate,        originalairdate "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -169,6 +170,8 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
 
         prog.partnumber = query.value(11).toUInt();
         prog.parttotal  = query.value(12).toUInt();
+        prog.airdate    = query.value(13).toString();
+        prog.originalairdate = query.value(14).toDate();
 
         programs.push_back(prog);
         count++;
@@ -279,6 +282,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     QString lsubtitle = subtitle;
     QString ldesc     = description;
     QString lcategory = category;
+    QString lairdate  = airdate;
+    QDate loriginalairdate = originalairdate;
 
     if (match.title.length() >= ltitle.length())
         ltitle = match.title;
@@ -291,6 +296,12 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
 
     if (lcategory.isEmpty() && !match.category.isEmpty())
         lcategory = match.category;
+
+    if (lairdate.isEmpty() && !match.airdate.isEmpty())
+        lairdate = match.airdate;
+
+    if (!loriginalairdate.isValid() && match.originalairdate.isValid())
+        loriginalairdate = match.originalairdate;
 
     uint tmp = category_type;
     if (!category_type && match.category_type)
@@ -317,6 +328,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    closecaptioned = :CC,        subtitled     = :SUBTITLED, "
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
         "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
+        "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
         "    listingsource  = :LSOURCE "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART ");
@@ -336,6 +348,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":HDTV",        lhdtv);
     query.bindValue(":PARTNO",      lpartnumber);
     query.bindValue(":PARTTOTAL",   lparttotal);
+    query.bindValue(":AIRDATE",     lairdate.isEmpty() ? "0000" : lairdate);
+    query.bindValue(":ORIGAIRDATE", loriginalairdate);
     query.bindValue(":LSOURCE",     1);
 
     if (!query.exec())
@@ -458,14 +472,14 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         "  starttime,      endtime, "
         "  closecaptioned, subtitled,      stereo,          hdtv, "
         "  partnumber,     parttotal, "
-        "  listingsource ) "
+        "  airdate,        originalairdate,listingsource ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
         " :STARTTIME,     :ENDTIME, "
         " :CC,            :SUBTITLED,     :STEREO,         :HDTV, "
         " :PARTNUMBER,    :PARTTOTAL, "
-        " :LSOURCE ) ");
+        " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE ) ");
 
     QString cattype = myth_category_type_to_string(category_type);
 
@@ -483,6 +497,8 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":HDTV",        IsHDTV());
     query.bindValue(":PARTNUMBER",  partnumber);
     query.bindValue(":PARTTOTAL",   parttotal);
+    query.bindValue(":AIRDATE",     airdate.isEmpty() ? "0000" : airdate);
+    query.bindValue(":ORIGAIRDATE", originalairdate);
     query.bindValue(":LSOURCE",     1);
 
     if (!query.exec())

@@ -3230,8 +3230,12 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
     if (HasFlags(kFlagSignalMonitorRunning))
     {
+        MPEGStreamData *sd = NULL;
+        if (GetDTVSignalMonitor())
+            sd = GetDTVSignalMonitor()->GetStreamData();
         TeardownSignalMonitor();
         ClearFlags(kFlagSignalMonitorRunning);
+        delete sd;
     }
     if (HasFlags(kFlagWaitingForSignal))
         ClearFlags(kFlagWaitingForSignal);

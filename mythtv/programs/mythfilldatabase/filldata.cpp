@@ -3067,6 +3067,11 @@ bool fillData(QValueList<Source> &sourcelist)
                 }
             }
         }
+        else if (xmltv_grabber == "eitonly")
+        {
+            VERBOSE(VB_IMPORTANT, "Source configured to use only the "
+                    "broadcasted guide data. Skipping.");
+        }
         else if (xmltv_grabber == "/bin/true" ||
                  xmltv_grabber == "none" ||
                  xmltv_grabber == "")

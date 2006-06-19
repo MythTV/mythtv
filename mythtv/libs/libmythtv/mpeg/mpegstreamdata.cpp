@@ -211,7 +211,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         if (!buggy && !partial->IsGood())
         {
             VERBOSE(VB_SIPARSER, "Discarding broken PES packet");
-            ClearPartialPES(tspacket->PID());
+            DeletePartialPES(tspacket->PID());
             return NULL;
         }
 

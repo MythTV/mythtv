@@ -86,8 +86,8 @@ class DVBStreamData : virtual public MPEGStreamData
     {
         if (_sdto_versions[tsid] == version)
             return;
-        _sdt_versions[tsid] = version;
-        init_sections(_sdt_section_seen[tsid], last_section);
+        _sdto_versions[tsid] = version;
+        init_sections(_sdto_section_seen[tsid], last_section);
     }
     int VersionSDTo(uint tsid) const
     {

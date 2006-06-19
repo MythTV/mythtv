@@ -74,6 +74,8 @@ class EITHelper
     void AddEIT(const DVBEventInformationTable*) {}
 #endif // !USING_BACKEND
 
+    void PruneCache(uint timestamp);
+
   private:
     uint GetChanID(uint atscsrcid);
     uint GetChanID(uint serviceid, uint networkid, uint transportid);

@@ -136,6 +136,9 @@ void EITScanner::RunEventLoop(void)
             activeScanNextTrig = QDateTime::currentDateTime()
                 .addSecs(activeScanTrigTime);
             activeScanNextChan++;
+
+            // 24 hours ago
+            eitHelper->PruneCache(activeScanNextTrig.toTime_t() - 86400);
         }
 
         exitThreadCond.wait(200); // sleep up to 200 ms.

@@ -13,13 +13,14 @@
 #include <qmutex.h>
 #include <qstring.h>
 
-typedef QMap<uint64_t, uint64_t> key_map_t;
+typedef QMap<uint, uint64_t> event_map_t;
+typedef QMap<uint64_t, event_map_t*> key_map_t;
 
 class EITCache
 {
   public:
     EITCache();
-   ~EITCache() {};
+   ~EITCache();
 
     bool IsNewEIT(uint networkid, uint tsid,    uint serviceid,
                   uint tableid,   uint version,
@@ -31,8 +32,12 @@ class EITCache
     QString GetStatistics(void) const;
 
   private:
+    event_map_t * LoadChannel(uint networkid, uint tsid, uint serviceid);
+    void DropChannel(uint64_t channel);
+    void WriteToDB(void);
+
     // event key cache
-    key_map_t   eventMap;
+    key_map_t   channelMap;
 
     mutable QMutex eventMapLock;
     uint            lastPruneTime;
@@ -42,8 +47,10 @@ class EITCache
     uint        hitCnt;
     uint        tblChgCnt;
     uint        verChgCnt;
+    uint        entryCnt;
     uint        pruneCnt;
     uint        prunedHitCnt;
+    uint        wrongChannelHitCnt;
 
     static const uint kVersionMax;
 };
