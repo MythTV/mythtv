@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060621-1"
+VERSION="0.1.20060621-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -279,13 +279,18 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
     if result<>0:
         fatalError("Failed while running mplex - %s" % command)
 
-    command = path_spumux[0] + " -m dvd -s 0 '%s' < '%s' > '%s'" % (xmlfile, tempmovie, finaloutput)
-    result = runCommand(command)
-    if result<>0:
-        fatalError("Failed while running spumux - %s" % command)
+    if xmlfile != "":
+        command = path_spumux[0] + " -m dvd -s 0 '%s' < '%s' > '%s'" % (xmlfile, tempmovie, finaloutput)
+        result = runCommand(command)
+        if result<>0:
+            fatalError("Failed while running spumux - %s" % command)
+    else:
+        os.rename(tempmovie, finaloutput)
 
-    os.remove(tempvideo)
-    os.remove(tempmovie)
+    if os.path.exists(tempvideo):
+            os.remove(tempvideo)
+    if os.path.exists(tempmovie):
+            os.remove(tempmovie)
 
 def findEncodingProfile(profile):
     """Returns the XML node for the given encoding profile"""
@@ -2277,7 +2282,7 @@ def createDetailsPage(screensize, numberofitems):
                     getThemeFile(themeName,menumusic),
                     menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
-                    os.path.join(getTempPath(),"detailsspumux-%s.xml" % itemnum),
+                    "",
                     os.path.join(getTempPath(),"details-%s.mpg" % itemnum))
 
         #On to the next item
