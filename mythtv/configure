@@ -57,6 +57,7 @@ firewire_cable_box="yes"
 dbox2_dvb_box="yes"
 ip_network_recorder="yes"
 hdhomerun_box="yes"
+freebox_box="yes"
 x11_include_path="/usr/X11R6/include"
 x11="yes"
 xrandr="yes"
@@ -178,6 +179,7 @@ echo "  --disable-backend        disable backend  [breaks dependency checking]"
 echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
 echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
+echo "  --disable-freebox        disable support for Freebox"
 echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
 echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
 echo "  --disable-crciprec       disable support for Network Recorder"
@@ -818,6 +820,10 @@ for opt do
   --enable-dbox2) dbox2_dvb_box="yes"
   ;;
   --disable-dbox2) dbox2_dvb_box="no"
+  ;;
+  --enable-freebox) freebox_box="yes"
+  ;;
+  --disable-freebox) freebox_box="no"
   ;;
   --enable-hdhomerun) hdhomerun_box="yes"
   ;;
@@ -2329,6 +2335,7 @@ if test x"$backend" = x"yes" ; then
   echo "DBox2 support    $dbox2_dvb_box"
   echo "HDHomeRun sup.   $hdhomerun_box"
   echo "CRC Ip Rec sup.  $ip_network_recorder"
+  echo "FreeBox support  $freebox_box"
 fi
 
 if test x"$frontend" = x"yes" ; then
@@ -2937,6 +2944,7 @@ if test x"$backend" = x"no" ; then
     dbox2_dvb_box="no"
     hdhomerun_box="no"
     ip_network_recorder="no"
+    freebox_box="no"
     dvb="no"
 fi
 
@@ -2988,6 +2996,11 @@ fi
 
 if test "$ip_network_recorder" = "yes" ; then
   CCONFIG="$CCONFIG using_ip_rec"
+fi
+
+if test x"$freebox_box" = x"yes" ; then
+    CCONFIG="$CCONFIG using_freebox using_live"
+    CONFIG_DEFINES="$CONFIG_DEFINES USING_FREEBOX"
 fi
 
 if test x"$lirc" = x"yes" ; then

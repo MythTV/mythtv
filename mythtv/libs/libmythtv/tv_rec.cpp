@@ -45,6 +45,7 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dbox2channel.h"
 #include "hdhrchannel.h"
+#include "freeboxchannel.h"
 
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
@@ -53,6 +54,7 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "dbox2recorder.h"
 #include "hdhrrecorder.h"
+#include "freeboxrecorder.h"
 
 #ifdef USING_CRC_IP_NETWORK_REC
 #include "crcipnetworkrecorder.h"
@@ -205,6 +207,16 @@ bool TVRec::CreateChannel(const QString &startchannel)
         init_run = true;
 #endif // USING_CRC_IP_NETWORK_REC
     }
+    else if (genOpt.cardtype == "FREEBOX")
+    {
+#ifdef USING_FREEBOX
+        channel = new FreeboxChannel(this, genOpt.videodev);
+        if (!channel->Open())
+            return false;
+        InitChannel(genOpt.defaultinput, startchannel);
+        init_run = true;
+#endif
+    }    
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
 #ifdef USING_V4L
@@ -883,6 +895,14 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         recorder->SetOption("dvb_on_demand",     dvbOpt.dvb_on_demand);
 #endif // USING_DVB
+    }
+    else if (genOpt.cardtype == "FREEBOX")
+    {
+#ifdef USING_FREEBOX
+        FreeboxChannel *chan = dynamic_cast<FreeboxChannel*>(channel);
+        recorder = new FreeboxRecorder(this, chan);
+        recorder->SetOption("mrl", genOpt.videodev);
+#endif // USING_FREEBOX
     }
     else
     {

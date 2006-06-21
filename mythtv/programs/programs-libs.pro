@@ -1,17 +1,20 @@
 INCLUDEPATH += ../../libs/ ../../libs/libmyth ../../libs/libmythtv  ../..
 INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
 INCLUDEPATH += ../../libs/libmythupnp
+INCLUDEPATH += ../../libs/libmythlivemedia
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat
 LIBS += -L../../libs/libmythfreemheg
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
+LIBS += -L../../libs/libmythlivemedia
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION 
 LIBS += -lmythfreemheg-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION 
+LIBS += -lmythlivemedia-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
@@ -27,10 +30,12 @@ TARGETDEPS += ../../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSI
 TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 DEPENDPATH += ../../libs/libmyth ../../libs/libmythtv ../../libs/libsavcodec
 DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libmythui
 DEPENDPATH += ../../libs/libmythupnp
+DEPENDPATH += ../../libs/libmythlivemedia
 
 CONFIG += opengl
 

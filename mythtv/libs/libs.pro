@@ -10,4 +10,5 @@ SUBDIRS += libavutil libavcodec libavformat libmythsamplerate
 SUBDIRS += libmythsoundtouch libmythmpeg2 libmythdvdnav
 SUBDIRS += libmyth libmythtv libmythui libmythfreemheg
 SUBDIRS += libmythupnp
+SUBDIRS += libmythlivemedia
 

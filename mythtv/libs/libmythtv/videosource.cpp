@@ -996,6 +996,18 @@ class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
     }
 };
 
+class FreeboxHost : public LineEditSetting, public CCSetting
+{
+  public:
+    FreeboxHost(const CaptureCard &parent):
+        CCSetting(parent, "videodevice")
+    {
+        setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
+        setLabel(QObject::tr("Freebox MRL"));
+        setHelpText(QObject::tr("The FreeBox Media Resource Locator (MRL)."));
+    }
+};
+
 class HDHomeRunTunerIndex: public ComboBoxSetting, public CCSetting
 {
   public:
@@ -1006,6 +1018,27 @@ class HDHomeRunTunerIndex: public ComboBoxSetting, public CCSetting
         addSelection("0");
         addSelection("1");
     }
+};
+
+class FreeboxConfigurationGroup : public VerticalConfigurationGroup
+{
+  public:
+    FreeboxConfigurationGroup(CaptureCard& a_parent):
+       ConfigurationGroup(false, true, false, false),
+       VerticalConfigurationGroup(false, true, false, false),
+       parent(a_parent)
+    {
+        setUseLabel(false);
+        addChild(new FreeboxHost(parent));
+
+        // TODO Create a generic fixed input class to replace duplicates
+        HDHRCardInput *defaultinput = new HDHRCardInput(parent);
+        addChild(defaultinput);
+        defaultinput->setVisible(false);
+    };
+
+  private:
+    CaptureCard &parent;
 };
 
 void HDHRCardInput::fillSelections(const QString&)
@@ -1239,6 +1272,10 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent) :
 #ifdef USING_CRC_IP_NETWORK_REC
     addTarget("CRC_IP",   new CRCIpNetworkRecorderConfigurationGroup(parent));
 #endif // USING_CRC_IP_NETWORK_REC
+
+#ifdef USING_FREEBOX
+    addTarget("FREEBOX",   new FreeboxConfigurationGroup(parent));
+#endif // USING_FREEBOX
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
@@ -1362,6 +1399,10 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("CRC IP Network Recorder"), "CRC_IP");
 #endif // USING_CRC_IP_NETWORK_REC
+
+#ifdef USING_FREEBOX
+    setting->addSelection(QObject::tr("Freebox Network Recorder"), "FREEBOX");
+#endif // USING_FREEBOX
 }
 
 class CardID: public SelectLabelSetting, public CISetting {

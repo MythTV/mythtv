@@ -570,6 +570,7 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype,
     QStringList ret;
 
     if (("FIREWIRE"  == cardtype) ||
+        ("FREEBOX"   == cardtype) ||
         ("DBOX2"     == cardtype) ||
         ("HDHOMERUN" == cardtype) ||
         ("CRC_IP"    == cardtype)) 
@@ -803,6 +804,7 @@ void CardUtil::GetCardInputs(
     QStringList inputs;
 
     if (("FIREWIRE"  == cardtype) ||
+        ("FREEBOX"   == cardtype) ||
         ("DBOX2"     == cardtype) ||
         ("HDHOMERUN" == cardtype) ||
         ("CRC_IP"    == cardtype))

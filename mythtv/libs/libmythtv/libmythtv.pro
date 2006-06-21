@@ -10,9 +10,22 @@ INSTALLS = target
 INCLUDEPATH += ../.. ..
 INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
 INCLUDEPATH += ./dvbdev ./mpeg
+INCLUDEPATH += ../libmythlivemedia/BasicUsageEnvironment/include
+INCLUDEPATH += ../libmythlivemedia/groupsock/include
+INCLUDEPATH += ../libmythlivemedia/liveMedia/include
+INCLUDEPATH += ../libmythlivemedia/UsageEnvironment/include
+
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
 DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav
 DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun
+DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
+DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
+DEPENDPATH  += ../libmythlivemedia/groupsock/include
+DEPENDPATH  += ../libmythlivemedia/groupsock
+DEPENDPATH  += ../libmythlivemedia/liveMedia/include
+DEPENDPATH  += ../libmythlivemedia/liveMedia
+DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
+DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
@@ -374,6 +387,18 @@ using_backend {
     using_dbox2:SOURCES += dbox2recorder.cpp dbox2channel.cpp dbox2epg.cpp
     using_dbox2:HEADERS += dbox2recorder.h dbox2channel.h dbox2epg.h
     using_dbox2:DEFINES += USING_DBOX2
+    
+    # Support for freebox (http://adsl.free.fr/)
+    using_freebox {
+        HEADERS += freeboxrecorder.h     freeboxmediasink.h
+        HEADERS += freeboxchannel.h      freeboxchannelfetcher.h
+        HEADERS += freeboxchannelinfo.h
+
+        SOURCES += freeboxrecorder.cpp   freeboxmediasink.cpp
+        SOURCES += freeboxchannel.cpp    freeboxchannelfetcher.cpp
+
+        DEFINES += USING_FREEBOX
+    }
 
     # Support for HDHomeRun box
     using_hdhr {
