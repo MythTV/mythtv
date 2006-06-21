@@ -348,6 +348,9 @@ void RecordingSelector::cancelPressed()
 
 void RecordingSelector::updateRecordingList(void)
 {
+    if (!recordingList)
+        return;
+
     recording_list->Reset();
 
     if (category_selector)
@@ -405,7 +408,7 @@ void RecordingSelector::getRecordingList(void)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Burn"),
                                   tr("You don't have any recordings!\n\nClick OK"));
-        QTimer::singleShot(100, this, SLOT(handleCancel()));
+        QTimer::singleShot(100, this, SLOT(cancelPressed()));
         return;
     }
 
@@ -435,6 +438,9 @@ void RecordingSelector::setCategory(int item)
 
 void RecordingSelector::updateSelectedList()
 {
+    if (!recordingList)
+        return;
+
     selectedList.clear();
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM archiveitems WHERE type = 'Recording'");
