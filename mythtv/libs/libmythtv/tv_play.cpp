@@ -5085,9 +5085,14 @@ void TV::KeyRepeatOK(void)
     keyRepeat = true;
 }
 
+/** \fn TV::UnMute(void)
+ *  \brief If the player exists and sound is muted, this unmutes the sound.
+ */
 void TV::UnMute(void)
 {
-    // If muted, unmute
+    if (!nvp)
+        return;
+
     AudioOutput *aud = nvp->getAudioOutput();
     if (aud && aud->GetMute())
         aud->ToggleMute();
