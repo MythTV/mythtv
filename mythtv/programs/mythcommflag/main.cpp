@@ -1047,7 +1047,10 @@ int main(int argc, char *argv[])
     }
     else if (!chanid.isEmpty() && !starttime.isEmpty())
     {
-        result = FlagCommercials(chanid, starttime);
+        if (queueJobInstead)
+            QueueCommFlagJob(chanid, starttime);
+        else
+            result = FlagCommercials(chanid, starttime);
     }
     else
     {
