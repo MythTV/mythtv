@@ -119,6 +119,10 @@ SOURCES += livetvchain.cpp
 SOURCES += playgroup.cpp
 SOURCES += progdetails.cpp
 
+# C stuff
+HEADERS += frequencies.h
+SOURCES += frequencies.c
+
 using_frontend {
     # Recording profile stuff
     HEADERS += profilegroup.h
@@ -302,10 +306,6 @@ using_backend {
             DEFINES += USING_DVB_EIT
         }
     }
-
-    # C stuff
-    HEADERS += frequencies.h
-    SOURCES += frequencies.c
 
     DEFINES += USING_BACKEND
 }
