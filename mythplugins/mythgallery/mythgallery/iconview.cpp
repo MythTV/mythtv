@@ -91,12 +91,12 @@ bool ThumbItem::Remove(void)
     return false;
 }
 
-IconView::IconView(const QString& galleryDir, MythMediaDevice *initialDevice,
-                   MythMainWindow* parent, const char* name )
-    : MythDialog(parent, name)
+IconView::IconView(const QString &galleryDir, MythMediaDevice *initialDevice,
+                   const int sortorder, MythMainWindow *parent,
+                   const char *name)
+    : MythDialog(parent, name),
+      m_galleryDir(galleryDir), m_sortorder(sortorder)
 {
-    m_galleryDir = galleryDir;    
-
     m_inMenu     = false;
     m_inSubMenu  = false;
     m_itemList.setAutoDelete(true);
@@ -541,7 +541,8 @@ void IconView::keyPressEvent(QKeyEvent *e)
 
                         if (QGLFormat::hasOpenGL())
                         {
-                            GLSDialog gv(m_itemList, pos, slideShow,
+                            GLSDialog gv(m_itemList, pos,
+                                         slideShow, m_sortorder,
                                          gContext->GetMainWindow());
                             gv.exec();
                         }
@@ -556,7 +557,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     else 
 #endif
                     {
-                        SingleView sv(m_itemList, pos, slideShow,
+                        SingleView sv(m_itemList, pos, slideShow, m_sortorder,
                                       gContext->GetMainWindow());
                         sv.exec();
                     }                         
@@ -865,7 +866,8 @@ void IconView::loadDirectory(const QString& dir, bool topleft)
     m_lastRow = 0;
     m_lastCol = 0;
 
-    m_isGallery = GalleryUtil::loadDirectory(m_itemList, dir, false, &m_itemDict, m_thumbGen);;
+    m_isGallery = GalleryUtil::loadDirectory(m_itemList, dir, m_sortorder,
+                                             false, &m_itemDict, m_thumbGen);
     m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
     m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
 
@@ -1173,7 +1175,8 @@ void IconView::actionSlideShow()
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
         if (QGLFormat::hasOpenGL()) {
-            GLSDialog gv(m_itemList, pos, 1, gContext->GetMainWindow());
+            GLSDialog gv(m_itemList, pos, 1, m_sortorder,
+                         gContext->GetMainWindow());
             gv.exec();
         }
         else {
@@ -1185,7 +1188,8 @@ void IconView::actionSlideShow()
     else 
 #endif
     {
-        SingleView sv(m_itemList, pos, 1, gContext->GetMainWindow());
+        SingleView sv(m_itemList, pos, 1, m_sortorder,
+                      gContext->GetMainWindow());
         sv.exec();
     }                         
 }
@@ -1204,7 +1208,8 @@ void IconView::actionRandomShow()
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
         if (QGLFormat::hasOpenGL()) {
-            GLSDialog gv(m_itemList, pos, 2, gContext->GetMainWindow());
+            GLSDialog gv(m_itemList, pos, 2, m_sortorder,
+                         gContext->GetMainWindow());
             gv.exec();
         }
         else {
@@ -1216,7 +1221,8 @@ void IconView::actionRandomShow()
     else 
 #endif
     {
-        SingleView sv(m_itemList, pos, 2, gContext->GetMainWindow());
+        SingleView sv(m_itemList, pos, 2, m_sortorder,
+                      gContext->GetMainWindow());
         sv.exec();
     }                         
 }
@@ -1442,7 +1448,7 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
         return;
 
     d.setNameFilter(MEDIA_FILENAMES);
-    d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+    d.setSorting(m_sortorder);
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks  | QDir::Readable);
     d.setMatchAllDirs(true);
     const QFileInfoList *list = d.entryInfoList();

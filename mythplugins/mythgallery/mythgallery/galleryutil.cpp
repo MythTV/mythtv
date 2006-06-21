@@ -137,8 +137,8 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
     return rotateAngle;
 }
 
-bool GalleryUtil::loadDirectory(ThumbList& itemList,
-                                const QString& dir, bool recurse,
+bool GalleryUtil::loadDirectory(ThumbList& itemList, const QString& dir,
+                                int sortorder, bool recurse,
                                 ThumbDict *itemDict, ThumbGenerator* thumbGen)
 {
     QString blah = dir;
@@ -157,7 +157,7 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
         thumbGen->getThumbcacheDir(currDir);
 
     d.setNameFilter(MEDIA_FILENAMES);
-    d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+    d.setSorting(sortorder);
 
     d.setMatchAllDirs(true);
     const QFileInfoList *list = d.entryInfoList();
@@ -188,9 +188,9 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
 
         if (fi->isDir() && recurse) 
         {
-            GalleryUtil::loadDirectory(itemList,
-                                       QDir::cleanDirPath(fi->absFilePath()), true,
-                                       itemDict, thumbGen);
+            GalleryUtil::loadDirectory(
+                itemList, QDir::cleanDirPath(fi->absFilePath()),
+                sortorder, true, itemDict, thumbGen);
         }
         else 
         {

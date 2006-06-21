@@ -42,12 +42,13 @@ using namespace std;
 #define LOC QString("GLXDialog: ")
 #define LOC_ERR QString("GLXDialog, Error: ")
 
-GLSDialog::GLSDialog(const ThumbList& itemList, int pos, int slideShow, 
+GLSDialog::GLSDialog(const ThumbList& itemList,
+                     int pos, int slideShow, int sortOrder,
                      MythMainWindow *parent, const char *name)
     : MythDialog(parent, name)
 {
     QBoxLayout *l = new QVBoxLayout(this);
-    m_view = new GLSingleView(itemList, pos, slideShow, this);
+    m_view = new GLSingleView(itemList, pos, slideShow, sortOrder, this);
     l->addWidget(m_view);
 
     setFocusProxy(m_view);
@@ -63,8 +64,8 @@ void GLSDialog::closeEvent(QCloseEvent *e)
     e->accept();
 }
 
-GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow, 
-                           QWidget *parent)
+GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
+                           int sortorder, QWidget *parent)
     : QGLWidget(parent)
 {
     m_pos      = pos;
@@ -94,7 +95,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
         {
             if (recurse)
             {
-                GalleryUtil::loadDirectory(m_itemList, item->path, 
+                GalleryUtil::loadDirectory(m_itemList, item->path, sortorder,
                                            recurse, NULL, NULL);
             }
             m_itemList.remove(item);

@@ -25,6 +25,7 @@ int mythplugin_config(void);
 void runGallery(void)
 {
     gContext->addCurrentLocation("mythgallery");
+    int sortorder = gContext->GetNumSetting("GallerySortOrder");
     QString startdir = gContext->GetSetting("GalleryDir");
     QDir dir(startdir);
     if (!dir.exists() || !dir.isReadable()) {
@@ -36,7 +37,8 @@ void runGallery(void)
     }
     else
     {
-        IconView icv(startdir, NULL, gContext->GetMainWindow(), "IconView");
+        IconView icv(startdir, NULL, sortorder,
+                     gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
     gContext->removeCurrentLocation();
@@ -44,6 +46,7 @@ void runGallery(void)
 
 void handleMedia(MythMediaDevice *dev)
 {
+    int sortorder = gContext->GetNumSetting("GallerySortOrder");
     QString galleryDir = gContext->GetSetting("GalleryDir");
     QDir dir(galleryDir);
     if (!dir.exists() || !dir.isReadable())
@@ -56,7 +59,8 @@ void handleMedia(MythMediaDevice *dev)
     }
     else
     {
-        IconView icv(galleryDir, dev, gContext->GetMainWindow(), "IconView");
+        IconView icv(galleryDir, dev, sortorder,
+                     gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
 }

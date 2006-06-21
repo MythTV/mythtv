@@ -30,6 +30,19 @@ static HostCheckBox *MythGalleryThumbnailLocation()
     return gc;
 };
 
+static HostComboBox *MythGallerySortOrder()
+{
+    HostComboBox *gc = new HostComboBox("GallerySortOrder");
+    gc->setLabel(QObject::tr("Sort order when browsing"));
+    gc->addSelection("Name (A-Z alpha)", QString::number(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase));
+    gc->addSelection("Reverse Name (Z-A alpha)", QString::number(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase | QDir::Reversed));
+    gc->addSelection("Mod Time (earliest first)", QString::number(QDir::Time | QDir::DirsFirst | QDir::IgnoreCase | QDir::Reversed));
+    gc->addSelection("Reverse Mod Time (most recent first)", QString::number(QDir::Time | QDir::DirsFirst | QDir::IgnoreCase));
+    gc->setHelpText(QObject::tr("This is the sort order for the displayed "
+                    "picture thumbnails."));
+    return gc;
+};
+
 static HostLineEdit *MythGalleryMoviePlayerCmd()
 {
     HostLineEdit *gc = new HostLineEdit("GalleryMoviePlayerCmd");
@@ -161,6 +174,7 @@ public:
 
         addChild(MythGalleryDir());
         addChild(MythGalleryThumbnailLocation());
+        addChild(MythGallerySortOrder());
         addChild(MythGalleryImportDirs());
         addChild(MythGalleryMoviePlayerCmd());
 

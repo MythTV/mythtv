@@ -32,7 +32,7 @@ class SingleView : public MythDialog
     
 public:
 
-    SingleView(ThumbList itemList, int pos, int slideShow, 
+    SingleView(ThumbList itemList, int pos, int slideShow, int sortorder,
                MythMainWindow *parent, const char *name=0);
     ~SingleView();
 

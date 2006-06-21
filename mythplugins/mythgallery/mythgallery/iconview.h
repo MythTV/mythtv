@@ -65,8 +65,8 @@ class IconView : public MythDialog
 {
     Q_OBJECT
   public:
-    IconView(const QString& galleryDir, MythMediaDevice *initialDevice,
-             MythMainWindow* parent, const char* name = 0);
+    IconView(const QString &galleryDir, MythMediaDevice *initialDevice,
+             int sortorder, MythMainWindow *parent, const char *name = 0);
     ~IconView();
 
   protected:
@@ -121,6 +121,7 @@ class IconView : public MythDialog
     QDict<ThumbItem>    m_itemDict;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
+    int                 m_sortorder;
 
     XMLParse           *m_theme;
     QRect               m_menuRect;

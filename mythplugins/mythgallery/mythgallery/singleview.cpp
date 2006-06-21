@@ -35,7 +35,7 @@
 #include "galleryutil.h"
 
 SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
-                       MythMainWindow *parent, const char *name )
+                       int sortorder, MythMainWindow *parent, const char *name)
     : MythDialog(parent, name)
 {
     m_itemList  = itemList;
@@ -53,7 +53,8 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
         ThumbItem* next = m_itemList.next();
         if (item->isDir) {
             if (recurse)
-                GalleryUtil::loadDirectory(m_itemList, item->path, recurse, NULL, NULL);
+                GalleryUtil::loadDirectory(m_itemList, item->path, sortorder,
+                                           recurse, NULL, NULL);
             m_itemList.remove(item);
         }
         item = next;

@@ -31,8 +31,8 @@ class GalleryUtil
 
     static QString getCaption(const QString &filePath);
 
-    static bool loadDirectory(ThumbList& itemList,
-                              const QString& dir, bool recurse,
+    static bool loadDirectory(ThumbList& itemList, const QString& dir,
+                              int sortorder, bool recurse,
                               ThumbDict *itemDict, ThumbGenerator* thumbGen);
 
     static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
