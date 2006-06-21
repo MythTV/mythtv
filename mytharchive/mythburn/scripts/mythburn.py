@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060617-1"
+VERSION="0.1.20060621-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -967,7 +967,7 @@ def preProcessFile(file, folder):
     if file.hasAttribute("localfilename"):
    	    mediafile = file.attributes["localfilename"].value
 
-    getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"))
+    getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
 
     videosize = getVideoSize(os.path.join(folder, "streaminfo.xml"))
 
@@ -1029,10 +1029,10 @@ def multiplexMPEGStream(video, audio1, audio2, destination):
         if result != 0:
             fatalError("mplex failed with result %d" % result)
 
-def getStreamInformation(filename, xmlFilename):
+def getStreamInformation(filename, xmlFilename, lenMethod):
     """create a stream.xml file for filename"""
     filename = quoteFilename(filename)
-    command = "mytharchivehelper -i %s %s" % (filename, xmlFilename)
+    command = "mytharchivehelper -i %s %s %d" % (filename, xmlFilename, lenMethod)
 
     result = runCommand(command)
 
@@ -2651,12 +2651,28 @@ def processFile(file, folder):
                         mediafile = os.path.join(folder, 'newfile.mpg')
                     else:
                         write("Failed to run mythtrancode to fix any errors")
+    else:
+        #does the user always want to run recordings through mythtranscode?
+        #may help to fix any errors in the file 
+        if (alwaysRunMythtranscode == True or 
+                (getFileType(folder) == "mpegts" and isFileOkayForDVD(file, folder))):
+            if file.hasAttribute("localfilename"):
+                localfile = file.attributes["localfilename"].value
+            else:
+                localfile = file.attributes["filename"].value
+            write("Attempting to run mythtranscode --mpeg2 to fix any errors")
+            chanid = -1
+            starttime = -1
+            if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False, localfile):
+                mediafile = os.path.join(folder, 'newfile.mpg')
+            else:
+                write("Failed to run mythtrancode to fix any errors")
 
     #do we need to re-encode the file to make it DVD compliant?
     if not isFileOkayForDVD(file, folder):
         #we need to re-encode the file, make sure we get the right video/audio streams
         #would be good if we could also split the file at the same time
-        getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"))
+        getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
 
         #choose which streams we need
         video, audio1, audio2 = selectStreams(folder)
@@ -2688,7 +2704,7 @@ def processFile(file, folder):
     # the file is now DVD compliant split it into video and audio parts
 
     # find out what streams we have available now
-    getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"))
+    getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 1)
 
     # choose which streams we need
     video, audio1, audio2 = selectStreams(folder)

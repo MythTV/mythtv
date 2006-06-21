@@ -710,7 +710,6 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     av_register_all();
 
     AVFormatContext *inputFC = NULL;
-    AVInputFormat *fmt = NULL;
 
     // Open recording
     VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
@@ -885,7 +884,7 @@ int getFrameCount(AVFormatContext *inputFC, int vid_id)
     return count;
 }
 
-bool getFileInfo(QString inFile, QString outFile)
+bool getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
     const char *type = NULL;
     int ret;
@@ -922,9 +921,7 @@ bool getFileInfo(QString inFile, QString outFile)
         return 0;
     }
 
-    VERBOSE(VB_JOBQUEUE, "av_estimate_timings - Start");
     av_estimate_timings(inputFC);
-    VERBOSE(VB_JOBQUEUE, "av_estimate_timings - Stop");
 
     // Dump stream information
     dump_format(inputFC, 0, inFile.ascii(), 0);
@@ -984,13 +981,35 @@ bool getFileInfo(QString inFile, QString outFile)
 
                 streams.appendChild(stream);
 
-                // calc duration of the file by counting the video frames
-                int duration = getFrameCount(inputFC, i);
-                VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(duration));
-                duration = (int)(duration / fps);
-                VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
-                root.setAttribute("duration", duration);
-
+                switch (lenMethod)
+                {
+                    case 0:
+                    {
+                        // use duration guess from avformat
+                        if (inputFC->duration != (uint) AV_NOPTS_VALUE)
+                        {
+                            root.setAttribute("duration", (uint) inputFC->duration / AV_TIME_BASE);
+                            VERBOSE(VB_JOBQUEUE, QString("duration = %1")
+                                    .arg(inputFC->duration / AV_TIME_BASE));
+                        }
+                        else
+                            root.setAttribute("duration", "N/A");
+                        break;
+                    }
+                    case 1:
+                    {
+                        // calc duration of the file by counting the video frames
+                        int duration = getFrameCount(inputFC, i);
+                        VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(duration));
+                        duration = (int)(duration / fps);
+                        VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
+                        root.setAttribute("duration", duration);
+                        break;
+                    }
+                    default:
+                        root.setAttribute("duration", "N/A");
+                        VERBOSE(VB_JOBQUEUE, QString("Unknown lenMethod (%1)").arg(lenMethod));
+                }
                 break;
             }
 
@@ -1103,8 +1122,11 @@ void showUsage()
     cout << "       thumblist - comma seperated list of required thumbs in seconds\n";
     cout << "       outfile   - name of file to save thumbs to eg 'thumb-%1.jpg'\n";
     cout << "                   %1 will be replaced with the no. of the thumb\n";
-    cout << "-i/--getfileinfo infile outfile\n";
+    cout << "-i/--getfileinfo infile outfile method\n";
     cout << "                          (write some file information to outfile for infile)\n";
+    cout << "                          method is the method to used to calc the file duration\n";
+    cout << "                          0 - use av_estimate_timings() (quick but not very accurate)\n";
+    cout << "                          1 - read all frames (most accurate but slow)\n";
     cout << "-p/--getdbparameters outfile\n";
     cout << "                          (write the mysql database parameters to outfile)\n";
     cout << "-n/--nativearchive        (archive files to a native archive format)\n";
@@ -1140,6 +1162,7 @@ int main(int argc, char **argv)
     QString inFile;
     QString outFile;
     QString logFile;
+    int lenMethod;
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -1274,6 +1297,18 @@ int main(int argc, char **argv)
                 cerr << "Missing outfile in -i/--getfileinfo option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
+
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]);
+                lenMethod = arg.toInt();
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing method in -i/--getfileinfo option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
         }
         else
         {
@@ -1292,7 +1327,7 @@ int main(int argc, char **argv)
     else if (bNativeArchive)
         res = doNativeArchive(outFile);
     else if (bGetFileInfo)
-        res = getFileInfo(inFile, outFile);
+        res = getFileInfo(inFile, outFile, lenMethod);
     else 
         showUsage();
 
