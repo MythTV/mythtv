@@ -1284,6 +1284,9 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         videobuf_retries = 0;
     }
 
+    if (framesPlayed < 5 && play_speed > 1)
+        next_play_speed = 1;
+
     // Decode the correct frame
     if (!GetDecoder())
         VERBOSE(VB_IMPORTANT, LOC + "GetFrame() called with NULL decoder.");
@@ -3173,6 +3176,9 @@ void NuppelVideoPlayer::StartPlaying(void)
             normal_speed = next_normal_speed;
             VERBOSE(VB_PLAYBACK, LOC + "Changing speed to " << play_speed);
 
+            if (ringBuffer->isDVD())
+                GetDecoder()->UpdateDVDFramesPlayed();
+
             if (play_speed == 0.0)
             {
                 DoPause();
@@ -3292,7 +3298,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             {
                 PauseVideo();
 
-                if (fftime >= 5)
+                if (fftime >= 5 && !ringBuffer->isDVD())
                     DoFastForward();
 
                 if (eof)
@@ -3692,7 +3698,8 @@ void NuppelVideoPlayer::DoPlay(void)
 #endif
 
         GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
-        GetDecoder()->DoRewind(framesPlayed);
+        if (!ringBuffer->isDVD())
+            GetDecoder()->DoRewind(framesPlayed);
         ClearAfterSeek();
     }
 

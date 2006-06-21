@@ -547,8 +547,6 @@ void AvFormatDecoder::Reset()
     {
         posmapStarted = false;
         SyncPositionMap();
-        framesPlayed = DVDCurrentFrameNumber();
-        framesRead = framesPlayed;
     }
 
 #if 0
@@ -2490,8 +2488,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     ScanStreams(true);
                     lastdvdtitle = dvdtitle;
                 }
-                framesPlayed = DVDCurrentFrameNumber();
-                framesRead = framesPlayed;
+                UpdateDVDFramesPlayed();
                 VERBOSE(VB_PLAYBACK, QString(LOC + "DVD Cell Changed. "
                                              "Update framesPlayed: %1 ")
                                              .arg(framesPlayed));

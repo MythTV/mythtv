@@ -712,13 +712,8 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
 
         if (elapsed == 0)
             SeekReset(framesPlayed, 0, true, true);
-
-        // update frames played
-        long long played = DVDCurrentFrameNumber();
-
-        framesPlayed = played;
-        GetNVP()->getVideoOutput()->SetFramesPlayed(played + 1);
-        GetNVP()->SetFramesPlayed(played + 1);
+    
+        UpdateDVDFramesPlayed();
     }
 }
 
@@ -734,14 +729,25 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
 
 long long DecoderBase::DVDCurrentFrameNumber(void)
 {
-    if (!ringBuffer->isDVD())
+    int size = m_positionMap.size() - 1;
+    if (!ringBuffer->isDVD() || size < 0)
         return 0;
 
-    int size = m_positionMap.size() - 1;
     long long currentpos = ringBuffer->GetReadPosition();
     long long multiplier = (currentpos * m_positionMap[size].index);
     long long currentframe = multiplier / m_positionMap[size].pos;
     return currentframe;
+}
+
+void DecoderBase::UpdateDVDFramesPlayed(void)
+{
+    long long currentpos = DVDCurrentFrameNumber();
+    if (currentpos != 0)
+    {
+        framesPlayed = framesRead = currentpos ;
+        GetNVP()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
+        GetNVP()->SetFramesPlayed(currentpos + 1);
+    }
 }
 
 QStringList DecoderBase::GetTracks(uint type) const
