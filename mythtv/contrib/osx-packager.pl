@@ -35,7 +35,7 @@ our $jobtools = 0;
 
 # For faster downloads, change this to a local mirror.
 #
-our $sourceforge = 'http://internap.dl.sf.net';
+our $sourceforge = 'http://umn.dl.sourceforge.net';
 
 # At the moment, there is mythtv plus these two
 our @components = ( 'myththemes', 'mythplugins' );
@@ -52,6 +52,7 @@ our %depend_order = (
         'lame',
         'mysqlclient',
         'qt-mt',
+        'dvdnav'
       ],
   'mythplugins'
   =>  [
@@ -79,6 +80,12 @@ our %depend = (
   {
     'url'
     =>  "$sourceforge/sourceforge/freetype/freetype-2.1.10.tar.gz",
+  },
+
+  # SVN head doesn't need this, but 0.19-fixes and earlier do
+  'dvdnav' =>
+  {
+    'url' => "$sourceforge/sourceforge/dvd/libdvdnav-0.1.10.tar.gz",
   },
 
   'lame'
@@ -193,7 +200,7 @@ our %depend = (
 #   },
   {
     'url'
-    =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-free-3.3.5.tar.gz',
+    =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-free-3.3.6.tar.gz',
     'conf-cmd'
     =>  'echo yes | ./configure',
     'conf'
@@ -205,7 +212,6 @@ our %depend = (
           '-qt-sql-mysql',
           '-no-style-cde',
           '-no-style-compact',
-          '-no-style-mac',
           '-no-style-motif',
           '-no-style-motifplus',
           '-no-style-platinum',
