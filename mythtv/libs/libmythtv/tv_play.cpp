@@ -265,7 +265,8 @@ void *SpawnDecode(void *param)
 TV::TV(void)
     : QObject(NULL, "TV"),
       // Configuration variables from database
-      baseFilters(""), fftime(0), rewtime(0),
+      baseFilters(""), db_time_format("h:mm AP"), db_short_date_format("M/d"),
+      fftime(0), rewtime(0),
       jumptime(0), smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
       osd_general_timeout(2), osd_prog_info_timeout(3),
@@ -381,6 +382,8 @@ bool TV::Init(bool createWindow)
     }
 
     baseFilters         += gContext->GetSetting("CustomFilters");
+    db_time_format       = gContext->GetSetting("TimeFormat", "h:mm AP");
+    db_short_date_format = gContext->GetSetting("ShortDateFormat", "M/d");
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
     arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
@@ -4663,9 +4666,9 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
  */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap)
-{
+{ 
     QString title, subtitle, desc, category, endtime, callsign, iconpath;
-    QString lenM, lenHM;
+    QDateTime begts, endts;
 
     QString starttime = infoMap["dbstarttime"];
     QString chanid    = infoMap["chanid"];
@@ -4673,16 +4676,39 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     QString seriesid  = infoMap["seriesid"];
     QString programid = infoMap["programid"];
 
-    GetNextProgram(enc, direction,
-                   title,     subtitle, desc,      category,
-                   starttime, endtime,  callsign,  iconpath,
-                   channum,   chanid,   seriesid,  programid);
+    if (!enc)
+        enc = activerecorder;
 
-    QString timeFmt = gContext->GetSetting("TimeFormat");
-    QString dateFmt = gContext->GetSetting("ShortDateFormat");
-    QDateTime begts = QDateTime::fromString(starttime, Qt::ISODate);
-    QDateTime endts = QDateTime::fromString(endtime,   Qt::ISODate);
-    format_time(begts.secsTo(endts), lenM, lenHM);
+    enc->GetNextProgram(direction,
+                        title,     subtitle,  desc,      category,
+                        starttime, endtime,   callsign,  iconpath,
+                        channum,   chanid,    seriesid,  programid);
+
+    if (!starttime.isEmpty())
+        begts = QDateTime::fromString(starttime, Qt::ISODate);
+    else
+        begts = QDateTime::fromString(infoMap["dbstarttime"], Qt::ISODate);
+
+    infoMap["starttime"] = begts.toString(db_time_format);
+    infoMap["startdate"] = begts.toString(db_short_date_format);
+
+    infoMap["endtime"] = infoMap["enddate"] = "";
+    if (!endtime.isEmpty())
+    {
+        endts = QDateTime::fromString(endtime, Qt::ISODate);
+        infoMap["endtime"] = endts.toString(db_time_format);
+        infoMap["enddate"] = endts.toString(db_short_date_format);
+    }
+
+    infoMap["lenmins"] = QString("0 %1").arg(TV::tr("minutes"));
+    infoMap["lentime"] = "0:00";
+    if (begts.isValid() && endts.isValid())
+    {
+        QString lenM, lenHM;
+        format_time(begts.secsTo(endts), lenM, lenHM);
+        infoMap["lenmins"] = lenM;
+        infoMap["lentime"] = lenHM;
+    }
 
     infoMap["dbstarttime"] = starttime;
     infoMap["dbendtime"]   = endtime;
@@ -4691,39 +4717,11 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     infoMap["description"] = desc;
     infoMap["category"]    = category;
     infoMap["callsign"]    = callsign;
-    infoMap["starttime"]   = begts.toString(timeFmt);
-    infoMap["startdate"]   = begts.toString(dateFmt);
-    infoMap["endtime"]     = endts.toString(timeFmt);
-    infoMap["enddate"]     = endts.toString(dateFmt);
     infoMap["channum"]     = channum;
     infoMap["chanid"]      = chanid;
     infoMap["iconpath"]    = iconpath;
     infoMap["seriesid"]    = seriesid;
     infoMap["programid"]   = programid;
-    infoMap["lenmins"]     = lenM;
-    infoMap["lentime"]     = lenHM;
-}
-
-/** \fn TV::GetNextProgram(RemoteEncoder*,int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- *  \brief Fetches information on the desired program from the backend.
- *  \param enc RemoteEncoder to query, if null query the activerecorder.
- *  \param direction BrowseDirection to get information on.
- */
-void TV::GetNextProgram(RemoteEncoder *enc, int direction,
-                        QString &title,     QString &subtitle,
-                        QString &desc,      QString &category,
-                        QString &starttime, QString &endtime,
-                        QString &callsign,  QString &iconpath,
-                        QString &channame,  QString &chanid,
-                        QString &seriesid,  QString &programid)
-{
-    if (!enc)
-        enc = activerecorder;
-
-    enc->GetNextProgram(direction,
-                        title,     subtitle,  desc,      category,
-                        starttime, endtime,   callsign,  iconpath,
-                        channame,  chanid,    seriesid,  programid);
 }
 
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
@@ -5378,8 +5376,11 @@ void TV::BrowseDispInfo(int direction)
     browsechannum = infoMap["channum"];
     browsechanid  = infoMap["chanid"];
 
-    if ((direction == BROWSE_LEFT) || (direction == BROWSE_RIGHT))
+    if (((direction == BROWSE_LEFT) || (direction == BROWSE_RIGHT)) &&
+        !infoMap["dbstarttime"].isEmpty())
+    {
         browsestarttime = infoMap["dbstarttime"];
+    }
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
     ProgramInfo *program_info = 

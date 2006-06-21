@@ -159,13 +159,6 @@ class TV : public QObject
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap);
-    void GetNextProgram(RemoteEncoder *enc, int direction,
-                        QString &title,     QString &subtitle,
-                        QString &desc,      QString &category,
-                        QString &starttime, QString &endtime,
-                        QString &callsign,  QString &iconpath,
-                        QString &channame,  QString &chanid,
-                        QString &seriesid,  QString &programid);
 
     // static functions
     static void InitKeys(void);
@@ -363,6 +356,8 @@ class TV : public QObject
   private:
     // Configuration variables from database
     QString baseFilters;
+    QString db_time_format;
+    QString db_short_date_format;
     int     fftime;
     int     rewtime;
     int     jumptime;
