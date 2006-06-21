@@ -319,12 +319,10 @@ void HDHRRecorder::StartRecording(void)
         return;
     }
 
-    MythTimer timer;
-    timer.start();
     hdhomerun_video_flush(_video_socket);
     while (_request_recording && !_error)
     {
-        if (PauseAndWait(10))
+        if (PauseAndWait())
             continue;
 
         if (_stream_data)
@@ -340,18 +338,11 @@ void HDHRRecorder::StartRecording(void)
             AdjustFilters();
         }
 
-        uint dbg = 0;
-        if (timer.elapsed() > 10)
-            dbg = timer.elapsed();
-
         unsigned long data_length;
         unsigned char *data_buffer =
             hdhomerun_video_recv_inplace(_video_socket,
                                          VIDEO_DATA_BUFFER_SIZE_1S / 5,
                                          &data_length);
-
-        timer.start();
-
         if (!data_buffer)
         {
             if (hdhomerun_video_get_state(_video_socket) == 0)
@@ -359,14 +350,9 @@ void HDHRRecorder::StartRecording(void)
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Recv error" + ENO);
                 break;
             }
+            usleep(5000);
 	    continue;
 	}
-
-        if (dbg)
-        {
-            VERBOSE(VB_PLAYBACK, LOC + "msecs: "<<dbg<<" bufsize: "
-                    <<data_length);
-        }
 
         ProcessTSData(data_buffer, data_length);
     }
