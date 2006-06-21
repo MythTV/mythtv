@@ -21,6 +21,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "audiooutputca.h"
+#include "config.h"
 
 // this holds Core Audio member variables
 struct CoreAudioData {
