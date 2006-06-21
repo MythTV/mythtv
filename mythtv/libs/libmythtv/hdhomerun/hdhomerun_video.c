@@ -68,12 +68,15 @@ struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size)
 		return NULL;
 	}
 
-	/* Set non blocking. */
-	fcntl(vs->sock, F_SETFL, O_NONBLOCK);
-
 	/* Set buffer size. */
 	unsigned long rx_size = 1024 * 1024;
 	setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, &rx_size, sizeof(rx_size));
+
+	/* Set timeout. */
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 50 * 1000;
+	setsockopt(vs->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
 	/* Bind socket. */
 	struct sockaddr_in sock_addr;
@@ -131,54 +134,36 @@ static void *hdhomerun_video_thread(void *arg)
 	struct hdhomerun_video_sock_t *vs = (struct hdhomerun_video_sock_t *)arg;
 
 	while (!vs->terminate) {
-		struct timeval t;
-		t.tv_sec = 1;
-		t.tv_usec = 0;
+		unsigned long head = vs->head;
 
-		fd_set readfds;
-		FD_ZERO(&readfds);
-		FD_SET(vs->sock, &readfds);
-
-		if (select(vs->sock+1, &readfds, NULL, NULL, &t) < 0) {
+		/* Receive. */
+		int length = recv(vs->sock, vs->buffer + head, VIDEO_DATA_PACKET_SIZE, 0);
+		if (length != VIDEO_DATA_PACKET_SIZE) {
+			if (length > 0) {
+				/* Data received but not valid - ignore. */
+				continue;
+			}
+			if (errno == EAGAIN) {
+				/* Wait for more data. */
+				continue;
+			}
 			vs->terminate = 1;
 			return NULL;
 		}
-		if (!FD_ISSET(vs->sock, &readfds)) {
+
+		/* Calculate new head. */
+		head += length;
+		if (head >= vs->buffer_size) {
+			head -= vs->buffer_size;
+		}
+
+		/* Check for buffer overflow. */
+		if (head == vs->tail) {
 			continue;
 		}
 
-		while (1) {
-			unsigned long head = vs->head;
-
-			/* Receive. */
-			int length = recv(vs->sock, vs->buffer + head, VIDEO_DATA_PACKET_SIZE, MSG_DONTWAIT);
-			if (length != VIDEO_DATA_PACKET_SIZE) {
-				if (length > 0) {
-					/* Data received but not valid - ignore. */
-					continue;
-				}
-				if (errno == EAGAIN) {
-					/* Wait for more data. */
-					break;
-				}
-				vs->terminate = 1;
-				return NULL;
-			}
-
-			/* Calculate new head. */
-			head += length;
-			if (head >= vs->buffer_size) {
-				head -= vs->buffer_size;
-			}
-
-			/* Check for buffer overflow. */
-			if (head == vs->tail) {
-				continue;
-			}
-
-			/* Atomic update. */
-			vs->head = head;
-		}
+		/* Atomic update. */
+		vs->head = head;
 	}
 
 	return NULL;
