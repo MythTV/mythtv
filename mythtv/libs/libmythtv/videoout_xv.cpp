@@ -982,8 +982,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     (void)stream_type, (void)xvmc_chroma, (void)test_surface;
 
 #ifdef USING_XVMC
-    Display *disp;
-    X11S(disp = XOpenDisplay(NULL));
+    Display *disp = MythXOpenDisplay();
 
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
@@ -1185,7 +1184,7 @@ bool VideoOutputXv::Init(
 
     XV_INIT_FATAL_ERROR_TEST(winid <= 0, "Invalid Window ID.");
 
-    X11S(XJ_disp = XOpenDisplay(NULL));
+    XJ_disp = MythXOpenDisplay();
     XV_INIT_FATAL_ERROR_TEST(!XJ_disp, "Failed to open display.");
 
     // Initialize X stuff

@@ -5,13 +5,9 @@
 
 static inline Display* createXvMCDisplay() 
 {
-    Display *disp = NULL;
-    X11S(disp = XOpenDisplay(NULL));
+    Display *disp = MythXOpenDisplay();
     if (!disp) 
-    {
-        VERBOSE(VB_IMPORTANT, "XOpenDisplay failed");
-        return 0;
-    }
+        return NULL;
 
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;

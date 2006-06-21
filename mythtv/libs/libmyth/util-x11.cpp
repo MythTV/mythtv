@@ -34,8 +34,8 @@ int GetNumberOfXineramaScreens(void)
     int nr_xinerama_screens = 0;
 
 #ifdef Q_WS_X11
+    Display *d = MythXOpenDisplay();
     X11L;
-    Display *d = XOpenDisplay(NULL);
     int event_base = 0, error_base = 0;
     if (XineramaQueryExtension(d, &event_base, &error_base) &&
         XineramaIsActive(d))
@@ -49,6 +49,27 @@ int GetNumberOfXineramaScreens(void)
 #endif // CONFIG_DARWIN
 #endif // !Q_WS_X11
     return nr_xinerama_screens;
+}
+
+Display *MythXOpenDisplay(void)
+{
+#ifdef Q_WS_X11
+    QString dispStr = gContext->GetX11Display();
+    const char *dispCStr = NULL;
+    if (!dispStr.isEmpty())
+        dispCStr = dispStr.ascii();
+
+    X11L;
+    Display *disp = XOpenDisplay(dispCStr);
+    X11U;
+
+    if (!disp)
+        VERBOSE(VB_IMPORTANT, "MythXOpenDisplay() failed");
+
+    return disp;
+#else
+    return NULL;
+#endif
 }
 
 // Everything below this line is only compiled if using X11

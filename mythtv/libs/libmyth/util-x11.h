@@ -10,6 +10,7 @@
 #include <X11/Xlib.h>
 #include <vector>
 
+Display *MythXOpenDisplay(void);
 int XJ_error_catcher(Display * d, XErrorEvent * xeev);
 void InstallXErrorHandler(Display *d);
 void PrintXErrors(Display *d, const std::vector<XErrorEvent>& events);

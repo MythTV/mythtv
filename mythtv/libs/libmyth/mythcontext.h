@@ -222,7 +222,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20060614-1"
+#define MYTH_BINARY_VERSION "0.19.20060621-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -411,6 +411,9 @@ class MythContext : public QObject, public MythObservable, public MythSocketCBs
     void addCurrentLocation(QString location);
     QString removeCurrentLocation(void);
     QString getCurrentLocation(void);
+
+    void SetX11Display(const QString &display);
+    QString GetX11Display(void) const;
 
     static QMutex verbose_mutex;
 

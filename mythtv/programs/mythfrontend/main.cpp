@@ -745,12 +745,18 @@ void CleanupMyOldInUsePrograms(void)
 
 int main(int argc, char **argv)
 {
-    QString geometry = "";
+    QString geometry = QString::null;
+    QString display  = QString::null;
 #ifdef Q_WS_X11
-    // Remember any -geometry argument which QApplication init will remove
+    // Remember any -display or -geometry argument
+    // which QApplication init will remove.
     for(int argpos = 1; argpos + 1 < argc; ++argpos)
+    {
         if (!strcmp(argv[argpos],"-geometry"))
             geometry = argv[argpos+1];
+        else if (!strcmp(argv[argpos],"-display"))
+            display = argv[argpos+1];
+    }
 #endif
 
 #ifdef Q_WS_MACX
@@ -870,6 +876,26 @@ int main(int argc, char **argv)
 
             ++argpos;
         }
+        else if (!strcmp(a.argv()[argpos],"-display") ||
+                 !strcmp(a.argv()[argpos],"--display"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                display = a.argv()[argpos+1];
+                if (display.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -display option\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                    ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -display option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
                  !strcmp(a.argv()[argpos],"--geometry"))
         {
@@ -980,7 +1006,12 @@ int main(int argc, char **argv)
        return FRONTEND_EXIT_OK;
     }
 
-    if (geometry != "" && !gContext->ParseGeometryOverride(geometry))
+    if (!display.isEmpty())
+    {
+        gContext->SetX11Display(display);
+    }
+
+    if (!geometry.isEmpty() && !gContext->ParseGeometryOverride(geometry))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Illegal -geometry argument '%1' (ignored)")

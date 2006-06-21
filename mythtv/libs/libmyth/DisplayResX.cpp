@@ -12,11 +12,11 @@ namespace X11
 #include <X11/extensions/Xrandr.h>
 }
 
-
 #include "util-x11.h"
 
 using namespace X11;
 
+Display *MythXOpenDisplay(void);
 static XRRScreenConfiguration *GetScreenConfig(Display*& display);
 
 DisplayResX::DisplayResX(void)
@@ -30,8 +30,7 @@ DisplayResX::~DisplayResX(void)
 
 bool DisplayResX::GetDisplaySize(int &width_mm, int &height_mm) const
 {
-    Display *display = NULL;
-    X11S(display = XOpenDisplay(NULL));
+    Display *display = MythXOpenDisplay();
     if (display == NULL)
         return false;
 
@@ -113,10 +112,10 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
 
 static XRRScreenConfiguration *GetScreenConfig(Display*& display)
 {
-    X11S(display = XOpenDisplay(NULL));
+    display = MythXOpenDisplay();
     if (!display)
     {
-        cerr<<"DisplaResX: Unable to XOpenDisplay"<<endl;
+        cerr<<"DisplaResX: MythXOpenDisplay call failed"<<endl;
         return NULL;
     }
 

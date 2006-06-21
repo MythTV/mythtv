@@ -70,6 +70,20 @@ static void *run_priv_thread(void *data)
 
 int main(int argc, char *argv[])
 {
+    QString geometry = QString::null;
+    QString display  = QString::null;
+#ifdef Q_WS_X11
+    // Remember any -display or -geometry argument
+    // which QApplication init will remove.
+    for(int argpos = 1; argpos + 1 < argc; ++argpos)
+    {
+        if (!strcmp(argv[argpos],"-geometry"))
+            geometry = argv[argpos+1];
+        else if (!strcmp(argv[argpos],"-display"))
+            display = argv[argpos+1];
+    }
+#endif
+
     QApplication a(argc, argv);
 
     print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
@@ -131,6 +145,26 @@ int main(int argc, char *argv[])
 
             ++argpos;
         }
+        else if (!strcmp(a.argv()[argpos],"-display") ||
+                 !strcmp(a.argv()[argpos],"--display"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                display = a.argv()[argpos+1];
+                if (display.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -display option\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                    ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -display option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (a.argv()[argpos][0] != '-')
         {
             filename = a.argv()[argpos];
@@ -145,6 +179,18 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return TV_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (!display.isEmpty())
+    {
+        gContext->SetX11Display(display);
+    }
+
+    if (!geometry.isEmpty() && !gContext->ParseGeometryOverride(geometry))
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Illegal -geometry argument '%1' (ignored)")
+                .arg(geometry));
     }
 
     if (settingsOverride.size())

@@ -218,6 +218,8 @@ class MythContextPrivate
 
     MythMainWindow *mainWindow;
 
+    QString m_x11_display;
+
     float m_wmult, m_hmult;
 
     // The part of the screen(s) allocated for the GUI. Unless
@@ -276,6 +278,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       attemptingToConnect(false),
       language(""),
       mainWindow(NULL),
+      m_x11_display(QString::null),
       m_wmult(1.0), m_hmult(1.0),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
@@ -2879,6 +2882,16 @@ bool MythContext::GetScreenIsAsleep(void)
     if (!d->screensaver)
         return false;
     return d->screensaver->Asleep();
+}
+
+void MythContext::SetX11Display(const QString &display)
+{
+    d->m_x11_display = QDeepCopy<QString>(display);
+}
+
+QString MythContext::GetX11Display(void) const
+{
+    return QDeepCopy<QString>(d->m_x11_display);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
