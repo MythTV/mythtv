@@ -2790,10 +2790,9 @@ void TVRec::GetNextProgram(int direction,
                            QString &desc,        QString &category,
                            QString &starttime,   QString &endtime,
                            QString &callsign,    QString &iconpath,
-                           QString &channelname, QString &chanidStr,
+                           QString &channum,     QString &chanidStr,
                            QString &seriesid,    QString &programid)
 {
-    QString nextchannum = channelname;
     QString compare     = "<=";
     QString sortorder   = "desc";
     QString input       = channel->GetCurrentInput();
@@ -2802,91 +2801,93 @@ void TVRec::GetNextProgram(int direction,
 
     if (BROWSE_SAME == direction)
         chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channelname, CHANNEL_DIRECTION_SAME, order);
+            cardid, input, channum, CHANNEL_DIRECTION_SAME, order);
     else if (BROWSE_UP == direction)
         chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channelname, CHANNEL_DIRECTION_UP, order);
+            cardid, input, channum, CHANNEL_DIRECTION_UP, order);
     else if (BROWSE_DOWN == direction)
         chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channelname, CHANNEL_DIRECTION_DOWN, order);
+            cardid, input, channum, CHANNEL_DIRECTION_DOWN, order);
     else if (BROWSE_FAVORITE == direction)
         chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channelname, CHANNEL_DIRECTION_FAVORITE, order);
+            cardid, input, channum, CHANNEL_DIRECTION_FAVORITE, order);
     else if (BROWSE_LEFT == direction)
+    {
+        chanid = ChannelUtil::GetNextChannel(
+            cardid, input, channum, CHANNEL_DIRECTION_SAME, order);
         compare = "<";
+    }
     else if (BROWSE_RIGHT == direction)
     {
+	chanid = ChannelUtil::GetNextChannel(
+            cardid, input, channum, CHANNEL_DIRECTION_SAME, order);
         compare = ">";
         sortorder = "asc";
     }
 
+    QString querystr = QString(
+        "SELECT title,     subtitle, description, category, "
+        "       starttime, endtime,  callsign,    icon,     "
+        "       channum,   seriesid, programid "
+        "FROM program, channel "
+        "WHERE program.chanid = channel.chanid AND "
+        "      channel.chanid = :CHANID        AND "
+        "      starttime %1 :STARTTIME "
+        "ORDER BY starttime %2 "
+        "LIMIT 1").arg(compare).arg(sortorder);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(querystr);
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", starttime);
+
+    // Clear everything now in case either query fails.
+    title     = subtitle  = desc      = category  = "";
+    starttime = endtime   = callsign  = iconpath  = "";
+    channum   = chanidStr = seriesid  = programid = "";
+
+    // We already know the new chanid..
     chanidStr = QString::number(chanid);
 
-    QString querystr =
-        "SELECT title,     subtitle,       description,   category, "
-        "       starttime, endtime,        callsign,      icon,     "
-        "       channum,   program.chanid, seriesid,      programid "
-        "FROM program, channel "
-        "WHERE program.chanid = channel.chanid ";
-
-    querystr += QString(
-        "AND channel.chanid = '%1' "
-        "AND starttime %3 '%2' "
-        "ORDER BY starttime %4 "
-        "LIMIT 1")
-        .arg(chanid).arg(starttime).arg(compare).arg(sortorder);
-
-    MSqlQuery sqlquery(MSqlQuery::InitCon());
-
-    sqlquery.prepare(querystr);
-
-    if (sqlquery.exec() && sqlquery.isActive() && sqlquery.size() > 0)
+    // Try to get the program info
+    if (!query.exec() && !query.isActive())
     {
-        if (sqlquery.next())
-        {
-            title = QString::fromUtf8(sqlquery.value(0).toString());
-            subtitle = QString::fromUtf8(sqlquery.value(1).toString());
-            desc = QString::fromUtf8(sqlquery.value(2).toString());
-            category = QString::fromUtf8(sqlquery.value(3).toString());
-            starttime =  sqlquery.value(4).toString();
-            endtime = sqlquery.value(5).toString();
-            callsign = sqlquery.value(6).toString();
-            iconpath = sqlquery.value(7).toString();
-            channelname = sqlquery.value(8).toString();
-            chanidStr = sqlquery.value(9).toString();
-            seriesid = sqlquery.value(10).toString();
-            programid = sqlquery.value(11).toString();
-        }
+        MythContext::DBError("GetNextProgram -- get program info", query);
     }
-    else
+    else if (query.next())
     {
-        // Couldn't get program info, so get the channel info and clear 
-        // everything else.
-        starttime = "";
-        endtime = "";
-        title = "";
-        subtitle = "";
-        desc = "";
-        category = "";
-        seriesid = "";
-        programid = "";
+        title     = QString::fromUtf8(query.value(0).toString());
+        subtitle  = QString::fromUtf8(query.value(1).toString());
+        desc      = QString::fromUtf8(query.value(2).toString());
+        category  = QString::fromUtf8(query.value(3).toString());
+        starttime = query.value(4).toString();
+        endtime   = query.value(5).toString();
+        callsign  = query.value(6).toString();
+        iconpath  = query.value(7).toString();
+        channum   = query.value(8).toString();
+        seriesid  = query.value(9).toString();
+        programid = query.value(10).toString();
 
-        querystr = QString(
-            "SELECT channum, callsign, icon, chanid "
-            "FROM channel "
-            "WHERE chanid = %1").arg(chanid);
-        sqlquery.prepare(querystr);
-
-        if (sqlquery.exec() && sqlquery.isActive() && sqlquery.size() > 0 && 
-            sqlquery.next())
-        {
-            channelname = sqlquery.value(0).toString();
-            callsign = sqlquery.value(1).toString();
-            iconpath = sqlquery.value(2).toString();
-            chanidStr = sqlquery.value(3).toString();
-        }
+        return;
     }
 
+    // Couldn't get program info, so get the channel info instead
+    query.prepare(
+        "SELECT channum, callsign, icon "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetNextProgram -- get channel info", query);
+    }
+    else if (query.next())
+    {
+        channum  = query.value(0).toString();
+        callsign = query.value(1).toString();
+        iconpath = query.value(2).toString();
+    }
 }
 
 bool TVRec::GetChannelInfo(uint &chanid, uint &sourceid,
