@@ -3298,7 +3298,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             {
                 PauseVideo();
 
-                if (fftime >= 5 && !ringBuffer->isDVD())
+                if (fftime >= 5)
                     DoFastForward();
 
                 if (eof)
