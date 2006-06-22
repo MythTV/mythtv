@@ -1490,11 +1490,13 @@ bool PlaybackBox::FillList()
 
                 if ((viewMask & VIEW_TITLES)) // Show titles
                 {
-                    progLists[p->title].prepend(p);
                     sTitle = sortTitle(p->title, viewMask, titleSort,
                             p->recpriority);
                     sTitle = sTitle.lower();
-                    sortedList[sTitle] = p->title;
+
+                    if (!sortedList.contains(sTitle))
+                        sortedList[sTitle] = p->title;
+                    progLists[sortedList[sTitle]].prepend(p);
                 } 
 
                 if ((viewMask & VIEW_RECGROUPS) &&
