@@ -51,9 +51,9 @@ int GetNumberOfXineramaScreens(void)
     return nr_xinerama_screens;
 }
 
+#ifdef Q_WS_X11
 Display *MythXOpenDisplay(void)
 {
-#ifdef Q_WS_X11
     QString dispStr = gContext->GetX11Display();
     const char *dispCStr = NULL;
     if (!dispStr.isEmpty())
@@ -67,10 +67,8 @@ Display *MythXOpenDisplay(void)
         VERBOSE(VB_IMPORTANT, "MythXOpenDisplay() failed");
 
     return disp;
-#else
-    return NULL;
-#endif
 }
+#endif
 
 // Everything below this line is only compiled if using X11
 
