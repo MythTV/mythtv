@@ -279,7 +279,7 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
     bool bEraseDVDRW = false;
     bool bDoBurn = false;
     QString saveDirectory;
-    int mediaType;
+    int mediaType = 0;
 
     QDomNodeList nodeList = doc.elementsByTagName("options");
     if (nodeList.count() == 1)
@@ -714,7 +714,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     // Open recording
     VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
 
-    if (av_open_input_file(&inputFC, inFile.ascii(), NULL, 0, NULL) != 0)
+    if (ret = av_open_input_file(&inputFC, inFile.ascii(), NULL, 0, NULL) != 0)
     {
         VERBOSE(VB_JOBQUEUE,
                 QString("Couldn't open input file, error #%1").arg(ret));
@@ -722,7 +722,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     }
 
     // Getting stream information
-    if (av_find_stream_info(inputFC) < 0)
+    if (ret = av_find_stream_info(inputFC) < 0)
     {
         VERBOSE(VB_JOBQUEUE,
                 QString("Couldn't get stream info, error #%1").arg(ret));
@@ -1162,7 +1162,7 @@ int main(int argc, char **argv)
     QString inFile;
     QString outFile;
     QString logFile;
-    int lenMethod;
+    int lenMethod = 0;
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)

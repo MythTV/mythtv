@@ -21,4 +21,4 @@ SOURCES += main.cpp
 
 LIBS += -L$${PREFIX}/lib
 LIBS += -lmyth-$$LIBVERSION -lmythtv-$$LIBVERSION 
-LIBS +=  -lmythui-$$LIBVERSION -lmythfreemheg-$$LIBVERSION
+LIBS +=  -lmythui-$$LIBVERSION -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
