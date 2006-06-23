@@ -50,7 +50,7 @@ class FreeboxRecorder : public DTVRecorder
   private:
     FreeboxRecorderImpl *_impl;
     char                 _abort_rtsp; ///< Used to abort rtsp session
-    bool                 _abort_recording; ///< Used to request abort StartRecording
+    bool                 _abort_recording; ///< Used to request abort
 
   private:
     FreeboxRecorder& operator=(const FreeboxRecorder&); //< avoid default impl

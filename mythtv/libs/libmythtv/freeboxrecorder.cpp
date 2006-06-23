@@ -4,12 +4,16 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// Qt headers
 #include <qwaitcondition.h>
 #include <qmutex.h>
 
+// Live555 headers
 #include <BasicUsageEnvironment.hh>
 #include <MediaSession.hh>
 #include <RTSPClient.hh>
+
+// MythTV headers
 #include "mpeg/mpegstreamdata.h"
 #include "mpeg/streamlisteners.h"
 #include "mpeg/tspacket.h"
@@ -47,7 +51,7 @@ void FreeboxData::SubsessionAfterPlayingCB(void)
     MediaSession& session = subsession->parentSession();
     MediaSubsessionIterator iter(session);
 
-    while (subsession = iter.next())
+    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
     {
         if (subsession->sink)
             return;
@@ -76,6 +80,7 @@ class FreeboxRecorderImpl : public MPEGSingleProgramStreamListener
                         FreeboxChannel  *channel) :
         _rec(recorder),
         _streamData(1, true),
+        _curChanInfo(channel->GetCurrentChanInfo()),
         _live_env(NULL),
         _rtsp_client(NULL),
         _session(NULL),
@@ -99,7 +104,7 @@ class FreeboxRecorderImpl : public MPEGSingleProgramStreamListener
 
     // Gets
     FreeboxChannelInfo GetCurrentChanInfo(void) const
-        { return _channel->GetCurrentChanInfo(); }
+        { return _curChanInfo; }
     MPEGStreamData&    StreamData(void)
         { return _streamData; }
     UsageEnvironment*  GetLiveEnv(void)
@@ -113,6 +118,8 @@ class FreeboxRecorderImpl : public MPEGSingleProgramStreamListener
     void SetLiveEnv(UsageEnvironment *env) { _live_env    = env;     }
     void SetRTSPClient(RTSPClient *client) { _rtsp_client = client;  }
     void SetSession(MediaSession *session) { _session     = session; }
+    void SetChannelInfo(const FreeboxChannelInfo& chanInfo)
+        { _curChanInfo = chanInfo; }
 
   public: // MPEGSingleProgramStreamListener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
@@ -121,6 +128,7 @@ class FreeboxRecorderImpl : public MPEGSingleProgramStreamListener
   private:
     FreeboxRecorder    *_rec;
     MPEGStreamData      _streamData;
+    FreeboxChannelInfo  _curChanInfo;
     UsageEnvironment   *_live_env;
     RTSPClient         *_rtsp_client;
     MediaSession       *_session;
@@ -157,7 +165,7 @@ void FreeboxRecorderImpl::Close(void)
     // Ensure RTSP cleanup, remove old RTSP session
     MediaSubsessionIterator iter(*_session);
     MediaSubsession *subsession;
-    while (subsession = iter.next())
+    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
     {
         Medium::close(subsession->sink);
         subsession->sink = NULL;
@@ -194,9 +202,11 @@ void FreeboxRecorder::Close(void)
     _impl->Close();
 }
 
-void FreeboxRecorder::ChannelChanged(const FreeboxChannelInfo&)
+void FreeboxRecorder::ChannelChanged(const FreeboxChannelInfo &chanInfo)
 {
-    // Channel change, we need to close current RTSP flow, and open a new one
+    // keep a copy to avoid deadlocks (TODO FIXME why is this needed?)
+    _impl->SetChannelInfo(chanInfo);
+    // Channel changed, we need to close current RTSP flow, and open a new one
     ResetEventLoop();
 }
 
@@ -308,7 +318,7 @@ bool FreeboxRecorder::StartRtsp(void)
     MediaSubsession *subsession;
     bool madeProgress = false;
 
-    while (subsession = iter.next())
+    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
     {
         if (!subsession->initiate(-1))
         {
@@ -363,7 +373,7 @@ bool FreeboxRecorder::StartRtsp(void)
     madeProgress = false;
     iter.reset();
 
-    while (subsession = iter.next())
+    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
     {
         if (!subsession->readSource())
             continue; // was not initiated
