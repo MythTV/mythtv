@@ -636,8 +636,8 @@ void MythSocket::StartReadyReadThread(void)
             int ret = pipe(m_readyread_pipe);
             assert(ret >= 0);
 
-            pthread_create(&m_readyread_thread, NULL, readyReadThread, NULL);
             m_readyread_run = true;
+            pthread_create(&m_readyread_thread, NULL, readyReadThread, NULL);
 
             atexit(ShutdownReadyReadThread);
         }
@@ -683,7 +683,6 @@ void *MythSocket::readyReadThread(void *)
     int maxfd;
     bool found;
 
-    m_readyread_run = true;
     while (m_readyread_run)
     {
         m_readyread_lock.lock();
