@@ -396,6 +396,11 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         {
             VERBOSE(VB_GENERAL, LOC + "readStringList: Error, timeout.");
             close();
+            if (m_cb)
+            {
+                m_cb->connectionClosed(this);
+                VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
+            }
             return false;
         }
         else if (quickTimeout && elapsed >= 7000)
@@ -403,6 +408,11 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
             VERBOSE(VB_GENERAL, LOC + 
                     "readStringList: Error, timeout (quick).");
             close();
+            if (m_cb)
+            {
+                m_cb->connectionClosed(this);
+                VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
+            }
             return false;
         }
 
