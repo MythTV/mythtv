@@ -834,10 +834,38 @@ class titleSort
 
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
+            if (a.prog->sortTitle != b.prog->sortTitle)
+            {
+                if (m_reverse)
+                    return (a.prog->sortTitle < b.prog->sortTitle);
+                else
+                    return (a.prog->sortTitle > b.prog->sortTitle);
+            }
+
+            int finalA = a.prog->recpriority + a.prog->recTypeRecPriority;
+            int finalB = b.prog->recpriority + b.prog->recTypeRecPriority;
+            if (finalA != finalB)
+            {
+                if (m_reverse)
+                    return finalA > finalB;
+                else
+                    return finalA < finalB;
+            }
+
+            int typeA = RecTypePriority(a.prog->recType);
+            int typeB = RecTypePriority(b.prog->recType);
+            if (typeA != typeB)
+            {
+                if (m_reverse)
+                    return typeA < typeB;
+                else
+                    return typeA > typeB;
+            }
+
             if (m_reverse)
-                return (a.prog->sortTitle < b.prog->sortTitle);
+                return a.prog->recordid < b.prog->recordid;
             else
-                return (a.prog->sortTitle > b.prog->sortTitle);
+                return a.prog->recordid > b.prog->recordid;
         }
 
     private:
@@ -852,30 +880,30 @@ class programRecPrioritySort
 
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
-            int finalA = a.prog->recpriority + 
-                         a.prog->recTypeRecPriority;
-            int finalB = b.prog->recpriority + 
-                         b.prog->recTypeRecPriority;
-
-            if (finalA == finalB)
+            int finalA = a.prog->recpriority + a.prog->recTypeRecPriority;
+            int finalB = b.prog->recpriority + b.prog->recTypeRecPriority;
+            if (finalA != finalB)
             {
-                int typeA = RecTypePriority(a.prog->recType);
-                int typeB = RecTypePriority(b.prog->recType);
-                if (typeA == typeB)
-                    if (m_reverse)
-                        return (a.prog->recordid < b.prog->recordid);
-                    else
-                        return (a.prog->recordid > b.prog->recordid);
-
                 if (m_reverse)
-                    return (typeA < typeB);
+                    return finalA > finalB;
                 else
-                    return (typeA > typeB);
+                    return finalA < finalB;
             }
+
+            int typeA = RecTypePriority(a.prog->recType);
+            int typeB = RecTypePriority(b.prog->recType);
+            if (typeA != typeB)
+            {
+                if (m_reverse)
+                    return typeA < typeB;
+                else
+                    return typeA > typeB;
+            }
+
             if (m_reverse)
-                return (finalA > finalB);
+                return a.prog->recordid < b.prog->recordid;
             else
-                return (finalA < finalB);
+                return a.prog->recordid > b.prog->recordid;
         }
 
     private:
@@ -892,16 +920,28 @@ class programRecTypeSort
         {
             int typeA = RecTypePriority(a.prog->recType);
             int typeB = RecTypePriority(b.prog->recType);
-            if (typeA == typeB)
+            if (typeA != typeB)
+            {
                 if (m_reverse)
-                    return (a.prog->sortTitle < b.prog->sortTitle);
+                    return (typeA < typeB);
                 else
-                    return (a.prog->sortTitle > b.prog->sortTitle);
+                    return (typeA > typeB);
+            }
+
+            int finalA = a.prog->recpriority + a.prog->recTypeRecPriority;
+            int finalB = b.prog->recpriority + b.prog->recTypeRecPriority;
+            if (finalA != finalB)
+            {
+                if (m_reverse)
+                    return finalA > finalB;
+                else
+                    return finalA < finalB;
+            }
 
             if (m_reverse)
-                return (typeA < typeB);
+                return a.prog->recordid < b.prog->recordid;
             else
-                return (typeA > typeB);
+                return a.prog->recordid > b.prog->recordid;
         }
 
     private:
