@@ -779,6 +779,7 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
         p->rectype == kFindWeeklyRecord)
         showinglist = &recordidlistmap[p->recordid];
 
+    RecStatusType oldstatus = p->recstatus;
     p->recstatus = rsLaterShowing;
 
     RecIter j = showinglist->begin();
@@ -789,7 +790,8 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
             continue;
 
         if (q->recstatus != rsEarlierShowing &&
-            q->recstatus != rsLaterShowing)
+            q->recstatus != rsLaterShowing &&
+            q->recstatus != rsUnknown)
             continue;
         if (!p->IsSameTimeslot(*q))
         {
@@ -818,7 +820,7 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
         return true;
     }
 
-    p->recstatus = rsWillRecord;
+    p->recstatus = oldstatus;
     return false;
 }
 
@@ -870,6 +872,9 @@ void Scheduler::MoveHigherRecords(void)
             continue;
 
         PrintRec(p, "  ?");
+
+        if (TryAnotherShowing(p))
+            continue;
 
         BackupRecStatus();
         p->recstatus = rsWillRecord;
