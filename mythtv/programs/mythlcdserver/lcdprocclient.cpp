@@ -475,6 +475,22 @@ void LCDProcClient::init()
     }
 }
 
+QString LCDProcClient::expandString(const QString &aString)
+{
+    if (pVersion != LCD_VERSION_5)
+        return aString;
+
+    QString bString;
+
+    // if version 5 then white space seperate the list of characters
+    for (uint x = 0; x < aString.length(); x++)
+    {
+        bString += aString.at(x) + QString(" ");
+    }
+
+    return bString;
+}
+
 void LCDProcClient::loadSettings()
 {
     if (!lcd_ready)
@@ -502,11 +518,11 @@ void LCDProcClient::loadSettings()
 
     if (old_keystring != "")
     {
-        aString = "client_del_key " + lcd_keystring;
+        aString = "client_del_key " + expandString(old_keystring);
         sendToServer(aString);
     }
     
-    aString = "client_add_key " + lcd_keystring;
+    aString = "client_add_key " + expandString(lcd_keystring);
     sendToServer(aString);
  
     setHeartbeat ("Time", lcd_heartbeaton);

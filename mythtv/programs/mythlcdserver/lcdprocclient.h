@@ -108,6 +108,7 @@ class LCDProcClient : public QObject
     void setPriority(const QString &screen, PRIORITY priority);
 
     void setHeartbeat (const QString &screen, bool onoff);
+    QString expandString(const QString &aString);
 
     void init();
     void assignScrollingList(QStringList theList, QString theScreen, 
