@@ -65,7 +65,7 @@ extern "C" {
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm);
 static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
-
+static int calc_hue_base(const QString &adaptor_name);
 
 /** \class  VideoOutputXv
  * Supports common video output methods used with %X11 Servers.
@@ -751,6 +751,11 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
         return false;
     }
 
+    VERBOSE(VB_IMPORTANT, LOC + QString("XvMC Adaptor Name: '%1'")
+            .arg(adaptor_name));
+
+    xv_hue_base = calc_hue_base(adaptor_name);
+
     InstallXErrorHandler(XJ_disp);
 
     // create XvMC buffers
@@ -818,13 +823,7 @@ bool VideoOutputXv::InitXVideo()
     VERBOSE(VB_IMPORTANT, LOC + QString("XVideo Adaptor Name: '%1'")
             .arg(adaptor_name));
 
-    xv_hue_base = 0; //< nVidia normal
-    if ((adaptor_name == "ATI Radeon Video Overlay") ||
-        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
-        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */))
-    {
-        xv_hue_base = 50;
-    }
+    xv_hue_base = calc_hue_base(adaptor_name);
 
     InstallXErrorHandler(XJ_disp);
 
@@ -3425,4 +3424,16 @@ CodecID myth2av_codecid(MythCodecID codec_id,
             break;
     } // switch(codec_id)
     return ret;
+}
+
+static int calc_hue_base(const QString &adaptor_name)
+{
+    if ((adaptor_name == "ATI Radeon Video Overlay") ||
+        (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
+        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */))
+    {
+        return 50;
+    }
+
+    return 0; //< nVidia normal
 }
