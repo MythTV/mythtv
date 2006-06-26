@@ -2405,7 +2405,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (prbuffer->InDVDMenuOrStillFrame())
                     UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
                                          osd_general_timeout);
-                else if (prbuffer->DVD()->NumPartsInTitle() > 2)
+                else if (!prbuffer->DVD()->StartOfTitle())
                 {
                     nvp->ChangeDVDTrack(0);
                     UpdateOSDSeekMessage(tr("Previous Chapter"),
@@ -2443,13 +2443,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     UpdateOSDSeekMessage(tr("Skip Still Frame"),
                             osd_general_timeout);
                 }
-                else if (prbuffer->DVD()->NumPartsInTitle() > 2)
+                else if (!prbuffer->DVD()->EndOfTitle()) 
                 {
                     nvp->ChangeDVDTrack(1);
                     UpdateOSDSeekMessage(tr("Next Chapter"),
                             osd_general_timeout);
                 }
-                else
+                else if (!prbuffer->DVD()->NumMenuButtons())
                 {
                     uint titleLength = prbuffer->DVD()->GetTotalTimeOfTitle();
                     uint chapterLength = prbuffer->DVD()->GetChapterLength();

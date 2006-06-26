@@ -40,7 +40,9 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       menupktpts(0), curAudioTrack(0),
       curSubtitleTrack(0), autoselectaudio(true),
       autoselectsubtitle(true), 
-      jumptotitle(true), parent(0)
+      jumptotitle(true), repeatseek(false),
+      seekpos(0), seekwhence(0),
+      parent(0)
 {
 }
 
@@ -61,7 +63,15 @@ void DVDRingBufferPriv::close(void)
 
 long long DVDRingBufferPriv::Seek(long long pos, int whence)
 {
-    dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
+    dvdnav_status_t dvdRet = dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
+    if (dvdRet == DVDNAV_STATUS_ERR && !repeatseek)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("Seek failed to jump to position %1").arg(pos) +
+                            " Will try and seek to this position at the next cell change");
+        repeatseek = true;
+        seekpos = pos;
+        seekwhence = whence;
+    }
     gotStop = false;
     return GetReadPosition();
 }
@@ -263,6 +273,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     autoselectaudio = true;
                     autoselectsubtitle = true;
                 }
+
+                if (repeatseek)
+                {
+                    Seek(seekpos, seekwhence);
+                    repeatseek = false;
+                }       
 
                 if (blockBuf != dvdBlockWriteBuf)
                 {

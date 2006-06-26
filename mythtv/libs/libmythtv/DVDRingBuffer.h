@@ -60,6 +60,8 @@ class DVDRingBufferPriv
 
     bool JumpToTitle(void) { return jumptotitle; }
     double GetFrameRate(void);
+    bool StartOfTitle(void) { return (part == 0); }
+    bool EndOfTitle(void)   { return (!titleParts) || (part == (titleParts - 1)); }
     
     // commands
     bool OpenFile(const QString &filename);
@@ -142,6 +144,9 @@ class DVDRingBufferPriv
     const char     *dvdname;
     const char     *serialnumber;
     bool           jumptotitle;
+    bool           repeatseek;
+    long long      seekpos;
+    int            seekwhence;
 
     NuppelVideoPlayer *parent;
 
