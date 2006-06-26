@@ -2811,7 +2811,9 @@ bool fillData(QValueList<Source> &sourcelist)
 
     need_post_grab_proc = false;
 
-    for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
+    for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
+    {
+        channel_update_run = false;
         VERBOSE(VB_GENERAL, sidStr.arg((*it).id)
                                   .arg((*it).name)
                                   .arg((*it).xmltvgrabber));
