@@ -138,15 +138,18 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
 
         if (m_sST == "ssdp:all")
             ProcessDevice( pSocket, &device );
+    }
+    else
+    {
+        // ------------------------------------------------------------------
+        // Send Device/Service specific response.
+        // ------------------------------------------------------------------
 
-        return;
+        SendMsg( pSocket, m_sST, m_sUDN );
     }
 
-    // ----------------------------------------------------------------------
-    // Send Device/Service specific response.
-    // ----------------------------------------------------------------------
-
-    SendMsg( pSocket, m_sST, m_sUDN );
+    delete pSocket;
+    pSocket = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
