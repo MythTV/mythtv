@@ -563,15 +563,45 @@ void HttpStatus::GetProgramDetails( HTTPRequest *pRequest )
         return;
     }
     
-    // -=>TODO: Add support for getting Recorded Program Info
-    
     // ----------------------------------------------------------------------
-    // Read Recording From Database
+    // -=>TODO: Add support for getting Recorded Program Info
+    // ----------------------------------------------------------------------
+    
+    // Build add'l SQL statement for Program Listing
+
+    MSqlBindings bindings;
+    QString      sSQL = "WHERE program.chanid = :ChanId "
+                          "AND program.starttime = :StartTime ";
+
+    bindings[":ChanId"   ] = sChanId;
+    bindings[":StartTime"] = dtStart.toString( Qt::ISODate );
+
+    // Get all Pending Scheduled Programs
+
+    RecList      recList;
+    ProgramList  schedList;
+
+    if (m_pSched)
+        m_pSched->getAllPending( &recList);
+
+    // ----------------------------------------------------------------------
+    // We need to convert from a RecList to a ProgramList  
+    // (ProgramList will autodelete ProgramInfo pointers)
     // ----------------------------------------------------------------------
 
-    ProgramInfo *pInfo = ProgramInfo::GetProgramAtDateTime( sChanId, 
-                                                            dtStart,
-                                                            false    );
+    for (RecIter itRecList =  recList.begin();
+                 itRecList != recList.end();   itRecList++)
+    {
+        schedList.append( *itRecList );
+    }
+
+    // ----------------------------------------------------------------------
+
+    ProgramList progList;
+
+    progList.FromProgram( sSQL, bindings, schedList );
+
+    ProgramInfo *pInfo = progList.first();
 
     if (pInfo==NULL)
     { 
@@ -1267,7 +1297,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     { 
         long long mTotal =  0, mUsed =  0, mAvail =  0; 
         long long gTotal =  0, gUsed =  0, gAvail =  0; 
-        QString hosts = "_local_"; 
+        QString hosts = "_local"; 
         QMap <QString, bool> backendsCounted; 
         QString encoderHost; 
         QMap<int, EncoderLink *>::Iterator eit; 
@@ -1312,7 +1342,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         storage.setAttribute("_total_free" , (int)(gAvail>>10)); 
  
         if (hosts != "") 
-            hosts += ",_total_"; 
+            hosts += ",_total"; 
         storage.setAttribute("slaves", hosts); 
     } 
 
@@ -1532,6 +1562,7 @@ void HttpStatus::FillChannelInfo( QDomElement &channel,
 */
 
         channel.setAttribute( "chanId"     , pInfo->chanid      );
+        channel.setAttribute( "chanNum"    , pInfo->chanstr     );
         channel.setAttribute( "callSign"   , pInfo->chansign    );
 //        channel.setAttribute( "iconURL"    , sIconURL           );
         channel.setAttribute( "channelName", pInfo->channame    );
@@ -1608,7 +1639,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "    margin-bottom:30px;\r\n"
        << "    -moz-border-radius:8px 0px 0px 8px;\r\n"
        << "  }\r\n"
-       << "  div#schedule a {\r\n"
+       << "  div.schedule a {\r\n"
        << "    display:block;\r\n"
        << "    color:#000;\r\n"
        << "    text-decoration:none;\r\n"
@@ -1616,17 +1647,17 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
        << "    border:thin solid #fff;\r\n"
        << "    width:350px;\r\n"
        << "  }\r\n"
-       << "  div#schedule a span {\r\n"
+       << "  div.schedule a span {\r\n"
        << "    display:none;\r\n"
        << "  }\r\n"
-       << "  div#schedule a:hover {\r\n"
+       << "  div.schedule a:hover {\r\n"
        << "    background-color:#F4F4F4;\r\n"
        << "    border-top:thin solid #000;\r\n"
        << "    border-bottom:thin solid #000;\r\n"
        << "    border-left:thin solid #000;\r\n"
        << "    cursor:default;\r\n"
        << "  }\r\n"
-       << "  div#schedule a:hover span {\r\n"
+       << "  div.schedule a:hover span {\r\n"
        << "    display:block;\r\n"
        << "    position:absolute;\r\n"
        << "    background-color:#F4F4F4;\r\n"
@@ -1852,7 +1883,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
        << " that " << (nNumRecordings == 1 ? "is" : "are") 
        << " scheduled for recording:\r\n";
 
-    os << "    <div id=\"schedule\">\r\n";
+    os << "    <div class=\"schedule\">\r\n";
 
     // Iterate through all scheduled programs
 
@@ -1988,7 +2019,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
                          " " + gContext->GetSetting("TimeFormat", "h:mm AP");
 
         os << "    Jobs currently in Queue or recently ended:\r\n<br />"
-           << "    <div id=\"schedule\">\r\n";
+           << "    <div class=\"schedule\">\r\n";
 
         
         QDomNode node = jobs.firstChild();
@@ -2150,7 +2181,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
         if (!e.isNull())
         {
-            QString slaves = e.attribute("slaves", "_local_");
+            QString slaves = e.attribute("slaves", "_local");
             QStringList tokens = QStringList::split(",", slaves);
 
             os << "      Disk Usage:<br />\r\n";
@@ -2158,20 +2189,20 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
             for (unsigned int i = 0; i < tokens.size(); i++)
             {
-                int nFree = e.attribute(tokens[i] + "free" , "0" ).toInt();
-                int nTotal= e.attribute(tokens[i] + "total", "0" ).toInt();
-                int nUsed = e.attribute(tokens[i] + "used" , "0" ).toInt();
+                int nFree = e.attribute(tokens[i] + "_free" , "0" ).toInt();
+                int nTotal= e.attribute(tokens[i] + "_total", "0" ).toInt();
+                int nUsed = e.attribute(tokens[i] + "_used" , "0" ).toInt();
 
-                if (slaves == "_local_")
+                if (slaves == "_local")
                 {
                     // do nothing
                 }
-                else if (tokens[i] == "_local_")
+                else if (tokens[i] == "_local")
                 {
                     os << "        <li>Master Backend:\r\n"
                        << "          <ul>\r\n";
                 }
-                else if (tokens[i] == "_total_")
+                else if (tokens[i] == "_total")
                 {
                     os << "        <li>Total Disk Space:\r\n"
                        << "          <ul>\r\n";
