@@ -43,9 +43,10 @@ bool CEvent::SetEvent   ()
 {
     m_mutex.lock();
     m_bSignaled = true;
-    m_mutex.unlock();
 
     m_wait.wakeAll();
+
+    m_mutex.unlock();
 
     return( true );
 }
@@ -82,10 +83,19 @@ bool CEvent::IsSignaled()
 
 bool CEvent::WaitForEvent( unsigned long time /*= ULONG_MAX */ ) 
 {
-    if (IsSignaled())
-        return( true );
+    m_mutex.lock(); 
 
-    return( m_wait.wait( time ) );
+    if (m_bSignaled) 
+    { 
+        m_mutex.unlock(); 
+        return true; 
+    }    
+    
+    bool ret = m_wait.wait(&m_mutex, time); 
+    
+    m_mutex.unlock(); 
+    
+    return ret;
 }
 
 /////////////////////////////////////////////////////////////////////////////
