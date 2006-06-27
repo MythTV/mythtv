@@ -61,6 +61,13 @@ void DVDRingBufferPriv::close(void)
     }            
 }
 
+bool DVDRingBufferPriv::IsInMenu(void) const
+{
+    return ((title == 0) || 
+            ((pgLength/90000) < 30) ||
+            (NumMenuButtons() > 0));
+}
+
 long long DVDRingBufferPriv::Seek(long long pos, int whence)
 {
     dvdnav_status_t dvdRet = dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
@@ -849,7 +856,7 @@ void DVDRingBufferPriv::ClearMenuSPUParameters(void)
     hl_width = hl_height = 0;
 }
 
-int DVDRingBufferPriv::NumMenuButtons(void)
+int DVDRingBufferPriv::NumMenuButtons(void) const
 {
     pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
     int numButtons = pci->hli.hl_gi.btn_ns;
@@ -977,6 +984,14 @@ double DVDRingBufferPriv::GetFrameRate(void)
         dvdfps = 29.97;
 
     return dvdfps;
+}
+
+bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
+{
+    if ((tmpcellid == cellid) && (tmpvobid == vobid))
+        return true;
+
+    return false;
 }
 
 /** \fn DVDRingBufferPriv::guess_palette(uint32_t, uint8_t, uint8_t)

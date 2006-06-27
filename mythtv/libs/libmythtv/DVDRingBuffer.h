@@ -30,7 +30,7 @@ class DVDRingBufferPriv
     // gets
     int  GetTitle(void) const { return title;        }
     int  GetPart(void)  const { return part;         }
-    bool IsInMenu(void) const { return (title == 0); }
+    bool IsInMenu(void) const; 
     bool IsOpen(void)   const { return dvdnav;       }
     long long GetReadPosition(void);
     long long GetTotalReadPosition(void) { return titleLength; }
@@ -62,6 +62,9 @@ class DVDRingBufferPriv
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (part == 0); }
     bool EndOfTitle(void)   { return (!titleParts) || (part == (titleParts - 1)); }
+    int GetCellID(void) { return cellid; }
+    int GetVobID(void)  { return vobid; }
+    bool IsSameChapter(int tmpcellid, int tmpvobid);
     
     // commands
     bool OpenFile(const QString &filename);
@@ -82,7 +85,7 @@ class DVDRingBufferPriv
     void MoveButtonUp(void);
     void MoveButtonDown(void);
     void ActivateButton(void);
-    int NumMenuButtons(void);
+    int NumMenuButtons(void) const;
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
     uint GetCurrentTime(void);
     void  SetTrack(uint type, int trackNo);

@@ -689,11 +689,13 @@ bool DecoderBase::GetWaitForChange(void)
 
 void DecoderBase::ChangeDVDTrack(bool ffw)
 {
-    bool result = true;
     if (!ringBuffer->isDVD())
         return;
-
-    uint prevcellstart = ringBuffer->DVD()->GetCellStart();
+    
+    bool result = true;
+    int prevcellstart = ringBuffer->DVD()->GetCellStart();
+    int prevcellid = ringBuffer->DVD()->GetCellID();
+    int prevvobid  = ringBuffer->DVD()->GetVobID();
 
     if (ffw)
         result = ringBuffer->DVD()->nextTrack();
@@ -704,8 +706,13 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
     {
         if ((prevcellstart == 0 && ffw) || (prevcellstart != 0))
         {
-            while (prevcellstart == ringBuffer->DVD()->GetCellStart())
+            int limit = 0;
+            while (ringBuffer->DVD()->IsSameChapter(prevcellid, prevvobid)
+                    && limit < 50)
+            {
+                limit++;
                 usleep(10000);
+            }
         } 
 
         uint elapsed = ringBuffer->DVD()->GetCellStart();
