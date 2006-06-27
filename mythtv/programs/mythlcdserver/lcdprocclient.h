@@ -24,32 +24,28 @@ class LCDProcClient : public QObject
     LCDProcClient(LCDServer *lparent);
 
     void customEvent(QCustomEvent  *e);
-     
+
    ~LCDProcClient();
 
     bool SetupLCD(void);
-    void loadSettings();   //reload the settings from the db
-    
+    void reset(void);
+
     void setStartupMessage(QString msq, uint messagetime);
-    
+
     // Used to actually connect to an LCD device       
     bool connectToHost(const QString &hostname, unsigned int port);
 
     void switchToTime();
-    
     void switchToMusic(const QString &artist, const QString &album, const QString &track);
     void setMusicProgress(QString time, float generic_progress);
     void setMusicRepeat(int repeat);
     void setMusicShuffle(int shuffle);
     void setLevels(int numbLevels, float *values);
-    
     void switchToChannel(QString channum = "", QString title = "", 
                          QString subtitle = "");
     void setChannelProgress(float percentViewed);
-    
     void switchToMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name = "",
                       bool popMenu = true);
-    
     void switchToGeneric(QPtrList<LCDTextItem> *textItems);
     void setGenericProgress(bool busy, float generic_progress);
 
@@ -57,14 +53,15 @@ class LCDProcClient : public QObject
     void setVolumeLevel(float volume_level);
 
     void switchToNothing();
-        
+
     void shutdown();
+    void removeWidgets();
     void updateLEDs(int mask);
     void stopAll(void);
-    
+
     int  getLCDWidth(void) { return lcdWidth; }
     int  getLCDHeight(void) { return lcdHeight; }
-    
+
   private slots: 
     void veryBadThings(int);       // Communication Errors
     void serverSendingData();      // Data coming back from LCDd
@@ -72,12 +69,14 @@ class LCDProcClient : public QObject
     void checkConnections();       // check connections to LCDd and mythbackend
                                    // every 10 seconds
 
+    void dobigclock(bool);         // Large display
+    void dostdclock();             // Small display
     void outputTime();             // Fire from a timer
     void outputMusic();            // Short timer (equalizer)
     void outputChannel();          // Longer timer (progress bar)
     void outputGeneric();          // Longer timer (progress bar)
     void outputVolume();
-    void outputRecStatus();        
+    void outputRecStatus();
     void scrollMenuText();         // Scroll the menu items if need be
     void beginScrollingMenuText(); // But only after a bit of time has gone by
     void unPopMenu();              // Remove the Pop Menu display
@@ -86,7 +85,7 @@ class LCDProcClient : public QObject
     void removeStartupMessage(void);
     void beginScrollingWidgets(void);
     void scrollWidgets(void);
-          
+
   private:
     void outputCenteredText(QString theScreen, QString theText,
                             QString widget = "topWidget", int row = 1);
@@ -95,13 +94,13 @@ class LCDProcClient : public QObject
                         QString widget = "topWidget", int row = 1);
     void outputRightText(QString theScreen, QString theText,
                          QString widget = "topWidget", int row = 1);
-    
+
     void outputScrollerText(QString theScreen, QString theText,
                          QString widget = "scroller", int top = 1, int bottom = 1);
-    
+
     QStringList formatScrollerText(const QString &text);
     void outputText(QPtrList<LCDTextItem> *textItems);
-    
+
     void sendToServer(const QString &someText);
 
     enum PRIORITY {TOP, URGENT, HIGH, MEDIUM, LOW, OFF};
@@ -111,6 +110,8 @@ class LCDProcClient : public QObject
     QString expandString(const QString &aString);
 
     void init();
+    void loadSettings();   //reload the settings from the db
+
     void assignScrollingList(QStringList theList, QString theScreen, 
                              QString theWidget = "topWidget", int theRow = 1);
 
@@ -118,7 +119,7 @@ class LCDProcClient : public QObject
     void assignScrollingWidgets(QString theText, QString theScreen,
                              QString theWidget = "topWidget", int theRow = 1);
     void formatScrollingWidgets(void);
-                             
+
     void startTime();
     void startMusic(QString artist, QString album, QString track);
     void startChannel(QString channum, QString title, QString subtitle);
@@ -127,7 +128,7 @@ class LCDProcClient : public QObject
                    bool popMenu);
     void startVolume(QString app_name);
     void showStartupMessage(void);
-    
+
     QString activeScreen;
 
     QSocket *socket;
@@ -141,21 +142,21 @@ class LCDProcClient : public QObject
     QTimer *recStatusTimer;
     QTimer *scrollListTimer;
     QTimer *showMessageTimer;
-    
+
     void setWidth(unsigned int);
     void setHeight(unsigned int);
     void setCellWidth(unsigned int);
     void setCellHeight(unsigned int);
     void setVersion(const QString &, const QString &);
     void describeServer();
-    
+
     unsigned int prioTop;
     unsigned int prioUrgent;
     unsigned int prioHigh;
     unsigned int prioMedium;
     unsigned int prioLow;
     unsigned int prioOff;
-     
+
     unsigned int lcdWidth;
     unsigned int lcdHeight;
     unsigned int cellWidth;
@@ -164,7 +165,7 @@ class LCDProcClient : public QObject
     QString serverVersion;
     QString protocolVersion;
     int pVersion;
-        
+
     float EQlevels[10];
     float progress;
     /** true if the generic progress indicator is a busy
@@ -197,7 +198,7 @@ class LCDProcClient : public QObject
     QString scrollListScreen, scrollListWidget;
     int scrollListRow;
     unsigned int scrollListItem;
-        
+
     unsigned int menuScrollPosition;
     QPtrList<LCDMenuItem> *lcdMenuItems;
 
@@ -220,13 +221,14 @@ class LCDProcClient : public QObject
     bool lcd_showrecstatus;
     bool lcd_backlighton;
     bool lcd_heartbeaton;
+    bool lcd_bigclock;
     int  lcd_popuptime;    
     QString lcd_showmusic_items;
     QString lcd_keystring;
     LCDServer *m_parent;
     QString startup_message;
     uint startup_showtime; 
-    
+
     // recording status stuff
     typedef struct
     {

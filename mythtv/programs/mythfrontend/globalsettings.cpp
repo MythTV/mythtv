@@ -2997,6 +2997,15 @@ static HostCheckBox *LCDHeartBeatOn()
     return gc;
 }
 
+static HostCheckBox *LCDBigClock()
+{
+    HostCheckBox *gc = new HostCheckBox("LCDBigClock");
+    gc->setLabel(QObject::tr("Display Large Clock"));
+    gc->setHelpText(QObject::tr("On multiline displays try and display the time as large as possible."));
+    gc->setValue(false);
+    return gc;
+}
+
 static HostLineEdit *LCDKeyString()
 {
     HostLineEdit *ge = new HostLineEdit("LCDKeyString");
@@ -3044,11 +3053,12 @@ public:
          setLeft->addChild(LCDShowMusic());
          setLeft->addChild(LCDShowMusicItems());
          setLeft->addChild(LCDShowChannel());
-         setRight->addChild(LCDShowRecStatus());
+         setLeft->addChild(LCDShowRecStatus());
          setRight->addChild(LCDShowVolume());
          setRight->addChild(LCDShowGeneric());
          setRight->addChild(LCDBacklightOn());
          setRight->addChild(LCDHeartBeatOn());
+         setRight->addChild(LCDBigClock());
          setRight->addChild(LCDKeyString());
          setHoriz->addChild(setLeft);
          setHoriz->addChild(setRight);
