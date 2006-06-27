@@ -16,6 +16,8 @@
 
 class ReaderPausedCB
 {
+  protected:
+    virtual ~ReaderPausedCB() {}
   public:
     virtual void ReaderPaused(int fd) = 0;
 };

@@ -35,6 +35,8 @@ class DVBEventInformationTable;
 
 class MPEGStreamListener
 {
+  protected:
+    virtual ~MPEGStreamListener() {}
   public:
     virtual void HandlePAT(const ProgramAssociationTable*) = 0;
     virtual void HandleCAT(const ConditionalAccessTable*) = 0;
@@ -43,6 +45,8 @@ class MPEGStreamListener
 
 class MPEGSingleProgramStreamListener
 {
+  protected:
+    virtual ~MPEGSingleProgramStreamListener() {}
   public:
     virtual void HandleSingleProgramPAT(ProgramAssociationTable*) = 0;
     virtual void HandleSingleProgramPMT(ProgramMapTable*) = 0;
@@ -50,6 +54,8 @@ class MPEGSingleProgramStreamListener
 
 class ATSCMainStreamListener
 {
+  protected:
+    virtual ~ATSCMainStreamListener() {}
   public:
     virtual void HandleSTT(const SystemTimeTable*) = 0;
     virtual void HandleMGT(const MasterGuideTable*) = 0;
@@ -58,6 +64,8 @@ class ATSCMainStreamListener
 
 class ATSCAuxStreamListener
 {
+  protected:
+    virtual ~ATSCAuxStreamListener() {}
   public:
     virtual void HandleTVCT(uint pid,const TerrestrialVirtualChannelTable*)=0;
     virtual void HandleCVCT(uint pid, const CableVirtualChannelTable*) = 0;
@@ -69,6 +77,8 @@ class ATSCAuxStreamListener
 
 class ATSCEITStreamListener
 {
+  protected:
+    virtual ~ATSCEITStreamListener() {}
   public:
     virtual void HandleEIT( uint pid, const EventInformationTable*) = 0;
     virtual void HandleETT( uint pid, const ExtendedTextTable*) = 0;
@@ -76,6 +86,8 @@ class ATSCEITStreamListener
 
 class DVBMainStreamListener
 {
+  protected:
+    virtual ~DVBMainStreamListener() {}
   public:
     virtual void HandleNIT(const NetworkInformationTable*) = 0;
     virtual void HandleSDT(uint tsid, const ServiceDescriptionTable*) = 0;
@@ -83,6 +95,8 @@ class DVBMainStreamListener
 
 class DVBOtherStreamListener
 {
+  protected:
+    virtual ~DVBOtherStreamListener() {}
   public:
     virtual void HandleNITo(const NetworkInformationTable*) = 0;
     virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable*) = 0;
@@ -90,6 +104,8 @@ class DVBOtherStreamListener
 
 class DVBEITStreamListener
 {
+  protected:
+    virtual ~DVBEITStreamListener() {}
   public:
     virtual void HandleEIT(const DVBEventInformationTable*) = 0;
 };

@@ -20,6 +20,8 @@ class ProgramMapTable;
 
 class EITSource
 {
+  protected:
+    virtual ~EITSource() {}
   public:
     virtual void SetEITHelper(EITHelper*) = 0;
     virtual void SetEITRate(float rate) = 0;
