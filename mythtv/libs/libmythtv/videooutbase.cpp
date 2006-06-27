@@ -561,7 +561,7 @@ QRect VideoOutput::GetTotalOSDBounds(void) const
     return QRect(QPoint(0, 0), video_dim);
 }
 
-/** \fn VideoOutput::ApplyDBScaleAndMove(void)
+/** \fn VideoOutput::ApplyManualScaleAndMove(void)
  *  \brief Apply scales and moves from "Zoom Mode" settings.
  */
 void VideoOutput::ApplyManualScaleAndMove(void)
