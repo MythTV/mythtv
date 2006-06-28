@@ -357,7 +357,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap[QString("atsc_%1_us%2").arg(A).arg(B)] = \
         new FrequencyTable(C+D, E, F, G, 6000000, H);
 
-    for (uint i = 0; i < 3; i++)
+    for (uint i = 0; i < 4; i++)
     {
         // USA Cable, ch 1 to 155 and T.7 to T.14
         FREQ(modStr[i], "cable0", desc[i], "Channel %1",
