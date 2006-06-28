@@ -4,9 +4,11 @@
 #ifndef ACCEL_UTILS_H_
 #define ACCEL_UTILS_H_
 
+#include "dvdv.h"
 #include "frame.h"
 
 struct AccelUtilsData;
+struct AVCodecContext;
 
 // This class manages the support for Apple's counterpart
 // to XVMC. It's used by AvFormatDecoder and VideoOutputQuartz,
@@ -30,10 +32,11 @@ class AccelUtils
     void Reset();
     
     // Prepare the Accel code for a call to avcodec_decode_video.
-    void PreProcessFrame();
+    bool PreProcessFrame(AVCodecContext *context);
 
     // Process the macroblocks collected by avcodec_decode_video.
-    void PostProcessFrame(VideoFrame *pic, int pict_type, bool gotpicture);
+    void PostProcessFrame(AVCodecContext *context,
+                          VideoFrame *pic, int pict_type, bool gotpicture);
 
     // Resize and reposition the video subwindow.
     void MoveResize(int imgx, int imgy, int imgw, int imgh,

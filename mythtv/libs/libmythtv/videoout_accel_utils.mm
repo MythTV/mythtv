@@ -12,14 +12,15 @@
 #include <qmap.h>
 using namespace std;
 
-// Accel path is always enabled while building this library
-#define HAVE_DVDV 1
 
 #include "videoout_accel_utils.h"
+#include "avcodec.h"
 #include "dvdv.h"
 #include "videoout_accel_private.h"
 #include "yuv2rgb.h"
 
+// Global which Nigel has not been able to put anywhere else:
+static DVDV_CurPtrs gDVDVState;
 
 // Default number of buffers in Apple's code
 const int kAppleBuffers = 4;
@@ -553,7 +554,7 @@ void AccelUtils::Reset(void)
 }
 
 // Prepare the Accel code for a call to avcodec_decode_video.
-void AccelUtils::PreProcessFrame(void)
+bool AccelUtils::PreProcessFrame(AVCodecContext *context)
 {
   d->mutex.lock();
   
@@ -561,9 +562,9 @@ void AccelUtils::PreProcessFrame(void)
   if (!d->curFrame)
   {
     VERBOSE(VB_PLAYBACK, "ERROR! No free frames available!");
-    d->mutex.unlock();
-    return;
-    
+    //d->mutex.unlock();
+    //return false;
+ 
     int i = d->usedFrames.count();
     if (i > 5)
       i = 5;
@@ -577,26 +578,36 @@ void AccelUtils::PreProcessFrame(void)
     }
     
     d->curFrame = d->freeFrames.dequeue();
+    if (!d->curFrame)
+    {
+      VERBOSE(VB_PLAYBACK, "ERROR! Still no free frames available!");
+      d->mutex.unlock();
+      return false;
+    }
   }    
   
   d->curFrame->showBuffer = kAppleBuffers;
   d->curFrame->vf = NULL;
+
   gDVDVState = d->curFrame->state;
+  context->accellent = &gDVDVState;
   
   // Allow accel decoding path for the next decode_video call.
-  gDVDVEnabled = 1;
+  context->accellent_enabled = 1;
   
   d->mutex.unlock();
+  return true;
 }
 
 // Process the macroblocks collected by avcodec_decode_video.
-void AccelUtils::PostProcessFrame(VideoFrame *pic, int pict_type,
-                                  bool gotpicture)
+void AccelUtils::PostProcessFrame(AVCodecContext *context,
+                                  VideoFrame *pic, int pict_type,
+				  bool gotpicture)
 {  
   d->mutex.lock();
   
   // Turn accel decoding path off again until the next PreProcessFrame.
-  gDVDVEnabled = 0;
+  context->accellent_enabled = 0;
   
   // get the buffer we used for this run
   FrameData *frame = d->curFrame;
