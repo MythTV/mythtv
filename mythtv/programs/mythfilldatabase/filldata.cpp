@@ -3915,6 +3915,104 @@ int main(int argc, char *argv[])
                 QString("    Found %1").arg(query.numRowsAffected()));
     }
 
+    // Mark first and last showings
+
+    if (grab_data)
+    {
+        VERBOSE(VB_GENERAL, "Marking episode first showings.");
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec("SELECT MIN(starttime),programid FROM program "
+                   "WHERE programid > '' GROUP BY programid;");
+
+        if (query.isActive() && query.size() > 0)
+        {
+            MSqlQuery updt(MSqlQuery::InitCon());
+            while(query.next())
+            {
+                updt.prepare("UPDATE program set first = 1 "
+                             "WHERE starttime = :STARTTIME "
+                             "  AND programid = :PROGRAMID;");
+                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
+                updt.bindValue(":PROGRAMID", query.value(1).toString());
+                updt.exec();
+            }
+        }
+        int found = query.numRowsAffected();
+
+        query.exec("SELECT MIN(starttime),title,subtitle,description "
+                   "FROM program WHERE programid = '' "
+                   "GROUP BY title,subtitle,description;");
+
+        if (query.isActive() && query.size() > 0)
+        {
+            MSqlQuery updt(MSqlQuery::InitCon());
+            while(query.next())
+            {
+                updt.prepare("UPDATE program set first = 1 "
+                             "WHERE starttime = :STARTTIME "
+                             "  AND title = :TITLE "
+                             "  AND subtitle = :SUBTITLE "
+                             "  AND description = :DESCRIPTION");
+                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
+                updt.bindValue(":TITLE", query.value(1).toString());
+                updt.bindValue(":SUBTITLE", query.value(2).toString());
+                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.exec();
+            }
+        }
+        found += query.numRowsAffected();
+        VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
+    }
+
+    if (grab_data)
+    {
+        VERBOSE(VB_GENERAL, "Marking episode last showings.");
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec("SELECT MAX(starttime),programid FROM program "
+                   "WHERE programid > '' GROUP BY programid;");
+
+        if (query.isActive() && query.size() > 0)
+        {
+            MSqlQuery updt(MSqlQuery::InitCon());
+            while(query.next())
+            {
+                updt.prepare("UPDATE program set last = 1 "
+                             "WHERE starttime = :STARTTIME "
+                             "  AND programid = :PROGRAMID;");
+                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
+                updt.bindValue(":PROGRAMID", query.value(1).toString());
+                updt.exec();
+            }
+        }
+        int found = query.numRowsAffected();
+
+        query.exec("SELECT MAX(starttime),title,subtitle,description "
+                   "FROM program WHERE programid = '' "
+                   "GROUP BY title,subtitle,description;");
+
+        if (query.isActive() && query.size() > 0)
+        {
+            MSqlQuery updt(MSqlQuery::InitCon());
+            while(query.next())
+            {
+                updt.prepare("UPDATE program set last = 1 "
+                             "WHERE starttime = :STARTTIME "
+                             "  AND title = :TITLE "
+                             "  AND subtitle = :SUBTITLE "
+                             "  AND description = :DESCRIPTION");
+                updt.bindValue(":STARTTIME", query.value(0).toDateTime());
+                updt.bindValue(":TITLE", query.value(1).toString());
+                updt.bindValue(":SUBTITLE", query.value(2).toString());
+                updt.bindValue(":DESCRIPTION", query.value(3).toString());
+                updt.exec();
+            }
+        }
+        found += query.numRowsAffected();
+        VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
+    }
+
     if (1) // limit MSqlQuery's lifetime
     {
         MSqlQuery query(MSqlQuery::InitCon());

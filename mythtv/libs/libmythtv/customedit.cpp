@@ -143,6 +143,14 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_cfrom << "";
     m_csql << "program.generic = 0 ";
 
+    m_clause->insertItem(tr("First showing of each episode"));
+    m_cfrom << "";
+    m_csql << "program.first > 0 ";
+
+    m_clause->insertItem(tr("Last showing of each episode"));
+    m_cfrom << "";
+    m_csql << "program.last > 0 ";
+
     m_clause->insertItem(QString(tr("Category type") +
             " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));
     m_cfrom << "";
