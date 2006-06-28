@@ -1537,6 +1537,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
             recording.setAttribute( "dupInType"     , pInfo->dupin       );
             recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
             recording.setAttribute( "encoderId"     , pInfo->cardid      );
+            recording.setAttribute( "recProfile"    , pInfo->GetProgramRecordingProfile());
             recording.setAttribute( "preRollSeconds", m_nPreRollSeconds );
         }
     }
