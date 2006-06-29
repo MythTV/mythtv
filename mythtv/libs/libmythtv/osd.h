@@ -154,6 +154,9 @@ class OSD : public QObject
 
     void SetTextSubtitles(const QStringList&);
     void ClearTextSubtitles(void);
+
+    void UpdateTeletext(void);
+
  private:
     bool InitDefaults(void);
     bool InitCC608(void);

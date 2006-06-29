@@ -269,11 +269,30 @@ bool OSD::InitTeletext(void)
     }
 
     OSDTypeTeletext *ttpage = new OSDTypeTeletext(
-        name, font, area, wmult, hmult);
+        name, font, area, wmult, hmult, this);
   
+    container->SetPriority(30);
     container->AddType(ttpage);
     return true;
 }   
+
+void OSD::UpdateTeletext(void)
+{
+    QMutexLocker locker(&osdlock);
+
+    OSDSet *container = GetSet("teletext");
+    if (!container)
+        return;
+
+    OSDType *type = container->GetType("teletext");
+    OSDTypeTeletext *ttpage = dynamic_cast<OSDTypeTeletext*>(type);
+    if (ttpage)
+    {
+        container->Display(1);
+        m_setsvisible = true;
+        changed = true;
+    }
+}
 
 void OSD::SetTextSubtitles(const QStringList &lines)
 {

@@ -19,6 +19,7 @@ SOURCES += ../libs/libmythtv/infodialog.cpp
 SOURCES += ../libs/libmythtv/jobqueue.cpp
 SOURCES += ../libs/libmythtv/jobqueue.h
 SOURCES += ../libs/libmythtv/NuppelVideoPlayer.cpp
+SOURCES += ../libs/libmythtv/osdtypeteletext.cpp
 SOURCES += ../libs/libmythtv/playgroup.cpp
 SOURCES += ../libs/libmythtv/previouslist.cpp
 SOURCES += ../libs/libmythtv/profilegroup.cpp

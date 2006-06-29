@@ -20,11 +20,6 @@
 
 #include <cmath>
 
-//#include <iostream>
-//using namespace std;
-
-#include <qcolor.h>
-#include <qapplication.h>
 #include <qmutex.h>
 
 #include "osd.h"
@@ -47,35 +42,43 @@ const int    OSDTypeTeletext::kTeletextRows    = 26;
 
 /*****************************************************************************/
 OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
-                                 QRect displayrect, float wmult, float hmult)
+                                 QRect displayrect, float wmult, float hmult,
+                                 OSD *osd)
     : OSDType(name),
+      m_lock(true),
       m_displayrect(displayrect),       m_unbiasedrect(0,0,0,0),
-      m_font(font),                     m_surface(NULL),
       m_box(NULL),
 
       m_tt_colspace(m_displayrect.width()  / kTeletextColumns),
       m_tt_rowspace(m_displayrect.height() / kTeletextRows),
 
-      m_bgcolor_y(0),                   m_bgcolor_u(0),
-      m_bgcolor_v(0),                   m_bgcolor_a(0),
       // last fetched page
       m_fetchpage(0),                   m_fetchsubpage(0),
-      // currently displayed page:
+
+      // current font
+      m_font(font),
+
+      // current character background
+      m_bgcolor_y(0),                   m_bgcolor_u(0),
+      m_bgcolor_v(0),                   m_bgcolor_a(0),
+
+      // currently displayed page
       m_curpage(0x100),                 m_cursubpage(-1),
       m_curpage_showheader(true),       m_curpage_issubtitle(false),
 
       m_transparent(false),             m_revealHidden(false),
-      m_displaying(false)
+      m_displaying(false),              m_osd(osd),
+      m_header_changed(false),          m_page_changed(false)
 {
     m_unbiasedrect  = bias(m_displayrect, wmult, hmult);
 
     // fill Bitswap
     for (int i = 0; i < 256; i++)
     {
-        bitswap[i] = 0;
+        m_bitswap[i] = 0;
         for (int bit = 0; bit < 8; bit++)
             if (i & (1 << bit))
-                bitswap[i] |= (1 << (7-bit));
+                m_bitswap[i] |= (1 << (7-bit));
     }
 
     Reset(); // initializes m_magazines
@@ -86,12 +89,14 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
  */
 void OSDTypeTeletext::Reset(void)
 {
+    QMutexLocker locker(&m_lock);
+
     for (uint mag = 0; mag < 8; mag++)
     {
         QMutexLocker lock(&m_magazines[mag].lock);
 
         // clear all sub pages in page
-        std::map<int, TeletextPage>::iterator iter;
+        int_to_page_t::iterator iter;
         iter = m_magazines[mag].pages.begin();
         while (iter != m_magazines[mag].pages.end())
         {
@@ -104,7 +109,9 @@ void OSDTypeTeletext::Reset(void)
         m_magazines[mag].pages.clear();
         m_magazines[mag].current_page = 0;
         m_magazines[mag].current_subpage = 0;
+        m_magazines[mag].loadingpage.active = false;
     }
+    memset(m_header, ' ', 40);
 
     m_curpage    = 0x100;
     m_cursubpage = -1;
@@ -115,57 +122,59 @@ void OSDTypeTeletext::Reset(void)
     m_pageinput[2] = '0';
 }
 
-/** \fn OSDTypeTeletext::CharConversion(char, int)
- *  \brief converts the given character to the given language
- */
-char OSDTypeTeletext::CharConversion(char ch, int lang)
-{
-    int c = 0;
-    for (int j = 0; j < 14; j++)
-    {
-        c = ch & 0x7F;
-        if (c == lang_chars[0][j])
-            ch = lang_chars[lang + 1][j];
-    }
-    return ch;
-}
-
 /** \fn OSDTypeTeletext::AddPageHeader(int,int,const unsigned char*,int,int,int)
- *  \brief Adds a new page header 
- *         (page=0 if none)
+ *  \brief Adds a new page header (page=0 if none).
  */
 void OSDTypeTeletext::AddPageHeader(int page, int subpage,
                                     const unsigned char* buf,
                                     int vbimode, int lang, int flags)
 {
+    QMutexLocker locker(&m_lock);
+
     int magazine = MAGAZINE(page);
     if (magazine < 1 || magazine > 8)
         return;
     int lastPage = m_magazines[magazine - 1].current_page;
     int lastSubPage = m_magazines[magazine - 1].current_subpage;
 
-    // update the last fetched page if the magazine is the same 
+    // update the last fetched page if the magazine is the same
     // and the page no. is different
-    if (page != lastPage || subpage != lastSubPage)
+
+    if ((page != lastPage || subpage != lastSubPage) &&
+        m_magazines[magazine - 1].loadingpage.active)
+    {
+        TeletextSubPage *ttpage = FindSubPage(lastPage, lastSubPage);
+        if (!ttpage)
+        {
+            ttpage = &(m_magazines[magazine - 1]
+                       .pages[lastPage].subpages[lastSubPage]);
+            m_magazines[magazine - 1].pages[lastPage].pagenum = lastPage;
+            ttpage->subpagenum = lastSubPage;
+        }
+
+        memcpy(ttpage, &m_magazines[magazine - 1].loadingpage,
+               sizeof(TeletextSubPage));
+
+        m_magazines[magazine - 1].loadingpage.active = false;
+
         PageUpdated(lastPage, lastSubPage);
+    }
 
     m_fetchpage = page;
     m_fetchsubpage = subpage;
 
-    TeletextSubPage *ttpage = FindSubPage(page, subpage);
-
-    if (ttpage == NULL)
-    {
-        ttpage = &m_magazines[magazine - 1].pages[page].subpages[subpage];
-        m_magazines[magazine - 1].pages[page].pagenum = page;
-        ttpage->subpagenum = subpage;
-
-        for (int i=0; i < 6; i++)
-            ttpage->floflink[i] = 0;
-    }
+    TeletextSubPage *ttpage = &m_magazines[magazine - 1].loadingpage;
 
     m_magazines[magazine - 1].current_page = page;
     m_magazines[magazine - 1].current_subpage = subpage;
+
+    memset(ttpage->data, ' ', sizeof(ttpage->data));
+
+    ttpage->active = true;
+    ttpage->subpagenum = subpage;
+
+    for (uint i = 0; i < 6; i++)
+        ttpage->floflink[i] = 0;
 
     ttpage->lang = lang;
     ttpage->flags = flags;
@@ -173,22 +182,23 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
 
     ttpage->subtitle = (vbimode == VBI_DVB_SUBTITLE);
 
-    for (int j = 0; j < 8; j++)
-        ttpage->data[0][j] = 32;
+    memset(ttpage->data[0], ' ', 8 * sizeof(uint8_t));
 
     if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
     {
-        for (int j = 8; j < 40; j++)
-            ttpage->data[0][j] = bitswap[buf[j]];
+        for (uint j = 8; j < 40; j++)
+            ttpage->data[0][j] = m_bitswap[buf[j]];
     }
     else 
     {
         memcpy(ttpage->data[0]+0, buf, 40);
-        memset(ttpage->data[0]+40, ' ', sizeof(ttpage->data)-40);
     }
     
     if ( !(ttpage->flags & TP_INTERRUPTED_SEQ)) 
+    {
+        memcpy(m_header, ttpage->data[0], 40);
         HeaderUpdated(ttpage->data[0],ttpage->lang);
+    }
 }
 
 /** \fn OSDTypeTeletext::AddTeletextData(int,int,const unsigned char*,int)
@@ -197,28 +207,26 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
 void OSDTypeTeletext::AddTeletextData(int magazine, int row, 
                                       const unsigned char* buf, int vbimode)
 {
+    QMutexLocker locker(&m_lock);
+
     int b1, b2, b3, err;
 
     if (magazine < 1 || magazine > 8)
         return;
 
     int currentpage = m_magazines[magazine - 1].current_page;
-    int currentsubpage = m_magazines[magazine -1].current_subpage;
-    if (currentpage == 0)
+    if (!currentpage)
         return;
 
-    TeletextSubPage *ttpage = FindSubPage(currentpage, currentsubpage);
-
-    if (ttpage == NULL)
-        return;
+    TeletextSubPage *ttpage = &m_magazines[magazine - 1].loadingpage;
 
     switch (row)
     {
         case 1 ... 24: // Page Data
             if (vbimode == VBI_DVB || vbimode == VBI_DVB_SUBTITLE)
             {
-                for (int j = 0; j < 40; j++)
-                    ttpage->data[row][j] = bitswap[buf[j]];
+                for (uint j = 0; j < 40; j++)
+                    ttpage->data[row][j] = m_bitswap[buf[j]];
             } 
             else 
             {
@@ -298,7 +306,7 @@ void OSDTypeTeletext::AddTeletextData(int magazine, int row,
     }
 }
 
-/** \fn OSDTypeTeletext::PageUpdated(int)
+/** \fn OSDTypeTeletext::PageUpdated(int,int)
  *  \brief Updates the page, if given pagenumber is the same
  *         as the current shown page
  */
@@ -313,13 +321,8 @@ void OSDTypeTeletext::PageUpdated(int page, int subpage)
     if (subpage != m_cursubpage && m_cursubpage != -1)
         return;
 
-
-    if (m_surface != NULL)
-    {
-        m_surface->SetChanged(true);
-        m_surface->ClearUsed();
-        DrawPage();
-    }
+    m_page_changed = true;
+    m_osd->UpdateTeletext();
 }
 
 /** \fn OSDTypeTeletext::HeaderUpdated(unsigned char*,int)
@@ -331,6 +334,8 @@ void OSDTypeTeletext::PageUpdated(int page, int subpage)
  */
 void OSDTypeTeletext::HeaderUpdated(unsigned char *page, int lang)
 {
+    (void)lang;
+
     if (!m_displaying)
         return;
 
@@ -340,20 +345,25 @@ void OSDTypeTeletext::HeaderUpdated(unsigned char *page, int lang)
     if (m_curpage_showheader == false)
         return;
 
-    if (m_surface != NULL)
-        DrawHeader(page, lang);
+    m_header_changed = true;
+
+    // Cannot use the OSD to trigger a draw for this. If it does it
+    // takes too much time drawing the page each time the data changes
+    // (the OSD erases the surface before doing a redraw so the entire
+    // teletext contents must be re-displayed).
+    //m_osd->UpdateTeletext();
 }
 
-/** \fn OSDTypeTeletext::FindPage(int, int)
+/** \fn OSDTypeTeletext::FindPageInternal(int, int)
  *  \brief Finds the given page
  *
  *  \param page Page number
  *  \param direction find page before or after the given page
  *  \return TeletextPage (NULL if not found) 
  */
-TeletextPage* OSDTypeTeletext::FindPage(int page, int direction)
+const TeletextPage *OSDTypeTeletext::FindPageInternal(
+    int page, int direction) const
 {
-    TeletextPage *res = NULL;
     int mag = MAGAZINE(page);
 
     if (mag > 8 || mag < 1)
@@ -361,18 +371,18 @@ TeletextPage* OSDTypeTeletext::FindPage(int page, int direction)
 
     QMutexLocker lock(&m_magazines[mag - 1].lock);
 
-    std::map<int, TeletextPage>::iterator pageIter;
+    int_to_page_t::const_iterator pageIter;
     pageIter = m_magazines[mag - 1].pages.find(page);
     if (pageIter == m_magazines[mag - 1].pages.end())
         return NULL;
 
-    res = &pageIter->second;
+    const TeletextPage *res = &pageIter->second;
     if (direction == -1)
     {
         --pageIter;
         if (pageIter == m_magazines[mag - 1].pages.end())
         {
-            std::map<int, TeletextPage>::reverse_iterator iter;
+            int_to_page_t::const_reverse_iterator iter;
             iter = m_magazines[mag - 1].pages.rbegin();
             res = &iter->second;
         }
@@ -395,7 +405,7 @@ TeletextPage* OSDTypeTeletext::FindPage(int page, int direction)
     return res;
 }
 
-/** \fn OSDTypeTeletext::FindSubPage(int, int, int)
+/** \fn OSDTypeTeletext::FindSubPageInternal(int, int, int) const
  *  \brief Finds the given page
  *
  *  \param page Page number
@@ -404,9 +414,9 @@ TeletextPage* OSDTypeTeletext::FindPage(int page, int direction)
  *         (only if Subpage is not -1)
  *  \return TeletextSubPage (NULL if not found) 
  */
-TeletextSubPage* OSDTypeTeletext::FindSubPage(int page, int subpage, int direction)
+const TeletextSubPage *OSDTypeTeletext::FindSubPageInternal(
+    int page, int subpage, int direction) const
 {
-    TeletextSubPage *res = NULL;
     int mag = MAGAZINE(page);
 
     if (mag > 8 || mag < 1)
@@ -414,61 +424,48 @@ TeletextSubPage* OSDTypeTeletext::FindSubPage(int page, int subpage, int directi
 
     QMutexLocker lock(&m_magazines[mag - 1].lock);
 
+    int_to_page_t::const_iterator pageIter;
+    pageIter = m_magazines[mag - 1].pages.find(page);
+    if (pageIter == m_magazines[mag - 1].pages.end())
+        return NULL;
+
+    const TeletextPage *ttpage = &(pageIter->second);
+    int_to_subpage_t::const_iterator subpageIter =
+        ttpage->subpages.begin();
+
+    // try to find the subpage given, or first if subpage == -1
+    if (subpage != -1)
+        subpageIter = ttpage->subpages.find(subpage);
+
+    if (subpageIter == ttpage->subpages.end())
+        return NULL;
+
     if (subpage == -1)
+        return &(subpageIter->second);
+
+    const TeletextSubPage *res = &(subpageIter->second);
+    if (direction == -1)
     {
-        // return the first subpage found
-        std::map<int, TeletextPage>::iterator pageIter;
-        pageIter = m_magazines[mag - 1].pages.find(page);
-        if (pageIter == m_magazines[mag - 1].pages.end())
-            return NULL;
-
-        TeletextPage *page = &pageIter->second;
-        std::map<int, TeletextSubPage>::iterator subpageIter;
-        subpageIter = page->subpages.begin();
-        if (subpageIter == page->subpages.end())
-            return NULL;
-
-        return &subpageIter->second;
+        --subpageIter;
+        if (subpageIter == ttpage->subpages.end())
+        {
+            int_to_subpage_t::const_reverse_iterator iter =
+                ttpage->subpages.rbegin();
+            res = &(iter->second);
+        }
+        else
+        {
+            res = &(subpageIter->second);
+        }
     }
-    else
+
+    if (direction == 1)
     {
-        // try to find the subpage given
-        std::map<int, TeletextPage>::iterator pageIter;
-        pageIter = m_magazines[mag - 1].pages.find(page);
-        if (pageIter == m_magazines[mag - 1].pages.end())
-            return NULL;
+        ++subpageIter;
+        if (subpageIter == ttpage->subpages.end())
+            subpageIter = ttpage->subpages.begin();
 
-        TeletextPage *page = &pageIter->second;
-        std::map<int, TeletextSubPage>::iterator subpageIter;
-        subpageIter = page->subpages.find(subpage);
-        if (subpageIter == page->subpages.end())
-            return NULL;
-
-        res = &subpageIter->second;
-        if (direction == -1)
-        {
-            --subpageIter;
-            if (subpageIter == page->subpages.end())
-            {
-                std::map<int, TeletextSubPage>::reverse_iterator iter;
-                iter = page->subpages.rbegin();
-                res = &iter->second;
-            }
-            else
-                res = &subpageIter->second;
-        }
-
-        if (direction == 1)
-        {
-            ++subpageIter;
-            if (subpageIter == page->subpages.end())
-            {
-                subpageIter = page->subpages.begin();
-                res = &subpageIter->second;
-            }
-            else
-                res = &subpageIter->second;
-        }
+        res = &(subpageIter->second);
     }
 
     return res;
@@ -482,6 +479,8 @@ TeletextSubPage* OSDTypeTeletext::FindSubPage(int page, int subpage, int directi
  */
 void OSDTypeTeletext::KeyPress(uint key)
 {
+    QMutexLocker locker(&m_lock);
+
     int newPage = m_curpage;
     int newSubPage = m_cursubpage;
     bool numeric_input = false;
@@ -665,6 +664,8 @@ void OSDTypeTeletext::KeyPress(uint key)
  */
 void OSDTypeTeletext::SetPage(int page, int subpage)
 {
+    QMutexLocker locker(&m_lock);
+
     if (page < 0x100 || page > 0x899)
         return;
 
@@ -677,58 +678,54 @@ void OSDTypeTeletext::SetPage(int page, int subpage)
     PageUpdated(m_curpage, m_cursubpage);
 }
 
-/** \fn OSDTypeTeletext::SetForegroundColor(int)
- *  \brief Set the font color to the given color.
- *
- *   NOTE: TTColor::TRANSPARENT does not do anything!
- *  \sa TTColor
- */
-void OSDTypeTeletext::SetForegroundColor(int color)
-{
-    switch (color & ~TTColor::TRANSPARENT)
-    {
-        case TTColor::BLACK:   m_font->setColor(kColorBlack);   break;
-        case TTColor::RED:     m_font->setColor(kColorRed);     break;
-        case TTColor::GREEN:   m_font->setColor(kColorGreen);   break;
-        case TTColor::YELLOW:  m_font->setColor(kColorYellow);  break;
-        case TTColor::BLUE:    m_font->setColor(kColorBlue);    break;
-        case TTColor::MAGENTA: m_font->setColor(kColorMagenta); break;
-        case TTColor::CYAN:    m_font->setColor(kColorCyan);    break;
-        case TTColor::WHITE:   m_font->setColor(kColorWhite);   break;
-    }
-
-    m_font->setShadow(0,0);
-    m_font->setOutline(0);
-}
-
-/** \fn OSDTypeTeletext:SetBackgroundColor(int)
- *  \brief Set the background color to the given color
- *
- *  \sa TTColor
- */
-void OSDTypeTeletext::SetBackgroundColor(int ttcolor)
+QColor color_tt2qt(int ttcolor)
 {
     QColor color;
 
     switch (ttcolor & ~TTColor::TRANSPARENT)
     {
-        case TTColor::BLACK:   color = kColorBlack;   break;
-        case TTColor::RED:     color = kColorRed;     break;
-        case TTColor::GREEN:   color = kColorGreen;   break;
-        case TTColor::YELLOW:  color = kColorYellow;  break;
-        case TTColor::BLUE:    color = kColorBlue;    break;
-        case TTColor::MAGENTA: color = kColorMagenta; break;
-        case TTColor::CYAN:    color = kColorCyan;    break;
-        case TTColor::WHITE:   color = kColorWhite;   break;
+        case TTColor::BLACK:   color = OSDTypeTeletext::kColorBlack;   break;
+        case TTColor::RED:     color = OSDTypeTeletext::kColorRed;     break;
+        case TTColor::GREEN:   color = OSDTypeTeletext::kColorGreen;   break;
+        case TTColor::YELLOW:  color = OSDTypeTeletext::kColorYellow;  break;
+        case TTColor::BLUE:    color = OSDTypeTeletext::kColorBlue;    break;
+        case TTColor::MAGENTA: color = OSDTypeTeletext::kColorMagenta; break;
+        case TTColor::CYAN:    color = OSDTypeTeletext::kColorCyan;    break;
+        case TTColor::WHITE:   color = OSDTypeTeletext::kColorWhite;   break;
     }
 
-    int r = color.red();
-    int g = color.green();
-    int b = color.blue();
+    return color;
+}
 
-    float y = (0.299*r) + (0.587*g) + (0.114*b);
-    float u = (0.564*(b - y)); // = -0.169R-0.331G+0.500B
-    float v = (0.713*(r - y)); // = 0.500R-0.419G-0.081B
+/** \fn OSDTypeTeletext::SetForegroundColor(int) const
+ *  \brief Set the font color to the given color.
+ *
+ *   NOTE: TTColor::TRANSPARENT does not do anything!
+ *  \sa TTColor
+ */
+void OSDTypeTeletext::SetForegroundColor(int ttcolor) const
+{
+    m_font->setColor(color_tt2qt(ttcolor));
+    m_font->setShadow(0,0);
+    m_font->setOutline(0);
+}
+
+/** \fn OSDTypeTeletext:SetBackgroundColor(int) const
+ *  \brief Set the background color to the given color
+ *
+ *  \sa TTColor
+ */
+void OSDTypeTeletext::SetBackgroundColor(int ttcolor) const
+{
+    const QColor color = color_tt2qt(ttcolor);
+
+    const int r = color.red();
+    const int g = color.green();
+    const int b = color.blue();
+
+    const float y = (0.299*r) + (0.587*g) + (0.114*b);
+    const float u = (0.564*(b - y)); // = -0.169R-0.331G+0.500B
+    const float v = (0.713*(r - y)); // = 0.500R-0.419G-0.081B
 
     m_bgcolor_y = (uint8_t)(y);
     m_bgcolor_u = (uint8_t)(127 + u);
@@ -736,13 +733,13 @@ void OSDTypeTeletext::SetBackgroundColor(int ttcolor)
     m_bgcolor_a = (ttcolor & TTColor::TRANSPARENT) ? 0x00 : 0xff;
 }
 
-/** \fn OSDTypeTeletext::DrawBackground(int, int)
- *  \brief draws background in the color set in setBackgroundColor
+/** \fn OSDTypeTeletext::DrawBackground(OSDSurface*,int,int) const
+ *  \brief draws background in the color set in SetBackgroundColor().
  *
  *  \param x X position (40 cols)
  *  \param y Y position (25 rows)
  */
-void OSDTypeTeletext::DrawBackground(int x, int y)
+void OSDTypeTeletext::DrawBackground(OSDSurface *surface, int x, int y) const
 {
     x *= m_tt_colspace;
     x += m_displayrect.left();
@@ -750,46 +747,42 @@ void OSDTypeTeletext::DrawBackground(int x, int y)
     y *= m_tt_rowspace;
     y += m_displayrect.top();
 
-    DrawRect(x, y, m_tt_colspace, m_tt_rowspace);
+    DrawRect(surface, QRect(x, y, m_tt_colspace, m_tt_rowspace));
 }
 
-/** \fn OSDTypeteletext::drawRect(int, int, int, int)
- *  \brief draws a Rectangle at position x and y (width dx, height dy)
- *         with the color set in setBackgroundColor
- *
- *  \param x X position at the screen
- *  \param y Y position at the screen
- *  \param dx width
- *  \param dy height
+/** \fn OSDTypeteletext::DrawRect(OSDSurface*,const QRect) const
+ *  \brief Draws a Rectangle with the color set in SetBackgroundColor().
  */
-void OSDTypeTeletext::DrawRect(int x, int y, int dx, int dy)
+void OSDTypeTeletext::DrawRect(OSDSurface *surface, const QRect rect) const
 {
-    QRect all(x, y, dx, dy);
-    m_surface->AddRect(all);
+    QRect tmp = rect;
+    surface->AddRect(tmp);
 
-    int luma_stride = m_surface->width;
-    int chroma_stride = m_surface->width >> 1;
-    int ye = y + dy;
+    const int luma_stride   = surface->width;
+    const int chroma_stride = surface->width >> 1;
+    const int y  = rect.top(),    x  = rect.left();
+    const int dy = rect.height(), dx = rect.width();
+    const int ye = y + dy;
 
-    unsigned char *buf_y = m_surface->y + (luma_stride * y) + x;
-    unsigned char *buf_u = m_surface->u + (chroma_stride * (y>>1)) + (x>>1);
-    unsigned char *buf_v = m_surface->v + (chroma_stride * (y>>1)) + (x>>1);
-    unsigned char *buf_a = m_surface->alpha + (luma_stride * y) + x;
+    unsigned char *buf_y = surface->y + (luma_stride * y) + x;
+    unsigned char *buf_u = surface->u + (chroma_stride * (y>>1)) + (x>>1);
+    unsigned char *buf_v = surface->v + (chroma_stride * (y>>1)) + (x>>1);
+    unsigned char *buf_a = surface->alpha + (luma_stride * y) + x;
 
-    for (; y<ye; ++y)
+    for (int j = y; j < ye; j++)
     {
-        for (int i=0; i<dx; ++i)
+        for (int i = 0; i < dx; i++)
         {
             buf_y[i] = m_bgcolor_y;
             buf_a[i] = m_bgcolor_a;
         }
 
-        if ((y & 1) == 0)
+        if (!(y & 1))
         {
-            for (int i=0; i<dx; ++i)
+            for (int k = 0; k < dx; k++)
             {
-                buf_u[i>>1] = m_bgcolor_u;
-                buf_v[i>>1] = m_bgcolor_v;
+                buf_u[k>>1] = m_bgcolor_u;
+                buf_v[k>>1] = m_bgcolor_v;
             }
 
             buf_u += chroma_stride;
@@ -801,7 +794,7 @@ void OSDTypeTeletext::DrawRect(int x, int y, int dx, int dy)
     }
 }
 
-/** \fn OSDTypeTeletext::DrawCharacter(int, int, QChar, int)
+/** \fn OSDTypeTeletext::DrawCharacter(OSDSurface*,int,int,QChar,int) const
  *  \brief Draws a character at posistion x, y 
  *
  *  \param x X position (40 cols)
@@ -809,7 +802,9 @@ void OSDTypeTeletext::DrawRect(int x, int y, int dx, int dy)
  *  \param ch Character
  *  \param doubleheight if different to 0, draw doubleheighted character
  */
-void OSDTypeTeletext::DrawCharacter(int x, int y, QChar ch, int doubleheight)
+void OSDTypeTeletext::DrawCharacter(OSDSurface *surface,
+                                    int x, int y,
+                                    QChar ch, int doubleheight) const
 {
     if (!m_font)
         return;
@@ -822,8 +817,8 @@ void OSDTypeTeletext::DrawCharacter(int x, int y, QChar ch, int doubleheight)
     y *= m_tt_rowspace;
     y += m_displayrect.top();
 
-    m_font->DrawString(m_surface, x, y, line,
-                       m_surface->width, m_surface->height,
+    m_font->DrawString(surface, x, y, line,
+                       surface->width, surface->height,
                        255, doubleheight);
 }
 
@@ -833,35 +828,52 @@ void OSDTypeTeletext::DrawCharacter(int x, int y, QChar ch, int doubleheight)
  *  \param x X position (40 cols)
  *  \param y Y position (25 rows)
  *  \param code Code
- *  \param doubleheight if different to 0, draw doubleheighted mosaic)
+ *  \param doubleheight if different to 0, draw doubleheighted mosaic) const
  */
-void OSDTypeTeletext::DrawMosaic(int x, int y, int code, int doubleheight)
+void OSDTypeTeletext::DrawMosaic(OSDSurface *surface, int x, int y,
+                                 int code, int doubleheight) const
 {
-    (void)x;
-    (void)y;
-    (void)code;
-
     x *= m_tt_colspace;
     x += m_displayrect.left();
 
     y *= m_tt_rowspace;
     y += m_displayrect.top();
 
-    int dx = (int)round(m_tt_colspace / 2)+1;
-    int dy = (int)round(m_tt_rowspace / 3)+1;
+    int dx = (int)round(m_tt_colspace / 2) + 1;
+    int dy = (int)round(m_tt_rowspace / 3) + 1;
+    dy = (doubleheight) ? (2 * dy) : dy;
 
-    if (doubleheight != 0)
-        dy *= 2;
-
-    if (code & 0x10) DrawRect(x,      y + 2*dy, dx, dy);
-    if (code & 0x40) DrawRect(x + dx, y + 2*dy, dx, dy);
-    if (code & 0x01) DrawRect(x,      y,        dx, dy);
-    if (code & 0x02) DrawRect(x + dx, y,        dx, dy);
-    if (code & 0x04) DrawRect(x,      y + dy,   dx, dy);
-    if (code & 0x08) DrawRect(x + dx, y + dy,   dx, dy);
+    if (code & 0x10)
+        DrawRect(surface, QRect(x,      y + 2*dy, dx, dy));
+    if (code & 0x40)
+        DrawRect(surface, QRect(x + dx, y + 2*dy, dx, dy));
+    if (code & 0x01)
+        DrawRect(surface, QRect(x,      y,        dx, dy));
+    if (code & 0x02)
+        DrawRect(surface, QRect(x + dx, y,        dx, dy));
+    if (code & 0x04)
+        DrawRect(surface, QRect(x,      y + dy,   dx, dy));
+    if (code & 0x08)
+        DrawRect(surface, QRect(x + dx, y + dy,   dx, dy));
 }
 
-void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
+/** \fn cvt_char(char,int)
+ *  \brief converts the given character to the given language
+ */
+static char cvt_char(char ch, int lang)
+{
+    int c = 0;
+    for (int j = 0; j < 14; j++)
+    {
+        c = ch & 0x7F;
+        if (c == lang_chars[0][j])
+            ch = lang_chars[lang + 1][j];
+    }
+    return ch;
+}
+
+void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
+                               uint row, int lang) const
 {
     bool mosaic;
     bool conceal;
@@ -903,7 +915,7 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
     if (row == 1)
     {
         for (uint x = 0; x < 8; x++)
-            DrawBackground(x, 1);
+            DrawBackground(surface, x, 1);
     }
 
     for (uint x = (row == 1 ? 8 : 0); x < (uint)kTeletextColumns; ++x)
@@ -1006,57 +1018,60 @@ void OSDTypeTeletext::DrawLine(const unsigned char* page, uint row, int lang)
             if (m_transparent)
                 SetBackgroundColor(TTColor::TRANSPARENT);
 
-            DrawBackground(x, row);
+            DrawBackground(surface, x, row);
             if (doubleheight && row < (uint)kTeletextRows)
-                DrawBackground(x, row + 1);
+                DrawBackground(surface, x, row + 1);
 
             if ((mosaic) && (ch < 0x40 || ch > 0x5F))
             {
                 SetBackgroundColor(newfgcolor);
-                DrawMosaic(x, row, ch, doubleheight);
+                DrawMosaic(surface, x, row, ch, doubleheight);
             }
-            else 
+            else
             {
-                char c2 = CharConversion(ch, lang);
+                char c2 = cvt_char(ch, lang);
                 bool dh = doubleheight && row < (uint)kTeletextRows;
                 int  rw = (dh) ? row + 1 : row;
-                DrawCharacter(x, rw, c2, dh);
+                DrawCharacter(surface, x, rw, c2, dh);
             }
         }
     }
 }
 
-void OSDTypeTeletext::DrawHeader(const unsigned char* page, int lang)
+void OSDTypeTeletext::DrawHeader(OSDSurface *surface,
+                                 const unsigned char* page, int lang) const
 {
     if (!m_displaying)
         return;
 
     if (page != NULL)
-        DrawLine(page, 1, lang);
-    
-    StatusUpdated();
+        DrawLine(surface, page, 1, lang);
+
+    DrawStatus(surface);
 }
 
-void OSDTypeTeletext::DrawPage(void)
+void OSDTypeTeletext::DrawPage(OSDSurface *surface) const
 {
     if (!m_displaying)
         return;
 
-    TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage);
+    const TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage);
 
-    if (ttpage == NULL)
+    if (!ttpage)
     {
-        DrawHeader(NULL,0);
+        // no page selected so show the header and a list of available pages
+        DrawHeader(surface, NULL, 0);
         return;
     }
 
     m_cursubpage = ttpage->subpagenum;
 
     int a = 0;
-    if ((ttpage->subtitle) || (ttpage->flags & 
-            (TP_SUPPRESS_HEADER + TP_NEWSFLASH + TP_SUBTITLE)))
+    if ((ttpage->subtitle) ||
+        (ttpage->flags & (TP_SUPPRESS_HEADER | TP_NEWSFLASH | TP_SUBTITLE)))
     {
-        a = 1;
+        a = 1; // when showing subtitles we don't want to see the teletext
+               // header line, so we skip that line...
         m_curpage_showheader = false;
         m_curpage_issubtitle = true;
     }
@@ -1064,48 +1079,50 @@ void OSDTypeTeletext::DrawPage(void)
     {
         m_curpage_issubtitle = false;
         m_curpage_showheader = true;
-        DrawHeader(ttpage->data[0], ttpage->lang);
+        DrawHeader(surface, m_header, ttpage->lang);
+
+        m_header_changed = false;
     }
 
-    for (int y = kTeletextRows-a; y >= 2; y--)
-        DrawLine(ttpage->data[y-1], y, ttpage->lang);
+    for (int y = kTeletextRows - a; y >= 2; y--)
+        DrawLine(surface, ttpage->data[y-1], y, ttpage->lang);
+
+    m_page_changed = false;
 }
 
 void OSDTypeTeletext::Reinit(float wmult, float hmult)
 {
+    QMutexLocker locker(&m_lock);
+
     m_displayrect = bias(m_unbiasedrect, wmult, hmult);
     m_tt_colspace = m_displayrect.width()  / kTeletextColumns;
     m_tt_rowspace = m_displayrect.height() / kTeletextRows;
 }
 
-void OSDTypeTeletext::Draw(OSDSurface *surface, int fade, int maxfade,
-                           int xoff, int yoff)
+void OSDTypeTeletext::Draw(OSDSurface *surface,
+                           int /*fade*/, int /*maxfade*/,
+                           int /*xoff*/, int /*yoff*/)
 {
-    (void)surface;
-    (void)fade;
-    (void)maxfade;
-    (void)xoff;
-    (void)yoff;
+    QMutexLocker locker(&m_lock);
 
-    m_surface = surface;
-    DrawPage();
+    DrawPage(surface);
 }
 
-void OSDTypeTeletext::StatusUpdated(void)
+void OSDTypeTeletext::DrawStatus(OSDSurface *surface) const
 {
     SetForegroundColor(TTColor::WHITE);
     SetBackgroundColor(TTColor::BLACK);
 
     if (!m_transparent)
         for (int i = 0; i < 40; ++i)
-            DrawBackground(i, 0);
+            DrawBackground(surface, i, 0);
 
-    DrawCharacter(1, 0, 'P', 0);
-    DrawCharacter(2, 0, m_pageinput[0], 0);
-    DrawCharacter(3, 0, m_pageinput[1], 0);
-    DrawCharacter(4, 0, m_pageinput[2], 0);
+    DrawCharacter(surface, 1, 0, 'P', 0);
+    DrawCharacter(surface, 2, 0, m_pageinput[0], 0);
+    DrawCharacter(surface, 3, 0, m_pageinput[1], 0);
+    DrawCharacter(surface, 4, 0, m_pageinput[2], 0);
 
-    TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage);
+    const TeletextSubPage *ttpage = FindSubPage(m_curpage, m_cursubpage);
 
     if (!ttpage)
     {
@@ -1114,11 +1131,12 @@ void OSDTypeTeletext::StatusUpdated(void)
 
         if (!m_transparent)
             for (int i = 7; i < 40; i++)
-                DrawBackground(i, 0);
+                DrawBackground(surface, i, 0);
 
-        char *str = "Page Not Available";
-        for (unsigned int i = 0; i < strlen(str); ++i)
-            DrawCharacter(i+10, 0, str[i], 0);
+        QString str = QObject::tr("Page Not Available",
+                                  "Requested Teletext page not available");
+        for (uint i = 0; (i < 30) && i < str.length(); i++)
+            DrawCharacter(surface, i+10, 0, str[i], 0);
 
         return;
     }
@@ -1126,14 +1144,14 @@ void OSDTypeTeletext::StatusUpdated(void)
     // get list of available sub pages
     QString str = "";
     int count = 1, selected = 0;
-    TeletextPage *page = FindPage(m_curpage);
+    const TeletextPage *page = FindPage(m_curpage);
     if (page)
     {
-        std::map<int, TeletextSubPage>::iterator subpageIter;
+        int_to_subpage_t::const_iterator subpageIter;
         subpageIter = page->subpages.begin();
         while (subpageIter != page->subpages.end())
         {
-            TeletextSubPage *subpage = &subpageIter->second;
+            const TeletextSubPage *subpage = &subpageIter->second;
 
             if (subpage->subpagenum == m_cursubpage)
             {
@@ -1180,7 +1198,7 @@ void OSDTypeTeletext::StatusUpdated(void)
         else
             SetBackgroundColor(TTColor::BLACK);
 
-        DrawBackground(x * 3 + 7, 0);
+        DrawBackground(surface, x * 3 + 7, 0);
 
         if (str[x * 3] == '*')
         {
@@ -1188,12 +1206,12 @@ void OSDTypeTeletext::StatusUpdated(void)
             SetBackgroundColor(TTColor::RED);
         }
 
-        DrawBackground(x * 3 + 8, 0);
-        DrawBackground(x * 3 + 9, 0);
+        DrawBackground(surface, x * 3 + 8, 0);
+        DrawBackground(surface, x * 3 + 9, 0);
 
-        DrawCharacter(x * 3 + 7, 0, str[x * 3], 0);
-        DrawCharacter(x * 3 + 8, 0, str[x * 3 + 1], 0);
-        DrawCharacter(x * 3 + 9, 0, str[x * 3 + 2], 0);
+        DrawCharacter(surface, x * 3 + 7, 0, str[x * 3], 0);
+        DrawCharacter(surface, x * 3 + 8, 0, str[x * 3 + 1], 0);
+        DrawCharacter(surface, x * 3 + 9, 0, str[x * 3 + 2], 0);
     }
 }
 
