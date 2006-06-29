@@ -714,7 +714,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     // Open recording
     VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
 
-    if (ret = av_open_input_file(&inputFC, inFile.ascii(), NULL, 0, NULL) != 0)
+    if ((ret = av_open_input_file(&inputFC, inFile.ascii(), NULL, 0, NULL)) != 0)
     {
         VERBOSE(VB_JOBQUEUE,
                 QString("Couldn't open input file, error #%1").arg(ret));
@@ -722,7 +722,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     }
 
     // Getting stream information
-    if (ret = av_find_stream_info(inputFC) < 0)
+    if ((ret = av_find_stream_info(inputFC)) < 0)
     {
         VERBOSE(VB_JOBQUEUE,
                 QString("Couldn't get stream info, error #%1").arg(ret));
@@ -1108,6 +1108,7 @@ bool getDBParamters(QString outFile)
     t << params.dbPassword << endl;
     t << params.dbName << endl;
     t << gContext->GetHostName() << endl;
+    t << gContext->GetInstallPrefix() << endl;
     f.close();
 
     return true;

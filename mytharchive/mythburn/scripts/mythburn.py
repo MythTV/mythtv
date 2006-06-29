@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060621-2"
+VERSION="0.1.20060629-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -115,6 +115,7 @@ mediatype = DVD_SL
 savefilename = ''
 
 configHostname = socket.gethostname()
+installPrefix = ""
 
 # job xml file
 jobDOM = None
@@ -161,6 +162,7 @@ def getMysqlDBParameters():
     global mysql_passwd
     global mysql_db
     global configHostname
+    global installPrefix
 
     f = tempfile.NamedTemporaryFile();
     result = os.spawnlp(os.P_WAIT, 'mytharchivehelper','mytharchivehelper',
@@ -178,6 +180,7 @@ def getMysqlDBParameters():
     mysql_passwd = f.readline()[:-1]
     mysql_db = f.readline()[:-1]
     configHostname = f.readline()[:-1]
+    installPrefix = f.readline()[:-1]
     f.close()
     del f
 
@@ -3024,14 +3027,16 @@ if progresslog != "":
     progressfile = open(progresslog, 'w')
     write( "mythburn.py (%s) starting up..." % VERSION)
 
-#if the script is run from the web interface the PATH environment variable does not include
-#many of the bin locations we need so just append a few likely locations where our required
-#executables may be
-environPath = os.getenv("PATH")
-os.environ['PATH'] += "/bin:/sbin:/usr/local/bin:/usr/bin:/opt/bin:"
 
 #Get mysql database parameters
 getMysqlDBParameters();
+
+#if the script is run from the web interface the PATH environment variable does not include
+#many of the bin locations we need so just append a few likely locations where our required
+#executables may be
+if not os.environ['PATH'].endswith(':'):
+    os.environ['PATH'] += ":"
+os.environ['PATH'] += "/bin:/sbin:/usr/local/bin:/usr/bin:/opt/bin:" + installPrefix +"/bin:"
 
 #Get defaults from MythTV database
 defaultsettings = getDefaultParametersFromMythTVDB()
