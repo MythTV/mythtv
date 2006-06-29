@@ -13,8 +13,6 @@
 #include <iostream>
 using namespace std;
 
-MythContext *gContext;
-
 static void *run_priv_thread(void *data)
 {
     (void)data;
@@ -102,6 +100,9 @@ int main(int argc, char *argv[])
     
     gContext->LoadQtConfig();
 
+#if defined(Q_OS_MACX) 
+    // Mac OS X doesn't define the AudioOutputDevice setting 
+#else
     QString auddevice = gContext->GetSetting("AudioOutputDevice");
     if (auddevice == "" || auddevice == QString::null)
     {
@@ -109,6 +110,7 @@ int main(int argc, char *argv[])
                 "to run 'mythfrontend', not 'mythtv'.");
         return TV_EXIT_NO_AUDIO;
     }
+#endif
 
     print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
 
