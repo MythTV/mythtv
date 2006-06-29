@@ -3919,6 +3919,9 @@ int main(int argc, char *argv[])
 
     if (grab_data)
     {
+        MSqlQuery updt(MSqlQuery::InitCon());
+        updt.exec("UPDATE program SET first = 0, last = 0;");
+
         VERBOSE(VB_GENERAL, "Marking episode first showings.");
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -3928,7 +3931,6 @@ int main(int argc, char *argv[])
 
         if (query.isActive() && query.size() > 0)
         {
-            MSqlQuery updt(MSqlQuery::InitCon());
             while(query.next())
             {
                 updt.prepare("UPDATE program set first = 1 "
@@ -3948,7 +3950,6 @@ int main(int argc, char *argv[])
 
         if (query.isActive() && query.size() > 0)
         {
-            MSqlQuery updt(MSqlQuery::InitCon());
             while(query.next())
             {
                 updt.prepare("UPDATE program set first = 1 "
@@ -3965,20 +3966,15 @@ int main(int argc, char *argv[])
         }
         found += query.numRowsAffected();
         VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
-    }
 
-    if (grab_data)
-    {
         VERBOSE(VB_GENERAL, "Marking episode last showings.");
 
-        MSqlQuery query(MSqlQuery::InitCon());
         query.exec("SELECT MAX(starttime),programid FROM program "
                    "WHERE programid > '' AND NOT (category_type = 'series' "
                    "AND program.programid LIKE '%0000') GROUP BY programid;");
 
         if (query.isActive() && query.size() > 0)
         {
-            MSqlQuery updt(MSqlQuery::InitCon());
             while(query.next())
             {
                 updt.prepare("UPDATE program set last = 1 "
@@ -3989,7 +3985,7 @@ int main(int argc, char *argv[])
                 updt.exec();
             }
         }
-        int found = query.numRowsAffected();
+        found = query.numRowsAffected();
 
         query.exec("SELECT MAX(starttime),title,subtitle,description "
                    "FROM program WHERE programid = '' "
@@ -3998,7 +3994,6 @@ int main(int argc, char *argv[])
 
         if (query.isActive() && query.size() > 0)
         {
-            MSqlQuery updt(MSqlQuery::InitCon());
             while(query.next())
             {
                 updt.prepare("UPDATE program set last = 1 "

@@ -2194,6 +2194,18 @@ static GlobalSpinBox *GRPrefInputRecPriority()
     return bs;
 }
 
+static GlobalSpinBox *GROnceRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("OnceRecPriority", 0, 99, 1);
+    bs->setLabel(QObject::tr("Priority When Shown Once"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing of "
+                    "an episode, special or movie only appears once in "
+                    "the current TV listing. This improves the chance that "
+                    "a show will record in it's only available time slot."));
+    bs->setValue(0);
+    return bs;
+}
+
 static GlobalSpinBox *GRHDTVRecPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("HDTVRecPriority", -99, 99, 1);
@@ -3569,6 +3581,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     sched->addChild(GRDefaultEndOffset());
     sched->addChild(GRComplexPriority());
     sched->addChild(GRPrefInputRecPriority());
+    sched->addChild(GROnceRecPriority());
     sched->addChild(GRHDTVRecPriority());
     sched->addChild(GRCCRecPriority());
     addChild(sched);

@@ -1935,6 +1935,7 @@ void Scheduler::AddNewRecords(void)
 
     int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
     int prefinputpri    = gContext->GetNumSetting("PrefInputPriority", 2);
+    int oncepriority    = gContext->GetNumSetting("OnceRecPriority", 0);
     int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
     int ccpriority      = gContext->GetNumSetting("CCRecPriority", 0);
 
@@ -2034,7 +2035,8 @@ void Scheduler::AddNewRecords(void)
 "RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "channel.recpriority + cardinput.recpriority, "
-"RECTABLE.prefinput, program.hdtv, program.closecaptioned "
+"RECTABLE.prefinput, program.hdtv, program.closecaptioned, "
+"program.first, program.last "
 + QString(
 "FROM recordmatch "
 
@@ -2198,14 +2200,18 @@ void Scheduler::AddNewRecords(void)
 
         p->recpriority2 += result.value(39).toInt();
 
-        if (p->inputid == result.value(40).toInt())
+        if (prefinputpri != 0 && p->inputid == result.value(40).toInt())
             p->recpriority2 += prefinputpri;
 
-        if (result.value(41).toInt() > 0)
+        if (hdtvpriority != 0 && result.value(41).toInt() > 0)
             p->recpriority2 += hdtvpriority;
 
-        if (result.value(42).toInt() > 0)
+        if (ccpriority != 0 && result.value(42).toInt() > 0)
             p->recpriority2 += ccpriority;
+
+        if (oncepriority != 0 && result.value(43).toInt() > 0 && 
+                                 result.value(44).toInt() > 0)
+            p->recpriority2 += oncepriority;
 
         if (complexpriority == 0)
         {
