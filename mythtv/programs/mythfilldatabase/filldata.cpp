@@ -3926,8 +3926,8 @@ int main(int argc, char *argv[])
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec("SELECT MIN(starttime),programid FROM program "
-                   "WHERE programid > '' AND NOT (category_type = 'series' "
-                   "AND program.programid LIKE '%0000') GROUP BY programid;");
+                   "WHERE programid > '' AND generic = 0 "
+                   "GROUP BY programid;");
 
         if (query.isActive() && query.size() > 0)
         {
@@ -3944,8 +3944,7 @@ int main(int argc, char *argv[])
         int found = query.numRowsAffected();
 
         query.exec("SELECT MIN(starttime),title,subtitle,description "
-                   "FROM program WHERE programid = '' "
-                   "AND (subtitle > '' OR description > '') "
+                   "FROM program WHERE programid = '' AND generic = 0 "
                    "GROUP BY title,subtitle,description;");
 
         if (query.isActive() && query.size() > 0)
@@ -3970,8 +3969,8 @@ int main(int argc, char *argv[])
         VERBOSE(VB_GENERAL, "Marking episode last showings.");
 
         query.exec("SELECT MAX(starttime),programid FROM program "
-                   "WHERE programid > '' AND NOT (category_type = 'series' "
-                   "AND program.programid LIKE '%0000') GROUP BY programid;");
+                   "WHERE programid > '' AND generic = 0 "
+                   "GROUP BY programid;");
 
         if (query.isActive() && query.size() > 0)
         {
@@ -3988,8 +3987,7 @@ int main(int argc, char *argv[])
         found = query.numRowsAffected();
 
         query.exec("SELECT MAX(starttime),title,subtitle,description "
-                   "FROM program WHERE programid = '' "
-                   "AND (subtitle > '' OR description > '') "
+                   "FROM program WHERE programid = '' AND generic = 0 "
                    "GROUP BY title,subtitle,description;");
 
         if (query.isActive() && query.size() > 0)

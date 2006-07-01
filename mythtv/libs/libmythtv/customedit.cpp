@@ -104,36 +104,20 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_cfrom << "";
     m_csql << "program.title = 'Nova' ";
 
+    m_clause->insertItem(tr("Match words in the title"));
+    m_cfrom << "";
+    m_csql << "program.title LIKE 'CSI: %' ";
+
     m_clause->insertItem(tr("Match an exact episode"));
     m_cfrom << "";
     m_csql << QString("program.title = 'Seinfeld' \n"
                       "AND program.subtitle = 'The Soup' ");
-
-    m_clause->insertItem(tr("Match words in the title"));
-    m_cfrom << "";
-    m_csql << "program.title LIKE '%Junkyard%' ";
 
     m_clause->insertItem(tr("Match in any descriptive field"));
     m_cfrom << "";
     m_csql << QString("(program.title LIKE '%Japan%' \n"
                       "     OR program.subtitle LIKE '%Japan%' \n"
                       "     OR program.description LIKE '%Japan%') ");
-
-    m_clause->insertItem(tr("Limit by category"));
-    m_cfrom << "";
-    m_csql << "program.category = 'Reality' ";
-
-    m_clause->insertItem(tr("All matches for a genre (Data Direct)"));
-    m_cfrom << "LEFT JOIN programgenres ON "
-               "program.chanid = programgenres.chanid AND "
-               "program.starttime = programgenres.starttime ";
-    m_csql << "programgenres.genre = 'Reality' ";
-
-    m_clause->insertItem(tr("Limit by MPAA or VCHIP rating (Data Direct)"));
-    m_cfrom << "LEFT JOIN programrating ON "
-               "program.chanid = programrating.chanid AND "
-               "program.starttime = programrating.starttime ";
-    m_csql << "(programrating.rating = 'G' OR programrating.rating LIKE 'TV-Y%') ";
 
     m_clause->insertItem(tr("New episodes only"));
     m_cfrom << "";
@@ -151,25 +135,27 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_cfrom << "";
     m_csql << "program.last > 0 ";
 
-    m_clause->insertItem(QString(tr("Category type") +
-            " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));
+    m_clause->insertItem(tr("Anytime on a specific day of the week"));
     m_cfrom << "";
-    m_csql << "program.category_type = 'sports' ";
+    m_csql << "DAYNAME(program.starttime) = 'Tuesday' ";
 
-    m_clause->insertItem(tr("Limit movies by the year of release"));
+    m_clause->insertItem(tr("Only on weekdays (Monday through Friday)"));
     m_cfrom << "";
-    m_csql << "program.category_type = 'movie' AND program.airdate >= 2000 ";
+    m_csql << "WEEKDAY(program.starttime) < 5 ";
 
-    m_clause->insertItem(tr("Minimum star rating (0.0 to 1.0 for movies only)"));
+    m_clause->insertItem(tr("Only on weekends"));
     m_cfrom << "";
-    m_csql << "program.stars >= 0.75 ";
+    m_csql << "WEEKDAY(program.starttime) >= 5 ";
 
-    m_clause->insertItem(tr("Person named in the credits (Data Direct)"));
-    m_cfrom << ", people, credits";
-    m_csql << QString("people.name = 'Tom Hanks' \n"
-                      "AND credits.person = people.person \n"
-                      "AND program.chanid = credits.chanid \n"
-                      "AND program.starttime = credits.starttime ");
+    m_clause->insertItem(tr("Only in primetime"));
+    m_cfrom << "";
+    m_csql << QString("HOUR(program.starttime) >= 19 \n"
+                      "AND HOUR(program.starttime) < 23 ");
+
+    m_clause->insertItem(tr("Not in primetime"));
+    m_cfrom << "";
+    m_csql << QString("(HOUR(program.starttime) < 19 \n"
+                      "      OR HOUR(program.starttime) >= 23) ");
 
     m_clause->insertItem(tr("Only on a specific station"));
     m_cfrom << "";
@@ -199,27 +185,42 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_cfrom << "";
     m_csql << "program.hdtv > 0 ";
 
-    m_clause->insertItem(tr("Anytime on a specific day of the week"));
+    m_clause->insertItem(tr("Limit by category"));
     m_cfrom << "";
-    m_csql << "DAYNAME(program.starttime) = 'Tuesday' ";
+    m_csql << "program.category = 'Reality' ";
 
-    m_clause->insertItem(tr("Only on weekdays (Monday through Friday)"));
-    m_cfrom << "";
-    m_csql << "WEEKDAY(program.starttime) < 5 ";
+    m_clause->insertItem(tr("All matches for a genre (Data Direct)"));
+    m_cfrom << "LEFT JOIN programgenres ON "
+               "program.chanid = programgenres.chanid AND "
+               "program.starttime = programgenres.starttime ";
+    m_csql << "programgenres.genre = 'Reality' ";
 
-    m_clause->insertItem(tr("Only on weekends"));
-    m_cfrom << "";
-    m_csql << "WEEKDAY(program.starttime) >= 5 ";
+    m_clause->insertItem(tr("Limit by MPAA or VCHIP rating (Data Direct)"));
+    m_cfrom << "LEFT JOIN programrating ON "
+               "program.chanid = programrating.chanid AND "
+               "program.starttime = programrating.starttime ";
+    m_csql << "(programrating.rating = 'G' OR programrating.rating "
+              "LIKE 'TV-Y%') ";
 
-    m_clause->insertItem(tr("Only in primetime"));
+    m_clause->insertItem(QString(tr("Category type") +
+            " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));
     m_cfrom << "";
-    m_csql << QString("HOUR(program.starttime) >= 19 \n"
-                      "AND HOUR(program.starttime) < 23 ");
+    m_csql << "program.category_type = 'sports' ";
 
-    m_clause->insertItem(tr("Not in primetime"));
+    m_clause->insertItem(tr("Limit movies by the year of release"));
     m_cfrom << "";
-    m_csql << QString("(HOUR(program.starttime) < 19 \n"
-                      "      OR HOUR(program.starttime) >= 23) ");
+    m_csql << "program.category_type = 'movie' AND program.airdate >= 2000 ";
+
+    m_clause->insertItem(tr("Minimum star rating (0.0 to 1.0 for movies only)"));
+    m_cfrom << "";
+    m_csql << "program.stars >= 0.75 ";
+
+    m_clause->insertItem(tr("Person named in the credits (Data Direct)"));
+    m_cfrom << ", people, credits";
+    m_csql << QString("people.name = 'Tom Hanks' \n"
+                      "AND credits.person = people.person \n"
+                      "AND program.chanid = credits.chanid \n"
+                      "AND program.starttime = credits.starttime ");
 
 /*  This shows how to use oldprogram but is a bad idea in practice.
     This would match all future showings until the day after the first
@@ -257,6 +258,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_clause->insertItem(tr("First Episodes (complete example for Data Direct)"));
     m_cfrom << "";
     m_csql << QString("program.previouslyshown = 0 \n"
+              "AND program.first > 0 \n"
               "AND program.programid LIKE 'EP%0001' \n"
               "AND DAYOFYEAR(program.originalairdate) = \n"
               "    DAYOFYEAR(program.starttime) ");
