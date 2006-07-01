@@ -1864,6 +1864,7 @@ OSDTypeBox::OSDTypeBox(const OSDTypeBox &other)
 {
     size = other.size;
     m_unbiasedsize = other.m_unbiasedsize;
+    m_color = other.m_color;
 }
 
 OSDTypeBox::~OSDTypeBox()
