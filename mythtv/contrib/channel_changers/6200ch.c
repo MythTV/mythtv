@@ -28,7 +28,7 @@
 #include <unistd.h> // for usleep
 
 // Motorola DCT-6200 IDs
-// Note: there are at least three different vendor IDs for the 6200
+// Note: there are at least ten different vendor IDs for the 6200
 #define DCT6200_VENDOR_ID1 0x00000ce5
 #define DCT6200_VENDOR_ID2 0x00000e5c
 #define DCT6200_VENDOR_ID3 0x00001225
@@ -38,6 +38,7 @@
 #define DCT6200_VENDOR_ID7 0x000011ae
 #define DCT6200_VENDOR_ID8 0x0000152f
 #define DCT6200_VENDOR_ID9 0x000014e8
+#define DCT6200_VENDOR_ID10 0x000016b5
 #define DCT6200_SPEC_ID    0x00005068
 #define DCT6200_SW_VERSION 0x00010101
 #define DCT6200_MODEL_ID1  0x0000620a
@@ -169,6 +170,7 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID7) ||
             (dir.vendor_id == DCT6200_VENDOR_ID8) ||
             (dir.vendor_id == DCT6200_VENDOR_ID9) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID10) ||
             (dir.vendor_id == DCT6412_VENDOR_ID1)) &&
            ((dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||
