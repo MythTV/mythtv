@@ -2977,6 +2977,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 {
                     int gotSubtitles = 0;
                     AVSubtitle subtitle;
+                    memset(&subtitle, 0, sizeof(AVSubtitle));
 
                     if (ringBuffer->isDVD())
                     {

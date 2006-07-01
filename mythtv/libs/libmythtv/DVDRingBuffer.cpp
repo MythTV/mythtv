@@ -44,6 +44,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       seekpos(0), seekwhence(0),
       parent(0)
 {
+    memset(&dvdMenuButton, 0, sizeof(AVSubtitle));
 }
 
 DVDRingBufferPriv::~DVDRingBufferPriv()
@@ -408,8 +409,15 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         .arg(hl->ex).arg(hl->ey)
                         .arg(hl->pts).arg(hl->buttonN));
 
+                menuBtnLock.lock();
+
                 if (DVDButtonUpdate(false))
+                {
+                    ClearMenuButton();
                     buttonExists = DrawMenuButton(menuSpuPkt,menuBuflength);
+                }
+
+                menuBtnLock.unlock();
 
                 ClearSubtitlesOSD();
                 if (blockBuf != dvdBlockWriteBuf)
@@ -600,6 +608,8 @@ void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
         (buttonstreamid > 0))
         return;
 
+    QMutexLocker lock(&menuBtnLock);
+
     buttonstreamid = stream_id;
     ClearMenuSPUParameters();
     uint8_t *spu_pkt;
@@ -618,16 +628,22 @@ void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
 
 AVSubtitleRect *DVDRingBufferPriv::GetMenuButton(void)
 {
+    menuBtnLock.lock();
+
     if ((menuBuflength > 4) && buttonExists)
         return &(dvdMenuButton.rects[0]);
 
     return NULL;
 }
 
+void DVDRingBufferPriv::ReleaseMenuButton(void)
+{
+    menuBtnLock.unlock();
+}
 
 bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
 {
-    int gotbutton = 0;
+    int gotbutton;
     if (DecodeSubtitles(&dvdMenuButton, &gotbutton, spu_pkt, buf_size))
     {
         int x1, y1;
@@ -809,6 +825,7 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
 {
     if (!parent)
         return false;
+
     int videoheight = parent->GetVideoHeight();
     int videowidth = parent->GetVideoWidth();
 
@@ -837,19 +854,29 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
     return false;
 }
 
+void DVDRingBufferPriv::ClearMenuButton(void)
+{
+    if (buttonExists || dvdMenuButton.rects)
+    {
+        av_free(dvdMenuButton.rects[0].rgba_palette);
+        av_free(dvdMenuButton.rects[0].bitmap);
+        av_free(dvdMenuButton.rects);
+
+        dvdMenuButton.rects = NULL;
+        dvdMenuButton.num_rects = 0;
+        buttonExists = false;
+    }
+}
+
 void DVDRingBufferPriv::ClearMenuSPUParameters(void)
 {
     if (menuBuflength == 0)
         return;
 
     VERBOSE(VB_PLAYBACK,LOC + "Clearing Menu SPU Packet" );
-    if (buttonExists)
-    {
-        av_free(dvdMenuButton.rects[0].rgba_palette);
-        av_free(dvdMenuButton.rects[0].bitmap);
-        av_free(dvdMenuButton.rects);
-        buttonExists = false;
-    }  
+
+    ClearMenuButton();
+
     av_free(menuSpuPkt);
     menuBuflength = 0;
     hl_startx = hl_starty = 0;

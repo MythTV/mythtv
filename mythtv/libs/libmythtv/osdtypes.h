@@ -301,7 +301,7 @@ class OSDTypeImage : public OSDType
     void Reinit(float wmult, float hmult);
 
     void LoadImage(const QString &filename, float wmult, float hmult, 
-                   int scalew = -1, int scaleh = -1);
+                   int scalew = -1, int scaleh = -1, bool usecache = true);
     void LoadFromQImage(const QImage &img);
 
     void SetStaticSize(int scalew, int scaleh) { m_scalew = scalew;

@@ -1217,6 +1217,14 @@ OSDTypeImage::~OSDTypeImage()
         delete m_cacheitem;
         m_cacheitem = NULL;
     }
+    else
+    {
+        // non-cached
+        if (m_yuv)
+            delete [] m_yuv;
+        if (m_alpha)
+            delete [] m_alpha;
+    }
 }
 
 void OSDTypeImage::SetName(const QString &name)
@@ -1242,47 +1250,64 @@ void OSDTypeImage::Reinit(float wmult, float hmult)
 }
 
 void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
-                             int scalew, int scaleh)
+                             int scalew, int scaleh, bool usecache)
 {
     QString ckey;
-   
-    if (!filename.isEmpty() && filename.length() >= 2)
-    {
-        ckey = OSDImageCache::CreateKey(
-            filename, wmult, hmult, scalew, scaleh);
+
+    if (usecache)
+    {   
+        if (!filename.isEmpty() && filename.length() >= 2)
+            ckey = OSDImageCache::CreateKey(filename, wmult, hmult, 
+                                            scalew, scaleh);
+        else 
+            return; // this method requires a backing file
     }
-    else 
+
+    // Discard any in-cache items..
+    if (m_cacheitem && !usecache)
     {
-        // this method requires a backing file
-        return;
+        c_cache.Insert(m_cacheitem);
+        m_cacheitem = NULL;
+    }
+    else if (!m_cacheitem || !usecache)
+    {
+        if (m_yuv)
+            delete [] m_yuv;
+        m_yuv = NULL;
+        if (m_alpha)
+            delete [] m_alpha;
+        m_alpha = NULL;
+
+        m_isvalid = false; 
+    }
+
+    if (usecache)
+    {
+        // Get the item from the cache so it's not freed while in use
+        OSDImageCacheValue *value = c_cache.Get(ckey, true);
+  
+        if (value != NULL)
+        {
+            m_yuv       = value->m_yuv;
+            m_ybuffer   = value->m_ybuffer;
+            m_ubuffer   = value->m_ubuffer;
+            m_vbuffer   = value->m_vbuffer;
+            m_alpha     = value->m_alpha;
+            m_imagesize = value->m_imagesize;
+            m_isvalid   = true;
+
+            // Put the old image back to the cache so it can be reused in the
+            // future, and possibly freed by the cache system if the size limit
+            // is reached
+            if (m_cacheitem)
+                c_cache.Insert(m_cacheitem);
+            m_cacheitem = value;
+
+            return;
+        }
     }
   
-    // Get the item from the cache so it's not freed while in use
-    OSDImageCacheValue* value = c_cache.Get(ckey, true);
-  
-    if (value != NULL)
-    {
-        m_yuv       = value->m_yuv;
-        m_ybuffer   = value->m_ybuffer;
-        m_ubuffer   = value->m_ubuffer;
-        m_vbuffer   = value->m_vbuffer;
-        m_alpha     = value->m_alpha;
-        m_imagesize = value->m_imagesize;
-        m_isvalid   = true;
-
-        // Put the old image back to the cache so it can be reused in the
-        // future, and possibly freed by the cache system if the size limit
-        // is reached
-        if (!m_cacheitem)
-            c_cache.Insert(m_cacheitem);
-        m_cacheitem = value;
-
-        return;
-    }
-   
-    // scaled image was not found in cache, have to create it
-  
-
+    // Create image 
     QImage tmpimage(filename);
 
     if (tmpimage.width() == 0)
@@ -1321,28 +1346,40 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     m_imagesize = QRect(0, 0, imwidth, imheight);
 
-    // put the old image back to the cache so it can be reused in the
-    // future, and possibly freed by the cache system if the size limit
-    // is reached
-    if (m_cacheitem)
-        c_cache.Insert(m_cacheitem);
+    if (usecache)
+    {
+        // put the old image back to the cache so it can be reused in the
+        // future, and possibly freed by the cache system if the size limit
+        // is reached
+        if (m_cacheitem)
+            c_cache.Insert(m_cacheitem);
   
-    m_cacheitem = new OSDImageCacheValue(
-        ckey,
-        m_yuv,     m_ybuffer, m_ubuffer,
-        m_vbuffer, m_alpha,   m_imagesize);
+        m_cacheitem = new OSDImageCacheValue(
+            ckey,
+            m_yuv,     m_ybuffer, m_ubuffer,
+            m_vbuffer, m_alpha,   m_imagesize);
  
-    // save the new cache item to the file cache
-    if (!filename.isEmpty())
-        c_cache.SaveToDisk(m_cacheitem);
+        // save the new cache item to the file cache
+        if (!filename.isEmpty())
+            c_cache.SaveToDisk(m_cacheitem);
+    }
 }
 
 void OSDTypeImage::LoadFromQImage(const QImage &img)
 {
-    // this method is not cached as it's used mostly for
-    // subtitles which are displayed only once anyways, caching
-    // would probably only slow things down overall
-    if (m_isvalid)
+    // this method is not cached
+
+    if (!m_cacheitem)
+    {
+        if (m_yuv)
+            delete [] m_yuv;
+        m_yuv = NULL;
+        if (m_alpha)
+            delete [] m_alpha;
+        m_alpha = NULL;
+        m_isvalid = false;
+    }
+    else
     {
         delete m_cacheitem;
         m_cacheitem = NULL;
@@ -1628,7 +1665,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
     m_scaleh = scaleh;
     m_cacheitem = NULL;
 
-    LoadImage(m_redname, wmult, hmult, scalew, scaleh);
+    LoadImage(m_redname, wmult, hmult, scalew, scaleh, false);
     if (m_isvalid)
     {
         m_risvalid = m_isvalid;
@@ -1643,7 +1680,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
         m_alpha = m_yuv = NULL;
     }
 
-    LoadImage(m_bluename, wmult, hmult, scalew, scaleh);
+    LoadImage(m_bluename, wmult, hmult, scalew, scaleh, false);
 }
 
 OSDTypeEditSlider::~OSDTypeEditSlider()
@@ -1664,7 +1701,7 @@ void OSDTypeEditSlider::Reinit(float wmult, float hmult)
 
     m_displaypos = m_displayrect.topLeft();
 
-    LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh);
+    LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh, false);
     if (m_isvalid)
     {
         m_risvalid = m_isvalid;
@@ -1679,7 +1716,7 @@ void OSDTypeEditSlider::Reinit(float wmult, float hmult)
         m_alpha = m_yuv = NULL;
     }
 
-    LoadImage(m_bluename, wmult, hmult, m_scalew, m_scaleh);
+    LoadImage(m_bluename, wmult, hmult, m_scalew, m_scaleh, false);
 }
 
 void OSDTypeEditSlider::ClearAll(void)

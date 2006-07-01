@@ -7,6 +7,7 @@
 
 #include <qstring.h>
 #include <qobject.h>
+#include <qmutex.h>
 #include "util.h"
 #include "../libavcodec/avcodec.h"
 
@@ -44,7 +45,10 @@ class DVDRingBufferPriv
     bool IsWaiting(void) { return dvdWaiting; }
     int  NumPartsInTitle(void) { return titleParts; }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
+
     AVSubtitleRect *GetMenuButton(void);
+    void ReleaseMenuButton(void);
+
     bool IgnoringStillorWait(void) { return skipstillorwait; }
     long long GetCellStartPos(void);
     uint ButtonPosX(void) { return hl_startx; }
@@ -153,9 +157,12 @@ class DVDRingBufferPriv
 
     NuppelVideoPlayer *parent;
 
+    QMutex menuBtnLock;
+
     bool DrawMenuButton(uint8_t *spu_pkt, int buf_size);
     bool DVDButtonUpdate(bool b_mode);
     void ClearMenuSPUParameters(void);
+    void ClearMenuButton(void);
     bool MenuButtonChanged(void);
     uint ConvertLangCode(uint16_t code); /// converts 2char key to 3char key
     void SelectDefaultButton(void);

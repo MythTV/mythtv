@@ -6136,6 +6136,7 @@ void NuppelVideoPlayer::ExpireSubtitles(void)
             av_free(rect->rgba_palette);
             av_free(rect->bitmap);
         }
+
         if (subtitlePage.num_rects > 0)
             av_free(subtitlePage.rects);
     }
@@ -6315,6 +6316,8 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         hidedvdbutton = false;
         subtitleLock.unlock();
     }
+
+    ringBuffer->DVD()->ReleaseMenuButton();
 }
 
 void NuppelVideoPlayer::ActivateDVDButton(void)
