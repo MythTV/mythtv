@@ -1227,7 +1227,7 @@ MythTV Archive GUI theme
           </textarea>
 
           <statusbar name="size_bar" draworder="1" whitespace="5">
-              <context>1</context>
+              <context>-1</context>
               <container fleximage="no">ma_size_background.png</container>
               <fill>ma_size_tick.png</fill>
               <position>670,355</position>
@@ -1235,28 +1235,28 @@ MythTV Archive GUI theme
           </statusbar>
 
           <textarea name="maxsize" draworder="2">
-              <context>1</context>
+              <context>-1</context>
               <area>710,360,100,30</area>
               <font>smallstatsfont</font>
               <value>xxxxx mb</value>
           </textarea>
 
           <textarea name="minsize" draworder="3">
-              <context>1</context>
+              <context>-1</context>
               <area>710,500,100,30</area>
               <font>smallstatsfont</font>
               <value>0 mb</value>
           </textarea>
 
           <textarea name="currentsize" draworder="4">
-              <context>1</context>
+              <context>-1</context>
               <area>710,425,100,30</area>
               <font>smallstatsfont</font>
               <value>xxxxx mb</value>
           </textarea>
 
           <textarea name="currentsize_error" draworder="4">
-              <context>1</context>
+              <context>-1</context>
               <area>710,425,100,30</area>
               <font>statserror</font>
               <value>xxxxx mb</value>
@@ -1431,14 +1431,57 @@ MythTV Archive GUI theme
               <showarrow>no</showarrow>
           </listbtnarea>
 
+          <image name="image" draworder="0">
+              <context>3</context>
+              <position>25,310</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>650,240</staticsize>
+          </image>
+          <!--
           <textbutton name="advanced_button" draworder="1">
-              <position>35,300</position>
+              <position>35,450</position>
               <context>3</context>
               <image function="on" filename="ma_text_button_on.png"></image>
               <image function="off" filename="ma_text_button_off.png"></image>
               <image function="pushed" filename="ma_text_button_pushed.png"></image>
               <font>buttons</font>
           </textbutton>
+          -->
+          <textarea name="title" draworder="1" align="left">
+              <context>3</context>
+              <area>45,320,500,50</area>
+              <font>label</font>
+              <value>Encoder Profile</value>
+          </textarea>
+          <selector name="profile_selector" draworder="1">
+              <context>3</context>
+              <area>45,345,300,40</area>
+              <font>description</font>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+          </selector>
+          <textarea name="profile_text" draworder="1">
+              <context>3</context>
+              <area>45,380,610,90</area>
+              <font>detail</font>
+              <value></value>
+              <multiline>yes</multiline>
+          </textarea>
+          <textarea name="oldfilesize" draworder="5" align="left">
+              <context>3</context>
+              <area>45,485,200,40</area>
+              <font>detail</font>
+              <value>Original Size x.xx Gb</value>
+              <multiline>no</multiline>
+          </textarea>
+          <textarea name="newfilesize" draworder="5" align="right">
+              <context>3</context>
+              <area>450,485,200,40</area>
+              <font>detail</font>
+              <value>New Size x.xx Gb</value>
+              <multiline>no</multiline>
+          </textarea>
 
       </container>
 

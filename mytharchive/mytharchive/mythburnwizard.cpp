@@ -37,6 +37,7 @@ MythburnWizard::MythburnWizard(ArchiveDestination destination,
 
     archiveList = NULL;
     popupMenu = NULL;
+    profileList = NULL;
     setContext(1);
     wireUpTheme();
     assignFirstFocus();
@@ -50,7 +51,7 @@ MythburnWizard::MythburnWizard(ArchiveDestination destination,
     loadConfiguration();
 
     freeSpace = destination.freeSpace / 1024;
-    updateSizeBar();
+    updateSizeBar(true);
 }
 
 MythburnWizard::~MythburnWizard(void)
@@ -59,6 +60,9 @@ MythburnWizard::~MythburnWizard(void)
 
     if (archiveList)
         delete archiveList;
+    if (profileList)
+        delete profileList;
+
 }
 
 void MythburnWizard::keyPressEvent(QKeyEvent *e)
@@ -128,6 +132,8 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
                 theme_selector->push(false);
             else if (getCurrentFocusWidget() == category_selector)
                 category_selector->push(false);
+            else if (getCurrentFocusWidget() == profile_selector)
+                profile_selector->push(false);
             else
                 nextPrevWidgetFocus(false);
         }
@@ -137,6 +143,8 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
                 theme_selector->push(true);
             else if (getCurrentFocusWidget() == category_selector)
                 category_selector->push(true);
+            else if (getCurrentFocusWidget() == profile_selector)
+                profile_selector->push(true);
             else
                 nextPrevWidgetFocus(true);
         }
@@ -157,7 +165,7 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
                 freeSpace = MAX_DVDR_SIZE_DL;
             else
                 freeSpace = MAX_DVDR_SIZE_SL;
-            updateSizeBar();
+            updateSizeBar(getContext() != 2);
         }
         else if (action == "TOGGLECUT")
         {
@@ -183,37 +191,68 @@ void MythburnWizard::toggleSelectedState()
     UIListBtnTypeItem *item = archive_list->GetItemCurrent();
     if (item->state() == UIListBtnTypeItem:: FullChecked)
     {
+        //unselect item
         if (selectedList.find((ArchiveItem *) item->getData()) != -1)
             selectedList.remove((ArchiveItem *) item->getData());
         item->setChecked(UIListBtnTypeItem:: NotChecked);
     }
     else
     {
+        // select item
         if (selectedList.find((ArchiveItem *) item->getData()) == -1)
             selectedList.append((ArchiveItem *) item->getData());
 
         item->setChecked(UIListBtnTypeItem:: FullChecked);
+
+
+        ArchiveItem *a = (ArchiveItem *) item->getData();
+
+        // get duration of this file
+        if (a->duration == 0)
+            getFileDetails(a);
+
+        // get default encoding profile if needed
+        if (a->encoderProfile == NULL)
+        {
+            a->encoderProfile = getDefaultProfile(a);
+            setProfile(a->encoderProfile, a);
+        }
     }
 
     archive_list->refresh();
-    updateSizeBar();
 
     updateSelectedArchiveList();
 }
 
-void MythburnWizard::updateSizeBar()
+void MythburnWizard::updateSizeBar(bool show)
 {
+    if (show)
+    {
+        maxsize_text->show();
+        minsize_text->show();
+        size_bar->show();
+        currentsize_error_text->show();
+        currentsize_text->show();
+    }
+    else
+    {
+        maxsize_text->hide();
+        minsize_text->hide();
+        size_bar->hide();
+        currentsize_error_text->hide();
+        currentsize_text->hide();
+    }
+
     long long size = 0;
     ArchiveItem *a;
 
     for (a = selectedList.first(); a; a = selectedList.next())
     {
-        size += a->size; 
+        size += a->newsize; 
     }
 
     usedSpace = size / 1024 / 1024;
 
-    UITextType *item;
     QString tmpSize;
 
     if (size_bar)
@@ -224,44 +263,33 @@ void MythburnWizard::updateSizeBar()
 
     tmpSize.sprintf("%0d Mb", freeSpace);
 
-    item = getUITextType("maxsize");
-    if (item)
-        item->SetText(tr(tmpSize));
+    maxsize_text->SetText(tmpSize);
 
-    item = getUITextType("minsize");
-    if (item)
-        item->SetText(tr("0 Mb"));
+    minsize_text->SetText("0 Mb");
 
     tmpSize.sprintf("%0d Mb", usedSpace);
 
     if (usedSpace > freeSpace)
     {
-        item = getUITextType("currentsize");
-        if (item)
-            item->hide();
+        currentsize_text->hide();
 
-        item = getUITextType("currentsize_error");
-        if (item)
-        {
-            item->show();
-            item->SetText(tmpSize);
-        }
+        currentsize_error_text->SetText(tmpSize);
+        if (show)
+            currentsize_error_text->show();
     }
     else
     {
-        item = getUITextType("currentsize_error");
-        if (item)
-            item->hide();
+        currentsize_error_text->hide();
 
-        item = getUITextType("currentsize");
-        if (item)
-        {
-            item->show();
-            item->SetText(tmpSize);
-        }
+        currentsize_text->SetText(tmpSize);
+        if (show)
+            currentsize_text->show();
     }
 
     size_bar->refresh();
+
+    if (show)
+        selectedChanged(selected_list->GetItemCurrent());
 }
 
 void MythburnWizard::wireUpTheme()
@@ -338,22 +366,224 @@ void MythburnWizard::wireUpTheme()
     }
 
     selected_list = getUIListBtnType("selectedlist");
+    if (selected_list)
+    {
+        connect(selected_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
+                this, SLOT(selectedChanged(UIListBtnTypeItem *)));
+    }
 
     archive_list = getUIListBtnType("archivelist");
     if (archive_list)
     {
-        getArchiveList();
         connect(archive_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
                 this, SLOT(titleChanged(UIListBtnTypeItem *)));
     }
 
+    maxsize_text = getUITextType("maxsize");
+    minsize_text =  getUITextType("minsize");
+    currentsize_error_text = getUITextType("currentsize_error");
+    currentsize_text = getUITextType("currentsize");
+
     size_bar = getUIStatusBarType("size_bar");
-    if (size_bar)
+
+    profile_selector = getUISelectorType("profile_selector");
+    if (profile_selector)
     {
-        updateSizeBar();
+        connect(profile_selector, SIGNAL(pushed(int)),
+                this, SLOT(setProfile(int)));
     }
 
+    profile_text = getUITextType("profile_text");
+    loadEncoderProfiles();
+
+    oldsize_text = getUITextType("oldfilesize");
+    newsize_text =  getUITextType("newfilesize");
+
+    getArchiveList();
+
     buildFocusList();
+}
+
+void MythburnWizard::loadEncoderProfiles()
+{
+    profileList = new vector<EncoderProfile*>;
+
+    profile_selector->addItem(0, tr("Don't re-encode"));
+    EncoderProfile *item = new EncoderProfile;
+    item->name = "NONE";
+    item->description = "";
+    item->bitrate = 0.0f;
+    profileList->push_back(item);
+
+    // find the encoding profiles
+    QString filename = gContext->GetShareDir() + 
+            "mytharchive/encoder_profiles/ffmpeg_dvd_pal.xml";
+    QDomDocument doc("mydocument");
+    QFile file(filename);
+    if (!file.open(IO_ReadOnly))
+        return;
+
+    if (!doc.setContent( &file )) 
+    {
+        file.close();
+        return;
+    }
+    file.close();
+
+    QDomElement docElem = doc.documentElement();
+    QDomNodeList profileNodeList = doc.elementsByTagName("profile");
+    QString name, desc, bitrate;
+
+    for (int x = 0; x < (int) profileNodeList.count(); x++)
+    {
+        QDomNode n = profileNodeList.item(x);
+        QDomElement e = n.toElement();
+        QDomNode n2 = e.firstChild();
+        while (!n2.isNull())
+        {
+            QDomElement e2 = n2.toElement();
+            if(!e2.isNull()) 
+            {
+                if (e2.tagName() == "name")
+                    name = e2.text();
+                if (e2.tagName() == "description")
+                    desc = e2.text();
+                if (e2.tagName() == "bitrate")
+                    bitrate = e2.text();
+
+            }
+            n2 = n2.nextSibling();
+
+        }
+        profile_selector->addItem(x + 1, name);
+
+        EncoderProfile *item = new EncoderProfile;
+        item->name = name;
+        item->description = desc;
+        item->bitrate = bitrate.toFloat();
+        profileList->push_back(item);
+    }
+
+    profile_selector->setToItem(0);
+}
+
+void MythburnWizard::setProfile(int itemNo)
+{
+    EncoderProfile *profile = profileList->at(itemNo);
+    UIListBtnTypeItem *item = selected_list->GetItemCurrent();
+    if (item)
+    {
+        ArchiveItem *a = (ArchiveItem *) item->getData();
+        setProfile(profile, a);
+    }
+}
+
+void MythburnWizard::setProfile(EncoderProfile *profile, ArchiveItem *item)
+{
+    if (profile)
+    {
+        profile_text->SetText(profile->description);
+        if (item)
+        {
+            if (profile->name == "NONE")
+            {
+                item->encoderProfile = profile;
+                item->newsize = item->size;
+            }
+            else
+            {
+                item->encoderProfile = profile;
+                item->newsize = recalcSize(profile, item);
+            }
+
+            if (newsize_text)
+            {
+                newsize_text->SetText(tr("New Size ") + formatSize(item->newsize / 1024, 2));
+            }
+
+            updateSizeBar(true);
+        }
+    }
+}
+
+bool MythburnWizard::getFileDetails(ArchiveItem *a)
+{
+//    MythBusyDialog *busy = new MythBusyDialog(tr("Getting file details. Please Wait..."));
+//    busy->start();
+
+    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+
+    if (!tempDir.endsWith("/"))
+        tempDir += "/";
+
+    QString inFile;
+    int lenMethod = 0;
+    if (a->type == "Recording")
+    {
+        inFile = gContext->GetSetting("RecordFilePrefix") + "/" + a->filename;
+        lenMethod = 2;
+    }
+    else
+    {
+        inFile = a->filename;
+    }
+
+    QString outFile = tempDir + "/work/file.xml";
+
+    // call mytharchivehelper to get files stream info etc.
+    QString command = QString("mytharchivehelper -i '%1' '%2' %3 > /dev/null 2>&1")
+            .arg(inFile).arg(outFile).arg(lenMethod);
+    int res = system(command);
+    if (WIFEXITED(res))
+        res = WEXITSTATUS(res);
+    if (res != 0)
+        return false;
+
+    QDomDocument doc("mydocument");
+    QFile file(outFile);
+    if (!file.open(IO_ReadOnly))
+        return false;
+
+    if (!doc.setContent( &file )) 
+    {
+        file.close();
+        return false;
+    }
+    file.close();
+
+    // get file type and duration
+    QDomElement docElem = doc.documentElement();
+    QDomNodeList nodeList = doc.elementsByTagName("file");
+    if (nodeList.count() < 1)
+        return false;
+    QDomNode n = nodeList.item(0);
+    QDomElement e = n.toElement();
+    a->fileCodec = e.attribute("type");
+    a->duration = e.attribute("duration").toInt();
+
+    // get frame size and video codec
+    nodeList = doc.elementsByTagName("video");
+    if (nodeList.count() < 1)
+        return false;
+    n = nodeList.item(0);
+    e = n.toElement();
+    a->videoCodec = e.attribute("codec");
+    a->videoWidth = e.attribute("width").toInt();
+    a->videoHeight = e.attribute("height").toInt();
+//    busy->Close();
+//    delete busy;
+
+    return true;
+}
+
+long long MythburnWizard::recalcSize(EncoderProfile *profile, ArchiveItem *a)
+{
+    if (a->duration == 0)
+        return 0;
+
+    int length = a->duration;
+    float len = (float) length / 3600;
+    return (long long) (len * profile->bitrate * 1024 * 1024);
 }
 
 void MythburnWizard::toggleUseCutlist(bool state)
@@ -426,6 +656,36 @@ void MythburnWizard::titleChanged(UIListBtnTypeItem *item)
     buildFocusList();
 }
 
+void MythburnWizard::selectedChanged(UIListBtnTypeItem *item)
+{
+    if (!item)
+        return;
+
+    ArchiveItem *a;
+
+    a = (ArchiveItem *) item->getData();
+
+    if (!a)
+        return;
+
+    if (oldsize_text)
+    {
+        oldsize_text->SetText(tr("Original Size ") + formatSize(a->size / 1024, 2));
+    }
+
+    if (newsize_text)
+    {
+        newsize_text->SetText(tr("New Size ") + formatSize(a->newsize / 1024, 2));
+    }
+
+    if (a->encoderProfile->name == "NONE")
+        profile_selector->setToItem(tr("Don't re-encode"));
+    else
+        profile_selector->setToItem(a->encoderProfile->name);
+
+    profile_text->SetText(a->encoderProfile->description);
+}
+
 void MythburnWizard::handleNextPage()
 {
     if (getContext() == 1 && selectedList.count() == 0)
@@ -448,6 +708,7 @@ void MythburnWizard::handleNextPage()
             next_button->setText(tr("Next"));
     }
 
+    updateSizeBar(getContext() != 2);
     updateForeground();
     buildFocusList();
 }
@@ -752,12 +1013,19 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
                 item->subtitle = QString::fromUtf8(query.value(3).toString());
                 item->description = QString::fromUtf8(query.value(4).toString());
                 item->size = query.value(5).toLongLong();
+                item->newsize = query.value(5).toLongLong();
+                item->encoderProfile = NULL;
                 item->startDate = QString::fromUtf8(query.value(6).toString());
                 item->startTime = QString::fromUtf8(query.value(7).toString());
                 item->filename = filename;
                 item->hasCutlist = hasCutList(type, filename);
                 item->useCutlist = false;
                 item->editedDetails = false;
+                item->duration = 0;
+                item->fileCodec = "";
+                item->videoCodec = "";
+                item->videoWidth = 0;
+                item->videoHeight = 0;
 
                 archiveList->push_back(item);
             }
@@ -770,6 +1038,52 @@ vector<ArchiveItem *> *MythburnWizard::getArchiveListFromDB(void)
     }
 
     return archiveList;
+}
+
+EncoderProfile *MythburnWizard::getDefaultProfile(ArchiveItem *item)
+{
+    if (!item)
+        return profileList->at(0);
+
+    EncoderProfile *profile = NULL;
+
+    // is the file an mpeg2 file?
+    if (item->videoCodec.lower() == "mpeg2video")
+    {
+        // does the file already have a valid DVD resolution?
+        if (gContext->GetSetting("MythArchiveVideoFormat", "pal").lower() == "ntsc")
+        {
+            if ((item->videoWidth == 720 && item->videoHeight == 480) ||
+                (item->videoWidth == 704 && item->videoHeight == 480) ||
+                (item->videoWidth == 352 && item->videoHeight == 480) ||
+                (item->videoWidth == 352 && item->videoHeight == 240))
+            {
+                // don't need to re-encode
+                profile = profileList->at(0);
+            }
+        }
+        else
+        {
+            if ((item->videoWidth == 720 && item->videoHeight == 576) ||
+                (item->videoWidth == 704 && item->videoHeight == 576) ||
+                (item->videoWidth == 352 && item->videoHeight == 576) ||
+                (item->videoWidth == 352 && item->videoHeight == 288))
+            {
+                // don't need to re-encode
+                profile = profileList->at(0);
+            }
+        }
+    }
+
+    if (!profile)
+    {
+        // file needs re-encoding - use SP profile by default
+        for (uint x = 0; x < profileList->size(); x++)
+            if (profileList->at(x)->name == "SP")
+                profile = profileList->at(x);
+    }
+
+    return profile;
 }
 
 void MythburnWizard::getArchiveList(void)
@@ -844,7 +1158,7 @@ void MythburnWizard::createConfigFile(const QString &filename)
         file.setAttribute("type", a->type.lower() );
         file.setAttribute("usecutlist", a->useCutlist);
         file.setAttribute("filename", a->filename);
-
+        file.setAttribute("encodingprofile", a->encoderProfile->name);
         if (a->editedDetails)
         {
             QDomElement details = doc.createElement("details");
@@ -916,6 +1230,7 @@ void MythburnWizard::updateSelectedArchiveList(void)
             item->setChecked(UIListBtnTypeItem::FullChecked);
         else
             item->setChecked(UIListBtnTypeItem::NotChecked);
+        item->setData(a);
     }
 }
 
@@ -971,7 +1286,7 @@ void MythburnWizard::useSLDVD()
         return;
 
     freeSpace = MAX_DVDR_SIZE_SL;
-    updateSizeBar();
+    updateSizeBar(getContext() != 2);
     closePopupMenu();
 }
 
@@ -981,7 +1296,7 @@ void MythburnWizard::useDLDVD()
         return;
 
     freeSpace = MAX_DVDR_SIZE_DL;
-    updateSizeBar();
+    updateSizeBar(getContext() != 2);
     closePopupMenu();
 }
 

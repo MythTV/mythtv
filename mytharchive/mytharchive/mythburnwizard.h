@@ -23,6 +23,13 @@ enum ArchiveItemType
 
 typedef struct
 {
+    QString name;
+    QString description;
+    float bitrate;
+} EncoderProfile;
+
+typedef struct
+{
     int     id;
     QString type;
     QString title;
@@ -32,10 +39,17 @@ typedef struct
     QString startTime;
     QString filename;
     long long size;
+    long long newsize;
+    int duration;
+    EncoderProfile *encoderProfile;
+    QString fileCodec;
+    QString videoCodec;
+    int videoWidth, videoHeight;
     bool hasCutlist;
     bool useCutlist;
     bool editedDetails;
 } ArchiveItem;
+
 
 class MythburnWizard : public MythThemedDialog
 {
@@ -61,7 +75,9 @@ class MythburnWizard : public MythThemedDialog
 
     void setTheme(int);
     void setCategory(int);
+    void setProfile(int);
     void titleChanged(UIListBtnTypeItem *item);
+    void selectedChanged(UIListBtnTypeItem *item);
     void toggleUseCutlist(bool state);
     void showMenu(void);
     void closePopupMenu(void);
@@ -82,7 +98,7 @@ class MythburnWizard : public MythThemedDialog
     void toggleSelectedState(void);
     void getArchiveList(void);
     void wireUpTheme(void);
-    void updateSizeBar(void);
+    void updateSizeBar(bool show);
     void loadConfiguration(void);
     void saveConfiguration(void);
     void updateSelectedArchiveList(void);
@@ -94,9 +110,16 @@ class MythburnWizard : public MythThemedDialog
     bool hasCutList(QString &type, QString &filename);
     bool extractDetailsFromFilename(const QString &inFile,
                                     QString &chanID, QString &startTime);
+    void loadEncoderProfiles(void);
+    EncoderProfile *getDefaultProfile(ArchiveItem *item);
+    long long recalcSize(EncoderProfile *profile, ArchiveItem *a);
+    bool getFileDetails(ArchiveItem *a);
+    void setProfile(EncoderProfile *profile, ArchiveItem *item);
 
     vector<ArchiveItem *>  *archiveList;
     QPtrList<ArchiveItem> selectedList;
+
+    vector<EncoderProfile *> *profileList;
 
     UISelectorType *theme_selector;
     UIImageType    *theme_image;
@@ -132,7 +155,18 @@ class MythburnWizard : public MythThemedDialog
     UITextType       *nocutlist_text;
     UITextType       *filesize_text;
 
+    // size bar
     UIStatusBarType  *size_bar;
+    UITextType       *maxsize_text;
+    UITextType       *minsize_text;
+    UITextType       *currentsize_error_text;
+    UITextType       *currentsize_text;
+
+    // profile
+    UISelectorType   *profile_selector;
+    UITextType       *profile_text;
+    UITextType       *oldsize_text;
+    UITextType       *newsize_text;
 
     MythPopupBox     *popupMenu;
 };

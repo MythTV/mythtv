@@ -2660,10 +2660,14 @@ def processFile(file, folder):
                     else:
                         write("Failed to run mythtrancode to fix any errors")
     else:
-        #does the user always want to run recordings through mythtranscode?
+        #does the user always want to run mpeg2 files through mythtranscode?
         #may help to fix any errors in the file 
-        if (alwaysRunMythtranscode == True or 
-                (getFileType(folder) == "mpegts" and isFileOkayForDVD(file, folder))):
+        write("File type is '%s'" % getFileType(folder))
+        write("Video codec is '%s'" % getVideoCodec(folder))
+
+        if (alwaysRunMythtranscode == True and 
+                string.lower(getVideoCodec(folder)) == "mpeg2video" and
+                isFileOkayForDVD(file, folder)):
             if file.hasAttribute("localfilename"):
                 localfile = file.attributes["localfilename"].value
             else:

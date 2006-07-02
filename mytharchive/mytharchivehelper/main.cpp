@@ -27,7 +27,7 @@ class NativeArchive
       NativeArchive(void);
       ~NativeArchive(void);
 
-      bool doNativeArchive(QString &jobFile);
+      int doNativeArchive(QString &jobFile);
       bool copyFile(const QString &source, const QString &destination);
   private:
       QString formatSize(long long size);
@@ -253,7 +253,7 @@ void burnISOImage(int mediaType, bool bEraseDVDRW)
     VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
 }
 
-bool NativeArchive::doNativeArchive(QString &jobFile)
+int NativeArchive::doNativeArchive(QString &jobFile)
 {
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
 
@@ -262,14 +262,14 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
     if (!file.open(IO_ReadOnly))
     {
         VERBOSE(VB_ALL, "Could not open job file: " + jobFile); 
-        return false;
+        return 1;
     }
 
     if (!doc.setContent(&file))
     {
         VERBOSE(VB_ALL, "Could not load job file: " + jobFile); 
         file.close();
-        return false;
+        return 1;
     }
 
     file.close();
@@ -300,7 +300,7 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
     else
     {
         VERBOSE(VB_ALL, QString("Found %1 options nodes - should be 1").arg(nodeList.count()));
-        return false;
+        return 1;
     }
     VERBOSE(VB_JOBQUEUE, QString("Options - createiso: %1, doburn: %2, mediatype: %3, "
             "erasedvdrw: %4").arg(bCreateISO).arg(bDoBurn).arg(mediaType).arg(bEraseDVDRW));
@@ -324,7 +324,7 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
     if (nodeList.count() < 1)
     {
         VERBOSE(VB_ALL, "Cannot find any file nodes?");
-        return false;
+        return 1;
     }
 
     QString dbVersion = gContext->GetSetting("DBSchemaVer", "");
@@ -665,7 +665,7 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
         if (!f.open(IO_WriteOnly))
         {
             VERBOSE(VB_ALL, "MythNativeWizard: Failed to open file for writing - " + xmlFile);
-            return false;
+            return 1;
         }
 
         QTextStream t(&f);
@@ -677,7 +677,7 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
         bool res = copyFile(prefix + "/" + filename, saveDirectory + title + "/" + filename);
         if (!res)
         {
-            return false;
+            return 1;
         }
     }
 
@@ -694,16 +694,16 @@ bool NativeArchive::doNativeArchive(QString &jobFile)
 
     VERBOSE(VB_JOBQUEUE, "Finished processing job file");
 
-    return true;
+    return 0;
 }
 
 bool doNativeArchive(QString &jobFile)
 {
-    NativeArchive ra;
-    return ra.doNativeArchive(jobFile);
+    NativeArchive na;
+    return na.doNativeArchive(jobFile);
 }
 
-bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
+int grabThumbnail(QString inFile, QString thumbList, QString outFile)
 {
     int ret;
 
@@ -718,7 +718,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     {
         VERBOSE(VB_JOBQUEUE,
                 QString("Couldn't open input file, error #%1").arg(ret));
-        return false;
+        return 1;
     }
 
     // Getting stream information
@@ -728,7 +728,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
                 QString("Couldn't get stream info, error #%1").arg(ret));
         av_close_input_file(inputFC);
         inputFC = NULL;
-        return false;
+        return 1;
     }
 
     // find the first video stream
@@ -754,7 +754,7 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     if (videostream == -1)
     {
         VERBOSE(VB_JOBQUEUE, "Couldn't find a video stream");
-        return false;
+        return 1;
     }
 
     // get the codec context for the video stream
@@ -766,14 +766,14 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     if (codec == NULL)
     {
         VERBOSE(VB_JOBQUEUE, "Couldn't find codec for video stream");
-        return false;
+        return 1;
     }
 
     // open codec
     if (avcodec_open(codecCtx, codec) < 0)
     {
         VERBOSE(VB_JOBQUEUE, "Couldn't open codec for video stream");
-        return false;
+        return 1;
     }
 
     // get list of required thumbs
@@ -860,13 +860,13 @@ bool grabThumbnail(QString inFile, QString thumbList, QString outFile)
     // close the video file
     av_close_input_file(inputFC);
 
-    return true;
+    return 0;
 }
 
-int getFrameCount(AVFormatContext *inputFC, int vid_id)
+long long getFrameCount(AVFormatContext *inputFC, int vid_id)
 {
     AVPacket pkt;
-    int count = 0;
+    long long count = 0;
 
     VERBOSE(VB_JOBQUEUE, "Calculating frame count");
 
@@ -884,7 +884,57 @@ int getFrameCount(AVFormatContext *inputFC, int vid_id)
     return count;
 }
 
-bool getFileInfo(QString inFile, QString outFile, int lenMethod)
+long long getFrameCount(const QString &filename, float fps)
+{
+    // only wont the filename
+    QString basename = filename;
+    int pos = filename.findRev('/');
+    if (pos > 0)
+        basename = filename.mid(pos + 1);
+
+    int keyframedist = -1;
+    QMap<long long, long long> posMap;
+
+    ProgramInfo *progInfo = getProgramInfoForFile(basename);
+    if (!progInfo)
+        return 0;
+
+    progInfo->GetPositionMap(posMap, MARK_GOP_BYFRAME);
+    if (!posMap.empty())
+    {
+        keyframedist = 1;
+    }
+    else
+    {
+        progInfo->GetPositionMap(posMap, MARK_GOP_START);
+        if (!posMap.empty())
+        {
+            keyframedist = 15;
+            if (fps < 26 && fps > 24)
+                keyframedist = 12;
+        }
+        else
+        {
+            progInfo->GetPositionMap(posMap, MARK_KEYFRAME);
+            if (!posMap.empty())
+            {
+                // keyframedist should be set in the fileheader so no
+                // need to try to determine it in this case
+                return 0;
+            }
+        }
+    }
+
+    if (posMap.empty())
+        return 0; // no position map in recording
+
+    QMap<long long, long long>::const_iterator it = posMap.end();
+    it--;
+    long long totframes = it.key() * keyframedist;
+    return totframes;
+}
+
+int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
     const char *type = NULL;
     int ret;
@@ -906,7 +956,7 @@ bool getFileInfo(QString inFile, QString outFile, int lenMethod)
     {
         VERBOSE(VB_JOBQUEUE,
             QString("Couldn't open input file, error #%1").arg(ret));
-        return 0;
+        return 1;
     }
 
     // Getting stream information
@@ -918,7 +968,7 @@ bool getFileInfo(QString inFile, QString outFile, int lenMethod)
             QString("Couldn't get stream info, error #%1").arg(ret));
         av_close_input_file(inputFC);
         inputFC = NULL;
-        return 0;
+        return 1;
     }
 
     av_estimate_timings(inputFC);
@@ -999,9 +1049,20 @@ bool getFileInfo(QString inFile, QString outFile, int lenMethod)
                     case 1:
                     {
                         // calc duration of the file by counting the video frames
-                        int duration = getFrameCount(inputFC, i);
-                        VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(duration));
-                        duration = (int)(duration / fps);
+                        long long frames = getFrameCount(inputFC, i);
+                        VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
+                        int duration = (int)(frames / fps);
+                        VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
+                        root.setAttribute("duration", duration);
+                        break;
+                    }
+                    case 2:
+                    {
+                        // use info from pos map in db 
+                        // (only useful if the file is a myth recording)
+                        long long frames = getFrameCount(inFile, fps);
+                        VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
+                        int duration = (int)(frames / fps);
                         VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
                         root.setAttribute("duration", duration);
                         break;
@@ -1075,7 +1136,7 @@ bool getFileInfo(QString inFile, QString outFile, int lenMethod)
     if (!f.open(IO_WriteOnly))
     {
         VERBOSE(VB_JOBQUEUE, "Failed to open file for writing - " + outFile);
-        return false;
+        return 1;
     }
 
     QTextStream t(&f);
@@ -1086,10 +1147,10 @@ bool getFileInfo(QString inFile, QString outFile, int lenMethod)
     av_close_input_file(inputFC);
     inputFC = NULL;
 
-    return true;
+    return 0;
 }
 
-bool getDBParamters(QString outFile)
+int getDBParamters(QString outFile)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
@@ -1099,7 +1160,7 @@ bool getDBParamters(QString outFile)
     {
         cout << "MythArchiveHelper: Failed to open file for writing - "
                 << outFile << endl;
-        return false;
+        return 1;
     }
 
     QTextStream t(&f);
@@ -1111,7 +1172,7 @@ bool getDBParamters(QString outFile)
     t << gContext->GetInstallPrefix() << endl;
     f.close();
 
-    return true;
+    return 0;
 }
 
 void showUsage()
@@ -1128,6 +1189,7 @@ void showUsage()
     cout << "                          method is the method to used to calc the file duration\n";
     cout << "                          0 - use av_estimate_timings() (quick but not very accurate)\n";
     cout << "                          1 - read all frames (most accurate but slow)\n";
+    cout << "                          2 - use position map in DB (quick, only works for myth recordings)\n";
     cout << "-p/--getdbparameters outfile\n";
     cout << "                          (write the mysql database parameters to outfile)\n";
     cout << "-n/--nativearchive        (archive files to a native archive format)\n";
@@ -1332,7 +1394,7 @@ int main(int argc, char **argv)
     else 
         showUsage();
 
-    return 0;
+    return res;
 }
 
 
