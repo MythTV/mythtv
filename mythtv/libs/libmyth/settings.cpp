@@ -1161,8 +1161,8 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this, SIGNAL(deleteButtonPressed(int)));
     connect(this, SIGNAL(valueChanged(const QString&)),
             widget, SLOT(setCurrentItem(const QString&)));
-    connect(widget, SIGNAL(highlighted(const QString&)),
-            this, SLOT(setValueByLabel(const QString&)));
+    connect(widget, SIGNAL(highlighted(int)),
+            this, SLOT(setValueByIndex(int)));
 
     if (cg)
         connect(widget, SIGNAL(changeHelpText(QString)), cg,
@@ -1181,13 +1181,10 @@ void ListBoxSetting::setSelectionMode(MythListBox::SelectionMode mode)
        widget->setSelectionMode(selectionMode);
 }
 
-void ListBoxSetting::setValueByLabel(const QString& label) {
-    for(unsigned i = 0 ; i < labels.size() ; ++i)
-        if (labels[i] == label) {
-            setValue(values[i]);
-            return;
-        }
-    cerr << "BUG: ListBoxSetting::setValueByLabel called for unknown label " << label << endl;
+void ListBoxSetting::setValueByIndex(int index)
+{
+    if (((uint)index) < values.size())
+        setValue(values[index]);
 }
 
 void ImageSelectSetting::addImageSelection(const QString& label,

@@ -468,7 +468,7 @@ signals:
     void deleteButtonPressed(int);
 
 protected slots:
-    void setValueByLabel(const QString& label);
+    void setValueByIndex(int index);
     void addSelection(const QString& label,
                       QString value=QString::null,
                       bool select=false) {
