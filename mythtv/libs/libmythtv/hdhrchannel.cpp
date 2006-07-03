@@ -80,7 +80,7 @@ bool HDHRChannel::FindDevice(void)
 
     /* Create socket. */
     struct hdhomerun_discover_sock_t *discoverSock = NULL;
-    discoverSock = hdhomerun_discover_create();
+    discoverSock = hdhomerun_discover_create(500);
 
     if (!discoverSock)
     {
@@ -181,7 +181,8 @@ QString HDHRChannel::DeviceGet(const QString &name)
 
     QString ret = QString::null;
     unsigned char *ptr = response.ptr, *data = NULL;
-    unsigned char tag, dlen;
+    unsigned char tag;
+    int dlen;
     while (hdhomerun_read_tlv(&ptr, response.end, &tag, &dlen, &data) >= 0)
     {
         char buf[1024+64];

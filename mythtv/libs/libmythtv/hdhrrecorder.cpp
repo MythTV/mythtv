@@ -100,7 +100,7 @@ bool HDHRRecorder::Open(void)
     }
 
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S);
+    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S, 50);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");

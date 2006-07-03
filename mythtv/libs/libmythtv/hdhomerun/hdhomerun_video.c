@@ -37,7 +37,7 @@ struct hdhomerun_video_sock_t {
 
 static void *hdhomerun_video_thread(void *arg);
 
-struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size)
+struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size, unsigned long timeout)
 {
 	/* Buffer size. */
 	buffer_size = (buffer_size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
@@ -73,10 +73,10 @@ struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size)
 	setsockopt(vs->sock, SOL_SOCKET, SO_RCVBUF, &rx_size, sizeof(rx_size));
 
 	/* Set timeout. */
-	struct timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 50 * 1000;
-	setsockopt(vs->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+	struct timeval t;
+	t.tv_sec = timeout / 1000;
+	t.tv_usec = (timeout % 1000) * 1000;
+	setsockopt(vs->sock, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
 
 	/* Bind socket. */
 	struct sockaddr_in sock_addr;
@@ -258,4 +258,3 @@ void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs)
 	/* Atomic update of tail. */
 	vs->tail = vs->head;
 }
-

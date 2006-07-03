@@ -43,8 +43,11 @@ struct hdhomerun_control_sock_t *hdhomerun_control_create(unsigned long ip_addr,
 		return NULL;
 	}
 
-	/* Set non blocking. */
-	fcntl(cs->sock, F_SETFL, O_NONBLOCK);
+	/* Set timeout. */
+	struct timeval t;
+	t.tv_sec = timeout / 1000;
+	t.tv_usec = (timeout % 1000) * 1000;
+	setsockopt(cs->sock, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
 
 	/* Initiate connection. */
 	struct sockaddr_in sock_addr;
@@ -53,29 +56,6 @@ struct hdhomerun_control_sock_t *hdhomerun_control_create(unsigned long ip_addr,
 	sock_addr.sin_addr.s_addr = htonl(ip_addr);
 	sock_addr.sin_port = htons(HDHOMERUN_CONTROL_TCP_PORT);
 	if (connect(cs->sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
-		if ((errno != EINPROGRESS) && (errno != EAGAIN)) {
-			hdhomerun_control_destroy(cs);
-			return NULL;
-		}
-	}
-
-	/* Wait for connect to succeed. */
-	struct timeval t;
-	t.tv_sec = timeout / 1000;
-	t.tv_usec = (timeout % 1000) * 1000;
-
-	fd_set writefds;
-	fd_set exceptfds;
-	FD_ZERO(&writefds);
-	FD_ZERO(&exceptfds);
-	FD_SET(cs->sock, &writefds);
-	FD_SET(cs->sock, &exceptfds);
-
-	if (select(cs->sock+1, NULL, &writefds, &exceptfds, &t) < 0) {
-		hdhomerun_control_destroy(cs);
-		return NULL;
-	}
-	if (!FD_ISSET(cs->sock, &writefds)) {
 		hdhomerun_control_destroy(cs);
 		return NULL;
 	}
@@ -106,9 +86,7 @@ int hdhomerun_control_send(struct hdhomerun_control_sock_t *cs, unsigned char *s
 {
 	int length = end - start;
 	if (send(cs->sock, (char *)start, length, 0) != length) {
-		if ((errno != EINPROGRESS) && (errno != EAGAIN)) {
-			return -1;
-		}
+		return -1;
 	}
 	return 0;
 }
@@ -126,6 +104,19 @@ int hdhomerun_control_send_set_request(struct hdhomerun_control_sock_t *cs, cons
 	unsigned char buffer[1024];
 	unsigned char *ptr = buffer;
 	hdhomerun_write_set_request(&ptr, name, value);
+	return hdhomerun_control_send(cs, buffer, ptr);
+}
+
+int hdhomerun_control_send_upgrade_request(struct hdhomerun_control_sock_t *cs, unsigned long sequence, void *data, int length)
+{
+	unsigned char buffer[1024 + 64];
+	unsigned char *ptr = buffer;
+
+	if (length + 64 > (int)sizeof(buffer)) {
+		return -1;
+	}
+
+	hdhomerun_write_upgrade_request(&ptr, sequence, data, length);
 	return hdhomerun_control_send(cs, buffer, ptr);
 }
 
@@ -184,11 +175,30 @@ static int hdhomerun_control_recv_process(struct hdhomerun_control_sock_t *cs, s
 int hdhomerun_control_recv(struct hdhomerun_control_sock_t *cs, struct hdhomerun_control_data_t *result, unsigned long timeout)
 {
 	int ret = hdhomerun_control_recv_process(cs, result);
-	if (ret == 0) {
+	if (ret != 0) {
+		return ret;
+	}
+
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	unsigned long long stop_time = ((unsigned long long)t.tv_sec * 1000) + (t.tv_usec / 1000) + timeout;
+
+	while (1) {
 		ret = hdhomerun_control_recv_sock(cs, timeout);
+		if (ret < 0) {
+			return ret;
+		}
 		if (ret == 1) {
 			ret = hdhomerun_control_recv_process(cs, result);
+			if (ret != 0) {
+				return ret;
+			}
+		}
+
+		gettimeofday(&t, NULL);
+		unsigned long long current_time = ((unsigned long long)t.tv_sec * 1000) + (t.tv_usec / 1000);
+		if (current_time >= stop_time) {
+			return 0;
 		}
 	}
-	return ret;
 }

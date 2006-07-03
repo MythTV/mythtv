@@ -138,7 +138,7 @@ void HDHRSignalMonitor::RunTableMonitor(void)
     dtvMonitorRunning = true;
 
     struct hdhomerun_video_sock_t *_video_socket;
-    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S);
+    _video_socket = hdhomerun_video_create(VIDEO_DATA_BUFFER_SIZE_1S, 50);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get video socket");

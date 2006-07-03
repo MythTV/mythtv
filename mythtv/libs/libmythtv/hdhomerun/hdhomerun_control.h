@@ -37,6 +37,7 @@ extern unsigned long hdhomerun_control_get_local_addr(struct hdhomerun_control_s
 extern int hdhomerun_control_send(struct hdhomerun_control_sock_t *cs, unsigned char *start, unsigned char *end);
 extern int hdhomerun_control_send_get_request(struct hdhomerun_control_sock_t *cs, const char *name);
 extern int hdhomerun_control_send_set_request(struct hdhomerun_control_sock_t *cs, const char *name, const char *value);
+extern int hdhomerun_control_send_upgrade_request(struct hdhomerun_control_sock_t *cs, unsigned long sequence, void *data, int length);
 
 extern int hdhomerun_control_recv(struct hdhomerun_control_sock_t *cs, struct hdhomerun_control_data_t *result, unsigned long timeout);
 

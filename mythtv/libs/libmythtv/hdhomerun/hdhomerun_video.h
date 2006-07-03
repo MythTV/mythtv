@@ -26,7 +26,7 @@ struct hdhomerun_video_sock_t;
 #define VIDEO_DATA_PACKET_SIZE (188 * 7)
 #define VIDEO_DATA_BUFFER_SIZE_1S (20000000 / 8)
 
-extern struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size);
+extern struct hdhomerun_video_sock_t *hdhomerun_video_create(unsigned long buffer_size, unsigned long timeout);
 extern void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 extern unsigned short hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
 extern int hdhomerun_video_get_state(struct hdhomerun_video_sock_t *vs);

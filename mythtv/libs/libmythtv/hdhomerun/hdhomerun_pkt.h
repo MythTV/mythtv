@@ -52,7 +52,7 @@ extern void hdhomerun_write_u32(unsigned char **pptr, unsigned long v);
 
 extern int hdhomerun_peek_packet_length(unsigned char *ptr);
 extern int hdhomerun_process_packet(unsigned char **pptr, unsigned char **pend);
-extern int hdhomerun_read_tlv(unsigned char **pptr, unsigned char *end, unsigned char *ptag, unsigned char *plength, unsigned char **pvalue);
+extern int hdhomerun_read_tlv(unsigned char **pptr, unsigned char *end, unsigned char *ptag, int *plength, unsigned char **pvalue);
 
 extern void hdhomerun_write_discover_request(unsigned char **pptr, unsigned long device_type, unsigned long device_id);
 extern void hdhomerun_write_get_request(unsigned char **pptr, const char *name);

@@ -29,10 +29,12 @@ struct hdhomerun_discover_device_t {
 	unsigned long device_id;
 };
 
-extern struct hdhomerun_discover_sock_t *hdhomerun_discover_create(void);
+extern struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeout);
 extern void hdhomerun_discover_destroy(struct hdhomerun_discover_sock_t *ds);
 extern int hdhomerun_discover_send(struct hdhomerun_discover_sock_t *ds, unsigned long device_type, unsigned long device_id);
 extern int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomerun_discover_device_t *result, unsigned long timeout);
+
+extern int hdhomerun_discover_validate_device_id(unsigned long device_id);
 
 #ifdef __cplusplus
 }

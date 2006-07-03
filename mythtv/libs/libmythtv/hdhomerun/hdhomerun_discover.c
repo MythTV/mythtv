@@ -26,7 +26,7 @@ struct hdhomerun_discover_sock_t {
 	int sock;
 };
 
-struct hdhomerun_discover_sock_t *hdhomerun_discover_create(void)
+struct hdhomerun_discover_sock_t *hdhomerun_discover_create(unsigned long timeout)
 {
 	struct hdhomerun_discover_sock_t *ds = (struct hdhomerun_discover_sock_t *)malloc(sizeof(struct hdhomerun_discover_sock_t));
 	if (!ds) {
@@ -40,8 +40,11 @@ struct hdhomerun_discover_sock_t *hdhomerun_discover_create(void)
 		return NULL;
 	}
 
-	/* Set non blocking. */
-	fcntl(ds->sock, F_SETFL, O_NONBLOCK);
+	/* Set timeout. */
+	struct timeval t;
+	t.tv_sec = timeout / 1000;
+	t.tv_usec = (timeout % 1000) * 1000;
+	setsockopt(ds->sock, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
 
 	/* Allow broadcast. */
 	int sock_opt = 1;
@@ -82,9 +85,7 @@ int hdhomerun_discover_send(struct hdhomerun_discover_sock_t *ds, unsigned long 
 
 	int length = ptr - buffer;
 	if (sendto(ds->sock, (char *)buffer, length, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != length) {
-		if ((errno != EINPROGRESS) && (errno != EAGAIN)) {
-			return -1;
-		}
+		return -1;
 	}
 
 	return 0;
@@ -134,7 +135,7 @@ int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomer
 	result->device_id = 0;
 	while (1) {
 		unsigned char tag;
-		unsigned char len;
+		int len;
 		unsigned char *value;
 		if (hdhomerun_read_tlv(&ptr, end, &tag, &len, &value) < 0) {
 			break;
@@ -159,4 +160,22 @@ int hdhomerun_discover_recv(struct hdhomerun_discover_sock_t *ds, struct hdhomer
 	}
 
 	return 1;
+}
+
+int hdhomerun_discover_validate_device_id(unsigned long device_id)
+{
+	static unsigned long lookup_table[16] = {0xA, 0x5, 0xF, 0x6, 0x7, 0xC, 0x1, 0xB, 0x9, 0x2, 0x8, 0xD, 0x4, 0x3, 0xE, 0x0};
+
+	unsigned long checksum = 0;
+
+	checksum ^= lookup_table[(device_id >> 28) & 0x0F];
+	checksum ^= (device_id >> 24) & 0x0F;
+	checksum ^= lookup_table[(device_id >> 20) & 0x0F];
+	checksum ^= (device_id >> 16) & 0x0F;
+	checksum ^= lookup_table[(device_id >> 12) & 0x0F];
+	checksum ^= (device_id >> 8) & 0x0F;
+	checksum ^= lookup_table[(device_id >> 4) & 0x0F];
+	checksum ^= (device_id >> 0) & 0x0F;
+
+	return (checksum == 0);
 }
