@@ -605,7 +605,7 @@ void HttpStatus::GetProgramDetails( HTTPRequest *pRequest )
 
     if (pInfo==NULL)
     { 
-        pRequest->m_response <<  "<Error>Error Reading Program Info/Error>";
+        pRequest->m_response <<  "<Error>Error Reading Program Info</Error>";
         return;
     }
 
