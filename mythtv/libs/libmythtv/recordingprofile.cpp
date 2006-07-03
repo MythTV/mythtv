@@ -1,4 +1,5 @@
 #include "recordingprofile.h"
+#include "cardutil.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
 #include "libmyth/mythwizard.h"
@@ -895,12 +896,13 @@ void RecordingProfile::loadByID(int profileId)
         "      recordingprofiles.id = :PROFILEID");
     result.bindValue(":PROFILEID", profileId);
 
+    QString type = "";
     if (!result.exec() || !result.isActive())
         MythContext::DBError("RecordingProfile::loadByID -- cardtype", result);
     else if (result.next())
     {
-        QString type = result.value(0).toString();
-        isEncoder = (type != "DVB" && type != "HDTV");
+        type = result.value(0).toString();
+        isEncoder = CardUtil::IsEncoder(type);
     }
 
     if (isEncoder)
@@ -924,7 +926,7 @@ void RecordingProfile::loadByID(int profileId)
                     this,      SLOT(FiltersChanged(const QString &)));
         }
     }
-    else
+    else if (type.upper() == "DVB")
     {
         addChild(new RecordingType(*this));
     }

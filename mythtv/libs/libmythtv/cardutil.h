@@ -117,6 +117,15 @@ class CardUtil
         return ERROR_UNKNOWN;
     }
 
+    static bool         IsEncoder(const QString &rawtype)
+    {
+        return
+            (rawtype != "DVB")       && (rawtype != "HDTV")    &&
+            (rawtype != "FIREWIRE")  && (rawtype != "DBOX2")   &&
+            (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX") &&
+            (rawtype != "CRC_IP");
+    }
+
     static int          GetCardID(const QString &videodevice,
                                   QString hostname = QString::null);
     static uint         GetChildCardID(uint cardid);

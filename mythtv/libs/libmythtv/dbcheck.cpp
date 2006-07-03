@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1148";
+const QString currentDatabaseVersion = "1149";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2336,6 +2336,32 @@ static bool doUpgradeTVDatabaseSchema(void)
 };
 
         if (!performActualUpdate(updates, "1148", dbver))
+            return false;
+    }
+
+    if (dbver == "1148")
+    {
+        const QString updates[] = {
+"INSERT INTO recordingprofiles SET name = 'Default', profilegroup = (select id from profilegroups where cardtype='FREEBOX');",
+"INSERT INTO recordingprofiles SET name = 'Live TV', profilegroup = (select id from profilegroups where cardtype='FREEBOX');",
+"INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = (select id from profilegroups where cardtype='FREEBOX');",
+"INSERT INTO recordingprofiles SET name = 'Low Quality', profilegroup = (select id from profilegroups where cardtype='FREEBOX');",
+
+"INSERT INTO profilegroups SET name = 'HDHomeRun Recorders', cardtype = 'HDHOMERUN', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = 'Default', profilegroup = (select id from profilegroups where cardtype='HDHOMERUN');",
+"INSERT INTO recordingprofiles SET name = 'Live TV', profilegroup = (select id from profilegroups where cardtype='HDHOMERUN');",
+"INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = (select id from profilegroups where cardtype='HDHOMERUN');",
+"INSERT INTO recordingprofiles SET name = 'Low Quality', profilegroup = (select id from profilegroups where cardtype='HDHOMERUN');",
+
+"INSERT INTO profilegroups SET name = 'CRC IP Recorders', cardtype = 'CRC_IP', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = 'Default', profilegroup = (select id from profilegroups where cardtype='CRC_IP');",
+"INSERT INTO recordingprofiles SET name = 'Live TV', profilegroup = (select id from profilegroups where cardtype='CRC_IP');",
+"INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = (select id from profilegroups where cardtype='CRC_IP');",
+"INSERT INTO recordingprofiles SET name = 'Low Quality', profilegroup = (select id from profilegroups where cardtype='CRC_IP');",
+""
+};
+
+        if (!performActualUpdate(updates, "1149", dbver))
             return false;
     }
 
