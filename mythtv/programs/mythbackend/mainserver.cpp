@@ -1306,7 +1306,7 @@ void *MainServer::SpawnDeleteThread(void *param)
     return NULL;
 }
 
-void MainServer::DoDeleteThread(DeleteStruct *ds)
+void MainServer::DoDeleteThread(const DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
     // after deleteing a recording, then we can hammer the DB and filesystem
@@ -1413,6 +1413,29 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     /* Delete preview thumbnail. */
     delete_file_immediately(ds->filename + ".png", followLinks, true);
 
+    DoDeleteInDB(ds, pginfo);
+
+    if (pginfo->recgroup != "LiveTV")
+        ScheduledRecording::signalChange(0);
+
+    delete pginfo;
+
+    deletelock.unlock();
+
+    if (fd != -1)
+    {
+        m_expirer->TruncatePending();
+        TruncateAndClose(m_expirer, fd, ds->filename);
+        m_expirer->TruncateFinished();
+    }
+}
+
+void MainServer::DoDeleteInDB(const DeleteStruct *ds,
+                              const ProgramInfo *pginfo)
+{
+    QString logInfo = QString("chanid %1 at %2")
+        .arg(ds->chanid).arg(ds->recstartts.toString());
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME;");
@@ -1487,20 +1510,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Error deleting recordedmarkup for %1.")
                                    .arg(logInfo));
-    }
-
-    if (pginfo->recgroup != "LiveTV")
-        ScheduledRecording::signalChange(0);
-
-    delete pginfo;
-
-    deletelock.unlock();
-
-    if (fd != -1)
-    {
-        m_expirer->TruncatePending();
-        TruncateAndClose(m_expirer, fd, ds->filename);
-        m_expirer->TruncateFinished();
     }
 }
 

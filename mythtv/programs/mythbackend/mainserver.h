@@ -140,7 +140,8 @@ class MainServer : public QObject, public MythSocketCBs
     QString LocalFilePath(QUrl &url);
 
     static void *SpawnDeleteThread(void *param);
-    void DoDeleteThread(DeleteStruct *ds);
+    void DoDeleteThread(const DeleteStruct *ds);
+    void DoDeleteInDB(const DeleteStruct *ds, const ProgramInfo *pginfo);
 
     LiveTVChain *GetExistingChain(QString id);
     LiveTVChain *GetExistingChain(MythSocket *sock);
