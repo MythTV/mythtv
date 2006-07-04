@@ -18,7 +18,7 @@ qmake_clean.target = clean
 qmake_clean.depends = perl_clean
 
 perl_install.target = perl_install
-perl_install.commands = @-make -f Makefile.perl install
+perl_install.commands = make -f Makefile.perl pure_install PERL_INSTALL_ROOT="$(INSTALL_ROOT)"
 perl_install.depends = perl_build
 
 qmake_install.target = install
