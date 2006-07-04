@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '.20 svn';
+    $VERSION = '.20svn';
 
 # Load sub libraries
     use MythTV::Program;
