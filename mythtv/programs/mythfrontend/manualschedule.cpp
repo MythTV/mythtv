@@ -34,6 +34,7 @@ using namespace std;
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/recordingtypes.h"
 #include "libmythtv/remoteutil.h"
+#include "libmythtv/channelutil.h"
 
 ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
               : MythDialog(parent, name)
@@ -72,26 +73,22 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     m_channel->setBackgroundOrigin(WindowOrigin);
 
 
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
+    QString longChannelFormat = gContext->GetSetting("LongChannelFormat",
+                                                     "<num> <name>");
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+    DBChanList channels = ChannelUtil::GetChannels(0, false, "callsign");
+    ChannelUtil::SortChannels(channels, chanorder);
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT chanid, channum, callsign, name "
-                          "FROM channel GROUP BY channum, callsign "
-                          "ORDER BY %1;").arg(chanorder));
+    for (uint i = 0; i < channels.size(); i++)
+    {
+        QString chantext = QDeepCopy<QString>(longChannelFormat);
+        chantext
+            .replace("<num>",  channels[i].channum)
+            .replace("<sign>", channels[i].callsign)
+            .replace("<name>", channels[i].name);
 
-    QString longChannelFormat = 
-        gContext->GetSetting("LongChannelFormat", "<num> <name>");
-
-    if (query.exec() && query.isActive() && query.size()) {
-      while(query.next()) {
-          QString channel = longChannelFormat;
-          channel.replace("<num>", query.value(1).toString())
-              .replace("<sign>", QString::fromUtf8(query.value(2).toString()))
-              .replace("<name>", QString::fromUtf8(query.value(3).toString()));
-          m_channel->insertItem(channel);
-          m_chanids << query.value(0).toString();
-      }
-      
+        m_channel->insertItem(chantext);
+        m_chanids << QString::number(channels[i].chanid);
     }
 
     hbox->addWidget(m_channel);

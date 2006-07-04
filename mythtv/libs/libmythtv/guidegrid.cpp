@@ -31,6 +31,7 @@ using namespace std;
 #include "customedit.h"
 #include "util.h"
 #include "remoteutil.h"
+#include "channelutil.h"
 
 bool RunProgramGuide(uint &chanid, QString &channum,
                      bool thread, TV *player,
@@ -179,7 +180,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
             container->SetDrawFontShadow(false);
     }
 
-    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
+    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     dateformat = gContext->GetSetting("ShortDateFormat", "ddd d");
     unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
@@ -559,69 +560,34 @@ void GuideGrid::timeout()
 
 void GuideGrid::fillChannelInfos(bool gotostartchannel)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-
     m_channelInfos.clear();
+
+    DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
+    ChannelUtil::SortChannels(channels, channelOrdering);
 
     if (showFavorites)
     {
-        query.prepare(
-            "SELECT channel.channum, channel.callsign, "
-            "       channel.icon,    channel.chanid, "
-            "       favorites.favid, channel.name "
-            "FROM videosource, cardinput, favorites, channel "
-            "WHERE channel.chanid       = favorites.chanid     AND "
-            "      visible              = 1                    AND "
-            "      channel.sourceid     = videosource.sourceid AND "
-            "      videosource.sourceid = cardinput.sourceid "
-            "GROUP BY channum, callsign "
-            "ORDER BY " + channelOrdering);
-
-        if (query.exec() && query.isActive())
-            showFavorites = query.size();
-        else
-            MythContext::DBError("fillChannelInfos -- favorites", query);
-    }
-
-    if (!showFavorites)
-    {
-        query.prepare(
-            "SELECT channel.channum, channel.callsign, "
-            "       channel.icon,    channel.chanid, "
-            "       favorites.favid, channel.name "
-            "FROM videosource, cardinput, "
-            "       channel LEFT JOIN favorites "
-            "       ON favorites.chanid = channel.chanid "
-            "WHERE visible              = 1                    AND "
-            "      channel.sourceid     = videosource.sourceid AND "
-            "      videosource.sourceid = cardinput.sourceid "
-            "GROUP BY channum, callsign "
-            "ORDER BY " + channelOrdering);
-
-        if (!query.exec() || !query.isActive())
+        DBChanList tmp;
+        for (uint i = 0; i < channels.size(); i++)
         {
-            MythContext::DBError("fillChannelInfos -- all connected", query);
-            return;
+            if (channels[i].favorite)
+                tmp.push_back(channels[i]);
         }
+
+        if (!tmp.empty())
+            channels = tmp;
     }
- 
+
     bool startingset = false;
-    while (query.next())
+    for (uint i = 0; i < channels.size(); i++)
     {
         ChannelInfo val;
-
-        val.chanstr  = query.value(0).toString();
-        val.chanid   = query.value(3).toInt();
-
-        // validate the channum and chanid, skip channel if these are invalid
-        if (val.chanstr == "" || !val.chanid)
-            continue;
-
-        // fill in the rest of the data...
-        val.callsign = QString::fromUtf8(query.value(1).toString());
-        val.iconpath = query.value(2).toString();
-        val.favid    = query.value(4).toInt();
-        val.channame = QString::fromUtf8(query.value(5).toString());
+        val.chanstr  = channels[i].channum;
+        val.chanid   = channels[i].chanid;
+        val.callsign = channels[i].callsign;
+        val.favid    = channels[i].favorite;
+        val.channame = channels[i].name;
+        val.iconpath = channels[i].icon;
         val.iconload = false;
 
         // set starting channel index if it hasn't been set
@@ -633,10 +599,11 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
             m_currentStartChannel = m_channelInfos.size();
             startingset = true;
         }
-                
+
         // add the new channel to the list
         m_channelInfos.push_back(val);
     }
+ 
     // set starting channel index to 0 if it hasn't been set
     if (gotostartchannel)
         m_currentStartChannel = (startingset) ? m_currentStartChannel : 0;

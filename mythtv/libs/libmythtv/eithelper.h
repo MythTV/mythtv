@@ -60,13 +60,15 @@ class EITHelper
     uint GetGPSOffset(void) const { return (uint) (0 - gps_offset); }
 
     void SetGPSOffset(uint _gps_offset) { gps_offset = 0 - _gps_offset; }
-    void SetFixup(uint atscsrcid, uint eitfixup);
+    void SetFixup(uint atsc_major, uint atsc_minor, uint eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
     void SetSourceID(uint _sourceid);
 
 #ifdef USING_BACKEND
-    void AddEIT(uint atscsrcid, const EventInformationTable *eit);
-    void AddETT(uint atscsrcid, const ExtendedTextTable     *ett);
+    void AddEIT(uint atsc_major, uint atsc_minor,
+                const EventInformationTable *eit);
+    void AddETT(uint atsc_major, uint atsc_minor,
+                const ExtendedTextTable     *ett);
     void AddEIT(const DVBEventInformationTable *eit);
 #else // if !USING_BACKEND
     void AddEIT(uint, const EventInformationTable*) {}
@@ -77,10 +79,10 @@ class EITHelper
     void PruneCache(uint timestamp);
 
   private:
-    uint GetChanID(uint atscsrcid);
+    uint GetChanID(uint atsc_major, uint atsc_minor);
     uint GetChanID(uint serviceid, uint networkid, uint transportid);
 
-    void CompleteEvent(uint atscsrcid,
+    void CompleteEvent(uint atsc_major, uint atsc_minor,
                        const ATSCEvent &event,
                        const QString   &ett);
 

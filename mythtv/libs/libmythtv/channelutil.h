@@ -8,6 +8,33 @@ using namespace std;
 
 class NetworkInformationTable;
 
+class DBChannel
+{
+  public:
+    DBChannel(const QString &_channum, const QString &_callsign,
+              uint _chanid, uint _major_chan, uint _minor_chan,
+              uint _favorite,
+              const QString &_name, const QString &_icon) :
+        channum(_channum), callsign(_callsign), chanid(_chanid),
+        major_chan(_major_chan), minor_chan(_minor_chan),
+        favorite(_favorite),
+        name(_name), icon(_icon) {}
+
+    bool operator == (uint _chanid) const
+        { return chanid == _chanid; }
+
+    QString channum;
+    QString callsign;
+    uint    chanid;
+    uint    major_chan;
+    uint    minor_chan;
+    uint    favorite;
+    QString name;
+    QString icon;
+};
+typedef vector<DBChannel> DBChanList;
+
+
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use
  */
@@ -44,9 +71,17 @@ class ChannelUtil
     static int     GetBetterMplexID(int current_mplexid,
                                     int transport_id, int network_id);
 
-    static int     GetTuningParams(int mplexid, QString &modulation);
+    static bool    GetTuningParams(uint mplexid,
+                                   QString  &modulation,
+                                   uint64_t &frequency,
+                                   uint     &dvb_transportid,
+                                   uint     &dvb_networkid);
+
     static bool    GetATSCChannel(uint sourceid, const QString &channum,
                                   uint &major,   uint          &minor);
+    static bool    IsATSCChannel(uint sourceid, const QString &channum)
+        { uint m1, m2; GetATSCChannel(sourceid, channum, m1,m2); return m2; }
+
     // Channel/Service Stuff
     static int     CreateChanID(uint sourceid, const QString &chan_num);
 
@@ -90,31 +125,26 @@ class ChannelUtil
 
     static int     GetChanID(uint sourceid, const QString &channum)
         { return GetChannelValueInt("chanid", sourceid, channum); }
-    static int     GetATSCSRCID(uint sourceid, const QString &channum)
-        { return GetChannelValueInt("atscsrcid", sourceid, channum); }
+    static bool    GetChannelData(
+        uint    sourceid,         const QString &channum,
+        QString &tvformat,        QString       &modulation,
+        QString &freqtable,       QString       &freqid,
+        int     &finetune,        uint64_t      &frequency,
+        int     &mpeg_prog_num,
+        uint    &atsc_major,      uint          &atsc_minor,
+        uint    &dvb_transportid, uint          &dvb_networkid,
+        uint    &mplexid,         bool          &commfree);
+    static uint    GetSourceID(uint cardid, const QString &inputname);
     static int     GetProgramNumber(uint sourceid, const QString &channum)
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
 
-    static QString GetNextChannel(uint           cardid,
-                                  const QString &inputname,
-                                  const QString &channum,
-                                  int            direction,
-                                  QString       &channelorder,
-                                  uint          &chanid);
+    static DBChanList GetChannels(uint srcid, bool vis_only, QString grp="");
+    static void    SortChannels(DBChanList &list, const QString &order);
 
-    static uint    GetNextChannel(uint           cardid,
-                                  const QString &inputname,
-                                  const QString &channum,
-                                  int            direction,
-                                  QString       &channelorder)
-    {
-        uint chanid = 0;
-        GetNextChannel(cardid,    inputname,    channum,
-                       direction, channelorder, chanid);
-        return chanid;
-    }
+    static uint    GetNextChannel(const DBChanList &sorted,
+                                  uint old_chanid, int direction);
 
     static QString GetChannelValueStr(const QString &channel_field,
                                       uint           sourceid,

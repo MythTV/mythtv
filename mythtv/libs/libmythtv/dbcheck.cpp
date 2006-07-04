@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1149";
+const QString currentDatabaseVersion = "1151";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -276,7 +276,7 @@ determine whether to use the on-air-guide data from this channel to
 update the listings. Using the on-air-guide is currently experimental
 and must be selected when you compile %MythTV. Finally, the 'atscsrcid'
 field currently contains both the major and minor atsc channels, encoded
-in the form (majorChannel * 256 | minorChannel) when using DVB drivers.
+in the form (atsc_major_chan * 256 | atsc_minor_chan).
 
 \section program_table Program Entry Table (program)
 'category_type' holds one of these exact four strings:
@@ -2367,9 +2367,35 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1149")
+    {
+        const QString updates[] = {
+"UPDATE settings SET data='channum' WHERE value='ChannelOrdering' AND data!='callsign';",
+""
+};
+
+        if (!performActualUpdate(updates, "1150", dbver))
+            return false;
+    }
+
+    if (dbver == "1150")
+    {
+        const QString updates[] = {
+"ALTER TABLE channel ADD atsc_major_chan INT UNSIGNED NOT NULL default '0';",
+"ALTER TABLE channel ADD atsc_minor_chan INT UNSIGNED NOT NULL default '0';",
+"UPDATE channel SET atsc_major_chan = atscsrcid / 256;",
+"UPDATE channel SET atsc_minor_chan = atscsrcid % 256;",
+""
+};
+
+        if (!performActualUpdate(updates, "1151", dbver))
+            return false;
+    }
+
 //"ALTER TABLE capturecard DROP COLUMN dvb_recordts;" in 0.21
 //"ALTER TABLE capturecard DROP COLUMN dvb_hw_decoder;" in 0.21
-//"ALTER TABLE cardinput DROP COLUMN  preference;" in 0.22
+//"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
+//"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
 
     return true;
 }

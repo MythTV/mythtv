@@ -10,7 +10,7 @@
 #include <qsqldatabase.h>
 
 // MythTV headers
-
+#include "channelutil.h"
 #include "frequencies.h"
 #include "tv.h"
 
@@ -31,10 +31,12 @@ class InputBase
 
     InputBase(QString _name,            QString _startChanNum,
               QString _tuneToChannel,   QString _externalChanger,
-              uint    _sourceid,        uint    _cardid) :
+              uint    _sourceid,        uint    _cardid,
+              const DBChanList &_channels) :
         name(_name),                    startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
         sourceid(_sourceid),            cardid(_cardid),
+        channels(_channels),
         inputNumV4L(-1),
         videoModeV4L1(0),               videoModeV4L2(0) {}
 
@@ -47,6 +49,7 @@ class InputBase
     QString externalChanger; // for using a cable box...
     uint    sourceid;        // associated channel listings source
     uint    cardid;          // input card id
+    DBChanList channels;
     int     inputNumV4L;
     int     videoModeV4L1;
     int     videoModeV4L2;
@@ -83,6 +86,8 @@ class ChannelBase
     virtual int GetFd(void) const { return -1; };
 
     // Gets
+    virtual uint GetNextChannel(uint chanid, int direction) const;
+    virtual uint GetNextChannel(const QString &channum, int direction) const;
     virtual int GetInputByName(const QString &input) const;
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const
@@ -100,9 +105,9 @@ class ChannelBase
     virtual uint GetCurrentSourceID(void) const
         { return inputs[GetCurrentInputNum()]->sourceid; }
     virtual uint GetInputCardID(int inputNum) const;
+    virtual DBChanList GetChannels(int inputNum) const;
+    virtual DBChanList GetChannels(const QString &inputname) const;
     virtual QStringList GetConnectedInputs(void) const;
-    virtual QString GetOrdering(void) const
-        { return channelorder; }
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
     bool IsCommercialFree(void) const { return commfree; }
@@ -110,8 +115,6 @@ class ChannelBase
     virtual QString GetDevice(void) const { return ""; }
 
     // Sets
-    virtual void SetChannelOrdering(const QString &chanorder)
-        { channelorder = chanorder; }
     virtual void Renumber(uint srcid, const QString &oldChanNum,
                           const QString &newChanNum);
 
@@ -148,17 +151,17 @@ class ChannelBase
     /// \brief Returns program number in PAT, -1 if unknown.
     virtual int GetProgramNumber(void) const
         { return currentProgramNum; };
-    /// \brief Returns major channel, -1 if unknown.
-    virtual int GetMajorChannel(void) const
+    /// \brief Returns major channel, 0 if unknown.
+    virtual uint GetMajorChannel(void) const
         { return currentATSCMajorChannel; };
-    /// \brief Returns minor channel, -1 if unknown.
-    virtual int GetMinorChannel(void) const
+    /// \brief Returns minor channel, 0 if unknown.
+    virtual uint GetMinorChannel(void) const
         { return currentATSCMinorChannel; };
-    /// \brief Returns DVB original_network_id, -1 if unknown.
-    virtual int GetOriginalNetworkID(void) const
+    /// \brief Returns DVB original_network_id, 0 if unknown.
+    virtual uint GetOriginalNetworkID(void) const
         { return currentOriginalNetworkID; };
-    /// \brief Returns DVB transport_stream_id, -1 if unknown.
-    virtual int GetTransportID(void) const
+    /// \brief Returns DVB transport_stream_id, 0 if unknown.
+    virtual uint GetTransportID(void) const
         { return currentTransportID; };
 
     // \brief Set cardid for scanning
@@ -177,18 +180,17 @@ class ChannelBase
     static void StoreInputChannels(const InputMap&);
 
     TVRec   *pParent;
-    QString  channelorder;
     QString  curchannelname;
     int      currentInputID;
     bool     commfree;
     uint     cardid;
     InputMap inputs;
 
-    int     currentATSCMajorChannel;
-    int     currentATSCMinorChannel;
     int     currentProgramNum;
-    int     currentOriginalNetworkID;
-    int     currentTransportID;
+    uint    currentATSCMajorChannel;
+    uint    currentATSCMinorChannel;
+    uint    currentTransportID;
+    uint    currentOriginalNetworkID;
 };
 
 #endif

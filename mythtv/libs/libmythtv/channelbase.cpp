@@ -32,11 +32,11 @@ using namespace std;
 
 ChannelBase::ChannelBase(TVRec *parent)
     : 
-    pParent(parent), channelorder("channum + 0"), curchannelname(""),
+    pParent(parent), curchannelname(""),
     currentInputID(-1), commfree(false), cardid(0),
-    currentATSCMajorChannel(-1), currentATSCMinorChannel(-1),
-    currentProgramNum(-1), currentOriginalNetworkID(-1), 
-    currentTransportID(-1)
+    currentProgramNum(-1),
+    currentATSCMajorChannel(0), currentATSCMinorChannel(0),
+    currentTransportID(0),      currentOriginalNetworkID(0)
 {
 }
 
@@ -46,26 +46,37 @@ ChannelBase::~ChannelBase(void)
 
 bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
 {
-    bool fTune = false;
-    uint chanid;
-    QString start, nextchan;
-    start = nextchan = ChannelUtil::GetNextChannel(
-        GetCardID(), GetCurrentInput(), GetCurrentName(),
-        dir,         channelorder,      chanid);
+    uint startchanid = GetNextChannel(GetCurrentName(), dir);
+    uint nextchanid  = startchanid;
 
+    bool ok = false;
     do
     {
-       fTune = SetChannelByString(nextchan);
-       if (!fTune)
-       {
-           nextchan = ChannelUtil::GetNextChannel(
-               GetCardID(), GetCurrentInput(), GetCurrentName(),
-               dir,         channelorder,      chanid);
-       }
+        if (!(ok = SetChannelByString(ChannelUtil::GetChanNum(nextchanid))))
+            nextchanid = GetNextChannel(nextchanid, dir);
     }
-    while (!fTune && nextchan != start);
+    while (!ok && (nextchanid != startchanid));
 
-    return fTune;
+    return ok;
+}
+
+uint ChannelBase::GetNextChannel(uint chanid, int direction) const
+{
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return 0;
+
+    return ChannelUtil::GetNextChannel((*it)->channels, chanid, direction);
+}
+
+uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
+{
+    InputMap::const_iterator it = inputs.find(currentInputID);
+    if (it == inputs.end())
+        return 0;
+
+    uint chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
+    return GetNextChannel(chanid, direction);
 }
 
 int ChannelBase::GetNextInputNum(void) const
@@ -184,6 +195,30 @@ uint ChannelBase::GetInputCardID(int inputNum) const
     if (it != inputs.end())
         return (*it)->cardid;
     return 0;    
+}
+
+DBChanList ChannelBase::GetChannels(int inputNum) const
+{
+    int inputid = (inputNum > 0) ? inputNum : currentInputID;
+
+    DBChanList ret;
+    InputMap::const_iterator it = inputs.find(inputid);
+    if (it != inputs.end())
+        ret = (*it)->channels;
+
+    return ret;
+}
+
+DBChanList ChannelBase::GetChannels(const QString &inputname) const
+{
+    int inputid = currentInputID;
+    if (!inputname.isEmpty())
+    {
+        int tmp = GetInputByName(inputname);
+        inputid = (tmp > 0) ? tmp : inputid;
+    }
+
+    return GetChannels(inputid);
 }
 
 bool ChannelBase::ChangeExternalChannel(const QString &channum)
@@ -349,10 +384,10 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
     int chansep = chan.find("_");
 
     currentProgramNum        = -1;
-    currentOriginalNetworkID = -1;
-    currentTransportID       = -1;
-    currentATSCMajorChannel  = -1;
-    currentATSCMinorChannel  = -1;
+    currentOriginalNetworkID = 0;
+    currentTransportID       = 0;
+    currentATSCMajorChannel  = 0;
+    currentATSCMinorChannel  = 0;
 
     if (progsep >= 0)
     {
@@ -375,12 +410,12 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
         }
     }
 
-    if (currentATSCMinorChannel >= 0)
+    if (currentATSCMinorChannel > 0)
         VERBOSE(VB_CHANNEL,
                 QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3_%4")
                 .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentATSCMinorChannel));
-    else if ((-1 == currentATSCMajorChannel) && (-1 == currentProgramNum))
+    else if ((0 == currentATSCMajorChannel) && (0 == currentProgramNum))
         VERBOSE(VB_CHANNEL,
                 QString("ChannelBase(%1)::SetCachedATSCInfo(%2): RESET")
                 .arg(GetDevice()).arg(chan));
@@ -486,10 +521,16 @@ bool ChannelBase::InitializeInputs(void)
         uint inputcardid = query.value(6).toUInt();
         inputcardid = (inputcardid) ? inputcardid : cardid;
 
+        uint sourceid = query.value(5).toUInt();
+        DBChanList channels = ChannelUtil::GetChannels(sourceid, false);
+
+        QString order = gContext->GetSetting("ChannelOrdering", "channum");
+        ChannelUtil::SortChannels(channels, order);
+
         inputs[query.value(0).toUInt()] = new InputBase(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
-            query.value(5).toUInt(),   inputcardid);
+            sourceid, inputcardid, channels);
     }
 
     // Set initial input to first connected input

@@ -40,7 +40,6 @@ PreviousList::PreviousList(MythMainWindow *parent, const char *name,
     hourFormat = gContext->GetSetting("TimeFormat");
     timeFormat = gContext->GetSetting("ShortDateFormat") + " " + hourFormat;
     fullDateFormat = dayFormat + " " + hourFormat;
-    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     allowEvents = true;

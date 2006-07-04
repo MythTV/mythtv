@@ -987,7 +987,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     QMap<QString, int> inUseMap;
     QString inUseKey;
@@ -1019,34 +1018,40 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         }
 
 
-    QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
-                       "recorded.title,recorded.subtitle,recorded.description,"
-                       "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
-                       "recorded.autoexpire,editing,bookmark,recorded.category,"
-                       "recorded.recgroup,record.dupin,record.dupmethod,"
-                       "record.recordid,outputfilters,"
-                       "recorded.seriesid,recorded.programid,recorded.filesize, "
-                       "recorded.lastmodified, recorded.findid, "
-                       "recorded.originalairdate, recorded.playgroup, "
-                       "recorded.basename, recorded.progstart, "
-                       "recorded.progend, recorded.stars, "
-                       "recordedprogram.stereo, recordedprogram.hdtv, "
-                       "recordedprogram.closecaptioned, transcoded, "
-                       "recorded.recpriority "
-                       "FROM recorded "
-                       "LEFT JOIN record ON recorded.recordid = record.recordid "
-                       "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-                       "LEFT JOIN recordedprogram ON (recorded.chanid = recordedprogram.chanid "
-                              "AND recorded.starttime = recordedprogram.starttime) "
-                       "WHERE (recorded.deletepending = 0 OR "
-                              "DATE_ADD(recorded.lastmodified, "
-                                       "INTERVAL 5 MINUTE) <= NOW()) "
-                       "ORDER BY recorded.starttime";
+    QString thequery =
+        "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
+        "recorded.title,recorded.subtitle,recorded.description,"
+        "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
+        "recorded.autoexpire,editing,bookmark,recorded.category,"
+        "recorded.recgroup,record.dupin,record.dupmethod,"
+        "record.recordid,outputfilters,"
+        "recorded.seriesid,recorded.programid,recorded.filesize, "
+        "recorded.lastmodified, recorded.findid, "
+        "recorded.originalairdate, recorded.playgroup, "
+        "recorded.basename, recorded.progstart, "
+        "recorded.progend, recorded.stars, "
+        "recordedprogram.stereo, recordedprogram.hdtv, "
+        "recordedprogram.closecaptioned, transcoded, "
+        "recorded.recpriority "
+        "FROM recorded "
+        "LEFT JOIN record ON recorded.recordid = record.recordid "
+        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+        "LEFT JOIN recordedprogram ON "
+        " ( recorded.chanid = recordedprogram.chanid AND "
+        "  recorded.starttime = recordedprogram.starttime ) "
+        "WHERE ( recorded.deletepending = 0 OR "
+        "        DATE_ADD(recorded.lastmodified, INTERVAL 5 MINUTE) <= NOW() "
+        "      ) "
+        "ORDER BY recorded.starttime";
 
     if (type == "Delete")
         thequery += " DESC";
 
-    thequery += ", " + chanorder + " DESC;";
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+    if (chanorder != "channum")
+        thequery += ", " + chanorder;
+    else // approximation which the DB can handle
+        thequery += ",atsc_major_chan,atsc_minor_chan,channum,callsign";
 
     QStringList outputlist;
     QString fileprefix = gContext->GetFilePrefix();
@@ -1055,7 +1060,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     query.prepare(thequery);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("ProgramList::FromRecorded", query);
+        outputlist << "0";
+    }
+    else
     {
         outputlist << QString::number(query.size());
 
@@ -1248,8 +1258,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             delete proginfo;
         }
     }
-    else
-        outputlist << "0";
 
     for (ri = schedList.begin(); ri != schedList.end(); ri++)
         delete (*ri);

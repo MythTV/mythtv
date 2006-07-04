@@ -38,8 +38,8 @@ class ATSCStreamData : virtual public MPEGStreamData
     /// Current UTC to GPS time offset in seconds
     uint GPSOffset(void) const { return _GPS_UTC_offset; }
 
-    inline uint GetATSCSRCID(uint eit_sourceid) const;
-    inline bool HasATSCSRCIDMap(void) const;
+    inline uint GetATSCMajorMinor(uint eit_sourceid) const;
+    inline bool HasATSCMajorMinorMap(void) const;
     bool HasEITPIDChanges(const uint_vec_t &in_use_pid) const;
     bool GetEITPIDChanges(const uint_vec_t &in_use_pid,
                           uint_vec_t &pids_to_add,
@@ -120,7 +120,7 @@ class ATSCStreamData : virtual public MPEGStreamData
     atsc_eit_pid_map_t        _atsc_eit_pids;
     atsc_ett_pid_map_t        _atsc_ett_pids;
 
-    QMap<uint,uint>           _sourceid_to_atscsrcid;
+    QMap<uint,uint>           _sourceid_to_atsc_maj_min;
 
 
     // Signals
@@ -146,16 +146,16 @@ class ATSCStreamData : virtual public MPEGStreamData
 };
 
 
-inline uint ATSCStreamData::GetATSCSRCID(uint eit_sourceid) const
+inline uint ATSCStreamData::GetATSCMajorMinor(uint eit_sourceid) const
 {
     QMutexLocker locker(&_listener_lock);
-    return _sourceid_to_atscsrcid[eit_sourceid];
+    return _sourceid_to_atsc_maj_min[eit_sourceid];
 }
 
-inline bool ATSCStreamData::HasATSCSRCIDMap(void) const
+inline bool ATSCStreamData::HasATSCMajorMinorMap(void) const
 {
     QMutexLocker locker(&_listener_lock);
-    return _sourceid_to_atscsrcid.size();
+    return !_sourceid_to_atsc_maj_min.empty();
 }
 
 inline int ATSCStreamData::VersionTVCT(uint tsid) const

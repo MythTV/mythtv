@@ -117,7 +117,7 @@ void ATSCStreamData::Reset(int major, int minor)
     _eit_version.clear();
     _eit_section_seen.clear();
 
-    _sourceid_to_atscsrcid.clear();
+    _sourceid_to_atsc_maj_min.clear();
     _atsc_eit_pids.clear();
     _atsc_ett_pids.clear();
 
@@ -275,9 +275,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             for (uint i = 0; i < _atsc_eit_listeners.size(); i++)
                 _atsc_eit_listeners[i]->HandleEIT(pid, &eit);
 
-            const uint atscsrcid = GetATSCSRCID(eit.SourceID());
-            if (atscsrcid && _eit_helper)
-                _eit_helper->AddEIT(atscsrcid, &eit);
+            const uint mm = GetATSCMajorMinor(eit.SourceID());
+            if (mm && _eit_helper)
+                _eit_helper->AddEIT(mm >> 16, mm & 0xffff, &eit);
                 
             return true;
         }
@@ -291,9 +291,9 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             if (ett.IsEventETM() && _eit_helper) // Guide ETTs
             {
-                const uint atscsrcid = GetATSCSRCID(ett.SourceID());
-                if (atscsrcid)
-                    _eit_helper->AddETT(atscsrcid, &ett);
+                const uint mm = GetATSCMajorMinor(ett.SourceID());
+                if (mm)
+                    _eit_helper->AddETT(mm >> 16, mm & 0xffff, &ett);
             }
 
             return true;
@@ -452,7 +452,7 @@ void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
     for (uint i = 0; i < _atsc_main_listeners.size(); i++)
         _atsc_main_listeners[i]->HandleVCT(tsid, vct);
 
-    _sourceid_to_atscsrcid.clear();
+    _sourceid_to_atsc_maj_min.clear();
     for (uint i = 0; i < vct->ChannelCount() ; i++)
     {
         if (vct->IsHiddenInGuide(i))
@@ -477,8 +477,8 @@ void ATSCStreamData::ProcessVCT(uint tsid, const VirtualChannelTable *vct)
                 .arg(vct->MajorChannel(i))
                 .arg(vct->MinorChannel(i)));
 
-        _sourceid_to_atscsrcid[vct->SourceID(i)] =
-            vct->MajorChannel(i) << 8 | vct->MinorChannel(i);
+        _sourceid_to_atsc_maj_min[vct->SourceID(i)] =
+            vct->MajorChannel(i) << 16 | vct->MinorChannel(i);
     }
 }
 

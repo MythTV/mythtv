@@ -76,7 +76,7 @@ class DVBChannel : public ChannelBase
   private:
     int  GetChanID(void) const;
     bool GetTransportOptions(int mplexid);
-    bool GetChannelOptions(const QString &channum);
+    bool InitChannelParams(uint sourceid, const QString &channum);
 
     void CheckOptions();
     bool CheckModulation(fe_modulation_t modulation) const;

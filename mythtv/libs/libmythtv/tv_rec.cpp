@@ -1065,16 +1065,36 @@ void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
     }
 #endif // USING_V4L
 
+    bool ok;
     if (inputname.isEmpty())
-        channel->SetChannelByString(startchannel);
+        ok = channel->SetChannelByString(startchannel);
     else
-        channel->SwitchToInput(inputname, startchannel);
+        ok = channel->SwitchToInput(inputname, startchannel);
 
-    // Set channel ordering, and check validity...
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
-    ChannelUtil::GetNextChannel(cardid, inputname, startchannel,
-                                BROWSE_SAME, chanorder);
-    channel->SetChannelOrdering(chanorder);
+    // try another channel if start channel fails
+    if (!ok)
+    {
+        QString msg1 = QString("Setting start channel '%1' failed, ")
+            .arg(startchannel);
+        QString msg2 = "";
+
+        DBChanList channels = channel->GetChannels(inputname);
+        if (channels.empty())
+            msg2 = "and no other channels were found on input.";
+        else
+        {
+            QString channum = channels[0].channum;
+            if (inputname.isEmpty())
+                ok = channel->SetChannelByString(channum);
+            else
+                ok = channel->SwitchToInput(inputname, channum);
+
+            msg2 = (ok) ?
+                QString("tuned to '%1' instead.").arg(channum) :
+                QString("and backup '%1' failed as well.").arg(channum);
+        }
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg1 + "\n\t\t\t" + msg2);
+    }
 }
 
 void TVRec::CloseChannel(void)
@@ -2815,32 +2835,24 @@ void TVRec::GetNextProgram(int direction,
 {
     QString compare     = "<=";
     QString sortorder   = "desc";
-    QString input       = channel->GetCurrentInput();
-    QString order       = channel->GetOrdering();
-    int     chanid      = -1;
+    uint     chanid     = 0;
 
     if (BROWSE_SAME == direction)
-        chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channum, CHANNEL_DIRECTION_SAME, order);
+        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
     else if (BROWSE_UP == direction)
-        chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channum, CHANNEL_DIRECTION_UP, order);
+        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_UP);
     else if (BROWSE_DOWN == direction)
-        chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channum, CHANNEL_DIRECTION_DOWN, order);
+        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_DOWN);
     else if (BROWSE_FAVORITE == direction)
-        chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channum, CHANNEL_DIRECTION_FAVORITE, order);
+        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_FAVORITE);
     else if (BROWSE_LEFT == direction)
     {
-        chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channum, CHANNEL_DIRECTION_SAME, order);
+        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
         compare = "<";
     }
     else if (BROWSE_RIGHT == direction)
     {
-	chanid = ChannelUtil::GetNextChannel(
-            cardid, input, channum, CHANNEL_DIRECTION_SAME, order);
+	chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
         compare = ">";
         sortorder = "asc";
     }
@@ -3047,13 +3059,9 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
 
     if (channel && !channum.isEmpty() && (channum.find("NextChannel") >= 0))
     {
-        int dir = channum.right(channum.length() - 12).toInt();
-        uint chanid;
-        QString channelordering = channel->GetOrdering();
-        channum = ChannelUtil::GetNextChannel(
-            cardid,                    channel->GetCurrentInput(),
-            channel->GetCurrentName(), dir,
-            channelordering,           chanid);
+        int dir     = channum.right(channum.length() - 12).toInt();
+        uint chanid = channel->GetNextChannel(0, dir);
+        channum     = ChannelUtil::GetChanNum(chanid);
     }
 
     return channum;
@@ -3081,9 +3089,8 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
 
         if (atsc)
         {
-            uint atscsrcid = ChannelUtil::GetATSCSRCID(sourceid, newchannum);
-            uint major = atscsrcid >> 8;
-            uint minor = atscsrcid & 0xff;
+            uint major, minor = 0;
+            ChannelUtil::GetATSCChannel(sourceid, newchannum, major, minor);
 
             if (minor && atsc->HasChannel(major, minor))
             {

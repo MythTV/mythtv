@@ -309,20 +309,25 @@ bool HDHRChannel::TuneTo(uint freqid)
 
 bool HDHRChannel::SetChannelByString(const QString &channum)
 {
-    VERBOSE(VB_CHANNEL, LOC + QString("Set channel '%1'").arg(channum));
+    QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
+    QString loc_err = loc + ", Error: ";
+    VERBOSE(VB_CHANNEL, loc);
+    
     if (!Open())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Set channel request without active connection");
+        VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
+                "will not open, can not change channels.");
+
         return false;
     }
 
     QString inputName;
     if (!CheckChannel(channum, inputName))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "CheckChannel failed. " +
-                QString("Please verify channel '%1'").arg(channum) +
-                " in the \"mythtv-setup\" Channel Editor.");
+        VERBOSE(VB_IMPORTANT, loc_err +
+                "CheckChannel failed.\n\t\t\tPlease verify the channel "
+                "in the 'mythtv-setup' Channel Editor.");
+
         return false;
     }
 
@@ -338,40 +343,25 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     if (it == inputs.end())
         return false;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString(
-        "SELECT finetune, freqid, tvformat, freqtable, "
-        "       atscsrcid, commfree, mplexid "
-        "FROM channel, videosource "
-        "WHERE videosource.sourceid = channel.sourceid AND "
-        "      channum = '%1' AND channel.sourceid = '%2'")
-        .arg(channum).arg((*it)->sourceid);
+    // Fetch tuning data from the database.
+    QString tvformat, modulation, freqtable, freqid;
+    int finetune;
+    uint64_t frequency;
+    int mpeg_prog_num;
+    uint atsc_major, atsc_minor, mplexid, tsid, netid;
 
-    query.prepare(thequery);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("fetchtuningparams", query);
-    if (!query.next())
+    if (!ChannelUtil::GetChannelData(
+        (*it)->sourceid, channum,
+        tvformat, modulation, freqtable, freqid,
+        finetune, frequency,
+        mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
+        mplexid, commfree))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                    "CheckChannel failed because it could not\n"
-                    "\t\t\tfind channel number '%2' in DB for source '%3'.")
-                .arg(channum).arg((*it)->sourceid));
         return false;
     }
 
-    int     finetune  = query.value(0).toInt();
-    QString freqid    = query.value(1).toString();
-    QString tvformat  = query.value(2).toString();
-    QString freqtable = query.value(3).toString();
-    uint    atscsrcid = query.value(4).toInt();
-    commfree          = query.value(5).toBool();
-    uint    mplexid   = query.value(6).toInt();
-
-    QString modulation;
-    int frequency = ChannelUtil::GetTuningParams(mplexid, modulation);
+    // If the frequency is zeroed out, don't use it directly.
     bool ok = (frequency > 0);
-
     if (!ok)
     {
         frequency = (freqid.toInt(&ok) + finetune) * 1000;
@@ -379,30 +369,34 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     }
     bool isFrequency = ok && (frequency > 10000000);
 
-    curchannelname = channum;
-    inputs[currentInputID]->startChanNum = curchannelname;
-
-    VERBOSE(VB_CHANNEL, LOC +
-            QString("freqid = %1, atscsrcid = %2, mplexid = %3")
-            .arg(freqid).arg(atscsrcid).arg(mplexid));
-
-    if (isFrequency)
+    // Tune to proper frequency
+    if ((*it)->externalChanger.isEmpty())
     {
-        if (!Tune(frequency, inputName, modulation))
-            return false;
+        if (isFrequency)
+        {
+            if (!Tune(frequency, inputName, modulation))
+                return false;
+        }
+        else
+        {
+            if (!TuneTo(freqid.toInt()))
+                return false;
+        }
     }
+    else if (!ChangeExternalChannel(freqid))
+        return false;
+
+    // Set the current channum to the new channel's channum
+    curchannelname = QDeepCopy<QString>(channum);
+
+    // Set the major and minor channel for any additional multiplex tuning
+    if (atsc_major || atsc_minor)
+        SetCachedATSCInfo(QString("%1_%2").arg(atsc_major).arg(atsc_minor));
     else
-    {
-        if (!TuneTo(freqid.toInt()))
-            return false;
-    }
+        SetCachedATSCInfo(QString("%1_0").arg(channum));
 
-    QString min_maj = QString("%1_0").arg(channum);
-    if (atscsrcid > 255)
-    {
-        min_maj = QString("%1_%2").arg(atscsrcid >> 8).arg(atscsrcid & 0xff);
-    }
-    SetCachedATSCInfo(min_maj);
+    // Set this as the future start channel for this source
+    inputs[currentInputID]->startChanNum = curchannelname;
 
     return true;
 }

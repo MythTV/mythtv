@@ -29,6 +29,7 @@
 #include "scanwizard.h"
 #include "cardutil.h"
 #include "sourceutil.h"
+#include "channelutil.h"
 #include "frequencies.h"
 
 #ifdef USING_DVB
@@ -1614,33 +1615,23 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     else if (query.next())
         startChan = query.value(0).toString();
 
-    // Get the existing channels on the connected source
-    query.prepare(
-        "SELECT channum "
-        "FROM channel "
-        "WHERE sourceid = :SOURCEID "
-        "ORDER BY atscsrcid, channum");
-    query.bindValue(":SOURCEID", sourceid.toUInt());
+    DBChanList channels = ChannelUtil::GetChannels(sourceid.toUInt(), false);
 
-    QString nnsc = startChan.isEmpty() ? "" : startChan;
-    if (!query.exec() || !query.isActive())
+    if (channels.empty())
     {
-        addSelection(tr("DB Error, see console"), nnsc);
-        MythContext::DBError("SetSourceID -- get channels", query);
+        addSelection(tr("Please add channels to this source"),
+                     startChan.isEmpty() ? "" : startChan);
+        return;
     }
-    else if (query.size() > 0)
+
+    // If there are channels sort them, then add them 
+    // (selecting the old start channel if it is there).
+    QString order = gContext->GetSetting("ChannelOrdering", "channum");
+    ChannelUtil::SortChannels(channels, order);
+    for (uint i = 0; i < channels.size(); i++)
     {
-        // If there are channels add them, and
-        // highlight the old start channel
-        while (query.next())
-        {
-            const QString channum = query.value(0).toString();
-            addSelection(channum, channum, channum == startChan);
-        }
-    }
-    else
-    {
-        addSelection(tr("Please add channels to this source"), nnsc);
+        const QString channum = channels[i].channum;
+        addSelection(channum, channum, channum == startChan);
     }
 }
 

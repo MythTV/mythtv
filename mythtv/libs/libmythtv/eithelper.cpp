@@ -17,9 +17,10 @@ using namespace std;
 
 const uint EITHelper::kChunkSize = 20;
 
-static int get_chan_id_from_db(uint sourceid,  uint atscsrcid);
-static int get_chan_id_from_db(uint sourceid,  uint serviceid,
-                               uint networkid, uint transportid);
+static uint get_chan_id_from_db(uint sourceid,
+                                uint atscmajor, uint atscminor);
+static uint get_chan_id_from_db(uint sourceid,  uint serviceid,
+                                uint networkid, uint transportid);
 static void init_fixup(QMap<uint64_t,uint> &fix);
 static int calc_eit_utc_offset(void);
 
@@ -109,10 +110,11 @@ uint EITHelper::ProcessEvents(void)
     return insertCount;
 }
 
-void EITHelper::SetFixup(uint atscsrcid, uint eitfixup)
+void EITHelper::SetFixup(uint atsc_major, uint atsc_minor, uint eitfixup)
 {
     QMutexLocker locker(&eitList_lock);
-    fixup[atscsrcid] = eitfixup;
+    uint atsc_key = (atsc_major << 16) | atsc_minor;
+    fixup[atsc_key] = eitfixup;
 }
 
 void EITHelper::SetLanguagePreferences(const QStringList &langPref)
@@ -138,10 +140,12 @@ void EITHelper::SetSourceID(uint _sourceid)
     sourceid = _sourceid;
 }
 
-void EITHelper::AddEIT(uint atscsrcid, const EventInformationTable *eit)
+void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
+                       const EventInformationTable *eit)
 {
-    EventIDToATSCEvent &events = incomplete_events[atscsrcid];
-    EventIDToETT &etts = unmatched_etts[atscsrcid];
+    uint atsc_key = (atsc_major << 16) | atsc_minor;
+    EventIDToATSCEvent &events = incomplete_events[atsc_key];
+    EventIDToETT &etts = unmatched_etts[atsc_key];
 
     for (uint i = 0; i < eit->EventCount(); i++)
     {
@@ -154,12 +158,12 @@ void EITHelper::AddEIT(uint atscsrcid, const EventInformationTable *eit)
 
         if (it != etts.end())
         {
-            CompleteEvent(atscsrcid, ev, *it);
+            CompleteEvent(atsc_major, atsc_minor, ev, *it);
             etts.erase(it);
         }
         else if (!ev.etm)
         {
-            CompleteEvent(atscsrcid, ev, QString::null);
+            CompleteEvent(atsc_major, atsc_minor, ev, QString::null);
         }
         else
         {
@@ -171,26 +175,32 @@ void EITHelper::AddEIT(uint atscsrcid, const EventInformationTable *eit)
     }
 }
 
-void EITHelper::AddETT(uint atscsrcid, const ExtendedTextTable *ett)
+void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
+                       const ExtendedTextTable *ett)
 {
+    uint atsc_key = (atsc_major << 16) | atsc_minor;
     // Try to complete an Event
-    ATSCSRCToEvents::iterator eits_it = incomplete_events.find(atscsrcid);
+    ATSCSRCToEvents::iterator eits_it = incomplete_events.find(atsc_key);
     if (eits_it != incomplete_events.end())
     {
         EventIDToATSCEvent::iterator it = (*eits_it).find(ett->EventID());
         if (it != (*eits_it).end())
         {
-            CompleteEvent(atscsrcid, *it, ett->ExtendedTextMessage()
-                          .GetBestMatch(languagePreferences));
+            CompleteEvent(
+                atsc_major, atsc_minor, *it,
+                ett->ExtendedTextMessage().GetBestMatch(languagePreferences));
+
             if ((*it).desc)
                 delete [] (*it).desc;
+
             (*eits_it).erase(it);
+
             return;
         }
     }
 
     // Couldn't find matching EIT. If not yet in unmatched ETT map, insert it.
-    EventIDToETT &elist = unmatched_etts[atscsrcid];
+    EventIDToETT &elist = unmatched_etts[atsc_key];
     if (elist.find(ett->EventID()) == elist.end())
     {
         elist[ett->EventID()] = ett->ExtendedTextMessage()
@@ -345,11 +355,11 @@ void EITHelper::PruneCache(uint timestamp)
 // private methods and functions below this line                    //
 //////////////////////////////////////////////////////////////////////
 
-void EITHelper::CompleteEvent(uint atscsrcid,
+void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
                               const ATSCEvent &event,
                               const QString   &ett)
 {
-    uint chanid = GetChanID(atscsrcid);
+    uint chanid = GetChanID(atsc_major, atsc_minor);
     if (!chanid)
         return;
 
@@ -363,25 +373,31 @@ void EITHelper::CompleteEvent(uint atscsrcid,
     bool captioned = MPEGDescriptor::Find(list, DescriptorID::caption_service);
     bool stereo = false;
 
+    uint atsc_key = (atsc_major << 16) | atsc_minor;
+
     QMutexLocker locker(&eitList_lock);
     db_events.enqueue(new DBEvent(chanid, QDeepCopy<QString>(event.title),
                                   QDeepCopy<QString>(ett),
                                   starttime, endtime,
-                                  fixup[atscsrcid], captioned, stereo));
+                                  fixup[atsc_key], captioned, stereo));
 }
 
-uint EITHelper::GetChanID(uint atscsrcid)
+uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 {
-    uint key = sourceid << 16 | atscsrcid;
+    uint64_t key;
+    key  = ((uint64_t) sourceid);
+    key |= ((uint64_t) atsc_minor) << 16;
+    key |= ((uint64_t) atsc_major) << 32;
+
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
         return max(*it, 0);
 
-    int chanid = get_chan_id_from_db(sourceid, atscsrcid);
-    if (chanid != 0)
+    uint chanid = get_chan_id_from_db(sourceid, atsc_major, atsc_minor);
+    if (chanid)
         srv_to_chanid[key] = chanid;
 
-    return max(chanid, 0);
+    return chanid;
 }
 
 uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
@@ -396,22 +412,25 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
     if (it != srv_to_chanid.end())
         return max(*it, 0);
 
-    int chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
-    if (chanid != 0)
+    uint chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
+    if (chanid)
         srv_to_chanid[key] = chanid;
 
-    return max(chanid, 0);
+    return chanid;
 }
 
-static int get_chan_id_from_db(uint sourceid, uint atscsrcid)
+static uint get_chan_id_from_db(uint sourceid,
+                                uint atsc_major, uint atsc_minor)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
             "SELECT chanid, useonairguide "
             "FROM channel "
-            "WHERE atscsrcid = :ATSCSRCID AND "
-            "      sourceid  = :SOURCEID");
-    query.bindValue(":ATSCSRCID", atscsrcid);
+            "WHERE atsc_major_chan = :MAJORCHAN AND "
+            "      atsc_minor_chan = :MINORCHAN AND "
+            "      sourceid        = :SOURCEID");
+    query.bindValue(":MAJORCHAN", atsc_major);
+    query.bindValue(":MINORCHAN", atsc_minor);
     query.bindValue(":SOURCEID",  sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -419,15 +438,15 @@ static int get_chan_id_from_db(uint sourceid, uint atscsrcid)
     else if (query.next())
     {
         bool useOnAirGuide = query.value(1).toBool();
-        return (useOnAirGuide) ? query.value(0).toInt() : -1;
+        return (useOnAirGuide) ? query.value(0).toUInt() : 0;
     }
 
-    return -1;
+    return 0;
 }
 
 // Figure out the chanid for this channel
-static int get_chan_id_from_db(uint sourceid, uint serviceid,
-                               uint networkid, uint transportid)
+static uint get_chan_id_from_db(uint sourceid, uint serviceid,
+                                uint networkid, uint transportid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -457,10 +476,10 @@ static int get_chan_id_from_db(uint sourceid, uint serviceid,
     {
         // Check to see if we are interseted in this channel
         bool useOnAirGuide = query.value(1).toBool();
-        return (useOnAirGuide) ? query.value(0).toInt() : -1;        
+        return (useOnAirGuide) ? query.value(0).toUInt() : 0;
     }
 
-    return -1;
+    return 0;
 }
 
 static void init_fixup(QMap<uint64_t,uint> &fix)

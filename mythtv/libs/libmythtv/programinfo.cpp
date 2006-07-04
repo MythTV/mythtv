@@ -4002,8 +4002,14 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         querystr += " GROUP BY program.starttime, channel.channum, "
             "  channel.callsign, program.title ";
     if (!sql.contains(" ORDER BY "))
-        querystr += QString(" ORDER BY program.starttime, ") + 
-                    gContext->GetSetting("ChannelOrdering", "channum+0") + " ";
+    {
+        querystr += " ORDER BY program.starttime, ";
+        QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+        if (chanorder != "channum")
+            querystr += chanorder + " ";
+        else // approximation which the DB can handle
+            querystr += "atsc_major_chan,atsc_minor_chan,channum,callsign ";
+    }
     if (!sql.contains(" LIMIT "))
         querystr += " LIMIT 1000 ";
 
@@ -4096,7 +4102,6 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
     QString ip        = gContext->GetSetting("BackendServerIP");
     QString port      = gContext->GetSetting("BackendServerPort");
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     // ----------------------------------------------------------------------
 
@@ -4134,37 +4139,48 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
     // ----------------------------------------------------------------------
 
-    QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
-                       "recorded.title,recorded.subtitle,recorded.description,"
-                       "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
-                       "recorded.autoexpire,editing,bookmark,recorded.category,"
-                       "recorded.recgroup,record.dupin,record.dupmethod,"
-                       "record.recordid,outputfilters,"
-                       "recorded.seriesid,recorded.programid,recorded.filesize, "
-                       "recorded.lastmodified, recorded.findid, "
-                       "recorded.originalairdate, recorded.playgroup, "
-                       "recorded.basename, recorded.progstart, "
-                       "recorded.progend, recorded.stars, "
-                       "recordedprogram.stereo, recordedprogram.hdtv, "
-                       "recordedprogram.closecaptioned "
-                       "FROM recorded "
-                       "LEFT JOIN record ON recorded.recordid = record.recordid "
-                       "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-                       "LEFT JOIN recordedprogram ON (recorded.chanid = recordedprogram.chanid "
-                              "AND recorded.starttime = recordedprogram.starttime) "
-                       "WHERE (recorded.deletepending = 0 OR "
-                              "DATE_ADD(recorded.lastmodified, "
-                                       "INTERVAL 5 MINUTE) <= NOW()) "
-                       "ORDER BY recorded.starttime";
+    QString thequery =
+        "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
+        "recorded.title,recorded.subtitle,recorded.description,"
+        "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
+        "recorded.autoexpire,editing,bookmark,recorded.category,"
+        "recorded.recgroup,record.dupin,record.dupmethod,"
+        "record.recordid,outputfilters,"
+        "recorded.seriesid,recorded.programid,recorded.filesize, "
+        "recorded.lastmodified, recorded.findid, "
+        "recorded.originalairdate, recorded.playgroup, "
+        "recorded.basename, recorded.progstart, "
+        "recorded.progend, recorded.stars, "
+        "recordedprogram.stereo, recordedprogram.hdtv, "
+        "recordedprogram.closecaptioned "
+        "FROM recorded "
+        "LEFT JOIN record ON recorded.recordid = record.recordid "
+        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+        "LEFT JOIN recordedprogram ON "
+        " ( recorded.chanid    = recordedprogram.chanid AND "
+        "   recorded.starttime = recordedprogram.starttime ) "
+        "WHERE ( recorded.deletepending = 0 OR "
+        "        DATE_ADD(recorded.lastmodified,  INTERVAL 5 MINUTE) <= NOW() "
+        "      ) "
+        "ORDER BY recorded.starttime";
 
     if ( bDescending )
         thequery += " DESC";
 
-    thequery += ", " + chanorder + " DESC;";
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
+    if (chanorder != "channum")
+        thequery += ", " + chanorder;
+    else // approximation which the DB can handle
+        thequery += ",atsc_major_chan,atsc_minor_chan,channum,callsign";
 
     query.prepare(thequery);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("ProgramList::FromRecorded", query);
+        return true;
+    }
+    else
     {
         while (query.next())
         {

@@ -52,6 +52,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "tv_rec.h"
 #include "cardutil.h"
+#include "channelutil.h"
 
 #include "dvbtypes.h"
 #include "dvbchannel.h"
@@ -242,41 +243,53 @@ bool DVBChannel::TuneMultiplex(uint mplexid)
     return true;
 }
 
-bool DVBChannel::SetChannelByString(const QString &chan)
+bool DVBChannel::SetChannelByString(const QString &channum)
 {
-    QString func = QString("SetChannelByString(%1)").arg(chan);
-    VERBOSE(VB_CHANNEL, LOC + func);
+    QString tmp     = QString("SetChannelByString(%1): ").arg(channum);
+    QString loc     = LOC + tmp;
+    QString loc_err = LOC_ERR + tmp;
+
+    VERBOSE(VB_CHANNEL, loc);
     if (fd_frontend < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + func + QString(": not open"));
+        VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
+                "will not open, can not change channels.");
 
         return false;
     }
 
-    if (curchannelname == chan && !first_tune)
+    if (curchannelname == channum && !first_tune)
     {
-        VERBOSE(VB_CHANNEL, LOC + func + ": already on channel");
+        VERBOSE(VB_CHANNEL, loc + "Already on channel");
         return true;
     }
 
     QString inputName;
-    if (!CheckChannel(chan, inputName))
+    if (!CheckChannel(channum, inputName))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "CheckChannel failed. " +
-                QString("Please verify channel '%1'").arg(chan) +
-                " in the \"mythtv-setup\" Channel Editor.");
+        VERBOSE(VB_IMPORTANT, loc_err +
+                "CheckChannel failed.\n\t\t\tPlease verify the channel "
+                "in the 'mythtv-setup' Channel Editor.");
+
         return false;
     }
-    // If CheckChannel filled in the inputName we need to
-    // change inputs.
-    if (!inputName.isEmpty())
+
+    // If CheckChannel filled in the inputName we need to change inputs.
+    if (!inputName.isEmpty() && (nextInputID == currentInputID))
         nextInputID = GetInputByName(inputName);
-    
-    if (GetChannelOptions(chan) == false)
+
+    // Get the input data for the channel
+    int inputid = (nextInputID >= 0) ? nextInputID : currentInputID;
+    InputMap::const_iterator it = inputs.find(inputid);
+    if (it == inputs.end())
+        return false;
+
+    // Initialize all the tuning parameters
+    if (!InitChannelParams((*it)->sourceid, channum))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get channel options for " +
-                QString("channel '%1'.").arg(chan));
-        
+        VERBOSE(VB_IMPORTANT, loc_err +
+                "Failed to initialize channel options");
+
         return false;
     }
 
@@ -285,19 +298,17 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     if (!Tune(cur_tuning))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Tuning to frequency for " +
-                QString("channel '%1'.").arg(chan));
+        VERBOSE(VB_IMPORTANT, loc_err + "Tuning to frequency.");
 
         return false;
     }
 
-    curchannelname = chan;
+    curchannelname = QDeepCopy<QString>(channum);
 
-    VERBOSE(VB_CHANNEL, LOC + "Tuned to frequency for " +
-            QString("channel '%1'.").arg(chan));
+    VERBOSE(VB_CHANNEL, loc + "Tuned to frequency.");
 
     currentInputID = nextInputID;
-    inputs[currentInputID]->startChanNum = curchannelname;
+    inputs[currentInputID]->startChanNum = QDeepCopy<QString>(curchannelname);
 
     return true;
 }
@@ -333,57 +344,35 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
     return SetChannelByString((*it)->startChanNum);
 }
 
-/** \fn DVBChannel::GetChannelOptions(const QString &)
- *  \brief This function called when tuning to a specific stream.
+/** \fn DVBChannel::InitChannelParams(uint,const QString&)
+ *  \brief Initializes all variables pertaining to a channel.
+ *
+ *  \sa GetTransportOptions(int) which this calls to initialize
+ *         variables required to initially tune to the
+ *         transport where the channel may be found.
+ *
+ *  \return true on success and false on failure
  */
-bool DVBChannel::GetChannelOptions(const QString &channum)
+bool DVBChannel::InitChannelParams(uint sourceid, const QString &channum)
 {
-    // Reset Channel data
-    currentATSCMajorChannel = currentATSCMinorChannel = -1;
-    currentProgramNum = -1;
-    currentOriginalNetworkID = currentTransportID = -1;
+    QString tvformat, modulation, freqtable, freqid;
+    int finetune;
+    uint64_t frequency;
+    uint mplexid;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT chanid, serviceid, channel.mplexid, atscsrcid, "
-        "       cardinputid, networkid, transportid "
-        "FROM channel, cardinput, capturecard, dtv_multiplex "
-        "WHERE channel.mplexid    = dtv_multiplex.mplexid AND "
-        "      cardinput.sourceid = channel.sourceid      AND "
-        "      capturecard.cardid = cardinput.cardid      AND "
-        "      cardinput.cardid   = :CARDID               AND "
-        "      channel.channum    = :CHANNUM");
-    query.bindValue(":CARDID",  GetCardID());
-    query.bindValue(":CHANNUM", channum);
-
-    if (!query.exec() || !query.isActive())
+    if (!ChannelUtil::GetChannelData(
+            sourceid,   channum,
+            tvformat,   modulation,   freqtable,   freqid,
+            finetune,   frequency,    currentProgramNum,
+            currentATSCMajorChannel,  currentATSCMinorChannel,
+            currentTransportID,       currentOriginalNetworkID,
+            mplexid,    commfree))
     {
-        MythContext::DBError("GetChannelOptions - ChanID", query);
         return false;
     }
 
-    uint mplexid = 0;
-    while (query.next() && !mplexid)
-    {
-        if (query.value(4).toInt() != nextInputID)
-            continue;
-
-        currentProgramNum = query.value(1).toUInt();
-        mplexid           = query.value(2).toUInt();
-
-        if (query.value(3).toUInt() & 0xff)
-        {
-            currentATSCMajorChannel  = query.value(3).toUInt() >> 8;
-            currentATSCMinorChannel  = query.value(3).toUInt() & 0xff;
-            currentTransportID       = query.value(6).toUInt();
-            currentProgramNum        = -1;
-        }
-        else if (query.value(5).toUInt() > 0)
-        {
-            currentOriginalNetworkID = query.value(5).toUInt();
-            currentTransportID       = query.value(6).toUInt();
-        }
-    }
+    if (currentATSCMinorChannel)
+        currentProgramNum = -1;
 
     if (mplexid)
         return GetTransportOptions(mplexid);
@@ -395,8 +384,6 @@ bool DVBChannel::GetChannelOptions(const QString &channum)
 /** \fn DVBChannel::GetTransportOptions(int mplexid)
  *  \brief Initializes tuning from database using mplexid.
  *
- *  \todo pParent doesn't exist when you create a DVBChannel from videosource
- *        but this is important (i think) for remote backends
  *  \return true on success and false on failure
  */
 bool DVBChannel::GetTransportOptions(int mplexid)

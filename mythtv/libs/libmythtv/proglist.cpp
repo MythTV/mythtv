@@ -23,6 +23,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 #include "mythdbcon.h"
+#include "channelutil.h"
 
 ProgLister::ProgLister(ProgListType pltype,
                        const QString &view, const QString &from,
@@ -39,7 +40,7 @@ ProgLister::ProgLister(ProgListType pltype,
     hourFormat = gContext->GetSetting("TimeFormat");
     timeFormat = gContext->GetSetting("ShortDateFormat") + " " + hourFormat;
     fullDateFormat = dayFormat + " " + hourFormat;
-    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
+    channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     switch (pltype)
@@ -977,36 +978,26 @@ void ProgLister::powerEdit()
     stationList.clear();
     stationList << "";
 
-    query.prepare(QString("SELECT channel.chanid, channel.channum, "
-                  "channel.callsign, channel.name FROM channel "
-                  "WHERE channel.visible = 1 "
-                  "GROUP BY callsign "
-                  "ORDER BY ") + channelOrdering + ";");
-    query.exec();
+    DBChanList channels = ChannelUtil::GetChannels(0, false, "callsign");
+    ChannelUtil::SortChannels(channels, channelOrdering);
 
-    if (query.isActive() && query.size())
+    for (uint i = 0; i < channels.size(); i++)
     {
-        while (query.next())
-        {
-            QString chanid = query.value(0).toString();
-            QString channum = query.value(1).toString();
-            QString chansign = QString::fromUtf8(query.value(2).toString());
-            QString channame = QString::fromUtf8(query.value(3).toString());
+        QString chantext = QDeepCopy<QString>(channelFormat);
+        chantext
+            .replace("<num>",  channels[i].channum)
+            .replace("<sign>", channels[i].callsign)
+            .replace("<name>", channels[i].name);
 
-            QString chantext = channelFormat;
-            chantext.replace("<num>", channum)
-                .replace("<sign>", chansign)
-                .replace("<name>", channame);
+        viewList << QString::number(channels[i].chanid);
+        viewTextList << chantext;
 
-            viewList << chanid;
-            viewTextList << chantext;
-
-            powerStation->insertItem(chantext);
-            stationList << chansign;
-            if (chansign == field[5])
-                powerStation->setCurrentItem(powerStation->count() - 1);
-        }
+        powerStation->insertItem(chantext);
+        stationList << channels[i].callsign;
+        if (channels[i].callsign == field[5])
+            powerStation->setCurrentItem(powerStation->count() - 1);
     }
+
     powerPopup->addWidget(powerStation);
 
     powerOkButton = new MythPushButton(powerPopup);
@@ -1185,33 +1176,22 @@ void ProgLister::fillViewList(const QString &view)
 
     if (type == plChannel) // list by channel
     {
-        MSqlQuery query(MSqlQuery::InitCon()); 
-        query.prepare(QString("SELECT channel.chanid, channel.channum, "
-                      "channel.callsign, channel.name FROM channel "
-                      "WHERE channel.visible = 1 "
-                      "GROUP BY channum, callsign "
-                      "ORDER BY ") + channelOrdering + ";");
-        query.exec();
+        DBChanList channels = ChannelUtil::GetChannels(0, false, "callsign");
+        ChannelUtil::SortChannels(channels, channelOrdering);
 
-        if (query.isActive() && query.size())
+        for (uint i = 0; i < channels.size(); i++)
         {
-            while (query.next())
-            {
-                QString chanid = query.value(0).toString();
-                QString channum = query.value(1).toString();
-                QString chansign = QString::fromUtf8(query.value(2).toString());
-                QString channame = QString::fromUtf8(query.value(3).toString());
+            QString chantext = QDeepCopy<QString>(channelFormat);
+            chantext
+                .replace("<num>",  channels[i].channum)
+                .replace("<sign>", channels[i].callsign)
+                .replace("<name>", channels[i].name);
 
-                QString chantext = channelFormat;
-                chantext.replace("<num>", channum)
-                    .replace("<sign>", chansign)
-                    .replace("<name>", channame);
-
-                viewList << chanid;
-                viewTextList << chantext;
-            }
+            viewList << QString::number(channels[i].chanid);
+            viewTextList << chantext;
         }
-        if (view != "")
+
+        if (!view.isEmpty())
             curView = viewList.findIndex(view);
     }
     else if (type == plCategory) // list by category

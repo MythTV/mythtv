@@ -193,10 +193,14 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
 
         // Use the frequency we already have for this mplex
         // as it may be one of the other_frequencies for this mplex
-        QString modulation;
         int mux = ChannelUtil::GetMplexID(sourceid, tsid, netid);
-        if (mux != -1)
-            freq = ChannelUtil::GetTuningParams(mux, modulation);
+        if (mux > 0)
+        {
+            QString dummy_mod;
+            uint dummy_tsid, dummy_netid;
+            ChannelUtil::GetTuningParams(mux, dummy_mod, freq,
+                                         dummy_tsid, dummy_netid);
+        }
 
         mux = ChannelUtil::CreateMultiplex(
             sourceid,            "dvb",
@@ -566,29 +570,37 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     return -1;
 }
 
-int ChannelUtil::GetTuningParams(int mplexid, QString &modulation)
+bool ChannelUtil::GetTuningParams(uint      mplexid,
+                                  QString  &modulation,
+                                  uint64_t &frequency,
+                                  uint     &dvb_transportid,
+                                  uint     &dvb_networkid)
 {
-    if (mplexid <= 0)
-        return -1;
+    if (!mplexid)
+        return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT frequency, modulation "
-                          "FROM dtv_multiplex "
-                          "WHERE mplexid=%1").arg(mplexid));
+    query.prepare(
+        "SELECT transportid, networkid, frequency, modulation "
+        "FROM dtv_multiplex "
+        "WHERE mplexid = :MPLEXID");
+    query.bindValue(":MPLEXID", mplexid);
 
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("GetTuningParams failed ", query);
-        return -1;
+        return false;
     }
 
-    if (!query.size())
-        return -1;
+    if (!query.next())
+        return false;
 
-    query.next();
+    dvb_transportid = query.value(0).toUInt();
+    dvb_networkid   = query.value(1).toUInt();
+    frequency       = (uint64_t) query.value(2).toDouble(); // Qt 3.1 compat
+    modulation      = query.value(3).toString();
 
-    modulation = query.value(1).toString();
-    return query.value(0).toInt(); 
+    return true;
 }
 
 QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
@@ -796,269 +808,74 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     return query.exec();
 }
 
-QString ChannelUtil::GetNextChannel(
-    uint           cardid,       const QString &inputname,
-    const QString &channum,      int            direction,
-    QString       &channelorder, uint          &chanid)
-{
-    chanid = 0;
-    bool isNum = true;
-    channum.toULong(&isNum);
-
-    if (!isNum && channelorder == "channum + 0")
-    {
-        bool has_atsc = GetChannelValueInt("atscsrcid", cardid,
-                                           inputname, channum);
-        channelorder = (has_atsc) ? "atscsrcid" : "channum";
-        if (!has_atsc)
-        {
-            QString msg = QString(
-                "Your channel ordering method \"channel number (numeric)\"\n"
-                "\t\t\twill not work with channels like: '%1' \n"
-                "\t\t\tConsider switching to order by \"database order\"  \n"
-                "\t\t\tor \"channel number (alpha)\" in the general       \n"
-                "\t\t\tsettings section of the frontend setup             \n"
-                "\t\t\tSwitched to '%2' order.")
-                .arg(channum).arg(channelorder);
-            VERBOSE(VB_IMPORTANT, LOC + msg);
-        }
-    }
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString querystr = QString(
-        "SELECT %1 "
-        "FROM channel,capturecard,cardinput "
-        "WHERE channel.channum      = :CHANNUM           AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID            AND "
-        "      capturecard.hostname = :HOSTNAME").arg(channelorder);
-    query.prepare(querystr);
-    query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":CARDID",   cardid);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-    QString id = QString::null;
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("getnextchannel 1", query);
-    else if (query.next())
-        id = query.value(0).toString();
-
-    if (id.isEmpty())
-    {
-        QString msg = QString(
-            "Channel: '%1' was not found in the database.\n"
-            "\t\t\tMost likely, the default channel set for this input\n"
-            "\t\t\tcardid %2, input '%3'\n"
-            "\t\t\tin setup is wrong\n")
-            .arg(channum).arg(cardid).arg(inputname);
-        VERBOSE(VB_IMPORTANT, LOC + msg);
-
-        querystr = QString(
-            "SELECT %1 "
-            "FROM channel, capturecard, cardinput "
-            "WHERE channel.sourceid     = cardinput.sourceid AND "
-            "      cardinput.cardid     = capturecard.cardid AND "
-            "      capturecard.cardid   = :CARDID            AND "
-            "      capturecard.hostname = :HOSTNAME "
-            "ORDER BY %2 "
-            "LIMIT 1").arg(channelorder).arg(channelorder);
-        query.prepare(querystr);
-        query.bindValue(":CARDID",   cardid);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("getnextchannel 2", query);
-        else if (query.next())
-            id = query.value(0).toString();
-    }
-
-    if (id.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Couldn't find any channels in the database,\n"
-                "\t\t\tplease make sure your inputs are associated\n"
-                "\t\t\tproperly with your cards.");
-        return "";
-    }
-
-    // Now let's try finding the next channel in the desired direction
-    QString comp = ">";
-    QString ordering = "";
-    QString fromfavorites = "";
-    QString wherefavorites = "";
-
-    if (direction == CHANNEL_DIRECTION_DOWN)
-    {
-        comp = "<";
-        ordering = " DESC ";
-    }
-    else if (direction == CHANNEL_DIRECTION_FAVORITE)
-    {
-        fromfavorites = ",favorites";
-        wherefavorites = "AND favorites.chanid = channel.chanid";
-    }
-    else if (direction == CHANNEL_DIRECTION_SAME)
-    {
-        comp = "=";
-    }
-
-    QString wherepart = QString(
-        "cardinput.cardid     = capturecard.cardid AND "
-        "capturecard.cardid   = :CARDID            AND "
-        "capturecard.hostname = :HOSTNAME          AND "
-        "channel.visible      = 1                  AND "
-        "cardinput.sourceid = channel.sourceid ");
-
-    querystr = QString(
-        "SELECT channel.channum, channel.chanid "
-        "FROM channel, capturecard, cardinput%1 "
-        "WHERE channel.%2 %3 :ID %4 AND "
-        "      %5 "
-        "ORDER BY channel.%6 %7 "
-        "LIMIT 1")
-        .arg(fromfavorites).arg(channelorder)
-        .arg(comp).arg(wherefavorites)
-        .arg(wherepart).arg(channelorder).arg(ordering);
-
-    query.prepare(querystr);
-    query.bindValue(":CARDID",   cardid);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.bindValue(":ID",       id);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("getnextchannel 3", query);
-    }
-    else if (query.next())
-    {
-        chanid = query.value(1).toUInt();
-        return query.value(0).toString();
-    }
-    else
-    {
-        // Couldn't find the channel going in the desired direction, 
-        // so loop around and find it on the flip side...
-        comp = "<";
-        if (direction == CHANNEL_DIRECTION_DOWN) 
-            comp = ">";
-
-        // again, %9 is the limit for this
-        querystr = QString(
-            "SELECT channel.channum, channel.chanid "
-            "FROM channel, capturecard, cardinput%1 "
-            "WHERE channel.%2 %3 :ID %4 AND "
-            "      %5 "
-            "ORDER BY channel.%6 %7 "
-            "LIMIT 1")
-            .arg(fromfavorites).arg(channelorder)
-            .arg(comp).arg(wherefavorites)
-            .arg(wherepart).arg(channelorder).arg(ordering);
-
-        query.prepare(querystr);
-        query.bindValue(":CARDID",   cardid);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-        query.bindValue(":ID",       id); 
-
-        if (!query.exec() || !query.isActive())
-        {
-            MythContext::DBError("getnextchannel", query);
-        }
-        else if (query.next())
-        {
-            chanid = query.value(1).toUInt();
-            return query.value(0).toString();
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, "getnextchannel, query failed: "<<querystr);
-        }
-    }
-
-    // just stay on same channel
-    chanid = max(GetChannelValueInt("chanid", cardid, inputname, channum), 0);
-    return channum;
-}
-
 int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
                            int major_channel, int minor_channel,
                            int program_number)
 {
-    // Currently we don't use the service transport id,
-    // but we should use it according to ATSC std 65.
-    (void) service_transport_id;
-    
     MSqlQuery query(MSqlQuery::InitCon());
 
-    // This works for transports inserted by a scan
-    query.prepare(QString("SELECT chanid FROM channel "
-                          "WHERE serviceID=%1 AND mplexid=%2")
-                  .arg(program_number).arg(mplexid));
-    
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("Selecting channel/dtv_multiplex 1", query);
-        return -1;
-    }
-    if (query.size())
-    {
-        query.next();
-        return query.value(0).toInt();
-    }
-
-    if (major_channel <= 0)
-        return -1;
-
     // find source id, so we can find manually inserted ATSC channels
-    query.prepare(QString("SELECT sourceid FROM dtv_multiplex "
-                          "WHERE mplexid=%2").arg(mplexid));
+    query.prepare("SELECT sourceid "
+                  "FROM dtv_multiplex "
+                  "WHERE mplexid = :MPLEXID");
+    query.bindValue(":MPLEXID", mplexid);
     if (!query.exec() || !query.isActive() || !query.size())
     {
         MythContext::DBError("Selecting channel/dtv_multiplex 2", query);
         return -1;
     }
-    query.next();
+    if (!query.next())
+        return -1;
+
     int source_id = query.value(0).toInt();
 
-    uint atsc_src_id = (major_channel << 8) | (minor_channel & 0xff);
-
-    // Find manually inserted/edited channels...
     QString qstr[] = 
     {
-        // find based on pcHDTV formatted major and minor channels
+        // find a proper ATSC channel
+        QString("SELECT chanid FROM channel,dtv_multiplex "
+                "WHERE channel.sourceid          = %1 AND "
+                "      atsc_major_chan           = %2 AND "
+                "      atsc_minor_chan           = %3 AND "
+                "      dtv_multiplex.transportid = %4 AND "
+                "      dtv_multiplex.mplexid     = %5 AND "
+                "      dtv_multiplex.sourceid    = channel.sourceid AND "
+                "      dtv_multiplex.mplexid     = channel.mplexid")
+        .arg(source_id).arg(major_channel).arg(minor_channel)
+        .arg(service_transport_id).arg(mplexid),
+
+        // Find manually inserted/edited channels in order of scariness.
+
+        // find renamed channel, where atsc is valid
+        QString("SELECT chanid FROM channel "
+                "WHERE sourceid=%1 AND "
+                "atsc_major_chan=%2 AND "
+                "atsc_minor_chan=%3")
+        .arg(source_id).arg(major_channel).arg(minor_channel),
+        // find based on mpeg program number and mplexid alone
+        QString("SELECT chanid FROM channel "
+                "WHERE sourceid=%1 AND serviceID=%1 AND mplexid=%2")
+        .arg(source_id).arg(program_number).arg(mplexid),
+        // find based on OLD pcHDTV formatted major and minor channels
         QString("SELECT chanid FROM channel "
                 "WHERE sourceid=%1 AND channum='%2_%3'")
         .arg(source_id).arg(major_channel).arg(minor_channel),
-        // find based on pcHDTV formatted major channel and program number
-        // really old format, still used in freq_id, but we don't check that.
+        // find based on OLD pcHDTV formatted major channel and program number
         QString("SELECT chanid FROM channel "
                 "WHERE sourceid=%1 AND channum='%2-%3'")
         .arg(source_id).arg(major_channel).arg(program_number),
-        // find based on DVB formatted major and minor channels
+        // find based on OLD DVB formatted major and minor channels
         QString("SELECT chanid FROM channel "
                 "WHERE sourceid=%1 AND channum='%2%3'")
         .arg(source_id).arg(major_channel).arg(minor_channel),
-        // find renamed channel, where atscsrcid is valid
-        QString("SELECT chanid FROM channel "
-                "WHERE sourceid=%1 AND atscsrcid=%2")
-        .arg(source_id).arg(atsc_src_id),
     };
 
-    for (uint i = 0; i < 4; i++)
+    for (uint i = 0; i < 6; i++)
     {
         query.prepare(qstr[i]);
         if (!query.exec() || !query.isActive())
-        {
             MythContext::DBError("Selecting channel/dtv_multiplex 3", query);
-            return -1;
-        }
-        if (query.size())
-        {
-            query.next();
+        if (query.next())
             return query.value(0).toInt();
-        }
     }
 
     return -1;
@@ -1164,17 +981,17 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     QString chanNum = (chan_num == "-1") ?
         QString::number(service_id) : chan_num;
 
-    uint atsc_src_id = (atsc_major_channel << 8) | (atsc_minor_channel & 0xff);
-
     query.prepare(
         "INSERT INTO channel "
         "  (chanid,        channum,    sourceid,   callsign,  "
-        "   name,          mplexid,    serviceid,  atscsrcid, "
+        "   name,          mplexid,    serviceid,             "
+        "   atsc_major_chan,           atsc_minor_chan,       "
         "   useonairguide, visible,    freqid,     tvformat,  "
         "   icon,          xmltvid) "
         "VALUES "
         "  (:CHANID,       :CHANNUM,   :SOURCEID,  :CALLSIGN,  "
-        "   :NAME,         :MPLEXID,   :SERVICEID, :ATSCSRCID, "
+        "   :NAME,         :MPLEXID,   :SERVICEID,             "
+        "   :MAJORCHAN,                :MINORCHAN,             "
         "   :USEOAG,       :VISIBLE,   :FREQID,    :TVFORMAT,  "
         "   :ICON,         :XMLTVID)");
 
@@ -1188,7 +1005,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
         query.bindValue(":MPLEXID",   db_mplexid);
 
     query.bindValue(":SERVICEID", service_id);
-    query.bindValue(":ATSCSRCID", atsc_src_id);
+    query.bindValue(":MAJORCHAN", atsc_major_channel);
+    query.bindValue(":MINORCHAN", atsc_minor_channel);
     query.bindValue(":USEOAG",    use_on_air_guide);
     query.bindValue(":VISIBLE",   !hidden);
     (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
@@ -1223,19 +1041,19 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    uint atsc_src_id = (atsc_major_channel << 8) | (atsc_minor_channel & 0xff);
-
-    query.prepare("UPDATE channel "
-                  "SET mplexid=:MPLEXID,     serviceid=:SERVICEID, "
-                  "    atscsrcid=:ATSCSRCID, callsign=:CALLSIGN, "
-                  "    name=:NAME,           channum=:CHANNUM, "
-                  "    freqid=:FREQID,       tvformat=:TVFORMAT, "
-                  "    sourceid=:SOURCEID "
-                  "WHERE chanid=:CHANID");
+    query.prepare(
+        "UPDATE channel "
+        "SET mplexid         = :MPLEXID,   serviceid       = :SERVICEID, "
+        "    atsc_major_chan = :MAJORCHAN, atsc_minor_chan = :MINORCHAN, "
+        "    callsign        = :CALLSIGN,  name            = :NAME,      "
+        "    channum         = :CHANNUM,   freqid          = :FREQID,    "
+        "    tvformat        = :TVFORMAT,  sourceid        = :SOURCEID   "
+        "WHERE chanid=:CHANID");
 
     query.bindValue(":MPLEXID",   db_mplexid);
     query.bindValue(":SERVICEID", service_id);
-    query.bindValue(":ATSCSRCID", atsc_src_id);
+    query.bindValue(":MAJORCHAN", atsc_major_channel);
+    query.bindValue(":MINORCHAN", atsc_minor_channel);
     query.bindValue(":CALLSIGN",  callsign.utf8());
     query.bindValue(":NAME",      service_name.utf8());
     query.bindValue(":SOURCEID",  source_id);
@@ -1244,7 +1062,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         query.bindValue(":CHANNUM",   chan_num);
     if (freqid > 0)
         query.bindValue(":FREQID",    freqid);
-    if (atsc_major_channel > 0)
+    if (atsc_minor_channel > 0)
         query.bindValue(":TVFORMAT",  "ATSC");
 
     if (!query.exec() || !query.isActive())
@@ -1320,4 +1138,244 @@ QString ChannelUtil::GetDTVPrivateType(uint network_id,
         return QString::null;
 
     return query.value(0).toString();
+}
+                    
+bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
+                                 uint &major,   uint          &minor)
+{
+    major = minor = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT atsc_major_chan, atsc_minor_chan "
+        "FROM channel "
+        "WHERE channum  = :CHANNUM AND "
+        "      sourceid = :SOURCEID");
+
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":CHANNUM",  channum);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("getatscchannel", query);
+    else if (query.next())
+    {
+        major = query.value(0).toUInt();
+        minor = query.value(1).toUInt();
+        return true;
+    }
+
+    return false;
+}
+
+bool ChannelUtil::GetChannelData(
+    uint    sourceid,         const QString &channum,
+    QString &tvformat,        QString       &modulation,
+    QString &freqtable,       QString       &freqid,
+    int     &finetune,        uint64_t      &frequency,
+    int     &mpeg_prog_num,
+    uint    &atsc_major,      uint          &atsc_minor,
+    uint    &dvb_transportid, uint          &dvb_networkid,
+    uint    &mplexid,
+    bool    &commfree)
+{
+    tvformat      = modulation = freqtable = freqid = QString::null;
+    finetune      = 0;
+    frequency     = 0;
+    mpeg_prog_num = -1;
+    atsc_major    = atsc_minor = mplexid = 0;
+    commfree      = false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT finetune, freqid, tvformat, freqtable, "
+        "       commfree, mplexid, "
+        "       atsc_major_chan, atsc_minor_chan, serviceid "
+        "FROM channel, videosource "
+        "WHERE videosource.sourceid = channel.sourceid AND "
+        "      channum              = :CHANNUM         AND "
+        "      channel.sourceid     = :SOURCEID");
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetChannelData", query);
+        return false;
+    }
+    else if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "GetChannelData() failed because it could not\n"
+                    "\t\t\tfind channel number '%1' in DB for source '%2'.")
+                .arg(channum).arg(sourceid));
+        return false;
+    }
+
+    finetune      = query.value(0).toInt();
+    freqid        = query.value(1).toString();
+    tvformat      = query.value(2).toString();
+    freqtable     = query.value(3).toString();
+    commfree      = query.value(4).toBool();
+    mplexid       = query.value(5).toUInt();
+    atsc_major    = query.value(6).toUInt();
+    atsc_minor    = query.value(7).toUInt();
+    mpeg_prog_num = query.value(8).toUInt();
+
+    if (!mplexid)
+        return true;
+
+    return GetTuningParams(mplexid, modulation, frequency,
+                           dvb_transportid, dvb_networkid);
+}
+
+DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
+{
+    DBChanList list;
+    QMap<uint,uint> favorites;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT chanid, favid "
+        "FROM favorites");
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("get channels -- favorites", query);
+    else
+    {
+        while (query.next())
+            favorites[query.value(0).toUInt()] = query.value(1).toUInt();
+    }
+
+    QString qstr =
+        "SELECT channum, callsign, chanid, "
+        "       atsc_major_chan, atsc_minor_chan, "
+        "       name, icon "
+        "FROM channel ";
+
+    if (sourceid)
+        qstr += QString("WHERE sourceid='%1' ").arg(sourceid);
+    else
+        qstr += ",cardinput,capturecard "
+            "WHERE cardinput.sourceid = channel.sourceid   AND "
+            "      cardinput.cardid   = capturecard.cardid     ";
+
+    if (vis_only)
+        qstr += "AND visible=1 ";
+
+    if (!grp.isEmpty())
+        qstr += QString("GROUP BY %1 ").arg(grp);
+
+    query.prepare(qstr);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("get channels -- sourceid", query);
+        return list;
+    }
+
+    while (query.next())
+    {
+        if (query.value(0).toString().isEmpty() || !query.value(2).toUInt())
+            continue; // skip if channum blank, or chanid empty
+
+        DBChannel chan(
+            query.value(0).toString(),                    /* channum    */
+            QString::fromUtf8(query.value(1).toString()), /* callsign   */
+            query.value(2).toUInt(),                      /* chanid     */
+            query.value(3).toUInt(),                      /* ATSC major */
+            query.value(4).toUInt(),                      /* ATSC minor */
+            favorites[query.value(2).toUInt()],           /* favid      */
+            QString::fromUtf8(query.value(5).toString()), /* name       */
+            query.value(6).toString());                   /* icon       */
+
+        list.push_back(chan);
+    }
+
+    return list;
+}
+
+inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
+{
+    return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
+}
+
+inline bool lt_smart(const DBChannel &a, const DBChannel &b)
+{
+    int cmp = 0;
+    if (a.major_chan && b.major_chan)
+    {
+        if ((cmp = a.major_chan - b.major_chan))
+            return cmp < 0;
+
+        if ((cmp = a.minor_chan - b.minor_chan))
+            return cmp < 0;
+    }
+
+    bool isIntA, isIntB;
+    int a_int = a.channum.toUInt(&isIntA);
+    int b_int = a.channum.toUInt(&isIntB);
+    if (isIntA && isIntB)
+    {
+        cmp = a_int - b_int;
+        if (cmp)
+            return cmp < 0;
+    }
+    else
+    {
+        return QString::localeAwareCompare(a.channum, b.channum) < 0;
+    }
+
+    return lt_callsign(a,b);
+}
+
+void ChannelUtil::SortChannels(DBChanList &list, const QString &order)
+{
+    if (order.lower() == "callsign")
+        sort(list.begin(), list.end(), lt_callsign);
+    else /* if (sortorder == "channum") */
+        sort(list.begin(), list.end(), lt_smart);
+}
+
+uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
+                                 uint old_chanid, int direction)
+{
+    DBChanList::const_iterator it =
+        find(sorted.begin(), sorted.end(), old_chanid);
+
+    if (it == sorted.end())
+        it = sorted.begin(); // not in list, pretend we are on first channel
+
+    if (it == sorted.end())
+        return 0; // no channels..
+
+    if (CHANNEL_DIRECTION_DOWN == direction)
+    {
+        if (it == sorted.begin())
+            return sorted.rbegin()->chanid;
+        it--;
+    }
+    else if (CHANNEL_DIRECTION_UP == direction)
+    {
+        it++;
+        if (it == sorted.end())
+            it = sorted.begin();
+    }
+    else if (CHANNEL_DIRECTION_FAVORITE == direction)
+    {
+        DBChanList::const_iterator it_orig = it;
+        for (;;++it)
+        {
+            if (it == sorted.end())
+                it = sorted.begin();
+
+            if (it == it_orig)
+            {
+                if (!it->favorite)
+                    ++it;
+                break; // no (other?) favorites
+            }
+
+            if (it->favorite)
+                break; // found next favorite
+        }
+    }
+
+    return it->chanid;
 }

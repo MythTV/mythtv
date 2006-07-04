@@ -30,11 +30,9 @@ static bool    has_setting(QString line, QString key);
 static QString html_escape(QString str);
 static void    get_atsc_stuff(QString channum, int sourceid, int freqid,
                               int &major, int &minor, long long &freq);
-static uint    create_atscsrcid(QString chan_major, QString chan_minor);
 static QString process_dd_station(uint sourceid,
                                   QString  chan_major, QString  chan_minor,
-                                  QString &tvformat,   uint    &freqid,
-                                  uint    &atscsrcid);
+                                  QString &tvformat,   uint    &freqid);
 static void    update_channel_basic(uint    sourceid,   bool    insert,
                                     QString xmltvid,    QString callsign,
                                     QString name,       uint    freqid,
@@ -680,18 +678,18 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)
         "UPDATE channel "
         "SET callsign  = :CALLSIGN,  name   = :NAME, "
         "    channum   = :CHANNUM,   freqid = :FREQID, "
-        "    atscsrcid = :ATSCSRCID "
+        "    atsc_major_chan = :MAJORCHAN, "
+        "    atsc_minor_chan = :MINORCHAN "
         "WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID");
 
     while (dd_station_info.next())        
     {
-        uint    atscsrcid  = 0;
         uint    freqid     = dd_station_info.value(3).toUInt();
         QString chan_major = dd_station_info.value(4).toString();
         QString chan_minor = dd_station_info.value(5).toString();
         QString tvformat   = QString::null;
         QString channum    = process_dd_station(
-            sourceid, chan_major, chan_minor, tvformat, freqid, atscsrcid);
+            sourceid, chan_major, chan_minor, tvformat, freqid);
 
         chan_update_q.bindValue(":CALLSIGN",  dd_station_info.value(0));
         chan_update_q.bindValue(":NAME",      dd_station_info.value(1));
@@ -699,7 +697,8 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(uint sourceid)
         chan_update_q.bindValue(":CHANNUM",   channum);
         chan_update_q.bindValue(":SOURCEID",  sourceid);
         chan_update_q.bindValue(":FREQID",    freqid);
-        chan_update_q.bindValue(":ATSCSRCID", atscsrcid);
+        chan_update_q.bindValue(":MAJORCHAN", chan_major.toUInt());
+        chan_update_q.bindValue(":MINORCHAN", chan_minor.toUInt());
 
         if (!chan_update_q.exec())
         {
@@ -1756,35 +1755,22 @@ static void get_atsc_stuff(QString channum, int sourceid, int freqid,
     }
 }
 
-static uint create_atscsrcid(QString chan_major, QString chan_minor)
-{
-    bool ok;
-    uint major = chan_major.toUInt(&ok), atscsrcid = 0;
-    if (!ok)
-        return atscsrcid;
-
-    atscsrcid = major << 8;
-    if (chan_minor.isEmpty())
-        return atscsrcid;
-
-    return atscsrcid | chan_minor.toUInt();
-}
-
 static QString process_dd_station(
     uint sourceid, QString chan_major, QString chan_minor,
-    QString &tvformat, uint &freqid, uint &atscsrcid)
+    QString &tvformat, uint &freqid)
 {
     QString channum = chan_major;
-    atscsrcid = create_atscsrcid(chan_major, chan_minor);
+    bool ok;
+    uint minor = chan_minor.toUInt(&ok);
+
     tvformat = "Default";
 
-    if (atscsrcid & 0xff)
+    if (minor && ok)
     {
         tvformat = "atsc";
         channum += SourceUtil::GetChannelSeparator(sourceid) + chan_minor;
     }
-
-    if (!freqid && !(atscsrcid & 0xff))
+    else if (!freqid)
         freqid = chan_major.toInt();
 
     return channum;
@@ -1797,19 +1783,21 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
 {
     callsign = (callsign.isEmpty()) ? name : callsign;
 
-    uint atscsrcid;
     QString tvformat;
     QString channum = process_dd_station(
-        sourceid, chan_major, chan_minor, tvformat, freqid, atscsrcid);
+        sourceid, chan_major, chan_minor, tvformat, freqid);
 
     // First check if channel already in DB, but without xmltvid
     MSqlQuery query(MSqlQuery::DDCon());
     query.prepare("SELECT chanid FROM channel "
                   "WHERE sourceid = :SOURCEID AND "
-                  "      (channum=:CHANNUM OR atscsrcid=:ATSCSRCID)");
+                  "      ( channum = :CHANNUM OR "
+                  "        ( atsc_major_chan = :MAJORCHAN AND "
+                  "          atsc_minor_chan = :MINORCHAN ) )");
     query.bindValue(":SOURCEID",  sourceid);
     query.bindValue(":CHANNUM",   channum);
-    query.bindValue(":ATSCSRCID", atscsrcid);
+    query.bindValue(":MAJORCHAN", chan_major.toUInt());
+    query.bindValue(":MINORCHAN", chan_minor.toUInt());
 
     if (!query.exec() || !query.isActive())
     {

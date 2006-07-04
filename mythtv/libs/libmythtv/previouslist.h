@@ -48,7 +48,6 @@ class PreviousList : public MythDialog
     QString hourFormat;
     QString timeFormat;
     QString fullDateFormat;
-    QString channelOrdering;
     QString channelFormat;
 
     RecSearchType searchtype;
