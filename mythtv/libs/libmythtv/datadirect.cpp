@@ -5,10 +5,12 @@
 #include <sys/stat.h>  // for chmod
 
 // Qt headers
+#include <qmap.h>
 #include <qfile.h>
 #include <qstring.h>
 #include <qregexp.h>
 #include <qfileinfo.h>
+#include <qdeepcopy.h>
 
 // MythTV headers
 #include "datadirect.h"
@@ -25,6 +27,12 @@
 #define LOC QString("DataDirect: ")
 #define LOC_ERR QString("DataDirect, Error: ")
 
+static QMutex lineup_type_lock;
+static QMap<QString,uint> lineupid_to_srcid;
+static QMap<uint,QString> srcid_to_type;
+
+static void    set_lineup_type(const QString &lineupid, const QString &type);
+static QString get_lineup_type(uint sourceid);
 static QString get_setting(QString line, QString key);
 static bool    has_setting(QString line, QString key);
 static QString html_escape(QString str);
@@ -221,6 +229,8 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     }
     else if (pqname == "lineup")
     {
+        set_lineup_type(curr_lineup.lineupid, curr_lineup.type);
+
         parent.lineups.push_back(curr_lineup);
 
         query.prepare(
@@ -1770,7 +1780,7 @@ static QString process_dd_station(
         tvformat = "atsc";
         channum += SourceUtil::GetChannelSeparator(sourceid) + chan_minor;
     }
-    else if (!freqid)
+    else if (!freqid && (get_lineup_type(sourceid) == "LocalBroadcast"))
         freqid = chan_major.toInt();
 
     return channum;
@@ -1863,6 +1873,43 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
             freqid,    icon,      tvformat,
             xmltvid);
     }
+}
+
+static void set_lineup_type(const QString &lineupid, const QString &type)
+{
+    QMutexLocker locker(&lineup_type_lock);
+    if (lineupid_to_srcid[lineupid])
+        return;
+
+    // get lineup to source mapping
+    uint srcid = 0;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT sourceid "
+        "FROM videosource "
+        "WHERE lineupid = :LINEUPID");
+    query.bindValue(":LINEUPID", lineupid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("end_element", query);
+    else if (query.next())
+        srcid = query.value(0).toUInt();
+
+    if (srcid)
+    {
+        lineupid_to_srcid[QDeepCopy<QString>(lineupid)] = srcid;
+
+        // set type for source
+        srcid_to_type[srcid] = QDeepCopy<QString>(type);
+
+        VERBOSE(VB_GENERAL, "sourceid "<<srcid<<" has lineup type: "<<type);
+    }
+}
+
+static QString get_lineup_type(uint sourceid)
+{
+    QMutexLocker locker(&lineup_type_lock);
+    return QDeepCopy<QString>(srcid_to_type[sourceid]);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
