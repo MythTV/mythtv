@@ -12,7 +12,7 @@ include ( config.mak )
 include ( settings.pro )
 
 # Directories
-SUBDIRS += libs filters programs themes i18n
+SUBDIRS += libs filters programs themes i18n bindings
 
 # clean up config on distclean, this must be the last sub-directory
 SUBDIRS += config
