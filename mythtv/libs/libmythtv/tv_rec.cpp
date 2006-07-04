@@ -1735,7 +1735,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetStreamData(sd);
         sm->SetDVBService(netid, tsid, progNum);
         sd->SetVideoStreamsRequired(neededVideo);
-        sd->SetVideoStreamsRequired(neededAudio);
+        sd->SetAudioStreamsRequired(neededAudio);
         sm->SetFTAOnly(fta);
 
         sm->AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
