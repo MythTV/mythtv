@@ -82,6 +82,8 @@ frontend="yes"
 backend="no"
 opengl="no"
 
+bindings_perl="no"
+
 if test x"$CC" != x"" ; then
     cc="$CC"
 fi
@@ -907,6 +909,18 @@ for opt do
       # We already processed these options earlier so the empty case
       # here is so we don't error out and say they're unknown options.
   ;;
+  --with-bindings=*)
+      tmp_bindings=`echo $opt | cut -d '=' -f 2`
+      for binding in ${tmp_bindings//,/ } ; do
+          declare bindings_${binding}="yes"
+      done
+  ;;
+  --without-bindings=*)
+      tmp_bindings=`echo $opt | cut -d '=' -f 2`
+      for binding in ${tmp_bindings//,/ } ; do
+          declare bindings_${binding}="no"
+      done
+   ;;
   *)
   echo "Unknown option \"$opt\"."
   echo "See $0 --help for available options."
@@ -2372,6 +2386,11 @@ echo "Frontend         $frontend"
 echo "Backend          $backend"
 echo
 
+echo "# Bindings"
+for binding in ${!bindings_*} ; do
+    echo "${binding#bindings_}           ${!binding}"
+done
+
 MYTH_CONFIG_H=libs/libmyth/mythconfig.h
 MYTH_CONFIG_MAK=libs/libmyth/mythconfig.mak
 echo "Creating $MYTH_CONFIG_H and $MYTH_CONFIG_MAK"
@@ -3084,6 +3103,12 @@ fi
 if test x"$backend" = x"yes" ; then
   CCONFIG="$CCONFIG using_backend"
 fi
+
+for binding in ${!bindings_*} ; do
+  if test x"${!binding}" = x"yes"; then
+    CCONFIG="$CCONFIG using_bindings_${binding#bindings_}"
+  fi
+done
 
 if test x"$CCONFIG" != x"" ; then
   echo "CCONFIG=$CCONFIG" >> $MYTH_CONFIG_MAK

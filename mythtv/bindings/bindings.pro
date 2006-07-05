@@ -1,2 +1,8 @@
+include ( ../config.mak )
+include ( ../settings.pro )
+
 TEMPLATE=subdirs
-SUBDIRS=perl
+
+using_bindings_perl {
+    SUBDIRS+=perl
+}
