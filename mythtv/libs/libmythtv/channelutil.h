@@ -4,6 +4,7 @@
 #include <vector>
 using namespace std;
 
+#include <stdint.h>
 #include <qstring.h>
 
 class NetworkInformationTable;
