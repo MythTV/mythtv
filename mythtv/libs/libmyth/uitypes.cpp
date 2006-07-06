@@ -2301,15 +2301,27 @@ void UIRemoteEditType::Draw(QPainter *dr, int drawlayer, int context)
 {
     if (hidden)
     {
+        if (edit && edit->isVisible())
+            edit->hide();
+
         return;
     }
-    
+
     if (m_context == context || m_context == -1)
     {
         if (drawlayer == m_order)
         {
+            if (edit && !edit->isVisible())
+                edit->show();
+
             dr = dr;
         }
+    }
+    else
+    {
+        // not in this context so hide the edit
+        if (edit && edit->isVisible())
+            edit->hide();
     }
 }
 
