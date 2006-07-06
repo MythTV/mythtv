@@ -1299,27 +1299,38 @@ inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
 inline bool lt_smart(const DBChannel &a, const DBChannel &b)
 {
     int cmp = 0;
-    if (a.major_chan && b.major_chan)
-    {
-        if ((cmp = a.major_chan - b.major_chan))
-            return cmp < 0;
 
+    bool isIntA, isIntB;
+    int a_int = a.channum.toUInt(&isIntA);
+    int b_int = b.channum.toUInt(&isIntB);
+
+    // one of the channels is an ATSC channel, and the other
+    // is either ATSC or is numeric.
+    if ((a.minor_chan || b.minor_chan) &&
+        (a.minor_chan || isIntA) && (b.minor_chan || isIntB))
+    {
+        int a_maj = (!a.minor_chan && isIntA) ? a_int : a.major_chan;
+        int b_maj = (!b.minor_chan && isIntB) ? b_int : b.major_chan;
+        if ((cmp = a_maj - b_maj))
+            return cmp < 0;
+        
         if ((cmp = a.minor_chan - b.minor_chan))
             return cmp < 0;
     }
 
-    bool isIntA, isIntB;
-    int a_int = a.channum.toUInt(&isIntA);
-    int b_int = a.channum.toUInt(&isIntB);
     if (isIntA && isIntB)
     {
+        // both channels have a numeric channum
         cmp = a_int - b_int;
         if (cmp)
             return cmp < 0;
     }
     else
     {
-        return QString::localeAwareCompare(a.channum, b.channum) < 0;
+        // one of channels does not have a numeric channum
+        cmp = QString::localeAwareCompare(a.channum, b.channum);
+        if (cmp)
+            return cmp < 0;
     }
 
     return lt_callsign(a,b);
