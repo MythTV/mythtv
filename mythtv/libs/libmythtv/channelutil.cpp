@@ -576,7 +576,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
                                   uint     &dvb_transportid,
                                   uint     &dvb_networkid)
 {
-    if (!mplexid)
+    if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1221,7 +1221,7 @@ bool ChannelUtil::GetChannelData(
     atsc_minor    = query.value(7).toUInt();
     mpeg_prog_num = query.value(8).toUInt();
 
-    if (!mplexid)
+    if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
 
     return GetTuningParams(mplexid, modulation, frequency,
