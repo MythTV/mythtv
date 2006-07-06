@@ -2383,8 +2383,11 @@ static bool doUpgradeTVDatabaseSchema(void)
         const QString updates[] = {
 "ALTER TABLE channel ADD atsc_major_chan INT UNSIGNED NOT NULL default '0';",
 "ALTER TABLE channel ADD atsc_minor_chan INT UNSIGNED NOT NULL default '0';",
-"UPDATE channel SET atsc_major_chan = atscsrcid / 256;",
-"UPDATE channel SET atsc_minor_chan = atscsrcid % 256;",
+/* the updates were split in two for mysql 3.23 compatibility. */
+"UPDATE channel SET atsc_major_chan = atscsrcid;",
+"UPDATE channel SET atsc_major_chan = atsc_major_chan / 256;",
+"UPDATE channel SET atsc_minor_chan = atscsrcid;",
+"UPDATE channel SET atsc_minor_chan = atsc_minor_chan % 256;",
 ""
 };
 
