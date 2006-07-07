@@ -65,7 +65,7 @@ void DVDRingBufferPriv::close(void)
 bool DVDRingBufferPriv::IsInMenu(void) const
 {
     return ((title == 0) || 
-            ((pgLength/90000) < 30) ||
+            ((pgcLength/90000) < 30) ||
             (NumMenuButtons() > 0));
 }
 
@@ -990,7 +990,9 @@ uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
 
 void DVDRingBufferPriv::ClearSubtitlesOSD(void)
 {
-    if (parent && parent->GetOSD())
+    if (parent && parent->GetOSD() &&
+            parent->IsPlaying() && parent->IsDecoderThreadAlive()
+            && parent->GetOSD()->IsSetDisplaying("subtitles"))
     {
         parent->GetOSD()->HideSet("subtitles");
         parent->GetOSD()->ClearAll("subtitles");
