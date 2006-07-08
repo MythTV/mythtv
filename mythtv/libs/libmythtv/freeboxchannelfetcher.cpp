@@ -50,6 +50,14 @@ void FreeboxChannelFetcher::Stop(void)
     lock.unlock();
 }
 
+void *run_scan_thunk(void *param)
+{
+    FreeboxChannelFetcher *chanscan = (FreeboxChannelFetcher*) param;
+    chanscan->RunScan();
+
+    return NULL;
+}
+
 bool FreeboxChannelFetcher::Scan(void)
 {
     lock.lock();
@@ -67,14 +75,6 @@ bool FreeboxChannelFetcher::Scan(void)
     lock.unlock();
 
     return thread_running;
-}
-
-void *run_scan_thunk(void *param)
-{
-    FreeboxChannelFetcher *chanscan = (FreeboxChannelFetcher*) param;
-    chanscan->RunScan();
-
-    return NULL;
 }
 
 void FreeboxChannelFetcher::RunScan(void)
