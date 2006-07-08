@@ -1,6 +1,6 @@
-INCLUDEPATH += ../../libs/ ../../libs/libmyth ../../libs/libmythtv  ../..
+INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmythtv
 INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
-INCLUDEPATH += ../../libs/libmythupnp
+INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui
 INCLUDEPATH += ../../libs/libmythlivemedia
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
@@ -32,9 +32,9 @@ TARGETDEPS += ../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXT
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
-DEPENDPATH += ../../libs/libmyth ../../libs/libmythtv ../../libs/libsavcodec
-DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libmythui
-DEPENDPATH += ../../libs/libmythupnp
+DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
+DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libsavcodec
+DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
 DEPENDPATH += ../../libs/libmythlivemedia
 
 CONFIG += opengl
