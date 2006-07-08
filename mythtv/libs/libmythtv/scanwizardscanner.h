@@ -43,6 +43,7 @@
 
 class ScanWizard;
 class AnalogScan;
+class FreeboxChannelFetcher;
 class LogList;
 class SIScan;
 class ScanProgressPopup;
@@ -82,6 +83,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
     void PreScanCommon(uint cardid, uint sourceid);
     void TunedScanCommon(uint cardid, uint sourceid, bool ok);
     void ScanAnalog(uint cardid, uint sourceid);
+    void ScanFreeBox(uint cardid, uint sourceid);
 
     void dvbLock(int);
     void dvbSNR(int);
@@ -101,6 +103,7 @@ class ScanWizardScanner : public VerticalConfigurationGroup
 
     SIScan            *scanner;
     AnalogScan        *analogScanner;
+    FreeboxChannelFetcher *freeboxScanner;
 
     int                nScanType;
     int                nMultiplexToTuneTo;

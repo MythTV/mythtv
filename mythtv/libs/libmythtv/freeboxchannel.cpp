@@ -34,7 +34,8 @@ bool FreeboxChannel::Open(void)
     
     if (m_freeboxchannels.empty())
     {
-        QString content = FreeboxChannelFetcher::DownloadPlaylist(m_videodev);
+        QString content = FreeboxChannelFetcher::DownloadPlaylist(
+            m_videodev, true);
         m_freeboxchannels = FreeboxChannelFetcher::ParsePlaylist(content);
         VERBOSE(VB_IMPORTANT, LOC + QString("Loaded %1 channels from %2")
             .arg(m_freeboxchannels.size())

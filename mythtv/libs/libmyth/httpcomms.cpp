@@ -141,10 +141,10 @@ void HttpComms::done(bool error)
     
     VERBOSE(VB_NETWORK, QString("done: %1 bytes").arg(m_data.size()));
 
-    m_done = true;
-
     if (m_timer)
         m_timer->stop();
+
+    m_done = true;
 }
 
 void HttpComms::stateChanged(int state)
@@ -260,10 +260,15 @@ void HttpComms::timeout()
 }
 
 
-// getHttp - static function for grabbing http data for a url
-//           this is a synchronous function, it will block according to the vars
-QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries, 
-                           int maxRedirects, bool allowGzip,  Credentials* webCred)
+/** \fn HttpComms::getHttp(QString&,int,int,int,bool,Credentials*,bool)
+ *  \brief Static function for grabbing http data for a url.
+ *
+ *   This is a synchronous function, it will block according to the vars.
+ */
+QString HttpComms::getHttp(QString     &url,
+                           int          timeoutMS,    int  maxRetries, 
+                           int          maxRedirects, bool allowGzip,
+                           Credentials *webCred,      bool isInQtEventThread)
 {
     int redirectCount = 0;
     int timeoutCount = 0;
@@ -294,7 +299,8 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
 
         while (!httpGrabber->isDone())
         {
-            qApp->processEvents();
+            if (isInQtEventThread)
+                qApp->processEvents();
             usleep(10000);
         }
 

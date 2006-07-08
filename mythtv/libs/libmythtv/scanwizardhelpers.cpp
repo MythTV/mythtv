@@ -58,6 +58,12 @@ static QString card_types(void)
 # endif // USING_IVTV
 #endif // USING_V4L
 
+#ifdef USING_FREEBOX
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'FREEBOX'";
+#endif // USING_FREEBOX
+
 #ifdef USING_HDHOMERUN
     if (!cardTypes.isEmpty())
         cardTypes += ",";
@@ -335,6 +341,10 @@ void ScanTypeSetting::refresh(const QString& card)
 #endif
 */
         break;
+    case CardUtil::FREEBOX:
+        addSelection(tr("M3U Import"),
+                     QString::number(FreeBoxImport), true);
+        return;
     case CardUtil::ERROR_PROBE:
         addSelection(QObject::tr("Failed to probe the card"),
                      QString::number(Error_Probe), true);
@@ -422,6 +432,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
               wizard->paneSingle);
     addTarget(QString::number(ScanTypeSetting::FullTransportScan),
               scanAllTransports);
+    addTarget(QString::number(ScanTypeSetting::FreeBoxImport),
+              new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::Import),
               filename);
 }

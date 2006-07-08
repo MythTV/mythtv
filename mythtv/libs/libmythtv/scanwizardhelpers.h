@@ -219,6 +219,8 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         FullTransportScan,
         // Scan of one transport already in the database
         TransportScan,
+        // Freebox import of channels from M3U URL
+        FreeBoxImport,
         // Imports lists from dvb-utils scanners
         Import
     };

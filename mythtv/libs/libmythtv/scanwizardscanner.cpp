@@ -61,6 +61,8 @@
 #include "hdhrsignalmonitor.h"
 #endif
 
+#include "freeboxchannelfetcher.h"
+
 #define LOC QString("SWizScan: ")
 #define LOC_ERR QString("SWizScan, Error: ")
 
@@ -103,6 +105,7 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
       log(new LogList()),
       channel(NULL),                popupProgress(NULL),
       scanner(NULL),                analogScanner(NULL),
+      freeboxScanner(NULL),
       nScanType(-1),
       nMultiplexToTuneTo(0),        nVideoSource(0),
       frequency(0),                 modulation("8vsb")
@@ -132,6 +135,15 @@ void ScanWizardScanner::finish()
         analogScanner->stop();
         delete analogScanner;
         analogScanner = NULL;
+    }
+#endif
+
+#ifdef USING_FREEBOX
+    if (freeboxScanner)
+    {
+        freeboxScanner->Stop();
+        delete freeboxScanner;
+        freeboxScanner = NULL;
     }
 #endif
 }
@@ -410,6 +422,11 @@ void ScanWizardScanner::scan()
             startChan["modulation"]);
 #endif // USING_DVB
     }
+    else if (nScanType == ScanTypeSetting::FreeBoxImport)
+    {
+        do_scan = false;
+        ScanFreeBox(cardid, nVideoSource);
+    }
     else
     {
         do_scan = false;
@@ -628,6 +645,33 @@ void ScanWizardScanner::ScanAnalog(uint cardid, uint sourceid)
         cancelScan();
     }
 #endif
+}
+
+void ScanWizardScanner::ScanFreeBox(uint cardid, uint sourceid)
+{
+#ifdef USING_FREEBOX
+    //Create an analog scan object
+    freeboxScanner = new FreeboxChannelFetcher(sourceid, cardid);
+    popupProgress  = new ScanProgressPopup(this, false);
+
+    connect(freeboxScanner, SIGNAL(ServiceScanComplete(void)),
+            this,           SLOT(  scanComplete(void)));
+    connect(freeboxScanner, SIGNAL(ServiceScanUpdateText(const QString&)),
+            this,           SLOT(  updateText(const QString&)));
+    connect(freeboxScanner, SIGNAL(ServiceScanPercentComplete(int)),
+            this,           SLOT(  serviceScanPctComplete(int)));
+
+    popupProgress->progress(0);
+    popupProgress->exec(this);
+
+    if (!freeboxScanner->Scan())
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  tr("ScanWizard"),
+                                  tr("Error starting scan"));
+        cancelScan();
+    }
+#endif // USING_FREEBOX
 }
 
 void ScanWizardScanner::HandleTuneComplete(void)
