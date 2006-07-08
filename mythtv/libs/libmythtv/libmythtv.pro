@@ -390,12 +390,14 @@ using_backend {
     
     # Support for freebox (http://adsl.free.fr/)
     using_freebox {
-        HEADERS += freeboxrecorder.h     freeboxmediasink.h
-        HEADERS += freeboxchannel.h      freeboxchannelfetcher.h
+        HEADERS += freeboxrecorder.h           freeboxmediasink.h
+        HEADERS += freeboxchannel.h            freeboxchannelfetcher.h
+        HEADERS += freeboxsignalmonitor.h      rtspcomms.h
         HEADERS += freeboxchannelinfo.h
 
-        SOURCES += freeboxrecorder.cpp   freeboxmediasink.cpp
-        SOURCES += freeboxchannel.cpp    freeboxchannelfetcher.cpp
+        SOURCES += freeboxrecorder.cpp         freeboxmediasink.cpp
+        SOURCES += freeboxchannel.cpp          freeboxchannelfetcher.cpp
+        SOURCES += freeboxsignalmonitor.cpp    rtspcomms.cpp
 
         DEFINES += USING_FREEBOX
     }

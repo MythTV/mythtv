@@ -16,10 +16,9 @@ class FreeboxRecorder;
 
 class FreeboxChannel : public ChannelBase
 {
-    friend class FreeboxRecorderImpl;
   public:
     FreeboxChannel(TVRec *parent, const QString &videodev);
-    ~FreeboxChannel(void) { }
+    ~FreeboxChannel();
 
     bool Open(void);
     void Close(void);
@@ -30,16 +29,14 @@ class FreeboxChannel : public ChannelBase
     bool SwitchToInput(int inputNum, bool setstarting);
     bool SetChannelByString(const QString &channum);
 
-    void SetRecorder(FreeboxRecorder *rec);
+    FreeboxChannelInfo GetCurrentChanInfo(void) const
+        { return GetChanInfo(curchannelname); }
 
   private:
     FreeboxChannelInfo GetChanInfo(const QString& channum,
                                    uint           sourceid = 0) const;
-    FreeboxChannelInfo GetCurrentChanInfo(void) const
-        { return GetChanInfo(curchannelname); }
 
     QString               m_videodev;
-    FreeboxRecorder      *m_recorder;
     fbox_chan_map_t       m_freeboxchannels;
     mutable QMutex        m_lock;
 

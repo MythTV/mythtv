@@ -1,14 +1,14 @@
-/**
+/** -*- Mode: c++ -*-
  *  FreeboxMediaSink
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
 #include "freeboxmediasink.h"
-#include "freeboxrecorder.h"
+#include "rtspcomms.h"
 
 FreeboxMediaSink::FreeboxMediaSink(UsageEnvironment &pEnv,
-                                   FreeboxRecorder  &pRecorder,
+                                   RTSPListener     &pRecorder,
                                    unsigned int      bufferSize) :
     MediaSink(pEnv),    fBufferSize(bufferSize),
     env(pEnv),          recorder(pRecorder)
@@ -25,8 +25,8 @@ FreeboxMediaSink::~FreeboxMediaSink()
     }
 }
 
-FreeboxMediaSink *FreeboxMediaSink::createNew(UsageEnvironment &env,
-                                              FreeboxRecorder  &pRecorder,
+FreeboxMediaSink *FreeboxMediaSink::CreateNew(UsageEnvironment &env,
+                                              RTSPListener     &pRecorder,
                                               unsigned int      bufferSize)
 {
     return new FreeboxMediaSink(env, pRecorder, bufferSize);
@@ -58,15 +58,8 @@ void FreeboxMediaSink::afterGettingFrame(
 void FreeboxMediaSink::afterGettingFrame1(unsigned int   frameSize,
                                           struct timeval presentationTime)
 {
-    addData(fBuffer, frameSize, presentationTime);
+    recorder.AddData(fBuffer, frameSize, presentationTime);
     continuePlaying();
-}
-
-void FreeboxMediaSink::addData(unsigned char *data,
-                               unsigned int   dataSize,
-                               struct timeval presentationTime)
-{
-    recorder.AddData(data, dataSize, presentationTime);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

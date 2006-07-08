@@ -901,6 +901,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
 #ifdef USING_FREEBOX
         FreeboxChannel *chan = dynamic_cast<FreeboxChannel*>(channel);
         recorder = new FreeboxRecorder(this, chan);
+        ringBuffer->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("mrl", genOpt.videodev);
 #endif // USING_FREEBOX
     }
@@ -3456,6 +3457,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (has_dummy && ringBuffer)
         {
+            // Make sure recorder doesn't point to bogus ringbuffer before
+            // it is potentially restarted without a new ringbuffer, if
+            // the next channel won't tune and the user exits LiveTV.
+            if (recorder)
+                recorder->SetRingBuffer(NULL);
+
             SetFlags(kFlagDummyRecorderRunning);
             VERBOSE(VB_RECORD, "DummyDTVRecorder -- started");
             SetFlags(kFlagRingBufferReady);

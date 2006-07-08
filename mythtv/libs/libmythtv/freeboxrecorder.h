@@ -7,50 +7,63 @@
 #ifndef FREEBOXRECORDER_H_
 #define FREEBOXRECORDER_H_
 
-#include "dtvrecorder.h"
+#include <qwaitcondition.h>
 
+#include "dtvrecorder.h"
+#include "freeboxmediasink.h"
+#include "rtspcomms.h"
+#include "streamlisteners.h"
+
+class TSPacket;
 class FreeboxChannel;
 class FreeboxChannelInfo;
-class FreeboxRecorderImpl;
+class MPEGStreamData;
 
-/**
- *  Constructs a FreeboxRecorder
+/** \brief Processes data from RTSPComms and writes it to disk.
  */
-class FreeboxRecorder : public DTVRecorder
+class FreeboxRecorder : public DTVRecorder, public RTSPListener,
+                        public MPEGSingleProgramStreamListener
 {
-    friend class FreeboxChannel;
     friend class FreeboxMediaSink;
-    friend class FreeboxRecorderImpl;
+    friend class RTSPComms;
+
   public:
     FreeboxRecorder(TVRec *rec, FreeboxChannel *channel);
     ~FreeboxRecorder();
 
-    void StartRecording(void);
-    void StopRecording(void);
-
-    void SetOptionsFromProfile(RecordingProfile*, const QString&,
-                               const QString&, const QString&) {}
-
-  private:
     bool Open(void);
     void Close(void);
 
-    void ChannelChanged(const FreeboxChannelInfo &chaninfo);
+    virtual void Pause(bool clear = true);
+    virtual void Unpause(void);
 
-    /// Callback function to add MPEG2 TS data
+    virtual void StartRecording(void);
+    virtual void StopRecording(void);
+
+    virtual void SetOptionsFromProfile(RecordingProfile*, const QString&,
+                                       const QString&, const QString&) {}
+
+    virtual void SetStreamData(MPEGStreamData*);
+    virtual MPEGStreamData *GetStreamData(void) { return _stream_data; }
+
+  private:
+    void ProcessTSPacket(const TSPacket& tspacket);
+
+    // implements RTSPListener
     void AddData(unsigned char *data,
                  unsigned int   dataSize,
                  struct timeval presentationTime);
 
-    void ProcessTSPacket(const TSPacket& tspacket);
-
-    bool StartRtsp(void);
-    void ResetEventLoop(void);
+    // implements MPEGSingleProgramStreamListener
+    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
+    void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
   private:
-    FreeboxRecorderImpl *_impl;
-    char                 _abort_rtsp; ///< Used to abort rtsp session
-    bool                 _abort_recording; ///< Used to request abort
+    FreeboxChannel *_channel;
+    MPEGStreamData *_stream_data;
+    RTSPComms      *_rtsp;
+    QWaitCondition  _cond_recording;
+
 
   private:
     FreeboxRecorder& operator=(const FreeboxRecorder&); //< avoid default impl

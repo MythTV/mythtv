@@ -1,4 +1,4 @@
-/**
+/** -*- Mode: c++ -*-
  *  FreeboxMediaSink
  *  Copyright (c) 2006 by Laurent Arnal, Benjamin Lerman & Mickaël Remars
  *  Distributed as part of MythTV under GPL v2 and later.
@@ -9,7 +9,14 @@
 
 #include <MediaSink.hh>
 
-class FreeboxRecorder;
+class RTSPListener
+{
+  public:
+    /// Callback function to add MPEG2 TS data
+    virtual void AddData(unsigned char *data,
+                         unsigned int   dataSize,
+                         struct timeval presentationTime) = 0;
+};
 
 // ============================================================================
 // FreeboxMediaSink : Helper class use to receive RTSP data from socket.
@@ -17,18 +24,13 @@ class FreeboxRecorder;
 class FreeboxMediaSink : public MediaSink
 {
   public:
-    static FreeboxMediaSink *createNew(UsageEnvironment &env,
-                                       FreeboxRecorder  &pRecorder,
+    static FreeboxMediaSink *CreateNew(UsageEnvironment &env,
+                                       RTSPListener     &pRecorder,
                                        unsigned          bufferSize);
-
-    /// Callback function called when rtsp data are ready
-    void addData(unsigned char *data,
-                 unsigned int   dataSize,
-                 struct timeval presentationTime);
 
   protected:
     FreeboxMediaSink(UsageEnvironment &env,
-                     FreeboxRecorder  &pRecorder,
+                     RTSPListener     &pRecorder,
                      unsigned int      bufferSize);
     virtual ~FreeboxMediaSink();
 
@@ -47,7 +49,7 @@ class FreeboxMediaSink : public MediaSink
     unsigned char    *fBuffer;
     unsigned int      fBufferSize;
     UsageEnvironment &env;
-    FreeboxRecorder  &recorder;
+    RTSPListener     &recorder;
 
   private:
     // avoid default contructors & operator=

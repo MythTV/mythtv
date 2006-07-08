@@ -17,14 +17,21 @@ FreeboxChannel::FreeboxChannel(TVRec         *parent,
                                const QString &videodev)
     : ChannelBase(parent),
       m_videodev(QDeepCopy<QString>(videodev)),
-      m_recorder(NULL),
       m_lock(true)
 {
+    VERBOSE(VB_CHANNEL, LOC + "ctor");
+}
+
+FreeboxChannel::~FreeboxChannel()
+{
+    VERBOSE(VB_CHANNEL, LOC + "dtor");
 }
 
 bool FreeboxChannel::Open(void)
 {
+    VERBOSE(VB_CHANNEL, LOC + "Open() -- begin");
     QMutexLocker locker(&m_lock);
+    VERBOSE(VB_CHANNEL, LOC + "Open() -- locked");
 
     if (!InitializeInputs())
     {
@@ -42,24 +49,34 @@ bool FreeboxChannel::Open(void)
             .arg(m_videodev));
     }
 
-    return IsOpen();
+    bool open = IsOpen();
+    VERBOSE(VB_CHANNEL, LOC + "Open() -- end");
+    return open;
 }
 
 void FreeboxChannel::Close(void)
 {
+    VERBOSE(VB_CHANNEL, LOC + "Close() -- begin");
     QMutexLocker locker(&m_lock);
+    VERBOSE(VB_CHANNEL, LOC + "Close() -- locked");
     m_freeboxchannels.clear();
+    VERBOSE(VB_CHANNEL, LOC + "Close() -- end");
 }
 
 bool FreeboxChannel::IsOpen(void) const
 {
+    VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- begin");
     QMutexLocker locker(&m_lock);
-    return m_freeboxchannels.size() > 0;
+    VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- locked");
+    bool open = m_freeboxchannels.size() > 0;
+    VERBOSE(VB_CHANNEL, LOC + "IsOpen() -- end");
+    return open;
 }
 
 bool FreeboxChannel::SwitchToInput(const QString &inputname,
                                    const QString &channum)
 {
+    VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1)").arg(inputname));
     QMutexLocker locker(&m_lock);
 
     int inputNum = GetInputByName(inputname);
@@ -71,6 +88,7 @@ bool FreeboxChannel::SwitchToInput(const QString &inputname,
 
 bool FreeboxChannel::SwitchToInput(int inputNum, bool setstarting)
 {
+    VERBOSE(VB_CHANNEL, LOC + QString("SwitchToInput(%1)").arg(inputNum));
     QMutexLocker locker(&m_lock);
 
     InputMap::const_iterator it = inputs.find(inputNum);
@@ -87,7 +105,9 @@ bool FreeboxChannel::SwitchToInput(int inputNum, bool setstarting)
 
 bool FreeboxChannel::SetChannelByString(const QString &channum)
 {
+    VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- begin");
     QMutexLocker locker(&m_lock);
+    VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- locked");
 
     // Verify that channel exists
     if (!GetChanInfo(channum).isValid())
@@ -100,21 +120,18 @@ bool FreeboxChannel::SetChannelByString(const QString &channum)
 
     // Set the channel..
     curchannelname = channum;
+    currentProgramNum = 1;
 
-    // Send signal to recorder that channel has changed.
-    if (m_recorder)
-    {
-        FreeboxChannelInfo chaninfo(GetCurrentChanInfo());
-        m_recorder->ChannelChanged(chaninfo);
-    }
-
+    VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- end");
     return true;
 }
 
 FreeboxChannelInfo FreeboxChannel::GetChanInfo(const QString &channum,
                                                uint           sourceid) const
-{
+{ 
+    VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- begin");
     QMutexLocker locker(&m_lock);
+    VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- locked");
 
     FreeboxChannelInfo dummy;
     QString msg = LOC_ERR + QString("GetChanInfo(%1) failed").arg(channum);
@@ -177,12 +194,6 @@ FreeboxChannelInfo FreeboxChannel::GetChanInfo(const QString &channum,
 
     VERBOSE(VB_IMPORTANT, msg);
     return dummy;
-}
-
-void FreeboxChannel::SetRecorder(FreeboxRecorder *rec)
-{
-    QMutexLocker locker(&m_lock);
-    m_recorder = rec;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

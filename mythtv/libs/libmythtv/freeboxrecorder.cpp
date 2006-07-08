@@ -4,424 +4,142 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-// Qt headers
-#include <qwaitcondition.h>
-#include <qmutex.h>
-
-// Live555 headers
-#include <BasicUsageEnvironment.hh>
-#include <MediaSession.hh>
-#include <RTSPClient.hh>
-
 // MythTV headers
-#include "mpeg/mpegstreamdata.h"
-#include "mpeg/streamlisteners.h"
-#include "mpeg/tspacket.h"
+#include "mpegstreamdata.h"
+#include "tspacket.h"
 #include "freeboxchannel.h"
-#include "freeboxmediasink.h"
 #include "freeboxrecorder.h"
 
+#define LOC QString("FBRec: ")
+#define LOC_ERR QString("FBRec, Error: ")
+
 // ============================================================================
-// FreeboxData : Helper class use for static Callback handler
+// FreeboxRecorder : Processes data from RTSPComms and writes it to disk
 // ============================================================================
-class FreeboxData
-{
-  public:
-    FreeboxData(FreeboxRecorder *pFreeboxRecorder,
-                MediaSubsession *pMediaSubSession) :
-        freeboxRecorder(pFreeboxRecorder),
-        mediaSubSession(pMediaSubSession)
-    {
-    }
-
-    void SubsessionAfterPlayingCB(void);
-    void SubsessionByeHandlerCB(void);
-
-  private:
-    FreeboxRecorder *freeboxRecorder;
-    MediaSubsession *mediaSubSession;
-};
-
-void FreeboxData::SubsessionAfterPlayingCB(void)
-{
-    MediaSubsession* subsession = mediaSubSession;
-    Medium::close(subsession->sink);
-    subsession->sink = NULL;
-
-    MediaSession& session = subsession->parentSession();
-    MediaSubsessionIterator iter(session);
-
-    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
-    {
-        if (subsession->sink)
-            return;
-    }
-}
-
-static void sub_after_playing_cb(void *clientData)
-{
-    ((FreeboxData*)clientData)->SubsessionAfterPlayingCB();
-}
-
-void FreeboxData::SubsessionByeHandlerCB(void)
-{
-    SubsessionAfterPlayingCB();
-}
-
-static void sub_bye_handler_cb(void *clientData)
-{
-    ((FreeboxData*)clientData)->SubsessionByeHandlerCB();
-}
-
-class FreeboxRecorderImpl : public MPEGSingleProgramStreamListener
-{
-  public:
-    FreeboxRecorderImpl(FreeboxRecorder *recorder,
-                        FreeboxChannel  *channel) :
-        _rec(recorder),
-        _streamData(1, true),
-        _curChanInfo(channel->GetCurrentChanInfo()),
-        _live_env(NULL),
-        _rtsp_client(NULL),
-        _session(NULL),
-        _channel(channel)
-    {
-        _streamData.AddMPEGSPListener(this);
-        _channel->SetRecorder(_rec);
-    }
-
-    virtual ~FreeboxRecorderImpl()
-    {
-        _channel->SetRecorder(NULL);
-    }
-
-    void Close(void);
-
-    void Lock(void)   const { _lock.lock();    }
-    void Unlock(void) const { _lock.unlock();  }
-    void WakeAll(void)      { _cond.wakeAll(); }
-    void Wait(int msec)     { _cond.wait(&_lock, msec); }
-
-    // Gets
-    FreeboxChannelInfo GetCurrentChanInfo(void) const
-        { return _curChanInfo; }
-    MPEGStreamData&    StreamData(void)
-        { return _streamData; }
-    UsageEnvironment*  GetLiveEnv(void)
-        { return _live_env; }
-    RTSPClient*        GetRTSPClient(void)
-        { return _rtsp_client; }
-    MediaSession*      GetSession(void)
-        { return _session; }
-
-    // Sets
-    void SetLiveEnv(UsageEnvironment *env) { _live_env    = env;     }
-    void SetRTSPClient(RTSPClient *client) { _rtsp_client = client;  }
-    void SetSession(MediaSession *session) { _session     = session; }
-    void SetChannelInfo(const FreeboxChannelInfo& chanInfo)
-        { _curChanInfo = chanInfo; }
-
-  public: // MPEGSingleProgramStreamListener
-    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
-    void HandleSingleProgramPMT(ProgramMapTable *pmt);
-
-  private:
-    FreeboxRecorder    *_rec;
-    MPEGStreamData      _streamData;
-    FreeboxChannelInfo  _curChanInfo;
-    UsageEnvironment   *_live_env;
-    RTSPClient         *_rtsp_client;
-    MediaSession       *_session;
-    FreeboxChannel     *_channel;    ///< Current channel
-    QWaitCondition      _cond;       ///< Condition  used to coordinate threads
-    mutable QMutex      _lock;       ///< Lock  used to coordinate threads
-};
-
-void FreeboxRecorderImpl::HandleSingleProgramPAT(ProgramAssociationTable *pat)
-{
-    if (!pat)
-        return;
-
-    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-    pat->tsheader()->SetContinuityCounter(next);
-    _rec->BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader())));
-}
-
-void FreeboxRecorderImpl::HandleSingleProgramPMT(ProgramMapTable *pmt)
-{
-    if (!pmt)
-        return;
-
-    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next);
-    _rec->BufferedWrite(*(reinterpret_cast<const TSPacket*>(pmt->tsheader())));
-}
-
-void FreeboxRecorderImpl::Close(void)
-{
-    if (!_session)
-        return;
-
-    // Ensure RTSP cleanup, remove old RTSP session
-    MediaSubsessionIterator iter(*_session);
-    MediaSubsession *subsession;
-    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
-    {
-        Medium::close(subsession->sink);
-        subsession->sink = NULL;
-    }
-
-    if (!_session)
-        return;
-
-    _rtsp_client->teardownMediaSession(*_session);
-
-    // Close all RTSP descriptor
-    Medium::close(_session);
-    Medium::close(_rtsp_client);
-}
 
 FreeboxRecorder::FreeboxRecorder(TVRec *rec, FreeboxChannel *channel) :
-    DTVRecorder(rec), _impl(new FreeboxRecorderImpl(this, channel)),
-    _abort_rtsp(0), _abort_recording(false)
+    DTVRecorder(rec),
+    _channel(channel),
+    _stream_data(NULL),
+    _rtsp(new RTSPComms(this))
 {
 }
 
 FreeboxRecorder::~FreeboxRecorder()
 {
-    delete _impl;
+    StopRecording();
+
+    if (_rtsp)
+    {
+        delete _rtsp;
+        _rtsp = NULL;
+    }
 }
 
 bool FreeboxRecorder::Open(void)
 {
-    return !(_error = !StartRtsp());
+    VERBOSE(VB_RECORD, LOC + "Open() -- begin");
+
+    if (_rtsp->IsOpen())
+        _rtsp->Close();
+
+    FreeboxChannelInfo chaninfo = _channel->GetCurrentChanInfo();
+    if (!chaninfo.isValid())
+    {
+        _error = true;
+    }
+    else
+    {
+        _error = !(_rtsp->Init()); 
+        if (!_error)
+            _error = !(_rtsp->Open(chaninfo.m_url));
+    }
+
+    VERBOSE(VB_RECORD, LOC + "Open() -- end err("<<_error<<")");
+    return !_error;
 }
 
 void FreeboxRecorder::Close(void)
 {
-    _impl->Close();
+    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+    _rtsp->Stop();
+    _rtsp->Close();
+    VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void FreeboxRecorder::ChannelChanged(const FreeboxChannelInfo &chanInfo)
+void FreeboxRecorder::Pause(bool clear)
 {
-    // keep a copy to avoid deadlocks (TODO FIXME why is this needed?)
-    _impl->SetChannelInfo(chanInfo);
-    // Channel changed, we need to close current RTSP flow, and open a new one
-    ResetEventLoop();
+    VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
+    DTVRecorder::Pause(clear);
+    _rtsp->Stop();
+    _rtsp->Close();
+    VERBOSE(VB_RECORD, LOC + "Pause() -- end");
+}
+
+void FreeboxRecorder::Unpause(void)
+{
+    VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
+    if (_recording && !_rtsp->IsOpen())
+        Open();
+    DTVRecorder::Unpause();
+    VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
 }
 
 void FreeboxRecorder::StartRecording(void)
 {
-    _impl->Lock();
-    _recording = true;
-
-    while (!_abort_recording && Open())
+    VERBOSE(VB_RECORD, LOC + "StartRecording() -- begin");
+    if (!Open())
     {
-        _impl->Unlock();
-
-        // Go into main RTSP loop, feeding data to mythtv
-        _impl->GetLiveEnv()->taskScheduler().doEventLoop(&_abort_rtsp);
-
-        _impl->Lock();
-        FinishRecording();
-        Close();
-
-        // Reset _abort_rtsp before unlocking ResetEventLoop()
-        // to avoid race condition
-        _abort_rtsp = 0;
-        _impl->WakeAll();
+        _error = true;
+        return;
     }
 
+    // Start up...
+    _recording = true;
+    _request_recording = true;
+
+    while (_request_recording)
+    {
+        if (PauseAndWait())
+            continue;
+
+        if (!_rtsp->IsOpen())
+        {
+            usleep(5000);
+            continue;
+        }
+
+        // Go into main RTSP loop, feeding data to AddData
+        _rtsp->Run();
+    }
+
+    // Finish up...
+    FinishRecording();
+    Close();
+
+    VERBOSE(VB_RECORD, LOC + "StartRecording() -- end");
     _recording = false;
-    _impl->Unlock();
+    _cond_recording.wakeAll();
 }
 
 void FreeboxRecorder::StopRecording(void)
 {
-    _abort_recording = true; // No lock needed
-    ResetEventLoop();
-}
+    VERBOSE(VB_RECORD, LOC + "StopRecording() -- begin");
+    Pause();
+    _rtsp->Close();
 
-void FreeboxRecorder::ResetEventLoop(void)
-{
-    _impl->Lock();
-    _abort_rtsp = ~0;
+    _request_recording = false;
+    while (_recording)
+        _cond_recording.wait(500);
 
-    while (_recording && _abort_rtsp)
-        _impl->Wait(500);
-
-    _impl->Unlock();
-}
-
-// ======================================================================
-// StartRtsp : start a new RTSP session for the current channel
-// ======================================================================
-bool FreeboxRecorder::StartRtsp(void)
-{
-    // Retrieve the RTSP channel URL
-    FreeboxChannelInfo chaninfo = _impl->GetCurrentChanInfo();
-
-    if (!chaninfo.isValid())
-        return false;
-
-    QString url = chaninfo.m_url;
-
-    // Begin by setting up our usage environment:
-    TaskScheduler *scheduler = BasicTaskScheduler::createNew();
-    _impl->SetLiveEnv(BasicUsageEnvironment::createNew(*scheduler));
-
-    // Create our client object:
-    RTSPClient *tmp = RTSPClient::createNew(*_impl->GetLiveEnv(), 0, "myRTSP", 0);
-    _impl->SetRTSPClient(tmp);
-    if (!tmp)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Freebox # Failed to create RTSP client: %1")
-                .arg(_impl->GetLiveEnv()->getResultMsg()));
-        return false;
-    }
-
-    // Setup URL for the current session
-    char *sdpDescription = _impl->GetRTSPClient()->describeURL(url);
-    _impl->GetRTSPClient()->describeStatus();
-
-    if (!sdpDescription)
-    {
-        VERBOSE(VB_IMPORTANT, QString(
-                    "Freebox # Failed to get a SDP description from URL: %1 %2")
-                .arg(url).arg(_impl->GetLiveEnv()->getResultMsg()));
-        return false;
-    }
-
-    // Create a media session object from this SDP description:
-    _impl->SetSession(MediaSession::createNew(
-                          *_impl->GetLiveEnv(), sdpDescription));
-
-    delete[] sdpDescription;
-
-    if (!_impl->GetSession())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Freebox # Failed to create MediaSession: %1")
-                .arg(_impl->GetLiveEnv()->getResultMsg()));
-        return false;
-    }
-    else if (!_impl->GetSession()->hasSubsessions())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Freebox # This session has no media subsessions"));
-        return false;
-    }
-
-    // Then, setup the "RTPSource"s for the session:
-    MediaSubsessionIterator iter(*_impl->GetSession());
-    MediaSubsession *subsession;
-    bool madeProgress = false;
-
-    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
-    {
-        if (!subsession->initiate(-1))
-        {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Freebox # Can't create receiver for: %1 / %2 subsession: %3")
-                    .arg(subsession->mediumName())
-                    .arg(subsession->codecName())
-                    .arg(_impl->GetLiveEnv()->getResultMsg()));
-        }
-        else
-        {
-            madeProgress = true;
-
-            if (subsession->rtpSource() != NULL)
-            {
-                unsigned const thresh = 1000000; // 1 second
-                subsession->rtpSource()->setPacketReorderingThresholdTime(thresh);
-            }
-        }
-    }
-
-    if (!madeProgress)
-        return false;
-
-    // Perform additional 'setup' on each subsession, before playing them:
-    madeProgress = false;
-    iter.reset();
-    while ((subsession = iter.next()) != NULL)
-    {
-        if (subsession->clientPortNum() == 0)
-            continue; // port # was not set
-
-        if (_impl->GetRTSPClient()->setupMediaSubsession(*subsession, false, false))
-        {
-            madeProgress = true;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Freebox # Failed to setup: %1 %2 : %3")
-                    .arg(subsession->mediumName())
-                    .arg(subsession->codecName())
-                    .arg(_impl->GetLiveEnv()->getResultMsg()));
-        }
-    }
-
-    if (!madeProgress)
-        return false;
-
-    // Create and start "FileSink"s for each subsession:
-    // FileSink while receive Mpeg2 TS Data & will feed them to mythtv
-    madeProgress = false;
-    iter.reset();
-
-    while ((subsession = iter.next())) /* <- extra braces for pedantic gcc */
-    {
-        if (!subsession->readSource())
-            continue; // was not initiated
-
-        FreeboxMediaSink *freeboxMediaSink = FreeboxMediaSink::createNew(
-            *_impl->GetLiveEnv(), *this, TSPacket::SIZE * 128);
-
-        subsession->sink = freeboxMediaSink;
-        if (!subsession->sink)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Freebox # Failed to create sink: %1")
-                    .arg(_impl->GetLiveEnv()->getResultMsg()));
-        }
-
-        subsession->sink->startPlaying(*(subsession->readSource()),
-                                       sub_after_playing_cb,
-                                       new FreeboxData(this, subsession));
-
-        if (subsession->rtcpInstance())
-        {
-            subsession->rtcpInstance()->setByeHandler(
-                sub_bye_handler_cb, new FreeboxData(this, subsession));
-        }
-
-        madeProgress = true;
-    }
-
-    if (!madeProgress)
-        return false;
-
-    // Setup player
-    if (!(_impl->GetRTSPClient()->playMediaSession(*_impl->GetSession())))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Freebox # Failed to start playing session: %1")
-                .arg(_impl->GetLiveEnv()->getResultMsg()));
-        return false;
-    }
-
-    return true;
+    VERBOSE(VB_RECORD, LOC + "StopRecording() -- end");
 }
 
 // ===================================================
 // findTSHeader : find a TS Header in flow
 // ===================================================
 static int FreeboxRecorder_findTSHeader(const unsigned char *data,
-                                        unsigned int         dataSize)
+                                        uint dataSize)
 {
     unsigned int pos = 0;
 
@@ -436,7 +154,7 @@ static int FreeboxRecorder_findTSHeader(const unsigned char *data,
 }
 
 // ===================================================
-// addData : feed date from RTSP flow to mythtv
+// AddData : feed data from RTSP flow to mythtv
 // ===================================================
 void FreeboxRecorder::AddData(unsigned char *data,
                               unsigned       dataSize,
@@ -447,11 +165,9 @@ void FreeboxRecorder::AddData(unsigned char *data,
     // data may be compose from more than one packet, loop to consume all data
     while (readIndex < dataSize)
     {
-        // If recorder is pause, stop there
-        if (PauseAndWait())
-        {
+        // If recorder is paused, stop there
+        if (IsPaused())
             return;
-        }
 
         // Find the next TS Header in data
         int tsPos = FreeboxRecorder_findTSHeader(data + readIndex, dataSize);
@@ -459,25 +175,23 @@ void FreeboxRecorder::AddData(unsigned char *data,
         // if no TS, something bad happens
         if (tsPos == -1)
         {
-            VERBOSE(VB_IMPORTANT, "FREEBOX: No TS header.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "No TS header.");
             break;
         }
 
         // if TS Header not at start of data, we receive out of sync data
         if (tsPos > 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("FREEBOX: TS header at %1, not in sync.")
-                    .arg(tsPos));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("TS packet at %1, not in sync.").arg(tsPos));
         }
 
         // Check if the next packet in buffer is complete :
         // packet size is 188 bytes long
         if ((dataSize - tsPos) < TSPacket::SIZE)
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "FREEBOX: TS header at %1 but packet not yet complete.")
-                    .arg(tsPos));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "TS packet at stradles end of buffer.");
             break;
         }
 
@@ -492,33 +206,67 @@ void FreeboxRecorder::AddData(unsigned char *data,
 
 void FreeboxRecorder::ProcessTSPacket(const TSPacket& tspacket)
 {
-    if (tspacket.TransportError())
+    if (!_stream_data)
         return;
 
-    if (tspacket.ScramplingControl())
+    if (tspacket.TransportError() || tspacket.ScramplingControl())
         return;
 
-    MPEGStreamData &sd = _impl->StreamData();
     if (tspacket.HasAdaptationField())
-        sd.HandleAdaptationFieldControl(&tspacket);
+        _stream_data->HandleAdaptationFieldControl(&tspacket);
 
     if (tspacket.HasPayload())
     {
         const unsigned int lpid = tspacket.PID();
 
         // Pass or reject packets based on PID, and parse info from them
-        if (lpid == sd.VideoPIDSingleProgram())
+        if (lpid == _stream_data->VideoPIDSingleProgram())
         {
             _buffer_packets = !FindMPEG2Keyframes(&tspacket);
             BufferedWrite(tspacket);
         }
-        else if (sd.IsAudioPID(lpid))
+        else if (_stream_data->IsAudioPID(lpid))
             BufferedWrite(tspacket);
-        else if (sd.IsListeningPID(lpid))
-            sd.HandleTSTables(&tspacket);
-        else if (sd.IsWritingPID(lpid))
+        else if (_stream_data->IsListeningPID(lpid))
+            _stream_data->HandleTSTables(&tspacket);
+        else if (_stream_data->IsWritingPID(lpid))
             BufferedWrite(tspacket);
     }
+}
+
+void FreeboxRecorder::SetStreamData(MPEGStreamData *data)
+{
+    VERBOSE(VB_RECORD, LOC + "SetStreamData()");
+    if (data == _stream_data)
+        return;
+
+    MPEGStreamData *old_data = _stream_data;
+    _stream_data = data;
+    if (old_data)
+        delete old_data;
+
+    if (data)
+        data->AddMPEGSPListener(this);
+}
+
+void FreeboxRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
+{
+    if (!pat)
+        return;
+
+    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+    pat->tsheader()->SetContinuityCounter(next);
+    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pat->tsheader())));
+}
+
+void FreeboxRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
+{
+    if (!pmt)
+        return;
+
+    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+    pmt->tsheader()->SetContinuityCounter(next);
+    BufferedWrite(*(reinterpret_cast<const TSPacket*>(pmt->tsheader())));
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

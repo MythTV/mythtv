@@ -28,6 +28,11 @@
 #   include "hdhrchannel.h"
 #endif
 
+#ifdef USING_FREEBOX
+#   include "freeboxsignalmonitor.h"
+#   include "freeboxchannel.h"
+#endif
+
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
@@ -92,6 +97,15 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
         HDHRChannel *hdhrc = dynamic_cast<HDHRChannel*>(channel);
         if (hdhrc)
             signalMonitor = new HDHRSignalMonitor(db_cardnum, hdhrc);
+    }
+#endif
+
+#ifdef USING_FREEBOX
+    if (cardtype.upper() == "FREEBOX")
+    {
+        FreeboxChannel *fbc = dynamic_cast<FreeboxChannel*>(channel);
+        if (fbc)
+            signalMonitor = new FreeboxSignalMonitor(db_cardnum, fbc);
     }
 #endif
 

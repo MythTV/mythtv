@@ -250,7 +250,8 @@ inline bool SignalMonitor::IsSupported(QString cardtype)
 {
     return (CardUtil::IsDVBCardType(cardtype) ||
             (cardtype.upper() == "HDTV")      ||
-            (cardtype.upper() == "HDHOMERUN"));
+            (cardtype.upper() == "HDHOMERUN") ||
+            (cardtype.upper() == "FREEBOX"));
 }
 
 
