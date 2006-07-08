@@ -459,6 +459,10 @@ void ScanWizardScanner::scan()
 void ScanWizardScanner::Import(uint sourceid, int cardtype,
                                const QString &file)
 {
+    (void) sourceid;
+    (void) cardtype;
+    (void) file;
+
 #ifdef USING_DVB
     DVBConfParser *parser = NULL;
 
