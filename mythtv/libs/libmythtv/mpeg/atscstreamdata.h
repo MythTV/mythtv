@@ -28,6 +28,7 @@ class ATSCStreamData : virtual public MPEGStreamData
    ~ATSCStreamData();
 
     void Reset(void) { Reset(-1, -1); }
+    void Reset(int desiredProgram);
     void Reset(int desiredMajorChannel, int desiredMinorChannel);
     void SetDesiredChannel(int major, int minor);
 
