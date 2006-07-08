@@ -109,9 +109,10 @@ void AnalogScan::doScan()
         emit serviceScanPCTComplete((i * 100) / count);
     }
     channel->Close();
-    delete channel;
 
   do_scan_end:
+    if (channel)
+        delete channel;
     emit serviceScanComplete();
 }
 
