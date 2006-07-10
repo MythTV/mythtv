@@ -4688,8 +4688,8 @@ Screenshots are displayed when you are browsing your ROMS in <bf>mythgame</bf>.
 Unzip and place them in <tt>/usr/local/share/xmame/snaps</tt>
 
 - <tt>history.dat</tt>
-<p>Download from <url url="http://www.arcade-history.com/history_database.php"
-name="http://www.arcade-history.com/history_database.php">
+<p>Download from <url url="http://www.arcade-history.com/"
+name="http://www.arcade-history.com/">
 This file fills in a bit of background about each ROM.
 
 - <tt>hiscore.dat</tt>
