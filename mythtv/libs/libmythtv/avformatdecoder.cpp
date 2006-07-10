@@ -815,7 +815,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     {
         int initialAudio = -1, initialVideo = -1;
-        if (itv)
+        if (itv || (itv = GetNVP()->GetInteractiveTV()))
             itv->GetInitialStreams(initialAudio, initialVideo);
         if (initialAudio >= 0)
             SetAudioByComponentTag(initialAudio);
@@ -2095,7 +2095,7 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 void AvFormatDecoder::ProcessDSMCCPacket(
     const AVStream *str, const AVPacket *pkt)
 {
-    if (!itv)
+    if (!itv && ! (itv = GetNVP()->GetInteractiveTV()))
         return;
 
     // The packet may contain several tables.

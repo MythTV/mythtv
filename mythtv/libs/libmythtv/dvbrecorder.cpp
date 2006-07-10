@@ -424,6 +424,8 @@ void DVBRecorder::OpenFilter(uint pid, int pes_type, uint stream_type)
 
 bool DVBRecorder::AdjustFilters(void)
 {
+    StopDummyVideo(); // Stop the dummy video before acquiring the lock.
+
     QMutexLocker change_lock(&_pid_lock);
 
     if (!_input_pat || !_input_pmt)
@@ -491,7 +493,6 @@ bool DVBRecorder::AdjustFilters(void)
 
 
     // [Re]start dummy video
-    StopDummyVideo();
     StartDummyVideo();
 
     // Report if there are no PIDs..
@@ -597,6 +598,7 @@ void DVBRecorder::StartRecording(void)
             {
                 CreatePAT();
                 CreatePMT();
+                _ts_packets_until_psip_sync = 0;
             }
         }
 
@@ -1125,6 +1127,7 @@ void DVBRecorder::StartDummyVideo(void)
 
 void DVBRecorder::RunDummyVideo(void)
 {
+    sleep(3); // Delay start-up. This seems to avoid some problems.
     QString p = gContext->GetThemesParentDir();
     QString path[] =
     {
