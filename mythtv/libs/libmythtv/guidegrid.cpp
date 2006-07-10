@@ -562,8 +562,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 {
     m_channelInfos.clear();
 
-    DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
-    ChannelUtil::SortChannels(channels, channelOrdering);
+    DBChanList channels = ChannelUtil::GetChannels(0, true);
+    ChannelUtil::SortChannels(channels, channelOrdering, true);
 
     if (showFavorites)
     {

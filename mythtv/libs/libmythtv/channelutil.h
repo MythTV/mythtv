@@ -142,7 +142,8 @@ class ChannelUtil
         { return GetChannelValueStr("videofilters", sourceid, channum); }
 
     static DBChanList GetChannels(uint srcid, bool vis_only, QString grp="");
-    static void    SortChannels(DBChanList &list, const QString &order);
+    static void    SortChannels(DBChanList &list, const QString &order,
+                                bool eliminate_duplicates = false);
 
     static uint    GetNextChannel(const DBChanList &sorted,
                                   uint old_chanid, int direction);

@@ -1336,12 +1336,30 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     return lt_callsign(a,b);
 }
 
-void ChannelUtil::SortChannels(DBChanList &list, const QString &order)
+void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
+                               bool eliminate_duplicates)
 {
-    if (order.lower() == "callsign")
+    bool cs = order.lower() == "callsign";
+    if (cs)
         sort(list.begin(), list.end(), lt_callsign);
     else /* if (sortorder == "channum") */
         sort(list.begin(), list.end(), lt_smart);
+
+    if (eliminate_duplicates && !list.empty())
+    {
+        DBChanList tmp;
+        tmp.push_back(list[0]);
+        for (uint i = 1; i < list.size(); i++)
+        {
+            if ((cs && lt_callsign(tmp.back(), list[i])) ||
+                (!cs && lt_smart(tmp.back(), list[i])))
+            {
+                tmp.push_back(list[i]);
+            }
+        }
+
+        list = tmp;
+    }
 }
 
 uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
