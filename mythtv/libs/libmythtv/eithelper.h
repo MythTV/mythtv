@@ -71,8 +71,8 @@ class EITHelper
                 const ExtendedTextTable     *ett);
     void AddEIT(const DVBEventInformationTable *eit);
 #else // if !USING_BACKEND
-    void AddEIT(uint, const EventInformationTable*) {}
-    void AddETT(uint, const ExtendedTextTable*) {}
+    void AddEIT(uint, uint, const EventInformationTable*) {}
+    void AddETT(uint, uint, const ExtendedTextTable*) {}
     void AddEIT(const DVBEventInformationTable*) {}
 #endif // !USING_BACKEND
 
