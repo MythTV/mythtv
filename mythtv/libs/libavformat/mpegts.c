@@ -648,6 +648,16 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
 
         if (dvbci.txt_type && (stream_type == STREAM_TYPE_PRIVATE_DATA))
             stream_type = STREAM_TYPE_VBI_DVB;
+
+        if ((dvbci.component_tag >= 0) && (stream_type == STREAM_TYPE_PRIVATE_DATA))
+        {
+            /* Audio and video are sometimes encoded in private streams labelled with a component tag. */
+            if (dvbci.language[0])
+                stream_type = STREAM_TYPE_AUDIO_MPEG2;
+            else
+                stream_type = STREAM_TYPE_VIDEO_MPEG2;
+        }
+
 #ifdef DEBUG_SI
         av_log(NULL, AV_LOG_DEBUG, "stream_type=%d pid=0x%x\n", stream_type, pid);
 #endif
@@ -845,7 +855,6 @@ static int is_desired_stream(int stream_type)
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
-        case STREAM_TYPE_PRIVATE_DATA:
         case STREAM_TYPE_VBI_DVB:
         case STREAM_TYPE_SUBTITLE_DVB:
         case STREAM_TYPE_DSMCC_B:
