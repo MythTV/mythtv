@@ -104,7 +104,7 @@ ProgLister::ProgLister(ProgListType pltype,
     powerSubtitleEdit = NULL;
     powerDescEdit = NULL;
     powerCatType = NULL;
-    powerCategory = NULL;
+    powerGenre = NULL;
     powerStation = NULL;
 
     curView = -1;
@@ -527,8 +527,8 @@ void ProgLister::setViewFromPowerEdit()
     if (powerCatType->currentItem() > 0)
         text += typeList[powerCatType->currentItem()];
     text += ":";
-    if (powerCategory->currentItem() > 0)
-        text += categoryList[powerCategory->currentItem()];
+    if (powerGenre->currentItem() > 0)
+        text += genreList[powerGenre->currentItem()];
     text += ":";
     if (powerStation->currentItem() > 0)
         text += stationList[powerStation->currentItem()];
@@ -554,6 +554,7 @@ void ProgLister::addSearchRecord(void)
         return;
 
     QString text = "";
+    bool genreflag = false;
 
     if (chooseLineEdit)
         text = chooseLineEdit->text();
@@ -579,7 +580,7 @@ void ProgLister::addSearchRecord(void)
             return;
 
         MSqlBindings bindings;
-        powerStringToSQL(text.utf8(), what, bindings);
+        genreflag = powerStringToSQL(text.utf8(), what, bindings);
 
         if (what == "")
             return;
@@ -589,7 +590,18 @@ void ProgLister::addSearchRecord(void)
 
 
     ScheduledRecording record;
-    record.loadBySearch(searchtype, text, what);
+
+    if (genreflag)
+    {
+        QString fromgenre = QString("LEFT JOIN programgenres ON "
+                "program.chanid = programgenres.chanid AND "
+                "program.starttime = programgenres.starttime ");
+        record.loadBySearch(searchtype, text, fromgenre, what);
+    }
+    else
+    {
+        record.loadBySearch(searchtype, text, what);
+    }
     record.exec();
 
     chooseListBox->setFocus();
@@ -947,14 +959,14 @@ void ProgLister::powerEdit()
     powerCatType->setCurrentItem(typeList.findIndex(field[3]));
     powerPopup->addWidget(powerCatType);
 
-    powerCategory = new MythComboBox(false, powerPopup);
-    powerCategory->insertItem(tr("(Any Category)"));
-    categoryList.clear();
-    categoryList << "";
+    powerGenre = new MythComboBox(false, powerPopup);
+    powerGenre->insertItem(tr("(Any Genre)"));
+    genreList.clear();
+    genreList << "";
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT category FROM program GROUP BY category;");
+    query.prepare("SELECT genre FROM programgenres GROUP BY genre;");
     query.exec();
 
     if (query.isActive() && query.size())
@@ -965,20 +977,20 @@ void ProgLister::powerEdit()
             if (category <= " " || category == NULL)
                 continue;
             category = QString::fromUtf8(query.value(0).toString());
-            powerCategory->insertItem(category);
-            categoryList << category;
+            powerGenre->insertItem(category);
+            genreList << category;
             if (category == field[4])
-                powerCategory->setCurrentItem(powerCategory->count() - 1);
+                powerGenre->setCurrentItem(powerGenre->count() - 1);
         }
     }
-    powerPopup->addWidget(powerCategory);
+    powerPopup->addWidget(powerGenre);
 
     powerStation = new MythComboBox(false, powerPopup);
     powerStation->insertItem(tr("(Any Station)"));
     stationList.clear();
     stationList << "";
 
-    DBChanList channels = ChannelUtil::GetChannels(0, false, "callsign");
+    DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
     ChannelUtil::SortChannels(channels, channelOrdering);
 
     for (uint i = 0; i < channels.size(); i++)
@@ -1024,8 +1036,8 @@ void ProgLister::powerEdit()
 
     delete powerCatType;
     powerCatType = NULL;
-    delete powerCategory;
-    powerCategory = NULL;
+    delete powerGenre;
+    powerGenre = NULL;
     delete powerStation;
     powerStation = NULL;
 
@@ -1035,9 +1047,10 @@ void ProgLister::powerEdit()
     powerPopup = NULL;
 }
 
-void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
+bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
                                   MSqlBindings &bindings)
 {
+    int ret = 0;
     output = "";
     QString curfield;
 
@@ -1047,7 +1060,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     {
         VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
                 .arg(qphrase).arg(field.count()));
-        return;
+        return ret;
     }
 
     if (field[0])
@@ -1091,8 +1104,9 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         if (output > "")
             output += "\nAND ";
 
-        output += "program.category = :POWERCAT ";
-        bindings[":POWERCAT"] = field[4];
+        output += "programgenres.genre = :POWERGENRE ";
+        bindings[":POWERGENRE"] = field[4];
+        ret = 1;
     }
 
     if (field[5])
@@ -1103,6 +1117,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
         output += "channel.callsign = :POWERCALLSIGN ";
         bindings[":POWERCALLSIGN"] = field[5];
     }
+    return ret;
 }
 
 void ProgLister::quickRecord()
@@ -1176,7 +1191,8 @@ void ProgLister::fillViewList(const QString &view)
 
     if (type == plChannel) // list by channel
     {
-        DBChanList channels = ChannelUtil::GetChannels(0, false, "callsign");
+        DBChanList channels = ChannelUtil::GetChannels(0, true,
+                                                       "channum, chanid");
         ChannelUtil::SortChannels(channels, channelOrdering);
 
         for (uint i = 0; i < channels.size(); i++)
@@ -1361,7 +1377,7 @@ void ProgLister::fillItemList(void)
     if (curView < 0)
          return;
 
-    QString where;
+    QString where = "";
     QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = viewList[curView].utf8();
 
@@ -1444,11 +1460,16 @@ void ProgLister::fillItemList(void)
         QString powerWhere;
         MSqlBindings powerBindings;
 
-        powerStringToSQL(qphrase, powerWhere, powerBindings);
+        bool genreflag = powerStringToSQL(qphrase, powerWhere, powerBindings);
 
         if (powerWhere != "")
         {
-            where = QString("WHERE channel.visible = 1 "
+            if (genreflag)
+                where = QString("LEFT JOIN programgenres ON "
+                        "program.chanid = programgenres.chanid AND "
+                        "program.starttime = programgenres.starttime ");
+
+            where += QString("WHERE channel.visible = 1 "
                     "  AND program.endtime > :PGILSTART "
                     "  AND ( ") + powerWhere + " ) ";
             MSqlAddMoreBindings(bindings, powerBindings);

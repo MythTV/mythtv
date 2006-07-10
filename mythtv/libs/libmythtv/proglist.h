@@ -84,7 +84,7 @@ class ProgLister : public MythDialog
     ProgramList schedList;
 
     QStringList typeList;
-    QStringList categoryList;
+    QStringList genreList;
     QStringList stationList;
 
     XMLParse *theme;
@@ -131,11 +131,11 @@ class ProgLister : public MythDialog
     MythRemoteLineEdit *powerSubtitleEdit;
     MythRemoteLineEdit *powerDescEdit;
     MythComboBox *powerCatType;
-    MythComboBox *powerCategory;
+    MythComboBox *powerGenre;
     MythComboBox *powerStation;
     MythPushButton *powerOkButton;
 
-    void powerStringToSQL(const QString &qphrase, QString &output, 
+    bool powerStringToSQL(const QString &qphrase, QString &output, 
                           MSqlBindings &bindings);
 };
 

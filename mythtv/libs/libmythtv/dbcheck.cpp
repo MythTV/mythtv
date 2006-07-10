@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1151";
+const QString currentDatabaseVersion = "1152";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2392,6 +2392,17 @@ static bool doUpgradeTVDatabaseSchema(void)
 };
 
         if (!performActualUpdate(updates, "1151", dbver))
+            return false;
+    }
+
+    if (dbver == "1151")
+    {
+        const QString updates[] = {
+"ALTER TABLE programgenres ADD INDEX (genre);",
+""
+};
+
+        if (!performActualUpdate(updates, "1152", dbver))
             return false;
     }
 
