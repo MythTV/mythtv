@@ -190,6 +190,9 @@ void RomInfo::fillData()
     if (system != "")
         thequery += " AND system=\"" + system + "\"";
 
+    // added order by to get the (first) disk with the accurate diskcount
+    thequery += " ORDER BY diskcount DESC";
+    
     thequery += ";";
 
     MSqlQuery query(MSqlQuery::InitCon());
