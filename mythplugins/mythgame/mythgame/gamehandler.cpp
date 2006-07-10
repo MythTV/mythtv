@@ -482,6 +482,11 @@ int GameHandler::buildFileCount(QString directory, GameHandler *handler)
 {
     int filecount = 0;
     QDir RomDir(directory);
+
+				// If we can't read it's contents move on
+    if (!RomDir.isReadable()) 
+        return 0;
+
     const QFileInfoList* List = RomDir.entryInfoList();
     for (QFileInfoListIterator it(*List); it; ++it)
     {   
@@ -549,6 +554,11 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
                                 MythProgressDialog *pdial, int* filecount)
 {
     QDir RomDir(directory);
+
+                                // If we can't read it's contents move on
+    if (!RomDir.isReadable()) 
+        return;
+
     RomDir.setSorting( QDir:: DirsFirst | QDir::Name );
     const QFileInfoList* List = RomDir.entryInfoList();
     for (QFileInfoListIterator it(*List); it; ++it)
