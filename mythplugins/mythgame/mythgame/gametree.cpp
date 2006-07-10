@@ -136,6 +136,9 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
 
     m_gameTree = new GenericTree("game root", 0, false);
 
+    timer = new QTimer( this ); 
+    connect( timer, SIGNAL(timeout()),  SLOT(showImageTimeout()) ); 
+
     wireUpTheme();
     //  create system filter to only select games where handlers are present
     QString systemFilter;
@@ -251,12 +254,19 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
             if (romInfo->ImagePath()) 
             {
                 m_gameImage->SetImage(romInfo->ImagePath());
-                m_gameImage->LoadImage();
+                //m_gameImage->LoadImage();
+
+                if ( timer->isActive() ) 
+                    timer->changeInterval(330); 
+                else 
+                    timer->start(330, true); 
+
             }
         }
     }
     else 
     {   // Otherwise use some defaults.
+        timer->stop();
         m_gameImage->SetImage("");
         m_gameTitle->SetText("");
         m_gameSystem->SetText("Unknown");
@@ -266,6 +276,12 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
     }
 
 }
+
+void GameTree::showImageTimeout(void) 
+{ 
+    m_gameImage->LoadImage(); 
+} 
+
 
 QString getElement(QStringList list, int pos)
 {

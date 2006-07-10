@@ -102,6 +102,7 @@ class GameTree : public MythThemedDialog
   public slots:
     void handleTreeListSelection(int, IntVector*);
     void handleTreeListEntry(int, IntVector*);
+    void showImageTimeout(void); 
 
   protected:
     void keyPressEvent(QKeyEvent *e);
@@ -125,6 +126,8 @@ class GameTree : public MythThemedDialog
     UITextType  *m_gameGenre;
     UITextType  *m_gameFavourite;
     UIImageType *m_gameImage;
+
+    QTimer      *timer;
 };
 
 #endif
