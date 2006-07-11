@@ -1296,25 +1296,47 @@ inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
+inline bool is_renumbered(const DBChannel &c)
+{
+    if (c.channum.isEmpty())
+        return false;
+
+    // extract integers from channum
+    uint num = 0;
+    for (uint i = 0; i < c.channum.length(); i++)
+    {
+        bool ok;
+        uint tmp = QString(c.channum[i]).toUInt(&ok);
+        num = (ok) ? ((10 * num) + tmp) : num;
+    }
+    QString channum = QString::number(num);
+    QString atscnum = QString("%1%2").arg(c.major_chan).arg(c.minor_chan);
+
+    return channum != atscnum;
+}
+
 inline bool lt_smart(const DBChannel &a, const DBChannel &b)
 {
     int cmp = 0;
 
     bool isIntA, isIntB;
-    int a_int = a.channum.toUInt(&isIntA);
-    int b_int = b.channum.toUInt(&isIntB);
+    uint a_int   = a.channum.toUInt(&isIntA);
+    uint b_int   = b.channum.toUInt(&isIntB);
+
+    // if an ATSC channel is renumbered, ignore real ATSC channel numbers.
+    uint a_minor = (a.minor_chan && is_renumbered(a)) ? 0 : a.minor_chan;
+    uint b_minor = (b.minor_chan && is_renumbered(b)) ? 0 : b.minor_chan;
 
     // one of the channels is an ATSC channel, and the other
     // is either ATSC or is numeric.
-    if ((a.minor_chan || b.minor_chan) &&
-        (a.minor_chan || isIntA) && (b.minor_chan || isIntB))
+    if ((a_minor || b_minor) && (a_minor || isIntA) && (b_minor || isIntB))
     {
-        int a_maj = (!a.minor_chan && isIntA) ? a_int : a.major_chan;
-        int b_maj = (!b.minor_chan && isIntB) ? b_int : b.major_chan;
+        int a_maj = (!a_minor && isIntA) ? a_int : a.major_chan;
+        int b_maj = (!b_minor && isIntB) ? b_int : b.major_chan;
         if ((cmp = a_maj - b_maj))
             return cmp < 0;
         
-        if ((cmp = a.minor_chan - b.minor_chan))
+        if ((cmp = a_minor - b_minor))
             return cmp < 0;
     }
 
