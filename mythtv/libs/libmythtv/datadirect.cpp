@@ -379,6 +379,9 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_productioncrew", query);
+
+        curr_productioncrew.givenname = "";
+        curr_productioncrew.surname = "";
     }    
     else if (pqname == "genre") 
     {
