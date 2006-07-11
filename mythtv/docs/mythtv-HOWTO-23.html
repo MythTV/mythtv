@@ -262,7 +262,7 @@ information.</P>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  Performing this step will remove the entire database. You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the setup program.</CAPTION>
+to setup the database structure before running the mythtv-setup program.</CAPTION>
 </FIGURE>
 
 <BLOCKQUOTE><CODE>
@@ -642,21 +642,21 @@ configurations.  The only hard-and-fast rule is that the Master backend
 capture device in the Master backend must be the first capture card defined in the
 database.</P>
 <P>One example of an advanced configuration is the round-robin scheme.  Rather
-than defining all of the cards on the master, you could first go into setup
-on the master to define globals such as the general configuration and the
-channel lineup but not the host-specific configuration item like the capture
-card.  In this example, we will use a 4 tuner configuration, where two
+than defining all of the cards on the master, you could first go into
+mythtv-setup on the master to define globals such as the general configuration
+and the channel lineup but not the host-specific configuration item like the
+capture card.  In this example, we will use a 4 tuner configuration, where two
 slaves have one card each and the master has two.
 <OL>
 <LI>Add the first capture card on one of the slaves.  Complete the
 configuration, connecting the input source to the card.  This will get
-cardid #1 in the database.  Exit setup.</LI>
+cardid #1 in the database.  Exit mythtv-setup.</LI>
 <LI>Configure the first capture card on the master backend.  This will get
-cardid #2 in the database.  Exit setup.</LI>
+cardid #2 in the database.  Exit mythtv-setup.</LI>
 <LI>Configure the first capture card on the second slave.  This will be
-cardid #3 in the database.  Exit setup.</LI>
+cardid #3 in the database.  Exit mythtv-setup.</LI>
 <LI>Configure the second capture card on the master backend.  This will
-get cardid #4 in the database.  Exit setup.</LI>
+get cardid #4 in the database.  Exit mythtv-setup.</LI>
 </OL>
 </P>
 <P>Using this scheme, the master backend will not use both capture cards until
@@ -1334,7 +1334,7 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Run the MythTV setup program.  When the setup program prompts "Would you
+<P>Run the mythtv-setup program.  When the setup program prompts "Would you
 like to clear all program/channel settings before starting configuration
 [no]" type "yes".</P>
 <P>Complete the configuration as detailed in the section called 
@@ -1348,11 +1348,11 @@ in
 <CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
 your capture device.  If you created "Cable-DD", then don't forget to bind
 <CODE>/dev/video0</CODE> to Cable-DD in the 
-<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A> portion of setup.</CAPTION>
+<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A> portion of mythtv-setup.</CAPTION>
 </FIGURE>
 </P>
-<P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
-the database with new data.</P>
+<P>Once you're done running mythtv-setup, run <B>mythfilldatabase</B> to
+populate the database with new data.</P>
 <P>To restore the channel icons, you will need to perform one of two steps. 
 Both are dependant on the channel_copy table you created above.</P>
 <P>If you're running MySQL v3, execute the following.  Note that the
@@ -1492,7 +1492,7 @@ contrib directory which may work for you.</LI>
 created a recording is the one which will flag commercials.  You may wish to
 use a different machine to run commercial flagging.</P>
 <P>On the slower machine:</P>
-<P>Start the backend setup program.  Advance through the pages until you get to
+<P>Start the mythtv-setup program.  Advance through the pages until you get to
 the Job Queue page.  Turn off the setting that says "Allow Commercial
 Detection jobs", thereby preventing any commercial flagging jobs from
 running on this machine.</P>
@@ -1500,7 +1500,7 @@ running on this machine.</P>
 OFF so that new jobs are allowed to run anywhere.</P>
 <P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
 <P>On the faster machine:</P>
-<P>Start the backend setup program.  Advance through the pages until you get to
+<P>Start the mythtv-setup program.  Advance through the pages until you get to
 the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
 ON for this machine.</P>
 <P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue

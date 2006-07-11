@@ -1422,8 +1422,8 @@ will take effect.</P>
 <P><B>NOTE</B>: This section will be considered abandoned as of v0.20.</P>
 <P>Red Hat Linux 9 use a default locale with UTF-8 encoding.
 Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
-whenever you run setup or mythfilldatabase you will get a lot of UTF-8
-warnings. There is an 
+whenever you run mythtv-setup or mythfilldatabase you will get a lot of 
+UTF-8 warnings. There is an 
 <A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
 Date::Manip at the XMLTV site fixing this and other XMLTV related
 bugs.</P>
@@ -1653,7 +1653,7 @@ enter <B>ZIYN-DQZO-SBUT</B>.</P>
 <P>Fill in the survey, then proceed to the lineup choices and configure your
 account for your particular location and the channels that you have.  This
 configuration will be imported into MythTV when you first run the
-<B>setup</B> program.</P>
+<B>mythtv-setup</B> program.</P>
 <P>See the section called 
 <A HREF="#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
@@ -1840,7 +1840,7 @@ frontends.</P>
 following:
 <LI>You do NOT need the MySQL server installed on your remote frontend</LI>
 <LI>You do NOT need XMLTV installed on your remote frontend</LI>
-<LI>You do NOT need to run the MythTV setup program on
+<LI>You do NOT need to run the mythtv-setup program on
 your frontend machine</LI>
 </P>
 <P>Other than the exclusion of the MySQL server and XMLTV, the MythTV
@@ -1848,7 +1848,7 @@ compilation procedure is the same as when you're setting up both a backend
 and a frontend.  However, you <EM>will</EM> need to install the database
 access libraries.</P>
 <P>Once MythTV is compiled and installed:
-<LI>Run the MythTV setup program on your Master backend. Under the "General"
+<LI>Run the mythtv-setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
 to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
@@ -2635,7 +2635,7 @@ $ irw
 <P>Once you've verified lirc is working you can press <B>CTRL-C</B> to exit
 <B>irw</B> and configure the channel changing script.</P>
 <P>The path to the channel changing script will need to be entered on the
-mythbackend setup screen for Input Connections.</P>
+mythtv-setup screen for Input Connections.</P>
 <P>This csh script will be called each time MythTV needs to change the channel.
 Below is a copy of the script followed by the corresponding perl script.
 Make sure both are in your path. Also make sure you leave the #!/bin/csh
@@ -2699,7 +2699,7 @@ directory structure setup yet.  See the
 <A HREF="#advancedpartitionformatting">Advanced Partition Formatting</A> section for hints on creating a
 partition for MythTV.</P>
 <P>If you create a <CODE>/var/video</CODE> subdirectory, change
-<CODE>/mnt/store/</CODE> to <CODE>/var/video/</CODE> in the setup screens.
+<CODE>/mnt/store/</CODE> to <CODE>/var/video/</CODE> in the mythtv-setup screens.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -2715,11 +2715,11 @@ running multiple backend systems, the Master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.</P>
 <P>The Master backend will always choose the first available tuner in the same
-order as you add cards through "setup". In other words, the second card you
-add will only be used when there are two overlapping recordings, the third
-when there are three, and so on. Therefore, you will want to have the
-greatest amount of disk space on the Master backend because its tuner will
-always be the first choice. You will then want to add your 
+order as you add cards through "mythtv-setup". In other words, the second
+card you add will only be used when there are two overlapping recordings, 
+the third when there are three, and so on. Therefore, you will want to have
+the greatest amount of disk space on the Master backend because its tuner
+will always be the first choice. You will then want to add your 
 <A HREF="#nonmaster_backend">other backends</A> in the order of your
 preference for recording.</P>
 <P>
@@ -2787,8 +2787,8 @@ option you wish to configure.</P>
 <H3>General</H3>
 
 <P>The first screen of the General configuration deals with IP addresses of the
-system that you're running setup on and any master backend you may have.  If
-you've only got one machine, then the default values are fine and you can
+system that you're running mythtv-setup on and any master backend you may have.
+If you've only got one machine, then the default values are fine and you can
 move to the next page by pressing the space bar.  If you need to move around
 the screen, use the arrow keys to move focus between settings, not the
 mouse.</P>
@@ -2799,8 +2799,9 @@ not</EM> use the "127.0.0.1" IP address.</P>
 address, you must use real IP addresses in both fields, otherwise your
 frontend machines will generate "Unexpected response to MYTH_PROTO_VERSION"
 errors.</P>
-<P>It is very strongly discouraged that you make any changes to the port
-settings from the defaults.</P>
+<P>Changing any of the port settings is very strongly discouraged.
+(If you do accidentally change them, the defaults are 6543 for
+the master/backend server, and 6544 for the HTTP requests)</P>
 <P>Once you're satisfied with the values, move the focus down to Next and hit
 the space bar.</P>
 <P>The next screen details the Host-specific Backend setup.  This is where you
@@ -2841,7 +2842,7 @@ username and password that you have established with DataDirect, then move
 to the "Retrieve Listings" button and press the space bar.  </P>
 <P><B>NOTE</B>: You need <B>wget</B> version 1.9.1 or higher to use
 DataDirect.</P>
-<P>The setup program will contact the Zap2It servers and get your account
+<P>The mythtv-setup program will contact the Zap2It servers and get your account
 information.  Once you're done, you may click the Finish button and skip the
 next few paragraphs in this document since they only apply to users that are
 using the external XMLTV script to get their guide data.</P>
@@ -2912,8 +2913,8 @@ further items to configure, thereby returning you to the command line.</P>
 <P>The channel editor is used to globally alter channel information,
 including items like hue, contrast, fine tuning and others.  Users in North
 America shouldn't run the channel editor until after completing initial
-setup and running <B>mythfilldatabase</B> at least once to populate the
-database.</P>
+mythtv-setup and running <B>mythfilldatabase</B> at least once to populate
+the database.</P>
 
 <H2><A NAME="ss9.2">9.2</A> <A HREF="#toc9.2">Post-configuration</A>
 </H2>
@@ -2995,7 +2996,7 @@ the steps outlined in the section called
 backends as discussed in the section titled 
 <A HREF="#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
 you have the correct IP address for the database server in the "Database
-Configuration" screen of the setup application on this slave backend.</P>
+Configuration" screen of the mythtv-setup application on this slave backend.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -3366,7 +3367,7 @@ V4L not listed above), Myth includes two methods for software encoding:
 RTjpeg and MPEG-4.  RTjpeg has significantly fewer CPU demands than MPEG-4,
 but it generates larger files than MPEG-4 for a given recording.</P>
 <P>For DVB and HDTV cards, no further configuration is required after
-setting up the card using the 'setup' program.
+setting up the card using the 'mythtv-setup' program.
 For all other cards, configuration is done through MythFrontend. 
 Selecting 'Recording Profiles' from the 'TV Settings' screen will list
 the profiles currently available for the cards in your system. 
@@ -4007,7 +4008,7 @@ command" with the "Wakeup time format" suitable for that tool.</P>
 
 <P>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
-find the settings for this in the second page of the setup program,
+find the settings for this in the second page of the mythtv-setup program,
 or at the end of <CODE>mysql.txt</CODE>.  The meanings are the same as
 discussed in "The WakeOnLan settings" above.</P>
 
@@ -4180,13 +4181,13 @@ is -1.</P>
 <P>Per channel -- Setup->TV Settings->Recording Priorities->Channel Priorities
 can be useful if you believe that you prefer any of the shows on certain
 channels. This would give all shows on a channel an advantage by default.</P>
-<P>Input preference -- in the MythTV "setup" program, the "Input Connections"
-section allows you to add additional priority in the "Input preference".
+<P>Input priority -- in the "mythtv-setup" program, the "Input Connections"
+section allows you to add additional priority in the "Input priority".
 This is simply another priority factor but has an interesting effect. If a
 card input has a higher value than the other cards, the scheduler will see
-that you would rather record showings of episodes on this card rather than a
+that you would rather record showings of episodes on this input rather than a
 showing on another card. If you have multiple cards of different quality,
-you may want to set input preference to encourage the scheduler to record
+you may want to set input priority to encourage the scheduler to record
 shows on your best card(s) whenever possible. This can also be useful if you
 have multiple video sources which include the same stations. For example,
 with digital and analog cable you could increase the digital cable input
@@ -4506,7 +4507,15 @@ time in ISO 8601 format.</LI>
 <H2><A NAME="ss12.5">12.5</A> <A HREF="#toc12.5">Advanced Recording Options</A>
 </H2>
 
-<H3>Creating Power Search rules with Custom RecordMythTV's "Custom Record" feature gives you unlimited control for creatingspecialized search recording rules to meet your needs. It allows you tochoose your criteria to search for matching shows based on any of theinformation in the program listings, channel information, time functions andmore. This goes beyond the capabilities of any other DVR system and it isunlikely that this level of scheduling customization will ever be availablein any commercial DVR system.</H3>
+<H3>Creating Power Search rules with Custom Record</H3>
+
+<P>MythTV's "Custom Record" feature gives you unlimited control for creating
+specialized search recording rules to meet your needs. It allows you to
+choose your criteria to search for matching shows based on any of the
+information in the program listings, channel information, time functions and
+more. This goes beyond the capabilities of any other DVR system and it is
+unlikely that this level of scheduling customization will ever be available
+in any commercial DVR system.</P>
 
 <H3>Getting Started</H3>
 
@@ -5164,7 +5173,7 @@ into <CODE>/usr/local/share/xmame</CODE></P>
 Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
 <P>- <CODE>history.dat</CODE></P>
 <P>Download from 
-<A HREF="http://www.arcade-history.com/history_database.php">http://www.arcade-history.com/history_database.php</A>
+<A HREF="http://www.arcade-history.com/">http://www.arcade-history.com/</A>
 This file fills in a bit of background about each ROM.</P>
 <P>- <CODE>hiscore.dat</CODE></P>
 <P>Download from 
@@ -5903,7 +5912,7 @@ intents and purposes your computer will have crashed.</P>
 <H2><A NAME="ss22.3">22.3</A> <A HREF="#toc22.3">Installing</A>
 </H2>
 
-<H3>When trying to run setup, you get an error like this: "./setup: error while loading shared libraries:"</H3>
+<H3>When trying to run mythtv-setup, you get an error like this: "mythtv-setup: error while loading shared libraries:"</H3>
 
 <P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
 section on modifying 
@@ -6560,7 +6569,7 @@ information.</P>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  Performing this step will remove the entire database. You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the setup program.</CAPTION>
+to setup the database structure before running the mythtv-setup program.</CAPTION>
 </FIGURE>
 
 <BLOCKQUOTE><CODE>
@@ -6940,21 +6949,21 @@ configurations.  The only hard-and-fast rule is that the Master backend
 capture device in the Master backend must be the first capture card defined in the
 database.</P>
 <P>One example of an advanced configuration is the round-robin scheme.  Rather
-than defining all of the cards on the master, you could first go into setup
-on the master to define globals such as the general configuration and the
-channel lineup but not the host-specific configuration item like the capture
-card.  In this example, we will use a 4 tuner configuration, where two
+than defining all of the cards on the master, you could first go into
+mythtv-setup on the master to define globals such as the general configuration
+and the channel lineup but not the host-specific configuration item like the
+capture card.  In this example, we will use a 4 tuner configuration, where two
 slaves have one card each and the master has two.
 <OL>
 <LI>Add the first capture card on one of the slaves.  Complete the
 configuration, connecting the input source to the card.  This will get
-cardid #1 in the database.  Exit setup.</LI>
+cardid #1 in the database.  Exit mythtv-setup.</LI>
 <LI>Configure the first capture card on the master backend.  This will get
-cardid #2 in the database.  Exit setup.</LI>
+cardid #2 in the database.  Exit mythtv-setup.</LI>
 <LI>Configure the first capture card on the second slave.  This will be
-cardid #3 in the database.  Exit setup.</LI>
+cardid #3 in the database.  Exit mythtv-setup.</LI>
 <LI>Configure the second capture card on the master backend.  This will
-get cardid #4 in the database.  Exit setup.</LI>
+get cardid #4 in the database.  Exit mythtv-setup.</LI>
 </OL>
 </P>
 <P>Using this scheme, the master backend will not use both capture cards until
@@ -7632,7 +7641,7 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Run the MythTV setup program.  When the setup program prompts "Would you
+<P>Run the mythtv-setup program.  When the setup program prompts "Would you
 like to clear all program/channel settings before starting configuration
 [no]" type "yes".</P>
 <P>Complete the configuration as detailed in the section called 
@@ -7646,11 +7655,11 @@ in
 <CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
 your capture device.  If you created "Cable-DD", then don't forget to bind
 <CODE>/dev/video0</CODE> to Cable-DD in the 
-<A HREF="#VideoSources">Video Sources</A> portion of setup.</CAPTION>
+<A HREF="#VideoSources">Video Sources</A> portion of mythtv-setup.</CAPTION>
 </FIGURE>
 </P>
-<P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
-the database with new data.</P>
+<P>Once you're done running mythtv-setup, run <B>mythfilldatabase</B> to
+populate the database with new data.</P>
 <P>To restore the channel icons, you will need to perform one of two steps. 
 Both are dependant on the channel_copy table you created above.</P>
 <P>If you're running MySQL v3, execute the following.  Note that the
@@ -7790,7 +7799,7 @@ contrib directory which may work for you.</LI>
 created a recording is the one which will flag commercials.  You may wish to
 use a different machine to run commercial flagging.</P>
 <P>On the slower machine:</P>
-<P>Start the backend setup program.  Advance through the pages until you get to
+<P>Start the mythtv-setup program.  Advance through the pages until you get to
 the Job Queue page.  Turn off the setting that says "Allow Commercial
 Detection jobs", thereby preventing any commercial flagging jobs from
 running on this machine.</P>
@@ -7798,7 +7807,7 @@ running on this machine.</P>
 OFF so that new jobs are allowed to run anywhere.</P>
 <P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
 <P>On the faster machine:</P>
-<P>Start the backend setup program.  Advance through the pages until you get to
+<P>Start the mythtv-setup program.  Advance through the pages until you get to
 the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
 ON for this machine.</P>
 <P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue
@@ -8232,8 +8241,8 @@ $
 errors") you will probably have problems with HDTV.  Check your antenna,
 cables, etc.</P>
 <P>Once you have confirmed that your card is able to lock onto a HDTV signal it
-is time to configure MythTV. Start the setup program, and in the Capture
-Cards section change the card type to "Digital Video Broadcast".</P>
+is time to configure MythTV. Start the mythtv-setup program, and in the
+Capture Cards section change the card type to "Digital Video Broadcast".</P>
 <P>For HDTV you do not need to use the Advanced configuration. </P>
 <H2><A NAME="ss24.4">24.4</A> <A HREF="#toc24.4">Diskless Ubuntu</A>
 </H2>
