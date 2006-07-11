@@ -1261,7 +1261,7 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         }
 
         // See if service already in database based on service ID
-        int chanid = ChannelUtil::GetChanID(db_mplexid, -1, 0, 0,
+        int chanid = ChannelUtil::GetChanID(db_mplexid, -1, -1, -1,
                                             sdt->ServiceID(i));
 
         if (chanid < 0)
