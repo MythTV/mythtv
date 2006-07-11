@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-03-10, v0.19.02
+<date>2006-07-11, v0.19.03
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -28,7 +28,8 @@ messages - I will simply delete your mail.
 <sect1>What is MythTV?
 <p>MythTV is a GPL licensed suite of programs that allow you to build the
 mythical home media convergence box on your own using Open Source software
-and operating systems.
+and operating systems.  MythTV is known to work on Linux and Mac OS X
+(PowerPC and Intel).  It does not run on Windows.
 
 MythTV has a number of capabilities.  The television portion allows you to
 do the following:
@@ -7456,10 +7457,10 @@ encoder bitrates that produce very large files.
 <sect2>JFS
 <p>JFS (Journaling File System) is a journaling filesystem originally
 developed by IBM for AIX which was later released as open source.  While not
-as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9) and
-Fedora Core 1 (RHFC1) and Mandriva as well as other distros.  According to
-tests, JFS is the file deletion speed king, deleting virtually any file in
-under one second, even files as large as 10 gigabytes.
+as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9), Fedora
+Core and Mandriva as well as other distros.  According to tests, JFS is the
+file deletion speed king, deleting virtually any file in under one second,
+even files as large as 10 gigabytes.
 
 <sect2>XFS
 <p>XFS is a journaling file system originally developed by SGI for Irix, and
@@ -7540,16 +7541,22 @@ not before the <bf>azap</bf> is compiled, so you should be able to continue.
 $ su
 # cp utils/szap/azap /usr/local/bin
 </verb></tscreen>
+
+Download the firmware for the card.  Go to <url
+url="http://www.linuxtv.org/download/dvb/firmware/"
+name="http://www.linuxtv.org/download/dvb/firmware/"> and download what is
+appropriate for your hardware.
+
 On Gentoo, execute the following:
 <tscreen><verb>
 # mkdir /lib/firmware
-# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+# cp ~/dvb-fe-nxt2002.fw /lib/firmware
 # echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
 # exit
 </verb></tscreen>
 On Debian:
 <tscreen><verb>
-# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+# cp ~/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
 # exit
 </verb></tscreen>
 
@@ -7855,7 +7862,7 @@ minimum Qt version (Ticket 1363).  Updated transcoding sections (Ticket
 1349)
 v0.19.02, 2006-03-10.  Update minimum MySQL version.  Add a note to the
 debugging section that if you're going to trim, don't trim too much.
-
+v0.19.03, 2006-07-11.  Add that MythTV works on Mac OS X.  Fix arcade-history URL.
 -->
 
 <!--

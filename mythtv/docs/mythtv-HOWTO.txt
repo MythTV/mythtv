@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2006-03-10, v0.19.02
+  2006-07-11, v0.19.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -366,7 +366,8 @@
 
   MythTV is a GPL licensed suite of programs that allow you to build the
   mythical home media convergence box on your own using Open Source
-  software and operating systems.
+  software and operating systems.  MythTV is known to work on Linux and
+  Mac OS X (PowerPC and Intel).  It does not run on Windows.
 
   MythTV has a number of capabilities.  The television portion allows
   you to do the following:
@@ -404,6 +405,7 @@
   +o  MythGallery, a picture-viewing application
 
   +o  MythVideo, a media-viewer for content not created within MythTV
+
 
   +o  MythDVD, a DVD viewer / ripper
 
@@ -471,8 +473,6 @@
   <http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html> or as a PDF
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
-
-
   This HOWTO is for MythTV v0.19
 
 
@@ -8782,10 +8782,9 @@
   JFS (Journaling File System) is a journaling filesystem originally
   developed by IBM for AIX which was later released as open source.
   While not as common as Ext3 or ReiserFS, it is distributed with RedHat
-  9 (RH9) and Fedora Core 1 (RHFC1) and Mandriva as well as other
-  distros.  According to tests, JFS is the file deletion speed king,
-  deleting virtually any file in under one second, even files as large
-  as 10 gigabytes.
+  9 (RH9), Fedora Core and Mandriva as well as other distros.  According
+  to tests, JFS is the file deletion speed king, deleting virtually any
+  file in under one second, even files as large as 10 gigabytes.
 
 
   [1m24.2.5.  XFS[0m
@@ -8857,6 +8856,7 @@
   Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2
   PCI.
 
+
   Exit menuconfig, then compile modules and the kernel.  (Gentoo will do
   this automatically as a part of the [1mgenkernel [22mstep.
 
@@ -8890,11 +8890,16 @@
 
 
 
+  Download the firmware for the card.  Go to
+  http://www.linuxtv.org/download/dvb/firmware/
+  <http://www.linuxtv.org/download/dvb/firmware/> and download what is
+  appropriate for your hardware.
+
   On Gentoo, execute the following:
 
 
        # mkdir /lib/firmware
-       # cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+       # cp ~/dvb-fe-nxt2002.fw /lib/firmware
        # echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
        # exit
 
@@ -8903,7 +8908,7 @@
   On Debian:
 
 
-       # cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+       # cp ~/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
        # exit
 
 
@@ -8913,13 +8918,10 @@
 
   Once you've rebooted, confirm that the card is detected.  If you type
   [1mdmesg[22m, you should see something like this:
-
-
-
-  drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
-  drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
-  DVB: registering new adapter (SkyStar2).
-  DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+       drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+       drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+       DVB: registering new adapter (SkyStar2).
+       DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
 
 
 

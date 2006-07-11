@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-03-10, v0.19.02
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2006-07-11, v0.19.03
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -259,7 +259,8 @@ messages - I will simply delete your mail.</CAPTION>
 
 <P>MythTV is a GPL licensed suite of programs that allow you to build the
 mythical home media convergence box on your own using Open Source software
-and operating systems.</P>
+and operating systems.  MythTV is known to work on Linux and Mac OS X
+(PowerPC and Intel).  It does not run on Windows.</P>
 <P>MythTV has a number of capabilities.  The television portion allows you to
 do the following:
 <UL>
@@ -8079,10 +8080,10 @@ encoder bitrates that produce very large files.</P>
 
 <P>JFS (Journaling File System) is a journaling filesystem originally
 developed by IBM for AIX which was later released as open source.  While not
-as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9) and
-Fedora Core 1 (RHFC1) and Mandriva as well as other distros.  According to
-tests, JFS is the file deletion speed king, deleting virtually any file in
-under one second, even files as large as 10 gigabytes.</P>
+as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9), Fedora
+Core and Mandriva as well as other distros.  According to tests, JFS is the
+file deletion speed king, deleting virtually any file in under one second,
+even files as large as 10 gigabytes.</P>
 
 <H3>XFS</H3>
 
@@ -8177,12 +8178,15 @@ $ su
 # cp utils/szap/azap /usr/local/bin
 </PRE>
 </CODE></BLOCKQUOTE>
-
-On Gentoo, execute the following:
+</P>
+<P>Download the firmware for the card.  Go to 
+<A HREF="http://www.linuxtv.org/download/dvb/firmware/">http://www.linuxtv.org/download/dvb/firmware/</A> and download what is
+appropriate for your hardware.</P>
+<P>On Gentoo, execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
 # mkdir /lib/firmware
-# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+# cp ~/dvb-fe-nxt2002.fw /lib/firmware
 # echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
 # exit
 </PRE>
@@ -8191,7 +8195,7 @@ On Gentoo, execute the following:
 On Debian:
 <BLOCKQUOTE><CODE>
 <PRE>
-# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+# cp ~/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
