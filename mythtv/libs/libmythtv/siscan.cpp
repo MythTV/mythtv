@@ -965,7 +965,7 @@ void SIScan::UpdatePMTinDB(
 {
     // See if service already in database based on program number
     int chanid = ChannelUtil::GetChanID(
-        db_mplexid, -1, 0, 0, pmt->ProgramNumber());
+        db_mplexid, -1, -1, -1, pmt->ProgramNumber());
 
     QString chan_num = ChannelUtil::GetChanNum(chanid);
     if (chan_num.isEmpty() || renameChannels)
