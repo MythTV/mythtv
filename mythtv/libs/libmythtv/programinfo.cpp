@@ -455,10 +455,9 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
         }
         else
         {
-            progMap["starttime"] = startts.toString("yyyy");
-            progMap["recstarttime"] = startts.toString("yyyy");
+            progMap["startdate"] = startts.toString("yyyy");
+            progMap["recstartdate"] = startts.toString("yyyy");
         }
-        
     }
     else
     {
