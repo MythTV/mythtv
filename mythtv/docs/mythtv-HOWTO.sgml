@@ -4068,7 +4068,7 @@ time in ISO 8601 format.
 
 <sect1>Advanced Recording Options
 <sect2>Creating Power Search rules with Custom Record
-
+<p>
 MythTV's "Custom Record" feature gives you unlimited control for creating
 specialized search recording rules to meet your needs. It allows you to
 choose your criteria to search for matching shows based on any of the
