@@ -1214,10 +1214,10 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 {
     VERBOSE(VB_PLAYBACK, LOC + "StopStuff() -- begin");
 
-    if (prbuffer->isDVD())
+    if (activerbuffer->isDVD())
     {
         VERBOSE(VB_PLAYBACK,LOC + " StopStuff() -- get dvd player out of still frame or wait status");
-        prbuffer->DVD()->IgnoreStillOrWait(true);
+        activerbuffer->DVD()->IgnoreStillOrWait(true);
     } 
 
     if (stopRingBuffers)
@@ -2254,25 +2254,25 @@ void TV::ProcessKeypress(QKeyEvent *e)
     if (handled)
         return;
 
-    if (prbuffer->isDVD() && prbuffer->DVD()->IsInMenu())
+    if (activerbuffer->isDVD() && activerbuffer->DVD()->IsInMenu())
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
             QString action = actions[i];
-            int nb_buttons = prbuffer->DVD()->NumMenuButtons();
+            int nb_buttons = activerbuffer->DVD()->NumMenuButtons();
             if (nb_buttons > 0)
             {
                 handled = true;
                 if (action == "UP" || action == "CHANNELUP")
-                    prbuffer->DVD()->MoveButtonUp();
+                    activerbuffer->DVD()->MoveButtonUp();
                 else if (action == "DOWN" || action == "CHANNELDOWN")
-                    prbuffer->DVD()->MoveButtonDown();
+                    activerbuffer->DVD()->MoveButtonDown();
                 else if (action == "LEFT" || action == "SEEKRWND")
-                    prbuffer->DVD()->MoveButtonLeft();
+                    activerbuffer->DVD()->MoveButtonLeft();
                 else if (action == "RIGHT" || action == "SEEKFFWD")
-                    prbuffer->DVD()->MoveButtonRight();
+                    activerbuffer->DVD()->MoveButtonRight();
                 else if (action == "SELECT")
-                    nvp->ActivateDVDButton();
+                    activenvp->ActivateDVDButton();
                 else
                     handled = false;
             }
@@ -2286,11 +2286,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
         QString action = actions[i];
         handled = true;
 
-        if (action == "SKIPCOMMERCIAL" && !prbuffer->isDVD())
+        if (action == "SKIPCOMMERCIAL" && !activerbuffer->isDVD())
             DoSkipCommercials(1);
-        else if (action == "SKIPCOMMBACK" && !prbuffer->isDVD())
+        else if (action == "SKIPCOMMBACK" && !activerbuffer->isDVD())
             DoSkipCommercials(-1);
-        else if (action == "QUEUETRANSCODE" && !prbuffer->isDVD())
+        else if (action == "QUEUETRANSCODE" && !activerbuffer->isDVD())
             DoQueueTranscode("Default");
         else if (action == "QUEUETRANSCODE_AUTO")
             DoQueueTranscode("Autodetect");
@@ -2304,9 +2304,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoPlay();
         else if (action == "PAUSE") 
             DoPause();
-        else if (action == "SPEEDINC" && !prbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SPEEDINC" && !activerbuffer->InDVDMenuOrStillFrame())
             ChangeSpeed(1);
-        else if (action == "SPEEDDEC" && !prbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SPEEDDEC" && !activerbuffer->InDVDMenuOrStillFrame())
             ChangeSpeed(-1);
         else if (action == "ADJUSTSTRETCH")
             ChangeTimeStretch(0);   // just display
@@ -2349,7 +2349,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 AddKeyToInputQueue(0);
             }            
         }
-        else if (action == "SEEKFFWD" && !prbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SEEKFFWD" && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_FORWARD);
@@ -2365,7 +2365,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(1);
         }
-        else if (action == "FFWDSTICKY" && !prbuffer->InDVDMenuOrStillFrame())
+        else if (action == "FFWDSTICKY" && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_END);
@@ -2374,7 +2374,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(1);
         }
-        else if (action == "SEEKRWND" && !prbuffer->InDVDMenuOrStillFrame())
+        else if (action == "SEEKRWND" && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_REWIND);
@@ -2389,7 +2389,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 ChangeFFRew(-1);
         }
-        else if (action == "RWNDSTICKY" && !prbuffer->InDVDMenuOrStillFrame())
+        else if (action == "RWNDSTICKY" && !activerbuffer->InDVDMenuOrStillFrame())
         {
             if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_SET);
@@ -2400,21 +2400,21 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "JUMPRWND")
         {
-            if (prbuffer->isDVD())
+            if (activerbuffer->isDVD())
             {
-                if (prbuffer->InDVDMenuOrStillFrame())
+                if (activerbuffer->InDVDMenuOrStillFrame())
                     UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
                                          osd_general_timeout);
-                else if (!prbuffer->DVD()->StartOfTitle())
+                else if (!activerbuffer->DVD()->StartOfTitle())
                 {
-                    nvp->ChangeDVDTrack(0);
+                    activenvp->ChangeDVDTrack(0);
                     UpdateOSDSeekMessage(tr("Previous Chapter"),
                                             osd_general_timeout);
                 }
                 else
                 {
-                    uint titleLength = prbuffer->DVD()->GetTotalTimeOfTitle();
-                    uint chapterLength = prbuffer->DVD()->GetChapterLength();
+                    uint titleLength = activerbuffer->DVD()->GetTotalTimeOfTitle();
+                    uint chapterLength = activerbuffer->DVD()->GetChapterLength();
                     if ((titleLength == chapterLength) &&
                         chapterLength > 300)
                     {
@@ -2422,7 +2422,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     } 
                     else
                     {                        
-                        nvp->GoToDVDProgram(0);
+                        activenvp->GoToDVDProgram(0);
                         UpdateOSDSeekMessage(tr("Previous Title"),
                                                 osd_general_timeout);
                     }
@@ -2435,25 +2435,25 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "JUMPFFWD")
         {
-            if (prbuffer->isDVD())
+            if (activerbuffer->isDVD())
             {
-                if (prbuffer->DVD()->InStillFrame())
+                if (activerbuffer->DVD()->InStillFrame())
                 {
-                    prbuffer->DVD()->SkipStillFrame();
+                    activerbuffer->DVD()->SkipStillFrame();
                     UpdateOSDSeekMessage(tr("Skip Still Frame"),
                             osd_general_timeout);
                 }
-                else if (!prbuffer->DVD()->EndOfTitle()) 
+                else if (!activerbuffer->DVD()->EndOfTitle()) 
                 {
-                    nvp->ChangeDVDTrack(1);
+                    activenvp->ChangeDVDTrack(1);
                     UpdateOSDSeekMessage(tr("Next Chapter"),
                             osd_general_timeout);
                 }
-                else if (!prbuffer->DVD()->NumMenuButtons())
+                else if (!activerbuffer->DVD()->NumMenuButtons())
                 {
-                    uint titleLength = prbuffer->DVD()->GetTotalTimeOfTitle();
-                    uint chapterLength = prbuffer->DVD()->GetChapterLength();
-                    uint currentTime = prbuffer->DVD()->GetCurrentTime();
+                    uint titleLength = activerbuffer->DVD()->GetTotalTimeOfTitle();
+                    uint chapterLength = activerbuffer->DVD()->GetChapterLength();
+                    uint currentTime = activerbuffer->DVD()->GetCurrentTime();
                     if ((titleLength == chapterLength) &&
                         (currentTime < (chapterLength - (jumptime * 60))) &&
                         chapterLength > 300)
@@ -2462,7 +2462,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     }
                     else
                     {
-                        nvp->GoToDVDProgram(1);
+                        activenvp->GoToDVDProgram(1);
                         UpdateOSDSeekMessage(tr("Next Title"), 
                             osd_general_timeout);
                     }
@@ -2473,7 +2473,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
             }
         }
-        else if (action == "JUMPBKMRK" && !prbuffer->isDVD())
+        else if (action == "JUMPBKMRK" && !activerbuffer->isDVD())
         {
             int bookmark = activenvp->GetBookmark();
             if (bookmark > frameRate)
@@ -2555,7 +2555,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (StateIsPlaying(internalState) &&
                      gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
                      playbackinfo && playbackinfo->isVideo && 
-                     !prbuffer->InDVDMenuOrStillFrame())
+                     !activerbuffer->InDVDMenuOrStillFrame())
             {
                 nvp->Pause();
 
@@ -2704,7 +2704,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     if ((StateIsLiveTV(GetState()) || StateIsPlaying(internalState)) &&
-        (!prbuffer->InDVDMenuOrStillFrame()))
+        (!activerbuffer->InDVDMenuOrStillFrame()))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -2784,7 +2784,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             QString action = actions[i];
             handled = true;
 
-            if (action == "DELETE" && !prbuffer->isDVD())
+            if (action == "DELETE" && !activerbuffer->isDVD())
             {
                 NormalSpeed();
                 StopFFRew();
@@ -2795,20 +2795,20 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 wantsToQuit = true;
             }
             else if (action == "JUMPTODVDROOTMENU")
-                nvp->GoToDVDMenu("menu");
+                activenvp->GoToDVDMenu("menu");
             else if (action == "GUIDE")
                 EditSchedule(kScheduleProgramGuide);
             else if (action == "FINDER")
                 EditSchedule(kScheduleProgramFinder);
-            else if (action == "TOGGLEEDIT" && !prbuffer->isDVD())
+            else if (action == "TOGGLEEDIT" && !activerbuffer->isDVD())
                 StartProgramEditMode();
             else if (action == "TOGGLEBROWSE")
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
             {
-                if (prbuffer->isDVD() && !prbuffer->InDVDMenuOrStillFrame())
+                if (activerbuffer->isDVD() && !activerbuffer->InDVDMenuOrStillFrame())
                 {
-                    nvp->ChangeDVDTrack(0);
+                    activenvp->ChangeDVDTrack(0);
                     UpdateOSDSeekMessage(tr("Previous Chapter"),
                                          osd_general_timeout);
                 }
@@ -2819,9 +2819,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }    
             else if (action == "CHANNELDOWN")
             {
-                if (prbuffer->isDVD() && !prbuffer->InDVDMenuOrStillFrame())
+                if (activerbuffer->isDVD() && !activerbuffer->InDVDMenuOrStillFrame())
                 {
-                    nvp->ChangeDVDTrack(1);
+                    activenvp->ChangeDVDTrack(1);
                     UpdateOSDSeekMessage(tr("Next Chapter"),
                                          osd_general_timeout);
                 }
@@ -3296,7 +3296,7 @@ QString TV::PlayMesg()
 
 void TV::DoPause(void)
 {
-    if (prbuffer->InDVDMenuOrStillFrame())
+    if (activerbuffer->InDVDMenuOrStillFrame())
         return;
 
     speed_index = 0;
@@ -4307,7 +4307,7 @@ void TV::ToggleOSD(bool includeStatusOSD)
         return;
         
     // DVD toggles between status and nothing
-    if (prbuffer->isDVD())
+    if (activerbuffer->isDVD())
     {
         if (osd->IsSetDisplaying("status"))
             osd->HideAll();
@@ -6122,7 +6122,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     else if (StateIsPlaying(internalState))
     {
         if (action == "JUMPTODVDROOTMENU")
-            nvp->GoToDVDMenu("menu");
+            activenvp->GoToDVDMenu("menu");
         else if (action == "TOGGLEEDIT")
             StartProgramEditMode();
         else if (action == "TOGGLEAUTOEXPIRE")
@@ -6301,7 +6301,7 @@ void TV::BuildOSDTreeMenu(void)
         item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
                                   "PREVCHAN");
     }
-    else if (StateIsPlaying(internalState) && prbuffer->isDVD())
+    else if (StateIsPlaying(internalState) && activerbuffer->isDVD())
     {
         item = new OSDGenericTree(treeMenu,tr("DVD Root Menu"), "JUMPTODVDROOTMENU");
     }

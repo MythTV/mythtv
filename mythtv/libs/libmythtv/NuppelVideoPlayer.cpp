@@ -3367,6 +3367,8 @@ void NuppelVideoPlayer::StartPlaying(void)
         delete audioOutput;
     audioOutput = NULL;
 
+    if (ringBuffer->isDVD())
+        ringBuffer->DVD()->SetParent(NULL);
 /*
     if (!using_null_videoout)
     {

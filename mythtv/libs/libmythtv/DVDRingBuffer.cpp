@@ -659,8 +659,9 @@ bool DVDRingBufferPriv::DrawMenuButton(uint8_t *spu_pkt, int buf_size)
             dvdMenuButton.rects[0].y  = hl_starty - y1;
         else
             dvdMenuButton.rects[0].y = 0;
+        return true;
     }
-    return gotbutton;       
+    return false;       
 }
 
 bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
@@ -991,8 +992,7 @@ uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
 void DVDRingBufferPriv::ClearSubtitlesOSD(void)
 {
     if (parent && parent->GetOSD() &&
-            parent->IsPlaying() && parent->IsDecoderThreadAlive()
-            && parent->GetOSD()->IsSetDisplaying("subtitles"))
+        parent->GetOSD()->IsSetDisplaying("subtitles"))
     {
         parent->GetOSD()->HideSet("subtitles");
         parent->GetOSD()->ClearAll("subtitles");

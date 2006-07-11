@@ -800,9 +800,11 @@ void pullup_free_context(struct pullup_context *c)
 	do {
 		free(f->diffs);
 		free(f->comb);
+        free(f->var);
 		f = f->next;
 		free(f->prev);
 	} while (f != c->head);
+    free(c->frame->ifields);
 	free(c->frame);
 	free(c);
 }
