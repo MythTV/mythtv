@@ -66,6 +66,9 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
     if (it == inputs.end())
         return 0;
 
+    if (!chanid)
+        chanid = ChannelUtil::GetChanID((*it)->sourceid, curchannelname);
+
     return ChannelUtil::GetNextChannel((*it)->channels, chanid, direction);
 }
 
