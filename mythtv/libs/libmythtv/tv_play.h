@@ -464,8 +464,6 @@ class TV : public QObject
     mutable QString queuedChanNum;
     /// Queued ChanID (from EPG channel selector)
     uint            queuedChanID;
-    /// Used to strip unwanted characters from queuedChanNum
-    QRegExp         queuedChanNumExpr;
     /// Lock used so that input QStrings can be used across threads, and so
     /// that queuedChanNumExpr can be used safely in Qt 3.2 and earlier.
     mutable QMutex  queuedInputLock;

@@ -306,7 +306,6 @@ TV::TV(void)
       asInputMode(false), asInputModeExpires(QTime::currentTime()),
       // Channel changing state variables
       queuedChanNum(""),
-      queuedChanNumExpr(QRegExp("([1-9]|\\w)")),
       muteTimer(new QTimer(this)),
       lockTimerOn(false),
       // previous channel functionality state variables
@@ -335,8 +334,6 @@ TV::TV(void)
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL), embedWinID(0), embedBounds(0,0,0,0)
 {
-    queuedChanNumExpr.setMinimal(true); // we don't need greedy matching
-
     for (uint i = 0; i < 2; i++)
     {
         pseudoLiveTVRec[i]   = NULL;
@@ -3892,15 +3889,20 @@ QString TV::GetQueuedChanNum(void) const
 {
     QMutexLocker locker(&queuedInputLock);
 
-    // avoid regular expression if queue is empty.
-    if (!queuedChanNum.isEmpty())
+    if (queuedChanNum.isEmpty())
+        return "";
+
+    // strip initial zeros and other undesirable characters
+    uint i = 0;
+    for (; i < queuedChanNum.length(); i++)
     {
-        // strip initial zeros.
-        int nzi = queuedChanNum.find(queuedChanNumExpr);
-        if (nzi > 0)
-            queuedChanNum = queuedChanNum.right(queuedChanNum.length() - nzi);
-        queuedChanNum.stripWhiteSpace();
+        if ((queuedChanNum[i] > '0') && (queuedChanNum[i] <= '9'))
+            break;
     }
+    queuedChanNum = queuedChanNum.right(queuedChanNum.length() - i);
+
+    // strip whitespace at end of string
+    queuedChanNum.stripWhiteSpace();
 
     return QDeepCopy<QString>(queuedChanNum);
 }
