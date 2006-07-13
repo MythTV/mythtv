@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060713-1"
+VERSION="0.1.20060713-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -64,6 +64,8 @@ FILE   = 3
 
 dvdPAL=(720,576)
 dvdNTSC=(720,480)
+dvdPALdpi=(75,80)
+dvdNTSCdpi=(81,72)
 
 dvdPALHalfD1="352x576"
 dvdNTSCHalfD1="352x480"
@@ -1991,7 +1993,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
     node.setAttribute("y1","%d" % int(boundarybox[3] + 1))
     spunode.appendChild(node)   
 
-def createMenu(screensize, numberofitems):
+def createMenu(screensize, screendpi, numberofitems):
     """Creates all the necessary menu images and files for the MythBurn menus."""
 
     #Get the main menu node (we must only have 1)
@@ -2074,8 +2076,8 @@ def createMenu(screensize, numberofitems):
             itemnum+=1
 
         #Save this menu image and its mask
-        bgimage.save(os.path.join(getTempPath(),"background-%s.png" % page),"PNG",quality=99,optimize=0)
-        bgimagemask.save(os.path.join(getTempPath(),"backgroundmask-%s.png" % page),"PNG",quality=99,optimize=0)
+        bgimage.save(os.path.join(getTempPath(),"background-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
+        bgimagemask.save(os.path.join(getTempPath(),"backgroundmask-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
 
 ## Experimental!
 ##        for i in range(1,750):
@@ -2110,7 +2112,7 @@ def createMenu(screensize, numberofitems):
         #Move on to the next page
         page+=1
 
-def createChapterMenu(screensize, numberofitems):
+def createChapterMenu(screensize, screendpi, numberofitems):
     """Creates all the necessary menu images and files for the MythBurn menus."""
 
     #Get the main menu node (we must only have 1)
@@ -2189,9 +2191,9 @@ def createChapterMenu(screensize, numberofitems):
                         999, chapter, chapterlist)
 
         #Save this menu image and its mask
-        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.png" % page),"PNG",quality=99,optimize=0)
+        bgimage.save(os.path.join(getTempPath(),"chaptermenu-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
 
-        bgimagemask.save(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page),"PNG",quality=99,optimize=0)
+        bgimagemask.save(os.path.join(getTempPath(),"chaptermenumask-%s.png" % page),"PNG",quality=99,optimize=0,dpi=screendpi)
 
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("select",os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
         spumuxdom.documentElement.firstChild.firstChild.setAttribute("highlight",os.path.join(getTempPath(),"chaptermenumask-%s.png" % page))
@@ -2222,7 +2224,7 @@ def createChapterMenu(screensize, numberofitems):
         #Move on to the next page
         page+=1
 
-def createDetailsPage(screensize, numberofitems):
+def createDetailsPage(screensize, screendpi, numberofitems):
     """Creates all the necessary images and files for the details page."""
 
     write( "Creating details pages")
@@ -2271,7 +2273,7 @@ def createDetailsPage(screensize, numberofitems):
                       "", spumuxdom, spunode, numberofitems, 0, "")
 
         #Save this details image
-        bgimage.save(os.path.join(getTempPath(),"details-%s.png" % itemnum),"PNG",quality=99,optimize=0)
+        bgimage.save(os.path.join(getTempPath(),"details-%s.png" % itemnum),"PNG",quality=99,optimize=0,dpi=screendpi)
 
         #Release large amounts of memory ASAP !
         del draw
@@ -2833,8 +2835,10 @@ def processJob(job):
 
         if videomode=="ntsc":
             format=dvdNTSC
+            dpi=dvdNTSCdpi
         elif videomode=="pal":
             format=dvdPAL
+            dpi=dvdPALdpi
         else:
             fatalError("Unknown videomode is set (%s)" % videomode)
 
@@ -2902,15 +2906,15 @@ def processJob(job):
             #for the chapter marks and thumbnails.
             #create the DVD menus...
             if wantMainMenu:
-                createMenu(format, files.length)
+                createMenu(format, dpi, files.length)
 
             #Submenus are visible when you select the chapter menu while the recording is playing
             if wantChapterMenu:
-                createChapterMenu(format, files.length)
+                createChapterMenu(format, dpi, files.length)
 
             #Details Page are displayed just before playing each recording
             if wantDetailsPage:
-                createDetailsPage(format, files.length)
+                createDetailsPage(format, dpi, files.length)
 
             #DVD Author file
             if not wantMainMenu and not wantChapterMenu:
