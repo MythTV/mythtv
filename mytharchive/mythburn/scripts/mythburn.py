@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060629-1"
+VERSION="0.1.20060713-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1072,6 +1072,7 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     """Use mythtrancode to cut commercials and/or clean up an mpeg2 file"""
 
     if localfile != "":
+        localfile = quoteFilename(localfile)
         if usecutlist == True:
             command = "mythtranscode --mpeg2 --honorcutlist -i %s -o %s" % (localfile, destination)
         else:
