@@ -2525,8 +2525,8 @@ echo "Big Endian       $bigendian"
 #echo "broken inttypes.h $emu_fast_int"
 if test $cpu = "x86" -o $cpu = "x86_64"; then
     echo "MMX enabled      $mmx"
-    echo "Vector Builtins  $builtin_vector"
-    echo "3DNow! Builtins  $mm3dnow"
+#    echo "Vector Builtins  $builtin_vector"
+#    echo "3DNow! Builtins  $mm3dnow"
 fi
 if test $cpu = "armv4l"; then
     echo "IWMMXT enabled   $iwmmxt"
@@ -2765,14 +2765,14 @@ if test "$mmx" = "yes" ; then
   echo "#define HAVE_MMX 1" >> $TMPH
   echo "#define __CPU__ 586" >> $TMPH
 fi
-if test "$builtin_vector" = "yes" ; then
-  echo "TARGET_BUILTIN_VECTOR=yes" >> $MYTH_CONFIG_MAK
-  echo "#define HAVE_BUILTIN_VECTOR 1" >> $TMPH
-fi
-if test "$mm3dnow" = "yes" ; then
-  echo "TARGET_BUILTIN_3DNOW=yes" >> $MYTH_CONFIG_MAK
-  echo "#define HAVE_MM3DNOW 1" >> $TMPH
-fi
+#if test "$builtin_vector" = "yes" ; then
+#  echo "TARGET_BUILTIN_VECTOR=yes" >> $MYTH_CONFIG_MAK
+#  echo "#define HAVE_BUILTIN_VECTOR 1" >> $TMPH
+#fi
+#if test "$mm3dnow" = "yes" ; then
+#  echo "TARGET_BUILTIN_3DNOW=yes" >> $MYTH_CONFIG_MAK
+#  echo "#define HAVE_MM3DNOW 1" >> $TMPH
+#fi
 if test "$cpuclipspositive" = "yes"; then
   echo "#define CPU_CLIPS_POSITIVE 1" >> $TMPH
 else
