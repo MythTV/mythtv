@@ -1146,6 +1146,8 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             if (pkt->stream_index == vid_id ||
                     aFrame.contains(pkt->stream_index))
                 done = 1;
+            else 
+                av_free_packet(pkt);
         }
         pkt->duration = framenum++;
         if (showprogress && QDateTime::currentDateTime() > statustime)
@@ -1188,6 +1190,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
             default:
                 framePool.enqueue(tmpFrame);
+                av_free_packet(pkt);
                 return -1;
         }
     }
@@ -2411,6 +2414,7 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
                 posMap[count] = pkt.pos;
             count++;
         }
+        av_free_packet(&pkt);
     }
 
     // Close input file
