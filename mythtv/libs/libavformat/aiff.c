@@ -17,7 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "avi.h"
+#include "allformats.h"
+#include "riff.h"
 #include "intfloat_readwrite.h"
 
 const CodecTag codec_aiff_tags[] = {
@@ -110,7 +111,7 @@ static int fix_bps(int codec_id)
 }
 
 /* Returns the number of sound data frames or negative on error */
-unsigned int get_aiff_header(ByteIOContext *pb, AVCodecContext *codec,
+static unsigned int get_aiff_header(ByteIOContext *pb, AVCodecContext *codec,
                              int size, unsigned version)
 {
     AVExtFloat ext;
@@ -220,10 +221,10 @@ static int aiff_write_header(AVFormatContext *s)
     put_le32(pb, enc->codec_tag);
     if (coder_len & 1) {
         put_byte(pb, coder_len);
-        put_buffer(pb, (uint8_t*)enc->codec->name, coder_len);
+        put_buffer(pb, (const uint8_t*)enc->codec->name, coder_len);
     } else {
         put_byte(pb, coder_len+1);
-        put_buffer(pb, (uint8_t*)enc->codec->name, coder_len);
+        put_buffer(pb, (const uint8_t*)enc->codec->name, coder_len);
         put_byte(pb, 0);
     }
 
@@ -427,8 +428,8 @@ static int aiff_read_seek(AVFormatContext *s,
     return pcm_read_seek(s, stream_index, timestamp, flags);
 }
 
-
-static AVInputFormat aiff_iformat = {
+#ifdef CONFIG_AIFF_DEMUXER
+AVInputFormat aiff_demuxer = {
     "aiff",
     "Audio IFF",
     0,
@@ -438,9 +439,10 @@ static AVInputFormat aiff_iformat = {
     aiff_read_close,
     aiff_read_seek,
 };
+#endif
 
-#ifdef CONFIG_MUXERS
-static AVOutputFormat aiff_oformat = {
+#ifdef CONFIG_AIFF_MUXER
+AVOutputFormat aiff_muxer = {
     "aiff",
     "Audio IFF",
     "audio/aiff",
@@ -452,14 +454,4 @@ static AVOutputFormat aiff_oformat = {
     aiff_write_packet,
     aiff_write_trailer,
 };
-#endif //CONFIG_MUXERS
-
-int ff_aiff_init(void)
-{
-    av_register_input_format(&aiff_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&aiff_oformat);
-#endif //CONFIG_MUXERS
-    return 0;
-}
-
+#endif

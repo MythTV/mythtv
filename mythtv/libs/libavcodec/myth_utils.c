@@ -109,7 +109,7 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_FFVHUFF:          return "FFVHUFF";
         case CODEC_ID_RV30:             return "RV30";
         case CODEC_ID_RV40:             return "RV40";
-        case CODEC_ID_VC9:              return "VC9";
+        case CODEC_ID_VC1:              return "VC1";
         case CODEC_ID_WMV3:             return "WMV3";
         case CODEC_ID_LOCO:             return "LOCO";
         case CODEC_ID_WNV1:             return "WNV1";

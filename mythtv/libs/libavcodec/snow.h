@@ -35,6 +35,10 @@
 #define LOG2_OBMC_MAX 8
 #define OBMC_MAX (1<<(LOG2_OBMC_MAX))
 
+#define DWT_97 0
+#define DWT_53 1
+#define DWT_X  2
+
 /** Used to minimize the amount of memory used in order to optimize cache performance. **/
 struct slice_buffer_s {
     DWTELEM * * line; ///< For use by idwt and predict_slices.
@@ -120,6 +124,9 @@ struct slice_buffer_s {
 extern void ff_snow_vertical_compose97i(DWTELEM *b0, DWTELEM *b1, DWTELEM *b2, DWTELEM *b3, DWTELEM *b4, DWTELEM *b5, int width);
 extern void ff_snow_horizontal_compose97i(DWTELEM *b, int width);
 extern void ff_snow_inner_add_yblock(uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h, int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
+
+int w53_32_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h);
+int w97_32_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h);
 
 
 /* C bits used by mmx/sse2/altivec */

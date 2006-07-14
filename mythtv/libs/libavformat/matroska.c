@@ -28,7 +28,7 @@
 
 #include "avformat.h"
 /* For codec_get_bmp_id and codec_get_wav_id. */
-#include "avi.h"
+#include "riff.h"
 #include "intfloat_readwrite.h"
 
 /* EBML version supported */
@@ -183,14 +183,14 @@ typedef enum {
  */
 
 typedef struct CodecTags{
-    char *str;
+    const char *str;
     enum CodecID id;
 }CodecTags;
 
 #define MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC   "V_MS/VFW/FOURCC"
 #define MATROSKA_CODEC_ID_AUDIO_ACM          "A_MS/ACM"
 
-CodecTags codec_tags[]={
+static CodecTags codec_tags[]={
 //    {"V_MS/VFW/FOURCC"  , CODEC_ID_NONE},
     {"V_UNCOMPRESSED"   , CODEC_ID_RAWVIDEO},
     {"V_MPEG4/ISO/SP"   , CODEC_ID_MPEG4},
@@ -2630,16 +2630,12 @@ matroska_read_close (AVFormatContext *s)
         av_free(track);
     }
 
-    for (n = 0; n < s->nb_streams; n++) {
-        av_free(s->streams[n]->codec->extradata);
-    }
-
     memset(matroska, 0, sizeof(MatroskaDemuxContext));
 
     return 0;
 }
 
-static AVInputFormat matroska_iformat = {
+AVInputFormat matroska_demuxer = {
     "matroska",
     "Matroska file format",
     sizeof(MatroskaDemuxContext),
@@ -2648,10 +2644,3 @@ static AVInputFormat matroska_iformat = {
     matroska_read_packet,
     matroska_read_close,
 };
-
-int
-matroska_init(void)
-{
-    av_register_input_format(&matroska_iformat);
-    return 0;
-}

@@ -137,7 +137,7 @@ static int ogg_write_trailer(AVFormatContext *avfcontext) {
 }
 
 
-static AVOutputFormat ogg_oformat = {
+AVOutputFormat ogg_muxer = {
     "ogg",
     "Ogg Vorbis",
     "audio/x-vorbis",
@@ -249,7 +249,6 @@ static int ogg_read_close(AVFormatContext *avfcontext) {
 
     ogg_stream_clear(&context->os) ;
     ogg_sync_clear(&context->oy) ;
-    av_freep(&avfcontext->streams[0]->codec.extradata);
 
     return 0 ;
 }
@@ -266,11 +265,3 @@ static AVInputFormat ogg_iformat = {
     .extensions = "ogg",
 } ;
 #endif
-
-int libogg_init(void) {
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&ogg_oformat) ;
-#endif
-/*     av_register_input_format(&ogg_iformat); */
-    return 0 ;
-}

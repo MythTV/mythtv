@@ -43,7 +43,7 @@ static int daud_packet(AVFormatContext *s, AVPacket *pkt) {
     return ret;
 }
 
-static AVInputFormat daud_iformat = {
+AVInputFormat daud_demuxer = {
     "daud",
     "D-Cinema audio format",
     0,
@@ -54,10 +54,3 @@ static AVInputFormat daud_iformat = {
     NULL,
     .extensions = "302",
 };
-
-int daud_init(void)
-{
-    av_register_input_format(&daud_iformat);
-    return 0;
-}
-

@@ -319,7 +319,7 @@ static int vmd_read_close(AVFormatContext *s)
     return 0;
 }
 
-static AVInputFormat vmd_iformat = {
+AVInputFormat vmd_demuxer = {
     "vmd",
     "Sierra VMD format",
     sizeof(VmdDemuxContext),
@@ -328,9 +328,3 @@ static AVInputFormat vmd_iformat = {
     vmd_read_packet,
     vmd_read_close,
 };
-
-int vmd_init(void)
-{
-    av_register_input_format(&vmd_iformat);
-    return 0;
-}

@@ -27,7 +27,7 @@ SOURCES += jfdctfst.c jfdctint.c mpegaudio.c ac3enc.c mjpeg.c audresample.c
 SOURCES += resample2.c dsputil.c motion_est.c imgconvert.c imgresample.c
 SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c
 SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
-SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c 
+SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c bitstream_filter.c
 SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
 SOURCES += dvbsub.c dvbsubdec.c dvdsubenc.c opt.c lzo.c myth_utils.c
 
@@ -54,6 +54,10 @@ contains( DO_ASV1, yes ) {
 
 contains( CONFIG_AVS_DECODER, yes ) {
     SOURCES += avs.c
+}
+
+contains( CONFIG_CAVS_DECODER, yes ) {
+    SOURCES += cavs.c cavsdsp.c
 }
 
 contains( CONFIG_CINEPAK_DECODER, yes ) {
@@ -89,6 +93,14 @@ contains( DO_FFV1, yes ) {
 
 contains( CONFIG_FLAC_DECODER, yes ) {
     SOURCES += flac.c
+}
+
+contains( CONFIG_FLAC_ENCODER, yes ) {
+    SOURCES += flacenc.c
+}
+
+contains( CONFIG_FLASHSV_DECODER, yes ) {
+    SOURCES += flashsv.c
 }
 
 contains( CONFIG_FLIC_DECODER, yes ) {
@@ -262,9 +274,9 @@ contains( CONFIG_ULTI_DECODER, yes ) {
     SOURCES += ulti.c
 }
 
-DO_VC9 = $$CONFIG_VC9_DECODER $$CONFIG_WMV3_DECODER 
-contains( DO_VC9, yes ) {
-    SOURCES += vc9.c
+DO_VC1 = $$CONFIG_VC1_DECODER $$CONFIG_WMV3_DECODER 
+contains( DO_VC1, yes ) {
+    SOURCES += vc1.c
 }
 
 DO_VCR1 = $$CONFIG_VCR1_DECODER $$CONFIG_VCR1_ENCODER

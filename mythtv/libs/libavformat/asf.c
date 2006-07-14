@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "avi.h"
+#include "riff.h"
 #include "mpegaudio.h"
 #include "asf.h"
 
@@ -730,7 +730,6 @@ static int asf_read_close(AVFormatContext *s)
     for(i=0;i<s->nb_streams;i++) {
         AVStream *st = s->streams[i];
         av_free(st->priv_data);
-        av_free(st->codec->extradata);
     av_free(st->codec->palctrl);
     }
     return 0;
@@ -841,7 +840,7 @@ static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int 
     return 0;
 }
 
-static AVInputFormat asf_iformat = {
+AVInputFormat asf_demuxer = {
     "asf",
     "asf format",
     sizeof(ASFContext),
@@ -852,18 +851,3 @@ static AVInputFormat asf_iformat = {
     asf_read_seek,
     asf_read_pts,
 };
-
-#ifdef CONFIG_MUXERS
-    extern AVOutputFormat asf_oformat;
-    extern AVOutputFormat asf_stream_oformat;
-#endif //CONFIG_MUXERS
-
-int asf_init(void)
-{
-    av_register_input_format(&asf_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&asf_oformat);
-    av_register_output_format(&asf_stream_oformat);
-#endif //CONFIG_MUXERS
-    return 0;
-}

@@ -278,7 +278,7 @@ static int roq_read_close(AVFormatContext *s)
     return 0;
 }
 
-static AVInputFormat roq_iformat = {
+AVInputFormat roq_demuxer = {
     "RoQ",
     "Id RoQ format",
     sizeof(RoqDemuxContext),
@@ -287,9 +287,3 @@ static AVInputFormat roq_iformat = {
     roq_read_packet,
     roq_read_close,
 };
-
-int roq_init(void)
-{
-    av_register_input_format(&roq_iformat);
-    return 0;
-}

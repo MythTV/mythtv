@@ -19,9 +19,6 @@
  */
 #include "avformat.h"
 
-/* XXX: this is a hack */
-extern int loop_input;
-
 typedef struct {
     int img_first;
     int img_last;
@@ -236,7 +233,7 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
 
     if (!s->is_pipe) {
         /* loop over input */
-        if (loop_input && s->img_number > s->img_last) {
+        if (s1->loop_input && s->img_number > s->img_last) {
             s->img_number = s->img_first;
         }
         if (get_frame_filename(filename, sizeof(filename),
@@ -364,8 +361,8 @@ static int img_write_trailer(AVFormatContext *s)
 #endif /* CONFIG_MUXERS */
 
 /* input */
-
-static AVInputFormat image2_iformat = {
+#ifdef CONFIG_IMAGE2_DEMUXER
+AVInputFormat image2_demuxer = {
     "image2",
     "image2 sequence",
     sizeof(VideoData),
@@ -377,8 +374,9 @@ static AVInputFormat image2_iformat = {
     NULL,
     AVFMT_NOFILE,
 };
-
-static AVInputFormat image2pipe_iformat = {
+#endif
+#ifdef CONFIG_IMAGE2PIPE_DEMUXER
+AVInputFormat image2pipe_demuxer = {
     "image2pipe",
     "piped image2 sequence",
     sizeof(VideoData),
@@ -388,12 +386,11 @@ static AVInputFormat image2pipe_iformat = {
     img_read_close,
     NULL,
 };
+#endif
 
-
-#ifdef CONFIG_MUXERS
 /* output */
-
-static AVOutputFormat image2_oformat = {
+#ifdef CONFIG_IMAGE2_MUXER
+AVOutputFormat image2_muxer = {
     "image2",
     "image2 sequence",
     "",
@@ -406,8 +403,9 @@ static AVOutputFormat image2_oformat = {
     img_write_trailer,
     AVFMT_NOFILE,
 };
-
-static AVOutputFormat image2pipe_oformat = {
+#endif
+#ifdef CONFIG_IMAGE2PIPE_MUXER
+AVOutputFormat image2pipe_muxer = {
     "image2pipe",
     "piped image2 sequence",
     "",
@@ -419,17 +417,4 @@ static AVOutputFormat image2pipe_oformat = {
     img_write_packet,
     img_write_trailer,
 };
-#endif /* CONFIG_MUXERS */
-
-int img2_init(void)
-{
-    av_register_input_format(&image2_iformat);
-    av_register_input_format(&image2pipe_iformat);
-
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&image2_oformat);
-    av_register_output_format(&image2pipe_oformat);
 #endif
-
-    return 0;
-}

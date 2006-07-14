@@ -22,7 +22,6 @@
 
 /* write DVB SI sections */
 
-#ifdef CONFIG_MUXERS
 /*********************************************/
 /* mpegts section writer */
 
@@ -34,7 +33,7 @@ typedef struct MpegTSSection {
 } MpegTSSection;
 
 /* NOTE: 4 bytes must be left at the end for the crc32 */
-void mpegts_write_section(MpegTSSection *s, uint8_t *buf, int len)
+static void mpegts_write_section(MpegTSSection *s, uint8_t *buf, int len)
 {
     unsigned int crc;
     unsigned char packet[TS_PACKET_SIZE];
@@ -89,7 +88,7 @@ static inline void put16(uint8_t **q_ptr, int val)
     *q_ptr = q;
 }
 
-int mpegts_write_section1(MpegTSSection *s, int tid, int id,
+static int mpegts_write_section1(MpegTSSection *s, int tid, int id,
                           int version, int sec_num, int last_sec_num,
                           uint8_t *buf, int len)
 {
@@ -661,7 +660,7 @@ static int mpegts_write_end(AVFormatContext *s)
     return 0;
 }
 
-AVOutputFormat mpegts_mux = {
+AVOutputFormat mpegts_muxer = {
     "mpegts",
     "MPEG2 transport stream format",
     "video/x-mpegts",
@@ -673,4 +672,3 @@ AVOutputFormat mpegts_mux = {
     mpegts_write_packet,
     mpegts_write_end,
 };
-#endif // CONFIG_MUXERS

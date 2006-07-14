@@ -5,34 +5,6 @@
 #ifndef AVCODEC_I386MMX_H
 #define AVCODEC_I386MMX_H
 
-#ifdef ARCH_X86_64
-#  define REGa  rax
-#  define REGc  rcx
-#  define REGd  rdx
-#  define REG_a "rax"
-#  define REG_b "rbx"
-#  define REG_c "rcx"
-#  define REG_d "rdx"
-#  define REG_D "rdi"
-#  define REG_S "rsi"
-#  define REG_SP "rsp"
-#  define ALIGN_MASK "$0xFFFFFFFFFFFFFFF8"
-#  define PTR_SIZE "8"
-#else
-#  define REGa  eax
-#  define REGc  ecx
-#  define REGd  edx
-#  define REG_a "eax"
-#  define REG_b "ebx"
-#  define REG_c "ecx"
-#  define REG_d "edx"
-#  define REG_D "edi"
-#  define REG_S "esi"
-#  define REG_SP "esp"
-#  define ALIGN_MASK "$0xFFFFFFF8"
-#  define PTR_SIZE "4"
-#endif
-
 /*
  * The type of an value that fits in an MMX register (note that long
  * long constant values MUST be suffixed by LL and unsigned long long

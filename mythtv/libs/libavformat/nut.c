@@ -33,7 +33,8 @@
 #include <limits.h>
 #include "avformat.h"
 #include "mpegaudio.h"
-#include "avi.h"
+#include "riff.h"
+#include "adler32.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -330,7 +331,7 @@ static int get_packetheader(NUTContext *nut, ByteIOContext *bc, int calculate_ch
 
     size= get_v(bc);
 
-    init_checksum(bc, calculate_checksum ? update_adler32 : NULL, 0);
+    init_checksum(bc, calculate_checksum ? av_adler32_update : NULL, 0);
 
     nut->packet_start[2] = start;
     nut->written_packet_size= size;
@@ -475,7 +476,7 @@ static int put_packetheader(NUTContext *nut, ByteIOContext *bc, int max_size, in
     put_v(bc, nut->written_packet_size); /* forward ptr */
 
     if(calculate_checksum)
-        init_checksum(bc, update_adler32, 0);
+        init_checksum(bc, av_adler32_update, 0);
 
     return 0;
 }
@@ -1413,17 +1414,14 @@ static int nut_read_seek(AVFormatContext *s, int stream_index, int64_t target_ts
 static int nut_read_close(AVFormatContext *s)
 {
     NUTContext *nut = s->priv_data;
-    int i;
 
-    for(i=0;i<s->nb_streams;i++) {
-        av_freep(&s->streams[i]->codec->extradata);
-    }
     av_freep(&nut->stream);
 
     return 0;
 }
 
-static AVInputFormat nut_iformat = {
+#ifdef CONFIG_NUT_DEMUXER
+AVInputFormat nut_demuxer = {
     "nut",
     "nut format",
     sizeof(NUTContext),
@@ -1435,9 +1433,9 @@ static AVInputFormat nut_iformat = {
     nut_read_timestamp,
     .extensions = "nut",
 };
-
-#ifdef CONFIG_MUXERS
-static AVOutputFormat nut_oformat = {
+#endif
+#ifdef CONFIG_NUT_MUXER
+AVOutputFormat nut_muxer = {
     "nut",
     "nut format",
     "video/x-nut",
@@ -1456,13 +1454,4 @@ static AVOutputFormat nut_oformat = {
     nut_write_trailer,
     .flags = AVFMT_GLOBALHEADER,
 };
-#endif //CONFIG_MUXERS
-
-int nut_init(void)
-{
-    av_register_input_format(&nut_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&nut_oformat);
-#endif //CONFIG_MUXERS
-    return 0;
-}
+#endif

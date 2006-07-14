@@ -67,7 +67,7 @@ typedef struct
 } dvb_caption_info_t;
 
 static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
-                             uint8_t **p, uint8_t *p_end);
+                             uint8_t **p, uint8_t *p_end, int *stream_type);
 
 typedef struct
 {
@@ -632,7 +632,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         dvb_caption_info_t dvbci;
         int stream_type = get8(&p, p_end);
         int pid = get16(&p, p_end);
-        int desc_ok = mpegts_parse_desc(&dvbci, &p, p_end);
+        int desc_ok = mpegts_parse_desc(&dvbci, &p, p_end, &stream_type);
         if ((stream_type < 0) || (pid < 0) || (desc_ok < 0))
         {
             av_log(NULL, AV_LOG_ERROR,
@@ -868,7 +868,7 @@ static int is_desired_stream(int stream_type)
 }
 
 static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
-                             uint8_t **p, uint8_t *p_end)
+                             uint8_t **p, uint8_t *p_end, int *stream_type)
 {
     const uint8_t *desc_list_end, *desc_end;
     int desc_list_len, desc_len, desc_tag;
@@ -888,6 +888,15 @@ static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
         desc_tag = get8(p, desc_list_end);
         if (desc_tag < 0)
             break;
+        if (*stream_type == STREAM_TYPE_PRIVATE_DATA) {
+            if((desc_tag == 0x6A) || (desc_tag == 0x7A)) {
+                /*assume DVB AC-3 Audio*/
+                *stream_type = STREAM_TYPE_AUDIO_AC3;
+            } else if(desc_tag == 0x7B) {
+                /* DVB DTS audio */
+                *stream_type = STREAM_TYPE_AUDIO_DTS;
+            }
+        }
         desc_len = get8(p, desc_list_end);
         desc_end = *p + desc_len;
         if (desc_end > desc_list_end)
@@ -2303,7 +2312,7 @@ void mpegts_parse_close(MpegTSContext *ts)
     av_free(ts);
 }
 
-AVInputFormat mpegts_demux = {
+AVInputFormat mpegts_demuxer = {
     "mpegts",
     "MPEG2 transport stream format",
     sizeof(MpegTSContext),
@@ -2315,12 +2324,3 @@ AVInputFormat mpegts_demux = {
     mpegts_get_pcr,
     .flags = AVFMT_SHOW_IDS,
 };
-
-int mpegts_init(void)
-{
-    av_register_input_format(&mpegts_demux);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&mpegts_mux);
-#endif
-    return 0;
-}

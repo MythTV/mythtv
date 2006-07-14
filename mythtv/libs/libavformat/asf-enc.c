@@ -17,13 +17,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "avi.h"
+#include "riff.h"
 #include "asf.h"
 
 #undef NDEBUG
 #include <assert.h>
-
-#ifdef CONFIG_MUXERS
 
 
 #define ASF_INDEXED_INTERVAL    10000000
@@ -349,7 +347,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
     /* stream headers */
     for(n=0;n<s->nb_streams;n++) {
         int64_t es_pos;
-        uint8_t *er_spr = NULL;
+        const uint8_t *er_spr = NULL;
         int er_spr_len = 0;
         //        ASFStream *stream = &asf->streams[n];
 
@@ -360,7 +358,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
 
         if (enc->codec_type == CODEC_TYPE_AUDIO) {
             if (enc->codec_id == CODEC_ID_ADPCM_G726) {
-                er_spr     = (uint8_t *)error_spread_ADPCM_G726;
+                er_spr     = error_spread_ADPCM_G726;
                 er_spr_len = sizeof(error_spread_ADPCM_G726);
             }
         }
@@ -823,7 +821,8 @@ static int asf_write_trailer(AVFormatContext *s)
     return 0;
 }
 
-AVOutputFormat asf_oformat = {
+#ifdef CONFIG_ASF_MUXER
+AVOutputFormat asf_muxer = {
     "asf",
     "asf format",
     "video/x-ms-asf",
@@ -840,8 +839,10 @@ AVOutputFormat asf_oformat = {
     asf_write_trailer,
     .flags = AVFMT_GLOBALHEADER,
 };
+#endif
 
-AVOutputFormat asf_stream_oformat = {
+#ifdef CONFIG_ASF_STREAM_MUXER
+AVOutputFormat asf_stream_muxer = {
     "asf_stream",
     "asf format",
     "video/x-ms-asf",
@@ -858,4 +859,4 @@ AVOutputFormat asf_stream_oformat = {
     asf_write_trailer,
     .flags = AVFMT_GLOBALHEADER,
 };
-#endif //CONFIG_MUXERS
+#endif //CONFIG_ASF_STREAM_MUXER

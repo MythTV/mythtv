@@ -60,7 +60,7 @@ extern "C" {
 #define STREAM_TYPE_SUBTITLE_DVB    0x100
 #define STREAM_TYPE_VBI_DVB         0x101
 
-extern AVOutputFormat mpegts_mux;
+extern AVOutputFormat mpegts_muxer;
 
 typedef struct MpegTSContext MpegTSContext;
 

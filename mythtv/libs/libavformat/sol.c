@@ -22,7 +22,8 @@
  */
 
 #include "avformat.h"
-#include "avi.h"
+#include "allformats.h"
+#include "riff.h"
 #include "bswap.h"
 
 /* if we don't know the size in advance */
@@ -145,7 +146,7 @@ static int sol_read_close(AVFormatContext *s)
     return 0;
 }
 
-static AVInputFormat sol_iformat = {
+AVInputFormat sol_demuxer = {
     "sol",
     "Sierra SOL Format",
     0,
@@ -155,9 +156,3 @@ static AVInputFormat sol_iformat = {
     sol_read_close,
     pcm_read_seek,
 };
-
-int sol_init(void)
-{
-    av_register_input_format(&sol_iformat);
-    return 0;
-}

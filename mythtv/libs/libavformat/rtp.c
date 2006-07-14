@@ -218,7 +218,7 @@ int rtp_get_codec_info(AVCodecContext *codec, int payload_type)
 {
     if (AVRtpPayloadTypes[payload_type].codec_id != CODEC_ID_NONE) {
         codec->codec_type = AVRtpPayloadTypes[payload_type].codec_type;
-        codec->codec_id = AVRtpPayloadTypes[payload_type].codec_type;
+        codec->codec_id = AVRtpPayloadTypes[payload_type].codec_id;
         if (AVRtpPayloadTypes[payload_type].audio_channels > 0)
             codec->channels = AVRtpPayloadTypes[payload_type].audio_channels;
         if (AVRtpPayloadTypes[payload_type].clock_rate > 0)
@@ -860,7 +860,7 @@ static int rtp_write_trailer(AVFormatContext *s1)
     return 0;
 }
 
-AVOutputFormat rtp_mux = {
+AVOutputFormat rtp_muxer = {
     "rtp",
     "RTP output format",
     NULL,
@@ -872,9 +872,3 @@ AVOutputFormat rtp_mux = {
     rtp_write_packet,
     rtp_write_trailer,
 };
-
-int rtp_init(void)
-{
-    av_register_output_format(&rtp_mux);
-    return 0;
-}

@@ -27,15 +27,13 @@ struct frame_attributes {
     int top_field_first;
 };
 
-#ifdef CONFIG_MUXERS
-
 static int yuv4_generate_header(AVFormatContext *s, char* buf)
 {
     AVStream *st;
     int width, height;
     int raten, rated, aspectn, aspectd, n;
     char inter;
-    char *colorspace = "";
+    const char *colorspace = "";
 
     st = s->streams[0];
     width = st->codec->width;
@@ -171,7 +169,8 @@ static int yuv4_write_trailer(AVFormatContext *s)
     return 0;
 }
 
-AVOutputFormat yuv4mpegpipe_oformat = {
+#ifdef CONFIG_YUV4MPEGPIPE_MUXER
+AVOutputFormat yuv4mpegpipe_muxer = {
     "yuv4mpegpipe",
     "YUV4MPEG pipe format",
     "",
@@ -184,7 +183,7 @@ AVOutputFormat yuv4mpegpipe_oformat = {
     yuv4_write_trailer,
     .flags = AVFMT_RAWPICTURE,
 };
-#endif //CONFIG_MUXERS
+#endif
 
 /* Header size increased to allow room for optional flags */
 #define MAX_YUV4_HEADER 80
@@ -393,7 +392,8 @@ static int yuv4_probe(AVProbeData *pd)
         return 0;
 }
 
-AVInputFormat yuv4mpegpipe_iformat = {
+#ifdef CONFIG_YUV4MPEGPIPE_DEMUXER
+AVInputFormat yuv4mpegpipe_demuxer = {
     "yuv4mpegpipe",
     "YUV4MPEG pipe format",
     sizeof(struct frame_attributes),
@@ -403,13 +403,4 @@ AVInputFormat yuv4mpegpipe_iformat = {
     yuv4_read_close,
     .extensions = "y4m"
 };
-
-int yuv4mpeg_init(void)
-{
-    av_register_input_format(&yuv4mpegpipe_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&yuv4mpegpipe_oformat);
-#endif //CONFIG_MUXERS
-    return 0;
-}
-
+#endif

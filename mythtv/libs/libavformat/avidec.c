@@ -19,6 +19,7 @@
 #include "avformat.h"
 #include "avi.h"
 #include "dv.h"
+#include "riff.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -137,10 +138,12 @@ static int read_braindead_odml_indx(AVFormatContext *s, int frame_num){
                 ast->cum_len ++;
             last_pos= pos;
         }else{
-            int64_t offset= get_le64(pb);
-            int size      = get_le32(pb);
-            int duration  = get_le32(pb);
-            int64_t pos= url_ftell(pb);
+            int64_t offset, pos;
+            int duration;
+            offset = get_le64(pb);
+            get_le32(pb);       /* size */
+            duration = get_le32(pb);
+            pos = url_ftell(pb);
 
             url_fseek(pb, offset+8, SEEK_SET);
             read_braindead_odml_indx(s, frame_num);
@@ -186,7 +189,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
     unsigned int size, nb_frames;
     int i, n;
     AVStream *st;
-    AVIStream *ast;
+    AVIStream *ast = NULL;
     int xan_video = 0;  /* hack to support Xan A/V */
 
     avi->stream_index= -1;
@@ -429,8 +432,10 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
             break;
         case MKTAG('i', 'n', 'd', 'x'):
             i= url_ftell(pb);
-            read_braindead_odml_indx(s, 0);
-            avi->index_loaded=1;
+            if(!url_is_streamed(pb)){
+                read_braindead_odml_indx(s, 0);
+                avi->index_loaded=1;
+            }
             url_fseek(pb, i+size, SEEK_SET);
             break;
         default:
@@ -451,7 +456,7 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
         return -1;
     }
 
-    if(!avi->index_loaded)
+    if(!avi->index_loaded && !url_is_streamed(pb))
         avi_load_index(s);
     avi->index_loaded = 1;
     avi->non_interleaved |= guess_ni_flag(s);
@@ -897,7 +902,6 @@ static int avi_read_close(AVFormatContext *s)
         AVStream *st = s->streams[i];
         AVIStream *ast = st->priv_data;
         av_free(ast);
-        av_free(st->codec->extradata);
         av_free(st->codec->palctrl);
     }
 
@@ -921,7 +925,7 @@ static int avi_probe(AVProbeData *p)
         return 0;
 }
 
-static AVInputFormat avi_iformat = {
+AVInputFormat avi_demuxer = {
     "avi",
     "avi format",
     sizeof(AVIContext),
@@ -931,9 +935,3 @@ static AVInputFormat avi_iformat = {
     avi_read_close,
     avi_read_seek,
 };
-
-int avidec_init(void)
-{
-    av_register_input_format(&avi_iformat);
-    return 0;
-}

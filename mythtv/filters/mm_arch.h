@@ -5,7 +5,7 @@
 #endif
 
 #ifdef MMX
-  #include "i386/mmx.h"
+  #include "x86_cpu.h"
 #else
   #define emms()    ;
 

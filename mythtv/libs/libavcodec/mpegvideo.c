@@ -1123,8 +1123,8 @@ int MPV_encode_init(AVCodecContext *avctx)
     }
 
     if(avctx->b_frame_strategy && (avctx->flags&CODEC_FLAG_PASS2)){
-        av_log(avctx, AV_LOG_ERROR, "b_frame_strategy must be 0 on the second pass\n");
-        return -1;
+        av_log(avctx, AV_LOG_INFO, "notice: b_frame_strategy only affects the first pass\n");
+        avctx->b_frame_strategy = 0;
     }
 
     i= ff_gcd(avctx->time_base.den, avctx->time_base.num);
@@ -1370,10 +1370,6 @@ int MPV_encode_init(AVCodecContext *avctx)
 int MPV_encode_end(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
-
-#ifdef STATS
-    print_stats();
-#endif
 
     ff_rate_control_uninit(s);
 
@@ -2379,7 +2375,7 @@ static void select_input_picture(MpegEncContext *s){
                     }
                 }
                 for(i=0; i<s->max_b_frames+1; i++){
-                    if(s->input_picture[i]==NULL || s->input_picture[i]->b_frame_score - 1 > s->mb_num/40) break;
+                    if(s->input_picture[i]==NULL || s->input_picture[i]->b_frame_score - 1 > s->mb_num/s->avctx->b_sensitivity) break;
                 }
 
                 b_frames= FFMAX(0, i-1);

@@ -6,16 +6,12 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-#    define CONFIG_WIN32
-#endif
-
-#if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(EMULATE_INTTYPES)
-#    define EMULATE_INTTYPES
-#endif
-
 #ifndef M_PI
 #define M_PI    3.14159265358979323846
+#endif
+
+#if ( defined(__PIC__) || defined(__pic__) ) && ! defined(PIC)
+#    define PIC
 #endif
 
 #ifdef HAVE_AV_CONFIG_H
@@ -98,14 +94,8 @@
     typedef unsigned char  uint8_t;
     typedef unsigned short uint16_t;
     typedef unsigned int   uint32_t;
-
-#   ifdef CONFIG_WIN32
-        typedef signed __int64   int64_t;
-        typedef unsigned __int64 uint64_t;
-#   else /* other OS */
-        typedef signed long long   int64_t;
-        typedef unsigned long long uint64_t;
-#   endif /* other OS */
+    typedef signed long long   int64_t;
+    typedef unsigned long long uint64_t;
 #endif /* EMULATE_INTTYPES */
 
 #ifndef PRId64
@@ -182,82 +172,36 @@ typedef uint64_t      uint_fast64_t;
 #    endif
 #endif
 
-#if defined(CONFIG_OS2) || defined(CONFIG_SUNOS)
-static inline float floorf(float f) {
-    return floor(f);
-}
+#ifndef int64_t_C
+#define int64_t_C(c)     (c ## LL)
+#define uint64_t_C(c)    (c ## ULL)
 #endif
 
-#ifdef CONFIG_WIN32
+#ifdef HAVE_AV_CONFIG_H
 
-/* windows */
-
-#    if !defined(__MINGW32__) && !defined(__CYGWIN__)
-#        define int64_t_C(c)     (c ## i64)
-#        define uint64_t_C(c)    (c ## i64)
-
-#    ifdef HAVE_AV_CONFIG_H
-#            define inline __inline
+#ifdef __MINGW32__
+#    ifdef _DEBUG
+#        define DEBUG
 #    endif
 
-#    else
-#        define int64_t_C(c)     (c ## LL)
-#        define uint64_t_C(c)    (c ## ULL)
-#    endif /* __MINGW32__ */
+#    define snprintf _snprintf
+#    define vsnprintf _vsnprintf
 
-#    ifdef HAVE_AV_CONFIG_H
-#        ifdef _DEBUG
-#            define DEBUG
-#        endif
-
-#        define snprintf _snprintf
-#        define vsnprintf _vsnprintf
-
-#        ifdef CONFIG_WINCE
-#            define perror(a)
-#        endif
-
+#    ifdef CONFIG_WINCE
+#        define perror(a)
 #    endif
 
-/* CONFIG_WIN32 end */
+/* __MINGW32__ end */
 #elif defined (CONFIG_OS2)
 /* OS/2 EMX */
 
-#ifndef int64_t_C
-#define int64_t_C(c)     (c ## LL)
-#define uint64_t_C(c)    (c ## ULL)
-#endif
-
-#ifdef HAVE_AV_CONFIG_H
-
-#ifdef USE_FASTMEMCPY
-#include "fastmemcpy.h"
-#endif
-
 #include <float.h>
 
-#endif /* HAVE_AV_CONFIG_H */
+#endif /* !__MINGW32__ && CONFIG_OS2 */
 
-/* CONFIG_OS2 end */
-#else
-
-/* unix */
-
-#ifndef int64_t_C
-#define int64_t_C(c)     (c ## LL)
-#define uint64_t_C(c)    (c ## ULL)
-#endif
-
-#ifdef HAVE_AV_CONFIG_H
-
-#        ifdef USE_FASTMEMCPY
-#            include "fastmemcpy.h"
-#        endif
-#    endif /* HAVE_AV_CONFIG_H */
-
-#endif /* !CONFIG_WIN32 && !CONFIG_OS2 */
-
-#ifdef HAVE_AV_CONFIG_H
+#    ifdef USE_FASTMEMCPY
+#        include "fastmemcpy.h"
+#    endif
 
 #if defined(__MINGW32__) && !defined(BUILD_AVUTIL) && defined(BUILD_SHARED_AV)
 #  define FF_IMPORT_ATTR __declspec(dllimport)
@@ -288,25 +232,18 @@ static inline float floorf(float f) {
 
 /* debug stuff */
 
-#    ifndef DEBUG
+#    if !defined(DEBUG) && !defined(NDEBUG)
 #        define NDEBUG
 #    endif
 #    include <assert.h>
 
 /* dprintf macros */
-#    if defined(CONFIG_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-
-inline void dprintf(const char* fmt,...) {}
-
+#    ifdef DEBUG
+#        define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
 #    else
+#        define dprintf(fmt,...)
+#    endif
 
-#        ifdef DEBUG
-#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
-#        else
-#            define dprintf(fmt,...)
-#        endif
-
-#    endif /* !CONFIG_WIN32 */
 #    ifdef CONFIG_WINCE
 #            define abort()
 #    endif
@@ -339,30 +276,6 @@ extern const uint32_t inverse[256];
 #    define FASTDIV(a,b)   ((uint32_t)((((uint64_t)a)*inverse[b])>>32))
 #else
 #    define FASTDIV(a,b)   ((a)/(b))
-#endif
-
-/* define it to include statistics code (useful only for optimizing
-   codec efficiency */
-//#define STATS
-
-#ifdef STATS
-
-enum {
-    ST_UNKNOWN,
-    ST_DC,
-    ST_INTRA_AC,
-    ST_INTER_AC,
-    ST_INTRA_MB,
-    ST_INTER_MB,
-    ST_MV,
-    ST_NB,
-};
-
-extern int st_current_index;
-extern unsigned int st_bit_counts[ST_NB];
-extern unsigned int st_out_bit_counts[ST_NB];
-
-void print_stats(void);
 #endif
 
 /* misc math functions */
@@ -436,12 +349,9 @@ static inline int mid_pred(int a, int b, int c)
  */
 static inline int clip(int a, int amin, int amax)
 {
-    if (a < amin)
-        return amin;
-    else if (a > amax)
-        return amax;
-    else
-        return a;
+    if (a < amin)      return amin;
+    else if (a > amax) return amax;
+    else               return a;
 }
 
 /**
@@ -505,6 +415,20 @@ static inline int ff_get_fourcc(const char *s){
             level= (level^mask)-mask;
 #endif
 
+#define GET_UTF8(val, GET_BYTE, ERROR)\
+    val= GET_BYTE;\
+    {\
+        int ones= 7 - av_log2(val ^ 255);\
+        if(ones==1)\
+            ERROR\
+        val&= 127>>ones;\
+        while(--ones > 0){\
+            int tmp= GET_BYTE - 128;\
+            if(tmp>>6)\
+                ERROR\
+            val= (val<<6) + tmp;\
+        }\
+    }
 
 #if __CPU__ >= 686 && !defined(RUNTIME_CPUDETECT)
 #define COPY3_IF_LT(x,y,a,b,c,d)\
@@ -618,7 +542,7 @@ tend= read_time();\
 /* btw, rintf() is existing on fbsd too -- alex */
 static always_inline long int lrintf(float x)
 {
-#ifdef CONFIG_WIN32
+#ifdef __MINGW32__
 #  ifdef ARCH_X86
     int32_t i;
     asm volatile(
@@ -632,13 +556,8 @@ static always_inline long int lrintf(float x)
 #  endif /* ARCH_X86 */
 #else
     return (int)(rint(x));
-#endif /* CONFIG_WIN32 */
+#endif /* __MINGW32__ */
 }
-#else
-#ifndef _ISOC9X_SOURCE
-#define _ISOC9X_SOURCE
-#endif
-#include <math.h>
 #endif /* HAVE_LRINTF */
 
 #endif /* HAVE_AV_CONFIG_H */

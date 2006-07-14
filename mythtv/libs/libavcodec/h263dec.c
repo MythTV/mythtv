@@ -85,6 +85,7 @@ int ff_h263_decode_init(AVCodecContext *avctx)
         s->h263_pred = 1;
         s->msmpeg4_version=5;
         break;
+    case CODEC_ID_VC1:
     case CODEC_ID_WMV3:
         s->h263_msmpeg4 = 1;
         s->h263_pred = 1;
@@ -390,6 +391,7 @@ static int h263_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_siz
     return END_NOT_FOUND;
 }
 
+#ifdef CONFIG_H263_PARSER
 static int h263_parse(AVCodecParserContext *s,
                            AVCodecContext *avctx,
                            uint8_t **poutbuf, int *poutbuf_size,
@@ -410,6 +412,7 @@ static int h263_parse(AVCodecParserContext *s,
     *poutbuf_size = buf_size;
     return next;
 }
+#endif
 
 int ff_h263_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
@@ -886,6 +889,7 @@ AVCodec flv_decoder = {
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1
 };
 
+#ifdef CONFIG_H263_PARSER
 AVCodecParser h263_parser = {
     { CODEC_ID_H263 },
     sizeof(ParseContext),
@@ -893,3 +897,4 @@ AVCodecParser h263_parser = {
     h263_parse,
     ff_parse_close,
 };
+#endif

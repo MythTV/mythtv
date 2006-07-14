@@ -30,8 +30,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/time.h>
-#define _LINUX_TIME_H 1
-#include <linux/videodev.h>
+#include <asm/types.h>
+#include <linux/videodev2.h>
 #include <time.h>
 
 static const int desired_video_buffers = 256;
@@ -457,7 +457,9 @@ static int v4l2_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     if (capabilities & V4L2_CAP_STREAMING) {
         s->io_method = io_mmap;
         res = mmap_init(s);
-        res = mmap_start(s);
+        if (res == 0) {
+            res = mmap_start(s);
+        }
     } else {
         s->io_method = io_read;
         res = read_init(s);
@@ -520,7 +522,7 @@ static int v4l2_read_close(AVFormatContext *s1)
     return 0;
 }
 
-static AVInputFormat v4l2_format = {
+AVInputFormat v4l2_demuxer = {
     "video4linux2",
     "video grab",
     sizeof(struct video_data),
@@ -530,9 +532,3 @@ static AVInputFormat v4l2_format = {
     v4l2_read_close,
     .flags = AVFMT_NOFILE,
 };
-
-int v4l2_init(void)
-{
-    av_register_input_format(&v4l2_format);
-    return 0;
-}

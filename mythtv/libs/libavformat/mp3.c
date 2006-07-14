@@ -240,6 +240,32 @@ static void id3_create_tag(AVFormatContext *s, uint8_t *buf)
 }
 
 /* mp3 read */
+
+static int mp3_read_probe(AVProbeData *p)
+{
+    int d;
+
+    if(p->buf_size < 4)
+        return 0;
+
+    if(p->buf[0] == 'I' && p->buf[1] == 'D' && p->buf[2] == '3' &&
+       p->buf[3] < 5)
+        return AVPROBE_SCORE_MAX;
+
+    if(p->buf[0] != 0xff)
+        return 0;
+
+    d = p->buf[1];
+    if((d & 0xe0) != 0xe0 || ((d & 0x18) == 0x08 || (d & 0x06) == 0))
+        return 0;
+
+    d = p->buf[2];
+    if((d & 0xf0) == 0xf0 || (d & 0x0c) == 0x0c)
+        return 0;
+
+    return AVPROBE_SCORE_MAX;
+}
+
 static int mp3_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
@@ -342,19 +368,20 @@ static int mp3_write_trailer(struct AVFormatContext *s)
 }
 #endif //CONFIG_MUXERS
 
-AVInputFormat mp3_iformat = {
+#ifdef CONFIG_MP3_DEMUXER
+AVInputFormat mp3_demuxer = {
     "mp3",
     "MPEG audio",
     0,
-    NULL,
+    mp3_read_probe,
     mp3_read_header,
     mp3_read_packet,
     mp3_read_close,
     .extensions = "mp2,mp3,m2a", /* XXX: use probe */
 };
-
-#ifdef CONFIG_MUXERS
-AVOutputFormat mp2_oformat = {
+#endif
+#ifdef CONFIG_MP2_MUXER
+AVOutputFormat mp2_muxer = {
     "mp2",
     "MPEG audio layer 2",
     "audio/x-mpeg",
@@ -370,9 +397,9 @@ AVOutputFormat mp2_oformat = {
     mp3_write_packet,
     mp3_write_trailer,
 };
-
-#ifdef CONFIG_MP3LAME
-AVOutputFormat mp3_oformat = {
+#endif
+#ifdef CONFIG_MP3_MUXER
+AVOutputFormat mp3_muxer = {
     "mp3",
     "MPEG audio layer 3",
     "audio/x-mpeg",
@@ -385,16 +412,3 @@ AVOutputFormat mp3_oformat = {
     mp3_write_trailer,
 };
 #endif
-#endif //CONFIG_MUXERS
-
-int mp3_init(void)
-{
-    av_register_input_format(&mp3_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&mp2_oformat);
-#ifdef CONFIG_MP3LAME
-    av_register_output_format(&mp3_oformat);
-#endif
-#endif //CONFIG_MUXERS
-    return 0;
-}

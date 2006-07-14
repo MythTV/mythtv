@@ -26,7 +26,8 @@
  */
 
 #include "avformat.h"
-#include "avi.h"
+#include "allformats.h"
+#include "riff.h"
 
 /* if we don't know the size in advance */
 #define AU_UNKOWN_SIZE ((uint32_t)(~0))
@@ -177,7 +178,8 @@ static int au_read_close(AVFormatContext *s)
     return 0;
 }
 
-static AVInputFormat au_iformat = {
+#ifdef CONFIG_AU_DEMUXER
+AVInputFormat au_demuxer = {
     "au",
     "SUN AU Format",
     0,
@@ -187,9 +189,10 @@ static AVInputFormat au_iformat = {
     au_read_close,
     pcm_read_seek,
 };
+#endif
 
-#ifdef CONFIG_MUXERS
-static AVOutputFormat au_oformat = {
+#ifdef CONFIG_AU_MUXER
+AVOutputFormat au_muxer = {
     "au",
     "SUN AU Format",
     "audio/basic",
@@ -201,13 +204,4 @@ static AVOutputFormat au_oformat = {
     au_write_packet,
     au_write_trailer,
 };
-#endif //CONFIG_MUXERS
-
-int au_init(void)
-{
-    av_register_input_format(&au_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&au_oformat);
-#endif //CONFIG_MUXERS
-    return 0;
-}
+#endif //CONFIG_AU_MUXER

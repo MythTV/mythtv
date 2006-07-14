@@ -62,7 +62,7 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     int width, height;
     int video_fd, frame_size;
     int ret, frame_rate, frame_rate_base;
-    int desired_palette;
+    int desired_palette, desired_depth;
     struct video_tuner tuner;
     struct video_audio audio;
     struct video_picture pict;
@@ -118,12 +118,16 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     }
 
     desired_palette = -1;
-    if (st->codec->pix_fmt == PIX_FMT_YUV420P) {
+    desired_depth = -1;
+    if (ap->pix_fmt == PIX_FMT_YUV420P) {
         desired_palette = VIDEO_PALETTE_YUV420P;
-    } else if (st->codec->pix_fmt == PIX_FMT_YUV422) {
+        desired_depth = 12;
+    } else if (ap->pix_fmt == PIX_FMT_YUV422) {
         desired_palette = VIDEO_PALETTE_YUV422;
-    } else if (st->codec->pix_fmt == PIX_FMT_BGR24) {
+        desired_depth = 16;
+    } else if (ap->pix_fmt == PIX_FMT_BGR24) {
         desired_palette = VIDEO_PALETTE_RGB24;
+        desired_depth = 24;
     }
 
     /* set tv standard */
@@ -155,14 +159,18 @@ static int grab_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 #endif
     /* try to choose a suitable video format */
     pict.palette = desired_palette;
+    pict.depth= desired_depth;
     if (desired_palette == -1 || (ret = ioctl(video_fd, VIDIOCSPICT, &pict)) < 0) {
         pict.palette=VIDEO_PALETTE_YUV420P;
+        pict.depth=12;
         ret = ioctl(video_fd, VIDIOCSPICT, &pict);
         if (ret < 0) {
             pict.palette=VIDEO_PALETTE_YUV422;
+            pict.depth=16;
             ret = ioctl(video_fd, VIDIOCSPICT, &pict);
             if (ret < 0) {
                 pict.palette=VIDEO_PALETTE_RGB24;
+                pict.depth=24;
                 ret = ioctl(video_fd, VIDIOCSPICT, &pict);
                 if (ret < 0)
                     goto fail1;
@@ -357,7 +365,7 @@ static int grab_read_close(AVFormatContext *s1)
     return 0;
 }
 
-static AVInputFormat video_grab_device_format = {
+AVInputFormat video_grab_device_demuxer = {
     "video4linux",
     "video grab",
     sizeof(VideoData),
@@ -838,11 +846,5 @@ static int aiw_close(VideoData *s)
 {
     av_freep(&s->lum_m4_mem);
     av_freep(&s->src_mem);
-    return 0;
-}
-
-int video_grab_init(void)
-{
-    av_register_input_format(&video_grab_device_format);
     return 0;
 }

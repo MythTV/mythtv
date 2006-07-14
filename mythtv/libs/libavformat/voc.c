@@ -18,7 +18,7 @@
  */
 
 #include "avformat.h"
-#include "avi.h"    /* for CodecTag */
+#include "riff.h"    /* for CodecTag */
 #include "voc.h"
 
 
@@ -93,18 +93,6 @@ static int voc_read_header(AVFormatContext *s, AVFormatParameters *ap)
     return 0;
 }
 
-static int voc_get_bps(int codec_id)
-{
-    switch (codec_id) {
-    case CODEC_ID_PCM_S16LE:
-        return 16;
-    case CODEC_ID_ADPCM_CT:
-        return 4;
-    default:
-        return 8;
-    }
-}
-
 int
 voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
 {
@@ -130,7 +118,7 @@ voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
                 dec->sample_rate = sample_rate;
             dec->channels = channels;
             dec->codec_id = codec_get_id(voc_codec_tags, get_byte(pb));
-            dec->bits_per_sample = voc_get_bps(dec->codec_id);
+            dec->bits_per_sample = av_get_bits_per_sample(dec->codec_id);
             voc->remaining_size -= 2;
             max_size -= 2;
             channels = 1;
@@ -185,7 +173,7 @@ static int voc_read_close(AVFormatContext *s)
     return 0;
 }
 
-static AVInputFormat voc_iformat = {
+AVInputFormat voc_demuxer = {
     "voc",
     "Creative Voice File format",
     sizeof(voc_dec_context_t),
@@ -268,7 +256,7 @@ static int voc_write_trailer(AVFormatContext *s)
     return 0;
 }
 
-static AVOutputFormat voc_oformat = {
+AVOutputFormat voc_muxer = {
     "voc",
     "Creative Voice File format",
     "audio/x-voc",
@@ -282,15 +270,3 @@ static AVOutputFormat voc_oformat = {
 };
 
 #endif /* CONFIG_MUXERS */
-
-
-int voc_init(void)
-{
-#ifdef CONFIG_DEMUXERS
-    av_register_input_format(&voc_iformat);
-#endif /* CONFIG_DEMUXERS */
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&voc_oformat);
-#endif /* CONFIG_MUXERS */
-    return 0;
-}

@@ -30,6 +30,9 @@
 #  include <machine/ioctl_meteor.h>
 #  include <machine/ioctl_bt848.h>
 # endif
+#elif defined(__FreeBSD_kernel__)
+# include <dev/bktr/ioctl_meteor.h>
+# include <dev/bktr/ioctl_bt848.h>
 #elif defined(__DragonFly__)
 # include <dev/video/meteor/ioctl_meteor.h>
 # include <dev/video/bktr/ioctl_bt848.h>
@@ -313,7 +316,7 @@ static int grab_read_close(AVFormatContext *s1)
     return 0;
 }
 
-AVInputFormat video_grab_device_format = {
+AVInputFormat video_grab_device_demuxer = {
     "bktr",
     "video grab",
      sizeof(VideoData),
@@ -323,9 +326,3 @@ AVInputFormat video_grab_device_format = {
     grab_read_close,
     .flags = AVFMT_NOFILE,
 };
-
-int video_grab_init(void)
-{
-    av_register_input_format(&video_grab_device_format);
-    return 0;
-}

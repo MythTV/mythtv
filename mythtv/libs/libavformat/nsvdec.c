@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "avi.h"
+#include "riff.h"
 
 //#define DEBUG
 //#define DEBUG_DUMP_INDEX // XXX dumbdriving-271.nsv breaks with it commented!!
@@ -705,7 +705,6 @@ static int nsv_read_close(AVFormatContext *s)
             av_free(ast->index_entries);
             av_free(ast);
         }
-        av_free(st->codec->extradata);
         av_free(st->codec->palctrl);
     }
 
@@ -743,7 +742,7 @@ static int nsv_probe(AVProbeData *p)
     return 0;
 }
 
-static AVInputFormat nsv_iformat = {
+AVInputFormat nsv_demuxer = {
     "nsv",
     "NullSoft Video format",
     sizeof(NSVContext),
@@ -753,9 +752,3 @@ static AVInputFormat nsv_iformat = {
     nsv_read_close,
     nsv_read_seek,
 };
-
-int nsvdec_init(void)
-{
-    av_register_input_format(&nsv_iformat);
-    return 0;
-}

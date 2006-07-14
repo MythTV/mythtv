@@ -58,6 +58,10 @@
 #define TEMP_NOISE_FILTER               0x100000
 #define FORCE_QUANT                     0x200000
 
+#if ( defined(__PIC__) || defined(__pic__) ) && ! defined(PIC)
+#    define PIC
+#endif
+
 //use if u want a faster postprocessing code
 //cant differentiate between chroma & luma filters (both on or both off)
 //obviosly the -pp option at the commandline has no effect except turning the here selected
@@ -79,8 +83,8 @@ static inline int CLIP(int a){
  * Postprocessng filter.
  */
 struct PPFilter{
-        char *shortName;
-        char *longName;
+        const char *shortName;
+        const char *longName;
         int chromDefault;       ///< is chrominance filtering on by default if this filter is manually activated
         int minLumQuality;      ///< minimum quality to turn luminance filtering on
         int minChromQuality;    ///< minimum quality to turn chrominance filtering on

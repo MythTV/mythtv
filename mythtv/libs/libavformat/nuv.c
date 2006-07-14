@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "avi.h"
+#include "riff.h"
 
 typedef struct {
     int v_id;
@@ -186,7 +186,7 @@ static int nuv_packet(AVFormatContext *s, AVPacket *pkt) {
     while (!url_feof(pb)) {
         ret = get_buffer(pb, hdr, HDRSIZE);
         if (ret <= 0)
-            return ret;
+            return ret ? ret : -1;
         frametype = hdr[0];
         size = PKTSIZE(LE_32(&hdr[8]));
         switch (frametype) {
@@ -227,7 +227,7 @@ static int nuv_packet(AVFormatContext *s, AVPacket *pkt) {
     return AVERROR_IO;
 }
 
-static AVInputFormat nuv_iformat = {
+AVInputFormat nuv_demuxer = {
     "nuv",
     "NuppelVideo format",
     sizeof(NUVContext),
@@ -237,9 +237,3 @@ static AVInputFormat nuv_iformat = {
     NULL,
     NULL,
 };
-
-int nuv_init(void) {
-    av_register_input_format(&nuv_iformat);
-    return 0;
-}
-

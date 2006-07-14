@@ -17,7 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
-#include "avi.h"
+#include "allformats.h"
+#include "riff.h"
 
 typedef struct {
     offset_t atrpos, atsqpos, awapos;
@@ -300,8 +301,8 @@ static int mmf_read_seek(AVFormatContext *s,
     return pcm_read_seek(s, stream_index, timestamp, flags);
 }
 
-
-static AVInputFormat mmf_iformat = {
+#ifdef CONFIG_MMF_DEMUXER
+AVInputFormat mmf_demuxer = {
     "mmf",
     "mmf format",
     sizeof(MMFContext),
@@ -311,9 +312,9 @@ static AVInputFormat mmf_iformat = {
     mmf_read_close,
     mmf_read_seek,
 };
-
-#ifdef CONFIG_MUXERS
-static AVOutputFormat mmf_oformat = {
+#endif
+#ifdef CONFIG_MMF_MUXER
+AVOutputFormat mmf_muxer = {
     "mmf",
     "mmf format",
     "application/vnd.smaf",
@@ -325,14 +326,4 @@ static AVOutputFormat mmf_oformat = {
     mmf_write_packet,
     mmf_write_trailer,
 };
-#endif //CONFIG_MUXERS
-
-int ff_mmf_init(void)
-{
-    av_register_input_format(&mmf_iformat);
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&mmf_oformat);
-#endif //CONFIG_MUXERS
-    return 0;
-}
-
+#endif

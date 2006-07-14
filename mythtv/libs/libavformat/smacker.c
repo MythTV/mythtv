@@ -22,7 +22,7 @@
  */
 
 #include "avformat.h"
-#include "avi.h"
+#include "riff.h"
 #include "bswap.h"
 
 #define SMACKER_PAL 0x01
@@ -329,15 +329,10 @@ static int smacker_read_close(AVFormatContext *s)
     if(smk->frm_flags)
         av_free(smk->frm_flags);
 
-    for(i=0;i<s->nb_streams;i++) {
-        AVStream *st = s->streams[i];
-        if(st->codec->extradata)
-            av_free(st->codec->extradata);
-    }
     return 0;
 }
 
-static AVInputFormat smacker_iformat = {
+AVInputFormat smacker_demuxer = {
     "smk",
     "Smacker Video",
     sizeof(SmackerContext),
@@ -346,9 +341,3 @@ static AVInputFormat smacker_iformat = {
     smacker_read_packet,
     smacker_read_close,
 };
-
-int smacker_init(void)
-{
-    av_register_input_format(&smacker_iformat);
-    return 0;
-}

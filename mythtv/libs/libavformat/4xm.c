@@ -318,7 +318,7 @@ static int fourxm_read_close(AVFormatContext *s)
     return 0;
 }
 
-static AVInputFormat fourxm_iformat = {
+AVInputFormat fourxm_demuxer = {
     "4xm",
     "4X Technologies format",
     sizeof(FourxmDemuxContext),
@@ -327,9 +327,3 @@ static AVInputFormat fourxm_iformat = {
     fourxm_read_packet,
     fourxm_read_close,
 };
-
-int fourxm_init(void)
-{
-    av_register_input_format(&fourxm_iformat);
-    return 0;
-}

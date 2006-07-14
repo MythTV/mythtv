@@ -23,6 +23,7 @@
 #include "../dsputil.h"
 #include "../simple_idct.h"
 #include "../mpegvideo.h"
+#include "x86_cpu.h"
 #include "mmx.h"
 
 //#undef NDEBUG
@@ -185,6 +186,11 @@ static const uint64_t ff_pb_FC attribute_used __attribute__ ((aligned(8))) = 0xF
 
 #undef DEF
 #undef PAVGB
+
+#define SBUTTERFLY(a,b,t,n)\
+    "movq " #a ", " #t "              \n\t" /* abcd */\
+    "punpckl" #n " " #b ", " #a "     \n\t" /* aebf */\
+    "punpckh" #n " " #b ", " #t "     \n\t" /* cgdh */\
 
 /***********************************/
 /* standard MMX */
@@ -1527,11 +1533,6 @@ static void sub_hfyu_median_prediction_mmx2(uint8_t *dst, uint8_t *src1, uint8_t
     "pmaxsw " #z ", " #a "            \n\t"\
     "paddusw " #a ", " #sum "         \n\t"
 
-#define SBUTTERFLY(a,b,t,n)\
-    "movq " #a ", " #t "              \n\t" /* abcd */\
-    "punpckl" #n " " #b ", " #a "     \n\t" /* aebf */\
-    "punpckh" #n " " #b ", " #t "     \n\t" /* cgdh */\
-
 #define TRANSPOSE4(a,b,c,d,t)\
     SBUTTERFLY(a,b,t,wd) /* a=aebf t=cgdh */\
     SBUTTERFLY(c,d,b,wd) /* c=imjn b=kolp */\
@@ -2524,7 +2525,6 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int o
                 : "m"(src[0]), "m"(src[1]),
                   "m"(*r4), "m"(shift2)
             );
-
             src += stride;
         }
         src += 4-h*stride;
@@ -3110,7 +3110,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_3dnow;
         }
 
-#if 0 
+#if 0
         if(mm_flags & MM_SSE2){
             c->horizontal_compose97i = ff_snow_horizontal_compose97i_sse2;
             c->vertical_compose97i = ff_snow_vertical_compose97i_sse2;

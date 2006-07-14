@@ -167,7 +167,7 @@ static int flv_write_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-static AVOutputFormat flv_oformat = {
+AVOutputFormat flv_muxer = {
     "flv",
     "flv format",
     "video/x-flv",
@@ -183,9 +183,3 @@ static AVOutputFormat flv_oformat = {
     flv_write_packet,
     flv_write_trailer,
 };
-
-int flvenc_init(void)
-{
-    av_register_output_format(&flv_oformat);
-    return 0;
-}

@@ -4099,7 +4099,7 @@ static int decode_ref_pic_list_reordering(H264Context *h){
     return 0;
 }
 
-static int fill_mbaff_ref_list(H264Context *h){
+static void fill_mbaff_ref_list(H264Context *h){
     int list, i, j;
     for(list=0; list<2; list++){
         for(i=0; i<h->ref_count[list]; i++){
@@ -5258,18 +5258,11 @@ decode_intra_mb:
 
 //                fill_intra4x4_pred_table(h);
                 for(i=0; i<16; i+=di){
-                    const int mode_coded= !get_bits1(&s->gb);
-                    const int predicted_mode=  pred_intra_mode(h, i);
-                    int mode;
+                    int mode= pred_intra_mode(h, i);
 
-                    if(mode_coded){
+                    if(!get_bits1(&s->gb)){
                         const int rem_mode= get_bits(&s->gb, 3);
-                        if(rem_mode<predicted_mode)
-                            mode= rem_mode;
-                        else
-                            mode= rem_mode + 1;
-                    }else{
-                        mode= predicted_mode;
+                        mode = rem_mode + (rem_mode >= mode);
                     }
 
                     if(di==4)
@@ -7481,7 +7474,7 @@ static int decode_sei(H264Context *h){
 
         switch(type){
         case 5:
-            if(decode_unregistered_user_data(h, size) < 0);
+            if(decode_unregistered_user_data(h, size) < 0)
                 return -1;
             break;
         default:
@@ -7879,6 +7872,7 @@ static int find_frame_end(H264Context *h, const uint8_t *buf, int buf_size){
     return END_NOT_FOUND;
 }
 
+#ifdef CONFIG_H264_PARSER
 static int h264_parse(AVCodecParserContext *s,
                       AVCodecContext *avctx,
                       uint8_t **poutbuf, int *poutbuf_size,
@@ -7924,7 +7918,7 @@ static int h264_split(AVCodecContext *avctx,
     }
     return 0;
 }
-
+#endif /* CONFIG_H264_PARSER */
 
 static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
     MpegEncContext * const s = &h->s;
@@ -7973,7 +7967,8 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
       }
 
         ptr= decode_nal(h, buf + buf_index, &dst_length, &consumed, h->is_avc ? nalsize : buf_size - buf_index);
-        if(ptr[dst_length - 1] == 0) dst_length--;
+        while(ptr[dst_length - 1] == 0 && dst_length > 1)
+            dst_length--;
         bit_length= 8*dst_length - decode_rbsp_trailing(ptr + dst_length - 1);
 
         if(s->avctx->debug&FF_DEBUG_STARTCODE){
@@ -8494,6 +8489,7 @@ AVCodec h264_decoder = {
     .flush= flush_dpb,
 };
 
+#ifdef CONFIG_H264_PARSER
 AVCodecParser h264_parser = {
     { CODEC_ID_H264 },
     sizeof(H264Context),
@@ -8502,5 +8498,6 @@ AVCodecParser h264_parser = {
     ff_parse_close,
     h264_split,
 };
+#endif
 
 #include "svq3.c"

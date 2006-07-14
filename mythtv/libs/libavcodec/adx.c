@@ -267,7 +267,7 @@ static uint32_t read_long(const unsigned char *p)
     return (p[0]<<24)|(p[1]<<16)|(p[2]<<8)|p[3];
 }
 
-int is_adx(const unsigned char *buf,size_t bufsize)
+static int is_adx(const unsigned char *buf,size_t bufsize)
 {
     int    offset;
 
@@ -385,8 +385,8 @@ static int adx_decode_frame(AVCodecContext *avctx,
 }
 
 #ifdef CONFIG_ENCODERS
-AVCodec adx_adpcm_encoder = {
-    "adx_adpcm",
+AVCodec adpcm_adx_encoder = {
+    "adpcm_adx",
     CODEC_TYPE_AUDIO,
     CODEC_ID_ADPCM_ADX,
     sizeof(ADXContext),
@@ -397,8 +397,8 @@ AVCodec adx_adpcm_encoder = {
 };
 #endif //CONFIG_ENCODERS
 
-AVCodec adx_adpcm_decoder = {
-    "adx_adpcm",
+AVCodec adpcm_adx_decoder = {
+    "adpcm_adx",
     CODEC_TYPE_AUDIO,
     CODEC_ID_ADPCM_ADX,
     sizeof(ADXContext),
