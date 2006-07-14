@@ -3923,12 +3923,14 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
 
     QString chanids = QString::number(chanid);
 
+    int hoursMax = gContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
+
     ProgramInfo *prog = NULL;
     if (pseudoLiveTVRecording)
         prog = new ProgramInfo(*pseudoLiveTVRecording);
     else
         prog = ProgramInfo::GetProgramAtDateTime(
-            chanids, mythCurrentDateTime(), true);
+            chanids, mythCurrentDateTime(), true, hoursMax);
 
     if (prog->recstartts == prog->recendts)
     {

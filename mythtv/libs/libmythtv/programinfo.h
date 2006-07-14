@@ -99,7 +99,8 @@ class ProgramInfo
     ProgramInfo(const ProgramInfo &other);
     static ProgramInfo *GetProgramAtDateTime(const QString &channel, 
                                              const QDateTime &dtime, 
-                                             bool genUnknown = false);
+                                             bool genUnknown = false, 
+                                             int clampHoursMax = 0);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel, 
                                                const QString &starttime);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel, 

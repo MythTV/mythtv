@@ -637,13 +637,15 @@ int ProgramInfo::SecsTillStart(void) const
  *  \param channel %Channel ID on which to search for program.
  *  \param dtime   Date and Time for which we desire the program.
  *  \param genUnknown Generate a full entry for live-tv if unknown
+ *  \param clampHoursMax Clamp the maximum time to X hours.
  *  \return Pointer to a ProgramInfo from database if it succeeds,
  *          Pointer to an "Unknown" ProgramInfo if it does not find
  *          anything in database.
  */
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel, 
                                                const QDateTime &dtime,
-                                               bool genUnknown)
+                                               bool genUnknown,
+                                               int clampHoursMax)
 {
     ProgramList schedList;
     ProgramList progList;
@@ -659,8 +661,20 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     progList.FromProgram(querystr, bindings, schedList);
 
     if (!progList.isEmpty())
-        return progList.take(0);
+    {
+        ProgramInfo *pginfo = progList.take(0);
 
+        if (clampHoursMax > 0)
+        {
+            if (pginfo->startts.secsTo(pginfo->endts) > clampHoursMax * 3600)
+            {
+                pginfo->endts = pginfo->startts.addSecs(clampHoursMax * 3600);
+                pginfo->recendts = pginfo->endts;
+            }
+        }
+    
+        return pginfo;
+    }
     ProgramInfo *p = new ProgramInfo;
 
     MSqlQuery query(MSqlQuery::InitCon());
