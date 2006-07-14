@@ -637,7 +637,7 @@ int ProgramInfo::SecsTillStart(void) const
  *  \param channel %Channel ID on which to search for program.
  *  \param dtime   Date and Time for which we desire the program.
  *  \param genUnknown Generate a full entry for live-tv if unknown
- *  \param clampHoursMax Clamp the maximum time to X hours.
+ *  \param clampHoursMax Clamp the maximum time to X hours from dtime.
  *  \return Pointer to a ProgramInfo from database if it succeeds,
  *          Pointer to an "Unknown" ProgramInfo if it does not find
  *          anything in database.
@@ -666,9 +666,9 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 
         if (clampHoursMax > 0)
         {
-            if (pginfo->startts.secsTo(pginfo->endts) > clampHoursMax * 3600)
+            if (dtime.secsTo(pginfo->endts) > clampHoursMax * 3600)
             {
-                pginfo->endts = pginfo->startts.addSecs(clampHoursMax * 3600);
+                pginfo->endts = dtime.addSecs(clampHoursMax * 3600);
                 pginfo->recendts = pginfo->endts;
             }
         }
