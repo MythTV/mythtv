@@ -2,6 +2,7 @@
 
 // Std C headers
 #include <cmath>
+#include <unistd.h>
 
 // MythTV headers
 #include "mythcontext.h"
