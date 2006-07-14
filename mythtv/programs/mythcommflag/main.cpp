@@ -433,7 +433,10 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
             fstream outputstream(outputfilename, ios::app | ios::out );
             outputstream << "commercialBreakListFor: " << program_info->title
                          << " on " << program_info->chanid << " @ "
-                         << program_info->recstartts.toString(Qt::ISODate) << endl;
+                         << program_info->recstartts.toString(Qt::ISODate)
+                         << endl;
+            outputstream << "totalframecount: " << nvp->GetTotalFrameCount()
+                         << endl;
             streamOutCommercialBreakList(outputstream, commBreakList);
         }
     }
