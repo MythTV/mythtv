@@ -2640,7 +2640,7 @@ echo
 
 echo "# Bindings"
 for binding in ${!bindings_*} ; do
-    echo "${binding#bindings_}           ${!binding}"
+    printf "%-16.16s %s\n" "${binding#bindings_}" "${!binding}"
 done
 
 MYTH_CONFIG_H=libs/libmyth/mythconfig.h
