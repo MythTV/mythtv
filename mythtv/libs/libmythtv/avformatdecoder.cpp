@@ -933,9 +933,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
     current_height = enc->height;
     current_aspect = aspect_ratio;
 
-    enc->opaque = NULL;
-    enc->get_buffer = NULL;
-    enc->release_buffer = NULL;
+    enc->opaque = (void *)this;
+    enc->get_buffer = avcodec_default_get_buffer;
+    enc->release_buffer = avcodec_default_release_buffer;
     enc->draw_horiz_band = NULL;
     enc->slice_flags = 0;
 
@@ -960,7 +960,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
                   codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
     {
         enc->flags |= CODEC_FLAG_EMU_EDGE;
-        enc->opaque = (void *)this;
         enc->get_buffer = get_avf_buffer_xvmc;
         enc->release_buffer = release_avf_buffer_xvmc;
         enc->draw_horiz_band = render_slice_xvmc;
@@ -972,7 +971,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc)
              !(enc->width % 16))
     {
         enc->flags |= CODEC_FLAG_EMU_EDGE;
-        enc->opaque = (void *)this;
         enc->get_buffer = get_avf_buffer;
         enc->release_buffer = release_avf_buffer;
         enc->draw_horiz_band = NULL;
@@ -2910,12 +2908,15 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                     context->width,
                                     context->height);
 
-                        // Set the frame flags, but then discard it
-                        // since we are not using it for display.
-                        xf->interlaced_frame = mpa_pic.interlaced_frame;
-                        xf->top_field_first = mpa_pic.top_field_first;
-                        xf->frameNumber = framesPlayed;
-                        GetNVP()->DiscardVideoFrame(xf);
+                        if (xf)
+                        {
+                            // Set the frame flags, but then discard it
+                            // since we are not using it for display.
+                            xf->interlaced_frame = mpa_pic.interlaced_frame;
+                            xf->top_field_first = mpa_pic.top_field_first;
+                            xf->frameNumber = framesPlayed;
+                            GetNVP()->DiscardVideoFrame(xf);
+                        }
                     }
 
                     long long temppts = pts;

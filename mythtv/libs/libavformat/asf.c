@@ -486,7 +486,7 @@ static int asf_get_packet(AVFormatContext *s)
     int rsize = 9;
     int c;
 
-    assert((url_ftell(&s->pb) - s->data_offset) % asf->packet_size == 0);
+    //assert((url_ftell(&s->pb) - s->data_offset) % asf->packet_size == 0);
 
     c = get_byte(pb);
     if (c != 0x82) {
