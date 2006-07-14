@@ -614,6 +614,17 @@ QString DVBTuning::toString(fe_type_t type) const
             .arg(HierarchyString())
             .arg(GuardIntervalString());
     }
+#ifdef FE_GET_EXTENDED_INFO
+    else if (FE_DVB_S2 == type)
+    {
+        msg = QString("Frequency: %1 Symbol Rate: %2 Pol: %3 Inv: %4 Mod: %5")
+            .arg(Frequency())
+            .arg(QPSKSymbolRate())
+            .arg(PolarityChar())
+            .arg(InversionString())
+            .arg(ModulationString());
+    }
+#endif
     return msg;
 }
 
@@ -1038,6 +1049,10 @@ QString toString(const fe_type_t type)
         return "OFDM";
     else if (FE_ATSC == type)
         return "ATSC";
+#ifdef FE_GET_EXTENDED_INFO
+    else if (FE_DVB_S2 == type)
+        return "DVB_S2";
+#endif
     return "Unknown";
 }
 
