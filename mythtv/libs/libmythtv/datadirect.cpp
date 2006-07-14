@@ -1785,6 +1785,8 @@ static QString process_dd_station(
     }
     else if (!freqid && (get_lineup_type(sourceid) == "LocalBroadcast"))
         freqid = chan_major.toInt();
+    else
+        freqid = channum.toInt();
 
     return channum;
 }
@@ -1803,7 +1805,7 @@ static void update_channel_basic(uint    sourceid,   bool    insert,
     // First check if channel already in DB, but without xmltvid
     MSqlQuery query(MSqlQuery::DDCon());
     query.prepare("SELECT chanid FROM channel "
-                  "WHERE sourceid = :SOURCEID AND "
+                  "WHERE sourceid = :SOURCEID AND xmltvid = 0 AND "
                   "      ( channum = :CHANNUM OR "
                   "        ( atsc_major_chan = :MAJORCHAN AND "
                   "          atsc_minor_chan = :MINORCHAN ) )");
