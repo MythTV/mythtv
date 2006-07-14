@@ -328,7 +328,19 @@ QString NetworkControl::processKey(QStringList tokens)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
 
-    QWidget *widget = gContext->GetMainWindow()->currentWidget()->focusWidget();
+    QObject *keyDest = NULL;
+
+    if (!gContext)
+        return QString("ERROR: Application has no gContext!\n");
+
+    if (gContext->GetMainWindow())
+        keyDest = gContext->GetMainWindow();
+    else
+        return QString("ERROR: Application has no main window!\n");
+
+    if (gContext->GetMainWindow()->currentWidget())
+        keyDest = gContext->GetMainWindow()->currentWidget()->focusWidget();
+
     unsigned int curToken = 1;
     while (curToken < tokens.size())
     {
@@ -337,10 +349,10 @@ QString NetworkControl::processKey(QStringList tokens)
             int keyCode = keyMap[tokens[curToken]];
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, NoButton);
-            QApplication::postEvent(widget, event);
+            QApplication::postEvent(keyDest, event);
 
             event = new QKeyEvent(QEvent::KeyRelease, keyCode, 0, NoButton);
-            QApplication::postEvent(widget, event);
+            QApplication::postEvent(keyDest, event);
         }
         else if ((tokens[curToken].length() == 1) &&
                  (tokens[curToken][0].isLetterOrNumber()))
@@ -355,11 +367,11 @@ QString NetworkControl::processKey(QStringList tokens)
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
                                   tokens[curToken]);
-            QApplication::postEvent(widget, event);
+            QApplication::postEvent(keyDest, event);
 
             event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, buttons,
                                   tokens[curToken]);
-            QApplication::postEvent(widget, event);
+            QApplication::postEvent(keyDest, event);
         }
         else
             return QString("ERROR: Invalid syntax at '%1', see 'help %2' for "
