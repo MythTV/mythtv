@@ -49,6 +49,7 @@ class AudioReencodeBuffer : public AudioOutput
                              int audio_samplerate, bool audio_passthru)
     {
         (void)audio_samplerate;
+        (void)audio_passthru;
         bits = audio_bits;
         channels = audio_channels;
         bytes_per_sample = bits * channels / 8;
@@ -337,7 +338,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         QMap<long long, int> delMap;
         QMap<long long, int>::Iterator it;
         QString cutStr = "";
-        long long lastStart;
+        long long lastStart = 0;
 
         m_proginfo->GetCutList(delMap);
 
