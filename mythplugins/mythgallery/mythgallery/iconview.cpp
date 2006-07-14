@@ -1231,6 +1231,7 @@ void IconView::actionSettings()
 {
     GallerySettings settings;
     settings.exec();
+    gContext->ClearSettingsCache();
 }
 
 void IconView::actionImport()
