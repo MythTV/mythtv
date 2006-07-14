@@ -1221,6 +1221,13 @@ bool ChannelUtil::GetChannelData(
     atsc_minor    = query.value(7).toUInt();
     mpeg_prog_num = query.value(8).toUInt();
 
+    /// HACK begin -- deal with broken freqid, see ticket #1848
+    bool ok;
+    int num = channum.toInt(&ok);
+    if (freqid.isEmpty() || freqid == "0")
+        freqid = QString::number(num);
+    /// HACK end -- deal with broken freqid, see ticket #1848
+
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
 
