@@ -448,6 +448,7 @@ contains( HAVE_MLIB, yes ) {
 contains( TARGET_ARCH_ALPHA, yes ) {
     SOURCES += alpha/dsputil_alpha.c alpha/mpegvideo_alpha.c 
     SOURCES += alpha/motion_est_alpha.c alpha/dsputil_alpha_asm.S
+    SOURCES += alpha/simple_idct_alpha.c alpha/motion_est_mvi_asm.S
     QMAKE_CFLAGS_RELEASE += -fforce-addr -freduce-all-givs
 }
 
