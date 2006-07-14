@@ -105,6 +105,15 @@ static HostComboBox *SlideshowOpenGLTransition()
     return gc;
 };
 
+static HostSpinBox *SlideshowOpenGLTransitionLength()
+{
+    HostSpinBox *gc = new HostSpinBox(
+        "SlideshowOpenGLTransitionLength", 500, 10000, 500);
+    gc->setLabel(QObject::tr("Duration of OpenGL Transition (milliseconds)"));
+    gc->setValue(2000);
+    return gc;
+};
+
 #endif /* OPENGL_SUPPORT */
 
 static HostComboBox *SlideshowTransition()
@@ -186,6 +195,7 @@ public:
     
         ConfigurationGroup* openGLConfig = new VerticalConfigurationGroup(false);
         openGLConfig->addChild(SlideshowOpenGLTransition());
+        openGLConfig->addChild(SlideshowOpenGLTransitionLength());
         addTarget("1", openGLConfig);
 
         ConfigurationGroup* regularConfig = new VerticalConfigurationGroup(false);

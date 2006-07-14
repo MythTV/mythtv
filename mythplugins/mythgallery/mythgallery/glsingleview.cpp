@@ -139,6 +139,9 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
         m_effectRandom = true;
     }
 
+    SetTransitionTimeout(gContext->GetNumSetting(
+                             "SlideshowOpenGLTransitionLength", 2000));
+
     // --------------------------------------------------------------------
 
     m_delay = gContext->GetNumSetting("SlideshowDelay", 0);
@@ -216,8 +219,12 @@ void GLSingleView::cleanUp(void)
 
     makeCurrent();
 
-    m_timer->stop();
-    delete m_timer;
+    if (m_timer)
+    {
+        m_timer->stop();
+        m_timer->deleteLater();
+        m_timer = NULL;
+    }
 
     if (m_texItem[0].tex)
         glDeleteTextures(1, &m_texItem[0].tex);
@@ -781,7 +788,7 @@ void GLSingleView::effectNone(void)
 
 void GLSingleView::effectBlend(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -791,6 +798,7 @@ void GLSingleView::effectBlend(void)
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
+    float t = m_time.elapsed() * m_transTimeoutInv;
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
@@ -820,7 +828,7 @@ void GLSingleView::effectBlend(void)
 
     glBegin(GL_QUADS);
     {
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f / (100.0f) * (float)m_i);
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f * t);
         glVertex3f(-1.0f, -1.0f, 0.0f);
         glVertex3f(+1.0f, -1.0f, 0.0f);
         glVertex3f(+1.0f, +1.0f, 0.0f);
@@ -836,7 +844,7 @@ void GLSingleView::effectBlend(void)
 
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f / (100.0f) * (float)m_i);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f * t);
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(-tb.cx, -tb.cy, 0.0f);
 
@@ -856,7 +864,7 @@ void GLSingleView::effectBlend(void)
 
 void GLSingleView::effectZoomBlend(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -874,7 +882,7 @@ void GLSingleView::effectZoomBlend(void)
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
     glRotatef(ta.angle, 0.0f, 0.0f, 1.0f);
-    float t = 1.0f / (100.00f) * (float)m_i;
+    float t = m_time.elapsed() * m_transTimeoutInv;
     glBindTexture(GL_TEXTURE_2D, ta.tex);
 
     glBegin(GL_QUADS);
@@ -902,7 +910,7 @@ void GLSingleView::effectZoomBlend(void)
 
     glBegin(GL_QUADS);
     {
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f / (100.0f) * (float) m_i);
+        glColor4f(1.0f, 1.0f, 1.0f, t);
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(-tb.cx, -tb.cy, 0.0f);
 
@@ -922,7 +930,7 @@ void GLSingleView::effectZoomBlend(void)
 
 void GLSingleView::effectRotate(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -935,6 +943,7 @@ void GLSingleView::effectRotate(void)
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
+    float t = m_time.elapsed() * m_transTimeoutInv;
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
@@ -963,10 +972,10 @@ void GLSingleView::effectRotate(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float rotate = 360.0f/100.0f*(float)m_i;
+    float rotate = 360.0f * t;
     glRotatef(((m_dir == 0) ? -1 : 1) * rotate, 
               0.0f, 0.0f, 1.0f);
-    float scale = 1.0f/100.0f*(100.0f-(float)(m_i));
+    float scale = 1.0f * (1.0f - t);
     glScalef(scale, scale, 1.0f);
 
     glMatrixMode(GL_TEXTURE);
@@ -997,7 +1006,7 @@ void GLSingleView::effectRotate(void)
 
 void GLSingleView::effectBend(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -1010,6 +1019,7 @@ void GLSingleView::effectBend(void)
 
     int a = (m_curr == 0) ? 1 : 0;
     int b =  m_curr;
+    float t = m_time.elapsed() * m_transTimeoutInv;
 
     TexItem& ta = m_texItem[a];
     TexItem& tb = m_texItem[b];
@@ -1038,7 +1048,7 @@ void GLSingleView::effectBend(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef(90.0f/100.0f*(float)m_i, 
+    glRotatef(90.0f * t, 
               (m_dir == 0) ? 1.0f : 0.0f, 
               (m_dir == 1) ? 1.0f : 0.0f, 
               0.0f);
@@ -1070,7 +1080,7 @@ void GLSingleView::effectBend(void)
 
 void GLSingleView::effectFade(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -1078,16 +1088,14 @@ void GLSingleView::effectFade(void)
         return;
     }
 
-    int a;
-    float opacity;
-    if (m_i <= 50)
+    float t       = m_time.elapsed() * m_transTimeoutInv;
+    int   a       = m_curr;
+    float opacity = 2.0f * (t - 0.5f);
+
+    if (m_time.elapsed() <= m_transTimeout / 2)
     {
         a =  (m_curr == 0) ? 1 : 0;
-        opacity = 1.0f - 1.0f/50.0f*(float)(m_i);
-    }
-    else {
-        opacity = 1.0f/50.0f*(float)(m_i-50.0f);
-        a = m_curr;
+        opacity = 1.0f - (2.0f * t);
     }
 
     TexItem& ta = m_texItem[a];
@@ -1121,7 +1129,7 @@ void GLSingleView::effectFade(void)
 
 void GLSingleView::effectInOut(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -1134,26 +1142,21 @@ void GLSingleView::effectInOut(void)
         m_dir = 1 + (int)((4.0f*rand()/(RAND_MAX+1.0f)));
     }
 
-    int a;
-    bool out;
-    if (m_i <= 50)
+    int  a   = m_curr;
+    bool out = false;
+    if (m_time.elapsed() <= m_transTimeout / 2)
     {
         a   = (m_curr == 0) ? 1 : 0;
-        out = 1;
-    }
-    else
-    {
-        a   = m_curr;
-        out = 0;
+        out = true;
     }
 
     TexItem& ta = m_texItem[a];
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float t = (out) ?
-        1.0f / 50.0f * (50.0f - m_i) :
-        1.0f / 50.0f * (m_i - 50.0f);
+
+    float tt = m_time.elapsed() * m_transTimeoutInv;
+    float t = 2.0f / ((out) ? (0.5f - tt) : (tt - 0.5f));
 
     glScalef(t, t, 1.0f);
     t = 1.0f - t;
@@ -1191,7 +1194,7 @@ void GLSingleView::effectInOut(void)
 
 void GLSingleView::effectSlide(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -1232,7 +1235,8 @@ void GLSingleView::effectSlide(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float trans = 2.0f/100.0f*(float)m_i;
+    float t = m_time.elapsed() * m_transTimeoutInv;
+    float trans = 2.0f * t;
     glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * trans : 0.0f, 
                  (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * trans : 0.0f, 
                  0.0f);
@@ -1266,7 +1270,7 @@ void GLSingleView::effectSlide(void)
 
 void GLSingleView::effectFlutter(void)
 {
-    if (m_i > 100)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -1317,13 +1321,15 @@ void GLSingleView::effectFlutter(void)
     }
     glEnd();
 
+    float t      = m_time.elapsed() * m_transTimeoutInv;
+    float rotate = 60.0f * t;
+    float scale  = 1.0f  - t;
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float rotate = 60.0f/100.0f*(float)m_i;
     glRotatef(rotate, 1.0f, 0.0f, 0.0f);
-    float scale = 1.0f/100.0f*(100.0f-(float)m_i);
     glScalef(scale, scale, scale);
-    glTranslatef(1.0f/100.0f*(float)m_i, 1.0f/100.0f*(float)m_i, 0.0f);
+    glTranslatef(t, t, 0.0f);
 
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
@@ -1387,10 +1393,10 @@ void GLSingleView::effectFlutter(void)
 
 void GLSingleView::effectCube(void)
 {
-    int tot = 200;
-    int rotStart = 50;
+    float tot      = m_transTimeout ? m_transTimeout : 1.0f;
+    float rotStart = 0.25f * m_transTimeout;
 
-    if (m_i > tot)
+    if (m_time.elapsed() > m_transTimeout)
     {
         paintTexture();
         m_effectRunning = false;
@@ -1435,8 +1441,9 @@ void GLSingleView::effectCube(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float trans = 5.0f *
-        (float) ((m_i <= tot / 2) ? m_i : tot - m_i) / (float)tot;
+    float elapsed = (float) m_time.elapsed();
+    float tmp     = ((elapsed <= tot * 0.5) ? elapsed : tot - elapsed);
+    float trans   = 5.0f * tmp / tot;
 
     glTranslatef(0.0f, 0.0f, -znear - 1.0f - trans);
 
@@ -1548,10 +1555,10 @@ void GLSingleView::effectCube(void)
     }
     glEnd();
 
-    if (m_i >= rotStart && m_i < (tot-rotStart))
+    if ((elapsed >= rotStart) && (elapsed < (tot - rotStart)))
     {
-        xrot += 360.0f / (float)(tot - 2 * rotStart);
-        yrot += 180.0f / (float)(tot - 2 * rotStart);
+        xrot = 360.0f * (elapsed - ( rotStart)) / (tot - 2 * rotStart);
+        yrot = 0.5f * xrot;
     }
 
     m_i++;
@@ -1604,6 +1611,7 @@ void GLSingleView::slotTimeOut(void)
                 m_effectRunning = true;
                 m_i = 0;
             }
+            m_time.restart();
         }
     }
 

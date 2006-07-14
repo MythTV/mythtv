@@ -25,6 +25,8 @@
 #include <qgl.h>
 #include <qmap.h>
 
+#include <mythtv/util.h>
+
 #include "iconview.h"
 #include "sequence.h"
 
@@ -62,6 +64,14 @@ public:
 
     void cleanUp();
 
+    void SetTransitionTimeout(int timeout)
+    {
+        m_transTimeout = timeout;
+        m_transTimeoutInv = 1.0f;
+        if (timeout)
+            m_transTimeoutInv = 1.0f / timeout;
+    }
+
 protected:
 
     void initializeGL();
@@ -96,8 +106,11 @@ private:
     float         m_sx, m_sy;
 
     QTimer       *m_timer;
+    MythTimer 	  m_time;
     int           m_tmout;
     int           m_delay;
+    int           m_transTimeout;
+    float         m_transTimeoutInv;
     bool          m_effectRunning;
     bool          m_running;
     int           m_slideShow;
