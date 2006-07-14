@@ -129,7 +129,7 @@ MythTV Archive GUI theme
           <context>1</context>
           <position>25,235</position>
           <filename>trans-cr-background.png</filename>
-          <staticsize>750,290</staticsize>
+          <staticsize>750,330</staticsize>
       </image>
 
       <textarea name="title" draworder="1" align="left">
@@ -185,18 +185,28 @@ MythTV Archive GUI theme
           <font>buttons</font>
       </textbutton>
 
-      <textarea name="freespace_label" draworder="1" align="right">
+      <textarea name="freespace_label" draworder="1" align="left">
           <context>1</context>
-          <area>80,450,200,50</area>
+          <area>45,480,150,50</area>
           <font>label</font>
-          <value>Free Space</value>
+          <value>Free Space:</value>
       </textarea>
       <textarea name="freespace_text" draworder="1" align="left">
           <context>1</context>
-          <area>300,450,200,50</area>
+          <area>215,480,200,50</area>
           <font>description</font>
           <value>0.00Gb</value>
       </textarea>
+
+      <textbutton name="advanced_button" draworder="3">
+          <position>590,470</position>
+          <context>1</context>
+          <image function="on" filename="ma_text_button_on.png"></image>
+          <image function="off" filename="ma_text_button_off.png"></image>
+          <image function="pushed" filename="ma_text_button_pushed.png"></image>
+          <font>buttons</font>
+      </textbutton>
+
 
   </container>
 
@@ -1043,6 +1053,444 @@ MythTV Archive GUI theme
   </window>
 
   <!--
+      Import Native Wizard
+   -->
+
+  <window name="import_native_wizard">
+      <font name="title" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>24</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="buttons" face="Arial">
+          <color>#ffffff</color>
+          <size>12</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="edit" face="Arial">
+          <color>#ffffff</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="active" face="Arial">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="inactive" face="Arial">
+          <color>#9999cc</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="info" face="Arial">
+          <color>#9999cc</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="label" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>18</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="detail" face="Arial">
+          <color>#ffffff</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="detailtitle" face="Arial">
+          <color>#ffff00</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <!--
+          ****************************
+          first page
+          ****************************
+      -->
+
+      <container name="wizardpages">
+          <area>0,0,800,550</area>
+
+          <textarea name="title" draworder="1" align="center">
+              <context>1</context>
+              <area>0,0,800,45</area>
+              <font>title</font>
+              <multiline>no</multiline>
+              <value>Find Archived File</value>
+          </textarea>
+
+          <textbutton name="back_button" draworder="1">
+              <context>1</context>
+              <position>35,55</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+          <textbutton name="home_button" draworder="1">
+              <context>1</context>
+              <position>200,55</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+          <textarea name="location_label" draworder="0" align="right">
+              <context>1</context>
+              <area>20,105,140,30</area>
+              <font>label</font>
+              <multiline>no</multiline>
+              <value>Location:</value>
+          </textarea>
+          <remoteedit name="location_edit" draworder="0" align="left">
+              <context>1</context>
+              <area>180,105,580,30</area>
+              <font>edit</font>
+          </remoteedit>
+
+          <listbtnarea name="filelist"  draworder="1">
+              <context>1</context>
+              <area>20,140,760,250</area>
+              <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+              </gradient>
+              <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
+              </gradient>
+              <fcnfont name="active" function="active"></fcnfont>
+              <fcnfont name="inactive" function="inactive"></fcnfont>
+              <showscrollarrows>yes</showscrollarrows>
+              <showarrow>no</showarrow>
+          </listbtnarea>
+
+        <image name="image" draworder="0">
+            <context>1</context>
+            <position>10,400</position>
+            <filename>trans-cr-background.png</filename>
+            <staticsize>780,150</staticsize>
+        </image>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>1</context>
+            <area>30,415,160,40</area>
+            <font>label</font>
+            <value>Title:</value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>1</context>
+            <area>30,455,160,40</area>
+            <font>label</font>
+            <value>Subtitle:</value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>1</context>
+            <area>30,495,160,40</area>
+            <font>label</font>
+            <value>Start Time:</value>
+        </textarea>
+
+        <textarea name="title_text" draworder="1" align="left">
+            <context>1</context>
+            <area>180,420,500,40</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <textarea name="subtitle_text" draworder="1" align="left">
+            <context>1</context>
+            <area>180,460,500,40</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <textarea name="starttime_text" draworder="1" align="left">
+            <context>1</context>
+            <area>180,500,500,40</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+
+        <!--
+            ****************************
+            second page
+            ****************************
+        -->
+
+        <textarea name="title" draworder="1" align="center">
+            <context>2</context>
+            <area>0,10,800,50</area>
+            <font>title</font>
+            <value>Select Associated Channel</value>
+        </textarea>
+
+        <!--
+            archived file channel 
+        -->
+
+        <image name="image" draworder="0">
+            <context>2</context>
+            <position>25,60</position>
+            <filename>trans-cr-background.png</filename>
+            <staticsize>750,170</staticsize>
+        </image>
+
+        <textarea name="progtitle" draworder="3">
+            <context>2</context>
+            <area>40,70,440,30</area>
+            <font>detailtitle</font>
+            <value></value>
+            <multiline>no</multiline>
+        </textarea>
+
+        <textarea name="progdatetime" draworder="4" align="right">
+            <context>2</context>
+            <area>590,70,165,30</area>
+            <font>detailtitle</font>
+            <value></value>
+            <multiline>no</multiline>
+        </textarea>
+
+        <textarea name="progdescription" draworder="5">
+            <context>2</context>
+            <area>40,100,720,100</area>
+            <font>detail</font>
+            <value></value>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <image name="preview_image" draworder="0">
+            <context>2</context>
+            <position>615,70</position>
+            <staticsize>130,100</staticsize>
+            <filename>blank.png</filename>
+        </image>
+
+        <image name="image" draworder="0">
+            <context>2</context>
+            <position>25,225</position>
+            <filename>trans-cr-background.png</filename>
+            <staticsize>750,160</staticsize>
+        </image>
+
+        <textarea name="label" draworder="2" align="center">
+            <context>2</context>
+            <area>50,230,690,50</area>
+            <font>label</font>
+            <value>Archived Channel</value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>50,280,500,50</area>
+            <font>label</font>
+            <value>Chan. ID:</value>
+        </textarea>
+
+        <textarea name="chanid" draworder="1" align="left">
+            <context>2</context>
+            <area>190,285,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>50,320,500,50</area>
+            <font>label</font>
+            <value>Chan. No:</value>
+        </textarea>
+
+        <textarea name="channo" draworder="1" align="left">
+            <context>2</context>
+            <area>190,325,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>350,280,500,50</area>
+            <font>label</font>
+            <value>Callsign:</value>
+        </textarea>
+
+        <textarea name="callsign" draworder="1" align="left">
+            <context>2</context>
+            <area>480,285,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>350,320,500,50</area>
+            <font>label</font>
+            <value>Name:</value>
+        </textarea>
+
+        <textarea name="name" draworder="1" align="left">
+            <context>2</context>
+            <area>480,325,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <!--
+            local file channel 
+         -->
+
+        <image name="image" draworder="0">
+            <context>2</context>
+            <position>25,380</position>
+            <filename>trans-cr-background.png</filename>
+            <staticsize>750,170</staticsize>
+        </image>
+
+        <textarea name="label" draworder="2" align="center">
+            <context>2</context>
+            <area>50,385,690,50</area>
+            <font>label</font>
+            <value>Local Channel</value>
+        </textarea>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>50,440,500,50</area>
+            <font>label</font>
+            <value>Chan. ID:</value>
+        </textarea>
+
+        <textarea name="local_chanid" draworder="1" align="left">
+            <context>2</context>
+            <area>190,444,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <pushbutton name="searchchanid_button" draworder="2">
+            <context>2</context>
+            <position>300,440</position>
+            <image function="on" filename="ma_blankbutton_on.png"></image>
+            <image function="off" filename="ma_blankbutton_off.png"></image>
+            <image function="pushed" filename="ma_blankbutton_pushed.png"></image>
+        </pushbutton>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>50,480,500,50</area>
+            <font>label</font>
+            <value>Chan. No:</value>
+        </textarea>
+
+        <textarea name="local_channo" draworder="1" align="left">
+            <context>2</context>
+            <area>190,484,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <pushbutton name="searchchanno_button" draworder="2">
+            <context>2</context>
+            <position>300,480</position>
+            <image function="on" filename="ma_blankbutton_on.png"></image>
+            <image function="off" filename="ma_blankbutton_off.png"></image>
+            <image function="pushed" filename="ma_blankbutton_pushed.png"></image>
+        </pushbutton>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>350,440,500,50</area>
+            <font>label</font>
+            <value>Callsign:</value>
+        </textarea>
+
+        <textarea name="local_callsign" draworder="1" align="left">
+            <context>2</context>
+            <area>480,445,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <pushbutton name="searchcallsign_button" draworder="2">
+            <context>2</context>
+            <position>700,440</position>
+            <image function="on" filename="ma_blankbutton_on.png"></image>
+            <image function="off" filename="ma_blankbutton_off.png"></image>
+            <image function="pushed" filename="ma_blankbutton_pushed.png"></image>
+        </pushbutton>
+
+        <textarea name="label" draworder="1" align="left">
+            <context>2</context>
+            <area>350,480,500,50</area>
+            <font>label</font>
+            <value>Name:</value>
+        </textarea>
+
+        <textarea name="local_name" draworder="1" align="left">
+            <context>2</context>
+            <area>480,485,500,50</area>
+            <font>detail</font>
+            <value></value>
+        </textarea>
+
+        <pushbutton name="searchname_button" draworder="2">
+            <context>2</context>
+            <position>700,480</position>
+            <image function="on" filename="ma_blankbutton_on.png"></image>
+            <image function="off" filename="ma_blankbutton_off.png"></image>
+            <image function="pushed" filename="ma_blankbutton_pushed.png"></image>
+        </pushbutton>
+
+      </container>
+
+
+      <!--
+          button area shown on all pages
+          -->
+      <container name="buttons">
+          <area>0,550,800,50</area>
+
+          <textbutton name="cancel_button" draworder="1">
+              <position>35,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="prev_button" draworder="1">
+              <position>440,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="next_button" draworder="1">
+              <position>610,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+      </container>
+  </window>
+
+  <!--
       *******************************************************************
       The mythburn wizard
       *******************************************************************
@@ -1437,16 +1885,7 @@ MythTV Archive GUI theme
               <filename>trans-cr-background.png</filename>
               <staticsize>650,240</staticsize>
           </image>
-          <!--
-          <textbutton name="advanced_button" draworder="1">
-              <position>35,450</position>
-              <context>3</context>
-              <image function="on" filename="ma_text_button_on.png"></image>
-              <image function="off" filename="ma_text_button_off.png"></image>
-              <image function="pushed" filename="ma_text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
-          -->
+
           <textarea name="title" draworder="1" align="left">
               <context>3</context>
               <area>45,320,500,50</area>

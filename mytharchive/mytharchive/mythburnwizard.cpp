@@ -18,7 +18,6 @@
 #include "mytharchivewizard.h"
 #include "mythburnwizard.h"
 #include "editmetadata.h"
-#include "advancedoptions.h"
 
 // last page in wizard
 const int LAST_PAGE = 3;
@@ -333,14 +332,6 @@ void MythburnWizard::wireUpTheme()
     {
         cancel_button->setText(tr("Cancel"));
         connect(cancel_button, SIGNAL(pushed()), this, SLOT(handleCancel()));
-    }
-
-    // advanced button
-    advanced_button = getUITextButtonType("advanced_button");
-    if (advanced_button)
-    {
-        advanced_button->setText(tr("Advanced Options"));
-        connect(advanced_button, SIGNAL(pushed()), this, SLOT(advancedPressed()));
     }
 
     // recordings selector
@@ -1342,19 +1333,5 @@ void MythburnWizard::showEditMetadataDialog()
         // update widgets to reflect any changes
         titleChanged(item);
         item->setText(curItem->title);
-    }
-}
-
-void MythburnWizard::advancedPressed()
-{
-    AdvancedOptions *dialog = new AdvancedOptions(gContext->GetMainWindow(),
-                           "advanced_options", "mytharchive-", "advanced options");
-    int res = dialog->exec();
-    delete dialog;
-
-    if (res)
-    {
-        // need to reload our copy of setting in case they have changed
-        loadConfiguration();
     }
 }

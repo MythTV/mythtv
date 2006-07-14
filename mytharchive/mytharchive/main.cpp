@@ -30,6 +30,7 @@ using namespace std;
 #include "recordingselector.h"
 #include "videoselector.h"
 #include "dbcheck.h"
+#include "importnativewizard.h"
 
 void runExportVideo(void)
 {
@@ -111,6 +112,83 @@ void runExportVideo(void)
     // now show the log viewer
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
 //    dialog.setFilename(logDir + "/mythburn.log");
+    dialog.setFilename(logDir + "/progress.log");
+    dialog.exec();
+}
+
+void runImportVideo(void)
+{
+    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+
+    if (tempDir == "")
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Myth Archive"),
+                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
+                                          "Have you set the correct path in the settings?"));  
+        return;
+    }
+
+    if (!tempDir.endsWith("/"))
+        tempDir += "/";
+
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString workDir = tempDir + "work";
+
+    // make sure the 'work', 'logs', and 'config' directories exist
+    QDir dir(tempDir);
+    if (!dir.exists())
+    {
+        dir.mkdir(tempDir);
+        system("chmod 777 " + tempDir);
+    }
+
+    dir = QDir(workDir);
+    if (!dir.exists())
+    {
+        dir.mkdir(workDir);
+        system("chmod 777 " + workDir);
+    }
+
+    dir = QDir(logDir);
+    if (!dir.exists())
+    {
+        dir.mkdir(logDir);
+        system("chmod 777 " + logDir);
+    }
+    dir = QDir(configDir);
+    if (!dir.exists())
+    {
+        dir.mkdir(configDir);
+        system("chmod 777 " + configDir);
+    }
+
+    QFile file(logDir + "/mythburn.lck");
+
+    //Are we already building a recording?
+    if ( file.exists() )
+    {
+        // Yes so we just show the log viewer
+        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
+        dialog.setFilename(logDir + "/progress.log");
+        dialog.exec();
+        return;
+    }
+
+    QString filter = "*.xml";
+
+    ImportNativeWizard wiz("/", filter, gContext->GetMainWindow(),
+                          "import_native_wizard", "mytharchive-", "import native wizard");
+    qApp->unlock();
+    int res = wiz.exec();
+    qApp->lock();
+
+    if (res == 0)
+        return;
+
+    // now show the log viewer
+    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
     dialog.setFilename(logDir + "/progress.log");
     dialog.exec();
 }
@@ -201,6 +279,8 @@ void ArchiveCallback(void *data, QString &selection)
         runSelectMenu("archiveselect.xml");
     else if (sel == "archive_export_video")
         runExportVideo();
+    else if (sel == "archive_import_video")
+        runImportVideo();
 }
 
 void runMenu(QString which_menu)

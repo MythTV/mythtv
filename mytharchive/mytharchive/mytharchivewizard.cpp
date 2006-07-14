@@ -230,6 +230,14 @@ void MythArchiveWizard::wireUpTheme()
 
     freespace_text = getUITextType("freespace_text");
 
+    // advanced button
+    advanced_button = getUITextButtonType("advanced_button");
+    if (advanced_button)
+    {
+        advanced_button->setText(tr("Advanced Options"));
+        connect(advanced_button, SIGNAL(pushed()), this, SLOT(advancedPressed()));
+    }
+
     setFormat(0);
     setDestination(0);
 }
@@ -335,8 +343,6 @@ void MythArchiveWizard::runMythBurnWizard()
     commandline += " > "  + logDir + "/mythburn.log 2>&1 &";       //Logs
 
     delete wiz;
-
-//    cerr << "About to run command line: " << commandline << endl;
 
     int state = system(commandline);
 
@@ -541,3 +547,16 @@ void MythArchiveWizard::handleFind(void)
     qApp->lock();
 }
 
+void MythArchiveWizard::advancedPressed()
+{
+    AdvancedOptions *dialog = new AdvancedOptions(gContext->GetMainWindow(),
+            "advanced_options", "mytharchive-", "advanced options");
+    int res = dialog->exec();
+    delete dialog;
+
+    if (res)
+    {
+        // need to reload our copy of setting in case they have changed
+        loadConfiguration();
+    }
+}

@@ -27,10 +27,14 @@ class NativeArchive
       NativeArchive(void);
       ~NativeArchive(void);
 
-      int doNativeArchive(QString &jobFile);
+      int doNativeArchive(const QString &jobFile);
+      int doImportArchive(const QString &xmlFile, int chanID);
       bool copyFile(const QString &source, const QString &destination);
+      int importRecording(const QDomElement &itemNode, const QString &xmlFile, int chanID);
+      int importVideo(const QDomElement &itemNode, const QString &xmlFile);
   private:
       QString formatSize(long long size);
+      QString findNodeText(const QDomElement &elem, const QString &nodeName);
 };
 
 NativeArchive::NativeArchive(void)
@@ -73,18 +77,19 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
 {
     QFile srcFile(source), destFile(destination);
 
-    VERBOSE(VB_JOBQUEUE, QString("copying from %1 to %2")
-            .arg(source).arg(destination));
+    VERBOSE(VB_JOBQUEUE, QString("copying from %1").arg(source));
+    VERBOSE(VB_JOBQUEUE, QString("to %2").arg(destination));
 
     if (!srcFile.open(IO_ReadOnly))
     { 
-        VERBOSE(VB_JOBQUEUE, "Unable to open source file");
+        VERBOSE(VB_JOBQUEUE, "ERROR: Unable to open source file");
         return false;
     }
 
     if (!destFile.open(IO_WriteOnly))
     { 
-        VERBOSE(VB_JOBQUEUE, "Unable to open destination file");
+        VERBOSE(VB_JOBQUEUE, "ERROR: Unable to open destination file");
+        VERBOSE(VB_JOBQUEUE, "Do you have write access to the directory?");
         srcFile.close();
         return false;
     }
@@ -99,8 +104,8 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
 
     if (freeSpace != -1 && freeSpace < totalSize / 1024)
     {
-        VERBOSE(VB_JOBQUEUE, QString("Not enough free space available on destination filesystem. %1 %2")
-                .arg(freeSpace).arg(totalSize));
+        VERBOSE(VB_JOBQUEUE, QString("ERROR: Not enough free space available on destination filesystem."));
+        VERBOSE(VB_JOBQUEUE, QString("Available: %1 Needed %2").arg(freeSpace).arg(totalSize));
         destFile.close();
         srcFile.close();
         return false;
@@ -112,7 +117,7 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
 
         if (destLen == -1 || srcLen != destLen)
         {
-            VERBOSE(VB_JOBQUEUE, "Error while trying to write to destination file.");
+            VERBOSE(VB_JOBQUEUE, "ERROR: While trying to write to destination file.");
             srcFile.close();
             destFile.close();
             return false;
@@ -131,7 +136,8 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
     destFile.close();
     if (srcFile.size() != destFile.size())
     {
-        VERBOSE(VB_JOBQUEUE, "Copy not completed OK - Source and destination file sizes do not match!!");
+        VERBOSE(VB_JOBQUEUE, "ERROR: Copy not completed OK - "
+                             "Source and destination file sizes do not match!!");
         VERBOSE(VB_JOBQUEUE, QString("Source is %1 bytes, Destination is %2 bytes")
                 .arg(srcFile.size()).arg(destFile.size()));
         return false;
@@ -161,7 +167,7 @@ bool extractDetailsFromFilename(const QString &inFile,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_ALL, 
                 QString("MythArchiveHelper: Cannot find details for %1").arg(inFile));
         return false;
     }
@@ -220,8 +226,13 @@ void createISOImage(QString &sourceDirectory)
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
     int res = system(command);
-    cout << "createISOImage result: " << res << endl;
-    VERBOSE(VB_JOBQUEUE, "Finished creating ISO image");
+    if (WIFEXITED(res))
+        res = WEXITSTATUS(res);
+    if (res == 0)
+        VERBOSE(VB_JOBQUEUE, "Finished creating ISO image");
+    else
+        VERBOSE(VB_JOBQUEUE, QString("ERROR: Failed while running mkisofs. Result: %1")
+                .arg(res));
 }
 
 void burnISOImage(int mediaType, bool bEraseDVDRW)
@@ -249,11 +260,16 @@ void burnISOImage(int mediaType, bool bEraseDVDRW)
     }
 
     int res = system(command);
-    cout << "burnISOImage result: " << res << endl;
-    VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
+    if (WIFEXITED(res))
+        res = WEXITSTATUS(res);
+    if (res == 0)
+        VERBOSE(VB_JOBQUEUE, "Finished burning ISO image");
+    else
+        VERBOSE(VB_JOBQUEUE, 
+                QString("ERROR: Failed while running growisofs. Result: %1").arg(res));
 }
 
-int NativeArchive::doNativeArchive(QString &jobFile)
+int NativeArchive::doNativeArchive(const QString &jobFile)
 {
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
 
@@ -692,15 +708,285 @@ int NativeArchive::doNativeArchive(QString &jobFile)
     // make sure the files we created are read/writable by all 
     system("chmod -R a+rw-x+X " + saveDirectory);
 
-    VERBOSE(VB_JOBQUEUE, "Finished processing job file");
+
 
     return 0;
 }
 
-bool doNativeArchive(QString &jobFile)
+int NativeArchive::doImportArchive(const QString &xmlFile, int chanID)
+{
+    // open xml file 
+    QDomDocument doc("mydocument");
+    QFile file(xmlFile);
+    if (!file.open(IO_ReadOnly))
+    {
+        VERBOSE(VB_ALL, "ERROR: Failed to open file for reading - " + xmlFile);
+        return 1;
+    }
+
+    if (!doc.setContent(&file)) 
+    {
+        file.close();
+        VERBOSE(VB_ALL, "ERROR: Failed to read from xml file - " + xmlFile);
+        return 1;
+    }
+    file.close();
+
+    QString docType = doc.doctype().name();
+    QString type, dbVersion;
+    QDomNodeList itemNodeList;
+    QDomNode node;
+    QDomElement itemNode;
+
+    if (docType == "MYTHARCHIVEITEM")
+    {
+        itemNodeList = doc.elementsByTagName("item");
+
+        if (itemNodeList.count() < 1)
+        {
+            VERBOSE(VB_ALL, "ERROR: Couldn't find an 'item' element in XML file");
+            return 1;
+        }
+
+        node = itemNodeList.item(0);
+        itemNode = node.toElement();
+        type = itemNode.attribute("type");
+        dbVersion = itemNode.attribute("databaseversion");
+
+        VERBOSE(VB_JOBQUEUE, QString("Archive DB version: %1, Local DB version: %2")
+                .arg(dbVersion).arg(gContext->GetSetting("DBSchemaVer")));
+    }
+    else
+    {
+        VERBOSE(VB_ALL, "ERROR: Not a native archive xml file - " + xmlFile);
+        return 1;
+    }
+
+    if (type == "recording")
+    {
+        return importRecording(itemNode, xmlFile, chanID);
+    }
+    else if (type == "video")
+    {
+        return importVideo(itemNode, xmlFile);
+    }
+
+    return 1;
+}
+
+int NativeArchive::importRecording(const QDomElement &itemNode, const QString &xmlFile, int chanID)
+{
+    VERBOSE(VB_JOBQUEUE, QString("Import recording using chanID: %1").arg(chanID));
+    VERBOSE(VB_JOBQUEUE, QString("Archived recording xml file: %1").arg(xmlFile));
+
+    QString videoFile = xmlFile.left(xmlFile.length() - 4);
+    QString basename = videoFile;
+    int pos = videoFile.findRev('/');
+    if (pos > 0)
+        basename = videoFile.mid(pos + 1);
+
+    QDomNodeList nodeList = itemNode.elementsByTagName("recorded");
+    if (nodeList.count() < 1)
+    {
+        VERBOSE(VB_ALL, "ERROR: Couldn't find a 'recorded' element in XML file");
+        return 1;
+    }
+
+    QDomNode n = nodeList.item(0);
+    QDomElement recordedNode = n.toElement();
+
+    // copy file to recording directory
+    if (!copyFile(videoFile, gContext->GetSetting("RecordFilePrefix") + 
+            "/" + basename))
+    {
+        return 1;
+    }
+
+    QString startTime = findNodeText(recordedNode, "starttime");
+
+    // copy recorded to database
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO recorded (chanid,starttime,endtime,"
+            "title,subtitle,description,category,hostname,bookmark,"
+            "editing,cutlist,autoexpire, commflagged,recgroup,"
+            "recordid, seriesid,programid,lastmodified,filesize,stars,"
+            "previouslyshown,originalairdate,preserve,findid,deletepending,"
+            "transcoder,timestretch,recpriority,basename,progstart,progend,"
+            "playgroup,profile,duplicate,transcoded) "
+            "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
+            ":SUBTITLE,:DESCRIPTION,:CATEGORY,:HOSTNAME,"
+            ":BOOKMARK,:EDITING,:CUTLIST,:AUTOEXPIRE,"
+            ":COMMFLAGGED,:RECGROUP,:RECORDID,:SERIESID,"
+            ":PROGRAMID,:LASTMODIFIED,:FILESIZE,:STARS,"
+            ":PREVIOUSLYSHOWN,:ORIGINALAIRDATE,:PRESERVE,:FINDID,"
+            ":DELETEPENDING,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY,"
+            ":BASENAME,:PROGSTART,:PROGEND,:PLAYGROUP,:PROFILE,:DUPLICATE,:TRANSCODED);");
+    query.bindValue(":CHANID", chanID);
+    query.bindValue(":STARTTIME", startTime);
+    query.bindValue(":ENDTIME", findNodeText(recordedNode, "endtime"));
+    query.bindValue(":TITLE", findNodeText(recordedNode, "title"));
+    query.bindValue(":SUBTITLE", findNodeText(recordedNode, "subtitle"));
+    query.bindValue(":DESCRIPTION", findNodeText(recordedNode, "description"));
+    query.bindValue(":CATEGORY", findNodeText(recordedNode, "category"));
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":BOOKMARK", findNodeText(recordedNode, "bookmark"));
+    query.bindValue(":EDITING", findNodeText(recordedNode, "editing"));
+    query.bindValue(":CUTLIST", findNodeText(recordedNode, "cutlist"));
+    query.bindValue(":AUTOEXPIRE", findNodeText(recordedNode, "autoexpire"));
+    query.bindValue(":COMMFLAGGED", findNodeText(recordedNode, "commflagged"));
+    query.bindValue(":RECGROUP", findNodeText(recordedNode, "recgroup"));
+    query.bindValue(":RECORDID", findNodeText(recordedNode, "recordid"));
+    query.bindValue(":SERIESID", findNodeText(recordedNode, "seriesid"));
+    query.bindValue(":PROGRAMID", findNodeText(recordedNode, "programid"));
+    query.bindValue(":LASTMODIFIED", findNodeText(recordedNode, "lastmodified"));
+    query.bindValue(":FILESIZE", findNodeText(recordedNode, "filesize"));
+    query.bindValue(":STARS", findNodeText(recordedNode, "stars"));
+    query.bindValue(":PREVIOUSLYSHOWN", findNodeText(recordedNode, "previouslyshown"));
+    query.bindValue(":ORIGINALAIRDATE", findNodeText(recordedNode, "originalairdate"));
+    query.bindValue(":PRESERVE", findNodeText(recordedNode, "preserve"));
+    query.bindValue(":FINDID", findNodeText(recordedNode, "findid"));
+    query.bindValue(":DELETEPENDING", findNodeText(recordedNode, "deletepending"));
+    query.bindValue(":TRANSCODER", findNodeText(recordedNode, "transcoder"));
+    query.bindValue(":TIMESTRETCH", findNodeText(recordedNode, "timestretch"));
+    query.bindValue(":RECPRIORITY", findNodeText(recordedNode, "recpriority"));
+    query.bindValue(":BASENAME", findNodeText(recordedNode, "basename"));
+    query.bindValue(":PROGSTART", findNodeText(recordedNode, "progstart"));
+    query.bindValue(":PROGEND", findNodeText(recordedNode, "progend"));
+    query.bindValue(":PLAYGROUP", findNodeText(recordedNode, "playgroup"));
+    query.bindValue(":PROFILE", findNodeText(recordedNode, "profile"));
+    query.bindValue(":DUPLICATE", findNodeText(recordedNode, "duplicate"));
+    query.bindValue(":TRANSCODED", findNodeText(recordedNode, "transcoded"));
+
+    if (query.exec())
+        VERBOSE(VB_JOBQUEUE, "Inserted recorded details into database");
+    else
+    {
+        print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+        MythContext::DBError("recorded insert", query);
+        print_verbose_messages = VB_JOBQUEUE;
+    }
+
+    // copy recordedmarkup to db
+    nodeList = itemNode.elementsByTagName("recordedmarkup");
+    if (nodeList.count() < 1)
+    {
+        VERBOSE(VB_ALL, "WARNING: Couldn't find a 'recordedmarkup' element in XML file");
+    }
+    else
+    {
+        n = nodeList.item(0);
+        QDomElement markupNode = n.toElement();
+
+        nodeList = markupNode.elementsByTagName("mark");
+        if (nodeList.count() < 1)
+        {
+            VERBOSE(VB_ALL, "WARNING: Couldn't find any 'mark' elements in XML file");
+        }
+        else
+        {
+            for (uint x = 0; x < nodeList.count(); x++)
+            {
+                n = nodeList.item(x);
+                QDomElement e = n.toElement();
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("INSERT INTO recordedmarkup (chanid, starttime, "
+                        "mark, offset, type)"
+                        "VALUES(:CHANID,:STARTTIME,:MARK,:OFFSET,:TYPE);");
+                query.bindValue(":CHANID", chanID);
+                query.bindValue(":STARTTIME", startTime);
+                query.bindValue(":MARK", e.attribute("mark"));
+                query.bindValue(":OFFSET", e.attribute("offset"));
+                query.bindValue(":TYPE", e.attribute("type"));
+
+                if (!query.exec())
+                {
+                    print_verbose_messages = VB_JOBQUEUE + VB_IMPORTANT;
+                    MythContext::DBError("recordedmark insert", query);
+                    return 1;
+                }
+            }
+
+            VERBOSE(VB_JOBQUEUE, "Inserted recordedmarkup details into database");
+        }
+    }
+
+    VERBOSE(VB_JOBQUEUE, "Import completed OK");
+
+    return 0;
+}
+
+int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFile)
+{
+    // FIXME
+    (void) itemNode;
+    (void) xmlFile;
+    return 0;
+}
+
+QString NativeArchive::findNodeText(const QDomElement &elem, const QString &nodeName)
+{
+    QDomNodeList nodeList = elem.elementsByTagName(nodeName);
+    if (nodeList.count() < 1)
+    {
+        cout << QString("Couldn't find a '%1' element in XML file").arg(nodeName) << endl;
+        return "";
+    }
+
+    QDomNode n = nodeList.item(0);
+    QDomElement e = n.toElement();
+    QString res = "";
+
+    for (QDomNode node = e.firstChild(); !node.isNull();
+         node = node.nextSibling())
+    {
+        QDomText t = node.toText();
+        if (!t.isNull())
+        {
+            res = t.data();
+            break;
+        }
+    }
+
+    // some fixups
+    // FIXME could be a lot smarter
+    if (nodeName == "recgroup")
+    {
+        res = "Default";
+    }
+    else if (nodeName == "recordid")
+    {
+        res = "";
+    }
+    else if (nodeName == "seriesid")
+    {
+        res = "";
+    }
+    else if (nodeName == "programid")
+    {
+        res = "";
+    }
+    else if (nodeName == "playgroup")
+    {
+        res = "Default";
+    }
+    else if (nodeName == "profile")
+    {
+        res = "";
+    }
+
+    return res;
+}
+
+int doNativeArchive(const QString &jobFile)
 {
     NativeArchive na;
     return na.doNativeArchive(jobFile);
+}
+
+int doImportArchive(const QString &inFile, int chanID)
+{
+    NativeArchive na;
+    return na.doImportArchive(inFile, chanID);
 }
 
 int grabThumbnail(QString inFile, QString thumbList, QString outFile)
@@ -1192,8 +1478,13 @@ void showUsage()
     cout << "                          2 - use position map in DB (quick, only works for myth recordings)\n";
     cout << "-p/--getdbparameters outfile\n";
     cout << "                          (write the mysql database parameters to outfile)\n";
-    cout << "-n/--nativearchive        (archive files to a native archive format)\n";
+    cout << "-n/--nativearchive jobfile \n";
+    cout << "                          (archive files to a native archive format)\n";
     cout << "       jobfile    - filename of archive job file\n";
+    cout << "-f/--importarchive xmlfile chanID\n";
+    cout << "                          (import an archived file)";
+    cout << "       xmlfile    - filename of the archive xml file";
+    cout << "       chanID     - chanID to use when inserting records in DB";
     cout << "-l/--log logfile          (name of log file to send messages)\n";
     cout << "-v/--verbose debug-level  (Use '-v help' for level info)\n";
     cout << "-h/--help                 (shows this usage)\n";
@@ -1220,12 +1511,14 @@ int main(int argc, char **argv)
     bool bGrabThumbnail = false;
     bool bGetDBParameters = false;
     bool bNativeArchive = false;
+    bool bImportArchive = false;
     bool bGetFileInfo = false;
     QString thumbList;
     QString inFile;
     QString outFile;
     QString logFile;
     int lenMethod = 0;
+    int chanID;
 
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -1314,6 +1607,33 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-f") ||
+                  !strcmp(a.argv()[argpos],"--importarchive"))
+        {
+            bImportArchive = true;
+            if (a.argc()-1 > argpos)
+            {
+                inFile = a.argv()[argpos+1]; 
+                ++argpos;
+            } 
+            else
+            {
+                cerr << "Missing filename argument to -f/--importarchive option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+
+            if (a.argc()-1 > argpos)
+            {
+                QString arg(a.argv()[argpos+1]); 
+                chanID = arg.toInt();
+                ++argpos;
+            } 
+            else
+            {
+                cerr << "Missing chanID argument to -f/--importarchive option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"-l") ||
                   !strcmp(a.argv()[argpos],"--log"))
         {
@@ -1389,6 +1709,8 @@ int main(int argc, char **argv)
         res = getDBParamters(outFile);
     else if (bNativeArchive)
         res = doNativeArchive(outFile);
+    else if (bImportArchive)
+        res = doImportArchive(inFile, chanID);
     else if (bGetFileInfo)
         res = getFileInfo(inFile, outFile, lenMethod);
     else 

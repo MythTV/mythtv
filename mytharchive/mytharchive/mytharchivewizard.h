@@ -11,6 +11,8 @@
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
 
+#include "advancedoptions.h"
+
 typedef struct ArchiveFormat
 {
     QString name;
@@ -64,6 +66,8 @@ class MythArchiveWizard : public MythThemedDialog
     void setFormat(int);
     void setDestination(int);
 
+    void advancedPressed();
+
   private:
     int format_no;
     int destination_no;
@@ -85,6 +89,7 @@ class MythArchiveWizard : public MythThemedDialog
 
     UIRemoteEditType *filename_edit;
     UITextButtonType *find_button;
+    UITextButtonType *advanced_button;
 
     UITextButtonType *next_button;
     UITextButtonType *prev_button;

@@ -40,12 +40,12 @@ INSTALLS += menufiles uifiles scriptfiles introfiles themefiles imagefiles music
 
 HEADERS += archivesettings.h mythburnwizard.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h editmetadata.h
-HEADERS += advancedoptions.h mytharchivewizard.h mythnativewizard.h
+HEADERS += advancedoptions.h mytharchivewizard.h mythnativewizard.h importnativewizard.h
 
 SOURCES += main.cpp archivesettings.cpp mythburnwizard.cpp logviewer.cpp 
 SOURCES += fileselector.cpp recordingselector.cpp videoselector.cpp
 SOURCES += dbcheck.cpp editmetadata.cpp advancedoptions.cpp 
-SOURCES += mytharchivewizard.cpp mythnativewizard.cpp
+SOURCES += mytharchivewizard.cpp mythnativewizard.cpp importnativewizard.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

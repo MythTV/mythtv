@@ -85,9 +85,8 @@ class MythburnWizard : public MythThemedDialog
     void useSLDVD(void);
     void useDLDVD(void);
     void removeItem(void);
-    void advancedPressed();
 
-    private:
+  private:
     ArchiveDestination archiveDestination;
     QString themeDir; 
     int freeSpace;
@@ -144,7 +143,6 @@ class MythburnWizard : public MythThemedDialog
     UITextButtonType *next_button;
     UITextButtonType *prev_button;
     UITextButtonType *cancel_button;
-    UITextButtonType *advanced_button;
 
     UISelectorType   *category_selector;
     UITextType       *title_text;
