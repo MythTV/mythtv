@@ -112,6 +112,7 @@ class PlaybackBox : public MythDialog
     void cursorUp(bool page = false, bool newview = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
+    void customEdit();
     void upcoming();
     void details();
     void selected();

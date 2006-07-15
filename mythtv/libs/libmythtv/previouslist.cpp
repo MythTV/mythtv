@@ -20,6 +20,7 @@ using namespace std;
 #include "previouslist.h"
 #include "proglist.h"
 #include "scheduledrecording.h"
+#include "customedit.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -149,6 +150,8 @@ void PreviousList::keyPressEvent(QKeyEvent *e)
             accept();
         else if (action == "INFO")
             edit();
+        else if (action == "CUSTOMEDIT")
+            customEdit();
         else if (action == "UPCOMING")
             upcoming();
         else if (action == "DETAILS")
@@ -380,6 +383,19 @@ void PreviousList::edit()
         return;
 
     pi->EditScheduled();
+}
+
+void PreviousList::customEdit()
+{
+    ProgramInfo *pi = itemList.at(curItem);
+
+    if (!pi)
+        return;
+
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
+                                    pi->getRecordID(), pi->title);
+    ce->exec();
+    delete ce;
 }
 
 void PreviousList::upcoming()

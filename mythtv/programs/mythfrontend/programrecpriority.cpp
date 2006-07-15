@@ -573,13 +573,10 @@ void ProgramRecPriority::customEdit(void)
     ScheduledRecording record;
     record.loadByID(curitem->recordid);
 
-    if (record.getSearchType() == kPowerSearch)
-    {
-        CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
                                         "customedit", curitem->recordid, "");
-        ce->exec();
-        delete ce;
-    }
+    ce->exec();
+    delete ce;
 }
 
 void ProgramRecPriority::deactivate(void)

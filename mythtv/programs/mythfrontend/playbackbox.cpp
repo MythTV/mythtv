@@ -38,6 +38,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
+#include "customedit.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -1873,6 +1874,29 @@ void PlaybackBox::upcoming()
     delete pl;
 }
 
+void PlaybackBox::customEdit()
+{
+    previewVideoState = kStopping;
+
+    if (!curitem)
+        return;
+
+    if (curitem->availableStatus != asAvailable)
+    {
+        showAvailablePopup(curitem);
+        return;
+    }
+    ProgramInfo *pi = curitem;
+
+    if (!pi)
+        return;
+
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
+                                    pi->getRecordID(), pi->title);
+    ce->exec();
+    delete ce;
+}
+
 void PlaybackBox::details()
 {
     previewVideoState = kStopping;
@@ -3601,6 +3625,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 showActionsSelected();
             else if (action == "DETAILS")
                 details();
+            else if (action == "CUSTOMEDIT")
+                customEdit();
             else if (action == "UPCOMING")
                 upcoming();
             else if (action == "SELECT")
