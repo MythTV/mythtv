@@ -1,4 +1,4 @@
-QMAKE_CLEAN += Makefile.perl
+QMAKE_CLEAN += filethatdoesntexist ; [ -f Makefile.perl ] && make -f Makefile.perl clean
 
 mythperlbindings.target = Makefile.perl
 mythperlbindings.depends = Makefile.PL
@@ -9,13 +9,7 @@ mythperbindingsbuild.depends = Makefile.perl
 mythperbindingsbuild.commands = @-make -f Makefile.perl
 
 phony.target = .PHONY
-phony.depends = perl_build perl_clean
-
-perl_clean.target = perl_clean
-perl_clean.commands = @-make -f Makefile.perl clean
-
-qmake_clean.target = clean
-qmake_clean.depends = perl_clean
+phony.depends = perl_build
 
 perl_install.target = install
 perl_install.depends = all
