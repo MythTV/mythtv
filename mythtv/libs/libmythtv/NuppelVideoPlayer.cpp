@@ -3457,6 +3457,7 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
             {
                 long long newaudio;
                 newaudio = tc_lastval[TC_VIDEO] - tc_diff_estimate;
+                timecode -= tc_wrap[TC_AUDIO];
                 tc_wrap[TC_AUDIO] = newaudio - timecode;
                 timecode = newaudio;
                 tc_lastval[TC_AUDIO] = timecode;
