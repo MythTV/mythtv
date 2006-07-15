@@ -2036,7 +2036,7 @@ void Scheduler::AddNewRecords(void)
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "channel.recpriority + cardinput.recpriority, "
 "RECTABLE.prefinput, program.hdtv, program.closecaptioned, "
-"program.first, program.last "
+"program.first, program.last, program.stereo "
 + QString(
 "FROM recordmatch "
 
@@ -2212,6 +2212,13 @@ void Scheduler::AddNewRecords(void)
         if (oncepriority != 0 && result.value(43).toInt() > 0 && 
                                  result.value(44).toInt() > 0)
             p->recpriority2 += oncepriority;
+
+        if (result.value(41).toInt())
+            p->programflags |= FL_HDTV;
+        if (result.value(45).toInt())
+            p->programflags |= FL_STEREO;
+        if (result.value(42).toInt())
+            p->programflags |= FL_CC;
 
         if (complexpriority == 0)
         {
