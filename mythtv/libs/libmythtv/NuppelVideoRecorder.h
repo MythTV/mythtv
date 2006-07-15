@@ -138,7 +138,6 @@ class NuppelVideoRecorder : public RecorderBase, public CC608Reader
     
     int fd; // v4l input file handle
     signed char *strm;
-    long dropped;
     unsigned int lf, tf;
     int M1, M2, Q;
     int w, h;
@@ -154,8 +153,6 @@ class NuppelVideoRecorder : public RecorderBase, public CC608Reader
     int audio_samplerate; // rate we request from sounddevice
     int effectivedsp; // actual measured rate
 
-    int quiet;
-    int rawmode;
     int usebttv;
     float video_aspect;
 

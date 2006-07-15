@@ -68,7 +68,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
     inputchannel = 1;
     compression = 1;
     compressaudio = 1;
-    rawmode = 0;
     usebttv = 1;
     w = 352;
     h = 240;
@@ -2856,11 +2855,9 @@ void NuppelVideoRecorder::FinishRecording(void)
 void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync, 
                                      bool forcekey)
 {
-    int tmp = 0, r = 0, out_len = OUT_LEN;
+    int tmp = 0, out_len = OUT_LEN;
     struct rtframeheader frameheader;
-    int xaa, freecount = 0, compressthis;
-    int raw = 0;
-    int timeperframe = 40;
+    int raw = 0, compressthis = compression;
     uint8_t *planes[3];
     int len = frame->size;
     int fnum = frame->frameNumber;
@@ -2871,11 +2868,8 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
     planes[0] = buf;
     planes[1] = planes[0] + frame->width * frame->height;
-    if (picture_format == PIX_FMT_YUV422P)
-        planes[2] = planes[1] + (frame->width * frame->height) / 2;
-    else
-        planes[2] = planes[1] + (frame->width * frame->height) / 4;
-    compressthis = compression;
+    planes[2] = planes[1] + (frame->width * frame->height) /
+                            (picture_format == PIX_FMT_YUV422P ? 2 : 4);
 
     if (lf == 0) 
     {   // this will be triggered every new file
@@ -2884,35 +2878,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         lasttimecode = 0;
         frameofgop = 0;
         forcekey = true;
-    }
-
-    // count free buffers -- FIXME this can be done with less CPU time!!
-    for (xaa = 0; xaa < video_buffer_count; xaa++) 
-    {
-        if (videobuffer[xaa]->freeToBuffer) 
-            freecount++;
-    }
-
-    if (freecount < (video_buffer_count / 3)) 
-        compressthis = 0; // speed up the encode process
-    
-    if (freecount < 5 || rawmode)
-        raw = 1; // speed up the encode process
-    
-    if (raw==1 || compressthis==0) 
-    {
-        if (ringBuffer->IsIOBound())
-        {
-            /* need to compress, the disk can't handle any more bandwidth*/
-            raw=0;
-            compressthis=1;
-        }
-    }
-
-    if (transcoding)
-    {
-        raw = 0;
-        compressthis = 1;
     }
 
     // see if it's time for a seeker header, sync information and a keyframe
@@ -2986,6 +2951,33 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     }
     else
     {
+        int freecount = 0; 
+        freecount = act_video_buffer > act_video_encode ? 
+                    video_buffer_count - (act_video_buffer - act_video_encode) :
+                    act_video_encode - act_video_buffer; 
+
+        if (freecount < (video_buffer_count / 3))  
+            compressthis = 0; // speed up the encode process 
+
+        if (freecount < 5) 
+            raw = 1; // speed up the encode process 
+
+        if (raw == 1 || compressthis == 0)  
+        { 
+            if (ringBuffer->IsIOBound()) 
+            { 
+                /* need to compress, the disk can't handle any more bandwidth*/ 
+                raw=0; 
+                compressthis=1; 
+            } 
+        } 
+ 
+        if (transcoding) 
+        { 
+            raw = 0; 
+            compressthis = 1; 
+        }
+
         if (!raw) 
         {
             if (wantkeyframe)
@@ -2996,7 +2988,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             tmp = len;
 
         // here is lzo compression afterwards
-        if (compressthis) {
+        if (compressthis)
+        {
+            int r = 0;
             if (raw) 
                 r = lzo1x_1_compress((unsigned char*)buf, len, 
                                      out, (lzo_uint *)&out_len, wrkmem);
@@ -3009,34 +3003,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
                 return;
             }
         }
-    }
-
-    dropped = (((fnum-lf)>>1) - 1); // should be += 0 ;-)
-    
-    if (dropped>0)
-    {
-        if (ntsc_framerate)
-            timeperframe = (int)(1000 / (30 * framerate_multiplier));
-        else
-            timeperframe = (int)(1000 / (25 * framerate_multiplier));
-    }
-   
-    // if we have lost frames we insert "copied" frames until we have the
-    // exact count because of that we should have no problems with audio 
-    // sync, as long as we don't loose audio samples :-/
-  
-    while (0 && dropped > 0) 
-    {
-        frameheader.timecode = lasttimecode + timeperframe;
-        lasttimecode = frameheader.timecode;
-        frameheader.keyframe  = frameofgop;             // no keyframe defaulted
-        frameheader.packetlength =  0;   // no additional data needed
-        frameheader.frametype    = 'V';  // last frame (or nullframe if first)
-        frameheader.comptype    = 'L';
-        WriteFrameheader(&frameheader);
-        // we don't calculate sizes for lost frames for compression computation
-        dropped--;
-        frameofgop++;
     }
 
     frameheader.frametype = 'V'; // video frame
