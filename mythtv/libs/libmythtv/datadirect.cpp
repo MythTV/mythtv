@@ -1287,7 +1287,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 }
 
 bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
-                                         bool restore,
+                                         bool restore, bool onlyGrabSelected,
                                          uint cache_age_allowed_in_seconds)
 {
     if (cache_age_allowed_in_seconds)
@@ -1312,9 +1312,13 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
         return false;
 
     const RawLineupChannels orig_channels = (*lit).channels;
-    SetAll(lineupid, true);
-    if (!SaveLineupChanges(lineupid))
-        return false;
+
+    if (!onlyGrabSelected)
+    {
+        SetAll(lineupid, true);
+        if (!SaveLineupChanges(lineupid))
+            return false;
+    }
 
     ok = GrabLineupsOnly();
 

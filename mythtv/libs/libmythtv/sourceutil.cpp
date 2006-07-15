@@ -5,6 +5,7 @@
 
 // MythTV headers
 #include "sourceutil.h"
+#include "cardutil.h"
 #include "mythdbcon.h"
 #include "util.h"
 
@@ -92,7 +93,7 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
 
 bool SourceUtil::IsAnalog(uint sourceid)
 {
-    bool analog = false;
+    bool analog = true;
     MSqlQuery query(MSqlQuery::DDCon());
     query.prepare(
         "SELECT cardtype "
@@ -101,11 +102,28 @@ bool SourceUtil::IsAnalog(uint sourceid)
         "      cardinput.sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
+    bool has_any = false;
     if (query.exec() && query.next())
     {
-        analog = true;
-        do analog &= ((query.value(0).toString().upper() != "DVB") &&
-                      (query.value(0).toString().upper() != "HDTV"));
+        has_any = true;
+        do 
+            analog &= CardUtil::IsEncoder(query.value(0).toString().upper());
+        while (query.next());
+    }
+
+    if (has_any)
+        return analog;
+
+    // Try looking at channels if source is not connected,
+    query.prepare(
+        "SELECT atsc_minor_chan, serviceid "
+        "FROM channel "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    if (query.exec() && query.next())
+    {
+        do 
+            analog &= !query.value(0).toInt() && !query.value(1).toInt();
         while (query.next());
     }
 

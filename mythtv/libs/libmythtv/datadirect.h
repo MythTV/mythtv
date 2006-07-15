@@ -267,6 +267,7 @@ class DataDirectProcessor
 
     // combined commands
     bool GrabFullLineup(const QString &lineupid, bool restore = true,
+                        bool onlyGrabSelected = false,
                         uint cache_age_allowed_in_seconds = 0);
     bool SaveLineup(const QString &lineupid,
                     const QMap<QString,bool> &xmltvids);
