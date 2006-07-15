@@ -22,8 +22,7 @@
 
 using namespace std;
 
-static bool insert_program(MSqlQuery&,
-                           const ProgramInfo*,
+static bool insert_program(const ProgramInfo*,
                            const ScheduledRecording*);
 
 /** \fn StripHTMLTags(const QString&)
@@ -1508,8 +1507,6 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost) const
  */
 void ProgramInfo::StartedRecording(QString prefix, QString ext)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-
     if (!record)
     {
         record = new ScheduledRecording();
@@ -1518,12 +1515,14 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
 
     hostname = gContext->GetHostName();
     pathname = CreateRecordBasename(ext);
-    while (!insert_program(query, this, record))
+    while (!insert_program(this, record))
     {
         recstartts = recstartts.addSecs(1);
         pathname = CreateRecordBasename(ext);
     }
     pathname = prefix + "/" + pathname;
+
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID"
                   " AND starttime = :START;");
@@ -1558,10 +1557,11 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
         MythContext::DBError("Copy program ratings on record", query);    
 }
 
-static bool insert_program(MSqlQuery                &query,
-                           const ProgramInfo        *pg,
+static bool insert_program(const ProgramInfo        *pg,
                            const ScheduledRecording *schd)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
     query.prepare("LOCK TABLES recorded WRITE");
     if (!query.exec())
     {
