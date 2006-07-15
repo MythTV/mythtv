@@ -76,6 +76,9 @@ void *AnalogScan::spawn(void *param)
 void AnalogScan::doScan()
 {
     fRunning = true;
+    scanThreadCondLock.lock();
+    scanThreadCond.wakeAll();
+    scanThreadCondLock.unlock();
 
     Channel         *channel = NULL;
     struct CHANLIST *flist   = NULL;
@@ -157,9 +160,13 @@ bool AnalogScan::scan()
     }
 
     if (!fRunning)
+    {
+        scanThreadCondLock.lock();
         pthread_create(&thread, NULL, spawn, this);
-    while (!fRunning)
-        usleep(50);
+        scanThreadCond.wait(&scanThreadCondLock);
+        scanThreadCondLock.unlock();
+    }
+
     return true;
 }
 

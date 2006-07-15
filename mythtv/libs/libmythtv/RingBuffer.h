@@ -173,6 +173,10 @@ class RingBuffer
 
     long long readAdjust;
 
+    /// Condition to signal that the read ahead thread is running
+    QWaitCondition readAheadRunningCond;
+    QMutex readAheadRunningCondLock;
+ 
     // constants
     static const uint kBufferSize;
     static const uint kReadTestSize;

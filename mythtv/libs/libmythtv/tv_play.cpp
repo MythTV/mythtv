@@ -481,10 +481,10 @@ bool TV::Init(bool createWindow)
         qApp->processEvents();
     }
 
+    mainLoopCondLock.lock();
     pthread_create(&event, NULL, EventThread, this);
-
-    while (!runMainLoop && !IsErrored())
-        usleep(50);
+    mainLoopCond.wait(&mainLoopCondLock);
+    mainLoopCondLock.unlock();
 
     return !IsErrored();
 }
@@ -1081,9 +1081,8 @@ void TV::HandleStateChange(void)
  */
 bool TV::InStateChange() const
 {
-    if (stateLock.locked())
+    if (!stateLock.tryLock())
         return true;
-    stateLock.lock();
     bool inStateChange = nextStates.size() > 0;
     stateLock.unlock();
     return inStateChange;
@@ -1306,10 +1305,10 @@ void TV::SetupPlayer(bool isWatchingRecording)
         nvp->SetWatchingRecording(true);
 
     int udp_port = gContext->GetNumSetting("UDPNotifyPort");
-     if (udp_port > 0)
-         udpnotify = new UDPNotify(this, udp_port);
-     else
-         udpnotify = NULL;
+    if (udp_port > 0)
+        udpnotify = new UDPNotify(this, udp_port);
+    else
+        udpnotify = NULL;
 }
 
 
@@ -1499,6 +1498,10 @@ void TV::RunTV(void)
     switchToRec = NULL;
     runMainLoop = true;
     exitPlayer = false;
+
+    mainLoopCondLock.lock();
+    mainLoopCond.wakeAll();
+    mainLoopCondLock.unlock();
 
     while (runMainLoop)
     {

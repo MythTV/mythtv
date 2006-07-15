@@ -103,8 +103,6 @@ NetworkControl::NetworkControl(int port)
     keyMap["f11"]                    = Qt::Key_F11;
     keyMap["f12"]                    = Qt::Key_F12;
 
-    runCommandThread = true;
-
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -123,11 +121,7 @@ NetworkControl::~NetworkControl(void)
 
     notifyDataAvailable();
 
-    runCommandThread = false;
-
-    while (commandThreadRunning)
-        usleep(1000);
-
+    pthread_cancel(command_thread);
     pthread_join(command_thread, NULL);
 }
 
@@ -143,10 +137,11 @@ void NetworkControl::RunCommandThread(void)
 {
     QString command;
     int commands = 0;
-    commandThreadRunning = true;
 
-    while(runCommandThread)
+    for (;;)
     {
+        pthread_testcancel();
+
         ncLock.lock();
         commands = networkControlCommands.size();
         ncLock.unlock();
@@ -167,8 +162,6 @@ void NetworkControl::RunCommandThread(void)
 
         usleep(50000);
     }
-
-    commandThreadRunning = false;
 }
 
 void NetworkControl::processNetworkControlCommand(QString command)

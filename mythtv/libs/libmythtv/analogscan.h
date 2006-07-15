@@ -35,6 +35,8 @@
 
 #include <qobject.h>
 #include <qstring.h>
+#include <qmutex.h>
+#include <qwaitcondition.h>
 #include <pthread.h>
 #include "frequencies.h"
 
@@ -89,6 +91,10 @@ protected:
                     const QString& name, int frequency);
     /** @brief Scanning thread*/
     pthread_t thread;
+
+    /** @brief Condition to signal that the scanning thread is running */
+    QWaitCondition scanThreadCond;
+    QMutex scanThreadCondLock;
 
     /** @brief Actual scanning proc */
     void doScan();

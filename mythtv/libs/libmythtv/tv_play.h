@@ -565,6 +565,10 @@ class TV : public QObject
     /// runs pipnvp's NuppelVideoPlayer::StartPlaying().
     pthread_t pipdecode;
 
+    /// Condition to signal that the Event thread is up and running
+    QWaitCondition mainLoopCond;
+    QMutex mainLoopCondLock;
+
     // Constants
     static const int kInitFFRWSpeed; ///< 1x, default to normal speed
     static const int kMuteTimeout;   ///< Channel changing mute timeout in msec

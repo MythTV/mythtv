@@ -214,8 +214,9 @@ class JobQueue : public QObject
     bool childThreadStarted;
     bool isMaster;
 
-    bool queuePoll;
     pthread_t queueThread;
+    QWaitCondition queueThreadCond;
+    QMutex queueThreadCondLock;
 };
 
 #endif

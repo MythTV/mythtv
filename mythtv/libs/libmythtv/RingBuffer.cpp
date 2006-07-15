@@ -629,10 +629,10 @@ void RingBuffer::StartupReadAheadThread(void)
 {
     readaheadrunning = false;
 
+    readAheadRunningCondLock.lock();
     pthread_create(&reader, NULL, StartReader, this);
-
-    while (!readaheadrunning)
-        usleep(50);
+    readAheadRunningCond.wait(&readAheadRunningCondLock);
+    readAheadRunningCondLock.unlock();
 }
 
 /** \fn RingBuffer::KillReadAheadThread(void)
@@ -730,6 +730,9 @@ void RingBuffer::ReadAheadThread(void)
     totfree = ReadBufFree();
 
     readaheadrunning = true;
+    readAheadRunningCondLock.lock();
+    readAheadRunningCond.wakeAll();
+    readAheadRunningCondLock.unlock();
     while (readaheadrunning)
     {
         if (pausereadthread || writemode)

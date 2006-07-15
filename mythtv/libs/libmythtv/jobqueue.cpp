@@ -35,13 +35,11 @@ JobQueue::JobQueue(bool master)
 
     jobsRunning = 0;
 
-    queuePoll = false;
-
 #ifndef USING_VALGRIND
+    queueThreadCondLock.lock();
     pthread_create(&queueThread, NULL, QueueProcesserThread, this);
-
-    while (!queuePoll)
-        usleep(50);
+    queueThreadCond.wait(&queueThreadCondLock);
+    queueThreadCondLock.unlock();
 #endif // USING_VALGRIND
 
     gContext->addListener(this);
@@ -49,7 +47,7 @@ JobQueue::JobQueue(bool master)
 
 JobQueue::~JobQueue(void)
 {
-    queuePoll = false;
+    pthread_cancel(queueThread);    
     pthread_join(queueThread, NULL);
 
     gContext->removeListener(this);
@@ -130,7 +128,9 @@ void JobQueue::customEvent(QCustomEvent *e)
 
 void JobQueue::RunQueueProcesser()
 {
-    queuePoll = true;
+    queueThreadCondLock.lock();
+    queueThreadCond.wakeAll();
+    queueThreadCondLock.unlock();
 
     RecoverQueue();
 
@@ -177,8 +177,10 @@ void JobQueue::ProcessQueue(void)
     bool inTimeWindow = true;
     bool startedJobAlready = false;
 
-    while (queuePoll)
+    for (;;)
     {
+        pthread_testcancel();
+
         startedJobAlready = false;
         sleepTime = gContext->GetNumSetting("JobQueueCheckFrequency", 30);
         queueStartTimeStr =
