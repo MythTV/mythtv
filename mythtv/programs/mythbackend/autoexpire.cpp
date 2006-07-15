@@ -607,7 +607,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                 "too many episodes (only want %4).")
                                 .arg(title)
                                 .arg(startts.toString())
-                                .arg(query.value(5).toInt()/1024/1024)
+                                .arg(stringToLongLong(query.value(5).toString())/1024/1024)
                                 .arg(maxIter.data());
 
                     if (print_verbose_messages & VB_IMPORTANT)
