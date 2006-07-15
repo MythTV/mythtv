@@ -2603,6 +2603,11 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --output %s",
                         xmltv_grabber.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_il")
+        // Israeli grabber returns all known data by default
+        command.sprintf("nice %s --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        filename.ascii());
     else
     {
         isNorthAmerica = true;
