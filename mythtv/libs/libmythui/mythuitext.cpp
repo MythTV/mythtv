@@ -210,7 +210,7 @@ void MythUIText::StopCycling(void)
 bool MythUIText::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
-        SetArea(parseRect(element));
+        m_Area = m_OrigDisplayRect = parseRect(element);
     else if (element.tagName() == "altarea")
         m_AltDisplayRect = parseRect(element);
     else if (element.tagName() == "font")
@@ -311,7 +311,7 @@ void MythUIText::CopyFrom(MythUIType *base)
 
     m_Justification = text->m_Justification;
     m_OrigDisplayRect = text->m_OrigDisplayRect;
-    m_AltDisplayRect = m_AltDisplayRect;
+    m_AltDisplayRect = text->m_AltDisplayRect;
 
     m_Message = text->m_Message;
     m_CutMessage = text->m_CutMessage;
