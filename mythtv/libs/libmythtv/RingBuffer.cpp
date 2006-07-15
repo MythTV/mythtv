@@ -444,7 +444,7 @@ int RingBuffer::safe_read(int fd, void *data, uint sz)
 
             // 3 second timeout with usleep(60000), 
             // or 0.12 seconds if it's an old, unmodified file.
-            if (zerocnt >= ((oldfile) ? 2 : (livetvchain) ? 6 : 50))
+            if (zerocnt >= ((oldfile) ? 2 : (livetvchain) ? 6 : 40))
             {
                 break;
             }
@@ -921,7 +921,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
                  readErr++;
 
                  // HACK Sometimes the readhead thread gets borked on startup.
-                 if ((readErr > 2 && readErr % 2) && (rbrpos ==0))
+                 if ((readErr > 4 && readErr % 2) && (rbrpos ==0))
                  {
                     VERBOSE(VB_IMPORTANT, "restarting readhead thread..");
                     KillReadAheadThread();
