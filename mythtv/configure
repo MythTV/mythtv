@@ -1565,7 +1565,7 @@ if test $altivec = "yes"; then
     else
         inc_altivec_h=
     fi
-    check_cc <<EOF || altivec=no
+    check_cc $ARCHFLAGS <<EOF || altivec=no
 $inc_altivec_h
 int main(void) {
     vector signed int v1, v2, v3;
