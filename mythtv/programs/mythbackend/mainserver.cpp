@@ -1519,6 +1519,21 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds,
                            QString("Error deleting recordedmarkup for %1.")
                                    .arg(logInfo));
     }
+
+    query.prepare("DELETE FROM recordedseek "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":STARTTIME", ds->recstartts);
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Recorded program delete recordedseek",
+                             query);
+        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+                           QString("Error deleting recordedseek for %1.")
+                                   .arg(logInfo));
+    }
 }
 
 /** \fn DeleteFile(const QString&,bool)

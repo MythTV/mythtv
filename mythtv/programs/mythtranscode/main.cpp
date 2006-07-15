@@ -653,21 +653,20 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         {
             query.prepare("DELETE FROM recordedmarkup "
                           "WHERE chanid = :CHANID "
-                          "AND starttime = :STARTTIME "
-                          "AND type not in ( :KEYFRAME, :GOP_BYFRAME ) ;");
+                          "AND starttime = :STARTTIME ");
             query.bindValue(":CHANID", pginfo->chanid);
             query.bindValue(":STARTTIME", pginfo->recstartts);
-            query.bindValue(":KEYFRAME", MARK_KEYFRAME);
-            query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
             query.exec();
 
             if (!query.isActive())
                 MythContext::DBError("Error in mythtranscode", query);
 
             query.prepare("UPDATE recorded "
-                          "SET cutlist = NULL, bookmark = NULL "
+                          "SET cutlist = :CUTLIST, bookmark = :BOOKMARK "
                           "WHERE chanid = :CHANID "
                           "AND starttime = :STARTTIME ;");
+            query.bindValue(":CUTLIST", "0");
+            query.bindValue(":BOOKMARK", "0");
             query.bindValue(":CHANID", pginfo->chanid);
             query.bindValue(":STARTTIME", pginfo->recstartts);
             query.exec();
@@ -682,14 +681,16 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.prepare("DELETE FROM recordedmarkup "
                           "WHERE chanid = :CHANID "
                           "AND starttime = :STARTTIME "
-                          "AND type not in ( :KEYFRAME, :GOP_BYFRAME, "
-                          "    :COMM_START, :COMM_END) ;");
+                          "AND type not in ( :COMM_START, "
+                          "    :COMM_END, :BOOKMARK, "
+                          "    :CUTLIST_START, :CUTLIST_END) ;");
             query.bindValue(":CHANID", pginfo->chanid);
             query.bindValue(":STARTTIME", pginfo->recstartts);
-            query.bindValue(":KEYFRAME", MARK_KEYFRAME);
-            query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
             query.bindValue(":COMM_START", MARK_COMM_START);
             query.bindValue(":COMM_END", MARK_COMM_END);
+            query.bindValue(":BOOKMARK", MARK_BOOKMARK);
+            query.bindValue(":CUTLIST_START", MARK_CUT_START);
+            query.bindValue(":CUTLIST_END", MARK_CUT_END);
             query.exec();
 
             if (!query.isActive())

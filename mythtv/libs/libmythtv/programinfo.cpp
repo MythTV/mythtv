@@ -1524,6 +1524,14 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
+    query.prepare("DELETE FROM recordedseek WHERE chanid = :CHANID"
+                  " AND starttime = :START;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START", recstartts);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Clear seek info on record", query);
+
     query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID"
                   " AND starttime = :START;");
     query.bindValue(":CHANID", chanid);
@@ -2311,7 +2319,7 @@ void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
     }
     else
     {
-        query.prepare("SELECT mark, offset FROM recordedmarkup"
+        query.prepare("SELECT mark, offset FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
@@ -2341,7 +2349,7 @@ void ProgramInfo::ClearPositionMap(int type) const
     }
     else
     {
-        query.prepare("DELETE FROM recordedmarkup"
+        query.prepare("DELETE FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
@@ -2386,7 +2394,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     }
     else
     {
-        query.prepare("DELETE FROM recordedmarkup"
+        query.prepare("DELETE FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE"
@@ -2429,7 +2437,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
         }
         else
         {        
-            query.prepare("INSERT INTO recordedmarkup"
+            query.prepare("INSERT INTO recordedseek"
                           " (chanid, starttime, mark, type, offset)"
                           " VALUES"
                           " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
@@ -2475,7 +2483,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
         }
         else
         {
-            query.prepare("INSERT INTO recordedmarkup"
+            query.prepare("INSERT INTO recordedseek"
                           " (chanid, starttime, mark, type, offset)"
                           " VALUES"
                           " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");

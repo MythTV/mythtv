@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1152";
+const QString currentDatabaseVersion = "1153";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2406,6 +2406,28 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1152")
+    {
+        const QString updates[] = {
+"ALTER TABLE recordedmarkup DROP PRIMARY KEY, ADD PRIMARY KEY (chanid,starttime,type,mark);",
+"CREATE TABLE IF NOT EXISTS recordedseek ("
+"  chanid int(10) unsigned NOT NULL default '0',"
+"  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  mark bigint(20) NOT NULL default '0',"
+"  offset varchar(32) default NULL,"
+"  type int(11) NOT NULL default '0',"
+"  PRIMARY KEY  (chanid,starttime,type,mark));",
+"INSERT INTO recordedseek (chanid, starttime, mark, offset, type) SELECT"
+" chanid, starttime, mark, offset, type FROM recordedmarkup WHERE type in (6, 7, 9);",
+"DELETE FROM recordedmarkup WHERE type in (6, 7, 9);",
+"",
+};
+
+       if (!performActualUpdate(updates, "1153", dbver))
+            return false;
+    }
+
+//"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
 //"ALTER TABLE capturecard DROP COLUMN dvb_recordts;" in 0.21
 //"ALTER TABLE capturecard DROP COLUMN dvb_hw_decoder;" in 0.21
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
