@@ -16,6 +16,9 @@
 // MythTV headers
 #include "audiooutputbase.h"
 
+#define LOC QString("AO: ")
+#define LOC_ERR QString("AO, ERROR: ")
+
 AudioOutputBase::AudioOutputBase(
     QString laudio_main_device,    QString           laudio_passthru_device,
     int     /*laudio_bits*/,       int               /*laudio_channels*/,
@@ -96,13 +99,13 @@ void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
         audio_stretchfactor = laudio_stretchfactor;
         if (pSoundStretch)
         {
-            VERBOSE(VB_GENERAL, QString("Changing time stretch to %1")
+            VERBOSE(VB_GENERAL, LOC + QString("Changing time stretch to %1")
                                         .arg(audio_stretchfactor));
             pSoundStretch->setTempo(audio_stretchfactor);
         }
         else if (audio_stretchfactor != 1.0)
         {
-            VERBOSE(VB_GENERAL, QString("Using time stretch %1")
+            VERBOSE(VB_GENERAL, LOC + QString("Using time stretch %1")
                                         .arg(audio_stretchfactor));
             pSoundStretch = new soundtouch::SoundTouch();
             pSoundStretch->setSampleRate(audio_samplerate);
@@ -169,7 +172,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     // Actually do the device specific open call
     if (!OpenDevice())
     {
-        VERBOSE(VB_AUDIO, "Aborting reconfigure");
+        VERBOSE(VB_AUDIO, LOC_ERR + "Aborting reconfigure");
         pthread_mutex_unlock(&avsync_lock);
         pthread_mutex_unlock(&audio_buflock);
         return;
@@ -177,7 +180,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
 
     SyncVolume();
     
-    VERBOSE(VB_AUDIO, QString("Audio fragment size: %1")
+    VERBOSE(VB_AUDIO, LOC + QString("Audio fragment size: %1")
             .arg(fragment_size));
 
     if (audio_buffer_unused < 0)
@@ -198,7 +201,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     if (audio_samplerate != laudio_samplerate)
     {
         int error;
-        VERBOSE(VB_GENERAL, QString("Using resampler. From: %1 to %2")
+        VERBOSE(VB_GENERAL, LOC + QString("Using resampler. From: %1 to %2")
                                .arg(laudio_samplerate).arg(audio_samplerate));
         src_ctx = src_new (SRC_SINC_BEST_QUALITY, audio_channels, &error);
         if (error)
@@ -216,7 +219,8 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
         need_resampler = true;
     }
 
-    VERBOSE(VB_AUDIO, QString("Audio Stretch Factor: %1").arg(audio_stretchfactor));
+    VERBOSE(VB_AUDIO, LOC + QString("Audio Stretch Factor: %1")
+            .arg(audio_stretchfactor));
 
     SetStretchFactorLocked(audio_stretchfactor);
     if (pSoundStretch)
@@ -231,7 +235,7 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     StartOutputThread();
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&audio_buflock);
-    VERBOSE(VB_AUDIO, "Ending reconfigure");
+    VERBOSE(VB_AUDIO, LOC + "Ending reconfigure");
 }
 
 void AudioOutputBase::StartOutputThread(void)
@@ -253,7 +257,7 @@ void AudioOutputBase::KillAudio()
 {
     killAudioLock.lock();
 
-    VERBOSE(VB_AUDIO, "Killing AudioOutputDSP");
+    VERBOSE(VB_AUDIO, LOC + "Killing AudioOutputDSP");
     killaudio = true;
     StopOutputThread();
 
@@ -317,7 +321,7 @@ void AudioOutputBase::SetTimecode(long long timecode)
 
 void AudioOutputBase::SetEffDsp(int dsprate)
 {
-    VERBOSE(VB_AUDIO, QString("SetEffDsp: %1").arg(dsprate));
+    VERBOSE(VB_AUDIO, LOC + QString("SetEffDsp: %1").arg(dsprate));
     effdsp = dsprate;
     effdspstretched = (int)((float)effdsp / audio_stretchfactor);
 }
@@ -444,7 +448,14 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
         len = (int)ceilf(float(len) * src_data.src_ratio);
 
     if ((len > afree) && !blocking)
+    {
+        VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + QString(
+                "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4") 
+                .arg(len).arg(AUDBUFSIZE-afree).arg(afree)
+                .arg(timecode)); 
+
         return false; // would overflow
+    }
 
     // resample input if necessary
     if (need_resampler && src_ctx) 
@@ -464,8 +475,9 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
         src_data.end_of_input = 0;
         int error = src_process(src_ctx, &src_data);
         if (error)
-            VERBOSE(VB_IMPORTANT, QString("Error occured while resampling "
-                    "audio: %1").arg(src_strerror(error)));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Error occured while resampling audio: %1")
+                    .arg(src_strerror(error)));
 
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff,
                                  src_data.output_frames_gen*audio_channels);
@@ -491,8 +503,16 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
     // Check we have enough space to write the data
     if (need_resampler && src_ctx)
         len = (int)ceilf(float(len) * src_data.src_ratio);
+
     if ((len > afree) && !blocking)
+    {
+        VERBOSE(VB_AUDIO|VB_TIMESTAMP, LOC + QString(
+                "AddSamples FAILED bytes=%1, used=%2, free=%3, timecode=%4") 
+                .arg(len).arg(AUDBUFSIZE-afree).arg(afree)
+                .arg(timecode)); 
+
         return false; // would overflow
+    }
 
     // resample input if necessary
     if (need_resampler && src_ctx) 
@@ -508,8 +528,9 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
         src_data.end_of_input = 0;
         int error = src_process(src_ctx, &src_data);
         if (error)
-            VERBOSE(VB_IMPORTANT, QString("Error occured while resampling "
-                    "audio: %1").arg(src_strerror(error)));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Error occured while resampling audio: %1")
+                    .arg(src_strerror(error)));
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff, 
                                  src_data.output_frames_gen*audio_channels);
 
@@ -533,22 +554,23 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
     {
         if (blocking)
         {
-            VERBOSE(VB_AUDIO, "Waiting for free space");
+            VERBOSE(VB_AUDIO, LOC + "Waiting for free space");
             // wait for more space
             pthread_cond_wait(&audio_bufsig, &audio_buflock);
             afree = audiofree(false);
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Audio buffer overflow, audio data lost!");
             samples = afree / audio_bytes_per_sample;
             len = samples * audio_bytes_per_sample;
             if (src_ctx) 
             {
                 int error = src_reset(src_ctx);
                 if (error)
-                    VERBOSE(VB_IMPORTANT, QString("Error occured while "
-                            "resetting resampler: %1")
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                            "Error occured while resetting resampler: %1")
                             .arg(src_strerror(error)));
             }
         }
@@ -567,7 +589,8 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     
     int afree = audiofree(false);
 
-    VERBOSE(VB_AUDIO, QString("_AddSamples bytes=%1, used=%2, free=%3, timecode=%4")
+    VERBOSE(VB_AUDIO|VB_TIMESTAMP,
+            LOC + QString("_AddSamples bytes=%1, used=%2, free=%3, timecode=%4")
             .arg(samples * audio_bytes_per_sample)
             .arg(AUDBUFSIZE-afree).arg(afree).arg((long)timecode));
     
@@ -714,7 +737,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         {
             if (!audio_actually_paused)
             {
-                VERBOSE(VB_AUDIO, "OutputAudioLoop: audio paused");
+                VERBOSE(VB_AUDIO, LOC + "OutputAudioLoop: audio paused");
                 OutputEvent e(OutputEvent::Paused);
                 dispatch(e);
                 was_paused = true;
@@ -727,7 +750,7 @@ void AudioOutputBase::OutputAudioLoop(void)
             space_on_soundcard = getSpaceOnSoundcard();
 
             if (space_on_soundcard != last_space_on_soundcard) {
-                VERBOSE(VB_AUDIO, QString("%1 bytes free on soundcard")
+                VERBOSE(VB_AUDIO, LOC + QString("%1 bytes free on soundcard")
                         .arg(space_on_soundcard));
                 last_space_on_soundcard = space_on_soundcard;
             }
@@ -740,7 +763,7 @@ void AudioOutputBase::OutputAudioLoop(void)
                     WriteAudio(zeros, fragment_size);
                 } else {
                     // this should never happen now -dag
-                    VERBOSE(VB_AUDIO,
+                    VERBOSE(VB_AUDIO, LOC +
                             QString("waiting for space on soundcard "
                                     "to write zeros: have %1 need %2")
                             .arg(space_on_soundcard).arg(fragment_size));
@@ -755,7 +778,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         {
             if (was_paused) 
             {
-                VERBOSE(VB_AUDIO, "OutputAudioLoop: Play Event");
+                VERBOSE(VB_AUDIO, LOC + "OutputAudioLoop: Play Event");
                 OutputEvent e(OutputEvent::Playing);
                 dispatch(e);
                 was_paused = false;
@@ -776,12 +799,12 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (fragment_size > audiolen(true))
         {
             if (audiolen(true) > 0)  // only log if we're sending some audio
-                VERBOSE(VB_AUDIO,
+                VERBOSE(VB_AUDIO, LOC +
                         QString("audio waiting for buffer to fill: "
                                 "have %1 want %2")
                         .arg(audiolen(true)).arg(fragment_size));
 
-            VERBOSE(VB_AUDIO, "Broadcasting free space avail");
+            VERBOSE(VB_AUDIO, LOC + "Broadcasting free space avail");
             pthread_mutex_lock(&audio_buflock);
             pthread_cond_broadcast(&audio_bufsig);
             pthread_mutex_unlock(&audio_buflock);
@@ -795,7 +818,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (fragment_size > space_on_soundcard)
         {
             if (space_on_soundcard != last_space_on_soundcard) {
-                VERBOSE(VB_AUDIO,
+                VERBOSE(VB_AUDIO, LOC +
                         QString("audio waiting for space on soundcard: "
                                 "have %1 need %2")
                         .arg(space_on_soundcard).arg(fragment_size));
@@ -805,7 +828,7 @@ void AudioOutputBase::OutputAudioLoop(void)
             numlowbuffer++;
             if (numlowbuffer > 5 && audio_buffer_unused)
             {
-                VERBOSE(VB_IMPORTANT, "dropping back audio_buffer_unused");
+                VERBOSE(VB_IMPORTANT, LOC + "dropping back audio_buffer_unused");
                 audio_buffer_unused /= 2;
             }
 
@@ -821,7 +844,7 @@ void AudioOutputBase::OutputAudioLoop(void)
             WriteAudio(fragment, fragment_size);
     }
 
-    VERBOSE(VB_AUDIO, "OutputAudioLoop: Stop Event");
+    VERBOSE(VB_AUDIO, LOC + "OutputAudioLoop: Stop Event");
     OutputEvent e(OutputEvent::Stopped);
     dispatch(e);
 }
@@ -857,7 +880,7 @@ int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool full
 
         /* update raud */
         raud = (raud + fragment_size) % AUDBUFSIZE;
-        VERBOSE(VB_AUDIO, "Broadcasting free space avail");
+        VERBOSE(VB_AUDIO, LOC + "Broadcasting free space avail");
         pthread_cond_broadcast(&audio_bufsig);
 
         written_size = fragment_size;
@@ -900,17 +923,19 @@ void AudioOutputBase::Drain()
 
 void *AudioOutputBase::kickoffOutputAudioLoop(void *player)
 {
-    VERBOSE(VB_AUDIO, QString("kickoffOutputAudioLoop: pid = %1")
-                              .arg(getpid()));
+    VERBOSE(VB_AUDIO, LOC + QString("kickoffOutputAudioLoop: pid = %1")
+                                    .arg(getpid()));
     ((AudioOutputBase *)player)->OutputAudioLoop();
-    VERBOSE(VB_AUDIO, "kickoffOutputAudioLoop exiting");
+    VERBOSE(VB_AUDIO, LOC + "kickoffOutputAudioLoop exiting");
     return NULL;
 }
 
 int AudioOutputBase::readOutputData(unsigned char*, int)
 {
-    VERBOSE(VB_IMPORTANT, "base AudioOutputBase should not be "
-                          "getting asked to readOutputData()");
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "base AudioOutputBase should not be "
+                                    "getting asked to readOutputData()");
     return 0;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 

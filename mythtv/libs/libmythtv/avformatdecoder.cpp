@@ -1773,7 +1773,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         {
             long long startpos = pkt->pos;
 
-            VERBOSE(VB_PLAYBACK, LOC + 
+            VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC + 
                     QString("positionMap[ %1 ] == %2.")
                     .arg(prevgoppos / keyframedist)
                     .arg((int)startpos));
@@ -2809,6 +2809,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 (curstream->codec->channels * 2) / 
                                 curstream->codec->sample_rate);
 
+                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
+					        LOC + QString("audio timecode %1 %2 %3 %4") 
+                            .arg(pkt->pts).arg(pkt->dts).arg(temppts)
+							.arg(lastapts)); 
+
                     GetNVP()->AddAudioData((char *)audioSamples, data_size,
                                            temppts);
 
@@ -2925,6 +2930,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         lastvpts = temppts;
                     else
                         temppts = lastvpts;
+
+                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP,
+					        LOC + QString("video timecode %1 %2 %3 %4") 
+                            .arg(pkt->pts).arg(pkt->dts).arg(temppts)
+							.arg(lastapts)); 
 
 /* XXX: Broken.
                     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
