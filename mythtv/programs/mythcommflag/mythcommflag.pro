@@ -10,5 +10,13 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-SOURCES += main.cpp ClassicCommDetector.cpp CommDetectorFactory.cpp CommDetectorBase.cpp
-HEADERS += CommDetectorBase.h ClassicCommDetector.h SlotRelayer.h CustomEventRelayer.h CommDetectorFactory.h
+SOURCES += main.cpp CommDetectorFactory.cpp CommDetectorBase.cpp Histogram.cpp
+SOURCES += ClassicCommDetector.cpp ClassicLogoDetector.cpp 
+SOURCES += ClassicSceneChangeDetector.cpp
+
+HEADERS += CommDetectorFactory.h SlotRelayer.h CustomEventRelayer.h
+HEADERS += SceneChangeDetectorBase.h LogoDetectorBase.h
+HEADERS += CommDetectorBase.h Histogram.h
+HEADERS += ClassicCommDetector.h ClassicLogoDetector.h
+HEADERS += ClassicSceneChangeDetector.h
+

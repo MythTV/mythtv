@@ -13,17 +13,17 @@ CommDetectorBase*
                                           const QDateTime& recordingStartedAt,
                                           const QDateTime& recordingStopsAt)
 {
-	switch (commDetectMethod)
-	{
-		//Future different CommDetect implementations will be created here.
+    switch (commDetectMethod)
+    {
+        //Future different CommDetect implementations will be created here.
         default:
-			return new ClassicCommDetector(commDetectMethod, showProgress,
+            return new ClassicCommDetector(commDetectMethod, showProgress,
                                            fullSpeed, nvp, startedAt,
                                            stopsAt, recordingStartedAt,
                                            recordingStopsAt);
-	}
-	
-	return 0;
+    }
+
+    return 0;
 }
 
 

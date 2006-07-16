@@ -1,9 +1,12 @@
 #include <cmath>
+#include <algorithm>
 #include <unistd.h>
 
 #include "CommDetector.h"
 #include "ClassicCommDetector.h"
 #include "libmythtv/NuppelVideoPlayer.h"
+#include "ClassicLogoDetector.h"
+#include "ClassicSceneChangeDetector.h"
 
 #include "qstring.h"
 #include "libmyth/mythcontext.h"
@@ -48,16 +51,9 @@ ClassicCommDetector::ClassicCommDetector(int commDetectMethod_in,
         stopsAt(stopsAt_in),
         recordingStartedAt(recordingStartedAt_in),
         recordingStopsAt(recordingStopsAt_in),
-        framesProcessed(0),preRoll(0),postRoll(0)
+        framesProcessed(0),preRoll(0),postRoll(0),
+        logoDetector(0)
 {
-
-    edgeMask = NULL;
-    logoFrame = NULL;
-    logoMask = NULL;
-    logoCheckMask = NULL;
-    logoMaxValues = NULL;
-    logoMinValues = NULL;
-    tmpBuf = NULL;
 
     stillRecording = recordingStopsAt > QDateTime::currentDateTime();
     
@@ -81,21 +77,11 @@ ClassicCommDetector::ClassicCommDetector(int commDetectMethod_in,
         gContext->GetNumSetting("CommDetectMinShowLength", 65);
     commDetectMaxCommLength =
         gContext->GetNumSetting("CommDetectMaxCommLength", 125);
-    commDetectLogoSamplesNeeded =
-        gContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
-    commDetectLogoSampleSpacing =
-        gContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
-    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
-                                  commDetectLogoSampleSpacing;
-    commDetectLogoGoodEdgeThreshold =
-        gContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
-        .toDouble();
-    commDetectLogoBadEdgeThreshold =
-        gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
-        .toDouble();
+
     skipAllBlanks = !!gContext->GetNumSetting("CommSkipAllBlanks", 1);
     commDetectBlankCanHaveLogo =
         !!gContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
+
 }
 
 void ClassicCommDetector::Init()
@@ -171,48 +157,20 @@ void ClassicCommDetector::Init()
     if (fabs(((width*1.0)/height) - 1.333333) < 0.1)
         currentAspect = COMM_ASPECT_NORMAL;
 
-    lastFrameWasSceneChange = false;
-
-    memset(lastHistogram, 0, sizeof(lastHistogram));
-    memset(histogram, 0, sizeof(histogram));
-    lastHistogram[0] = -1;
-    histogram[0] = -1;
+    sceneChangeDetector = new ClassicSceneChangeDetector(width, height,
+        commDetectBorder, horizSpacing, vertSpacing);
+    connect(
+         sceneChangeDetector, 
+         SIGNAL(haveNewInformation(unsigned int,bool,float)), 
+         this, 
+         SLOT(sceneChangeDetectorHasNewInformation(unsigned int,bool,float))
+    );
 
     frameIsBlank = false;
-    sceneHasChanged = false;
     stationLogoPresent = false;
 
     framePtr = NULL;
 
-    if (edgeMask)
-        delete [] edgeMask;
-    edgeMask = new EdgeMaskEntry[width * height];
-
-    if (logoFrame)
-        delete [] logoFrame;
-    logoFrame = new unsigned char[width * height];
-
-    if (logoMask)
-        delete [] logoMask;
-    logoMask = new unsigned char[width * height];
-
-    if (logoCheckMask)
-        delete [] logoCheckMask;
-    logoCheckMask = new unsigned char[width * height];
-
-    if (logoMaxValues)
-        delete [] logoMaxValues;
-    logoMaxValues = new unsigned char[width * height];
-
-    if (logoMinValues)
-        delete [] logoMinValues;
-    logoMinValues = new unsigned char[width * height];
-
-    if (tmpBuf)
-        delete [] tmpBuf;
-    tmpBuf = new unsigned char[width * height];
-
-    logoFrameCount = 0;
     logoInfoAvailable = false;
 
     ClearAllMaps();
@@ -226,56 +184,63 @@ void ClassicCommDetector::Init()
 
 ClassicCommDetector::~ClassicCommDetector()
 {
-    if (edgeMask)
-        delete [] edgeMask;
-    if (logoFrame)
-        delete [] logoFrame;
-    if (logoMask)
-        delete [] logoMask;
-    if (logoCheckMask)
-        delete [] logoCheckMask;
-    if (logoMaxValues)
-        delete [] logoMaxValues;
-    if (logoMinValues)
-        delete [] logoMinValues;
-    if (tmpBuf)
-        delete [] tmpBuf;
+    if (sceneChangeDetector)
+        delete sceneChangeDetector;
+
+    if (logoDetector)
+        delete logoDetector;
 }
 
 bool ClassicCommDetector::go()
 {
     nvp->SetNullVideo();
-    
+
+    int secsSince = 0;
     int requiredBuffer = 30;
     int requiredHeadStart = requiredBuffer;
-
-    if (commDetectMethod & COMM_DETECT_LOGO)
-    {
-        requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
-        requiredHeadStart += commDetectLogoSecondsNeeded;
-    }
-
-    emit statusUpdate("Building Detection Buffer");
-
     bool wereRecording = stillRecording;
-    int secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
-    while (secsSince < requiredHeadStart && stillRecording)
+
+    emit statusUpdate("Building Head Start Buffer");
+    secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+    while (stillRecording && (secsSince < requiredHeadStart))
     {
         emit breathe();
         if (m_bStop)
             return false;
+
         sleep(2);
         secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
     }
-
-    // Don't bother flagging short ~realtime recordings
-    if ((wereRecording) && (!stillRecording) && (secsSince < requiredHeadStart))
-        return false;
 
     if (nvp->OpenFile() < 0)
         return false;
 
     Init();
+
+    if (commDetectMethod & COMM_DETECT_LOGO)
+    {
+        logoDetector = new ClassicLogoDetector(this, width, height,
+            commDetectBorder, horizSpacing, vertSpacing);
+
+        requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
+        requiredHeadStart += logoDetector->getRequiredAvailableBufferForSearch();
+
+        emit statusUpdate("Building Logo Detection Buffer");
+        secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+        while (stillRecording && (secsSince < requiredHeadStart))
+        {
+            emit breathe();
+            if (m_bStop)
+                return false;
+
+            sleep(2);
+            secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+        }
+    }
+
+    // Don't bother flagging short ~realtime recordings
+    if ((wereRecording) && (!stillRecording) && (secsSince < requiredHeadStart))
+        return false;
 
     aggressiveDetection = gContext->GetNumSetting("AggressiveCommDetect", 1);
 
@@ -287,9 +252,10 @@ bool ClassicCommDetector::go()
     }
     nvp->SetCaptionsEnabled(false);
 
+    unsigned int length = static_cast<unsigned int>(nvp->GetLength());
     if ((commDetectMethod & COMM_DETECT_LOGO) &&
-        ((nvp->GetLength() == 0) ||
-         (nvp->GetLength() > commDetectLogoSecondsNeeded)))
+        ((length == 0) ||
+         (length > logoDetector->getRequiredAvailableBufferForSearch())))
     {
         emit statusUpdate("Searching for Logo");
 
@@ -299,7 +265,7 @@ bool ClassicCommDetector::go()
             cerr.flush();
         }
 
-        SearchForLogo();
+        logoInfoAvailable = logoDetector->searchForLogo(nvp);
 
         if (showProgress)
         {
@@ -529,6 +495,23 @@ bool ClassicCommDetector::go()
     return true;
 }
 
+void ClassicCommDetector::sceneChangeDetectorHasNewInformation(
+    unsigned int framenum,bool isSceneChange,float debugValue)
+{
+    if (isSceneChange)
+    {
+        frameInfo[framenum].flagMask |= COMM_FRAME_SCENE_CHANGE;
+        sceneMap[framenum] = MARK_SCENE_CHANGE;
+    }
+    else
+    {
+        frameInfo[framenum].flagMask &= ~COMM_FRAME_SCENE_CHANGE;
+        sceneMap.erase(framenum);
+    }
+
+    frameInfo[framenum].sceneChangePercent = (int) (debugValue*100);
+}
+
 void ClassicCommDetector::getCommercialBreakList(QMap<long long, int> &marks)
 {
 
@@ -633,9 +616,6 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     int bottomDarkRow = height - commDetectBorder - 1;
     int leftDarkCol = commDetectBorder;
     int rightDarkCol = width - commDetectBorder - 1;
-    int flagMask = 0;
-    int *curHistogram = histogram;
-    int sceneChangePercent = -1;
     FrameInfoEntry fInfo;
 
     if (!frame || frame_number == -1 || frame->codec != FMT_YV12)
@@ -662,6 +642,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     fInfo.aspect = currentAspect;
     fInfo.format = COMM_FORMAT_NORMAL;
     fInfo.flagMask = 0;
+
+    int& flagMask = frameInfo[curFrameNumber].flagMask;
 
     // Fill in dummy info records for skipped frames.
     if (lastFrameNumber != (curFrameNumber - 1))
@@ -693,15 +675,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 
     if (commDetectMethod & COMM_DETECT_SCENE)
     {
-        lastFrameWasSceneChange = sceneHasChanged;
-        sceneHasChanged = false;
-
-        if (lastHistogram[0] == -1)
-            curHistogram = lastHistogram;
-        else
-            memcpy(lastHistogram, histogram, sizeof(histogram));
-
-        memset(curHistogram, 0, sizeof(histogram));
+        sceneChangeDetector->processFrame(framePtr);
     }
 
     stationLogoPresent = false;
@@ -714,31 +688,35 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         {
             pixel = framePtr[y * width + x];
 
-            if ((commDetectMethod & COMM_DETECT_BLANKS) &&
-                ((!commDetectBlankCanHaveLogo) ||
-                 (!logoInfoAvailable) ||
-                 ((logoInfoAvailable) &&
-                  ((y < logoMinY) || (y > logoMaxY) ||
-                   (x < logoMinX) || (x > logoMaxX)))))
+            if (commDetectMethod & COMM_DETECT_BLANKS)
             {
-                blankPixelsChecked++;
-                totBrightness += pixel;
+                 bool checkPixel = false;
+                 if (!commDetectBlankCanHaveLogo)
+                     checkPixel = true;
 
-                if (pixel < min)
-                    min = pixel;
+                 if (!logoInfoAvailable)
+                     checkPixel = true;
+                 else if (!logoDetector->pixelInsideLogo(x,y))
+                     checkPixel=true;
 
-                if (pixel > max)
-                    max = pixel;
+                 if (checkPixel)
+                 {
+                     blankPixelsChecked++;
+                     totBrightness += pixel;
+  
+                     if (pixel < min)
+                          min = pixel;
 
-                if (pixel > rowMax[y])
-                    rowMax[y] = pixel;
+                     if (pixel > max)
+                          max = pixel;
 
-                if (pixel > colMax[x])
-                    colMax[x] = pixel;
+                     if (pixel > rowMax[y])
+                         rowMax[y] = pixel;
+
+                     if (pixel > colMax[x])
+                         colMax[x] = pixel;
+                 }
             }
-
-            if (commDetectMethod & COMM_DETECT_SCENE)
-                curHistogram[pixel]++;
         }
     }
 
@@ -818,43 +796,10 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
             frameIsBlank = true;
     }
 
-    if (commDetectMethod & COMM_DETECT_SCENE)
-    {
-        if (lastFrameWasSceneChange)
-        {
-            memcpy(lastHistogram, histogram, sizeof(histogram));
-            frameInfo[curFrameNumber].sceneChangePercent = 0;
-        }
-        else if (curHistogram != lastHistogram)
-        {
-            long similar = 0;
-
-            for(int i = 0; i < 256; i++)
-            {
-                if (histogram[i] < lastHistogram[i])
-                    similar += histogram[i];
-                else
-                    similar += lastHistogram[i];
-            }
-
-            sceneChangePercent = (int)(100.0 * similar /
-                                       ((width - (commDetectBorder * 2)) *
-                                        (height - (commDetectBorder * 2)) /
-                                        (vertSpacing * horizSpacing)));
-
-            frameInfo[curFrameNumber].sceneChangePercent = sceneChangePercent;
-
-            if (sceneChangePercent < 85)
-            {
-                memcpy(lastHistogram, histogram, sizeof(histogram));
-                sceneHasChanged = true;
-            }
-        }
-    }
-
     if ((logoInfoAvailable) && (commDetectMethod & COMM_DETECT_LOGO))
     {
-        stationLogoPresent = CheckEdgeLogo();
+        stationLogoPresent =
+            logoDetector->doesThisFrameContainTheFoundLogo(framePtr);
     }
 
 #if 0
@@ -872,16 +817,16 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         blankFrameCount++;
     }
 
-    if (sceneHasChanged)
-    {
-        sceneMap[curFrameNumber] = MARK_SCENE_CHANGE;
-        flagMask |= COMM_FRAME_SCENE_CHANGE;
-    }
-
     if (stationLogoPresent)
         flagMask |= COMM_FRAME_LOGO_PRESENT;
 
-    frameInfo[curFrameNumber].flagMask = flagMask;
+    //TODO: move this debugging code out of the perframe loop, and do it after
+    // we've processed all frames. this is because a scenechangedetector can
+    // now use a few frames to determine wether the frame a few frames ago was
+    // a scene change or not.. due to this lookahead possibility the values
+    // that are currently in the frameInfo array, might be changed a few frames
+    // from now. The ClassicSceneChangeDetector doesn't use this though. future
+    // scenechangedetectors might.
 
     if (verboseDebugging)
         VERBOSE(VB_COMMFLAG,
@@ -2142,172 +2087,6 @@ void ClassicCommDetector::DumpMap(QMap<long long, int> &map)
     VERBOSE(VB_COMMFLAG, "---------------------------------------------------");
 }
 
-void ClassicCommDetector::DumpLogo(bool fromCurrentFrame)
-{
-    char scrPixels[] = " .oxX";
-
-    if (!logoInfoAvailable)
-        return;
-
-    cerr << "\nLogo Data ";
-    if (fromCurrentFrame)
-        cerr << "from current frame\n";
-
-    cerr << "\n     ";
-
-    for(int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
-        cerr << (x % 10);
-    cerr << "\n";
-
-    for(int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
-    {
-        cerr << QString::number(y).rightJustify(3, ' ') << ": ";
-        for(int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
-        {
-            if (fromCurrentFrame)
-            {
-                cerr << scrPixels[framePtr[y * width + x] / 50];
-            }
-            else
-            {
-                switch (logoMask[y * width + x])
-                {
-                        case 0:
-                        case 2: cerr << " ";
-                        break;
-                        case 1: cerr << "*";
-                        break;
-                        case 3: cerr << ".";
-                        break;
-                }
-            }
-        }
-        cerr << "\n";
-    }
-    cerr.flush();
-}
-
-void ClassicCommDetector::SetLogoMaskArea()
-{
-    VERBOSE(VB_COMMFLAG, "SetLogoMaskArea()");
-
-    logoMinX = width - 1;
-    logoMaxX = 0;
-    logoMinY = height - 1;
-    logoMaxY = 0;
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            if (edgeMask[y * width + x].isedge)
-            {
-                if (x < logoMinX)
-                    logoMinX = x;
-                if (y < logoMinY)
-                    logoMinY = y;
-                if (x > logoMaxX)
-                    logoMaxX = x;
-                if (y > logoMaxY)
-                    logoMaxY = y;
-            }
-        }
-    }
-
-    logoMinX -= 5;
-    logoMaxX += 5;
-    logoMinY -= 5;
-    logoMaxY += 5;
-
-    if (logoMinX < 4)
-        logoMinX = 4;
-    if (logoMaxX > (width-5))
-        logoMaxX = (width-5);
-    if (logoMinY < 4)
-        logoMinY = 4;
-    if (logoMaxY > (height-5))
-        logoMaxY = (height-5);
-}
-
-void ClassicCommDetector::SetLogoMask(unsigned char *mask)
-{
-    int pixels = 0;
-
-    memcpy(logoMask, mask, width * height);
-
-    SetLogoMaskArea();
-
-    for(int y = logoMinY; y <= logoMaxY; y++)
-        for(int x = logoMinX; x <= logoMaxX; x++)
-            if (!logoMask[y * width + x] == 1)
-                pixels++;
-
-    if (pixels < 30)
-    {
-        detectStationLogo = false;
-        return;
-    }
-
-    // set the pixels around our logo
-    for(int y = (logoMinY - 1); y <= (logoMaxY + 1); y++)
-    {
-        for(int x = (logoMinX - 1); x <= (logoMaxX + 1); x++)
-        {
-            if (!logoMask[y * width + x])
-            {
-                for (int y2 = y - 1; y2 <= (y + 1); y2++)
-                {
-                    for (int x2 = x - 1; x2 <= (x + 1); x2++)
-                    {
-                        if ((logoMask[y2 * width + x2] == 1) &&
-                            (!logoMask[y * width + x]))
-                        {
-                            logoMask[y * width + x] = 2;
-                            x2 = x + 2;
-                            y2 = y + 2;
-
-                            logoCheckMask[y2 * width + x2] = 1;
-                            logoCheckMask[y * width + x] = 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    for(int y = (logoMinY - 2); y <= (logoMaxY + 2); y++)
-    {
-        for(int x = (logoMinX - 2); x <= (logoMaxX + 2); x++)
-        {
-            if (!logoMask[y * width + x])
-            {
-                for (int y2 = y - 1; y2 <= (y + 1); y2++)
-                {
-                    for (int x2 = x - 1; x2 <= (x + 1); x2++)
-                    {
-                        if ((logoMask[y2 * width + x2] == 2) &&
-                            (!logoMask[y * width + x]))
-                        {
-                            logoMask[y * width + x] = 3;
-                            x2 = x + 2;
-                            y2 = y + 2;
-
-                            logoCheckMask[y * width + x] = 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-#ifdef SHOW_DEBUG_WIN
-    DumpLogo(true);
-#endif
-
-    logoFrameCount = 0;
-    logoInfoAvailable = true;
-}
-
 void ClassicCommDetector::CondenseMarkMap(QMap<long long, int>&map, int spacing,
                                           int length)
 {
@@ -2412,257 +2191,6 @@ void ClassicCommDetector::ConvertShowMapToCommMap(QMap<long long, int>&map)
 /* ideas for this method ported back from comskip.c mods by Jere Jones
  * which are partially mods based on Myth's original commercial skip
  * code written by Chris Pinkham. */
-bool ClassicCommDetector::CheckEdgeLogo(void)
-{
-
-    int radius = 2;
-    int x, y;
-    int pos1, pos2, pos3;
-    int pixel;
-    int goodEdges = 0;
-    int badEdges = 0;
-    int testEdges = 0;
-    int testNotEdges = 0;
-
-    for (y = logoMinY; y <= logoMaxY; y++ )
-    {
-        for (x = logoMinX; x <= logoMaxX; x++ )
-        {
-            pos1 = y * width + x;
-            pos2 = (y - radius) * width + x;
-            pos3 = (y + radius) * width + x;
-
-            pixel = framePtr[pos1];
-
-            if (edgeMask[pos1].horiz)
-            {
-                if ((abs(framePtr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
-                    (abs(framePtr[pos1 + radius] - pixel) >= logoEdgeDiff))
-                    goodEdges++;
-                testEdges++;
-            }
-            else
-            {
-                if ((abs(framePtr[pos1 - radius] - pixel) >= logoEdgeDiff) ||
-                    (abs(framePtr[pos1 + radius] - pixel) >= logoEdgeDiff))
-                    badEdges++;
-                testNotEdges++;
-            }
-
-            if (edgeMask[pos1].vert)
-            {
-                if ((abs(framePtr[pos2] - pixel) >= logoEdgeDiff) ||
-                    (abs(framePtr[pos3] - pixel) >= logoEdgeDiff))
-                    goodEdges++;
-                testEdges++;
-            }
-            else
-            {
-                if ((abs(framePtr[pos2] - pixel) >= logoEdgeDiff) ||
-                    (abs(framePtr[pos3] - pixel) >= logoEdgeDiff))
-                    badEdges++;
-                testNotEdges++;
-            }
-        }
-    }
-
-    double goodEdgeRatio = (double)goodEdges / (double)testEdges;
-    double badEdgeRatio = (double)badEdges / (double)testNotEdges;
-
-    if ((goodEdgeRatio > commDetectLogoGoodEdgeThreshold) &&
-        (badEdgeRatio < commDetectLogoBadEdgeThreshold))
-        return true;
-    else
-        return false;
-}
-
-
-void ClassicCommDetector::SearchForLogo()
-{
-    int seekIncrement = (int)(commDetectLogoSampleSpacing * fps);
-    long long seekFrame;
-    int loops;
-    int maxLoops = commDetectLogoSamplesNeeded;
-    EdgeMaskEntry *edgeCounts;
-    int pos, i, x, y, dx, dy;
-    int edgeDiffs[] = {5, 7, 10, 15, 20, 30, 40, 50, 60, 0 };
-
-
-    VERBOSE(VB_COMMFLAG, "Searching for Station Logo");
-
-    logoInfoAvailable = false; 
-
-    edgeCounts = new EdgeMaskEntry[width * height];
-
-    for (i = 0; edgeDiffs[i] != 0 && !logoInfoAvailable; i++)
-    {
-        int pixelsInMask = 0;
-
-        VERBOSE(VB_COMMFLAG, QString("Trying with edgeDiff == %1")
-                .arg(edgeDiffs[i]));
-
-        memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
-        memset(edgeMask, 0, sizeof(EdgeMaskEntry) * width * height);
-
-        nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
-
-        loops = 0;
-        seekFrame = preRoll + seekIncrement;
-
-        while(loops < maxLoops && !nvp->GetEof())
-        {
-            VideoFrame* vf = nvp->GetRawVideoFrame(seekFrame);
-
-            if ((loops % 50) == 0)
-                emit breathe();
-
-            if (m_bStop)
-            {
-                nvp->DiscardVideoFrame(vf);
-                return;
-            }
-
-            if (!fullSpeed)
-                usleep(10000);
-
-            DetectEdges(vf, edgeCounts, edgeDiffs[i]);
-
-            seekFrame += seekIncrement;
-            loops++;
-
-            nvp->DiscardVideoFrame(vf);
-        }
-
-        VERBOSE(VB_COMMFLAG, "Analyzing edge data");
-
-#ifdef SHOW_DEBUG_WIN
-        unsigned char *fakeFrame;
-        fakeFrame = new unsigned char[width * height * 3 / 2];
-        memset(fakeFrame, 0, width * height * 3 / 2);
-#endif
-
-        for (y = 0; y < height; y++)
-        {
-            if ((y > (height/4)) && (y < (height * 3 / 4)))
-                continue;
-
-            for (x = 0; x < width; x++)
-            {
-                if ((x > (width/4)) && (x < (width * 3 / 4)))
-                    continue;
-
-                pos = y * width + x;
-
-                if (edgeCounts[pos].isedge > (maxLoops * 0.66))
-                {
-                    edgeMask[pos].isedge = 1;
-                    pixelsInMask++;
-#ifdef SHOW_DEBUG_WIN
-                    fakeFrame[pos] = 0xff;
-#endif
-
-                }
-
-                if (edgeCounts[pos].horiz > (maxLoops * 0.66))
-                    edgeMask[pos].horiz = 1;
-
-                if (edgeCounts[pos].vert > (maxLoops * 0.66))
-                    edgeMask[pos].vert = 1;
-
-                if (edgeCounts[pos].ldiag > (maxLoops * 0.66))
-                    edgeMask[pos].ldiag = 1;
-
-                if (edgeCounts[pos].rdiag > (maxLoops * 0.66))
-                    edgeMask[pos].rdiag = 1;
-            }
-        }
-
-        SetLogoMaskArea();
-
-        for (y = logoMinY; y < logoMaxY; y++)
-        {
-            for (x = logoMinX; x < logoMaxX; x++)
-            {
-                int neighbors = 0;
-
-                if (!edgeMask[y * width + x].isedge)
-                    continue;
-
-                for (dy = y - 2; dy <= (y + 2); dy++ )
-                {
-                    for (dx = x - 2; dx <= (x + 2); dx++ )
-                    {
-                        if (edgeMask[dy * width + dx].isedge)
-                            neighbors++;
-                    }
-                }
-
-                if (neighbors < 5)
-                    edgeMask[y * width + x].isedge = 0;
-            }
-        }
-
-        SetLogoMaskArea();
-
-        VERBOSE(VB_COMMFLAG, QString("Testing Logo area: topleft "
-                                     "(%1,%2), bottomright (%3,%4)")
-                                     .arg(logoMinX).arg(logoMinY)
-                                     .arg(logoMaxX).arg(logoMaxY));
-
-#ifdef SHOW_DEBUG_WIN
-        for (x = logoMinX; x < logoMaxX; x++)
-        {
-            pos = logoMinY * width + x;
-            fakeFrame[pos] = 0x7f;
-            pos = logoMaxY * width + x;
-            fakeFrame[pos] = 0x7f;
-        }
-        for (y = logoMinY; y < logoMaxY; y++)
-        {
-            pos = y * width + logoMinX;
-            fakeFrame[pos] = 0x7f;
-            pos = y * width + logoMaxX;
-            fakeFrame[pos] = 0x7f;
-        }
-
-        comm_debug_show(fakeFrame);
-        delete [] fakeFrame;
-
-        cerr << "Hit ENTER to continue" << endl;
-        getchar();
-#endif
-
-        if (((logoMaxX - logoMinX) < (width / 4)) &&
-            ((logoMaxY - logoMinY) < (height / 4)) &&
-            (pixelsInMask > 50))
-        {
-            logoInfoAvailable = true;
-            logoEdgeDiff = edgeDiffs[i];
-
-            VERBOSE(VB_COMMFLAG, QString("Using Logo area: topleft "
-                                         "(%1,%2), bottomright (%3,%4)")
-                    .arg(logoMinX).arg(logoMinY)
-                    .arg(logoMaxX).arg(logoMaxY));
-        }
-        else
-        {
-            VERBOSE(VB_COMMFLAG, QString("Rejecting Logo area: topleft "
-                                         "(%1,%2), bottomright (%3,%4), "
-                                         "pixelsInMask (%5). "
-                                         "Not within specified limits.")
-                    .arg(logoMinX).arg(logoMinY)
-                    .arg(logoMaxX).arg(logoMaxY)
-                    .arg(pixelsInMask));
-        }
-    }
-
-    delete [] edgeCounts;
-
-    if (!logoInfoAvailable)
-        VERBOSE(VB_COMMFLAG, "No suitable logo area found.");
-
-    nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
-}
 
 void ClassicCommDetector::CleanupFrameInfo(void)
 {
@@ -2753,63 +2281,6 @@ void ClassicCommDetector::CleanupFrameInfo(void)
     }
 }
 
-void ClassicCommDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
-                                      int edgeDiff)
-{
-    int r = 2;
-    unsigned char *buf = frame->buf;
-    unsigned char p;
-    int pos, x, y;
-
-    for (y = commDetectBorder + r; y < (height - commDetectBorder - r); y++)
-    {
-        if ((y > (height/4)) && (y < (height * 3 / 4)))
-            continue;
-
-        for (x = commDetectBorder + r; x < (width - commDetectBorder - r); x++)
-        {
-            int edgeCount = 0;
-
-            if ((x > (width/4)) && (x < (width * 3 / 4)))
-                continue;
-
-            pos = y * width + x;
-            p = buf[pos];
-
-            if (( abs(buf[y * width + (x - r)] - p) >= edgeDiff) ||
-                ( abs(buf[y * width + (x + r)] - p) >= edgeDiff))
-            {
-                edges[pos].horiz++;
-                edgeCount++;
-            }
-
-            if (( abs(buf[(y - r) * width + x] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * width + x] - p) >= edgeDiff))
-            {
-                edges[pos].vert++;
-                edgeCount++;
-            }
-
-            if (( abs(buf[(y - r) * width + (x - r)] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * width + (x + r)] - p) >= edgeDiff))
-            {
-                edges[pos].ldiag++;
-                edgeCount++;
-            }
-
-            if (( abs(buf[(y - r) * width + (x + r)] - p) >= edgeDiff) ||
-                ( abs(buf[(y + r) * width + (x - r)] - p) >= edgeDiff))
-            {
-                edges[pos].rdiag++;
-                edgeCount++;
-            }
-
-            if (edgeCount >= 3)
-                edges[pos].isedge++;
-        }
-    }
-}
-
 void ClassicCommDetector::GetLogoCommBreakMap(QMap<long long, int> &map)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::GetLogoCommBreakMap()");
@@ -2841,5 +2312,9 @@ void ClassicCommDetector::GetLogoCommBreakMap(QMap<long long, int> &map)
 
 }
 
+void ClassicCommDetector::logoDetectorBreathe()
+{
+    emit breathe();
+}
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
