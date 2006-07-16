@@ -1185,6 +1185,9 @@ for opt do
       # We already processed these options earlier so the empty case
       # here is so we don't error out and say they're unknown options.
   ;;
+  --previous|--prev)
+      echo "No history of previous configure parameters."
+  ;;
   --with-bindings=*)
       tmp_bindings="$optval"
       for binding in ${tmp_bindings//,/ } ; do
