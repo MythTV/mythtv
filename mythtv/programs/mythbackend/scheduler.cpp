@@ -1525,6 +1525,9 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
             }
         }
     }
+    else
+        retval = true; // allow shutdown if now command is set.
+
     return retval;
 }
 
