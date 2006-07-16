@@ -5,7 +5,9 @@
 #include <qdialog.h>
 #include <qevent.h>
 #include <qfont.h>
+#ifdef USE_OPENGL_PAINTER
 #include <qgl.h>
+#endif
 
 #include "mythuitype.h"
 #include "mythscreenstack.h"
@@ -43,9 +45,15 @@ typedef  int (*MediaPlayCallback)(const char*,  const char*, const char*, const 
 
 class MythMainWindowPrivate;
 
-class MythMainWindow : public QGLWidget
+// Cheat moc
+#ifdef USE_OPENGL_PAINTER
+#define QWidget QGLWidget
+#endif
+
+class MythMainWindow : public QWidget
 {
     Q_OBJECT
+#undef QWidget
   public:
     void Init(void);
     void Show(void);

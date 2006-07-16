@@ -28,7 +28,9 @@
 #include "mythmainwindow.h"
 #include "mythscreentype.h"
 #include "mythpainter.h"
+#ifdef USE_OPENGL_PAINTER
 #include "mythpainter_ogl.h"
+#endif
 #include "mythpainter_qt.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -217,20 +219,29 @@ MythPainter *GetMythPainter(void)
     return MythMainWindow::getMainWindow()->GetCurrentPainter();
 }
 
+#ifdef USE_OPENGL_PAINTER
+#define QWidget QGLWidget
+#endif
+
 MythMainWindow::MythMainWindow()
-              : QGLWidget(NULL, "mainWindow")
+              : QWidget(NULL, "mainWindow")
 {
+
+#undef QWidget
     d = new MythMainWindowPrivate;
 
     d->AllowInput = false;
 
+
     QString painter = gContext->GetSetting("ThemePainter", "qt");
+#ifdef USE_OPENGL_PAINTER
     if (painter == "opengl")
     {
         VERBOSE(VB_GENERAL, "Using the OpenGL painter");
         d->painter = new MythOpenGLPainter();
     }
     else
+#endif
     {
         VERBOSE(VB_GENERAL, "Using the Qt painter");
         d->painter = new MythQtPainter();
@@ -301,7 +312,9 @@ MythMainWindow::MythMainWindow()
     RegisterKey("Global", "8", "8", "8");
     RegisterKey("Global", "9", "9", "9");
 
+#ifdef USE_OPENGL_PAINTER
     setAutoBufferSwap(false);
+#endif
 
     d->gestureTimer = new QTimer(this);
     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
