@@ -5130,7 +5130,11 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
 
     if (honorCutList && (!deleteMap.isEmpty()))
     {
-        if (videoOutput->GetLastDecodedFrame()->frameNumber >= dm_iter.key())
+        long long lastDecodedFrameNumber =
+            videoOutput->GetLastDecodedFrame()->frameNumber;
+
+        if ((lastDecodedFrameNumber >= dm_iter.key()) ||
+            (lastDecodedFrameNumber == -1 && dm_iter.key() == 0))
         {
             while((dm_iter.data() == 1) && (dm_iter != deleteMap.end()))
             {
@@ -5139,6 +5143,10 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 dm_iter++;
                 msg += QString(" to %1").arg((int)dm_iter.key());
                 VERBOSE(VB_GENERAL, msg);
+
+                if(dm_iter.key() == totalFrames)
+                   return false;
+
                 GetDecoder()->DoFastForward(dm_iter.key());
                 GetDecoder()->ClearStoredData();
                 ClearAfterSeek();
