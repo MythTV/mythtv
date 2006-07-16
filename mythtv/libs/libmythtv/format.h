@@ -62,7 +62,7 @@ typedef struct rtframeheader
 			//    V .. Next Video Sync 
 			//         timecode == next video framenumber
 			//    S .. Audio,Video,Text Correlation [NI]
-			//    H .. New Header - format changed (only aspect now)
+			//    M .. New Header - format changed (only aspect now)
 			// T: C .. Closed Caption (US)
 			//    T .. Teletext Subtitles (Europe)
    char keyframe;	//    0 .. keyframe
