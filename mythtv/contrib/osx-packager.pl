@@ -45,6 +45,54 @@ our @targetsJT = ( 'MythCommFlag',  'MythJobQueue');
 our @targetsBE = ( 'MythBackend',   'MythFillDatabase',
                    'MythTranscode', 'MythTV-Setup');
 
+# Patches for MythTV source
+our %patches = (
+  'mythtv' =>
+'Index: libs/libmythui/mythmainwindow.cpp
+===================================================================
+--- libs/libmythui/mythmainwindow.cpp   (revision 10480)
++++ libs/libmythui/mythmainwindow.cpp   (working copy)
+@@ -218,14 +218,13 @@
+ }
+ 
+ MythMainWindow::MythMainWindow()
+-              : QGLWidget(NULL, "mainWindow")
++              : QWidget(NULL, "mainWindow")
+ {
+     d = new MythMainWindowPrivate;
+ 
+     d->AllowInput = false;
+ 
+-    QString painter = gContext->GetSetting("ThemePainter", "qt");
+-    if (painter == "opengl")
++    if (0)
+     {
+         VERBOSE(VB_GENERAL, "Using the OpenGL painter");
+         d->painter = new MythOpenGLPainter();
+@@ -301,8 +300,6 @@
+     RegisterKey("Global", "8", "8", "8");
+     RegisterKey("Global", "9", "9", "9");
+ 
+-    setAutoBufferSwap(false);
+-
+     d->gestureTimer = new QTimer(this);
+     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
+ 
+Index: libs/libmythui/mythmainwindow.h
+===================================================================
+--- libs/libmythui/mythmainwindow.h     (revision 10480)
++++ libs/libmythui/mythmainwindow.h     (working copy)
+@@ -43,7 +43,7 @@
+ 
+ class MythMainWindowPrivate;
+ 
+-class MythMainWindow : public QGLWidget
++class MythMainWindow : public QWidget
+ {
+     Q_OBJECT
+   public:'
+);
+
 our %depend_order = (
   'mythtv'
   =>  [
@@ -781,6 +829,12 @@ foreach my $comp (@comps)
   {
     # clean the Makefiles, as process requires PREFIX hacking
     &CleanMakefiles();
+  }
+ 
+  # Apply any nasty mac-specific patches 
+  if ($patches{$comp})
+  {
+    &Syscall([ "echo '$patches{$comp}' | patch -p0 --forward" ]);
   }
   
   # configure and make
