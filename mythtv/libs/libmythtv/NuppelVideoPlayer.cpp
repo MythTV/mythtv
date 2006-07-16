@@ -4503,20 +4503,33 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
 {
     bool deletepoint = false;
-    QMap<long long, int>::Iterator i;
     int direction = 0;
 
-    for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
+    if(!deleteMap.isEmpty())
     {
-        long long pos = framesPlayed - i.key();
-        if (pos < 0)
-            pos = 0 - pos;
-        if ((pos < (int)ceil(20 * video_frame_rate)) && !allowSelectNear)
+        QMap<long long, int>::ConstIterator iter = deleteMap.begin();
+
+        while((iter != deleteMap.end()) && (iter.key() < framesPlayed))
+            ++iter;
+
+        if (iter == deleteMap.end())
+        {
+            --iter;
+        }
+        else if((iter != deleteMap.begin()) && (iter.key() != framesPlayed))
+        {
+            long long value = iter.key();
+            if((framesPlayed - (--iter).key()) > (value - framesPlayed))
+                ++iter;
+        }
+
+        direction = iter.data();
+        deleteframe = iter.key();
+
+        if ((llabs(deleteframe - framesPlayed) <
+                   (int)ceil(20 * video_frame_rate)) && !allowSelectNear)
         {
             deletepoint = true;
-            deleteframe = i.key();
-            direction = i.data();
-            break;
         }
     }
 
