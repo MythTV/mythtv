@@ -796,9 +796,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     (frame.timecode - lasttimecode - (int)vidFrameTime);
             }
 
-            if (video_aspect != nvp->GetAspectRatio())
+            if (video_aspect != nvp->GetVideoAspect())
             {
-                video_aspect = nvp->GetAspectRatio();
+                video_aspect = nvp->GetVideoAspect();
                 nvr->SetNewVideoParams(video_aspect);
             }
 
