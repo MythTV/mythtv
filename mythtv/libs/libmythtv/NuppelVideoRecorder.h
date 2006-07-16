@@ -99,6 +99,8 @@ class NuppelVideoRecorder : public RecorderBase, public CC608Reader
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
     void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 
+    void SetNewVideoParams(double newaspect);
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -110,6 +112,8 @@ class NuppelVideoRecorder : public RecorderBase, public CC608Reader
 
  private:
     inline void WriteFrameheader(rtframeheader *fh);
+
+    void WriteFileHeader(void);
 
     void SavePositionMap(bool force);
 

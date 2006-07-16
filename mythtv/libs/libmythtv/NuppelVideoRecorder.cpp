@@ -1770,16 +1770,31 @@ inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)
     ringBuffer->Write(fh, FRAMEHEADERSIZE);
 }
 
-void NuppelVideoRecorder::WriteHeader(void)
+void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
+{
+    if (newaspect == video_aspect)
+        return;
+
+    video_aspect = newaspect;
+
+    struct rtframeheader frameheader;
+    memset(&frameheader, 0, sizeof(frameheader));
+
+    frameheader.frametype = 'S';
+    frameheader.comptype = 'M';
+    frameheader.packetlength = sizeof(struct rtfileheader);
+
+    WriteFrameheader(&frameheader);
+
+    WriteFileHeader();
+}
+
+void NuppelVideoRecorder::WriteFileHeader(void)
 {
     struct rtfileheader fileheader;
-    struct rtframeheader frameheader;
-    static unsigned long int tbls[128];
     static const char finfo[12] = "MythTVVideo";
     static const char vers[5]   = "0.07";
-    
-    if (!videoFilters)
-        InitFilters();
+
     memset(&fileheader, 0, sizeof(fileheader));
     memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
     memcpy(fileheader.version, vers, sizeof(fileheader.version));
@@ -1809,6 +1824,17 @@ void NuppelVideoRecorder::WriteHeader(void)
     fileheader.keyframedist  = bswap_32(fileheader.keyframedist);
 #endif
     ringBuffer->Write(&fileheader, FILEHEADERSIZE);
+}
+
+void NuppelVideoRecorder::WriteHeader(void)
+{
+    struct rtframeheader frameheader;
+    static unsigned long int tbls[128];
+    
+    if (!videoFilters)
+        InitFilters();
+
+    WriteFileHeader();
 
     memset(&frameheader, 0, sizeof(frameheader));
     frameheader.frametype = 'D'; // compressor data

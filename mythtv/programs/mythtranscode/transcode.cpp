@@ -741,6 +741,24 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             if (! nvp->WriteStoredData(outRingBuffer, (did_ff == 0),
                                        timecodeOffset))
             {
+                if (video_aspect != nvp->GetVideoAspect())
+                {
+                    video_aspect = nvp->GetVideoAspect();
+                    nvr->SetNewVideoParams(video_aspect);
+                }
+
+                if (video_width != nvp->GetVideoWidth() ||
+                    video_height != nvp->GetVideoHeight())
+                {
+                    video_width = nvp->GetVideoWidth();
+                    video_height = nvp->GetVideoHeight();
+
+                    VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
+                        .arg(video_width).arg(video_height)
+                        .arg(newWidth).arg(newHeight));
+
+                }
+
                 if (did_ff == 1)
                 {
                   // Create a new 'I' frame if we just processed a cut.
@@ -776,6 +794,22 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 did_ff = 2;
                 timecodeOffset +=
                     (frame.timecode - lasttimecode - (int)vidFrameTime);
+            }
+
+            if (video_aspect != nvp->GetAspectRatio())
+            {
+                video_aspect = nvp->GetAspectRatio();
+                nvr->SetNewVideoParams(video_aspect);
+            }
+
+            if (video_width != nvp->GetVideoWidth() || 
+                video_height != nvp->GetVideoHeight())
+            {
+                video_width = nvp->GetVideoWidth();
+                video_height = nvp->GetVideoHeight(); 
+                VERBOSE(VB_IMPORTANT, QString("Resizing from %1x%2 to %3x%4")
+                        .arg(video_width).arg(video_height)
+                        .arg(newWidth).arg(newHeight));
             }
 
             if ((video_width == newWidth) && (video_height == newHeight))
