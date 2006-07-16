@@ -844,6 +844,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
             proginfo->hasAirDate = true;
         }
         proginfo->hostname = query.value(18).toString();
+        proginfo->recstatus = rsRecorded;
         proginfo->recordid = query.value(19).toInt();
         proginfo->transcoder = query.value(20).toInt();
 
