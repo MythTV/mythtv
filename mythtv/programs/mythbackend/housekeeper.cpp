@@ -326,7 +326,7 @@ void HouseKeeper::CleanupAllOldInUsePrograms(void)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM inuseprograms "
-                  "WHERE lastupdatetime > :FOURHOURSAGO ;");
+                  "WHERE lastupdatetime < :FOURHOURSAGO ;");
     query.bindValue(":FOURHOURSAGO", fourHoursAgo);
     query.exec();
 }
