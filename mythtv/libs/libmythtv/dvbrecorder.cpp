@@ -925,7 +925,9 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
         info = _pid_infos[pid] = new PIDInfo();
 
     // Check for keyframes and count frames
-    if (StreamID::IsVideo(info->streamType))
+    if (info->streamType == StreamID::H264Video)
+        _buffer_packets = !FindH264Keyframes(&tspacket);
+    else if (StreamID::IsVideo(info->streamType))
         _buffer_packets = !FindMPEG2Keyframes(&tspacket);
 
     // Sync recording start to first keyframe
@@ -952,7 +954,8 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
             info->payloadStartSeen = true;
         }
 
-        BufferedWrite(tspacket);
+        if ((info->streamType != StreamID::H264Video) || _seen_sps)
+            BufferedWrite(tspacket);
     }
     else
         VERBOSE(VB_IMPORTANT, LOC + QString("Unknown PID 0x%1")
