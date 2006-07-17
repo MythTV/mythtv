@@ -905,6 +905,9 @@ void StatusBox::doLogEntries(void)
     }
       
     contentTotalLines = count;
+    if (contentPos > (contentTotalLines - 1))
+        contentPos = contentTotalLines - 1;
+
     update(ContentRect);
 }
 
