@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060713-2"
+VERSION="0.1.20060717-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -2513,10 +2513,10 @@ def selectAspectRatio(folder):
     node = nodes[0]
     try:
         ar = float(node.attributes["aspectratio"].value)
-        if ar > float(4.0/3.0 - 0.00001) and ar < float(4.0/3.0 + 0.00001):
+        if ar > float(4.0/3.0 - 0.01) and ar < float(4.0/3.0 + 0.01):
             aspectratio = "4:3"
             write("Aspect ratio is 4:3")
-        elif ar > float(16.0/9.0 - 0.00001) and ar < float(16.0/9.0 + 0.00001):
+        elif ar > float(16.0/9.0 - 0.01) and ar < float(16.0/9.0 + 0.01):
             aspectratio = "16:9"
             write("Aspect ratio is 16:9")
         else:
