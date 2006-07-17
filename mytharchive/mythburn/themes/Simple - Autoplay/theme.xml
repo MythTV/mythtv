@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+    <!-- Example theme for MythBurn - creates an autoplay DVD with no menus or intro -->
+    <fonts>
+        <font size="23">FreeSans.ttf</font>
+        <font size="18">FreeSans.ttf</font>
+        <font size="16">FreeSans.ttf</font>
+    </fonts>
+
+</mythburntheme>
