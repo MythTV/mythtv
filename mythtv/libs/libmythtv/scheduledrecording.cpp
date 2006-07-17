@@ -704,6 +704,10 @@ void ScheduledRecording::setRecGroup(const QString& newrecgroup) {
     recgroup->setValue(newrecgroup);
 }
 
+QString ScheduledRecording::GetRecGroup(void) const {
+    return recgroup->getValue();
+}
+
 void ScheduledRecording::setPlayGroup(const QString& newplaygroup) {
     playgroup->setValue(newplaygroup);
 }

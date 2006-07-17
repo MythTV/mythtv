@@ -115,6 +115,7 @@ public:
     QString getRecordSubTitle(void) const;
     QString getRecordDescription(void) const;
     QString getProfileName(void) const;
+    QString GetRecGroup(void) const;
 
     void findMatchingPrograms(list<ProgramInfo*>& proglist);
 
@@ -272,3 +273,6 @@ protected:
 
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
+

@@ -1302,7 +1302,26 @@ void TVRec::RunTV(void)
             bool enable_ui  = true;
 
             if (has_rec && (has_finish || (now > recordEndTime)))
+            {
+                if (pseudoLiveTVRecording && curRecording)
+                {
+                    int secsSince = curRecording->recstartts.secsTo(
+                                        QDateTime::currentDateTime());
+                    if (secsSince < 120)
+                    {
+                        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG,
+                            autoRunJobs);
+                        JobQueue::RemoveJobsFromMask(JOB_TRANSCODE,
+                            autoRunJobs);
+                    }
+
+                    if (autoRunJobs)
+                        JobQueue::QueueRecordingJobs(curRecording,
+                            autoRunJobs);
+                }
+
                 SetPseudoLiveTVRecording(NULL);
+            }
             else if (!has_rec && !rec_soon && curRecording && LIVETV_END)
             {
                 SwitchLiveTVRingBuffer();
@@ -3736,6 +3755,20 @@ void TVRec::TuningRestartRecorder(void)
     {
         FinishedRecording(curRecording);
         curRecording->MarkAsInUse(false);
+
+        if (pseudoLiveTVRecording)
+        {
+            int secsSince = curRecording->recstartts.secsTo(
+                                              QDateTime::currentDateTime());
+            if (secsSince < 120)
+            {
+                JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
+                JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
+            }
+
+            if (autoRunJobs)
+                JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+        }
     }
 
     SwitchLiveTVRingBuffer(true, !had_dummyrec);
@@ -3792,9 +3825,16 @@ void TVRec::TuningRestartRecorder(void)
         VERBOSE(VB_RECORD, LOC + "Pseudo LiveTV recording starting." +
                 "\n\t\t\t" + msg1 + "\n\t\t\t" + msg2);
 
-        int autoexpiredef = gContext->GetNumSetting("AutoExpireDefault", 0);
-        curRecording->SetAutoExpire(autoexpiredef);
-        curRecording->ApplyRecordRecGroupChange("Default");
+        curRecording->SetAutoExpire(
+            curRecording->GetScheduledRecording()->GetAutoExpire());
+        curRecording->ApplyRecordRecGroupChange(
+            curRecording->GetScheduledRecording()->GetRecGroup());
+
+        RecordingProfile profile;
+        QString profileName = load_profile(genOpt.cardtype, NULL,
+                                           curRecording, profile);
+        autoRunJobs = init_jobs(curRecording, profile, runJobOnHostOnly,
+                                transcodeFirst, earlyCommFlag);
     }
 
     ClearFlags(kFlagNeedToStartRecorder);
@@ -4049,3 +4089,6 @@ QString TuningRequest::toString(void) const
         .arg((program != 0) ? "yes" : "no").arg(channel).arg(input)
         .arg(TVRec::FlagToString(flags));
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
+
