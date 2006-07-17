@@ -62,6 +62,7 @@ void KeyframeSequencer::Reset(void) /* throw() */
 
     saw_AU_delimiter = false;
     saw_first_VCL_NAL_unit = false;
+    saw_sps = false;
 
     did_evaluate_once = false;
     keyframe = false;
@@ -114,9 +115,11 @@ void KeyframeSequencer::KeyframePredicate(
     }
 
     // stage 2: determine if it's an IDR AU
-    if (!saw_first_VCL_NAL_unit && new_NAL_type == NALUnitType::SLICE_IDR)
+    if (!saw_first_VCL_NAL_unit && !saw_sps && new_NAL_type == NALUnitType::SPS)
     {
-        keyframe = true;
+        saw_sps = true;
+        state_changed = true;
+        keyframe = false;
     }
 
     // stage 3: did we see the AU's first VCL NAL unit yet?
@@ -124,6 +127,10 @@ void KeyframeSequencer::KeyframePredicate(
     {
         saw_first_VCL_NAL_unit = true;
         saw_AU_delimiter = false;
+        state_changed = true;
+        if (saw_sps)
+            keyframe = true;
+        saw_sps = false;
     }
 }
 
@@ -152,7 +159,6 @@ uint32_t KeyframeSequencer::AddBytes(
                     read_first_NAL_byte = false;
                     keyframe = false;
 
-                    state_changed = true;
                     return local_bytes - bytes;
                 }
                 else
@@ -168,6 +174,7 @@ uint32_t KeyframeSequencer::AddBytes(
         }
     }
 
+    state_changed = false;
     if (synced && !read_first_NAL_byte && local_bytes < local_bytes_end)
     {
         KeyframePredicate(*local_bytes);
@@ -182,7 +189,6 @@ uint32_t KeyframeSequencer::AddBytes(
         return local_bytes - bytes;
     }
 
-    state_changed = false;
     return local_bytes - bytes;
 }
 

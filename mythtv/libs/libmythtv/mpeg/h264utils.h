@@ -195,6 +195,7 @@ class KeyframeSequencer
 
     bool    saw_AU_delimiter;
     bool    saw_first_VCL_NAL_unit;
+    bool    saw_sps;
 
     bool    did_evaluate_once;
     bool    keyframe;
