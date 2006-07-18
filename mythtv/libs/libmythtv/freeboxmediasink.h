@@ -7,6 +7,11 @@
 #ifndef _FREEBOXMEDIASINK_H_
 #define _FREEBOXMEDIASINK_H_
 
+#include <vector>
+using namespace std;
+
+#include <qmutex.h>
+
 #include <MediaSink.hh>
 
 class RTSPListener
@@ -27,12 +32,13 @@ class FreeboxMediaSink : public MediaSink
 {
   public:
     static FreeboxMediaSink *CreateNew(UsageEnvironment &env,
-                                       RTSPListener     &pRecorder,
                                        unsigned          bufferSize);
+
+    void AddListener(RTSPListener*);
+    void RemoveListener(RTSPListener*);
 
   protected:
     FreeboxMediaSink(UsageEnvironment &env,
-                     RTSPListener     &pRecorder,
                      unsigned int      bufferSize);
     virtual ~FreeboxMediaSink();
 
@@ -44,14 +50,16 @@ class FreeboxMediaSink : public MediaSink
                                   unsigned int   numTruncatedBytes,
                                   struct timeval presentationTime,
                                   unsigned int   durationInMicroseconds);
+
   private:
     virtual Boolean continuePlaying(void);
 
   private:
-    unsigned char    *fBuffer;
-    unsigned int      fBufferSize;
-    UsageEnvironment &env;
-    RTSPListener     &recorder;
+    unsigned char         *fBuffer;
+    unsigned int           fBufferSize;
+    UsageEnvironment      &env;
+    vector<RTSPListener*>  listeners;
+    mutable QMutex         lock;
 
   private:
     // avoid default contructors & operator=

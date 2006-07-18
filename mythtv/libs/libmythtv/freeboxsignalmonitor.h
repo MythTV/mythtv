@@ -39,8 +39,9 @@ class FreeboxSignalMonitor : public DTVSignalMonitor, public RTSPListener
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
 
+    FreeboxChannel *GetChannel(void);
+
   protected:
-    RTSPComms         *rtsp;
     bool               dtvMonitorRunning;
     pthread_t          table_monitor_thread;
 };

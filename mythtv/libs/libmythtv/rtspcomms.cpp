@@ -68,11 +68,10 @@ static void sub_bye_handler_cb(void *clientData)
     ((RTSPData*)clientData)->SubsessionByeHandlerCB();
 }
 
-RTSPComms::RTSPComms(RTSPListener *recorder) :
+RTSPComms::RTSPComms() :
     _abort(0),          _running(false),
-    _rec(recorder),
     _live_env(NULL),    _rtsp_client(NULL),
-    _session(NULL)
+    _session(NULL),     _lock(false)
 {
     //Init();
 }
@@ -154,8 +153,6 @@ void RTSPComms::Deinit(void)
 bool RTSPComms::Open(const QString &url)
 {
     VERBOSE(VB_RECORD, LOC + "Open() -- begin");
-    if (!_rec)
-        return false;
 
     if (!Init())
         return false;
@@ -263,7 +260,7 @@ bool RTSPComms::Open(const QString &url)
             continue; // was not initiated
 
         FreeboxMediaSink *freeboxMediaSink = FreeboxMediaSink::CreateNew(
-            *_live_env, *_rec, TSPacket::SIZE * 128*1024);
+            *_live_env, TSPacket::SIZE * 128*1024);
 
         subsession->sink = freeboxMediaSink;
         if (!subsession->sink)
@@ -272,6 +269,10 @@ bool RTSPComms::Open(const QString &url)
                     QString("Freebox # Failed to create sink: %1")
                     .arg(_live_env->getResultMsg()));
         }
+
+        vector<RTSPListener*>::iterator it = _listeners.begin();
+        for (; it != _listeners.end(); ++it)
+            freeboxMediaSink->AddListener(*it);
 
         subsession->sink->startPlaying(*(subsession->readSource()),
                                        sub_after_playing_cb,
@@ -364,4 +365,73 @@ void RTSPComms::Stop(void)
     while (_running)
         _cond.wait(&_lock, 500);
     VERBOSE(VB_RECORD, LOC + "Stop() -- end");
+}
+
+void RTSPComms::AddListener(RTSPListener *item)
+{
+    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
+    if (!item)
+    {
+        VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 0");
+        return;
+    }
+
+    // avoid duplicates
+    RemoveListener(item);
+
+    // add to local list
+    QMutexLocker locker(&_lock);
+    _listeners.push_back(item);
+
+    // if there is a session, add to each subsession->sink
+    if (!_session)
+    {
+        VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 1");
+        return;
+    }
+
+    MediaSubsessionIterator mit(*_session);
+    MediaSubsession *subsession;
+    while ((subsession = mit.next())) /* <- extra braces for pedantic gcc */
+    {
+        FreeboxMediaSink *sink = NULL;
+        if (sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink))
+            sink->AddListener(item);
+    }
+    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 2");
+}
+
+void RTSPComms::RemoveListener(RTSPListener *item)
+{
+    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin");
+    QMutexLocker locker(&_lock);
+    vector<RTSPListener*>::iterator it =
+        find(_listeners.begin(), _listeners.end(), item);
+
+    if (it == _listeners.end())
+    {
+        VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 1");
+        return;
+    }
+
+    // remove from local list..
+    *it = *_listeners.rbegin();
+    _listeners.resize(_listeners.size() - 1);
+
+    // if there is a session, remove from each subsession->sink
+    if (!_session)
+    {
+        VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 2");
+        return;
+    }
+
+    MediaSubsessionIterator mit(*_session);
+    MediaSubsession *subsession;
+    while ((subsession = mit.next())) /* <- extra braces for pedantic gcc */
+    {
+        FreeboxMediaSink *sink = NULL;
+        if (sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink))
+            sink->RemoveListener(item);
+    }
+    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 3");
 }

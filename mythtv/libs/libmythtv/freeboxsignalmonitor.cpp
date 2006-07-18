@@ -1,9 +1,7 @@
 // -*- Mode: c++ -*-
 
-#include "mythcontext.h"
+// MythTV headers
 #include "mpegstreamdata.h"
-
-#include "freeboxchannel.h"
 #include "freeboxsignalmonitor.h"
 #include "rtspcomms.h"
 
@@ -33,14 +31,14 @@ FreeboxSignalMonitor::FreeboxSignalMonitor(
     int db_cardnum, FreeboxChannel *_channel,
     uint _flags, const char *_name)
     : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
-      rtsp(new RTSPComms(this)),
       dtvMonitorRunning(false)
 {
     bool isLocked = false;
-    if (rtsp->Init())
+    if (GetChannel()->GetRTSP()->Init())
     {
-        FreeboxChannelInfo chaninfo = _channel->GetCurrentChanInfo();
-        isLocked = chaninfo.isValid() && rtsp->Open(chaninfo.m_url);
+        FreeboxChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();
+        isLocked = (chaninfo.isValid() && 
+                    GetChannel()->GetRTSP()->Open(chaninfo.m_url));
     }
 
     QMutexLocker locker(&statusLock);
@@ -53,18 +51,19 @@ FreeboxSignalMonitor::FreeboxSignalMonitor(
  */
 FreeboxSignalMonitor::~FreeboxSignalMonitor()
 {
+    GetChannel()->GetRTSP()->RemoveListener(this);
     Stop();
+}
 
-    if (rtsp)
-    {
-        delete rtsp;
-        rtsp = NULL;
-    }
+FreeboxChannel *FreeboxSignalMonitor::GetChannel(void)
+{
+    return dynamic_cast<FreeboxChannel*>(channel);
 }
 
 void FreeboxSignalMonitor::deleteLater(void)
 {
     disconnect(); // disconnect signals we may be sending...
+    GetChannel()->GetRTSP()->RemoveListener(this);
     Stop();
     DTVSignalMonitor::deleteLater();
 }
@@ -75,10 +74,11 @@ void FreeboxSignalMonitor::deleteLater(void)
 void FreeboxSignalMonitor::Stop(void)
 {
     DBG_SM("Stop", "begin");
+    GetChannel()->GetRTSP()->RemoveListener(this);
     SignalMonitor::Stop();
     if (dtvMonitorRunning)
     {
-        rtsp->Stop();
+        GetChannel()->GetRTSP()->Stop();
         dtvMonitorRunning = false;
         pthread_join(table_monitor_thread, NULL);
     }
@@ -101,7 +101,9 @@ void FreeboxSignalMonitor::RunTableMonitor(void)
 
     GetStreamData()->AddListeningPID(0);
 
-    rtsp->Run();
+    GetChannel()->GetRTSP()->AddListener(this);
+    GetChannel()->GetRTSP()->Run();
+    GetChannel()->GetRTSP()->RemoveListener(this);
 
     dtvMonitorRunning = false;
     DBG_SM("Run", "end");

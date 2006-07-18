@@ -11,13 +11,9 @@
 
 #include "dtvrecorder.h"
 #include "freeboxmediasink.h"
-#include "rtspcomms.h"
 #include "streamlisteners.h"
 
-class TSPacket;
 class FreeboxChannel;
-class FreeboxChannelInfo;
-class MPEGStreamData;
 
 /** \brief Processes data from RTSPComms and writes it to disk.
  */
@@ -61,7 +57,6 @@ class FreeboxRecorder : public DTVRecorder, public RTSPListener,
   private:
     FreeboxChannel *_channel;
     MPEGStreamData *_stream_data;
-    RTSPComms      *_rtsp;
     QWaitCondition  _cond_recording;
 
 

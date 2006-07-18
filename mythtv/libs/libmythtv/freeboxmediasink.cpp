@@ -4,14 +4,20 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <algorithm>
+using namespace std;
+
+#include "mythcontext.h"
 #include "freeboxmediasink.h"
 #include "rtspcomms.h"
 
+#define LOC QString("RTSPSink:")
+#define LOC_ERR QString("RTSPSink, Error:")
+
 FreeboxMediaSink::FreeboxMediaSink(UsageEnvironment &pEnv,
-                                   RTSPListener     &pRecorder,
                                    unsigned int      bufferSize) :
     MediaSink(pEnv),    fBufferSize(bufferSize),
-    env(pEnv),          recorder(pRecorder)
+    env(pEnv),          lock(true)
 {
     fBuffer = new unsigned char[fBufferSize];
 }
@@ -26,10 +32,9 @@ FreeboxMediaSink::~FreeboxMediaSink()
 }
 
 FreeboxMediaSink *FreeboxMediaSink::CreateNew(UsageEnvironment &env,
-                                              RTSPListener     &pRecorder,
                                               unsigned int      bufferSize)
 {
-    return new FreeboxMediaSink(env, pRecorder, bufferSize);
+    return new FreeboxMediaSink(env, bufferSize);
 }
 
 Boolean FreeboxMediaSink::continuePlaying(void)
@@ -58,8 +63,39 @@ void FreeboxMediaSink::afterGettingFrame(
 void FreeboxMediaSink::afterGettingFrame1(unsigned int   frameSize,
                                           struct timeval presentationTime)
 {
-    recorder.AddData(fBuffer, frameSize, presentationTime);
+    lock.lock();
+    vector<RTSPListener*>::iterator it = listeners.begin();
+    for (; it != listeners.end(); ++it)
+        (*it)->AddData(fBuffer, frameSize, presentationTime);
+    lock.unlock();
+
     continuePlaying();
+}
+
+void FreeboxMediaSink::AddListener(RTSPListener *item)
+{
+    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- begin");
+    if (item)
+    {
+        RemoveListener(item);
+        QMutexLocker locker(&lock);
+        listeners.push_back(item);
+    }
+    VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end");
+}
+
+void FreeboxMediaSink::RemoveListener(RTSPListener *item)
+{
+    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- begin 1");
+    QMutexLocker locker(&lock);
+    vector<RTSPListener*>::iterator it =
+        find(listeners.begin(), listeners.end(), item);
+    if (it != listeners.end())
+    {
+        *it = *listeners.rbegin();
+        listeners.resize(listeners.size() - 1);
+    }
+    VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 6");
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -9,6 +9,7 @@
 #include "tspacket.h"
 #include "freeboxchannel.h"
 #include "freeboxrecorder.h"
+#include "rtspcomms.h"
 
 #define LOC QString("FBRec: ")
 #define LOC_ERR QString("FBRec, Error: ")
@@ -20,28 +21,23 @@
 FreeboxRecorder::FreeboxRecorder(TVRec *rec, FreeboxChannel *channel) :
     DTVRecorder(rec),
     _channel(channel),
-    _stream_data(NULL),
-    _rtsp(new RTSPComms(this))
+    _stream_data(NULL)
 {
+    _channel->GetRTSP()->AddListener(this);
 }
 
 FreeboxRecorder::~FreeboxRecorder()
 {
     StopRecording();
-
-    if (_rtsp)
-    {
-        delete _rtsp;
-        _rtsp = NULL;
-    }
+    _channel->GetRTSP()->RemoveListener(this);
 }
 
 bool FreeboxRecorder::Open(void)
 {
     VERBOSE(VB_RECORD, LOC + "Open() -- begin");
 
-    if (_rtsp->IsOpen())
-        _rtsp->Close();
+    if (_channel->GetRTSP()->IsOpen())
+        _channel->GetRTSP()->Close();
 
     FreeboxChannelInfo chaninfo = _channel->GetCurrentChanInfo();
     if (!chaninfo.isValid())
@@ -50,9 +46,9 @@ bool FreeboxRecorder::Open(void)
     }
     else
     {
-        _error = !(_rtsp->Init()); 
+        _error = !(_channel->GetRTSP()->Init()); 
         if (!_error)
-            _error = !(_rtsp->Open(chaninfo.m_url));
+            _error = !(_channel->GetRTSP()->Open(chaninfo.m_url));
     }
 
     VERBOSE(VB_RECORD, LOC + "Open() -- end err("<<_error<<")");
@@ -62,8 +58,8 @@ bool FreeboxRecorder::Open(void)
 void FreeboxRecorder::Close(void)
 {
     VERBOSE(VB_RECORD, LOC + "Close() -- begin");
-    _rtsp->Stop();
-    _rtsp->Close();
+    _channel->GetRTSP()->Stop();
+    _channel->GetRTSP()->Close();
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
@@ -71,15 +67,15 @@ void FreeboxRecorder::Pause(bool clear)
 {
     VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
     DTVRecorder::Pause(clear);
-    _rtsp->Stop();
-    _rtsp->Close();
+    _channel->GetRTSP()->Stop();
+    _channel->GetRTSP()->Close();
     VERBOSE(VB_RECORD, LOC + "Pause() -- end");
 }
 
 void FreeboxRecorder::Unpause(void)
 {
     VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
-    if (_recording && !_rtsp->IsOpen())
+    if (_recording && !_channel->GetRTSP()->IsOpen())
         Open();
     DTVRecorder::Unpause();
     VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
@@ -103,14 +99,14 @@ void FreeboxRecorder::StartRecording(void)
         if (PauseAndWait())
             continue;
 
-        if (!_rtsp->IsOpen())
+        if (!_channel->GetRTSP()->IsOpen())
         {
             usleep(5000);
             continue;
         }
 
         // Go into main RTSP loop, feeding data to AddData
-        _rtsp->Run();
+        _channel->GetRTSP()->Run();
     }
 
     // Finish up...
@@ -126,7 +122,7 @@ void FreeboxRecorder::StopRecording(void)
 {
     VERBOSE(VB_RECORD, LOC + "StopRecording() -- begin");
     Pause();
-    _rtsp->Close();
+    _channel->GetRTSP()->Close();
 
     _request_recording = false;
     while (_recording)

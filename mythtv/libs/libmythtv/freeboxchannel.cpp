@@ -6,9 +6,12 @@
 
 #include "freeboxchannel.h"
 
+#include <qdeepcopy.h>
+
+#include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "libmythtv/freeboxchannelfetcher.h"
-#include "libmythtv/freeboxrecorder.h"
-#include "libmythtv/tv_rec.h"
+#include "libmythtv/rtspcomms.h"
 
 #define LOC QString("FBChan(%1): ").arg(GetCardID())
 #define LOC_ERR QString("FBChan(%1), Error: ").arg(GetCardID())
@@ -17,6 +20,7 @@ FreeboxChannel::FreeboxChannel(TVRec         *parent,
                                const QString &videodev)
     : ChannelBase(parent),
       m_videodev(QDeepCopy<QString>(videodev)),
+      m_rtsp(new RTSPComms()),
       m_lock(true)
 {
     VERBOSE(VB_CHANNEL, LOC + "ctor");
@@ -24,7 +28,13 @@ FreeboxChannel::FreeboxChannel(TVRec         *parent,
 
 FreeboxChannel::~FreeboxChannel()
 {
-    VERBOSE(VB_CHANNEL, LOC + "dtor");
+    VERBOSE(VB_CHANNEL, LOC + "dtor -- begin");
+    if (m_rtsp)
+    {
+        delete m_rtsp;
+        m_rtsp = NULL;
+    }
+    VERBOSE(VB_CHANNEL, LOC + "dtor -- end");
 }
 
 bool FreeboxChannel::Open(void)

@@ -12,7 +12,7 @@
 
 #include <qmutex.h>
 
-class FreeboxRecorder;
+class RTSPComms;
 
 class FreeboxChannel : public ChannelBase
 {
@@ -32,12 +32,16 @@ class FreeboxChannel : public ChannelBase
     FreeboxChannelInfo GetCurrentChanInfo(void) const
         { return GetChanInfo(curchannelname); }
 
+    RTSPComms       *GetRTSP(void)       { return m_rtsp; }
+    const RTSPComms *GetRTSP(void) const { return m_rtsp; }
+    
   private:
     FreeboxChannelInfo GetChanInfo(const QString& channum,
                                    uint           sourceid = 0) const;
 
     QString               m_videodev;
     fbox_chan_map_t       m_freeboxchannels;
+    RTSPComms            *m_rtsp;
     mutable QMutex        m_lock;
 
   private:
