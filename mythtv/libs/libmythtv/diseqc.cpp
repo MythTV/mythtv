@@ -11,17 +11,20 @@
 // POSIX headers
 #include <sys/time.h>
 
-// System headers
-#include <linux/dvb/frontend.h>
-
 // MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "diseqc.h"
 
 #ifdef USING_DVB
-#include "dvbtypes.h"
-#endif // USING_DVB
+#   include "dvbtypes.h"
+#else
+#   define SEC_VOLTAGE_13  0
+#   define SEC_VOLTAGE_18  1
+#   define SEC_VOLTAGE_OFF 2
+#   define SEC_MINI_A      0
+#   define SEC_MINI_B      1
+#endif
 
 // DiSEqC sleep intervals per eutelsat spec
 #define DISEQC_SHORT_WAIT     (15 * 1000)
@@ -541,6 +544,7 @@ void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
         delete old_root;
 }
 
+#ifdef USING_DVB
 static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
 {
     (void) fd;
@@ -548,7 +552,6 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
 
     bool success = false;
 
-#ifdef USING_DVB
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
     {
         if (ioctl(fd, FE_DISEQC_SEND_MASTER_CMD, &cmd) == 0)
@@ -556,7 +559,6 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
         else
             usleep(TIMEOUT_WAIT);
     }
-#endif //USING_DVB
 
     if (!success)
     {
@@ -566,6 +568,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
 
     return success;
 }
+#endif //USING_DVB
 
 /** \fn DiSEqCDevTree::SendCommand(uint,uint,uint,uint,unsigned char*)
  *  \brief Sends a DiSEqC command.
@@ -584,6 +587,15 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad DiSEqC command");
         return false;
     }
+
+#ifndef USING_DVB
+
+    (void) adr;
+    (void) cmd;
+    (void) repeats;
+    return false;
+
+#else // if USING_DVB
 
     // prepare command
     dvb_diseqc_master_cmd mcmd;
@@ -616,6 +628,8 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
     }
 
     return true;
+
+#endif // USING_DVB
 }
 
 /** \fn DiSEqCDevTree::ResetDiseqc(bool)
@@ -1287,6 +1301,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
 #endif // !FE_DISHNETWORK_SEND_LEGACY_CMD
 }
 
+#ifdef USING_DVB
 static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 {
     (void) fd;
@@ -1294,7 +1309,6 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 
     bool success = false;
 
-#ifdef USING_DVB
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
     {
         if (ioctl(fd, FE_DISEQC_SEND_BURST, cmd) == 0)
@@ -1302,7 +1316,6 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
         else
             usleep(TIMEOUT_WAIT);
     }
-#endif // USING_DVB
 
     if (!success)
     {
@@ -1311,6 +1324,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 
     return success;
 }
+#endif // USING_DVB
 
 bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
                                   const DVBTuning &/*tuning*/,
@@ -1319,8 +1333,10 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
     VERBOSE(VB_CHANNEL, LOC + "Changing to Tone switch port " +
             QString("%1/2").arg(pos + 1));
 
+#ifdef USING_DVB
     if (mini_diseqc(m_tree.GetFD(), pos == 0 ? SEC_MINI_A : SEC_MINI_B))
         return true;
+#endif // USING_DVB
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting Tone Switch failed." + ENO);
     return false;
