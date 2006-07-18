@@ -337,6 +337,8 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 #endif
         SetIntOption(profile, "mpeg4optionvhq");
         SetIntOption(profile, "mpeg4option4mv");
+        SetIntOption(profile, "mpeg4optionidct");
+        SetIntOption(profile, "mpeg4optionime");
     }
     else if (setting == "RTjpeg")
     {
@@ -3249,3 +3251,6 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
         ringBuffer->Write(buf, len);
     }
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
+
