@@ -348,6 +348,13 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
         }
 
         len += remainder;
+
+        if (len < 10) // 10 bytes = 4 bytes TS header + 6 bytes PES header
+        {
+            remainder = len;
+            continue;
+        }
+
         remainder = GetStreamData()->ProcessData(buffer, len);
         if (remainder > 0 && (len > remainder)) // leftover bytes
             memmove(buffer, &(buffer[len - remainder]), remainder);

@@ -515,8 +515,9 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
     fix[ 4096 << 16] = EITFixUp::kFixAUStar;
 
-    fix[769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
-    fix[ 33LL << 32 |  133 << 16] = EITFixUp::kEFixPro7Sat; // DVB-S Astra19.2E
+    fix[ 769LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Berlin
+    fix[3075LL << 32 | 8468 << 16] = EITFixUp::kEFixPro7Sat; // DVB-T Bremen
+    fix[                133 << 16] = EITFixUp::kEFixPro7Sat; // Premiere and pro7/Sat.1 
 }
 
 static int calc_eit_utc_offset(void)
