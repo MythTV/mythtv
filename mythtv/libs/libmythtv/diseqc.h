@@ -7,6 +7,9 @@
 #ifndef _DISEQC_H_
 #define _DISEQC_H_
 
+// C headers
+#include <inttypes.h>
+
 // C++ headers
 #include <vector>
 using namespace std;
