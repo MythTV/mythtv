@@ -1188,6 +1188,18 @@ static struct CHANLIST pal_bcast_za[] ={
 };
 
 /* --------------------------------------------------------------------- */
+/* Singapore broadcast added by Teo En Ming on 16 July 2006 */
+static struct CHANLIST pal_bcast_sg[] = {
+    { "1", 175250 },
+    { "2", 196250 },
+    { "3", 224250 },
+    { "4", 487250 },
+    { "5", 495250 },
+    { "6", 543250 },
+    { "7", 743250 },
+};
+
+/* --------------------------------------------------------------------- */
 
 static struct CHANLIST argentina[] = {
     { "001",   56250 },
@@ -1305,5 +1317,6 @@ struct CHANLISTS chanlists[] = {
     { "southafrica",      pal_bcast_za,      CHAN_COUNT(pal_bcast_za)      },
     { "argentina",        argentina,         CHAN_COUNT(argentina)         },
     { "australia-optus",  pal_australia_optus, CHAN_COUNT(pal_australia_optus) },
+    { "singapore",        pal_bcast_sg,      CHAN_COUNT(pal_bcast_sg)      },
     { NULL, NULL, 0 } /* EOF */
 };
