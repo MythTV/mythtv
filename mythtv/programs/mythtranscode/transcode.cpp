@@ -530,6 +530,16 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         return REENCODE_ERROR;
     }
 
+    int vidSize = 0;
+
+    // 1920x1080 video is actually 1920x1088 because of the 16x16 blocks so
+    // we have to fudge the output size here.  nuvexport knows how to handle
+    // this and as of right now it is the only app that uses the fifo ability.
+    if (video_height == 1080 && video_width == 1920)
+        vidSize = (1088 * 1920) * 3 / 2;
+    else
+        vidSize = (video_height * video_width) * 3 / 2;
+
     VideoFrame frame;
     frame.codec = FMT_YV12;
     frame.width = newWidth;
@@ -546,7 +556,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             VERBOSE(VB_GENERAL, "Enforcing sync on fifos");
         fifow = new FIFOWriter::FIFOWriter(2, framecontrol);
 
-        if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
+        if (!fifow->FIFOInit(0, QString("video"), vidfifo, vidSize, 50) ||
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
             VERBOSE(VB_IMPORTANT, "Error initializing fifo writer.  Aborting");
@@ -645,7 +655,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     int count = 0;
                     while (delta > vidFrameTime)
                     {
-                        fifow->FIFOWrite(0, frame.buf, frame.size);
+                        fifow->FIFOWrite(0, frame.buf, vidSize);
                         count++;
                         delta -= (int)vidFrameTime;
                     }
@@ -678,10 +688,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             }
             else
             {
-                fifow->FIFOWrite(0, frame.buf, frame.size);
+                fifow->FIFOWrite(0, frame.buf, vidSize);
                 if (dropvideo)
                 {
-                    fifow->FIFOWrite(0, frame.buf, frame.size);
+                    fifow->FIFOWrite(0, frame.buf, vidSize);
                     curFrameNum++;
                     dropvideo--;
                 }
