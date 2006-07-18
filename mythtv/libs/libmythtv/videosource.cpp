@@ -931,7 +931,20 @@ class DBOX2Host: public LineEditSetting, public CCSetting {
        }
 };
 
-class DBOX2ConfigurationGroup: public VerticalConfigurationGroup {
+class DBOX2Input: public ComboBoxSetting, public CCSetting
+{
+  public:
+    DBOX2Input(const CaptureCard& parent)
+      : CCSetting(parent, "defaultinput")
+    {
+        setLabel(QObject::tr("Default Input"));
+        addSelection("MPEG2TS");
+        setHelpText(QObject::tr("Only MPEG2TS is supported at this time."));
+    }
+};
+
+class DBOX2ConfigurationGroup: public VerticalConfigurationGroup
+{
   public:
     DBOX2ConfigurationGroup(CaptureCard& a_parent):
         ConfigurationGroup(false, true, false, false),
@@ -941,6 +954,7 @@ class DBOX2ConfigurationGroup: public VerticalConfigurationGroup {
         addChild(new DBOX2Port(parent));
         addChild(new DBOX2HttpPort(parent));
         addChild(new DBOX2Host(parent));
+        addChild(new DBOX2Input(parent));
     };
   private:
     CaptureCard &parent;
