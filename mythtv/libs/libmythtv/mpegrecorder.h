@@ -53,6 +53,8 @@ class MpegRecorder : public RecorderBase
 
     bool OpenMpegFileAsInput(void);
     bool OpenV4L2DeviceAsInput(void);
+    bool SetIVTVDeviceOptions(int chanfd);
+    bool SetV4L2DeviceOptions(int chanfd);
 
     void ResetForNewFile(void);
 

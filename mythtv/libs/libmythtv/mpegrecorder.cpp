@@ -15,6 +15,9 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 
+#include <algorithm>
+using namespace std;
+
 // Qt headers
 #include <qregexp.h>
 
@@ -319,72 +322,6 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
     }
 
-    struct ivtv_ioctl_codec ivtvcodec;
-    bzero(&ivtvcodec, sizeof(ivtvcodec));
-
-    if (ioctl(chanfd, IVTV_IOC_G_CODEC, &ivtvcodec) < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error getting codec params" + ENO);
-        return false;
-    }
-
-    // only 48kHz works properly.
-    int audio_rate = 1;
-
-/*
-    int audio_rate;
-    if (audsamplerate == 44100)
-        audio_rate = 0;
-    else if (audsamplerate == 48000)
-        audio_rate = 1;
-    // 32kHz doesn't seem to work, let's force 44.1kHz instead.
-    else if (audsamplerate == 32000)
-        audio_rate = 2;
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error setting audio sample rate" +
-                QString("\n\t\t\t%1 is not a valid sampling rate")
-                .arg(audsamplerate);
-
-        return;
-    }
-*/
-
-    ivtvcodec.aspect = aspectratio;
-    if (audtype == 2)
-    {
-        if (audbitratel2 < 10)
-            audbitratel2 = 10;
-        ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
-                                  (audbitratel2 << 4);
-    }
-    else
-    {
-        if (audbitratel1 < 6)
-            audbitratel1 = 6;
-        ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
-                                  (audbitratel1 << 4);
-    }
-
-    ivtvcodec.bitrate = bitrate * 1000;
-    ivtvcodec.bitrate_peak = maxbitrate * 1000;
-
-    if (ivtvcodec.bitrate > ivtvcodec.bitrate_peak)
-        ivtvcodec.bitrate = ivtvcodec.bitrate_peak;
-
-    // framerate (1 = 25fps, 0 = 30fps)
-    ivtvcodec.framerate = (!ntsc_framerate);
-    ivtvcodec.stream_type = streamtype;
-
-    if (ioctl(chanfd, IVTV_IOC_S_CODEC, &ivtvcodec) < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error setting codec params" + ENO);
-        return false;
-    }
-
-    if (ivtvcodec.framerate)
-        keyframedist = 12;
-
     struct v4l2_control ctrl;
     ctrl.id = V4L2_CID_AUDIO_VOLUME;
     ctrl.value = 65536 / 100 *audvolume;
@@ -392,26 +329,74 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (ioctl(chanfd, VIDIOC_S_CTRL, &ctrl) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
-		        "Unable to set recording volume" + ENO);
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-		        "If you are using an AverMedia M179 card this is normal.");
+                "Unable to set recording volume" + ENO + "\n\t\t\t" +
+                "If you are using an AverMedia M179 card this is normal.");
     }
+
+    if (!SetIVTVDeviceOptions(chanfd) && !SetV4L2DeviceOptions(chanfd))
+        return false;
+
+    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
+    if (readfd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
+        return false;
+    }
+
+    return true;
+}
+
+bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
+{
+    struct ivtv_ioctl_codec ivtvcodec;
+    bzero(&ivtvcodec, sizeof(ivtvcodec));
+
+    if (ioctl(chanfd, IVTV_IOC_G_CODEC, &ivtvcodec) < 0)
+    {
+        // Downgrade to VB_RECORD warning when ioctl isn't supported,
+        // unless the driver is completely missitng it probably
+        // supports the Linux v2.6.18 v4l2 mpeg encoder API.
+        VERBOSE((22 == errno) ? VB_RECORD : VB_IMPORTANT,
+                ((22 == errno) ? LOC_WARN : LOC_ERR) +
+                "Error getting codec params using old IVTV ioctl" + ENO);
+        return false;
+    }
+
+    audbitratel1 = max(audbitratel1, 6);
+    audbitratel2 = max(audbitratel2, 10);
+
+    int audio_rate = 1; // only 48kHz works properly.
+    int audbitrate = (2 == audtype) ? audbitratel2 : audbitratel1;
+
+    ivtvcodec.audio_bitmask  = audio_rate | (audtype << 2);
+    ivtvcodec.audio_bitmask |= audbitrate << 4;
+    ivtvcodec.aspect         = aspectratio;
+    ivtvcodec.bitrate        = min(bitrate, maxbitrate) * 1000;
+    ivtvcodec.bitrate_peak   = maxbitrate * 1000;
+    ivtvcodec.framerate      = ntsc_framerate ? 0 : 1; // 1->25fps, 0->30fps
+    ivtvcodec.stream_type    = streamtype;
+
+    if (ioctl(chanfd, IVTV_IOC_S_CODEC, &ivtvcodec) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Error setting codec params" + ENO);
+        return false;
+    }
+
+    keyframedist = (ivtvcodec.framerate) ? 12 : keyframedist;
 
     if (vbimode)
     {
         struct ivtv_sliced_vbi_format vbifmt;
         bzero(&vbifmt, sizeof(struct ivtv_sliced_vbi_format));
-        vbifmt.service_set = (1==vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
+        vbifmt.service_set = (1 == vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
+
         if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) 
         {
             struct v4l2_format vbi_fmt;
             bzero(&vbi_fmt, sizeof(struct v4l2_format));
             vbi_fmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
-            vbi_fmt.fmt.sliced.service_set = 0;
-            if (1 == vbimode)
-                vbi_fmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_625;
-            else
-                vbi_fmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_525;
+            vbi_fmt.fmt.sliced.service_set = (1 == vbimode) ?
+                V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
             if (ioctl(chanfd, VIDIOC_S_FMT, &vbi_fmt) < 0)
             {
@@ -433,11 +418,127 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
                 .arg(vbifmt.io_size));
     }
 
-    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
-    if (readfd < 0)
+    return true;
+}
+
+bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
+{
+    static const int kNumControls = 7;
+    struct v4l2_ext_controls ctrls;
+    struct v4l2_ext_control ext_ctrl[kNumControls];
+
+    // Set controls
+    bzero(&ctrls,    sizeof(struct v4l2_ext_controls));
+    bzero(&ext_ctrl, sizeof(struct v4l2_ext_control) * kNumControls);
+
+    audbitratel1 = max(audbitratel1, 6);
+    audbitratel2 = max(audbitratel2, 10);
+
+    int audbitrate = (2 == audtype) ? audbitratel2 : audbitratel1;
+
+    if (audtype != 2)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "MPEG Layer1 does not work properly with ivtv driver. "
+                "\n\t\t\tUsing MPEG layer 2 audio instead.");
+    }
+
+    // only 48kHz works properly.
+    ext_ctrl[0].id    = V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ;
+    ext_ctrl[0].value = V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000;
+
+    ext_ctrl[1].id    = V4L2_CID_MPEG_VIDEO_ASPECT;
+    ext_ctrl[1].value = aspectratio - 1;
+
+    ext_ctrl[2].id    = V4L2_CID_MPEG_AUDIO_ENCODING;
+    ext_ctrl[2].value = audtype - 1;
+
+    ext_ctrl[3].id    = V4L2_CID_MPEG_AUDIO_L2_BITRATE;
+    ext_ctrl[3].value = audbitrate - 1;
+
+    ext_ctrl[4].id    = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ext_ctrl[4].value = (bitrate = min(bitrate, maxbitrate)) * 1000;
+
+    ext_ctrl[5].id    = V4L2_CID_MPEG_VIDEO_BITRATE_PEAK;
+    ext_ctrl[5].value = maxbitrate * 1000;
+
+    ext_ctrl[6].id    = V4L2_CID_MPEG_STREAM_TYPE;
+    ext_ctrl[6].value = V4L2_MPEG_STREAM_TYPE_MPEG2_PS;
+
+    ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
+    ctrls.count       = kNumControls;
+    ctrls.controls    = ext_ctrl;
+
+    if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
+    {
+        if (ctrls.error_idx >= ctrls.count)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Could not set MPEG controls" + ENO);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Could not set MPEG controls %1 through %2.")
+                    .arg(ctrls.error_idx)
+                    .arg(ext_ctrl[ctrls.error_idx].value) + ENO);
+        }
         return false;
+    }
+
+    // Get controls
+    ext_ctrl[0].id    = V4L2_CID_MPEG_VIDEO_GOP_SIZE;
+    ext_ctrl[0].value = 0;
+
+    ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
+    ctrls.count       = 1;
+    ctrls.controls    = ext_ctrl;
+
+    if (ioctl(chanfd, VIDIOC_G_EXT_CTRLS, &ctrls) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get "
+                "V4L2_CID_MPEG_VIDEO_GOP_SIZE, defaulting to 12" + ENO);
+        ext_ctrl[0].value = 12;
+    }
+
+    keyframedist = ext_ctrl[0].value;
+
+    // VBI is not yet working as of July 11th, 2006 with IVTV driver.
+    // V4L2_CID_MPEG_STREAM_VBI_FMT needs to be finished/supported first.
+    if (vbimode)
+    {
+        struct v4l2_format vbifmt;
+        bzero(&vbifmt, sizeof(struct v4l2_format));
+        vbifmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
+        /* vbifmt.fmt.sliced.service_set = (1==vbimode) ?
+                                           VBI_TYPE_TELETEXT : VBI_TYPE_CC; */
+        if (1 == vbimode)
+            vbifmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_625;
+        else
+            vbifmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_525;
+
+        if (ioctl(chanfd, VIDIOC_S_FMT, &vbifmt) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, "Can't enable VBI recording" + ENO);
+        }
+
+        struct v4l2_ext_control vbi_fmt;
+        vbi_fmt.id    = V4L2_CID_MPEG_STREAM_VBI_FMT;
+        vbi_fmt.value = V4L2_MPEG_STREAM_VBI_FMT_IVTV;
+        ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+        ctrls.count      = 1;
+        ctrls.controls   = &vbi_fmt;
+        if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Can't enable VBI recording (2)"+ENO);
+        }
+
+        ioctl(chanfd, VIDIOC_G_FMT, &vbifmt);
+
+        VERBOSE(VB_RECORD, LOC + QString(
+                "VBI service:%1, io size:%3")
+                .arg(vbifmt.fmt.sliced.service_set)
+                .arg(vbifmt.fmt.sliced.io_size));
     }
 
     return true;
