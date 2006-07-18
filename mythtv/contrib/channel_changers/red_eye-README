@@ -1,0 +1,126 @@
+=== === === === === === === === === === === === === === === === === === ===
+
+Linux driver for
+        Red-Eye Serial: A serial remote control interface for
+                        Pace(r) Digital Cable Receivers
+
+=== === === === === === === === === === === === === === === === === === ===
+
+White Wing Logic make a serial-controlled IR transmitter for controlling
+Pace(r) digital cable receivers as used by some CableTV companies in the
+UK (notably Telewest).
+
+The original software for Linux was written by Malcolm Smith and was
+distributed from the website with no copyright, license or attribution.
+
+I decided to rework the code to compile under GCC 4.x and a 2.6 kernel.
+in the process I added some debug control to the original, and a little
+argv handling, though very fragile.
+
+I have offered this code to White Wing Logic and also to the MythTV 
+project in the hope that others find it useful.
+
+=== === === === === === === === === === === === === === === === === === ===
+
+Installation
+
+Compile the source
+        $ gcc -o red_eye red_eye.c
+
+Copy to bin directory and set permissions
+        $ cp ./red_eye /usr/local/bin/red_eye
+        $ chown root:root /usr/local/bin/red_eye
+        $ chmod 0555 /usr/local/bin/red_eye
+
+Test the binary
+        $ red_eye
+
+        usage: red_eye deviceComPort sendString waitSecs [debug]
+         -or-  red_eye sendString [debug]
+        
+         where deviceComPort   is e.g. /dev/ttyS0
+               sendString      is your desired command to the RedEye Serial
+               waitSecs        is pause time after command (in seconds 0-9)
+               debug           is debug level (0=off, 9=max)
+
+        $ red_eye 101 2
+        Opening port for /dev/ttyS0
+        Entering function open_port()
+          Opening port...
+          Opening port succeeded!
+          Setting file options...
+          Setting file options suceeded!
+          Getting current options for the port...
+          Getting current options for the port succeeded!
+          Setting baud rates for the port...
+          Setting baud rates for the port succeeded!
+          Setting local mode...
+          Setting local mode suceeded!
+        Leaving function open_port()
+        Setting RTS for /dev/ttyS0
+        Entering function set_rts()
+          Checking current state of RTS line...
+            RTS bit is set 
+          Checking current state of RTS line suceeded
+          Setting RTS line...
+          Setting RTS line succeeded
+          Checking new state of RTS line...
+            RTS bit was set correctly 
+          Checking new state of RTS line suceeded
+        Leaving function set_rts()
+        Pausing for 2 seconds to allow IR system to power up
+        Writing data ("101") now
+        Writing data suceeded
+        Sleeping for 1 seconds ....
+        Start close... finished
+        $ echo $?
+        0
+
+        $ red_eye 101
+        $ echo $?
+        0
+
+=== === === === === === === === === === === === === === === === === === ===
+
+Contacts:
+
+White Wing Logic
+        http://www.whitewing.co.uk/
+        Mike Harrison <info@whitewing.co.uk>
+
+	http://www.redremote.co.uk/
+	info@redremote.co.uk
+
+Red-Eye Serial
+	http://www.redremote.co.uk/serial/
+ 
+Current code
+        This program was rewritten by Michael Thomson
+	<redeye@m-thomson.net>
+
+Original code
+        This program is based on red_eye.c by Malcolm Smith,
+        distributed with no copyright or license from:
+        http://www.redremote.co.uk/serial/resdown.html
+ 
+        The original software may still be available from: 
+        http://www.redremote.co.uk/serial/red_eye.tgz
+ 
+=== === === === === === === === === === === === === === === === === === ===
+ 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA  02110-1301  USA
+ 
+=== === === === === === === === === === === === === === === === === === ===
