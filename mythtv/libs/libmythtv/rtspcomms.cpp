@@ -96,18 +96,32 @@ bool RTSPComms::Init(void)
 
     // Begin by setting up our usage environment:
     TaskScheduler *scheduler = BasicTaskScheduler::createNew();
+    if (!scheduler)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create Live Scheduler.");
+        return false;
+    }
+
     _live_env = BasicUsageEnvironment::createNew(*scheduler);
+    if (!_live_env)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create Live Environment.");
+        delete scheduler;
+        return false;
+    }
 
     // Create our client object:
     _rtsp_client = RTSPClient::createNew(*_live_env, 0, "myRTSP", 0);
 
     if (!_rtsp_client)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Freebox # Failed to create RTSP client: %1")
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to create RTSP client: %1")
                 .arg(_live_env->getResultMsg()));
 
-        _live_env = NULL; // TODO free resources.
+        _live_env->reclaim();
+        _live_env = NULL;
+        delete scheduler;
     }
 
     VERBOSE(VB_RECORD, LOC + "Init() -- end");
@@ -127,7 +141,13 @@ void RTSPComms::Deinit(void)
         _rtsp_client = NULL;
     }
 
-    _live_env = NULL; // TODO free resources.
+    if (_live_env)
+    {
+        TaskScheduler *scheduler = &_live_env->taskScheduler();
+        _live_env->reclaim();
+        _live_env = NULL;
+        delete scheduler;
+    }
     VERBOSE(VB_RECORD, LOC + "Deinit() -- end");
 }
 
