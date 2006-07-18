@@ -6,6 +6,7 @@ using namespace std;
 
 #include "settings.h"
 #include "datadirect.h"
+#include "diseqcsettings.h"
 
 class SignalTimeout;
 class ChannelTimeout;
@@ -203,7 +204,6 @@ class TunerCardInput: public ComboBoxSetting, public CCSetting
 
   public slots:
     void fillSelections(const QString &device);
-    void diseqcType(const QString &diseqcType);
 
   private:
     QString last_device;
@@ -381,10 +381,8 @@ public:
     static void fillSelections(SelectSetting* setting);
     static void fillSelections(SelectSetting* setting, bool no_children);
 
-    void load() {
-        ConfigurationWizard::load();
-    };
-
+    virtual void save();
+    
 public slots:
     void DiSEqCPanel();
     void analogPanel();
@@ -421,6 +419,7 @@ private:
 private:
     ID       *id;
     ParentID *parentid;
+    DiSEqCDevTree tree;
 };
 
 class CardInput;
@@ -525,18 +524,12 @@ class CardID;
 class ChildID;
 class InputName;
 class SourceID;
-class DVBLNBChooser;
-class DiSEqCPos;
-class DiSEqCPort;
-class LNBLofSwitch;
-class LNBLofLo;
-class LNBLofHi;
 
 class CardInput: public ConfigurationWizard
 {
     Q_OBJECT
   public:
-    CardInput(bool is_dvb_card);
+    CardInput(bool is_dvb_card, int cardid);
 
     int getInputID(void) const { return id->intValue(); };
 
@@ -544,7 +537,6 @@ class CardInput: public ConfigurationWizard
     void loadByInput(int cardid, QString input);
     QString getSourceName(void) const;
 
-    void fillDiseqcSettingsInput(QString _pos, QString _port);
     void SetChildCardID(uint);
 
     virtual void save();
@@ -553,6 +545,7 @@ class CardInput: public ConfigurationWizard
   public slots:
     void channelScanner();
     void sourceFetch();
+    void diseqcConfig();
 
   private:
     class ID: virtual public IntegerSetting,
@@ -578,13 +571,8 @@ class CardInput: public ConfigurationWizard
     ChildID         *childid;
     InputName       *inputname;
     SourceID        *sourceid;
-    DVBLNBChooser   *lnbsettings;
-    DiSEqCPos       *diseqcpos;
-    DiSEqCPort      *diseqcport;
-    LNBLofSwitch    *lnblofswitch;
-    LNBLofLo        *lnbloflo;
-    LNBLofHi        *lnblofhi;
     StartingChannel *startchan;
+    DiSEqCDevSettings  settings;
 };
 
 #endif

@@ -235,7 +235,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             // DVB specific
             tsid,                 netid,
             cd.SymbolRateHz(),    -1,
-            QChar(cd.PolarizationString()[0]), -1,
+            QChar(cd.PolarizationString()[0]), 'a',
             -1,
             cd.FECInnerString(),  QString::null,
             -1,                   QString::null,
@@ -680,6 +680,24 @@ QString ChannelUtil::GetInputName(int source_id)
         inputname = query.value(0).toString();
     }
     return inputname;
+}
+
+int ChannelUtil::GetInputID(int source_id, int card_id)
+{
+    int input_id = -1;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardinputid"
+                  " FROM cardinput"
+                  " WHERE sourceid = :SOURCEID"
+                  " AND cardid = :CARDID");
+    query.bindValue(":SOURCEID", source_id);
+    query.bindValue(":CARDID", card_id);
+
+    if (query.exec() && query.isActive() && query.next())
+        input_id = query.value(0).toInt();
+
+    return input_id;
 }
 
 QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
@@ -1221,13 +1239,6 @@ bool ChannelUtil::GetChannelData(
     atsc_minor    = query.value(7).toUInt();
     mpeg_prog_num = query.value(8).toUInt();
 
-    /// HACK begin -- deal with broken freqid, see ticket #1848
-    bool ok;
-    int num = channum.toInt(&ok);
-    if (freqid.isEmpty() || freqid == "0")
-        freqid = QString::number(num);
-    /// HACK end -- deal with broken freqid, see ticket #1848
-
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
 
@@ -1303,47 +1314,25 @@ inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
-inline bool is_renumbered(const DBChannel &c)
-{
-    if (c.channum.isEmpty())
-        return false;
-
-    // extract integers from channum
-    uint num = 0;
-    for (uint i = 0; i < c.channum.length(); i++)
-    {
-        bool ok;
-        uint tmp = QString(c.channum[i]).toUInt(&ok);
-        num = (ok) ? ((10 * num) + tmp) : num;
-    }
-    QString channum = QString::number(num);
-    QString atscnum = QString("%1%2").arg(c.major_chan).arg(c.minor_chan);
-
-    return channum != atscnum;
-}
-
 inline bool lt_smart(const DBChannel &a, const DBChannel &b)
 {
     int cmp = 0;
 
     bool isIntA, isIntB;
-    uint a_int   = a.channum.toUInt(&isIntA);
-    uint b_int   = b.channum.toUInt(&isIntB);
-
-    // if an ATSC channel is renumbered, ignore real ATSC channel numbers.
-    uint a_minor = (a.minor_chan && is_renumbered(a)) ? 0 : a.minor_chan;
-    uint b_minor = (b.minor_chan && is_renumbered(b)) ? 0 : b.minor_chan;
+    int a_int = a.channum.toUInt(&isIntA);
+    int b_int = b.channum.toUInt(&isIntB);
 
     // one of the channels is an ATSC channel, and the other
     // is either ATSC or is numeric.
-    if ((a_minor || b_minor) && (a_minor || isIntA) && (b_minor || isIntB))
+    if ((a.minor_chan || b.minor_chan) &&
+        (a.minor_chan || isIntA) && (b.minor_chan || isIntB))
     {
-        int a_maj = (!a_minor && isIntA) ? a_int : a.major_chan;
-        int b_maj = (!b_minor && isIntB) ? b_int : b.major_chan;
+        int a_maj = (!a.minor_chan && isIntA) ? a_int : a.major_chan;
+        int b_maj = (!b.minor_chan && isIntB) ? b_int : b.major_chan;
         if ((cmp = a_maj - b_maj))
             return cmp < 0;
         
-        if ((cmp = a_minor - b_minor))
+        if ((cmp = a.minor_chan - b.minor_chan))
             return cmp < 0;
     }
 

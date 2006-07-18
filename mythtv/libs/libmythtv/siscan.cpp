@@ -619,15 +619,18 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     // Tune to multiplex
     if (GetDVBChannel())
     {
+        // always wait for rotor to finish
+        GetDVBSignalMonitor()->AddFlags(kDVBSigMon_WaitForPos);
+
         if (item.mplexid > 0)
         {
-            ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
+            ok = GetDVBChannel()->TuneMultiplex(item.mplexid, item.SourceID);
         }
         else
         {
             DVBTuning tuning = item.tuning;
             tuning.params.frequency = freq;
-            ok = GetDVBChannel()->Tune(tuning, true);
+            ok = GetDVBChannel()->Tune(tuning, true, item.SourceID);
         }
     }
 #endif // USING_DVB
@@ -827,10 +830,7 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
         ok = tuning.parseQPSK(
             startChan["frequency"],   startChan["inversion"],
             startChan["symbolrate"],  startChan["fec"],
-            startChan["polarity"],
-            startChan["diseqc_type"], startChan["diseqc_port"],
-            startChan["diseqc_pos"],  startChan["lnb_lof_switch"],
-            startChan["lnb_lof_hi"],  startChan["lnb_lof_lo"]);
+            startChan["polarity"]);
     }
     else if (std == "dvb" && mod.left(3) == "qam")
     {

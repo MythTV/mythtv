@@ -332,28 +332,6 @@ bool CardUtil::IsDVB(uint cardid, const QString &inputname)
     return "DVB" == GetRawCardType(cardid, inputname);
 }
 
-/** \fn CardUtil::GetDISEqCType(uint)
- *  \brief Returns the disqec type associated with a DVB card
- *  \param nCardID card id to check
- *  \return the disqec type
- */
-enum DISEQC_TYPES CardUtil::GetDISEqCType(uint nCardID)
-{
-    int iRet = 0;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT dvb_diseqc_type "
-                  "FROM capturecard "
-                  "WHERE capturecard.cardid = :CARDID");
-    query.bindValue(":CARDID", nCardID);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetDISEqCType()", query);
-    else if (query.next())
-        iRet = query.value(0).toInt();
-
-    return (DISEQC_TYPES)iRet;
-}
-
 /** \fn CardUtil::GetDefaultInput(uint)
  *  \brief Returns the default input for the card
  *  \param nCardID card id to check
@@ -564,8 +542,27 @@ InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
     return list;
 }
 
-QStringList CardUtil::probeInputs(QString device, QString cardtype,
-                                  int diseqctype)
+InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
+{
+    InputNames list;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardinputid, inputname "
+        "FROM cardinput "
+        "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("CardUtil::GetConfiguredDVBInputs", query);
+    else
+    {
+        while (query.next())
+            list[query.value(0).toUInt()] = query.value(1).toString();
+    }
+    return list;
+}
+
+QStringList CardUtil::probeInputs(QString device, QString cardtype)
 {
     QStringList ret;
 
@@ -578,7 +575,7 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype,
         ret += "MPEG2TS";
     }
     else if ("DVB" == cardtype)
-        ret += probeDVBInputs(device, diseqctype);
+        ret += probeDVBInputs(device);
     else
         ret += probeV4LInputs(device);
 
@@ -617,28 +614,24 @@ QStringList CardUtil::probeV4LInputs(QString device)
     return ret;
 }
 
-QStringList CardUtil::probeDVBInputs(QString device, int diseqc_type)
+QStringList CardUtil::probeDVBInputs(QString device)
 {
     QStringList ret;
 
 #ifdef USING_DVB
-    if (diseqc_type < 0)
+    int cardid = CardUtil::GetCardID(device);
+    if (!cardid)
+        return ret;
+
+    InputNames list = GetConfiguredDVBInputs(cardid);
+    InputNames::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
     {
-        int cardid = CardUtil::GetCardID(device);
-        if (cardid <= 0)
-            return ret;
-        diseqc_type = GetDISEqCType(cardid);
+        if (it.key())
+            ret += *it;
     }
-
-    QValueList<DVBDiSEqCInput> dvbinput;
-    dvbinput = fillDVBInputsDiSEqC(diseqc_type);
-
-    QValueList<DVBDiSEqCInput>::iterator it;
-    for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
-        ret += (*it).input;
 #else
     (void) device;
-    (void) diseqc_type;
     ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
 #endif
 
@@ -667,66 +660,6 @@ QStringList CardUtil::probeChildInputs(QString device)
                            query.value(1).toString());
 
     return ret;
-}
-
-QValueList<DVBDiSEqCInput>
-CardUtil::fillDVBInputsDiSEqC(int dvb_diseqc_type)
-{
-    QValueList<DVBDiSEqCInput> list;
-
-    QString stxt   = "DiSEqC Switch Input %1";
-    QString mtxt   = "DiSEqC v1.2 Motor Position %1";
-    QString itxt   = "DiSEqC v1.3 Input %1";
-    QString l21txt = "SW21 Input %1";
-    QString l64txt = "SW64 Input %1";
-
-    switch (dvb_diseqc_type)
-    {
-        case DISEQC_MINI_2:
-        case DISEQC_SWITCH_2_1_0:
-        case DISEQC_SWITCH_2_1_1:
-            for (uint i = 0; i < 2; ++i)
-                list.append(DVBDiSEqCInput(
-                                stxt.arg(i+1), QString::number(i), ""));
-            break;
-        case DISEQC_SWITCH_4_1_0:
-        case DISEQC_SWITCH_4_1_1:
-            for (uint i = 0; i < 4; ++i)
-                list.append(DVBDiSEqCInput(
-                                stxt.arg(i+1), QString::number(i), ""));
-            break;
-        case DISEQC_POSITIONER_1_2:
-            for (uint i = 1; i < 50; ++i)
-                list.append(DVBDiSEqCInput(
-                                mtxt.arg(i), "", QString::number(i)));
-            break;
-        case DISEQC_POSITIONER_X:
-            for (uint i = 1; i < 20; ++i)
-                list.append(DVBDiSEqCInput(
-                                itxt.arg(i), "", QString::number(i)));
-            break;
-        case DISEQC_POSITIONER_1_2_SWITCH_2:
-            for (uint i = 0; i < 10; ++i)
-                list.append(DVBDiSEqCInput(
-                                stxt.arg(i+1,2), QString::number(i), ""));
-            break;
-        case DISEQC_SW21:
-            for (uint i = 0; i < 2; ++i)
-                list.append(DVBDiSEqCInput(
-                                l21txt.arg(i+1,2), QString::number(i), ""));
-            break;
-        case DISEQC_SW64:
-            for (uint i = 0; i < 3; ++i)
-                list.append(DVBDiSEqCInput(
-                                l64txt.arg(i+1,2), QString::number(i), ""));
-            break;
-        case DISEQC_SINGLE:
-        default:
-            list.append(DVBDiSEqCInput(
-                            QString("DVBInput"), QString(""), QString("")));
-    }
-
-    return list;
 }
 
 QString CardUtil::GetDeviceLabel(uint cardid,
@@ -820,7 +753,7 @@ void CardUtil::GetCardInputs(
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        CardInput* cardinput = new CardInput(false);
+        CardInput* cardinput = new CardInput(false, cardid);
         cardinput->loadByInput(rcardid, (*it));
         cardinput->SetChildCardID((parentid) ? cardid : 0);
         inputLabels.push_back(
@@ -829,24 +762,39 @@ void CardUtil::GetCardInputs(
         cardInputs.push_back(cardinput);
     }
 
+#ifdef USING_DVB
     if ("DVB" == cardtype)
     {
-        QValueList<DVBDiSEqCInput> dvbinputs;
-        int diseq_type = GetDISEqCType(cardid);
-        dvbinputs = fillDVBInputsDiSEqC(diseq_type);
-        QValueList<DVBDiSEqCInput>::iterator it;
-        for (it = dvbinputs.begin(); it != dvbinputs.end(); ++it)
+        InputNames list;
+        list[0] = "DVBInput";
+        bool needs_conf = DTVDeviceNeedsConfiguration(rcardid);
+        if (needs_conf)
+            list = GetConfiguredDVBInputs(rcardid);
+
+        InputNames::const_iterator it;
+        for (it = list.begin(); it != list.end(); ++it)
         {
-            CardInput* cardinput = new CardInput(true);
-            cardinput->loadByInput(rcardid, (*it).input);
-            cardinput->fillDiseqcSettingsInput((*it).position,(*it).port);
-            cardinput->SetChildCardID((parentid) ? cardid : 0);
+            CardInput *cardinput = new CardInput(true, rcardid);
+            cardinput->loadByInput(rcardid, *it);
+            cardinput->SetChildCardID(parentid ? cardid : 0);
             inputLabels.push_back(
                 dev_label + QString(" (%1) -> %2")
-                .arg((*it).input).arg(cardinput->getSourceName()));
+                .arg(*it).arg(cardinput->getSourceName()));
             cardInputs.push_back(cardinput);            
         }
+        
+        // plus add one "new" input
+        if (needs_conf)
+        {
+            CardInput *newcard = new CardInput(true, rcardid);
+            QString newname = QString("DVBInput #%1").arg(list.size() + 1);
+            newcard->loadByInput(rcardid, newname);
+            newcard->SetChildCardID((parentid) ? cardid : 0);
+            inputLabels.push_back(dev_label + " " + QObject::tr("New Input"));
+            cardInputs.push_back(newcard);
+        }
     }
+#endif // USING_DVB
 
     if (parentid)
         return;
@@ -873,6 +821,17 @@ bool CardUtil::DeleteCard(uint cardid)
 {
     if (!cardid)
         return true;
+
+#ifdef USING_DVB
+    // delete device tree
+    DiSEqCDevTree tree;
+    tree.Load(cardid);
+    if (!tree.Root())
+    {
+        tree.SetRoot(NULL);
+        tree.Store(cardid);
+    }
+#endif
 
     // delete any children
     MSqlQuery query(MSqlQuery::InitCon());

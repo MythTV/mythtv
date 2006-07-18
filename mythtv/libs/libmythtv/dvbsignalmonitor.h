@@ -10,6 +10,8 @@ class DVBChannel;
 
 typedef QMap<uint,int> FilterMap;
 
+#define RETUNE_TIMEOUT 5000
+
 class DVBSignalMonitor: public DTVSignalMonitor
 {
     Q_OBJECT
@@ -23,6 +25,8 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     bool UpdateFiltersFromStreamData(void);
 
+    virtual void SetRotorTarget(float target);
+
   public slots:
     void deleteLater(void);
 
@@ -30,6 +34,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void StatusSignalToNoise(const SignalMonitorValue&);
     void StatusBitErrorRate(const SignalMonitorValue&);
     void StatusUncorrectedBlocks(const SignalMonitorValue&);
+    void StatusRotorPosition(const SignalMonitorValue&);
 
   protected:
     DVBSignalMonitor(void);
@@ -38,6 +43,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     virtual void UpdateValues(void);
     void EmitDVBSignals(void);
 
+    void RetuneMonitor(void);
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
     void RunTableMonitorTS(void);
@@ -52,6 +58,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     SignalMonitorValue signalToNoise;
     SignalMonitorValue bitErrorRate;
     SignalMonitorValue uncorrectedBlocks;
+    SignalMonitorValue rotorPosition;
 
     bool               useSectionReader;
     bool               dtvMonitorRunning;

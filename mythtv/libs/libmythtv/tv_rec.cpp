@@ -1759,6 +1759,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetFTAOnly(fta);
 
         sm->AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
+        sm->AddFlags(kDVBSigMon_WaitForPos);
+        sm->SetRotorTarget(0.0f);
 
         VERBOSE(VB_RECORD, LOC + "Successfully set up DVB table monitoring.");
         return true;
@@ -1795,6 +1797,8 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sd->SetVideoStreamsRequired(1);
         sm->SetFTAOnly(fta);
         sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
+        sm->AddFlags(kDVBSigMon_WaitForPos);
+        sm->SetRotorTarget(1.0f);
 
         VERBOSE(VB_RECORD, LOC + "Successfully set up MPEG table monitoring.");
         return true;
@@ -3153,9 +3157,7 @@ void TVRec::HandleTuning(void)
         request.input   = input;
 
         if (TuningOnSameMultiplex(request))
-        {
-            VERBOSE(VB_IMPORTANT, "\n\n\tOn same multiplex\n\n");
-        }
+            VERBOSE(VB_PLAYBACK, LOC + "On same multiplex");
 
         TuningShutdowns(request);
 

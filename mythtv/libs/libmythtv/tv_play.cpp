@@ -4481,6 +4481,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     uint  sig  = 0;
     float snr  = 0.0f;
     uint  ber  = 0xffffffff;
+    int   pos  = -1;
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
     QString err = QString::null, msg = QString::null;
     for (it = slist.begin(); it != slist.end(); ++it)
@@ -4505,6 +4506,8 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
             snr = it->GetValue();
         else if ("ber" == it->GetShortName())
             ber = it->GetValue();
+        else if ("pos" == it->GetShortName())
+            pos = it->GetValue();
         else if ("seen_pat" == it->GetShortName())
             pat = it->IsGood() ? "a" : "_";
         else if ("matching_pat" == it->GetShortName())
@@ -4543,6 +4546,8 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
         sigDesc += " | " + tr("S/N %1dB").arg(log10f(snr), 3, 'f', 1);
     if (ber != 0xffffffff)
         sigDesc += " | " + tr("BE %1", "Bit Errors").arg(ber, 2);
+    if ((pos >= 0) && (pos < 100))
+        sigDesc += " | " + tr("Rotor %1\%").arg(pos,2);
 
     sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7) %8")
         .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)

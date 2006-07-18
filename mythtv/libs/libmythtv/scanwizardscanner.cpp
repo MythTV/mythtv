@@ -281,41 +281,6 @@ void ScanWizardScanner::cancelScan()
     popupProgress = NULL;
 }
 
-static bool get_diseqc(uint cardid, uint sourceid,
-                       QMap<QString,QString> &startChan)
-{
-    // SQL code to get the disqec paramters HERE
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
-        "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
-        "FROM cardinput, capturecard "
-        "WHERE cardinput.cardid   = capturecard.cardid AND "
-        "      cardinput.cardid   = :CARDID            AND "
-        "      cardinput.sourceid = :SOURCEID ");
-    query.bindValue(":CARDID",   cardid);
-    query.bindValue(":SOURCEID", sourceid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("ScanWizardScanner::scan()", query);
-        return false;
-    }
-
-    if (query.next())
-    {
-        startChan["diseqc_type"]    = query.value(0).toString();
-        startChan["diseqc_port"]    = query.value(1).toString();
-        startChan["diseqc_pos"]     = query.value(2).toString();
-        startChan["lnb_lof_switch"] = query.value(3).toString();
-        startChan["lnb_lof_hi"]     = query.value(4).toString();
-        startChan["lnb_lof_lo"]     = query.value(5).toString();
-        return true;
-    }
-
-    return false;
-}
-
 // full scan of existing transports broken
 // existing transport scan broken
 void ScanWizardScanner::scan()
@@ -387,8 +352,6 @@ void ScanWizardScanner::scan()
         startChan["modulation"] = "qpsk";
         startChan["polarity"]   = pane->polarity();
 
-        nit_scan_parse_failed = !get_diseqc(cardid, nVideoSource, startChan);
-
 #ifdef USING_DVB
         if (!nit_scan_parse_failed)
         {
@@ -396,10 +359,7 @@ void ScanWizardScanner::scan()
             nit_scan_parse_failed = !tuning.parseQPSK(
                 startChan["frequency"],   startChan["inversion"],
                 startChan["symbolrate"],  startChan["fec"],
-                startChan["polarity"],
-                startChan["diseqc_type"], startChan["diseqc_port"],
-                startChan["diseqc_pos"],  startChan["lnb_lof_switch"],
-                startChan["lnb_lof_hi"],  startChan["lnb_lof_lo"]);
+                startChan["polarity"]);
         }
 #endif // USING_DVB
     }

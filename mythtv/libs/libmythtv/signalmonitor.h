@@ -55,6 +55,7 @@ enum {
     kDVBSigMon_WaitForSNR = 0x01000000,
     kDVBSigMon_WaitForBER = 0x02000000,
     kDVBSigMon_WaitForUB  = 0x04000000,
+    kDVBSigMon_WaitForPos = 0x08000000, ///< Wait for rotor
 };
 
 inline QString sm_flags_to_string(uint);

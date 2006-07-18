@@ -317,23 +317,13 @@ extern bool equal_type(
 class DVBTuning
 {
   public:
-    DVBTuning()
-      : voltage(SEC_VOLTAGE_OFF), tone(SEC_TONE_OFF), 
-        diseqc_type(0), diseqc_port(0), diseqc_pos(0.0f),
-        lnb_lof_switch(0), lnb_lof_hi(0), lnb_lof_lo(0)
+    DVBTuning() : polariz('v')
     {
         bzero(&params, sizeof(dvb_fe_params));
     }
 
     struct dvb_fe_params params;
-    fe_sec_voltage_t    voltage;
-    fe_sec_tone_mode_t  tone;
-    unsigned int        diseqc_type;
-    unsigned int        diseqc_port;
-    float               diseqc_pos;
-    unsigned int        lnb_lof_switch;
-    unsigned int        lnb_lof_hi;
-    unsigned int        lnb_lof_lo;
+    char                 polariz;
 
     bool equalQPSK(const DVBTuning& other, uint range = 0) const
         { return equal_qpsk(params, other.params, range);  }
@@ -348,6 +338,7 @@ class DVBTuning
 
     // Helper functions to get the paramaters as DB friendly strings
     char InversionChar() const;
+    char PolarityChar() const;
     char TransmissionModeChar() const;
     char BandwidthChar() const;
     char HierarchyChar() const;
@@ -356,7 +347,6 @@ class DVBTuning
 
     // Helper functions to parse params from DB friendly strings
     static fe_bandwidth      parseBandwidth(    const QString&, bool &ok);
-    static fe_sec_voltage    parsePolarity(     const QString&, bool &ok);
     static fe_guard_interval parseGuardInterval(const QString&, bool &ok);
     static fe_transmit_mode  parseTransmission( const QString&, bool &ok);
     static fe_hierarchy      parseHierarchy(    const QString&, bool &ok);
@@ -375,10 +365,13 @@ class DVBTuning
     QString HPCodeRateString() const;
     QString LPCodeRateString() const;
     QString QAMInnerFECString() const;
+    QString QPSKInnerFECString() const;
     QString ModulationString() const;
     QString ConstellationString() const;
     QString HierarchyString() const;
     QString toString(fe_type_t type) const;
+
+    bool FillFromDB(fe_type_t type, uint mplexid);
 
     bool parseATSC(const QString& frequency,      const QString modulation);
 
@@ -390,10 +383,7 @@ class DVBTuning
 
     bool parseQPSK(const QString& frequency,      const QString& inversion,
                    const QString& symbol_rate,    const QString& fec_inner,
-                   const QString& pol,            const QString& diseqc_type,
-                   const QString& diseqc_port,    const QString& diseqc_pos,
-                   const QString& lnb_lof_switch, const QString& lnb_lof_hi,
-                   const QString& lnb_lof_lo);
+                   const QString& pol);
 
     bool parseQAM(const QString& frequency,       const QString& inversion,
                   const QString& symbol_rate,     const QString& fec_inner,
@@ -404,12 +394,18 @@ class DVBTuning
         { return equal_dvbs2(params, other.params, range);  }
     uint DVBS2SymbolRate() const { return params.u.qpsk2.symbol_rate; }
     bool parseDVBS2(const QString& frequency,      const QString& inversion,
-                   const QString& symbol_rate,    const QString& fec_inner,
-                   const QString& pol,            const QString& diseqc_type,
-                   const QString& diseqc_port,    const QString& diseqc_pos,
-                   const QString& lnb_lof_switch, const QString& lnb_lof_hi,
-                   const QString& lnb_lof_lo,     const QString& modulation);
+                    const QString& symbol_rate,    const QString& fec_inner,
+                    const QString& pol,            const QString& modulation);
 #endif
+
+  private:
+    bool ParseTuningParams(
+        fe_type_t type,
+        QString frequency,    QString inversion,      QString symbolrate,
+        QString fec,          QString polarity,
+        QString hp_code_rate, QString lp_code_rate,   QString constellation,
+        QString trans_mode,   QString guard_interval, QString hierarchy,
+        QString modulation,   QString bandwidth);
 };
 
 #endif // DVB_TYPES_H

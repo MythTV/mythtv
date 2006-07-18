@@ -2,6 +2,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include <cmath>
 
 #include <pthread.h>
 #include <fcntl.h>
@@ -54,6 +55,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                         65535,  false,     0, 65535, 0),
       uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
                         65535,  false,     0, 65535, 0),
+      rotorPosition    (tr("Rotor Progress"),     "pos",
+                        100,    true,      0,   100, 0),
       useSectionReader(false),
       dtvMonitorRunning(false)
 {
@@ -118,6 +121,13 @@ void DVBSignalMonitor::deleteLater(void)
     DTVSignalMonitor::deleteLater();
 }
 
+// documented in dtvsignalmonitor.h
+void DVBSignalMonitor::SetRotorTarget(float target)
+{
+    QMutexLocker locker(&statusLock);
+    rotorPosition.SetThreshold((int)roundf(100 * target));
+}
+
 /** \fn DVBSignalMonitor::GetDVBCardNum(void) const
  *  \brief Returns DVB Card Number from DVBChannel.
  */
@@ -151,6 +161,8 @@ QStringList DVBSignalMonitor::GetStatusList(bool kick)
         list<<bitErrorRate.GetName()<<bitErrorRate.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForUB))
         list<<uncorrectedBlocks.GetName()<<uncorrectedBlocks.GetStatus();
+    if (HasFlags(kDVBSigMon_WaitForPos))
+        list<<rotorPosition.GetName()<<rotorPosition.GetStatus();
     statusLock.unlock();
     return list;
 }
@@ -332,6 +344,7 @@ void DVBSignalMonitor::RunTableMonitorTS(void)
     FD_SET (dvr_fd, &fd_select_set);
     while (dtvMonitorRunning && GetStreamData())
     {
+        RetuneMonitor();
         UpdateFiltersFromStreamData();
 
         // timeout gets reset by select, so we need to create new one
@@ -398,6 +411,7 @@ void DVBSignalMonitor::RunTableMonitorSR(void)
 
     while (dtvMonitorRunning && GetStreamData())
     {
+        RetuneMonitor();
         UpdateFiltersFromStreamData();
 
         bool readSomething = false;
@@ -486,6 +500,63 @@ bool DVBSignalMonitor::SupportsTSMonitoring(void)
     return supports_ts;
 }
 
+void DVBSignalMonitor::RetuneMonitor(void)
+{
+    DVBChannel *dvbchan = dynamic_cast<DVBChannel*>(channel);
+    int fd_frontend = dvbchan->GetFd();
+
+    // Get lock status
+    bool is_locked = true;
+    fe_status_t status;
+    if (ioctl(fd_frontend, FE_READ_STATUS, &status) != -1)
+    {
+        QMutexLocker locker(&statusLock);
+        is_locked = (status & FE_HAS_LOCK);
+        signalLock.SetValue(is_locked ? 1 : 0);
+    }
+
+    // Rotor position
+    if (HasFlags(kDVBSigMon_WaitForPos))
+    {
+        const DiSEqCDevRotor *rotor = dvbchan->GetRotor();
+        if (rotor)
+        {
+            bool was_moving, is_moving;
+            {
+                QMutexLocker locker(&statusLock);
+                was_moving = rotorPosition.GetValue() < 100;
+                int pos    = (int)truncf(rotor->GetProgress() * 100);
+                rotorPosition.SetValue(pos);
+                is_moving  = rotorPosition.GetValue() < 100;
+            }
+            
+            // Retune if move completes normally
+            if (was_moving && !is_moving)
+            {
+                DBG_SM("UpdateValues", "Retuning for rotor completion");
+                dvbchan->Retune();
+
+                // (optionally) No need to wait for SDT anymore...
+                // RemoveFlags(kDTVSigMon_WaitForSDT);
+            }
+        }
+        else 
+        {
+            // If no rotor is present, pretend the movement is completed
+            QMutexLocker locker(&statusLock);
+            rotorPosition.SetValue(100);
+        }
+    }
+
+    // Periodically retune if card can't recover
+    if (!dvbchan->IsSelfRetuning() && !is_locked &&
+        dvbchan->GetTimeSinceTune() > RETUNE_TIMEOUT)
+    {
+        DBG_SM("UpdateValues", "Retuning for lock loss");
+        dvbchan->Retune();
+    }
+}
+
 void DVBSignalMonitor::RunTableMonitor(void)
 {
     dtvMonitorRunning = true;
@@ -521,6 +592,8 @@ void DVBSignalMonitor::UpdateValues(void)
         update_done = true;
         return;
     }
+
+    RetuneMonitor();
 
     bool wasLocked = false, isLocked = false;
     // We use uint16_t for sig & snr because this is correct for DVB API 4.0,
@@ -576,6 +649,7 @@ void DVBSignalMonitor::UpdateValues(void)
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
     if (isLocked && GetStreamData() &&
+        (!HasFlags(kDVBSigMon_WaitForPos) || rotorPosition.IsGood()) &&
         HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
@@ -612,6 +686,8 @@ void DVBSignalMonitor::EmitDVBSignals(void)
         EMIT(StatusBitErrorRate, bitErrorRate);
     if (HasFlags(kDVBSigMon_WaitForUB))
         EMIT(StatusUncorrectedBlocks, uncorrectedBlocks);
+    if (HasFlags(kDVBSigMon_WaitForPos))
+        EMIT(StatusRotorPosition, rotorPosition);
 }
 
 #undef EMIT

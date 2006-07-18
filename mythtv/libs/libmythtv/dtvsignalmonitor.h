@@ -48,6 +48,9 @@ class DTVSignalMonitor : public SignalMonitor,
     void SetFTAOnly(bool fta)    { ignoreEncrypted = fta;  }
     bool GetFTAOnly() const      { return ignoreEncrypted; }
 
+    /// Sets rotor target pos from 0.0 to 1.0
+    virtual void SetRotorTarget(float) {}
+
     void AddFlags(uint _flags);
     void RemoveFlags(uint _flags);
 

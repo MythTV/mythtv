@@ -31,6 +31,7 @@
 #include "sourceutil.h"
 #include "channelutil.h"
 #include "frequencies.h"
+#include "diseqcsettings.h"
 
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
@@ -44,12 +45,6 @@ class RecorderOptions: public ConfigurationWizard
 {
   public:
     RecorderOptions(CaptureCard& parent);
-};
-
-class DVBDiSEqCConfigurationWizard: public ConfigurationWizard
-{
-  public:
-    DVBDiSEqCConfigurationWizard(CaptureCard &parent);
 };
 
 QString VSSetting::whereClause(MSqlBindings& bindings)
@@ -789,42 +784,6 @@ class DVBOnDemand: public CheckBoxSetting, public CCSetting
     };
 };
 
-class DVBDiSEqCType: public ComboBoxSetting, public CCSetting
-{
-  public:
-    DVBDiSEqCType(const CaptureCard& parent)
-      : CCSetting(parent, "dvb_diseqc_type")
-    {
-        setLabel(QObject::tr("DiSEqC Input Type: (DVB-S)"));
-        addSelection(QObject::tr("Single LNB / Input"),
-                     QString::number(DISEQC_SINGLE));
-        addSelection(QObject::tr("Tone Switch aka Mini DiSEqC (2-Way)"),
-                     QString::number(DISEQC_MINI_2));
-        addSelection(QObject::tr("DiSEqC v1.0 Switch (2-Way)"),
-                     QString::number(DISEQC_SWITCH_2_1_0));
-        addSelection(QObject::tr("DiSEqC v1.1 Switch (2-Way)"),
-                     QString::number(DISEQC_SWITCH_2_1_1));
-        addSelection(QObject::tr("DiSEqC v1.0 Switch (4-Way)"),
-                     QString::number(DISEQC_SWITCH_4_1_0));
-        addSelection(QObject::tr("DiSEqC v1.1 Switch (4-Way)"),
-                     QString::number(DISEQC_SWITCH_4_1_1));
-        addSelection(QObject::tr("DiSEqC v1.2 Positioner"),
-                     QString::number(DISEQC_POSITIONER_1_2));
-        addSelection(QObject::tr("DiSEqC v1.3 Positioner (Goto X)"),
-                     QString::number(DISEQC_POSITIONER_X));
-        addSelection(QObject::tr("DiSEqC v1.1 or 2.1 (10-way method2)"),
-                     QString::number(DISEQC_POSITIONER_1_2_SWITCH_2));
-        addSelection(QObject::tr("SW21 Switch (2-Way)"),
-                     QString::number(DISEQC_SW21));
-        addSelection(QObject::tr("SW64 Switch (3-Way)"),
-                     QString::number(DISEQC_SW64));
-        setHelpText(QObject::tr("Select the input type for DVB-S cards. "
-                    "Leave as Single LNB/Input for DVB-C or DVB-T. "
-                    "The inputs are mapped from Input Connections option "
-                    "on the main menu"));
-    };
-};
-
 class DVBTuningDelay: public SpinBoxSetting, public CCSetting
 {
   public:
@@ -1340,8 +1299,21 @@ void CaptureCard::fillSelections(SelectSetting* setting, bool no_children)
     }
 }
 
+void CaptureCard::save()
+{
+    ConfigurationWizard::save();
+#ifdef USING_DVB
+    tree.Store(getCardID());
+    DiSEqCDev trees;
+    trees.InvalidateTrees();
+#endif
+}
+
 void CaptureCard::loadByID(int cardid) 
 {
+#ifdef USING_DVB
+    tree.Load(cardid);
+#endif
     id->setValue(cardid);
     load();
 }
@@ -1479,75 +1451,6 @@ class InputName: public LabelSetting, public CISetting {
     };
 };
 
-class LNBLofSwitch: public LineEditSetting, public CISetting {
-  public:
-    LNBLofSwitch(const CardInput& parent):
-        CISetting(parent, "lnb_lof_switch") {
-        setLabel(QObject::tr("LNB LOF Switch"));
-        setValue("11700000");
-        setHelpText(QObject::tr("This defines at what frequency (in Hz) "
-                    "the LNB will do a switch from high to low setting, "
-                    "and vice versa."));
-    };
-};
-
-class LNBLofHi: public LineEditSetting, public CISetting {
-  public:
-    LNBLofHi(const CardInput& parent):
-        CISetting(parent, "lnb_lof_hi") {
-        setLabel(QObject::tr("LNB LOF High"));
-        setValue("10600000");
-        setHelpText(QObject::tr("This defines the offset (in Hz) the "
-                    "frequency coming from the LNB will be in high "
-                    "setting."));
-    };
-};
-
-class LNBLofLo: public LineEditSetting, public CISetting {
-  public:
-    LNBLofLo(const CardInput& parent):
-        CISetting(parent, "lnb_lof_lo") {
-        setLabel(QObject::tr("LNB LOF Low"));
-        setValue("9750000");
-        setHelpText(QObject::tr("This defines the offset (in Hz) the "
-                    "frequency coming from the LNB will be in low "
-                    "setting."));
-    };
-};
-
-class DiSEqCPos: public LineEditSetting, public CISetting
-{
-  public:
-    DiSEqCPos(const CardInput& parent)
-        : CISetting(parent, "diseqc_pos")
-    {
-        setLabel(QObject::tr("DiSEqC Satellite Location"));
-        setValue("0.0");
-        setHelpText(QObject::tr("The longitude of the satellite "
-                    "you are aiming at.  For western hemisphere use "
-                    "a negative value.  Value is in decimal."));
-//        setVisible(false);
-    };
-//    void fillSelections(const QString& pos) {
-//        setValue(pos);
-//    };
-};
-
-
-class DiSEqCPort: public LabelSetting, public CISetting
-{
-  public:
-    DiSEqCPort(const CardInput& parent)
-        : CISetting(parent, "diseqc_port")
-    {
-        setVisible(false);
-    };
-    void fillSelections(const QString& port) {
-        setValue(port);
-    };
-};
-
-
 class FreeToAir: public CheckBoxSetting, public CISetting {
   public:
     FreeToAir(const CardInput& parent):
@@ -1652,26 +1555,6 @@ class InputPriority: public SpinBoxSetting, public CISetting {
     };
 };
 
-class DVBLNBChooser: public ComboBoxSetting {
-  public:
-    DVBLNBChooser()
-    {
-        setLabel("LNB Settings: (DVB-S)");
-        addSelection("Universal - 2");
-        addSelection("DBS");
-        addSelection("Universal - 1");
-        addSelection("Custom");
-        setHelpText(
-            QObject::tr("Select the LNB Settings for DVB-S cards.") + " " +
-            QObject::tr("For DVB-C and DVB-T you don't need to "
-                        "set these values."));
-    };
-    void save() {};
-    void load() {};
-
-private:
-};
-
 class DishNetEIT: public CheckBoxSetting, public CISetting
 {
   public:
@@ -1688,8 +1571,10 @@ class DishNetEIT: public CheckBoxSetting, public CISetting
     };
 };
 
-CardInput::CardInput(bool isDVBcard)
+CardInput::CardInput(bool isDVBcard, int _cardid)
 {
+    (void) _cardid;
+
     addChild(id = new ID());
 
     ConfigurationGroup *group =
@@ -1709,6 +1594,31 @@ CardInput::CardInput(bool isDVBcard)
         group->addChild(new ExternalChannelCommand(*this));
         group->addChild(new PresetTuner(*this));
     }
+
+#ifdef USING_DVB
+    if (isDVBcard)
+    {
+        ConfigurationGroup *dvbgroup =
+            new HorizontalConfigurationGroup();
+        dvbgroup->setLabel(QObject::tr("DVB options"));
+
+        ConfigurationGroup *chgroup = 
+            new VerticalConfigurationGroup(false, false, true, true);
+
+        TransButtonSetting *diseqc = new TransButtonSetting();
+        diseqc->setLabel(tr("DVB-S"));
+        diseqc->setHelpText(tr("Input and satellite settings."));
+        diseqc->setVisible(DTVDeviceNeedsConfiguration(_cardid));
+        dvbgroup->addChild(diseqc);
+        connect(diseqc, SIGNAL(pressed()), SLOT(diseqcConfig()));
+   
+        chgroup->addChild(new FreeToAir(*this));
+        chgroup->addChild(new RadioServices(*this));
+        chgroup->addChild(new DishNetEIT(*this));
+        dvbgroup->addChild(chgroup);
+        group->addChild(dvbgroup);
+    }
+#endif
 
     TransButtonSetting *scan = new TransButtonSetting();
     scan->setLabel(tr("Scan for channels"));
@@ -1733,25 +1643,6 @@ CardInput::CardInput(bool isDVBcard)
     group->addChild(new InputPriority(*this));
 
     addChild(group);
-
-#ifdef USING_DVB
-    if (isDVBcard)
-    {
-        ConfigurationGroup *dvbgroup =
-          new VerticalConfigurationGroup(false, false, true, true);
-   
-        dvbgroup->addChild(diseqcpos    = new DiSEqCPos(*this));
-        dvbgroup->addChild(diseqcport   = new DiSEqCPort(*this));
-        dvbgroup->addChild(lnblofswitch = new LNBLofSwitch(*this));
-        dvbgroup->addChild(lnblofhi = new LNBLofHi(*this));
-        dvbgroup->addChild(lnbloflo = new LNBLofLo(*this));
-
-        dvbgroup->addChild(new FreeToAir(*this));
-        dvbgroup->addChild(new RadioServices(*this));
-        dvbgroup->addChild(new DishNetEIT(*this));
-        addChild(dvbgroup);
-    }
-#endif
 
     childid = new ChildID(*this);
     addChild(childid);
@@ -1816,6 +1707,14 @@ void CardInput::sourceFetch(void)
     }
 }
 
+void CardInput::diseqcConfig(void)
+{
+#ifdef USING_DVB
+    DTVDeviceConfigWizard wizard(settings, cardid->getValue().toUInt());
+    wizard.exec();
+#endif // USING_DVB
+}
+
 QString CISetting::whereClause(MSqlBindings& bindings) 
 {
     QString cardinputidTag(":WHERECARDINPUTID");
@@ -1844,6 +1743,9 @@ QString CISetting::setClause(MSqlBindings& bindings)
 void CardInput::loadByID(int inputid) 
 {
     id->setValue(inputid);
+#ifdef USING_DVB
+    settings.Load(inputid);
+#endif
     load();
 }
 
@@ -1866,32 +1768,6 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
         cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
-
-    if (CardUtil::IsDVB(_cardid, _inputname))
-    {
-        QString subtype = CardUtil::ProbeSubTypeName(_cardid, _inputname);
-        CardUtil::CARD_TYPES dvbType = CardUtil::toCardType(subtype);
-        
-        if ("QPSK" == subtype)
-        {
-            //Check for DiSEqC type
-            diseqcpos->setVisible(true);
-            lnblofswitch->setVisible(true);
-            lnbloflo->setVisible(true);
-            lnblofhi->setVisible(true);
-
-            DISEQC_TYPES dt = CardUtil::GetDISEqCType(_cardid);
-            bool pos = (dt == DISEQC_POSITIONER_X);
-            diseqcpos->setEnabled(pos);
-        }
-        else if (dvbType > CardUtil::ERROR_PROBE)
-        {
-            diseqcpos->setVisible(false);
-            lnblofswitch->setVisible(false);
-            lnbloflo->setVisible(false);
-            lnblofhi->setVisible(false);
-        }
-    }
 }
 
 void CardInput::save() 
@@ -1908,15 +1784,10 @@ void CardInput::save()
     else
     {
         ConfigurationWizard::save();
+#ifdef USING_DVB
+        settings.Store(getInputID());
+#endif
     }
-}
-
-void CardInput::fillDiseqcSettingsInput(QString _pos, QString _port) 
-{
-    if (_port != "")
-        diseqcport->setValue(_port);
-    if (_pos != "")
-        diseqcpos->setValue(_pos);
 }
 
 int CISetting::getInputID(void) const 
@@ -2178,6 +2049,7 @@ int CardInputEditor::exec()
 
 void CardInputEditor::load() 
 {
+    cardinputs.clear();
     clearSelections();
 
     // We do this manually because we want custom labels.  If
@@ -2373,21 +2245,10 @@ void TunerCardInput::fillSelections(const QString& device)
 
     last_device = device;
     QStringList inputs =
-        CardUtil::probeInputs(device, last_cardtype, last_diseqct);
+        CardUtil::probeInputs(device, last_cardtype);
 
     for (QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
         addSelection(*i);
-}
-
-void TunerCardInput::diseqcType(const QString &diseqcType)
-{
-    bool ok;
-    int tmp = diseqcType.toInt(&ok);
-    if (ok)
-    {
-        last_diseqct = tmp;
-        fillSelections(last_device);
-    }
 }
 
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
@@ -2433,7 +2294,6 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));    
-    buttonDiSEqC->setHelpText(tr("Various additional settings."));
 
     HorizontalConfigurationGroup *advcfg = 
         new HorizontalConfigurationGroup(false, false, true, true);
@@ -2441,10 +2301,6 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     advcfg->addChild(buttonAnalog);
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
-
-    DVBDiSEqCType  *diseqctype   = new DVBDiSEqCType(parent);
-    addChild(diseqctype);
-    diseqctype->setVisible(false);
 
     TunerCardInput *defaultinput = new TunerCardInput(parent, "0", "DVB");
     addChild(defaultinput);
@@ -2464,10 +2320,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
             &parent,      SLOT(  analogPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
             &parent,      SLOT(  recorderOptionsPanel()));
-    connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
-            defaultinput, SLOT(  diseqcType  (const QString&)));
 
-    defaultinput->diseqcType(diseqctype->getValue());
     cardnum->setValue(0);
 }
 
@@ -2512,11 +2365,13 @@ void CaptureCard::recorderOptionsPanel()
 
 void CaptureCard::DiSEqCPanel()
 {
+#ifdef USING_DVB
     reload();
 
-    DVBDiSEqCConfigurationWizard diseqcWiz(*this);
+    DTVDeviceTreeWizard diseqcWiz(tree);
     diseqcWiz.exec();
     load();
+#endif // USING_DVB
 }
 
 RecorderOptions::RecorderOptions(CaptureCard& parent)
@@ -2530,47 +2385,4 @@ RecorderOptions::RecorderOptions(CaptureCard& parent)
     rec->addChild(new DVBTuningDelay(parent));
 
     addChild(rec);
-}
-
-static GlobalLineEdit *DiSEqCLatitude()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("latitude");
-    gc->setLabel("Latitude");
-    gc->setHelpText(
-        QObject::tr("The Cartesian latitude for your location.") + " " +
-        QObject::tr("Use negative numbers for southern "
-                    "and western coordinates."));
-    return gc;
-}
-
-static GlobalLineEdit *DiSEqCLongitude()
-{
-    GlobalLineEdit *gc = new GlobalLineEdit("longitude");
-    gc->setLabel("Longitude");
-    gc->setHelpText(
-        QObject::tr("The Cartesian longitude for your location.") + " " +
-        QObject::tr("Use negative numbers for southern "
-                    "and western coordinates."));
-    return gc;
-}
-
-DVBDiSEqCConfigurationWizard::DVBDiSEqCConfigurationWizard(CaptureCard &parent)
-{
-    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-    rec->setLabel(QObject::tr("DiSEqC Options"));
-    rec->setUseLabel(false);
-
-    DVBDiSEqCType  *diseqctype   = new DVBDiSEqCType(parent);
-    TunerCardInput *defaultinput = new TunerCardInput(parent);
-
-    rec->addChild(diseqctype);
-    rec->addChild(defaultinput);
-    rec->addChild(DiSEqCLatitude());
-    rec->addChild(DiSEqCLongitude());
-    addChild(rec);
-
-    connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
-            defaultinput, SLOT(  diseqcType(  const QString&)));
-
-    defaultinput->diseqcType(diseqctype->getValue());
 }

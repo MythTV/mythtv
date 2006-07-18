@@ -16,6 +16,7 @@
 #include "mythdbcon.h"
 #include "channelbase.h"
 #include "streamlisteners.h"
+#include "diseqc.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -30,7 +31,6 @@ typedef struct { QString name; fe_type_t type; } dvb_frontend_info;
 class TVRec;
 class DVBCam;
 class DVBRecorder;
-class DVBDiSEqC;
 
 class DVBChannel : public ChannelBase
 {
@@ -59,13 +59,24 @@ class DVBChannel : public ChannelBase
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
     uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
+    /// If true the hardware will retune when it loses lock, otherwise
+    /// the tuner needs to be told to tune when it loses lock.
+    bool IsSelfRetuning(void) const;
+    /// Milliseconds since last tuning request, or 0 if never tuned.
+    int  GetTimeSinceTune(void) const;
+    /// Returns rotor object if it exists, NULL otherwise.
+    const DiSEqCDevRotor *GetRotor(void) const;
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
     bool SwitchToInput(int newcapchannel, bool setstarting);
     bool SetChannelByString(const QString &chan);
-    bool Tune(const DVBTuning &tuning, bool force_reset = false);
-    bool TuneMultiplex(uint mplexid);
+    bool Tune(const DVBTuning &tuning,
+              bool force_reset = false,
+              uint sourceid    = 0,
+              bool same_input  = false);
+    bool TuneMultiplex(uint mplexid, uint sourceid = 0);
+    bool Retune(void);
 
     bool GetTuningParams(DVBTuning &tuning) const;
 
@@ -75,35 +86,32 @@ class DVBChannel : public ChannelBase
 
   private:
     int  GetChanID(void) const;
-    bool GetTransportOptions(int mplexid);
-    bool InitChannelParams(uint sourceid, const QString &channum);
+    bool InitChannelParams(DVBTuning &t,
+                           uint sourceid, const QString &channum);
 
-    void CheckOptions();
+    void CheckOptions(DVBTuning &t) const;
     bool CheckModulation(fe_modulation_t modulation) const;
     bool CheckCodeRate(fe_code_rate_t rate) const;
 
-    bool ParseTuningParams(
-        fe_type_t type,
-        QString frequency,    QString inversion,      QString symbolrate,
-        QString fec,          QString polarity,       QString dvb_diseqc_type,
-        QString diseqc_port,  QString diseqc_pos,     QString lnb_lof_switch,
-        QString lnb_lof_hi,   QString lnb_lof_lo,     QString _sistandard,
-        QString hp_code_rate, QString lp_code_rate,   QString constellation,
-        QString trans_mode,   QString guard_interval, QString hierarchy,
-        QString modulation,   QString bandwidth,      QString _input_id);
-
   private:
     // Data
-    DVBDiSEqC        *diseqc; ///< Used to send commands to external devices
+    DiSEqCDev         diseqc_dev;
+    DiSEqCDevSettings diseqc_settings;
+    DiSEqCDevTree    *diseqc_tree;
     DVBCam           *dvbcam; ///< Used to decrypt encrypted streams
 
     // Tuning State
+    QMutex            tune_lock;
     dvb_frontend_info info;        ///< Contains info on tuning hardware
 #ifdef FE_GET_EXTENDED_INFO
     dvb_fe_caps_extended extinfo;  ///< Additional info on tuning hardware
 #endif
-    DVBTuning         cur_tuning;  ///< Tuning options sent to tuning hardware
-    DVBTuning         prev_tuning; ///< Last tuning options sent to hardware
+
+    /// Last tuning options Tune() attempted to send to hardware
+    DVBTuning         desired_tuning;
+    /// Last tuning options Tune() succesfully sent to hardware
+    DVBTuning         prev_tuning;
+
     uint              tuning_delay;///< Extra delay to add for broken drivers
     uint              sigmon_delay;///< Minimum delay between FE_LOCK checks
     bool              first_tune;  ///< Used to force hardware reset
@@ -113,6 +121,7 @@ class DVBChannel : public ChannelBase
     int               cardnum;     ///< DVB Card number
     bool              has_crc_bug; ///< true iff our driver munges PMT
     int               nextInputID; ///< Signal an input change
+    QTime             tune_time;   ///< FIXME won't work well at midnight
 };
 
 #endif

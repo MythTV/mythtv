@@ -1,4 +1,7 @@
-#include <mythcontext.h>
+// -*- Mode: c++ -*-
+
+#include "mythcontext.h"
+#include "mythdbcon.h"
 #include "dvbtypes.h"
 
 static QString mod2str(fe_modulation mod);
@@ -416,6 +419,11 @@ char DVBTuning::InversionChar() const
     }
 }
 
+char DVBTuning::PolarityChar() const
+{
+    return polariz;
+}
+
 char DVBTuning::TransmissionModeChar() const
 {
     switch (params.u.ofdm.transmission_mode)
@@ -539,6 +547,11 @@ QString DVBTuning::QAMInnerFECString() const
     return coderate(params.u.qam.fec_inner);
 }
 
+QString DVBTuning::QPSKInnerFECString() const
+{
+    return coderate(params.u.qpsk.fec_inner);
+}
+
 QString DVBTuning::GuardIntervalString() const
 {
     //Guard Interval
@@ -584,7 +597,7 @@ QString DVBTuning::toString(fe_type_t type) const
         msg = QString("Frequency: %1 Symbol Rate: %2 Pol: %3 Inv: %4")
             .arg(Frequency())
             .arg(QPSKSymbolRate())
-            .arg((voltage == SEC_VOLTAGE_13) ? "V/R" : "H/L")
+            .arg(PolarityChar())
             .arg(InversionString());
     }
     else if (FE_QAM == type)
@@ -626,6 +639,77 @@ QString DVBTuning::toString(fe_type_t type) const
     }
 #endif
     return msg;
+}
+
+bool DVBTuning::FillFromDB(fe_type_t type, uint mplexid)
+{
+    MSqlQuery q(MSqlQuery::InitCon());
+
+    // Query for our DVBTuning params
+    q.prepare(
+        "SELECT frequency,         inversion,      symbolrate, "
+        "       fec,               polarity, "
+        "       hp_code_rate,      lp_code_rate,   constellation, "
+        "       transmission_mode, guard_interval, hierarchy, "
+        "       modulation,        bandwidth "
+        "FROM dtv_multiplex "
+        "WHERE dtv_multiplex.mplexid = :MPLEXID");
+    q.bindValue(":MPLEXID", mplexid);
+
+    if (!q.exec() || !q.isActive())
+    {
+        MythContext::DBError("DVBTuning::FillFromDB", q);
+        return false;
+    }
+
+    if (!q.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not find dvb tuning parameters for " +
+                QString("mplex %1").arg(mplexid));
+
+        return false;
+    }
+
+    // Parse the query into our DVBTuning class
+    return ParseTuningParams(
+        type,
+        q.value(0).toString(),  q.value(1).toString(), q.value(2).toString(),
+        q.value(3).toString(),  q.value(4).toString(),
+        q.value(5).toString(),  q.value(6).toString(), q.value(7).toString(),
+        q.value(8).toString(),  q.value(9).toString(), q.value(10).toString(),
+        q.value(11).toString(), q.value(12).toString());
+}
+
+bool DVBTuning::ParseTuningParams(
+    fe_type_t type,
+    QString frequency,    QString inversion,      QString symbolrate,
+    QString fec,          QString polarity,
+    QString hp_code_rate, QString lp_code_rate,   QString constellation,
+    QString trans_mode,   QString guard_interval, QString hierarchy,
+    QString modulation,   QString bandwidth)
+{
+    if (FE_QPSK == type)
+        return parseQPSK(
+            frequency,       inversion,     symbolrate,   fec,   polarity);
+    else if (FE_QAM == type)
+        return parseQAM(
+            frequency,       inversion,     symbolrate,   fec,   modulation);
+    else if (FE_OFDM == type)
+        return parseOFDM(
+            frequency,       inversion,     bandwidth,    hp_code_rate,
+            lp_code_rate,    constellation, trans_mode,   guard_interval,
+            hierarchy);
+    else if (FE_ATSC == type)
+        return parseATSC(frequency, modulation);
+#ifdef FE_GET_EXTENDED_INFO
+    else if (FE_DVB_S2 == type)
+        return parseDVBS2(
+            frequency,       inversion,     symbolrate,   fec,   polarity,
+            modulation);
+#endif // FE_GET_EXTENDED_INFO
+   
+    return false;
 }
 
 bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
@@ -687,13 +771,7 @@ bool DVBTuning::parseOFDM(const QString& frequency,   const QString& inversion,
 bool DVBTuning::parseDVBS2(
     const QString& frequency,   const QString& inversion,
     const QString& symbol_rate, const QString& fec_inner,
-    const QString& pol,         const QString& _diseqc_type,
-    const QString& _diseqc_port,
-    const QString& _diseqc_pos,
-    const QString& _lnb_lof_switch,
-    const QString& _lnb_lof_hi,
-    const QString& _lnb_lof_lo,
-    const QString &modulation)
+    const QString& pol,         const QString& modulation)
 {
     bool ok = true;
 
@@ -713,35 +791,20 @@ bool DVBTuning::parseDVBS2(
         return false;
     }
 
-    voltage = parsePolarity(pol, ok);
-    if (SEC_VOLTAGE_OFF == voltage)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid polarization, aborting.");
-        return false;
-    }
+    if (!pol.isEmpty())
+        polariz = QChar(pol[0]).lower();
 
     p.fec_inner = parseCodeRate(fec_inner, ok);
 
     p.modulation = parseModulation(modulation, ok);
-    diseqc_type = _diseqc_type.toInt();
-    diseqc_port = _diseqc_port.toInt();
-    diseqc_pos  = _diseqc_pos.toFloat();
-    lnb_lof_switch = _lnb_lof_switch.toInt();
-    lnb_lof_hi  = _lnb_lof_hi.toInt();
-    lnb_lof_lo  = _lnb_lof_lo.toInt();
+
     return true;
 }
 #endif
 
-// TODO: Add in DiseqcPos when diseqc class supports it
 bool DVBTuning::parseQPSK(const QString& frequency,   const QString& inversion,
                           const QString& symbol_rate, const QString& fec_inner,
-                          const QString& pol,         const QString& _diseqc_type,
-                          const QString& _diseqc_port,
-                          const QString& _diseqc_pos,
-                          const QString& _lnb_lof_switch,
-                          const QString& _lnb_lof_hi,
-                          const QString& _lnb_lof_lo)
+                          const QString& pol)
 {
     bool ok = true;
 
@@ -764,22 +827,11 @@ bool DVBTuning::parseQPSK(const QString& frequency,   const QString& inversion,
         return false;
     }
 
-    voltage = parsePolarity(pol, ok);
-    if (SEC_VOLTAGE_OFF == voltage)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid polarization, aborting.");
-
-        return false;
-    }
+    if (!pol.isEmpty())
+        polariz = QChar(pol[0]).lower();
 
     p.fec_inner = parseCodeRate(fec_inner, ok);
 
-    diseqc_type = _diseqc_type.toInt();
-    diseqc_port = _diseqc_port.toInt();
-    diseqc_pos  = _diseqc_pos.toFloat();
-    lnb_lof_switch = _lnb_lof_switch.toInt();
-    lnb_lof_hi  = _lnb_lof_hi.toInt();
-    lnb_lof_lo  = _lnb_lof_lo.toInt();
     return true;
 }
 
@@ -832,20 +884,6 @@ fe_bandwidth DVBTuning::parseBandwidth(const QString &bw, bool &ok)
                     "falling back to 'auto'.").arg(bandwidth));
 
     return BANDWIDTH_AUTO;
-}
-
-fe_sec_voltage DVBTuning::parsePolarity(const QString &pol, bool &ok)
-{
-    char polarity = QChar(pol[0]).lower();
-    ok = true;
-    switch (polarity)
-    {
-        case 'v':
-        case 'r': return SEC_VOLTAGE_13;
-        case 'h':
-        case 'l': return SEC_VOLTAGE_18;
-        default: return SEC_VOLTAGE_OFF;
-    }
 }
 
 fe_guard_interval DVBTuning::parseGuardInterval(const QString &gi, bool &ok)
@@ -1026,7 +1064,7 @@ static QString coderate(fe_code_rate_t coderate)
 {
     switch (coderate)
     {
-        case FEC_NONE: return "None";
+        case FEC_NONE: return "none";
         case FEC_1_2:  return "1/2";
         case FEC_2_3:  return "2/3";
         case FEC_3_4:  return "3/4";
@@ -1035,7 +1073,7 @@ static QString coderate(fe_code_rate_t coderate)
         case FEC_6_7:  return "6/7";
         case FEC_7_8:  return "7/8";
         case FEC_8_9:  return "8/9";
-        default:       return "Auto";
+        default:       return "auto";
     }
 }
 

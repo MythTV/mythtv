@@ -161,6 +161,10 @@ SOURCES += progdetails.cpp
 SOURCES += channeleditor.cpp        channelsettings.cpp
 SOURCES += previewgenerator.cpp     dvbtransporteditor.cpp
 
+# DiSEqC
+HEADERS += diseqc.h                 diseqcsettings.h
+SOURCES += diseqc.cpp               diseqcsettings.cpp
+
 # Listings downloading classes
 HEADERS += datadirect.h
 SOURCES += datadirect.cpp
@@ -436,9 +440,9 @@ using_backend {
 
         # Channel stuff
         HEADERS += dvbchannel.h           dvbsignalmonitor.h
-        HEADERS += dvbdiseqc.h            dvbcam.h
+        HEADERS += dvbcam.h
         SOURCES += dvbchannel.cpp         dvbsignalmonitor.cpp
-        SOURCES += dvbdiseqc.cpp          dvbcam.cpp
+        SOURCES += dvbcam.cpp
 
         # DVB Recorder
         HEADERS += dvbrecorder.h

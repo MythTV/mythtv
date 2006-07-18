@@ -10,13 +10,14 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1153";
+const QString currentDatabaseVersion = "1154";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
                                 QString &dbver);
 static bool InitializeDatabase(void);
 static bool doUpgradeTVDatabaseSchema(void);
+bool convert_diseqc_db(void);
 
 /** \defgroup db_schema MythTV Database Schema
 
@@ -2427,11 +2428,49 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
-//"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
+    if (dbver == "1153")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS diseqc_config "
+" ( cardinputid INT(10) UNSIGNED NOT NULL, "
+"   diseqcid    INT(10) UNSIGNED NOT NULL, "
+"   value       VARCHAR(16) NOT NULL default '', "
+"   KEY id (cardinputid) );",
+"CREATE TABLE IF NOT EXISTS diseqc_tree "
+" ( diseqcid        INT(10) UNSIGNED NOT NULL auto_increment, "
+"   parentid        INT(10) UNSIGNED default NULL, "
+"   ordinal         TINYINT(3) UNSIGNED NOT NULL, "
+"   type            VARCHAR(16) NOT NULL default '', "
+"   subtype         VARCHAR(16) NOT NULL default '', "
+"   description     VARCHAR(32) NOT NULL default '', "
+"   switch_ports    TINYINT(3) UNSIGNED NOT NULL default 0, "
+"   rotor_hi_speed  FLOAT NOT NULL default 0.0, "
+"   rotor_lo_speed  FLOAT NOT NULL default 0.0, "
+"   rotor_positions VARCHAR(255) NOT NULL default '', "
+"   lnb_lof_switch  INT(10) NOT NULL default 0, "
+"   lnb_lof_hi      INT(10) NOT NULL default 0, "
+"   lnb_lof_lo      INT(10) NOT NULL default 0, "
+"   PRIMARY KEY (diseqcid), KEY parentid (parentid) );",
+"ALTER TABLE capturecard ADD diseqcid INT(10) UNSIGNED default NULL;",
+""
+};
+
+        if (!performActualUpdate(updates, "1154", dbver))
+            return false;
+
+        convert_diseqc_db();
+    }
+
 //"ALTER TABLE capturecard DROP COLUMN dvb_recordts;" in 0.21
 //"ALTER TABLE capturecard DROP COLUMN dvb_hw_decoder;" in 0.21
 //"ALTER TABLE cardinput DROP COLUMN preference;" in 0.22
 //"ALTER TABLE channel DROP COLUMN atscsrcid;" in 0.22
+//"ALTER TABLE recordedmarkup DROP COLUMN offset;" in 0.22
+//"ALTER TABLE cardinput DROP diseqc_port;" in 0.22
+//"ALTER TABLE cardinput DROP diseqc_pos;" in 0.22
+//"ALTER TABLE cardinput DROP lnb_lof_switch;" in 0.22
+//"ALTER TABLE cardinput DROP lnb_lof_hi;" in 0.22
+//"ALTER TABLE cardinput DROP lnb_lof_lo;" in 0.22
 
     return true;
 }

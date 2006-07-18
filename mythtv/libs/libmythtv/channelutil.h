@@ -177,6 +177,7 @@ class ChannelUtil
     static QString GetServiceName(int chanid);
     static int     GetSourceID(int mplexid);
     static QString GetInputName(int sourceid);
+    static int     GetInputID(int sourceid, int cardid);
     static QString GetDTVPrivateType(uint networkid, const QString &key,
                                      const QString sitype = "dvb");
 

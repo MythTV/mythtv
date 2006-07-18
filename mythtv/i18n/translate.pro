@@ -11,6 +11,7 @@ SOURCES += ../libs/libmythtv/channeleditor.cpp
 SOURCES += ../libs/libmythtv/channelsettings.cpp
 SOURCES += ../libs/libmythtv/channelsettings.h
 SOURCES += ../libs/libmythtv/customedit.cpp
+SOURCES += ../libs/libmythtv/diseqcsettings.cpp
 SOURCES += ../libs/libmythtv/dtvsignalmonitor.cpp
 SOURCES += ../libs/libmythtv/dvbsignalmonitor.cpp
 SOURCES += ../libs/libmythtv/dvbtransporteditor.cpp

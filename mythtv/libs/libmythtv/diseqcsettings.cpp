@@ -1,0 +1,1422 @@
+/*
+ * \file dvbdevtree_cfg.cpp
+ * \brief DVB-S Device Tree Configuration Classes.
+ * \author Copyright (C) 2006, Yeasah Pell
+ */
+
+// Std C headers
+#include <cmath>
+
+// MythTV headers
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "diseqcsettings.h"
+
+/* Lat/Long items relocated from videosource.cpp */
+
+static GlobalLineEdit *DiSEqCLatitude(void)
+{
+    GlobalLineEdit *gc = new GlobalLineEdit("latitude");
+    gc->setLabel("Latitude");
+    gc->setHelpText(
+        DeviceTree::tr("The Cartesian latitude for your location.") + " " +
+        DeviceTree::tr("Use negative numbers for southern "
+                    "and western coordinates."));
+    return gc;
+}
+
+static GlobalLineEdit *DiSEqCLongitude(void)
+{
+    GlobalLineEdit *gc = new GlobalLineEdit("longitude");
+    gc->setLabel("Longitude");
+    gc->setHelpText(
+        DeviceTree::tr("The Cartesian longitude for your location.") + " " +
+        DeviceTree::tr("Use negative numbers for southern "
+                    "and western coordinates."));
+    return gc;
+}
+
+//////////////////////////////////////// DeviceTypeSetting
+
+class DeviceTypeSetting : public ComboBoxSetting
+{
+  public:
+    DeviceTypeSetting(DiSEqCDevDevice &device) : m_device(device)
+    {
+        setLabel(DeviceTree::tr("Device Type"));
+        addSelection(DeviceTree::tr("Switch"),
+                     QString::number((uint) DiSEqCDevDevice::kTypeSwitch));
+        addSelection(DeviceTree::tr("Rotor"),
+                     QString::number((uint) DiSEqCDevDevice::kTypeRotor));
+        addSelection(DeviceTree::tr("LNB"),
+                     QString::number((uint) DiSEqCDevDevice::kTypeLNB));
+    }
+
+    virtual void load(void)
+    {
+        QString tmp = QString::number((uint) m_device.GetDeviceType());
+        setValue(getValueIndex(tmp));
+    }
+
+    virtual void save(void)
+    {
+        m_device.SetDeviceType(
+            (DiSEqCDevDevice::dvbdev_t) getValue().toUInt());
+    }
+
+  private:
+    DiSEqCDevDevice &m_device;
+};
+
+//////////////////////////////////////// DeviceDescrSetting
+
+class DeviceDescrSetting : public LineEditSetting
+{
+  public:
+    DeviceDescrSetting(DiSEqCDevDevice &device) : m_device(device)
+    {
+        setLabel(DeviceTree::tr("Description"));
+        QString help = DeviceTree::tr(
+            "Optional descriptive name for this device, to "
+            "make it easier to configure settings later.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(m_device.GetDescription());
+    }
+
+    virtual void save(void)
+    {
+        m_device.SetDescription(getValue());
+    }
+
+  private:
+    DiSEqCDevDevice &m_device;
+};
+
+//////////////////////////////////////// SwitchTypeSetting
+
+class SwitchTypeSetting : public ComboBoxSetting
+{
+  public:
+    SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) : m_switch(switch_dev)
+    {
+        setLabel(DeviceTree::tr("Switch Type"));
+        setHelpText(DeviceTree::tr("Select the type of switch from the list."));
+
+        addSelection(DeviceTree::tr("Tone"),
+                     QString::number((uint) DiSEqCDevSwitch::kTypeTone));
+        addSelection(DeviceTree::tr("DiSEqC"),
+                     QString::number((uint)
+                                     DiSEqCDevSwitch::kTypeDiSEqCCommitted));
+        addSelection(DeviceTree::tr("DiSEqC (Uncommitted)"),
+                     QString::number((uint)
+                                     DiSEqCDevSwitch::kTypeDiSEqCUncommitted));
+        addSelection(DeviceTree::tr("Legacy SW21"),
+                     QString::number((uint) DiSEqCDevSwitch::kTypeLegacySW21));
+        addSelection(DeviceTree::tr("Legacy SW42"),
+                     QString::number((uint) DiSEqCDevSwitch::kTypeLegacySW42));
+        addSelection(DeviceTree::tr("Legacy SW64"),
+                     QString::number((uint) DiSEqCDevSwitch::kTypeLegacySW64));
+    }
+
+    virtual void load(void)
+    {
+        setValue(getValueIndex(QString::number((uint) m_switch.GetType())));
+    }
+
+    virtual void save(void)
+    {
+        m_switch.SetType((DiSEqCDevSwitch::dvbdev_switch_t)
+                         getValue().toUInt());
+    }
+
+  private:
+    DiSEqCDevSwitch &m_switch;
+};
+
+//////////////////////////////////////// SwitchPortsSetting
+
+class SwitchPortsSetting : public LineEditSetting
+{
+  public:
+    SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) : m_switch(switch_dev)
+    {
+        setLabel(DeviceTree::tr("Number of ports"));
+        setHelpText(DeviceTree::tr("The number of ports this switch has."));
+    }
+
+    virtual void load(void)
+    {
+        setValue(QString::number(m_switch.GetNumPorts()));
+    }
+
+    virtual void save(void)
+    {
+        m_switch.SetNumPorts(getValue().toUInt());
+    }
+
+  private:
+    DiSEqCDevSwitch &m_switch;
+};
+
+//////////////////////////////////////// SwitchConfig
+
+SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev)
+{
+    ConfigurationGroup *group =
+        new VerticalConfigurationGroup(false, false);
+    group->setLabel(DeviceTree::tr("Switch Configuration"));
+
+    group->addChild(new DeviceDescrSetting(switch_dev));
+    m_type = new SwitchTypeSetting(switch_dev);
+    group->addChild(m_type);
+    m_ports = new SwitchPortsSetting(switch_dev);
+    group->addChild(m_ports);
+
+    connect(m_type, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  update(void)));
+
+    addChild(group);
+}
+
+void SwitchConfig::update(void)
+{
+    switch ((DiSEqCDevSwitch::dvbdev_switch_t) m_type->getValue().toUInt())
+    {
+        case DiSEqCDevSwitch::kTypeTone:
+        case DiSEqCDevSwitch::kTypeLegacySW21:
+        case DiSEqCDevSwitch::kTypeLegacySW42:
+            m_ports->setValue("2");
+            m_ports->setEnabled(false);
+            break;
+        case DiSEqCDevSwitch::kTypeLegacySW64:
+            m_ports->setValue("3");
+            m_ports->setEnabled(false);
+            break;
+        case DiSEqCDevSwitch::kTypeDiSEqCCommitted:
+        case DiSEqCDevSwitch::kTypeDiSEqCUncommitted:
+            m_ports->setEnabled(true);
+            break;
+    }
+}
+
+//////////////////////////////////////// RotorTypeSetting
+
+class RotorTypeSetting : public ComboBoxSetting
+{
+  public:
+    RotorTypeSetting(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+    {
+        setLabel(DeviceTree::tr("Rotor Type"));
+        setHelpText(DeviceTree::tr("Select the type of rotor from the list."));
+        addSelection(DeviceTree::tr("DiSEqC 1.2"),
+                     QString::number((uint) DiSEqCDevRotor::kTypeDiSEqC_1_2));
+        addSelection(DeviceTree::tr("DiSEqC 1.3 (GotoX/USALS)"),
+                     QString::number((uint) DiSEqCDevRotor::kTypeDiSEqC_1_3));
+    }
+
+    virtual void load(void)
+    {
+        setValue(getValueIndex(QString::number((uint)m_rotor.GetType())));
+    }
+
+    virtual void save(void)
+    {
+        m_rotor.SetType((DiSEqCDevRotor::dvbdev_rotor_t)getValue().toUInt());
+    }
+
+  private:
+    DiSEqCDevRotor &m_rotor;
+};
+
+//////////////////////////////////////// RotorLoSpeedSetting
+
+class RotorLoSpeedSetting : public LineEditSetting
+{
+  public:
+    RotorLoSpeedSetting(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+    {
+        setLabel(DeviceTree::tr("Rotor Low Speed (deg/sec)"));
+        QString help = DeviceTree::tr(
+            "To allow the approximate monitoring of rotor movement, enter "
+            "the rated angular speed of the rotor when powered at 13V.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(QString::number(m_rotor.GetLoSpeed()));
+    }
+
+    virtual void save(void)
+    {
+        m_rotor.SetLoSpeed(getValue().toDouble());
+    }
+
+  private:
+    DiSEqCDevRotor &m_rotor;
+};
+
+//////////////////////////////////////// RotorHiSpeedSetting
+
+class RotorHiSpeedSetting : public LineEditSetting
+{
+  public:
+    RotorHiSpeedSetting(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+    {
+        setLabel(DeviceTree::tr("Rotor High Speed (deg/sec)"));
+        QString help = DeviceTree::tr(
+            "To allow the approximate monitoring of rotor movement, enter "
+            "the rated angular speed of the rotor when powered at 18V.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(QString::number(m_rotor.GetHiSpeed()));
+    }
+
+    virtual void save(void)
+    {
+        m_rotor.SetHiSpeed(getValue().toDouble());
+    }
+
+  private:
+    DiSEqCDevRotor &m_rotor;
+};
+
+//////////////////////////////////////// RotorPosMap
+
+static QString AngleToString(double angle)
+{
+    QString str = QString::null;
+    if (angle >= 0.0)
+        str = QString::number(angle) + 
+            DeviceTree::tr("E", "Eastern Hemisphere");
+    else /* if (angle < 0.0) */
+        str = QString::number(-angle) + 
+            DeviceTree::tr("W", "Western Hemisphere");
+    return str;
+}
+
+static double AngleToFloat(const QString &angle)
+{
+    if (angle.length() < 2)
+        return 0.0;
+
+    double pos;
+    QChar postfix = angle.at(angle.length() - 1);
+    if (postfix.isLetter())
+    {
+        pos = angle.left(angle.length() - 1).toDouble();
+        if (postfix.upper() == DeviceTree::tr("W", "Western Hemisphere"))
+            pos = -pos;
+    }
+    else
+        pos = angle.toDouble();
+
+    return pos;
+}
+
+RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+{
+    connect(this, SIGNAL(editButtonPressed(int)),   SLOT(edit(void)));
+    connect(this, SIGNAL(deleteButtonPressed(int)), SLOT(del(void)));
+    connect(this, SIGNAL(accepted(int)),            SLOT(edit(void)));
+}
+
+void RotorPosMap::load(void)
+{
+    m_posmap = m_rotor.GetPosMap();
+    PopulateList();
+}
+
+void RotorPosMap::save(void)
+{
+    m_rotor.SetPosMap(m_posmap);
+}
+
+void RotorPosMap::edit(void)
+{
+    uint id = getValue().toUInt();
+
+    QString angle;
+    if (MythPopupBox::showGetTextPopup(
+            gContext->GetMainWindow(),
+            DeviceTree::tr("Position Index %1").arg(id),
+            DeviceTree::tr("Orbital Position"), angle))
+    {
+        m_posmap[id] = AngleToFloat(angle);
+        PopulateList();
+    }
+}
+
+void RotorPosMap::del(void)
+{
+    uint id = getValue().toUInt();
+    m_posmap.erase(id);
+    PopulateList();
+}
+
+void RotorPosMap::PopulateList(void)
+{
+    int old_sel = getValueIndex(getValue());
+    clearSelections();
+    uint num_pos = 64;
+    for (uint pos = 1; pos < num_pos; pos++)
+    {
+        uint_to_dbl_t::const_iterator it = m_posmap.find(pos);
+        QString posval = DeviceTree::tr("None");
+        if (it != m_posmap.end())
+            posval = AngleToString(*it);
+
+        addSelection(DeviceTree::tr("Position #%1 (%2)").arg(pos).arg(posval),
+                     QString::number(pos));
+    }
+    setCurrentItem(old_sel);
+}
+
+//////////////////////////////////////// RotorPosConfig
+
+class RotorPosConfig : public VerticalConfigurationGroup,
+                       public ConfigurationDialog
+{
+  public:
+    RotorPosConfig(DiSEqCDevRotor &rotor)
+    {
+        setLabel(DeviceTree::tr("Rotor Position Map"));
+        setUseLabel(true);
+        addChild(new RotorPosMap(rotor));
+    }
+
+    virtual int exec(void)
+    {
+        while (ConfigurationDialog::exec() == QDialog::Accepted);
+        return QDialog::Rejected;
+    }
+};
+
+//////////////////////////////////////// RotorConfig
+
+RotorConfig::RotorConfig(DiSEqCDevRotor &rotor) : m_rotor(rotor)
+{
+    ConfigurationGroup *group =
+        new VerticalConfigurationGroup(false, false);
+    group->setLabel(DeviceTree::tr("Rotor Configuration"));
+
+    group->addChild(new DeviceDescrSetting(rotor));
+
+    ConfigurationGroup *tgroup =
+        new HorizontalConfigurationGroup(false, false, true, true);
+
+    RotorTypeSetting *rtype = new RotorTypeSetting(rotor);
+    connect(rtype, SIGNAL(valueChanged(const QString&)),
+            this,  SLOT(  SetType(     const QString&)));
+    tgroup->addChild(rtype);
+
+    m_pos = new TransButtonSetting();
+    m_pos->setLabel(DeviceTree::tr("Positions"));
+    m_pos->setHelpText(DeviceTree::tr("Rotor position setup."));
+    m_pos->setEnabled(rotor.GetType() == DiSEqCDevRotor::kTypeDiSEqC_1_2);
+    connect(m_pos, SIGNAL(pressed(void)),
+            this,  SLOT(  RunRotorPositionsDialog(void)));
+    tgroup->addChild(m_pos);
+
+    group->addChild(tgroup);
+    group->addChild(new RotorLoSpeedSetting(rotor));
+    group->addChild(new RotorHiSpeedSetting(rotor));
+    group->addChild(DiSEqCLatitude());
+    group->addChild(DiSEqCLongitude());
+
+    addChild(group);
+}
+
+void RotorConfig::SetType(const QString &type)
+{
+    DiSEqCDevRotor::dvbdev_rotor_t rtype;
+    rtype = (DiSEqCDevRotor::dvbdev_rotor_t) type.toUInt();
+    m_pos->setEnabled(rtype == DiSEqCDevRotor::kTypeDiSEqC_1_2);
+}
+
+void RotorConfig::RunRotorPositionsDialog(void)
+{
+    RotorPosConfig config(m_rotor);
+    config.exec();
+    config.save();
+}
+
+//////////////////////////////////////// LnbPresetSetting
+
+struct lnb_preset
+{
+    QString                    name;
+    DiSEqCDevLNB::dvbdev_lnb_t type;
+    uint                       lof_sw;
+    uint                       lof_lo;
+    uint                       lof_hi;
+};
+
+static lnb_preset lnb_presets[] =
+{
+    /* description, type, LOF switch, LOF low, LOF high */
+    { DeviceTree::tr("Single (Europe)"),
+      DiSEqCDevLNB::kTypeVoltageControl,               0,  9750000,        0 },
+    { DeviceTree::tr("Universal (Europe)"),
+      DiSEqCDevLNB::kTypeVoltageAndToneControl, 11700000,  9750000, 10600000 },
+    { DeviceTree::tr("Circular (N. America)"),
+      DiSEqCDevLNB::kTypeVoltageControl,               0, 11250000,        0 },
+    { DeviceTree::tr("Linear (N. America)"),
+      DiSEqCDevLNB::kTypeVoltageControl,               0, 10750000,        0 },
+    { DeviceTree::tr("C Band"),
+      DiSEqCDevLNB::kTypeVoltageControl,               0,  5150000,        0 },
+    { DeviceTree::tr("DishPro Bandstacked"),
+      DiSEqCDevLNB::kTypeBandstacked,                  0, 11250000, 14350000 },
+    { QString::null,
+      DiSEqCDevLNB::kTypeVoltageControl,               0,        0,        0 },
+};
+
+uint FindPreset(const DiSEqCDevLNB &lnb)
+{
+    uint i;
+    for (i = 0; !lnb_presets[i].name.isEmpty(); i++)
+    {
+        if (lnb_presets[i].type   == lnb.GetType()      &&
+            lnb_presets[i].lof_sw == lnb.GetLOFSwitch() &&
+            lnb_presets[i].lof_lo == lnb.GetLOFLow()    &&
+            lnb_presets[i].lof_hi == lnb.GetLOFHigh())
+        {
+            break;
+        }
+    }
+    return i;
+}
+
+class LNBPresetSetting : public ComboBoxSetting
+{
+  public:
+    LNBPresetSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    {
+        setLabel(DeviceTree::tr("LNB Preset"));
+        QString help = DeviceTree::tr(
+            "Select the LNB preset from the list, or choose "
+            "'Custom' and set the advanced settings below.");
+        setHelpText(help);
+
+        uint i = 0;
+        for (; !lnb_presets[i].name.isEmpty(); i++)
+            addSelection(lnb_presets[i].name, QString::number(i));
+        addSelection(DeviceTree::tr("Custom"), QString::number(i));
+    }
+
+    virtual void load(void)
+    {
+        setValue(FindPreset(m_lnb));
+    }
+
+    virtual void save(void)
+    {
+    }
+
+  private:
+    DiSEqCDevLNB &m_lnb;
+};
+
+//////////////////////////////////////// LNBTypeSetting
+
+class LNBTypeSetting : public ComboBoxSetting
+{
+  public:
+    LNBTypeSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    {
+        setLabel(DeviceTree::tr("LNB Type"));
+        setHelpText(DeviceTree::tr("Select the type of LNB from the list."));
+        addSelection(DeviceTree::tr("Legacy (Fixed)"),
+                     QString::number((uint) DiSEqCDevLNB::kTypeFixed));
+        addSelection(DeviceTree::tr("Standard (Voltage)"),
+                     QString::number((uint) DiSEqCDevLNB::
+                                     kTypeVoltageControl));
+        addSelection(DeviceTree::tr("Universal (Voltage & Tone)"),
+                     QString::number((uint) DiSEqCDevLNB::
+                                     kTypeVoltageAndToneControl));
+        addSelection(DeviceTree::tr("Bandstacked"),
+                     QString::number((uint) DiSEqCDevLNB::kTypeBandstacked));
+    }
+
+    virtual void load(void)
+    {
+        setValue(getValueIndex(QString::number((uint) m_lnb.GetType())));
+    }
+
+    virtual void save(void)
+    {
+        m_lnb.SetType((DiSEqCDevLNB::dvbdev_lnb_t) getValue().toUInt());
+    }
+
+  private:
+    DiSEqCDevLNB &m_lnb;
+};
+
+//////////////////////////////////////// LNBLOFSwitchSetting
+
+class LNBLOFSwitchSetting : public LineEditSetting
+{
+  public:
+    LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    {
+        setLabel(DeviceTree::tr("LNB LOF Switch (MHz)"));
+        QString help = DeviceTree::tr(
+            "This defines at what frequency the LNB will do a "
+            "switch from high to low setting, and vice versa.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(QString::number(m_lnb.GetLOFSwitch() / 1000));
+    }
+
+    virtual void save(void)
+    {
+        m_lnb.SetLOFSwitch(getValue().toUInt() * 1000);
+    }
+
+  private:
+    DiSEqCDevLNB &m_lnb;
+};
+
+//////////////////////////////////////// LNBLOFLowSetting
+
+class LNBLOFLowSetting : public LineEditSetting
+{
+  public:
+    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    {
+        setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
+        QString help = DeviceTree::tr(
+            "This defines the offset the frequency coming "
+            "from the LNB will be in low setting. For bandstacked "
+            "LNBs this is the vertical/right polarization band.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(QString::number(m_lnb.GetLOFLow() / 1000));
+    }
+
+    virtual void save(void)
+    {
+        m_lnb.SetLOFLow(getValue().toUInt() * 1000);
+    }
+
+  private:
+    DiSEqCDevLNB &m_lnb;
+};
+
+//////////////////////////////////////// LNBLOFHighSetting
+
+class LNBLOFHighSetting : public LineEditSetting
+{
+  public:
+    LNBLOFHighSetting(DiSEqCDevLNB &lnb) : m_lnb(lnb)
+    {
+        setLabel(DeviceTree::tr("LNB LOF High (MHz)"));
+        QString help = DeviceTree::tr(
+            "This defines the offset the frequency coming from "
+            "the LNB will be in high setting. For bandstacked "
+            "LNBs this is the horizontal/left polarization band.");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(QString::number(m_lnb.GetLOFHigh() / 1000));
+    }
+
+    virtual void save(void)
+    {
+        m_lnb.SetLOFHigh(getValue().toUInt() * 1000);
+    }
+
+  private:
+    DiSEqCDevLNB &m_lnb;
+};
+
+//////////////////////////////////////// LNBConfig
+
+LNBConfig::LNBConfig(DiSEqCDevLNB &lnb)
+{
+    ConfigurationGroup *group =
+        new VerticalConfigurationGroup(false, false);
+    group->setLabel(DeviceTree::tr("LNB Configuration"));
+
+    group->addChild(new DeviceDescrSetting(lnb));
+    LNBPresetSetting *preset = new LNBPresetSetting(lnb);
+    group->addChild(preset);
+    m_type = new LNBTypeSetting(lnb);
+    group->addChild(m_type);
+    m_lof_switch = new LNBLOFSwitchSetting(lnb);
+    group->addChild(m_lof_switch);
+    m_lof_lo = new LNBLOFLowSetting(lnb);
+    group->addChild(m_lof_lo);
+    m_lof_hi = new LNBLOFHighSetting(lnb);
+    group->addChild(m_lof_hi);
+    connect(m_type, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  UpdateType(  void)));
+    connect(preset, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  SetPreset(   const QString&)));
+    addChild(group);
+}
+
+void LNBConfig::SetPreset(const QString &value)
+{
+    uint index = value.toUInt();
+    if (index >= (sizeof(lnb_presets) / sizeof(lnb_preset)))
+        return;
+
+    lnb_preset &preset = lnb_presets[index];
+    if (preset.name == NULL)
+    {
+        m_type->setEnabled(true);
+        UpdateType();
+    }
+    else
+    {
+        m_type->setValue(m_type->getValueIndex(
+                             QString::number((uint)preset.type)));
+        m_lof_switch->setValue(QString::number(preset.lof_sw / 1000));
+        m_lof_lo->setValue(QString::number(preset.lof_lo / 1000));
+        m_lof_hi->setValue(QString::number(preset.lof_hi / 1000));
+        m_type->setEnabled(false);
+        m_lof_switch->setEnabled(false);
+        m_lof_hi->setEnabled(false);
+        m_lof_lo->setEnabled(false);
+    }
+}
+
+void LNBConfig::UpdateType(void)
+{
+    if (!m_type->isEnabled())
+        return;
+
+    switch ((DiSEqCDevSwitch::dvbdev_switch_t) m_type->getValue().toUInt())
+    {
+        case DiSEqCDevLNB::kTypeFixed:
+        case DiSEqCDevLNB::kTypeVoltageControl:
+            m_lof_switch->setEnabled(false);
+            m_lof_hi->setEnabled(false);
+            m_lof_lo->setEnabled(true);
+            break;
+        case DiSEqCDevLNB::kTypeVoltageAndToneControl:
+            m_lof_switch->setEnabled(true);
+            m_lof_hi->setEnabled(true);
+            m_lof_lo->setEnabled(true);
+            break;
+        case DiSEqCDevLNB::kTypeBandstacked:
+            m_lof_switch->setEnabled(false);
+            m_lof_hi->setEnabled(true);
+            m_lof_lo->setEnabled(true);
+            break;
+    }
+}
+
+//////////////////////////////////////// DeviceTree
+
+DeviceTree::DeviceTree(DiSEqCDevTree &tree) : m_tree(tree)
+{
+    connect(this, SIGNAL(editButtonPressed(int)),   SLOT(edit(void)));
+    connect(this, SIGNAL(deleteButtonPressed(int)), SLOT(del(void)));
+    connect(this, SIGNAL(accepted(int)),            SLOT(edit(void)));
+}
+
+void DeviceTree::load(void)
+{
+    PopulateTree();
+}
+
+void DeviceTree::save(void)
+{
+}
+
+bool DeviceTree::EditNodeDialog(uint nodeid)
+{
+    DiSEqCDevDevice *dev = m_tree.FindDevice(nodeid);
+    if (!dev)
+    {
+        VERBOSE(VB_IMPORTANT, QString("DeviceTree::EditNodeDialog(%1) "
+                                      "-- device not found").arg(nodeid));
+        return false;
+    }
+
+    bool changed = false;
+    switch (dev->GetDeviceType())
+    {
+        case DiSEqCDevDevice::kTypeSwitch:
+        {
+            DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(dev);
+            if (sw)
+            {
+                SwitchConfig config(*sw);
+                changed = (config.exec() == MythDialog::Accepted);
+            }
+        }
+        break;
+
+        case DiSEqCDevDevice::kTypeRotor:
+        {
+            DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(dev);
+            if (rotor)
+            {
+                RotorConfig config(*rotor);
+                changed = (config.exec() == MythDialog::Accepted);
+            }
+        }
+        break;
+
+        case DiSEqCDevDevice::kTypeLNB:
+        {
+            DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
+            if (lnb)
+            {
+                LNBConfig config(*lnb);
+                changed = (config.exec() == MythDialog::Accepted);
+            }
+        }
+        break;
+
+        default:
+            break;
+    }
+
+    if (changed)
+        PopulateTree();
+
+    return changed;
+}
+
+bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
+{
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(), "");
+    popup->addLabel(tr("Select Type of Device"));
+
+    MythListBox *list = new MythListBox(popup);
+    list->setScrollBar(false);
+    list->setBottomScrollBar(false);
+    list->insertItem(tr("Switch"));
+    list->insertItem(tr("Rotor"));
+    list->insertItem(tr("LNB"));
+    list->setCurrentItem(0);
+
+    popup->addWidget(list);
+    connect(list,  SIGNAL(accepted(int)),
+            popup, SLOT(  done(    int)));
+    list->setFocus();
+
+    int res = popup->ExecPopup();
+    type = (DiSEqCDevDevice::dvbdev_t)list->currentItem();
+    delete popup;
+
+    return res >= 0;
+}
+
+void DeviceTree::CreateRootNodeDialog(void)
+{
+    DiSEqCDevDevice::dvbdev_t type;
+    if (!RunTypeDialog(type))
+        return;
+
+    DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
+    if (dev)
+    {
+        m_tree.SetRoot(dev);
+
+        if (!EditNodeDialog(dev->GetDeviceID()))
+            m_tree.SetRoot(NULL);
+
+        PopulateTree();
+    }
+}
+
+void DeviceTree::CreateNewNodeDialog(uint parentid, uint child_num)
+{
+    DiSEqCDevDevice *parent = m_tree.FindDevice(parentid);
+    if (!parent)
+        return;
+
+    DiSEqCDevDevice::dvbdev_t type;
+    if (RunTypeDialog(type))
+    {
+        DiSEqCDevDevice *dev = DiSEqCDevDevice::CreateByType(m_tree, type);
+        if (!dev)
+            return;
+
+        if (parent->SetChild(child_num, dev))
+        {
+            if (!EditNodeDialog(dev->GetDeviceID()))
+                parent->SetChild(child_num, NULL);
+            PopulateTree();
+        }
+        else
+        {
+            delete dev;
+        }
+    }
+}
+
+void DeviceTree::edit(void)
+{
+    QString id = getValue();
+    if (id.find(':') == -1)
+    {
+        EditNodeDialog(id.toUInt());
+    }
+    else
+    {
+        QStringList vals = QStringList::split(':', id, true);
+        if (vals[0].isEmpty())
+            CreateRootNodeDialog();
+        else
+            CreateNewNodeDialog(vals[0].toUInt(), vals[1].toUInt());
+    }
+    setFocus();
+}
+
+void DeviceTree::del(void)
+{
+    QString id = getValue();
+
+    if (id.find(':') == -1)
+    {
+        uint nodeid = id.toUInt();
+        DiSEqCDevDevice *dev = m_tree.FindDevice(nodeid);
+        if (dev)
+        {
+            DiSEqCDevDevice *parent = dev->GetParent();
+            if (parent)
+                parent->SetChild(dev->GetOrdinal(), NULL);
+            else
+                m_tree.SetRoot(NULL);
+
+            PopulateTree();
+        }
+    }
+
+    setFocus();
+}
+
+void DeviceTree::PopulateTree(void)
+{
+    int old_sel = getValueIndex(getValue());
+    clearSelections();
+    PopulateTree(m_tree.Root());
+    setCurrentItem(old_sel);
+}
+
+void DeviceTree::PopulateTree(DiSEqCDevDevice *node,
+                              DiSEqCDevDevice *parent,
+                              uint childnum,
+                              uint depth)
+{
+    QString indent;
+    indent.fill(' ', 8 * depth);
+
+    if (node)
+    {
+        QString id = QString::number(node->GetDeviceID());
+        addSelection(indent + node->GetDescription(), id);
+        uint num_ch = node->GetChildCount();
+        for (uint ch = 0; ch < num_ch; ch++)
+            PopulateTree(node->GetChild(ch), node, ch, depth+1);
+    }
+    else
+    {
+        QString id;
+        if (parent)
+            id = QString::number(parent->GetDeviceID());
+        id += ":" + QString::number(childnum);
+
+        addSelection(indent + "(Unconnected)", id);
+    }
+}
+
+//////////////////////////////////////// DTVDeviceTreeWizard
+
+DTVDeviceTreeWizard::DTVDeviceTreeWizard(DiSEqCDevTree &tree)
+    : ConfigurationGroup(false, true, false, false),
+      VerticalConfigurationGroup(false, true, false, false)
+{
+    setLabel(DeviceTree::tr("DiSEqC Device Tree"));
+    addChild(new DeviceTree(tree));
+}
+
+int DTVDeviceTreeWizard::exec(void)
+{
+    while (ConfigurationDialog::exec() == QDialog::Accepted);
+    return QDialog::Rejected;
+}
+
+//////////////////////////////////////// SwitchSetting
+
+class SwitchSetting : public ComboBoxSetting
+{
+  public:
+    SwitchSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
+        : m_node(node), m_settings(settings)
+    {
+        setLabel(node.GetDescription());
+        setHelpText(DeviceTree::tr("Choose a port to use for this switch."));
+
+        uint num_children = node.GetChildCount();
+        for (uint ch = 0; ch < num_children; ch++)
+        {
+            QString val = QString("%1").arg(ch);
+            QString descr = DeviceTree::tr("Port %1").arg(ch+1);
+            DiSEqCDevDevice *child = node.GetChild(ch);
+            if (child)
+                descr += QString(" (%2)").arg(child->GetDescription());
+            addSelection(descr, val);
+        }
+    }
+
+    virtual void load(void)
+    {
+        double value = m_settings.GetValue(m_node.GetDeviceID());
+        setValue((uint)value);
+    }
+
+    virtual void save(void)
+    {
+        m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
+    }
+
+  private:
+    DiSEqCDevDevice   &m_node;
+    DiSEqCDevSettings &m_settings;
+};
+
+//////////////////////////////////////// RotorSetting
+
+class RotorSetting : public ComboBoxSetting
+{
+  public:
+    RotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
+        : m_node(node), m_settings(settings)
+    {
+        setLabel(node.GetDescription());
+        setHelpText(DeviceTree::tr("Choose a satellite position."));
+
+        DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(&m_node);
+        if (rotor)
+            m_posmap = rotor->GetPosMap();
+    }
+
+    virtual void load(void)
+    {
+        clearSelections();
+
+        uint_to_dbl_t::const_iterator it;
+        for (it = m_posmap.begin(); it != m_posmap.end(); ++it)
+            addSelection(AngleToString(*it), QString::number(*it));
+
+        double angle = m_settings.GetValue(m_node.GetDeviceID());
+        setValue(getValueIndex(QString::number(angle)));
+    }
+
+    virtual void save(void)
+    {
+        m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
+    }
+
+  private:
+    DiSEqCDevDevice   &m_node;
+    DiSEqCDevSettings &m_settings;
+    uint_to_dbl_t      m_posmap;
+};
+
+//////////////////////////////////////// USALSRotorSetting
+
+class USALSRotorSetting : public LineEditSetting
+{
+  public:
+    USALSRotorSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
+        : m_node(node), m_settings(settings)
+    {
+        setLabel(node.GetDescription());
+        QString help = DeviceTree::tr(
+            "The longitude of the satellite you are aiming at, in degrees. "
+            "In the Western hemisphere use 'W' as the suffix. "
+            "In the Eastern hemisphere use 'E' as the suffix. ");
+        setHelpText(help);
+    }
+
+    virtual void load(void)
+    {
+        setValue(AngleToString(m_settings.GetValue(m_node.GetDeviceID())));
+    }
+
+    virtual void save(void)
+    {
+        m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(getValue()));
+    }
+
+  private:
+    DiSEqCDevDevice   &m_node;
+    DiSEqCDevSettings &m_settings;
+};
+
+//////////////////////////////////////// DTVDeviceNeedsConfiguration
+
+bool DTVDeviceNeedsConfiguration(uint cardid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT type "
+        "FROM diseqc_tree, capturecard "
+        "WHERE capturecard.diseqcid = diseqc_tree.diseqcid AND"
+        "      capturecard.cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("DTVDeviceNeedsConfiguration", query);
+    else if (query.next())
+        return (query.value(0).toString().lower() != "lnb");
+
+    return false;
+}
+
+//////////////////////////////////////// DTVDeviceConfigWizard
+
+DTVDeviceConfigWizard::DTVDeviceConfigWizard(DiSEqCDevSettings &settings,
+                                             uint cardid)
+    : m_settings(settings)
+{
+    ConfigurationGroup *group =
+        new VerticalConfigurationGroup(false, false);
+    group->setLabel(DeviceTree::tr("DTV Device Configuration"));
+
+    // load
+    m_tree.Load(cardid);
+
+    // initial UI setup
+    AddNodes(*group, m_tree.Root());
+    SelectNodes();
+
+    addChild(group);
+}
+
+DTVDeviceConfigWizard::~DTVDeviceConfigWizard(void)
+{
+}
+
+void DTVDeviceConfigWizard::AddNodes(ConfigurationGroup &group,
+                                     DiSEqCDevDevice    *node)
+{
+    if (!node)
+        return;
+
+    Setting *setting = NULL;
+    switch (node->GetDeviceType())
+    {
+        case DiSEqCDevDevice::kTypeSwitch:
+            setting = new SwitchSetting(*node, m_settings);
+            connect(setting, SIGNAL(valueChanged(const QString&)),
+                    SLOT(SelectNodes()));
+            break;
+        case DiSEqCDevDevice::kTypeRotor:
+        {
+            DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(node);
+            if (rotor && (rotor->GetType() == DiSEqCDevRotor::kTypeDiSEqC_1_2))
+                setting = new RotorSetting(*node, m_settings);
+            else
+                setting = new USALSRotorSetting(*node, m_settings);
+            break;
+        }
+        default:
+            break;
+    }
+
+    if (setting)
+    {
+        // add this node
+        m_devs[node->GetDeviceID()] = setting;
+        group.addChild(setting);
+    }
+
+    // add children
+    uint num_ch = node->GetChildCount();
+    for (uint ch = 0; ch < num_ch; ch++)
+        AddNodes(group, node->GetChild(ch));
+}
+
+void DTVDeviceConfigWizard::SelectNodes(void)
+{
+    save();
+
+    QMap<uint,bool> active;
+    DiSEqCDevDevice *node = m_tree.Root();
+    while (node)
+    {
+        active[node->GetDeviceID()] = true;
+        node = node->GetSelectedChild(m_settings);
+    }
+
+    devid_to_setting_t::iterator it = m_devs.begin();
+    for (; it != m_devs.end(); ++it)
+        (*it)->setEnabled(active[it.key()]);
+}
+
+//////////////////////////////////////// Database Upgrade
+
+enum OLD_DISEQC_TYPES
+{
+    DISEQC_SINGLE                  = 0,
+    DISEQC_MINI_2                  = 1,
+    DISEQC_SWITCH_2_1_0            = 2,
+    DISEQC_SWITCH_2_1_1            = 3,
+    DISEQC_SWITCH_4_1_0            = 4,
+    DISEQC_SWITCH_4_1_1            = 5,
+    DISEQC_POSITIONER_1_2          = 6,
+    DISEQC_POSITIONER_X            = 7,
+    DISEQC_POSITIONER_1_2_SWITCH_2 = 8,
+    DISEQC_POSITIONER_X_SWITCH_2   = 9,
+    DISEQC_SW21                    = 10,
+    DISEQC_SW64                    = 11,
+};
+
+// import old diseqc configuration into tree
+bool convert_diseqc_db(void)
+{
+    MSqlQuery cquery(MSqlQuery::InitCon());
+    cquery.prepare(
+        "SELECT cardid, dvb_diseqc_type "
+        "FROM capturecard"
+        "WHERE dvb_diseqc_type IS NOT NULL AND "
+        "      diseqcid IS NULL");
+
+    // iterate through cards
+    if (!cquery.exec())
+        return false;
+
+    MSqlQuery iquery(MSqlQuery::InitCon());
+    iquery.prepare(
+        "SELECT cardinputid,    diseqc_port, diseqc_pos, "
+        "       lnb_lof_switch, lnb_lof_hi,  lnb_lof_lo  "
+        "FROM cardinput "
+        "WHERE cardinput.cardid = :CARDID");
+
+    while (cquery.next())
+    {
+        uint cardid = cquery.value(0).toUInt();
+        OLD_DISEQC_TYPES type = (OLD_DISEQC_TYPES) cquery.value(1).toUInt();
+
+        DiSEqCDevTree    tree;
+        DiSEqCDevDevice *root     = NULL;
+        uint             add_lnbs = 0;
+        DiSEqCDevLNB::dvbdev_lnb_t lnb_type =
+            DiSEqCDevLNB::kTypeVoltageAndToneControl;
+
+        // create root of tree
+        switch (type)
+        {
+            case DISEQC_SINGLE:
+            {
+                // single LNB
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeLNB);
+                break;
+            }
+
+            case DISEQC_MINI_2:
+            {
+                // tone switch + 2 LNBs
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSwitch);
+                DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
+                sw->SetType(DiSEqCDevSwitch::kTypeTone);
+                sw->SetNumPorts(2);
+                add_lnbs = 2;
+                break;
+            }
+
+            case DISEQC_SWITCH_2_1_0:
+            case DISEQC_SWITCH_2_1_1:
+            {
+                // 2 port diseqc + 2 LNBs
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSwitch);
+                DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
+                sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
+                sw->SetNumPorts(2);
+                add_lnbs = 2;
+                break;
+            }
+
+            case DISEQC_SWITCH_4_1_0:
+            case DISEQC_SWITCH_4_1_1:
+            {
+                // 4 port diseqc + 4 LNBs
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSwitch);
+                DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
+                sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
+                sw->SetNumPorts(4);
+                add_lnbs = 4;
+                break;
+            }
+
+            case DISEQC_POSITIONER_1_2:
+            {
+                // non-usals positioner + LNB
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeRotor);
+                DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(root);
+                rotor->SetType(DiSEqCDevRotor::kTypeDiSEqC_1_2);
+                add_lnbs = 1;
+                break;
+            }
+
+            case DISEQC_POSITIONER_X:
+            {
+                // usals positioner + LNB (diseqc_pos)
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeRotor);
+                DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(root);
+                rotor->SetType(DiSEqCDevRotor::kTypeDiSEqC_1_3);
+                add_lnbs = 1;
+                break;
+            }
+
+            case DISEQC_POSITIONER_1_2_SWITCH_2:
+            {
+                // 10 port uncommitted switch + 10 LNBs
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSwitch);
+                DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
+                sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCUncommitted);
+                sw->SetNumPorts(10);
+                add_lnbs = 10;
+                break;
+            }
+
+            case DISEQC_SW21:
+            {
+                // legacy SW21 + 2 fixed lnbs
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSwitch);
+                DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
+                sw->SetType(DiSEqCDevSwitch::kTypeLegacySW21);
+                sw->SetNumPorts(2);
+                add_lnbs = 2;
+                lnb_type = DiSEqCDevLNB::kTypeFixed;
+                break;
+            }
+
+            case DISEQC_SW64:
+            {
+                // legacy SW64 + 3 fixed lnbs
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSwitch);
+                DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
+                sw->SetType(DiSEqCDevSwitch::kTypeLegacySW64);
+                sw->SetNumPorts(3);
+                add_lnbs = 3;
+                lnb_type = DiSEqCDevLNB::kTypeFixed;
+                break;
+            }
+
+            default:
+            {
+                VERBOSE(VB_IMPORTANT, QString("Unknown DiSEqC device type ") +
+                        QString("%1 ignoring card %2").arg(type).arg(cardid));
+                break;
+            }
+        }
+
+        if (!root)
+            continue;
+
+        tree.SetRoot(root);
+
+        // create LNBs
+        for (uint i = 0; i < add_lnbs; i++)
+        {
+            DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>
+                (DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeLNB));
+            lnb->SetType(lnb_type);
+            lnb->SetDescription(QString("LNB #%1").arg(i+1));
+            if (!root->SetChild(i, lnb))
+                delete lnb;
+        }
+
+        // save the tree to get real device ids
+        tree.Store(cardid);
+
+        // iterate inputs
+        DiSEqCDevSettings set;
+        iquery.bindValue(":CARDID", cardid);
+
+        if (!iquery.exec())
+            return false;
+
+        while (iquery.next())
+        {
+            uint inputid = iquery.value(0).toUInt();
+            uint port = iquery.value(1).toUInt();
+            double pos = iquery.value(2).toDouble();
+            DiSEqCDevLNB *lnb = NULL;
+
+            // configure LNB and settings
+            switch (type)
+            {
+                case DISEQC_SINGLE:
+                    lnb = dynamic_cast<DiSEqCDevLNB*>(root);
+                    break;
+
+                case DISEQC_MINI_2:
+                case DISEQC_SWITCH_2_1_0:
+                case DISEQC_SWITCH_2_1_1:
+                case DISEQC_SWITCH_4_1_0:
+                case DISEQC_SWITCH_4_1_1:
+                case DISEQC_SW21:
+                case DISEQC_SW64:
+                case DISEQC_POSITIONER_1_2_SWITCH_2:
+                    lnb = dynamic_cast<DiSEqCDevLNB*>(root->GetChild(port));
+                    set.SetValue(root->GetDeviceID(), port);
+                    break;
+
+                case DISEQC_POSITIONER_1_2:
+                case DISEQC_POSITIONER_X:
+                    lnb = dynamic_cast<DiSEqCDevLNB*>(root->GetChild(0));
+                    set.SetValue(root->GetDeviceID(), pos);
+                    break;
+
+                default:
+                    break;
+            }
+
+            // configure lnb
+            if (lnb)
+            {
+                lnb->SetLOFSwitch(iquery.value(3).toUInt());
+                lnb->SetLOFHigh(iquery.value(4).toUInt());
+                lnb->SetLOFLow(iquery.value(5).toUInt());
+            }
+
+            // save settings
+            set.Store(inputid);
+        }
+
+        // save any LNB changes
+        tree.Store(cardid);
+
+        // invalidate cached devices
+        DiSEqCDev trees;
+        trees.InvalidateTrees();
+    }
+
+    return true;
+}
