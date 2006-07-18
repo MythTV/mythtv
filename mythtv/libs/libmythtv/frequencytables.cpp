@@ -361,12 +361,29 @@ static void init_freq_tables(freq_table_map_t &fmap)
     {
         // USA Cable, ch 1 to 155 and T.7 to T.14
         FREQ(modStr[i], "cable0", desc[i], "Channel %1",
-             1, 75000000, 1005000000, mod[i]);
-        FREQ(modStr[i], "cable1", desc[i], "Channel T-%1",
-             7, 10000000,   52000000, mod[i]);
-        // USA Cable, QAM 256 ch 78 to 155
+             1,    75000000,  75000001, mod[i]);  // 1
+        FREQ(modStr[i], "cable1", desc[i], "Channel %1",
+             2,    57000000,   85000000, mod[i]); // 2-6
+        FREQ(modStr[i], "cable2", desc[i], "Channel %1",
+             7,   177000000,  213000000, mod[i]); // 7-13
+        FREQ(modStr[i], "cable2", desc[i], "Channel %1",
+             14,  123000000,  171000000, mod[i]); // 14-22
+        FREQ(modStr[i], "cable2", desc[i], "Channel %1",
+             23,  219000000,  495000000, mod[i]); // 23-69
+        FREQ(modStr[i], "cable3", desc[i], "Channel %1",
+             70,  501000000,  645000000, mod[i]); // 70-94
+        FREQ(modStr[i], "cable4", desc[i], "Channel %1",
+             95,   93000000,  117000000, mod[i]); // 95-99
+        FREQ(modStr[i], "cable5", desc[i], "Channel %1",
+             100, 651000000, 1005000000, mod[i]); // 100-159
+        FREQ(modStr[i], "cable6", desc[i], "Channel T-%1",
+             7,    10000000,   52000000, mod[i]); // T7-14
+
+        // USA Cable, QAM 256 ch 78 to 159
         FREQ(modStr[i], "cablehigh0", desc[i], "Channel %1",
-             78, 537000000,1005000000, mod[i]);
+             78,  559000000,  645000000, mod[i]); // 78-94
+        FREQ(modStr[i], "cablehigh1", desc[i], "Channel %1",
+             100, 651000000, 1005000000, mod[i]); // 100-159
 
         QString std[]   = { "hrc",  "irc"   };
         QString sdesc[] = { "HRC ", "IRC "  };
@@ -376,18 +393,24 @@ static void init_freq_tables(freq_table_map_t &fmap)
         {
             // USA Cable HRC/IRC, ch 1 to 125
             FREQ(modStr[i], std[j] + "0", desc[i], sdesc[j] + "%1",
-                 1,   73750000 + off[j],  73750001 + off[j], mod[i]);
+                 1,    73750000 + off[j],  73750001 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "1", desc[i], sdesc[j] + "%1",
-                 2,   55750000 + off[j],  67750000 + off[j], mod[i]);
+                 2,    55750000 + off[j],  67750000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "2", desc[i], sdesc[j] + "%1",
-                 5,   79750000 + off[j],  85750000 + off[j], mod[i]);
+                 5,    79750000 + off[j],  85750000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "3", desc[i], sdesc[j] + "%1",
-                 7,  175750000 + off[j], 643750000 + off[j], mod[i]);
+                 7,   175750000 + off[j], 211750000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "4", desc[i], sdesc[j] + "%1",
-                 95,  91750000 + off[j], 114000000 + off[j], mod[i]);
+                 14,
+                 121750000 + off[j] - (j ? 100000 : 0),
+                 169750000 + off[j] - (j ? 100000 : 0), mod[i]);
             FREQ(modStr[i], std[j] + "5", desc[i], sdesc[j] + "%1",
+                 23,  211750000 + off[j], 481750000 + off[j], mod[i]);
+            FREQ(modStr[i], std[j] + "6", desc[i], sdesc[j] + "%1",
+                 95,   91750000 + off[j], 114000000 + off[j], mod[i]);
+            FREQ(modStr[i], std[j] + "7", desc[i], sdesc[j] + "%1",
                  100, 649750000 + off[j], 799750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "6", desc[i], sdesc[j] + "T-%1",
+            FREQ(modStr[i], std[j] + "8", desc[i], sdesc[j] + "T-%1",
                  7,     8175000 + off[j],  50750000 + off[j], mod[i]);
 
             // USA Cable HRC/IRC, ch 67-125
