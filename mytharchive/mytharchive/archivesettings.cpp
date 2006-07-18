@@ -104,6 +104,30 @@ static HostCheckBox *MythArchiveUseFIFO()
     return gc;
 };
 
+static HostComboBox *MainMenuAspectRatio()
+{
+    HostComboBox *gc = new HostComboBox("MythArchiveMainMenuAR");
+    gc->setLabel(QObject::tr("Main Menu Aspect Ratio"));
+    gc->addSelection("4:3");
+    gc->addSelection("16:9");
+    gc->setValue(1);
+    gc->setHelpText(QObject::tr("Aspect ratio to use when creating the main menu."));
+    return gc;
+};
+
+static HostComboBox *ChapterMenuAspectRatio()
+{
+    HostComboBox *gc = new HostComboBox("MythArchiveChapterMenuAR");
+    gc->setLabel(QObject::tr("Chapter Menu Aspect Ratio"));
+    gc->addSelection("4:3");
+    gc->addSelection("16:9");
+    gc->addSelection("Video");
+    gc->setValue(2);
+    gc->setHelpText(QObject::tr("Aspect ratio to use when creating the chapter menu. "
+            "Video means use the same aspect ratio as the associated video."));
+    return gc;
+};
+
 static HostLineEdit *MythArchiveFfmpegCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveFfmpegCmd");
@@ -202,6 +226,8 @@ ArchiveSettings::ArchiveSettings()
     vcg2->addChild(MythArchiveCopyRemoteFiles());
     vcg2->addChild(MythArchiveAlwaysUseMythTranscode());
     vcg2->addChild(MythArchiveUseFIFO());
+    vcg2->addChild(MainMenuAspectRatio());
+    vcg2->addChild(ChapterMenuAspectRatio());
     addChild(vcg2);
 
     VerticalConfigurationGroup* vcg3 = new VerticalConfigurationGroup(false);

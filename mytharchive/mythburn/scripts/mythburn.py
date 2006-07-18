@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060717-1"
+VERSION="0.1.20060718-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -39,7 +39,7 @@ VERSION="0.1.20060717-1"
 ##set this variable to True and then re-run the scripts
 ##the temp. files will not be deleted and it will run through
 ##very much quicker!
-debug_secondrunthrough = False
+debug_secondrunthrough = True
 
 # default encoding profile to use
 defaultEncodingProfile = "SP"
@@ -98,6 +98,13 @@ useFIFO = True
 encodetoac3 = False
 alwaysRunMythtranscode = False
 copyremoteFiles = False
+
+#main menu aspect ratio (4:3 or 16:9)
+mainmenuAspectRatio = "16:9"
+
+#chapter menu aspect ratio (4:3, 16:9 or Video) 
+#video means same aspect ratio as the video title
+chaptermenuAspectRatio = "Video"
 
 #name of the default job file
 jobfile="mydata.xml"
@@ -265,7 +272,7 @@ def runCommand(command):
     checkCancelFlag()
     return result
 
-def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, finaloutput):
+def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, finaloutput, aspectratio):
     if videomode=="pal":
         framespersecond=frameratePAL
     else:
@@ -273,8 +280,8 @@ def encodeMenu(background, tempvideo, music, musiclength, tempmovie, xmlfile, fi
 
     totalframes=int(musiclength * framespersecond)
 
-    command = path_png2yuv[0] + " -n %s -v0 -I p -f %s -j '%s' | %s -b 5000 -a 3 -v 1 -f 8 -o '%s'" \
-               % (totalframes, framespersecond, background, path_mpeg2enc[0], tempvideo)
+    command = path_png2yuv[0] + " -n %s -v0 -I p -f %s -j '%s' | %s -b 5000 -a %s -v 1 -f 8 -o '%s'" \
+               % (totalframes, framespersecond, background, path_mpeg2enc[0], aspectratio, tempvideo)
     result = runCommand(command)
     if result<>0:
         fatalError("Failed while running png2yuv - %s" % command)
@@ -348,6 +355,22 @@ def getLengthOfVideo(index):
 
     return duration
 
+def getAspectRatioOfVideo(index):
+    """Returns the aspect ratio of the video file (1.333, 1.778, etc)"""
+
+    #open the XML containing information about this file
+    infoDOM = xml.dom.minidom.parse(os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+
+    #error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "file":
+        fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+    video = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("video")[0]
+    if video.attributes["aspectratio"].value != 'N/A':
+        aspect_ratio = float(video.attributes["aspectratio"].value)
+    else:
+        aspect_ratio = 1.77778; # default
+    write("aspect ratio is: %s" % aspect_ratio)
+    return aspect_ratio
 
 def getFormatedLengthOfVideo(index):
     duration = getLengthOfVideo(index)
@@ -415,6 +438,8 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveCopyRemoteFiles',
                         'MythArchiveAlwaysUseMythTranscode',
                         'MythArchiveUseFIFO',
+                        'MythArchiveMainMenuAR',
+                        'MythArchiveChapterMenuAR',
                         'ISO639Language0',
                         'ISO639Language1'
                         )) order by value"""
@@ -1466,6 +1491,14 @@ def createDVDAuthorXML(screensize, numberofitems):
 
     video = dvddom.createElement("video")
     video.setAttribute("format",videomode)
+
+    # set aspect ratio
+    if mainmenuAspectRatio == "4:3":
+        video.setAttribute("aspect", "4:3")
+    else:
+        video.setAttribute("aspect", "16:9")
+        video.setAttribute("widescreen", "nopanscan")
+
     menus_element.appendChild(video)
 
     pgc=menus_element.childNodes[1]
@@ -1557,6 +1590,21 @@ def createDVDAuthorXML(screensize, numberofitems):
 
             video = dvddom.createElement("video")
             video.setAttribute("format",videomode)
+
+            # set the right aspect ratio
+            if chaptermenuAspectRatio == "4:3":
+                video.setAttribute("aspect", "4:3")
+            elif chaptermenuAspectRatio == "16:9":
+                video.setAttribute("aspect", "16:9")
+                video.setAttribute("widescreen", "nopanscan")
+            else: 
+                # use same aspect ratio as the video
+                if getAspectRatioOfVideo(itemnum) > 1.4:
+                    video.setAttribute("aspect", "16:9")
+                    video.setAttribute("widescreen", "nopanscan")
+                else:
+                    video.setAttribute("aspect", "4:3")
+
             menus.appendChild(video)
 
             if wantChapterMenu:
@@ -1596,6 +1644,25 @@ def createDVDAuthorXML(screensize, numberofitems):
 
             titles = dvddom.createElement("titles")
             titleset.appendChild(titles)
+
+            # set the right aspect ratio
+            title_video = dvddom.createElement("video")
+            title_video.setAttribute("format",videomode)
+
+            if chaptermenuAspectRatio == "4:3":
+                title_video.setAttribute("aspect", "4:3")
+            elif chaptermenuAspectRatio == "16:9":
+                title_video.setAttribute("aspect", "16:9")
+                title_video.setAttribute("widescreen", "nopanscan")
+            else: 
+                # use same aspect ratio as the video
+                if getAspectRatioOfVideo(itemnum) > 1.4:
+                    title_video.setAttribute("aspect", "16:9")
+                    title_video.setAttribute("widescreen", "nopanscan")
+                else:
+                    title_video.setAttribute("aspect", "4:3")
+
+            titles.appendChild(title_video)
 
             pgc = dvddom.createElement("pgc")
             titles.appendChild(pgc)
@@ -1669,6 +1736,7 @@ def createDVDAuthorXML(screensize, numberofitems):
         dvdcode+="}"       
         vmgm_pre_node.appendChild(dvddom.createTextNode(dvdcode))
 
+    #write(dvddom.toprettyxml())
     #Save xml to file
     WriteXMLToFile (dvddom,os.path.join(getTempPath(),"dvdauthor.xml"))
 
@@ -2095,14 +2163,20 @@ def createMenu(screensize, screendpi, numberofitems):
         #write( spumuxdom.toprettyxml())
         WriteXMLToFile (spumuxdom,os.path.join(getTempPath(),"spumux-%s.xml" % page))
 
-        write("Encoding Menu Page %s" % page)
+        if mainmenuAspectRatio == "4:3":
+            aspect_ratio = 2
+        else:
+            aspect_ratio = 3
+
+        write("Encoding Menu Page %s using aspect ratio '%s'" % (page, mainmenuAspectRatio))
         encodeMenu(os.path.join(getTempPath(),"background-%s.png" % page),
                     os.path.join(getTempPath(),"temp.m2v"),
                     getThemeFile(themeName,menumusic),
                     menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
                     os.path.join(getTempPath(),"spumux-%s.xml" % page),
-                    os.path.join(getTempPath(),"menu-%s.mpg" % page))
+                    os.path.join(getTempPath(),"menu-%s.mpg" % page),
+                    aspect_ratio)
 
         #Tidy up temporary files
 ####        os.remove(os.path.join(getTempPath(),"spumux-%s.xml" % page))
@@ -2207,14 +2281,25 @@ def createChapterMenu(screensize, screendpi, numberofitems):
         #write( spumuxdom.toprettyxml())
         WriteXMLToFile (spumuxdom,os.path.join(getTempPath(),"chapterspumux-%s.xml" % page))
 
-        write("Encoding Chapter Menu Page %s" % page)
+        if chaptermenuAspectRatio == "4:3":
+            aspect_ratio = '2'
+        elif chaptermenuAspectRatio == "16:9":
+            aspect_ratio = '3'
+        else: 
+            if getAspectRatioOfVideo(page) > 1.4:
+                aspect_ratio = '3'
+            else:
+                aspect_ratio = '2'
+
+        write("Encoding Chapter Menu Page %s using aspect ratio '%s'" % (page, chaptermenuAspectRatio))
         encodeMenu(os.path.join(getTempPath(),"chaptermenu-%s.png" % page),
                     os.path.join(getTempPath(),"temp.m2v"),
                     getThemeFile(themeName,menumusic),
                     menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
                     os.path.join(getTempPath(),"chapterspumux-%s.xml" % page),
-                    os.path.join(getTempPath(),"chaptermenu-%s.mpg" % page))
+                    os.path.join(getTempPath(),"chaptermenu-%s.mpg" % page),
+                    aspect_ratio)
 
         #Tidy up
 ####        os.remove(os.path.join(getTempPath(),"chaptermenu-%s.png" % page))
@@ -2279,6 +2364,11 @@ def createDetailsPage(screensize, screendpi, numberofitems):
         del draw
         del bgimage
 
+        # always use the same aspect ratio as the video
+        aspect_ratio='2'
+        if getAspectRatioOfVideo(itemnum) > 1.4:
+            aspect_ratio='3'
+
         #write( spumuxdom.toprettyxml())
         WriteXMLToFile (spumuxdom,os.path.join(getTempPath(),"detailsspumux-%s.xml" % itemnum))
 
@@ -2289,7 +2379,8 @@ def createDetailsPage(screensize, screendpi, numberofitems):
                     menulength,
                     os.path.join(getTempPath(),"temp.mpg"),
                     "",
-                    os.path.join(getTempPath(),"details-%s.mpg" % itemnum))
+                    os.path.join(getTempPath(),"details-%s.mpg" % itemnum),
+                    aspect_ratio)
 
         #On to the next item
         itemnum+=1
@@ -2580,7 +2671,7 @@ def isFileOkayForDVD(file, folder):
     # has the user elected to re-encode the file
     if file.hasAttribute("encodingprofile"):
         if file.attributes["encodingprofile"].value != "NONE":
-            write("File will be re-encode using profile %s" % file.attributes["encodingprofile"].value)
+            write("File will be re-encoded using profile %s" % file.attributes["encodingprofile"].value)
             return False
 
     if not isResolutionOkayForDVD(videosize):
@@ -2638,7 +2729,7 @@ def processFile(file, folder):
                     localfile = file.attributes["localfilename"].value
                 else:
                     localfile = ""
-                write("File has a cut list - attempting to run mythtrancode to remove unwanted segments")
+                write("File has a cut list - running mythtrancode to remove unwanted segments")
                 chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                 starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
                 if runMythtranscode(chanid, starttime, os.path.join(folder,'tmp'), True, localfile):
@@ -2655,7 +2746,7 @@ def processFile(file, folder):
                         localfile = file.attributes["localfilename"].value
                     else:
                         localfile = ""
-                    write("Attempting to run mythtranscode --mpeg2 to fix any errors")
+                    write("Running mythtranscode --mpeg2 to fix any errors")
                     chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
                     starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
                     if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False, localfile):
@@ -2675,7 +2766,7 @@ def processFile(file, folder):
                 localfile = file.attributes["localfilename"].value
             else:
                 localfile = file.attributes["filename"].value
-            write("Attempting to run mythtranscode --mpeg2 to fix any errors")
+            write("Running mythtranscode --mpeg2 to fix any errors")
             chanid = -1
             starttime = -1
             if runMythtranscode(chanid, starttime, os.path.join(folder, 'newfile.mpg'), False, localfile):
@@ -3064,6 +3155,8 @@ useFIFO = (defaultsettings["MythArchiveUseFIFO"] == '1')
 encodetoac3 = (defaultsettings["MythArchiveEncodeToAc3"] == '1')
 alwaysRunMythtranscode = (defaultsettings["MythArchiveAlwaysUseMythTranscode"] == '1')
 copyremoteFiles = (defaultsettings["MythArchiveCopyRemoteFiles"] == '1')
+mainmenuAspectRatio = defaultsettings["MythArchiveMainMenuAR"]
+chaptermenuAspectRatio = defaultsettings["MythArchiveChapterMenuAR"]
 
 # external commands
 path_mplex = [defaultsettings["MythArchiveMplexCmd"], os.path.split(defaultsettings["MythArchiveMplexCmd"])[1]]
