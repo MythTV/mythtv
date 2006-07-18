@@ -16,6 +16,8 @@ class RTSPListener
     virtual void AddData(unsigned char *data,
                          unsigned int   dataSize,
                          struct timeval presentationTime) = 0;
+  protected:
+    virtual ~RTSPListener() {}
 };
 
 // ============================================================================
