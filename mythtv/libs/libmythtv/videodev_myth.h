@@ -10,6 +10,7 @@ typedef unsigned short __u16;
 typedef int  __s32;
 typedef unsigned char __u8;
 typedef unsigned long long __u64;
+typedef long long __s64;
 #else
 #include <linux/types.h>
 #include <linux/version.h>
