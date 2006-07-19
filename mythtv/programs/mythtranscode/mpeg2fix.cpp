@@ -1208,7 +1208,6 @@ bool MPEG2fixup::FindStart()
     {
         if (GetFrame(&pkt))
             return false;
-
         if (vid_id == pkt.stream_index)
         {
             while (! vFrame.isEmpty())
@@ -1254,9 +1253,42 @@ bool MPEG2fixup::FindStart()
                                          vFrame.first()->pkt.pts);
                 if (delta < -180000 || delta > 180000) //2 seconds
                 {
+                    //Check all video sequence packets against current
+                    //audio packet
+                    MPEG2frame *found = NULL;
+		    while (vFrame.current())
+                    {
+                        if(vFrame.current()->isSequence)
+                        {
+                            int64_t dlta1 = diff2x33(af->first()->pkt.pts,
+                                                     vFrame.current()->pkt.pts);
+                            if (dlta1 >= -180000 && dlta1 <= 180000)
+                            {
+				found = vFrame.current();
+                                delta = dlta1;
+                                break;
+                            }
+                        }
+                        vFrame.next();
+                    }
+                    if (found)
+                    {
+                        while (vFrame.first() != found)
+                        {
+                            framePool.enqueue( vFrame.first());
+                            vFrame.removeFirst();
+                        }
+                    }
+                }
+                if (delta < -180000 || delta > 180000) //2 seconds
+                {
                         VERBOSE(MPF_PROCESS,
                                 QString("Dropping A packet from stream %1")
                                        .arg(it.key()));
+                        VERBOSE(MPF_PROCESS,
+                                QString("     A:%1 V:%2")
+                                        .arg(PtsTime(af->first()->pkt.pts))
+                                        .arg(PtsTime(vFrame.first()->pkt.pts)));
                         framePool.enqueue( af->first());
                         af->removeFirst();
                         continue;
