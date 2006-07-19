@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060718-1"
+VERSION="0.1.20060719-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -39,7 +39,7 @@ VERSION="0.1.20060718-1"
 ##set this variable to True and then re-run the scripts
 ##the temp. files will not be deleted and it will run through
 ##very much quicker!
-debug_secondrunthrough = True
+debug_secondrunthrough = False
 
 # default encoding profile to use
 defaultEncodingProfile = "SP"
