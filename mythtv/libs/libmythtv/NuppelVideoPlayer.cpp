@@ -4528,7 +4528,7 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
         direction = iter.data();
         deleteframe = iter.key();
 
-        if ((std::llabs(deleteframe - framesPlayed) <
+        if ((absLongLong(deleteframe - framesPlayed) <
                    (int)ceil(20 * video_frame_rate)) && !allowSelectNear)
         {
             deletepoint = true;

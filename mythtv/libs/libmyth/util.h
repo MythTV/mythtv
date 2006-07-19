@@ -38,6 +38,10 @@ class MythTimer
 
 QDateTime mythCurrentDateTime();
 
+// This is necessary for GCC 3.3, which has llabs(long long)
+// but not abs(long long) or std::llabs(long long)
+inline  long long  absLongLong(long long  n)  { return n >= 0 ? n : -n; } 
+
 void encodeLongLong(QStringList &list, long long num);
 long long decodeLongLong(QStringList &list, uint offset);
 long long decodeLongLong(QStringList &list, QStringList::iterator &it);

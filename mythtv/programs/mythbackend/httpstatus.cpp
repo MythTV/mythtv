@@ -27,9 +27,6 @@
     #include <sensors/chips.h> 
 #endif 
 
-// This is necessary for GCC 3.3, which has llabs(long long) but not abs(...) 
-inline  long long  myAbs(long long  n)  { return n >= 0 ? n : -n; } 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -1324,7 +1321,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                 storage.setAttribute(encoderHost + "_free" , (int)(mAvail>>10)); 
  
                 if ((mTotal == iTotal) && 
-                    (myAbs(mAvail - iAvail) < (iAvail * 0.05))) 
+                    (absLongLong(mAvail - iAvail) < (iAvail * 0.05))) 
                 { 
                     storage.setAttribute(encoderHost + "_shared" , 1); 
                 } 
