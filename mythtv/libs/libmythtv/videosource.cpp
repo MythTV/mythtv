@@ -721,6 +721,23 @@ class SkipBtAudio: public CheckBoxSetting, public CCSetting
    };
 };
 
+class DVBInput: public ComboBoxSetting, public CCSetting
+{
+  public:
+    DVBInput(const CaptureCard& parent)
+      : CCSetting(parent, "defaultinput")
+    {
+        setLabel(QObject::tr("Default Input"));
+        fillSelections(false);
+    }
+
+    void fillSelections(bool diseqc)
+    {
+        clearSelections();
+        addSelection((diseqc) ? "DVBInput #1" : "DVBInput");
+    }
+};
+
 class DVBCardNum: public SpinBoxSetting, public CCSetting
 {
   public:
@@ -1313,21 +1330,8 @@ void CaptureCard::fillSelections(SelectSetting* setting, bool no_children)
     }
 }
 
-void CaptureCard::save()
-{
-    ConfigurationWizard::save();
-#ifdef USING_DVB
-    tree.Store(getCardID());
-    DiSEqCDev trees;
-    trees.InvalidateTrees();
-#endif
-}
-
 void CaptureCard::loadByID(int cardid) 
 {
-#ifdef USING_DVB
-    tree.Load(cardid);
-#endif
     id->setValue(cardid);
     load();
 }
@@ -2316,7 +2320,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
 
-    TunerCardInput *defaultinput = new TunerCardInput(parent, "0", "DVB");
+    defaultinput = new DVBInput(parent);
     addChild(defaultinput);
     defaultinput->setVisible(false);
 
@@ -2326,16 +2330,44 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
-    connect(cardnum,      SIGNAL(valueChanged  (const QString&)),
-            defaultinput, SLOT(  fillSelections(const QString&)));
     connect(buttonDiSEqC, SIGNAL(pressed()),
-            &parent,      SLOT(  DiSEqCPanel()));
+            this,         SLOT(  DiSEqCPanel()));
     connect(buttonAnalog, SIGNAL(pressed()),
             &parent,      SLOT(  analogPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
             &parent,      SLOT(  recorderOptionsPanel()));
 
     cardnum->setValue(0);
+}
+
+void DVBConfigurationGroup::DiSEqCPanel()
+{
+#ifdef USING_DVB
+    parent.reload(); // ensure card id is valid
+
+    DTVDeviceTreeWizard diseqcWiz(tree);
+    diseqcWiz.exec();
+    defaultinput->fillSelections(tree.Root() != NULL);
+#endif // USING_DVB
+}
+
+void DVBConfigurationGroup::load()
+{
+    VerticalConfigurationGroup::load();
+#ifdef USING_DVB
+    tree.Load(parent.getCardID());
+    defaultinput->fillSelections(tree.Root() != NULL);
+#endif
+}
+
+void DVBConfigurationGroup::save()
+{
+    VerticalConfigurationGroup::save();
+#ifdef USING_DVB
+    tree.Store(parent.getCardID());
+    DiSEqCDev trees;
+    trees.InvalidateTrees();
+#endif
 }
 
 void CaptureCard::reload(void)
@@ -2375,17 +2407,6 @@ void CaptureCard::recorderOptionsPanel()
 
     RecorderOptions acw(*this);
     acw.exec();
-}
-
-void CaptureCard::DiSEqCPanel()
-{
-#ifdef USING_DVB
-    reload();
-
-    DTVDeviceTreeWizard diseqcWiz(tree);
-    diseqcWiz.exec();
-    load();
-#endif // USING_DVB
 }
 
 RecorderOptions::RecorderOptions(CaptureCard& parent)

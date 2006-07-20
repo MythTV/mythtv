@@ -333,7 +333,7 @@ class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
     TunerCardInput    *input;
 };
 
-class TunerCardInput;
+class DVBInput;
 class DVBCardName;
 class DVBCardType;
 class DVBTuningDelay;
@@ -343,19 +343,24 @@ class DVBConfigurationGroup: public VerticalConfigurationGroup {
 public:
     DVBConfigurationGroup(CaptureCard& a_parent);
 
+    virtual void load(void);
+    virtual void save(void);
+    
 public slots:
     void probeCard(const QString& cardNumber);
-
+    void DiSEqCPanel(void);
+    
 private:
     CaptureCard        &parent;
 
-    TunerCardInput     *defaultinput;
+    DVBInput           *defaultinput;
     DVBCardName        *cardname;
     DVBCardType        *cardtype;
     SignalTimeout      *signal_timeout;
     ChannelTimeout     *channel_timeout;
     TransButtonSetting *buttonAnalog;
     DVBTuningDelay     *tuning_delay;
+    DiSEqCDevTree       tree;
 };
 
 class CaptureCardGroup: public VerticalConfigurationGroup,
@@ -381,15 +386,13 @@ public:
     static void fillSelections(SelectSetting* setting);
     static void fillSelections(SelectSetting* setting, bool no_children);
 
-    virtual void save();
-    
+    void reload(void);
+
 public slots:
-    void DiSEqCPanel();
     void analogPanel();
     void recorderOptionsPanel();
 
 private:
-    void reload(void);
 
     class ID: virtual public IntegerSetting,
               public AutoIncrementStorage {
@@ -419,7 +422,6 @@ private:
 private:
     ID       *id;
     ParentID *parentid;
-    DiSEqCDevTree tree;
 };
 
 class CardInput;
