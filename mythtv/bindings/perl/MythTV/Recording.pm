@@ -40,7 +40,7 @@ package MythTV::Recording;
                                   + $self->{'fs_low'};
         # Pull the last known frame from the database, to help guestimate the
         # total frame count.
-            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT MAX(mark) FROM recordedmarkup WHERE chanid=? AND starttime=FROM_UNIXTIME(?)');
+            $sh = $self->{'_mythtv'}{'dbh'}->prepare('SELECT MAX(mark) FROM recordedseek WHERE chanid=? AND starttime=FROM_UNIXTIME(?)');
             $sh->execute($self->{'chanid'}, $self->{'recstartts'});
             ($self->{'last_frame'}) = $sh->fetchrow_array();
             $sh->finish();
