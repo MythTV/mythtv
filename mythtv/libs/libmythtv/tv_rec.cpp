@@ -3535,7 +3535,6 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         }
         else
         {
-            VERBOSE(VB_EIT, LOC + "Starting Passive Scan");
             scanner->StartPassiveScan(channel, streamData, eitIgnoresSource);
         }
     }
