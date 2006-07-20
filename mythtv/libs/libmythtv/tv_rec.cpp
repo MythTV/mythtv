@@ -3528,7 +3528,16 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(streamData);
         if (dsd)
             dsd->SetDishNetEIT(is_dishnet_eit(cardid));
-        scanner->StartPassiveScan(channel, streamData, eitIgnoresSource);
+        if (!get_use_eit(GetCaptureCardNum()))
+        {
+            VERBOSE(VB_EIT, LOC + "EIT scanning disabled "
+                    "for all sources on this card.");
+        }
+        else
+        {
+            VERBOSE(VB_EIT, LOC + "Starting Passive Scan");
+            scanner->StartPassiveScan(channel, streamData, eitIgnoresSource);
+        }
     }
 
     return streamData;
