@@ -37,13 +37,35 @@ static int help(void)
 	return 1;
 }
 
+static void extract_appname(const char *argv0)
+{
+	char *ptr = strrchr(argv0, '/');
+	if (ptr) {
+		argv0 = ptr + 1;
+	}
+	ptr = strrchr(argv0, '\\');
+	if (ptr) {
+		argv0 = ptr + 1;
+	}
+	appname = argv0;
+}
+
 static int contains(const char *arg, const char *cmpstr)
 {
-	if (strcmp(arg, cmpstr) == 0)
+	if (strcmp(arg, cmpstr) == 0) {
 		return 1;
-	if (arg[0] == '-' && arg[1] == '-' &&
-	    strcmp(arg+2, cmpstr) == 0)
+	}
+
+	if (*arg++ != '-') {
+		return 0;
+	}
+	if (*arg++ != '-') {
+		return 0;
+	}
+	if (strcmp(arg, cmpstr) == 0) {
 		return 1;
+	}
+
 	return 0;
 }
 
@@ -287,22 +309,25 @@ int main_cmd(struct hdhomerun_control_sock_t *control_sock, int argc, char *argv
 
 int main(int argc, char *argv[])
 {
-	appname = argv[0];
+	extract_appname(argv[0]);
 
 	argv++;
 	argc--;
 
-	if (argc < 1) {
+	if (argc == 0) {
 		return help();
+	}
+	int i;
+	for (i = 0; i < argc; i++) {
+		if (contains(argv[i], "help")) {
+			return help();
+		}
 	}
 
 	char *id_str = *argv++; argc--;
 	if (contains(id_str, "discover")) {
 		return discover_print();
 	}
-        if (contains(id_str, "help")) {
-		return help();
-        }
 
 	struct hdhomerun_control_sock_t *control_sock = create_control_sock(id_str);
 	if (!control_sock) {

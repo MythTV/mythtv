@@ -37,7 +37,7 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
     bool valid;
     _device_id = device.toUInt(&valid, 16);
 
-    if (!valid)
+    if (!valid || !hdhomerun_discover_validate_device_id(_device_id))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid DeviceID '%1'")
                 .arg(device));
