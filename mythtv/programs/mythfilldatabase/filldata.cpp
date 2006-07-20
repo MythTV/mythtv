@@ -862,7 +862,8 @@ bool DataDirectUpdateChannels(Source source)
     ddprocessor.SetUserID(source.userid);
     ddprocessor.SetPassword(source.password);
 
-    bool ok    = ddprocessor.GrabFullLineup(source.lineupid, true, true);
+    bool ok    = ddprocessor.GrabFullLineup(
+        source.lineupid, true, SourceUtil::IsAnalog(source.id));
     logged_in  = source.userid;
     raw_lineup = source.id;
 
