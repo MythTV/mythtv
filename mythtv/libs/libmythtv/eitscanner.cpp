@@ -141,7 +141,7 @@ void EITScanner::RunEventLoop(void)
             eitHelper->PruneCache(activeScanNextTrig.toTime_t() - 86400);
         }
 
-        exitThreadCond.wait(200); // sleep up to 200 ms.
+        exitThreadCond.wait(400); // sleep up to 400 ms.
     }
 }
 
