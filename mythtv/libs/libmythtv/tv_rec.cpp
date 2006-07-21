@@ -3285,7 +3285,13 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
             sd = GetDTVSignalMonitor()->GetStreamData();
         TeardownSignalMonitor();
         ClearFlags(kFlagSignalMonitorRunning);
-        //delete sd; // <- causes segfault
+
+        // Delete StreamData if it is not in use by the recorder.
+        MPEGStreamData *rec_sd = NULL;
+        if (GetDTVRecorder())
+            rec_sd = GetDTVRecorder()->GetStreamData();
+        if (sd && (sd != rec_sd))
+            delete sd;
     }
     if (HasFlags(kFlagWaitingForSignal))
         ClearFlags(kFlagWaitingForSignal);
