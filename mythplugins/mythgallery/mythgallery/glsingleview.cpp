@@ -146,9 +146,9 @@ QString GLTexture::GetDescription(void) const
     if (!item)
         return QString::null;
 
-    QFileInfo fi(item->path);
+    QFileInfo fi(item->GetPath());
 
-    QString info = item->name;
+    QString info = item->GetName();
     info += "\n\n" + GLSingleView::tr("Folder: ") + fi.dir().dirName();
     info += "\n" + GLSingleView::tr("Created: ") + fi.created().toString();
     info += "\n" + GLSingleView::tr("Modified: ") +
@@ -230,11 +230,11 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     while (item)
     {
         ThumbItem* next = m_itemList.next();
-        if (item->isDir)
+        if (item->IsDir())
         {
             if (recurse)
             {
-                GalleryUtil::loadDirectory(m_itemList, item->path, sortorder,
+                GalleryUtil::LoadDirectory(m_itemList, item->GetPath(), sortorder,
                                            recurse, NULL, NULL);
             }
             m_itemList.remove(item);
@@ -395,7 +395,7 @@ void GLSingleView::paintGL(void)
         {
             m_movieState = 2;
             ThumbItem* item = m_itemList.at(m_pos);
-            QString path = QString("\"") + item->path + "\"";
+            QString path = QString("\"") + item->GetPath() + "\"";
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
             cmd.replace("%s", path);
             myth_system(cmd);
@@ -590,15 +590,12 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         else if (action == "DELETE")
         {
             ThumbItem *item = m_itemList.at(m_pos);
-            if (item && GalleryUtil::Delete(item->path))
+            if (item && GalleryUtil::Delete(item->GetPath()))
             {
                 m_zoom = 1.0f;
                 m_sx   = 0;
                 m_sy   = 0;
-                // Delete thumbnail for this
-                if (item->pixmap)
-                    delete item->pixmap;
-                item->pixmap = 0;
+                item->SetPixmap(NULL);
                 advanceFrame();
                 loadImage();
             }
@@ -688,7 +685,7 @@ void GLSingleView::advanceFrame(void)
         item = m_itemList.at(m_pos);
         if (item)
         {
-            if (QFile::exists(item->path))
+            if (QFile::exists(item->GetPath()))
             {
                 break;
             }
@@ -717,7 +714,7 @@ void GLSingleView::retreatFrame(void)
         item = m_itemList.at(m_pos);
         if (item)
         {
-            if (QFile::exists(item->path))
+            if (QFile::exists(item->GetPath()))
             {
                 break;
             }
@@ -743,13 +740,13 @@ void GLSingleView::loadImage(void)
         return;
     }
 
-    if (GalleryUtil::isMovie(item->path))
+    if (GalleryUtil::isMovie(item->GetPath()))
     {
         m_movieState = 1;
         return;
     }
 
-    QImage image(item->path);
+    QImage image(item->GetPath());
     if (image.isNull())
         return;
 
@@ -758,7 +755,7 @@ void GLSingleView::loadImage(void)
     {
         QPtrList<LCDTextItem> textItems;
         textItems.setAutoDelete(true);
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->name,
+        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->GetName(),
                                          "Generic", true));
         QString tmp = QString::number(m_pos + 1) + " / " +
             QString::number(m_itemList.count());
@@ -784,14 +781,7 @@ void GLSingleView::Rotate(int angle)
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item)
-    {
         item->SetRotationAngle(ang);
-
-        // Delete thumbnail for this
-        if (item->pixmap)
-            delete item->pixmap;
-        item->pixmap = 0;
-    }
 
     m_texItem[m_curr].SwapWidthHeight();
     m_texItem[m_curr].ScaleTo(m_screenSize);

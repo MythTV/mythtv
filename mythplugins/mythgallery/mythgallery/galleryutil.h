@@ -20,20 +20,22 @@
 #ifndef EXIFUTIL_H
 #define EXIFUTIL_H
 
+#include <qfileinfo.h>
+
 #include "iconview.h"
 
 class GalleryUtil
 {
  public:
-    static bool isImage(const char* filePath);
-    static bool isMovie(const char* filePath);
-    static long getNaturalRotation(const char* filePath);
+    static bool isImage(const char *filePath);
+    static bool isMovie(const char *filePath);
+    static long GetNaturalRotation(const char *filePath);
 
-    static QString getCaption(const QString &filePath);
+    static QString GetCaption(const QString &filePath);
 
-    static bool loadDirectory(ThumbList& itemList, const QString& dir,
+    static bool LoadDirectory(ThumbList &itemList, const QString &dir,
                               int sortorder, bool recurse,
-                              ThumbDict *itemDict, ThumbGenerator* thumbGen);
+                              ThumbDict *itemDict, ThumbGenerator *thumbGen);
 
     static bool CopyMove(const QFileInfo &src, QFileInfo &dst, bool move)
         { if (move) return Move(src, dst); else return Copy(src, dst); }

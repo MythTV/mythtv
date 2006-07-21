@@ -55,7 +55,7 @@ bool GalleryUtil::isMovie(const char* filePath)
     return !fi.isDir() && MOVIE_FILENAMES.find(fi.extension()) != -1;
 }
 
-long GalleryUtil::getNaturalRotation(const char* filePath)
+long GalleryUtil::GetNaturalRotation(const char* filePath)
 {
     long rotateAngle = 0;
 
@@ -137,7 +137,7 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
     return rotateAngle;
 }
 
-bool GalleryUtil::loadDirectory(ThumbList& itemList, const QString& dir,
+bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                                 int sortorder, bool recurse,
                                 ThumbDict *itemDict, ThumbGenerator* thumbGen)
 {
@@ -188,24 +188,23 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList, const QString& dir,
 
         if (fi->isDir() && recurse) 
         {
-            GalleryUtil::loadDirectory(
+            GalleryUtil::LoadDirectory(
                 itemList, QDir::cleanDirPath(fi->absFilePath()),
                 sortorder, true, itemDict, thumbGen);
         }
         else 
         {
-            ThumbItem* item = new ThumbItem;
-            item->name      = fi->fileName();
-            item->path      = QDir::cleanDirPath(fi->absFilePath());
-            item->isDir     = fi->isDir();
+            ThumbItem *item = new ThumbItem(
+                fi->fileName(),
+                QDir::cleanDirPath(fi->absFilePath()), fi->isDir());
 
             itemList.append(item);
 
             if (itemDict)
-                itemDict->insert(item->name, item);
+                itemDict->insert(item->GetName(), item);
 
             if (thumbGen)
-                thumbGen->addFile(item->name);
+                thumbGen->addFile(item->GetName());
         }
     }
 
@@ -217,7 +216,7 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList, const QString& dir,
     return isGallery;
 }
 
-QString GalleryUtil::getCaption(const QString& filePath)
+QString GalleryUtil::GetCaption(const QString &filePath)
 {
     QString caption("");
 

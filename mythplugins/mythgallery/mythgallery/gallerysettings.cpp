@@ -74,7 +74,7 @@ static HostLineEdit *MythGalleryImportDirs()
     return gc;
 };
 
-#ifdef OPENGL_SUPPORT
+#ifdef USING_OPENGL
 
 static HostCheckBox *SlideshowUseOpenGL()
 {
@@ -114,7 +114,7 @@ static HostSpinBox *SlideshowOpenGLTransitionLength()
     return gc;
 };
 
-#endif /* OPENGL_SUPPORT */
+#endif /* USING_OPENGL */
 
 static HostComboBox *SlideshowTransition()
 {
@@ -187,7 +187,7 @@ public:
         addChild(MythGalleryImportDirs());
         addChild(MythGalleryMoviePlayerCmd());
 
-#ifdef OPENGL_SUPPORT
+#ifdef USING_OPENGL
         
         HostCheckBox* useOpenGL = SlideshowUseOpenGL();
         addChild(useOpenGL);

@@ -51,10 +51,11 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     ThumbItem* item = m_itemList.first();
     while (item) {
         ThumbItem* next = m_itemList.next();
-        if (item->isDir) {
+        if (item->IsDir())
+        {
             if (recurse)
-                GalleryUtil::loadDirectory(m_itemList, item->path, sortorder,
-                                           recurse, NULL, NULL);
+                GalleryUtil::LoadDirectory(m_itemList, item->GetPath(),
+                                           sortorder, recurse, NULL, NULL);
             m_itemList.remove(item);
         }
         item = next;
@@ -192,7 +193,7 @@ void SingleView::paintEvent(QPaintEvent *)
         {
             m_movieState = 2;
             ThumbItem* item = m_itemList.at(m_pos);
-            QString path = QString("\"") + item->path + "\"";
+            QString path = QString("\"") + item->GetPath() + "\"";
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
             cmd.replace("%s", path);
             myth_system(cmd);
@@ -221,11 +222,11 @@ void SingleView::paintEvent(QPaintEvent *)
             if(m_showcaption && !m_ctimer->isActive())
             {
                 ThumbItem* item = m_itemList.at(m_pos);
-                if(item->caption == "")
-                    item->caption = GalleryUtil::getCaption(item->path);
+                if (!item->HasCaption())
+                    item->SetCaption(GalleryUtil::GetCaption(item->GetPath()));
 
-                if(item->caption != "") {
-
+                if (item->HasCaption())
+                {
                     // Store actual background to restore later
                     bitBlt(m_captionbackup, 0, 0, &pix,
                            0, screenheight - 100, screenwidth, 100);
@@ -238,7 +239,7 @@ void SingleView::paintEvent(QPaintEvent *)
                     QPainter p(&pix, this);
                     p.drawText(0, screenheight - 100,
                                screenwidth, 100,
-                               Qt::AlignCenter, item->caption);
+                               Qt::AlignCenter, item->GetCaption());
                     p.end();
 
                     m_ctimer->start(m_showcaption * 1000, true);
@@ -263,8 +264,8 @@ void SingleView::paintEvent(QPaintEvent *)
 
                 QPainter p(&pix, this);
                 ThumbItem* item = m_itemList.at(m_pos);
-                QFileInfo fi(item->path);
-                QString info(item->name);
+                QFileInfo fi(item->GetPath());
+                QString info(item->GetName());
                 info += "\n\n" + tr("Folder: ") + fi.dir().dirName();
                 info += "\n" + tr("Created: ") + fi.created().toString();
                 info += "\n" + tr("Modified: ") + fi.lastModified().toString();
@@ -456,15 +457,12 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         else if (action == "DELETE")
         {
             ThumbItem *item = m_itemList.at(m_pos);
-            if (item && GalleryUtil::Delete(item->path))
+            if (item && GalleryUtil::Delete(item->GetPath()))
             {
                 m_zoom = 1.0;
                 m_sx   = 0;
                 m_sy   = 0;
-                // Delete thumbnail for this
-                if (item->pixmap)
-                    delete item->pixmap;
-                item->pixmap = 0;
+                item->SetPixmap(NULL);
                 advanceFrame();
                 loadImage();
             }
@@ -508,7 +506,7 @@ void SingleView::advanceFrame()
         m_pos = m_sequence->next();
         item = m_itemList.at(m_pos);
         if( item ) {
-            if( QFile::exists(item->path) ) {
+            if( QFile::exists(item->GetPath()) ) {
                 break;
             }
         }
@@ -528,7 +526,7 @@ void SingleView::retreatFrame()
         m_pos = m_sequence->prev();
         item = m_itemList.at(m_pos);
         if( item ) { 
-            if( QFile::exists(item->path) ) {
+            if( QFile::exists(item->GetPath()) ) {
                 break;
             }
         }
@@ -549,11 +547,11 @@ void SingleView::loadImage()
     
     ThumbItem *item = m_itemList.at(m_pos);
     if (item) {
-      if (GalleryUtil::isMovie(item->path)) {
+      if (GalleryUtil::isMovie(item->GetPath())) {
         m_movieState = 1;
       }
       else {
-        m_image.load(item->path);
+        m_image.load(item->GetPath());
         
         if (!m_image.isNull()) {
 
@@ -574,7 +572,8 @@ void SingleView::loadImage()
       {
           QPtrList<LCDTextItem> textItems;
           textItems.setAutoDelete(true);
-          textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->name, "Generic", true));
+          textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->GetName(),
+                                           "Generic", true));
           textItems.append(new LCDTextItem(2, ALIGN_CENTERED, QString::number(m_pos + 1) + 
                   " / " + QString::number(m_itemList.count()), "Generic", false));
           lcd->switchToGeneric(&textItems);
@@ -582,7 +581,7 @@ void SingleView::loadImage()
     }
     else {
       std::cerr << "SingleView: Failed to load image "
-        << item->path << std::endl;
+        << item->GetPath() << std::endl;
     }
 }
 
@@ -595,14 +594,8 @@ void SingleView::rotate(int angle)
         m_rotateAngle += 360;
 
     ThumbItem *item = m_itemList.at(m_pos);
-    if (item) {
+    if (item)
         item->SetRotationAngle(m_rotateAngle);
-
-        // Delete thumbnail for this
-        if (item->pixmap)
-            delete item->pixmap;
-        item->pixmap = 0;
-    }
     
     if (!m_image.isNull()) {
         QWMatrix matrix;

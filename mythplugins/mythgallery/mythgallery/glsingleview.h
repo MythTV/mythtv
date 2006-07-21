@@ -21,6 +21,7 @@
 
 #ifndef GLSINGLEVIEW_H
 #define GLSINGLEVIEW_H
+#ifdef USING_OPENGL
 
 #include <qgl.h>
 #include <qmap.h>
@@ -191,4 +192,5 @@ class GLSingleView : public QGLWidget
     void slotTimeOut(void);
 };
 
-#endif /* GLSINGLEVIEW_H */
+#endif // USING_OPENGL
+#endif // GLSINGLEVIEW_H
