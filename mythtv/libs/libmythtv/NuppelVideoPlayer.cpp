@@ -4447,21 +4447,19 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 
     QString text = "";
 
-    int fps = (int)ceil(video_frame_rate);
-
     switch (seekamountpos)
     {
         case 0: text = QObject::tr("cut point"); seekamount = -2; break;
         case 1: text = QObject::tr("keyframe"); seekamount = -1; break;
         case 2: text = QObject::tr("1 frame"); seekamount = 1; break;
-        case 3: text = QObject::tr("0.5 seconds"); seekamount = fps / 2; break;
-        case 4: text = QObject::tr("1 second"); seekamount = fps; break;
-        case 5: text = QObject::tr("5 seconds"); seekamount = fps * 5; break;
-        case 6: text = QObject::tr("20 seconds"); seekamount = fps * 20; break;
-        case 7: text = QObject::tr("1 minute"); seekamount = fps * 60; break;
-        case 8: text = QObject::tr("5 minutes"); seekamount = fps * 300; break;
-        case 9: text = QObject::tr("10 minutes"); seekamount = fps * 600; break;
-        default: text = QObject::tr("error"); seekamount = fps; break;
+        case 3: text = QObject::tr("0.5 seconds"); seekamount = (int)roundf(video_frame_rate / 2); break;
+        case 4: text = QObject::tr("1 second"); seekamount = (int)roundf(video_frame_rate); break;
+        case 5: text = QObject::tr("5 seconds"); seekamount = (int)roundf(video_frame_rate * 5); break;
+        case 6: text = QObject::tr("20 seconds"); seekamount = (int)roundf(video_frame_rate * 20); break;
+        case 7: text = QObject::tr("1 minute"); seekamount = (int)roundf(video_frame_rate * 60); break;
+        case 8: text = QObject::tr("5 minutes"); seekamount = (int)roundf(video_frame_rate * 300); break;
+        case 9: text = QObject::tr("10 minutes"); seekamount = (int)roundf(video_frame_rate * 600); break;
+        default: text = QObject::tr("error"); seekamount = (int)roundf(video_frame_rate); break;
     }
 
     QMap<QString, QString> infoMap;
@@ -4471,22 +4469,19 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 
 void NuppelVideoPlayer::UpdateTimeDisplay(void)
 {
-    int hours = 0;
-    int mins = 0;
-    int secs = 0;
-    int frames = 0;
+    int secs, frames, ss, mm, hh;
 
-    int fps = (int)ceil(video_frame_rate);
+    secs = (int)(framesPlayed / video_frame_rate);
+    frames = framesPlayed - (int)(secs * video_frame_rate);
 
-    hours = (framesPlayed / fps) / 60 / 60;
-    mins = (framesPlayed / fps) / 60 - (hours * 60);
-    secs = (framesPlayed / fps) - (mins * 60) - (hours * 60 * 60);
-    frames = framesPlayed - ((secs * fps) + (mins * 60 * fps) +
-                             (hours * 60 * 60 * fps));
+    ss = secs;
+    mm = ss / 60;
+    ss %= 60;
+    hh = mm / 60;
+    mm %= 60;
 
     char timestr[128];
-    sprintf(timestr, "%1d:%02d:%02d.%02d",
-        hours, mins, secs, frames);
+    sprintf(timestr, "%d:%02d:%02d.%02d", hh, mm, ss, frames);
 
     char framestr[128];
     sprintf(framestr, "%lld", framesPlayed);
