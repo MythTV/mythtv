@@ -34,23 +34,76 @@
 #include "constants.h"
 #include "galleryutil.h"
 
-SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
-                       int sortorder, MythMainWindow *parent, const char *name)
-    : MythDialog(parent, name)
-{
-    m_itemList  = itemList;
-    m_pos       = pos;
-    m_slideShow = slideShow;
+template<typename T> T sq(T val) { return val * val; }
 
+SingleView::SingleView(
+    ThumbList       itemList,  int pos,
+    int             slideShow, int sortorder,
+    MythMainWindow *parent,
+    const char *name)
+    : MythDialog(parent, name),
+      m_pos(pos),
+      m_itemList(itemList),
+
+      m_movieState(0),
+      m_pixmap(NULL),
+
+      m_rotateAngle(0),
+      m_zoom(1.0f),
+      m_source_loc(0,0),
+
+      m_info(false),
+      m_infoBgPix(NULL),
+
+      m_showcaption(false),
+      m_captionBgPix(NULL),
+      m_captionbackup(NULL),
+      m_ctimer(new QTimer(this)),
+
+      m_tmout(0),
+      m_delay(0),
+      m_effectRunning(false),
+      m_running(false),
+      m_slideShow(slideShow),
+      m_sstimer(new QTimer(this)),
+      m_effectPix(NULL),
+      m_painter(NULL),
+
+      m_effectMethod(NULL),
+      m_effectRandom(false),
+      m_sequence(NULL),
+
+      // Common effect state variables
+      m_effect_current_frame(0),
+      m_effect_subtype(0),
+      m_effect_bounds(0,0,0,0),
+      m_effect_delta0(0,0),
+      m_effect_delta1(0,0),
+      m_effect_i(0),
+      m_effect_j(0),
+      m_effect_framerate(0),
+      m_effect_delta2_x(0.0f),
+      m_effect_delta2_y(0.0f),
+      m_effect_alpha(0.0f),
+
+      // Unshared effect state variables
+      m_effect_spiral_tmp0(0,0),
+      m_effect_spiral_tmp1(0,0),
+      m_effect_multi_circle_out_delta_alpha(0.0f),
+      m_effect_milti_circle_out_points(4),
+      m_effect_circle_out_points(4)
+{
     // --------------------------------------------------------------------
 
     // remove all dirs from m_itemList;
     bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
 
     m_itemList.setAutoDelete(false);
-    ThumbItem* item = m_itemList.first();
-    while (item) {
-        ThumbItem* next = m_itemList.next();
+
+    ThumbItem *item = m_itemList.first();
+    while (item)
+    {
+        ThumbItem *next = m_itemList.next();
         if (item->IsDir())
         {
             if (recurse)
@@ -71,34 +124,32 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     
     // --------------------------------------------------------------------
 
-    registerEffects();
+    RegisterEffects();
     
-    m_effectMethod = 0;
-    m_effectRandom = false;
     QString transType = gContext->GetSetting("SlideshowTransition");
     if (!transType.isEmpty() && m_effectMap.contains(transType))
         m_effectMethod = m_effectMap[transType];
     
-    if (!m_effectMethod || transType == "random") {
-        m_effectMethod = getRandomEffect();
+    if (!m_effectMethod || transType == "random")
+    {
+        m_effectMethod = GetRandomEffect();
         m_effectRandom = true;
     }
 
     // ---------------------------------------------------------------
 
     m_delay = gContext->GetNumSetting("SlideshowDelay", 0);
-    if (!m_delay)
-        m_delay = 2;
+    m_delay = (!m_delay) ? 2 : m_delay;
+    m_tmout = m_delay * 1000;
 
     // ----------------------------------------------------------------
 
     m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
-    if(m_showcaption > m_delay)
-        m_showcaption = m_delay;
+    m_showcaption = min(m_delay, m_showcaption);
 
-    if(m_showcaption)
+    if (m_showcaption)
     {
-        m_captionBgPix = createBg(screenwidth, 100);
+        m_captionBgPix  = CreateBackground(QSize(screenwidth, 100));
         m_captionbackup = new QPixmap(screenwidth, 100);
     }
 
@@ -111,45 +162,26 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
 
     // --------------------------------------------------------------------
 
-    m_movieState  = 0;
-    m_pixmap      = 0;
-    m_rotateAngle = 0;
-    m_zoom        = 1;
-    m_sx          = 0;
-    m_sy          = 0;
-
-    m_info        = false;
-    m_infoBgPix   = 0;
-
-    // --------------------------------------------------------------------
-
-    m_tmout = m_delay * 1000;
-    m_effectRunning = false;
-    m_running = false;
-    m_i = 0;
-    m_effectPix = 0;
-    m_painter = 0;
-    m_sequence = 0;
-    mIntArray = 0;
-
-    m_sstimer = new QTimer(this);
     connect(m_sstimer, SIGNAL(timeout()), SLOT(slotSlideTimeOut()));
-
-    m_ctimer = new QTimer(this);
-    connect(m_ctimer, SIGNAL(timeout()), SLOT(slotCaptionTimeOut()));
+    connect(m_ctimer,  SIGNAL(timeout()), SLOT(slotCaptionTimeOut()));
 
     // --------------------------------------------------------------------
 
-    if(slideShow > 1)
+    if (slideShow > 1)
     {
         m_sequence = new SequenceShuffle(m_itemList.count());
         m_pos = 0;
     }
     else
+    {
         m_sequence = new SequenceInc(m_itemList.count());
+    }
+
     m_pos = m_sequence->index(m_pos);
-    loadImage();
-    if (slideShow) {
+    LoadImage();
+
+    if (slideShow)
+    {
         m_running = true;
         m_sstimer->start(m_tmout, true);
         gContext->DisableScreensaver();
@@ -158,28 +190,40 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
 
 SingleView::~SingleView()
 {
-    if (m_painter) {
+    if (m_painter)
+    {
         if (m_painter->isActive())
             m_painter->end();
+
         delete m_painter;
+        m_painter = NULL;
     }
 
     if (m_sequence)
+    {
         delete m_sequence;
+        m_sequence = NULL;
+    }
 
     if (m_pixmap)
+    {
         delete m_pixmap;
+        m_pixmap = NULL;
+    }
 
     if (m_effectPix)
+    {
         delete m_effectPix;
+        m_effectPix = NULL;
+    }
     
     if (m_infoBgPix)
+    {
         delete m_infoBgPix;
+        m_infoBgPix = NULL;
+    }
 
-    if (mIntArray)
-        delete [] mIntArray;
-
-    if (class LCD* lcd = LCD::Get())
+    if (class LCD *lcd = LCD::Get())
     {
         lcd->switchToTime();
     }
@@ -192,7 +236,7 @@ void SingleView::paintEvent(QPaintEvent *)
         if (m_movieState == 1)
         {
             m_movieState = 2;
-            ThumbItem* item = m_itemList.at(m_pos);
+            ThumbItem *item = m_itemList.at(m_pos);
             QString path = QString("\"") + item->GetPath() + "\"";
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
             cmd.replace("%s", path);
@@ -203,42 +247,46 @@ void SingleView::paintEvent(QPaintEvent *)
             }
         }
     }
-    else if (!m_effectRunning) {
-        
+    else if (!m_effectRunning)
+    {
         QPixmap pix(screenwidth, screenheight);
         pix.fill(this, 0, 0);
 
-        if (m_pixmap) {
-
+        if (m_pixmap)
+        {
             if (m_pixmap->width() <= screenwidth &&
                 m_pixmap->height() <= screenheight)
-                bitBlt(&pix, (screenwidth-m_pixmap->width())/2,
-                       (screenheight-m_pixmap->height())/2,
-                       m_pixmap,0,0,-1,-1,Qt::CopyROP);
-            else
-                bitBlt(&pix, 0, 0, m_pixmap, m_sx, m_sy,
-                       pix.width(), pix.height());
-
-            if(m_showcaption && !m_ctimer->isActive())
             {
-                ThumbItem* item = m_itemList.at(m_pos);
+                bitBlt(&pix,
+                       (screenwidth  - m_pixmap->width())  >> 1,
+                       (screenheight - m_pixmap->height()) >> 1,
+                       m_pixmap,0,0,-1,-1,Qt::CopyROP);
+            }
+            else
+            {
+                bitBlt(&pix, QPoint(0, 0),
+                       m_pixmap, QRect(m_source_loc, pix.size()));
+            }
+
+            if (m_showcaption && !m_ctimer->isActive())
+            {
+                ThumbItem *item = m_itemList.at(m_pos);
                 if (!item->HasCaption())
                     item->SetCaption(GalleryUtil::GetCaption(item->GetPath()));
 
                 if (item->HasCaption())
                 {
                     // Store actual background to restore later
-                    bitBlt(m_captionbackup, 0, 0, &pix,
-                           0, screenheight - 100, screenwidth, 100);
+                    bitBlt(m_captionbackup, QPoint(0, 0), &pix,
+                           QRect(0, screenheight - 100, screenwidth, 100));
 
                     // Blit semi-transparent background into place
-                    bitBlt(&pix, 0, screenheight - 100, m_captionBgPix,
-                           0, 0, screenwidth, 100);
+                    bitBlt(&pix, QPoint(0, screenheight - 100),
+                           m_captionBgPix, QRect(0, 0, screenwidth, 100));
 
                     // Draw caption
                     QPainter p(&pix, this);
-                    p.drawText(0, screenheight - 100,
-                               screenwidth, 100,
+                    p.drawText(0, screenheight - 100, screenwidth, 100,
                                Qt::AlignCenter, item->GetCaption());
                     p.end();
 
@@ -246,57 +294,75 @@ void SingleView::paintEvent(QPaintEvent *)
                 }
             }
 
-            if (m_zoom != 1) {
+            if (m_zoom != 1.0f)
+            {
                 QPainter p(&pix, this);
                 p.drawText(screenwidth / 10, screenheight / 10,
                            QString::number(m_zoom) + "x Zoom");
                 p.end();
             }
 
-            if (m_info) {
+            if (m_info)
+            {
 
                 if (!m_infoBgPix)
-                    m_infoBgPix = createBg(screenwidth-2*screenwidth/10,
-                                           screenheight-2*screenheight/10);
+                {
+                    m_infoBgPix = CreateBackground(QSize(
+                        screenwidth  - 2 * screenwidth  / 10,
+                        screenheight - 2 * screenheight / 10));
+                }
 
-                bitBlt(&pix, screenwidth/10, screenheight/10,
-                       m_infoBgPix,0,0,-1,-1,Qt::CopyROP);
+                bitBlt(&pix, QPoint(screenwidth / 10, screenheight / 10),
+                       m_infoBgPix, QRect(0,0,-1,-1), Qt::CopyROP);
 
                 QPainter p(&pix, this);
-                ThumbItem* item = m_itemList.at(m_pos);
-                QFileInfo fi(item->GetPath());
-                QString info(item->GetName());
-                info += "\n\n" + tr("Folder: ") + fi.dir().dirName();
-                info += "\n" + tr("Created: ") + fi.created().toString();
-                info += "\n" + tr("Modified: ") + fi.lastModified().toString();
-                info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
-                info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
-                        .arg(m_image.width());
-                info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
-                        .arg(m_image.height());
-                info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
-                                       tr("megapixels"))
-                        .arg((float)m_image.width() * m_image.height() / 1000000,
-                             0, 'f', 2);
-                info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
-                                       tr("degrees")).arg(m_rotateAngle);
-                p.drawText(screenwidth/10 + (int)(10*wmult),
-                           screenheight/10 + (int)(10*hmult),
-                           m_infoBgPix->width()-2*(int)(10*wmult),
-                           m_infoBgPix->height()-2*(int)(10*hmult),
-                           Qt::AlignLeft, info);
+                ThumbItem *item = m_itemList.at(m_pos);
+                QString info = GetDescription(item, m_image.size());
+                if (!info.isEmpty())
+                {
+                    p.drawText(screenwidth  / 10 + (int)(10 * wmult),
+                               screenheight / 10 + (int)(10 * hmult),
+                               m_infoBgPix->width()  - 2 * (int)(10 * wmult),
+                               m_infoBgPix->height() - 2 * (int)(10 * hmult),
+                               Qt::AlignLeft, info);
+                }
                 p.end();
             }
 
         }
         
-        bitBlt(this,0,0,&pix,0,0,-1,-1,Qt::CopyROP);
-
+        bitBlt(this, QPoint(0,0), &pix, QRect(0,0,-1,-1), Qt::CopyROP);
     }
-    else {
+    else
+    {
         if (m_effectMethod)
             (this->*m_effectMethod)();
     }
+}
+
+QString SingleView::GetDescription(const ThumbItem *item, const QSize &sz)
+{
+    if (!item)
+        return QString::null;
+
+    QFileInfo fi(item->GetPath());
+
+    QString info = item->GetName();
+    info += "\n\n" + tr("Folder: ") + fi.dir().dirName();
+    info += "\n" + tr("Created: ") + fi.created().toString();
+    info += "\n" + tr("Modified: ") + fi.lastModified().toString();
+    info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
+    info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
+        .arg(sz.width());
+    info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
+        .arg(sz.height());
+    info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
+                           tr("megapixels"))
+        .arg((float)sz.width() * sz.height() / 1000000, 0, 'f', 2);
+    info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
+                           tr("degrees")).arg(m_rotateAngle);
+
+    return info;
 }
 
 void SingleView::keyPressEvent(QKeyEvent *e)
@@ -329,150 +395,137 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT" || action == "UP")
         {
-            m_rotateAngle = 0;
-            m_zoom = 1;
-            m_sx   = 0;
-            m_sy   = 0;
-            retreatFrame();
-            loadImage();
+            DisplayPrev(true, true);
         }
         else if (action == "RIGHT" || action == "DOWN")
         {
-            m_rotateAngle = 0;
-            m_zoom = 1;
-            m_sx   = 0;
-            m_sy   = 0;
-            advanceFrame();
-            loadImage();
+            DisplayNext(true, true);
         }
         else if (action == "ZOOMOUT")
         {
-            m_sx   = 0;
-            m_sy   = 0;
-            if (m_zoom > 0.5) {
-                m_zoom = m_zoom /2;
-                zoom();
-            }
+            m_source_loc = QPoint(0, 0);
+            if (m_zoom > 0.5f)
+                SetZoom(m_zoom * 0.5f);
             else
                 handled = false;
         }
         else if (action == "ZOOMIN")
         {
-            m_sx   = 0;
-            m_sy   = 0;
-            if (m_zoom < 4.0) {
-                m_zoom = m_zoom * 2;
-                zoom();
-            }
+            m_source_loc = QPoint(0, 0);
+            if (m_zoom < 4.0f)
+                SetZoom(m_zoom * 2.0f);
             else
                 handled = false;
         }
         else if (action == "FULLSIZE")
         {
-            m_sx = 0;
-            m_sy = 0;
-            if (m_zoom != 1) {
-                m_zoom = 1.0;
-                zoom();
-            }
+            m_source_loc = QPoint(0, 0);
+            if (m_zoom != 1.0f)
+                SetZoom(1.0f);
             else
                 handled = false;
         }
         else if (action == "SCROLLLEFT")
         {
-            if (m_zoom > 1.0) {
-                m_sx -= scrollX;
-                m_sx  = (m_sx < 0) ? 0 : m_sx;
+            if (m_zoom > 1.0f)
+            {
+                m_source_loc.setX(m_source_loc.x() - scrollX);
+                m_source_loc.setX(
+                    (m_source_loc.x() < 0) ? 0 : m_source_loc.x());
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLRIGHT")
         {
-            if (m_zoom > 1.0 && m_pixmap) {
-                m_sx += scrollX;
-                m_sx  = QMIN(m_sx, m_pixmap->width()-
-                             scrollX-screenwidth);
+            if (m_zoom > 1.0f && m_pixmap)
+            {
+                m_source_loc.setX(m_source_loc.x() + scrollX);
+                m_source_loc.setX(
+                    min(m_source_loc.x(),
+                        m_pixmap->width() - scrollX - screenwidth));
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLUP")
         {
-            if (m_zoom > 1.0 && m_pixmap) {
-                m_sy += scrollY;
-                m_sy  = QMIN(m_sy, m_pixmap->height()-
-                             scrollY-screenheight);
+            if (m_zoom > 1.0f && m_pixmap)
+            {
+                m_source_loc.setY(m_source_loc.y() + scrollY);
+                m_source_loc.setY( 
+                    min(m_source_loc.y(),
+                        m_pixmap->height() - scrollY - screenheight));
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLDOWN")
         {
-            if (m_zoom > 1.0) {
-                m_sy -= scrollY;
-                m_sy  = (m_sy < 0) ? 0 : m_sy;
+            if (m_zoom > 1.0f)
+            {
+                m_source_loc.setY(m_source_loc.y() - scrollY);
+                m_source_loc.setY(
+                    (m_source_loc.y() < 0) ? 0 : m_source_loc.y());
             }
             else
                 handled = false;
         }
         else if (action == "RECENTER")
         {
-            if (m_zoom > 1.0 && m_pixmap) {
-                m_sx = (m_pixmap->width()-screenwidth)/2;
-                m_sy = (m_pixmap->height()-screenheight)/2;
+            if (m_zoom > 1.0f && m_pixmap)
+            {
+                m_source_loc = QPoint(
+                    (m_pixmap->width()  - screenwidth)  >> 1,
+                    (m_pixmap->height() - screenheight) >> 1);
             }
             else
                 handled = false;
         }
         else if (action == "UPLEFT")
         {
-            if (m_zoom > 1.0) {
-                m_sx = m_sy = 0;
+            if (m_zoom > 1.0f)
+            {
+                m_source_loc = QPoint(0,0);
             }
             else
                 handled = false;
         }
         else if (action == "LOWRIGHT")
         {
-            if (m_zoom > 1.0 && m_pixmap) {
-                m_sx  = m_pixmap->width()-scrollX-screenwidth;
-                m_sy  = m_pixmap->height()-scrollY-screenheight;
+            if (m_zoom > 1.0f && m_pixmap)
+            {
+                m_source_loc = QPoint(
+                    m_pixmap->width()  - scrollX - screenwidth,
+                    m_pixmap->height() - scrollY - screenheight);
             }
             else
                 handled = false;
         }
         else if (action == "ROTRIGHT")
         {
-            m_sx = 0;
-            m_sy = 0;
-            rotate(90);
+            m_source_loc = QPoint(0, 0);
+            Rotate(90);
         }
         else if (action == "ROTLEFT")
         {
-            m_sx = 0;
-            m_sy = 0;
-            rotate(-90);
+            m_source_loc = QPoint(0, 0);
+            Rotate(-90);
         }
         else if (action == "DELETE")
         {
             ThumbItem *item = m_itemList.at(m_pos);
             if (item && GalleryUtil::Delete(item->GetPath()))
             {
-                m_zoom = 1.0;
-                m_sx   = 0;
-                m_sy   = 0;
                 item->SetPixmap(NULL);
-                advanceFrame();
-                loadImage();
+                DisplayNext(true, true);
             }
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
                  action == "RANDOMSHOW")
         {
-            m_sx   = 0;
-            m_sy   = 0;
-            m_zoom = 1.0;
+            m_source_loc = QPoint(0, 0);
+            m_zoom = 1.0f;
             m_rotateAngle = 0;
             m_running = !wasRunning;
         }
@@ -484,108 +537,156 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    if (m_running) {
+    if (m_running)
+    {
         m_sstimer->start(m_tmout, true);
         gContext->DisableScreensaver();
     }
 
-    if (handled) {
+    if (handled)
+    {
         update();
     }
-    else {
+    else
+    {
         MythDialog::keyPressEvent(e);
     }
 }
 
-void SingleView::advanceFrame()
+void SingleView::DisplayNext(bool reset, bool loadImage)
 {
-    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    if (reset)
+    {
+        m_rotateAngle = 0;
+        m_zoom = 1.0f;
+        m_source_loc = QPoint(0, 0);
+    }
+
+    // Search for next item that hasn't been deleted.
+    // Close viewer in none remain.
     ThumbItem *item;
     int oldpos = m_pos;
-    while( 1 ) {
+    while (true)
+    {
         m_pos = m_sequence->next();
         item = m_itemList.at(m_pos);
-        if( item ) {
-            if( QFile::exists(item->GetPath()) ) {
+        if (item)
+        {
+            if (QFile::exists(item->GetPath()))
+            {
                 break;
             }
         }
-        if( m_pos == oldpos ) {
+        if (m_pos == oldpos)
+        {
             // No valid items!!!
             reject();
         }
     }
+
+    if (loadImage)
+        LoadImage();
 }
 
-void SingleView::retreatFrame()
+void SingleView::DisplayPrev(bool reset, bool loadImage)
 {
-    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    if (reset)
+    {
+        m_rotateAngle = 0;
+        m_zoom = 1.0f;
+        m_source_loc = QPoint(0, 0);
+    }
+
+    // Search for next item that hasn't been deleted.
+    // Close viewer in none remain.
     ThumbItem *item;
     int oldpos = m_pos;
-    while( 1 ) {
+    while (true)
+    {
         m_pos = m_sequence->prev();
         item = m_itemList.at(m_pos);
-        if( item ) { 
-            if( QFile::exists(item->GetPath()) ) {
+        if (item)
+        { 
+            if (QFile::exists(item->GetPath()))
+            {
                 break;
             }
         }
-        if( m_pos == oldpos ) {
+        if (m_pos == oldpos)
+        {
             // No valid items!!!
             reject();
         }
     }
+
+    if (loadImage)
+        LoadImage();
 }
 
-void SingleView::loadImage()
+void SingleView::LoadImage(void)
 {
     m_movieState = 0;
-    if (m_pixmap) {
+    if (m_pixmap)
+    {
         delete m_pixmap;
         m_pixmap = 0;
     }
     
     ThumbItem *item = m_itemList.at(m_pos);
-    if (item) {
-      if (GalleryUtil::isMovie(item->GetPath())) {
-        m_movieState = 1;
-      }
-      else {
-        m_image.load(item->GetPath());
-        
-        if (!m_image.isNull()) {
-
-          m_rotateAngle = item->GetRotationAngle();
-          
-          if (m_rotateAngle != 0) {
-            QWMatrix matrix;
-            matrix.rotate(m_rotateAngle);
-            m_image = m_image.xForm(matrix);
-          }
-        
-          m_pixmap = new QPixmap(m_image.smoothScale(screenwidth, screenheight,
-                                 QImage::ScaleMin));
-          
+    if (item)
+    {
+        if (GalleryUtil::isMovie(item->GetPath()))
+        {
+            m_movieState = 1;
         }
-      }
-      if (class LCD* lcd = LCD::Get())
-      {
-          QPtrList<LCDTextItem> textItems;
-          textItems.setAutoDelete(true);
-          textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->GetName(),
-                                           "Generic", true));
-          textItems.append(new LCDTextItem(2, ALIGN_CENTERED, QString::number(m_pos + 1) + 
-                  " / " + QString::number(m_itemList.count()), "Generic", false));
-          lcd->switchToGeneric(&textItems);
-      }
+        else
+        {
+            m_image.load(item->GetPath());
+        
+            if (!m_image.isNull())
+            {
+
+                m_rotateAngle = item->GetRotationAngle();
+          
+                if (m_rotateAngle != 0)
+                {
+                    QWMatrix matrix;
+                    matrix.rotate(m_rotateAngle);
+                    m_image = m_image.xForm(matrix);
+                }
+        
+                m_pixmap = new QPixmap(
+                    m_image.smoothScale(screenwidth, screenheight,
+                                        QImage::ScaleMin));
+          
+            }
+        }
+
+        if (class LCD *lcd = LCD::Get())
+        {
+            QPtrList<LCDTextItem> textItems;
+            textItems.setAutoDelete(true);
+            textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                             item->GetName(),
+                                             "Generic", true));
+            textItems.append(new LCDTextItem(
+                                 2, ALIGN_CENTERED,
+                                 QString::number(m_pos + 1) + 
+                                 " / " +
+                                 QString::number(m_itemList.count()),
+                                 "Generic", false));
+
+            lcd->switchToGeneric(&textItems);
+        }
     }
-    else {
-      std::cerr << "SingleView: Failed to load image "
-        << item->GetPath() << std::endl;
+    else
+    {
+        std::cerr << "SingleView: Failed to load image "
+                  << item->GetPath() << std::endl;
     }
 }
 
-void SingleView::rotate(int angle)
+void SingleView::Rotate(int angle)
 {
     m_rotateAngle += angle;
     if (m_rotateAngle >= 360)
@@ -597,11 +698,13 @@ void SingleView::rotate(int angle)
     if (item)
         item->SetRotationAngle(m_rotateAngle);
     
-    if (!m_image.isNull()) {
+    if (!m_image.isNull())
+    {
         QWMatrix matrix;
         matrix.rotate(angle);
         m_image = m_image.xForm(matrix);
-        if (m_pixmap) {
+        if (m_pixmap)
+        {
             delete m_pixmap;
             m_pixmap = 0;
         }
@@ -611,23 +714,28 @@ void SingleView::rotate(int angle)
     }
 }
 
-void SingleView::zoom()
+void SingleView::SetZoom(float zoom)
 {
-    if (!m_image.isNull()) {
-        if (m_pixmap) {
-            delete m_pixmap;
-            m_pixmap = 0;
-        }
-        m_pixmap =
-            new QPixmap(m_image.smoothScale((int)(screenwidth*m_zoom),
-                                            (int)(screenheight*m_zoom),
-                                            QImage::ScaleMin));
+    m_zoom = zoom;
+
+    if (m_image.isNull())
+        return;
+
+    if (m_pixmap)
+    {
+        delete m_pixmap;
+        m_pixmap = 0;
     }
+
+    m_pixmap = new QPixmap(m_image.smoothScale(
+                               (int)(screenwidth  * m_zoom),
+                               (int)(screenheight * m_zoom),
+                               QImage::ScaleMin));
 }
 
-QPixmap *SingleView::createBg(int width, int height)
+QPixmap *SingleView::CreateBackground(const QSize &sz)
 {
-    QImage img(width, height, 32);
+    QImage img(sz.width(), sz.height(), 32);
     img.setAlphaBuffer(true);
 
     for (int y = 0; y < img.height(); y++) 
@@ -642,24 +750,24 @@ QPixmap *SingleView::createBg(int width, int height)
     return new QPixmap(img);
 }
 
-void SingleView::registerEffects()
+void SingleView::RegisterEffects(void)
 {
-    m_effectMap.insert("none", &SingleView::effectNone);
-    m_effectMap.insert("chess board", &SingleView::effectChessboard);
-    m_effectMap.insert("melt down", &SingleView::effectMeltdown);
-    m_effectMap.insert("sweep", &SingleView::effectSweep);
-    m_effectMap.insert("noise", &SingleView::effectNoise);
-    m_effectMap.insert("growing", &SingleView::effectGrowing);
-    m_effectMap.insert("incoming edges", &SingleView::effectIncomingEdges);
-    m_effectMap.insert("horizontal lines", &SingleView::effectHorizLines);
-    m_effectMap.insert("vertical lines", &SingleView::effectVertLines);
-    m_effectMap.insert("circle out", &SingleView::effectCircleOut);
-    m_effectMap.insert("multicircle out", &SingleView::effectMultiCircleOut);
-    m_effectMap.insert("spiral in", &SingleView::effectSpiralIn);
-    m_effectMap.insert("blobs", &SingleView::effectBlobs);
+    m_effectMap.insert("none",             &SingleView::EffectNone);
+    m_effectMap.insert("chess board",      &SingleView::EffectChessboard);
+    m_effectMap.insert("melt down",        &SingleView::EffectMeltdown);
+    m_effectMap.insert("sweep",            &SingleView::EffectSweep);
+    m_effectMap.insert("noise",            &SingleView::EffectNoise);
+    m_effectMap.insert("growing",          &SingleView::EffectGrowing);
+    m_effectMap.insert("incoming edges",   &SingleView::EffectIncomingEdges);
+    m_effectMap.insert("horizontal lines", &SingleView::EffectHorizLines);
+    m_effectMap.insert("vertical lines",   &SingleView::EffectVertLines);
+    m_effectMap.insert("circle out",       &SingleView::EffectCircleOut);
+    m_effectMap.insert("multicircle out",  &SingleView::EffectMultiCircleOut);
+    m_effectMap.insert("spiral in",        &SingleView::EffectSpiralIn);
+    m_effectMap.insert("blobs",            &SingleView::EffectBlobs);
 }
 
-SingleView::EffectMethod SingleView::getRandomEffect()
+SingleView::EffectMethod SingleView::GetRandomEffect(void)
 {
     QMap<QString,EffectMethod> tmpMap(m_effectMap);
     tmpMap.remove("none");
@@ -667,16 +775,17 @@ SingleView::EffectMethod SingleView::getRandomEffect()
     QStringList t = tmpMap.keys();
 
     int count = t.count();
-    int i = (int)((float)(count)*rand()/(RAND_MAX+1.0));
+    int i = (int) ( (float)(count) * rand() / (RAND_MAX + 1.0f) );
     QString key = t[i];
 
     return tmpMap[key];
 }
 
-void SingleView::startPainter()
+void SingleView::StartPainter(void)
 {
     if (!m_painter)
         m_painter = new QPainter();
+
     if (m_painter->isActive())
         m_painter->end();
 
@@ -689,7 +798,7 @@ void SingleView::startPainter()
     m_painter->setPen(Qt::NoPen);
 }
 
-void SingleView::createEffectPix()
+void SingleView::CreateEffectPixmap(void)
 {
     if (!m_effectPix) 
         m_effectPix = new QPixmap(screenwidth, screenheight);
@@ -697,13 +806,15 @@ void SingleView::createEffectPix()
     m_effectPix->fill(this, 0, 0);
 
     if (m_pixmap)
-        bitBlt(m_effectPix,
-               (m_effectPix->width()-m_pixmap->width())/2,
-               (m_effectPix->height()-m_pixmap->height())/2,
-               m_pixmap, 0, 0, -1, -1, Qt::CopyROP);
+    {
+        QPoint src_loc((m_effectPix->width()  - m_pixmap->width() ) >> 1,
+                       (m_effectPix->height() - m_pixmap->height()) >> 1);
+        bitBlt(m_effectPix, src_loc,
+               m_pixmap, QRect(0, 0, -1, -1), Qt::CopyROP);
+    }
 }
 
-void SingleView::effectNone()
+void SingleView::EffectNone(void)
 {
     m_effectRunning = false;
     m_tmout = -1;
@@ -711,23 +822,24 @@ void SingleView::effectNone()
     return;
 }
 
-void SingleView::effectChessboard()
+void SingleView::EffectChessboard(void)
 {
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        mw  = width();
-        mh  = height();
-        mdx = 8;              // width of one tile
-        mdy = 8;              // height of one tile
-        mj  = (mw+mdx-1)/mdx; // number of tiles
-        mx  = mj*mdx;         // shrinking x-offset from screen border
-        mix = 0;              // growing x-offset from screen border
-        miy = 0;              // 0 or mdy for growing tiling effect
-        my  = mj&1 ? 0 : mdy; // 0 or mdy for shrinking tiling effect
-        mwait = 800 / mj;     // timeout between effects
+        m_effect_delta0 = QPoint(8, 8);       // tile size
+        // m_effect_j = number of tiles
+        m_effect_j = (width() + m_effect_delta0.x() - 1) / m_effect_delta0.x();
+        m_effect_delta1 = QPoint(0, 0);       // growing offsets from screen border
+        m_effect_framerate = 800 / m_effect_j;
+
+        // x = shrinking x-offset from screen border
+        // y = 0 or tile size for shrinking tiling effect
+        m_effect_bounds = QRect(
+            m_effect_j * m_effect_delta0.x(), (m_effect_j & 1) ? 0 : m_effect_delta0.y(),
+            width(), height());
     }
 
-    if (mix >= mw)
+    if (m_effect_delta1.x() >= m_effect_bounds.width())
     {
         m_effectRunning = false;
         m_tmout = -1;
@@ -735,100 +847,116 @@ void SingleView::effectChessboard()
         return;
     }
 
-    mix += mdx;
-    mx  -= mdx;
-    miy = miy ? 0 : mdy;
-    my  = my ? 0 : mdy;
+    m_effect_delta1 = QPoint(m_effect_delta1.x() + m_effect_delta0.x(),
+                      (m_effect_delta1.y()) ? 0 : m_effect_delta0.y());
+    QPoint t = QPoint(m_effect_bounds.x() - m_effect_delta0.x(),
+                      (m_effect_bounds.y()) ? 0 : m_effect_delta0.y());
+    m_effect_bounds = QRect(t, m_effect_bounds.size());
 
-    for (int y=0; y<mw; y+=(mdy<<1))
+    for (int y = 0; y < m_effect_bounds.width(); y += (m_effect_delta0.y()<<1))
     {
-         bitBlt(this, mix, y+miy, m_effectPix, mix, y+miy,
-                mdx, mdy, Qt::CopyROP, true);
-         bitBlt(this, mx, y+my, m_effectPix, mx, y+my,
-                mdx, mdy, Qt::CopyROP, true);
+        QPoint src0(m_effect_delta1.x(), y + m_effect_delta1.y());
+        QRect  dst0(m_effect_delta1.x(), y + m_effect_delta1.y(),
+                    m_effect_delta0.x(), m_effect_delta0.y());
+        QPoint src1(m_effect_bounds.x(), y + m_effect_bounds.y());
+        QRect  dst1(m_effect_bounds.x(), y + m_effect_bounds.y(),
+                    m_effect_delta0.x(), m_effect_delta0.y());
+        bitBlt(this, src0, m_effectPix, dst0, Qt::CopyROP, true);
+        bitBlt(this, src1, m_effectPix, dst0, Qt::CopyROP, true);
     }
 
-    m_tmout = mwait;
+    m_tmout = m_effect_framerate;
 
-    m_i = 1;
+    m_effect_current_frame = 1;
 }
 
-void SingleView::effectSweep()
+void SingleView::EffectSweep(void)
 {
-    int w, h, x, y, i;
-
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        // subtype: 0=sweep right to left, 1=sweep left to right
-        //          2=sweep bottom to top, 3=sweep top to bottom
-        mSubType = rand() % 4;
-        mw  = width();
-        mh  = height();
-        mdx = (mSubType==1 ? 16 : -16);
-        mdy = (mSubType==3 ? 16 : -16);
-        mx  = (mSubType==1 ? 0 : mw);
-        my  = (mSubType==3 ? 0 : mh);
+        m_effect_subtype = rand() % 4;
+        m_effect_delta0 = QPoint(
+            (kSweepLeftToRight == m_effect_subtype) ? 16 : -16,
+            (kSweepTopToBottom == m_effect_subtype) ? 16 : -16);
+        m_effect_bounds = QRect(
+            (kSweepLeftToRight == m_effect_subtype) ? 0 : width(),
+            (kSweepTopToBottom == m_effect_subtype) ? 0 : height(),
+            width(), height());
     }
 
-    if (mSubType==0 || mSubType==1)
+    if (kSweepRightToLeft == m_effect_subtype ||
+        kSweepLeftToRight == m_effect_subtype)
     {
         // horizontal sweep
-        if ((mSubType==0 && mx < -64) ||
-            (mSubType==1 && mx > mw+64))
+        if ((kSweepRightToLeft == m_effect_subtype &&
+             m_effect_bounds.x() < -64) ||
+            (kSweepLeftToRight == m_effect_subtype &&
+             m_effect_bounds.x() > m_effect_bounds.width() + 64))
         {
             m_tmout = -1;
             m_effectRunning = false;
             update();
             return;
         }
-        for (w=2,i=4,x=mx; i>0; i--, w<<=1, x-=mdx)
+
+        int w, x, i;
+        for (w = 2, i = 4, x = m_effect_bounds.x(); i > 0;
+             i--, w <<= 1, x -= m_effect_delta0.x())
         {
-            bitBlt(this, x, 0, m_effectPix,
-                   x, 0, w, mh, Qt::CopyROP, true);
+            bitBlt(this, QPoint(x, 0),
+                   m_effectPix, QRect(x, 0, w, m_effect_bounds.height()),
+                   Qt::CopyROP, true);
         }
-        mx += mdx;
+
+        m_effect_bounds.moveLeft(m_effect_bounds.x() + m_effect_delta0.x());
     }
     else
     {
         // vertical sweep
-        if ((mSubType==2 && my < -64) ||
-            (mSubType==3 && my > mh+64))
+        if ((kSweepBottomToTop == m_effect_subtype &&
+             m_effect_bounds.y() < -64) ||
+            (kSweepTopToBottom == m_effect_subtype &&
+             m_effect_bounds.y() > m_effect_bounds.height() + 64))
         {
             m_tmout = -1;
             m_effectRunning = false;
             update();
             return;
         }
-        for (h=2,i=4,y=my; i>0; i--, h<<=1, y-=mdy)
+
+        int h, y, i;
+        for (h = 2, i = 4, y = m_effect_bounds.y(); i > 0;
+             i--, h <<= 1, y -= m_effect_delta0.y())
         {
-            bitBlt(this, 0, y, m_effectPix,
-                   0, y, mw, h, Qt::CopyROP, true);
+            bitBlt(this, QPoint(0, y), m_effectPix,
+                   QRect(0, y, m_effect_bounds.width(), h),
+                   Qt::CopyROP, true);
         }
-        my += mdy;
+
+        m_effect_bounds.moveTop(m_effect_bounds.y() + m_effect_delta0.y());
     }
 
     m_tmout = 20;
-    m_i = 1;
+    m_effect_current_frame = 1;
 }
 
-void SingleView::effectGrowing()
+void SingleView::EffectGrowing(void)
 {
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        mw = width();
-        mh = height();
-        mx = mw >> 1;
-        my = mh >> 1;
-        mi = 0;
-        mfx = mx / 100.0;
-        mfy = my / 100.0;
+        m_effect_bounds = QRect(width() >> 1, height() >> 1, width(), height());
+        m_effect_i = 0;
+        m_effect_delta2_x = m_effect_bounds.x() * 0.01f;
+        m_effect_delta2_y = m_effect_bounds.y() * 0.01f;
     }
 
-    mx = (mw>>1) - (int)(mi * mfx);
-    my = (mh>>1) - (int)(mi * mfy);
-    mi++;
+    m_effect_bounds.moveTopLeft(
+        QPoint((m_effect_bounds.width()  >> 1) - (int)(m_effect_i * m_effect_delta2_x),
+               (m_effect_bounds.height() >> 1) - (int)(m_effect_i * m_effect_delta2_y)));
 
-    if (mx<0 || my<0)
+    m_effect_i++;
+
+    if (m_effect_bounds.x() < 0 || m_effect_bounds.y() < 0)
     {
         m_tmout = -1;
         m_effectRunning = false;
@@ -836,26 +964,28 @@ void SingleView::effectGrowing()
         return;
     }
 
-    bitBlt(this, mx, my, m_effectPix, mx, my,
-           mw - (mx<<1), mh - (my<<1), Qt::CopyROP, true);
+    QSize dst_sz(m_effect_bounds.width()  - (m_effect_bounds.x() << 1),
+                 m_effect_bounds.height() - (m_effect_bounds.y() << 1));
+
+    bitBlt(this, m_effect_bounds.topLeft(),
+           m_effectPix, QRect(m_effect_bounds.topLeft(), dst_sz),
+           Qt::CopyROP, true);
 
     m_tmout = 20;
-    m_i     = 1;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectHorizLines()
+void SingleView::EffectHorizLines(void)
 {
-    static int iyPos[] = { 0, 4, 2, 6, 1, 5, 3, 7, -1 };
-    int y;
+    static const int iyPos[] = { 0, 4, 2, 6, 1, 5, 3, 7, -1 };
 
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        mw = width();
-        mh = height();
-        mi = 0;
+        m_effect_bounds.setSize(size());
+        m_effect_i = 0;
     }
 
-    if (iyPos[mi] < 0)
+    if (iyPos[m_effect_i] < 0)
     {
         m_tmout = -1;
         m_effectRunning = false;
@@ -863,104 +993,102 @@ void SingleView::effectHorizLines()
         return;
     }
 
-    for (y=iyPos[mi]; y<mh; y+=8)
+    for (int y = iyPos[m_effect_i]; y < m_effect_bounds.height(); y += 8)
     {
-        bitBlt(this, 0, y, m_effectPix,
-               0, y, mw, 1, Qt::CopyROP, true);
-    }
-
-    mi++;
-    
-    if (iyPos[mi] >= 0) {
-        m_tmout = 160;
-        m_i     = 1;
-    }
-    else {
-        m_tmout = -1;
-        m_effectRunning = false;
-        update();
-        return;
-    }        
-}
-
-void SingleView::effectVertLines()
-{
-    static int ixPos[] = { 0, 4, 2, 6, 1, 5, 3, 7, -1 };
-    int x;
-
-    if (m_i == 0)
-    {
-        mw = width();
-        mh = height();
-        mi = 0;
-    }
-
-    if (ixPos[mi] < 0)
-    {
-        m_tmout = -1;
-        m_effectRunning = false;
-        update();
-        return;
-    }
-
-    for (x=ixPos[mi]; x<mw; x+=8)
-    {
-        bitBlt(this, x, 0, m_effectPix,
-               x, 0, 1, mh, Qt::CopyROP, true);
-    }
-
-    mi++;
-    
-    if (ixPos[mi] >= 0) {
-        m_tmout = 160;
-        m_i     = 1;
-    }
-    else {
-        m_tmout = -1;
-        m_effectRunning = false;
-        update();
-        return;
-    }        
-}
-
-void SingleView::effectMeltdown()
-{
-    int i, x, y;
-    bool done;
-
-    if (m_i == 0)
-    {
-        if (mIntArray)
-            delete [] mIntArray;
-        mw = width();
-        mh = height();
-        mdx = 4;
-        mdy = 16;
-        mix = mw / mdx;
-        mIntArray = new int[mix];
-        for (i=mix-1; i>=0; i--)
-            mIntArray[i] = 0;
-    }
-
-    done = true;
-    for (i=0,x=0; i<mix; i++,x+=mdx)
-    {
-        y = mIntArray[i];
-        if (y >= mh)
-            continue;
-        done = false;
-        if ((rand()&15) < 6)
-            continue;
-        bitBlt(this, x, y, m_effectPix, x, y, mdx, mdy,
+        bitBlt(this, QPoint(0, y),
+               m_effectPix, QRect(0, y, m_effect_bounds.width(), 1),
                Qt::CopyROP, true);
-        mIntArray[i] += mdy;
+    }
+
+    m_effect_i++;
+    
+    if (iyPos[m_effect_i] >= 0)
+    {
+        m_tmout = 160;
+        m_effect_current_frame     = 1;
+    }
+    else
+    {
+        m_tmout = -1;
+        m_effectRunning = false;
+        update();
+        return;
+    }        
+}
+
+void SingleView::EffectVertLines(void)
+{
+    static const int ixPos[] = { 0, 4, 2, 6, 1, 5, 3, 7, -1 };
+
+    if (m_effect_current_frame == 0)
+    {
+        m_effect_bounds.setSize(size());
+        m_effect_i = 0;
+    }
+
+    if (ixPos[m_effect_i] < 0)
+    {
+        m_tmout = -1;
+        m_effectRunning = false;
+        update();
+        return;
+    }
+
+    for (int x = ixPos[m_effect_i]; x < m_effect_bounds.width(); x += 8)
+    {
+        bitBlt(this, QPoint(x, 0),
+               m_effectPix, QRect(x, 0, 1, m_effect_bounds.height()),
+               Qt::CopyROP, true);
+    }
+
+    m_effect_i++;
+    
+    if (ixPos[m_effect_i] >= 0)
+    {
+        m_tmout = 160;
+        m_effect_current_frame     = 1;
+    }
+    else
+    {
+        m_tmout = -1;
+        m_effectRunning = false;
+        update();
+        return;
+    }        
+}
+
+void SingleView::EffectMeltdown(void)
+{
+    if (m_effect_current_frame == 0)
+    {
+        m_effect_bounds.setSize(size());
+        m_effect_delta0 = QPoint(4, 16);
+        m_effect_delta1 = QPoint(m_effect_bounds.width() / m_effect_delta0.x(), 0);
+        m_effect_meltdown_y_disp.resize(m_effect_delta1.x());
+    }
+
+    int x = 0;
+    bool done = true;
+    for (int i = 0; i < m_effect_delta1.x(); i++, x += m_effect_delta0.x())
+    {
+        int y = m_effect_meltdown_y_disp[i];
+        if (y >= m_effect_bounds.height())
+            continue;
+
+        done = false;
+        if ((rand() & 0xF) < 6)
+            continue;
+
+        bitBlt(this, QPoint(x, y),
+               m_effectPix,
+               QRect(x, y, m_effect_delta0.x(), m_effect_delta0.y()),
+               Qt::CopyROP, true);
+
+        m_effect_meltdown_y_disp[i] += m_effect_delta0.y();
     }
 
     if (done)
     {
-        delete [] mIntArray;
-        mIntArray = 0;
-
         m_tmout = -1;
         m_effectRunning = false;
         update();
@@ -968,29 +1096,25 @@ void SingleView::effectMeltdown()
     }
 
     m_tmout = 15;
-    m_i     = 1;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectIncomingEdges()
+void SingleView::EffectIncomingEdges(void)
 {
-    int x1, y1;
-
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        mw = width();
-        mh = height();
-        mix = mw >> 1;
-        miy = mh >> 1;
-        mfx = mix / 100.0;
-        mfy = miy / 100.0;
-        mi = 0;
-        mSubType = rand() & 1;
+        m_effect_bounds.setSize(size());
+        m_effect_delta1 = QPoint(m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
+        m_effect_delta2_x = m_effect_delta1.x() * 0.01f;
+        m_effect_delta2_y = m_effect_delta1.y() * 0.01f;
+        m_effect_i = 0;
+        m_effect_subtype = rand() & 1;
     }
 
-    mx = (int)(mfx * mi);
-    my = (int)(mfy * mi);
+    m_effect_bounds.moveTopLeft(QPoint((int)(m_effect_delta2_x * m_effect_i),
+                                (int)(m_effect_delta2_y * m_effect_i)));
 
-    if (mx>mix || my>miy)
+    if (m_effect_bounds.x() > m_effect_delta1.x() || m_effect_bounds.y() > m_effect_delta1.y())
     {
         m_tmout = -1;
         m_effectRunning = false;
@@ -998,63 +1122,78 @@ void SingleView::effectIncomingEdges()
         return;
     }
 
-    x1 = mw - mx;
-    y1 = mh - my;
-    mi++;
+    int x1 = m_effect_bounds.width()  - m_effect_bounds.x();
+    int y1 = m_effect_bounds.height() - m_effect_bounds.y();
+    m_effect_i++;
 
-    if (mSubType)
+    if (kIncomingEdgesMoving == m_effect_subtype)
     {
         // moving image edges
-        bitBlt(this,  0,  0, m_effectPix, mix-mx, miy-my, mx, my,
+        bitBlt(this,  0,  0, m_effectPix,
+               m_effect_delta1.x() - m_effect_bounds.x(),
+               m_effect_delta1.y() - m_effect_bounds.y(),
+               m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this, x1,  0, m_effectPix, mix, miy-my, mx, my,
+        bitBlt(this, x1,  0, m_effectPix,
+               m_effect_delta1.x(), m_effect_delta1.y() - m_effect_bounds.y(),
+               m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this,  0, y1, m_effectPix, mix-mx, miy, mx, my,
+        bitBlt(this,  0, y1, m_effectPix,
+               m_effect_delta1.x() - m_effect_bounds.x(), m_effect_delta1.y(),
+               m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this, x1, y1, m_effectPix, mix, miy, mx, my,
+        bitBlt(this, x1, y1, m_effectPix,
+               m_effect_delta1.x(), m_effect_delta1.y(),
+               m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
     }
     else
     {
         // fixed image edges
-        bitBlt(this,  0,  0, m_effectPix,  0,  0, mx, my,
+        bitBlt(this,  0,  0,
+               m_effectPix, 0,   0, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this, x1,  0, m_effectPix, x1,  0, mx, my,
+        bitBlt(this, x1,  0,
+               m_effectPix, x1,  0, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this,  0, y1, m_effectPix,  0, y1, mx, my,
+        bitBlt(this,  0, y1,
+               m_effectPix,  0, y1, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this, x1, y1, m_effectPix, x1, y1, mx, my,
+        bitBlt(this, x1, y1,
+               m_effectPix, x1, y1, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
     }
 
     m_tmout = 20;
-    m_i     = 1;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectMultiCircleOut()
+void SingleView::EffectMultiCircleOut(void)
 {
     int x, y, i;
     double alpha;
-    static QPointArray pa(4);
 
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        startPainter();
-        mw = width();
-        mh = height();
-        mx = mw;
-        my = mh>>1;
-        pa.setPoint(0, mw>>1, mh>>1);
-        pa.setPoint(3, mw>>1, mh>>1);
-        mfy = sqrt((double)mw*mw + mh*mh) / 2;
-        mi  = rand()%15 + 2;
-        mfd = M_PI*2/mi;
-        mAlpha = mfd;
-        mwait = 10 * mi;
-        mfx = M_PI/32;  // divisor must be powers of 8
+        StartPainter();
+        m_effect_bounds = QRect(width(), height() >> 1,
+                         width(), height());
+
+        m_effect_milti_circle_out_points.setPoint(
+            0, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
+        m_effect_milti_circle_out_points.setPoint(
+            3, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
+
+        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f + 
+                           sq(m_effect_bounds.height()) * 0.5f);
+        m_effect_i = (rand() & 0xf) + 2;
+        m_effect_multi_circle_out_delta_alpha = M_PI * 2 / m_effect_i;
+        m_effect_alpha = m_effect_multi_circle_out_delta_alpha;
+        m_effect_framerate = 10 * m_effect_i;
+        m_effect_delta2_x = M_PI / 32;  // divisor must be powers of 8
     }
 
-    if (mAlpha < 0)
+    if (m_effect_alpha < 0)
     {
         m_painter->end();
 
@@ -1064,48 +1203,46 @@ void SingleView::effectMultiCircleOut()
         return;
     }
 
-    for (alpha=mAlpha, i=mi; i>=0; i--, alpha+=mfd)
+    for (alpha = m_effect_alpha, i = m_effect_i; i >= 0;
+         i--, alpha += m_effect_multi_circle_out_delta_alpha)
     {
-        x = (mw>>1) + (int)(mfy * cos(-alpha));
-        y = (mh>>1) + (int)(mfy * sin(-alpha));
+        x = (m_effect_bounds.width()  >> 1) + (int)(m_effect_delta2_y * cos(-alpha));
+        y = (m_effect_bounds.height() >> 1) + (int)(m_effect_delta2_y * sin(-alpha));
 
-        mx = (mw>>1) + (int)(mfy * cos(-alpha + mfx));
-        my = (mh>>1) + (int)(mfy * sin(-alpha + mfx));
+        m_effect_bounds.moveTopLeft(
+            QPoint((m_effect_bounds.width()  >> 1) +
+                   (int)(m_effect_delta2_y * cos(-alpha + m_effect_delta2_x)),
+                   (m_effect_bounds.height() >> 1) +
+                   (int)(m_effect_delta2_y * sin(-alpha + m_effect_delta2_x))));
 
-        pa.setPoint(1, x, y);
-        pa.setPoint(2, mx, my);
+        m_effect_milti_circle_out_points.setPoint(1, x, y);
+        m_effect_milti_circle_out_points.setPoint(2, m_effect_bounds.x(), m_effect_bounds.y());
 
-        m_painter->drawPolygon(pa);
+        m_painter->drawPolygon(m_effect_milti_circle_out_points);
     }
 
-    mAlpha -= mfx;
+    m_effect_alpha -= m_effect_delta2_x;
 
-    m_tmout = mwait;
-    m_i     = 1;
+    m_tmout = m_effect_framerate;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectSpiralIn()
+void SingleView::EffectSpiralIn(void)
 {
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        startPainter();
-        mw = width();
-        mh = height();
-        mix = mw / 8;
-        miy = mh / 8;
-        mx0 = 0;
-        mx1 = mw - mix;
-        my0 = miy;
-        my1 = mh - miy;
-        mdx = mix;
-        mdy = 0;
-        mi = 0;
-        mj = 16 * 16;
-        mx = 0;
-        my = 0;
+        StartPainter();
+        m_effect_delta0   = QPoint(width() >> 3, 0);
+        m_effect_delta1   = QPoint(width() >> 3, height() >> 3);
+        m_effect_i = 0;
+        m_effect_j = 16 * 16;
+        m_effect_bounds   = QRect(QPoint(0,0), size());
+        m_effect_spiral_tmp0 = QPoint(0, m_effect_delta1.y());
+        m_effect_spiral_tmp1 = QPoint(m_effect_bounds.width()  - m_effect_delta1.x(),
+                                      m_effect_bounds.height() - m_effect_delta1.y());
     }
 
-    if (mi==0 && mx0>=mx1)
+    if (m_effect_i == 0 && m_effect_spiral_tmp0.x() >= m_effect_spiral_tmp1.x())
     {
         m_painter->end();
 
@@ -1115,67 +1252,66 @@ void SingleView::effectSpiralIn()
         return;
     }
 
-    if (mi==0 && mx>=mx1) // switch to: down on right side
+    if (m_effect_i == 0 && m_effect_bounds.x() >= m_effect_spiral_tmp1.x())
     {
-        mi = 1;
-        mdx = 0;
-        mdy = miy;
-        mx1 -= mix;
+        // switch to: down on right side
+        m_effect_i = 1;
+        m_effect_delta0 = QPoint(0, m_effect_delta1.y());
+        m_effect_spiral_tmp1.setX(m_effect_spiral_tmp1.x() - m_effect_delta1.x());
     }
-    else if (mi==1 && my>=my1) // switch to: right to left on bottom
-                               // side
+    else if (m_effect_i == 1 && m_effect_bounds.y() >= m_effect_spiral_tmp1.y())
     {
-        mi = 2;
-        mdx = -mix;
-        mdy = 0;
-        my1 -= miy;
+        // switch to: right to left on bottom side
+        m_effect_i = 2;
+        m_effect_delta0 = QPoint(-m_effect_delta1.x(), 0);
+        m_effect_spiral_tmp1.setY(m_effect_spiral_tmp1.y() - m_effect_delta1.y());
     }
-    else if (mi==2 && mx<=mx0) // switch to: up on left side
+    else if (m_effect_i == 2 && m_effect_bounds.x() <= m_effect_spiral_tmp0.x())
     {
-        mi = 3;
-        mdx = 0;
-        mdy = -miy;
-        mx0 += mix;
+        // switch to: up on left side
+        m_effect_i = 3;
+        m_effect_delta0 = QPoint(0, -m_effect_delta1.y());
+        m_effect_spiral_tmp0.setX(m_effect_spiral_tmp0.x() + m_effect_delta1.x());
     }
-    else if (mi==3 && my<=my0) // switch to: left to right on top side
+    else if (m_effect_i == 3 && m_effect_bounds.y() <= m_effect_spiral_tmp0.y())
     {
-        mi = 0;
-        mdx = mix;
-        mdy = 0;
-        my0 += miy;
+        // switch to: left to right on top side
+        m_effect_i = 0;
+        m_effect_delta0 = QPoint(m_effect_delta1.x(), 0);
+        m_effect_spiral_tmp0.setY(m_effect_spiral_tmp0.y() + m_effect_delta1.y());
     }
 
-    bitBlt(this, mx, my, m_effectPix, mx, my, mix, miy,
+    bitBlt(this, m_effect_bounds.x(), m_effect_bounds.y(), m_effectPix,
+           m_effect_bounds.x(), m_effect_bounds.y(),
+           m_effect_delta1.x(), m_effect_delta1.y(),
            Qt::CopyROP, true);
 
-    mx += mdx;
-    my += mdy;
-    mj--;
+    m_effect_bounds.moveTopLeft(m_effect_bounds.topLeft() + m_effect_delta0);
+    m_effect_j--;
 
     m_tmout = 8;
-    m_i     = 1;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectCircleOut()
+void SingleView::EffectCircleOut(void)
 {
-    int x, y;
-    static QPointArray pa(4);
-
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        startPainter();
-        mw = width();
-        mh = height();
-        mx = mw;
-        my = mh>>1;
-        mAlpha = 2*M_PI;
-        pa.setPoint(0, mw>>1, mh>>1);
-        pa.setPoint(3, mw>>1, mh>>1);
-        mfx = M_PI/16;  // divisor must be powers of 8
-        mfy = sqrt((double)mw*mw + mh*mh) / 2;
+        StartPainter();
+        m_effect_bounds = QRect(QPoint(width(), height() >> 1), size());
+        m_effect_alpha = 2 * M_PI;
+
+        m_effect_circle_out_points.setPoint(
+            0, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
+        m_effect_circle_out_points.setPoint(
+            3, m_effect_bounds.width() >> 1, m_effect_bounds.height() >> 1);
+
+        m_effect_delta2_x = M_PI / 16;  // divisor must be powers of 8
+        m_effect_delta2_y = sqrtf(sq(m_effect_bounds.width())  * 1.0f +
+                           sq(m_effect_bounds.height()) * 0.5f);
     }
 
-    if (mAlpha < 0)
+    if (m_effect_alpha < 0)
     {
         m_painter->end();
         
@@ -1185,35 +1321,38 @@ void SingleView::effectCircleOut()
         return;
     }
 
-    x = mx;
-    y = my;
-    mx = (mw>>1) + (int)(mfy * cos(mAlpha));
-    my = (mh>>1) + (int)(mfy * sin(mAlpha));
-    mAlpha -= mfx;
+    QPoint tmp = m_effect_bounds.topLeft();
 
-    pa.setPoint(1, x, y);
-    pa.setPoint(2, mx, my);
+    m_effect_bounds.moveTopLeft(
+        QPoint((m_effect_bounds.width()  >> 1) +
+               (int)(m_effect_delta2_y * cos(m_effect_alpha)),
+               (m_effect_bounds.height() >> 1) +
+               (int)(m_effect_delta2_y * sin(m_effect_alpha))));
 
-    m_painter->drawPolygon(pa);
+    m_effect_alpha -= m_effect_delta2_x;
+
+    m_effect_circle_out_points.setPoint(1, tmp);
+    m_effect_circle_out_points.setPoint(2, m_effect_bounds.topLeft());
+
+    m_painter->drawPolygon(m_effect_circle_out_points);
 
     m_tmout = 20;
-    m_i     = 1;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectBlobs()
+void SingleView::EffectBlobs(void)
 {
     int r;
 
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        startPainter();
-        mAlpha = M_PI * 2;
-        mw = width();
-        mh = height();
-        mi = 150;
+        StartPainter();
+        m_effect_alpha = M_PI * 2;
+        m_effect_bounds.setSize(size());
+        m_effect_i = 150;
     }
 
-    if (mi <= 0)
+    if (m_effect_i <= 0)
     {
         m_painter->end();
 
@@ -1223,18 +1362,20 @@ void SingleView::effectBlobs()
         return;
     }
 
-    mx = rand() % mw;
-    my = rand() % mh;
+    m_effect_bounds.setTopLeft(QPoint(rand() % m_effect_bounds.width(),
+                               rand() % m_effect_bounds.height()));
+
     r = (rand() % 200) + 50;
 
-    m_painter->drawEllipse(mx-r, my-r, r, r);
-    mi--;
+    m_painter->drawEllipse(m_effect_bounds.x() - r,
+                           m_effect_bounds.y() - r, r, r);
+    m_effect_i--;
 
     m_tmout = 10;
-    m_i     = 1;
+    m_effect_current_frame     = 1;
 }
 
-void SingleView::effectNoise()
+void SingleView::EffectNoise(void)
 {
     int x, y, i, w, h, fact, sz;
 
@@ -1244,12 +1385,12 @@ void SingleView::effectNoise()
     h = height() >> fact;
     sz = 1 << fact;
 
-    for (i = (w*h)<<1; i > 0; i--)
+    for (i = (w * h) << 1; i > 0; i--)
     {
         x = (rand() % w) << fact;
         y = (rand() % h) << fact;
-        bitBlt(this, x, y, m_effectPix,
-               x, y, sz, sz, Qt::CopyROP, true);
+        bitBlt(this, QPoint(x, y),
+               m_effectPix, QRect(x, y, sz, sz), Qt::CopyROP, true);
     }
 
     m_tmout = -1;
@@ -1259,35 +1400,36 @@ void SingleView::effectNoise()
 }
 
 
-void SingleView::slotSlideTimeOut()
+void SingleView::slotSlideTimeOut(void)
 {
     bool wasMovie = false, isMovie = false;
-    if (!m_effectMethod) {
+    if (!m_effectMethod)
+    {
         std::cerr << "SingleView: No transition method"
                   << std::endl;
         return;
     }
 
-    if (!m_effectRunning) {
-
-        if (m_tmout == -1) {
-            // effect was running and is complete now
+    if (!m_effectRunning)
+    {
+        if (m_tmout == -1)
+        {
+            // wffect was running and is complete now
             // run timer while showing current image
             m_tmout = m_delay * 1000;
-            m_i = 0;
+            m_effect_current_frame = 0;
         }
-        else {
-
+        else
+        {
             // timed out after showing current image
             // load next image and start effect
-
             if (m_effectRandom)
-                m_effectMethod = getRandomEffect();
+                m_effectMethod = GetRandomEffect();
 
-            advanceFrame();
+            DisplayNext(false, false);
 
             wasMovie = m_movieState > 0;
-            loadImage();
+            LoadImage();
             isMovie = m_movieState > 0;
             // If transitioning to/from a movie, don't do an effect,
             // and shorten timeout
@@ -1295,27 +1437,30 @@ void SingleView::slotSlideTimeOut()
             {
                 m_tmout = 1;
             }
-            else {
-                createEffectPix();
+            else
+            {
+                CreateEffectPixmap();
                 m_effectRunning = true;
                 m_tmout = 10;
-                m_i = 0;
+                m_effect_current_frame = 0;
             }
-       }   
+        }   
     }
 
     update();
     m_sstimer->start(m_tmout, true);
+
     // If transitioning to/from a movie, no effect is running so 
     // next timeout should trigger proper immage delay.
-    if( wasMovie || isMovie ) {
+    if (wasMovie || isMovie)
+    {
         m_tmout = -1;
     }
 }
 
-void SingleView::slotCaptionTimeOut()
+void SingleView::slotCaptionTimeOut(void)
 {
     m_ctimer->stop();
-    bitBlt(this,0,screenheight - 100,m_captionbackup,0,0,-1,-1,Qt::CopyROP);
+    bitBlt(this, QPoint(0, screenheight - 100),
+           m_captionbackup, QRect(0,0,-1,-1), Qt::CopyROP);
 }
-
