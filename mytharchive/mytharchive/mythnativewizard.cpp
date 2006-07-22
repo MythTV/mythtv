@@ -497,13 +497,12 @@ void MythNativeWizard::updateArchiveList(void)
 
 vector<NativeItem *> *MythNativeWizard::getArchiveListFromDB(void)
 {
-    // for the moment we only know how to archive recordings
     vector<NativeItem*> *archiveList = new vector<NativeItem*>;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, type, title, subtitle, description, size, "
                   "startdate, starttime, filename, hascutlist "
-                  "FROM archiveitems WHERE type = 'Recording' "
+                  "FROM archiveitems WHERE type = 'Recording' OR type = 'Video' "
                   "ORDER BY title, subtitle");
     query.exec();
     if (query.isActive() && query.numRowsAffected())

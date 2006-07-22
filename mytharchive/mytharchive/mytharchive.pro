@@ -1,6 +1,6 @@
 include ( ../mythconfig.mak )
 include ( ../settings.pro )
-
+ 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
 TEMPLATE = lib opengl

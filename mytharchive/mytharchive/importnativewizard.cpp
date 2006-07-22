@@ -586,6 +586,51 @@ void ImportNativeWizard::loadXML(const QString &filename)
 
             m_isValidXMLSelected = true;
         }
+        else if (type == "video")
+        {
+            QDomNodeList nodeList = e.elementsByTagName("videometadata");
+            if (nodeList.count() < 1)
+            {
+                cout << "Couldn't find a 'videometadata' element in XML file" << endl;
+                return;
+            }
+
+            n = nodeList.item(0);
+            e = n.toElement();
+            n = e.firstChild();
+            while (!n.isNull())
+            {
+                e = n.toElement();
+                if (!e.isNull()) 
+                {
+                    if (e.tagName() == "title")
+                    {
+                        m_title_text->SetText(e.text());
+                        m_progTitle_text->SetText(e.text());
+                        m_subtitle_text->SetText("");
+                        m_starttime_text->SetText("");
+                        m_progDateTime_text->SetText("");
+                    }
+
+                    if (e.tagName() == "plot")
+                    {
+                        m_progDescription_text->SetText(e.text());
+                    }
+                }
+                n = n.nextSibling();
+            }
+
+            m_chanID_text->SetText("N/A");
+            m_chanNo_text->SetText("N/A");
+            m_chanName_text->SetText("N/A");
+            m_callsign_text->SetText("N/A");
+            m_localChanID_text->SetText("N/A");
+            m_localChanNo_text->SetText("N/A");
+            m_localChanName_text->SetText("N/A");
+            m_localCallsign_text->SetText("N/A");
+
+            m_isValidXMLSelected = true;
+        }
     }
     else
     {
