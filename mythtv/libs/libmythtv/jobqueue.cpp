@@ -1832,13 +1832,6 @@ void JobQueue::DoTranscodeThread(void)
         }
         else
         {
-            msg = QString("Transcode %1")
-                          .arg(StatusText(GetJobStatus(jobID)));
-
-            details = QString("%1%2: (%3)")
-                              .arg(program_info->title).arg(subtitle)
-                              .arg(transcoderName);
-
             if (status == JOB_FINISHED)
             {
                 retry = false;
@@ -1868,18 +1861,22 @@ void JobQueue::DoTranscodeThread(void)
                                       .arg(transcoderName);
                 }
 
-                VERBOSE(VB_GENERAL, LOC +
-                        QString("%1 for %2%3: %4 => %5 (%6)")
-                        .arg(msg).arg(program_info->title).arg(subtitle)
-                        .arg(PrettyPrint(origfilesize))
-                        .arg(PrettyPrint(filesize)).arg(transcoderName));
-
                 MythEvent me("RECORDING_LIST_CHANGE");
                 gContext->dispatch(me);
 
                 program_info->SetTranscoded(TRANSCODING_COMPLETE);
             }
+            else
+            {
+                ChangeJobStatus(jobID, JOB_ERRORED, QString("Trancode failed "
+                                "with status: %1").arg(result));
+                details = QString("%1%2: (%3)")
+                          .arg(program_info->title).arg(subtitle)
+                          .arg(transcoderName);
+            }
 
+            msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
+            VERBOSE(VB_GENERAL, LOC + msg + ": " + details);
             gContext->LogEntry("transcode", LP_NOTICE, msg, details);
         }
     }
