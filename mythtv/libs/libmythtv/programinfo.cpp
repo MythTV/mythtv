@@ -1132,7 +1132,7 @@ void ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QStri
     query.bindValue(":TITLE", newTitle.utf8());
     query.bindValue(":SUBTITLE", newSubtitle.utf8());
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":START", recstartts.toString("yyyyMMddhhmmss"));
 
     if (!query.exec())
         MythContext::DBError("RecTitle update", query);
