@@ -46,6 +46,7 @@ class ThreadedFileWriter
     bool            flush;
     bool            write_is_blocked;
     bool            in_dtor;
+    bool            ignore_writes;
     long long       tfw_min_write_size;
 
     // buffer position state

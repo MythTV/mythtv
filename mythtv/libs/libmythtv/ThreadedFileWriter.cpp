@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <signal.h>
 #include <fcntl.h>
 
 // MythTV headers
@@ -35,7 +36,7 @@ const uint ThreadedFileWriter::TFW_MIN_WRITE_SIZE = TFW_DEF_BUF_SIZE / 8;
  *   to the stream.
  */
 
-/** \fn safe_write(int, const void*, uint)
+/** \fn safe_write(int, const void*, uint, bool &ok)
  *  \brief Writes data to disk
  *
  *   This just uses the Standard C write() to write to disk.
@@ -46,7 +47,7 @@ const uint ThreadedFileWriter::TFW_MIN_WRITE_SIZE = TFW_DEF_BUF_SIZE / 8;
  *  \param data Pointer to data to write
  *  \param sz   Size of data to write in bytes
  */
-static uint safe_write(int fd, const void *data, uint sz)
+static uint safe_write(int fd, const void *data, uint sz, bool &ok)
 {
     int ret;
     uint tot = 0;
@@ -81,6 +82,7 @@ static uint safe_write(int fd, const void *data, uint sz)
             usleep(1000);
         }
     }
+    ok = (errcnt < 3);
     return tot;
 }
 
@@ -89,6 +91,7 @@ static uint safe_write(int fd, const void *data, uint sz)
  */
 void *ThreadedFileWriter::boot_writer(void *wotsit)
 {
+    signal(SIGXFSZ, SIG_IGN);
     ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
     fw->DiskLoop();
     return NULL;
@@ -114,7 +117,7 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     mode(pmode),                         fd(-1),
     // state
     no_writes(false),                    flush(false),
-    in_dtor(false),
+    in_dtor(false),                      ignore_writes(false),
     tfw_min_write_size(0),
     // buffer position state
     rpos(0),                             wpos(0),
@@ -130,6 +133,7 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
  */
 bool ThreadedFileWriter::Open(void)
 {
+    ignore_writes = false;
     fd = open(filename.ascii(), flags, mode);
 
     if (fd < 0)
@@ -362,17 +366,33 @@ void ThreadedFileWriter::DiskLoop(void)
            the 10% that was free... */
         size = (size > TFW_MAX_WRITE_SIZE) ? TFW_MAX_WRITE_SIZE : size;
 
-        if ((rpos + size) > tfw_buf_size)
+        bool write_ok;
+        if (ignore_writes)
+            ;
+        else if ((rpos + size) > tfw_buf_size)
         {
             int first_chunk_size  = tfw_buf_size - rpos;
             int second_chunk_size = size - first_chunk_size;
-            size = safe_write(fd, buf+rpos, first_chunk_size);
-            if ((int)size == first_chunk_size)
-                size += safe_write(fd, buf, second_chunk_size);
+            size = safe_write(fd, buf+rpos, first_chunk_size, write_ok);
+            if ((int)size == first_chunk_size && write_ok)
+                size += safe_write(fd, buf, second_chunk_size, write_ok);
         }
         else
         {
-            size = safe_write(fd, buf+rpos, size);
+            size = safe_write(fd, buf+rpos, size, write_ok);
+        }
+
+        QString msg =
+            "Maximum file size exceeded by '%1'\n\t\t\t"
+            "You must either change the process ulimits, configure\n\t\t\t"
+            "your operating system with \"Large File\" support, or use\n\t\t\t"
+            "a filesystem which supports 64-bit or 128-bit files.\n\t\t\t"
+            "HINT: FAT32 is a 32-bit filesystem.";
+
+        if (!ignore_writes && !write_ok && (EFBIG == errno))
+        {
+            VERBOSE(VB_IMPORTANT, msg.arg(filename));
+            ignore_writes = true;
         }
 
         if (written < tfw_min_write_size)
