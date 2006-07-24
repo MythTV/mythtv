@@ -23,14 +23,19 @@
 #define GLSINGLEVIEW_H
 #ifdef USING_OPENGL
 
+// Qt headers
 #include <qgl.h>
 #include <qmap.h>
 #include <qsize.h>
 
+// MythTV plugin headers
 #include <mythtv/util.h>
 
+// MythGallery headers
+#include "imageview.h"
 #include "iconview.h"
 #include "sequence.h"
+#include "gltexture.h"
 
 class QImage;
 class QTimer;
@@ -51,49 +56,7 @@ class GLSDialog : public MythDialog
     GLSingleView *m_view;
 };
 
-class GLTexture
-{
-  public:
-    GLTexture() : tex(0), angle(0), item(NULL),
-        width(512), height(512), cx(1.0f), cy(1.0f) {}
-    ~GLTexture() { Deinit(); }
-
-    void Init(const QImage &image);
-    void Deinit(void);
-
-    void Bind(void);
-    void MakeQuad(float alpha = 1.0f, float scale = 1.0f);
-    void SwapWidthHeight(void)
-        { int tmp = width; width = height; height = tmp; }
-
-    // Sets
-    void SetItem(ThumbItem*, const QSize &sz);
-    void SetSize(const QSize &sz)
-        { width = sz.width(); height = sz.height(); }
-    void SetScale(float x, float y)
-        { cx = x; cy = y; }
-    void ScaleTo(const QSize &dest);
-    void SetAngle(int newangle) { angle = newangle; }
-
-    // Gets
-    QSize   GetSize(void)        const { return QSize(width, height); }
-    uint    GetPixelCount(void)  const { return width * height; }
-    float   GetTextureX(void)    const { return cx; }
-    float   GetTextureY(void)    const { return cy; }
-    int     GetAngle(void)       const { return angle; }
-    QString GetDescription(void) const;
-
-  private:
-    GLuint     tex;
-    int        angle;
-    ThumbItem *item;
-    int        width;
-    int        height;
-    float      cx;
-    float      cy;
-};
-
-class GLSingleView : public QGLWidget
+class GLSingleView : public QGLWidget, public ImageView
 {
     Q_OBJECT
 
@@ -104,92 +67,70 @@ class GLSingleView : public QGLWidget
 
     void CleanUp(void);
 
-    void SetTransitionTimeout(int timeout)
-    {
-        m_transTimeout = timeout;
-        m_transTimeoutInv = 1.0f;
-        if (timeout)
-            m_transTimeoutInv = 1.0f / timeout;
-    }
-
   protected:
     void initializeGL(void);
+
+    // Commands
+    virtual void Rotate(int angle);
+    virtual void DisplayNext(bool reset, bool loadImage);
+    virtual void DisplayPrev(bool reset, bool loadImage);
+    virtual void LoadImage(void);
     void resizeGL(int w, int h);
     void paintGL(void);
+    void paintTexture(void);
+    void createTexInfo(void);
+    virtual void keyPressEvent(QKeyEvent *e);
 
-    void keyPressEvent(QKeyEvent *e);
+    // Sets
+    virtual void SetZoom(float zoom);
+    void SetTransitionTimeout(int timeout);
 
-  private:
-    int           m_pos;
-    ThumbList     m_itemList;
+    // Gets
+    int GetNearestGLTextureSize(int) const;
 
-    int           m_movieState;
-    QSize         m_screenSize;
-    float         m_wmult;
-    float         m_hmult;
+    virtual void RegisterEffects(void);
+    virtual void RunEffect(const QString &effect);
 
-    QSize         m_textureSize;
-    GLTexture     m_texItem[2];
-    int           m_curr;
-    bool          m_tex1First;
-
-    float         m_zoom;
-    float         m_sx;
-    float         m_sy;
-
-    QTimer       *m_timer;
-    MythTimer 	  m_time;
-    int           m_delay;
-    int           m_tmout;
-    int           m_transTimeout;
-    float         m_transTimeoutInv;
-    bool          m_effectRunning;
-    bool          m_running;
-    int           m_slideShow;
-
-    GLuint        m_texInfo;
-    bool          m_showInfo;
-    int           m_maxTexDim;
-    
-    int           m_i;
-    int           m_dir;
-    float         m_points[40][40][3];
-
-    typedef void               (GLSingleView::*EffectMethod)();
-    EffectMethod                m_effectMethod;
-    QMap<QString,EffectMethod>  m_effectMap;
-    bool                        m_effectRandom;
-    SequenceBase               *m_sequence;
-
-    float         m_cube_xrot;
-    float         m_cube_yrot;
-    float         m_cube_zrot;
-
-  private:
-    int   NearestGLTextureSize(int); 
-    void  advanceFrame(void);
-    void  retreatFrame(void);
-    void  loadImage(void);
-    void  paintTexture(void);
-    void  Rotate(int angle);
-    void  createTexInfo(void);
-
-    void  RegisterEffects(void);
-    EffectMethod GetRandomEffect(void);
-
-    void effectNone(void);
-    void effectBlend(void);
-    void effectZoomBlend(void);
-    void effectFade(void);
-    void effectRotate(void);
-    void effectBend(void);
-    void effectInOut(void);
-    void effectSlide(void);
-    void effectFlutter(void);
-    void effectCube(void);
+    void EffectNone(void);
+    void EffectBlend(void);
+    void EffectZoomBlend(void);
+    void EffectFade(void);
+    void EffectRotate(void);
+    void EffectBend(void);
+    void EffectInOut(void);
+    void EffectSlide(void);
+    void EffectFlutter(void);
+    void EffectCube(void);
 
   private slots:
-    void slotTimeOut(void);
+    void SlideTimeout(void);
+
+  private:
+    // General
+    float         m_source_x;
+    float         m_source_y;
+
+    // Texture variables (for display and effects)
+    int           m_texMaxDim;
+    QSize         m_texSize;
+    GLTexture     m_texItem[2];
+    int           m_texCur;
+    bool          m_tex1First;
+
+    // Info variables
+    GLuint        m_texInfo;
+    
+    // Common effect state variables
+    int           m_effect_rotate_direction;
+    MythTimer 	  m_effect_frame_time;
+    int           m_effect_transition_timeout;
+    float         m_effect_transition_timeout_inv;
+
+    // Unshared effect state variables
+    float         m_effect_flutter_points[40][40][3];
+    float         m_effect_cube_xrot;
+    float         m_effect_cube_yrot;
+    float         m_effect_cube_zrot;
 };
 
 #endif // USING_OPENGL

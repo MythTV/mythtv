@@ -2,6 +2,8 @@
 
 // Qt headers
 #include <qpixmap.h>
+#include <qfileinfo.h>
+#include <qdir.h>
 
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>
@@ -86,4 +88,27 @@ long ThumbItem::GetRotationAngle(void)
         return query.value(0).toInt();
 
     return GalleryUtil::GetNaturalRotation(m_path);
+}
+
+QString ThumbItem::GetDescription(const QSize &sz, int angle) const
+{
+    QFileInfo fi(GetPath());
+
+    QString info = GetName();
+    info += "\n\n" + QObject::tr("Folder: ") + fi.dir().dirName();
+    info += "\n" + QObject::tr("Created: ") + fi.created().toString();
+    info += "\n" + QObject::tr("Modified: ") +
+        fi.lastModified().toString();
+    info += "\n" + QString(QObject::tr("Bytes") + ": %1").arg(fi.size());
+    info += "\n" + QString(QObject::tr("Width") + ": %1 " +
+                           QObject::tr("pixels")).arg(sz.width());
+    info += "\n" + QString(QObject::tr("Height") + ": %1 " +
+                           QObject::tr("pixels")).arg(sz.height());
+    info += "\n" + QString(QObject::tr("Pixel Count") + ": %1 " +
+                           QObject::tr("megapixels"))
+        .arg((float) sz.width() * sz.height() * (1.0f/1000000.0f), 0, 'f', 2);
+    info += "\n" + QString(QObject::tr("Rotation Angle") + ": %1 " +
+                           QObject::tr("degrees")).arg(angle);
+
+    return info;
 }

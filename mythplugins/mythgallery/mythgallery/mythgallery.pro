@@ -23,19 +23,21 @@ INSTALLS += installimages uifiles
 
 # Input
 HEADERS += iconview.h          singleview.h
+HEADERS += imageview.h
 HEADERS += gallerysettings.h   dbcheck.h 
 HEADERS += qtiffio.h           galleryutil.h
 HEADERS += constants.h
 HEADERS += thumbgenerator.h    thumbview.h
 SOURCES += iconview.cpp        singleview.cpp
+SOURCES += imageview.cpp
 SOURCES += gallerysettings.cpp dbcheck.cpp
 SOURCES += qtiffio.cpp         galleryutil.cpp
 SOURCES += thumbgenerator.cpp  thumbview.cpp
 SOURCES += main.cpp
 
 opengl {
-    SOURCES *= glsingleview.cpp
-    HEADERS *= glsingleview.h
+    SOURCES *= glsingleview.cpp gltexture.cpp
+    HEADERS *= glsingleview.h   gltexture.h
     DEFINES += USING_OPENGL
 }
 

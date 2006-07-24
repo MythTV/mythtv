@@ -1,8 +1,10 @@
+// -*- Mode: c++ -*-
 /* ============================================================
  * File  : singleview.h
- * Description : 
+ * Description :  
  * 
-
+ * Copyright 2004-2006 Renchi Raju, Daniel Kristjansson
+ *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published bythe Free Software Foundation;
@@ -25,12 +27,13 @@ using namespace std;
 #include <qimage.h>
 #include <qpointarray.h>
 
+#include "imageview.h"
 #include "iconview.h"
 #include "sequence.h"
 
 class QTimer;
 
-class SingleView : public MythDialog
+class SingleView : public MythDialog, public ImageView
 {
     Q_OBJECT
     
@@ -49,24 +52,21 @@ class SingleView : public MythDialog
     static const int kIncomingEdgesMoving = 1;
 
   protected:
-    // Initialize
-    void  RegisterEffects(void);
-
     // Commands
-    void  Rotate(int angle);
-    void  DisplayNext(bool reset, bool loadImage);
-    void  DisplayPrev(bool reset, bool loadImage);
-    void  LoadImage(void);
+    virtual void Rotate(int angle);
+    virtual void DisplayNext(bool reset, bool loadImage);
+    virtual void DisplayPrev(bool reset, bool loadImage);
+    virtual void LoadImage(void);
     virtual void paintEvent(QPaintEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
 
     // Sets
-    void  SetZoom(float zoom);
+    virtual void SetZoom(float zoom);
+    void SetPixmap(QPixmap*);
 
-    // Gets
-    QString GetDescription(const ThumbItem *item, const QSize &sz);
-    typedef void (SingleView::*EffectMethod)();
-    EffectMethod GetRandomEffect(void);
+    // Effects
+    virtual void RegisterEffects(void);
+    virtual void RunEffect(const QString &effect);
 
   private:
     void  StartPainter(void);
@@ -90,45 +90,28 @@ class SingleView : public MythDialog
     static QPixmap *CreateBackground(const QSize &sz);
 
   private slots:
-    void  slotSlideTimeOut(void);
-    void  slotCaptionTimeOut(void);
+    void  SlideTimeout(void);
+    void  CaptionTimeout(void);
 
   private:
-    int           m_pos;
-    ThumbList     m_itemList;
-
-    int           m_movieState;
+    // General
     QPixmap      *m_pixmap;
     QImage        m_image;
-
-    int           m_rotateAngle;
-    float         m_zoom;
+    int           m_angle;
     QPoint        m_source_loc;
 
-    bool          m_info;
-    QPixmap      *m_infoBgPix;
+    // Info variables
+    QPixmap      *m_info_pixmap;
 
-    int           m_showcaption;
-    QPixmap      *m_captionBgPix;
-    QPixmap      *m_captionbackup;
-    QTimer       *m_ctimer;
-
-    int           m_tmout;
-    int           m_delay;
-    bool          m_effectRunning;
-    bool          m_running;
-    int           m_slideShow;
-    QTimer       *m_sstimer;
-    QPixmap      *m_effectPix;
-    QPainter     *m_painter;
-
-    EffectMethod                m_effectMethod;
-    QMap<QString,EffectMethod>  m_effectMap;
-    bool                        m_effectRandom;
-    SequenceBase               *m_sequence;
+    // Common slideshow variables
+    int           m_caption_show;
+    QPixmap      *m_caption_pixmap;
+    QPixmap      *m_caption_restore_pixmap;
+    QTimer       *m_caption_timer;
 
     // Common effect state variables
-    int           m_effect_current_frame;
+    QPixmap      *m_effect_pixmap;
+    QPainter     *m_effect_painter;
     int           m_effect_subtype;
     QRect         m_effect_bounds;    ///< effect image bounds
     QPoint        m_effect_delta0;    ///< misc effects delta

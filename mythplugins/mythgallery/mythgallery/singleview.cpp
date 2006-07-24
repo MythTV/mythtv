@@ -1,8 +1,10 @@
+// -*- Mode: c++ -*-
 /* ============================================================
  * File  : singleview.cpp
  * Description : 
- * 
-
+ *
+ * Copyright 2004-2006 Renchi Raju, Daniel Kristjansson
+ *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published bythe Free Software Foundation;
@@ -16,23 +18,30 @@
  * 
  * ============================================================ */
 
-#include <iostream>
+// ANSI C headers
 #include <cmath>
 
+// C++ headers
+#include <iostream>
+using namespace std;
+
+// Qt headers
 #include <qevent.h>
 #include <qimage.h>
-#include <qfileinfo.h>
-#include <qdir.h>
 #include <qtimer.h>
 #include <qpainter.h>
 
+// MythTV plugin headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
-#include <mythtv/lcddevice.h>
 
+// MythGallery headers
 #include "singleview.h"
 #include "constants.h"
 #include "galleryutil.h"
+
+#define LOC QString("QtView: ")
+#define LOC_ERR QString("QtView, Error: ")
 
 template<typename T> T sq(T val) { return val * val; }
 
@@ -42,39 +51,25 @@ SingleView::SingleView(
     MythMainWindow *parent,
     const char *name)
     : MythDialog(parent, name),
-      m_pos(pos),
-      m_itemList(itemList),
+      ImageView(itemList, pos, slideShow, sortorder),
 
-      m_movieState(0),
+      // General
       m_pixmap(NULL),
-
-      m_rotateAngle(0),
-      m_zoom(1.0f),
+      m_angle(0),
       m_source_loc(0,0),
 
-      m_info(false),
-      m_infoBgPix(NULL),
+      // Info variables
+      m_info_pixmap(NULL),
 
-      m_showcaption(false),
-      m_captionBgPix(NULL),
-      m_captionbackup(NULL),
-      m_ctimer(new QTimer(this)),
-
-      m_tmout(0),
-      m_delay(0),
-      m_effectRunning(false),
-      m_running(false),
-      m_slideShow(slideShow),
-      m_sstimer(new QTimer(this)),
-      m_effectPix(NULL),
-      m_painter(NULL),
-
-      m_effectMethod(NULL),
-      m_effectRandom(false),
-      m_sequence(NULL),
+      // Caption variables
+      m_caption_show(false),
+      m_caption_pixmap(NULL),
+      m_caption_restore_pixmap(NULL),
+      m_caption_timer(new QTimer(this)),
 
       // Common effect state variables
-      m_effect_current_frame(0),
+      m_effect_pixmap(NULL),
+      m_effect_painter(NULL),
       m_effect_subtype(0),
       m_effect_bounds(0,0,0,0),
       m_effect_delta0(0,0),
@@ -93,64 +88,30 @@ SingleView::SingleView(
       m_effect_milti_circle_out_points(4),
       m_effect_circle_out_points(4)
 {
-    // --------------------------------------------------------------------
-
-    // remove all dirs from m_itemList;
-    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-
-    m_itemList.setAutoDelete(false);
-
-    ThumbItem *item = m_itemList.first();
-    while (item)
-    {
-        ThumbItem *next = m_itemList.next();
-        if (item->IsDir())
-        {
-            if (recurse)
-                GalleryUtil::LoadDirectory(m_itemList, item->GetPath(),
-                                           sortorder, recurse, NULL, NULL);
-            m_itemList.remove(item);
-        }
-        item = next;
-    }
-
-    // since we remove dirs item position might have changed
-    item = itemList.at(m_pos);
-    if (item) 
-        m_pos = m_itemList.find(item);
-
-    if (!item || (m_pos == -1))
-        m_pos = 0;
-    
-    // --------------------------------------------------------------------
-
+    m_slideshow_timer = new QTimer(this);
     RegisterEffects();
-    
+
+    // --------------------------------------------------------------------
+
     QString transType = gContext->GetSetting("SlideshowTransition");
-    if (!transType.isEmpty() && m_effectMap.contains(transType))
-        m_effectMethod = m_effectMap[transType];
+    if (!transType.isEmpty() && m_effect_map.contains(transType))
+        m_effect_method = m_effect_map[transType];
     
-    if (!m_effectMethod || transType == "random")
+    if (m_effect_method.isEmpty() || transType == "random")
     {
-        m_effectMethod = GetRandomEffect();
-        m_effectRandom = true;
+        m_effect_method = GetRandomEffect();
+        m_effect_random = true;
     }
 
     // ---------------------------------------------------------------
 
-    m_delay = gContext->GetNumSetting("SlideshowDelay", 0);
-    m_delay = (!m_delay) ? 2 : m_delay;
-    m_tmout = m_delay * 1000;
+    m_caption_show = gContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_caption_show = min(m_slideshow_frame_delay, m_caption_show);
 
-    // ----------------------------------------------------------------
-
-    m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
-    m_showcaption = min(m_delay, m_showcaption);
-
-    if (m_showcaption)
+    if (m_caption_show)
     {
-        m_captionBgPix  = CreateBackground(QSize(screenwidth, 100));
-        m_captionbackup = new QPixmap(screenwidth, 100);
+        m_caption_pixmap  = CreateBackground(QSize(screenwidth, 100));
+        m_caption_restore_pixmap = new QPixmap(screenwidth, 100);
     }
 
     // --------------------------------------------------------------------
@@ -162,70 +123,46 @@ SingleView::SingleView(
 
     // --------------------------------------------------------------------
 
-    connect(m_sstimer, SIGNAL(timeout()), SLOT(slotSlideTimeOut()));
-    connect(m_ctimer,  SIGNAL(timeout()), SLOT(slotCaptionTimeOut()));
+    connect(m_slideshow_timer, SIGNAL(timeout()), SLOT(SlideTimeout()));
+    connect(m_caption_timer,   SIGNAL(timeout()), SLOT(CaptionTimeout()));
 
     // --------------------------------------------------------------------
 
-    if (slideShow > 1)
-    {
-        m_sequence = new SequenceShuffle(m_itemList.count());
-        m_pos = 0;
-    }
-    else
-    {
-        m_sequence = new SequenceInc(m_itemList.count());
-    }
-
-    m_pos = m_sequence->index(m_pos);
     LoadImage();
+
+    // --------------------------------------------------------------------
 
     if (slideShow)
     {
-        m_running = true;
-        m_sstimer->start(m_tmout, true);
+        m_slideshow_running = true;
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
         gContext->DisableScreensaver();
     }
 }
 
 SingleView::~SingleView()
 {
-    if (m_painter)
+    if (m_effect_painter)
     {
-        if (m_painter->isActive())
-            m_painter->end();
+        if (m_effect_painter->isActive())
+            m_effect_painter->end();
 
-        delete m_painter;
-        m_painter = NULL;
+        delete m_effect_painter;
+        m_effect_painter = NULL;
     }
 
-    if (m_sequence)
-    {
-        delete m_sequence;
-        m_sequence = NULL;
-    }
+    SetPixmap(NULL);
 
-    if (m_pixmap)
+    if (m_effect_pixmap)
     {
-        delete m_pixmap;
-        m_pixmap = NULL;
-    }
-
-    if (m_effectPix)
-    {
-        delete m_effectPix;
-        m_effectPix = NULL;
+        delete m_effect_pixmap;
+        m_effect_pixmap = NULL;
     }
     
-    if (m_infoBgPix)
+    if (m_info_pixmap)
     {
-        delete m_infoBgPix;
-        m_infoBgPix = NULL;
-    }
-
-    if (class LCD *lcd = LCD::Get())
-    {
-        lcd->switchToTime();
+        delete m_info_pixmap;
+        m_info_pixmap = NULL;
     }
 }
 
@@ -241,13 +178,13 @@ void SingleView::paintEvent(QPaintEvent *)
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
             cmd.replace("%s", path);
             myth_system(cmd);
-            if (!m_running)
+            if (!m_slideshow_running)
             {
                 reject();
             }
         }
     }
-    else if (!m_effectRunning)
+    else if (!m_effect_running)
     {
         QPixmap pix(screenwidth, screenheight);
         pix.fill(this, 0, 0);
@@ -268,7 +205,7 @@ void SingleView::paintEvent(QPaintEvent *)
                        m_pixmap, QRect(m_source_loc, pix.size()));
             }
 
-            if (m_showcaption && !m_ctimer->isActive())
+            if (m_caption_show && !m_caption_timer->isActive())
             {
                 ThumbItem *item = m_itemList.at(m_pos);
                 if (!item->HasCaption())
@@ -277,12 +214,12 @@ void SingleView::paintEvent(QPaintEvent *)
                 if (item->HasCaption())
                 {
                     // Store actual background to restore later
-                    bitBlt(m_captionbackup, QPoint(0, 0), &pix,
+                    bitBlt(m_caption_restore_pixmap, QPoint(0, 0), &pix,
                            QRect(0, screenheight - 100, screenwidth, 100));
 
                     // Blit semi-transparent background into place
                     bitBlt(&pix, QPoint(0, screenheight - 100),
-                           m_captionBgPix, QRect(0, 0, screenwidth, 100));
+                           m_caption_pixmap, QRect(0, 0, screenwidth, 100));
 
                     // Draw caption
                     QPainter p(&pix, this);
@@ -290,7 +227,7 @@ void SingleView::paintEvent(QPaintEvent *)
                                Qt::AlignCenter, item->GetCaption());
                     p.end();
 
-                    m_ctimer->start(m_showcaption * 1000, true);
+                    m_caption_timer->start(m_caption_show * 1000, true);
                 }
             }
 
@@ -302,28 +239,30 @@ void SingleView::paintEvent(QPaintEvent *)
                 p.end();
             }
 
-            if (m_info)
+            if (m_info_show)
             {
-
-                if (!m_infoBgPix)
+                if (!m_info_pixmap)
                 {
-                    m_infoBgPix = CreateBackground(QSize(
+                    m_info_pixmap = CreateBackground(QSize(
                         screenwidth  - 2 * screenwidth  / 10,
                         screenheight - 2 * screenheight / 10));
                 }
 
                 bitBlt(&pix, QPoint(screenwidth / 10, screenheight / 10),
-                       m_infoBgPix, QRect(0,0,-1,-1), Qt::CopyROP);
+                       m_info_pixmap, QRect(0,0,-1,-1), Qt::CopyROP);
 
                 QPainter p(&pix, this);
                 ThumbItem *item = m_itemList.at(m_pos);
-                QString info = GetDescription(item, m_image.size());
+                QString info = QString::null;
+                if (item)
+                    info = item->GetDescription(m_image.size(), m_angle);
+
                 if (!info.isEmpty())
                 {
                     p.drawText(screenwidth  / 10 + (int)(10 * wmult),
                                screenheight / 10 + (int)(10 * hmult),
-                               m_infoBgPix->width()  - 2 * (int)(10 * wmult),
-                               m_infoBgPix->height() - 2 * (int)(10 * hmult),
+                               m_info_pixmap->width()  - 2 * (int)(10 * wmult),
+                               m_info_pixmap->height() - 2 * (int)(10 * hmult),
                                Qt::AlignLeft, info);
                 }
                 p.end();
@@ -333,54 +272,26 @@ void SingleView::paintEvent(QPaintEvent *)
         
         bitBlt(this, QPoint(0,0), &pix, QRect(0,0,-1,-1), Qt::CopyROP);
     }
-    else
-    {
-        if (m_effectMethod)
-            (this->*m_effectMethod)();
-    }
-}
-
-QString SingleView::GetDescription(const ThumbItem *item, const QSize &sz)
-{
-    if (!item)
-        return QString::null;
-
-    QFileInfo fi(item->GetPath());
-
-    QString info = item->GetName();
-    info += "\n\n" + tr("Folder: ") + fi.dir().dirName();
-    info += "\n" + tr("Created: ") + fi.created().toString();
-    info += "\n" + tr("Modified: ") + fi.lastModified().toString();
-    info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
-    info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
-        .arg(sz.width());
-    info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
-        .arg(sz.height());
-    info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
-                           tr("megapixels"))
-        .arg((float)sz.width() * sz.height() / 1000000, 0, 'f', 2);
-    info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
-                           tr("degrees")).arg(m_rotateAngle);
-
-    return info;
+    else if (!m_effect_method.isEmpty())
+        RunEffect(m_effect_method);
 }
 
 void SingleView::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
 
-    bool wasRunning = m_running;
-    m_sstimer->stop();
-    m_ctimer->stop();
-    m_running = false;
+    bool wasRunning = m_slideshow_running;
+    m_slideshow_timer->stop();
+    m_caption_timer->stop();
+    m_slideshow_running = false;
     gContext->RestoreScreensaver();
-    m_effectRunning = false;
-    m_tmout = m_delay * 1000;
-    if (m_painter && m_painter->isActive())
-        m_painter->end();
+    m_effect_running = false;
+    m_slideshow_frame_delay_state = m_slideshow_frame_delay * 1000;
+    if (m_effect_painter && m_effect_painter->isActive())
+        m_effect_painter->end();
 
-    bool wasInfo = m_info;
-    m_info = false;
+    bool wasInfo = m_info_show;
+    m_info_show = false;
     
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
@@ -526,20 +437,20 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         {
             m_source_loc = QPoint(0, 0);
             m_zoom = 1.0f;
-            m_rotateAngle = 0;
-            m_running = !wasRunning;
+            m_angle = 0;
+            m_slideshow_running = !wasRunning;
         }
         else if (action == "INFO")
         {
-            m_info = !wasInfo;
+            m_info_show = !wasInfo;
         }
         else 
             handled = false;
     }
 
-    if (m_running)
+    if (m_slideshow_running)
     {
-        m_sstimer->start(m_tmout, true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
         gContext->DisableScreensaver();
     }
 
@@ -557,7 +468,7 @@ void SingleView::DisplayNext(bool reset, bool loadImage)
 {
     if (reset)
     {
-        m_rotateAngle = 0;
+        m_angle = 0;
         m_zoom = 1.0f;
         m_source_loc = QPoint(0, 0);
     }
@@ -568,7 +479,7 @@ void SingleView::DisplayNext(bool reset, bool loadImage)
     int oldpos = m_pos;
     while (true)
     {
-        m_pos = m_sequence->next();
+        m_pos = m_slideshow_sequence->next();
         item = m_itemList.at(m_pos);
         if (item)
         {
@@ -592,26 +503,22 @@ void SingleView::DisplayPrev(bool reset, bool loadImage)
 {
     if (reset)
     {
-        m_rotateAngle = 0;
+        m_angle = 0;
         m_zoom = 1.0f;
         m_source_loc = QPoint(0, 0);
     }
 
     // Search for next item that hasn't been deleted.
     // Close viewer in none remain.
-    ThumbItem *item;
     int oldpos = m_pos;
     while (true)
     {
-        m_pos = m_sequence->prev();
-        item = m_itemList.at(m_pos);
-        if (item)
-        { 
-            if (QFile::exists(item->GetPath()))
-            {
-                break;
-            }
-        }
+        m_pos = m_slideshow_sequence->prev();
+
+        ThumbItem *item = m_itemList.at(m_pos);
+        if (item && QFile::exists(item->GetPath()))
+            break;
+
         if (m_pos == oldpos)
         {
             // No valid items!!!
@@ -626,92 +533,58 @@ void SingleView::DisplayPrev(bool reset, bool loadImage)
 void SingleView::LoadImage(void)
 {
     m_movieState = 0;
-    if (m_pixmap)
-    {
-        delete m_pixmap;
-        m_pixmap = 0;
-    }
+
+    SetPixmap(NULL);
     
     ThumbItem *item = m_itemList.at(m_pos);
-    if (item)
+    if (!item)
     {
-        if (GalleryUtil::isMovie(item->GetPath()))
-        {
-            m_movieState = 1;
-        }
-        else
-        {
-            m_image.load(item->GetPath());
-        
-            if (!m_image.isNull())
-            {
-
-                m_rotateAngle = item->GetRotationAngle();
-          
-                if (m_rotateAngle != 0)
-                {
-                    QWMatrix matrix;
-                    matrix.rotate(m_rotateAngle);
-                    m_image = m_image.xForm(matrix);
-                }
-        
-                m_pixmap = new QPixmap(
-                    m_image.smoothScale(screenwidth, screenheight,
-                                        QImage::ScaleMin));
-          
-            }
-        }
-
-        if (class LCD *lcd = LCD::Get())
-        {
-            QPtrList<LCDTextItem> textItems;
-            textItems.setAutoDelete(true);
-            textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                             item->GetName(),
-                                             "Generic", true));
-            textItems.append(new LCDTextItem(
-                                 2, ALIGN_CENTERED,
-                                 QString::number(m_pos + 1) + 
-                                 " / " +
-                                 QString::number(m_itemList.count()),
-                                 "Generic", false));
-
-            lcd->switchToGeneric(&textItems);
-        }
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        return;
     }
-    else
+
+    if (GalleryUtil::isMovie(item->GetPath()))
     {
-        std::cerr << "SingleView: Failed to load image "
-                  << item->GetPath() << std::endl;
+        m_movieState = 1;
+        return;
     }
+
+    m_image.load(item->GetPath());
+    if (m_image.isNull())
+        return;
+
+    m_angle = item->GetRotationAngle();
+    if (m_angle != 0)
+    {
+        QWMatrix matrix;
+        matrix.rotate(m_angle);
+        m_image = m_image.xForm(matrix);
+    }
+        
+    SetZoom(m_zoom);
+
+    UpdateLCD(item);
 }
 
 void SingleView::Rotate(int angle)
 {
-    m_rotateAngle += angle;
-    if (m_rotateAngle >= 360)
-        m_rotateAngle -= 360;
-    if (m_rotateAngle < 0)
-        m_rotateAngle += 360;
+    m_angle += angle;
+
+    m_angle = (m_angle >= 360) ? m_angle - 360 : m_angle;
+    m_angle = (m_angle < 0)    ? m_angle + 360 : m_angle;
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item)
-        item->SetRotationAngle(m_rotateAngle);
+        item->SetRotationAngle(m_angle);
     
-    if (!m_image.isNull())
-    {
-        QWMatrix matrix;
-        matrix.rotate(angle);
-        m_image = m_image.xForm(matrix);
-        if (m_pixmap)
-        {
-            delete m_pixmap;
-            m_pixmap = 0;
-        }
-        m_pixmap = new QPixmap(m_image.smoothScale((int)(m_zoom*screenwidth),
-                                                   (int)(m_zoom*screenheight),
-                                                   QImage::ScaleMin));
-    }
+    if (m_image.isNull())
+        return;
+
+    QWMatrix matrix;
+    matrix.rotate(angle);
+    m_image = m_image.xForm(matrix);
+
+    SetZoom(m_zoom);
 }
 
 void SingleView::SetZoom(float zoom)
@@ -721,16 +594,21 @@ void SingleView::SetZoom(float zoom)
     if (m_image.isNull())
         return;
 
+    QImage img = m_image.smoothScale((int) (screenwidth  * m_zoom),
+                                     (int) (screenheight * m_zoom),
+                                     QImage::ScaleMin);
+
+    SetPixmap(new QPixmap(img));
+}
+
+void SingleView::SetPixmap(QPixmap *pixmap)
+{
     if (m_pixmap)
     {
         delete m_pixmap;
-        m_pixmap = 0;
+        m_pixmap = NULL;
     }
-
-    m_pixmap = new QPixmap(m_image.smoothScale(
-                               (int)(screenwidth  * m_zoom),
-                               (int)(screenheight * m_zoom),
-                               QImage::ScaleMin));
+    m_pixmap = pixmap;
 }
 
 QPixmap *SingleView::CreateBackground(const QSize &sz)
@@ -752,72 +630,88 @@ QPixmap *SingleView::CreateBackground(const QSize &sz)
 
 void SingleView::RegisterEffects(void)
 {
-    m_effectMap.insert("none",             &SingleView::EffectNone);
-    m_effectMap.insert("chess board",      &SingleView::EffectChessboard);
-    m_effectMap.insert("melt down",        &SingleView::EffectMeltdown);
-    m_effectMap.insert("sweep",            &SingleView::EffectSweep);
-    m_effectMap.insert("noise",            &SingleView::EffectNoise);
-    m_effectMap.insert("growing",          &SingleView::EffectGrowing);
-    m_effectMap.insert("incoming edges",   &SingleView::EffectIncomingEdges);
-    m_effectMap.insert("horizontal lines", &SingleView::EffectHorizLines);
-    m_effectMap.insert("vertical lines",   &SingleView::EffectVertLines);
-    m_effectMap.insert("circle out",       &SingleView::EffectCircleOut);
-    m_effectMap.insert("multicircle out",  &SingleView::EffectMultiCircleOut);
-    m_effectMap.insert("spiral in",        &SingleView::EffectSpiralIn);
-    m_effectMap.insert("blobs",            &SingleView::EffectBlobs);
+    m_effect_map.insert("none",             "EffectNone");
+    m_effect_map.insert("chess board",      "EffectChessboard");
+    m_effect_map.insert("melt down",        "EffectMeltdown");
+    m_effect_map.insert("sweep",            "EffectSweep");
+    m_effect_map.insert("noise",            "EffectNoise");
+    m_effect_map.insert("growing",          "EffectGrowing");
+    m_effect_map.insert("incoming edges",   "EffectIncomingEdges");
+    m_effect_map.insert("horizontal lines", "EffectHorizLines");
+    m_effect_map.insert("vertical lines",   "EffectVertLines");
+    m_effect_map.insert("circle out",       "EffectCircleOut");
+    m_effect_map.insert("multicircle out",  "EffectMultiCircleOut");
+    m_effect_map.insert("spiral in",        "EffectSpiralIn");
+    m_effect_map.insert("blobs",            "EffectBlobs");
 }
 
-SingleView::EffectMethod SingleView::GetRandomEffect(void)
+void SingleView::RunEffect(const QString &effect)
 {
-    QMap<QString,EffectMethod> tmpMap(m_effectMap);
-    tmpMap.remove("none");
-    
-    QStringList t = tmpMap.keys();
-
-    int count = t.count();
-    int i = (int) ( (float)(count) * rand() / (RAND_MAX + 1.0f) );
-    QString key = t[i];
-
-    return tmpMap[key];
+    if (effect == "EffectChessboard")
+        EffectChessboard();
+    else if (effect == "EffectMeltdown")
+        EffectMeltdown();
+    else if (effect == "EffectSweep")
+        EffectSweep();
+    else if (effect == "EffectNoise")
+        EffectNoise();
+    else if (effect == "EffectGrowing")
+        EffectGrowing();
+    else if (effect == "EffectIncomingEdges")
+        EffectIncomingEdges();
+    else if (effect == "EffectHorizLines")
+        EffectHorizLines();
+    else if (effect == "EffectVertLines")
+        EffectVertLines();
+    else if (effect == "EffectCircleOut")
+        EffectCircleOut();
+    else if (effect == "EffectMultiCircleOut")
+        EffectMultiCircleOut();
+    else if (effect == "EffectSpiralIn")
+        EffectSpiralIn();
+    else if (effect == "EffectBlobs")
+        EffectBlobs();
+    else //if (effect == "EffectNone")
+        EffectNone();
 }
 
 void SingleView::StartPainter(void)
 {
-    if (!m_painter)
-        m_painter = new QPainter();
+    if (!m_effect_painter)
+        m_effect_painter = new QPainter();
 
-    if (m_painter->isActive())
-        m_painter->end();
+    if (m_effect_painter->isActive())
+        m_effect_painter->end();
 
     QBrush brush;
-    if (m_effectPix)
-        brush.setPixmap(*m_effectPix);
+    if (m_effect_pixmap)
+        brush.setPixmap(*m_effect_pixmap);
 
-    m_painter->begin(this);
-    m_painter->setBrush(brush);
-    m_painter->setPen(Qt::NoPen);
+    m_effect_painter->begin(this);
+    m_effect_painter->setBrush(brush);
+    m_effect_painter->setPen(Qt::NoPen);
 }
 
 void SingleView::CreateEffectPixmap(void)
 {
-    if (!m_effectPix) 
-        m_effectPix = new QPixmap(screenwidth, screenheight);
+    if (!m_effect_pixmap) 
+        m_effect_pixmap = new QPixmap(screenwidth, screenheight);
 
-    m_effectPix->fill(this, 0, 0);
+    m_effect_pixmap->fill(this, 0, 0);
 
     if (m_pixmap)
     {
-        QPoint src_loc((m_effectPix->width()  - m_pixmap->width() ) >> 1,
-                       (m_effectPix->height() - m_pixmap->height()) >> 1);
-        bitBlt(m_effectPix, src_loc,
+        QPoint src_loc((m_effect_pixmap->width()  - m_pixmap->width() ) >> 1,
+                       (m_effect_pixmap->height() - m_pixmap->height()) >> 1);
+        bitBlt(m_effect_pixmap, src_loc,
                m_pixmap, QRect(0, 0, -1, -1), Qt::CopyROP);
     }
 }
 
 void SingleView::EffectNone(void)
 {
-    m_effectRunning = false;
-    m_tmout = -1;
+    m_effect_running = false;
+    m_slideshow_frame_delay_state = -1;
     update();
     return;
 }
@@ -841,8 +735,8 @@ void SingleView::EffectChessboard(void)
 
     if (m_effect_delta1.x() >= m_effect_bounds.width())
     {
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         update();
         return;
     }
@@ -861,11 +755,11 @@ void SingleView::EffectChessboard(void)
         QPoint src1(m_effect_bounds.x(), y + m_effect_bounds.y());
         QRect  dst1(m_effect_bounds.x(), y + m_effect_bounds.y(),
                     m_effect_delta0.x(), m_effect_delta0.y());
-        bitBlt(this, src0, m_effectPix, dst0, Qt::CopyROP, true);
-        bitBlt(this, src1, m_effectPix, dst0, Qt::CopyROP, true);
+        bitBlt(this, src0, m_effect_pixmap, dst0, Qt::CopyROP, true);
+        bitBlt(this, src1, m_effect_pixmap, dst0, Qt::CopyROP, true);
     }
 
-    m_tmout = m_effect_framerate;
+    m_slideshow_frame_delay_state = m_effect_framerate;
 
     m_effect_current_frame = 1;
 }
@@ -893,8 +787,8 @@ void SingleView::EffectSweep(void)
             (kSweepLeftToRight == m_effect_subtype &&
              m_effect_bounds.x() > m_effect_bounds.width() + 64))
         {
-            m_tmout = -1;
-            m_effectRunning = false;
+            m_slideshow_frame_delay_state = -1;
+            m_effect_running = false;
             update();
             return;
         }
@@ -904,7 +798,7 @@ void SingleView::EffectSweep(void)
              i--, w <<= 1, x -= m_effect_delta0.x())
         {
             bitBlt(this, QPoint(x, 0),
-                   m_effectPix, QRect(x, 0, w, m_effect_bounds.height()),
+                   m_effect_pixmap, QRect(x, 0, w, m_effect_bounds.height()),
                    Qt::CopyROP, true);
         }
 
@@ -918,8 +812,8 @@ void SingleView::EffectSweep(void)
             (kSweepTopToBottom == m_effect_subtype &&
              m_effect_bounds.y() > m_effect_bounds.height() + 64))
         {
-            m_tmout = -1;
-            m_effectRunning = false;
+            m_slideshow_frame_delay_state = -1;
+            m_effect_running = false;
             update();
             return;
         }
@@ -928,7 +822,7 @@ void SingleView::EffectSweep(void)
         for (h = 2, i = 4, y = m_effect_bounds.y(); i > 0;
              i--, h <<= 1, y -= m_effect_delta0.y())
         {
-            bitBlt(this, QPoint(0, y), m_effectPix,
+            bitBlt(this, QPoint(0, y), m_effect_pixmap,
                    QRect(0, y, m_effect_bounds.width(), h),
                    Qt::CopyROP, true);
         }
@@ -936,7 +830,7 @@ void SingleView::EffectSweep(void)
         m_effect_bounds.moveTop(m_effect_bounds.y() + m_effect_delta0.y());
     }
 
-    m_tmout = 20;
+    m_slideshow_frame_delay_state = 20;
     m_effect_current_frame = 1;
 }
 
@@ -958,8 +852,8 @@ void SingleView::EffectGrowing(void)
 
     if (m_effect_bounds.x() < 0 || m_effect_bounds.y() < 0)
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -968,10 +862,10 @@ void SingleView::EffectGrowing(void)
                  m_effect_bounds.height() - (m_effect_bounds.y() << 1));
 
     bitBlt(this, m_effect_bounds.topLeft(),
-           m_effectPix, QRect(m_effect_bounds.topLeft(), dst_sz),
+           m_effect_pixmap, QRect(m_effect_bounds.topLeft(), dst_sz),
            Qt::CopyROP, true);
 
-    m_tmout = 20;
+    m_slideshow_frame_delay_state = 20;
     m_effect_current_frame     = 1;
 }
 
@@ -987,8 +881,8 @@ void SingleView::EffectHorizLines(void)
 
     if (iyPos[m_effect_i] < 0)
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -996,7 +890,7 @@ void SingleView::EffectHorizLines(void)
     for (int y = iyPos[m_effect_i]; y < m_effect_bounds.height(); y += 8)
     {
         bitBlt(this, QPoint(0, y),
-               m_effectPix, QRect(0, y, m_effect_bounds.width(), 1),
+               m_effect_pixmap, QRect(0, y, m_effect_bounds.width(), 1),
                Qt::CopyROP, true);
     }
 
@@ -1004,13 +898,13 @@ void SingleView::EffectHorizLines(void)
     
     if (iyPos[m_effect_i] >= 0)
     {
-        m_tmout = 160;
+        m_slideshow_frame_delay_state = 160;
         m_effect_current_frame     = 1;
     }
     else
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }        
@@ -1028,8 +922,8 @@ void SingleView::EffectVertLines(void)
 
     if (ixPos[m_effect_i] < 0)
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -1037,7 +931,7 @@ void SingleView::EffectVertLines(void)
     for (int x = ixPos[m_effect_i]; x < m_effect_bounds.width(); x += 8)
     {
         bitBlt(this, QPoint(x, 0),
-               m_effectPix, QRect(x, 0, 1, m_effect_bounds.height()),
+               m_effect_pixmap, QRect(x, 0, 1, m_effect_bounds.height()),
                Qt::CopyROP, true);
     }
 
@@ -1045,13 +939,13 @@ void SingleView::EffectVertLines(void)
     
     if (ixPos[m_effect_i] >= 0)
     {
-        m_tmout = 160;
+        m_slideshow_frame_delay_state = 160;
         m_effect_current_frame     = 1;
     }
     else
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }        
@@ -1080,7 +974,7 @@ void SingleView::EffectMeltdown(void)
             continue;
 
         bitBlt(this, QPoint(x, y),
-               m_effectPix,
+               m_effect_pixmap,
                QRect(x, y, m_effect_delta0.x(), m_effect_delta0.y()),
                Qt::CopyROP, true);
 
@@ -1089,13 +983,13 @@ void SingleView::EffectMeltdown(void)
 
     if (done)
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
 
-    m_tmout = 15;
+    m_slideshow_frame_delay_state = 15;
     m_effect_current_frame     = 1;
 }
 
@@ -1116,8 +1010,8 @@ void SingleView::EffectIncomingEdges(void)
 
     if (m_effect_bounds.x() > m_effect_delta1.x() || m_effect_bounds.y() > m_effect_delta1.y())
     {
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -1129,20 +1023,20 @@ void SingleView::EffectIncomingEdges(void)
     if (kIncomingEdgesMoving == m_effect_subtype)
     {
         // moving image edges
-        bitBlt(this,  0,  0, m_effectPix,
+        bitBlt(this,  0,  0, m_effect_pixmap,
                m_effect_delta1.x() - m_effect_bounds.x(),
                m_effect_delta1.y() - m_effect_bounds.y(),
                m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this, x1,  0, m_effectPix,
+        bitBlt(this, x1,  0, m_effect_pixmap,
                m_effect_delta1.x(), m_effect_delta1.y() - m_effect_bounds.y(),
                m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this,  0, y1, m_effectPix,
+        bitBlt(this,  0, y1, m_effect_pixmap,
                m_effect_delta1.x() - m_effect_bounds.x(), m_effect_delta1.y(),
                m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
-        bitBlt(this, x1, y1, m_effectPix,
+        bitBlt(this, x1, y1, m_effect_pixmap,
                m_effect_delta1.x(), m_effect_delta1.y(),
                m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
@@ -1151,20 +1045,20 @@ void SingleView::EffectIncomingEdges(void)
     {
         // fixed image edges
         bitBlt(this,  0,  0,
-               m_effectPix, 0,   0, m_effect_bounds.x(), m_effect_bounds.y(),
+               m_effect_pixmap, 0,   0, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
         bitBlt(this, x1,  0,
-               m_effectPix, x1,  0, m_effect_bounds.x(), m_effect_bounds.y(),
+               m_effect_pixmap, x1,  0, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
         bitBlt(this,  0, y1,
-               m_effectPix,  0, y1, m_effect_bounds.x(), m_effect_bounds.y(),
+               m_effect_pixmap,  0, y1, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
         bitBlt(this, x1, y1,
-               m_effectPix, x1, y1, m_effect_bounds.x(), m_effect_bounds.y(),
+               m_effect_pixmap, x1, y1, m_effect_bounds.x(), m_effect_bounds.y(),
                Qt::CopyROP, true);
     }
 
-    m_tmout = 20;
+    m_slideshow_frame_delay_state = 20;
     m_effect_current_frame     = 1;
 }
 
@@ -1195,10 +1089,10 @@ void SingleView::EffectMultiCircleOut(void)
 
     if (m_effect_alpha < 0)
     {
-        m_painter->end();
+        m_effect_painter->end();
 
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -1218,12 +1112,12 @@ void SingleView::EffectMultiCircleOut(void)
         m_effect_milti_circle_out_points.setPoint(1, x, y);
         m_effect_milti_circle_out_points.setPoint(2, m_effect_bounds.x(), m_effect_bounds.y());
 
-        m_painter->drawPolygon(m_effect_milti_circle_out_points);
+        m_effect_painter->drawPolygon(m_effect_milti_circle_out_points);
     }
 
     m_effect_alpha -= m_effect_delta2_x;
 
-    m_tmout = m_effect_framerate;
+    m_slideshow_frame_delay_state = m_effect_framerate;
     m_effect_current_frame     = 1;
 }
 
@@ -1244,10 +1138,10 @@ void SingleView::EffectSpiralIn(void)
 
     if (m_effect_i == 0 && m_effect_spiral_tmp0.x() >= m_effect_spiral_tmp1.x())
     {
-        m_painter->end();
+        m_effect_painter->end();
 
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -1281,7 +1175,7 @@ void SingleView::EffectSpiralIn(void)
         m_effect_spiral_tmp0.setY(m_effect_spiral_tmp0.y() + m_effect_delta1.y());
     }
 
-    bitBlt(this, m_effect_bounds.x(), m_effect_bounds.y(), m_effectPix,
+    bitBlt(this, m_effect_bounds.x(), m_effect_bounds.y(), m_effect_pixmap,
            m_effect_bounds.x(), m_effect_bounds.y(),
            m_effect_delta1.x(), m_effect_delta1.y(),
            Qt::CopyROP, true);
@@ -1289,7 +1183,7 @@ void SingleView::EffectSpiralIn(void)
     m_effect_bounds.moveTopLeft(m_effect_bounds.topLeft() + m_effect_delta0);
     m_effect_j--;
 
-    m_tmout = 8;
+    m_slideshow_frame_delay_state = 8;
     m_effect_current_frame     = 1;
 }
 
@@ -1313,10 +1207,10 @@ void SingleView::EffectCircleOut(void)
 
     if (m_effect_alpha < 0)
     {
-        m_painter->end();
+        m_effect_painter->end();
         
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -1334,9 +1228,9 @@ void SingleView::EffectCircleOut(void)
     m_effect_circle_out_points.setPoint(1, tmp);
     m_effect_circle_out_points.setPoint(2, m_effect_bounds.topLeft());
 
-    m_painter->drawPolygon(m_effect_circle_out_points);
+    m_effect_painter->drawPolygon(m_effect_circle_out_points);
 
-    m_tmout = 20;
+    m_slideshow_frame_delay_state = 20;
     m_effect_current_frame     = 1;
 }
 
@@ -1354,10 +1248,10 @@ void SingleView::EffectBlobs(void)
 
     if (m_effect_i <= 0)
     {
-        m_painter->end();
+        m_effect_painter->end();
 
-        m_tmout = -1;
-        m_effectRunning = false;
+        m_slideshow_frame_delay_state = -1;
+        m_effect_running = false;
         update();
         return;
     }
@@ -1367,11 +1261,11 @@ void SingleView::EffectBlobs(void)
 
     r = (rand() % 200) + 50;
 
-    m_painter->drawEllipse(m_effect_bounds.x() - r,
+    m_effect_painter->drawEllipse(m_effect_bounds.x() - r,
                            m_effect_bounds.y() - r, r, r);
     m_effect_i--;
 
-    m_tmout = 10;
+    m_slideshow_frame_delay_state = 10;
     m_effect_current_frame     = 1;
 }
 
@@ -1390,41 +1284,39 @@ void SingleView::EffectNoise(void)
         x = (rand() % w) << fact;
         y = (rand() % h) << fact;
         bitBlt(this, QPoint(x, y),
-               m_effectPix, QRect(x, y, sz, sz), Qt::CopyROP, true);
+               m_effect_pixmap, QRect(x, y, sz, sz), Qt::CopyROP, true);
     }
 
-    m_tmout = -1;
-    m_effectRunning = false;
+    m_slideshow_frame_delay_state = -1;
+    m_effect_running = false;
     update();
     return;
 }
 
-
-void SingleView::slotSlideTimeOut(void)
+void SingleView::SlideTimeout(void)
 {
     bool wasMovie = false, isMovie = false;
-    if (!m_effectMethod)
+    if (m_effect_method.isEmpty())
     {
-        std::cerr << "SingleView: No transition method"
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No transition method");
         return;
     }
 
-    if (!m_effectRunning)
+    if (!m_effect_running)
     {
-        if (m_tmout == -1)
+        if (m_slideshow_frame_delay_state == -1)
         {
             // wffect was running and is complete now
             // run timer while showing current image
-            m_tmout = m_delay * 1000;
+            m_slideshow_frame_delay_state = m_slideshow_frame_delay * 1000;
             m_effect_current_frame = 0;
         }
         else
         {
             // timed out after showing current image
             // load next image and start effect
-            if (m_effectRandom)
-                m_effectMethod = GetRandomEffect();
+            if (m_effect_random)
+                m_effect_method = GetRandomEffect();
 
             DisplayNext(false, false);
 
@@ -1435,32 +1327,32 @@ void SingleView::slotSlideTimeOut(void)
             // and shorten timeout
             if (wasMovie || isMovie)
             {
-                m_tmout = 1;
+                m_slideshow_frame_delay_state = 1;
             }
             else
             {
                 CreateEffectPixmap();
-                m_effectRunning = true;
-                m_tmout = 10;
+                m_effect_running = true;
+                m_slideshow_frame_delay_state = 10;
                 m_effect_current_frame = 0;
             }
         }   
     }
 
     update();
-    m_sstimer->start(m_tmout, true);
+    m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
 
     // If transitioning to/from a movie, no effect is running so 
     // next timeout should trigger proper immage delay.
     if (wasMovie || isMovie)
     {
-        m_tmout = -1;
+        m_slideshow_frame_delay_state = -1;
     }
 }
 
-void SingleView::slotCaptionTimeOut(void)
+void SingleView::CaptionTimeout(void)
 {
-    m_ctimer->stop();
+    m_caption_timer->stop();
     bitBlt(this, QPoint(0, screenheight - 100),
-           m_captionbackup, QRect(0,0,-1,-1), Qt::CopyROP);
+           m_caption_restore_pixmap, QRect(0,0,-1,-1), Qt::CopyROP);
 }

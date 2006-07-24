@@ -5,7 +5,7 @@
  * Description : 
  * 
  * Copyright 2004 by Renchi Raju
-
+ *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published bythe Free Software Foundation;
@@ -19,28 +19,31 @@
  *
  * ============================================================ */
 
+// ANSI C headers
 #include <cmath>
 
+// C++ headers
 #include <algorithm>
 using namespace std;
 
+// Qt headers
 #include <qtimer.h>
 #include <qimage.h>
 #include <qlayout.h>
 #include <qsize.h>
-#include <qfileinfo.h>
 #include <qdir.h>
 #include <qpainter.h>
 
+// MythTV plugin headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/lcddevice.h>
 #include <mythtv/util.h>
 
+// MythGallery headers
 #include "glsingleview.h"
 #include "galleryutil.h"
 
-#define LOC QString("GLXDialog: ")
-#define LOC_ERR QString("GLXDialog, Error: ")
+#define LOC QString("GLView: ")
+#define LOC_ERR QString("GLView, Error: ")
 
 GLSDialog::GLSDialog(const ThumbList& itemList,
                      int pos, int slideShow, int sortOrder,
@@ -64,204 +67,50 @@ void GLSDialog::closeEvent(QCloseEvent *e)
     e->accept();
 }
 
-/** \fn GLTexture::Init(const QImage&)
- *  \brief Create the texture initialized with QImage
- */
-void GLTexture::Init(const QImage &image)
-{
-    Deinit();
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-
-    /* actually generate the texture */
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, image.width(), image.height(), 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-
-    /* enable linear filtering  */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-}
-
-/** \fn GLTexture::Init(void)
- *  \brief Delete the texture
- */
-void GLTexture::Deinit(void)
-{
-    if (tex)
-        glDeleteTextures(1, &tex);
-}
-
-void GLTexture::Bind(void)
-{
-    glMatrixMode(GL_TEXTURE);
-    glLoadIdentity();
-    glRotatef(GetAngle(), 0.0f, 0.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, tex);
-}
-
-void GLTexture::MakeQuad(float alpha, float scale)
-{
-    Bind();
-
-    glBegin(GL_QUADS);
-    glColor4f(1.0f, 1.0f, 1.0f, alpha);
-
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-GetTextureX() * scale, -GetTextureY() * scale, 0.0f);
-
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(+GetTextureX() * scale, -GetTextureY() * scale, 0.0f);
-
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(+GetTextureX() * scale, +GetTextureY() * scale, 0.0f);
-
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(-GetTextureX() * scale, +GetTextureY() * scale, 0.0f);
-    glEnd();
-}
-
-void GLTexture::ScaleTo(const QSize &dest)
-{
-    QSize sz = GetSize();
-    sz.scale(dest.width(), dest.height(), QSize::ScaleMin);
-    SetScale((float)sz.width()  / (float)dest.width(),
-             (float)sz.height() / (float)dest.height());
-}
-
-void GLTexture::SetItem(ThumbItem *thumbItem, const QSize &sz)
-{
-    item = thumbItem;
-    if (item)
-    {
-        angle = item->GetRotationAngle();
-        SetSize(sz);
-
-        if (angle % 180 != 0)
-            SwapWidthHeight();
-    }
-}
-
-QString GLTexture::GetDescription(void) const
-{
-    if (!item)
-        return QString::null;
-
-    QFileInfo fi(item->GetPath());
-
-    QString info = item->GetName();
-    info += "\n\n" + GLSingleView::tr("Folder: ") + fi.dir().dirName();
-    info += "\n" + GLSingleView::tr("Created: ") + fi.created().toString();
-    info += "\n" + GLSingleView::tr("Modified: ") +
-        fi.lastModified().toString();
-    info += "\n" + QString(GLSingleView::tr("Bytes") + ": %1").arg(fi.size());
-    info += "\n" + QString(GLSingleView::tr("Width") + ": %1 " +
-                           GLSingleView::tr("pixels")).arg(GetSize().width());
-    info += "\n" + QString(GLSingleView::tr("Height") + ": %1 " +
-                           GLSingleView::tr("pixels")).arg(GetSize().height());
-    info += "\n" + QString(GLSingleView::tr("Pixel Count") + ": %1 " +
-                           GLSingleView::tr("megapixels"))
-        .arg((float) GetPixelCount() / 1000000.0f, 0, 'f', 2);
-    info += "\n" + QString(GLSingleView::tr("Rotation Angle") + ": %1 " +
-                           GLSingleView::tr("degrees")).arg(angle);
-
-    return info;
-}
-
 GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
                            int sortorder, QWidget *parent)
     : QGLWidget(parent),
-      m_pos(pos),
-      m_itemList(itemList),
-      m_movieState(0),
-      m_screenSize(640,480),
-      m_wmult(1.0f),
-      m_hmult(1.0f),
-      m_textureSize(512,512),
-      m_curr(0),
+      ImageView(itemList, pos, slideShow, sortorder),
+      // General
+      m_source_x(0.0f),
+      m_source_y(0.0f),
+
+      // Texture variables (for display and effects)
+      m_texMaxDim(512),
+      m_texSize(512,512),
+      m_texCur(0),
       m_tex1First(true),
 
-      m_zoom(1.0f),
-      m_sx(0.0f),
-      m_sy(0.0f),
-
-      m_timer(new QTimer(this)),
-      m_delay(2),
-      m_tmout(m_delay * 1000),
-      m_transTimeout(2000),
-      m_transTimeoutInv(1.0f / m_transTimeout),
-      m_effectRunning(false),
-      m_running(false),
-      m_slideShow(slideShow),
-
+      // Info variables
       m_texInfo(0),
-      m_showInfo(false),
 
-      m_maxTexDim(512),
-      m_i(0),
-      m_dir(0),
+      // Common effect state variables
+      m_effect_rotate_direction(0),
+      m_effect_transition_timeout(2000),
+      m_effect_transition_timeout_inv(1.0f / m_effect_transition_timeout),
 
-      m_effectMethod(NULL),
-      m_effectRandom(false),
-      m_sequence(NULL),
-
-      m_cube_xrot(0.0f),
-      m_cube_yrot(0.0f),
-      m_cube_zrot(0.0f)
+      // Unshared effect state variables
+      m_effect_cube_xrot(0.0f),
+      m_effect_cube_yrot(0.0f),
+      m_effect_cube_zrot(0.0f)
 {
+    m_slideshow_timer = new QTimer(this);
+    RegisterEffects();
+
     // --------------------------------------------------------------------
 
     setFocusPolicy(QWidget::WheelFocus);
 
-    {
-        int xbase, ybase, screenwidth, screenheight;
-        gContext->GetScreenSettings(xbase, screenwidth,  m_wmult,
-                                    ybase, screenheight, m_hmult);
-        m_screenSize = QSize(screenwidth, screenheight);
-    }
-
     // --------------------------------------------------------------------
-
-    // remove all dirs from m_itemList;
-    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-
-    m_itemList.setAutoDelete(false);
-
-    ThumbItem *item = m_itemList.first();
-    while (item)
-    {
-        ThumbItem* next = m_itemList.next();
-        if (item->IsDir())
-        {
-            if (recurse)
-            {
-                GalleryUtil::LoadDirectory(m_itemList, item->GetPath(), sortorder,
-                                           recurse, NULL, NULL);
-            }
-            m_itemList.remove(item);
-        }
-        item = next;
-    }
-
-    // since we remove dirs item position might have changed
-    item = itemList.at(m_pos);
-    if (item)
-        m_pos = m_itemList.find(item);
-
-    if (!item || (m_pos == -1))
-        m_pos = 0;
-
-    // --------------------------------------------------------------------
-
-    RegisterEffects();
 
     QString transType = gContext->GetSetting("SlideshowOpenGLTransition");
-    if (!transType.isEmpty() && m_effectMap.contains(transType))
-        m_effectMethod = m_effectMap[transType];
+    if (!transType.isEmpty() && m_effect_map.contains(transType))
+        m_effect_method = m_effect_map[transType];
 
-    if (!m_effectMethod || transType == QString("random (gl)"))
+    if (!m_effect_method || transType == QString("random (gl)"))
     {
-        m_effectMethod = GetRandomEffect();
-        m_effectRandom = true;
+        m_effect_method = GetRandomEffect();
+        m_effect_random = true;
     }
 
     SetTransitionTimeout(gContext->GetNumSetting(
@@ -269,81 +118,31 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
 
     // --------------------------------------------------------------------
 
-    m_delay = gContext->GetNumSetting("SlideshowDelay", 0);
-    m_delay = (!m_delay) ? 2 : m_delay;
-    m_tmout = m_delay * 1000;
+    connect(m_slideshow_timer, SIGNAL(timeout()), this, SLOT(SlideTimeout()));
 
     // --------------------------------------------------------------------
-
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(slotTimeOut()));
-
-    // --------------------------------------------------------------------
-
-    if (slideShow > 1)
-    {
-        m_sequence = new SequenceShuffle(m_itemList.count());
-        m_pos = 0;
-    }
-    else
-    {
-        m_sequence = new SequenceInc(m_itemList.count());
-    }
-
-    m_pos = m_sequence->index(m_pos);
 
     if (slideShow)
     {
-        m_running = true;
-        m_timer->start(m_tmout, true);
+        m_slideshow_running = true;
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
         gContext->DisableScreensaver();
     }
 }
 
 GLSingleView::~GLSingleView()
 {
-    if (m_sequence)
-    {
-        delete m_sequence;
-        m_sequence = NULL;
-    }
-}
-
-int GLSingleView::NearestGLTextureSize(int v)
-{
-    int n = 0, last = 0;
-    int s;
-
-    for (s = 0; s < 32; ++s)
-    {
-        if (((v >> s) & 1) == 1)
-        {
-            ++n;
-            last = s;
-        }
-    }
-
-    if (n > 1)
-        s = 1 << (last + 1);
-    else
-        s = 1 << last;
-
-    return min(s, m_maxTexDim);
 }
 
 void GLSingleView::CleanUp(void)
 {
-    if (class LCD* lcd = LCD::Get())
-    {
-        lcd->switchToTime();
-    }
-
     makeCurrent();
 
-    if (m_timer)
+    if (m_slideshow_timer)
     {
-        m_timer->stop();
-        m_timer->deleteLater();
-        m_timer = NULL;
+        m_slideshow_timer->stop();
+        m_slideshow_timer->deleteLater();
+        m_slideshow_timer = NULL;
     }
 
     m_texItem[0].Deinit();
@@ -370,12 +169,12 @@ void GLSingleView::initializeGL(void)
 
     GLint param;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &param);
-    m_maxTexDim = param;
+    m_texMaxDim = param;
 
-    m_textureSize = QSize(NearestGLTextureSize(m_screenSize.width()),
-                          NearestGLTextureSize(m_screenSize.height()));
+    m_texSize = QSize(GetNearestGLTextureSize(m_screenSize.width()),
+                      GetNearestGLTextureSize(m_screenSize.height()));
 
-    loadImage();
+    LoadImage();
 }
 
 void GLSingleView::resizeGL(int w, int h)
@@ -399,7 +198,7 @@ void GLSingleView::paintGL(void)
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
             cmd.replace("%s", path);
             myth_system(cmd);
-            if (!m_running)
+            if (!m_slideshow_running)
             {
                 close();
             }
@@ -418,9 +217,9 @@ void GLSingleView::paintGL(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if (m_effectRunning && m_effectMethod)
+    if (m_effect_running && !m_effect_method.isEmpty())
     {
-        (this->*m_effectMethod)();
+        RunEffect(m_effect_method);
     }
     else
     {
@@ -435,15 +234,15 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 {
     bool handled    = false;
 
-    bool wasRunning = m_running;
-    m_timer->stop();
-    m_running = false;
+    bool wasRunning = m_slideshow_running;
+    m_slideshow_timer->stop();
+    m_slideshow_running = false;
     gContext->RestoreScreensaver();
-    m_effectRunning = false;
-    m_tmout = m_delay * 1000;
+    m_effect_running = false;
+    m_slideshow_frame_delay_state = m_slideshow_frame_delay * 1000;
 
-    bool wasInfo = m_showInfo;
-    m_showInfo = false;
+    bool wasInfo = m_info_show;
+    m_info_show = false;
 
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
@@ -458,89 +257,75 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
         if (action == "LEFT" || action == "UP")
         {
-            m_zoom = 1.0f;
-            m_sx   = 0;
-            m_sy   = 0;
-            retreatFrame();
-            loadImage();
+            DisplayPrev(true, true);
         }
         else if (action == "RIGHT" || action == "DOWN")
         {
-            m_zoom = 1.0f;
-            m_sx   = 0;
-            m_sy   = 0;
-            advanceFrame();
-            loadImage();
+            DisplayNext(true, true);
         }
         else if (action == "ZOOMOUT")
         {
-            m_sx   = 0;
-            m_sy   = 0;
+            m_source_x   = 0;
+            m_source_y   = 0;
             if (m_zoom > 0.5f)
-            {
-                m_zoom = m_zoom /2;
-            }
+                SetZoom(m_zoom * 0.5f);
             else
                 handled = false;
         }
         else if (action == "ZOOMIN")
         {
-            m_sx   = 0;
-            m_sy   = 0;
+            m_source_x   = 0;
+            m_source_y   = 0;
             if (m_zoom < 4.0f)
-            {
-                m_zoom = m_zoom * 2;
-            }
+                SetZoom(m_zoom * 2.0f);
             else
                 handled = false;
         }
         else if (action == "FULLSIZE")
         {
-            m_sx = 0;
-            m_sy = 0;
+            m_source_x = 0;
+            m_source_y = 0;
             if (m_zoom != 1)
-            {
-                m_zoom = 1.0f;
-            }
+                SetZoom(1.0f);
             else
                 handled = false;
         }
         else if (action == "SCROLLLEFT")
         {
-            if (m_zoom > 1.0f && m_sx < 1.0f)
+            if (m_zoom > 1.0f && m_source_x < 1.0f)
             {
-                m_sx += scrollX;
-                m_sx  = min(m_sx, 1.0f);
+                m_source_x += scrollX;
+                m_source_x  = min(m_source_x, 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLRIGHT")
         {
-            if (m_zoom > 1.0f && m_sx > -1.0f)
+            if (m_zoom > 1.0f && m_source_x > -1.0f)
             {
-                m_sx -= scrollX;
-                m_sx  = max(m_sx, -1.0f);
+                m_source_x -= scrollX;
+                m_source_x  = max(m_source_x, -1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLUP")
         {
-            if (m_zoom > 1.0f && m_sy < 1.0f)
+            if (m_zoom > 1.0f && m_source_y < 1.0f)
             {
-                m_sy += scrollY;
-                m_sy  = min(m_sy, 1.0f);
+                m_source_y += scrollY;
+                m_source_y  = min(m_source_y, 1.0f);
             }
             else
                 handled = false;
         }
         else if (action == "SCROLLDOWN")
         {
-            if (m_zoom > 1.0f && m_sy > -1.0f)
+            if (m_zoom > 1.0f && m_source_y > -1.0f)
             {
-                m_sy -= scrollY;
-                m_sy  = max(m_sy, -1.0f);
+                m_source_y -= scrollY;
+                m_source_y  = max(m_source_y, -1.0f);
             }
             else
                 handled = false;
@@ -549,8 +334,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             if (m_zoom > 1.0f)
             {
-                m_sx = 0.0f;
-                m_sy = 0.0f;
+                m_source_x = 0.0f;
+                m_source_y = 0.0f;
             }
             else
                 handled = false;
@@ -559,8 +344,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             if (m_zoom > 1.0f)
             {
-                m_sx  =  1.0f;
-                m_sy  = -1.0f;
+                m_source_x  =  1.0f;
+                m_source_y  = -1.0f;
             }
             else
                 handled = false;
@@ -569,22 +354,22 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
         {
             if (m_zoom > 1.0f)
             {
-                m_sx = -1.0f;
-                m_sy =  1.0f;
+                m_source_x = -1.0f;
+                m_source_y =  1.0f;
             }
             else
                 handled = false;
         }
         else if (action == "ROTRIGHT")
         {
-            m_sx = 0;
-            m_sy = 0;
+            m_source_x = 0;
+            m_source_y = 0;
             Rotate(90);
         }
         else if (action == "ROTLEFT")
         {
-            m_sx = 0;
-            m_sy = 0;
+            m_source_x = 0;
+            m_source_y = 0;
             Rotate(-90);
         }
         else if (action == "DELETE")
@@ -592,33 +377,29 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             ThumbItem *item = m_itemList.at(m_pos);
             if (item && GalleryUtil::Delete(item->GetPath()))
             {
-                m_zoom = 1.0f;
-                m_sx   = 0;
-                m_sy   = 0;
                 item->SetPixmap(NULL);
-                advanceFrame();
-                loadImage();
+                DisplayNext(true, true);
             }
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
                  action == "RANDOMSHOW")
         {
-            m_sx   = 0;
-            m_sy   = 0;
-            m_zoom = 1.0f;
-            m_running = !wasRunning;
+            m_source_x   = 0;
+            m_source_y   = 0;
+            SetZoom(1.0f);
+            m_slideshow_running = !wasRunning;
         }
         else if (action == "INFO")
         {
-            m_showInfo = !wasInfo;
+            m_info_show = !wasInfo;
         }
         else
             handled = false;
     }
 
-    if (m_running)
+    if (m_slideshow_running)
     {
-        m_timer->start(m_tmout, true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
         gContext->DisableScreensaver();
     }
 
@@ -637,12 +418,12 @@ void GLSingleView::paintTexture(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glTranslatef(m_sx, m_sy, 0.0f);
+    glTranslatef(m_source_x, m_source_y, 0.0f);
     glScalef(m_zoom, m_zoom, 1.0f);
 
-    m_texItem[m_curr].MakeQuad();
+    m_texItem[m_texCur].MakeQuad();
 
-    if (m_showInfo)
+    if (m_info_show)
     {
         createTexInfo();
 
@@ -672,8 +453,15 @@ void GLSingleView::paintTexture(void)
     }
 }
 
-void GLSingleView::advanceFrame(void)
+void GLSingleView::DisplayNext(bool reset, bool loadImage)
 {
+    if (reset)
+    {
+        m_zoom     = 1.0f;
+        m_source_x = 0.0f;
+        m_source_y = 0.0f;
+    }
+
     // Search for next item that hasn't been deleted.
     // Close viewer if none remain.
     ThumbItem *item;
@@ -681,7 +469,7 @@ void GLSingleView::advanceFrame(void)
 
     while (true)
     {
-        m_pos = m_sequence->next();
+        m_pos = m_slideshow_sequence->next();
         item = m_itemList.at(m_pos);
         if (item)
         {
@@ -698,27 +486,32 @@ void GLSingleView::advanceFrame(void)
     }
 
     m_tex1First = !m_tex1First;
-    m_curr      = (m_curr) ? 0 : 1;
+    m_texCur      = (m_texCur) ? 0 : 1;
+
+    if (loadImage)
+        LoadImage();
 }
 
-void GLSingleView::retreatFrame(void)
+void GLSingleView::DisplayPrev(bool reset, bool loadImage)
 {
+    if (reset)
+    {
+        m_zoom     = 1.0f;
+        m_source_x = 0.0f;
+        m_source_y = 0.0f;
+    }
+
     // Search for next item that hasn't been deleted.
     // Close viewer in none remain.
-    ThumbItem *item;
     int oldpos = m_pos;
-
     while (true)
     {
-        m_pos = m_sequence->prev();
-        item = m_itemList.at(m_pos);
-        if (item)
-        {
-            if (QFile::exists(item->GetPath()))
-            {
-                break;
-            }
-        }
+        m_pos = m_slideshow_sequence->prev();
+
+        ThumbItem *item = m_itemList.at(m_pos);
+        if (item && QFile::exists(item->GetPath()))
+            break;
+
         if (m_pos == oldpos)
         {
             // No valid items!!!
@@ -727,10 +520,13 @@ void GLSingleView::retreatFrame(void)
     };
 
     m_tex1First = !m_tex1First;
-    m_curr      = (m_curr) ? 0 : 1;
+    m_texCur    = (m_texCur) ? 0 : 1;
+
+    if (loadImage)
+        LoadImage();
 }
 
-void GLSingleView::loadImage(void)
+void GLSingleView::LoadImage(void)
 {
     m_movieState = 0;
     ThumbItem *item = m_itemList.at(m_pos);
@@ -750,93 +546,125 @@ void GLSingleView::loadImage(void)
     if (image.isNull())
         return;
 
-    LCD *lcd = LCD::Get();
-    if (lcd)
-    {
-        QPtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, item->GetName(),
-                                         "Generic", true));
-        QString tmp = QString::number(m_pos + 1) + " / " +
-            QString::number(m_itemList.count());
-        textItems.append(new LCDTextItem(
-                             2, ALIGN_CENTERED, tmp, "Generic", false));
-        lcd->switchToGeneric(&textItems);
-    }
-
     int a = m_tex1First ? 0 : 1;
     m_texItem[a].SetItem(item, image.size());
     m_texItem[a].ScaleTo(m_screenSize);
-    m_texItem[a].Init(convertToGLFormat(image.smoothScale(m_textureSize)));
+    m_texItem[a].Init(convertToGLFormat(image.smoothScale(m_texSize)));
+
+    UpdateLCD(item);
 }
 
 void GLSingleView::Rotate(int angle)
 {
-    int ang = m_texItem[m_curr].GetAngle() + angle;
+    int ang = m_texItem[m_texCur].GetAngle() + angle;
 
     ang = (ang >= 360) ? ang - 360 : ang;
     ang = (ang < 0)    ? ang + 360 : ang;
 
-    m_texItem[m_curr].SetAngle(ang);
+    m_texItem[m_texCur].SetAngle(ang);
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item)
         item->SetRotationAngle(ang);
 
-    m_texItem[m_curr].SwapWidthHeight();
-    m_texItem[m_curr].ScaleTo(m_screenSize);
+    m_texItem[m_texCur].SwapWidthHeight();
+    m_texItem[m_texCur].ScaleTo(m_screenSize);
+}
+
+void GLSingleView::SetZoom(float zoom)
+{
+    m_zoom = zoom;
+}
+
+void GLSingleView::SetTransitionTimeout(int timeout)
+{
+    m_effect_transition_timeout = timeout;
+    m_effect_transition_timeout_inv = 1.0f;
+    if (timeout)
+        m_effect_transition_timeout_inv = 1.0f / timeout;
+}
+
+int GLSingleView::GetNearestGLTextureSize(int v) const
+{
+    int n = 0, last = 0;
+    int s;
+
+    for (s = 0; s < 32; ++s)
+    {
+        if (((v >> s) & 1) == 1)
+        {
+            ++n;
+            last = s;
+        }
+    }
+
+    if (n > 1)
+        s = 1 << (last + 1);
+    else
+        s = 1 << last;
+
+    return min(s, m_texMaxDim);
 }
 
 void GLSingleView::RegisterEffects(void)
 {
-    m_effectMap.insert("none",            &GLSingleView::effectNone);
-    m_effectMap.insert("blend (gl)",      &GLSingleView::effectBlend);
-    m_effectMap.insert("zoom blend (gl)", &GLSingleView::effectZoomBlend);
-    m_effectMap.insert("fade (gl)",       &GLSingleView::effectFade);
-    m_effectMap.insert("rotate (gl)",     &GLSingleView::effectRotate);
-    m_effectMap.insert("bend (gl)",       &GLSingleView::effectBend);
-    m_effectMap.insert("inout (gl)",      &GLSingleView::effectInOut);
-    m_effectMap.insert("slide (gl)",      &GLSingleView::effectSlide);
-    m_effectMap.insert("flutter (gl)",    &GLSingleView::effectFlutter);
-    m_effectMap.insert("cube (gl)",       &GLSingleView::effectCube);
+    m_effect_map.insert("none",            "EffectNone");
+    m_effect_map.insert("blend (gl)",      "EffectBlend");
+    m_effect_map.insert("zoom blend (gl)", "EffectZoomBlend");
+    m_effect_map.insert("fade (gl)",       "EffectFade");
+    m_effect_map.insert("rotate (gl)",     "EffectRotate");
+    m_effect_map.insert("bend (gl)",       "EffectBend");
+    m_effect_map.insert("inout (gl)",      "EffectInOut");
+    m_effect_map.insert("slide (gl)",      "EffectSlide");
+    m_effect_map.insert("flutter (gl)",    "EffectFlutter");
+    m_effect_map.insert("cube (gl)",       "EffectCube");
 }
 
-GLSingleView::EffectMethod GLSingleView::GetRandomEffect(void)
+void GLSingleView::RunEffect(const QString &effect)
 {
-    QMap<QString, EffectMethod>  tmpMap(m_effectMap);
-
-    tmpMap.remove("none");
-    QStringList t = tmpMap.keys();
-
-    int count = t.count();
-
-    int i = (int)((float)(count) * rand()/(RAND_MAX+1.0));
-    QString key = t[i];
-
-    return tmpMap[key];
+    if (effect == "EffectBlend")
+        EffectBlend();
+    else if (effect == "EffectZoomBlend")
+        EffectZoomBlend();
+    else if (effect == "EffectFade")
+        EffectFade();
+    else if (effect == "EffectRotate")
+        EffectRotate();
+    else if (effect == "EffectBend")
+        EffectBend();
+    else if (effect == "EffectInOut")
+        EffectInOut();
+    else if (effect == "EffectSlide")
+        EffectSlide();
+    else if (effect == "EffectFlutter")
+        EffectFlutter();
+    else if (effect == "EffectCube")
+        EffectCube();
+    else //if (effect == "EffectNone")
+        EffectNone();
 }
 
-void GLSingleView::effectNone(void)
+void GLSingleView::EffectNone(void)
 {
     paintTexture();
-    m_effectRunning = false;
-    m_tmout = -1;
+    m_effect_running = false;
+    m_slideshow_frame_delay_state = -1;
     return;
 }
 
-void GLSingleView::effectBlend(void)
+void GLSingleView::EffectBlend(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    float t = m_time.elapsed() * m_transTimeoutInv;
+    float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    m_texItem[(m_curr) ? 0 : 1].MakeQuad();
+    m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
     glBegin(GL_QUADS);
     {
@@ -848,207 +676,207 @@ void GLSingleView::effectBlend(void)
     }
     glEnd();
 
-    m_texItem[m_curr].MakeQuad(t);
+    m_texItem[m_texCur].MakeQuad(t);
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectZoomBlend(void)
+void GLSingleView::EffectZoomBlend(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    float t = m_time.elapsed() * m_transTimeoutInv;
+    float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    m_texItem[m_curr ? 0 : 1].MakeQuad(1.0f - t, 1.0f + (0.75 * t));
-    m_texItem[m_curr].MakeQuad(t);
+    m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - t, 1.0f + (0.75 * t));
+    m_texItem[m_texCur].MakeQuad(t);
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectRotate(void)
+void GLSingleView::EffectRotate(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    if (m_i == 0)
-        m_dir = (int)((2.0*rand()/(RAND_MAX+1.0)));
+    if (m_effect_current_frame == 0)
+        m_effect_rotate_direction = (int)((2.0*rand()/(RAND_MAX+1.0)));
 
-    float t = m_time.elapsed() * m_transTimeoutInv;
+    float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    m_texItem[m_curr].MakeQuad();
+    m_texItem[m_texCur].MakeQuad();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     float rotate = 360.0f * t;
-    glRotatef(((m_dir == 0) ? -1 : 1) * rotate,
+    glRotatef(((m_effect_rotate_direction == 0) ? -1 : 1) * rotate,
               0.0f, 0.0f, 1.0f);
     float scale = 1.0f * (1.0f - t);
     glScalef(scale, scale, 1.0f);
 
-    m_texItem[(m_curr) ? 0 : 1].MakeQuad();
+    m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectBend(void)
+void GLSingleView::EffectBend(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    if (m_i == 0)
-        m_dir = (int)((2.0f*rand()/(RAND_MAX+1.0f)));
+    if (m_effect_current_frame == 0)
+        m_effect_rotate_direction = (int)((2.0f*rand()/(RAND_MAX+1.0f)));
 
-    float t = m_time.elapsed() * m_transTimeoutInv;
+    float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    m_texItem[m_curr].MakeQuad();
+    m_texItem[m_texCur].MakeQuad();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(90.0f * t,
-              (m_dir == 0) ? 1.0f : 0.0f,
-              (m_dir == 1) ? 1.0f : 0.0f,
+              (m_effect_rotate_direction == 0) ? 1.0f : 0.0f,
+              (m_effect_rotate_direction == 1) ? 1.0f : 0.0f,
               0.0f);
 
-    m_texItem[(m_curr) ? 0 : 1].MakeQuad();
+    m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectFade(void)
+void GLSingleView::EffectFade(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    float t = m_time.elapsed() * m_transTimeoutInv;
+    float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    if (m_time.elapsed() <= m_transTimeout / 2)
-        m_texItem[(m_curr) ? 0 : 1].MakeQuad(1.0f - (2.0f * t));
+    if (m_effect_frame_time.elapsed() <= m_effect_transition_timeout / 2)
+        m_texItem[(m_texCur) ? 0 : 1].MakeQuad(1.0f - (2.0f * t));
     else
-        m_texItem[m_curr].MakeQuad(2.0f * (t - 0.5f));
+        m_texItem[m_texCur].MakeQuad(2.0f * (t - 0.5f));
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectInOut(void)
+void GLSingleView::EffectInOut(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        m_dir = 1 + (int)((4.0f*rand()/(RAND_MAX+1.0f)));
+        m_effect_rotate_direction = 1 + (int)((4.0f*rand()/(RAND_MAX+1.0f)));
     }
 
-    int  texnum  = m_curr;
+    int  texnum  = m_texCur;
     bool fadeout = false;
-    if (m_time.elapsed() <= m_transTimeout / 2)
+    if (m_effect_frame_time.elapsed() <= m_effect_transition_timeout / 2)
     {
-        texnum  = (m_curr) ? 0 : 1;
+        texnum  = (m_texCur) ? 0 : 1;
         fadeout = true;
     }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float tt = m_time.elapsed() * m_transTimeoutInv;
+    float tt = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
     float t = 2.0f / ((fadeout) ? (0.5f - tt) : (tt - 0.5f));
 
     glScalef(t, t, 1.0f);
     t = 1.0f - t;
-    glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * t : 0.0f,
-                 (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * t : 0.0f,
+    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? 1 : -1) * t : 0.0f,
+                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? 1 : -1) * t : 0.0f,
                  0.0f);
 
     m_texItem[texnum].MakeQuad();
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectSlide(void)
+void GLSingleView::EffectSlide(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    if (m_i == 0)
-        m_dir = 1 + (int)((4.0f * rand() / (RAND_MAX + 1.0f)));
+    if (m_effect_current_frame == 0)
+        m_effect_rotate_direction = 1 + (int)((4.0f * rand() / (RAND_MAX + 1.0f)));
 
-    m_texItem[m_curr].MakeQuad();
+    m_texItem[m_texCur].MakeQuad();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    float t = m_time.elapsed() * m_transTimeoutInv;
+    float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
     float trans = 2.0f * t;
-    glTranslatef((m_dir % 2 == 0) ? ((m_dir == 2)? 1 : -1) * trans : 0.0f,
-                 (m_dir % 2 == 1) ? ((m_dir == 1)? 1 : -1) * trans : 0.0f,
+    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? 1 : -1) * trans : 0.0f,
+                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? 1 : -1) * trans : 0.0f,
                  0.0f);
 
-    m_texItem[(m_curr) ? 0 : 1].MakeQuad();
+    m_texItem[(m_texCur) ? 0 : 1].MakeQuad();
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectFlutter(void)
+void GLSingleView::EffectFlutter(void)
 {
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
-    GLTexture &ta = m_texItem[(m_curr) ? 0 : 1];
+    GLTexture &ta = m_texItem[(m_texCur) ? 0 : 1];
 
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
         for (int x = 0; x < 40; x++)
         {
             for (int y = 0; y < 40; y++)
             {
-                m_points[x][y][0] =
+                m_effect_flutter_points[x][y][0] =
                     (float) (x / 20.0f - 1.0f) * ta.GetTextureX();
-                m_points[x][y][1] =
+                m_effect_flutter_points[x][y][1] =
                     (float) (y / 20.0f - 1.0f) * ta.GetTextureY();
-                m_points[x][y][2] =
+                m_effect_flutter_points[x][y][2] =
                     (float) sin((x / 20.0f - 1.0f) * M_PI * 2.0f) / 5.0;
             }
         }
     }
 
-    m_texItem[m_curr].MakeQuad();
+    m_texItem[m_texCur].MakeQuad();
 
-    float t      = m_time.elapsed() * m_transTimeoutInv;
+    float t      = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
     float rotate = 60.0f * t;
     float scale  = 1.0f  - t;
 
@@ -1076,55 +904,55 @@ void GLSingleView::effectFlutter(void)
                 float_xb = (float) (x + 1) / 40.0f;
                 float_yb = (float) (y + 1) / 40.0f;
                 glTexCoord2f(float_x, float_y);
-                glVertex3f(m_points[x][y][0],
-                           m_points[x][y][1],
-                           m_points[x][y][2]);
+                glVertex3f(m_effect_flutter_points[x][y][0],
+                           m_effect_flutter_points[x][y][1],
+                           m_effect_flutter_points[x][y][2]);
                 glTexCoord2f(float_x, float_yb);
-                glVertex3f(m_points[x][y + 1][0],
-                           m_points[x][y + 1][1],
-                           m_points[x][y + 1][2]);
+                glVertex3f(m_effect_flutter_points[x][y + 1][0],
+                           m_effect_flutter_points[x][y + 1][1],
+                           m_effect_flutter_points[x][y + 1][2]);
                 glTexCoord2f(float_xb, float_yb);
-                glVertex3f(m_points[x + 1][y + 1][0],
-                           m_points[x + 1][y + 1][1],
-                           m_points[x + 1][y + 1][2]);
+                glVertex3f(m_effect_flutter_points[x + 1][y + 1][0],
+                           m_effect_flutter_points[x + 1][y + 1][1],
+                           m_effect_flutter_points[x + 1][y + 1][2]);
                 glTexCoord2f(float_xb, float_y);
-                glVertex3f(m_points[x + 1][y][0],
-                           m_points[x + 1][y][1],
-                           m_points[x + 1][y][2]);
+                glVertex3f(m_effect_flutter_points[x + 1][y][0],
+                           m_effect_flutter_points[x + 1][y][1],
+                           m_effect_flutter_points[x + 1][y][2]);
             }
         }
     }
     glEnd();
 
     // wave every two iterations
-    if (m_i%2 == 0)
+    if (m_effect_current_frame%2 == 0)
     {
 
         float hold;
         int x, y;
         for (y = 0; y < 40; y++)
         {
-            hold = m_points[0][y][2];
+            hold = m_effect_flutter_points[0][y][2];
             for (x = 0; x < 39; x++)
             {
-                m_points[x][y][2] = m_points[x + 1][y][2];
+                m_effect_flutter_points[x][y][2] = m_effect_flutter_points[x + 1][y][2];
             }
-            m_points[39][y][2] = hold;
+            m_effect_flutter_points[39][y][2] = hold;
         }
     }
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::effectCube(void)
+void GLSingleView::EffectCube(void)
 {
-    float tot      = m_transTimeout ? m_transTimeout : 1.0f;
-    float rotStart = 0.25f * m_transTimeout;
+    float tot      = m_effect_transition_timeout ? m_effect_transition_timeout : 1.0f;
+    float rotStart = 0.25f * m_effect_transition_timeout;
 
-    if (m_time.elapsed() > m_transTimeout)
+    if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
         paintTexture();
-        m_effectRunning = false;
-        m_tmout = -1;
+        m_effect_running = false;
+        m_slideshow_frame_delay_state = -1;
         return;
     }
 
@@ -1133,8 +961,8 @@ void GLSingleView::effectCube(void)
     glDepthFunc(GL_LEQUAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    GLTexture &ta = m_texItem[(m_curr) ? 0 : 1];
-    GLTexture &tb = m_texItem[m_curr];
+    GLTexture &ta = m_texItem[(m_texCur) ? 0 : 1];
+    GLTexture &tb = m_texItem[m_texCur];
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -1146,24 +974,24 @@ void GLSingleView::effectCube(void)
 
     glFrustum(-1.0f, 1.0f, -1.0f, 1.0f, znear - 0.01f, 10.0f);
 
-    if (m_i == 0)
+    if (m_effect_current_frame == 0)
     {
-        m_cube_xrot = 0.0f;
-        m_cube_yrot = 0.0f;
-        m_cube_zrot = 0.0f;
+        m_effect_cube_xrot = 0.0f;
+        m_effect_cube_yrot = 0.0f;
+        m_effect_cube_zrot = 0.0f;
     }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float elapsed = (float) m_time.elapsed();
+    float elapsed = (float) m_effect_frame_time.elapsed();
     float tmp     = ((elapsed <= tot * 0.5) ? elapsed : tot - elapsed);
     float trans   = 5.0f * tmp / tot;
 
     glTranslatef(0.0f, 0.0f, -znear - 1.0f - trans);
 
-    glRotatef(m_cube_xrot, 1.0f, 0.0f, 0.0f);
-    glRotatef(m_cube_yrot, 0.0f, 1.0f, 0.0f);
+    glRotatef(m_effect_cube_xrot, 1.0f, 0.0f, 0.0f);
+    glRotatef(m_effect_cube_yrot, 0.0f, 1.0f, 0.0f);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -1288,72 +1116,72 @@ void GLSingleView::effectCube(void)
 
     if ((elapsed >= rotStart) && (elapsed < (tot - rotStart)))
     {
-        m_cube_xrot = 360.0f * (elapsed - rotStart) / (tot - 2 * rotStart);
-        m_cube_yrot = 0.5f * m_cube_xrot;
+        m_effect_cube_xrot = 360.0f * (elapsed - rotStart) / (tot - 2 * rotStart);
+        m_effect_cube_yrot = 0.5f * m_effect_cube_xrot;
     }
 
-    m_i++;
+    m_effect_current_frame++;
 }
 
-void GLSingleView::slotTimeOut(void)
+void GLSingleView::SlideTimeout(void)
 {
     bool wasMovie = false, isMovie = false;
-    if (!m_effectMethod)
+    if (m_effect_method.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "No transition method");
         return;
     }
 
-    if (m_effectRunning)
+    if (m_effect_running)
     {
-        m_tmout = 10;
+        m_slideshow_frame_delay_state = 10;
     }
     else
     {
-        if (m_tmout == -1)
+        if (m_slideshow_frame_delay_state == -1)
         {
             // effect was running and is complete now
             // run timer while showing current image
-            m_tmout = m_delay * 1000;
-            m_i     = 0;
+            m_slideshow_frame_delay_state = m_slideshow_frame_delay * 1000;
+            m_effect_current_frame     = 0;
         }
         else
         {
-
             // timed out after showing current image
             // load next image and start effect
 
-            if (m_effectRandom)
-                m_effectMethod = GetRandomEffect();
+            if (m_effect_random)
+                m_effect_method = GetRandomEffect();
 
-            advanceFrame();
+            DisplayNext(false, false);
 
             wasMovie = m_movieState > 0;
-            loadImage();
+            LoadImage();
             isMovie = m_movieState > 0;
             // If transitioning to/from a movie, don't do an effect,
             // and shorten timeout
             if (wasMovie || isMovie)
             {
-                m_tmout = 1;
+                m_slideshow_frame_delay_state = 1;
             }
             else
             {
-                m_tmout = 10;
-                m_effectRunning = true;
-                m_i = 0;
+                m_slideshow_frame_delay_state = 10;
+                m_effect_running = true;
+                m_effect_current_frame = 0;
             }
-            m_time.restart();
+            m_effect_frame_time.restart();
         }
     }
 
     updateGL();
-    m_timer->start(m_tmout, true);
+    m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+
     // If transitioning to/from a movie, no effect is running so
     // next timeout should trigger proper immage delay.
     if (wasMovie || isMovie)
     {
-        m_tmout = -1;
+        m_slideshow_frame_delay_state = -1;
     }
 }
 
@@ -1362,7 +1190,7 @@ void GLSingleView::createTexInfo(void)
     if (m_texInfo)
         glDeleteTextures(1, &m_texInfo);
 
-    QString info = m_texItem[m_curr].GetDescription();
+    QString info = m_texItem[m_texCur].GetDescription();
     if (info.isEmpty())
         return;
 
