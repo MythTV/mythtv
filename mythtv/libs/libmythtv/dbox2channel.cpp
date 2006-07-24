@@ -50,7 +50,7 @@ DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
       m_dbox2options(dbox2_options), m_cardid(cardid),
       m_channelListReady(false),     m_lastChannel("1"),
       m_requestChannel(""),          m_epg(new DBox2EPG()),
-      m_recorderAlive(false),
+      m_recorderAlive(false),        m_recorder(NULL),
       http(new QHttp()),             httpChanger(new QHttp()),
       m_relay(new DBox2CRelay(this)),
       m_dbox2channelcount(0)

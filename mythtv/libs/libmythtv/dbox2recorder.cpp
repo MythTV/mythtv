@@ -510,7 +510,7 @@ int DBox2Recorder::processStream(stream_meta *stream)
     stream->bufferIndex += bytesRead;
 
     int readIndex = 0;
-    while (readIndex < stream->bufferIndex)
+    while (readIndex + (int)TSPacket::SIZE < (int)stream->bufferIndex)
     {
         // Try to find next TS
         int tsPos = findTSHeader(stream->buffer + readIndex,
@@ -528,13 +528,8 @@ int DBox2Recorder::processStream(stream_meta *stream)
         }
 
         // Check if enough data is available to process complete TS packet.
-        if ((stream->bufferIndex - readIndex - tsPos) < 188)
-        {
-            // VERBOSE(VB_IMPORTANT, LOC +
-            //         QString("TS header at %1").arg(tsPos) +
-            //         "but packet not yet complete.");
+        if ((stream->bufferIndex - readIndex - tsPos) < (int)TSPacket::SIZE)
             break;
-        }
 
         updatePMTSectionID(stream->buffer + readIndex + tsPos, m_pmtPID);
 
@@ -560,9 +555,13 @@ int DBox2Recorder::processStream(stream_meta *stream)
         readIndex += tsPos + TSPacket::SIZE;
     }
 
-    memcpy(stream->buffer, stream->buffer + readIndex, bufferSize - readIndex);
-    stream->bufferIndex = stream->bufferIndex - readIndex;
-
+    if (readIndex > 0)
+    {
+        memcpy(stream->buffer, stream->buffer + readIndex,
+               bufferSize - readIndex);
+        stream->bufferIndex = stream->bufferIndex - readIndex;
+    }
+    
     if (stream->bufferIndex < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
