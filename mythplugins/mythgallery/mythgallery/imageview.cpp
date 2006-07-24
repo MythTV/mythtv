@@ -69,6 +69,10 @@ ImageView::ImageView(const ThumbList &itemList,
 
     m_itemList.setAutoDelete(false);
 
+    ThumbItem *origItem = NULL;
+    if ((uint)m_pos < m_itemList.count())
+        origItem = m_itemList.at(m_pos);
+
     // remove all dirs from m_itemList;
     ThumbItem *item = m_itemList.first();
     while (item)
@@ -87,10 +91,6 @@ ImageView::ImageView(const ThumbList &itemList,
     // --------------------------------------------------------------------
 
     // since we remove dirs item position might have changed
-    ThumbItem *origItem = NULL;
-    if ((uint)m_pos < m_itemList.count())
-        origItem = m_itemList.at(m_pos);
-
     if (origItem) 
         m_pos = m_itemList.find(origItem);
 
