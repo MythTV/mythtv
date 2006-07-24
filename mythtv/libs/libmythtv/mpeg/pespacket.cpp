@@ -26,7 +26,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
     {
         VERBOSE(VB_RECORD, "Error: We started a PES packet, "
                 "without a payloadStart!");
-        return false;
+        return true;
     }
     else if (!IsClone())
     {
