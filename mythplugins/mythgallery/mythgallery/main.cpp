@@ -22,33 +22,10 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
-void runGallery(void)
+static void run(MythMediaDevice *dev)
 {
-    gContext->addCurrentLocation("mythgallery");
-    int sortorder = gContext->GetNumSetting("GallerySortOrder");
     QString startdir = gContext->GetSetting("GalleryDir");
     QDir dir(startdir);
-    if (!dir.exists() || !dir.isReadable()) {
-        DialogBox diag(gContext->GetMainWindow(),
-                       QObject::tr("Gallery Directory does not exist"
-                                   " or is unreadable."));
-        diag.AddButton(QObject::tr("Ok"));
-        diag.exec();
-    }
-    else
-    {
-        IconView icv(startdir, NULL, sortorder,
-                     gContext->GetMainWindow(), "IconView");
-        icv.exec();
-    }
-    gContext->removeCurrentLocation();
-}
-
-void handleMedia(MythMediaDevice *dev)
-{
-    int sortorder = gContext->GetNumSetting("GallerySortOrder");
-    QString galleryDir = gContext->GetSetting("GalleryDir");
-    QDir dir(galleryDir);
     if (!dir.exists() || !dir.isReadable())
     {
         DialogBox diag(gContext->GetMainWindow(),
@@ -59,12 +36,22 @@ void handleMedia(MythMediaDevice *dev)
     }
     else
     {
-        IconView icv(galleryDir, dev, sortorder,
-                     gContext->GetMainWindow(), "IconView");
+        IconView icv(startdir, dev, gContext->GetMainWindow());
         icv.exec();
     }
 }
 
+void runGallery(void)
+{
+    gContext->addCurrentLocation("mythgallery");
+    run(NULL);
+    gContext->removeCurrentLocation();
+}
+
+void handleMedia(MythMediaDevice *dev)
+{
+    run(dev);
+}
 
 void setupKeys(void)
 {

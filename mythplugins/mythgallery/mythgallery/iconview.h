@@ -40,9 +40,7 @@ class IconView : public MythDialog
   public:
     IconView(const QString   &galleryDir,
              MythMediaDevice *initialDevice,
-             int              sortorder,
-             MythMainWindow  *parent,
-             const char      *name = 0);
+             MythMainWindow  *parent);
     ~IconView();
 
   protected:
@@ -98,7 +96,6 @@ class IconView : public MythDialog
     QDict<ThumbItem>    m_itemDict;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
-    int                 m_sortorder;
 
     XMLParse           *m_theme;
     QRect               m_menuRect;
@@ -135,7 +132,12 @@ class IconView : public MythDialog
     int                 m_thumbH;
 
     ThumbGenerator     *m_thumbGen;
+
     int                 m_showcaption;
+    int                 m_sortorder;
+    bool                m_useOpenGL;
+    bool                m_recurse;
+    QStringList         m_paths;
 
     typedef void (IconView::*MenuAction)(void);
 

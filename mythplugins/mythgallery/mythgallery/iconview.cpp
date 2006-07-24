@@ -52,11 +52,9 @@ using namespace std;
 
 IconView::IconView(const QString   &galleryDir,
                    MythMediaDevice *initialDevice,
-                   int              sortorder,
-                   MythMainWindow  *parent,
-                   const char      *name)
-    : MythDialog(parent, name),
-      m_galleryDir(galleryDir), m_sortorder(sortorder),
+                   MythMainWindow  *parent)
+    : MythDialog(parent, "IconView"),
+      m_galleryDir(galleryDir),
 
       m_theme(NULL),            m_menuRect(0,0,0,0),
       m_textRect(0,0,0,0),      m_viewRect(0,0,0,0),
@@ -80,7 +78,13 @@ IconView::IconView(const QString   &galleryDir,
                      this,
                      (int)(m_thumbW - 10 * wmult),
                      (int)(m_thumbH - 10 * hmult))),
-      m_showcaption(gContext->GetNumSetting("GalleryOverlayCaption", 0))
+
+      m_showcaption(gContext->GetNumSetting("GalleryOverlayCaption", 0)),
+      m_sortorder(gContext->GetNumSetting("GallerySortOrder", 0)),
+      m_useOpenGL(gContext->GetNumSetting("SlideshowUseOpenGL", 0)),
+      m_recurse(gContext->GetNumSetting("GalleryRecursiveSlideshow", 0)),
+      m_paths(QStringList::split(
+                  ":", gContext->GetSetting("GalleryImportDirs")))
 {
     m_itemList.setAutoDelete(true);
     m_itemDict.setAutoDelete(false);
@@ -522,10 +526,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     }
 
 #ifdef USING_OPENGL
-                    int useOpenGL =
-                        gContext->GetNumSetting("SlideshowUseOpenGL");
-
-                    if (useOpenGL)
+                    if (m_useOpenGL)
                     {
 
                         if (QGLFormat::hasOpenGL())
@@ -1171,15 +1172,13 @@ void IconView::HandleDeleteCurrent(void)
 void IconView::HandleSlideShow(void)
 {
     ThumbItem *item = m_itemList.at(m_currRow * m_nCols + m_currCol);
-    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-    if (!item || (item->IsDir() && !recurse))
+    if (!item || (item->IsDir() && !m_recurse))
         return;
 
     int pos = m_currRow * m_nCols + m_currCol;
 
 #ifdef USING_OPENGL
-    int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
-    if (useOpenGL)
+    if (m_useOpenGL)
     {
         if (QGLFormat::hasOpenGL())
         {
@@ -1206,15 +1205,13 @@ void IconView::HandleSlideShow(void)
 void IconView::HandleRandomShow(void)
 {
     ThumbItem *item = m_itemList.at(m_currRow * m_nCols + m_currCol);
-    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-    if (!item || (item->IsDir() && !recurse))
+    if (!item || (item->IsDir() && !m_recurse))
         return;
 
     int pos = m_currRow * m_nCols + m_currCol;
 
 #ifdef USING_OPENGL
-    int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
-    if (useOpenGL)
+    if (m_useOpenGL)
     {
         if (QGLFormat::hasOpenGL())
         {
@@ -1244,6 +1241,27 @@ void IconView::HandleSettings(void)
     GallerySettings settings;
     settings.exec();
     gContext->ClearSettingsCache();
+
+    // reload settings
+    m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_sortorder   = gContext->GetNumSetting("GallerySortOrder", 0);
+    m_useOpenGL   = gContext->GetNumSetting("SlideshowUseOpenGL", 0);
+    m_recurse     = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    m_paths       = QStringList::split(
+        ":", gContext->GetSetting("GalleryImportDirs"));
+
+    // reload directory
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
+    {
+        LoadDirectory(m_currDevice->getMountPath(), true);
+        mon->Unlock(m_currDevice);
+    }
+    else
+    {
+        m_currDevice = NULL;
+        LoadDirectory(m_galleryDir, true);
+    }
 }
 
 void IconView::HandleImport(void)
@@ -1257,9 +1275,6 @@ void IconView::HandleImport(void)
     if (importDiag.exec() != 2)
         return;
 
-    QStringList paths = QStringList::split(
-        ":", gContext->GetSetting("GalleryImportDirs"));
-
     // Makes import directory samba/windows friendly (no colon)
     QString idirname = m_currDir + "/" +
         QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
@@ -1267,7 +1282,8 @@ void IconView::HandleImport(void)
     importdir.mkdir(idirname);
     importdir.setPath(idirname);
 
-    for (QStringList::Iterator it = paths.begin(); it != paths.end(); ++it)
+    for (QStringList::const_iterator it = m_paths.begin();
+         it != m_paths.end(); ++it)
     {
         path.setFile(*it);
         if (path.isDir() && path.isReadable())
