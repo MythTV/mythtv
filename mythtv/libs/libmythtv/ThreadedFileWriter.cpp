@@ -382,15 +382,20 @@ void ThreadedFileWriter::DiskLoop(void)
             size = safe_write(fd, buf+rpos, size, write_ok);
         }
 
-        QString msg =
-            "Maximum file size exceeded by '%1'\n\t\t\t"
-            "You must either change the process ulimits, configure\n\t\t\t"
-            "your operating system with \"Large File\" support, or use\n\t\t\t"
-            "a filesystem which supports 64-bit or 128-bit files.\n\t\t\t"
-            "HINT: FAT32 is a 32-bit filesystem.";
 
         if (!ignore_writes && !write_ok && (EFBIG == errno))
         {
+            QString msg =
+                "Maximum file size exceeded by '%1'"
+                "\n\t\t\t"
+                "You must either change the process ulimits, configure"
+                "\n\t\t\t"
+                "your operating system with \"Large File\" support, or use"
+                "\n\t\t\t"
+                "a filesystem which supports 64-bit or 128-bit files."
+                "\n\t\t\t"
+                "HINT: FAT32 is a 32-bit filesystem.";
+
             VERBOSE(VB_IMPORTANT, msg.arg(filename));
             ignore_writes = true;
         }
