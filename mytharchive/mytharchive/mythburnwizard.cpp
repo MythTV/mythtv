@@ -7,31 +7,32 @@
 
 // qt
 #include <qdir.h>
-#include <qdom.h>
+#include <qapplication.h>
 
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/libmythtv/remoteutil.h>
+#include <mythtv/libmythtv/programinfo.h>
 
 // mytharchive
-#include "mytharchivewizard.h"
+#include "archiveutil.h"
 #include "mythburnwizard.h"
 #include "editmetadata.h"
+#include "fileselector.h"
 
 // last page in wizard
-const int LAST_PAGE = 3;
+const int LAST_PAGE = 4;
 
 //Max size of a DVD-R in Mbytes
 const int MAX_DVDR_SIZE_SL = 4489;
 const int MAX_DVDR_SIZE_DL = 8978;
 
-MythburnWizard::MythburnWizard(ArchiveDestination destination,
-                               MythMainWindow *parent, QString window_name,
+MythburnWizard::MythburnWizard(MythMainWindow *parent, QString window_name,
                                QString theme_filename, const char *name)
                 : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
-    archiveDestination = destination;
+    //archiveDestination = AD_DVD_SL;
     themeDir = gContext->GetShareDir() + "mytharchive/themes/";
 
     archiveList = NULL;
@@ -49,8 +50,7 @@ MythburnWizard::MythburnWizard(ArchiveDestination destination,
 
     loadConfiguration();
 
-    freeSpace = destination.freeSpace / 1024;
-    updateSizeBar(true);
+    updateSizeBar();
 }
 
 MythburnWizard::~MythburnWizard(void)
@@ -61,7 +61,6 @@ MythburnWizard::~MythburnWizard(void)
         delete archiveList;
     if (profileList)
         delete profileList;
-
 }
 
 void MythburnWizard::keyPressEvent(QKeyEvent *e)
@@ -133,6 +132,8 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
                 category_selector->push(false);
             else if (getCurrentFocusWidget() == profile_selector)
                 profile_selector->push(false);
+            else if (getCurrentFocusWidget() == destination_selector)
+                destination_selector->push(false);
             else
                 nextPrevWidgetFocus(false);
         }
@@ -144,6 +145,8 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
                 category_selector->push(true);
             else if (getCurrentFocusWidget() == profile_selector)
                 profile_selector->push(true);
+            else if (getCurrentFocusWidget() == destination_selector)
+                destination_selector->push(true);
             else
                 nextPrevWidgetFocus(true);
         }
@@ -164,7 +167,7 @@ void MythburnWizard::keyPressEvent(QKeyEvent *e)
                 freeSpace = MAX_DVDR_SIZE_DL;
             else
                 freeSpace = MAX_DVDR_SIZE_SL;
-            updateSizeBar(getContext() != 2);
+            updateSizeBar();
         }
         else if (action == "TOGGLECUT")
         {
@@ -219,12 +222,15 @@ void MythburnWizard::toggleSelectedState()
     }
 
     archive_list->refresh();
+    updateSizeBar();
 
     updateSelectedArchiveList();
 }
 
-void MythburnWizard::updateSizeBar(bool show)
+void MythburnWizard::updateSizeBar(void)
 {
+    bool show = (getContext() == 2 || getContext() == 4);
+
     if (show)
     {
         maxsize_text->show();
@@ -293,6 +299,32 @@ void MythburnWizard::updateSizeBar(bool show)
 
 void MythburnWizard::wireUpTheme()
 {
+    // make iso image checkbox
+    createISO_check = getUICheckBoxType("makeisoimage_check");
+    if (createISO_check)
+    {
+        connect(createISO_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleCreateISO(bool)));
+    }
+
+    // burn dvdr checkbox
+    doBurn_check = getUICheckBoxType("burntodvdr_check");
+    if (doBurn_check)
+    {
+        connect(doBurn_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleDoBurn(bool)));
+    }
+    doBurn_text = getUITextType("burntodvdr_text");
+
+    // erase DVD RW checkbox
+    eraseDvdRw_check = getUICheckBoxType("erasedvdrw_check");
+    if (eraseDvdRw_check)
+    {
+        connect(eraseDvdRw_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleEraseDvdRw(bool)));
+    }
+    eraseDvdRw_text = getUITextType("erasedvdrw_text");
+
     // theme preview images
     intro_image = getUIImageType("intro_image");
     mainmenu_image = getUIImageType("mainmenu_image");
@@ -333,6 +365,40 @@ void MythburnWizard::wireUpTheme()
         cancel_button->setText(tr("Cancel"));
         connect(cancel_button, SIGNAL(pushed()), this, SLOT(handleCancel()));
     }
+
+    // destination selector
+    destination_selector = getUISelectorType("destination_selector");
+    if (destination_selector)
+    {
+        connect(destination_selector, SIGNAL(pushed(int)),
+                this, SLOT(setDestination(int)));
+
+        for (int x = 0; x < ArchiveDestinationsCount; x++)
+            destination_selector->addItem(ArchiveDestinations[x].type,
+                                          ArchiveDestinations[x].name);
+    }
+
+    destination_text = getUITextType("destination_text");
+
+    // find button
+    find_button = getUITextButtonType("find_button");
+    if (find_button)
+    {
+        find_button->setText(tr("Choose File..."));
+        connect(find_button, SIGNAL(pushed()), this, SLOT(handleFind()));
+    }
+
+    filename_edit = getUIRemoteEditType("filename_edit");
+    if (filename_edit)
+    {
+        filename_edit->createEdit(this);
+        connect(filename_edit, SIGNAL(loosingFocus()), this, 
+                SLOT(filenameEditLostFocus()));
+    }
+
+    freespace_text = getUITextType("freespace_text");
+
+    setDestination(0);
 
     // recordings selector
     category_selector = getUISelectorType("category_selector");
@@ -492,7 +558,7 @@ void MythburnWizard::setProfile(EncoderProfile *profile, ArchiveItem *item)
                 newsize_text->SetText(tr("New Size ") + formatSize(item->newsize / 1024, 2));
             }
 
-            updateSizeBar(true);
+            updateSizeBar();
         }
     }
 }
@@ -679,7 +745,7 @@ void MythburnWizard::selectedChanged(UIListBtnTypeItem *item)
 
 void MythburnWizard::handleNextPage()
 {
-    if (getContext() == 1 && selectedList.count() == 0)
+    if (getContext() == 2 && selectedList.count() == 0)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
             tr("You need to select at least one item to archive!"));
@@ -687,7 +753,10 @@ void MythburnWizard::handleNextPage()
     }
 
     if (getContext() == LAST_PAGE)
+    {
+        runScript();
         done(Accepted);
+    }
     else
         setContext(getContext() + 1);
 
@@ -699,7 +768,7 @@ void MythburnWizard::handleNextPage()
             next_button->setText(tr("Next"));
     }
 
-    updateSizeBar(getContext() != 2);
+    updateSizeBar();
     updateForeground();
     buildFocusList();
 }
@@ -715,6 +784,7 @@ void MythburnWizard::handlePrevPage()
     if (next_button)
         next_button->setText(tr("Next"));
 
+    updateSizeBar();
     updateForeground();
     buildFocusList();
 }
@@ -1192,18 +1262,29 @@ void MythburnWizard::createConfigFile(const QString &filename)
 void MythburnWizard::loadConfiguration(void)
 {
     theme_selector->setToItem(
-            gContext->GetSetting("MythArchiveMenuTheme", ""));
+            gContext->GetSetting("MythBurnMenuTheme", ""));
     setTheme(theme_list.findIndex(theme_selector->getCurrentString()));
 
-    bCreateISO = (gContext->GetSetting("MythArchiveCreateISO", "0") == "1");
-    bDoBurn = (gContext->GetSetting("MythArchiveBurnDVDr", "1") == "1");
-    bEraseDvdRw = (gContext->GetSetting("MythArchiveEraseDvdRw", "0") == "1");
+    bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
+    createISO_check->setState(bCreateISO);
+
+    bDoBurn = (gContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
+    doBurn_check->setState(bDoBurn);
+
+    bEraseDvdRw = (gContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
+    eraseDvdRw_check->setState(bEraseDvdRw);
 }
 
 void MythburnWizard::saveConfiguration(void)
 {
-    gContext->SaveSetting("MythArchiveMenuTheme", 
+    gContext->SaveSetting("MythBurnMenuTheme", 
                 theme_selector->getCurrentString());
+    gContext->SaveSetting("MythBurnCreateISO", 
+                          (createISO_check->getState() ? "1" : "0"));
+    gContext->SaveSetting("MythBurnBurnDVDr", 
+                          (doBurn_check->getState() ? "1" : "0"));
+    gContext->SaveSetting("MythBurnEraseDvdRw", 
+                          (eraseDvdRw_check->getState() ? "1" : "0"));
 }
 
 void MythburnWizard::updateSelectedArchiveList(void)
@@ -1227,7 +1308,7 @@ void MythburnWizard::updateSelectedArchiveList(void)
 
 void MythburnWizard::showMenu()
 {
-    if (popupMenu)
+    if (popupMenu || getContext() != 2)
         return;
 
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
@@ -1238,16 +1319,7 @@ void MythburnWizard::showMenu()
     button->setFocus();
 
     popupMenu->addButton(tr("Remove Item"), this, SLOT(removeItem()));
-
-    QLabel *splitter = popupMenu->addLabel(" ", MythPopupBox::Small);
-    splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
-    splitter->setMinimumHeight((int) (25 * hmult));
-    splitter->setMaximumHeight((int) (25 * hmult));
-
-    popupMenu->addButton(tr("Use SL DVD (4489Mb)"), this, SLOT(useSLDVD()));
-    popupMenu->addButton(tr("Use DL DVD (8978Mb)"), this, SLOT(useDLDVD()));
+    popupMenu->addButton(tr("Cancel"), this, SLOT(closePopupMenu()));
 
     popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
 }
@@ -1268,26 +1340,6 @@ void MythburnWizard::editDetails()
         return;
 
     showEditMetadataDialog();
-    closePopupMenu();
-}
-
-void MythburnWizard::useSLDVD()
-{
-    if (!popupMenu)
-        return;
-
-    freeSpace = MAX_DVDR_SIZE_SL;
-    updateSizeBar(getContext() != 2);
-    closePopupMenu();
-}
-
-void MythburnWizard::useDLDVD()
-{
-    if (!popupMenu)
-        return;
-
-    freeSpace = MAX_DVDR_SIZE_DL;
-    updateSizeBar(getContext() != 2);
     closePopupMenu();
 }
 
@@ -1327,11 +1379,152 @@ void MythburnWizard::showEditMetadataDialog()
         return;
 
     EditMetadataDialog editDialog(curItem, gContext->GetMainWindow(),
-                                  "edit_metadata", "mytharchive-", "edit metadata");
+                                  "edit_metadata", "mythburn-", "edit metadata");
     if (editDialog.exec())
     {
         // update widgets to reflect any changes
         titleChanged(item);
         item->setText(curItem->title);
     }
+}
+
+void MythburnWizard::setDestination(int item)
+{
+    if (item < 0 || item > ArchiveDestinationsCount - 1)
+        item = 0;
+
+    destination_no = item;
+    if (destination_text)
+    {
+        destination_text->SetText(ArchiveDestinations[item].description);
+    }
+
+    switch(item)
+    {
+        case AD_DVD_SL:
+        case AD_DVD_DL:
+            filename_edit->hide();
+            find_button->hide();
+            eraseDvdRw_check->hide();
+            eraseDvdRw_text->hide();
+            doBurn_check->show();
+            doBurn_text->show();
+            break;
+        case AD_DVD_RW:
+            filename_edit->hide();
+            find_button->hide();
+            eraseDvdRw_check->show();
+            eraseDvdRw_text->show();
+            doBurn_check->show();
+            doBurn_text->show();
+            break;
+        case AD_FILE:
+            long long dummy;
+            ArchiveDestinations[item].freeSpace = 
+                    getDiskSpace(filename_edit->getText(), dummy, dummy);
+
+            filename_edit->show();
+            find_button->show();
+            eraseDvdRw_check->hide();
+            eraseDvdRw_text->hide();
+            doBurn_check->hide();
+            doBurn_text->hide();
+            break;
+    }
+
+    // update free space
+    if (ArchiveDestinations[item].freeSpace != -1)
+    {
+        freespace_text->SetText(formatSize(ArchiveDestinations[item].freeSpace, 2));
+        freeSpace = ArchiveDestinations[item].freeSpace / 1024;
+    }
+    else
+    {
+        freespace_text->SetText("Unknown");
+        freeSpace = 0;
+    }
+
+    buildFocusList();
+}
+
+void MythburnWizard::handleFind(void)
+{
+    FileSelector selector(FSTYPE_FILE, "/", "*.*", gContext->GetMainWindow(),
+                          "file_selector", "mytharchive-", "file selector");
+    qApp->unlock();
+    bool res = selector.exec();
+
+    if (res)
+    {
+        filename_edit->setText(selector.getSelected());
+        filenameEditLostFocus();
+    }
+    qApp->lock();
+}
+
+void MythburnWizard::filenameEditLostFocus()
+{
+    long long dummy;
+    ArchiveDestinations[AD_FILE].freeSpace = 
+            getDiskSpace(filename_edit->getText(), dummy, dummy);
+
+    // if we don't get a valid freespace value it probably means the file doesn't
+    // exist yet so try looking up the freespace for the parent directory 
+    if (ArchiveDestinations[AD_FILE].freeSpace == -1)
+    {
+        QString dir = filename_edit->getText();
+        int pos = dir.findRev('/');
+        if (pos > 0)
+            dir = dir.left(pos);
+        else
+            dir = "/";
+
+        ArchiveDestinations[AD_FILE].freeSpace = getDiskSpace(dir, dummy, dummy);
+    }
+
+    if (ArchiveDestinations[AD_FILE].freeSpace != -1)
+    {
+        freespace_text->SetText(formatSize(ArchiveDestinations[AD_FILE].freeSpace, 2));
+        freeSpace = ArchiveDestinations[AD_FILE].freeSpace / 1024;
+    }
+    else
+    {
+        freespace_text->SetText("Unknown");
+        freeSpace = 0;
+    }
+}
+
+void MythburnWizard::runScript()
+{
+    QString tempDir = getTempDirectory();
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString commandline;
+
+    // remove existing progress.log if present
+    if (QFile::exists(logDir + "/progress.log"))
+        QFile::remove(logDir + "/progress.log");
+
+    // remove cancel flag file if present
+    if (QFile::exists(logDir + "/mythburncancel.lck"))
+        QFile::remove(logDir + "/mythburncancel.lck");
+
+    createConfigFile(configDir + "/mydata.xml");
+    commandline = "python " + gContext->GetShareDir() + "mytharchive/scripts/mythburn.py";
+    commandline += " -j " + configDir + "/mydata.xml";             // job file
+    commandline += " -l " + logDir + "/progress.log";              // progress log
+    commandline += " > "  + logDir + "/mythburn.log 2>&1 &";       //Logs
+
+    int state = system(commandline);
+
+    if (state != 0) 
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Myth Archive"),
+                                  QObject::tr("It was not possible to create the DVD. "  
+                                          " An error occured when running the scripts") );
+        done(Rejected);
+        return;
+    }
+
+    done(Accepted);
 }

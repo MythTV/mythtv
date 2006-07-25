@@ -23,7 +23,7 @@ using namespace std;
 
 // mytharchive
 #include "videoselector.h"
-#include "mytharchivewizard.h"
+#include "archiveutil.h"
 
 VideoSelector::VideoSelector(MythMainWindow *parent, QString window_name,
                                  QString theme_filename, const char *name)

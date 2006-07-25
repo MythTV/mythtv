@@ -11,7 +11,7 @@
 
 // mytharchive
 #include "importnativewizard.h"
-#include "mytharchivewizard.h"
+#include "archiveutil.h"
 
 // last page in wizard
 const int LAST_PAGE = 2;
@@ -644,13 +644,12 @@ void ImportNativeWizard::loadXML(const QString &filename)
 void ImportNativeWizard::findChannelMatch(const QString &chanID, const QString &chanNo,
                                           const QString &name, const QString &callsign)
 {
-
     // find best match in channel table for this recording
 
     // look for an exact match - maybe the user is importing back an old recording
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, name, callsign FROM channel "
-            "WHERE chanid = :CHANID AND channum = :CHANNUM AND name = :NAME"
+            "WHERE chanid = :CHANID AND channum = :CHANNUM AND name = :NAME "
             "AND callsign = :CALLSIGN;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":CHANNUM", chanNo);

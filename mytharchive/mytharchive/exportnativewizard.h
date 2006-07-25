@@ -1,12 +1,11 @@
-#ifndef MYTHNATIVEWIZARD_H_
-#define MYTHBURNWIZARD_H_
+#ifndef EXPORTNATIVEWIZARD_H_
+#define EXPORTNATIVEWIZARD_H_
 
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/libmythtv/programinfo.h>
 
-#include "mytharchivewizard.h"
+#include "archiveutil.h"
 
 enum NativeItemType
 {
@@ -31,17 +30,16 @@ typedef struct
     bool editedDetails;
 } NativeItem;
 
-class MythNativeWizard : public MythThemedDialog
+class ExportNativeWizard : public MythThemedDialog
 {
 
   Q_OBJECT
 
   public:
-    MythNativeWizard(ArchiveDestination destination,
-                   MythMainWindow *parent, QString window_name,
+    ExportNativeWizard(MythMainWindow *parent, QString window_name,
                    QString theme_filename, const char *name = 0);
 
-    ~MythNativeWizard(void);
+    ~ExportNativeWizard(void);
 
     void setSaveFilename(QString filename) {saveFilename = filename;}
     void createConfigFile(const QString &filename);
@@ -57,17 +55,17 @@ class MythNativeWizard : public MythThemedDialog
     void toggleUseCutlist(bool state);
     void showMenu(void);
     void closePopupMenu(void);
-    void editDetails(void);
-    void useSLDVD(void);
-    void useDLDVD(void);
     void removeItem(void);
-    void advancedPressed();
     void toggleCreateISO(bool state) { bCreateISO = state; };
     void toggleDoBurn(bool state) { bDoBurn = state; };
     void toggleEraseDvdRw(bool state) { bEraseDvdRw = state; };
+    void handleFind(void);
+    void filenameEditLostFocus(void);
+    void setDestination(int);
 
   private:
     ArchiveDestination archiveDestination;
+    int destination_no;
     int freeSpace;
     int usedSpace;
 
@@ -80,10 +78,8 @@ class MythNativeWizard : public MythThemedDialog
     void loadConfiguration(void);
     void saveConfiguration(void);
     void updateSelectedArchiveList(void);
-    void showEditMetadataDialog();
-    bool extractDetailsFromFilename(const QString &filename, QString &chanID, QString &startTime);
-    QString loadFile(const QString &filename);
     vector<NativeItem *>  *getArchiveListFromDB(void);
+    void runScript();
 
     vector<NativeItem *>  *archiveList;
     QPtrList<NativeItem> selectedList;
@@ -101,6 +97,14 @@ class MythNativeWizard : public MythThemedDialog
     UITextButtonType *prev_button;
     UITextButtonType *cancel_button;
 
+    UISelectorType   *destination_selector;
+    UITextType       *destination_text;
+
+    UITextType       *freespace_text;
+
+    UIRemoteEditType *filename_edit;
+    UITextButtonType *find_button;
+
     UISelectorType   *category_selector;
     UITextType       *title_text;
     UITextType       *datetime_text;
@@ -115,6 +119,9 @@ class MythNativeWizard : public MythThemedDialog
     UICheckBoxType   *createISO_check;
     UICheckBoxType   *doBurn_check;
     UICheckBoxType   *eraseDvdRw_check;
+    UITextType       *createISO_text;
+    UITextType       *doBurn_text;
+    UITextType       *eraseDvdRw_text;
 
     MythPopupBox     *popupMenu;
 };

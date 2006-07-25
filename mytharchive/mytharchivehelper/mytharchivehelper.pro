@@ -1,11 +1,7 @@
 include ( ../mythconfig.mak )
 include ( ../settings.pro )
 
-TEMP = $${SRC_PATH}
-TEMP ~= s/'//
-
-INCLUDEPATH += $${TEMP}/libs $${TEMP}/libs/libmythtv $${TEMP}/libs/libmyth
-INCLUDEPATH += $${TEMP}/libs/libavcodec $${TEMP}/libs/libavutil
+INCLUDEPATH += $${PREFIX}/include/mythtv
 
 TEMPLATE = app
 CONFIG += thread opengl
@@ -16,9 +12,9 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += 
-SOURCES += main.cpp
+HEADERS += ../mytharchive/archiveutil.h
+SOURCES += main.cpp ../mytharchive/archiveutil.cpp
 
 LIBS += -L$${PREFIX}/lib
 LIBS += -lmyth-$$LIBVERSION -lmythtv-$$LIBVERSION 
-LIBS +=  -lmythui-$$LIBVERSION -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION

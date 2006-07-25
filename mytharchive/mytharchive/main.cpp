@@ -5,6 +5,7 @@
 	
 	Starting point for the MythArchive module
 */
+#include "config.h"
 
 #include <iostream>
 using namespace std;
@@ -22,22 +23,30 @@ using namespace std;
 #include <mythtv/libmythui/myththemedmenu.h>
 
 // mytharchive
-#include "mythburnwizard.h"
-#include "mytharchivewizard.h"
 #include "archivesettings.h"
 #include "logviewer.h"
 #include "fileselector.h"
 #include "recordingselector.h"
 #include "videoselector.h"
 #include "dbcheck.h"
-#include "importnativewizard.h"
 
-void runExportVideo(void)
+#ifdef CREATE_DVD 
+    #include "mythburnwizard.h"
+#endif
+
+#ifdef CREATE_NATIVE
+    #include "exportnativewizard.h"
+    #include "importnativewizard.h"
+#endif
+
+
+void runCreateDVD(void)
 {
+#ifdef CREATE_DVD 
     int res;
 
     QString commandline;
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = getTempDirectory();
 
     if (tempDir == "")
     {
@@ -48,40 +57,11 @@ void runExportVideo(void)
         return;
     }
 
-    if (!tempDir.endsWith("/"))
-         tempDir += "/";
-
     QString logDir = tempDir + "logs";
     QString configDir = tempDir + "config";
     QString workDir = tempDir + "work";
 
-    // make sure the 'work', 'logs', and 'config' directories exist
-    QDir dir(tempDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(tempDir);
-        system("chmod 777 " + tempDir);
-    }
-
-    dir = QDir(workDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(workDir);
-        system("chmod 777 " + workDir);
-    }
-
-    dir = QDir(logDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(logDir);
-        system("chmod 777 " + logDir);
-    }
-    dir = QDir(configDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(configDir);
-        system("chmod 777 " + configDir);
-    }
+    checkTempDirectory();
 
     QFile file(logDir + "/mythburn.lck");
 
@@ -95,30 +75,36 @@ void runExportVideo(void)
         return;
     }
 
-    // show the mytharchive wizard
-    MythArchiveWizard *arcWiz;
+    // show the mythburn wizard
+    MythburnWizard *burnWiz;
 
-    arcWiz = new MythArchiveWizard(gContext->GetMainWindow(),
-                             "mytharchive_wizard", "mytharchive-");
+    burnWiz = new MythburnWizard(gContext->GetMainWindow(),
+                             "mythburn_wizard", "mythburn-");
     qApp->unlock();
-    res = arcWiz->exec();
+    res = burnWiz->exec();
     qApp->lock();
     qApp->processEvents();
-    delete arcWiz;
+    delete burnWiz;
 
     if (res == 0)
         return;
 
     // now show the log viewer
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-//    dialog.setFilename(logDir + "/mythburn.log");
     dialog.setFilename(logDir + "/progress.log");
     dialog.exec();
+#else
+    cout << "DVD creation is not compiled in!!" << endl;
+#endif
 }
 
-void runImportVideo(void)
+void runCreateArchive(void)
 {
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+#ifdef CREATE_NATIVE
+    int res;
+
+    QString commandline;
+    QString tempDir = getTempDirectory();
 
     if (tempDir == "")
     {
@@ -129,40 +115,71 @@ void runImportVideo(void)
         return;
     }
 
-    if (!tempDir.endsWith("/"))
-        tempDir += "/";
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString workDir = tempDir + "work";
+
+    checkTempDirectory();
+
+    QFile file(logDir + "/mythburn.lck");
+
+    //Are we already building a recording?
+    if ( file.exists() )
+    {
+        // Yes so we just show the log viewer
+        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
+        dialog.setFilename(logDir + "/progress.log");
+        dialog.exec();
+        return;
+    }
+
+    // show the export native wizard
+    ExportNativeWizard *nativeWiz;
+
+    nativeWiz = new ExportNativeWizard(gContext->GetMainWindow(),
+                                 "exportnative_wizard", "mythnative-");
+    qApp->unlock();
+    res = nativeWiz->exec();
+    qApp->lock();
+    qApp->processEvents();
+    delete nativeWiz;
+
+    if (res == 0)
+        return;
+
+    // now show the log viewer
+    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
+    dialog.setFilename(logDir + "/progress.log");
+    dialog.exec();
+#else
+    cout << "Native archive creation is not compiled in!!" << endl;
+#endif
+}
+
+void runEncodeVideo(void)
+{
+
+}
+
+void runImportVideo(void)
+{
+#ifdef CREATE_NATIVE
+    QString tempDir = getTempDirectory();
+
+    if (tempDir == "")
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Myth Archive"),
+                                  QObject::tr("Cannot find the MythArchive work directory.\n" 
+                                          "Have you set the correct path in the settings?"));  
+        return;
+    }
 
     QString logDir = tempDir + "logs";
     QString configDir = tempDir + "config";
     QString workDir = tempDir + "work";
 
-    // make sure the 'work', 'logs', and 'config' directories exist
-    QDir dir(tempDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(tempDir);
-        system("chmod 777 " + tempDir);
-    }
-
-    dir = QDir(workDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(workDir);
-        system("chmod 777 " + workDir);
-    }
-
-    dir = QDir(logDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(logDir);
-        system("chmod 777 " + logDir);
-    }
-    dir = QDir(configDir);
-    if (!dir.exists())
-    {
-        dir.mkdir(configDir);
-        system("chmod 777 " + configDir);
-    }
+    checkTempDirectory();
 
     QFile file(logDir + "/mythburn.lck");
 
@@ -179,7 +196,7 @@ void runImportVideo(void)
     QString filter = "*.xml";
 
     ImportNativeWizard wiz("/", filter, gContext->GetMainWindow(),
-                          "import_native_wizard", "mytharchive-", "import native wizard");
+                          "import_native_wizard", "mythnative-", "import native wizard");
     qApp->unlock();
     int res = wiz.exec();
     qApp->lock();
@@ -191,6 +208,9 @@ void runImportVideo(void)
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
     dialog.setFilename(logDir + "/progress.log");
     dialog.exec();
+#else
+    cout << "Native archive creation is not compiled in!!" << endl;
+#endif
 }
 
 void runRecordingSelector(void)
@@ -269,6 +289,39 @@ void runSelectMenu(QString which_menu)
     }
 }
 
+void FormatCallback(void *data, QString &selection)
+{
+    (void) data;
+
+    QString sel = selection.lower();
+
+    if (sel == "archive_create_dvd")
+        runCreateDVD();
+    else if (sel == "archive_create_archive")
+        runCreateArchive();
+    else if (sel == "archive_encode_video")
+        runEncodeVideo();
+}
+
+void runFormatMenu(QString which_menu)
+{
+    QString themedir = gContext->GetThemeDir();
+    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
+                                              GetMythMainWindow()->GetMainStack(),
+                                              "format menu");
+    diag->setCallback(FormatCallback, NULL);
+    diag->setKillable();
+
+    if (diag->foundTheme())
+    {
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
+    }
+    else
+    {
+        cerr << "Couldn't find theme " << themedir << endl;
+    }
+}
+
 void ArchiveCallback(void *data, QString &selection)
 {
     (void) data;
@@ -278,7 +331,7 @@ void ArchiveCallback(void *data, QString &selection)
     if (sel == "archive_finder")
         runSelectMenu("archiveselect.xml");
     else if (sel == "archive_export_video")
-        runExportVideo();
+        runFormatMenu("archiveformat.xml");
     else if (sel == "archive_import_video")
         runImportVideo();
 }

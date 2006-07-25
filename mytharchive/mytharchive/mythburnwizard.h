@@ -10,9 +10,8 @@
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/libmythtv/programinfo.h>
 
-#include "mytharchivewizard.h"
+#include "archiveutil.h"
 
 enum ArchiveItemType
 {
@@ -57,8 +56,7 @@ class MythburnWizard : public MythThemedDialog
   Q_OBJECT
 
   public:
-    MythburnWizard(ArchiveDestination destination,
-                   MythMainWindow *parent, QString window_name,
+    MythburnWizard(MythMainWindow *parent, QString window_name,
                    QString theme_filename, const char *name = 0);
 
     ~MythburnWizard(void);
@@ -82,12 +80,18 @@ class MythburnWizard : public MythThemedDialog
     void showMenu(void);
     void closePopupMenu(void);
     void editDetails(void);
-    void useSLDVD(void);
-    void useDLDVD(void);
     void removeItem(void);
+    void handleFind(void);
+    void filenameEditLostFocus(void);
+    void setDestination(int);
+
+    void toggleCreateISO(bool state) { bCreateISO = state; };
+    void toggleDoBurn(bool state) { bDoBurn = state; };
+    void toggleEraseDvdRw(bool state) { bEraseDvdRw = state; };
 
   private:
     ArchiveDestination archiveDestination;
+    int destination_no;
     QString themeDir; 
     int freeSpace;
     int usedSpace;
@@ -97,7 +101,7 @@ class MythburnWizard : public MythThemedDialog
     void toggleSelectedState(void);
     void getArchiveList(void);
     void wireUpTheme(void);
-    void updateSizeBar(bool show);
+    void updateSizeBar();
     void loadConfiguration(void);
     void saveConfiguration(void);
     void updateSelectedArchiveList(void);
@@ -114,11 +118,20 @@ class MythburnWizard : public MythThemedDialog
     long long recalcSize(EncoderProfile *profile, ArchiveItem *a);
     bool getFileDetails(ArchiveItem *a);
     void setProfile(EncoderProfile *profile, ArchiveItem *item);
+    void runScript();
 
     vector<ArchiveItem *>  *archiveList;
     QPtrList<ArchiveItem> selectedList;
 
     vector<EncoderProfile *> *profileList;
+
+    UISelectorType   *destination_selector;
+    UITextType       *destination_text;
+
+    UITextType       *freespace_text;
+
+    UIRemoteEditType *filename_edit;
+    UITextButtonType *find_button;
 
     UISelectorType *theme_selector;
     UIImageType    *theme_image;
@@ -165,6 +178,13 @@ class MythburnWizard : public MythThemedDialog
     UITextType       *profile_text;
     UITextType       *oldsize_text;
     UITextType       *newsize_text;
+
+    UICheckBoxType   *createISO_check;
+    UICheckBoxType   *doBurn_check;
+    UICheckBoxType   *eraseDvdRw_check;
+    UITextType       *createISO_text;
+    UITextType       *doBurn_text;
+    UITextType       *eraseDvdRw_text;
 
     MythPopupBox     *popupMenu;
 };

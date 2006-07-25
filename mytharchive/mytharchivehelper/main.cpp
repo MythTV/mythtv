@@ -7,6 +7,8 @@ using namespace std;
 #include <qapplication.h>
 #include <qfile.h>
 #include <qdir.h>
+#include <qdom.h>
+#include <qimage.h>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -14,12 +16,12 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/exitcodes.h>
 #include <mythtv/mythdbcon.h>
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
+#include <ffmpeg/avcodec.h>
+#include <ffmpeg/avformat.h>
 #include <libmythtv/programinfo.h>
 
 // mytharchive headers
-#include "../mytharchive/mytharchivewizard.h"
+#include "../mytharchive/archiveutil.h"
 
 class NativeArchive
 {
@@ -35,7 +37,6 @@ class NativeArchive
       int exportRecording(QDomElement &itemNode, const QString &saveDirectory);
       int exportVideo(QDomElement &itemNode, const QString &saveDirectory);
   private:
-      QString formatSize(long long size);
       QString findNodeText(const QDomElement &elem, const QString &nodeName);
 };
 
@@ -52,27 +53,6 @@ NativeArchive::~NativeArchive(void)
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
     if (QFile::exists(tempDir + "/logs/mythburn.lck"))
         QFile::remove(tempDir + "/logs/mythburn.lck");
-}
-
-QString NativeArchive::formatSize(long long sizeKB)
-{
-    if (sizeKB>1024*1024*1024) // Terabytes
-    {
-        double sizeGB = sizeKB/(1024*1024*1024.0);
-        return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:2);
-    }
-    else if (sizeKB>1024*1024) // Gigabytes
-    {
-        double sizeGB = sizeKB/(1024*1024.0);
-        return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:2);
-    }
-    else if (sizeKB>1024) // Megabytes
-    {
-        double sizeMB = sizeKB/1024.0;
-        return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:2);
-    }
-    // Kilobytes
-    return QString("%1 KB").arg(sizeKB);
 }
 
 bool NativeArchive::copyFile(const QString &source, const QString &destination)
@@ -148,69 +128,6 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
         VERBOSE(VB_JOBQUEUE, "Copy completed OK");
 
     return true;
-}
-
-bool extractDetailsFromFilename(const QString &inFile,
-                                QString &chanID, QString &startTime)
-{
-    VERBOSE(VB_JOBQUEUE, "Extracting details from: " + inFile);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime FROM recorded "
-            "WHERE basename = :BASENAME");
-    query.bindValue(":BASENAME", inFile);
-
-    query.exec();
-    if (query.isActive() && query.numRowsAffected())
-    {
-        query.first();
-        chanID = query.value(0).toString();
-        startTime= query.value(1).toString();
-    }
-    else
-    {
-        VERBOSE(VB_JOBQUEUE, 
-                QString("MythArchiveHelper: Cannot find details for %1").arg(inFile));
-        return false;
-    }
-
-    VERBOSE(VB_JOBQUEUE, QString("chanid: %1 starttime:%2 ").arg(chanID).arg(startTime));
-
-    return true;
-}
-
-ProgramInfo *getProgramInfoForFile(const QString &inFile)
-{
-    ProgramInfo *pinfo = NULL;
-    QString chanID, startTime;
-    bool bIsMythRecording = false;
-
-    bIsMythRecording = extractDetailsFromFilename(inFile, chanID, startTime);
-
-    if (bIsMythRecording)
-    {
-        pinfo = ProgramInfo::GetProgramFromRecorded(chanID, startTime);
-
-        if (pinfo)
-        {
-            // file is a myth recording
-            pinfo->pathname = gContext->GetSetting("RecordFilePrefix") + "/" +
-                pinfo->pathname;
-        }
-    }
-
-    if (!pinfo)
-    {
-        // file is not a myth recording or is no longer in the db
-        pinfo = new ProgramInfo();
-        pinfo->pathname = inFile;
-        pinfo->isVideo = true;
-        VERBOSE(VB_JOBQUEUE, "File is not a Myth recording.");
-    }
-    else
-        VERBOSE(VB_JOBQUEUE, "File is a Myth recording.");
-
-    return pinfo;
 }
 
 void createISOImage(QString &sourceDirectory)
@@ -752,7 +669,7 @@ int NativeArchive::exportRecording(QDomElement &itemNode, const QString &saveDir
     {
         VERBOSE(VB_JOBQUEUE, "Copying preview image");
         res = copyFile(prefix + "/" + filename + ".png", saveDirectory + title 
-                + "/" + filename + "png");
+                + "/" + filename + ".png");
         if (!res)
         {
             return 0;
@@ -2175,9 +2092,9 @@ void showUsage()
     cout << "                          (archive files to a native archive format)\n";
     cout << "       jobfile    - filename of archive job file\n";
     cout << "-f/--importarchive xmlfile chanID\n";
-    cout << "                          (import an archived file)";
-    cout << "       xmlfile    - filename of the archive xml file";
-    cout << "       chanID     - chanID to use when inserting records in DB";
+    cout << "                          (import an archived file)\n";
+    cout << "       xmlfile    - filename of the archive xml file\n";
+    cout << "       chanID     - chanID to use when inserting records in DB\n";
     cout << "-l/--log logfile          (name of log file to send messages)\n";
     cout << "-v/--verbose debug-level  (Use '-v help' for level info)\n";
     cout << "-h/--help                 (shows this usage)\n";

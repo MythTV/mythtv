@@ -7,32 +7,26 @@
 
 // qt
 #include <qdir.h>
-#include <qdom.h>
+#include <qapplication.h>
 
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/libmythtv/remoteutil.h>
+#include <mythtv/libmythtv/programinfo.h>
 
 // mytharchive
-#include "mytharchivewizard.h"
-#include "mythnativewizard.h"
-#include "advancedoptions.h"
+#include "exportnativewizard.h"
+#include "fileselector.h"
+#include "archiveutil.h"
 
 // last page in wizard
-const int LAST_PAGE = 2;
+const int LAST_PAGE = 3;
 
-//Max size of a DVD-R in Mbytes
-const int MAX_DVDR_SIZE_SL = 4489;
-const int MAX_DVDR_SIZE_DL = 8978;
-
-MythNativeWizard::MythNativeWizard(ArchiveDestination destination,
-                               MythMainWindow *parent, QString window_name,
+ExportNativeWizard::ExportNativeWizard(MythMainWindow *parent, QString window_name,
                                QString theme_filename, const char *name)
                 : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
-    archiveDestination = destination;
-
     archiveList = NULL;
     popupMenu = NULL;
     setContext(1);
@@ -47,11 +41,10 @@ MythNativeWizard::MythNativeWizard(ArchiveDestination destination,
 
     loadConfiguration();
 
-    freeSpace = destination.freeSpace / 1024;
     updateSizeBar();
 }
 
-MythNativeWizard::~MythNativeWizard(void)
+ExportNativeWizard::~ExportNativeWizard(void)
 {
     saveConfiguration();
 
@@ -59,7 +52,7 @@ MythNativeWizard::~MythNativeWizard(void)
         delete archiveList;
 }
 
-void MythNativeWizard::keyPressEvent(QKeyEvent *e)
+void ExportNativeWizard::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
@@ -124,6 +117,8 @@ void MythNativeWizard::keyPressEvent(QKeyEvent *e)
         {
             if (getCurrentFocusWidget() == category_selector)
                 category_selector->push(false);
+            else if (getCurrentFocusWidget() == destination_selector)
+                destination_selector->push(false);
             else
                 nextPrevWidgetFocus(false);
         }
@@ -131,6 +126,8 @@ void MythNativeWizard::keyPressEvent(QKeyEvent *e)
         {
             if (getCurrentFocusWidget() == category_selector)
                 category_selector->push(true);
+            else if (getCurrentFocusWidget() == destination_selector)
+                destination_selector->push(true);
             else
                 nextPrevWidgetFocus(true);
         }
@@ -145,14 +142,6 @@ void MythNativeWizard::keyPressEvent(QKeyEvent *e)
         {
             showMenu();
         }
-        else if (action == "INFO")
-        {
-            if (freeSpace == MAX_DVDR_SIZE_SL)
-                freeSpace = MAX_DVDR_SIZE_DL;
-            else
-                freeSpace = MAX_DVDR_SIZE_SL;
-            updateSizeBar();
-        }
         else
             handled = false;
     }
@@ -161,7 +150,7 @@ void MythNativeWizard::keyPressEvent(QKeyEvent *e)
             MythThemedDialog::keyPressEvent(e);
 }
 
-void MythNativeWizard::toggleSelectedState()
+void ExportNativeWizard::toggleSelectedState()
 {
     UIListBtnTypeItem *item = archive_list->GetItemCurrent();
     if (item->state() == UIListBtnTypeItem:: FullChecked)
@@ -184,7 +173,7 @@ void MythNativeWizard::toggleSelectedState()
     updateSelectedArchiveList();
 }
 
-void MythNativeWizard::updateSizeBar()
+void ExportNativeWizard::updateSizeBar()
 {
     long long size = 0;
     NativeItem *a;
@@ -247,8 +236,34 @@ void MythNativeWizard::updateSizeBar()
     size_bar->refresh();
 }
 
-void MythNativeWizard::wireUpTheme()
+void ExportNativeWizard::wireUpTheme()
 {
+    // make iso image checkbox
+    createISO_check = getUICheckBoxType("makeisoimage_check");
+    if (createISO_check)
+    {
+        connect(createISO_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleCreateISO(bool)));
+    }
+
+    // burn dvdr checkbox
+    doBurn_check = getUICheckBoxType("burntodvdr_check");
+    if (doBurn_check)
+    {
+        connect(doBurn_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleDoBurn(bool)));
+    }
+    doBurn_text = getUITextType("burntodvdr_text");
+
+    // erase DVD RW checkbox
+    eraseDvdRw_check = getUICheckBoxType("erasedvdrw_check");
+    if (eraseDvdRw_check)
+    {
+        connect(eraseDvdRw_check, SIGNAL(pushed(bool)),
+                this, SLOT(toggleEraseDvdRw(bool)));
+    }
+    eraseDvdRw_text = getUITextType("erasedvdrw_text");
+
     // finish button
     next_button = getUITextButtonType("next_button");
     if (next_button)
@@ -272,6 +287,42 @@ void MythNativeWizard::wireUpTheme()
         cancel_button->setText(tr("Cancel"));
         connect(cancel_button, SIGNAL(pushed()), this, SLOT(handleCancel()));
     }
+
+    // destination selector
+    destination_selector = getUISelectorType("destination_selector");
+    if (destination_selector)
+    {
+        connect(destination_selector, SIGNAL(pushed(int)),
+                this, SLOT(setDestination(int)));
+
+        for (int x = 0; x < ArchiveDestinationsCount; x++)
+            destination_selector->addItem(ArchiveDestinations[x].type,
+                                          ArchiveDestinations[x].name);
+    }
+
+    destination_text = getUITextType("destination_text");
+
+    // optional destination items
+
+    // find button
+    find_button = getUITextButtonType("find_button");
+    if (find_button)
+    {
+        find_button->setText(tr("Choose File..."));
+        connect(find_button, SIGNAL(pushed()), this, SLOT(handleFind()));
+    }
+
+    filename_edit = getUIRemoteEditType("filename_edit");
+    if (filename_edit)
+    {
+        filename_edit->createEdit(this);
+        connect(filename_edit, SIGNAL(loosingFocus()), this, 
+                SLOT(filenameEditLostFocus()));
+    }
+
+    freespace_text = getUITextType("freespace_text");
+
+    setDestination(0);
 
     // recordings selector
     category_selector = getUISelectorType("category_selector");
@@ -302,34 +353,10 @@ void MythNativeWizard::wireUpTheme()
         updateSizeBar();
     }
 
-    // make iso image checkbox
-    createISO_check = getUICheckBoxType("makeisoimage");
-    if (createISO_check)
-    {
-        connect(createISO_check, SIGNAL(pushed(bool)),
-                this, SLOT(toggleCreateISO(bool)));
-    }
-
-    // burn dvdr checkbox
-    doBurn_check = getUICheckBoxType("burntodvdr");
-    if (doBurn_check)
-    {
-        connect(doBurn_check, SIGNAL(pushed(bool)),
-                this, SLOT(toggleDoBurn(bool)));
-    }
-
-    // erase DVD RW checkbox
-    eraseDvdRw_check = getUICheckBoxType("erasedvdrw");
-    if (eraseDvdRw_check)
-    {
-        connect(eraseDvdRw_check, SIGNAL(pushed(bool)),
-                this, SLOT(toggleEraseDvdRw(bool)));
-    }
-
     buildFocusList();
 }
 
-void MythNativeWizard::titleChanged(UIListBtnTypeItem *item)
+void ExportNativeWizard::titleChanged(UIListBtnTypeItem *item)
 {
     NativeItem *a;
 
@@ -356,9 +383,9 @@ void MythNativeWizard::titleChanged(UIListBtnTypeItem *item)
     buildFocusList();
 }
 
-void MythNativeWizard::handleNextPage()
+void ExportNativeWizard::handleNextPage()
 {
-    if (getContext() == 1 && selectedList.count() == 0)
+    if (getContext() == 2 && selectedList.count() == 0)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
             tr("You need to select at least one item to archive!"));
@@ -366,7 +393,10 @@ void MythNativeWizard::handleNextPage()
     }
 
     if (getContext() == LAST_PAGE)
-        done(Accepted); //archiveItems();
+    {
+        runScript();
+        done(Accepted);
+    }
     else
         setContext(getContext() + 1);
 
@@ -382,38 +412,7 @@ void MythNativeWizard::handleNextPage()
     buildFocusList();
 }
 
-bool MythNativeWizard::extractDetailsFromFilename(const QString &filename, 
-                                               QString &chanID, QString &startTime)
-{
-    cout << "Extracting details from: " << filename << endl;
-    chanID = "";
-    startTime = "";
-    bool res = false;
-
-    int sep = filename.find('_');
-    if (sep != -1)
-    {
-        chanID = filename.left(sep);
-        startTime = filename.mid(sep + 1, filename.length() - sep - 5);
-        if (startTime.length() == 14)
-        {
-            QString year, month, day, hour, minute, second;
-            year = startTime.mid(0, 4);
-            month = startTime.mid(4, 2);
-            day = startTime.mid(6, 2);
-            hour = startTime.mid(8, 2);
-            minute = startTime.mid(10, 2);
-            second = startTime.mid(12, 2);
-            startTime = QString("%1-%2-%3T%4:%5:%6").arg(year).arg(month).arg(day)
-                .arg(hour).arg(minute).arg(second);
-            res = true;
-        }
-    }
-    cout << "chanid: " << chanID << " starttime: " << startTime << endl; 
-    return res;
-}
-
-void MythNativeWizard::handlePrevPage()
+void ExportNativeWizard::handlePrevPage()
 {
     if (getContext() == 1)
         done(Rejected);
@@ -428,37 +427,12 @@ void MythNativeWizard::handlePrevPage()
     buildFocusList();
 }
 
-void MythNativeWizard::handleCancel()
+void ExportNativeWizard::handleCancel()
 {
     done(Rejected);
 }
 
-QString MythNativeWizard::loadFile(const QString &filename)
-{
-    QString res = "";
-
-    QFile file(filename);
-
-    if (!file.exists())
-        return "";
-
-    if (file.open( IO_ReadOnly ))
-    {
-        QTextStream stream(&file);
-
-        while ( !stream.atEnd() )
-        {
-            res = res + stream.readLine();
-        }
-        file.close();
-    }
-    else
-        return "";
-
-    return res;
-}
-
-void MythNativeWizard::updateArchiveList(void)
+void ExportNativeWizard::updateArchiveList(void)
 {
     archive_list->Reset();
 
@@ -495,7 +469,7 @@ void MythNativeWizard::updateArchiveList(void)
     archive_list->refresh();
 }
 
-vector<NativeItem *> *MythNativeWizard::getArchiveListFromDB(void)
+vector<NativeItem *> *ExportNativeWizard::getArchiveListFromDB(void)
 {
     vector<NativeItem*> *archiveList = new vector<NativeItem*>;
 
@@ -529,14 +503,14 @@ vector<NativeItem *> *MythNativeWizard::getArchiveListFromDB(void)
     }
     else
     {
-        cout << "MythNativeWizard: Failed to get any archive items" << endl;
+        cout << "ExportNativeWizard: Failed to get any archive items" << endl;
         return NULL;
     }
 
     return archiveList;
 }
 
-void MythNativeWizard::getArchiveList(void)
+void ExportNativeWizard::getArchiveList(void)
 {
     NativeItem *a;
     archiveList = getArchiveListFromDB();
@@ -579,35 +553,35 @@ void MythNativeWizard::getArchiveList(void)
     setCategory(0);
 }
 
-void MythNativeWizard::setCategory(int item)
+void ExportNativeWizard::setCategory(int item)
 {
     (void) item;
     updateArchiveList();
 }
 
-void MythNativeWizard::loadConfiguration(void)
+void ExportNativeWizard::loadConfiguration(void)
 {
-    bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
+    bCreateISO = (gContext->GetSetting("MythNativeCreateISO", "0") == "1");
     createISO_check->setState(bCreateISO);
 
-    bDoBurn = (gContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
+    bDoBurn = (gContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
     doBurn_check->setState(bDoBurn);
 
-    bEraseDvdRw = (gContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
+    bEraseDvdRw = (gContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
     eraseDvdRw_check->setState(bEraseDvdRw);
 }
 
-void MythNativeWizard::saveConfiguration(void)
+void ExportNativeWizard::saveConfiguration(void)
 {
-    gContext->SaveSetting("MythBurnCreateISO", 
+    gContext->SaveSetting("MythNativeCreateISO", 
                           (createISO_check->getState() ? "1" : "0"));
-    gContext->SaveSetting("MythBurnBurnDVDr", 
+    gContext->SaveSetting("MythNativeBurnDVDr", 
                           (doBurn_check->getState() ? "1" : "0"));
-    gContext->SaveSetting("MythBurnEraseDvdRw", 
+    gContext->SaveSetting("MythNativeEraseDvdRw", 
                           (eraseDvdRw_check->getState() ? "1" : "0"));
 }
 
-void MythNativeWizard::updateSelectedArchiveList(void)
+void ExportNativeWizard::updateSelectedArchiveList(void)
 {
     selected_list->Reset();
 
@@ -621,34 +595,24 @@ void MythNativeWizard::updateSelectedArchiveList(void)
     }
 }
 
-void MythNativeWizard::showMenu()
+void ExportNativeWizard::showMenu()
 {
-    if (popupMenu)
+    if (popupMenu || getContext() != 2)
         return;
 
     popupMenu = new MythPopupBox(gContext->GetMainWindow(),
                                       "popupMenu");
 
     QButton *button;
-    button = popupMenu->addButton(tr("Edit Details"), this, SLOT(editDetails()));
+
+    button = popupMenu->addButton(tr("Remove Item"), this, SLOT(removeItem()));
     button->setFocus();
-
-    popupMenu->addButton(tr("Remove Item"), this, SLOT(removeItem()));
-
-    QLabel *splitter = popupMenu->addLabel(" ", MythPopupBox::Small);
-    splitter->setLineWidth(2);
-    splitter->setFrameShape(QFrame::HLine);
-    splitter->setFrameShadow(QFrame::Sunken);
-    splitter->setMinimumHeight((int) (25 * hmult));
-    splitter->setMaximumHeight((int) (25 * hmult));
-
-    popupMenu->addButton(tr("Use SL DVD (4489Mb)"), this, SLOT(useSLDVD()));
-    popupMenu->addButton(tr("Use DL DVD (8978Mb)"), this, SLOT(useDLDVD()));
+    popupMenu->addButton(tr("Cancel"), this, SLOT(closePopupMenu()));
 
     popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
 }
 
-void MythNativeWizard::closePopupMenu()
+void ExportNativeWizard::closePopupMenu()
 {
     if (!popupMenu)
         return;
@@ -658,36 +622,7 @@ void MythNativeWizard::closePopupMenu()
     popupMenu = NULL;
 }
 
-void MythNativeWizard::editDetails()
-{
-    if (!popupMenu)
-        return;
-
-    showEditMetadataDialog();
-    closePopupMenu();
-}
-
-void MythNativeWizard::useSLDVD()
-{
-    if (!popupMenu)
-        return;
-
-    freeSpace = MAX_DVDR_SIZE_SL;
-    updateSizeBar();
-    closePopupMenu();
-}
-
-void MythNativeWizard::useDLDVD()
-{
-    if (!popupMenu)
-        return;
-
-    freeSpace = MAX_DVDR_SIZE_DL;
-    updateSizeBar();
-    closePopupMenu();
-}
-
-void MythNativeWizard::removeItem()
+void ExportNativeWizard::removeItem()
 {
     if (!popupMenu)
         return;
@@ -710,41 +645,7 @@ void MythNativeWizard::removeItem()
     closePopupMenu();
 }
 
-void MythNativeWizard::showEditMetadataDialog()
-{
-#if 0
-    UIListBtnTypeItem *item = archive_list->GetItemCurrent();
-    NativeItem *curItem = (NativeItem *) item->getData();
-
-    if (!curItem)
-        return;
-
-    EditMetadataDialog editDialog(curItem, gContext->GetMainWindow(),
-                                  "edit_metadata", "mythburn-", "edit metadata");
-    if (editDialog.exec())
-    {
-        // update widgets to reflect any changes
-        titleChanged(item);
-        item->setText(curItem->title);
-    }
-#endif
-}
-
-void MythNativeWizard::advancedPressed()
-{
-    AdvancedOptions *dialog = new AdvancedOptions(gContext->GetMainWindow(),
-                           "advanced_options", "mythburn-", "advanced options");
-    int res = dialog->exec();
-    delete dialog;
-
-    if (res)
-    {
-        // need to reload our copy of setting in case they have changed
-        loadConfiguration();
-    }
-}
-
-void MythNativeWizard::createConfigFile(const QString &filename)
+void ExportNativeWizard::createConfigFile(const QString &filename)
 {
     QDomDocument doc("NATIVEARCHIVEJOB");
 
@@ -766,7 +667,7 @@ void MythNativeWizard::createConfigFile(const QString &filename)
         file.setAttribute("type", i->type.lower() );
         file.setAttribute("title", i->title);
         file.setAttribute("filename", i->filename);
-        file.setAttribute("delete", "0"); //FIXME
+        file.setAttribute("delete", "0");
         media.appendChild(file);
     }
 
@@ -784,7 +685,7 @@ void MythNativeWizard::createConfigFile(const QString &filename)
     QFile f(filename);
     if (!f.open(IO_WriteOnly))
     {
-        cout << "MythNativeWizard::createConfigFile: Failed to open file for writing - "
+        cout << "ExportNativeWizard::createConfigFile: Failed to open file for writing - "
                 << filename << endl;
         return;
     }
@@ -793,3 +694,148 @@ void MythNativeWizard::createConfigFile(const QString &filename)
     t << doc.toString(4);
     f.close();
 }
+
+void ExportNativeWizard::setDestination(int item)
+{
+    if (item < 0 || item > ArchiveDestinationsCount - 1)
+        item = 0;
+
+    destination_no = item;
+    if (destination_text)
+    {
+        destination_text->SetText(ArchiveDestinations[item].description);
+    }
+
+    switch(item)
+    {
+        case AD_DVD_SL:
+        case AD_DVD_DL:
+            filename_edit->hide();
+            find_button->hide();
+            eraseDvdRw_check->hide();
+            eraseDvdRw_text->hide();
+            doBurn_check->show();
+            doBurn_text->show();
+            break;
+        case AD_DVD_RW:
+            filename_edit->hide();
+            find_button->hide();
+            eraseDvdRw_check->show();
+            eraseDvdRw_text->show();
+            doBurn_check->show();
+            doBurn_text->show();
+            break;
+        case AD_FILE:
+            long long dummy;
+            ArchiveDestinations[item].freeSpace = 
+                    getDiskSpace(filename_edit->getText(), dummy, dummy);
+
+            filename_edit->show();
+            find_button->show();
+            eraseDvdRw_check->hide();
+            eraseDvdRw_text->hide();
+            doBurn_check->hide();
+            doBurn_text->hide();
+            break;
+    }
+
+    filename_edit->refresh();
+    eraseDvdRw_check->refresh();
+    eraseDvdRw_text->refresh();
+    find_button->refresh();
+
+    // update free space
+    if (ArchiveDestinations[item].freeSpace != -1)
+    {
+        freespace_text->SetText(formatSize(ArchiveDestinations[item].freeSpace, 2));
+        freeSpace = ArchiveDestinations[item].freeSpace / 1024;
+    }
+    else
+    {
+        freespace_text->SetText("Unknown");
+        freeSpace = 0;
+    }
+
+    buildFocusList();
+}
+
+void ExportNativeWizard::handleFind(void)
+{
+    FileSelector selector(FSTYPE_FILE, "/", "*.*", gContext->GetMainWindow(),
+                          "file_selector", "mytharchive-", "file selector");
+    qApp->unlock();
+    bool res = selector.exec();
+
+    if (res)
+    {
+        filename_edit->setText(selector.getSelected());
+        filenameEditLostFocus();
+    }
+    qApp->lock();
+}
+
+void ExportNativeWizard::filenameEditLostFocus()
+{
+    long long dummy;
+    ArchiveDestinations[AD_FILE].freeSpace = 
+            getDiskSpace(filename_edit->getText(), dummy, dummy);
+
+    // if we don't get a valid freespace value it probably means the file doesn't
+    // exist yet so try looking up the freespace for the parent directory 
+    if (ArchiveDestinations[AD_FILE].freeSpace == -1)
+    {
+        QString dir = filename_edit->getText();
+        int pos = dir.findRev('/');
+        if (pos > 0)
+            dir = dir.left(pos);
+        else
+            dir = "/";
+
+        ArchiveDestinations[AD_FILE].freeSpace = getDiskSpace(dir, dummy, dummy);
+    }
+
+    if (ArchiveDestinations[AD_FILE].freeSpace != -1)
+    {
+        freespace_text->SetText(formatSize(ArchiveDestinations[AD_FILE].freeSpace, 2));
+        freeSpace = ArchiveDestinations[AD_FILE].freeSpace / 1024;
+    }
+    else
+    {
+        freespace_text->SetText("Unknown");
+        freeSpace = 0;
+    }
+}
+
+void ExportNativeWizard::runScript()
+{
+    QString tempDir = getTempDirectory();
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString commandline;
+
+    // remove existing progress.log if present
+    if (QFile::exists(logDir + "/progress.log"))
+        QFile::remove(logDir + "/progress.log");
+
+    // remove cancel flag file if present
+    if (QFile::exists(logDir + "/mythburncancel.lck"))
+        QFile::remove(logDir + "/mythburncancel.lck");
+
+    createConfigFile(configDir + "/mydata.xml");
+    commandline = "mytharchivehelper -n " + configDir + "/mydata.xml";  // job file
+    commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
+
+    int state = system(commandline);
+
+    if (state != 0) 
+    {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Myth Archive"),
+                                  QObject::tr("It was not possible to create the DVD. "  
+                                          " An error occured when running the scripts") );
+        done(Rejected);
+        return;
+    }
+
+    done(Accepted);
+}
+

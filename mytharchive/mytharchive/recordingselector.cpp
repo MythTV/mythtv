@@ -24,7 +24,7 @@ using namespace std;
 
 // mytharchive
 #include "recordingselector.h"
-#include "mytharchivewizard.h"
+#include "archiveutil.h"
 
 RecordingSelector::RecordingSelector(MythMainWindow *parent, QString window_name,
                                  QString theme_filename, const char *name)

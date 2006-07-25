@@ -11,8 +11,7 @@
 
 // mytharchive
 #include "fileselector.h"
-#include "mytharchivewizard.h"
-
+#include "archiveutil.h"
 
 ////////////////////////////////////////////////////////////////
 
