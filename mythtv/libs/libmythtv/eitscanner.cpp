@@ -1,5 +1,9 @@
 // -*- Mode: c++ -*-
 
+// POSIX headers
+#include <sys/time.h>
+#include <sys/resource.h>
+
 #include "tv_rec.h"
 
 #include "channelbase.h"
@@ -30,10 +34,6 @@ EITScanner::EITScanner()
     eitHelper->SetLanguagePreferences(langPref);
 
     pthread_create(&eventThread, NULL, SpawnEventLoop, this);
-
-    // Lower scheduling priority, to avoid problems with recordings.
-    struct sched_param sp = {19 /* very low priority */};
-    pthread_setschedparam(eventThread, SCHED_OTHER, &sp);
 }
 
 void EITScanner::TeardownAll(void)
@@ -59,6 +59,9 @@ void EITScanner::TeardownAll(void)
  */
 void *EITScanner::SpawnEventLoop(void *param)
 {
+    // Lower scheduling priority, to avoid problems with recordings.
+    if (setpriority(PRIO_PROCESS, 0, 19))
+        VERBOSE(VB_IMPORTANT, LOC + "Setting priority failed." + ENO);
     EITScanner *scanner = (EITScanner*) param;
     scanner->RunEventLoop();
     return NULL;

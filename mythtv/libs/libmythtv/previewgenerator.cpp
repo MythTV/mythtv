@@ -5,6 +5,8 @@
 #include <sys/types.h> // for stat
 #include <sys/stat.h>  // for stat
 #include <unistd.h>    // for stat
+#include <sys/time.h>
+#include <sys/resource.h>
 
 // Qt headers
 #include <qfileinfo.h>
@@ -142,9 +144,6 @@ void PreviewGenerator::disconnectSafe(void)
 void PreviewGenerator::Start(void)
 {
     pthread_create(&previewThread, NULL, PreviewRun, this);
-    // Lower scheduling priority, to avoid problems with recordings.
-    struct sched_param sp = {9 /* lower than normal */};
-    pthread_setschedparam(previewThread, SCHED_OTHER, &sp);
     // detach, so we don't have to join thread to free thread local mem.
     pthread_detach(previewThread);
 }
@@ -171,6 +170,9 @@ void PreviewGenerator::Run(void)
 
 void *PreviewGenerator::PreviewRun(void *param)
 {
+    // Lower scheduling priority, to avoid problems with recordings.
+    if (setpriority(PRIO_PROCESS, 0, 9))
+        VERBOSE(VB_IMPORTANT, LOC + "Setting priority failed." + ENO);
     PreviewGenerator *gen = (PreviewGenerator*) param;
     gen->createSockets = true;
     gen->Run();

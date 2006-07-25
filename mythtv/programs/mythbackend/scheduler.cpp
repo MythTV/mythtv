@@ -71,10 +71,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     {
         pthread_t scthread;
         pthread_create(&scthread, NULL, SchedulerThread, this);
-
-        // Lower scheduling priority, to avoid problems with recordings.
-        struct sched_param sp = {9 /* lower than normal */};
-        pthread_setschedparam(scthread, SCHED_OTHER, &sp);
     }
 }
 
@@ -1592,6 +1588,9 @@ void Scheduler::ShutdownServer(int prerollseconds)
 
 void *Scheduler::SchedulerThread(void *param)
 {
+    // Lower scheduling priority, to avoid problems with recordings.
+    if (setpriority(PRIO_PROCESS, 0, 9))
+        VERBOSE(VB_IMPORTANT, LOC + "Setting priority failed." + ENO);
     Scheduler *sched = (Scheduler *)param;
     sched->RunScheduler();
  
