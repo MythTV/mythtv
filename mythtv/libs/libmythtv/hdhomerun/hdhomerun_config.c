@@ -113,7 +113,7 @@ static unsigned long get_ip_addr(struct hdhomerun_discover_sock_t *discover_sock
 {
 	int a[4];
 	if (sscanf(id_str, "%u.%u.%u.%u", &a[0], &a[1], &a[2], &a[3]) == 4) {
-		return (a[0] << 24) | (a[0] << 16) | (a[0] << 8) | (a[0] << 0);
+		return (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0);
 	}
 
 	unsigned long id = (unsigned long)strtoll(id_str, NULL, 16);
@@ -317,14 +317,11 @@ int main(int argc, char *argv[])
 	if (argc == 0) {
 		return help();
 	}
-	int i;
-	for (i = 0; i < argc; i++) {
-		if (contains(argv[i], "help")) {
-			return help();
-		}
-	}
 
 	char *id_str = *argv++; argc--;
+	if (contains(id_str, "help")) {
+		return help();
+	}
 	if (contains(id_str, "discover")) {
 		return discover_print();
 	}
