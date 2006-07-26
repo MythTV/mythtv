@@ -1387,6 +1387,7 @@ void Scheduler::RunScheduler(void)
         {
             MythEvent me("SCHEDULE_CHANGE");
             gContext->dispatch(me);
+            idleSince = QDateTime();
         }
 
         // if idletimeout is 0, the user disabled the auto-shutdown feature
