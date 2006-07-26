@@ -363,21 +363,21 @@ static void init_freq_tables(freq_table_map_t &fmap)
     for (uint i = 0; i < 4; i++)
     {
         // USA Cable, ch 2 to 155 and T.7 to T.14
+        FREQ(modStr[i], "cable0", desc[i], "Channel %1",
+             2,    57000000,   69000000, mod[i]); // 2-4
         FREQ(modStr[i], "cable1", desc[i], "Channel %1",
-             2,    57000000,   85000000, mod[i]); // 2-6
+             5,    79000000,   85000000, mod[i]); // 5-6
         FREQ(modStr[i], "cable2", desc[i], "Channel %1",
              7,   177000000,  213000000, mod[i]); // 7-13
-        FREQ(modStr[i], "cable2", desc[i], "Channel %1",
-             14,  123000000,  171000000, mod[i]); // 14-22
-        FREQ(modStr[i], "cable2", desc[i], "Channel %1",
-             23,  219000000,  495000000, mod[i]); // 23-69
         FREQ(modStr[i], "cable3", desc[i], "Channel %1",
-             70,  501000000,  645000000, mod[i]); // 70-94
+             14,  123000000,  171000000, mod[i]); // 14-22
         FREQ(modStr[i], "cable4", desc[i], "Channel %1",
-             95,   93000000,  117000000, mod[i]); // 95-99
+             23,  219000000,  495000000, mod[i]); // 23-94
         FREQ(modStr[i], "cable5", desc[i], "Channel %1",
+             95,   93000000,  117000000, mod[i]); // 95-99
+        FREQ(modStr[i], "cable6", desc[i], "Channel %1",
              100, 651000000, 1005000000, mod[i]); // 100-159
-        FREQ(modStr[i], "cable6", desc[i], "Channel T-%1",
+        FREQ(modStr[i], "cable7", desc[i], "Channel T-%1",
              7,    8750000,   50750000, mod[i]); // T7-14
 
         // USA Cable, QAM 256 ch 78 to 159
