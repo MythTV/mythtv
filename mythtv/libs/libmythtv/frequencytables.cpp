@@ -378,7 +378,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         FREQ(modStr[i], "cable5", desc[i], "Channel %1",
              100, 651000000, 1005000000, mod[i]); // 100-159
         FREQ(modStr[i], "cable6", desc[i], "Channel T-%1",
-             7,    10000000,   52000000, mod[i]); // T7-14
+             7,    8750000,   50750000, mod[i]); // T7-14
 
         // USA Cable, QAM 256 ch 78 to 159
         FREQ(modStr[i], "cablehigh0", desc[i], "Channel %1",
