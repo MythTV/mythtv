@@ -413,8 +413,6 @@ static void init_freq_tables(freq_table_map_t &fmap)
                  95,   91750000 + off[j], 114000000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "7", desc[i], sdesc[j] + "%1",
                  100, 649750000 + off[j], 799750000 + off[j], mod[i]);
-            FREQ(modStr[i], std[j] + "8", desc[i], sdesc[j] + "T-%1",
-                 7,     8175000 + off[j],  50750000 + off[j], mod[i]);
 
             // USA Cable HRC/IRC, ch 67-125
             FREQ(modStr[i], std[j] + "high0", desc[i], sdesc[j] + "%1",
