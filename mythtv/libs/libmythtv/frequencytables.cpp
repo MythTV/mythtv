@@ -335,17 +335,20 @@ static void init_freq_tables(freq_table_map_t &fmap)
         GUARD_INTERVAL_AUTO, HIERARCHY_NONE, VSB_8, -100000, 100000);
 #else
     // USA Terrestrial (center frequency, subtract 1.75 Mhz for visual carrier)
-    // VHF 2-6
+    // VHF 2-4
     fmap["atsc_vsb8_us0"] = new FrequencyTable(
-        "ATSC Channel %1",  2,  57000000,  85000000, 6000000, VSB_8);
-    // VHF 7-13
+        "ATSC Channel %1",  2,  57000000,  69000000, 6000000, VSB_8);
+    // VHF 5-6
     fmap["atsc_vsb8_us1"] = new FrequencyTable(
+        "ATSC Channel %1",  5,  79000000,  85000000, 6000000, VSB_8);
+    // VHF 7-13
+    fmap["atsc_vsb8_us2"] = new FrequencyTable(
         "ATSC Channel %1",  7, 177000000, 213000000, 6000000, VSB_8);
     // UHF 14-69
-    fmap["atsc_vsb8_us2"] = new FrequencyTable(
+    fmap["atsc_vsb8_us3"] = new FrequencyTable(
         "ATSC Channel %1", 14, 473000000, 803000000, 6000000, VSB_8);
     // UHF 70-83
-    fmap["atsc_vsb8_us3"] = new FrequencyTable(
+    fmap["atsc_vsb8_us4"] = new FrequencyTable(
         "ATSC Channel %1", 70, 809000000, 887000000, 6000000, VSB_8);
 #endif // USING_DVB
 
