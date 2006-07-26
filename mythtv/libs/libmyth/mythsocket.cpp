@@ -306,13 +306,13 @@ bool MythSocket::writeStringList(QStringList &list)
         else if (temp <= 0)
         {
             errorcount++;
-            if (errorcount > 50)
+            if (errorcount > 5000)
             {          
                 VERBOSE(VB_GENERAL, LOC +
                         "writeStringList: No data written on writeBlock");
                 return false;
             }
-            usleep(500);
+            usleep(1000);
         }
     }
     return true;
@@ -362,7 +362,7 @@ bool MythSocket::writeData(const char *data, Q_ULONG len)
         else
         {
             zerocnt++;
-            if (zerocnt > 200)
+            if (zerocnt > 5000)
             {
                 VERBOSE(VB_IMPORTANT, LOC +
                         "writeData: Error, zerocnt timeout");
