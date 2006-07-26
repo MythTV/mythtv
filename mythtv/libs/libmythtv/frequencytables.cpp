@@ -362,9 +362,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     for (uint i = 0; i < 4; i++)
     {
-        // USA Cable, ch 1 to 155 and T.7 to T.14
-        FREQ(modStr[i], "cable0", desc[i], "Channel %1",
-             1,    75000000,  75000001, mod[i]);  // 1
+        // USA Cable, ch 2 to 155 and T.7 to T.14
         FREQ(modStr[i], "cable1", desc[i], "Channel %1",
              2,    57000000,   85000000, mod[i]); // 2-6
         FREQ(modStr[i], "cable2", desc[i], "Channel %1",

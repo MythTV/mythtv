@@ -98,7 +98,6 @@ static struct CHANLIST ntsc_bcast[] = {
 
 /* US cable */
 static struct CHANLIST ntsc_cable[] = {
-    { "1",	 73250 },
     { "2",	 55250 },
     { "3",	 61250 },
     { "4",	 67250 },
