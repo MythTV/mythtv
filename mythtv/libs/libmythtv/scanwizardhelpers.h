@@ -281,18 +281,22 @@ class ScanFrequencyTable: public ComboBoxSetting, public TransientStorage
     ScanFrequencyTable()
     {
         addSelection(QObject::tr("Broadcast"),        "us",          true);
-        addSelection(QObject::tr("Cable")    +" 78+", "uscablehigh", false);
-        addSelection(QObject::tr("Cable HRC")+" 67+", "ushrchigh",   false);
-        addSelection(QObject::tr("Cable IRC")+" 67+", "usirchigh",   false);
+        addSelection(QObject::tr("Cable")     + " " +
+                     QObject::tr("High"),             "uscablehigh", false);
+        addSelection(QObject::tr("Cable HRC") + " " +
+                     QObject::tr("High"),             "ushrchigh",   false);
+        addSelection(QObject::tr("Cable IRC") + " " +
+                     QObject::tr("High"),             "usirchigh",   false);
         addSelection(QObject::tr("Cable"),            "uscable",     false);
         addSelection(QObject::tr("Cable HRC"),        "ushrc",       false);
         addSelection(QObject::tr("Cable IRC"),        "usirc",       false);
 
         setLabel(QObject::tr("Frequency Table"));
         setHelpText(QObject::tr("Frequency table to use.") + " " +
-                    QObject::tr("The option of scanning only at channel 78 "
-                                "and above is provided because most "
-                                "digital channels are in that range."));
+                    QObject::tr(
+                        "The option of scanning only \"High\" "
+                        "frequency channels is useful because most "
+                        "digital channels are on the higher frequencies."));
     }
 };
 
