@@ -601,7 +601,6 @@ bool DVBChannel::Tune(const DVBTuning &tuning,
         return false;
     }
 
-    tune_time.start();
     desired_tuning = tuning;
 
     if (fd_frontend < 0)
@@ -782,16 +781,6 @@ const DiSEqCDevRotor *DVBChannel::GetRotor(void) const
         return diseqc_tree->FindRotor(diseqc_settings);
 
     return NULL;
-}
-
-bool DVBChannel::IsSelfRetuning(void) const
-{
-    return info.caps & FE_CAN_RECOVER;
-}
-
-int DVBChannel::GetTimeSinceTune(void) const
-{
-    return first_tune ? 0 : tune_time.elapsed();
 }
 
 /** \fn drain_dvb_events(int)

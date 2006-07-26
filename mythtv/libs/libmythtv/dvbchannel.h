@@ -59,11 +59,6 @@ class DVBChannel : public ChannelBase
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
     uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
-    /// If true the hardware will retune when it loses lock, otherwise
-    /// the tuner needs to be told to tune when it loses lock.
-    bool IsSelfRetuning(void) const;
-    /// Milliseconds since last tuning request, or 0 if never tuned.
-    int  GetTimeSinceTune(void) const;
     /// Returns rotor object if it exists, NULL otherwise.
     const DiSEqCDevRotor *GetRotor(void) const;
 
@@ -121,7 +116,6 @@ class DVBChannel : public ChannelBase
     int               cardnum;     ///< DVB Card number
     bool              has_crc_bug; ///< true iff our driver munges PMT
     int               nextInputID; ///< Signal an input change
-    QTime             tune_time;   ///< FIXME won't work well at midnight
 };
 
 #endif

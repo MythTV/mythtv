@@ -503,17 +503,6 @@ bool DVBSignalMonitor::SupportsTSMonitoring(void)
 void DVBSignalMonitor::RetuneMonitor(void)
 {
     DVBChannel *dvbchan = dynamic_cast<DVBChannel*>(channel);
-    int fd_frontend = dvbchan->GetFd();
-
-    // Get lock status
-    bool is_locked = true;
-    fe_status_t status;
-    if (ioctl(fd_frontend, FE_READ_STATUS, &status) != -1)
-    {
-        QMutexLocker locker(&statusLock);
-        is_locked = (status & FE_HAS_LOCK);
-        signalLock.SetValue(is_locked ? 1 : 0);
-    }
 
     // Rotor position
     if (HasFlags(kDVBSigMon_WaitForPos))
@@ -546,14 +535,6 @@ void DVBSignalMonitor::RetuneMonitor(void)
             QMutexLocker locker(&statusLock);
             rotorPosition.SetValue(100);
         }
-    }
-
-    // Periodically retune if card can't recover
-    if (!dvbchan->IsSelfRetuning() && !is_locked &&
-        dvbchan->GetTimeSinceTune() > RETUNE_TIMEOUT)
-    {
-        DBG_SM("UpdateValues", "Retuning for lock loss");
-        dvbchan->Retune();
     }
 }
 
