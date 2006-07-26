@@ -212,29 +212,49 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
     {
         struct dmx_sct_filter_params sctFilterParams;
         bzero(&sctFilterParams, sizeof(struct dmx_sct_filter_params));
-        // TODO as is this will break for ATSC streams, where the
-        // MGT is on pid 0x1ffb and the VCTs can be on any pid like
-        // PMTs, but is usually on 0x1ffb.
         switch ( (__u16) pid )
         {
             case 0x0: // PAT
                 sctFilterParams.filter.filter[0] = 0;
+                sctFilterParams.filter.mask[0]   = 0xff;
                 break;
             case 0x0010: // assume this is for an NIT
                 // With this filter we can only ever get NIT for this network
-                // because other networks nit need a filter of 0x41
+                // because other networks NIT need a filter of 0x41
+                // FIXME: This will break for North American DVB providers
+                //        which improperly transmit current NIT with 0x41
+                // FIXME: This will break with ATSC when pid 0x10 is used
+                //        for the PMT. It is recommended but not required
+                //        that ATSC channels avoid using pid 0x10 for the
+                //        PMT.
                 sctFilterParams.filter.filter[0] = 0x40;
+                sctFilterParams.filter.mask[0]   = 0xff;
                 break;
             case 0x0011: // assume this is for an SDT
+                // With this filter we can only ever get SDT for this network
+                // because other networks SDT need a filter of 0x46
+                // FIXME: This will break for North American DVB providers
+                //        which improperly transmit current SDT with 0x46
+                // FIXME: This will break with ATSC when pid 0x11 is used
+                //        for the PMT. It is recommended but not required
+                //        that ATSC channels avoid using pid 0x11 for the
+                //        PMT.
                 sctFilterParams.filter.filter[0] = 0x42;
+                sctFilterParams.filter.mask[0]   = 0xff;
                 break;
-            default: // otherwise assume we are looking for a PMT
-                sctFilterParams.filter.filter[0] = 0x02;
+            case 0x1ffb:
+                // MGT 0xC7, Terrestrial VCT 0xC8, Cable VCT 0xC9, RRT 0xCA,
+                // STT 0xCD, DCCT 0xD3, DCCSCT 0xD4, Caption 0x86
+                sctFilterParams.filter.filter[0] = 0x00;
+                sctFilterParams.filter.mask[0]   = 0x00;
+            default:
+                // otherwise assume it could be any table
+                sctFilterParams.filter.filter[0] = 0x00;
+                sctFilterParams.filter.mask[0]   = 0x00;
                 break;
         }
         sctFilterParams.pid            = (__u16) pid;
         sctFilterParams.timeout        = 0;
-        sctFilterParams.filter.mask[0] = 0xff;
         sctFilterParams.flags          = DMX_IMMEDIATE_START; 
 
         if (ioctl(mux_fd, DMX_SET_FILTER, &sctFilterParams) < 0)
