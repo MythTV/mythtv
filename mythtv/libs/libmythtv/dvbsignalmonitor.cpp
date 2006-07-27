@@ -218,35 +218,30 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
                 sctFilterParams.filter.filter[0] = 0;
                 sctFilterParams.filter.mask[0]   = 0xff;
                 break;
-            case 0x0010: // assume this is for an NIT
-                // With this filter we can only ever get NIT for this network
-                // because other networks NIT need a filter of 0x41
-                // FIXME: This will break for North American DVB providers
-                //        which improperly transmit current NIT with 0x41
-                // FIXME: This will break with ATSC when pid 0x10 is used
-                //        for the PMT. It is recommended but not required
-                //        that ATSC channels avoid using pid 0x10 for the
-                //        PMT.
-                sctFilterParams.filter.filter[0] = 0x40;
-                sctFilterParams.filter.mask[0]   = 0xff;
+            case 0x0010: // assume this is for an NIT, NITo, PMT
+                // This filter will give us table ids 0x00-0x03, 0x40-0x43
+                // we expect to see table ids 0x02, 0x40 and 0x41 on this PID
+                // NOTE: In theory, this will break with ATSC when PID 0x10
+                //       is used for ATSC/MPEG tables. This is frowned upon,
+                //       but PMTs have been seen on in the wild.
+                sctFilterParams.filter.filter[0] = 0x00;
+                sctFilterParams.filter.mask[0]   = 0xbc;
                 break;
-            case 0x0011: // assume this is for an SDT
-                // With this filter we can only ever get SDT for this network
-                // because other networks SDT need a filter of 0x46
-                // FIXME: This will break for North American DVB providers
-                //        which improperly transmit current SDT with 0x46
-                // FIXME: This will break with ATSC when pid 0x11 is used
-                //        for the PMT. It is recommended but not required
-                //        that ATSC channels avoid using pid 0x11 for the
-                //        PMT.
-                sctFilterParams.filter.filter[0] = 0x42;
-                sctFilterParams.filter.mask[0]   = 0xff;
+            case 0x0011: // assume this is for an SDT, SDTo, PMT
+                // This filter will give us table ids 0x02, 0x06, 0x42 and 0x46
+                // All but 0x06 are ones we want to see.
+                // NOTE: In theory this will break with ATSC when pid 0x11
+                //       is used for random ATSC tables. In practice only
+                //       video data has been seen on 0x11.
+                sctFilterParams.filter.filter[0] = 0x02;
+                sctFilterParams.filter.mask[0]   = 0xbb;
                 break;
-            case 0x1ffb:
+            case 0x1ffb: // assume this is for various ATSC tables
                 // MGT 0xC7, Terrestrial VCT 0xC8, Cable VCT 0xC9, RRT 0xCA,
                 // STT 0xCD, DCCT 0xD3, DCCSCT 0xD4, Caption 0x86
-                sctFilterParams.filter.filter[0] = 0x00;
-                sctFilterParams.filter.mask[0]   = 0x00;
+                sctFilterParams.filter.filter[0] = 0x80;
+                sctFilterParams.filter.mask[0]   = 0xa0;
+                break;
             default:
                 // otherwise assume it could be any table
                 sctFilterParams.filter.filter[0] = 0x00;
