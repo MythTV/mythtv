@@ -2560,7 +2560,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
-    else if (xmltv_grabber == "tv_grab_es")
+    else if (xmltv_grabber == "tv_grab_es" ||
+             xmltv_grabber == "tv_grab_es_laguiatv")
         // Use fixed interval of 3 days for Spanish grabber
         command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), 
@@ -2622,6 +2623,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_de_tvtoday" ||
          xmltv_grabber == "tv_grab_fi" ||
          xmltv_grabber == "tv_grab_es" ||
+         xmltv_grabber == "tv_grab_es_laguiatv" ||
          xmltv_grabber == "tv_grab_se_swedb" ||
          xmltv_grabber == "tv_grab_no" ||
          xmltv_grabber == "tv_grab_dk" ||
@@ -2829,6 +2831,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_uk_rt" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
+            xmltv_grabber == "tv_grab_es_laguiatv" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
             xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp" ||
             xmltv_grabber == "tv_grab_pt" || xmltv_grabber == "tv_grab_ee" ||

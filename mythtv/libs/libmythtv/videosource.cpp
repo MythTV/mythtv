@@ -297,6 +297,7 @@ void XMLTV_generic_config::save()
 
     if (grabber == "tv_grab_de_tvtoday" || grabber == "tv_grab_se_swedb" || 
         grabber == "tv_grab_fi" || grabber == "tv_grab_es" ||
+        grabber == "tv_grab_es_laguiatv" ||
         grabber == "tv_grab_nl" || grabber == "tv_grab_jp" ||
         grabber == "tv_grab_no" || grabber == "tv_grab_pt" ||
         grabber == "tv_grab_ee" || grabber == "tv_grab_be_tvb" ||
@@ -396,6 +397,9 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
 
     addTarget("tv_grab_es", new XMLTV_generic_config(parent, "tv_grab_es"));
     grabber->addSelection("Spain", "tv_grab_es");
+
+    addTarget("tv_grab_es_laguiatv", new XMLTV_generic_config(parent, "tv_grab_es_laguiatv"));
+    grabber->addSelection("Spain (Alt)", "tv_grab_es_laguiatv");
 
     addTarget("tv_grab_nl", new XMLTV_generic_config(parent, "tv_grab_nl"));
     grabber->addSelection("Holland", "tv_grab_nl");
