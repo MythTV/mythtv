@@ -82,7 +82,8 @@ typedef struct {
     /** intra prediction is done with un-deblocked samples
      they are saved here before deblocking the MB  */
     uint8_t *top_border_y, *top_border_u, *top_border_v;
-    uint8_t left_border_y[16], left_border_u[10], left_border_v[10];
+    uint8_t left_border_y[26], left_border_u[10], left_border_v[10];
+    uint8_t intern_border_y[26];
     uint8_t topleft_border_y, topleft_border_u, topleft_border_v;
 
     void (*intra_pred_l[8])(uint8_t *d,uint8_t *top,uint8_t *left,int stride);
@@ -151,8 +152,8 @@ static void filter_mb(AVSContext *h, enum mb_t mb_type) {
     memcpy(&h->top_border_u[h->mbx*10+1], h->cu +  7* h->c_stride,8);
     memcpy(&h->top_border_v[h->mbx*10+1], h->cv +  7* h->c_stride,8);
     for(i=0;i<8;i++) {
-        h->left_border_y[i*2+0] = *(h->cy + 15 + (i*2+0)*h->l_stride);
-        h->left_border_y[i*2+1] = *(h->cy + 15 + (i*2+1)*h->l_stride);
+        h->left_border_y[i*2+1] = *(h->cy + 15 + (i*2+0)*h->l_stride);
+        h->left_border_y[i*2+2] = *(h->cy + 15 + (i*2+1)*h->l_stride);
         h->left_border_u[i+1] = *(h->cu + 7 + i*h->c_stride);
         h->left_border_v[i+1] = *(h->cv + 7 + i*h->c_stride);
     }
@@ -211,25 +212,26 @@ static void filter_mb(AVSContext *h, enum mb_t mb_type) {
  ****************************************************************************/
 
 static inline void load_intra_pred_luma(AVSContext *h, uint8_t *top,
-                                        uint8_t *left, int block) {
+                                        uint8_t **left, int block) {
     int i;
 
     switch(block) {
     case 0:
-        memcpy(&left[1],h->left_border_y,16);
-        left[0] = left[1];
-        left[17] = left[16];
+        *left = h->left_border_y;
+        h->left_border_y[0] = h->left_border_y[1];
+        memset(&h->left_border_y[17],h->left_border_y[16],9);
         memcpy(&top[1],&h->top_border_y[h->mbx*16],16);
         top[17] = top[16];
         top[0] = top[1];
         if((h->flags & A_AVAIL) && (h->flags & B_AVAIL))
-            left[0] = top[0] = h->topleft_border_y;
+            h->left_border_y[0] = top[0] = h->topleft_border_y;
         break;
     case 1:
+        *left = h->intern_border_y;
         for(i=0;i<8;i++)
-            left[i+1] = *(h->cy + 7 + i*h->l_stride);
-        memset(&left[9],left[8],9);
-        left[0] = left[1];
+            h->intern_border_y[i+1] = *(h->cy + 7 + i*h->l_stride);
+        memset(&h->intern_border_y[9],h->intern_border_y[8],9);
+        h->intern_border_y[0] = h->intern_border_y[1];
         memcpy(&top[1],&h->top_border_y[h->mbx*16+8],8);
         if(h->flags & C_AVAIL)
             memcpy(&top[9],&h->top_border_y[(h->mbx + 1)*16],8);
@@ -238,22 +240,21 @@ static inline void load_intra_pred_luma(AVSContext *h, uint8_t *top,
         top[17] = top[16];
         top[0] = top[1];
         if(h->flags & B_AVAIL)
-            left[0] = top[0] = h->top_border_y[h->mbx*16+7];
+            h->intern_border_y[0] = top[0] = h->top_border_y[h->mbx*16+7];
         break;
     case 2:
-        memcpy(&left[1],&h->left_border_y[8],8);
-        memset(&left[9],left[8],9);
+        *left = &h->left_border_y[8];
         memcpy(&top[1],h->cy + 7*h->l_stride,16);
         top[17] = top[16];
-        left[0] = h->left_border_y[7];
         top[0] = top[1];
         if(h->flags & A_AVAIL)
-            top[0] = left[0];
+            top[0] = h->left_border_y[8];
         break;
     case 3:
-        for(i=0;i<9;i++)
-            left[i] = *(h->cy + 7 + (i+7)*h->l_stride);
-        memset(&left[9],left[8],9);
+        *left = &h->intern_border_y[8];
+        for(i=0;i<8;i++)
+            h->intern_border_y[i+9] = *(h->cy + 7 + (i+8)*h->l_stride);
+        memset(&h->intern_border_y[17],h->intern_border_y[16],9);
         memcpy(&top[0],h->cy + 7 + 7*h->l_stride,9);
         memset(&top[9],top[8],9);
         break;
@@ -576,23 +577,19 @@ static void mv_pred(AVSContext *h, enum mv_loc_t nP, enum mv_loc_t nC,
     vector_t *mvA = &h->mv[nP-1];
     vector_t *mvB = &h->mv[nP-4];
     vector_t *mvC = &h->mv[nC];
-    vector_t *mvP2 = NULL;
+    const vector_t *mvP2 = NULL;
 
     mvP->ref = ref;
     mvP->dist = h->dist[mvP->ref];
     if(mvC->ref == NOT_AVAIL)
         mvC = &h->mv[nP-5]; // set to top-left (mvD)
-    if(mode == MV_PRED_PSKIP) {
-        if((mvA->ref == NOT_AVAIL) || (mvB->ref == NOT_AVAIL) ||
+    if((mode == MV_PRED_PSKIP) &&
+       ((mvA->ref == NOT_AVAIL) || (mvB->ref == NOT_AVAIL) ||
            ((mvA->x | mvA->y | mvA->ref) == 0)  ||
-           ((mvB->x | mvB->y | mvB->ref) == 0) ) {
-            mvP->x = mvP->y = 0;
-            set_mvs(mvP,size);
-            return;
-        }
-    }
+           ((mvB->x | mvB->y | mvB->ref) == 0) )) {
+        mvP2 = &un_mv;
     /* if there is only one suitable candidate, take it */
-    if((mvA->ref >= 0) && (mvB->ref < 0) && (mvC->ref < 0)) {
+    } else if((mvA->ref >= 0) && (mvB->ref < 0) && (mvC->ref < 0)) {
         mvP2= mvA;
     } else if((mvA->ref < 0) && (mvB->ref >= 0) && (mvC->ref < 0)) {
         mvP2= mvB;
@@ -659,7 +656,7 @@ static int decode_residual_block(AVSContext *h, GetBitContext *gb,
     for(i=0;i<65;i++) {
         level_code = get_ue_code(gb,r->golomb_order);
         if(level_code >= ESCAPE_CODE) {
-            run = (level_code - ESCAPE_CODE) >> 1;
+            run = ((level_code - ESCAPE_CODE) >> 1) + 1;
             esc_code = get_ue_code(gb,esc_golomb_order);
             level = esc_code + (run > r->max_run ? 1 : r->level_add[run]);
             while(level > r->inc_limit)
@@ -667,8 +664,6 @@ static int decode_residual_block(AVSContext *h, GetBitContext *gb,
             mask = -(level_code & 1);
             level = (level^mask) - mask;
         } else {
-            if(level_code < 0)
-                return -1;
             level = r->rltab[level_code][0];
             if(!level) //end of block signal
                 break;
@@ -680,7 +675,7 @@ static int decode_residual_block(AVSContext *h, GetBitContext *gb,
     }
     /* inverse scan and dequantization */
     while(--i >= 0){
-        pos += 1 + run_buf[i];
+        pos += run_buf[i];
         if(pos > 63) {
             av_log(h->s.avctx, AV_LOG_ERROR,
                    "position out of block bounds at pic %d MB(%d,%d)\n",
@@ -716,7 +711,7 @@ static inline int decode_residual_inter(AVSContext *h) {
 
     /* get quantizer */
     if(h->cbp && !h->qp_fixed)
-        h->qp += get_se_golomb(&h->s.gb);
+        h->qp = (h->qp + get_se_golomb(&h->s.gb)) & 63;
     for(block=0;block<4;block++)
         if(h->cbp & (1<<block))
             decode_residual_block(h,&h->s.gb,inter_2dvlc,0,h->qp,
@@ -822,7 +817,7 @@ static int decode_mb_i(AVSContext *h, int cbp_code) {
     GetBitContext *gb = &h->s.gb;
     int block, pred_mode_uv;
     uint8_t top[18];
-    uint8_t left[18];
+    uint8_t *left = NULL;
     uint8_t *d;
 
     init_mb(h);
@@ -876,12 +871,12 @@ static int decode_mb_i(AVSContext *h, int cbp_code) {
     }
     h->cbp = cbp_tab[cbp_code][0];
     if(h->cbp && !h->qp_fixed)
-        h->qp += get_se_golomb(gb); //qp_delta
+        h->qp = (h->qp + get_se_golomb(gb)) & 63; //qp_delta
 
     /* luma intra prediction interleaved with residual decode/transform/add */
     for(block=0;block<4;block++) {
         d = h->cy + h->luma_scan[block];
-        load_intra_pred_luma(h, top, left, block);
+        load_intra_pred_luma(h, top, &left, block);
         h->intra_pred_l[h->pred_mode_Y[scan3x3[block]]]
             (d, top, left, h->l_stride);
         if(h->cbp & (1<<block))
@@ -1041,16 +1036,12 @@ static void decode_mb_b(AVSContext *h, enum mb_t mb_type) {
         if(mb_type & 1) { /* 16x8 macroblock types */
             if(flags & FWD0)
                 mv_pred(h, MV_FWD_X0, MV_FWD_C2, MV_PRED_TOP,  BLK_16X8, 1);
-            if(flags & SYM0) {
-                mv_pred(h, MV_FWD_X0, MV_FWD_C2, MV_PRED_TOP,  BLK_16X8, 1);
+            if(flags & SYM0)
                 mv_pred_sym(h, &h->mv[MV_FWD_X0], BLK_16X8);
-            }
             if(flags & FWD1)
                 mv_pred(h, MV_FWD_X2, MV_FWD_A1, MV_PRED_LEFT, BLK_16X8, 1);
-            if(flags & SYM1) {
-                mv_pred(h, MV_FWD_X2, MV_FWD_A1, MV_PRED_LEFT, BLK_16X8, 1);
-                mv_pred_sym(h, &h->mv[9], BLK_16X8);
-            }
+            if(flags & SYM1)
+                mv_pred_sym(h, &h->mv[MV_FWD_X2], BLK_16X8);
             if(flags & BWD0)
                 mv_pred(h, MV_BWD_X0, MV_BWD_C2, MV_PRED_TOP,  BLK_16X8, 0);
             if(flags & BWD1)
@@ -1058,16 +1049,12 @@ static void decode_mb_b(AVSContext *h, enum mb_t mb_type) {
         } else {          /* 8x16 macroblock types */
             if(flags & FWD0)
                 mv_pred(h, MV_FWD_X0, MV_FWD_B3, MV_PRED_LEFT, BLK_8X16, 1);
-            if(flags & SYM0) {
-                mv_pred(h, MV_FWD_X0, MV_FWD_B3, MV_PRED_LEFT, BLK_8X16, 1);
+            if(flags & SYM0)
                 mv_pred_sym(h, &h->mv[MV_FWD_X0], BLK_8X16);
-            }
             if(flags & FWD1)
                 mv_pred(h, MV_FWD_X1, MV_FWD_C2, MV_PRED_TOPRIGHT,BLK_8X16, 1);
-            if(flags & SYM1) {
-                mv_pred(h, MV_FWD_X1, MV_FWD_C2, MV_PRED_TOPRIGHT,BLK_8X16, 1);
-                mv_pred_sym(h, &h->mv[6], BLK_8X16);
-            }
+            if(flags & SYM1)
+                mv_pred_sym(h, &h->mv[MV_FWD_X1], BLK_8X16);
             if(flags & BWD0)
                 mv_pred(h, MV_BWD_X0, MV_BWD_B3, MV_PRED_LEFT, BLK_8X16, 0);
             if(flags & BWD1)
@@ -1154,6 +1141,10 @@ static int decode_pic(AVSContext *h) {
     get_bits(&s->gb,16);//bbv_dwlay
     if(h->stc == PIC_PB_START_CODE) {
         h->pic_type = get_bits(&s->gb,2) + FF_I_TYPE;
+        if(h->pic_type > FF_B_TYPE) {
+            av_log(s->avctx, AV_LOG_ERROR, "illegal picture type\n");
+            return -1;
+        }
         /* make sure we have the reference frames we need */
         if(!h->DPB[0].data[0] ||
           (!h->DPB[1].data[0] && h->pic_type == FF_B_TYPE))

@@ -22,7 +22,7 @@ QMAKE_CFLAGS_DEBUG += -O
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += bitstream.c utils.c mem.c allcodecs.c mpegvideo.c jrevdct.c 
+SOURCES += bitstream.c utils.c allcodecs.c mpegvideo.c jrevdct.c 
 SOURCES += jfdctfst.c jfdctint.c mpegaudio.c ac3enc.c mjpeg.c audresample.c
 SOURCES += resample2.c dsputil.c motion_est.c imgconvert.c imgresample.c
 SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c

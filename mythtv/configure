@@ -26,16 +26,16 @@ show_help(){
   echo "  --previous               use previous configure parameters if possible"
   echo "  --compile-type=CTYPE     one of release, profile, debug [$compile_type]"
   echo "                           NOTE: profile is for sampling profilers"
-  echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+  echo "  --prefix=PREFIX          install in PREFIX [$PREFIX]"
   echo "  --libdir-name=LIBNAME    search/install libraries in PREFIX/LIBNAME [$libdir_name]"
   #echo "  --libdir=DIR             install libs in DIR [PREFIX/lib]"
+#  echo "  --shlibdir=DIR           install shared libs in DIR [PREFIX/lib]"
   #echo "  --mandir=DIR             man documentation in DIR [PREFIX/man]"
   echo "  --disable-ccache         disable compiler cache (ccache)"
   echo "  --disable-distcc         disable distributed compilation (distcc)"
   #echo "  --enable-mp3lame         enable mp3 encoding via libmp3lame [default=no]"
   #echo "  --enable-libogg          enable ogg support via libogg [default=no]"
   #echo "  --enable-vorbis          enable vorbis support via libvorbis [default=no]"
-  #echo "  --enable-theora          enable theora support via libtheora [default=no]"
   #echo "  --enable-faad            enable faad support via libfaad [default=no]"
   #echo "  --enable-faadbin         build faad support with runtime linking [default=no]"
   #echo "  --enable-faac            enable faac support via libfaac [default=no]"
@@ -318,10 +318,6 @@ filter_out(){
     echo "$@" | sed "s%\\<$pattern\\>%%g"
 }
 
-if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
-    show_help
-fi
-
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
 x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott"
 x86_mmx_cpus="$x86_mmx_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,athlon-mp,"
@@ -359,9 +355,10 @@ TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
 logging="yes"
 logfile="config.err"
 compile_type="release"
-prefix="/usr/local"
-libdir=""
+PREFIX="/usr/local"
 libdir_name="lib"
+libdir=""
+shlibdir=""
 incdir=""
 mandir=""
 bindir=""
@@ -582,7 +579,6 @@ pp="yes"
 shared_pp="no"
 mingw32="no"
 mingwce="no"
-cygwin="no"
 os2="no"
 lstatic="yes"
 lshared="no"
@@ -600,6 +596,7 @@ dlfcn="no"
 dlopen="no"
 mpegaudio_hp="yes"
 SHFLAGS='-shared -Wl,-soname,$@'
+VHOOKFLAGS="$SHFLAGS"
 netserver="no"
 need_inet_aton="no"
 protocols="yes"
@@ -607,7 +604,7 @@ ffserver="no"
 ffplay="no"
 LIBOBJFLAGS=""
 FFLDFLAGS=-Wl,--warn-common
-FFSLDFLAGS=-Wl,-E
+FFSERVERLDFLAGS=-Wl,-E
 LDCONFIG="ldconfig"
 LIBPREF="lib"
 LIBSUF=".a"
@@ -632,7 +629,7 @@ memalignhack="no"
 targetos=`uname -s`
 case $targetos in
 BeOS)
-prefix="/boot/home/config"
+PREFIX="/boot/home/config"
 # helps building libavcodec
 CFLAGS="$CFLAGS -DPIC -fomit-frame-pointer"
 # 3 gcc releases known for BeOS, each with ugly bugs
@@ -668,7 +665,7 @@ audio_oss="no"
 dv1394="no"
 make="gmake"
 FFLDFLAGS=""
-FFSLDFLAGS=""
+FFSERVERLDFLAGS=""
 SHFLAGS="-shared -Wl,-h,\$@"
 need_inet_aton="yes"
 extralibs="$extralibs -lsocket -lnsl"
@@ -750,6 +747,7 @@ audio_jack="no"
 dv1394="no"
 ffserver="no"
 SHFLAGS="-dynamiclib -Wl,-single_module -Wl,-install_name,\$(libdir)/\$(SLIBNAME),-current_version,\$(SPPVERSION),-compatibility_version,\$(SPPVERSION)"
+VHOOKFLAGS='-dynamiclib -Wl,-single_module -flat_namespace -undefined suppress -Wl,-install_name,$(libdir)/vhook/$@'
 extralibs=""
 darwin="yes"
 strip="strip -x"
@@ -758,7 +756,7 @@ FFLDFLAGS="-Wl,-search_paths_first"
 SLIBSUF=".dylib"
 SLIBNAME_WITH_FULLVERSION='$(SLIBPREF)$(NAME).$(LIBVERSION)$(SLIBSUF)'
 SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(NAME).$(LIBMAJOR)$(SLIBSUF)'
-FFSLDFLAGS=-Wl,-bind_at_load
+FFSERVERLDFLAGS=-Wl,-bind_at_load
 ;;
 MINGW32*)
 # Note: the rest of the mingw32 config is done afterwards as mingw32
@@ -766,6 +764,7 @@ MINGW32*)
 mingw32="yes"
 ;;
 CYGWIN*)
+shlibdir='${PREFIX}/bin'
 v4l="no"
 ivtv="no"
 dvb="no"
@@ -777,8 +776,12 @@ audio_arts="no"
 audio_jack="no"
 dv1394="no"
 extralibs=""
-cygwin="yes"
 EXESUF=".exe"
+SLIBPREF="cyg"
+SLIBSUF=".dll"
+SLIBNAME_WITH_VERSION='$(SLIBPREF)$(NAME)-$(LIBVERSION)$(SLIBSUF)'
+SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(NAME)-$(LIBMAJOR)$(SLIBSUF)'
+SHFLAGS='-shared -Wl,--out-implib=lib$(NAME).dll.a'
 ;;
 Linux)
 CCONFIG="$CCONFIG linux"
@@ -799,7 +802,7 @@ strip="echo ignoring strip"
 CFLAGS="$CFLAGS -Zomf"
 FFLDFLAGS="-Zomf -Zstack 16384 -s"
 SHFLAGS="-Zdll -Zomf"
-FFSLDFLAGS=""
+FFSERVERLDFLAGS=""
 LIBPREF=""
 LIBSUF=".lib"
 SLIBPREF=""
@@ -850,6 +853,10 @@ else
     source_path="`cd \"$source_path\"; pwd`"
 fi
 
+if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
+    show_help
+fi
+
 FFMPEG_CONFIGURATION=" "
 for opt do
   FFMPEG_CONFIGURATION="$FFMPEG_CONFIGURATION""$opt "
@@ -886,11 +893,13 @@ for opt do
   ;;
   --compile-type=*) compile_type="$optval"
   ;;  
-  --prefix=*) prefix="$optval"; force_prefix=yes
+  --prefix=*) PREFIX="$optval"; force_prefix=yes
   ;;
   --libdir-name=*) libdir_name="$optval"
   ;;
   --libdir=*) libdir="$optval"; force_prefix=yes
+  ;;
+  --shlibdir=*) shlibdir="$optval"
   ;;
   --mandir=*) mandir="$optval"
   ;;
@@ -906,7 +915,7 @@ for opt do
   ;;
   --extra-cxxflags=*) ECXXFLAGS="$optval"
   ;;
-  --extra-ldflags=*) LDFLAGS="$LDFLAGS $optval"
+  --extra-ldflags=*) EXTRALDFLAGS="$optval"
   ;;
   --extra-libs=*) extralibs="$optval"
   ;;
@@ -979,8 +988,6 @@ for opt do
 #  --enable-libogg) libogg="yes"
 #  ;;
 #  --enable-vorbis) vorbis="yes"
-#  ;;
-#  --enable-theora) theora="yes"
 #  ;;
   --enable-faad) faad="yes"
   ;;
@@ -1295,17 +1302,16 @@ EOF
     if test "$mingwce" = "yes"; then
         protocols="no"
     fi
-    #FIXME: This ignores --extra-ldflags.
     FFLDFLAGS='-Wl,--output-def,$(@:.dll=.def),--out-implib,lib$(SLIBNAME:$(SLIBSUF)=.dll.a)'
     SLIBPREF=""
     SLIBSUF=".dll"
     EXESUF=".exe"
-    if test "$force_prefix" != yes; then prefix="$PROGRAMFILES/FFmpeg"; fi
-    if test "$force_libdir" != yes; then bindir="$prefix"; fi
+    if test "$force_prefix" != yes; then PREFIX="$PROGRAMFILES/FFmpeg"; fi
+    if test "$force_libdir" != yes; then bindir="$PREFIX"; fi
 fi
 
 # Combine FFLDFLAGS and the LDFLAGS environment variable
-LDFLAGS="$FFLDFLAGS $LDFLAGS"
+LDFLAGS="$FFLDFLAGS $EXTRALDFLAGS $LDFLAGS"
 
 test -n "$cross_prefix" && cross_compile=yes
 cc="${cross_prefix}${cc}"
@@ -2267,15 +2273,19 @@ if test "$gprof" = "yes" ; then
 fi
 
 if test x"$bindir" = x""; then
-    bindir="${prefix}/bin"
+    bindir="${PREFIX}/bin"
 fi
 
 if test x"$libdir" = x""; then
-    libdir="${prefix}/${libdir_name}"
+    libdir="${PREFIX}/${libdir_name}"
+fi
+
+if test x"$shlibdir" = x""; then
+    shlibdir="$libdir"
 fi
 
 if test x"$mandir" = x""; then
-    mandir="${prefix}/man"
+    mandir="${PREFIX}/man"
 fi
 
 if test x"$dts" = x"yes"; then
@@ -2510,7 +2520,7 @@ echo "# Basic Settings"
 echo "Compile type     $compile_type"
 echo "Compiler cache   $ccache"
 echo "DistCC           $distcc"
-echo "Install prefix   $prefix"
+echo "Install prefix   $PREFIX"
 #echo "Source path      $source_path"
 #echo "C compiler       $cc"
 #echo "make             $make"
@@ -2547,7 +2557,6 @@ fi
 #echo "mp3lame enabled  $mp3lame"
 #echo "libogg enabled   $libogg"
 #echo "vorbis enabled   $vorbis"
-#echo "theora enabled   $theora"
 #echo "faad enabled     $faad"
 #echo "faadbin enabled  $faadbin"
 #echo "faac enabled     $faac"
@@ -2657,8 +2666,9 @@ echo "# Automatically generated by configure - do not modify" > $MYTH_CONFIG_MAK
 echo "/* Automatically generated by configure - do not modify */" > $TMPH
 echo "#define FFMPEG_CONFIGURATION "'"'"$FFMPEG_CONFIGURATION"'"' >> $TMPH
 
-echo "PREFIX=$prefix" >> $MYTH_CONFIG_MAK
+echo "PREFIX=$PREFIX" >> $MYTH_CONFIG_MAK
 echo "LIBDIR=$libdir" >> $MYTH_CONFIG_MAK
+#echo "shlibdir=$shlibdir" >> $MYTH_CONFIG_MAK
 #echo "bindir=$bindir" >> $MYTH_CONFIG_MAK
 #echo "mandir=$mandir" >> $MYTH_CONFIG_MAK
 #echo "MAKE=$make" >> $MYTH_CONFIG_MAK
@@ -2687,8 +2697,9 @@ echo "ECFLAGS=$ECFLAGS" >> $MYTH_CONFIG_MAK
 echo "ECXXFLAGS=$ECXXFLAGS" >> $MYTH_CONFIG_MAK
 #echo "SHCFLAGS=$SHCFLAGS">>$MYTH_CONFIG_MAK
 #echo "LDFLAGS=$LDFLAGS" >> $MYTH_CONFIG_MAK
-#echo "FFSLDFLAGS=$FFSLDFLAGS" >> $MYTH_CONFIG_MAK
+#echo "FFSERVERLDFLAGS=$FFSERVERLDFLAGS" >> $MYTH_CONFIG_MAK
 #echo "SHFLAGS=$SHFLAGS" >> $MYTH_CONFIG_MAK
+#echo "VHOOKFLAGS=$VHOOKFLAGS" >> $MYTH_CONFIG_MAK
 #echo "LIBOBJFLAGS=$LIBOBJFLAGS" >> config.mak
 #echo "BUILD_STATIC=$lstatic" >> config.mak
 #echo "BUILDSUF=$BUILDSUF" >> $MYTH_CONFIG_MAK

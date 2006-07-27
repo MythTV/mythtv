@@ -7,37 +7,47 @@
 #include "adler32.h"
 
 #define BASE 65521L /* largest prime smaller than 65536 */
-#define NMAX 5552
-/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
 
 #define DO1(buf)  {s1 += *buf++; s2 += s1;}
-#define DO2(buf)  DO1(buf); DO1(buf);
-#define DO4(buf)  DO2(buf); DO2(buf);
-#define DO8(buf)  DO4(buf); DO4(buf);
-#define DO16(buf) DO8(buf); DO8(buf);
+#define DO4(buf)  DO1(buf); DO1(buf); DO1(buf); DO1(buf);
+#define DO16(buf) DO4(buf); DO4(buf); DO4(buf); DO4(buf);
 
 unsigned long av_adler32_update(unsigned long adler, const uint8_t *buf, unsigned int len)
 {
     unsigned long s1 = adler & 0xffff;
-    unsigned long s2 = (adler >> 16) & 0xffff;
-    int k;
+    unsigned long s2 = adler >> 16;
 
-    if (buf == NULL) return 1L;
-
-    while (len > 0) {
-        k = FFMIN(len, NMAX);
-        len -= k;
-#ifndef CONFIG_SMALL
-        while (k >= 16) {
-            DO16(buf);
-            k -= 16;
-        }
+    while (len>0) {
+#ifdef CONFIG_SMALL
+        while(len>4 && s2 < (1U<<31)){
+            DO4(buf); len-=4;
+#else
+        while(len>16 && s2 < (1U<<31)){
+            DO16(buf); len-=16;
 #endif
-        while(k--) {
-            DO1(buf);
         }
+        DO1(buf); len--;
         s1 %= BASE;
         s2 %= BASE;
     }
     return (s2 << 16) | s1;
 }
+
+#ifdef TEST
+#include "log.h"
+#define LEN 7001
+volatile int checksum;
+int main(){
+    int i;
+    char data[LEN];
+    av_log_level = AV_LOG_DEBUG;
+    for(i=0; i<LEN; i++)
+        data[i]= ((i*i)>>3) + 123*i;
+    for(i=0; i<1000; i++){
+        START_TIMER
+        checksum= av_adler32_update(1, data, LEN);
+        STOP_TIMER("adler")
+    }
+    av_log(NULL, AV_LOG_DEBUG, "%X == 50E6E508\n", checksum);
+}
+#endif
