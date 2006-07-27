@@ -284,8 +284,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       disable_passthru(false),
       // DVD
       lastdvdtitle(-1), lastcellstart(0),
-      dvdmenupktseen(false), dvdvideopause(false),
-      lastrepeat(0)
+      dvdmenupktseen(false), dvdvideopause(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
@@ -2960,11 +2959,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     picframe->interlaced_frame = mpa_pic.interlaced_frame;
                     picframe->top_field_first = mpa_pic.top_field_first;
                     picframe->repeat_pict = mpa_pic.repeat_pict;
-
-                    /* FIXME, HACK, etc. */
-                    if (picframe->repeat_pict != lastrepeat)
-                        picframe->interlaced_frame = 1;
-                    lastrepeat = picframe->repeat_pict;
 
                     picframe->frameNumber = framesPlayed;
                     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
