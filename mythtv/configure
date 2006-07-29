@@ -3465,7 +3465,6 @@ uninstall:
 	\$(NONE)
 
 distclean: clean
-	-cd ../setup && qmake && make distclean
 	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak 
 	-rm -f ../$MYTH_CONFIG_H    ../config.h
 	-rm -f ../Makefile          ../config.err
