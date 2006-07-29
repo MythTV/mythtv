@@ -18,9 +18,9 @@
 
 struct ArchiveDestination ArchiveDestinations[] =
 {
-    {AD_DVD_SL,   "Single Layer DVD", "Single Layer DVD (4489Mb)", 4489*1024},
-    {AD_DVD_DL,   "Dual Layer DVD",   "Dual Layer DVD (8979Mb)",   8979*1024},
-    {AD_DVD_RW,   "DVD +/- RW",       "Rewritable DVD",            4489*1024},
+    {AD_DVD_SL,   "Single Layer DVD", "Single Layer DVD (4482Mb)", 4482*1024},
+    {AD_DVD_DL,   "Dual Layer DVD",   "Dual Layer DVD (8964Mb)",   8964*1024},
+    {AD_DVD_RW,   "DVD +/- RW",       "Rewritable DVD",            4482*1024},
     {AD_FILE,     "File",             "Any file accessable from "
             "your filesystem.",          -1},
 };

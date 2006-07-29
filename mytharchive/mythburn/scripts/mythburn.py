@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060719-1"
+VERSION="0.1.20060729-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -73,7 +73,7 @@ dvdPALD1="%sx%s" % (dvdPAL[0],dvdPAL[1])
 dvdNTSCD1="%sx%s" % (dvdNTSC[0],dvdNTSC[1])
 
 #Single and dual layer recordable DVD free space in MBytes
-dvdrsize=(4489,8978)   
+dvdrsize=(4482,8964)
 
 frameratePAL=25
 framerateNTSC=29.97

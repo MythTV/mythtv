@@ -25,8 +25,8 @@
 const int LAST_PAGE = 4;
 
 //Max size of a DVD-R in Mbytes
-const int MAX_DVDR_SIZE_SL = 4489;
-const int MAX_DVDR_SIZE_DL = 8978;
+const int MAX_DVDR_SIZE_SL = 4482;
+const int MAX_DVDR_SIZE_DL = 8964;
 
 MythburnWizard::MythburnWizard(MythMainWindow *parent, QString window_name,
                                QString theme_filename, const char *name)
