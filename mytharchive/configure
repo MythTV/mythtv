@@ -34,7 +34,6 @@ MythArchive related options:
   --enable-mytharchive     build the mytharchive plugin [$archive]
   --enable-create-dvd      enable dvd creation [$createdvd]
   --enable-create-archive  enable native archive creation [$createarchive]
-#  --enable-encode-video    enable video file re-encoding [$encodevideo]
 
 EOF
 exit 1
