@@ -561,7 +561,21 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
                         const char* director, int lenMins, const char* year) 
 {
     int res = -1; 
-   
+  
+    QString filename = QString(mrl);
+    QFile checkFile(filename);
+    if (!checkFile.exists() && !filename.contains("dvd"))
+    {
+        QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
+                                        "Check if the video exists")
+                                        .arg(filename.section("/", -1))
+                                        .arg(filename.section("/", 0, -2));
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                    "Open Failed",
+                                    errorText);
+        return res;
+    }
+    
     TV *tv = new TV();
 
     if (!tv->Init())
