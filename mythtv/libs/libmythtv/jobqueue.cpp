@@ -1868,7 +1868,7 @@ void JobQueue::DoTranscodeThread(void)
             }
             else
             {
-                ChangeJobStatus(jobID, JOB_ERRORED, QString("Trancode failed "
+                ChangeJobStatus(jobID, JOB_ERRORED, QString("Transcode failed "
                                 "with status: %1").arg(result));
                 details = QString("%1%2: (%3)")
                           .arg(program_info->title).arg(subtitle)
