@@ -446,7 +446,7 @@ if test -f /usr/bin/hostinfo ; then
         processor=`/usr/bin/hostinfo | grep "Processor type:"` 
         processor=${processor#Processor type: *} 
         processor=${processor% (*} 
-        if test x"${processor:0:3}" = x"ppc" ; then 
+        if test x"`echo $processor | cut -c1-3`" = x"ppc" ; then
             tune=$processor 
         else 
             processor=`/usr/sbin/sysctl -n machdep.cpu.model_string` 
@@ -2366,7 +2366,7 @@ if test x"$firewire_cable_box" = x"yes" ; then
             fi
         fi
     fi
-    if test x"$darwin" == x"yes" ; then
+    if test x"$darwin" = x"yes" ; then
         # This should pick the newest. e.g. FireWireSDK21 instead of 20
         # Unfortunately, the location keeps changing:
         #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
@@ -2467,11 +2467,11 @@ if ! has_library libGL ; then
     opengl_vsync="no"
 fi
 
-if test x"$opengl_vsync" == x"yes" ; then
+if test x"$opengl_vsync" = x"yes" ; then
     opengl="yes"
 fi
 
-if test x"$xvmc_opengl" == x"yes" ; then
+if test x"$xvmc_opengl" = x"yes" ; then
     opengl="yes"
 fi
 
@@ -2508,7 +2508,7 @@ if has_header "sensors/sensors.h" && has_library libsensors ; then
     lmsensors="yes"
 fi
 
-if test x"$darwin" == x"yes" ; then
+if test x"$darwin" = x"yes" ; then
     # So far, only OS X 10.4 has this as a non-private framework
     if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
         darwin_da="yes"
