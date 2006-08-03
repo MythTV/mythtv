@@ -1,5 +1,5 @@
-include ( ../mythconfig.mak )
-include ( ../settings.pro )
+include ( ../../mythconfig.mak )
+include ( ../../settings.pro )
 
 TEMPLATE = app
 CONFIG -= moc qt

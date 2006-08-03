@@ -1,5 +1,5 @@
-include ( ../mythconfig.mak )
-include ( ../settings.pro )
+include ( ../../mythconfig.mak )
+include ( ../../settings.pro )
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
