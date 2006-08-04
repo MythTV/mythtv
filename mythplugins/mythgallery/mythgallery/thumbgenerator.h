@@ -43,6 +43,7 @@ public:
     ThumbGenerator(QObject *parent, int w, int h);
     ~ThumbGenerator();
 
+    void setSize(int w, int h);
     void setDirectory(const QString& directory, bool isGallery=false);
     void addFile(const QString& fileName);
     void cancel();

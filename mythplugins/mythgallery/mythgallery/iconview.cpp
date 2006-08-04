@@ -832,6 +832,9 @@ void IconView::LoadTheme(void)
         m_nRows  = m_viewRect.height()/m_thumbH - 1;
         m_spaceW = m_thumbW / (m_nCols + 1);
         m_spaceH = m_thumbH / (m_nRows + 1);
+        
+        m_thumbGen->setSize((int)(m_thumbW - 10 * wmult), 
+                            (int)(m_thumbH - 10 * hmult));
     }
 }
 
@@ -926,7 +929,7 @@ void IconView::LoadThumbnail(ThumbItem *item)
     if (!image.isNull())
     {
         image = image.smoothScale((int)(m_thumbW - 10 * wmult),
-                                  (int)(m_thumbW - 10 * wmult),
+                                  (int)(m_thumbH - 10 * hmult),
                                   QImage::ScaleMax);
         int rotateAngle = 0;
 

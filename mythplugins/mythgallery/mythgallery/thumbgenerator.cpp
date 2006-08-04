@@ -52,6 +52,12 @@ ThumbGenerator::~ThumbGenerator()
     wait();
 }
 
+void ThumbGenerator::setSize(int w, int h)
+{
+    m_width = w;
+    m_height = h;
+}
+
 void ThumbGenerator::setDirectory(const QString& directory, bool isGallery)
 {
     m_mutex.lock();
@@ -135,7 +141,7 @@ void ThumbGenerator::run()
                 if (image.isNull())
                     continue; // give up;
                 
-                image = image.smoothScale(m_width,m_width,QImage::ScaleMax);
+                image = image.smoothScale(m_width,m_height,QImage::ScaleMax);
                 image.save(cachePath, "JPEG");
 
                 // deep copies all over
