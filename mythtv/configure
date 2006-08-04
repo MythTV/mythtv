@@ -1198,17 +1198,17 @@ for opt do
   --with-bindings=*)
       tmp_bindings=`echo ${optval} | sed -e 's/,/ /g'`
       for binding in ${tmp_bindings} ; do
-		  if test x"${binding}" = x"perl"; then
-			  bindings_perl="yes"
-		  fi
+          if test x"${binding}" = x"perl"; then
+              bindings_perl="yes"
+          fi
       done
   ;;
   --without-bindings=*)
       tmp_bindings=`echo ${optval} | sed -e 's/,/ /g'`
       for binding in ${tmp_bindings} ; do
-		  if test x"${binding}" = x"perl"; then
-			  bindings_perl="no"
-		  fi
+          if test x"${binding}" = x"perl"; then
+              bindings_perl="no"
+          fi
       done
   ;;
   --help) show_help
