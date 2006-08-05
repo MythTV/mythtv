@@ -1885,55 +1885,47 @@ void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade,
     QRect disprect = size;
     disprect.moveBy(xoff, yoff);
 
-    int ystart = disprect.top();
-    int yend = disprect.bottom();
-    int xstart = disprect.left();
-    int xend = disprect.right();
+    int xstart = clamp(disprect.left(),   0, surface->width);
+    int xend   = clamp(disprect.right(),  0, surface->width);
+    int ystart = clamp(disprect.top(),    0, surface->height);
+    int yend   = clamp(disprect.bottom(), 0, surface->height);
+    int height = yend - ystart;
+    int width  = xend - xstart;
 
-    if (xstart < 0)
-        xstart = 0;
-    if (xend > surface->width)
-        xend = surface->width;
-    if (ystart < 0)
-        ystart = 0;
-    if (yend > surface->height)
-        yend = surface->height;
+    if ((height <= 0) || (width <= 0))
+        return; // nothing to do...
 
-    int height = yend - ystart + 1, width = xend - xstart + 1;
-
-    QRect destRect = QRect(xstart, ystart, width, height); 
-    bool needblend = false;
-
-    if (surface->IntersectsDrawn(destRect))
-        needblend = true;
+    QRect destRect(xstart, ystart, width, height); 
     surface->AddRect(destRect);
 
     int alphamod = 255;
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    int ydestwidth;
-
     int h,s,v;
     m_color.getHsv(&h, &s, &v);
 
     alpha = ((alpha * alphamod) + 0x80) >> 8;
-    if (!needblend)
+
+    if (surface->IntersectsDrawn(destRect))
+    {
+        // needs blending...
+        dest = surface->y + ystart * surface->width + xstart;
+        destalpha = surface->alpha + ystart * surface->width + xstart;
+        (surface->blendconstfunc) (v, 0, 0, alpha, dest, NULL, NULL, destalpha,
+                                   surface->width, width, height, 0,
+                                   surface->rec_lut, surface->pow_lut);
+    }
+    else
     {
         for (int y = ystart; y < yend; y++)
         {
-            ydestwidth = y * surface->width;
+            int ydestwidth = y * surface->width;
             
             memset(surface->y + xstart + ydestwidth, 0, width);
             memset(surface->alpha + xstart + ydestwidth, alpha, width);
         }
-        return;
     }
-    dest = surface->y + ystart * surface->width + xstart;
-    destalpha = surface->alpha + ystart * surface->width + xstart;
-    (surface->blendconstfunc) (v, 0, 0, alpha, dest, NULL, NULL, destalpha,
-                               surface->width, width, height, 0,
-                               surface->rec_lut, surface->pow_lut);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
