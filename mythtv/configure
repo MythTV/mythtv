@@ -1569,7 +1569,7 @@ if test $cpu = "powerpc"; then
     fi
 fi
 
-check_header altivec.h && _altivec_h=yes || _altivec_h=no
+check_header altivec.h $ARCHFLAGS && _altivec_h=yes || _altivec_h=no
 
 # check if our compiler supports Motorola AltiVec C API
 if test $altivec = "yes"; then
