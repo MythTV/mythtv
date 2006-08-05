@@ -56,7 +56,7 @@
     die "Unable to locate mysql.txt:  $!\n\n" unless ($found && $db_host);
 
 # Connect to the database
-    $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
+    $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host;mysql_emulated_prepare=1", $db_user, $db_pass)
         or die "Cannot connect to database: $!\n\n";
 
 # Repair and optimize each table
