@@ -584,8 +584,7 @@ void ProgFinder::customEdit()
             return;
 
         CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                        "customedit", curPick->getRecordID(),
-                                        curPick->title);
+                                        "customedit", curPick);
         ce->exec();
         delete ce;
     }

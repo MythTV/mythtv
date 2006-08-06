@@ -1706,8 +1706,8 @@ void GuideGrid::customEdit()
     if (!pginfo)
         return;
 
-    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
-                                    pginfo->getRecordID(), pginfo->title);
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
+                                    "customedit", pginfo);
     ce->exec();
     delete ce;
 }

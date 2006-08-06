@@ -392,8 +392,8 @@ void PreviousList::customEdit()
     if (!pi)
         return;
 
-    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
-                                    pi->getRecordID(), pi->title);
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
+                                    "customedit", pi);
     ce->exec();
     delete ce;
 }

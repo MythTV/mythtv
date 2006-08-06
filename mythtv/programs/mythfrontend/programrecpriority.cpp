@@ -574,7 +574,7 @@ void ProgramRecPriority::customEdit(void)
     record.loadByID(curitem->recordid);
 
     CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                        "customedit", curitem->recordid, "");
+                                        "customedit", curitem);
     ce->exec();
     delete ce;
 }

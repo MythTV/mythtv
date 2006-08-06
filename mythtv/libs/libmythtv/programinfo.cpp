@@ -66,6 +66,11 @@ ProgramInfo::ProgramInfo(void)
     startCol = -1;
     isVideo = false;
     lenMins = 0;
+
+    title = "";
+    subtitle = "";
+    description = "";
+    category = "";
     chanstr = "";
     chansign = "";
     channame = "";

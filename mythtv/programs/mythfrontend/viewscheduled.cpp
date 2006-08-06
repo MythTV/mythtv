@@ -551,8 +551,8 @@ void ViewScheduled::customEdit()
     if (!p)
         return;
 
-    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(), "customedit",
-                                    p->getRecordID(), p->title);
+    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
+                                    "customedit", p);
     ce->exec();
     delete ce;
 }

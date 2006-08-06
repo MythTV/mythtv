@@ -17,7 +17,7 @@ class CustomEdit : public MythDialog
   public:
 
     CustomEdit(MythMainWindow *parent, const char *name = 0,
-                 int recid = 0, QString ltitle = "");
+                 ProgramInfo *m_pginfo = NULL);
    ~CustomEdit(void);
    
   signals:

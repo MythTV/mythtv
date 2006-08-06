@@ -28,9 +28,21 @@ using namespace std;
 #include "mythdbcon.h"
 
 CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
-                         int recid, QString ltitle)
+                       ProgramInfo *pginfo)
               : MythDialog(parent, name)
 {
+    ProgramInfo *p = new ProgramInfo();
+    p->title = "";
+    p->subtitle = "";
+    p->description = "";
+    p->category = "";
+
+    if (pginfo)
+    {
+        delete p;
+        p = pginfo;
+    }
+
     prevItem = 0;
     maxex = 0;
     exSuffix = QString(" (%1)").arg(tr("stored example"));
@@ -75,7 +87,8 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
             m_recsub  << QString::fromUtf8(result.value(2).toString());
             m_recdesc << QString::fromUtf8(result.value(3).toString());
 
-            if (trimTitle == ltitle || result.value(0).toInt() == recid)
+            if (trimTitle == p->title ||
+                result.value(0).toInt() == p->recordid)
                 titlematch = m_rule->count() - 1;
         }
     }
@@ -102,17 +115,36 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Match an exact title"));
     m_cfrom << "";
-    m_csql << "program.title = 'Nova' ";
+    if (p->title > "")
+        m_csql << QString("program.title = '%1' ").arg(p->title);
+    else
+        m_csql << "program.title = 'Nova' ";
 
     m_clause->insertItem(tr("Match words in the title"));
     m_cfrom << "";
     m_csql << "program.title LIKE 'CSI: %' ";
 
-    m_clause->insertItem(tr("Match an exact episode"));
-    m_cfrom << "";
-    m_csql << QString("program.title = 'Seinfeld' \n"
+    if (p->programid > "")
+    {
+        m_clause->insertItem(tr("Match this episode"));
+        m_cfrom << "";
+        m_csql << QString("program.programid = '%1' ").arg(p->programid);
+    }
+    else if (p->subtitle > "")
+    {
+        m_clause->insertItem(tr("Match this episode"));
+        m_cfrom << "";
+        m_csql << QString("program.subtitle = '%1' \n"
+                          "AND program.description = '%2' ")
+                          .arg(p->subtitle).arg(p->description);
+    }
+    else
+    {
+        m_clause->insertItem(tr("Match an exact episode"));
+        m_cfrom << "";
+        m_csql << QString("program.title = 'Seinfeld' \n"
                       "AND program.subtitle = 'The Soup' ");
-
+    }
     m_clause->insertItem(tr("Match in any descriptive field"));
     m_cfrom << "";
     m_csql << QString("(program.title LIKE '%Japan%' \n"
@@ -137,7 +169,8 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Anytime on a specific day of the week"));
     m_cfrom << "";
-    m_csql << "DAYNAME(program.starttime) = 'Tuesday' ";
+    m_csql << QString("DAYNAME(program.starttime) = '%1' ")
+                      .arg(p->startts.toString("dddd"));
 
     m_clause->insertItem(tr("Only on weekdays (Monday through Friday)"));
     m_cfrom << "";
@@ -159,7 +192,10 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Only on a specific station"));
     m_cfrom << "";
-    m_csql << "channel.callsign = 'ESPN' ";
+    if (p->chansign > "")
+        m_csql << QString("channel.callsign = '%1' ").arg(p->chansign);
+    else
+        m_csql << "channel.callsign = 'ESPN' ";
 
     m_clause->insertItem(tr("Exclude one station"));
     m_cfrom << "";
@@ -187,13 +223,19 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     m_clause->insertItem(tr("Limit by category"));
     m_cfrom << "";
-    m_csql << "program.category = 'Reality' ";
+    if (p->category > "")
+        m_csql << QString("program.category = '%1' ").arg(p->category);
+    else
+        m_csql << "program.category = 'Reality' ";
 
     m_clause->insertItem(tr("All matches for a genre (Data Direct)"));
     m_cfrom << "LEFT JOIN programgenres ON "
                "program.chanid = programgenres.chanid AND "
                "program.starttime = programgenres.starttime ";
-    m_csql << "programgenres.genre = 'Reality' ";
+    if (p->category > "")
+        m_csql << QString("programgenres.genre = '%1' ").arg(p->category);
+    else
+        m_csql << "programgenres.genre = 'Reality' ";
 
     m_clause->insertItem(tr("Limit by MPAA or VCHIP rating (Data Direct)"));
     m_cfrom << "LEFT JOIN programrating ON "
@@ -369,12 +411,12 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
         m_rule->setCurrentItem(titlematch);
         ruleChanged();
     }
-    else if (ltitle > "")
+    else if (p->title > "")
     {
-        m_title->setText(ltitle);
+        m_title->setText(p->title);
         m_subtitle->setText("");
         m_description->setText("program.title = '" +
-                               ltitle.replace("\'","\'\'") + "' ");
+                               p->title.replace("\'","\'\'") + "' ");
         textChanged();
     }
 
