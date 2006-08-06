@@ -4265,6 +4265,22 @@ if the show was marked as a repeat and did not have a date for the first
 airing. If this is "0" it usually means that this is a brand new show or a
 rebroadcast within the first two weeks.
 
+<item>"program.generic" is a field created by MythTV to try mark
+showings for a series where the specific episode information is not
+included. When these generic showings appear, it is impossible for the
+system to determine if they are repeats of the same episode(s) or if
+they are all different episodes.
+
+<item>"program.first" is a field created by MythTV to mark the first
+showing in the current listings for each episode, movie or special.
+Choosing to match only the "first" showing can be useful for sports
+that are brodcast live then repeated.
+
+<item>"program.last" is a field created by MythTV to mark the last
+showing in the current listings for each episode, movie or special.
+If a showing is marked both "first" and "last" then it is the only
+showing of that program in the current TV listings.
+
 <item>"program.programid" is the Tribune Media Service database record
 identifier for each program description. In general, these start with a two
 letter prefix, MV, EP, SP or SH that correspond to the
