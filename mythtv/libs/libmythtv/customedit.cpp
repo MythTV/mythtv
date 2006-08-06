@@ -276,7 +276,8 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_clause->insertItem(tr("Multiple sports teams (complete example)"));
     m_cfrom << "";
     m_csql << QString("program.title = 'NBA Basketball' \n"
-              "AND program.subtitle REGEXP '(Miami|Cavaliers|Lakers)' ");
+              "AND program.subtitle REGEXP '(Miami|Cavaliers|Lakers)' \n"
+              "AND program.first > 0 \n");
 
     m_clause->insertItem(tr("Sci-fi B-movies (complete example)"));
     m_cfrom << "";
