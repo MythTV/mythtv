@@ -281,6 +281,7 @@ void ProgLister::updateBackground(void)
                 case plPeopleSearch: value = tr("People Search"); break;
                 case plPowerSearch: value = tr("Power Search"); break;
                 case plSQLSearch: value = tr("Power Search"); break;
+                case plRecordid: value = tr("Rule Search"); break;
                 case plCategory: value = tr("Category Search"); break;
                 case plChannel: value = tr("Channel Search"); break;
                 case plMovies: value = tr("Movie Search"); break;
@@ -1331,6 +1332,27 @@ void ProgLister::fillViewList(const QString &view)
         viewList << view;
         viewTextList << tr("Power Recording Rule");
     }
+    else if (type == plRecordid)
+    {
+        curView = 0;
+
+        MSqlQuery query(MSqlQuery::InitCon()); 
+        query.prepare("SELECT title FROM record "
+                      "WHERE recordid = :RECORDID");
+        query.bindValue(":RECORDID", view);
+        query.exec();
+
+        if (query.isActive() && query.size())
+        {
+            if (query.next())
+            {
+                QString title = query.value(0).toString();
+                title = QString::fromUtf8(query.value(0).toString());
+                viewList << view;
+                viewTextList << title;
+            }
+        }
+    }
     if (curView >= (int)viewList.count())
         curView = viewList.count() - 1;
 }
@@ -1511,6 +1533,15 @@ void ProgLister::fillItemList(void)
         if (titleSort)
             where += "  AND program.starttime < DATE_ADD(:PGILSEARCHTIME, "
                      "INTERVAL '1' HOUR) ";
+    }
+    else if (type == plRecordid) // list by recordid
+    {
+        where = "JOIN recordmatch ON "
+                " (program.starttime = recordmatch.starttime "
+                "  AND program.chanid = recordmatch.chanid) "
+                "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND recordmatch.recordid = :PGILPHRASE ";
     }
 
     schedList.FromScheduler();

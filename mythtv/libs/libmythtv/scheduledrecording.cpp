@@ -531,46 +531,49 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
     gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 }
 
-void ScheduledRecording::runProgList(void)
+void ScheduledRecording::runTitleList(void)
 {
     ProgLister *pl = NULL;
 
-    if (search->intValue() && getRecordID())
+    if (search->intValue())
     {
-        ScheduledRecording rule;
-        rule.loadByID(getRecordID());
-
-        switch (search->intValue())
+        if (m_pginfo)
         {
-        case kTitleSearch:
-            pl = new ProgLister(plTitleSearch,
-                                rule.description->getValue(), "",
+            pl = new ProgLister(plTitle, m_pginfo->title, "",
                                 gContext->GetMainWindow(), "proglist");
-            break;
-        case kKeywordSearch:
-            pl = new ProgLister(plKeywordSearch,
-                                rule.description->getValue(), "",
+        }
+        else
+        {
+            QString trimTitle = title->getValue();
+            trimTitle.remove(QRegExp(" \\(.*\\)$"));
+            pl = new ProgLister(plTitle, trimTitle, "",
                                 gContext->GetMainWindow(), "proglist");
-            break;
-        case kPeopleSearch:
-            pl = new ProgLister(plPeopleSearch,
-                                rule.description->getValue(), "",
-                                gContext->GetMainWindow(), "proglist");
-            break;
-        case kPowerSearch:
-            pl = new ProgLister(plSQLSearch, rule.description->getValue(),
-                                rule.subtitle->getValue(),
-                                gContext->GetMainWindow(), "proglist");
-            break;
-        default:
-            pl = new ProgLister(plTitle, title->getValue(), "",
-                                gContext->GetMainWindow(), "proglist");
-            break;
         }
     }
     else
+    {
         pl = new ProgLister(plTitle, title->getValue(), "",
                             gContext->GetMainWindow(), "proglist");
+    }
+    pl->exec();
+    delete pl;
+}
+
+void ScheduledRecording::runRuleList(void)
+{
+    ProgLister *pl = NULL;
+
+    if (getRecordID())
+    {
+        pl = new ProgLister(plRecordid,
+                            QString("%1").arg(getRecordID()), "",
+                            gContext->GetMainWindow(), "proglist");
+    }
+    else
+    {
+        pl = new ProgLister(plTitle, title->getValue(), "",
+                            gContext->GetMainWindow(), "proglist");
+    }
     pl->exec();
     delete pl;
 }

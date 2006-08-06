@@ -136,17 +136,27 @@ SRSchedInfoGroup::SRSchedInfoGroup(ScheduledRecording *_rec, ManagedList* _paren
     connect(detailsButton, SIGNAL(selected(ManagedListItem*)), _rec,
                                   SLOT(runShowDetails()));
 
-    previousButton = new ManagedListItem(QObject::tr("List previous episodes"),
-                                         _parentList, this, "listPrevious");
+    upcomingButton = 
+        new ManagedListItem(QObject::tr("Upcoming episodes for this title"),
+                            _parentList, this, "listUpcoming");
+    addItem(upcomingButton, -1);
+    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), _rec,
+                                   SLOT(runTitleList()));
+
+    upcomingRuleButton = 
+        new ManagedListItem(QObject::tr("Upcoming episodes for this rule"),
+                            _parentList, this, "listRule");
+    addItem(upcomingRuleButton, -1);
+    connect(upcomingRuleButton, SIGNAL(selected(ManagedListItem*)), _rec,
+                                   SLOT(runRuleList()));
+
+    previousButton =
+        new ManagedListItem(QObject::tr("Previously scheduled episodes"),
+                            _parentList, this, "listPrevious");
     addItem(previousButton, -1);
     connect(previousButton, SIGNAL(selected(ManagedListItem*)), _rec,
                                    SLOT(runPrevList()));
 
-    upcomingButton = new ManagedListItem(QObject::tr("List upcoming episodes"),
-                                         _parentList, this, "listUpcoming");
-    addItem(upcomingButton, -1);
-    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), _rec,
-                                   SLOT(runProgList()));
 }
 
 void SRStorageOptionsGroup::itemChanged(ManagedListItem*)

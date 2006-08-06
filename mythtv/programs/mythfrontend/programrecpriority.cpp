@@ -641,7 +641,7 @@ void ProgramRecPriority::upcoming(void)
     ScheduledRecording record;
 
     record.loadByID(curitem->recordid);
-    record.runProgList();
+    record.runRuleList();
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch) 

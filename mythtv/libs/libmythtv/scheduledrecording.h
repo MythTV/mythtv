@@ -175,7 +175,8 @@ public:
     QString ChannelText(QString format);
 
 public slots:
-    void runProgList();
+    void runTitleList();
+    void runRuleList();
     void runPrevList();
     void testRecording();
 

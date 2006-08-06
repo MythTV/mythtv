@@ -20,7 +20,8 @@ enum ProgListType {
     plMovies,
     plCategory,
     plChannel,
-    plTime
+    plTime,
+    plRecordid
 };
 
 

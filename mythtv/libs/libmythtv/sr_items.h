@@ -423,6 +423,7 @@ class SRSchedInfoGroup : public ManagedListGroup
         ManagedListItem* detailsButton;
         ManagedListItem* previousButton;
         ManagedListItem* upcomingButton;
+        ManagedListItem* upcomingRuleButton;
 
         ScheduledRecording *schedRec;
 };
