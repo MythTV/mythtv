@@ -1097,7 +1097,7 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
 
     if (!handled)
     {
-        VERBOSE(VB_IMPORTANT, QString("XDS: ") +
+        VERBOSE(VB_VBI, QString("XDS: ") +
                 QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
                 .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
                 .arg(xds_buf.size())
@@ -1142,7 +1142,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         uint month = xds_buf[5] & 0x0f;
         month = (month < 1 || month > 12) ? 0 : month;
 
-        VERBOSE(VB_GENERAL, loc +
+        VERBOSE(VB_VBI, loc +
                 QString("Start Time %1/%2 %3:%4%5")
                 .arg(month).arg(day).arg(hour).arg(min / 10).arg(min % 10));
     }
@@ -1296,7 +1296,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
         if (is_better(tmp, xds_net_name))
         {
-            VERBOSE(VB_GENERAL, QString("XDS: Network Name '%1'").arg(tmp));
+            VERBOSE(VB_VBI, QString("XDS: Network Name '%1'").arg(tmp));
             xds_net_name = tmp;
         }
     }
@@ -1305,7 +1305,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
         if (is_better(tmp, xds_net_call) && (tmp.find(" ") < 0))
         {
-            VERBOSE(VB_GENERAL, QString("XDS: Network Call '%1'").arg(tmp));
+            VERBOSE(VB_VBI, QString("XDS: Network Call '%1'").arg(tmp));
             xds_net_call = tmp;
         }
     }
@@ -1315,7 +1315,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
                      xds_buf[4] <<  8 | xds_buf[5]);
         if (tsid != xds_tsid)
         {
-            VERBOSE(VB_GENERAL, QString("XDS: TSID 0x%1").arg(tsid,0,16));
+            VERBOSE(VB_VBI, QString("XDS: TSID 0x%1").arg(tsid,0,16));
             xds_tsid = tsid;
         }
     }
