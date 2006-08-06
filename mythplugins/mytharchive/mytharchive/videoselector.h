@@ -19,7 +19,8 @@ typedef struct
     QString category;
     QString filename;
     QString coverfile;
-    uint size;
+    int     parentalLevel;
+    uint    size;
 } VideoInfo;
 
 class VideoSelector : public MythThemedDialog
@@ -54,11 +55,18 @@ class VideoSelector : public MythThemedDialog
     void getVideoList(void);
     void wireUpTheme(void);
     vector<VideoInfo *> *getVideoListFromDB(void);
+    bool checkParentPassword(void);
+    void setParentalLevel(int which_level);
 
     vector<VideoInfo *>  *videoList;
     QPtrList<VideoInfo>  selectedList;
 
+    int              currentParentalLevel;
+    UITextType       *pl_text;
+
     UIListBtnType    *video_list;
+    UITextType       *warning_text;
+
     UITextButtonType *ok_button;
     UITextButtonType *cancel_button;
 

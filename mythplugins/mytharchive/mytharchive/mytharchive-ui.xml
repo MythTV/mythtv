@@ -411,7 +411,7 @@ MythTV Archive GUI theme
           </selector>
 
           <listbtnarea name="videolist"  draworder="1">
-              <area>50,130,680,175</area>
+              <area>50,130,690,175</area>
               <gradient type="unselected" start="#505050" end="#000000" alpha="100">
               </gradient>
               <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
@@ -458,6 +458,23 @@ MythTV Archive GUI theme
               <position>620,323</position>
               <staticsize>130,190</staticsize>
           </image>
+
+          <textarea name="label" draworder="1" align="right">
+              <area>660,285,60,40</area>
+              <font>detailtitle</font>
+              <value>PL:</value>
+          </textarea>
+          <textarea name="parentallevel_text" draworder="1">
+              <area>725,285,20,40</area>
+              <font>detail</font>
+              <value>1</value>
+          </textarea>
+
+          <textarea name="warning_text" draworder="2" align="center">
+              <area>50,150,690,40</area>
+              <font>detail</font>
+              <value>No videos available</value>
+          </textarea>
 
       </container> 
 
