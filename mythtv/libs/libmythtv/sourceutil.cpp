@@ -74,7 +74,7 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
         "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
-    if (!query.exec() && !query.isActive())
+    if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("SourceUtil::GetListingsLoginData()", query);
         return false;
@@ -91,10 +91,11 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
     return true;
 }
 
-bool SourceUtil::IsAnalog(uint sourceid)
+static QStringList get_cardtypes(uint sourceid)
 {
-    bool analog = true;
-    MSqlQuery query(MSqlQuery::DDCon());
+    QStringList list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardtype "
         "FROM capturecard, cardinput "
@@ -102,37 +103,69 @@ bool SourceUtil::IsAnalog(uint sourceid)
         "      cardinput.sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
 
-    bool has_any = false;
-    if (query.exec() && query.next())
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("get_cardtypes()", query);
+    else
     {
-        has_any = true;
-        do 
-            analog &= CardUtil::IsEncoder(query.value(0).toString().upper());
-        while (query.next());
+        while (query.next())
+            list += query.value(0).toString().upper();
     }
 
-    if (has_any)
-        return analog;
+    return list;
+}
+
+bool SourceUtil::IsEncoder(uint sourceid)
+{
+    bool encoder = true;
+
+    QStringList types = get_cardtypes(sourceid);
+    QStringList::const_iterator it = types.begin();
+    for (; it != types.end(); ++it)
+        encoder &= CardUtil::IsEncoder(*it);
+
+    // Source is connected, go by card types for type determination
+    if (!types.empty())
+        return encoder;
 
     // Try looking at channels if source is not connected,
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT atsc_minor_chan, serviceid "
         "FROM channel "
         "WHERE sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
-    if (query.exec() && query.next())
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("SourceUtil::IsEncoder", query);
+    else
     {
-        do 
-            analog &= !query.value(0).toInt() && !query.value(1).toInt();
-        while (query.next());
+        while (query.next())
+            encoder &= !query.value(0).toInt() && !query.value(1).toInt();
     }
 
-    return analog;
+    return encoder;
 }
 
-bool SourceUtil::UpdateChannelsFromListings(uint sourceid)
+bool SourceUtil::IsUnscanable(uint sourceid)
 {
-    myth_system(QString("mythfilldatabase --only-update-channels "
-                        "--sourceid %1").arg(sourceid));
+    bool unscanable = false;
+    QStringList types = get_cardtypes(sourceid);
+    QStringList::const_iterator it = types.begin();
+    for (; it != types.end(); ++it)
+        unscanable &= CardUtil::IsUnscanable(*it);
+
+    return types.empty() || unscanable;
+}
+
+bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
+{
+    QString cmd = "mythfilldatabase --only-update-channels ";
+    if (sourceid)
+        cmd += QString("--sourceid %1 ").arg(sourceid);
+    if (!cardtype.isEmpty())
+        cmd += QString("--cardtype %1 ").arg(cardtype);
+
+    myth_system(cmd);
+                        
     return true;
 }

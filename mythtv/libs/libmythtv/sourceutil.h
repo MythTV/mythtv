@@ -14,8 +14,10 @@ class SourceUtil
     static bool    GetListingsLoginData(uint sourceid,
                                         QString &grabber, QString &userid,
                                         QString &passwd,  QString &lineupid);
-    static bool    IsAnalog(uint sourceid);
-    static bool    UpdateChannelsFromListings(uint sourceid);
+    static bool    IsEncoder(uint sourceid);
+    static bool    IsUnscanable(uint sourceid);
+    static bool    UpdateChannelsFromListings(
+        uint sourceid, QString cardtype = QString::null);
 };
 
 #endif //_SOURCEUTIL_H_

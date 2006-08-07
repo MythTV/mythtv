@@ -1689,11 +1689,20 @@ void CardInput::SetChildCardID(uint ccid)
 void CardInput::channelScanner(void)
 {
     uint srcid = sourceid->getValue().toUInt();
+    uint crdid = cardid->getValue().toUInt();
 
 #ifdef USING_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
     save(); // save info for scanner.
+
+    QString cardtype = CardUtil::GetRawCardType(crdid, srcid);
+    if (CardUtil::IsUnscanable(cardtype))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Sorry, %1 cards do not "
+                                      "yet support scanning.").arg(cardtype));
+        return;
+    }
 
     ScanWizard scanwizard(srcid);
     scanwizard.exec(false,true);
@@ -1715,10 +1724,26 @@ void CardInput::channelScanner(void)
 void CardInput::sourceFetch(void)
 {
     uint srcid = sourceid->getValue().toUInt();
+    uint child = childid->getValue().toUInt();
+    uint crdid = (child) ? child : cardid->getValue().toUInt();
 
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
-    SourceUtil::UpdateChannelsFromListings(srcid);
+    if (cardid && srcid)
+    {
+        QString cardtype = CardUtil::GetRawCardType(crdid, 0);
+
+        if (!CardUtil::IsUnscanable(cardtype) &&
+            !CardUtil::IsEncoder(cardtype)    &&
+            !num_channels_before)
+        {
+            VERBOSE(VB_IMPORTANT, "Skipping channel fetch, you need to "
+                    "scan for channels first.");
+            return;
+        }
+
+        SourceUtil::UpdateChannelsFromListings(srcid, cardtype);
+    }
 
     if (SourceUtil::GetChannelCount(srcid))
         startchan->SetSourceID(QString::number(srcid));        

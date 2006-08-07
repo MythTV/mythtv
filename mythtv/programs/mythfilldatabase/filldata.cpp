@@ -37,7 +37,7 @@
 #include "channelutil.h"
 #include "programinfo.h"
 #include "frequencytables.h"
-#include "channelutil.h"
+#include "cardutil.h"
 #include "sourceutil.h"
 #include "remoteutil.h"
 
@@ -76,6 +76,7 @@ int listing_wrap_offset = 0;
 QString lastdduserid;
 DataDirectProcessor ddprocessor;
 QString graboptions = "";
+QString cardtype = QString::null;
 
 class ChanInfo
 {
@@ -818,8 +819,20 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
 
     bool insert_channels = channel_updates;
     if (!insert_channels)
-        insert_channels = (SourceUtil::IsAnalog(source.id) &&
-                           !remove_new_channels);
+    {
+        bool isEncoder, isUnscanable;
+        if (cardtype.isEmpty())
+        {
+            isEncoder    = SourceUtil::IsEncoder(source.id);
+            isUnscanable = SourceUtil::IsUnscanable(source.id);
+        }
+        else
+        {
+            isEncoder    = CardUtil::IsEncoder(cardtype);
+            isUnscanable = CardUtil::IsUnscanable(cardtype);
+        }
+        insert_channels = (isEncoder || isUnscanable) && !remove_new_channels;
+    }
 
     int new_channels = DataDirectProcessor::UpdateChannelsSafe(
         source.id, insert_channels);
@@ -863,7 +876,7 @@ bool DataDirectUpdateChannels(Source source)
     ddprocessor.SetPassword(source.password);
 
     bool ok    = ddprocessor.GrabFullLineup(
-        source.lineupid, true, SourceUtil::IsAnalog(source.id));
+        source.lineupid, true, SourceUtil::IsEncoder(source.id));
     logged_in  = source.userid;
     raw_lineup = source.id;
 
@@ -3421,6 +3434,22 @@ int main(int argc, char *argv[])
             }
 
             sourceid = QString(a.argv()[++argpos]).toInt();
+        }
+        else if (!strcmp(a.argv()[argpos], "--cardtype"))
+        {
+            if (!sourceid)
+            {
+                printf("--cardtype option must follow a --sourceid option\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
+            if (((argpos + 1) >= a.argc()))
+            {
+                printf("missing parameter for --cardtype option\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
+            cardtype = QString(a.argv()[++argpos]).stripWhiteSpace().upper();
         }
         else if (!strcmp(a.argv()[argpos], "--max-days"))
         {
