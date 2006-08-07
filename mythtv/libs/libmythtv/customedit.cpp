@@ -32,16 +32,18 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
               : MythDialog(parent, name)
 {
     ProgramInfo *p = new ProgramInfo();
-    p->title = "";
-    p->subtitle = "";
-    p->description = "";
-    p->category = "";
 
     if (pginfo)
     {
         delete p;
         p = pginfo;
     }
+
+    QString baseTitle = p->title;
+    baseTitle.remove(QRegExp(" \\(.*\\)$"));
+
+    QString quoteTitle = baseTitle;
+    quoteTitle.replace("\'","\'\'");
 
     prevItem = 0;
     maxex = 0;
@@ -87,7 +89,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
             m_recsub  << QString::fromUtf8(result.value(2).toString());
             m_recdesc << QString::fromUtf8(result.value(3).toString());
 
-            if (trimTitle == p->title ||
+            if (trimTitle == baseTitle ||
                 result.value(0).toInt() == p->recordid)
                 titlematch = m_rule->count() - 1;
         }
@@ -116,7 +118,8 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     m_clause->insertItem(tr("Match an exact title"));
     m_cfrom << "";
     if (p->title > "")
-        m_csql << QString("program.title = '%1' ").arg(p->title);
+        m_csql << QString("program.title = '%1' ")
+                          .arg(quoteTitle);
     else
         m_csql << "program.title = 'Nova' ";
 
@@ -136,7 +139,8 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
         m_cfrom << "";
         m_csql << QString("program.subtitle = '%1' \n"
                           "AND program.description = '%2' ")
-                          .arg(p->subtitle).arg(p->description);
+                          .arg(p->subtitle.replace("\'","\'\'"))
+                          .arg(p->description.replace("\'","\'\'"));
     }
     else
     {
@@ -414,10 +418,9 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     }
     else if (p->title > "")
     {
-        m_title->setText(p->title);
+        m_title->setText(baseTitle);
         m_subtitle->setText("");
-        m_description->setText("program.title = '" +
-                               p->title.replace("\'","\'\'") + "' ");
+        m_description->setText("program.title = '" + quoteTitle + "' ");
         textChanged();
     }
 
