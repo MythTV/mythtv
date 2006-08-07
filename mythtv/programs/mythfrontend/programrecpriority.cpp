@@ -238,6 +238,34 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
                 SortList();
                 update(fullRect);
             }
+            else if (action == "5")
+            {
+                if (sortType != byCount)
+                {
+                    sortType = byCount;
+                    reverseSort = false;
+                }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
+            }
+            else if (action == "6")
+            {
+                if (sortType != byRecCount)
+                {
+                    sortType = byRecCount;
+                    reverseSort = false;
+                }
+                else
+                {
+                    reverseSort = !reverseSort;
+                }
+                SortList();
+                update(fullRect);
+            }
             else if (action == "PREVVIEW" || action == "NEXTVIEW")
             {
                 reverseSort = false;
@@ -746,10 +774,10 @@ void ProgramRecPriority::FillList(void)
                    "record.type, record.inactive "
                    "FROM record;");
    
-    int matches = 0;
-
     if (result.exec() && result.isActive() && result.size() > 0)
     {
+        countMatches();
+
         while (result.next()) 
         {
             int recordid = result.value(0).toInt();
@@ -776,7 +804,8 @@ void ProgramRecPriority::FillList(void)
                     progInfo->recTypeRecPriority = recTypeRecPriority;
                     progInfo->recType = recType;
                     progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
-                    matches++;
+                    progInfo->matchCount = listMatch[progInfo->recordid];
+                    progInfo->recCount = recMatch[progInfo->recordid];
                     break;
                 }
             }
@@ -784,8 +813,6 @@ void ProgramRecPriority::FillList(void)
     }
     else
         MythContext::DBError("Get program recording priorities query", result);
-
-    countMatches();
 }
 
 void ProgramRecPriority::countMatches()
@@ -945,6 +972,72 @@ class programRecTypeSort
         bool m_reverse;
 };
 
+class programCountSort 
+{
+    public:
+        programCountSort(bool reverseSort = false) {m_reverse = reverseSort;}
+
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        {
+            int countA = a.prog->matchCount;
+            int countB = b.prog->matchCount;
+            int recCountA = a.prog->recCount;
+            int recCountB = b.prog->recCount;
+
+            if (countA != countB)
+            {
+                if (m_reverse)
+                    return countA > countB;
+                else
+                    return countA < countB;
+            }
+            if (recCountA != recCountB)
+            {
+                if (m_reverse)
+                    return recCountA > recCountB;
+                else
+                    return recCountA < recCountB;
+            }
+            return (a.prog->sortTitle > b.prog->sortTitle);
+        }
+
+    private:
+        bool m_reverse;
+};
+
+class programRecCountSort 
+{
+    public:
+        programRecCountSort(bool reverseSort=false) {m_reverse = reverseSort;}
+
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        {
+            int countA = a.prog->matchCount;
+            int countB = b.prog->matchCount;
+            int recCountA = a.prog->recCount;
+            int recCountB = b.prog->recCount;
+
+            if (recCountA != recCountB)
+            {
+                if (m_reverse)
+                    return recCountA > recCountB;
+                else
+                    return recCountA < recCountB;
+            }
+            if (countA != countB)
+            {
+                if (m_reverse)
+                    return countA > countB;
+                else
+                    return countA < countB;
+            }
+            return (a.prog->sortTitle > b.prog->sortTitle);
+        }
+
+    private:
+        bool m_reverse;
+};
+
 void ProgramRecPriority::SortList() 
 {
     int i, j;
@@ -991,6 +1084,22 @@ void ProgramRecPriority::SortList()
                  else
                      sort(sortedList.begin(), sortedList.end(), 
                           programRecTypeSort());
+                 break;
+        case byCount :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programCountSort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programCountSort());
+                 break;
+        case byRecCount :
+                 if (reverseSort)
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programRecCountSort(true));
+                 else
+                     sort(sortedList.begin(), sortedList.end(), 
+                          programRecCountSort());
                  break;
     }
 
@@ -1178,7 +1287,8 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
         QString matchInfo;
         if (curitem->recstatus == rsInactive)
-            matchInfo = curitem->RecStatusText();
+            matchInfo = QString("%1 %2").arg(listMatch[curitem->recordid])
+                                        .arg(curitem->RecStatusText());
         else
             matchInfo = QString(tr("Recording %1 of %2"))
                                    .arg(recMatch[curitem->recordid])

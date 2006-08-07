@@ -21,6 +21,8 @@ class ProgramRecPriorityInfo : public ProgramInfo
 
     int recTypeRecPriority;
     RecordingType recType;
+    int matchCount;
+    int recCount;
 };
 
 class ProgramRecPriority : public MythDialog
@@ -31,7 +33,9 @@ class ProgramRecPriority : public MythDialog
     {
         byTitle,
         byRecPriority,
-        byRecType
+        byRecType,
+        byCount,
+        byRecCount
     };
 
     ProgramRecPriority(MythMainWindow *parent, const char *name = 0);
