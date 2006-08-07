@@ -297,7 +297,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     if (lcategory.isEmpty() && !match.category.isEmpty())
         lcategory = match.category;
 
-    if (lairdate.isEmpty() && !match.airdate.isEmpty())
+    if (lairdate.isEmpty() && !match.airdate.isEmpty() && !match.airdate == '0')
         lairdate = match.airdate;
 
     if (!loriginalairdate.isValid() && match.originalairdate.isValid())
