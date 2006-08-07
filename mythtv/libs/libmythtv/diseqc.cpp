@@ -7,6 +7,7 @@
 // Std C headers
 #include <cstring>
 #include <cmath>
+#include <unistd.h>
 
 // POSIX headers
 #include <sys/time.h>
