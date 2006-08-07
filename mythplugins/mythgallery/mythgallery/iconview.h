@@ -32,6 +32,7 @@
 class XMLParse;
 class UIListBtnType;
 class ThumbGenerator;
+class MediaMonitor;
 
 class IconView : public MythDialog
 {
@@ -48,6 +49,7 @@ class IconView : public MythDialog
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
     bool HandleEscape(void);
+    bool CheckMediaDevices(MediaMonitor*);
 
   private:
     void SetupMediaMonitor(void);

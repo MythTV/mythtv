@@ -574,21 +574,23 @@ void IconView::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-bool IconView::HandleEscape(void)
+bool IconView::CheckMediaDevices(MediaMonitor *mon)
 {
-    //VERBOSE(VB_IMPORTANT, "ESCAPE: showDevices("<<m_showDevices<<")");
-
-    if (m_showDevices)
-        return false;
-
-    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-    if (!mon)
-        return false;
-
     bool handled = false;
     QDir curdir(m_currDir);
     QValueList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
     QValueList<MythMediaDevice*>::iterator it = removables.begin();
+
+    for (; (it != removables.end()); it++)
+    {
+        if (mon->ValidateAndLock(*it))
+        {
+            VERBOSE(VB_IMPORTANT, "dev: "<<(*it)->getDevicePath());
+            mon->Unlock(*it);
+        }
+    }
+
+    it = removables.begin();
     for (; !handled && (it != removables.end()); it++)
     {
         if (!mon->ValidateAndLock(*it))
@@ -621,6 +623,21 @@ bool IconView::HandleEscape(void)
 
         mon->Unlock(*it);
     }
+
+    return handled;
+}
+
+bool IconView::HandleEscape(void)
+{
+    if (m_showDevices)
+        return false;
+
+    bool handled = false;
+    QDir curdir(m_currDir);
+
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon)
+        handled = CheckMediaDevices(mon);
 
     if (!handled && (curdir != QDir(m_galleryDir)))
     {
