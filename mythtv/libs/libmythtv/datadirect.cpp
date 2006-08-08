@@ -1326,7 +1326,7 @@ bool DataDirectProcessor::GrabFullLineup(const QString &lineupid,
         SaveLineupToCache(lineupid);
 
     (*lit).channels = orig_channels;
-    if (restore)
+    if (restore && !onlyGrabSelected)
         ok &= SaveLineupChanges(lineupid);
 
     return ok;

@@ -812,19 +812,16 @@ void get_atsc_stuff(QString channum, int sourceid, int freqid,
     }
 }
 
-// DataDirect stuff
-void DataDirectStationUpdate(Source source, bool update_icons = true)
+static bool insert_chan(uint sourceid)
 {
-    DataDirectProcessor::UpdateStationViewTable(source.lineupid);
-
     bool insert_channels = channel_updates;
     if (!insert_channels)
     {
         bool isEncoder, isUnscanable;
         if (cardtype.isEmpty())
         {
-            isEncoder    = SourceUtil::IsEncoder(source.id);
-            isUnscanable = SourceUtil::IsUnscanable(source.id);
+            isEncoder    = SourceUtil::IsEncoder(sourceid);
+            isUnscanable = SourceUtil::IsUnscanable(sourceid);
         }
         else
         {
@@ -834,6 +831,15 @@ void DataDirectStationUpdate(Source source, bool update_icons = true)
         insert_channels = (isEncoder || isUnscanable) && !remove_new_channels;
     }
 
+    return insert_channels;
+}
+
+// DataDirect stuff
+void DataDirectStationUpdate(Source source, bool update_icons = true)
+{
+    DataDirectProcessor::UpdateStationViewTable(source.lineupid);
+
+    bool insert_channels = insert_chan(source.id);
     int new_channels = DataDirectProcessor::UpdateChannelsSafe(
         source.id, insert_channels);
 
@@ -876,7 +882,7 @@ bool DataDirectUpdateChannels(Source source)
     ddprocessor.SetPassword(source.password);
 
     bool ok    = ddprocessor.GrabFullLineup(
-        source.lineupid, true, SourceUtil::IsEncoder(source.id));
+        source.lineupid, true, insert_chan(source.id)/*only sel*/);
     logged_in  = source.userid;
     raw_lineup = source.id;
 
