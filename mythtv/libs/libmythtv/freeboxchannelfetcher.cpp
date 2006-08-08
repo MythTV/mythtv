@@ -14,8 +14,12 @@
 #define LOC QString("FBChanFetch: ")
 #define LOC_ERR QString("FBChanFetch, Error: ")
 
-static bool parse_chan_info(
-    const QString &line1, QString &channum, QString &name);
+static bool parse_chan_info(const QString      &rawdata,
+                            FreeboxChannelInfo &info,
+                            QString            &channum,
+                            uint               &lineNum);
+static bool parse_extinf(const QString &data,
+                         QString &channum, QString &name);
 
 FreeboxChannelFetcher::FreeboxChannelFetcher(unsigned _sourceid,
                                              unsigned _cardid) :
@@ -119,6 +123,7 @@ void FreeboxChannelFetcher::RunScan(void)
     {
         QString channum = it.key();
         QString name    = (*it).m_name;
+        QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
         QString msg     = tr("Channel #%1 : %2").arg(channum).arg(name);
 
         int chanid = ChannelUtil::GetChanID(sourceid, channum);
@@ -128,13 +133,15 @@ void FreeboxChannelFetcher::RunScan(void)
             chanid = ChannelUtil::CreateChanID(sourceid, channum);
             ChannelUtil::CreateChannel(
                 0, sourceid, chanid, name, name, channum,
-                0, 0, 0, false, false, false, 0);
+                0, 0, 0, false, false, false, 0,
+                "", "Default", xmltvid);
         }
         else
         {
             emit ServiceScanUpdateText(tr("Updating %1").arg(msg));
             ChannelUtil::UpdateChannel(
                 0, sourceid, chanid, name, name, channum, 0, 0, 0, 0);
+            //TODO Update the xmltvid
         }
 
         SetNumChannelsInserted(i);
@@ -187,6 +194,22 @@ QString FreeboxChannelFetcher::DownloadPlaylist(const QString &url,
     return QString::fromUtf8(tmp);
 }
 
+static uint estimate_number_of_channels(const QString &rawdata)
+{
+    uint result = 0;
+    uint numLine = 1;
+    while (true)
+    {
+        QString url = rawdata.section("\n", numLine, numLine);
+        if (url.isEmpty())
+            return result;
+
+        ++numLine;
+        if (!url.startsWith("#")) // ignore comments
+            ++result;
+    }
+}
+
 fbox_chan_map_t FreeboxChannelFetcher::ParsePlaylist(
     const QString &rawdata, FreeboxChannelFetcher *fetcher)
 {
@@ -206,37 +229,32 @@ fbox_chan_map_t FreeboxChannelFetcher::ParsePlaylist(
     }
 
     // estimate number of channels
-    for (uint i = 1; fetcher; i += 2)
+    if (fetcher)
     {
-        QString url = rawdata.section("\n", i+1, i+1);
-        if (url.isEmpty())
-        {
-            fetcher->SetTotalNumChannels(i>>1);
+        uint num_channels = estimate_number_of_channels(rawdata);
+        fetcher->SetTotalNumChannels(num_channels);
 
-            VERBOSE(VB_CHANNEL, "Estimating there are "<<(i>>1)
-                    <<" channels in playlist");
-
-            break;
-        }
+        VERBOSE(VB_CHANNEL, "Estimating there are "<<num_channels
+                <<" channels in playlist");
     }
 
     // Parse each channel
-    for (int i = 1; true; i += 2)
+    uint lineNum = 1;
+    for (uint i = 1; true; i++)
     {
-        QString tmp = rawdata.section("\n", i+0, i+0);
-        QString url = rawdata.section("\n", i+1, i+1);
-        if (tmp.isEmpty() || url.isEmpty())
+        FreeboxChannelInfo info;
+        QString channum = QString::null;
+
+        if (!parse_chan_info(rawdata, info, channum, lineNum))
             break;
 
-        QString channum, name;
         QString msg = tr("Encountered malformed channel");
-        if (parse_chan_info(tmp, channum, name))
+        if (!channum.isEmpty())
         {
-            chanmap[channum] = FreeboxChannelInfo(name, url);
+            chanmap[channum] = info;
 
             msg = tr("Parsing Channel #%1 : %2 : %3")
-                .arg(channum).arg(name).arg(url);
-
+                .arg(channum).arg(info.m_name).arg(info.m_url);
             VERBOSE(VB_CHANNEL, msg);
 
             msg = QString::null; // don't tell fetcher
@@ -246,41 +264,77 @@ fbox_chan_map_t FreeboxChannelFetcher::ParsePlaylist(
         {
             if (!msg.isEmpty())
                 fetcher->SetMessage(msg);
-            fetcher->SetNumChannelsParsed(1+(i>>1));
+            fetcher->SetNumChannelsParsed(i);
         }
     }
 
     return chanmap;
 }
 
-static bool parse_chan_info(const QString &line1,
-                            QString &channum, QString &name)
+static bool parse_chan_info(const QString      &rawdata,
+                            FreeboxChannelInfo &info,
+                            QString            &channum,
+                            uint               &lineNum)
 {
-    // each line contains ://
-    // header:extension,channelNum - channelName rtsp://channelUrl
-    //#EXTINF:0,2 - France 2 rtsp://mafreebox.freebox.fr/freeboxtv/201
+    // #EXTINF:0,2 - France 2                <-- duration,channum - channame
+    // #EXTMYTHTV:xmltvid=C2.telepoche.com   <-- optional line (myth specific)
+    // #...                                  <-- ignored comments
+    // rtsp://mafreebox.freebox.fr/freeboxtv/201 <-- url
 
-    QString msg = LOC_ERR +
-        QString("Invalid header in channel list line \n\t\t\t%1").arg(line1);
-
-    channum = name = QString::null;
-
-    // Verify Line Header
-    int pos = line1.find(":", 0);
-    if ((pos < 0) || (line1.mid(0, pos) != "#EXTINF"))
+    QString name;
+    QString xmltvid;
+    while (true)
     {
-        VERBOSE(VB_IMPORTANT, msg);
-        return false;
+        QString line = rawdata.section("\n", lineNum, lineNum);
+        if (line.isEmpty())
+            return false;
+
+        ++lineNum;
+        if (line.startsWith("#"))
+        {
+            if (line.startsWith("#EXTINF:"))
+            {
+                parse_extinf(line.mid(line.find(':')+1), channum, name);
+            }
+            else if (line.startsWith("#EXTMYTHTV:"))
+            {
+                QString data = line.mid(line.find(':')+1);
+                if (data.startsWith("xmltvid="))
+                {
+                    xmltvid = data.mid(data.find('=')+1);
+                }
+            }
+            else
+            {
+                // Just ignore other comments
+            }
+        }
+        else
+        {
+            if (name.isEmpty())
+                return false;
+            QString url = line;
+            info = FreeboxChannelInfo(name, url, xmltvid);
+            return true;
+        }
     }
+}
+
+static bool parse_extinf(const QString &line1,
+                         QString &channum, QString &name)
+{
+    // data is supposed to contain the "0,2 - France 2" part
+    QString msg = LOC_ERR +
+        QString("Invalid header in channel list line \n\t\t\tEXTINF:%1")
+        .arg(line1);
 
     // Parse extension portion
-    pos = line1.find(",", pos + 1);
+    int pos = line1.find(",");
     if (pos < 0)
     {
         VERBOSE(VB_IMPORTANT, msg);
         return false;
     }
-    //list.push_back(line1.mid(oldPos, pos - oldPos));
 
     // Parse freebox channel number
     int oldpos = pos + 1;
