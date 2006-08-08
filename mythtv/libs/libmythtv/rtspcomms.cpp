@@ -395,7 +395,7 @@ void RTSPComms::AddListener(RTSPListener *item)
     while ((subsession = mit.next())) /* <- extra braces for pedantic gcc */
     {
         FreeboxMediaSink *sink = NULL;
-        if (sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink))
+        if ((sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink)))
             sink->AddListener(item);
     }
     VERBOSE(VB_RECORD, LOC + "AddListener("<<item<<") -- end 2");
@@ -430,7 +430,7 @@ void RTSPComms::RemoveListener(RTSPListener *item)
     while ((subsession = mit.next())) /* <- extra braces for pedantic gcc */
     {
         FreeboxMediaSink *sink = NULL;
-        if (sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink))
+        if ((sink = dynamic_cast<FreeboxMediaSink*>(subsession->sink)))
             sink->RemoveListener(item);
     }
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<item<<") -- end 3");
