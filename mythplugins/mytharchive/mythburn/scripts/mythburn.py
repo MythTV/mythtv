@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060808-1"
+VERSION="0.1.20060808-2"
 
 
 ##You can use this debug flag when testing out new themes
@@ -105,6 +105,9 @@ mainmenuAspectRatio = "16:9"
 #chapter menu aspect ratio (4:3, 16:9 or Video) 
 #video means same aspect ratio as the video title
 chaptermenuAspectRatio = "Video"
+
+#default chapter length in seconds
+chapterLength = 5 * 60;
 
 #name of the default job file
 jobfile="mydata.xml"
@@ -405,6 +408,22 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
     if getthumbnails==True:
         extractVideoFrames( os.path.join(getItemTempPath(itemnum),"stream.mv2"),
             os.path.join(getItemTempPath(itemnum),"chapter-%1.jpg"), thumbList)
+
+    return chapters
+
+def createVideoChapters(segment, lengthofvideo): 
+    """Returns chapter marks spaced segment seconds through the file"""
+    if lengthofvideo < segment:
+        return "00:00:00"
+
+    numofchapters = lengthofvideo / segment;
+    chapters = ""
+    starttime = 0
+    count = 1
+    while count <= numofchapters:
+        chapters += time.strftime("%H:%M:%S", time.gmtime(starttime)) + ","
+        starttime += segment
+        count += 1
 
     return chapters
 
@@ -1671,7 +1690,6 @@ def createDVDAuthorXML(screensize, numberofitems):
             if wantDetailsPage:
                 #add the detail page intro for this item
                 vob = dvddom.createElement("vob")
-                #vob.setAttribute("chapters",createVideoChapters(itemnum,chapters,getLengthOfVideo(itemnum),False) )
                 vob.setAttribute("file",os.path.join(getTempPath(),"details-%s.mpg" % itemnum))
                 pgc.appendChild(vob)
 
@@ -1679,7 +1697,7 @@ def createDVDAuthorXML(screensize, numberofitems):
             if wantChapterMenu:
                 vob.setAttribute("chapters",createVideoChapters(itemnum,chapters,getLengthOfVideo(itemnum),False) )
             else:
-                vob.setAttribute("chapters",createVideoChapters(itemnum,8,getLengthOfVideo(itemnum),False) )
+                vob.setAttribute("chapters", createVideoChapters(chapterLength, getLengthOfVideo(itemnum)))
 
             vob.setAttribute("file",os.path.join(getItemTempPath(itemnum),"final.mpg"))
             pgc.appendChild(vob)
@@ -1810,7 +1828,6 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         if wantDetailsPage:
             #add the detail page intro for this item
             vob = dvddom.createElement("vob")
-            #vob.setAttribute("chapters",createVideoChapters(itemnum,chapters,getLengthOfVideo(itemnum),False) )
             vob.setAttribute("file",os.path.join(getTempPath(),"details-%s.mpg" % itemNum))
             pgc.appendChild(vob)
             fileCount +=1
@@ -1818,6 +1835,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.mpg"))
+        vob.setAttribute("chapters", createVideoChapters(chapterLength, getLengthOfVideo(itemNum)))
         pgc.appendChild(vob)
         del vob
 
