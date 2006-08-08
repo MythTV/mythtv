@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060729-1"
+VERSION="0.1.20060808-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1825,7 +1825,10 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         if itemNum == numberofitems:
             post.appendChild(dvddom.createTextNode("exit;"))
         else:
-            post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 1)))
+            if wantIntro:
+                post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 2)))
+            else:
+                post.appendChild(dvddom.createTextNode("jump title %d chapter 1;" % (itemNum + 1)))
 
         pgc.appendChild(post)
         fileCount +=1
