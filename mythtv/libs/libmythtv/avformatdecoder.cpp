@@ -72,6 +72,8 @@ static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
 
 typedef MythDeque<AVFrame*> avframe_q;
 
+int parity_table[256];
+
 class AvFormatDecoderPrivate
 {
   public:
@@ -1045,6 +1047,40 @@ void default_captions(sinfo_vec_t *tracks, int av_index)
     }
 }
 
+int parity(uint8_t byte) {
+    int i;
+    int ones = 0;
+
+    for (i = 0; i < 7; i++) {
+        if (byte & (1 << i))
+            ones++;
+    }
+
+    return ones & 1;
+}
+
+// CC Parity checking 
+// taken from xine-lib libspucc
+
+void build_parity_table(void) {
+    uint8_t byte;
+    int parity_v;
+    for (byte = 0; byte <= 127; byte++) {
+        parity_v = parity(byte);
+        /* CC uses odd parity (i.e., # of 1's in byte is odd.) */
+        parity_table[byte] = parity_v;
+        parity_table[byte | 0x80] = !parity_v;
+    }
+}
+
+int good_parity(uint16_t data) {
+    int ret = parity_table[data & 0xff] && parity_table[(data & 0xff00) >> 8];
+    if (! ret)
+        VERBOSE(VB_VBI, QString("VBI: Bad parity in EIA-608 data (%1)")
+                            .arg(data,0,16));
+    return ret;
+}
+
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 {
     tracks[kTrackTypeCC608].clear();
@@ -1270,6 +1306,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     d->InitMPEG2();
                 }
 
+                build_parity_table();
                 enc->decode_cc_dvd  = decode_cc_dvd;
 
                 // Set the default stream to the stream
@@ -1632,7 +1669,9 @@ void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
                 /* expect EIA-608 CC1/CC2 encoding */
                 int tc = utc / 1000;
                 int data = (data2 << 8) | data1;
-                nd->ccd608->FormatCCField(tc, 0, data);
+                if (good_parity(data)) {
+                    nd->ccd608->FormatCCField(tc, 0, data);
+                }
                 utc += 33367;
                 skip = 5;
                 break;
@@ -1695,7 +1734,9 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
         uint cc_type  = cc_code & 0x03;
 
         if (cc_type <= 0x1) // EIA-608 field-1/2
-            ccd608->FormatCCField(lastccptsu / 1000, cc_type, data);
+            if (good_parity(data)) {
+                ccd608->FormatCCField(lastccptsu / 1000, cc_type, data);
+            }
         else // EIA-708 CC data
             ccd708->decode_cc_data(cc_type, data1, data2);
     }
@@ -2028,7 +2069,9 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 if (21 == line)
                 {
                     int data = (buf[2] << 8) | buf[1];
-                    ccd608->FormatCCField(utc/1000, field, data);
+                    if (good_parity(data)) {
+                        ccd608->FormatCCField(utc/1000, field, data);
+                    }
                     utc += 33367;
                 }
                 break;
