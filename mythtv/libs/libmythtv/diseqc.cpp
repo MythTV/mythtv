@@ -30,6 +30,8 @@
 // DiSEqC sleep intervals per eutelsat spec
 #define DISEQC_SHORT_WAIT     (15 * 1000)
 #define DISEQC_LONG_WAIT      (100 * 1000)
+#define DISEQC_POWER_OFF_WAIT (1000 * 1000)
+#define DISEQC_POWER_ON_WAIT  (500 * 1000)
 
 // Number of times to retry ioctls after receiving ETIMEDOUT before giving up
 #define TIMEOUT_RETRIES       10
@@ -642,9 +644,22 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
 {
     Reset();
 
-    VERBOSE(VB_CHANNEL, LOC + "Resetting DiSEqC Bus");
+    // power cycle the bus if requested
+    // tests show that the wait times required can be very long (~1sec)
+    if (hard_reset)
+    {
+        VERBOSE(VB_CHANNEL, LOC + "Power-cycling DiSEqC Bus");
+
+        SetVoltage(SEC_VOLTAGE_OFF);
+        usleep(DISEQC_POWER_OFF_WAIT);
+    }
+
+    // make sure the bus is powered
+    SetVoltage(SEC_VOLTAGE_18);
+    usleep(DISEQC_POWER_ON_WAIT);
 
     // issue a global reset command
+    VERBOSE(VB_CHANNEL, LOC + "Resetting DiSEqC Bus");
     if (!SendCommand(DISEQC_ADR_ALL, DISEQC_CMD_RESET))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -654,25 +669,15 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
 
     usleep(DISEQC_LONG_WAIT);
 
-    // power cycle the bus if requested
-    if (hard_reset)
-    {
-        VERBOSE(VB_CHANNEL, LOC + "Power-cycling DiSEqC Bus");
-
-        SetVoltage(SEC_VOLTAGE_OFF);
-        usleep(DISEQC_LONG_WAIT);
-
-        SetVoltage(SEC_VOLTAGE_18);
-        usleep(DISEQC_LONG_WAIT);
-    }
-
     return true;
 }
 
 void DiSEqCDevTree::Open(int fd_frontend)
 {
     m_fd_frontend = fd_frontend;
-    ResetDiseqc(true);
+
+    // issue reset command
+    ResetDiseqc(false /* do a soft reset */);
 }
 
 bool DiSEqCDevTree::SetVoltage(uint voltage)
