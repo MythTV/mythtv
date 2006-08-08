@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation>Mapa:</translation>
+        <translation type="obsolete">Mapa:</translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Ustvarjena:</translation>
+        <translation type="obsolete">Ustvarjena:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Spremenjena:</translation>
+        <translation type="obsolete">Spremenjena:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Bajti</translation>
+        <translation type="obsolete">Bajti</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Širina</translation>
+        <translation type="obsolete">Širina</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>piksli</translation>
+        <translation type="obsolete">piksli</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Višina</translation>
+        <translation type="obsolete">Višina</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Število pikslov</translation>
+        <translation type="obsolete">Število pikslov</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapiksli</translation>
+        <translation type="obsolete">megapiksli</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Kot zasuka</translation>
+        <translation type="obsolete">Kot zasuka</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>stopinje</translation>
+        <translation type="obsolete">stopinje</translation>
     </message>
 </context>
 <context>
@@ -102,6 +102,94 @@
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery failed to load theme, see console for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected device is no longer available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta Data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marking...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Marked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Current File or Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 folder, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Marked Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting %1 images and folders, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moving marked images...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying marked images...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -169,7 +257,7 @@
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation>Mapa z slikami ne obstaja ali pa ni bralna.</translation>
+        <translation type="obsolete">Mapa z slikami ne obstaja ali pa ni bralna.</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -207,52 +295,64 @@
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sort order when browsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the sort order for the displayed picture thumbnails.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration of OpenGL Transition (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
         <source>Folder: </source>
-        <translation>Mapa:</translation>
+        <translation type="obsolete">Mapa:</translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Ustvarjena:</translation>
+        <translation type="obsolete">Ustvarjena:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Spremenjena:</translation>
+        <translation type="obsolete">Spremenjena:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Bajti</translation>
+        <translation type="obsolete">Bajti</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Širina</translation>
+        <translation type="obsolete">Širina</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>piksli</translation>
+        <translation type="obsolete">piksli</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Višina</translation>
+        <translation type="obsolete">Višina</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Število pikslov</translation>
+        <translation type="obsolete">Število pikslov</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapiksli</translation>
+        <translation type="obsolete">megapiksli</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Kot zasuka</translation>
+        <translation type="obsolete">Kot zasuka</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>stopinje</translation>
+        <translation type="obsolete">stopinje</translation>
     </message>
 </context>
 </TS>

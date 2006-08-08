@@ -3,18 +3,21 @@
    <button>
       <type>ARCHIVE_FINDER</type>
       <text>Find Files To Archive</text>
+      <text lang="es">Buscar Ficheros a Archivar</text>
       <action>ARCHIVE_FINDER</action>
    </button>
 
    <button>
       <type>ARCHIVE_EXPORT_VIDEO</type>
       <text>Export Video Files</text>
+      <text lang="es">Exportar Ficheros Video</text>
       <action>ARCHIVE_EXPORT_VIDEO</action>
    </button>
 
    <button>
        <type>ARCHIVE_IMPORT_VIDEO</type>
        <text>Import Video Files</text>
+       <text lang="es">Importar Ficheros Video</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 

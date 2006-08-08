@@ -343,7 +343,7 @@ DVD-asemaa ei ole määritelty.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Tuntematon</translation>
+        <translation type="obsolete">Tuntematon</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -372,6 +372,10 @@ DVD-asemaa ei ole määritelty.</translation>
     <message>
         <source>ISO Image</source>
         <translation>ISO-Kuvake</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Tuntematon</translation>
     </message>
 </context>
 </TS>

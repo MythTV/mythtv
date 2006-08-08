@@ -1,8 +1,8 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>AdvancedOptions</name>
+    <name>EditMetadataDialog</name>
     <message>
-        <source>OK</source>
+        <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11,13 +11,55 @@
     </message>
 </context>
 <context>
-    <name>EditMetadataDialog</name>
+    <name>ExportNativeWizard</name>
     <message>
-        <source>Save</source>
+        <source>0 Mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to select at least one item to archive!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Archive Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth Burn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any items to archive!
+
+Click OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Item</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -53,6 +95,61 @@
     </message>
 </context>
 <context>
+    <name>ImportNativeWizard</name>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to select a valid archive XML file!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to select a valid chanID!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a ChanID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a ChanNo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a Channel Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a Callsign</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LogViewer</name>
     <message>
         <source>Log Viewer</source>
@@ -76,7 +173,7 @@
     </message>
 </context>
 <context>
-    <name>MythArchiveWizard</name>
+    <name>MythburnWizard</name>
     <message>
         <source>Next</source>
         <translation type="unfinished"></translation>
@@ -87,136 +184,56 @@
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to select at least one item to archive!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Archive Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth Burn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any items to archive!
+
+Click OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Item</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Choose File...</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>MythNativeWizard</name>
     <message>
-        <source>0 Mb</source>
+        <source>Don&apos;t re-encode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next</source>
+        <source>New Size </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to select at least one item to archive!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Archive Items</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any items to archive!
-
-Click OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Details</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove Item</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use SL DVD (4489Mb)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use DL DVD (8978Mb)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MythburnWizard</name>
-    <message>
-        <source>0 Mb</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Advanced Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to select at least one item to archive!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Archive Items</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any items to archive!
-
-Click OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Details</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove Item</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use SL DVD (4489Mb)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use DL DVD (8978Mb)</source>
+        <source>Original Size </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -224,10 +241,6 @@ Click OK</source>
     <name>QObject</name>
     <message>
         <source>Myth Archive Temp Directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Location where MythArchive should create its temporory work files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -364,7 +377,63 @@ This may take a few minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>It was not possible to create the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
+        <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always Encode to AC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy remote files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always Use Mythtranscode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use FIFOs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio to use when creating the main menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter Menu Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythArchive Settings (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -447,6 +516,10 @@ Click OK</source>
         <source>You don&apos;t have any videos!
 
 Click OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

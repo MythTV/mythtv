@@ -98,15 +98,31 @@
     </message>
     <message>
         <source>Would you like to save now?</source>
-        <translation>Vil du gemme nu?</translation>
+        <translation type="obsolete">Vil du gemme nu?</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Gem</translation>
+        <translation type="obsolete">Gem</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Afbryd</translation>
+        <translation type="obsolete">Afbryd</translation>
+    </message>
+    <message>
+        <source>Exiting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

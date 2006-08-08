@@ -142,6 +142,14 @@
         <source>This can take a long time to run.</source>
         <translation>Bunun çalışması uzun sürebilir.</translation>
     </message>
+    <message>
+        <source>DVB-S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input and satellite settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelEditor</name>
@@ -375,6 +383,18 @@
         <source>The database error was</source>
         <translation type="unfinished">Veritabanı hatası</translation>
     </message>
+    <message>
+        <source>Match this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First showing of each episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last showing of each episode</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomRecord</name>
@@ -585,10 +605,6 @@
 WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Various additional settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>DVBSignalMonitor</name>
@@ -603,6 +619,10 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <message>
         <source>Uncorrected Blocks</source>
         <translation>Düzeltilmemiş Bloklar</translation>
+    </message>
+    <message>
+        <source>Rotor Progress</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -648,6 +668,279 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Fetching lineups from %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DeviceTree</name>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished">Sizin konumunuz için Kartezyen enlemi.</translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished">Güney ve Batı koordinatları için eksi sayılar kullanın.</translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished">Sizin konumunuz için Kartezyen boylamı.</translation>
+    </message>
+    <message>
+        <source>Device Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Açıklama</translation>
+    </message>
+    <message>
+        <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of switch from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished">DiSEqC</translation>
+    </message>
+    <message>
+        <source>DiSEqC (Uncommitted)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW21</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW42</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of ports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of ports this switch has.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of rotor from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC 1.2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC 1.3 (GotoX/USALS)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Low Speed (deg/sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor High Speed (deg/sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>Eastern Hemisphere</comment>
+        <translation type="unfinished">E</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>Western Hemisphere</comment>
+        <translation type="unfinished">W</translation>
+    </message>
+    <message>
+        <source>Position Index %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Orbital Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Hiçbiri</translation>
+    </message>
+    <message>
+        <source>Position #%1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Position Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Positions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor position setup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single (Europe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Universal (Europe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Circular (N. America)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear (N. America)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C Band</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DishPro Bandstacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of LNB from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy (Fixed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard (Voltage)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Universal (Voltage &amp; Tone)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandstacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Switch (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Low (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset the frequency coming from the LNB will be in low setting. For bandstacked LNBs this is the vertical/right polarization band.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF High (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Type of Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Device Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a port to use for this switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a satellite position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DTV Device Configuration</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1596,7 +1889,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation>(Herhangi Bir Kategori)</translation>
+        <translation type="obsolete">(Herhangi Bir Kategori)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
@@ -1633,6 +1926,14 @@ Returning to the previous menu.</source>
     <message>
         <source>Power Recording Rule</source>
         <translation>Gelişmiş Kayıt Kuralı</translation>
+    </message>
+    <message>
+        <source>Rule Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Genre)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3322,7 +3623,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
-        <translation>Sadece kanal 78 ve üstünde tarama yapma seçeneği, çoğu dijital kanalın bu aralıkta bulunmasından dolayı sunulmuştur.</translation>
+        <translation type="obsolete">Sadece kanal 78 ve üstünde tarama yapma seçeneği, çoğu dijital kanalın bu aralıkta bulunmasından dolayı sunulmuştur.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
@@ -3438,11 +3739,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>List previous episodes</source>
-        <translation>Önceki bölümleri listele</translation>
+        <translation type="obsolete">Önceki bölümleri listele</translation>
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation>Gelecek bölümleri listele</translation>
+        <translation type="obsolete">Gelecek bölümleri listele</translation>
     </message>
     <message>
         <source>Create New Recording Group</source>
@@ -3882,11 +4183,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation>DiSEqC Giriş Tipi: (DVB-S)</translation>
+        <translation type="obsolete">DiSEqC Giriş Tipi: (DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
-        <translation>DVB-S kartları için giriş tipini seçin. Tek LNB/DVB-C veya DVB-T Girişi olarak bırakın. Girişler, ana menüdeki Giriş Bağlantıları seçeneğinden eşlenmiştir</translation>
+        <translation type="obsolete">DVB-S kartları için giriş tipini seçin. Tek LNB/DVB-C veya DVB-T Girişi olarak bırakın. Girişler, ana menüdeki Giriş Bağlantıları seçeneğinden eşlenmiştir</translation>
     </message>
     <message>
         <source>Cable box model</source>
@@ -3898,7 +4199,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
-        <translation>Firewire Modeli, özel alternatif yol modelleri gerektiğinde, gelecekte kullanmak içindir.</translation>
+        <translation type="obsolete">Firewire Modeli, özel alternatif yol modelleri gerektiğinde, gelecekte kullanmak içindir.</translation>
     </message>
     <message>
         <source>Connection Type</source>
@@ -4030,15 +4331,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>LNB LOF Switch</source>
-        <translation>LNB LOF Anahtarı</translation>
+        <translation type="obsolete">LNB LOF Anahtarı</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>Bu, LNB&apos;nin (Hz cinsinden) hangi frekansta yüksek ayardan düşük ayara veya tam tersi ayara geçeceği anahtarı belirtir.</translation>
+        <translation type="obsolete">Bu, LNB&apos;nin (Hz cinsinden) hangi frekansta yüksek ayardan düşük ayara veya tam tersi ayara geçeceği anahtarı belirtir.</translation>
     </message>
     <message>
         <source>LNB LOF High</source>
-        <translation>LNB LOF Yüksek</translation>
+        <translation type="obsolete">LNB LOF Yüksek</translation>
     </message>
     <message>
         <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
@@ -4046,7 +4347,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>LNB LOF Low</source>
-        <translation>LNB LOF Düşük</translation>
+        <translation type="obsolete">LNB LOF Düşük</translation>
     </message>
     <message>
         <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
@@ -4054,11 +4355,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>DiSEqC Satellite Location</source>
-        <translation>DiSEqC Uydu Konumu</translation>
+        <translation type="obsolete">DiSEqC Uydu Konumu</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
-        <translation>Hedeflediğiniz uydunun boylamı.  batı yarımküre için eksi değer kullanın.  Değer, ondalık cinsindendir.</translation>
+        <translation type="obsolete">Hedeflediğiniz uydunun boylamı.  batı yarımküre için eksi değer kullanın.  Değer, ondalık cinsindendir.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
@@ -4094,11 +4395,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Select the LNB Settings for DVB-S cards.</source>
-        <translation>DVB-S kartlarının LNB Ayarlarını seçin.</translation>
+        <translation type="obsolete">DVB-S kartlarının LNB Ayarlarını seçin.</translation>
     </message>
     <message>
         <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
-        <translation>DVB-C ve DVB-T için bu değerleri ayarlamanız gerekmez.</translation>
+        <translation type="obsolete">DVB-C ve DVB-T için bu değerleri ayarlamanız gerekmez.</translation>
     </message>
     <message>
         <source>Connect source to input</source>
@@ -4134,19 +4435,19 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation>Sizin konumunuz için Kartezyen enlemi.</translation>
+        <translation type="obsolete">Sizin konumunuz için Kartezyen enlemi.</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation>Güney ve Batı koordinatları için eksi sayılar kullanın.</translation>
+        <translation type="obsolete">Güney ve Batı koordinatları için eksi sayılar kullanın.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation>Sizin konumunuz için Kartezyen boylamı.</translation>
+        <translation type="obsolete">Sizin konumunuz için Kartezyen boylamı.</translation>
     </message>
     <message>
         <source>DiSEqC Options</source>
-        <translation>DiSEqC Seçenekleri</translation>
+        <translation type="obsolete">DiSEqC Seçenekleri</translation>
     </message>
     <message>
         <source>Data Direct Lineup</source>
@@ -4762,15 +5063,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>channel number (numeric)</source>
-        <translation>kanal numarası (sayısal)</translation>
+        <translation type="obsolete">kanal numarası (sayısal)</translation>
     </message>
     <message>
         <source>channel number (alpha)</source>
-        <translation>kanal numarası (alfa)</translation>
+        <translation type="obsolete">kanal numarası (alfa)</translation>
     </message>
     <message>
         <source>database order</source>
-        <translation>veritabanı sırası</translation>
+        <translation type="obsolete">veritabanı sırası</translation>
     </message>
     <message>
         <source>channel name</source>
@@ -4778,7 +5079,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>ATSC channel</source>
-        <translation>ATSC kanalı</translation>
+        <translation type="obsolete">ATSC kanalı</translation>
     </message>
     <message>
         <source>Vertical over/underscan percentage</source>
@@ -7904,50 +8205,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Single LNB / Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.2 Positioner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.3 Positioner (Goto X)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW21 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW64 Switch (3-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVB Tuning Delay (msec)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7981,14 +8238,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CRC IP Network Recorder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in high setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in low setting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8311,6 +8560,73 @@ Myth will now exit.</source>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Page Not Available</source>
+        <comment>Requested Teletext page not available</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freebox MRL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The FreeBox Media Resource Locator (MRL).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freebox Network Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>channel number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority When Shown Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing of an episode, special or movie only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Large Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On multiline displays try and display the time as large as possible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open 
+ &apos;%1&apos; in %2 
+Check if the video exists</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8380,6 +8696,10 @@ Myth will now exit.</source>
         <source>Existing Transport Scan</source>
         <translation>Mevcut Aktarmaların Taraması</translation>
     </message>
+    <message>
+        <source>M3U Import</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
@@ -8430,7 +8750,7 @@ Myth will now exit.</source>
     <name>StartingChannel</name>
     <message>
         <source>DB Error, see console</source>
-        <translation>Veritabanı Hatası, konsola bakın</translation>
+        <translation type="obsolete">Veritabanı Hatası, konsola bakın</translation>
     </message>
     <message>
         <source>Please add channels to this source</source>
@@ -9235,6 +9555,10 @@ No other details</source>
     </message>
     <message>
         <source>Toggle On/Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor %1%</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

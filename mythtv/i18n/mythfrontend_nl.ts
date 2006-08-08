@@ -146,6 +146,14 @@
         <source>This can take a long time to run.</source>
         <translation>Dit kan een hele tijd duren.</translation>
     </message>
+    <message>
+        <source>DVB-S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input and satellite settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelEditor</name>
@@ -380,6 +388,18 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <source>The database error was</source>
         <translation type="unfinished">De databasefout was</translation>
     </message>
+    <message>
+        <source>Match this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First showing of each episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last showing of each episode</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomRecord</name>
@@ -583,10 +603,6 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Various additional settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not open card #%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -608,6 +624,10 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <message>
         <source>Uncorrected Blocks</source>
         <translation>Niet gecorrigeerde blokken.</translation>
+    </message>
+    <message>
+        <source>Rotor Progress</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -653,6 +673,279 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     </message>
     <message>
         <source>Fetching lineups from %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DeviceTree</name>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished">De Cartesiaanse breedtegraad voor uw locatie.</translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished">Negatieve waarden gebruiken voor zuidelijke en westelijke coördinaten.</translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished">De Cartesiaanse lengtegraad voor uw locatie.</translation>
+    </message>
+    <message>
+        <source>Device Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Beschrijving</translation>
+    </message>
+    <message>
+        <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of switch from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished">DiSEqC</translation>
+    </message>
+    <message>
+        <source>DiSEqC (Uncommitted)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW21</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW42</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of ports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of ports this switch has.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of rotor from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC 1.2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC 1.3 (GotoX/USALS)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Low Speed (deg/sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor High Speed (deg/sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>Eastern Hemisphere</comment>
+        <translation type="unfinished">E</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>Western Hemisphere</comment>
+        <translation type="unfinished">W</translation>
+    </message>
+    <message>
+        <source>Position Index %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Orbital Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Geen</translation>
+    </message>
+    <message>
+        <source>Position #%1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Position Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Positions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor position setup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single (Europe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Universal (Europe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Circular (N. America)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear (N. America)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C Band</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DishPro Bandstacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of LNB from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy (Fixed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard (Voltage)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Universal (Voltage &amp; Tone)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandstacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Switch (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Low (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset the frequency coming from the LNB will be in low setting. For bandstacked LNBs this is the vertical/right polarization band.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF High (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Type of Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Device Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a port to use for this switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a satellite position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DTV Device Configuration</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1627,7 +1920,7 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation>(Elke Categorie)</translation>
+        <translation type="obsolete">(Elke Categorie)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
@@ -1636,6 +1929,14 @@ Terug naar het vorige menu.</translation>
     <message>
         <source>Premieres</source>
         <translation>Premières</translation>
+    </message>
+    <message>
+        <source>Rule Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Genre)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1982,15 +2283,15 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>channel number (numeric)</source>
-        <translation>zendernummer (numeriek)</translation>
+        <translation type="obsolete">zendernummer (numeriek)</translation>
     </message>
     <message>
         <source>channel number (alpha)</source>
-        <translation>zendernummer (alfabet)</translation>
+        <translation type="obsolete">zendernummer (alfabet)</translation>
     </message>
     <message>
         <source>database order</source>
-        <translation>volgorde in database</translation>
+        <translation type="obsolete">volgorde in database</translation>
     </message>
     <message>
         <source>channel name</source>
@@ -3139,15 +3440,15 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>LNB LOF Switch</source>
-        <translation>LNB LOF Switch</translation>
+        <translation type="obsolete">LNB LOF Switch</translation>
     </message>
     <message>
         <source>LNB LOF High</source>
-        <translation>LNB LOF Hoog</translation>
+        <translation type="obsolete">LNB LOF Hoog</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
-        <translation>LNB LOF Laag</translation>
+        <translation type="obsolete">LNB LOF Laag</translation>
     </message>
     <message>
         <source>Recorder Options</source>
@@ -4517,7 +4818,7 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation>Lijst volgende afleveringen</translation>
+        <translation type="obsolete">Lijst volgende afleveringen</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
@@ -5268,15 +5569,15 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation>DiSEqC Input Type: (DVB-S)</translation>
+        <translation type="obsolete">DiSEqC Input Type: (DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
-        <translation>Selecteer het ingangstype voor DVB-S kaarten. Als Single LNB/Input laten staan voor DVB-C of DVB-T. De ingangen worden toegewezen door de &apos;Ingang verbindingen&apos; optie in het hoofdmenu.</translation>
+        <translation type="obsolete">Selecteer het ingangstype voor DVB-S kaarten. Als Single LNB/Input laten staan voor DVB-C of DVB-T. De ingangen worden toegewezen door de &apos;Ingang verbindingen&apos; optie in het hoofdmenu.</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>Dit definieert op welke frequentie (in Hz) de LNB zal wisselen tussen de hoog en laag instelling en omgekeerd.</translation>
+        <translation type="obsolete">Dit definieert op welke frequentie (in Hz) de LNB zal wisselen tussen de hoog en laag instelling en omgekeerd.</translation>
     </message>
     <message>
         <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
@@ -5288,11 +5589,11 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>DiSEqC Satellite Location</source>
-        <translation>DiSEqC satelliet locatie</translation>
+        <translation type="obsolete">DiSEqC satelliet locatie</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
-        <translation>De lengtegraad van de satelliet waarop u richt. Een negatieve waarde voor de westerlijke hemisfeer gebruiken. Waarde is decimaal.</translation>
+        <translation type="obsolete">De lengtegraad van de satelliet waarop u richt. Een negatieve waarde voor de westerlijke hemisfeer gebruiken. Waarde is decimaal.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
@@ -5555,7 +5856,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     </message>
     <message>
         <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
-        <translation>&apos;Firewire model&apos; is voor toekomstig gebruik, in het geval er specifieke aanpassingen moeten komen voor bepaalde modellen.</translation>
+        <translation type="obsolete">&apos;Firewire model&apos; is voor toekomstig gebruik, in het geval er specifieke aanpassingen moeten komen voor bepaalde modellen.</translation>
     </message>
     <message>
         <source>CPU friendly preview of recordings</source>
@@ -6397,7 +6698,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>ATSC channel</source>
-        <translation>ATSC zender</translation>
+        <translation type="obsolete">ATSC zender</translation>
     </message>
     <message>
         <source>Your preferred language for the user interface.</source>
@@ -6637,11 +6938,11 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Select the LNB Settings for DVB-S cards.</source>
-        <translation>Selecteer de LNB instellingen voor DVB-S TV-kaarten.</translation>
+        <translation type="obsolete">Selecteer de LNB instellingen voor DVB-S TV-kaarten.</translation>
     </message>
     <message>
         <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
-        <translation>Voor DVB-C en DVB-T hoeft u deze waarden niet in te vullen.</translation>
+        <translation type="obsolete">Voor DVB-C en DVB-T hoeft u deze waarden niet in te vullen.</translation>
     </message>
     <message>
         <source>Starting LiveTV channel.</source>
@@ -6717,7 +7018,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
-        <translation>De optie enkel op kanaal 78 en daarboven te zoeken naar zenders is beschikbaar omdat de meeste digitale zenders zich in dit gebied bevinden.</translation>
+        <translation type="obsolete">De optie enkel op kanaal 78 en daarboven te zoeken naar zenders is beschikbaar omdat de meeste digitale zenders zich in dit gebied bevinden.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
@@ -6929,19 +7230,19 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation>De Cartesiaanse breedtegraad voor uw locatie.</translation>
+        <translation type="obsolete">De Cartesiaanse breedtegraad voor uw locatie.</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation>Negatieve waarden gebruiken voor zuidelijke en westelijke coördinaten.</translation>
+        <translation type="obsolete">Negatieve waarden gebruiken voor zuidelijke en westelijke coördinaten.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation>De Cartesiaanse lengtegraad voor uw locatie.</translation>
+        <translation type="obsolete">De Cartesiaanse lengtegraad voor uw locatie.</translation>
     </message>
     <message>
         <source>DiSEqC Options</source>
-        <translation>DiSEqC opties</translation>
+        <translation type="obsolete">DiSEqC opties</translation>
     </message>
     <message>
         <source>Period</source>
@@ -6981,7 +7282,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>List previous episodes</source>
-        <translation>Lijst van vorige afleveringen</translation>
+        <translation type="obsolete">Lijst van vorige afleveringen</translation>
     </message>
     <message>
         <source>Preview schedule changes</source>
@@ -7378,50 +7679,6 @@ Myth zal nu afsluiten.</translation>
         <source>CC</source>
         <comment>Closed Captioned</comment>
         <translation type="unfinished">OND</translation>
-    </message>
-    <message>
-        <source>Single LNB / Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.2 Positioner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.3 Positioner (Goto X)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW21 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW64 Switch (3-Way)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Use DishNet Long-term EIT Data</source>
@@ -7986,14 +8243,6 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in high setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in low setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Input priority</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8225,6 +8474,73 @@ Myth zal nu afsluiten.</translation>
         <source>EIT Scanner Options</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Page Not Available</source>
+        <comment>Requested Teletext page not available</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freebox MRL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The FreeBox Media Resource Locator (MRL).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freebox Network Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>channel number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority When Shown Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing of an episode, special or movie only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Large Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On multiline displays try and display the time as large as possible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open 
+ &apos;%1&apos; in %2 
+Check if the video exists</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8294,6 +8610,10 @@ Myth zal nu afsluiten.</translation>
         <source>Existing Transport Scan</source>
         <translation>Scan van bestaande transports</translation>
     </message>
+    <message>
+        <source>M3U Import</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
@@ -8344,7 +8664,7 @@ Myth zal nu afsluiten.</translation>
     <name>StartingChannel</name>
     <message>
         <source>DB Error, see console</source>
-        <translation>DB fout, zie console</translation>
+        <translation type="obsolete">DB fout, zie console</translation>
     </message>
     <message>
         <source>Please add channels to this source</source>
@@ -9143,6 +9463,10 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Toggle On/Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor %1%</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

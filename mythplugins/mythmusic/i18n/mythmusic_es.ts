@@ -347,6 +347,14 @@
         <source>Remove Duplicates</source>
         <translation>Eliminar duplicados</translation>
     </message>
+    <message>
+        <source>1 Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -388,11 +396,11 @@
     </message>
     <message>
         <source>Audio device</source>
-        <translation>Dispositivo de áudio</translation>
+        <translation>Dispositivo de audio</translation>
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation>Dispositivo de audio para la reproducción.</translation>
+        <translation type="obsolete">Dispositivo de audio para la reproducción.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -428,7 +436,7 @@
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation>Si se activa, MythMusic no comprueba las marcas ID3 en los archivos y simplemente determina el gènero, artista, álbum, número de pista y tíyulo por el nombre de archivo.</translation>
+        <translation>Si se activa, MythMusic no comprueba las marcas ID3 en los archivos y simplemente determina el género, artista, álbum, número de pista y tíyulo por el nombre de archivo.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
@@ -844,7 +852,7 @@
     </message>
     <message>
         <source>Artists</source>
-        <translation>Artistas</translation>
+        <translation type="obsolete">Artistas</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
@@ -897,6 +905,18 @@
     <message>
         <source>Checks the database for duplicates when importing/ripping CDs.</source>
         <translation>Comprueba la existencia de duplicados al importar/ripear CDs.</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

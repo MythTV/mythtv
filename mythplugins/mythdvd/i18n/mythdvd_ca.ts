@@ -352,7 +352,7 @@ No hi ha un dispositiu de DVD definit.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Desconegut</translation>
+        <translation type="obsolete">Desconegut</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -381,6 +381,10 @@ No hi ha un dispositiu de DVD definit.</translation>
     <message>
         <source>ISO Image</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Desconegut</translation>
     </message>
 </context>
 </TS>

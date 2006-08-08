@@ -356,7 +356,7 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Inconnu</translation>
+        <translation type="obsolete">Inconnu</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -385,6 +385,10 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <message>
         <source>ISO Image</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnu</translation>
     </message>
 </context>
 </TS>

@@ -347,6 +347,14 @@
         <source>Remove Duplicates</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>1 Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -392,7 +400,7 @@
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation>再生時に使用するオーディオデバイス.</translation>
+        <translation type="obsolete">再生時に使用するオーディオデバイス.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -844,7 +852,7 @@
     </message>
     <message>
         <source>Artists</source>
-        <translation>アーティスト</translation>
+        <translation type="obsolete">アーティスト</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
@@ -896,6 +904,18 @@
     </message>
     <message>
         <source>Loading Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Title</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

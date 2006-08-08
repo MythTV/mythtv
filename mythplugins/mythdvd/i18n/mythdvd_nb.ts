@@ -345,7 +345,7 @@ Det er ikke angitt en DVD-enhet.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Ukjent</translation>
+        <translation type="obsolete">Ukjent</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -374,6 +374,10 @@ Det er ikke angitt en DVD-enhet.</translation>
     <message>
         <source>ISO Image</source>
         <translation>ISO-bilde</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Ukjent</translation>
     </message>
 </context>
 </TS>

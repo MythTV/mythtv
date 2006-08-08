@@ -356,7 +356,7 @@ Nimate definirane DVD naprave.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Nepoznano</translation>
+        <translation type="obsolete">Nepoznano</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -385,6 +385,10 @@ Nimate definirane DVD naprave.</translation>
     <message>
         <source>ISO Image</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Nepozano</translation>
     </message>
 </context>
 </TS>

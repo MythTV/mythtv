@@ -66,7 +66,7 @@
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoge innstillinger for</translation>
     </message>
 </context>
 <context>
@@ -109,15 +109,15 @@
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Virkelig slette ALLE opptakskort på «%1»?</translation>
     </message>
     <message>
         <source>Error getting list of cards for this host</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke hente liste over kort for denne verten</translation>
     </message>
     <message>
         <source>Unable to delete capturecards for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke slette opptakskort for «%1»</translation>
     </message>
 </context>
 <context>
@@ -141,6 +141,14 @@
     <message>
         <source>This can take a long time to run.</source>
         <translation>Dette kan ta lang tid.</translation>
+    </message>
+    <message>
+        <source>DVB-S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input and satellite settings.</source>
+        <translation type="unfinished">Inndata- og satelittinnstillinger.</translation>
     </message>
 </context>
 <context>
@@ -205,334 +213,187 @@
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
-        <translation type="unfinished"></translation>
+        <translation>lagret eksempel</translation>
     </message>
     <message>
         <source>Edit Rule</source>
-        <translation type="unfinished">Rediger regel</translation>
+        <translation>Rediger regel</translation>
     </message>
     <message>
         <source>&lt;New rule&gt;</source>
-        <translation type="unfinished">&lt;Ny regel&gt;</translation>
+        <translation>&lt;Ny regel&gt;</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished">Regelnavn</translation>
+        <translation>Regelnavn</translation>
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished">Finn en eksakt tittel</translation>
+        <translation>Finn en eksakt tittel</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished">Finn en eksakt episode</translation>
+        <translation>Finn en eksakt episode</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished">Finn ord i tittelen</translation>
+        <translation>Finn ord i tittelen</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished">F</translation>
+        <translation>Finn i ethvert beskrivende felt</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished">Begrens til kategori</translation>
+        <translation>Begrens etter kategori</translation>
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation type="unfinished">Alle treff for en sjanger (DataDirect)</translation>
+        <translation>Alle treff for en sjanger (Data Direct)</translation>
     </message>
     <message>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Begrens etter MPAA- eller VCHIP-rangering (Data Direct)</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished">Bare nye episoder</translation>
+        <translation>Bare nye episoder</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta med uidentifiserte episoder</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished">Kategoritype</translation>
+        <translation>Kategoritype</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished">eller</translation>
+        <translation>eller</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished">Begrens filmer etter utgivelsesår</translation>
+        <translation>Begrens filmer etter utgivelsesår</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished">Minimumsrangering (0,0 til 1,0 kun for filmer)</translation>
+        <translation>Minimumsrangering (0,0 til 1,0 kun for filmer)</translation>
     </message>
     <message>
         <source>Person named in the credits (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Medvirkende person (Data Direct)</translation>
     </message>
     <message>
         <source>Only on a specific station</source>
-        <translation type="unfinished">Kun på en bestemt stasjon</translation>
+        <translation>Kun på en bestemt stasjon</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished">Ekskluder en stasjon</translation>
+        <translation>Ekskluder en stasjon</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished">Finn relaterte forkortinger</translation>
+        <translation>Finn relaterte forkortinger</translation>
     </message>
     <message>
         <source>Only on channels marked as favorites</source>
-        <translation type="unfinished">Kun på kanaler markert som favoritter</translation>
+        <translation>Kun på kanaler markert som favoritter</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished">Bare kanaler fra en bestemt videokilde</translation>
+        <translation>Bare kanaler fra en bestemt videokilde</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished">Bare kanaler markert som reklamefrie</translation>
+        <translation>Bare kanaler markert som reklamefrie</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished">Bare sendinger markert som HDTV</translation>
+        <translation>Bare sendinger markert som HDTV</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished">Når som helst på en bestemt ukedag</translation>
+        <translation>Nårr som helst på en bestemt ukedag</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished">Bare på hverdager (mandag til fredag)</translation>
+        <translation>Bare på hverdager (mandag til fredag)</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished">Bare i helger</translation>
+        <translation>Bare i helger</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished">Bare i beste sendetid</translation>
+        <translation>Bare i beste sendetid</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished">Ikke i beste sendetid</translation>
+        <translation>Ikke i beste sendetid</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished">Flere idrettslag (komplett eksempel)</translation>
+        <translation>Flere idrettslag (komplett eksempel)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished">Sci-fi B-filmer (komplett eksempel)</translation>
+        <translation>Sci-fi B-filmer (komplett eksempel)</translation>
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished">SportsCenter over natten (komplett eksempel - bruk «Finn daglig»)</translation>
+        <translation>SportsCenter over natten (komplett eksempel - bruk «Finn daglig»)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished">Ukens film (komplett eksempel - bruk «Finn ukentlig»)</translation>
+        <translation>Ukens film (komplett eksempel - bruk «Finn ukentlig»)</translation>
     </message>
     <message>
         <source>First Episodes (complete example for Data Direct)</source>
-        <translation type="unfinished">Første episoder (komplett eksempel for Data Direct)</translation>
+        <translation>Første episoder (komplett eksempel for Data Direct)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished">Legg til dette eksempeluttrykket</translation>
+        <translation>Legg til dette eksempeluttrykket</translation>
     </message>
     <message>
         <source>Additional Tables</source>
-        <translation type="unfinished">Ytterligere tabeller</translation>
+        <translation>Ytterligere tabeller</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished">Test</translation>
+        <translation>Test</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">Ta opp</translation>
+        <translation>Ta opp</translation>
     </message>
     <message>
         <source>Store</source>
+        <translation>Lagre</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation>En feil ble funnet under kontrollering</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation>Databasefeilen var</translation>
+    </message>
+    <message>
+        <source>Match this episode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <source>First showing of each episode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error was found when checking</source>
-        <translation type="unfinished">En feil ble funnet under kontrollering</translation>
-    </message>
-    <message>
-        <source>The database error was</source>
-        <translation type="unfinished">Databasefeilen var</translation>
-    </message>
-</context>
-<context>
-    <name>CustomRecord</name>
-    <message>
-        <source>Rule Name</source>
-        <translation type="obsolete">Regelnavn</translation>
-    </message>
-    <message>
-        <source>Match an exact title</source>
-        <translation type="obsolete">Finn en eksakt tittel</translation>
-    </message>
-    <message>
-        <source>Match an exact episode</source>
-        <translation type="obsolete">Finn en eksakt episode</translation>
-    </message>
-    <message>
-        <source>Match words in the title</source>
-        <translation type="obsolete">Finn ord i tittelen</translation>
-    </message>
-    <message>
-        <source>Match in any descriptive field</source>
-        <translation type="obsolete">F</translation>
-    </message>
-    <message>
-        <source>Limit by category</source>
-        <translation type="obsolete">Begrens til kategori</translation>
-    </message>
-    <message>
-        <source>New episodes only</source>
-        <translation type="obsolete">Bare nye episoder</translation>
-    </message>
-    <message>
-        <source>Category type</source>
-        <translation type="obsolete">Kategoritype</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation type="obsolete">eller</translation>
-    </message>
-    <message>
-        <source>Limit movies by the year of release</source>
-        <translation type="obsolete">Begrens filmer etter utgivelsesår</translation>
-    </message>
-    <message>
-        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="obsolete">Minimumsrangering (0,0 til 1,0 kun for filmer)</translation>
-    </message>
-    <message>
-        <source>Exclude one station</source>
-        <translation type="obsolete">Ekskluder en stasjon</translation>
-    </message>
-    <message>
-        <source>Match related callsigns</source>
-        <translation type="obsolete">Finn relaterte forkortinger</translation>
-    </message>
-    <message>
-        <source>Only channels from a specific video source</source>
-        <translation type="obsolete">Bare kanaler fra en bestemt videokilde</translation>
-    </message>
-    <message>
-        <source>Only channels marked as commercial free</source>
-        <translation type="obsolete">Bare kanaler markert som reklamefrie</translation>
-    </message>
-    <message>
-        <source>Only shows marked as HDTV</source>
-        <translation type="obsolete">Bare sendinger markert som HDTV</translation>
-    </message>
-    <message>
-        <source>Anytime on a specific day of the week</source>
-        <translation type="obsolete">Når som helst på en bestemt ukedag</translation>
-    </message>
-    <message>
-        <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="obsolete">Bare på hverdager (mandag til fredag)</translation>
-    </message>
-    <message>
-        <source>Only on weekends</source>
-        <translation type="obsolete">Bare i helger</translation>
-    </message>
-    <message>
-        <source>Only in primetime</source>
-        <translation type="obsolete">Bare i beste sendetid</translation>
-    </message>
-    <message>
-        <source>Not in primetime</source>
-        <translation type="obsolete">Ikke i beste sendetid</translation>
-    </message>
-    <message>
-        <source>Multiple sports teams (complete example)</source>
-        <translation type="obsolete">Flere idrettslag (komplett eksempel)</translation>
-    </message>
-    <message>
-        <source>Sci-fi B-movies (complete example)</source>
-        <translation type="obsolete">Sci-fi B-filmer (komplett eksempel)</translation>
-    </message>
-    <message>
-        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="obsolete">SportsCenter over natten (komplett eksempel - bruk «Finn daglig»)</translation>
-    </message>
-    <message>
-        <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="obsolete">Ukens film (komplett eksempel - bruk «Finn ukentlig»)</translation>
-    </message>
-    <message>
-        <source>Add this example clause</source>
-        <translation type="obsolete">Legg til dette eksempeluttrykket</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="obsolete">Test</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation type="obsolete">Ta opp</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>An error was found when checking</source>
-        <translation type="obsolete">En feil ble funnet under kontrollering</translation>
-    </message>
-    <message>
-        <source>The database error was</source>
-        <translation type="obsolete">Databasefeilen var</translation>
-    </message>
-    <message>
-        <source>Edit Rule</source>
-        <translation type="obsolete">Rediger regel</translation>
-    </message>
-    <message>
-        <source>&lt;New rule&gt;</source>
-        <translation type="obsolete">&lt;Ny regel&gt;</translation>
-    </message>
-    <message>
-        <source>First Episodes (complete example for Data Direct)</source>
-        <translation type="obsolete">Første episoder (komplett eksempel for Data Direct)</translation>
-    </message>
-    <message>
-        <source>All matches for a genre (Data Direct)</source>
-        <translation type="obsolete">Alle treff for en sjanger (DataDirect)</translation>
-    </message>
-    <message>
-        <source>Person named in the credits</source>
-        <translation type="obsolete">Person nevnt som medvirkende</translation>
-    </message>
-    <message>
-        <source>Only on a specific station</source>
-        <translation type="obsolete">Kun på en bestemt stasjon</translation>
-    </message>
-    <message>
-        <source>Only on channels marked as favorites</source>
-        <translation type="obsolete">Kun på kanaler markert som favoritter</translation>
-    </message>
-    <message>
-        <source>Additional Tables</source>
-        <translation type="obsolete">Ytterligere tabeller</translation>
+        <source>Last showing of each episode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -558,28 +419,29 @@
     </message>
     <message>
         <source>Analog Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Analoge innstillinger</translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inndata- og satelittinnstillinger.</translation>
     </message>
     <message>
         <source>Analog child card settings.
 WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This card does not support analog tuning, but the DVB drivers do not yet allow us to detect this problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for analoge datterkort. 
+ADVARSEL: Ikke trykk på knappen hvis du bruker et «Air2PC HD-5000»-kort! Dette kortet støtter ikke analog søking, men DVB-driverne er ikke i stand til å oppdage dette problemet.</translation>
     </message>
     <message>
         <source>Various additional settings.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Diverse ytterlige innstillinger.</translation>
     </message>
     <message>
         <source>Could not open card #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke åpne kort %1</translation>
     </message>
     <message>
         <source>Could not get card info for card #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke hente informasjon for kort %1</translation>
     </message>
 </context>
 <context>
@@ -595,6 +457,10 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <message>
         <source>Uncorrected Blocks</source>
         <translation>Urettede blokker</translation>
+    </message>
+    <message>
+        <source>Rotor Progress</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -631,15 +497,280 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
 <context>
     <name>DataDirectLineupSelector</name>
     <message>
-        <source>Fetching lineups from DataDirect service...</source>
-        <translation type="obsolete">Henter oppstillinger fra DataDirect-tjenesten . . .</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from the Myth Plus service...</source>
-        <translation type="obsolete">Henter oppstillinger fra Myth Plus-tjenesten . . .</translation>
-    </message>
-    <message>
         <source>Fetching lineups from %1...</source>
+        <translation>Henter oppstillinger fra %1 . . .</translation>
+    </message>
+</context>
+<context>
+    <name>DeviceTree</name>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished">Bruk negative tall for sørlige og vestlige koordinater.</translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Beskrivelse</translation>
+    </message>
+    <message>
+        <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of switch from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished">DiSEqC</translation>
+    </message>
+    <message>
+        <source>DiSEqC (Uncommitted)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW21</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW42</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy SW64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of ports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of ports this switch has.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of rotor from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC 1.2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC 1.3 (GotoX/USALS)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Low Speed (deg/sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor High Speed (deg/sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>Eastern Hemisphere</comment>
+        <translation type="unfinished">T</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>Western Hemisphere</comment>
+        <translation type="unfinished">U</translation>
+    </message>
+    <message>
+        <source>Position Index %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Orbital Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Ingen</translation>
+    </message>
+    <message>
+        <source>Position #%1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Position Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Positions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotor position setup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single (Europe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Universal (Europe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Circular (N. America)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear (N. America)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C Band</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DishPro Bandstacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the type of LNB from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy (Fixed)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard (Voltage)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Universal (Voltage &amp; Tone)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandstacked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Switch (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Low (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset the frequency coming from the LNB will be in low setting. For bandstacked LNBs this is the vertical/right polarization band.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF High (MHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Type of Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Device Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a port to use for this switch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose a satellite position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DTV Device Configuration</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -717,15 +848,15 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 card!!!! This ca
     <name>MPEGConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation type="unfinished"></translation>
+        <translation>Undersøkelsesinfo</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke åpne</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke spørre</translation>
     </message>
 </context>
 <context>
@@ -931,11 +1062,11 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv inn gruppenavn eller trykk VELG for å skrive inn tekst via tastatur på skjermen</translation>
     </message>
     <message>
         <source>(Create new group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Lag ny gruppe)</translation>
     </message>
 </context>
 <context>
@@ -1330,39 +1461,39 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Show Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis programdetaljer</translation>
     </message>
     <message>
         <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaket har blitt konvertert</translation>
     </message>
     <message>
         <source>Recording is in Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaker er i stereo</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaket er i høy kvalitet</translation>
     </message>
     <message>
         <source>Recording is Closed Captioned</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppdaket er tekstet</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Oppdag automatisk</translation>
+        <translation>Oppdag automatisk</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Høy kvalitet</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Middels kvalitet</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav kvalitet</translation>
     </message>
 </context>
 <context>
@@ -1405,22 +1536,22 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Allow this episode to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillat at denne episoden tas opp på nytt</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Aldri ta opp denne episoden</translation>
     </message>
 </context>
 <context>
     <name>ProgDetails</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -1578,7 +1709,7 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation>(Alle kategorier)</translation>
+        <translation type="obsolete">(Alle kategorier)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
@@ -1615,6 +1746,14 @@ Går tilbake til forrige meny.</translation>
     <message>
         <source>Premieres</source>
         <translation>Premierer</translation>
+    </message>
+    <message>
+        <source>Rule Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Any Genre)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1682,10 +1821,6 @@ Går tilbake til forrige meny.</translation>
     <message>
         <source>Error!</source>
         <translation>Feil</translation>
-    </message>
-    <message>
-        <source>Any</source>
-        <translation type="obsolete">Alle</translation>
     </message>
 </context>
 <context>
@@ -1881,10 +2016,6 @@ Går tilbake til forrige meny.</translation>
     <message>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
         <translation>Hvis denne kanalen bruker et annet format enn «TV-format» i «Generell hovedtjenerkonfigurasjon» kan det velges her.</translation>
-    </message>
-    <message>
-        <source>Rank</source>
-        <translation type="obsolete">Rangering</translation>
     </message>
     <message>
         <source>Icon</source>
@@ -2160,18 +2291,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Transportinnstillinger</translation>
     </message>
     <message>
-        <source>TXT off</source>
-        <translation type="obsolete">Tekst-TV av</translation>
-    </message>
-    <message>
-        <source>CC off</source>
-        <translation type="obsolete">Teksting av</translation>
-    </message>
-    <message>
-        <source>CC</source>
-        <translation type="obsolete">Teksting</translation>
-    </message>
-    <message>
         <source>TXT</source>
         <translation>Tekst-TV</translation>
     </message>
@@ -2253,11 +2372,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>cut</source>
-        <translation>Klipp</translation>
-    </message>
-    <message>
-        <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation type="obsolete">Posisjonen er nær et eksisterende klippepunkt.</translation>
+        <translation>Klippet</translation>
     </message>
     <message>
         <source>Delete this cut point</source>
@@ -2638,11 +2753,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>HDTV</translation>
     </message>
     <message>
-        <source>CC</source>
-        <comment>Close Captioned</comment>
-        <translation type="obsolete">Tekstet</translation>
-    </message>
-    <message>
         <source>Subtitled</source>
         <translation>Undertekster</translation>
     </message>
@@ -2768,10 +2878,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>Capture Card</source>
         <translation>TV-kort</translation>
-    </message>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Søker</translation>
     </message>
     <message>
         <source>Power Search</source>
@@ -3307,7 +3413,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation>Vis kommende episoder</translation>
+        <translation type="obsolete">Vis kommende episoder</translation>
     </message>
     <message>
         <source>Save these settings</source>
@@ -3413,11 +3519,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation>Inndatatype for DISEqC (DVB-S)</translation>
+        <translation type="obsolete">Inndatatype for DISEqC (DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
-        <translation>Velg inndatatypen for DVB-S-kort. Behold «Enkel LNB/Inndata» for DVB-C eller DVB-T. Inndata kartlegges fra «Inndata» i hovedmenyen</translation>
+        <translation type="obsolete">Velg inndatatypen for DVB-S-kort. Behold «Enkel LNB/Inndata» for DVB-C eller DVB-T. Inndata kartlegges fra «Inndata» i hovedmenyen</translation>
     </message>
     <message>
         <source>Other</source>
@@ -3489,27 +3595,27 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>LNB LOF Switch</source>
-        <translation>LNB LOF-bytting</translation>
+        <translation type="obsolete">LNB LOF-bytting</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>Dette angir på hvilken frekvens (i Hz) LNB bytter fra høy til lav innstilling, og omvendt.</translation>
+        <translation type="obsolete">Dette angir på hvilken frekvens (i Hz) LNB bytter fra høy til lav innstilling, og omvendt.</translation>
     </message>
     <message>
         <source>LNB LOF High</source>
-        <translation>LNB LOF høy</translation>
+        <translation type="obsolete">LNB LOF høy</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
-        <translation>LNB LOF lav</translation>
+        <translation type="obsolete">LNB LOF lav</translation>
     </message>
     <message>
         <source>DiSEqC Satellite Location</source>
-        <translation>DISEqC-satellittplassering</translation>
+        <translation type="obsolete">DISEqC-satellittplassering</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
-        <translation>Lengdegraden til satelitten, bruk en negativ verdi for den vestlige halvkule. Verdien er i desimalformat.</translation>
+        <translation type="obsolete">Lengdegraden til satelitten, bruk en negativ verdi for den vestlige halvkule. Verdien er i desimalformat.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
@@ -3538,14 +3644,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Starting channel</source>
         <translation>Startkanal</translation>
-    </message>
-    <message>
-        <source>Input preference</source>
-        <translation type="obsolete">Foretrukket inndata</translation>
-    </message>
-    <message>
-        <source>If the input preference is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
-        <translation type="obsolete">Hvis inndata-foretrekkelsen ikke er lik for alle inndatakilder, vil kanskje planleggeren velge å ta opp et program seinere så det kan taes opp fra en inndatakilde med en høyere verdi.</translation>
     </message>
     <message>
         <source>Connect source to input</source>
@@ -3774,10 +3872,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Metode for reklamehopping</translation>
     </message>
     <message>
-        <source>Blank Frame Detection (default)</source>
-        <translation type="obsolete">Oppdaging av tomme bilder (standard)</translation>
-    </message>
-    <message>
         <source>Blank Frame + Scene Change Detection</source>
         <translation>Oppdaging av tomme bilder og sceneendringer</translation>
     </message>
@@ -3792,10 +3886,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>All</source>
         <translation>Alle</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Dette bestemmer metoden som skal brukes for å oppdage når reklamer begynner og slutter. «Automatisk merking av reklamer» må være slått på for å bruke noe annet enn oppdaging av tomme bilder.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -3963,15 +4053,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>channel number (numeric)</source>
-        <translation>Kanalnummer (numerisk)</translation>
+        <translation type="obsolete">Kanalnummer (numerisk)</translation>
     </message>
     <message>
         <source>channel number (alpha)</source>
-        <translation>Kanalnummer (alfabetisk)</translation>
+        <translation type="obsolete">Kanalnummer (alfabetisk)</translation>
     </message>
     <message>
         <source>database order</source>
-        <translation>Databaserekkefølge</translation>
+        <translation type="obsolete">Databaserekkefølge</translation>
     </message>
     <message>
         <source>channel name</source>
@@ -4018,18 +4108,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Bruk video som tidsgrunnlag og flytt lyden for å holde den synkronisert. (Eksperimentelt)</translation>
     </message>
     <message>
-        <source>Black background for Closed Captioning</source>
-        <translation type="obsolete">Svart bakgrunn for undertekster</translation>
-    </message>
-    <message>
-        <source>If enabled, captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
-        <translation type="obsolete">Undertekster vises på svart bakgrunn for høyest mulig kontrast. Ellers vises tekstingen med uthevet skrift uten bakgrunn.</translation>
-    </message>
-    <message>
-        <source>Always display Closed Captioning</source>
-        <translation type="obsolete">Vis alltid undertekster</translation>
-    </message>
-    <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
         <translation>Undertekster blir vist under avspilling av opptak og direkte TV. De kan slås av og på ved å trykke «T» under avspilling.</translation>
     </message>
@@ -4056,14 +4134,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
         <translation>Under avspilling vil velg-knappen (linjeskift eller mellomrom) bytte mellom å lagre og slette posisjon. Hvis dette er av vil velg-knappen lagre posisjonen hver gang.</translation>
-    </message>
-    <message>
-        <source>Use Xv picture controls</source>
-        <translation type="obsolete">Bruk Xv-bildekontrollere</translation>
-    </message>
-    <message>
-        <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="obsolete">Hvis dette er på brukes Xv-bildekontrollere (lysstyrke, kontrast etc.) under avspilling. Disse er uavhengige av Video4Linux-kontrollene brukt under opptak. Xv-kontrollene virker kanskje ikke ordentlig på noen systemer.</translation>
     </message>
     <message>
         <source>UDP Notify Port</source>
@@ -4103,7 +4173,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display thumbnail preview images of recordings</source>
-        <translation type="unfinished">Generer et bilde som forhåndsvisning av opptak</translation>
+        <translation>Lag et bilde som forhåndsvisning av opptak</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
@@ -5154,10 +5224,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Programoversikt</translation>
     </message>
     <message>
-        <source>General Recording Priorities Settings</source>
-        <translation type="obsolete">Innstillinger for generelle opptaksprioriteter</translation>
-    </message>
-    <message>
         <source>Screen settings</source>
         <translation>Skjerminnstillinger</translation>
     </message>
@@ -5470,10 +5536,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Ventetid for gjenoppkobling (sek)</translation>
     </message>
     <message>
-        <source>Length of time the frontend waits between the tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
-        <translation type="obsolete">Hvor lenge klienten venter mellom hvert forsøk for å prøve å vekke hovedtjeneren. Dette bør være den tiden hovedtjeneren bruker for å starte. Angi 0 for å slå av denne funksjonen.</translation>
-    </message>
-    <message>
         <source>Count of reconnect tries</source>
         <translation>Antall gjenoppkoblingsforsøk</translation>
     </message>
@@ -5750,10 +5812,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Kunne ikke re-initalisere video.</translation>
     </message>
     <message>
-        <source>CC/TXT enabled</source>
-        <translation type="obsolete">Teksting/Tekst-TV på</translation>
-    </message>
-    <message>
         <source>And, never ask again.</source>
         <translation>Og ikke spør igjen.</translation>
     </message>
@@ -5894,7 +5952,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
-        <translation>FireWire-modell er for framtidig bruk, hvis det blir nødvendig med spesielle løsninger.</translation>
+        <translation type="obsolete">FireWire-modell er for framtidig bruk, hvis det blir nødvendig med spesielle løsninger.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
@@ -6262,10 +6320,6 @@ Myth vil nå avsluttes.</translation>
         <translation>Kommando som kjøres før tjeneren slås av. Avslutningsverdien bestemmer om tjeneren skal slås av. 0 slår av, 1 starter ledighetstelleren på nytt, og 2 tilbakestiller tjeneren til å vente på en klient.</translation>
     </message>
     <message>
-        <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
-        <translation type="obsolete">Antall bonuspoeng som skal legges til ethvert opptak på denne kanalen under planlegging.</translation>
-    </message>
-    <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
         <translation>Bildefil for bruk som ikon for denne kanalen på diverse MythTV-visninger.</translation>
     </message>
@@ -6320,14 +6374,6 @@ Myth vil nå avsluttes.</translation>
         <translation>Tidsavbrudd for signal (ms)</translation>
     </message>
     <message>
-        <source>Store recordings in TS format.</source>
-        <translation type="obsolete">Lagre opptak i TS-format.</translation>
-    </message>
-    <message>
-        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation type="obsolete">Bruk transportstrøm-format som lagringsformatet i motsetning til å bruke den foreldete programstrøm-konverteringen. Konverteringen mister data, og tvinger MythTV til å slå av noen sikkerhetssjekker for justering.</translation>
-    </message>
-    <message>
         <source>Always prompt for initial group filter</source>
         <translation>Alltid spør om første gruppefilter</translation>
     </message>
@@ -6341,7 +6387,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>ATSC channel</source>
-        <translation>ATSC-kanal</translation>
+        <translation type="obsolete">ATSC-kanal</translation>
     </message>
     <message>
         <source>Your preferred language for the user interface.</source>
@@ -6476,18 +6522,6 @@ Myth vil nå avsluttes.</translation>
         <translation>(51) Ingen</translation>
     </message>
     <message>
-        <source>Using hardware MPEG decoder</source>
-        <translation type="obsolete">Bruk maskinvare-MPEG-dekoder</translation>
-    </message>
-    <message>
-        <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
-        <translation type="obsolete">Dette reduserer kompleksiteten til strømmen MythTV tar opp sånn at den kan mates direkte til en maskinvare-MPEG-dekoder.</translation>
-    </message>
-    <message>
-        <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation type="obsolete">Du ønsker nok også å velge foretrukket språk i grensesnittets Verktøy/Innstillinger:Innstillinger:TV-innstillinger:Generelt (side 3).</translation>
-    </message>
-    <message>
         <source>(Delete all capture cards)</source>
         <translation>(Slett alle opptakskort)</translation>
     </message>
@@ -6577,11 +6611,11 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Select the LNB Settings for DVB-S cards.</source>
-        <translation>Velg LNB-innstillingene for DVB-S-kort.</translation>
+        <translation type="obsolete">Velg LNB-innstillingene for DVB-S-kort.</translation>
     </message>
     <message>
         <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
-        <translation>Du behøver ikke velge disse verdiene for DVB-C og DVB-T.</translation>
+        <translation type="obsolete">Du behøver ikke velge disse verdiene for DVB-C og DVB-T.</translation>
     </message>
     <message>
         <source>Starting LiveTV channel.</source>
@@ -6657,7 +6691,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
-        <translation>Valget om å bare søke på kanal 78 og høyere gis fordi de fleste digitale kanaler er i det området.</translation>
+        <translation type="obsolete">Valget om å bare søke på kanal 78 og høyere gis fordi de fleste digitale kanaler er i det området.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
@@ -6670,14 +6704,6 @@ Myth vil nå avsluttes.</translation>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
         <translation>De fleste kabelsystemene i USA bruker QAM 256 eller QAM 64, men noen blandete systemer bruker kanskje 8 VSB for kanaler over luften.</translation>
-    </message>
-    <message>
-        <source>Could not query inputs.</source>
-        <translation type="obsolete">Klarte ikke spørre inndata.</translation>
-    </message>
-    <message>
-        <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="obsolete">FEIL: bygg med V4L-støtte for å spørre inndata</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6708,14 +6734,6 @@ Myth vil nå avsluttes.</translation>
         <translation>Fart</translation>
     </message>
     <message>
-        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="obsolete">Klarte ikke åpne «%1» for å spørre inndataene dens.</translation>
-    </message>
-    <message>
-        <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation type="obsolete">FEIL: bygg med DVB-støtte for å spørre inndata</translation>
-    </message>
-    <message>
         <source>Deinterlace algorithm.</source>
         <translation>Avflettingsalgoritme.</translation>
     </message>
@@ -6729,19 +6747,19 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>General OSD time-out (sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelt tidsavbrudd for visning på skjermen (s)</translation>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active after it is first activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mange sekunder en visning på skjermen vil være aktiv etter at den er slått på.</translation>
     </message>
     <message>
         <source>Program Info OSD time-out</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsavbrudd for programinfo på skjermen</translation>
     </message>
     <message>
         <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mange sekunder visningen på skjermen skal vise programinformasjon etter at den først vises.</translation>
     </message>
     <message>
         <source>Use line edit virtual keyboards</source>
@@ -6776,10 +6794,6 @@ Myth vil nå avsluttes.</translation>
         <translation>Omstartkommando for nvram-wakeup</translation>
     </message>
     <message>
-        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
-        <translation type="obsolete">Kommando som skal kjøres hvis BIOS&apos;en krever at maskinen startes på nytt for at innstillingene skal tre i kraft. Se filen «README» for flere eksempler.</translation>
-    </message>
-    <message>
         <source>Command to reboot</source>
         <translation>Kommando for å starte på nytt</translation>
     </message>
@@ -6809,7 +6823,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er på oppdateres data i denne kilden med listedata fra kanalene selv, «over luften».</translation>
     </message>
     <message>
         <source>EIT Transport Timeout (mins)</source>
@@ -6817,7 +6831,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mye tid som kan brukes på å vente på listedata fra en DTV-kanal før det sees etter listedata på den neste kanalen.</translation>
     </message>
     <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
@@ -6841,11 +6855,11 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>UDP Notify OSD time-out</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsavbrudd for UDP-meldinger på skjermen</translation>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor mange sekunder en visning på skjermen varer for UDP-meldinger.</translation>
     </message>
     <message>
         <source>CC font</source>
@@ -6868,20 +6882,12 @@ Myth vil nå avsluttes.</translation>
         <translation>Hvor lenge MythTV venter på et signaltreff når det søker etter kanaler, eller viser en advarsel når du ser på TV.</translation>
     </message>
     <message>
-        <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation>Bruk negative tall for sørlige og vestlige koordinater.</translation>
-    </message>
-    <message>
-        <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Bruk negative tall for sørlige og vestlige koordinater.</translation>
     </message>
     <message>
         <source>DiSEqC Options</source>
-        <translation>DiSEqC-innstillinger</translation>
+        <translation type="obsolete">DiSEqC-innstillinger</translation>
     </message>
     <message>
         <source>Period</source>
@@ -6921,7 +6927,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>List previous episodes</source>
-        <translation>List opp tidlgiere episoder</translation>
+        <translation type="obsolete">List opp tidlgiere episoder</translation>
     </message>
     <message>
         <source>Preview schedule changes</source>
@@ -6981,325 +6987,326 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Title Pronounce</source>
-        <translation type="unfinished"></translation>
+        <translation>Titteluttale</translation>
     </message>
     <message>
         <source>Unidentified Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Uidentifisert episode</translation>
     </message>
     <message>
         <source>Producer</source>
-        <translation type="unfinished"></translation>
+        <translation>Produsent</translation>
     </message>
     <message>
         <source>Executive Producer</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksekutiv produsent</translation>
     </message>
     <message>
         <source>Writer</source>
-        <translation type="unfinished"></translation>
+        <translation>Forfatter</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Vert</translation>
     </message>
     <message>
         <source>Adapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilpasser</translation>
     </message>
     <message>
         <source>Presenter</source>
-        <translation type="unfinished"></translation>
+        <translation>Presentør</translation>
     </message>
     <message>
         <source>Commentator</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommentator</translation>
     </message>
     <message>
         <source>Guest</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjest</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>Recording Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksregel</translation>
     </message>
     <message>
         <source>Search Phrase</source>
-        <translation type="unfinished"></translation>
+        <translation>Søkeuttrykk</translation>
     </message>
     <message>
         <source>Recorded File Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppført filstørrelse</translation>
     </message>
     <message>
         <source>Recording Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksprofil</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>TIllater konvertereren å endre størrelsen på video under konvertering.</translation>
     </message>
     <message>
         <source>Lossless transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Tapsfri konvertering</translation>
     </message>
     <message>
         <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kod på nytt igjen kun der det er absolutt nødvendig (som regel kun rundt klippepunkt). Ellers beholdes lyd- og videoformat identiske til kilden. Dette skal gi høyest kvalitet, men vil ikke spare så mye plass.</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv inn gruppenavn eller trykk VELG for å skrive inn tekst via tastatur på skjermen</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Visningsnavn (valgfritt)</translation>
     </message>
     <message>
         <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette navnet vises på skjermen når direkte TV begynner og når inndata/kort endres. Sørg for at informasjonen er unik for hver inndatakilde hvis du bruker dette.</translation>
     </message>
     <message>
         <source>Enable DTS to SPDIF passthrough</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på DTS til SPDIF-gjennomgang</translation>
     </message>
     <message>
         <source>Enable sending DTS audio directly to your sound card&apos;s SPDIF output, on sources which contain DTS soundtracks (usually DVDs).  Requires that the audio output device be set to something suitable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på sending av DTS-lyd direkte til lydkortets SPDIF-ut, for kilder som inneholder DTS-lydspor (som regel DVD&apos;er). Dette krever at enheten for lydavspilling angis som noe fornuftig.</translation>
     </message>
     <message>
         <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis «Direkte TV»-opptak når «Alle programmer»-filteret brukes</translation>
     </message>
     <message>
         <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er av blir opptak fra Direkte TV kun synlige via den spesielle opptaksgruppen «Direkte TV».</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Metoden som brukes for å bestemme hvilke programmer som skal slettes først. «Direkte TV»-opptak utløper alltid før vanlige opptak.</translation>
     </message>
     <message>
         <source>LiveTV recordings Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyeste alder for «Direkte TV»-opptak</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old.  LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk utløping tvinger utløping av «Direkte TV»-opptak når de er så mange dager gamle. De kan også utløpe tidligere hvis det er nødvendig å rydde mer diskplass.</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøver vises med dagens dato.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøver vises med morgendagens dato.</translation>
     </message>
     <message>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Foretrukket tidsformat.</translation>
     </message>
     <message>
         <source>Run mythfilldatabase at time suggested by the grabber.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjør mythfilldatabase på tider foreslått av henteren.</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne innstillingen gjør at en DataDirect-leverandør kan oppgi neste nedlastingstid for å fordele belastningen på tjenerne sine.</translation>
     </message>
     <message>
         <source>AutoExpire List</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-utløping</translation>
     </message>
     <message>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Listen over automatiske utløpinger viser alle opptak som kan utløpe og rekkefølgen for dette. Opptak på toppen utløper først.</translation>
     </message>
     <message>
         <source>Suggested Next: </source>
-        <translation type="unfinished"></translation>
+        <translation>Foreslått neste: </translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
-        <translation type="unfinished"></translation>
+        <translation>med %1 kvalitet på %2 KB/s</translation>
     </message>
     <message>
         <source>%1 hours left</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 timer igjen</translation>
     </message>
     <message>
         <source>%1 hours and %2 minutes left</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 timer og %2 minutter igjen</translation>
     </message>
     <message>
         <source>%1 minutes left</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 minutter igjen</translation>
     </message>
     <message>
         <source>average</source>
-        <translation type="unfinished"></translation>
+        <translation>vanlig</translation>
     </message>
     <message>
         <source>maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>høyeste</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
-        <translation type="unfinished"></translation>
+        <translation>Angir en periode hvor hovedtjeneren bør være våken</translation>
     </message>
     <message>
         <source>Shutdown with Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå av med hovedtjener</translation>
     </message>
     <message>
         <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythwelcome vil automatisk slå av denne maskinen når hovedtjeneren slås av. Bør kun velges på maskiner som bare er klienter</translation>
     </message>
     <message>
         <source>Command to run to start the Frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for å starte klienten</translation>
     </message>
     <message>
         <source>Command to start mythfrontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for å starte mythfrontend.</translation>
     </message>
     <message>
         <source>MythShutdown/MythWelcome Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for MythShutdown/MythWelcome</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>De originale filene får endelser på «.old» når konverteringen er ferdig, hvis dette er på og konvertereren er aktiv.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppgi enten den eksakte frekvensen i kHz eller en gyldig kanal for ditt TV-format.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verdi som legges til den oppgitte frekvensen i kHz, for finjustering.</translation>
     </message>
     <message>
         <source>Spain</source>
-        <translation type="unfinished"></translation>
+        <translation>Spania</translation>
     </message>
     <message>
         <source>Enable Network Remote Control interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på grensesnitt for fjernkontroll over nettverk</translation>
     </message>
     <message>
         <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette slår på støtte for å kontrollere mythfrontend over nettverket</translation>
     </message>
     <message>
         <source>Network Remote Control Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port for fjernkontroll over nettverk</translation>
     </message>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette angir hvilken port grensesnittet for fjernkontroll over nettverk lytter på for nye forbindelser.</translation>
     </message>
     <message>
         <source>You are close to an existing cut point. Would you like to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Du er nær et eksisterende klippepunkt. Vil du</translation>
     </message>
     <message>
         <source>Insert a new cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Lage et nytt klippepunkt</translation>
     </message>
     <message>
         <source>Too Far %1</source>
-        <translation type="unfinished"></translation>
+        <translation>For langt %1</translation>
     </message>
     <message>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis bredden er satt til «auto», kalkuleres den basert på opptakets høyde og høyde/bredde-forhold.</translation>
     </message>
     <message>
         <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis høyden er satt til «auto», kalkuleres den basert på opptakets bredde og høyde/bredde-forhold.</translation>
     </message>
     <message>
         <source>Radio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Radiokanaler.</translation>
     </message>
     <message>
         <source>If set, radio channels will also be included.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er på blir også radiokanaler tatt med.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle tilgjengelige metoder</translation>
     </message>
     <message>
         <source>Blank Frame Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppdaging av tomme bilder</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette bestemmer metoden som skal brukes for å oppdage når reklamer begynner og slutter.</translation>
     </message>
     <message>
         <source>Maximum commercial skip (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lengste reklamehopping (i sekunder)</translation>
     </message>
     <message>
         <source>Weighted Time/Priority Combination</source>
-        <translation type="unfinished"></translation>
+        <translation>Vektlagt tid/prioritet-kombinasjon</translation>
     </message>
     <message>
         <source>Auto Expire Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Vektlegging på prioritet for autoutløping</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antall ekstra dager et program får for hvert prioriteringspoeng. Dette brukes bare hvis metoden «Vektlagt tid/prioritet-kombasjon Vektlegging på prioritet for autoutløping» er valgt.</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>Maskinvareakselerasjon for Mac</translation>
     </message>
     <message>
         <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac-maskinvare vil da prøve å bruke grafikkprosessoren; dette kan gjøre at Mac&apos;en din klikker eller henger.</translation>
     </message>
     <message>
         <source>Transcoder command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for konverterer</translation>
     </message>
     <message>
         <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmet som brukes for å konvertere opptak. Hvis feltet er tomt brukes «mythtranscode».</translation>
     </message>
     <message>
         <source>Commercial Flagger command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for reklamemerker</translation>
     </message>
     <message>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmet som brukes for å opptage reklamer i et opptak. Hvis feltet er tomt brukes «mythcommflag».</translation>
     </message>
     <message>
         <source>F</source>
-        <comment>RecStatusChar rsOffLine</comment>
-        <translation type="unfinished">F</translation>
+        <comment>
+RecStatusChar rsOffLine</comment>
+        <translation type="obsolete">F</translation>
     </message>
     <message>
         <source>Recorder Off-Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaker er av</translation>
     </message>
     <message>
         <source>the backend recorder is off-line.</source>
-        <translation type="unfinished"></translation>
+        <translation>opptakstjeneren er av.</translation>
     </message>
     <message>
         <source>CC</source>
         <comment>Closed Captioned</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tekstet</translation>
     </message>
     <message>
         <source>Use DishNet Long-term EIT Data</source>
@@ -7311,387 +7318,343 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single LNB / Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tone Switch aka Mini DiSEqC (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.0 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 Switch (4-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.2 Positioner</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.3 Positioner (Goto X)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC v1.1 or 2.1 (10-way method2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW21 Switch (2-Way)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SW64 Switch (3-Way)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando som skal kjøres hvis BIOS&apos;en din krever en omstart for at innstillingene for nvram-vekking skal tre i kraft. La feltet være blankt hvis maskinen ikke krever dette. Se i LESMEG-filen for flere eksempler.</translation>
     </message>
     <message>
         <source>Education</source>
-        <translation type="unfinished"></translation>
+        <translation>Utdanning</translation>
     </message>
     <message>
         <source>Entertainment</source>
-        <translation type="unfinished"></translation>
+        <translation>Underholdning</translation>
     </message>
     <message>
         <source>Movie</source>
-        <translation type="unfinished"></translation>
+        <translation>Film</translation>
     </message>
     <message>
         <source>News</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyheter</translation>
     </message>
     <message>
         <source>Religious</source>
-        <translation type="unfinished"></translation>
+        <translation>Religiøst</translation>
     </message>
     <message>
         <source>Sports</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Handling</translation>
     </message>
     <message>
         <source>Advertisement</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklame</translation>
     </message>
     <message>
         <source>Animated</source>
-        <translation type="unfinished"></translation>
+        <translation>Animert</translation>
     </message>
     <message>
         <source>Anthology</source>
-        <translation type="unfinished"></translation>
+        <translation>Antologi</translation>
     </message>
     <message>
         <source>Automobile</source>
-        <translation type="unfinished"></translation>
+        <translation>Bil</translation>
     </message>
     <message>
         <source>Awards</source>
-        <translation type="unfinished"></translation>
+        <translation>Prisutdelinger</translation>
     </message>
     <message>
         <source>Baseball</source>
-        <translation type="unfinished"></translation>
+        <translation>Baseball</translation>
     </message>
     <message>
         <source>Basketball</source>
-        <translation type="unfinished"></translation>
+        <translation>Basketball</translation>
     </message>
     <message>
         <source>Bulletin</source>
-        <translation type="unfinished"></translation>
+        <translation>Offisielle meldinger</translation>
     </message>
     <message>
         <source>Business</source>
-        <translation type="unfinished"></translation>
+        <translation>Næringsliv</translation>
     </message>
     <message>
         <source>Classical</source>
-        <translation type="unfinished"></translation>
+        <translation>Klassisk</translation>
     </message>
     <message>
         <source>College</source>
-        <translation type="unfinished"></translation>
+        <translation>College</translation>
     </message>
     <message>
         <source>Combat</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamp</translation>
     </message>
     <message>
         <source>Comedy</source>
-        <translation type="unfinished"></translation>
+        <translation>Komedie</translation>
     </message>
     <message>
         <source>Commentary</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommentar</translation>
     </message>
     <message>
         <source>Concert</source>
-        <translation type="unfinished"></translation>
+        <translation>Konsert</translation>
     </message>
     <message>
         <source>Consumer</source>
-        <translation type="unfinished"></translation>
+        <translation>Forbruker</translation>
     </message>
     <message>
         <source>Contemporary</source>
-        <translation type="unfinished"></translation>
+        <translation>Samtidig</translation>
     </message>
     <message>
         <source>Crime</source>
-        <translation type="unfinished"></translation>
+        <translation>Krim</translation>
     </message>
     <message>
         <source>Dance</source>
-        <translation type="unfinished"></translation>
+        <translation>Dans</translation>
     </message>
     <message>
         <source>Documentary</source>
-        <translation type="unfinished"></translation>
+        <translation>Dokumentar</translation>
     </message>
     <message>
         <source>Drama</source>
-        <translation type="unfinished"></translation>
+        <translation>Drama</translation>
     </message>
     <message>
         <source>Elementary</source>
-        <translation type="unfinished"></translation>
+        <translation>Elementary</translation>
     </message>
     <message>
         <source>Erotica</source>
-        <translation type="unfinished"></translation>
+        <translation>Erotikk</translation>
     </message>
     <message>
         <source>Exercise</source>
-        <translation type="unfinished"></translation>
+        <translation>Trim</translation>
     </message>
     <message>
         <source>Fantasy</source>
-        <translation type="unfinished"></translation>
+        <translation>Fantasi</translation>
     </message>
     <message>
         <source>Farm</source>
-        <translation type="unfinished"></translation>
+        <translation>Gård</translation>
     </message>
     <message>
         <source>Fashion</source>
-        <translation type="unfinished"></translation>
+        <translation>Mote</translation>
     </message>
     <message>
         <source>Fiction</source>
-        <translation type="unfinished"></translation>
+        <translation>Fantasi</translation>
     </message>
     <message>
         <source>Food</source>
-        <translation type="unfinished"></translation>
+        <translation>Mat</translation>
     </message>
     <message>
         <source>Football</source>
-        <translation type="unfinished"></translation>
+        <translation>Fotball</translation>
     </message>
     <message>
         <source>Foreign</source>
-        <translation type="unfinished"></translation>
+        <translation>Utenlandsk</translation>
     </message>
     <message>
         <source>Fund Raiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Pengeinnsamling</translation>
     </message>
     <message>
         <source>Game/Quiz</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill/Spørreprogram</translation>
     </message>
     <message>
         <source>Garden</source>
-        <translation type="unfinished"></translation>
+        <translation>Hage</translation>
     </message>
     <message>
         <source>Golf</source>
-        <translation type="unfinished"></translation>
+        <translation>Golf</translation>
     </message>
     <message>
         <source>Government</source>
-        <translation type="unfinished"></translation>
+        <translation>Regjering</translation>
     </message>
     <message>
         <source>Health</source>
-        <translation type="unfinished"></translation>
+        <translation>Helse</translation>
     </message>
     <message>
         <source>High School</source>
-        <translation type="unfinished"></translation>
+        <translation>High School</translation>
     </message>
     <message>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>Historie</translation>
     </message>
     <message>
         <source>Hobby</source>
-        <translation type="unfinished"></translation>
+        <translation>Hobby</translation>
     </message>
     <message>
         <source>Hockey</source>
-        <translation type="unfinished"></translation>
+        <translation>Hockey</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Hjem</translation>
     </message>
     <message>
         <source>Horror</source>
-        <translation type="unfinished"></translation>
+        <translation>Grøsser</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informasjon</translation>
     </message>
     <message>
         <source>Instruction</source>
-        <translation type="unfinished"></translation>
+        <translation>Instruksjon</translation>
     </message>
     <message>
         <source>International</source>
-        <translation type="unfinished"></translation>
+        <translation>Internasjonal</translation>
     </message>
     <message>
         <source>Interview</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervju</translation>
     </message>
     <message>
         <source>Legal</source>
-        <translation type="unfinished"></translation>
+        <translation>Rettslig</translation>
     </message>
     <message>
         <source>Live</source>
-        <translation type="unfinished"></translation>
+        <translation>Direkte</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalt</translation>
     </message>
     <message>
         <source>Math</source>
-        <translation type="unfinished"></translation>
+        <translation>Matematikk</translation>
     </message>
     <message>
         <source>Medical</source>
-        <translation type="unfinished"></translation>
+        <translation>Medisin</translation>
     </message>
     <message>
         <source>Meeting</source>
-        <translation type="unfinished"></translation>
+        <translation>Møte</translation>
     </message>
     <message>
         <source>Military</source>
-        <translation type="unfinished"></translation>
+        <translation>Militært</translation>
     </message>
     <message>
         <source>Miniseries</source>
-        <translation type="unfinished"></translation>
+        <translation>Miniserie</translation>
     </message>
     <message>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Musikk</translation>
     </message>
     <message>
         <source>Mystery</source>
-        <translation type="unfinished"></translation>
+        <translation>Mysterium</translation>
     </message>
     <message>
         <source>National</source>
-        <translation type="unfinished"></translation>
+        <translation>Nasjonalt</translation>
     </message>
     <message>
         <source>Nature</source>
-        <translation type="unfinished"></translation>
+        <translation>Natur</translation>
     </message>
     <message>
         <source>Police</source>
-        <translation type="unfinished"></translation>
+        <translation>Politi</translation>
     </message>
     <message>
         <source>Politics</source>
-        <translation type="unfinished"></translation>
+        <translation>Politikk</translation>
     </message>
     <message>
         <source>Premiere</source>
-        <translation type="unfinished"></translation>
+        <translation>Premiere</translation>
     </message>
     <message>
         <source>Prerecorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Forhåndsopptak</translation>
     </message>
     <message>
         <source>Product</source>
-        <translation type="unfinished"></translation>
+        <translation>Produkt</translation>
     </message>
     <message>
         <source>Professional</source>
-        <translation type="unfinished"></translation>
+        <translation>Professionelt</translation>
     </message>
     <message>
         <source>Public</source>
-        <translation type="unfinished"></translation>
+        <translation>Offentlig</translation>
     </message>
     <message>
         <source>Racing</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappkjøring</translation>
     </message>
     <message>
         <source>Reading</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesing</translation>
     </message>
     <message>
         <source>Repair</source>
-        <translation type="unfinished"></translation>
+        <translation>Reparasjon</translation>
     </message>
     <message>
         <source>Review</source>
-        <translation type="unfinished"></translation>
+        <translation>Anmeldelse</translation>
     </message>
     <message>
         <source>Romance</source>
-        <translation type="unfinished"></translation>
+        <translation>Romantikk</translation>
     </message>
     <message>
         <source>Science</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitenskap</translation>
     </message>
     <message>
         <source>Series</source>
-        <translation type="unfinished">Serier</translation>
+        <translation>Serie</translation>
     </message>
     <message>
         <source>Service</source>
-        <translation type="unfinished"></translation>
+        <translation>Tjeneste</translation>
     </message>
     <message>
         <source>Shopping</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjøping</translation>
     </message>
     <message>
         <source>Soap Opera</source>
-        <translation type="unfinished"></translation>
+        <translation>Såpeopera</translation>
     </message>
     <message>
         <source>Special</source>
-        <translation type="unfinished"></translation>
+        <translation>Spesial</translation>
     </message>
     <message>
         <source>Suspense</source>
@@ -7699,156 +7662,157 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Talk</source>
-        <translation type="unfinished"></translation>
+        <translation>Snakk</translation>
     </message>
     <message>
         <source>Technical</source>
-        <translation type="unfinished"></translation>
+        <translation>Teknisk</translation>
     </message>
     <message>
         <source>Tennis</source>
-        <translation type="unfinished"></translation>
+        <translation>Tennis</translation>
     </message>
     <message>
         <source>Travel</source>
-        <translation type="unfinished"></translation>
+        <translation>Reise</translation>
     </message>
     <message>
         <source>Variety</source>
-        <translation type="unfinished"></translation>
+        <translation>Variert</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>Weather</source>
-        <translation type="unfinished"></translation>
+        <translation>Vær</translation>
     </message>
     <message>
         <source>Western</source>
-        <translation type="unfinished"></translation>
+        <translation>Western</translation>
     </message>
     <message>
         <source>DataDirect</source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirect</translation>
     </message>
     <message>
         <source>Time Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsforskyvning</translation>
     </message>
     <message>
         <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legg denne forskyvningen (i minutter) til programoversikt-dataene ved importering. Dette kan være nyttig hvis data for en spesiell kanal er i en annen tidssone.</translation>
     </message>
     <message>
         <source>(Works for DataDirect listings only.)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Virker kun for DataDirect.)</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Prioritet</translation>
+        <translation>Prioritet</translation>
     </message>
     <message>
         <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antall prioritetspoeng som skal legges til ethvert opptak på denne kanalen ved planlegging.</translation>
     </message>
     <message>
         <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk et positivt tall som prioritet hvis du vil at dette skal være en prioritert kanal, eller et negativt for å gjøre det motsatte.</translation>
     </message>
     <message>
         <source>Current Example</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjeldende eksempel</translation>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagre</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstatt</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Spor</translation>
     </message>
     <message>
         <source>Audio track</source>
-        <translation type="unfinished">Lydspor</translation>
+        <translation>Lydspor</translation>
     </message>
     <message>
         <source>Subtitle track</source>
-        <translation type="unfinished">Tekstspor</translation>
+        <translation>Tekstspor</translation>
     </message>
     <message>
         <source>CC</source>
         <comment>EIA-608 closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tekstet</translation>
     </message>
     <message>
         <source>ATSC CC</source>
         <comment>EIA-708 closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>ATSC-tekstet</translation>
     </message>
     <message>
         <source>TT CC</source>
         <comment>Teletext closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-TV-tekstet</translation>
     </message>
     <message>
         <source>TT Menu</source>
         <comment>Teletext Menu</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-TV-meny</translation>
     </message>
     <message>
         <source>TXT CAP</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-TV-teksting</translation>
     </message>
     <message>
         <source>Text subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-undertekstet</translation>
     </message>
     <message>
         <source>Text Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-undertekster</translation>
     </message>
     <message>
         <source>No captions</source>
         <comment>CC/Teletext/Subtitle text not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ingen undertekster</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished">Posisjon</translation>
+        <translation>Posisjon</translation>
     </message>
     <message>
         <source>No Seektable</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke søkbart</translation>
     </message>
     <message>
         <source>Recording Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptakstype</translation>
     </message>
     <message>
         <source>This option allows you to filter out unwanted streams. &apos;Normal&apos; will record all relevant streams including interactive television data. &apos;TV Only&apos; will record only audio, video and subtitle streams. </source>
-        <translation type="unfinished"></translation>
+        <translation>Denne innstillingen lar deg sile ut uønskede strømmer. «Normal» tar opp alle relevante strømmer, inkludert data for interaktivt TV. «Kun TV» tar bare opp lyd-, video- og undertekststrømmer.</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <source>TV Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun TV</translation>
     </message>
     <message>
         <source>Audio Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun lyd</translation>
     </message>
     <message>
         <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre som brukes ved konvertering med denne profilen. Dette må være blankt for å utføre tapfri konvertering. Format: 
+[[&lt;filter&gt;=&lt;valg&gt;,]...]</translation>
     </message>
     <message>
         <source>Cable IRC</source>
@@ -7856,20 +7820,20 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Use any available input</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk enhver tilgjengelig inndatakilde</translation>
     </message>
     <message>
         <source>Prefer input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Foretrekk inndatakilde %1</translation>
     </message>
     <message>
         <source>Select Preferred Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg foretrukket inndatakilde</translation>
     </message>
     <message>
         <source>UNKNOWN%1</source>
         <comment>Synthesized callsign</comment>
-        <translation type="unfinished"></translation>
+        <translation>UKJENT%1</translation>
     </message>
     <message>
         <source>DVB Tuning Delay (msec)</source>
@@ -7881,79 +7845,71 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Device ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Enhet-ID</translation>
     </message>
     <message>
         <source>Device ID from the back of the HDHomeRun unit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enhet-ID fra baksiden av HDHomeRun-enheten.</translation>
     </message>
     <message>
         <source>Tuner</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaker</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
-        <translation type="unfinished"></translation>
+        <translation>URL&apos;en til den innkommende strømmen (eks.: udp://?localport=1234)</translation>
     </message>
     <message>
         <source>HDHomeRun DTV tuner box</source>
-        <translation type="unfinished"></translation>
+        <translation>HDHomeRun DTV-boks</translation>
     </message>
     <message>
         <source>CRC IP Network Recorder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in high setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the LNB will be in low setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>CRC IP-nettverksopptaker</translation>
     </message>
     <message>
         <source>Input priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Inndataprioritet</translation>
     </message>
     <message>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis inndataprioriteten ikke er lik på alle inndatakilder kan planleggeren velge å ta opp en sending på et seinere tidspunkt sånn at den kan tas opp fra en inndatakilde med høyere prioritet.</translation>
     </message>
     <message>
         <source>(Delete all capture cards on %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Slett alle opptakskort på %1)</translation>
     </message>
     <message>
         <source>Passthrough output device</source>
-        <translation type="unfinished"></translation>
+        <translation>Utenhet for gjennomgang</translation>
     </message>
     <message>
         <source>Audio output device to use for AC3 and DTS passthrough. Default is the same as Audio output device. This value is currently only used with ALSA sound output.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyd-utenhet som skal brukes for AC3- og DTS-gjennomgang. Standardverdien er den samme som lyd-uthenhet. Denne verdien brukes for øyeblikket bare av ALSA-lydutgang.</translation>
     </message>
     <message>
         <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the user to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV vil fraråde lange, manuelle reklamehopp. Hopp som er lengre enn dette vil kreve at brukeren trykker HOPP-tasten to ganger. Dette har ingen effekt for automatisk reklamehopping.</translation>
     </message>
     <message>
         <source>Text zoom percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Prosent tekstforstørring</translation>
     </message>
     <message>
         <source>Use this to enlage or shrink captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk dette for å forstørre eller -minske undertekster.</translation>
     </message>
     <message>
         <source>Default Caption Font Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard skrifttype for undertekster</translation>
     </message>
     <message>
         <source>This allows you to set which font type to use when the broadcaster does not specify a font.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette gjør at du kan velge hvilken skrifttype du vil bruke når kringkasteren ikke oppgir en.</translation>
     </message>
     <message>
         <source>Monospaced serif</source>
@@ -7973,131 +7929,131 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Casual</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanlig</translation>
     </message>
     <message>
         <source>Cursive</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursiv</translation>
     </message>
     <message>
         <source>Capitals</source>
-        <translation type="unfinished"></translation>
+        <translation>Store bokstaver</translation>
     </message>
     <message>
         <source>ATSC caption settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for ATSC-undertekster</translation>
     </message>
     <message>
         <source>ATSC closed caption font</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekstskrift for ATSC</translation>
     </message>
     <message>
         <source>ATSC caption fonts</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekstskrifter for ATSC</translation>
     </message>
     <message>
         <source>Black background for analog closed captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart bakgrunn for analog underteksting</translation>
     </message>
     <message>
         <source>If enabled, analog captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er på vises analoge undertekster over et svart felt for høyeste kontrast. Ellers bruker de uthevet skrift over bildet.</translation>
     </message>
     <message>
         <source>Always display closed captioning or subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Alltid vis undertekster</translation>
     </message>
     <message>
         <source>Enable Interactive TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på interaktivt TV</translation>
     </message>
     <message>
         <source>If enabled, interactive TV applications (MHEG) will be activated.  This is used for teletext and logos for radio and channels that are currently off-air.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er på vil interaktive TV-programmer (MHEG) være tilgjengelige. Dette brukes til tekst-TV og logoer for radiokanaler og kanaler som for øyeblikket er av luften.</translation>
     </message>
     <message>
         <source>Paint Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Malingsmotor</translation>
     </message>
     <message>
         <source>Qt</source>
-        <translation type="unfinished"></translation>
+        <translation>Qt</translation>
     </message>
     <message>
         <source>OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL</translation>
     </message>
     <message>
         <source>This selects what Myth uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette velger hva Myth bruker for å tegne. Velg OpenGL hvis du har noenlunde god maksinvare. Endring av dette krever en omstart.</translation>
     </message>
     <message>
         <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard «Start tidlig»-minutter for nye opptaksregler</translation>
     </message>
     <message>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg 0 med mindre du forventer at flesteparten av TV-programmene ikke starter samtidig som oppgitt i programoversikten. Dette angir den forhåndsvalgte start tidlig/seint-tiden når regler lages. Disse kan da justeres per opptaksregel.</translation>
     </message>
     <message>
         <source>Default &apos;End Late&apos; minutes for new recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard «Slutt seint»-minutter for nye opptaksregler</translation>
     </message>
     <message>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg 0 med mindre du forventer at flesteparten av TV-programmene ikke begynner samtidig som oppgitt i programoversikten. Dette angir den forhåndsvalgte slutt tidlig/seint-tiden når regler lages. Disse kan da justeres per opptaksregel.</translation>
     </message>
     <message>
         <source>Complex Prioritization</source>
-        <translation type="unfinished"></translation>
+        <translation>Innviklet prioritering</translation>
     </message>
     <message>
         <source>If set, per rule plus type priorities will be used for primary prioritization with all other priorities having a secondary effect. Unset so that all are treated equally in a single total priority as described in the HOWTO.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis på brukes per regel- samt typeprioriteter for primær-prioritering og alle andre prioriteter har en sekundær effekt. Slå av sånn at alle behandles likt i en enkel total prioritet som beskrevet i veiledningen.</translation>
     </message>
     <message>
         <source>Preferred Input Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Foretrukket inndata-prioritet</translation>
     </message>
     <message>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ytterligere prioritet når en sending passer den foretrukne inndatakilden valgt i «Planleggingsinnstillinger»-delen av opptaksregelen.</translation>
     </message>
     <message>
         <source>HDTV Recording Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksprioritet for HDTV</translation>
     </message>
     <message>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ytterligere prioritet når en sending er merket som en HDTV-kringkasting i TV-dataene.</translation>
     </message>
     <message>
         <source>Close Captioned Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritet for teksting</translation>
     </message>
     <message>
         <source>Additional priority when a showing is marked as Close Captioned in the TV listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ytterligere prioritet når en sending er merket som undertekstet i TV-dataene.</translation>
     </message>
     <message>
         <source>Sort Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorter titler</translation>
     </message>
     <message>
         <source>Alphabetically</source>
-        <translation type="unfinished"></translation>
+        <translation>Alfabetisk</translation>
     </message>
     <message>
         <source>By Recording Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Etter opptaksprioritet</translation>
     </message>
     <message>
         <source>Scheduler Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Planleggingsinnstillinger</translation>
     </message>
     <message>
         <source>Recording Type Priority Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for opptakstypeprioritet</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -8105,15 +8061,15 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Delete Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett nå</translation>
     </message>
     <message>
         <source>Disable AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå av autoutløping</translation>
     </message>
     <message>
         <source>AutoExpire Actions:</source>
-        <translation type="unfinished"></translation>
+        <translation>Handlinger for autoutløping:</translation>
     </message>
     <message>
         <source>Time offset for EIT listings</source>
@@ -8129,7 +8085,7 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>If enabled, listings data collected on one Video Source will be applied to the first matching DVB channel on any Video Source. This is sometimes useful for DVB-S, but may insert bogus data into any ATSC listings stored in the same database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er på blir programdata som er samlet inn på en videokilde brukes på den første passende DVB-kanalen på enhver videokilde. Dette er av og til nyttig for DVB-S, men det kan sette inn feil data i ATSC-data lagres i den samme databasen.</translation>
     </message>
     <message>
         <source>Backend Idle Before EIT Crawl (seconds)</source>
@@ -8141,10 +8097,82 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvor lenge klienten venter mellom forsøk på å vekke hovedtjeneren. Dette bør settes til tiden hovedtjeneren bruker på å starte. 0 slår dette av.</translation>
     </message>
     <message>
         <source>EIT Scanner Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Not Available</source>
+        <comment>Requested Teletext page not available</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecStatusChar rsOffLine</comment>
+        <translation type="unfinished">F</translation>
+    </message>
+    <message>
+        <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming episodes for this rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freebox MRL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The FreeBox Media Resource Locator (MRL).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freebox Network Recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>channel number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority When Shown Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing of an episode, special or movie only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Large Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On multiline displays try and display the time as large as possible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open 
+ &apos;%1&apos; in %2 
+Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8216,43 +8244,16 @@ Myth vil nå avsluttes.</translation>
         <source>Full Scan (Tuned)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>M3U Import</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
         <translation>Søketype</translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Søker</translation>
-    </message>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Søkeveiviser</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Kunne ikke bytte til transport</translation>
-    </message>
-    <message>
-        <source>Error parsing parameters</source>
-        <translation type="obsolete">Kunne ikke spalte parametere</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Kunne ikke starte søk</translation>
-    </message>
-    <message>
-        <source>Failed to open : </source>
-        <translation type="obsolete">Kunne ikke åpne: </translation>
-    </message>
-    <message>
-        <source>Failed to parse : </source>
-        <translation type="obsolete">Kunne ikke spalte: </translation>
     </message>
 </context>
 <context>
@@ -8266,7 +8267,7 @@ Myth vil nå avsluttes.</translation>
     <name>StartingChannel</name>
     <message>
         <source>DB Error, see console</source>
-        <translation>Databasefeil, se på konsollet</translation>
+        <translation type="obsolete">Databasefeil, se på konsollet</translation>
     </message>
     <message>
         <source>Please add channels to this source</source>
@@ -8278,10 +8279,6 @@ Myth vil nå avsluttes.</translation>
     <message>
         <source>Tuner %1 </source>
         <translation>TV-kort %1 </translation>
-    </message>
-    <message>
-        <source>is not available</source>
-        <translation type="obsolete">er ikke tilgjengelig</translation>
     </message>
     <message>
         <source>is watching live TV</source>
@@ -8325,50 +8322,38 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 opptak som bruker %2 er tillat å autoutløpe</translation>
     </message>
     <message>
         <source>LiveTV</source>
-        <translation type="unfinished">Direkte TV</translation>
+        <translation>Direkte TV</translation>
     </message>
     <message>
         <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 av disse er Direkte TV og bruker %2</translation>
     </message>
     <message>
         <source>is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>er utilgjengelig</translation>
     </message>
 </context>
 <context>
     <name>TV</name>
     <message>
-        <source>MythTV is already using all available inputs for recording.  If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation type="obsolete">MythTV bruker allerede alle TV-kortene til opptak. Program som taes opp kan sees i mediebiblioteket. For å se direkte TV må et av opptakene slettes fra opptaksmenyen.</translation>
-    </message>
-    <message>
-        <source>Cancel and go back to the TV menu</source>
-        <translation type="obsolete">Avbryt og gå tilbake til hovedmenyen</translation>
-    </message>
-    <message>
         <source>Record and watch while it records</source>
-        <translation>Ta opp og se på mens det taes opp</translation>
+        <translation>Ta opp og se på opptaket</translation>
     </message>
     <message>
         <source>Let it record and go back to the Main Menu</source>
-        <translation>Ta det opp, og gå tilbake til hovedmenyen</translation>
+        <translation>Ta det opp og gå til hovedmenyen</translation>
     </message>
     <message>
         <source>Don&apos;t let it record, I want to watch TV</source>
-        <translation>Ikke ta det opp, se direkte TV i stedet</translation>
+        <translation>Ikke ta opp, se direkte TV i stedet</translation>
     </message>
     <message>
         <source>Play</source>
         <translation>Spill av</translation>
-    </message>
-    <message>
-        <source>Audio track</source>
-        <translation type="obsolete">Lydspor</translation>
     </message>
     <message>
         <source>Forward</source>
@@ -8483,44 +8468,8 @@ Ingen flere detaljer</translation>
         <translation> minutter</translation>
     </message>
     <message>
-        <source>Brightness (REC) %1 %</source>
-        <translation type="obsolete">Lysstyrke (opptak): %1%</translation>
-    </message>
-    <message>
-        <source>Adjust Recording</source>
-        <translation type="obsolete">Rediger opptak</translation>
-    </message>
-    <message>
-        <source>Brightness %1 %</source>
-        <translation type="obsolete">Lysstyrke: %1%</translation>
-    </message>
-    <message>
         <source>Adjust Picture</source>
         <translation>juster bilde</translation>
-    </message>
-    <message>
-        <source>Contrast (REC) %1 %</source>
-        <translation type="obsolete">Kontrast (opptak): %1%</translation>
-    </message>
-    <message>
-        <source>Contrast %1 %</source>
-        <translation type="obsolete">Kontrast: %1%</translation>
-    </message>
-    <message>
-        <source>Colour (REC) %1 %</source>
-        <translation type="obsolete">Farge (opptak): %1%</translation>
-    </message>
-    <message>
-        <source>Colour %1 %</source>
-        <translation type="obsolete">Farge: %1%</translation>
-    </message>
-    <message>
-        <source>Hue (REC) %1 %</source>
-        <translation type="obsolete">Nyanse (opptak): %1%</translation>
-    </message>
-    <message>
-        <source>Hue %1 %</source>
-        <translation type="obsolete">Nyanse: %1%</translation>
     </message>
     <message>
         <source>Volume %1 %</source>
@@ -8607,14 +8556,6 @@ Ingen flere detaljer</translation>
         <translation>Nyanse</translation>
     </message>
     <message>
-        <source>Volume</source>
-        <translation type="obsolete">Volum</translation>
-    </message>
-    <message>
-        <source>(REC)</source>
-        <translation type="obsolete">(Opptak)</translation>
-    </message>
-    <message>
         <source>This program is currently being edited</source>
         <translation>Dette programmet er under redigering</translation>
     </message>
@@ -8685,26 +8626,6 @@ Ingen flere detaljer</translation>
     <message>
         <source>Turn Auto-Expire ON</source>
         <translation>Automatisk utløping: på</translation>
-    </message>
-    <message>
-        <source>Toggle Teletext</source>
-        <translation type="obsolete">Vis/Skjul tekst-TV</translation>
-    </message>
-    <message>
-        <source>Closed Captioning</source>
-        <translation type="obsolete">Undertekster</translation>
-    </message>
-    <message>
-        <source>Toggle CC</source>
-        <translation type="obsolete">Teksting på/av</translation>
-    </message>
-    <message>
-        <source>CC</source>
-        <translation type="obsolete">Teksting</translation>
-    </message>
-    <message>
-        <source>TXT</source>
-        <translation type="obsolete">Tekst-TV</translation>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
@@ -8831,20 +8752,8 @@ Ingen flere detaljer</translation>
         <translation>OK</translation>
     </message>
     <message>
-        <source>Previous Recording</source>
-        <translation type="obsolete">Tidligere opptak</translation>
-    </message>
-    <message>
         <source>Select Audio Track</source>
         <translation>Velg lydspor</translation>
-    </message>
-    <message>
-        <source>Select Subtitles</source>
-        <translation type="obsolete">Velg tekster</translation>
-    </message>
-    <message>
-        <source>Subtitle track</source>
-        <translation type="obsolete">Tekstspor</translation>
     </message>
     <message>
         <source>Signal %1%</source>
@@ -8868,12 +8777,14 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>TXT:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst:</translation>
     </message>
     <message>
         <source>Seek:</source>
-        <comment>seek to location</comment>
-        <translation type="unfinished">Søk:</translation>
+        <comment>
+
+seek to location</comment>
+        <translation type="obsolete">Søk:</translation>
     </message>
     <message>
         <source>S/N %1dB</source>
@@ -8886,181 +8797,178 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>Speed 16X</source>
-        <translation type="unfinished">Fart: 16X</translation>
+        <translation>Fart: 16X</translation>
     </message>
     <message>
         <source>Speed 8X</source>
-        <translation type="unfinished">Fart: 8X</translation>
-    </message>
-    <message>
-        <source>Speed 4X</source>
-        <translation type="obsolete">Fart: 4X</translation>
-    </message>
-    <message>
-        <source>Speed 1/2X</source>
-        <translation type="obsolete">Fart: 1/2X</translation>
-    </message>
-    <message>
-        <source>Speed 1/4X</source>
-        <translation type="obsolete">Fart: 1/4X</translation>
+        <translation>Fart: 8X</translation>
     </message>
     <message>
         <source>Swap PiP/Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt bilde-i-bidle/hoved</translation>
     </message>
     <message>
         <source>Skip Still Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over stillbilde</translation>
     </message>
     <message>
         <source>Next Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste tittel</translation>
     </message>
     <message>
         <source>DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-rotmeny</translation>
     </message>
     <message>
         <source>Schedule Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Planlegg opptak</translation>
     </message>
     <message>
         <source>Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Programfinner</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished">Rediger opptaksplan</translation>
+        <translation>Rediger opptaksplan</translation>
     </message>
     <message>
         <source>Previous Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige tittel</translation>
     </message>
     <message>
         <source>Skip Back Not Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp tilbake ikke tillat</translation>
     </message>
     <message>
         <source>Channel Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalredigerer</translation>
     </message>
     <message>
         <source>Callsign</source>
-        <translation type="unfinished">Forkorting</translation>
+        <translation>Forkorting</translation>
     </message>
     <message>
         <source>Channel #</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalnr.</translation>
     </message>
     <message>
         <source>Channel Name</source>
-        <translation type="unfinished">Kanalnavn</translation>
+        <translation>Kanalnavn</translation>
     </message>
     <message>
         <source>XMLTV ID</source>
-        <translation type="unfinished">XMLTV-ID</translation>
+        <translation>XMLTV ID</translation>
     </message>
     <message>
         <source>[P]robe</source>
-        <translation type="unfinished"></translation>
+        <translation>[U]ndersøk</translation>
     </message>
     <message>
         <source>[O]k</source>
-        <translation type="unfinished"></translation>
+        <translation>[O]k</translation>
     </message>
     <message>
         <source>Jump to Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til program</translation>
     </message>
     <message>
         <source>Recorded Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Program som er tatt opp</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Oppdag automatisk</translation>
+        <translation>Oppdag automatisk</translation>
     </message>
     <message>
         <source>High Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Høy kvalitet</translation>
     </message>
     <message>
         <source>Medium Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Middels kvalitet</translation>
     </message>
     <message>
         <source>Low Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav kvalitet</translation>
     </message>
     <message>
         <source>Toggle Teletext Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-TV-undertekster av/på</translation>
     </message>
     <message>
         <source>Toggle Teletext Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-TV-meny av/på</translation>
     </message>
     <message>
         <source>Toggle</source>
-        <translation type="unfinished"></translation>
+        <translation>Av/På</translation>
     </message>
     <message>
         <source>(I)</source>
         <comment>Interlaced (Normal)</comment>
-        <translation type="unfinished"></translation>
+        <translation>(I)</translation>
     </message>
     <message>
         <source>(i)</source>
         <comment>Interlaced (Reversed)</comment>
-        <translation type="unfinished"></translation>
+        <translation>(i)</translation>
     </message>
     <message>
         <source>(P)</source>
         <comment>Progressive</comment>
-        <translation type="unfinished"></translation>
+        <translation>(P)</translation>
     </message>
     <message>
         <source>Video Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Videosøk</translation>
     </message>
     <message>
         <source>Detect</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppdag</translation>
     </message>
     <message>
         <source>Progressive</source>
-        <translation type="unfinished"></translation>
+        <translation>Progressiv</translation>
     </message>
     <message>
         <source>Interlaced (Normal)</source>
-        <translation type="unfinished"></translation>
+        <translation>Flettet (normal)</translation>
     </message>
     <message>
         <source>Interlaced (Reversed)</source>
-        <translation type="unfinished"></translation>
+        <translation>Flettet (reversert)</translation>
     </message>
     <message>
         <source>Select Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg undertekst</translation>
     </message>
     <message>
         <source>Select VBI CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg VBI-undertekst</translation>
     </message>
     <message>
         <source>Select ATSC CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg ATSC-undertekst</translation>
     </message>
     <message>
         <source>Select DVB CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg DVB-undertekst</translation>
     </message>
     <message>
         <source>Toggle On/Off</source>
+        <translation>Av/På</translation>
+    </message>
+    <message>
+        <source>Seek:</source>
+        <comment>seek to location</comment>
+        <translation type="unfinished">Søk:</translation>
+    </message>
+    <message>
+        <source>Rotor %1%</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9136,7 +9044,7 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation>Velg et opptak som skal sees</translation>
+        <translation>Velg et opptak du vil se</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase:</source>
@@ -9228,73 +9136,73 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>Program Details:</source>
-        <translation type="unfinished"></translation>
+        <translation>Programdetaljer:</translation>
     </message>
     <message>
         <source>Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Programdetaljer</translation>
     </message>
     <message>
         <source>Welcome to MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Velkommen til MythTV</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV er arbeidsledig og slås snart av.</translation>
     </message>
     <message>
         <source>Current Recording(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjeldende opptak</translation>
     </message>
     <message>
         <source>Retrieving Recording Status ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Henter opptakstatus . . .</translation>
     </message>
     <message>
         <source>Next Scheduled Recording(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste planlagte opptak</translation>
     </message>
     <message>
         <source>Retrieving Scheduled Recordings ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Henter planlagte opptak . . .</translation>
     </message>
     <message>
         <source>WARNING: There are conflicting scheduled recordings!</source>
-        <translation type="unfinished"></translation>
+        <translation>ADVARSEL: Planlagte opptak er i konflikt</translation>
     </message>
 </context>
 <context>
     <name>UIManagedTreeListType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Søk</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished"></translation>
+        <translation>Starter med tekst</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished"></translation>
+        <translation>Inneholder tekst</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
     <name>V4LConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppdaget info</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke åpne</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke spørre</translation>
     </message>
 </context>
 <context>
@@ -9344,11 +9252,11 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;schdiff&apos; element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temaet du bruker inneholder ikke et «schdiff»-element. Kontakt temaforfatteren og be om en oppdatering.&lt;br&gt;&lt;br&gt;Den neste skjermen vil være tom; avbryt det for å komme tilbake til menyen.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -9419,7 +9327,7 @@ Ingen flere detaljer</translation>
     </message>
     <message>
         <source>MythTV is busy grabbing EPG data.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV er opptatt med å hente programoversikt.</translation>
     </message>
     <message>
         <source>MythTV is locked by a user.</source>
@@ -9486,11 +9394,11 @@ Ingen flere detaljer</translation>
     <name>pcHDTVConfigurationGroup</name>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke åpne</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke spørre</translation>
     </message>
 </context>
 </TS>

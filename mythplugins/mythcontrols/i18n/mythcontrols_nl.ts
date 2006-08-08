@@ -98,15 +98,31 @@
     </message>
     <message>
         <source>Would you like to save now?</source>
-        <translation>Wilt u nu opslaan?</translation>
+        <translation type="obsolete">Wilt u nu opslaan?</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Opslaan</translation>
+        <translation type="obsolete">Opslaan</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation>Afsluiten</translation>
+        <translation type="obsolete">Afsluiten</translation>
+    </message>
+    <message>
+        <source>Exiting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

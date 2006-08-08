@@ -344,7 +344,7 @@ Du har ikke defineret et DVD device.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Ukendt</translation>
+        <translation type="obsolete">Ukendt</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -373,6 +373,10 @@ Du har ikke defineret et DVD device.</translation>
     <message>
         <source>ISO Image</source>
         <translation>ISO Image</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Ukendt</translation>
     </message>
 </context>
 </TS>

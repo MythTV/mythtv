@@ -126,6 +126,7 @@
       <text lang="PT">Regras de Gravação</text>
       <text lang="ES">Avanzada</text>
       <text lang="NL">Geavanceerde Opname</text>
+      <text lang="DK">Avanceret</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -190,7 +191,7 @@
       <text lang="NL">Geplande Opnames</text>
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Aufnahmeplan</text>
-      <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="DK">Løs konflikter</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Kommande inspelningar</text>
       <text lang="JA">予約衝突修正</text>

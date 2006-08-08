@@ -879,11 +879,7 @@
     </message>
     <message>
         <source>doppler radar</source>
-        <translation type="unfinished">レーダー画像</translation>
-    </message>
-    <message>
-        <source>satellite image</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">レーダー画像</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).

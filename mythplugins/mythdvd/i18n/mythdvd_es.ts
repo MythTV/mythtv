@@ -3,7 +3,7 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation>La conexión al proceso de trascodificación se interrumpió. Eso no es bueno.</translation>
+        <translation>La conexión al proceso de recodificación se interrumpió. Eso no es bueno.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
@@ -154,11 +154,11 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation>Comando de trascodificación básico</translation>
+        <translation>Comando de recodificación básico</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation>Comando básico (sin argumentos) para ejecutar la trascodificación en su sistema.</translation>
+        <translation>Comando básico (sin argumentos) para ejecutar la recodificación en su sistema.</translation>
     </message>
     <message>
         <source>MTD port number</source>
@@ -170,7 +170,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
-        <translation>Trazas del MTC a la ventana de terminal</translation>
+        <translation>Trazas del MTD a la ventana de terminal</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
@@ -182,7 +182,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation>Si se activa, el MTD (Myth Transcoding Daemon) conservará, por defecto, el AC3 (Dolby Digital) en la trascodificación.</translation>
+        <translation>Si se activa, el MTD (Myth Transcoding Daemon) conservará, por defecto, el AC3 (Dolby Digital) en la recodificación.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
@@ -206,7 +206,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation>Si se especifica un valor distinto de 0, los arxivos ripeados se fragmentarán en ficheros de este tamaño (en MB). Aplica tanto a los archivos temporales como a los definitivos.</translation>
+        <translation>Si se especifica un valor distinto de 0, los archivos ripeados se fragmentarán en ficheros de este tamaño (en MB). Aplica tanto a los archivos temporales como a los definitivos.</translation>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
@@ -301,7 +301,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     <name>ThemeUI</name>
     <message>
         <source>Rip/Transcode</source>
-        <translation>Ripear/Trascodificar</translation>
+        <translation>Ripear/Recodificar</translation>
     </message>
     <message>
         <source>Job 1 of 1</source>
@@ -352,7 +352,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Desconocido</translation>
+        <translation type="obsolete">Desconocido</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -381,6 +381,10 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     <message>
         <source>ISO Image</source>
         <translation>Imágen ISO</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Desconocido</translation>
     </message>
 </context>
 </TS>

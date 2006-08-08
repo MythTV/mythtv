@@ -651,11 +651,11 @@
     <name>Weather</name>
     <message>
         <source>doppler radar</source>
-        <translation>dopplerjev oddjanik</translation>
+        <translation type="obsolete">dopplerjev oddjanik</translation>
     </message>
     <message>
         <source>satellite image</source>
-        <translation>satelitska slika</translation>
+        <translation type="obsolete">satelitska slika</translation>
     </message>
     <message>
         <source> is invalid)</source>

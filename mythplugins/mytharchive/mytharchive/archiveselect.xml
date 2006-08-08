@@ -3,18 +3,21 @@
    <button>
       <type>ARCHIVE_SELECT_RECORDINGS</type>
       <text>Select Recordings</text>
+      <text lang="es">Seleccionar Grabaciones</text>
       <action>ARCHIVE_SELECT_RECORDINGS</action>
    </button>
 
    <button>
       <type>ARCHIVE_SELECT_VIDEOS</type>
       <text>Select Video Files</text>
+      <text lang="es">Seleccionar Ficheros Video</text>
       <action>ARCHIVE_SELECT_VIDEOS</action>
    </button>
 
    <button>
        <type>ARCHIVE_SELECT_FILES</type>
        <text>Select Files</text>
+       <text lang="es">Seleccionar Ficheros</text>
        <action>ARCHIVE_SELECT_FILES</action>
    </button>
 

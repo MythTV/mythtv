@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation>Katalog: </translation>
+        <translation type="obsolete">Katalog: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Skapad: </translation>
+        <translation type="obsolete">Skapad: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Modifierad: </translation>
+        <translation type="obsolete">Modifierad: </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Bytes</translation>
+        <translation type="obsolete">Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Bredd</translation>
+        <translation type="obsolete">Bredd</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>pixlar</translation>
+        <translation type="obsolete">pixlar</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Höjd</translation>
+        <translation type="obsolete">Höjd</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Pixelantal</translation>
+        <translation type="obsolete">Pixelantal</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapixels</translation>
+        <translation type="obsolete">megapixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Rotationsvinkel</translation>
+        <translation type="obsolete">Rotationsvinkel</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>grader</translation>
+        <translation type="obsolete">grader</translation>
     </message>
 </context>
 <context>
@@ -103,6 +103,94 @@
     <message>
         <source>Delete</source>
         <translation>Ta bort</translation>
+    </message>
+    <message>
+        <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery failed to load theme, see console for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected device is no longer available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta Data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marking...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Marked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Current File or Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 folder, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Marked Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting %1 images and folders, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moving marked images...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying marked images...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -169,7 +257,7 @@
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation>Katalogen med bilder existerar inte eller är oläsbar.</translation>
+        <translation type="obsolete">Katalogen med bilder existerar inte eller är oläsbar.</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -207,52 +295,64 @@
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation>Antal sekunder att visa en beskrivning ovanpå en fullstor bild.</translation>
     </message>
+    <message>
+        <source>Sort order when browsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the sort order for the displayed picture thumbnails.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration of OpenGL Transition (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
         <source>Created: </source>
-        <translation>Skapad:</translation>
+        <translation type="obsolete">Skapad:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Modifierad:</translation>
+        <translation type="obsolete">Modifierad:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Bytes</translation>
+        <translation type="obsolete">Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Bredd</translation>
+        <translation type="obsolete">Bredd</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>pixlar</translation>
+        <translation type="obsolete">pixlar</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Höjd</translation>
+        <translation type="obsolete">Höjd</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Pixelantal</translation>
+        <translation type="obsolete">Pixelantal</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapixels</translation>
+        <translation type="obsolete">megapixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Rotationsvinkel</translation>
+        <translation type="obsolete">Rotationsvinkel</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>grader</translation>
+        <translation type="obsolete">grader</translation>
     </message>
     <message>
         <source>Folder: </source>
-        <translation>Katalog:</translation>
+        <translation type="obsolete">Katalog:</translation>
     </message>
 </context>
 </TS>

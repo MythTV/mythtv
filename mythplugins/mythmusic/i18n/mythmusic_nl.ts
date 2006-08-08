@@ -367,6 +367,14 @@
         <source>Remove Duplicates</source>
         <translation>Dubbels vervangen</translation>
     </message>
+    <message>
+        <source>1 Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -412,7 +420,7 @@
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation>Audioapparaat voor afspelen.</translation>
+        <translation type="obsolete">Audioapparaat voor afspelen.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -865,7 +873,7 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation>Artiesten</translation>
+        <translation type="obsolete">Artiesten</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
@@ -918,6 +926,18 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <message>
         <source>Loading Music</source>
         <translation>Bezig met laden van muziek</translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

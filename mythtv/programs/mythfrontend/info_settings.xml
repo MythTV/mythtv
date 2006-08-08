@@ -3,7 +3,7 @@
    <button>
      <type>SETTINGS_WEATHER</type>
      <text>Weather Settings</text>
-     <text lang="ES">Configurar El Tiempo</text>
+     <text lang="ES">El Tiempo</text>
      <text lang="FR">Configuration météo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
@@ -28,7 +28,7 @@
      <text>News Settings</text>
      <text lang="DE">Nachrichten</text>
      <text lang="CA">Configurar Notícies</text>
-     <text lang="ES">Configurar Noticias</text>
+     <text lang="ES">Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
      <text lang="FR">Configuration des nouvelles</text>
      <text lang="IS">Stillingar frétta</text>
@@ -89,7 +89,7 @@
      <text lang="ET">Veebi seaded</text>
      <text lang="NB">Innstilinger for nettleser</text>
      <text lang="DK">Web instillinger</text>
-     <text lang="ES">Configurar Web</text>
+     <text lang="ES">Web</text>
      <text lang="PT">Configurar Navegação Web</text>
      <text lang="CZ">Nastavení webu</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
@@ -110,7 +110,7 @@
      <text lang="ET">Retseptide seaded</text>     
      <text lang="NB">Innstillinger for oppskrifter</text>
      <text lang="DK">Opskrifts indstillinger</text>
-     <text lang="ES">Configurar Recetas</text>
+     <text lang="ES">Recetas</text>
      <text lang="PT">Configurar Receitas</text>
      <text lang="CZ">Nastavení receptů</text>
      <alttext lang="ET">Retseptid</alttext>

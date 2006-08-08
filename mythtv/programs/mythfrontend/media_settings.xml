@@ -26,7 +26,7 @@
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
-       <text lang="ES">Configurar Vídeos</text>
+       <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Vidéos</text>
        <text lang="DE">Videos</text>

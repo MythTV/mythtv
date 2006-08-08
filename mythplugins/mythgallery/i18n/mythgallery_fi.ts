@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation>Kansio: </translation>
+        <translation type="obsolete">Kansio: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Luotu: </translation>
+        <translation type="obsolete">Luotu: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Muokattu: </translation>
+        <translation type="obsolete">Muokattu: </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Tavua</translation>
+        <translation type="obsolete">Tavua</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Leveys</translation>
+        <translation type="obsolete">Leveys</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>pikseliä</translation>
+        <translation type="obsolete">pikseliä</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Korkeus</translation>
+        <translation type="obsolete">Korkeus</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>pikselimäärä</translation>
+        <translation type="obsolete">pikselimäärä</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapikseliä</translation>
+        <translation type="obsolete">megapikseliä</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Käännöskulma</translation>
+        <translation type="obsolete">Käännöskulma</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>astetta</translation>
+        <translation type="obsolete">astetta</translation>
     </message>
 </context>
 <context>
@@ -103,6 +103,94 @@
     <message>
         <source>Delete</source>
         <translation>Poista</translation>
+    </message>
+    <message>
+        <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery failed to load theme, see console for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected device is no longer available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta Data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marking...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Marked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Current File or Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 folder, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Marked Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting %1 images and folders, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moving marked images...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying marked images...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -169,7 +257,7 @@
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation>Kansiota ei ole tai se on lukukelvoton.</translation>
+        <translation type="obsolete">Kansiota ei ole tai se on lukukelvoton.</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -207,52 +295,64 @@
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sort order when browsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the sort order for the displayed picture thumbnails.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration of OpenGL Transition (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
         <source>Created: </source>
-        <translation>Luotu: </translation>
+        <translation type="obsolete">Luotu: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Muokattu:</translation>
+        <translation type="obsolete">Muokattu:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation>Tavua</translation>
+        <translation type="obsolete">Tavua</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Leveys</translation>
+        <translation type="obsolete">Leveys</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>pikseliä</translation>
+        <translation type="obsolete">pikseliä</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Korkeus</translation>
+        <translation type="obsolete">Korkeus</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Pikselimäärä</translation>
+        <translation type="obsolete">Pikselimäärä</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapikseliä</translation>
+        <translation type="obsolete">megapikseliä</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Käännöskulma</translation>
+        <translation type="obsolete">Käännöskulma</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>astetta</translation>
+        <translation type="obsolete">astetta</translation>
     </message>
     <message>
         <source>Folder: </source>
-        <translation>Kansio: </translation>
+        <translation type="obsolete">Kansio: </translation>
     </message>
 </context>
 </TS>

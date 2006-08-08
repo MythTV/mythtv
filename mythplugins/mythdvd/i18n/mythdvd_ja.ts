@@ -352,7 +352,7 @@ DVDデバイスが設定されていません｡</translation>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>不明</translation>
+        <translation type="obsolete">不明</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -381,6 +381,10 @@ DVDデバイスが設定されていません｡</translation>
     <message>
         <source>ISO Image</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">不明</translation>
     </message>
 </context>
 </TS>

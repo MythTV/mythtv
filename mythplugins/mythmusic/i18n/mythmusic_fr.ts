@@ -351,6 +351,14 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Remove Duplicates</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>1 Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle: Album</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -396,7 +404,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation>Périphérique Audio pour jouer la Musique.</translation>
+        <translation type="obsolete">Périphérique Audio pour jouer la Musique.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -848,7 +856,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Artists</source>
-        <translation>Artistes</translation>
+        <translation type="obsolete">Artistes</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
@@ -900,6 +908,18 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Loading Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Title</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -348,7 +348,7 @@ You have no DVD Device defined.</source>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation>Unbekannt</translation>
+        <translation type="obsolete">Unbekannt</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
@@ -377,6 +377,10 @@ You have no DVD Device defined.</source>
     <message>
         <source>ISO Image</source>
         <translation>ISO-Image</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Unbekannt</translation>
     </message>
 </context>
 </TS>

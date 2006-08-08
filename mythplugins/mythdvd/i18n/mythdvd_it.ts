@@ -337,10 +337,6 @@ You have no DVD Device defined.</source>
 <context>
     <name>TitleDialog</name>
     <message>
-        <source>Unkown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 - Title %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -366,6 +362,10 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>ISO Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

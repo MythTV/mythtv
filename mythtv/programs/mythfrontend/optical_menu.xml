@@ -76,6 +76,7 @@
       <text lang="FI">Polta DVD</text>
       <text lang="FR">Graver un DVD</text>
       <text lang="PT">Gravar DVD</text>
+      <text lang="ES">Grabar DVD</text>
       <text lang="DE">DVD brennen</text>
       <text lang="NL">DVD Branden</text>
       <text lang="CZ">Vypálit DVD</text>
@@ -88,6 +89,7 @@
       <type>ARCHIVE</type>
       <text>Archive Files</text>
       <text lang="SV">Arkivera filer</text>
+      <text lang="ES">Archivar Ficheros</text>
       <action>PLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>
@@ -120,6 +122,7 @@
       <type>EJECT</type>
       <text>Eject media</text>
       <text lang="SV">Mata ut</text>
+      <text lang="ES">Expulsar medios</text>
       <action>EJECT</action>
    </button>
 

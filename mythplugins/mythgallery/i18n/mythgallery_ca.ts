@@ -2,48 +2,44 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <source>Folder: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Created: </source>
-        <translation type="unfinished">Creat:</translation>
+        <translation type="obsolete">Creat:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished">Modificat:</translation>
+        <translation type="obsolete">Modificat:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished">Bytes</translation>
+        <translation type="obsolete">Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished">Amplada</translation>
+        <translation type="obsolete">Amplada</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished">píxels</translation>
+        <translation type="obsolete">píxels</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished">Alçada</translation>
+        <translation type="obsolete">Alçada</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished">Nombre de Pixels</translation>
+        <translation type="obsolete">Nombre de Pixels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished">megapíxels</translation>
+        <translation type="obsolete">megapíxels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished">Angle de rotació</translation>
+        <translation type="obsolete">Angle de rotació</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished">graus</translation>
+        <translation type="obsolete">graus</translation>
     </message>
 </context>
 <context>
@@ -102,6 +98,94 @@
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery failed to load theme, see console for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected device is no longer available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta Data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Marking...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Marked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Dir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Current File or Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 folder, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting 1 image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Marked Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting %1 images and folders, including any subfolders and files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moving marked images...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copying marked images...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -168,10 +252,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -207,52 +287,60 @@
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sort order when browsing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the sort order for the displayed picture thumbnails.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration of OpenGL Transition (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
         <source>Bytes</source>
-        <translation>Bytes</translation>
+        <translation type="obsolete">Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation>Amplada</translation>
+        <translation type="obsolete">Amplada</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation>Alçada</translation>
+        <translation type="obsolete">Alçada</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Nombre de Pixels</translation>
+        <translation type="obsolete">Nombre de Pixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Angle de rotació</translation>
+        <translation type="obsolete">Angle de rotació</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>píxels</translation>
+        <translation type="obsolete">píxels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation>megapíxels</translation>
+        <translation type="obsolete">megapíxels</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>graus</translation>
+        <translation type="obsolete">graus</translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Creat:</translation>
+        <translation type="obsolete">Creat:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Modificat:</translation>
-    </message>
-    <message>
-        <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Modificat:</translation>
     </message>
 </context>
 </TS>
