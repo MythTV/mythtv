@@ -32,7 +32,6 @@ MythburnWizard::MythburnWizard(MythMainWindow *parent, QString window_name,
                                QString theme_filename, const char *name)
                 : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
-    //archiveDestination = AD_DVD_SL;
     themeDir = gContext->GetShareDir() + "mytharchive/themes/";
 
     archiveList = NULL;
@@ -1398,6 +1397,8 @@ void MythburnWizard::setDestination(int item)
     {
         destination_text->SetText(ArchiveDestinations[item].description);
     }
+
+    archiveDestination = ArchiveDestinations[item];
 
     switch(item)
     {

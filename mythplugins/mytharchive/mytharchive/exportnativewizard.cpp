@@ -706,6 +706,8 @@ void ExportNativeWizard::setDestination(int item)
         destination_text->SetText(ArchiveDestinations[item].description);
     }
 
+    archiveDestination = ArchiveDestinations[item];
+
     switch(item)
     {
         case AD_DVD_SL:
