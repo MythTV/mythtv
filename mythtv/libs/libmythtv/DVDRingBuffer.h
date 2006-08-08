@@ -65,7 +65,9 @@ class DVDRingBufferPriv
     bool JumpToTitle(void) { return jumptotitle; }
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (part == 0); }
-    bool EndOfTitle(void)   { return (!titleParts) || (part == (titleParts - 1)); }
+    bool EndOfTitle(void)   { return    ((!titleParts) || 
+                                        (part == (titleParts - 1)) ||
+                                        (titleParts == 1)); }
     int GetCellID(void) { return cellid; }
     int GetVobID(void)  { return vobid; }
     bool IsSameChapter(int tmpcellid, int tmpvobid);

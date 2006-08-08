@@ -253,10 +253,10 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         QString("DVDNAV_CELL_CHANGE: "
                                 "pg_length == %1, pgc_length == %2, "
                                 "cell_start == %3, pg_start == %4, "
-                                "title == %5, part == %6 ")
+                                "title == %5, part == %6 titleParts %7")
                             .arg(pgLength).arg(pgcLength)
                             .arg(cellStart).arg(pgStart)
-                            .arg(title).arg(part));
+                            .arg(title).arg(part).arg(titleParts));
                                 
                 buttonSelected = false;
                 if (gotoCellStart)
