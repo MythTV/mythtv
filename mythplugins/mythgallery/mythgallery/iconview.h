@@ -48,8 +48,6 @@ class IconView : public MythDialog
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
-    bool HandleEscape(void);
-    bool CheckMediaDevices(MediaMonitor*);
 
   private:
     void SetupMediaMonitor(void);
@@ -64,6 +62,14 @@ class IconView : public MythDialog
     bool MoveDown(void);
     bool MoveLeft(void);
     bool MoveRight(void);
+
+    bool HandleEscape(void);
+    bool HandleMediaEscape(MediaMonitor*);
+    bool HandleSubDirEscape(const QString &parent);
+
+    bool HandleItemSelect(const QString &action);
+    bool HandleMediaDeviceSelect(ThumbItem *item);
+    bool HandleImageSelect(const QString &action);
 
     void HandleMainMenu(void);
     void HandleSubMenuMetadata(void);

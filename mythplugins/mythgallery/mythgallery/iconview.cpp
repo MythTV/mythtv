@@ -447,117 +447,15 @@ void IconView::keyPressEvent(QKeyEvent *e)
 
             handled = true;
         }
+        else if (m_inMenu && (action == "SELECT" || action == "PLAY"))
+        {
+            HandleMenuButtonPress();
+            menuHandled = true;
+        }
         else if (action == "SELECT" || action == "PLAY" ||
                  action == "SLIDESHOW" || action == "RANDOMSHOW")
         {
-            if (m_inMenu && (action == "SELECT" || action == "PLAY"))
-            {
-                HandleMenuButtonPress();
-                menuHandled = true;
-            }
-            else {
-                int pos = m_currRow * m_nCols + m_currCol;
-                ThumbItem *item = m_itemList.at(pos);
-                if (!item)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "The impossible happened");
-                    break;
-                }
-
-                QFileInfo fi(item->GetPath());
-
-                // if the selected item is a Media Device
-                // attempt to mount it if it isn't already
-                if (item->GetMediaDevice() && (action == "SELECT" ||
-                                          action == "PLAY"))
-                {
-                    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-                    if (mon && mon->ValidateAndLock(item->GetMediaDevice()))
-                    {
-                        m_currDevice = item->GetMediaDevice();
-
-                        if (!m_currDevice->isMounted())
-                            m_currDevice->mount();
-
-                        item->SetPath(m_currDevice->getMountPath(), true);
-
-                        connect(m_currDevice,
-                                SIGNAL(statusChanged(MediaStatus,
-                                                     MythMediaDevice*)),
-                                SLOT(mediaStatusChanged(MediaStatus,
-                                                        MythMediaDevice*)));
-
-                        mon->Unlock(m_currDevice);
-                    }
-                    else
-                    {
-                        // device was removed
-                        MythPopupBox::showOkPopup(
-                            gContext->GetMainWindow(),
-                            tr("Error"),
-                            tr("The selected device is no longer available"));
-
-                        HandleShowDevices();
-                        m_currRow = 0;
-                        m_currCol = 0;
-                        handled = true;
-                        break;
-                    }
-                }
-
-                if (!handled && item->IsDir() &&
-                    (action == "SELECT" || action == "PLAY"))
-                {
-                    LoadDirectory(item->GetPath(), true);
-                    handled = true;
-                }
-                else
-                {
-                    handled = true;
-
-                    int slideShow = 0;
-                    if (action == "PLAY" || action == "SLIDESHOW")
-                    {
-                        slideShow = 1;
-                    }
-                    else if (action == "RANDOMSHOW")
-                    {
-                        slideShow = 2;
-                    }
-
-#ifdef USING_OPENGL
-                    if (m_useOpenGL)
-                    {
-
-                        if (QGLFormat::hasOpenGL())
-                        {
-                            GLSDialog gv(m_itemList, pos,
-                                         slideShow, m_sortorder,
-                                         gContext->GetMainWindow());
-                            gv.exec();
-                        }
-                        else
-                        {
-                            MythPopupBox::showOkPopup(
-                                gContext->GetMainWindow(),
-                                tr("Error"),
-                                tr("Sorry: OpenGL support not available"));
-                        }
-                    }
-                    else
-#endif
-                    {
-                        SingleView sv(m_itemList, pos, slideShow, m_sortorder,
-                                      gContext->GetMainWindow());
-                        sv.exec();
-                    }
-
-                    // if the user deleted files while in single view mode
-                    // the cached contents of the directory will be out of
-                    // sync, reload the current directory to refresh the view
-                    LoadDirectory(m_currDir, true);
-                }
-            }
+            handled = HandleItemSelect(action);
         }
     }
 
@@ -574,23 +472,141 @@ void IconView::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-bool IconView::CheckMediaDevices(MediaMonitor *mon)
+bool IconView::HandleItemSelect(const QString &action)
 {
+    bool handled = false;
+
+    int pos = m_currRow * m_nCols + m_currCol;
+    ThumbItem *item = m_itemList.at(pos);
+    if (!item)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Item not found at " +
+                QString("%1,%2").arg(m_currRow).arg(m_currCol));
+        return handled;
+    }
+
+    QFileInfo fi(item->GetPath());
+
+    if (action == "SELECT" || action == "PLAY")
+    {
+        // if the selected item is a Media Device
+        // attempt to mount it if it isn't already
+        if (item->GetMediaDevice())
+            handled = HandleMediaDeviceSelect(item);
+
+        if (!handled && item->IsDir())
+        {
+            LoadDirectory(item->GetPath(), true);
+            handled = true;
+        }
+    }
+
+    if (!handled)
+        handled = HandleImageSelect(action);
+
+    return handled;
+}
+
+bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
+{
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon && mon->ValidateAndLock(item->GetMediaDevice()))
+    {
+        m_currDevice = item->GetMediaDevice();
+
+        if (!m_currDevice->isMounted())
+            m_currDevice->mount();
+
+        item->SetPath(m_currDevice->getMountPath(), true);
+
+        connect(m_currDevice,
+                SIGNAL(statusChanged(MediaStatus,
+                                     MythMediaDevice*)),
+                SLOT(mediaStatusChanged(MediaStatus,
+                                        MythMediaDevice*)));
+
+        LoadDirectory(m_currDevice->getMountPath(), true);
+
+        mon->Unlock(m_currDevice);
+    }
+    else
+    {
+        // device was removed
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(),
+            tr("Error"),
+            tr("The selected device is no longer available"));
+
+        HandleShowDevices();
+        m_currRow = 0;
+        m_currCol = 0;
+    }
+
+    return true;
+}
+
+void IconView::HandleSlideShow(void)
+{
+    HandleImageSelect("SLIDESHOW");
+}
+
+void IconView::HandleRandomShow(void)
+{
+    HandleImageSelect("RANDOMSHOW");
+}
+
+bool IconView::HandleImageSelect(const QString &action)
+{
+    int pos = m_currRow * m_nCols + m_currCol;
+    ThumbItem *item = m_itemList.at(pos);
+    if (!item || (item->IsDir() && !m_recurse))
+        return false;
+
+    int slideShow = ((action == "PLAY" || action == "SLIDESHOW") ? 1 : 
+                     (action == "RANDOMSHOW") ? 2 : 0);
+
+#ifdef USING_OPENGL
+    if (m_useOpenGL)
+    {
+        if (QGLFormat::hasOpenGL())
+        {
+            GLSDialog gv(m_itemList, pos,
+                         slideShow, m_sortorder,
+                         gContext->GetMainWindow());
+            gv.exec();
+        }
+        else
+        {
+            MythPopupBox::showOkPopup(
+                gContext->GetMainWindow(),
+                tr("Error"),
+                tr("Sorry: OpenGL support not available"));
+        }
+    }
+    else
+#endif
+    {
+        SingleView sv(m_itemList, pos, slideShow, m_sortorder,
+                      gContext->GetMainWindow());
+        sv.exec();
+    }
+
+    // if the user deleted files while in single view mode
+    // the cached contents of the directory will be out of
+    // sync, reload the current directory to refresh the view
+    LoadDirectory(m_currDir, true);
+
+    return true;
+}
+
+bool IconView::HandleMediaEscape(MediaMonitor *mon)
+{
+    //VERBOSE(VB_IMPORTANT, LOC + "HandleMediaEscape("<<mon<<")");
+
     bool handled = false;
     QDir curdir(m_currDir);
     QValueList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
     QValueList<MythMediaDevice*>::iterator it = removables.begin();
-
-    for (; (it != removables.end()); it++)
-    {
-        if (mon->ValidateAndLock(*it))
-        {
-            VERBOSE(VB_IMPORTANT, "dev: "<<(*it)->getDevicePath());
-            mon->Unlock(*it);
-        }
-    }
-
-    it = removables.begin();
     for (; !handled && (it != removables.end()); it++)
     {
         if (!mon->ValidateAndLock(*it))
@@ -620,26 +636,36 @@ bool IconView::CheckMediaDevices(MediaMonitor *mon)
 
             handled = true;
         }
+        else
+        {
+            handled = HandleSubDirEscape((*it)->getMountPath());
+        }
 
         mon->Unlock(*it);
     }
 
+    //VERBOSE(VB_IMPORTANT, LOC + "HandleMediaEscape() handled: "<<handled);
+
     return handled;
 }
 
-bool IconView::HandleEscape(void)
+static bool is_subdir(const QDir &parent, const QDir &subdir)
 {
-    if (m_showDevices)
-        return false;
+    QString pstr = parent.canonicalPath();
+    QString cstr = subdir.canonicalPath();
+    bool ret = !cstr.find(pstr);
+    //VERBOSE(VB_IMPORTANT, QString("is_subdir(%1,%2) -> %3")
+    //        .arg(pstr).arg(cstr).arg(ret));
+    return ret;
+}
 
+bool IconView::HandleSubDirEscape(const QString &parent)
+{
     bool handled = false;
+
     QDir curdir(m_currDir);
-
-    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-    if (mon)
-        handled = CheckMediaDevices(mon);
-
-    if (!handled && (curdir != QDir(m_galleryDir)))
+    QDir pdir(parent);
+    if ((curdir != pdir) && is_subdir(pdir, curdir))
     {
         QString oldDirName = curdir.dirName();
         curdir.cdUp();
@@ -660,6 +686,35 @@ bool IconView::HandleEscape(void)
 
         handled = true;
     }
+
+    return handled;
+}
+
+bool IconView::HandleEscape(void)
+{
+    //VERBOSE(VB_IMPORTANT, LOC + "HandleEscape() " +
+    //        QString("showDevices: %1").arg(m_showDevices));
+
+    bool handled = false;
+
+    // If we are showing the attached devices, ESCAPE should always exit..
+    if (m_showDevices)
+    {
+        //VERBOSE(VB_IMPORTANT, LOC + "HandleEscape() exiting on showDevices");
+        return false;
+    }
+
+    // If we are viewing an attached device we should show the attached devices
+    MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
+    if (mon)
+        handled = HandleMediaEscape(mon);
+
+    // If we are viewing a subdirectory of the gallery directory, we should
+    // move up the directory tree, otherwise ESCAPE should exit..
+    if (!handled)
+        handled = HandleSubDirEscape(m_galleryDir);
+
+    //VERBOSE(VB_IMPORTANT, LOC + "HandleEscape() handled: "<<handled<<"\n");
 
     return handled;
 }
@@ -859,7 +914,11 @@ void IconView::LoadDirectory(const QString &dir, bool topleft)
 {
     QDir d(dir);
     if (!d.exists())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "LoadDirectory called with " +
+                QString("non-existant directory: '%1'").arg(dir));
         return;
+    }
 
     m_showDevices = false;
 
@@ -867,31 +926,28 @@ void IconView::LoadDirectory(const QString &dir, bool topleft)
     m_itemList.clear();
     m_itemDict.clear();
 
+    m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, m_sortorder,
+                                             false, &m_itemDict, m_thumbGen);
+
+    m_lastRow = max((int)ceilf((float)m_itemList.count() /
+                                (float)m_nCols) - 1, 0);
+    m_lastCol = max(m_itemList.count() - m_lastRow * m_nCols - 1, (uint)0);
+
     if (topleft)
     {
         m_currRow = 0;
         m_currCol = 0;
         m_topRow  = 0;
     }
-    m_lastRow = 0;
-    m_lastCol = 0;
-
-    m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, m_sortorder,
-                                             false, &m_itemDict, m_thumbGen);
-    m_lastRow = max((int)ceilf((float)m_itemList.count() /
-                                (float)m_nCols) - 1, 0);
-    m_lastCol = max(m_itemList.count() - m_lastRow * m_nCols - 1, (uint)0);
-
-    if (!topleft)
+    else
     {
-        if ((uint)(m_currRow * m_nCols + m_currCol) > (m_itemList.count() - 1))
+        uint currIndx = m_currRow * m_nCols + m_currCol;
+        uint lastIndx = m_itemList.count() - 1;
+        if (currIndx > lastIndx)
         {
-            m_currRow = (m_itemList.count()-1) / m_nCols;
-            m_currCol = (m_itemList.count()-1) % m_nCols;
-            if (m_topRow > m_currRow)
-            {
-                m_topRow = m_currRow;
-            }
+            m_currRow = lastIndx / m_nCols;
+            m_currCol = lastIndx % m_nCols;
+            m_topRow  = min(m_topRow, m_currRow);
         }
     }
 }
@@ -1189,73 +1245,6 @@ void IconView::HandleDeleteCurrent(void)
     }
 }
 
-void IconView::HandleSlideShow(void)
-{
-    ThumbItem *item = m_itemList.at(m_currRow * m_nCols + m_currCol);
-    if (!item || (item->IsDir() && !m_recurse))
-        return;
-
-    int pos = m_currRow * m_nCols + m_currCol;
-
-#ifdef USING_OPENGL
-    if (m_useOpenGL)
-    {
-        if (QGLFormat::hasOpenGL())
-        {
-            GLSDialog gv(m_itemList, pos, 1, m_sortorder,
-                         gContext->GetMainWindow());
-            gv.exec();
-        }
-        else {
-            MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(),
-                tr("Error"),
-                tr("Sorry: OpenGL support not available"));
-        }
-    }
-    else
-#endif
-    {
-        SingleView sv(m_itemList, pos, 1, m_sortorder,
-                      gContext->GetMainWindow());
-        sv.exec();
-    }
-}
-
-void IconView::HandleRandomShow(void)
-{
-    ThumbItem *item = m_itemList.at(m_currRow * m_nCols + m_currCol);
-    if (!item || (item->IsDir() && !m_recurse))
-        return;
-
-    int pos = m_currRow * m_nCols + m_currCol;
-
-#ifdef USING_OPENGL
-    if (m_useOpenGL)
-    {
-        if (QGLFormat::hasOpenGL())
-        {
-            GLSDialog gv(m_itemList, pos, 2, m_sortorder,
-                         gContext->GetMainWindow());
-            gv.exec();
-        }
-        else
-        {
-            MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(),
-                tr("Error"),
-                tr("Sorry: OpenGL support not available"));
-        }
-    }
-    else
-#endif
-    {
-        SingleView sv(m_itemList, pos, 2, m_sortorder,
-                      gContext->GetMainWindow());
-        sv.exec();
-    }
-}
-
 void IconView::HandleSettings(void)
 {
     GallerySettings settings;
@@ -1403,6 +1392,10 @@ void IconView::HandleShowDevices(void)
 
     m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
     m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
+
+    // exit from menu on show devices action..
+    m_inMenu = false;
+    update();
 }
 
 void IconView::HandleCopyHere(void)
