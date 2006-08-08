@@ -44,6 +44,8 @@ class IconView : public MythDialog
              MythMainWindow  *parent);
     ~IconView();
 
+    QString GetError(void) { return m_errorStr; }
+
   protected:
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
@@ -51,7 +53,12 @@ class IconView : public MythDialog
 
   private:
     void SetupMediaMonitor(void);
-    void LoadTheme(void);
+
+    bool LoadTheme(void);
+    bool LoadMenuTheme(void);
+    bool LoadViewTheme(void);
+    bool LoadThemeImages(void);
+
     void LoadDirectory(const QString &dir, bool topleft);
 
     void UpdateMenu(void);
@@ -146,6 +153,8 @@ class IconView : public MythDialog
     bool                m_useOpenGL;
     bool                m_recurse;
     QStringList         m_paths;
+
+    QString             m_errorStr;
 
     typedef void (IconView::*MenuAction)(void);
 

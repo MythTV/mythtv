@@ -84,13 +84,28 @@ IconView::IconView(const QString   &galleryDir,
       m_useOpenGL(gContext->GetNumSetting("SlideshowUseOpenGL", 0)),
       m_recurse(gContext->GetNumSetting("GalleryRecursiveSlideshow", 0)),
       m_paths(QStringList::split(
-                  ":", gContext->GetSetting("GalleryImportDirs")))
+                  ":", gContext->GetSetting("GalleryImportDirs"))),
+      m_errorStr(QString::null)
 {
     m_itemList.setAutoDelete(true);
     m_itemDict.setAutoDelete(false);
 
     setNoErase();
-    LoadTheme();
+
+    QDir dir(m_galleryDir);
+    if (!dir.exists() || !dir.isReadable())
+    {
+        m_errorStr = tr("MythGallery Directory '%1' does not exist "
+                        "or is unreadable.").arg(m_galleryDir);
+        return;
+    }
+
+    if (!LoadTheme())
+    {
+        m_errorStr = tr("MythGallery failed to load theme, "
+                        "see console for details.");
+        return;
+    }
 
     SetupMediaMonitor();
 
@@ -753,7 +768,7 @@ void IconView::customEvent(QCustomEvent *e)
 
 }
 
-void IconView::LoadTheme(void)
+bool IconView::LoadTheme(void)
 {
     m_theme = new XMLParse();
     m_theme->SetWMult(wmult);
@@ -790,34 +805,40 @@ void IconView::LoadTheme(void)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         "Unknown element: " << e.tagName());
-                exit(-1);
+                return false;
             }
         }
     }
 
+    return LoadMenuTheme() && LoadViewTheme() && LoadThemeImages();
+}
+
+static UIListBtnType* get_button(LayerSet *container, const QString &name)
+{
+    UIListBtnType *btn = (UIListBtnType*) container->GetType(name);
+    if (!btn)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to get %1 area.").arg(name));
+    }
+    return btn;
+}
+
+bool IconView::LoadMenuTheme(void)
+{
     LayerSet *container = m_theme->GetSet("menu");
     if (!container)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get menu container.");
-        exit(-1);
+        return false;
     }
 
-    m_menuType = (UIListBtnType*) container->GetType("menu");
-    if (!m_menuType)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get menu area.");
-        exit(-1);
-    }
+    m_menuType    = get_button(container, "menu");
+    m_submenuType = get_button(container, "submenu");
+    if (!m_menuType || !m_submenuType)
+        return false;
 
-    m_submenuType = (UIListBtnType*) container->GetType("submenu");
-    if (!m_submenuType)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get submenu area.");
-        exit(-1);
-    }
-
-    // Menu Handles
-
+    // Set Menu Text and Handlers
     UIListBtnTypeItem *item;
     item = new UIListBtnTypeItem(m_menuType, tr("SlideShow"));
     item->setData(new MenuAction(&IconView::HandleSlideShow));
@@ -832,82 +853,67 @@ void IconView::LoadTheme(void)
     item = new UIListBtnTypeItem(m_menuType, tr("Settings"));
     item->setData(new MenuAction(&IconView::HandleSettings));
 
+    // The menu is initially not active
     m_menuType->SetActive(false);
 
-    container = m_theme->GetSet("view");
+    return true;
+}
+
+bool IconView::LoadViewTheme(void)
+{
+    LayerSet *container = m_theme->GetSet("view");
     if (!container)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get view container.");
-        exit(-1);
+        return false;
     }
 
     UIBlackHoleType *bhType = (UIBlackHoleType*) container->GetType("view");
     if (!bhType)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get view area.");
-        exit(-1);
+        return false;
+    }
+}
+
+bool load_pixmap(const QString &name, QPixmap &dest)
+{
+    QImage *img = gContext->LoadScaleImage(name);
+    if (img)
+    {
+        dest = QPixmap(*img);
+        delete img;
+
+        return true;
     }
 
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to load '%1'").arg(name));
+    return false;
+}
+
+bool IconView::LoadThemeImages(void)
+{
+    bool ok = true;
+    ok &= load_pixmap("gallery-back-reg.png",   m_backRegPix);
+    ok &= load_pixmap("gallery-back-sel.png",   m_backSelPix);
+    ok &= load_pixmap("gallery-folder-reg.png", m_folderRegPix);
+    ok &= load_pixmap("gallery-folder-sel.png", m_folderSelPix);
+    ok &= load_pixmap("gallery-mark.png",       m_MrkPix);
+
+    if (ok)
     {
-        QImage *img = gContext->LoadScaleImage("gallery-back-reg.png");
-        if (!img)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to load gallery-back-reg.png");
-            exit(-1);
-        }
-        m_backRegPix = QPixmap(*img);
-        delete img;
-
-        img = gContext->LoadScaleImage("gallery-back-sel.png");
-        if (!img)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to load gallery-back-sel.png");
-            exit(-1);
-        }
-        m_backSelPix = QPixmap(*img);
-        delete img;
-
-        img = gContext->LoadScaleImage("gallery-folder-reg.png");
-        if (!img)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to load gallery-folder-reg.png");
-            exit(-1);
-        }
-        m_folderRegPix = QPixmap(*img);
-        delete img;
-
-        img = gContext->LoadScaleImage("gallery-folder-sel.png");
-        if (!img)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to load gallery-folder-sel.png");
-            exit(-1);
-        }
-        m_folderSelPix = QPixmap(*img);
-        delete img;
-
-        img = gContext->LoadScaleImage("gallery-mark.png");
-        if (!img)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load gallery-mark.png");
-            exit(-1);
-        }
-        m_MrkPix = QPixmap(*img);
-        delete img;
-
         m_thumbW = m_backRegPix.width();
         m_thumbH = m_backRegPix.height();
-        m_nCols  = m_viewRect.width()/m_thumbW - 1;
-        m_nRows  = m_viewRect.height()/m_thumbH - 1;
+        m_nCols  = m_viewRect.width()  / m_thumbW - 1;
+        m_nRows  = m_viewRect.height() / m_thumbH - 1;
         m_spaceW = m_thumbW / (m_nCols + 1);
         m_spaceH = m_thumbH / (m_nRows + 1);
-        
+
         m_thumbGen->setSize((int)(m_thumbW - 10 * wmult), 
                             (int)(m_thumbH - 10 * hmult));
     }
+
+    return ok;
 }
 
 void IconView::LoadDirectory(const QString &dir, bool topleft)

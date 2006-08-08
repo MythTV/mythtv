@@ -25,19 +25,14 @@ int mythplugin_config(void);
 static void run(MythMediaDevice *dev)
 {
     QString startdir = gContext->GetSetting("GalleryDir");
-    QDir dir(startdir);
-    if (!dir.exists() || !dir.isReadable())
-    {
-        DialogBox diag(gContext->GetMainWindow(),
-                       QObject::tr("Gallery Directory does not "
-                                   "exist or is unreadable."));
-        diag.AddButton(QObject::tr("Ok"));
-        diag.exec();
-    }
+    IconView icv(startdir, dev, gContext->GetMainWindow());
+    if (icv.GetError().isEmpty())
+        icv.exec();
     else
     {
-        IconView icv(startdir, dev, gContext->GetMainWindow());
-        icv.exec();
+        DialogBox diag(gContext->GetMainWindow(), icv.GetError());
+        diag.AddButton(QObject::tr("Ok"));
+        diag.exec();
     }
 }
 
