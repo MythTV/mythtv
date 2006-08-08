@@ -50,6 +50,16 @@ public:
 };
 
 
+class RomFavourite: virtual public CheckBoxSetting, virtual public RomSetting {
+public:
+    RomFavourite(QString rom):
+        RomSetting("favorite", rom) {
+        setLabel(QObject::tr("Favorite"));
+        setHelpText(QObject::tr("Rom status as a Favourite"));
+    };
+};
+
+
 
 RomEditDLG::RomEditDLG(QString romname)
 {
@@ -62,7 +72,7 @@ RomEditDLG::RomEditDLG(QString romname)
     group->addChild(new RomYear(romname));
     group->addChild(new RomCountry(romname));
     group->addChild(new RomPublisher(romname));
-
+    group->addChild(new RomFavourite(romname));
     addChild(group);
 }
 
