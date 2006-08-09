@@ -20,7 +20,8 @@ using namespace std;
 // return true if complete or broken
 bool PESPacket::AddTSPacket(const TSPacket* packet)
 {
-    uint tlen = Length() + ((_pesdata-1) - _fullbuffer) + 4 /* CRC bytes */;
+    // +3 = first 3 bytes of pespacket header, not included in Length()
+    uint tlen = Length() + (_pesdata - _fullbuffer) +3;
 
     if (!tsheader()->PayloadStart())
     {
