@@ -28,6 +28,7 @@ using namespace std;
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "tv_play.h"
+#include "bswap.h" // for WORDS_BIGENDIAN
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -35,10 +36,6 @@ extern "C" {
 
 #include "videodev_myth.h"
 #include "go7007_myth.h"
-
-#ifdef WORDS_BIGENDIAN
-#include "bswap.h"
-#endif
 
 #ifndef MJPIOC_S_PARAMS
 #include "videodev_mjpeg.h"
@@ -3099,6 +3096,12 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     lf = fnum;
 }
 
+static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
+{
+    for (int i = 0; i < audio_channels * buf_cnt; i++)
+        buf[i] = bswap_16(buf[i]);
+}
+
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 {
     struct rtframeheader frameheader;
@@ -3153,21 +3156,23 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         int gaplesssize = 0;
         int lameret = 0;
 
+        int sample_cnt = audio_buffer_size / audio_bytes_per_sample;
+
+#ifdef WORDS_BIGENDIAN
+        bswap_16_buf((short int*) buf, sample_cnt, audio_channels);
+#endif
+
         if (audio_channels == 2)
         {
-            lameret = lame_encode_buffer_interleaved(gf, (short int *)buf,
-                                                     audio_buffer_size / 
-                                                     audio_bytes_per_sample,
-                                                     (unsigned char *)mp3buf,
-                                                     mp3buf_size);
+            lameret = lame_encode_buffer_interleaved(
+                gf, (short int*) buf, sample_cnt,
+                (unsigned char*) mp3buf, mp3buf_size);
         }
         else
         {
-            lameret = lame_encode_buffer(gf, (short int *)buf, (short int *)buf,
-                                         audio_buffer_size / 
-                                         audio_bytes_per_sample,
-                                         (unsigned char *)mp3buf,
-                                         mp3buf_size);
+            lameret = lame_encode_buffer(
+                gf, (short int*) buf, (short int*) buf, sample_cnt,
+                (unsigned char*) mp3buf, mp3buf_size);
         }
 
         if (lameret < 0)
