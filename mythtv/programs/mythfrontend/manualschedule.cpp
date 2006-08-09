@@ -106,8 +106,12 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     for(int m_index = 0; m_index <= 60; m_index++)
     {
-        m_startdate->insertItem(m_nowDateTime.addDays(m_index)
-                              .toString(dateformat));
+        QString dinfo = m_nowDateTime.addDays(m_index).toString(dateformat);
+        if (m_nowDateTime.addDays(m_index).date().dayOfWeek() < 6)
+            dinfo += QString(" (%1)").arg(tr("5 weekdays if daily"));
+        else
+            dinfo += QString(" (%1)").arg(tr("7 days per week if daily"));
+        m_startdate->insertItem(dinfo);
         if (m_nowDateTime.addDays(m_index).toString("MMdd") ==
             m_startDateTime.toString("MMdd"))
             m_startdate->setCurrentItem(m_startdate->count() - 1);
