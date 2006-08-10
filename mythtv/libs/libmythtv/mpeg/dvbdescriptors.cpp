@@ -310,7 +310,7 @@ QString FrequencyListDescriptor::toString() const
     QString str = "FrequencyListDescriptor: frequencies: ";
 
     for (uint i = 0; i < FrequencyCount(); i++)
-        str.append(QString(" %1").arg(Frequency(i)));
+        str.append(QString(" %1").arg(FrequencyHz(i)));
 
     return str;
 }
@@ -332,3 +332,49 @@ QString ServiceDescriptor::toString() const
 
     return str;
 }
+
+QString CableDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("CableDeliverySystemDescriptor: ");
+
+    str.append(QString("Frequency: %1\n").arg(FrequencyHz()));
+    str.append(QString("      Mod=%1, SymbR=%2, FECInner=%3, FECOuter=%4")
+        .arg(ModulationString())
+        .arg(SymbolRateHz())
+        .arg(FECInnerString())
+        .arg(FECOuterString()));
+
+    return str;
+}
+
+QString SatelliteDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("SatelliteDeliverySystemDescriptor: ");
+
+    str.append(QString("Frequency: %1\n").arg(FrequencyHz()));
+    str.append(QString("      Mod=%1, SymbR=%2, FECInner=%3, Orbit=%4, Pol=%5")
+        .arg(ModulationString())
+        .arg(SymbolRateHz())
+        .arg(FECInnerString())
+        .arg(OrbitalPositionString())
+        .arg(PolarizationString()));
+
+    return str;
+}
+
+QString TerrestrialDeliverySystemDescriptor::toString() const
+{
+    QString str = QString("TerrestrialDeliverySystemDescriptor: ");
+
+    str.append(QString("Frequency: %1\n").arg(FrequencyHz()));
+    str.append(QString("      BW=%1k, C=%2, HP=%3, LP=%4, GI=%5, TransMode=%6k")
+        .arg(BandwidthString())
+        .arg(ConstellationString())
+        .arg(CodeRateHPString())
+        .arg(CodeRateLPString())
+        .arg(GuardIntervalString())
+        .arg(TransmissionModeString()));
+
+    return str;
+}
+

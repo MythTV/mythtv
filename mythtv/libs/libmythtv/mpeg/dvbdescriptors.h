@@ -557,7 +557,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     };
     uint FECInner() const { return _data[12] & 0xf; }
     QString FECInnerString() const { return coderate_inner(FECInner()); }
-    QString toString() const { return QString("CableDeliverySystemDescriptor(stub)"); }
+    QString toString() const;
 };
 
 class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
@@ -646,7 +646,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint FECInner() const { return _data[12] & 0xf; }
     QString FECInnerString() const { return coderate_inner(FECInner()); }
 
-    QString toString() const { return QString("SatelliteDeliverySystemDescriptor(stub)"); }
+    QString toString() const;
 
 };
 
@@ -789,7 +789,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     bool OtherFrequencyInUse()  const { return _data[8] & 0x1; }
     // reserved_future_use     32   9.0
 
-    QString toString() const { return QString("TerrestrialDeliverySystemDescriptor(stub)"); }
+    QString toString() const;
 };
 
 class DSNGDescriptor : public MPEGDescriptor
