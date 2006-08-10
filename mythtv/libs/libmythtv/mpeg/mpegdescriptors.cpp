@@ -412,6 +412,8 @@ QString MPEGDescriptor::toString() const
         str = AudioStreamDescriptor(_data).toString();
     else if (DescriptorID::caption_service == DescriptorTag())
         str = CaptionServiceDescriptor(_data).toString();
+    else if (DescriptorID::extended_channel_name == DescriptorTag())
+        str = ExtendedChannelNameDescriptor(_data).toString();
     else if (DescriptorID::component_name == DescriptorTag())
         str = ComponentNameDescriptor(_data).toString();
     else if (DescriptorID::conditional_access == DescriptorTag())

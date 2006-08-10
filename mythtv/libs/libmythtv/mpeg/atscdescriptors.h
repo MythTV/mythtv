@@ -338,7 +338,7 @@ class ExtendedChannelNameDescriptor : public MPEGDescriptor
     MultipleStringStructure LongChannelName(void) const;
     QString LongChannelNameString(void) const;
 
-    QString toString() const { return QString("ExtendedChannelNameDescriptor(stub)"); }
+    QString toString() const;
 };
 
 #endif

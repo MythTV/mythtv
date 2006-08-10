@@ -353,3 +353,9 @@ QString ExtendedChannelNameDescriptor::LongChannelNameString(void) const
 
     return str;
 }
+
+QString ExtendedChannelNameDescriptor::toString() const
+{
+    return QString("ExtendedChannelNameDescriptor: '%1'")
+        .arg(LongChannelNameString());
+}
