@@ -874,6 +874,8 @@ bool IconView::LoadViewTheme(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get view area.");
         return false;
     }
+
+    return true;
 }
 
 bool load_pixmap(const QString &name, QPixmap &dest)
