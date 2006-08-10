@@ -28,7 +28,7 @@ using namespace std;
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "tv_play.h"
-#include "bswap.h" // for WORDS_BIGENDIAN
+#include "bswap.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
