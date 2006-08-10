@@ -51,10 +51,6 @@ using namespace std;
 #endif
 
 
-// This is necessary for GCC 3.3, which has llabs(long long) but not abs(...)
-inline  long long  myAbs(long long  n)  { return n >= 0 ? n : -n; }
-
-
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
