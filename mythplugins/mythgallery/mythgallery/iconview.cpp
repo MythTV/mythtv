@@ -611,6 +611,13 @@ bool IconView::HandleImageSelect(const QString &action)
     // sync, reload the current directory to refresh the view
     LoadDirectory(m_currDir, true);
 
+    // reselect current item... or next item if deleted,
+    // or failing that select last item.
+    pos = min((uint)pos, m_itemList.count());
+    m_currRow = pos / m_nCols;
+    m_currCol = pos - (m_currRow * m_nCols);
+    m_topRow  = max(0, m_currRow + 1 - m_nRows);
+
     return true;
 }
 
