@@ -20,9 +20,6 @@ using namespace std;
 // return true if complete or broken
 bool PESPacket::AddTSPacket(const TSPacket* packet)
 {
-    // +3 = first 3 bytes of pespacket header, not included in Length()
-    uint tlen = Length() + (_pesdata - _fullbuffer) +3;
-
     if (!tsheader()->PayloadStart())
     {
         VERBOSE(VB_RECORD, "Error: We started a PES packet, "
@@ -75,14 +72,23 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
     else
     {
         VERBOSE(VB_RECORD, "AddTSPacket: Out of sync!!! "
-                "Need to wait for next payloadStart");
+                "Need to wait for next payloadStart" +
+                QString(" PID: 0x%1, continuity counter: %2 (expected %3).")
+                .arg(packet->PID(),0,16).arg(cc).arg(ccExp));
         return true;
     }
 
-    if (_pesdataSize >= tlen)
+    // check if it's safe to call Length
+    if ((_psiOffset + 1 + 3) <=  _pesdataSize)
     {
-        _badPacket = !VerifyCRC();
-        return true;
+        // +3 = first 3 bytes of pespacket header, not included in Length()
+        uint tlen = Length() + (_pesdata - _fullbuffer) +3;
+
+        if (_pesdataSize >= tlen)
+        {
+            _badPacket = !VerifyCRC();
+            return true;
+        }
     }
 
     return false;

@@ -204,6 +204,18 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     PESPacket* partial = GetPartialPES(tspacket->PID());
     if (partial && partial->AddTSPacket(tspacket))
     {
+        // check if it's safe to read pespacket's Length()
+        if ((partial->PSIOffset() + 1 + 3) > partial->TSSizeInBuffer())
+        {
+            VERBOSE(VB_RECORD,
+                    QString("Discarding broken PES packet. Packet's length at "
+                            "position %1 isn't in the buffer of %2 bytes.")
+                    .arg(partial->PSIOffset() + 1 + 3)
+                    .arg(partial->TSSizeInBuffer()));
+            DeletePartialPES(tspacket->PID());
+            return NULL;
+        }
+
         // Discard broken packets
         bool buggy = _have_CRC_bug &&
         ((TableID::PMT == partial->StreamID()) ||
@@ -242,6 +254,16 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                 return psip;
             }
         }
+        // discard incomplete packets
+        if (packetStart > partial->TSSizeInBuffer())
+        {
+            VERBOSE(VB_RECORD, QString("Discarding broken PES packet. ") +
+                    QString("Packet with %1 bytes doesn't fit "
+                            "into a buffer of %2 bytes.")
+                    .arg(packetStart).arg(partial->TSSizeInBuffer()));
+            delete psip;
+            psip = NULL;
+        }
 
         moreTablePackets = false;
         DeletePartialPES(tspacket->PID());
@@ -275,7 +297,6 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
 
     const unsigned char* pesdata = tspacket->data() + offset;
     const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
-    const PESPacket pes = PESPacket::View(*tspacket);
     if ((pes_length + offset + extra_offset) > 188)
     {
         SavePartialPES(tspacket->PID(), new PESPacket(*tspacket));

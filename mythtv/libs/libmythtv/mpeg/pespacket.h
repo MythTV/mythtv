@@ -30,7 +30,7 @@ class PESPacket
             VERBOSE(VB_IMPORTANT, "Started PESPacket, but !payloadStart()");
             _psiOffset = tspacket.AFCOffset();
         }
-        _pesdata = tspacket.data() + tspacket.AFCOffset() + 1;
+        _pesdata = tspacket.data() + _psiOffset + 1;
 
         _badPacket = true;
         // first check if Length() will return something useful and
