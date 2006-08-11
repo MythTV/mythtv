@@ -252,10 +252,7 @@ bool ClassicCommDetector::go()
     }
     nvp->SetCaptionsEnabled(false);
 
-    unsigned int length = static_cast<unsigned int>(nvp->GetLength());
-    if ((commDetectMethod & COMM_DETECT_LOGO) &&
-        ((length == 0) ||
-         (length > logoDetector->getRequiredAvailableBufferForSearch())))
+    if (commDetectMethod & COMM_DETECT_LOGO)
     {
         emit statusUpdate("Searching for Logo");
 
