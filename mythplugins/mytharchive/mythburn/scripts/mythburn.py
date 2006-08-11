@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060808-2"
+VERSION="0.1.20060811-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -411,7 +411,7 @@ def createVideoChapters(itemnum, numofchapters, lengthofvideo, getthumbnails):
 
     return chapters
 
-def createVideoChapters(segment, lengthofvideo): 
+def createVideoChaptersFixedLength(segment, lengthofvideo): 
     """Returns chapter marks spaced segment seconds through the file"""
     if lengthofvideo < segment:
         return "00:00:00"
@@ -1697,7 +1697,7 @@ def createDVDAuthorXML(screensize, numberofitems):
             if wantChapterMenu:
                 vob.setAttribute("chapters",createVideoChapters(itemnum,chapters,getLengthOfVideo(itemnum),False) )
             else:
-                vob.setAttribute("chapters", createVideoChapters(chapterLength, getLengthOfVideo(itemnum)))
+                vob.setAttribute("chapters", createVideoChaptersFixedLength(chapterLength, getLengthOfVideo(itemnum)))
 
             vob.setAttribute("file",os.path.join(getItemTempPath(itemnum),"final.mpg"))
             pgc.appendChild(vob)
@@ -1835,7 +1835,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.mpg"))
-        vob.setAttribute("chapters", createVideoChapters(chapterLength, getLengthOfVideo(itemNum)))
+        vob.setAttribute("chapters", createVideoChaptersFixedLength(chapterLength, getLengthOfVideo(itemNum)))
         pgc.appendChild(vob)
         del vob
 
