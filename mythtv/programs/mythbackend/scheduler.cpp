@@ -14,6 +14,7 @@ using namespace std;
 #else
 #include <sys/param.h>
 #include <sys/mount.h>
+#include <sys/resource.h>
 #endif
 
 #include <sys/stat.h>
