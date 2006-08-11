@@ -265,13 +265,18 @@ void ViewScheduled::FillList(void)
 
     QDateTime now = QDateTime::currentDateTime();
 
+    QMap<int, int> toomanycounts;
+
     ProgramInfo *p = recList.first();
     while (p)
     {
         if ((p->recendts >= now || p->endts >= now) && 
             (showAll || p->recstatus <= rsWillRecord || 
              p->recstatus == rsDontRecord ||
-             (p->recstatus > rsEarlierShowing && p->recstatus != rsRepeat)))
+             (p->recstatus == rsTooManyRecordings && 
+              ++toomanycounts[p->recordid] <= 1) ||
+             (p->recstatus > rsTooManyRecordings && 
+              p->recstatus != rsRepeat)))
         {
             cardref[p->cardid]++;
             if (p->cardid > maxcard)
