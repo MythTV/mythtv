@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdint.h>
+#include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 using namespace std;
 
 

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstdlib>
+#include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 
 // qt
 #include <qdir.h>
