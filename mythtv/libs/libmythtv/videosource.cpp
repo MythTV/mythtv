@@ -2376,7 +2376,7 @@ void DVBConfigurationGroup::DiSEqCPanel()
 
     DTVDeviceTreeWizard diseqcWiz(tree);
     diseqcWiz.exec();
-    defaultinput->fillSelections(tree.Root() != NULL);
+    defaultinput->fillSelections(DTVDeviceNeedsConfiguration(tree));
 #endif // USING_DVB
 }
 
@@ -2385,7 +2385,7 @@ void DVBConfigurationGroup::load()
     VerticalConfigurationGroup::load();
 #ifdef USING_DVB
     tree.Load(parent.getCardID());
-    defaultinput->fillSelections(tree.Root() != NULL);
+    defaultinput->fillSelections(DTVDeviceNeedsConfiguration(tree));
 #endif
 }
 

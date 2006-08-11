@@ -1071,20 +1071,15 @@ class USALSRotorSetting : public LineEditSetting
 
 bool DTVDeviceNeedsConfiguration(uint cardid)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT type "
-        "FROM diseqc_tree, capturecard "
-        "WHERE capturecard.diseqcid = diseqc_tree.diseqcid AND"
-        "      capturecard.cardid = :CARDID");
-    query.bindValue(":CARDID", cardid);
+    DiSEqCDev dev;
+    DiSEqCDevTree *diseqc_tree = dev.FindTree(cardid);
+    return diseqc_tree ? DTVDeviceNeedsConfiguration(*diseqc_tree) : false;
+}
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("DTVDeviceNeedsConfiguration", query);
-    else if (query.next())
-        return (query.value(0).toString().lower() != "lnb");
-
-    return false;
+bool DTVDeviceNeedsConfiguration(DiSEqCDevTree& tree)
+{
+    DiSEqCDevDevice *root = tree.Root();
+    return (root && root->GetDeviceType() != DiSEqCDevDevice::kTypeLNB);
 }
 
 //////////////////////////////////////// DTVDeviceConfigWizard
