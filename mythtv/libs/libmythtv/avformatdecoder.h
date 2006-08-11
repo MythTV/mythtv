@@ -76,6 +76,7 @@ class AvFormatDecoder : public DecoderBase
                     bool use_null_video_out, bool allow_libmpeg2 = true);
    ~AvFormatDecoder();
 
+    void CloseCodecs();
     void CloseContext();
     void Reset(void);
     void Reset(bool reset_video_data = true, bool seek_reset = true);

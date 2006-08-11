@@ -325,7 +325,7 @@ AvFormatDecoder::~AvFormatDecoder()
         delete [] audioSamples;
 }
 
-void AvFormatDecoder::CloseContext()
+void AvFormatDecoder::CloseCodecs()
 {
     if (ic)
     {
@@ -336,13 +336,22 @@ void AvFormatDecoder::CloseContext()
             if (st->codec->codec)
                 avcodec_close(st->codec);
         }
-
+    }
+}
+    
+void AvFormatDecoder::CloseContext()
+{
+    if (ic)
+    {
+        CloseCodecs();
+        
         ic->iformat->flags |= AVFMT_NOFILE;
 
         av_free(ic->pb.buffer);
         av_close_input_file(ic);
         ic = NULL;
     }
+        
     d->DestroyMPEG2();
     h264_kf_seq->Reset();
 }
@@ -2622,7 +2631,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         !ringBuffer->DVD()->InStillFrame())
                 {
                     av_free_packet(pkt);
-                    av_find_stream_info(ic);
+                    CloseCodecs();
                     ScanStreams(false);
                     allowedquit = true;
                     continue;
