@@ -1355,7 +1355,7 @@ sub MountHDImage
     {
         if (! -e "$SCRIPTDIR/.osx-packager.dmg")
         {
-            Syscall(['hdiutil', 'create', '-size', '1200m',
+            Syscall(['hdiutil', 'create', '-size', '1300m',
                      "$SCRIPTDIR/.osx-packager.dmg", '-volname',
                      'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
         }
