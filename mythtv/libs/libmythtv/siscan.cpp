@@ -1340,6 +1340,19 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
                 QString::null /*inner FEC*/,tuning.ConstellationDB(),
                 tuning.HierarchyChar(),     tuning.HPCodeRateString(),
                 tuning.LPCodeRateString(),  tuning.GuardIntervalString());
+        else if (FE_QPSK == GetDVBChannel()->GetCardType()) 
+            mplexid = ChannelUtil::CreateMultiplex( 
+                (*transport).SourceID,      (*transport).standard, 
+                (*transport).tuning.Frequency(),
+                (*transport).ModulationDB(), 
+                sm->GetDetectedTransportID(), 
+                sm->GetDetectedNetworkID(), 
+                tuning.QPSKSymbolRate(),    -1, 
+                tuning.PolarityChar(),      tuning.InversionChar(), 
+                -1, 
+                tuning.QPSKInnerFECString(),QString::null, 
+                -1,                         QString::null, 
+                QString::null,              QString::null); 
         else
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
