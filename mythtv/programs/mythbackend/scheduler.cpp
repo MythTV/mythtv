@@ -2326,8 +2326,11 @@ void Scheduler::AddNotListed(void) {
 "FROM RECTABLE "
 " INNER JOIN channel ON (channel.chanid = RECTABLE.chanid) "
 " LEFT JOIN recordmatch on RECTABLE.recordid = recordmatch.recordid "
-"WHERE (type = %1 OR type = %2) AND recordmatch.chanid IS NULL")
+"WHERE (type = %1 OR type = %2 OR type = %3 OR type = %4) "
+" AND recordmatch.chanid IS NULL")
         .arg(kSingleRecord)
+        .arg(kTimeslotRecord)
+        .arg(kWeekslotRecord)
         .arg(kOverrideRecord);
 
     while (1)
@@ -2356,6 +2359,8 @@ void Scheduler::AddNotListed(void) {
             .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                   (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
+    QDateTime now = QDateTime::currentDateTime();
+
     while (result.next())
     {
         ProgramInfo *p = new ProgramInfo;
@@ -2368,6 +2373,33 @@ void Scheduler::AddNotListed(void) {
         p->startts.setDate(result.value(4).toDate());
         p->endts.setTime(result.value(5).toTime());
         p->endts.setDate(result.value(6).toDate());
+
+        if (p->rectype == kTimeslotRecord)
+        {
+            int days = p->startts.daysTo(now);
+
+            p->startts = p->startts.addDays(days);
+            p->endts   = p->endts.addDays(days);
+
+            if (p->endts < now)
+            {
+                p->startts = p->startts.addDays(1);
+                p->endts   = p->endts.addDays(1);
+            }
+        }
+        else if (p->rectype == kWeekslotRecord)
+        {
+            int weeks = (p->startts.daysTo(now) + 6) / 7; 
+
+            p->startts = p->startts.addDays(weeks * 7);
+            p->endts   = p->endts.addDays(weeks * 7);
+
+            if (p->endts < now)
+            {
+                p->startts = p->startts.addDays(7);
+                p->endts   = p->endts.addDays(7);
+            }
+        }
 
         p->recstartts = p->startts.addSecs(result.value(7).toInt() * -60);
         p->recendts = p->endts.addSecs(result.value(8).toInt() * 60);
@@ -2387,9 +2419,12 @@ void Scheduler::AddNotListed(void) {
         }
 
         p->title = QString::fromUtf8(result.value(9).toString());
-        p->subtitle = QString::fromUtf8(result.value(10).toString());
-        p->description = QString::fromUtf8(result.value(11).toString());
 
+        if (p->rectype == kSingleRecord || p->rectype == kOverrideRecord)
+        {
+            p->subtitle = QString::fromUtf8(result.value(10).toString());
+            p->description = QString::fromUtf8(result.value(11).toString());
+        }
         p->chanstr = result.value(12).toString();
         p->chansign = QString::fromUtf8(result.value(13).toString());
         p->channame = QString::fromUtf8(result.value(14).toString());
