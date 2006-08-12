@@ -172,7 +172,7 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID8) ||
             (dir.vendor_id == DCT6200_VENDOR_ID9) ||
             (dir.vendor_id == DCT6200_VENDOR_ID10) ||
-           (dir.vendor_id == DCT6200_VENDOR_ID11) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID11) ||
             (dir.vendor_id == DCT6412_VENDOR_ID1)) &&
            ((dir.model_id == DCT6200_MODEL_ID1) ||
             (dir.model_id == DCT6200_MODEL_ID2) ||
