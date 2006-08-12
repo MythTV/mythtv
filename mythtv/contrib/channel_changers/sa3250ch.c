@@ -4,6 +4,7 @@
  * 
  * Copyright 2004,2005 by Stacey D. Son <mythdev@son.org> 
  * Copyright 2005 Matt Porter <mporter@kernel.crashing.org>
+ * Portions Copyright 2006 Chris Ingrassia <chris@spicecoffee.org> (SA4200 and Single-digit command mode)
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +28,15 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* SA3250HD IDs */
-#define SA3250HD_VENDOR_ID	0x000011e6
+#define SA3250HD_VENDOR_ID1     0x000011e6
 #define SA3250HD_VENDOR_ID2     0x000014f8
-#define SA3250HD_MODEL_ID	0x00000be0
+#define SA3250HD_VENDOR_ID3     0x00001692
+#define SA3250HD_MODEL_ID1      0x00000be0
+#define SA4200HD_VENDOR_ID1     0x000014f8
+#define SA4200HD_MODEL_ID1      0x00001072
 
 #define AVC1394_SA3250_COMMAND_CHANNEL 0x000007c00   /* subunit command */
 #define AVC1394_SA3250_OPERAND_KEY_PRESS 0xe7
@@ -46,7 +51,9 @@
 
 void usage()
 {
-   fprintf(stderr, "Usage: sa3250ch [-v] <channel_num>\n");
+   fprintf(stderr, "Usage: sa3250ch [-v] [-s] <channel_num>\n");
+   fprintf(stderr, "  -v : Verbose Mode\n");
+   fprintf(stderr, "  -s : Send command as single digit (for SA4200 and some SA3250s)\n");
    exit(1);
 }
 
@@ -54,6 +61,7 @@ int main (int argc, char *argv[])
 {
    rom1394_directory dir;
    int device = -1;
+   int single = 0;
    int i;
    int verbose = 0;
    quadlet_t cmd[3];
@@ -63,12 +71,23 @@ int main (int argc, char *argv[])
    if (argc < 2) 
       usage();
 
-   if (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'v') {
-      verbose = 1;
-      chn = atoi(argv[2]);
-   } else {
-      chn = atoi(argv[1]);
-   }
+  for(i = 1; i < argc; ++i) {
+      if ((argv[i][0] == '-') && (strlen(argv[i]) > 1)) {
+        switch(argv[i][1]) {
+            case 'v':
+                verbose = 1;
+                break;
+            case 's':
+                single = 1;
+                break;
+            default:
+                fprintf(stderr, "WARNING: Unknown option \'%c\', ignoring", argv[i][1]);
+        }
+      }
+      else {
+          chn = atoi(argv[i]);
+      }
+  }
 
 #ifdef RAW1394_V_0_8
    raw1394handle_t handle = raw1394_get_handle();
@@ -104,9 +123,12 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 		
-      if ((dir.vendor_id == SA3250HD_VENDOR_ID ||
-           dir.vendor_id == SA3250HD_VENDOR_ID2)  &&
-          (dir.model_id == SA3250HD_MODEL_ID)) {
+      if ( ((dir.vendor_id == SA4200HD_VENDOR_ID1) &&
+	    (dir.model_id == SA4200HD_MODEL_ID1))  ||
+          (((dir.vendor_id == SA3250HD_VENDOR_ID1) ||
+            (dir.vendor_id == SA3250HD_VENDOR_ID2) ||
+            (dir.vendor_id == SA3250HD_VENDOR_ID3)) &&
+            (dir.model_id == SA3250HD_MODEL_ID1))) {
             device = i;
             break;
       }
@@ -118,28 +140,44 @@ int main (int argc, char *argv[])
         exit(1);
    }
 
-   dig[2] = 0x30 | (chn % 10);
-   dig[1] = 0x30 | ((chn % 100)  / 10);
-   dig[0] = 0x30 | ((chn % 1000) / 100);
+   if (single) {
+       /* Send channel as single number for SA4200 and some SA3250s */
+       if (verbose)
+        printf("Using single number channel change command method\n");
+        
+       cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS;
+       cmd[1] = CTL_CMD1 | (chn << 8);
+       cmd[2] = 0x0;
 
-   cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS;
-   cmd[1] = CTL_CMD1 | (dig[2] << 16) | (dig[1] << 8) | dig[0];
-   cmd[2] = CTL_CMD2;
+       if (verbose)
+            printf("AV/C Command: cmd0=0x%08x cmd1=0x%08x cmd2=0x%08x\n",
+                   cmd[0], cmd[1], cmd[2]);
+       avc1394_transaction_block(handle, 0, cmd, 3, 1);       
+   } else {
+       /* Default method sending three seperate digits */
+       dig[2] = 0x30 | (chn % 10);
+       dig[1] = 0x30 | ((chn % 100)  / 10);
+       dig[0] = 0x30 | ((chn % 1000) / 100);
 
-   if (verbose)
-      printf("AV/C Command: %d%d%d = cmd0=0x%08x cmd2=0x%08x cmd3=0x%08x\n", 
-            dig[0] & 0xf, dig[1] & 0xf, dig[2] & 0xf, cmd[0], cmd[1], cmd[2]);
+       cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS;
+       cmd[1] = CTL_CMD1 | (dig[2] << 16) | (dig[1] << 8) | dig[0];
+       cmd[2] = CTL_CMD2;
 
-   avc1394_transaction_block(handle, 0, cmd, 3, 1);
-   cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
-   cmd[1] = CTL_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
-   cmd[2] = CTL_CMD2;
+       if (verbose)
+          printf("AV/C Command: %d%d%d = cmd0=0x%08x cmd2=0x%08x cmd3=0x%08x\n", 
+                dig[0] & 0xf, dig[1] & 0xf, dig[2] & 0xf, cmd[0], cmd[1], cmd[2]);
 
-   if (verbose)
-      printf("AV/C Command: %d%d%d = cmd0=0x%08x cmd2=0x%08x cmd3=0x%08x\n", 
-            dig[0] & 0xf, dig[1] & 0xf, dig[2] & 0xf, cmd[0], cmd[1], cmd[2]);
+       avc1394_transaction_block(handle, 0, cmd, 3, 1);
+       cmd[0] = CTL_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
+       cmd[1] = CTL_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
+       cmd[2] = CTL_CMD2;
 
-   avc1394_transaction_block(handle, 0, cmd, 3, 1);
+       if (verbose)
+          printf("AV/C Command: %d%d%d = cmd0=0x%08x cmd2=0x%08x cmd3=0x%08x\n", 
+                dig[0] & 0xf, dig[1] & 0xf, dig[2] & 0xf, cmd[0], cmd[1], cmd[2]);
+
+       avc1394_transaction_block(handle, 0, cmd, 3, 1);
+   }
 
    raw1394_destroy_handle(handle);
 
