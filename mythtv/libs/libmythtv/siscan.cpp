@@ -376,7 +376,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
                                   bool wait_until_complete)
 {
     const DVBStreamData &dsd = (const DVBStreamData &)(*sd);
-    if (wait_until_complete && !dsd.HasCachedSDT() && !dsd.HasCachedAllNIT())
+    if (wait_until_complete && !(dsd.HasCachedSDT() && dsd.HasCachedAllNIT()))
         return;
 
     emit ServiceScanUpdateText(tr("Updating Services"));
@@ -621,6 +621,7 @@ bool SIScan::Tune(const transport_scan_items_it_t transport)
     {
         // always wait for rotor to finish
         GetDVBSignalMonitor()->AddFlags(kDVBSigMon_WaitForPos);
+        GetDVBSignalMonitor()->SetRotorTarget(1.0f);
 
         if (item.mplexid > 0)
         {
