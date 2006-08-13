@@ -828,7 +828,7 @@ void ProgramRecPriority::countMatches()
     ProgramInfo *s;
     for (s = schedList.first(); s; s = schedList.next())
     {
-        if (s->recendts > now)
+        if (s->recendts > now && s->recstatus != rsNotListed)
         {
             listMatch[s->recordid]++;
             if (s->recstatus == rsConflict ||
