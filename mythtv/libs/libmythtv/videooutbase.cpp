@@ -529,10 +529,11 @@ QRect VideoOutput::GetVisibleOSDBounds(
         float xs = (db_scale_horiz > 0.0f) ? db_scale_horiz : 0.0f;
         float ys = (db_scale_vert > 0.0f) ? db_scale_vert : 0.0f;
         QPoint s((int)(v.width() * xs), (int)(v.height() * ys));
-        tl += s*0.5f;
-        br -= s*1.5f;
+        tl += s;
+        br -= s;
     }
-    QRect vb(tl, br);
+    // Work around Qt bug, QRect(QPoint(0,0), QPoint(0,0)) has area 1.
+    QRect vb(tl.x(), tl.y(), br.x() - tl.x(), br.y() - tl.y());
 
     // The calculation is completely bogus if the video is not centered
     // which happens in the EPG, where we don't actually care about the OSD.
