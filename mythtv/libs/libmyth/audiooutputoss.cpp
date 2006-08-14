@@ -106,11 +106,6 @@ bool AudioOutputOSS::OpenDevice()
                        .arg(audio_bits));
     }
 
-#ifdef AFMT_AC3
-    if (audio_passthru)
-        format = AFMT_AC3;
-#endif
-
     if (audio_channels > 2)
     {
         if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
