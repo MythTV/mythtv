@@ -564,7 +564,7 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
   
     QString filename = QString(mrl);
     QFile checkFile(filename);
-    if (!checkFile.exists() && !filename.contains("dvd"))
+    if (!checkFile.exists() && !filename.startsWith("dvd:"))
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
                                         "Check if the video exists")
@@ -594,7 +594,10 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     pginfo->isVideo = true;
     pginfo->pathname = mrl;
     
-    if (pginfo->pathname.find(".iso", 0, false) != -1)
+    QDir d(filename + "/VIDEO_TS");
+    if (filename.findRev(".iso", -1, false) == filename.length() - 4 ||
+        filename.findRev(".img", -1, false) == filename.length() - 4 ||
+        d.exists())
     {
         pginfo->pathname = QString("dvd:%1").arg(mrl);
     }
