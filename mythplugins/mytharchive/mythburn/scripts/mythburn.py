@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060811-1"
+VERSION="0.1.20060815-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1015,11 +1015,11 @@ def preProcessFile(file, folder):
     if doesFileExist(mediafile) == False:
         fatalError("Source file does not exist: " + mediafile)
 
+    if file.hasAttribute("localfilename"):
+        mediafile = file.attributes["localfilename"].value
+
     #write( "Original file is",os.path.getsize(mediafile),"bytes in size")
     getFileInformation(file, os.path.join(folder, "info.xml"))
-
-    if file.hasAttribute("localfilename"):
-   	    mediafile = file.attributes["localfilename"].value
 
     getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
 
@@ -2722,7 +2722,9 @@ def processFile(file, folder):
 
     mediafile=""
 
-    if file.attributes["type"].value=="recording":
+    if file.hasAttribute("localfilename"):
+        mediafile=file.attributes["localfilename"].value
+    elif file.attributes["type"].value=="recording":
         mediafile = os.path.join(recordingpath, file.attributes["filename"].value)
     elif file.attributes["type"].value=="video":
         mediafile=os.path.join(videopath, file.attributes["filename"].value)
