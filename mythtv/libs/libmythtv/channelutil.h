@@ -14,11 +14,11 @@ class DBChannel
   public:
     DBChannel(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
-              uint _favorite,
+              uint _favorite, bool _visible,
               const QString &_name, const QString &_icon) :
         channum(_channum), callsign(_callsign), chanid(_chanid),
         major_chan(_major_chan), minor_chan(_minor_chan),
-        favorite(_favorite),
+        favorite(_favorite), visible(_visible),
         name(_name), icon(_icon) {}
 
     bool operator == (uint _chanid) const
@@ -30,6 +30,7 @@ class DBChannel
     uint    major_chan;
     uint    minor_chan;
     uint    favorite;
+    bool    visible;
     QString name;
     QString icon;
 };

@@ -1265,7 +1265,7 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
     QString qstr =
         "SELECT channum, callsign, chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
-        "       name, icon "
+        "       name, icon, visible "
         "FROM channel ";
 
     if (sourceid)
@@ -1300,6 +1300,7 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
             query.value(3).toUInt(),                      /* ATSC major */
             query.value(4).toUInt(),                      /* ATSC minor */
             favorites[query.value(2).toUInt()],           /* favid      */
+            query.value(7).toBool(),                      /* visible    */
             QString::fromUtf8(query.value(5).toString()), /* name       */
             query.value(6).toString());                   /* icon       */
 
@@ -1392,7 +1393,35 @@ uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
     if (it == sorted.end())
         return 0; // no channels..
 
-    if (CHANNEL_DIRECTION_DOWN == direction)
+    bool skip_non_visible = true; // TODO make DB selectable
+    if (skip_non_visible)
+    {
+        DBChanList::const_iterator start = it;
+        if (CHANNEL_DIRECTION_DOWN == direction)
+        {
+            do
+            {
+                if (it == sorted.begin())
+                {
+                    it = find(sorted.begin(), sorted.end(),
+                              sorted.rbegin()->chanid);
+                }
+                else
+                {
+                    it--;
+                }
+            } while ((it != start) && !it->visible);
+        }
+        else if (CHANNEL_DIRECTION_UP == direction)
+        {
+            do
+            {
+                it++;
+                it = (it == sorted.end()) ? sorted.begin() : it;
+            } while ((it != start) && !it->visible);
+        }
+    }
+    else if (CHANNEL_DIRECTION_DOWN == direction)
     {
         if (it == sorted.begin())
             return sorted.rbegin()->chanid;
@@ -1401,21 +1430,20 @@ uint ChannelUtil::GetNextChannel(const DBChanList &sorted,
     else if (CHANNEL_DIRECTION_UP == direction)
     {
         it++;
-        if (it == sorted.end())
-            it = sorted.begin();
+        it = (it == sorted.end()) ? sorted.begin() : it;
     }
     else if (CHANNEL_DIRECTION_FAVORITE == direction)
     {
         DBChanList::const_iterator it_orig = it;
         for (;;++it)
         {
-            if (it == sorted.end())
-                it = sorted.begin();
+            it = (it == sorted.end()) ? sorted.begin() : it;
 
             if (it == it_orig)
             {
                 if (!it->favorite)
                     ++it;
+                it = (it == sorted.end()) ? sorted.begin() : it;
                 break; // no (other?) favorites
             }
 
