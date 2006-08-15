@@ -777,7 +777,7 @@ void OSDTypeTeletext::DrawRect(OSDSurface *surface, const QRect rect) const
             buf_a[i] = m_bgcolor_a;
         }
 
-        if (!(y & 1))
+        if (!(j & 1))
         {
             for (int k = 0; k < dx; k++)
             {
