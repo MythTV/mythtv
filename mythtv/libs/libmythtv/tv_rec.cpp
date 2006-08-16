@@ -1696,6 +1696,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
                 GetDTVRecorder()->SetStreamData(asd);
         }
 
+        asd->Reset(major, minor);
         sm->SetStreamData(sd);
         sm->SetChannel(major, minor);
         sd->SetVideoStreamsRequired(1);
@@ -1752,6 +1753,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         bool fta = CardUtil::IgnoreEncrypted(
             GetCaptureCardNum(), channel->GetCurrentInput());
 
+        dsd->Reset(netid, tsid, progNum);
         sm->SetStreamData(sd);
         sm->SetDVBService(netid, tsid, progNum);
         sd->SetVideoStreamsRequired(neededVideo);
@@ -1792,6 +1794,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         bool fta = CardUtil::IgnoreEncrypted(
             GetCaptureCardNum(), channel->GetCurrentInput());
 
+        sd->Reset(progNum);
         sm->SetStreamData(sd);
         sm->SetProgramNumber(progNum);
         sd->SetVideoStreamsRequired(1);
