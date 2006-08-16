@@ -1785,6 +1785,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     }
     XJ_shm_infos.clear();
     xv_buffers.clear();
+    XJ_yuv_infos.clear();
     XJ_non_xv_image = NULL;
 
 #ifdef USING_XVMC
