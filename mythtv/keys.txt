@@ -40,6 +40,7 @@ Watching TV or a recording
       While Picture Adjustment is on-screen, use Left and Right arrows
       to adjust. These settings adjust the look of the video playback,
       and are independent of the G-key settings used at record-time.
+      The Xv picture controls must be enabled in the Playback settings.
 - U   Increase the play speed [muted]
 - J   Decrease the play speed [muted]
 - A   Adjust time stretch (speed up or slow down play speed [with audio])
@@ -96,21 +97,24 @@ With the video paused:
 
 Watching TV only:
 
-- 0-9 Enter a channel number...
-      If the channel is not unique or smart channel change is disabled
-      press Return/OK when done, to commit the channel change.
-- G   Rotate between the various Picture Adjustments (Colour, Hue, etc.)
-      for recording.  These values affect the look of the resulting .nuv file,
-      and are independent of the playback picture settings. While Picture 
-      Adjustment is on-screen, use Left and Right arrows to adjust.
-- H   Channel history. Each repeat steps back through the previous channels.
-- O   Turns on 'Browse' mode, allowing user to browse channels and program
-      info while watching current show FullScreen.
-- /   Change to the next "favorite" channel
-- ?   Mark/Unmark the current channel as a "favorite" channel
-- Y   Switch Capture Cards
-- C   Change inputs on TV Tuner card
-- F7  Monitor signal on a card capable of signal monitoring.
+- 0-9    Enter a channel number...
+         If the channel is not unique or smart channel change is disabled
+         press Return/OK when done, to commit the channel change.
+- G      Rotate between the various Picture Adjustments (Colour, Hue, etc.)
+         for recording.  These values affect the look for all recordings made
+         with the current capture card and are independent of the playback
+         picture settings. While Picture Adjustment is on-screen, use Left and
+         Right arrows to adjust.
+- Ctrl-G The same as G, except it affects the look for all recordings made
+         on the current channel, independent of the capture card used.
+- H      Channel history. Each repeat steps back through the previous channels.
+- O      Turns on 'Browse' mode, allowing user to browse channels and program
+         info while watching current show FullScreen.
+- /      Change to the next "favorite" channel
+- ?      Mark/Unmark the current channel as a "favorite" channel
+- Y      Switch capture cards
+- C      Change inputs on current capture card
+- F7     Monitor signal quality on a card capable of signal monitoring
 
 LiveTV while not in Browse Mode:
 - Up/Down arrows  Change the channel.

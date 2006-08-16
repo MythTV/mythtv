@@ -381,6 +381,8 @@ bool TV::Init(bool createWindow)
     baseFilters         += gContext->GetSetting("CustomFilters");
     db_time_format       = gContext->GetSetting("TimeFormat", "h:mm AP");
     db_short_date_format = gContext->GetSetting("ShortDateFormat", "M/d");
+    db_use_picture_attr  = gContext->GetNumSetting(
+                            "UseOutputPictureControls", 0);
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
     arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
@@ -5534,6 +5536,9 @@ void TV::DoTogglePictureAttribute(int itype)
 {
     PictureAdjustType type = (PictureAdjustType) itype;
 
+    if (!db_use_picture_attr && kAdjustingPicture_Playback == type)
+        return;
+
     adjustingPicture = type;
 
     adjustingPictureAttribute += 1;
@@ -6414,23 +6419,26 @@ void TV::BuildOSDTreeMenu(void)
                                  (letterbox == kLetterbox_16_9_Stretch) ? 1 : 0,
                                  NULL, "ASPECTGROUP");
 
-    item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
-    subitem = new OSDGenericTree(item, tr("Brightness"),
-                                 "TOGGLEPICCONTROLS" +
-                                 QString("%1")
-                                 .arg(kPictureAttribute_Brightness));
-    subitem = new OSDGenericTree(item, tr("Contrast"),
-                                 "TOGGLEPICCONTROLS" +
-                                 QString("%1")
-                                 .arg(kPictureAttribute_Contrast));
-    subitem = new OSDGenericTree(item, tr("Colour"),
-                                 "TOGGLEPICCONTROLS" +
-                                 QString("%1")
-                                 .arg(kPictureAttribute_Colour));
-    subitem = new OSDGenericTree(item, tr("Hue"),
-                                 "TOGGLEPICCONTROLS" +
-                                 QString("%1")
-                                 .arg(kPictureAttribute_Hue));
+    if (db_use_picture_attr)
+    {
+        item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
+        subitem = new OSDGenericTree(item, tr("Brightness"),
+                                     "TOGGLEPICCONTROLS" +
+                                     QString("%1")
+                                     .arg(kPictureAttribute_Brightness));
+        subitem = new OSDGenericTree(item, tr("Contrast"),
+                                     "TOGGLEPICCONTROLS" +
+                                     QString("%1")
+                                     .arg(kPictureAttribute_Contrast));
+        subitem = new OSDGenericTree(item, tr("Colour"),
+                                     "TOGGLEPICCONTROLS" +
+                                     QString("%1")
+                                     .arg(kPictureAttribute_Colour));
+        subitem = new OSDGenericTree(item, tr("Hue"),
+                                     "TOGGLEPICCONTROLS" +
+                                     QString("%1")
+                                     .arg(kPictureAttribute_Hue));
+    }
 
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
                              "TOGGLEMANUALZOOM");
