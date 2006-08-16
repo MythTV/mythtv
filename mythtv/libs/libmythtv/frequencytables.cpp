@@ -372,7 +372,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         FREQ(modStr[i], "cable3", desc[i], "Channel %1",
              14,  123000000,  171000000, mod[i]); // 14-22
         FREQ(modStr[i], "cable4", desc[i], "Channel %1",
-             23,  219000000,  495000000, mod[i]); // 23-94
+             23,  219000000,  645000000, mod[i]); // 23-94
         FREQ(modStr[i], "cable5", desc[i], "Channel %1",
              95,   93000000,  117000000, mod[i]); // 95-99
         FREQ(modStr[i], "cable6", desc[i], "Channel %1",
