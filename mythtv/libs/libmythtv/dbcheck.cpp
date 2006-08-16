@@ -2254,7 +2254,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1141")
     {
         const QString updates[] = {
-"CREATE TABLE customexample ("
+"CREATE TABLE IF NOT EXISTS customexample ("
 "  rulename VARCHAR(64) NOT NULL PRIMARY KEY, "
 "  fromclause text NOT NULL DEFAULT '',"
 "  whereclause text NOT NULL DEFAULT ''"
@@ -2418,7 +2418,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  offset varchar(32) default NULL,"
 "  type int(11) NOT NULL default '0',"
 "  PRIMARY KEY  (chanid,starttime,type,mark));",
-"INSERT INTO recordedseek (chanid, starttime, mark, offset, type) SELECT"
+"INSERT IGNORE INTO recordedseek (chanid, starttime, mark, offset, type) SELECT"
 " chanid, starttime, mark, offset, type FROM recordedmarkup WHERE type in (6, 7, 9);",
 "DELETE FROM recordedmarkup WHERE type in (6, 7, 9);",
 "",
