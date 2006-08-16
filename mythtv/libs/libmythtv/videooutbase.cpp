@@ -1365,9 +1365,11 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
 
     switch (frame->codec)
     {
-        case FMT_YV12:
+        case FMT_YV12: // works for YUV & YVU 420 formats due to offsets
         {
-            surface->BlendToYV12(frame->buf);
+            surface->BlendToYV12(frame->buf + frame->offsets[0],
+                                 frame->buf + frame->offsets[1],
+                                 frame->buf + frame->offsets[2]);
             break;
         }
         case FMT_AI44:

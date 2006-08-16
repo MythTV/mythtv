@@ -15,6 +15,7 @@
 #include <sys/shm.h>
 #include <X11/keysym.h>
 
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
@@ -99,7 +100,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
-      xv_chroma(0),     xv_color_conv_buf(NULL),
+      xv_chroma(0),
 
       chroma_osd(NULL)
 {
@@ -199,8 +200,7 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect,
     if (!res_changed && !cid_changed)
     {
         if (VideoOutputSubType() == XVideo)
-            clear_xv_buffers(vbuffers, video_dim.width(), video_dim.height(),
-                             xv_chroma);
+            vbuffers.Clear(xv_chroma);
         if (asp_changed)
             MoveResize();
         return;
@@ -1500,13 +1500,9 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             .arg(num).arg(video_dim.width()).arg(video_dim.height()));
 
     vector<unsigned char*> bufs;
-    XShmSegmentInfo blank;
-    // for now make reserve big enough to avoid realloc.. 
-    // we should really have vector of pointers...
-    XJ_shm_infos.reserve(max(num + 32, (uint)128));
     for (uint i = 0; i < num; i++)
     {
-        XJ_shm_infos.push_back(blank);
+        XShmSegmentInfo *info = new XShmSegmentInfo;
         void *image = NULL;
         int size = 0;
         int desiredsize = 0;
@@ -1515,10 +1511,11 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 
         if (use_xv)
         {
-            image = XvShmCreateImage(XJ_disp, xv_port, xv_chroma, 0, 
-                                     video_dim.width(), video_dim.height(),
-                                     &XJ_shm_infos[i]);
-            size = ((XvImage*)image)->data_size + 64;
+            XvImage *img =
+                XvShmCreateImage(XJ_disp, xv_port, xv_chroma, 0, 
+                                 video_dim.width(), video_dim.height(), info);
+            size = img->data_size + 64;
+            image = img;
             desiredsize = video_dim.width() * video_dim.height() * 3 / 2;
 
             if (image && size < desiredsize)
@@ -1528,13 +1525,37 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                         "requested size.");
                 XFree(image);
                 image = NULL;
+                delete info;
+            }
+
+            if (image && (3 == img->num_planes))
+            {
+                XJ_shm_infos.push_back(info);
+                YUVInfo tmp(img->width, img->height, img->data_size,
+                            img->pitches, img->offsets);
+                if (xv_chroma == GUID_YV12_PLANAR)
+                {
+                    swap(tmp.pitches[1], tmp.pitches[2]);
+                    swap(tmp.offsets[1], tmp.offsets[2]);
+                }
+
+                XJ_yuv_infos.push_back(tmp);
+            }
+            else if (image)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                        "XvShmCreateImage() failed to create image "
+                        "with the correct number of pixel planes.");
+                XFree(image);
+                image = NULL;
+                delete info;
             }
         }
         else
         {
             XImage *img =
                 XShmCreateImage(XJ_disp, DefaultVisual(XJ_disp, XJ_screen_num),
-                                XJ_depth, ZPixmap, 0, &XJ_shm_infos[i],
+                                XJ_depth, ZPixmap, 0, info,
                                 display_visible_rect.width(),
                                 display_visible_rect.height());
             size = img->bytes_per_line * img->height + 64;
@@ -1548,6 +1569,14 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                         "requested size.");
                 XDestroyImage((XImage *)image);
                 image = NULL;
+                delete info;
+            }
+
+            if (image)
+            {
+                YUVInfo tmp(img->width, img->height,
+                            img->bytes_per_line * img->height, NULL, NULL);
+                XJ_yuv_infos.push_back(tmp);
             }
         }
 
@@ -1555,27 +1584,28 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 
         if (image)
         {
-            XJ_shm_infos[i].shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
-            if (XJ_shm_infos[i].shmid >= 0)
+            XJ_shm_infos[i]->shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
+            if (XJ_shm_infos[i]->shmid >= 0)
             {
-                XJ_shm_infos[i].shmaddr = (char*) shmat(XJ_shm_infos[i].shmid, 0, 0);
+                XJ_shm_infos[i]->shmaddr = (char*)
+                    shmat(XJ_shm_infos[i]->shmid, 0, 0);
                 if (use_xv)
-                    ((XvImage*)image)->data = XJ_shm_infos[i].shmaddr;
+                    ((XvImage*)image)->data = XJ_shm_infos[i]->shmaddr;
                 else
-                    ((XImage*)image)->data = XJ_shm_infos[i].shmaddr;
-                xv_buffers[(unsigned char*) XJ_shm_infos[i].shmaddr] = image;
-                XJ_shm_infos[i].readOnly = False;
+                    ((XImage*)image)->data = XJ_shm_infos[i]->shmaddr;
+                xv_buffers[(unsigned char*) XJ_shm_infos[i]->shmaddr] = image;
+                XJ_shm_infos[i]->readOnly = False;
 
                 X11L;
-                XShmAttach(XJ_disp, &XJ_shm_infos[i]);
+                XShmAttach(XJ_disp, XJ_shm_infos[i]);
                 XSync(XJ_disp, False); // needed for FreeBSD?
                 X11U;
 
                 // Mark for delete immediately.
                 // It won't actually be removed until after we detach it.
-                shmctl(XJ_shm_infos[i].shmid, IPC_RMID, 0);
+                shmctl(XJ_shm_infos[i]->shmid, IPC_RMID, 0);
 
-                bufs.push_back((unsigned char*) XJ_shm_infos[i].shmaddr);
+                bufs.push_back((unsigned char*) XJ_shm_infos[i]->shmaddr);
             }
             else
             { 
@@ -1605,15 +1635,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         vector<unsigned char*> bufs = 
             CreateShmImages(vbuffers.allocSize(), true);
         ok = vbuffers.CreateBuffers(
-            video_dim.width(), video_dim.height(), bufs);
-
-        clear_xv_buffers(vbuffers, video_dim.width(), video_dim.height(),
-                         xv_chroma);
+            video_dim.width(), video_dim.height(), bufs, XJ_yuv_infos);
 
         X11S(XSync(XJ_disp, False));
-        if (xv_chroma != GUID_I420_PLANAR)
-            xv_color_conv_buf = new unsigned char[
-                video_dim.width() * video_dim.height() * 3 / 2];
     }
     else if (subtype == XShm || subtype == Xlib)
     {
@@ -1727,12 +1751,6 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 
     vbuffers.DeleteBuffers();
 
-    if (xv_color_conv_buf)
-    {
-        delete [] xv_color_conv_buf;
-        xv_color_conv_buf = NULL;
-    }
-
     if (delete_pause_frame)
     {
         if (av_pause_frame.buf)
@@ -1747,11 +1765,11 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         }
     }
 
-    for (uint i=0; i<XJ_shm_infos.size(); ++i)
+    for (uint i = 0; i < XJ_shm_infos.size(); i++)
     {
-        X11S(XShmDetach(XJ_disp, &(XJ_shm_infos[i])));
+        X11S(XShmDetach(XJ_disp, XJ_shm_infos[i]));
         XvImage *image = (XvImage*) 
-            xv_buffers[(unsigned char*)XJ_shm_infos[i].shmaddr];
+            xv_buffers[(unsigned char*) XJ_shm_infos[i]->shmaddr];
         if (image)
         {
             if ((XImage*)image == (XImage*)XJ_non_xv_image)
@@ -1759,10 +1777,11 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
             else
                 X11S(XFree(image));
         }
-        if (XJ_shm_infos[i].shmaddr)
-            shmdt(XJ_shm_infos[i].shmaddr);
-        if (XJ_shm_infos[i].shmid > 0)
-            shmctl(XJ_shm_infos[0].shmid, IPC_RMID, 0);
+        if (XJ_shm_infos[i]->shmaddr)
+            shmdt(XJ_shm_infos[i]->shmaddr);
+        if (XJ_shm_infos[i]->shmid > 0)
+            shmctl(XJ_shm_infos[i]->shmid, IPC_RMID, 0);
+        delete XJ_shm_infos[i];
     }
     XJ_shm_infos.clear();
     xv_buffers.clear();
@@ -2067,22 +2086,6 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
         framesPlayed = frame->frameNumber + 1;
         image        = (XvImage*) xv_buffers[frame->buf];
         vbuffers.UnlockFrame(frame, "PrepareFrameXv");
-    }
-
-    if (image && (GUID_YV12_PLANAR == xv_chroma))
-    {
-        vbuffers.LockFrame(frame, "PrepareFrameXv -- color conversion");
-        int width = frame->width;
-        int height = frame->height;
-
-        memcpy(xv_color_conv_buf, (unsigned char *)image->data + 
-               (width * height), width * height / 4);
-        memcpy((unsigned char *)image->data + (width * height),
-               (unsigned char *)image->data + (width * height) * 5 / 4,
-               width * height / 4);
-        memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
-               xv_color_conv_buf, width * height / 4);
-        vbuffers.UnlockFrame(frame, "PrepareFrameXv -- color conversion");
     }
 
     if (vbuffers.GetScratchFrame() == frame)

@@ -44,6 +44,19 @@ enum BufferType
     kVideoBuffer_all       = 0x0000001F,
 };
 
+class YUVInfo
+{
+  public:
+    YUVInfo(uint w, uint h, uint size, const int *p, const int *o);
+
+  public:
+    uint width;
+    uint height;
+    uint size;
+    uint pitches[3];
+    uint offsets[3];
+};
+
 class VideoBuffers
 {
   public:
@@ -55,7 +68,9 @@ class VideoBuffers
               uint needprebuffer_small, uint keepprebuffer,
               bool enable_frame_locking = false);
 
-    bool CreateBuffers(int width, int height, vector<unsigned char*> bufs);
+    bool CreateBuffers(int width, int height,
+                       vector<unsigned char*> bufs,
+                       vector<YUVInfo>        yuvinfo);
     bool CreateBuffers(int width, int height);
     void DeleteBuffers(void);
 
@@ -119,6 +134,9 @@ class VideoBuffers
     void RemoveInheritence(const VideoFrame *frame);
     frame_queue_t Children(const VideoFrame *frame);
     bool HasChildren(const VideoFrame *frame);
+
+    void Clear(uint i, int fourcc);
+    void Clear(int fourcc);
 
 #ifdef USING_XVMC
     VideoFrame* PastFrame(const VideoFrame *frame);

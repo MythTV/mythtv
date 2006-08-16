@@ -549,18 +549,19 @@ void delete_dithertoia44_8_context(dither8_context *context)
     delete context;
 }
 
-/** \fn OSDSurface::BlendToYV12(unsigned char *) const
+/** \fn OSDSurface::BlendToYV12(unsigned char*,unsigned char*,unsigned char*) const
  *  \brief Alpha blends OSDSurface to yuv buffer of the same size.
- *  \param yuvptr Pointer to YUV buffer to blend OSD to.
+ *  \param yptrdest Pointer to Y buffer to blend OSD to.
+ *  \param uptrdest Pointer to U buffer to blend OSD to.
+ *  \param vptrdest Pointer to V buffer to blend OSD to.
  */
-void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
+void OSDSurface::BlendToYV12(unsigned char *yptrdest,
+                             unsigned char *uptrdest,
+                             unsigned char *vptrdest) const
 {
     QMutexLocker lock(&usedRegionsLock);
     const OSDSurface *surface = this;
     blendtoyv12_8_fun blender = blendtoyv12_8_init(surface);
-
-    unsigned char *uptrdest = yuvptr + surface->width * surface->height;
-    unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
 
     QMemArray<QRect> rects = surface->usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
@@ -590,7 +591,7 @@ void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
             yoffset = y * surface->width;
 
             src = surface->y + yoffset + startcol;
-            dest = yuvptr + yoffset + startcol;
+            dest = yptrdest + yoffset + startcol;
             alpha = surface->alpha + yoffset + startcol;
 
             for (int x = startcol; x <= endcol; x++)

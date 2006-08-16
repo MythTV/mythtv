@@ -37,7 +37,9 @@ class OSDSurface
     }
     int GetRevision() { return revision; }
 
-    void BlendToYV12(unsigned char *yuvptr) const;
+    void BlendToYV12(unsigned char *yptr,
+                     unsigned char *uptr,
+                     unsigned char *vptr) const;
     void BlendToARGB(unsigned char *argbptr,
                      uint stride, uint height, bool blendtoblack=false,
                      uint threshold = 0) const;

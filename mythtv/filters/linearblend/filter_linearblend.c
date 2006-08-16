@@ -157,36 +157,35 @@ inline void linearBlendAltivec(unsigned char *src, int stride)
 int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
 {
     (void)f;
-    int width = frame->width;
     int height = frame->height;
-    unsigned char *yuvptr = frame->buf;
-    int stride = width;
+    unsigned char *yptr = frame->buf + frame->offsets[0];
+    int stride = frame->pitches[0];
     int ymax = height - 8;
     int x,y;
     unsigned char *src = 0;
-    unsigned char *uoff;
-    unsigned char *voff;
+    unsigned char *uoff = frame->buf + frame->offsets[1];
+    unsigned char *voff = frame->buf + frame->offsets[2];
     TF_VARS;
 
     TF_START;
  
-    if ((stride % 16) || ((unsigned int)yuvptr % 16))
+    if ((stride & 0xf) || ((unsigned int)yptr & 0xf))
     {
         for (y = 0; y < ymax; y += 8)
         {  
-            for (x = 0; x < stride; x+= 8)
+            for (x = 0; x < stride; x += 8)
             {
-                src = yuvptr + x + y * stride;  
+                src = yptr + x + y * stride;  
                 linearBlend(src, stride);  
             }
         }
     }
     else
     {
-        src = yuvptr;
+        src = yptr;
         for (y = 0; y < ymax; y += 8)
         {  
-            for (x = 0; x < stride; x+= 16)
+            for (x = 0; x < stride; x += 16)
             {
                 linearBlendAltivec(src, stride);
                 src += 16;
@@ -195,13 +194,10 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
         }
     }
  
-    stride = width / 2;
+    stride = pitches[1];
     ymax = height / 2 - 8;
   
-    uoff = yuvptr + width * height;
-    voff = yuvptr + width * height * 5 / 4;
- 
-    if ((stride % 16) || ((unsigned int)uoff % 16))
+    if ((stride & 0xf) || ((unsigned int)uoff & 0xf))
     {
         for (y = 0; y < ymax; y += 8)
         {
@@ -284,15 +280,14 @@ void linearBlend(unsigned char *src, int stride)
 
 int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
 {
-    int width = frame->width;
     int height = frame->height;
-    unsigned char *yuvptr = frame->buf;
-    int stride = width;
+    unsigned char *yptr = frame->buf + frame->offsets[0];
+    int stride = frame->pitches[0];
     int ymax = height - 8;
     int x,y;
     unsigned char *src;
-    unsigned char *uoff;
-    unsigned char *voff;
+    unsigned char *uoff = frame->buf + frame->offsets[1];
+    unsigned char *voff = frame->buf + frame->offsets[2];
     LBFilter *vf = (LBFilter *)f;
     TF_VARS;
 
@@ -302,17 +297,14 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
     {  
         for (x = 0; x < stride; x+=8)
         {
-            src = yuvptr + x + y * stride;  
+            src = yptr + x + y * stride;
             (vf->subfilter)(src, stride);  
         }
     }
  
-    stride = width / 2;
+    stride = frame->pitches[1];
     ymax = height / 2 - 8;
   
-    uoff = yuvptr + width * height;
-    voff = yuvptr + width * height * 5 / 4;
- 
     for (y = 0; y < ymax; y += 8)
     {
         for (x = 0; x < stride; x += 8)

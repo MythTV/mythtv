@@ -5,6 +5,7 @@
 #include "mythcontext.h"
 #include "videobuffers.h"
 #include "../libavcodec/avcodec.h"
+#include "util-xv.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h" // for xvmc stuff
@@ -17,6 +18,31 @@
 #define TRY_LOCK_SPIN_WAIT             100 /* usec */
 
 int next_dbg_str = 0;
+
+YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
+    : width(w), height(h), size(sz)
+{
+    if (p)
+    {
+        memcpy(pitches, p, 3 * sizeof(int));
+    }
+    else
+    {
+        pitches[0] = width;
+        pitches[1] = pitches[2] = width >> 1;
+    }
+
+    if (o)
+    {
+        memcpy(offsets, o, 3 * sizeof(int));
+    }
+    else
+    {
+        offsets[0] = 0;
+        offsets[1] = width * height;
+        offsets[2] = offsets[1] + (offsets[1] >> 2);
+    }
+}
 
 /**
  * \class VideoBuffers
@@ -1071,11 +1097,13 @@ VideoFrame* VideoBuffers::GetOSDParent(const VideoFrame *osd)
 bool VideoBuffers::CreateBuffers(int width, int height)
 {
     vector<unsigned char*> bufs;
-    return CreateBuffers(width, height, bufs);
+    vector<YUVInfo>        yuvinfo;
+    return CreateBuffers(width, height, bufs, yuvinfo);
 }
 
 bool VideoBuffers::CreateBuffers(int width, int height,
-                                 vector<unsigned char*> bufs)
+                                 vector<unsigned char*> bufs,
+                                 vector<YUVInfo>        yuvinfo)
 {
     bool ok = true;
     uint bpp = 12 / 4; /* bits per pixel div common factor */
@@ -1087,16 +1115,14 @@ bool VideoBuffers::CreateBuffers(int width, int height,
     uint adj_w = (width  + 15) & ~0xF;
     uint adj_h = (height + 15) & ~0xF;
     uint buf_size = (adj_w * adj_h * bpp + 4/* to round up */) / bpb;
+
     while (bufs.size() < allocSize())
     {
         unsigned char *data = (unsigned char*)av_malloc(buf_size + 64);
 
-        // init buffers (y plane to 0, u/v planes to 127),
-        // to prevent green screens..
-        bzero(data, width * height);
-        memset(data + width * height, 127, width * height / 2);
-
         bufs.push_back(data);
+        yuvinfo.push_back(YUVInfo(width, height, buf_size, NULL, NULL));
+
         if (bufs.back())
         {
             VERBOSE(VB_PLAYBACK, "Created data @"
@@ -1106,18 +1132,24 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         else
             ok = false;
     }
+
     for (uint i = 0; i < allocSize(); i++)
     {
-        buffers[i].width = width;
-        buffers[i].height = height;
+        buffers[i].width  = yuvinfo[i].width;
+        buffers[i].height = yuvinfo[i].height;
+        memcpy(buffers[i].pitches, yuvinfo[i].pitches, 3 * sizeof(int));
+        memcpy(buffers[i].offsets, yuvinfo[i].offsets, 3 * sizeof(int));
         buffers[i].bpp = 12;
-        buffers[i].size = buf_size;
+        buffers[i].size = max(buf_size, yuvinfo[i].size);
         buffers[i].codec = FMT_YV12;
         buffers[i].qscale_table = NULL;
         buffers[i].qstride = 0;
         buffers[i].buf = bufs[i];
         ok &= (bufs[i] != NULL);
     }
+
+    Clear(GUID_I420_PLANAR); // GUID_YV12_PLANAR is cleared the same way..
+
     return ok;
 }
 
@@ -1271,6 +1303,27 @@ QString VideoBuffers::GetStatus(int n) const
             str += " ";
     }
     return str;
+}
+
+void VideoBuffers::Clear(uint i, int fourcc)
+{
+    if ((GUID_I420_PLANAR == fourcc) ||
+        (GUID_YV12_PLANAR == fourcc))
+    {
+        VideoFrame *vf = at(i);
+        uint ysize  = vf->width * vf->height;
+        uint uvsize = ysize >> 2;
+
+        bzero( vf->buf + vf->offsets[0], ysize);
+        memset(vf->buf + vf->offsets[1], 127, uvsize);
+        memset(vf->buf + vf->offsets[2], 127, uvsize);
+    }
+}
+
+void VideoBuffers::Clear(int fourcc)
+{
+    for (uint i = 0; i < allocSize(); i++)
+        Clear(i, fourcc);
 }
 
 /*******************************

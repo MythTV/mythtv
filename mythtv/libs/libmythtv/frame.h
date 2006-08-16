@@ -37,6 +37,9 @@ typedef struct VideoFrame_
     int top_field_first; // 1 if top field is first.
     int repeat_pict;
     int forcekey; // hardware encoded .nuv
+
+    int pitches[3]; // Y, U, & V pitches
+    int offsets[3]; // Y, U, & V offsets
 } VideoFrame;
 
 #endif

@@ -187,7 +187,8 @@ class VideoOutputXv : public VideoOutput
 
     // Used for all non-XvMC drawing
     VideoFrame           av_pause_frame;
-    vector<XShmSegmentInfo> XJ_shm_infos;
+    vector<XShmSegmentInfo*> XJ_shm_infos;
+    vector<YUVInfo>      XJ_yuv_infos;
 
     // Basic non-Xv drawing info
     XImage              *XJ_non_xv_image;
@@ -217,7 +218,6 @@ class VideoOutputXv : public VideoOutput
     int                  xv_colorkey;
     bool                 xv_draw_colorkey;
     int                  xv_chroma;
-    unsigned char       *xv_color_conv_buf;
     buffer_map_t         xv_buffers;
     bool                 xv_need_bobdeint_repaint;
 

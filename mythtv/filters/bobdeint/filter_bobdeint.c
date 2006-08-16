@@ -70,12 +70,11 @@ int bobDeintFilter(VideoFilter *f, VideoFrame *frame)
     int width = frame->width;
     int height = frame->height;
     int ymax = height;
-    unsigned char *yuvptr = frame->buf;
-    int stride = width;
+    int stride = frame->pitches[0];
 
-    unsigned char *yoff;
-    unsigned char *uoff;
-    unsigned char *voff;
+    unsigned char *yoff = frame->buf + frame->offsets[0];
+    unsigned char *uoff = frame->buf + frame->offsets[1];
+    unsigned char *voff = frame->buf + frame->offsets[2];
 
     if (filter->tmp_size < width) 
     {
@@ -90,13 +89,10 @@ int bobDeintFilter(VideoFilter *f, VideoFrame *frame)
         filter->state_size = height;
     }
 
-    yoff = yuvptr;
     doSplit(filter, yoff, ymax, stride);
     
-    stride = width / 2;
-    ymax = height/2;
-    uoff = yuvptr + width * height;
-    voff = yuvptr + width * height * 5 / 4;
+    stride = frame->pitches[1];
+    ymax = height >> 1;
     doSplit(filter, uoff, ymax, stride);
     doSplit(filter, voff, ymax, stride);
 

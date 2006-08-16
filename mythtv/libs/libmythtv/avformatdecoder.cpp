@@ -1525,16 +1525,11 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 
     VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(true);
 
-    int width = frame->width;
-    int height = frame->height;
-
-    pic->data[0] = frame->buf;
-    pic->data[1] = pic->data[0] + width * height;
-    pic->data[2] = pic->data[1] + width * height / 4;
-
-    pic->linesize[0] = width;
-    pic->linesize[1] = width / 2;
-    pic->linesize[2] = width / 2;
+    for (int i = 0; i < 3; i++)
+    {
+        pic->data[i]     = frame->buf + frame->offsets[i];
+        pic->linesize[i] = frame->pitches[i];
+    }
 
     pic->opaque = frame;
     pic->type = FF_BUFFER_TYPE_USER;

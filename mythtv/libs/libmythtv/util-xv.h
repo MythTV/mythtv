@@ -28,6 +28,5 @@ extern void del_open_xv_port(int port);
 extern bool has_open_xv_port(int port);
 extern uint cnt_open_xv_port(void);
 extern QString xvflags2str(int flags);
-extern void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 
 #endif // _UTIL_XV_H_

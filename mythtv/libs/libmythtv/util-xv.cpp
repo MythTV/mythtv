@@ -80,19 +80,3 @@ QString xvflags2str(int flags)
         str.append("XvImageMask ");
     return str;
 }
-
-void clear_xv_buffers(VideoBuffers &vbuffers,
-                      int width, int height, int xv_chroma)
-{
-    if ((GUID_I420_PLANAR == xv_chroma) ||
-        (GUID_YV12_PLANAR == xv_chroma))
-    {
-        for (uint i = 0; i < vbuffers.allocSize(); i++)
-        {
-            unsigned char *data = vbuffers.at(i)->buf;
-            bzero(data, width * height);
-            memset(data + width * height, 127,
-                   width * height / 2);
-        }
-    }
-}

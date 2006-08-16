@@ -31,18 +31,15 @@ typedef struct OFFilter
 int oneFieldFilter(VideoFilter *f, VideoFrame *frame)
 {
     OFFilter *filter = (OFFilter *)(f);
-    int width = frame->width;
     int height = frame->height;
     int bottom = filter->bottom;
-    unsigned char *yuvptr = frame->buf;
-    int stride = width;
+    int stride = frame->pitches[0];
     int ymax = height - 2;
     int y;
-    unsigned char *yoff;
-    unsigned char *uoff;
-    unsigned char *voff;
+    unsigned char *yoff = frame->buf + frame->offsets[0];
+    unsigned char *uoff = frame->buf + frame->offsets[1];
+    unsigned char *voff = frame->buf + frame->offsets[2];
 
-    yoff = yuvptr;
     for (y = 0; y < ymax; y += 2) 
     {
         unsigned char *src = (bottom ? &(yoff[(y+1)*stride]) : &(yoff[y*stride]));
@@ -50,12 +47,9 @@ int oneFieldFilter(VideoFilter *f, VideoFrame *frame)
         memcpy(dst, src, stride);
     }
  
-    stride = width / 2;
+    stride = frame->pitches[1];
     ymax = height / 2 - 2;
   
-    uoff = yuvptr + width * height;
-    voff = yuvptr + width * height * 5 / 4;
- 
     for (y = 0; y < ymax; y += 2)
     {
         unsigned char *src = (bottom ? &(uoff[(y+1)*stride]) : &(uoff[y*stride]));
