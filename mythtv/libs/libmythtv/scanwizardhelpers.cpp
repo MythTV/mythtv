@@ -334,12 +334,10 @@ void ScanTypeSetting::refresh(const QString& card)
     case CardUtil::HDHOMERUN:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_ATSC), true);
-/* TODO disabled import to so we get some bug reports on scanner. dtk 4/6/2006
 #ifdef USING_DVB
         addSelection(tr("Import channels.conf"),
                      QString::number(Import));
 #endif
-*/
         break;
     case CardUtil::FREEBOX:
         addSelection(tr("M3U Import"),
