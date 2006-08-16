@@ -362,7 +362,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     for (uint i = 0; i < 4; i++)
     {
-        // USA Cable, ch 2 to 155 and T.7 to T.14
+        // USA Cable, ch 2 to 159 and T.7 to T.14
         FREQ(modStr[i], "cable0", desc[i], "Channel %1",
              2,    57000000,   69000000, mod[i]); // 2-4
         FREQ(modStr[i], "cable1", desc[i], "Channel %1",
@@ -382,7 +382,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
         // USA Cable, QAM 256 ch 78 to 159
         FREQ(modStr[i], "cablehigh0", desc[i], "Channel %1",
-             78,  559000000,  645000000, mod[i]); // 78-94
+             78,  549000000,  645000000, mod[i]); // 78-94
         FREQ(modStr[i], "cablehigh1", desc[i], "Channel %1",
              100, 651000000, 1005000000, mod[i]); // 100-159
 
@@ -406,15 +406,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
                  121750000 + off[j] - (j ? 100000 : 0),
                  169750000 + off[j] - (j ? 100000 : 0), mod[i]);
             FREQ(modStr[i], std[j] + "5", desc[i], sdesc[j] + "%1",
-                 23,  211750000 + off[j], 481750000 + off[j], mod[i]);
+                 23,  217750000 + off[j], 643750000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "6", desc[i], sdesc[j] + "%1",
-                 95,   91750000 + off[j], 114000000 + off[j], mod[i]);
+                 95,   91750000 + off[j], 115750000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "7", desc[i], sdesc[j] + "%1",
                  100, 649750000 + off[j], 799750000 + off[j], mod[i]);
 
-            // USA Cable HRC/IRC, ch 67-125
+            // USA Cable HRC/IRC, ch 76-125
             FREQ(modStr[i], std[j] + "high0", desc[i], sdesc[j] + "%1",
-                 67,  535750000 + off[j], 643750000 + off[j], mod[i]);
+                 76,  535750000 + off[j], 643750000 + off[j], mod[i]);
             FREQ(modStr[i], std[j] + "high1", desc[i], sdesc[j] + "%1",
                  100, 649750000 + off[j], 799750000 + off[j], mod[i]);
         }
