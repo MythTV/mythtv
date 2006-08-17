@@ -34,7 +34,7 @@ public:
     int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp);
     const AVPicture *getImage(const VideoFrame *frame, long long frameno,
             int *pwidth, int *pheight);
-    int finished(void);
+    int reportTime(void);
 
 private:
     long long       frameno;            /* frame number */
@@ -42,7 +42,7 @@ private:
     AVPicture       pgm;                /* grayscale frame */
 #ifdef PGM_CONVERT_GREYSCALE
     struct timeval  convert_time;
-    bool            finished_done;
+    bool            time_reported;
 #endif /* PGM_CONVERT_GREYSCALE */
 };
 

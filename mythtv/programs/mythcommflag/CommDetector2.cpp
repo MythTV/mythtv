@@ -10,7 +10,7 @@
 #include "FrameAnalyzer.h"
 #include "PGMConverter.h"
 #include "BorderDetector.h"
-#include "BlankFrameDetector.h"
+#include "HistogramAnalyzer.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
 
@@ -162,6 +162,21 @@ int passFinished(QPtrList<FrameAnalyzer> *pass)
             (fa = iifa.current()); ++iifa)
         (void)fa->finished();
 
+    for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
+            (fa = iifa.current()); ++iifa)
+        (void)fa->finished2();
+
+    return 0;
+}
+
+int passReportTime(QPtrList<FrameAnalyzer> *pass)
+{
+    FrameAnalyzer       *fa;
+
+    for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
+            (fa = iifa.current()); ++iifa)
+        (void)fa->reportTime();
+
     return 0;
 }
 
@@ -240,7 +255,8 @@ void createDebugDirectory(QString dirname, QString comment)
 
 QString frameToTimestamp(long long frameno, float fps)
 {
-    int ms, ss, mm, hh;
+    int         ms, ss, mm, hh;
+    QString     ts;
 
     ms = (int)roundf(frameno / fps * 1000);
 
@@ -255,8 +271,29 @@ QString frameToTimestamp(long long frameno, float fps)
     hh = mm / 60;
     mm %= 60;
 
-    QString ts;
     return ts.sprintf("%d:%02d:%02d", hh, mm, ss);
+}
+
+QString frameToTimestampms(long long frameno, float fps)
+{
+    int         ms, ss, mm;
+    QString     ts;
+
+    ms = (int)roundf(frameno / fps * 1000);
+
+    ss = ms / 1000;
+    ms %= 1000;
+
+    mm = ss / 60;
+    ss %= 60;
+
+    return ts.sprintf("%d:%02d.%03d", mm, ss, ms);
+}
+
+QString strftimeval(const struct timeval *tv)
+{
+    QString str;
+    return str.sprintf("%ld.%06ld", tv->tv_sec, tv->tv_usec);
 }
 
 };  /* namespace */
@@ -281,9 +318,31 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     QPtrList<FrameAnalyzer> pass0, pass1;
     PGMConverter            *pgmConverter = NULL;
     BorderDetector          *borderDetector = NULL;
+    HistogramAnalyzer       *histogramAnalyzer = NULL;
     TemplateFinder          *logoFinder = NULL;
+    TemplateMatcher         *logoMatcher = NULL;
 
     debugdir = debugDirectory(chanid, recstartts);
+
+    /*
+     * Look for blank frames to use as delimiters between commercial and
+     * non-commercial segments.
+     */
+    if ((commDetectMethod & COMM_DETECT_2_BLANK))
+    {
+        if (!pgmConverter)
+            pgmConverter = new PGMConverter();
+
+        if (!borderDetector)
+            borderDetector = new BorderDetector();
+
+        if (!histogramAnalyzer)
+        {
+            histogramAnalyzer = new HistogramAnalyzer(pgmConverter,
+                    borderDetector, debugdir);
+            pass1.append(histogramAnalyzer);
+        }
+    }
 
     /*
      * Logo Detection requires two passes. The first pass looks for static
@@ -294,7 +353,6 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     if ((commDetectMethod & COMM_DETECT_2_LOGO))
     {
         CannyEdgeDetector       *cannyEdgeDetector = NULL;
-        TemplateMatcher         *logoMatcher = NULL;
 
         if (!pgmConverter)
             pgmConverter = new PGMConverter();
@@ -320,22 +378,10 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
         }
     }
 
-    if ((commDetectMethod & COMM_DETECT_2_BLANK))
+    if (logoMatcher && histogramAnalyzer)
     {
-        BlankFrameDetector      *blankFrameDetector = NULL;
-
-        if (!pgmConverter)
-            pgmConverter = new PGMConverter();
-
-        if (!borderDetector)
-            borderDetector = new BorderDetector();
-
-        if (!blankFrameDetector)
-        {
-            blankFrameDetector = new BlankFrameDetector(pgmConverter,
-                    borderDetector, logoFinder, debugdir);
-            pass1.append(blankFrameDetector);
-        }
+        logoMatcher->setHistogramAnalyzer(histogramAnalyzer);
+        histogramAnalyzer->setTemplateState(logoFinder);
     }
 
     /* Aggregate them all together. */
@@ -387,10 +433,10 @@ int CommDetector2::buildBuffer(int minbuffer)
     return 0;
 }
 
-void CommDetector2::reportState(int elapsed_sec, long long frameno,
+void CommDetector2::reportState(int elapsedms, long long frameno,
         long long nframes, unsigned int passno, unsigned int npasses)
 {
-    float fps = elapsed_sec ? (float)frameno / elapsed_sec : 0;
+    float fps = elapsedms ? (float)frameno * 1000 / elapsedms : 0;
 
     /* Assume that 0-th pass is negligible in terms of computational cost. */
     int percentage = passno == 0 ? 0 :
@@ -500,17 +546,20 @@ bool CommDetector2::go(void)
         long long currentFrameNumber = 0;
         long long lastLoggedFrame = currentFrameNumber;
         QTime clock;
+        struct timeval getframetime;
 
         clock.start();
+        memset(&getframetime, 0, sizeof(getframetime));
         while (currentFrameNumber < nframes && !(*pass).isEmpty() &&
                 !nvp->GetEof())
         {
-            struct timeval startTime;
+            struct timeval start, end, elapsed;
 
-            if (isRecording)
-                (void)gettimeofday(&startTime, NULL);
-
+            (void)gettimeofday(&start, NULL);
             VideoFrame *currentFrame = nvp->GetRawVideoFrame(nextFrame);
+            (void)gettimeofday(&end, NULL);
+            timersub(&end, &start, &elapsed);
+            timeradd(&getframetime, &elapsed, &getframetime);
 
             if (stopForBreath(isRecording, currentFrameNumber))
             {
@@ -535,7 +584,7 @@ bool CommDetector2::go(void)
             if (needToReportState(showProgress, isRecording,
                         currentFrameNumber))
             {
-                reportState(flagTime.elapsed() / 1000, currentFrameNumber,
+                reportState(flagTime.elapsed(), currentFrameNumber,
                         myTotalFrames, passno, npasses);
             }
 
@@ -561,7 +610,7 @@ bool CommDetector2::go(void)
 
             if (isRecording)
             {
-                waitForBuffer(&startTime, minlag,
+                waitForBuffer(&start, minlag,
                         recstartts.secsTo(QDateTime::currentDateTime()) -
                         flagTime.elapsed() / 1000, nvp->GetFrameRate(),
                         fullSpeed);
@@ -580,6 +629,11 @@ bool CommDetector2::go(void)
         }
 
         if (passFinished(&(*pass)))
+            return false;
+
+        VERBOSE(VB_COMMFLAG, QString("NVP Time: GetRawVideoFrame=%1s")
+                .arg(strftimeval(&getframetime)));
+        if (passReportTime(&(*pass)))
             return false;
     }
 

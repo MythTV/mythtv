@@ -13,6 +13,7 @@
 #define __BORDERDETECTOR_H__
 
 typedef struct AVPicture AVPicture;
+class NuppelVideoPlayer;
 
 class BorderDetector
 {
@@ -21,9 +22,13 @@ public:
     BorderDetector(void);
     ~BorderDetector(void);
 
+    int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp);
+
     static const long long UNCACHED = -1;
     int getDimensions(const AVPicture *pgm, int pgmheight, long long frameno,
             int *prow, int *pcol, int *pwidth, int *pheight);
+
+    int reportTime(void);
 
 private:
     long long       frameno;            /* frame number */
@@ -31,6 +36,8 @@ private:
     int             width, height;      /* content dimensions */
 
     int             debugLevel;
+    struct timeval  analyze_time;
+    bool            time_reported;
 };
 
 #endif  /* !__BORDERDETECTOR_H__ */

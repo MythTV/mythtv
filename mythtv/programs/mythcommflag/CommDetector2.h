@@ -18,6 +18,8 @@ namespace commDetector2 {
 QString debugDirectory(int chanid, const QDateTime& recstartts);
 void createDebugDirectory(QString dirname, QString comment);
 QString frameToTimestamp(long long frameno, float fps);
+QString frameToTimestampms(long long frameno, float fps);
+QString strftimeval(const struct timeval *tv);
 
 };  /* namespace */
 

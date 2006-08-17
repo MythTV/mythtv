@@ -10,6 +10,7 @@
 /* Base class for commercial flagging frame analyzers. */
 
 #include <limits.h>
+#include <qmap.h>
 
 typedef struct VideoFrame_ VideoFrame;
 class NuppelVideoPlayer;
@@ -50,13 +51,31 @@ public:
     virtual enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame) = 0;
 
+    /* Static analysis. */
     virtual int finished(void) { return 0; }
+
+    /* Allow for inter-FrameAnalyzer analysis. */
+    virtual int finished2(void) { return 0; }
+
+    virtual int reportTime(void) const { return 0; }
 
     virtual bool isContent(long long frameno) const {
         (void)frameno;
         return false;
     }
+
+    typedef QMap<long long, long long> FrameMap;    /* frameno => nframes */
 };
+
+namespace frameAnalyzer {
+
+void frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap,
+        float fps, const char *comment);
+
+void frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap,
+        float fps, const char *comment);
+
+}; /* namespace */
 
 #endif  /* !__FRAMEANALYZER_H__ */
 

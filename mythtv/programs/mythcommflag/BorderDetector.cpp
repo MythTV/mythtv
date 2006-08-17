@@ -1,17 +1,32 @@
+#include <sys/time.h>
+
 #include "avcodec.h"        /* AVPicture */
 #include "mythcontext.h"    /* gContext */
 
+#include "CommDetector2.h"
 #include "BorderDetector.h"
+
+using namespace commDetector2;
 
 BorderDetector::BorderDetector(void)
     : frameno(-1)
     , debugLevel(0)
+    , time_reported(false)
 {
     debugLevel = gContext->GetNumSetting("BorderDetectorDebugLevel", 0);
 }
 
 BorderDetector::~BorderDetector(void)
 {
+}
+
+int
+BorderDetector::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
+{
+    (void)nvp;  /* gcc */
+    time_reported = false;
+    memset(&analyze_time, 0, sizeof(analyze_time));
+    return 0;
 }
 
 int
@@ -84,11 +99,14 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
     const int               VERTSLOP = max(MAXLINES, pgmheight * 1 / 120);
     const int               HORIZSLOP = max(MAXLINES, pgmwidth * 125 / 20000);
 
+    struct timeval          start, end, elapsed;
     unsigned char           minval, maxval, val;
     int                     rr, cc, minrow, maxrow, mincol, maxcol;
     int                     newrow, newcol, newwidth, newheight;
     bool                    top, bottom, left, right;
     int                     range, outliers, lines;
+
+    (void)gettimeofday(&start, NULL);
 
     if (_frameno != UNCACHED && _frameno == frameno)
         goto done;
@@ -278,13 +296,18 @@ done:
     *pcol = col;
     *pwidth = width;
     *pheight = height;
+
+    (void)gettimeofday(&end, NULL);
+    timersub(&end, &start, &elapsed);
+    timeradd(&analyze_time, &elapsed, &analyze_time);
+
     return 0;
 
 blank_frame:
     row = VERTMARGIN;
     col = HORIZMARGIN;
-    width = pgmwidth - HORIZMARGIN;
-    height = pgmheight - VERTMARGIN;
+    width = pgmwidth - 2 * HORIZMARGIN;
+    height = pgmheight - 2 * VERTMARGIN;
     if (newwidth && (left || right))
     {
         col = newcol;
@@ -310,7 +333,23 @@ blank_frame:
                 .arg(mincol).arg(minrow));
     }
 
+    (void)gettimeofday(&end, NULL);
+    timersub(&end, &start, &elapsed);
+    timeradd(&analyze_time, &elapsed, &analyze_time);
+
     return -1;  /* Blank frame. */
+}
+
+int
+BorderDetector::reportTime(void)
+{
+    if (!time_reported)
+    {
+        VERBOSE(VB_COMMFLAG, QString("BD Time: analyze=%1s")
+                .arg(strftimeval(&analyze_time)));
+        time_reported = true;
+    }
+    return 0;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

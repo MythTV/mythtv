@@ -618,6 +618,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
 
     memset(&cropped, 0, sizeof(cropped));
     memset(&tmpl, 0, sizeof(tmpl));
+    memset(&analyze_time, 0, sizeof(analyze_time));
 
     /*
      * debugLevel:
@@ -694,6 +695,9 @@ TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp)
     if (pgmConverter->nuppelVideoPlayerInited(nvp))
         goto free_tmpl;
 
+    if (borderDetector->nuppelVideoPlayerInited(nvp))
+        goto free_tmpl;
+
     if (tmpl_done)
     {
         if (tmpl_valid)
@@ -763,6 +767,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     const AVPicture     *pgm, *edges;
     int                 pgmwidth, pgmheight;
     int                 croprow, cropcol, cropwidth, cropheight;
+    struct timeval      start, end, elapsed;
 
     if (frameno < nextFrame)
     {
@@ -780,6 +785,8 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
                 &croprow, &cropcol, &cropwidth, &cropheight))
     {
         /* Not a blank frame. */
+
+        (void)gettimeofday(&start, NULL);
 
         if (croprow < mincontentrow)
             mincontentrow = croprow;
@@ -813,6 +820,10 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
                         debug_frames, debugdir))
                 goto error;
         }
+
+        (void)gettimeofday(&end, NULL);
+        timersub(&end, &start, &elapsed);
+        timeradd(&analyze_time, &elapsed, &analyze_time);
     }
 
     if (nextFrame > endFrame)
@@ -834,9 +845,6 @@ error:
 int
 TemplateFinder::finished(void)
 {
-    if (pgmConverter->finished())
-        return -1;
-
     if (!tmpl_done)
     {
         if (template_alloc(scores, width, height,
@@ -871,6 +879,20 @@ TemplateFinder::finished(void)
 free_tmpl:
     avpicture_free(&tmpl);
     return -1;
+}
+
+int
+TemplateFinder::reportTime(void) const
+{
+    if (pgmConverter->reportTime())
+        return -1;
+
+    if (borderDetector->reportTime())
+        return -1;
+
+    VERBOSE(VB_COMMFLAG, QString("TF Time: analyze=%1s")
+            .arg(strftimeval(&analyze_time)));
+    return 0;
 }
 
 const struct AVPicture *

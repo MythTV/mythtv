@@ -2,15 +2,18 @@
 #include "avcodec.h"        /* AVPicture */
 #include "frame.h"          /* VideoFrame */
 
+#include "CommDetector2.h"
 #include "pgm.h"
 #include "PGMConverter.h"
+
+using namespace commDetector2;
 
 PGMConverter::PGMConverter(void)
     : frameno(-1)
     , width(-1)
     , height(-1)
 #ifdef PGM_CONVERT_GREYSCALE
-    , finished_done(false)
+    , time_reported(false)
 #endif /* PGM_CONVERT_GREYSCALE */
 {
     memset(&pgm, 0, sizeof(pgm));
@@ -28,8 +31,8 @@ PGMConverter::~PGMConverter(void)
 int
 PGMConverter::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
 {
-    finished_done = false;
 #ifdef PGM_CONVERT_GREYSCALE
+    time_reported = false;
     memset(&convert_time, 0, sizeof(convert_time));
 #endif /* PGM_CONVERT_GREYSCALE */
 
@@ -103,17 +106,14 @@ error:
 }
 
 int
-PGMConverter::finished(void)
+PGMConverter::reportTime(void)
 {
 #ifdef PGM_CONVERT_GREYSCALE
-    if (!finished_done)
+    if (!time_reported)
     {
-        QString     timestr;
-
         VERBOSE(VB_COMMFLAG, QString("PGM Time: convert=%1s")
-                .arg(timestr.sprintf("%ld.%06ld",
-                        convert_time.tv_sec, convert_time.tv_usec)));
-        finished_done = true;
+                .arg(strftimeval(&convert_time)));
+        time_reported = true;
     }
 #endif /* PGM_CONVERT_GREYSCALE */
     return 0;

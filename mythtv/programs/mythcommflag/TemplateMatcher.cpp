@@ -1,12 +1,15 @@
+#include <stdio.h>
 #include <math.h>
 
 #include "NuppelVideoPlayer.h"
 #include "avcodec.h"        /* AVPicture */
 
 #include "CommDetector2.h"
+#include "FrameAnalyzer.h"
 #include "pgm.h"
 #include "PGMConverter.h"
 #include "EdgeDetector.h"
+#include "HistogramAnalyzer.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
 
@@ -15,6 +18,7 @@
 #include <qfileinfo.h>
 
 using namespace commDetector2;
+using namespace frameAnalyzer;
 
 namespace {
 
@@ -86,62 +90,50 @@ next_pixel:
 bool
 readMatches(QString filename, unsigned short *matches, long long nframes)
 {
-    QFile qfile(filename);
+    FILE        *fp;
+    long long   frameno;
 
-    if (!qfile.open(IO_ReadOnly))
+    if (!(fp = fopen(filename, "r")))
         return false;
 
-    QTextStream     stream(&qfile);
-    long long       ii = 0;
-    bool            ok;
-
-    while (!stream.atEnd())
+    for (frameno = 0; frameno < nframes; frameno++)
     {
-        if (ii >= nframes)
+        int nitems = fscanf(fp, "%hu", &matches[frameno]);
+        if (nitems != 1)
         {
-            VERBOSE(VB_COMMFLAG, QString("Too much data in %1")
-                    .arg(filename));
-            goto error;
-        }
-        matches[ii++] = stream.readLine().toUShort(&ok);
-        if (!ok)
-        {
-            VERBOSE(VB_COMMFLAG, QString("Error reading %1 at line %2")
-                    .arg(filename).arg(ii - 1));
+            VERBOSE(VB_COMMFLAG, QString("Not enough data in %1: frame %2")
+                    .arg(filename).arg(frameno));
             goto error;
         }
     }
-    qfile.close();
 
-    if (ii < nframes)
-    {
-        VERBOSE(VB_COMMFLAG, QString(
-                    "Not enough data in %1 (got %2, expected %3)")
-                .arg(filename).arg(ii).arg(nframes));
-        return false;
-    }
+    if (fclose(fp))
+        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+                .arg(filename).arg(strerror(errno)));
     return true;
 
 error:
-    qfile.close();
+    if (fclose(fp))
+        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+                .arg(filename).arg(strerror(errno)));
     return false;
 }
 
 bool
 writeMatches(QString filename, unsigned short *matches, long long nframes)
 {
-    QFile qfile(filename);
+    FILE        *fp;
+    long long   frameno;
 
-    if (!qfile.open(IO_WriteOnly))
+    if (!(fp = fopen(filename, "w")))
         return false;
 
-    QTextStream     stream(&qfile);
-    long long       ii;
+    for (frameno = 0; frameno < nframes; frameno++)
+        (void)fprintf(fp, "%hu\n", matches[frameno]);
 
-    for (ii = 0; ii < nframes; ii++)
-        stream << matches[ii] << "\n";
-
-    qfile.close();
+    if (fclose(fp))
+        VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
+                .arg(filename).arg(strerror(errno)));
     return true;
 }
 
@@ -306,6 +298,7 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     , pgmConverter(pgmc)
     , edgeDetector(ed)
     , templateFinder(tf)
+    , histogramAnalyzer(NULL)
     , matches(NULL)
     , match(NULL)
     , iscontent(NULL)
@@ -430,7 +423,9 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp)
     memset(matches, 0, nframes * sizeof(*matches));
 
     match = new unsigned char[nframes];
+
     iscontent = new unsigned char[nframes];
+    memset(iscontent, 0, nframes * sizeof(*iscontent));
 
     if (debug_matches)
     {
@@ -545,13 +540,8 @@ TemplateMatcher::finished(void)
     const int       MINBREAKLEN = (int)roundf(25 * fps);  /* frames */
     const int       MINSEGLEN = (int)roundf(25 * fps);    /* frames */
 
-    long long       ii, segb, sege, seglen, brkb, brke, brklen;
-    QString         analyzestr;
-    QMap<long long, long long>  breakSegment; /* frameno => len */
-    QMap<long long, long long>::Iterator bb, bb1;
-
-    if (pgmConverter->finished())
-        goto error;
+    long long                           segb, brkb;
+    FrameAnalyzer::FrameMap::Iterator   bb;
 
     if (!matches_done && debug_matches)
     {
@@ -563,7 +553,7 @@ TemplateMatcher::finished(void)
         }
     }
 
-    for (ii = 0; ii < nframes; ii++)
+    for (long long ii = 0; ii < nframes; ii++)
         match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
 
     if (debugLevel >= 2)
@@ -578,6 +568,7 @@ TemplateMatcher::finished(void)
     /*
      * Construct breaks.
      */
+    breakMap.clear();
     brkb = 0;
     while (brkb < nframes)
     {
@@ -585,18 +576,21 @@ TemplateMatcher::finished(void)
         if (match[brkb])
             brkb = matchspn(nframes, match, brkb, match[brkb]);
 
-        brke = matchspn(nframes, match, brkb, match[brkb]);
-        brklen = brke - brkb;
-        breakSegment[brkb] = brklen;
+        long long brke = matchspn(nframes, match, brkb, match[brkb]);
+        long long brklen = brke - brkb;
+        breakMap[brkb] = brklen;
 
         brkb = brke;
     }
 
     /*
-     * Eliminate false breaks.
+     * Eliminate false breaks (but allow short "false" breaks if they start at
+     * the very beginning).
      */
-    bb = breakSegment.begin();
-    while (bb != breakSegment.end())
+    bb = breakMap.begin();
+    if (bb != breakMap.end() && bb.key() == 0)
+        ++bb;
+    while (bb != breakMap.end())
     {
         if (bb.data() >= MINBREAKLEN)
         {
@@ -604,20 +598,22 @@ TemplateMatcher::finished(void)
             continue;
         }
 
-        bb1 = bb;
+        FrameAnalyzer::FrameMap::Iterator bb1 = bb;
         ++bb;
-        breakSegment.remove(bb1);
+        breakMap.remove(bb1);
     }
 
     /*
      * Eliminate false segments.
      */
     segb = 0;
-    bb = breakSegment.begin();
-    while (bb != breakSegment.end())
+    bb = breakMap.begin();
+    if (bb != breakMap.end() && bb.key() == 0)
+        ++bb;
+    while (bb != breakMap.end())
     {
         brkb = bb.key();
-        seglen = brkb - segb;
+        long long seglen = brkb - segb;
         if (seglen >= MINSEGLEN)
         {
             segb = brkb + bb.data();
@@ -626,20 +622,20 @@ TemplateMatcher::finished(void)
         }
 
         /* Merge break with next break. */
-        bb1 = bb;
+        FrameAnalyzer::FrameMap::Iterator bb1 = bb;
         ++bb1;
-        if (bb1 == breakSegment.end())
+        if (bb1 == breakMap.end())
         {
             /* Extend break to end of recording. */
-            breakSegment[brkb] = nframes - brkb;
+            breakMap[brkb] = nframes - brkb;
         }
         else
         {
             /* Extend break to cover next break; delete next break. */
-            breakSegment[brkb] = bb1.key() + bb1.data() - brkb;  /* bb */
+            breakMap[brkb] = bb1.key() + bb1.data() - brkb;  /* bb */
             bb = bb1;
             ++bb1;
-            breakSegment.remove(bb);
+            breakMap.remove(bb);
         }
         bb = bb1;
     }
@@ -647,28 +643,163 @@ TemplateMatcher::finished(void)
     /*
      * Report breaks.
      */
-    bb = breakSegment.begin();
-    while (bb != breakSegment.end())
-    {
-        brkb = bb.key();
-        brklen = bb.data();
-        brke = brkb + brklen;
+    frameAnalyzerReportMap(&breakMap, fps, "TM Break");
 
-        VERBOSE(VB_COMMFLAG, QString("TM Break: frame %1-%2 (%3-%4, %5)")
-                .arg(brkb, 6).arg(brke - 1, 6)
-                .arg(frameToTimestamp(brkb, fps))
-                .arg(frameToTimestamp(brke - 1, fps))
-                .arg(frameToTimestamp(brklen, fps)));
-        ++bb;
+    return 0;
+
+error:
+    return -1;
+}
+
+int
+TemplateMatcher::finished2(void)
+{
+    /*
+     * TUNABLE:
+     *
+     * Expect 30% +/- 3% to be commercials.
+     */
+    const int       MINBREAKS = nframes * 25 / 100;
+    const int       MAXBREAKS = nframes * 36 / 100;
+
+    /*
+     * TUNABLE:
+     *
+     * When logos are a good indicator of commercial breaks, allow blank frames
+     * to adjust logo breaks.
+     */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
+
+    /*
+     * If a histogramAnalyzer exists and breaktime is as expected, assume
+     * TemplateMatching is basically correct; use HistogramAnalyzer information
+     * only to adjust beginnings and endings of existing TemplateMatcher
+     * breaks.
+     */
+    if (histogramAnalyzer)
+    {
+        long long brklen = 0;
+        for (FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
+                ii != breakMap.end();
+                ++ii)
+            brklen += ii.data();
+
+        if (brklen >= MINBREAKS && brklen <= MAXBREAKS)
+        {
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks:"
+                        " adjusting for blanks")
+                    .arg(100 * brklen / nframes));
+
+            bool skipBlanks = histogramAnalyzer->getSkipBlanks();
+            FrameAnalyzer::FrameMap blankMap = histogramAnalyzer->getBlanks();
+
+            FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
+            while (ii != breakMap.end())
+            {
+                FrameAnalyzer::FrameMap::Iterator iinext = ii;
+                ++iinext;
+
+                /* Get bounds of beginning of logo break. */
+                long long iibb = ii.key() - MAXBLANKADJUSTMENT;
+                long long iiee = ii.key() + MAXBLANKADJUSTMENT;
+                FrameAnalyzer::FrameMap::const_iterator jjfound =
+                    blankMap.constEnd();
+
+                if (ii.key() > 0)
+                {
+                    /* Look for a blank frame near beginning of logo break. */
+                    FrameAnalyzer::FrameMap::const_iterator jj =
+                        blankMap.constBegin();
+                    if (!jj.key() && !jj.data())
+                        ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
+                    for (; jj != blankMap.constEnd(); ++jj)
+                    {
+                        long long jjbb = jj.key();
+                        long long jjee = jjbb + jj.data();
+
+                        if (jjbb > iiee)
+                            break;      /* Passed (iibb,iiee). */
+
+                        if (jjee < iibb)
+                            continue;   /* Keep looking. */
+
+                        jjfound = jj;
+                    }
+                }
+
+                /* Get bounds of end of logo break. */
+                long long mmbb = iibb + ii.data();
+                long long mmee = iiee + ii.data();
+
+                /* Look for a blank frame near end of logo break. */
+                FrameAnalyzer::FrameMap::const_iterator kk, kkfound;
+                kkfound = blankMap.constEnd();
+                kk = jjfound;
+                if (kk == blankMap.constEnd())
+                    kk = blankMap.constBegin();
+                else
+                    ++kk;
+                for (; kk != blankMap.constEnd(); ++kk)
+                {
+                    long long kkbb = kk.key();
+                    long long kkee = kkbb + kk.data();
+
+                    if (kkbb > mmee)
+                        break;      /* Passed (mmbb,mmee). */
+
+                    if (kkee < mmbb)
+                        continue;   /* Keep looking. */
+
+                    kkfound = kk;
+                }
+
+                long long start = ii.key();
+                long long end = start + ii.data();
+                if (jjfound != blankMap.constEnd())
+                {
+                    start = jjfound.key();
+                    if (!skipBlanks)
+                        start += jjfound.data();
+                }
+                if (kkfound != blankMap.constEnd())
+                {
+                    end = kkfound.key();
+                    if (skipBlanks)
+                        end += kkfound.data();
+                }
+                if (start != ii.key())
+                    breakMap.remove(ii);
+                breakMap[start] = end - start;
+
+                ii = iinext;
+            }
+
+            histogramAnalyzer->clear();
+        }
+        else
+        {
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks"
+                        " (wanted %2-%3%)")
+                    .arg(100 * brklen / nframes)
+                    .arg(100 * MINBREAKS / nframes)
+                    .arg(100 * MAXBREAKS / nframes));
+        }
+
+        /*
+         * Report breaks.
+         */
+        frameAnalyzerReportMap(&breakMap, fps, "TM Break");
     }
 
     /*
      * Initialize isContent state.
      */
-    segb = 0;
-    for (bb = breakSegment.begin(); bb != breakSegment.end(); ++bb)
+    long long segb = 0;
+    for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
+            bb != breakMap.end();
+            ++bb)
     {
-        sege = bb.key();
+        long long sege = bb.key();
         for (long long ii = segb; ii < sege; ii++)
             iscontent[ii] = 1;
         segb = sege + bb.data();
@@ -676,14 +807,24 @@ TemplateMatcher::finished(void)
     for (long long ii = segb; ii < nframes; ii++)
         iscontent[ii] = 1;
 
-    VERBOSE(VB_COMMFLAG, QString("TM Time: analyze=%1s")
-            .arg(analyzestr.sprintf("%ld.%06ld",
-                    analyze_time.tv_sec, analyze_time.tv_usec)));
-
     return 0;
+}
 
-error:
-    return -1;
+int
+TemplateMatcher::reportTime(void) const
+{
+    if (pgmConverter->reportTime())
+        return -1;
+
+    VERBOSE(VB_COMMFLAG, QString("TM Time: analyze=%1s")
+            .arg(strftimeval(&analyze_time)));
+    return 0;
+}
+
+void
+TemplateMatcher::setHistogramAnalyzer(HistogramAnalyzer *ha)
+{
+    histogramAnalyzer = ha;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

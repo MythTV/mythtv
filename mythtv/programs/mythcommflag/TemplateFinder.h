@@ -40,6 +40,7 @@ public:
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame);
     int finished(void);
+    int reportTime(void) const;
 
     /* TemplateFinder implementation. */
     const struct AVPicture *getTemplate(int *prow, int *pcol,
@@ -83,6 +84,7 @@ private:
     bool            debug_frames;
     bool            tmpl_valid;
     bool            tmpl_done;
+    struct timeval  analyze_time;
 };
 
 #endif  /* !__TEMPLATEFINDER_H__ */
