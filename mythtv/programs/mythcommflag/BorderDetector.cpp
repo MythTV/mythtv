@@ -108,6 +108,9 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
 
     (void)gettimeofday(&start, NULL);
 
+    newrow = 0;
+    newheight = 0;
+
     if (_frameno != UNCACHED && _frameno == frameno)
         goto done;
 
