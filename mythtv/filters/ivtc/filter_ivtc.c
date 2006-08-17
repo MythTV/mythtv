@@ -22,14 +22,14 @@ typedef struct ThisFilter
     VideoFilter vf;
 
     struct pullup_context *context;
-    int uoff;
-    int voff;
     int height;
     int width;
     int progressive_frame_seen;
     int interlaced_frame_seen;
     int apply_filter;
 } ThisFilter;
+
+static void SetupFilter(ThisFilter *vf, int width, int height, int *pitches);
 
 static inline void * memcpy_pic(void * dst, const void * src, int height, int dstStride, int srcStride)
 {
@@ -71,25 +71,20 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame)
     if (!filter->apply_filter)
         return 1;
     
+    SetupFilter(filter, frame->width, frame->height, (int*)frame->pitches);
+
     struct pullup_buffer *b;
     struct pullup_frame *f;
-    int height  = frame->height;
-    int width   = frame->width;
-    int cwidth  = width / 2;
-    int cheight = height / 2;
+    int ypitch  = filter->context->stride[0];
+    int height  = filter->height;
+    int cpitch  = filter->context->stride[1];
+    int cheight = filter->height >> 1;
     int p = frame->top_field_first ^ 1;
 
     struct pullup_context *c = filter->context;
     if (c->bpp[0] == 0)
         c->bpp[0] = c->bpp[1] = c->bpp[2] = frame->bpp;
     
-    if ((frame->width != filter->width) ||
-        (frame->height != filter->height))
-    {
-        return 0;
-    }
-
-
     b = pullup_get_buffer(c,2);
     if (!b)
     {
@@ -98,9 +93,12 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame)
         return 0;   
     }
         
-    memcpy_pic(b->planes[0], frame->buf, height, width, width);
-    memcpy_pic(b->planes[1], frame->buf + filter->uoff, cheight, cwidth, cwidth);
-    memcpy_pic(b->planes[2], frame->buf + filter->voff, cheight, cwidth, cwidth);
+    memcpy_pic(b->planes[0], frame->buf + frame->offsets[0],
+               height,  ypitch, ypitch);
+    memcpy_pic(b->planes[1], frame->buf + frame->offsets[1],
+               cheight, cpitch, cpitch);
+    memcpy_pic(b->planes[2], frame->buf + frame->offsets[2],
+               cheight, cpitch, cpitch);
 
     pullup_submit_field(c, b, p);
     pullup_submit_field(c, b, p^1);
@@ -142,11 +140,15 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame)
         pullup_pack_frame(c, f);
     }
 
-    memcpy_pic(frame->buf, f->buffer->planes[0], height, width, width);
-    memcpy_pic(frame->buf + filter->uoff, f->buffer->planes[1], cheight, cwidth, cwidth);
-    memcpy_pic(frame->buf + filter->voff, f->buffer->planes[2], cheight, cwidth, cwidth);
+    memcpy_pic(frame->buf + frame->offsets[0], f->buffer->planes[0],
+               height,  ypitch, ypitch);
+    memcpy_pic(frame->buf + frame->offsets[1], f->buffer->planes[1],
+               cheight, cpitch, cpitch);
+    memcpy_pic(frame->buf + frame->offsets[2], f->buffer->planes[2],
+               cheight, cpitch, cpitch);
                             
     pullup_release_frame(f);
+
     return 1;
 }
 
@@ -154,6 +156,34 @@ void
 IvtcFilterCleanup( VideoFilter * filter)
 {
     pullup_free_context((((ThisFilter *)filter)->context));    
+}
+
+static void SetupFilter(ThisFilter *vf, int width, int height, int *pitches)
+{
+    if (vf->width  == width  &&
+        vf->height == height &&
+        vf->context->stride[0] == pitches[0] && 
+        vf->context->stride[1] == pitches[1] &&
+        vf->context->stride[2] == pitches[2])
+    {
+        return;
+    }
+    
+    vf->width         = width;
+    vf->height        = height;
+
+    vf->context->w[0] = width;
+    vf->context->w[1] = width >> 1;
+    vf->context->w[2] = width >> 1;
+    vf->context->w[3] = 0;
+    vf->context->h[0] = height;
+    vf->context->h[1] = height >> 1;
+    vf->context->h[2] = height >> 1;
+    vf->context->h[3] = 0;
+    vf->context->stride[0] = pitches[0];
+    vf->context->stride[1] = pitches[1];
+    vf->context->stride[2] = pitches[2];
+    vf->context->stride[3] = 0;
 }
 
 VideoFilter *
@@ -176,13 +206,10 @@ NewIvtcFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
+    bzero (filter, sizeof (ThisFilter));
     filter->progressive_frame_seen = 0;
     filter->interlaced_frame_seen = 0;
     filter->apply_filter = 0;
-    filter->height = *height;
-    filter->width  = *width;
-    filter->uoff = *width * *height;
-    filter->voff = *width * *height  * 5 /  4;
     filter->context = pullup_alloc_context();
     struct pullup_context *c = filter->context;
     c->metric_plane = 0;
@@ -194,16 +221,10 @@ NewIvtcFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     c->nplanes = 4;
     pullup_preinit_context(c);
     c->bpp[0] = c->bpp[1] = c->bpp[2] = 0;
-    c->w[0] = *width;
-    c->h[0] = *height;
-    c->w[1] = c->w[2] = (*width >> 1);
-    c->h[1] = c->h[2] = (*height >> 1);
-    c->w[3] = 0;
-    c->h[3] = 0;
-    c->stride[0] = *width;
-    c->stride[1] = c->stride[2] = (*width >> 1);
-    c->stride[3] = c->w[3];
     c->background[1] = c->background[2]  = 128;
+
+    int pitches[3] = { *width, *width >> 1, *width >> 1 };
+    SetupFilter(filter, *width, *height, pitches);
 
 #ifdef HAVE_MMX
     c->cpu      |= PULLUP_CPU_MMX;

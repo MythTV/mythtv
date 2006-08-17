@@ -34,12 +34,6 @@ typedef struct ThisFilter
 {
     VideoFilter vf;
 
-    int yend;
-    int cend;
-
-    int width;
-    int height;
-
 #ifdef MMX
     int yfilt;
     int cfilt;
@@ -141,62 +135,54 @@ void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
 }
 #endif /* MMX */
 
-static void SetupSize(ThisFilter *filter, VideoFrameType inpixfmt,
-                      int *width, int *height)
-{
-    filter->width = *width;
-    filter->height = *height;
-
-    filter->yend = *width * *height;
-
-    switch (inpixfmt)
-    {
-        case FMT_YV12:
-            filter->cend = filter->yend + *width * *height / 2;
-            break;
-        case FMT_YUV422P:
-            filter->cend = filter->yend + *width * *height;
-            break;
-        default:
-            break;
-    }
-}
-
 int adjustFilter (VideoFilter *vf, VideoFrame *frame)
 {
     ThisFilter *filter = (ThisFilter *) vf;
     TF_VARS;
 
-    if (frame->width != filter->width || frame->height != filter->height)
-        SetupSize(filter, frame->codec, &frame->width, &frame->height);
-
     TF_START;
+    {
+        unsigned char *ybeg = frame->buf + frame->offsets[0];
+        unsigned char *yend = ybeg + (frame->pitches[0] * frame->height);
+        int cheight = (frame->codec == FMT_YV12) ?
+            (frame->height >> 1) : frame->height;
+        unsigned char *ubeg = frame->buf + frame->offsets[1];
+        unsigned char *uend = ubeg + (frame->pitches[1] * cheight);
+        unsigned char *vbeg = frame->buf + frame->offsets[2];
+        unsigned char *vend = ubeg + (frame->pitches[2] * cheight);
 
 #ifdef MMX
-    if (filter->yfilt)
-        adjustRegionMMX(frame->buf, frame->buf + filter->yend, filter->ytable,
-                        &(filter->yshift), &(filter->yscale), &(filter->ymin),
-                        mm_cpool + 1, mm_cpool + 2);
-    else
-        adjustRegion(frame->buf, frame->buf + filter->yend, filter->ytable);
+        if (filter->yfilt)
+            adjustRegionMMX(ybeg, yend, filter->ytable,
+                            &(filter->yshift), &(filter->yscale),
+                            &(filter->ymin), mm_cpool + 1, mm_cpool + 2);
+        else
+            adjustRegion(ybeg, yend, filter->ytable);
 
-    if (filter->cfilt)
-        adjustRegionMMX(frame->buf + filter->yend, frame->buf + filter->cend,
-                        filter->ctable, &(filter->cshift), &(filter->cscale),
-                        &(filter->cmin), mm_cpool + 3, mm_cpool + 4);
-    else
-        adjustRegion(frame->buf + filter->yend, frame->buf + filter->cend,
-                     filter->ctable);
+        if (filter->cfilt)
+        {
+            adjustRegionMMX(ubeg, uend, filter->ctable,
+                            &(filter->cshift), &(filter->cscale),
+                            &(filter->cmin), mm_cpool + 3, mm_cpool + 4);
+            adjustRegionMMX(vbeg, vend, filter->ctable,
+                            &(filter->cshift), &(filter->cscale),
+                            &(filter->cmin), mm_cpool + 3, mm_cpool + 4);
+        }
+        else
+        {
+            adjustRegion(ubeg, uend, filter->ctable);
+            adjustRegion(vbeg, vend, filter->ctable);
+        }
 
-    if (filter->yfilt || filter->cfilt)
-        emms();
+        if (filter->yfilt || filter->cfilt)
+            emms();
 
 #else /* MMX */
-    adjustRegion(frame->buf, frame->buf + filter->yend, filter->ytable);
-    adjustRegion(frame->buf + filter->yend, frame->buf + filter->cend,
-                 filter->ctable);
+        adjustRegion(ybeg, yend, filter->ytable);
+        adjustRegion(ubeg, uend, filter->ctable);
+        adjustRegion(vbeg, vend, filter->ctable);
 #endif /* MMX */
-
+    }
     TF_END(filter, "Adjust: ");
     return 0;
 }
@@ -249,11 +235,13 @@ int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
 VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                    int *width, int *height, char *options)
+                 int *width, int *height, char *options)
 {
     ThisFilter *filter;
     int numopts, ymin, ymax, cmin, cmax;
     float ygamma, cgamma;
+    (void) width;
+    (void) height;
 
     if (inpixfmt != outpixfmt ||
         (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P))
@@ -304,8 +292,6 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     fillTable (filter->ytable, ymin, ymax, 16, 235, ygamma);
     fillTable (filter->ctable, cmin, cmax, 16, 240, cgamma);
 #endif
-
-    SetupSize(filter, inpixfmt, width, height);
 
     filter->vf.filter = &adjustFilter;
     filter->vf.cleanup = NULL;
