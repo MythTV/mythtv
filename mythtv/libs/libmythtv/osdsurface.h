@@ -39,7 +39,8 @@ class OSDSurface
 
     void BlendToYV12(unsigned char *yptr,
                      unsigned char *uptr,
-                     unsigned char *vptr) const;
+                     unsigned char *vptr,
+                     int ystride, int ystride, int vstride) const;
     void BlendToARGB(unsigned char *argbptr,
                      uint stride, uint height, bool blendtoblack=false,
                      uint threshold = 0) const;
