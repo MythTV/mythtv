@@ -624,6 +624,7 @@ sunmlib="no"
 pthreads="no"
 gpl="yes"
 memalignhack="no"
+asmalign_pot="unknown"
 
 # OS specific
 targetos=`uname -s`
@@ -1372,7 +1373,7 @@ if test "$gpl" != "yes"; then
     fi
 
     if test "$dts" != "no"; then
-        echo "libdts is under GPL and --enable-gpl is not specified"
+        echo "libdts is under GPL and --enable-gpl is not specified."
         fail="yes"
     fi
 
@@ -2279,6 +2280,12 @@ if test "$gprof" = "yes" ; then
     LDFLAGS="$LDFLAGS -p"
 fi
 
+# find if .align arg is power-of-two or not
+if test $asmalign_pot = "unknown"; then
+    asmalign_pot="no"
+    echo 'asm (".align 3");' | check_cc && asmalign_pot="yes"
+fi
+
 if test x"$bindir" = x""; then
     bindir="${PREFIX}/bin"
 fi
@@ -2603,6 +2610,7 @@ fi
 #else
 #    echo "License: GPL"
 #fi
+#echo ".align is power-of-two" $asmalign_pot
 echo
 if test x"$frontend" = x"yes" ; then
   echo "# Input Support"
@@ -3251,6 +3259,12 @@ fi
 
 if test "$amr_if2" = "yes" ; then
   echo "AMR_CFLAGS=-DIF2=1" >> $MYTH_CONFIG_MAK
+fi
+
+if test "$asmalign_pot" = "yes" ; then
+  printf '#define ASMALIGN(ZEROBITS) ".align " #ZEROBITS "\\n\\t"\n' >> $TMPH
+else
+  printf '#define ASMALIGN(ZEROBITS) ".align 1<<" #ZEROBITS "\\n\\t"\n' >> $TMPH
 fi
 
 if test x"$frontend" = x"no" ; then

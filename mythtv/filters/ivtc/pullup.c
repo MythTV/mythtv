@@ -21,7 +21,7 @@ static int diff_y_mmx(unsigned char *a, unsigned char *b, int s)
 		"pxor %%mm4, %%mm4 \n\t"
 		"pxor %%mm7, %%mm7 \n\t"
 		
-		".balign 16 \n\t"
+		ASMALIGN(4)
 		"1: \n\t"
 		
 		"movq (%%esi), %%mm0 \n\t"
@@ -70,7 +70,7 @@ static int licomb_y_mmx(unsigned char *a, unsigned char *b, int s)
 		"pxor %%mm7, %%mm7 \n\t"
 		"subl %%eax, %%edi \n\t"
 		
-		".balign 16 \n\t"
+		ASMALIGN(4)
 		"2: \n\t"
 
 		"movq (%%esi), %%mm0 \n\t"
@@ -159,7 +159,7 @@ static int var_y_mmx(unsigned char *a, unsigned char *b, int s)
 		"pxor %%mm4, %%mm4 \n\t"
 		"pxor %%mm7, %%mm7 \n\t"
 		
-		".balign 16 \n\t"
+		ASMALIGN(4)
 		"1: \n\t"
 		
 		"movq (%%esi), %%mm0 \n\t"
