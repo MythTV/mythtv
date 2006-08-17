@@ -34,7 +34,7 @@ CannyEdgeDetector::CannyEdgeDetector(void)
 
     /* Compute Gaussian mask. */
     mask = new double[mask_width];
-    val = exp(0);
+    val = 1.0;  /* Initialize center of Gaussian mask (rr=0 => exp(0)). */
     mask[mask_radius] = val;
     sum = val;
     for (rr = 1; rr <= mask_radius; rr++)
