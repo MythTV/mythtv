@@ -39,6 +39,7 @@ using namespace std;
 #include "filtermanager.h"
 #define IGNORE_TV_PLAY_REC
 #include "tv.h"
+#include "fourcc.h"
 
 #define LOC QString("VideoOutputXv: ")
 #define LOC_ERR QString("VideoOutputXv Error: ")
