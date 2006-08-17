@@ -23,17 +23,22 @@ public:
     ~HistogramAnalyzer(void);
 
     enum FrameAnalyzer::analyzeFrameResult nuppelVideoPlayerInited(
-            NuppelVideoPlayer *nvp);
+            NuppelVideoPlayer *nvp, long long nframes);
     void setLogoState(TemplateFinder *finder);
+    static const long long UNCACHED = -1;
     enum FrameAnalyzer::analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno);
-    int finished(void);
+    int finished(long long nframes, bool final);
     int reportTime(void) const;
 
-    const unsigned char *getBlanks(void) const { return blank; }
+    /* Each color 0-255 gets a scaled frequency counter 0-255. */
+    typedef unsigned char   Histogram[UCHAR_MAX + 1];
+
     const float *getMeans(void) const { return mean; }
     const unsigned char *getMedians(void) const { return median; }
     const float *getStdDevs(void) const { return stddev; }
+    const Histogram *getHistograms(void) const { return histogram; }
+    const unsigned char *getMonochromatics(void) const { return monochromatic; }
 
 private:
     PGMConverter            *pgmConverter;
@@ -44,16 +49,17 @@ private:
     int                     logowidth, logoheight;
     int                     logorr1, logocc1, logorr2, logocc2;
 
-    long long               nframes;                /* total frame count */
-
     /* Per-frame info. */
-    unsigned char           *blank;                 /* boolean */
     float                   *mean;                  /* mean pixel value */
     unsigned char           *median;                /* median pixel value */
     float                   *stddev;                /* standard deviation */
     int                     *frow, *fcol;           /* position of borders */
     int                     *fwidth, *fheight;      /* area of borders */
+    Histogram               *histogram;             /* histogram */
+    unsigned char           *monochromatic;         /* computed boolean */
+    int                     histval[UCHAR_MAX + 1]; /* temporary buffer */
     unsigned char           *buf;                   /* temporary buffer */
+    long long               lastframeno;
 
     /* Debugging */
     int                     debugLevel;

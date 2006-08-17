@@ -11,6 +11,7 @@
 
 typedef struct AVPicture AVPicture;
 class HistogramAnalyzer;
+class TemplateMatcher;
 
 class BlankFrameDetector : public FrameAnalyzer
 {
@@ -21,23 +22,24 @@ public:
 
     /* FrameAnalyzer interface. */
     const char *name(void) const { return "BlankFrameDetector"; }
-    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp);
+    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+            long long nframes);
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame);
-    int finished(void);
+    int finished(long long nframes, bool final);
     int reportTime(void) const;
 
     /* BlankFrameDetector interface. */
-    bool getSkipBlanks(void) const { return skipblanks; }
+    bool getSKipCommBlanks(void) const { return skipcommblanks; }
     const FrameAnalyzer::FrameMap *getBlanks(void) const { return &blankMap; }
+    int computeForLogoSurplus(const TemplateMatcher *tm);
+    int computeForLogoDeficit(const TemplateMatcher *tm);
     int computeBreaks(FrameMap *breaks);
 
 private:
     HistogramAnalyzer       *histogramAnalyzer;
-    long long               nframes;                /* total frame count */
     float                   fps;
-    unsigned int            npixels;
-    bool                    skipblanks;             /* blanks as commercials */
+    bool                    skipcommblanks;         /* skip commercial blanks */
 
     FrameAnalyzer::FrameMap blankMap;
     FrameAnalyzer::FrameMap breakMap;

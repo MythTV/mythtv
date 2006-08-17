@@ -24,6 +24,7 @@ SOURCES += FrameAnalyzer.cpp
 SOURCES += TemplateFinder.cpp TemplateMatcher.cpp
 SOURCES += HistogramAnalyzer.cpp
 SOURCES += BlankFrameDetector.cpp
+SOURCES += SceneChangeDetector.cpp
 
 HEADERS += SlotRelayer.h CustomEventRelayer.h
 HEADERS += CommDetectorFactory.h CommDetectorBase.h
@@ -42,3 +43,4 @@ HEADERS += FrameAnalyzer.h
 HEADERS += TemplateFinder.h TemplateMatcher.h
 HEADERS += HistogramAnalyzer.h
 HEADERS += BlankFrameDetector.h
+HEADERS += SceneChangeDetector.h

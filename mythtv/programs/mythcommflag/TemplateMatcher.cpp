@@ -348,7 +348,8 @@ TemplateMatcher::~TemplateMatcher(void)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp)
+TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp,
+        long long nframes)
 {
     /*
      * TUNABLE:
@@ -373,7 +374,6 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp)
     int             tmpledges;
 
     nvp = _nvp;
-    nframes = nvp->GetTotalFrameCount();
     fps = nvp->GetFrameRate();
 
     if (!(tmpl = templateFinder->getTemplate(&tmplrow, &tmplcol,
@@ -514,12 +514,12 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
 error:
     VERBOSE(VB_COMMFLAG, QString(
                 "TemplateMatcher::analyzeFrame error at frame %1 of %2")
-            .arg(frameno).arg(nframes));
+            .arg(frameno));
     return ANALYZE_ERROR;
 }
 
 int
-TemplateMatcher::finished(void)
+TemplateMatcher::finished(long long nframes, bool final)
 {
     /*
      * TUNABLE:
@@ -538,7 +538,7 @@ TemplateMatcher::finished(void)
 
     if (!matches_done && debug_matches)
     {
-        if (writeMatches(debugdata, matches, nframes))
+        if (final && writeMatches(debugdata, matches, nframes))
         {
             VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished wrote %1")
                     .arg(debugdata));
@@ -546,15 +546,18 @@ TemplateMatcher::finished(void)
         }
     }
 
+    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher::finished(%1)")
+            .arg(nframes));
+
     for (long long ii = 0; ii < nframes; ii++)
         match[ii] = matches[ii] >= mintmpledges ? 1 : 0;
 
     if (debugLevel >= 2)
     {
-        if (finishedDebug(pgmConverter, edgeDetector, nvp,
+        if (final && finishedDebug(pgmConverter, edgeDetector, nvp,
                     nframes, match, matches, &overlay, &cropped,
-                    tmplrow, tmplcol, tmplwidth, tmplheight,
-                    debug_frames, debugdir))
+                    tmplrow, tmplcol, tmplwidth, tmplheight, debug_frames,
+                    debugdir))
             goto error;
     }
 
@@ -566,8 +569,9 @@ TemplateMatcher::finished(void)
     while (brkb < nframes)
     {
         /* Find break. */
-        if (match[brkb])
-            brkb = matchspn(nframes, match, brkb, match[brkb]);
+        if (match[brkb] &&
+                (brkb = matchspn(nframes, match, brkb, match[brkb])) == nframes)
+            break;
 
         long long brke = matchspn(nframes, match, brkb, match[brkb]);
         long long brklen = brke - brkb;
@@ -656,25 +660,43 @@ TemplateMatcher::reportTime(void) const
 }
 
 int
-TemplateMatcher::breakCoverage(void) const
+TemplateMatcher::templateCoverage(long long nframes, bool final) const
 {
+    /*
+     * Return <0 for too little logo coverage (some content has no logo), 0 for
+     * "correct" coverage, and >0 for too much coverage (some commercials have
+     * logos).
+     */
+
     /*
      * TUNABLE:
      *
-     * Expect 25%-36% of total length to be commercials.
+     * Expect 20%-45% of total length to be commercials.
      */
-    const int       MINBREAKS = nframes * 25 / 100;
-    const int       MAXBREAKS = nframes * 36 / 100;
+    const int       MINBREAKS = nframes * 20 / 100;
+    const int       MAXBREAKS = nframes * 45 / 100;
 
     const long long brklen = frameAnalyzerMapSum(&breakMap);
     const bool good = brklen >= MINBREAKS && brklen <= MAXBREAKS;
 
     if (debugLevel >= 1)
     {
-        if (good)
+        if (!tmpl)
         {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks:"
-                        " adjusting for blanks")
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher: no template"
+                        " (wanted %2-%3%)")
+                    .arg(100 * MINBREAKS / nframes)
+                    .arg(100 * MAXBREAKS / nframes));
+        }
+        else if (!final)
+        {
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks"
+                        " (real-time flagging)")
+                    .arg(100 * brklen / nframes));
+        }
+        else if (good)
+        {
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks")
                     .arg(100 * brklen / nframes));
         }
         else
@@ -687,11 +709,10 @@ TemplateMatcher::breakCoverage(void) const
         }
     }
 
-    /*
-     * Return <0 for too little logo coverage, 0 for "correct" coverage, and >0
-     * for too much coverage.
-     */
-    return brklen < MINBREAKS ? -1 : brklen <= MAXBREAKS ? 0 : 1;
+    if (!final)
+        return 0;   /* real-time flagging */
+
+    return brklen < MINBREAKS ? 1 : brklen <= MAXBREAKS ? 0 : -1;
 }
 
 int
@@ -705,9 +726,11 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
      * beginnings and endings of existing TemplateMatcher breaks.
      */
     const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
-    const bool      skipBlanks = blankFrameDetector->getSkipBlanks();
+    const bool      skipCommBlanks = blankFrameDetector->getSKipCommBlanks();
 
     const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
+
+    VERBOSE(VB_COMMFLAG, QString("TemplateMatcher adjusting for blanks"));
 
     FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
     while (ii != breakMap.end())
@@ -724,14 +747,14 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
         {
             /* Look for a blank frame near beginning of logo break. */
             FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constBegin();
-            if (!jj.key() && !jj.data())
+            if (jj != blankMap->constEnd() && !jj.key() && !jj.data())
                 ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
             for (; jj != blankMap->constEnd(); ++jj)
             {
                 long long jjbb = jj.key();
                 long long jjee = jjbb + jj.data();
 
-                if (jjbb > iiee)
+                if (iiee < jjbb)
                     break;      /* Passed (iibb,iiee). */
 
                 if (jjee < iibb)
@@ -758,7 +781,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
             long long kkbb = kk.key();
             long long kkee = kkbb + kk.data();
 
-            if (kkbb > mmee)
+            if (mmee < kkbb)
                 break;      /* Passed (mmbb,mmee). */
 
             if (kkee < mmbb)
@@ -772,13 +795,13 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
         if (jjfound != blankMap->constEnd())
         {
             start = jjfound.key();
-            if (!skipBlanks)
+            if (!skipCommBlanks)
                 start += jjfound.data();
         }
         if (kkfound != blankMap->constEnd())
         {
             end = kkfound.key();
-            if (skipBlanks)
+            if (skipCommBlanks)
                 end += kkfound.data();
         }
         if (start != ii.key())
@@ -803,7 +826,7 @@ TemplateMatcher::computeBreaks(FrameAnalyzer::FrameMap *breaks)
             bb != breakMap.end();
             ++bb)
     {
-        (*breaks)[bb.key()] = bb.data();
+        breaks->insert(bb.key(), bb.data());
     }
     return 0;
 }

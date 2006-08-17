@@ -41,7 +41,7 @@ private:
     long long               frameno;            /* frame number */
     int                     row, col;           /* content location */
     int                     width, height;      /* content dimensions */
-    bool                    isblank;
+    bool                    ismonochromatic;
 
     /* Debugging. */
     int                     debugLevel;

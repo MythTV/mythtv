@@ -13,7 +13,7 @@ BorderDetector::BorderDetector(void)
     : logoFinder(NULL)
     , logo(NULL)
     , frameno(-1)
-    , isblank(false)
+    , ismonochromatic(false)
     , debugLevel(0)
     , time_reported(false)
 {
@@ -64,7 +64,7 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
      *
      * If there is a logo, exclude its area from border detection.
      *
-     * Return 0 for normal frames; non-zero for "blank" (monochromatic) frames.
+     * Return 0 for normal frames; non-zero for monochromatic frames.
      */
 
     /*
@@ -85,7 +85,7 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
      * edge-detection phase where they are likely to take edge pixels away from
      * possible template edges.
      */
-    static const unsigned char  MAXRANGE = 10;
+    static const unsigned char  MAXRANGE = 8;
 
     /*
      * TUNABLE:
@@ -131,7 +131,7 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
      * Slop to accommodate any jagged letterboxing/pillarboxing edges.
      */
     const int               VERTSLOP = max(MAXLINES, pgmheight * 1 / 120);
-    const int               HORIZSLOP = max(MAXLINES, pgmwidth * 125 / 20000);
+    const int               HORIZSLOP = max(MAXLINES, pgmwidth * 5 / 1000);
 
     struct timeval          start, end, elapsed;
     unsigned char           minval, maxval, val;
@@ -198,7 +198,7 @@ found_left:
         newcol = cc + HORIZSLOP;
         newwidth = max(0, maxcol - HORIZSLOP - newcol + 1);
         if (newcol > maxcol)
-            goto blank_frame;
+            goto monochromatic_frame;
 
         /*
          * Find right edge. Keep same minval/maxval as left edge. Also, right
@@ -237,7 +237,7 @@ found_right:
         newwidth = max(0, cc - HORIZSLOP - newcol + 1);
 
         if (!newwidth)
-            goto blank_frame;
+            goto monochromatic_frame;
 
         if (top || bottom)
             break;  /* No need to repeat letterboxing check. */
@@ -278,7 +278,7 @@ found_top:
         newrow = rr + VERTSLOP;
         newheight = max(0, maxrow - VERTSLOP - newrow + 1);
         if (newrow > maxrow)
-            goto blank_frame;
+            goto monochromatic_frame;
 
         /*
          * Find bottom edge. Keep same minval/maxval as top edge. Also, bottom
@@ -318,7 +318,7 @@ found_bottom:
         newheight = max(0, rr - VERTSLOP - newrow + 1);
 
         if (!newheight)
-            goto blank_frame;
+            goto monochromatic_frame;
 
         if (left || right)
             break;  /* No need to repeat pillarboxing check. */
@@ -343,16 +343,16 @@ found_bottom:
     col = newcol;
     width = newwidth;
     height = newheight;
-    isblank = false;
+    ismonochromatic = false;
     goto done;
 
-blank_frame:
+monochromatic_frame:
     frameno = _frameno;
     row = newrow;
     col = newcol;
     width = newwidth;
     height = newheight;
-    isblank = true;
+    ismonochromatic = true;
 
 done:
     *prow = row;
@@ -364,7 +364,7 @@ done:
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
 
-    return isblank ? -1 : 0;
+    return ismonochromatic ? -1 : 0;
 }
 
 int

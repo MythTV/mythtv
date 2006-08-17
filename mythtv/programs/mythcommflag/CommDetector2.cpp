@@ -12,6 +12,7 @@
 #include "BorderDetector.h"
 #include "HistogramAnalyzer.h"
 #include "BlankFrameDetector.h"
+#include "SceneChangeDetector.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
 
@@ -61,7 +62,7 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
 int nuppelVideoPlayerInited(QPtrList<FrameAnalyzer> *pass,
         QPtrList<FrameAnalyzer> *finishedAnalyzers,
         QPtrList<FrameAnalyzer> *deadAnalyzers,
-        NuppelVideoPlayer *nvp)
+        NuppelVideoPlayer *nvp, long long nframes)
 {
     QPtrListIterator<FrameAnalyzer>     iifa(*pass);
     FrameAnalyzer                       *fa;
@@ -72,7 +73,7 @@ int nuppelVideoPlayerInited(QPtrList<FrameAnalyzer> *pass,
     {
         ++jjfa;
 
-        ares = fa->nuppelVideoPlayerInited(nvp);
+        ares = fa->nuppelVideoPlayerInited(nvp, nframes);
 
         if (ares == FrameAnalyzer::ANALYZE_OK ||
                 ares == FrameAnalyzer::ANALYZE_ERROR)
@@ -159,13 +160,13 @@ long long processFrame(QPtrList<FrameAnalyzer> *pass,
     return minNextFrame;
 }
 
-int passFinished(QPtrList<FrameAnalyzer> *pass)
+int passFinished(QPtrList<FrameAnalyzer> *pass, long long nframes, bool final)
 {
     FrameAnalyzer       *fa;
 
     for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
             (fa = iifa.current()); ++iifa)
-        (void)fa->finished();
+        (void)fa->finished(nframes, final);
 
     return 0;
 }
@@ -179,6 +180,11 @@ int passReportTime(QPtrList<FrameAnalyzer> *pass)
         (void)fa->reportTime();
 
     return 0;
+}
+
+bool searchingForLogo(TemplateFinder *tf, QPtrList<FrameAnalyzer> *pass)
+{
+    return tf && pass->find(tf) != -1;
 }
 
 };  // namespace
@@ -298,15 +304,19 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     , recstartts(recstartts_in)
     , recendts(recendts_in)
     , isRecording(QDateTime::currentDateTime() < recendts)
+    , sendBreakMapUpdates(false)
+    , breakMapUpdateRequested(false)
+    , finished(false)
+    , logoFinder(NULL)
     , logoMatcher(NULL)
     , blankFrameDetector(NULL)
+    , sceneChangeDetector(NULL)
     , debugdir("")
 {
     QPtrList<FrameAnalyzer> pass0, pass1;
     PGMConverter            *pgmConverter = NULL;
     BorderDetector          *borderDetector = NULL;
     HistogramAnalyzer       *histogramAnalyzer = NULL;
-    TemplateFinder          *logoFinder = NULL;
 
     debugdir = debugDirectory(chanid, recstartts);
 
@@ -336,6 +346,40 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
         }
     }
 
+#ifdef LATER
+    /*
+     * "Scene Detection" doesn't seem to be too useful (in the USA); there are
+     * just too many false positives from non-commercial cut scenes. But I'll
+     * leave the code in here in case someone else finds it useful.
+     */
+
+    /*
+     * Look for "scene changes" to use as delimiters between commercial and
+     * non-commercial segments.
+     */
+    if ((commDetectMethod & COMM_DETECT_2_SCENE))
+    {
+        if (!pgmConverter)
+            pgmConverter = new PGMConverter();
+
+        if (!borderDetector)
+            borderDetector = new BorderDetector();
+
+        if (!histogramAnalyzer)
+        {
+            histogramAnalyzer = new HistogramAnalyzer(pgmConverter,
+                    borderDetector, debugdir);
+        }
+
+        if (!sceneChangeDetector)
+        {
+            sceneChangeDetector = new SceneChangeDetector(histogramAnalyzer,
+                    debugdir);
+            pass1.append(sceneChangeDetector);
+        }
+    }
+#endif /* LATER */
+
     /*
      * Logo Detection requires two passes. The first pass looks for static
      * areas of the screen to look for logos and generate a template. The
@@ -358,7 +402,8 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
         if (!logoFinder)
         {
             logoFinder = new TemplateFinder(pgmConverter, borderDetector,
-                    cannyEdgeDetector, nvp, debugdir);
+                    cannyEdgeDetector, nvp, recstartts.secsTo(recendts),
+                    debugdir);
             pass0.append(logoFinder);
         }
 
@@ -376,50 +421,6 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     /* Aggregate them all together. */
     frameAnalyzers.append(pass0);
     frameAnalyzers.append(pass1);
-}
-
-int CommDetector2::buildBuffer(int minbuffer)
-{
-    bool                    wereRecording = isRecording;
-    int                     buffer = minbuffer;
-    int                     maxExtra = 0;
-    int                     preroll = recstartts.secsTo(startts);
-
-    for (frameAnalyzerList::const_iterator pass = frameAnalyzers.begin();
-            pass != frameAnalyzers.end();
-            ++pass)
-    {
-        FrameAnalyzer   *fa;
-
-        if ((*pass).isEmpty())
-            continue;
-
-        for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
-                (fa = iifa.current()); ++iifa)
-        {
-            maxExtra = max(maxExtra, fa->extraBuffer(preroll));
-        }
-
-        buffer += maxExtra;
-    }
-
-    emit statusUpdate("Building Detection Buffer");
-
-    int reclen;
-    while (isRecording && (reclen = recstartts.secsTo(
-        QDateTime::currentDateTime())) < buffer)
-    {
-        emit breathe();
-        if (m_bStop)
-            return -1;
-        sleep(2);
-    }
-
-    // Don't bother flagging short ~realtime recordings
-    if (wereRecording && !isRecording && reclen < buffer)
-        return -1;
-
-    return 0;
 }
 
 void CommDetector2::reportState(int elapsedms, long long frameno,
@@ -465,29 +466,43 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
     }
 }
 
-int CommDetector2::computeBreaks(void)
+int CommDetector2::computeBreaks(long long nframes)
 {
+    int             trow, tcol, twidth, theight;
+    TemplateMatcher *matcher;
+
     breaks.clear();
 
-    if (logoMatcher && blankFrameDetector)
+    matcher = logoFinder &&
+        logoFinder->getTemplate(&trow, &tcol, &twidth, &theight) ? logoMatcher :
+        NULL;
+
+    if (matcher && blankFrameDetector)
     {
         int cmp;
-        if (!(cmp = logoMatcher->breakCoverage()))
+        if (!(cmp = matcher->templateCoverage(nframes, finished)))
         {
-            if (logoMatcher->adjustForBlanks(blankFrameDetector))
+            if (matcher->adjustForBlanks(blankFrameDetector))
                 return -1;
-            if (logoMatcher->computeBreaks(&breaks))
+            if (matcher->computeBreaks(&breaks))
                 return -1;
         }
         else
         {
+            if (cmp > 0 &&
+                    blankFrameDetector->computeForLogoSurplus(matcher))
+                return -1;
+            else if (cmp < 0 &&
+                    blankFrameDetector->computeForLogoDeficit(matcher))
+                return -1;
+
             if (blankFrameDetector->computeBreaks(&breaks))
                 return -1;
         }
     }
-    else if (logoMatcher)
+    else if (matcher)
     {
-        if (logoMatcher->computeBreaks(&breaks))
+        if (matcher->computeBreaks(&breaks))
             return -1;
     }
     else if (blankFrameDetector)
@@ -505,9 +520,6 @@ bool CommDetector2::go(void)
 
     nvp->SetNullVideo();
 
-    if (buildBuffer(minlag) < 0)
-        return false;
-
     if (nvp->OpenFile() < 0)
         return false;
 
@@ -523,30 +535,30 @@ bool CommDetector2::go(void)
     QTime flagTime;
     flagTime.start();
     
-    long long myTotalFrames = recendts < QDateTime::currentDateTime() ?
-        nvp->GetTotalFrameCount() :
-        (long long)(nvp->GetFrameRate() * recstartts.secsTo(recendts));
+    /* If still recording, estimate the eventual total number of frames. */
+    long long nframes = isRecording ?
+        (long long)roundf((recstartts.secsTo(recendts) + 5) *
+                          nvp->GetFrameRate()) :
+            nvp->GetTotalFrameCount();
+    bool postprocessing = !isRecording;
 
     if (showProgress)
     {
-        if (myTotalFrames)
+        if (nframes)
             cerr << "  0%/      ";
         else
             cerr << "     0/      ";
         cerr.flush();
     }
 
-    emit breathe();
-
+    QMap<long long, int> lastBreakMap;
     unsigned int passno = 0;
     unsigned int npasses = frameAnalyzers.count();
-    long long nframes = nvp->GetTotalFrameCount();
-    for (frameAnalyzerList::iterator pass = frameAnalyzers.begin();
-            pass != frameAnalyzers.end();
-            ++pass, passno++)
+    for (currentPass = frameAnalyzers.begin();
+            currentPass != frameAnalyzers.end();
+            ++currentPass, passno++)
     {
-        QPtrList<FrameAnalyzer> finishedAnalyzers, deadAnalyzers;
-        FrameAnalyzer           *fa;
+        QPtrList<FrameAnalyzer> deadAnalyzers;
 
         VERBOSE(VB_COMMFLAG, QString(
                     "CommDetector2::go pass %1 of %2 (%3 frames, %4 fps)")
@@ -554,8 +566,8 @@ bool CommDetector2::go(void)
                 .arg(nvp->GetTotalFrameCount())
                 .arg(nvp->GetFrameRate(), 0, 'f', 2));
 
-        if (nuppelVideoPlayerInited(&(*pass), &finishedAnalyzers,
-                    &deadAnalyzers, nvp))
+        if (nuppelVideoPlayerInited(&(*currentPass), &finishedAnalyzers,
+                    &deadAnalyzers, nvp, nframes))
             return false;
 
         /*
@@ -566,15 +578,17 @@ bool CommDetector2::go(void)
          */
         nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
         long long nextFrame = -1;
-        long long currentFrameNumber = 0;
+        currentFrameNumber = 0;
         long long lastLoggedFrame = currentFrameNumber;
         QTime clock;
         struct timeval getframetime;
 
+        if (searchingForLogo(logoFinder, &(*currentPass)))
+            emit statusUpdate("Performing Logo Identification");
+
         clock.start();
         memset(&getframetime, 0, sizeof(getframetime));
-        while (currentFrameNumber < nframes && !(*pass).isEmpty() &&
-                !nvp->GetEof())
+        while (!(*currentPass).isEmpty() && !nvp->GetEof())
         {
             struct timeval start, end, elapsed;
 
@@ -600,18 +614,15 @@ bool CommDetector2::go(void)
                 sleep(1);
             }
 
-            // sleep a little so we don't use all cpu even if we're niced
-            if (!fullSpeed && !isRecording)
-                usleep(10000);  // 10ms
-
-            if (needToReportState(showProgress, isRecording,
+            if (!searchingForLogo(logoFinder, &(*currentPass)) &&
+                    needToReportState(showProgress, isRecording,
                         currentFrameNumber))
             {
                 reportState(flagTime.elapsed(), currentFrameNumber,
-                        myTotalFrames, passno, npasses);
+                        nframes, passno, npasses);
             }
 
-            nextFrame = processFrame(&(*pass), &finishedAnalyzers,
+            nextFrame = processFrame(&(*currentPass), &finishedAnalyzers,
                     &deadAnalyzers, currentFrame, currentFrameNumber);
 
             if (currentFrameNumber >= 1 &&
@@ -625,7 +636,7 @@ bool CommDetector2::go(void)
                             "processFrame %1 of %2 (%3%) - %4 fps")
                         .arg(currentFrameNumber)
                         .arg(nframes)
-                        .arg((currentFrameNumber + 1) * 100 / nframes)
+                        .arg((int)roundf(currentFrameNumber * 100.0 / nframes))
                         .arg((currentFrameNumber - lastLoggedFrame) * 1000 /
                             elapsed));
                 lastLoggedFrame = currentFrameNumber;
@@ -639,33 +650,65 @@ bool CommDetector2::go(void)
                         fullSpeed);
             }
 
+            // sleep a little so we don't use all cpu even if we're niced
+            if (!fullSpeed && !isRecording)
+                usleep(10000);  // 10ms
+
+            if (sendBreakMapUpdates && (breakMapUpdateRequested ||
+                        !(currentFrameNumber % 500)))
+            {
+                QMap<long long, int> breakMap;
+
+                getCommercialBreakList(breakMap);
+
+                QMap<long long, int>::const_iterator ii, jj;
+                ii = breakMap.begin();
+                jj = lastBreakMap.begin();
+                while (ii != breakMap.end() && jj != breakMap.end())
+                {
+                    if (ii.key() != jj.key())
+                        break;
+                    if (ii.data() != jj.data())
+                        break;
+                    ++ii;
+                    ++jj;
+                }
+                bool same = ii == breakMap.end() && jj == lastBreakMap.end();
+                lastBreakMap = breakMap;
+
+                if (breakMapUpdateRequested || !same)
+                    emit gotNewCommercialBreakList();
+
+                breakMapUpdateRequested = false;
+            }
+
             nvp->DiscardVideoFrame(currentFrame);
 
             currentFrameNumber = nextFrame;
         }
 
         QPtrListIterator<FrameAnalyzer> iifa(finishedAnalyzers);
+        FrameAnalyzer *fa;
         while ((fa = iifa.current()))
         {
             finishedAnalyzers.remove(fa);
-            (*pass).append(fa);
+            (*currentPass).append(fa);
         }
 
-        if (passFinished(&(*pass)))
+        if (postprocessing)
+            currentFrameNumber = nvp->GetTotalFrameCount() - 1;
+        if (passFinished(&(*currentPass), currentFrameNumber + 1, true))
             return false;
 
         VERBOSE(VB_COMMFLAG, QString("NVP Time: GetRawVideoFrame=%1s")
                 .arg(strftimeval(&getframetime)));
-        if (passReportTime(&(*pass)))
+        if (passReportTime(&(*currentPass)))
             return false;
     }
 
-    if (computeBreaks())
-        return false;
-
     if (showProgress)
     {
-        if (myTotalFrames)
+        if (nframes)
             cerr << "\b\b\b\b\b\b      \b\b\b\b\b\b";
         else
             cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b             "
@@ -673,14 +716,33 @@ bool CommDetector2::go(void)
         cerr.flush();
     }
 
+    finished = true;
     return true;
 }
 
 void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
 {
+    if (!finished)
+    {
+        for (frameAnalyzerList::iterator pass = frameAnalyzers.begin();
+                pass != frameAnalyzers.end();
+                ++pass)
+        {
+            if (*pass == *currentPass && passFinished(&finishedAnalyzers,
+                        currentFrameNumber + 1, false))
+                return;
+            if (passFinished(&(*pass), currentFrameNumber + 1, false))
+                return;
+        }
+    }
+
+    if (computeBreaks(currentFrameNumber + 1))
+        return;
+
     marks.clear();
 
     /* Create break list. */
+    long long breakframes = 0;
     for (FrameAnalyzer::FrameMap::Iterator bb = breaks.begin();
             bb != breaks.end();
             ++bb)
@@ -691,6 +753,8 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
 
         marks[segb] = MARK_COMM_START;
         marks[sege] = MARK_COMM_END;
+
+        breakframes += seglen;
     }
 
     /* Report results. */
@@ -712,12 +776,39 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
                 .arg(frameToTimestamp(markend, fps))
                 .arg(frameToTimestamp(markend - markstart + 1, fps)));
     }
+
+    const long long nframes = nvp->GetTotalFrameCount();
+    VERBOSE(VB_COMMFLAG, QString("Flagged %1 of %2 frames (%3 of %4),"
+                " %5% commercials (%6)")
+            .arg(currentFrameNumber)
+            .arg(nframes)
+            .arg(frameToTimestamp(currentFrameNumber, fps))
+            .arg(frameToTimestamp(nframes, fps))
+            .arg(breakframes * 100 / currentFrameNumber)
+            .arg(frameToTimestamp(breakframes, fps)));
 }
 
 void CommDetector2::recordingFinished(long long totalFileSize)
 {
     CommDetectorBase::recordingFinished(totalFileSize);
     isRecording = false;
+    VERBOSE(VB_COMMFLAG, QString("CommDetector2::recordingFinished: %1 bytes")
+            .arg(totalFileSize));
+}
+
+void CommDetector2::requestCommBreakMapUpdate(void)
+{
+    if (searchingForLogo(logoFinder, &(*currentPass)))
+    {
+        VERBOSE(VB_COMMFLAG, "Ignoring request for commBreakMapUpdate;"
+                " still doing logo detection");
+        return;
+    }
+
+    VERBOSE(VB_COMMFLAG, QString("commBreakMapUpdate requested at frame %1")
+            .arg(currentFrameNumber + 1));
+    sendBreakMapUpdates = true;
+    breakMapUpdateRequested = true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

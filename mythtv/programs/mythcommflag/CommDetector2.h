@@ -10,8 +10,10 @@
 #include "FrameAnalyzer.h"
 
 class NuppelVideoPlayer;
+class TemplateFinder;
 class TemplateMatcher;
 class BlankFrameDetector;
+class SceneChangeDetector;
 
 namespace commDetector2 {
 
@@ -30,15 +32,15 @@ public:
             bool showProgress, bool fullSpeed, NuppelVideoPlayer* nvp,
             int chanid, const QDateTime& startts, const QDateTime& endts,
             const QDateTime& recstartts, const QDateTime& recendts);
-    bool go(void);
-    void getCommercialBreakList(QMap<long long, int> &comms);
-    void recordingFinished(long long totalFileSize);
+    virtual bool go(void);
+    virtual void getCommercialBreakList(QMap<long long, int> &comms);
+    virtual void recordingFinished(long long totalFileSize);
+    virtual void requestCommBreakMapUpdate(void);
 
 private:
-    int buildBuffer(int minbuffer); // seconds
     void reportState(int elapsed_sec, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);
-    int computeBreaks(void);
+    int computeBreaks(long long nframes);
 
     enum SkipTypes          commDetectMethod;
     bool                    showProgress;
@@ -47,14 +49,22 @@ private:
     QDateTime               startts, endts, recstartts, recendts;
 
     bool                    isRecording;        /* current state */
+    bool                    sendBreakMapUpdates;
+    bool                    breakMapUpdateRequested;
+    bool                    finished;
 
+    long long               currentFrameNumber;
     typedef QValueList<QPtrList<FrameAnalyzer> >    frameAnalyzerList;
     frameAnalyzerList       frameAnalyzers;     /* one list per scan of file */
+    frameAnalyzerList::iterator currentPass;
+    QPtrList<FrameAnalyzer> finishedAnalyzers;
 
     FrameAnalyzer::FrameMap breaks;
 
+    TemplateFinder          *logoFinder;
     TemplateMatcher         *logoMatcher;
     BlankFrameDetector      *blankFrameDetector;
+    SceneChangeDetector     *sceneChangeDetector;
 
     QString                 debugdir;
 };

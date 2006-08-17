@@ -9,60 +9,139 @@
 #include "quickselect.h"
 #include "HistogramAnalyzer.h"
 #include "BlankFrameDetector.h"
+#include "TemplateMatcher.h"
 
 using namespace commDetector2;
 using namespace frameAnalyzer;
 
 namespace {
 
-struct threshold {
-    float           maxmean;
-    unsigned int    maxmedian;
-    float           maxstddev;
-    unsigned int    minblanklen;
-};
+bool
+isBlank(unsigned char median, float stddev, unsigned char maxmedian,
+        float maxstddev)
+{
+    return median < maxmedian || median == maxmedian && stddev <= maxstddev;
+}
+
+int
+sort_ascending_uchar(const void *aa, const void *bb)
+{
+    return *(unsigned char*)aa - *(unsigned char*)bb;
+}
+
+int
+sort_ascending_float(const void *aa, const void *bb)
+{
+    float faa = *(float*)aa;
+    float fbb = *(float*)bb;
+    return faa < fbb ? -1 : faa == fbb ? 0 : 1;
+}
 
 bool
-isBlank(float mean, unsigned char median, float stddev, unsigned int nthresh,
-        const struct threshold *thresh, unsigned int *maxblanklen)
+pickmedian(const unsigned char medianval,
+        unsigned char minval, unsigned char maxval)
 {
-    bool found = false;
-
-    for (unsigned int ii = 0; ii < nthresh; ii++)
-    {
-        if (mean <= thresh[ii].maxmean && median <= thresh[ii].maxmedian &&
-                stddev <= thresh[ii].maxstddev)
-        {
-            maxblanklen[ii]++;
-            found = true;
-        }
-    }
-
-    return found;
+    return medianval >= minval && medianval <= maxval;
 }
 
 void
-computeBlankMap(FrameAnalyzer::FrameMap *blankMap, float fps, long long nframes,
-        const unsigned char *blank, const float *mean,
-        const unsigned char *median, const float *stddev)
+computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
+        const unsigned char *median, const float *stddev,
+        const unsigned char *monochromatic)
 {
-    /* Blanks of these sequences are ORed together. */
-    const struct threshold thresh[] = {
-        /* Digital HDTV ("Bones" on FOX). */
-        { 5.0,  5,  0.0,    (unsigned int)roundf(6 / 59.94 * fps) },
+    /*
+     * Select a "black" value based on a curve, to deal with varying "black"
+     * levels.
+     */
+    const unsigned char     MINBLANKMEDIAN = 1;
+    const unsigned char     MAXBLANKMEDIAN = 96;
+    const float             MEDIANPCTILE = 0.95;
+    const float             STDDEVPCTILE = 0.85;
 
-        /* SDTV broadcast over digital HDTV ("24" reruns on ABC). */
-        { 2.0,  2,  0.26,   (unsigned int)roundf(6 / 59.94 * fps) },
-    };
-    const unsigned int nthresh = sizeof(thresh)/sizeof(*thresh);
+    long long       frameno, segb, sege, nblanks;
+    long long       blankno, blankno1, blankno2;
+    long long       stddevno, stddevno1, stddevno2;
+    unsigned char   *blankmedian, maxmedian;
+    float           *blankstddev, maxstddev;
 
-    long long       frameno, segb, sege;
-    unsigned int    maxblanklen[nthresh];
+    /* Count and select for monochromatic frames. */
+
+    nblanks = 0;
+    for (frameno = 0; frameno < nframes; frameno++)
+    {
+        if (monochromatic[frameno] && pickmedian(median[frameno],
+                    MINBLANKMEDIAN, MAXBLANKMEDIAN))
+            nblanks++;
+    }
+
+    if (!nblanks)
+    {
+        /* No monochromatic frames. */
+        VERBOSE(VB_COMMFLAG,
+                "BlankFrameDetector::computeBlankMap: No blank frames.");
+        return;
+    }
+
+    /* Select percentile values from monochromatic frames. */
+
+    blankmedian = new unsigned char[nblanks];
+    blankstddev = new float[nblanks];
+    blankno = 0;
+    for (frameno = 0; frameno < nframes; frameno++)
+    {
+        if (monochromatic[frameno] && pickmedian(median[frameno],
+                    MINBLANKMEDIAN, MAXBLANKMEDIAN))
+        {
+            blankmedian[blankno] = median[frameno];
+            blankstddev[blankno] = stddev[frameno];
+            blankno++;
+        }
+    }
+
+    qsort(blankmedian, nblanks, sizeof(*blankmedian), sort_ascending_uchar);
+    blankno = min(nblanks - 1, (long long)roundf(nblanks * MEDIANPCTILE));
+    maxmedian = blankmedian[blankno];
+
+    qsort(blankstddev, nblanks, sizeof(*blankstddev), sort_ascending_float);
+    stddevno = min(nblanks - 1, (long long)roundf(nblanks * STDDEVPCTILE));
+    maxstddev = blankstddev[stddevno];
+
+    /* Determine effective percentile ranges (for debugging). */
+
+    blankno1 = blankno;
+    blankno2 = blankno;
+    while (blankno1 > 0 && blankmedian[blankno1] == maxmedian)
+        blankno1--;
+    if (blankmedian[blankno1] != maxmedian)
+        blankno1++;
+    while (blankno2 < nblanks && blankmedian[blankno2] == maxmedian)
+        blankno2++;
+    if (blankno2 == nblanks)
+        blankno2--;
+
+    stddevno1 = stddevno;
+    stddevno2 = stddevno;
+    while (stddevno1 > 0 && blankstddev[stddevno1] == maxstddev)
+        stddevno1--;
+    if (blankstddev[stddevno1] != maxstddev)
+        stddevno1++;
+    while (stddevno2 < nblanks && blankstddev[stddevno2] == maxstddev)
+        stddevno2++;
+    if (stddevno2 == nblanks)
+        stddevno2--;
+
+    VERBOSE(VB_COMMFLAG, QString("Blanks selecting"
+                " median<=%1 (%2-%3%), stddev<=%4 (%5-%6%)")
+            .arg(maxmedian)
+            .arg(blankno1 * 100 / nblanks).arg(blankno2 * 100 / nblanks)
+            .arg(maxstddev)
+            .arg(stddevno1 * 100 / nblanks).arg(stddevno2 * 100 / nblanks));
+
+    delete []blankmedian;
+    delete []blankstddev;
 
     blankMap->clear();
-    memset(maxblanklen, 0, sizeof(maxblanklen));
-    if (blank[0] && isBlank(mean[0], median[0], stddev[0], nthresh, thresh,
-                maxblanklen))
+    if (monochromatic[0] && isBlank(median[0], stddev[0], maxmedian, maxstddev))
     {
         segb = 0;
         sege = 0;
@@ -70,14 +149,14 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, float fps, long long nframes,
     else
     {
         /* Fake up a dummy blank frame for interval calculations. */
-        (*blankMap)[-1] = 0;
+        blankMap->insert(0, 0);
         segb = -1;
         sege = -1;
     }
     for (frameno = 1; frameno < nframes; frameno++)
     {
-        if (blank[frameno] && isBlank(mean[frameno], median[frameno],
-                    stddev[frameno], nthresh, thresh, maxblanklen))
+        if (monochromatic[frameno] && isBlank(median[frameno], stddev[frameno],
+                    maxmedian, maxstddev))
         {
             /* Blank frame. */
             if (sege < frameno - 1)
@@ -96,30 +175,14 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, float fps, long long nframes,
         {
             /* Transition to non-blank frame. */
             long long seglen = frameno - segb;
-            for (unsigned int ii = 0; ii < nthresh; ii++)
-            {
-                if (maxblanklen[ii] >= thresh[ii].minblanklen)
-                {
-                    (*blankMap)[segb] = seglen;
-                    break;
-                }
-            }
-            memset(maxblanklen, 0, sizeof(maxblanklen));
+            blankMap->insert(segb, seglen);
         }
     }
     if (sege == frameno - 1)
     {
         /* Possibly ending on blank frames. */
         long long seglen = frameno - segb;
-        for (unsigned int ii = 0; ii < nthresh; ii++)
-        {
-            if (maxblanklen[ii] >= thresh[ii].minblanklen)
-            {
-                (*blankMap)[segb] = seglen;
-                break;
-            }
-        }
-        memset(maxblanklen, 0, sizeof(maxblanklen));
+        blankMap->insert(segb, seglen);
     }
 
     FrameAnalyzer::FrameMap::Iterator iiblank = blankMap->end();
@@ -130,14 +193,14 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, float fps, long long nframes,
          * Didn't end on blank frames, so add a dummy blank frame at the
          * end.
          */
-        (*blankMap)[nframes] = 0;
+        blankMap->insert(nframes - 1, 0);
     }
 }
 
 void
 computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
-        const FrameAnalyzer::FrameMap *blankMap, float fps, long long nframes,
-        bool skipblanks)
+        const FrameAnalyzer::FrameMap *blankMap, float fps, bool skipcommblanks,
+        int debugLevel)
 {
     /*
      * TUNABLE:
@@ -145,129 +208,146 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
      * Common commercial-break lengths.
      */
     static const struct {
-        int     len;
-        int     delta;
-    } breaklen[] = {
-        { 240, 15 },
-        { 210, 15 },
-        { 180, 15 },
-        { 150, 15 },
-        { 120, 15 },
-        { 105, 15 },
-        {  90, 15 },
-        {  75, 15 },
-        {  60, 15 },
-        {  45, 15 },
-        {  30, 15 },
-        {  15, 15 },
+        int     len;    /* seconds */
+        int     delta;  /* seconds */
+    } breaktype[] = {
+        /* Sort by "len". */
+        { 15,   2 },
+        { 20,   2 },
+        { 30,   5 },
+        { 60,   5 },
     };
-#ifdef LATER
-    static const long long maxbreaktime = breaklen[0].len + breaklen[0].delta;
-#endif /* LATER */
+    static const unsigned int   nbreaktypes =
+        sizeof(breaktype)/sizeof(*breaktype);
 
     /*
      * TUNABLE:
      *
-     * Minimum length of "content", to coalesce consecutive commercial breaks
-     * (or to avoid too many false consecutive breaks).
+     * Shortest non-commercial length, used to coalesce consecutive commercial
+     * breaks that are usually identified due to in-commercial cuts.
      */
-    const int   MINSEGLEN = (int)roundf(25 * fps);
+    static const int MINCONTENTLEN = (int)roundf(10 * fps);
 
     breakMap->clear();
-    FrameAnalyzer::FrameMap::const_iterator iiblank = blankMap->begin();
-    while (iiblank != blankMap->end())
+    for (FrameAnalyzer::FrameMap::const_iterator iiblank = blankMap->begin();
+            iiblank != blankMap->end();
+            ++iiblank)
     {
-next:
         long long brkb = iiblank.key();
-        brkb = max(0LL, min(nframes - 1, brkb));  /* Dummy frames. */
-        if (brkb > 0 && !skipblanks)
-            brkb += iiblank.data();             /* Exclude leading blanks. */
+        long long iilen = iiblank.data();
+        long long start = brkb + iilen / 2;
 
-        if (!breakMap->empty())
+        for (unsigned int ii = 0; ii < nbreaktypes; ii++)
         {
-            FrameAnalyzer::FrameMap::const_iterator iibreak = breakMap->end();
-            --iibreak;
-            long long lastb = iibreak.key();
-            long long laste = lastb + iibreak.data();
-            long long seglen = brkb - laste;
-            if (seglen < MINSEGLEN)
+            /* Look for next blank frame that is an acceptable distance away. */
+            FrameAnalyzer::FrameMap::const_iterator jjblank = iiblank;
+            for (++jjblank; jjblank != blankMap->end(); ++jjblank)
             {
-                ++iiblank;
-                continue;
-            }
-        }
+                long long brke = jjblank.key();
+                long long jjlen = jjblank.data();
+                long long end = brke + jjlen / 2;
 
-        /* Work backwards from end to test maximal candidate break brkments. */
-        FrameAnalyzer::FrameMap::const_iterator jjblank = blankMap->end();
-        --jjblank;
-        while (jjblank != iiblank)
-        {
-            long long brke = jjblank.key();
-            if (brke + jjblank.data() == nframes - 1 || skipblanks)
-                brke += jjblank.data();  /* Exclude trailing blanks. */
+                long long testlen = (long long)roundf((end - start) / fps);
+                if (testlen > breaktype[ii].len + breaktype[ii].delta)
+                    break;      /* Too far ahead; break to next break length. */
+                if (abs(testlen - breaktype[ii].len) > breaktype[ii].delta)
+                    continue;   /* Outside delta range; try next end-blank. */
 
-            long long brklen = brke - brkb;                      /* frames */
-            long long brktime = (long long)roundf(brklen / fps); /* seconds */
-
-            /*
-             * Test if the brkment length matches any of the candidate
-             * commercial break lengths.
-             */
-            for (unsigned int ii = 0;
-                    ii < sizeof(breaklen)/sizeof(*breaklen);
-                    ii++)
-            {
-                if (brktime > breaklen[ii].len + breaklen[ii].delta)
-                    break;
-                if (abs(brktime - breaklen[ii].len) <= breaklen[ii].delta)
+                /* Mark this commercial break. */
+                for (unsigned int jj = 0;; jj++)
                 {
-                    (*breakMap)[brkb] = brklen;
-                    iiblank = jjblank;
-                    goto next;
+                    long long newbrkb = brkb + jj;
+                    if (breakMap->find(newbrkb) == breakMap->end())
+                    {
+                        breakMap->insert(newbrkb, brke - newbrkb);
+                        break;
+                    }
                 }
             }
-            --jjblank;
         }
-        ++iiblank;
     }
 
-#ifdef LATER
+    if (debugLevel >= 1)
+    {
+        frameAnalyzerReportMap(breakMap, fps, "BF Break");
+        VERBOSE(VB_COMMFLAG, "BF coalescing overlapping/nearby breaks ...");
+    }
+
     /*
-     * Eliminate false breaks.
+     * Coalesce overlapping or very-nearby breaks (handles cut-scenes within a
+     * commercial).
      */
-    long long segb = 0;
-    FrameAnalyzer::FrameMap::Iterator iibreak = breakMap->begin();
-    FrameAnalyzer::FrameMap::Iterator iibreak0 = breakMap->end();
+    for (;;)
+    {
+        bool coalesced = false;
+        FrameAnalyzer::FrameMap::iterator iibreak = breakMap->begin();
+        while (iibreak != breakMap->end())
+        {
+            long long iib = iibreak.key();
+            long long iie = iib + iibreak.data();
+
+            FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
+            ++jjbreak;
+            if (jjbreak == breakMap->end())
+                break;
+
+            long long jjb = jjbreak.key();
+            long long jje = jjb + jjbreak.data();
+
+            if (jjb < iib)
+            {
+                /* (jjb,jje) is behind (iib,iie). */
+                ++iibreak;
+                continue;
+            }
+
+            if (iie + MINCONTENTLEN < jjb)
+            {
+                /* (jjb,jje) is too far ahead. */
+                ++iibreak;
+                continue;
+            }
+
+            /* Coalesce. */
+            if (jje > iie)
+                breakMap->replace(iib, jje - iib);  /* overlap */
+            breakMap->remove(jjbreak);
+            coalesced = true;
+            iibreak = breakMap->find(iib);
+        }
+        if (!coalesced)
+            break;
+    }
+
+    /* Adjust for skipcommblanks configuration. */
+    FrameAnalyzer::FrameMap::iterator iibreak = breakMap->begin();
     while (iibreak != breakMap->end())
     {
-        long long sege = iibreak.key();
-        long long seglen = sege - segb;
-        if (seglen < MINSEGLEN && iibreak != breakMap->begin())
-        {
-            /*
-             * Too soon since last break ended. If aggregate break (previous
-             * break + this break) is reasonably short, merge them together.
-             * Otherwise, eliminate this break as a false break.
-             */
-            if (iibreak0 != breakMap->end())
-            {
-                long long seglen = sege + iibreak.data() - iibreak0.key();
-                long long segtime = (long long)roundf(seglen / fps);
-                if (segtime <= maxbreaktime)
-                    (*breakMap)[iibreak0.key()] = seglen;   /* Merge. */
-            }
-            FrameAnalyzer::FrameMap::Iterator jjbreak = iibreak;
-            ++iibreak;
-            breakMap->remove(jjbreak);
-            continue;
-        }
+        long long iib = iibreak.key();
+        long long iie = iib + iibreak.data();
 
-        /* Normal break; save cursors and continue. */
-        segb = sege + iibreak.data();
-        iibreak0 = iibreak;
-        ++iibreak;
+        if (!skipcommblanks)
+        {
+            /* Trim leading blanks from commercial break. */
+            FrameAnalyzer::FrameMap::const_iterator iiblank =
+                blankMap->find(iib);
+            FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
+            ++jjbreak;
+            iib += iiblank.data();
+            breakMap->remove(iibreak);
+            breakMap->insert(iib, iie - iib);
+            iibreak = jjbreak;
+        }
+        else
+        {
+            /* Add trailing blanks to commercial break. */
+            ++iibreak;
+            FrameAnalyzer::FrameMap::const_iterator jjblank =
+                blankMap->find(iie);
+            iie += jjblank.data();
+            breakMap->replace(iib, iie - iib);
+        }
     }
-#endif /* LATER */
 }
 
 };  /* namespace */
@@ -277,10 +357,10 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     , histogramAnalyzer(ha)
     , debugLevel(0)
 {
-    skipblanks = gContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
+    skipcommblanks = gContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
 
-    VERBOSE(VB_COMMFLAG, QString("BlankFrameDetector: skipblanks=%1")
-            .arg(skipblanks ? "true" : "false"));
+    VERBOSE(VB_COMMFLAG, QString("BlankFrameDetector: skipcommblanks=%1")
+            .arg(skipcommblanks ? "true" : "false"));
 
     /*
      * debugLevel:
@@ -299,14 +379,13 @@ BlankFrameDetector::~BlankFrameDetector(void)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-BlankFrameDetector::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp)
+BlankFrameDetector::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+        long long nframes)
 {
     FrameAnalyzer::analyzeFrameResult ares =
-        histogramAnalyzer->nuppelVideoPlayerInited(nvp);
+        histogramAnalyzer->nuppelVideoPlayerInited(nvp, nframes);
 
-    nframes = nvp->GetTotalFrameCount();
     fps = nvp->GetFrameRate();
-    npixels = nvp->GetVideoWidth() * nvp->GetVideoHeight();
 
     VERBOSE(VB_COMMFLAG, QString(
                 "BlankFrameDetector::nuppelVideoPlayerInited %1x%2")
@@ -333,39 +412,235 @@ BlankFrameDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
 }
 
 int
-BlankFrameDetector::finished(void)
+BlankFrameDetector::finished(long long nframes, bool final)
 {
-    if (histogramAnalyzer->finished())
+    if (histogramAnalyzer->finished(nframes, final))
         return -1;
 
-    /*
-     * Identify all sequences of blank frames (blankMap).
-     */
-    computeBlankMap(&blankMap, fps, nframes, histogramAnalyzer->getBlanks(),
-            histogramAnalyzer->getMeans(), histogramAnalyzer->getMedians(),
-            histogramAnalyzer->getStdDevs());
+    VERBOSE(VB_COMMFLAG, QString("BlankFrameDetector::finished(%1)")
+            .arg(nframes));
+
+    /* Identify all sequences of blank frames (blankMap). */
+    computeBlankMap(&blankMap, nframes,
+            histogramAnalyzer->getMedians(), histogramAnalyzer->getStdDevs(),
+            histogramAnalyzer->getMonochromatics());
     if (debugLevel >= 2)
         frameAnalyzerReportMapms(&blankMap, fps, "BF Blank");
+
+    return 0;
+}
+
+int
+BlankFrameDetector::computeForLogoSurplus(
+        const TemplateMatcher *templateMatcher)
+{
+    /*
+     * See TemplateMatcher::templateCoverage; some commercial breaks have
+     * logos. Conversely, any logo breaks are probably really breaks, so prefer
+     * those over blank-frame-calculated breaks.
+     */
+    const FrameAnalyzer::FrameMap *logoBreakMap = templateMatcher->getBreaks();
+
+    /* TUNABLE: see TemplateMatcher::adjustForBlanks */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
+
+    VERBOSE(VB_COMMFLAG, "BlankFrameDetector adjusting for logo surplus");
+
+    /*
+     * For each logo break, find the blank frames closest to its beginning and
+     * end. This helps properly support CommSkipAllBlanks.
+     */
+    for (FrameAnalyzer::FrameMap::const_iterator ii =
+                logoBreakMap->constBegin();
+            ii != logoBreakMap->constEnd();
+            ++ii)
+    {
+        /* Get bounds of beginning of logo break. */
+        long long iikey = ii.key();
+        long long iibb = iikey - MAXBLANKADJUSTMENT;
+        long long iiee = iikey + MAXBLANKADJUSTMENT;
+        FrameAnalyzer::FrameMap::Iterator jjfound = blankMap.end();
+
+        /* Look for a blank frame near beginning of logo break. */
+        for (FrameAnalyzer::FrameMap::Iterator jj = blankMap.begin();
+                jj != blankMap.end();
+                ++jj)
+        {
+            long long jjbb = jj.key();
+            long long jjee = jjbb + jj.data();
+
+            if (iiee < jjbb)
+                break;      /* No nearby blank frames. */
+
+            if (jjee < iibb)
+                continue;   /* Too early; keep looking. */
+
+            jjfound = jj;
+            if (iikey <= jjbb)
+            {
+                /*
+                 * Prefer the first blank frame beginning after the logo break
+                 * begins.
+                 */
+                break;
+            }
+        }
+
+        /* Adjust blank frame to begin with logo break beginning. */
+        if (jjfound != blankMap.end())
+        {
+            long long jjee = jjfound.key() + jjfound.data();
+            blankMap.remove(jjfound);
+            if (jjee <= iikey)
+            {
+                /* Move blank frame to beginning of logo break. */
+                if (blankMap.find(iikey) == blankMap.end())
+                    blankMap.insert(iikey, 1);
+                else
+                    blankMap.replace(iikey, 1);
+            }
+            else
+            {
+                /* Adjust blank frame to begin with logo break. */
+                blankMap.insert(iikey, jjee - iikey);
+            }
+        }
+
+        /* Get bounds of end of logo break. */
+        long long kkkey = ii.key() + ii.data();
+        long long kkbb = kkkey - MAXBLANKADJUSTMENT;
+        long long kkee = kkkey + MAXBLANKADJUSTMENT;
+        FrameAnalyzer::FrameMap::Iterator mmfound = blankMap.end();
+
+        /* Look for a blank frame near end of logo break. */
+        for (FrameAnalyzer::FrameMap::Iterator mm = blankMap.begin();
+                mm != blankMap.end();
+                ++mm)
+        {
+            long long mmbb = mm.key();
+            long long mmee = mmbb + mm.data();
+
+            if (kkee < mmbb)
+                break;      /* No nearby blank frames. */
+
+            if (mmee < kkbb)
+                continue;   /* Too early; keep looking. */
+
+            /* Prefer the last blank frame ending before the logo break ends. */
+            if (mmee < kkkey || mmfound == blankMap.end())
+                mmfound = mm;
+            if (mmee >= kkkey)
+                break;
+        }
+
+        /* Adjust blank frame to end with logo break end. */
+        if (mmfound != blankMap.end())
+        {
+            long long mmbb = mmfound.key();
+            if (mmbb < kkkey)
+            {
+                /* Adjust blank frame to end with logo break. */
+                blankMap.replace(mmbb, kkkey - mmbb);
+            }
+            else
+            {
+                /* Move blank frame to end of logo break. */
+                blankMap.remove(mmfound);
+                if (blankMap.find(kkkey) == blankMap.end())
+                    blankMap.insert(kkkey - 1, 1);
+                else
+                    blankMap.replace(kkkey - 1, 1);
+            }
+        }
+    }
 
     /*
      * Compute breaks (breakMap).
      */
-    computeBreakMap(&breakMap, &blankMap, fps, nframes, skipblanks);
-    frameAnalyzerReportMap(&breakMap, fps, "BF Break");
+    computeBreakMap(&breakMap, &blankMap, fps, skipcommblanks, debugLevel);
 
+    /*
+     * Expand blank-frame breaks to fully include overlapping logo breaks.
+     * Fully include logo breaks that don't include any blank-frame breaks.
+     */
+    for (FrameAnalyzer::FrameMap::const_iterator ii =
+                logoBreakMap->constBegin();
+            ii != logoBreakMap->constEnd();
+            ++ii)
+    {
+        long long iibb = ii.key();
+        long long iiee = iibb + ii.data();
+        bool overlap = false;
+
+        for (FrameAnalyzer::FrameMap::Iterator jj = breakMap.begin();
+                jj != breakMap.end();
+            )
+        {
+            long long jjbb = jj.key();
+            long long jjee = jjbb + jj.data();
+            FrameAnalyzer::FrameMap::Iterator jjnext = jj;
+            ++jjnext;
+
+            if (iiee < jjbb)
+            {
+                if (!overlap)
+                {
+                    /* Fully incorporate logo break */
+                    breakMap.insert(iibb, iiee - iibb);
+                }
+                break;
+            }
+
+            if (iibb < jjbb && jjbb < iiee)
+            {
+                /* End of logo break includes beginning of blank-frame break. */
+                overlap = true;
+                breakMap.remove(jj);
+                breakMap.insert(iibb, max(iiee, jjee) - iibb);
+            }
+            else if (jjbb < iibb && iibb < jjee)
+            {
+                /* End of blank-frame break includes beginning of logo break. */
+                overlap = true;
+                if (jjee < iiee)
+                    breakMap.replace(jjbb, iiee - jjbb);
+            }
+
+            jj = jjnext;
+        }
+    }
+
+    frameAnalyzerReportMap(&breakMap, fps, "BF Break");
+    return 0;
+}
+
+int
+BlankFrameDetector::computeForLogoDeficit(
+        const TemplateMatcher *templateMatcher)
+{
+    (void)templateMatcher;  /* gcc */
+
+    VERBOSE(VB_COMMFLAG, "BlankFrameDetector adjusting for"
+            " too little logo coverage (unimplemented)");
     return 0;
 }
 
 int
 BlankFrameDetector::computeBreaks(FrameAnalyzer::FrameMap *breaks)
 {
+    if (breakMap.empty())
+    {
+        /* Compute breaks (breakMap). */
+        computeBreakMap(&breakMap, &blankMap, fps, skipcommblanks, debugLevel);
+        frameAnalyzerReportMap(&breakMap, fps, "BF Break");
+    }
+
     breaks->clear();
     for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
             bb != breakMap.end();
             ++bb)
-    {
-        (*breaks)[bb.key()] = bb.data();
-    }
+        breaks->insert(bb.key(), bb.data());
+
     return 0;
 }
 

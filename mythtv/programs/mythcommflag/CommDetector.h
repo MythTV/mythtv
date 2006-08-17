@@ -13,6 +13,7 @@ enum SkipTypes {
     COMM_DETECT_2           = 0x00000100,
     COMM_DETECT_2_LOGO      = 0x00000101,
     COMM_DETECT_2_BLANK     = 0x00000102,
+    COMM_DETECT_2_SCENE     = 0x00000104,
     COMM_DETECT_2_ALL       = 0x000001FF,
 };
 

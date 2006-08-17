@@ -21,15 +21,25 @@ frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
          * Recording" OSD.
          */
         bb = ii.key() + 1;
-        ee = bb + ii.data();
-        len = ee - bb;
+        if (ii.data())
+        {
+            ee = bb + ii.data();
+            len = ee - bb;
 
-        VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
-                .arg(comment)
-                .arg(bb, 6).arg(ee - 1, 6)
-                .arg(frameToTimestamp(bb, fps))
-                .arg(frameToTimestamp(ee - 1, fps))
-                .arg(frameToTimestamp(len, fps)));
+            VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
+                    .arg(comment)
+                    .arg(bb, 6).arg(ee - 1, 6)
+                    .arg(frameToTimestamp(bb, fps))
+                    .arg(frameToTimestamp(ee - 1, fps))
+                    .arg(frameToTimestamp(len, fps)));
+        }
+        else
+        {
+            VERBOSE(VB_COMMFLAG, QString("%1: %2 (%3)")
+                    .arg(comment)
+                    .arg(bb, 6)
+                    .arg(frameToTimestamp(bb, fps)));
+        }
     }
 }
 
@@ -48,15 +58,25 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
          * Recording" OSD.
          */
         bb = ii.key() + 1;
-        ee = bb + ii.data();
-        len = ee - bb;
+        if (ii.data())
+        {
+            ee = bb + ii.data();
+            len = ee - bb;
 
-        VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
-                .arg(comment)
-                .arg(bb, 6).arg(ee - 1, 6)
-                .arg(frameToTimestamp(bb, fps))
-                .arg(frameToTimestamp(ee - 1, fps))
-                .arg(frameToTimestampms(len, fps)));
+            VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
+                    .arg(comment)
+                    .arg(bb, 6).arg(ee - 1, 6)
+                    .arg(frameToTimestamp(bb, fps))
+                    .arg(frameToTimestamp(ee - 1, fps))
+                    .arg(frameToTimestampms(len, fps)));
+        }
+        else
+        {
+            VERBOSE(VB_COMMFLAG, QString("%1: %2 (%3)")
+                    .arg(comment)
+                    .arg(bb, 6)
+                    .arg(frameToTimestamp(bb, fps)));
+        }
     }
 }
 

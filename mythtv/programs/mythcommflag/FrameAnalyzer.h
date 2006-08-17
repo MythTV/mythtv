@@ -22,12 +22,6 @@ public:
 
     virtual const char *name(void) const = 0;
 
-    /* return extra buffer time (seconds) needed for "real-time" flagging. */
-    virtual int extraBuffer(int preroll) const {
-        (void)preroll;
-        return 0;
-    }
-
     /* Analyze a frame. */
     enum analyzeFrameResult {
         ANALYZE_OK,         /* Analysis OK */
@@ -37,8 +31,9 @@ public:
     };
 
     virtual enum analyzeFrameResult nuppelVideoPlayerInited(
-            NuppelVideoPlayer *nvp) {
+            NuppelVideoPlayer *nvp, long long nframes) {
         (void)nvp;
+        (void)nframes;
         return ANALYZE_OK;
     };
 
@@ -51,7 +46,11 @@ public:
     virtual enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame) = 0;
 
-    virtual int finished(void) { return 0; }
+    virtual int finished(long long nframes, bool final) {
+        (void)nframes;
+        (void)final;
+        return 0;
+    }
     virtual int reportTime(void) const { return 0; }
 
     /* 0-based frameno => nframes */

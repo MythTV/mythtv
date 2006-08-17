@@ -293,7 +293,9 @@ template_alloc(const unsigned int *scores, int width, int height,
     if (sortedscores[0] == sortedscores[nn - 1])
     {
         /* All pixels in the template area look the same; no template. */
-        VERBOSE(VB_COMMFLAG, QString("template_alloc: pixels all identical!"));
+        VERBOSE(VB_COMMFLAG, QString(
+                    "template_alloc: %1x%2 pixels all identical!")
+                .arg(width).arg(height));
         goto free_thresh;
     }
 
@@ -553,7 +555,7 @@ writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
 };  /* namespace */
 
 TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
-        EdgeDetector *ed, NuppelVideoPlayer *nvp,
+        EdgeDetector *ed, NuppelVideoPlayer *nvp, int proglen,
         QString debugdir)
     : FrameAnalyzer()
     , pgmConverter(pgmc)
@@ -600,8 +602,10 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
      * the possible template, and the interval between frames for analysis.
      * This affects how soon flagging can start after a recording has begun
      * (a.k.a. "real-time flagging").
+     *
+     * Sample half of the program length or 20 minutes, whichever is less.
      */
-    sampleTime = 20 * 60;   /* Sample first <n> minutes. */
+    sampleTime = min(proglen / 2, 20 * 60);
 
     const float         fps = nvp->GetFrameRate();
 
@@ -653,14 +657,9 @@ TemplateFinder::~TemplateFinder(void)
     avpicture_free(&cropped);
 }
 
-int
-TemplateFinder::extraBuffer(int preroll) const
-{
-    return max(0, preroll) + sampleTime;
-}
-
 enum FrameAnalyzer::analyzeFrameResult
-TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp)
+TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+        long long nframes)
 {
     /*
      * Only detect edges in portions of the frame where we expect to find
@@ -673,6 +672,7 @@ TemplateFinder::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp)
      */
     QString tmpldims, nvpdims;
 
+    (void)nframes; /* gcc */
     width = nvp->GetVideoWidth();
     height = nvp->GetVideoHeight();
     nvpdims = QString("%1x%2").arg(width).arg(height);
@@ -845,8 +845,9 @@ error:
 }
 
 int
-TemplateFinder::finished(void)
+TemplateFinder::finished(long long nframes, bool final)
 {
+    (void)nframes;  /* unused */
     if (!tmpl_done)
     {
         if (template_alloc(scores, width, height,
@@ -854,11 +855,12 @@ TemplateFinder::finished(void)
                     &tmpl, &tmplrow, &tmplcol, &tmplwidth, &tmplheight,
                     debug_edgecounts, debugdir))
         {
-            writeDummyTemplate(debugdata);
+            if (final)
+                writeDummyTemplate(debugdata);
         }
         else
         {
-            if (debug_template)
+            if (final && debug_template)
             {
                 if (!(tmpl_valid = writeTemplate(debugtmpl, &tmpl,
                             debugdata, tmplrow, tmplcol,
@@ -873,7 +875,8 @@ TemplateFinder::finished(void)
             }
         }
 
-        tmpl_done = true;
+        if (final)
+            tmpl_done = true;
     }
 
     borderDetector->setLogoState(this);

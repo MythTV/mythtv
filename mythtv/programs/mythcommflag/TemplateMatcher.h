@@ -36,14 +36,16 @@ public:
 
     /* FrameAnalyzer interface. */
     const char *name(void) const { return "TemplateMatcher"; }
-    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp);
+    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
+            long long nframes);
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame);
-    int finished(void);
+    int finished(long long nframes, bool final);
     int reportTime(void) const;
 
     /* TemplateMatcher interface. */
-    int breakCoverage(void) const;
+    int templateCoverage(long long nframes, bool final) const;
+    const FrameAnalyzer::FrameMap *getBreaks(void) const { return &breakMap; }
     int adjustForBlanks(const BlankFrameDetector *bf);
     int computeBreaks(FrameMap *breaks);
 
@@ -60,7 +62,6 @@ private:
     unsigned short          *matches;               /* matching pixels */
     unsigned char           *match;                 /* boolean result: 1/0 */
 
-    long long               nframes;                /* total frame count */
     float                   fps;
     AVPicture               cropped;                /* pre-allocated buffer */
     FrameAnalyzer::FrameMap breakMap;               /* frameno => nframes */
