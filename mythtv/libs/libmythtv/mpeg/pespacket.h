@@ -196,11 +196,8 @@ class PESPacket
     const unsigned char* pesdata() const { return _pesdata; }
     unsigned char* pesdata()             { return _pesdata; }
 
-    const unsigned char* dvbParseableData() const { return _pesdata; }
-    /// \brief You can call SIParser::ParseTable(data, size, pid)
-    ///        where data = pes.dvbParseableData(), size = pes.length()+12,
-    ///        and pid = pes.tspacket()->PID().
-    unsigned char* dvbParseableData() { return _pesdata; }
+    const unsigned char* data() const { return _fullbuffer; }
+    unsigned char* data() { return _fullbuffer; }
 
     void SetStreamID(uint id) { _pesdata[0] = id; }
     void SetLength(uint len)
