@@ -17,13 +17,15 @@ sgm_init(unsigned int *sgm, const AVPicture *src, int srcheight)
      * that pixel: how much it differs from its neighbors.
      */
     const int       srcwidth = src->linesize[0];
-    int             rr, cc, dx, dy;
+    int             rr, cc, dx, dy, rr2, cc2;
     unsigned char   *rr0, *rr1;
 
     (void)srcheight;    /* gcc */
-    for (rr = 0; rr < srcheight - 1; rr++)
+    rr2 = srcheight - 1;
+    cc2 = srcwidth - 1;
+    for (rr = 0; rr < rr2; rr++)
     {
-        for (cc = 0; cc < srcwidth - 1; cc++)
+        for (cc = 0; cc < cc2; cc++)
         {
             rr0 = src->data[0] + rr * srcwidth + cc;
             rr1 = src->data[0] + (rr + 1) * srcwidth + cc;
@@ -60,7 +62,7 @@ edge_mark(AVPicture *dst, int dstheight,
     const int           dstwidth = dst->linesize[0];
     const int           padded_width = extraleft + dstwidth + extraright;
     unsigned int        thresholdval;
-    int                 nn, ii, rr, cc, first, last;
+    int                 nn, ii, rr, cc, first, last, last2;
 
     /*
      * sgm: SGM values of padded (convolved) image
@@ -93,7 +95,8 @@ edge_mark(AVPicture *dst, int dstheight,
     {
         unsigned int    newthresholdval;
 
-        for (last = ii; last < nn - 1 && sgmsorted[last] == thresholdval;
+        last2 = nn - 1;
+        for (last = ii; last < last2 && sgmsorted[last] == thresholdval;
                 last++) ;
         if (sgmsorted[last] != thresholdval)
             last--;

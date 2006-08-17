@@ -4,16 +4,24 @@
 #include "mythcontext.h"    /* gContext */
 
 #include "CommDetector2.h"
+#include "TemplateFinder.h"
 #include "BorderDetector.h"
 
 using namespace commDetector2;
 
 BorderDetector::BorderDetector(void)
-    : frameno(-1)
+    : logoFinder(NULL)
+    , logo(NULL)
+    , frameno(-1)
+    , isblank(false)
     , debugLevel(0)
     , time_reported(false)
 {
     debugLevel = gContext->GetNumSetting("BorderDetectorDebugLevel", 0);
+
+    if (debugLevel >= 1)
+        VERBOSE(VB_COMMFLAG,
+            QString("BorderDetector debugLevel %1").arg(debugLevel));
 }
 
 BorderDetector::~BorderDetector(void)
@@ -29,10 +37,36 @@ BorderDetector::nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp)
     return 0;
 }
 
+void
+BorderDetector::setLogoState(TemplateFinder *finder)
+{
+    if ((logoFinder = finder) && (logo = logoFinder->getTemplate(
+                    &logorr1, &logocc1, &logowidth, &logoheight)))
+    {
+        logorr2 = logorr1 + logoheight - 1;
+        logocc2 = logocc1 + logowidth - 1;
+
+        VERBOSE(VB_COMMFLAG, QString(
+                    "BorderDetector::setLogoState: %1x%2@(%3,%4)")
+            .arg(logowidth).arg(logoheight).arg(logocc1).arg(logorr1));
+    }
+}
+
 int
 BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
         long long _frameno, int *prow, int *pcol, int *pwidth, int *pheight)
 {
+    /*
+     * The basic algorithm is to look for pixels of the same color along all
+     * four borders of the frame, working inwards until the pixels cease to be
+     * of uniform color. This way, letterboxing/pillarboxing bars can be of any
+     * color (varying shades of black-grey).
+     *
+     * If there is a logo, exclude its area from border detection.
+     *
+     * Return 0 for normal frames; non-zero for "blank" (monochromatic) frames.
+     */
+
     /*
      * TUNABLE:
      *
@@ -51,7 +85,7 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
      * edge-detection phase where they are likely to take edge pixels away from
      * possible template edges.
      */
-    static const unsigned char  MAXRANGE = 32;
+    static const unsigned char  MAXRANGE = 10;
 
     /*
      * TUNABLE:
@@ -101,7 +135,7 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
 
     struct timeval          start, end, elapsed;
     unsigned char           minval, maxval, val;
-    int                     rr, cc, minrow, maxrow, mincol, maxcol;
+    int                     rr, cc, minrow, maxrow, mincol, maxcol, rr2, cc2;
     int                     newrow, newcol, newwidth, newheight;
     bool                    top, bottom, left, right;
     int                     range, outliers, lines;
@@ -109,6 +143,8 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
     (void)gettimeofday(&start, NULL);
 
     newrow = 0;
+    newcol = 0;
+    newwidth = 0;
     newheight = 0;
 
     if (_frameno != UNCACHED && _frameno == frameno)
@@ -136,6 +172,10 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
             outliers = 0;
             for (rr = minrow; rr <= maxrow; rr++)
             {
+                if (logo && rr >= logorr1 && rr <= logorr2 &&
+                        cc >= logocc1 && cc <= logocc2)
+                    continue;   /* Exclude logo area from analysis. */
+
                 val = pgm->data[0][rr * pgmwidth + cc];
                 range = max(maxval, val) - min(minval, val);
                 if (range > MAXRANGE)
@@ -156,17 +196,25 @@ BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
         }
 found_left:
         newcol = cc + HORIZSLOP;
-        newwidth = maxcol - HORIZSLOP - newcol + 1;
+        newwidth = max(0, maxcol - HORIZSLOP - newcol + 1);
         if (newcol > maxcol)
             goto blank_frame;
 
-        /* Find right edge (keep same minval/maxval as left edge). */
+        /*
+         * Find right edge. Keep same minval/maxval as left edge. Also, right
+         * pillarbox should be roughly the same size as the left pillarbox.
+         */
         lines = 0;
-        for (cc = maxcol; cc > newcol; cc--)
+        cc2 = max(newcol, pgmwidth - newcol);
+        for (cc = maxcol; cc > cc2; cc--)
         {
             outliers = 0;
             for (rr = minrow; rr <= maxrow; rr++)
             {
+                if (logo && rr >= logorr1 && rr <= logorr2 &&
+                        cc >= logocc1 && cc <= logocc2)
+                    continue;   /* Exclude logo area from analysis. */
+
                 val = pgm->data[0][rr * pgmwidth + cc];
                 range = max(maxval, val) - min(minval, val);
                 if (range > MAXRANGE)
@@ -198,11 +246,16 @@ found_right:
         minval = UCHAR_MAX;
         maxval = 0;
         lines = 0;
+        cc2 = newcol + newwidth;
         for (rr = minrow; rr <= maxrow; rr++)
         {
             outliers = 0;
-            for (cc = newcol; cc < newcol + newwidth; cc++)
+            for (cc = newcol; cc < cc2; cc++)
             {
+                if (logo && rr >= logorr1 && rr <= logorr2 &&
+                        cc >= logocc1 && cc <= logocc2)
+                    continue;   /* Exclude logo area from analysis. */
+
                 val = pgm->data[0][rr * pgmwidth + cc];
                 range = max(maxval, val) - min(minval, val);
                 if (range > MAXRANGE)
@@ -223,17 +276,26 @@ found_right:
         }
 found_top:
         newrow = rr + VERTSLOP;
-        newheight = maxrow - VERTSLOP - newrow + 1;
+        newheight = max(0, maxrow - VERTSLOP - newrow + 1);
         if (newrow > maxrow)
             goto blank_frame;
 
-        /* Find bottom edge (keep same minval/maxval as top edge). */
+        /*
+         * Find bottom edge. Keep same minval/maxval as top edge. Also, bottom
+         * letterbox should be roughly the same size as the top letterbox.
+         */
         lines = 0;
-        for (rr = maxrow; rr > newrow; rr--)
+        rr2 = max(newrow, pgmheight - newrow);
+        cc2 = newcol + newwidth;
+        for (rr = maxrow; rr > rr2; rr--)
         {
             outliers = 0;
-            for (cc = newcol; cc < newcol + newwidth; cc++)
+            for (cc = newcol; cc < cc2; cc++)
             {
+                if (logo && rr >= logorr1 && rr <= logorr2 &&
+                        cc >= logocc1 && cc <= logocc2)
+                    continue;   /* Exclude logo area from analysis. */
+
                 val = pgm->data[0][rr * pgmwidth + cc];
                 range = max(maxval, val) - min(minval, val);
                 if (range > MAXRANGE)
@@ -276,23 +338,21 @@ found_bottom:
         break;
     }
 
-    if (debugLevel >= 1)
-    {
-        if (row != newrow || col != newcol ||
-            width != newwidth || height != newheight)
-        {
-            VERBOSE(VB_COMMFLAG, QString("Frame %1: %2x%3@(%4,%5)")
-                    .arg(_frameno, 5)
-                    .arg(newwidth).arg(newheight)
-                    .arg(newcol).arg(newrow));
-        }
-    }
-
     frameno = _frameno;
     row = newrow;
     col = newcol;
     width = newwidth;
     height = newheight;
+    isblank = false;
+    goto done;
+
+blank_frame:
+    frameno = _frameno;
+    row = newrow;
+    col = newcol;
+    width = newwidth;
+    height = newheight;
+    isblank = true;
 
 done:
     *prow = row;
@@ -304,43 +364,7 @@ done:
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
 
-    return 0;
-
-blank_frame:
-    row = VERTMARGIN;
-    col = HORIZMARGIN;
-    width = pgmwidth - 2 * HORIZMARGIN;
-    height = pgmheight - 2 * VERTMARGIN;
-    if (newwidth && (left || right))
-    {
-        col = newcol;
-        width = newwidth;
-    }
-    if (newheight && (top || bottom))
-    {
-        row = newrow;
-        height = newheight;
-    }
-
-    frameno = _frameno;
-    *prow = row;
-    *pcol = col;
-    *pwidth = width;
-    *pheight = height;
-
-    if (debugLevel >= 1)
-    {
-        VERBOSE(VB_COMMFLAG, QString("Frame %1: %2x%3@(%4,%5): blank")
-                .arg(_frameno, 5)
-                .arg(maxcol - mincol + 1).arg(maxrow - minrow + 1)
-                .arg(mincol).arg(minrow));
-    }
-
-    (void)gettimeofday(&end, NULL);
-    timersub(&end, &start, &elapsed);
-    timeradd(&analyze_time, &elapsed, &analyze_time);
-
-    return -1;  /* Blank frame. */
+    return isblank ? -1 : 0;
 }
 
 int

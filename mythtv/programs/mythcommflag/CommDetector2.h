@@ -7,11 +7,11 @@
 
 #include "CommDetector.h"
 #include "CommDetectorBase.h"
+#include "FrameAnalyzer.h"
 
 class NuppelVideoPlayer;
-class EdgeDetector;
-class FrameAnalyzer;
 class TemplateMatcher;
+class BlankFrameDetector;
 
 namespace commDetector2 {
 
@@ -35,9 +35,10 @@ public:
     void recordingFinished(long long totalFileSize);
 
 private:
-    int     buildBuffer(int minbuffer); // seconds
-    void    reportState(int elapsed_sec, long long frameno, long long nframes,
+    int buildBuffer(int minbuffer); // seconds
+    void reportState(int elapsed_sec, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);
+    int computeBreaks(void);
 
     enum SkipTypes          commDetectMethod;
     bool                    showProgress;
@@ -50,9 +51,14 @@ private:
     typedef QValueList<QPtrList<FrameAnalyzer> >    frameAnalyzerList;
     frameAnalyzerList       frameAnalyzers;     /* one list per scan of file */
 
+    FrameAnalyzer::FrameMap breaks;
+
+    TemplateMatcher         *logoMatcher;
+    BlankFrameDetector      *blankFrameDetector;
+
     QString                 debugdir;
 };
 
-#endif
+#endif  /* !_COMMDETECTOR2_H_ */
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

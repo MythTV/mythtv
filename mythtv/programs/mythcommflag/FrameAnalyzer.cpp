@@ -16,7 +16,11 @@ frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
     {
         long long   bb, ee, len;
 
-        bb = ii.key();
+        /*
+         * QMap'd as 0-based index, but display as 1-based index to match "Edit
+         * Recording" OSD.
+         */
+        bb = ii.key() + 1;
         ee = bb + ii.data();
         len = ee - bb;
 
@@ -39,7 +43,11 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
     {
         long long   bb, ee, len;
 
-        bb = ii.key();
+        /*
+         * QMap'd as 0-based index, but display as 1-based index to match "Edit
+         * Recording" OSD.
+         */
+        bb = ii.key() + 1;
         ee = bb + ii.data();
         len = ee - bb;
 
@@ -50,6 +58,17 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
                 .arg(frameToTimestamp(ee - 1, fps))
                 .arg(frameToTimestampms(len, fps)));
     }
+}
+
+long long
+frameAnalyzerMapSum(const FrameAnalyzer::FrameMap *frameMap)
+{
+    long long sum = 0;
+    for (FrameAnalyzer::FrameMap::const_iterator ii = frameMap->begin();
+            ii != frameMap->end();
+            ++ii)
+        sum += ii.data();
+    return sum;
 }
 
 };  /* namespace */

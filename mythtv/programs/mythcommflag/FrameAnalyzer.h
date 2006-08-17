@@ -51,20 +51,11 @@ public:
     virtual enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame) = 0;
 
-    /* Static analysis. */
     virtual int finished(void) { return 0; }
-
-    /* Allow for inter-FrameAnalyzer analysis. */
-    virtual int finished2(void) { return 0; }
-
     virtual int reportTime(void) const { return 0; }
 
-    virtual bool isContent(long long frameno) const {
-        (void)frameno;
-        return false;
-    }
-
-    typedef QMap<long long, long long> FrameMap;    /* frameno => nframes */
+    /* 0-based frameno => nframes */
+    typedef QMap<long long, long long> FrameMap;
 };
 
 namespace frameAnalyzer {
@@ -74,6 +65,8 @@ void frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap,
 
 void frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap,
         float fps, const char *comment);
+
+long long frameAnalyzerMapSum(const FrameAnalyzer::FrameMap *frameMap);
 
 }; /* namespace */
 

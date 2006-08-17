@@ -9,7 +9,7 @@
 #include "pgm.h"
 #include "PGMConverter.h"
 #include "EdgeDetector.h"
-#include "HistogramAnalyzer.h"
+#include "BlankFrameDetector.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
 
@@ -298,10 +298,8 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     , pgmConverter(pgmc)
     , edgeDetector(ed)
     , templateFinder(tf)
-    , histogramAnalyzer(NULL)
     , matches(NULL)
     , match(NULL)
-    , iscontent(NULL)
     , debugLevel(0)
     , debugdir(debugdir)
 #ifdef PGM_CONVERT_GREYSCALE
@@ -346,8 +344,6 @@ TemplateMatcher::~TemplateMatcher(void)
         delete []matches;
     if (match)
         delete []match;
-    if (iscontent)
-        delete []iscontent;
     avpicture_free(&cropped);
 }
 
@@ -423,9 +419,6 @@ TemplateMatcher::nuppelVideoPlayerInited(NuppelVideoPlayer *_nvp)
     memset(matches, 0, nframes * sizeof(*matches));
 
     match = new unsigned char[nframes];
-
-    iscontent = new unsigned char[nframes];
-    memset(iscontent, 0, nframes * sizeof(*iscontent));
 
     if (debug_matches)
     {
@@ -652,165 +645,6 @@ error:
 }
 
 int
-TemplateMatcher::finished2(void)
-{
-    /*
-     * TUNABLE:
-     *
-     * Expect 30% +/- 3% to be commercials.
-     */
-    const int       MINBREAKS = nframes * 25 / 100;
-    const int       MAXBREAKS = nframes * 36 / 100;
-
-    /*
-     * TUNABLE:
-     *
-     * When logos are a good indicator of commercial breaks, allow blank frames
-     * to adjust logo breaks.
-     */
-    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
-
-    /*
-     * If a histogramAnalyzer exists and breaktime is as expected, assume
-     * TemplateMatching is basically correct; use HistogramAnalyzer information
-     * only to adjust beginnings and endings of existing TemplateMatcher
-     * breaks.
-     */
-    if (histogramAnalyzer)
-    {
-        long long brklen = 0;
-        for (FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
-                ii != breakMap.end();
-                ++ii)
-            brklen += ii.data();
-
-        if (brklen >= MINBREAKS && brklen <= MAXBREAKS)
-        {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks:"
-                        " adjusting for blanks")
-                    .arg(100 * brklen / nframes));
-
-            bool skipBlanks = histogramAnalyzer->getSkipBlanks();
-            FrameAnalyzer::FrameMap blankMap = histogramAnalyzer->getBlanks();
-
-            FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
-            while (ii != breakMap.end())
-            {
-                FrameAnalyzer::FrameMap::Iterator iinext = ii;
-                ++iinext;
-
-                /* Get bounds of beginning of logo break. */
-                long long iibb = ii.key() - MAXBLANKADJUSTMENT;
-                long long iiee = ii.key() + MAXBLANKADJUSTMENT;
-                FrameAnalyzer::FrameMap::const_iterator jjfound =
-                    blankMap.constEnd();
-
-                if (ii.key() > 0)
-                {
-                    /* Look for a blank frame near beginning of logo break. */
-                    FrameAnalyzer::FrameMap::const_iterator jj =
-                        blankMap.constBegin();
-                    if (!jj.key() && !jj.data())
-                        ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
-                    for (; jj != blankMap.constEnd(); ++jj)
-                    {
-                        long long jjbb = jj.key();
-                        long long jjee = jjbb + jj.data();
-
-                        if (jjbb > iiee)
-                            break;      /* Passed (iibb,iiee). */
-
-                        if (jjee < iibb)
-                            continue;   /* Keep looking. */
-
-                        jjfound = jj;
-                    }
-                }
-
-                /* Get bounds of end of logo break. */
-                long long mmbb = iibb + ii.data();
-                long long mmee = iiee + ii.data();
-
-                /* Look for a blank frame near end of logo break. */
-                FrameAnalyzer::FrameMap::const_iterator kk, kkfound;
-                kkfound = blankMap.constEnd();
-                kk = jjfound;
-                if (kk == blankMap.constEnd())
-                    kk = blankMap.constBegin();
-                else
-                    ++kk;
-                for (; kk != blankMap.constEnd(); ++kk)
-                {
-                    long long kkbb = kk.key();
-                    long long kkee = kkbb + kk.data();
-
-                    if (kkbb > mmee)
-                        break;      /* Passed (mmbb,mmee). */
-
-                    if (kkee < mmbb)
-                        continue;   /* Keep looking. */
-
-                    kkfound = kk;
-                }
-
-                long long start = ii.key();
-                long long end = start + ii.data();
-                if (jjfound != blankMap.constEnd())
-                {
-                    start = jjfound.key();
-                    if (!skipBlanks)
-                        start += jjfound.data();
-                }
-                if (kkfound != blankMap.constEnd())
-                {
-                    end = kkfound.key();
-                    if (skipBlanks)
-                        end += kkfound.data();
-                }
-                if (start != ii.key())
-                    breakMap.remove(ii);
-                breakMap[start] = end - start;
-
-                ii = iinext;
-            }
-
-            histogramAnalyzer->clear();
-        }
-        else
-        {
-            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks"
-                        " (wanted %2-%3%)")
-                    .arg(100 * brklen / nframes)
-                    .arg(100 * MINBREAKS / nframes)
-                    .arg(100 * MAXBREAKS / nframes));
-        }
-
-        /*
-         * Report breaks.
-         */
-        frameAnalyzerReportMap(&breakMap, fps, "TM Break");
-    }
-
-    /*
-     * Initialize isContent state.
-     */
-    long long segb = 0;
-    for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
-            bb != breakMap.end();
-            ++bb)
-    {
-        long long sege = bb.key();
-        for (long long ii = segb; ii < sege; ii++)
-            iscontent[ii] = 1;
-        segb = sege + bb.data();
-    }
-    for (long long ii = segb; ii < nframes; ii++)
-        iscontent[ii] = 1;
-
-    return 0;
-}
-
-int
 TemplateMatcher::reportTime(void) const
 {
     if (pgmConverter->reportTime())
@@ -821,10 +655,157 @@ TemplateMatcher::reportTime(void) const
     return 0;
 }
 
-void
-TemplateMatcher::setHistogramAnalyzer(HistogramAnalyzer *ha)
+int
+TemplateMatcher::breakCoverage(void) const
 {
-    histogramAnalyzer = ha;
+    /*
+     * TUNABLE:
+     *
+     * Expect 25%-36% of total length to be commercials.
+     */
+    const int       MINBREAKS = nframes * 25 / 100;
+    const int       MAXBREAKS = nframes * 36 / 100;
+
+    const long long brklen = frameAnalyzerMapSum(&breakMap);
+    const bool good = brklen >= MINBREAKS && brklen <= MAXBREAKS;
+
+    if (debugLevel >= 1)
+    {
+        if (good)
+        {
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks:"
+                        " adjusting for blanks")
+                    .arg(100 * brklen / nframes));
+        }
+        else
+        {
+            VERBOSE(VB_COMMFLAG, QString("TemplateMatcher has %1% breaks"
+                        " (wanted %2-%3%)")
+                    .arg(100 * brklen / nframes)
+                    .arg(100 * MINBREAKS / nframes)
+                    .arg(100 * MAXBREAKS / nframes));
+        }
+    }
+
+    /*
+     * Return <0 for too little logo coverage, 0 for "correct" coverage, and >0
+     * for too much coverage.
+     */
+    return brklen < MINBREAKS ? -1 : brklen <= MAXBREAKS ? 0 : 1;
+}
+
+int
+TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
+{
+    /*
+     * TUNABLE:
+     *
+     * When logos are a good indicator of commercial breaks, allow blank frames
+     * to adjust logo breaks. Use BlankFrameDetector information to adjust
+     * beginnings and endings of existing TemplateMatcher breaks.
+     */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
+    const bool      skipBlanks = blankFrameDetector->getSkipBlanks();
+
+    const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
+
+    FrameAnalyzer::FrameMap::Iterator ii = breakMap.begin();
+    while (ii != breakMap.end())
+    {
+        FrameAnalyzer::FrameMap::Iterator iinext = ii;
+        ++iinext;
+
+        /* Get bounds of beginning of logo break. */
+        long long iibb = ii.key() - MAXBLANKADJUSTMENT;
+        long long iiee = ii.key() + MAXBLANKADJUSTMENT;
+        FrameAnalyzer::FrameMap::const_iterator jjfound = blankMap->constEnd();
+
+        if (ii.key() > 0)
+        {
+            /* Look for a blank frame near beginning of logo break. */
+            FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constBegin();
+            if (!jj.key() && !jj.data())
+                ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
+            for (; jj != blankMap->constEnd(); ++jj)
+            {
+                long long jjbb = jj.key();
+                long long jjee = jjbb + jj.data();
+
+                if (jjbb > iiee)
+                    break;      /* Passed (iibb,iiee). */
+
+                if (jjee < iibb)
+                    continue;   /* Keep looking. */
+
+                jjfound = jj;
+            }
+        }
+
+        /* Get bounds of end of logo break. */
+        long long mmbb = iibb + ii.data();
+        long long mmee = iiee + ii.data();
+
+        /* Look for a blank frame near end of logo break. */
+        FrameAnalyzer::FrameMap::const_iterator kk, kkfound;
+        kkfound = blankMap->constEnd();
+        kk = jjfound;
+        if (kk == blankMap->constEnd())
+            kk = blankMap->constBegin();
+        else
+            ++kk;
+        for (; kk != blankMap->constEnd(); ++kk)
+        {
+            long long kkbb = kk.key();
+            long long kkee = kkbb + kk.data();
+
+            if (kkbb > mmee)
+                break;      /* Passed (mmbb,mmee). */
+
+            if (kkee < mmbb)
+                continue;   /* Keep looking. */
+
+            kkfound = kk;
+        }
+
+        long long start = ii.key();
+        long long end = start + ii.data();
+        if (jjfound != blankMap->constEnd())
+        {
+            start = jjfound.key();
+            if (!skipBlanks)
+                start += jjfound.data();
+        }
+        if (kkfound != blankMap->constEnd())
+        {
+            end = kkfound.key();
+            if (skipBlanks)
+                end += kkfound.data();
+        }
+        if (start != ii.key())
+            breakMap.remove(ii);
+        breakMap[start] = end - start;
+
+        ii = iinext;
+    }
+
+    /*
+     * Report breaks.
+     */
+    frameAnalyzerReportMap(&breakMap, fps, "TM Break");
+    return 0;
+}
+
+int
+TemplateMatcher::computeBreaks(FrameAnalyzer::FrameMap *breaks)
+{
+    breaks->clear();
+    for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
+            bb != breakMap.end();
+            ++bb)
+    {
+        (*breaks)[bb.key()] = bb.data();
+    }
+    return 0;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

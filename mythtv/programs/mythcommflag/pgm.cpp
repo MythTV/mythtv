@@ -250,7 +250,7 @@ pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
     const int       srcwidth = src->linesize[0];
     const int       newwidth = srcwidth + 2 * mask_radius;
     const int       newheight = srcheight + 2 * mask_radius;
-    int             ii, rr, cc;
+    int             ii, rr, cc, rr2, cc2;
     double          sum;
 
     /* Get a padded copy of the src image for use by the convolutions. */
@@ -262,9 +262,11 @@ pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
     img_copy(dst, s1, PIX_FMT_GRAY8, newwidth, newheight);
 
     /* "s1" convolve with column vector => "s2" */
-    for (rr = mask_radius; rr < mask_radius + srcheight; rr++)
+    rr2 = mask_radius + srcheight;
+    cc2 = mask_radius + srcwidth;
+    for (rr = mask_radius; rr < rr2; rr++)
     {
-        for (cc = mask_radius; cc < mask_radius + srcwidth; cc++)
+        for (cc = mask_radius; cc < cc2; cc++)
         {
             sum = 0;
             for (ii = -mask_radius; ii <= mask_radius; ii++)
@@ -277,9 +279,9 @@ pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
     }
 
     /* "s2" convolve with row vector => "dst" */
-    for (rr = mask_radius; rr < mask_radius + srcheight; rr++)
+    for (rr = mask_radius; rr < rr2; rr++)
     {
-        for (cc = mask_radius; cc < mask_radius + srcwidth; cc++)
+        for (cc = mask_radius; cc < cc2; cc++)
         {
             sum = 0;
             for (ii = -mask_radius; ii <= mask_radius; ii++)

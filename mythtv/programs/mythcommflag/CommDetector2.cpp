@@ -11,6 +11,7 @@
 #include "PGMConverter.h"
 #include "BorderDetector.h"
 #include "HistogramAnalyzer.h"
+#include "BlankFrameDetector.h"
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
 
@@ -66,14 +67,16 @@ int nuppelVideoPlayerInited(QPtrList<FrameAnalyzer> *pass,
     FrameAnalyzer                       *fa;
     FrameAnalyzer::analyzeFrameResult   ares;
 
-    while ((fa = iifa.current()))
+    for (QPtrListIterator<FrameAnalyzer> jjfa = iifa;
+            (fa = iifa.current()); iifa = jjfa)
     {
+        ++jjfa;
+
         ares = fa->nuppelVideoPlayerInited(nvp);
 
         if (ares == FrameAnalyzer::ANALYZE_OK ||
                 ares == FrameAnalyzer::ANALYZE_ERROR)
         {
-            ++iifa;
             continue;
         }
 
@@ -111,8 +114,11 @@ long long processFrame(QPtrList<FrameAnalyzer> *pass,
     long long                           nextFrame, minNextFrame;
 
     minNextFrame = FrameAnalyzer::ANYFRAME;
-    while ((fa = iifa.current()))
+    for (QPtrListIterator<FrameAnalyzer> jjfa = iifa;
+            (fa = iifa.current()); iifa = jjfa)
     {
+        ++jjfa;
+
         ares = fa->analyzeFrame(frame, frameno, &nextFrame);
 
         if (ares == FrameAnalyzer::ANALYZE_OK ||
@@ -120,7 +126,6 @@ long long processFrame(QPtrList<FrameAnalyzer> *pass,
         {
             if (minNextFrame > nextFrame)
                 minNextFrame = nextFrame;
-            ++iifa;
             continue;
         }
 
@@ -162,10 +167,6 @@ int passFinished(QPtrList<FrameAnalyzer> *pass)
             (fa = iifa.current()); ++iifa)
         (void)fa->finished();
 
-    for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
-            (fa = iifa.current()); ++iifa)
-        (void)fa->finished2();
-
     return 0;
 }
 
@@ -178,22 +179,6 @@ int passReportTime(QPtrList<FrameAnalyzer> *pass)
         (void)fa->reportTime();
 
     return 0;
-}
-
-bool isContent(QPtrList<FrameAnalyzer> *pass, long long frameno)
-{
-    /* Compute some function of all analyses on a given frame. */
-    unsigned int    score;
-    FrameAnalyzer   *fa;
-
-    score = 0;
-    for (QPtrListIterator<FrameAnalyzer> iifa(*pass);
-            (fa = iifa.current()); ++iifa)
-    {
-        if (fa->isContent(frameno))
-            score++;
-    }
-    return score > 0;
 }
 
 };  // namespace
@@ -313,6 +298,8 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     , recstartts(recstartts_in)
     , recendts(recendts_in)
     , isRecording(QDateTime::currentDateTime() < recendts)
+    , logoMatcher(NULL)
+    , blankFrameDetector(NULL)
     , debugdir("")
 {
     QPtrList<FrameAnalyzer> pass0, pass1;
@@ -320,7 +307,6 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
     BorderDetector          *borderDetector = NULL;
     HistogramAnalyzer       *histogramAnalyzer = NULL;
     TemplateFinder          *logoFinder = NULL;
-    TemplateMatcher         *logoMatcher = NULL;
 
     debugdir = debugDirectory(chanid, recstartts);
 
@@ -340,7 +326,13 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
         {
             histogramAnalyzer = new HistogramAnalyzer(pgmConverter,
                     borderDetector, debugdir);
-            pass1.append(histogramAnalyzer);
+        }
+
+        if (!blankFrameDetector)
+        {
+            blankFrameDetector = new BlankFrameDetector(histogramAnalyzer,
+                    debugdir);
+            pass1.append(blankFrameDetector);
         }
     }
 
@@ -378,11 +370,8 @@ CommDetector2::CommDetector2(enum SkipTypes commDetectMethod_in,
         }
     }
 
-    if (logoMatcher && histogramAnalyzer)
-    {
-        logoMatcher->setHistogramAnalyzer(histogramAnalyzer);
-        histogramAnalyzer->setTemplateState(logoFinder);
-    }
+    if (histogramAnalyzer && logoFinder)
+        histogramAnalyzer->setLogoState(logoFinder);
 
     /* Aggregate them all together. */
     frameAnalyzers.append(pass0);
@@ -474,6 +463,40 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
         emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
                 .arg(frameno).arg(fps));
     }
+}
+
+int CommDetector2::computeBreaks(void)
+{
+    breaks.clear();
+
+    if (logoMatcher && blankFrameDetector)
+    {
+        int cmp;
+        if (!(cmp = logoMatcher->breakCoverage()))
+        {
+            if (logoMatcher->adjustForBlanks(blankFrameDetector))
+                return -1;
+            if (logoMatcher->computeBreaks(&breaks))
+                return -1;
+        }
+        else
+        {
+            if (blankFrameDetector->computeBreaks(&breaks))
+                return -1;
+        }
+    }
+    else if (logoMatcher)
+    {
+        if (logoMatcher->computeBreaks(&breaks))
+            return -1;
+    }
+    else if (blankFrameDetector)
+    {
+        if (blankFrameDetector->computeBreaks(&breaks))
+            return -1;
+    }
+
+    return 0;
 }
 
 bool CommDetector2::go(void)
@@ -637,6 +660,9 @@ bool CommDetector2::go(void)
             return false;
     }
 
+    if (computeBreaks())
+        return false;
+
     if (showProgress)
     {
         if (myTotalFrames)
@@ -652,73 +678,33 @@ bool CommDetector2::go(void)
 
 void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
 {
-    /*
-     * As a matter of record, the TemplateMatcher is tuned to yield false
-     * positives (non-commercials marked as commercials); false negatives
-     * (commercials marked as non-commercials) are expected to be rare.
-     */
-    const long long                 nframes = nvp->GetTotalFrameCount();
-    const float                     fps = nvp->GetFrameRate();
-    unsigned int                    passno;
-    bool                            prevContent, thisContent;
-    QPtrList<FrameAnalyzer>         *pass1;
-    QMap<long long, int>::Iterator  iimark;
-
     marks.clear();
 
-    /* XXX: Pass #1 (0-based) contains the image analyses. */
-
-    passno = 0;
-    pass1 = NULL;
-    for (frameAnalyzerList::iterator pass = frameAnalyzers.begin();
-            pass != frameAnalyzers.end();
-            ++pass, passno++)
-    {
-        if (passno == 1)
-        {
-            pass1 = &(*pass);
-            break;
-        }
-    }
-
-    if (!pass1)
-        return;
-
     /* Create break list. */
-
-    if (!(prevContent = isContent(pass1, 0)))
-        marks[0] = MARK_COMM_START;
-    for (long long frameno = 1; frameno < nframes; frameno++)
+    for (FrameAnalyzer::FrameMap::Iterator bb = breaks.begin();
+            bb != breaks.end();
+            ++bb)
     {
-        if ((thisContent = isContent(pass1, frameno)) == prevContent)
-            continue;
+        long long segb = bb.key();
+        long long seglen = bb.data();
+        long long sege = segb + seglen - 1;
 
-        if (!thisContent)
-        {
-            marks[frameno] = MARK_COMM_START;
-        }
-        else
-        {
-            if ((iimark = marks.find(frameno - 1)) == marks.end())
-                marks[frameno - 1] = MARK_COMM_END;
-            else
-                marks.remove(iimark);
-        }
-        prevContent = thisContent;
+        marks[segb] = MARK_COMM_START;
+        marks[sege] = MARK_COMM_END;
     }
-    if (!prevContent)
-        marks[nframes - 1] = MARK_COMM_END;
 
     /* Report results. */
-
-    for (iimark = marks.begin(); iimark != marks.end(); ++iimark)
+    const float fps = nvp->GetFrameRate();
+    for (QMap<long long, int>::const_iterator iimark = marks.begin();
+            iimark != marks.end();
+            ++iimark)
     {
         long long   markstart, markend;
 
-        markstart = iimark.key();   /* MARK_COMM_BEGIN */
-        ++iimark;                   /* MARK_COMM_END */
-
-        markend = iimark.key();
+        /* Display as 1-based frame numbers. */
+        markstart = iimark.key() + 1;   /* MARK_COMM_BEGIN */
+        ++iimark;                       /* MARK_COMM_END */
+        markend = iimark.key() + 1;
 
         VERBOSE(VB_COMMFLAG, QString("Break: frame %1-%2 (%3-%4, %5)")
                 .arg(markstart, 6).arg(markend, 6)

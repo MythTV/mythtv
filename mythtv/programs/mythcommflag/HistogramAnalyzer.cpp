@@ -8,6 +8,8 @@
 #include "FrameAnalyzer.h"
 #include "PGMConverter.h"
 #include "BorderDetector.h"
+#include "quickselect.h"
+#include "TemplateFinder.h"
 #include "HistogramAnalyzer.h"
 
 using namespace commDetector2;
@@ -16,7 +18,9 @@ using namespace frameAnalyzer;
 namespace {
 
 bool
-readData(QString filename, unsigned long long *histval, long long nframes)
+readData(QString filename, unsigned char *blank, float *mean,
+        unsigned char *median, float *stddev,
+        int *frow, int *fcol, int *fwidth, int *fheight, long long nframes)
 {
     FILE            *fp;
     long long       frameno;
@@ -26,14 +30,35 @@ readData(QString filename, unsigned long long *histval, long long nframes)
 
     for (frameno = 0; frameno < nframes; frameno++)
     {
-        int nitems = fscanf(fp, "%llu", &histval[frameno]);
-        if (nitems != 1)
+        int blankval, medianval, widthval, heightval, colval, rowval;
+        float meanval, stddevval;
+        int nitems = fscanf(fp, "%d %f %d %f %d %d %d %d",
+                &blankval, &meanval, &medianval, &stddevval,
+                &widthval, &heightval, &colval, &rowval);
+        if (nitems != 8)
         {
             VERBOSE(VB_COMMFLAG, QString(
                         "Not enough data in %1: frame %2")
                     .arg(filename).arg(frameno));
             goto error;
         }
+        if (blankval < 0 || blankval > 1 ||
+                medianval < 0 || medianval > UCHAR_MAX ||
+                widthval < 0 || heightval < 0 || colval < 0 || rowval < 0)
+        {
+            VERBOSE(VB_COMMFLAG, QString(
+                        "Data out of range in %1: frame %2")
+                    .arg(filename).arg(frameno));
+            goto error;
+        }
+        blank[frameno] = blankval ? 1 : 0;
+        mean[frameno] = meanval;
+        median[frameno] = medianval;
+        stddev[frameno] = stddevval;
+        frow[frameno] = rowval;
+        fcol[frameno] = colval;
+        fwidth[frameno] = widthval;
+        fheight[frameno] = heightval;
     }
     if (fclose(fp))
         VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
@@ -48,7 +73,9 @@ error:
 }
 
 bool
-writeData(QString filename, unsigned long long *histval, long long nframes)
+writeData(QString filename, unsigned char *blank, float *mean,
+        unsigned char *median, float *stddev,
+        int *frow, int *fcol, int *fwidth, int *fheight, long long nframes)
 {
     FILE            *fp;
     long long       frameno;
@@ -57,214 +84,35 @@ writeData(QString filename, unsigned long long *histval, long long nframes)
         return false;
 
     for (frameno = 0; frameno < nframes; frameno++)
-        (void)fprintf(fp, "%24llu\n", histval[frameno]);
+        (void)fprintf(fp, "%3u %10.6f %3u %10.6f %5u %5u %5u %5u\n",
+                      blank[frameno],
+                      mean[frameno], median[frameno], stddev[frameno],
+                      fwidth[frameno], fheight[frameno],
+                      fcol[frameno], frow[frameno]);
     if (fclose(fp))
         VERBOSE(VB_COMMFLAG, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
     return true;
 }
 
-#ifdef LATER
-unsigned long long
-histogramValue(const HistogramAnalyzer::Histogram *hist)
-{
-    /*
-     * Type needs to be big enough to hold maximum value:
-     * HISTOGRAM_MAXCOLOR * HISTOGRAM_MAXCOLOR * 1980 x 1080
-     */
-    unsigned long long  histval = 0;
-    for (unsigned int color = 0;
-            color <= HistogramAnalyzer::HISTOGRAM_MAXCOLOR;
-            color++)
-        histval += color * (*hist)[color];
-    return histval;
-}
-#endif /* LATER */
-
-bool
-isBlank(unsigned long long histval, unsigned int maxblack)
-{
-    return histval <= maxblack;
-}
-
-void
-computeBlankMap(FrameAnalyzer::FrameMap *blankMap, float fps,
-        long long nframes, unsigned long long *histval,
-        unsigned int maxblackval)
-{
-    const int   MINBLACKLEN = (int)roundf(0.34 * fps);
-
-    long long   segb, sege;
-
-    blankMap->clear();
-
-    if (isBlank(histval[0], maxblackval))
-    {
-        segb = 0;
-        sege = 0;
-    }
-    else
-    {
-        /* Fake up a dummy blank "segment" at frame 0. */
-        (*blankMap)[0] = 1;
-        segb = -1;
-        sege = -1;
-    }
-    for (long long frameno = 1; frameno < nframes; frameno++)
-    {
-        if (isBlank(histval[frameno], maxblackval))
-        {
-            /* Blank frame. */
-            if (sege < frameno - 1)
-            {
-                /* Start counting. */
-                segb = frameno;
-                sege = frameno;
-            }
-            else
-            {
-                /* Continue counting. */
-                sege = frameno;
-            }
-        }
-        else if (sege == frameno - 1)
-        {
-            /* Transition to non-blank frame. */
-            long long seglen = frameno - segb;
-            if (seglen >= MINBLACKLEN)
-                (*blankMap)[segb] = seglen;
-        }
-    }
-}
-
-void
-computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
-        const FrameAnalyzer::FrameMap *blankMap, float fps, long long nframes,
-        bool skipblanks)
-{
-    /*
-     * TUNABLE:
-     *
-     * Common commercial-break lengths.
-     */
-    static const struct {
-        int     len;
-        int     delta;
-    } breaklen[] = {
-        { 270, 15 },
-        { 240, 15 },
-        { 210, 15 },
-        { 180, 15 },
-        { 150, 15 },
-        { 120, 15 },
-        { 105, 15 },
-        {  90, 15 },
-        {  75, 15 },
-        {  60, 15 },
-        {  45, 15 },
-        {  30, 15 },
-        {  15, 15 },
-    };
-    static const long long maxbreaktime = breaklen[0].len + breaklen[0].delta;
-
-    /*
-     * TUNABLE:
-     *
-     * Minimum length of "content", to coalesce consecutive commercial breaks
-     * (or to avoid too many false consecutive breaks).
-     */
-    const int   MINSEGLEN = (int)roundf(25 * fps);
-
-    breakMap->clear();
-    FrameAnalyzer::FrameMap::const_iterator iiblank = blankMap->begin();
-    while (iiblank != blankMap->end())
-    {
-next:
-        long long segb = iiblank.key();
-        if (segb > 0 && !skipblanks)
-            segb += iiblank.data();      /* Exclude leading blanks. */
-
-        /* Work backwards from end to test maximal candidate break segments. */
-        FrameAnalyzer::FrameMap::const_iterator jjblank = blankMap->end();
-        --jjblank;
-        while (jjblank != iiblank)
-        {
-            long long sege = jjblank.key();
-            if (sege + jjblank.data() == nframes - 1 || skipblanks)
-                sege += jjblank.data();  /* Exclude trailing blanks. */
-
-            long long seglen = sege - segb;                      /* frames */
-            long long segtime = (long long)roundf(seglen / fps); /* seconds */
-
-            /*
-             * Test if the segment length matches any of the candidate
-             * commercial break lengths.
-             */
-            for (unsigned int ii = 0;
-                    ii < sizeof(breaklen)/sizeof(*breaklen);
-                    ii++)
-            {
-                if (segtime > breaklen[ii].len + breaklen[ii].delta)
-                    break;
-                if (abs(segtime - breaklen[ii].len) <= breaklen[ii].delta)
-                {
-                    (*breakMap)[segb] = seglen;
-                    iiblank = jjblank;
-                    goto next;
-                }
-            }
-            --jjblank;
-        }
-        ++iiblank;
-    }
-
-    /*
-     * Eliminate false breaks.
-     */
-    long long segb = 0;
-    FrameAnalyzer::FrameMap::Iterator iibreak = breakMap->begin();
-    FrameAnalyzer::FrameMap::Iterator iibreak0 = breakMap->end();
-    while (iibreak != breakMap->end())
-    {
-        long long sege = iibreak.key();
-        long long seglen = sege - segb;
-        if (seglen < MINSEGLEN && iibreak != breakMap->begin())
-        {
-            /*
-             * Too soon since last break ended. If aggregate break (previous
-             * break + this break) is reasonably short, merge them together.
-             * Otherwise, eliminate this break as a false break.
-             */
-            if (iibreak0 != breakMap->end())
-            {
-                long long seglen = sege + iibreak.data() - iibreak0.key();
-                long long segtime = (long long)roundf(seglen / fps);
-                if (segtime <= maxbreaktime)
-                    (*breakMap)[iibreak0.key()] = seglen;   /* Merge. */
-            }
-            FrameAnalyzer::FrameMap::Iterator jjbreak = iibreak;
-            ++iibreak;
-            breakMap->remove(jjbreak);
-            continue;
-        }
-
-        /* Normal break; save cursors and continue. */
-        segb = sege + iibreak.data();
-        iibreak0 = iibreak;
-        ++iibreak;
-    }
-}
-
 };  /* namespace */
 
 HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
         QString debugdir)
-    : FrameAnalyzer()
-    , pgmConverter(pgmc)
+    : pgmConverter(pgmc)
     , borderDetector(bd)
-    , histval(NULL)
+    , logoFinder(NULL)
+    , logo(NULL)
+    , blank(NULL)
+    , mean(NULL)
+    , median(NULL)
+    , stddev(NULL)
+    , frow(NULL)
+    , fcol(NULL)
+    , fwidth(NULL)
+    , fheight(NULL)
+    , buf(NULL)
     , debugLevel(0)
-    , debugdir(debugdir)
 #ifdef PGM_CONVERT_GREYSCALE
     , debugdata(debugdir + "/HistogramAnalyzer-pgm.txt")
 #else  /* !PGM_CONVERT_GREYSCALE */
@@ -274,16 +122,11 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     , histval_done(false)
 {
     memset(&analyze_time, 0, sizeof(analyze_time));
-    skipblanks = gContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
-
-    VERBOSE(VB_COMMFLAG, QString("HistogramAnalyzer: skipblanks=%1")
-            .arg(skipblanks ? "true" : "false"));
 
     /*
      * debugLevel:
      *      0: no debugging
-     *      1: cache frame information into debugdir [1 file]
-     *      2: extra verbosity [O(nframes)]
+     *      1: cache frame information into debugdata [1 file]
      */
     debugLevel = gContext->GetNumSetting("HistogramAnalyzerDebugLevel", 0);
 
@@ -297,62 +140,107 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
 
 HistogramAnalyzer::~HistogramAnalyzer(void)
 {
-    if (histval)
-        delete []histval;
-    if (iscontent)
-        delete []iscontent;
+    if (blank)
+        delete []blank;
+    if (mean)
+        delete []mean;
+    if (median)
+        delete []median;
+    if (stddev)
+        delete []stddev;
+    if (frow)
+        delete []frow;
+    if (fcol)
+        delete []fcol;
+    if (fwidth)
+        delete []fwidth;
+    if (fheight)
+        delete []fheight;
+    if (buf)
+        delete []buf;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
 HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp)
 {
+    if (blank)
+        return FrameAnalyzer::ANALYZE_OK;
+
     nframes = nvp->GetTotalFrameCount();
-    fps = nvp->GetFrameRate();
-    npixels = nvp->GetVideoWidth() * nvp->GetVideoHeight();
+
+    unsigned int width = nvp->GetVideoWidth();
+    unsigned int height = nvp->GetVideoHeight();
+
+    if ((logo = logoFinder->getTemplate(&logorr1, &logocc1,
+                    &logowidth, &logoheight)))
+    {
+        logorr2 = logorr1 + logoheight - 1;
+        logocc2 = logocc1 + logowidth - 1;
+    }
+    QString details = logo ? QString("logo %1x%2@(%3,%4)")
+        .arg(logowidth).arg(logoheight).arg(logocc1).arg(logorr1) :
+            QString("no logo");
 
     VERBOSE(VB_COMMFLAG, QString(
-                "HistogramAnalyzer::nuppelVideoPlayerInited %1x%2")
-            .arg(nvp->GetVideoWidth())
-            .arg(nvp->GetVideoHeight()));
+                "HistogramAnalyzer::nuppelVideoPlayerInited %1x%2: %3")
+            .arg(width).arg(height).arg(details));
 
     if (pgmConverter->nuppelVideoPlayerInited(nvp))
-	    return ANALYZE_FATAL;
+	    return FrameAnalyzer::ANALYZE_FATAL;
 
     if (borderDetector->nuppelVideoPlayerInited(nvp))
-	    return ANALYZE_FATAL;
+	    return FrameAnalyzer::ANALYZE_FATAL;
 
-    histval = new unsigned long long[nframes];
-    memset(histval, 0, nframes * sizeof(*histval));
+    blank = new unsigned char[nframes];
+    mean = new float[nframes];
+    median = new unsigned char[nframes];
+    stddev = new float[nframes];
+    frow = new int[nframes];
+    fcol = new int[nframes];
+    fwidth = new int[nframes];
+    fheight = new int[nframes];
 
-    iscontent = new unsigned char[nframes];
-    memset(iscontent, 0, nframes * sizeof(*iscontent));
+    memset(blank, 0, nframes * sizeof(*blank));
+    memset(mean, 0, nframes * sizeof(*mean));
+    memset(median, 0, nframes * sizeof(*median));
+    memset(stddev, 0, nframes * sizeof(*stddev));
+    memset(frow, 0, nframes * sizeof(*frow));
+    memset(fcol, 0, nframes * sizeof(*fcol));
+    memset(fwidth, 0, nframes * sizeof(*fwidth));
+    memset(fheight, 0, nframes * sizeof(*fheight));
+
+    unsigned int npixels = width * height;
+    buf = new unsigned char[npixels];
 
     if (debug_histval)
     {
-        if (readData(debugdata, histval, nframes))
+        if (readData(debugdata, blank, mean, median, stddev,
+                    frow, fcol, fwidth, fheight, nframes))
         {
             VERBOSE(VB_COMMFLAG, QString(
                         "HistogramAnalyzer::nuppelVideoPlayerInited read %1")
                     .arg(debugdata));
             histval_done = true;
-            return ANALYZE_FINISHED;
+            return FrameAnalyzer::ANALYZE_FINISHED;
         }
     }
-    return ANALYZE_OK;
+
+    return FrameAnalyzer::ANALYZE_OK;
+}
+
+void
+HistogramAnalyzer::setLogoState(TemplateFinder *finder)
+{
+    logoFinder = finder;
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno,
-        long long *pNextFrame)
+HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
 {
-#ifdef LATER
     /*
-     * TUNABLE:
-     *
-     * Default color value to assign to margin areas of the screen.
+     * Various statistical computations over pixel values: mean, median,
+     * (running) standard deviation over sample population.
      */
-    static const unsigned char  DEFAULT = 0;
-#endif /* LATER */
 
     /*
      * TUNABLE:
@@ -366,92 +254,108 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno,
 
     const AVPicture     *pgm;
     int                 pgmwidth, pgmheight;
+    bool                isblank;
     int                 croprow, cropcol, cropwidth, cropheight;
-    int                 rr, cc;
+    unsigned int        borderpixels, livepixels, npixels;
+    unsigned char       *pp, bordercolor;
+    unsigned long long  sumval, sumsquares;
+    int                 rr, cc, rr2, cc2;
     struct timeval      start, end, elapsed;
-
-    *pNextFrame = NEXTFRAME;
 
     if (!(pgm = pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
         goto error;
 
-    (void)borderDetector->getDimensions(pgm, pgmheight, frameno,
-                &croprow, &cropcol, &cropwidth, &cropheight);
+    isblank = borderDetector->getDimensions(pgm, pgmheight, frameno,
+            &croprow, &cropcol, &cropwidth, &cropheight) != 0;
 
     (void)gettimeofday(&start, NULL);
 
-#ifdef LATER
+    frow[frameno] = croprow;
+    fcol[frameno] = cropcol;
+    fwidth[frameno] = cropwidth;
+    fheight[frameno] = cropheight;
 
-    /* Add margin pixels as default pixel color (black). */
-    memset(&histogram, 0, sizeof(histogram));
-    histogram[DEFAULT] =
-        ((pgmheight - cropheight) / RINC + 1) * (pgmwidth / CINC + 1) +
-        ((pgmwidth - cropwidth) / CINC + 1) * (cropheight / RINC + 1);
-
-    if (cropheight && cropwidth)
+    if (isblank)
     {
-        for (rr = croprow; rr < croprow + cropheight; rr += RINC)
+        /*
+         * Optimization for monochromatic frames; just sample the center area.
+         * This correctly handles both "blank" (black) frames as well as
+         * monochromatic frames (e.g., bright white-light "flashback" frames).
+         */
+        croprow = pgmheight * 3 / 8;
+        cropheight = pgmheight / 4;
+        cropcol = pgmwidth * 3 / 8;
+        cropwidth = pgmwidth / 4;
+    }
+
+    borderpixels = ((pgmheight - cropheight) / RINC) * (pgmwidth / CINC) +
+        (cropheight / RINC) * ((pgmwidth - cropwidth) / CINC);
+    livepixels = (cropheight / RINC) * (cropwidth / CINC);
+    if (logo)
+        livepixels -= (logoheight / RINC) * (logowidth / CINC);
+    npixels = borderpixels + livepixels;
+
+    pp = buf + borderpixels;
+    sumval = 0;
+    sumsquares = 0;
+
+    rr2 = croprow + cropheight;
+    cc2 = cropcol + cropwidth;
+    for (rr = croprow; rr < rr2; rr += RINC)
+    {
+        for (cc = cropcol; cc < cc2; cc += CINC)
         {
-            for (cc = cropcol; cc < cropcol + cropwidth; cc += CINC)
-            {
-                unsigned char val = pgm->data[0][rr * pgmwidth + cc];
-                histogram[val]++;
-            }
+            if (logo && rr >= logorr1 && rr <= logorr2 &&
+                    cc >= logocc1 && cc <= logocc2)
+                continue;   /* Exclude logo area from analysis. */
+
+            unsigned char val = pgm->data[0][rr * pgmwidth + cc];
+            *pp++ = val;
+            sumval += val;
+            sumsquares += val * val;
         }
     }
 
-    histval[frameno] = histogramValue(&histogram);
-
-#else  /* !LATER */
-
-    histval[frameno] = 0;
-    if (cropheight && cropwidth)
+    bordercolor = 0;
+    if (isblank)
     {
-        for (rr = croprow; rr < croprow + cropheight; rr += RINC)
-        {
-            for (cc = cropcol; cc < cropcol + cropwidth; cc += CINC)
-            {
-                unsigned char val = pgm->data[0][rr * pgmwidth + cc];
-                if (val)
-                    histval[frameno] += val;
-            }
-        }
+        /*
+         * Fake up the margin pixels to be of the same color as the sampled
+         * area.
+         */
+        bordercolor = (sumval + livepixels - 1) / livepixels;
+        sumval += borderpixels * bordercolor;
+        sumsquares += borderpixels * bordercolor * bordercolor;
     }
 
-#endif /* !LATER */
+    memset(buf, bordercolor, borderpixels * sizeof(*buf));
+    blank[frameno] = isblank ? 1 : 0;
+    mean[frameno] = (float)sumval / npixels;
+    median[frameno] = quick_select_median(buf, npixels);
+    stddev[frameno] = sqrt((sumsquares - (float)sumval * sumval / npixels) /
+            (npixels - 1));
 
     (void)gettimeofday(&end, NULL);
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
 
-    return ANALYZE_OK;
+    return FrameAnalyzer::ANALYZE_OK;
 
 error:
     VERBOSE(VB_COMMFLAG,
             QString("HistogramAnalyzer::analyzeFrame error at frame %1")
             .arg(frameno));
 
-    return ANALYZE_ERROR;
+    return FrameAnalyzer::ANALYZE_ERROR;
 }
 
 int
 HistogramAnalyzer::finished(void)
 {
-    /*
-     * TUNABLE:
-     *
-     * Maximum histogram value for a frame to be considered a blank frame. This
-     * is equivalent to expressing this value as some average greyscale value
-     * in [0..255] and averaging out all histogram values. This way we get
-     * finer precision, as well as not having to perform all the unnecessary
-     * averaging calculations.
-     */
-    const unsigned long long maxhistval = npixels * HISTOGRAM_MAXCOLOR;
-    const unsigned int MAXBLACKVAL = (unsigned int)(0.002 * maxhistval);
-
     if (!histval_done && debug_histval)
     {
-        if (writeData(debugdata, histval, nframes))
+        if (writeData(debugdata, blank, mean, median, stddev,
+                    frow, fcol, fwidth, fheight, nframes))
         {
             VERBOSE(VB_COMMFLAG, QString(
                         "HistogramAnalyzer::finished wrote %1")
@@ -459,63 +363,6 @@ HistogramAnalyzer::finished(void)
             histval_done = true;
         }
     }
-
-#if 0
-    /*
-     * Report histogram summaries with some context.
-     */
-    if (debugLevel >= 2)
-    {
-        for (long long frameno = 0; frameno < nframes; frameno++)
-        {
-            bool isblank = false;
-
-            for (long long ii = frameno - 10; ii < frameno + 10; ii++)
-            {
-                if (isBlank(histval[ii], MAXBLACKVAL))
-                {
-                    isblank = true;
-                    break;
-                }
-            }
-            if (isblank)
-                VERBOSE(VB_COMMFLAG, QString("HA Frame %1 (%2): %3 (%4)")
-                        .arg(frameno, 6)
-                        .arg(frameToTimestamp(frameno, fps))
-                        .arg(histval[frameno], 8)
-                        .arg((float)histval[frameno] / maxhistval, 8, 'f', 6));
-        }
-    }
-#endif
-
-    /*
-     * Identify all sequences of blank frames (blankMap).
-     */
-    computeBlankMap(&blankMap, fps, nframes, histval, MAXBLACKVAL);
-    if (debugLevel >= 2)
-        frameAnalyzerReportMapms(&blankMap, fps, "HA Blank");
-
-    /*
-     * Compute breaks (breakMap).
-     */
-    computeBreakMap(&breakMap, &blankMap, fps, nframes, skipblanks);
-    frameAnalyzerReportMap(&breakMap, fps, "HA Break");
-
-    /*
-     * Initialize isContent state.
-     */
-    long long segb = 0;
-    for (FrameAnalyzer::FrameMap::const_iterator bb = breakMap.begin();
-            bb != breakMap.end();
-            ++bb)
-    {
-        long long sege = bb.key();
-        for (long long ii = segb; ii < sege; ii++)
-            iscontent[ii] = 1;
-        segb = sege + bb.data();
-    }
-    for (long long ii = segb; ii < nframes; ii++)
-        iscontent[ii] = 1;
 
     return 0;
 }
@@ -532,20 +379,6 @@ HistogramAnalyzer::reportTime(void) const
     VERBOSE(VB_COMMFLAG, QString("HA Time: analyze=%1s")
             .arg(strftimeval(&analyze_time)));
     return 0;
-}
-
-void
-HistogramAnalyzer::setTemplateState(TemplateFinder *tf)
-{
-    templateFinder = tf;
-}
-
-void
-HistogramAnalyzer::clear(void)
-{
-    VERBOSE(VB_COMMFLAG, "HistogramAnalyzer::clear");
-    breakMap.clear();
-    memset(iscontent, 0, nframes * sizeof(*iscontent));
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

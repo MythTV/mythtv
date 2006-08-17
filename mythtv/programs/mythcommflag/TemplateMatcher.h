@@ -25,7 +25,6 @@ typedef struct AVPicture AVPicture;
 class PGMConverter;
 class EdgeDetector;
 class TemplateFinder;
-class HistogramAnalyzer;
 
 class TemplateMatcher : public FrameAnalyzer
 {
@@ -41,18 +40,17 @@ public:
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame);
     int finished(void);
-    int finished2(void);
     int reportTime(void) const;
-    bool isContent(long long frameno) const { return iscontent[frameno] > 0; }
 
     /* TemplateMatcher interface. */
-    void setHistogramAnalyzer(HistogramAnalyzer *ha);
+    int breakCoverage(void) const;
+    int adjustForBlanks(const BlankFrameDetector *bf);
+    int computeBreaks(FrameMap *breaks);
 
 private:
     PGMConverter            *pgmConverter;
     EdgeDetector            *edgeDetector;
     TemplateFinder          *templateFinder;
-    HistogramAnalyzer       *histogramAnalyzer;
     const struct AVPicture  *tmpl;                  /* template image */
     int                     tmplrow, tmplcol;       /* template location */
     int                     tmplwidth, tmplheight;  /* template dimensions */
@@ -61,7 +59,6 @@ private:
     /* Per-frame info. */
     unsigned short          *matches;               /* matching pixels */
     unsigned char           *match;                 /* boolean result: 1/0 */
-    unsigned char           *iscontent;             /* boolean result: 1/0 */
 
     long long               nframes;                /* total frame count */
     float                   fps;

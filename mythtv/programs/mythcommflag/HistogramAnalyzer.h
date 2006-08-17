@@ -14,7 +14,7 @@ class PGMConverter;
 class BorderDetector;
 class TemplateFinder;
 
-class HistogramAnalyzer : public FrameAnalyzer
+class HistogramAnalyzer
 {
 public:
     /* Ctor/dtor. */
@@ -22,46 +22,41 @@ public:
             QString debugdir);
     ~HistogramAnalyzer(void);
 
-    /* FrameAnalyzer interface. */
-    const char *name(void) const { return "HistogramAnalyzer"; }
-    enum analyzeFrameResult nuppelVideoPlayerInited(NuppelVideoPlayer *nvp);
-    enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
-            long long frameno, long long *pNextFrame);
+    enum FrameAnalyzer::analyzeFrameResult nuppelVideoPlayerInited(
+            NuppelVideoPlayer *nvp);
+    void setLogoState(TemplateFinder *finder);
+    enum FrameAnalyzer::analyzeFrameResult analyzeFrame(const VideoFrame *frame,
+            long long frameno);
     int finished(void);
     int reportTime(void) const;
-    bool isContent(long long frameno) const { return iscontent[frameno] > 0; }
 
-    /* HistogramAnalyzer interface. */
-    void setTemplateState(TemplateFinder *tf);
-    bool getSkipBlanks(void) const { return skipblanks; }
-    const FrameAnalyzer::FrameMap getBlanks(void) const { return blankMap; }
-    void clear(void);
-
-    static const unsigned int   HISTOGRAM_MAXCOLOR = UCHAR_MAX;
-    typedef unsigned int        Histogram[HISTOGRAM_MAXCOLOR + 1];
+    const unsigned char *getBlanks(void) const { return blank; }
+    const float *getMeans(void) const { return mean; }
+    const unsigned char *getMedians(void) const { return median; }
+    const float *getStdDevs(void) const { return stddev; }
 
 private:
     PGMConverter            *pgmConverter;
     BorderDetector          *borderDetector;
-    TemplateFinder          *templateFinder;
+
+    TemplateFinder          *logoFinder;
+    const struct AVPicture  *logo;
+    int                     logowidth, logoheight;
+    int                     logorr1, logocc1, logorr2, logocc2;
+
     long long               nframes;                /* total frame count */
-    float                   fps;
-    unsigned int            npixels;
-    bool                    skipblanks;             /* blanks as commercials */
 
     /* Per-frame info. */
-#ifdef LATER
-    Histogram               histogram;
-#endif /* LATER */
-    unsigned long long      *histval;
-    unsigned char           *iscontent;             /* boolean result: 1/0 */
-
-    FrameAnalyzer::FrameMap blankMap;               /* frameno => nframes */
-    FrameAnalyzer::FrameMap breakMap;               /* frameno => nframes */
+    unsigned char           *blank;                 /* boolean */
+    float                   *mean;                  /* mean pixel value */
+    unsigned char           *median;                /* median pixel value */
+    float                   *stddev;                /* standard deviation */
+    int                     *frow, *fcol;           /* position of borders */
+    int                     *fwidth, *fheight;      /* area of borders */
+    unsigned char           *buf;                   /* temporary buffer */
 
     /* Debugging */
     int                     debugLevel;
-    QString                 debugdir;
     QString                 debugdata;              /* filename */
     bool                    debug_histval;
     bool                    histval_done;

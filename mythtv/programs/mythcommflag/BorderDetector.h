@@ -14,6 +14,7 @@
 
 typedef struct AVPicture AVPicture;
 class NuppelVideoPlayer;
+class TemplateFinder;
 
 class BorderDetector
 {
@@ -23,6 +24,7 @@ public:
     ~BorderDetector(void);
 
     int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp);
+    void setLogoState(TemplateFinder *finder);
 
     static const long long UNCACHED = -1;
     int getDimensions(const AVPicture *pgm, int pgmheight, long long frameno,
@@ -31,13 +33,20 @@ public:
     int reportTime(void);
 
 private:
-    long long       frameno;            /* frame number */
-    int             row, col;           /* content location */
-    int             width, height;      /* content dimensions */
+    TemplateFinder          *logoFinder;
+    const struct AVPicture  *logo;
+    int                     logowidth, logoheight;
+    int                     logorr1, logocc1, logorr2, logocc2;
 
-    int             debugLevel;
-    struct timeval  analyze_time;
-    bool            time_reported;
+    long long               frameno;            /* frame number */
+    int                     row, col;           /* content location */
+    int                     width, height;      /* content dimensions */
+    bool                    isblank;
+
+    /* Debugging. */
+    int                     debugLevel;
+    struct timeval          analyze_time;
+    bool                    time_reported;
 };
 
 #endif  /* !__BORDERDETECTOR_H__ */

@@ -50,12 +50,14 @@ bounding_score(const AVPicture *img, int row, int col, int width, int height)
     /* Return a value scaled to [0..1000000 (100M)] */
     const int       imgwidth = img->linesize[0];
     unsigned int    score;
-    int             rr, cc;
+    int             rr, cc, rr2, cc2;
 
     score = 0;
-    for (rr = row; rr < row + height; rr++)
+    rr2 = row + height;
+    cc2 = col + width;
+    for (rr = row; rr < rr2; rr++)
     {
-        for (cc = col; cc < col + width; cc++)
+        for (cc = col; cc < cc2; cc++)
         {
             if (img->data[0][rr * imgwidth + cc])
                 score++;
@@ -873,6 +875,8 @@ TemplateFinder::finished(void)
 
         tmpl_done = true;
     }
+
+    borderDetector->setLogoState(this);
 
     return 0;
 
