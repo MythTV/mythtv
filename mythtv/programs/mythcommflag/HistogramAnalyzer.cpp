@@ -296,7 +296,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     int                 pgmwidth, pgmheight;
     bool                ismonochromatic;
     int                 croprow, cropcol, cropwidth, cropheight;
-    unsigned int        borderpixels, livepixels, npixels;
+    unsigned int        borderpixels, livepixels, npixels, halfnpixels;
     unsigned char       *pp, bordercolor;
     unsigned long long  sumval, sumsquares;
     int                 rr, cc, rr1, cc1, rr2, cc2, rr3, cc3;
@@ -366,7 +366,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     npixels = borderpixels + livepixels;
 
     /* Scale scores down to [0..255]. */
-    unsigned int halfnpixels = npixels / 2;
+    halfnpixels = npixels / 2;
     for (unsigned int color = 0; color < UCHAR_MAX + 1; color++)
         histogram[frameno][color] =
             (histval[color] * UCHAR_MAX + halfnpixels) / npixels;
