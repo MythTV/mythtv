@@ -1,6 +1,8 @@
 #ifndef _COMMDETECTOR_FACTORY_H_
 #define _COMMDETECTOR_FACTORY_H_
 
+#include "CommDetector.h"
+
 class CommDetectorBase;
 class NuppelVideoPlayer;
 class RemoteEncoder;
@@ -12,8 +14,10 @@ public:
 	CommDetectorFactory() {}
 	~CommDetectorFactory() {}
 
-	CommDetectorBase* makeCommDetector(int commDetectMethod, bool showProgress,
+	CommDetectorBase* makeCommDetector(enum SkipTypes commDetectMethod,
+                                       bool showProgress,
                                        bool fullSpeed, NuppelVideoPlayer* nvp,
+                                       int chanid,
                                        const QDateTime& startedAt,
                                        const QDateTime& stopsAt,
                                        const QDateTime& recordingStartedAt,

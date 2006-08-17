@@ -1,6 +1,7 @@
 #ifndef _CLASSIC_COMMDETECTOR_H_
 #define _CLASSIC_COMMDETECTOR_H_
 
+#include "CommDetector.h"
 #include "CommDetectorBase.h"
 #include "libmythtv/frame.h"
 #include "qdatetime.h"
@@ -14,7 +15,7 @@ class ClassicCommDetector : public CommDetectorBase
     Q_OBJECT
 
     public:
-        ClassicCommDetector(int commDetectMethod, bool showProgress,
+        ClassicCommDetector(enum SkipTypes commDetectMethod, bool showProgress,
                             bool fullSpeed, NuppelVideoPlayer* nvp,
                             const QDateTime& startedAt_in,
                             const QDateTime& stopsAt_in,
@@ -83,7 +84,7 @@ class ClassicCommDetector : public CommDetectorBase
         void CleanupFrameInfo(void);
         void GetLogoCommBreakMap(QMap<long long, int> &map);
 
-        int commDetectMethod;
+        enum SkipTypes commDetectMethod;
         bool showProgress;
         bool fullSpeed;
         NuppelVideoPlayer *nvp;

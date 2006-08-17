@@ -35,7 +35,7 @@ enum frameFormats {
     COMM_FORMAT_MAX
 };
 
-ClassicCommDetector::ClassicCommDetector(int commDetectMethod_in,
+ClassicCommDetector::ClassicCommDetector(enum SkipTypes commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
                                          NuppelVideoPlayer* nvp_in,
@@ -543,6 +543,10 @@ void ClassicCommDetector::getCommercialBreakList(QMap<long long, int> &marks)
             case COMM_DETECT_ALL:         BuildAllMethodsCommList();
                                           marks = commBreakMap;
                                           break;
+            default: VERBOSE(VB_COMMFLAG,
+                             QString("Unexpected commDetectMethod: %1")
+                             .arg(commDetectMethod));
+                     break;
     }
 
     VERBOSE(VB_COMMFLAG, "Final Commercial Break Map" );

@@ -44,7 +44,7 @@ bool watchingRecording = false;
 CommDetectorBase* commDetector = NULL;
 RemoteEncoder* recorder = NULL;
 ProgramInfo* program_info = NULL;
-int commDetectMethod = -1;
+enum SkipTypes commDetectMethod = COMM_DETECT_UNINIT;
 int recorderNum = -1;
 bool dontSubmitCommbreakListToDB =  false;
 QString outputfilename;
@@ -372,11 +372,12 @@ void incomingCustomEvent(QCustomEvent* e)
 }
 
 int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
-                      NuppelVideoPlayer* nvp, int commDetectMethod)
+                      NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod)
 {
     CommDetectorFactory factory;
     commDetector = factory.makeCommDetector(commDetectMethod, showPercentage,
                                             fullSpeed, nvp,
+                                            program_info->chanid.toInt(),
                                             program_info->startts,
                                             program_info->endts,
                                             program_info->recstartts,
@@ -454,9 +455,9 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
 int FlagCommercials(QString chanid, QString starttime)
 {
     int breaksFound = 0;
-    if (commDetectMethod==-1)
-        commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
-                                                   COMM_DETECT_ALL);
+    if (commDetectMethod == COMM_DETECT_UNINIT)
+        commDetectMethod = (enum SkipTypes)gContext->GetNumSetting(
+                                    "CommercialSkipMethod", COMM_DETECT_ALL);
     QMap<long long, int> blanks;
     recorder = NULL;
     program_info = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
@@ -687,9 +688,9 @@ int main(int argc, char *argv[])
         {
             QString method = (a.argv()[++argpos]);
             bool ok;
-            commDetectMethod = method.toInt(&ok);
+            commDetectMethod = (enum SkipTypes)method.toInt(&ok);
             if (!ok)
-                commDetectMethod = -1;
+                commDetectMethod = COMM_DETECT_UNINIT;
         }
         else if (!strcmp(a.argv()[argpos], "--gencutlist"))
             copyToCutlist = true;
