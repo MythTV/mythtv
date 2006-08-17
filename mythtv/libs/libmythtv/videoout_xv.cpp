@@ -3434,7 +3434,8 @@ static int calc_hue_base(const QString &adaptor_name)
 {
     if ((adaptor_name == "ATI Radeon Video Overlay") ||
         (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
-        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */))
+        (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
+        (adaptor_name == "SIS 300/315/330 series Video Overlay"))
     {
         return 50;
     }
