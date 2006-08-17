@@ -5,7 +5,7 @@
 #include "mythcontext.h"
 #include "videobuffers.h"
 #include "../libavcodec/avcodec.h"
-#include "util-xv.h"
+#include "fourcc.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h" // for xvmc stuff

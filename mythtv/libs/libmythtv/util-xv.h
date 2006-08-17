@@ -8,10 +8,6 @@
 #include "videobuffers.h"
 #include "exitcodes.h"
 
-// See http://www.fourcc.org/yuv.php for more info on formats
-#define GUID_I420_PLANAR 0x30323449
-#define GUID_IYUV_PLANAR 0x56555949 /**< bit equivalent to I420 */
-#define GUID_YV12_PLANAR 0x32315659
 
 class port_info
 {
