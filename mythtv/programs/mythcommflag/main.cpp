@@ -371,14 +371,6 @@ void incomingCustomEvent(QCustomEvent* e)
     }
 }
 
-void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
-{
-    (void)ptr;
-    (void)level;
-    (void)fmt;
-    (void)vl;
-}
-
 int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
                       NuppelVideoPlayer* nvp, enum SkipTypes commDetectMethod)
 {
@@ -420,8 +412,6 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
     message += program_info->chanid + " " +
                program_info->recstartts.toString(Qt::ISODate);
     RemoteSendMessage(message);
-
-    av_log_set_callback(my_av_print);
 
     bool result = commDetector->go();
     int comms_found = 0;

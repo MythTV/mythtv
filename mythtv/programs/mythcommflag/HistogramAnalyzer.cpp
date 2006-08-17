@@ -206,7 +206,7 @@ HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
     unsigned int width = nvp->GetVideoWidth();
     unsigned int height = nvp->GetVideoHeight();
 
-    if ((logo = logoFinder->getTemplate(&logorr1, &logocc1,
+    if (logoFinder && (logo = logoFinder->getTemplate(&logorr1, &logocc1,
                     &logowidth, &logoheight)))
     {
         logorr2 = logorr1 + logoheight - 1;

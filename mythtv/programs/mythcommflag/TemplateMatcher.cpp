@@ -581,8 +581,8 @@ TemplateMatcher::finished(long long nframes, bool final)
     }
 
     /*
-     * Eliminate false breaks (but allow short "false" breaks if they start at
-     * the very beginning).
+     * Eliminate false breaks (but allow short breaks if they start at the very
+     * beginning or end at the very end).
      */
     bb = breakMap.begin();
     if (bb != breakMap.end() && bb.key() == 0)
@@ -597,6 +597,9 @@ TemplateMatcher::finished(long long nframes, bool final)
 
         FrameAnalyzer::FrameMap::Iterator bb1 = bb;
         ++bb;
+        if (bb == breakMap.end())
+            continue;
+
         breakMap.remove(bb1);
     }
 
