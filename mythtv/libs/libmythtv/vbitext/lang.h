@@ -4,6 +4,7 @@
 #include "vt.h"
 
 extern int latin1;
+extern const unsigned char lang_chars[][16]; /* from vbilut.cpp */
 
 struct enhance
 {
