@@ -251,6 +251,8 @@ void LCD::restartConnection()
 
 void LCD::readyRead(MythSocket *sock)
 {
+    (void) sock;
+
     QMutexLocker locker(&socketLock);
 
     QString lineFromServer, tempString;

@@ -25,6 +25,7 @@
 
 #define LowPass(Prev, Curr, Coef) (Curr + Coef[Prev - Curr])
 
+#undef ABS
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 
 #ifdef MMX
@@ -71,6 +72,8 @@ PrecalcCoefs (uint8_t * Ct, double Dist25)
 static void SetupSize(ThisFilter *filter, VideoFrameType inpixfmt,
                       int *width, int *height)
 {
+    (void) inpixfmt;
+
     if (filter->line)
         free(filter->line);
 

@@ -225,6 +225,9 @@ static int licomb_y(unsigned char *a, unsigned char *b, int s)
 }
 
 static int qpcomb_y(unsigned char *a, unsigned char *b, int s)
+    __attribute__ ((unused)); /* <- to suppress compiler warning */
+
+static int qpcomb_y(unsigned char *a, unsigned char *b, int s)
 {
 	int i, j, diff=0;
 	for (i=4; i; i--) {
@@ -571,7 +574,7 @@ static int decide_frame_length(struct pullup_context *c)
 	struct pullup_field *f0 = c->first;
 	struct pullup_field *f1 = f0->next;
 	struct pullup_field *f2 = f1->next;
-	struct pullup_field *f3 = f2->next;
+	/*struct pullup_field *f3 = f2->next;*/
 	int l;
 	
 	if (queue_length(c->first, c->last) < 4) return 0;
@@ -616,6 +619,9 @@ static void print_aff_and_breaks(struct pullup_context *c, struct pullup_field *
 	int i;
 	struct pullup_field *f0 = f;
 	const char aff_l[] = "+..", aff_r[] = "..+";
+
+	(void) c;
+
 	printf("\naffinity: ");
 	for (i = 0; i < 4; i++) {
 		printf("%c%d%c", aff_l[1+f->affinity], i, aff_r[1+f->affinity]);
@@ -703,7 +709,7 @@ static void copy_field(struct pullup_context *c, struct pullup_buffer *dest,
 void pullup_pack_frame(struct pullup_context *c, struct pullup_frame *fr)
 {
 	int i;
-	int par = fr->parity;
+	/*int par = fr->parity;*/
 	if (fr->buffer) return;
 	if (fr->length < 2) return; /* FIXME: deal with this */
 	for (i = 0; i < 2; i++)

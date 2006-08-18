@@ -595,8 +595,8 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     pginfo->pathname = mrl;
     
     QDir d(filename + "/VIDEO_TS");
-    if (filename.findRev(".iso", -1, false) == filename.length() - 4 ||
-        filename.findRev(".img", -1, false) == filename.length() - 4 ||
+    if (filename.findRev(".iso", -1, false) == (int)filename.length() - 4 ||
+        filename.findRev(".img", -1, false) == (int)filename.length() - 4 ||
         d.exists())
     {
         pginfo->pathname = QString("dvd:%1").arg(mrl);

@@ -84,6 +84,7 @@ class DBox2Channel : public ChannelBase
     QString           m_requestChannel;
     DBox2EPG         *m_epg;
     bool              m_recorderAlive;
+    DBox2Recorder    *m_recorder;
 
     QHttp            *http;
     QHttp            *httpChanger;
@@ -93,7 +94,6 @@ class DBox2Channel : public ChannelBase
     QMap<int,QString> m_dbox2channelids;
     QMap<int,QString> m_dbox2channelnames;
 
-    DBox2Recorder    *m_recorder;
     QMutex            m_lock;
 };
 

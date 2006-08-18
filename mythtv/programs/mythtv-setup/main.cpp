@@ -240,6 +240,7 @@ int main(int argc, char *argv[])
     gContext->SetMainWindow(mainWindow);
 
     MythThemeBase *themeBase = new MythThemeBase();
+    (void) themeBase;
 
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");

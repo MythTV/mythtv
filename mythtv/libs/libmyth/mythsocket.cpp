@@ -644,6 +644,7 @@ void MythSocket::StartReadyReadThread(void)
         if (m_readyread_run == false)
         {
             int ret = pipe(m_readyread_pipe);
+            (void) ret;
             assert(ret >= 0);
 
             m_readyread_run = true;

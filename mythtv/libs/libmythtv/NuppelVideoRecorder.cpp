@@ -3097,6 +3097,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 }
 
 static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
+    __attribute__ ((unused)); /* <- suppress compiler warning */
+
+static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 {
     for (int i = 0; i < audio_channels * buf_cnt; i++)
         buf[i] = bswap_16(buf[i]);
