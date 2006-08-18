@@ -2752,11 +2752,10 @@ void NuppelVideoRecorder::doWriteThread(void)
             case ACTION_VIDEO:
             {
                 VideoFrame frame;
-                frame.codec = FMT_YV12;
-                frame.width = w;
-                frame.height = h;
-                frame.buf = videobuffer[act_video_encode]->buffer;
-                frame.size = videobuffer[act_video_encode]->bufferlen;
+                init(&frame,
+                     FMT_YV12, videobuffer[act_video_encode]->buffer,
+                     w, h, 12, videobuffer[act_video_encode]->bufferlen);
+
                 frame.frameNumber = videobuffer[act_video_encode]->sample;
                 frame.timecode = videobuffer[act_video_encode]->timecode;
                 frame.forcekey = videobuffer[act_video_encode]->forcekey;  

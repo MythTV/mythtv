@@ -1135,16 +1135,11 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 
     for (uint i = 0; i < allocSize(); i++)
     {
-        buffers[i].width  = yuvinfo[i].width;
-        buffers[i].height = yuvinfo[i].height;
-        memcpy(buffers[i].pitches, yuvinfo[i].pitches, 3 * sizeof(int));
-        memcpy(buffers[i].offsets, yuvinfo[i].offsets, 3 * sizeof(int));
-        buffers[i].bpp = 12;
-        buffers[i].size = max(buf_size, yuvinfo[i].size);
-        buffers[i].codec = FMT_YV12;
-        buffers[i].qscale_table = NULL;
-        buffers[i].qstride = 0;
-        buffers[i].buf = bufs[i];
+        init(&buffers[i],
+             FMT_YV12, bufs[i], yuvinfo[i].width, yuvinfo[i].height,
+             12, max(buf_size, yuvinfo[i].size),
+             (const int*) yuvinfo[i].pitches, (const int*) yuvinfo[i].offsets);
+
         ok &= (bufs[i] != NULL);
     }
 
@@ -1187,26 +1182,25 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         xvmc_render_state_t *render = new xvmc_render_state_t;
         allocated_structs.push_back((unsigned char*)render);
         memset(render, 0, sizeof(xvmc_render_state_t));
-        buffers[i].buf          = (unsigned char*) render;
 
         // constants
         render->magic           = MP_XVMC_RENDER_MAGIC;
         render->state           = 0;
-        buffers[i].bpp          = -1;
-        buffers[i].codec        = FMT_XVMC_IDCT_MPEG2;
-        buffers[i].size         = sizeof(XvMCSurface);
 
         // from videoout_xv
         render->disp            = disp;
         render->ctx             = &xvmc_ctx;
 
-        // from width, height, and xvmv block and surface arrays
+        // from xvmv block and surface arrays
         render->p_surface       = &surf->surface;
-        buffers[i].height       = height;
-        buffers[i].width        = width;
 
         render->total_number_of_data_blocks = surf->blocks.num_blocks;
         render->total_number_of_mv_blocks   = surf->macro_blocks.num_blocks;
+
+        init(&buffers[i],
+             FMT_XVMC_IDCT_MPEG2, (unsigned char*) render,
+             width, height, -1, sizeof(XvMCSurface));
+
         buffers[i].priv[0]      = ffmpeg_vld_hack;
         buffers[i].priv[1]      = ffmpeg_vld_hack;
 

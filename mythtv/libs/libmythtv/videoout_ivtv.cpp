@@ -443,10 +443,8 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
 
     VideoFrame tmpframe;
-    tmpframe.codec = FMT_ARGB32;
-    tmpframe.buf = (unsigned char *)osdbuf_aligned;
-    tmpframe.width = stride;
-    tmpframe.height = video_dim.height();
+    init(&tmpframe, FMT_ARGB32, (unsigned char *)osdbuf_aligned,
+         stride, video_dim.height(), 32, 4 * stride * video_dim.height());
 
     OSDSurface *surface = NULL;
     if (osd)
