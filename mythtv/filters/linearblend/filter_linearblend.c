@@ -194,7 +194,7 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
         }
     }
  
-    stride = pitches[1];
+    stride = frame->pitches[1];
     ymax = height / 2 - 8;
   
     if ((stride & 0xf) || ((unsigned int)uoff & 0xf))
