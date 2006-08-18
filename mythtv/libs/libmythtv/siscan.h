@@ -143,6 +143,12 @@ class SIScan : public QObject,
 
     void OptimizeNITFrequencies(NetworkInformationTable *nit);
 
+    uint FindBestMplexFreq(const uint tuning_freq,
+                       const transport_scan_items_it_t transport,
+                       const uint sourceid, const uint transportid,
+                       const uint networkid);
+
+
     static QString loc(const SIScan*);
 
   private:

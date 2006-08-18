@@ -1315,6 +1315,37 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
     }
 }
 
+// FindBestMplexFreq()
+//  - Examines the freq in the DB against the curent tuning frequency and
+//    it's offset frequencies. If the frequency in the DB is any of the
+//    tuning frequencies or offsets then use the DB frequency.
+uint SIScan::FindBestMplexFreq(const uint tuning_freq,
+    const transport_scan_items_it_t transport, const uint sourceid,
+    const uint transportid, const uint networkid)
+{
+    uint64_t    db_freq;
+    QString     tmp_modulation;
+    uint        tmp_transportid, tmp_networkid;
+    int         mplexid;
+
+    mplexid = ChannelUtil::GetMplexID(sourceid, transportid, networkid);
+    if (mplexid < 0)
+        return tuning_freq;
+
+    if (!ChannelUtil::GetTuningParams((uint)mplexid, tmp_modulation,
+        db_freq, tmp_transportid, tmp_networkid))
+    {
+        return tuning_freq;
+    }
+
+    for (uint i = 0; i < (*transport).offset_cnt(); i++)
+    {
+        if ((uint)db_freq == (*transport).freq_offset(i))
+            return (uint)db_freq;
+    }
+    return tuning_freq;
+}
+
 int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
 {
     int mplexid = -1;
@@ -1328,11 +1359,18 @@ int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
         if (!GetDVBChannel()->GetTuningParams(tuning))
             tuning = (*transport).tuning;
 
+        uint bestFrequency = FindBestMplexFreq(
+            tuning.Frequency(),
+            transport,
+            (*transport).SourceID,
+            sm->GetDetectedTransportID(),
+            sm->GetDetectedNetworkID());
+
         // Write the best info we have to the DB
         if (FE_OFDM == GetDVBChannel()->GetCardType())
             mplexid = ChannelUtil::CreateMultiplex(
                 (*transport).SourceID,      (*transport).standard,
-                tuning.Frequency(),         tuning.ModulationDB(),
+                bestFrequency,              tuning.ModulationDB(),
                 sm->GetDetectedTransportID(),
                 sm->GetDetectedNetworkID(),
                 -1 /* symbol rate */,       tuning.BandwidthChar(),
