@@ -418,6 +418,7 @@ static GlobalComboBox *CommercialSkipMethod()
     bc->addSelection(QObject::tr("Blank Frame + Scene Change Detection"), "3");
     bc->addSelection(QObject::tr("Scene Change Detection"), "2");
     bc->addSelection(QObject::tr("Logo Detection"), "4");
+    bc->addSelection(QObject::tr("Experimental"), "511");
     bc->setHelpText(QObject::tr("This determines the method used by MythTV to "
                     "detect when commercials start and end."));
     return bc;
