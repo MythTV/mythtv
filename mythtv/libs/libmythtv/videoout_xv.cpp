@@ -1578,6 +1578,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                 YUVInfo tmp(img->width, img->height,
                             img->bytes_per_line * img->height, NULL, NULL);
                 XJ_yuv_infos.push_back(tmp);
+                XJ_shm_infos.push_back(info);
             }
         }
 
