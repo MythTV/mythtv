@@ -190,7 +190,7 @@ namespace
       private:
         typedef std::set<QString> image_ext;
         image_ext m_image_ext;
-        VideoScanner::VideoLoadedMap &m_video_files;
+		DirListType &m_video_files;
     };
 }
 
