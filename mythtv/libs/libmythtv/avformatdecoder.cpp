@@ -1488,7 +1488,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (captionmode &&
                (trackNo < 0 || trackNo >= (int)GetTrackCount(kTrackTypeSubtitle)))
             {
-                GetNVP()->SetCaptionsEnabled(false);
+                GetNVP()->SetCaptionsEnabled(false, false);
             }
             else
             {
@@ -1496,7 +1496,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (!ringBuffer->InDVDMenuOrStillFrame() &&
                         !captionmode && trackNo >= 0)
                 {
-                    GetNVP()->SetCaptionsEnabled(true);
+                    GetNVP()->SetCaptionsEnabled(true, false);
                 }
             }
         }

@@ -564,7 +564,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         videoOutput->EmbedInWidget(embedid, embx, emby, embw, embh);
     }
 
-    SetCaptionsEnabled(gContext->GetNumSetting("DefaultCCMode"));
+    SetCaptionsEnabled(gContext->GetNumSetting("DefaultCCMode"), false);
 
     return true;
 }
@@ -620,8 +620,8 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     if (textDisplayMode)
     {
-        DisableCaptions(textDisplayMode);
-        SetCaptionsEnabled(true);
+        DisableCaptions(textDisplayMode, false);
+        SetCaptionsEnabled(true, false);
     }
 }
 
@@ -1450,48 +1450,48 @@ void NuppelVideoPlayer::DisableCaptions(uint mode, bool osd_msg)
 
     ResetCaptions(mode);
 
-    if (osd_msg && osd)
+    if (!osd || !osd_msg)
+        return;
+
+    QString msg = " ";
+    if (kDisplayNUVTeletextCaptions & mode)
+        msg += QObject::tr("TXT CAP");
+    if (kDisplayTeletextCaptions & mode)
     {
-        QString msg = " ";
-        if (kDisplayNUVTeletextCaptions & mode)
-            msg += QObject::tr("TXT CAP");
-        if (kDisplayTeletextCaptions & mode)
-        {
-            msg += decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
-                                         GetTrack(kTrackTypeTeletextCaptions));
+        msg += decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
+                                     GetTrack(kTrackTypeTeletextCaptions));
 
-            DisableTeletext();
-        }
-        if (kDisplayAVSubtitle & mode)
-        {
-            msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
-                                         GetTrack(kTrackTypeSubtitle));
-        }
-        if (kDisplayTextSubtitle & mode)
-        {
-	    msg += QObject::tr("Text subtitles");
-        }
-        if (kDisplayCC608 & mode)
-        {
-            msg += decoder->GetTrackDesc(kTrackTypeCC608,
-                                         GetTrack(kTrackTypeCC608));
-        }
-        if (kDisplayCC708 & mode)
-        {
-            msg += decoder->GetTrackDesc(kTrackTypeCC708,
-                                         GetTrack(kTrackTypeCC708));
-        }
+        DisableTeletext();
+    }
+    if (kDisplayAVSubtitle & mode)
+    {
+        msg += decoder->GetTrackDesc(kTrackTypeSubtitle,
+                                     GetTrack(kTrackTypeSubtitle));
+    }
+    if (kDisplayTextSubtitle & mode)
+    {
+        msg += QObject::tr("Text subtitles");
+    }
+    if (kDisplayCC608 & mode)
+    {
+        msg += decoder->GetTrackDesc(kTrackTypeCC608,
+                                     GetTrack(kTrackTypeCC608));
+    }
+    if (kDisplayCC708 & mode)
+    {
+        msg += decoder->GetTrackDesc(kTrackTypeCC708,
+                                     GetTrack(kTrackTypeCC708));
+    }
 
-        if (msg != " ")
-        {
-            msg += " " + QObject::tr("Off");
-            osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
-        }
+    if (msg != " ")
+    {
+        msg += " " + QObject::tr("Off");
+        osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
     }
 }
 
 // caller has decoder_changed_lock
-void NuppelVideoPlayer::EnableCaptions(uint mode)
+void NuppelVideoPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     QString msg = "";
     if (kDisplayAVSubtitle & mode)
@@ -1536,7 +1536,7 @@ void NuppelVideoPlayer::EnableCaptions(uint mode)
     msg += " " + QObject::tr("On");
 
     textDisplayMode = mode;
-    if (osd)
+    if (osd && osd_msg)
         osd->SetSettingsText(msg, 3 /* seconds until message timeout */);
 
 }
@@ -1626,7 +1626,7 @@ bool NuppelVideoPlayer::ToggleCaptions(uint type)
     return textDisplayMode;
 }
 
-void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
+void NuppelVideoPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
 {
     uint origMode = textDisplayMode;
 
@@ -1636,33 +1636,33 @@ void NuppelVideoPlayer::SetCaptionsEnabled(bool enable)
 
     if (!enable)
     {
-        DisableCaptions(origMode);
+        DisableCaptions(origMode, osd_msg);
         return;
     }
     
     // figure out which text type to enable..
     bool captions_found = true;
     if (decoder->GetTrackCount(kTrackTypeSubtitle))
-        EnableCaptions(kDisplayAVSubtitle);
+        EnableCaptions(kDisplayAVSubtitle, osd_msg);
     else if (textSubtitles.GetSubtitleCount() > 0)
-        EnableCaptions(kDisplayTextSubtitle);
+        EnableCaptions(kDisplayTextSubtitle, osd_msg);
     else if (decoder->GetTrackCount(kTrackTypeCC708))
-        EnableCaptions(kDisplayCC708);
+        EnableCaptions(kDisplayCC708, osd_msg);
     else if (decoder->GetTrackCount(kTrackTypeTeletextCaptions))
-        EnableCaptions(kDisplayTeletextCaptions);
+        EnableCaptions(kDisplayTeletextCaptions, osd_msg);
     else if (vbimode == VBIMode::PAL_TT)
-        EnableCaptions(kDisplayNUVTeletextCaptions);
+        EnableCaptions(kDisplayNUVTeletextCaptions, osd_msg);
     else if (vbimode == VBIMode::NTSC_CC)
     {
         if (decoder->GetTrackCount(kTrackTypeCC608))
-            EnableCaptions(kDisplayCC608);
+            EnableCaptions(kDisplayCC608, osd_msg);
         else
             captions_found = false;
     }
     else 
         captions_found = false;
 
-    if (!captions_found && osd)
+    if (!captions_found && osd && osd_msg)
     {
         QString msg = QObject::tr(
             "No captions", "CC/Teletext/Subtitle text not available");
@@ -5722,7 +5722,7 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
                 ((sid == 3) ? CC_CC3 : CC_CC4);
         }
         DisableCaptions(textDisplayMode, false);
-        EnableCaptions(kDisplayCC608);
+        EnableCaptions(kDisplayCC608, false);
     }
     else if (kTrackTypeTeletextCaptions == type)
     {
@@ -5733,7 +5733,7 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
 }
 
 /** \fn NuppelVideoPlayer::TracksChanged(uint)
- *  \brief This tries to re-enables captions/subtitles if the user
+ *  \brief This tries to re-enable captions/subtitles if the user
  *         wants them and one of the captions/subtitles tracks has
  *         changed.
  */
@@ -5742,7 +5742,7 @@ void NuppelVideoPlayer::TracksChanged(uint trackType)
     if (trackType >= kTrackTypeSubtitle &&
         trackType <= kTrackTypeTeletextCaptions && textDesired)
     {
-        SetCaptionsEnabled(textDesired);
+        SetCaptionsEnabled(true, false);
     }
 }
 

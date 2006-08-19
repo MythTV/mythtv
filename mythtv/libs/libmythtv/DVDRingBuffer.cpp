@@ -320,7 +320,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 if (parent)
                 {
                     if (IsInMenu() && parent->GetCaptionMode())
-                        parent->SetCaptionsEnabled(false);
+                        parent->SetCaptionsEnabled(false, false);
                 }
 
                 if (blockBuf != dvdBlockWriteBuf)

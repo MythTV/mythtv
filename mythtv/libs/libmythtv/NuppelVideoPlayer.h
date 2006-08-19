@@ -286,11 +286,11 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Closed caption and teletext stuff
     uint GetCaptionMode(void) const { return textDisplayMode; }
     void ResetCaptions(uint mode_override = 0);
-    void DisableCaptions(uint mode, bool osd_msg = true);
-    void EnableCaptions(uint mode);
+    void DisableCaptions(uint mode, bool osd_msg=true);
+    void EnableCaptions(uint mode, bool osd_msg=true);
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint mode);
-    void SetCaptionsEnabled(bool);
+    void SetCaptionsEnabled(bool, bool osd_msg=true);
     bool LoadExternalSubtitles(const QString &subtitleFileName);
 
     // Teletext Menu and non-NUV teletext decoder
