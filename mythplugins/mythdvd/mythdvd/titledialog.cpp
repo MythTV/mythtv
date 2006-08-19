@@ -410,10 +410,18 @@ void TitleDialog::ripTitles()
             //  we need to ask mythvideo stuff where it lives
             //
            
-            QString destination_directory = gContext->GetSetting("mythdvd.LocalRipDirectory");
+            QString destination_directory =
+                    gContext->GetSetting("mythdvd.LocalRipDirectory");
 
-            if (!destination_directory.length()) {
-                destination_directory = gContext->GetSetting("VideoStartupDir");
+            if (!destination_directory.length())
+            {
+                // Assume import directory is first video scan directory
+                QStringList videodirs =
+                        QStringList::split(":", gContext->
+                                           GetSetting("VideoStartupDir"),
+                                           false);
+                if (videodirs.size())
+                    destination_directory = videodirs[0];
             }
  
             if(destination_directory.length() < 1)
