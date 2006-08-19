@@ -26,7 +26,7 @@
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
-use XML::Simple;
+#use XML::Simple;
 
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);

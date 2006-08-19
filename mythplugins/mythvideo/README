@@ -1,11 +1,11 @@
                                    MythVideo
-                                 Version 0.17
+                                 Version 0.20
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.14 or higher installed and working
+	MythTV 0.20 or higher installed and working
 
 If you have met the requirements above, simply type 'qmake mythvideo.pro' then 
 'make' in the main directory to begin compiling.
@@ -52,6 +52,12 @@ Enter IMDB #' (depending on what you want to do).
 
 If that fails, or you wish to set the cover art by hand, then just hit a
 number key on your remote. All will be well.
+
+Note: the imdb.pl script has dependencies you may need to install
+before using.
+
+imdb.pl Dependencies
+	libwww-perl 
 
 
 PARENTAL LEVEL INFORMATION
