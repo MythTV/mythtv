@@ -726,9 +726,11 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
      *
      * When logos are a good indicator of commercial breaks, allow blank frames
      * to adjust logo breaks. Use BlankFrameDetector information to adjust
-     * beginnings and endings of existing TemplateMatcher breaks.
+     * beginnings and endings of existing TemplateMatcher breaks. Allow logos
+     * to deviate by up to MAXBLANKADJUSTMENT frames before/after the break
+     * actually begins/ends.
      */
-    const int       MAXBLANKADJUSTMENT = (int)roundf(5 * fps);  /* frames */
+    const int       MAXBLANKADJUSTMENT = (int)roundf(25 * fps);  /* frames */
     const bool      skipCommBlanks = blankFrameDetector->getSKipCommBlanks();
 
     const FrameAnalyzer::FrameMap *blankMap = blankFrameDetector->getBlanks();
@@ -748,7 +750,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
 
         if (ii.key() > 0)
         {
-            /* Look for a blank frame near beginning of logo break. */
+            /* Look for first blank frame after beginning of logo break. */
             FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constBegin();
             if (jj != blankMap->constEnd() && !jj.key() && !jj.data())
                 ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
@@ -771,7 +773,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
         long long mmbb = iibb + ii.data();
         long long mmee = iiee + ii.data();
 
-        /* Look for a blank frame near end of logo break. */
+        /* Look for last blank frame before end of logo break. */
         FrameAnalyzer::FrameMap::const_iterator kk, kkfound;
         kkfound = blankMap->constEnd();
         kk = jjfound;
