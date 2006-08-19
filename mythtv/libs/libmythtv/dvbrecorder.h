@@ -10,6 +10,7 @@
 
 // C++ includes
 #include <vector>
+#include <deque>
 using namespace std;
 
 // Qt includes
@@ -31,7 +32,7 @@ class PIDInfo
     PIDInfo() :
         filter_fd(-1),      continuityCount(0xFF),
         streamType(0),      pesType(-1),
-        isEncrypted(false), payloadStartSeen(false) {;}
+        isEncrypted(false), payloadStartSeen(false), priority(0) {;}
 
     int    filter_fd;         ///< Input filter file descriptor
     uint   continuityCount;   ///< last Continuity Count (sentinel 0xFF)
@@ -39,6 +40,8 @@ class PIDInfo
     int    pesType;           ///< PESStreamID
     bool   isEncrypted;       ///< true if PID is marked as encrypted
     bool   payloadStartSeen;  ///< true if payload start packet seen on PID
+    int    priority;          ///< filters with priority < 0 can be closed
+                              //   if a new filter can't be opened
 
     inline void Close(void);
     inline bool CheckCC(uint cc);
@@ -91,8 +94,10 @@ class DVBRecorder : public DTVRecorder,
 
     bool AdjustFilters(void);
     bool AdjustEITPIDs(void);
+    void AdjustMonitoringPMTPIDs(void);
     void CloseFilters(void);
-    void OpenFilter(uint pid, int pes_type, uint mpeg_stream_type);
+    bool OpenFilter(uint pid, int pes_type,
+                    uint mpeg_stream_type, int priority);
     int  OpenFilterFd(uint pid, int pes_type, uint stream_type);
 
     void SetOutputPAT(ProgramAssociationTable*);
@@ -131,6 +136,8 @@ class DVBRecorder : public DTVRecorder,
     QMutex          _pid_lock;
     PIDInfoMap      _pid_infos;
     uint_vec_t      _eit_pids;
+
+    deque<uint>     _pmt_monitoring_pids;
 
     /// PAT on input side
     ProgramAssociationTable *_input_pat;
@@ -174,6 +181,8 @@ class DVBRecorder : public DTVRecorder,
     static const int TSPACKETS_BETWEEN_PSIP_SYNC;
     static const int POLL_INTERVAL;
     static const int POLL_WARNING_TIMEOUT;
+    static const int kFilterPriorityHigh;
+    static const int kFilterPriorityLow;
 };
 
 inline void PIDInfo::Close(void)

@@ -73,6 +73,8 @@ using namespace std;
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
+const int DVBRecorder::kFilterPriorityHigh  =   0;
+const int DVBRecorder::kFilterPriorityLow   =  -7;
 
 #define TS_TICKS_PER_SEC    90000
 #define DUMMY_VIDEO_PID     VIDEO_PID(0x20)
@@ -381,10 +383,17 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     return fd_tmp;
 }
 
-void DVBRecorder::OpenFilter(uint pid, int pes_type, uint stream_type)
+/** \fn DVBRecorder::OpenFilter(uint, int, uint, int)
+ *  \brief management of pid filter opening
+ *  \returns false if a low priority was closed or no filter was opened
+ *           true  otherwise
+ */
+bool DVBRecorder::OpenFilter(uint pid, int pes_type,
+                             uint stream_type, int priority)
 {
     PIDInfo *info   = NULL;
     int      fd_tmp = -1;
+    bool     avail  = true;
 
     QMutexLocker change_lock(&_pid_lock);
     PIDInfoMap::iterator it = _pid_infos.find(pid);
@@ -400,6 +409,41 @@ void DVBRecorder::OpenFilter(uint pid, int pes_type, uint stream_type)
     if (fd_tmp < 0)
         fd_tmp = OpenFilterFd(pid, pes_type, stream_type);
 
+    // try to close a low priority filter
+    if (fd_tmp < 0)
+    {
+        // no free filters available
+        avail = false;
+        PIDInfoMap::iterator lp_it = _pid_infos.begin();
+        for (;lp_it != _pid_infos.end(); ++lp_it)
+        {
+            if (lp_it != it && (*lp_it)->priority < 0)
+            {
+                (*lp_it)->Close();
+                break;
+            }
+        }
+        if (lp_it != _pid_infos.end())
+        {
+            // PMT PIDs are the only low priority pids
+            uint lp_pid = lp_it.key();
+
+            VERBOSE(VB_RECORD, LOC + "Closing low priority PID filter " +
+                    QString("on PID 0x%1.").arg(lp_pid, 0, 16));
+
+            _pmt_monitoring_pids.push_back(lp_pid);
+            delete *lp_it;
+            _pid_infos.erase(lp_it);
+
+            fd_tmp = OpenFilterFd(pid, pes_type, stream_type);
+        }
+        else
+        {
+            VERBOSE(VB_RECORD, LOC + "No low priority PID filter available, "
+                    "open will fail.");
+        }
+    }
+
     if (fd_tmp < 0)
     {
         if (info)
@@ -407,7 +451,7 @@ void DVBRecorder::OpenFilter(uint pid, int pes_type, uint stream_type)
             delete *it;
             _pid_infos.erase(it);
         }
-        return;
+        return avail;
     }
 
     if (!info)
@@ -417,9 +461,12 @@ void DVBRecorder::OpenFilter(uint pid, int pes_type, uint stream_type)
     info->filter_fd  = fd_tmp;
     info->streamType = stream_type;
     info->pesType    = pes_type;
+    info->priority   = priority;
 
     // Add the new info to the map
     _pid_infos[pid] = info;
+
+    return avail;
 }
 
 bool DVBRecorder::AdjustFilters(void)
@@ -427,6 +474,7 @@ bool DVBRecorder::AdjustFilters(void)
     StopDummyVideo(); // Stop the dummy video before acquiring the lock.
 
     QMutexLocker change_lock(&_pid_lock);
+    _pmt_monitoring_pids.clear();
 
     if (!_input_pat || !_input_pmt)
         return false;
@@ -436,13 +484,6 @@ bool DVBRecorder::AdjustFilters(void)
     add_pid.push_back(MPEG_PAT_PID);
     add_stream_type.push_back(StreamID::PrivSec);
     _stream_data->AddListeningPID(MPEG_PAT_PID);
-
-    for (uint i = 0; i < _input_pat->ProgramCount(); i++)
-    {
-        add_pid.push_back(_input_pat->ProgramPID(i));
-        add_stream_type.push_back(StreamID::PrivSec);
-        _stream_data->AddListeningPID(_input_pat->ProgramPID(i));
-    }
 
     // Record the streams in the PMT...
     bool need_pcr_pid = true;
@@ -470,6 +511,23 @@ bool DVBRecorder::AdjustFilters(void)
         _stream_data->AddListeningPID(_eit_pids[i]);
     }
 
+    // Adding PMT PIDs to monitoring queue and register them with StreamData
+    uint input_pmt_pid = _input_pat->FindPID(_input_pmt->ProgramNumber());
+    for (uint i = 0; i < _input_pat->ProgramCount(); i++)
+    {
+        uint pmt_pid = _input_pat->ProgramPID(i);
+        _stream_data->AddListeningPID(pmt_pid);
+        if (pmt_pid == input_pmt_pid)
+        {
+            add_pid.push_back(input_pmt_pid);
+            add_stream_type.push_back(StreamID::PrivSec);
+        }
+        else
+        {
+            _pmt_monitoring_pids.push_back(pmt_pid);
+        }
+    }
+
     // Delete filters for pids we no longer wish to monitor
     PIDInfoMap::iterator it   = _pid_infos.begin();
     PIDInfoMap::iterator next = it;
@@ -489,7 +547,10 @@ bool DVBRecorder::AdjustFilters(void)
 
     // Add or adjust filters for pids we wish to monitor
     for (uint i = 0; i < add_pid.size(); i++)
-        OpenFilter(add_pid[i], DMX_PES_OTHER, add_stream_type[i]);
+    {
+        OpenFilter(add_pid[i], DMX_PES_OTHER,
+                   add_stream_type[i], kFilterPriorityHigh);
+    }
 
 
     // [Re]start dummy video
@@ -536,6 +597,26 @@ bool DVBRecorder::AdjustEITPIDs(void)
     return true;
 }
 
+void DVBRecorder::AdjustMonitoringPMTPIDs()
+{
+    QMutexLocker change_lock(&_pid_lock);
+    bool filters_available = true;
+
+    while (!_pmt_monitoring_pids.empty() && filters_available)
+    {
+        uint pid = _pmt_monitoring_pids.front();
+
+        filters_available = OpenFilter(
+            pid, DMX_PES_OTHER, StreamID::PrivSec, kFilterPriorityLow);
+
+        _pmt_monitoring_pids.pop_front();
+    }
+
+    VERBOSE(VB_RECORD, LOC + "Currently not listening on " +
+            QString("%1 PMT PIDs, %2 PID filters open.")
+            .arg(_pmt_monitoring_pids.size() - 1).arg(_pid_infos.size()));
+}
+
 void DVBRecorder::StartRecording(void)
 {
     if (!Open())
@@ -565,6 +646,7 @@ void DVBRecorder::StartRecording(void)
     }
     _drb->Start();
 
+    int count = 0;
     while (_request_recording && !_error)
     {
         if (PauseAndWait())
@@ -600,6 +682,12 @@ void DVBRecorder::StartRecording(void)
                 CreatePMT();
                 _ts_packets_until_psip_sync = 0;
             }
+        }
+
+        if (count-- <= 0)
+        {
+            AdjustMonitoringPMTPIDs();
+            count = 250;
         }
 
         ssize_t len = _drb->Read(_buffer, _buffer_size);
