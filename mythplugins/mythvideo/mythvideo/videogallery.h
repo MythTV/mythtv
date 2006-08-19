@@ -14,40 +14,29 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef VIDEOGALLERY_H_
 #define VIDEOGALLERY_H_
 
-#include <qwidget.h>
-#include <qdialog.h>
-#include <qapplication.h>
-#include <qstringlist.h>
-
-#include <mythtv/mythwidgets.h>
-#include <qdom.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/uilistbtntype.h>
-
 #include "videodlg.h"
 
+class UIListBtnTypeItem;
 
 class VideoGallery : public VideoDialog
 {
     Q_OBJECT
+
   public:
-    VideoGallery(MythMainWindow *parent, const char *name = 0);
-    
-    void processEvents() { qApp->processEvents(); }
-    
-    
+    VideoGallery(MythMainWindow *lparent, const QString &lname,
+                 VideoList *video_list);
+
   protected slots:
     void moveCursor(const QString& action);
     void exitWin();
     void slotChangeView();
     void handleVideoSelect();
-    
+
   protected:
     virtual void parseContainer(QDomElement &element);
     virtual void fetchVideos();
-    void doMenu(bool info=false);
-    void paintEvent(QPaintEvent *);
+    void doMenu(bool info = false);
+    void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
     bool handleSelect();
     void handleDirSelect();
@@ -55,27 +44,23 @@ class VideoGallery : public VideoDialog
     bool goBack();
 
   private:
-
-    QPixmap getPixmap(QString &level);
     void LoadIconWindow();
 
-    
-    void updateText(QPainter *);
-    void updateView(QPainter *);
-    void updateArrows(QPainter *);
-    void updateSingleIcon(QPainter *,int,int);
-    void drawIcon(QPainter *,GenericTree*,int,int,int);
-
-    void actionChangeView(UIListBtnTypeItem*);
-    void actionFilter(UIListBtnTypeItem*);
+    void updateText(QPainter *p);
+    void updateView(QPainter *p);
+    void updateArrows(QPainter *p);
+    void updateSingleIcon(QPainter *p, int lx, int ly);
+    void drawIcon(QPainter *p, GenericTree *curTreePos, int curPos, int xpos,
+                  int ypos);
 
     void positionIcon();
-    
+
+    void computeLastRowCol(int list_count);
+
+  private:
     bool subtitleOn;
     bool keepAspectRatio;
-    QString curPath;
 
-    
     QRect textRect;
     QRect viewRect;
     QRect arrowsRect;
@@ -99,13 +84,9 @@ class VideoGallery : public VideoDialog
     int thumbH;
 
     bool allowselect;
-    
-    QString prefix;
-    
+
     GenericTree *video_tree_root;
     GenericTree *where_we_are;
-
-    void computeLastRowCol(int list_count);
 };
 
 #endif

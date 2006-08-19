@@ -1,65 +1,60 @@
 #ifndef VIDEOLIST_H_
 #define VIDEOLIST_H_
 
-#include <qapplication.h>
-#include <qdialog.h>
-#include <qmap.h>
-
-#include <mythtv/mythwidgets.h>
-#include <mythtv/uitypes.h>
-
-#include "videofilter.h"
-#include "metadata.h"
-
 // Type of the item added to the tree
-#define SUB_FOLDER      -1
-#define UP_FOLDER       -2
-#define ROOT_NODE       -3
+enum TreeNodeType {
+    kSubFolder = -1,
+    kUpFolder = -2,
+    kRootNode = -3
+};
 
-// Ordering of items on a tree level (low -> high)
-#define ORDER_UP        0
-#define ORDER_SUB       1
-#define ORDER_ITEM      2
+// Tree node attribute index
+enum TreeNodeAttributes {
+    kNodeSort,
+    kFolderPath
+};
+
+class GenericTree;
+class VideoFilterSettings;
+class Metadata;
+class MetadataListManager;
 
 class VideoList
 {
-    public:
-        VideoList(const QString& _prefix = "");
-        virtual ~VideoList();
+  public:
+    VideoList();
+    ~VideoList();
 
-        GenericTree *buildVideoList(bool filebrowser, bool flatlist,
-                                                        int parental_level);
-        Metadata *getVideoListMetadata(int index);
-        void wantVideoListUpdirs(bool yes);
-        VideoFilterSettings *getCurrentVideoFilter() { return currentVideoFilter; }
-        unsigned int count(void) const { return metas.count(); }
+    GenericTree *buildVideoList(bool filebrowser, bool flatlist,
+                                int parental_level, bool include_updirs);
 
-    private:
-        void buildFsysList(bool flatlist, int parental_level);
-        void buildDbList(bool flatlist, int parental_level);
-        void buildFileList(const QString& directory);
-        bool ignoreExtension(const QString& extension) const;
+    void refreshList(bool filebrowser, int parental_level, bool flatlist);
 
-        void removeUpnodes(GenericTree *parent);
-        void addUpnodes(GenericTree *parent);
-        GenericTree *addDirNode(GenericTree *where_to_add,
-                                                        const QString& dname);
-        GenericTree *addFileNode(GenericTree *where_to_add,
-                                                const QString& fname, int id);
+    // If the only change to the underlying metadata requires
+    // another sort (for video manager currently).
+    void resortList(bool flat_list);
 
-        bool m_ListUnknown;
-        bool m_LoadMetaData;
-        QMap<QString,bool> m_IgnoreList;
+    Metadata *getVideoListMetadata(int index);
+    const Metadata *getVideoListMetadata(int index) const;
+    unsigned int count() const;
 
-        QSqlDatabase *db;
-        int nitems;      // Number of real items in the tree
-        bool has_updirs; // True if tree has updirs
-        QStringList  browser_mode_files;
-        GenericTree *video_tree_root;
-        QValueVector<Metadata> metas;   // sorted/indexed by current filter
-        VideoFilterSettings *currentVideoFilter;
+    const VideoFilterSettings &getCurrentVideoFilter();
+    void setCurrentVideoFilter(const VideoFilterSettings &filter);
+
+    // returns the number of videos matched by this filter
+    int test_filter(const VideoFilterSettings &filter) const;
+
+    unsigned int getFilterChangedState();
+
+    bool Delete(int video_id);
+
+    const MetadataListManager &getListCache() const;
+
+    // returns the folder path associated with a returned tree
+    QString getFolderPath(int folder_id) const;
+
+  private:
+    class VideoListImp *m_imp;
 };
 
 #endif // VIDEOLIST_H
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */

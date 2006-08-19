@@ -11,51 +11,40 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 
-#include <qlayout.h>
 #include <qapplication.h>
-#include <qcursor.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
-#include <iostream>
-#include <unistd.h>
-#include <qregexp.h>
-#include <qnetwork.h>
-#include <qurl.h>
-#include <qdir.h>
 
-using namespace std;
+#include <unistd.h>
+
+#include <mythtv/mythcontext.h>
+#include <mythtv/xmlparse.h>
+
+#include "videoselected.h"
 
 #include "metadata.h"
-#include "videoselected.h"
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
-#include <mythtv/mythdbcon.h>
+#include "videolist.h"
+#include "videoutils.h"
 
-VideoSelected::VideoSelected(VideoList *lvideo_list,
-                             MythMainWindow *parent, const char *name, 
-                             int index)
-            : MythDialog(parent, name)
+VideoSelected::VideoSelected(const VideoList *video_list,
+                             MythMainWindow *lparent, const QString &lname,
+                             int index) :
+    MythDialog(lparent, lname), noUpdate(false), m_state(0),
+    allowselect(false), m_video_list(video_list)
 {
-    video_list = lvideo_list;
+    m_item = m_video_list->getVideoListMetadata(index);
 
-    curitem = video_list->getVideoListMetadata(index);
-    curitem->fillDataFromID();
-
-    noUpdate = false;
-    m_state = 0;
-
-    
     fullRect = QRect(0, 0, size().width(), size().height());
-    
-    theme = new XMLParse();
+
+    theme.reset(new XMLParse());
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
     theme->LoadTheme(xmldata, "selected", "video-");
     LoadWindow(xmldata);
 
-    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
-    if (!bgTransBackup)
-        bgTransBackup = new QPixmap();
+    bgTransBackup.reset(gContext->LoadScalePixmap("trans-backup.png"));
+    if (!bgTransBackup.get())
+        bgTransBackup.reset(new QPixmap());
 
     updateBackground();
 
@@ -64,8 +53,11 @@ VideoSelected::VideoSelected(VideoList *lvideo_list,
 
 VideoSelected::~VideoSelected()
 {
-    delete theme;
-    delete bgTransBackup;
+}
+
+void VideoSelected::processEvents()
+{
+    qApp->processEvents();
 }
 
 void VideoSelected::keyPressEvent(QKeyEvent *e)
@@ -82,27 +74,26 @@ void VideoSelected::keyPressEvent(QKeyEvent *e)
         if (action == "SELECT" && allowselect)
         {
             handled = true;
-            selected(curitem);
+            startPlayItem();
             return;
 
         }
+    }
 
-        if (!handled)
+    if (!handled)
+    {
+        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
-
-            for (unsigned int i = 0; i < actions.size() && !handled; i++)
+            if (actions[i] == "PLAYBACK")
             {
-                QString action = actions[i];
-                if (action == "PLAYBACK")
-                {
-                    handled = true;
-                    selected(curitem);
-                }
-            }            
+                handled = true;
+                startPlayItem();
+            }
         }
     }
-    
+
     if (!handled)
         MythDialog::keyPressEvent(e);
 }
@@ -126,7 +117,8 @@ void VideoSelected::updateBackground(void)
 
 void VideoSelected::grayOut(QPainter *tmp)
 {
-    tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), Dense4Pattern));
+    tmp->fillRect(QRect(QPoint(0, 0), size()),
+                  QBrush(QColor(10, 10, 10), Dense4Pattern));
 }
 
 void VideoSelected::paintEvent(QPaintEvent *e)
@@ -148,71 +140,66 @@ void VideoSelected::paintEvent(QPaintEvent *e)
     }
 }
 
+namespace
+{
+    const int kMythVideoStartPlayEventType = 301976;
+}
+
+void VideoSelected::customEvent(QCustomEvent *e)
+{
+    if (e->type() == kMythVideoStartPlayEventType)
+    {
+        if (m_item)
+            PlayVideo(m_item->ID(), m_video_list->getListCache());
+        ++m_state;
+        update(fullRect);
+    }
+}
+
 void VideoSelected::updatePlayWait(QPainter *p)
 {
-  if (m_state < 4)
-  {
-    backup.flush();
-    backup.begin(this);
-    if (m_state == 1)
-        grayOut(&backup);
-    backup.end();
-
-    LayerSet *container = NULL;
-    container = theme->GetSet("playwait");
-    if (container)
+    if (m_state < 4)
     {
-        container->Draw(p, 0, 0);
-        container->Draw(p, 1, 0);
-        container->Draw(p, 2, 0);
-        container->Draw(p, 3, 0);
-    }
-    m_state++;
-    update(fullRect);
-  }
-  else if (m_state == 4)
-  {
-    QTime playing_time;
-    playing_time.start();
+        backup.flush();
+        backup.begin(this);
+        if (m_state == 1)
+            grayOut(&backup);
+        backup.end();
 
-    // Play the movie
-    myth_system((QString("%1 ") .arg(m_cmd)).local8Bit());
-
-    Metadata *childItem = new Metadata;
-    Metadata *parentItem = new Metadata(*curitem);
-
-    while (parentItem->ChildID() > 0 && playing_time.elapsed() > 10000)
-    {
-        childItem->setID(parentItem->ChildID());
-        childItem->fillDataFromID();
-
-        if (parentItem->ChildID() > 0)
+        LayerSet *container = theme->GetSet("playwait");
+        if (container)
         {
-            //Load up data about this child
-            selected(childItem);
-            playing_time.start();
-            myth_system((QString("%1 ") .arg(m_cmd)).local8Bit());
+            for (int i = 0; i < 4; ++i)
+                container->Draw(p, i, 0);
         }
-
-        delete parentItem;
-        parentItem = new Metadata(*childItem);
+        m_state++;
+        update(fullRect);
     }
+    else if (m_state == 4)
+    {
+        // This is done so we don't lock the paint event (bad).
+        ++m_state;
+        QApplication::postEvent(this,
+                                new QCustomEvent(kMythVideoStartPlayEventType));
+    }
+    else if (m_state == 5)
+    {
+        // playing state
+    }
+    else if (m_state == 6)
+    {
+        backup.begin(this);
+        backup.drawPixmap(0, 0, myBackground);
+        backup.end();
+        noUpdate = false;
 
-    delete childItem;
-    delete parentItem;    
-    
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
-    noUpdate = false;
+        gContext->GetMainWindow()->raise();
+        gContext->GetMainWindow()->setActiveWindow();
+        gContext->GetMainWindow()->currentWidget()->setFocus();
 
-    gContext->GetMainWindow()->raise();
-    gContext->GetMainWindow()->setActiveWindow();
-    gContext->GetMainWindow()->currentWidget()->setFocus();
-
-    m_state = 0;
-    update(fullRect);
-  }
+        m_state = 0;
+        update(fullRect);
+    }
 }
 
 void VideoSelected::updateInfo(QPainter *p)
@@ -222,88 +209,66 @@ void VideoSelected::updateInfo(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    if (curitem)
+    if (m_item)
     {
-       QString title = curitem->Title();
-       QString filename = curitem->Filename();
-       QString director = curitem->Director();
-       QString year = QString("%1").arg(curitem->Year());
-       if (year == "1895") 
-           year = "?";
-       QString coverfile = curitem->CoverFile();
-       QString inetref = curitem->InetRef();
-       QString plot = curitem->Plot();
-       QString userrating = QString("%1").arg(curitem->UserRating());
-       QString rating = curitem->Rating();
-       if (rating == "<NULL>")
-           rating = tr("No rating available.");
-       QString length = QString("%1").arg(curitem->Length()) + " " +
-	      	      	tr("minutes");
-       QString level = QString("%1").arg(curitem->ShowLevel());
-
-       LayerSet *container = NULL;
-       container = theme->GetSet("info");
+       LayerSet *container = theme->GetSet("info");
        if (container)
        {
-           UITextType *type = (UITextType *)container->GetType("title");
-           if (type)
-               type->SetText(title);
+           checkedSetText((UITextType *)container->GetType("title"),
+                          m_item->Title());
+           checkedSetText((UITextType *)container->GetType("filename"),
+                          m_item->Filename());
 
-           type = (UITextType *)container->GetType("filename");
-           if (type)
-               type->SetText(filename);
-
-           type = (UITextType *)container->GetType("director");
-           if (type)
-               type->SetText(director);
- 
-           type = (UITextType *)container->GetType("year");
-           if (type)
-               type->SetText(year);
-
-           type = (UITextType *)container->GetType("coverfile");
-           if (type)
-               type->SetText(coverfile);
-  
+           QString coverfile = m_item->CoverFile();
            UIImageType *itype = (UIImageType *)container->GetType("coverart");
            if (itype)
            {
-               itype->SetImage(coverfile);
-               itype->LoadImage();
+               if (isDefaultCoverFile(coverfile))
+               {
+                   if (itype->isShown())
+                       itype->hide();
+               }
+               else
+               {
+                   if (itype->GetImageFilename() != coverfile)
+                   {
+                       itype->SetImage(coverfile);
+                       itype->LoadImage();
+                   }
+                   if (itype->isHidden())
+                       itype->show();
+               }
            }
 
-           type = (UITextType *)container->GetType("inetref");
-           if (type)
-               type->SetText(inetref);
+           checkedSetText((UITextType *)container->GetType("video_player"),
+                          Metadata::getPlayer(m_item));
+           checkedSetText((UITextType *)container->GetType("director"),
+                          m_item->Director());
+           checkedSetText((UITextType *)container->GetType("plot"),
+                          m_item->Plot());
+           checkedSetText((UITextType *)container->GetType("rating"),
+                          getDisplayRating(m_item->Rating()));
+           checkedSetText((UITextType *)container->GetType("inetref"),
+                          m_item->InetRef());
+           checkedSetText((UITextType *)container->GetType("year"),
+                          getDisplayYear(m_item->Year()));
+           checkedSetText((UITextType *)container->GetType("userrating"),
+                          getDisplayUserRating(m_item->UserRating()));
+           checkedSetText((UITextType *)container->GetType("length"),
+                          getDisplayLength(m_item->Length()));
+           checkedSetText((UITextType *)container->GetType("coverfile"),
+                          m_item->CoverFile());
+           checkedSetText((UITextType *)container->GetType("child_id"),
+                          QString::number(m_item->ChildID()));
+           checkedSetText((UITextType *)container->GetType("browseable"),
+                          getDisplayBrowse(m_item->Browse()));
+           checkedSetText((UITextType *)container->GetType("category"),
+                          m_item->Category());
+           checkedSetText((UITextType *)container->GetType("level"),
+                          QString::number(m_item->ShowLevel()));
 
-           type = (UITextType *)container->GetType("plot");
-           if (type)
-               type->SetText(plot);
- 
-           type = (UITextType *)container->GetType("userrating");
-           if (type)
-               type->SetText(userrating);
-
-           type = (UITextType *)container->GetType("rating");
-           if (type)
-               type->SetText(rating);
-
-           type = (UITextType *)container->GetType("length");
-           if (type)
-               type->SetText(length);
-
-           type = (UITextType *)container->GetType("level");
-           if (type)
-               type->SetText(level);
-
-           container->Draw(&tmp, 1, 0); 
-           container->Draw(&tmp, 2, 0);
-           container->Draw(&tmp, 3, 0);
-           container->Draw(&tmp, 4, 0);  
-           container->Draw(&tmp, 5, 0);
-           container->Draw(&tmp, 6, 0); 
-           container->Draw(&tmp, 7, 0);
-           container->Draw(&tmp, 8, 0);
+           for (int i = 1; i < 9; ++i)
+               container->Draw(&tmp, i, 0);
        }
 
        allowselect = true;
@@ -313,27 +278,23 @@ void VideoSelected::updateInfo(QPainter *p)
        LayerSet *norec = theme->GetSet("novideos_info");
        if (norec)
        {
-           norec->Draw(&tmp, 4, 0);
-           norec->Draw(&tmp, 5, 0);
-           norec->Draw(&tmp, 6, 0);
-           norec->Draw(&tmp, 7, 0);
-           norec->Draw(&tmp, 8, 0);
+           for (int i = 4; i < 9; ++i)
+               norec->Draw(&tmp, i, 0);
        }
 
        allowselect = false;
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
-
 }
 
 void VideoSelected::LoadWindow(QDomElement &element)
 {
 
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
+    for (QDomNode lchild = element.firstChild(); !lchild.isNull();
+         lchild = lchild.nextSibling())
     {
-        QDomElement e = child.toElement();
+        QDomElement e = lchild.toElement();
         if (!e.isNull())
         {
             if (e.tagName() == "font")
@@ -346,7 +307,8 @@ void VideoSelected::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                VERBOSE(VB_IMPORTANT,
+                        QString("Unknown element: ").arg(e.tagName()));
                 exit(0);
             }
         }
@@ -356,121 +318,27 @@ void VideoSelected::LoadWindow(QDomElement &element)
 void VideoSelected::parseContainer(QDomElement &element)
 {
     QRect area;
-    QString name;
+    QString container_name;
     int context;
-    theme->parseContainer(element, name, context, area);
+    theme->parseContainer(element, container_name, context, area);
 
-    if (name.lower() == "info")
+    if (container_name.lower() == "info")
         infoRect = area;
 }
- 
+
 void VideoSelected::exitWin()
 {
     emit accept();
 }
 
-void VideoSelected::selected(Metadata *someItem)
+void VideoSelected::startPlayItem()
 {
-    QString filename = someItem->Filename();
-    QString ext = someItem->Filename().section('.',-1);
-
-    QString handler = gContext->GetSetting("VideoDefaultPlayer");
-    QString special_handler = someItem->PlayCommand();
-    
-    //
-    //  Does this specific metadata have its own
-    //  unique player command?
-    //
-    if(special_handler.length() > 1)
-    {
-        handler = special_handler;
-    }
-    
-    else
-    {
-        //
-        //  Do we have a specialized player for this
-        //  type of file?
-        //
-        
-        QString extension = filename.section(".", -1, -1);
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT playcommand, use_default FROM "
-                      "videotypes WHERE extension = :EXT ;");
-        query.bindValue(":EXT", extension);
-
-        if(query.exec() && query.isActive() && query.size() > 0)
-        {
-            query.next();
-            if(!query.value(1).toBool())
-            {
-                //
-                //  This file type is defined and
-                //  it is not set to use default player
-                //
-
-                handler = query.value(0).toString();                
-            }
-        }
-    }
-    
-    QString year = QString("%1").arg(someItem->Year());
-    // See if this is being handled by a plugin..
-    if(gContext->GetMainWindow()->HandleMedia(handler, filename, someItem->Plot(), 
-                                              someItem->Title(), someItem->Director(),
-                                                  someItem->Length(), year))
-    {
-        return;
-    }
-    
- 
-    QString arg;
-    arg.sprintf("\"%s\"",
-                filename.replace(QRegExp("\""), "\\\"").utf8().data());
-
-    QString command = "";
-    
-    // If handler contains %d, substitute default player command
-    // This would be used to add additional switches to the default without
-    // needing to retype the whole default command.  But, if the
-    // command and the default command both contain %s, drop the %s from
-    // the default since the new command already has it
-    //
-    // example: default: mplayer -fs %s
-    //          custom : %d -ao alsa9:spdif %s
-    //          result : mplayer -fs -ao alsa9:spdif %s
-    if(handler.contains("%d"))
-    {
-	QString default_handler = gContext->GetSetting("VideoDefaultPlayer");
-	if(handler.contains("%s") && default_handler.contains("%s"))
-	{
-		default_handler = default_handler.replace(QRegExp("%s"), "");
-	}
-	command = handler.replace(QRegExp("%d"), default_handler);
-    }
-
-    if(handler.contains("%s"))
-    {
-        command = handler.replace(QRegExp("%s"), arg);
-    }
-    else
-    {
-        command = handler + " " + arg;
-    }
-
-    //cout << "command:" << command << endl;
-
-    m_title = someItem->Title();
-    LayerSet *container = NULL;
-    container = theme->GetSet("playwait");
+    LayerSet *container = theme->GetSet("playwait");
     if (container)
     {
-         UITextType *type = (UITextType *)container->GetType("title");
-         if (type)
-             type->SetText(m_title);
+        checkedSetText((UITextType *)container->GetType("title"),
+                       m_item->Title());
     }
-    m_cmd = command;
     m_state = 1;
     update(fullRect);
 }

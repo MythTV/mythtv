@@ -1,12 +1,8 @@
-#include "mythtv/mythcontext.h"
+#include <mythtv/mythcontext.h>
 
 #include "globalsettings.h"
-#include <qfile.h>
-#include <qdialog.h>
-#include <qcursor.h>
-#include <qdir.h>
-#include <qimage.h>
-#include "videodlg.h"
+#include "globals.h"
+
 // General Settings
 
 static HostComboBox *VideoDefaultParentalLevel()
@@ -15,7 +11,7 @@ static HostComboBox *VideoDefaultParentalLevel()
     gc->setLabel(QObject::tr("Starting Parental Level"));
     gc->addSelection(QObject::tr("4 - Highest"), "4");
     gc->addSelection(QObject::tr("1 - Lowest"), "1");
-    gc->addSelection("2"); 
+    gc->addSelection("2");
     gc->addSelection("3");
     gc->setHelpText(QObject::tr("This is the 'level' that MythVideo starts at. "
                     "Any videos with a level at or below this will be shown in "
@@ -31,7 +27,7 @@ static HostComboBox *VideoDefaultView()
     gc->setLabel(QObject::tr("Default View"));
     gc->addSelection(QObject::tr("Gallery"), "1");
     gc->addSelection(QObject::tr("Browser"), "0");
-    gc->addSelection(QObject::tr("Listings"), "2"); 
+    gc->addSelection(QObject::tr("Listings"), "2");
     gc->setHelpText(QObject::tr("The default view for MythVideo. "
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));
@@ -133,6 +129,29 @@ static HostCheckBox *VideoNewBrowsable()
     return gc;
 };
 
+namespace
+{
+    HostCheckBox *VideoSortIgnoresCase()
+    {
+        HostCheckBox *hcb = new HostCheckBox("mythvideo.sort_ignores_case");
+        hcb->setLabel(QObject::tr("Sorting ignores case"));
+        hcb->setValue(true);
+        hcb->setHelpText(QObject::tr("If set, case is ignored when sorting "
+                                     "entries in a view."));
+        return hcb;
+    }
+
+    HostCheckBox *VideoDBFolderView()
+    {
+        HostCheckBox *hcb = new HostCheckBox("mythvideo.db_folder_view");
+        hcb->setLabel(QObject::tr("Show folders for database views"));
+        hcb->setValue(true);
+        hcb->setHelpText(QObject::tr("If set, sub folders of your video "
+                                     "directory will be shown in supported "
+                                     "views."));
+        return hcb;
+    }
+}
 
 static HostLineEdit *SearchListingsCommand()
 {
@@ -172,7 +191,7 @@ static HostLineEdit *VideoStartupDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoStartupDir");
     gc->setLabel(QObject::tr("Directory that holds videos"));
-    gc->setValue("/share/Movies/dvd");
+    gc->setValue(DEFAULT_VIDEOSTARTUP_DIR);
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythVideo only needs to have read permission "
                     "to the directory."));
@@ -253,7 +272,8 @@ VideoGeneralSettings::VideoGeneralSettings()
     general->addChild(VideoAggressivePC());
     addChild(general);
 
-    VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
+    VerticalConfigurationGroup* general2 =
+            new VerticalConfigurationGroup(false);
     general2->setLabel(QObject::tr("General Settings (2/2)"));
     general2->addChild(VideoListUnknownFiletypes());
     general2->addChild(VideoBrowserNoDB());
@@ -261,6 +281,8 @@ VideoGeneralSettings::VideoGeneralSettings()
     general2->addChild(VideoTreeNoDB());
     general2->addChild(VideoTreeNoMetaData());
     general2->addChild(VideoNewBrowsable());
+    general2->addChild(VideoSortIgnoresCase());
+    general2->addChild(VideoDBFolderView());
     general2->addChild(VideoDefaultView());
     addChild(general2);
 
@@ -282,7 +304,8 @@ VideoGeneralSettings::VideoGeneralSettings()
 
 VideoPlayerSettings::VideoPlayerSettings()
 {
-    VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
+    VerticalConfigurationGroup *playersettings =
+            new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("Player Settings"));
     playersettings->addChild(VideoDefaultPlayer());
     addChild(playersettings);

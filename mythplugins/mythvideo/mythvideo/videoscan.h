@@ -1,8 +1,8 @@
 #ifndef VIDEO_SCANNER_H
-#define  VIDEO_SCANNER_H
-#include <qobject.h>
+#define VIDEO_SCANNER_H
+
 #include <qmap.h>
-#include <qmap.h>
+#include <qstringlist.h> // optional
 
 enum VideoFileLocation
 {
@@ -11,29 +11,32 @@ enum VideoFileLocation
     kBoth
 };
 
-
-
-typedef QMap <QString, VideoFileLocation> VideoLoadedMap;
+class MetadataListManager;
 
 class VideoScanner
 {
     public:
         VideoScanner();
-        void doScan(const QString& dirs);
-    
+        ~VideoScanner();
+
+        void doScan(const QStringList &dirs);
+
+    private:
+        typedef QMap <QString, VideoFileLocation> VideoLoadedMap;
+
     private:
         bool m_ListUnknown;
         bool m_RemoveAll;
         bool m_KeepAll;
         VideoLoadedMap m_VideoFiles;
 
-        QMap<QString,bool> m_IgnoreList;
+        MetadataListManager *m_dbmetadata;
 
+    private:
         void promptForRemoval(const QString& filename);
-        bool ignoreExtension(const QString& extension) const;
         void verifyFiles();
         void updateDB();
-        void buildFileList(const QString &directory, 
+        void buildFileList(const QString &directory,
                            const QStringList &imageExtensions);
 };
 

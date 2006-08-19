@@ -1,73 +1,200 @@
-#include <qdir.h>
-#include <iostream>
-using namespace std;
-
 #include <qapplication.h>
-#include <unistd.h>
-#include <qsocketnotifier.h>
-#include <qtextcodec.h>
-#include <qregexp.h>
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/time.h>
+#include <mythtv/mythcontext.h>
+#include <mythtv/lcddevice.h>
+#include <mythtv/libmythui/myththemedmenu.h>
 
-#include "metadata.h"
 #include "videomanager.h"
 #include "videobrowser.h"
 #include "videotree.h"
 #include "videogallery.h"
-#include "videofilter.h"
 #include "globalsettings.h"
 #include "fileassoc.h"
 #include "dbcheck.h"
 #include "videoscan.h"
+#include "cleanup.h"
+#include "globals.h"
+#include "videolist.h"
+#include "videoutils.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/mythdbcon.h>
+#if defined(AEW_VG)
+#include <valgrind/memcheck.h>
+#endif
 
-#include <mythtv/libmythui/myththemedmenu.h>
+namespace
+{
+    template <typename T>
+    class screen_inst
+    {
+      public:
+        screen_inst(T *inst, const QString &loc_name) : m_inst(inst),
+            m_location_name(loc_name)
+        {
+        }
 
-void runMenu(QString, const QString &);
-void VideoCallback(void *, QString &);
-void SearchDir(QString &);
+        int run()
+        {
+            gContext->addCurrentLocation(m_location_name);
+            qApp->unlock();
+            m_inst->exec();
+            qApp->lock();
+            gContext->removeCurrentLocation();
+            return m_inst->videoExitType();
+        }
 
+        ~screen_inst()
+        {
+            delete m_inst;
+        }
 
-extern "C" {
-int mythplugin_init(const char *libversion);
-int mythplugin_run(void);
-int mythplugin_config(void);
+      private:
+        T *m_inst;
+        const QString &m_location_name;
+    };
+
+    template <typename T>
+    int exec_screen(T *inst, const QString &loc_name)
+    {
+        screen_inst<T> si(inst, loc_name);
+        return si.run();
+    }
+
+    class screens
+    {
+      private:
+        static int runVideoManager(VideoList *video_list)
+        {
+            if (checkParentPassword())
+            {
+                VideoScanner scanner;
+                scanner.doScan(GetVideoDirs());
+
+                return exec_screen(new VideoManager(gContext->GetMainWindow(),
+                                                    "video manager",
+                                                    video_list),
+                                   "videomanager");
+            }
+            return 0;
+        }
+
+        static int runVideoBrowser(VideoList *video_list)
+        {
+            return exec_screen(new VideoBrowser(gContext->GetMainWindow(),
+                                                "video browser", video_list),
+                               "videobrowser");
+        }
+
+        static int runVideoTree(VideoList *video_list)
+        {
+            return exec_screen(new VideoTree(gContext->GetMainWindow(),
+                                             "videotree", "video-",
+                                             "video tree", video_list),
+                               "videolistings");
+        }
+
+        static int runVideoGallery(VideoList *video_list)
+        {
+            return exec_screen(new VideoGallery(gContext->GetMainWindow(),
+                                                "video gallery", video_list),
+                               "videogallery");
+        }
+
+      public:
+        // FIXME: This silliness brought to you by REG_JUMP
+        // which doesn't allow for basic things like pushing
+        // an int or void * through the callback.
+        enum screen_type
+        {
+            stVideoBrowser = VideoDialog::DLG_BROWSER,
+            stVideoGallery = VideoDialog::DLG_GALLERY,
+            stVideoTree = VideoDialog::DLG_TREE,
+            stVideoManager,
+            stDefaultView
+        };
+
+        static void runScreen(screen_type st)
+        {
+            static VideoList *video_list = 0;
+
+            if (st == stDefaultView)
+            {
+                st = static_cast<screen_type>(
+                        gContext->GetNumSetting("Default MythVideo View",
+                                                stVideoGallery));
+            }
+
+            if (!video_list)
+            {
+                video_list = new VideoList;
+            }
+
+            int sret = 0;
+            switch (st)
+            {
+                case stVideoManager:
+                {
+                    sret = runVideoManager(video_list);
+                    break;
+                }
+                case stVideoBrowser:
+                {
+                    sret = runVideoBrowser(video_list);
+                    break;
+                }
+                case stVideoTree:
+                {
+                    sret = runVideoTree(video_list);
+                    break;
+                }
+                case stVideoGallery:
+                {
+                    sret = runVideoGallery(video_list);
+                    break;
+                }
+                case stDefaultView:
+                default:
+                {
+                    sret = runVideoGallery(video_list);
+                    break;
+                }
+            }
+
+            if (sret != SCREEN_EXIT_VIA_JUMP)
+            {
+                // All these hoops to make view switching faster.
+
+                // If a screen didn't exit via a jump we should clean up
+                // the data we loaded.
+                CleanupHooks::getInstance()->cleanup();
+                delete video_list;
+                video_list = 0;
+            }
+        }
+    };
+
+    void screenVideoManager() { screens::runScreen(screens::stVideoManager); }
+    void screenVideoBrowser() { screens::runScreen(screens::stVideoBrowser); }
+    void screenVideoTree() { screens::runScreen(screens::stVideoTree); }
+    void screenVideoGallery() { screens::runScreen(screens::stVideoGallery); }
+    void screenVideoDefault() { screens::runScreen(screens::stDefaultView); }
 }
 
-void runVideoManager(void);
-void runVideoBrowser(void);
-void runVideoTree(void);
-void runVideoGallery(void);
-void runDefaultView(void);
-
-
-void setupKeys(void)
+void setupKeys()
 {
-    REG_JUMP("MythVideo", "The MythVideo default view", "", 
-             runDefaultView);
-             
-    REG_JUMP("Video Manager", "The MythVideo video manager", "", 
-             runVideoManager);
-    REG_JUMP("Video Browser", "The MythVideo video browser", "", 
-             runVideoBrowser);
-    REG_JUMP("Video Listings", "The MythVideo video listings", "", 
-             runVideoTree);
-    REG_JUMP("Video Gallery", "The MythVideo video gallery", "",
-             runVideoGallery);
+    REG_JUMP(JUMP_VIDEO_DEFAULT, "The MythVideo default view", "",
+             screenVideoDefault);
 
-    
+    REG_JUMP(JUMP_VIDEO_MANAGER, "The MythVideo video manager", "",
+             screenVideoManager);
+    REG_JUMP(JUMP_VIDEO_BROWSER, "The MythVideo video browser", "",
+             screenVideoBrowser);
+    REG_JUMP(JUMP_VIDEO_TREE, "The MythVideo video listings", "",
+             screenVideoTree);
+    REG_JUMP(JUMP_VIDEO_GALLERY, "The MythVideo video gallery", "",
+             screenVideoGallery);
+
     REG_KEY("Video","FILTER","Open video filter dialog","F");
-    
+
     REG_KEY("Video","DELETE","Delete video","D");
     REG_KEY("Video","BROWSE","Change browsable in video manager","B");
     REG_KEY("Video","INCPARENT","Increase Parental Level","],},F11");
@@ -77,207 +204,6 @@ void setupKeys(void)
     REG_KEY("Video","END","Go to the last video","End");
 }
 
-
-int mythplugin_init(const char *libversion)
-{
-    if (!gContext->TestPopupVersion("mythvideo", libversion,
-                                    MYTH_BINARY_VERSION))
-        return -1;
-
-    gContext->ActivateSettingsCache(false);
-    UpgradeVideoDatabaseSchema();
-    gContext->ActivateSettingsCache(true);
-
-    VideoGeneralSettings general;
-    general.load();
-    general.save();
-    VideoPlayerSettings settings;
-    settings.load();
-    settings.save();
-
-    setupKeys();
-
-    return 0;
-}
-
-int mythplugin_run(void)
-{
-    QString themedir = gContext->GetThemeDir();
-    runMenu(themedir, "videomenu.xml");
-
-    return 0;
-}
-
-int mythplugin_config(void)
-{
-    QString themedir = gContext->GetThemeDir();
-    runMenu(themedir, "video_settings.xml");
-
-    return 0;
-}
-
-void runMenu(QString themedir, const QString &menuname)
-{
-    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), menuname,
-                                              GetMythMainWindow()->GetMainStack(),
-                                              "video menu");
-
-    diag->setCallback(VideoCallback, NULL);
-    diag->setKillable();
-
-    if (diag->foundTheme())
-    {
-        if (class LCD * lcd = LCD::Get())
-        {
-            lcd->switchToTime();
-        }
-        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
-    }
-    else
-    {
-        cerr << "Couldn't find theme " << themedir << endl;
-        delete diag;
-    }
-}
-
-bool checkParentPassword()
-{
-    QDateTime curr_time = QDateTime::currentDateTime();
-    QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
-    QString password = gContext->GetSetting("VideoAdminPassword");
-
-    if (password.length() < 1)
-        return true;
-
-    // See if we recently (and succesfully) asked for a password
-    
-    if (last_time_stamp.length() < 1)
-    {
-        // Probably first time used
-
-        cerr << "main.o: Could not read password/pin time stamp. "
-             << "This is only an issue if it happens repeatedly. " << endl;
-    }
-    else
-    {
-        QDateTime last_time = QDateTime::fromString(last_time_stamp, 
-                                                    Qt::TextDate);
-        if (last_time.secsTo(curr_time) < 120)
-        {
-            // Two minute window
-            last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
-            return true;
-        }
-    }
-    
-    // See if there is a password set
-    
-    if (password.length() > 0)
-    {
-        bool ok = false;
-        MythPasswordDialog *pwd = new MythPasswordDialog(QObject::tr("Parental Pin:"),
-                                                         &ok,
-                                                         password,
-                                                         gContext->GetMainWindow());
-        pwd->exec();
-        delete pwd;
-
-        if (ok)
-        {
-            // All is good
-            last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
-            return true;
-        }
-    }
-    else
-        return true;
-    return false;
-}
-
-void runVideoManager(void)
-{
-    if (checkParentPassword())
-    {
-        QString startdir = gContext->GetSetting("VideoStartupDir",
-                                                "/share/Movies/dvd");
-        VideoScanner scanner;
-        scanner.doScan(startdir);
-
-        VideoManager *manage = new VideoManager(gContext->GetMainWindow(),
-                                                "video manager");
-        gContext->addCurrentLocation("videomanager");
-        qApp->unlock();
-        manage->exec();
-        qApp->lock();
-        gContext->removeCurrentLocation();
-        delete manage;
-    }
-}
-
-void runVideoBrowser(void)
-{
-    VideoBrowser *browse = new VideoBrowser(gContext->GetMainWindow(),
-                                            "video browser");
-    gContext->addCurrentLocation("videobrowser");
-    qApp->unlock();
-    browse->exec();
-    qApp->lock();
-    gContext->removeCurrentLocation();
-    delete browse;
-}
-
-void runVideoTree(void)
-{
-    VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
-                                    "videotree",
-                                    "video-",
-                                    "video tree"); 
-    gContext->addCurrentLocation("videolistings");
-    qApp->unlock();
-    tree->exec();
-    qApp->lock();
-    gContext->removeCurrentLocation();
-    delete tree;
-}
-
-void runDefaultView(void)
-{
-    int viewType = gContext->GetNumSetting("Default MythVideo View", VideoDialog::DLG_GALLERY);
-
-    switch (viewType)
-    {
-        case VideoDialog::DLG_BROWSER:
-            runVideoBrowser();
-            break;
-        case VideoDialog::DLG_GALLERY:
-            runVideoGallery();
-            break;
-        case VideoDialog::DLG_TREE:
-            runVideoTree();
-            break;
-        default:            
-            runVideoGallery();
-            break;
-    };
-    
-}
-
-void runVideoGallery(void)
-{
-    VideoGallery *gallery = new VideoGallery(gContext->GetMainWindow(),
-                                             "video gallery");
-    gContext->addCurrentLocation("videogallery");
-    qApp->unlock();
-    gallery->exec();
-    qApp->lock();
-    gContext->removeCurrentLocation();
-    delete gallery;
-}
-
 void VideoCallback(void *data, QString &selection)
 {
     (void)data;
@@ -285,22 +211,22 @@ void VideoCallback(void *data, QString &selection)
     QString sel = selection.lower();
 
     if (sel == "manager")
-        runVideoManager();
+        screenVideoManager();
     else if (sel == "browser")
-        runVideoBrowser();
+        screenVideoBrowser();
     else if (sel == "listing")
-        runVideoTree();
+        screenVideoTree();
     else if (sel == "gallery")
-        runVideoGallery();
+        screenVideoGallery();
     else if (sel == "settings_general")
     {
         //
-        //  If we are doing aggressive 
+        //  If we are doing aggressive
         //  Parental Control, then junior
         //  is going to have to try harder
         //  than that!
         //
-        
+
         if (gContext->GetNumSetting("VideoAggressivePC", 0))
         {
             if (checkParentPassword())
@@ -326,13 +252,88 @@ void VideoCallback(void *data, QString &selection)
                            "file_associations",
                            "video-",
                            "fa dialog");
-        
+
         fa.exec();
     }
 }
 
+void runMenu(QString themedir, const QString &menuname)
+{
+    MythThemedMenu *diag =
+            new MythThemedMenu(themedir.ascii(), menuname,
+                               GetMythMainWindow()->GetMainStack(),
+                               "video menu");
 
+    diag->setCallback(VideoCallback, NULL);
+    diag->setKillable();
 
+    if (diag->foundTheme())
+    {
+        if (LCD *lcd = LCD::Get())
+        {
+            lcd->switchToTime();
+        }
+        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1").arg(themedir));
+        delete diag;
+    }
+}
 
+extern "C"
+{
+    int mythplugin_init(const char *libversion);
+    int mythplugin_run();
+    int mythplugin_config();
+    void mythplugin_destroy();
+}
 
+int mythplugin_init(const char *libversion)
+{
+    if (!gContext->TestPopupVersion("mythvideo", libversion,
+                                    MYTH_BINARY_VERSION))
+        return -1;
 
+    gContext->ActivateSettingsCache(false);
+    UpgradeVideoDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
+
+    VideoGeneralSettings general;
+    general.load();
+    general.save();
+    VideoPlayerSettings settings;
+    settings.load();
+    settings.save();
+
+    setupKeys();
+
+    return 0;
+}
+
+int mythplugin_run()
+{
+    QString themedir = gContext->GetThemeDir();
+    runMenu(themedir, "videomenu.xml");
+    return 0;
+}
+
+int mythplugin_config()
+{
+    QString themedir = gContext->GetThemeDir();
+    runMenu(themedir, "video_settings.xml");
+
+    return 0;
+}
+
+void mythplugin_destroy()
+{
+    CleanupHooks::getInstance()->cleanup();
+#if defined(AEW_VG)
+    // valgrind forgets symbols of unloaded modules
+    // I'd rather sort out known non-leaks than piece
+    // together a call stack.
+    VALGRIND_DO_LEAK_CHECK;
+#endif
+}

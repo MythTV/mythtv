@@ -1,19 +1,21 @@
-#ifndef MYTHSETTINGS_H
-#define MYTHSETTINGS_H
+#ifndef MYTHSETTINGS_H_
+#define MYTHSETTINGS_H_
 
-#include "mythtv/settings.h"
-#include "mythtv/mythcontext.h"
+#include <mythtv/settings.h>
 
 // The real work.
 
-// Temporary dumping ground for things that have not been properly categorized yet
-class VideoGeneralSettings: virtual public ConfigurationWizard {
-public:
+// Temporary dumping ground for things that have not been properly
+// categorized yet
+class VideoGeneralSettings: virtual public ConfigurationWizard
+{
+  public:
     VideoGeneralSettings();
 };
 
-class VideoPlayerSettings: virtual public ConfigurationWizard {
-public:
+class VideoPlayerSettings: virtual public ConfigurationWizard
+{
+  public:
     VideoPlayerSettings();
 };
 

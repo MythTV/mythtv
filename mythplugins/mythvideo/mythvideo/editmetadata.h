@@ -6,34 +6,34 @@
 
 	(c) 2003, 2004 Thor Sigvaldason, Isaac Richards, and ?? ??
 	Part of the mythTV project
-	
+
     Class to let user edit the metadata associated with
     a given video
 
 */
 
-#include <iostream>
-using namespace std;
 #include <mythtv/mythdialogs.h>
 
-#include "metadata.h"
+class Metadata;
+class MetadataListManager;
 
 class EditMetadataDialog : public MythThemedDialog
 {
 
   Q_OBJECT
-  
+
     //
     //  Dialog to manipulate the data
     //
-    
+
   public:
-  
-    EditMetadataDialog(const Metadata *source_metadata,
-                       MythMainWindow *parent, 
-                       const QString& window_name,
-                       const QString& theme_filename,
-                       const char* name = 0);
+
+    EditMetadataDialog(Metadata *source_metadata,
+                       const MetadataListManager &cache,
+                       MythMainWindow *parent_,
+                       const QString &window_name,
+                       const QString &theme_filename,
+                       const char *name_ = 0);
     ~EditMetadataDialog();
 
     void keyPressEvent(QKeyEvent *e);
@@ -41,7 +41,7 @@ class EditMetadataDialog : public MythThemedDialog
     void fillWidgets();
 
   public slots:
-  
+
     void takeFocusAwayFromEditor(bool up_or_down);
     void saveAndExit();
     void setTitle(QString new_title);
@@ -54,20 +54,21 @@ class EditMetadataDialog : public MythThemedDialog
     void findCoverArt();
 
   private:
-  
+
     Metadata            *working_metadata;
+    Metadata            *m_orig_metadata;
 
     //
     //  GUI stuff
-    //  
-    
+    //
+
     MythRemoteLineEdit  *title_editor;
     UIBlackHoleType     *title_hack;
 
     MythRemoteLineEdit  *player_editor;
     UIBlackHoleType     *player_hack;
 
-    UISelectorType	    *category_select;
+    UISelectorType      *category_select;
     UISelectorType      *level_select;
     UICheckBoxType      *child_check;
     UISelectorType      *child_select;
@@ -80,11 +81,10 @@ class EditMetadataDialog : public MythThemedDialog
     //  Remember video-to-play-next index number when the user is toggling
     //  child videos on and off
     //
-    
+
     int cachedChildSelection;
- 
+
+    const MetadataListManager &m_meta_cache;
 };
 
-
 #endif
-

@@ -1,230 +1,146 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
-#include <qregexp.h>
 #include <qstring.h>
 
-#include <mythtv/mythcontext.h>
-#include <qpixmap.h>
-#include <qimage.h>
+#include <utility>
+#include <vector>
+
+class QPixmap;
+class QImage;
+class MSqlQuery;
+class MetadataListManager;
+
+enum { VIDEO_YEAR_DEFAULT = 1895 };
 
 class Metadata
 {
   public:
-    Metadata(const QString& lfilename = "", const QString& lcoverfile = "", 
-             const QString& ltitle = "", int lyear = 0, const QString& linetref = "", 
-             const QString& ldirector = "", const QString& lplot = "", 
-             float luserrating = 0.0, const QString& lrating = "", int llength = 0, 
-             int lid = 0, int lshowlevel = 1, int lchildID = -1,
-             bool lbrowse = true, const QString& lplaycommand = "",
-             const QString& lcategory = "",
-             const QStringList& lgenres = QStringList(),
-             const QStringList& lcountries = QStringList())
-    {
-        coverImage = NULL;
-        coverPixmap = NULL;
-        filename = lfilename;
-        coverfile = lcoverfile;
-        title = ltitle;
-        year = lyear;
-        inetref = linetref;
-        director = ldirector;
-        plot = lplot;
-        luserrating = luserrating;
-        rating = lrating;
-        length = llength;
-        showlevel = lshowlevel;
-        id = lid;
-        childID = lchildID;
-        browse = lbrowse;
-        playcommand = lplaycommand;
-        category = lcategory;
-        genres = lgenres;
-        countries = lcountries;
-    }
-    
-    Metadata(const Metadata &other) { clone(other); }
-    
-    void clone(const Metadata &other) 
-    {
-        coverImage = NULL;
-        coverPixmap = NULL;
-        filename = other.filename;
-        coverfile = other.coverfile;
-        title = other.title;
-        year = other.year;
-        inetref = other.inetref;
-        director = other.director;
-        plot = other.plot;
-        userrating = other.userrating;
-        rating = other.rating;
-        length = other.length;
-        showlevel = other.showlevel;
-        id = other.id;
-        childID = other.childID;
-        browse = other.browse;
-        playcommand = other.playcommand;
-        category = other.category;
-        genres = other.genres;
-        countries = other.countries;
-    }
-    
-    
-    static void purgeByFilename( const QString& filename );
-    static void purgeByID( int ID );
-    
-    void reset()
-    {
-        if (coverImage) delete coverImage;
-        
-        coverImage  = NULL;
-        coverPixmap = NULL;
-        
-        filename    = "";
-        coverfile   = "";
-        title       = "";
-        inetref     = "";
-        director    = "";
-        plot        = "";
-        playcommand = "";
-        category    = "";
-        rating      = "";
-        
-        length      = 0;
-        showlevel   = 1;
-        id          = 0;
-        categoryID  = 0;
-        childID     = -1;
-        year        = 0;
-        
-        userrating  = 0.0;
-        
-        browse = true;
-       
-        genres = QStringList();
-        countries = QStringList();
-        player = "";
+    typedef std::pair<int, QString> genre_entry;
+    typedef std::pair<int, QString> country_entry;
+    typedef std::vector<genre_entry> genre_list;
+    typedef std::vector<country_entry> country_list;
 
-    }
-    
-    ~Metadata() { if (coverImage) delete coverImage; }
+  public:
+    static QString GenerateDefaultSortKey(const Metadata &m,
+                                          bool ignore_case = true);
+    static QString FilenameToTitle(const QString &file_name);
+    static QString trimTitle(const QString &title, bool ignore_case);
+    static QString getPlayer(const Metadata *item);
+    static QString getPlayer(const Metadata *item, QString &internal_mrl);
+    static QString getPlayCommand(const Metadata *item);
+    static bool getPlayer(const QString &extension, QString &player,
+            bool &use_default);
 
+  public:
+    Metadata(const QString &filename = "", const QString &coverfile = "",
+             const QString &title = "", int year = VIDEO_YEAR_DEFAULT,
+             const QString &inetref = "", const QString &director = "",
+             const QString &plot = "", float userrating = 0.0,
+             const QString &rating = "", int length = 0,
+             int id = 0, int showlevel = 1, int categoryID = 0,
+             int childID = -1, bool browse = true,
+             const QString &playcommand = "", const QString &category = "",
+             const genre_list &genres = genre_list(),
+             const country_list &countries = country_list());
+    ~Metadata();
+    Metadata(MSqlQuery &query);
+    Metadata(const Metadata &rhs);
+    Metadata &operator=(const Metadata &rhs);
 
-    const QString& Title() const { return title; }
-    void setTitle(const QString& _title) { title = _title; }
-    
-    int Year() const { return year; }
-    void setYear(int _year) { year = _year; }
+    // returns a string to use when sorting
+    bool hasSortKey() const;
+    const QString &getSortKey() const;
+    void setSortKey(const QString &sort_key);
 
-    const QString& InetRef() const { return inetref; }
-    void setInetRef(const QString& _inetRef) { inetref = _inetRef; }
+    // flat index
+    void setFlatIndex(int index);
+    int getFlatIndex() const;
 
-    const QString& Director() const { return director; }
-    void setDirector(const QString& _director) { director = _director; }
+    const QString &getPrefix() const;
+    void setPrefix(const QString &prefix);
 
-    const QString& Plot() const { return plot; }
-    void setPlot(const QString& _plot) { plot = _plot; }
+    const QString &Title() const;
+    void setTitle(const QString& title);
 
-    float UserRating() const { return userrating; }
-    void setUserRating(float _userRating) { userrating = _userRating; }
- 
-    const QString& Rating() const { return rating; }
-    void setRating(const QString& _rating) { rating = _rating; }
+    int Year() const;
+    void setYear(int year);
 
-    int Length() const { return length; }
-    void setLength(int _length) { length = _length; }
+    const QString &InetRef() const;
+    void setInetRef(const QString &inetRef);
 
-    unsigned int ID() const { return id; }
-    void setID(int _id) { id = _id; }
+    const QString &Director() const;
+    void setDirector(const QString &director);
 
-    int ChildID() const { return childID; }
-    void setChildID(int _childID) { childID = _childID; }
-    
-    bool Browse() const {return browse; }
-    void setBrowse(bool _browse){ browse = _browse;}
-   
-    const QString& PlayCommand() const {return playcommand;}
-    void setPlayCommand(const QString& _playCommand){playcommand = _playCommand;}
-    
-    int ShowLevel() const { return showlevel; }
-    void setShowLevel(int _showLevel) { showlevel = _showLevel; }
+    const QString &Plot() const;
+    void setPlot(const QString &plot);
 
-    const QString& Filename() const { return filename; }
-    void setFilename(QString& _filename) { filename = _filename; }
+    float UserRating() const;
+    void setUserRating(float userRating);
 
-    const QString& CoverFile() const { return coverfile; }
-    void setCoverFile(QString& _coverFile) { coverfile = _coverFile; }
-    
-    const QString& Player() const { return player; }
-    void setPlayer(const QString& _player) { player = _player; }
+    const QString &Rating() const;
+    void setRating(const QString &rating);
 
-    const QString& Category() const { return category;}
-    void setCategory(const QString& _category) { category = _category;}
-    
-    const QStringList& Genres() const { return genres; }
-    void setGenres(const QStringList& _genres) { genres = _genres; }
+    int Length() const;
+    void setLength(int length);
 
-    const QStringList& Countries() const { return countries;}
-    void setCountries(const QStringList& _countries) { countries = _countries; }
+    unsigned int ID() const;
+    void setID(int id);
 
-    int getCategoryID() { if (categoryID <= 0) categoryID = lookupCategoryID(); return categoryID; }
+    int ChildID() const;
+    void setChildID(int childID);
+
+    bool Browse() const;
+    void setBrowse(bool browse);
+
+    const QString &PlayCommand() const;
+    void setPlayCommand(const QString &playCommand);
+
+    int ShowLevel() const;
+    void setShowLevel(int showLevel);
+
+    const QString& Filename() const;
+    void setFilename(const QString &filename);
+
+    QString getFilenameNoPrefix() const;
+
+    const QString &CoverFile() const;
+    void setCoverFile(const QString &coverFile);
+
+    const QString &Category() const;
+//    void setCategory(const QString &category);
+
+    const genre_list &Genres() const;
+    void setGenres(const genre_list &genres);
+
+    const country_list &Countries() const;
+    void setCountries(const country_list &countries);
+
+    int getCategoryID() const;
     void setCategoryID(int id);
-    
-    QPixmap* getCoverPixmap();
-    void setCoverPixmap(QPixmap* pix) { coverPixmap = pix; }
-    bool haveCoverPixmap() const { return (coverPixmap != NULL); }
 
-    QImage* getCoverImage();
-            
-    void guessTitle();
-    void eatBraces(const QString& left_brace, const QString& right_brace);
+    QPixmap *getCoverPixmap();
+    void setCoverPixmap(QPixmap *pix);
+    bool haveCoverPixmap() const;
+
+    QImage *getCoverImage();
 
     void dumpToDatabase();
     void updateDatabase();
-    bool fillDataFromID();
-    bool fillDataFromFilename();
-    
-    bool Remove();
-  
+//    bool fillDataFromID(const MetadataListManager &cache);
+    bool fillDataFromFilename(const MetadataListManager &cache);
+
+    // If you aren't VideoList don't call this
+    bool deleteFile();
+
+    // drops the metadata from the DB
+    bool dropFromDB();
+
   private:
-    void fillCategory();
-    void fillCountries();
-    void updateCountries();
-    void fillGenres();
-    void updateGenres();
-    bool removeDir(const QString& dirName);
-    int lookupCategoryID();  
-    
-    
-    
-    QImage* coverImage;
-    QPixmap* coverPixmap;
-    
-
-    QString title;
-    QString inetref;
-    QString director;
-    QString plot;
-    QString rating;
-    QString playcommand;
-    QString category;
-    QStringList genres;
-    QStringList countries;
-    QString player;
-    QString filename;
-    QString coverfile;
-
-    int categoryID;
-    int childID;
-    int year;
-    int length;
-    int showlevel;
-    bool browse;
-    unsigned int id;	// videometadata.intid
-    float userrating;    
+    class MetadataImp *m_imp;
 };
 
-bool operator==(const Metadata& a, const Metadata& b);
-bool operator!=(const Metadata& a, const Metadata& b);
+bool operator==(const Metadata &a, const Metadata &b);
+bool operator!=(const Metadata &a, const Metadata &b);
 
 #endif

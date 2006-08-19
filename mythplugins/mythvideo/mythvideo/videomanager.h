@@ -1,37 +1,36 @@
 #ifndef VIDEOMANAGER_H_
 #define VIDEOMANAGER_H_
 
-#include <qwidget.h>
-#include <qdialog.h>
-#include <qapplication.h>
-#include <qstringlist.h>
+#include <memory>
 
-#include <mythtv/httpcomms.h>
-#include "metadata.h"
-#include <mythtv/mythwidgets.h>
-#include <qdom.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
-#include "videofilter.h"
+#include <mythtv/mythdialogs.h>
 
-enum
+namespace
 {
-    SHOWING_MAINWINDOW = 0,
-    SHOWING_EDITWINDOW,
-    SHOWING_IMDBLIST,
-    SHOWING_IMDBMANUAL
-};
+    class ListBehaviorManager;
 
-typedef QValueList<Metadata>  ValueMetadata;
+    enum DisplayState
+    {
+        SHOWING_MAINWINDOW = 0,
+        SHOWING_EDITWINDOW,
+        SHOWING_IMDBLIST,
+        SHOWING_IMDBMANUAL
+    };
+}
 
+class QPainter;
+class QNetworkOperation;
+class VideoList;
+class Metadata;
 class VideoManager : public MythDialog
 {
     Q_OBJECT
   public:
-    VideoManager(MythMainWindow *parent, const char *name = 0);
-    ~VideoManager(void);
-    void processEvents() { qApp->processEvents(); }
-    
+    VideoManager(MythMainWindow *lparent, const QString &lname,
+                 VideoList *video_list);
+    ~VideoManager();
+    int videoExitType() { return 0; }
+
   public slots:
     void slotManualIMDB();
     void slotAutoIMDB();
@@ -41,26 +40,24 @@ class VideoManager : public MythDialog
     void slotDoCancel();
     void slotDoFilter();
     void slotToggleBrowseable();
-    
-    
-  
+
   protected slots:
-    void selected();
     void videoMenu();
-    void editMetadata();
+
     void cursorLeft();
     void cursorRight();
     void cursorDown();
     void cursorUp();
+
     void pageDown();
     void pageUp();
+
     void exitWin();
 
   protected:
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
-    void validateUp();
-    void doWaitBackground(QPainter& p, const QString& titleText);
+    void doWaitBackground(QPainter &p, const QString &titleText);
 
   private slots:
     void num(const QString &text);
@@ -70,97 +67,67 @@ class VideoManager : public MythDialog
     void handleIMDBList();
     void handleIMDBManual();
     void doParental(int amount);
-    
-    bool updateML;
-    bool noUpdate;
-    int debug;
-    VideoFilterSettings *currentVideoFilter;
-
-    QPixmap getPixmap(QString &level);
-    ValueMetadata m_list;
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
 
     void cancelPopup();
-    
-    XMLParse *theme;
-    QDomElement xmldata;
 
     void ResetCurrentItem();
-    void RemoveCurrentItem();
 
-    void RefreshMovieList();
-    QString ratingCountry;
-    void GetMovieData(const QString& );
-    int GetMovieListing(const QString& );
-    QString GetMoviePoster(const QString& );
-    QStringList movieList;
-    QString curIMDBNum;
-    QString executeExternal(const QStringList& args, const QString& purpose = QString(""));
+    void RefreshMovieList(bool resort_only);
+    void GetMovieData(const QString &);
+    int GetMovieListing(const QString &);
+    QString GetMoviePoster(const QString &);
 
-    void updateBackground(void);
+    void updateBackground();
     void updateList(QPainter *);
     void updateMovieList(QPainter *);
     void updateInfo(QPainter *);
-    void updatePlayWait(QPainter *);
     void updateIMDBEnter(QPainter *);
 
     void grayOut(QPainter *);
 
-    QPixmap *bgTransBackup;
+  private:
+    bool updateML;
+    bool noUpdate;
+
+    VideoList *m_video_list;
+
+    std::auto_ptr<XMLParse> m_theme;
+
+    QStringList movieList;
+    QString curIMDBNum;
+
+    std::auto_ptr<QPixmap> bgTransBackup;
     Metadata *curitem;
     QString curitemMovie;
 
-    QPainter backup;
+    std::auto_ptr<QPainter> backup;
     QPixmap myBackground;
-    bool can_do_page_down;
-    bool can_do_page_down_movie;
 
-    int inList;
-    int inData;
-    int listCount;
-    int dataCount;
- 
-    int inListMovie;
-    int inDataMovie;
-    int listCountMovie;
-    int dataCountMovie;
+    DisplayState m_state;
 
-    int m_state;
-
-    int listsize;
-    int listsizeMovie;
     QRect listRect;
     QRect movieListRect;
     QRect infoRect;
     QRect fullRect;
     QRect imdbEnterRect;
 
-    QString m_cmd;   
-    QString m_title;
-
-    QString movieTitle;
-    int movieYear;
-    QString movieDirector;
-    QString moviePlot;
-    float movieUserRating;
-    QString movieRating;
-    int movieRuntime;
     QString movieNumber;
-    QStringList movieGenres;
-    QStringList movieCountries;
 
-    MythPopupBox* popup;
+    MythPopupBox *popup;
     bool expectingPopup;
-    
-    QString videoDir;    
+
+    QString videoDir;
     QString artDir;
-    QString theMovieName;
     bool allowselect;
-    bool isbusy;
+    bool isbusy; // ignores keys when true (set when doing http request)
     bool iscopycomplete;
     bool iscopysuccess;
+
+    std::auto_ptr<ListBehaviorManager> m_list_behave;
+    std::auto_ptr<ListBehaviorManager> m_movie_list_behave;
 };
 
 #endif

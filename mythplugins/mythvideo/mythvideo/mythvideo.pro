@@ -23,12 +23,15 @@ INSTALLS += installfiles uifiles installimages installscripts
 HEADERS += metadata.h videomanager.h videobrowser.h videofilter.h dbcheck.h
 HEADERS += globalsettings.h videotree.h fileassoc.h editmetadata.h
 HEADERS += videogallery.h videoselected.h videodlg.h videoscan.h
-HEADERS += videolist.h
+HEADERS += videolist.h dbaccess.h quicksp.h metadatalistmanager.h
+HEADERS += cleanup.h globals.h dirscan.h videoutils.h
 
-SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp videofilter.cpp dbcheck.cpp
+SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp
+SOURCES += videofilter.cpp dbcheck.cpp
 SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp
 SOURCES += videogallery.cpp videoselected.cpp videodlg.cpp videoscan.cpp
-SOURCES += videolist.cpp
+SOURCES += videolist.cpp dbaccess.cpp metadatalistmanager.cpp
+SOURCES += cleanup.cpp globals.cpp dirscan.cpp videoutils.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

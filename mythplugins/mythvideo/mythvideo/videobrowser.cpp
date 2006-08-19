@@ -1,37 +1,29 @@
-#include <qlayout.h>
-#include <qapplication.h>
-#include <qcursor.h>
-#include <qstringlist.h>
 #include <qpixmap.h>
-#include <iostream>
 #include <unistd.h>
-#include <qregexp.h>
-#include <qnetwork.h>
-#include <qurl.h>
-#include <qdir.h>
 
-using namespace std;
+#include <mythtv/mythcontext.h>
+#include <mythtv/xmlparse.h>
 
 #include "metadata.h"
 #include "videobrowser.h"
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
 
 #include "videofilter.h"
+#include "videolist.h"
+#include "videoutils.h"
 
-
-
-VideoBrowser::VideoBrowser(MythMainWindow *parent, const char *name)
-            : VideoDialog(DLG_BROWSER, parent, "browser", name)
+VideoBrowser::VideoBrowser(MythMainWindow *lparent, const QString &lname,
+                           VideoList *video_list) :
+    VideoDialog(DLG_BROWSER, lparent, "browser", lname, video_list),
+    inData(0), m_state(0)
 {
-    m_state = 0;
-    
+    setFlatList(true);
+
     setFileBrowser(gContext->GetNumSetting("VideoBrowserNoDB", 0));
-    loadWindow(xmldata);        
-    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
-    
-    if (!bgTransBackup)
-        bgTransBackup = new QPixmap();
+    loadWindow(xmldata);
+    bgTransBackup.reset(gContext->LoadScalePixmap("trans-backup.png"));
+
+    if (!bgTransBackup.get())
+        bgTransBackup.reset(new QPixmap());
 
     setNoErase();
 
@@ -41,18 +33,15 @@ VideoBrowser::VideoBrowser(MythMainWindow *parent, const char *name)
 
 VideoBrowser::~VideoBrowser()
 {
-    delete bgTransBackup;
 }
-
 
 void VideoBrowser::slotParentalLevelChanged()
 {
     LayerSet *container = theme->GetSet("browsing");
-    if(container)
+    if (container)
     {
-        UITextType *pl_value = (UITextType *)container->GetType("pl_value");
-        if (pl_value)
-           pl_value->SetText(QString("%1").arg(currentParentalLevel));
+        checkedSetText((UITextType *)container->GetType("pl_value"),
+                       QString::number(currentParentalLevel));
     }
 }
 
@@ -76,9 +65,9 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         else if (action == "UP")
             jumpSelection(-1);
         else if (action == "PAGEDOWN")
-            jumpSelection(video_list->count() / 5);
+            jumpSelection(m_video_list->count() / 5);
         else if (action == "PAGEUP")
-            jumpSelection(-(video_list->count() / 5));
+            jumpSelection(-(m_video_list->count() / 5));
         else if (action == "LEFT")
             cursorLeft();
         else if (action == "RIGHT")
@@ -86,11 +75,11 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         else if (action == "HOME")
             jumpToSelection(0);
         else if (action == "END")
-            jumpToSelection(video_list->count() - 1);
+            jumpToSelection(m_video_list->count() - 1);
         else if (action == "INCPARENT")
             shiftParental(1);
         else if (action == "DECPARENT")
-            shiftParental(-1);            
+            shiftParental(-1);
         else if (action == "1" || action == "2" ||
                 action == "3" || action == "4")
             setParentalLevel(action.toInt());
@@ -114,9 +103,9 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
                 handled = true;
                 slotWatchVideo();
             }
-        }            
+        }
     }
-    
+
     if (!handled)
         MythDialog::keyPressEvent(e);
 }
@@ -126,37 +115,36 @@ void VideoBrowser::doMenu(bool info)
     if (createPopup())
     {
         QButton *focusButton = NULL;
-        if(info)
+        if (info)
         {
-            focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
+            focusButton = popup->addButton(tr("Watch This Video"), this,
+                                           SLOT(slotWatchVideo()));
             popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
         }
         else
         {
             if (!isFileBrowser)
-                focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
-            
+                focusButton = popup->addButton(tr("Filter Display"), this,
+                                               SLOT(slotDoFilter()));
+
             QButton* tempButton = addDests();
             if (!focusButton)
                 focusButton = tempButton;
         }
-        
+
         popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
-        
+
         popup->ShowPopup(this, SLOT(slotDoCancel()));
-    
+
         if (focusButton)
             focusButton->setFocus();
     }
-    
 }
-
 
 void VideoBrowser::fetchVideos()
 {
     VideoDialog::fetchVideos();
-    video_list->wantVideoListUpdirs(isFileBrowser);
-    
+
     SetCurrentItem(0);
     update(infoRect);
     update(browsingRect);
@@ -165,7 +153,8 @@ void VideoBrowser::fetchVideos()
 
 void VideoBrowser::grayOut(QPainter *tmp)
 {
-    tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), Dense4Pattern));
+    tmp->fillRect(QRect(QPoint(0, 0), size()),
+                  QBrush(QColor(10, 10, 10), Dense4Pattern));
 }
 
 void VideoBrowser::paintEvent(QPaintEvent *e)
@@ -192,47 +181,44 @@ void VideoBrowser::paintEvent(QPaintEvent *e)
 
 void VideoBrowser::updatePlayWait(QPainter *p)
 {
-  if (m_state < 4)
-  {
-    backup.flush();
-    backup.begin(this);
-    if (m_state == 1)
-        grayOut(&backup);
-    backup.end();
-
-    LayerSet *container = NULL;
-    container = theme->GetSet("playwait");
-    if (container)
+    if (m_state < 4)
     {
-        container->Draw(p, 0, 0);
-        container->Draw(p, 1, 0);
-        container->Draw(p, 2, 0);
-        container->Draw(p, 3, 0);
-    }
-    m_state++;
-    update(fullRect);
-  }
-  else if (m_state == 4)
-  {
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
-    allowPaint = true;
-  }
-}
+        backup.flush();
+        backup.begin(this);
+        if (m_state == 1)
+            grayOut(&backup);
+        backup.end();
 
+        LayerSet *container = NULL;
+        container = theme->GetSet("playwait");
+        if (container)
+        {
+            for (int i = 0; i < 4; ++i)
+                container->Draw(p, i, 0);
+        }
+        m_state++;
+        update(fullRect);
+    }
+    else if (m_state == 4)
+    {
+        backup.begin(this);
+        backup.drawPixmap(0, 0, myBackground);
+        backup.end();
+        allowPaint = true;
+    }
+}
 
 void VideoBrowser::SetCurrentItem(unsigned int index)
 {
     curitem = NULL;
-    
-    unsigned int list_count = video_list->count();
-    
+
+    unsigned int list_count = m_video_list->count();
+
     if (list_count == 0)
         return;
 
     inData = QMIN(list_count - 1, index);
-    curitem = video_list->getVideoListMetadata(inData);
+    curitem = m_video_list->getVideoListMetadata(inData);
 }
 
 void VideoBrowser::updateBrowsing(QPainter *p)
@@ -241,36 +227,25 @@ void VideoBrowser::updateBrowsing(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    unsigned int list_count = video_list->count();
+    unsigned int list_count = m_video_list->count();
 
-    QString vidnum;  
+    QString vidnum;
     if (list_count > 0)
         vidnum = QString(tr("%1 of %2")).arg(inData + 1).arg(list_count);
     else
         vidnum = tr("No Videos");
 
-    LayerSet *container = NULL;
-    container = theme->GetSet("browsing");
+    LayerSet *container = theme->GetSet("browsing");
     if (container)
     {
-        UITextType *type = (UITextType *)container->GetType("currentvideo");
-        if (type)
-            type->SetText(vidnum);
+        checkedSetText((UITextType *)container->GetType("currentvideo"),
+                       vidnum);
 
-        UITextType *pl_value = (UITextType *)container->GetType("pl_value");
-        if (pl_value)
-        {
-           pl_value->SetText(QString("%1").arg(currentParentalLevel));
-        }
+        checkedSetText((UITextType *)container->GetType("pl_value"),
+                       QString::number(currentParentalLevel));
 
-        container->Draw(&tmp, 1, 0);
-        container->Draw(&tmp, 2, 0);
-        container->Draw(&tmp, 3, 0);
-        container->Draw(&tmp, 4, 0);
-        container->Draw(&tmp, 5, 0);
-        container->Draw(&tmp, 6, 0);
-        container->Draw(&tmp, 7, 0);
-        container->Draw(&tmp, 8, 0);
+        for (int i = 1; i < 9; ++i)
+            container->Draw(&tmp, i, 0);
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
@@ -283,97 +258,66 @@ void VideoBrowser::updateInfo(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    if (video_list->count() > 0 && curitem)
+    if (m_video_list->count() > 0 && curitem)
     {
-       QString title = curitem->Title();
-       QString filename = curitem->Filename();
-       QString director = curitem->Director();
-       QString year = QString("%1").arg(curitem->Year());
-       if (year == "1895") 
-           year = "?";
-       QString coverfile = curitem->CoverFile();
-       QString inetref = curitem->InetRef();
-       QString plot = curitem->Plot();
-       QString userrating = QString("%1").arg(curitem->UserRating());
-       QString rating = curitem->Rating();
-       if (rating == "<NULL>")
-           rating = tr("No rating available.");
-       QString length = QString("%1").arg(curitem->Length()) + " " + tr("minutes");
-       QString level = QString("%1").arg(curitem->ShowLevel());
-
-       LayerSet *container = NULL;
-       container = theme->GetSet("info");
+       LayerSet *container = theme->GetSet("info");
        if (container)
        {
-           UITextType *type = (UITextType *)container->GetType("title");
-           if (type)
-               type->SetText(title);
+           checkedSetText((UITextType *)container->GetType("title"),
+                          curitem->Title());
+           checkedSetText((UITextType *)container->GetType("filename"),
+                          curitem->Filename());
+           checkedSetText((UITextType *)container->GetType("video_player"),
+                          Metadata::getPlayer(curitem));
 
-           type = (UITextType *)container->GetType("filename");
-           if (type)
-               type->SetText(filename);
-
-           type = (UITextType *)container->GetType("director");
-           if (type)
-               type->SetText(director);
- 
-           type = (UITextType *)container->GetType("year");
-           if (type)
-               type->SetText(year);
-
-           type = (UITextType *)container->GetType("coverfile");
-           if (type)
-               type->SetText(coverfile);
-  
+           QString coverfile = curitem->CoverFile();
            UIImageType *itype = (UIImageType *)container->GetType("coverart");
-           if (itype && (coverfile != QObject::tr("No Cover")) && (coverfile != QObject::tr("None")))
+           if (itype)
            {
-               if (itype->GetImageFilename() != coverfile)
+               if (isDefaultCoverFile(coverfile))
                {
-                   itype->SetImage(coverfile);
-                   itype->LoadImage();
+                   if (itype->isShown())
+                       itype->hide();
                }
-               if (itype->isHidden())
-                   itype->show();   
+               else
+               {
+                   if (itype->GetImageFilename() != coverfile)
+                   {
+                       itype->SetImage(coverfile);
+                       itype->LoadImage();
+                   }
+                   if (itype->isHidden())
+                       itype->show();
+               }
            }
-           else
-           {
-               if (itype->isShown())
-                   itype->hide();   
-           }
 
-           type = (UITextType *)container->GetType("inetref");
-           if (type)
-               type->SetText(inetref);
+           checkedSetText((UITextType *)container->GetType("director"),
+                          curitem->Director());
+           checkedSetText((UITextType *)container->GetType("plot"),
+                          curitem->Plot());
+           checkedSetText((UITextType *)container->GetType("rating"),
+                          getDisplayRating(curitem->Rating()));
+           checkedSetText((UITextType *)container->GetType("inetref"),
+                          curitem->InetRef());
+           checkedSetText((UITextType *)container->GetType("year"),
+                          getDisplayYear(curitem->Year()));
+           checkedSetText((UITextType *)container->GetType("userrating"),
+                          getDisplayUserRating(curitem->UserRating()));
+           checkedSetText((UITextType *)container->GetType("length"),
+                          getDisplayLength(curitem->Length()));
+           checkedSetText((UITextType *)container->GetType("coverfile"),
+                          coverfile);
+           checkedSetText((UITextType *)container->GetType("child_id"),
+                          QString::number(curitem->ChildID()));
+           checkedSetText((UITextType *)container->GetType("browseable"),
+                          getDisplayBrowse(curitem->Browse()));
+           checkedSetText((UITextType *)container->GetType("category"),
+                          curitem->Category());
+           checkedSetText((UITextType *)container->GetType("level"),
+                          QString::number(curitem->ShowLevel()));
 
-           type = (UITextType *)container->GetType("plot");
-           if (type)
-               type->SetText(plot);
- 
-           type = (UITextType *)container->GetType("userrating");
-           if (type)
-               type->SetText(userrating);
-
-           type = (UITextType *)container->GetType("rating");
-           if (type)
-               type->SetText(rating);
-
-           type = (UITextType *)container->GetType("length");
-           if (type)
-               type->SetText(length);
-
-           type = (UITextType *)container->GetType("level");
-           if (type)
-               type->SetText(level);
-  
-           container->Draw(&tmp, 1, 0); 
-           container->Draw(&tmp, 2, 0);
-           container->Draw(&tmp, 3, 0);
-           container->Draw(&tmp, 4, 0);  
-           container->Draw(&tmp, 5, 0);
-           container->Draw(&tmp, 6, 0); 
-           container->Draw(&tmp, 7, 0);
-           container->Draw(&tmp, 8, 0);
+           for (int i = 1; i < 9; ++i)
+               container->Draw(&tmp, i, 0);
        }
     }
     else
@@ -381,16 +325,12 @@ void VideoBrowser::updateInfo(QPainter *p)
        LayerSet *norec = theme->GetSet("novideos_info");
        if (norec)
        {
-           norec->Draw(&tmp, 4, 0);
-           norec->Draw(&tmp, 5, 0);
-           norec->Draw(&tmp, 6, 0);
-           norec->Draw(&tmp, 7, 0);
-           norec->Draw(&tmp, 8, 0);
+           for (int i = 4; i < 9; ++i)
+               norec->Draw(&tmp, i, 0);
        }
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
-
 }
 
 void VideoBrowser::jumpToSelection(int index)
@@ -402,7 +342,7 @@ void VideoBrowser::jumpToSelection(int index)
 
 void VideoBrowser::jumpSelection(int amount)
 {
-    unsigned int list_count = video_list->count();
+    unsigned int list_count = m_video_list->count();
 
     if (list_count == 0)
         return;
@@ -416,7 +356,6 @@ void VideoBrowser::jumpSelection(int amount)
 
     jumpToSelection(index);
 }
-   
 
 void VideoBrowser::cursorLeft()
 {
@@ -430,15 +369,14 @@ void VideoBrowser::cursorRight()
 
 void VideoBrowser::parseContainer(QDomElement &element)
 {
-    
     QRect area;
-    QString name;
+    QString container_name;
     int context;
-    theme->parseContainer(element, name, context, area);
-    if (name.lower() == "info")
+    theme->parseContainer(element, container_name, context, area);
+
+    container_name = container_name.lower();
+    if (container_name == "info")
         infoRect = area;
-    if (name.lower() == "browsing")
+    if (container_name == "browsing")
         browsingRect = area;
 }
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */

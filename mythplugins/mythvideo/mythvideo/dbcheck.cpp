@@ -1,14 +1,11 @@
 #include <qstring.h>
 
-#include <iostream>
-using namespace std;
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 
 #include "dbcheck.h"
 
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
-
-const QString currentDatabaseVersion = "1008";
+const QString currentDatabaseVersion = "1009";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -25,7 +22,7 @@ static void performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythVideo schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythVideo schema version ") +
             version);
 
     int counter = 0;
@@ -106,7 +103,7 @@ static void InitializeDatabase(void)
 void UpgradeVideoDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("VideoDBSchemaVer");
-    
+
     if (dbver == currentDatabaseVersion)
         return;
 
@@ -152,8 +149,8 @@ void UpgradeVideoDatabaseSchema(void)
 
         performActualUpdate(updates, "1003", dbver);
     }
-    
-    
+
+
     if (dbver == "1003")
     {
         const QString updates[] = {
@@ -187,16 +184,17 @@ void UpgradeVideoDatabaseSchema(void)
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) "
 "VALUES (\"iso\", \"mplayer -fs -zoom -quiet -vo xv -dvd-device %s dvd://1\", 0, 1);",
 ""
-    };
+};
+
         performActualUpdate(updates, "1006", dbver);
     }
 
     if (dbver == "1006")
     {
         const QString updates[] = {
-"ALTER TABLE videometadatacountry ADD INDEX(idvideo); ", 
-"ALTER TABLE videometadatacountry ADD INDEX(idcountry);",  
-"ALTER TABLE videometadatagenre ADD INDEX(idvideo);",             
+"ALTER TABLE videometadatacountry ADD INDEX(idvideo); ",
+"ALTER TABLE videometadatacountry ADD INDEX(idcountry);",
+"ALTER TABLE videometadatagenre ADD INDEX(idvideo);",
 "ALTER TABLE videometadatagenre ADD INDEX(idgenre);",
 ""
 };
@@ -216,4 +214,16 @@ void UpgradeVideoDatabaseSchema(void)
         performActualUpdate(updates, "1008", dbver);
     }
 
+    if (dbver == "1008")
+    {
+        const QString updates[] = {
+"UPDATE videometadata "
+"LEFT JOIN videocategory ON (videometadata.category = videocategory.intid) "
+"SET videometadata.category = 0 "
+"WHERE videocategory.intid IS NULL;",
+""
+};
+
+        performActualUpdate(updates, "1009", dbver);
+    }
 }

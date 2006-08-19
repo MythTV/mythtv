@@ -433,7 +433,7 @@
       <textarea name="title" draworder="4" align="hcenter">
         <area>20,8,760,100</area>
         <font>leadfnt</font>
-	<multiline>yes</multiline> 
+        <multiline>yes</multiline> 
       </textarea>
       <textarea name="dirlbl" draworder="4" align="left">
         <area>235, 90,150,35</area>
