@@ -161,6 +161,8 @@ class ImageCacheImp
                 ret->scale_image.
                         convertFromImage(scale_me.smoothScale(width,height,
                                                               scale));
+                ret->scale_width = width;
+                ret->scale_height = height;
             }
             else
             {
