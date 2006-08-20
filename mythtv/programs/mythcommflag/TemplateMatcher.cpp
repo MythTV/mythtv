@@ -744,13 +744,16 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
         ++iinext;
 
         /* Get bounds of beginning of logo break. */
-        long long iibb = ii.key() - MAXBLANKADJUSTMENT;
-        long long iiee = ii.key() + MAXBLANKADJUSTMENT;
+        long long brkb = ii.key();
+        long long brkbmax = brkb + MAXBLANKADJUSTMENT;
         FrameAnalyzer::FrameMap::const_iterator jjfound = blankMap->constEnd();
 
         if (ii.key() > 0)
         {
-            /* Look for first blank frame after beginning of logo break. */
+            /*
+             * Look for first blank frames ending on/after beginning of logo
+             * break.
+             */
             FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constBegin();
             if (jj != blankMap->constEnd() && !jj.key() && !jj.data())
                 ++jj;   /* Skip faked-up dummy frame-0 blank frame. */
@@ -759,42 +762,43 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector)
                 long long jjbb = jj.key();
                 long long jjee = jjbb + jj.data();
 
-                if (iiee < jjbb)
-                    break;      /* Passed (iibb,iiee). */
-
-                if (jjee < iibb)
-                    continue;   /* Keep looking. */
-
-                jjfound = jj;
+                if (brkb <= jjee)
+                {
+                    if (jjbb <= brkbmax)
+                        jjfound = jj;
+                    break;
+                }
             }
         }
 
         /* Get bounds of end of logo break. */
-        long long mmbb = iibb + ii.data();
-        long long mmee = iiee + ii.data();
+        long long brke = ii.key() + ii.data();
+        long long brkemin = brke - MAXBLANKADJUSTMENT;
 
-        /* Look for last blank frame before end of logo break. */
-        FrameAnalyzer::FrameMap::const_iterator kk, kkfound;
-        kkfound = blankMap->constEnd();
-        kk = jjfound;
-        if (kk == blankMap->constEnd())
-            kk = blankMap->constBegin();
-        else
-            ++kk;
-        for (; kk != blankMap->constEnd(); ++kk)
+        /*
+         * Look for last blank frames beginning before/on end of logo break.
+         * (Going backwards, look for the "first" blank frames beginning
+         * before/on end of logo break.)
+         */
+        FrameAnalyzer::FrameMap::const_iterator kkfound = blankMap->constEnd();
+        FrameAnalyzer::FrameMap::const_iterator kk = blankMap->constEnd();
+        --kk;
+        for (; kk != jjfound && kk != blankMap->constBegin(); --kk)
         {
             long long kkbb = kk.key();
             long long kkee = kkbb + kk.data();
 
-            if (mmee < kkbb)
-                break;      /* Passed (mmbb,mmee). */
-
-            if (kkee < mmbb)
-                continue;   /* Keep looking. */
-
-            kkfound = kk;
+            if (kkbb <= brke)
+            {
+                if (brkemin <= kkee)
+                    kkfound = kk;
+                break;
+            }
         }
 
+        /*
+         * Adjust breakMap for blank frames.
+         */
         long long start = ii.key();
         long long end = start + ii.data();
         if (jjfound != blankMap->constEnd())
