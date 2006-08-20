@@ -129,6 +129,9 @@ class MythMainWindow : public QWidget
     void customEvent(QCustomEvent *ce);
     void closeEvent(QCloseEvent *e);
     void paintEvent(QPaintEvent *e);
+#ifdef USING_APPLEREMOTE
+    bool event(QEvent* e);
+#endif
     
     void ExitToMainMenu();
 

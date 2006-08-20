@@ -10,13 +10,18 @@
 #include <qwindowsystem_qws.h>
 #endif
 #ifdef Q_WS_MACX
-#import <HIToolbox/Menus.h>   // For GetMBarHeight()
+#include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
 #include <pthread.h>
 
 #ifdef USE_LIRC
 #include "lirc.h"
+#include "lircevent.h"
+#endif
+
+#ifdef USING_APPLEREMOTE
+#include "AppleRemoteListener.h"
 #include "lircevent.h"
 #endif
 
@@ -66,6 +71,23 @@ static void *SpawnJoystickMenu(void *param)
     if (!js->Init(config_file))
         js->Process();
 
+    return NULL;
+}
+#endif
+
+#ifdef USING_APPLEREMOTE
+static void* SpawnAppleRemote(void* param)
+{
+    MythMainWindow      *main_window = (MythMainWindow *)param;
+    AppleRemoteListener *arl = new AppleRemoteListener(main_window);
+    AppleRemote         &remote(AppleRemote::instance());
+
+    remote.setListener(arl);
+    remote.startListening();
+    if (!remote.isListeningToRemote())
+        return NULL;
+
+    remote.runLoop();
     return NULL;
 }
 #endif
@@ -281,6 +303,16 @@ MythMainWindow::MythMainWindow()
     pthread_create(&js_tid, &attr2, SpawnJoystickMenu, this);
 #endif
 
+#ifdef USING_APPLEREMOTE
+    pthread_t appleremote_tid;
+
+    pthread_attr_t attr3;
+    pthread_attr_init(&attr3);
+    pthread_attr_setdetachstate(&attr3, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&appleremote_tid, &attr3, SpawnAppleRemote, this);
+#endif
+
     d->keyContexts.setAutoDelete(true);
 
     RegisterKey("Global", "UP", "Up Arrow", "Up");
@@ -439,6 +471,31 @@ void MythMainWindow::paintEvent(QPaintEvent *pe)
 {
     d->repaintRegion = d->repaintRegion.unite(pe->region());
 }
+
+#ifdef USING_APPLEREMOTE
+// This may be possible via installEventFilter() instead?
+
+bool MythMainWindow::event(QEvent* e)
+{
+    switch (e->type())
+    {
+        case QEvent::WindowActivate:
+        {
+            AppleRemote::instance().startListening();
+            break;
+        }
+        case QEvent::WindowDeactivate:
+        {
+            // relinquish the remote
+            AppleRemote::instance().stopListening();
+            break;
+        }
+        default:
+            break;
+    }
+    return QWidget::event(e);
+}
+#endif
 
 void MythMainWindow::Init(void)
 {
@@ -1196,7 +1253,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                 mon->Unlock(pDev);
         }
     }
-#ifdef USE_LIRC
+#if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
     else if (ce->type() == kLircKeycodeEventType && !d->ignore_lirc_keys) 
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
