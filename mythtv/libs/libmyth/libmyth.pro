@@ -77,6 +77,11 @@ macx {
     HEADERS += util-osx.h
     SOURCES += util-osx.cpp
 
+    using_appleremote {
+        HEADERS += AppleRemote.h   AppleRemoteListener.h   lircevent.h
+        SOURCES += AppleRemote.cpp AppleRemoteListener.cpp lircevent.cpp
+    }
+
     # Mac OS X Frameworks
     FWKS = ApplicationServices AudioUnit Carbon CoreAudio IOKit
 
