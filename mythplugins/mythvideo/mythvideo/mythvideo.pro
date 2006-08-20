@@ -27,11 +27,11 @@ HEADERS += videolist.h dbaccess.h quicksp.h metadatalistmanager.h
 HEADERS += cleanup.h globals.h dirscan.h videoutils.h imagecache.h
 
 SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp
-SOURCES += videofilter.cpp dbcheck.cpp
+SOURCES += videofilter.cpp dbcheck.cpp cleanup.cpp 
 SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp
 SOURCES += videogallery.cpp videoselected.cpp videodlg.cpp videoscan.cpp
 SOURCES += videolist.cpp dbaccess.cpp metadatalistmanager.cpp
-SOURCES += cleanup.cpp globals.cpp dirscan.cpp videoutils.cpp imagecache.cpp
+SOURCES += globals.cpp dirscan.cpp videoutils.cpp imagecache.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

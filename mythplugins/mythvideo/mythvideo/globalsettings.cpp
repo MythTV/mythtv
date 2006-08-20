@@ -151,6 +151,19 @@ namespace
                                      "views."));
         return hcb;
     }
+
+    HostSpinBox *VideoImageCacheSize()
+    {
+        HostSpinBox *hsb = new HostSpinBox("mythvideo.ImageCacheSize", 10,
+                                           1000, 10);
+        hsb->setValue(50);
+        hsb->setLabel(QObject::tr("Image cache size"));
+        hsb->setHelpText(QObject::tr("This setting determines the number "
+                                     "of images MythVideo will cache for "
+                                     "views."));
+        return hsb;
+    }
+
 }
 
 static HostLineEdit *SearchListingsCommand()
@@ -283,7 +296,9 @@ VideoGeneralSettings::VideoGeneralSettings()
     general2->addChild(VideoNewBrowsable());
     general2->addChild(VideoSortIgnoresCase());
     general2->addChild(VideoDBFolderView());
+    general2->addChild(VideoImageCacheSize());
     general2->addChild(VideoDefaultView());
+
     addChild(general2);
 
     VerticalConfigurationGroup* vman = new VerticalConfigurationGroup(false);

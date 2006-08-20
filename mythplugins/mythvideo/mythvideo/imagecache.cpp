@@ -8,6 +8,7 @@
 
 #include "cleanup.h"
 #include "imagecache.h"
+#include "quicksp.h"
 
 class ImageCacheImp
 {
@@ -20,10 +21,10 @@ class ImageCacheImp
 
     const QPixmap *load(const QString &image_file)
     {
-        cache_entry *ce = addImage(image_file);
-        if (ce)
+        cache_entry_ptr cep = addImage(image_file);
+        if (cep.get())
         {
-            return &ce->image;
+            return &cep->image;
         }
 
         return NULL;
@@ -33,10 +34,10 @@ class ImageCacheImp
                         QImage::ScaleMode scale)
     {
         QPixmap *ret = NULL;
-        cache_entry *ce = addScaleImage(image_file, width, height, scale);
-        if (ce && !ce->scale_image.isNull())
+        cache_entry_ptr cep = addScaleImage(image_file, width, height, scale);
+        if (cep.get() && !cep->scale_image.isNull())
         {
-            ret = &ce->scale_image;
+            ret = &cep->scale_image;
         }
 
         return ret;
@@ -47,11 +48,11 @@ class ImageCacheImp
         QPixmap *ret = NULL;
         if (pre_loaded)
         {
-            m_cache.push_back(cache_entry(image_file));
-            cache_entry *ce = &m_cache.back();
-            ce->image = *pre_loaded;
-            ret = &ce->image;
-            m_cache_index.insert(cache_map::value_type(ce->filename, ce));
+            cache_entry_ptr cep(new cache_entry(image_file, pre_loaded));
+            m_cache.push_back(cep);
+            ret = &cep->image;
+            m_cache_index.insert(cache_map::value_type(cep->filename,
+                                                       --m_cache.end()));
             trim_cache();
         }
         return ret;
@@ -98,6 +99,16 @@ class ImageCacheImp
         {
         }
 
+        cache_entry(const QString &file, QPixmap *img) :
+            filename(file), scale_mode(QImage::ScaleFree),
+				scale_width(0), scale_height(0)
+        {
+            if (img)
+            {
+                image = *img;
+            }
+        }
+
         QString filename;
         QPixmap image;
         QPixmap scale_image;
@@ -106,17 +117,20 @@ class ImageCacheImp
 		int scale_height;
     };
 
-    typedef std::list<cache_entry> cache_list;
-    typedef std::map<QString, cache_entry *> cache_map;
+    typedef simple_ref_ptr<cache_entry> cache_entry_ptr;
+    typedef std::list<cache_entry_ptr> cache_list;
+    typedef std::map<QString, cache_list::iterator> cache_map;
 
   private:
-    cache_entry *addImage(const QString &image_file)
+    cache_entry_ptr addImage(const QString &image_file)
     {
-        cache_entry *ret = NULL;
+        cache_entry_ptr ret;
         cache_map::iterator p = m_cache_index.find(image_file);
         if (p != m_cache_index.end())
         {
-            ret = p->second;
+            m_cache.push_back(*p->second);
+            m_cache.erase(p->second);
+            ret = *(p->second = --m_cache.end());
             VERBOSE(VB_GENERAL, QString("ImageCache hit for: %1")
                     .arg(image_file));
         }
@@ -125,17 +139,14 @@ class ImageCacheImp
             VERBOSE(VB_GENERAL, QString("ImageCache miss for: %1")
                     .arg(image_file));
 
-            m_cache.push_back(cache_entry(image_file));
-            cache_entry *ce = &m_cache.back();
-            if (!ce->image.load(ce->filename))
+            cache_entry_ptr cep(new cache_entry(image_file));
+
+            if (cep->image.load(cep->filename))
             {
-                m_cache.pop_back();
-                ret = NULL;
-            }
-            else
-            {
-                m_cache_index.insert(cache_map::value_type(ce->filename, ce));
-                ret = ce;
+                m_cache.push_back(cep);
+                m_cache_index.insert(cache_map::value_type(cep->filename,
+                                                           --m_cache.end()));
+                ret = cep;
             }
 
             trim_cache();
@@ -144,11 +155,11 @@ class ImageCacheImp
         return ret;
     }
 
-    cache_entry *addScaleImage(const QString &image_file, int width, int height,
-                               QImage::ScaleMode scale)
+    cache_entry_ptr addScaleImage(const QString &image_file, int width,
+                                  int height, QImage::ScaleMode scale)
     {
-        cache_entry *ret = addImage(image_file);
-        if (ret && !ret->image.isNull())
+        cache_entry_ptr ret = addImage(image_file);
+        if (ret.get() && !ret->image.isNull())
         {
             if (ret->scale_image.isNull() || ret->scale_mode != scale ||
 					ret->scale_width != width || ret->scale_height != height)
@@ -179,7 +190,7 @@ class ImageCacheImp
     {
         if (m_cache.size())
         {
-            const QString &filename = m_cache.front().filename;
+            const QString &filename = m_cache.front()->filename;
             cache_map::iterator p = m_cache_index.find(filename);
             if (p != m_cache_index.end())
             {
