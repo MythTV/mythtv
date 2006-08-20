@@ -25,6 +25,9 @@ using namespace std;
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
 
+// from libmyth
+#include "mythdialogs.h"
+
 struct TextAttributes
 {
     QRect textRect;
@@ -2118,9 +2121,9 @@ bool MythThemedMenuPrivate::findDepends(const QString &fileList)
     return false;
 }
 
-bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting, 
+bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
                               const QString &password_setting,
-                              const QString& /* text */)
+                              const QString &text)
 {
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = gContext->GetSetting(timestamp_setting);
@@ -2151,12 +2154,11 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     if (password.length() > 0)
     {
         bool ok = false;
-#if 0
         MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok, password,
                                                      gContext->GetMainWindow());
         pwd->exec();
         delete pwd;
-#endif
+
         if (ok)
         {
             last_time_stamp = curr_time.toString(Qt::TextDate);
