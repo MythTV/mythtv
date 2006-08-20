@@ -187,7 +187,7 @@ void VideoDialog::playVideo(Metadata *someItem)
     update(fullRect);
     allowPaint = false;
 
-    PlayVideo(someItem->ID(), m_video_list->getListCache());
+    PlayVideo(someItem->Filename(), m_video_list->getListCache());
 
     gContext->GetMainWindow()->raise();
     gContext->GetMainWindow()->setActiveWindow();

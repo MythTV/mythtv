@@ -522,7 +522,7 @@ void VideoTree::playVideo(Metadata *someItem)
     if (!someItem)
         return;
 
-    PlayVideo(someItem->ID(), m_video_list->getListCache());
+    PlayVideo(someItem->Filename(), m_video_list->getListCache());
 
     m_imp->video_tree_list->deactivate();
     gContext->GetMainWindow()->raise();

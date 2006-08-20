@@ -4,7 +4,7 @@
 class Metadata;
 class MetadataListManager;
 
-void PlayVideo(unsigned int video_id, const MetadataListManager &video_list);
+void PlayVideo(const QString &filename, const MetadataListManager &video_list);
 
 template <typename T>
 void checkedSetText(T *item, const QString &text)

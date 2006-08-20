@@ -14,9 +14,9 @@ namespace
     const QString VIDEO_COVERFILE_DEFAULT_OLD = QObject::tr("None");
 }
 
-void PlayVideo(unsigned int video_id, const MetadataListManager &video_list)
+void PlayVideo(const QString &filename, const MetadataListManager &video_list)
 {
-    MetadataListManager::MetadataPtr item = video_list.byID(video_id);
+    MetadataListManager::MetadataPtr item = video_list.byFilename(filename);
 
     if (!item.get()) return;
 

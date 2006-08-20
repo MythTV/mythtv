@@ -150,7 +150,7 @@ void VideoSelected::customEvent(QCustomEvent *e)
     if (e->type() == kMythVideoStartPlayEventType)
     {
         if (m_item)
-            PlayVideo(m_item->ID(), m_video_list->getListCache());
+            PlayVideo(m_item->Filename(), m_video_list->getListCache());
         ++m_state;
         update(fullRect);
     }
