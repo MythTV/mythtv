@@ -26,6 +26,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "videoselected.h"
 #include "videolist.h"
 #include "videoutils.h"
+#include "imagecache.h"
 
 VideoGallery::VideoGallery(MythMainWindow *lparent, const QString &lname,
                            VideoList *video_list) :
@@ -345,7 +346,7 @@ void VideoGallery::updateSingleIcon(QPainter *p, int lx, int ly)
 void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
                             int xpos, int ypos)
 {
-    QImage *image = 0;
+    QString icon_file;
     int yoffset = 0;
     Metadata *meta = NULL;
 
@@ -364,16 +365,35 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
 
             QString filename = QString("%1/folder").arg(folder_path);
 
-            image = new QImage();
-            // folder.[png|jpg|gif]
-
-            if (!image->load(filename + ".png"))
-                if (!image->load(filename + ".jpg"))
-                         image->load(filename + ".gif");
+            QStringList test_files;
+            test_files.append(filename + ".png");
+            test_files.append(filename + ".jpg");
+            test_files.append(filename + ".gif");
+            for (QStringList::const_iterator tfp = test_files.begin();
+                 tfp != test_files.end(); ++tfp)
+            {
+                if (QFile::exists(*tfp))
+                {
+                    icon_file = *tfp;
+                    break;
+                }
+            }
         }
         else if (curTreePos->getInt() == kUpFolder) // up-directory
         {
-            image = gContext->LoadScaleImage("mv_gallery_dir_up.png");
+            icon_file = "mv_gallery_dir_up.png";
+
+            // prime the cache
+            if (!ImageCache::getImageCache().hitTest(icon_file))
+            {
+                std::auto_ptr<QImage> image(gContext->
+                                            LoadScaleImage(icon_file));
+                if (image.get())
+                {
+                    QPixmap pm(*image.get());
+                    ImageCache::getImageCache().load(icon_file, &pm);
+                }
+            }
         }
 
         // directory icons are 10% smaller
@@ -389,7 +409,8 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
         // load video icon
         meta = m_video_list->getVideoListMetadata(curTreePos->getInt());
 
-        image = meta->getCoverImage();
+        if (meta)
+            icon_file = meta->CoverFile();
     }
 
     int bw  = backRegPix.width();
@@ -397,39 +418,10 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
     int sw  = (int)(11*wmult);
     int sh  = (int)(11*hmult);
 
+    UITextType *itype = 0;
+    UITextType *ttype = 0;
 
-    if (image && !image->isNull())
-    {
-
-        QPixmap *pixmap = NULL;
-        if (meta && meta->haveCoverPixmap())
-            pixmap = meta->getCoverPixmap();
-
-        if (!pixmap)
-            pixmap = new QPixmap(image->smoothScale((int)(thumbW-2*sw),
-                                                    (int)(thumbH-2*sh-yoffset),
-                                                    (keepAspectRatio ?
-                                                     QImage::ScaleMin :
-                                                     QImage::ScaleFree)));
-
-        if (!pixmap->isNull())
-            p->drawPixmap(xpos + sw, ypos + sh + yoffset,
-                          *pixmap,
-                          (pixmap->width()-bw)/2+sw,
-                          (pixmap->height()-bh+yoffset)/2+sh,
-                          bw-2*sw, bh-2*sh-yoffset);
-
-        if (meta)
-            meta->setCoverPixmap(pixmap);
-        else
-            delete pixmap;
-    }
-
-
-    UITextType *itype = (UITextType*)0;
-    UITextType *ttype = (UITextType*)0;
-
-    LayerSet* container = theme->GetSet("view");
+    LayerSet *container = theme->GetSet("view");
 
     if (container)
     {
@@ -441,23 +433,38 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
         VERBOSE(VB_IMPORTANT, QString("Failed to get view Container"));
     }
 
-    // text instead of an image
-    if (itype && (!image || image->isNull()))
+    if (icon_file.length())
     {
-        QRect area = itype->DisplayArea();
+        const QPixmap *icon_image = ImageCache::getImageCache().
+                load(icon_file, int(thumbW - 2 * sw),
+                     int(thumbH - 2 * sh - yoffset),
+                     keepAspectRatio ?  QImage::ScaleMin : QImage::ScaleFree);
 
-        area.setX(xpos + sw);
-        area.setY(ypos + sh + yoffset);
-        area.setWidth(bw-2*sw);
-        area.setHeight(bh-2*sh-yoffset);
-        itype->SetDisplayArea(area);
-        itype->calculateScreenArea();
-        itype->SetText(meta ? meta->Title() : curTreePos->getString());
-
-        for (int i = 0; i < 4; ++i)
-            itype->Draw(p, i, 0);
+        if (icon_image && !icon_image->isNull())
+            p->drawPixmap(xpos + sw, ypos + sh + yoffset, *icon_image,
+                          (icon_image->width() - bw) / 2 + sw,
+                          (icon_image->height() - bh + yoffset) / 2 + sh,
+                          bw - 2 * sw, bh - 2 * sh - yoffset);
     }
+    else
+    {
+        // text instead of an image
+        if (itype)
+        {
+            QRect area = itype->DisplayArea();
 
+            area.setX(xpos + sw);
+            area.setY(ypos + sh + yoffset);
+            area.setWidth(bw-2*sw);
+            area.setHeight(bh-2*sh-yoffset);
+            itype->SetDisplayArea(area);
+            itype->calculateScreenArea();
+            itype->SetText(meta ? meta->Title() : curTreePos->getString());
+
+            for (int i = 0; i < 4; ++i)
+                itype->Draw(p, i, 0);
+        }
+    }
 
     // text underneath an icon
     if (ttype && subtitleOn)
@@ -475,9 +482,6 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
         for (int i = 0; i < 4; ++i)
             ttype->Draw(p, i, 0);
     }
-
-    if (image && !meta)
-        delete image;
 }
 
 void VideoGallery::doMenu(bool info)

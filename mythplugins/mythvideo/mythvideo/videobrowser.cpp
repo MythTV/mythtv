@@ -10,6 +10,7 @@
 #include "videofilter.h"
 #include "videolist.h"
 #include "videoutils.h"
+#include "imagecache.h"
 
 VideoBrowser::VideoBrowser(MythMainWindow *lparent, const QString &lname,
                            VideoList *video_list) :
@@ -281,13 +282,27 @@ void VideoBrowser::updateInfo(QPainter *p)
                }
                else
                {
-                   if (itype->GetImageFilename() != coverfile)
+                   QSize img_size = itype->GetSize();
+                   const QPixmap *img =
+                           ImageCache::getImageCache().load(coverfile,
+                                                            img_size.width(),
+                                                            img_size.height(),
+                                                            QImage::ScaleFree);
+                   if (img)
                    {
-                       itype->SetImage(coverfile);
-                       itype->LoadImage();
+                       if (itype->GetImage().serialNumber() !=
+                           img->serialNumber())
+                       {
+                           itype->SetImage(*img);
+                           if (itype->isHidden())
+                               itype->show();
+                       }
                    }
-                   if (itype->isHidden())
-                       itype->show();
+                   else
+                   {
+                       if (itype->isShown())
+                           itype->hide();
+                   }
                }
            }
 

@@ -25,6 +25,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "metadata.h"
 #include "videolist.h"
 #include "videoutils.h"
+#include "imagecache.h"
 
 VideoSelected::VideoSelected(const VideoList *video_list,
                              MythMainWindow *lparent, const QString &lname,
@@ -230,13 +231,28 @@ void VideoSelected::updateInfo(QPainter *p)
                }
                else
                {
-                   if (itype->GetImageFilename() != coverfile)
+                   QSize img_size = itype->GetSize();
+                   const QPixmap *img =
+                           ImageCache::getImageCache().load(coverfile,
+                                                            img_size.width(),
+                                                            img_size.height(),
+                                                            QImage::ScaleFree);
+
+                   if (img)
                    {
-                       itype->SetImage(coverfile);
-                       itype->LoadImage();
+                       if (itype->GetImage().serialNumber() !=
+                           img->serialNumber())
+                       {
+                           itype->SetImage(*img);
+                           if (itype->isHidden())
+                               itype->show();
+                       }
                    }
-                   if (itype->isHidden())
-                       itype->show();
+                   else
+                   {
+                       if (itype->isShown())
+                           itype->hide();
+                   }
                }
            }
 

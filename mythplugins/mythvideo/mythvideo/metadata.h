@@ -6,8 +6,6 @@
 #include <utility>
 #include <vector>
 
-class QPixmap;
-class QImage;
 class MSqlQuery;
 class MetadataListManager;
 
@@ -118,12 +116,6 @@ class Metadata
 
     int getCategoryID() const;
     void setCategoryID(int id);
-
-    QPixmap *getCoverPixmap();
-    void setCoverPixmap(QPixmap *pix);
-    bool haveCoverPixmap() const;
-
-    QImage *getCoverImage();
 
     void dumpToDatabase();
     void updateDatabase();

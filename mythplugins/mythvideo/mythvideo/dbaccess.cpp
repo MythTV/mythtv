@@ -21,29 +21,6 @@ namespace
 
         T &m_c;
     };
-
-    template <typename T>
-    class SimpleCleanup : public CleanupProc
-    {
-      public:
-        SimpleCleanup(T *inst) : m_inst(inst)
-        {
-            CleanupHooks::getInstance()->addHook(this);
-        }
-
-        ~SimpleCleanup()
-        {
-            CleanupHooks::getInstance()->removeHook(this);
-        }
-
-        void doClean()
-        {
-            m_inst->cleanup();
-        }
-
-      private:
-        T *m_inst;
-    };
 }
 
 class SingleValueImp

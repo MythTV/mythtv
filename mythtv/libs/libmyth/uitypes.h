@@ -445,14 +445,14 @@ class UIImageType : public UIType
     void SetFlex(bool flex) { m_flex = flex; }
     void ResetFilename() { m_filename = orig_filename; };
     void SetImage(QString file) { m_filename = file; }
-    void SetImage(QPixmap imgdata) { img = imgdata; }
+    void SetImage(const QPixmap &imgdata) { img = imgdata; m_show = true; }
     void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
     void SetSkip(int x, int y) { m_drop_x = x; m_drop_y = y; }
 
     void ResetImage() { img = QPixmap(); }
     void LoadImage();
-    QPixmap GetImage() { return img; }
-    int GetSize() { return m_force_x; }
+    const QPixmap &GetImage() { return img; }
+    QSize GetSize() { return QSize(m_force_x, m_force_y); }
     virtual void Draw(QPainter *, int, int);
 
     const QString& GetImageFilename() const { return m_filename; }

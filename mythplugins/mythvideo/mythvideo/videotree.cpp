@@ -11,6 +11,7 @@
 #include "videolist.h"
 #include "metadata.h"
 #include "videoutils.h"
+#include "imagecache.h"
 
 class VideoTreeImp
 {
@@ -127,13 +128,22 @@ class VideoTreeImp
 
         if (!isDefaultCoverFile(item->CoverFile()))
         {
-            video_poster->SetImage(item->CoverFile());
+            QSize img_size = video_poster->GetSize();
+            const QPixmap *img = ImageCache::getImageCache()
+                    .load(item->CoverFile(), img_size.width(),
+                          img_size.height(), QImage::ScaleFree);
+            if (img)
+            {
+                video_poster->SetImage(*img);
+                if (!video_poster->isShown())
+                    video_poster->show();
+            }
         }
         else
         {
-            video_poster->SetImage("blank.png");
+            if (video_poster->isShown())
+                video_poster->hide();
         }
-        video_poster->LoadImage();
 
         checkedSetText(m_director, item->Director());
         checkedSetText(m_rating, getDisplayRating(item->Rating()));

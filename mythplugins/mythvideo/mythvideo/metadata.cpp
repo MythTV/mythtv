@@ -2,8 +2,6 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qregexp.h>
-#include <qpixmap.h>
-#include <qimage.h>
 
 #include <cmath>
 
@@ -33,7 +31,7 @@ class MetadataImp
              const QString &playcommand, const QString &category,
              const genre_list &genres,
              const country_list &countries) :
-        m_coverPixmap(NULL), m_title(title),
+        m_title(title),
         m_inetref(inetref), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries),
@@ -45,7 +43,7 @@ class MetadataImp
         VideoCategory::getCategory().get(m_categoryID, m_category);
     }
 
-    MetadataImp(MSqlQuery &query) : m_coverPixmap(NULL), m_has_sort_key(false)
+    MetadataImp(MSqlQuery &query) : m_has_sort_key(false)
     {
         fromDBRow(query);
     }
@@ -60,9 +58,6 @@ class MetadataImp
 
     MetadataImp &operator=(const MetadataImp &rhs)
     {
-        m_coverImage.reset();
-        m_coverPixmap = NULL;
-
         m_title = rhs.m_title;
         m_inetref = rhs.m_inetref;
         m_director = rhs.m_director;
@@ -92,12 +87,6 @@ class MetadataImp
     }
 
   public:
-    QImage *getCoverImage();
-
-    QPixmap *getCoverPixmap();
-    void setCoverPixmap(QPixmap *pix) { m_coverPixmap = pix; }
-    bool hasCoverPixmap() const { return m_coverPixmap; }
-
     bool hasSortKey() const { return m_has_sort_key; }
     const QString &getSortKey() const { return m_sort_key; }
     void setSortKey(const QString &sort_key)
@@ -215,9 +204,6 @@ class MetadataImp
     void saveToDatabase();
 
   private:
-    std::auto_ptr<QImage> m_coverImage;
-    QPixmap *m_coverPixmap;
-
     QString m_title;
     QString m_inetref;
     QString m_director;
@@ -561,33 +547,6 @@ void MetadataImp::updateCountries()
         country->first = VideoCountry::getCountry().add(country->second);
         VideoCountryMap::getCountryMap().add(m_id, country->first);
     }
-}
-
-QImage *MetadataImp::getCoverImage()
-{
-    if (!m_coverImage.get() && !isDefaultCoverFile(m_coverfile))
-    {
-        std::auto_ptr<QImage> image(new QImage());
-        if (image->load(m_coverfile))
-        {
-            m_coverImage = image;
-        }
-    }
-
-    return m_coverImage.get();
-}
-
-QPixmap *MetadataImp::getCoverPixmap()
-{
-    if (m_coverPixmap)
-        return m_coverPixmap;
-
-    if (m_coverfile)
-    {
-        m_coverPixmap = new QPixmap();
-        m_coverPixmap->load(m_coverfile);
-    }
-    return m_coverPixmap;
 }
 
 ////////////////////////////////////////
@@ -1056,26 +1015,6 @@ int Metadata::getCategoryID() const
 void Metadata::setCategoryID(int id)
 {
     m_imp->setCategoryID(id);
-}
-
-QPixmap *Metadata::getCoverPixmap()
-{
-    return m_imp->getCoverPixmap();
-}
-
-void Metadata::setCoverPixmap(QPixmap *pix)
-{
-    m_imp->setCoverPixmap(pix);
-}
-
-bool Metadata::haveCoverPixmap() const
-{
-    return m_imp->hasCoverPixmap();
-}
-
-QImage *Metadata::getCoverImage()
-{
-    return m_imp->getCoverImage();
 }
 
 void Metadata::dumpToDatabase()
