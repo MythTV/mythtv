@@ -12,7 +12,7 @@ INCLUDEPATH += $${PREFIX}/include/mythtv
 TEMPLATE = lib opengl
 CONFIG += plugin thread
 TARGET = mytharchive
-target.path = $${PREFIX}/lib/mythtv/plugins
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 ###############################################
