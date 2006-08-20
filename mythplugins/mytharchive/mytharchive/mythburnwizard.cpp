@@ -474,7 +474,9 @@ void MythburnWizard::loadEncoderProfiles()
 
     // find the encoding profiles
     QString filename = gContext->GetShareDir() + 
-            "mytharchive/encoder_profiles/ffmpeg_dvd_pal.xml";
+            "mytharchive/encoder_profiles/ffmpeg_dvd_" + 
+            ((gContext->GetSetting("MythArchiveVideoFormat", "pal").lower() == "ntsc") ? "ntsc" : "pal") +
+            ".xml";
     QDomDocument doc("mydocument");
     QFile file(filename);
     if (!file.open(IO_ReadOnly))
