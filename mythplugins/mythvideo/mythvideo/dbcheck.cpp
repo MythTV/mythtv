@@ -1,11 +1,13 @@
 #include <qstring.h>
+#include <qregexp.h>
+#include <qstringlist.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1009";
+const QString currentDatabaseVersion = "1010";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -17,26 +19,35 @@ static void UpdateDBVersionNumber(const QString &newnumber)
                          .arg(newnumber));
 }
 
-static void performActualUpdate(const QString updates[], QString version,
-                                QString &dbver)
+static void performActualUpdate(const QStringList &updates,
+                                const QString &version, QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_IMPORTANT, QString("Upgrading to MythVideo schema version ") +
             version);
 
-    int counter = 0;
-    QString thequery = updates[counter];
-
-    while (thequery != "")
+    for (QStringList::const_iterator p = updates.begin(); p != updates.end();
+         ++p)
     {
-        query.exec(thequery);
-        counter++;
-        thequery = updates[counter];
+        query.exec(*p);
     }
 
     UpdateDBVersionNumber(version);
     dbver = version;
+}
+
+static void performActualUpdate(const QString updates[], QString version,
+                                QString &dbver)
+{
+    QStringList upQuery;
+    for (int i = 0; ; ++i)
+    {
+        QString q = updates[i];
+        if (q == "") break;
+        upQuery.append(q);
+    }
+    performActualUpdate(upQuery, version, dbver);
 }
 
 static void InitializeDatabase(void)
@@ -82,17 +93,17 @@ static void InitializeDatabase(void)
     {
         const QString updates2[] = {
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
-"    VALUES (\"txt\", \"\", 1, 0);",
+"    VALUES ('txt', '', 1, 0);",
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
-"    VALUES (\"log\", \"\", 1, 0);",
+"    VALUES ('log', '', 1, 0);",
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
-"    VALUES (\"mpg\", \"\", 0, 1);",
+"    VALUES ('mpg', 'Internal', 0, 0);",
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
-"    VALUES (\"avi\", \"\", 0, 1);",
+"    VALUES ('avi', '', 0, 1);",
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
-"    VALUES (\"vob\", \"\", 0, 1);",
+"    VALUES ('vob', 'Internal', 0, 0);",
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
-"    VALUES (\"mpeg\", \"\", 0, 1);",
+"    VALUES ('mpeg', 'Internal', 0, 0);",
 ""
 };
         dbver = "";
@@ -180,9 +191,9 @@ void UpgradeVideoDatabaseSchema(void)
     {
         const QString updates[] = {
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) "
-"VALUES (\"VIDEO_TS\", \"mplayer -fs -zoom -quiet -vo xv -dvd-device %s dvd://1\", 0, 1);",
+"VALUES ('VIDEO_TS', 'Internal', 0, 0);",
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) "
-"VALUES (\"iso\", \"mplayer -fs -zoom -quiet -vo xv -dvd-device %s dvd://1\", 0, 1);",
+"VALUES ('iso', 'Internal', 0, 0);",
 ""
 };
 
@@ -225,5 +236,36 @@ void UpgradeVideoDatabaseSchema(void)
 };
 
         performActualUpdate(updates, "1009", dbver);
+    }
+
+    if (dbver == "1009")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec("SELECT extension, playcommand FROM videotypes");
+
+        QRegExp extChange("^(img|vob|mpeg|mpg|iso|VIDEO_TS)$", false);
+        QStringList updates;
+        if (query.isActive() && query.size())
+        {
+            while (query.next())
+            {
+                QString extension = query.value(0).toString();
+                QString playcommand = query.value(1).toString();
+                if (playcommand != "Internal" && extension.find(extChange) == 0)
+                {
+                    updates.append(QString(
+"UPDATE videotypes SET extension = '%1_old' WHERE extension = '%2';")
+                                   .arg(extension).arg(extension));
+                    updates.append(QString(
+"INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) VALUES "
+"('%3', 'Internal', 0, 0);").arg(extension));
+                }
+            }
+        }
+        updates.append(
+"INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) VALUES "
+"('img', 'Internal', 0, 0);");
+
+        performActualUpdate(updates, "1010", dbver);
     }
 }
