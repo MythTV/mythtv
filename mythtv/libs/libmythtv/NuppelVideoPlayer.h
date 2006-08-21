@@ -595,6 +595,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // General Caption/Teletext/Subtitle support
     uint     textDisplayMode;
+    uint     prevTextDisplayMode;
 
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)

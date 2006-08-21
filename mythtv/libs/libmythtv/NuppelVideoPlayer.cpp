@@ -180,6 +180,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
 
       // General Caption/Teletext/Subtitle support
       textDisplayMode(kDisplayNone),
+      prevTextDisplayMode(kDisplayNone),
       // Support for analog captions and teletext
       vbimode(VBIMode::None),       
       ttPageNum(0x888),             ccmode(CC_CC1),
@@ -1555,6 +1556,7 @@ void NuppelVideoPlayer::EnableTeletext(void)
         tt_view->SetPage(0x100, -1);
         oset->Display();
         osd->SetVisible(oset, 0);
+        prevTextDisplayMode = textDisplayMode;
         textDisplayMode = kDisplayTeletextMenu;
     }
 }
@@ -1569,8 +1571,14 @@ void NuppelVideoPlayer::DisableTeletext(void)
         tt_view->SetDisplaying(false);
     GetOSD()->HideSet("teletext");
 
-    textDisplayMode = kDisplayNone;
-    
+    /* If subtitles are enabled before the teletext menu was displayed, re-enabled them */
+    if (prevTextDisplayMode & kDisplayAllCaptions) {
+        textDisplayMode = prevTextDisplayMode;
+    }
+    else {
+        textDisplayMode = kDisplayNone;
+    }
+
 }
 
 void NuppelVideoPlayer::ResetTeletext(void)
