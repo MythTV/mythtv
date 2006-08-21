@@ -1,0 +1,73 @@
+firewire_tester is used to help determine which type of connection to 
+use with mythtv.  It can also help to stabilize a broadcast connection, 
+which is sometimes required after rebooting your backend host or set top 
+box (STB).
+
+Jim Westfall (jwestfall@surrealistic.net)
+
+$ ./firewire_tester 
+firewire_tester <action> -n <node> [-P <port>] [-v]
+ Actions: (one is required)
+    -b          - test broadcast connection
+    -p          - test p2p connection
+    -B          - attempt to fix/stabilize broadcast connection
+ Options
+    -n <node>   - firewire node, required
+    -P <port>   - firewire port, default 0
+    -v          - verbose
+
+There are 2 types of connections that can be used by mythtv to talk to 
+the STB to transfer mpeg2 data.  These are peer 2 peer (P2P) and 
+broadcast.  You will need to determine which works best with your STB.
+
+Best bet is to start with trying P2P.  First thing to do is change the 
+channel on your STB to a known non-encrypted channel, then run the 
+tester multiple times testing a P2P connection.  If they all come back 
+successful then have mythtv use P2P.  If you find that it fails, then 
+move onto testing broadcast.  Start by doing the -B action to attempt 
+fix/stabilize broadcast connection.  Once it has then test broadcast a 
+few more times with -b action.
+
+example STB on node 0 that works best with a broadcast connection.
+
+- test P2P connection a few times
+$ ./firewire_tester -p -n 0
+Action: Test P2P connection, node 0, channel 0
+P2P: Testing...Failed
+
+$ ./firewire_tester -p -n 0
+Action: Test P2P connection, node 0, channel 0
+P2P: Testing...Success, 37 packets received
+
+$ ./firewire_tester -p -n 0
+Action: Test P2P connection, node 0, channel 0
+P2P: Testing...Failed
+
+- 2 out of 3 failed, not good.
+- now use the -B option to try and fix/stabilize broadcast connection
+$ ./firewire_tester -B -n 0
+Action: Attempt to fix broadcast connection, node 0
+Broadcast: Testing...Failed
+P2P: Testing...Failed
+P2P: Testing...Success, 58 packets received
+Broadcast: Testing...Failed
+P2P: Testing...Failed
+P2P: Testing...Success, 48 packets received
+Broadcast: Testing...Success, 75 packets
+Broadcast: Testing...Success, 49 packets
+Broadcast: Testing...Success, 42 packets
+Broadcast: Testing...Success, 31 packets
+Broadcast: Testing...Success, 112 packets
+Broadcast Fix: Success
+
+- worked! do a few more broadcast connection tests
+$ ./firewire_tester -b -n 0
+Action: Test broadcast, node 0, channel 63
+Broadcast: Testing...Success, 61 packets
+
+$ ./firewire_tester -b -n 0
+Action: Test broadcast, node 0, channel 63
+Broadcast: Testing...Success, 68 packets
+
+- looks good, configure mythtv to use broadcast connection type.
+
