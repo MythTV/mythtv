@@ -391,6 +391,7 @@ ivtv_header="no"
 dvb="no"
 dvb_path="/usr/include"
 lirc="yes"
+appleremote="no"
 joystick_menu="yes"
 firewire_cable_box="yes"
 dbox2_dvb_box="yes"
@@ -740,6 +741,8 @@ v4l="no"
 ivtv="no"
 dvb="no"
 x11="no"
+lirc="no"
+appleremote="yes"
 joystick_menu="no"
 audio_oss="no"
 audio_alsa="no"
@@ -2616,6 +2619,7 @@ if test x"$frontend" = x"yes" ; then
   echo "# Input Support"
   echo "Joystick menu    $joystick_menu"
   echo "lirc support     $lirc"
+  echo "Apple Remote     $appleremote"
 fi
 
 if test x"$backend" = x"yes" ; then
@@ -3344,6 +3348,11 @@ fi
 if test x"$lirc" = x"yes" ; then
   CCONFIG="$CCONFIG using_lirc"
   echo "CONFIG_LIRC_LIBS=-llirc_client" >> $MYTH_CONFIG_MAK
+fi
+
+if test x"$appleremote" = x"yes" ; then
+  CCONFIG="$CCONFIG using_appleremote"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_APPLEREMOTE"
 fi
 
 if test "$joystick_menu" = "yes" ; then
