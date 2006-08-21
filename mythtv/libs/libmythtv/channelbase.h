@@ -185,6 +185,7 @@ class ChannelBase
     bool     commfree;
     uint     cardid;
     InputMap inputs;
+    DBChanList allchannels; ///< channels across all inputs
 
     int     currentProgramNum;
     uint    currentATSCMajorChannel;

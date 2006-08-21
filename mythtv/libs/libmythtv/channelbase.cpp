@@ -69,7 +69,7 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
     if (!chanid)
         chanid = ChannelUtil::GetChanID((*it)->sourceid, curchannelname);
 
-    return ChannelUtil::GetNextChannel((*it)->channels, chanid, direction);
+    return ChannelUtil::GetNextChannel(allchannels, chanid, direction);
 }
 
 uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
@@ -518,6 +518,8 @@ bool ChannelBase::InitializeInputs(void)
         return false;
     }
 
+    allchannels.clear();
+    QString order = gContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
         // If there is a childcardid use it instead of cardid
@@ -527,14 +529,18 @@ bool ChannelBase::InitializeInputs(void)
         uint sourceid = query.value(5).toUInt();
         DBChanList channels = ChannelUtil::GetChannels(sourceid, false);
 
-        QString order = gContext->GetSetting("ChannelOrdering", "channum");
         ChannelUtil::SortChannels(channels, order);
 
         inputs[query.value(0).toUInt()] = new InputBase(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
             sourceid, inputcardid, channels);
+
+        allchannels.insert(allchannels.end(),
+                           channels.begin(), channels.end());
     }
+    ChannelUtil::SortChannels(allchannels, order);
+    ChannelUtil::EliminateDuplicateChanNum(allchannels);
 
     // Set initial input to first connected input
     currentInputID = -1;

@@ -12,6 +12,7 @@ class NetworkInformationTable;
 class DBChannel
 {
   public:
+    DBChannel(const DBChannel&);
     DBChannel(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
               uint _favorite, bool _visible,
@@ -24,6 +25,9 @@ class DBChannel
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
 
+    const DBChannel& operator=(const DBChannel&);
+
+  public:
     QString channum;
     QString callsign;
     uint    chanid;
@@ -145,6 +149,7 @@ class ChannelUtil
     static DBChanList GetChannels(uint srcid, bool vis_only, QString grp="");
     static void    SortChannels(DBChanList &list, const QString &order,
                                 bool eliminate_duplicates = false);
+    static void    EliminateDuplicateChanNum(DBChanList &list);
 
     static uint    GetNextChannel(const DBChanList &sorted,
                                   uint old_chanid, int direction);

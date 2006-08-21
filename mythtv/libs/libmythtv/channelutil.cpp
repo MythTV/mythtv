@@ -3,6 +3,7 @@
 #include <algorithm>
 using namespace std;
 
+#include <qdeepcopy.h>
 #include <qregexp.h>
 #include <stdint.h>
 
@@ -14,8 +15,25 @@ using namespace std;
 #define LOC QString("ChanUtil: ")
 #define LOC_ERR QString("ChanUtil, Error: ")
 
-#define LOC QString("ChanUtil: ")
-#define LOC_ERR QString("ChanUtil, Error: ")
+DBChannel::DBChannel(const DBChannel &other)
+{
+    (*this) = other;
+}
+
+const DBChannel& DBChannel::operator=(const DBChannel &other)
+{
+    channum    = QDeepCopy<QString>(other.channum);
+    callsign   = QDeepCopy<QString>(other.callsign);
+    chanid     = other.chanid;
+    major_chan = other.major_chan;
+    minor_chan = other.minor_chan;
+    favorite   = other.favorite;
+    visible    = other.visible;
+    name       = QDeepCopy<QString>(other.name);
+    icon       = QDeepCopy<QString>(other.icon);
+
+    return *this;
+}
 
 static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
                               uint frequency,
@@ -1378,6 +1396,25 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
         }
 
         list = tmp;
+    }
+}
+
+void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
+{
+    QMap<QString,bool> seen;
+    DBChanList::iterator it = list.begin();
+    DBChanList::iterator it_next = it;
+    ++it_next;
+
+    while (it != list.end())
+    {
+        if (seen[(*it).channum])
+            list.erase(it);
+
+        seen[(*it).channum] = true;
+
+        it = it_next;
+        ++it_next;
     }
 }
 
