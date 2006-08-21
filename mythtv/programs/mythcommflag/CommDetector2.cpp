@@ -751,10 +751,13 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
         long long seglen = bb.data();
         long long sege = segb + seglen - 1;
 
-        marks[segb] = MARK_COMM_START;
-        marks[sege] = MARK_COMM_END;
+        if (segb < sege)
+        {
+            marks[segb] = MARK_COMM_START;
+            marks[sege] = MARK_COMM_END;
 
-        breakframes += seglen;
+            breakframes += seglen;
+        }
     }
 
     /* Report results. */
