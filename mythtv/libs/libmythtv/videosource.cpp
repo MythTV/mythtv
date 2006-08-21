@@ -614,7 +614,7 @@ class VBIDevice: public PathSetting, public CCSetting
         QDir dev("/dev/v4l", "vbi*", QDir::Name, QDir::System);
         if (!fillSelectionsFromDir(dev, card, driver))
         {
-            dev.setPath("/v4l");
+            dev.setPath("/dev");
             fillSelectionsFromDir(dev, card, driver);
         }
     }
