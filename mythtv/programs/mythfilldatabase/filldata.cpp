@@ -2823,6 +2823,8 @@ bool fillData(QValueList<Source> &sourcelist)
     MSqlQuery query(MSqlQuery::InitCon());
     QDateTime GuideDataBefore, GuideDataAfter;
     int failures = 0;
+    int externally_handled = 0;
+    int total_sources = sourcelist.size();
 
     query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
     if (query.isActive() && query.size() > 0)
@@ -3101,6 +3103,11 @@ bool fillData(QValueList<Source> &sourcelist)
         {
             VERBOSE(VB_IMPORTANT, "Source configured to use only the "
                     "broadcasted guide data. Skipping.");
+            externally_handled++;
+            query.exec(QString("UPDATE settings SET data ='%1' "
+                               "WHERE value='mythfilldatabaseLastRunStart' OR "
+                               "value = 'mythfilldatabaseLastRunEnd'")
+                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
         }
         else if (xmltv_grabber == "/bin/true" ||
                  xmltv_grabber == "none" ||
@@ -3108,6 +3115,11 @@ bool fillData(QValueList<Source> &sourcelist)
         {
             VERBOSE(VB_IMPORTANT,
                     "Source configured with no grabber. Nothing to do.");
+            externally_handled++;
+            query.exec(QString("UPDATE settings SET data ='%1' "
+                               "WHERE value='mythfilldatabaseLastRunStart' OR "
+                               "value = 'mythfilldatabaseLastRunEnd'")
+                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
         }
         else
         {
@@ -3137,7 +3149,8 @@ bool fillData(QValueList<Source> &sourcelist)
 
     if (failures == 0)
     {
-        if (GuideDataAfter == GuideDataBefore)
+        if ((GuideDataAfter == GuideDataBefore) &&
+            (total_sources != externally_handled))
             status = "mythfilldatabase ran, but did not insert "
                      "any new data into the Guide.  This can indicate a "
                      "potential grabber failure."; 
