@@ -112,21 +112,22 @@ void playDVD(void)
     //
     //  Get the command string to play a DVD
     //
-    
-    QString command_string = gContext->GetSetting("DVDPlayerCommand");
+
+    QString command_string = gContext->GetSetting("mythdvd.DVDPlayerCommand");
+//    , "Internal");
 
     gContext->addCurrentLocation("playdvd");
 
     if ( (command_string.find("internal", 0, false) > -1)||
          (command_string.length() < 1))
     {
-        QString filename = QString("dvd:/%1" ).arg(gContext->GetSetting("DVDDeviceLocation"));
+        QString filename = QString("dvd:/%1" )
+                .arg(gContext->GetSetting("DVDDeviceLocation"));
         command_string = "Internal";
         gContext->GetMainWindow()->HandleMedia(command_string, filename);
         gContext->removeCurrentLocation();
         return;
     }
-    
     else
     {
         if(command_string.contains("%d"))

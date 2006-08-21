@@ -76,10 +76,12 @@ DVDGeneralSettings::DVDGeneralSettings()
 
 static HostLineEdit *PlayerCommand()
 {
-    HostLineEdit *gc = new HostLineEdit("DVDPlayerCommand");
+    HostLineEdit *gc = new HostLineEdit("mythdvd.DVDPlayerCommand");
     gc->setLabel(QObject::tr("DVD Player Command"));
-    gc->setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
-    gc->setHelpText(QObject::tr("This can be any command to launch a DVD player "
+//    gc->setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
+    gc->setValue("Internal");
+    gc->setHelpText(
+        QObject::tr("This can be any command to launch a DVD player "
                     "(e.g. MPlayer, ogle, etc.). If present, %d will "
                     "be substituted for the DVD device (e.g. /dev/dvd)."));
     return gc;
