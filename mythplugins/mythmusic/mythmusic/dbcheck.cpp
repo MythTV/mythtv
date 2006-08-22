@@ -434,12 +434,14 @@ void UpgradeMusicDatabaseSchema(void)
 "  SET hostname=''"
 "  WHERE playlist_name='default_playlist_storage'"
 "    OR playlist_name='backup_playlist_storage';",
-//"DROP TABLE musicmetadata;",
-//"DROP TABLE musicplaylist;",
-//RENAME TABLE music_smartplaylists TO smartplaylist;RENAME TABLE music_smartplaylist_categories TO smartplaylistcategory;RENAME TABLE music_smartplaylist_items TO smartplaylistitem; DROP TABLE music_albums; DROP TABLE music_artists; DROP TABLE music_genres; DROP TABLE music_playlists; DROP TABLE music_songs; DROP TABLE music_stats;UPDATE settings SET data=1005 WHERE value='MusicDBSchemaVer';
 ""
 };
         performActualUpdate(updates, "1006", dbver);
     }
+
+/* in 0.21 */
+//"DROP TABLE musicmetadata;",
+//"DROP TABLE musicplaylist;",
+
 }
 
