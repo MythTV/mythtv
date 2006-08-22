@@ -41,7 +41,7 @@ class ExitToMainMenuEvent : public QCustomEvent
 #define REG_MEDIA_HANDLER(a, b, c, d, e, f) GetMythMainWindow()->RegisterMediaHandler(a, b, c, d, e, f)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
-typedef  int (*MediaPlayCallback)(const char*,  const char*, const char*, const char*, int, const char*);
+typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, int, const QString &);
 
 class MythMainWindowPrivate;
 

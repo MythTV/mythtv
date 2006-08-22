@@ -557,19 +557,19 @@ QString RandTheme(QString &themename)
     return themename;
 }
 
-int internal_play_media(const char *mrl, const char* plot, const char* title, 
-                        const char* director, int lenMins, const char* year) 
+int internal_play_media(const QString &mrl, const QString &plot, 
+                        const QString &title, const QString &director, 
+                        int lenMins, const QString &year) 
 {
     int res = -1; 
   
-    QString filename = QString(mrl);
-    QFile checkFile(filename);
-    if (!checkFile.exists() && !filename.startsWith("dvd:"))
+    QFile checkFile(mrl);
+    if (!checkFile.exists() && !mrl.startsWith("dvd:"))
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
                                         "Check if the video exists")
-                                        .arg(filename.section("/", -1))
-                                        .arg(filename.section("/", 0, -2));
+                                        .arg(mrl.section("/", -1))
+                                        .arg(mrl.section("/", 0, -2));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                     "Open Failed",
                                     errorText);
@@ -594,9 +594,9 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     pginfo->isVideo = true;
     pginfo->pathname = mrl;
     
-    QDir d(filename + "/VIDEO_TS");
-    if (filename.findRev(".iso", -1, false) == (int)filename.length() - 4 ||
-        filename.findRev(".img", -1, false) == (int)filename.length() - 4 ||
+    QDir d(mrl + "/VIDEO_TS");
+    if (mrl.findRev(".iso", -1, false) == (int)mrl.length() - 4 ||
+        mrl.findRev(".img", -1, false) == (int)mrl.length() - 4 ||
         d.exists())
     {
         pginfo->pathname = QString("dvd:%1").arg(mrl);
@@ -604,16 +604,13 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     
     pginfo->description = plot;
     
-    
     if (strlen(director))
         pginfo->subtitle = QString( "%1: %2" ).arg(QObject::tr("Directed By")).arg(director);
     
     pginfo->title = title;
 
-        
     if (tv->Playback(pginfo))
     {
-        
         while (tv->GetState() != kState_None)
         {
             qApp->unlock();
@@ -624,7 +621,6 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
         }
     }
     
-
     res = 0;
     
     sleep(1);
