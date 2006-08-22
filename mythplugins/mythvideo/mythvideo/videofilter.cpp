@@ -1,10 +1,8 @@
 /*
-    editmetadata.cpp
+    videofilter.cpp
     (c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
     Part of the mythTV project
 */
-
-#include <set>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
@@ -16,6 +14,8 @@
 #include "metadata.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
+
+#include <set>
 
 enum GenreFilter {
     kGenreFilterAll = -1,

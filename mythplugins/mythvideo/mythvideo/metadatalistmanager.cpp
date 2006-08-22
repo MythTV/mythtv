@@ -1,11 +1,11 @@
-#include <list>
-#include <map>
-
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
 #include "metadata.h"
 #include "metadatalistmanager.h"
+
+#include <list>
+#include <map>
 
 class MetadataListManagerImp
 {

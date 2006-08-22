@@ -1,11 +1,11 @@
-#include <vector>
-#include <map>
-
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythcontext.h>
 
 #include "dbaccess.h"
 #include "cleanup.h"
+
+#include <vector>
+#include <map>
 
 namespace
 {

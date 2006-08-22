@@ -1,9 +1,9 @@
 #ifndef VIDEOMANAGER_H_
 #define VIDEOMANAGER_H_
 
-#include <memory>
-
 #include <mythtv/mythdialogs.h>
+
+#include <memory>
 
 namespace
 {
