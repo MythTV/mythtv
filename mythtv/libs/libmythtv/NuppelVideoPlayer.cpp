@@ -1285,7 +1285,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         videobuf_retries = 0;
     }
 
-    if (framesPlayed < 5 && play_speed > 1)
+    if (framesPlayed < 5 && play_speed > 1 && ringBuffer->isDVD())
         next_play_speed = 1;
 
     // Decode the correct frame
