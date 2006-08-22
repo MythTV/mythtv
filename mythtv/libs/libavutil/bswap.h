@@ -138,11 +138,11 @@ static inline double bswap_dbl(double x)
     union {
         uint32_t l[2];
         double   d;
-    } t;
-    t.d = x;
-    t.l[0] = bswap_32(t.l[1]);
-    t.l[1] = bswap_32(t.l[0]);
-    return t.d;
+    } w, r;
+    w.d = x;
+    r.l[0] = bswap_32(w.l[1]);
+    r.l[1] = bswap_32(w.l[0]);
+    return w.d;
 }
 
 // be2me ... BigEndian to MachineEndian
