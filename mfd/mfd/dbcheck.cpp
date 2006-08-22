@@ -9,7 +9,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1005";
+const QString currentDatabaseVersion = "1006";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -323,5 +323,125 @@ void UpgradeMusicDatabaseSchema(void)
 
         performActualUpdate(updates, "1005", dbver);
     }
+
+
+        if (dbver == "1005")
+        {
+            const QString updates[] = {
+"CREATE TABLE music_albums ("
+"    album_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
+"    artist_id int(11) unsigned NOT NULL default '0',"
+"    album_name varchar(255) NOT NULL default '',"
+"    year smallint(6) NOT NULL default '0',"
+"    compilation tinyint(1) unsigned NOT NULL default '0',"
+"    INDEX idx_album_name(album_name)"
+");",
+"CREATE TABLE music_artists ("
+"    artist_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
+"    artist_name varchar(255) NOT NULL default '',"
+"    INDEX idx_artist_name(artist_name)"
+");",
+"CREATE TABLE music_genres ("
+"    genre_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
+"    genre varchar(25) NOT NULL default '',"
+"    INDEX idx_genre(genre)"
+");",
+"CREATE TABLE music_playlists ("
+"    playlist_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
+"    playlist_name varchar(255) NOT NULL default '',"
+"    playlist_songs text NOT NULL default '',"
+"    last_accessed timestamp NOT NULL,"
+"    length int(11) unsigned NOT NULL default '0',"
+"    songcount smallint(8) unsigned NOT NULL default '0',"
+"    hostname VARCHAR(255) NOT NULL default ''"
+");",
+"CREATE TABLE music_songs ("
+"    song_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
+"    filename text NOT NULL default '',"
+"    name varchar(255) NOT NULL default '',"
+"    track smallint(6) unsigned NOT NULL default '0',"
+"    artist_id int(11) unsigned NOT NULL default '0',"
+"    album_id int(11) unsigned NOT NULL default '0',"
+"    genre_id int(11) unsigned NOT NULL default '0',"
+"    year smallint(6) NOT NULL default '0',"
+"    length int(11) unsigned NOT NULL default '0',"
+"    numplays int(11) unsigned NOT NULL default '0',"
+"    rating tinyint(4) unsigned NOT NULL default '0',"
+"    lastplay timestamp NOT NULL,"
+"    date_entered datetime default NULL,"
+"    date_modified datetime default NULL,"
+"    format varchar(4) NOT NULL default '0',"
+"    mythdigest VARCHAR(255),"
+"    size BIGINT(20) unsigned,"
+"    description VARCHAR(255),"
+"    comment VARCHAR(255),"
+"    disc_count SMALLINT(5) UNSIGNED DEFAULT '0',"
+"    disc_number SMALLINT(5) UNSIGNED DEFAULT '0',"
+"    track_count SMALLINT(5) UNSIGNED DEFAULT '0',"
+"    start_time INT(10) UNSIGNED DEFAULT '0',"
+"    stop_time INT(10) UNSIGNED,"
+"    eq_preset VARCHAR(255),"
+"    relative_volume TINYINT DEFAULT '0',"
+"    sample_rate INT(10) UNSIGNED DEFAULT '0',"
+"    bitrate INT(10) UNSIGNED DEFAULT '0',"
+"    bpm SMALLINT(5) UNSIGNED,"
+"    INDEX idx_name(name),"
+"    INDEX idx_mythdigest(mythdigest)"
+");",
+"CREATE TABLE music_stats ("
+"    num_artists smallint(5) unsigned NOT NULL default '0',"
+"    num_albums smallint(5) unsigned NOT NULL default '0',"
+"    num_songs mediumint(8) unsigned NOT NULL default '0',"
+"    num_genres tinyint(3) unsigned NOT NULL default '0',"
+"    total_time varchar(12) NOT NULL default '0',"
+"    total_size varchar(10) NOT NULL default '0'"
+");",
+"RENAME TABLE smartplaylist TO music_smartplaylists;",
+"RENAME TABLE smartplaylistitem TO music_smartplaylist_items;",
+"RENAME TABLE smartplaylistcategory TO music_smartplaylist_categories;",
+// Run necessary SQL to migrate the table structure
+"CREATE TEMPORARY TABLE tmp_artists"
+"  SELECT DISTINCT artist FROM musicmetadata;",
+"INSERT INTO tmp_artists"
+"  SELECT DISTINCT compilation_artist"
+"  FROM musicmetadata"
+"  WHERE compilation_artist<>artist;",
+"INSERT INTO music_artists (artist_name) SELECT DISTINCT artist FROM tmp_artists;",
+"INSERT INTO music_albums (artist_id, album_name, year, compilation) "
+"  SELECT artist_id, album, ROUND(AVG(year)) AS year, IF(SUM(compilation),1,0) AS compilation"
+"  FROM musicmetadata"
+"  LEFT JOIN music_artists ON compilation_artist=artist_name"
+"  GROUP BY artist_id, album;",
+"INSERT INTO music_genres (genre) SELECT DISTINCT genre FROM musicmetadata;",
+"INSERT INTO music_songs "
+"   (song_id, artist_id, album_id, genre_id, year, lastplay,"
+"    date_entered, date_modified, name, track, length, size, numplays,"
+"    rating, filename)"
+"  SELECT intid, ma.artist_id, mb.album_id, mg.genre_id, mmd.year, lastplay,"
+"         date_added, date_modified, title, tracknum, length, IFNULL(size,0), playcount,"
+"         rating, filename"
+"  FROM musicmetadata AS mmd"
+"  LEFT JOIN music_artists AS ma ON mmd.artist=ma.artist_name"
+"  LEFT JOIN music_artists AS mc ON mmd.compilation_artist=mc.artist_name"
+"  LEFT JOIN music_albums AS mb ON mmd.album=mb.album_name AND mc.artist_id=mb.artist_id"
+"  LEFT JOIN music_genres AS mg ON mmd.genre=mg.genre;",
+"INSERT INTO music_playlists"
+"  (playlist_id,playlist_name,playlist_songs,hostname)"
+"  SELECT playlistid, name, songlist, hostname"
+"  FROM musicplaylist;",
+// Set all playlists to be global by killing the hostname
+"UPDATE music_playlists"
+"  SET hostname=''"
+"  WHERE playlist_name='default_playlist_storage'"
+"    OR playlist_name='backup_playlist_storage';",
+""
+};
+        performActualUpdate(updates, "1006", dbver);
+    }
+
+/* in 0.21 */
+//"DROP TABLE musicmetadata;",
+//"DROP TABLE musicplaylist;",
+
 }
 

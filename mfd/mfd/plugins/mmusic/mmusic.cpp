@@ -77,7 +77,7 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     //  This is a "magic" number signifying what we want to see
     //
     
-    desired_database_version = "1005";
+    desired_database_version = "1006";
 
     //
     //  Initialize our container and set things up for a clean slate
@@ -526,7 +526,7 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
     
     MSqlQuery query(MSqlQuery::InitCon());
     
-    query.exec("SELECT intid, filename FROM musicmetadata ;");
+    query.exec("SELECT song_id, filename FROM music_songs ;");
     
     if(query.isActive())
     {
@@ -544,7 +544,7 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
 
                     ++count;
                     MSqlQuery delete_query(MSqlQuery::InitCon());
-                    delete_query.prepare("DELETE FROM musicmetadata WHERE intid = ?");
+                    delete_query.prepare("DELETE FROM music_songs WHERE song_id = ?");
                     delete_query.bindValue(0, query.value(0).toUInt());
                     delete_query.exec();
                     log(QString("removed item %1 (\"%2\") from the database")
@@ -556,7 +556,7 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
     }
     else
     {
-        warning("something wrong with your musicmetadata table");
+        warning("something wrong with your music_songs table");
     }
     
     if(count > 0)
@@ -638,26 +638,26 @@ bool MMusicWatcher::checkDataSources(const QString &startdir)
     
     MSqlQuery query(MSqlQuery::InitCon());
     
-    query.exec("SELECT COUNT(filename) FROM musicmetadata;");
+    query.exec("SELECT COUNT(filename) FROM music_songs;");
     
     if(!query.isActive())
     {
         if(!sent_musicmetadata_table_warning)
         {
-            warning("cannot get data from a table called musicmetadata");
+            warning("cannot get data from a table called music_songs");
             sent_musicmetadata_table_warning = true;
         }
         return false;
         
     }
     
-    query.exec("SELECT COUNT(playlistid) FROM musicplaylist ");
+    query.exec("SELECT COUNT(playlist_id) FROM music_saved_playlists ");
 
     if(!query.isActive())
     {
         if(!sent_playlist_table_warning)
         {
-            warning("cannot get data from a table called musisplaylist");
+            warning("cannot get data from a table called music_saved_playlists");
             sent_playlist_table_warning = true;
         }
         return false;
@@ -977,17 +977,30 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT intid, artist, album, title, genre, "
-                  "year, tracknum, length, rating, "
-                  "lastplay, playcount, mythdigest, size, date_added, "
-                  "date_modified, format, description, comment, "
-                  "compilation, composer, disc_count, disc_number, "
-                  "track_count, start_time, stop_time, eq_preset, "
-                  "relative_volume, sample_rate, bpm "
-                  "FROM musicmetadata WHERE filename = ? ;");
+    query.prepare("SELECT music_songs.song_id, music_artists.artist_name, "
+		  "music_albums.album_name, music_songs.name, "
+		  "music_genres.genre, music_songs.year, "
+		  "music_songs.track, music_songs.length, "
+		  "music_songs.rating, music_songs.lastplay, "
+		  "music_songs.numplays, music_songs.mythdigest,"
+		  "music_songs.size, music_songs.date_entered, "
+		  "music_songs.date_modified, music_songs.format, "
+		  "music_songs.description, music_songs.comment, "
+		  "music_songs.compilation, music_comp_artists.artist_name AS composer, "
+		  "music_songs.disc_count, music_songs.disc_number, "
+		  "music_songs.track_count, music_songs.start_time, "
+		  "music_songs.stop_time, music_songs.eq_preset, "
+		  "music_songs.relative_volume, music_songs.bitrate, "
+		  "music_songs.bpm "
+		  "FROM music_songs "
+		  "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id " 
+		  "LEFT JOIN music_artists AS music_comp_artists ON music_songs.compilationartist_id=music_comp_artists.artist_id " 
+		  "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id " 
+		  "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id " 
+		  "WHERE filename = ? ;");
 
     query.bindValue(0, sqlfilename.utf8());
-    
+
     query.exec();
 
     if (query.isActive())
@@ -1198,7 +1211,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         
         MSqlQuery query(MSqlQuery::InitCon());
 
-        query.prepare("INSERT INTO musicmetadata (filename, mythdigest) "
+        query.prepare("INSERT INTO music_songs(filename, mythdigest) "
                       "values ( ? , ?)");
 
         query.bindValue(0, sqlfilename.utf8());
@@ -1213,7 +1226,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
             return NULL;
         }
         
-        query.prepare("SELECT intid FROM musicmetadata "
+        query.prepare("SELECT song_id FROM music_songs "
                                "WHERE mythdigest = ? ;");
         query.bindValue(0, new_item->getMythDigest());
         query.exec();
@@ -1322,26 +1335,140 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("UPDATE musicmetadata SET "
-                  "title = ? , "
-                  "artist = ? , "
-                  "album = ? , "
-                  "genre = ? , "
+
+//Genrecheck
+//Albumcheck
+//Artist
+    int ArtistID;
+    query.prepare("SELECT music_artists.artist_id FROM music_artists "
+                  " WHERE (((music_artists.artist_name)=:ARTIST));");
+    query.bindValue(":ARTIST", an_item->getArtist().utf8());
+    query.exec();
+//    cout << query.executedQuery() << endl;
+    if (query.size() > 0)
+	{
+	query.next();
+        ArtistID = query.value(0).toInt();
+	}
+    else
+	{
+	query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+	query.bindValue(":ARTIST", an_item->getArtist().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+	query.prepare("SELECT music_artists.artist_id FROM music_artists "
+                  " WHERE (((music_artists.artist_name)=:ARTIST));");
+	query.bindValue(":ARTIST", an_item->getArtist().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+	query.next();
+        ArtistID = query.value(0).toInt();	
+	}
+
+//Compilation Artist	
+    int CoArtistID;
+    query.prepare("SELECT music_artists.artist_id FROM music_artists "
+                  " WHERE (((music_artists.artist_name)=:ARTIST));");
+    query.bindValue(":ARTIST", an_item->getComposer().utf8());
+    query.exec();
+//    cout << query.executedQuery() << endl;
+    if (query.size() > 0)
+	{
+	query.next();
+        CoArtistID = query.value(0).toInt();
+	}
+    else
+	{
+	query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+	query.bindValue(":ARTIST", an_item->getComposer().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+	query.prepare("SELECT music_artists.artist_id FROM music_artists "
+                  " WHERE (((music_artists.artist_name)=:ARTIST));");
+	query.bindValue(":ARTIST", an_item->getComposer().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+	query.next();
+        CoArtistID = query.value(0).toInt();	
+	}
+
+//Album
+    int AlbumID;
+    query.prepare("SELECT music_albums.album_id FROM music_albums "
+                  " WHERE (((music_albums.album_name)=:ALBUM));");
+    query.bindValue(":ALBUM", an_item->getAlbum().utf8());
+    query.exec();
+//    cout << query.executedQuery() << endl;
+    if (query.size() > 0)
+	{
+	query.next();
+        AlbumID = query.value(0).toInt();
+	}
+    else
+	{
+	query.prepare("INSERT INTO music_albums (album_name) VALUES (:ALBUM);");
+	query.bindValue(":ALBUM", an_item->getAlbum().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+        
+	query.prepare("SELECT music_albums.album_id FROM music_albums "
+                  " WHERE (((music_albums.album_name)=:ALBUM));");
+	query.bindValue(":ALBUM", an_item->getAlbum().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+	query.next();
+
+        AlbumID = query.value(0).toInt();	
+	}
+
+//Genres
+    int GenreID;
+    query.prepare("SELECT music_genres.genre_id FROM music_genres "
+                  " WHERE (((music_genres.genre)=:GENRE));");
+    query.bindValue(":GENRE", an_item->getGenre().utf8());
+    query.exec();
+//    cout << query.executedQuery() << endl;
+    if (query.size() > 0)
+	{
+	query.next();
+        GenreID = query.value(0).toInt();
+	}
+    else
+	{
+	query.prepare("INSERT INTO music_genres (genre) VALUES (:GENRE);");
+	query.bindValue(":GENRE", an_item->getGenre().utf8());
+	query.exec();
+//        cout << query.executedQuery() << endl;
+        
+        query.prepare("SELECT music_genres.genre_id FROM music_genres "
+                  " WHERE (((music_genres.genre)=:GENRE));");
+	query.bindValue(":GENRE", an_item->getGenre().utf8());
+	query.exec();
+//	cout << query.executedQuery() << endl;
+	query.next();
+        GenreID = query.value(0).toInt();	
+	}
+
+    query.prepare("UPDATE music_songs SET "
+                  "name = ? , "
+                  "artist_id = ? , "
+                  "album_id = ? , "
+                  "genre_id = ? , "
                   "year = ? , "
-                  "tracknum = ? , "
+                  "track = ? , "
                   "length = ? , "
                   "rating = ? , "
                   "lastplay = ? , "
-                  "playcount = ? , "
+                  "numplays = ? , "
                   "mythdigest = ? , "
                   "size = ? , "
-                  "date_added = ? , "
+                  "date_entered = ? , "
                   "date_modified = ? , "
                   "format = ? , "
                   "description = ? , "
                   "comment = ? , "
                   "compilation = ? , "
-                  "composer = ? , "
+                  "compilationartist_id = ? , "
                   "disc_count = ? , "
                   "disc_number = ? , "
                   "track_count = ? , "
@@ -1349,14 +1476,14 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
                   "stop_time = ? , "
                   "eq_preset = ? , "
                   "relative_volume = ? , "
-                  "sample_rate = ? , "
+                  "bitrate = ? , "
                   "bpm = ?  "
-                  "WHERE intid = ? ;");
+                  "WHERE song_id = ? ;");
 
     query.bindValue(0,  an_item->getTitle().utf8());
-    query.bindValue(1,  an_item->getArtist().utf8());
-    query.bindValue(2,  an_item->getAlbum().utf8());
-    query.bindValue(3,  an_item->getGenre().utf8());
+    query.bindValue(1,  ArtistID);
+    query.bindValue(2,  AlbumID);
+    query.bindValue(3,  GenreID);
     query.bindValue(4,  an_item->getYear());
     query.bindValue(5,  an_item->getTrack());
     query.bindValue(6,  an_item->getLength());
@@ -1371,7 +1498,7 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     query.bindValue(15, an_item->getDescription().utf8());
     query.bindValue(16, an_item->getComment().utf8());
     query.bindValue(17, an_item->getCompilation());
-    query.bindValue(18, an_item->getComposer().utf8());
+    query.bindValue(18, CoArtistID);
     query.bindValue(19, an_item->getDiscCount());
     query.bindValue(20, an_item->getDiscNumber());
     query.bindValue(21, an_item->getTrackCount());
@@ -1467,14 +1594,12 @@ void MMusicWatcher::loadPlaylists()
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT name, songlist, playlistid FROM musicplaylist "
-                  "WHERE name != ? "
-                  "AND name != ? "
-                  "AND hostname = ? ;");
+    query.prepare("SELECT playlist_name, playlist_songs, playlist_id FROM music_saved_playlists "
+                  "WHERE playlist_name != ? "
+                  "AND playlist_name != ? ;");
         
     query.bindValue(0, "backup_playlist_storage");
     query.bindValue(1, "default_playlist_storage");
-    query.bindValue(2, hostname);
         
     query.exec();
 
@@ -1617,12 +1742,31 @@ void MMusicWatcher::persistPlaylist(Playlist *a_playlist)
     
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("UPDATE musicplaylist SET songlist = ?, name = ? WHERE "
-                  "playlistid = ? ;");
+    int songcount = 0, playtime = 0, an_int;
+    QStringList list = QStringList::split(",", db_song_list_string);
+    QStringList::iterator it = list.begin();
+    for (; it != list.end(); it++)
+    {
+        an_int = QString(*it).toInt();
+        if (an_int != 0)
+        {
+	    songcount++;
+	    query.prepare("SELECT length FROM music_songs WHERE song_id = :ID ;");
+    	    query.bindValue(":ID", an_int);
+    	    query.exec();
+	    query.next();
+	    playtime += query.value(0).toInt();
+	}
+    }
+
+    query.prepare("UPDATE music_saved_playlists SET playlist_songs = ?, playlist_name = ? WHERE "
+                  "playlist_id = ?, songcount = ?, time = ? ;");
 
     query.bindValue(0, db_song_list_string);
     query.bindValue(1, a_playlist->getName().utf8());
     query.bindValue(2, a_playlist->getDbId());
+    query.bindValue(3, songcount);
+    query.bindValue(4, playtime);
         
     query.exec();
     
@@ -1665,11 +1809,30 @@ void MMusicWatcher::createPlaylistInDb(Playlist *a_playlist)
     
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("INSERT INTO musicplaylist (name, hostname, songlist) values (?, ?, ?) ; ");
+    int songcount = 0, playtime = 0, an_int;
+    QStringList list = QStringList::split(",", db_song_list_string);
+    QStringList::iterator it = list.begin();
+    for (; it != list.end(); it++)
+    {
+        an_int = QString(*it).toInt();
+        if (an_int != 0)
+        {
+	    songcount++;
+	    query.prepare("SELECT length FROM music_songs WHERE song_id = :ID ;");
+    	    query.bindValue(":ID", an_int);
+    	    query.exec();
+	    query.next();
+	    playtime += query.value(0).toInt();
+	}
+    }
+
+    query.prepare("INSERT INTO music_saved_playlists (playlist_name, hostname, playlist_songs, songcount, time) values (?, ?, ?, ?, ?) ; ");
 
     query.bindValue(0, a_playlist->getName().utf8());
     query.bindValue(1, hostname);
     query.bindValue(2, db_song_list_string);
+    query.bindValue(3, songcount);
+    query.bindValue(4, playtime);
         
     query.exec();
     
@@ -1681,11 +1844,20 @@ void MMusicWatcher::createPlaylistInDb(Playlist *a_playlist)
         return;
     }
     
-    query.prepare("SELECT playlistid FROM musicplaylist WHERE name = ? AND hostname = ? AND songlist = ? ; ");
+    if (a_playlist->getName() == "default_playlist_storage" || a_playlist->getName() == "backup_playlist_storage")
+	{
+	query.prepare("SELECT playlist_id FROM music_saved_playlists WHERE playlist_name = ? AND hostname = ? AND playlist_songs = ? ; ");
+	query.bindValue(0, a_playlist->getName().utf8());
+	query.bindValue(1, hostname);
+	query.bindValue(2, db_song_list_string);
+	}
+    else
+	{
+	query.prepare("SELECT playlist_id FROM music_saved_playlists WHERE playlist_name = ? AND playlist_songs = ? ; ");
+	query.bindValue(0, a_playlist->getName().utf8());
+	query.bindValue(1, db_song_list_string);
+	}
 
-    query.bindValue(0, a_playlist->getName().utf8());
-    query.bindValue(1, hostname);
-    query.bindValue(2, db_song_list_string);
 
     query.exec();
 
@@ -1776,7 +1948,7 @@ void MMusicWatcher::deletePlaylist(int a_playlist_id)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("DELETE FROM musicplaylist WHERE playlistid = ? ; ");
+    query.prepare("DELETE FROM music_saved_playlists WHERE playlist_id = ? ; ");
 
     query.bindValue(0, playlist_database_id);
         
