@@ -14,6 +14,7 @@ using namespace std;
 
 
 #include "videoout_accel_utils.h"
+#undef ABS
 #include "avcodec.h"
 #include "dvdv.h"
 #include "videoout_accel_private.h"
