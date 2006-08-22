@@ -432,6 +432,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void DoPlay(void);
     bool DoFastForward(void);
     bool DoRewind(void);
+    void DoChangeDVDTrack(void);
 
     // Private seeking stuff
     void ClearAfterSeek(bool clearvideobuffers = true);
@@ -764,6 +765,7 @@ class NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // DVD
     bool indvdstillframe;
     bool hidedvdbutton;
+    int need_change_dvd_track;
 
     // Debugging variables
     Jitterometer *output_jmeter;

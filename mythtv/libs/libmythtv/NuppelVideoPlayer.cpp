@@ -254,6 +254,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       isDummy(false),               
       // DVD stuff
       indvdstillframe(false), hidedvdbutton(true),
+      need_change_dvd_track(0),
       // Debugging variables
       output_jmeter(NULL)
 {
@@ -3248,7 +3249,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                     GetFrame(audioOutput == NULL || !normal_speed);
                     resetvideo = true;
                     while (resetvideo)
-                        usleep(50);
+                        usleep(1000);
                 }
                 rewindtime = 0;
             }
@@ -3262,9 +3263,18 @@ void NuppelVideoPlayer::StartPlaying(void)
                     GetFrame(audioOutput == NULL || !normal_speed);
                     resetvideo = true;
                     while (resetvideo)
-                        usleep(50);
+                        usleep(1000);
                 }
                 fftime = 0;
+            }
+            else if (need_change_dvd_track)
+            {
+                DoChangeDVDTrack();
+                GetFrame(audioOutput == NULL || !normal_speed);
+                resetvideo = true;
+                while (resetvideo)
+                    usleep(1000);
+                need_change_dvd_track = 0;
             }
             else if (livetvchain && livetvchain->NeedsToJump())
             {
@@ -3273,7 +3283,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 GetFrame(audioOutput == NULL || !normal_speed);
                 resetvideo = true;
                 while (resetvideo)
-                    usleep(50);
+                    usleep(1000);
             }
             else
             {
@@ -3295,7 +3305,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
                 UnpauseVideo();
                 while (GetVideoPause())
-                    usleep(50);
+                    usleep(1000);
             }
             rewindtime = 0;
         }
@@ -3316,10 +3326,23 @@ void NuppelVideoPlayer::StartPlaying(void)
 
                 UnpauseVideo();
                 while (GetVideoPause())
-                    usleep(50);
+                    usleep(1000);
             }
 
             fftime = 0;
+        }
+
+        if (need_change_dvd_track)
+        {
+            PauseVideo();
+
+            DoChangeDVDTrack();
+
+            UnpauseVideo();
+            while (GetVideoPause())
+                usleep(1000);
+
+            need_change_dvd_track = 0;
         }
 
         if (skipcommercials != 0 && ffrew_skip == 1)
@@ -3329,7 +3352,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             DoSkipCommercials(skipcommercials);
             UnpauseVideo();
             while (GetVideoPause())
-                usleep(50);
+                usleep(1000);
 
             skipcommercials = 0;
             continue;
@@ -3360,7 +3383,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 JumpToFrame(deleteIter.key());
                 UnpauseVideo();
                 while (GetVideoPause())
-                    usleep(50);
+                    usleep(1000);
             }
         }
     }
@@ -4157,7 +4180,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
     editmode = true;
     Pause();
     while (!GetPause())
-        usleep(50);
+        usleep(1000);
 
     seekamount = keyframedist;
     seekamountpos = 3;
@@ -4267,7 +4290,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             {
                 rewindtime = seekamount;
                 while (rewindtime != 0)
-                    usleep(50);
+                    usleep(1000);
                 UpdateEditSlider();
             }
             else
@@ -4280,7 +4303,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             {
                 fftime = seekamount;
                 while (fftime != 0)
-                    usleep(50);
+                    usleep(1000);
                 UpdateEditSlider();
             }
             else
@@ -4363,7 +4386,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                 rewindtime = fps * FFREW_MULTICOUNT / 2;
             }
             while (rewindtime != 0)
-                usleep(50);
+                usleep(1000);
             UpdateEditSlider();
             UpdateTimeDisplay();
         }
@@ -4377,7 +4400,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                 fftime = fps * FFREW_MULTICOUNT / 2;
             }
             while (fftime != 0)
-                usleep(50);
+                usleep(1000);
             UpdateEditSlider();
             UpdateTimeDisplay();
         }
@@ -4675,7 +4698,7 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
 
             fftime = framenum - framesPlayed;
             while (fftime > 0)
-                usleep(50);
+                usleep(1000);
         }
         else
         {
@@ -4690,7 +4713,7 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
 
             rewindtime = framesPlayed - framenum;
             while (rewindtime > 0)
-                usleep(50);
+                usleep(1000);
         }
     }
     else
@@ -4705,14 +4728,14 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
             GetDecoder()->setExactSeeks(false);
             fftime = (long long)(editKeyFrameDist * 1.1);
             while (fftime > 0)
-                usleep(50);
+                usleep(1000);
         }
         else
         {
             GetDecoder()->setExactSeeks(false);
             rewindtime = 2;
             while (rewindtime > 0)
-                usleep(50);
+                usleep(1000);
         }
     }
 
@@ -5505,7 +5528,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                         (int)(commrewindamount * video_frame_rate));
                     UnpauseVideo();
                     while (GetVideoPause())
-                        usleep(50);
+                        usleep(1000);
 
                     GetFrame(1, true);
                 }
@@ -6261,8 +6284,13 @@ void NuppelVideoPlayer::ChangeDVDTrack(bool ffw)
     if (!ringBuffer->isDVD())
        return;
 
-    GetDecoder()->ChangeDVDTrack(ffw);
-    ClearAfterSeek();
+    need_change_dvd_track = (ffw ? 1 : -1);
+}
+
+void NuppelVideoPlayer::DoChangeDVDTrack(void)
+{
+    GetDecoder()->ChangeDVDTrack(need_change_dvd_track > 0);
+    ClearAfterSeek(false);
 }
 
 void NuppelVideoPlayer::DisplayDVDButton(void)

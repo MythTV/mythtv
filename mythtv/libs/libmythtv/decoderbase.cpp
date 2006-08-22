@@ -717,10 +717,10 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
 
         uint elapsed = ringBuffer->DVD()->GetCellStart();
 
+        UpdateDVDFramesPlayed();
+
         if (elapsed == 0)
             SeekReset(framesPlayed, 0, true, true);
-    
-        UpdateDVDFramesPlayed();
     }
 }
 
