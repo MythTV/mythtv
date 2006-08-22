@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-07-11, v0.19.03
+<date>2006-, v0.20
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -42,21 +42,26 @@ them.  All servers are centrally managed and all programs are scheduled by the
 Master backend.
 <item>You can have multiple clients (called "frontends" in MythTV parlance),
 each with a common view of all available programs.  Any client can watch any
-program that was recorded by any of the servers.  Clients can be diskless
-and controlled entirely by a remote control.
+program that was recorded by any of the servers, assuming that they have the
+hardware capabilities to view the content; a low-powered frontend will not
+be able to watch HDTV, for example.  Clients can be diskless and controlled
+entirely by a remote control.
 <item>You may use any combination of standard analog capture card, MPEG-2,
-MJPEG, DVB or HDTV capture devices.  With appropriate hardware, MythTV can
-control set top boxes, often found in digital cable and satellite TV
-systems.
+MJPEG, DVB, HDTV and firewire capture devices.  With appropriate hardware,
+MythTV can control set top boxes, often found in digital cable and satellite
+TV systems.
 <item>Program Guide Data in North America is downloaded from Zap2It.com, a
 subsidiary of Tribune Media Services.  This free service is called
 DataDirect, and provides MythTV almost two weeks of scheduling information. 
 Program Guide Data in other countries is obtained using XMLTV.  MythTV uses
 this information to create a schedule that maximizes the number of programs
 that can be recorded if you don't have enough tuners.
+<item>MythTV implements a UPNP server, so a UPNP client should automatically
+see content from your MythTV system.
 </itemize> 
 Other modules in MythTV include:
 <itemize>
+<item>MythArchive, a tool to create DVDs
 <item>MythGallery, a picture-viewing application
 <item>MythVideo, a media-viewer for content not created within MythTV
 <item>MythDVD, a DVD viewer / ripper
@@ -81,10 +86,10 @@ you use one of the big-name OS packages.
 See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
 like to install a custom version of Knoppix optimized for MythTV.
 
-See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
+See <url url="http://linpvr.org" name="http://linpvr.org"> if you'd like
 to install MythTV onto a VIA Epia M machine.
 
-See <url url="http://bit.blkbk.com/" name="http://bit.blkbk.com/"> if you'd
+See <url url="http://bit.blkbk.com" name="http://bit.blkbk.com"> if you'd
 like to install MythTV on a Xbox.
 
 See <url url="http://wilsonet.com/mythtv/"
@@ -114,7 +119,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.19
+This HOWTO is for MythTV v0.20
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -524,6 +529,12 @@ url="http://www.plextor.com/english/support/LinuxSDK.htm"
 name="http://www.plextor.com/english/support/LinuxSDK.htm">. MythTV uses the
 Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.
 
+<sect3>Standalone Ethernet Capture Devices.
+<p>Devices such as the HDHomeRun <url url="http://www.hdhomerun.com"
+name="http://www.hdhomerun.com"> are supported.  The HDHomeRun provides two
+ATSC Over-the-air (8VSB) tuners connected to your network via 100Mbps
+ethernet.
+
 <sect2>Hardware known NOT to work and other issues
 <p><itemize>
 <item>Hauppauge WinTV-D or -HD (no driver)
@@ -636,34 +647,6 @@ url="http://gatos.sourceforge.net/watching_tv.php"
 name="http://gatos.sourceforge.net/watching_tv.php"> for details. Also see
 <url url="http://www.retinalburn.net/linux/tvout.html"
 name="http://www.retinalburn.net/linux/tvout.html"> for more information.
-
-<sect3>Matrox
-<p><bf>NOTE</bf>: If updated information for the Matrox cards is not
-provided prior to MythTV v0.20 I will assume that there is no interest and
-will remove this section.
-
-<p>The standard Matrox driver included with XFree86 does not support TV-out.
-
-Older Matrox cards can be used with a proprietary X driver provided by 
-Matrox, and it does simultaneously support TV out and XVideo on some cards. 
-See <url url="http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm"
-name="http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm"> for details.
-
-Newer Matrox cards can be run with a set of kernel patches (for kernel 
-2.4.19) and a customized X driver, but this arrangement does not support 
-XVideo on TV-out. See 
-<url url="http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html"
-name="http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html"> for details.
-
-Specific cards:
-<itemize>
-<item>Matrox G400 AGP. Uses external adapter to provide Composite and
-SVideo ports. Reported to work with the proprietary Matrox X driver.
-<item>Matrox Millennium 450GX AGP. Uses external adapter to provide
-Composite and SVideo ports. TV-out implementation does <em>NOT</em> support XVideo.
-<item>Matrox Millennium 550GX AGP. Uses external adapter to provide
-Composite and S-Video ports. TV-out implementation does <em>NOT</em> support XVideo.
-</itemize>
 
 <sect3>NVIDIA
 <p>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
@@ -835,15 +818,15 @@ send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
 <p>Debian packages for MythTV and most of its add-on modules are maintained
 by Christian Marillat <url url="mailto:marillat@free.fr"
 name="mailto:marillat@free.fr"> and are available at <url
-url="http://debian.video.free.fr/"
-name="http://debian.video.free.fr/">. 
+url="http://www.debian-multimedia.org/"
+name="http://www.debian-multimedia.org/">. 
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.
 
 If you have followed the instructions on the above page you should have added
 <tscreen><verb>
-deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+deb-src http://www.debian-multimedia.org sid main
 </verb></tscreen>
 
 to your <tt>/etc/apt/sources.list</tt> file.  Running <bf>apt-get update</bf> and then
@@ -1013,8 +996,8 @@ this may take a lot of time if you need to do a full Qt build.
 your <tt>/etc/apt/sources.list</tt>
 <tscreen><verb>
 # Christian Marillat's packages (mplayer, lame)
-deb ftp://ftp.nerim.net/debian-marillat/ sid main
-deb-src ftp://ftp.nerim.net/debian-marillat/ sid main
+deb http://www.debian-multimedia.org sid main
+deb-src http://www.debian-multimedia.org sid main
 </verb></tscreen>
 and executing:
 <tscreen><verb>
@@ -1370,8 +1353,8 @@ $ cd mythtv
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.19.tar.bz2
-$ cd mythtv-0.19
+$ tar -xjf mythtv-0.20.tar.bz2
+$ cd mythtv-0.20
 $ ./configure
 </verb></tscreen>
 
@@ -2007,7 +1990,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.19/configfiles
+$ cd ~/mythtv-0.20/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2516,7 +2499,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.19, the available options are:
+As of MythTV v0.20, the available options are:
 <tscreen><verb>
 $ mythbackend --help
 Valid options are:
@@ -2736,7 +2719,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.19
+version 0.20
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -3368,8 +3351,8 @@ can be modified by the user without re-compiling or altering the program
 functionality.  Download the MythThemes tarball from the website and untar it:
 
 <tscreen><verb>
-$ tar -xjf myththemes-0.19.tar.bz2
-$ cd ~/myththemes-0.19
+$ tar -xjf myththemes-0.20.tar.bz2
+$ cd ~/myththemes-0.20
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -3596,8 +3579,7 @@ If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <tt>/dev/rtc</tt> before
 setting the wakeuptime.
 <sect1>Controlling the mythfrontend via telnet
-<p>New in 0.19 is the capability to control the mythfrontend using telnet
-commands.  To use this feature you must first enable it in Settings>General>General
+<p>To use this feature you must first enable it in Settings>General>General
 
 The network control listens on port 6546, as demonstrated below:
 
@@ -4102,15 +4084,14 @@ box should now show:
 As you have probably guessed, this says that we want to search for all
 programs with the title "Nova" regardless of the time, day, channel, etc.
 
-If you do not receive a PBS station that carries "Nova" or would like to
-use another title, edit the title by pressing the down arrow to highlight
-the text box and right arrow over the the word "Nova". If you are using a
+If you do not receive a PBS station that carries "Nova" or would like to use
+another title, edit the title by pressing the down arrow to highlight the
+text box and right arrow over the the word "Nova". If you are using a
 keyboard you can simply delete the four letters and type a different title
 between the quotes. With a remote control, you can do 'cell phone' style
 text entry with the number pad. The delete key is the "X" in the grouping
-for "1", zero is grouped with "9" and "0" acts as the "Caps Lock" key.
-With MythTV version 0.19 or later, you can press ENTER in the text box
-to popup a virtual keyboard.
+for "1", zero is grouped with "9" and "0" acts as the "Caps Lock" key. You
+can press ENTER in the text box to popup a virtual keyboard.
 
 Note: the text box honors many familiar Emacs control keys. It is also
 possible to cut and paste text into the text box so you can edit with a
@@ -4303,8 +4284,8 @@ name="http://www.mythtv.org/"> .
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
-$ tar -xjf mythplugins-0.19.tar.bz2
-$ cd mythplugins-0.19
+$ tar -xjf mythplugins-0.20.tar.bz2
+$ cd mythplugins-0.20
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4352,7 +4333,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins-0.19/</tt> directory.
+already in the <tt>~/mythplugins-0.20/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4368,7 +4349,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.19 
+$ cd ~/mythplugins-0.20 
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4417,7 +4398,7 @@ Mandriva Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins-0.19/mythweb
+$ cd ~/mythplugins-0.20/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4481,7 +4462,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4724,7 +4705,7 @@ section to obtain mythplugins.
 
 Switch to the mythplugins directory:
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 </verb></tscreen>
 
 Compile and install mythgame:
@@ -4940,7 +4921,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5073,7 +5054,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5125,7 +5106,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5165,7 +5146,7 @@ prerequisites using the following command:
 In the example below, we have enabled support for transcoding and for VCD
 playing.  You may remove these options if you don't need them.
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 $ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
 $ qmake mythplugins.pro
 $ make
@@ -5201,7 +5182,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins-0.19
+$ cd ~/mythplugins-0.20
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -7871,14 +7852,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.19.00, 2006-02-07.  Version bump.  Add snippet for network control.  Update diskless HOWTO.
-v0.19.01, 2006-03-01.  Added information for NFS caching.  Add link to wiki
-in QuickStart.  Update dependencies for Mandriva (Ticket 1305). Updated
-minimum Qt version (Ticket 1363).  Updated transcoding sections (Ticket
-1349)
-v0.19.02, 2006-03-10.  Update minimum MySQL version.  Add a note to the
-debugging section that if you're going to trim, don't trim too much.
-v0.19.03, 2006-07-11.  Add that MythTV works on Mac OS X.  Fix arcade-history URL.
+v0.20.00, 2006  Start prepping for 0.20.  Add HDHomeRun as a capture device.  Update URLs.
 -->
 
 <!--
