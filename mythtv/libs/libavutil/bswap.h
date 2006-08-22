@@ -142,7 +142,7 @@ static inline double bswap_dbl(double x)
     w.d = x;
     r.l[0] = bswap_32(w.l[1]);
     r.l[1] = bswap_32(w.l[0]);
-    return w.d;
+    return r.d;
 }
 
 // be2me ... BigEndian to MachineEndian
