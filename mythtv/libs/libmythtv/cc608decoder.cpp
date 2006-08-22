@@ -1094,7 +1094,7 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
         ; // reserved
     else if (xds_class == 0x0d) // cont code: 0x0e
         handled = true; // undefined
-
+#if DEBUG_XDS
     if (!handled)
     {
         VERBOSE(VB_VBI, QString("XDS: ") +
@@ -1103,6 +1103,7 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
                 .arg(xds_buf.size())
                 .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
     }
+#endif // DEBUG_XDS
 }
 
 bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)

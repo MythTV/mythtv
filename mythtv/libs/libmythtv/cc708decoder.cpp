@@ -451,11 +451,13 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
                          pen_style, win_style);
         i+=7;
     }
+#if DEBUG_CC_SERVICE
     else
     {
         fprintf(stderr, "handle_cc_c1: (NOT HANDLED) "
                 "code(0x%02x) i(%i) blk_size(%i)\n", code, i, blk_size);
     }
+#endif
 
     return i;
 }
