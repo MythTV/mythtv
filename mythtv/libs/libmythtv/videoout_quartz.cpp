@@ -1491,9 +1491,9 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
         data->pixelSize  = scratch->size;
         data->pixmapSize = hdrSize + data->pixelSize;
         data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
-        data->pixelData = data->pixmap;
-   
-        data->pixelData += hdrSize;  // Jump past the header 
+
+        // Jump past the header:
+        data->pixelData = (char *)data->pixmap + hdrSize;
 
         data->pixmap->componentInfoY.offset    = scratch->offsets[0] + hdrSize;
         data->pixmap->componentInfoY.rowBytes  = scratch->pitches[0];
