@@ -1687,6 +1687,10 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Crusoe(m) Processor TM5600" > /dev/null ; then
        ARCHFLAGS="-march=pentium2"
 # c3-2
+   elif expr "$processor" : ".*VIA Esther" > /dev/null ; then
+       ARCHFLAGS="-march=c3-2"
+       optimize="small"
+       cpu_raw="c3-2"
    elif expr "$processor" : ".*VIA Nehemiah" > /dev/null ; then
        ARCHFLAGS="-march=c3-2"
        optimize="small"
