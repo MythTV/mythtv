@@ -348,9 +348,9 @@ Metadata* MetaIOMP4::read(QString filename)
                                      genre,
                                      year, 
                                      tracknum, 
-                                     length,
-                                     0, 0, 0, "",
-                                     compilation);
+                                     length);
+    
+    retdata->setCompilation(compilation);
 
     //retdata->setComposer(writer);
     //retdata->setComment(comment);

@@ -42,8 +42,11 @@ class Metadata
                 format = lformat;
             }
 
-    Metadata(const Metadata &other) 
+    Metadata(const Metadata &other)
             {
+                *this = other;
+                changed = false;
+                /*
                 filename = other.filename;
                 artist = other.artist;
                 compilation_artist = other.compilation_artist;
@@ -63,6 +66,7 @@ class Metadata
                 show = other.show;
                 changed = false;
                 format = other.format;
+                */
             }
 
     Metadata& operator=(Metadata *rhs);
@@ -125,20 +129,19 @@ class Metadata
     bool Compilation() { return compilation; }
     void setCompilation(bool state) { compilation = state; formattedartist = formattedtitle = ""; }
     bool determineIfCompilation(bool cd = false);
-    
+
     bool isInDatabase(void);
     void dumpToDatabase(void);
-    void updateDatabase(void);
     void setField(const QString &field, const QString &data);
     void getField(const QString& field, QString *data);
-    void fillData();
-    void fillDataFromID();
     void persist();
     bool hasChanged(){return changed;}
     int compare (Metadata *other);
     static void setArtistAndTrackFormats();
 
     static void SetStartdir(const QString &dir);
+
+    static QStringList fillFieldList(QString field);
 
   private:
     void setCompilationFormatting(bool cd = false);

@@ -4,6 +4,7 @@
 #include "editmetadata.h"
 #include "decoder.h"
 #include "genres.h"
+#include "metadata.h"
 
 EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
                                  MythMainWindow *parent,
@@ -357,38 +358,19 @@ bool EditMetadataDialog::showList(QString caption, QString &value)
         value = searchDialog->getResult();
         res = true;
     }
-    
+
     delete searchDialog;
     setActiveWindow();
-    
-    return res;     
+
+    return res;
 }
 
-void EditMetadataDialog::fillSearchList(QString field)
-{
-    searchList.clear();
-    
-    QString querystr;
-    querystr = QString("SELECT DISTINCT %1 FROM musicmetadata ORDER BY %2").arg(field).arg(field);
-         
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(querystr);
-
-    if (query.isActive() && query.size())
-    {
-        while (query.next())
-        {
-            searchList << QString::fromUtf8(query.value(0).toString());
-        }
-    }         
-}
-    
 void EditMetadataDialog::searchArtist()
 {
     QString s;
-    
-    fillSearchList("artist");
-    
+
+    searchList = Metadata::fillFieldList("artist");
+
     s = m_metadata->Artist();
     if (showList(tr("Select an Artist"), s))
     {
@@ -400,9 +382,9 @@ void EditMetadataDialog::searchArtist()
 void EditMetadataDialog::searchCompilationArtist()
 {
     QString s;
-    
-    fillSearchList("compilation_artist");
-    
+
+    searchList = Metadata::fillFieldList("compilation_artist");
+
     s = m_metadata->CompilationArtist();
     if (showList(tr("Select a Compilation Artist"), s))
     {
@@ -414,9 +396,9 @@ void EditMetadataDialog::searchCompilationArtist()
 void EditMetadataDialog::searchAlbum()
 {
     QString s;
-    
-    fillSearchList("album");
-    
+
+    searchList = Metadata::fillFieldList("album");
+
     s = m_metadata->Album();
     if (showList(tr("Select an Album"), s))
     {
@@ -430,10 +412,13 @@ void EditMetadataDialog::searchGenre()
     QString s;
 
     // load genre list
+    /*
     searchList.clear();
     for (int x = 0; x < genre_table_size; x++)
         searchList.push_back(QString(genre_table[x]));
     searchList.sort();
+    */
+    searchList = Metadata::fillFieldList("genre");
 
     s = m_metadata->Genre();
     if (showList(tr("Select a Genre"), s))
@@ -491,7 +476,7 @@ void EditMetadataDialog::saveToDatabase()
 {
     cancelPopup();
 
-    m_metadata->updateDatabase();
+    m_metadata->dumpToDatabase();
     *m_sourceMetadata = m_metadata;
     done(1);
 }

@@ -6,7 +6,7 @@ using namespace std;
 
 #include <mythtv/mythdialogs.h>
 
-#include "metadata.h"
+class Metadata;
 
 class UIPhoneEntry;
 
@@ -45,7 +45,6 @@ class EditMetadataDialog : public MythThemedDialog
     void checkClicked(bool state);
   private:
 
-    void fillSearchList(QString field);
     bool showList(QString caption, QString &value);
     
     Metadata *m_metadata, *m_sourceMetadata ;

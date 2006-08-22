@@ -13,6 +13,7 @@
 using namespace std;
 
 #include "smartplaylist.h"
+#include "metadata.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/dialogbox.h>
@@ -33,19 +34,21 @@ struct SmartPLField
 static SmartPLField SmartPLFields[] = 
 {
     { "",              "",                               ftString,   0,    0,    0 },
-    { "Artist",        "artist",                         ftString,   0,    0,    0 },
-    { "Album",         "album",                          ftString,   0,    0,    0 },
-    { "Title",         "title",                          ftString,   0,    0,    0 },
-    { "Genre",         "genre",                          ftString,   0,    0,    0 },
-    { "Year",          "year",                           ftNumeric,  1900, 2099, 2000 },
-    { "Track No.",     "tracknum",                       ftNumeric,  0,    99,   0 },
-    { "Rating",        "rating",                         ftNumeric,  0,    10,   0 },
-    { "Play Count",    "playcount",                      ftNumeric,  0,    9999, 0 },
-    { "Compilation",   "compilation",                    ftBoolean,  0,    0,    0 },
-    { "Comp. Artist",  "compilation_artist",             ftString,   0,    0,    0 },
-    { "Last Play",     "FROM_DAYS(TO_DAYS(lastplay))",   ftDate,     0,    0,    0 },
-    { "Date Imported", "FROM_DAYS(TO_DAYS(date_added))", ftDate,     0,    0,    0 },
-};        
+    { "Artist",        "music_artists.artist_name",      ftString,   0,    0,    0 },
+    { "Album",         "music_songs.album_name",         ftString,   0,    0,    0 },
+    { "Title",         "music_songs.name",               ftString,   0,    0,    0 },
+    { "Genre",         "music_genres.genre",             ftString,   0,    0,    0 },
+    { "Year",          "music_songs.year",               ftNumeric,  1900, 2099, 2000 },
+    { "Track No.",     "music_songs.track",              ftNumeric,  0,    99,   0 },
+    { "Rating",        "music_songs.rating",             ftNumeric,  0,    10,   0 },
+    { "Play Count",    "music_songs.numplays",           ftNumeric,  0,    9999, 0 },
+    { "Compilation",   "music_albums.compilation",       ftBoolean,  0,    0,    0 },
+    { "Comp. Artist",  "music_comp_artists.artist_name", ftString,   0,    0,    0 },
+    { "Last Play",     "FROM_DAYS(TO_DAYS(music_songs.lastplay))",
+                                                         ftDate,     0,    0,    0 },
+    { "Date Imported", "FROM_DAYS(TO_DAYS(music_songs.date_added))",
+                                                         ftDate,     0,    0,    0 },
+};
 
 struct SmartPLOperator
 {
@@ -644,36 +647,18 @@ bool SmartPLCriteriaRow::showList(QString caption, QString &value)
         value = searchDialog->getResult();
         res = true;
     }
-    
+
     delete searchDialog;
-    
-    return res;     
+
+    return res;
 }
 
-void SmartPLCriteriaRow::fillSearchList(QString field)
-{
-    searchList.clear();
-    
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr;
-    querystr = QString("SELECT DISTINCT %1 FROM musicmetadata ORDER BY %2").arg(field).arg(field);
-        
-    query.exec(querystr);
-    if (query.isActive() && query.numRowsAffected())
-    {
-        while (query.next())
-        {
-            searchList << QString::fromUtf8(query.value(0).toString());
-        }
-    }         
-}
-    
 void SmartPLCriteriaRow::searchArtist(MythRemoteLineEdit *editor)
 {
     QString s;
-    
-    fillSearchList("artist");
-    
+
+    searchList = Metadata::fillFieldList("artist");
+
     s = editor->text();
     if (showList(tr("Select an Artist"), s))
     {
@@ -684,9 +669,9 @@ void SmartPLCriteriaRow::searchArtist(MythRemoteLineEdit *editor)
 void SmartPLCriteriaRow::searchCompilationArtist(MythRemoteLineEdit *editor)
 {
     QString s;
-    
-    fillSearchList("compilation_artist");
-    
+
+    searchList = Metadata::fillFieldList("compilation_artist");
+
     s = editor->text();
     if (showList(tr("Select a Compilation Artist"), s))
     {
@@ -697,9 +682,9 @@ void SmartPLCriteriaRow::searchCompilationArtist(MythRemoteLineEdit *editor)
 void SmartPLCriteriaRow::searchAlbum(MythRemoteLineEdit *editor)
 {
     QString s;
-    
-    fillSearchList("album");
-    
+
+    searchList = Metadata::fillFieldList("album");
+
     s = editor->text();
     if (showList(tr("Select an Album"), s))
     {
@@ -711,7 +696,7 @@ void SmartPLCriteriaRow::searchGenre(MythRemoteLineEdit *editor)
 {
     QString s;
 
-    fillSearchList("genre");
+    searchList = Metadata::fillFieldList("genre");
 
     s = editor->text();
     if (showList(tr("Select a Genre"), s))
@@ -724,7 +709,7 @@ void SmartPLCriteriaRow::searchTitle(MythRemoteLineEdit *editor)
 {
     QString s;
 
-    fillSearchList("title");
+    searchList = Metadata::fillFieldList("title");
 
     s = editor->text();
     if (showList(tr("Select a Title"), s))
@@ -815,7 +800,7 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
     }
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO smartplaylistitem (smartplaylistid, field, operator,"
+    query.prepare("INSERT INTO music_smartplaylist_items (smartplaylistid, field, operator,"
                   " value1, value2)"
                   "VALUES (:SMARTPLAYLISTID, :FIELD, :OPERATOR, :VALUE1, :VALUE2);");
     query.bindValue(":SMARTPLAYLISTID", smartPlaylistID);
@@ -1130,7 +1115,7 @@ void SmartPlaylistEditor::updateMatches(void)
 {
     bPlaylistIsValid = true;
     
-    QString sql = "select count(*) from musicmetadata ";
+    QString sql = "select count(*) from music_songs ";
     sql += getWhereClause();
     
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1177,7 +1162,7 @@ void SmartPlaylistEditor::saveClicked(void)
     
     MSqlQuery query(MSqlQuery::InitCon());
     // insert new smartplaylist
-    query.prepare("INSERT INTO smartplaylist (name, categoryid, matchtype, orderby, limitto) "
+    query.prepare("INSERT INTO music_smartplaylists (name, categoryid, matchtype, orderby, limitto) "
                 "VALUES (:NAME, :CATEGORYID, :MATCHTYPE, :ORDERBY, :LIMIT);");
     query.bindValue(":NAME", name.utf8());
     query.bindValue(":CATEGORYID", categoryid);
@@ -1193,7 +1178,7 @@ void SmartPlaylistEditor::saveClicked(void)
     
     // get smartplaylistid
     int ID;
-    query.prepare("SELECT smartplaylistid FROM smartplaylist "
+    query.prepare("SELECT smartplaylistid FROM music_smartplaylists "
                   "WHERE categoryid = :CATEGORYID AND name = :NAME;");
     query.bindValue(":CATEGORYID", categoryid);
     query.bindValue(":NAME", name.utf8());
@@ -1252,8 +1237,8 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     MSqlQuery query(MSqlQuery::InitCon());
     int ID;
     
-    query.prepare("SELECT smartplaylistid, name, categoryid, matchtype, orderby, limitto " 
-                  "FROM smartplaylist WHERE name = :NAME AND categoryid = :CATEGORYID;");
+    query.prepare("SELECT smartplaylistid, name, categoryid, matchtype, orderby, limitto "
+                  "FROM music_smartplaylists WHERE name = :NAME AND categoryid = :CATEGORYID;");
     query.bindValue(":NAME", name.utf8());
     query.bindValue(":CATEGORYID", categoryid);
     if (query.exec())
@@ -1284,8 +1269,8 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     SmartPLCriteriaRow *row;    
     uint rowCount;
     
-    query.prepare("SELECT field, operator, value1, value2 " 
-                  "FROM smartplaylistitem WHERE smartplaylistid = :ID "
+    query.prepare("SELECT field, operator, value1, value2 "
+                  "FROM music_smartplaylist_items WHERE smartplaylistid = :ID "
                   "ORDER BY smartplaylistitemid;");
     query.bindValue(":ID", ID);
     if (!query.exec())
@@ -1392,7 +1377,7 @@ void SmartPlaylistEditor::newCategory(void)
     // insert new smartplaylistcategory
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO smartplaylistcategory (name) "
+    query.prepare("INSERT INTO music_smartplaylist_categories (name) "
                 "VALUES (:NAME);");
     query.bindValue(":NAME", categoryEdit->text().utf8());
     
@@ -1438,7 +1423,7 @@ void SmartPlaylistEditor::renameCategory(void)
         
     // change the category     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE smartplaylistcategory SET name = :NEW_CATEGORY "
+    query.prepare("UPDATE music_smartplaylist_categories SET name = :NEW_CATEGORY "
                   "WHERE name = :OLD_CATEGORY;");
     query.bindValue(":OLD_CATEGORY", categoryCombo->currentText().utf8());
     query.bindValue(":NEW_CATEGORY", categoryEdit->text().utf8());
@@ -1458,8 +1443,12 @@ void SmartPlaylistEditor::renameCategory(void)
 QString SmartPlaylistEditor::getSQL(QString fields)
 {
     QString sql, whereClause, orderByClause, limitClause;
-    
-    sql = "SELECT " + fields + " FROM musicmetadata ";
+    sql = "SELECT " + fields + " FROM music_songs "
+          "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+          "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+          "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
+          "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id ";
+
     whereClause = getWhereClause();
     orderByClause = getOrderByClause();
     if (limitSpinEdit->value() > 0)
@@ -1506,8 +1495,8 @@ QString SmartPlaylistEditor::getWhereClause(void)
 
 void SmartPlaylistEditor::showResultsClicked(void)
 {
-    QString sql = getSQL("intid, artist, album, title, genre, year, tracknum");
-    
+    QString sql = getSQL("song_id, music_artists.artist_name, album_name, name, genre, year, track");
+
     SmartPLResultViewer *resultViewer = new SmartPLResultViewer(gContext->GetMainWindow(), "resultviewer");
     resultViewer->setSQL(sql);
     resultViewer->exec();
@@ -1535,7 +1524,7 @@ void SmartPlaylistEditor::getSmartPlaylistCategories(void)
     categoryCombo->clear();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.exec("SELECT name FROM smartplaylistcategory ORDER BY name;"))
+    if (query.exec("SELECT name FROM music_smartplaylist_categories ORDER BY name;"))
     {
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -1563,7 +1552,7 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
     
     // get playlist ID
     int ID;
-    query.prepare("SELECT smartplaylistid FROM smartplaylist WHERE name = :NAME "
+    query.prepare("SELECT smartplaylistid FROM music_smartplaylists WHERE name = :NAME "
                   "AND categoryid = :CATEGORYID;");
     query.bindValue(":NAME", name.utf8());
     query.bindValue(":CATEGORYID", categoryid);
@@ -1588,13 +1577,13 @@ bool SmartPlaylistEditor::deleteSmartPlaylist(QString category, QString name)
     } 
     
     //delete smartplaylist items
-    query.prepare("DELETE FROM smartplaylistitem WHERE smartplaylistid = :ID;");
+    query.prepare("DELETE FROM music_smartplaylist_items WHERE smartplaylistid = :ID;");
     query.bindValue(":ID", ID);
     if (!query.exec())
         MythContext::DBError("Delete smartplaylist items", query);
 
     //delete smartplaylist
-    query.prepare("DELETE FROM smartplaylist WHERE smartplaylistid = :ID;");
+    query.prepare("DELETE FROM music_smartplaylists WHERE smartplaylistid = :ID;");
     query.bindValue(":ID", ID);
     if (!query.exec())
         MythContext::DBError("Delete smartplaylist", query);
@@ -1608,9 +1597,9 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
 {
     int categoryid = SmartPlaylistEditor::lookupCategoryID(category);
     MSqlQuery query(MSqlQuery::InitCon());
-    
+
     //delete all smartplaylists with the selected category
-    query.prepare("SELECT name FROM smartplaylist "
+    query.prepare("SELECT name FROM music_smartplaylists "
                   "WHERE categoryid = :CATEGORYID;");
     query.bindValue(":CATEGORYID", categoryid);
     if (!query.exec())
@@ -1629,7 +1618,7 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
     }
     
     // delete the category
-    query.prepare("DELETE FROM smartplaylistcategory WHERE categoryid = :ID;");
+    query.prepare("DELETE FROM music_smartplaylist_categories WHERE categoryid = :ID;");
     query.bindValue(":ID", categoryid);
     if (!query.exec())
         MythContext::DBError("Delete smartplaylist category", query);
@@ -1639,15 +1628,15 @@ bool SmartPlaylistEditor::deleteCategory(QString category)
 
 // static function to lookup the categoryid given its name
 int SmartPlaylistEditor::lookupCategoryID(QString category)
-{    
+{
     int ID;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT categoryid FROM smartplaylistcategory "
+    query.prepare("SELECT categoryid FROM music_smartplaylist_categories "
                   "WHERE name = :CATEGORY;");
     query.bindValue(":CATEGORY", category.utf8());
 
     if (query.exec())
-    {    
+    {
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             query.first();
@@ -2023,7 +2012,7 @@ void SmartPlaylistDialog::getSmartPlaylistCategories(void)
     categoryCombo->clear();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.exec("SELECT name FROM smartplaylistcategory ORDER BY name;"))
+    if (query.exec("SELECT name FROM music_smartplaylist_categories ORDER BY name;"))
     {
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -2044,8 +2033,8 @@ void SmartPlaylistDialog::getSmartPlaylists(QString category)
 
     listbox->clear();
 
-    MSqlQuery query(MSqlQuery::InitCon());    
-    query.prepare("SELECT name FROM smartplaylist WHERE categoryid = :CATEGORYID "
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name FROM music_smartplaylists WHERE categoryid = :CATEGORYID "
                   "ORDER BY name;");
     query.bindValue(":CATEGORYID", categoryid);
                    

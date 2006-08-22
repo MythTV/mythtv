@@ -72,7 +72,6 @@ class SmartPLCriteriaRow : public QObject
     void value2ButtonClicked(void);
   
   private:
-    void fillSearchList(QString field);
     bool showList(QString caption, QString &value);
     void searchGenre(MythRemoteLineEdit *editor);
     void searchArtist(MythRemoteLineEdit *editor);

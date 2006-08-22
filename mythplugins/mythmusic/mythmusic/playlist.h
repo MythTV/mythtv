@@ -83,8 +83,7 @@ class Playlist
     void loadPlaylist(QString a_name, QString a_host);
     void loadPlaylistByID(int id, QString a_host);
 
-    void savePlaylist(QString a_name);
-    void saveNewPlaylist(QString a_host);
+    void savePlaylist(QString a_name, QString a_host);
 
     void putYourselfOnTheListView(UIListGenericTree *a_parent);
 

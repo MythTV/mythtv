@@ -541,7 +541,7 @@ void PlaybackBoxMusic::allTracks()
         return;
 
    closePlaylistPopup();
-   updatePlaylistFromQuickPlaylist("ORDER BY artist, album, tracknum");
+   updatePlaylistFromQuickPlaylist("ORDER BY artist_name, album_name, track");
 }
 
 void PlaybackBoxMusic::fromCD()
@@ -597,8 +597,8 @@ void PlaybackBoxMusic::byArtist()
         return;
 
     QString value = formattedFieldValue(curMeta->Artist().utf8());
-    QString whereClause = "WHERE artist = " + value +
-                          " ORDER BY album, tracknum"; 
+    QString whereClause = "WHERE artist_name = " + value +
+                          " ORDER BY album_name, track"; 
 
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
@@ -610,8 +610,8 @@ void PlaybackBoxMusic::byAlbum()
         return;
 
     QString value = formattedFieldValue(curMeta->Album().utf8());
-    QString whereClause = "WHERE album = " + value + 
-                          " ORDER BY tracknum";
+    QString whereClause = "WHERE album_name = " + value + 
+                          " ORDER BY track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
 }
@@ -623,7 +623,7 @@ void PlaybackBoxMusic::byGenre()
 
     QString value = formattedFieldValue(curMeta->Genre().utf8()); 
     QString whereClause = "WHERE genre = " + value +
-                          " ORDER BY artist, album, tracknum";   
+                          " ORDER BY artist_name, album_name, track";   
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
 }
@@ -635,7 +635,7 @@ void PlaybackBoxMusic::byYear()
 
     QString value = formattedFieldValue(curMeta->Year()); 
     QString whereClause = "WHERE year = " + value + 
-                          " ORDER BY artist, album, tracknum";
+                          " ORDER BY artist_name, album_name, track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
 }

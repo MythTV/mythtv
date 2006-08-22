@@ -91,7 +91,7 @@ void RemoveFileFromDB (const QString &directory, const QString &filename)
     // We know that the filename will not contain :// as the SQL limits this
     sqlfilename.remove(0, directory.length());
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM musicmetadata WHERE "
+    query.prepare("DELETE FROM music_songs WHERE "
                   "filename = :NAME ;");
     query.bindValue(":NAME", sqlfilename.utf8());
     query.exec();
@@ -110,7 +110,7 @@ void UpdateFileInDB(const QString &filename)
         {
             disk_meta->setID(db_meta->ID());
             disk_meta->setRating(db_meta->Rating());
-            disk_meta->updateDatabase();
+            disk_meta->dumpToDatabase();
         }
 
         if (disk_meta)
@@ -261,7 +261,7 @@ void SearchDir(QString &directory)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT filename, date_modified "
-               "FROM musicmetadata "
+               "FROM music_songs "
                "WHERE filename NOT LIKE ('%://%')");
 
     int counter = 0;
@@ -561,7 +561,7 @@ static void preMusic(MusicData *mdata)
 
 
     MSqlQuery count_query(MSqlQuery::InitCon());
-    count_query.exec("SELECT COUNT(*) FROM musicmetadata;");
+    count_query.exec("SELECT COUNT(*) FROM music_songs;");
 
     bool musicdata_exists = false;
     if (count_query.isActive())

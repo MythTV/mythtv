@@ -35,7 +35,7 @@ void Track::postLoad(PlaylistsContainer *grandparent)
     if (index_value > 0) // Normal Track
         label = all_available_music->getLabel(index_value, &bad_reference);
     else if (index_value < 0)
-        label = grandparent->getPlaylistName( index_value,  bad_reference);
+        label = grandparent->getPlaylistName( (-1 * index_value),  bad_reference);
     else
     {
         cerr << "playlist.o: Not sure how I got 0 as a track number, but "
@@ -69,18 +69,17 @@ bool Playlist::checkTrack(int a_track_id, bool cd_flag)
 {
     // XXX SPEED THIS UP
     // Should be a straight lookup against cached index
-    bool result = false;
     Track *it;
 
     for (it = songs.first(); it; it = songs.next())
     {
         if (it->getValue() == a_track_id && it->getCDFlag() == cd_flag)
         {
-            result = true;
+            return true;
         }
     }  
 
-    return result;    
+    return false;
 }
 
 void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
@@ -327,10 +326,11 @@ void PlaylistsContainer::load()
     all_other_playlists->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT playlistid FROM musicplaylist "
-                  "WHERE name != :DEFAULT  "
-                  "AND name != :BACKUP  "
-                  "AND hostname = :HOST ORDER BY playlistid ;");
+    query.prepare("SELECT playlist_id FROM music_playlists "
+                  "WHERE playlist_name != :DEFAULT"
+                  " AND playlist_name != :BACKUP "
+                  " AND (hostname = '' OR hostname = :HOST) "
+                  "ORDER BY playlist_id;");
     query.bindValue(":DEFAULT", "default_playlist_storage");
     query.bindValue(":BACKUP", "backup_playlist_storage"); 
     query.bindValue(":HOST", my_host);
@@ -469,19 +469,33 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     }
    
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT playlistid, name, songlist FROM "
-                  "musicplaylist WHERE name = :NAME AND "
-                  "hostname = :HOST ;");
-    query.bindValue(":NAME", a_name);
+
+    if (name == "default_playlist_storage" || name == "backup_playlist_storage")
+    {
+        query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
+                      "FROM  music_playlists "
+                      "WHERE playlist_name = :NAME"
+                      " AND hostname = :HOST;");
+    }
+    else
+    {
+        // Technically this is never called as this function is only used to load
+        // the default/backup playlists.
+        query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
+                      "FROM music_playlists "
+                      "WHERE playlist_name = :NAME"
+                      " AND (hostname = '' OR hostname = :HOST);");
+    }
+    query.bindValue(":NAME", a_name.utf8());
     query.bindValue(":HOST", a_host);
 
     if (query.exec() && query.size() > 0)
     {
         while (query.next())
         {
-            this->playlistid = query.value(0).toInt();
-            this->name = QString::fromUtf8(query.value(1).toString());
-            this->raw_songlist = query.value(2).toString();
+            playlistid = query.value(0).toInt();
+            name = QString::fromUtf8(query.value(1).toString());
+            raw_songlist = query.value(2).toString();
         }
         if (name == "default_playlist_storage")
             name = "the user should never see this";
@@ -490,8 +504,11 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     }
     else
     {
-        name = a_name;
-        saveNewPlaylist(a_host);
+        // Asked me to load a playlist I can't find so let's create a new one :)
+        playlistid = 0; // Be safe just in case we call load over the top
+                        // of an existing playlist
+        raw_songlist = "";
+        savePlaylist(a_name, a_host);
         changed = true;
     }
 }
@@ -499,9 +516,10 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
 void Playlist::loadPlaylistByID(int id, QString a_host)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT playlistid, name, songlist FROM "
-                  "musicplaylist WHERE playlistid = :ID AND "
-                  "hostname = :HOST ;");
+    query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
+                  "FROM music_playlists "
+                  "WHERE playlist_id = :ID"
+                  " AND (hostname = '' OR hostname = :HOST);");
     query.bindValue(":ID", id);
     query.bindValue(":HOST", a_host);
 
@@ -509,9 +527,9 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
 
     while (query.next())
     {
-        this->playlistid = query.value(0).toInt();
-        this->name = QString::fromUtf8(query.value(1).toString());
-        this->raw_songlist = query.value(2).toString();
+        playlistid = query.value(0).toInt();
+        name = QString::fromUtf8(query.value(1).toString());
+        raw_songlist = query.value(2).toString();
     }
 
     if (name == "default_playlist_storage")
@@ -570,24 +588,19 @@ void Playlist::fillSongsFromSonglist(bool filter)
 
 void Playlist::fillSonglistFromSongs()
 {
-    bool first = true;
-    QString a_list;
+    QString a_list = "";
     Track *it;
     for (it = songs.first(); it; it = songs.next())
     {
         if (!it->getCDFlag())
         {
-            if (first)
-            {
-                first = false;
-                a_list = QString("%1").arg(it->getValue());
-            }
-            else
-                a_list += QString(",%1").arg(it->getValue());
+            a_list += QString(",%1").arg(it->getValue());
         }
     }
 
-    raw_songlist = a_list;
+    raw_songlist = "";
+    if (a_list.length() > 1)
+        raw_songlist = a_list.remove(0, 1);
 }
 
 void Playlist::fillSonglistFromQuery(QString whereClause,
@@ -604,7 +617,10 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
 
     QString theQuery;
 
-    theQuery = "SELECT intid FROM musicmetadata ";
+    theQuery = "SELECT song_id FROM music_songs "
+               "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+               "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+               "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id ";
 
     if (whereClause.length() > 0)
       theQuery += whereClause;
@@ -719,13 +735,13 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     int limitTo;
     
     query.prepare("SELECT smartplaylistid, matchtype, orderby, limitto "
-                  "FROM smartplaylist WHERE categoryid = :CATEGORYID AND name = :NAME;");
+                  "FROM music_smartplaylists WHERE categoryid = :CATEGORYID AND name = :NAME;");
     query.bindValue(":NAME", name.utf8());
     query.bindValue(":CATEGORYID", categoryID);
         
     if (query.exec())
     {
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.first();
             ID = query.value(0).toInt();
@@ -749,10 +765,10 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     QString whereClause = "WHERE ";
     
     query.prepare("SELECT field, operator, value1, value2 "
-                  "FROM smartplaylistitem WHERE smartplaylistid = :ID;");
+                  "FROM music_smartplaylist_items WHERE smartplaylistid = :ID;");
     query.bindValue(":ID", ID);
     query.exec();
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         bool bFirst = true;
         while (query.next())
@@ -770,96 +786,109 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
             }
         }
     }
-    
+
     // add order by clause
     whereClause += getOrderBySQL(orderBy);
-    
+
     // add limit
     if (limitTo > 0)
-        whereClause +=  " LIMIT " + QString::number(limitTo); 
+        whereClause +=  " LIMIT " + QString::number(limitTo);
 
     fillSonglistFromQuery(whereClause, removeDuplicates, insertOption, currentTrackID);
 }
-    
-void Playlist::savePlaylist(QString a_name)
+
+void Playlist::savePlaylist(QString a_name, QString a_host)
 {
-    name = name.simplifyWhiteSpace();
+    name = a_name.simplifyWhiteSpace();
     if (name.length() < 1)
-        return;
-
-    fillSonglistFromSongs();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT NULL FROM musicplaylist WHERE playlistid = :ID ;");
-    query.bindValue(":ID", playlistid);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.prepare("UPDATE musicplaylist SET songlist = :LIST , "
-                      "name = :NAME WHERE playlistid = :ID ;");
-        query.bindValue(":LIST", raw_songlist);
-        query.bindValue(":NAME", a_name.utf8());
-        query.bindValue(":ID", playlistid);
-    }
-    else
-    {
-        query.prepare("INSERT INTO musicplaylist (name,songlist) "
-                      "VALUES(:NAME, :LIST);");
-        query.bindValue(":LIST", raw_songlist);
-        query.bindValue(":NAME", a_name.utf8());
-    }
-
-    query.exec();
-}
-
-void Playlist::saveNewPlaylist(QString a_host)
-{
-    name = name.simplifyWhiteSpace();
-    if(name.length() < 1)
     {
         cerr << "playlist.o: Not going to save a playlist with no name" << endl ;
         return;
     }
 
-    if(a_host.length() < 1)
+    if (a_host.length() < 1)
     {
         cerr << "playlist.o: Not going to save a playlist with no hostname" << endl;
         return;
     }
+    if (name.length() < 1)
+        return;
 
     fillSonglistFromSongs();
-    
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT musicplaylist (name, hostname) "
-                  "VALUES(:NAME, :HOST);");
-    query.bindValue(":NAME", name.utf8());
-    query.bindValue(":HOST", a_host);
 
-    query.exec();
-
-    query.prepare("SELECT playlistid FROM musicplaylist WHERE "
-                  "name = :NAME AND hostname = :HOST ;");
-    query.bindValue(":NAME", name.utf8());
-    query.bindValue(":HOST", a_host);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
+    int songcount = 0, playtime = 0, an_int;
+    QStringList list = QStringList::split(",", raw_songlist);
+    QStringList::iterator it = list.begin();
+    for (; it != list.end(); it++)
     {
-        while(query.next())
+        an_int = QString(*it).toInt();
+        if (an_int != 0)
         {
-            //  If multiple rows with same name,
-            //  make sure we get the last one
-            playlistid = query.value(0).toInt();
+            songcount++;
+            if (an_int > 0)
+            {
+                query.prepare("SELECT length FROM music_songs WHERE song_id = :ID ;");
+            }
+            else
+            {
+                query.prepare("SELECT length FROM music_playlists WHERE playlist_id = :ID ;");
+                an_int *= -1;
+            }
+            query.bindValue(":ID", an_int);
+            query.exec();
+            if (query.size() > 0)
+            {
+                query.next();
+                playtime += query.value(0).toInt();
+            }
         }
+    }
+
+    bool save_host = ("default_playlist_storage" == a_name || "backup_playlist_storage" == a_name);
+    if (playlistid > 0)
+    {
+        QString str_query = "UPDATE music_playlists SET playlist_songs = :LIST,"
+                            " playlist_name = :NAME, songcount = :SONGCOUNT, length = :PLAYTIME";
+        if (save_host)
+            str_query += ", hostname = :HOSTNAME";
+        str_query += " WHERE playlist_id = :ID ;";
+
+        query.prepare(str_query);
+        query.bindValue(":ID", playlistid);
     }
     else
     {
-        MythContext::DBError("playlist insert", query);
+        QString str_query = "INSERT INTO music_playlists"
+                            " (playlist_name, playlist_songs, songcount, length";
+        if (save_host)
+            str_query += ", hostname";
+        str_query += ") VALUES(:NAME, :LIST, :SONGCOUNT, :PLAYTIME";
+        if (save_host)
+            str_query += ", :HOSTNAME";
+        str_query += ");";
+
+        query.prepare(str_query);
     }
+    query.bindValue(":LIST", raw_songlist);
+    query.bindValue(":NAME", a_name.utf8());
+    query.bindValue(":SONGCOUNT", songcount);
+    query.bindValue(":PLAYTIME", playtime);
+    if (save_host)
+        query.bindValue(":HOSTNAME", a_host);
+
+    if (!query.exec() || (playlistid < 1 && query.numRowsAffected() < 1))
+    {
+        MythContext::DBError("Problem saving playlist", query);
+    }
+
+    if (playlistid < 1)
+        playlistid = query.lastInsertId().toInt();
 }
 
 QString Playlist::removeDuplicateTracks(const QString &new_songlist)
 {
-    raw_songlist = raw_songlist.remove(' '); 
+    raw_songlist.remove(' ');
 
     QStringList curList = QStringList::split(",", raw_songlist);
     QStringList newList = QStringList::split(",", new_songlist);
@@ -1095,22 +1124,21 @@ void PlaylistsContainer::save()
         if(a_list->hasChanged())
         {
             a_list->fillSonglistFromSongs();
-            a_list->savePlaylist(a_list->getName());
+            a_list->savePlaylist(a_list->getName(), my_host);
         }
     }
-    
-    active_playlist->savePlaylist("default_playlist_storage");
-    backup_playlist->savePlaylist("backup_playlist_storage");
+
+    active_playlist->savePlaylist("default_playlist_storage", my_host);
+    backup_playlist->savePlaylist("backup_playlist_storage", my_host);
 }
 
 void PlaylistsContainer::createNewPlaylist(QString name)
 {
     Playlist *new_list = new Playlist(all_available_music);
     new_list->setParent(this);
-    new_list->setName(name);
-    
+
     //  Need to touch the database to get persistent ID
-    new_list->saveNewPlaylist(my_host);
+    new_list->savePlaylist(name, my_host);
     new_list->Changed();
     all_other_playlists->append(new_list);
     //if(my_widget)
@@ -1123,9 +1151,9 @@ void PlaylistsContainer::copyNewPlaylist(QString name)
 {
     Playlist *new_list = new Playlist(all_available_music);
     new_list->setParent(this);
-    new_list->setName(name);
+
     //  Need to touch the database to get persistent ID
-    new_list->saveNewPlaylist(my_host);
+    new_list->savePlaylist(name, my_host);
     new_list->Changed();
     all_other_playlists->append(new_list);
     active_playlist->copyTracks(new_list, false);
@@ -1196,7 +1224,7 @@ void PlaylistsContainer::copyToActive(int index)
 void PlaylistsContainer::renamePlaylist(int index, QString new_name)
 {
     Playlist *list_to_rename = getPlaylist(index);
-    if(list_to_rename)
+    if (list_to_rename)
     {
         list_to_rename->setName(new_name);
         list_to_rename->Changed();
@@ -1237,10 +1265,10 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM musicplaylist WHERE playlistid = :ID ;");
+    query.prepare("DELETE FROM music_playlists WHERE playlist_id = :ID ;");
     query.bindValue(":ID", kill_me);
 
-    if (query.exec() || query.size() < 1)
+    if (!query.exec() || query.numRowsAffected() < 1)
     {
         MythContext::DBError("playlist delete", query);
     }
@@ -1261,7 +1289,7 @@ QString PlaylistsContainer::getPlaylistName(int index, bool &reference)
         Playlist *a_list;
         for(a_list = all_other_playlists->last(); a_list; a_list = all_other_playlists->prev())
         {
-            if (a_list->getID() * -1 == index)
+            if (a_list->getID() == index)
             {
                 return a_list->getName();   
             }
@@ -1538,7 +1566,7 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
                 level_down->computeSize(child_MB, child_sec);
                 size_in_MB += child_MB;
                 size_in_sec += child_sec;
-	    }
+            }
         }
     }
 }

@@ -104,8 +104,9 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
     // which totally messes up the rest of the page.
     artistedit->setMaximumWidth((int)(0.7 * screenwidth));
 
-    fillComboBox(*artistedit, "artist");
-
+    QStringList strlist = Metadata::fillFieldList("artist");
+    artistedit->insertStringList(strlist);
+    
     QLabel *albuml = new QLabel(tr("Album: "), firstdiag);
     albuml->setBackgroundOrigin(WindowOrigin);
     albumedit = new MythLineEdit(firstdiag);
@@ -114,7 +115,8 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
     QLabel *genrelabel = new QLabel(tr("Genre: "), firstdiag);
     genrelabel->setBackgroundOrigin(WindowOrigin);
     genreedit = new MythComboBox(true, firstdiag);
-    fillComboBox (*genreedit, "genre");
+    strlist = Metadata::fillFieldList("genre");
+    genreedit->insertStringList(strlist);
 
 
     compilation = new MythCheckBox(firstdiag);
@@ -196,30 +198,30 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
 
                 length = track->Length() / 1000;
 
-		QString title = track->Title();
-		newTune = isNewTune(artistname, albumname, title);
+                QString title = track->Title();
+                newTune = isNewTune(artistname, albumname, title);
 
-		if (newTune)
-		{
-		    min = length / 60;
+                if (newTune)
+                {
+                    min = length / 60;
                     sec = length % 60;
 
-		    table->setNumRows(row + 1);
-                
-		    table->setRowHeight(row, (int)(30 * hmult));
-		    
-		    label.sprintf("%d", trackno + 1);
-		    table->setText(row, 0, label);
-		    
-		    table->setText(row, 1, track->Title());
-		    
-		    table->setText(row, 2, track->Artist());
-		    
-		    label.sprintf("%02d:%02d", min, sec);
-		    table->setText(row, 3, label);
-                
-		    row++;
-		}
+                    table->setNumRows(row + 1);
+
+                    table->setRowHeight(row, (int)(30 * hmult));
+
+                    label.sprintf("%d", trackno + 1);
+                    table->setText(row, 0, label);
+
+                    table->setText(row, 1, track->Title());
+
+                    table->setText(row, 2, track->Artist());
+
+                    label.sprintf("%02d:%02d", min, sec);
+                    table->setText(row, 3, label);
+
+                    row++;
+                }
                 delete track;
             }
         }
@@ -283,31 +285,34 @@ bool Ripper::isNewTune(QString& artist, QString& album, QString& title)
 {
     if (gContext->GetNumSetting("OnlyImportNewMusic",1))
     {
-        MSqlQuery query(MSqlQuery::InitCon());	
-	QString queryString("SELECT filename, artist, album, title, intid "
-			    "FROM musicmetadata WHERE artist REGEXP \'");      
-	QString token = artist;
-	token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+        MSqlQuery query(MSqlQuery::InitCon());
+        QString queryString("SELECT filename, artist_name, album_name, name, song_id "
+                            "FROM music_songs "
+                            "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                            "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                            "WHERE artist_name REGEXP \'");      
+        QString token = artist;
+        token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
       
-	queryString += token + "\' AND " + "album REGEXP \'";
-	token = album;
-	token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-	queryString += token + "\' AND " + "title    REGEXP \'";
-	token = title;
-	token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
-	queryString += token + "\' ORDER BY artist, album, title, intid, filename";      
-	query.prepare(queryString);
-	
-	bool has_entries = true;     
-	if (!query.exec() || !query.isActive())
-	{
-	    MythContext::DBError("Search music database", query);
-	    has_entries = false;
-	}
-      	if (query.numRowsAffected() > 0)
-	{
-	    return false;
-	}
+        queryString += token + "\' AND " + "album_name REGEXP \'";
+        token = album;
+        token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+        queryString += token + "\' AND " + "name    REGEXP \'";
+        token = title;
+        token.replace(QRegExp("(/|\\\\|:|\'|\\,|\\!|\\(|\\)|\"|\\?|\\|)"), QString("."));
+        queryString += token + "\' ORDER BY artist_name, album_name, name, song_id, filename";      
+        query.prepare(queryString);
+        
+        bool has_entries = true;     
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Search music database", query);
+            has_entries = false;
+        }
+        if (query.numRowsAffected() > 0)
+        {
+            return false;
+        }
     }       
     return true;
 }
@@ -522,31 +527,6 @@ void Ripper::switchTitlesAndArtists()
     }
 
     delete decoder;
-}
-
-void Ripper::fillComboBox(MythComboBox &box, const QString &db_column)
-{
-    QString querystr = QString("SELECT DISTINCT %1 FROM musicmetadata;")
-                               .arg(db_column);
-      
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(querystr);
-   
-    QValueList<QString> list;
-   
-    if (query.isActive() && query.size() > 0)
-    { 
-        while (query.next())
-        {
-            list.push_front(query.value(0).toString());
-        }
-    }
-   
-    QStringList strlist(list);
-   
-    strlist.sort();
-   
-    box.insertStringList(strlist);
 }
 
 void Ripper::handleFileTokens(QString &filename, Metadata *track)

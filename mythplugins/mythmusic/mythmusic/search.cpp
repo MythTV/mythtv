@@ -66,7 +66,7 @@ const char *mapping[] =
 
 void SearchDialog::runQuery(QString searchText)
 {
-    // This method will perform a search in the 'musicmetadata' table and fill
+    // This method will perform a search in the various music_* tables and fill
     // the 'listbox' widget with the results.
     // The following columns are searched: filename, artist, album, title.
     // To facilitate usage with a remote, two search modes exist and
@@ -103,8 +103,10 @@ void SearchDialog::runQuery(QString searchText)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString queryString("SELECT filename, artist, album, title, intid "
-                        "FROM musicmetadata ");
+    QString queryString("SELECT filename, artist_name, album_name, name, song_id "
+                        "FROM music_songs "
+                        "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                        "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id ");      
 
     QStringList list = QStringList::split(QRegExp("[>,]"), searchText);
     whereClause = "";
@@ -117,10 +119,10 @@ void SearchDialog::runQuery(QString searchText)
                  QString stxt = list[i];
                  whereClause += (i) ? " AND ( " : "WHERE (";
                  whereClause +=
-                    "filename LIKE '%" + stxt + "%' OR "
-                    "artist   LIKE '%" + stxt + "%' OR "
-                    "album    LIKE '%" + stxt + "%' OR "
-                    "title    LIKE '%" + stxt + "%')";
+                    "filename    LIKE '%" + stxt + "%' OR "
+                    "artist_name LIKE '%" + stxt + "%' OR "
+                    "album_name  LIKE '%" + stxt + "%' OR "
+                    "name    LIKE '%" + stxt + "%')";
              }
              VERBOSE(VB_GENERAL, QString("alpha whereClause " + whereClause ));
         }
@@ -131,17 +133,17 @@ void SearchDialog::runQuery(QString searchText)
                 QString stxt = list[i].stripWhiteSpace();
                 whereClause += (i) ? " AND ( " : "WHERE (";
                 whereClause +=
-                    "filename REGEXP '" + stxt + "' OR "
-                    "artist   REGEXP '" + stxt + "' OR "
-                    "album    REGEXP '" + stxt + "' OR "
-                    "title    REGEXP '" + stxt + "')";
+                    "filename    REGEXP '" + stxt + "' OR "
+                    "artist_name REGEXP '" + stxt + "' OR "
+                    "album_name  REGEXP '" + stxt + "' OR "
+                    "name        REGEXP '" + stxt + "')";
             }
             VERBOSE(VB_GENERAL,QString("numeric whereClause " + whereClause ));
         }
     }
 
     queryString += whereClause;
-    queryString += " ORDER BY artist, album, title, intid, filename ";
+    queryString += " ORDER BY artist_name, album_name, name, song_id, filename ";
 
     query.prepare(queryString);
 
@@ -217,7 +219,7 @@ void SearchDialog::runQuery(QString searchText)
 void SearchDialog::itemSelected(int i)
 {
     unsigned int id = ((SearchListBoxItem*)listbox->item(i))->getId();
-    whereClause = QString("WHERE intid='%1';").arg(id);
+    whereClause = QString("WHERE song_id='%1';").arg(id);
     done(0);
 }
 

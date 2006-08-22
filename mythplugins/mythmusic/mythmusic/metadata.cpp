@@ -31,23 +31,23 @@ bool operator!=(const Metadata& a, const Metadata& b)
 
 Metadata& Metadata::operator=(Metadata *rhs)
 {
-    artist = rhs->Artist();
-    compilation_artist = rhs->CompilationArtist();
-    album = rhs->Album();
-    title = rhs->Title();
-    formattedartist = rhs->FormatArtist();
-    formattedtitle = rhs->FormatTitle();
-    genre = rhs->Genre();
-    year = rhs->Year();
-    tracknum = rhs->Track();
-    length = rhs->Length();
-    rating = rhs->Rating();
-    lastplay = rhs->LastPlayStr();
-    playcount = rhs->Playcount();
-    compilation = rhs->Compilation();
-    id = rhs->ID();
-    filename = rhs->Filename();
-    changed = rhs->hasChanged();
+    artist = rhs->artist;
+    compilation_artist = rhs->compilation_artist;
+    album = rhs->album;
+    title = rhs->title;
+    formattedartist = rhs->formattedartist;
+    formattedtitle = rhs->formattedtitle;
+    genre = rhs->genre;
+    year = rhs->year;
+    tracknum = rhs->tracknum;
+    length = rhs->length;
+    rating = rhs->rating;
+    lastplay = rhs->lastplay;
+    playcount = rhs->playcount;
+    compilation = rhs->compilation;
+    id = rhs->id;
+    filename = rhs->filename;
+    changed = rhs->changed;
 
     return *this;
 }
@@ -62,9 +62,9 @@ void Metadata::SetStartdir(const QString &dir)
 void Metadata::persist()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE musicmetadata set rating = :RATING , "
-                  "playcount = :PLAYCOUNT , lastplay = :LASTPLAY "
-                  "where intid = :ID ;");
+    query.prepare("UPDATE music_songs set rating = :RATING , "
+                  "numplays = :PLAYCOUNT , lastplay = :LASTPLAY "
+                  "where song_id = :ID ;");
     query.bindValue(":RATING", rating);
     query.bindValue(":PLAYCOUNT", playcount);
     query.bindValue(":LASTPLAY", lastplay);
@@ -100,9 +100,17 @@ bool Metadata::isInDatabase()
         sqlfilename.remove(0, m_startdir.length());
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT artist,compilation_artist,album,title,genre,year,tracknum,"
-                  "length,intid,rating,playcount,lastplay,compilation,format FROM "
-                  "musicmetadata WHERE filename = :FILENAME ;");
+    query.prepare("SELECT music_artists.artist_name, music_comp_artists.artist_name AS compilation_artist, "
+                  "music_albums.album_name, music_songs.name, music_genres.genre, music_songs.year, "
+                  "music_songs.track, music_songs.length, music_songs.song_id, music_songs.rating, "
+                  "music_songs.numplays, music_songs.lastplay, music_albums.compilation, "
+                  "music_songs.format "
+                  "FROM music_songs "
+                  "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                  "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                  "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
+                  "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
+                  "WHERE music_songs.filename = :FILENAME ;");
     query.bindValue(":FILENAME", sqlfilename.utf8());
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -150,14 +158,22 @@ void Metadata::dumpToDatabase()
     // Don't update the database if a song with the exact same
     // metadata is already there
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT filename FROM musicmetadata WHERE "
-                  "( ( artist = :ARTIST ) AND "
-                  "( compilation_artist = :COMPILATION_ARTIST ) "
-                  "( album = :ALBUM ) AND ( title = :TITLE ) "
-                  "AND ( genre = :GENRE ) AND "
-                  "( year = :YEAR ) AND ( tracknum = :TRACKNUM ) "
-                  "AND ( length = :LENGTH ) "
-                  "AND ( format = :FORMAT) );");
+    query.prepare("SELECT music_songs.filename "
+                  "FROM music_songs "
+                  "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                  "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                  "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
+                  "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
+                  "WHERE music_artists.artist_name = :ARTIST"
+                  " AND music_comp_artists.artist_name = :COMPILATION_ARTIST"
+                  " AND music_albums.album_name = :ALBUM"
+                  " AND music_songs.name = :TITLE"
+                  " AND music_genres.genre = :GENRE"
+                  " AND music_songs.year = :YEAR"
+                  " AND music_songs.track = :TRACKNUM"
+                  " AND music_songs.length = :LENGTH"
+                  " AND music_songs.format = :FORMAT ;");
+
     query.bindValue(":ARTIST", artist.utf8());
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -171,34 +187,189 @@ void Metadata::dumpToDatabase()
     if (query.exec() && query.isActive() && query.size() > 0)
         return;
 
-    query.prepare("INSERT INTO musicmetadata "
-                  "(artist,   compilation_artist, album,      title,  "
-                  " genre,    year,               tracknum,   length, "
-                  " filename, compilation,        date_added, date_modified, "
-                  " format ) "
-                  "VALUES "
-                  "(:ARTIST,  :COMPILATION_ARTIST,:ALBUM,     :TITLE,   "
-                  " :GENRE,   :YEAR,              :TRACKNUM,  :LENGTH,  "
-                  " :FILENAME,:COMPILATION,       :DATE_ADDED,:DATE_MOD,"
-                  " :FORMAT)");
+    // Load the artist id or insert it and get the id
+    unsigned int artistId;
+    query.prepare("SELECT artist_id FROM music_artists "
+                  "WHERE artist_name = :ARTIST ;");
     query.bindValue(":ARTIST", artist.utf8());
-    query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("music select artist id", query);
+        return;
+    }
+    if (query.size() > 0)
+    {
+        query.next();
+        artistId = query.value(0).toInt();
+    }
+    else
+    {
+        query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+        query.bindValue(":ARTIST", artist.utf8());
+
+        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        {
+            MythContext::DBError("music insert artist", query);
+            return;
+        }
+        artistId = query.lastInsertId().toInt();
+    }
+
+    // Compilation Artist
+    unsigned int compilationArtistId;
+    query.prepare("SELECT artist_id FROM music_artists "
+                  "WHERE artist_name = :ARTIST ;");
+    query.bindValue(":ARTIST", compilation_artist.utf8());
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("music select compilation artist id", query);
+        return;
+    }
+    if (query.size() > 0)
+    {
+        query.next();
+        compilationArtistId = query.value(0).toInt();
+    }
+    else
+    {
+        query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+        query.bindValue(":ARTIST", compilation_artist.utf8());
+
+        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        {
+            MythContext::DBError("music insert compilation artist", query);
+            return;
+        }
+        compilationArtistId = query.lastInsertId().toInt();
+    }
+
+    // Album
+    unsigned int albumId;
+    query.prepare("SELECT album_id FROM music_albums "
+                  "WHERE artist_id = :COMP_ARTIST_ID "
+                  " AND album_name = :ALBUM ;");
+    query.bindValue(":COMP_ARTIST_ID", compilationArtistId);
     query.bindValue(":ALBUM", album.utf8());
-    query.bindValue(":TITLE", title.utf8());
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("music select album id", query);
+        return;
+    }
+    if (query.size() > 0)
+    {
+        query.next();
+        albumId = query.value(0).toInt();
+    }
+    else
+    {
+        query.prepare("INSERT INTO music_albums (artist_id, album_name, compilation, year) VALUES (:COMP_ARTIST_ID, :ALBUM, :COMPILATION, :YEAR);");
+        query.bindValue(":COMP_ARTIST_ID", compilationArtistId);
+        query.bindValue(":ALBUM", album.utf8());
+        query.bindValue(":COMPILATION", compilation);
+        query.bindValue(":YEAR", year);
+
+        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        {
+            MythContext::DBError("music insert album", query);
+            return;
+        }
+        albumId = query.lastInsertId().toInt();
+    }
+
+    // Genres
+    unsigned int genreId;
+    query.prepare("SELECT genre_id FROM music_genres "
+                  "WHERE genre = :GENRE ;");
     query.bindValue(":GENRE", genre.utf8());
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("music select genre id", query);
+        return;
+    }
+    if (query.size() > 0)
+    {
+        query.next();
+        genreId = query.value(0).toInt();
+    }
+    else
+    {
+        query.prepare("INSERT INTO music_genres (genre) VALUES (:GENRE);");
+        query.bindValue(":GENRE", genre.utf8());
+
+        if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+        {
+            MythContext::DBError("music insert genre", query);
+            return;
+        }
+        genreId = query.lastInsertId().toInt();
+    }
+
+    // We have all the id's now. We can insert it.
+    QString strQuery;
+    if (id < 1)
+    {
+        strQuery = "INSERT INTO music_songs ("
+                   " artist_id, album_id,  name,         genre_id,"
+                   " year,      track,     length,       filename,"
+                   " rating,    format,    date_entered, date_modified ) "
+                   "VALUES ("
+                   " :ARTIST,   :ALBUM,    :TITLE,       :GENRE,"
+                   " :YEAR,     :TRACKNUM, :LENGTH,      :FILENAME,"
+                   " :RATING,   :FORMAT,   :DATE_ADD,    :DATE_MOD );";
+    }
+    else
+    {
+        strQuery = "UPDATE music_songs SET"
+                   "  artist_id = :ARTIST"
+                   ", album_id = :ALBUM"
+                   ", name = :TITLE"
+                   ", genre_id = :GENRE"
+                   ", year = :YEAR"
+                   ", track = :TRACKNUM"
+                   ", length = :LENGTH"
+                   ", filename = :FILENAME"
+                   ", rating = :RATING"
+                   ", format = :FORMAT"
+                   ", date_modified = :DATE_MOD "
+                   "WHERE song_id= :ID ;";
+    }
+
+    query.prepare(strQuery);
+    /*
+    query.prepare("INSERT INTO music_songs "
+                  "  (artist_id, album_id,     name,"
+                  "   genre_id,  year,         track,                length,"
+                  "   filename,  date_entered, date_modified,"
+                  "   format,    size,         bitrate) "
+                  "VALUES "
+                  "  (:ARTIST,   :ALBUM,       :TITLE,"
+                  "   :GENRE,    :YEAR,        :TRACKNUM,            :LENGTH,"
+                  "   :FILENAME, :DATE_ADDED,  :DATE_MOD,"
+                  "   :FORMAT,   :FILESIZE,    :BITRATE)"
+                  );
+    */
+    query.bindValue(":ARTIST", artistId);
+    query.bindValue(":ALBUM", albumId);
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":GENRE", genreId);
     query.bindValue(":YEAR", year);
     query.bindValue(":TRACKNUM", tracknum);
     query.bindValue(":LENGTH", length);
     query.bindValue(":FILENAME", sqlfilename.utf8());
-    query.bindValue(":COMPILATION", compilation);
-    query.bindValue(":DATE_ADDED",  QDateTime::currentDateTime());
-    query.bindValue(":DATE_MOD",    QDateTime::currentDateTime());
+    query.bindValue(":RATING", rating);
     query.bindValue(":FORMAT", format);
-    
+    query.bindValue(":DATE_MOD", QDateTime::currentDateTime());
+
+    if (id < 1)
+        query.bindValue(":DATE_ADDED",  QDateTime::currentDateTime());
+    else
+        query.bindValue(":ID", id);
+
     query.exec();
 
-    // easiest way to ensure we've got 'id' filled.
-    fillData();
+    if (id < 1 && query.isActive() && 1 == query.numRowsAffected())
+        id = query.lastInsertId().toInt();
 }
 
 // Default values for formats
@@ -328,54 +499,6 @@ QString Metadata::FormatTitle()
 }
 
 
-void Metadata::updateDatabase()
-{
-    // only save to DB if something changed
-    //if (!hasChanged())
-    //    return;
-
-    if (artist == "")
-        artist = QObject::tr("Unknown Artist");
-    if (album == "")
-        album = QObject::tr("Unknown Album");
-    if (title == "")
-        title = filename;
-    if (genre == "")
-        genre = QObject::tr("Unknown Genre");
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("UPDATE musicmetadata    "
-                  "SET artist   = :ARTIST,   "
-                  "    album    = :ALBUM,    "
-                  "    title    = :TITLE,    "
-                  "    genre    = :GENRE,    "
-                  "    year     = :YEAR,     "
-                  "    tracknum = :TRACKNUM, "
-                  "    rating   = :RATING,   " 
-                  "    date_modified      = :DATE_MODIFIED, "
-                  "    compilation        = :COMPILATION,   "
-                  "    compilation_artist = :COMPILATION_ARTIST, "
-                  "    format             = :FORMAT "
-                  "WHERE intid = :ID;");
-    query.bindValue(":ARTIST",             artist.utf8());
-    query.bindValue(":ALBUM",              album.utf8());
-    query.bindValue(":TITLE",              title.utf8());
-    query.bindValue(":GENRE",              genre.utf8());
-    query.bindValue(":YEAR",               year);
-    query.bindValue(":TRACKNUM",           tracknum);
-    query.bindValue(":RATING",             rating);
-    query.bindValue(":DATE_MODIFIED",      QDateTime::currentDateTime());
-    query.bindValue(":COMPILATION",        compilation);
-    query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
-    query.bindValue(":FORMAT", format);
-    query.bindValue(":ID", id);
-
-    if (!query.exec())
-         MythContext::DBError("Update musicmetadata", query);
-}
-
-
 void Metadata::setField(const QString &field, const QString &data)
 {
     if (field == "artist")
@@ -426,92 +549,6 @@ void Metadata::getField(const QString &field, QString *data)
     }
 }
 
-void Metadata::fillData()
-{
-    if (title == "")
-        return;
-
-    QString thequery = "SELECT artist,compilation_artist,album,title,genre,year,tracknum,length,"
-                       "filename,intid,rating,playcount,lastplay,compilation,format "
-                       "FROM musicmetadata WHERE title = :TITLE";
-
-    if (album != "")
-        thequery += " AND album = :ALBUM";
-    if (artist != "")
-        thequery += " AND artist = :ARTIST";
-    if (compilation_artist != "")
-        thequery += " AND compilation_artist = :COMPILATION_ARTIST";
-
-    thequery += ";";
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(thequery);
-    query.bindValue(":TITLE", title.utf8());
-    query.bindValue(":ALBUM", album.utf8());
-    query.bindValue(":ARTIST", artist.utf8());
-    query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-
-        artist = QString::fromUtf8(query.value(0).toString());
-        compilation_artist = QString::fromUtf8(query.value(1).toString());
-        album = QString::fromUtf8(query.value(2).toString());
-        title = QString::fromUtf8(query.value(3).toString());
-        genre = QString::fromUtf8(query.value(4).toString());
-        year = query.value(5).toInt();
-        tracknum = query.value(6).toInt();
-        length = query.value(7).toInt();
-        filename = QString::fromUtf8(query.value(8).toString());
-        id = query.value(9).toUInt();
-        rating = query.value(10).toInt();
-        playcount = query.value(11).toInt();
-        lastplay = query.value(12).toString();
-        compilation = (query.value(13).toInt() > 0);
-        format = query.value(14).toString();
-
-        if (!filename.contains("://"))
-            filename = m_startdir + filename;
-    }
-}
-
-void Metadata::fillDataFromID()
-{       
-    if (id == 0)
-        return; 
-        
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT title,artist,compilation_artist,album,title,genre,year,tracknum,"
-                  "length,filename,rating,playcount,lastplay,compilation,format FROM "
-                  "musicmetadata WHERE intid = :ID ;");
-    query.bindValue(":ID", id);
-        
-    if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        title = QString::fromUtf8(query.value(0).toString());
-        artist = QString::fromUtf8(query.value(1).toString());
-        compilation_artist = QString::fromUtf8(query.value(2).toString());
-        album = QString::fromUtf8(query.value(3).toString());
-        title = QString::fromUtf8(query.value(4).toString());
-        genre = QString::fromUtf8(query.value(5).toString());
-        year = query.value(6).toInt();
-        tracknum = query.value(7).toInt();
-        length = query.value(8).toInt();
-        filename = QString::fromUtf8(query.value(9).toString());
-        rating = query.value(10).toInt();
-        playcount = query.value(11).toInt();
-        lastplay = query.value(12).toString();
-        compilation = (query.value(13).toInt() > 0);
-        format = query.value(14).toString();
-
-        if (!filename.contains("://"))
-            filename = m_startdir + filename;
-    }
-}
-
 void Metadata::decRating()
 {
     if (rating > 0)
@@ -551,6 +588,43 @@ void Metadata::incPlayCount()
 {
     playcount++;
     changed = true;
+}
+
+QStringList Metadata::fillFieldList(QString field)
+{
+    QStringList searchList;
+    searchList.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if ("artist" == field || "compilation_artist" == field)
+    {
+        query.prepare("SELECT artist_name FROM music_artists ORDER BY artist_name;");
+    }
+    else if ("album" == field)
+    {
+        query.prepare("SELECT album_name FROM music_albums ORDER BY album_name;");
+    }
+    else if ("title" == field)
+    {
+        query.prepare("SELECT name FROM music_songs ORDER BY name;");
+    }
+    else if ("genre" == field)
+    {
+        query.prepare("SELECT genre FROM music_genres ORDER BY genre;");
+    }
+    else
+    {
+        return searchList;
+    }
+
+    if (query.exec() && query.isActive() && query.size())
+    {
+        while (query.next())
+        {
+            searchList << QString::fromUtf8(query.value(0).toString());
+        }
+    }
+    return searchList;
 }
 
 MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
@@ -648,11 +722,18 @@ bool AllMusic::startLoading(void)
 void AllMusic::resync()
 {
     done_loading = false;
-    QString aquery =    "SELECT intid, artist, compilation_artist, album, title, genre, "
-                        "year, tracknum, length, filename, rating, "
-                        "lastplay, playcount, compilation, format "
-                        "FROM musicmetadata "
-                        "ORDER BY intid;";
+
+    QString aquery = "SELECT music_songs.song_id, music_artists.artist_name, music_comp_artists.artist_name AS compilation_artist, "
+                     "music_albums.album_name, music_songs.name, music_genres.genre, music_songs.year, "
+                     "music_songs.track, music_songs.length, music_songs.filename, "
+                     "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_albums.compilation, "
+                     "music_songs.format "
+                     "FROM music_songs "
+                     "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                     "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                     "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
+                     "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
+                     "ORDER BY music_songs.song_id;";
 
     QString filename, artist, album, title;
 
@@ -696,12 +777,12 @@ void AllMusic::resync()
                 query.value(7).toInt(),
                 query.value(8).toInt(),
                 query.value(0).toInt(),
-                query.value(10).toInt(),
-                query.value(12).toInt(),
-                query.value(11).toString(),
-                (query.value(13).toInt() > 0),
-                query.value(14).toString());
-            
+                query.value(10).toInt(), //rating
+                query.value(11).toInt(), //playcount
+                query.value(12).toString(), //lastplay
+                (query.value(13).toInt() > 0), //compilation
+                query.value(14).toString()); //format
+
             //  Don't delete temp, as PtrList now owns it
             all_music.append(temp);
 
