@@ -22,7 +22,7 @@ class ImageCacheImp
     const QPixmap *load(const QString &image_file)
     {
         cache_entry_ptr cep = addImage(image_file);
-        if (cep.get())
+        if (cep)
         {
             return &cep->image;
         }
@@ -35,7 +35,7 @@ class ImageCacheImp
     {
         QPixmap *ret = NULL;
         cache_entry_ptr cep = addScaleImage(image_file, width, height, scale);
-        if (cep.get() && !cep->scale_image.isNull())
+        if (cep && !cep->scale_image.isNull())
         {
             ret = &cep->scale_image;
         }
@@ -159,7 +159,7 @@ class ImageCacheImp
                                   int height, QImage::ScaleMode scale)
     {
         cache_entry_ptr ret = addImage(image_file);
-        if (ret.get() && !ret->image.isNull())
+        if (ret && !ret->image.isNull())
         {
             if (ret->scale_image.isNull() || ret->scale_mode != scale ||
 					ret->scale_width != width || ret->scale_height != height)

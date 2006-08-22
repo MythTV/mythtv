@@ -1624,7 +1624,7 @@ void VideoManager::slotDoFilter()
     {
         RefreshMovieList(false);
     }
-    else if (filter_state & VideoFilterSettings::SORT_ORDER_CHANGED)
+    else if (filter_state & VideoFilterSettings::kSortOrderChanged)
     {
         RefreshMovieList(true);
     }

@@ -1051,7 +1051,7 @@ bool Metadata::fillDataFromFilename(const MetadataListManager &cache)
 
     MetadataListManager::MetadataPtr mp =
             cache.byFilename(m_imp->getFilename());
-    if (mp.get())
+    if (mp)
     {
         *this = *mp;
         return true;

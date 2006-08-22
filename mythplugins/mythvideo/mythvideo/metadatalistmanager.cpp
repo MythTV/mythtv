@@ -71,7 +71,7 @@ class MetadataListManagerImp
   private:
     bool purge_entry(MetadataPtr metadata)
     {
-        if (metadata.get())
+        if (metadata)
         {
             int_to_meta::iterator im = m_id_map.find(metadata->ID());
             string_to_meta::iterator sm = m_file_map.find(metadata->Filename());

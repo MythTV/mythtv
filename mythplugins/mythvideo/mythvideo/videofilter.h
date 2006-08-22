@@ -21,15 +21,19 @@ class VideoFilterSettings
   public:
     static const unsigned int FILTER_MASK = 0xFFFE;
     static const unsigned int SORT_MASK = 0x1;
-    static const unsigned int SORT_ORDER_CHANGED = (1 << 0);
-    static const unsigned int FILTER_CATEGORY_CHANGED = (1 << 1);
-    static const unsigned int FILTER_GENRE_CHANGED = (1 << 2);
-    static const unsigned int FILTER_COUNTRY_CHANGED = (1 << 3);
-    static const unsigned int FILTER_YEAR_CHANGED = (1 << 4);
-    static const unsigned int FILTER_RUNTIME_CHANGED = (1 << 5);
-    static const unsigned int FILTER_USERRATING_CHANGED = (1 << 6);
-    static const unsigned int FILTER_BROWSE_CHANGED = (1 << 7);
-    static const unsigned int FILTER_PARENTAL_LEVEL_CHANGED = (1 << 8);
+    enum FilterChanges {
+        kSortOrderChanged = (1 << 0),
+        kFilterCategoryChanged = (1 << 1),
+        kFilterGenreChanged = (1 << 2),
+        kFilterCountryChanged = (1 << 3),
+        kFilterYearChanged = (1 << 4),
+        kFilterRuntimeChanged = (1 << 5),
+        kFilterUserRatingChanged = (1 << 6),
+        kFilterBrowseChanged = (1 << 7),
+        kFilterInetRefChanged = (1 << 8),
+        kFilterCoverFileChanged = (1 << 9),
+        kFilterParentalLevelChanged = (1 << 8)
+    };
 
   public:
     VideoFilterSettings(bool loaddefaultsettings = true,
@@ -57,64 +61,78 @@ class VideoFilterSettings
     int getCategory() const { return category; }
     void setCategory(int lcategory)
     {
-        m_changed_state |= FILTER_CATEGORY_CHANGED;
+        m_changed_state |= kFilterCategoryChanged;
         category = lcategory;
     }
 
     int getGenre() const { return genre; }
     void setGenre(int lgenre)
     {
-        m_changed_state |= FILTER_GENRE_CHANGED;
+        m_changed_state |= kFilterGenreChanged;
         genre = lgenre;
     }
 
     int getCountry() const { return country; }
     void setCountry(int lcountry)
     {
-        m_changed_state |= FILTER_COUNTRY_CHANGED;
+        m_changed_state |= kFilterCountryChanged;
         country = lcountry;
     }
 
     int getYear() const { return year; }
     void setYear(int lyear)
     {
-        m_changed_state |= FILTER_YEAR_CHANGED;
+        m_changed_state |= kFilterYearChanged;
         year = lyear;
     }
 
     int getRuntime() const { return runtime; }
     void setRuntime(int lruntime)
     {
-        m_changed_state |= FILTER_RUNTIME_CHANGED;
+        m_changed_state |= kFilterRuntimeChanged;
         runtime = lruntime;
     }
 
     int getUserrating() const { return userrating; }
     void setUserrating(int luserrating)
     {
-        m_changed_state |= FILTER_USERRATING_CHANGED;
+        m_changed_state |= kFilterUserRatingChanged;
         userrating = luserrating;
     }
 
     int getBrowse() const {return browse; }
     void setBrowse(int lbrowse)
     {
-        m_changed_state |= FILTER_BROWSE_CHANGED;
+        m_changed_state |= kFilterBrowseChanged;
         browse = lbrowse;
     }
 
     ordering getOrderby() const { return orderby; }
     void setOrderby(ordering lorderby)
     {
-        m_changed_state |= SORT_ORDER_CHANGED;
+        m_changed_state |= kSortOrderChanged;
         orderby = lorderby;
     }
 
     int getParentalLevel() const { return m_parental_level; }
     void setParentalLevel(int parental_level)
     {
-        m_changed_state |= FILTER_PARENTAL_LEVEL_CHANGED;
+        m_changed_state |= kFilterParentalLevelChanged;
         m_parental_level = parental_level;
+    }
+
+    int getInteRef() const { return m_inetref; }
+    void setInetRef(int inetref)
+    {
+        m_inetref = inetref;
+        m_changed_state |= kFilterInetRefChanged;
+    }
+
+    int getCoverFile() const { return m_coverfile; }
+    void setCoverFile(int coverfile)
+    {
+        m_coverfile = coverfile;
+        m_changed_state |= kFilterCoverFileChanged;
     }
 
     unsigned int getChangedState()
@@ -132,6 +150,8 @@ class VideoFilterSettings
     int runtime;
     int userrating;
     int browse;
+    int m_inetref;
+    int m_coverfile;
     ordering orderby;
     int m_parental_level;
     QString prefix;
@@ -200,7 +220,9 @@ class VideoFilterDialog : public MythThemedDialog
     void setGenre(int new_genre);
     void setRunTime(int new_runtime);
     void setBrowse(int new_browse);
-    void setOrderby(/* VideoFilterSettings::ordering */ int new_orderby);
+    void setInetRef(int new_inetref);
+    void setCoverFile(int new_coverfile);
+    void setOrderby(int new_orderby);
 
  private:
     void update_numvideo();
@@ -219,6 +241,9 @@ class VideoFilterDialog : public MythThemedDialog
     UITextButtonType    *save_button;
     UITextButtonType    *done_button;
     UITextType          *numvideos_text;
+
+    UISelectorType  *m_intetref_select;
+    UISelectorType  *m_coverfile_select;
 
     FilterSettingsProxy *m_fsp;
     const VideoList &m_video_list;

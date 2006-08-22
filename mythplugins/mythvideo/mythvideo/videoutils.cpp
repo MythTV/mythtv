@@ -18,7 +18,7 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
 {
     MetadataListManager::MetadataPtr item = video_list.byFilename(filename);
 
-    if (!item.get()) return;
+    if (!item) return;
 
     QTime playing_time;
 
@@ -49,7 +49,7 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
             break;
         }
     }
-    while (item.get() && playing_time.elapsed() > WATCHED_WATERMARK);
+    while (item && playing_time.elapsed() > WATCHED_WATERMARK);
 }
 
 bool checkParentPassword()

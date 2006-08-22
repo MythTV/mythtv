@@ -20,7 +20,7 @@ template <typename T, class Locker = NoLock>
 class simple_ref_ptr
 {
   public:
-    simple_ref_ptr() : m_ref(NULL)
+    simple_ref_ptr() : m_ref(0)
     {
     }
 
@@ -29,7 +29,7 @@ class simple_ref_ptr
         m_ref = new ref(ptr);
     }
 
-    simple_ref_ptr(const simple_ref_ptr &rhs) : m_ref(NULL)
+    simple_ref_ptr(const simple_ref_ptr &rhs) : m_ref(0)
     {
         *this = rhs;
     }
@@ -48,19 +48,9 @@ class simple_ref_ptr
         return *this;
     }
 
-    T *operator->()
-    {
-        return get();
-    }
-
     T *operator->() const
     {
         return get();
-    }
-
-    T &operator*()
-    {
-        return *get();
     }
 
     T &operator*() const
@@ -72,13 +62,25 @@ class simple_ref_ptr
     {
         if (m_ref) return m_ref->get();
 
-        return NULL;
+        return 0;
     }
 
     void reset(T *ptr)
     {
         unref();
         m_ref = new ref(ptr);
+    }
+
+    typedef T *(simple_ref_ptr<T>::*fake_bool)() const;
+
+    operator fake_bool() const
+    {
+        return m_ref == 0 ? 0 : &simple_ref_ptr<T>::get;
+    }
+
+    bool operator!() const
+    {
+        return m_ref == 0;
     }
 
   private:
@@ -128,12 +130,24 @@ class simple_ref_ptr
         if (m_ref && m_ref->dec() <= 0)
         {
             delete m_ref;
-            m_ref = NULL;
+            m_ref = 0;
         }
     }
 
   private:
     ref *m_ref;
 };
+
+template <typename T>
+bool operator==(const simple_ref_ptr<T> &lhs, const simple_ref_ptr<T> &rhs)
+{
+    return lhs.get() == rhs.get();
+}
+
+template <typename T>
+bool operator!=(const simple_ref_ptr<T> &lhs, const simple_ref_ptr<T> &rhs)
+{
+    return lhs.get() != rhs.get();
+}
 
 #endif // QUICKSP_H_

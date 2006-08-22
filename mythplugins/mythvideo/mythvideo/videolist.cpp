@@ -481,7 +481,7 @@ class VideoListImp
     {
         bool ret = false;
         MetadataPtr mp = m_metadata.byID(video_id);
-        if (mp.get())
+        if (mp)
         {
             ret = mp->deleteFile();
             if (ret) ret = m_metadata.purgeByID(video_id);
@@ -997,7 +997,7 @@ namespace
         {
             smart_dir_node sdn = dst.addSubDir((*dir)->getPath(),
                                                (*dir)->getName());
-            copy_filtered_tree(*(sdn.get()), *(dir->get()), filter);
+            copy_filtered_tree(*sdn, *(dir->get()), filter);
         }
     }
 
