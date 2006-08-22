@@ -564,6 +564,7 @@ void VideoOutputQuartzView::InputChanged(int width, int height, float aspect,
     (void)width;
     (void)height;
     (void)aspect;
+    (void)av_codec_id;
 
     // need to redo codec, but not the port
     End();
@@ -1420,28 +1421,20 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
 bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
-    for (int i = 0; i < vbuffers.allocSize(); i++)
-    {
-        vbuffers.at(i)->width  = video_dim.width();
-        vbuffers.at(i)->height = video_dim.height();
-        vbuffers.at(i)->bpp    = 12;
-        vbuffers.at(i)->size   = (video_dim.width() * video_dim.height() *
-                                  vbuffers.at(i)->bpp / 8);
-        vbuffers.at(i)->codec  = FMT_YV12;
-
-        vbuffers.at(i)->buf = new unsigned char[vbuffers.at(i)->size + 64];
-    }
+    vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
 
     // Set up pause and scratch frames
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+    VideoFrame *scratch = vbuffers.GetScratchFrame();
+
+    pauseFrame.height = scratch->height;
+    pauseFrame.width  = scratch->width;
+    pauseFrame.bpp    = scratch->bpp;
+    pauseFrame.size   = scratch->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    pauseFrame.frameNumber = scratch->frameNumber;
 
     // Set up pixel storage and image description for source
     data->pixelLock.lock();
@@ -1493,22 +1486,21 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     else
     {
         // YUV420 uses a descriptive header
-        data->pixelSize = (width * height * 3) / 2;
-        data->pixmapSize = sizeof(PlanarPixmapInfoYUV420) + data->pixelSize;
+        uint hdrSize = sizeof(PlanarPixmapInfoYUV420);
+
+        data->pixelSize  = scratch->size;
+        data->pixmapSize = hdrSize + data->pixelSize;
         data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
-        data->pixelData = &(data->pixmap[1]);
-    
-        long offset = sizeof(PlanarPixmapInfoYUV420);
-        data->pixmap->componentInfoY.offset = offset;
-        data->pixmap->componentInfoY.rowBytes = width;
-    
-        offset += width * height;
-        data->pixmap->componentInfoCb.offset = offset;
-        data->pixmap->componentInfoCb.rowBytes = width / 2;
-    
-        offset += (width * height) / 4;
-        data->pixmap->componentInfoCr.offset = offset;
-        data->pixmap->componentInfoCr.rowBytes = width / 2;
+        data->pixelData = data->pixmap;
+   
+        data->pixelData += hdrSize;  // Jump past the header 
+
+        data->pixmap->componentInfoY.offset    = scratch->offsets[0] + hdrSize;
+        data->pixmap->componentInfoY.rowBytes  = scratch->pitches[0];
+        data->pixmap->componentInfoCb.offset   = scratch->offsets[1] + hdrSize;
+        data->pixmap->componentInfoCb.rowBytes = scratch->pitches[1];
+        data->pixmap->componentInfoCr.offset   = scratch->offsets[2] + hdrSize;
+        data->pixmap->componentInfoCr.rowBytes = scratch->pitches[2];
     }
     
     data->pixelLock.unlock();
@@ -1560,11 +1552,7 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    for (int i = 0; i < vbuffers.allocSize(); i++)
-    {
-        delete [] vbuffers.at(i)->buf;
-        vbuffers.at(i)->buf = NULL;
-    }
+    vbuffers.DeleteBuffers();
 }
 
 void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
@@ -1743,13 +1731,14 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
     {
         if (data->yuvConverter)
         {
-            int frameSize = frame->width * frame->height;
             data->yuvConverter((uint8_t *)(data->pixelData),
-                               frame->buf,
-                               &frame->buf[frameSize],
-                               &frame->buf[frameSize * 5 / 4],
+                               frame->buf + frame->offsets[0], // Y
+                               frame->buf + frame->offsets[1], // U
+                               frame->buf + frame->offsets[2], // V
                                frame->width, frame->height,
                                (frame->width % 2), (frame->width % 2), 0);
+            // FIXME - These values (stride) should be calculated
+            //         from frame->pitches and frame->width ?
         }
         else
             memcpy(data->pixelData, frame->buf, frame->size);
