@@ -101,17 +101,17 @@ void DVDRingBufferPriv::GetDescForPos(QString &desc) const
 
 bool DVDRingBufferPriv::OpenFile(const QString &filename) 
 {
-    dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename);
+    dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename.local8Bit());
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to open DVD device at %1")
-                .arg(filename));
+                .arg(filename.local8Bit()));
         return false;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Opened DVD device at %1")
-                .arg(filename));
+                .arg(filename.local8Bit()));
         dvdnav_set_readahead_flag(dvdnav, 1);
         dvdnav_set_PGC_positioning_flag(dvdnav, 1);
 

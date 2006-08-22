@@ -221,7 +221,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         while (openTimer.elapsed() < timetowait)
         {
             lasterror = 0;
-            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+            fd2 = open(filename.local8Bit(), O_RDONLY|O_LARGEFILE|O_STREAMING);
                 
             if (fd2 < 0)
             {
