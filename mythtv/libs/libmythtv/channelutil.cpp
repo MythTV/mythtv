@@ -21,7 +21,7 @@ DBChannel::DBChannel(const DBChannel &other)
     (*this) = other;
 }
 
-const DBChannel& DBChannel::operator=(const DBChannel &other)
+DBChannel& DBChannel::operator=(const DBChannel &other)
 {
     channum    = QDeepCopy<QString>(other.channum);
     callsign   = QDeepCopy<QString>(other.callsign);

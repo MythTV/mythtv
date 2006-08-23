@@ -25,7 +25,7 @@ class DBChannel
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
 
-    const DBChannel& operator=(const DBChannel&);
+    DBChannel& operator=(const DBChannel&);
 
   public:
     QString channum;
