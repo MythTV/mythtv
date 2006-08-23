@@ -875,7 +875,6 @@ int main(int argc, char **argv)
                 {
                     cerr << "Invalid or missing argument to -O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-H
                 } 
  
                 QStringList pairs = QStringList::split(",", tmpArg);
