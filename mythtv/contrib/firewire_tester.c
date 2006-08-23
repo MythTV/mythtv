@@ -204,7 +204,7 @@ int fix_broadcast(raw1394handle_t handle, nodeid_t node) {
 }
 
 void usage(void) {
-    printf("firewire_tester <action> -n <node> [-P <port>] [-v]\n");
+    printf("firewire_tester <action> -n <node> [-P <port>] [-r <n>] [-v]\n");
     printf(" Actions: (one is required)\n");
     printf("    -b          - test broadcast connection\n");
     printf("    -p          - test p2p connection\n");
@@ -212,18 +212,21 @@ void usage(void) {
     printf(" Options\n");
     printf("    -n <node>   - firewire node, required\n");
     printf("    -P <port>   - firewire port, default 0\n");
+    printf("    -r <n>      - run action <n> times, default 1\n");
     printf("    -v          - verbose\n");
+    exit(1);
 }
 
 int main(int argc, char **argv) {
     raw1394handle_t handle;
     int node = -1;
     int port = 0;
-    int c, success;
+    int runs = 1;
+    int c, i, success;
     int action = ACTION_NONE;
 
     opterr = 0;
-    while ((c = getopt(argc, argv, "Bbn:pP:v")) != -1)
+    while ((c = getopt(argc, argv, "Bbn:pP:r:v")) != -1)
     {
         switch (c) 
         {
@@ -234,7 +237,6 @@ int main(int argc, char **argv) {
                 {
                     printf("Invalid command line\n");
                     usage();
-                    exit(1);
                 }
                 action = ACTION_FIX_BCAST;
                 break;
@@ -245,7 +247,6 @@ int main(int argc, char **argv) {
                 {
                     printf("Invalid command line\n");
                     usage();
-                    exit(1);
                 }
                 action = ACTION_TEST_BCAST;
                 break;
@@ -266,7 +267,6 @@ int main(int argc, char **argv) {
                 if (port < 0)
                 {
                     printf("Invalid port: %d\n", port);
-                    exit(1);
                 }
                 break;
 
@@ -276,9 +276,18 @@ int main(int argc, char **argv) {
                 {
                     printf("Invalid command line\n");
                     usage();
-                    exit(1);
                 }
                 action = ACTION_TEST_P2P;
+                break;
+
+            // number of runs
+            case 'r':
+                runs = atoi(optarg);
+                if (runs <= 0)
+                {
+                    printf("Run amount <= 0\n");
+                    usage();
+                }
                 break;
 
             // verbose
@@ -288,7 +297,7 @@ int main(int argc, char **argv) {
 
             // bad option
             default:
-                printf("invalid command line\n");
+                printf("Invalid command line\n");
                 usage();
                 
         }
@@ -297,14 +306,12 @@ int main(int argc, char **argv) {
     if (action == ACTION_NONE)
     {
         usage();
-        exit(1);
     }
 
     if (node == -1)
     {
-        printf("node is a required option\n");
+        printf("-n <node> is a required option\n");
         usage();
-        exit(1);
     }
 
     VERBOSE("raw1394: Allocating handle, port %d.\n", port);
@@ -315,26 +322,30 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    success = 0;
     switch (action)
     {
         case ACTION_TEST_BCAST:
-            printf("Action: Test broadcast, node %d, channel %d\n", 
-                   node, 63 - node);
-            success = test_broadcast(handle, node);
+            printf("Action: Test broadcast %d times, node %d, channel %d\n", 
+                   runs, node, 63 - node);
+            for (i = 0;i < runs;i++) 
+                success += test_broadcast(handle, node);
             break;
         case ACTION_TEST_P2P:
-            printf("Action: Test P2P connection, node %d, channel %d\n",
-                   node, node);
-            success = test_p2p(handle, node);
+            printf("Action: Test P2P connection %d times, node %d, channel %d\n",
+                   runs, node, node);
+            for (i = 0;i < runs;i++)
+                success += test_p2p(handle, node);
             break;
         case ACTION_FIX_BCAST:
-            printf("Action: Attempt to fix broadcast connection, node %d\n", 
-                   node);
-            success = fix_broadcast(handle, node);
+            printf("Action: Attempt to fix broadcast connection %d times, node %d\n", 
+                   runs, node);
+            for (i = 0;i < runs;i++)
+                success += fix_broadcast(handle, node);
             break;
     }
 
     VERBOSE("raw1394: Releasing handle.\n");
     raw1394_destroy_handle(handle);
-    exit(!success);
+    exit(!(success == runs));
 }

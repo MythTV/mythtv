@@ -5,8 +5,7 @@ box (STB).
 
 Jim Westfall (jwestfall@surrealistic.net)
 
-$ ./firewire_tester 
-firewire_tester <action> -n <node> [-P <port>] [-v]
+firewire_tester <action> -n <node> [-P <port>] [-r <n>] [-v]
  Actions: (one is required)
     -b          - test broadcast connection
     -p          - test p2p connection
@@ -14,6 +13,7 @@ firewire_tester <action> -n <node> [-P <port>] [-v]
  Options
     -n <node>   - firewire node, required
     -P <port>   - firewire port, default 0
+    -r <n>      - run action <n> times, default 1
     -v          - verbose
 
 There are 2 types of connections that can be used by mythtv to talk to 
@@ -31,22 +31,18 @@ few more times with -b action.
 example STB on node 0 that works best with a broadcast connection.
 
 - test P2P connection a few times
-$ ./firewire_tester -p -n 0
-Action: Test P2P connection, node 0, channel 0
+$ ./firewire_tester -p -n 0 -r 5
+Action: Test P2P connection 5 times, node 0, channel 0
+P2P: Testing...Failed
+P2P: Testing...Success, 46 packets received
+P2P: Testing...Success, 164 packets received
+P2P: Testing...Failed
 P2P: Testing...Failed
 
-$ ./firewire_tester -p -n 0
-Action: Test P2P connection, node 0, channel 0
-P2P: Testing...Success, 37 packets received
-
-$ ./firewire_tester -p -n 0
-Action: Test P2P connection, node 0, channel 0
-P2P: Testing...Failed
-
-- 2 out of 3 failed, not good.
+- 2 out of 5 failed, not good.
 - now use the -B option to try and fix/stabilize broadcast connection
 $ ./firewire_tester -B -n 0
-Action: Attempt to fix broadcast connection, node 0
+Action: Attempt to fix broadcast connection 1 times, node 0
 Broadcast: Testing...Failed
 P2P: Testing...Failed
 P2P: Testing...Success, 58 packets received
@@ -61,13 +57,13 @@ Broadcast: Testing...Success, 112 packets
 Broadcast Fix: Success
 
 - worked! do a few more broadcast connection tests
-$ ./firewire_tester -b -n 0
-Action: Test broadcast, node 0, channel 63
-Broadcast: Testing...Success, 61 packets
-
-$ ./firewire_tester -b -n 0
-Action: Test broadcast, node 0, channel 63
-Broadcast: Testing...Success, 68 packets
+$ ./firewire_tester -b -n 0 -r 5
+Action: Test broadcast 5 times, node 0, channel 63
+Broadcast: Testing...Success, 42 packets
+Broadcast: Testing...Success, 112 packets
+Broadcast: Testing...Success, 27 packets
+Broadcast: Testing...Success, 78 packets
+Broadcast: Testing...Success, 103 packets
 
 - looks good, configure mythtv to use broadcast connection type.
 
