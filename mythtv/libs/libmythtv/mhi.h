@@ -19,15 +19,15 @@
 #include <qptrqueue.h>
 
 // MythTV headers
-#include "../libavcodec/avcodec.h" // to decode single MPEG I-frames
 #include "../libmythfreemheg/freemheg.h"
 #include "interactivetv.h"
-#include "mhi.h"
 #include "dsmcc.h"
 #include "osdtypes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "NuppelVideoPlayer.h"
+
+#include "../libavcodec/avcodec.h" // to decode single MPEG I-frames
 
 class OSDSet;
 class DSMCCPacket;
