@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 
 #include <algorithm>
+#include <set>
 using namespace std;
 
 #include <qdeepcopy.h>
@@ -1401,20 +1402,18 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 
 void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
 {
-    QMap<QString,bool> seen;
+    typedef std::set<QString> seen_set;
+    seen_set seen;
+
     DBChanList::iterator it = list.begin();
-    DBChanList::iterator it_next = it;
-    ++it_next;
 
     while (it != list.end())
     {
-        if (seen[(*it).channum])
-            list.erase(it);
-
-        seen[(*it).channum] = true;
-
-        it = it_next;
-        ++it_next;
+        std::pair<seen_set::iterator, bool> insret = seen.insert(it->channum);
+        if (insret.second)
+            ++it;
+        else
+            it = list.erase(it);
     }
 }
 
