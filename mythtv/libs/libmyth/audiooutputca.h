@@ -8,6 +8,7 @@
 
 using namespace std;
 
+#undef AUDBUFSIZE
 #define AUDBUFSIZE 512000
 
 // We hide Core Audio-specific items, to avoid
