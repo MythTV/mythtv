@@ -749,12 +749,9 @@ long long DecoderBase::DVDCurrentFrameNumber(void)
 void DecoderBase::UpdateDVDFramesPlayed(void)
 {
     long long currentpos = DVDCurrentFrameNumber();
-    if (currentpos != 0)
-    {
-        framesPlayed = framesRead = currentpos ;
-        GetNVP()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
-        GetNVP()->SetFramesPlayed(currentpos + 1);
-    }
+    framesPlayed = framesRead = currentpos ;
+    GetNVP()->getVideoOutput()->SetFramesPlayed(currentpos + 1);
+    GetNVP()->SetFramesPlayed(currentpos + 1);
 }
 
 QStringList DecoderBase::GetTracks(uint type) const
