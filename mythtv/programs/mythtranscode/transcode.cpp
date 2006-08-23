@@ -13,10 +13,10 @@
 #include <iostream>
 using namespace std;
 
+#include "osdtypes.h"
 #include "transcode.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"
-#include "osdtypes.h"
 #include "remoteutil.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
