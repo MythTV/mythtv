@@ -793,6 +793,13 @@ int main(int argc, char **argv)
     if (binname != "mythfrontend")
         pluginname = binname;
 
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if (!gContext->Init())
+    {   
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||
@@ -868,6 +875,7 @@ int main(int argc, char **argv)
                 {
                     cerr << "Invalid or missing argument to -O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
+H
                 } 
  
                 QStringList pairs = QStringList::split(",", tmpArg);
@@ -885,6 +893,36 @@ int main(int argc, char **argv)
             {
                 cerr << "Invalid or missing argument to -O/--override-setting option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+
+            ++argpos;
+        }
+        else if (!strcmp(a.argv()[argpos],"-G") ||
+                 !strcmp(a.argv()[argpos],"--get-setting"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                QString tmpArg = a.argv()[argpos+1];
+                if (tmpArg.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                } 
+ 
+                QStringList pairs = QStringList::split(",", tmpArg);
+                QString value;
+                for (unsigned int index = 0; index < pairs.size(); ++index)
+                {
+                    value = gContext->GetSetting(pairs[index]);
+                    cerr << "\tSettings Value : " << pairs[index];
+                    cerr <<  " = " << value << endl;
+                }
+                return FRONTEND_EXIT_OK;
+            }
+            else
+            {
+                cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
             }
 
             ++argpos;
@@ -953,6 +991,9 @@ int main(int argc, char **argv)
                     "-O or " << endl <<
                     "  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'" << endl <<
                     "                               This option may be repeated multiple times" << endl <<
+                    "-G or " << endl <<
+                    "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
+                    "                               Use a comma seperated list to return multiple values" << endl <<
                     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
 
                     "--version                      Version information" << endl <<
@@ -997,13 +1038,6 @@ int main(int argc, char **argv)
     QDir dir(fileprefix);
     if (!dir.exists())
         dir.mkdir(fileprefix);
-
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init())
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
-    }
 
     if (ResetSettings)
     {
