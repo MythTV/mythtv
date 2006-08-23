@@ -232,6 +232,7 @@ class AvFormatDecoder : public DecoderBase
     CC608Decoder     *ccd608;
     CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
+    int               cc608_parity_table[256];
 
     // MHEG
     InteractiveTV    *itv;                ///< MHEG/MHP decoder
