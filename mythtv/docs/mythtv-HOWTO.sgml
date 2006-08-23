@@ -47,9 +47,9 @@ hardware capabilities to view the content; a low-powered frontend will not
 be able to watch HDTV, for example.  Clients can be diskless and controlled
 entirely by a remote control.
 <item>You may use any combination of standard analog capture card, MPEG-2,
-MJPEG, DVB, HDTV and firewire capture devices.  With appropriate hardware,
-MythTV can control set top boxes, often found in digital cable and satellite
-TV systems.
+MJPEG, DVB, HDTV, USB and firewire capture devices.  With appropriate
+hardware, MythTV can control set top boxes, often found in digital cable and
+satellite TV systems.
 <item>Program Guide Data in North America is downloaded from Zap2It.com, a
 subsidiary of Tribune Media Services.  This free service is called
 DataDirect, and provides MythTV almost two weeks of scheduling information. 
@@ -485,7 +485,7 @@ In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.
 
 <sect3>HDTV.
-<p>There are a number of HDTV card with Linux drivers which are known to
+<p>There are a number of HDTV cards with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
 be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_cards"
 name="http://www.linuxtv.org/wiki/index.php/ATSC_cards"> Some cards support
@@ -501,10 +501,25 @@ Cards that have been reported to work include:
 <item>dvico Fusion HDTV Lite 5 (8VSB, QAM256)
 </itemize>
 
+<bf>NOTE</bf>:There are no known consumer-level capture devices which will
+allow you to capture the HDTV output (DVI, HDMI, VGA, YPbPr / Component)
+from a set-top box commonly found with digital cable systems or satellite
+systems. <emphasis>None</emphasis> of the capture devices listed above
+perform any encoding; they merely allow your computer to save a copy of a
+HDTV stream which has already been converted to MPEG-2 at the broadcast
+facility.
+
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
 progressive or interlaced, and whether your display card has hardware-assist
-support for Linux. For 720p content (1280x720), a 2.4GHz P4 should be
+support for Linux.
+
+The Simple Answer: Once you are in the 3.2 Ghz P4-class of CPU you should have
+no issues with viewing HDTV.
+
+The Complicated Answer:
+
+For 720p content (1280x720), a 2.4GHz P4 should be
 sufficient.
 
 For 1920x1080i->1920x1080p with the better deinterlacing methods
@@ -512,6 +527,7 @@ done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
 Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 acceleration.  If you enable the hardware acceleration, you may be able to
 use a 1.8GHz processor.
+
 
 <sect3>Firewire.
 <p>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
@@ -529,28 +545,26 @@ url="http://www.plextor.com/english/support/LinuxSDK.htm"
 name="http://www.plextor.com/english/support/LinuxSDK.htm">. MythTV uses the
 Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.
 
-<sect3>Standalone Ethernet Capture Devices.
+Hauppauge WinTV-PVR-USB2 (driver available at <url
+url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">) emulates a PVR-x50
+card.
+
+<sect3>Network Attached Capture Devices.
 <p>Devices such as the HDHomeRun <url url="http://www.hdhomerun.com"
 name="http://www.hdhomerun.com"> are supported.  The HDHomeRun provides two
 ATSC Over-the-air (8VSB) tuners connected to your network via 100Mbps
 ethernet.
 
 <sect2>Hardware known NOT to work and other issues
-<p><itemize>
+<p>
+<itemize>
 <item>Hauppauge WinTV-D or -HD (no driver)
 <item>Hauppauge WinTV-USB series
 <item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
-<item>Hauppauge WinTV-PVR-USB2 (driver available at http://www.isely.net - no MythTV support.  May work if setup thinks it's a PVR-x50 card.)
 <item>ATI All-in-Wonder series
 </itemize>
 
-There are no known consumer-level capture devices which will allow you to
-capture the HDTV output (either DVI or HDMI) from a set-top box commonly
-found with digital cable systems or satellite systems.
-
-There are no known consumer-level capture devices which will allow you to
-capture component output from a set-top box.
 <sect2>Sound card
 <p>The system needs a sound card or an on-board equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
@@ -7852,7 +7866,10 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.20.00, 2006  Start prepping for 0.20.  Add HDHomeRun as a capture device.  Update URLs.
+v0.20.00, 2006  Start prepping for 0.20.  Add HDHomeRun as a capture device. 
+Update URLs.  Move around some of the HDTV stuff.  Add a part about HDTV and
+capturing it in raw format (you can't, so stop asking).
+
 -->
 
 <!--
