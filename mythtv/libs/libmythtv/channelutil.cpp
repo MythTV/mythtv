@@ -1409,7 +1409,8 @@ void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
 
     while (it != list.end())
     {
-        std::pair<seen_set::iterator, bool> insret = seen.insert(it->channum);
+        QString tmp = QDeepCopy<QString>(it->channum);
+        std::pair<seen_set::iterator, bool> insret = seen.insert(tmp);
         if (insret.second)
             ++it;
         else
