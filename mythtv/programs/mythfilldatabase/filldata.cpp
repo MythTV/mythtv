@@ -2773,6 +2773,24 @@ void clearOldDBEntries(void)
     query.bindValue(":OFFSET", offset);
     query.exec();
 
+    query.prepare("DELETE p FROM recordedprogram p "
+                  "LEFT JOIN recorded r ON "
+                  "  p.chanid = r.chanid AND p.starttime = r.progstart "
+                  "WHERE r.chanid IS NULL;");
+    query.exec();
+
+    query.prepare("DELETE p FROM recordedrating p "
+                  "LEFT JOIN recorded r ON "
+                  "  p.chanid = r.chanid AND p.starttime = r.progstart "
+                  "WHERE r.chanid IS NULL;");
+    query.exec();
+
+    query.prepare("DELETE p FROM recordedcredits p "
+                  "LEFT JOIN recorded r ON "
+                  "  p.chanid = r.chanid AND p.starttime = r.progstart "
+                  "WHERE r.chanid IS NULL;");
+    query.exec();
+
     query.prepare("DELETE FROM record WHERE (type = :SINGLE "
                   "OR type = :OVERRIDE OR type = :DONTRECORD) "
                   "AND enddate < NOW();");

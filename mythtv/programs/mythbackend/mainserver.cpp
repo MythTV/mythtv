@@ -1455,43 +1455,6 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds,
                                    .arg(logInfo));
     }
 
-    query.prepare("SELECT COUNT(*) FROM recorded "
-                  "WHERE chanid = :CHANID AND progstart = :PROGSTART;");
-    query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":PROGSTART", pginfo->startts);
-    if (!query.exec() || !query.isActive() || !query.next())
-    {
-        MythContext::DBError("Recorded program parts left query", query);
-    }
-    else if (query.value(0).toInt() == 0)
-    {
-        // No more recordings that are part of this Program so we can
-        // cleanup these three tables
-        query.prepare("DELETE FROM recordedrating "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-        query.bindValue(":CHANID", ds->chanid);
-        query.bindValue(":STARTTIME", pginfo->startts);
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Recorded program delete recordedrating",
-                                 query);
-
-        query.prepare("DELETE FROM recordedprogram "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-        query.bindValue(":CHANID", ds->chanid);
-        query.bindValue(":STARTTIME", pginfo->startts);
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Recorded program delete recordedprogram",
-                                 query);
-
-        query.prepare("DELETE FROM recordedcredits "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-        query.bindValue(":CHANID", ds->chanid);
-        query.bindValue(":STARTTIME", pginfo->startts);
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Recorded program delete recordedcredits",
-                                 query);
-    }
-
     sleep(1);
 
     // Notify the frontend so it can requery for Free Space
