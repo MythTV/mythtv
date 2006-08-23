@@ -1572,15 +1572,12 @@ void NuppelVideoPlayer::DisableTeletext(void)
         tt_view->SetDisplaying(false);
     GetOSD()->HideSet("teletext");
 
-    /* If subtitles are enabled before the teletext menu was displayed, re-enable them */
-    if (prevTextDisplayMode & kDisplayAllCaptions) {
-        textDisplayMode = prevTextDisplayMode;
-        EnableCaptions(textDisplayMode, false);
-    }
-    else {
-        textDisplayMode = kDisplayNone;
-    }
+    textDisplayMode = kDisplayNone;
 
+    /* If subtitles are enabled before the teletext menu was displayed,
+       re-enabled them. */
+    if (prevTextDisplayMode & kDisplayAllCaptions)
+        EnableCaptions(prevTextDisplayMode, false);
 }
 
 void NuppelVideoPlayer::ResetTeletext(void)
