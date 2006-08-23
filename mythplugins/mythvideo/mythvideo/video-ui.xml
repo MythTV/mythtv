@@ -1257,61 +1257,72 @@
 		<area>10,10,780,580</area>
 	
 		<textarea name="title" draworder="0" align="center">
-			<area>10,10,760,50</area>
+			<area>10,0,760,40</area>
 			<font>title</font>
 			<value>Filters video list</value>
 		</textarea>
-		<!--
-			Labels
-		-->
+
+		<!-- Labels -->
+		<textarea name="numvideos_text" draworder="0">
+			<area>10,40,400,30</area>
+			<font>display</font>
+			<value>Aucune video</value>
+		</textarea>
+
 		<textarea name="category_text" draworder="0" align="right">
-			<area>50,100,320,40</area>
+			<area>50,72,320,34</area>
 			<font>display</font>
 			<value>Category :</value>
 		</textarea>
 		<textarea name="genre_text" draworder="0" align="right">
-			<area>50,140,320,40</area>
+			<area>50,106,320,34</area>
 			<font>display</font>
 			<value>Genre :</value>
 		</textarea>
 		<textarea name="country_text" draworder="0" align="right">
-			<area>50,180,320,40</area>
+			<area>50,140,320,34</area>
 			<font>display</font>
 			<value>Country :</value>
 		</textarea>
 		<textarea name="year_text" draworder="0" align="right">
-			<area>50,220,320,40</area>
+			<area>50,174,320,34</area>
 			<font>display</font>
 			<value>Year :</value>
 		</textarea>
 		<textarea name="runtime_text" draworder="0" align="right">
-			<area>50,260,320,40</area>
+			<area>50,208,320,34</area>
 			<font>display</font>
 			<value>Runtime :</value>
 		</textarea>
 		<textarea name="userrating_text" draworder="0" align="right">
-			<area>50,300,320,40</area>
+			<area>50,242,320,34</area>
 			<font>display</font>
 			<value>User Rating :</value>
 		</textarea>
 		<textarea name="browse_text" draworder="0" align="right">
-			<area>50,340,320,40</area>
+			<area>50,276,320,34</area>
 			<font>display</font>
 			<value>Browse :</value>
 		</textarea>
+		<textarea name="inetref_text" draworder="0" align="right">
+			<area>50,310,320,34</area>
+			<font>display</font>
+			<value>InetRef :</value>
+		</textarea>
+		<textarea name="coverfile_text" draworder="0" align="right">
+			<area>50,344,320,34</area>
+			<font>display</font>
+			<value>Cover File :</value>
+		</textarea>
 		<textarea name="orderby_text" draworder="0" align="right">
-			<area>50,380,320,40</area>
+			<area>50,378,320,34</area>
 			<font>display</font>
 			<value>Sort by :</value>
 		</textarea>
 
-
-
-		<!--
-			Widgets
-		-->
+		<!-- Widgets -->
 		<selector name="category_select" draworder="0">
-			<area>380,95,300,40</area>
+			<area>380,70,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
@@ -1319,49 +1330,63 @@
 		</selector>
 
 		<selector name="genre_select" draworder="0">
-			<area>380,135,300,40</area>
+			<area>380,104,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
 			<image function="pushed" filename="mv_leftright_pushed.png"></image>
 		</selector>
 		<selector name="country_select" draworder="0">
-			<area>380,175,300,40</area>
+			<area>380,138,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
 			<image function="pushed" filename="mv_leftright_pushed.png"></image>
 		</selector>
 		<selector name="year_select" draworder="0">
-			<area>380,215,300,40</area>
+			<area>380,172,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
 			<image function="pushed" filename="mv_leftright_pushed.png"></image>
 		</selector>
 		<selector name="runtime_select" draworder="0">
-			<area>380,255,300,40</area>
+			<area>380,206,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
 			<image function="pushed" filename="mv_leftright_pushed.png"></image>
 		</selector>
 		<selector name="userrating_select" draworder="0">
-			<area>380,295,300,40</area>
+			<area>380,240,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
 			<image function="pushed" filename="mv_leftright_pushed.png"></image>
 		</selector>
 		<selector name="browse_select" draworder="0">
-			<area>380,335,300,40</area>
+			<area>380,274,300,34</area>
+			<font>display</font>
+			<image function="on" filename="mv_leftright_on.png"></image>
+			<image function="off" filename="mv_leftright_off.png"></image>
+			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+		</selector>
+		<selector name="inetref_select" draworder="0">
+			<area>380,308,300,34</area>
+			<font>display</font>
+			<image function="on" filename="mv_leftright_on.png"></image>
+			<image function="off" filename="mv_leftright_off.png"></image>
+			<image function="pushed" filename="mv_leftright_pushed.png"></image>
+		</selector>
+		<selector name="coverfile_select" draworder="0">
+			<area>380,342,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
 			<image function="pushed" filename="mv_leftright_pushed.png"></image>
 		</selector>
 		<selector name="orderby_select" draworder="0">
-			<area>380,375,300,40</area>
+			<area>380,376,300,34</area>
 			<font>display</font>
 			<image function="on" filename="mv_leftright_on.png"></image>
 			<image function="off" filename="mv_leftright_off.png"></image>
@@ -1384,11 +1409,6 @@
 			<image function="pushed" filename="mv_large_text_button_pushed.png"></image>
 		</textbutton>
 
-		<textarea name="numvideos_text" draworder="0">
-			<area>10,50,400,100</area>
-			<font>display</font>
-			<value>Aucune video</value>
-		</textarea>
 	</container>
     </window>
 

@@ -355,9 +355,12 @@ VideoFilterDialog::VideoFilterDialog(FilterSettingsProxy *fsp,
                                  QString window_name,
                                  QString theme_filename,
                                  const VideoList &video_list,
-                                 const char *name_)
-                : MythThemedDialog(parent_, window_name, theme_filename, name_),
-                m_fsp(fsp), m_video_list(video_list)
+                                 const char *name_) :
+    MythThemedDialog(parent_, window_name, theme_filename, name_),
+    browse_select(0), orderby_select(0), year_select(0), userrating_select(0),
+    category_select(0), country_select(0), genre_select(0), runtime_select(0),
+    save_button(0), done_button(0), numvideos_text(0), m_intetref_select(0),
+    m_coverfile_select(0), m_fsp(fsp), m_video_list(video_list)
 {
     //
     //  The only thing this screen does is let the
@@ -366,15 +369,6 @@ VideoFilterDialog::VideoFilterDialog(FilterSettingsProxy *fsp,
     //
 
     m_settings = m_fsp->getSettings();
-
-    // Widgets
-    year_select = NULL;
-    userrating_select = NULL;
-    category_select = NULL;
-    country_select = NULL;
-    genre_select = NULL;
-    runtime_select = NULL;
-    numvideos_text=NULL;
 
     wireUpTheme();
     fillWidgets();

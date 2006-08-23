@@ -527,11 +527,19 @@ void MetadataImp::updateGenres()
     VideoGenreMap::getGenreMap().remove(m_id);
 
     // ensure that all genres we have are in the DB
-    genre_list::iterator genre;
-    for (genre = m_genres.begin() ; genre != m_genres.end() ; ++genre)
+    genre_list::iterator genre = m_genres.begin();
+    while (genre != m_genres.end())
     {
-        genre->first = VideoGenre::getGenre().add(genre->second);
-        VideoGenreMap::getGenreMap().add(m_id, genre->first);
+        if (genre->second.stripWhiteSpace().length())
+        {
+            genre->first = VideoGenre::getGenre().add(genre->second);
+            VideoGenreMap::getGenreMap().add(m_id, genre->first);
+            ++genre;
+        }
+        else
+        {
+            genre = m_genres.erase(genre);
+        }
     }
 }
 
@@ -540,12 +548,19 @@ void MetadataImp::updateCountries()
     // remove countries for this video
     VideoCountryMap::getCountryMap().remove(m_id);
 
-    country_list::iterator country;
-    for (country = m_countries.begin(); country != m_countries.end();
-            ++country)
+    country_list::iterator country = m_countries.begin();
+    while (country != m_countries.end())
     {
-        country->first = VideoCountry::getCountry().add(country->second);
-        VideoCountryMap::getCountryMap().add(m_id, country->first);
+        if (country->second.stripWhiteSpace().length())
+        {
+            country->first = VideoCountry::getCountry().add(country->second);
+            VideoCountryMap::getCountryMap().add(m_id, country->first);
+            ++country;
+        }
+        else
+        {
+            country = m_countries.erase(country);
+        }
     }
 }
 

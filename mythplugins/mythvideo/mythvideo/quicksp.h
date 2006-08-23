@@ -8,6 +8,8 @@ struct NoLock
 };
 
 // TODO: implement for threads
+// If implemented for threads move the instance pointer to simple_ref_ptr
+// so simple access isn't synchronized.
 struct ThreadLock
 {
     void lock() {}
