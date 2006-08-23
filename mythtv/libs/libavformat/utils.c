@@ -966,7 +966,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 *pkt = s->cur_pkt;
                 compute_pkt_fields(s, st, NULL, pkt);
                 s->cur_st = NULL;
-                return 0;
+                break;
             } else if (s->cur_len > 0 && st->discard < AVDISCARD_ALL) {
                 if (!st->got_frame) {
                     st->cur_frame_startpos = s->cur_pkt.pos;
@@ -992,7 +992,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     pkt->pos = st->cur_frame_startpos;
                     compute_pkt_fields(s, st, st->parser, pkt);
                     st->got_frame = 0;
-                    return 0;
+                    break;
                 }
             } else {
                 /* free packet */
@@ -1029,6 +1029,13 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 
             st = s->streams[s->cur_pkt.stream_index];
             if (st) {
+                if(st->codec->debug & FF_DEBUG_PTS)
+                    av_log(s, AV_LOG_DEBUG, "av_read_packet stream=%d, pts=%lld, dts=%lld, size=%d\n",
+                        s->cur_pkt.stream_index,
+                        s->cur_pkt.pts,
+                        s->cur_pkt.dts,
+                        s->cur_pkt.size);
+
                 s->cur_st = st;
                 s->cur_ptr = s->cur_pkt.data;
                 s->cur_len = s->cur_pkt.size;
@@ -1047,6 +1054,14 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 	    }
         }
     }
+    if (st && st->codec->debug & FF_DEBUG_PTS)
+        av_log(s, AV_LOG_DEBUG, "av_read_frame_internal stream=%d, pts=%lld, dts=%lld, size=%d\n",
+            pkt->stream_index,
+            pkt->pts,
+            pkt->dts,
+            pkt->size);
+
+    return 0;
 }
 
 /**
@@ -2659,7 +2674,7 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
     int ret;
 
     ret=compute_pkt_fields2(s->streams[pkt->stream_index], pkt);
-    if(ret<0)
+    if(ret<0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
         return ret;
  
     truncate_ts(s->streams[pkt->stream_index], pkt);
@@ -2671,11 +2686,22 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
 }
 
 /**
- * @brief interleave_packet implementation which will interleave per DTS.
- * packets with pkt->destruct == av_destruct_packet will be freed inside this function.
- * so they cannot be used after it, note calling av_free_packet() on them is still safe
+ * Interleave a packet per DTS in an output media file.
+ *
+ * Packets with pkt->destruct == av_destruct_packet will be freed inside this fu
+nction,
+ * so they cannot be used after it, note calling av_free_packet() on them is sti
+ll safe.
+ *
+ * @param s media file handle
+ * @param out the interleaved packet will be output here
+ * @param in the input packet
+ * @param flush 1 if no further packets are available as input and all
+ *              remaining packets should be output
+ * @return 1 if a packet was output, 0 if no packet could be output,
+ *         < 0 if an error occured
  */
-static int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush){
+int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush){
     AVPacketList *pktl, **next_point, *this_pktl;
     int stream_count=0;
     int streams[MAX_STREAMS];
@@ -2767,7 +2793,7 @@ int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt){
         return 0;
 
 //av_log(NULL, AV_LOG_DEBUG, "av_interleaved_write_frame %d %Ld %Ld\n", pkt->size, pkt->dts, pkt->pts);
-    if(compute_pkt_fields2(st, pkt) < 0)
+    if(compute_pkt_fields2(st, pkt) < 0 && !(s->oformat->flags & AVFMT_NOTIMESTAMPS))
         return -1;
 
     if(pkt->dts == AV_NOPTS_VALUE)

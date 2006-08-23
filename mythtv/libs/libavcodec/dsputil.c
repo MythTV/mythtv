@@ -35,6 +35,9 @@
 /* snow.c */
 void ff_spatial_dwt(int *buffer, int width, int height, int stride, int type, int decomposition_count);
 
+/* vorbis.c */
+void vorbis_inverse_coupling(float *mag, float *ang, int blocksize);
+
 uint8_t cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
 uint32_t squareTbl[512] = {0, };
 
@@ -2588,6 +2591,15 @@ void ff_avg_cavs_qpel16_mc00_c(uint8_t *dst, uint8_t *src, int stride) {
 }
 #endif /* CONFIG_CAVS_DECODER */
 
+#if defined(CONFIG_VC1_DECODER) || defined(CONFIG_WMV3_DECODER)
+/* VC-1 specific */
+void ff_vc1dsp_init(DSPContext* c, AVCodecContext *avctx);
+
+void ff_put_vc1_mspel_mc00_c(uint8_t *dst, uint8_t *src, int stride, int rnd) {
+    put_pixels8_c(dst, src, stride, 8);
+}
+#endif /* CONFIG_VC1_DECODER||CONFIG_WMV3_DECODER */
+
 static void wmv2_mspel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int w){
     uint8_t *cm = cropTbl + MAX_NEG_CROP;
     int i;
@@ -3741,6 +3753,39 @@ WARPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
 WARPER8_16_SQ(rd8x8_c, rd16_c)
 WARPER8_16_SQ(bit8x8_c, bit16_c)
 
+static void vector_fmul_c(float *dst, const float *src, int len){
+    int i;
+    for(i=0; i<len; i++)
+        dst[i] *= src[i];
+}
+
+static void vector_fmul_reverse_c(float *dst, const float *src0, const float *src1, int len){
+    int i;
+    src1 += len-1;
+    for(i=0; i<len; i++)
+        dst[i] = src0[i] * src1[-i];
+}
+
+void ff_vector_fmul_add_add_c(float *dst, const float *src0, const float *src1, const float *src2, int src3, int len, int step){
+    int i;
+    for(i=0; i<len; i++)
+        dst[i*step] = src0[i] * src1[i] + src2[i] + src3;
+}
+
+void ff_float_to_int16_c(int16_t *dst, const float *src, int len){
+    int i;
+    for(i=0; i<len; i++) {
+        int_fast32_t tmp = ((int32_t*)src)[i];
+        if(tmp & 0xf0000){
+            tmp = (0x43c0ffff - tmp)>>31;
+            // is this faster on some gcc/cpu combinations?
+//          if(tmp > 0x43c0ffff) tmp = 0xFFFF;
+//          else                 tmp = 0;
+        }
+        dst[i] = tmp - 0x8000;
+    }
+}
+
 /* XXX: those functions should be suppressed ASAP when all IDCTs are
  converted */
 static void ff_jref_idct_put(uint8_t *dest, int line_size, DCTELEM *block)
@@ -4010,6 +4055,9 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #ifdef CONFIG_CAVS_DECODER
     ff_cavsdsp_init(c,avctx);
 #endif
+#if defined(CONFIG_VC1_DECODER) || defined(CONFIG_WMV3_DECODER)
+    ff_vc1dsp_init(c,avctx);
+#endif
 
     c->put_mspel_pixels_tab[0]= put_mspel8_mc00_c;
     c->put_mspel_pixels_tab[1]= put_mspel8_mc10_c;
@@ -4077,6 +4125,14 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->horizontal_compose97i = ff_snow_horizontal_compose97i;
     c->inner_add_yblock = ff_snow_inner_add_yblock;
 #endif
+
+#ifdef CONFIG_VORBIS_DECODER
+    c->vorbis_inverse_coupling = vorbis_inverse_coupling;
+#endif
+    c->vector_fmul = vector_fmul_c;
+    c->vector_fmul_reverse = vector_fmul_reverse_c;
+    c->vector_fmul_add_add = ff_vector_fmul_add_add_c;
+    c->float_to_int16 = ff_float_to_int16_c;
 
     c->shrink[0]= ff_img_copy_plane;
     c->shrink[1]= ff_shrink22;

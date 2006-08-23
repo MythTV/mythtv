@@ -4,7 +4,8 @@
 #
 
 # make sure we are running under a compatible shell
-(: ${foo%%bar}) 2>/dev/null
+unset foo
+(: ${foo%%bar}) 2>/dev/null && ! (: ${foo?}) 2>/dev/null
 if test "$?" != 0; then
     if test "x$FFMPEG_CONFIGURE_EXEC" = x; then
         FFMPEG_CONFIGURE_EXEC=1
@@ -81,6 +82,7 @@ show_help(){
   #echo "  --disable-audio-beos     disable BeOS audio support [default=no]"
   #echo "  --disable-dv1394         disable DV1394 grabbing [default=no]"
   #echo "  --disable-network        disable network support [default=no]"
+  #echo "  --disable-ipv6           disable ipv6 support [default=no]"
   #echo "  --disable-zlib           disable zlib [default=no]"
   #echo "  --disable-simple_idct    disable simple IDCT routines [default=no]"
   #echo "  --disable-vhook          disable video hooking support"
@@ -227,27 +229,29 @@ add_extralibs(){
     append extralibs "$@"
 }
 
+check_cmd(){
+    log "$@"
+    "$@" >>$logfile 2>&1
+}
+
 check_cc(){
     log check_cc "$@"
     cat >$TMPC
     log_file $TMPC
-    log $cc $CFLAGS "$@" -c -o $TMPO $TMPC
-    $cc $CFLAGS "$@" -c -o $TMPO $TMPC >>$logfile 2>&1
+    check_cmd $cc $CFLAGS "$@" -c -o $TMPO $TMPC
 }
 
 check_cpp(){
     log check_cpp "$@"
     cat >$TMPC
     log_file $TMPC
-    log $cc $CFLAGS "$@" -E -o $TMPO $TMPC
-    $cc $CFLAGS "$@" -E -o $TMPO $TMPC >>$logfile 2>&1
+    check_cmd $cc $CFLAGS "$@" -E -o $TMPO $TMPC
 }
 
 check_ld(){
     log check_ld "$@"
     check_cc || return
-    log $cc $LDFLAGS "$@" -o $TMPE $TMPO $extralibs
-    $cc $LDFLAGS "$@" -o $TMPE $TMPO $extralibs >>$logfile 2>&1
+    check_cmd $cc $LDFLAGS "$@" -o $TMPE $TMPO $extralibs
 }
 
 check_cflags(){
@@ -508,7 +512,7 @@ case "$cpu" in
   ;;
   x86_64)
     cpu="x86"
-    canon_arch="`cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
+    canon_arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
     if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
       if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
         cpu="x86_64"
@@ -562,12 +566,12 @@ audio_beos="no"
 dv1394="no"
 dc1394="no"
 network="yes"
+ipv6="yes"
 zlib="yes"
 libgsm="no"
 mp3lame="no"
 libogg="no"
 vorbis="no"
-theora="no"
 faad="no"
 faadbin="no"
 faac="no"
@@ -623,6 +627,7 @@ amr_nb_fixed="no"
 amr_if2="no"
 sunmlib="no"
 pthreads="no"
+swscaler="no"
 gpl="yes"
 memalignhack="no"
 asmalign_pot="unknown"
@@ -768,6 +773,7 @@ MINGW32*)
 mingw32="yes"
 ;;
 CYGWIN*)
+targetos=CYGWIN
 shlibdir='${PREFIX}/bin'
 v4l="no"
 ivtv="no"
@@ -793,6 +799,7 @@ backend="yes"
 v4l="yes"
 ;;
 IRIX*)
+targetos=IRIX
 ranlib="echo ignoring ranlib"
 v4l="no"
 audio_oss="no"
@@ -823,27 +830,8 @@ vhook="no"
 os2="yes"
 
 ;;
-*) ;;
-esac
-
-# From MPlayer configure. We need TARGET_OS available
-# to the Makefile, so it can distinguish between flavors
-# of AltiVec on PowerPC.
-TARGET_OS=`( uname -s ) 2>&1`
-  case "$TARGET_OS" in
-  Linux|FreeBSD|NetBSD|BSD/OS|OpenBSD|SunOS|QNX|Darwin|GNU|BeOS|MorphOS)
-    ;;
-  IRIX*)
-    TARGET_OS=IRIX
-    ;;
-  HP-UX*)
-    TARGET_OS=HP-UX
-    ;;
-  [cC][yY][gG][wW][iI][nN]*)
-    TARGET_OS=CYGWIN
-    ;;
   *)
-    TARGET_OS="$TARGET_OS-UNKNOWN"
+    targetos="${targetos}-UNKNOWN"
     ;;
   esac
 
@@ -973,6 +961,8 @@ for opt do
   ;;
   --disable-network) network="no"; ffserver="no"
   ;;
+  --disable-ipv6) ipv6="no";
+  ;;
   --disable-zlib) zlib="no"
   ;;
   --disable-a52) a52="no"
@@ -1049,6 +1039,8 @@ for opt do
   --enable-ffmpeg-pthreads) pthreads="yes"
   ;;
   --disable-ffmpeg-pthreads) pthreads="no"
+  ;;
+  --enable-swscaler) swscaler="yes"
   ;;
   --enable-gpl) gpl="yes"
   ;;
@@ -1338,14 +1330,6 @@ EOF
     exit 1;
 fi
 
-if test "$theora" = "yes" ; then
-    if test "$libogg" = "no"; then
-        echo "libogg must be enabled to enable Theora."
-        fail="yes"
-        theora="no"
-    fi
-fi
-
 if test "$vorbis" = "yes" ; then
     if test "$libogg" = "no"; then
         echo "libogg must be enabled to enable Vorbis."
@@ -1400,6 +1384,10 @@ EOF
         fi
     fi
 
+    if test "$swscaler" != "no"; then
+        echo "The software scaler is under GPL and --enable-gpl is not specified."
+        fail="yes"
+    fi
 
     if test "$fail" = "yes"; then
         exit 1
@@ -1450,21 +1438,24 @@ if test $targetos = Darwin; then
         gcc_version="`$cc -v 2>&1 | grep version | cut -d ' ' -f3-`"
         case "$gcc_version" in
             *2.95*)
-                CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer"
+                CFLAGS="$CFLAGS -no-cpp-precomp -pipe"
                 ;;
             *[34].*)
-                CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer -force_cpusubtype_ALL -Wno-sign-compare"
+                CFLAGS="$CFLAGS -no-cpp-precomp -pipe -force_cpusubtype_ALL -Wno-sign-compare"
                 if test "$lshared" = no; then
                    needmdynamicnopic="yes"
                 fi
                 ;;
             *)
-                CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer"
+                CFLAGS="$CFLAGS -no-cpp-precomp -pipe"
                 if test "$lshared" = no; then
                    needmdynamicnopic="yes"
                 fi
                 ;;
         esac
+    fi
+    if test $optimize != "no"; then
+        CFLAGS="$CFLAGS -fomit-frame-pointer"
     fi
 fi
 
@@ -1937,7 +1928,8 @@ if check_header malloc.h; then
 fi
 
 if test "$_memalign" = "no" -a "$mmx" = "yes" -a \
-        "$memalignhack" != "yes" -a "$targetos" != "Darwin" ; then
+        "$memalignhack" != "yes" -a "$targetos" != "Darwin" -a \
+        "$targetos" != "FreeBSD" ; then
     die "Error, no memalign() but SSE enabled, disable it or use --enable-memalign-hack."
 fi
 
@@ -1970,7 +1962,6 @@ enabled libgsm  && require libgsm gsm.h gsm_create -lgsm
 enabled mp3lame && require LAME lame/lame.h lame_init -lmp3lame
 enabled vorbis  && require libvorbis vorbis/vorbisenc.h vorbis_info_init -lvorbis -lvorbisenc -logg
 enabled libogg  && require libogg ogg/ogg.h ogg_sync_init -logg
-enabled theora  && require libtheora theora/theora.h theora_info_init -ltheora
 enabled xvid    && require XviD xvid.h xvid_global -lxvidcore
 enabled x264    && require x264 x264.h x264_encoder_open -lx264
 enabled dc1394  && require libdc1394 libdc1394/dc1394_control.h dc1394_create_handle -ldc1394_control -lraw1394
@@ -2155,7 +2146,7 @@ fi
 ##########################################
 # IPv6 check
 
-enabled network && check_ld <<EOF && ipv6=yes || ipv6=no
+enabled network && enabled ipv6 && check_ld <<EOF && ipv6=yes || ipv6=no
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -2734,7 +2725,7 @@ echo "ECXXFLAGS=$ECXXFLAGS" >> $MYTH_CONFIG_MAK
 #echo "SLIBPREF=$SLIBPREF" >> $MYTH_CONFIG_MAK
 #echo "SLIBSUF=\${BUILDSUF}$SLIBSUF" >> $MYTH_CONFIG_MAK
 #echo "EXESUF=\${BUILDSUF}$EXESUF" >> $MYTH_CONFIG_MAK
-echo "TARGET_OS=$TARGET_OS" >> $MYTH_CONFIG_MAK
+echo "TARGET_OS=$targetos" >> $MYTH_CONFIG_MAK
 if test "$cpu" = "x86" ; then
   echo "TARGET_ARCH_X86=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_X86 1" >> $TMPH
@@ -2955,6 +2946,11 @@ if test "$pp" = "yes" ; then
   echo "CONFIG_PP=yes" >> $MYTH_CONFIG_MAK
 fi
 
+if test "$swscaler" = "yes" ; then
+  echo "#define CONFIG_SWSCALER 1" >> $TMPH
+  echo "CONFIG_SWSCALER=yes" >> config.mak
+fi
+
 # MPEG audio high precision mode
 if test "$mpegaudio_hp" = "yes" ; then
   echo "#define CONFIG_MPEGAUDIO_HP 1" >> $TMPH
@@ -3069,11 +3065,6 @@ if test "$vorbis" = "yes" ; then
   echo "CONFIG_LIBVORBIS=yes" >> $MYTH_CONFIG_MAK
 fi
 
-if test "$theora" = "yes" ; then
-  echo "#define CONFIG_LIBTHEORA 1" >> $TMPH
-  echo "CONFIG_LIBTHEORA=yes" >> $MYTH_CONFIG_MAK
-fi
-
 if test "$faad" = "yes" ; then
   echo "#define CONFIG_FAAD 1" >> $TMPH
   echo "CONFIG_FAAD=yes" >> $MYTH_CONFIG_MAK
@@ -3134,11 +3125,11 @@ if test "$os2" = "yes" ; then
   echo "#define HAVE_THREADS 1" >> $TMPH
 fi
 
-if test "$TARGET_OS" = "SunOS" ; then
+if test "$targetos" = "SunOS" ; then
   echo "#define CONFIG_SUNOS 1" >> $TMPH
 fi
 
-if test "$TARGET_OS" = "BeOS" ; then
+if test "$targetos" = "BeOS" ; then
   echo "HAVE_BEOSTHREADS=yes" >> $MYTH_CONFIG_MAK
   echo "#define HAVE_BEOSTHREADS 1" >> $TMPH
   echo "#define HAVE_THREADS 1" >> $TMPH

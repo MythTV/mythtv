@@ -106,6 +106,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_RAWVIDEO, MKTAG('I', '4', '2', '0') },
     { CODEC_ID_RAWVIDEO, MKTAG('Y', 'U', 'Y', '2') },
     { CODEC_ID_RAWVIDEO, MKTAG('Y', '4', '2', '2') },
+    { CODEC_ID_RAWVIDEO, MKTAG('Y', 'V', '1', '2') },
     { CODEC_ID_RAWVIDEO, MKTAG('U', 'Y', 'V', 'Y') },
     { CODEC_ID_RAWVIDEO, MKTAG('I', 'Y', 'U', 'V') },
     { CODEC_ID_INDEO3, MKTAG('I', 'V', '3', '1') },
@@ -151,6 +152,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_CSCD, MKTAG('C', 'S', 'C', 'D') },
     { CODEC_ID_ZMBV, MKTAG('Z', 'M', 'B', 'V') },
     { CODEC_ID_KMVC, MKTAG('K', 'M', 'V', 'C') },
+    { CODEC_ID_CAVS, MKTAG('C', 'A', 'V', 'S') },
     { CODEC_ID_RAWVIDEO, 0 },
     { CODEC_ID_NONE, 0 },
 };
@@ -175,6 +177,7 @@ const CodecTag codec_wav_tags[] = {
     { CODEC_ID_WMAV1, 0x160 },
     { CODEC_ID_WMAV2, 0x161 },
     { CODEC_ID_AAC, 0x706d },
+    { CODEC_ID_MPEG4AAC, 0xff },
     { CODEC_ID_VORBIS, ('V'<<8)+'o' }, //HACK/FIXME, does vorbis in WAV/AVI have an (in)official id?
     { CODEC_ID_SONIC, 0x2048 },
     { CODEC_ID_SONIC_LS, 0x2048 },

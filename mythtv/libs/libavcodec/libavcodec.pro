@@ -30,6 +30,7 @@ SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
 SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c bitstream_filter.c
 SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
 SOURCES += dvbsub.c dvbsubdec.c dvdsubenc.c opt.c lzo.c myth_utils.c
+SOURCES += audioconvert.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h i386/mmx.h opt.h
@@ -276,7 +277,7 @@ contains( CONFIG_ULTI_DECODER, yes ) {
 
 DO_VC1 = $$CONFIG_VC1_DECODER $$CONFIG_WMV3_DECODER 
 contains( DO_VC1, yes ) {
-    SOURCES += vc1.c
+    SOURCES += vc1.c vc1dsp.c
 }
 
 DO_VCR1 = $$CONFIG_VCR1_DECODER $$CONFIG_VCR1_ENCODER
@@ -407,10 +408,6 @@ contains( CONFIG_LIBOGG, yes ) {
         SOURCES += oggvorbis.c
         LIBS += -lvorbisenc -lvorbis
     }
-    contains( CONFIG_LIBTHEORA, yes ) {
-        SOURCES += oggtheora.c
-        LIBS += -ltheora
-    }
     LIBS += -logg
 }
 
@@ -430,6 +427,7 @@ contains( TARGET_MMX, yes ) {
     SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c i386/vp3dsp_mmx.c
     SOURCES += i386/vp3dsp_sse2.c i386/idct_mmx_xvid.c i386/fft_3dn.c
     SOURCES += i386/fft_3dn2.c #i386/snowdsp_mmx.c
+    SOURCES += i386/cavsdsp_mmx.c
 #    contains( TARGET_BUILTIN_VECTOR, yes ) {
 #        QMAKE_CFLAGS_RELEASE += -msse
 #        QMAKE_CFLAGS_DEBUG += -msse
@@ -459,7 +457,8 @@ contains( TARGET_ARCH_POWERPC, yes ) {
 contains( TARGET_ALTIVEC, yes ) {
     SOURCES += ppc/dsputil_altivec.c ppc/mpegvideo_altivec.c ppc/idct_altivec.c
     SOURCES += ppc/gmc_altivec.c ppc/fdct_altivec.c ppc/fft_altivec.c
-    SOURCES += ppc/dsputil_h264_altivec.c ppc/dsputil_snow_altivec.c
+    SOURCES += ppc/h264_altivec.c ppc/snow_altivec.c ppc/vc1dsp_altivec.c
+    SOURCES += ppc/float_altivec.c
   macx {
     QMAKE_CFLAGS_RELEASE += -faltivec
     QMAKE_CFLAGS_DEBUG   += -faltivec

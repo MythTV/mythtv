@@ -20,7 +20,7 @@
 #include "avformat.h"
 #include "riff.h"
 #include "avio.h"
-#include "mov.h"
+#include "isom.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -341,13 +341,13 @@ static const CodecTag codec_movaudio_tags[] = {
 static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
 {
     offset_t pos = url_ftell(pb);
-    int vbr=  track->enc->codec_id == CODEC_ID_AAC ||
-              track->enc->codec_id == CODEC_ID_MP3 ||
-              track->enc->codec_id == CODEC_ID_AMR_NB;
-    int version = track->mode == MODE_MOV &&
-        (vbr ||
-         track->enc->codec_id == CODEC_ID_PCM_S32LE ||
-         track->enc->codec_id == CODEC_ID_PCM_S24LE);
+    int vbr=  track->mode == MODE_MOV &&
+        (track->enc->codec_id == CODEC_ID_AAC ||
+         track->enc->codec_id == CODEC_ID_MP3 ||
+         track->enc->codec_id == CODEC_ID_AMR_NB);
+    int version = vbr ||
+        track->enc->codec_id == CODEC_ID_PCM_S32LE ||
+        track->enc->codec_id == CODEC_ID_PCM_S24LE;
 
     put_be32(pb, 0); /* size */
     put_le32(pb, track->tag); // store it byteswapped
@@ -360,16 +360,11 @@ static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
     put_be16(pb, 0); /* Revision level */
     put_be32(pb, 0); /* Reserved */
 
-    put_be16(pb, track->enc->channels); /* Number of channels */
-    /* TODO: Currently hard-coded to 16-bit, there doesn't seem
-                 to be a good way to get number of bits of audio */
-    put_be16(pb, 0x10); /* Reserved */
+    put_be16(pb, track->mode == MODE_MOV ? track->enc->channels : 2); /* Number of channels */
+    /* FIXME 8 bit for 'raw ' in mov */
+    put_be16(pb, 16); /* Reserved */
 
-    if(vbr) {
-        put_be16(pb, 0xfffe); /* compression ID (vbr)*/
-    } else {
-        put_be16(pb, 0); /* compression ID (= 0) */
-    }
+    put_be16(pb, vbr ? 0xfffe : 0); /* compression ID */
     put_be16(pb, 0); /* packet size (= 0) */
     put_be16(pb, track->timescale); /* Time scale */
     put_be16(pb, 0); /* Reserved */
@@ -402,8 +397,10 @@ static int mov_write_d263_tag(ByteIOContext *pb)
     put_be32(pb, 0xf); /* size */
     put_tag(pb, "d263");
     put_tag(pb, "FFMP");
-    put_be16(pb, 0x0a);
-    put_byte(pb, 0);
+    put_byte(pb, 0); /* decoder version */
+    /* FIXME use AVCodecContext level/profile, when encoder will set values */
+    put_byte(pb, 0xa); /* level */
+    put_byte(pb, 0); /* profile */
     return 0xf;
 }
 
@@ -535,6 +532,7 @@ static const CodecTag codec_movvideo_tags[] = {
     { CODEC_ID_SVQ1, MKTAG('S', 'V', 'Q', '1') },
     { CODEC_ID_SVQ3, MKTAG('S', 'V', 'Q', '3') },
     { CODEC_ID_MPEG4, MKTAG('m', 'p', '4', 'v') },
+    { CODEC_ID_H263, MKTAG('h', '2', '6', '3') },
     { CODEC_ID_H263, MKTAG('s', '2', '6', '3') },
     { CODEC_ID_H264, MKTAG('a', 'v', 'c', '1') },
     /* special handling in mov_find_video_codec_tag */
@@ -564,6 +562,11 @@ static int mov_find_video_codec_tag(AVFormatContext *s, MOVTrack *track)
                 else
                     tag = MKTAG('d', 'v', 'p', 'p');
             }
+        } else if (track->enc->codec_id == CODEC_ID_H263) {
+            if (track->mode == MODE_MOV)
+                tag = MKTAG('h', '2', '6', '3');
+            else
+                tag = MKTAG('s', '2', '6', '3');
         } else {
             tag = codec_get_tag(codec_movvideo_tags, track->enc->codec_id);
         }
@@ -610,13 +613,19 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
 
     put_be16(pb, 0); /* Codec stream version */
     put_be16(pb, 0); /* Codec stream revision (=0) */
-    put_tag(pb, "FFMP"); /* Vendor */
-    if(track->enc->codec_id == CODEC_ID_RAWVIDEO) {
-        put_be32(pb, 0); /* Temporal Quality */
-        put_be32(pb, 0x400); /* Spatial Quality = lossless*/
+    if (track->mode == MODE_MOV) {
+        put_tag(pb, "FFMP"); /* Vendor */
+        if(track->enc->codec_id == CODEC_ID_RAWVIDEO) {
+            put_be32(pb, 0); /* Temporal Quality */
+            put_be32(pb, 0x400); /* Spatial Quality = lossless*/
+        } else {
+            put_be32(pb, 0x200); /* Temporal Quality = normal */
+            put_be32(pb, 0x200); /* Spatial Quality = normal */
+        }
     } else {
-        put_be32(pb, 0x200); /* Temporal Quality = normal */
-        put_be32(pb, 0x200); /* Spatial Quality = normal */
+        put_be32(pb, 0); /* Reserved */
+        put_be32(pb, 0); /* Reserved */
+        put_be32(pb, 0); /* Reserved */
     }
     put_be16(pb, track->enc->width); /* Video width */
     put_be16(pb, track->enc->height); /* Video height */
@@ -626,7 +635,8 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
     put_be16(pb, 1); /* Frame count (= 1) */
 
     memset(compressor_name,0,32);
-    if (track->enc->codec && track->enc->codec->name)
+    /* FIXME not sure, ISO 14496-1 draft where it shall be set to 0 */
+    if (track->mode == MODE_MOV && track->enc->codec && track->enc->codec->name)
         strncpy(compressor_name,track->enc->codec->name,31);
     put_byte(pb, strlen(compressor_name));
     put_buffer(pb, compressor_name, 31);
@@ -916,10 +926,7 @@ static int mov_write_edts_tag(ByteIOContext *pb, MOVTrack *track)
 
     put_be32(pb, av_rescale_rnd(track->trackDuration, globalTimescale, track->timescale, AV_ROUND_UP)); /* duration   ... doesn't seem to effect psp */
 
-    if (track->hasBframes)
-        put_be32(pb, track->sampleDuration); /* first pts is 1 */
-    else
-        put_be32(pb, 0);
+    put_be32(pb, track->cluster[0].cts); /* first pts is cts since dts is 0 */
     put_be32(pb, 0x00010000);
     return 0x24;
 }
@@ -1457,6 +1464,8 @@ static int mov_write_header(AVFormatContext *s)
         MOVTrack *track= &mov->tracks[i];
 
         track->enc = st->codec;
+        track->language = ff_mov_iso639_to_lang(st->language, mov->mode != MODE_MOV);
+        track->mode = mov->mode;
         if(st->codec->codec_type == CODEC_TYPE_VIDEO){
             track->tag = mov_find_video_codec_tag(s, track);
             av_set_pts_info(st, 64, 1, st->codec->time_base.den);
@@ -1465,8 +1474,6 @@ static int mov_write_header(AVFormatContext *s)
             av_set_pts_info(st, 64, 1, st->codec->sample_rate);
             track->sampleSize = (av_get_bits_per_sample(st->codec->codec_id) >> 3) * st->codec->channels;
         }
-        track->language = ff_mov_iso639_to_lang(st->language, mov->mode != MODE_MOV);
-        track->mode = mov->mode;
     }
 
     mov_write_mdat_tag(pb, mov);

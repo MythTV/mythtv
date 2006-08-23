@@ -79,7 +79,7 @@ static inline void av_free_packet(AVPacket *pkt)
    is assumed to be such as 0 <= num < den */
 typedef struct AVFrac {
     int64_t val, num, den;
-} AVFrac;
+} AVFrac attribute_deprecated;
 
 /*************************************************/
 /* input/output formats */
@@ -122,6 +122,7 @@ typedef struct AVFormatParameters {
 #define AVFMT_RAWPICTURE    0x0020 /* format wants AVPicture structure for
                                       raw picture data */
 #define AVFMT_GLOBALHEADER  0x0040 /* format wants global header */
+#define AVFMT_NOTIMESTAMPS  0x0080 /* format doesnt need / has any timestamps */
 
 typedef struct AVOutputFormat {
     const char *name;
@@ -363,8 +364,8 @@ extern AVInputFormat *first_iformat;
 extern AVOutputFormat *first_oformat;
 
 /* still image support */
-struct AVInputImageContext;
-typedef struct AVInputImageContext AVInputImageContext;
+struct AVInputImageContext attribute_deprecated;
+typedef struct AVInputImageContext AVInputImageContext attribute_deprecated;
 
 typedef struct AVImageInfo {
     enum PixelFormat pix_fmt; /* requested pixel format */
@@ -372,7 +373,7 @@ typedef struct AVImageInfo {
     int height; /* requested height */
     int interleaved; /* image is interleaved (e.g. interleaved GIF) */
     AVPicture pict; /* returned allocated image */
-} AVImageInfo;
+} AVImageInfo attribute_deprecated;
 
 /* AVImageFormat.flags field constants */
 #define AVIMAGE_INTERLEAVED 0x0001 /* image format support interleaved output */
@@ -393,18 +394,18 @@ typedef struct AVImageFormat {
     int (*img_write)(ByteIOContext *, AVImageInfo *);
     int flags;
     struct AVImageFormat *next;
-} AVImageFormat;
+} AVImageFormat attribute_deprecated;
 
-void av_register_image_format(AVImageFormat *img_fmt);
-AVImageFormat *av_probe_image_format(AVProbeData *pd);
-AVImageFormat *guess_image_format(const char *filename);
+void av_register_image_format(AVImageFormat *img_fmt) attribute_deprecated;
+AVImageFormat *av_probe_image_format(AVProbeData *pd) attribute_deprecated;
+AVImageFormat *guess_image_format(const char *filename) attribute_deprecated;
 enum CodecID av_guess_image2_codec(const char *filename);
 int av_read_image(ByteIOContext *pb, const char *filename,
                   AVImageFormat *fmt,
-                  int (*alloc_cb)(void *, AVImageInfo *info), void *opaque);
-int av_write_image(ByteIOContext *pb, AVImageFormat *fmt, AVImageInfo *img);
+                  int (*alloc_cb)(void *, AVImageInfo *info), void *opaque) attribute_deprecated;
+int av_write_image(ByteIOContext *pb, AVImageFormat *fmt, AVImageInfo *img) attribute_deprecated;
 
-extern AVImageFormat *first_image_format;
+extern AVImageFormat *first_image_format attribute_deprecated;
 
 /* XXX: use automatic init with either ELF sections or C file parser */
 /* modules */
@@ -497,6 +498,7 @@ int av_set_parameters(AVFormatContext *s, AVFormatParameters *ap);
 int av_write_header(AVFormatContext *s);
 int av_write_frame(AVFormatContext *s, AVPacket *pkt);
 int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt);
+int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush);
 
 int av_write_trailer(AVFormatContext *s);
 

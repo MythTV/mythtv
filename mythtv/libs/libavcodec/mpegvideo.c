@@ -32,7 +32,7 @@
 #include <limits.h>
 
 #ifdef USE_FASTMEMCPY
-#include "fastmemcpy.h"
+#include "libvo/fastmemcpy.h"
 #endif
 
 //#undef NDEBUG
@@ -1692,7 +1692,7 @@ void MPV_frame_end(MpegEncContext *s)
  * @param color color of the arrow
  */
 static void draw_line(uint8_t *buf, int sx, int sy, int ex, int ey, int w, int h, int stride, int color){
-    int t, x, y, fr, f;
+    int x, y, fr, f;
 
     sx= clip(sx, 0, w-1);
     sy= clip(sy, 0, h-1);
@@ -1703,8 +1703,8 @@ static void draw_line(uint8_t *buf, int sx, int sy, int ex, int ey, int w, int h
 
     if(ABS(ex - sx) > ABS(ey - sy)){
         if(sx > ex){
-            t=sx; sx=ex; ex=t;
-            t=sy; sy=ey; ey=t;
+            SWAP(int, sx, ex);
+            SWAP(int, sy, ey);
         }
         buf+= sx + sy*stride;
         ex-= sx;
@@ -1717,8 +1717,8 @@ static void draw_line(uint8_t *buf, int sx, int sy, int ex, int ey, int w, int h
         }
     }else{
         if(sy > ey){
-            t=sx; sx=ex; ex=t;
-            t=sy; sy=ey; ey=t;
+            SWAP(int, sx, ex);
+            SWAP(int, sy, ey);
         }
         buf+= sx + sy*stride;
         ey-= sy;

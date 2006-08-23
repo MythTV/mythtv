@@ -87,9 +87,9 @@ typedef struct {
 typedef struct vorbis_context_s {
     AVCodecContext *avccontext;
     GetBitContext gb;
+    DSPContext dsp;
 
-    MDCTContext mdct0;
-    MDCTContext mdct1;
+    MDCTContext mdct[2];
     uint_fast8_t first_frame;
     uint_fast32_t version;
     uint_fast8_t audio_channels;
@@ -97,10 +97,8 @@ typedef struct vorbis_context_s {
     uint_fast32_t bitrate_maximum;
     uint_fast32_t bitrate_nominal;
     uint_fast32_t bitrate_minimum;
-    uint_fast32_t blocksize_0;
-    uint_fast32_t blocksize_1;
-    const float * swin;
-    const float * lwin;
+    uint_fast32_t blocksize[2];
+    const float * win[2];
     uint_fast16_t codebook_count;
     vorbis_codebook *codebooks;
     uint_fast8_t floor_count;
@@ -119,6 +117,8 @@ typedef struct vorbis_context_s {
     float *ret;
     float *buf;
     float *buf_tmp;
+    uint_fast32_t add_bias; // for float->int conversion
+    uint_fast32_t exp_bias;
 } vorbis_context;
 
 

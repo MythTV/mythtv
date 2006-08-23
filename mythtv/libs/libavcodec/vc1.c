@@ -112,7 +112,7 @@ enum MVModes {
 enum BMVTypes {
     BMV_TYPE_BACKWARD,
     BMV_TYPE_FORWARD,
-    BMV_TYPE_INTERPOLATED = 3 //XXX: ??
+    BMV_TYPE_INTERPOLATED
 };
 //@}
 
@@ -717,160 +717,6 @@ static int vop_dquant_decoding(VC1Context *v)
     return 0;
 }
 
-
-/** Do inverse transform
- */
-static void vc1_inv_trans(DCTELEM block[64], int M, int N)
-{
-    int i;
-    register int t1,t2,t3,t4,t5,t6,t7,t8;
-    DCTELEM *src, *dst;
-
-    src = block;
-    dst = block;
-    if(M==4){
-        for(i = 0; i < N; i++){
-            t1 = 17 * (src[0] + src[2]);
-            t2 = 17 * (src[0] - src[2]);
-            t3 = 22 * src[1];
-            t4 = 22 * src[3];
-            t5 = 10 * src[1];
-            t6 = 10 * src[3];
-
-            dst[0] = (t1 + t3 + t6 + 4) >> 3;
-            dst[1] = (t2 - t4 + t5 + 4) >> 3;
-            dst[2] = (t2 + t4 - t5 + 4) >> 3;
-            dst[3] = (t1 - t3 - t6 + 4) >> 3;
-
-            src += 8;
-            dst += 8;
-        }
-    }else{
-        for(i = 0; i < N; i++){
-            t1 = 12 * (src[0] + src[4]);
-            t2 = 12 * (src[0] - src[4]);
-            t3 = 16 * src[2] +  6 * src[6];
-            t4 =  6 * src[2] - 16 * src[6];
-
-            t5 = t1 + t3;
-            t6 = t2 + t4;
-            t7 = t2 - t4;
-            t8 = t1 - t3;
-
-            t1 = 16 * src[1] + 15 * src[3] +  9 * src[5] +  4 * src[7];
-            t2 = 15 * src[1] -  4 * src[3] - 16 * src[5] -  9 * src[7];
-            t3 =  9 * src[1] - 16 * src[3] +  4 * src[5] + 15 * src[7];
-            t4 =  4 * src[1] -  9 * src[3] + 15 * src[5] - 16 * src[7];
-
-            dst[0] = (t5 + t1 + 4) >> 3;
-            dst[1] = (t6 + t2 + 4) >> 3;
-            dst[2] = (t7 + t3 + 4) >> 3;
-            dst[3] = (t8 + t4 + 4) >> 3;
-            dst[4] = (t8 - t4 + 4) >> 3;
-            dst[5] = (t7 - t3 + 4) >> 3;
-            dst[6] = (t6 - t2 + 4) >> 3;
-            dst[7] = (t5 - t1 + 4) >> 3;
-
-            src += 8;
-            dst += 8;
-        }
-    }
-
-    src = block;
-    dst = block;
-    if(N==4){
-        for(i = 0; i < M; i++){
-            t1 = 17 * (src[ 0] + src[16]);
-            t2 = 17 * (src[ 0] - src[16]);
-            t3 = 22 * src[ 8];
-            t4 = 22 * src[24];
-            t5 = 10 * src[ 8];
-            t6 = 10 * src[24];
-
-            dst[ 0] = (t1 + t3 + t6 + 64) >> 7;
-            dst[ 8] = (t2 - t4 + t5 + 64) >> 7;
-            dst[16] = (t2 + t4 - t5 + 64) >> 7;
-            dst[24] = (t1 - t3 - t6 + 64) >> 7;
-
-            src ++;
-            dst ++;
-        }
-    }else{
-        for(i = 0; i < M; i++){
-            t1 = 12 * (src[ 0] + src[32]);
-            t2 = 12 * (src[ 0] - src[32]);
-            t3 = 16 * src[16] +  6 * src[48];
-            t4 =  6 * src[16] - 16 * src[48];
-
-            t5 = t1 + t3;
-            t6 = t2 + t4;
-            t7 = t2 - t4;
-            t8 = t1 - t3;
-
-            t1 = 16 * src[ 8] + 15 * src[24] +  9 * src[40] +  4 * src[56];
-            t2 = 15 * src[ 8] -  4 * src[24] - 16 * src[40] -  9 * src[56];
-            t3 =  9 * src[ 8] - 16 * src[24] +  4 * src[40] + 15 * src[56];
-            t4 =  4 * src[ 8] -  9 * src[24] + 15 * src[40] - 16 * src[56];
-
-            dst[ 0] = (t5 + t1 + 64) >> 7;
-            dst[ 8] = (t6 + t2 + 64) >> 7;
-            dst[16] = (t7 + t3 + 64) >> 7;
-            dst[24] = (t8 + t4 + 64) >> 7;
-            dst[32] = (t8 - t4 + 64 + 1) >> 7;
-            dst[40] = (t7 - t3 + 64 + 1) >> 7;
-            dst[48] = (t6 - t2 + 64 + 1) >> 7;
-            dst[56] = (t5 - t1 + 64 + 1) >> 7;
-
-            src++;
-            dst++;
-        }
-    }
-}
-
-/** Apply overlap transform to vertical edge
- * @todo optimize
- * @todo move to DSPContext
- */
-static void vc1_v_overlap(uint8_t* src, int stride)
-{
-    int i;
-    int a, b, c, d;
-    for(i = 0; i < 8; i++) {
-        a = src[-2*stride];
-        b = src[-stride];
-        c = src[0];
-        d = src[stride];
-
-        src[-2*stride] = clip_uint8((7*a + d + 3) >> 3);
-        src[-stride] = clip_uint8((-a + 7*b + c + d + 3) >> 3);
-        src[0] = clip_uint8((a + b + 7*c - d + 3) >> 3);
-        src[stride] = clip_uint8((a + 7*d + 3) >> 3);
-        src++;
-    }
-}
-
-/** Apply overlap transform to horizontal edge
- * @todo optimize
- * @todo move to DSPContext
- */
-static void vc1_h_overlap(uint8_t* src, int stride)
-{
-    int i;
-    int a, b, c, d;
-    for(i = 0; i < 8; i++) {
-        a = src[-2];
-        b = src[-1];
-        c = src[0];
-        d = src[1];
-
-        src[-2] = clip_uint8((7*a + d + 3) >> 3);
-        src[-1] = clip_uint8((-a + 7*b + c + d + 3) >> 3);
-        src[0] = clip_uint8((a + b + 7*c - d + 3) >> 3);
-        src[1] = clip_uint8((a + 7*d + 3) >> 3);
-        src += stride;
-    }
-}
-
 /** Put block onto picture
  * @todo move to DSPContext
  */
@@ -880,6 +726,14 @@ static void vc1_put_block(VC1Context *v, DCTELEM block[6][64])
     int ys, us, vs;
     DSPContext *dsp = &v->s.dsp;
 
+    if(v->rangeredfrm) {
+        int i, j, k;
+        for(k = 0; k < 6; k++)
+            for(j = 0; j < 8; j++)
+                for(i = 0; i < 8; i++)
+                    block[k][i + j*8] = ((block[k][i + j*8] - 128) << 1) + 128;
+
+    }
     ys = v->s.current_picture.linesize[0];
     us = v->s.current_picture.linesize[1];
     vs = v->s.current_picture.linesize[2];
@@ -891,8 +745,10 @@ static void vc1_put_block(VC1Context *v, DCTELEM block[6][64])
     dsp->put_pixels_clamped(block[2], Y, ys);
     dsp->put_pixels_clamped(block[3], Y + 8, ys);
 
-    dsp->put_pixels_clamped(block[4], v->s.dest[1], us);
-    dsp->put_pixels_clamped(block[5], v->s.dest[2], vs);
+    if(!(v->s.flags & CODEC_FLAG_GRAY)) {
+        dsp->put_pixels_clamped(block[4], v->s.dest[1], us);
+        dsp->put_pixels_clamped(block[5], v->s.dest[2], vs);
+    }
 }
 
 /** Do motion compensation over 1 macroblock
@@ -935,13 +791,20 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
     srcU += uvsrc_y * s->uvlinesize + uvsrc_x;
     srcV += uvsrc_y * s->uvlinesize + uvsrc_x;
 
-    if((v->mv_mode == MV_PMODE_INTENSITY_COMP)
-       || (unsigned)src_x > s->h_edge_pos - (mx&3) - 16
-       || (unsigned)src_y > s->v_edge_pos - (my&3) - 16){
-        uint8_t *uvbuf= s->edge_emu_buffer + 18 * s->linesize;
+    /* for grayscale we should not try to read from unknown area */
+    if(s->flags & CODEC_FLAG_GRAY) {
+        srcU = s->edge_emu_buffer + 18 * s->linesize;
+        srcV = s->edge_emu_buffer + 18 * s->linesize;
+    }
 
-        ff_emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, 16+1, 16+1,
-                            src_x, src_y, s->h_edge_pos, s->v_edge_pos);
+    if(v->rangeredfrm || (v->mv_mode == MV_PMODE_INTENSITY_COMP)
+       || (unsigned)(src_x - s->mspel) > s->h_edge_pos - (mx&3) - 16 - s->mspel*3
+       || (unsigned)(src_y - s->mspel) > s->v_edge_pos - (my&3) - 16 - s->mspel*3){
+        uint8_t *uvbuf= s->edge_emu_buffer + 19 * s->linesize;
+
+        srcY -= s->mspel * (1 + s->linesize);
+        ff_emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, 17+s->mspel*2, 17+s->mspel*2,
+                            src_x - s->mspel, src_y - s->mspel, s->h_edge_pos, s->v_edge_pos);
         srcY = s->edge_emu_buffer;
         ff_emulated_edge_mc(uvbuf     , srcU, s->uvlinesize, 8+1, 8+1,
                             uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
@@ -949,14 +812,34 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
                             uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
         srcU = uvbuf;
         srcV = uvbuf + 16;
+        /* if we deal with range reduction we need to scale source blocks */
+        if(v->rangeredfrm) {
+            int i, j;
+            uint8_t *src, *src2;
+
+            src = srcY;
+            for(j = 0; j < 17 + s->mspel*2; j++) {
+                for(i = 0; i < 17 + s->mspel*2; i++) src[i] = ((src[i] - 128) >> 1) + 128;
+                src += s->linesize;
+            }
+            src = srcU; src2 = srcV;
+            for(j = 0; j < 9; j++) {
+                for(i = 0; i < 9; i++) {
+                    src[i] = ((src[i] - 128) >> 1) + 128;
+                    src2[i] = ((src2[i] - 128) >> 1) + 128;
+                }
+                src += s->uvlinesize;
+                src2 += s->uvlinesize;
+            }
+        }
         /* if we deal with intensity compensation we need to scale source blocks */
         if(v->mv_mode == MV_PMODE_INTENSITY_COMP) {
             int i, j;
             uint8_t *src, *src2;
 
             src = srcY;
-            for(j = 0; j < 17; j++) {
-                for(i = 0; i < 17; i++) src[i] = v->luty[src[i]];
+            for(j = 0; j < 17 + s->mspel*2; j++) {
+                for(i = 0; i < 17 + s->mspel*2; i++) src[i] = v->luty[src[i]];
                 src += s->linesize;
             }
             src = srcU; src2 = srcV;
@@ -969,6 +852,7 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
                 src2 += s->uvlinesize;
             }
         }
+        srcY += s->mspel * (1 + s->linesize);
     }
 
     if(v->fastuvmc) {
@@ -976,7 +860,14 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
         uvmy = uvmy + ((uvmy<0)?(uvmy&1):-(uvmy&1));
     }
 
-    if(!s->quarter_sample) { // hpel mc
+    if(s->mspel) {
+        dxy = ((my & 3) << 2) | (mx & 3);
+        dsp->put_vc1_mspel_pixels_tab[dxy](s->dest[0]    , srcY    , s->linesize, v->rnd);
+        dsp->put_vc1_mspel_pixels_tab[dxy](s->dest[0] + 8, srcY + 8, s->linesize, v->rnd);
+        srcY += s->linesize * 8;
+        dsp->put_vc1_mspel_pixels_tab[dxy](s->dest[0] + 8 * s->linesize    , srcY    , s->linesize, v->rnd);
+        dsp->put_vc1_mspel_pixels_tab[dxy](s->dest[0] + 8 * s->linesize + 8, srcY + 8, s->linesize, v->rnd);
+    } else if(!s->quarter_sample) { // hpel mc
         mx >>= 1;
         my >>= 1;
         dxy = ((my & 1) << 1) | (mx & 1);
@@ -993,6 +884,8 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
         else
             dsp->put_no_rnd_qpel_pixels_tab[0][dxy](s->dest[0], srcY, s->linesize);
     }
+
+    if(s->flags & CODEC_FLAG_GRAY) return;
     /* Chroma MC always uses qpel blilinear */
     uvdxy = ((uvmy & 3) << 2) | (uvmx & 3);
     if(!v->rnd){
@@ -1029,14 +922,42 @@ static void vc1_mc_4mv_luma(VC1Context *v, int n)
 
     srcY += src_y * s->linesize + src_x;
 
-    if((unsigned)src_x > s->h_edge_pos - (mx&3) - 16
-       || (unsigned)src_y > s->v_edge_pos - (my&3) - 16){
-        ff_emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, 16+1, 16+1,
-                            src_x, src_y, s->h_edge_pos, s->v_edge_pos);
+    if(v->rangeredfrm || (v->mv_mode == MV_PMODE_INTENSITY_COMP)
+       || (unsigned)(src_x - s->mspel) > s->h_edge_pos - (mx&3) - 8 - s->mspel*2
+       || (unsigned)(src_y - s->mspel) > s->v_edge_pos - (my&3) - 8 - s->mspel*2){
+        srcY -= s->mspel * (1 + s->linesize);
+        ff_emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, 9+s->mspel*2, 9+s->mspel*2,
+                            src_x - s->mspel, src_y - s->mspel, s->h_edge_pos, s->v_edge_pos);
         srcY = s->edge_emu_buffer;
+        /* if we deal with range reduction we need to scale source blocks */
+        if(v->rangeredfrm) {
+            int i, j;
+            uint8_t *src;
+
+            src = srcY;
+            for(j = 0; j < 9 + s->mspel*2; j++) {
+                for(i = 0; i < 9 + s->mspel*2; i++) src[i] = ((src[i] - 128) >> 1) + 128;
+                src += s->linesize;
+            }
+        }
+        /* if we deal with intensity compensation we need to scale source blocks */
+        if(v->mv_mode == MV_PMODE_INTENSITY_COMP) {
+            int i, j;
+            uint8_t *src;
+
+            src = srcY;
+            for(j = 0; j < 9 + s->mspel*2; j++) {
+                for(i = 0; i < 9 + s->mspel*2; i++) src[i] = v->luty[src[i]];
+                src += s->linesize;
+            }
+        }
+        srcY += s->mspel * (1 + s->linesize);
     }
 
-    if(!s->quarter_sample) { // hpel mc
+    if(s->mspel) {
+        dxy = ((my & 3) << 2) | (mx & 3);
+        dsp->put_vc1_mspel_pixels_tab[dxy](s->dest[0] + off, srcY, s->linesize, v->rnd);
+    } else if(!s->quarter_sample) { // hpel mc
         mx >>= 1;
         my >>= 1;
         dxy = ((my & 1) << 1) | (mx & 1);
@@ -1080,6 +1001,7 @@ static void vc1_mc_4mv_chroma(VC1Context *v)
     static const int count[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
 
     if(!v->s.last_picture.data[0])return;
+    if(s->flags & CODEC_FLAG_GRAY) return;
 
     for(i = 0; i < 4; i++) {
         mvx[i] = s->mv[0][i][0];
@@ -1130,7 +1052,8 @@ static void vc1_mc_4mv_chroma(VC1Context *v)
     uvsrc_y = clip(uvsrc_y,  -8, s->mb_height *  8);
     srcU = s->last_picture.data[1] + uvsrc_y * s->uvlinesize + uvsrc_x;
     srcV = s->last_picture.data[2] + uvsrc_y * s->uvlinesize + uvsrc_x;
-    if((unsigned)uvsrc_x > (s->h_edge_pos >> 1) - 9
+    if(v->rangeredfrm || (v->mv_mode == MV_PMODE_INTENSITY_COMP)
+       || (unsigned)uvsrc_x > (s->h_edge_pos >> 1) - 9
        || (unsigned)uvsrc_y > (s->v_edge_pos >> 1) - 9){
         ff_emulated_edge_mc(s->edge_emu_buffer     , srcU, s->uvlinesize, 8+1, 8+1,
                             uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
@@ -1138,6 +1061,37 @@ static void vc1_mc_4mv_chroma(VC1Context *v)
                             uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
         srcU = s->edge_emu_buffer;
         srcV = s->edge_emu_buffer + 16;
+
+        /* if we deal with range reduction we need to scale source blocks */
+        if(v->rangeredfrm) {
+            int i, j;
+            uint8_t *src, *src2;
+
+            src = srcU; src2 = srcV;
+            for(j = 0; j < 9; j++) {
+                for(i = 0; i < 9; i++) {
+                    src[i] = ((src[i] - 128) >> 1) + 128;
+                    src2[i] = ((src2[i] - 128) >> 1) + 128;
+                }
+                src += s->uvlinesize;
+                src2 += s->uvlinesize;
+            }
+        }
+        /* if we deal with intensity compensation we need to scale source blocks */
+        if(v->mv_mode == MV_PMODE_INTENSITY_COMP) {
+            int i, j;
+            uint8_t *src, *src2;
+
+            src = srcU; src2 = srcV;
+            for(j = 0; j < 9; j++) {
+                for(i = 0; i < 9; i++) {
+                    src[i] = v->lutuv[src[i]];
+                    src2[i] = v->lutuv[src2[i]];
+                }
+                src += s->uvlinesize;
+                src2 += s->uvlinesize;
+            }
+        }
     }
 
     if(v->fastuvmc) {
@@ -1281,8 +1235,10 @@ static int decode_sequence_header(AVCodecContext *avctx, GetBitContext *gb)
         v->res_rtm_flag = get_bits(gb, 1); //reserved
         if (!v->res_rtm_flag)
         {
+//            av_log(avctx, AV_LOG_ERROR,
+//                   "0 for reserved RES_RTM_FLAG is forbidden\n");
             av_log(avctx, AV_LOG_ERROR,
-                   "0 for reserved RES_RTM_FLAG is forbidden\n");
+                   "Old WMV3 version detected, only I-frames will be decoded\n");
             //return -1;
         }
         av_log(avctx, AV_LOG_DEBUG,
@@ -1408,6 +1364,7 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
                 v->s.quarter_sample = 1;
         } else
             v->s.quarter_sample = 1;
+        v->s.mspel = !(v->mv_mode == MV_PMODE_1MV_HPEL_BILIN || (v->mv_mode == MV_PMODE_INTENSITY_COMP && v->mv_mode2 == MV_PMODE_1MV_HPEL_BILIN));
 
         if ((v->mv_mode == MV_PMODE_INTENSITY_COMP &&
                  v->mv_mode2 == MV_PMODE_MIXED_MV)
@@ -1457,6 +1414,7 @@ static int vc1_parse_frame_header(VC1Context *v, GetBitContext* gb)
         lowquant = (v->pq > 12) ? 0 : 1;
         v->mv_mode = get_bits1(gb) ? MV_PMODE_1MV : MV_PMODE_1MV_HPEL_BILIN;
         v->s.quarter_sample = (v->mv_mode == MV_PMODE_1MV);
+        v->s.mspel = v->s.quarter_sample;
 
         status = bitplane_decoding(v->direct_mb_plane, &v->dmb_is_raw, v);
         if (status < 0) return -1;
@@ -1727,6 +1685,105 @@ static inline void vc1_pred_mv(MpegEncContext *s, int n, int dmv_x, int dmv_y, i
     }
 }
 
+/** Motion compensation for direct or interpolated blocks in B-frames
+ */
+static void vc1_interp_mc(VC1Context *v)
+{
+    MpegEncContext *s = &v->s;
+    DSPContext *dsp = &v->s.dsp;
+    uint8_t *srcY, *srcU, *srcV;
+    int dxy, uvdxy, mx, my, uvmx, uvmy, src_x, src_y, uvsrc_x, uvsrc_y;
+
+    if(!v->s.next_picture.data[0])return;
+
+    mx = s->mv[1][0][0];
+    my = s->mv[1][0][1];
+    uvmx = (mx + ((mx & 3) == 3)) >> 1;
+    uvmy = (my + ((my & 3) == 3)) >> 1;
+    srcY = s->next_picture.data[0];
+    srcU = s->next_picture.data[1];
+    srcV = s->next_picture.data[2];
+
+    src_x = s->mb_x * 16 + (mx >> 2);
+    src_y = s->mb_y * 16 + (my >> 2);
+    uvsrc_x = s->mb_x * 8 + (uvmx >> 2);
+    uvsrc_y = s->mb_y * 8 + (uvmy >> 2);
+
+    src_x   = clip(  src_x, -16, s->mb_width  * 16);
+    src_y   = clip(  src_y, -16, s->mb_height * 16);
+    uvsrc_x = clip(uvsrc_x,  -8, s->mb_width  *  8);
+    uvsrc_y = clip(uvsrc_y,  -8, s->mb_height *  8);
+
+    srcY += src_y * s->linesize + src_x;
+    srcU += uvsrc_y * s->uvlinesize + uvsrc_x;
+    srcV += uvsrc_y * s->uvlinesize + uvsrc_x;
+
+    /* for grayscale we should not try to read from unknown area */
+    if(s->flags & CODEC_FLAG_GRAY) {
+        srcU = s->edge_emu_buffer + 18 * s->linesize;
+        srcV = s->edge_emu_buffer + 18 * s->linesize;
+    }
+
+    if(v->rangeredfrm
+       || (unsigned)src_x > s->h_edge_pos - (mx&3) - 16
+       || (unsigned)src_y > s->v_edge_pos - (my&3) - 16){
+        uint8_t *uvbuf= s->edge_emu_buffer + 19 * s->linesize;
+
+        ff_emulated_edge_mc(s->edge_emu_buffer, srcY, s->linesize, 17, 17,
+                            src_x - s->mspel, src_y - s->mspel, s->h_edge_pos, s->v_edge_pos);
+        srcY = s->edge_emu_buffer;
+        ff_emulated_edge_mc(uvbuf     , srcU, s->uvlinesize, 8+1, 8+1,
+                            uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
+        ff_emulated_edge_mc(uvbuf + 16, srcV, s->uvlinesize, 8+1, 8+1,
+                            uvsrc_x, uvsrc_y, s->h_edge_pos >> 1, s->v_edge_pos >> 1);
+        srcU = uvbuf;
+        srcV = uvbuf + 16;
+        /* if we deal with range reduction we need to scale source blocks */
+        if(v->rangeredfrm) {
+            int i, j;
+            uint8_t *src, *src2;
+
+            src = srcY;
+            for(j = 0; j < 17; j++) {
+                for(i = 0; i < 17; i++) src[i] = ((src[i] - 128) >> 1) + 128;
+                src += s->linesize;
+            }
+            src = srcU; src2 = srcV;
+            for(j = 0; j < 9; j++) {
+                for(i = 0; i < 9; i++) {
+                    src[i] = ((src[i] - 128) >> 1) + 128;
+                    src2[i] = ((src2[i] - 128) >> 1) + 128;
+                }
+                src += s->uvlinesize;
+                src2 += s->uvlinesize;
+            }
+        }
+    }
+
+    if(v->fastuvmc) {
+        uvmx = uvmx + ((uvmx<0)?(uvmx&1):-(uvmx&1));
+        uvmy = uvmy + ((uvmy<0)?(uvmy&1):-(uvmy&1));
+    }
+
+    if(!s->quarter_sample) { // hpel mc
+        mx >>= 1;
+        my >>= 1;
+        dxy = ((my & 1) << 1) | (mx & 1);
+
+        dsp->avg_pixels_tab[0][dxy](s->dest[0], srcY, s->linesize, 16);
+    } else {
+        dxy = ((my & 3) << 2) | (mx & 3);
+
+        dsp->avg_qpel_pixels_tab[0][dxy](s->dest[0], srcY, s->linesize);
+    }
+
+    if(s->flags & CODEC_FLAG_GRAY) return;
+    /* Chroma MC always uses qpel blilinear */
+    uvdxy = ((uvmy & 3) << 2) | (uvmx & 3);
+    dsp->avg_qpel_pixels_tab[1][uvdxy](s->dest[1], srcU, s->uvlinesize);
+    dsp->avg_qpel_pixels_tab[1][uvdxy](s->dest[2], srcV, s->uvlinesize);
+}
+
 /** Reconstruct motion vector for B-frame and do motion compensation
  */
 static inline void vc1_b_mc(VC1Context *v, int dmv_x[2], int dmv_y[2], int direct, int mode)
@@ -1741,8 +1798,35 @@ static inline void vc1_b_mc(VC1Context *v, int dmv_x[2], int dmv_y[2], int direc
     dmv_x[1] <<= 1 - s->quarter_sample;
     dmv_y[1] <<= 1 - s->quarter_sample;
 
-    if(direct || mode == BMV_TYPE_INTERPOLATED) {
-        /* TODO */
+    if(direct) {
+        for(i = 0; i < 4; i++) {
+            mx[i] = s->last_picture.motion_val[0][s->block_index[i]][0];
+            my[i] = s->last_picture.motion_val[0][s->block_index[i]][1];
+        }
+        mv_x = median4(mx[0], mx[1], mx[2], mx[3]);
+        mv_y = median4(my[0], my[1], my[2], my[3]);
+        s->mv[0][0][0] = (mv_x * v->bfraction + B_FRACTION_DEN/2) / B_FRACTION_DEN;
+        s->mv[0][0][1] = (mv_y * v->bfraction + B_FRACTION_DEN/2) / B_FRACTION_DEN;
+        vc1_mc_1mv(v, 0);
+
+        for(i = 0; i < 4; i++) {
+            mx[i] = s->next_picture.motion_val[0][s->block_index[i]][0];
+            my[i] = s->next_picture.motion_val[0][s->block_index[i]][1];
+        }
+        mv_x = median4(mx[0], mx[1], mx[2], mx[3]);
+        mv_y = median4(my[0], my[1], my[2], my[3]);
+        s->mv[1][0][0] = (mv_x * (B_FRACTION_DEN - v->bfraction) + B_FRACTION_DEN/2) / B_FRACTION_DEN;
+        s->mv[1][0][1] = (mv_y * (B_FRACTION_DEN - v->bfraction) + B_FRACTION_DEN/2) / B_FRACTION_DEN;
+        vc1_interp_mc(v);
+        return;
+    }
+    if(mode == BMV_TYPE_INTERPOLATED) {
+        s->mv[0][0][0] = dmv_x[0];
+        s->mv[0][0][1] = dmv_y[0];
+        vc1_mc_1mv(v, 0);
+        s->mv[1][0][0] = dmv_x[1];
+        s->mv[1][0][1] = dmv_y[1];
+        vc1_interp_mc(v);
         return;
     }
 
@@ -2413,7 +2497,7 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
             if(!v->pquantizer)
                 block[idx] += (block[idx] < 0) ? -mquant : mquant;
         }
-        vc1_inv_trans(block, 8, 8);
+        s->dsp.vc1_inv_trans_8x8(block);
         break;
     case TT_4X4:
         for(j = 0; j < 4; j++) {
@@ -2431,7 +2515,7 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
                     block[idx + off] += (block[idx + off] < 0) ? -mquant : mquant;
             }
             if(!(subblkpat & (1 << (3 - j))))
-                vc1_inv_trans(block + off, 4, 4);
+                s->dsp.vc1_inv_trans_4x4(block, j);
         }
         break;
     case TT_8X4:
@@ -2450,7 +2534,7 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
                     block[idx + off] += (block[idx + off] < 0) ? -mquant : mquant;
             }
             if(!(subblkpat & (1 << (1 - j))))
-                vc1_inv_trans(block + off, 8, 4);
+                s->dsp.vc1_inv_trans_8x4(block, j);
         }
         break;
     case TT_4X8:
@@ -2469,7 +2553,7 @@ static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n, int mquan
                     block[idx + off] += (block[idx + off] < 0) ? -mquant : mquant;
             }
             if(!(subblkpat & (1 << (1 - j))))
-                vc1_inv_trans(block + off, 4, 8);
+                s->dsp.vc1_inv_trans_4x8(block, j);
         }
         break;
     }
@@ -2565,21 +2649,24 @@ static int vc1_decode_p_mb(VC1Context *v)
                         v->c_avail = v->mb_type[0][s->block_index[i] - 1];
 
                     vc1_decode_intra_block(v, s->block[i], i, val, mquant, (i&4)?v->codingset2:v->codingset);
-                    vc1_inv_trans(s->block[i], 8, 8);
+                    if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
+                    s->dsp.vc1_inv_trans_8x8(s->block[i]);
+                    if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
                     for(j = 0; j < 64; j++) s->block[i][j] += 128;
                     s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
                     /* TODO: proper loop filtering */
                     if(v->pq >= 9 && v->overlap) {
                         if(v->a_avail)
-                            vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+                            s->dsp.vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2), (i<4) ? ((i&1)>>1) : (s->mb_y&1));
                         if(v->c_avail)
-                            vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+                            s->dsp.vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2), (i<4) ? (i&1) : (s->mb_x&1));
                     }
                 } else if(val) {
                     vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
                     if(!v->ttmbf && ttmb < 8) ttmb = -1;
                     first_block = 0;
-                    s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
+                    if((i<4) || !(s->flags & CODEC_FLAG_GRAY))
+                        s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                 }
             }
         }
@@ -2666,21 +2753,24 @@ static int vc1_decode_p_mb(VC1Context *v)
                         v->c_avail = v->mb_type[0][s->block_index[i] - 1];
 
                     vc1_decode_intra_block(v, s->block[i], i, is_coded[i], mquant, (i&4)?v->codingset2:v->codingset);
-                    vc1_inv_trans(s->block[i], 8, 8);
+                    if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
+                    s->dsp.vc1_inv_trans_8x8(s->block[i]);
+                    if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
                     for(j = 0; j < 64; j++) s->block[i][j] += 128;
                     s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                     /* TODO: proper loop filtering */
                     if(v->pq >= 9 && v->overlap) {
                         if(v->a_avail)
-                            vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+                            s->dsp.vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2), (i<4) ? ((i&1)>>1) : (s->mb_y&1));
                         if(v->c_avail)
-                            vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
+                            s->dsp.vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2), (i<4) ? (i&1) : (s->mb_x&1));
                     }
                 } else if(is_coded[i]) {
                     status = vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
                     if(!v->ttmbf && ttmb < 8) ttmb = -1;
                     first_block = 0;
-                    s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
+                    if((i<4) || !(s->flags & CODEC_FLAG_GRAY))
+                        s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
                 }
             }
             return status;
@@ -2716,7 +2806,7 @@ static void vc1_decode_b_mb(VC1Context *v)
     GetBitContext *gb = &s->gb;
     int i, j;
     int mb_pos = s->mb_x + s->mb_y * s->mb_stride;
-    int cbp; /* cbp decoding stuff */
+    int cbp = 0; /* cbp decoding stuff */
     int mqdiff, mquant; /* MB quantization */
     int ttmb = v->ttfrm; /* MB Transform type */
 
@@ -2754,6 +2844,8 @@ static void vc1_decode_b_mb(VC1Context *v)
     if (!direct) {
         if (!skipped) {
             GET_MVDATA(dmv_x[0], dmv_y[0]);
+            dmv_x[1] = dmv_x[0];
+            dmv_y[1] = dmv_y[0];
         }
         if(skipped || !s->mb_intra) {
             bmvtype = decode012(gb);
@@ -2769,7 +2861,6 @@ static void vc1_decode_b_mb(VC1Context *v)
             }
         }
     }
-
     if (skipped) {
         vc1_b_mc(v, dmv_x, dmv_y, direct, bmvtype);
         return;
@@ -2777,8 +2868,10 @@ static void vc1_decode_b_mb(VC1Context *v)
     if (direct) {
         cbp = get_vlc2(&v->s.gb, v->cbpcy_vlc->table, VC1_CBPCY_P_VLC_BITS, 2);
         GET_MQUANT();
+        s->mb_intra = 0;
+        mb_has_coeffs = 0;
         s->current_picture.qscale_table[mb_pos] = mquant;
-        if(!v->ttmbf && !s->mb_intra && mb_has_coeffs)
+        if(!v->ttmbf)
             ttmb = get_vlc2(gb, vc1_ttmb_vlc[v->tt_index].table, VC1_TTMB_VLC_BITS, 2);
         vc1_b_mc(v, dmv_x, dmv_y, direct, bmvtype);
     } else {
@@ -2829,21 +2922,17 @@ static void vc1_decode_b_mb(VC1Context *v)
                 v->c_avail = v->mb_type[0][s->block_index[i] - 1];
 
             vc1_decode_intra_block(v, s->block[i], i, val, mquant, (i&4)?v->codingset2:v->codingset);
-            vc1_inv_trans(s->block[i], 8, 8);
+            if((i>3) && (s->flags & CODEC_FLAG_GRAY)) continue;
+            s->dsp.vc1_inv_trans_8x8(s->block[i]);
+            if(v->rangeredfrm) for(j = 0; j < 64; j++) s->block[i][j] <<= 1;
             for(j = 0; j < 64; j++) s->block[i][j] += 128;
             s->dsp.put_pixels_clamped(s->block[i], s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
-            /* TODO: proper loop filtering */
-            if(v->pq >= 9 && v->overlap) {
-                if(v->a_avail)
-                    vc1_v_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
-                if(v->c_avail)
-                    vc1_h_overlap(s->dest[dst_idx] + off, s->linesize >> ((i & 4) >> 2));
-            }
         } else if(val) {
             vc1_decode_p_block(v, s->block[i], i, mquant, ttmb, first_block);
             if(!v->ttmbf && ttmb < 8) ttmb = -1;
             first_block = 0;
-            s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
+            if((i<4) || !(s->flags & CODEC_FLAG_GRAY))
+                s->dsp.add_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i&4)?s->uvlinesize:s->linesize);
         }
     }
 }
@@ -2917,7 +3006,7 @@ static void vc1_decode_i_blocks(VC1Context *v)
 
                 vc1_decode_i_block(v, s->block[k], k, val, (k<4)? v->codingset : v->codingset2);
 
-                vc1_inv_trans(s->block[k], 8, 8);
+                s->dsp.vc1_inv_trans_8x8(s->block[k]);
                 if(v->pq >= 9 && v->overlap) {
                     for(j = 0; j < 64; j++) s->block[k][j] += 128;
                 }
@@ -2926,21 +3015,25 @@ static void vc1_decode_i_blocks(VC1Context *v)
             vc1_put_block(v, s->block);
             if(v->pq >= 9 && v->overlap) { /* XXX: do proper overlapping insted of loop filter */
                 if(!s->first_slice_line) {
-                    vc1_v_overlap(s->dest[0], s->linesize);
-                    vc1_v_overlap(s->dest[0] + 8, s->linesize);
-                    vc1_v_overlap(s->dest[1], s->uvlinesize);
-                    vc1_v_overlap(s->dest[2], s->uvlinesize);
+                    s->dsp.vc1_v_overlap(s->dest[0], s->linesize, 0);
+                    s->dsp.vc1_v_overlap(s->dest[0] + 8, s->linesize, 0);
+                    if(!(s->flags & CODEC_FLAG_GRAY)) {
+                        s->dsp.vc1_v_overlap(s->dest[1], s->uvlinesize, s->mb_y&1);
+                        s->dsp.vc1_v_overlap(s->dest[2], s->uvlinesize, s->mb_y&1);
+                    }
                 }
-                vc1_v_overlap(s->dest[0] + 8 * s->linesize, s->linesize);
-                vc1_v_overlap(s->dest[0] + 8 * s->linesize + 8, s->linesize);
+                s->dsp.vc1_v_overlap(s->dest[0] + 8 * s->linesize, s->linesize, 1);
+                s->dsp.vc1_v_overlap(s->dest[0] + 8 * s->linesize + 8, s->linesize, 1);
                 if(s->mb_x) {
-                    vc1_h_overlap(s->dest[0], s->linesize);
-                    vc1_h_overlap(s->dest[0] + 8 * s->linesize, s->linesize);
-                    vc1_h_overlap(s->dest[1], s->uvlinesize);
-                    vc1_h_overlap(s->dest[2], s->uvlinesize);
+                    s->dsp.vc1_h_overlap(s->dest[0], s->linesize, 0);
+                    s->dsp.vc1_h_overlap(s->dest[0] + 8 * s->linesize, s->linesize, 0);
+                    if(!(s->flags & CODEC_FLAG_GRAY)) {
+                        s->dsp.vc1_h_overlap(s->dest[1], s->uvlinesize, s->mb_x&1);
+                        s->dsp.vc1_h_overlap(s->dest[2], s->uvlinesize, s->mb_x&1);
+                    }
                 }
-                vc1_h_overlap(s->dest[0] + 8, s->linesize);
-                vc1_h_overlap(s->dest[0] + 8 * s->linesize + 8, s->linesize);
+                s->dsp.vc1_h_overlap(s->dest[0] + 8, s->linesize, 1);
+                s->dsp.vc1_h_overlap(s->dest[0] + 8 * s->linesize + 8, s->linesize, 1);
             }
 
             if(get_bits_count(&s->gb) > v->bits) {
@@ -3079,7 +3172,10 @@ static int vc1_decode_init(AVCodecContext *avctx)
     GetBitContext gb;
 
     if (!avctx->extradata_size || !avctx->extradata) return -1;
-    avctx->pix_fmt = PIX_FMT_YUV420P;
+    if (!(avctx->flags & CODEC_FLAG_GRAY))
+        avctx->pix_fmt = PIX_FMT_YUV420P;
+    else
+        avctx->pix_fmt = PIX_FMT_GRAY8;
     v->s.avctx = avctx;
     avctx->flags |= CODEC_FLAG_EMU_EDGE;
     v->s.flags |= CODEC_FLAG_EMU_EDGE;
@@ -3181,7 +3277,8 @@ static int vc1_decode_frame(AVCodecContext *avctx,
     if(vc1_parse_frame_header(v, &s->gb) == -1)
         return -1;
 
-//    if(s->pict_type != I_TYPE && s->pict_type != P_TYPE)return -1;
+    if(s->pict_type != I_TYPE && !v->res_rtm_flag)return -1;
+    if(s->pict_type == B_TYPE)return -1;
 
     // for hurry_up==5
     s->current_picture.pict_type= s->pict_type;

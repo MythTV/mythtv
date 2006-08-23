@@ -1,5 +1,10 @@
 #ifndef SWSCALE_EMU_H
 #define SWSCALE_EMU_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Dummy, only useful for compilation! */
 #define SWS_FAST_BILINEAR 1
 #define SWS_BILINEAR 2
@@ -29,10 +34,8 @@ int sws_scale(struct SwsContext *ctx, uint8_t* src[], int srcStride[],
 
 void sws_freeContext(struct SwsContext *swsContext);
 
-static inline void sws_global_init(void *(*alloc)(unsigned int size),
-                     void (*free)(void *ptr),
-                     void (*log)(void*, int level, const char *fmt, ...))
-{
+#ifdef __cplusplus
 }
+#endif
 
 #endif /* SWSCALE_EMU_H */

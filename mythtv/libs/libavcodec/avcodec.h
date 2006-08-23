@@ -17,8 +17,8 @@ extern "C" {
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(10<<8)+0)
-#define LIBAVCODEC_VERSION      51.10.0
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(11<<8)+0)
+#define LIBAVCODEC_VERSION      51.11.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -201,8 +201,7 @@ enum CodecID {
     CODEC_ID_TRUESPEECH,
     CODEC_ID_TTA,
     CODEC_ID_SMACKAUDIO,
-
-    CODEC_ID_OGGTHEORA= 0x16000,
+    CODEC_ID_QCELP,
 
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000,
@@ -1210,6 +1209,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_VP3          12
 #define FF_IDCT_IPP          13
 #define FF_IDCT_XVIDMMX      14
+#define FF_IDCT_CAVS         15
 
     /**
      * slice count.
@@ -2131,7 +2131,6 @@ extern AVCodec ac3_encoder;
 extern AVCodec mp2_encoder;
 extern AVCodec mp3lame_encoder;
 extern AVCodec oggvorbis_encoder;
-extern AVCodec oggtheora_encoder;
 extern AVCodec faac_encoder;
 extern AVCodec flac_encoder;
 extern AVCodec xvid_encoder;
@@ -2217,7 +2216,6 @@ extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
 extern AVCodec ffvhuff_decoder;
 extern AVCodec oggvorbis_decoder;
-extern AVCodec oggtheora_decoder;
 extern AVCodec cyuv_decoder;
 extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;

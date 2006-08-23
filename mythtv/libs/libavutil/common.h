@@ -56,6 +56,14 @@
 #endif
 #endif
 
+#ifndef attribute_deprecated
+#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#    define attribute_deprecated __attribute__((deprecated))
+#else
+#    define attribute_deprecated
+#endif
+#endif
+
 #ifndef EMULATE_INTTYPES
 #   include <inttypes.h>
 #else
@@ -168,6 +176,8 @@ typedef uint64_t      uint_fast64_t;
 
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
+
+#define SWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
 /* misc math functions */
 extern FF_IMPORT_ATTR const uint8_t ff_log2_tab[256];

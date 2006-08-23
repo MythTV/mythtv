@@ -29,6 +29,7 @@ SOURCES += rational.c intfloat_readwrite.c crc.c md5.c
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files  = adler32.h avutil.h common.h mathematics.h integer.h internal.h 
 inc.files += lls.h log.h rational.h intfloat_readwrite.h crc.h md5.h x86_cpu.h
+inc.files += softfloat.h
 
 INSTALLS += inc
 
