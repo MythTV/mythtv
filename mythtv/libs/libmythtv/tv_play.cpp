@@ -6212,13 +6212,16 @@ void TV::DoDisplayJumpMenu(void)
 
     if (infoList)
     {
+        pbinfoLock.lock();
         vector<ProgramInfo *>::iterator i = infoList->begin();
         for ( ; i != infoList->end(); i++)
         {
             p = *i;
-            if (p->recgroup != "LiveTV" || LiveTVInAllPrograms)
+            //if (p->recgroup != "LiveTV" || LiveTVInAllPrograms)
+            if (p->recgroup == playbackinfo->recgroup)
                 progLists[p->title].prepend(p);
         }
+        pbinfoLock.unlock();
 
         QMap<QString,ProgramList>::Iterator Iprog;
         for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
