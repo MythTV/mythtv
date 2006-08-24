@@ -1363,6 +1363,11 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
         if (cmp)
             return cmp < 0;
     }
+    else if (isIntA ^ isIntB)
+    {
+        // if only one is channel numeric always consider it less than
+        return isIntA;
+    }
     else
     {
         // one of channels does not have a numeric channum
@@ -1379,9 +1384,9 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 {
     bool cs = order.lower() == "callsign";
     if (cs)
-        sort(list.begin(), list.end(), lt_callsign);
+        stable_sort(list.begin(), list.end(), lt_callsign);
     else /* if (sortorder == "channum") */
-        sort(list.begin(), list.end(), lt_smart);
+        stable_sort(list.begin(), list.end(), lt_smart);
 
     if (eliminate_duplicates && !list.empty())
     {
