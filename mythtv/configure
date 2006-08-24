@@ -1607,7 +1607,7 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
 # Multiprocessor Xeon
    elif expr "$processor" : ".*XEON(TM) MP CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
-   elif expr "$processor" : "Genuine Intel(R) CPU" > /dev/null ; then
+   elif expr "$processor" : "Genuine.*Intel.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Celeron(R) M processor" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
