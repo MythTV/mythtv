@@ -417,7 +417,7 @@ bool DVBRecorder::OpenFilter(uint pid, int pes_type,
         PIDInfoMap::iterator lp_it = _pid_infos.begin();
         for (;lp_it != _pid_infos.end(); ++lp_it)
         {
-            if (lp_it != it && (*lp_it)->priority < 0)
+            if (lp_it != it && (*lp_it)->priority < kFilterPriorityHigh)
             {
                 (*lp_it)->Close();
                 break;
@@ -439,8 +439,7 @@ bool DVBRecorder::OpenFilter(uint pid, int pes_type,
         }
         else
         {
-            VERBOSE(VB_RECORD, LOC + "No low priority PID filter available, "
-                    "open will fail.");
+            VERBOSE(VB_RECORD, LOC_ERR + "Out of PID filters!");
         }
     }
 
@@ -467,6 +466,17 @@ bool DVBRecorder::OpenFilter(uint pid, int pes_type,
     _pid_infos[pid] = info;
 
     return avail;
+}
+
+bool DVBRecorder::SetPIDFilterPriority(uint pid, int priority)
+{
+    PIDInfoMap::iterator it = _pid_infos.find(pid);
+    bool exists = it != _pid_infos.end();
+
+    if (exists)
+        (*it)->priority = priority;
+
+    return exists;
 }
 
 bool DVBRecorder::AdjustFilters(void)
@@ -519,7 +529,7 @@ bool DVBRecorder::AdjustFilters(void)
         _stream_data->AddListeningPID(pmt_pid);
         if (pmt_pid == input_pmt_pid)
         {
-            add_pid.push_back(input_pmt_pid);
+            add_pid.push_back(pmt_pid);
             add_stream_type.push_back(StreamID::PrivSec);
         }
         else
@@ -529,20 +539,34 @@ bool DVBRecorder::AdjustFilters(void)
     }
 
     // Delete filters for pids we no longer wish to monitor
+    // and make sure pids are set to the correct priority
     PIDInfoMap::iterator it   = _pid_infos.begin();
     PIDInfoMap::iterator next = it;
     for (; it != _pid_infos.end(); it = next)
     {
         next = it; next++;
 
-        if (find(add_pid.begin(), add_pid.end(), it.key()) == add_pid.end())
+        if (find(add_pid.begin(), add_pid.end(), it.key()) != add_pid.end())
         {
-            _stream_data->RemoveListeningPID(it.key());
-            _stream_data->RemoveWritingPID(it.key());
-            (*it)->Close();
-            delete *it;
-            _pid_infos.erase(it);
+            // Make sure this is considered high priority pid
+            SetPIDFilterPriority(it.key(), kFilterPriorityHigh);
+            continue;
         }
+
+        if (find(_pmt_monitoring_pids.begin(), _pmt_monitoring_pids.end(),
+                 it.key()) != _pmt_monitoring_pids.end())
+        {
+            // Make sure this is considered low priority pid
+            SetPIDFilterPriority(it.key(), kFilterPriorityLow);
+            continue;
+        }
+
+        // Delete pids we are no longer interested in
+        _stream_data->RemoveListeningPID(it.key());
+        _stream_data->RemoveWritingPID(it.key());
+        (*it)->Close();
+        delete *it;
+        _pid_infos.erase(it);
     }
 
     // Add or adjust filters for pids we wish to monitor

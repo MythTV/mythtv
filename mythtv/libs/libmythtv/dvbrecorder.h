@@ -99,6 +99,7 @@ class DVBRecorder : public DTVRecorder,
     bool OpenFilter(uint pid, int pes_type,
                     uint mpeg_stream_type, int priority);
     int  OpenFilterFd(uint pid, int pes_type, uint stream_type);
+    bool SetPIDFilterPriority(uint pid, int priority);
 
     void SetOutputPAT(ProgramAssociationTable*);
     void SetOutputPMT(ProgramMapTable*);
