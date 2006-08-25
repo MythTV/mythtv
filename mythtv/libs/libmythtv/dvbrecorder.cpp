@@ -612,9 +612,17 @@ void DVBRecorder::AdjustMonitoringPMTPIDs()
         _pmt_monitoring_pids.pop_front();
     }
 
-    VERBOSE(VB_RECORD, LOC + "Currently not listening on " +
-            QString("%1 PMT PIDs, %2 PID filters open.")
-            .arg(_pmt_monitoring_pids.size() - 1).arg(_pid_infos.size()));
+    if (VB_RECORD & print_verbose_messages)
+    {
+        QString tmp0 = ""; 
+        QString tmp1 = QString("%1 PID filters open.").arg(_pid_infos.size());
+
+        int sz = _pmt_monitoring_pids.size();
+        if (sz)
+            tmp0 = QString("Not listening on %1 PMT PIDs, ").arg(sz);
+
+        VERBOSE(VB_RECORD, LOC + tmp0 + tmp1);
+    }
 }
 
 void DVBRecorder::StartRecording(void)
