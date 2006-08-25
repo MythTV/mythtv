@@ -135,7 +135,7 @@ void XMLParse::parseFont(QDomElement &element)
     QString color = "#ffffff";
     QString dropcolor = "#000000";
     QString hint;
-    QFont::StyleHint styleHint = QFont::AnyStyle;    
+    QFont::StyleHint styleHint = QFont::Helvetica;    
     
     bool haveSizeSmall = false;
     bool haveSizeBig = false;
@@ -150,8 +150,6 @@ void XMLParse::parseFont(QDomElement &element)
     
     fontProp *baseFont = NULL;
     
-    
-    
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -159,8 +157,6 @@ void XMLParse::parseFont(QDomElement &element)
         return;
     }
 
-    
-    
     QString base =  element.attribute("base", "");
     if (!base.isNull() && !base.isEmpty())
     {
@@ -186,15 +182,12 @@ void XMLParse::parseFont(QDomElement &element)
         haveFace = true;
     }
     
-   
     hint = element.attribute("stylehint", "");
     if (!hint.isNull() && !hint.isEmpty())
     {
         styleHint = (QFont::StyleHint)hint.toInt();
     }
 
-    
-    
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -285,14 +278,10 @@ void XMLParse::parseFont(QDomElement &element)
         return;
     }
 
-    
-    
-    
     if (baseFont && !haveSize)
         size = baseFont->face.pointSize();
     else    
         size = (int)ceil(size * hmult);
-    
     
     // If we don't have to, don't load the font.
     if (!haveFace && baseFont)
@@ -304,7 +293,11 @@ void XMLParse::parseFont(QDomElement &element)
     else
     {
         QFont temp(face, size);
-        temp.setStyleHint(styleHint);
+        temp.setStyleHint(styleHint, QFont::PreferAntialias);
+
+        if (!temp.exactMatch())
+            temp = QFont(QFontInfo(QApplication::font()).family(), size);
+
         newFont.face = temp;
     }
     
@@ -337,8 +330,6 @@ void XMLParse::parseFont(QDomElement &element)
         else
             newFont.face.setUnderline(false);
     }    
-
-    
     
     if (haveColor)
     {

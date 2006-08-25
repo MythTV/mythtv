@@ -1422,7 +1422,14 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
 QFont MythMainWindow::CreateFont(const QString &face, int pointSize, 
                                  int weight, bool italic)
 {
-    return QFont(face, NormalizeFontSize(pointSize), weight, italic);
+    QFont font = QFont(face);
+    if (!font.exactMatch())
+        font = QFont(QApplication::font()).family();
+    font.setPointSize(NormalizeFontSize(pointSize));
+    font.setWeight(weight);
+    font.setItalic(italic);
+
+    return font;
 }
 
 QRect MythMainWindow::NormRect(const QRect &rect)

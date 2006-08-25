@@ -1,3 +1,5 @@
+#include <qapplication.h>
+
 #include "mythcontext.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"
@@ -140,7 +142,14 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         }
     }
     else
+    {
         newFont->m_face.setFamily(face);
+        if (!newFont->m_face.exactMatch())
+        {
+            QFont tmp = QApplication::font();
+            newFont->m_face.setFamily(QFontInfo(tmp).family());
+        }
+    }
 
     QString hint = element.attribute("stylehint", "");
     if (!hint.isNull() && !hint.isEmpty())

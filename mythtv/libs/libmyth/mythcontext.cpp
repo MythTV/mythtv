@@ -512,6 +512,14 @@ void MythContextPrivate::StoreGUIsettings()
 
     m_wmult = m_screenwidth  / (float)m_baseWidth;
     m_hmult = m_screenheight / (float)m_baseHeight;
+
+    QFont font = QFont("Arial");
+    if (!font.exactMatch())
+        font = QFont();
+    font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
+    font.setPointSize((int)(14.0 * m_hmult));
+
+    QApplication::setFont(font);
     
     //VERBOSE(VB_IMPORTANT, QString("GUI multipliers are: width %1, height %2").arg(m_wmult).arg(m_hmult));
 }
@@ -2526,19 +2534,29 @@ void MythContext::connectionClosed(MythSocket *sock)
 
 QFont MythContext::GetBigFont(void)
 {
-    return QFont("Arial", (int)floor(d->bigfontsize * d->m_hmult), QFont::Bold);
+    QFont font = QApplication::font();
+    font.setPointSize((int)floor(d->bigfontsize * d->m_hmult));
+    font.setWeight(QFont::Bold);
+
+    return font;
 }
 
 QFont MythContext::GetMediumFont(void)
 {
-    return QFont("Arial", (int)floor(d->mediumfontsize * d->m_hmult), 
-                 QFont::Bold);
+    QFont font = QApplication::font();
+    font.setPointSize((int)floor(d->mediumfontsize * d->m_hmult));
+    font.setWeight(QFont::Bold);
+
+    return font;
 }
 
 QFont MythContext::GetSmallFont(void)
 {
-    return QFont("Arial", (int)floor(d->smallfontsize * d->m_hmult), 
-                 QFont::Bold);
+    QFont font = QApplication::font();
+    font.setPointSize((int)floor(d->smallfontsize * d->m_hmult));
+    font.setWeight(QFont::Bold);
+
+    return font;
 }
 
 /** \fn MythContext::GetLanguage()
