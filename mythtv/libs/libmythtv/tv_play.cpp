@@ -4919,10 +4919,19 @@ void TV::ToggleTimeStretch(void)
 
 void TV::ChangeTimeStretch(int dir, bool allowEdit)
 {
+    const float kTimeStretchMin = 0.5;
+    const float kTimeStretchMax = 2.0;
     float new_normal_speed = normal_speed + 0.05*dir;
     stretchAdjustment = allowEdit;
 
-    if (new_normal_speed > 2.0 || new_normal_speed < 0.48)
+    if (new_normal_speed > kTimeStretchMax && normal_speed < kTimeStretchMax)
+        new_normal_speed = kTimeStretchMax;
+    else if (new_normal_speed < kTimeStretchMin &&
+             normal_speed > kTimeStretchMin)
+        new_normal_speed = kTimeStretchMin;
+
+    if (new_normal_speed > kTimeStretchMax ||
+        new_normal_speed < kTimeStretchMin)
         return;
 
     normal_speed = new_normal_speed;
@@ -4938,7 +4947,7 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
             UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         else
         {
-            int val = (int)(normal_speed*500);
+            int val = (int)(normal_speed*(1000/kTimeStretchMax));
             GetOSD()->ShowStatus(val, false, tr("Adjust Time Stretch"), text, 
                                  10, kOSDFunctionalType_TimeStretchAdjust);
             update_osd_pos = false;
