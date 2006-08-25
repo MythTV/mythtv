@@ -1,11 +1,11 @@
 #ifndef VIDEODIALOG_H_
 #define VIDEODIALOG_H_
 
-#include <memory>
-
 #include <qstring.h>
 
 #include <mythtv/mythdialogs.h>
+
+#include <memory>
 
 class Metadata;
 class VideoList;

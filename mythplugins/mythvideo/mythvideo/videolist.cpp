@@ -1,8 +1,3 @@
-#include <memory>
-#include <algorithm>
-#include <iterator>
-#include <map>
-
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/mythmediamonitor.h>
@@ -16,6 +11,11 @@
 #include "quicksp.h"
 #include "dirscan.h"
 #include "videoutils.h"
+
+#include <memory>
+#include <algorithm>
+#include <iterator>
+#include <map>
 
 namespace
 {
