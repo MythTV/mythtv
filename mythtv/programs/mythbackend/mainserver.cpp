@@ -1391,11 +1391,27 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         tvchain->DeleteProgram(pginfo);
 
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
+    bool slowDeletes = gContext->GetNumSetting("TruncateDeletesSlowly", 0);
+    int fd = -1;
+    bool errmsg = false;
 
     /* Delete recording. */
-    int fd = DeleteFile(ds->filename, followLinks);
+    if (slowDeletes)
+    {
+        fd = DeleteFile(ds->filename, followLinks);
 
-    if ((fd < 0) && checkFile.exists())
+        if ((fd < 0) && checkFile.exists())
+            errmsg = true;
+    }
+    else
+    {
+        delete_file_immediately(ds->filename, followLinks, false);
+        sleep(2);
+        if (checkFile.exists())
+            errmsg = true;
+    }
+
+    if (errmsg)
     {
         VERBOSE(VB_IMPORTANT,
             QString("Error deleting file: %1. Keeping metadata in database.")
@@ -1426,7 +1442,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
     deletelock.unlock();
 
-    if (fd != -1)
+    if (slowDeletes && fd != -1)
     {
         m_expirer->TruncatePending();
         TruncateAndClose(m_expirer, fd, ds->filename);

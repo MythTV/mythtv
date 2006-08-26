@@ -132,6 +132,17 @@ static GlobalCheckBox *SaveTranscoding()
     return gc;
 };
 
+static HostCheckBox *TruncateDeletes()
+{
+    HostCheckBox *hc = new HostCheckBox("TruncateDeletesSlowly");
+    hc->setLabel(QObject::tr("Delete files slowly"));
+    hc->setValue(false);
+    hc->setHelpText(QObject::tr("Some filesystems use a lot of resources when "
+                    "deleting large recording files.  This option makes Myth "
+                    "delete the file slowly to lessen the impact."));
+    return hc;
+};
+
 static GlobalCheckBox *DeletesFollowLinks()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("DeletesFollowLinks");
@@ -676,6 +687,7 @@ BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
     group1->setLabel(QObject::tr("Host-specific Backend Setup"));
     group1->addChild(RecordFilePrefix());
+    group1->addChild(TruncateDeletes());
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
