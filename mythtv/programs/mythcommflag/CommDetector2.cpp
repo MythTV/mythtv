@@ -1,6 +1,7 @@
 #include <math.h>
 #include <qdir.h>
 #include <qfileinfo.h>
+#include <unistd.h>
 
 #include "NuppelVideoPlayer.h"
 
