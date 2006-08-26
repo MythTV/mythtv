@@ -896,7 +896,7 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
 #if DEBUG_XDS
     for (uint i = start; (i < buf.size()) && (i < end); i++)
     {
-        VERBOSE(VB_IMPORTANT, QString("%1: 0x%2 -> 0x%3 %4")
+        VERBOSE(VB_VBI, QString("%1: 0x%2 -> 0x%3 %4")
                 .arg(i,2).arg(buf[i],2,16)
                 .arg(CharCC(buf[i]),2,16)
                 .arg(CharCC(buf[i])));
@@ -911,7 +911,7 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
     }
 
 #if DEBUG_XDS
-    VERBOSE(VB_IMPORTANT, QString("XDSDecodeString: '%1'").arg(tmp));
+    VERBOSE(VB_VBI, QString("XDSDecodeString: '%1'").arg(tmp));
 #endif // DEBUG_XDS
 
     return tmp.stripWhiteSpace();
@@ -1169,7 +1169,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             .arg(length_elapsed_min / 10).arg(length_elapsed_min % 10)
             .arg(length_elapsed_secs / 10).arg(length_elapsed_secs % 10);
 
-        VERBOSE(VB_GENERAL, loc + msg);
+        VERBOSE(VB_VBI, loc + msg);
     }
     else if ((b2 == 0x03) && (xds_buf.size() >= 6))
     {
@@ -1177,7 +1177,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         if (is_better(tmp, xds_program_name[cf]))
         {
             xds_program_name[cf] = tmp;
-            VERBOSE(VB_GENERAL, loc + QString("Program Name: '%1'")
+            VERBOSE(VB_VBI, loc + QString("Program Name: '%1'")
                     .arg(GetProgramName(future)));
         }
     }
@@ -1198,7 +1198,7 @@ bool CC608Decoder::XDSPacketParseProgram(
         if (!unchanged)
         {
             xds_program_type[cf] = program_type;
-            VERBOSE(VB_GENERAL, loc + QString("Program Type '%1'")
+            VERBOSE(VB_VBI, loc + QString("Program Type '%1'")
                     .arg(GetProgramType(future)));
         }
     }
@@ -1216,7 +1216,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             {
                 xds_rating_systems[cf]            |= kHasCanEnglish;
                 xds_rating[cf][kRatingCanEnglish]  = tv_rating;
-                VERBOSE(VB_GENERAL, loc + "VChip "
+                VERBOSE(VB_VBI, loc + "VChip "
                         << GetRatingString(kRatingCanEnglish, future));
             }
         }
@@ -1227,7 +1227,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             {
                 xds_rating_systems[cf]           |= kHasCanFrench;
                 xds_rating[cf][kRatingCanFrench]  = tv_rating;
-                VERBOSE(VB_GENERAL, loc + "VChip "
+                VERBOSE(VB_VBI, loc + "VChip "
                         << GetRatingString(kRatingCanFrench, future));
             }
         }
@@ -1241,7 +1241,7 @@ bool CC608Decoder::XDSPacketParseProgram(
                 uint f = ((xds_buf[0]<<3) & 0x80) | ((xds_buf[1]<<1) & 0x70);
                 xds_rating_systems[cf]     |= kHasTPG;
                 xds_rating[cf][kRatingTPG]  = tv_rating | f;
-                VERBOSE(VB_GENERAL, loc + "VChip "
+                VERBOSE(VB_VBI, loc + "VChip "
                         << GetRatingString(kRatingTPG, future));
             }
         }
@@ -1252,7 +1252,7 @@ bool CC608Decoder::XDSPacketParseProgram(
             {
                 xds_rating_systems[cf]      |= kHasMPAA;
                 xds_rating[cf][kRatingMPAA]  = movie_rating;
-                VERBOSE(VB_GENERAL, loc + "VChip "
+                VERBOSE(VB_VBI, loc + "VChip "
                         << GetRatingString(kRatingMPAA, future));
             }
         }
