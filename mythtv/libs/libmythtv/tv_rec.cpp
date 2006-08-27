@@ -4001,7 +4001,9 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         prog->endts = prog->recendts = prog->recstartts.addSecs(3600);
     }
 
-    prog->recstartts = mythCurrentDateTime();
+    if (!pseudoLiveTVRecording)
+        prog->recstartts = mythCurrentDateTime();
+
     StartedRecording(prog);
 
     *rb = new RingBuffer(prog->GetFileName(), true);
