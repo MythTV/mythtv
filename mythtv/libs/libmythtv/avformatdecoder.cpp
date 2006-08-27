@@ -1499,19 +1499,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             qBubbleSort(tracks[kTrackTypeSubtitle]);
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
-            bool captionmode = GetNVP()->GetCaptionMode();
-            if (captionmode &&
-               (trackNo < 0 || trackNo >= (int)GetTrackCount(kTrackTypeSubtitle)))
-            {
-                GetNVP()->SetCaptionsEnabled(false, false);
-            }
-            else
-            {
-                SetTrack(kTrackTypeSubtitle, trackNo);
-                if (!ringBuffer->InDVDMenuOrStillFrame() &&
-                        !captionmode && trackNo >= 0)
+            uint captionmode = GetNVP()->GetCaptionMode();
+            if (captionmode == kDisplayAVSubtitle) {
+                if (trackNo < 0 || trackNo >= (int)GetTrackCount(kTrackTypeSubtitle))
                 {
-                    GetNVP()->SetCaptionsEnabled(true, false);
+                    GetNVP()->SetCaptionsEnabled(false, false);
+                }
+                else
+                {
+                    if (!ringBuffer->InDVDMenuOrStillFrame() && trackNo >= 0)
+                        GetNVP()->SetCaptionsEnabled(true, false);
                 }
             }
         }
