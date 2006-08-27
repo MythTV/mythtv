@@ -295,8 +295,8 @@ void VideoBrowser::updateInfo(QPainter *p)
                        {
                            itype->SetImage(*img);
                        }
-					   if (itype->isHidden())
-						   itype->show();
+                       if (itype->isHidden())
+                           itype->show();
                    }
                    else
                    {
