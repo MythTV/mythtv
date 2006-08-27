@@ -294,9 +294,9 @@ void VideoBrowser::updateInfo(QPainter *p)
                            img->serialNumber())
                        {
                            itype->SetImage(*img);
-                           if (itype->isHidden())
-                               itype->show();
                        }
+					   if (itype->isHidden())
+						   itype->show();
                    }
                    else
                    {
