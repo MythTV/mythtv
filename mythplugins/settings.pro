@@ -1,6 +1,6 @@
 CONFIG += $$CCONFIG
 
-LIBVERSION = 0.19
+LIBVERSION = 0.20
 
 INCLUDEPATH += $${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
