@@ -2382,6 +2382,18 @@ key to edit it.
 
 Once you have no additional cards to setup, press ESC.
 
+<figure loc="here">
+<eps file="stop.eps" height="1cm">
+<img src="stop.png">
+<caption>
+<bf>NOTE</bf>: If you have a dual digital/analog card, such as the pcHDTV
+cards and some DViCO cards, then you should not configure this as two
+separate cards. Configure the digital portion as a DVB card, then click
+on the "Analog Options" button within the DVB configuration panel for
+the card and configure the analog portion of the card there.
+</caption>
+</figure>
+
 <sect2>Video Sources <label id="VideoSources">
 <p>When you start, the highlight should be on (New Video Source).  Press the
 space bar to begin.  The first field asks for the name of the video source.
@@ -2405,7 +2417,8 @@ If you wish to continue using the XMLTV grabber, then move to the Zip/postal
 code field and put in the appropriate value.
 
 If you're outside of North America, then some manual interaction will be
-required with XMLTV.
+required with XMLTV. You may need to switch from the MythTV setup program
+to the console it was run on to interact with XMLTV.
 
 Once you have chosen your provider, press RETURN to continue.  XMLTV will
 now begin collecting the initial data for your location.  The screen may
@@ -2435,12 +2448,29 @@ with an "Antenna" source you defined in Video Sources, you would move to the
 Using the left and right arrow keys will show you the various choices you
 have already created for video source.  In our case, you would use the
 left/right cursor keys until "Antenna" was shown in the Video Source field. 
-Press down to move to the next setting, all of which should be
-self-explanatory.
+Press down to move to the next setting.
 
 If you have multiple input connection types (Such as Tuner 0 and Tuner 1),
 it's very, very likely that it is the lowest numbered input that is actually
 available on the device.
+
+On the connection pane there is a "Scan for channels" button,
+if you are configuring a digital source such as a DVB card, you
+need scan for channels and you must do this before pressing the
+"Fetch channels from listins source" button. You may scan for
+analog channels on an analog input, but this is not needed.
+
+The other button is called "Fetch channels from listins source".
+As long as you have a real listings source you should fetch channels
+from this listings source for analog channels, and it is recommended
+that you do this for digital sources as well (unless the listing 
+source is tranmitted EIT data). If you are using XMLTV, you may
+need to switch from the MythTV setup program to the console it was
+run on to interact with XMLTV after pressing this button. It is possible
+to fetch the channels on the command line using mythfilldatabase. But
+if you need to do this, you will probably need to re-enter the MythTV
+setup program to configure the "Starting channel" setting for this
+source->input connection.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
