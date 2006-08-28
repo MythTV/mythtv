@@ -64,6 +64,8 @@ extern "C" {
 #define XVMC_CHROMA_FORMAT_420 0x00000001
 #endif
 
+//#define USE_ATI_PROPRIETARY_DRIVER_XVIDEO_HACK
+
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm);
 static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
@@ -800,6 +802,17 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
 #endif // USING_XVMC
 }
 
+static bool has_format(XvImageFormatValues *formats, int format_cnt, int id)
+{
+    for (int i = 0; i < format_cnt; i++)
+    {
+        if ((formats[i].id == id))
+            return true;
+    }
+
+    return false;
+}
+
 /**
  * \fn VideoOutputXv::InitXVideo()
  * Creates and initializes video buffers.
@@ -829,40 +842,37 @@ bool VideoOutputXv::InitXVideo()
     InstallXErrorHandler(XJ_disp);
 
     bool foundimageformat = false;
-    int formats = 0;
-    XvImageFormatValues *fo;
-    X11S(fo = XvListImageFormats(XJ_disp, xv_port, &formats));
-    for (int i = 0; i < formats; i++)
-    {
-        if ((fo[i].id == GUID_I420_PLANAR) ||
-            (fo[i].id == GUID_IYUV_PLANAR))
-        {
-            foundimageformat = true;
-            xv_chroma = GUID_I420_PLANAR;
-        }
-    }
+    int ids[] = { GUID_I420_PLANAR, GUID_IYUV_PLANAR, GUID_YV12_PLANAR };
+    int format_cnt = 0;
+    XvImageFormatValues *formats;
+    X11S(formats = XvListImageFormats(XJ_disp, xv_port, &format_cnt));
 
-    if (!foundimageformat)
+    for (int i = 0; i < format_cnt; i++)
     {
-        for (int i = 0; i < formats; i++)
-        {
-            if (fo[i].id == GUID_YV12_PLANAR)
-            {
-                foundimageformat = true;
-                xv_chroma = GUID_YV12_PLANAR;
-            }
-        }
-    }
-
-    for (int i = 0; i < formats; i++)
-    {
-        char *chr = (char*) &(fo[i].id);
+        char *chr = (char*) &(formats[i].id);
         VERBOSE(VB_PLAYBACK, LOC + QString("XVideo Format #%1 is '%2%3%4%5'")
                 .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
     }
 
-    if (fo)
-        X11S(XFree(fo));
+#ifdef USE_ATI_PROPRIETARY_DRIVER_XVIDEO_HACK
+    swap(ids[0], ids[2]);
+#endif // USE_ATI_PROPRIETARY_DRIVER_XVIDEO_HACK
+
+    for (uint i = 0; i < sizeof(ids)/sizeof(int); i++)
+    {
+        if (has_format(formats, format_cnt, ids[i]))
+        {
+            xv_chroma = ids[i];
+            foundimageformat = true;
+            break;
+        }
+    }
+
+    // IYUV is bit identical to I420, just pretend we saw I420
+    xv_chroma = (GUID_IYUV_PLANAR == xv_chroma) ? GUID_I420_PLANAR : xv_chroma;
+
+    if (formats)
+        X11S(XFree(formats));
 
     if (foundimageformat)
     {
