@@ -56,14 +56,17 @@ our %depend_order = (
         'lame',
         'mysqlclient',
         'qt-mt',
-        'dvdnav'
+        # Not needed since SVN -r8965. Kept here for 0.19 builds
+        #'dvdnav'
       ],
   'mythplugins'
   =>  [
         'tiff',
         'exif',
         'dvdcss',
-        'dvdread',
+        # MythDVD used to use this to build mtd.
+        # Not needed since SVN -r8965. Kept here for 0.19 builds
+        # 'dvdread',
 # MythMusic needs these seven things:
 #        'libmad',
 #        'libid3tag',
@@ -829,9 +832,8 @@ foreach my $comp (@comps)
 
   if ($comp eq 'mythtv')
   {
-    # Remove Nigel's frontend speedup hack
-    &DoSpeedupHacks('programs/programs.pro', 'mythfrontend');
-    &DoSpeedupHacks('mythtv.pro', 'libs filters programs themes i18n');
+    # Remove/add Nigel's frontend building speedup hack
+    &DoSpeedupHacks('programs/programs.pro', 'mythfrontend mythtv');
   }
   
   &Verbose("Making $comp");
@@ -873,7 +875,7 @@ $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 ### Create each package.
 ### Note that this is a bit of a waste of disk space,
 ### because there are now multiple copies of each library.
-my @targets = ('MythFrontend');
+my @targets = ('MythFrontend', 'MythTV');
 
 if ( $jobtools )
 {   push @targets, @targetsJT   }
@@ -899,7 +901,7 @@ foreach my $target ( @targets )
   &Verbose("Installing frameworks into $target");
   &PackagedExecutable($finalTarget, $builtTarget);
   
- if ( $target eq "MythFrontend" or $target eq "MythTV-Setup" )
+ if ( $target eq "MythFrontend" or $target =~ m/^MythTV/ )
  {
   # Install themes, filters, etc.
   &Verbose("Installing resources into $target");
