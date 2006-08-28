@@ -882,6 +882,7 @@ void DVDRingBufferPriv::ClearMenuSPUParameters(void)
     menuBuflength = 0;
     hl_startx = hl_starty = 0;
     hl_width = hl_height = 0;
+    buttonstreamid = 0;
 }
 
 int DVDRingBufferPriv::NumMenuButtons(void) const
