@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060815-1"
+VERSION="0.1.20060828-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -1316,7 +1316,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
     checkCancelFlag()
 
     if getFileType(folder) == "mpegts":
-        command = "mythreplex --demux  -t TS -o %s " % (folder + "/stream")
+        command = "mythreplex --demux --fix_sync -t TS -o %s " % (folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID])
 
         if audio1[AUDIO_ID] != -1: 
@@ -1332,7 +1332,7 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
                 command += "-c %d " % (audio2[AUDIO_ID])
 
     else:
-        command = "mythreplex --demux  -o %s " % (folder + "/stream")
+        command = "mythreplex --demux  --fix_sync -o %s " % (folder + "/stream")
         command += "-v %d " % (video[VIDEO_ID] & 255)
 
         if audio1[AUDIO_ID] != -1: 
