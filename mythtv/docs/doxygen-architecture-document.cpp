@@ -1,5 +1,5 @@
 /**
-\mainpage MythTV Architecture
+\mainpage %MythTV Architecture
 
 \section intro Introduction
 
@@ -10,14 +10,14 @@ This is intended for both those new to %MythTV and experienced
 with it to get familiar with different aspects of the code base.
 
 If you are just looking for the code formatting standards, 
-see the unofficial mythtv.info page 
-<a href="http://www.mythtv.info/moin.cgi/CodingStandards">
+see the official %MythTV wiki article 
+<a href="http://www.mythtv.org/wiki/index.php/Coding_Standards">
 coding standards</a>. If you are looking for the 
 <a href="http://svn.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
 it can be found on the official pages. 
 If you haven't already, you should subscribe to
 the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">
-developer mailing list</a>
+developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">SVN commits mailing list</a>
 
 If you just stumbled onto the developer pages
 by accident, maybe you want to go to the official
@@ -57,6 +57,7 @@ to documentation on the code itself.
       The 
       \ref recorder_subsystem "recorders" and 
       \ref av_player_subsystem "A/V players" are supported by libmythtv.
+  <dt>libmythui              <dd>Main user interface rendering library
   <dt>libavcodec/libavformat <dd>This is the ffmpeg A/V decoding library (aka avlib).
       <a href="http://ffmpeg.sourceforge.net/documentation.php">Documented Externally</a>.
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
@@ -68,7 +69,6 @@ to documentation on the code itself.
   <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
       <a href="http://sky.prohosting.com/oparviai/soundtouch/">External Website</a>.
       We use this for the time-stretch feature.
-  <dt>libmythui              <dd>Next Gen UI rendering library, not yet being used.
 </dl>
 Two libraries libmythmpeg2 and libmythsamplerate appear redundant, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and
