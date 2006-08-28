@@ -556,11 +556,12 @@ Hauppauge WinTV-PVR-USB2 (driver available at <url
 url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">) emulates a PVR-x50
 card.
 
-<sect3>Network Attached Capture Devices.
-<p>Devices such as the HDHomeRun <url url="http://www.hdhomerun.com"
-name="http://www.hdhomerun.com"> are supported.  The HDHomeRun provides two
-ATSC Over-the-air (8VSB) tuners connected to your network via 100Mbps
-ethernet.
+<sect3>IP Recorders (RTSP,UDP)
+<p>RTSP MPEG-2 TS recording is supported using the Freebox recorder in MythTV, this expects the channels to be supplied as an m3u playlist. If your DSL/Fiber provider provides television service, but does not provide an m3u playlist for the channels, you can construct one for your own use (you do not need to download it from the same server as the streams themselves).
+
+<p>UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP Network recorder, but this recorder only supports recording a single channel per recorder.
+
+<bf>NOTE</bf>: Some DSL providers only allow you to use one recorder at a time, so you may need to limit yourself to one recorder in MythTV and turn off any set top box the cable provider sold or rented to you with your service. This limitation is independent of the bandwidth you have purchased.
 
 <sect2>Hardware known NOT to work and other issues
 <p>
