@@ -341,7 +341,9 @@ class UIGuideType : public UIType
 
 class UIListType : public UIType
 {
-  public:
+    Q_OBJECT
+
+    public:
     UIListType(const QString &, QRect, int);
     ~UIListType();
 
@@ -396,6 +398,12 @@ class UIListType : public UIType
     void Draw(QPainter *, int drawlayer, int);
     bool ShowSelAlways() const { return m_showSelAlways; }
     void ShowSelAlways(bool bnew) { m_showSelAlways = bnew; }
+    void calculateScreenArea();
+
+  public slots:
+    bool takeFocus();
+    void looseFocus();
+
   private:
     //QString cutDown(QString, QFont *, int);
     int m_selheight;

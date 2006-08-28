@@ -2127,8 +2127,12 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     if (colCnt == -1)
         list->SetColumnContext(1, -1);
 
+    list->SetParent(container);
+    list->calculateScreenArea();
     container->AddType(list);
 
+    // the selection image is only drawn on layer 8
+    container->bumpUpLayers(8);
 }
 
 LayerSet *XMLParse::GetSet(const QString &text)

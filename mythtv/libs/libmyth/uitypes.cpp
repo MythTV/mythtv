@@ -992,6 +992,8 @@ UIListType::UIListType(const QString &name, QRect area, int dorder)
     m_darrow = false;
     m_fill_type = -1;
     m_showSelAlways = true;
+    has_focus = false;
+    takes_focus = true;
 }
 
 UIListType::~UIListType()
@@ -1256,6 +1258,42 @@ void UIListType::SetItemArrow(int num, int which)
     listArrows[num + 100] = which;
 }
 
+void UIListType::calculateScreenArea()
+{
+    QRect r2, r = m_area;
+
+    // take the selection image position into account
+    r2.setRect(r.x() + m_selection_loc.x(), r.y() + m_selection_loc.y(),
+               m_selection.width(), m_selection.height()); 
+    r = r.unite(r2);
+
+    // take the up arrow image position into account
+    r2.setRect(m_uparrow_loc.x(), m_uparrow_loc.y(),
+              m_uparrow.width(), m_uparrow.height()); 
+    r = r.unite(r2);
+
+    // take the down arrow image position into account
+    r2.setRect(m_downarrow_loc.x(), m_downarrow_loc.y(),
+               m_downarrow.width(), m_downarrow.height()); 
+    r = r.unite(r2);
+
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+
+bool UIListType::takeFocus()
+{
+    SetActive(true);
+    return UIType::takeFocus();
+}
+
+void UIListType::looseFocus()
+{
+    SetActive(false);
+    UIType::looseFocus();
+}
 
 // *****************************************************************
 
