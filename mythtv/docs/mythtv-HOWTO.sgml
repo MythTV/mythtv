@@ -1574,6 +1574,10 @@ This can be done from the command line by typing:
 <sect2>Gentoo
 <p>After installing MySQL you need to initialize the database by running
 mysql_install_db as root. 
+<p>If you install MySQL 4.x, rather than 3.x, you will also want to comment
+out "log-bin" in you /etc/mysql/my.cnf configuration file. This option will
+quickly fill your "/var" disk partition with many of gigabytes of data,
+unless you are doing database replication and deleting these files regularly.
 
 <sect1>Setting up the initial database
 <p>This step is only required on the system maintaining the database, which
