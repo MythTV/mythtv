@@ -45,6 +45,7 @@ struct replex {
 	int otype;
 	int ignore_pts; 
 	int keep_pts;
+	int fix_sync;
 	uint64_t inflength;
 	uint64_t finread;
 	int lastper;

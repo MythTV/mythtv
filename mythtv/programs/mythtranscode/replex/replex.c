@@ -39,6 +39,9 @@
 #include "replex.h"
 #include "pes.h"
 
+#include "avcodec.h"
+#include "avformat.h"
+
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif
@@ -61,6 +64,65 @@ int replex_check_id(struct replex *rx, uint16_t id)
 			return i+0x80;
 
 	return -1;
+}
+
+int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
+{
+	AVCodec *codec;
+	AVCodecContext *c= NULL;
+	int frame_size, j, out_size;
+	short *samples;
+	
+	fprintf(stderr, "encoding an MP2 audio frame\n");
+
+	/* find the MP2 encoder */
+	codec = avcodec_find_encoder(CODEC_ID_MP2);
+	if (!codec) {
+		fprintf(stderr, "codec not found\n");
+		return 1;
+	}
+ 
+	c = avcodec_alloc_context();
+
+	/* put sample parameters */
+	c->bit_rate = aframe->bit_rate;
+	c->sample_rate = aframe->frequency;
+	c->channels = 2;
+	 
+	/* open it */
+	if (avcodec_open(c, codec) < 0) {
+		fprintf(stderr, "could not open codec\n");
+		av_free(c);
+		return 1;
+	}
+
+	/* the codec gives us the frame size, in samples */
+	frame_size = c->frame_size;
+	samples = malloc(frame_size * 2 * c->channels);
+	
+	/* create samples for a single blank frame */
+	for (j=0;j<frame_size;j++) {
+		samples[2*j] = 0;
+		samples[2*j+1] = 0;
+	}
+		
+	/* encode the samples */
+	out_size = avcodec_encode_audio(c, buffer, bufsize, samples);
+	
+	if (out_size != bufsize) {
+		fprintf(stderr, "frame size (%d) does not equal required size (%d)?\n",
+				out_size, bufsize);
+		free(samples);
+		avcodec_close(c);
+		av_free(c);
+		return 1;
+	}
+
+	free(samples);
+	avcodec_close(c);
+	av_free(c);
+	
+	return 0;
 }
 
 void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
@@ -154,7 +216,7 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 				int diff = ring_posdiff(rbuf, iu->start, 
 							p->ini_pos + pos+c);
 				
-				if ( (re =check_audio_header(rbuf, aframe, 
+				if ( (re = check_audio_header(rbuf, aframe, 
 							     pos+c+off,len-c-pos,
 							     type)) < 0){
 			
@@ -163,9 +225,9 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 						return;
 					}
 					
-					if (aframe->framesize > diff){
+					if ((int) aframe->framesize > diff){
 						if ( re == -3){
-							c+= pos+1;
+							c += pos+1;
 							continue;
 						}
 					
@@ -176,13 +238,73 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 						continue;
 					}
 				}
-				if (aframe->framesize > diff){
+				if ((int) aframe->framesize > diff){
 					c += pos+2;
 					//fprintf(stderr,"WRONG HEADER2 %d\n", diff);
 					continue;
 				}
 			}
+			
+			// try to fix audio sync - only works for mpeg audio for now 
+			if (aframe->set && rx->fix_sync && first && type == MPEG_AUDIO){
+				int frame_time = aframe->frametime;
+				int64_t diff;
+				diff = ptsdiff(trans_pts_dts(p->pts), add_pts_audio(0, aframe,*acount + 1) + *fpts);
+				if (abs ((int)diff) >= frame_time){
+					fprintf(stderr,"fixing audio PTS inconsistency - diff: ");
+					printpts(abs(diff));
 
+					if (diff < 0){
+						diff = abs(diff);
+						int framesdiff = diff / frame_time;
+						fprintf(stderr, " - need to remove %d frame(s)\n", framesdiff);
+						
+						// FIXME can only remove one frame at a time for now
+						if (framesdiff > 1)
+							framesdiff = 1;
+						iu->pts = add_pts_audio(0, aframe, -framesdiff);
+						c += aframe->framesize;
+						continue;
+					} else {
+						int framesdiff = diff / frame_time;
+						fprintf(stderr, " - need to add %d frame(s)\n", framesdiff);
+						
+						// limit inserts to a maximum of 5 frames
+						if (framesdiff > 5)
+							framesdiff = 5;
+
+						// alloc memmory for  audio frame
+						uint8_t *framebuf;
+						if ( !(framebuf = (uint8_t *) malloc(sizeof(uint8_t) * aframe->framesize))) {
+							fprintf(stderr,"Not enough memory for audio frame\n");
+							exit(1);
+						}
+
+						// try to encode a blank frame
+						if (encode_mp2_audio(aframe, framebuf, sizeof(uint8_t) * aframe->framesize) != 0) {
+							// encode failed so just use a copy of the current frame
+							int res;
+							res = ring_peek(rbuf, framebuf, aframe->framesize, 0);
+							if (res != (int) aframe->framesize) {
+								fprintf(stderr,"ring buffer failed to peek frame res: %d\n", res);
+								exit(1);
+							}
+						}	
+						
+						// add each extra frame required direct to the output file
+						int x;
+						for (x = 0; x < framesdiff; x++){
+							if (type == AC3)
+								write(rx->dmx_out[num+1+rx->apidn], framebuf, aframe->framesize);
+							else
+								write(rx->dmx_out[num+1], framebuf, aframe->framesize);
+							*acount += 1;
+						}
+						
+						free(framebuf);
+					}
+				}
+			}
 
 			if (aframe->set){
 				if(iu->active){
@@ -190,6 +312,7 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 								  iu->start, 
 								  p->ini_pos + 
 								  pos+c);
+
 					if (iu->length < aframe->framesize ||
 					    iu->length > aframe->framesize+1){
 						fprintf(stderr,"Wrong audio frame size: %d\n", iu->length);
@@ -248,7 +371,7 @@ void analyze_audio( pes_in_t *p, struct replex *rx, int len, int num, int type)
 				iu->start = (p->ini_pos+pos+c)%bsize;
 			}
 			c += pos;
-			if (c + aframe->framesize > len){
+			if (c + (int) aframe->framesize > len){
 //				fprintf(stderr,"SHORT %d\n", len -c);
 				c = len;
 			} else {
@@ -950,7 +1073,7 @@ ssize_t save_read(struct replex *rx, void *buf, size_t count)
 	if (rx->itype== REPLEX_AVI){
 		int l = rx->inflength - rx->finread;
 		if ( l <= 0) return 0;
-		if ( count > l) count = l;
+		if ( (int) count > l) count = l;
 	}
 	while(neof >= 0 && re < count){
 		neof = read(fd, buf+re, count - re);
@@ -990,14 +1113,14 @@ int guess_fill( struct replex *rx)
 	for (i=0; i<rx->apidn;i++){
 		if ((aavail = ring_avail(&rx->index_arbuffer[i])
 		     /sizeof(index_unit)) < LIMIT)
-			if (fill < ring_free(&rx->arbuffer[i]))
+			if (fill < (int) ring_free(&rx->arbuffer[i]))
 				fill = ring_free(&rx->arbuffer[i]);
 	}
 
 	for (i=0; i<rx->ac3n;i++){
 		if ((ac3avail = ring_avail(&rx->index_ac3rbuffer[i])
 		     /sizeof(index_unit)) < LIMIT)
-			if (fill < ring_free(&rx->ac3rbuffer[i]))
+			if (fill < (int) ring_free(&rx->ac3rbuffer[i]))
 				fill = ring_free(&rx->ac3rbuffer[i]);
 	}
 
@@ -1024,7 +1147,7 @@ void find_pids_file(struct replex *rx)
 	uint16_t vpid=0, apid=0, ac3pid=0;
 		
 	fprintf(stderr,"Trying to find PIDs\n");
-	while (!afound && !vfound && count < rx->inflength){
+	while (!afound && !vfound && count < (int) rx->inflength){
 		if (rx->vpid) vfound = 1;
 		if (rx->apidn) afound = 1;
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
@@ -1084,7 +1207,7 @@ void find_all_pids_file(struct replex *rx)
     memset (ac3pid , 0 , MAXAC3PID*sizeof(uint16_t));
 
 	fprintf(stderr,"Trying to find PIDs\n");
-	while (count < rx->inflength-IN_SIZE){
+	while (count < (int) rx->inflength-IN_SIZE){
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
 			perror("reading");
 		else 
@@ -1289,7 +1412,7 @@ void find_pes_ids(struct replex *rx)
 	fprintf(stderr,"Trying to find PES IDs\n");
 	rx->scan_found=0;
 	rx->pvideo.priv = rx ;
-	while (count < rx->inflength-IN_SIZE){
+	while (count < (int) rx->inflength-IN_SIZE){
 		if ((re = save_read(rx,buf,IN_SIZE))<0)
 			perror("reading");
 		else 
@@ -2107,6 +2230,7 @@ void usage(char *progname)
         printf ("  --audio_delay,      -e:  audio delay in ms\n");
         printf ("  --ignore_PTS,       -f:  ignore all PTS information of original\n");
         printf ("  --keep_PTS,         -k:  keep and don't correct PTS information of original\n");
+        printf ("  --fix_sync,         -n:  try to fix audio sync while demuxing\n");
         printf ("  --demux,            -z:  demux only (-o is basename)\n");
         printf ("  --analyze,          -y:  analyze (0=video,1=audio, 2=both)\n");
         printf ("  --scan,             -s:  scan for streams\n");
@@ -2116,20 +2240,20 @@ void usage(char *progname)
 
 int main(int argc, char **argv)
 {
-        int c;
+	int c;
 	int analyze=0;
 	int scan =0;
-        char *filename = NULL;
-        char *type = "SVCD";
-        char *inpt = "TS";
+	char *filename = NULL;
+	char *type = "SVCD";
+	char *inpt = "TS";
 
 	struct replex rx;
 
 	memset(&rx, 0, sizeof(struct replex));
 
-        while (1) {
-                int option_index = 0;
-                static struct option long_options[] = {
+	while (1) {
+		int option_index = 0;
+		static struct option long_options[] = {
 			{"type", required_argument, NULL, 't'},
 			{"input_stream", required_argument, NULL, 'i'},
 			{"video_pid", required_argument, NULL, 'v'},
@@ -2140,6 +2264,7 @@ int main(int argc, char **argv)
 			{"of",required_argument, NULL, 'o'},
 			{"ignore_PTS",required_argument, NULL, 'f'},
 			{"keep_PTS",required_argument, NULL, 'k'},
+			{"fix_sync",no_argument, NULL, 'n'},
 			{"demux",no_argument, NULL, 'z'},
 			{"analyze",required_argument, NULL, 'y'},
 			{"scan",required_argument, NULL, 's'},
@@ -2147,19 +2272,19 @@ int main(int argc, char **argv)
 			{"help", no_argument , NULL, 'h'},
 			{0, 0, 0, 0}
 		};
-                c = getopt_long (argc, argv, 
-				 "t:o:a:v:i:hp:q:d:c:fkd:e:zy:sx",
+		c = getopt_long (argc, argv, 
+					"t:o:a:v:i:hp:q:d:c:n:fkd:e:zy:sx",
                                  long_options, &option_index);
-                if (c == -1)
-                        break;
+		if (c == -1)
+    		break;
 
-                switch (c) {
-                case 't':
-                        type = optarg;
-                        break;
-                case 'i':
-                        inpt = optarg;
-                        break;
+		switch (c) {
+		case 't':
+			type = optarg;
+			break;
+		case 'i':
+			inpt = optarg;
+			break;
 		case 'd':
 			rx.video_delay = strtol(optarg,(char **)NULL, 0) 
 				*CLOCK_MS;
@@ -2168,28 +2293,28 @@ int main(int argc, char **argv)
 			rx.audio_delay = strtol(optarg,(char **)NULL, 0) 
 				*CLOCK_MS;
 			break;
-                case 'a':
+		case 'a':
 			if (rx.apidn==N_AUDIO){
 				fprintf(stderr,"Too many audio PIDs\n");
 				exit(1);
 			}
                         rx.apid[rx.apidn] = strtol(optarg,(char **)NULL, 0);
 			rx.apidn++;
-                        break;
-                case 'v':
-                        rx.vpid = strtol(optarg,(char **)NULL, 0);
-                        break;
-                case 'c':
+			break;
+		case 'v':
+			rx.vpid = strtol(optarg,(char **)NULL, 0);
+			break;
+		case 'c':
 			if (rx.ac3n==N_AC3){
 				fprintf(stderr,"Too many audio PIDs\n");
 				exit(1);
 			}
-                        rx.ac3_id[rx.ac3n] = strtol(optarg,(char **)NULL, 0);
+			rx.ac3_id[rx.ac3n] = strtol(optarg,(char **)NULL, 0);
 			rx.ac3n++;
-                        break;
-                case 'o':
-                        filename = optarg;
-                        break;
+			break;
+		case 'o':
+			filename = optarg;
+			break;
 		case 'f':
 			rx.ignore_pts =1;
 			break;
@@ -2198,6 +2323,9 @@ int main(int argc, char **argv)
 			break;
 		case 'z':
 			rx.demux =1;
+			break;
+		case 'n':
+			rx.fix_sync =1;
 			break;
 		case 'y':
 			analyze = strtol(optarg,(char **)NULL, 0);
@@ -2210,37 +2338,40 @@ int main(int argc, char **argv)
 		case 'x':
 			rx.vdr=1;
 			break;
-                case 'h':
-                case '?':
-                default:
-                        usage(argv[0]);
-                }
-        }
+		case 'h':
+		case '?':
+		default:
+			usage(argv[0]);
+		}
+	}
 
-        if (optind == argc-1) {
-                if ((rx.fd_in = open(argv[optind] ,O_RDONLY| O_LARGEFILE)) < 0) {
-                        perror("Error opening input file ");
-                        exit(1);
-                }
-                fprintf(stderr,"Reading from %s\n", argv[optind]);
+	if (rx.fix_sync)
+		av_register_all();
+	
+	if (optind == argc-1) {
+		if ((rx.fd_in = open(argv[optind] ,O_RDONLY| O_LARGEFILE)) < 0) {
+			perror("Error opening input file ");
+			exit(1);
+		}
+		fprintf(stderr,"Reading from %s\n", argv[optind]);
 		rx.inflength = lseek(rx.fd_in, 0, SEEK_END);
 		fprintf(stderr,"Input file length: %.2f MB\n",rx.inflength/1024./1024.);
 		lseek(rx.fd_in,0,SEEK_SET);
 		rx.lastper = 0;
 		rx.finread = 0;
-        } else {
+	} else {
 		fprintf(stderr,"using stdin as input\n");
 		rx.fd_in = STDIN_FILENO;
 		rx.inflength = 0;
-        }
+	}
 
 	if (!rx.demux){
 		if (filename){
 			if ((rx.fd_out = open(filename,O_WRONLY|O_CREAT
-					      |O_TRUNC|O_LARGEFILE,
-					      S_IRUSR|S_IWUSR|S_IRGRP|
-					      S_IWGRP|
-					      S_IROTH|S_IWOTH)) < 0){
+					|O_TRUNC|O_LARGEFILE,
+					S_IRUSR|S_IWUSR|S_IRGRP|
+					S_IWGRP|
+					S_IROTH|S_IWOTH)) < 0){
 				perror("Error opening output file");
 				exit(1);
 			}
@@ -2260,16 +2391,16 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-        if (!strncmp(type,"MPEG2",6))
+	if (!strncmp(type,"MPEG2",6))
 		rx.otype=REPLEX_MPEG2;
 	else if (!strncmp(type,"DVD",4))
 		rx.otype=REPLEX_DVD;
 	else if (!strncmp(type,"HDTV",4))
 		rx.otype=REPLEX_HDTV;
-        else if (!rx.demux)
-                usage(argv[0]);
+	else if (!rx.demux)
+		usage(argv[0]);
 	
-        if (!strncmp(inpt,"TS",3)){
+	if (!strncmp(inpt,"TS",3)){
 		rx.itype=REPLEX_TS;
 	} else if (!strncmp(inpt,"PS",3)){
 		rx.itype=REPLEX_PS;
@@ -2285,7 +2416,7 @@ int main(int argc, char **argv)
 		rx.apid[0] = 0xC0;
 		rx.ignore_pts =1;
 	} else {
-                usage(argv[0]);
+		usage(argv[0]);
 	}
 
 	init_replex(&rx);

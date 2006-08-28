@@ -115,6 +115,7 @@ struct audio_frame_s{
 	uint32_t mode_extension;
 	uint32_t emphasis;
 	uint32_t framesize;
+	uint32_t frametime;
 	uint32_t off;
 } audio_frame_t;
 
