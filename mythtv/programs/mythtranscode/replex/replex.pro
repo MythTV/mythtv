@@ -19,6 +19,7 @@ INCLUDEPATH += replex
 INCLUDEPATH += ../../../libs/libavcodec ../../../libs/libavformat
 INCLUDEPATH += ../../../libs/libavutil  ../../../libs/libmythmpeg2
 
-LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -L../../../libs/libavcodec -lmythavcodec-$${LIBVERSION}
+LIBS += -L../../../libs/libavformat -lmythavformat-$${LIBVERSION}
+LIBS += -L../../../libs/libavutil -lmythavutil-$${LIBVERSION}
 LIBS += $$EXTRA_LIBS
-
