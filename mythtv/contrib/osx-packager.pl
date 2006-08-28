@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-### osx-packager.pl
+### osx-packager.pl $Id$
 ### Tool for automating frontend builds on Mac OS X.
 ### Run "osx-packager.pl -man" for full documentation.
 
@@ -919,21 +919,24 @@ foreach my $target ( @targets )
      {
        &Verbose("Installing $mtd into $target");
        &Syscall([ 'cp', $mtd, "$finalTarget/Contents/MacOS" ]) or die;
+       &AddFakeBinDir($finalTarget);
      }
   }
 }
 
 if ( $backend )
 {
+  my $BE = "$SCRIPTDIR/MythBackend.app";
+
   # The backend gets all the useful binaries it might call:
   foreach my $binary ( 'mythjobqueue', 'mythcommflag', 'mythtranscode' )
   {
     my $SRC  = "$PREFIX/bin/$binary.app/Contents/MacOS/$binary";
     if ( -e $SRC )
     {
-      &Syscall([ '/bin/cp', $SRC,
-                 "$SCRIPTDIR/MythBackend.app/Contents/MacOS" ]) or die;
-      &PackagedExecutable("$SCRIPTDIR/MythBackend.app", $binary);
+      &Syscall([ '/bin/cp', $SRC, "$BE/Contents/MacOS" ]) or die;
+      &PackagedExecutable($BE, $binary);
+      &AddFakeBinDir($BE);
     }
   }
 }
@@ -941,17 +944,19 @@ if ( $backend )
 if ( $jobtools )
 {
   # JobQueue also gets some binaries it might call:
-  my $DEST = "$SCRIPTDIR/MythJobQueue.app/Contents/MacOS";
+  my $JQ   = "$SCRIPTDIR/MythJobQueue.app";
+  my $DEST = "$JQ/Contents/MacOS";
   my $SRC  = "$PREFIX/bin/mythcommflag.app/Contents/MacOS/mythcommflag";
 
   &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-  &PackagedExecutable("$SCRIPTDIR/MythJobQueue.app", 'mythcommflag');
+  &PackagedExecutable($JQ, 'mythcommflag');
 
   $SRC  = "$PREFIX/bin/mythtranscode.app/Contents/MacOS/mythtranscode";
   if ( -e $SRC )
   {
       &Syscall([ '/bin/cp', $SRC, $DEST ]) or die;
-      &PackagedExecutable("$SCRIPTDIR/MythJobQueue.app", 'mythtranscode');
+      &PackagedExecutable($JQ, 'mythtranscode');
+      &AddFakeBinDir($JQ);
   }
 }
 
@@ -1377,7 +1382,7 @@ sub UnmountHDImage
     my $device = HDImageDevice();
     if ($device)
     {
-        Syscall(['hdiutil', 'detach', $device, '-force']);
+        &Syscall(['hdiutil', 'detach', $device, '-force']);
     }
 }
 
@@ -1427,6 +1432,19 @@ sub DoSpeedupHacks($$)
   }
   close IN; close OUT;
   rename("$file.orig", $file);
+}
+
+#######################################################
+## Parts of MythTV try to call helper apps like this:
+## gContext->GetInstallPrefix() + "/bin/mythtranscode";
+## which means we need a bin directory.
+#######################################################
+
+sub AddFakeBinDir($)
+{
+  my ($target) = @_;
+
+  &Syscall(['ln', '-sf', '../MacOS', "$target/Contents/Resources/bin"]);
 }
 
 ### end file
