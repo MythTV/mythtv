@@ -1616,18 +1616,19 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
             .arg(increment / (1024.0 * 1024.0), 0, 'f', 2)
             .arg(sleep_time));
 
-    // Get the on disk file size and disk block size.
+    // Get the on disk file size and preferred I/O block size.
     struct stat buf;
     fstat(fd, &buf);
-    size_t fsize = buf.st_blksize * buf.st_blocks;
+    // Estimate the file size.  Don't use buf.st_blksize * buf.st_blocks
+    // The unit for st_blocks is undefined.  See section "RATIONALE" at
+    // http://www.opengroup.org/onlinepubs/000095399/basedefs/sys/stat.h.html
+    off_t fsize = ((buf.st_size / buf.st_blksize) + 1) * buf.st_blksize;
 
     // Round truncate increment up to a blocksize, w/min of 1 block.
     increment = ((increment / buf.st_blksize) + 1) * buf.st_blksize;
 
     while (fsize > increment)
     {
-        fsize -= increment;
-
         //VERBOSE(VB_FILE, QString("Truncating '%1' to %2 MB")
         //        .arg(filename).arg(fsize / (1024.0 * 1024.0), 0, 'f', 2));
 
@@ -1638,6 +1639,8 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
                     .arg(filename) + ENO);
             return 0 == close(fd);
         }
+
+        fsize -= increment;
 
         usleep(sleep_time * 1000);
     }
