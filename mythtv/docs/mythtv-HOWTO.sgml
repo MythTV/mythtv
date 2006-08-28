@@ -494,20 +494,27 @@ work with Over The Air signals captured with an antenna (with 8VSB).
 
 Cards that have been reported to work include:
 <itemize>
-<item>Air2PC PCI (8VSB)
-<item>pcHDTV-2000 (8VSB)
-<item>Air2PC HD5000 (8VSB, QAM256)
-<item>pcHDTV-3000 (8VSB, QAM256)
-<item>dvico Fusion HDTV Lite 5 (8VSB, QAM256)
+<item>pcHDTV HD-2000, Air2PC PCI rev 1-3, SiliconDust HDHomeRun (8VSB only)
+<item>pcHDTV HD-3000/5500             (8VSB, QAM256)
+<item>Air2PC HD-5000                  (8VSB, QAM256)
+<item>DViCO Fusion HDTV Lite/Gold 5   (8VSB, QAM256)
 </itemize>
 
-<bf>NOTE</bf>:There are no known consumer-level capture devices which will
+<bf>NOTE</bf>: There are no known consumer-level capture devices which will
 allow you to capture the HDTV output (DVI, HDMI, VGA, YPbPr / Component)
 from a set-top box commonly found with digital cable systems or satellite
 systems. <emphasis>None</emphasis> of the capture devices listed above
 perform any encoding; they merely allow your computer to save a copy of a
 HDTV stream which has already been converted to MPEG-2 at the broadcast
 facility.
+
+<bf>NOTE:</bf>: All of these cards except for the HD-2000 and
+HDHomeRun should be configured as DVB cards. The HD-2000, can
+be configured as a pcHDTV card if you use the V4L drivers from
+www.pchdtv.com and Linux 2.6.9 or earlier, with later kernels
+it must be configured as a DVB card, but you lose access to
+the second antenna input in ATSC mode. The HDHomeRun should be
+configured as two HDHomeRun cards, one for each tuner.
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
