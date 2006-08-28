@@ -77,8 +77,10 @@ show_help(){
   echo "  --disable-audio-arts     disable aRts audio support"
   echo "  --disable-audio-jack     disable JACK audio support"
   echo "  --enable-valgrind        disables timeouts for valgrind memory debugging"
-  echo "  --disable-frontend       disable frontend [breaks dependency checking, previews]"
-  echo "  --disable-backend        disable backend  [breaks dependency checking]"
+  # Don't print disable frontend/backend options, these
+  # cause breakage and people use them inappropriately. -- dtk
+  #echo "  --disable-frontend       disable frontend [breaks dependency checking, previews]"
+  #echo "  --disable-backend        disable backend  [breaks dependency checking]"
   #echo "  --disable-audio-beos     disable BeOS audio support [default=no]"
   #echo "  --disable-dv1394         disable DV1394 grabbing [default=no]"
   #echo "  --disable-network        disable network support [default=no]"
