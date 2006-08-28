@@ -318,6 +318,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
         prefixDir.cd("../Resources");
         if (QDir(prefixDir.canonicalPath() + "/share").exists())
             m_installprefix = prefixDir.canonicalPath();
+        if (QDir(prefixDir.canonicalPath() + "/lib").exists())
+            m_installlibdir = prefixDir.canonicalPath() + "/lib";
     }
     VERBOSE(VB_IMPORTANT, QString("Using runtime prefix = %1")
             .arg(m_installprefix));
