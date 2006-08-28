@@ -282,7 +282,7 @@ void VideoBrowser::updateInfo(QPainter *p)
                }
                else
                {
-                   QSize img_size = itype->GetSize();
+                   QSize img_size = itype->GetSize(true);
                    const QPixmap *img =
                            ImageCache::getImageCache().load(coverfile,
                                                             img_size.width(),

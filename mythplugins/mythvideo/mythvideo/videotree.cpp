@@ -128,7 +128,7 @@ class VideoTreeImp
 
         if (!isDefaultCoverFile(item->CoverFile()))
         {
-            QSize img_size = video_poster->GetSize();
+            QSize img_size = video_poster->GetSize(true);
             const QPixmap *img = ImageCache::getImageCache()
                     .load(item->CoverFile(), img_size.width(),
                           img_size.height(), QImage::ScaleFree);
