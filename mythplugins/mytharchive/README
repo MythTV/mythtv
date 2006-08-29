@@ -1,19 +1,21 @@
-MythArchive
-===========
-MythArchive is a MythTV style plugin which uses the Mythburn Script to create
+MythArchive 0.20
+================
+MythArchive is a MythTV style plugin which uses the mythburn.py script to create
 and burn DVD's from MythTV recordings, MythVideo files or any video files
 available on a MythTV system. It can also export recordings to a native
 archive format which can then be imported back into a MythTV system  restoring
 all the associated metadata.
 
+There is a more detailed description of what MythArchive is capable of on the wiki :-
+www.mythtv.org/wiki/index.php/MythArchive
+
+
 PREREQUISITES
 =============
 
-This plugin requires at least SVN Revision 9846 from trunk to run. It will
-NOT work with the 0.19-fixes branch.
+MythArchive doesn't need any prerequisites to compile other than Myth itself.
 
-You will also need to install the following dependencies for the mythburn
-script:
+You will need to install the following dependencies for the mythburn script:
 
 Python2.3.5
 python2.3-mysqldb
@@ -28,11 +30,12 @@ tcrequant (optional)
 COMPILE AND INSTALL MYTHARCHIVE
 ===============================
 
-Do the usual install routine. (change the prefix to suit your system)
+MythArchive is part of mythplugins and can be selected to be compiled
+by adding --enable-mytharchive when configuring the plugins.
 
-$ ./configure --prefix=/usr
-$ make
-# make install
+You can also choose which parts of MythArchive you would like to include
+    --enable-create-dvd      enable dvd creation [yes]
+    --enable-create-archive  enable native archive creation [yes]
 
 
 FEATURES / HOW-TO-USE
@@ -40,7 +43,7 @@ FEATURES / HOW-TO-USE
 
 After installing MythArchive, restart the mythfrontend.  There should be two
 new menu items.  The first is used to run the MythArchive plugin and the
-second shows MythArchive's settings page.
+second shows MythArchive's settings pages.
 
 IMPORTANT - You must confirm that the program settings are appropriate for
 your system.  The temp directory setting is crucial - you must have
@@ -52,17 +55,79 @@ files for archiving from the "Find Files To Archive" menu. You can
 choose MythTV recordings, MythVideo files or any media file accessible
 from your filesystem.
 
-Next you select items you would like to burn from the "Export Video File" 
-menu. If available you can tell MythArchive to use the cut list to cut
-out commercials etc. If you need to edit the details of an item. Press
-'MENU' and select "Edit Details" to show the 'Edit Details Dialog'.
+To create a DVD
+---------------
+* Choose Export Video Files | Create DVD.
 
-Next select a menu theme.
+* Choose what size DVD you are going to use and whether you want to just
+  create the file system or create an ISO image for later burning or actually
+  burn the ISO image to a blank DVD. Press 'Next'.
 
-Finally review what files have been selected and if you are happy
-click 'Finish' to start the DVD creation process. You can monitor
-the progress in the log viewer or exit the log viewer and continue
-to use MythTV.
+* Choose what files you want on the DVD. If the file is a MythTV recording and
+  the file has a cut list you can have MythArchive cut out the commercials for 
+  you. If you wish to edit the files metadata (title, subtile, description etc)
+  press 'Menu' to show the popup menu and choose 'Edit Details'. Press 'Next'.
+
+* Choose the DVD menu theme you would like. Press 'Next'.
+ 
+* The final page of the wizard shows you the shows you have chosen and the
+  order in which they will appear on the DVD and also shows whether a cut list 
+  will be used. On this page you can also choose what re-encoding profile to
+  use. Each file can have a different profile if you wish. If the file is
+  already a DVD compliant file the default is to not re-encode the file but
+  you can if you wish choose another profile maybe to reduce the file size so you
+  can squeeze more files on the DVD. Press 'Finish'.
+
+  The script to create the DVD will now be run and the log viewer will now be 
+  shown.
+
+To create a native archive backup
+---------------------------------
+* Choose Export Video Files | Create Native Archive 
+
+* Choose what size DVD you are going to use and whether you want to just
+  create the file system or create an ISO image for later burning or actually
+  burn the ISO image to a blank DVD. Press 'Next'.
+
+* Choose what files you want to backup. Only MythTV recordings or MythVideo
+  files are supported.
+
+* The final page of the wizard shows you the files you have chosen. 
+  Press 'Finish'
+
+  The script to create the backup files will now be run and the log viewer 
+  will now be shown. 
+
+To import a native archive backup
+---------------------------------
+* Choose Import Video Files 
+
+* Use the file selector to find the xml file containing the metadata for the
+  file you want to import. Press 'Next' 
+
+* On the next page if the file you want to import is a MythTV recording you
+  can choose what TV channel should be associated with the recording - this is
+  mostly usefull if the exporting system and importing system have different
+  channel line ups. MythArchive tries hard to find a reasonable match but
+  there may be instances where it can't find one so you may have to choose a
+  channel yourself. Press 'Finish' 
+
+  The script to import the archive will now be run and the log viewer will 
+  now be shown. 
+
+Using the log viewer 
+--------------------
+Whenever a script is run to create a DVD or native archive or when the import
+native archive script is run the log viewer will automatically be shown. By
+default the viewer will automatically update ever 5 seconds. You can turn this
+off or change the update frequency by changing the options at the top of the
+viewer. You can if you wish exit the viewer and continue to use Myth. If you 
+do this and return to MythArchive and the script is still running the log 
+viewer will be shown again automatically. If you want to stop the script you
+can press 'Cancel' and the script will be asked to stop. It may take several 
+minutes for the script to respond, depending on what it is doing at the time. 
+The update button will force the log viewer to update.
+
 
 Keys:-
 * Up/Down/Left/Right - move focus/change selection
