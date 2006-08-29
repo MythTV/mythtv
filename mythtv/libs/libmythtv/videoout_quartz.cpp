@@ -176,7 +176,7 @@ VideoOutputQuartzView::VideoOutputQuartzView(QuartzData *pData)
 
     thePort = NULL;
     desiredWidth = desiredHeight = desiredXoff = desiredYoff = 0;
-    theCodec = NULL;
+    theCodec = 0;
     theMask = NULL;
 
     frameSkip = 1;
@@ -272,7 +272,7 @@ void VideoOutputQuartzView::End(void)
     if (theCodec)
     {
         CDSequenceEnd(theCodec);
-        theCodec = NULL;
+        theCodec = 0;
         if (theMask)
         {
             DisposeRgn(theMask);
@@ -1328,8 +1328,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     CFDictionaryRef m;
     m = CGDisplayCurrentMode(data->screen);
     data->refreshRate = get_float_CF(m, kCGDisplayRefreshRate);
-    if (data->refreshRate == 0.0)	// LCD display?
-        data->refreshRate = 150;
+    if (data->refreshRate == 0.0)    // LCD display?
+        data->refreshRate = 150.0;   // Divisible by 25Hz and 30Hz
+                                     // to minimise AV sync waiting
 
     // Global configuration options
     data->scaleUpVideo = gContext->GetNumSetting("MacScaleUp", 1);
