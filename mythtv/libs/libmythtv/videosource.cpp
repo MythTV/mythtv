@@ -2171,7 +2171,7 @@ static QString remove_chaff(const QString &name)
     else if (short_name.left(8).lower() == "lgdt3302")
         short_name = "DViCO HDTV3";
     else if (short_name.left(8).lower() == "lgdt3303")
-        short_name = "DViCO v2 or Air2PC v3";
+        short_name = "DViCO v2 or Air2PC v3 or pcHDTV HD-5500";
 
     return short_name;
 }
