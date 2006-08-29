@@ -72,7 +72,7 @@ and FLAC
 <item>MythNews, a RSS news grabber
 <item>MythBrowser, a web browser
 <item>MythWeb, which allows you to control your MythTV system using a web
-browser.  With MythWeb, you can schedule recordings, delete files, change
+browser.  With MythWeb, you can schedule and delete recordings, change
 keybindings and more.  With proper security, you may even schedule a program
 over the Internet and have it immediately acted on by the scheduler.
 <item>MythPhone, phone and videophone using SIP.
@@ -195,7 +195,11 @@ See the instructions on how to debug in <ref id="debugging" name="Section 22">.
 The bug database is not a chat room, so restrict your entries to what is
 relevant.  It's also not a repository of feature requests; a feature request
 without an accompanying patch file to implement that feature will be quickly
-closed.
+closed.  There is a feature wishlist on the wiki at <url
+url="http://www.mythtv.org/wiki/index.php/Feature_Wishlist"
+name="http://www.mythtv.org/wiki/index.php/Feature_Wishlist">.  There is no
+guarantee that anything on the wishlist will ever get code written to
+implement it.
 
 If a developer closes out your bug, it's likely you didn't provide enough
 information.  Don't re-open a bug without providing additional information.
@@ -314,6 +318,12 @@ being done by a dedicated video processor, the host CPU requirements are
 quite low.  See the <ref id="video_capture_device" name="Video Capture
 Device"> section for details.
 
+The price differential between a frame grabber and a card that implements
+hardware MPEG-2 encoding, such as the Hauppauge PVR-x50 series, is now less
+than $30 US.  Primary development in MythTV has transitioned to supporting
+MPEG-2 capture devices and HDTV, so if given the option, go with the
+hardware MPEG-2 encoder.
+
 If you have a Via M10000 series or a Hauppauge PVR-350, MythTV can use the
 hardware-based video decoder for playback, which further reduces CPU
 requirements.
@@ -358,8 +368,14 @@ but requires great care in how you format and mount the volume.
 Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are <em>strongly</em> encouraged to
-consider one of these for your MythTV filesystem.  JFS is the absolute
-best at deletion, so you may want to try it if XFS gives you problems.
+consider one of these for your MythTV filesystem.  JFS is the absolute best
+at deletion, so you may want to try it if XFS gives you problems.  MythTV
+.20 also incorporates a "slow delete" feature, which progressively shrinks
+the file rather than attempting to delete it all at once, so if you're more
+comfortable with a filesystem such as ext3 (whose delete performance for
+large files isn't that good) you may use it as well.  There are other
+ramifications to using XFS and JFS - neither offer the opportunity to shrink
+a filesystem; they may only be expanded.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -395,9 +411,9 @@ url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
 name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information and for specific hardware questions.
 
-The most common inexpensive cards available use the Bt848 or Bt878 video
-capture chip; examples are the "Hauppauge WinTV Go" card and the "AverTV
-Desktop PVR" card, both of which use the bttv kernel module.
+The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
+series of video capture chips; examples are the "Hauppauge WinTV Go" card and
+the "AverTV Desktop PVR" card, both of which use the bttv kernel module.
 
 <code>
 NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
@@ -419,9 +435,6 @@ drivers that are available provide only a limited subset of the V4L API.
 The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
 </caption>
 </figure>
-
-Newer cards may use the CX23881 series of chips; a driver is available at
-<url url="http://bytesex.org/cx88/" name="http://bytesex.org/cx88/">.
 
 After you have installed a suitable capture device, you can check that 
 the kernel sees it with <tt>lspci</tt>. Look for an entry labeled "Multimedia 
@@ -471,12 +484,8 @@ for Live TV at 416x480.
 <p>DVB is a video standard primarily found in Europe (where it comes in
 DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
 is also used as the programming interface for HDTV capture cards in Linux. 
-MythTV supports DVB; see the pages maintained by Martin Smith <url
-url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net">
-at <url url="http://www.ethics-gradient.net/myth/mythdvb.html"
-name="http://www.ethics-gradient.net/myth/mythdvb.html"> for more
-information.  To see if your DVB card is supported, see the list of cards in
-the "Supported Hardware" section of the DVB Wiki at <url
+To see if your DVB card is supported, see the list of cards in the
+"Supported Hardware" section of the DVB Wiki at <url
 url="http://www.linuxtv.org/wiki/index.php/Main_Page"
 name="http://www.linuxtv.org/wiki/index.php/Main_Page"> for more
 information.
@@ -508,13 +517,14 @@ perform any encoding; they merely allow your computer to save a copy of a
 HDTV stream which has already been converted to MPEG-2 at the broadcast
 facility.
 
-<bf>NOTE:</bf>: All of these cards except for the HD-2000 and
-HDHomeRun should be configured as DVB cards. The HD-2000, can
-be configured as a pcHDTV card if you use the V4L drivers from
-www.pchdtv.com and Linux 2.6.9 or earlier, with later kernels
-it must be configured as a DVB card, but you lose access to
-the second antenna input in ATSC mode. The HDHomeRun should be
-configured as two HDHomeRun cards, one for each tuner.
+<bf>NOTE:</bf>: All of the cards listed above (except for the HD-2000 and
+HDHomeRun) should be configured as DVB cards. The HD-2000 can be configured
+as a pcHDTV card if you use the V4L drivers from <url
+url="http://www.pchdtv.com" name="http://www.pchdtv.com"> and use Linux
+kernel 2.6.9 or earlier.  With kernel 2.6.10 and higher it must be
+configured as a DVB card, but you lose access to the second antenna input in
+ATSC mode. The HDHomeRun should be configured as two HDHomeRun cards, one
+for each tuner.
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
@@ -526,15 +536,13 @@ no issues with viewing HDTV.
 
 The Complicated Answer:
 
-For 720p content (1280x720), a 2.4GHz P4 should be
-sufficient.
+For 720p content (1280x720), a 2.4GHz P4 should be sufficient.
 
 For 1920x1080i->1920x1080p with the better deinterlacing methods
 done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
 Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 acceleration.  If you enable the hardware acceleration, you may be able to
 use a 1.8GHz processor.
-
 
 <sect3>Firewire.
 <p>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
@@ -556,12 +564,21 @@ Hauppauge WinTV-PVR-USB2 (driver available at <url
 url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">) emulates a PVR-x50
 card.
 
-<sect3>IP Recorders (RTSP,UDP)
-<p>RTSP MPEG-2 TS recording is supported using the Freebox recorder in MythTV, this expects the channels to be supplied as an m3u playlist. If your DSL/Fiber provider provides television service, but does not provide an m3u playlist for the channels, you can construct one for your own use (you do not need to download it from the same server as the streams themselves).
+<sect3>IP Recorders (RTSP, UDP)
+<p>RTSP MPEG-2 TS recording is supported using the Freebox recorder in
+MythTV, which expects the channels to be supplied as a m3u playlist. If your
+DSL/Fiber provider supplies television service, but does not provide a m3u
+playlist for the channels, you can construct one for your own use (you do
+not need to download it from the same server as the streams themselves).
 
-<p>UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP Network recorder, but this recorder only supports recording a single channel per recorder.
+UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP Network
+recorder, but this recorder only supports recording a single channel per
+recorder.
 
-<bf>NOTE</bf>: Some DSL providers only allow you to use one recorder at a time, so you may need to limit yourself to one recorder in MythTV and turn off any set top box the cable provider sold or rented to you with your service. This limitation is independent of the bandwidth you have purchased.
+<bf>NOTE</bf>: Some DSL providers only allow you to use one recorder at a
+time, so you may need to limit yourself to one recorder in MythTV and turn
+off any set top box the cable provider sold or rented to you with your
+service. This limitation is independent of the bandwidth you have purchased.
 
 <sect2>Hardware known NOT to work and other issues
 <p>
@@ -607,9 +624,8 @@ a sound card for audio capture.
 not recommended.  Line-level devices have higher voltages and can damage the
 sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at <url
-url="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8"
-name="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">
-for additional information.
+url="http://www.tldp.org/HOWTO/MP3-HOWTO.html"
+name="http://www.tldp.org/HOWTO/MP3-HOWTO.html"> for additional information.
 </caption>
 </figure>
 
@@ -7908,9 +7924,11 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.20.00, 2006  Start prepping for 0.20.  Add HDHomeRun as a capture device. 
+v0.20.00, 2006  Start prepping for 0.20.  Add HDHomeRun as a capture device.
 Update URLs.  Move around some of the HDTV stuff.  Add a part about HDTV and
-capturing it in raw format (you can't, so stop asking).
+capturing it in raw format (you can't, so stop asking).  Update information
+on filesystems and the slow delete feature.
+
 
 -->
 
