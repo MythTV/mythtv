@@ -1,5 +1,5 @@
                                     MythGame
-			          Release 0.19
+			          Release 0.20
 
 
 BUILD/CONFIGURATION INSTRUCTIONS
@@ -32,7 +32,7 @@ MythGame will also read the mysql.txt settings files used by MythTV, so any
 changes you made to those will be carried over into this.
 
 If you require help configuring MythGame please see the new Wiki located on
-http://www.mythtv.org.
+http://www.mythtv.org/wiki/
 
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev

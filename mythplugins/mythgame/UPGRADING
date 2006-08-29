@@ -1,7 +1,0 @@
-UPGRADING FROM RELEASE 0.8 on up
---------------------------------
-No changes necessary.
-
-UPGRADING FROM RELEASE 0.7
---------------------------
-Insert gamedb/nesdb.sql and gamedb/snesdata.sql into your database.
