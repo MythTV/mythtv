@@ -8129,7 +8129,7 @@ Myth lopetetaan.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
+        <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

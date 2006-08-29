@@ -7860,7 +7860,7 @@ RecStatusChar rsOffLine</comment>
         <translation>URL</translation>
     </message>
     <message>
-        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
+        <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
         <translation>URL&apos;en til den innkommende strømmen (eks.: udp://?localport=1234)</translation>
     </message>
     <message>

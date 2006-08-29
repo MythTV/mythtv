@@ -1072,7 +1072,7 @@ class CRCIpNetworkRecorderDeviceID: public LineEditSetting, public CCSetting
     {
         setValue("udp://?localport=1234");
         setLabel(QObject::tr("URL"));
-        setHelpText(QObject::tr("URL of the incomming stream "
+        setHelpText(QObject::tr("URL of the incoming stream "
                                 "(ex.: udp://?localport=1234)"));
     }
 };

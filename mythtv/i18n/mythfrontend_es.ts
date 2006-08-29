@@ -8195,7 +8195,7 @@ Myth saldrá ahora.</translation>
         <translation>URL</translation>
     </message>
     <message>
-        <source>URL of the incomming stream (ex.: udp://?localport=1234)</source>
+        <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
         <translation>URL del stream entrante (ej.: udp://?localport=1234)</translation>
     </message>
     <message>
