@@ -186,7 +186,10 @@ void EITFixUp::FixUK(DBEvent &event) const
 
     position = event.description.find(m_ukSubtitle);
     if (position != -1)
+    {
         event.flags |= DBEvent::kSubtitled;
+        event.description.replace(m_ukSubtitle, "");
+    }
 
     // BBC three case (could add another record here ?)
     event.description = event.description.replace(m_ukThen, "");
