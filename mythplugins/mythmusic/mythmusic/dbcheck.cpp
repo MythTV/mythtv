@@ -429,11 +429,11 @@ void UpgradeMusicDatabaseSchema(void)
 "  (playlist_id,playlist_name,playlist_songs,hostname)"
 "  SELECT playlistid, name, songlist, hostname"
 "  FROM musicplaylist;",
-// Set all playlists to be global by killing the hostname
+// Set all real playlists to be global by killing the hostname
 "UPDATE music_playlists"
 "  SET hostname=''"
-"  WHERE playlist_name='default_playlist_storage'"
-"    OR playlist_name='backup_playlist_storage';",
+"  WHERE playlist_name<>'default_playlist_storage'"
+"    AND playlist_name<>'backup_playlist_storage';",
 ""
 };
         performActualUpdate(updates, "1006", dbver);
