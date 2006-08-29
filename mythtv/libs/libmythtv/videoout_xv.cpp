@@ -1174,7 +1174,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
 
     // The XVideo output methods sometimes allow the picture to
     // be adjusted, if the chroma keying color can be discovered.
-    if (VideoOutputSubType() >= XVideo && xv_colorkey)
+    if (VideoOutputSubType() >= XVideo && xv_colorkey &&
+        gContext->GetNumSetting("UseOutputPictureControls", 0))
         InitPictureAttributes();
 
     return true;
