@@ -1254,7 +1254,7 @@ int VideoOutputQuartz::GetRefreshRate(void)
             QString("VideoOutputQuartz::GetRefreshRate() [returning %1]")
                    .arg((int)data->refreshRate));
 
-    return (int)data->refreshRate;
+    return (int) (1000000 / data->refreshRate);
 }
 
 bool VideoOutputQuartz::Init(int width, int height, float aspect,

@@ -186,6 +186,8 @@ class VideoOutput
     virtual void GetOSDBounds(QRect &visible, QRect &total,
                               float &pixelAspect, float &fontScale) const;
 
+    /// \brief Returns current display's frame refresh period in microseconds.
+    ///        e.g. 1000000 / frame_rate_in_Hz
     virtual int GetRefreshRate(void) = 0;
 
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
