@@ -38,6 +38,7 @@ class Channel : public ChannelBase
 
     // Commands
     bool SwitchToInput(int newcapchannel, bool setstarting);
+    bool Retune(void);
 
     // Picture attributes.
     bool InitPictureAttributes(void);

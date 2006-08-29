@@ -660,6 +660,43 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
     return true;
 }
 
+/** \fn Channel::Retune(void)
+ *  \brief Retunes to last tuned frequency.
+ *
+ *  NOTE: This only works for V4L2 and only for analog tuning.
+ */
+bool Channel::Retune(void)
+{
+    if (usingv4l2)
+    {
+        struct v4l2_frequency vf;
+        bzero(&vf, sizeof(vf));
+
+        vf.tuner = 0; // use first tuner
+        vf.type = V4L2_TUNER_ANALOG_TV;
+
+        // Get the last tuned frequency
+        int ioctlval = ioctl(videofd, VIDIOC_G_FREQUENCY, &vf);
+        if (ioctlval < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Retune failed (1)" + ENO);
+            return false;
+        }
+
+        // Set the last tuned frequency again...
+        ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
+        if (ioctlval < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Retune failed (2)" + ENO);
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 bool Channel::IsTuned() const
 {
     if (usingv4l2)

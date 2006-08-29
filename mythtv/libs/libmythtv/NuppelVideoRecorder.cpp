@@ -1419,7 +1419,15 @@ again:
         vbuf.memory = V4L2_MEMORY_MMAP;
         if (ioctl(fd, VIDIOC_DQBUF, &vbuf) < 0)
         {
-            perror("VIDIOC_DQBUF");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "DQBUF ioctl failed." + ENO);
+
+            // EIO failed DQBUF de-tunes post 2.6.15.3 for cx88
+            if (errno == EIO && channelObj)
+            {
+                channelObj->Retune();
+                continue;
+            }
+
             if (errno == -EINVAL)
             {
                 for (int i = 0; i < numbuffers; i++)

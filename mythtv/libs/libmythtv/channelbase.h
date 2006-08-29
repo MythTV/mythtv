@@ -127,6 +127,9 @@ class ChannelBase
 
     virtual bool InitializeInputs(void);
 
+    // Misc. Commands
+    virtual bool Retune(void) { return false; }
+
     /// Saves current channel as the default channel for the current input.
     virtual void StoreInputChannels(void)
         { StoreInputChannels(inputs); }
