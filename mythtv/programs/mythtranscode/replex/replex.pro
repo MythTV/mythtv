@@ -19,7 +19,16 @@ INCLUDEPATH += replex
 INCLUDEPATH += ../../../libs/libavcodec ../../../libs/libavformat
 INCLUDEPATH += ../../../libs/libavutil  ../../../libs/libmythmpeg2
 
-LIBS += -L../../../libs/libavcodec -lmythavcodec-$${LIBVERSION}
-LIBS += -L../../../libs/libavformat -lmythavformat-$${LIBVERSION}
-LIBS += -L../../../libs/libavutil -lmythavutil-$${LIBVERSION}
+LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION -lmythavutil-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
+LIBS += -L../../../libs/libavutil -L../../../libs/libavcodec -L../../../libs/libavformat
+
+isEmpty(QMAKE_EXTENSION_SHLIB) {
+  QMAKE_EXTENSION_SHLIB=so
+}
+
+TARGETDEPS += ../../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+
+DEPENDPATH += ../../../libs/libavutil ../../../libs/libavformat ../../../libs/libsavcodec
