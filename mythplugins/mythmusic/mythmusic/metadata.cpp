@@ -596,9 +596,14 @@ QStringList Metadata::fillFieldList(QString field)
     searchList.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if ("artist" == field || "compilation_artist" == field)
+    if ("artist" == field)
     {
         query.prepare("SELECT artist_name FROM music_artists ORDER BY artist_name;");
+    }
+    else if ("compilation_artist" == field)
+    {
+        query.prepare("SELECT DISTINCT artist_name FROM music_artists, music_albums where "  
+                "music_albums.artist_id=music_artists.artist_id ORDER BY artist_name");
     }
     else if ("album" == field)
     {

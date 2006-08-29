@@ -35,7 +35,7 @@ static SmartPLField SmartPLFields[] =
 {
     { "",              "",                               ftString,   0,    0,    0 },
     { "Artist",        "music_artists.artist_name",      ftString,   0,    0,    0 },
-    { "Album",         "music_songs.album_name",         ftString,   0,    0,    0 },
+    { "Album",         "music_albums.album_name",        ftString,   0,    0,    0 },
     { "Title",         "music_songs.name",               ftString,   0,    0,    0 },
     { "Genre",         "music_genres.genre",             ftString,   0,    0,    0 },
     { "Year",          "music_songs.year",               ftNumeric,  1900, 2099, 2000 },
@@ -783,9 +783,8 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
     }
     else if (PLField->type == ftBoolean)
     {
-        // compilation field uses 0 = false;  >0 = true
-        Value1 = (value1Combo->currentText() == "Yes") ? "1":"0";
-        Value2 = (value2Combo->currentText() == "Yes") ? "1":"0";
+        Value1 = value1Combo->currentText();
+        Value2 = value2Combo->currentText();
     }
     else if (PLField->type == ftDate)
     {
@@ -834,8 +833,8 @@ void SmartPLCriteriaRow::initValues(QString Field, QString Operator, QString Val
         }
         else if (PLField->type == ftBoolean)
         {
-            value1Combo->setCurrentText( (Value1 == "1") ? "Yes":"No" );
-            value2Combo->setCurrentText( (Value2 == "1") ? "Yes":"No" );
+            value1Combo->setCurrentText(Value1);
+            value2Combo->setCurrentText(Value2);
         }
         else if (PLField->type == ftDate)
         {
@@ -1113,11 +1112,15 @@ void SmartPlaylistEditor::titleChanged(void)
 
 void SmartPlaylistEditor::updateMatches(void)
 {
-    bPlaylistIsValid = true;
-    
-    QString sql = "select count(*) from music_songs ";
+    QString sql = "select count(*) from music_songs " 
+                  "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
+                  "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+                  "LEFT JOIN music_artists AS music_comp_artists ON " 
+                  "music_albums.artist_id=music_comp_artists.artist_id "
+                  "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id ";
+
     sql += getWhereClause();
-    
+
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.exec(sql))
     {
@@ -1128,15 +1131,15 @@ void SmartPlaylistEditor::updateMatches(void)
         }
         else
             matchesCount = 0;
-    }    
+    }
     else
-    {    
-        bPlaylistIsValid = false;
+    {
         matchesCount = 0;
     }
-        
-    matchesLabel->setText(QString().setNum(matchesCount));    
-    
+
+    matchesLabel->setText(QString().setNum(matchesCount));
+
+    bPlaylistIsValid = (matchesCount > 0);
     showResultsButton->setEnabled(matchesCount > 0);
     titleChanged();
 }
@@ -1495,7 +1498,8 @@ QString SmartPlaylistEditor::getWhereClause(void)
 
 void SmartPlaylistEditor::showResultsClicked(void)
 {
-    QString sql = getSQL("song_id, music_artists.artist_name, album_name, name, genre, year, track");
+    QString sql = getSQL("song_id, music_artists.artist_name, album_name, "
+                         "name, genre, music_songs.year, track");
 
     SmartPLResultViewer *resultViewer = new SmartPLResultViewer(gContext->GetMainWindow(), "resultviewer");
     resultViewer->setSQL(sql);
