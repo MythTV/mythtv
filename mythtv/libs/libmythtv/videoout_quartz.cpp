@@ -1667,6 +1667,12 @@ void VideoOutputQuartz::DrawUnusedRects(bool)
 
 void VideoOutputQuartz::UpdatePauseFrame(void)
 {
+    if (!pauseFrame.buf)
+    {
+        puts("VideoOutputQuartz::UpdatePauseFrame() - no buffers?");
+        return;
+    }
+
     VideoFrame *pauseb = vbuffers.GetScratchFrame();
     VideoFrame *pauseu = vbuffers.head(kVideoBuffer_used);
     if (pauseu)
