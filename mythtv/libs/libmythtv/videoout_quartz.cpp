@@ -1171,7 +1171,7 @@ VideoOutputQuartz::VideoOutputQuartz(void)
 {
     Started = 0; 
 
-    pauseFrame.buf = NULL;
+    init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
 
     data = new QuartzData();
     data->views.setAutoDelete(true);
@@ -1424,18 +1424,17 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
     vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
 
-    // Set up pause and scratch frames
+    // Set up pause frame
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
     VideoFrame *scratch = vbuffers.GetScratchFrame();
 
-    pauseFrame.height = scratch->height;
-    pauseFrame.width  = scratch->width;
-    pauseFrame.bpp    = scratch->bpp;
-    pauseFrame.size   = scratch->size;
-    pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    init(&pauseFrame, FMT_YV12, new unsigned char[scratch->size], 
+         scratch->width, scratch->height, scratch->bpp, scratch->size);
+
     pauseFrame.frameNumber = scratch->frameNumber;
+
 
     // Set up pixel storage and image description for source
     data->pixelLock.lock();
@@ -1551,7 +1550,10 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
     data->pixelLock.unlock();
 
     if (pauseFrame.buf)
+    {
         delete [] pauseFrame.buf;
+        init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
+    }
 
     vbuffers.DeleteBuffers();
 }
