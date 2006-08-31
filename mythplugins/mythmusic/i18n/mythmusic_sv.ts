@@ -351,11 +351,11 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Ordning: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordning: Album</translation>
     </message>
 </context>
 <context>
@@ -391,10 +391,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Audio device</source>
         <translation>Ljudenhet</translation>
-    </message>
-    <message>
-        <source>Audio Device used for playback.</source>
-        <translation type="obsolete">Ljudenhet som används för avspelning.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -853,10 +849,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>CD-bränningsinställningar</translation>
     </message>
     <message>
-        <source>Artists</source>
-        <translation type="obsolete">Artister</translation>
-    </message>
-    <message>
         <source>Creating CD File System</source>
         <translation>Skapar filsystem för CD</translation>
     </message>
@@ -912,15 +904,15 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>förvald</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudenhet för uppspelning. &apos;förvald&apos; använder enheten angiven i MythTV</translation>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänd titel</translation>
     </message>
 </context>
 <context>

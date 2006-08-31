@@ -34,6 +34,7 @@ SOURCES += ../libs/libmythtv/recordingprofile.h
 SOURCES += ../libs/libmythtv/scanwizard.cpp
 SOURCES += ../libs/libmythtv/scanwizardhelpers.cpp
 SOURCES += ../libs/libmythtv/scanwizardhelpers.h
+SOURCES += ../libs/libmythtv/scanwizardscanner.cpp
 SOURCES += ../libs/libmythtv/scheduledrecording.cpp
 SOURCES += ../libs/libmythtv/signalmonitor.cpp
 SOURCES += ../libs/libmythtv/sr_items.cpp

@@ -11,43 +11,43 @@
     </message>
     <message>
         <source>Edit Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera platsdetaljer</translation>
     </message>
     <message>
         <source>Enter Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange platsdetaljer</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Namn:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Edit News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera nyhetsplats</translation>
     </message>
     <message>
         <source>Add News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till nyhetsplats</translation>
     </message>
     <message>
         <source>Delete News Site</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort nyhetsplats</translation>
     </message>
 </context>
 <context>
@@ -94,13 +94,15 @@ Minsta tillåtna värdet är 30 minuter.</translation>
     <name>QObject</name>
     <message>
         <source>MythNews</source>
-        <translation type="unfinished"></translation>
+        <translation>MythNews</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this news site
 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill ta bort denna nyhetsplats
+
+%1</translation>
     </message>
 </context>
 <context>

@@ -878,14 +878,6 @@
         <translation>*** Ogiltigt plats-ID eller serverfel ***</translation>
     </message>
     <message>
-        <source>doppler radar</source>
-        <translation type="obsolete">dopplerradar</translation>
-    </message>
-    <message>
-        <source>satellite image</source>
-        <translation type="obsolete">satellitbild</translation>
-    </message>
-    <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
         <translation>Myth kunde inte hämta dina väderdata inom utsatt tid (%1 sekunder).

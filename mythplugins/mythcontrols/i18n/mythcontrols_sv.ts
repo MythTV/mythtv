@@ -97,32 +97,20 @@
         <translation>Osparade ändringar</translation>
     </message>
     <message>
-        <source>Would you like to save now?</source>
-        <translation type="obsolete">Vill du spara?</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="obsolete">Spara</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="obsolete">Avsluta</translation>
-    </message>
-    <message>
         <source>Exiting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutar...</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara ändringar?</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej</translation>
     </message>
 </context>
 </TS>

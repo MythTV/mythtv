@@ -1,52 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>GLSingleView</name>
-    <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Katalog: </translation>
-    </message>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Skapad: </translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Modifierad: </translation>
-    </message>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Bytes</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Bredd</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">pixlar</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Höjd</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Pixelantal</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapixels</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Rotationsvinkel</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">grader</translation>
-    </message>
-</context>
-<context>
     <name>IconView</name>
     <message>
         <source>Import pictures?</source>
@@ -106,91 +59,91 @@
     </message>
     <message>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery-katalog &apos;%1&apos; finns inte eller är oläsbar.</translation>
     </message>
     <message>
         <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery kunde inte ladda tema, se konsol för detaljer.</translation>
     </message>
     <message>
         <source>The selected device is no longer available</source>
-        <translation type="unfinished"></translation>
+        <translation>Vald enhet är inte längre tillgänglig</translation>
     </message>
     <message>
         <source>Meta Data...</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadata...</translation>
     </message>
     <message>
         <source>Marking...</source>
-        <translation type="unfinished"></translation>
+        <translation>Märkning...</translation>
     </message>
     <message>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil...</translation>
     </message>
     <message>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation>Återgå</translation>
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa märkning</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj alla</translation>
     </message>
     <message>
         <source>Show Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa enheter</translation>
     </message>
     <message>
         <source>Copy here</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiera hit</translation>
     </message>
     <message>
         <source>Move here</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytta hit</translation>
     </message>
     <message>
         <source>Create Dir</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa katalog</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort aktuell fil eller katalog</translation>
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tar bort 1 katalog, inklusive underkataloger och filer.</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tar bort 1 bild.</translation>
     </message>
     <message>
         <source>Delete Marked Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort märkta filer</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tar bort %1 bilder och kataloger, inklusive underkataloger och filer.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny katalog</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa ny katalog</translation>
     </message>
     <message>
         <source>Moving marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Flyttar märkta bilder...</translation>
     </message>
     <message>
         <source>Copying marked images...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopierar märkta bilder...</translation>
     </message>
 </context>
 <context>
@@ -256,10 +209,6 @@
         <translation>Detta är den typ av OpenGL-övergångseffekt som används mellan bilder vid uppspelning av bildspel.</translation>
     </message>
     <message>
-        <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="obsolete">Katalogen med bilder existerar inte eller är oläsbar.</translation>
-    </message>
-    <message>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
@@ -297,62 +246,15 @@
     </message>
     <message>
         <source>Sort order when browsing</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteringsordning vid bläddring</translation>
     </message>
     <message>
         <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteringsordning för de visade bildminiatyrerna.</translation>
     </message>
     <message>
         <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SingleView</name>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Skapad:</translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Modifierad:</translation>
-    </message>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Bytes</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Bredd</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">pixlar</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Höjd</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Pixelantal</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapixels</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Rotationsvinkel</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">grader</translation>
-    </message>
-    <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Katalog:</translation>
+        <translation>Längd på OpenGL-övergång (millisekunder)</translation>
     </message>
 </context>
 </TS>

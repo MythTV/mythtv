@@ -10,10 +10,6 @@
         <translation>Inga</translation>
     </message>
     <message>
-        <source>No Cover</source>
-        <translation>Ingen omslagsbild</translation>
-    </message>
-    <message>
         <source>Done</source>
         <translation>Klart</translation>
     </message>
@@ -102,26 +98,6 @@
     <message>
         <source>Player Settings</source>
         <translation>Inställningar för spelare</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation>PIN-kod (barnlås):</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation>Ingen omslagsbild</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Okänd</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Inga</translation>
-    </message>
-    <message>
-        <source>Unknown Rating</source>
-        <translation>Okänd rankning</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
@@ -263,6 +239,78 @@
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
         <translation>Videolistvyn laddar alla kända videometadata från databasen. Att stänga av denna funktion kan minska tiden det tar att ladda videolistvyn väsentligt</translation>
+    </message>
+    <message>
+        <source>Sorting ignores case</source>
+        <translation>Skiftlägesokänslig sortering</translation>
+    </message>
+    <message>
+        <source>If set, case is ignored when sorting entries in a view.</source>
+        <translation>Ignorerar skillnad mellan stora och små bokstäver vid sortering i en vy.</translation>
+    </message>
+    <message>
+        <source>Show folders for database views</source>
+        <translation>Visa kataloger i databasvyer</translation>
+    </message>
+    <message>
+        <source>If set, sub folders of your video directory will be shown in supported views.</source>
+        <translation>Visar underkataloger till din videokatalog i de vyer som stödjer detta.</translation>
+    </message>
+    <message>
+        <source>Image cache size</source>
+        <translation>Bildcachestorlek</translation>
+    </message>
+    <message>
+        <source>This setting determines the number of images MythVideo will cache for views.</source>
+        <translation>Antal bilder som MythVideo cachar för vyer.</translation>
+    </message>
+    <message>
+        <source>^(The |A |An )</source>
+        <translation>^(The |A |An )</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Alla</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nej</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>År</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation>Användarbetyg</translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation>Speltid</translation>
+    </message>
+    <message>
+        <source>Filename</source>
+        <translation>Filnamn</translation>
+    </message>
+    <message>
+        <source>Video ID</source>
+        <translation>Video-ID</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Okänd</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Inga</translation>
     </message>
 </context>
 <context>
@@ -495,14 +543,6 @@
         <translation>Inga filmer</translation>
     </message>
     <message>
-        <source>No rating available.</source>
-        <translation>Ingen rankning tillgänglig.</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation>minuter</translation>
-    </message>
-    <message>
         <source>Watch This Video</source>
         <translation>Spela upp denna film</translation>
     </message>
@@ -541,10 +581,6 @@
         <source>Ok</source>
         <translation>OK</translation>
     </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation>PIN-kod (barnlås):</translation>
-    </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
@@ -557,16 +593,8 @@
         <translation>Resultat av detta filter: Inga videos</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Okänd</translation>
-    </message>
-    <message>
         <source>minutes</source>
         <translation>minuter</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Alla</translation>
     </message>
     <message>
         <source>Save as default</source>
@@ -611,34 +639,6 @@
         <translation>Avbryt</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation>minuter</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation>Ja</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation>Nej</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation>Ingen omslagsbild</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Okänd</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Ingen</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation>Oklassificerad</translation>
-    </message>
-    <message>
         <source>delete failed</source>
         <translation>borttagning misslyckades</translation>
     </message>
@@ -676,22 +676,7 @@
     </message>
 </context>
 <context>
-    <name>VideoSelected</name>
-    <message>
-        <source>No rating available.</source>
-        <translation>Ingen rankning tillgänglig.</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation>minuter</translation>
-    </message>
-</context>
-<context>
     <name>VideoTree</name>
-    <message>
-        <source>Parental Pin:</source>
-        <translation>PIN-kod (barnlås):</translation>
-    </message>
     <message>
         <source>Select action</source>
         <translation>Välj åtgärd</translation>
