@@ -163,16 +163,20 @@
   <catcolor category="Wetenschap" color="#33ff99"></catcolor>
   
   <!-- Categories introduced by tv_grab_jp -->
+  <catcolor category="その他" color="#222200"></catcolor>
   <catcolor category="ドラマ" color="rosybrown3"></catcolor>
   <catcolor category="映画" color="Blue"></catcolor>
   <catcolor category="スポーツ" color="DarkCyan"></catcolor>
-  <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
+  <catcolor category="演劇" color="turquoise3"></catcolor>
   <catcolor category="音楽" color="DarkRed"></catcolor>
-  <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
-  <catcolor category="教養" color="CornflowerBlue"></catcolor>
-  <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
-  <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
-  <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
+  <catcolor category="バラエティ" color="DarkOrchid"></catcolor>
+  <catcolor category="ドキュメンタリー・教養" color="goldenrod"></catcolor>
+  <catcolor category="アニメ・特撮" color="#3333aa"></catcolor>
+  <catcolor category="キッズ" color="MediumSlateBlue"></catcolor>
+  <catcolor category="ニュース・報道" color="DarkOrange3"></catcolor>
+  <catcolor category="趣味・実用" color="goldenrod"></catcolor>
+  <catcolor category="情報" color="#00aa00"></catcolor>
+  <catcolor category="教育" color="CornflowerBlue"></catcolor>
   
   <!-- Categories introduced by tv_grab_br -->
   <catcolor category="Educativo" color="CornflowerBlue"></catcolor>

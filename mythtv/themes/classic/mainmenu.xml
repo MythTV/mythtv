@@ -207,6 +207,7 @@
       <text lang="ES">Teléfono</text>
       <text lang="NL">Telefoon</text>
       <text lang="PL">Telefon</text>
+      <text lang="JA">電話</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

@@ -55,6 +55,7 @@
      <text lang="DE">Kinoprogramm</text>
      <text lang="NL">Bioscoop Tijden</text>
      <text lang="CZ">Programy kin</text>
+     <text lang="JA">ムービータイム</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>

@@ -69,6 +69,7 @@
       <text lang="PT">Gravações Feitas</text>
       <text lang="ES">Grabaciones Anteriores</text>
       <text lang="NL">Eerder Opgenomen</text>
+      <text lang="JA">録画履歴</text>
       <action>TV_PREVIOUS</action>
    </button>
 

@@ -120,6 +120,7 @@
       <text lang="PT">Gravações Feitas</text>
       <text lang="ES">Grabaciones Antiguas</text>
       <text lang="NL">Eerdere Opnames</text>
+      <text lang="JA">録画履歴</text>
       <action>TV_PREVIOUS</action>
    </button>
 

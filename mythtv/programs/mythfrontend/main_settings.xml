@@ -152,6 +152,7 @@
       <text lang="ES">Teléfono</text>
       <text lang="PT">Configurar Telefone</text>
       <text lang="CZ">Nastavení telefonu</text>
+      <text lang="JA">電話設定</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

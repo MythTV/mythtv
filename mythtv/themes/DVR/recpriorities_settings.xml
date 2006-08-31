@@ -12,6 +12,7 @@
       <text lang="PT">Definir Prioridades de Gravação</text>
       <text lang="ES">Ajustar Prioridades Grabación</text>
       <text lang="NL">Opnameprioriteit Instellen</text>
+      <text lang="JA">録画優先順位設定</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
@@ -21,6 +22,7 @@
       <alttext lang="PT">Prioridades de Gravação</alttext>
       <alttext lang="ES">Prioridades Grabación</alttext>
       <alttext lang="NL">Opnameprioriteit</alttext>
+　    <alttext lang="JA">録画優先順位</text>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 

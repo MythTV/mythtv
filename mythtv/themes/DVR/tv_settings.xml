@@ -70,6 +70,7 @@
       <text lang="ES">Grupos de Reproducción</text>
       <text lang="ET">Mahamängimisgrupid</text>
       <text lang="NL">Afspeelgroepen</text>
+      <text lang="JA">プレイバックグループ</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -85,7 +86,7 @@
       <text lang="DK">Optagelse</text>
       <text lang="PT">Perfis de Gravação</text>
       <text lang="SV">Inspelningsprofiler</text>
-      <text lang="JA">録画プロフィール</text>
+      <text lang="JA">録画プロファイル</text>
       <text lang="FI">Nauhoitusprofiilit</text>
       <text lang="ZH_TW">錄影設定</text>
       <text lang="SI">Snemalni profili</text>

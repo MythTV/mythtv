@@ -81,6 +81,7 @@
       <text lang="NL">DVD Branden</text>
       <text lang="CZ">Vypálit DVD</text>
       <text lang="SV">Bränn DVD</text>
+      <text lang="JA">DVD書込</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

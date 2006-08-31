@@ -59,6 +59,7 @@
       <text lang="ET">Muuda klahve</text>
       <text lang="NL">Toetsen Aanpassen</text>
       <text lang="CZ">Editovat klávesy</text>
+      <text lang="JA">キー設定</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>

@@ -59,7 +59,7 @@
       <text lang="IS">Komandi upptökur</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Kommande inspelningar</text>
-      <text lang="JA">予約衝突修正</text>
+      <text lang="JA">これからの録画</text>
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
       <text lang="SI">Prihajajoča snemanja</text>
@@ -100,7 +100,7 @@
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
       <text lang="SV">Tidigare inspelningar</text>
-      <text lang="JA">以前の録画</text>
+      <text lang="JA">録画履歴</text>
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="IS">Fyrri upptökur</text>
       <text lang="NL">Vorige Opnames</text>      

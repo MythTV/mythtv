@@ -50,6 +50,7 @@
       <text lang="ES">Configurar Teclas</text>
       <text lang="NL">Toetsen Instellen</text>
       <text lang="PL">Edycja guzik�w</text>
+      <text lang="JA">キー設定</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
@@ -142,6 +143,7 @@
       <text lang="ES">Configurar Radio</text>
       <text lang="NL">Radio Instellingen</text>
       <text lang="PL">Konfiguracja Radia</text>
+      <text lang="JA">ラジオ設定</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -282,6 +284,7 @@
       <text lang="ES">Configurar Teléfono</text>
       <text lang="NL">Telefoon Instellingen</text>
       <text lang="PL">Konfiguracja Telefonu</text>
+      <text lang="JA">電話設定</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
