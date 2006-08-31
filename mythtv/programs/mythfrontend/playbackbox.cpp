@@ -3651,7 +3651,12 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 handled = false;
         }
         else
-            handled = false;
+        { 
+            if (action == "LEFT" && arrowAccel) 
+                exitWin(); 
+            else 
+                handled = false; 
+        } 
     }
 
     if (!handled)
