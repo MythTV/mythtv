@@ -417,7 +417,7 @@ void RecordingSelector::getRecordingList(void)
 
     if (category_selector)
     {
-        category_selector->addItem(0, "All Recordings");
+        category_selector->addItem(0, tr("All Recordings"));
         category_selector->setToItem(0);
     }
 

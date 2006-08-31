@@ -503,7 +503,7 @@ void VideoSelector::getVideoList(void)
 
     if (category_selector)
     {
-        category_selector->addItem(0, "All Videos");
+        category_selector->addItem(0, tr("All Videos"));
         category_selector->setToItem(0);
     }
 

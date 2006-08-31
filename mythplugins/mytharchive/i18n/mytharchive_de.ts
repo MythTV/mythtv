@@ -3,524 +3,533 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
     <name>ExportNativeWizard</name>
     <message>
         <source>0 Mb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Mb</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei auswählen...</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss mindestens ein Objekt zum Archivieren ausgewählt werden!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Abschließen</translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Archivobjekte</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Es existieren keine Objekte zum Archivieren!
+
+OK Klicken</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Objekt entfernen</translation>
     </message>
 </context>
 <context>
     <name>FileSelector</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Anfang</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss mindestens eine Datei ausgewählt werden!</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
-        <translation type="unfinished"></translation>
+        <translation>Das gewählte Objekt ist kein Verzeichnis!</translation>
     </message>
 </context>
 <context>
     <name>ImportNativeWizard</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Anfang</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select a valid archive XML file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss eine gültige XML Archivdatei ausgewählt werden!</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss eine gültige chanID ausgewählt werden!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Abschließen</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="unfinished"></translation>
+        <translation>ChanID wählen</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="unfinished"></translation>
+        <translation>ChanNo wählen</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalname wählen</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmname wählen</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
     <message>
         <source>Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgabebetrachter</translation>
     </message>
     <message>
         <source>Seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekunden</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisieren</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Beenden</translation>
     </message>
 </context>
 <context>
     <name>MythburnWizard</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiter</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss mindestens ein Objekt zum Archivieren ausgewählt werden!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Abschließen</translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Archivobjekte</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Es existieren keine Objekte zum Archivieren!
+
+OK Klicken</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details bearbeiten</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Objekt entfernen</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei auswählen...</translation>
     </message>
     <message>
         <source>Don&apos;t re-encode</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht neu-kodieren</translation>
     </message>
     <message>
         <source>New Size </source>
-        <translation type="unfinished"></translation>
+        <translation> Neue Größe</translation>
     </message>
     <message>
         <source>Original Size </source>
-        <translation type="unfinished"></translation>
+        <translation> Originalgröße</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Myth Archive Temp Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archives temporäres Verzeichnis</translation>
     </message>
     <message>
         <source>Myth Archive Share Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archives gemeinsames Verzeichnis</translation>
     </message>
     <message>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad in welchem MythArchive seine Skripte, Intros und Themendateien speichert</translation>
     </message>
     <message>
         <source>Video format</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoformat</translation>
     </message>
     <message>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoformat für DVD-Aufnahmen, PAL oder NTSC.</translation>
     </message>
     <message>
         <source>File Selector Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiauswähler Filter</translation>
     </message>
     <message>
         <source>The file name filter to use in the file selector.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Dateinamefilter der im Dateiauswähler benutzt wird.</translation>
     </message>
     <message>
         <source>Location of DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Gerät</translation>
     </message>
     <message>
         <source>Which DVD drive to use when burning discs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Welches DVD Laufwerk zum Brennen benutzt werden soll.</translation>
     </message>
     <message>
         <source>ffmpeg Command</source>
-        <translation type="unfinished"></translation>
+        <translation>ffmpeg Kommando</translation>
     </message>
     <message>
         <source>Command to run ffmpeg.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von ffmpeg.</translation>
     </message>
     <message>
         <source>mplex Command</source>
-        <translation type="unfinished"></translation>
+        <translation>mplex Kommando</translation>
     </message>
     <message>
         <source>Command to run mplex</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von mplex</translation>
     </message>
     <message>
         <source>dvdauthor command</source>
-        <translation type="unfinished"></translation>
+        <translation>dvdauthor Kommando</translation>
     </message>
     <message>
         <source>Command to run dvdauthor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von dvdauthor.</translation>
     </message>
     <message>
         <source>mkisofs command</source>
-        <translation type="unfinished"></translation>
+        <translation>mkisofs Kommando</translation>
     </message>
     <message>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von mkisofs. (Es wird benutzt, um ISO Abbilder zu erstellen)</translation>
     </message>
     <message>
         <source>growisofs command</source>
-        <translation type="unfinished"></translation>
+        <translation>growisofs Kommando</translation>
     </message>
     <message>
         <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von growisofs. (Es wird benutzt, um DVDs zu brennen)</translation>
     </message>
     <message>
         <source>tcrequant command</source>
-        <translation type="unfinished"></translation>
+        <translation>tcrequant Kommando</translation>
     </message>
     <message>
         <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von tcrequant (Teil des transcode Paketes). Optional - Leer lassen, wenn kein transcode Paket installiert ist.</translation>
     </message>
     <message>
         <source>png2yuv command</source>
-        <translation type="unfinished"></translation>
+        <translation>png2yuv Kommando</translation>
     </message>
     <message>
         <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von png2yuv. Teil des mjpegtools Paketes</translation>
     </message>
     <message>
         <source>spumux command</source>
-        <translation type="unfinished"></translation>
+        <translation>spumus Kommando</translation>
     </message>
     <message>
         <source>Command to run spumux. Part of dvdauthor package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von spumux. Teil des dvdauthor Paketes</translation>
     </message>
     <message>
         <source>mpeg2enc command</source>
-        <translation type="unfinished"></translation>
+        <translation>mpeg2enc Kommando</translation>
     </message>
     <message>
         <source>Command to run mpeg2enc. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando zum Ausführen von mpeg2enc. Teil des mjpegtool Paketes</translation>
     </message>
     <message>
         <source>MythArchive Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive  Einstellungen</translation>
     </message>
     <message>
         <source>MythArchive External Commands (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive externe Kommandos (1)</translation>
     </message>
     <message>
         <source>MythArchive External Commands (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive externe Kommandos (2)</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Burn</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Hintergrundverarbeitung wurde zum Anhalten angewiesen.
+Dies kann einige Minuten in Anspruch nehmen.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>  Die Erstellung der DVD war nicht möglich. Während des Ausführens der Skripte ist ein Fehler aufgetreten</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad in welchem MythArchive seine temporären Arbeitsdateien erstellt. Hier wird VIEL Platz benötigt.</translation>
     </message>
     <message>
         <source>Always Encode to AC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Immer zu AC3 kodieren</translation>
     </message>
     <message>
         <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für eine bessere Kompatibilität mit den DVD-Abspielgeräten in NTSC Ländern werden bei dieser Auswahl Tonspuren immer zu AC3 neu-kodiert.</translation>
     </message>
     <message>
         <source>Copy remote files</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiere entfernte Dateien</translation>
     </message>
     <message>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei dieser Option werden Dateien auf entfernten Dateisystemen vor der Verarbeitung auf das lokale Dateisystem kopiert. Dies beschleunigt die Verarbeitung und reduziert die Auslastung des Netzwerkes</translation>
     </message>
     <message>
         <source>Always Use Mythtranscode</source>
-        <translation type="unfinished"></translation>
+        <translation>Immer Mythtranscode benutzen</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei dieser Option werden mpeg2 Dateien immer von mythtranscode verarbeitet um diese von Fehlern zu bereinigen. Dies kann dabei helfen einige Tonprobleme zu beheben.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
-        <translation type="unfinished"></translation>
+        <translation>FIFOs benutzen</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Skript wird FIFOs benutzen, um die Ausgabe von mplex in den dvdauthor zu leiten, anstatt seine eigenen Dateien zu erstellen. Spart Zeit und Festplattenplatz während Multiplexoperationen. Dies wird nicht von Windows unterstützt </translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauptmenü Seitenverhältnis</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the main menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Welches Seitenverhältnis beim Erstellen des Hauptmenüs benutzt werden soll.</translation>
     </message>
     <message>
         <source>Chapter Menu Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapitelmenü Seitenverhältnis</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Welches Seitenverhältnis beim Erstellen des Kapitelmenüs benutzt werden soll. Die Option Video bedeutet das Seitenverhältnis des Videos zu benutzen.</translation>
     </message>
     <message>
         <source>MythArchive Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive  Einstellungen (2)</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>  Es war nicht möglich das Archiv zu importieren. Ein Fehler ist während des Ausführens von &apos;mytharchivehelper&apos; aufgetreten</translation>
     </message>
 </context>
 <context>
     <name>RecordingSelector</name>
     <message>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl löschen</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alles auswählen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one recording!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss mindestens eine Aufnahme ausgewählt werden!</translation>
     </message>
     <message>
         <source>All Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Aufnahmen</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any recordings!
 
 Click OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Es existieren keine Aufnahmen!
+
+OK klicken</translation>
     </message>
 </context>
 <context>
     <name>VideoSelector</name>
     <message>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl löschen</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alles auswählen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one video file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Es muss mindestens eine Videodatei ausgewählt werden!</translation>
     </message>
     <message>
         <source>All Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Videos</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoauswahl</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!
 
 Click OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Es existieren keine Videos!
+
+OK klicken</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kindersicherungs-Pin:</translation>
     </message>
 </context>
 </TS>

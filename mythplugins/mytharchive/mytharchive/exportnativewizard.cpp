@@ -540,7 +540,7 @@ void ExportNativeWizard::getArchiveList(void)
 
     if (category_selector)
     {
-        category_selector->addItem(0, "All Archive Items");
+        category_selector->addItem(0, tr("All Archive Items"));
         category_selector->setToItem(0);
     }
 
