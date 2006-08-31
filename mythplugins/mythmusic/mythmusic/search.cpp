@@ -120,7 +120,7 @@ void SearchDialog::runQuery(QString searchText)
                  whereClause += (i) ? " AND ( " : "WHERE (";
                  whereClause +=
                     "filename    LIKE '%" + stxt + "%' OR "
-                    "artist_name LIKE '%" + stxt + "%' OR "
+                    "music_artists.artist_name LIKE '%" + stxt + "%' OR "
                     "album_name  LIKE '%" + stxt + "%' OR "
                     "name    LIKE '%" + stxt + "%')";
              }
@@ -134,7 +134,7 @@ void SearchDialog::runQuery(QString searchText)
                 whereClause += (i) ? " AND ( " : "WHERE (";
                 whereClause +=
                     "filename    REGEXP '" + stxt + "' OR "
-                    "artist_name REGEXP '" + stxt + "' OR "
+                    "music_artists.artist_name REGEXP '" + stxt + "' OR "
                     "album_name  REGEXP '" + stxt + "' OR "
                     "name        REGEXP '" + stxt + "')";
             }
