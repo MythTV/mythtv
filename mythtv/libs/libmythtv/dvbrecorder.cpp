@@ -1078,8 +1078,10 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
             BufferedWrite(tspacket);
     }
     else
-        VERBOSE(VB_IMPORTANT, LOC + QString("Unknown PID 0x%1")
+    {
+        VERBOSE(VB_RECORD, LOC + QString("Unknown PID 0x%1")
                 .arg(pid,0,16));
+    }
 }
 
 void DVBRecorder::GetTimeStamp(const TSPacket& tspacket)
