@@ -277,7 +277,7 @@
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished">Minimum star rating (0.0 to 1.0 for films only)</translation>
+        <translation>Minimum star rating (0.0 to 1.0 for films only)</translation>
     </message>
     <message>
         <source>Person named in the credits (Data Direct)</source>
@@ -341,11 +341,11 @@
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished"></translation>
+        <translation>SportsCentre Overnight (complete example - use FindDaily)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Film of the Week (complete example - use FindWeekly)</translation>
     </message>
     <message>
         <source>First Episodes (complete example for Data Direct)</source>
@@ -7183,7 +7183,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">The number of days bonus a programme gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
@@ -7249,7 +7249,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Movie</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Film</translation>
     </message>
     <message>
         <source>News</source>
@@ -7621,7 +7621,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Offset (in minutes) to apply to the programme guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</translation>
     </message>
     <message>
         <source>(Works for DataDirect listings only.)</source>
@@ -8072,7 +8072,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Additional priority when a showing of an episode, special or movie only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Additional priority when a showing of an episode, special or film only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</translation>
     </message>
     <message>
         <source>Display Large Clock</source>
@@ -8728,7 +8728,7 @@ No other details</source>
     </message>
     <message>
         <source>Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programme Finder</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
@@ -8772,11 +8772,11 @@ No other details</source>
     </message>
     <message>
         <source>Jump to Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Jump to Programme</translation>
     </message>
     <message>
         <source>Recorded Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Record Programme</translation>
     </message>
     <message>
         <source>Default</source>
@@ -9034,11 +9034,11 @@ No other details</source>
     </message>
     <message>
         <source>Program Details:</source>
-        <translation type="unfinished"></translation>
+        <translation>Programme Details:</translation>
     </message>
     <message>
         <source>Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Programme Details</translation>
     </message>
     <message>
         <source>Welcome to MythTV</source>
