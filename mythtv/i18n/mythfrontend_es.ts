@@ -144,11 +144,11 @@
     </message>
     <message>
         <source>DVB-S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
-        <translation type="unfinished">Ajustes de entrada y satélite.</translation>
+        <translation>Ajustes de entrada y satélite.</translation>
     </message>
 </context>
 <context>
@@ -385,15 +385,15 @@
     </message>
     <message>
         <source>Match this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Coincidir con este episodio</translation>
     </message>
     <message>
         <source>First showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Primera emisión de cada episodio</translation>
     </message>
     <message>
         <source>Last showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Última emisión de cada episodio</translation>
     </message>
 </context>
 <context>
@@ -623,7 +623,7 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
     <message>
         <source>Rotor Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Progreso Rotor</translation>
     </message>
 </context>
 <context>
@@ -676,213 +676,213 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     <name>DeviceTree</name>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished">La latitud Cartesiana de su posición.</translation>
+        <translation>La latitud Cartesiana de su posición.</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="unfinished">Use números negativos para coordenadas del sur y oeste.</translation>
+        <translation>Use números negativos para coordenadas del sur y oeste.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished">La longitud Cartesiana de su posición.</translation>
+        <translation>La longitud Cartesiana de su posición.</translation>
     </message>
     <message>
         <source>Device Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo Dispositivo</translation>
     </message>
     <message>
         <source>Switch</source>
-        <translation type="unfinished"></translation>
+        <translation>Switch</translation>
     </message>
     <message>
         <source>Rotor</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>LNB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished">Descripción</translation>
+        <translation>Descripción</translation>
     </message>
     <message>
         <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre descriptivo opcional para este dispositivo, para que sea más fácil configurar los ajustes después.</translation>
     </message>
     <message>
         <source>Switch Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo Switch</translation>
     </message>
     <message>
         <source>Select the type of switch from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija el tipo de interruptor de la lista.</translation>
     </message>
     <message>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Tono</translation>
     </message>
     <message>
         <source>DiSEqC</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>DiSEqC (Uncommitted)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Legacy SW21</source>
-        <translation type="unfinished"></translation>
+        <translation>Antiguo SW21</translation>
     </message>
     <message>
         <source>Legacy SW42</source>
-        <translation type="unfinished"></translation>
+        <translation>Antiguo SW42</translation>
     </message>
     <message>
         <source>Legacy SW64</source>
-        <translation type="unfinished"></translation>
+        <translation>Antiguo SW64</translation>
     </message>
     <message>
         <source>Number of ports</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de puertos</translation>
     </message>
     <message>
         <source>The number of ports this switch has.</source>
-        <translation type="unfinished"></translation>
+        <translation>El número de puertos que tiene este switch.</translation>
     </message>
     <message>
         <source>Switch Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración Switch</translation>
     </message>
     <message>
         <source>Rotor Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo Rotor</translation>
     </message>
     <message>
         <source>Select the type of rotor from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija el tipo de rotor de la lista.</translation>
     </message>
     <message>
         <source>DiSEqC 1.2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>DiSEqC 1.3 (GotoX/USALS)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rotor Low Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Baja Velocidad Rotor (gra/seg)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
-        <translation type="unfinished"></translation>
+        <translation>Para permitir el monotorizado aproximado del rotor, introduzca la velocidad angular del rotor cuando esté a 13V.</translation>
     </message>
     <message>
         <source>Rotor High Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alta Velocidad Rotor (gra/seg)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
-        <translation type="unfinished"></translation>
+        <translation>Para permitir el monotorizado aproximado del rotor, introduzca la velocidad angular del rotor cuando esté a 18V.</translation>
     </message>
     <message>
         <source>E</source>
         <comment>Eastern Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>W</source>
         <comment>Western Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Position Index %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Índice Posición %1</translation>
     </message>
     <message>
         <source>Orbital Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posición Orbital</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">Ninguno</translation>
+        <translation>Ninguno</translation>
     </message>
     <message>
         <source>Position #%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Posición #%1 (%2)</translation>
     </message>
     <message>
         <source>Rotor Position Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Mapa Posición Rotor</translation>
     </message>
     <message>
         <source>Rotor Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración Rotor</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Posiciones</translation>
     </message>
     <message>
         <source>Rotor position setup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajuste posición rotor.</translation>
     </message>
     <message>
         <source>Single (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Simple (Europa)</translation>
     </message>
     <message>
         <source>Universal (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Universal (Europa)</translation>
     </message>
     <message>
         <source>Circular (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation>Circular (N. América)</translation>
     </message>
     <message>
         <source>Linear (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lineal (N. América)</translation>
     </message>
     <message>
         <source>C Band</source>
-        <translation type="unfinished"></translation>
+        <translation>Banda C</translation>
     </message>
     <message>
         <source>DishPro Bandstacked</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>LNB Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Preajuste LNB</translation>
     </message>
     <message>
         <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija el preajuste LNB de la lista, o elija &apos;Personalizado&apos; y ajuste las opciones avanzadas debajo.</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>Personalizado</translation>
     </message>
     <message>
         <source>LNB Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo LNB</translation>
     </message>
     <message>
         <source>Select the type of LNB from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija el tipo de LNB de la lista.</translation>
     </message>
     <message>
         <source>Legacy (Fixed)</source>
-        <translation type="unfinished"></translation>
+        <translation>Antiguo (Fijo)</translation>
     </message>
     <message>
         <source>Standard (Voltage)</source>
-        <translation type="unfinished"></translation>
+        <translation>Estándar (Voltaje)</translation>
     </message>
     <message>
         <source>Universal (Voltage &amp; Tone)</source>
-        <translation type="unfinished"></translation>
+        <translation>Universal (Voltaje &amp; Tono)</translation>
     </message>
     <message>
         <source>Bandstacked</source>
@@ -890,15 +890,15 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
     <message>
         <source>LNB LOF Switch (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This defines at what frequency the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esto define a que frecuencia el LNB cambiará de alto a bajo ajuste, y viceversa.</translation>
     </message>
     <message>
         <source>LNB LOF Low (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB LOF Bajo (MHz)</translation>
     </message>
     <message>
         <source>This defines the offset the frequency coming from the LNB will be in low setting. For bandstacked LNBs this is the vertical/right polarization band.</source>
@@ -914,35 +914,35 @@ AVISO: ¡¡¡No pulse el botón si usa una tarjeta Air2PC HD-5000!!! Esta tarjet
     </message>
     <message>
         <source>LNB Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración LNB</translation>
     </message>
     <message>
         <source>Select Type of Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija Tipo de Dispositivo</translation>
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Árbol Dispositivos DiSEqC</translation>
     </message>
     <message>
         <source>Choose a port to use for this switch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un puerto a usar para este switch.</translation>
     </message>
     <message>
         <source>Port %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Puerto %1</translation>
     </message>
     <message>
         <source>Choose a satellite position.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija una posición de satélite.</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at, in degrees. In the Western hemisphere use &apos;W&apos; as the suffix. In the Eastern hemisphere use &apos;E&apos; as the suffix. </source>
-        <translation type="unfinished"></translation>
+        <translation>La longitud del satélite al que está apuntando. En el hemisferio occidental use &apos;W&apos; como sufijo. En el hemisferio oriental use &apos;E&apos; como sufijo. </translation>
     </message>
     <message>
         <source>DTV Device Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración Dispositivo DTV</translation>
     </message>
 </context>
 <context>
@@ -1924,11 +1924,11 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>Rule Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Regla Búsqueda</translation>
     </message>
     <message>
         <source>(Any Genre)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Cualquier Género)</translation>
     </message>
 </context>
 <context>
@@ -2924,7 +2924,7 @@ Volviendo al menú anterior.</translation>
     </message>
     <message>
         <source>Location of PIP Video window.</source>
-        <translation type="unfinished">Posición de ventana de Video PIP</translation>
+        <translation>Posición de ventana de Video PIP.</translation>
     </message>
     <message>
         <source>Reverse direction in fast forward/rewind</source>
@@ -4555,7 +4555,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
-        <translation>Colorear la guia de programas usando los colores de género. (No disponible para todos los grabbers)</translation>
+        <translation>Colorear la guía de programas usando los colores de género. (No disponible para todos los grabbers)</translation>
     </message>
     <message>
         <source>Only display &apos;favorite&apos; channels</source>
@@ -5863,7 +5863,7 @@ La mayoría de las tarjetas pueden autodetectar, así que déjelo en Auto a no s
     </message>
     <message>
         <source>Resize Video while transcoding</source>
-        <translation type="unfinished">Cambiar de tamaño el video durante la recodificación.</translation>
+        <translation>Cambiar de tamaño el video durante la recodificación</translation>
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
@@ -8449,69 +8449,71 @@ Myth saldrá ahora.</translation>
     <message>
         <source>Page Not Available</source>
         <comment>Requested Teletext page not available</comment>
-        <translation type="unfinished"></translation>
+        <translation>Página No Disponible</translation>
     </message>
     <message>
         <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
-        <translation type="unfinished"></translation>
+        <translation>La opción de buscar sólo canales en frecuencia &quot;Alta&quot; es útil porque la mayoría de los canales digitales están en las frecuencias altas.</translation>
     </message>
     <message>
         <source>Upcoming episodes for this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Siguientes episodios de este título</translation>
     </message>
     <message>
         <source>Upcoming episodes for this rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Siguientes episodios de esta regla</translation>
     </message>
     <message>
         <source>Previously scheduled episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Episodios anteriormente programados</translation>
     </message>
     <message>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija el model que más se parece al suyo. Dependiendo de la revisión del firmware SA4200HD puede funcionar mejor para un SA3250HD.</translation>
     </message>
     <message>
         <source>Freebox MRL</source>
-        <translation type="unfinished"></translation>
+        <translation>MRL Freebox</translation>
     </message>
     <message>
         <source>The FreeBox Media Resource Locator (MRL).</source>
-        <translation type="unfinished"></translation>
+        <translation>La Media Resource Locator (MRL) del FreeBox.</translation>
     </message>
     <message>
         <source>Freebox Network Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabador Freebox</translation>
     </message>
     <message>
         <source>DVB options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones DVB</translation>
     </message>
     <message>
         <source>channel number</source>
-        <translation type="unfinished"></translation>
+        <translation>número canal</translation>
     </message>
     <message>
         <source>Priority When Shown Once</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioridad Única Emisión</translation>
     </message>
     <message>
         <source>Additional priority when a showing of an episode, special or movie only appears once in the current TV listing. This improves the chance that a show will record in it&apos;s only available time slot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioridad adicional cuando la emisión de un episodio, especial o película aparece una sóla vez en el listado actual de TV. Esto mejora la posibilidad de que un programa se grabe en su única franja horaria.</translation>
     </message>
     <message>
         <source>Display Large Clock</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Reloj Grande</translation>
     </message>
     <message>
         <source>On multiline displays try and display the time as large as possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>En pantallas multilínea intentar y mostrar la hora lo más grande posible.</translation>
     </message>
     <message>
         <source>Failed to open 
  &apos;%1&apos; in %2 
 Check if the video exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo al abrir
+&apos;%1&apos; en %2
+Compruebe que el video existe</translation>
     </message>
 </context>
 <context>
@@ -8584,7 +8586,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>M3U Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar M3U</translation>
     </message>
 </context>
 <context>
@@ -8962,7 +8964,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation>Guia Programas</translation>
+        <translation>Guía Programas</translation>
     </message>
     <message>
         <source>Picture-in-Picture</source>
@@ -9435,7 +9437,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Rotor %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor %1%</translation>
     </message>
 </context>
 <context>
@@ -9458,7 +9460,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>&quot;seleccione &quot;Guia de Programas&quot; o &quot;Busqueda de programas&quot;</translation>
+        <translation>Seleccione &quot;Guía de Programas&quot; o &quot;Búsqueda de programas&quot;</translation>
     </message>
     <message>
         <source>(1) Sort by Channel    (2) Sort by Priority</source>
@@ -9482,7 +9484,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>(4) Program Guide   **(6) Program Finder **</source>
-        <translation>(4) Guia de Programas **(6) Busqueda de programas **</translation>
+        <translation>(4) Guía de Programas **(6) Búsqueda de programas **</translation>
     </message>
     <message>
         <source>Select a letter...</source>

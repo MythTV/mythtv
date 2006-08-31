@@ -25,55 +25,55 @@
     <name>ExportNativeWizard</name>
     <message>
         <source>0 Mb</source>
-        <translation type="unfinished">0 Mb</translation>
+        <translation>0 Mb</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Siguiente</translation>
+        <translation>Siguiente</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished">Elejir fichero...</translation>
+        <translation>Elejir fichero...</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished">Myth Archive</translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
-        <translation type="unfinished">¡Necesita seleccionar al menos un elemento a archivar!</translation>
+        <translation>¡Necesita seleccionar al menos un elemento a archivar!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Terminar</translation>
+        <translation>Terminar</translation>
     </message>
     <message>
         <source>All Archive Items</source>
-        <translation type="unfinished">Todos los elementos</translation>
+        <translation>Todos los elementos</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation type="unfinished">Myth Burn</translation>
+        <translation>Myth Burn</translation>
     </message>
     <message>
         <source>You don&apos;t have any items to archive!
 
 Click OK</source>
-        <translation type="unfinished">¡No tiene ningún elemento a archivar!
+        <translation>¡No tiene ningún elemento a archivar!
 
 Pulse OK</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Eliminar Elemento</translation>
+        <translation>Eliminar Elemento</translation>
     </message>
 </context>
 <context>
@@ -111,55 +111,55 @@ Pulse OK</translation>
     <name>ImportNativeWizard</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Atrás</translation>
+        <translation>Atrás</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished">Inicio</translation>
+        <translation>Inicio</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Siguiente</translation>
+        <translation>Siguiente</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Anterior</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished">Myth Archive</translation>
+        <translation>Myth Archive</translation>
     </message>
     <message>
         <source>You need to select a valid archive XML file!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡Necesita seleccionar un fichero XML válido!</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡Necesita seleccionar un IDcanal válido!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Terminar</translation>
+        <translation>Terminar</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un IDcanal</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un NºCanal</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Nombre Canal</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Callsign</translation>
     </message>
 </context>
 <context>
@@ -335,19 +335,19 @@ Pulse OK</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished">Elejir fichero...</translation>
+        <translation>Elija fichero...</translation>
     </message>
     <message>
         <source>Don&apos;t re-encode</source>
-        <translation type="unfinished"></translation>
+        <translation>No recodificar</translation>
     </message>
     <message>
         <source>New Size </source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo Tamaño</translation>
     </message>
     <message>
         <source>Original Size </source>
-        <translation type="unfinished"></translation>
+        <translation>Tamaño Original</translation>
     </message>
 </context>
 <context>
@@ -499,63 +499,63 @@ This may take a few minutes.</source>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lugar donde Myth Archive almacena sus ficheros temporales. Se requiere MUCHO espacio libre.</translation>
     </message>
     <message>
         <source>Always Encode to AC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Siempre Codificar en AC3</translation>
     </message>
     <message>
         <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, las pistas de sonido se recodificarán siempre a AC3 para una mejor compatibilidad con reproductores DVD de paises NTSC.</translation>
     </message>
     <message>
         <source>Copy remote files</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar ficheros remotos</translation>
     </message>
     <message>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado ficheros en sistemas remotos serán copiados localmente antes de procesar. Acelera el procesado y reduce el ancho de banda de la red</translation>
     </message>
     <message>
         <source>Always Use Mythtranscode</source>
-        <translation type="unfinished"></translation>
+        <translation>Siempre usar Mythtranscode</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado los ficheros mpeg2 siempre se pasarán a través de mythtranscode para evitar errores. Puede ayudar a arreglar algunos errores de sonido.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar FIFOs</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation>El script usará FIFOs para pasar la salida de mplex a dvdauthor en ves de crear ficheros intermedios. Ahorra tiempo y espacio durante las operaciones de multiplexado pero no está soportado en plataforma Windows</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Relación Aspecto Menú Principal</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the main menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Relación de aspecto a usar al crear el menú principal.</translation>
     </message>
     <message>
         <source>Chapter Menu Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Relación Aspecto Menú Capítulos</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Relación de aspecto a usar al crear el menú de capítulos. Video significa usar la misma relación de aspecto que el video asociado.</translation>
     </message>
     <message>
         <source>MythArchive Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes MythArchive (2)</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>No fue posible importar el Archivo.  Un error ocurrió al ejecutar &apos;mytharchivehelper&apos;</translation>
     </message>
 </context>
 <context>
@@ -645,7 +645,7 @@ Pulse OK</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN Bloqueo:</translation>
     </message>
 </context>
 </TS>

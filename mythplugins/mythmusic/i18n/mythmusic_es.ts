@@ -349,11 +349,11 @@
     </message>
     <message>
         <source>1 Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Aleatorio: Album</translation>
     </message>
     <message>
         <source>Shuffle: Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Aleatorio: Album</translation>
     </message>
 </context>
 <context>
@@ -908,15 +908,15 @@
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>por defecto</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo de Sonido usado para la reproducción. &apos;por defecto&apos; usará el especificado en MythTV</translation>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Título Desconocido</translation>
     </message>
 </context>
 <context>

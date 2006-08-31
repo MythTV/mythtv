@@ -110,19 +110,19 @@
     </message>
     <message>
         <source>Exiting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Saliendo...</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Guardar Cambios?</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>í</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>No</translation>
     </message>
 </context>
 </TS>

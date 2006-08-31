@@ -384,7 +384,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Desconocido</translation>
+        <translation>Desconocido</translation>
     </message>
 </context>
 </TS>

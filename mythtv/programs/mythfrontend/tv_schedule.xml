@@ -4,7 +4,7 @@
       <type>TV_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
-      <text lang="ES">Guía de programas</text>
+      <text lang="ES">Guía de Programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programmagids</text>
       <text lang="FR">Grille des programmes</text>
@@ -43,7 +43,7 @@
       <type>TV_PROGFIND</type>
       <text>Program Finder</text>
       <text lang="IT">Ricerca programmi</text>
-      <text lang="ES">Buscar programas</text>
+      <text lang="ES">Buscar Programas</text>
       <text lang="CA">Cercar programes</text>
       <text lang="NL">Programma's Zoeken</text>
       <text lang="FR">Recherche d'émission</text>

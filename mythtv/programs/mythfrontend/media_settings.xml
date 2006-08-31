@@ -3,7 +3,7 @@
    <button>
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
-     <text lang="ES">Configurar Música</text>
+     <text lang="ES">Música</text>
      <text lang="FR">Musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
@@ -26,7 +26,7 @@
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
-       <text lang="ES">Configurar Videos</text>
+       <text lang="ES">Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Vidéos</text>
        <text lang="DE">Videos</text>
@@ -51,7 +51,7 @@
      <text>DVD Settings</text>
      <text lang="DE">DVD</text>
      <text lang="PT">Configurar DVD</text>
-     <text lang="ES">Configurar DVD</text>
+     <text lang="ES">DVD</text>
      <text lang="CA">Configurar DVD</text>
      <text lang="FR">DVD</text>
      <text lang="IS">Stillingar DVD</text>
@@ -71,7 +71,7 @@
    <button>
       <type>SETTINGS_IMAGES</type>
       <text>Images Settings</text>
-      <text lang="ES">Configurar Fotos</text>
+      <text lang="ES">Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="FR">Images</text>
       <text lang="DE">Bilder</text>
@@ -94,7 +94,7 @@
    <button>
      <type>SETTINGS_GAME</type>
      <text>Game Settings</text>
-     <text lang="ES">Configurar Juegos</text>
+     <text lang="ES">Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
      <text lang="FR">Jeux</text>
@@ -126,7 +126,7 @@
      <text lang="ET">Raadio seaded</text>
      <text lang="NB">Radioinnstillinger</text>
      <text lang="DK">Radioindstillinger</text>
-     <text lang="ES">Configurar Radio</text>
+     <text lang="ES">Radio</text>
      <text lang="PT">Configurar Rádio</text>
      <text lang="NL">Radio Instellingen</text>
      <action>CONFIGPLUGIN mythfm</action>
@@ -150,6 +150,7 @@
       <type>SETTINGS_ARCHIVE</type>
       <text>Archive Files Settings</text>
       <text lang="SV">Filarkivering</text>
+      <text lang="ES">Archivado Ficheros</text>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>
