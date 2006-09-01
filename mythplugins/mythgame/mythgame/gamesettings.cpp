@@ -169,7 +169,7 @@ public:
     Extensions(const MythGamePlayerSettings& parent):
         MGSetting(parent, "extensions") {
         setLabel(QObject::tr("File Extensions"));
-        setHelpText(QObject::tr("List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator"));
+        setHelpText(QObject::tr("A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator"));
     };
 };
 
