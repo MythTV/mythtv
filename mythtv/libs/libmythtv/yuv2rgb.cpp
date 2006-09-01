@@ -682,7 +682,108 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
     }
 }
 
-#ifdef HAVE_ALTIVEC
+/* YUV420 to VUY2 colorspace conversion routines.
+ *
+ * In the early days of the OS X port of MythTV, Paul Jara noticed that
+ * QuickTime spent a lot of time converting from YUV420 to YUV422.
+ * He found some sample code on the Ars Technica forum by a
+ * Frenchman called Titer which used Altivec to speed this up.
+ * Jeremiah Morris took that code and added it into MythTV.
+ *
+ * All was well until the Intel Macs came along,
+ * which seem to crash when fed YUV420 from MythTV.
+ *
+ * Fortunately, Mino Taoyama has provided an MMX optimised version too.
+ */
+
+#ifdef MMX
+static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
+                             uint8_t * pu, uint8_t * pv,
+                             int h_size, int v_size,
+                             int vuy_stride, int y_stride, int uv_stride)
+{
+    uint8_t *ibuf1 = image;
+    uint8_t *ibuf2 = image;
+    uint8_t *ybuf1 = py;
+    uint8_t *ybuf2 = py;
+    uint8_t *ubuf = pu;
+    uint8_t *vbuf = pv;
+    
+    int x,y;
+    
+    for(y = v_size/2; y--; )
+    {
+        ibuf1 = ibuf2;
+        ibuf2 += h_size * 2;
+        ybuf1 = ybuf2;
+        ybuf2 += h_size;
+        
+        for(x = 0; x < h_size / 16; x++)
+        {
+            
+            movq_m2r (*ybuf1, mm0);   // y data
+            movq_m2r (*ybuf2, mm1);   // y data
+            movq_m2r (*ubuf, mm2);    // u data
+            movq_m2r (*vbuf, mm3);    // v data
+            
+            movq_r2r (mm2, mm4);      // Copy U
+            
+            punpcklbw_r2r (mm3, mm2); // Combine low U & V  mm2 = uv low
+            punpckhbw_r2r (mm3, mm4); // Combine high U & V mm4 = uv high
+            
+            movq_r2r (mm2, mm5);      // Copy low UV  mm5 = uv low
+            movq_r2r (mm2, mm6);      // Copy low UV  mm6 = uv low
+            punpcklbw_r2r (mm0, mm5); // mm5 = y1 low uv low
+            punpckhbw_r2r (mm0, mm6); // mm6 = y1 high uv high
+            
+            movntq_r2m (mm5, *(ibuf1));
+            movntq_r2m (mm6, *(ibuf1+8));
+    
+            movq_r2r (mm2, mm5);      // Copy low UV mm5 = uv low
+            movq_r2r (mm2, mm6);      // Copy low UV mm6 = uv low
+	    punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
+            punpckhbw_r2r (mm1, mm6); // mm6 = y2 high uv high
+    
+            movntq_r2m (mm5, *(ibuf2));
+            movntq_r2m (mm6, *(ibuf2+8));
+    
+    
+            movq_m2r (*(ybuf1+8), mm0); // y data
+            movq_m2r (*(ybuf2+8), mm1); // y data
+    
+            movq_r2r (mm4, mm5);      // Copy high UV mm5 = uv high
+            movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high
+            punpcklbw_r2r (mm0, mm5); // mm5 = y1 low uv high
+            punpckhbw_r2r (mm0, mm6); // mm6 = y1 high uv high
+            
+            movntq_r2m (mm5, *(ibuf1+16));
+            movntq_r2m (mm6, *(ibuf1+24));
+            
+            movq_r2r (mm4, mm5);      // Copy high UV mm5 = uv high
+            movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high     
+            punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
+            punpckhbw_r2r (mm1, mm6); // mm6 = y2 high uv high
+    
+            movntq_r2m (mm5, *(ibuf2+16));
+            movntq_r2m (mm6, *(ibuf2+24));
+            
+            ibuf1 += 32;
+            ibuf2 += 32;
+            ybuf1 += 16;
+            ybuf2 += 16;
+            ubuf += 8;
+            vbuf += 8;
+        }
+        ibuf2 += vuy_stride;
+        ybuf2 += y_stride;
+        ubuf += uv_stride;
+        vbuf += uv_stride;
+    }
+}
+
+#endif // MMX
+
+
 static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
                                  uint8_t * pu, uint8_t * pv,
                                  int h_size, int v_size,
@@ -716,6 +817,9 @@ static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
         pi2 += vuy_stride;
     }
 }
+
+
+#ifdef HAVE_ALTIVEC
 
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
@@ -807,13 +911,35 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     }
 }
 
-yuv2vuy_fun yuv2vuy_init_altivec (void)
+#endif // HAVE_ALTIVEC
+
+
+/** \fn     get_vuy2yuv_conv(void)
+ *  \return A pointer to a YUV to VUY conversion function,
+ *          which uses Altivec on appropriate machines,
+ *          or MMX if it was compiled in.
+ */
+yuv2vuy_fun get_yuv2vuy_conv(void)
 {
+#ifdef HAVE_ALTIVEC
     if (has_altivec())
         return altivec_yuv420_2vuy;
-    else
-        return non_vec_yuv420_2vuy; /* Fallback to C */
+#endif
+
+#ifdef MMX
+    return mmx_yuv420_2vuy;
+#endif
+
+    return non_vec_yuv420_2vuy; /* Fallback to C */
 }
+
+
+
+/* 2VUY to YUV420 conversion routines
+ *
+ * For completeness, and as another Altivec assembler example.
+ * Note that we have no MMX version of this.
+ */
 
 static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
                                  uint8_t * pu, uint8_t * pv,
@@ -848,6 +974,8 @@ static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
         pi2 += vuy_stride;
     }
 }
+
+#ifdef HAVE_ALTIVEC
 
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
@@ -943,17 +1071,18 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
     }
 }
 
-/** \fn vuy2yuv_init_altivec (void)
- *  \brief This returns a vuy to yuv converter, using
- *         Altivec if it was compiled in.
- *
- *  \return function pointer or NULL if converter could not be found.
+#endif // HAVE_ALTIVEC
+
+
+/** \fn     get_vuy2yuv_conv(void)
+ *  \return A pointer to a VUY to YUV conversion function,
+ *          which uses Altivec on appropriate machines.
  */
-vuy2yuv_fun vuy2yuv_init_altivec (void)
+vuy2yuv_fun get_vuy2yuv_conv(void)
 {
+#ifdef HAVE_ALTIVEC
     if (has_altivec())
         return altivec_2vuy_yuv420;
-    else
-        return non_vec_2vuy_yuv420; /* Fallback to C */
+#endif
+    return non_vec_2vuy_yuv420; /* Fallback to C */
 }
-#endif // HAVE_ALTIVEC

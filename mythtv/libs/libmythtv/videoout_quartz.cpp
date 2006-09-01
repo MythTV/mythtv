@@ -409,7 +409,7 @@ void VideoOutputQuartzView::Transform(void)
       accel->MoveResize(0, 0, parentData->srcWidth, parentData->srcHeight,
                         (int)((w - sw) / 2.0), (int)((h - sh) / 2.0),
                         sw, sh);
-#endif // CONFIG_MAC_ACCEL                        
+#endif
 
     // apply over/underscan
     int hscan = gContext->GetNumSetting("HorizScanPercentage", 5);
@@ -1339,7 +1339,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
     
     if (gContext->GetNumSetting("MacYuvConversion", 1))
-        data->yuvConverter = yuv2vuy_init_altivec();
+        data->yuvConverter = get_yuv2vuy_conv();
     else
         data->yuvConverter = NULL;
 
@@ -1453,7 +1453,11 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     ImageDescription *desc = *data->imgDesc;
 
     desc->idSize = sizeof(ImageDescription);
+#ifdef WORDS_BIGENDIAN
     desc->cType = kYUV420CodecType;
+#else
+    desc->cType = kComponentVideoCodecType;  // Wrong, but prevents Intel crash
+#endif
     desc->version = 1;
     desc->revisionLevel = 0;
     desc->spatialQuality = codecNormalQuality;

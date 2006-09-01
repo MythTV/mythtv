@@ -3112,14 +3112,15 @@ static HostCheckBox *MacGammaCorrect()
 static HostCheckBox *MacYuvConversion()
 {
     HostCheckBox *gc = new HostCheckBox("MacYuvConversion");
-    gc->setLabel(QObject::tr("Use Altivec-enhanced color space conversion"));
-#ifdef HAVE_ALTIVEC
+    gc->setLabel(QObject::tr("Use Vector-enhanced color space conversion"));
+#if defined(HAVE_ALTIVEC) || defined(MMX)
     gc->setValue(true);
 #else
     gc->setValue(false);
 #endif
     gc->setHelpText(QObject::tr("If checked, YUV 4:2:0 will be converted to "
-                    "UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, "
+                    "UYVY 4:2:2 in an Altivec/MMX enabled routine.  "
+                    "If unchecked, "
                     "QuickTime will handle the conversion instead."));
     return gc;
 }
