@@ -2403,77 +2403,16 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "JUMPRWND")
         {
             if (activerbuffer->isDVD())
-            {
-                if (activerbuffer->InDVDMenuOrStillFrame())
-                    UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
-                                         osd_general_timeout);
-                else if (!activerbuffer->DVD()->StartOfTitle())
-                {
-                    activenvp->ChangeDVDTrack(0);
-                    UpdateOSDSeekMessage(tr("Previous Chapter"),
-                                            osd_general_timeout);
-                }
-                else
-                {
-                    uint titleLength = activerbuffer->DVD()->GetTotalTimeOfTitle();
-                    uint chapterLength = activerbuffer->DVD()->GetChapterLength();
-                    if ((titleLength == chapterLength) &&
-                        chapterLength > 300)
-                    {
-                        DoSeek(-jumptime * 60, tr("Jump Back"));
-                    } 
-                    else
-                    {                        
-                        activenvp->GoToDVDProgram(0);
-                        UpdateOSDSeekMessage(tr("Previous Title"),
-                                                osd_general_timeout);
-                    }
-                }
-            }
+                DVDJumpBack();       
             else
-            {
                 DoSeek(-jumptime * 60, tr("Jump Back"));
-            }
         }
         else if (action == "JUMPFFWD")
         {
             if (activerbuffer->isDVD())
-            {
-                if (activerbuffer->DVD()->InStillFrame())
-                {
-                    activerbuffer->DVD()->SkipStillFrame();
-                    UpdateOSDSeekMessage(tr("Skip Still Frame"),
-                            osd_general_timeout);
-                }
-                else if (!activerbuffer->DVD()->EndOfTitle()) 
-                {
-                    activenvp->ChangeDVDTrack(1);
-                    UpdateOSDSeekMessage(tr("Next Chapter"),
-                            osd_general_timeout);
-                }
-                else if (!activerbuffer->DVD()->NumMenuButtons())
-                {
-                    uint titleLength = activerbuffer->DVD()->GetTotalTimeOfTitle();
-                    uint chapterLength = activerbuffer->DVD()->GetChapterLength();
-                    uint currentTime = activerbuffer->DVD()->GetCurrentTime();
-                    if ((titleLength == chapterLength) &&
-                        (currentTime < (chapterLength - (jumptime * 60))) &&
-                        chapterLength > 300)
-                    {
-                        DoSeek(jumptime * 60, tr("Jump Ahead"));
-                    }
-                    else
-                    {
-                        activenvp->GoToDVDProgram(1);
-                        UpdateOSDSeekMessage(tr("Next Title"), 
-                            osd_general_timeout);
-                    }
-                }
-            }
+                DVDJumpForward();
             else
-            {
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
-            }
         }
         else if (action == "JUMPBKMRK" && !activerbuffer->isDVD())
         {
@@ -2808,29 +2747,17 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
             {
-                if (activerbuffer->isDVD() && !activerbuffer->InDVDMenuOrStillFrame())
-                {
-                    activenvp->ChangeDVDTrack(0);
-                    UpdateOSDSeekMessage(tr("Previous Chapter"),
-                                         osd_general_timeout);
-                }
+                if (activerbuffer->isDVD()) 
+                    DVDJumpBack();
                 else
-                {
                     DoSeek(-jumptime * 60, tr("Jump Back"));
-                }
             }    
             else if (action == "CHANNELDOWN")
             {
-                if (activerbuffer->isDVD() && !activerbuffer->InDVDMenuOrStillFrame())
-                {
-                    activenvp->ChangeDVDTrack(1);
-                    UpdateOSDSeekMessage(tr("Next Chapter"),
-                                         osd_general_timeout);
-                }
+                if (activerbuffer->isDVD())
+                    DVDJumpForward();
                 else
-                {
                     DoSeek(jumptime * 60, tr("Jump Ahead"));
-                }
             }
             else
                 handled = false;
@@ -7067,6 +6994,79 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
     }
 
     return found;
+}
+
+/* \fn TV::DVDJumpForward(void)
+ * \brief jump to the previous dvd title or chapter
+ */
+void TV::DVDJumpBack(void)
+{
+    if (!activerbuffer->isDVD())
+     return;
+               
+    if (activerbuffer->InDVDMenuOrStillFrame())
+        UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
+                                osd_general_timeout);
+    else if (!activerbuffer->DVD()->StartOfTitle())
+    {
+        activenvp->ChangeDVDTrack(0);
+        UpdateOSDSeekMessage(tr("Previous Chapter"),
+                                osd_general_timeout);
+    }
+    else
+    {
+        uint titleLength = activerbuffer->DVD()->GetTotalTimeOfTitle();
+        uint chapterLength = activerbuffer->DVD()->GetChapterLength();
+        if ((titleLength == chapterLength) && chapterLength > 300)
+        {
+            DoSeek(-jumptime * 60, tr("Jump Back"));
+        }
+        else
+        {
+            activenvp->GoToDVDProgram(0);
+            UpdateOSDSeekMessage(tr("Previous Title"),
+                                    osd_general_timeout);
+        }
+    }
+}
+
+/* \fn TV::DVDJumpForward(void)
+ * \brief jump to the next dvd title or chapter
+ */
+void TV::DVDJumpForward(void)
+{
+    if (!activerbuffer->isDVD())
+        return;
+    if (activerbuffer->DVD()->InStillFrame())
+    {
+        activerbuffer->DVD()->SkipStillFrame();
+        UpdateOSDSeekMessage(tr("Skip Still Frame"),
+                                osd_general_timeout);
+    }
+    else if (!activerbuffer->DVD()->EndOfTitle())
+    {
+        activenvp->ChangeDVDTrack(1);
+        UpdateOSDSeekMessage(tr("Next Chapter"),
+                                osd_general_timeout);
+    }
+    else if (!activerbuffer->DVD()->NumMenuButtons())
+    {
+        uint titleLength = activerbuffer->DVD()->GetTotalTimeOfTitle();
+        uint chapterLength = activerbuffer->DVD()->GetChapterLength();
+        uint currentTime = activerbuffer->DVD()->GetCurrentTime();
+        if ((titleLength == chapterLength) &&
+            (currentTime < (chapterLength - (jumptime * 60))) &&
+            chapterLength > 300)
+        {
+            DoSeek(jumptime * 60, tr("Jump Ahead"));
+        }
+        else
+        {
+            activenvp->GoToDVDProgram(1);
+            UpdateOSDSeekMessage(tr("Next Title"),
+                                osd_general_timeout);
+        }
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

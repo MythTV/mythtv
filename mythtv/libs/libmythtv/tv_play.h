@@ -340,6 +340,10 @@ class TV : public QObject
 
     void ITVRestart(bool isLive);
 
+    //dvd functions
+    void DVDJumpBack(void);
+    void DVDJumpForward(void);       
+
     static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,
                                       const QString &videoFile);
 
