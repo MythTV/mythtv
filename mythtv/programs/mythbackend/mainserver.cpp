@@ -1627,7 +1627,7 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
     // Round truncate increment up to a blocksize, w/min of 1 block.
     increment = ((increment / buf.st_blksize) + 1) * buf.st_blksize;
 
-    while (fsize > increment)
+    while (fsize > 0)
     {
         //VERBOSE(VB_FILE, QString("Truncating '%1' to %2 MB")
         //        .arg(filename).arg(fsize / (1024.0 * 1024.0), 0, 'f', 2));
