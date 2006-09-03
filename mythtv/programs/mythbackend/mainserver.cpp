@@ -1647,7 +1647,8 @@ bool MainServer::TruncateAndClose(const AutoExpire *expirer,
 
     bool ok = (0 == close(fd));
 
-    usleep((sleep_time * fsize * 1000) / increment);
+    if (fsize > 0)
+        usleep((sleep_time * fsize * 1000) / increment);
 
     VERBOSE(VB_FILE, QString("Finished truncating '%1'").arg(filename));
 
