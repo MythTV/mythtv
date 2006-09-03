@@ -1064,7 +1064,7 @@ void DVBRecorder::ProcessTSPacket2(const TSPacket& tspacket)
     {
         // Sync streams to the first Payload Unit Start Indicator
         // _after_ first keyframe iff _wait_for_keyframe_option is true
-        if (!info->payloadStartSeen)
+        if (!info->payloadStartSeen && tspacket.HasPayload())
         {
             if (!tspacket.PayloadStart())
                 return; // not payload start - drop packet
