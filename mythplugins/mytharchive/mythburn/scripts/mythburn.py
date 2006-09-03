@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060828-1"
+VERSION="0.1.20060903-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -357,6 +357,43 @@ def getLengthOfVideo(index):
         duration = 0;
 
     return duration
+
+def getAudioParams(folder):
+    """Returns the audio bitrate and no of channels for a file from its streaminfo.xml"""
+
+    #open the XML containing information about this file
+    infoDOM = xml.dom.minidom.parse(os.path.join(folder, 'streaminfo.xml'))
+
+    #error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "file":
+        fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+    audio = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("audio")[0]
+
+    samplerate = audio.attributes["samplerate"].value
+    channels = audio.attributes["channels"].value
+
+    return (samplerate, channels)
+
+def getVideoParams(folder):
+    """Returns the video resolution, fps and aspect ratio for the video file from the streamindo.xml file"""
+
+    #open the XML containing information about this file
+    infoDOM = xml.dom.minidom.parse(os.path.join(folder, 'streaminfo.xml'))
+
+    #error out if its the wrong XML
+    if infoDOM.documentElement.tagName != "file":
+        fatalError("Stream info file doesn't look right (%s)" % os.path.join(getItemTempPath(index), 'streaminfo.xml'))
+    video = infoDOM.getElementsByTagName("file")[0].getElementsByTagName("streams")[0].getElementsByTagName("video")[0]
+
+    if video.attributes["aspectratio"].value != 'N/A':
+        aspect_ratio = video.attributes["aspectratio"].value
+    else:
+        aspect_ratio = "1.77778" 
+
+    videores = video.attributes["width"].value + 'x' + video.attributes["height"].value
+    fps = video.attributes["fps"].value
+
+    return (videores, fps, aspect_ratio)
 
 def getAspectRatioOfVideo(index):
     """Returns the aspect ratio of the video file (1.333, 1.778, etc)"""
@@ -1255,6 +1292,80 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         if result!=0:
             fatalError("Failed while running ffmpeg (Pass 2) to re-encode video.\n"
                        "Command was %s" % command)
+
+def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutlist):
+    """Encodes a nuv video source file to MPEG2 video and AC3 audio, using mythtranscode & ffmpeg"""
+
+    profileNode = findEncodingProfile(profile)
+    parameters = profileNode.getElementsByTagName("parameter")
+
+    # default values - will be overriden by values from the profile 
+    outvideobitrate = 5000
+    if videomode == "ntsc":
+        outvideores = "720x480"
+    else:
+        outvideores = "720,576"
+
+    outaudiochannels = 2
+    outaudiobitrate = 384
+    outaudiosamplerate = 48000
+    outaudiocodec = "ac3"
+
+    for param in parameters:
+        name = param.attributes["name"].value
+        value = param.attributes["value"].value
+
+        # we only support a subset of the parameter for the moment
+        if name == "-acodec":
+            outaudiocodec = value
+        if name == "-ac":
+            outaudiochannels = value
+        if name == "-ab":
+            outaudiobitrate = value
+        if name == "-ar":
+            outaudiosamplerate = value
+        if name == "-b":
+            outvideobitrate = value
+        if name == "-s":
+            outvideores = value
+
+    if (usecutlist == True):
+        PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
+                    '-p', '27',
+                    '-c', chanid,
+                    '-s', starttime,
+                    '--honorcutlist',
+                    '-f', folder)
+        write("mythtranscode started (using cut list) PID = %s" % PID)
+    else:
+        PID=os.spawnlp(os.P_NOWAIT, "mythtranscode", "mythtranscode",
+                    '-p', '27',
+                    '-c', chanid,
+                    '-s', starttime,
+                    '-f', folder)
+
+        write("mythtranscode started PID = %s" % PID)
+
+
+    samplerate, channels = getAudioParams(folder)
+    videores, fps, aspectratio = getVideoParams(folder)
+
+    command =  path_ffmpeg[0] + " -y "
+    command += "-f s16le -ar %s -ac %s -i %s " % (samplerate, channels, os.path.join(folder, "audout")) 
+    command += "-f rawvideo -pix_fmt yuv420p -s %s -aspect %s -r %s " % (videores, aspectratio, fps)
+    command += "-i %s " % os.path.join(folder, "vidout")
+    command += "-aspect %s -r %s -s %s -b %s " % (aspectratio, fps, outvideores, outvideobitrate)
+    command += "-vcodec mpeg2video -qmin 5 "
+    command += "-ab %s -ar %s -acodec %s " % (outaudiobitrate, outaudiosamplerate, outaudiocodec)
+    command += "-f dvd %s" % quoteFilename(destvideofile)
+
+    time.sleep(2)
+    write("Running ffmpeg")
+    result = runCommand(command)
+    if result != 0:
+        os.kill(PID, SIGKILL)
+        fatalError("Failed while running ffmpeg to re-encode video.\n"
+                   "Command was %s" % command)
 
 def runDVDAuthor():
     write( "Starting dvdauthor")
@@ -2799,32 +2910,68 @@ def processFile(file, folder):
 
     #do we need to re-encode the file to make it DVD compliant?
     if not isFileOkayForDVD(file, folder):
-        #we need to re-encode the file, make sure we get the right video/audio streams
-        #would be good if we could also split the file at the same time
-        getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
+        if getFileType(folder) == 'nuv':
+            #file is a nuv file which ffmpeg has problems reading so use mythtranscode to pass
+            #the video and audio stream to ffmpeg to do the reencode
 
-        #choose which streams we need
-        video, audio1, audio2 = selectStreams(folder)
+            #we need to re-encode the file, make sure we get the right video/audio streams
+            #would be good if we could also split the file at the same time
+            getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
 
-        #choose which aspect ratio we should use
-        aspectratio = selectAspectRatio(folder)
+            #choose which streams we need
+            video, audio1, audio2 = selectStreams(folder)
 
-        write("Re-encoding audio and video")
+            #choose which aspect ratio we should use
+            aspectratio = selectAspectRatio(folder)
 
-        # Run from local file?
-        if file.hasAttribute("localfilename"):
-            mediafile = file.attributes["localfilename"].value
+            write("Re-encoding audio and video from nuv file")
 
-        # what encoding profile should we use
-        if file.hasAttribute("encodingprofile"):
-            profile = file.attributes["encodingprofile"].value
+            # Run from local file?
+            if file.hasAttribute("localfilename"):
+                mediafile = file.attributes["localfilename"].value
+
+            # what encoding profile should we use
+            if file.hasAttribute("encodingprofile"):
+                profile = file.attributes["encodingprofile"].value
+            else:
+                profile = defaultEncodingProfile
+
+            chanid = getText(infoDOM.getElementsByTagName("chanid")[0])
+            starttime = getText(infoDOM.getElementsByTagName("starttime")[0])
+            usecutlist = (file.attributes["usecutlist"].value == "1" and 
+                          getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes")
+
+            #do the re-encode
+            encodeNuvToMPEG2(chanid, starttime, os.path.join(folder, "newfile2.mpg"), folder,
+                             profile, usecutlist)
+            mediafile = os.path.join(folder, 'newfile2.mpg')
         else:
-            profile = defaultEncodingProfile
+            #we need to re-encode the file, make sure we get the right video/audio streams
+            #would be good if we could also split the file at the same time
+            getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
 
-        #do the re-encode 
-        encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video,
-                           audio1, audio2, aspectratio, profile)
-        mediafile = os.path.join(folder, 'newfile2.mpg')
+            #choose which streams we need
+            video, audio1, audio2 = selectStreams(folder)
+
+            #choose which aspect ratio we should use
+            aspectratio = selectAspectRatio(folder)
+
+            write("Re-encoding audio and video")
+
+            # Run from local file?
+            if file.hasAttribute("localfilename"):
+                mediafile = file.attributes["localfilename"].value
+
+            # what encoding profile should we use
+            if file.hasAttribute("encodingprofile"):
+                profile = file.attributes["encodingprofile"].value
+            else:
+                profile = defaultEncodingProfile
+
+            #do the re-encode 
+            encodeVideoToMPEG2(mediafile, os.path.join(folder, "newfile2.mpg"), video,
+                            audio1, audio2, aspectratio, profile)
+            mediafile = os.path.join(folder, 'newfile2.mpg')
 
     #remove an intermediate file
     if os.path.exists(os.path.join(folder, "newfile1.mpg")):
