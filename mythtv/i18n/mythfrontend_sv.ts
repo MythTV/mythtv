@@ -5132,14 +5132,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Låt QuickTime korrigera bildens gammavärde för att matcha din monitor. Att stänga av detta kan spara några CPU-cykler.</translation>
     </message>
     <message>
-        <source>Use Altivec-enhanced color space conversion</source>
-        <translation>Använd Altivec-förbättrad färgrymdskonvertering</translation>
-    </message>
-    <message>
-        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Konvertera YUV 4:2:0 till UYVY 4:2:2 i en Altivec-optimerad rutin. Annars hanterar QuickTime konverteringen i stället.</translation>
-    </message>
-    <message>
         <source>Recording Host</source>
         <translation>Inspelningsvärd</translation>
     </message>
@@ -8126,6 +8118,14 @@ Kontrollera om videon existerar</translation>
     <message>
         <source>URL of the incoming stream (ex.: udp://?localport=1234)</source>
         <translation>URL för inkommande ström (ex.: udp://?localport=1234)</translation>
+    </message>
+    <message>
+        <source>Use Vector-enhanced color space conversion</source>
+        <translation>Använd vektor-förbättrad färgrymdskonvertering</translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec/MMX enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation>Konvertera YUV 4:2:0 till UYVY 4:2:2 i en Altivec/MMX-optimerad rutin. Annars hanterar QuickTime konverteringen i stället.</translation>
     </message>
 </context>
 <context>

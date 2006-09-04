@@ -136,10 +136,6 @@ Välj en.</translation>
         <translation>Filändelser</translation>
     </message>
     <message>
-        <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation>Lista över alla filändelser som används av denna emulator. Tomt betyder att alla filer under Rom-sökvägen anses användas av denna emulator</translation>
-    </message>
-    <message>
         <source>ScreenShots</source>
         <translation>Skärmdumpar</translation>
     </message>
@@ -268,6 +264,10 @@ att du vill göra detta?</translation>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
         <translation>SEGA/MASTER SYSTEM</translation>
+    </message>
+    <message>
+        <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
+        <translation>Kommaseparerad lista över alla filändelser som används av denna emulator. Tomt betyder att alla filer under Rom-sökvägen anses användas av denna emulator</translation>
     </message>
 </context>
 <context>
