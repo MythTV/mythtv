@@ -132,6 +132,13 @@ class ConfigurationGroup: virtual public Configurable
     void setUseLabel(bool useit) { uselabel = useit; }
     void setUseFrame(bool useit) { useframe = useit; }
 
+    void setOptions(bool luselabel = true, bool luseframe = true,
+                    bool lzeroMargin = false, bool lzeroSpace = false)
+    {
+        uselabel = luselabel; useframe = luseframe;
+        zeroMargin = lzeroMargin; zeroSpace = lzeroSpace;
+    }
+
   signals:
     void changeHelpText(QString);
     
