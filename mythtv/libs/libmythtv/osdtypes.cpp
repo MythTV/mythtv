@@ -1254,14 +1254,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 {
     QString ckey;
 
-    if (usecache)
-    {   
-        if (!filename.isEmpty() && filename.length() >= 2)
-            ckey = OSDImageCache::CreateKey(filename, wmult, hmult, 
-                                            scalew, scaleh);
-        else 
-            return; // this method requires a backing file
-    }
+    m_isvalid = false;
 
     // Discard any in-cache items..
     if (m_cacheitem && !usecache)
@@ -1277,12 +1270,16 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
         if (m_alpha)
             delete [] m_alpha;
         m_alpha = NULL;
-
-        m_isvalid = false; 
     }
 
     if (usecache)
     {
+        if (!filename.isEmpty() && filename.length() >= 2)
+            ckey = OSDImageCache::CreateKey(filename, wmult, hmult,
+                                            scalew, scaleh);
+        else
+            return; // this method requires a backing file
+
         // Get the item from the cache so it's not freed while in use
         OSDImageCacheValue *value = c_cache.Get(ckey, true);
   
@@ -1295,6 +1292,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
             m_alpha     = value->m_alpha;
             m_imagesize = value->m_imagesize;
             m_isvalid   = true;
+            m_filename  = filename;
 
             // Put the old image back to the cache so it can be reused in the
             // future, and possibly freed by the cache system if the size limit
@@ -1333,6 +1331,7 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
     QImage tmp2 = tmpimage.smoothScale(imwidth, imheight);
 
     m_isvalid = true;
+    m_filename = filename;
 
     m_yuv = new unsigned char[imwidth * imheight * 3 / 2];
     m_ybuffer = m_yuv;
