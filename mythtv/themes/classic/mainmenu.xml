@@ -261,6 +261,7 @@
        <text>Archive Files</text>
        <text lang="ET">Arhiveerimine</text>
        <text lang="SV">Arkivera filer</text>
+       <text lang="NL">Bestanden Archiveren</text>
        <text lang="RU">Архив файлов</text>
        <action>PLUGIN mytharchive</action>
        <depends>mytharchive</depends>

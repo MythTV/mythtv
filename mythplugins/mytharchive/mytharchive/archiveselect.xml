@@ -5,6 +5,7 @@
       <text>Select Recordings</text>
       <text lang="es">Seleccionar Grabaciones</text>
       <text lang="et">Salvestiste valimine</text>
+      <text lang="nl">Selecteer Opnames</text>
       <action>ARCHIVE_SELECT_RECORDINGS</action>
    </button>
 
@@ -13,6 +14,7 @@
       <text>Select Video Files</text>
       <text lang="es">Seleccionar Ficheros Video</text>
       <text lang="et">Videofailide valimine</text>
+      <text lang="nl">Selecteer Film Bestanden</text>
       <action>ARCHIVE_SELECT_VIDEOS</action>
    </button>
 
@@ -21,6 +23,7 @@
        <text>Select Files</text>
        <text lang="es">Seleccionar Ficheros</text>
        <text lang="et">Failide valimine</text>
+       <text lang="nl">Selecteer Bestanden</text>
        <action>ARCHIVE_SELECT_FILES</action>
    </button>
 
