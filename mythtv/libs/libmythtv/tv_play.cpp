@@ -3216,9 +3216,11 @@ QString TV::PlayMesg()
         mesg = mesg.arg(normal_speed);
     }
 
+/*
     FrameScanType scan = activenvp->GetScanType();
     if (is_progressive(scan) || is_interlaced(scan))
         mesg += " (" + frame_scan_to_string(scan, true) + ")";
+*/
 
     return mesg;
 }
