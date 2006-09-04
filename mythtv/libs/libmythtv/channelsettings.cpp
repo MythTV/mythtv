@@ -276,13 +276,13 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id) :
 
     Source *source;
 
-    HorizontalConfigurationGroup* group1 = new HorizontalConfigurationGroup(false,true);
+    HorizontalConfigurationGroup* group1 = new HorizontalConfigurationGroup(false,false,true,true);
 
     VerticalConfigurationGroup* left = new VerticalConfigurationGroup(false,true);
     left->addChild(new Channum(id));
     left->addChild(new Callsign(id));
 
-    HorizontalConfigurationGroup *lefthoz = new HorizontalConfigurationGroup(false,true);
+    HorizontalConfigurationGroup *lefthoz = new HorizontalConfigurationGroup(false,false,true,true);
 
     lefthoz->addChild(new Visible(id));
     lefthoz->addChild(new CommFree(id));
