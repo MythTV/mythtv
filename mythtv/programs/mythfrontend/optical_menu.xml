@@ -92,12 +92,12 @@
    </button>
 
    <button>
-      <text lang="ET">Arhiveerimine</text>
       <type>ARCHIVE</type>
       <text>Archive Files</text>
       <text lang="SV">Arkivera filer</text>
       <text lang="ES">Archivar Ficheros</text>
       <text lang="RU">Архивировать файлы</text>
+      <text lang="ET">Arhiveerimine</text>
       <action>PLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>
@@ -123,10 +123,10 @@
       <text lang="NB">Importer CD</text>
       <text lang="CZ">Načíst CD</text>
       <text lang="RU">Импортировать CD</text>
+      <text lang="ET">Meedia väljastamine</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>
-      <text lang="ET">Meedia väljastamine</text>
 
    <button>
       <type>EJECT</type>
