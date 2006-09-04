@@ -792,12 +792,15 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     {
         while (query.next())
         {
-            if (query.value(3).toString() > " ")
+            QString title = QString::fromUtf8(query.value(2).toString());
+            QString subtitle = QString::fromUtf8(query.value(3).toString());
+
+            if (subtitle > " ")
                 episode = QString("%1 -\"%2\"")
-                                  .arg(query.value(2).toString().local8Bit())
-                                  .arg(query.value(3).toString().local8Bit());
+                                  .arg(title)
+                                  .arg(subtitle);
             else
-                episode = query.value(2).toString().local8Bit();
+                episode = title;
 
             result +=
                 QString("%1 %2 %3").arg(query.value(0).toInt())

@@ -171,11 +171,12 @@ int main(int argc, char *argv[])
         QString name = arg.section("=", 0, 0);
         name.replace("--", "");
 
-        QString value = arg.section("=", 1);
+        QString value = QString::fromLocal8Bit(arg.section("=", 1));
         if (verbose)
         {
 
-            cerr << "name: " << name << " -- value: " << value << endl;
+            cerr << "name: " << name 
+		 << " -- value: " << value.local8Bit() << endl;
         }
 
         name.append("%");
@@ -185,7 +186,7 @@ int main(int argc, char *argv[])
     }
 
     if (verbose)
-        cout << "output:\n" << message << endl;
+        cout << "output:\n" << message.local8Bit() << endl;
 
     QSocketDevice sock(QSocketDevice::Datagram);
 

@@ -2505,16 +2505,19 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 
             proginfo->title = QString::fromUtf8(result.value(5).toString());
             proginfo->subtitle =
-                    QString::fromUtf8(result.value(6).toString());
+                QString::fromUtf8(result.value(6).toString());
             proginfo->description =
                 QString::fromUtf8(result.value(7).toString());
 
             proginfo->recpriority = result.value(8).toInt();
-            proginfo->channame = QString::fromUtf8(result.value(10).toString());
+            proginfo->channame = 
+                QString::fromUtf8(result.value(10).toString());
             if (proginfo->channame.isNull())
                 proginfo->channame = "";
-            proginfo->recgroup = result.value(12).toString();
-            proginfo->playgroup = result.value(22).toString();
+            proginfo->recgroup = 
+                QString::fromUtf8(result.value(12).toString());
+            proginfo->playgroup = 
+                QString::fromUtf8(result.value(22).toString());
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
@@ -2522,10 +2525,12 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->chanstr = result.value(16).toString();
             if (proginfo->chanstr.isNull())
                 proginfo->chanstr = "";
-            proginfo->chansign = QString::fromUtf8(result.value(17).toString());
+            proginfo->chansign = 
+                QString::fromUtf8(result.value(17).toString());
             proginfo->seriesid = result.value(18).toString();
             proginfo->programid = result.value(19).toString();
-            proginfo->category = result.value(20).toString();
+            proginfo->category = 
+                QString::fromUtf8(result.value(20).toString());
             proginfo->findid = result.value(21).toInt();
             
             proginfo->recstartts = proginfo->startts;

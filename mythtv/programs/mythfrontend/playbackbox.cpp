@@ -4202,7 +4202,7 @@ void PlaybackBox::showRecGroupChooser(void)
     {
         while (query.next())
         {
-            dispGroup = query.value(0).toString();
+            dispGroup = QString::fromUtf8(query.value(0).toString());
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
             dispGroup = (dispGroup == "Default") ? tr("Default") : dispGroup;
@@ -4240,7 +4240,7 @@ void PlaybackBox::showRecGroupChooser(void)
     {
         while (query.next())
         {
-            dispGroup = query.value(0).toString();
+            dispGroup = QString::fromUtf8(query.value(0).toString());
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
 
@@ -4377,7 +4377,7 @@ QString PlaybackBox::getRecGroupPassword(QString group)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT password FROM recgrouppassword "
                                    "WHERE recgroup = :GROUP ;");
-        query.bindValue(":GROUP", group);
+        query.bindValue(":GROUP", group.utf8());
 
         if (query.exec() && query.isActive() && query.size() > 0)
             if (query.next())
@@ -4402,8 +4402,11 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
 
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
-            recGroupPwCache[query.value(0).toString()] =
+        {
+            QString recgroup = QString::fromUtf8(query.value(0).toString());
+            recGroupPwCache[recgroup] =
                 query.value(1).toString();
+        }
 }
 
 void PlaybackBox::doPlaylistChangeRecGroup(void)
@@ -4446,7 +4449,7 @@ void PlaybackBox::showRecGroupChanger(void)
             else
                 itemStr = tr("items");
 
-            dispGroup = query.value(0).toString();
+            dispGroup = QString::fromUtf8(query.value(0).toString());
 
             if (dispGroup == "Default")
                 dispGroup = tr("Default");
@@ -4796,7 +4799,7 @@ void PlaybackBox::setRecGroupPassword(void)
 
         query.prepare("DELETE FROM recgrouppassword "
                            "WHERE recgroup = :RECGROUP ;");
-        query.bindValue(":RECGROUP", recGroup);       
+        query.bindValue(":RECGROUP", recGroup.utf8());
 
         query.exec();
 
@@ -4805,7 +4808,7 @@ void PlaybackBox::setRecGroupPassword(void)
             query.prepare("INSERT INTO recgrouppassword "
                           "(recgroup, password) VALUES "
                           "( :RECGROUP , :PASSWD )");
-            query.bindValue(":RECGROUP", recGroup);
+            query.bindValue(":RECGROUP", recGroup.utf8());
             query.bindValue(":PASSWD", newPassword);
 
             query.exec();

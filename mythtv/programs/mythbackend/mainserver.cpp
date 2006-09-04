@@ -1154,8 +1154,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->category = QString::fromUtf8(query.value(15).toString());
 
-            proginfo->recgroup = query.value(16).toString();
-            proginfo->playgroup = query.value(27).toString();
+            proginfo->recgroup = QString::fromUtf8(query.value(16).toString());
+            proginfo->playgroup = QString::fromUtf8(query.value(27).toString());
 
             proginfo->recpriority = query.value(36).toInt();
 

@@ -1730,11 +1730,11 @@ void MythContext::DBError(const QString &where, const QSqlQuery& query)
 #if QT_VERSION >= 0x030200
     str += "Query was:\n";
     str += query.executedQuery() + "\n";
-    str += DBErrorMessage(query.lastError());
+    str += QString::fromUtf8(DBErrorMessage(query.lastError()));
 #else
     str += "Your version of Qt is too old to provide proper debugging\n";
     str += "Query may have been:\n";
-    str += query.lastQuery() + "\n";
+    str += QString::fromUtf8(query.lastQuery()) + "\n";
     str += DBErrorMessage(query.lastError());
 #endif
     VERBOSE(VB_IMPORTANT, str);

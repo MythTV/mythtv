@@ -3165,7 +3165,7 @@ void ProgramInfo::showDetails(void) const
             generic = query.value(10).toInt();
             showtype = query.value(11).toString();
             colorcode = query.value(12).toString();
-            title_pronounce = query.value(13).toString();
+            title_pronounce = QString::fromUtf8(query.value(13).toString());
         }
         else if (!query.isActive())
             MythContext::DBError("ProgramInfo::showDetails", query);
@@ -3266,7 +3266,7 @@ void ProgramInfo::showDetails(void) const
 
     if (category != "")
     {
-        s = qApp->translate("Category", category);
+        s = category;
 
         query.prepare("SELECT genre FROM programgenres "
                       "WHERE chanid = :CHANID AND starttime = :STARTTIME "

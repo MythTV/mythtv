@@ -1425,7 +1425,7 @@ QString SimpleDBStorage::setClause(MSqlBindings& bindings)
     QString tagname(":SET" + column.upper());
     QString clause(column + " = " + tagname);
 
-    bindings.insert(tagname, getValue());
+    bindings.insert(tagname, getValue().utf8());
 
     return clause;
 }
@@ -1480,7 +1480,7 @@ QString GlobalSetting::setClause(MSqlBindings& bindings)
     QString clause("value = " + valueTag + ", data = " + dataTag);
 
     bindings.insert(valueTag, getName());
-    bindings.insert(dataTag, getValue());
+    bindings.insert(dataTag, getValue().utf8());
 
     return clause;
 }
