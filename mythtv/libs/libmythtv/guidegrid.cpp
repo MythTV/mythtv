@@ -1106,7 +1106,7 @@ void GuideGrid::paintChannels(QPainter *p)
         if ((y == (unsigned int)2 && scrolltype != 1) || 
             ((signed int)y == m_currentRow && scrolltype == 1))
         {
-            if (chinfo->iconpath != "none" && chinfo->iconpath != "")
+            if (!chinfo->iconpath.isEmpty() && chinfo->iconpath != "none")
             {
                 int iconsize = 0;
                 if (itype)
@@ -1115,8 +1115,13 @@ void GuideGrid::paintChannels(QPainter *p)
                     iconsize = type->GetSize();
                 if (!chinfo->iconload)
                     chinfo->LoadIcon(iconsize);
-                if (chinfo->iconload && itype)
-                    itype->SetImage(chinfo->icon);
+                if (chinfo->iconload)
+                {
+                    if (itype)
+                        itype->SetImage(chinfo->icon);
+                }
+                else
+                    chinfo->iconpath = QString::null;
             }
         }
 
@@ -1137,6 +1142,11 @@ void GuideGrid::paintChannels(QPainter *p)
                     chinfo->LoadIcon(iconsize);
                 if (chinfo->iconload)
                     type->SetIcon(y, chinfo->icon);
+                else
+                {
+                    chinfo->iconpath = QString::null;
+                    type->ResetImage(y);
+                }
             }
             else
             {
@@ -1242,17 +1252,18 @@ void GuideGrid::paintInfo(QPainter *p)
         container->ClearAllText();
         container->SetText(infoMap);
 
-        UITextType *type;
-
-        type = (UITextType *)container->GetType("misicon");
-        if (type)
-            type->SetText(chinfo->callsign);
-
         UIImageType *itype = (UIImageType *)container->GetType("icon");
         if (itype)
         {
             itype->SetImage(chinfo->iconpath);
             itype->LoadImage();
+        }
+
+        if (!itype || chinfo->iconpath.isEmpty() || chinfo->iconpath == "none")
+        {
+            UITextType *type = (UITextType *)container->GetType("misicon");
+            if (type)
+                type->SetText(chinfo->callsign);
         }
 
         container->Draw(&tmp, 1, m_context);
