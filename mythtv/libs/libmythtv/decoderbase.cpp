@@ -31,6 +31,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
       hasFullPositionMap(false), recordingHasPositionMap(false),
       posmapStarted(false), positionMapType(MARK_UNSET),
+      dontSyncPositionMap(false),
 
       exactseeks(false), livetv(false), watchingrecording(false),
 
@@ -281,6 +282,9 @@ bool DecoderBase::SyncPositionMap(void)
     VERBOSE(VB_PLAYBACK, "Resyncing position map. posmapStarted = "
             << (int) posmapStarted << " livetv(" << livetv << ") "
             << "watchingRec(" << watchingrecording << ")");
+
+    if (dontSyncPositionMap)
+        return false;
 
     unsigned int old_posmap_size = m_positionMap.size();
     

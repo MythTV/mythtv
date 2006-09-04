@@ -447,7 +447,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     framesRead = lastKey;
 
     int normalframes = desiredFrame - framesPlayed;
-
+    normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, discardFrames, discardFrames);
 
     if (discardFrames)
@@ -882,6 +882,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             keyframedist = 1;
             positionMapType = MARK_GOP_BYFRAME;
         }
+
+        dontSyncPositionMap = true;
     }
 
     // Don't build a seek index for MythTV files, the user needs to

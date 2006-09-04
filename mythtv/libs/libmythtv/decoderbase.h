@@ -180,6 +180,7 @@ class DecoderBase
     MarkTypes positionMapType;
  
     QValueVector<PosMapEntry> m_positionMap;
+    bool dontSyncPositionMap;
 
     bool exactseeks;
     bool livetv;
