@@ -3814,6 +3814,9 @@ void NuppelVideoPlayer::DoPlay(void)
 
 bool NuppelVideoPlayer::DoRewind(void)
 {
+    // Save Audio Sync setting before seeking 
+    SaveAudioTimecodeOffset(GetAudioTimecodeOffset()); 
+
     long long number = rewindtime + 1;
     long long desiredFrame = framesPlayed - number;
 
@@ -3987,6 +3990,9 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 
 bool NuppelVideoPlayer::DoFastForward(void)
 {
+    // Save Audio Sync setting before seeking
+    SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
+
     long long number = fftime - 1;
     long long desiredFrame = framesPlayed + number;
 
