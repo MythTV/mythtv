@@ -21,6 +21,7 @@
       <text lang="NB">Programoversikt</text>
       <text lang="EN_GB">Programme Guide</text>
       <text lang="CZ">Programový průvodce</text>
+      <text lang="RU">Программа передач</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Guía</alttext>
@@ -36,6 +37,7 @@
       <alttext lang="ET">Kava</alttext>
       <alttext lang="NB">Oversikt</alttext>
       <alttext lang="PT">Guia</alttext>
+      <alttext lang="RU">Программа</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -60,6 +62,7 @@
       <text lang="NB">Programfinner</text>
       <text lang="EN_GB">Programme Finder</text>
       <text lang="CZ">Vyhledávač programů</text>
+      <text lang="RU">Поиск программы</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -75,6 +78,7 @@
       <alttext lang="SI">Iskalec</alttext>
       <alttext lang="ET">Otsija</alttext>
       <alttext lang="NB">Finner</alttext>
+      <alttext lang="RU">Поиск</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -90,12 +94,13 @@
       <text lang="FI">Etsi Sanoista</text>
       <text lang="ZH_TW">關鍵字</text>
       <text lang="SI">Iskanje besed</text>
-      <text lang="ET">Otsi sõnu</text>
+      <text lang="ET">Sõnade otsimine</text>
       <text lang="NB">Søk etter ord</text>
       <text lang="DK">Søg ord</text>
       <text lang="ES">Buscar Palabras</text>
       <text lang="PT">Pesquisar Palavras</text>
       <text lang="CZ">Hledat slova</text>
+      <text lang="RU">Поиск по словам</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -108,6 +113,7 @@
       <alttext lang="DK">Søg</alttext>
       <alttext lang="ES">Palabras</alttext>
       <alttext lang="PT">Palavras</alttext>
+      <alttext lang="RU">Слова</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -122,12 +128,13 @@
       <text lang="IS">Listaleit</text>
       <text lang="FI">Etsi Oppaasta</text>
       <text lang="SI">Iskanje seznamov</text>
-      <text lang="ET">Otsi nimekirju</text>
+      <text lang="ET">Nimekirjade otsimine</text>
       <text lang="NB">Søk i lister</text>
       <text lang="DK">Søg i lister</text>
       <text lang="ES">Buscar Listas</text>
       <text lang="PT">Pesquisar Listas</text>
       <text lang="CZ">Hledat seznamy</text>
+      <text lang="RU">Поиск по спискам</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="IS">Listar</alttext>
@@ -140,6 +147,7 @@
       <alttext lang="DK">Lister</alttext>
       <alttext lang="ES">Listas</alttext>
       <alttext lang="PT">Listas</alttext>
+      <alttext lang="RU">Списки</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -160,6 +168,7 @@
       <text lang="FI">Välitön Nauhoitus</text>
       <text lang="ET">Kohene salvestamine</text>
       <text lang="NB">Øyeblikkelig opptak</text>
+      <text lang="RU">Немедленная запись</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -170,6 +179,7 @@
       <alttext lang="SV">Omedelbar</alttext>
       <alttext lang="JA">簡単録画</alttext>
       <alttext lang="NB">Ta opp nå</alttext>
+      <alttext lang="RU">Немедленно</alttext>
       <action>TV_MANUAL</action>
    </button>
 -->
@@ -192,6 +202,7 @@
       <text lang="ES">Avanzada</text>
       <text lang="PT">Regras de Gravação</text>
       <text lang="CZ">Volné nahrávání</text>
+      <text lang="RU">Дополнительно</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -215,6 +226,7 @@
       <text lang="NB">Manuelt opptak</text>
       <text lang="ES">Programación Manual</text>
       <text lang="CZ">Ruční plánování</text>
+      <text lang="RU">Ручное планирование</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
@@ -231,6 +243,7 @@
       <alttext lang="ET">Käsitsi</alttext>
       <alttext lang="NB">Manuelt</alttext>
       <alttext lang="ES">Manual</alttext>
+      <alttext lang="RU">Вручную</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

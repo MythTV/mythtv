@@ -20,6 +20,7 @@
       <text lang="ET">Üldine</text>
       <text lang="NB">Generelt</text>
       <text lang="CZ">Obecné</text>
+      <text lang="RU">Общее</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -44,6 +45,7 @@
       <text lang="NB">Programoversikt</text>
       <text lang="EN_GB">Programme Guide</text>
       <text lang="CZ">Programový průvodce</text>
+      <text lang="RU">Программа передач</text>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="ET">Kava</alttext>
       <action>SETTINGS EPG</action>
@@ -69,6 +71,7 @@
       <text lang="ET">Mahamängimine</text>
       <text lang="NB">Avspilling</text>
       <text lang="CZ">Přehrávání</text>
+      <text lang="RU">Воспроизведение</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -84,6 +87,7 @@
       <text lang="NL">Afspeelgroepen</text>
       <text lang="CZ">Skupiny přehrávání</text>
       <text lang="JA">プレイバックグループ</text>
+      <text lang="RU">Группы воспроизведения</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -107,10 +111,12 @@
       <text lang="ET">Salvestamisprofiilid</text>
       <text lang="NB">Opptaksprofiler</text>
       <text lang="CZ">Nahrávací profily</text>
+      <text lang="RU">Профили записей</text>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
       <alttext lang="ET">Profiilid</alttext>
       <alttext lang="PT">Perfis</alttext>
+      <alttext lang="RU">Профили</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -132,10 +138,12 @@
       <text lang="PT">Prioridades de Gravação</text>
       <text lang="NL">Opnameprioriteiten</text>
       <text lang="CZ">Priority nahrávání</text>
+      <text lang="RU">Приоритеты записей</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="ES">Prioridades</alttext>
       <alttext lang="PT">Prioridades</alttext>
+      <alttext lang="RU">Приоритеты</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

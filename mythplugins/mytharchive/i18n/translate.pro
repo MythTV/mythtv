@@ -10,4 +10,4 @@ SOURCES += ../mytharchive/videoselector.cpp
 
 TRANSLATIONS  = mytharchive_de.ts mytharchive_si.ts mytharchive_fr.ts
 TRANSLATIONS += mytharchive_sv.ts mytharchive_nl.ts mytharchive_nb.ts
-TRANSLATIONS += mytharchive_fi.ts mytharchive_es.ts
+TRANSLATIONS += mytharchive_fi.ts mytharchive_es.ts mytharchive_et.ts

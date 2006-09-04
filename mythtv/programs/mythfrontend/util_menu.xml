@@ -18,6 +18,7 @@
       <text lang="ES">Gestionar Música</text>
       <text lang="PT">Gerir Música</text>
       <text lang="CZ">Hudební nástroje</text>
+      <text lang="RU">Работа с музыкой</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -41,6 +42,7 @@
       <text lang="ET">Videohaldus</text>
       <text lang="NB">Videobehandler</text>
       <text lang="CZ">Manažer filmů</text>
+      <text lang="RU">Управление фильмами</text>
       <action>JUMP Video Manager</action>
       <depends>mythvideo</depends>
    </button>
@@ -56,10 +58,11 @@
       <text lang="SV">Ändra knappar</text>
       <text lang="ES">Editar Teclas</text>
       <text lang="PT">Configurar Teclas</text>
-      <text lang="ET">Muuda klahve</text>
+      <text lang="ET">Klahvide muutmine</text>
       <text lang="NL">Toetsen Aanpassen</text>
       <text lang="CZ">Editovat klávesy</text>
       <text lang="JA">キー設定</text>
+      <text lang="RU">Редактировать клавиши</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>
@@ -81,9 +84,10 @@
       <text lang="FI">Asetukset</text>
       <text lang="ZH_TW">設定</text>
       <text lang="SI">Nastavitve</text>
-      <text lang="ET">Seaded</text>
+      <text lang="ET">Sätted</text>
       <text lang="NB">Innstillinger</text>
       <text lang="CZ">Nastavení</text>
+      <text lang="RU">Настройки</text>
       <action>MENU main_settings.xml</action>
    </button>
 

@@ -14,6 +14,7 @@
       <text lang="JA">一般</text>
       <text lang="SI">Splošno</text>
       <text lang="ET">Üldine</text>
+      <text lang="RU">Общие</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -32,8 +33,10 @@
       <text lang="JA">番組ガイド</text>
       <text lang="SI">Programski vodič</text>
       <text lang="ET">Telekava</text>
+      <text lang="RU">Программа передач</text>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="ET">Kava</alttext>
+      <alttext lang="RU">Программа</alttext>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -52,6 +55,7 @@
       <text lang="JA">再生</text>
       <text lang="SI">Predvajanje</text>
       <text lang="ET">Mahamängimine</text>
+      <text lang="RU">Воспроизведение</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -64,6 +68,8 @@
       <text lang="ES">Grupos Reproducción</text>
       <text lang="NL">Afspeelgroepen</text>
       <text lang="JA">プレイバックグループ</text>
+      <text lang="RU">Группы воспроизведения</text>
+      <alttext lang="RU">Группы</alttext>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -82,10 +88,12 @@
       <text lang="JA">録画プロファイル</text>
       <text lang="SI">Snemalni profili</text>
       <text lang="ET">Salvestamisprofiilid</text>
+      <text lang="RU">Профили записи</text>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
       <alttext lang="ET">Profiilid</alttext>
       <alttext lang="PT">Perfis</alttext>
+      <alttext lang="RU">Профили</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -102,8 +110,10 @@
       <text lang="DK">Optagelsesprioriteter</text>
       <text lang="ES">Prioridades</text>
       <text lang="NL">Opnameprioriteiten</text>
+      <text lang="RU">Приоритеты записей</text>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="PT">Prioridades</alttext>
+      <alttext lang="RU">Приоритеты</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

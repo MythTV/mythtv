@@ -13,6 +13,7 @@
      <text lang="ES">TV</text>
      <text lang="NL">TV</text>
      <text lang="PL">TV</text>
+     <text lang="RU">ТВ</text>
      <action>MENU tvmenu.xml</action>
    </button>
 
@@ -32,6 +33,7 @@
      <text lang="SI">Glasba</text>
      <text lang="ET">Muusika</text>
      <text lang="PL">Muzyka</text>
+     <text lang="RU">Музыка</text>
      <action>PLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -52,6 +54,7 @@
      <text lang="SI">Filmi</text>
      <text lang="ET">Video</text>
      <text lang="PL">Filmy</text>
+     <text lang="RU">Фильмы</text>
      <action>PLUGIN mythvideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -68,6 +71,7 @@
      <text lang="DK">DVD</text>
      <text lang="ES">DVD</text>
      <text lang="PL">DVD</text>
+     <text lang="RU">DVD</text>
      <action>PLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -85,6 +89,7 @@
       <text lang="ES">Radio</text>
       <text lang="NL">Radio</text>
       <text lang="PL">Radio</text>
+      <text lang="RU">Радио</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -105,6 +110,7 @@
      <text lang="SI">Slike</text>
      <text lang="ET">Galerii</text>
      <text lang="PL">Zdj�cia</text>
+     <text lang="RU">Изображения</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -125,6 +131,7 @@
      <text lang="SI">Igre</text>
      <text lang="ET">Mängud</text>
      <text lang="PL">Gry</text>
+     <text lang="RU">Игры</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -145,6 +152,7 @@
      <text lang="SI">Vreme</text>
      <text lang="ET">Ilm</text>
      <text lang="PL">Pogoda</text>
+     <text lang="RU">Погода</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -164,6 +172,7 @@
      <text lang="DK">Nyheder</text>
      <text lang="PT">Notícias</text>
      <text lang="PL">Wiadomo�ci</text>
+     <text lang="RU">Новости</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -172,6 +181,7 @@
      <type>NETFLIX</type>
      <text>NetFlix</text>
      <text lang="PT">Aluguer de Filmes</text>
+     <text lang="ET">MythFlix</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -190,6 +200,7 @@
       <text lang="ES">Web</text>
       <text lang="NL">Internet</text>
       <text lang="PL">Internet</text>
+      <text lang="RU">WWW</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -208,6 +219,7 @@
       <text lang="NL">Telefoon</text>
       <text lang="PL">Telefon</text>
       <text lang="JA">電話</text>
+      <text lang="RU">Телефон</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -224,6 +236,7 @@
       <text lang="ES">Recetas</text>
       <text lang="NL">Recepten</text>
       <text lang="PL">Przepisy</text>
+      <text lang="RU">Рецепты</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -233,11 +246,12 @@
       <text>Burn DVD</text>
       <text lang="FR">Gravure DVD</text>
       <text lang="PT">Gravar DVD</text>
-      <text lang="ET">Kirjuta DVD</text>
+      <text lang="ET">DVD kirjutamine</text>
       <text lang="ES">Grabar DVD</text>
       <text lang="NL">DVD Branden</text>
       <text lang="PL">Nagraj DVD</text>
       <text lang="SV">Br�nn DVD</text>
+      <text lang="RU">Прожиг DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -245,7 +259,9 @@
    <button>
        <type>ARCHIVE</type>
        <text>Archive Files</text>
+       <text lang="ET">Arhiveerimine</text>
        <text lang="SV">Arkivera filer</text>
+       <text lang="RU">Архив файлов</text>
        <action>PLUGIN mytharchive</action>
        <depends>mytharchive</depends>
    </button>
@@ -260,6 +276,7 @@
      <text lang="PT">Horários de Cinema</text>
      <text lang="NL">Bioscoop Tijden</text>
      <text lang="PL">Movie Times</text>
+     <text lang="RU">Афиша кино</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -278,8 +295,9 @@
      <text lang="SV">Inställningar</text>
      <text lang="JA">設定</text>
      <text lang="SI">Nastavitve</text>
-     <text lang="ET">Seaded</text>
+     <text lang="ET">Sätted</text>
      <text lang="PL">Ustawienia</text>
+     <text lang="RU">Настройки</text>
      <action>MENU main_settings.xml</action>
    </button>
 
@@ -294,6 +312,7 @@
      <text lang="PT">Desligar</text>
      <text lang="NL">Afsluiten</text>
      <text lang="PL">Wy��cz</text>
+     <text lang="RU">Завершение работы</text>
      <action>SHUTDOWN</action>
    </button> -->
 

@@ -4,6 +4,7 @@
       <type>ARCHIVE_CREATE_DVD</type>
       <text>Create DVD</text>
       <text lang="es">Crear DVD</text>
+      <text lang="et">DVD valmistamine</text>
       <action>ARCHIVE_CREATE_DVD</action>
       <depends>themes/default/mythburn-ui.xml</depends>
    </button>
@@ -12,6 +13,7 @@
       <type>ARCHIVE_CREATE_ARCHIVE</type>
       <text>Create Native Archive</text>
       <text lang="es">Crear Archivo Nativo</text>
+      <text lang="et">Arhiivi valmistamine</text>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
       <depends>themes/default/mythnative-ui.xml</depends>
   </button>
@@ -20,6 +22,7 @@
        <type>ARCHIVE_ENCODE_VIDEO</type>
        <text>Encode Video File</text>
        <text lang="es">Codificar Fichero Video</text>
+       <text lang="et">Videofaili kodeerimine</text>
        <action>ARCHIVE_ENCODE_VIDEO</action>
        <depends></depends>
    </button>

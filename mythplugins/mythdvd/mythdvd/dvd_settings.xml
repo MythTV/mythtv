@@ -14,6 +14,7 @@
       <text lang="JA">全般設定</text>
       <text lang="NB">Generelt</text>
       <text lang="FI">Yleiset Asetukset</text>
+      <text lang="ET">Üldised sätted</text>
       <action>DVD_SETTINGS_GENERAL</action>
    </button>
 
@@ -31,6 +32,7 @@
       <text lang="JA">再生設定</text>
       <text lang="NB">Avspilling</text>
       <text lang="FI">Toistoasetukset</text>
+      <text lang="ET">Mängimise sätted</text>
       <action>DVD_SETTINGS_PLAY</action>
    </button>
 
@@ -48,6 +50,7 @@
       <text lang="NL">DVD RIP instellingen</text>
       <text lang="JA">再生設定</text>
       <text lang="FI">Aseta DVD-Kopionti</text>
+      <text lang="ET">Rippimise sätted</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

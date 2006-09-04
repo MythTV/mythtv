@@ -16,6 +16,7 @@
       <text lang="PT">Definir Prioridades de Gravação</text>
       <text lang="NL">Opnameprioriteiten Instellen</text>
       <text lang="CZ">Nastavení priorit nahrávání</text>
+      <text lang="RU">Установить приоритеты записей</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
@@ -23,6 +24,7 @@
       <alttext lang="SI">Snemalne prioritete</alttext>
       <alttext lang="ET">Salvestamisprioriteedid</alttext>
       <alttext lang="PT">Prioridades de Gravação</alttext>
+      <alttext lang="RU">Записи</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -43,6 +45,7 @@
       <text lang="ES">Prioridad Canales</text>
       <text lang="PT">Definir Prioridades de Gravação de Canais</text>
       <text lang="CZ">Nastavení kanálových priorit nahrávání</text>
+      <text lang="RU">Установить приоритеты каналов</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="FR">Priorités</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
@@ -52,6 +55,7 @@
       <alttext lang="SI">Prioritete kanalov</alttext>
       <alttext lang="ET">Kanaliprioriteedid</alttext>
       <alttext lang="PT">Prioridades de Gravação de Canais</alttext>
+      <alttext lang="RU">Каналы</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

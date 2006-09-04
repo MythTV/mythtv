@@ -15,6 +15,7 @@
       <text lang="JA">全般設定</text>
       <text lang="FI">Yleiset Asetukset</text>
       <text lang="SI">Splošne nastavitve</text>
+      <text lang="ET">Üldised sätted</text>
       <action>MUSIC_SET_GENERAL</action>
    </button>
 
@@ -33,6 +34,7 @@
       <text lang="JA">プレイヤー設定</text>
       <text lang="FI">Soittoasetukset</text>
       <text lang="SI">Nastavitve predvajanja</text>
+      <text lang="ET">Mängija sätted</text>
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
@@ -49,6 +51,7 @@
       <text lang="JA">リッパー設定</text>
       <text lang="FI">Tuontiasetukset</text>
       <text lang="SI">Nastavitve ripanja</text>
+      <text lang="ET">Rippija sätted</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
 

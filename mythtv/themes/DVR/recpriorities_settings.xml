@@ -13,6 +13,7 @@
       <text lang="ES">Ajustar Prioridades Grabación</text>
       <text lang="NL">Opnameprioriteit Instellen</text>
       <text lang="JA">録画優先順位設定</text>
+      <text lang="RU">Установить приоритет записей</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
@@ -22,7 +23,8 @@
       <alttext lang="PT">Prioridades de Gravação</alttext>
       <alttext lang="ES">Prioridades Grabación</alttext>
       <alttext lang="NL">Opnameprioriteit</alttext>
-　    <alttext lang="JA">録画優先順位</text>
+      <alttext lang="JA">録画優先順位</alttext>
+      <alttext lang="RU">Записи</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -39,6 +41,7 @@
       <text lang="PT">Definir Prioridades de Gravação de Canais</text>
       <text lang="ES">Ajustar Prioridades de Canales</text>
       <text lang="NL">Opnameprioriteit Per Zender</text>
+      <text lang="RU">Установить приоритет каналов</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
@@ -49,6 +52,7 @@
       <alttext lang="PT">Prioridades de Canais</alttext>
       <alttext lang="ES">Prioridades Canales</alttext>
       <alttext lang="NL">Prioriteit Per Zender</alttext>
+      <alttext lang="RU">Каналы</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

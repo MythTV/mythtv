@@ -17,6 +17,7 @@
      <text lang="ES">Teléfono</text>
      <text lang="PT">Telefone</text>
      <text lang="CZ">Telefon</text>
+     <text lang="RU">Телефон</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -40,6 +41,7 @@
      <text lang="DK">Nyheder</text>
      <text lang="PT">Notícias</text>
      <text lang="CZ">Novinky</text>
+     <text lang="RU">Новости</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -56,6 +58,7 @@
      <text lang="NL">Bioscoop Tijden</text>
      <text lang="CZ">Programy kin</text>
      <text lang="JA">ムービータイム</text>
+     <text lang="RU">Афиша кино</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -80,6 +83,7 @@
      <text lang="ET">Ilmateade</text>
      <text lang="NB">Været</text>
      <text lang="CZ">Počasí</text>
+     <text lang="RU">Погода</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -91,6 +95,7 @@
      <text lang="PT">Aluguer de Filmes</text>
      <text lang="DE">MythFlix</text>
      <text lang="NL">MythFlix</text>
+     <text lang="ET">MythFlix</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -113,6 +118,7 @@
       <text lang="PT">Navegação Web</text>
       <text lang="NL">Internet</text>
       <text lang="CZ">Prohlížení webu</text>
+      <text lang="RU">WWW</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -135,6 +141,7 @@
      <text lang="ES">Recetas</text>
      <text lang="PT">Receitas</text>
      <text lang="CZ">Recepty</text>
+     <text lang="RU">Рецепты</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -157,6 +164,7 @@
       <text lang="ES">Estado Sistema</text> 
       <text lang="PT">Estado do Sistema</text>
       <text lang="CZ">Stav systému</text>
+      <text lang="RU">Состояние системы</text>
       <action>TV_STATUS</action>
    </button>
 

@@ -17,6 +17,7 @@
       <text lang="ZH_TW">節目表</text>
       <text lang="SI">Programski vodič</text>
       <text lang="ET">Telekava</text>
+      <text lang="RU">Программа передач</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Guía</alttext>
@@ -30,6 +31,7 @@
       <alttext lang="SI">Vodič</alttext>
       <alttext lang="ET">Kava</alttext>
       <alttext lang="PT">Guia</alttext>
+      <alttext lang="RU">Программа</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -50,6 +52,7 @@
       <text lang="ZH_TW">搜尋節目</text>
       <text lang="SI">Iskalec programov</text>
       <text lang="ET">Programmiotsija</text>
+      <text lang="RU">Поиск программы</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
@@ -63,6 +66,7 @@
       <alttext lang="ZH_TW">搜尋</alttext>
       <alttext lang="SI">Iskalec</alttext>
       <alttext lang="ET">Otsija</alttext>
+      <alttext lang="RU">Поиск</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -77,10 +81,11 @@
       <text lang="FI">Etsi Sanoista</text>
       <text lang="ZH_TW">關鍵字</text>
       <text lang="SI">Besedno iskanje</text>
-      <text lang="ET">Otsi sõnu</text>
+      <text lang="ET">Sõnade otsimine</text>
       <text lang="DK">Søgeord</text>
       <text lang="PT">Pesquisar Palavras</text>
       <text lang="ES">Palabras</text>
+      <text lang="RU">Поиск слов</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoeken</alttext>
@@ -90,6 +95,7 @@
       <alttext lang="ET">Sõnad</alttext>
       <alttext lang="DK">Ord</alttext>
       <alttext lang="PT">Palavras</alttext>
+      <alttext lang="RU">Слова</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -103,10 +109,11 @@
       <text lang="DE">Listensuche</text>
       <text lang="FI">Etsi Oppaasta</text>
       <text lang="SI">Seznamsko iskanje</text>
-      <text lang="ET">Otsi nimekirju</text>
+      <text lang="ET">Nimekirjade otsimine</text>
       <text lang="DK">Søg på lister</text>
       <text lang="PT">Pesquisar Listas</text>
       <text lang="ES">Listados</text>
+      <text lang="RU">Поиск по списку</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
@@ -116,6 +123,7 @@
       <alttext lang="ET">Nimekirjad</alttext>
       <alttext lang="DK">Lister</alttext>
       <alttext lang="PT">Listas</alttext>
+      <alttext lang="RU">Списки</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -135,6 +143,7 @@
       <text lang="JA">簡単録画</text>
       <text lang="FI">Välitön Nauhoitus</text>
       <text lang="ET">Kohene salvestamine</text>
+      <text lang="RU">Немедленая запись</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -144,6 +153,7 @@
       <alttext lang="PT">Gravação Imediata</alttext>
       <alttext lang="SV">Omedelbar</alttext>
       <alttext lang="JA">簡単録画</alttext>
+      <alttext lang="RU">Немедленно</alttext>
       <action>TV_MANUAL</action>
    </button>
 -->
@@ -162,6 +172,7 @@
       <text lang="DK">Avanceret</text>
       <text lang="PT">Regras de Gravação</text>
       <text lang="ES">Avanzada</text>
+      <text lang="RU">Дополнительно</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -181,6 +192,7 @@
       <text lang="ZH_TW">手動預錄</text>
       <text lang="SI">Ročno snemanje</text>
       <text lang="ET">Käsitsi salvestamine</text>
+      <text lang="RU">Ручная запись</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Manual</alttext>
       <alttext lang="CA">Programar</alttext>
@@ -194,6 +206,7 @@
       <alttext lang="ZH_TW">手動預錄</alttext>
       <alttext lang="SI">Ročno</alttext>
       <alttext lang="ET">Käsitsi</alttext>
+      <alttext lang="RU">Вручную</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

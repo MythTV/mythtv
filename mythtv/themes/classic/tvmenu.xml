@@ -15,6 +15,7 @@
       <text lang="JA">TVを見る</text>
       <text lang="SI">Gledanje TV</text>
       <text lang="ET">Vaata telerit</text>
+      <text lang="RU">Смотреть ТВ</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -32,7 +33,8 @@
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="SI">Planiranje snemanj</text>
-      <text lang="ET">Plaani salvestamisi</text>
+      <text lang="ET">Salvestamise plaanimine</text>
+      <text lang="RU">Расписание записи</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Planifier</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -46,6 +48,7 @@
       <alttext lang="DE">Planung</alttext>
       <alttext lang="SI">Planiranje</alttext>
       <alttext lang="ET">Plaanimine</alttext>
+      <alttext lang="RU">Расписание</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -63,7 +66,8 @@
       <text lang="SV">Titta på inspelningar</text>
       <text lang="JA">録画再生</text>
       <text lang="SI">Predvajanje snemanj</text>
-      <text lang="ET">Vaata salvestisi</text>
+      <text lang="ET">Salvestiste vaatamine</text>
+      <text lang="RU">Смотреть записи</text>
       <alttext lang="DE">Wiedergabe</alttext>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="SV">Inspelningar</alttext>
@@ -84,10 +88,12 @@
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
       <text lang="SI">Brisanje snemanj</text>
-      <text lang="ET">Kustuta salvestisi</text>
+      <text lang="ET">Salvestiste kustutamine</text>
+      <text lang="RU">Удалить записи</text>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="ET">Kustuta</alttext>
       <alttext lang="SV">Radera</alttext>
+      <alttext lang="RU">Удалить</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -102,7 +108,7 @@
       <text lang="DE">TV direkt</text>
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
-      <text lang="ET">TV läbilase</text>
+      <text lang="ET">Otse-TV</text>
       <text lang="NL">TV Direct</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
@@ -121,6 +127,7 @@
       <text lang="ES">Grabaciones Antiguas</text>
       <text lang="NL">Eerdere Opnames</text>
       <text lang="JA">録画履歴</text>
+      <text lang="RU">Ранее записано</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -137,6 +144,7 @@
       <text lang="PT">Estado do Sistema</text>
       <text lang="ES">Estado Sistema</text>
       <text lang="NL">Systeemstatus</text>
+      <text lang="RU">Состояние системы</text>
       <action>TV_STATUS</action>
    </button>
 

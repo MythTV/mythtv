@@ -14,6 +14,7 @@
       <text lang="JA">DVD再生</text>
       <text lang="NB">Spill av DVD</text>
       <text lang="FI">Toista DVD</text>
+      <text lang="ET">DVD mängimine</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -27,6 +28,7 @@
       <text lang="NL">VCD Afspelen</text>
       <text lang="JA">VCD再生</text>
       <text lang="FI">Toista VCD</text>
+      <text lang="ET">VCD mängimine</text>
       <action>VCD_PLAY</action>
    </button>
 
@@ -45,12 +47,14 @@
       <text lang="NL">DVD Rip</text>
       <text lang="JA">DVDリッピング</text>
       <text lang="FI">Kopioi DVD</text>
+      <text lang="ET">DVD rippimine</text>
       <action>DVD_RIP</action>
    </button>
 
    <button>
       <type>EJECT</type>
       <text>Eject media</text>
+      <text lang="ET">Meedia väljastamine</text>
       <action>EJECT</action>
    </button>
 

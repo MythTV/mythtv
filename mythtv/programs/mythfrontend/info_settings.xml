@@ -16,9 +16,10 @@
      <text lang="FI">Sään Asetukset</text>
      <text lang="ZH_TW">天氣報告設定</text>
      <text lang="SI">Nastavitve vremena</text>
-     <text lang="ET">Ilmateate seaded</text>
+     <text lang="ET">Ilmateate sätted</text>
      <text lang="NB">Innstillinger for vær</text>
      <text lang="CZ">Nastavení počasí</text>
+     <text lang="RU">Настройки погоды</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -37,11 +38,12 @@
      <text lang="FI">Uutisten Asetukset</text>
      <text lang="ZH_TW">網上新聞設定</text>
      <text lang="SI">Nastavitve novic</text>
-     <text lang="ET">Uudiste seaded</text>
+     <text lang="ET">Uudiste sätted</text>
      <text lang="NB">Innstillinger for nyheter</text>
      <text lang="DK">Nyheds indstillinger</text>
      <text lang="PT">Configurar Notícias</text>
      <text lang="CZ">Nastavení zpráv</text>
+     <text lang="RU">Настройки новостей</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -51,12 +53,13 @@
      <text>Movie Time Settings</text>
      <text lang="FI">Elokuvahaun Asetukset</text>
      <text lang="SI">Nastavitve čas filmov</text>
-     <text lang="ET">Filmiaegade seaded</text>
+     <text lang="ET">Filmiaegade sätted</text>
      <text lang="SV">Biotider</text>
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="DE">Kinoprogramm</text>
      <text lang="NL">Bioscoop Tijden</text>
      <text lang="CZ">Nastavení programů kin</text>
+     <text lang="RU">Настройки афиши кино</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -68,8 +71,9 @@
      <text lang="PT">Configurar Aluguer de Filmes</text>
      <text lang="DE">MythFlix</text>
      <text lang="ES">MythFlix</text>
-     <text lang="ET">MythFlix seaded</text>
+     <text lang="ET">MythFlix sätted</text>
      <text lang="NL">MythFlix Instellingen</text>
+     <text lang="RU">Настройки MythFlix</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -86,12 +90,13 @@
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
      <text lang="SI">Spletne nastavitve</text>
-     <text lang="ET">Veebi seaded</text>
+     <text lang="ET">Veebi sätted</text>
      <text lang="NB">Innstilinger for nettleser</text>
      <text lang="DK">Web instillinger</text>
      <text lang="ES">Web</text>
      <text lang="PT">Configurar Navegação Web</text>
      <text lang="CZ">Nastavení webu</text>
+     <text lang="RU">Настройки браузера</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -107,12 +112,13 @@
      <text lang="IS">Stillingar uppskrifta</text>
      <text lang="NL">Recepten Instellingen</text>     
      <text lang="SI">Nastavitve receptov</text>
-     <text lang="ET">Retseptide seaded</text>     
+     <text lang="ET">Retseptide sätted</text>     
      <text lang="NB">Innstillinger for oppskrifter</text>
      <text lang="DK">Opskrifts indstillinger</text>
      <text lang="ES">Recetas</text>
      <text lang="PT">Configurar Receitas</text>
      <text lang="CZ">Nastavení receptů</text>
+     <text lang="RU">Настройки рецептов</text>
      <alttext lang="ET">Retseptid</alttext>
      <alttext lang="PT">Receitas</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

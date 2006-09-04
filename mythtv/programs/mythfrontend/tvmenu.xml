@@ -20,6 +20,7 @@
       <text lang="ET">Vaata telerit</text>
       <text lang="NB">Se på TV</text>
       <text lang="CZ">Sledovat TV</text>
+      <text lang="RU">Смотреть ТВ</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -40,9 +41,10 @@
       <text lang="FI">Ajasta Nauhoituksia</text>
       <text lang="ZH_TW">預設錄影</text>
       <text lang="SI">Plan snemanj</text>
-      <text lang="ET">Plaani salvestamisi</text>
+      <text lang="ET">Salvestamiste plaanimine</text>
       <text lang="NB">Planlegg opptak</text>
       <text lang="CZ">Plánovat nahrávky</text>
+      <text lang="RU">Расписание записей</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Planification</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -58,6 +60,7 @@
       <alttext lang="SI">Plan</alttext>
       <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="NB">Planlegg</alttext>
+      <alttext lang="RU">Расписание</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -78,9 +81,10 @@
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Predvajanje snemanj</text>
-      <text lang="ET">Vaata salvestisi</text>
+      <text lang="ET">Salvestiste vaatamine</text>
       <text lang="NB">Se på opptak</text>
       <text lang="CZ">Sledovat nahrávky</text>
+      <text lang="RU">Смотреть записи</text>
       <alttext lang="ET">Salvestised</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
@@ -102,10 +106,11 @@
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
       <text lang="SI">Brisanje snemanj</text>
-      <text lang="ET">Kustuta salvestisi</text>
+      <text lang="ET">Salvestiste kustutamine</text>
       <text lang="NB">Slett opptak</text>
       <text lang="CZ">Mazat nahrávky</text>
-      <alttext lang="ET">Kustuta</alttext>
+      <text lang="RU">Удалить записи</text>
+      <alttext lang="ET">Kustutamine</alttext>
       <alttext lang="DE">Löschen</alttext>
       <action>TV_DELETE</action>
    </button> 
@@ -146,6 +151,7 @@
       <text lang="DK">Systemstatus</text>
       <text lang="PT">Estado do Sistema</text>
       <text lang="CZ">Stav systému</text>
+      <text lang="RU">Состояние системы</text>
       <action>TV_STATUS</action>
    </button>
 

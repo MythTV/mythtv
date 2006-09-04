@@ -15,6 +15,7 @@
      <text lang="DK">1. Generelt</text>
      <text lang="ES">1. General</text>
      <text lang="CZ">1. Obecný</text>
+     <text lang="RU">1. Общие</text>
      <action>GENERAL</action>
    </button>
 
@@ -33,6 +34,7 @@
      <text lang="DK">2. TV-kort</text>
      <text lang="ES">2. Capturadoras</text>
      <text lang="CZ">2. Zachytávací karty</text>
+     <text lang="RU">2. Карты захвата</text>
      <action>CAPTURE CARDS</action>
    </button>
 
@@ -51,6 +53,7 @@
      <text lang="DK">3. Videokilder</text>
      <text lang="ES">3. Fuentes de Vídeo</text>
      <text lang="CZ">3. Zdroje obrazu</text>
+     <text lang="RU">3. Видео источники</text>
      <action>VIDEO SOURCES</action>
    </button>
 
@@ -69,6 +72,7 @@
      <text lang="DK">4. Indgange</text>
      <text lang="ES">4. Conexiones</text>
      <text lang="CZ">4. Připojení vstupů</text>
+     <text lang="RU">4. Соединение входов</text>
      <action>CARD INPUTS</action>
    </button>
 
@@ -86,6 +90,7 @@
      <text lang="DK">5. Kanal opsætning</text>
      <text lang="ES">5. Editor Canales</text>
      <text lang="CZ">5. Editor kanálů</text>
+     <text lang="RU">5. Редактор каналов</text>
      <action>CHANNEL EDITOR</action>
    </button>
 

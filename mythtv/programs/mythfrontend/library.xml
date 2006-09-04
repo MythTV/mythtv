@@ -17,11 +17,13 @@
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Gledanje snemanj</text>
-      <text lang="ET">Vaata salvestisi</text>
+      <text lang="ET">Salvestiste vaatamine</text>
       <text lang="NB">Se på opptak</text>
       <text lang="CZ">Sledování nahrávek</text>
+      <text lang="RU">Смотреть записи</text>
       <alttext lang="SV">Inspelningar</alttext>
       <alttext lang="ET">Salvestised</alttext>
+      <alttext lang="RU">Записи</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -41,11 +43,13 @@
      <text lang="FI">Katso Videoita</text>
      <text lang="ZH_TW">播放電影</text>
      <text lang="SI">Gledanje filmov</text>
-     <text lang="ET">Vaata videot</text>
+     <text lang="ET">Video vaatamine</text>
      <text lang="NB">Se på videoer</text>
      <text lang="CZ">Sledovat filmy</text>
+     <text lang="RU">Смотреть фильмы</text>
      <alttext lang="SV">Filmer</alttext>
      <alttext lang="ET">Video</alttext>
+     <alttext lang="RU">Фильмы</alttext>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -70,6 +74,7 @@
       <text lang="ET">Kuula muusikat</text>
       <text lang="NB">Hør på musikk</text>
       <text lang="CZ">Poslouchat muziku</text>
+      <text lang="RU">Слушать музыку</text>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -91,9 +96,11 @@
      <text lang="ES">Escuchar Radio</text>
      <text lang="PT">Ouvir Rádio</text>
      <text lang="CZ">Poslouchat rádio</text>
+     <text lang="RU">Слушать радио</text>
      <alttext lang="SV">Radio</alttext>
      <alttext lang="PT">Rádio</alttext>
      <alttext lang="ET">Raadio</alttext>
+     <alttext lang="RU">Радио</alttext>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -118,6 +125,7 @@
      <text lang="ET">Pildialbum</text>
      <text lang="NB">Bildegalleri</text>
      <text lang="CZ">Galerie fotek</text>
+     <text lang="RU">Изображения</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -142,6 +150,7 @@
      <text lang="ET">Mängud</text>
      <text lang="NB">Spill</text>
      <text lang="CZ">Hrát hry</text>
+     <text lang="RU">Играть в игры</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

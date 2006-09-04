@@ -12,6 +12,7 @@ trans.files += mythfrontend_ja.qm mythfrontend_si.qm mythfrontend_fi.qm
 trans.files += mythfrontend_zh_tw.qm mythfrontend_nb.qm mythfrontend_is.qm
 trans.files += mythfrontend_pt_br.qm mythfrontend_en_gb.qm mythfrontend_cz.qm
 trans.files += mythfrontend_et.qm mythfrontend_pl.qm mythfrontend_tr.qm
+trans.files += mythfrontend_ru.qm
 
 INSTALLS += trans
 

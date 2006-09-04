@@ -15,6 +15,7 @@
       <text lang="DK">Titel</text>
       <text lang="PT">Por Títulos</text>
       <text lang="ES">Títulos</text>
+      <text lang="RU">Заголовки</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -33,6 +34,7 @@
       <text lang="DK">Søgeord</text>
       <text lang="PT">Por Palavras-Chave</text>
       <text lang="ES">Palabras</text>
+      <text lang="RU">Ключевые слова</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -49,6 +51,7 @@
       <text lang="PT">Por Pessoas</text>
       <text lang="ES">Personas</text>
       <text lang="NL">Personen</text>
+      <text lang="RU">Действующие лица</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -66,6 +69,7 @@
       <text lang="PT">Pesquisa Avançada</text>
       <text lang="ES">Avanzada</text>
       <text lang="NL">Geavanceerd</text>
+      <text lang="RU">Дополнительно</text>
       <alttext lang="ET">Muud</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>
@@ -85,6 +89,7 @@
       <text lang="PT">Por Novos Títulos</text>
       <text lang="ET">Uued saated</text>
       <text lang="ES">Nuevos Títulos</text>
+      <text lang="RU">Новые заголовки</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -103,6 +108,7 @@
       <text lang="PT">Por Filmes</text>
       <text lang="ET">Filmid</text>
       <text lang="ES">Películas</text>
+      <text lang="RU">Фильмы</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -121,6 +127,7 @@
       <text lang="PT">Por Categorias</text>
       <text lang="ET">Kategooriad</text>
       <text lang="ES">Categorías</text>
+      <text lang="RU">Категории</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -139,6 +146,7 @@
       <text lang="PT">Por Canais</text>
       <text lang="ET">Kanalid</text>
       <text lang="ES">Canales</text>
+      <text lang="RU">Каналы</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -157,6 +165,7 @@
       <text lang="PT">Por Data e Hora</text>
       <text lang="ET">Aeg</text>
       <text lang="ES">Horas</text>
+      <text lang="RU">Время</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

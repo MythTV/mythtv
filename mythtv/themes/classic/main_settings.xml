@@ -16,6 +16,7 @@
       <text lang="SI">Splošno</text>
       <text lang="ET">Üldine</text>
       <text lang="PL">Og�lne</text>
+      <text lang="RU">Общее</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -35,6 +36,7 @@
       <text lang="SI">Vzgled</text>
       <text lang="ET">Kujundus</text>
       <text lang="PL">Wygl�d</text>
+      <text lang="RU">Внешний вид</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -46,11 +48,12 @@
       <text lang="SV">Ändra knappar</text>
       <text lang="DK">Tasteopsætning</text>
       <text lang="PT">Configurar Teclas</text>
-      <text lang="ET">Muuda klahve</text>
+      <text lang="ET">Klahvide muutmine</text>
       <text lang="ES">Configurar Teclas</text>
       <text lang="NL">Toetsen Instellen</text>
       <text lang="PL">Edycja guzik�w</text>
       <text lang="JA">キー設定</text>
+      <text lang="RU">Редактировать клавиши</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
@@ -68,8 +71,9 @@
      <text lang="SV">TV</text>
      <text lang="JA">TV設定</text>
      <text lang="SI">TV nastavitve</text>
-     <text lang="ET">TV seaded</text>
+     <text lang="ET">TV sätted</text>
      <text lang="PL">Konfiguracja TV</text>
+     <text lang="RU">Настройка ТВ</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -86,8 +90,9 @@
      <text lang="SV">Musik</text>
      <text lang="JA">ミュージック設定</text>
      <text lang="SI">Glasbene nastavitve</text>
-     <text lang="ET">Muusika seaded</text>
+     <text lang="ET">Muusika sätted</text>
      <text lang="PL">Konfiguracja Muzyki</text>
+     <text lang="RU">Настройка музыки</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -105,8 +110,9 @@
        <text lang="SV">Video</text>
        <text lang="JA">ビデオ設定</text>
        <text lang="SI">Video nastavitve</text>
-       <text lang="ET">Video seaded</text>
+       <text lang="ET">Video sätted</text>
        <text lang="PL">Konfiguracja Film�w</text>
+       <text lang="RU">Настройка фильмов</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -123,9 +129,10 @@
      <text lang="SV">DVD</text>
      <text lang="JA">DVD設定</text>
      <text lang="SI">DVD nastavitve</text>
-     <text lang="ET">DVD seaded</text>
+     <text lang="ET">DVD sätted</text>
      <text lang="DK">DVD Indstillinger</text>
      <text lang="PL">Konfiguracja DVD</text>
+     <text lang="RU">Настройка DVD</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -136,7 +143,7 @@
       <text lang="DE">Radio</text>
       <text lang="FR">Radio</text>
       <text lang="SI">Radio nastavitve</text>
-      <text lang="ET">Raadio seaded</text>
+      <text lang="ET">Raadio sätted</text>
       <text lang="SV">Radio</text>
       <text lang="DK">Radio Indstillinger</text>
       <text lang="PT">Configurar Rádio</text>
@@ -144,6 +151,7 @@
       <text lang="NL">Radio Instellingen</text>
       <text lang="PL">Konfiguracja Radia</text>
       <text lang="JA">ラジオ設定</text>
+      <text lang="RU">Настройка радио</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -161,8 +169,9 @@
       <text lang="SV">Bilder</text>
       <text lang="JA">イメージ設定</text>
       <text lang="SI">Nastavitve slik</text>
-      <text lang="ET">Galerii seaded</text>
+      <text lang="ET">Galerii sätted</text>
       <text lang="PL">Konfiguracja Galerii</text>
+      <text lang="RU">Настройка изображений</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -180,8 +189,9 @@
      <text lang="SV">Spel</text>
      <text lang="JA">ゲーム設定</text>
      <text lang="SI">Nastavitve iger</text>
-     <text lang="ET">Mängude seaded</text>
+     <text lang="ET">Mängude sätted</text>
      <text lang="PL">Konfiguracja Gier</text>
+     <text lang="RU">Настройка игр</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -199,8 +209,9 @@
      <text lang="SV">Väder</text>
      <text lang="JA">天気設定</text>
      <text lang="SI">Nastavitve vremena</text>
-     <text lang="ET">Ilmateate seaded</text>
+     <text lang="ET">Ilmateate sätted</text>
      <text lang="PL">Konfiguracja Pogody</text>
+     <text lang="RU">Настройка погоды</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -216,10 +227,11 @@
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース設定</text>
      <text lang="SI">Nastavitve novic</text>
-     <text lang="ET">Uudiste seaded</text>
+     <text lang="ET">Uudiste sätted</text>
      <text lang="DK">Nyheds Indstillinger</text>
      <text lang="PT">Configurar Notícias</text>
      <text lang="PL">Konfiguracja Wiadomo�ci</text>
+     <text lang="RU">Настройка новостей</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -228,10 +240,11 @@
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
      <text lang="PT">Configurar Aluguer de Filmes</text>
-     <text lang="ET">NetFlix seaded</text>
+     <text lang="ET">NetFlix'i sätted</text>
      <text lang="ES">MythFlix</text>
      <text lang="NL">NetFlix Instellingen</text>
      <text lang="PL">Konfiguracja NetFlix</text>
+     <text lang="RU">Настройка MythFlix</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -244,12 +257,13 @@
      <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
      <text lang="SI">Nastavitve spleta</text>
-     <text lang="ET">Veebi seaded</text>
+     <text lang="ET">Veebi sätted</text>
      <text lang="DK">Web Indstillinger</text>
      <text lang="PT">Config. Navegação Web</text>
      <text lang="ES">Configurar Web</text>
      <text lang="NL">Internet Instellingen</text>
      <text lang="PL">Konfiguracja przegladarki WWW</text>
+     <text lang="RU">Настройка браузера</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -260,13 +274,14 @@
       <text lang="DE">Rezepte</text>
       <text lang="FR">Recettes</text>
       <text lang="SI">Nastavitve receptov</text>
-      <text lang="ET">Retseptide seaded</text>
+      <text lang="ET">Retseptide sätted</text>
       <text lang="SV">Recept</text>
       <text lang="DK">Opskrifts Indstillinger</text>
       <text lang="PT">Configurar Receitas</text>
       <text lang="ES">Configurar Recetas</text>
       <text lang="NL">Recepten Instellingen</text>
       <text lang="PL">Konfiguracja Przepis�w</text>
+      <text lang="RU">Настройка рецептов</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -277,7 +292,7 @@
       <text lang="DE">Telefon</text>
       <text lang="FR">Téléphone</text>
       <text lang="SI">Nastavitve telefona</text>
-      <text lang="ET">Telefoni seaded</text>
+      <text lang="ET">Telefoni sätted</text>
       <text lang="SV">Telefon</text>
       <text lang="DK">Telefon Indstillinger</text>
       <text lang="PT">Configurar Telefone</text>
@@ -285,6 +300,7 @@
       <text lang="NL">Telefoon Instellingen</text>
       <text lang="PL">Konfiguracja Telefonu</text>
       <text lang="JA">電話設定</text>
+      <text lang="RU">Настройка телефона</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -295,12 +311,13 @@
      <text lang="FI">Elokuvien Aika-asetukset</text>
      <text lang="FR">Movie Time</text>
      <text lang="SI">Nastavitve čas filmov</text>
-     <text lang="ET">Filmiaegade seaded</text>
+     <text lang="ET">Filmiaegade sätted</text>
      <text lang="SV">Biotider</text>
      <text lang="DK">Biograf Indstillinger</text>
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="NL">Bioscoop Instellingen</text>
      <text lang="PL">Konfiguracja MovieTime</text>
+     <text lang="RU">Настройка афиши кино</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -317,9 +334,10 @@
      <text lang="SV">XBox</text>
      <text lang="JA">XBox設定</text>
      <text lang="SI">Nastavitve Xbox</text>
-     <text lang="ET">Xbox-i seaded</text>
+     <text lang="ET">Xbox-i sätted</text>
      <text lang="DK">XBox Indstillinger</text>
      <text lang="PL">Konfiguracja XBOX</text>
+     <text lang="RU">Настройка XBOX</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -329,11 +347,12 @@
      <text>Burn DVD Settings</text>
      <text lang="FR">Gravure DVD</text>
      <text lang="PT">Configurar Gravação de DVDs</text>
-     <text lang="ET">DVD-kirjutaja seaded</text>
+     <text lang="ET">DVD-kirjutaja sätted</text>
      <text lang="ES">Config. Grabación DVD</text>
      <text lang="NL">DVD Branden Instellingen</text>
      <text lang="PL">Konfiguracja nagrywarki DVD</text>
      <text lang="SV">DVD-br�nning</text>
+     <text lang="RU">Настройки прожига DVD</text>
      <action>CONFIGPLUGIN mythburn</action>
      <depends>mythburn</depends>
    </button>
@@ -341,7 +360,9 @@
    <button>
      <type>SETTINGS_ARCHIVE</type>
      <text>Archive Files Settings</text>
+     <text lang="ET">Arhiveerimise sätted</text>
      <text lang="SV">Filarkivering</text>
+     <text lang="RU">Настройка архива</text>
      <action>CONFIGPLUGIN mytharchive</action>
      <depends>mytharchive</depends>
    </button>

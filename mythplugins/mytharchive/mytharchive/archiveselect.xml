@@ -4,6 +4,7 @@
       <type>ARCHIVE_SELECT_RECORDINGS</type>
       <text>Select Recordings</text>
       <text lang="es">Seleccionar Grabaciones</text>
+      <text lang="et">Salvestiste valimine</text>
       <action>ARCHIVE_SELECT_RECORDINGS</action>
    </button>
 
@@ -11,6 +12,7 @@
       <type>ARCHIVE_SELECT_VIDEOS</type>
       <text>Select Video Files</text>
       <text lang="es">Seleccionar Ficheros Video</text>
+      <text lang="et">Videofailide valimine</text>
       <action>ARCHIVE_SELECT_VIDEOS</action>
    </button>
 
@@ -18,6 +20,7 @@
        <type>ARCHIVE_SELECT_FILES</type>
        <text>Select Files</text>
        <text lang="es">Seleccionar Ficheros</text>
+       <text lang="et">Failide valimine</text>
        <action>ARCHIVE_SELECT_FILES</action>
    </button>
 

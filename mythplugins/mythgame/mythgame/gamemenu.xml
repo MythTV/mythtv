@@ -9,6 +9,7 @@
      <text lang="DE">Spiele</text>
      <text lang="SI">Igre</text>
      <text lang="FI">Pelaa</text>
+     <text lang="ET">Mängud</text>
      <action>GAME_PLAY</action>
   </button>
 

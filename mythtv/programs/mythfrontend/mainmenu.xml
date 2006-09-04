@@ -20,6 +20,7 @@
       <text lang="ET">Vaata telerit</text>
       <text lang="NB">Se på TV</text>
       <text lang="CZ">Sledovat TV</text>
+      <text lang="RU">Смотреть ТВ</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -41,6 +42,7 @@
      <text lang="ES">Mediateca</text>
      <text lang="PT">Galeria Multimédia</text>
      <text lang="CZ">Multimediální katalog</text>
+     <text lang="RU">Мультимедиа</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
      <alttext lang="PT">Galeria</alttext>
@@ -67,10 +69,12 @@
       <text lang="ET">Salvestamine</text>
       <text lang="NB">Behandle opptak</text>
       <text lang="CZ">Spravovat nahrávky</text>
+      <text lang="RU">Управление записями</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="PT">Programação</alttext>
+      <alttext lang="RU">Записи</alttext>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -93,12 +97,14 @@
      <text lang="EN_GB">Information Centre</text>
      <text lang="PT">Centro de Informação</text>
      <text lang="CZ">Centrum informací</text>
+     <text lang="RU">Центр информации</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
      <alttext lang="ET">Info</alttext>
      <alttext lang="PT">Informação</alttext>
      <alttext lang="NL">Infocenter</alttext>
+     <alttext lang="RU">Информация</alttext>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -121,6 +127,7 @@
      <text lang="EN_GB">CD/DVD</text>
      <text lang="PT">CD/DVD</text>
      <text lang="CZ">CD/DVD</text>
+     <text lang="RU">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd mytharchive mythburn</depends>
    </button>
@@ -142,12 +149,14 @@
      <text lang="FI">Oheis/Asetukset</text>
      <text lang="ZH_TW">工具/設定</text>
      <text lang="SI">Nastavitve</text>
-     <text lang="ET">Utiliidid / seaded</text>
+     <text lang="ET">Utiliidid / sätted</text>
      <text lang="NB">Verktøy/Oppsett</text>
      <text lang="CZ">Pomůcky</text>
+     <text lang="RU">Утилиты / Настройки</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
-     <alttext lang="ET">Seaded</alttext>
+     <alttext lang="ET">Sätted</alttext>
+     <alttext lang="RU">Настройки</alttext>
      <action>MENU util_menu.xml</action>
    </button>
 
@@ -160,6 +169,7 @@
      <text lang="ET">Seiska</text>
      <text lang="PT">Gravações</text>
      <text lang="NL">Afsluiten</text>
+     <text lang="RU">Завершение работы</text>
      <action>SHUTDOWN</action>
    </button> -->
 
