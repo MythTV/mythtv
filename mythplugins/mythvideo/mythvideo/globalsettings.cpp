@@ -283,6 +283,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     general->addChild(VideoDefaultParentalLevel());
     general->addChild(VideoAdminPassword());
     general->addChild(VideoAggressivePC());
+    general->addChild(VideoDefaultView());
     addChild(general);
 
     VerticalConfigurationGroup* general2 =
@@ -297,8 +298,6 @@ VideoGeneralSettings::VideoGeneralSettings()
     general2->addChild(VideoSortIgnoresCase());
     general2->addChild(VideoDBFolderView());
     general2->addChild(VideoImageCacheSize());
-    general2->addChild(VideoDefaultView());
-
     addChild(general2);
 
     VerticalConfigurationGroup* vman = new VerticalConfigurationGroup(false);
