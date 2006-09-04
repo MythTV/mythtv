@@ -185,7 +185,6 @@ uint32_t KeyframeSequencer::AddBytes(
         synced = false;
         read_first_NAL_byte = true;
 
-        state_changed = true;
         return local_bytes - bytes;
     }
 
