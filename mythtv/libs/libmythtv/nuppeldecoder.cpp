@@ -570,16 +570,13 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
 
-    int width = c->width;
-    int height = c->height;
+    int i;
 
-    pic->data[0] = nd->directframe->buf;
-    pic->data[1] = pic->data[0] + width * height;
-    pic->data[2] = pic->data[1] + width * height / 4;
-
-    pic->linesize[0] = width;
-    pic->linesize[1] = width / 2;
-    pic->linesize[2] = width / 2;
+    for (i = 0; i < 3; i++)
+    {
+        pic->data[i] = nd->directframe->buf + nd->directframe->offsets[i];
+        pic->linesize[i] = nd->directframe->pitches[i];
+    }
 
     pic->opaque = nd->directframe;
     pic->type = FF_BUFFER_TYPE_USER;
@@ -691,6 +688,22 @@ void NuppelDecoder::CloseAVCodec(void)
     }
 }
 
+static void CopyToVideo(unsigned char *buf, int video_width,
+                        int video_height, VideoFrame *frame)
+{
+    uint ysize = video_width * video_height;
+    uint uvsize = ysize >> 2;
+
+    unsigned char *planes[3];
+    planes[0] = buf;
+    planes[1] = planes[0] + ysize;
+    planes[2] = planes[1] + uvsize;
+
+    memcpy(frame->buf + frame->offsets[0], planes[0], ysize);
+    memcpy(frame->buf + frame->offsets[1], planes[1], uvsize);
+    memcpy(frame->buf + frame->offsets[2], planes[2], uvsize);
+}
+      
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                                 unsigned char *lstrm, VideoFrame *frame)
 {
@@ -719,11 +732,11 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     if (frameheader->comptype == 'L') {
         switch(lastct) {
             case '0': case '3':
-                memcpy(outbuf, buf2, video_size);
+                CopyToVideo(buf2, video_width, video_height, frame);
                 break;
             case '1': case '2':
             default:
-                memcpy(outbuf, buf, video_size);
+                CopyToVideo(buf, video_width, video_height, frame);
                 break;
         }
         return true;
@@ -747,13 +760,13 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
     if (frameheader->comptype == '0')
     {
-        memcpy(outbuf, lstrm, video_size);
+        CopyToVideo(lstrm, video_width, video_height, frame);
         return true;
     }
 
     if (frameheader->comptype == '3')
     {
-        memcpy(outbuf, buf2, video_size);
+        CopyToVideo(buf2, video_width, video_height, frame);
         return true;
     }
 
@@ -764,7 +777,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         else
             rtjd->Decompress((int8_t*)buf2, planes);
 
-        memcpy(outbuf, buf, video_size);
+        CopyToVideo(buf, video_width, video_height, frame);
     }
     else
     {
