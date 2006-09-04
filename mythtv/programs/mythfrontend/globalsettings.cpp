@@ -2584,6 +2584,9 @@ public:
             VerticalConfigurationGroup(false, false, true, true),
             TriggeredConfigurationGroup(false) {
 
+        TriggeredConfigurationGroup::setOptions(false, false, true, true);
+        VerticalConfigurationGroup::setOptions(false, false, true, true);
+
         HostComboBox *defaultView = DefaultView();
         addChild(defaultView);
         setTrigger(defaultView);
@@ -3532,11 +3535,16 @@ GeneralSettings::GeneralSettings()
     general->addChild(LongChannelFormat());
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
-    general->addChild(AutoExpireMethod());
-    general->addChild(AutoExpireDayPriority());
-    general->addChild(AutoExpireDefault());
-    general->addChild(AutoExpireLiveTVMaxAge());
     addChild(general);
+
+    VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
+    autoexp->setLabel(QObject::tr("General (AutoExpire)"));
+    autoexp->addChild(AutoExpireMethod());
+    autoexp->addChild(AutoExpireDayPriority());
+    autoexp->addChild(AutoExpireDefault());
+    autoexp->addChild(AutoExpireLiveTVMaxAge());
+    autoexp->addChild(AutoExpireExtraSpace());
+    addChild(autoexp);
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
     jobs->setLabel(QObject::tr("General (Jobs)"));
@@ -3551,7 +3559,6 @@ GeneralSettings::GeneralSettings()
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
     general2->setLabel(QObject::tr("General (Advanced)"));
-    general2->addChild(AutoExpireExtraSpace());
     general2->addChild(RecordPreRoll());
     general2->addChild(RecordOverTime());
     general2->addChild(CategoryOverTimeSettings());
