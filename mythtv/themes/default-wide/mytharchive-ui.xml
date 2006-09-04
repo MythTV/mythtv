@@ -1,0 +1,506 @@
+<!--
+
+MythTV Archive GUI theme
+
+-->
+<mythuitheme>
+
+  <!-- 
+      Recording Selector
+  -->
+  <window name="recording_selector">
+
+      <font name="title" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>24</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="description" face="Arial">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="detail" face="Arial">
+          <color>#ffffff</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="detailtitle" face="Arial">
+          <color>#ffff00</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="label" face="Arial">
+          <color>#ffff00</color>
+          <size>16</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="buttons" face="Arial">
+          <color>#ffffff</color>
+          <size>12</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="active" face="Arial">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="inactive" face="Arial">
+          <color>#9999cc</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="smallstatsfont" face="Arial">
+          <color>#ffffff</color>
+          <size>10</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="statserror" face="Arial">
+          <color>#ff0000</color>
+          <size>10</size>
+          <bold>no</bold>
+      </font>
+
+      <container name="recordinglist">
+          <area>0,0,1280,650</area>
+
+          <image name="image" draworder="0">
+              <position>25,60</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>1230,340</staticsize>
+          </image>
+
+          <textarea name="title" draworder="1" align="center">
+              <area>0,10,1280,50</area>
+              <font>title</font>
+              <value>Select Recordings</value>
+          </textarea>
+
+          <textarea name="title" draworder="1" align="right">
+              <area>50,85,200,50</area>
+              <font>label</font>
+              <value>Show Recordings</value>
+          </textarea>
+
+          <selector name="category_selector" draworder="1">
+              <area>275,80,970,40</area>
+              <font>description</font>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+          </selector>
+
+          <listbtnarea name="recordinglist"  draworder="1">
+              <area>60,130,1140,205</area>
+              <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+              </gradient>
+              <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
+              </gradient>
+              <fcnfont name="active" function="active"></fcnfont>
+              <fcnfont name="inactive" function="inactive"></fcnfont>
+              <showscrollarrows>yes</showscrollarrows>
+              <showarrow>no</showarrow>
+          </listbtnarea>
+
+          <image name="image" draworder="0">
+              <position>25,370</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>1230,300</staticsize>
+          </image>
+
+          <textarea name="progtitle" draworder="3">
+              <area>60,395,640,30</area>
+              <font>detailtitle</font>
+              <value>title goes here</value>
+              <multiline>no</multiline>
+          </textarea>
+
+          <textarea name="progdatetime" draworder="4" align="right">
+              <area>680,395,530,30</area>
+              <font>detailtitle</font>
+              <value>sep 13, 2004 11:00 pm (1h 15m)</value>
+              <multiline>no</multiline>
+          </textarea>
+
+          <textarea name="progdescription" draworder="5">
+              <area>60,420,900,150</area>
+              <font>detail</font>
+              <value>description goes here.</value>
+              <multiline>yes</multiline>
+          </textarea>
+
+          <image name="cutlist_image" draworder="5">
+              <position>65,595</position>
+              <staticsize>25,25</staticsize>
+              <filename>ma_cutlist.png</filename>
+          </image>
+
+          <textarea name="filesize" draworder="5" align="right">
+              <area>1110,600,100,40</area>
+              <font>detail</font>
+              <value>x.xx Gb</value>
+              <multiline>yes</multiline>
+          </textarea>
+
+          <image name="preview_image" draworder="0">
+              <position>1000,425</position>
+              <staticsize>200,170</staticsize>
+              <filename>blank.png</filename>
+          </image>
+
+      </container> 
+
+      <!--
+          button area
+      -->
+      <container name="buttons">
+          <area>0,660,1280,50</area>
+
+          <textbutton name="cancel_button" draworder="1">
+              <position>55,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="ok_button" draworder="1">
+              <position>1060,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+      </container>
+  </window>
+
+  <!--
+      File Selector
+  -->
+
+  <window name="file_selector">
+      <font name="title" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>24</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="buttons" face="Arial">
+          <color>#ffffff</color>
+          <size>12</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="edit" face="Arial">
+          <color>#ffffff</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="active" face="Arial">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="inactive" face="Arial">
+          <color>#9999cc</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="info" face="Arial">
+          <color>#9999cc</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="label" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>18</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <container name="title">
+          <area>0,5,1280,45</area>
+          <textarea name="title" draworder="1" align="center">
+              <area>0,0,1280,45</area>
+              <font>title</font>
+              <multiline>no</multiline>
+              <value>File Finder</value>
+          </textarea>
+      </container>
+
+      <container name="location">
+          <area>0,55,1280,80</area>
+
+          <textbutton name="back_button" draworder="1">
+              <position>35,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+          <textbutton name="home_button" draworder="1">
+              <position>200,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+          <textarea name="location_label" draworder="0" align="right">
+              <area>20,50,140,30</area>
+              <font>label</font>
+              <multiline>no</multiline>
+              <value>Location:</value>
+          </textarea>
+          <remoteedit name="location_edit" draworder="0" align="left">
+              <area>180,50,1050,30</area>
+              <font>edit</font>
+          </remoteedit>
+      </container>
+
+      <container name="file_list">
+          <area>20,140,1240,500</area>
+          <listbtnarea name="filelist"  draworder="1">
+              <area>0,0,1240,500</area>
+              <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+              </gradient>
+              <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
+              </gradient>
+              <fcnfont name="active" function="active"></fcnfont>
+              <fcnfont name="inactive" function="inactive"></fcnfont>
+              <showscrollarrows>yes</showscrollarrows>
+              <showarrow>no</showarrow>
+          </listbtnarea>
+      </container>
+
+      <!--
+          button area shown on all pages
+      -->
+      <container name="buttons">
+          <area>0,660,1280,50</area>
+          <textbutton name="cancel_button" draworder="1">
+              <position>55,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+          <textbutton name="ok_button" draworder="1">
+              <position>1060,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+      </container>
+
+  </window>
+
+  <!--
+      Video Selector
+  -->
+  <window name="video_selector">
+
+      <font name="title" face="Arial">
+          <color>#ffff00</color>
+          <dropcolor>#000000</dropcolor>
+          <size>24</size>
+          <shadow>3,3</shadow>
+          <bold>yes</bold>
+      </font>
+
+      <font name="description" face="Arial">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="detail" face="Arial">
+          <color>#ffffff</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="detailtitle" face="Arial">
+          <color>#ffff00</color>
+          <size>14</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="label" face="Arial">
+          <color>#ffff00</color>
+          <size>16</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="buttons" face="Arial">
+          <color>#ffffff</color>
+          <size>12</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="active" face="Arial">
+          <color>#ffffff</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="inactive" face="Arial">
+          <color>#9999cc</color>
+          <size>18</size>
+          <bold>yes</bold>
+      </font>
+
+      <font name="smallstatsfont" face="Arial">
+          <color>#ffffff</color>
+          <size>10</size>
+          <bold>no</bold>
+      </font>
+
+      <font name="statserror" face="Arial">
+          <color>#ff0000</color>
+          <size>10</size>
+          <bold>no</bold>
+      </font>
+
+      <container name="videolist">
+          <area>0,0,1280,650</area>
+
+          <image name="image" draworder="0">
+              <position>25,60</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>1230,380</staticsize>
+          </image>
+
+          <textarea name="title" draworder="1" align="center">
+              <area>0,10,1280,50</area>
+              <font>title</font>
+              <value>Select Video's</value>
+          </textarea>
+
+          <textarea name="title" draworder="1" align="right">
+              <area>45,85,200,50</area>
+              <font>label</font>
+              <value>Video Category</value>
+          </textarea>
+
+          <selector name="category_selector" draworder="1">
+              <area>265,80,480,40</area>
+              <font>description</font>
+              <image function="on" filename="ma_leftright_on.png"></image>
+              <image function="off" filename="ma_leftright_off.png"></image>
+              <image function="pushed" filename="ma_leftright_pushed.png"></image>
+          </selector>
+
+          <listbtnarea name="videolist"  draworder="1">
+              <area>70,130,1130,245</area>
+              <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+              </gradient>
+              <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
+              </gradient>
+              <fcnfont name="active" function="active"></fcnfont>
+              <fcnfont name="inactive" function="inactive"></fcnfont>
+              <showscrollarrows>yes</showscrollarrows>
+              <showarrow>no</showarrow>
+          </listbtnarea>
+
+          <image name="image" draworder="0">
+              <position>30,410</position>
+              <filename>trans-cr-background.png</filename>
+              <staticsize>1050,260</staticsize>
+          </image>
+
+          <textarea name="videotitle" draworder="3">
+              <area>60,430,640,30</area>
+              <font>detailtitle</font>
+              <value>title goes here</value>
+              <multiline>no</multiline>
+          </textarea>
+
+          <textarea name="videoplot" draworder="5">
+              <area>60,480,800,130</area>
+              <font>detail</font>
+              <value>description goes here.</value>
+              <multiline>yes</multiline>
+          </textarea>
+
+          <textarea name="filesize" draworder="5" align="right">
+              <area>940,600,100,40</area>
+              <font>detail</font>
+              <value>x.xx Gb</value>
+              <multiline>yes</multiline>
+          </textarea>
+
+          <image name="cover_background" draworder="0">
+              <position>1075,418</position>
+              <staticsize>150,210</staticsize>
+              <filename>ma_coverback.png</filename>
+          </image>
+          <image name="cover_image" draworder="0">
+              <position>1080,423</position>
+              <staticsize>140,200</staticsize>
+          </image>
+
+          <textarea name="label" draworder="1" align="right">
+              <area>1100,350,60,40</area>
+              <font>detailtitle</font>
+              <value>PL:</value>
+          </textarea>
+          <textarea name="parentallevel_text" draworder="1">
+              <area>1190,350,20,40</area>
+              <font>detail</font>
+              <value>1</value>
+          </textarea>
+
+          <textarea name="warning_text" draworder="2" align="center">
+              <area>50,200,690,40</area>
+              <font>detail</font>
+              <value>No videos available</value>
+          </textarea>
+
+      </container> 
+
+      <!--
+          button area
+      -->
+      <container name="buttons">
+          <area>0,660,1280,50</area>
+
+          <textbutton name="cancel_button" draworder="1">
+              <position>55,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+          <textbutton name="ok_button" draworder="1">
+              <position>1060,0</position>
+              <image function="on" filename="ma_text_button_on.png"></image>
+              <image function="off" filename="ma_text_button_off.png"></image>
+              <image function="pushed" filename="ma_text_button_pushed.png"></image>
+              <font>buttons</font>
+          </textbutton>
+
+      </container>
+  </window>
+
+</mythuitheme>
