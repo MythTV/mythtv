@@ -390,7 +390,7 @@ public:
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use interlaced "
                     "DCT encoding.  You probably want this when encoding "
-                    "interlaced video."));
+                    "interlaced video. NOTE: Very high CPU usage."));
     };
 };
 
@@ -402,7 +402,7 @@ public:
         setValue(false);
         setHelpText(QObject::tr("If set, the MPEG4 encoder will use interlaced "
                     "motion estimation.  You probably want this when encoding "
-                    "interlaced video."));
+                    "interlaced video. NOTE: Very high CPU usage."));
     };
 };
 
