@@ -6,6 +6,7 @@
       <text lang="es">Crear DVD</text>
       <text lang="et">DVD valmistamine</text>
       <text lang="nl">Maak DVD</text>
+      <text lang="nb">Lag DVD</text>
       <action>ARCHIVE_CREATE_DVD</action>
       <depends>themes/default/mythburn-ui.xml</depends>
    </button>
@@ -16,6 +17,7 @@
       <text lang="es">Crear Archivo Nativo</text>
       <text lang="et">Arhiivi valmistamine</text>
       <text lang="nl">Maak Backup</text>
+      <text lang="nb">Lag naturlig arkiv</text>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
       <depends>themes/default/mythnative-ui.xml</depends>
   </button>
@@ -26,6 +28,7 @@
        <text lang="es">Codificar Fichero Video</text>
        <text lang="et">Videofaili kodeerimine</text>
        <text lang="nl">Encodeer Video Bestanden</text>
+       <text lang="nb">Konverter videofil</text>
        <action>ARCHIVE_ENCODE_VIDEO</action>
        <depends></depends>
    </button>

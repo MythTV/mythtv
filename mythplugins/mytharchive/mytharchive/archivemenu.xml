@@ -6,6 +6,7 @@
       <text lang="es">Buscar Ficheros a Archivar</text>
       <text lang="et">Failide otsimine arhiveerimiseks</text>
       <text lang="nl">Zoek bestanden om te archiveren</text>
+      <text lang="nb">Finn filer å arkivere</text>
       <action>ARCHIVE_FINDER</action>
    </button>
 
@@ -15,6 +16,7 @@
       <text lang="es">Exportar Ficheros Video</text>
       <text lang="et">Videofailide eksportimine</text>
       <text lang="nl">Exporteer Video Bestanden</text>
+      <text lang="nb">Eksporter videofiler</text>
       <action>ARCHIVE_EXPORT_VIDEO</action>
    </button>
 
@@ -24,6 +26,7 @@
        <text lang="es">Importar Ficheros Video</text>
        <text lang="et">Videofailide importimine</text>
        <text lang="nl">Importeer Video Bestanden</text>
+       <text lang="nb">Importer videofiler</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 

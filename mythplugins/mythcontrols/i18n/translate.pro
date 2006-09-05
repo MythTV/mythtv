@@ -7,4 +7,4 @@ SOURCES += ../mythcontrols/mythcontrols.cpp
 
 TRANSLATIONS  = mythcontrols_sv.ts mythcontrols_fi.ts mythcontrols_es.ts
 TRANSLATIONS += mythcontrols_de.ts mythcontrols_nl.ts mythcontrols_dk.ts
-TRANSLATIONS += mythcontrols_et.ts
+TRANSLATIONS += mythcontrols_et.ts mythcontrols_nb.ts
