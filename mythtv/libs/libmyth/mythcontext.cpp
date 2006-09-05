@@ -1637,20 +1637,23 @@ bool MythContext::ParseGeometryOverride(const QString geometry)
         return false;
     }
 
-    d->m_geometry_x = geo[3].toInt(&parsed);
-    if (longForm && !parsed)
+    if (longForm)
     {
-        VERBOSE(VB_IMPORTANT,
-                "Could not parse horizontal offset of geometry override");
-        return false;
-    }
+        d->m_geometry_x = geo[3].toInt(&parsed);
+        if (!parsed)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Could not parse horizontal offset of geometry override");
+            return false;
+        }
 
-    d->m_geometry_y = geo[4].toInt(&parsed);
-    if (longForm && !parsed)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Could not parse vertical offset of geometry override");
-        return false;
+        d->m_geometry_y = geo[4].toInt(&parsed);
+        if (!parsed)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Could not parse vertical offset of geometry override");
+            return false;
+        }
     }
 
     VERBOSE(VB_IMPORTANT, QString("Overriding GUI, width=%1,"
