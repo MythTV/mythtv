@@ -1205,6 +1205,9 @@ int TimezoneToInt (QString timezone)
 {
     // we signal an error by setting it invalid (> 840min = 14hr)
     int result = 841;
+    
+    if (timezone.upper() == "UTC" || timezone.upper() == "GMT")
+        return 0;
 
     if (timezone.length() == 5)
     {
@@ -2629,6 +2632,11 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_ru")
+        // Russian grabber returns all known data by default
+        command.sprintf("nice %s --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        filename.ascii());
     else
     {
         isNorthAmerica = true;
@@ -2655,7 +2663,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_pt" ||
          xmltv_grabber == "tv_grab_be_tvb" ||
          xmltv_grabber == "tv_grab_be_tlm" ||
-         xmltv_grabber == "tv_grab_ee"))
+         xmltv_grabber == "tv_grab_ee" ||
+         xmltv_grabber == "tv_grab_ru"))
          command += " --quiet";
 
 
@@ -2899,7 +2908,8 @@ bool fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "tv_grab_be_tlm" ||
                  xmltv_grabber == "tv_grab_is" ||
                  xmltv_grabber == "tv_grab_br" ||
-                 xmltv_grabber == "tv_grab_cz")
+                 xmltv_grabber == "tv_grab_cz" ||
+                 xmltv_grabber == "tv_grab_ru")
         {
             // Grabbers supporting the --offset option
 

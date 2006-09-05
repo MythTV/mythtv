@@ -303,7 +303,7 @@ void XMLTV_generic_config::save()
         grabber == "tv_grab_ee" || grabber == "tv_grab_be_tvb" ||
         grabber == "tv_grab_be_tlm" || grabber == "tv_grab_is" ||
         grabber == "tv_grab_br" || grabber == "tv_grab_cz" ||
-        grabber == "tv_grab_il")
+        grabber == "tv_grab_il" || grabber == "tv_grab_ru")
     {
         VERBOSE(VB_IMPORTANT, "\n" << err_msg);
         MythPopupBox::showOkPopup(
@@ -436,6 +436,9 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent) :
 
     addTarget("tv_grab_il", new XMLTV_generic_config(parent, "tv_grab_il"));
     grabber->addSelection("Israel", "tv_grab_il");
+
+    addTarget("tv_grab_ru", new XMLTV_generic_config(parent, "tv_grab_ru"));
+    grabber->addSelection("Russia", "tv_grab_ru");
 
     addTarget("/bin/true", new NoGrabber_config(parent));
     grabber->addSelection("No grabber", "/bin/true");

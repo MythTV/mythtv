@@ -290,5 +290,20 @@
   <catcolor category="Wissenschaft" color="#33ff99"></catcolor>
   <catcolor category="Zeichentrick" color="MediumSlateBlue"></catcolor>
 
+  <!-- Categories introduced by tv_grab_ru -->
+  <!-- (unofficial xmltv grabber for Russia) -->
+  <catcolor category="Художественный фильм" color="Blue"></catcolor>
+  <catcolor category="Мультипликационный сериал" color="#3333aa"></catcolor>
+  <catcolor category="Мультфильм" color="#3333aa"></catcolor>
+  <catcolor category="Документальный сериал" color="goldenrod"></catcolor>
+  <catcolor category="Документальный фильм" color="goldenrod"></catcolor>
+  <catcolor category="Спектакль" color="MediumTurquoise"></catcolor>
+  <catcolor category="Концерт" color="turquoise3"></catcolor>
+  <catcolor category="Комедия" color="#8800aa"></catcolor>
+  <catcolor category="Мелодрама" color="rosybrown3"></catcolor>
+  <catcolor category="Триллер" color="firebrick3"></catcolor>
+  <catcolor category="Боевик" color="MediumVioletRed"></catcolor>
+  <catcolor category="Фильм ужасов" color="firebrick3"></catcolor>
+
 </categorycolors>
 
