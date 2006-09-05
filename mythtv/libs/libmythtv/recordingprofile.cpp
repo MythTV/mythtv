@@ -388,9 +388,10 @@ public:
         CodecParam(parent, "mpeg4optionidct") {
         setLabel(QObject::tr("Enable interlaced DCT encoding"));
         setValue(false);
-        setHelpText(QObject::tr("If set, the MPEG4 encoder will use interlaced "
-                    "DCT encoding.  You probably want this when encoding "
-                    "interlaced video. NOTE: Very high CPU usage."));
+        setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
+                    "interlaced DCT encoding. You may want this when encoding "
+                    "interlaced video, however, this is experimental and may "
+                    "cause damaged video."));
     };
 };
 
@@ -400,9 +401,10 @@ public:
         CodecParam(parent, "mpeg4optionime") {
         setLabel(QObject::tr("Enable interlaced motion estimation"));
         setValue(false);
-        setHelpText(QObject::tr("If set, the MPEG4 encoder will use interlaced "
-                    "motion estimation.  You probably want this when encoding "
-                    "interlaced video. NOTE: Very high CPU usage."));
+        setHelpText(QObject::tr("If set, the MPEG4 encoder will use "
+                    "interlaced motion estimation. You may want this when "
+                    "encoding interlaced video, however, this is experimental "
+                    "and may cause damaged video."));
     };
 };
 
