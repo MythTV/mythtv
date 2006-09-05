@@ -2080,7 +2080,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     opr->SetOffset(offset);
     opr->SetPosition(initial_selection);
 
-    dialogResponseList[name] = 0;
+    dialogResponseList[name] = initial_selection;
 
     HighlightDialogSelection(container, offset + initial_selection);
 

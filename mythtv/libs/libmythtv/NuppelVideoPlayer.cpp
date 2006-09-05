@@ -4535,6 +4535,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
 {
     bool deletepoint = false;
+    bool cut_after = false;
     int direction = 0;
 
     if(!deleteMap.isEmpty())
@@ -4547,12 +4548,18 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
         if (iter == deleteMap.end())
         {
             --iter;
+            cut_after = !iter.data();
         }
         else if((iter != deleteMap.begin()) && (iter.key() != framesPlayed))
         {
             long long value = iter.key();
             if((framesPlayed - (--iter).key()) > (value - framesPlayed))
+            {
+                cut_after = !iter.data();
                 ++iter;
+            }
+            else
+                cut_after = !iter.data();
         }
 
         direction = iter.data();
@@ -4603,7 +4610,7 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
         options += option1;
         options += option2;
 
-        osd->NewDialogBox(dialogname, message, options, -1);
+        osd->NewDialogBox(dialogname, message, options, -1, cut_after);
     }
 }
 
