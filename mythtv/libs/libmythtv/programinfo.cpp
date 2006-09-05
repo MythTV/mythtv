@@ -3834,7 +3834,7 @@ void ProgramInfo::ShowNotRecordingDialog(void)
     QDateTime now = QDateTime::currentDateTime();
 
     if (recstartts < now && recendts > now &&
-        recstatus != rsDontRecord)
+        recstatus != rsDontRecord && recstatus != rsNotListed)
     {
         diag.AddButton(QObject::tr("Reactivate"));
         react = button++;
@@ -3865,11 +3865,12 @@ void ProgramInfo::ShowNotRecordingDialog(void)
         {
             if (rectype != kSingleRecord &&
                 recstatus != rsPreviousRecording &&
-                recstatus != rsCurrentRecording)
+                recstatus != rsCurrentRecording &&
+                recstatus != rsNotListed)
             {
                 if (recstartts > now)
                 {
-                    diag.AddButton(QObject::tr("Absolutely don't record"));
+                    diag.AddButton(QObject::tr("Don't record"));
                     addov1 = button++;
                 }
                 if (rectype != kFindOneRecord &&
@@ -3889,7 +3890,8 @@ void ProgramInfo::ShowNotRecordingDialog(void)
             diag.AddButton(QObject::tr("Edit Options"));
             ednorm = button++;
 
-            if (rectype != kSingleRecord && rectype != kFindOneRecord)
+            if (rectype != kSingleRecord && rectype != kFindOneRecord &&
+                recstatus != rsNotListed)
             {
                 diag.AddButton(QObject::tr("Add Override"));
                 edcust = button++;
