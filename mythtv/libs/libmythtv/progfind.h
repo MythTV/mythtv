@@ -88,6 +88,7 @@ class ProgFinder : public MythDialog
     bool running;
     int *gotInitData;
     bool ggActive;
+    bool arrowAccel;
 
     QTimer *update_Timer;
 

@@ -72,13 +72,15 @@ void RunProgramFind(bool thread, bool ggActive)
 }
 
 ProgFinder::ProgFinder(MythMainWindow *parent, const char *name, bool gg)
-          : MythDialog(parent, name)
+          : MythDialog(parent, name),
+            arrowAccel(true)
 {
     curSearch = 10;
     searchCount = 37;
     ggActive = gg;
 
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    arrowAccel = gContext->GetNumSetting("UseArrowAccels", 1);
 }
 
 void ProgFinder::Initialize(void)
@@ -515,7 +517,7 @@ void ProgFinder::update_timeout()
 void ProgFinder::cursorLeft()
 {
     inSearch--;
-    if (inSearch == -1)
+    if (inSearch == -1 && arrowAccel)
         escape();
     else
     {
@@ -562,6 +564,9 @@ void ProgFinder::cursorRight()
                 inSearch = 1;
         }
     }
+    else if (inSearch == 2 && arrowAccel)
+        getInfo();
+
     update(infoRect);
     update(listRect);
 }
