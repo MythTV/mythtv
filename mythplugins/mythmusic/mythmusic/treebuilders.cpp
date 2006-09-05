@@ -134,7 +134,6 @@ protected:
 
 private:
     QStringList m_paths;
-    //QDict<QString> m_charToSplitMap;
     QMap<QChar, QString> m_split_map;
 
     QString getSplitField(Metadata *meta, const QString &field) 
@@ -153,7 +152,7 @@ private:
         {
             if (field == "splitartist1") 
             {
-                split = QObject::tr("Artists ") + "(" + firstchar + ")";
+                split = QObject::tr("Artists") + " (" + firstchar + ")";
                 m_split_map[firstchar] = split;
             } 
             else 
@@ -165,7 +164,7 @@ private:
                 {
                     if (splits[i].testStr.contains(firstchar)) 
                     {
-                        split = QObject::tr("Artists ") + splits[i].dispStr;
+                        split = QObject::tr("Artists") + splits[i].dispStr;
                         m_split_map[firstchar] = split;
                         break;
                     }
@@ -175,7 +174,7 @@ private:
 
         if (split.isEmpty()) 
         {
-            split = QObject::tr("Artists") + "(" + firstchar + ")";
+            split = QObject::tr("Artists") + " (" + firstchar + ")";
             m_split_map[firstchar] = split;
         }
 
