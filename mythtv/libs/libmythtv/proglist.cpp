@@ -992,7 +992,7 @@ void ProgLister::powerEdit()
     stationList << "";
 
     DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
-    ChannelUtil::SortChannels(channels, channelOrdering);
+    ChannelUtil::SortChannels(channels, channelOrdering, true);
 
     for (uint i = 0; i < channels.size(); i++)
     {
@@ -1194,7 +1194,7 @@ void ProgLister::fillViewList(const QString &view)
     {
         DBChanList channels = ChannelUtil::GetChannels(0, true,
                                                        "channum, chanid");
-        ChannelUtil::SortChannels(channels, channelOrdering);
+        ChannelUtil::SortChannels(channels, channelOrdering, true);
 
         for (uint i = 0; i < channels.size(); i++)
         {
