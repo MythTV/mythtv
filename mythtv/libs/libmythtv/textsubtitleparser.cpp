@@ -5,8 +5,9 @@
  */
 
 #include <stdio.h>
-#include <qtextcodec.h>
+#include <cstring>
 #include <algorithm>
+#include <qtextcodec.h>
 
 using std::lower_bound;
 
@@ -115,6 +116,11 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
 
     target.SetFrameBasedTiming(!sub_data.uses_time);
 
+    // assume the text to be in UTF8 compatible format until encountering
+    // a string of which characters cannot be encoded by UTF8.
+    QTextCodec *utf8Codec = QTextCodec::codecForName("utf8");
+    bool utf8 = (bool)utf8Codec;
+
     // convert the subtitles to our own format and free the original structures
     for (int sub_i = 0; sub_i < sub_data.num; ++sub_i)
     {
@@ -129,10 +135,28 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
 
         for (int line = 0; line < sub->lines; ++line)
         {
-            newsub.textLines.push_back(QString(sub->text[line]));
+            const char *subLine = sub->text[line];
+            int lineLength = strlen(subLine);
+
+            // check if the string contains unknown chars to UTF8,
+            // if the encoding has not been detected to be non-UTF8
+            // before (the heuristics method can sometimes return
+            // larger than the lineLength for unknown reason, thus the >= )
+            utf8 = utf8 &&
+                (utf8Codec->heuristicContentMatch(subLine, lineLength) >= lineLength);
+
+            // use Latin1 as the fallback encoding in case there was
+            // non-UTF8 strings detected
+            // TODO: user option for setting the fallback encoding could
+            // be nice (it's impossible to detect the correct 8-bit encoding
+            // automatically)
+            if (utf8)
+                newsub.textLines.push_back(QString::fromUtf8(subLine));
+            else
+                newsub.textLines.push_back(QString::fromLatin1(subLine));
+
             free(sub->text[line]);
         }
-
         target.AddSubtitle(newsub);
     }
 

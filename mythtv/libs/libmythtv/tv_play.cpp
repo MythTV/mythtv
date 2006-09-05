@@ -6982,17 +6982,19 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
         baseName + "*.srt; " + baseName + "*.sub; " + baseName + "*.txt;");
 
     bool found = false;
+    QString candidate = "";
     QStringList::const_iterator it = candidates.begin();
     for (; (it != candidates.end()) && !found; ++it)
     {
-        if (nvp->LoadExternalSubtitles(dirName + "/" + *it))
+        candidate = dirName + "/" + *it;
+        if (nvp->LoadExternalSubtitles(candidate))
             found = true;
     }
 
     if (found)
     {
         VERBOSE(VB_PLAYBACK, LOC +
-                QString("Loaded text subtitles from '%1'.").arg(*it));
+                QString("Loaded text subtitles from '%1'.").arg(candidate));
     }
 
     return found;
