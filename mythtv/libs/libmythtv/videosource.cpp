@@ -784,9 +784,8 @@ class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
         setLabel(QObject::tr("Wait for SEQ start header."));
         setValue(true);
         setHelpText(
-            QObject::tr("Normally the dvb-recording will drop packets "
-                        "from the card until a sequence start header is seen. "
-                        "This option turns off this feature."));
+            QObject::tr("Make the dvb-recording will drop packets from "
+                        "the card until a sequence start header is seen."));
     };
 };
 
