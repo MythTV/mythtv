@@ -19,6 +19,7 @@
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qdir.h>
+#include <qurl.h>
 
 #include <iostream>
 using namespace std;
@@ -266,13 +267,9 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
 
 #else
     // Oops ... user doesn't have a Fast Fourier Library
-    p->fillRect(0, 0, size.width(), size.height(), back);
-    p->setPen(Qt::white);
-    p->setFont(gContext->GetMediumFont());
-    p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, 
-                Qt::AlignCenter, QObject::tr("Visualization requires FFT library"));
-    p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, 
-                Qt::AlignCenter, QObject::tr("Did you run configure?"));
+    drawWarning(p, back, size,
+                QObject::tr("Visualization requires FFT library") + "\n" + 
+                QObject::tr("Did you run configure?"));
 #endif
     
     return true;
@@ -304,10 +301,10 @@ AlbumArt::AlbumArt(MainVisual *parent)
     if (dec)
     {
         filename = dec->getFilename();
-        directory = filename.left(filename.findRev("/"));
+        directory = QUrl(filename).dirPath();
     }
 
-    fps = 20;
+    fps = 1;
 }
 
 AlbumArt::~AlbumArt()
@@ -325,57 +322,66 @@ bool AlbumArt::process(VisualNode *node)
     return true;
 }
 
+bool AlbumArt::needsUpdate() {
+    if (cursize != size)
+        return true;
+
+    if (filename != pParent->decoder()->getFilename()) {
+        QString curdir = QUrl(pParent->decoder()->getFilename()).dirPath();
+        if (directory != curdir)
+            return true;
+    }
+
+    return false;
+}
+
+QString AlbumArt::getImageFilename() 
+{
+    QString result;
+    QString curfile = pParent->decoder()->getFilename();
+    QString curdir = QUrl(curfile).dirPath();
+    QString namefilter = gContext->GetSetting("AlbumArtFilter",
+                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+    // Get directory contents based on filter
+    QDir folder(curdir, namefilter, QDir::Name | QDir::IgnoreCase, 
+                QDir::Files | QDir::Hidden);
+    
+    if (folder.count())
+        result = folder[rand() % folder.count()];
+
+    result.prepend("/");
+    result.prepend(curdir);
+    
+    return result;
+}
+
 bool AlbumArt::draw(QPainter *p, const QColor &back)
 {
     if (!pParent->decoder())
         return false;
 
-    QString curfile = pParent->decoder()->getFilename();
-    QString curdir = curfile.left(curfile.findRev("/"));
-    QImage art;
- 
     // If the directory has changed (new album) or the size, reload
-    if ((directory.compare(curdir) != 0) || (cursize != size))
+    if (needsUpdate())
     {
-        // Directory has changed
-        directory = curdir;
-        // Get filter
-        QString namefilter = gContext->GetSetting("AlbumArtFilter",
-                                              "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
-        // Get directory contents based on filter
-        QDir folder(curdir, namefilter, QDir::Name | QDir::IgnoreCase, 
-                    QDir::Files | QDir::Hidden);
-
-        QString fileart = "";
-
-        if (folder.count())
-            fileart = folder[rand() % folder.count()];
-
-        curdir.append("/");
-        curdir.append(fileart);
-        art.load(curdir);
+        QImage art(getImageFilename());
         if (art.isNull())
         {
-            p->fillRect(0, 0, size.width(), size.height(), back);
-            p->setPen(Qt::white);
-            p->setFont(gContext->GetMediumFont());
-            p->drawText(size.width() / 2 - 200, size.height() / 2 - 10, 400, 20, 
-                        Qt::AlignCenter, QObject::tr("?"));
+            drawWarning(p, back, size, QObject::tr("?"));
+            cursize = size;
             return true;
         }
-
-        QSize artsize = art.scale(size, QImage::ScaleMin).size();
-
-        // Paint the image
-        p->fillRect(0, 0, size.width(), size.height(), back);
-        p->drawPixmap((size.width() - artsize.width()) / 2,
-                      (size.height() - artsize.height()) / 2,
-                      art.smoothScale(size, QImage::ScaleMin));
-        // Store our new size
-        cursize = size;
-        return true;
+        image = art.smoothScale(size, QImage::ScaleMin);
     }
-    art.reset();
+
+    // Paint the image
+    p->fillRect(0, 0, size.width(), size.height(), back);
+    p->drawPixmap((size.width() - image.width()) / 2,
+                  (size.height() - image.height()) / 2,
+                  image);
+    
+    // Store our new size
+    cursize = size;
+
     return true;
 }
 
@@ -446,6 +452,103 @@ VisualBase *BlankFactory::create(MainVisual *parent, long int winid)
     return new Blank();
 }
 
+Squares::Squares()
+{
+    number_of_squares = 16;
+    fake_height = number_of_squares * analyzerBarWidth;
+}
+
+Squares::~Squares()
+{
+}
+
+void Squares::resize (const QSize &newsize) {
+    // Trick the spectrum analyzer into calculating 16 rectangles
+    Spectrum::resize (QSize (fake_height, fake_height));
+    // We have our own copy, Spectrum has it's own...
+    size = newsize;
+}
+
+void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h) 
+{
+    double r, g, b, per;
+    int correction = (size.width() % rects.size ()) / 2;
+    int x = ((i / 2) * w) + correction;
+    int y;
+
+    if (i % 2 == 0) 
+    {
+        y = c - h;
+        per = double(fake_height - rect->top()) / double(fake_height);
+    }
+    else
+    {
+        y = c;
+        per = double(rect->bottom()) / double(fake_height);
+    }
+
+    per = clamp(per, 1.0, 0.0);        
+    
+    r = startColor.red() + 
+        (targetColor.red() - startColor.red()) * (per * per);
+    g = startColor.green() + 
+        (targetColor.green() - startColor.green()) * (per * per);
+    b = startColor.blue() + 
+        (targetColor.blue() - startColor.blue()) * (per * per);
+    
+    r = clamp(r, 255.0, 0.0);
+    g = clamp(g, 255.0, 0.0);
+    b = clamp(b, 255.0, 0.0);
+
+    p->fillRect (x, y, w, h, QColor (int(r), int(g), int(b)));
+}
+
+bool Squares::draw(QPainter *p, const QColor &back)
+{
+    p->fillRect (0, 0, size.width (), size.height (), back);
+    int w = size.width () / (rects.size () / 2);
+    int h = w;
+    int center = size.height () / 2;
+
+#if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
+    QRect *rectsp = rects.data();
+    for (uint i = 0; i < rects.count(); i++)
+        drawRect(p, &(rectsp[i]), i, center, w, h);
+
+#else
+    // Oops ... user doesn't have a Fast Fourier Library
+    drawWarning(p, back, size,
+                QObject::tr("Visualization requires FFT library") + "\n" + 
+                QObject::tr("Did you run configure?"));
+#endif
+    
+    return true;
+
+    for (int x = 0; x < size.width (); x += w) {
+        p->fillRect (x, center - h / 2, w, h, QColor ("red"));
+        p->fillRect (x, center + h / 2, w, h, QColor ("blue"));
+    }
+    return true;
+}
+
+const QString &SquaresFactory::name(void) const
+{
+    static QString name("Squares");
+    return name;
+}
+
+const QString &SquaresFactory::description(void) const
+{
+    static QString name("Square visualizer");
+    return name;
+}
+
+VisualBase *SquaresFactory::create(MainVisual *parent, long int winid)
+{
+    (void)winid;
+    (void)parent;
+    return new Squares();
+}
 
 #ifdef OPENGL_SUPPORT
 

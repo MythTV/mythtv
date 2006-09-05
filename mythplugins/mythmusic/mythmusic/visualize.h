@@ -51,11 +51,11 @@ class Spectrum : public VisualBase
     Spectrum();
     virtual ~Spectrum();
 
-    void resize(const QSize &size);
+    virtual void resize(const QSize &size);
     bool process(VisualNode *node);
-    bool draw(QPainter *p, const QColor &back = Qt::black);
+    virtual bool draw(QPainter *p, const QColor &back = Qt::black);
 
-  private:
+  protected:
     inline double clamp(double cur, double max, double min);
 
     QColor startColor, targetColor;
@@ -93,12 +93,15 @@ class AlbumArt : public VisualBase
     void resize(const QSize &size);
     bool process(VisualNode *node = 0);
     bool draw(QPainter *p, const QColor &back = Qt::black);
+    bool needsUpdate();
+    QString getImageFilename();
 
   private:
     QSize size, cursize;
     QString filename;
     QString directory;
     MainVisual *pParent;
+    QImage image;
 };
 
 class AlbumArtFactory : public VisFactory
@@ -125,6 +128,31 @@ class Blank : public VisualBase
 };
 
 class BlankFactory : public VisFactory
+{
+  public:
+    const QString &name(void) const;
+    const QString &description(void) const;
+    VisualBase *create(MainVisual *parent, long int winid);
+};
+
+class Squares : public Spectrum
+{
+  public:
+    Squares();
+    virtual ~Squares();
+    
+    void resize (const QSize &newsize);
+    bool draw(QPainter *p, const QColor &back = Qt::black);
+
+  private:
+    void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
+    QSize size;
+    MainVisual *pParent;
+    int fake_height;
+    int number_of_squares;
+};
+
+class SquaresFactory : public VisFactory
 {
   public:
     const QString &name(void) const;

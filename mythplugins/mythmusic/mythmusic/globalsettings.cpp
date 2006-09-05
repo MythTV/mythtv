@@ -384,7 +384,7 @@ static HostLineEdit *VisualizationMode()
     gc->setHelpText(QObject::tr("List of visualizations to use during playback. "
                     "Possible values are space-separated list of ") + "Random, "
                     "MonoScope, StereoScope, Spectrum, BumpScope, Goom, "
-                    "Synaesthesia, AlbumArt, Gears, " + QObject::tr("and") +
+                    "Synaesthesia, AlbumArt, Gears, Squares " + QObject::tr("and") +
                     " Blank");
     return gc;
 };

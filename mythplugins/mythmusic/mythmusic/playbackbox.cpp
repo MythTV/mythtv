@@ -42,6 +42,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     mainvisual = NULL;
     visual_mode_timer = NULL;
     lcd_update_timer = NULL;
+    banner_timer = NULL;
     waiting_for_playlists_timer = NULL;
     playlist_tree = NULL;
     playlist_popup = NULL;    
@@ -61,6 +62,9 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     curSmartPlaylistCategory = "";
     curSmartPlaylistName = "";
     
+    banner_timer = new QTimer(this);
+    connect(banner_timer, SIGNAL(timeout()), this, SLOT(bannerDisable()));
+
     menufilters = gContext->GetNumSetting("MusicMenuFilters", 0);
 
     cd_reader_thread = NULL;
@@ -367,7 +371,10 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             showMenu();
         }
         else if (action == "INFO")
-            showEditMetadataDialog();
+            if (visualizer_status == 2) 
+                bannerToggle(curMeta);
+            else
+                showEditMetadataDialog();
         else
             handled = false;
     }
@@ -401,6 +408,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                                             160, 160);
                 setUpdatesEnabled(true);
                 mainvisual->setVisual(visual_workaround);
+                bannerDisable();
 
                 if (!m_parent->IsExitingToMain())
                     handled = true;
@@ -1122,6 +1130,7 @@ void PlaybackBoxMusic::play()
 
         decoder->start();
 
+        bannerEnable(curMeta);
         isplaying = true;
         curMeta->setLastPlay();
         curMeta->incPlayCount();    
@@ -1135,7 +1144,35 @@ void PlaybackBoxMusic::visEnable()
         setUpdatesEnabled(false);
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;
+    } 
+    else 
+    {
+        bannerDisable();
     }
+}
+
+void PlaybackBoxMusic::bannerEnable(Metadata *mdata)
+{
+    if (visualizer_status != 2) 
+        return;
+    
+    banner_timer->start(8000);
+    mainvisual->addInformation("\"" + mdata->Title() + "\"\n" + 
+                               mdata->Artist() + " - " + mdata->Album());
+}
+
+void PlaybackBoxMusic::bannerToggle(Metadata *mdata) 
+{
+    if (banner_timer->isActive())
+        bannerDisable();
+    else
+        bannerEnable(mdata);
+}
+
+void PlaybackBoxMusic::bannerDisable()
+{
+    banner_timer->stop();
+    mainvisual->addInformation("");
 }
 
 void PlaybackBoxMusic::CycleVisualizer()
@@ -1905,6 +1942,7 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
             mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 
                                     160, 160);
         mainvisual->setVisual(visual_mode);
+        bannerDisable();
         visualizer_status = 1;
         if(visual_mode_delay > 0)
         {

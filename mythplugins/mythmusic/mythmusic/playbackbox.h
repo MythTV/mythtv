@@ -67,6 +67,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void checkForPlaylists();
     void handleTreeListSignals(int, IntVector*);
     void visEnable();
+    void bannerDisable();
     void changeVolume(bool up_or_down);
     void toggleMute();
     void resetTimer();
@@ -109,6 +110,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void openOutputDevice(void);
     void postUpdate();
     void playFirstTrack();
+    void bannerEnable(Metadata *mdata);
+    void bannerToggle(Metadata *mdata);
 
     QIODevice *input;
     AudioOutput *output;
@@ -159,6 +162,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     int visual_mode_delay;
     QTimer *visual_mode_timer;
     QTimer *lcd_update_timer;
+    QTimer *banner_timer;
     int visualizer_status;
 
     bool showrating;
