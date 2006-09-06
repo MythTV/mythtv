@@ -21,7 +21,7 @@
     </font>
 
     <container name="menu">
-      <area>64,36,180,240</area>
+      <area>64,36,180,500</area>
 
       <listbtnarea name="menu" draworder="0">
         <area>0,0,180,240</area>
