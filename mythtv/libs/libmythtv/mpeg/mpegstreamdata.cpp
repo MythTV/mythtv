@@ -199,10 +199,11 @@ void MPEGStreamData::DeletePartialPES(uint pid)
 PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                                         bool &moreTablePackets)
 {
+    bool broken = true;
     moreTablePackets = true;
 
     PESPacket* partial = GetPartialPES(tspacket->PID());
-    if (partial && partial->AddTSPacket(tspacket))
+    if (partial && partial->AddTSPacket(tspacket, broken) && !broken)
     {
         // check if it's safe to read pespacket's Length()
         if ((partial->PSIOffset() + 1 + 3) > partial->TSSizeInBuffer())
@@ -270,7 +271,10 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         return psip;
     }
     else if (partial)
-    {    
+    {
+        if (broken)
+            DeletePartialPES(tspacket->PID());
+
         moreTablePackets = false;
         return 0; // partial packet is not yet complete.
     }

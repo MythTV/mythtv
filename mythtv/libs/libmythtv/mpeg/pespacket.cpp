@@ -18,8 +18,9 @@ extern "C" {
 using namespace std;
 
 // return true if complete or broken
-bool PESPacket::AddTSPacket(const TSPacket* packet)
+bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
 {
+    broken = true;
     if (!tsheader()->PayloadStart())
     {
         VERBOSE(VB_RECORD, "Error: We started a PES packet, "
@@ -78,6 +79,8 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
         return true;
     }
 
+    // packet is correct or incomplete
+    broken = false;
     // check if it's safe to call Length
     if ((_psiOffset + 1 + 3) <=  _pesdataSize)
     {

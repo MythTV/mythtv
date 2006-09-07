@@ -138,7 +138,7 @@ class PESPacket
     bool IsClone() const { return bool(_allocSize); }
 
     // return true if complete or broken
-    bool AddTSPacket(const TSPacket* tspacket);
+    bool AddTSPacket(const TSPacket* tspacket, bool &broken);
 
     bool IsGood() const { return !_badPacket; }
 
@@ -252,7 +252,7 @@ class PESPacket
   private:
     uint _psiOffset;    ///< AFCOffset + StartOfFieldPointer
     uint _ccLast;       ///< Continuity counter of last inserted TS Packet
-    uint _pesdataSize;  ///< Number of bytes containing PES data
+    uint _pesdataSize;  ///< Number of data bytes (TS header + PES data)
     uint _allocSize;    ///< Total number of bytes we allocated
     bool _badPacket;    ///< true if a CRC is not good yet
 };
