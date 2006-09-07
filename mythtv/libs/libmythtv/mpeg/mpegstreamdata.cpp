@@ -640,6 +640,11 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     if (!psip)
        return;
 
+    // drop stuffing packets
+    if ((TableID::ST       == psip->TableID()) ||
+        (TableID::STUFFING == psip->TableID()))
+        DONE_WITH_PES_PACKET();
+
     // Validate PSIP
     // but don't validate PMT/PAT if our driver has the PMT/PAT CRC bug.
     bool buggy = _have_CRC_bug &&
