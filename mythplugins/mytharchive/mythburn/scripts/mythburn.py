@@ -31,7 +31,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20060903-1"
+VERSION="0.1.20060907-1"
 
 
 ##You can use this debug flag when testing out new themes
@@ -47,7 +47,7 @@ defaultEncodingProfile = "SP"
 #*********************************************************************************
 #Dont change the stuff below!!
 #*********************************************************************************
-import os, string, socket, sys, getopt, traceback
+import os, string, socket, sys, getopt, traceback, signal
 import xml.dom.minidom
 import Image, ImageDraw, ImageFont
 import MySQLdb, codecs
@@ -1363,7 +1363,7 @@ def encodeNuvToMPEG2(chanid, starttime, destvideofile, folder, profile, usecutli
     write("Running ffmpeg")
     result = runCommand(command)
     if result != 0:
-        os.kill(PID, SIGKILL)
+        os.kill(PID, signal.SIGKILL)
         fatalError("Failed while running ffmpeg to re-encode video.\n"
                    "Command was %s" % command)
 
