@@ -722,9 +722,9 @@ class SkipBtAudio: public CheckBoxSetting, public CCSetting
     {
         setLabel(QObject::tr("Do not adjust volume"));
         setHelpText(
-            QObject::tr("Check this option for budget BT878 based "
-                        "DVB-T cards such as the AverTV DVB-T that "
-                        "require the audio volume left alone."));
+            QObject::tr("Enable this option for budget BT878 based "
+                        "DVB-T cards such as the AverTV DVB-T which "
+                        "require the audio volume to be left alone."));
    };
 };
 
@@ -787,7 +787,7 @@ class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
         setLabel(QObject::tr("Wait for SEQ start header."));
         setValue(true);
         setHelpText(
-            QObject::tr("Make the dvb-recording will drop packets from "
+            QObject::tr("Make the dvb-recording drop packets from "
                         "the card until a sequence start header is seen."));
     };
 };
@@ -802,7 +802,7 @@ class DVBOnDemand: public CheckBoxSetting, public CCSetting
         setValue(true);
         setHelpText(
             QObject::tr("This option makes the backend dvb-recorder "
-                        "only open the card when it is actually in-use leaving "
+                        "only open the card when it is actually in-use, leaving "
                         "it free for other programs at other times."));
     };
 };
@@ -992,7 +992,9 @@ class HDHomeRunDeviceID: public LineEditSetting, public CCSetting
         setValue("FFFFFFFF");
         setLabel(QObject::tr("Device ID"));
         setHelpText(QObject::tr("Device ID from the back of "
-                                "the HDHomeRun unit."));
+                                "the HDHomeRun unit.  You may use "
+                                "'FFFFFFFF' if there is only one unit "
+                                "on your your network."));
     }
 };
 
