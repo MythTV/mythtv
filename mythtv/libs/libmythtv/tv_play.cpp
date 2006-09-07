@@ -1212,7 +1212,7 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 {
     VERBOSE(VB_PLAYBACK, LOC + "StopStuff() -- begin");
 
-    if (prbuffer->isDVD())
+    if (prbuffer && prbuffer->isDVD())
     {
         VERBOSE(VB_PLAYBACK,LOC + " StopStuff() -- get dvd player out of still frame or wait status");
         prbuffer->DVD()->IgnoreStillOrWait(true);
