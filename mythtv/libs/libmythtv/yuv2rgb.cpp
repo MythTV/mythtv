@@ -696,6 +696,10 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
  * Fortunately, Mino Taoyama has provided an MMX optimised version too.
  */
 
+// Plain C function which is used for non-Vector-compatible dimensions
+static void non_vec_yuv420_2vuy (uint8_t *, uint8_t *, uint8_t *,
+                                 uint8_t *, int, int, int, int, int);
+
 #ifdef MMX
 static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
                              uint8_t * pu, uint8_t * pv,
@@ -711,6 +715,11 @@ static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
     
     int x,y;
     
+
+    if ((h_size % 16) | (v_size % 2))
+        return non_vec_yuv420_2vuy(image, py, pu, pv, h_size, v_size,
+                                   vuy_stride, y_stride, uv_stride);
+
     for(y = v_size/2; y--; )
     {
         ibuf1 = ibuf2;
@@ -779,6 +788,8 @@ static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
         ubuf += uv_stride;
         vbuf += uv_stride;
     }
+
+    emms();
 }
 
 #endif // MMX
