@@ -2560,14 +2560,20 @@ void PlaybackBox::showStoragePopup()
                              drawPopupFgColor, drawPopupBgColor,
                              drawPopupSelColor, "storage popup");
 
-    initPopup(popup, delitem, "", tr("A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low."));
+    initPopup(popup, delitem, "", "");
 
     QButton *storageButton;
 
+    storageButton = popup->addButton(tr("Change Recording Group"), this,
+                                     SLOT(showRecGroupChanger()));
+
+    popup->addButton(tr("Change Playback Group"), this,
+                     SLOT(showPlayGroupChanger()));
+
     if (delitem && delitem->GetAutoExpireFromRecorded())
-        storageButton = popup->addButton(tr("Disable Auto Expire"), this, SLOT(noAutoExpire()));
+        popup->addButton(tr("Disable Auto Expire"), this, SLOT(noAutoExpire()));
     else
-        storageButton = popup->addButton(tr("Enable Auto Expire"), this, SLOT(doAutoExpire()));
+        popup->addButton(tr("Enable Auto Expire"), this, SLOT(doAutoExpire()));
 
     if (delitem && delitem->UsesMaxEpisodes())
     {
@@ -2600,15 +2606,9 @@ void PlaybackBox::showRecordingPopup()
     popup->addButton(tr("Show Program Details"), this,
                      SLOT(showProgramDetails()));
 
-    popup->addButton(tr("Change Recording Group"), this,
-                     SLOT(showRecGroupChanger()));
-
     popup->addButton(tr("Change Recording Title"), this,
                      SLOT(showRecTitleChanger()));
     
-    popup->addButton(tr("Change Playback Group"), this,
-                     SLOT(showPlayGroupChanger()));
-
     popup->ShowPopup(this, SLOT(doCancel()));
     editButton->setFocus();
     
