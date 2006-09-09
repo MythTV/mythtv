@@ -25,6 +25,7 @@ class VisualNode;
 class LogScale;
 class QTimer;
 class VisFactory;
+class InfoWidget;
 
 class VisualNode
 {
@@ -110,8 +111,7 @@ signals:
 
 private:
     VisualBase *vis;
-    QString info;
-    QPixmap info_pixmap;
+    InfoWidget* info_widget;
     QPixmap pixmap;
     QPtrList<VisualNode> nodes;
     QTimer *timer;
@@ -120,6 +120,20 @@ private:
 
     QString current_visual_name;
     QStringList allowed_modes;
+};
+
+class InfoWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    InfoWidget(QWidget *parent = 0);
+    void addInformation(const QString &);
+    void paintEvent(QPaintEvent *);
+
+private:
+    QString info;
+    QPixmap info_pixmap;
 };
 
 class VisFactory

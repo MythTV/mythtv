@@ -115,6 +115,8 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
     setFont(gContext->GetBigFont());
     setCursor(QCursor(Qt::BlankCursor));
 
+    info_widget = new InfoWidget(this);
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / fps);
@@ -127,6 +129,9 @@ MainVisual::~MainVisual()
         delete vis;
         vis = 0;
     }
+
+    delete info_widget;
+    info_widget = 0;
 
     nodes.setAutoDelete(TRUE);
     nodes.clear();
@@ -302,7 +307,6 @@ void MainVisual::timeout()
         QPainter p(&pixmap);
         if (vis->draw(&p, Qt::black))
         {
-            p.drawPixmap((int)(pixmap.width() * 0.1), (int)(pixmap.height() * 0.8), info_pixmap);
             bitBlt(this, 0, 0, &pixmap);
         }
     } 
@@ -313,8 +317,6 @@ void MainVisual::timeout()
 
 void MainVisual::paintEvent(QPaintEvent *)
 {
-    QPainter p(&pixmap);
-    p.drawPixmap((int)(pixmap.width() * 0.1), (int)(pixmap.height() * 0.8), info_pixmap);
     bitBlt(this, 0, 0, &pixmap);
 }
 
@@ -325,6 +327,9 @@ void MainVisual::resizeEvent( QResizeEvent *event )
     QWidget::resizeEvent( event );
     if ( vis )
         vis->resize( size() );
+
+    info_widget->resize((int)(pixmap.width() * 0.8), (int)(pixmap.height() * 0.15));
+    info_widget->move((int)(pixmap.width() * 0.1), (int)(pixmap.height() * 0.8));
 }
 
 void MainVisual::customEvent(QCustomEvent *event)
@@ -359,51 +364,13 @@ void MainVisual::hideEvent(QHideEvent *e)
     QWidget::hideEvent(e);
 }
 
-void MainVisual::addInformation(const QString &new_info) {
-    if (new_info == info)
-        return;
-    
-    info = new_info;
-    if (info.isEmpty())
-    {        
-        info_pixmap.resize(0, 0);
-        return;
-    }
-
-    info_pixmap = QPixmap((int)(pixmap.width() * 0.8), 
-                          (int)(pixmap.height() * 0.15), 
-                          pixmap.depth ());
-    QPainter p(&info_pixmap);
-
-    int indent = int(info_pixmap.width() * 0.02);
-
-    p.fillRect(0, 0,
-               info_pixmap.width(), info_pixmap.height(),
-               QColor ("darkblue"));
-
-
-    p.setFont(gContext->GetMediumFont());
-
-    QFontMetrics fm(p.font());
-    int width = fm.width(info);
-    int height = fm.height() * (info.contains("\n") + 1);
-    int x = indent;
-    int y = indent;
-
-    QString info_copy = info;
-    for (int offset = 0; offset < height; offset += fm.height()) {
-        QString l = info_copy.left(info_copy.find("\n"));
-        p.setPen(Qt::black);
-        p.drawText(x + 2, y + offset + 2, width, height, Qt::AlignLeft, l);
-        p.setPen(Qt::white);
-        p.drawText(x, y + offset, width, height, Qt::AlignLeft, l);
-        info_copy.remove(0, l.length () + 1);
-    }
-}
-
 void MainVisual::registerVisFactory(VisFactory *vis)
 {
     visfactories->append(vis);
+}
+
+void MainVisual::addInformation(const QString &new_info) {
+    info_widget->addInformation(new_info);
 }
 
 VisualBase *MainVisual::createVis(const QString &name, MainVisual *parent,
@@ -448,6 +415,60 @@ VisualBase *MainVisual::randomVis(MainVisual *parent, long int winid)
     return vis;
 }
 */
+
+InfoWidget::InfoWidget(QWidget *parent)
+    : QWidget( parent)
+{
+    hide();
+}
+
+void InfoWidget::addInformation(const QString &new_info) {
+    if (new_info == info)
+        return;
+    
+    info = new_info;
+    if (info.isEmpty())
+    {        
+        hide();
+        return;
+    }
+
+    info_pixmap = QPixmap(width(), height()/*, pixmap.depth ()*/);
+    QPainter p(&info_pixmap);
+
+    int indent = int(info_pixmap.width() * 0.02);
+
+    p.fillRect(0, 0,
+               info_pixmap.width(), info_pixmap.height(),
+               QColor ("darkblue"));
+
+
+    p.setFont(gContext->GetMediumFont());
+
+    QFontMetrics fm(p.font());
+    int width = fm.width(info);
+    int height = fm.height() * (info.contains("\n") + 1);
+    int x = indent;
+    int y = indent;
+
+    QString info_copy = info;
+    for (int offset = 0; offset < height; offset += fm.height()) {
+        QString l = info_copy.left(info_copy.find("\n"));
+        p.setPen(Qt::black);
+        p.drawText(x + 2, y + offset + 2, width, height, Qt::AlignLeft, l);
+        p.setPen(Qt::white);
+        p.drawText(x, y + offset, width, height, Qt::AlignLeft, l);
+        info_copy.remove(0, l.length () + 1);
+    }
+
+    show();
+    repaint();
+}
+
+void InfoWidget::paintEvent ( QPaintEvent * ) 
+{
+    bitBlt(this, 0, 0, &info_pixmap); 
+}
 
 StereoScope::StereoScope()
 {
