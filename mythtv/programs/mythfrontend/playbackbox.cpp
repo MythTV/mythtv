@@ -2779,20 +2779,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     if (program->recstatus == rsRecording)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
 
-    // Remove this check and the auto expire buttons if a third button is added
-    // to the StoragePopup screen.  Otherwise for non-max-episode schedules,
-    // the popup will only show one button
-    if (delitem && delitem->UsesMaxEpisodes())
-    {
-        popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
-    } else {
-        if (delitem && delitem->GetAutoExpireFromRecorded())
-            popup->addButton(tr("Disable Auto Expire"), this,
-                             SLOT(noAutoExpire()));
-        else
-            popup->addButton(tr("Enable Auto Expire"), this, SLOT(doAutoExpire()));
-    }
-
+    popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
     popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
     popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
 
