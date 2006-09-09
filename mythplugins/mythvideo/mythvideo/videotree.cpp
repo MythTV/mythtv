@@ -138,6 +138,10 @@ class VideoTreeImp
                 if (!video_poster->isShown())
                     video_poster->show();
             }
+            else
+            {
+                video_poster->ResetImage();
+            }
         }
         else
         {
