@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2006-, v0.20
+<date>2006-09-10, v0.20
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -373,9 +373,10 @@ at deletion, so you may want to try it if XFS gives you problems.  MythTV
 .20 also incorporates a "slow delete" feature, which progressively shrinks
 the file rather than attempting to delete it all at once, so if you're more
 comfortable with a filesystem such as ext3 (whose delete performance for
-large files isn't that good) you may use it as well.  There are other
-ramifications to using XFS and JFS - neither offer the opportunity to shrink
-a filesystem; they may only be expanded.
+large files isn't that good) you may use it rather than one of the
+known-good high-performance file systems.  There are other ramifications to
+using XFS and JFS - neither offer the opportunity to shrink a filesystem;
+they may only be expanded.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -491,7 +492,9 @@ name="http://www.linuxtv.org/wiki/index.php/Main_Page"> for more
 information.
 
 In the United States, you may use a card such as the TwinHan to obtain
-unencrypted Free-To-Air satellite channels.
+unencrypted Free-To-Air satellite channels.  See <url
+url="http://www.lyngsat.com/" name="http://www.lyngsat.com/"> for the types
+of content which is available.
 
 <sect3>HDTV.
 <p>There are a number of HDTV cards with Linux drivers which are known to
@@ -572,7 +575,7 @@ playlist for the channels, you can construct one for your own use (you do
 not need to download it from the same server as the streams themselves).
 
 UDP MPEG-2 TS and MPEG-4 TS recording is supported by the CRC IP Network
-recorder, but this recorder only supports recording a single channel per
+recorder, but this recorder only supports recording of a single channel per
 recorder.
 
 <bf>NOTE</bf>: Some DSL providers only allow you to use one recorder at a
@@ -612,8 +615,9 @@ name="btaudio"> section for more information.
 <figure loc="here">
 <eps file="warning" height="1cm">
 <img src="warning.png">
-<caption><bf>NOTE</bf>:  The MPEG-2 cards supported by the IVTV driver do not require
-a sound card for audio capture.
+<caption><bf>NOTE</bf>:  Analog video capture cards are the only ones which
+require a soundcard for capturing audio.  DVB, HDTV, and other hardware encoder cards all provide a
+combined audio / video stream.
 </caption>
 </figure>
 
@@ -646,13 +650,13 @@ If you want to use MythTV with a standard television, you will need a
 physical connection from your video card to your TV set, which can either be
 a TV-out port on the card itself or an external adapter that converts the
 VGA signal to an appropriate video signal. "Appropriate" depends on a number
-of factors, such as video standard (NTSC vs. PAL) type of input connection
-(Composite vs. SVideo), etc.
+of factors, such as video standard (NTSC vs. PAL), the type of input
+connection (Composite vs. SVideo), etc.
 
 Note that with some video cards and X drivers, XVideo extensions are
 only supported on the VGA output, and not on the TV output.
 
-<sect2>Cards with TV out
+<sect2>Cards with TV-out
 <p>The next section deals with a number of cards that are known to have
 TV-out ports.  The list is unlikely to be complete, so if you know of
 others, please post a message to the mythtv-users mailing list so the
@@ -703,19 +707,6 @@ name="http://www.nvidia.com/object/unix.html"> for more information.
 NVIDIA drivers; they have excellent support for XvMC and ship with a good
 configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.
-
-<sect3>Savage
-<p>The standard savage X driver supports TV out on some Savage cards. 
-Unfortunately, XVideo support for the Savage 2000 card (a very common and 
-inexpensive Savage card with TV out) is broken. See 
-<url url="http://www.probo.com/timr/savage40.html"
-name="http://www.probo.com/timr/savage40.html"> for details.
-
-Specific cards:
-<itemize>
-<item>Savage 2000 AGP. Has Composite and SVideo ports. Does not support XVideo.
-<item>S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
-</itemize>
 
 <sect3>Hauppauge PVR-350 <label id="PVR-350">
 <p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
@@ -844,7 +835,7 @@ And finally:
 These steps however, do NOT perform the installation of any drivers required
 for <bf>ALSA</bf>, capture cards, <bf>lirc kernel modules</bf>, etc., nor do
 they set up your MythTV database. Check <url
-url="http://ATrpms.net/topic/multimedia/" name="ATrpms"> for the drivers you
+url="http://ATrpms.net/topic/multimedia/" name="http://ATrpms.net/topic/multimedia/"> for the drivers you
 need.
 
 <sect3>Mandriva
@@ -894,89 +885,36 @@ can use command-line utilities.  Either system will get the job done, and it
 all depends on your comfort level with Linux.
 
 In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2006-01-17, this list includes <bf>mysql</bf>,
-<bf>gcc</bf>, <bf>freetype2-devel</bf>, <bf>xorg-xserver-devel</bf>,
-<bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a remote
-control with MythTV, you're going to need the <bf>cdialog</bf> package in
-order to compile <bf>lircd</bf> if your distribution doesn't have a
-pre-packaged <bf>lirc</bf>.  If you are using <bf>XMLTV</bf> as a grabber,
-you will need <bf>perl</bf>.
+is installed.  This list includes <bf>mysql</bf>, <bf>gcc</bf>,
+<bf>freetype2-devel</bf>, <bf>xorg-xserver-devel</bf>, <bf>qt-devel</bf> and
+<bf>lame</bf>.  If you're going to use a remote control with MythTV, you're
+going to need the <bf>cdialog</bf> package in order to compile
+<bf>lircd</bf> if your distribution doesn't have a pre-packaged
+<bf>lirc</bf>.  If you are using <bf>XMLTV</bf> as a grabber, you will need
+<bf>perl</bf>.
 
 <code>
-NOTE:  Qt v3.2 or higher, but less than Qt v4.0, is required.
+NOTE:  Qt v3.2 or higher is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
-headers for compiling packages.  If you're having trouble compiling, ensure
+headers for compiling.  If you're having trouble compiling, ensure
 that you've installed the -devel version of a prerequisite.
 </code>
-
-<sect2>Graphical installation tools <label id="graphicinstalltools_">
-<sect3>Mandriva
-<p><bf>NOTE</bf>:  As of 2006-01-17 the following section should be
-considered out of date.  If no updates are submitted prior to the release of
-v0.20, they will be considered abandoned and removed from the HOWTO.
-<p>On systems running KDE, a tool which will allow you to see what packages
-are available and if they're installed on your system can be accessed by
-clicking K->Configuration->Packaging->KPackage
-
-While the graphical tools are nice, the command line tool is actually easier
-to use.  It's strongly recommended that you use the command line tool.
-
-There are many inter-related modules, so make sure that you've got the
-main package for each one, and not a sub package for an unrelated item.  For
-example, there are many modules that have "perl" in them; some are a part of
-the apache web server, others are a part of the perl distribution.  In each
-case, we're looking to make sure that the primary module is getting
-installed.
-
-Click the magnifying glass or press <bf>CTRL-F</bf> and enter "perl" as your
-search term.  You should find it under the "Perl" folder.  You need at least
-the perl 5.80 base package installed.  If not, click on the "Mark" button.
-
-If you are going to be installing MySQL on this system, search for mysql -
-it should be under "Databases".  Make sure that mysql and mysql-clients are
-installed.  If not, click on "Mark".
-
-Search for gcc.  You're going to need gcc and gcc-c++ installed.
-
-Search for freetype2.  Make sure that you've got freetype2 and
-freetype2-devel installed.
-
-Search for XFree86-devel.
-
-Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
-Qt") and libqt3 ("Libraries").
-
-<figure loc="here">
-<eps file="warning.eps" height="1cm">
-<img src="warning.png">
-<caption>NOTE for Mandriva users:  In versions after Mandriva 9.1, Mandriva
-removed the MySQL modules from the default installation.  Ensure that you
-install libqt3-mysql.
-</caption>
-</figure>
-
-Make sure that cdialog is installed if you want to use MythTV with a remote
-control if you need to compile <bf>lirc</bf> from source.
-
-alsa-utils is needed for setting the volume.  MythTV now has native volume
-support, but you may have a special configuration that necessitates an
-external program to adjust your volume settings.  If this is the case, then
-you can disable native volume support.
-
-If you marked anything to install, click on Install Marked.  Click "Yes" or
-OK if you get a message about satisfying dependencies.
 
 <sect2>Command-line installation <label id="CLIinstalltools_">
 <p> This section details the various methods for installing prerequisites
 from the command line.
 
 <sect3>Mandriva
-<p><bf>urpmi</bf> is the simplest tool for installation of packages from the
+<p><bf>NOTE</bf>:  The following instructions should be considered out of
+date as of 2006-09-10.  If updated instructions are not submitted by the
+release of v0.21 of MythTV they will be removed.
+
+<bf>urpmi</bf> is the simplest tool for installation of packages from the
 command line, but properly configuring it can be difficult.  The
-following website <url url="http://addmedia.linuxfornewbies.org/"
-name="http://addmedia.linuxfornewbies.org/"> will allow you to choose
+following website <url url="http://easyurpmi.zarb.org/"
+name="http://easyurpmi.zarb.org/"> will allow you to choose
 a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
@@ -1006,6 +944,7 @@ In that case, you're ready to move to the next <ref id="Setting_up_paths"
 name="section">.  Once you have completed installing the pre-requisites,
 exit out of the shell and start a new one to ensure that any environment
 variables setup by the installation have a chance to take effect.
+
 <sect3>Gentoo. 
 <p>If Qt has not been installed on your system: Edit
 <tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
@@ -1059,7 +998,7 @@ help if the packager skipped a step in their packaging.
 <sect2>General requirements
 <p>MythTV is written in C++ and requires a fairly complete, but standard, 
 compilation environment, including a recent g++ compiler, <tt>make</tt>, and 
-appropriate headers files for shared libraries. Any standard Linux 
+appropriate header files for shared libraries. Any standard Linux 
 distribution should be able to install a suitable compilation environment 
 from its packaging system. Section 3.2 of this HOWTO provides some details 
 of how to install the required environment for many distributions.
@@ -1166,16 +1105,6 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.
-<sect3>Red Hat Linux 9
-<p><bf>NOTE</bf>: This section will be considered abandoned as of v0.20.
-<p>Red Hat Linux 9 use a default locale with UTF-8 encoding.
-Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
-whenever you run mythtv-setup or mythfilldatabase you will get a lot of 
-UTF-8 warnings. There is an 
-<url url="http://membled.com/work/patches/DateManip/"
-name="http://membled.com/work/patches/DateManip/"> updated version of
-Date::Manip at the XMLTV site fixing this and other XMLTV related
-bugs.
 
 <sect2>Device Permissions <label id="devperms">
 <p>MythTV will need access to the video4linux devices on your system.  By
@@ -1199,13 +1128,13 @@ and replace it with
 What we're doing is allowing read and write access to the files in the
 video4linux directory.
 <sect>Downloading and compiling. <label id="DownloadAndCompile">
-<p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
-web site.  There are two installation methods you may choose from.  The
-first is to download the latest release in tarball format and compile.  The
-tarball release of MythTV should work on a wide variety of systems and
-should be the preferred method for new users.  If you wish to use the
-<bf>subversion</bf> copy of MythTV you may obtain it from <url
-url="http://svn.mythtv.org" name="http://svn.mythtv.org">
+<p>Get MythTV from the <url url="http://www.mythtv.org"
+name="http://www.mythtv.org"> web site.  There are two installation methods
+you may choose from.  The first is to download the latest release in tarball
+format and compile.  The tarball release of MythTV should work on a wide
+variety of systems and should be the preferred method for new users.  If you
+wish to use the <bf>subversion</bf> copy of MythTV you may obtain it from
+<url url="http://svn.mythtv.org" name="http://svn.mythtv.org">
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -1227,7 +1156,7 @@ skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.42).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.44).
 
 <code>
 NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
@@ -1302,7 +1231,7 @@ and skip straight to the XMLTV compilation step.
 <p>
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.42.tar.bz2
+$ tar -xjf xmltv-0.5.44.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites.  The following prerequisites are the
 minimum required; when you actually start running the xmltv setup program it
@@ -1321,7 +1250,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.42
+$ cd xmltv-0.5.44
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1508,7 +1437,7 @@ on the <bf>mythfrontend</bf> executable. This <bf>opens a security hole</bf>,
 but is the only option on systems that do not support either
 rlimits or the realtime module. This does not work on modern
 distributions either, and is <bf><em>not recommended</em></bf>
-on any system connected to the internet. This may also make it
+on any system connected to the Internet. This may also make it
 impossible to debug MythTV without running <bf>gdb</bf> as root. If you
 would still like to do this, you just need to run this as root:
 <tscreen><verb>
@@ -1676,18 +1605,19 @@ mysql> flush privileges;
 </verb></tscreen>
 
 <sect>Configuring Sound.
-<p>If your video doesn't appear to be in-sync with your audio, it could be
-because you are listening to the real-time audio from your video card rather
-than after it's been processed and synchronized to the video by MythTV. 
-Because MythTV is a personal video recorder, "Live TV" isn't really live -
-to let you pause live TV, MythTV is actually encoding the video, saving to
-disk, and then playing it back.  This procedure puts your MythTV "live" TV
-about 2 seconds behind real-time, so it's important that you're not
-listening to the live audio.  However, if you're having an issue where the
-audio and video aren't synchronized by small but varying amount, it's most
-likely because the sound driver that you're using doesn't have the
+<p>If your video doesn't appear to be in-sync with your audio and you're
+using an analog video capture card and a soundcard to capture audio, it
+could be because you are listening to the real-time audio from your video
+card rather than after it's been processed and synchronized to the video by
+MythTV.  Because MythTV is a personal video recorder, "Live TV" isn't really
+live - to let you pause live TV, MythTV is actually encoding the video,
+saving to disk, and then playing it back.  This procedure puts your MythTV
+"live" TV about 2 seconds behind real-time, so it's important that you're
+not listening to the live audio.  However, if you're having an issue where
+the audio and video aren't synchronized by small but varying amount, it's
+most likely because the sound driver that you're using doesn't have the
 DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
-with newer versions (0.9).  See the <ref id="Troubleshooting_Audio"
+with newer versions.  See the <ref id="Troubleshooting_Audio"
 name="Troubleshooting Audio"> section for more information if you're having
 issues with sound.  Also, ensure that no other programs are grabbing the
 audio output, like <bf>arts</bf> or <bf>esd</bf>.
@@ -1713,28 +1643,9 @@ dark green, meaning that it's "off".  You also want to click on the red LED
 so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.
-<sect3>Using OSS drivers.
-<p><bf>NOTE</bf>: This section will be removed in 0.20.  ALSA is the kernel
-sound driver now.
-<p>Red Hat Linux and Fedora Core 1 ship with OSS sound drivers rather than
-the ALSA drivers recommended by the MythTV team. The OSS drivers do work for
-many people, and for many cards. We recommend that you give OSS a try since
-it is already included in the vendor distribution. However, some people
-report problems (sync and jitter) with OSS, and in addition it does not
-support full-duplex on some cards.  Full duplex is required if you want to
-record and play sound using just one sound card. ALSA has good full-duplex
-support, and also has drivers for some built-in (motherboard) sound cards
-that OSS does not. Installing ALSA is less painful than you might think, so
-if OSS does not work for you, installing ALSA is not too difficult. For
-those of you who do not wish to install ALSA you must do this:
 
-To configure sound to work with MythTV, select <verb>RedHat Menu>Sound &
-Video>Volume Control</verb> to open up a mixer. Make sure your global volume
-(on the far left) is up. Also make sure that the "line in" section has
-"mute" and "record" checked and that the gain is turned up. You may have to
-experiment with volume/gain levels to get the best sound.  
 <sect3>Using ALSA.
-<p>If you'd like to use ALSA, you'll need to correctly setup your
+<p>To use ALSA, you'll need to correctly setup your
 <tt>asoundrc</tt> file. Configuring this file is beyond the scope of this
 HOWTO.  Once ALSA is working correctly, change the output sound device in
 mythfrontend->setup->Audio from <tt>/dev/dsp</tt> to <tt>ALSA:default</tt>.
@@ -1746,8 +1657,9 @@ program can be used to setup the mixer.  The "Master" volume setting is only
 required on a frontend machine to ensure that the sound channels are unmuted
 and configured for outputting sound.  The "Line" and "Capture" controls are
 required for your sound card to actually capture audio from the external
-Line-in.  Not all sound cards have a "Capture" control, but if yours does
-and you don't set it then MythTV will not capture audio.
+Line-in if it's connected to an analog frame grabber.  Not all sound cards
+have a "Capture" control, but if yours does and you don't set it then MythTV
+will not capture audio.
 
 <code>
 Note the spelling in the following commands.
@@ -1814,22 +1726,6 @@ build process.
 <p>To install lirc on Gentoo, all you need to do is:
 <tscreen><verb>
 # emerge lirc
-</verb></tscreen>
-
-<sect1>Mandriva
-<p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandriva
-through the "cdialog" RPM, and the kernel source.  Mandriva 9.0 is using the
-2.4.19 kernel, so either install the kernel sources from the installation CD
-or go to <url url="http://www.kernel.org" name="http://www.kernel.org"> and
-download the full 2.4.19 tar file from <url
-url="http://www.kernel.org/pub/linux/kernel/v2.4/"
-name="http://www.kernel.org/pub/linux/kernel/v2.4/">.
-
-<sect2>Obtaining the kernel
-<p>Install using urpmi.
-<tscreen><verb>
-$ su
-# urpmi kernel-source
 </verb></tscreen>
 
 <sect1>Red Hat Linux/Fedora Core
@@ -7924,7 +7820,7 @@ System->Preferences->Sound uncheck Enable sound server startup
 
 </article>
 <!-- Revision History
-v0.20.00, 2006  Start prepping for 0.20.  Add HDHomeRun as a capture device.
+v0.20.00, 2006-09-10.  Start prepping for 0.20.  Add HDHomeRun as a capture device.
 Update URLs.  Move around some of the HDTV stuff.  Add a part about HDTV and
 capturing it in raw format (you can't, so stop asking).  Update information
 on filesystems and the slow delete feature.
