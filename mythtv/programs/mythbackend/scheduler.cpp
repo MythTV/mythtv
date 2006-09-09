@@ -1379,7 +1379,9 @@ void Scheduler::RunScheduler(void)
             statuschanged = true;
 
             bool is_rec = (nextRecording->recstatus == rsRecording);
-            msg = is_rec ? "Started recording" : "Canceled recording"; 
+            msg = is_rec ? "Started recording" : "Canceled recording (" +
+                nextRecording->RecStatusText() + ")"; 
+
             VERBOSE(VB_GENERAL, msg << ": " << details);
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
         }
