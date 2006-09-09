@@ -14,6 +14,30 @@
 #include "rom_metadata.h"
 #include "unzip.h"
 
+int calcOffset(QString GameType, uLong filesize) {
+    int result;
+    uLong rom_size;
+
+    result = 0;
+
+    if (GameType == "NES") {
+        result = 16;
+    }
+    else if (GameType == "SNES") {
+         rom_size = (filesize / 0x2000) * 0x2000;
+
+         if (rom_size < filesize)
+             result = filesize - rom_size;
+    }
+    else if (GameType == "PCE") {
+         if (filesize & 0x0FFF)
+             result = filesize & 0x0FFF;
+
+    }
+
+    return result;
+}
+
 // Return the crc32 info for this rom. (ripped mostly from the old neshandler.cpp source)
 uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
 {
@@ -27,11 +51,9 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
 
     int offset;
     unzFile zf;
+    int blocksize;
 
-    if (GameType == "NES") 
-        offset = 16;
-    else
-        offset = 0;
+    blocksize = 8192;
 
     if ((zf = unzOpen(romname)))
     {
@@ -43,13 +65,14 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
             {
                 err = unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
 
-                // Skip past iNes header
+                offset = calcOffset(GameType, file_info.uncompressed_size);
+
                 if (offset > 0)
                     unzReadCurrentFile(zf, block, offset);
 
                 // Get CRC of rom data
                 int count;
-                while ((count = unzReadCurrentFile(zf, block, 32768)) > 0)
+                while ((count = unzReadCurrentFile(zf, block, blocksize))  == blocksize)
                 {
                     crc = crc32(crc, (Bytef *)block, (uInt)count);
                 }   
@@ -74,12 +97,14 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
         QFile f(romname);
         if (f.open(IO_ReadOnly))
         {
+            offset = calcOffset(GameType, f.size());
+cerr << "Offset Size : " << f.size() << "   offset : " << offset << endl;
             if (offset > 0)
                 f.readBlock(block, offset);
 
             // Get CRC of rom data
             Q_LONG count;
-            while ((count = f.readBlock(block, 32768)))
+            while ((count = f.readBlock(block, blocksize)) == blocksize)
             {
                 crc = crc32(crc, (Bytef *)block, (uInt)count);
             }   
