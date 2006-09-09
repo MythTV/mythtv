@@ -62,12 +62,14 @@ bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
 
 uint ChannelBase::GetNextChannel(uint chanid, int direction) const
 {
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
-        return 0;
-
     if (!chanid)
+    {
+        InputMap::const_iterator it = inputs.find(currentInputID);
+        if (it == inputs.end())
+            return 0;
+
         chanid = ChannelUtil::GetChanID((*it)->sourceid, curchannelname);
+    }
 
     return ChannelUtil::GetNextChannel(allchannels, chanid, direction);
 }

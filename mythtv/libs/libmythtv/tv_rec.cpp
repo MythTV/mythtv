@@ -2863,25 +2863,52 @@ void TVRec::GetNextProgram(int direction,
     QString compare     = "<=";
     QString sortorder   = "desc";
     uint     chanid     = 0;
+    uint sourceChanid   = 0;
 
-    if (BROWSE_SAME == direction)
-        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
-    else if (BROWSE_UP == direction)
-        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_UP);
-    else if (BROWSE_DOWN == direction)
-        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_DOWN);
-    else if (BROWSE_FAVORITE == direction)
-        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_FAVORITE);
-    else if (BROWSE_LEFT == direction)
+    if (!chanidStr.isEmpty())
     {
-        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
-        compare = "<";
+        sourceChanid = chanidStr.toUInt();
+        chanid = sourceChanid;
+
+        if (BROWSE_UP == direction)
+            chanid = channel->GetNextChannel(chanid, CHANNEL_DIRECTION_UP);
+        else if (BROWSE_DOWN == direction)
+            chanid = channel->GetNextChannel(chanid, CHANNEL_DIRECTION_DOWN);
+        else if (BROWSE_FAVORITE == direction)
+            chanid = channel->GetNextChannel(chanid, CHANNEL_DIRECTION_FAVORITE
+);
+        else if (BROWSE_LEFT == direction)
+        {
+            compare = "<";
+        }
+        else if (BROWSE_RIGHT == direction)
+        {
+            compare = ">";
+            sortorder = "asc";
+        }
     }
-    else if (BROWSE_RIGHT == direction)
+
+    if (!chanid)
     {
-	chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
-        compare = ">";
-        sortorder = "asc";
+        if (BROWSE_SAME == direction)
+            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
+        else if (BROWSE_UP == direction)
+            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_UP);
+        else if (BROWSE_DOWN == direction)
+            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_DOWN);
+        else if (BROWSE_FAVORITE == direction)
+            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_FAVORITE);
+        else if (BROWSE_LEFT == direction)
+        {
+            chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
+            compare = "<";
+        }
+        else if (BROWSE_RIGHT == direction)
+        {
+	        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
+            compare = ">";
+            sortorder = "asc";
+        }
     }
 
     QString querystr = QString(
@@ -3999,6 +4026,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
                 "\n\t\t\tProgramInfo is invalid."
                 "\n" + prog->toString());
         prog->endts = prog->recendts = prog->recstartts.addSecs(3600);
+        prog->chanid = chanids;
     }
 
     if (!pseudoLiveTVRecording)

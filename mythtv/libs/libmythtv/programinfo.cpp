@@ -1521,11 +1521,21 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
 
     hostname = gContext->GetHostName();
     pathname = CreateRecordBasename(ext);
-    while (!insert_program(this, record))
+
+    int count = 0;
+    while (!insert_program(this, record) && count < 50)
     {
         recstartts = recstartts.addSecs(1);
         pathname = CreateRecordBasename(ext);
+        count++;
     }
+
+    if (count >= 50)
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't insert program");
+        return;
+    }
+
     pathname = prefix + "/" + pathname;
 
     MSqlQuery query(MSqlQuery::InitCon());
