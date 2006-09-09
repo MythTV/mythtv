@@ -716,7 +716,7 @@ static void mmx_yuv420_2vuy (uint8_t * image, uint8_t * py,
     int x,y;
     
 
-    if ((h_size % 16) | (v_size % 2))
+    if ((h_size % 16) || (v_size % 2))
         return non_vec_yuv420_2vuy(image, py, pu, pv, h_size, v_size,
                                    vuy_stride, y_stride, uv_stride);
 
@@ -868,7 +868,7 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     vector unsigned char uv_vec;
     vector unsigned char y_vec;
 
-    if (!((h_size % 32) | (v_size % 2)))
+    if (!((h_size % 32) || (v_size % 2)))
     {
         // Width is a multiple of 32, process 2 lines at a time
         for (y = v_size / 2; y--; )
@@ -883,7 +883,7 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
         }
     
     }
-    else if (!((h_size % 16) | (v_size % 4)))
+    else if (!((h_size % 16) || (v_size % 4)))
     {
         // Width is a multiple of 16, process 4 lines at a time
         for (y = v_size / 4; y--; )
@@ -1028,7 +1028,7 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
                          uv1_vec, uv2_vec,
                          uva_vec, uvb_vec;
 
-    if (!((h_size % 32) | (v_size % 2)))
+    if (!((h_size % 32) || (v_size % 2)))
     {
         // Width is a multiple of 32, process 2 lines at a time
         for (y = v_size / 2; y--; )
@@ -1043,7 +1043,7 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
         }
     
     }
-    else if (!((h_size % 16) | (v_size % 4)))
+    else if (!((h_size % 16) || (v_size % 4)))
     {
         // Width is a multiple of 16, process 4 lines at a time
         for (y = v_size / 4; y--; )
